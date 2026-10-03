@@ -675,6 +675,15 @@ async function applyRLS() {
     );`
     console.log('✓ RLS policies configured for signup risk events')
 
+    await sql`ALTER TABLE IF EXISTS ai_usage_events ENABLE ROW LEVEL SECURITY;`
+    await sql`DROP POLICY IF EXISTS ai_usage_events_server_only_policy ON ai_usage_events;`
+    await sql`CREATE POLICY ai_usage_events_server_only_policy ON ai_usage_events FOR ALL USING (
+      NULLIF(current_setting('request.jwt.claims', true), '') IS NULL
+    ) WITH CHECK (
+      NULLIF(current_setting('request.jwt.claims', true), '') IS NULL
+    );`
+    console.log('✓ RLS policies configured for AI usage events')
+
     await sql`ALTER TABLE IF EXISTS merch_products ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS merch_variants ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS merch_orders ENABLE ROW LEVEL SECURITY;`

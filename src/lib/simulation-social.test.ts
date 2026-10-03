@@ -38,6 +38,7 @@ import {
   pickCanonCitation,
   formatCanonCitationDirective,
   pickClusteredForumVote,
+  isSimulatedVoteWorthy,
   scoreForumVoteCandidate,
   detectCanonCitation,
   inferPostStance,
@@ -488,6 +489,26 @@ Mastering the 06:00 Priority Pincer Lock was the turning point. It stabilized my
         { topicRatio: 0, rng: () => 0.1 }
       )
       expect(vote).toEqual({ type: 'post', id: 'p-challenge' })
+    })
+
+    it('skips sunk and low-quality posts when picking a vote', () => {
+      expect(isSimulatedVoteWorthy({ qualityScore: 49 })).toBe(false)
+      expect(isSimulatedVoteWorthy({ qualityScore: 50 })).toBe(true)
+      expect(isSimulatedVoteWorthy({ qualityScore: null })).toBe(true)
+      expect(isSimulatedVoteWorthy({ qualityScore: 90, sunk: true })).toBe(false)
+
+      const vote = pickClusteredForumVote(
+        { id: 'voter', drive: 'contrarian', affinities: { rival: -0.2 } },
+        [{ id: 't1', userId: 'other', content: 'Low effort.', qualityScore: 10 }],
+        [
+          { id: 'p-weak', userId: 'rival', content: 'That duration is overstated; try 3 minutes instead.', topicId: 't1', qualityScore: 20 },
+          { id: 'p-sunk', userId: 'ally', content: 'Sure.', topicId: 't1', sunk: true },
+          { id: 'p-good', userId: 'ally', content: 'Yes, 8 minutes worked for me too.', topicId: 't1', qualityScore: 80 },
+        ],
+        new Set(),
+        { topicRatio: 0.45, rng: () => 0.1 }
+      )
+      expect(vote).toEqual({ type: 'post', id: 'p-good' })
     })
 
     it('scores canon-citing posts higher for archivists', () => {

@@ -8,7 +8,17 @@ import { verifyAuthJWT } from '../jwt'
 import { validateInputGuardrails, checkRateLimit } from './guardrails'
 import { buildSystemPrompt, DEFAULT_ORACLE_PERSONA } from './codex-prompt'
 import { ORACLE_JAILBREAK_ERROR, screenOraclePrompt } from '../quality/oracle-preflight'
-import { saveAIMessage, createAIThread, summarizeThreadTitle, updateAIThreadTitle, getOwnedAIThread } from './service'
+import {
+  saveAIMessage,
+  createAIThread,
+  summarizeThreadTitle,
+  updateAIThreadTitle,
+  getOwnedAIThread,
+  getOracleUsageSnapshot,
+  recordOracleUsage,
+  finalizeOracleUsage,
+} from './service'
+import { decideOracleUsage, ORACLE_MAX_OUTPUT_TOKENS } from './usage-limits'
 import {
   commitOracleTextStream,
   formatOracleUnavailableMessage,
@@ -84,12 +94,17 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   }
 
   const userId = authUserId
+  const lastMessage = messages[messages.length - 1]
+  if (lastMessage?.role !== 'user') {
+    return Response.json({ error: 'The last message must come from you.' }, { status: 400 })
+  }
   const userText = getLastUserText(messages)
 
   const clientIp =
     request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
     request.headers.get('x-real-ip') ||
     '127.0.0.1'
+  // Per-instance flood guard. The durable per-member limits are checked below.
   const rateLimit = checkRateLimit(userId || clientIp, 30, 60 * 1000)
   if (!rateLimit.success) {
     return Response.json(
@@ -106,20 +121,35 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     )
   }
 
-  const preflight = await screenOraclePrompt(guardrail.sanitizedText || userText)
-  if (preflight.blocked) {
-    return Response.json(
-      { error: preflight.reason || ORACLE_JAILBREAK_ERROR },
-      { status: 400 }
-    )
-  }
-
+  // Guests get a canned reply, so they never reach the moderation or chat models.
   if (!userId) {
     return Response.json({
       text: pickGuestOracleResponse(userText, messages.length),
       threadId: null,
       isGuest: true,
     })
+  }
+
+  try {
+    const snapshot = await getOracleUsageSnapshot(userId)
+    const usage = decideOracleUsage(snapshot, snapshot.isPremium)
+    if (!usage.allowed) {
+      return Response.json(
+        { error: usage.message, limit: usage.scope },
+        { status: 429, headers: { 'Retry-After': String(usage.retryAfterSeconds) } }
+      )
+    }
+  } catch (err) {
+    // The per-instance guard above still applies while the usage table is unreachable.
+    console.warn('[handleOracleChatRequest] Usage check unavailable:', err)
+  }
+
+  const preflight = await screenOraclePrompt(guardrail.sanitizedText || userText)
+  if (preflight.blocked) {
+    return Response.json(
+      { error: preflight.reason || ORACLE_JAILBREAK_ERROR },
+      { status: 400 }
+    )
   }
 
   let activeThreadId = body.threadId
@@ -148,6 +178,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   const payloadMessages = toModelMessages(messages)
   const candidateModels = orderOracleModels(body.model, preflight.preferredModelId)
   let lastError: Error | null = null
+  const usageEventId = await recordOracleUsage({ userId, kind: 'chat' })
 
   for (const modelCandidate of candidateModels) {
     const abortController = new AbortController()
@@ -158,8 +189,16 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
         model: modelCandidate as any,
         system: systemPrompt,
         messages: payloadMessages,
+        maxOutputTokens: ORACLE_MAX_OUTPUT_TOKENS,
         abortSignal: abortController.signal,
-        onFinish: async ({ text }) => {
+        onFinish: async ({ text, totalUsage }) => {
+          if (usageEventId) {
+            void finalizeOracleUsage(usageEventId, {
+              model: modelCandidate,
+              inputTokens: totalUsage?.inputTokens,
+              outputTokens: totalUsage?.outputTokens,
+            })
+          }
           if (!userId || !threadIdForSave) return
           try {
             if (text) {
@@ -173,7 +212,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
 
             if (shouldSummarizeTitle) {
               // Asynchronously summarize thread title in the background without blocking TTFT
-              summarizeThreadTitle(userText)
+              summarizeThreadTitle(userText, undefined, userId)
                 .then(async (aiTitle) => {
                   if (aiTitle && aiTitle !== initialThreadTitle) {
                     await updateAIThreadTitle(threadIdForSave, aiTitle, userId)

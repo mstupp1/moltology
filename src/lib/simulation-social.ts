@@ -7,7 +7,18 @@ import type {
   SimulatedTrait,
 } from '../db/schema'
 
+import { REPLY_SINK_QUALITY_BELOW } from './forum-standing'
+
 export type Rng = () => number
+
+/**
+ * Simulated members only upvote posts worth upvoting. Sunk posts and posts
+ * the moderation model scored low are skipped. Unscored posts stay eligible.
+ */
+export function isSimulatedVoteWorthy(target: { qualityScore?: number | null; sunk?: boolean | null }): boolean {
+  if (target.sunk) return false
+  return !(typeof target.qualityScore === 'number' && target.qualityScore < REPLY_SINK_QUALITY_BELOW)
+}
 
 export const DEFAULT_MUTATION_CHANCE = 0.12
 export const DEFAULT_MAX_TRAITS_PER_MEMBER = 3
@@ -301,6 +312,8 @@ export interface ForumPostCandidate {
   authorHandle?: string | null
   content: string
   createdAt?: string | Date | null
+  qualityScore?: number | null
+  sunk?: boolean | null
 }
 
 export interface ForumTopicCandidate {
@@ -1075,12 +1088,15 @@ export function pickClusteredForumVote(
     content?: string | null
     title?: string | null
     repliesCount?: number | null
+    qualityScore?: number | null
   }>,
   candidatePosts: Array<{
     id: string
     userId?: string | null
     content?: string | null
     topicId?: string | null
+    qualityScore?: number | null
+    sunk?: boolean | null
   }>,
   existingVoteKeys: Set<string>,
   options: {
@@ -1095,10 +1111,14 @@ export function pickClusteredForumVote(
     topicRatio <= 0
       ? []
       : candidateTopics.filter(
-          (topic) => topic.userId !== voter.id && !existingVoteKeys.has(`topic:${topic.id}`)
+          (topic) =>
+            topic.userId !== voter.id &&
+            !existingVoteKeys.has(`topic:${topic.id}`) &&
+            isSimulatedVoteWorthy(topic)
         )
   const eligiblePosts = candidatePosts.filter(
-    (post) => post.userId !== voter.id && !existingVoteKeys.has(`post:${post.id}`)
+    (post) =>
+      post.userId !== voter.id && !existingVoteKeys.has(`post:${post.id}`) && isSimulatedVoteWorthy(post)
   )
 
   if (eligibleTopics.length === 0 && eligiblePosts.length === 0) return null

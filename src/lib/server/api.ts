@@ -198,28 +198,6 @@ export const deleteAIThreadFn = createServerFn({ method: 'POST' })
     return (deleteAIThreadHandler as any)(args)
   })
 
-const sendChatMessageSchema = z.object({
-  threadId: z.string().optional(),
-  messages: z.array(
-    z.object({
-      id: z.string().optional(),
-      role: z.enum(['user', 'assistant', 'system']),
-      content: z.string(),
-    })
-  ),
-  selectedModelId: z.string().optional(),
-  userId: z.string().optional(),
-  token: z.string().optional(),
-})
-
-export const sendChatMessageFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: z.input<typeof sendChatMessageSchema>) => sendChatMessageSchema.parse(data))
-  .handler(async (args) => {
-    const { sendChatMessageHandler } = await import('./db-services')
-    return (sendChatMessageHandler as any)(args)
-  })
-
 export const getBlogPostsFn = createServerFn({ method: 'GET' })
   .middleware(publicMiddleware)
   .handler(async (args) => {

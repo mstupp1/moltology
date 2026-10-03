@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { AIChatPanel } from './AIChatPanel'
-import { sendChatMessageHandler } from '@/lib/server/db-services'
 import { authClient } from '@/lib/auth-client'
 
 // Mock scrollIntoView for test environment

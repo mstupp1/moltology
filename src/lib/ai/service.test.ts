@@ -29,8 +29,8 @@ describe('summarizeThreadTitle', () => {
     vi.clearAllMocks()
   })
 
-  it('uses ORACLE_TITLE_MODEL_ID (alibaba/qwen3.7-flash) and returns cleaned AI-generated title', async () => {
-    expect(ORACLE_TITLE_MODEL_ID).toBe('alibaba/qwen3.7-flash')
+  it('uses ORACLE_TITLE_MODEL_ID (zai/glm-5.3-flash) and returns cleaned AI-generated title', async () => {
+    expect(ORACLE_TITLE_MODEL_ID).toBe('zai/glm-5.3-flash')
     const { generateText } = await import('ai')
     vi.mocked(generateText).mockResolvedValueOnce({
       text: '"Carcinization Acceleration Tips"',

@@ -779,6 +779,8 @@ export async function simulateForumActivity(
     content: string
     createdAt?: string | Date | null
     topicId?: string | null
+    qualityScore?: number | null
+    sunk?: boolean | null
   }> = []
 
   if (recentTopics.length > 0) {
@@ -793,6 +795,8 @@ export async function simulateForumActivity(
           content: forumPosts.content,
           createdAt: forumPosts.createdAt,
           topicId: forumPosts.topicId,
+          qualityScore: forumPosts.qualityScore,
+          sunk: forumPosts.sunk,
         })
         .from(forumPosts)
         .where(
@@ -821,6 +825,8 @@ export async function simulateForumActivity(
       authorHandle: memberById.get(post.userId || '')?.handle || null,
       content: post.content,
       createdAt: post.createdAt,
+      qualityScore: post.qualityScore,
+      sunk: post.sunk,
     }
     if (post.topicId && postsByTopic.has(post.topicId)) {
       postsByTopic.get(post.topicId)!.push(candidate)
@@ -862,11 +868,13 @@ export async function simulateForumActivity(
       userId: post.userId,
       content: post.content,
       topicId: decision.topicId,
+      qualityScore: post.qualityScore,
+      sunk: post.sunk,
     }))
     const voteTarget = pickClusteredForumVote(
       toPlannerMember(plannedAuthor),
       voteTopic
-        ? [{ id: voteTopic.id, userId: voteTopic.userId, content: voteTopic.content, title: voteTopic.title, repliesCount: voteTopic.repliesCount }]
+        ? [{ id: voteTopic.id, userId: voteTopic.userId, content: voteTopic.content, title: voteTopic.title, repliesCount: voteTopic.repliesCount, qualityScore: voteTopic.qualityScore }]
         : [],
       votePosts,
       new Set()
@@ -1354,6 +1362,8 @@ export async function simulateForumReactions(
       userId: forumPosts.userId,
       topicId: forumPosts.topicId,
       content: forumPosts.content,
+      qualityScore: forumPosts.qualityScore,
+      sunk: forumPosts.sunk,
     })
     .from(forumPosts)
     .orderBy(desc(forumPosts.createdAt))
@@ -1366,6 +1376,7 @@ export async function simulateForumReactions(
     title?: string | null
     content?: string | null
     repliesCount?: number | null
+    qualityScore?: number | null
   }> = []
   try {
     const fetchedTopics = await dbClient
@@ -1375,6 +1386,7 @@ export async function simulateForumReactions(
         title: forumTopics.title,
         content: forumTopics.content,
         repliesCount: forumTopics.repliesCount,
+        qualityScore: forumTopics.qualityScore,
       })
       .from(forumTopics)
       .orderBy(desc(forumTopics.createdAt))

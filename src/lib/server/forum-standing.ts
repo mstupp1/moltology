@@ -143,6 +143,8 @@ export interface ReviewedItem {
   qualityScore: number | null
   standingDelta: number
   sunk: boolean
+  /** Simulated member who upvoted a strong post. Its Standing comes from that vote. */
+  upvotedBy?: string
 }
 
 export interface MemberReviewResult {
@@ -152,10 +154,14 @@ export interface MemberReviewResult {
   standingChanges: Array<{ userId: string; delta: number }>
 }
 
+/** Simulated members drawn on to upvote strong posts. */
+export const REVIEW_VOTER_POOL_LIMIT = 50
+
 /**
  * Reviews unreviewed topics and replies from real members (not simulated
- * ones). Strong posts raise the author's Standing, weak ones lower it and
- * sink. Never casts votes on anyone's behalf.
+ * ones). A simulated member upvotes each strong post, which raises the
+ * author's Standing through the normal upvote count. Weak posts lower
+ * Standing and sink. Real members never vote through this path.
  */
 export async function reviewMemberPosts(
   dbClient: Db,
@@ -207,26 +213,87 @@ export async function reviewMemberPosts(
     .orderBy(forumPosts.createdAt)
     .limit(REVIEW_BATCH_LIMIT)
 
-  const screen = (title: string, body: string) =>
-    screenForumSubmission(
+  const voterPool = (
+    await dbClient
+      .select({ id: profiles.id })
+      .from(profiles)
+      .where(eq(profiles.isSimulated, true))
+      .limit(REVIEW_VOTER_POOL_LIMIT)
+  ).map((row: { id: string }) => row.id)
+
+  /**
+   * One simulated upvote on a strong post. Returns the voter, or null when no
+   * simulated member could vote (then the review falls back to a Standing point).
+   */
+  const castSimulatedUpvote = async (
+    target: { kind: 'topic' | 'reply'; id: string; authorId: string },
+  ): Promise<string | null> => {
+    const voters = voterPool.filter((id: string) => id !== target.authorId)
+    for (let attempt = 0; attempt < 3 && voters.length > 0; attempt++) {
+      const voter = voters.splice(Math.floor(Math.random() * voters.length), 1)[0]
+      if (options.dryRun) return voter
+      const [inserted] = await dbClient
+        .insert(forumVotes)
+        .values(target.kind === 'topic' ? { userId: voter, topicId: target.id } : { userId: voter, postId: target.id })
+        .onConflictDoNothing()
+        .returning({ id: forumVotes.id })
+      if (!inserted) continue
+      if (target.kind === 'topic') {
+        await dbClient
+          .update(forumTopics)
+          .set({ upvotes: sql`${forumTopics.upvotes} + 1` })
+          .where(eq(forumTopics.id, target.id))
+      } else {
+        await dbClient
+          .update(forumPosts)
+          .set({ upvotes: sql`${forumPosts.upvotes} + 1` })
+          .where(eq(forumPosts.id, target.id))
+      }
+      return voter
+    }
+    return null
+  }
+
+  /** Strong posts earn an upvote instead of a hidden Standing point when one can be cast. */
+  const withUpvote = async (
+    item: ReviewedItem,
+  ): Promise<ReviewedItem> => {
+    if (item.verdict !== 'strong') return item
+    const voter = await castSimulatedUpvote({ kind: item.kind, id: item.id, authorId: item.userId })
+    return voter ? { ...item, standingDelta: 0, upvotedBy: voter } : item
+  }
+
+  // Posts the live gate already scored keep that score. Only posts the live
+  // gate missed (timeout or outage) go back to the moderation model.
+  const score = async (
+    title: string,
+    body: string,
+    liveScore: number | null,
+  ): Promise<{ qualityScore: number | null; prohibited: boolean }> => {
+    if (liveScore != null) return { qualityScore: liveScore, prohibited: false }
+    const decision = await screenForumSubmission(
       { title, body },
       { evaluate: options.evaluate, timeoutMs: REVIEW_JEV_TIMEOUT_MS },
     )
+    return {
+      qualityScore: decision.source === 'jev' ? decision.qualityScore : null,
+      prohibited: decision.status === 'quarantine',
+    }
+  }
 
   const reviewed: ReviewedItem[] = []
   let deferred = 0
 
-  // Every post gets a fresh pass so prohibited content that slipped past a
-  // live timeout is caught. The live score is the fallback.
   for (const topic of topics) {
-    const decision = await screen(topic.title, topic.content)
-    const qualityScore = decision.source === 'jev' ? decision.qualityScore : topic.qualityScore
-    const outcome = reviewOutcome({ qualityScore, prohibited: decision.status === 'quarantine' })
+    const { qualityScore, prohibited } = await score(topic.title, topic.content, topic.qualityScore)
+    const outcome = reviewOutcome({ qualityScore, prohibited })
     if (!outcome || !topic.userId) {
       deferred += 1
       continue
     }
-    reviewed.push({ kind: 'topic', id: topic.id, userId: topic.userId, qualityScore, ...withSunk(outcome) })
+    reviewed.push(
+      await withUpvote({ kind: 'topic', id: topic.id, userId: topic.userId, qualityScore, ...withSunk(outcome) }),
+    )
     if (!options.dryRun) {
       await dbClient
         .update(forumTopics)
@@ -240,14 +307,15 @@ export async function reviewMemberPosts(
   }
 
   for (const reply of replies) {
-    const decision = await screen(reply.topicTitle, reply.content)
-    const qualityScore = decision.source === 'jev' ? decision.qualityScore : reply.qualityScore
-    const outcome = reviewOutcome({ qualityScore, prohibited: decision.status === 'quarantine' })
+    const { qualityScore, prohibited } = await score(reply.topicTitle, reply.content, reply.qualityScore)
+    const outcome = reviewOutcome({ qualityScore, prohibited })
     if (!outcome || !reply.userId) {
       deferred += 1
       continue
     }
-    reviewed.push({ kind: 'reply', id: reply.id, userId: reply.userId, qualityScore, ...withSunk(outcome) })
+    reviewed.push(
+      await withUpvote({ kind: 'reply', id: reply.id, userId: reply.userId, qualityScore, ...withSunk(outcome) }),
+    )
     if (!options.dryRun) {
       await dbClient
         .update(forumPosts)

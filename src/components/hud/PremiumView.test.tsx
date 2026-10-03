@@ -29,7 +29,7 @@ describe('Premium offer panel', () => {
     expect(screen.getByRole('button', { name: /Activate Premium/i })).toBeEnabled()
     expect(screen.getByText(/No payment is taken/i)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Manage membership/i })).not.toBeInTheDocument()
-    expect(screen.getByText('Premium benefits are not available yet.')).toBeInTheDocument()
+    expect(screen.getByText('Premium raises your Oracle chat limits.')).toBeInTheDocument()
     expect(screen.getByText(/does not change your rank, clearance, stage, or forum authority/i)).toBeInTheDocument()
   })
 

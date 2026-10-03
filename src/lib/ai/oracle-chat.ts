@@ -1,4 +1,5 @@
 import { ORACLE_MODELS, getOracleModel } from './oracle-models'
+import { capOracleHistory } from './usage-limits'
 
 export const GUEST_ORACLE_RESPONSES = [
   "The Oracle sees great potential in you, but you're still in Guest Mode! Create a free account to unlock detailed answers, advice, and save your chat history.",
@@ -34,7 +35,7 @@ export function getOracleCandidateModelIds(selectedModelId?: string): string[] {
 }
 
 /**
- * An explicit picker choice wins. Otherwise a Jev complexity pick leads,
+ * An explicit picker choice wins. Otherwise the preflight complexity pick leads,
  * then the remaining models stay as fallbacks.
  */
 export function orderOracleModels(requestedModelId?: string, preferredModelId?: string): string[] {
@@ -59,13 +60,19 @@ export function getLastUserText(messages: OracleChatMessageInput[]): string {
   return lastMsg?.content || lastMsg?.text || ''
 }
 
+/**
+ * Client history becomes model input. Only user and assistant turns pass, so a
+ * caller cannot inject a system message, and the history is capped by size.
+ */
 export function toModelMessages(messages: OracleChatMessageInput[]) {
-  return messages
+  const turns = messages
+    .filter((m) => m.role === 'user' || m.role === 'assistant')
     .filter((m) => Boolean((m.content || m.text || '').trim()))
     .map((m) => ({
-      role: m.role as 'user' | 'assistant' | 'system',
+      role: m.role as 'user' | 'assistant',
       content: (m.content || m.text || '').trim(),
     }))
+  return capOracleHistory(turns)
 }
 
 function chunkHasText(chunk: unknown): boolean {

@@ -73,14 +73,14 @@ describe('NewChatScreen Component', () => {
     const modelBtn = screen.getByRole('button', { name: /Select Cognition Model/i })
     fireEvent.click(modelBtn)
 
-    expect(screen.getAllByText('GLM 5.3 Flash').length).toBeGreaterThan(0)
-    const glmOptions = screen.getAllByRole('button', { name: /GLM 5.3 Flash/i })
-    fireEvent.click(glmOptions[glmOptions.length - 1])
+    expect(screen.getAllByText('Qwen 3.7').length).toBeGreaterThan(0)
+    const qwenOptions = screen.getAllByRole('button', { name: /Qwen 3.7/i })
+    fireEvent.click(qwenOptions[qwenOptions.length - 1])
 
-    expect(mockOnSelectModel).toHaveBeenCalledWith('zai/glm-5.3-flash')
+    expect(mockOnSelectModel).toHaveBeenCalledWith('alibaba/qwen3.7-flash')
   })
 
-  it('renders colored pill badges for Chat and Titles in model dropdown and allows selecting Qwen 3.7', () => {
+  it('renders the Chat badge and pricing in model dropdown and allows selecting Qwen 3.7', () => {
     render(
       <NewChatScreen
         userId="usr_test"
@@ -95,7 +95,6 @@ describe('NewChatScreen Component', () => {
     fireEvent.click(modelBtn)
 
     expect(screen.getByText('Chat')).toBeInTheDocument()
-    expect(screen.getByText('Titles')).toBeInTheDocument()
 
     // Tabular headers
     expect(screen.getByText('In / 1M')).toBeInTheDocument()
@@ -103,10 +102,10 @@ describe('NewChatScreen Component', () => {
     expect(screen.getByText('Latency')).toBeInTheDocument()
 
     // Pricing & latency values
-    expect(screen.getByText('$0.10')).toBeInTheDocument()
-    expect(screen.getByText('$0.50')).toBeInTheDocument()
-    expect(screen.getByText('2.3s')).toBeInTheDocument()
-    expect(screen.getByText('$0.075')).toBeInTheDocument()
+    expect(screen.getByText('$0.15')).toBeInTheDocument()
+    expect(screen.getByText('$1.20')).toBeInTheDocument()
+    expect(screen.getAllByText('0.4s').length).toBeGreaterThan(0)
+    expect(screen.getByText('$0.03')).toBeInTheDocument()
     expect(screen.getByText('1.9s')).toBeInTheDocument()
 
     const qwenOption = screen.getByRole('button', { name: /Qwen 3.7/i })
