@@ -2,7 +2,7 @@
 id: lock-two-currency-economy
 date: 2026-08-25
 title: "Lock the two-currency economy"
-summary: "Chitin Gems are earned, Molt Credits are bought, signup is free, and standing is never for sale."
+summary: "Chitin Gems are earned, Molt Credits are bought, signup is free, and rank and authority cannot be purchased."
 domains: [economy]
 rules: [economy.two-currencies, economy.red-line, economy.signup-free]
 status: accepted
@@ -17,7 +17,7 @@ Copy and features were drifting toward selling progress. The brand needed one ru
 
 ## Decision
 
-Two currencies with a hard split. Chitin Gems are only earned. Molt Credits are the paid layer and buy speed and style. Rank, clearance, stage, and forum authority are never for sale. The rule lives in `BRAND_BIBLE.md` section 4 and hard rule 4 in `AGENTS.md`.
+Two currencies with a hard split. Chitin Gems are only earned. Molt Credits are the paid layer and buy speed and style. Rank, clearance, stage, and forum authority cannot be purchased. The rule lives in `BRAND_BIBLE.md` section 4 and hard rule 4 in `AGENTS.md`.
 
 ## Alternatives
 

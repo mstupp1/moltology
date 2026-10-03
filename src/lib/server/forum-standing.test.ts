@@ -134,6 +134,15 @@ describe('reviewMemberPosts', () => {
     expect(res.standingChanges).toEqual([{ userId: 'alice', delta: 1 }])
   })
 
+  it('caps review upvotes per author per cycle', async () => {
+    const strong = (id: string) => ({ id, userId: 'alice', content: `Great reply ${id}.`, qualityScore: 90, topicTitle: 'Hi' })
+    const { db, votes } = fakeDb([[], [strong('p1'), strong('p2'), strong('p3')], [{ id: 'sim-1' }, { id: 'sim-2' }]])
+    const res = await reviewMemberPosts(db, { now: NOW, evaluate: async () => null })
+    expect(votes).toHaveLength(2)
+    expect(res.reviewed.filter((r) => r.upvotedBy)).toHaveLength(2)
+    expect(res.standingChanges).toEqual([])
+  })
+
   it('never has the author vote on their own post', async () => {
     const { db, votes } = fakeDb([
       [{ id: 't1', userId: 'sim-1', title: 'Shell routines', content: 'Great notes.', qualityScore: 80 }],

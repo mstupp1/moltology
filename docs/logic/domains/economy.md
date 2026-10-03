@@ -3,7 +3,7 @@ id: economy
 title: Economy & currencies
 order: 1
 color: '#ffb020'
-summary: Two currencies with a locked split. Chitin Gems are earned, Molt Credits are bought, and standing is never for sale.
+summary: Two currencies with a locked split. Chitin Gems are earned, Molt Credits are bought, and rank and authority cannot be purchased.
 rules:
   - id: economy.two-currencies
     title: Gems are earned, Credits are bought
@@ -15,7 +15,7 @@ rules:
       - file: AGENTS.md
         symbol: Hard list
   - id: economy.red-line
-    title: Standing is never for sale
+    title: Rank and authority can't be bought
     kind: invariant
     statement: Rank, clearance, stage, forum authority, and prestige titles cannot be bought with Molt Credits or Premium. Credits may add speed and style only.
     dependsOn: [economy.two-currencies]

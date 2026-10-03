@@ -3,7 +3,7 @@ id: premium
 title: Premium & billing
 order: 6
 color: '#d27bff'
-summary: A Stripe monthly membership in soft launch behind the staff gate. It does not sell standing, and it unlocks nothing yet.
+summary: A Stripe monthly membership in soft launch behind the staff gate. Its only benefit so far is a 10x Oracle allowance.
 rules:
   - id: premium.soft-launch
     title: Premium is staff-only for now
@@ -20,7 +20,7 @@ rules:
   - id: premium.no-standing
     title: Premium grants no standing
     kind: invariant
-    statement: Premium must never grant rank, clearance, stage, forum authority, or Chitin Gems. The entitlement list is empty until benefits are defined.
+    statement: Premium must never grant rank, clearance, stage, forum authority, Standing, or Chitin Gems. Its only listed benefit is 10 times the free Oracle allowance.
     dependsOn: [economy.red-line]
     anchors:
       - file: src/lib/premium-membership.ts
@@ -54,7 +54,7 @@ rules:
   - id: premium.webhook-signature
     title: Webhooks must be signed
     kind: gate
-    statement: The Stripe webhook verifies the signature before any membership write. A missing secret returns 500, and a bad signature returns 400.
+    statement: The Stripe webhook verifies the signature before any membership or merch write. A missing secret returns 500, and a bad signature returns 400. Completed merch checkouts are handed to merch fulfillment, and everything else goes to membership sync.
     anchors:
       - file: src/lib/stripe-webhook.ts
         symbol: verifyStripeWebhookSignature

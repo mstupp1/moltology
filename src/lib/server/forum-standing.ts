@@ -5,6 +5,7 @@ import { isAdminOrSuperAdmin } from '../permissions'
 import {
   STANDING_COPY,
   STANDING_RESTRICTED_DAILY_REPLIES,
+  REVIEW_MAX_GAIN_PER_CYCLE,
   evaluateForumStanding,
   isFlaggedSignupLevel,
   reviewOutcome,
@@ -254,13 +255,20 @@ export async function reviewMemberPosts(
     return null
   }
 
+  // Review upvotes count toward the same per-cycle gain cap as adjustments.
+  const upvotesByAuthor = new Map<string, number>()
+
   /** Strong posts earn an upvote instead of a hidden Standing point when one can be cast. */
   const withUpvote = async (
     item: ReviewedItem,
   ): Promise<ReviewedItem> => {
     if (item.verdict !== 'strong') return item
+    const given = upvotesByAuthor.get(item.userId) ?? 0
+    if (given >= REVIEW_MAX_GAIN_PER_CYCLE) return { ...item, standingDelta: 0 }
     const voter = await castSimulatedUpvote({ kind: item.kind, id: item.id, authorId: item.userId })
-    return voter ? { ...item, standingDelta: 0, upvotedBy: voter } : item
+    if (!voter) return item
+    upvotesByAuthor.set(item.userId, given + 1)
+    return { ...item, standingDelta: 0, upvotedBy: voter }
   }
 
   // Posts the live gate already scored keep that score. Only posts the live
