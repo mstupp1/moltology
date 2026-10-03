@@ -65,6 +65,49 @@ async function encodeMarketingWebp(
   fs.writeFileSync(outputWebp, buffer)
 }
 
+function bumpMarketingAssetVersion(): { newAssetVersion: number; newSwVersion: number } {
+  // 1. Bump MARKETING_ASSET_VERSION
+  const versionFile = path.resolve('src/lib/marketing-assets-version.ts')
+  let currentVersion = 1
+  if (fs.existsSync(versionFile)) {
+    const content = fs.readFileSync(versionFile, 'utf8')
+    const match = content.match(/MARKETING_ASSET_VERSION = '(\d+)'/)
+    if (match) {
+      currentVersion = parseInt(match[1], 10)
+    }
+  }
+  const nextVersion = currentVersion + 1
+  const versionContent = `/**
+ * Auto-generated marketing assets version token.
+ * Automatically incremented by scripts/capture-dashboard-mockups.ts to bust
+ * browser, CDN, and Service Worker caches when new mockups are captured.
+ */
+export const MARKETING_ASSET_VERSION = '${nextVersion}'
+`
+  fs.writeFileSync(versionFile, versionContent, 'utf8')
+  console.log(`🏷️ Bumped MARKETING_ASSET_VERSION to v${nextVersion} (in src/lib/marketing-assets-version.ts)`)
+
+  // 2. Bump Service Worker cache VERSION in public/sw.js
+  let nextSwVer = 2
+  const swFile = path.resolve('public/sw.js')
+  if (fs.existsSync(swFile)) {
+    let swContent = fs.readFileSync(swFile, 'utf8')
+    const swMatch = swContent.match(/const VERSION = 'moltology-hub-v(\d+)'/)
+    if (swMatch) {
+      const currentSwVer = parseInt(swMatch[1], 10)
+      nextSwVer = currentSwVer + 1
+      swContent = swContent.replace(
+        /const VERSION = 'moltology-hub-v\d+'/,
+        `const VERSION = 'moltology-hub-v${nextSwVer}'`
+      )
+      fs.writeFileSync(swFile, swContent, 'utf8')
+      console.log(`⚙️ Bumped Service Worker cache to moltology-hub-v${nextSwVer} (in public/sw.js)`)
+    }
+  }
+
+  return { newAssetVersion: nextVersion, newSwVersion: nextSwVer }
+}
+
 interface CaptureTarget {
   name: string
   route: string
@@ -275,6 +318,10 @@ async function main() {
       if (fs.existsSync(png)) fs.unlinkSync(png)
     }
     console.log('✅ Marketing WebP variants encoded for first-paint payload!')
+
+    // Automatically bump marketing asset version & Service Worker version to bust browser and CDN caches
+    bumpMarketingAssetVersion()
+
     console.log('\n🎉 ALL MOCKUP SCREENSHOTS CAPTURED WITH 100% VISUAL FIDELITY (ZERO WELCOME SCREENS)!')
   } finally {
     serverProcess.kill('SIGTERM')

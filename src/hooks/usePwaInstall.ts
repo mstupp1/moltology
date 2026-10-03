@@ -79,10 +79,12 @@ export function usePwaInstall(): PwaInstallState {
     return outcome
   }, [])
 
+  const isPreview = typeof window !== 'undefined' && window.location.search.includes('preview=true')
+
   return {
     isStandalone,
     canPromptInstall,
-    showInstallBanner: canPromptInstall && !isStandalone && !bannerDismissed,
+    showInstallBanner: !isPreview && canPromptInstall && !isStandalone && !bannerDismissed,
     dismissBanner,
     install,
   }

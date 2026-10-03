@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getAssetUrl, S3_BASE_URL } from './assets'
+import { getAssetUrl, S3_BASE_URL, MARKETING_ASSET_VERSION } from './assets'
 
 describe('Asset URL Resolver', () => {
   it('returns empty string for empty input', () => {
@@ -21,22 +21,28 @@ describe('Asset URL Resolver', () => {
     expect(getAssetUrl('/images/bubble_variant_1.jpg')).toBe('/images/bubble_variant_1.jpg')
     expect(getAssetUrl('/images/scanline_pattern.png')).toBe('/images/scanline_pattern.png')
     expect(getAssetUrl('/images/marketing/dashboard_desktop_preview.webp')).toBe(
-      '/images/marketing/dashboard_desktop_preview.webp',
+      `/images/marketing/dashboard_desktop_preview.webp?v=${MARKETING_ASSET_VERSION}`,
     )
     expect(getAssetUrl('/images/marketing/dashboard_desktop_preview_sm.webp')).toBe(
-      '/images/marketing/dashboard_desktop_preview_sm.webp',
+      `/images/marketing/dashboard_desktop_preview_sm.webp?v=${MARKETING_ASSET_VERSION}`,
     )
     expect(getAssetUrl('/images/marketing/dashboard_mobile_preview.webp')).toBe(
-      '/images/marketing/dashboard_mobile_preview.webp',
+      `/images/marketing/dashboard_mobile_preview.webp?v=${MARKETING_ASSET_VERSION}`,
     )
     expect(getAssetUrl('/images/marketing/dashboard_feature_preview.webp')).toBe(
-      '/images/marketing/dashboard_feature_preview.webp',
+      `/images/marketing/dashboard_feature_preview.webp?v=${MARKETING_ASSET_VERSION}`,
     )
     expect(getAssetUrl('/images/marketing/forum_feature_preview.webp')).toBe(
-      '/images/marketing/forum_feature_preview.webp',
+      `/images/marketing/forum_feature_preview.webp?v=${MARKETING_ASSET_VERSION}`,
     )
     expect(getAssetUrl('/images/marketing/oracle_feature_preview.webp')).toBe(
-      '/images/marketing/oracle_feature_preview.webp',
+      `/images/marketing/oracle_feature_preview.webp?v=${MARKETING_ASSET_VERSION}`,
+    )
+    expect(getAssetUrl('/images/marketing/dashboard_desktop_preview.webp?custom=1')).toBe(
+      '/images/marketing/dashboard_desktop_preview.webp?custom=1',
+    )
+    expect(getAssetUrl('/images/order_emblem.png?v=2')).toBe(
+      '/images/order_emblem.png?v=2',
     )
   })
 

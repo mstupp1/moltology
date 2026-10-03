@@ -109,22 +109,32 @@ npm run mockups:capture -- --url=/journal --output=journal_desktop_preview
 To guarantee clean, un-obscured, and fully authenticated UI screenshots without guest overlays or welcome splashes:
 1. **Automatic `?preview=true`**: The capture script automatically appends `?preview=true` (or `&preview=true`) to all route URLs.
 2. **Deterministic Authenticated Session**: In `auth-session.ts`, the presence of `preview=true` automatically resolves an authenticated member operative session (`Operative Unit #8971`) if no cached session exists, ensuring screenshots are **always logged in** (showing operative rank/avatar, active member console, and zero guest mode banners or "Sign Up" prompts).
-3. **`HudLayout.tsx` Splash Suppression**: The HUD layout checks `window.location.search.includes('preview=true')` to completely bypass `WelcomeSplash` and first-time initiate modals.
+3. **`HudLayout.tsx` & `usePwaInstall.ts` Splash & Banner Suppression**: The HUD layout and PWA install hook check `window.location.search.includes('preview=true')` to completely bypass `WelcomeSplash`, first-time initiate modals, and the `PwaInstallBanner`.
 4. **Headless Chrome Flags**: Chrome runs with `--no-first-run --no-default-browser-check --hide-scrollbars --headless=new` to avoid background setup pauses and hide scrollbars.
 
 ---
 
-## 4. Verification & Syncing
+## 4. Automated Cache Invalidation & Parity Sync
+
+To eliminate stale browser disk cache and PWA Service Worker caching traps across production:
+1. **Automated Marketing Version Bumping (`MARKETING_ASSET_VERSION`)**:
+   `npm run mockups:capture` automatically increments the version token in [`src/lib/marketing-assets-version.ts`](file:///Users/mylesstupp/Development/moltology/src/lib/marketing-assets-version.ts). [`getAssetUrl()`](file:///Users/mylesstupp/Development/moltology/src/lib/assets.ts) automatically appends `?v=${MARKETING_ASSET_VERSION}` to all marketing images across the homepage and UI showcase components, completely bypassing 1-year browser HTTP disk caching (`max-age=31536000`).
+2. **Automated Service Worker Eviction (`public/sw.js`)**:
+   `npm run mockups:capture` automatically increments the cache `VERSION` in [`public/sw.js`](file:///Users/mylesstupp/Development/moltology/public/sw.js), forcing client devices to activate the new service worker and purge stale runtime caches.
+3. **Automated Neon S3 CDN Sync**:
+   `npm run mockups:capture` automatically triggers `npm run s3:sync` upon completing capture, uploading all generated WebP mockups to the Neon S3 public assets bucket (`moltology-public-assets/images/marketing/`) and verifying 100% asset parity. No manual upload or query-parameter editing is required.
+
+---
+
+## 5. Verification Commands
 
 1. **Verify UI Integration Tests**:
    ```bash
-   npx vitest run src/components/LandingPage.test.tsx src/components/hud/DashboardMarketingShowcase.test.tsx
+   npx vitest run src/components/LandingPage.test.tsx src/components/hud/DashboardMarketingShowcase.test.tsx src/lib/assets.test.ts
    ```
 
-2. **Automated Neon S3 CDN Sync**:
-   `npm run mockups:capture` automatically triggers `npm run s3:sync` upon completing capture, uploading all generated WebP mockups to the Neon S3 public assets bucket (`moltology-public-assets/images/marketing/`) and verifying 100% asset parity. No manual upload follow-up is required.
+2. **Manual S3 Parity Verification** (if ever needed):
    ```bash
-   # Manual parity verification if ever needed:
    npm run s3:verify
 
    # Pass --skip-s3 to mockups:capture to bypass S3 upload during isolated local testing:

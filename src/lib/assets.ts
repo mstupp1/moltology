@@ -6,6 +6,10 @@
  * Heavy content, quiz graphics, PBR textures, character cutouts, and guides resolve to Neon S3.
  */
 
+import { MARKETING_ASSET_VERSION } from './marketing-assets-version'
+
+export { MARKETING_ASSET_VERSION }
+
 const getEndpoint = () => {
   if (typeof process !== 'undefined' && process.env?.AWS_ENDPOINT_URL_S3 && process.env?.AWS_S3_BUCKET) {
     return `${process.env.AWS_ENDPOINT_URL_S3.replace(/\/+$/, '')}/${process.env.AWS_S3_BUCKET}`
@@ -55,12 +59,16 @@ export function getAssetUrl(assetPath: string): string {
   }
 
   const cleanPath = assetPath.replace(/^\/+/, '')
+  const pathWithoutQuery = cleanPath.split('?')[0]
 
   if (
-    LOCAL_ASSET_WHITELIST.has(cleanPath) ||
+    LOCAL_ASSET_WHITELIST.has(pathWithoutQuery) ||
     cleanPath.startsWith('images/chassis/') ||
     cleanPath.startsWith('images/marketing/')
   ) {
+    if (cleanPath.startsWith('images/marketing/') && !cleanPath.includes('?')) {
+      return `/${cleanPath}?v=${MARKETING_ASSET_VERSION}`
+    }
     return `/${cleanPath}`
   }
 
