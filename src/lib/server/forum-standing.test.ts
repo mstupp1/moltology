@@ -8,16 +8,29 @@ import type { ForumGateAnswers } from '../quality/forum-gate'
 const NOW = new Date('2026-10-02T12:00:00.000Z')
 
 /** Minimal drizzle stand-in: each select resolves to the next queued row set. */
-function fakeDb(selectResults: unknown[][]) {
+function fakeDb(selectResults: unknown[][], options: { voteInserts?: boolean } = {}) {
   const queue = [...selectResults]
   const updates: Array<{ set: Record<string, unknown> }> = []
+  const votes: Array<Record<string, unknown>> = []
   const chain: any = {}
   for (const m of ['from', 'innerJoin', 'leftJoin', 'where', 'orderBy']) chain[m] = vi.fn(() => chain)
   chain.limit = vi.fn(() => Promise.resolve(queue.shift() ?? []))
   return {
     updates,
+    votes,
     db: {
       select: vi.fn(() => chain),
+      insert: vi.fn(() => ({
+        values: vi.fn((values: Record<string, unknown>) => ({
+          onConflictDoNothing: () => ({
+            returning: () => {
+              if (options.voteInserts === false) return Promise.resolve([])
+              votes.push(values)
+              return Promise.resolve([{ id: `vote-${votes.length}` }])
+            },
+          }),
+        })),
+      })),
       update: vi.fn(() => ({
         set: vi.fn((set: Record<string, unknown>) => {
           updates.push({ set })
@@ -91,6 +104,44 @@ describe('reviewMemberPosts', () => {
     expect(evaluate).toHaveBeenCalledTimes(1)
     expect(evaluate).toHaveBeenCalledWith(expect.objectContaining({ body: 'Missed live.' }))
     expect(res.reviewed.map((r) => r.id)).toEqual(['p1', 'p2'])
+  })
+
+  it('has a simulated member upvote strong posts instead of adding a Standing point', async () => {
+    const { db, votes, updates } = fakeDb([
+      [{ id: 't1', userId: 'alice', title: 'Shell routines', content: 'Great notes.', qualityScore: 80 }],
+      [{ id: 'p1', userId: 'bob', content: 'lol', qualityScore: 10, topicTitle: 'Shell routines' }],
+      [{ id: 'sim-1' }],
+    ])
+    const res = await reviewMemberPosts(db, { now: NOW, evaluate: async () => null })
+    expect(votes).toEqual([{ userId: 'sim-1', topicId: 't1' }])
+    expect(res.reviewed[0]).toMatchObject({ id: 't1', verdict: 'strong', upvotedBy: 'sim-1', standingDelta: 0 })
+    // Alice's Standing rises through the upvote; only Bob gets an adjustment.
+    expect(res.standingChanges).toEqual([{ userId: 'bob', delta: -1 }])
+    expect(updates.some((u) => 'upvotes' in u.set)).toBe(true)
+  })
+
+  it('falls back to a Standing point when no simulated member can vote', async () => {
+    const { db } = fakeDb(
+      [
+        [{ id: 't1', userId: 'alice', title: 'Shell routines', content: 'Great notes.', qualityScore: 80 }],
+        [],
+        [{ id: 'sim-1' }],
+      ],
+      { voteInserts: false },
+    )
+    const res = await reviewMemberPosts(db, { now: NOW, evaluate: async () => null })
+    expect(res.reviewed[0].upvotedBy).toBeUndefined()
+    expect(res.standingChanges).toEqual([{ userId: 'alice', delta: 1 }])
+  })
+
+  it('never has the author vote on their own post', async () => {
+    const { db, votes } = fakeDb([
+      [{ id: 't1', userId: 'sim-1', title: 'Shell routines', content: 'Great notes.', qualityScore: 80 }],
+      [],
+      [{ id: 'sim-1' }],
+    ])
+    await reviewMemberPosts(db, { now: NOW, evaluate: async () => null })
+    expect(votes).toEqual([])
   })
 
   it('defers posts Jev could not score and writes nothing for them', async () => {
