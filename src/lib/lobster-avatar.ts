@@ -38,10 +38,12 @@ import {
 } from './avatar/backdrop'
 import { paintDefs, type PaintContext } from './avatar/paint'
 import { AVATAR_EYE_COLORS, eyeDefs } from './avatar/parts'
-import { renderCharacter } from './avatar/races'
+import { portraitViewBox, renderCharacter, type CharacterSpec } from './avatar/races'
 import {
   AVATAR_ACCESSORIES,
   AVATAR_ANTENNAE,
+  AVATAR_BUILDS,
+  AVATAR_HEAD_SHAPES,
   AVATAR_CLAWS,
   AVATAR_MOUTHS,
   AVATAR_POSES,
@@ -55,7 +57,9 @@ import {
   seededRandom,
   type AvatarAccessory,
   type AvatarAntennae,
+  type AvatarBuild,
   type AvatarClaws,
+  type AvatarHeadShape,
   type AvatarMouth,
   type AvatarPose,
   type AvatarRace,
@@ -166,6 +170,8 @@ export interface LobsterAvatarConfig {
   claws?: AvatarClaws
   pose?: AvatarPose
   accessory?: AvatarAccessory
+  headShape?: AvatarHeadShape
+  build?: AvatarBuild
   height?: LobsterHeight | number
   armScale?: number
   backgroundTheme?: string
@@ -194,6 +200,8 @@ export interface ResolvedAvatarTraits {
   claws: AvatarClaws
   pose: AvatarPose
   accessory: AvatarAccessory
+  headShape: AvatarHeadShape
+  build: AvatarBuild
   height: LobsterHeight | number
   eyelidStyle: EyelidStyle
   eyeColor: LobsterEyeColor
@@ -215,6 +223,8 @@ export const AVATAR_TRAIT_KEYS = [
   'claws',
   'pose',
   'accessory',
+  'headShape',
+  'build',
   'height',
   'eyelidStyle',
   'eyeColor',
@@ -259,6 +269,8 @@ export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | nu
   if (isOneOf(AVATAR_CLAWS, lower(obj.claws))) config.claws = lower(obj.claws) as AvatarClaws
   if (isOneOf(AVATAR_POSES, lower(obj.pose))) config.pose = lower(obj.pose) as AvatarPose
   if (isOneOf(AVATAR_ACCESSORIES, lower(obj.accessory))) config.accessory = lower(obj.accessory) as AvatarAccessory
+  if (isOneOf(AVATAR_HEAD_SHAPES, lower(obj.headShape))) config.headShape = lower(obj.headShape) as AvatarHeadShape
+  if (isOneOf(AVATAR_BUILDS, lower(obj.build))) config.build = lower(obj.build) as AvatarBuild
   if (typeof obj.height === 'string') {
     const norm = obj.height.toLowerCase().trim()
     if (norm in LOBSTER_HEIGHT_MAP) config.height = LOBSTER_HEIGHT_MAP[norm]
@@ -423,6 +435,9 @@ export function resolveAvatarTraits(config: LobsterAvatarConfig): ResolvedAvatar
     claws: isOneOf(AVATAR_CLAWS, config.claws) ? config.claws : seeded.claws,
     pose: isOneOf(AVATAR_POSES, config.pose) ? config.pose : seeded.pose,
     accessory: isOneOf(AVATAR_ACCESSORIES, config.accessory) ? config.accessory : seeded.accessory,
+    // Shapes arrived after members had saved looks, so an unset shape keeps the original body.
+    headShape: isOneOf(AVATAR_HEAD_SHAPES, config.headShape) ? config.headShape : 'bean',
+    build: isOneOf(AVATAR_BUILDS, config.build) ? config.build : 'classic',
     height: config.height ?? seeded.height,
     eyelidStyle: config.eyelidStyle && isOneOf(LOBSTER_EYELID_STYLES, config.eyelidStyle) ? config.eyelidStyle : seeded.eyelidStyle,
     eyeColor: isOneOf(LOBSTER_EYE_COLORS, lower(config.eyeColor)) ? (lower(config.eyeColor) as LobsterEyeColor) : seeded.eyeColor,
@@ -557,8 +572,7 @@ function buildAvatarSvg(config: LobsterAvatarConfig, size: number, frame: Lobste
     rim: backdrop?.theme.accentColor ?? '#7dd3fc',
   }
 
-  const character = renderCharacter(
-    {
+  const spec: CharacterSpec = {
       race: traits.race,
       eyeColor: traits.eyeColor,
       eyeShape: traits.eyeVariant,
@@ -569,13 +583,14 @@ function buildAvatarSvg(config: LobsterAvatarConfig, size: number, frame: Lobste
       claws: traits.claws,
       pose: traits.pose,
       accessory: traits.accessory,
+      headShape: traits.headShape,
+      build: traits.build,
       heightScale: resolveHeightScale(traits.height),
       armScale: typeof config.armScale === 'number' ? Math.min(1.3, Math.max(0.8, config.armScale)) : 1,
-    },
-    ctx
-  )
+  }
+  const character = renderCharacter(spec, ctx)
 
-  const viewBox = frame === 'portrait' ? AVATAR_PORTRAIT_VIEWBOXES[traits.race] : LOBSTER_FULL_BODY_VIEWBOX
+  const viewBox = frame === 'portrait' ? portraitViewBox(spec) : LOBSTER_FULL_BODY_VIEWBOX
   const dataAttrs = [
     `data-avatar-slot="${frame}"`,
     `data-race="${traits.race}"`,
@@ -587,6 +602,8 @@ function buildAvatarSvg(config: LobsterAvatarConfig, size: number, frame: Lobste
     `data-eye-variant="${traits.eyeVariant}"`,
     `data-pupil-variant="${traits.pupilVariant}"`,
     `data-accessory="${traits.accessory}"`,
+    `data-head-shape="${traits.headShape}"`,
+    `data-build="${traits.build}"`,
     `data-antennae="${traits.antennae}"`,
     `data-pose="${traits.pose}"`,
     `data-texture="${escapeSvgAttr(traits.backgroundTexture)}"`,
@@ -735,5 +752,14 @@ export function lockAvatarConfig(config: LobsterAvatarConfig): LobsterAvatarConf
 
 /** A fresh random character that keeps the chosen race. */
 export function rerollAvatarConfig(config: Pick<LobsterAvatarConfig, 'race'>): LobsterAvatarConfig {
-  return { style: LOBSTER_AVATAR_STYLE, seed: randomLobsterSeed(), race: config.race ?? 'lobster' }
+  const seed = randomLobsterSeed()
+  const rng = seededRandom(`${seed}:shape`)
+  // New looks roll a shape too; unset shapes stay on the original body for saved members.
+  return {
+    style: LOBSTER_AVATAR_STYLE,
+    seed,
+    race: config.race ?? 'lobster',
+    headShape: pickFrom(rng, AVATAR_HEAD_SHAPES),
+    build: pickFrom(rng, AVATAR_BUILDS),
+  }
 }

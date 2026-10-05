@@ -3,7 +3,9 @@ import { z } from 'zod'
 import {
   AVATAR_ACCESSORIES,
   AVATAR_ANTENNAE,
+  AVATAR_BUILDS,
   AVATAR_CLAWS,
+  AVATAR_HEAD_SHAPES,
   AVATAR_MOUTHS,
   AVATAR_POSES,
   AVATAR_RACES,
@@ -26,6 +28,8 @@ export const avatarConfigShape = {
   claws: z.enum(AVATAR_CLAWS).optional(),
   pose: z.enum(AVATAR_POSES).optional(),
   accessory: z.enum(AVATAR_ACCESSORIES).optional(),
+  headShape: z.enum(AVATAR_HEAD_SHAPES).optional(),
+  build: z.enum(AVATAR_BUILDS).optional(),
   height: z.union([z.enum(['short', 'regular', 'tall', 'towering']), z.number().min(0.75).max(1.4)]).optional(),
   armScale: z.number().min(0.7).max(1.4).optional(),
   backgroundTheme: z.string().max(64).optional(),

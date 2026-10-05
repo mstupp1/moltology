@@ -5,9 +5,13 @@ import {
   AVATAR_ACCESSORY_LABELS,
   AVATAR_ANTENNAE,
   AVATAR_ANTENNAE_LABELS,
+  AVATAR_BUILDS,
+  AVATAR_BUILD_LABELS,
   AVATAR_CLAWS,
   AVATAR_CLAW_LABELS,
   AVATAR_EXPRESSION_LABELS,
+  AVATAR_HEAD_SHAPES,
+  AVATAR_HEAD_SHAPE_LABELS,
   AVATAR_MOUTHS,
   AVATAR_MOUTH_LABELS,
   AVATAR_POSES,
@@ -38,6 +42,7 @@ import {
   type ResolvedAvatarTraits,
 } from '@/lib/lobster-avatar'
 import { EYE_COLOR_SWATCH } from '@/lib/avatar/parts'
+import { headShapeOutline } from '@/lib/avatar/races'
 
 export interface AvatarCreatorPanelProps {
   value: LobsterAvatarConfig
@@ -203,6 +208,32 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({ value, o
       <div role="tabpanel" className="space-y-3 rounded-xl border border-white/10 bg-[#030d14]/70 p-3">
         {tab === 'body' && (
           <>
+            <OptionGroup label={traits.race === 'crab' ? 'Shell shape' : 'Head shape'}>
+              {AVATAR_HEAD_SHAPES.map((h) => (
+                <Chip key={h} selected={traits.headShape === h} disabled={disabled} onClick={() => set('headShape', h)}>
+                  <span className="inline-flex items-center gap-1.5">
+                    <svg viewBox={traits.race === 'crab' ? '-12 28 124 104' : '6 0 88 118'} className="w-4 h-4 shrink-0" aria-hidden="true">
+                      <path d={headShapeOutline(traits.race, h)} fill="currentColor" opacity="0.85" />
+                    </svg>
+                    {AVATAR_HEAD_SHAPE_LABELS[traits.race][h]}
+                  </span>
+                </Chip>
+              ))}
+            </OptionGroup>
+            <OptionGroup label="Build">
+              {AVATAR_BUILDS.map((b) => (
+                <Chip key={b} selected={traits.build === b} disabled={disabled} onClick={() => set('build', b)}>
+                  {AVATAR_BUILD_LABELS[traits.race][b]}
+                </Chip>
+              ))}
+            </OptionGroup>
+            <OptionGroup label="Height">
+              {LOBSTER_HEIGHTS.map((h) => (
+                <Chip key={h} selected={traits.height === h} disabled={disabled} onClick={() => set('height', h)}>
+                  {LOBSTER_HEIGHT_LABELS[h]}
+                </Chip>
+              ))}
+            </OptionGroup>
             <OptionGroup label="Shell color">
               {SHELL_PALETTES.map((p) => (
                 <Swatch
@@ -226,13 +257,6 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({ value, o
               {SHELL_MARKINGS.map((m) => (
                 <Chip key={m} selected={traits.marking === m} disabled={disabled} onClick={() => set('marking', m)}>
                   {SHELL_MARKING_LABELS[m]}
-                </Chip>
-              ))}
-            </OptionGroup>
-            <OptionGroup label="Height">
-              {LOBSTER_HEIGHTS.map((h) => (
-                <Chip key={h} selected={traits.height === h} disabled={disabled} onClick={() => set('height', h)}>
-                  {LOBSTER_HEIGHT_LABELS[h]}
                 </Chip>
               ))}
             </OptionGroup>

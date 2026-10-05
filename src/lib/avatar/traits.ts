@@ -122,6 +122,22 @@ export const AVATAR_ACCESSORY_LABELS: Readonly<Record<AvatarAccessory, string>> 
   beanie: 'Beanie',
 }
 
+/** Head silhouette. For crabs this is the shell, so the labels change with the race. */
+export const AVATAR_HEAD_SHAPES = ['bean', 'round', 'tall', 'wide', 'square', 'heart'] as const
+export type AvatarHeadShape = (typeof AVATAR_HEAD_SHAPES)[number]
+export const AVATAR_HEAD_SHAPE_LABELS: Readonly<Record<AvatarRace, Record<AvatarHeadShape, string>>> = {
+  lobster: { bean: 'Bean', round: 'Round', tall: 'Tall', wide: 'Wide', square: 'Boxy', heart: 'Pear' },
+  crab: { bean: 'Oval', round: 'Dome', tall: 'Tall dome', wide: 'Wide', square: 'Boxy', heart: 'Heart' },
+}
+
+/** Body build: torso and tail for lobsters, leg weight and belly depth for crabs. */
+export const AVATAR_BUILDS = ['classic', 'slim', 'chunky', 'barrel', 'tapered'] as const
+export type AvatarBuild = (typeof AVATAR_BUILDS)[number]
+export const AVATAR_BUILD_LABELS: Readonly<Record<AvatarRace, Record<AvatarBuild, string>>> = {
+  lobster: { classic: 'Classic', slim: 'Slim', chunky: 'Chunky', barrel: 'Barrel', tapered: 'Tapered' },
+  crab: { classic: 'Classic', slim: 'Spindly', chunky: 'Sturdy', barrel: 'Barrel', tapered: 'Pointy' },
+}
+
 export const AVATAR_EXPRESSION_LABELS: Readonly<Record<string, string>> = {
   open: 'Bright',
   relaxed: 'Easygoing',

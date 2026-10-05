@@ -77,4 +77,22 @@ describe('CharacterCreationStep', () => {
     const raceGroup = screen.getByRole('group', { name: 'Race' })
     expect(within(raceGroup).getByRole('button', { name: /Crab/i })).toHaveAttribute('aria-pressed', 'true')
   })
+
+  it('labels the head shape picker as a shell shape for crabs', () => {
+    render(
+      <CharacterCreationStep
+        initialConfig={{ style: 'critters', seed: 'larva-shape', race: 'lobster' }}
+        onBack={vi.fn()}
+        onComplete={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Head shape')).toBeInTheDocument()
+    const raceGroup = screen.getByRole('group', { name: 'Race' })
+    fireEvent.click(within(raceGroup).getByRole('button', { name: /Crab/i }))
+    expect(screen.getByText('Shell shape')).toBeInTheDocument()
+    const heart = screen.getByRole('button', { name: /Heart/i })
+    fireEvent.click(heart)
+    expect(heart).toHaveAttribute('aria-pressed', 'true')
+  })
 })
