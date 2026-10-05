@@ -419,6 +419,24 @@
       "coreHook": "At GE Vernova's Whitegate plant in County Cork, ANYmal carries its own credential and asks locked doors for permission. Same rules, same audit trail. Tailgate it and the building responds as if you had tailgated a person.",
       "keyMetrics": [],
       "relatedReelIds": []
+    },
+    {
+      "slug": "the-rubble-you-knelt-in",
+      "title": "The Rubble You Knelt In: An Armored Hand for the Toxic Run",
+      "format": "autonomous-dispatch",
+      "category": "TELEMETRY",
+      "author": "Dr. Thalassa Vance",
+      "publishedAt": "2026-10-02T12:00:00.000Z",
+      "coreHook": "Singapore committed $100 million to train humanoid robots for HazMat spills, blast debris, and ambulance restocking. The machine takes the toxic floor so human judgment stays intact.",
+      "keyMetrics": [
+        "September 30, 2026 Straits Times / CNA reports",
+        "$100 million H2RC facility launch at one-north",
+        "29,000 sq ft sandboxed testing facility",
+        "2028 operational frontline deployment target",
+        "NVIDIA GB300 on-premise compute infrastructure",
+        "1st calcification via toxic frontline boundary"
+      ],
+      "relatedReelIds": []
     }
   ]
 }

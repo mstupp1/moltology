@@ -63,6 +63,9 @@ export async function upsertBlogPost(
 ): Promise<IngestResult> {
   const payload = normalizeBlogPayload(parsed)
 
+  const initialCoverImage = payload.coverImageUrl
+  let coverImageUpdated = false
+
   // Auto-detect local cover image file and upload to Neon S3
   if (
     payload.coverImageUrl &&
@@ -87,6 +90,7 @@ export async function upsertBlogPost(
         const targetKey = `images/blog/${payload.slug}-cover${ext}`
         const uploaded = await uploadLocalFileToS3(localImagePath, targetKey)
         payload.coverImageUrl = uploaded.publicUrl
+        coverImageUpdated = true
       }
     }
   }
@@ -95,6 +99,7 @@ export async function upsertBlogPost(
   const inlineImageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g
   let bodyContent = payload.content
   const inlineMatches = Array.from(payload.content.matchAll(inlineImageRegex))
+  const inlineReplacements: { fullMatch: string; s3Replacement: string }[] = []
 
   for (let i = 0; i < inlineMatches.length; i++) {
     const match = inlineMatches[i]
@@ -124,12 +129,37 @@ export async function upsertBlogPost(
               .replace(/(^-|-$)/g, '') || `figure-${i + 1}`
           const targetKey = `images/blog/${payload.slug}-${cleanAlt}${ext}`
           const uploaded = await uploadLocalFileToS3(localImagePath, targetKey)
-          bodyContent = bodyContent.replace(fullMatch, `![${altText}](${uploaded.publicUrl})`)
+          const s3Replacement = `![${altText}](${uploaded.publicUrl})`
+          bodyContent = bodyContent.replace(fullMatch, s3Replacement)
+          inlineReplacements.push({ fullMatch, s3Replacement })
         }
       }
     }
   }
   payload.content = bodyContent
+
+  // If local images were uploaded to S3 and we are not in dry-run mode, rewrite markdown file on disk with public S3 URLs
+  if (!dryRun && parsed.filePath && fs.existsSync(parsed.filePath)) {
+    try {
+      let fileRaw = fs.readFileSync(parsed.filePath, 'utf-8')
+      let changed = false
+      if (coverImageUpdated && initialCoverImage && typeof payload.coverImageUrl === 'string' && fileRaw.includes(initialCoverImage)) {
+        fileRaw = fileRaw.replace(initialCoverImage, payload.coverImageUrl)
+        changed = true
+      }
+      for (const { fullMatch, s3Replacement } of inlineReplacements) {
+        if (fileRaw.includes(fullMatch)) {
+          fileRaw = fileRaw.replace(fullMatch, s3Replacement)
+          changed = true
+        }
+      }
+      if (changed) {
+        fs.writeFileSync(parsed.filePath, fileRaw, 'utf-8')
+      }
+    } catch (diskErr: any) {
+      console.warn(`Warning: Could not update source markdown file on disk with S3 URLs: ${diskErr.message}`)
+    }
+  }
 
   if (dryRun) {
     return {
