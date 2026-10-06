@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import {
   AVATAR_ACCESSORIES,
+  AVATAR_BUILDS,
+  AVATAR_HEAD_SHAPES,
   AVATAR_PORTRAIT_VIEWBOXES,
   AVATAR_RACES,
   AVATAR_TRAIT_KEYS,
@@ -365,7 +367,7 @@ describe('lobster-avatar', () => {
 
   it('renders both races in both frames with a race-specific portrait crop', () => {
     for (const race of AVATAR_RACES) {
-      const config = { style: 'critters' as const, seed: `race-${race}`, race }
+      const config = { style: 'critters' as const, seed: `race-${race}`, race, height: 'regular' as const }
       const full = generateLobsterAvatarSvg(config)
       const portrait = generateLobsterAvatarSvg(config, 128, { frame: 'portrait' })
       expect(attr(full, 'data-race')).toBe(race)
@@ -375,6 +377,54 @@ describe('lobster-avatar', () => {
     }
     expect(AVATAR_PORTRAIT_VIEWBOXES.lobster).toBe(LOBSTER_PORTRAIT_VIEWBOX)
     expect(AVATAR_PORTRAIT_VIEWBOXES.crab).not.toBe(LOBSTER_PORTRAIT_VIEWBOX)
+  })
+
+  it('keeps the portrait framed on the face for every height and head shape', () => {
+    const eyeOffset = (svg: string | null) => {
+      const top = Number(svg?.match(/viewBox="-9 (-?[\d.]+) 118 118"/)?.[1])
+      return Number.isFinite(top) ? top : NaN
+    }
+    for (const race of AVATAR_RACES) {
+      const short = eyeOffset(generateLobsterAvatarSvg({ style: 'critters', seed: 'crop', race, height: 'short' }, 128, { frame: 'portrait' }))
+      const tall = eyeOffset(generateLobsterAvatarSvg({ style: 'critters', seed: 'crop', race, height: 'towering' }, 128, { frame: 'portrait' }))
+      // Taller characters stand higher, so the crop moves up with them.
+      expect(tall).toBeLessThan(short)
+      const tallHead = eyeOffset(generateLobsterAvatarSvg({ style: 'critters', seed: 'crop', race, height: 'regular', headShape: 'tall' }, 128, { frame: 'portrait' }))
+      expect(tallHead).toBeLessThan(eyeOffset(generateLobsterAvatarSvg({ style: 'critters', seed: 'crop', race, height: 'regular' }, 128, { frame: 'portrait' })))
+    }
+  })
+
+  it('makes crab height stretch the legs, not just nudge the body', () => {
+    const lift = (height: 'short' | 'towering') =>
+      Number(generateLobsterAvatarSvg({ style: 'critters', seed: 'crab-h', race: 'crab', height }, 128, { frame: 'portrait' })?.match(/viewBox="-9 (-?[\d.]+) /)?.[1])
+    expect(lift('short') - lift('towering')).toBeGreaterThan(30)
+  })
+
+  it('renders every head shape and build on both races', () => {
+    for (const race of AVATAR_RACES) {
+      const outlines = new Set<string>()
+      for (const headShape of AVATAR_HEAD_SHAPES) {
+        for (const build of AVATAR_BUILDS) {
+          const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'shape', race, headShape, build, transparentBackground: true })
+          expect(attr(svg, 'data-head-shape')).toBe(headShape)
+          expect(attr(svg, 'data-build')).toBe(build)
+          expect(svg).not.toContain('NaN')
+          expect(svg).not.toContain('undefined')
+          outlines.add(svg!.replace(/av[a-z0-9]+-/g, ''))
+        }
+      }
+      // Every combination draws a different body.
+      expect(outlines.size).toBe(AVATAR_HEAD_SHAPES.length * AVATAR_BUILDS.length)
+    }
+  })
+
+  it('keeps saved looks without a shape on the original head and build', () => {
+    const traits = resolveAvatarTraits({ style: 'critters', seed: 'saved-before-shapes', race: 'crab' })
+    expect(traits.headShape).toBe('bean')
+    expect(traits.build).toBe('classic')
+    const reroll = rerollAvatarConfig({ race: 'crab' })
+    expect(AVATAR_HEAD_SHAPES).toContain(reroll.headShape)
+    expect(AVATAR_BUILDS).toContain(reroll.build)
   })
 
   it('gives the crab its own body without the lobster tail and abdomen', () => {
@@ -457,8 +507,10 @@ describe('lobster-avatar', () => {
         claws: 'crusher',
         pose: 'flex',
         accessory: 'crown',
+        headShape: 'heart',
+        build: 'barrel',
       })
-    ).toMatchObject({ race: 'crab', shellColor: 'jade', shellFinish: 'chrome', marking: 'tiger', mouth: 'fang', antennae: 'plume', claws: 'crusher', pose: 'flex', accessory: 'crown' })
+    ).toMatchObject({ headShape: 'heart', build: 'barrel',  race: 'crab', shellColor: 'jade', shellFinish: 'chrome', marking: 'tiger', mouth: 'fang', antennae: 'plume', claws: 'crusher', pose: 'flex', accessory: 'crown' })
 
     expect(
       parseLobsterAvatarConfig({ style: 'critters', seed: 'unit-2', race: 'shrimp', shellColor: '#ff0000', accessory: 'top_hat"><script>' })
