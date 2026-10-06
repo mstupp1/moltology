@@ -420,6 +420,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
           id: 'super-1',
           name: 'Super',
           email: 'myles@moltology.org',
+          emailVerified: true,
           role: 'user',
         },
       } as any,

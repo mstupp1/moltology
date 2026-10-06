@@ -7,14 +7,14 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-10-03",
+  "syncedAt": "2026-10-06",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 11,
     "rules": 97,
-    "decisions": 33,
+    "decisions": 34,
     "anchors": 170,
-    "drifted": 2,
+    "drifted": 7,
     "flagged": 12
   },
   "canvas": {
@@ -1015,7 +1015,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Super admin by email",
       "kind": "permission",
       "status": "active",
-      "statement": "A fixed list of emails always resolves to super_admin, whatever the stored role says. The profile role is checked first, then the session role.",
+      "statement": "A fixed list of emails resolves to super_admin once the account has confirmed that email, whatever the stored role says. Server checks rely on the stored profile role, which is raised to super_admin only for a confirmed address.",
       "anchors": [
         {
           "file": "src/lib/permissions.ts",
@@ -1028,10 +1028,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/permissions.ts",
           "symbol": "getEffectiveRole",
-          "line": 24,
+          "line": 37,
           "value": "getEffectiveRole(user, profileRole)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/permissions.ts#L24"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/permissions.ts#L37"
         }
       ],
       "tests": [
@@ -1047,7 +1047,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "access.staff"
       ],
       "decisions": [
-        "super-admin-by-email"
+        "super-admin-by-email",
+        "super-admin-needs-confirmed-email"
       ],
       "flag": null,
       "flow": null,
@@ -1055,7 +1056,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 94,
         "y": 232
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "access.staff",
@@ -1068,10 +1069,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/permissions.ts",
           "symbol": "isAdminOrSuperAdmin",
-          "line": 40,
+          "line": 53,
           "value": "isAdminOrSuperAdmin(user, profileRole)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/permissions.ts#L40"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/permissions.ts#L53"
         }
       ],
       "tests": [
@@ -1090,7 +1091,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "forum.covenant-watch"
       ],
       "decisions": [
-        "super-admin-by-email"
+        "super-admin-by-email",
+        "super-admin-needs-confirmed-email"
       ],
       "flag": null,
       "flow": null,
@@ -1098,7 +1100,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 94,
         "y": 388
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "access.write-auth",
@@ -1203,7 +1205,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "canViewHiddenPages",
           "line": 47,
           "value": "canViewHiddenPages(user, profileRole)",
-          "drift": "ok",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/hidden-pages.ts#L47"
         }
       ],
@@ -1228,7 +1230,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 544
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "access.admin-only-paths",
@@ -3040,18 +3042,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumTopicHandler",
-          "line": 1571,
+          "line": 1558,
           "value": "createForumTopicHandler({ data, context })",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1571"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1558"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "requirePublishableForumPost",
-          "line": 911,
+          "line": 892,
           "value": "requirePublishableForumPost(input)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L911"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L892"
         }
       ],
       "tests": [
@@ -3341,7 +3343,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 116,
         "y": 364
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "forum.rate-limit",
@@ -3411,10 +3413,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/community-rules.ts",
           "symbol": "validateForumContent",
-          "line": 103,
+          "line": 104,
           "value": "validateForumContent(title, content)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L103"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L104"
         }
       ],
       "tests": [
@@ -3712,10 +3714,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertForumAuthor",
-          "line": 919,
+          "line": 900,
           "value": "assertForumAuthor(rowUserId, actorId, action)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L919"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L900"
         }
       ],
       "tests": [
@@ -3940,7 +3942,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "handleOracleChatRequest",
           "line": 74,
           "value": "handleOracleChatRequest(request)",
-          "drift": "ok",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L74"
         }
       ],
@@ -4201,7 +4203,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1117,
         "y": 76
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "oracle.rate-limit",
@@ -7133,6 +7135,40 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "heading": "Consequences",
           "html": "<p>A higher Oracle allowance is the first Premium benefit. Moderation data is not covered by zero data retention while the gateway account is on Hobby. History still comes from the browser.</p>"
+        }
+      ]
+    },
+    {
+      "id": "super-admin-needs-confirmed-email",
+      "date": "2026-10-06",
+      "title": "Super admin by email needs a confirmed email",
+      "summary": "An allowlisted email grants super admin only after the account confirms it, because signup does not always require confirmation.",
+      "domains": [
+        "access"
+      ],
+      "rules": [
+        "access.super-admin-emails",
+        "access.staff"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Email confirmation is off unless <code>EMAIL_VERIFICATION_ENABLED</code> is true. Anyone could sign up with an allowlisted address that had no account yet and be treated as super admin, and <code>ensureUserProfile</code> would store that role.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p><code>getEffectiveRole</code> counts <code>SUPER_ADMIN_EMAILS</code> only when <code>emailVerified</code> is true. <code>ensureUserProfile</code> raises the stored role only for a confirmed address. Server checks pass JWT claims, which carry no confirmation flag, so they rely on the stored profile role.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>Turn on email confirmation for everyone. Rejected for now because the mail domain decision is separate.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<ul>\n<li>Accounts already stored as super_admin keep the role, so the owner is not locked out.</li>\n<li>A new allowlisted account must confirm its email, or be granted with <code>npm run db:grant-admin</code>, before it gets staff tools.</li>\n</ul>"
         }
       ]
     }

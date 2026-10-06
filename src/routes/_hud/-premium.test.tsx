@@ -88,7 +88,7 @@ describe('Premium HUD route', () => {
 
   it('renders the membership page for super admins', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
-      data: { user: { id: 'super-1', name: 'Super', email: 'myles@moltology.org', role: 'user' } },
+      data: { user: { id: 'super-1', name: 'Super', email: 'myles@moltology.org', emailVerified: true, role: 'user' } },
       isPending: false,
     } as never)
     const Component = Route.options.component!

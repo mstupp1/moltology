@@ -6,10 +6,11 @@ import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
 import { InlineTopicComposer, InlineTopicComposerHandle } from '@/components/forum/InlineTopicComposer'
 import { getForumCategoryBySlugFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { formatForumUnreadCount } from '@/lib/forum-visits'
-import { formatForumTopicCount } from '@/lib/forum-utils'
+import { formatForumTopicCount, isForumStaffBoard } from '@/lib/forum-utils'
 import { ForumUnreadMark } from '@/components/forum/ForumBits'
 import { INITIAL_FORUM_CATEGORIES, getCategoryBgImage } from '@/lib/forum-seed-data'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
@@ -71,15 +72,36 @@ function ForumBoardPage() {
   const [topics, setTopics] = useState<ForumTopicEntry[]>(loader.topics || [])
   const [sortBy, setSortBy] = useState<SortKey>('hot')
   const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
   const [loading, setLoading] = useState(false)
   const composerRef = useRef<InlineTopicComposerHandle>(null)
+  const staffAccess = useHiddenPageAccess()
+  const canStartTopic = !isForumStaffBoard(category?.slug ?? categorySlug) || staffAccess.canView
 
   useEffect(() => {
     setCategory(loader.category)
     setTopics(loader.topics || [])
   }, [loader])
 
+  // Wait for typing to pause so each keystroke does not run a board-wide search.
   useEffect(() => {
+    const trimmed = searchQuery.trim()
+    if (!trimmed) {
+      setDebouncedQuery('')
+      return
+    }
+    const timer = setTimeout(() => setDebouncedQuery(trimmed), 300)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  const initialFetchHandled = useRef(false)
+
+  useEffect(() => {
+    // A guest's first render already has the loader's topics for the default view.
+    if (!initialFetchHandled.current) {
+      initialFetchHandled.current = true
+      if (!userId && sortBy === 'hot' && !debouncedQuery) return
+    }
     let active = true
     setLoading(true)
     ;(async () => {
@@ -90,7 +112,7 @@ function ForumBoardPage() {
           getForumTopicsFn({
             data: {
               categorySlug,
-              query: searchQuery,
+              query: debouncedQuery || undefined,
               sortBy,
               ...auth,
             },
@@ -114,7 +136,7 @@ function ForumBoardPage() {
     return () => {
       active = false
     }
-  }, [categorySlug, sortBy, searchQuery, userId])
+  }, [categorySlug, sortBy, debouncedQuery, userId])
 
   const sortTabs: { key: SortKey; label: string }[] = [
     { key: 'hot', label: 'HOT' },
@@ -181,6 +203,7 @@ function ForumBoardPage() {
               </p>
             </div>
 
+            {canStartTopic && (
             <button
               onClick={() => composerRef.current?.expandAndFocus()}
               className="relative z-10 px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] text-black text-xs font-bold uppercase tracking-wider chamfer-corner shadow-[0_0_12px_rgba(0,255,255,0.25)] transition-all flex items-center gap-1.5 self-start sm:self-center shrink-0"
@@ -188,6 +211,7 @@ function ForumBoardPage() {
               <Plus className="w-4 h-4" />
               <span>New Post</span>
             </button>
+            )}
           </div>
         ) : (
           <div className="p-10 text-center chitin-card chamfer-corner border border-[#ff5540]/50 space-y-2">
@@ -266,7 +290,7 @@ function ForumBoardPage() {
                     <p className="text-xs text-[#839493]">
                       No posts found{searchQuery ? ' matching your search' : ' in this board yet'}.
                     </p>
-                    {!searchQuery && (
+                    {!searchQuery && canStartTopic && (
                       <button
                         onClick={() => composerRef.current?.expandAndFocus()}
                         className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all"

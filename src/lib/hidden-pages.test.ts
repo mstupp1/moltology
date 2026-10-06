@@ -33,7 +33,8 @@ describe('hidden pages', () => {
 
   it('lets admins and super admins view hidden pages', () => {
     expect(canViewHiddenPages({ email: 'ops@example.com', role: 'admin' })).toBe(true)
-    expect(canViewHiddenPages({ email: 'myles@moltology.org', role: 'user' })).toBe(true)
+    expect(canViewHiddenPages({ email: 'myles@moltology.org', emailVerified: true, role: 'user' })).toBe(true)
+    expect(canViewHiddenPages({ email: 'myles@moltology.org', emailVerified: false, role: 'user' })).toBe(false)
     expect(canViewHiddenPages({ email: 'member@example.com', role: 'user' }, 'admin')).toBe(true)
     expect(canViewHiddenPages({ email: 'member@example.com', role: 'user' }, 'super_admin')).toBe(true)
   })

@@ -175,7 +175,17 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   })
 
   const systemPrompt = buildSystemPrompt(DEFAULT_ORACLE_PERSONA, preflight.context)
-  const payloadMessages = toModelMessages(messages)
+  // History comes from the client, so earlier user turns get the same filter as the
+  // new one. Failing turns are dropped rather than failing the request, because the
+  // client may still hold a message that was blocked before.
+  const payloadMessages = toModelMessages(
+    messages.filter(
+      (m, index) =>
+        index === messages.length - 1 ||
+        m.role !== 'user' ||
+        validateInputGuardrails(m.content || m.text || '').allowed,
+    ),
+  )
   const candidateModels = orderOracleModels(body.model, preflight.preferredModelId)
   let lastError: Error | null = null
   const usageEventId = await recordOracleUsage({ userId, kind: 'chat' })

@@ -45,7 +45,7 @@ export function isHiddenPagePath(pathname: string | null | undefined): boolean {
  * `profileRole` covers clearance stored on the profile when the session role is still a member.
  */
 export function canViewHiddenPages(
-  user?: { email?: string | null; role?: string | null } | null,
+  user?: { email?: string | null; emailVerified?: boolean | null; role?: string | null } | null,
   profileRole?: string | null,
 ): boolean {
   return isAdminOrSuperAdmin(user, profileRole)

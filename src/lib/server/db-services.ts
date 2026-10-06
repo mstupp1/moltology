@@ -30,6 +30,7 @@ import { getCategoryBgImage } from '../forum-seed-data'
 import {
   assertForumWriteRateLimit,
   FORUM_LOCKED_ERROR,
+  FORUM_STAFF_BOARD_ERROR,
   validateForumContent,
 } from '../community-rules'
 import {
@@ -47,6 +48,12 @@ import {
   visibleForumContent,
   forumCategoryLookupSlugs,
   forumCategorySlugsMatch,
+  isForumStaffBoard,
+  escapeLikePattern,
+  forumTopicPreview,
+  FORUM_HOT_CANDIDATE_POOL,
+  FORUM_TOPIC_LIST_LIMIT,
+  FORUM_TOPIC_PREVIEW_CHARS,
 } from '../forum-utils'
 import {
   countUnreadForumTopics,
@@ -99,7 +106,6 @@ import {
 } from '../chassis-loadout'
 
 
-import { getPresignedViewUrl } from '../s3-client'
 import { verifyTurnstileToken } from './turnstile'
 import {
   ACTIVITY_FEED_FILTER_IDS,
@@ -391,23 +397,6 @@ export const updateUserStatsHandler = async ({ data, context }: ServerFnArgs<Use
 }
 
 
-interface GetAssetUrlInput {
-  key: string
-  expiresIn?: number
-}
-
-/**
- * Server Function: Get presigned URL for an S3 asset key.
- */
-export const getS3AssetUrlHandler = async ({ data }: ServerFnArgs<GetAssetUrlInput>) => {
-  if (!data?.key) {
-    throw new Error('Key parameter is required')
-  }
-  const url = await getPresignedViewUrl(data.key, undefined, data.expiresIn || 3600)
-  return { url }
-}
-
-
 interface GetAIThreadsInput {
   userId?: string
   token?: string
@@ -655,21 +644,13 @@ export const incrementBlogPostViewsHandler = async ({ data: slug, context }: Ser
   if (!slug) return null
   const dbClient = context?.db || getDb()
   try {
-    const records = await dbClient
-      .select()
-      .from(blogPosts)
-      .where(eq(blogPosts.slug, slug))
-      .limit(1)
-
-    if (records.length > 0) {
-      const r = records[0]
-      const updated = await dbClient
-        .update(blogPosts)
-        .set({ views: (r.views || 0) + 1 })
-        .where(eq(blogPosts.slug, slug))
-        .returning()
-      return updated[0]?.views ?? r.views + 1
-    }
+    // One atomic statement, so concurrent readers do not overwrite each other's count.
+    const [updated] = await dbClient
+      .update(blogPosts)
+      .set({ views: sql`${blogPosts.views} + 1` })
+      .where(and(eq(blogPosts.slug, slug), eq(blogPosts.isPublished, true)))
+      .returning({ views: blogPosts.views })
+    if (updated) return updated.views
   } catch (err) {
     console.warn(`[incrementBlogPostViewsFn] Failed to increment views for ${slug}:`, err)
   }
@@ -1210,6 +1191,8 @@ export interface GetForumTopicsInput {
   categorySlug?: string
   query?: string
   sortBy?: 'latest' | 'top' | 'active' | 'hot'
+  /** Rows to return, capped at FORUM_TOPIC_LIST_LIMIT. */
+  limit?: number
   userId?: string
   /** Neon Auth JWT so vote state can hydrate for the current initiate. */
   token?: string
@@ -1221,6 +1204,7 @@ export interface GetForumTopicsInput {
 export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetForumTopicsInput>): Promise<ForumTopicEntry[]> => {
   const dbClient = context?.db || getDb()
   const { categorySlug, query, sortBy = 'hot' } = data || {}
+  const limit = Math.min(Math.max(data?.limit ?? FORUM_TOPIC_LIST_LIMIT, 1), FORUM_TOPIC_LIST_LIMIT)
   const currentUserId = await resolveForumReaderId(data, context)
 
   try {
@@ -1237,7 +1221,8 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
         authorStage: forumTopics.authorStage,
         title: forumTopics.title,
         slug: forumTopics.slug,
-        content: forumTopics.content,
+        // Lists only render a one-line preview; a little slack covers collapsed whitespace.
+        content: sql<string>`left(${forumTopics.content}, ${FORUM_TOPIC_PREVIEW_CHARS * 2})`,
         isPinned: forumTopics.isPinned,
         isLocked: forumTopics.isLocked,
         views: forumTopics.views,
@@ -1262,8 +1247,8 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
       conditions.push(inArray(forumCategories.slug, forumCategoryLookupSlugs(categorySlug)))
     }
     if (query && query.trim() !== '') {
-      const q = `%${query.trim()}%`
-      conditions.push(or(like(forumTopics.title, q), like(forumTopics.content, q)))
+      const q = `%${escapeLikePattern(query.trim())}%`
+      conditions.push(or(ilike(forumTopics.title, q), ilike(forumTopics.content, q)))
     }
 
     let finalQuery = queryBuilder
@@ -1272,14 +1257,16 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
     }
 
     if (sortBy === 'top') {
-      finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.upvotes), desc(forumTopics.createdAt)) as any
+      finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.upvotes), desc(forumTopics.createdAt)).limit(limit) as any
     } else if (sortBy === 'active') {
-      finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.lastReplyAt)) as any
+      finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.lastReplyAt)).limit(limit) as any
     } else if (sortBy === 'latest') {
-      finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.createdAt)) as any
+      finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.createdAt)).limit(limit) as any
     } else {
-      // 'hot' — rank in JS after fetching (volume is small for MVP)
-      finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned)) as any
+      // 'hot' ranks in JS, over a pool of the most recently active topics.
+      finalQuery = finalQuery
+        .orderBy(desc(forumTopics.isPinned), desc(forumTopics.lastReplyAt))
+        .limit(FORUM_HOT_CANDIDATE_POOL) as any
     }
 
     let records = await finalQuery
@@ -1294,7 +1281,7 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
                 discoveryEligible: row.discoveryEligible,
               }),
             )
-      records = [...ranked].sort(compareHot as any)
+      records = [...ranked].sort(compareHot as any).slice(0, limit)
     }
 
     if (records && records.length > 0) {
@@ -1316,7 +1303,7 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
         authorStage: r.authorStage,
         title: r.title,
         slug: r.slug,
-        content: visibleForumContent(r.content, r.deletedAt),
+        content: forumTopicPreview(visibleForumContent(r.content, r.deletedAt)),
         isPinned: r.isPinned,
         isLocked: r.isLocked,
         views: r.views,
@@ -1587,16 +1574,29 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
     throw new Error(validation.error || 'Invalid content.')
   }
 
-  const gate = await requirePublishableForumPost({
-    title: data.title,
-    body: data.content,
-  })
+  const [targetCategory] = await dbClient
+    .select({ slug: forumCategories.slug })
+    .from(forumCategories)
+    .where(eq(forumCategories.id, data.categoryId))
+    .limit(1)
+  if (!targetCategory) {
+    throw new Error('That board is no longer available. Refresh the forums and try again.')
+  }
 
   const [userProfile] = await dbClient
     .select()
     .from(profiles)
     .where(eq(profiles.id, userId))
     .limit(1)
+
+  if (isForumStaffBoard(targetCategory.slug) && !isAdminOrSuperAdmin(null, userProfile?.role)) {
+    throw new Error(FORUM_STAFF_BOARD_ERROR)
+  }
+
+  const gate = await requirePublishableForumPost({
+    title: data.title,
+    body: data.content,
+  })
 
   const authorName = resolveMemberPublicName({
     userId,

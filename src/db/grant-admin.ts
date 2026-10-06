@@ -18,17 +18,9 @@ async function main() {
   console.log(`[Grant Admin] Granting role '${role}'...`)
 
   if (!target) {
-    // If no target provided, elevate all existing profiles to super_admin (or display instructions)
-    const existing = await sql`SELECT id FROM profiles;`
-    if (existing.length === 0) {
-      console.log('No profiles found in database. Usage: npm run db:grant-admin <email_or_userId> [role]')
-      return
-    }
-
-    console.log(`No specific target specified. Elevating ${existing.length} existing profile(s) to '${role}'...`)
-    await sql`UPDATE profiles SET role = ${role};`
-    console.log(`✓ All existing user profiles updated to role '${role}'!`)
-    return
+    // Never fall back to every profile: one missing argument would make every member staff.
+    console.error('Name the account to change. Usage: npm run db:grant-admin <email_or_userId> [role]')
+    process.exit(1)
   }
 
   // 1. Try matching by profile ID directly

@@ -50,6 +50,12 @@ import {
 import { PLACEHOLDER_LARVA_ID, resolveMemberLarvaId } from '../larva-id'
 import { verifyAuthJWT } from '../jwt'
 
+
+/** Resolves like a finished query and also supports a trailing `.limit()`. */
+function limitable<T>(rows: T) {
+  return Object.assign(Promise.resolve(rows), { limit: vi.fn().mockResolvedValue(rows) })
+}
+
 describe('Forum Server Handlers', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -388,7 +394,7 @@ describe('Forum Server Handlers', () => {
             from: vi.fn().mockReturnValue({
               leftJoin: vi.fn().mockReturnValue({
                 where: vi.fn().mockReturnValue({
-                  orderBy: vi.fn().mockResolvedValue([]),
+                  orderBy: vi.fn().mockImplementation(() => limitable([])),
                 }),
               }),
             }),
@@ -710,7 +716,7 @@ describe('Forum Server Handlers', () => {
             from: vi.fn().mockReturnValue({
               leftJoin: vi.fn().mockReturnValue({
                 where: vi.fn().mockReturnValue({
-                  orderBy: vi.fn().mockResolvedValue([
+                  orderBy: vi.fn().mockImplementation(() => limitable([
                     {
                       id: 'post-b',
                       topicId,
@@ -724,7 +730,7 @@ describe('Forum Server Handlers', () => {
                       profileLarvaId: PLACEHOLDER_LARVA_ID,
                       profileStage: 1,
                     },
-                  ]),
+                  ])),
                 }),
               }),
             }),
@@ -805,7 +811,7 @@ describe('Forum Server Handlers', () => {
           from: vi.fn().mockReturnValue({
             leftJoin: vi.fn().mockReturnValue({
               where: vi.fn().mockReturnValue({
-                orderBy: vi.fn().mockResolvedValue([
+                orderBy: vi.fn().mockImplementation(() => limitable([
                   {
                     id: '30000000-0000-0000-0000-000000000006',
                     topicId: '20000000-0000-0000-0000-000000000003',
@@ -819,7 +825,7 @@ describe('Forum Server Handlers', () => {
                     profileLarvaId: null,
                     profileStage: null,
                   },
-                ]),
+                ])),
               }),
             }),
           }),
@@ -890,6 +896,13 @@ describe('Forum Server Handlers', () => {
     }
 
     writeDb.select = vi.fn()
+      .mockImplementationOnce(() => ({
+        from: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockImplementation(() => ({
+            limit: vi.fn().mockResolvedValue([{ slug: 'general-discussion' }]),
+          })),
+        })),
+      }))
       .mockImplementationOnce(() => ({
         from: vi.fn().mockImplementation(() => ({
           where: vi.fn().mockImplementation(() => ({
@@ -972,7 +985,7 @@ describe('Forum Server Handlers', () => {
             from: vi.fn().mockReturnValue({
               leftJoin: vi.fn().mockReturnValue({
                 where: vi.fn().mockReturnValue({
-                  orderBy: vi.fn().mockResolvedValue([
+                  orderBy: vi.fn().mockImplementation(() => limitable([
                     {
                       id: 'post-b',
                       topicId,
@@ -987,7 +1000,7 @@ describe('Forum Server Handlers', () => {
                       profileLarvaId: PLACEHOLDER_LARVA_ID,
                       profileStage: 1,
                     },
-                  ]),
+                  ])),
                 }),
               }),
             }),
@@ -1577,7 +1590,7 @@ describe('Forum author edit and soft-delete', () => {
           from: vi.fn().mockReturnValue({
             leftJoin: vi.fn().mockReturnValue({
               where: vi.fn().mockReturnValue({
-                orderBy: vi.fn().mockResolvedValue([
+                orderBy: vi.fn().mockImplementation(() => limitable([
                   {
                     ...existingPost,
                     deletedAt: new Date('2026-09-06T02:05:00.000Z'),
@@ -1585,7 +1598,7 @@ describe('Forum author edit and soft-delete', () => {
                     profileLarvaId: null,
                     profileStage: 1,
                   },
-                ]),
+                ])),
               }),
             }),
           }),
@@ -1662,7 +1675,7 @@ describe('Forum author edit and soft-delete', () => {
             from: vi.fn().mockReturnValue({
               leftJoin: vi.fn().mockReturnValue({
                 where: vi.fn().mockReturnValue({
-                  orderBy: vi.fn().mockResolvedValue([]),
+                  orderBy: vi.fn().mockImplementation(() => limitable([])),
                 }),
               }),
             }),
@@ -1743,7 +1756,7 @@ describe('Forum author edit and soft-delete', () => {
           from: vi.fn().mockReturnValue({
             leftJoin: vi.fn().mockReturnValue({
               where: vi.fn().mockReturnValue({
-                orderBy: vi.fn().mockResolvedValue([]),
+                orderBy: vi.fn().mockImplementation(() => limitable([])),
               }),
             }),
           }),
@@ -1797,7 +1810,7 @@ describe('Forum author edit and soft-delete', () => {
     const topicQuery = {
       leftJoin: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
-      orderBy: vi.fn().mockResolvedValue([topicRow]),
+      orderBy: vi.fn().mockImplementation(() => limitable([topicRow])),
     }
     topicQuery.leftJoin.mockReturnValue(topicQuery)
 
@@ -1844,14 +1857,14 @@ describe('Forum author edit and soft-delete', () => {
         from: vi.fn().mockReturnValue({
           leftJoin: vi.fn().mockReturnThis(),
           where: vi.fn().mockReturnThis(),
-          orderBy: vi.fn().mockResolvedValue([topicRow]),
+          orderBy: vi.fn().mockImplementation(() => limitable([topicRow])),
         }),
       })),
     }
     const guestChain = {
       leftJoin: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
-      orderBy: vi.fn().mockResolvedValue([topicRow]),
+      orderBy: vi.fn().mockImplementation(() => limitable([topicRow])),
     }
     guestChain.leftJoin.mockReturnValue(guestChain)
     guestDb.select.mockImplementation(() => ({ from: vi.fn().mockReturnValue(guestChain) }))
@@ -1891,7 +1904,7 @@ describe('Forum author edit and soft-delete', () => {
     const topicQuery = {
       leftJoin: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
-      orderBy: vi.fn().mockResolvedValue([topicRow]),
+      orderBy: vi.fn().mockImplementation(() => limitable([topicRow])),
     }
     topicQuery.leftJoin.mockReturnValue(topicQuery)
     let selectCall = 0
@@ -1946,7 +1959,7 @@ describe('Forum author edit and soft-delete', () => {
     const topicQuery = {
       leftJoin: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
-      orderBy: vi.fn().mockResolvedValue([topicRow]),
+      orderBy: vi.fn().mockImplementation(() => limitable([topicRow])),
     }
     topicQuery.leftJoin.mockReturnValue(topicQuery)
 
@@ -1999,7 +2012,7 @@ describe('Forum author edit and soft-delete', () => {
       select: vi.fn().mockImplementation(() => {
         selectCall += 1
         if (selectCall === 1) {
-          return { from: vi.fn().mockReturnValue({ orderBy: vi.fn().mockResolvedValue([category]) }) }
+          return { from: vi.fn().mockReturnValue({ orderBy: vi.fn().mockImplementation(() => limitable([category])) }) }
         }
         if (selectCall === 2) {
           return {
@@ -2047,7 +2060,7 @@ describe('Forum author edit and soft-delete', () => {
     const guestDb = {
       select: vi.fn().mockImplementation(() => ({
         from: vi.fn().mockReturnValue({
-          orderBy: vi.fn().mockResolvedValue([category]),
+          orderBy: vi.fn().mockImplementation(() => limitable([category])),
           groupBy: vi.fn().mockResolvedValue([{ categoryId: category.id, count: 1 }]),
         }),
       })),
@@ -2171,7 +2184,7 @@ describe('forum category slug aliases', () => {
           from: vi.fn().mockReturnValue({
             leftJoin: vi.fn().mockReturnValue({
               where: vi.fn().mockReturnValue({
-                orderBy: vi.fn().mockResolvedValue([]),
+                orderBy: vi.fn().mockImplementation(() => limitable([])),
               }),
             }),
           }),

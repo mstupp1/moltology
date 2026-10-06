@@ -181,7 +181,7 @@ describe('ForumBoardPage (/_hud/forum/$categorySlug/)', () => {
     expect(getForumTopicsFn).toHaveBeenCalledWith({
       data: {
         categorySlug: 'general-discussion',
-        query: '',
+        query: undefined,
         sortBy: 'hot',
         userId: 'member-1',
         token: 'eyJ.payload.sig',

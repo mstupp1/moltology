@@ -17,6 +17,10 @@ import {
   visibleForumContent,
   FORUM_WITHDRAWN_BODY,
   formatForumTopicCount,
+  forumTopicPreview,
+  escapeLikePattern,
+  isForumStaffBoard,
+  FORUM_TOPIC_PREVIEW_CHARS,
 } from './forum-utils'
 
 describe('slugifyForumTitle', () => {
@@ -207,5 +211,27 @@ describe('getPostDepth', () => {
     expect(getPostDepth('a', byId)).toBe(0)
     expect(getPostDepth('b', byId)).toBe(1)
     expect(getPostDepth('c', byId)).toBe(2)
+  })
+})
+
+describe('forum list helpers', () => {
+  it('flattens whitespace and trims long bodies to a preview', () => {
+    expect(forumTopicPreview('line one\n\n  line two')).toBe('line one line two')
+    const long = forumTopicPreview('word '.repeat(200))
+    expect(long.length).toBeLessThanOrEqual(FORUM_TOPIC_PREVIEW_CHARS)
+    expect(long.endsWith('…')).toBe(true)
+    expect(forumTopicPreview(null)).toBe('')
+  })
+
+  it('escapes LIKE wildcards so searches match literally', () => {
+    expect(escapeLikePattern('50% off_now')).toBe('50\\% off\\_now')
+    expect(escapeLikePattern('back\\slash')).toBe('back\\\\slash')
+  })
+
+  it('recognises the staff board by slug or alias', () => {
+    expect(isForumStaffBoard('rules-announcements')).toBe(true)
+    expect(isForumStaffBoard('rules-directives')).toBe(true)
+    expect(isForumStaffBoard('general-discussion')).toBe(false)
+    expect(isForumStaffBoard(undefined)).toBe(false)
   })
 })

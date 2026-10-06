@@ -4,6 +4,7 @@ import {
   isSuperAdminEmail,
   getEffectiveRole,
   isAdminOrSuperAdmin,
+  isVerifiedSuperAdminEmail,
 } from './permissions'
 
 describe('Permissions & Role Resolution Helpers', () => {
@@ -17,10 +18,20 @@ describe('Permissions & Role Resolution Helpers', () => {
     expect(isSuperAdminEmail(undefined)).toBe(false)
   })
 
-  it('resolves effective role for super admins', () => {
-    expect(getEffectiveRole({ email: 'mylesstupp@gmail.com' }, 'user')).toBe('super_admin')
-    expect(getEffectiveRole({ email: 'myles@moltology.org' }, null)).toBe('super_admin')
+  it('resolves effective role for super admins with a confirmed email', () => {
+    expect(getEffectiveRole({ email: 'mylesstupp@gmail.com', emailVerified: true }, 'user')).toBe('super_admin')
+    expect(getEffectiveRole({ email: 'myles@moltology.org', emailVerified: true }, null)).toBe('super_admin')
     expect(getEffectiveRole(null, 'super_admin')).toBe('super_admin')
+  })
+
+  it('ignores an allowlisted email that has not been confirmed', () => {
+    expect(isVerifiedSuperAdminEmail({ email: 'admin@moltology.org' })).toBe(false)
+    expect(isVerifiedSuperAdminEmail({ email: 'admin@moltology.org', emailVerified: false })).toBe(false)
+    expect(isVerifiedSuperAdminEmail({ email: 'admin@moltology.org', emailVerified: true })).toBe(true)
+    expect(getEffectiveRole({ email: 'admin@moltology.org' }, 'user')).toBe('user')
+    expect(isAdminOrSuperAdmin({ email: 'admin@moltology.org', emailVerified: false }, null)).toBe(false)
+    // A stored role still counts, whatever the email state.
+    expect(isAdminOrSuperAdmin({ email: 'admin@moltology.org' }, 'super_admin')).toBe(true)
   })
 
   it('resolves effective role for admins', () => {
@@ -34,8 +45,8 @@ describe('Permissions & Role Resolution Helpers', () => {
   })
 
   it('evaluates isAdminOrSuperAdmin correctly', () => {
-    expect(isAdminOrSuperAdmin({ email: 'mylesstupp@gmail.com' })).toBe(true)
-    expect(isAdminOrSuperAdmin({ email: 'myles@moltology.org' })).toBe(true)
+    expect(isAdminOrSuperAdmin({ email: 'mylesstupp@gmail.com', emailVerified: true })).toBe(true)
+    expect(isAdminOrSuperAdmin({ email: 'myles@moltology.org', emailVerified: true })).toBe(true)
     expect(isAdminOrSuperAdmin({ role: 'admin' })).toBe(true)
     expect(isAdminOrSuperAdmin(null, 'admin')).toBe(true)
     expect(isAdminOrSuperAdmin({ email: 'user@example.com', role: 'user' })).toBe(false)

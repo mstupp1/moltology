@@ -17,15 +17,28 @@ export function isSuperAdminEmail(email?: string | null): boolean {
   return SUPER_ADMIN_EMAILS.includes(email.trim().toLowerCase())
 }
 
+type RoleSubject = { email?: string | null; emailVerified?: boolean | null; role?: string | null }
+
+/**
+ * True when the email is on SUPER_ADMIN_EMAILS and the account has confirmed it.
+ * Signup does not always require email confirmation, so an unconfirmed address
+ * proves nothing about who owns it.
+ */
+export function isVerifiedSuperAdminEmail(user?: RoleSubject | null): boolean {
+  return user?.emailVerified === true && isSuperAdminEmail(user.email)
+}
+
 /**
  * Resolves the effective role for a user given their explicit role and email.
- * Defaults to 'super_admin' if the email matches SUPER_ADMIN_EMAILS.
+ * A confirmed email on SUPER_ADMIN_EMAILS resolves to 'super_admin'. Server checks
+ * pass JWT claims without `emailVerified`, so they rely on the stored profile role,
+ * which `ensureUserProfile` sets only for confirmed addresses.
  */
 export function getEffectiveRole(
-  user?: { email?: string | null; role?: string | null } | null,
+  user?: RoleSubject | null,
   profileRole?: string | null
 ): 'super_admin' | 'admin' | 'user' | string | null {
-  if (profileRole === 'super_admin' || isSuperAdminEmail(user?.email)) {
+  if (profileRole === 'super_admin' || isVerifiedSuperAdminEmail(user)) {
     return 'super_admin'
   }
   if (profileRole === 'admin' || user?.role === 'admin') {
@@ -38,7 +51,7 @@ export function getEffectiveRole(
  * Checks if a user is an admin or super admin.
  */
 export function isAdminOrSuperAdmin(
-  user?: { email?: string | null; role?: string | null } | null,
+  user?: RoleSubject | null,
   profileRole?: string | null
 ): boolean {
   const role = getEffectiveRole(user, profileRole)

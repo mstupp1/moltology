@@ -5,6 +5,8 @@ import { getAuthJWTToken } from '@/lib/jwt'
 import { validateForumContent } from '@/lib/community-rules'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { useForumStanding } from '@/hooks/useForumStanding'
+import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
+import { isForumStaffBoard } from '@/lib/forum-utils'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { useForumAuth } from './ForumShell'
 import { MentionTextarea } from '@/components/forum/MentionTextarea'
@@ -28,7 +30,7 @@ export interface InlineTopicComposerProps {
 export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineTopicComposerProps>(
   function InlineTopicComposer(
     {
-      categories,
+      categories: allCategories,
       initialCategoryId,
       fixedCategory = false,
       onCreated,
@@ -40,8 +42,16 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
     const { isAuthenticated, isPending, userId, openAuth } = useForumAuth()
     const persist = useHudPersist()
     const standing = useForumStanding(isAuthenticated ? userId : null)
+    const staffAccess = useHiddenPageAccess()
+    // Members can reply on the staff board but cannot start topics there.
+    const categories = staffAccess.canView
+      ? allCategories
+      : allCategories.filter((c) => !isForumStaffBoard(c.slug))
     const [isExpanded, setIsExpanded] = useState(false)
     const [categoryId, setCategoryId] = useState(initialCategoryId || categories[0]?.id || '')
+    const activeCategoryId = categories.some((c) => c.id === categoryId)
+      ? categoryId
+      : categories[0]?.id || ''
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
     const [preview, setPreview] = useState(false)
@@ -114,7 +124,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
         const token = await getAuthJWTToken()
         const topic = await createForumTopicFn({
           data: {
-            categoryId,
+            categoryId: activeCategoryId,
             title: title.trim(),
             content: content.trim(),
             userId: userId ?? undefined,
@@ -194,7 +204,9 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
       )
     }
 
-    const currentCategory = categories.find((c) => c.id === categoryId)
+    if (categories.length === 0) return null
+
+    const currentCategory = categories.find((c) => c.id === activeCategoryId)
     const promptText =
       placeholder ||
       (fixedCategory && currentCategory
@@ -293,7 +305,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
               </label>
               <select
                 id="composer-category-select"
-                value={categoryId}
+                value={activeCategoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
                 disabled={fixedCategory}
                 className="w-full min-h-[44px] sm:min-h-[38px] bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] px-3 py-2 text-[16px] sm:text-xs text-[#dfe3e3] outline-none chamfer-corner transition-colors disabled:opacity-75"

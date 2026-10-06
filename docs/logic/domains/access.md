@@ -17,7 +17,7 @@ rules:
   - id: access.super-admin-emails
     title: Super admin by email
     kind: permission
-    statement: A fixed list of emails always resolves to super_admin, whatever the stored role says. The profile role is checked first, then the session role.
+    statement: A fixed list of emails resolves to super_admin once the account has confirmed that email, whatever the stored role says. Server checks rely on the stored profile role, which is raised to super_admin only for a confirmed address.
     dependsOn: [access.roles]
     anchors:
       - file: src/lib/permissions.ts

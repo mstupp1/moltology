@@ -72,7 +72,7 @@ describe('Subterranean HUD Route', () => {
 
   it('renders the vats hub for super admins', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
-      data: { user: { id: 'super-1', name: 'Commander Craw', email: 'myles@moltology.org', role: 'user' } },
+      data: { user: { id: 'super-1', name: 'Commander Craw', email: 'myles@moltology.org', emailVerified: true, role: 'user' } },
       isPending: false,
     } as any)
     const Component = Route.options.component!
