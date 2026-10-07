@@ -45,8 +45,8 @@ describe('MoltMaxPage', () => {
     renderPage()
     expect(screen.getByText(/Measure the shell/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /take the moltmax quiz/i })).toBeInTheDocument()
-    expect(screen.getByText(/Carapace Resilience/i)).toBeInTheDocument()
-    expect(screen.getByText(/Depth Composure/i)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /Carapace Resilience/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /Depth Composure/i })).toBeInTheDocument()
   })
 
   it('moves through the fifteen-question chamber flow and reveals a clearance', () => {
@@ -72,17 +72,16 @@ describe('MoltMaxPage', () => {
     expect(screen.getByText(/sudden wave of criticism/i)).toBeInTheDocument()
   })
 
-  it('supports Likert slider interaction on agreement scale questions', () => {
+  it('supports agreement scale interaction on agreement scale questions', () => {
     renderPage()
     fireEvent.click(screen.getByRole('button', { name: /take the moltmax quiz/i }))
     // Move to Question 2 (Likert format)
     answerCurrentQuestion()
     expect(screen.getByText(/02 ·/i)).toBeInTheDocument()
     
-    // Find slider and interact
-    const slider = screen.getByRole('slider')
-    expect(slider).toBeInTheDocument()
-    
+    // Next stays locked until a point on the scale is chosen
+    expect(screen.getByRole('button', { name: /next question/i })).toBeDisabled()
+
     // Click Strongly Agree step
     fireEvent.click(screen.getByRole('button', { name: /^Strongly Agree$/i }))
     
