@@ -25,6 +25,7 @@ import { PublicHeader } from '@/components/PublicHeader'
 import { MoltNationFooter } from '@/components/news/MoltNationFooter'
 import { AuthModal } from '@/components/AuthModal'
 import { submitLeadFn } from '@/lib/server/api'
+import { LEAD_CAPTURE_CHECK_PENDING, LEAD_CAPTURE_TURNSTILE_ACTION } from '@/lib/lead-capture'
 import { getAssetUrl } from '@/lib/assets'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
@@ -46,6 +47,10 @@ export const MoltmaxGuidePage: React.FC = () => {
       setError('Please enter a valid email address.')
       return
     }
+    if (!turnstileToken) {
+      setError(LEAD_CAPTURE_CHECK_PENDING)
+      return
+    }
 
     setLoading(true)
     setError(null)
@@ -56,7 +61,7 @@ export const MoltmaxGuidePage: React.FC = () => {
           email: email.trim(),
           source: 'moltmax_guide_page_hero',
           referrer: typeof window !== 'undefined' ? window.location.pathname : undefined,
-          turnstileToken: turnstileToken || undefined,
+          turnstileToken,
           emailOptIn,
         },
       })
@@ -76,6 +81,7 @@ export const MoltmaxGuidePage: React.FC = () => {
         }
       } else {
         setError('Could not submit request. Please try again.')
+        setTurnstileToken(null)
         turnstileRef.current?.reset()
       }
     } catch {
@@ -202,7 +208,7 @@ export const MoltmaxGuidePage: React.FC = () => {
                 {error && <p className="text-xs text-[#ff453a] font-sans">{error}</p>}
                 <TurnstileWidget
                   ref={turnstileRef}
-                  action="lead_capture"
+                  action={LEAD_CAPTURE_TURNSTILE_ACTION}
                   size="flexible"
                   onVerify={(token) => setTurnstileToken(token)}
                   onExpire={() => setTurnstileToken(null)}

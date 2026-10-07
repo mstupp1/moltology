@@ -316,6 +316,13 @@
       "when": 1791340602138,
       "tag": "0044_retire_super_admin",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1791390205982,
+      "tag": "0045_hot_path_indexes",
+      "breakpoints": true
     }
   ]
 }

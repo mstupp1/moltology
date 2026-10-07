@@ -117,7 +117,9 @@ describe('OrgPage (Moltology Organization Page)', () => {
     const dispatchBtn = screen.getByRole('button', { name: /DISPATCH NEURAL BEACON/i })
     fireEvent.click(dispatchBtn)
 
+    // The bot check has not finished in the test DOM, so nothing is sent yet.
     expect(dispatchBtn).toBeInTheDocument()
+    expect(screen.getByText(/wait for the security check to finish/i)).toBeInTheDocument()
   })
 
   it('allows browsing team and campus life gallery', () => {

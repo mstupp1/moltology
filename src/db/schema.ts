@@ -400,6 +400,7 @@ export const aiThreads = pgTable('ai_threads', {
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),
 }, (table) => [
+  index('ai_threads_user_id_idx').on(table.userId),
   pgPolicy('ai_threads_isolation_policy', {
     for: 'all',
     using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
@@ -416,6 +417,7 @@ export const aiMessages = pgTable('ai_messages', {
   parts: jsonb('parts').$type<Record<string, unknown>[]>().default([]).notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
 }, (table) => [
+  index('ai_messages_thread_created_idx').on(table.threadId, table.createdAt),
   pgPolicy('ai_messages_isolation_policy', {
     for: 'all',
     using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
@@ -431,7 +433,7 @@ const aiUsageServerOnly = sql`NULLIF(current_setting('request.jwt.claims', true)
 export const aiUsageEvents = pgTable('ai_usage_events', {
   id: uuid('id').defaultRandom().primaryKey(),
   userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
-  /** 'chat' counts toward limits. 'title' is recorded for cost only. */
+  /** 'chat' counts toward Oracle limits. 'title' is recorded for cost only. 'forum_write' counts toward forum write limits. */
   kind: text('kind').notNull(),
   model: text('model'),
   inputTokens: integer('inputTokens'),
@@ -485,6 +487,7 @@ export const blogComments = pgTable('blog_comments', {
   content: text('content').notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
 }, (table) => [
+  index('blog_comments_post_created_idx').on(table.postId, table.createdAt),
   pgPolicy('blog_comments_public_read_policy', {
     for: 'select',
     using: sql`true`
@@ -542,6 +545,9 @@ export const forumTopics = pgTable('forum_topics', {
   /** Author withdraw — body is sealed, thread and replies stay. */
   deletedAt: timestamp('deletedAt'),
 }, (table) => [
+  index('forum_topics_category_id_idx').on(table.categoryId),
+  index('forum_topics_user_id_idx').on(table.userId),
+  index('forum_topics_last_reply_at_idx').on(table.lastReplyAt),
   pgPolicy('forum_topics_public_read_policy', {
     for: 'select',
     using: sql`true`
@@ -613,6 +619,8 @@ export const forumVotes = pgTable('forum_votes', {
 }, (table) => [
   uniqueIndex('forum_votes_topic_user_unique').on(table.userId, table.topicId),
   uniqueIndex('forum_votes_post_user_unique').on(table.userId, table.postId),
+  index('forum_votes_topic_id_idx').on(table.topicId),
+  index('forum_votes_post_id_idx').on(table.postId),
   pgPolicy('forum_votes_public_read_policy', {
     for: 'select',
     using: sql`true`

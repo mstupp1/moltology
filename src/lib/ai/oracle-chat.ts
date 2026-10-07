@@ -61,8 +61,8 @@ export function getLastUserText(messages: OracleChatMessageInput[]): string {
 }
 
 /**
- * Client history becomes model input. Only user and assistant turns pass, so a
- * caller cannot inject a system message, and the history is capped by size.
+ * Stored history becomes model input. Only user and assistant turns pass, so a
+ * system message never reaches the model, and the history is capped by size.
  */
 export function toModelMessages(messages: OracleChatMessageInput[]) {
   const turns = messages

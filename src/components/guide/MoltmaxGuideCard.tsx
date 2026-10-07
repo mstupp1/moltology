@@ -16,6 +16,8 @@ import {
   Zap,
 } from 'lucide-react'
 import { submitLeadFn } from '@/lib/server/api'
+import { LEAD_CAPTURE_CHECK_PENDING, LEAD_CAPTURE_TURNSTILE_ACTION } from '@/lib/lead-capture'
+import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 import { getAssetUrl } from '@/lib/assets'
 
 export interface MoltmaxGuideCardProps {
@@ -31,6 +33,8 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
 }) => {
   const [email, setEmail] = useState('')
   const [emailOptIn, setEmailOptIn] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
   const [loading, setLoading] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -39,6 +43,10 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
     e.preventDefault()
     if (!email || !email.includes('@')) {
       setError('Please enter a valid email address.')
+      return
+    }
+    if (!turnstileToken) {
+      setError(LEAD_CAPTURE_CHECK_PENDING)
       return
     }
 
@@ -51,6 +59,7 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
           email: email.trim(),
           source,
           referrer: typeof window !== 'undefined' ? window.location.pathname : undefined,
+          turnstileToken,
           emailOptIn,
         },
       })
@@ -70,6 +79,8 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
         }
       } else {
         setError('Could not submit request. Please try again.')
+        setTurnstileToken(null)
+        turnstileRef.current?.reset()
       }
     } catch {
       setIsSubmitted(true)
@@ -210,6 +221,14 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
                   </span>
                 </label>
               </div>
+
+              <TurnstileWidget
+                ref={turnstileRef}
+                action={LEAD_CAPTURE_TURNSTILE_ACTION}
+                size="flexible"
+                onVerify={(token) => setTurnstileToken(token)}
+                onExpire={() => setTurnstileToken(null)}
+              />
 
               {error && <p className="text-xs text-[#ff453a] font-sans">{error}</p>}
               <p className="text-[10px] text-[#839493] font-sans">

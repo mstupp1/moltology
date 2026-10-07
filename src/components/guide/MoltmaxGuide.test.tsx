@@ -22,6 +22,21 @@ vi.mock('@/lib/server/api', async (importOriginal) => {
   }
 })
 
+vi.mock('@/components/TurnstileWidget', () => ({
+  TurnstileWidget: React.forwardRef(({ onVerify }: { onVerify?: (token: string) => void }, _ref) => {
+    React.useEffect(() => {
+      onVerify?.('turnstile-ok')
+    }, [onVerify])
+    return <div data-testid="turnstile-widget" />
+  }),
+}))
+
+vi.mock('@/lib/server/turnstile', () => ({
+  verifyTurnstileToken: vi.fn(async ({ token }: { token?: string }) =>
+    token ? { success: true } : { success: false, errorMessage: 'Bot verification token missing. Please try again.' },
+  ),
+}))
+
 describe('Moltmax Guide Lead Capture Components', () => {
   it('renders MoltmaxGuideCard with price anchoring, features, and opt-in checkbox', () => {
     render(<MoltmaxGuideCard />)
@@ -81,11 +96,18 @@ describe('Moltmax Guide Lead Capture Components', () => {
     expect(screen.getByText(/FREE PROTOCOL/i)).toBeDefined()
   })
 
+  it('submitLeadHandler rejects a lead with no bot check token', async () => {
+    await expect(
+      submitLeadHandler({ data: { email: 'bot@example.com', source: 'test_suite', emailOptIn: true } }),
+    ).rejects.toThrow(/token missing/i)
+  })
+
   it('submitLeadHandler validates email and returns downloadUrl', async () => {
     const res = await submitLeadHandler({
       data: {
         email: 'test-initiate@benthic.org',
         source: 'test_suite',
+        turnstileToken: 'turnstile-ok',
       },
     })
 

@@ -1,4 +1,3 @@
-import { env } from '../../env'
 
 export interface TurnstileVerificationOptions {
   token?: string | null
@@ -19,6 +18,27 @@ export interface TurnstileVerificationResult {
 }
 
 const CLOUDFLARE_SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
+
+/** Cloudflare's always-pass test secret. Only for local development and tests. */
+export const TURNSTILE_TEST_SECRET = '1x0000000000000000000000000000000AA'
+
+export const TURNSTILE_UNAVAILABLE_MESSAGE =
+  'Bot protection is not available right now. Please try again later.'
+
+/**
+ * The real secret when one is set. Without one, production gets null so every
+ * check fails, and other environments get the always-pass test secret.
+ */
+export function resolveTurnstileSecret(
+  rawEnv: Record<string, string | undefined> = process.env,
+): string | null {
+  const secret = rawEnv.TURNSTILE_SECRET_KEY?.trim()
+  if (secret) return secret
+  const isProduction = rawEnv.VERCEL_ENV
+    ? rawEnv.VERCEL_ENV === 'production'
+    : rawEnv.NODE_ENV === 'production'
+  return isProduction ? null : TURNSTILE_TEST_SECRET
+}
 
 /**
  * Canonical Server-Side Turnstile Verification
@@ -48,7 +68,15 @@ export async function verifyTurnstileToken(
     }
   }
 
-  const secretKey = env.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY || '1x0000000000000000000000000000000AA'
+  const secretKey = resolveTurnstileSecret()
+  if (!secretKey) {
+    console.error('[verifyTurnstileToken] TURNSTILE_SECRET_KEY is not set in production.')
+    return {
+      success: false,
+      errorCodes: ['missing-secret'],
+      errorMessage: TURNSTILE_UNAVAILABLE_MESSAGE,
+    }
+  }
 
   try {
     const formData = new URLSearchParams()

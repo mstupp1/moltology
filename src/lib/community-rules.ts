@@ -70,6 +70,10 @@ export interface GuardrailValidationResult {
 export const FORUM_WRITE_RATE_LIMIT = 10
 export const FORUM_WRITE_RATE_WINDOW_MS = 60 * 1000
 export const FORUM_WRITE_RATE_ERROR = 'You are posting too quickly. Wait a minute and try again.'
+/** Topic and reply creates and edits per member in any rolling 24 hours. */
+export const FORUM_WRITE_DAILY_LIMIT = 150
+export const FORUM_WRITE_DAILY_ERROR =
+  'You have reached the daily limit for new posts and edits. Try again tomorrow.'
 export const FORUM_LOCKED_ERROR = 'This thread is locked. New replies are closed.'
 export const FORUM_STAFF_BOARD_ERROR = 'Only staff can start topics on this board. Pick another board for your post.'
 
@@ -85,6 +89,22 @@ export function assertForumWriteRateLimit(userId: string): void {
   if (!result.success) {
     throw new Error(FORUM_WRITE_RATE_ERROR)
   }
+}
+
+export interface ForumWriteCounts {
+  lastMinute: number
+  lastDay: number
+}
+
+/**
+ * The durable check behind assertForumWriteRateLimit. Counts come from the
+ * database, so the cap holds across server instances. Returns an error message
+ * when the member is over a limit, or null when the write may go ahead.
+ */
+export function forumWriteLimitError(counts: ForumWriteCounts): string | null {
+  if (counts.lastDay >= FORUM_WRITE_DAILY_LIMIT) return FORUM_WRITE_DAILY_ERROR
+  if (counts.lastMinute >= FORUM_WRITE_RATE_LIMIT) return FORUM_WRITE_RATE_ERROR
+  return null
 }
 
 function scanForumSafety(text: string): GuardrailValidationResult | null {
