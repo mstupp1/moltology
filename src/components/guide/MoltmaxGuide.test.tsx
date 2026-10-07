@@ -62,9 +62,9 @@ describe('Moltmax Guide Lead Capture Components', () => {
       />
     )
 
-    expect(screen.getByText(/GET THE 2026/i)).toBeDefined()
-    expect(screen.getByText(/VALUE \$149\.00 USD/i)).toBeDefined()
-    expect(screen.getByText(/FREE TODAY \(\$0\.00\)/i)).toBeDefined()
+    expect(screen.getByRole('dialog', { name: /Shed the clutter\. Finish what you start\./i })).toBeDefined()
+    expect(screen.getByText(/What’s inside, and why it helps/i)).toBeDefined()
+    expect(screen.getByText(/A printable daily checklist/i)).toBeDefined()
 
     const optInCheckbox = screen.getByRole('checkbox')
     expect(optInCheckbox).toBeDefined()
@@ -73,18 +73,18 @@ describe('Moltmax Guide Lead Capture Components', () => {
     fireEvent.click(optInCheckbox)
     expect(optInCheckbox).toBeChecked()
 
-    const emailInput = screen.getByPlaceholderText(/initiate@benthic-core\.org/i)
+    const emailInput = screen.getByLabelText(/Your email/i)
     fireEvent.change(emailInput, { target: { value: 'initiate@moltology.org' } })
 
-    const submitBtn = screen.getByRole('button', { name: /CLAIM 100% FREE FIELD MANUAL/i })
+    const submitBtn = screen.getByRole('button', { name: /Get the free PDF/i })
     fireEvent.click(submitBtn)
 
     await waitFor(() => {
-      expect(screen.getByText(/YOUR FIELD MANUAL IS READY!/i)).toBeDefined()
-      expect(screen.getByText(/BIND TELEMETRY TO FREE BENTHIC ACCOUNT/i)).toBeDefined()
+      expect(screen.getByText(/Your manual is downloading/i)).toBeDefined()
+      expect(screen.getByText(/Next: turn the checklist into a habit/i)).toBeDefined()
     })
 
-    const activateBtn = screen.getByRole('button', { name: /ACTIVATE FREE MOLTOLOGY ACCOUNT/i })
+    const activateBtn = screen.getByRole('button', { name: /Create my free account/i })
     fireEvent.click(activateBtn)
     expect(onOpenAuthSignup).toHaveBeenCalledWith('initiate@moltology.org')
   })
@@ -92,8 +92,11 @@ describe('Moltmax Guide Lead Capture Components', () => {
   it('renders MoltmaxGuideFloatingPill correctly', () => {
     const onOpen = vi.fn()
     render(<MoltmaxGuideFloatingPill onOpenGuideModal={onOpen} />)
-    expect(screen.getByText(/2026 Moltmax Field Manual/i)).toBeDefined()
-    expect(screen.getByText(/FREE PROTOCOL/i)).toBeDefined()
+    expect(screen.getByText(/Moltmaxxing Field Manual/i)).toBeDefined()
+    fireEvent.click(screen.getByRole('button', { name: /Get the free Moltmaxxing Field Manual/i }))
+    expect(onOpen).toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: /Hide field manual offer/i }))
+    expect(screen.queryByText(/Moltmaxxing Field Manual/i)).toBeNull()
   })
 
   it('submitLeadHandler rejects a lead with no bot check token', async () => {
