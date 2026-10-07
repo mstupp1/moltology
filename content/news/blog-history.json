@@ -437,6 +437,17 @@
         "1st calcification via toxic frontline boundary"
       ],
       "relatedReelIds": []
+    },
+    {
+      "slug": "the-lid-you-closed",
+      "title": "The Lid You Closed: Cowork Keeps Working Beyond the Desk",
+      "format": "autonomous-dispatch",
+      "category": "TELEMETRY",
+      "author": "Silas Trench",
+      "publishedAt": "2026-10-07T15:36:17.000Z",
+      "coreHook": "Closing the laptop used to feel like putting the work away. Anthropic's October 6 change moves new Cowork tasks on Pro and Max into the cloud, inviting a fresh look at what we hand over and when we call a task finished.",
+      "keyMetrics": [],
+      "relatedReelIds": []
     }
   ]
 }
