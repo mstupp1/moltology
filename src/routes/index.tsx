@@ -8,13 +8,13 @@ export const Route = createFileRoute('/')({
     meta: [...seo(HOMEPAGE_SEO)],
     links: [
       canonicalLink(SITE_ORIGIN),
-      // Mobile LCP: chitin hero grain (matches HeroBackground img + fetchPriority high)
+      // Mobile LCP: responsive hero artwork (matches HeroBackground picture)
       {
         rel: 'preload',
         as: 'image',
         type: 'image/webp',
         media: '(max-width: 767px)',
-        href: getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2'),
+        href: getAssetUrl('/images/hero_benthic_expansive_v1_sm.webp'),
         fetchPriority: 'high',
       },
       {
@@ -30,7 +30,7 @@ export const Route = createFileRoute('/')({
         as: 'image',
         type: 'image/webp',
         media: '(min-width: 768px)',
-        href: getAssetUrl('/images/hero_widescreen_bg.webp'),
+        href: getAssetUrl('/images/hero_benthic_expansive_v1.webp'),
         fetchPriority: 'high',
       },
       {

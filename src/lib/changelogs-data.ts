@@ -35,25 +35,27 @@ Characters saved before this update keep their current head and build.`,
     releasedAt: '2026-10-05T23:59:00Z',
   },
   {
-    slug: '2026-10-02-character-creator-crabs-and-shell-styling',
+    slug: '2026-10-02-character-creator-forum-standing-oracle-safeguards',
     version: '2026.10.02',
-    title: 'Character Creator Rebuild: Crabs, Shell Finishes & Patterns',
-    category: 'Design',
-    tags: ['Design', 'Feature', 'UI/UX'],
-    summary: 'Crustaceans got a cleaner, rounder look, crabs joined the reef, and the character creator now lets you pick shell colors, finishes, patterns, faces, and headwear.',
-    content: `### Crabs Join the Reef
-- Pick a lobster or a crab when you build your character. Crabs get their own wide shell, eye stalks, and sideways stance.
-- Existing characters stay lobsters and keep their scene, eyes, and height.
+    title: 'Character Creator Rebuild, Forum Standing & Oracle Safeguards',
+    category: 'Feature',
+    tags: ['Feature', 'Design', 'Community', 'AI', 'UI/UX'],
+    summary: 'Crabs joined the reef alongside a complete character creator rebuild with custom shell finishes and live previews, earned forum standing now protects community discussions, and the Synaptic Oracle gained dependable daily usage allowances and faster model responses.',
+    content: `### Character Creator Rebuild
+- Pick a lobster or a crab when building your character, with crabs featuring their own wide shell, eye stalks, and sideways stance.
+- Every character was redrawn with smoother shapes, soft shading, specular highlights, and shell finishes ranging from glossy and pearlescent to bioluminescent.
+- Choose from 12 shell colors, 9 shell patterns, facial expressions, claws, and headwear, with a live side-by-side preview showing your full body and forum portrait.
+- All customization options are free.
 
-### A Cleaner, Rounder Look
-- Every character was redrawn with smoother shapes, soft shading, and a rim light that matches the backdrop.
-- Avatars now render crisp at every size instead of pixelated.
+### Forum Standing & Discussion Quality
+- Introduced Forum Standing to reward helpful contributions and protect community discussions from spam.
+- Creating new discussion threads now requires an established account plus earned standing or progression experience, encouraging thoughtful topics across boards.
+- Low-effort or thin replies are automatically collapsed to keep conversation threads clean, focused, and easy to read.
 
-### More Ways to Make It Yours
-- Choose from 12 shell colors, 5 finishes (glossy, satin, pearlescent, chrome, bioluminescent), and 9 patterns including tiger stripes, calico, and circuit traces.
-- Pick an expression, mouth, eye shape, antennae, claws, pose, and headwear such as a crown, hard hat, or halo.
-- A live preview shows your full body and your forum portrait side by side while you edit, and "Surprise me" rolls a fresh look without changing your race.
-- All options are free.`,
+### Synaptic Oracle Safeguards & Speed
+- Added dependable daily and per-minute conversation allowances, with 10x higher capacity for Premium supporters.
+- Switched the default conversation and title engine to GLM 5.3 Flash for near-instant responses, while keeping deep reasoning models in the picker.
+- Conversation titles now generate smoothly in the sidebar without loading flashes or page refreshes.`,
     releasedAt: '2026-10-02T23:59:00Z',
   },
   {

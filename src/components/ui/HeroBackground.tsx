@@ -4,6 +4,8 @@ import { lcpImageProps } from '@/lib/media-priority'
 
 export interface HeroBackgroundProps {
   className?: string
+  artworkSrc?: string
+  artworkSrcMobile?: string
   showWatermarks?: boolean
   leftWatermark?: string
   rightWatermark?: string
@@ -11,16 +13,56 @@ export interface HeroBackgroundProps {
 
 /**
  * Shared Hero Background Component
- * Mobile chitin WebP is the intentional LCP (preloaded on `/`); deck poster stays eager-low.
+ * Homepage artwork is responsive and preloaded on `/`; other heroes retain chitin grain.
  */
 export const HeroBackground: React.FC<HeroBackgroundProps> = ({
   className = '',
+  artworkSrc,
+  artworkSrcMobile,
   showWatermarks = true,
   leftWatermark = 'SYS.CORE · TRANSMUTATION_PIPELINE',
   rightWatermark = 'MARIANA_DEPTH_DATUM · 10984M',
 }) => {
   const chitinSm = getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2')
   const chitinLg = getAssetUrl('/images/chitin_texture_bg.webp')
+
+  if (artworkSrc) {
+    return (
+      <div className={`absolute inset-0 pointer-events-none overflow-hidden select-none z-0 ${className}`} aria-hidden="true">
+        <picture>
+          {artworkSrcMobile && <source media="(max-width: 767px)" srcSet={getAssetUrl(artworkSrcMobile)} />}
+          <img
+            src={getAssetUrl(artworkSrc)}
+            alt=""
+            role="presentation"
+            {...lcpImageProps}
+            width={1672}
+            height={941}
+            className="absolute inset-0 w-full h-full object-cover object-[62%_center] md:object-center"
+            data-testid="hero-artwork"
+          />
+        </picture>
+        <div className="absolute inset-0 bg-[#020608]/30 md:bg-[#020608]/15" />
+        {/* Keep the architectural depth open while feathering the frame into page chrome. */}
+        <div
+          className="absolute inset-0"
+          style={{ background: 'radial-gradient(ellipse at 62% 44%, transparent 24%, rgba(2,6,8,0.18) 53%, rgba(2,6,8,0.72) 83%, #020608 110%)' }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(90deg, rgba(2,6,8,0.82) 0%, rgba(2,6,8,0.48) 28%, rgba(2,6,8,0.12) 58%, transparent 78%)' }}
+        />
+        <div
+          className="absolute inset-x-0 top-0 h-[28%] min-h-36"
+          style={{ background: 'linear-gradient(to bottom, #020608 0%, rgba(2,6,8,0.75) 24%, rgba(2,6,8,0.25) 65%, transparent 100%)' }}
+        />
+        <div
+          className="absolute inset-x-0 bottom-0 h-[34%] min-h-48"
+          style={{ background: 'linear-gradient(to top, #020608 0%, rgba(2,6,8,0.92) 14%, rgba(2,6,8,0.48) 48%, transparent 100%)' }}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className={`absolute inset-0 w-full h-full pointer-events-none overflow-hidden select-none z-0 ${className}`} aria-hidden="true">

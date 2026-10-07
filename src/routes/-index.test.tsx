@@ -16,7 +16,7 @@ vi.mock('@/components/LandingPage', () => ({
 import { Route } from './index'
 
 describe('Homepage route head', () => {
-  it('preloads mobile chitin as LCP and desktop hero widescreen', async () => {
+  it('preloads the responsive homepage artwork as LCP', async () => {
     const headFn = Route.options.head
     expect(headFn).toBeTypeOf('function')
     if (typeof headFn !== 'function') {
@@ -32,7 +32,7 @@ describe('Homepage route head', () => {
           as: 'image',
           type: 'image/webp',
           media: '(max-width: 767px)',
-          href: getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2'),
+          href: getAssetUrl('/images/hero_benthic_expansive_v1_sm.webp'),
           fetchPriority: 'high',
         },
         {
@@ -47,7 +47,7 @@ describe('Homepage route head', () => {
           as: 'image',
           type: 'image/webp',
           media: '(min-width: 768px)',
-          href: getAssetUrl('/images/hero_widescreen_bg.webp'),
+          href: getAssetUrl('/images/hero_benthic_expansive_v1.webp'),
           fetchPriority: 'high',
         },
         {

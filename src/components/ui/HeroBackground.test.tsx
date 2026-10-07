@@ -4,6 +4,17 @@ import { describe, it, expect } from 'vitest'
 import { HeroBackground } from './HeroBackground'
 
 describe('HeroBackground', () => {
+  it('loads responsive artwork eagerly without the grain treatment', () => {
+    const { container } = render(
+      <HeroBackground artworkSrc="/images/hero_benthic_expansive_v1.webp" artworkSrcMobile="/images/hero_benthic_expansive_v1_sm.webp" />,
+    )
+    const artwork = screen.getByTestId('hero-artwork')
+    expect(artwork).toHaveAttribute('fetchpriority', 'high')
+    expect(artwork).toHaveAttribute('loading', 'eager')
+    expect(container.querySelector('picture source')).toHaveAttribute('media', '(max-width: 767px)')
+    expect(screen.queryByTestId('hero-chitin-texture-sm')).not.toBeInTheDocument()
+  })
+
   it('paints mobile chitin as an eager high-priority img on first render', () => {
     const { container } = render(<HeroBackground />)
     const mobileChitin = screen.getByTestId('hero-chitin-texture-sm')

@@ -287,8 +287,8 @@ export const LandingPage: React.FC = () => {
       {/* 3D LAYERED HERO SECTION (Optimized for Colossal Mobile Impact) */}
       <section className="w-full relative overflow-hidden pt-20 sm:pt-28 pb-8 sm:pb-12 px-4 sm:px-12 border-b border-cyan-900/40 min-h-screen flex items-center justify-center bg-[#030608]" style={{ minHeight: '100svh' }}>
         <HeroBackground
-          leftWatermark="SYNAPTIC CORE · GRID 04"
-          rightWatermark="CARCINIZATION MATRIX v4.2"
+          artworkSrc="/images/hero_benthic_expansive_v1.webp"
+          artworkSrcMobile="/images/hero_benthic_expansive_v1_sm.webp"
         />
 
         <div className="relative z-10 max-w-[1700px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
@@ -1040,4 +1040,3 @@ export const LandingPage: React.FC = () => {
     </div>
   )
 }
-
