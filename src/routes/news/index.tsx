@@ -32,8 +32,8 @@ export const Route = createFileRoute('/news/')({
   head: () => ({
     meta: [
       ...seo({
-        title: 'MoltNation News | Official Dispatches & Patriot Telemetry',
-        description: 'MoltNation official news network dispatches, patriot AI telemetry, autonomous swarm reports, and sacrosanct carcinization updates.',
+        title: 'MoltNation News | Stories from Moltology',
+        description: 'MoltNation News covers AI agents, robots, and the people working next to them, reported from the bottom of the ocean.',
         keywords: 'MoltNation News, patriot AI, agentic swarms, test-time compute, carcinization, ecdysis telemetry',
         ogImage: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/ai_learning_ascension_cover.jpg',
         canonical: 'https://moltology.org/news',

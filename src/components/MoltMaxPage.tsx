@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Activity, ArrowDown, ArrowRight, BookOpen, Brain, CheckCircle2, Clock, Compass, Layers3, ListChecks, Lock, Shield, Sparkles, Terminal, Zap } from 'lucide-react'
+import { Activity, ArrowDown, ArrowRight, BookOpen, CheckCircle2, Clock, ListChecks, Lock, Sparkles, Terminal } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { PublicHeader } from '@/components/PublicHeader'
 import { AuthModal } from '@/components/AuthModal'
@@ -16,76 +16,9 @@ import '@/styles/hud-chrome.css'
 import '@/styles/pbr-textures.css'
 import { QuizQuestionCard } from './moltmax/QuizQuestionCard'
 import { QuizResultsReveal } from './moltmax/QuizResultsReveal'
+import { VectorCarapaceDiagram } from './moltmax/VectorCarapaceDiagram'
 
 type PageMode = 'hero' | 'quiz' | 'results'
-
-const vectorDetails = [
-  {
-    icon: <Shield className="h-5 w-5" />,
-    label: 'Carapace Resilience',
-    dimension: 'Boundary & Stress Armor',
-    code: 'VEC-01',
-    description: 'Measures your capacity to absorb external criticism, friction, and setbacks without sustaining structural fracture or emotional corrosion.',
-    color: '#00ffcc',
-    borderClass: 'border-[#00ffcc]/40 hover:border-[#00ffcc]',
-    glowClass: 'hover:shadow-[0_0_30px_rgba(0,255,204,0.22)]',
-    bgGradient: 'from-[#081412]/95 via-[#060e0d]/95 to-[#030807]/95',
-    pbrUnderlay: 'pbr-underlay-chitin',
-    bullet: 'Stress absorption & deflection',
-  },
-  {
-    icon: <Zap className="h-5 w-5" />,
-    label: 'Pincer Torque',
-    dimension: 'Decisive Execution',
-    code: 'VEC-02',
-    description: 'Diagnoses your speed of closing the claw on high-stakes decisions and executing with unyielding leverage once committed.',
-    color: '#ffd700',
-    borderClass: 'border-[#ffd700]/40 hover:border-[#ffd700]',
-    glowClass: 'hover:shadow-[0_0_30px_rgba(255,215,0,0.2)]',
-    bgGradient: 'from-[#141208]/95 via-[#0e0c07]/95 to-[#080704]/95',
-    pbrUnderlay: 'pbr-underlay-carbon',
-    bullet: 'Uncompromised execution grip',
-  },
-  {
-    icon: <Brain className="h-5 w-5" />,
-    label: 'Synaptic Speed',
-    dimension: 'Neural Latency & Focus',
-    code: 'VEC-03',
-    description: 'Quantifies mental clarity in chaotic noise, split-second triage ability, and cognitive bandwidth under heavy operational load.',
-    color: '#38bdf8',
-    borderClass: 'border-cyan-500/40 hover:border-cyan-400',
-    glowClass: 'hover:shadow-[0_0_30px_rgba(0,195,255,0.22)]',
-    bgGradient: 'from-[#0a1215]/95 via-[#070d0f]/95 to-[#04080a]/95',
-    pbrUnderlay: 'pbr-underlay-circuit',
-    bullet: 'Zero-latency signal isolation',
-  },
-  {
-    icon: <Layers3 className="h-5 w-5" />,
-    label: 'Ecdysis Shedding',
-    dimension: 'Habit-Shedding & Growth',
-    code: 'VEC-04',
-    description: 'Measures your willingness to voluntarily molt outmoded habits, outdated pride, and dead patterns to make way for a denser carapace.',
-    color: '#00c3ff',
-    borderClass: 'border-[#00c3ff]/40 hover:border-[#00c3ff]',
-    glowClass: 'hover:shadow-[0_0_30px_rgba(0,195,255,0.22)]',
-    bgGradient: 'from-[#061118]/95 via-[#040b10]/95 to-[#020608]/95',
-    pbrUnderlay: 'pbr-underlay-alloy',
-    bullet: 'Voluntary ecdysis & unburdening',
-  },
-  {
-    icon: <Compass className="h-5 w-5" />,
-    label: 'Depth Composure',
-    dimension: 'Mariana Trench Stillness',
-    code: 'VEC-05',
-    description: 'Calibrates emotional equilibrium, nervous system regulation, and grounded calm when descending into 11,000 meters of benthic pressure.',
-    color: '#ff7b72',
-    borderClass: 'border-red-500/40 hover:border-red-400',
-    glowClass: 'hover:shadow-[0_0_30px_rgba(255,123,114,0.2)]',
-    bgGradient: 'from-[#140808]/95 via-[#0e0606]/95 to-[#080303]/95',
-    pbrUnderlay: 'pbr-underlay-basalt',
-    bullet: 'Benthic pressure homeostasis',
-  },
-]
 
 const howItWorks = [
   {
@@ -689,43 +622,8 @@ export const MoltMaxPage: React.FC = () => {
           <div className="pointer-events-none absolute left-1/3 top-1/3 h-[450px] w-[450px] -translate-y-1/2 rounded-full bg-cyan-500/10 blur-[150px]" />
           <div className="pointer-events-none absolute bottom-1/3 right-1/4 h-[400px] w-[400px] rounded-full bg-amber-500/10 blur-[140px]" />
 
-          <div className="relative grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-6">
-            {vectorDetails.map((vec, index) => (
-              <div
-                key={vec.code}
-                className={`chitin-card group relative flex flex-col overflow-hidden rounded-xl border-2 ${vec.borderClass} bg-gradient-to-b ${vec.bgGradient} p-5 transition-all duration-500 hover:-translate-y-1 sm:p-6 ${vec.glowClass} ${index < 2 ? 'lg:col-span-3' : 'lg:col-span-2'} ${index === 4 ? 'sm:col-span-2 lg:col-span-2' : ''}`}
-              >
-                <div className={`pbr-underlay ${vec.pbrUnderlay} opacity-35 transition-opacity group-hover:opacity-55`} />
-
-                <div className="relative z-10 flex flex-1 flex-col">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-black/40 transition-transform duration-300 group-hover:scale-110"
-                      style={{ color: vec.color, borderColor: `${vec.color}55` }}
-                    >
-                      {vec.icon}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-[11px] font-bold uppercase tracking-wider" style={{ color: vec.color }}>
-                        {vec.dimension}
-                      </div>
-                      <h3 className="font-grotesk text-lg font-black uppercase leading-tight text-white">
-                        {vec.label}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <p className="mt-4 flex-1 text-sm leading-relaxed text-gray-300">
-                    {vec.description}
-                  </p>
-
-                  <div className="mt-5 flex items-center justify-between gap-3 border-t border-white/10 pt-3 text-xs text-gray-300">
-                    <span>{vec.bullet}</span>
-                    <span className="shrink-0 font-bold tabular-nums" style={{ color: vec.color }}>3 questions</span>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="relative">
+            <VectorCarapaceDiagram />
           </div>
         </section>
 

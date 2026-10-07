@@ -45,8 +45,20 @@ describe('MoltMaxPage', () => {
     renderPage()
     expect(screen.getByText(/Measure the shell/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /take the moltmax quiz/i })).toBeInTheDocument()
+    expect(screen.getAllByRole('tab')).toHaveLength(5)
     expect(screen.getByRole('heading', { name: /Carapace Resilience/i })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /Depth Composure/i })).toBeInTheDocument()
+  })
+
+  it('shows each vector and its three questions when picked on the diagram', () => {
+    renderPage()
+    fireEvent.click(screen.getByRole('tab', { name: /Depth Composure/i }))
+    expect(screen.getByRole('tab', { name: /Depth Composure/i })).toHaveAttribute('aria-selected', 'true')
+    const panel = screen.getByRole('tabpanel')
+    expect(panel).toHaveTextContent(/Depth Composure/i)
+    expect(panel.querySelectorAll('ol > li')).toHaveLength(3)
+
+    fireEvent.keyDown(screen.getByRole('tab', { name: /Depth Composure/i }), { key: 'ArrowRight' })
+    expect(screen.getByRole('tab', { name: /Carapace Resilience/i })).toHaveAttribute('aria-selected', 'true')
   })
 
   it('moves through the fifteen-question chamber flow and reveals a clearance', () => {

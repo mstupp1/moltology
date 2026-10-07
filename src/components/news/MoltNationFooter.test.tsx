@@ -27,7 +27,7 @@ describe('MoltNationFooter Component', () => {
 
     expect(screen.getByText('MOLT')).toBeInTheDocument()
     expect(screen.getByText('NATION')).toBeInTheDocument()
-    expect(screen.getByText(/Official patriot telemetry & autonomous intelligence network/i)).toBeInTheDocument()
+    expect(screen.getByText(/the long road to becoming a crab/i)).toBeInTheDocument()
   })
 
   it('renders essential navigation links and store link', () => {
