@@ -8,7 +8,7 @@ export const Route = createFileRoute('/')({
     meta: [...seo(HOMEPAGE_SEO)],
     links: [
       canonicalLink(SITE_ORIGIN),
-      // Mobile LCP: responsive hero artwork (matches HeroBackground picture)
+      // Mobile LCP: responsive hero artwork (matches the HomeHero backdrop picture)
       {
         rel: 'preload',
         as: 'image',
@@ -17,14 +17,7 @@ export const Route = createFileRoute('/')({
         href: getAssetUrl('/images/hero_benthic_mobile_v2.webp'),
         fetchPriority: 'high',
       },
-      {
-        rel: 'preload',
-        as: 'image',
-        type: 'image/webp',
-        media: '(max-width: 767px)',
-        href: getAssetUrl('/images/hero_card_benthic_core_sm.webp'),
-      },
-      // Desktop LCP backdrop + deck poster
+      // Desktop LCP backdrop
       {
         rel: 'preload',
         as: 'image',
@@ -32,13 +25,6 @@ export const Route = createFileRoute('/')({
         media: '(min-width: 768px)',
         href: getAssetUrl('/images/hero_benthic_expansive_v1.webp'),
         fetchPriority: 'high',
-      },
-      {
-        rel: 'preload',
-        as: 'image',
-        type: 'image/webp',
-        media: '(min-width: 768px)',
-        href: getAssetUrl('/images/hero_card_benthic_core.webp'),
       },
     ],
   }),

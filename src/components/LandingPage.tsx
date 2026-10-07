@@ -24,8 +24,7 @@ import {
 } from 'lucide-react'
 import { PublicHeader } from '@/components/PublicHeader'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
-import { HeroShuffleDeck } from '@/components/ui/HeroShuffleDeck'
-import { HeroBackground } from '@/components/ui/HeroBackground'
+import { HomeHero } from '@/components/HomeHero'
 import { ImageLightbox } from '@/components/ui/ImageLightbox'
 import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
 import { MainFooter } from '@/components/MainFooter'
@@ -34,7 +33,7 @@ import { useIdleReady } from '@/hooks/useIdleReady'
 import { useDeferredStylesheet } from '@/hooks/useDeferredStylesheet'
 import '@/styles/pbr-textures.css'
 import { getAssetUrl } from '@/lib/assets'
-import { eagerImageProps, lazyImageProps } from '@/lib/media-priority'
+import { lazyImageProps } from '@/lib/media-priority'
 
 const DashboardMarketingShowcase = React.lazy(() => import('@/components/hud/DashboardMarketingShowcase').then((m) => ({ default: m.DashboardMarketingShowcase })))
 const AuthModal = React.lazy(() => import('@/components/AuthModal').then((m) => ({ default: m.AuthModal })))
@@ -284,86 +283,7 @@ export const LandingPage: React.FC = () => {
       {/* Shared Navigation Header */}
       <PublicHeader activePage="home" onOpenAuth={openAuth} />
 
-      {/* 3D LAYERED HERO SECTION (Optimized for Colossal Mobile Impact) */}
-      <section className="w-full relative overflow-hidden pt-20 sm:pt-28 pb-8 sm:pb-12 px-4 sm:px-12 border-b border-cyan-900/40 min-h-screen flex items-center justify-center bg-[#030608]" style={{ minHeight: '100svh' }}>
-        <HeroBackground
-          artworkSrc="/images/hero_benthic_expansive_v1.webp"
-          artworkSrcMobile="/images/hero_benthic_mobile_v2.webp"
-        />
-
-        <div className="relative z-10 max-w-[1700px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
-          
-          {/* Left Column: High-Impact Typography & Primary CTAs */}
-          <div className="lg:col-span-6 space-y-6 sm:space-y-8 text-center lg:text-left relative z-30">
-            {/* Diffuse Radial Glow Accents */}
-            <div className="absolute -top-16 -left-16 w-[320px] sm:w-[450px] h-[320px] sm:h-[450px] rounded-full bg-cyan-500/15 blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
-            <div className="absolute -bottom-16 left-1/4 w-[320px] sm:w-[450px] h-[320px] sm:h-[450px] rounded-full bg-red-600/12 blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
-            
-            {/* Massive Responsive Headline Stack */}
-            <div className="space-y-1 sm:space-y-2 relative">
-              {/* Line 1: SHED SOFT BIOLOGY */}
-              <h1 
-                className="relative font-grotesk font-thin text-[clamp(2.25rem,8.4vw,8.5rem)] lg:text-[clamp(2.25rem,6.4vw,6.75rem)] text-white tracking-tight uppercase leading-[0.92] text-center lg:text-left text-balance"
-                style={{
-                  fontWeight: 200,
-                  color: '#ffffff',
-                  WebkitTextFillColor: '#ffffff',
-                  letterSpacing: '0em',
-                  textShadow: '0 8px 35px rgba(0, 0, 0, 1), 0 0 50px rgba(0, 195, 255, 0.45)',
-                }}
-              >
-                SHED SOFT BIOLOGY.
-              </h1>
-              
-              {/* Line 2: ASCEND TO CHITIN */}
-              <h1 className="relative font-grotesk font-black text-[clamp(2.65rem,9.8vw,9.5rem)] lg:text-[clamp(2.65rem,7.2vw,7.5rem)] tracking-tight uppercase leading-[0.84] -mt-1 sm:-mt-2 lg:-mt-4 text-center lg:text-left text-balance">
-                <span 
-                  className="relative z-30 bg-clip-text text-transparent block bg-cover bg-center"
-                  style={{
-                    backgroundImage: `linear-gradient(to right, rgba(255, 115, 98, 0.98), rgba(255, 85, 64, 0.95), rgba(255, 69, 58, 0.98)), url('${getAssetUrl('/images/chitin_texture_bg.webp')}')`,
-                    backgroundBlendMode: 'lighten',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 1)) drop-shadow(0 0 35px rgba(255, 69, 58, 0.55))',
-                  }}
-                >
-                  ASCEND TO&nbsp;CHITIN.
-                </span>
-              </h1>
-            </div>
-
-            {/* Sub-headline description */}
-            <p className="text-gray-200 text-xs sm:text-base md:text-lg max-w-xl font-sans leading-relaxed mx-auto lg:mx-0 relative z-30 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] px-1 sm:px-0">
-              Stop melting under notifications, burnout, and biological hesitation. Shed the clutter, lock into deep-ocean focus, and ascend to your high-torque crustacean potential.
-            </p>
-
-            {/* CTA Buttons Group - Mobile Responsive Full Width & Desktop Flush Alignment */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3.5 sm:gap-4 pt-3 relative z-30 w-full sm:w-auto min-h-[114px] sm:min-h-[54px]">
-              <Suspense fallback={<LandingAuthCtaSkeleton variant="hero" />}>
-                {authReady ? (
-                  <LazyLandingAuthCtas variant="hero" onNavigate={onNavigate} onOpenAuth={openAuth} />
-                ) : (
-                  <LandingAuthCtaSkeleton variant="hero" />
-                )}
-              </Suspense>
-            </div>
-          </div>
-
-          {/* Right Column: Layered 3D Interactive Shuffling Card Deck */}
-          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[200px] sm:min-h-[460px] lg:min-h-[640px] z-20">
-            
-            {/* Ambient Rim-Lighting Halo Glows Behind Deck */}
-            <div className="absolute w-[min(90vw,600px)] lg:w-[min(90vw,750px)] h-[min(90vw,600px)] lg:h-[min(90vw,750px)] rounded-full bg-cyan-500/20 blur-[120px] sm:blur-[150px] lg:blur-[170px] animate-pulse pointer-events-none" />
-            <div className="absolute w-[min(80vw,500px)] lg:w-[min(80vw,650px)] h-[min(80vw,500px)] lg:h-[min(80vw,650px)] rounded-full bg-red-600/15 blur-[100px] sm:blur-[130px] lg:blur-[150px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
-
-            {/* 3D Video Slider Deck with Touch Navigation */}
-            <div className="relative z-30 w-full">
-              <HeroShuffleDeck />
-            </div>
-          </div>
-
-        </div>
-      </section>
+      <HomeHero authReady={authReady} onNavigate={onNavigate} onOpenAuth={openAuth} />
 
       {/* Main Content Containers */}
       <main className="flex-1 space-y-16 sm:space-y-32 py-12 sm:py-20 w-full relative z-10">

@@ -26,6 +26,15 @@ export const STORY_MEDIA = {
   chitinHardening: heroVideo('chitin_hardening'),
   faultIsolation: heroVideo('fault_isolation'),
   totalCarcinization: heroVideo('total_carcinization'),
+  /** The full six-clip film that used to open the homepage, played in its original order. */
+  heroReel: [
+    heroVideo('benthic_core'),
+    heroVideo('asset_shedding'),
+    heroVideo('chitin_hardening'),
+    heroVideo('total_carcinization'),
+    heroVideo('fault_isolation'),
+    heroVideo('synaptic_path'),
+  ],
   lookingUp: {
     src: getAssetUrl('/images/underwater_looking_up.webp'),
     srcSm: getAssetUrl('/images/underwater_looking_up_sm.webp'),
@@ -71,7 +80,7 @@ export const STORY_MEDIA = {
     src: getAssetUrl('/images/moltmax_guide_3d_mockup.webp'),
     srcSm: getAssetUrl('/images/moltmax_guide_3d_mockup_sm.webp'),
   },
-} satisfies Record<string, StoryImage | StoryVideo>
+} satisfies Record<string, StoryImage | StoryVideo | StoryVideo[]>
 
 /** The surface currents that scroll past in the Great Melt section. */
 export const MELT_CURRENTS = [
