@@ -1,7 +1,7 @@
 import { and, desc, eq, gte, isNull, ne, or, sql } from 'drizzle-orm'
 import { getDb } from '../../db'
 import { forumPosts, forumTopics, forumVotes, profiles, signupRiskEvents } from '../../db/schema'
-import { isAdminOrSuperAdmin } from '../permissions'
+import { isAdmin as hasStaffRole } from '../permissions'
 import {
   STANDING_COPY,
   STANDING_RESTRICTED_DAILY_REPLIES,
@@ -80,7 +80,7 @@ export async function loadForumStanding(
     .where(eq(profiles.id, userId))
     .limit(1)
 
-  const isAdmin = isAdminOrSuperAdmin({ email, role: profile?.role }, profile?.role)
+  const isAdmin = hasStaffRole(null, profile?.role)
   const [upvotes, signupFlagged] = await Promise.all([
     countUpvotesReceived(dbClient, userId),
     isAdmin ? Promise.resolve(false) : wasSignupFlagged(userId),

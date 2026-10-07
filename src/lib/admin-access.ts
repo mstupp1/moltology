@@ -1,6 +1,6 @@
 /**
  * Staff-only HUD paths. These are official steward tools, not hidden member chambers.
- * Clearance is still `isAdminOrSuperAdmin` via `useHiddenPageAccess`.
+ * Clearance is still `isAdmin` via `useHiddenPageAccess`.
  */
 export const ADMIN_ONLY_PATHS = ['/admin', '/watch'] as const
 

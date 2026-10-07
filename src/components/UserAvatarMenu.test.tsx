@@ -194,30 +194,20 @@ describe('UserAvatarMenu Component', () => {
     })
   })
 
-  it('renders SUPER ADMIN badge when user email matches super admin email', () => {
-    const superAdminUser = {
-      ...mockUser,
-      email: 'mylesstupp@gmail.com',
-    }
-    render(<UserAvatarMenu user={superAdminUser} />)
+  it('renders the ADMIN badge for an admin profile role', () => {
+    render(<UserAvatarMenu user={mockUser} userRole="admin" />)
 
-    const avatarBtn = screen.getByRole('button', { name: /user account menu/i })
-    fireEvent.click(avatarBtn)
+    fireEvent.click(screen.getByRole('button', { name: /user account menu/i }))
 
-    expect(screen.getByText('SUPER ADMIN')).toBeInTheDocument()
+    expect(screen.getByText('ADMIN')).toBeInTheDocument()
   })
 
-  it('renders SUPER ADMIN badge when user email is myles@moltology.org', () => {
-    const superAdminUser = {
-      ...mockUser,
-      email: 'myles@moltology.org',
-    }
-    render(<UserAvatarMenu user={superAdminUser} />)
+  it('does not render a staff badge from an email address alone', () => {
+    render(<UserAvatarMenu user={{ ...mockUser, email: 'mylesstupp@gmail.com' }} />)
 
-    const avatarBtn = screen.getByRole('button', { name: /user account menu/i })
-    fireEvent.click(avatarBtn)
+    fireEvent.click(screen.getByRole('button', { name: /user account menu/i }))
 
-    expect(screen.getByText('SUPER ADMIN')).toBeInTheDocument()
+    expect(screen.queryByText('ADMIN')).not.toBeInTheDocument()
   })
 
   it('does not render Underwater Bubbles toggle in the avatar menu', () => {

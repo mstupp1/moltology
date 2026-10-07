@@ -4,8 +4,9 @@ date: 2026-08-23
 title: "Recognize super admins by email in one place"
 summary: "Super admin status comes from a fixed email list in one permissions module, checked alongside the stored role."
 domains: [access]
-rules: [access.super-admin-emails, access.staff]
-status: accepted
+rules: [access.staff]
+status: superseded
+supersededBy: single-admin-role
 sources:
   - commit: '7472f6f275328758065858b19e94b52514dd0e68'
 ---

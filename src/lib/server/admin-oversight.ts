@@ -1,16 +1,14 @@
 import type { JWTPayload } from 'jose'
 import { desc, eq, gt, ilike, isNotNull, or, sql } from 'drizzle-orm'
 import { authSession, authUser, forumReports, profiles } from '../../db/schema'
-import { getEffectiveRole, isAdminOrSuperAdmin, isSuperAdminEmail } from '../permissions'
+import { isAdmin } from '../permissions'
 import { resolveWriteAuth, type WriteAuthContext, type WriteAuthData } from './write-auth'
 
 const STAFF_DENIED = 'This page is not available.'
-const ROLE_DENIED = 'Only a super admin can change clearance.'
 const ROLE_SELF = 'You cannot change your own clearance.'
-const ROLE_LOCKED = 'This account\'s clearance is locked.'
 const MEMBER_MISSING = 'Member not found.'
 
-export const ADMIN_MEMBER_ROLES = ['user', 'admin', 'super_admin'] as const
+export const ADMIN_MEMBER_ROLES = ['user', 'admin'] as const
 export type AdminMemberRole = (typeof ADMIN_MEMBER_ROLES)[number]
 
 export const ADMIN_MEMBER_LIMIT = 25
@@ -40,7 +38,6 @@ export type AdminMemberRow = {
 }
 
 export type AdminMemberDirectory = {
-  viewerCanManageRoles: boolean
   members: AdminMemberRow[]
 }
 
@@ -74,10 +71,8 @@ function asIso(value: Date | string | null | undefined): string | null {
   return date.toISOString()
 }
 
-function asRole(value: string | null | undefined, email: string | null): AdminMemberRole {
-  const effective = getEffectiveRole({ email, role: value }, value)
-  if (effective === 'admin' || effective === 'super_admin') return effective
-  return 'user'
+function asRole(value: string | null | undefined): AdminMemberRole {
+  return isAdmin(null, value) ? 'admin' : 'user'
 }
 
 /** Verified JWT plus a staff role read from the database. Shared by staff-only RPCs. */
@@ -93,15 +88,13 @@ export async function requireStaff(args: HandlerArgs<WriteAuthData | undefined>)
     .where(eq(profiles.id, auth.userId))
     .limit(1)
 
-  const email = claimEmail(auth.payload)
-  if (!isAdminOrSuperAdmin({ email, role: profile?.role }, profile?.role)) {
+  if (!isAdmin(null, profile?.role)) {
     throw new Error(STAFF_DENIED)
   }
 
   return {
     ...auth,
-    email,
-    viewerCanManageRoles: getEffectiveRole({ email, role: profile?.role }, profile?.role) === 'super_admin',
+    email: claimEmail(auth.payload),
   }
 }
 
@@ -161,13 +154,12 @@ export async function searchAdminMembersHandler(
   const rows = await filtered.orderBy(desc(profiles.updatedAt)).limit(ADMIN_MEMBER_LIMIT)
 
   return {
-    viewerCanManageRoles: auth.viewerCanManageRoles,
     members: rows.map((row) => ({
       id: row.id,
       handle: row.handle?.trim() || null,
       larvaId: row.larvaId,
       email: row.email ?? null,
-      role: asRole(row.role, row.email ?? null),
+      role: asRole(row.role),
       isPremium: row.isPremium,
       hasPurchasedPremium: row.hasPurchasedPremium,
       createdAt: asIso(row.createdAt) ?? new Date(0).toISOString(),
@@ -180,9 +172,6 @@ export async function setAdminMemberRoleHandler(
   args: HandlerArgs<(WriteAuthData & { profileId?: string; role?: string }) | undefined>,
 ): Promise<AdminRoleChangeReceipt> {
   const auth = await requireStaff(args)
-  if (!auth.viewerCanManageRoles) {
-    throw new Error(ROLE_DENIED)
-  }
 
   const profileId = args.data?.profileId?.trim() ?? ''
   const nextRole = args.data?.role
@@ -208,10 +197,6 @@ export async function setAdminMemberRoleHandler(
   if (!target) {
     throw new Error(MEMBER_MISSING)
   }
-  if (isSuperAdminEmail(target.email)) {
-    throw new Error(ROLE_LOCKED)
-  }
-
   const [updated] = await auth.dbClient
     .update(profiles)
     .set({ role: nextRole, updatedAt: new Date() })
@@ -225,7 +210,7 @@ export async function setAdminMemberRoleHandler(
   return {
     id: updated.id,
     handle: updated.handle?.trim() || target.handle?.trim() || null,
-    role: asRole(updated.role, null),
+    role: asRole(updated.role),
   }
 }
 
@@ -274,8 +259,6 @@ export async function listAdminPurchasesHandler(
 
 export const adminOversightErrors = {
   denied: STAFF_DENIED,
-  roleDenied: ROLE_DENIED,
   roleSelf: ROLE_SELF,
-  roleLocked: ROLE_LOCKED,
   memberMissing: MEMBER_MISSING,
 }

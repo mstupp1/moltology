@@ -7,14 +7,14 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-10-06",
+  "syncedAt": "2026-10-07",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 11,
-    "rules": 97,
+    "rules": 96,
     "decisions": 34,
-    "anchors": 170,
-    "drifted": 7,
+    "anchors": 169,
+    "drifted": 12,
     "flagged": 12
   },
   "canvas": {
@@ -72,17 +72,16 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "access",
       "title": "Access & roles",
       "color": "#00c3ff",
-      "summary": "Three clearance roles. Server functions verify the caller's JWT, then check the role before any staff action.",
+      "summary": "Two clearance roles. Server functions verify the caller's JWT, then check the role before any staff action.",
       "overviewHtml": "<p>Access has two layers. The UI hides staff tools from everyone else, and each server function checks the role again, because the client can be skipped.</p>",
       "box": {
         "x": 2628,
         "y": 0,
         "width": 1196,
-        "height": 832
+        "height": 676
       },
       "ruleIds": [
         "access.roles",
-        "access.super-admin-emails",
         "access.staff",
         "access.write-auth",
         "access.app-level-auth",
@@ -973,18 +972,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "access.roles",
       "domain": "access",
-      "title": "Three roles",
+      "title": "Two roles",
       "kind": "permission",
       "status": "active",
-      "statement": "Every profile has one role, user, admin, or super_admin, stored in profiles.role. Members are user by default.",
+      "statement": "Every profile has one role, user or admin, stored in profiles.role. Members are user by default. A leftover super_admin value counts as admin.",
       "anchors": [
         {
           "file": "src/lib/server/admin-oversight.ts",
           "symbol": "ADMIN_MEMBER_ROLES",
-          "line": 13,
-          "value": "['user', 'admin', 'super_admin'] as const",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/admin-oversight.ts#L13"
+          "line": 11,
+          "value": "['user', 'admin'] as const",
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/admin-oversight.ts#L11"
         },
         {
           "file": "src/db/schema.ts",
@@ -998,40 +997,42 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "tests": [],
       "dependsOn": [],
       "usedBy": [
-        "access.super-admin-emails"
+        "access.staff"
       ],
-      "decisions": [],
+      "decisions": [
+        "single-admin-role"
+      ],
       "flag": null,
       "flow": null,
       "position": {
         "x": 94,
         "y": 76
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
-      "id": "access.super-admin-emails",
+      "id": "access.staff",
       "domain": "access",
-      "title": "Super admin by email",
+      "title": "Staff means admin",
       "kind": "permission",
       "status": "active",
-      "statement": "A fixed list of emails resolves to super_admin once the account has confirmed that email, whatever the stored role says. Server checks rely on the stored profile role, which is raised to super_admin only for a confirmed address.",
+      "statement": "Staff is any member whose stored or session role is admin. No email address grants staff access. Every staff check in the app goes through isAdmin.",
       "anchors": [
         {
           "file": "src/lib/permissions.ts",
-          "symbol": "SUPER_ADMIN_EMAILS",
-          "line": 6,
-          "value": "[ 'mylesstupp@gmail.com', 'myles@moltology.org', 'admin@moltology.org', ]",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/permissions.ts#L6"
+          "symbol": "isAdmin",
+          "line": 27,
+          "value": "isAdmin(user, profileRole)",
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/permissions.ts#L27"
         },
         {
           "file": "src/lib/permissions.ts",
           "symbol": "getEffectiveRole",
-          "line": 37,
+          "line": 14,
           "value": "getEffectiveRole(user, profileRole)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/permissions.ts#L37"
+          "drift": "unverified",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/permissions.ts#L14"
         }
       ],
       "tests": [
@@ -1044,47 +1045,6 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "access.roles"
       ],
       "usedBy": [
-        "access.staff"
-      ],
-      "decisions": [
-        "super-admin-by-email",
-        "super-admin-needs-confirmed-email"
-      ],
-      "flag": null,
-      "flow": null,
-      "position": {
-        "x": 94,
-        "y": 232
-      },
-      "drift": "changed"
-    },
-    {
-      "id": "access.staff",
-      "domain": "access",
-      "title": "Staff means admin or super admin",
-      "kind": "permission",
-      "status": "active",
-      "statement": "Staff is any member whose effective role is admin or super_admin. Every staff check in the app goes through isAdminOrSuperAdmin.",
-      "anchors": [
-        {
-          "file": "src/lib/permissions.ts",
-          "symbol": "isAdminOrSuperAdmin",
-          "line": 53,
-          "value": "isAdminOrSuperAdmin(user, profileRole)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/permissions.ts#L53"
-        }
-      ],
-      "tests": [
-        {
-          "file": "src/lib/permissions.test.ts",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/permissions.test.ts"
-        }
-      ],
-      "dependsOn": [
-        "access.super-admin-emails"
-      ],
-      "usedBy": [
         "access.hidden-pages",
         "access.admin-only-paths",
         "access.staff-server-check",
@@ -1092,13 +1052,13 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "decisions": [
         "super-admin-by-email",
-        "super-admin-needs-confirmed-email"
+        "single-admin-role"
       ],
       "flag": null,
       "flow": null,
       "position": {
         "x": 94,
-        "y": 388
+        "y": 232
       },
       "drift": "changed"
     },
@@ -1144,7 +1104,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flow": null,
       "position": {
         "x": 700,
-        "y": 388
+        "y": 232
       },
       "drift": "ok"
     },
@@ -1160,8 +1120,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "file": "src/db/schema.ts",
           "symbol": "profiles",
           "line": 122,
-          "value": "pgTable('profiles', { id: text('id').primaryKey(), role: text('role').default('user').notNull(), // 'user' | 'admin' | 'super_admin' larvaId: text('larvaId').d…",
-          "drift": "ok",
+          "value": "pgTable('profiles', { id: text('id').primaryKey(), role: text('role').default('user').notNull(), // 'user' | 'admin' larvaId: text('larvaId').default('LARVA UN…",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L122"
         }
       ],
@@ -1180,9 +1140,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flow": null,
       "position": {
         "x": 904,
-        "y": 544
+        "y": 388
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "access.hidden-pages",
@@ -1228,7 +1188,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flow": null,
       "position": {
         "x": 28,
-        "y": 544
+        "y": 388
       },
       "drift": "changed"
     },
@@ -1274,7 +1234,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flow": null,
       "position": {
         "x": 320,
-        "y": 544
+        "y": 388
       },
       "drift": "ok"
     },
@@ -1289,10 +1249,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/admin-oversight.ts",
           "symbol": "requireStaff",
-          "line": 84,
+          "line": 79,
           "value": "requireStaff(args)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/admin-oversight.ts#L84"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/admin-oversight.ts#L79"
         }
       ],
       "tests": [
@@ -1316,9 +1276,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flow": null,
       "position": {
         "x": 612,
-        "y": 544
+        "y": 388
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "access.role-changes",
@@ -1326,15 +1286,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Who can change clearance",
       "kind": "permission",
       "status": "active",
-      "statement": "Only a super admin can change a member's role. Nobody can change their own role, and accounts on the super admin email list are locked.",
+      "statement": "Any admin can change another member's role between user and admin. Nobody can change their own role.",
       "anchors": [
         {
           "file": "src/lib/server/admin-oversight.ts",
           "symbol": "setAdminMemberRoleHandler",
-          "line": 179,
+          "line": 171,
           "value": "setAdminMemberRoleHandler(args)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/admin-oversight.ts#L179"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/admin-oversight.ts#L171"
         }
       ],
       "tests": [
@@ -1348,15 +1308,16 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [],
       "decisions": [
-        "admin-oversight-hub"
+        "admin-oversight-hub",
+        "single-admin-role"
       ],
       "flag": null,
       "flow": null,
       "position": {
         "x": 568,
-        "y": 700
+        "y": 544
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "access.admin-list-limits",
@@ -1369,18 +1330,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/admin-oversight.ts",
           "symbol": "ADMIN_MEMBER_LIMIT",
-          "line": 16,
+          "line": 14,
           "value": "25",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/admin-oversight.ts#L16"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/admin-oversight.ts#L14"
         },
         {
           "file": "src/lib/server/admin-oversight.ts",
           "symbol": "ADMIN_PURCHASE_LIMIT",
-          "line": 17,
+          "line": 15,
           "value": "50",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/admin-oversight.ts#L17"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/admin-oversight.ts#L15"
         }
       ],
       "tests": [],
@@ -1395,7 +1356,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flow": null,
       "position": {
         "x": 860,
-        "y": 700
+        "y": 544
       },
       "drift": "ok"
     },
@@ -3852,7 +3813,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "assertCovenantSteward",
           "line": 2349,
           "value": "assertCovenantSteward(dbClient, userId, payload)",
-          "drift": "ok",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2349"
         },
         {
@@ -3893,7 +3854,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 232
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "forum.community-rules",
@@ -5790,11 +5751,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "access"
       ],
       "rules": [
-        "access.super-admin-emails",
         "access.staff"
       ],
-      "status": "accepted",
-      "supersededBy": null,
+      "status": "superseded",
+      "supersededBy": "single-admin-role",
       "sources": [
         {
           "kind": "commit",
@@ -7139,16 +7099,17 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ]
     },
     {
-      "id": "super-admin-needs-confirmed-email",
-      "date": "2026-10-06",
-      "title": "Super admin by email needs a confirmed email",
-      "summary": "An allowlisted email grants super admin only after the account confirms it, because signup does not always require confirmation.",
+      "id": "single-admin-role",
+      "date": "2026-10-07",
+      "title": "One staff role: admin",
+      "summary": "Super admin is retired. Admin is the only staff role, any admin can change clearance, and no email grants staff access.",
       "domains": [
         "access"
       ],
       "rules": [
-        "access.super-admin-emails",
-        "access.staff"
+        "access.roles",
+        "access.staff",
+        "access.role-changes"
       ],
       "status": "accepted",
       "supersededBy": null,
@@ -7156,19 +7117,19 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "sections": [
         {
           "heading": "Context",
-          "html": "<p>Email confirmation is off unless <code>EMAIL_VERIFICATION_ENABLED</code> is true. Anyone could sign up with an allowlisted address that had no account yet and be treated as super admin, and <code>ensureUserProfile</code> would store that role.</p>"
+          "html": "<p>Super admin came from a fixed email list and was the only role allowed to change clearance. In practice every staff tool was shared with admins, and the email list let anyone who signed up with a listed address claim staff tools while email confirmation is off.</p>"
         },
         {
           "heading": "Decision",
-          "html": "<p><code>getEffectiveRole</code> counts <code>SUPER_ADMIN_EMAILS</code> only when <code>emailVerified</code> is true. <code>ensureUserProfile</code> raises the stored role only for a confirmed address. Server checks pass JWT claims, which carry no confirmation flag, so they rely on the stored profile role.</p>"
+          "html": "<p>Admin is the only staff role, stored on <code>profiles.role</code>. <code>getEffectiveRole</code> reads the stored role and the session role, never an email. Any admin can change another member&#39;s clearance, never their own. Migration 0044 rewrites stored <code>super_admin</code> profiles to <code>admin</code>, and the role check still reads a leftover <code>super_admin</code> value as admin.</p>"
         },
         {
           "heading": "Alternatives",
-          "html": "<ul>\n<li>Turn on email confirmation for everyone. Rejected for now because the mail domain decision is separate.</li>\n</ul>"
+          "html": "<ul>\n<li>Keep super admin but require a confirmed email. Rejected because the separate role added bookkeeping without protecting anything an admin cannot already reach.</li>\n</ul>"
         },
         {
           "heading": "Consequences",
-          "html": "<ul>\n<li>Accounts already stored as super_admin keep the role, so the owner is not locked out.</li>\n<li>A new allowlisted account must confirm its email, or be granted with <code>npm run db:grant-admin</code>, before it gets staff tools.</li>\n</ul>"
+          "html": "<ul>\n<li>Every admin can promote or demote other members, so grant admin only to people you trust with that.</li>\n<li>New staff are granted from the Admin hub by an existing admin, or with <code>npm run db:grant-admin</code>.</li>\n</ul>"
         }
       ]
     }
@@ -7259,14 +7220,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "crossDomain": false
     },
     {
-      "id": "access.roles->access.super-admin-emails",
+      "id": "access.roles->access.staff",
       "source": "access.roles",
-      "target": "access.super-admin-emails",
-      "crossDomain": false
-    },
-    {
-      "id": "access.super-admin-emails->access.staff",
-      "source": "access.super-admin-emails",
       "target": "access.staff",
       "crossDomain": false
     },

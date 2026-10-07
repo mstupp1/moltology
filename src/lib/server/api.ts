@@ -1010,7 +1010,7 @@ export const setAdminMemberRoleFn = createServerFn({ method: 'POST' })
     adminAuthSchema
       .extend({
         profileId: z.string().min(1),
-        role: z.enum(['user', 'admin', 'super_admin']),
+        role: z.enum(['user', 'admin']),
       })
       .parse(data),
   )

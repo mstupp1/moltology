@@ -3,36 +3,27 @@ id: access
 title: Access & roles
 order: 3
 color: '#00c3ff'
-summary: Three clearance roles. Server functions verify the caller's JWT, then check the role before any staff action.
+summary: Two clearance roles. Server functions verify the caller's JWT, then check the role before any staff action.
 rules:
   - id: access.roles
-    title: Three roles
+    title: Two roles
     kind: permission
-    statement: Every profile has one role, user, admin, or super_admin, stored in profiles.role. Members are user by default.
+    statement: Every profile has one role, user or admin, stored in profiles.role. Members are user by default. A leftover super_admin value counts as admin.
     anchors:
       - file: src/lib/server/admin-oversight.ts
         symbol: ADMIN_MEMBER_ROLES
       - file: src/db/schema.ts
         symbol: profiles.role
-  - id: access.super-admin-emails
-    title: Super admin by email
+  - id: access.staff
+    title: Staff means admin
     kind: permission
-    statement: A fixed list of emails resolves to super_admin once the account has confirmed that email, whatever the stored role says. Server checks rely on the stored profile role, which is raised to super_admin only for a confirmed address.
+    statement: Staff is any member whose stored or session role is admin. No email address grants staff access. Every staff check in the app goes through isAdmin.
     dependsOn: [access.roles]
     anchors:
       - file: src/lib/permissions.ts
-        symbol: SUPER_ADMIN_EMAILS
+        symbol: isAdmin
       - file: src/lib/permissions.ts
         symbol: getEffectiveRole
-    tests: [src/lib/permissions.test.ts]
-  - id: access.staff
-    title: Staff means admin or super admin
-    kind: permission
-    statement: Staff is any member whose effective role is admin or super_admin. Every staff check in the app goes through isAdminOrSuperAdmin.
-    dependsOn: [access.super-admin-emails]
-    anchors:
-      - file: src/lib/permissions.ts
-        symbol: isAdminOrSuperAdmin
     tests: [src/lib/permissions.test.ts]
   - id: access.write-auth
     title: Writes need a verified JWT
@@ -87,7 +78,7 @@ rules:
   - id: access.role-changes
     title: Who can change clearance
     kind: permission
-    statement: Only a super admin can change a member's role. Nobody can change their own role, and accounts on the super admin email list are locked.
+    statement: Any admin can change another member's role between user and admin. Nobody can change their own role.
     dependsOn: [access.staff-server-check]
     anchors:
       - file: src/lib/server/admin-oversight.ts

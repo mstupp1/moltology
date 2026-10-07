@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from 'vitest'
-import { SUPER_ADMIN_EMAILS } from '../permissions'
 import {
   adminOversightErrors,
   getAdminTelemetryHandler,
@@ -104,7 +103,6 @@ describe('admin oversight handlers', () => {
       data: {},
       context: { user: staff, db: directoryDb as never },
     })
-    expect(directory.viewerCanManageRoles).toBe(false)
     expect(directory.members[0]).toMatchObject({
       id: 'member-1',
       email: 'claw@example.com',
@@ -113,7 +111,7 @@ describe('admin oversight handlers', () => {
     })
 
     const purchaseDb = staffDb([
-      [{ role: 'super_admin' }],
+      [{ role: 'admin' }],
       [
         {
           ...member,
@@ -125,7 +123,7 @@ describe('admin oversight handlers', () => {
       ],
     ])
     const purchases = await listAdminPurchasesHandler({
-      context: { user: { sub: 'staff-1', email: SUPER_ADMIN_EMAILS[0] }, db: purchaseDb as never },
+      context: { user: staff, db: purchaseDb as never },
     })
     expect(purchases[0]).toMatchObject({
       moltCredits: '12.50',
@@ -135,46 +133,46 @@ describe('admin oversight handlers', () => {
     })
   })
 
-  it('lets a super admin change clearance and refuses self or locked accounts', async () => {
-    const caller = { sub: 'super-1', email: 'ops@example.com' }
+  it('lets an admin change clearance but not their own', async () => {
     const saved = staffDb(
-      [[{ role: 'super_admin' }], [{ id: 'member-2', handle: 'reef', email: 'reef@example.com', role: 'user' }]],
+      [[{ role: 'admin' }], [{ id: 'member-2', handle: 'reef', email: 'reef@example.com', role: 'user' }]],
       [[{ id: 'member-2', handle: 'reef', role: 'admin' }]],
     )
     await expect(
       setAdminMemberRoleHandler({
         data: { profileId: 'member-2', role: 'admin' },
-        context: { user: caller, db: saved as never },
+        context: { user: staff, db: saved as never },
       }),
     ).resolves.toEqual({ id: 'member-2', handle: 'reef', role: 'admin' })
     expect(saved.update).toHaveBeenCalled()
 
-    const selfDb = staffDb([[{ role: 'super_admin' }]])
+    const selfDb = staffDb([[{ role: 'admin' }]])
     await expect(
       setAdminMemberRoleHandler({
-        data: { profileId: 'super-1', role: 'user' },
-        context: { user: caller, db: selfDb as never },
+        data: { profileId: 'staff-1', role: 'user' },
+        context: { user: staff, db: selfDb as never },
       }),
     ).rejects.toThrow(adminOversightErrors.roleSelf)
     expect(selfDb.update).not.toHaveBeenCalled()
+  })
 
-    const lockedDb = staffDb([
-      [{ role: 'super_admin' }],
-      [{ id: 'locked-1', handle: 'root', email: SUPER_ADMIN_EMAILS[0], role: 'super_admin' }],
-    ])
+  it('refuses the retired super_admin role and lets a stored super_admin act as admin', async () => {
+    const legacyDb = staffDb([[{ role: 'super_admin' }]])
     await expect(
       setAdminMemberRoleHandler({
-        data: { profileId: 'locked-1', role: 'user' },
-        context: { user: caller, db: lockedDb as never },
+        data: { profileId: 'member-2', role: 'super_admin' },
+        context: { user: staff, db: legacyDb as never },
       }),
-    ).rejects.toThrow(adminOversightErrors.roleLocked)
+    ).rejects.toThrow('Choose a valid clearance level.')
+    expect(legacyDb.update).not.toHaveBeenCalled()
+  })
 
-    const adminDb = staffDb([[{ role: 'admin' }]])
+  it('does not treat a listed email as staff', async () => {
+    const db = staffDb([[{ role: 'user' }]])
     await expect(
-      setAdminMemberRoleHandler({
-        data: { profileId: 'member-2', role: 'admin' },
-        context: { user: staff, db: adminDb as never },
+      getAdminTelemetryHandler({
+        context: { user: { sub: 'member-9', email: 'mylesstupp@gmail.com' }, db: db as never },
       }),
-    ).rejects.toThrow(adminOversightErrors.roleDenied)
+    ).rejects.toThrow(adminOversightErrors.denied)
   })
 })

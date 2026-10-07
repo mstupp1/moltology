@@ -202,7 +202,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                 >
                   {displayName}
                 </span>
-                {effectiveRole && ['admin', 'super_admin'].includes(effectiveRole) && (
+                {effectiveRole === 'admin' && (
                   <span
                     className={`text-[9px] font-sans font-extrabold tracking-wider uppercase px-1.5 py-0.5 rounded chamfer-corner shrink-0 ${
                       isCorporate
@@ -210,7 +210,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                         : 'bg-[#00ffff]/15 border border-[#00ffff]/70 text-[#00ffff]'
                     }`}
                   >
-                    {effectiveRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
+                    ADMIN
                   </span>
                 )}
               </div>
@@ -392,7 +392,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                 >
                   {displayName}
                 </span>
-                {effectiveRole && ['admin', 'super_admin'].includes(effectiveRole) && (
+                {effectiveRole === 'admin' && (
                   <span
                     className={`text-[9px] font-sans font-extrabold tracking-wider uppercase px-1.5 py-0.5 rounded chamfer-corner shrink-0 ${
                       isCorporate
@@ -400,7 +400,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                         : 'bg-[#00ffff]/15 border border-[#00ffff]/70 text-[#00ffff] shadow-[0_0_8px_rgba(0,255,255,0.4)]'
                     }`}
                   >
-                    {effectiveRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
+                    ADMIN
                   </span>
                 )}
               </div>

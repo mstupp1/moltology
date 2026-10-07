@@ -7,7 +7,7 @@ export interface AdminAccessGuardProps {
 }
 
 /**
- * Renders steward tools for admins and super admins.
+ * Renders steward tools for admins.
  * Everyone else gets a plain unavailable notice, with no preview of the ledger.
  */
 export const AdminAccessGuard: React.FC<AdminAccessGuardProps> = ({ children, skeleton }) => {

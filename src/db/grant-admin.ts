@@ -13,15 +13,19 @@ const sql = neon(databaseUrl)
 
 async function main() {
   const target = process.argv[2]
-  const role = process.argv[3] || 'super_admin'
-
-  console.log(`[Grant Admin] Granting role '${role}'...`)
+  const role = process.argv[3] || 'admin'
 
   if (!target) {
     // Never fall back to every profile: one missing argument would make every member staff.
-    console.error('Name the account to change. Usage: npm run db:grant-admin <email_or_userId> [role]')
+    console.error('Name the account to change. Usage: npm run db:grant-admin <email_or_userId> [user|admin]')
     process.exit(1)
   }
+  if (role !== 'user' && role !== 'admin') {
+    console.error(`Unknown role '${role}'. Use 'user' or 'admin'.`)
+    process.exit(1)
+  }
+
+  console.log(`[Grant Admin] Granting role '${role}'...`)
 
   // 1. Try matching by profile ID directly
   let updated = await sql`UPDATE profiles SET role = ${role} WHERE id = ${target} RETURNING id;`

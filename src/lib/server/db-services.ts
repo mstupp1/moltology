@@ -61,7 +61,7 @@ import {
   type ForumVisitMaps,
 } from '../forum-visits'
 import { FORUM_REPORT_COPY, forumReportReasonLabel, validateForumReportInput } from '../forum-reports'
-import { isAdminOrSuperAdmin } from '../permissions'
+import { isAdmin } from '../permissions'
 import { assertCanReply, assertCanStartTopic, loadForumStanding } from './forum-standing'
 import { shouldSinkReply, type ForumStandingDecision } from '../forum-standing'
 import { getAssetUrl } from '../assets'
@@ -1589,7 +1589,7 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
     .where(eq(profiles.id, userId))
     .limit(1)
 
-  if (isForumStaffBoard(targetCategory.slug) && !isAdminOrSuperAdmin(null, userProfile?.role)) {
+  if (isForumStaffBoard(targetCategory.slug) && !isAdmin(null, userProfile?.role)) {
     throw new Error(FORUM_STAFF_BOARD_ERROR)
   }
 
@@ -2357,7 +2357,7 @@ async function assertCovenantSteward(
     .where(eq(profiles.id, userId))
     .limit(1)
 
-  if (!isAdminOrSuperAdmin({ email: jwtClaimEmail(payload), role: profile?.role }, profile?.role)) {
+  if (!isAdmin(null, profile?.role)) {
     throw new Error(FORUM_REPORT_COPY.watchSealed)
   }
 }
