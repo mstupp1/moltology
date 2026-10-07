@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { verifyTurnstileToken } from './turnstile'
+import { resolveTurnstileSecret, TURNSTILE_TEST_SECRET, verifyTurnstileToken } from './turnstile'
 
 describe('verifyTurnstileToken', () => {
   const originalFetch = globalThis.fetch
@@ -143,5 +143,25 @@ describe('verifyTurnstileToken', () => {
 
     expect(result.success).toBe(false)
     expect(result.errorCodes).toContain('internal-error')
+  })
+})
+
+describe('resolveTurnstileSecret', () => {
+  it('uses the configured secret', () => {
+    expect(resolveTurnstileSecret({ TURNSTILE_SECRET_KEY: ' real-secret ', VERCEL_ENV: 'production' })).toBe('real-secret')
+  })
+
+  it('fails closed in Vercel production without a secret', () => {
+    expect(resolveTurnstileSecret({ VERCEL_ENV: 'production', NODE_ENV: 'production' })).toBeNull()
+    expect(resolveTurnstileSecret({ TURNSTILE_SECRET_KEY: '  ', VERCEL_ENV: 'production' })).toBeNull()
+  })
+
+  it('fails closed in a non-Vercel production build without a secret', () => {
+    expect(resolveTurnstileSecret({ NODE_ENV: 'production' })).toBeNull()
+  })
+
+  it('uses the test secret in previews and development', () => {
+    expect(resolveTurnstileSecret({ VERCEL_ENV: 'preview', NODE_ENV: 'production' })).toBe(TURNSTILE_TEST_SECRET)
+    expect(resolveTurnstileSecret({ NODE_ENV: 'development' })).toBe(TURNSTILE_TEST_SECRET)
   })
 })

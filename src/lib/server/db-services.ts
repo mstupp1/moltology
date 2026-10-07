@@ -28,7 +28,6 @@ import { INITIAL_BLOG_POSTS } from '../blog-data'
 import type { BlogPostData } from '../blog-data'
 import { getCategoryBgImage } from '../forum-seed-data'
 import {
-  assertForumWriteRateLimit,
   FORUM_LOCKED_ERROR,
   FORUM_STAFF_BOARD_ERROR,
   validateForumContent,
@@ -107,6 +106,8 @@ import {
 
 
 import { verifyTurnstileToken } from './turnstile'
+import { assertForumWriteLimit } from './forum-write-limit'
+import { LEAD_CAPTURE_TURNSTILE_ACTION } from '../lead-capture'
 import {
   ACTIVITY_FEED_FILTER_IDS,
   type ActivityFeedFilter,
@@ -1561,7 +1562,7 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
     throw new Error('Unauthenticated: You must be registered and logged in to create discussion topics.')
   }
   const { userId, dbClient, payload } = auth
-  assertForumWriteRateLimit(userId)
+  await assertForumWriteLimit(userId)
   await assertCanStartTopic(dbClient, userId, jwtClaimEmail(payload))
 
   if (!data?.categoryId || !data?.title || !data?.content) {
@@ -1707,7 +1708,7 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     throw new Error('Unauthenticated: You must be registered and logged in to post replies.')
   }
   const { userId, dbClient, payload } = auth
-  assertForumWriteRateLimit(userId)
+  await assertForumWriteLimit(userId)
   const standing = await assertCanReply(dbClient, userId, jwtClaimEmail(payload))
 
   if (!data?.topicId || !data?.content) {
@@ -1985,7 +1986,7 @@ export const updateForumTopicHandler = async ({
   }
 
   const { userId, dbClient } = auth
-  assertForumWriteRateLimit(userId)
+  await assertForumWriteLimit(userId)
   const [existing] = await dbClient
     .select()
     .from(forumTopics)
@@ -2088,7 +2089,7 @@ export const updateForumPostHandler = async ({
   }
 
   const { userId, dbClient } = auth
-  assertForumWriteRateLimit(userId)
+  await assertForumWriteLimit(userId)
   const [existing] = await dbClient
     .select()
     .from(forumPosts)
@@ -3071,15 +3072,13 @@ export async function submitLeadHandler(args: ServerFnArgs<SubmitLeadInput>) {
   const referrer = validated.referrer || null
   const emailOptIn = validated.emailOptIn ?? false
 
-  // Canonical Turnstile bot verification check
-  if (validated.turnstileToken) {
-    const verification = await verifyTurnstileToken({
-      token: validated.turnstileToken,
-      expectedAction: 'lead_capture',
-    })
-    if (!verification.success) {
-      throw new Error(verification.errorMessage || 'Turnstile bot protection check failed.')
-    }
+  // Every lead form sends a Turnstile token, so a missing one is treated as a bot.
+  const verification = await verifyTurnstileToken({
+    token: validated.turnstileToken,
+    expectedAction: LEAD_CAPTURE_TURNSTILE_ACTION,
+  })
+  if (!verification.success) {
+    throw new Error(verification.errorMessage || 'Bot protection check failed. Please try again.')
   }
 
   const downloadUrl = getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf')

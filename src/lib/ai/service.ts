@@ -142,6 +142,20 @@ export async function getAIThreadMessages(threadId: string, userId: string) {
 }
 
 /**
+ * The newest stored turns of a thread, oldest first. Callers check ownership
+ * first. This is the Oracle's model history, so the client cannot supply it.
+ */
+export async function getRecentAIThreadTurns(threadId: string, limit: number) {
+  const rows = await getDb()
+    .select({ role: aiMessages.role, content: aiMessages.content })
+    .from(aiMessages)
+    .where(eq(aiMessages.threadId, threadId))
+    .orderBy(desc(aiMessages.createdAt))
+    .limit(limit)
+  return rows.reverse()
+}
+
+/**
  * Saves a new message to an AI thread the caller owns.
  */
 export async function saveAIMessage(input: SaveMessageInput) {

@@ -48,6 +48,8 @@ import { PublicHeader } from '@/components/PublicHeader'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { CareerHub } from '@/components/org/CareerHub'
 import { submitLeadFn } from '@/lib/server/api'
+import { LEAD_CAPTURE_CHECK_PENDING, LEAD_CAPTURE_TURNSTILE_ACTION } from '@/lib/lead-capture'
+import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
 export const OrgPage: React.FC = () => {
   const navigate = useNavigate()
@@ -173,6 +175,9 @@ export const OrgPage: React.FC = () => {
     message: '',
     emailOptIn: false,
   })
+  const [contactTurnstileToken, setContactTurnstileToken] = useState<string | null>(null)
+  const [contactError, setContactError] = useState<string | null>(null)
+  const contactTurnstileRef = React.useRef<TurnstileWidgetRef>(null)
   const [isContactSubmitting, setIsContactSubmitting] = useState(false)
   const [contactSubmitted, setContactSubmitted] = useState(false)
 
@@ -322,6 +327,11 @@ export const OrgPage: React.FC = () => {
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!contactTurnstileToken) {
+      setContactError(LEAD_CAPTURE_CHECK_PENDING)
+      return
+    }
+    setContactError(null)
     setIsContactSubmitting(true)
     try {
       await submitLeadFn({
@@ -329,10 +339,18 @@ export const OrgPage: React.FC = () => {
           email: contactForm.email.trim(),
           source: `org_contact_${contactForm.department}`,
           emailOptIn: contactForm.emailOptIn,
+          turnstileToken: contactTurnstileToken,
         },
-      }).catch(() => {})
-    } catch {}
+      })
+    } catch {
+      setIsContactSubmitting(false)
+      setContactTurnstileToken(null)
+      contactTurnstileRef.current?.reset()
+      toast.error('Could not send your message. Please try again.')
+      return
+    }
     setIsContactSubmitting(false)
+    setContactTurnstileToken(null)
     setContactSubmitted(true)
     toast.info(
       'Your message has been received. Our team will get back to you shortly.',
@@ -1721,6 +1739,17 @@ export const OrgPage: React.FC = () => {
                         </span>
                       </label>
                     </div>
+
+                    <TurnstileWidget
+                      ref={contactTurnstileRef}
+                      action={LEAD_CAPTURE_TURNSTILE_ACTION}
+                      theme="light"
+                      size="flexible"
+                      onVerify={(token) => setContactTurnstileToken(token)}
+                      onExpire={() => setContactTurnstileToken(null)}
+                    />
+
+                    {contactError && <p className="text-xs text-red-600 font-sans">{contactError}</p>}
                   </form>
                 )}
               </div>

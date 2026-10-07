@@ -14,11 +14,16 @@ import {
   summarizeThreadTitle,
   updateAIThreadTitle,
   getOwnedAIThread,
+  getRecentAIThreadTurns,
   getOracleUsageSnapshot,
   recordOracleUsage,
   finalizeOracleUsage,
 } from './service'
-import { decideOracleUsage, ORACLE_MAX_OUTPUT_TOKENS } from './usage-limits'
+import {
+  decideOracleUsage,
+  ORACLE_MAX_HISTORY_MESSAGES,
+  ORACLE_MAX_OUTPUT_TOKENS,
+} from './usage-limits'
 import {
   commitOracleTextStream,
   formatOracleUnavailableMessage,
@@ -154,10 +159,17 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
 
   let activeThreadId = body.threadId
   let isNewThread = !activeThreadId
+  let storedTurns: OracleChatMessageInput[] = []
   if (activeThreadId) {
     const owned = await getOwnedAIThread(userId, activeThreadId)
     if (!owned) {
       return Response.json({ error: 'Thread not found.' }, { status: 403 })
+    }
+    // Read before this turn is queued for saving so it is not counted twice.
+    try {
+      storedTurns = await getRecentAIThreadTurns(activeThreadId, ORACLE_MAX_HISTORY_MESSAGES)
+    } catch (err) {
+      console.warn('[handleOracleChatRequest] History read warning:', err)
     }
   } else {
     activeThreadId = crypto.randomUUID()
@@ -175,17 +187,16 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   })
 
   const systemPrompt = buildSystemPrompt(DEFAULT_ORACLE_PERSONA, preflight.context)
-  // History comes from the client, so earlier user turns get the same filter as the
-  // new one. Failing turns are dropped rather than failing the request, because the
-  // client may still hold a message that was blocked before.
-  const payloadMessages = toModelMessages(
-    messages.filter(
-      (m, index) =>
-        index === messages.length - 1 ||
-        m.role !== 'user' ||
-        validateInputGuardrails(m.content || m.text || '').allowed,
+  // History comes from saved messages, never the client, so a caller cannot forge
+  // assistant turns. Only the new user turn is taken from the request. If the
+  // previous reply is still being saved, it is missing from this one request.
+  // Stored user turns are re-checked in case the input filter has tightened since.
+  const payloadMessages = toModelMessages([
+    ...storedTurns.filter(
+      (m) => m.role !== 'user' || validateInputGuardrails(m.content || '').allowed,
     ),
-  )
+    { role: 'user', content: userText },
+  ])
   const candidateModels = orderOracleModels(body.model, preflight.preferredModelId)
   let lastError: Error | null = null
   const usageEventId = await recordOracleUsage({ userId, kind: 'chat' })
