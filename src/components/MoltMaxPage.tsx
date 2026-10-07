@@ -90,33 +90,33 @@ const vectorDetails = [
 const howItWorks = [
   {
     eyebrow: 'Answer',
-    title: 'Real-world scenarios',
-    description: 'Fifteen everyday dilemmas starring our armored lobster hero: criticism before breakfast, five pings at once, a task that has waited since yesterday.',
-    bullets: ['Scenarios, agree-or-disagree prompts, and quick either-or calls', 'No trick questions', 'Go back and change any answer'],
-    image: '/images/hero_card_asset_shedding.jpg',
-    imageAlt: '',
+    title: 'Spot your patterns',
+    description: 'From competing pings to unfinished tasks, answer fifteen everyday dilemmas to explore how you handle distraction, pressure, and change.',
+    bullets: ['No trick questions', 'Answer at your own pace', 'Revisit any answer'],
+    image: '/images/moltmax/moltmax-how-it-works-answer-v2.webp',
+    imageAlt: 'A friendly lobster at a reef workstation comparing small everyday scenarios',
     accent: '#22d3ee',
     underlay: 'pbr-underlay-chitin',
     cardClass: 'border-cyan-500/35 from-[#0a1215]/95 via-[#070d0f]/95 to-[#04080a]/95 hover:border-cyan-400 hover:shadow-[0_0_40px_rgba(0,195,255,0.22)]',
   },
   {
     eyebrow: 'Measure',
-    title: 'Five-trait profile',
-    description: 'Every answer feeds one of five traits: resilience, decisive execution, focus, habit-shedding, and calm under pressure.',
-    bullets: ['Five-axis radar chart of your strengths', 'A percentage for every trait', 'Strong spots and soft spots side by side'],
-    image: '/images/hero_card_chitin_hardening.jpg',
-    imageAlt: '',
+    title: 'See your strengths',
+    description: 'Get a five-trait profile showing your resilience, execution, focus, habit-shedding, and calm under pressure. See what already holds and where your shell needs support.',
+    bullets: ['Five-axis strengths chart', 'A percentage for each trait', 'A clear starting point'],
+    image: '/images/moltmax/moltmax-how-it-works-measure-v2.webp',
+    imageAlt: 'A friendly lobster examining its shell through an illuminated lens',
     accent: '#fbbf24',
     underlay: 'pbr-underlay-circuit',
     cardClass: 'border-[#ffd700]/35 from-[#121008]/95 via-[#0e0c07]/95 to-[#080704]/95 hover:border-[#ffd700] hover:shadow-[0_0_40px_rgba(255,215,0,0.2)]',
   },
   {
     eyebrow: 'Grow',
-    title: 'Scorecard and next steps',
-    description: 'Get your 0 to 100 Moltmax score, your clearance tier and lobster archetype, plus three small habit upgrades matched to your answers.',
-    bullets: ['Instant score and clearance tier', 'Downloadable scorecard image', 'Save to your profile with a free account'],
-    image: '/images/hero_card_benthic_core.jpg',
-    imageAlt: '',
+    title: 'Choose your next molt',
+    description: 'Leave with your Moltmax score, clearance tier, and three small habit upgrades matched to your score. Pick one to try today.',
+    bullets: ['Instant score and archetype', 'Downloadable scorecard', 'Save results with a free account'],
+    image: '/images/moltmax/moltmax-how-it-works-grow-v2.webp',
+    imageAlt: 'A friendly lobster taking a first step along a softly lit underwater path',
     accent: '#00ffcc',
     underlay: 'pbr-underlay-carbon',
     cardClass: 'border-[#00ffcc]/35 from-[#081412]/95 via-[#060e0d]/95 to-[#030807]/95 hover:border-[#00ffcc] hover:shadow-[0_0_40px_rgba(0,255,204,0.22)]',
@@ -601,10 +601,13 @@ export const MoltMaxPage: React.FC = () => {
               <Terminal className="h-3.5 w-3.5 text-cyan-400" /> How it works
             </div>
             <h2 className="font-grotesk text-3xl font-black uppercase tracking-tight text-white sm:text-4xl lg:text-5xl">
-              Three steps to your <span className="bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] bg-clip-text text-transparent">clearance</span>
+              Find your <span className="bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] bg-clip-text text-transparent">next molt</span> in three steps
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-gray-300 sm:text-base">
-              Fifteen everyday dilemmas, five traits, one honest reading of your shell. Your answers stay on your device unless you choose to save them.
+              Discover where surface noise gets in, where your shell already holds, and what to strengthen next. Fifteen questions, about four minutes. No account needed.
+            </p>
+            <p className="mx-auto mt-3 max-w-2xl text-xs leading-relaxed text-gray-400 sm:text-sm">
+              Your answers stay on your device. Saving to your profile stores your results.
             </p>
           </div>
         </section>
@@ -802,5 +805,4 @@ export const MoltMaxPage: React.FC = () => {
     </div>
   )
 }
-
 
