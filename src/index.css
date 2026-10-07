@@ -234,3 +234,59 @@
     overflow-x: auto;
   }
 }
+
+/* Field manual lead capture: modal entrance and the launcher's attention cues */
+@keyframes guideFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes guideRiseIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes guideBeamSpin {
+  to { transform: rotate(360deg); }
+}
+/* The cover sits still, then hops and wiggles once every few seconds. */
+@keyframes guideBookNudge {
+  0%, 78%, 100% { transform: translateY(0) rotate(-8deg); }
+  83% { transform: translateY(-7px) rotate(-3deg); }
+  88% { transform: translateY(-2px) rotate(-12deg); }
+  93% { transform: translateY(-4px) rotate(-6deg); }
+}
+.guide-overlay {
+  animation: guideFadeIn 200ms ease-out;
+}
+.guide-panel {
+  animation: guideRiseIn 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.guide-pill {
+  animation: guideRiseIn 500ms cubic-bezier(0.2, 0.8, 0.2, 1) 1.2s both;
+}
+.guide-pill-beam {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 250deg,
+    rgba(0, 195, 255, 0.9) 300deg,
+    #00ffcc 335deg,
+    transparent 360deg
+  );
+  animation: guideBeamSpin 4s linear infinite;
+}
+.guide-pill-book {
+  transform: rotate(-8deg);
+  animation: guideBookNudge 7s ease-in-out 2.5s infinite;
+}
+.guide-pill:hover .guide-pill-book {
+  animation: none;
+  transform: translateY(-4px) rotate(-3deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .guide-overlay,
+  .guide-panel,
+  .guide-pill,
+  .guide-pill-beam,
+  .guide-pill-book {
+    animation: none;
+  }
+}

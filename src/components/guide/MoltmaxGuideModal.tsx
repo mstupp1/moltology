@@ -2,22 +2,25 @@
  * ============================================================================
  * MOLTMAXXING GUIDE LEAD CAPTURE MODAL
  * 2-Step Lead Generation & Conversion Bridge:
- * 1. Capture email with price-anchored value ($149 -> FREE) & pseudo-3D mockup.
+ * 1. Capture email against a plain "what you get and why it helps" pitch.
  * 2. Instant PDF download trigger + Free Moltology Account Conversion pitch.
+ * Bottom sheet on phones, two-column dialog on desktop; both scroll inside
+ * the panel so the form and bot check are never clipped off-screen.
  * ============================================================================
  */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   X,
   Download,
-  Shield,
-  Sparkles,
   CheckCircle2,
-  Lock,
+  Check,
   ArrowRight,
   UserPlus,
-  Flame,
-  FileText,
+  Mail,
+  Clock,
+  RotateCcw,
+  Target,
+  ListChecks,
 } from 'lucide-react'
 import { submitLeadFn } from '@/lib/server/api'
 import { LEAD_CAPTURE_CHECK_PENDING, LEAD_CAPTURE_TURNSTILE_ACTION } from '@/lib/lead-capture'
@@ -31,6 +34,38 @@ export interface MoltmaxGuideModalProps {
   source?: string
 }
 
+const GUIDE_PDF_PATH = 'downloads/the-2026-moltmaxxing-protocol-guide.pdf'
+const GUIDE_PDF_FILENAME = 'the-2026-moltmaxxing-protocol-guide.pdf'
+
+const GUIDE_BENEFITS = [
+  {
+    icon: Clock,
+    title: 'A day you don’t have to plan.',
+    body: 'An hour-by-hour routine, so your energy goes into the work, not into deciding what’s next.',
+  },
+  {
+    icon: RotateCcw,
+    title: 'A weekly reset.',
+    body: 'A quick audit for dropping three habits or commitments that slow you down.',
+  },
+  {
+    icon: Target,
+    title: 'Grip training for decisions.',
+    body: 'Short drills for deciding faster and actually finishing what you start.',
+  },
+  {
+    icon: ListChecks,
+    title: 'A printable daily checklist.',
+    body: 'One page to tick off each day, because progress you can see is progress you keep.',
+  },
+] as const
+
+const ACCOUNT_PERKS = [
+  'A daily routine tracker that keeps your streak going',
+  'The Moltmax scan, to see where you’re starting from',
+  'A forum of people working on the same habits',
+] as const
+
 export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
   isOpen,
   onClose,
@@ -40,15 +75,17 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
   const [email, setEmail] = useState('')
   const [emailOptIn, setEmailOptIn] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
-  const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
+  const turnstileRef = useRef<TurnstileWidgetRef>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
   const [step, setStep] = useState<'claim' | 'success'>('claim')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [downloadUrl, setDownloadUrl] = useState(getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf'))
+  const [downloadUrl, setDownloadUrl] = useState(getAssetUrl(GUIDE_PDF_PATH))
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
+      panelRef.current?.focus({ preventScroll: true })
     } else {
       document.body.style.overflow = 'unset'
       // Reset after exit animation
@@ -99,7 +136,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
       })
 
       if (res?.success) {
-        const url = res.downloadUrl || getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf')
+        const url = res.downloadUrl || getAssetUrl(GUIDE_PDF_PATH)
         setDownloadUrl(url)
         setStep('success')
 
@@ -109,7 +146,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
           a.href = url
           a.target = '_blank'
           a.rel = 'noopener noreferrer'
-          a.download = 'the-2026-moltmaxxing-protocol-guide.pdf'
+          a.download = GUIDE_PDF_FILENAME
           document.body.appendChild(a)
           a.click()
           document.body.removeChild(a)
@@ -135,218 +172,245 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
     }
   }
 
+  const titleId = step === 'claim' ? 'guide-modal-title' : 'guide-modal-success-title'
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#020408]/85 backdrop-blur-md transition-opacity duration-300"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6 bg-[#020408]/85 backdrop-blur-md guide-overlay"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-xl bg-gradient-to-b from-[#060c18] to-[#020408] border border-[#00c3ff]/40 rounded-2xl shadow-[0_0_50px_rgba(0,195,255,0.25)] text-[#dfe3e3] overflow-hidden transition-all duration-300"
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className={`relative flex flex-col w-full max-h-[92dvh] sm:max-h-[calc(100dvh-3rem)] bg-[#040a15] border border-[#00c3ff]/30 border-b-0 sm:border-b rounded-t-2xl sm:rounded-2xl shadow-[0_0_60px_rgba(0,195,255,0.18)] text-[#dfe3e3] overflow-hidden outline-none guide-panel ${
+          step === 'claim' ? 'sm:max-w-[840px]' : 'sm:max-w-lg'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Glow Bar */}
-        <div className="h-1 bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8]" />
+        <div className="h-1 shrink-0 bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8]" />
 
-        {/* Close Button */}
+        {/* Close Button: outside the scroll area so it stays reachable */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full text-[#839493] hover:text-white hover:bg-white/10 transition-colors z-10 cursor-pointer"
-          aria-label="Close modal"
+          className="absolute top-3 right-3 p-2 rounded-full text-[#839493] bg-[#040a15]/80 hover:text-white hover:bg-white/10 transition-colors z-10 cursor-pointer"
+          aria-label="Close"
         >
           <X className="w-5 h-5" />
         </button>
 
-        {step === 'claim' ? (
-          <div className="p-6 sm:p-8 space-y-6">
-            {/* Header Badge */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff] text-[11px] font-sans font-bold uppercase tracking-wider">
-                <Sparkles className="w-3.5 h-3.5 text-[#ffd700]" />
-                DECLASSIFIED DOSSIER · EDITION 4.0
-              </span>
-              <span className="text-[11px] font-sans text-[#839493]">
-                SUBSIDIZED BY BENTHIC COUNCIL
-              </span>
-            </div>
+        <div className="overflow-y-auto overscroll-contain">
+          {/* Grab handle hint for the phone bottom sheet */}
+          <div className="sm:hidden mx-auto mt-2.5 h-1 w-10 rounded-full bg-white/15" aria-hidden="true" />
 
-            {/* Title & Price Anchoring */}
-            <div className="space-y-2">
-              <h2 className="text-2xl sm:text-3xl font-black font-grotesk text-white uppercase tracking-tight leading-tight">
-                GET THE 2026 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00c3ff] to-[#00ffcc]">MOLTMAXXING</span> FIELD MANUAL
-              </h2>
-              <div className="flex items-center gap-3 pt-1">
-                <span className="text-sm line-through text-[#ff453a] font-bold font-sans">
-                  VALUE $149.00 USD
-                </span>
-                <span className="px-2.5 py-0.5 rounded bg-[#00ffcc]/20 border border-[#00ffcc]/40 text-[#00ffcc] font-black text-xs font-sans tracking-wider animate-pulse">
-                  FREE TODAY ($0.00)
-                </span>
+          {step === 'claim' ? (
+            <div className="md:grid md:grid-cols-[280px_minmax(0,1fr)]">
+              {/* Cover column (desktop) */}
+              <div className="hidden md:flex flex-col items-center justify-center gap-6 px-8 py-10 border-r border-white/10 bg-[radial-gradient(ellipse_at_50%_45%,rgba(0,195,255,0.22),transparent_65%),linear-gradient(to_bottom,#06101f,#030812)]">
+                <img
+                  src={getAssetUrl('/images/moltmax_guide_3d_mockup.webp')}
+                  alt="Cover of the 2026 Moltmaxxing Field Manual"
+                  width={208}
+                  height={208}
+                  decoding="async"
+                  className="w-48 rounded-xl border border-white/15 shadow-[0_24px_60px_rgba(0,0,0,0.6),0_0_40px_rgba(0,195,255,0.2)] -rotate-3"
+                />
+                <p className="text-xs text-[#839493] font-sans text-center">
+                  4-page PDF · Printable · Free
+                </p>
               </div>
-            </div>
 
-            {/* Pseudo-3D Book Graphic & Bullet Points */}
-            <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
-              <div className="sm:col-span-5 flex justify-center">
-                <div className="relative group">
-                  <div className="absolute -inset-1 rounded-xl bg-gradient-to-r from-[#00c3ff] to-[#00ffcc] opacity-30 blur-md group-hover:opacity-60 transition duration-300" />
+              {/* Pitch + form */}
+              <div className="px-5 pt-4 pb-6 sm:px-8 sm:pt-7 sm:pb-7 space-y-5">
+                <div className="flex items-start gap-4 pr-8">
                   <img
-                    src={getAssetUrl('/images/moltmax_guide_3d_mockup.webp')}
-                    alt="The 2026 Moltmaxxing Protocol Tactical Field Manual"
-                    className="relative w-36 sm:w-44 rounded-lg shadow-2xl border border-white/20 object-cover"
+                    src={getAssetUrl('/images/moltmax_guide_3d_mockup_sm.webp')}
+                    alt=""
+                    width={64}
+                    height={72}
+                    decoding="async"
+                    className="md:hidden shrink-0 w-16 h-[72px] object-cover rounded-lg border border-white/15 shadow-lg -rotate-3"
                   />
+                  <div className="space-y-2 min-w-0">
+                    <p className="text-[11px] font-sans font-bold text-[#00ffcc] uppercase tracking-wider">
+                      Free field manual
+                    </p>
+                    <h2
+                      id="guide-modal-title"
+                      className="text-[22px] sm:text-3xl font-black font-grotesk text-white tracking-tight leading-[1.15]"
+                    >
+                      Shed the clutter. Finish what you start.
+                    </h2>
+                  </div>
                 </div>
-              </div>
 
-              <div className="sm:col-span-7 space-y-2.5 text-xs text-[#839493]">
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#00ffcc] shrink-0 mt-0.5" />
-                  <span><strong className="text-white">The 24-Hour Ecdysis Protocol:</strong> Exact hour-by-hour operational breakdown.</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#00ffcc] shrink-0 mt-0.5" />
-                  <span><strong className="text-white">Pincer Torque Drills:</strong> Calibrate 400–600 Nm executive grip force.</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#00ffcc] shrink-0 mt-0.5" />
-                  <span><strong className="text-white">Anti-Meltmaxxing Guide:</strong> Fortify against soft-tissue gravitational collapse.</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#00ffcc] shrink-0 mt-0.5" />
-                  <span><strong className="text-white">Printable HUD Checklists:</strong> Habit stackers &amp; daily tracking sheets.</span>
-                </div>
-              </div>
-            </div>
+                <p className="text-sm text-[#a9b6b5] leading-relaxed">
+                  The Moltmaxxing Field Manual is a short, printable plan for a calmer, more focused day. Read it
+                  tonight, use it tomorrow morning.
+                </p>
 
-            {/* Email Submission Form */}
-            <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-              <div className="space-y-1.5">
-                <label htmlFor="lead-email" className="block text-xs font-sans font-bold text-[#dfe3e3] uppercase">
-                  Transmit Telemetry Address (Email)
-                </label>
-                <div className="relative">
-                  <input
-                    id="lead-email"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="initiate@benthic-core.org"
-                    className="w-full px-4 py-3 bg-[#020408] border border-white/20 rounded-lg text-white font-sans text-sm placeholder:text-[#839493]/50 focus:outline-none focus:border-[#00c3ff] focus:ring-1 focus:ring-[#00c3ff] transition-all"
+                <div className="space-y-3">
+                  <h3 className="text-xs font-sans font-bold text-[#dfe3e3] uppercase tracking-wider">
+                    What’s inside, and why it helps
+                  </h3>
+                  <ul className="space-y-3">
+                    {GUIDE_BENEFITS.map(({ icon: Icon, title, body }) => (
+                      <li key={title} className="flex gap-3">
+                        <span className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#00c3ff]/10 border border-[#00c3ff]/20 text-[#00c3ff]">
+                          <Icon className="w-4 h-4" aria-hidden="true" />
+                        </span>
+                        <p className="min-w-0 text-[13px] leading-snug text-[#839493] pt-0.5">
+                          <strong className="font-semibold text-white">{title}</strong> {body}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Email Submission Form */}
+                <form onSubmit={handleSubmit} className="space-y-3">
+                  <label htmlFor="lead-email" className="block text-xs font-sans font-semibold text-[#dfe3e3]">
+                    Your email
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-2.5">
+                    <div className="relative flex-1">
+                      <Mail className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#839493]" aria-hidden="true" />
+                      <input
+                        id="lead-email"
+                        type="email"
+                        required
+                        autoComplete="email"
+                        inputMode="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@example.com"
+                        aria-invalid={error ? true : undefined}
+                        aria-describedby={error ? 'lead-email-error' : undefined}
+                        className="w-full pl-10 pr-4 py-3 bg-[#020408] border border-white/20 rounded-lg text-white font-sans text-base sm:text-sm placeholder:text-[#839493]/60 focus:outline-none focus:border-[#00c3ff] focus:ring-1 focus:ring-[#00c3ff] transition-all"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="shrink-0 py-3 px-5 rounded-lg font-grotesk font-bold text-sm bg-gradient-to-r from-[#00c3ff] to-[#00ffcc] hover:brightness-110 text-[#020408] transition-all shadow-[0_0_24px_rgba(0,195,255,0.35)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-wait"
+                    >
+                      {loading ? (
+                        <span>Preparing your download…</span>
+                      ) : (
+                        <>
+                          <Download className="w-4 h-4" aria-hidden="true" />
+                          <span>Get the free PDF</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  {error && (
+                    <p id="lead-email-error" role="alert" className="text-xs text-[#ff6b61] font-sans">
+                      {error}
+                    </p>
+                  )}
+
+                  {/* Explicit Opt-In Checkbox Below CTA */}
+                  <label className="flex items-start gap-2.5 cursor-pointer group select-none pt-1">
+                    <input
+                      type="checkbox"
+                      checked={emailOptIn}
+                      onChange={(e) => setEmailOptIn(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 shrink-0 rounded border-white/20 bg-[#020408] text-[#00c3ff] focus:ring-[#00c3ff] focus:ring-offset-0 cursor-pointer accent-[#00c3ff]"
+                    />
+                    <span className="text-xs text-[#839493] group-hover:text-[#dfe3e3] transition-colors font-sans leading-snug">
+                      Send me occasional updates, new field manuals, and articles.
+                    </span>
+                  </label>
+
+                  <TurnstileWidget
+                    ref={turnstileRef}
+                    action={LEAD_CAPTURE_TURNSTILE_ACTION}
+                    size="flexible"
+                    onVerify={(token) => setTurnstileToken(token)}
+                    onExpire={() => setTurnstileToken(null)}
                   />
-                  <Lock className="absolute right-3.5 top-3.5 w-4 h-4 text-[#839493]" />
+
+                  <p className="text-[11px] text-[#839493] font-sans">
+                    The download starts right away. We only email you if you tick the box.
+                  </p>
+                </form>
+              </div>
+            </div>
+          ) : (
+            /* Step 2: Download confirmation + Free Account Upsell Bridge */
+            <div className="px-5 pt-6 pb-6 sm:p-8 space-y-6 text-center">
+              <div className="inline-flex p-3 rounded-full bg-[#00ffcc]/10 border border-[#00ffcc]/40 text-[#00ffcc]">
+                <CheckCircle2 className="w-9 h-9" aria-hidden="true" />
+              </div>
+
+              <div className="space-y-2">
+                <h2
+                  id="guide-modal-success-title"
+                  className="text-2xl sm:text-[28px] font-black font-grotesk text-white tracking-tight leading-tight"
+                >
+                  Your manual is downloading
+                </h2>
+                <p className="text-sm text-[#a9b6b5] max-w-sm mx-auto leading-relaxed">
+                  If it didn’t start, use the download link at the bottom of this window.
+                </p>
+              </div>
+
+              {/* Free Account Bridge Box */}
+              <div className="p-5 rounded-xl bg-white/[0.03] border border-[#00c3ff]/30 text-left space-y-4">
+                <div className="space-y-1">
+                  <h3 className="text-base font-bold font-grotesk text-white">
+                    Next: turn the checklist into a habit
+                  </h3>
+                  <p className="text-xs text-[#839493] leading-relaxed">
+                    A free Moltology account gives the manual somewhere to live.
+                  </p>
                 </div>
-                {error && <p className="text-xs text-[#ff453a] font-sans">{error}</p>}
+                <ul className="space-y-2">
+                  {ACCOUNT_PERKS.map((perk) => (
+                    <li key={perk} className="flex items-start gap-2 text-[13px] text-[#dfe3e3]">
+                      <Check className="w-4 h-4 text-[#00ffcc] shrink-0 mt-0.5" aria-hidden="true" />
+                      <span>{perk}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <button
+                  onClick={handleCreateAccount}
+                  className="w-full py-3 px-4 rounded-lg font-grotesk font-bold text-sm bg-[#00c3ff] hover:bg-[#00e5ff] text-[#020408] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(0,195,255,0.35)]"
+                >
+                  <UserPlus className="w-4 h-4" aria-hidden="true" />
+                  <span>Create my free account</span>
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </button>
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3.5 px-6 rounded-lg font-grotesk font-black text-sm uppercase tracking-wider bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#00c3ff] hover:brightness-110 text-[#020408] transition-all shadow-[0_0_25px_rgba(0,195,255,0.4)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-              >
-                {loading ? (
-                  <span>DECRYPTING TRANSMISSION...</span>
-                ) : (
-                  <>
-                    <Download className="w-4 h-4" />
-                    <span>CLAIM 100% FREE FIELD MANUAL (INSTANT DOWNLOAD)</span>
-                  </>
-                )}
-              </button>
-
-              {/* Explicit Opt-In Checkbox Below CTA */}
-              <div className="pt-1 text-left">
-                <label className="flex items-start gap-2.5 cursor-pointer group select-none">
-                  <input
-                    type="checkbox"
-                    checked={emailOptIn}
-                    onChange={(e) => setEmailOptIn(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 rounded border-white/20 bg-[#020408] text-[#00c3ff] focus:ring-[#00c3ff] focus:ring-offset-0 cursor-pointer accent-[#00c3ff]"
-                  />
-                  <span className="text-xs text-[#839493] group-hover:text-[#dfe3e3] transition-colors font-sans leading-tight">
-                    Send me occasional updates, new field manuals, and articles.
-                  </span>
-                </label>
+              {/* Secondary Actions */}
+              <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-sans">
+                <a
+                  href={downloadUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download={GUIDE_PDF_FILENAME}
+                  className="inline-flex items-center gap-1.5 text-[#00c3ff] hover:underline"
+                >
+                  <Download className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Download again</span>
+                </a>
+                <span className="text-white/20" aria-hidden="true">|</span>
+                <button
+                  onClick={onClose}
+                  className="text-[#839493] hover:text-white transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
               </div>
-
-              <TurnstileWidget
-                ref={turnstileRef}
-                action={LEAD_CAPTURE_TURNSTILE_ACTION}
-                size="flexible"
-                onVerify={(token) => setTurnstileToken(token)}
-                onExpire={() => setTurnstileToken(null)}
-              />
-
-              <p className="text-[10px] text-center text-[#839493] font-sans">
-                🔒 Zero spam doctrine. 100% sovereign benthic telemetry. Instant digital declassification.
-              </p>
-            </form>
-          </div>
-        ) : (
-          /* Step 2: Transmission Decrypted + Free Account Upsell Bridge */
-          <div className="p-6 sm:p-8 space-y-6 text-center">
-            <div className="inline-flex p-3 rounded-full bg-[#00ffcc]/10 border border-[#00ffcc]/40 text-[#00ffcc]">
-              <CheckCircle2 className="w-10 h-10" />
             </div>
-
-            <div className="space-y-2">
-              <span className="text-xs font-sans font-bold text-[#00ffcc] uppercase tracking-wider">
-                TRANSMISSION DECRYPTED · DOSSIER DISPATCHED
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black font-grotesk text-white uppercase">
-                YOUR FIELD MANUAL IS READY!
-              </h2>
-              <p className="text-xs sm:text-sm text-[#839493] max-w-md mx-auto leading-relaxed">
-                We've initiated the download of <strong className="text-white">The 2026 Moltmaxxing Protocol</strong>. If the download didn't trigger automatically, use the direct link below.
-              </p>
-            </div>
-
-            {/* Free Account Bridge Box */}
-            <div className="p-5 rounded-xl bg-[#030814] border border-[#00c3ff]/40 text-left space-y-3 shadow-inner">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#ffd700] uppercase font-sans">
-                <Flame className="w-4 h-4 text-[#ffd700]" />
-                <span>NEXT STEP: BIND TELEMETRY TO FREE BENTHIC ACCOUNT</span>
-              </div>
-              <p className="text-xs text-[#839493]">
-                Your email (<strong className="text-white">{email}</strong>) is pre-cleared for a <strong className="text-[#00ffcc]">Free Moltology Larval Account</strong>:
-              </p>
-              <ul className="text-xs text-[#dfe3e3] space-y-1.5 list-disc list-inside">
-                <li>Track your 24-Hour Ecdysis streaks in the live HUD</li>
-                <li>Record pincer torque dynamometry biometrics</li>
-                <li>Calibrate your chassis loadout and seat vault gear on hardpoints</li>
-              </ul>
-
-              <button
-                onClick={handleCreateAccount}
-                className="w-full mt-2 py-3 px-4 rounded-lg font-grotesk font-black text-xs uppercase tracking-wider bg-[#00c3ff] hover:bg-[#00e5ff] text-[#020408] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(0,195,255,0.4)]"
-              >
-                <UserPlus className="w-4 h-4" />
-                <span>ACTIVATE FREE MOLTOLOGY ACCOUNT (1-CLICK)</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Secondary Actions */}
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-2 text-xs font-sans">
-              <a
-                href={downloadUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                download="the-2026-moltmaxxing-protocol-guide.pdf"
-                className="inline-flex items-center gap-1.5 text-[#00c3ff] hover:underline"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Download Again</span>
-              </a>
-              <span className="text-white/20">|</span>
-              <button
-                onClick={onClose}
-                className="text-[#839493] hover:text-white transition-colors cursor-pointer"
-              >
-                Dismiss Window
-              </button>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )
