@@ -12,7 +12,7 @@ const LazyWhatMoltologistsSayPage = lazy(() =>
 const canonical = `${SITE_ORIGIN}/what-is-moltology/what-moltologists-say`
 const title = 'What Moltologists Say About Moltology'
 const description =
-  'Warm, static voices from the Benthic Community on Isolation Domes, nightly audits, Soft-Shell Covenant, and earning clearance without buying rank.'
+  'Voices from the Benthic Community at every stage: first sheds, Isolation Domes, Nightly Molt Audits, and the Soft-Shell Covenant.'
 
 export const Route = createFileRoute('/what-is-moltology/what-moltologists-say')({
   head: () => ({

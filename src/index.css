@@ -203,3 +203,34 @@
 .animate-caret-blink {
   animation: caret-blink 1s infinite;
 }
+
+/* About pages: member voice marquee and floating field manual */
+@keyframes wimMarquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+@keyframes wimFloat {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-14px) rotate(1deg); }
+}
+.wim-marquee {
+  animation: wimMarquee 70s linear infinite;
+}
+.wim-marquee-reverse {
+  animation-direction: reverse;
+  animation-duration: 85s;
+}
+.wim-marquee:hover {
+  animation-play-state: paused;
+}
+.wim-marquee-mask {
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .wim-marquee {
+    animation: none;
+  }
+  .wim-marquee-mask > div {
+    overflow-x: auto;
+  }
+}

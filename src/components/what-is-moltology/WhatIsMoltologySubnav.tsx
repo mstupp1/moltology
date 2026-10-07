@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
 import { usePublicHeaderChrome } from '@/components/public-header-chrome'
 import { WHAT_IS_MOLTOLOGY_NAV, resolveWhatIsMoltologyNavId } from './nav'
+import { CHROME_VAR } from './story/motion'
 
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect
 
@@ -34,6 +35,15 @@ export const WhatIsMoltologySubnav: React.FC = () => {
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
+
+  // Sticky story sections pin below whatever chrome is currently on screen.
+  useEffect(() => {
+    const root = document.documentElement
+    root.style.setProperty(CHROME_VAR, `${offset + barHeight}px`)
+    return () => {
+      root.style.removeProperty(CHROME_VAR)
+    }
+  }, [offset, barHeight])
 
   useEffect(() => {
     const list = listRef.current
