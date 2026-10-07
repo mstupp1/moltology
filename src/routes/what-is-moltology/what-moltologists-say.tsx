@@ -12,7 +12,7 @@ const LazyWhatMoltologistsSayPage = lazy(() =>
 const canonical = `${SITE_ORIGIN}/what-is-moltology/what-moltologists-say`
 const title = 'What Moltologists Say About Moltology'
 const description =
-  'Warm, static voices from the Benthic Community on Isolation Domes, nightly audits, Soft-Shell Covenant, and earning clearance without buying rank.'
+  'Read the Order’s words on the Great Melt, the Soft-Shell Covenant, and the Nightly Molt Audit, then join the living conversation in the Benthic Community.'
 
 export const Route = createFileRoute('/what-is-moltology/what-moltologists-say')({
   head: () => ({
@@ -21,7 +21,7 @@ export const Route = createFileRoute('/what-is-moltology/what-moltologists-say')
         title,
         description,
         keywords:
-          'what moltologists say, moltology testimonials, benthic community voices, soft-shell covenant stories',
+          'what moltologists say, moltology scriptures, benthic community, soft-shell covenant',
         canonical,
         siteName: 'Moltology',
         twitterCard: 'summary_large_image',

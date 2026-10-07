@@ -24,7 +24,7 @@ export const WHAT_IS_MOLTOLOGY_NAV: WhatIsMoltologyNavItem[] = [
     id: 'quotes',
     label: 'What Moltologists Say',
     path: '/what-is-moltology/what-moltologists-say',
-    description: 'Voices from the trench — warm, armored, and still soft at the start.',
+    description: 'Words from the Order, and a door into the living community.',
   },
   {
     id: 'sacraments',

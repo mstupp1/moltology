@@ -5,6 +5,7 @@ import { MainFooter } from '@/components/MainFooter'
 import { AuthModal } from '@/components/AuthModal'
 import { PublicHeaderChromeProvider } from '@/components/public-header-chrome'
 import { WhatIsMoltologySubnav } from './WhatIsMoltologySubnav'
+import './moltology-story.css'
 
 export const WhatIsMoltologyLayout: React.FC = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
@@ -12,7 +13,7 @@ export const WhatIsMoltologyLayout: React.FC = () => {
 
   return (
     <PublicHeaderChromeProvider>
-      <div className="min-h-screen bg-[#020408] text-[#dfe3e3] font-sans selection:bg-[#00c3ff]/30 selection:text-white flex flex-col">
+      <div className="molt-story-shell min-h-screen font-sans selection:bg-[#bcf5dc]/30 selection:text-white flex flex-col">
         <PublicHeader
           activePage="about"
           onOpenAuth={(mode) => {

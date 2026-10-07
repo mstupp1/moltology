@@ -1,93 +1,160 @@
 import React from 'react'
-import { MessageSquareQuote } from 'lucide-react'
-import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { Link } from '@tanstack/react-router'
+import { ArrowDown, ArrowRight, BookOpen, MessageCircle } from 'lucide-react'
+import { getAssetUrl } from '@/lib/assets'
+import { StoryReveal } from './StoryReveal'
 
-const quotes = [
+const readings = [
   {
+    id: 'SCR-001',
+    title: 'The Prime Directive',
     quote:
-      'I thought I needed more motivation. I needed a door I could close before the dive. The Isolation Dome did more for my afternoons than any pep talk ever managed.',
-    name: 'Unit Kelp-Wire',
-    stage: 'Soft-Shed · S2',
+      'It is not a sin and it is not a diagnosis. It is weather, and you have been standing in it without a roof.',
   },
   {
+    id: 'SCR-013',
+    title: 'The Soft-Shell Covenant',
     quote:
-      'The Nightly Molt Audit is almost insultingly small. That is why I still do it on the nights I would skip anything larger. One tab closed. One apology unsent. One scroll left in the sea.',
-    name: 'Brine Circuit',
-    stage: 'Larval Initiate · L3',
+      'The humor of this Order is aimed at the melt: the tab bar, the deferred decision, the 2:00 AM scroll. It is never aimed at the person standing in it.',
   },
   {
-    quote:
-      'Nobody mocked me for arriving soft. They just made room. Soft-Shell Covenant stopped being scripture and started being how people stood around me the week after my first real shed.',
-    name: 'Ash Pincer',
-    stage: 'Exoshell Born · E1',
-  },
-  {
-    quote:
-      'Carcinization sounded like a joke until I noticed I was finishing things. The grip came before the armor. The armor came because the grip finally had somewhere to live.',
-    name: 'Deep Current 09',
-    stage: 'Soft-Shed · S3',
-  },
-  {
-    quote:
-      'I came for the gems and stayed for the Audit. Ten minutes a night, one thing shed, and the week stopped feeling like a pile of open tabs.',
-    name: 'Mariana Clerk',
-    stage: 'Exoshell Born · E2',
-  },
-  {
-    quote:
-      'The Great Melt was just my Tuesday: open loops, surface arguments I was not in, and a body that never got quiet. Moltology named the weather. Then it handed me a shell.',
-    name: 'Trench Listener',
-    stage: 'Larval Initiate · L2',
-  },
-  {
-    quote:
-      'I still melt some days. The difference is I notice the water temperature now, and I know which rite to run before the melt writes the whole evening.',
-    name: 'Calcified Neighbor',
-    stage: 'Full Carcinization · C1',
-  },
-  {
-    quote:
-      'Stewardship is quieter than I expected. The Ascendant work is mostly watching soft shells harden without poking them. The hardest shell stands guard.',
-    name: 'Synaptic Pod Lead',
-    stage: 'Full Carcinization · C2',
+    id: 'SCR-032',
+    title: 'The Nightly Molt Audit',
+    quote: 'The audit is an instrument, not a tribunal.',
   },
 ]
 
 export const WhatMoltologistsSayPage: React.FC = () => {
   return (
-    <main className="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-20 w-full space-y-12">
-      <section className="space-y-5">
-        <p className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff] text-xs font-sans tracking-widest uppercase">
-          <MessageSquareQuote className="w-3.5 h-3.5" />
-          Voices from the trench
-        </p>
-        <h1 className="text-3xl sm:text-5xl font-grotesk font-black tracking-tight text-white leading-tight">
-          What Moltologists say about Moltology
-        </h1>
-        <p className="text-base sm:text-lg text-[#839493] max-w-3xl leading-relaxed">
-          Static dispatches from the Benthic Community — warm, deadpan, and grounded in the
-          ordinary pain of melting. These are composite member voices, not celebrity
-          endorsements. The Order keeps soft shells named by designation, not spectacle.
-        </p>
+    <main className="molt-story flex-1">
+      <section className="story-section !py-0">
+        <div className="relative isolate min-h-[620px] overflow-hidden border-y border-white/10 sm:min-h-[700px] lg:min-h-[760px]">
+          <img
+            src={getAssetUrl('/images/forum/forum_general_bg.jpg')}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover object-center"
+            loading="eager"
+            decoding="async"
+          />
+          <div className="absolute inset-0 bg-[#040a0d]/35" aria-hidden="true" />
+          <div
+            className="absolute inset-0"
+            aria-hidden="true"
+            style={{
+              background:
+                'linear-gradient(90deg, rgba(4,10,13,.98) 0%, rgba(4,10,13,.88) 34%, rgba(4,10,13,.42) 68%, rgba(4,10,13,.18) 100%), linear-gradient(0deg, #040a0d 0%, rgba(4,10,13,.12) 36%, rgba(4,10,13,.18) 100%)',
+            }}
+          />
+
+          <div className="story-wrap relative z-10 grid min-h-[620px] items-center gap-12 py-20 sm:min-h-[700px] lg:min-h-[760px] lg:grid-cols-[minmax(0,1.2fr)_minmax(260px,.6fr)] lg:py-28">
+            <StoryReveal className="flex max-w-3xl flex-col items-start gap-5">
+              <p className="story-eyebrow">Words from the Order</p>
+              <h1 className="story-title max-w-3xl">What Moltologists Say</h1>
+              <p className="story-copy max-w-2xl text-lg sm:text-xl">
+                The Order’s scriptures speak plainly about the Great Melt, the work of
+                molting, and the care owed to anyone between shells. For conversations
+                from members themselves, enter the Benthic Community.
+              </p>
+              <div className="story-actions">
+                <Link to="/forum" className="story-button">
+                  Enter the Benthic Community
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+                <a href="#order-readings" className="story-button-secondary">
+                  Read the Order’s words
+                  <ArrowDown className="h-4 w-4" aria-hidden="true" />
+                </a>
+              </div>
+            </StoryReveal>
+
+            <StoryReveal delay={140} className="hidden lg:block">
+              <aside className="ml-auto flex max-w-sm flex-col gap-5 border-l border-[#bcf5dc]/60 pl-6">
+                <p className="story-eyebrow">The Soft-Shell Covenant · SCR-013</p>
+                <blockquote className="font-serif text-2xl leading-snug text-[#f2f0e9] xl:text-3xl">
+                  “The hardest shell in the trench is the one standing watch over someone who
+                  has none.”
+                </blockquote>
+                <p className="text-sm text-[#bcf5dc]">The Order of the Synaptic Path</p>
+              </aside>
+            </StoryReveal>
+          </div>
+        </div>
       </section>
 
-      <div className="grid gap-5 sm:grid-cols-2">
-        {quotes.map((entry, index) => (
-          <ScrollReveal key={entry.name} delayMs={index * 40}>
-            <blockquote className="h-full p-6 rounded-xl border border-cyan-900/50 bg-[#05090a] flex flex-col justify-between gap-5">
-              <p className="text-sm sm:text-base text-[#dfe3e3] leading-relaxed">
-                &ldquo;{entry.quote}&rdquo;
+      <section id="order-readings" className="story-section scroll-mt-24">
+        <div className="story-wrap">
+          <StoryReveal className="grid gap-8 lg:grid-cols-[minmax(0,.75fr)_minmax(0,1.25fr)] lg:items-end">
+            <div className="flex flex-col gap-4">
+              <p className="story-eyebrow">Readings from the canon</p>
+              <h2 className="story-heading max-w-xl">A softer word for the hard days.</h2>
+            </div>
+            <p className="story-copy max-w-2xl lg:justify-self-end">
+              These passages come from the Order’s published scriptures. They describe the
+              principles held in common across the Benthic Community.
+            </p>
+          </StoryReveal>
+
+          <div className="mt-12 border-t border-white/20">
+            {readings.map((reading, index) => (
+              <StoryReveal key={reading.id} delay={index * 90}>
+                <article className="grid gap-5 border-b border-white/20 py-8 sm:py-10 lg:grid-cols-[minmax(180px,.45fr)_minmax(0,1fr)] lg:gap-12 lg:py-12">
+                  <div className="flex items-start gap-3 lg:block">
+                    <BookOpen className="mt-1 h-4 w-4 shrink-0 text-[#bcf5dc]" aria-hidden="true" />
+                    <div className="flex flex-col gap-1">
+                      <p className="story-eyebrow">{reading.id}</p>
+                      <p className="text-sm text-[#9aadb0]">{reading.title}</p>
+                    </div>
+                  </div>
+                  <blockquote className="max-w-4xl font-serif text-2xl leading-snug text-[#f2f0e9] sm:text-3xl lg:text-4xl">
+                    “{reading.quote}”
+                  </blockquote>
+                </article>
+              </StoryReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="story-section !pt-0">
+        <div className="story-wrap">
+          <StoryReveal className="grid overflow-hidden border border-white/10 bg-white/[0.025] lg:grid-cols-[minmax(0,.85fr)_minmax(0,1.15fr)]">
+            <div className="flex flex-col items-start justify-center gap-5 p-7 sm:p-10 lg:p-14">
+              <p className="story-eyebrow">The Benthic Community</p>
+              <h2 className="story-heading">The living conversation is below.</h2>
+              <p className="story-copy max-w-xl">
+                Visit the forum to read current discussions, ask a question, or offer a
+                steady word to someone in their soft-shell window.
               </p>
-              <footer className="space-y-0.5 border-t border-white/10 pt-4">
-                <cite className="not-italic font-grotesk font-bold text-cyan-200 text-sm">
-                  {entry.name}
-                </cite>
-                <p className="text-xs text-[#839493] uppercase tracking-wide">{entry.stage}</p>
-              </footer>
-            </blockquote>
-          </ScrollReveal>
-        ))}
-      </div>
+              <div className="story-actions">
+                <Link to="/forum" className="story-button">
+                  Visit the forum
+                  <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </div>
+            </div>
+            <div className="relative min-h-[280px] overflow-hidden sm:min-h-[380px] lg:min-h-[480px]">
+              <picture>
+                <source
+                  media="(max-width: 767px)"
+                  srcSet={getAssetUrl('/images/marketing/forum_feature_preview_sm.webp')}
+                />
+                <img
+                  src={getAssetUrl('/images/marketing/forum_feature_preview.webp')}
+                  alt="Preview of the Benthic Community forum"
+                  className="absolute inset-0 h-full w-full object-cover object-left-top"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
+              <div
+                className="absolute inset-0 bg-gradient-to-r from-[#040a0d]/55 via-transparent to-transparent lg:from-[#040a0d]/40"
+                aria-hidden="true"
+              />
+            </div>
+          </StoryReveal>
+        </div>
+      </section>
     </main>
   )
 }
