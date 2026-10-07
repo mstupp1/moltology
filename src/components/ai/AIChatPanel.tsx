@@ -24,7 +24,7 @@ import { AuthModal } from '../AuthModal'
 import { useAuthSession } from '../../hooks/useAuthSession'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
 import { getAssetUrl } from '../../lib/assets'
-import { isAdminOrSuperAdmin } from '../../lib/permissions'
+import { isAdmin } from '../../lib/permissions'
 import { resolveMemberPublicName } from '../../lib/member-handle'
 import { getAuthJWTToken } from '../../lib/jwt'
 import { oracleAuthData } from '../../lib/ai/oracle-auth-client'
@@ -111,7 +111,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const conversationRef = useRef<HTMLDivElement>(null)
   const hadUserMessagesRef = useRef(false)
 
-  const canPickModel = isAdminOrSuperAdmin(user, profileRole)
+  const canPickModel = isAdmin(user, profileRole)
 
   useEffect(() => {
     if (!userId) {

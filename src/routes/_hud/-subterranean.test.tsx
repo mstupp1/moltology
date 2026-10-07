@@ -70,16 +70,4 @@ describe('Subterranean HUD Route', () => {
     expect(screen.queryByTestId('hidden-page-unavailable')).not.toBeInTheDocument()
   })
 
-  it('renders the vats hub for super admins', async () => {
-    vi.mocked(authClient.useSession).mockReturnValue({
-      data: { user: { id: 'super-1', name: 'Commander Craw', email: 'myles@moltology.org', role: 'user' } },
-      isPending: false,
-    } as any)
-    const Component = Route.options.component!
-    render(<Component />)
-
-    expect(
-      await screen.findByText('MUTAGENIC HYBRID RESEARCH CHAMBERS', {}, { timeout: LAZY_TIMEOUT })
-    ).toBeInTheDocument()
-  })
 })

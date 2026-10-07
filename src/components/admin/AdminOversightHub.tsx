@@ -29,7 +29,6 @@ const TABS: { id: AdminTab; label: string; icon: React.ComponentType<{ className
 const ROLE_OPTIONS: { value: AdminMemberRole; label: string }[] = [
   { value: 'user', label: 'User' },
   { value: 'admin', label: 'Admin' },
-  { value: 'super_admin', label: 'Super admin' },
 ]
 
 function roleLabel(role: AdminMemberRole): string {
@@ -309,8 +308,7 @@ function MemberDirectory({
               <p className="text-[11px] text-[#839493]">
                 Joined {utcDate(member.createdAt)} · Updated {utcDate(member.updatedAt)}
               </p>
-              {directory.viewerCanManageRoles ? (
-                <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                   <label className="text-[11px] text-[#839493]">
                     Clearance
                     <select
@@ -340,9 +338,6 @@ function MemberDirectory({
                     {savingId === member.id ? 'Saving' : 'Save clearance'}
                   </button>
                 </div>
-              ) : (
-                <p className="text-[11px] text-[#839493]">Only a super admin can change clearance.</p>
-              )}
             </li>
           ))}
         </ul>

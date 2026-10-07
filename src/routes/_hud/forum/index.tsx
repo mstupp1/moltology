@@ -110,15 +110,45 @@ function ForumIndexPage() {
     }
   }, [userId])
 
-  const filteredTopics = topicsState.filter((topic) => {
+  // Lists carry previews, not whole bodies, so a search asks the server once typing pauses.
+  const [searchResults, setSearchResults] = useState<{ query: string; topics: ForumTopicEntry[] } | null>(null)
+  useEffect(() => {
+    const trimmed = searchQuery.trim()
+    if (!trimmed) {
+      setSearchResults(null)
+      return
+    }
+    let active = true
+    const timer = setTimeout(async () => {
+      try {
+        const token = userId ? await getAuthJWTToken() : null
+        const auth = userId ? { userId, token: token ?? undefined } : {}
+        const found = await getForumTopicsFn({ data: { sortBy: 'hot', query: trimmed, ...auth } })
+        if (active) setSearchResults({ query: trimmed, topics: found || [] })
+      } catch {
+        if (active) setSearchResults({ query: trimmed, topics: [] })
+      }
+    }, 300)
+    return () => {
+      active = false
+      clearTimeout(timer)
+    }
+  }, [searchQuery, userId])
+
+  const trimmedQuery = searchQuery.trim()
+  const query = trimmedQuery.toLowerCase()
+  const serverMatches = searchResults?.query === trimmedQuery ? searchResults.topics : null
+  const filteredTopics = (serverMatches ?? topicsState).filter((topic) => {
     const matchesCategory =
       selectedCategoryFilter === 'ALL' ||
       topic.categorySlug === selectedCategoryFilter ||
       topic.categoryId === selectedCategoryFilter
+    // Narrow the loaded list right away while the server search is in flight.
     const matchesSearch =
-      !searchQuery.trim() ||
-      topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      topic.content.toLowerCase().includes(searchQuery.toLowerCase())
+      !query ||
+      serverMatches !== null ||
+      topic.title.toLowerCase().includes(query) ||
+      topic.content.toLowerCase().includes(query)
     return matchesCategory && matchesSearch
   })
 

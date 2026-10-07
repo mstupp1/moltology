@@ -162,7 +162,7 @@ export function ForumHubCard() {
         const token = userId ? ((await getAuthJWTToken()) ?? undefined) : undefined
         const auth = userId ? { userId, token } : {}
         const [fetchedTopics, fetchedCats] = await Promise.all([
-          getForumTopicsFn({ data: { sortBy: HUB_SORT, ...auth } }),
+          getForumTopicsFn({ data: { sortBy: HUB_SORT, limit: HUB_THREAD_LIMIT, ...auth } }),
           getForumCategoriesFn({ data: auth }),
         ])
         if (isMounted) {

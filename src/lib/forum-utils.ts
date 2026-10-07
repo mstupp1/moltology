@@ -131,6 +131,32 @@ export function kebabForumSlug(text: string): string {
     .slice(0, 80)
 }
 
+/** Most topics a list request returns. Lists render every row they get. */
+export const FORUM_TOPIC_LIST_LIMIT = 100
+/** Recent topics the hot sort ranks before it trims to the list limit. */
+export const FORUM_HOT_CANDIDATE_POOL = 300
+/** Lists show a one-line preview, so they never need the whole body. */
+export const FORUM_TOPIC_PREVIEW_CHARS = 280
+
+export function forumTopicPreview(content: string | null | undefined): string {
+  const flat = (content || '').replace(/\s+/g, ' ').trim()
+  return flat.length > FORUM_TOPIC_PREVIEW_CHARS
+    ? `${flat.slice(0, FORUM_TOPIC_PREVIEW_CHARS - 1).trimEnd()}…`
+    : flat
+}
+
+/** Escapes LIKE wildcards so a search for "50%" matches the text literally. */
+export function escapeLikePattern(query: string): string {
+  return query.replace(/[\\%_]/g, (ch) => `\\${ch}`)
+}
+
+/** Staff-owned board. Members can read and reply there but cannot start topics. */
+export const FORUM_STAFF_BOARD_SLUG = 'rules-announcements'
+
+export function isForumStaffBoard(slug: string | null | undefined): boolean {
+  return !!slug && resolveForumCategorySlug(slug) === FORUM_STAFF_BOARD_SLUG
+}
+
 /**
  * Name-guessed or retired board slugs that still point at a live category.
  * "Rules & Directives" kebab-cases to `rules-directives`, but the seeded

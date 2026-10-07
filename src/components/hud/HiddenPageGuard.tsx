@@ -7,7 +7,7 @@ export interface HiddenPageGuardProps {
 }
 
 /**
- * Renders a hidden page for admins and super admins.
+ * Renders a hidden page for admins.
  * Everyone else gets a plain unavailable notice, with no preview of the page.
  */
 export const HiddenPageGuard: React.FC<HiddenPageGuardProps> = ({ children, skeleton }) => {

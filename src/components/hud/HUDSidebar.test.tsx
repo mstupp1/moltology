@@ -390,7 +390,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.queryByRole('button', { name: /^ADMIN$/i })).not.toBeInTheDocument()
   })
 
-  it('shows hidden pages faded, with a hidden icon, for admins and super admins', async () => {
+  it('shows hidden pages faded, with a hidden icon, for admins', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -403,7 +403,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
       isPending: false,
     } as any)
 
-    const { rerender } = render(<HUDSidebar />)
+    render(<HUDSidebar />)
 
     const adminItem = screen.getByRole('button', { name: /^ADMIN$/i })
     expect(adminItem).not.toHaveAttribute('data-hidden', 'true')
@@ -413,26 +413,6 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(hiddenItem).toHaveAttribute('title', 'Hidden page')
     expect(hiddenItem.querySelector('[data-testid="hidden-page-icon"]')).toBeTruthy()
     expect(hiddenItem.querySelector('.opacity-40')).toBeTruthy()
-
-    vi.mocked(authClient.useSession).mockReturnValue({
-      data: {
-        user: {
-          id: 'super-1',
-          name: 'Super',
-          email: 'myles@moltology.org',
-          role: 'user',
-        },
-      } as any,
-      isPending: false,
-    } as any)
-    rerender(<HUDSidebar />)
-    expect(screen.getByRole('button', { name: /SUBTERRANEAN VATS/i })).toHaveAttribute(
-      'data-hidden',
-      'true',
-    )
-    for (const item of screen.getAllByRole('button', { name: /PREMIUM/i })) {
-      expect(item).toHaveAttribute('data-hidden', 'true')
-    }
   })
 
   it('shows a hidden page when admin clearance lives only on the profile', async () => {

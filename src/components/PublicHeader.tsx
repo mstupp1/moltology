@@ -3,7 +3,7 @@
  * PUBLIC TOP NAVIGATION HEADER
  * Shared navigation bar across top-level public pages (Landing / Org).
  * Features a modern glassmorphic HUD pill nav, high-tech glowing tab indicators,
- * Members keep the Etsy store link. Admins and super admins go to /store.
+ * Members keep the Etsy store link. Admins go to /store.
  * ============================================================================
  */
 import React, { useState, useEffect, useMemo, Suspense, lazy } from 'react'

@@ -39,7 +39,7 @@ vi.mock('@/lib/server/api', () => ({
     activeSessions: 5,
     healthy: true,
   }),
-  searchAdminMembersFn: vi.fn().mockResolvedValue({ viewerCanManageRoles: false, members: [] }),
+  searchAdminMembersFn: vi.fn().mockResolvedValue({ members: [] }),
   setAdminMemberRoleFn: vi.fn(),
   listAdminPurchasesFn: vi.fn().mockResolvedValue([]),
 }))

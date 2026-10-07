@@ -71,6 +71,7 @@ export const FORUM_WRITE_RATE_LIMIT = 10
 export const FORUM_WRITE_RATE_WINDOW_MS = 60 * 1000
 export const FORUM_WRITE_RATE_ERROR = 'You are posting too quickly. Wait a minute and try again.'
 export const FORUM_LOCKED_ERROR = 'This thread is locked. New replies are closed.'
+export const FORUM_STAFF_BOARD_ERROR = 'Only staff can start topics on this board. Pick another board for your post.'
 
 /**
  * Caps signed-in topic/reply create and edit traffic per member.

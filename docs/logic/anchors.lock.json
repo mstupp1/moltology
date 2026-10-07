@@ -10,7 +10,7 @@
   "access.roles::src/db/schema.ts#profiles.role": "1c1c4cc05cf9",
   "access.roles::src/lib/server/admin-oversight.ts#ADMIN_MEMBER_ROLES": "a473b74aaf07",
   "access.staff-server-check::src/lib/server/admin-oversight.ts#requireStaff": "e472fbeda8c7",
-  "access.staff::src/lib/permissions.ts#isAdminOrSuperAdmin": "c830e70184b9",
+  "access.staff::src/lib/permissions.ts#isAdmin": "c830e70184b9",
   "access.super-admin-emails::src/lib/permissions.ts#getEffectiveRole": "db52a7b02c57",
   "access.super-admin-emails::src/lib/permissions.ts#SUPER_ADMIN_EMAILS": "a1b06b6c9461",
   "access.write-auth::src/lib/server/write-auth.ts#resolveWriteAuth": "d488cea9577e",

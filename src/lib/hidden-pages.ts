@@ -1,9 +1,9 @@
 /**
  * Hidden pages stay out of navigation and search for members.
- * Admins and super admins can still open them. The sidebar shows those
+ * Admins can still open them. The sidebar shows those
  * entries faded, with a hidden icon, so staff can tell them apart.
  */
-import { isAdminOrSuperAdmin } from './permissions'
+import { isAdmin } from './permissions'
 
 export const HIDDEN_PAGES = [
   {
@@ -41,12 +41,12 @@ export function isHiddenPagePath(pathname: string | null | undefined): boolean {
 }
 
 /**
- * Admins and super admins may see hidden pages.
+ * Admins may see hidden pages.
  * `profileRole` covers clearance stored on the profile when the session role is still a member.
  */
 export function canViewHiddenPages(
-  user?: { email?: string | null; role?: string | null } | null,
+  user?: { email?: string | null; emailVerified?: boolean | null; role?: string | null } | null,
   profileRole?: string | null,
 ): boolean {
-  return isAdminOrSuperAdmin(user, profileRole)
+  return isAdmin(user, profileRole)
 }

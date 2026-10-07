@@ -1,14 +1,11 @@
 import { getDb } from '../db'
 import { profiles, userStats } from '../db/schema'
-import { eq, sql } from 'drizzle-orm'
-import { SUPER_ADMIN_EMAILS, isSuperAdminEmail } from './permissions'
+import { eq } from 'drizzle-orm'
 import { resolveMemberLarvaId, shouldReplacePlaceholderLarvaId } from './larva-id'
-
-export { SUPER_ADMIN_EMAILS }
 
 /**
  * Idempotently ensures a `profiles` and `user_stats` row exist for a Better Auth user id.
- * Automatically elevates known super admin accounts in `profiles`.
+ * New profiles start as `user`; staff is granted with `npm run db:grant-admin` or the admin page.
  * Real members get a unique LARVA UNIT number instead of the shared seed default.
  */
 export async function ensureUserProfile(userId?: string | null) {
@@ -16,30 +13,6 @@ export async function ensureUserProfile(userId?: string | null) {
   try {
     const db = getDb()
 
-    let isSuperAdmin = false
-    try {
-      const authUserRes = await db.execute(
-        sql`SELECT email FROM "user" WHERE id = ${userId} LIMIT 1`
-      )
-      const email = (authUserRes?.rows?.[0] as { email?: string } | undefined)?.email
-      if (isSuperAdminEmail(email)) {
-        isSuperAdmin = true
-      }
-    } catch {
-      try {
-        const legacyRes = await db.execute(
-          sql`SELECT email FROM neon_auth.user WHERE id::text = ${userId} LIMIT 1`
-        )
-        const email = (legacyRes?.rows?.[0] as { email?: string } | undefined)?.email
-        if (isSuperAdminEmail(email)) {
-          isSuperAdmin = true
-        }
-      } catch {
-        // Auth user table may be empty during first boot
-      }
-    }
-
-    const initialRole = isSuperAdmin ? 'super_admin' : 'user'
     const uniqueLarvaId = resolveMemberLarvaId(userId)
 
     const [existing] = await db
@@ -52,7 +25,7 @@ export async function ensureUserProfile(userId?: string | null) {
     if (!profile) {
       const [inserted] = await db
         .insert(profiles)
-        .values({ id: userId, role: initialRole, larvaId: uniqueLarvaId })
+        .values({ id: userId, role: 'user', larvaId: uniqueLarvaId })
         .onConflictDoNothing()
         .returning()
       profile = inserted || null
@@ -64,13 +37,6 @@ export async function ensureUserProfile(userId?: string | null) {
           .limit(1)
         profile = raced || null
       }
-    } else if (isSuperAdmin && profile.role !== 'super_admin') {
-      const [updatedRole] = await db
-        .update(profiles)
-        .set({ role: 'super_admin' })
-        .where(eq(profiles.id, userId))
-        .returning()
-      if (updatedRole) profile = updatedRole
     }
 
     if (profile && shouldReplacePlaceholderLarvaId(profile.id, profile.larvaId)) {

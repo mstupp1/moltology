@@ -86,16 +86,4 @@ describe('Premium HUD route', () => {
     expect(screen.queryByTestId('hidden-page-unavailable')).not.toBeInTheDocument()
   })
 
-  it('renders the membership page for super admins', async () => {
-    vi.mocked(authClient.useSession).mockReturnValue({
-      data: { user: { id: 'super-1', name: 'Super', email: 'myles@moltology.org', role: 'user' } },
-      isPending: false,
-    } as never)
-    const Component = Route.options.component!
-    render(<Component />)
-
-    expect(
-      await screen.findByRole('heading', { name: /Premium membership/i }, { timeout: LAZY_TIMEOUT }),
-    ).toBeInTheDocument()
-  })
 })

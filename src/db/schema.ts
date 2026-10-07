@@ -121,7 +121,7 @@ export interface SimulatedPersonaConfig {
 // Moltology Cult User Profiles Table (extends Better Auth user id with domain stats)
 export const profiles = pgTable('profiles', {
   id: text('id').primaryKey(),
-  role: text('role').default('user').notNull(), // 'user' | 'admin' | 'super_admin'
+  role: text('role').default('user').notNull(), // 'user' | 'admin'
   larvaId: text('larvaId').default('LARVA UNIT #8971').notNull(),
   /** Chosen public designation. Unique case-insensitive. Null until claimed. */
   handle: text('handle'),

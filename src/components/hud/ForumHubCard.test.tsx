@@ -178,7 +178,7 @@ describe('ForumHubCard', () => {
       'href',
       '/forum/carcinization',
     )
-    expect(getForumTopicsFn).toHaveBeenCalledWith({ data: { sortBy: 'active' } })
+    expect(getForumTopicsFn).toHaveBeenCalledWith({ data: { sortBy: 'active', limit: 3 } })
     expect(getForumCategoriesFn).toHaveBeenCalled()
   })
 
@@ -203,7 +203,7 @@ describe('ForumHubCard', () => {
     expect(screen.getByText('PINNED')).toBeInTheDocument()
     expect(screen.getByText('New')).toBeInTheDocument()
     expect(getForumTopicsFn).toHaveBeenCalledWith({
-      data: { sortBy: 'active', userId: 'user-hub', token: 'a.b.c' },
+      data: { sortBy: 'active', limit: 3, userId: 'user-hub', token: 'a.b.c' },
     })
     expect(getForumCategoriesFn).toHaveBeenCalledWith({
       data: { userId: 'user-hub', token: 'a.b.c' },

@@ -255,4 +255,34 @@ describe('InlineTopicComposer', () => {
       expect(screen.getByTestId('inline-composer-expanded')).toBeInTheDocument()
     })
   })
+
+  it('leaves the staff board out of the board picker for members', () => {
+    const withStaffBoard: ForumCategoryEntry[] = [
+      { ...mockCategories[0], id: 'cat-rules', name: 'Rules & Directives', slug: 'rules-announcements', sortOrder: 0 },
+      ...mockCategories,
+    ]
+    render(
+      <ForumShell>
+        <InlineTopicComposer categories={withStaffBoard} onCreated={onCreated} />
+      </ForumShell>
+    )
+
+    fireEvent.click(screen.getByTestId('inline-composer-collapsed'))
+    const select = screen.getByLabelText(/discussion board/i) as HTMLSelectElement
+    expect(select.value).toBe('cat-1')
+    expect(screen.queryByRole('option', { name: 'Rules & Directives' })).not.toBeInTheDocument()
+  })
+
+  it('renders nothing on the staff board for members', () => {
+    const { container } = render(
+      <ForumShell>
+        <InlineTopicComposer
+          categories={[{ ...mockCategories[0], id: 'cat-rules', name: 'Rules & Directives', slug: 'rules-announcements' }]}
+          fixedCategory
+          onCreated={onCreated}
+        />
+      </ForumShell>
+    )
+    expect(container.querySelector('#topic-composer')).toBeNull()
+  })
 })

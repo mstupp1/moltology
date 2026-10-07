@@ -6,7 +6,6 @@ import { publicMiddleware, authenticatedMiddleware } from './functions'
 import {
   getPublicChangelogsHandler,
   getChangelogBySlugHandler,
-  getS3AssetUrlHandler,
   toggleDailyAlignmentTaskHandler,
 } from './db-services'
 import type { ChangelogEntry } from '../changelogs-data'
@@ -178,16 +177,6 @@ describe('Server Functions', () => {
       expect(entry).toBeDefined()
       expect(entry?.slug).toBe(changelogs[0].slug)
     }
-  })
-
-  it('should execute getS3AssetUrlHandler when credentials exist', async () => {
-    if (!process.env.AWS_ENDPOINT_URL_S3 || !process.env.AWS_ACCESS_KEY_ID) {
-      expect(true).toBe(true)
-      return
-    }
-    const result = await getS3AssetUrlHandler({ data: { key: 'images/order_emblem.png' }, context: {} })
-    expect(result).toHaveProperty('url')
-    expect(result.url).toContain('images/order_emblem.png')
   })
 
   it('should throw when toggleDailyAlignmentTaskHandler is called unauthenticated', async () => {

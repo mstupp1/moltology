@@ -7,6 +7,7 @@ import {
 } from '../quality/forum-gate'
 import { assertCanStartTopic } from './forum-standing'
 import { STANDING_COPY } from '../forum-standing'
+import { FORUM_STAFF_BOARD_ERROR } from '../community-rules'
 
 vi.mock('./forum-standing', () => {
   const open = { standing: 0, canStartTopics: true, restricted: false, topicLockReason: null }
@@ -75,6 +76,14 @@ describe('forum Jev quality wiring', () => {
     })
 
     const insert = vi.fn()
+    // Board and profile lookups run before the gate.
+    const select = vi.fn().mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue([{ slug: 'general-discussion', role: 'user' }]),
+        }),
+      }),
+    })
     await expect(
       createForumTopicHandler({
         data: {
@@ -82,10 +91,34 @@ describe('forum Jev quality wiring', () => {
           title: 'A normal looking title',
           content: 'This body is long enough to pass the length check and still be refused.',
         },
-        context: { user: { sub: 'test-user-id' }, db: { insert } as any },
+        context: { user: { sub: 'test-user-id' }, db: { insert, select } as any },
       }),
     ).rejects.toThrow(FORUM_QUARANTINE_ERROR)
     expect(insert).not.toHaveBeenCalled()
+  })
+
+  it('refuses a member topic on the staff board before the gate runs', async () => {
+    const insert = vi.fn()
+    const lookups = [[{ slug: 'rules-announcements' }], [{ role: 'user' }]]
+    const select = vi.fn().mockImplementation(() => ({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue(lookups.shift() ?? []),
+        }),
+      }),
+    }))
+    await expect(
+      createForumTopicHandler({
+        data: {
+          categoryId: CATEGORY_ID,
+          title: 'Unofficial new rules',
+          content: 'This body is long enough to pass the length check on its own.',
+        },
+        context: { user: { sub: 'test-user-id' }, db: { insert, select } as any },
+      }),
+    ).rejects.toThrow(FORUM_STAFF_BOARD_ERROR)
+    expect(insert).not.toHaveBeenCalled()
+    expect(screenForumSubmission).not.toHaveBeenCalled()
   })
 
   it('refuses a topic from a member whose Standing has not unlocked threads', async () => {
@@ -184,7 +217,7 @@ describe('forum Jev quality wiring', () => {
     const chain = {
       leftJoin: vi.fn(),
       where: vi.fn(),
-      orderBy: vi.fn().mockResolvedValue(rows),
+      orderBy: vi.fn().mockReturnValue({ limit: vi.fn().mockResolvedValue(rows) }),
     }
     chain.leftJoin.mockReturnValue(chain)
     chain.where.mockReturnValue(chain)

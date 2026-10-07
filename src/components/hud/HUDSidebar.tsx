@@ -37,7 +37,7 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
 import { ChromaElement, HeaderBrand, AnimatedHamburger } from '../ui'
-import { getEffectiveRole, isAdminOrSuperAdmin } from '../../lib/permissions'
+import { getEffectiveRole, isAdmin } from '../../lib/permissions'
 import { isHiddenPagePath } from '../../lib/hidden-pages'
 import { isAdminOnlyPath } from '../../lib/admin-access'
 import { resolveMemberPublicName } from '../../lib/member-handle'
@@ -442,7 +442,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     },
   ]
 
-  const canViewHiddenPages = isAdminOrSuperAdmin(user, userRole)
+  const canViewHiddenPages = isAdmin(user, userRole)
   const visibleNavGroups = navGroups
     .map((group) => ({
       ...group,

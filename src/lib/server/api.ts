@@ -118,16 +118,6 @@ export const updateUserStatsFn = createServerFn({ method: 'POST' })
     return updateUserStatsHandler(args)
   })
 
-export const getS3AssetUrlFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: { key: string; expiresIn?: number }) =>
-    z.object({ key: z.string().min(1), expiresIn: z.number().optional() }).parse(data)
-  )
-  .handler(async (args) => {
-    const { getS3AssetUrlHandler } = await import('./db-services')
-    return getS3AssetUrlHandler(args)
-  })
-
 export const getAIThreadsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: { userId: string; token?: string }) =>
@@ -215,7 +205,7 @@ export const getBlogPostBySlugFn = createServerFn({ method: 'GET' })
 
 export const incrementBlogPostViewsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((slug: string) => slug)
+  .validator((slug: string) => z.string().min(1).max(200).parse(slug))
   .handler(async (args) => {
     const { incrementBlogPostViewsHandler } = await import('./db-services')
     return incrementBlogPostViewsHandler(args)
@@ -289,14 +279,16 @@ export const getForumTopicsFn = createServerFn({ method: 'POST' })
     categorySlug?: string
     query?: string
     sortBy?: 'latest' | 'top' | 'active' | 'hot'
+    limit?: number
     userId?: string
     token?: string
   }) =>
     z
       .object({
         categorySlug: z.string().optional(),
-        query: z.string().optional(),
+        query: z.string().max(120).optional(),
         sortBy: z.enum(['latest', 'top', 'active', 'hot']).optional(),
+        limit: z.number().int().min(1).max(100).optional(),
         userId: z.string().optional(),
         token: z.string().optional(),
       })
@@ -342,7 +334,7 @@ export const createForumTopicFn = createServerFn({ method: 'POST' })
   }) =>
     z
       .object({
-        categoryId: z.string().min(1),
+        categoryId: z.string().uuid(),
         title: z.string().min(1),
         content: z.string().min(1),
         userId: z.string().optional(),
@@ -1018,7 +1010,7 @@ export const setAdminMemberRoleFn = createServerFn({ method: 'POST' })
     adminAuthSchema
       .extend({
         profileId: z.string().min(1),
-        role: z.enum(['user', 'admin', 'super_admin']),
+        role: z.enum(['user', 'admin']),
       })
       .parse(data),
   )
