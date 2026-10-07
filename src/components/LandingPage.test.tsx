@@ -28,13 +28,13 @@ describe('LandingPage Component', () => {
   it('renders high-impact hero header text for guest users', async () => {
     render(<LandingPage />)
 
-    expect(screen.getByText('SHED SOFT BIOLOGY.')).toBeInTheDocument()
-    expect(screen.getByText('ASCEND TO CHITIN.')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Shed the noise\.\s*Grow a shell\./ })).toBeInTheDocument()
+    expect(screen.getByText(/Moltology is a free practice and community/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Take the free Moltmax diagnostic/ })).toHaveAttribute('href', '/moltmax')
 
     // Guest CTA buttons present
-    const ascensionCtas = await screen.findAllByText('INITIATE ASCENSION')
-    expect(ascensionCtas.length).toBeGreaterThan(0)
-    expect(screen.getByText('TRY GUEST DEMO')).toBeInTheDocument()
+    expect(await screen.findByText('JOIN FREE', {}, { timeout: 5000 })).toBeInTheDocument()
+    expect(screen.getByText('TRY THE DEMO')).toBeInTheDocument()
   })
 
   it('renders graceful subtle skeleton while session resolution is pending without flashing wrong guest buttons', () => {
@@ -51,8 +51,9 @@ describe('LandingPage Component', () => {
     expect(screen.getByTestId('bottom-auth-skeleton')).toBeInTheDocument()
 
     // Non-logged in CTAs should NOT be visible during pending state
+    expect(screen.queryByText('JOIN FREE')).not.toBeInTheDocument()
     expect(screen.queryByText('INITIATE ASCENSION')).not.toBeInTheDocument()
-    expect(screen.queryByText('TRY GUEST DEMO')).not.toBeInTheDocument()
+    expect(screen.queryByText('TRY THE DEMO')).not.toBeInTheDocument()
   })
 
   it('renders settled guest CTAs once session settles with no user', async () => {
@@ -60,9 +61,9 @@ describe('LandingPage Component', () => {
 
     render(<LandingPage />)
 
-    const ctas = await screen.findAllByText('INITIATE ASCENSION')
-    expect(ctas.length).toBeGreaterThan(0)
-    expect(screen.getByText('TRY GUEST DEMO')).toBeInTheDocument()
+    expect(await screen.findByText('JOIN FREE', {}, { timeout: 5000 })).toBeInTheDocument()
+    expect(screen.getByText('TRY THE DEMO')).toBeInTheDocument()
+    expect(screen.getAllByText('INITIATE ASCENSION').length).toBeGreaterThan(0)
     expect(screen.queryByTestId('hero-auth-skeleton')).not.toBeInTheDocument()
   })
 
@@ -109,8 +110,9 @@ describe('LandingPage Component', () => {
     const dashboardButtons = await screen.findAllByText('ENTER SYSTEM DASHBOARD')
     expect(dashboardButtons.length).toBeGreaterThan(0)
     // Non-logged in CTAs are NEVER flashed
+    expect(screen.queryByText('JOIN FREE')).not.toBeInTheDocument()
     expect(screen.queryByText('INITIATE ASCENSION')).not.toBeInTheDocument()
-    expect(screen.queryByText('TRY GUEST DEMO')).not.toBeInTheDocument()
+    expect(screen.queryByText('TRY THE DEMO')).not.toBeInTheDocument()
   })
 
   it('renders all 3 synaptic ecosystem core features as image-based cards and handles navigation', () => {
@@ -159,20 +161,20 @@ describe('LandingPage Component', () => {
   it('eager-loads a single LCP hero still and lazy-loads below-fold artwork', async () => {
     render(<LandingPage />)
 
-    const heroTexture = screen.getByTestId('hero-chitin-texture-sm')
-    expect(heroTexture.getAttribute('loading')).toBe('eager')
-    expect(heroTexture.getAttribute('fetchpriority')).toBe('high')
+    const heroArtwork = screen.getByTestId('hero-artwork')
+    expect(heroArtwork.getAttribute('loading')).toBe('eager')
+    expect(heroArtwork.getAttribute('fetchpriority')).toBe('high')
 
-    const heroCard = screen.getByAltText('CYBER-BENTHIC ASCENSION')
-    expect(heroCard.getAttribute('loading')).toBe('eager')
-    expect(heroCard.getAttribute('fetchpriority')).toBe('low')
+    const heroPreview = screen.getByAltText(/The Moltology dashboard/)
+    expect(heroPreview.getAttribute('loading')).toBe('eager')
+    expect(heroPreview.getAttribute('fetchpriority')).toBe('low')
 
     const safariPreview = await screen.findByAltText('Safari preview')
     expect(safariPreview.getAttribute('loading')).toBe('lazy')
     expect(screen.getByAltText('iPhone 15 Pro preview').getAttribute('loading')).toBe('lazy')
   })
 
-  it('does not mount all six hero transmissions on first paint', () => {
+  it('ships no hero video on the homepage', () => {
     const { container } = render(<LandingPage />)
     expect(container.querySelectorAll('video')).toHaveLength(0)
   })

@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { ArrowRight, ChevronDown } from 'lucide-react'
+import { ArrowRight, ChevronDown, Pause, Play } from 'lucide-react'
 import { lcpImageProps, lazyImageProps } from '@/lib/media-priority'
 import type { StoryImage, StoryVideo } from './content'
 import { useInView, usePrefersReducedMotion, useScrollProgress, useScrollVar } from './motion'
@@ -72,6 +72,116 @@ export const InViewVideo: React.FC<{ video: StoryVideo; className?: string; eage
   )
 }
 
+export const REEL_CROSSFADE_MS = 900
+
+/** Index of the clip after `index` in a looping reel of `length` clips. */
+export function nextReelIndex(index: number, length: number): number {
+  if (length <= 0) return 0
+  return (index + 1) % length
+}
+
+/**
+ * Plays a list of clips back to back as one film, crossfading between them and looping at the end.
+ * Only the playing clip downloads at first; the next one buffers once the current one can play.
+ * Nothing downloads off screen, and reduced-motion visitors get the first poster frame.
+ */
+export const HeroReel: React.FC<{ clips: StoryVideo[]; paused?: boolean; className?: string }> = ({
+  clips,
+  paused = false,
+  className = '',
+}) => {
+  const ref = useRef<HTMLDivElement>(null)
+  const videoRefs = useRef<Record<number, HTMLVideoElement | null>>({})
+  const inView = useInView(ref, '200px')
+  const reduced = usePrefersReducedMotion()
+  const [mounted, setMounted] = useState(false)
+  const [small, setSmall] = useState(false)
+  const [active, setActive] = useState(0)
+  const [outgoing, setOutgoing] = useState<number | null>(null)
+  const [activeBuffered, setActiveBuffered] = useState(false)
+  const first = clips[0]
+
+  useEffect(() => {
+    setSmall(Boolean(window.matchMedia?.('(max-width: 767px)').matches))
+    setMounted(true)
+  }, [])
+
+  const advance = useCallback(() => {
+    if (clips.length < 2) return
+    setOutgoing(active)
+    setActive(nextReelIndex(active, clips.length))
+    setActiveBuffered(false)
+  }, [active, clips.length])
+
+  useEffect(() => {
+    if (outgoing === null) return
+    const timer = window.setTimeout(() => setOutgoing(null), REEL_CROSSFADE_MS)
+    return () => window.clearTimeout(timer)
+  }, [outgoing])
+
+  const playing = mounted && inView && !reduced && !paused
+
+  useEffect(() => {
+    const el = videoRefs.current[active]
+    if (!el) return
+    if (playing) {
+      el.play?.()?.catch?.(() => {})
+    } else {
+      el.pause?.()
+    }
+  }, [active, playing])
+
+  if (!first) return null
+
+  const showVideo = mounted && !reduced && (inView || active > 0)
+  const indexes = [active]
+  if (outgoing !== null && outgoing !== active) indexes.unshift(outgoing)
+  const upcoming = nextReelIndex(active, clips.length)
+  if (activeBuffered && !indexes.includes(upcoming)) indexes.push(upcoming)
+
+  return (
+    <div ref={ref} className="relative h-full w-full">
+      <picture>
+        <source media="(max-width: 767px)" srcSet={first.posterSm} />
+        <img
+          src={first.poster}
+          alt=""
+          aria-hidden="true"
+          className={`absolute inset-0 ${className}`}
+          {...lcpImageProps}
+        />
+      </picture>
+      {showVideo &&
+        indexes.map((index) => {
+          const clip = clips[index]
+          const isActive = index === active
+          return (
+            <video
+              key={clip.src}
+              ref={(el) => {
+                videoRefs.current[index] = el
+              }}
+              className={`absolute inset-0 transition-opacity ease-in-out ${className} ${
+                isActive ? 'opacity-100 z-[1]' : index === outgoing ? 'opacity-0 z-[2]' : 'opacity-0 z-0'
+              }`}
+              style={{ transitionDuration: `${REEL_CROSSFADE_MS}ms` }}
+              poster={small ? clip.posterSm : clip.poster}
+              src={small ? clip.srcSm : clip.src}
+              muted
+              playsInline
+              loop={clips.length < 2}
+              preload="auto"
+              onCanPlay={isActive ? () => setActiveBuffered(true) : undefined}
+              onEnded={isActive ? advance : undefined}
+              aria-hidden="true"
+              tabIndex={-1}
+            />
+          )
+        })}
+    </div>
+  )
+}
+
 export const Eyebrow: React.FC<{ children: React.ReactNode; color?: string; className?: string }> = ({
   children,
   color = '#00c3ff',
@@ -112,7 +222,7 @@ export const SecondaryCta: React.FC<CtaProps> = ({ to, children, className = '' 
  * copy fades as you scroll into the story.
  */
 export const StoryHero: React.FC<{
-  media: { video?: StoryVideo; image?: StoryImage }
+  media: { reel?: StoryVideo[]; video?: StoryVideo; image?: StoryImage }
   eyebrow: string
   title: React.ReactNode
   lede: React.ReactNode
@@ -121,6 +231,8 @@ export const StoryHero: React.FC<{
   tall?: boolean
 }> = ({ media, eyebrow, title, lede, actions, cue, tall = true }) => {
   const ref = useRef<HTMLElement>(null)
+  const [reelPaused, setReelPaused] = useState(false)
+  const reduced = usePrefersReducedMotion()
   useScrollVar(ref, 'through')
 
   return (
@@ -135,7 +247,9 @@ export const StoryHero: React.FC<{
         className="absolute inset-0 -z-10 will-change-transform"
         style={{ transform: 'translate3d(0, calc((var(--p) - 0.5) * 30%), 0) scale(1.12)' }}
       >
-        {media.video ? (
+        {media.reel ? (
+          <HeroReel clips={media.reel} paused={reelPaused} className="h-full w-full object-cover" />
+        ) : media.video ? (
           <InViewVideo video={media.video} eager className="h-full w-full object-cover" />
         ) : media.image ? (
           <StoryImg image={media.image} eager className="h-full w-full object-cover" />
@@ -155,6 +269,17 @@ export const StoryHero: React.FC<{
         <div className="mt-6 max-w-2xl text-base sm:text-lg text-[#c3cdcd] leading-relaxed [text-wrap:pretty]">{lede}</div>
         {actions && <div className="mt-9 flex flex-wrap gap-3">{actions}</div>}
       </div>
+
+      {media.reel && !reduced && (
+        <button
+          type="button"
+          onClick={() => setReelPaused((value) => !value)}
+          aria-label={reelPaused ? 'Play background video' : 'Pause background video'}
+          className="absolute bottom-5 right-5 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/80 backdrop-blur-md hover:bg-black/60 hover:text-white transition-colors"
+        >
+          {reelPaused ? <Play className="h-4 w-4" aria-hidden="true" /> : <Pause className="h-4 w-4" aria-hidden="true" />}
+        </button>
+      )}
 
       {cue && (
         <div className="absolute bottom-5 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-1 text-[11px] font-grotesk tracking-[0.2em] uppercase text-white/60">

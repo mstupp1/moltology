@@ -659,7 +659,7 @@ export const WhatIsMoltologyHubPage: React.FC = () => {
     <main ref={mainRef} className="flex-1 w-full overflow-x-clip">
       <DepthGauge targetRef={mainRef} />
       <StoryHero
-        media={{ video: STORY_MEDIA.benthicCore }}
+        media={{ reel: STORY_MEDIA.heroReel }}
         eyebrow="What is Moltology"
         title={
           <>
