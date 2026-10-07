@@ -1,6 +1,6 @@
 import React from 'react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { INITIAL_BLOG_POSTS } from '../../lib/blog-data'
 
 // Mock TanStack Router
@@ -33,52 +33,52 @@ vi.mock('@/lib/auth-client', () => ({
 import { Route } from './index'
 const NewsIndexPage = Route.options.component!
 
+// Enough posts to fill the lead, latest, more stories, and the archive list.
+const MANY_POSTS = [
+  ...INITIAL_BLOG_POSTS,
+  ...INITIAL_BLOG_POSTS.map((post) => ({ ...post, slug: `${post.slug}-archive` })),
+]
+
 describe('NewsIndexPage (index.tsx) Route Component', () => {
+  // The route lazy-loads the page; warm the module so the first findBy doesn't race a cold import.
+  beforeAll(async () => {
+    await import('@/components/news/NewsIndexPage')
+  })
+
   beforeEach(() => {
     vi.clearAllMocks()
     mockUseLoaderData.mockReturnValue(INITIAL_BLOG_POSTS)
   })
 
-  it('renders main lead dispatch first in DOM hierarchy for proper mobile stacking', async () => {
-    const { container } = render(<NewsIndexPage />)
-
-    const mainLeadBadge = await screen.findByText(new RegExp(`${INITIAL_BLOG_POSTS[0].category} · MAIN LEAD DISPATCH`))
-    expect(mainLeadBadge).toBeInTheDocument()
-
-    // Verify main lead post headline and subtitle are rendered
-    expect(screen.getByRole('heading', { level: 1, name: 'The 2026 Moltmaxxing Protocol' })).toBeInTheDocument()
-    expect(screen.getAllByText('Why Elite AI Operators Are Shedding Biological Constraints')[0]).toBeInTheDocument()
-
-    // Verify the grid column order classes
-    const heroGrid = container.querySelector('.grid.grid-cols-1.lg\\:grid-cols-12')
-    expect(heroGrid).toBeTruthy()
-
-    const columns = heroGrid?.children
-    expect(columns?.length).toBe(3)
-
-    // First child in DOM should be the main lead column with order-1 lg:order-2
-    expect(columns?.[0].className).toContain('order-1')
-    expect(columns?.[0].className).toContain('lg:order-2')
-    expect(columns?.[0].className).toContain('lg:col-span-6')
-
-    // Second child in DOM should be the left column with order-2 lg:order-1
-    expect(columns?.[1].className).toContain('order-2')
-    expect(columns?.[1].className).toContain('lg:order-1')
-    expect(columns?.[1].className).toContain('lg:col-span-3')
-
-    // Third child in DOM should be the right column with order-3 lg:order-3
-    expect(columns?.[2].className).toContain('order-3')
-    expect(columns?.[2].className).toContain('lg:order-3')
-    expect(columns?.[2].className).toContain('lg:col-span-3')
-  })
-
-  it('renders MoltNation live breaking ticker and topic desks', async () => {
+  it('renders the newest story as the lead, followed by latest and more stories', async () => {
     render(<NewsIndexPage />)
 
-    expect(await screen.findByText('★ MOLTNATION LIVE ★')).toBeInTheDocument()
-    expect(screen.getByText('CATCH UP ON DISPATCHES')).toBeInTheDocument()
-    expect(screen.getByText('STREAMING NOW')).toBeInTheDocument()
-    expect(screen.queryByText('MOLTNATION PODCAST DISPATCHES')).not.toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'The 2026 Moltmaxxing Protocol' })
+    ).toBeInTheDocument()
+    expect(screen.getByText('Why Elite AI Operators Are Shedding Biological Constraints')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'Latest' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'More stories' })).toBeInTheDocument()
+  })
+
+  it('drops the ticker and placeholder sections', async () => {
+    render(<NewsIndexPage />)
+
+    await screen.findByRole('heading', { level: 1 })
+    expect(screen.queryByText('★ MOLTNATION LIVE ★')).not.toBeInTheDocument()
+    expect(screen.queryByText('STREAMING NOW')).not.toBeInTheDocument()
+    expect(screen.queryByText(/MOLTNATION UNDERSCORED/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/strongest El Niño/)).not.toBeInTheDocument()
+  })
+
+  it('filters by section and shows a plain empty state for searches with no match', async () => {
+    render(<NewsIndexPage />)
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Telemetry' }))
+    expect(screen.getByRole('heading', { level: 1, name: 'Telemetry' })).toBeInTheDocument()
+
+    fireEvent.change(screen.getByLabelText('Search stories'), { target: { value: 'zzzz-no-match' } })
+    expect(screen.getByText('No stories match that search.')).toBeInTheDocument()
   })
 
   it('eager-loads the flag LCP still and lazy-loads remaining dispatch artwork', async () => {
@@ -99,12 +99,13 @@ describe('NewsIndexPage (index.tsx) Route Component', () => {
     })
   })
 
-  it('emits crawlable article hrefs for every listed dispatch', async () => {
+  it('emits crawlable article hrefs for every listed story', async () => {
+    mockUseLoaderData.mockReturnValue(MANY_POSTS)
     const { container } = render(<NewsIndexPage />)
 
-    expect(await screen.findByRole('navigation', { name: 'MoltNation dispatch registry' })).toBeInTheDocument()
+    expect(await screen.findByRole('navigation', { name: 'News archive' })).toBeInTheDocument()
 
-    for (const post of INITIAL_BLOG_POSTS) {
+    for (const post of MANY_POSTS) {
       const links = container.querySelectorAll(`a[href="/news/${post.slug}"]`)
       expect(links.length).toBeGreaterThan(0)
     }
