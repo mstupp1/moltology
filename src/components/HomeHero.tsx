@@ -1,10 +1,9 @@
 import React, { Suspense } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, ListChecks, MessagesSquare, Sparkles } from 'lucide-react'
-import { HeroBackground } from '@/components/ui/HeroBackground'
 import { LandingAuthCtaSkeleton } from '@/components/LandingAuthCtaSkeleton'
 import { getAssetUrl } from '@/lib/assets'
-import { eagerImageProps } from '@/lib/media-priority'
+import { eagerImageProps, lcpImageProps } from '@/lib/media-priority'
 
 const LazyLandingAuthCtas = React.lazy(() =>
   import('@/components/LandingAuthCtas').then((m) => ({ default: m.LandingAuthCtas }))
@@ -36,11 +35,28 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
       aria-labelledby="home-hero-title"
       className="relative w-full overflow-hidden bg-[#030608] border-b border-cyan-900/40 pt-28 sm:pt-32 lg:pt-28"
     >
-      <HeroBackground
-        artworkSrc="/images/hero_benthic_expansive_v1.webp"
-        artworkSrcMobile="/images/hero_benthic_mobile_v2.webp"
-      />
-      <div className="home-hero-aurora absolute left-1/2 top-[18%] -translate-x-1/2 w-[min(1100px,140vw)] h-[520px] pointer-events-none" aria-hidden="true" />
+      {/*
+        The artwork is sized to the first screen, not the whole section, so it keeps its framing
+        instead of being blown up to cover the dashboard preview. Overlays stay symmetric and light:
+        a fade under the header, a soft pool of shade behind the copy, and a fade into the page.
+      */}
+      <div className="absolute inset-x-0 top-0 h-[100svh] min-h-[640px] sm:min-h-[760px] pointer-events-none select-none" aria-hidden="true">
+        <picture>
+          <source media="(max-width: 767px)" srcSet={getAssetUrl('/images/hero_benthic_mobile_v2.webp')} />
+          <img
+            src={getAssetUrl('/images/hero_benthic_expansive_v1.webp')}
+            alt=""
+            {...lcpImageProps}
+            width={1672}
+            height={941}
+            className="absolute inset-0 h-full w-full object-cover object-[50%_70%] md:object-[60%_60%]"
+            data-testid="hero-artwork"
+          />
+        </picture>
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#030608] to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_50%_42%,rgba(3,6,8,0.62),rgba(3,6,8,0.25)_60%,transparent_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-[#030608] via-[#030608]/80 to-transparent" />
+      </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-8 text-center">
         <p className="home-hero-rise inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-[#04161c]/70 backdrop-blur-md px-3.5 py-1.5 text-xs sm:text-sm text-cyan-100">

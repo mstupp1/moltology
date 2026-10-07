@@ -244,10 +244,6 @@
   from { background-position: 0% 50%; }
   to { background-position: 200% 50%; }
 }
-@keyframes homeHeroAurora {
-  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.85; }
-  50% { transform: translateX(-50%) scale(1.08); opacity: 1; }
-}
 @keyframes homeHeroSettle {
   from { transform: rotateX(24deg) translate3d(0, 40px, 0) scale(0.94); }
   to { transform: rotateX(0deg) translate3d(0, 0, 0) scale(1); }
@@ -264,13 +260,6 @@
   animation: homeHeroSheen 9s linear infinite;
   filter: drop-shadow(0 0 28px rgba(255, 90, 78, 0.45));
 }
-.home-hero-aurora {
-  background:
-    radial-gradient(closest-side at 35% 55%, rgba(0, 195, 255, 0.22), transparent),
-    radial-gradient(closest-side at 68% 45%, rgba(255, 69, 58, 0.16), transparent);
-  filter: blur(40px);
-  animation: homeHeroAurora 12s ease-in-out infinite;
-}
 .home-hero-device {
   transform-origin: 50% 100%;
   transform: rotateX(14deg);
@@ -285,7 +274,6 @@
 @media (prefers-reduced-motion: reduce) {
   .home-hero-rise,
   .home-hero-gradient,
-  .home-hero-aurora,
   .home-hero-device {
     animation: none;
   }
