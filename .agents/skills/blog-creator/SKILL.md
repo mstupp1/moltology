@@ -6,7 +6,7 @@ description: >-
   whenever the user asks to create, draft, generate, or publish a blog post,
   news dispatch, or run the blog creation process. Features autonomous topic
   scouting in frontier AI/robotics/workflows, the 4-part MoltNation narrative
-  blueprint, structured primary source citations, Antigravity 16:9 image
+  blueprint, structured primary source citations, ImageGen or Antigravity 16:9 image
   generation, Neon DB ingestion, and automated git ledger commits.
 ---
 
@@ -20,7 +20,7 @@ Dispatches are written from the perspective of **The Order of the Synaptic Path*
 
 ## Core Brand & Style Rules for Blog Dispatches
 
-Dispatches MUST comply with [BRAND_BIBLE.md](../../BRAND_BIBLE.md) and [STYLE_GUIDE.md](../../STYLE_GUIDE.md):
+Dispatches MUST comply with [BRAND_BIBLE.md](../../../BRAND_BIBLE.md) and [STYLE_GUIDE.md](../../../STYLE_GUIDE.md):
 
 1. **Mandatory Colon Headline:** Every news post MUST have a title AND a subtitle separated by a colon: `Title: Subtitle`. Title-only does not ship. Slashes (`/` or `//`) are strictly forbidden by STYLE_GUIDE BAN 1.
 2. **Everyday Human Grounding:** Open with the immediate sensory, physical friction of daily human life (holding a door, keeping 40 browser tabs open, warehouse cubbies, waiting on hold). Connect that feeling to the technical development.
@@ -36,7 +36,7 @@ Dispatches MUST comply with [BRAND_BIBLE.md](../../BRAND_BIBLE.md) and [STYLE_GU
 ```mermaid
 flowchart TD
     A["Step 1: Scout Real-World AI / Robotics / Workflow News<br/>(Web search, lab announcements, deduplicate vs blog-history.json)"] --> B["Step 2: Draft Dispatch with 4-Part MoltNation Arc<br/>(Human Hook → Telemetry & Filing → Moltology Contrast → Quiet Directive)"]
-    B --> C["Step 3: Generate 16:9 Visuals via Antigravity generate_image<br/>(Hero Cover, Figure 1 Macro 3D, Figure 2 Cinematic Wide)"]
+    B --> C["Step 3: Generate 16:9 Visuals via ImageGen or Antigravity<br/>(Hero Cover, Figure 1 Macro 3D, Figure 2 Cinematic Wide)"]
     C --> D["Step 4: Stage Markdown Locally in content/news/<slug>.md<br/>(Wire local image paths & Field Telemetry citations)"]
     D --> E["Step 5: Ingest to Neon DB & Upload Images to S3<br/>(npx tsx scripts/ingest.ts content/news/<slug>.md --commit)"]
     E --> F["Step 6: Continuity Ledger Updated & Auto-Committed to Git<br/>(content/news/blog-history.json clean & conflict-free)"]
@@ -144,9 +144,13 @@ publishedAt: "2026-10-02T08:00:00-04:00" # ISO-8601 with timezone
 
 ---
 
-### Step 3: Dynamic Visual Art Direction via Antigravity `generate_image`
+### Step 3: Dynamic Visual Art Direction via ImageGen or Antigravity
 
-All 3 visual assets for the article are generated directly using **Antigravity's built-in `generate_image` tool** in **16:9 aspect ratio**.
+Generate all 3 article visuals in **16:9 aspect ratio** using either **ImageGen's built-in `image_gen` tool** or **Antigravity's `generate_image` tool**. Both providers are approved; use the available provider without pausing solely because the other is unavailable.
+
+For ImageGen, follow the installed `imagegen` skill and use the built-in tool by default, with one generation call per asset. Copy selected outputs into the project's ignored `tmp/blog/<slug>/` workspace before wiring local paths into the article. Inspect each asset and verify its aspect ratio. CLI/API fallback requires the user's explicit choice under the imagegen skill.
+
+The examples below show Antigravity syntax; the same art direction applies to ImageGen prompts. Keep heavy images out of tracked `public/` and let the ingestion CLI upload them. Label conceptual supporting figures as illustrations rather than presenting them as documentary evidence.
 
 #### 1. Cover Hero Image (16:9)
 * **Standalone 3D Cinematic Render:** Focus on a single heroic subject drawn from the article's theme (e.g. an autonomous quadruped robot at a power plant threshold, an articulated bimanual robotic arm, subsea datacenter pod).

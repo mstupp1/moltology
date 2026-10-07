@@ -70,7 +70,7 @@ One toast system, one persistent notification system, one OS bridge. Never `aler
 
 ## Image Generation & Social Media Asset Policy
 
-- **Blog Articles (Antigravity `generate_image`)**: 16:9 Hero cover images and 1–2 inline supporting figures inside blog posts are generated directly via Antigravity `generate_image` (standalone cinematic 3D benthic/sci-fi imagery, sub-benthic compute pods, laser waveguides).
+- **Blog Articles (ImageGen or Antigravity)**: 16:9 Hero cover images and 1–2 inline supporting figures inside blog posts are generated via the built-in ImageGen `image_gen` tool or Antigravity `generate_image` (standalone cinematic 3D benthic/sci-fi imagery, sub-benthic compute pods, laser waveguides).
 - **Social Media Posts, Lead Magnets & Carousels (Composite ➔ Google Flow ➔ S3/Zernio Pipeline)**:
   - **Stage 1 (Scaffolding)**: Render high-DPI 2x Retina 2D composite layouts via Headless Chrome (`scripts/lib/composite-renderer.ts` / `npm run post:create` for single posts, `npm run carousel:create` for multi-slide carousels) as structural blueprints.
   - **Stage 2 (User Google Flow Handoff)**: Prompt the USER with the composite image path and rich, ready-to-copy **Google Flow prompt directives** (elevating flat layouts to photorealistic 3D glassmorphic HUD panels, ensuring **no wasted space**, and applying natural ambient mascot lighting and contact shadows without harsh backlights).
