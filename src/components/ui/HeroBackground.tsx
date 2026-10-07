@@ -38,7 +38,7 @@ export const HeroBackground: React.FC<HeroBackgroundProps> = ({
             {...lcpImageProps}
             width={1672}
             height={941}
-            className="absolute inset-0 w-full h-full object-cover object-[62%_center] md:object-center"
+            className="absolute inset-0 w-full h-full object-cover object-center"
             data-testid="hero-artwork"
           />
         </picture>
@@ -49,7 +49,7 @@ export const HeroBackground: React.FC<HeroBackgroundProps> = ({
           style={{ background: 'radial-gradient(ellipse at 62% 44%, transparent 24%, rgba(2,6,8,0.18) 53%, rgba(2,6,8,0.72) 83%, #020608 110%)' }}
         />
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 hidden md:block"
           style={{ background: 'linear-gradient(90deg, rgba(2,6,8,0.82) 0%, rgba(2,6,8,0.48) 28%, rgba(2,6,8,0.12) 58%, transparent 78%)' }}
         />
         <div
@@ -57,7 +57,7 @@ export const HeroBackground: React.FC<HeroBackgroundProps> = ({
           style={{ background: 'linear-gradient(to bottom, #020608 0%, rgba(2,6,8,0.75) 24%, rgba(2,6,8,0.25) 65%, transparent 100%)' }}
         />
         <div
-          className="absolute inset-x-0 bottom-0 h-[34%] min-h-48"
+          className="absolute inset-x-0 bottom-0 h-[22%] md:h-[34%] min-h-32 md:min-h-48"
           style={{ background: 'linear-gradient(to top, #020608 0%, rgba(2,6,8,0.92) 14%, rgba(2,6,8,0.48) 48%, transparent 100%)' }}
         />
       </div>

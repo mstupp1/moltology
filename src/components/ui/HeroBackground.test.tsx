@@ -6,7 +6,7 @@ import { HeroBackground } from './HeroBackground'
 describe('HeroBackground', () => {
   it('loads responsive artwork eagerly without the grain treatment', () => {
     const { container } = render(
-      <HeroBackground artworkSrc="/images/hero_benthic_expansive_v1.webp" artworkSrcMobile="/images/hero_benthic_expansive_v1_sm.webp" />,
+      <HeroBackground artworkSrc="/images/hero_benthic_expansive_v1.webp" artworkSrcMobile="/images/hero_benthic_mobile_v2.webp" />,
     )
     const artwork = screen.getByTestId('hero-artwork')
     expect(artwork).toHaveAttribute('fetchpriority', 'high')

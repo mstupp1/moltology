@@ -32,7 +32,7 @@ describe('Homepage route head', () => {
           as: 'image',
           type: 'image/webp',
           media: '(max-width: 767px)',
-          href: getAssetUrl('/images/hero_benthic_expansive_v1_sm.webp'),
+          href: getAssetUrl('/images/hero_benthic_mobile_v2.webp'),
           fetchPriority: 'high',
         },
         {
