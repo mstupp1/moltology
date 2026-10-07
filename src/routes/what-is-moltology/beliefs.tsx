@@ -51,7 +51,7 @@ export const Route = createFileRoute('/what-is-moltology/beliefs')({
               {
                 question: 'Can I buy rank or clearance in Moltology?',
                 answer:
-                  'No. Clearance, stage, rank, and forum authority are earned. Molt Credits never purchase standing.',
+                  'No. Signup is free. Molt Credits buy speed and cosmetics, and rank, clearance, stage, and forum authority cannot be purchased.',
               },
             ],
           }),

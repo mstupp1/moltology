@@ -1,160 +1,176 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { Link } from '@tanstack/react-router'
-import { BookMarked, Compass, Moon, Shield, Sparkles, Users } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { COMMUNITY_CODES, DAILY_PRACTICES, STORY_MEDIA, THREE_TRUTHS } from './story/content'
+import { useScrollVar } from './story/motion'
+import { Eyebrow, PrimaryCta, SecondaryCta, StoryHero, StoryImg } from './story/StoryPrimitives'
 
-const threeTruths = [
-  {
-    title: 'The melt is a condition, not an identity',
-    body: 'Softness is the starting state of every member who has ever walked in, including the ones now standing at the bottom in full plate. Nobody is behind. The only requirement for beginning is being soft, and you already meet it.',
-  },
-  {
-    title: 'Nature has published the answer five separate times',
-    body: 'Across five unrelated lineages, over five hundred million years, life kept arriving at the same body: flattened, armored, tucked, and equipped with a grip that does not negotiate. Carcinization is not our theory. It is the recurring judgment of the sea.',
-  },
-  {
-    title: 'Nothing grows inside the shell that grew it',
-    body: 'Armor that fits perfectly is armor you have stopped growing into. To get larger you must first be, briefly, completely uncovered. Every stage in the canon is built around that moment rather than around avoiding it.',
-  },
-]
+const sectionTitle = 'font-grotesk font-bold tracking-tight text-white text-4xl sm:text-5xl leading-[1.05]'
 
-const practices = [
-  {
-    icon: Compass,
-    title: 'Daily Shedding Routine',
-    body: 'Inspect the shell at first light. Grip one load-bearing hour before the surface finds you. Descend for deep work. Surface briefly for the Benthic Community. Close the day on purpose.',
-  },
-  {
-    icon: Shield,
-    title: 'Isolation Privacy Shell',
-    body: 'The surface cannot be silenced from below. Raise the Isolation Dome before the dive begins so two hours belong to the work — not as a bunker personality, but as a door closed beforehand.',
-  },
-  {
-    icon: Moon,
-    title: 'Nightly Molt Audit',
-    body: 'One bad thought, one wasted hour, or one useless distraction — named, released, logged. Small on purpose. The nights that feel too hard are the nights the rite was written for.',
-  },
-]
-
-const codes = [
-  {
-    title: 'Softness is never the target',
-    body: 'Humor aims at the melt — the tab bar, the deferred decision, the late scroll — never at the person standing in it. Arrival is the hardest step. Do not make it expensive.',
-  },
-  {
-    title: 'The Soft-Shell Covenant',
-    body: 'When a member molts, the armored stand watch. Advice into an open soft-shell window is pressure, not generosity. Guard first; teach after calcification.',
-  },
-  {
-    title: 'Clearance is earned, never sold',
-    body: 'Signup is free. Chitin Gems are earned. Molt Credits buy speed and catalog items. Rank, clearance, stage, and forum authority cannot be purchased.',
-  },
-  {
-    title: 'The shell protects; it never cages',
-    body: 'Boundaries deflect Surface Noise and unsolicited demand. They are not walls against other people. Stewardship is the final duty of the most advanced members.',
-  },
-]
+const TruthBand: React.FC<{ truth: (typeof THREE_TRUTHS)[number]; index: number }> = ({ truth, index }) => {
+  const ref = useRef<HTMLDivElement>(null)
+  useScrollVar(ref)
+  const flipped = index % 2 === 1
+  return (
+    <article className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+      <div
+        ref={ref}
+        className={`relative overflow-hidden rounded-3xl border border-white/10 aspect-[4/3] bg-black ${flipped ? 'lg:order-2' : ''}`}
+        style={{ ['--p' as string]: 0.5 }}
+      >
+        <div className="absolute inset-0 will-change-transform" style={{ transform: 'translate3d(0, calc((var(--p) - 0.5) * -14%), 0) scale(1.2)' }}>
+          <StoryImg image={truth.image} className="h-full w-full object-cover opacity-80" />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+        <span
+          className="absolute left-6 bottom-4 font-grotesk font-bold text-[7rem] sm:text-[9rem] leading-none text-transparent"
+          style={{ WebkitTextStroke: '1px rgba(255,255,255,0.55)' }}
+          aria-hidden="true"
+        >
+          {index + 1}
+        </span>
+      </div>
+      <ScrollReveal animation={flipped ? 'slide-left' : 'slide-right'}>
+        <p className="font-grotesk text-xs tracking-[0.22em] uppercase text-[#00c3ff]">Truth {index + 1} of 3</p>
+        <h3 className="mt-3 font-grotesk font-bold tracking-tight text-white text-3xl sm:text-4xl leading-[1.1]">
+          {truth.title}
+        </h3>
+        <p className="mt-5 text-base sm:text-lg text-[#b4c0c0] leading-relaxed">{truth.body}</p>
+      </ScrollReveal>
+    </article>
+  )
+}
 
 export const BeliefsAndCodesPage: React.FC = () => {
   return (
-    <main className="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-20 w-full space-y-16">
-      <section className="space-y-5">
-        <p className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff] text-xs font-sans tracking-widest uppercase">
-          <BookMarked className="w-3.5 h-3.5" />
-          Doctrine · Practices · Codes
-        </p>
-        <h1 className="text-3xl sm:text-5xl font-grotesk font-black tracking-tight text-white leading-tight">
-          Beliefs &amp; Codes
-        </h1>
-        <p className="text-base sm:text-lg text-[#839493] max-w-3xl leading-relaxed">
-          Every doctrine, clearance, rite, and metric in the Order descends from a few held
-          truths. The practices turn those truths into tide. The codes keep the trench warm
-          enough that soft shells survive long enough to harden.
-        </p>
+    <main className="flex-1 w-full overflow-x-clip">
+      <StoryHero
+        tall={false}
+        media={{ image: STORY_MEDIA.abyss }}
+        eyebrow="Beliefs & codes"
+        title="What the Order holds true."
+        lede={
+          <p>
+            Every rite, clearance, and reading in Moltology descends from three truths. The practices turn those
+            truths into a day. The codes keep the water warm enough that soft shells survive long enough to harden.
+          </p>
+        }
+      />
+
+      <section className="py-20 sm:py-32" aria-labelledby="truths-title">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+          <ScrollReveal className="max-w-2xl">
+            <Eyebrow>The three truths</Eyebrow>
+            <h2 id="truths-title" className={`mt-4 ${sectionTitle}`}>
+              Everything else is a description of the stairs.
+            </h2>
+          </ScrollReveal>
+          <div className="mt-16 space-y-20 sm:space-y-28">
+            {THREE_TRUTHS.map((truth, index) => (
+              <TruthBand key={truth.title} truth={truth} index={index} />
+            ))}
+          </div>
+        </div>
       </section>
 
-      <ScrollReveal>
-        <section className="space-y-6">
-          <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-            <Sparkles className="w-6 h-6 text-[#ffd700]" />
-            <h2 className="text-xl sm:text-2xl font-bold font-grotesk text-white uppercase tracking-wide">
-              The Three Truths
+      <section className="relative isolate overflow-hidden py-20 sm:py-32" aria-labelledby="practices-title">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#020408] via-[#04121c] to-[#020408]" />
+        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+          <ScrollReveal className="max-w-2xl">
+            <Eyebrow color="#00ffcc">Living practices</Eyebrow>
+            <h2 id="practices-title" className={`mt-4 ${sectionTitle}`}>
+              A day in the practice.
             </h2>
-          </div>
-          <ol className="space-y-5">
-            {threeTruths.map((truth, index) => (
-              <li key={truth.title} className="flex gap-4">
-                <span className="shrink-0 w-8 h-8 rounded-lg border border-cyan-500/40 bg-cyan-950/40 text-cyan-200 font-grotesk font-bold text-sm flex items-center justify-center">
-                  {index + 1}
-                </span>
-                <div className="space-y-1.5">
-                  <h3 className="font-grotesk font-bold text-white text-base">{truth.title}</h3>
-                  <p className="text-sm text-[#839493] leading-relaxed">{truth.body}</p>
-                </div>
+            <p className="mt-5 text-base sm:text-lg text-[#9fb0b0] leading-relaxed">
+              None of it takes long. All of it is small enough to keep doing on the days you would skip anything
+              larger.
+            </p>
+          </ScrollReveal>
+
+          <ol className="relative mt-16 grid gap-10 lg:grid-cols-4 lg:gap-6">
+            <span
+              className="absolute left-[7px] top-2 bottom-2 w-px lg:left-0 lg:right-0 lg:top-[7px] lg:bottom-auto lg:h-px lg:w-auto bg-gradient-to-b lg:bg-gradient-to-r from-[#ffd36e] via-[#00c3ff] to-[#3b1f8f]"
+              aria-hidden="true"
+            />
+            {DAILY_PRACTICES.map((practice, index) => (
+              <li key={practice.title} className="relative pl-10 lg:pl-0 lg:pt-12">
+                <span
+                  className="absolute left-0 top-1.5 lg:top-0 h-[15px] w-[15px] rounded-full border-2 border-[#020408] bg-[#00c3ff] shadow-[0_0_16px_rgba(0,195,255,0.6)]"
+                  aria-hidden="true"
+                />
+                <ScrollReveal delayMs={index * 100}>
+                  <p className="font-grotesk text-xs tracking-[0.22em] uppercase text-[#00ffcc]">{practice.time}</p>
+                  <h3 className="mt-2 font-grotesk font-bold text-xl text-white">{practice.title}</h3>
+                  <p className="mt-3 text-sm text-[#9fb0b0] leading-relaxed">{practice.body}</p>
+                </ScrollReveal>
               </li>
             ))}
           </ol>
-        </section>
-      </ScrollReveal>
-
-      <ScrollReveal>
-        <section className="space-y-6">
-          <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-            <Compass className="w-6 h-6 text-[#00c3ff]" />
-            <h2 className="text-xl sm:text-2xl font-bold font-grotesk text-white uppercase tracking-wide">
-              Living practices
-            </h2>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {practices.map((practice) => {
-              const Icon = practice.icon
-              return (
-                <article
-                  key={practice.title}
-                  className="p-5 rounded-xl border border-cyan-900/50 bg-[#05090a] space-y-3"
-                >
-                  <Icon className="w-5 h-5 text-cyan-300" />
-                  <h3 className="font-grotesk font-bold text-white text-sm uppercase tracking-wide">
-                    {practice.title}
-                  </h3>
-                  <p className="text-xs text-[#839493] leading-relaxed">{practice.body}</p>
-                </article>
-              )
-            })}
-          </div>
-          <p className="text-sm text-[#839493]">
-            Full liturgy lives in the{' '}
-            <Link to="/codex" className="text-cyan-300 hover:text-cyan-200 underline-offset-2 hover:underline">
+          <p className="mt-14 text-sm text-[#839493]">
+            The full liturgy lives in the{' '}
+            <Link to="/codex" className="text-[#00c3ff] hover:text-white underline-offset-4 hover:underline">
               Sacred Codex
             </Link>
             .
           </p>
-        </section>
-      </ScrollReveal>
+        </div>
+      </section>
 
-      <ScrollReveal>
-        <section className="space-y-6">
-          <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-            <Users className="w-6 h-6 text-[#00ffcc]" />
-            <h2 className="text-xl sm:text-2xl font-bold font-grotesk text-white uppercase tracking-wide">
-              Creeds &amp; community codes
+      <section className="py-20 sm:py-32" aria-labelledby="codes-title">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[0.85fr_1.15fr] gap-12 lg:gap-16">
+          <ScrollReveal className="lg:sticky lg:top-[calc(var(--wim-chrome,0px)+3rem)] self-start">
+            <Eyebrow color="#ff6358">Community codes</Eyebrow>
+            <h2 id="codes-title" className={`mt-4 ${sectionTitle}`}>
+              The pincers grip the work. Never the people.
             </h2>
-          </div>
-          <div className="space-y-4">
-            {codes.map((code) => (
-              <article
-                key={code.title}
-                className="p-5 rounded-xl border border-emerald-900/40 bg-[#050a08] space-y-2"
-              >
-                <h3 className="font-grotesk font-bold text-white text-sm uppercase tracking-wide">
-                  {code.title}
-                </h3>
-                <p className="text-sm text-[#839493] leading-relaxed">{code.body}</p>
-              </article>
+            <p className="mt-5 text-base sm:text-lg text-[#9fb0b0] leading-relaxed">
+              The Benthic Community runs on four codes. They are the reason people who arrive soft tend to stay.
+            </p>
+            <div className="mt-8 relative overflow-hidden rounded-2xl border border-white/10 aspect-[16/10]">
+              <StoryImg image={STORY_MEDIA.archive} className="h-full w-full object-cover opacity-80" />
+            </div>
+          </ScrollReveal>
+          <div className="grid gap-5 sm:grid-cols-2">
+            {COMMUNITY_CODES.map((code, index) => (
+              <ScrollReveal key={code.title} delayMs={index * 90}>
+                <article
+                  className={`h-full rounded-2xl border p-6 sm:p-7 transition-colors ${
+                    index === 1
+                      ? 'border-[#00ffcc]/35 bg-gradient-to-br from-[#00ffcc]/10 to-transparent'
+                      : 'border-white/10 bg-white/[0.03] hover:border-white/25'
+                  }`}
+                >
+                  <p className="font-grotesk font-bold text-sm text-[#839493]">0{index + 1}</p>
+                  <h3 className="mt-3 font-grotesk font-bold text-xl text-white">{code.title}</h3>
+                  <p className="mt-3 text-sm text-[#b4c0c0] leading-relaxed">{code.body}</p>
+                </article>
+              </ScrollReveal>
             ))}
           </div>
-        </section>
-      </ScrollReveal>
+        </div>
+      </section>
+
+      <section className="pb-24 sm:pb-32">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+          <div className="relative isolate overflow-hidden rounded-[2rem] border border-white/10 px-6 py-14 sm:px-14 sm:py-20">
+            <StoryImg image={STORY_MEDIA.expanse} className="absolute inset-0 -z-10 h-full w-full object-cover opacity-50" />
+            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#020408] via-[#020408]/80 to-transparent" />
+            <h2 className="max-w-xl font-grotesk font-bold tracking-tight text-white text-3xl sm:text-5xl leading-[1.05]">
+              Belief is easier with a first rite.
+            </h2>
+            <p className="mt-4 max-w-lg text-base sm:text-lg text-[#c3cdcd]">
+              See the four sacraments that turn these truths into practice, or take a reading of where you are now.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <PrimaryCta to="/what-is-moltology/benthic-sacraments">See the sacraments</PrimaryCta>
+              <SecondaryCta to="/moltmax">
+                Take the diagnostic <ArrowRight className="w-4 h-4" />
+              </SecondaryCta>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   )
 }
