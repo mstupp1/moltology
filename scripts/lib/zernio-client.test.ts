@@ -95,7 +95,7 @@ describe('zernio-client', () => {
     )
   })
 
-  it('queues an Instagram post and immediately chains the first comment', async () => {
+  it('queues an Instagram post with a deferred first comment and AI disclosure', async () => {
     const mockPost = {
       _id: 'post_ig_1',
       status: 'scheduled',
@@ -123,9 +123,21 @@ describe('zernio-client', () => {
 
     expect(result.dryRun).toBe(false)
     expect(result.postId).toBe('post_ig_1')
-    expect(result.commentId).toBe('comm_ig_1')
+    expect(result.commentId).toBeNull()
     expect(result.queueId).toBe(QUEUE_IDS.LEAD_MAGNETS_DAILY)
-    expect(fetchSpy).toHaveBeenCalledTimes(2)
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+    const payload = JSON.parse(fetchSpy.mock.calls[0][1]?.body as string)
+    expect(payload.platforms[0].platformSpecificData).toEqual({ firstComment: 'Comment "GUIDE" for link', isAiGenerated: true })
+  })
+
+  it('publishes immediately without queue scheduling fields and preserves failed status', async () => {
+    const spy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({ ok: true, text: async () => JSON.stringify({ post: { _id: 'failed_1', status: 'failed' } }) } as any)
+    const result = await queueInstagramPost({ mediaUrl: 'https://cdn.moltology.org/post.png', caption: 'A quiet hour.', publishNow: true })
+    const payload = JSON.parse(spy.mock.calls[0][1]?.body as string)
+    expect(payload.publishNow).toBe(true)
+    expect(payload).not.toHaveProperty('queueId')
+    expect(payload).not.toHaveProperty('queuedFromProfile')
+    expect(result.status).toBe('failed')
   })
 
   it('supports dry-run mode for Instagram posts without making HTTP calls', async () => {

@@ -43,7 +43,7 @@ export interface CreateInstagramPostOptions {
     | 'quiz'
     | string
   mascot?: CharacterKey | 'none'
-  aspectRatio?: '4:5' | '1:1'
+  aspectRatio?: '3:4' | '4:5' | '1:1'
   template?: 'marketing-leadmagnet' | 'prompt-vault' | 'hook' | 'spec-showdown' | 'directives'
   composite?: boolean
   publishNow?: boolean
@@ -51,6 +51,7 @@ export interface CreateInstagramPostOptions {
   prompt?: string
   polishedImage?: string
   inputImage?: string
+  contentJson?: string
 }
 
 export const DEFAULT_INSTAGRAM_ACCOUNT_ID = CANONICAL_INSTAGRAM_ACCOUNT_ID // moltology_org / Silas Trench
@@ -272,10 +273,26 @@ export function generatePostContent(
 /**
  * Main execution function
  */
+export function parsePostContent(value: unknown): InstagramPostScript {
+  if (!value || typeof value !== 'object') throw new Error('Post content must be a JSON object')
+  const data = value as Record<string, unknown>
+  for (const key of ['title', 'topic', 'hookHeadline', 'imagePrompt', 'caption', 'firstComment']) {
+    if (typeof data[key] !== 'string' || !(data[key] as string).trim()) {
+      throw new Error(`Post content requires a non-empty ${key}`)
+    }
+  }
+  if (!Array.isArray(data.hashtags) || data.hashtags.length > 3 || data.hashtags.some(tag => typeof tag !== 'string')) {
+    throw new Error('Post content requires at most three string hashtags')
+  }
+  return data as unknown as InstagramPostScript
+}
+
 export async function createInstagramPost(options: CreateInstagramPostOptions = {}) {
   const timestamp = Date.now()
   const theme = options.theme || 'moltmaxxing-guide'
-  const postData = generatePostContent(theme, options.topic, options.mascot)
+  const postData = options.contentJson
+    ? parsePostContent(JSON.parse(fs.readFileSync(path.resolve(options.contentJson), 'utf8')))
+    : generatePostContent(theme, options.topic, options.mascot)
   const aspect = options.aspectRatio || '4:5'
 
   const isPromptVault = ['oracle-prompts', 'synaptic-prompts', 'prompts'].includes(theme.toLowerCase())
@@ -370,7 +387,7 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
         caption: postData.caption,
         hashtags: postData.hashtags,
         firstComment: postData.firstComment,
-        status: options.publishNow ? 'published' : 'queued',
+        status: queueResult?.status || 'unknown',
         scheduledFor: queueResult?.scheduledFor || null,
         queueId: targetQueueId,
         zernioPostId: queueResult?.postId || null,
@@ -393,7 +410,7 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
     }
 
     console.log(`\n======================================================`)
-    console.log(`✨ INSTAGRAM POST PUBLISHED / QUEUED DETERMINISTICALLY!`)
+    console.log(`${options.dryRun ? "Dry run complete" : `Instagram post status: ${queueResult?.status || "unknown"}`}`)
     console.log(`======================================================`)
     console.log(`🖼️  Final Image: ${finalImagePath}`)
     if (publicUrl) console.log(`🔗 Public CDN URL: ${publicUrl}`)
@@ -511,7 +528,7 @@ if (process.argv[1] && process.argv[1].endsWith('create-instagram-post.ts')) {
   const topic = getArg('--topic')
   const theme = getArg('--theme')
   const mascot = getArg('--mascot') as CharacterKey | 'none' | undefined
-  const aspect = getArg('--aspect') as '4:5' | '1:1' | undefined
+  const aspect = getArg('--aspect') as '3:4' | '4:5' | '1:1' | undefined
   const template = getArg('--template') as
     | 'marketing-leadmagnet'
     | 'prompt-vault'
@@ -524,6 +541,7 @@ if (process.argv[1] && process.argv[1].endsWith('create-instagram-post.ts')) {
   const publishNow = args.includes('--publish-now')
   const prompt = getArg('--prompt')
   const polishedImage = getArg('--polished-image') || getArg('--input-image')
+  const contentJson = getArg('--content-json')
 
   createInstagramPost({
     topic,
@@ -536,6 +554,7 @@ if (process.argv[1] && process.argv[1].endsWith('create-instagram-post.ts')) {
     publishNow,
     prompt,
     polishedImage,
+    contentJson,
   }).catch((err) => {
     console.error('❌ Post Generation Failed:', err)
     process.exit(1)

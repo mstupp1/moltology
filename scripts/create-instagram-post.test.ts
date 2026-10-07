@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   generatePostContent,
+  parsePostContent,
   DEFAULT_INSTAGRAM_ACCOUNT_ID,
   DEFAULT_PROFILE_ID,
   DEFAULT_POST_QUEUE_ID,
@@ -8,6 +9,16 @@ import {
 import { hasSlashPair } from '../src/lib/copy-slash-pair'
 
 describe('create-instagram-post', () => {
+  it('keeps reviewed content instead of regenerating campaign defaults', () => {
+    const content = { title: 'Quiet hour', topic: 'Focus', hookHeadline: 'Protect your hour.', imagePrompt: 'Book', caption: 'Let the surface wait.', firstComment: 'Open the Codex.', hashtags: ['#Moltology'] }
+    expect(parsePostContent(content)).toEqual(content)
+  })
+
+  it('rejects incomplete saved copy and excessive hashtags before ingest', () => {
+    expect(() => parsePostContent({ caption: 'Partial draft' })).toThrow('title')
+    const content = generatePostContent('sacred-codex')
+    expect(() => parsePostContent({ ...content, hashtags: ['a', 'b', 'c', 'd'] })).toThrow('three')
+  })
   it('generates on-brand Moltmaxxing post content', () => {
     const post = generatePostContent('moltmaxxing')
     expect(post.title).toBeDefined()

@@ -240,8 +240,7 @@ export async function queueInstagramPost(
   }
 
   const postPayload: ZernioCreatePostPayload = {
-    queuedFromProfile: profileId,
-    queueId,
+    ...(options.publishNow ? {} : { queuedFromProfile: profileId, queueId }),
     content: options.caption,
     mediaItems: [{ type: 'image', url: options.mediaUrl }],
     platforms: [
@@ -249,6 +248,7 @@ export async function queueInstagramPost(
         platform: 'instagram',
         accountId,
         platformSpecificData: {
+          isAiGenerated: options.isAiGenerated ?? true,
           ...(options.firstComment ? { firstComment: options.firstComment } : {}),
         },
       },
@@ -262,15 +262,8 @@ export async function queueInstagramPost(
     console.log(`   ⏰ Scheduled For: ${post.scheduledFor}`)
   }
 
-  let commentId: string | null = null
-  if (options.firstComment) {
-    console.log(`   💬 Posting algorithmic first comment...`)
-    const commentRes = await postZernioComment(post._id, accountId, options.firstComment)
-    commentId = commentRes?.comment?._id || commentRes?._id || 'posted'
-    if (commentId) {
-      console.log(`   ✅ First comment posted successfully!`)
-    }
-  }
+  // firstComment is delivered by Zernio after publication. Do not post it twice.
+  const commentId: string | null = null
 
   return {
     postId: post._id,
