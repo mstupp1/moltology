@@ -79,13 +79,13 @@ export const SocialSpecShowdownSlide: React.FC<SocialSpecShowdownSlideProps> = (
 
       {/* 2. Headline */}
       <div className="mt-4">
-        <h1 className="text-[62px] leading-[1.02] font-black text-white tracking-tight uppercase">
+        <h1 className="text-[72px] leading-[1.0] [text-wrap:balance] font-black text-white tracking-tight uppercase">
           {headline}
         </h1>
       </div>
 
       {/* 3. Three Structured Comparison Cards */}
-      <div className="mt-4 space-y-4 flex-1">
+      <div className="flex-1 flex flex-col justify-center gap-5 py-7">
         {cards.map((card, idx) => {
           const variantClasses = {
             red: 'bg-[#1a080c]/90 border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.2)]',
@@ -104,29 +104,29 @@ export const SocialSpecShowdownSlide: React.FC<SocialSpecShowdownSlideProps> = (
           return (
             <div
               key={idx}
-              className={`w-[64%] p-6 rounded-2xl border backdrop-blur-md transition-all ${variantClasses}`}
+              className={`w-[60%] p-7 rounded-2xl border backdrop-blur-md transition-all ${variantClasses}`}
             >
               <div className="flex items-center gap-3">
-                <span className="px-3 py-1 rounded-md bg-black/50 border border-white/25 font-mono font-black text-sm text-white">
+                <span className="px-3 py-1 rounded-md bg-black/50 border border-white/25 font-mono font-black text-base text-white">
                   {card.number}
                 </span>
-                <span className={`font-mono font-bold text-[19px] tracking-wider uppercase ${headerColor}`}>
+                <span className={`font-mono font-bold text-[21px] leading-tight tracking-wider uppercase ${headerColor}`}>
                   {card.title}
                 </span>
               </div>
 
-              <div className="mt-2.5 font-mono font-black text-[40px] leading-tight text-white tracking-tight">
+              <div className="mt-3 font-mono font-black text-[48px] leading-[1.05] text-white tracking-tight">
                 {card.metric}
               </div>
 
               {card.description && (
-                <p className="mt-2 text-[17px] text-slate-200 font-sans leading-snug">
+                <p className="mt-2.5 text-[20px] text-slate-200 font-sans leading-snug">
                   {card.description}
                 </p>
               )}
 
               {card.bullets && (
-                <ul className="mt-2.5 space-y-1.5 text-[15px] text-slate-200">
+                <ul className="mt-3 space-y-2 text-[18px] text-slate-200">
                   {card.bullets.map((b, i) => (
                     <li key={i} className="flex items-center gap-2.5">
                       <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0" />
@@ -144,12 +144,12 @@ export const SocialSpecShowdownSlide: React.FC<SocialSpecShowdownSlideProps> = (
           mascot={mascot}
           position="bottom-right"
           width={360}
-          className="bottom-14 right-2"
+          className="bottom-28 -right-2"
         />
       </div>
 
       {/* 4. Bottom Navigation & Logo */}
-      <div className="mt-auto pt-4 flex items-center justify-between border-t border-slate-800/80">
+      <div className="pt-5 flex items-center justify-between border-t border-slate-800/80">
         <div className="flex items-center gap-3 font-mono font-bold text-[22px] text-slate-300">
           <span>{swipeCta}</span>
           <ArrowRight className="w-7 h-7 text-cyan-400 animate-pulse" />

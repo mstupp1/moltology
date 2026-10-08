@@ -113,6 +113,19 @@ const imageLayerSchema = z.object({
   radius: z.number().min(0).max(1000).optional(),
   shadow: z.boolean().optional(),
   flip: z.boolean().optional(),
+  border: colorSchema.optional(),
+})
+
+const brandLayerSchema = z.object({
+  ...layerBase,
+  type: z.literal('brand'),
+  /** emblem: the Order emblem alone; lockup: emblem + wordmark; wordmark: name only. */
+  variant: z.enum(['emblem', 'lockup', 'wordmark']).optional(),
+  /** Line under the wordmark, e.g. "moltology.org". */
+  caption: z.string().optional(),
+  size: z.number().positive().max(200).optional(),
+  align: z.enum(['left', 'center', 'right']).optional(),
+  color: colorSchema.optional(),
 })
 
 const mascotLayerSchema = z.object({
@@ -164,6 +177,7 @@ export const layoutLayerSchema = z.discriminatedUnion('type', [
   pillLayerSchema,
   buttonLayerSchema,
   imageLayerSchema,
+  brandLayerSchema,
   mascotLayerSchema,
   shapeLayerSchema,
   listLayerSchema,
@@ -280,7 +294,7 @@ export function lintLayoutSpec(spec: LayoutSpec): LayoutLintIssue[] {
   spec.layers.forEach((layer, index) => {
     const label = layer.id || `${layer.type}#${index}`
     const { x, y, w, h } = layer.box
-    const textual = layer.type === 'text' || layer.type === 'pill' || layer.type === 'button' || layer.type === 'list' || layer.type === 'stat'
+    const textual = ['text', 'pill', 'button', 'list', 'stat', 'brand'].includes(layer.type)
 
     if (textual) {
       if (x < safe || y < safe || x + w > 100 - safe || (h !== undefined && y + h > 100 - safe)) {

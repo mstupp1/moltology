@@ -9,7 +9,18 @@
     "scanlines": true
   },
   "layers": [
-    { "id": "eyebrow", "type": "pill", "text": "Before and after the molt", "size": 26, "align": "center", "box": { "x": 10, "y": 7, "w": 80 } },
+    {
+      "id": "eyebrow",
+      "type": "pill",
+      "text": "Before and after the molt",
+      "size": 26,
+      "align": "center",
+      "box": {
+        "x": 10,
+        "y": 7,
+        "w": 80
+      }
+    },
     {
       "id": "headline",
       "type": "text",
@@ -17,12 +28,68 @@
       "highlight": "Different shell.",
       "size": 88,
       "align": "center",
-      "box": { "x": 8, "y": 14, "w": 84, "h": 18 }
+      "box": {
+        "x": 8,
+        "y": 14,
+        "w": 84,
+        "h": 18
+      }
     },
-    { "id": "left-panel", "type": "panel", "style": "glass", "color": "#2a0d0d", "border": "rgba(255,69,58,0.55)", "box": { "x": 7, "y": 36, "w": 41, "h": 34 } },
-    { "id": "right-panel", "type": "panel", "style": "glass", "color": "#062433", "border": "rgba(0,195,255,0.55)", "glow": "cyan", "box": { "x": 52, "y": 36, "w": 41, "h": 34 } },
-    { "id": "left-stat", "type": "stat", "value": "47", "label": "open tabs, zero finished", "color": "crimson", "size": 150, "align": "center", "box": { "x": 9, "y": 43, "w": 37 } },
-    { "id": "right-stat", "type": "stat", "value": "1", "label": "tab, actually finished", "color": "cyan", "size": 150, "align": "center", "box": { "x": 54, "y": 43, "w": 37 } },
+    {
+      "id": "left-panel",
+      "type": "panel",
+      "style": "glass",
+      "color": "#2a0d0d",
+      "border": "rgba(255,69,58,0.55)",
+      "box": {
+        "x": 7,
+        "y": 36,
+        "w": 41,
+        "h": 34
+      }
+    },
+    {
+      "id": "right-panel",
+      "type": "panel",
+      "style": "glass",
+      "color": "#062433",
+      "border": "rgba(0,195,255,0.55)",
+      "glow": "cyan",
+      "box": {
+        "x": 52,
+        "y": 36,
+        "w": 41,
+        "h": 34
+      }
+    },
+    {
+      "id": "left-stat",
+      "type": "stat",
+      "value": "47",
+      "label": "open tabs, zero finished",
+      "color": "crimson",
+      "size": 150,
+      "align": "center",
+      "box": {
+        "x": 9,
+        "y": 43,
+        "w": 37
+      }
+    },
+    {
+      "id": "right-stat",
+      "type": "stat",
+      "value": "1",
+      "label": "tab, actually finished",
+      "color": "cyan",
+      "size": 150,
+      "align": "center",
+      "box": {
+        "x": 54,
+        "y": 43,
+        "w": 37
+      }
+    },
     {
       "id": "kicker",
       "type": "text",
@@ -32,8 +99,26 @@
       "weight": 500,
       "align": "center",
       "color": "bone",
-      "box": { "x": 10, "y": 74, "w": 80, "h": 10 }
+      "box": {
+        "x": 10,
+        "y": 74,
+        "w": 80,
+        "h": 10
+      }
     },
-    { "id": "cta", "type": "button", "text": "Join free", "size": 34, "style": "outline", "arrow": true, "box": { "x": 32, "y": 86, "w": 36, "h": 6.5 } }
+    {
+      "id": "cta",
+      "type": "button",
+      "text": "Join free",
+      "size": 34,
+      "style": "outline",
+      "arrow": true,
+      "box": {
+        "x": 30,
+        "y": 85,
+        "w": 40,
+        "h": 6.5
+      }
+    }
   ]
 }

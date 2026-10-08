@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "name": "question-cover",
+  "aspect": "3:4",
+  "safeArea": 5,
+  "background": {
+    "gradient": "radial-gradient(ellipse at 50% 30%, #0b3a55 0%, #021324 50%, #01060e 100%)",
+    "grain": true,
+    "vignette": true
+  },
+  "layers": [
+    {
+      "type": "shape",
+      "shape": "glow",
+      "color": "crimson",
+      "box": {
+        "x": -10,
+        "y": 55,
+        "w": 70,
+        "h": 45
+      },
+      "blur": 90,
+      "opacity": 0.22
+    },
+    {
+      "id": "eyebrow",
+      "type": "pill",
+      "text": "A question for the shallows",
+      "size": 28,
+      "align": "center",
+      "box": {
+        "x": 10,
+        "y": 8,
+        "w": 80
+      }
+    },
+    {
+      "id": "question",
+      "type": "text",
+      "text": "Why does the easy task take all afternoon?",
+      "highlight": "all afternoon?",
+      "highlightColor": "crimson",
+      "size": 124,
+      "weight": 700,
+      "align": "center",
+      "valign": "center",
+      "lineHeight": 1.0,
+      "tracking": -0.025,
+      "shadow": "strong",
+      "box": {
+        "x": 7,
+        "y": 15,
+        "w": 86,
+        "h": 36
+      }
+    },
+    {
+      "id": "answer-tease",
+      "type": "text",
+      "font": "body",
+      "text": "Nature solved this 500 million years ago. Swipe for the memo.",
+      "size": 38,
+      "weight": 500,
+      "align": "center",
+      "color": "bone",
+      "box": {
+        "x": 12,
+        "y": 53,
+        "w": 76,
+        "h": 10
+      }
+    },
+    {
+      "id": "mascot",
+      "type": "mascot",
+      "key": "lobster_peek",
+      "box": {
+        "x": 27,
+        "y": 60,
+        "w": 46,
+        "h": 28
+      }
+    },
+    {
+      "id": "swipe",
+      "type": "button",
+      "text": "Swipe",
+      "style": "outline",
+      "arrow": true,
+      "size": 32,
+      "box": {
+        "x": 38,
+        "y": 89,
+        "w": 24,
+        "h": 6
+      }
+    }
+  ]
+}

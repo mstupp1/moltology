@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "name": "blog-hero",
+  "aspect": "16:9",
+  "safeArea": 5,
+  "background": {
+    "gradient": "radial-gradient(ellipse at 75% 40%, #0b3a55 0%, #021324 45%, #01060e 100%)",
+    "grain": true,
+    "vignette": true
+  },
+  "layers": [
+    {
+      "type": "shape",
+      "shape": "glow",
+      "color": "cyan",
+      "box": {
+        "x": 55,
+        "y": 10,
+        "w": 45,
+        "h": 80
+      },
+      "blur": 120,
+      "opacity": 0.25
+    },
+    {
+      "id": "eyebrow",
+      "type": "pill",
+      "text": "MoltNation News",
+      "size": 24,
+      "box": {
+        "x": 6,
+        "y": 12,
+        "w": 40
+      }
+    },
+    {
+      "id": "headline",
+      "type": "text",
+      "text": "Why the best engineers close their tabs first",
+      "highlight": "close their tabs",
+      "size": 88,
+      "lineHeight": 1.02,
+      "tracking": -0.025,
+      "box": {
+        "x": 6,
+        "y": 24,
+        "w": 56,
+        "h": 36
+      }
+    },
+    {
+      "id": "dek",
+      "type": "text",
+      "font": "body",
+      "text": "Focus is a depth, not a setting.",
+      "size": 34,
+      "weight": 500,
+      "color": "bone",
+      "box": {
+        "x": 6,
+        "y": 62,
+        "w": 52,
+        "h": 8
+      }
+    },
+    {
+      "id": "brand",
+      "type": "brand",
+      "variant": "lockup",
+      "caption": "moltology.org",
+      "size": 44,
+      "box": {
+        "x": 6,
+        "y": 83,
+        "w": 40
+      }
+    },
+    {
+      "id": "mascot",
+      "type": "mascot",
+      "key": "lobster_engineer",
+      "box": {
+        "x": 63,
+        "y": 10,
+        "w": 34,
+        "h": 84
+      }
+    }
+  ]
+}

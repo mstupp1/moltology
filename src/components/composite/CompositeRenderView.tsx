@@ -144,6 +144,7 @@ export default function CompositeRenderView({ search }: CompositeRenderProps) {
             leftMetric={customData.leftMetric}
             rightMetric={customData.rightMetric}
             bulletPoints={customData.bulletPoints}
+            bulletsTitle={customData.bulletsTitle}
             mascot={mascot}
             backgroundImageUrl={customData.backgroundImageUrl}
           />
@@ -216,6 +217,8 @@ export default function CompositeRenderView({ search }: CompositeRenderProps) {
             rightTitle={customData.rightTitle}
             rightMetric={customData.rightMetric}
             rightBullets={customData.rightBullets}
+            leftCaption={customData.leftCaption}
+            rightCaption={customData.rightCaption}
             mascot={mascot}
             backgroundImageUrl={customData.backgroundImageUrl}
           />

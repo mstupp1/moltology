@@ -231,11 +231,63 @@ function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKe
             objectFit: layer.fit ?? 'cover',
             objectPosition: layer.position ?? 'center',
             borderRadius: layer.radius,
+            border: layer.border ? `2px solid ${resolveColor(layer.border)}` : undefined,
             filter: layer.shadow ? 'drop-shadow(0 24px 40px rgba(0,0,0,0.75))' : undefined,
             transform: [base.transform, layer.flip ? 'scaleX(-1)' : ''].filter(Boolean).join(' ') || undefined,
           }}
         />
       )
+
+    case 'brand': {
+      const size = layer.size ?? 56
+      const variant = layer.variant ?? 'lockup'
+      const align = layer.align ?? 'left'
+      const justify = align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'
+      return (
+        <div key={key} className="flex items-center" style={{ ...base, justifyContent: justify, gap: size * 0.3 }}>
+          {variant !== 'wordmark' && (
+            <img
+              src={getAssetUrl('/images/order_emblem.png')}
+              alt=""
+              loading="eager"
+              decoding="sync"
+              style={{ width: size * 1.2, height: size * 1.2, objectFit: 'contain', filter: 'drop-shadow(0 0 18px rgba(0,195,255,0.35))' }}
+            />
+          )}
+          {variant !== 'emblem' && (
+            <div className="flex flex-col" style={{ textAlign: align }}>
+              <span
+                style={{
+                  fontFamily: FONT_STACKS.display,
+                  fontWeight: 700,
+                  fontSize: size * 0.72,
+                  lineHeight: 1,
+                  letterSpacing: '-0.01em',
+                  color: resolveColor(layer.color, BRAND_COLORS.white),
+                }}
+              >
+                Moltology
+              </span>
+              {layer.caption && (
+                <span
+                  style={{
+                    fontFamily: FONT_STACKS.display,
+                    fontWeight: 600,
+                    fontSize: Math.max(16, size * 0.3),
+                    marginTop: size * 0.12,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: BRAND_COLORS.sky,
+                  }}
+                >
+                  {layer.caption}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      )
+    }
 
     case 'mascot': {
       const mascotKey = layer.key ?? fallbackMascot

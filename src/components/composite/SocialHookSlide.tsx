@@ -26,6 +26,8 @@ export interface SocialHookSlideProps {
   mascot?: MascotKey
   backgroundImageUrl?: string
   swipeCta?: string
+  /** Heading over the bullet card. */
+  bulletsTitle?: string
 }
 
 const THEME_PRESETS: Record<string, Partial<SocialHookSlideProps>> = {
@@ -129,6 +131,7 @@ export const SocialHookSlide: React.FC<SocialHookSlideProps> = ({
   mascot = 'lobster_thumbs_up',
   backgroundImageUrl,
   swipeCta = 'SWIPE FOR HARD DATA',
+  bulletsTitle = 'Key takeaways',
 }) => {
   const preset = THEME_PRESETS[theme] || {}
 
@@ -275,11 +278,11 @@ export const SocialHookSlide: React.FC<SocialHookSlideProps> = ({
       </div>
 
       {/* 5. Lower Highlight Banner & Mascot */}
-      <div className="mt-6 relative flex-1 flex items-start">
-        <div className="w-[62%] h-fit p-7 rounded-2xl bg-[#061a26]/90 border border-cyan-500/50 backdrop-blur-md shadow-lg flex flex-col">
+      <div className="mt-6 relative flex-1 flex items-center">
+        <div className="w-[60%] h-fit p-7 rounded-2xl bg-[#061a26]/90 border border-cyan-500/50 backdrop-blur-md shadow-lg flex flex-col">
           <div className="flex items-center gap-3 text-sky-300 font-black text-2xl mb-3.5">
             <Sparkles className="w-6 h-6 text-cyan-300" />
-            <span>Key Architectural Metrics</span>
+            <span>{bulletsTitle}</span>
           </div>
           <ul className="space-y-2.5 text-slate-100 text-[21px]">
             {finalBullets.map((pt, i) => (
@@ -295,13 +298,13 @@ export const SocialHookSlide: React.FC<SocialHookSlideProps> = ({
         <MascotOverlay
           mascot={mascot}
           position="bottom-right"
-          width={mascot === 'crab_stats' ? 330 : 370}
-          className="bottom-4 right-2"
+          width={mascot === 'crab_stats' ? 330 : 360}
+          className="bottom-0 -right-2"
         />
       </div>
 
       {/* 6. Bottom Navigation Cue & Watermark */}
-      <div className="mt-auto pt-4 flex items-center justify-between border-t border-slate-800/80">
+      <div className="pt-5 flex items-center justify-between border-t border-slate-800/80">
         <div className="flex items-center gap-3 font-mono font-bold text-[22px] text-slate-300">
           <span>{swipeCta}</span>
           <ArrowRight className="w-7 h-7 text-cyan-400 animate-pulse" />

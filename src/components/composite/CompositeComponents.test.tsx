@@ -54,14 +54,14 @@ describe('Composite UI Components', () => {
     expect(screen.getByText('HIGHLIGHT')).toBeInTheDocument()
     expect(screen.getByText('100 GB')).toBeInTheDocument()
     expect(screen.getByText('-50%')).toBeInTheDocument()
-    expect(screen.getByText('Key Architectural Metrics')).toBeInTheDocument()
+    expect(screen.getByText('Key takeaways')).toBeInTheDocument()
 
     // Verify key architectural metrics container wraps text and doesn't stretch to bottom
-    const metricsContainer = screen.getByText('Key Architectural Metrics').closest('.w-\\[62\\%\\]')
+    const metricsContainer = screen.getByText('Key takeaways').closest('.w-\\[60\\%\\]')
     expect(metricsContainer).toHaveClass('h-fit')
   })
 
-  it('renders SocialSpecShowdownSlide with all 3 comparison cards having equal 64% width', () => {
+  it('renders SocialSpecShowdownSlide with all 3 comparison cards having equal 60% width', () => {
     const { container } = render(
       <SocialSpecShowdownSlide
         headline="TEST SPEC SHOWDOWN"
@@ -96,16 +96,16 @@ describe('Composite UI Components', () => {
     expect(screen.getByText('CARD TWO')).toBeInTheDocument()
     expect(screen.getByText('CARD THREE')).toBeInTheDocument()
 
-    // Verify all 3 cards have w-[64%]
-    const card1 = screen.getByText('CARD ONE').closest('.w-\\[64\\%\\]')
-    const card2 = screen.getByText('CARD TWO').closest('.w-\\[64\\%\\]')
-    const card3 = screen.getByText('CARD THREE').closest('.w-\\[64\\%\\]')
+    // Verify all 3 cards have w-[60%]
+    const card1 = screen.getByText('CARD ONE').closest('.w-\\[60\\%\\]')
+    const card2 = screen.getByText('CARD TWO').closest('.w-\\[60\\%\\]')
+    const card3 = screen.getByText('CARD THREE').closest('.w-\\[60\\%\\]')
     expect(card1).toBeInTheDocument()
     expect(card2).toBeInTheDocument()
     expect(card3).toBeInTheDocument()
-    expect(card1).toHaveClass('w-[64%]')
-    expect(card2).toHaveClass('w-[64%]')
-    expect(card3).toHaveClass('w-[64%]')
+    expect(card1).toHaveClass('w-[60%]')
+    expect(card2).toHaveClass('w-[60%]')
+    expect(card3).toHaveClass('w-[60%]')
   })
 
   it('renders SocialDirectivesSlide with fit-height CTA card', () => {

@@ -486,7 +486,8 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
       </div>
 
       {/* 1. Header Section: Eyebrow Badge & Punchy Impact Headline */}
-      <div className="z-10 shrink-0 max-w-[660px]">
+      {/* Narrower than the canvas so the top-right mascot never sits on the copy */}
+      <div className="z-10 shrink-0 max-w-[615px]">
         {/* Eyebrow Pill */}
         <div
           className={`inline-flex items-center gap-2.5 px-4 py-2 rounded-xl border-2 shadow-lg ${
@@ -535,7 +536,7 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
               isCodex ? 'bg-[#00ffff] shadow-[0_0_12px_#00ffff]' : 'bg-[#ff453a]'
             }`}
           />
-          <p className="text-[24px] font-bold text-slate-100 tracking-wide">
+          <p className="text-[24px] leading-snug font-bold text-slate-100 tracking-wide [text-wrap:balance]">
             {finalSub}
           </p>
         </div>
@@ -574,10 +575,10 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
 
               {/* Text Info */}
               <div className="min-w-0 flex-1">
-                <h4 className="font-mono font-black text-[17px] tracking-wide text-white uppercase leading-tight">
+                <h4 className="font-mono font-black text-[20px] tracking-wide text-white uppercase leading-tight">
                   {item.title}
                 </h4>
-                <p className="text-[16px] text-slate-200 font-sans font-medium leading-snug mt-1 line-clamp-2">
+                <p className="text-[18px] text-slate-200 font-sans font-medium leading-snug mt-1 line-clamp-2">
                   {item.description}
                 </p>
               </div>
@@ -610,15 +611,9 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
                   isCodex ? 'border-[#00ffff]' : 'border-[#ff453a]'
                 }`}
               >
+                {/* No review stars: STYLE_GUIDE bans invented ratings. */}
                 <div
-                  className={`flex gap-0.5 text-[13px] ${
-                    isCodex ? 'text-[#00ffff]' : 'text-[#ff453a]'
-                  }`}
-                >
-                  {'★★★★★'}
-                </div>
-                <div
-                  className={`font-mono font-black text-[12.5px] uppercase leading-tight mt-1 ${
+                  className={`font-mono font-black text-[15px] uppercase leading-tight ${
                     isCodex ? 'text-[#00ffff]' : 'text-[#ff453a]'
                   }`}
                 >
@@ -630,7 +625,7 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
                   }`}
                 />
                 <div
-                  className={`font-mono font-bold text-[10px] tracking-wider uppercase ${
+                  className={`font-mono font-bold text-[12px] tracking-wider uppercase ${
                     isCodex ? 'text-[#67e8f9]' : 'text-[#ff6358]'
                   }`}
                 >
@@ -752,7 +747,7 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
 
           {/* Floating Quote Callout on Lower Right */}
           <div
-            className={`absolute -bottom-2 right-1 z-30 max-w-[245px] p-3.5 rounded-2xl bg-[#031522]/[0.98] border-2 shadow-[0_15px_35px_rgba(0,0,0,0.95)] backdrop-blur-md ${
+            className={`absolute -bottom-2 right-1 z-30 max-w-[300px] p-4 rounded-2xl bg-[#031522]/[0.98] border-2 shadow-[0_15px_35px_rgba(0,0,0,0.95)] backdrop-blur-md ${
               isCodex
                 ? 'border-[#00ffff]/80 shadow-[0_15px_35px_rgba(0,0,0,0.95),0_0_20px_rgba(0,255,255,0.25)]'
                 : 'border-[#ff453a]'
@@ -766,7 +761,7 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
               >
                 "
               </span>
-              <p className="text-xs font-semibold text-slate-100 leading-snug">
+              <p className="text-[17px] font-semibold text-slate-100 leading-snug">
                 {finalQuote}
               </p>
               <span

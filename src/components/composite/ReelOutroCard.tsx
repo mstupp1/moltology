@@ -50,7 +50,8 @@ export const ReelOutroCard: React.FC<ReelOutroCardProps> = ({
       showScanlines={true}
       showCornerBrackets={false}
     >
-      <div className="w-full h-full flex flex-col items-center justify-center text-center px-8 relative">
+      {/* Content sits in the upper safe area: Reels UI covers the bottom fifth and the mascot owns the corner. */}
+      <div className="w-full h-full flex flex-col items-center justify-center text-center px-8 pb-[220px] relative">
         {/* Main Content Group (Vertically Centered, Base Content Layer) */}
         <div className="w-full max-w-3xl flex flex-col items-center text-center relative z-10">
           {/* 1. Top Emblem & Moltology Brand Section */}
@@ -60,16 +61,16 @@ export const ReelOutroCard: React.FC<ReelOutroCardProps> = ({
               <img
                 src={getAssetUrl('/images/order_emblem.png')}
                 alt="Moltology Order Emblem"
-                className="w-44 h-44 object-contain relative z-10 drop-shadow-[0_0_30px_rgba(0,195,255,0.5)]"
+                className="w-56 h-56 object-contain relative z-10 drop-shadow-[0_0_30px_rgba(0,195,255,0.5)]"
               />
             </div>
 
             <div>
-              <h1 className="font-sans font-black text-6xl text-white tracking-tight drop-shadow-[0_2px_15px_rgba(0,0,0,0.9)]">
+              <h1 className="font-sans font-black text-7xl text-white tracking-tight drop-shadow-[0_2px_15px_rgba(0,0,0,0.9)]">
                 Moltology
               </h1>
               <div className="mt-2 flex items-center justify-center">
-                <span className="font-sans font-bold text-2xl tracking-[0.25em] text-[#38bdf8] uppercase drop-shadow-[0_0_10px_rgba(0,195,255,0.5)]">
+                <span className="font-sans font-bold text-[28px] tracking-[0.25em] text-[#38bdf8] uppercase drop-shadow-[0_0_10px_rgba(0,195,255,0.5)]">
                   THE SYNAPTIC PATH
                 </span>
               </div>
@@ -77,20 +78,20 @@ export const ReelOutroCard: React.FC<ReelOutroCardProps> = ({
           </div>
 
           {/* 2. Center Headline & Subheadline (Balanced & No Orphan Words) */}
-          <div className="mt-10 flex flex-col items-center text-center space-y-3.5 max-w-2xl px-4">
-            <h2 className="text-6xl font-black text-white tracking-tight uppercase leading-[1.12] drop-shadow-[0_0_25px_rgba(0,195,255,0.45)] whitespace-pre-line [text-wrap:balance]">
+          <div className="mt-16 flex flex-col items-center text-center space-y-5 max-w-[900px] px-4">
+            <h2 className="text-[88px] font-black text-white tracking-tight uppercase leading-[1.02] drop-shadow-[0_0_25px_rgba(0,195,255,0.45)] whitespace-pre-line [text-wrap:balance]">
               {headline}
             </h2>
-            <p className="text-3xl font-bold text-[#00c3ff] font-mono tracking-wider uppercase drop-shadow-[0_0_12px_rgba(0,195,255,0.35)] whitespace-pre-line [text-wrap:balance]">
+            <p className="text-[40px] leading-tight font-bold text-[#00c3ff] font-mono tracking-wider uppercase drop-shadow-[0_0_12px_rgba(0,195,255,0.35)] whitespace-pre-line [text-wrap:balance]">
               {subheadline}
             </p>
           </div>
 
           {/* 3. Canonical App-Style HUD CTA Button with Selected Molting Texture */}
-          <div className="mt-8 w-full max-w-[700px] flex flex-col items-center space-y-3.5 mx-auto">
+          <div className="mt-14 w-full max-w-[860px] flex flex-col items-center space-y-5 mx-auto">
             <div className="w-full p-[1.5px] rounded-2xl bg-gradient-to-r from-[#00c3ff] via-[#38bdf8] to-[#00c3ff] shadow-[0_0_30px_rgba(0,195,255,0.5),inset_0_0_15px_rgba(0,195,255,0.25)]">
               <div
-                className="w-full py-5 px-8 rounded-[14px] bg-cover bg-center flex flex-col items-center justify-center relative overflow-hidden border border-cyan-400/40 cursor-pointer"
+                className="w-full py-8 px-10 rounded-[14px] bg-cover bg-center flex flex-col items-center justify-center relative overflow-hidden border border-cyan-400/40 cursor-pointer"
                 style={{
                   backgroundImage: textureUrl
                     ? `linear-gradient(to bottom, rgba(5, 34, 43, 0.82), rgba(9, 61, 74, 0.78), rgba(6, 40, 51, 0.88)), url('${textureUrl}')`
@@ -100,22 +101,22 @@ export const ReelOutroCard: React.FC<ReelOutroCardProps> = ({
                 <div className="absolute top-0 inset-x-0 h-[1.5px] bg-white/25 pointer-events-none" />
                 <div
                   className={`flex items-center justify-center gap-3 text-white font-black tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] ${
-                    url.length > 32 ? 'text-2xl' : url.length > 22 ? 'text-3xl' : 'text-5xl'
+                    url.length > 32 ? 'text-4xl' : url.length > 22 ? 'text-5xl' : 'text-7xl'
                   }`}
                 >
-                  <span className="truncate max-w-[500px]">{url}</span>
-                  <ArrowRight className="w-8 h-8 text-cyan-300 stroke-[3.5] drop-shadow-[0_0_10px_rgba(0,195,255,0.8)] shrink-0" />
+                  <span className="truncate max-w-[680px]">{url}</span>
+                  <ArrowRight className="w-12 h-12 text-cyan-300 stroke-[3.5] drop-shadow-[0_0_10px_rgba(0,195,255,0.8)] shrink-0" />
                 </div>
                 {actionBadgeText && (
-                  <div className="mt-3 flex items-center justify-center gap-2 text-amber-400 font-mono font-bold text-lg tracking-wider uppercase drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]">
-                    <Sparkles className="w-5 h-5 text-amber-400 fill-amber-400/20" />
+                  <div className="mt-4 flex items-center justify-center gap-3 text-amber-400 font-mono font-bold text-2xl tracking-wider uppercase drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]">
+                    <Sparkles className="w-7 h-7 text-amber-400 fill-amber-400/20" />
                     <span>{actionBadgeText}</span>
                   </div>
                 )}
               </div>
             </div>
 
-            <p className="text-base font-mono font-bold tracking-[0.25em] text-slate-400 uppercase">
+            <p className="text-2xl font-mono font-bold tracking-[0.25em] text-slate-300 uppercase">
               {formattedLinkInBio}
             </p>
           </div>

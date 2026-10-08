@@ -15,6 +15,7 @@ describe('LayoutSlide', () => {
             { type: 'button', text: 'Join free', box: { x: 6, y: 80, w: 40, h: 6 } },
             { type: 'mascot', box: { x: 50, y: 40, w: 45, h: 50 } },
             { type: 'list', items: ['One', 'Two'], size: 30, marker: 'number', box: { x: 6, y: 50, w: 40 } },
+            { type: 'brand', variant: 'lockup', caption: 'moltology.org', box: { x: 6, y: 90, w: 40 } },
           ],
         }}
       />
@@ -27,5 +28,7 @@ describe('LayoutSlide', () => {
     expect(container.querySelector('[data-mascot-key="crab_stats"]')).not.toBeNull()
     expect(screen.getByText('2.')).toBeInTheDocument()
     expect(container.querySelector('[data-fit]')).not.toBeNull()
+    expect(screen.getByText('Moltology')).toBeInTheDocument()
+    expect(screen.getByText('moltology.org')).toBeInTheDocument()
   })
 })

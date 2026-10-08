@@ -38,7 +38,8 @@ The schema and lint rules live in [`src/components/composite/layout-spec.ts`](..
 | `panel` | Cards, glass HUD plates, color blocks | `style` (glass, solid, outline, gradient), `color`, `colorTo`, `border`, `radius`, `glow`, `shadow` |
 | `pill` | Eyebrows, category tags | `text`, `size`, `color`, `background`, `border`, `align` |
 | `button` | The call to action | `text`, `size`, `style` (solid, outline, gradient), `color`, `textColor`, `arrow` |
-| `image` | Product shots, plates, screenshots | `src`, `fit` (cover, contain), `position`, `radius`, `shadow`, `flip` |
+| `image` | Product shots, plates, screenshots | `src`, `fit` (cover, contain), `position`, `radius`, `border`, `shadow`, `flip` |
+| `brand` | Order emblem and wordmark sign-off | `variant` (emblem, lockup, wordmark), `caption`, `size`, `align`, `color` |
 | `mascot` | A character cutout | `key` (registry key; omit to use `--mascot`), `flip`, `shadow` |
 | `shape` | Glows, dividers, blocks, circles | `shape` (rect, circle, line, glow), `color`, `blur`, `radius`, `thickness` |
 | `list` | Bullets, steps, checklists | `items`, `size`, `marker` (dot, check, number, dash, none), `gap` |

@@ -1,0 +1,190 @@
+{
+  "version": 1,
+  "name": "three-steps",
+  "aspect": "4:5",
+  "safeArea": 5,
+  "background": {
+    "gradient": "linear-gradient(170deg, #062433 0%, #021324 40%, #01060e 100%)",
+    "spotlight": true,
+    "grain": true
+  },
+  "layers": [
+    {
+      "id": "eyebrow",
+      "type": "pill",
+      "text": "Three steps",
+      "size": 26,
+      "box": {
+        "x": 7,
+        "y": 6,
+        "w": 40
+      }
+    },
+    {
+      "id": "headline",
+      "type": "text",
+      "text": "How to finish the one thing you started",
+      "highlight": "finish",
+      "size": 84,
+      "lineHeight": 1.02,
+      "tracking": -0.02,
+      "box": {
+        "x": 7,
+        "y": 12,
+        "w": 86,
+        "h": 18
+      }
+    },
+    {
+      "id": "p1",
+      "type": "panel",
+      "style": "glass",
+      "color": "#062433",
+      "box": {
+        "x": 7,
+        "y": 34,
+        "w": 86,
+        "h": 14
+      }
+    },
+    {
+      "id": "p2",
+      "type": "panel",
+      "style": "glass",
+      "color": "#062433",
+      "box": {
+        "x": 7,
+        "y": 50,
+        "w": 86,
+        "h": 14
+      }
+    },
+    {
+      "id": "p3",
+      "type": "panel",
+      "style": "glass",
+      "color": "#062433",
+      "border": "rgba(0,195,255,0.7)",
+      "glow": "cyan",
+      "box": {
+        "x": 7,
+        "y": 66,
+        "w": 86,
+        "h": 14
+      }
+    },
+    {
+      "id": "n1",
+      "type": "stat",
+      "value": "1",
+      "color": "cyan",
+      "size": 96,
+      "align": "center",
+      "box": {
+        "x": 9,
+        "y": 35.5,
+        "w": 12
+      }
+    },
+    {
+      "id": "n2",
+      "type": "stat",
+      "value": "2",
+      "color": "cyan",
+      "size": 96,
+      "align": "center",
+      "box": {
+        "x": 9,
+        "y": 51.5,
+        "w": 12
+      }
+    },
+    {
+      "id": "n3",
+      "type": "stat",
+      "value": "3",
+      "color": "cyan",
+      "size": 96,
+      "align": "center",
+      "box": {
+        "x": 9,
+        "y": 67.5,
+        "w": 12
+      }
+    },
+    {
+      "id": "s1",
+      "type": "text",
+      "font": "body",
+      "text": "Close every tab that is not the task.",
+      "size": 38,
+      "weight": 600,
+      "valign": "center",
+      "box": {
+        "x": 23,
+        "y": 34,
+        "w": 66,
+        "h": 14
+      }
+    },
+    {
+      "id": "s2",
+      "type": "text",
+      "font": "body",
+      "text": "Set one timer. Ignore the shallows until it rings.",
+      "size": 38,
+      "weight": 600,
+      "valign": "center",
+      "box": {
+        "x": 23,
+        "y": 50,
+        "w": 66,
+        "h": 14
+      }
+    },
+    {
+      "id": "s3",
+      "type": "text",
+      "font": "body",
+      "text": "Ship the rough version. Polish is a second dive.",
+      "size": 38,
+      "weight": 600,
+      "valign": "center",
+      "box": {
+        "x": 23,
+        "y": 66,
+        "w": 66,
+        "h": 14
+      }
+    },
+    {
+      "id": "brand",
+      "type": "brand",
+      "variant": "lockup",
+      "caption": "moltology.org",
+      "size": 52,
+      "box": {
+        "x": 7,
+        "y": 86,
+        "w": 50
+      }
+    },
+    {
+      "id": "save",
+      "type": "text",
+      "font": "body",
+      "text": "Save this for tomorrow.",
+      "size": 30,
+      "weight": 500,
+      "color": "muted",
+      "align": "right",
+      "valign": "center",
+      "box": {
+        "x": 55,
+        "y": 86,
+        "w": 38,
+        "h": 7
+      }
+    }
+  ]
+}
