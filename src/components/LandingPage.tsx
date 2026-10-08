@@ -30,6 +30,7 @@ import { useIdleReady } from '@/hooks/useIdleReady'
 import { useDeferredStylesheet } from '@/hooks/useDeferredStylesheet'
 import '@/styles/pbr-textures.css'
 import { getAssetUrl } from '@/lib/assets'
+import { getMascotUrl } from '@/components/composite/MascotOverlay'
 import { lazyImageProps } from '@/lib/media-priority'
 
 const DashboardMarketingShowcase = React.lazy(() => import('@/components/hud/DashboardMarketingShowcase').then((m) => ({ default: m.DashboardMarketingShowcase })))
@@ -230,7 +231,7 @@ export const LandingPage: React.FC = () => {
           {/* Playful Corner Peeking Lobster Character Over Top Bezel */}
           <div className="absolute -top-10 sm:-top-16 right-8 sm:right-16 lg:right-24 z-30 pointer-events-none select-none">
             <img
-              src={getAssetUrl('/images/characters/char_lobster_corner_peek_sm.webp')}
+              src={getMascotUrl('lobster_peek')}
               alt="Hero Lobster Peeking Over Card"
               {...lazyImageProps}
               width={128}
@@ -310,7 +311,7 @@ export const LandingPage: React.FC = () => {
           {/* Pointing Lobster Hero Directing Focus to Canonical Doctrine */}
           <div className="hidden lg:flex absolute -top-10 sm:-top-14 right-10 sm:right-20 lg:right-28 z-20 items-center pointer-events-none select-none">
             <img
-              src={getAssetUrl('/images/characters/char_lobster_pointing_cta.webp')}
+              src={getMascotUrl('lobster_pointing')}
               alt="Hero Lobster Pointing to Action"
               {...lazyImageProps}
               width={160}
@@ -414,7 +415,7 @@ export const LandingPage: React.FC = () => {
             {/* Ascended Cyber Mascot in 4 Stages Section - Faded Blueprint Watermark on the Right Side */}
             <div className="absolute -right-12 sm:-right-6 lg:right-2 xl:right-8 bottom-0 sm:-bottom-4 lg:-bottom-8 w-[280px] sm:w-[420px] lg:w-[580px] xl:w-[680px] pointer-events-none select-none z-0 opacity-15 sm:opacity-20">
               <img
-                src={getAssetUrl('/images/characters/char_lobster_floating_peaceful.webp')}
+                src={getMascotUrl('lobster_peaceful')}
                 alt="Ascended Stage Background Mascot"
                 {...lazyImageProps}
                 width={400}
@@ -625,8 +626,8 @@ export const LandingPage: React.FC = () => {
             {/* Encouraging Thumbs-Up Hero Lobster atop Bottom Conversion Banner */}
             <div className="hidden sm:block absolute -top-12 sm:-top-16 right-8 sm:right-16 lg:right-24 z-30 pointer-events-none select-none">
               <img
-                src={getAssetUrl('/images/characters/char_lobster_thumbs_up.webp')}
-                alt="Hero Lobster Giving Thumbs-Up"
+                src={getMascotUrl('lobster_thumbs_up')}
+                alt="Lobster raising an approving pincer"
                 {...lazyImageProps}
                 width={160}
                 height={160}

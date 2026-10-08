@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { S3_BASE_URL } from '@/lib/assets'
+import { getAssetUrl } from '@/lib/assets'
 import { cn } from '@/lib/utils'
 
 export type MascotKey =
@@ -11,6 +11,21 @@ export type MascotKey =
   | 'lobster_peek'
   | 'lobster_peaceful'
   | 'lobster_engineer'
+  | 'lobster_pointing_junior'
+  | 'lobster_thumbs_up_junior'
+  | 'lobster_navigator_junior'
+  | 'lobster_peek_junior'
+  | 'lobster_peaceful_junior'
+  | 'lobster_engineer_junior'
+  | 'crab_stats_junior'
+  | 'crab_explorer'
+  | 'crab_explorer_junior'
+  | 'crab_builder'
+  | 'crab_builder_junior'
+  | 'lobster_archivist'
+  | 'crab_ritual_keeper'
+  | 'crab_sentinel'
+  | 'lobster_oracle_attendant'
   | 'random'
   | 'none'
   | (string & {})
@@ -26,52 +41,157 @@ export interface MascotInfo {
 export const MASCOT_REGISTRY: Record<string, MascotInfo> = {
   lobster_pointing: {
     key: 'lobster_pointing',
-    name: 'Lobster Pointing (CTA / Hero)',
-    filename: 'char_lobster_pointing_cta.webp',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_pointing_cta.webp`,
-    description: 'Hero lobster pointing directly at call to action buttons or key links',
+    name: 'Lobster Guide (Adult)',
+    filename: 'char_lobster_pointing_adult_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_lobster_pointing_adult_v2.webp?v=20261008'),
+    description: 'Coral guide raising a welcoming pincer with an adult standing stance',
   },
   lobster_thumbs_up: {
     key: 'lobster_thumbs_up',
-    name: 'Lobster Thumbs Up (Approval)',
-    filename: 'char_lobster_thumbs_up.webp',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.webp?v=4`,
-    description: 'Cheerful lobster giving a thumbs-up approval sign',
+    name: 'Lobster Approval (Adult)',
+    filename: 'char_lobster_thumbs_up_adult_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_lobster_thumbs_up_adult_v2.webp?v=20261008'),
+    description: 'Apricot lobster raising an approving pincer with an adult standing stance',
   },
   lobster_navigator: {
     key: 'lobster_navigator',
-    name: 'Lobster Navigator (Benthic Explorer)',
-    filename: 'char_lobster_navigator.webp',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_navigator.webp?v=3`,
-    description: 'Adventurous lobster explorer wearing opaque goggles and tactical benthic harness belt',
-  },
-  crab_stats: {
-    key: 'crab_stats',
-    name: 'Crab Pointing Stats (Metrics)',
-    filename: 'char_crab_pointing_stats.webp',
-    s3Url: `${S3_BASE_URL}/images/characters/char_crab_pointing_stats.webp`,
-    description: 'Energetic crab pointing at quantitative metrics and charts',
+    name: 'Lobster Explorer (Adult)',
+    filename: 'char_lobster_navigator_adult_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_lobster_navigator_adult_v2.webp?v=20261008'),
+    description: 'Explorer with goggles and utility harness with an adult standing stance',
   },
   lobster_peek: {
     key: 'lobster_peek',
-    name: 'Lobster Corner Peek (Surprise)',
-    filename: 'char_lobster_corner_peek.webp',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_corner_peek.webp`,
-    description: 'Playful lobster peeking over top or side container bezels',
+    name: 'Lobster Peek (Adult)',
+    filename: 'char_lobster_peek_adult_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_lobster_peek_adult_v2.webp?v=20261008'),
+    description: 'Rose lobster leaning curiously with raised pincers with an adult standing stance',
   },
   lobster_peaceful: {
     key: 'lobster_peaceful',
-    name: 'Lobster Peaceful (Zen Benthic)',
-    filename: 'char_lobster_floating_peaceful.webp',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_floating_peaceful.webp`,
-    description: 'Calm cyber-lobster floating peacefully in deep benthic waters',
+    name: 'Lobster Guardian (Adult)',
+    filename: 'char_lobster_peaceful_adult_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_lobster_peaceful_adult_v2.webp?v=20261008'),
+    description: 'Lavender guardian with a calm expression with an adult standing stance',
   },
   lobster_engineer: {
     key: 'lobster_engineer',
-    name: 'Lobster Engineer (Hardhat Diagnostic)',
-    filename: 'char_lobster_engineer.webp',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_engineer.webp`,
-    description: 'Cheerful lobster engineer wearing safety hardhat with holographic tablet',
+    name: 'Lobster Engineer (Adult)',
+    filename: 'char_lobster_engineer_adult_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_lobster_engineer_adult_v2.webp?v=20261008'),
+    description: 'Engineer with hardhat, tools and diagnostic tablet with an adult standing stance',
+  },
+  crab_stats: {
+    key: 'crab_stats',
+    name: 'Crab Metrics (Adult)',
+    filename: 'char_crab_stats_adult_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_crab_stats_adult_v2.webp?v=20261008'),
+    description: 'Terracotta crab presenting a chart with an adult standing stance',
+  },
+  lobster_pointing_junior: {
+    key: 'lobster_pointing_junior',
+    name: 'Junior Lobster Guide',
+    filename: 'char_lobster_pointing_junior_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_lobster_pointing_junior_v2.webp?v=20261008'),
+    description: 'Coral guide raising a welcoming pincer with short junior legs',
+  },
+  lobster_thumbs_up_junior: {
+    key: 'lobster_thumbs_up_junior',
+    name: 'Junior Lobster Approval',
+    filename: 'char_lobster_thumbs_up_junior_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_lobster_thumbs_up_junior_v2.webp?v=20261008'),
+    description: 'Apricot lobster raising an approving pincer with short junior legs',
+  },
+  lobster_navigator_junior: {
+    key: 'lobster_navigator_junior',
+    name: 'Junior Lobster Explorer',
+    filename: 'char_lobster_navigator_junior_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_lobster_navigator_junior_v2.webp?v=20261008'),
+    description: 'Explorer with goggles and utility harness with short junior legs',
+  },
+  lobster_peek_junior: {
+    key: 'lobster_peek_junior',
+    name: 'Junior Lobster Peek',
+    filename: 'char_lobster_peek_junior_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_lobster_peek_junior_v2.webp?v=20261008'),
+    description: 'Rose lobster leaning curiously with raised pincers with short junior legs',
+  },
+  lobster_peaceful_junior: {
+    key: 'lobster_peaceful_junior',
+    name: 'Junior Lobster Guardian',
+    filename: 'char_lobster_peaceful_junior_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_lobster_peaceful_junior_v2.webp?v=20261008'),
+    description: 'Lavender guardian with a calm expression with short junior legs',
+  },
+  lobster_engineer_junior: {
+    key: 'lobster_engineer_junior',
+    name: 'Junior Lobster Engineer',
+    filename: 'char_lobster_engineer_junior_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_lobster_engineer_junior_v2.webp?v=20261008'),
+    description: 'Engineer with hardhat, tools and diagnostic tablet with short junior legs',
+  },
+  crab_stats_junior: {
+    key: 'crab_stats_junior',
+    name: 'Junior Crab Metrics',
+    filename: 'char_crab_stats_junior_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_crab_stats_junior_v2.webp?v=20261008'),
+    description: 'Terracotta crab presenting a chart with short junior legs',
+  },
+  crab_explorer: {
+    key: 'crab_explorer',
+    name: 'Crab Explorer (Adult)',
+    filename: 'char_crab_explorer_adult_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_crab_explorer_adult_v2.webp?v=20261008'),
+    description: 'Blue crab explorer with compass, goggles and satchel with an adult standing stance',
+  },
+  crab_explorer_junior: {
+    key: 'crab_explorer_junior',
+    name: 'Junior Crab Explorer',
+    filename: 'char_crab_explorer_junior_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_crab_explorer_junior_v2.webp?v=20261008'),
+    description: 'Blue crab explorer with compass, goggles and satchel with short junior legs',
+  },
+  crab_builder: {
+    key: 'crab_builder',
+    name: 'Crab Builder (Adult)',
+    filename: 'char_crab_builder_adult_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_crab_builder_adult_v2.webp?v=20261008'),
+    description: 'Purple crab builder with hardhat and spanner with an adult standing stance',
+  },
+  crab_builder_junior: {
+    key: 'crab_builder_junior',
+    name: 'Junior Crab Builder',
+    filename: 'char_crab_builder_junior_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_crab_builder_junior_v2.webp?v=20261008'),
+    description: 'Purple crab builder with hardhat and spanner with short junior legs',
+  },
+  lobster_archivist: {
+    key: 'lobster_archivist',
+    name: 'Lobster Archivist (Adult)',
+    filename: 'char_lobster_archivist_adult_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_lobster_archivist_adult_v2.webp?v=20261008'),
+    description: 'Scholar with scripture book and shoulder mantle with an adult standing stance',
+  },
+  crab_ritual_keeper: {
+    key: 'crab_ritual_keeper',
+    name: 'Crab Ritual Keeper (Adult)',
+    filename: 'char_crab_ritual_keeper_adult_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_crab_ritual_keeper_adult_v2.webp?v=20261008'),
+    description: 'Ritual keeper with brass bell and ledger with an adult standing stance',
+  },
+  crab_sentinel: {
+    key: 'crab_sentinel',
+    name: 'Crab Sentinel (Adult)',
+    filename: 'char_crab_sentinel_adult_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_crab_sentinel_adult_v2.webp?v=20261008'),
+    description: 'Armored sentinel with shield and welcoming pincer with an adult standing stance',
+  },
+  lobster_oracle_attendant: {
+    key: 'lobster_oracle_attendant',
+    name: 'Lobster Oracle Attendant (Adult)',
+    filename: 'char_lobster_oracle_attendant_adult_v2.webp',
+    s3Url: getAssetUrl('images/characters/char_lobster_oracle_attendant_adult_v2.webp?v=20261008'),
+    description: 'Ivory Oracle attendant with listening instrument with an adult standing stance',
   },
 }
 
@@ -128,6 +248,11 @@ export function normalizeMascotKey(rawKey: string): string {
     raw = raw.replace(/^char_/, '')
   }
 
+  const registered = Object.values(MASCOT_REGISTRY).find(
+    (info) => info.filename.replace(/^char_/, '').replace(/\.[^/.]+$/, '') === raw
+  )
+  if (registered) return registered.key
+
   // Comprehensive alias normalization
   if (raw === 'lobster_pointing_cta' || raw === 'pointing' || raw === 'cta' || raw === 'lobster_cta') return 'lobster_pointing'
   if (raw === 'lobster_corner_peek' || raw === 'peek' || raw === 'corner_peek') return 'lobster_peek'
@@ -158,7 +283,7 @@ export function getMascotInfo(mascotKey: string): MascotInfo {
     key: normKey,
     name: normKey.replace(/_/g, ' ').toUpperCase(),
     filename,
-    s3Url: `${S3_BASE_URL}/images/characters/${filename}`,
+    s3Url: getAssetUrl(`images/characters/${filename}`),
   }
 }
 
@@ -204,7 +329,7 @@ export const MascotOverlay: React.FC<MascotOverlayProps> = ({
     if (!hasFailed) {
       setHasFailed(true)
       // Fallback to S3 default thumbs-up WebP
-      setCurrentSrc(`${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.webp?v=4`)
+      setCurrentSrc(getMascotUrl('lobster_thumbs_up'))
     }
   }
 

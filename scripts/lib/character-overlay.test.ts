@@ -5,8 +5,46 @@ import {
   getRandomCharacterKey,
   getRandomCharacterRotation,
 } from './character-overlay'
+import { MASCOT_REGISTRY, getMascotInfo } from '../../src/components/composite/MascotOverlay'
 
 describe('Character Overlay & Registry', () => {
+  it('keeps browser and script asset metadata aligned across adults, juniors and classes', () => {
+    expect(Object.keys(CHARACTER_REGISTRY).sort()).toEqual(Object.keys(MASCOT_REGISTRY).sort())
+    for (const [key, character] of Object.entries(CHARACTER_REGISTRY)) {
+      const mascot = MASCOT_REGISTRY[key]
+      expect(character.filename).toBe(mascot.filename)
+      expect(character.publicUrl).toBe(mascot.s3Url)
+      expect(character.publicUrl).toContain('?v=20261008')
+      expect(character.s3Path).toBe(`images/characters/${character.filename}`)
+      for (const filename of [character.filename, character.filename.replace('.webp', '.png')]) {
+        expect(getCharacterInfo(filename).key).toBe(key)
+        expect(getMascotInfo(filename).key).toBe(key)
+      }
+    }
+  })
+
+  it('resolves legacy filenames and aliases to adult successors while juniors stay separate', () => {
+    const aliases = {
+      'char_lobster_pointing_cta.png': 'lobster_pointing',
+      'char_lobster_corner_peek.webp': 'lobster_peek',
+      'char_lobster_floating_peaceful.png': 'lobster_peaceful',
+      'char_crab_pointing_stats.webp': 'crab_stats',
+      'LOBSTER_ACTION': 'lobster_navigator',
+      hardhat: 'lobster_engineer',
+    }
+    for (const [alias, key] of Object.entries(aliases)) {
+      expect(getCharacterInfo(alias).key).toBe(key)
+      expect(getMascotInfo(alias).key).toBe(key)
+      expect(getCharacterInfo(alias).filename).toContain('_adult_v2.webp')
+    }
+    expect(getCharacterInfo('lobster_pointing_junior').filename).toContain('_junior_v2.webp')
+    expect(getMascotInfo('crab_builder_junior').filename).toContain('_junior_v2.webp')
+    for (const key of ['lobster_archivist', 'crab_ritual_keeper', 'crab_sentinel', 'lobster_oracle_attendant']) {
+      expect(getCharacterInfo(key).key).toBe(key)
+      expect(getCharacterInfo(key).filename).toContain('_adult_v2.webp')
+    }
+  })
+
   it('contains core registered cartoon characters with valid S3 URLs', () => {
     const keys = [
       'lobster_pointing',
