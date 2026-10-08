@@ -47,6 +47,8 @@ npm run post:create -- --theme sacred-codex --mascot lobster_peaceful
 
 For custom layout copy or native 3:4 scaffolds, use `scripts/render-composite.ts --data <JSON>` or the existing `captureComposite` helper with `template: marketing-leadmagnet`, `aspectRatio: 3:4`, `scaleFactor: 2`, and `data` matching `SocialMarketingSlideProps`. Template defaults may still force uppercase or decorative CTAs: treat the render as a blueprint and explicitly replace them during polish.
 
+For a look the built-in templates don't cover, render a layout spec instead: `npm run composite:render -- --spec content/composite-layouts/<name>.json --aspect 3:4`. Layouts recreated from references live there; see the `composite-reference-library` skill. When a layout came from a reference, attach the reference preview to the polish pass as a style reference.
+
 Select from the full mascot registry in `src/components/composite/MascotOverlay.tsx`; omit `--mascot` for random rotation. Character cutouts live in S3 under `images/characters/`. Keep one clearly visible character with natural ambient lighting and soft contact shadows, without harsh backlights or artificial halos.
 
 ## Visual polish: built-in ImageGen by default

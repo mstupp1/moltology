@@ -144,7 +144,7 @@ export const SocialPromptVaultSlide: React.FC<SocialPromptVaultSlideProps> = ({
         {/* Eyebrow Pill */}
         <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#ff453a]/25 via-[#ff5540]/35 to-[#ff453a]/25 border-2 border-[#ff453a] shadow-[0_0_20px_rgba(255,69,58,0.4)] backdrop-blur-md">
           <span className="w-3 h-3 rounded-full bg-[#ff453a] shadow-[0_0_10px_#ff453a]" />
-          <span className="font-mono font-black text-[14px] tracking-wider uppercase text-[#ffa39e]">
+          <span className="font-mono font-black text-[18px] tracking-wider uppercase text-[#ffa39e]">
             {eyebrowBadge}
           </span>
         </div>
@@ -158,10 +158,10 @@ export const SocialPromptVaultSlide: React.FC<SocialPromptVaultSlideProps> = ({
             </svg>
           </div>
           <div className="text-right">
-            <div className="font-grotesk font-black text-sm text-white tracking-widest uppercase leading-tight">
+            <div className="font-grotesk font-black text-lg text-white tracking-widest uppercase leading-tight">
               {brandTitle}
             </div>
-            <div className="font-mono text-[9.5px] font-bold text-[#ff6358] tracking-wider uppercase">
+            <div className="font-mono text-[12px] font-bold text-[#ff6358] tracking-wider uppercase">
               {brandSubtitle}
             </div>
           </div>
@@ -212,7 +212,7 @@ export const SocialPromptVaultSlide: React.FC<SocialPromptVaultSlideProps> = ({
             <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[#ff453a] to-[#ff5540] flex items-center justify-center text-white font-black shrink-0 shadow-md">
               <CheckSquare className="w-4 h-4 text-white stroke-[3]" />
             </div>
-            <span className="font-mono font-black text-[16.5px] text-white tracking-wide">
+            <span className="font-mono font-black text-[19px] text-white tracking-wide">
               {heroSubPill}
             </span>
           </div>
@@ -229,21 +229,16 @@ export const SocialPromptVaultSlide: React.FC<SocialPromptVaultSlideProps> = ({
                 <div className="w-7 h-7 rounded-lg bg-[#ff453a]/20 border border-[#ff453a] flex items-center justify-center text-[#ff453a]">
                   <MessageSquare className="w-4 h-4" />
                 </div>
-                <span className="font-mono font-black text-xs text-[#ffa39e] uppercase tracking-widest">
+                <span className="font-mono font-black text-sm text-[#ffa39e] uppercase tracking-widest">
                   {promptCards[0].badge || 'ORACLE PROMPT'}
                 </span>
               </div>
               {/* Prompt Text */}
-              <p className="text-[17px] font-sans font-semibold text-slate-100 leading-snug">
+              <p className="text-[20px] font-sans font-semibold text-slate-100 leading-snug">
                 "{promptCards[0].prompt}"
               </p>
             </div>
           )}
-
-          {/* Floating Decorative Speech Bubble Icon on Right Edge */}
-          <div className="absolute top-1/3 -right-3 z-20 w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#ff453a] to-[#ff6358] border-2 border-[#ffa39e] shadow-[0_10px_25px_rgba(0,0,0,0.9),0_0_20px_rgba(255,69,58,0.6)] flex items-center justify-center text-white font-black text-lg">
-            <span className="leading-none pb-1">•••</span>
-          </div>
 
           {/* Prompt Card 2 */}
           {promptCards[1] && (
@@ -253,12 +248,12 @@ export const SocialPromptVaultSlide: React.FC<SocialPromptVaultSlideProps> = ({
                 <div className="w-7 h-7 rounded-lg bg-[#00c3ff]/20 border border-[#00c3ff] flex items-center justify-center text-[#00c3ff]">
                   <Search className="w-4 h-4" />
                 </div>
-                <span className="font-mono font-black text-xs text-[#67e8f9] uppercase tracking-widest">
+                <span className="font-mono font-black text-sm text-[#67e8f9] uppercase tracking-widest">
                   {promptCards[1].badge || 'ORACLE PROMPT'}
                 </span>
               </div>
               {/* Prompt Text */}
-              <p className="text-[17px] font-sans font-semibold text-slate-100 leading-snug">
+              <p className="text-[20px] font-sans font-semibold text-slate-100 leading-snug">
                 "{promptCards[1].prompt}"
               </p>
             </div>
@@ -273,7 +268,7 @@ export const SocialPromptVaultSlide: React.FC<SocialPromptVaultSlideProps> = ({
                 <span className="font-grotesk font-black text-[19px] leading-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-[#ff7b72] to-[#00c3ff] tracking-wider uppercase">
                   {orbBadgeText}
                 </span>
-                <span className="font-mono font-bold text-[8.5px] text-[#ff453a] tracking-widest uppercase">
+                <span className="font-mono font-bold text-[11px] text-[#ff453a] tracking-widest uppercase">
                   {orbBadgeSubtext}
                 </span>
               </div>

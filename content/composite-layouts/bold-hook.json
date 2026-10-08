@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "name": "bold-hook",
+  "aspect": "3:4",
+  "safeArea": 5,
+  "background": {
+    "gradient": "radial-gradient(ellipse at 30% 0%, #0a3550 0%, #021324 45%, #01060e 100%)",
+    "spotlight": true,
+    "grain": true
+  },
+  "layers": [
+    {
+      "type": "shape",
+      "shape": "glow",
+      "color": "cyan",
+      "box": {
+        "x": 40,
+        "y": 40,
+        "w": 70,
+        "h": 50
+      },
+      "blur": 80,
+      "opacity": 0.28
+    },
+    {
+      "id": "eyebrow",
+      "type": "pill",
+      "text": "The daily molt",
+      "size": 28,
+      "box": {
+        "x": 7,
+        "y": 7,
+        "w": 60
+      }
+    },
+    {
+      "id": "headline",
+      "type": "text",
+      "text": "You have 47 tabs open.\nClose 46.",
+      "highlight": "Close 46.",
+      "size": 112,
+      "weight": 700,
+      "lineHeight": 1.02,
+      "tracking": -0.02,
+      "shadow": "strong",
+      "box": {
+        "x": 7,
+        "y": 13,
+        "w": 86,
+        "h": 24
+      }
+    },
+    {
+      "id": "body",
+      "type": "text",
+      "font": "body",
+      "text": "Pincer Torque is finishing the one thing you started. Everything else can wait in the shallows.",
+      "size": 38,
+      "weight": 500,
+      "lineHeight": 1.3,
+      "color": "bone",
+      "shadow": "soft",
+      "box": {
+        "x": 7,
+        "y": 40,
+        "w": 48,
+        "h": 22
+      }
+    },
+    {
+      "id": "mascot",
+      "type": "mascot",
+      "box": {
+        "x": 50,
+        "y": 36,
+        "w": 50,
+        "h": 56
+      }
+    },
+    {
+      "id": "cta",
+      "type": "button",
+      "text": "Start free at moltology.org",
+      "size": 34,
+      "style": "solid",
+      "box": {
+        "x": 7,
+        "y": 85,
+        "w": 52,
+        "h": 7
+      }
+    }
+  ]
+}

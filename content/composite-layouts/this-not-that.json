@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "name": "this-not-that",
+  "aspect": "4:5",
+  "safeArea": 5,
+  "background": {
+    "gradient": "linear-gradient(180deg, #021324 0%, #01060e 100%)",
+    "scanlines": true,
+    "vignette": true
+  },
+  "layers": [
+    {
+      "id": "headline",
+      "type": "text",
+      "text": "The melt vs. the molt",
+      "highlight": "the molt",
+      "size": 92,
+      "align": "center",
+      "tracking": -0.02,
+      "box": {
+        "x": 7,
+        "y": 7,
+        "w": 86,
+        "h": 12
+      }
+    },
+    {
+      "id": "sub",
+      "type": "text",
+      "font": "body",
+      "text": "Same Tuesday. Two very different shells.",
+      "size": 34,
+      "weight": 500,
+      "color": "bone",
+      "align": "center",
+      "box": {
+        "x": 10,
+        "y": 19,
+        "w": 80,
+        "h": 6
+      }
+    },
+    {
+      "id": "left",
+      "type": "panel",
+      "style": "glass",
+      "color": "#2a0d0d",
+      "border": "rgba(255,69,58,0.55)",
+      "box": {
+        "x": 6,
+        "y": 29,
+        "w": 42,
+        "h": 50
+      }
+    },
+    {
+      "id": "right",
+      "type": "panel",
+      "style": "glass",
+      "color": "#062433",
+      "border": "rgba(0,195,255,0.6)",
+      "glow": "cyan",
+      "box": {
+        "x": 52,
+        "y": 29,
+        "w": 42,
+        "h": 50
+      }
+    },
+    {
+      "id": "left-title",
+      "type": "text",
+      "text": "The melt",
+      "color": "crimson",
+      "size": 52,
+      "box": {
+        "x": 10,
+        "y": 32,
+        "w": 34,
+        "h": 7
+      }
+    },
+    {
+      "id": "right-title",
+      "type": "text",
+      "text": "The molt",
+      "color": "cyan",
+      "size": 52,
+      "box": {
+        "x": 56,
+        "y": 32,
+        "w": 34,
+        "h": 7
+      }
+    },
+    {
+      "id": "left-list",
+      "type": "list",
+      "marker": "dash",
+      "markerColor": "crimson",
+      "size": 33,
+      "gap": 28,
+      "items": [
+        "Forty-seven open tabs",
+        "Replying to everything",
+        "Starting a fourth plan",
+        "Waiting to feel ready"
+      ],
+      "box": {
+        "x": 10,
+        "y": 42,
+        "w": 35
+      }
+    },
+    {
+      "id": "right-list",
+      "type": "list",
+      "marker": "check",
+      "markerColor": "cyan",
+      "size": 33,
+      "gap": 28,
+      "items": [
+        "One tab, one task",
+        "Replies batched at four",
+        "Finishing the first plan",
+        "Starting before ready"
+      ],
+      "box": {
+        "x": 56,
+        "y": 42,
+        "w": 35
+      }
+    },
+    {
+      "id": "brand",
+      "type": "brand",
+      "variant": "lockup",
+      "caption": "Start free at moltology.org",
+      "size": 50,
+      "align": "center",
+      "box": {
+        "x": 15,
+        "y": 84,
+        "w": 70
+      }
+    }
+  ]
+}

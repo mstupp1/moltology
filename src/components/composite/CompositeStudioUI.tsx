@@ -38,6 +38,7 @@ export type CompositeTemplateType =
   | 'reel-simple-outro'
   | 'reel-thumbnail'
   | 'blog-schematic'
+  | 'layout'
 
 export interface CompositeStudioUIProps {
   initialTemplate?: CompositeTemplateType

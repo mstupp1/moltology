@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "name": "story-cta",
+  "aspect": "9:16",
+  "safeArea": 6,
+  "background": {
+    "gradient": "radial-gradient(ellipse at 50% 35%, #0b3a55 0%, #021324 45%, #01060e 100%)",
+    "grain": true,
+    "vignette": true
+  },
+  "layers": [
+    {
+      "type": "shape",
+      "shape": "glow",
+      "color": "cyan",
+      "box": {
+        "x": 10,
+        "y": 10,
+        "w": 80,
+        "h": 40
+      },
+      "blur": 110,
+      "opacity": 0.22
+    },
+    {
+      "id": "brand",
+      "type": "brand",
+      "variant": "lockup",
+      "size": 70,
+      "align": "center",
+      "box": {
+        "x": 20,
+        "y": 12,
+        "w": 60
+      }
+    },
+    {
+      "id": "headline",
+      "type": "text",
+      "text": "The water is clearer down here.",
+      "highlight": "clearer",
+      "size": 120,
+      "align": "center",
+      "valign": "center",
+      "lineHeight": 1.0,
+      "tracking": -0.025,
+      "shadow": "strong",
+      "box": {
+        "x": 8,
+        "y": 22,
+        "w": 84,
+        "h": 22
+      }
+    },
+    {
+      "id": "body",
+      "type": "text",
+      "font": "body",
+      "text": "A calmer place to focus, finish things and be among the Order.",
+      "size": 44,
+      "weight": 500,
+      "align": "center",
+      "color": "bone",
+      "box": {
+        "x": 12,
+        "y": 45,
+        "w": 76,
+        "h": 9
+      }
+    },
+    {
+      "id": "cta",
+      "type": "button",
+      "text": "Join free",
+      "arrow": true,
+      "size": 52,
+      "box": {
+        "x": 22,
+        "y": 57,
+        "w": 56,
+        "h": 5.5
+      }
+    },
+    {
+      "id": "link",
+      "type": "text",
+      "text": "Link in bio",
+      "size": 30,
+      "weight": 600,
+      "tracking": 0.2,
+      "uppercase": true,
+      "color": "muted",
+      "align": "center",
+      "box": {
+        "x": 25,
+        "y": 63.5,
+        "w": 50,
+        "h": 3
+      }
+    },
+    {
+      "id": "mascot",
+      "type": "mascot",
+      "key": "lobster_peaceful",
+      "box": {
+        "x": 20,
+        "y": 67,
+        "w": 60,
+        "h": 24
+      }
+    }
+  ]
+}

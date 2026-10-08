@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CompositeStudioUI,
   CompositeTemplateType,
@@ -14,6 +14,9 @@ import {
   BlogSchematicCard,
   MascotKey,
 } from '@/components/composite'
+import { LayoutSlide } from '@/components/composite/LayoutSlide'
+import { parseLayoutSpec } from '@/components/composite/layout-spec'
+import { useCompositeReady } from '@/components/composite/useCompositeReady'
 import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
 import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
 
@@ -27,20 +30,43 @@ export interface CompositeRenderProps {
     preview?: boolean
     secret?: string
     data?: string
+    payload?: 'inject'
+  }
+}
+
+/** Shape the headless capture injects as window.__COMPOSITE_PAYLOAD__ (no URL length limit). */
+export interface InjectedCompositePayload {
+  template?: CompositeTemplateType
+  theme?: string
+  aspect?: CompositeAspectRatio
+  mascot?: MascotKey
+  data?: Record<string, any>
+}
+
+declare global {
+  interface Window {
+    __COMPOSITE_PAYLOAD__?: InjectedCompositePayload
   }
 }
 
 export default function CompositeRenderView({ search }: CompositeRenderProps) {
-  const template = search.template || 'hook'
-  const theme = search.theme || 'moltmaxxing'
-  const aspect = search.aspect || '4:5'
-  const mascot = search.mascot || 'lobster_thumbs_up'
   const isRaw = search.mode === 'raw'
+  const waitsForInjection = isRaw && search.payload === 'inject'
+  const [injected, setInjected] = useState<InjectedCompositePayload | null>(null)
+
+  useEffect(() => {
+    if (waitsForInjection) setInjected(window.__COMPOSITE_PAYLOAD__ ?? {})
+  }, [waitsForInjection])
+
+  const template = injected?.template || search.template || 'hook'
+  const theme = injected?.theme || search.theme || 'moltmaxxing'
+  const aspect = injected?.aspect || search.aspect || '4:5'
+  const mascot = injected?.mascot || search.mascot || 'lobster_thumbs_up'
   const isBypass = search.preview === true || !(!search.secret)
 
   // Parse optional custom data payload
-  let customData: Record<string, any> = {}
-  if (search.data) {
+  let customData: Record<string, any> = injected?.data ?? {}
+  if (!injected && search.data) {
     try {
       customData = JSON.parse(decodeURIComponent(search.data))
     } catch {
@@ -48,10 +74,19 @@ export default function CompositeRenderView({ search }: CompositeRenderProps) {
     }
   }
 
+  const contentReady = isRaw && (!waitsForInjection || injected !== null)
+  useCompositeReady(contentReady, `${template}|${aspect}|${mascot}|${injected ? 'i' : 'u'}`)
+
+  if (waitsForInjection && !injected) {
+    return <div className="w-screen h-screen bg-[#02080c]" />
+  }
+
   // Raw Mode: Minimal zero-padding render for headless Chrome capture
   if (isRaw) {
     return (
       <div className="w-screen h-screen m-0 p-0 overflow-hidden bg-[#02080c] flex items-start justify-start">
+        {template === 'layout' && <RawLayout data={customData} aspect={aspect} mascot={mascot} />}
+
         {template === 'marketing-leadmagnet' && (
           <SocialMarketingSlide
             aspectRatio={aspect}
@@ -109,6 +144,7 @@ export default function CompositeRenderView({ search }: CompositeRenderProps) {
             leftMetric={customData.leftMetric}
             rightMetric={customData.rightMetric}
             bulletPoints={customData.bulletPoints}
+            bulletsTitle={customData.bulletsTitle}
             mascot={mascot}
             backgroundImageUrl={customData.backgroundImageUrl}
           />
@@ -181,6 +217,8 @@ export default function CompositeRenderView({ search }: CompositeRenderProps) {
             rightTitle={customData.rightTitle}
             rightMetric={customData.rightMetric}
             rightBullets={customData.rightBullets}
+            leftCaption={customData.leftCaption}
+            rightCaption={customData.rightCaption}
             mascot={mascot}
             backgroundImageUrl={customData.backgroundImageUrl}
           />
@@ -206,4 +244,24 @@ export default function CompositeRenderView({ search }: CompositeRenderProps) {
       />
     </GuestLockGuard>
   )
+}
+
+function RawLayout({
+  data,
+  aspect,
+  mascot,
+}: {
+  data: Record<string, any>
+  aspect: CompositeAspectRatio
+  mascot: MascotKey
+}) {
+  const parsed = parseLayoutSpec(data.spec ?? data)
+  if (!parsed.ok) {
+    return (
+      <pre data-layout-error="" className="p-8 text-red-300 text-xl whitespace-pre-wrap">
+        {`Layout spec is invalid:\n${parsed.errors.join('\n')}`}
+      </pre>
+    )
+  }
+  return <LayoutSlide spec={parsed.spec} aspectRatio={aspect} mascot={mascot} showGuides={data.guides === true} />
 }

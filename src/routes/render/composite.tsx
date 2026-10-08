@@ -14,6 +14,7 @@ interface CompositeSearchParams {
   preview?: boolean
   secret?: string
   data?: string
+  payload?: 'inject'
 }
 
 export const Route = createFileRoute('/render/composite')({
@@ -27,6 +28,7 @@ export const Route = createFileRoute('/render/composite')({
       preview: search.preview === true || search.preview === 'true',
       secret: search.secret as string | undefined,
       data: search.data as string | undefined,
+      payload: search.payload === 'inject' ? 'inject' : undefined,
     }
   },
   head: () => ({

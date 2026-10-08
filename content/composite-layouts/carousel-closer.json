@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "name": "carousel-closer",
+  "aspect": "3:4",
+  "safeArea": 6,
+  "background": {
+    "gradient": "linear-gradient(180deg, #062433 0%, #021324 45%, #01060e 100%)",
+    "spotlight": true,
+    "grain": true
+  },
+  "layers": [
+    {
+      "id": "headline",
+      "type": "text",
+      "text": "Save this for the next time the tabs multiply.",
+      "highlight": "Save this",
+      "size": 96,
+      "align": "center",
+      "valign": "center",
+      "lineHeight": 1.02,
+      "tracking": -0.02,
+      "box": {
+        "x": 8,
+        "y": 8,
+        "w": 84,
+        "h": 28
+      }
+    },
+    {
+      "id": "mascot",
+      "type": "mascot",
+      "key": "lobster_thumbs_up",
+      "box": {
+        "x": 28,
+        "y": 36,
+        "w": 44,
+        "h": 32
+      }
+    },
+    {
+      "id": "cta",
+      "type": "button",
+      "text": "Start free at moltology.org",
+      "size": 38,
+      "box": {
+        "x": 14,
+        "y": 72,
+        "w": 72,
+        "h": 7
+      }
+    },
+    {
+      "id": "share",
+      "type": "text",
+      "font": "body",
+      "text": "Send it to someone with forty-seven tabs open.",
+      "size": 32,
+      "weight": 500,
+      "color": "bone",
+      "align": "center",
+      "box": {
+        "x": 12,
+        "y": 81,
+        "w": 76,
+        "h": 5
+      }
+    },
+    {
+      "id": "brand",
+      "type": "brand",
+      "variant": "lockup",
+      "size": 44,
+      "align": "center",
+      "box": {
+        "x": 30,
+        "y": 88,
+        "w": 40
+      }
+    }
+  ]
+}
