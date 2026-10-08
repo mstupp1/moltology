@@ -84,15 +84,17 @@ export const SectionBackdrop: React.FC<{
   fade?: keyof typeof FADES
   position?: string
   drift?: number
+  tone?: 'surface' | 'seabed' | 'gallery' | 'practice'
   className?: string
-}> = ({ image, fade = 'both', position = '50% 50%', drift = 10, className = '' }) => (
-  <div className={`absolute inset-0 -z-10 overflow-hidden pointer-events-none ${className}`} aria-hidden="true">
+}> = ({ image, fade = 'both', position = '50% 50%', drift = 10, tone = 'seabed', className = '' }) => (
+  <div className={`home-backdrop home-backdrop--${tone} absolute inset-0 -z-10 overflow-hidden pointer-events-none ${className}`} aria-hidden="true">
     <div
       className={`absolute -inset-y-[12%] inset-x-0 ${drift ? 'home-drift' : ''}`}
       style={{ ['--drift' as string]: `${drift / 2}%` }}
     >
-      <StoryImg image={image} className="h-full w-full object-cover" style={{ objectPosition: position }} />
+      <StoryImg image={image} className="home-backdrop-art h-full w-full object-cover" style={{ objectPosition: position }} />
     </div>
+    <div className="home-backdrop-vignette absolute inset-0" />
     <div className="absolute inset-0" style={{ background: FADES[fade] }} />
   </div>
 )

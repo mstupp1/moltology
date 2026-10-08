@@ -4,6 +4,7 @@ import { ArrowRight, ListChecks, MessagesSquare, Sparkles } from 'lucide-react'
 import { LandingAuthCtaSkeleton } from '@/components/LandingAuthCtaSkeleton'
 import { getAssetUrl } from '@/lib/assets'
 import { eagerImageProps, lcpImageProps } from '@/lib/media-priority'
+import { HOME_HERO_IMAGE } from '@/components/home/content'
 
 const LazyLandingAuthCtas = React.lazy(() =>
   import('@/components/LandingAuthCtas').then((m) => ({ default: m.LandingAuthCtas }))
@@ -37,25 +38,25 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
     >
       {/*
         The artwork is sized to the first screen, not the whole section, so it keeps its framing
-        instead of being blown up to cover the dashboard preview. Overlays stay symmetric and light:
-        a fade under the header, a soft pool of shade behind the copy, and a fade into the page.
+        instead of being blown up to cover the dashboard preview. A muted grade and edge vignette
+        blend the shell into the page, with a separate pool of shade behind the copy.
       */}
       <div className="absolute inset-x-0 top-0 h-[100svh] min-h-[640px] sm:min-h-[760px] pointer-events-none select-none" aria-hidden="true">
         <picture>
-          <source media="(max-width: 767px)" srcSet={getAssetUrl('/images/hero_benthic_mobile_v2.webp')} />
+          <source media="(max-width: 767px)" srcSet={HOME_HERO_IMAGE.srcSm} />
           <img
-            src={getAssetUrl('/images/hero_benthic_expansive_v1.webp')}
+            src={HOME_HERO_IMAGE.src}
             alt=""
             {...lcpImageProps}
             width={1672}
             height={941}
-            className="absolute inset-0 h-full w-full object-cover object-[50%_70%] md:object-[60%_60%]"
+            className="home-hero-art absolute inset-0 h-full w-full object-cover object-center"
             data-testid="hero-artwork"
           />
         </picture>
-        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#020408] to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_50%_42%,rgba(2,4,8,0.62),rgba(2,4,8,0.25)_60%,transparent_100%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-[#020408] via-[#020408]/80 to-transparent" />
+        <div className="home-hero-vignette absolute inset-0" />
+        <div className="home-hero-atmosphere absolute inset-0" />
+        <div className="home-hero-veil absolute inset-0" />
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-8 text-center">

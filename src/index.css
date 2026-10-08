@@ -292,6 +292,81 @@
   from { transform: translate3d(-4%, -2%, 0); }
   to { transform: translate3d(4%, 3%, 0); }
 }
+/* Grade decorative artwork independently of copy and screenshots. */
+.home-hero-art {
+  filter: brightness(0.72) saturate(0.58) contrast(0.96) blur(1.4px);
+  transform: scale(1.015);
+}
+.home-hero-vignette {
+  background:
+    linear-gradient(to right, rgba(2, 4, 8, 0.85), transparent 22%, transparent 78%, rgba(2, 4, 8, 0.85)),
+    radial-gradient(ellipse 76% 72% at 50% 45%, transparent 25%, rgba(2, 4, 8, 0.62) 72%, #020408 100%);
+}
+.home-hero-atmosphere {
+  background:
+    radial-gradient(ellipse 30% 38% at 18% 58%, rgba(0, 120, 145, 0.1), transparent 80%),
+    radial-gradient(ellipse 30% 34% at 82% 62%, rgba(0, 150, 140, 0.08), transparent 80%);
+}
+.home-hero-veil {
+  background:
+    radial-gradient(ellipse 60% 58% at 50% 42%, rgba(2, 4, 8, 0.58), rgba(2, 4, 8, 0.22) 65%, transparent),
+    linear-gradient(to bottom, #020408, rgba(2, 4, 8, 0.3) 16%, transparent 30%, transparent 56%, rgba(2, 4, 8, 0.72) 80%, #020408 100%);
+}
+.home-backdrop {
+  --art-brightness: 0.76;
+  --art-saturation: 0.68;
+  --art-blur: 0.5px;
+  --art-shade: 0.08;
+  background: #020408;
+}
+.home-backdrop--surface {
+  --art-brightness: 0.66;
+  --art-saturation: 0.5;
+  --art-blur: 0.8px;
+  --art-shade: 0.18;
+}
+.home-backdrop--gallery {
+  --art-brightness: 0.72;
+  --art-saturation: 0.74;
+  --art-blur: 1px;
+  --art-shade: 0.12;
+}
+.home-backdrop--practice {
+  --art-brightness: 0.8;
+  --art-saturation: 0.65;
+  --art-blur: 0.4px;
+  --art-shade: 0.1;
+}
+.home-backdrop-art {
+  filter: brightness(var(--art-brightness)) saturate(var(--art-saturation)) blur(var(--art-blur));
+}
+.home-backdrop-vignette {
+  background:
+    linear-gradient(rgba(2, 4, 8, var(--art-shade)), rgba(2, 4, 8, var(--art-shade))),
+    radial-gradient(ellipse 78% 72% at 50% 50%, transparent 32%, rgba(2, 4, 8, 0.5) 78%, #020408 100%);
+}
+.home-voice-glass {
+  background: linear-gradient(145deg, rgba(9, 22, 28, 0.78), rgba(3, 8, 11, 0.9));
+  -webkit-backdrop-filter: blur(6px) saturate(0.8);
+  backdrop-filter: blur(6px) saturate(0.8);
+  box-shadow: inset 0 1px 0 rgba(200, 240, 255, 0.035), 0 18px 44px rgba(0, 0, 0, 0.18);
+}
+.home-final-art {
+  filter: brightness(0.86) saturate(0.78) contrast(1.04);
+}
+.home-final-vignette {
+  background: radial-gradient(ellipse 90% 85% at 65% 40%, transparent 36%, rgba(2, 4, 8, 0.65) 82%, #020408 100%);
+}
+@media (max-width: 767px) {
+  .home-hero-vignette {
+    background:
+      linear-gradient(to right, rgba(2, 4, 8, 0.55), transparent 28%, transparent 72%, rgba(2, 4, 8, 0.55)),
+      radial-gradient(ellipse 100% 72% at 50% 42%, transparent 28%, rgba(2, 4, 8, 0.6) 78%, #020408 100%);
+  }
+  .home-final-vignette {
+    background: radial-gradient(ellipse 95% 65% at 50% 22%, transparent 28%, rgba(2, 4, 8, 0.6) 76%, #020408 100%);
+  }
+}
 .home-snow {
   position: absolute;
   inset: 0;
@@ -383,17 +458,6 @@
   width: max(140vw, 1500px);
   height: auto;
   transform: translate(-50%, -50%) rotate(-8deg);
-}
-/* Final invitation art: fades out on every side into the card, so there is no image edge. Static. */
-.home-final-art {
-  -webkit-mask-image: radial-gradient(ellipse 75% 80% at 50% 38%, #000 35%, transparent 75%);
-  mask-image: radial-gradient(ellipse 75% 80% at 50% 38%, #000 35%, transparent 75%);
-}
-@media (min-width: 768px) {
-  .home-final-art {
-    -webkit-mask-image: radial-gradient(ellipse 56% 66% at 56% 46%, #000 42%, transparent 84%);
-    mask-image: radial-gradient(ellipse 56% 66% at 56% 46%, #000 42%, transparent 84%);
-  }
 }
 /* Cards that tilt toward the pointer. JS writes --rx/--ry for the tilt and --gx/--gy for the glare. */
 .home-tilt {
