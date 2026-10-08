@@ -312,50 +312,73 @@
     radial-gradient(ellipse 60% 58% at 50% 42%, rgba(2, 4, 8, 0.58), rgba(2, 4, 8, 0.22) 65%, transparent),
     linear-gradient(to bottom, #020408, rgba(2, 4, 8, 0.3) 16%, transparent 30%, transparent 56%, rgba(2, 4, 8, 0.72) 80%, #020408 100%);
 }
+/* Section artwork. Each tone grades its art lightly and lights it where the art's own light falls.
+   --light-a / --light-b are the two light pools; --edge-blur is how far out of focus the edges go. */
 .home-backdrop {
-  --art-brightness: 0.76;
-  --art-saturation: 0.68;
-  --art-blur: 0.5px;
-  --art-shade: 0.08;
+  --art-brightness: 1.05;
+  --art-saturation: 0.9;
+  --edge-blur: 7px;
+  --focus: ellipse 70% 72% at 50% 50%;
+  --light-a: radial-gradient(ellipse 40% 45% at 50% 50%, rgba(0, 195, 255, 0.08), transparent 70%);
+  --light-b: radial-gradient(ellipse 1px 1px at 50% 50%, transparent, transparent);
   background: #020408;
 }
 .home-backdrop--surface {
-  --art-brightness: 0.66;
-  --art-saturation: 0.5;
-  --art-blur: 0.8px;
-  --art-shade: 0.18;
+  --art-brightness: 1.1;
+  --edge-blur: 10px;
+  /* Sharp only up at the surface; the water behind the copy goes soft, which keeps the text easy to read. */
+  --focus: ellipse 75% 38% at 50% 6%;
+  --light-a: radial-gradient(ellipse 55% 38% at 50% 4%, rgba(140, 220, 255, 0.14), transparent 70%);
+  --light-b: radial-gradient(ellipse 22% 18% at 30% 10%, rgba(255, 170, 110, 0.06), transparent 70%);
 }
-.home-backdrop--gallery {
-  --art-brightness: 0.72;
-  --art-saturation: 0.74;
-  --art-blur: 1px;
-  --art-shade: 0.12;
+.home-backdrop--seabed {
+  --art-brightness: 1.2;
+  --art-saturation: 0.95;
+  --focus: ellipse 75% 55% at 55% 72%;
+  --light-a: radial-gradient(ellipse 30% 26% at 82% 70%, rgba(0, 255, 204, 0.12), transparent 70%);
+  --light-b: radial-gradient(ellipse 45% 30% at 35% 80%, rgba(0, 195, 255, 0.06), transparent 70%);
 }
 .home-backdrop--practice {
-  --art-brightness: 0.8;
-  --art-saturation: 0.65;
-  --art-blur: 0.4px;
-  --art-shade: 0.1;
+  --art-brightness: 1.25;
+  --focus: ellipse 50% 45% at 65% 78%;
+  --edge-blur: 9px;
+  --light-a: radial-gradient(ellipse 22% 24% at 66% 80%, rgba(255, 196, 120, 0.12), transparent 70%);
+  --light-b: radial-gradient(ellipse 50% 40% at 50% 0%, rgba(0, 195, 255, 0.08), transparent 70%);
 }
+.home-backdrop--gallery {
+  --art-brightness: 1.15;
+  --art-saturation: 0.95;
+  --focus: ellipse 85% 70% at 50% 60%;
+  --light-a: radial-gradient(ellipse 22% 30% at 14% 62%, rgba(255, 170, 90, 0.1), transparent 70%);
+  --light-b: radial-gradient(ellipse 22% 30% at 88% 66%, rgba(255, 170, 90, 0.09), transparent 70%);
+}
+/* The out-of-focus copy, scaled a touch so the blur never pulls dark in from the frame edge. */
+.home-backdrop-soft {
+  filter: brightness(var(--art-brightness)) saturate(var(--art-saturation)) blur(var(--edge-blur));
+  transform: scale(1.06);
+}
+/* The sharp copy, kept only where the eye lands. */
 .home-backdrop-art {
-  filter: brightness(var(--art-brightness)) saturate(var(--art-saturation)) blur(var(--art-blur));
+  filter: brightness(var(--art-brightness)) saturate(var(--art-saturation));
+  -webkit-mask-image: radial-gradient(var(--focus), #000 30%, transparent 100%);
+  mask-image: radial-gradient(var(--focus), #000 30%, transparent 100%);
+}
+.home-backdrop-light {
+  background: var(--light-a), var(--light-b);
 }
 .home-backdrop-vignette {
-  background:
-    linear-gradient(rgba(2, 4, 8, var(--art-shade)), rgba(2, 4, 8, var(--art-shade))),
-    radial-gradient(ellipse 78% 72% at 50% 50%, transparent 32%, rgba(2, 4, 8, 0.5) 78%, #020408 100%);
+  background: radial-gradient(ellipse 90% 85% at 50% 50%, transparent 55%, rgba(2, 4, 8, 0.55) 100%);
 }
 .home-voice-glass {
-  background: linear-gradient(145deg, rgba(9, 22, 28, 0.78), rgba(3, 8, 11, 0.9));
-  -webkit-backdrop-filter: blur(6px) saturate(0.8);
-  backdrop-filter: blur(6px) saturate(0.8);
+  /* No backdrop-filter: the art behind drifts while scrolling, and re-blurring it every frame is costly. */
+  background: linear-gradient(145deg, rgba(9, 22, 28, 0.82), rgba(3, 8, 11, 0.9));
   box-shadow: inset 0 1px 0 rgba(200, 240, 255, 0.035), 0 18px 44px rgba(0, 0, 0, 0.18);
 }
 .home-final-art {
-  filter: brightness(0.86) saturate(0.78) contrast(1.04);
+  filter: brightness(1.05) saturate(0.95) contrast(1.04);
 }
 .home-final-vignette {
-  background: radial-gradient(ellipse 90% 85% at 65% 40%, transparent 36%, rgba(2, 4, 8, 0.65) 82%, #020408 100%);
+  background: radial-gradient(ellipse 95% 90% at 65% 45%, transparent 50%, rgba(2, 4, 8, 0.6) 100%);
 }
 @media (max-width: 767px) {
   .home-hero-vignette {
@@ -364,7 +387,7 @@
       radial-gradient(ellipse 100% 72% at 50% 42%, transparent 28%, rgba(2, 4, 8, 0.6) 78%, #020408 100%);
   }
   .home-final-vignette {
-    background: radial-gradient(ellipse 95% 65% at 50% 22%, transparent 28%, rgba(2, 4, 8, 0.6) 76%, #020408 100%);
+    background: radial-gradient(ellipse 100% 70% at 50% 25%, transparent 40%, rgba(2, 4, 8, 0.6) 90%);
   }
 }
 .home-snow {
