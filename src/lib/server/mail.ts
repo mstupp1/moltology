@@ -8,6 +8,7 @@ import {
   supportTicketCategoryLabel,
   supportTicketUrgencyLabel,
 } from '../support-tickets'
+import { contactTopicLabel } from '../contact-form'
 
 export const RESEND_EMAILS_URL = 'https://api.resend.com/emails'
 
@@ -164,6 +165,40 @@ export async function sendSupportTicketEmail(
     subject: `[Ticket ${input.ticketId}] ${input.subject}`,
     text: renderSupportTicketEmailText(input),
     replyTo: input.memberEmail?.trim() || undefined,
+  })
+}
+
+export interface ContactFormMailInput {
+  name: string
+  email: string
+  topic: string
+  message: string
+}
+
+export function renderContactFormEmailText(input: ContactFormMailInput): string {
+  return [
+    'Contact form message (moltology.org/org)',
+    '',
+    `Name: ${input.name}`,
+    `Email: ${input.email}`,
+    `Topic: ${contactTopicLabel(input.topic)}`,
+    '',
+    input.message,
+  ].join('\n')
+}
+
+/**
+ * Sends a public /org contact form message to support@moltology.org, with
+ * reply-to set to the sender so a reply goes straight back to them.
+ */
+export async function sendContactFormEmail(
+  input: ContactFormMailInput,
+): Promise<TransactionalMailResult> {
+  return sendTransactionalEmail({
+    to: SUPPORT_INBOX,
+    subject: `[Contact] ${contactTopicLabel(input.topic)}: ${input.name}`,
+    text: renderContactFormEmailText(input),
+    replyTo: input.email,
   })
 }
 

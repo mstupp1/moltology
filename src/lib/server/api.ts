@@ -969,6 +969,24 @@ const createSupportTicketSchema = z.object({
   clientIp: z.string().optional(),
 })
 
+const submitContactFormSchema = z.object({
+  name: z.string().max(200),
+  email: z.string().max(320),
+  topic: z.string().max(32).optional(),
+  message: z.string().max(5000),
+  emailOptIn: z.boolean().optional(),
+  turnstileToken: z.string().optional(),
+  molt_bait_field: z.string().optional(),
+})
+
+export const submitContactFormFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: z.input<typeof submitContactFormSchema>) => submitContactFormSchema.parse(data))
+  .handler(async (args) => {
+    const { submitContactFormHandler } = await import('./contact-form')
+    return submitContactFormHandler(args)
+  })
+
 export const createSupportTicketFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: z.input<typeof createSupportTicketSchema>) => createSupportTicketSchema.parse(data))

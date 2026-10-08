@@ -13,6 +13,7 @@ import {
   renderSupportTicketEmailText,
   sendEmailVerificationEmail,
   sendSupportTicketEmail,
+  sendContactFormEmail,
 } from './mail'
 
 describe('support ticket mail', () => {
@@ -113,6 +114,34 @@ describe('support ticket mail', () => {
     expect(payload.from).toBe(DEFAULT_SUPPORT_FROM)
     expect(payload.subject).toBe('[Ticket ticket-1] Chassis freeze')
     expect(payload.text).toContain('Member id: member-9')
+  })
+})
+
+describe('contact form mail', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
+  })
+
+  it('sends to the support inbox with reply-to set to the sender', async () => {
+    vi.stubEnv('RESEND_API_KEY', 're_test_key')
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, text: async () => '' })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await sendContactFormEmail({
+      name: 'Tester Crab',
+      email: 'crab@example.com',
+      topic: 'visit',
+      message: 'Requesting a tour of Chamber 04.',
+    })
+
+    expect(result).toEqual({ sent: true })
+    const payload = JSON.parse((fetchMock.mock.calls[0][1] as { body: string }).body)
+    expect(payload.to).toEqual([SUPPORT_INBOX])
+    expect(payload.reply_to).toBe('crab@example.com')
+    expect(payload.subject).toBe('[Contact] Visiting the lair: Tester Crab')
+    expect(payload.text).toContain('Email: crab@example.com')
+    expect(payload.text).toContain('Requesting a tour of Chamber 04.')
   })
 })
 
