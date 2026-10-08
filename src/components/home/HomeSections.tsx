@@ -489,6 +489,20 @@ export const HomeFinalCta: React.FC<HomeSectionProps> = ({ authReady, onNavigate
     <ScrollReveal animation="scale-up">
       <div className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-[#00c3ff]/20 bg-gradient-to-br from-[#04161c] via-[#03090d] to-[#020408] grid md:grid-cols-[1.15fr_0.85fr] items-center">
         <div className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-[#00c3ff]/10 blur-3xl -z-10" aria-hidden="true" />
+        <div
+          className="absolute inset-0 -z-10 md:hidden"
+          style={{ background: 'radial-gradient(40% 55% at 50% 30%, rgba(0, 195, 255, 0.14), transparent 70%)' }}
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-0 -z-10 hidden md:block"
+          style={{ background: 'radial-gradient(32% 60% at 70% 50%, rgba(0, 195, 255, 0.16), transparent 70%)' }}
+          aria-hidden="true"
+        />
+        {/* The art bleeds into the card through a soft mask over a glow, instead of sitting in its own box. */}
+        <div className="home-final-art absolute inset-x-0 top-0 h-[22rem] md:inset-y-0 md:left-auto md:h-auto md:w-[64%] -z-10" aria-hidden="true">
+          <StoryImg image={HOME_FINAL_IMAGE} className="h-full w-full object-cover" />
+        </div>
         <DepthLayer kind="caustics" className="-z-10" />
         <DepthLayer kind="snow" className="-z-10 opacity-50" />
         <div className="px-6 py-12 sm:p-14 lg:p-16">
@@ -515,10 +529,7 @@ export const HomeFinalCta: React.FC<HomeSectionProps> = ({ authReady, onNavigate
             Not ready yet? Get the free field manual.
           </Link>
         </div>
-        <div className="relative h-72 md:h-full md:min-h-[30rem]">
-          <StoryImg image={HOME_FINAL_IMAGE} className="absolute inset-0 h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b md:bg-gradient-to-r from-[#03090d] via-transparent to-transparent" aria-hidden="true" />
-        </div>
+        <div className="order-first md:order-none h-64 md:h-full md:min-h-[30rem]" aria-hidden="true" />
       </div>
     </ScrollReveal>
   </section>

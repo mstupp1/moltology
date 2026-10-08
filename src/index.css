@@ -384,6 +384,17 @@
   height: auto;
   transform: translate(-50%, -50%) rotate(-8deg);
 }
+/* Final invitation art: fades out on every side into the card, so there is no image edge. Static. */
+.home-final-art {
+  -webkit-mask-image: radial-gradient(ellipse 75% 80% at 50% 38%, #000 35%, transparent 75%);
+  mask-image: radial-gradient(ellipse 75% 80% at 50% 38%, #000 35%, transparent 75%);
+}
+@media (min-width: 768px) {
+  .home-final-art {
+    -webkit-mask-image: radial-gradient(ellipse 56% 66% at 56% 46%, #000 42%, transparent 84%);
+    mask-image: radial-gradient(ellipse 56% 66% at 56% 46%, #000 42%, transparent 84%);
+  }
+}
 /* Cards that tilt toward the pointer. JS writes --rx/--ry for the tilt and --gx/--gy for the glare. */
 .home-tilt {
   transition: transform 500ms cubic-bezier(0.2, 0.7, 0.2, 1);
