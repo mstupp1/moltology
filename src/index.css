@@ -341,6 +341,49 @@
   mask-image: linear-gradient(to bottom, #000, transparent 70%);
   -webkit-mask-image: linear-gradient(to bottom, #000, transparent 70%);
 }
+/* Sonar: three thin rings that ping outward from one point, staggered. Transform and opacity only. */
+@keyframes homeSonarPing {
+  from { transform: translate(-50%, -50%) scale(0.15); opacity: 0; }
+  15% { opacity: 0.7; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+.home-sonar {
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.home-sonar > span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: min(80vw, 760px);
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 255, 204, 0.22);
+  transform: translate(-50%, -50%) scale(0.15);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.home-sonar.is-live > span {
+  animation: homeSonarPing 12s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+.home-sonar.is-live > span:nth-child(2) { animation-delay: -4s; }
+.home-sonar.is-live > span:nth-child(3) { animation-delay: -8s; }
+/* Contours: a sonar map of the seafloor, drawn once as SVG. It stays still; the sonar ping supplies the motion. */
+.home-contours {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.home-contours > svg {
+  position: absolute;
+  left: var(--contour-x, 50%);
+  top: var(--contour-y, 50%);
+  width: max(140vw, 1500px);
+  height: auto;
+  transform: translate(-50%, -50%) rotate(-8deg);
+}
 /* Cards that tilt toward the pointer. JS writes --rx/--ry for the tilt and --gx/--gy for the glare. */
 .home-tilt {
   transition: transform 500ms cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -377,7 +420,8 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .home-snow.is-live::before,
-  .home-caustics.is-live {
+  .home-caustics.is-live,
+  .home-sonar.is-live > span {
     animation: none;
   }
   .home-tilt[data-tilting],

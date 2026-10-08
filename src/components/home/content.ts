@@ -176,24 +176,20 @@ export const HOME_FINAL_IMAGE: StoryImage = {
 }
 
 /**
- * Deep-sea photos laid low behind sections, ordered from the surface down. They are pre-dimmed
- * into the page colour, so the page never composites a translucent full-width layer.
+ * Deep-sea photos laid low behind sections, ordered from the surface down. They are pre-dimmed,
+ * desaturated and vignetted into the page colour, so the page never composites a translucent full-width layer.
  */
 export const HOME_BACKDROPS = {
   surface: {
-    src: getAssetUrl('/images/home/bg_surface_dim.webp'),
-    srcSm: getAssetUrl('/images/home/bg_surface_dim_sm.webp'),
+    src: getAssetUrl('/images/home/bg_surface_soft.webp'),
+    srcSm: getAssetUrl('/images/home/bg_surface_soft_sm.webp'),
   },
   seabed: {
-    src: getAssetUrl('/images/home/bg_seabed_dim.webp'),
-    srcSm: getAssetUrl('/images/home/bg_seabed_dim_sm.webp'),
-  },
-  pod: {
-    src: getAssetUrl('/images/home/bg_pod_dim.webp'),
-    srcSm: getAssetUrl('/images/home/bg_pod_dim_sm.webp'),
+    src: getAssetUrl('/images/home/bg_seabed_soft.webp'),
+    srcSm: getAssetUrl('/images/home/bg_seabed_soft_sm.webp'),
   },
   gallery: {
-    src: getAssetUrl('/images/home/bg_gallery_dim.webp'),
-    srcSm: getAssetUrl('/images/home/bg_gallery_dim_sm.webp'),
+    src: getAssetUrl('/images/home/bg_gallery_soft.webp'),
+    srcSm: getAssetUrl('/images/home/bg_gallery_soft_sm.webp'),
   },
 } satisfies Record<string, StoryImage>

@@ -57,8 +57,8 @@ export const HomeMelt: React.FC = () => {
       className="relative isolate overflow-hidden py-24 sm:py-36 bg-gradient-to-b from-[#020408] via-[#061722] to-[#020408]"
     >
       <SectionBackdrop image={HOME_BACKDROPS.surface} position="50% 20%" />
-      <DepthLayer kind="shafts" className="-z-10 opacity-80" />
-      <DepthLayer kind="snow" className="-z-10 opacity-60" />
+      <DepthLayer kind="shafts" className="-z-10 opacity-50" />
+      <DepthLayer kind="snow" className="-z-10 opacity-50" />
       <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-20 items-center">
         <ScrollReveal>
           <Eyebrow color="#ff6358">Sound familiar?</Eyebrow>
@@ -139,7 +139,7 @@ export const HomeIdea: React.FC = () => (
     aria-labelledby="home-idea-title"
     className="relative isolate overflow-hidden py-24 sm:py-32 bg-gradient-to-b from-[#020408] via-[#03101a] to-[#020408]"
   >
-    <SectionBackdrop image={HOME_BACKDROPS.seabed} fade="bottom" position="50% 75%" drift={14} />
+    <SectionBackdrop image={HOME_BACKDROPS.seabed} position="50% 75%" drift={14} />
     <div className="absolute inset-x-0 top-0 h-2/3 -z-10 bg-gradient-to-b from-[#020408] via-[#020408]/60 to-transparent" aria-hidden="true" />
     <div className="max-w-6xl mx-auto px-5 sm:px-8">
       <ScrollReveal className="max-w-3xl">
@@ -236,6 +236,30 @@ const StepAction: React.FC<{ step: HomeStep; onNavigate: (path: string) => void 
   </button>
 )
 
+/** No photo here: a soft glow, a still sonar map of the seabed, and a slow ping behind the screen. */
+const HowBackdrop: React.FC<{ sonarAt?: 'right' | 'top' }> = ({ sonarAt = 'top' }) => {
+  const centre = sonarAt === 'right' ? 'left-[64%] top-[55%]' : 'left-[80%] top-24'
+  return (
+    <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            sonarAt === 'right'
+              ? 'radial-gradient(45% 55% at 64% 55%, rgba(0, 195, 255, 0.09), transparent 70%), radial-gradient(35% 40% at 15% 30%, rgba(0, 255, 204, 0.05), transparent 70%)'
+              : 'radial-gradient(70% 35% at 80% 8%, rgba(0, 195, 255, 0.08), transparent 70%)',
+        }}
+      />
+      <DepthLayer
+        kind="contours"
+        style={{ ['--contour-x' as string]: sonarAt === 'right' ? '64%' : '80%', ['--contour-y' as string]: sonarAt === 'right' ? '55%' : '6rem' }}
+      />
+      <DepthLayer kind="sonar" className={`absolute ${centre}`} />
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, #020408, transparent 15%, transparent 85%, #020408)' }} />
+    </div>
+  )
+}
+
 const HowItWorksIntro: React.FC = () => (
   <>
     <Eyebrow color="#00ffcc">How it works</Eyebrow>
@@ -285,7 +309,7 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
   if (!pinned) {
     return (
       <section ref={sectionRef} aria-labelledby="home-how-title" className="relative isolate overflow-hidden py-24 sm:py-32">
-        <SectionBackdrop image={HOME_BACKDROPS.pod} position="50% 60%" />
+        <HowBackdrop />
         <div className="max-w-3xl mx-auto px-5 sm:px-8">
           <ScrollReveal>
             <HowItWorksIntro />
@@ -321,8 +345,7 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
       style={{ height: `${HOME_STEPS.length * 70 + 40}svh` }}
     >
       <div className="sticky top-0 isolate h-[100svh] overflow-hidden flex items-center pt-16">
-        <SectionBackdrop image={HOME_BACKDROPS.pod} position="50% 60%" drift={0} />
-        <DepthLayer kind="caustics" className="-z-10" />
+        <HowBackdrop sonarAt="right" />
         <div className="w-full max-w-6xl mx-auto px-8 grid grid-cols-[0.8fr_1.2fr] gap-16 items-center">
           <div>
             <HowItWorksIntro />

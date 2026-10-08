@@ -7,14 +7,66 @@ import { useInView, usePrefersReducedMotion } from '@/components/what-is-moltolo
  * Ambient deep-sea layers for homepage sections. Every layer is decorative, ignores the pointer,
  * and only animates while its section is on screen.
  */
-export const DepthLayer: React.FC<{ kind: 'snow' | 'caustics' | 'shafts'; className?: string }> = ({
-  kind,
-  className = '',
-}) => {
+export const DepthLayer: React.FC<{
+  kind: 'snow' | 'caustics' | 'shafts' | 'sonar' | 'contours'
+  className?: string
+  style?: React.CSSProperties
+}> = ({ kind, className = '', style }) => {
   const ref = useRef<HTMLDivElement>(null)
   const live = useInView(ref, '120px')
-  return <div ref={ref} className={`home-${kind} ${live ? 'is-live' : ''} ${className}`} aria-hidden="true" />
+  return (
+    <div ref={ref} className={`home-${kind} ${live ? 'is-live' : ''} ${className}`} style={style} aria-hidden="true">
+      {kind === 'sonar' && [0, 1, 2].map((i) => <span key={i} />)}
+      {kind === 'contours' && <ContourMap />}
+    </div>
+  )
 }
+
+/**
+ * Closed, gently wobbling rings around two seabed rises, like a bathymetric chart. Every ring
+ * shares the same few waves with a small per-ring shift, so neighbours stay roughly parallel.
+ * Deterministic, so the server and the browser draw the same paths.
+ */
+export function contourPaths(rings = 11, size = 1000): string[] {
+  const hills = [
+    { cx: 0.5, cy: 0.5, first: 0.035, step: 0.034, count: rings },
+    { cx: 0.8, cy: 0.28, first: 0.02, step: 0.022, count: Math.max(0, Math.round(rings / 2.5)) },
+  ]
+  const paths: string[] = []
+  for (const hill of hills) {
+    for (let k = 0; k < hill.count; k++) {
+      const r = (hill.first + hill.step * k) * size
+      const shift = k * 0.18
+      const points: string[] = []
+      for (let i = 0; i < 96; i++) {
+        const t = (i / 96) * Math.PI * 2
+        const wobble =
+          1 + 0.09 * Math.sin(2 * t + 0.6 + shift) + 0.05 * Math.sin(3 * t + 2.1 - shift) + 0.025 * Math.sin(5 * t + 4 + shift * 2)
+        const x = hill.cx * size + Math.cos(t) * r * wobble * 1.25
+        const y = hill.cy * size + Math.sin(t) * r * wobble
+        points.push(`${x.toFixed(1)} ${y.toFixed(1)}`)
+      }
+      paths.push(`M${points.join('L')}Z`)
+    }
+  }
+  return paths
+}
+
+const CONTOUR_PATHS = contourPaths()
+
+const ContourMap: React.FC = () => (
+  <svg viewBox="0 0 1000 1000" fill="none" focusable="false">
+    {CONTOUR_PATHS.map((d, i) => (
+      <path
+        key={i}
+        d={d}
+        stroke={i % 4 === 3 ? 'rgba(0, 255, 204, 0.14)' : 'rgba(0, 195, 255, 0.09)'}
+        strokeWidth={i % 4 === 3 ? 1.2 : 0.8}
+        vectorEffect="non-scaling-stroke"
+      />
+    ))}
+  </svg>
+)
 
 const FADES = {
   both: 'linear-gradient(to bottom, #020408, transparent 25%, transparent 70%, #020408)',

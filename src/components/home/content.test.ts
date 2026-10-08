@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { HOME_FAQ, HOME_MELT_MOMENTS, HOME_READINGS, HOME_STEPS, HOME_VOICES } from './content'
 import { litMomentForProgress } from './HomeSections'
-import { pointerOffset } from './HomeDepth'
+import { contourPaths, pointerOffset } from './HomeDepth'
 
 describe('homepage content', () => {
   it('picks three member voices that exist in the About content', () => {
@@ -53,5 +53,14 @@ describe('pointerOffset', () => {
   it('clamps outside the element and ignores empty boxes', () => {
     expect(pointerOffset(-1000, 9999, rect)).toEqual({ x: -0.5, y: 0.5 })
     expect(pointerOffset(10, 10, { left: 0, top: 0, width: 0, height: 0 })).toEqual({ x: 0, y: 0 })
+  })
+})
+
+describe('contourPaths', () => {
+  it('draws closed rings for both seabed rises, the same way every time', () => {
+    const paths = contourPaths(10)
+    expect(paths).toHaveLength(14)
+    expect(paths.every((d) => d.startsWith('M') && d.endsWith('Z') && !d.includes('NaN'))).toBe(true)
+    expect(contourPaths(10)).toEqual(paths)
   })
 })
