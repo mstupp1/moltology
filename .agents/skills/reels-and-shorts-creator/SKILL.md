@@ -68,3 +68,11 @@ The existing CLI handles narration, direction, Omni video, compositing, S3, dual
 Use the next queue slot. Never --publish-now without an explicit immediate-publication request. Use scripts/lib/zernio-client.ts through the CLI, not Zernio MCP tools. Verify stored schedule, video URL, both platform targets, Instagram isAiGenerated: true and native firstComment settings. A scheduled first comment is not posted yet. Before retrying an error, check the API and ledger to avoid duplicates.
 
 Commit only production files and preserve unrelated changes. Report the preview, actual schedule and cost estimate with billing uncertainty. Record topic, mascot, paths, post ID, duration, costs and failures in automation memory. These defaults apply to future work; do not replace an existing queued reel unless asked.
+
+## Finish with a clean working tree
+
+Record git status at the start of the run. Final queueing uses --commit for the tracked reel ledger. Commit any other intentional run-owned changes with explicit file paths; never blindly stage the entire working tree or include another task's changes. If a run updates the skill or other tracked production metadata, commit those too. A render-only run normally produces only ignored files.
+
+Keep generated images, video, audio, frame previews, draft JSON, logs and temporary runners under tmp/, which is already ignored. Published media belongs on S3. Add narrow .gitignore entries only when a new kind of disposable output genuinely falls outside the existing rules. Do not ignore tracked content/social ledgers or source files to hide changes.
+
+Before returning, inspect git status --porcelain. The run must leave no new uncommitted or untracked files. Preserve pre-existing or concurrent work; if it remains, report it rather than discarding it or claiming the whole tree is clean. When the user explicitly requests a completely clean current tree, inspect and commit legitimate pre-existing changes within that authorization. Do not use reset --hard, clean -fd or a hidden stash to manufacture cleanliness. Push/sync when the user authorizes it; otherwise the automatic cleanup is a local commit.

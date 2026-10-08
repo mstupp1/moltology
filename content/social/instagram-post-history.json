@@ -393,6 +393,31 @@
       "createdAt": "2026-10-07T15:39:49.594Z",
       "platformPostUrl": "https://www.instagram.com/p/DeMs5gnjP4s/",
       "imageGenerationTool": "built-in-imagegen"
+    },
+    {
+      "id": "post-1791468428046",
+      "topic": "Moltmaxxing Audit: noticing where attention drifts",
+      "hookHeadline": "Your tabs are open. Where is your attention?",
+      "theme": "moltmax-quiz",
+      "mascot": "lobster_engineer",
+      "commentKeyword": null,
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/posts/post-1791468428046.png",
+      "s3Key": "images/social/posts/post-1791468428046.png",
+      "aspectRatio": "3:4",
+      "caption": "Your tabs are open. Where is your attention?\n\nThe Moltmaxxing Audit asks how you meet distractions, decisions, and outgrown habits. Answer from the shell you have today, then choose one small shed from your results.\n\nTake the audit through the link in the first comment. The deep has room for your starting point.",
+      "hashtags": [
+        "#Moltology",
+        "#Moltmaxxing",
+        "#DeepWork"
+      ],
+      "firstComment": "Begin your Moltmaxxing Audit: https://moltology.org/moltmax\nWhich distraction keeps pulling you back to the surface?\n\n#Moltology\n#Moltmaxxing\n#DeepWork",
+      "status": "scheduled",
+      "scheduledFor": "2026-10-08T17:00:00.000Z",
+      "queueId": "6a8d93576f0e96efe2960c91",
+      "zernioPostId": "6ac7a38ef523bf696e16cce5",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "createdAt": "2026-10-08T14:07:10.460Z"
     }
   ]
 }
