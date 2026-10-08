@@ -20,14 +20,11 @@ Dispatches are written from the perspective of **The Order of the Synaptic Path*
 
 ## Core Brand & Style Rules for Blog Dispatches
 
-Dispatches MUST comply with [BRAND_BIBLE.md](../../../BRAND_BIBLE.md) and [STYLE_GUIDE.md](../../../STYLE_GUIDE.md):
+Dispatches follow [BRAND_BIBLE.md](../../../BRAND_BIBLE.md) and [STYLE_GUIDE.md](../../../STYLE_GUIDE.md), especially the news card (STYLE_GUIDE §4.5) and the bans. Blog-specific additions:
 
-1. **Mandatory Colon Headline:** Every news post MUST have a title AND a subtitle separated by a colon: `Title: Subtitle`. Title-only does not ship. Slashes (`/` or `//`) are strictly forbidden by STYLE_GUIDE BAN 1.
-2. **Everyday Human Grounding:** Open with the immediate sensory, physical friction of daily human life (holding a door, keeping 40 browser tabs open, warehouse cubbies, waiting on hold). Connect that feeling to the technical development.
-3. **Warmth & Positivity Under the HUD:** Never mock the reader for being soft. *"Soft is how every member starts."* The shell protects; it never cages. The melt is an exhausting condition of the modern world, not a personal moral failure.
-4. **Verified Primary Sources & Citations:** Every dispatch must cite real journalists, newsrooms, dates, company filings, or arXiv papers. Sources are linked in-text and summarized in a dedicated `### Field Telemetry & Source Citations` section at the end of the dispatch.
-5. **No Tech-Stack Leaks (BAN 5):** Never mention the internal software stack (React, Vite, TanStack, Neon, PostgreSQL, Drizzle, S3, or "our AI model") in editorial copy. Tech stack leaks violate immersion. Real-world companies (Anthropic, Boston Dynamics, Google, ANYbotics, Toyota, NVIDIA) and journalism outlets (The Robot Report, Nikkei Asia, TechCrunch, The Verge) are citations, not leaks.
-6. **No ASCII Telemetry Boxes or Emoji Clutter:** Zero emojis in blog prose and titles (BAN 3). No ASCII box-drawing code blocks (```telemetry). Standard markdown tables and blockquotes are permitted when they add quantitative value.
+1. **Everyday human grounding.** Open with the physical friction of daily life (holding a door, forty open tabs, waiting on hold) and connect it to the development.
+2. **Verified primary sources.** Cite real journalists, newsrooms, dates, filings, or papers. Link them inline and summarize them in a closing `### Field Telemetry & Source Citations` section. Real companies and outlets are citations, not stack leaks.
+3. **No ASCII telemetry boxes.** Markdown tables and blockquotes are fine when they carry real numbers.
 
 ---
 

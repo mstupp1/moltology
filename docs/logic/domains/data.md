@@ -74,7 +74,7 @@ rules:
       - file: scripts/check-asset-budget.ts
         symbol: MAX_FILE_MB
       - file: AGENTS.md
-        symbol: Asset Storage & Media Best Practices
+        symbol: Assets and media
 ---
 
 Most cost decisions trace back to two limits: Neon Free compute hours and Vercel Hobby Active CPU. Anything that polls, keeps compute awake, or grows storage without bound has to justify itself here.

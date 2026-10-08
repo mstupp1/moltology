@@ -11,7 +11,7 @@ rules:
     statement: Chitin Gems can only be earned through progress and contribution. Molt Credits are the only currency bought with real money. No flow may sell Gems.
     anchors:
       - file: BRAND_BIBLE.md
-        symbol: 4.1 The Duality
+        symbol: 4. The Economy
       - file: AGENTS.md
         symbol: Hard list
   - id: economy.red-line
@@ -21,7 +21,7 @@ rules:
     dependsOn: [economy.two-currencies]
     anchors:
       - file: BRAND_BIBLE.md
-        symbol: 4.4 The Red Line
+        symbol: 4. The Economy
   - id: economy.signup-free
     title: Signup is free
     kind: invariant
@@ -82,6 +82,6 @@ rules:
         symbol: simulateDailyRoutines
 ---
 
-The economy is a locked design decision in `BRAND_BIBLE.md` §4 and hard rule 4 in `AGENTS.md`. Every paid feature must be checked against the red line before it ships.
+The economy is a locked design decision in `BRAND_BIBLE.md` §4 and hard rule 2 in `AGENTS.md`. Every paid feature must be checked against the red line before it ships.
 
 Today the market is a demo. No real Credits are sold and nothing is enforced on the server.

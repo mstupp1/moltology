@@ -9,7 +9,7 @@ rules:
     title: Premium is staff-only for now
     kind: gate
     status: soft-launch
-    statement: The /premium page, checkout, price lookup, and the billing portal all require staff clearance during the soft launch. The dashboard banner is also shown only to staff.
+    statement: The /premium page, checkout, price lookup, and the billing portal all require a staff role during the soft launch. The dashboard banner is also shown only to staff.
     dependsOn: [access.hidden-pages]
     anchors:
       - file: src/lib/server/premium.ts

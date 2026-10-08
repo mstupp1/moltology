@@ -129,13 +129,12 @@ Google Flow stays a **human handoff**. The agent writes scene directives. The us
 
 Captions, first comments, HUD badges, outro CTAs, ledger blurbs, and skill examples that could be pasted onto a reel are public copy. [BRAND_BIBLE.md](../../../BRAND_BIBLE.md) wins on world. [STYLE_GUIDE.md](../../../STYLE_GUIDE.md) wins on writing.
 
-* **BAN 1:** no slash-pair titles. Series name and episode code are two fields. Separator if needed: middle dot, period, or colon. Em dash last resort.
+* All STYLE_GUIDE bans apply. Reel-specific notes follow.
+* Series name and episode code are two fields, never a slash-pair.
 * **Depth is meters**, never fathoms. Workplace / hardware texture: about ninety meters. Mariana / apex texture: about eleven thousand meters. Do not invent a new cosmology.
 * **Path / rank** is four stages and twelve clearances. The quiz measures that ladder. Never a 15-stage exam.
-* **Stay in the bit.** Generated copy, captions, comments, badges, and ledger blurbs must never label the bit. Agent-only: do not write satire, parody, or “dismantling the joke” into those surfaces. That sentence is instruction, not copy.
-* **Economy:** Chitin Gems are earned. Molt Credits are bought. Keep currency names correct if they appear, but leave the economy out of scripts, captions, and badges. No "earned, never bought" or "never for sale" lines.
-* **News:** if a reel cites a real outlet, hyperlink the outlet or headline in the caption. Journalism citations are not stack leaks.
-* **Hashtags:** max three, in the first comment, not glued into caption prose. Max one emoji in a caption. None in titles, eyebrows, or CTA buttons.
+* **Economy:** leave it out of scripts, captions, and badges. Keep currency names correct if they appear.
+* **News:** if a reel cites a real outlet, hyperlink the outlet or headline in the caption.
 
 ### 1. The Infinite Retention Loop
 Instagram's algorithm heavily rewards videos that viewers rewatch without noticing the loop point. Every series script is engineered so the final phrase seamlessly connects back into the opening hook word:

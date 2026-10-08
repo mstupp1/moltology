@@ -88,7 +88,7 @@ surface.
 
 1. **Choose the hour, not the mood.** The same hour, daily. The body learns a descent the
    way it learns a route.
-2. **Seal before you dive, not after.** Engage the Isolation Privacy Shell first. The
+2. **Seal before you dive, not after.** Engage the Isolation Dome first. The
    surface cannot be silenced from below; it can only be shut out from above.
 3. **Descend for two hours.** One task. No second task waiting in the same session. Two
    tasks in one dive is a surface habit wearing a diving suit.

@@ -73,7 +73,7 @@ rules:
       - file: src/lib/progression.ts
         symbol: SUB_STAGE_THRESHOLDS
       - file: BRAND_BIBLE.md
-        symbol: 4.5 Stages and Clearances Table
+        symbol: 3.3 Stages and clearances
     tests: [src/lib/progression.test.ts]
   - id: progression.legacy-stage
     title: Legacy stage backfill

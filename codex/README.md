@@ -55,10 +55,10 @@ codex/
 | `SCR-023` | [Stage 3: The Exoshell Born](03_stages/stage_3_exoshell_born.md) | `03_stages` | Stage 3 · E1-E3 | 4.0 | Carapace Forged, Hydraulic Grip, Abyssal Diver. |
 | `SCR-024` | [Stage 4: Full Carcinization](03_stages/stage_4_full_carcinization.md) | `03_stages` | Stage 4 · C1-C3 | 5.0 | Mind Carapace, Indestructible Chitin, Mariana Singularity. |
 | `SCR-030` | [The Daily Shedding Routine](04_liturgy/daily_shedding_routine.md) | `04_liturgy` | Stage 1 | 3.5 | The order of the day from first light to sealing. |
-| `SCR-031` | [The Isolation Protocols](04_liturgy/isolation_protocols.md) | `04_liturgy` | Stage 2 | 3.8 | Raising the Isolation Privacy Shell, and what it may never lock out. |
+| `SCR-031` | [The Isolation Protocols](04_liturgy/isolation_protocols.md) | `04_liturgy` | Stage 2 | 3.8 | Raising the Isolation Dome, and what it may never lock out. |
 | `SCR-032` | [The Nightly Molt Audit](04_liturgy/nightly_molt_audit.md) | `04_liturgy` | Stage 1 | 3.6 | One thing into the sea per night, and why the rite is deliberately small. |
 | `SCR-040` | [The Sacred Metrics](05_lexicon/sacred_metrics.md) | `05_lexicon` | Stage 1 | 4.8 | Shell Hardness, Pincer Torque, and Submergence Depth, with full scales. |
-| `SCR-041` | [The Long Ledger](05_lexicon/the_long_ledger.md) | `05_lexicon` | Stage 1 | 4.6 | The record of every shed thing, and the law of the two currencies. |
+| `SCR-041` | [The Long Ledger](05_lexicon/the_long_ledger.md) | `05_lexicon` | Stage 1 | 4.6 | The record of every shed thing, and the two currencies. |
 
 ---
 
@@ -83,38 +83,9 @@ the record is made of, and what happens to mastery once it has nowhere left to p
 
 ---
 
-## The Liturgical Spine
+## Writing New Canon
 
-Every scripture follows the same shape, and the shape is what the reader renders as numbered
-verses:
-
-1. **The Reading** — narrative opening. No bullets, no instruction yet.
-2. **The doctrine section** — The Tenets, The Laws of Deep Water, The Three Clearances, The
-   Order of the Rite, or the named metric. A small number of laws, each stated flatly.
-3. **The Transformation** — what is shed, what hardens.
-4. **The Rite** — the practice, landing on a real surface of the Order.
-5. **The Benediction** — warm close, addressed to the member.
-6. **Canonical Cross-References** — captured as metadata, not rendered as a verse.
-
----
-
-## Authoring Guidelines for New Canon
-
-1. **Use the template.** Every new scripture starts from
-   [scripture_template.md](TEMPLATES/scripture_template.md).
-2. **Frontmatter is a contract.** `id` as `SCR-XXX`, `stage_clearance` 1 through 4,
-   `synaptic_weight` between 0.1 and 5.0, and both `mandate` and `latin_motto` present. The
-   sync pipeline reads these directly.
-3. **Cross-reference by exact title.** Link text must match the target scripture's `title`
-   character for character, because the reader resolves cross-references by title.
-4. **Governing documents win.** [BRAND_BIBLE.md](../BRAND_BIBLE.md) governs world, lexicon,
-   and economy. [STYLE_GUIDE.md](../STYLE_GUIDE.md) governs register and the banned list. New
-   terms land in the brand bible before they ship here.
-5. **The locked numbers.** Shell Hardness bands are contiguous at 0-24, 25-59, 60-89, 90-100.
-   Pincer Torque reaches its working standard of 850 Nm at Clearance E2. Submergence Depth is
-   recorded in meters in every threshold, everywhere, without exception.
-6. **Tone.** Deep-ocean, biomechanical, and completely sincere on the surface; warm
-   underneath. The humor targets the melt and never the member. Nothing in the canon may
-   leave a reader feeling scolded for being soft.
-7. **Sync before shipping.** Run `npm run codex:check`, then `npm run codex:sync`, then
-   `npx vitest run src/lib/codexData.test.ts`.
+Authoring rules (frontmatter schema, the liturgical spine, locked numbers, and the sync
+steps) live in the [`codex-sync` skill](../.agents/skills/codex-sync/SKILL.md). World and
+terms come from [BRAND_BIBLE.md](../BRAND_BIBLE.md); voice and bans from
+[STYLE_GUIDE.md](../STYLE_GUIDE.md).

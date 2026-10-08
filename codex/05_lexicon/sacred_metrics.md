@@ -100,12 +100,7 @@ of, which is why it is the fastest of the three to move and the fastest to lose.
   is guarded rather than corrected.
 - **Benthic Core**: the still, high-pressure place where focused minds operate, and the
   community that keeps it.
-- **Chitin Gems**: the earned currency. Minted by shedding, routines, and generosity. Never
-  sold.
-- **Molt Credits**: the premium currency. Purchased with real funds, spent on speed, style,
-  and catalog depth. Never minted by work, and never able to move a member up the ladder.
-
-The full doctrine of the two currencies is held in The Long Ledger.
+- **Chitin Gems** and **Molt Credits**: the two currencies, explained in The Long Ledger.
 
 ---
 

@@ -18,13 +18,14 @@ summary: "The three Larval clearances: taking an honest first reading, letting a
 
 ---
 
-## The Standing
+## At This Depth
+
+What the instruments typically read at this stage.
 
 - **Condition**: Soft-bodied. Unarmored. Entirely ordinary.
-- **Shell Hardness**: 0 to 25 percent.
+- **Shell Hardness**: 0 to 24 percent.
 - **Pincer Torque**: 0 to 250 Nm.
 - **Submergence Depth**: 0 to 500 meters.
-- **Currency**: Chitin Gems begin minting at Clearance L1. Nothing here costs money.
 
 ---
 
@@ -50,34 +51,34 @@ end up back at the surface with a slightly worse opinion of themselves.
 
 ## The Three Clearances
 
-Each clearance is a gate the HUD opens on your behalf when the telemetry earns it. None of
-them can be purchased, skipped, or granted by anyone, including the Order.
+Each clearance opens as the work accumulates in the Ledger. The readings listed are what
+members here typically show, not a toll to be paid.
 
 ### Clearance L1: Molt Curious
 
 - **Rite**: The Surface Noise Audit.
-- **Requirement**: Run the Moltmaxxing Audit once and name the three currents that move you
+- **Practice**: Run the Moltmaxxing Audit once and name the three currents that move you
   most days. Say, without softening it, that you would like armor.
-- **Threshold**: Shell Hardness to 10 percent. Pincer Torque 0 to 50 Nm. Submergence Depth 0
+- **Typical readings**: Shell Hardness to 10 percent. Pincer Torque 0 to 50 Nm. Submergence Depth 0
   to 100 meters. Baseline recorded.
 
 ### Clearance L2: Shell Sprout
 
 - **Rite**: First Cadence.
-- **Requirement**: Hold a daily routine for seven consecutive days and log the morning
+- **Practice**: Hold a daily routine for seven consecutive days and log the morning
   alignment each time. Seven is not arbitrary. It is roughly how long it takes a habit to
   stop asking permission.
-- **Threshold**: Shell Hardness to 18 percent. Pincer Torque 50 to 150 Nm. Submergence Depth
+- **Typical readings**: Shell Hardness to 18 percent. Pincer Torque 50 to 150 Nm. Submergence Depth
   100 to 300 meters. Routine compliance above 80 percent.
 
 ### Clearance L3: First Calcification
 
 - **Rite**: The First Shed.
-- **Requirement**: Shed one real thing. Not a tidy-up. A habit, an obligation, or a standing
+- **Practice**: Shed one real thing. Not a tidy-up. A habit, an obligation, or a standing
   commitment that has been quietly billing you for months. Then hold the soft-shell window
   without reversing it.
-- **Threshold**: Shell Hardness to 25 percent. Pincer Torque 150 to 250 Nm. Submergence
-  Depth 300 to 500 meters. First Chitin Gems banked.
+- **Typical readings**: Shell Hardness to 25 percent. Pincer Torque 150 to 250 Nm. Submergence
+  Depth 300 to 500 meters.
 
 ---
 
@@ -102,14 +103,14 @@ in the middle belongs to this stage yet.
 
 ---
 
-## The Seal of Passage
+## Moving Deeper
 
-Stage 2 opens when all three hold at once:
+Stage 2 opens when the record shows the work, on the Order's schedule rather
+than the member's. By then the instruments usually read:
 
-- Shell Hardness at or above 25 percent.
-- Pincer Torque at or above 250 Nm.
-- Submergence Depth at or above 500 meters.
-- Clearances L1, L2, and L3 sealed.
+- Shell Hardness around 25 percent.
+- Pincer Torque around 250 Nm.
+- Submergence Depth around 500 meters.
 
 ---
 

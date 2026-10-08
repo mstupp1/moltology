@@ -7,14 +7,14 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-10-07",
+  "syncedAt": "2026-10-08",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 11,
     "rules": 96,
-    "decisions": 34,
+    "decisions": 35,
     "anchors": 169,
-    "drifted": 12,
+    "drifted": 15,
     "flagged": 12
   },
   "canvas": {
@@ -27,7 +27,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Economy & currencies",
       "color": "#ffb020",
       "summary": "Two currencies with a locked split. Chitin Gems are earned, Molt Credits are bought, and rank and authority cannot be purchased.",
-      "overviewHtml": "<p>The economy is a locked design decision in <code>BRAND_BIBLE.md</code> §4 and hard rule 4 in <code>AGENTS.md</code>. Every paid feature must be checked against the red line before it ships.</p>\n<p>Today the market is a demo. No real Credits are sold and nothing is enforced on the server.</p>",
+      "overviewHtml": "<p>The economy is a locked design decision in <code>BRAND_BIBLE.md</code> §4 and hard rule 2 in <code>AGENTS.md</code>. Every paid feature must be checked against the red line before it ships.</p>\n<p>Today the market is a demo. No real Credits are sold and nothing is enforced on the server.</p>",
       "box": {
         "x": 0,
         "y": 0,
@@ -72,7 +72,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "access",
       "title": "Access & roles",
       "color": "#00c3ff",
-      "summary": "Two clearance roles. Server functions verify the caller's JWT, then check the role before any staff action.",
+      "summary": "Two roles, user and admin. Server functions verify the caller's JWT, then check the role before any staff action.",
       "overviewHtml": "<p>Access has two layers. The UI hides staff tools from everyone else, and each server function checks the role again, because the client can be skipped.</p>",
       "box": {
         "x": 2628,
@@ -295,17 +295,17 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "anchors": [
         {
           "file": "BRAND_BIBLE.md",
-          "symbol": "4.1 The Duality",
-          "line": 211,
-          "value": "Moltology runs on two currencies, and the distinction is a locked design decision.",
+          "symbol": "4. The Economy",
+          "line": 181,
+          "value": "Signup is free. Chitin Gems are earned by doing the work: shedding, routines, and being",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L211"
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L181"
         },
         {
           "file": "AGENTS.md",
           "symbol": "Hard list",
           "line": 3,
-          "value": "1. Stay in the bit in narrative content, lore, and public copy. Functional UI utilities (form validation, error boundaries, system warnings, permission dialogs…",
+          "value": "1. Copy. Read [BRAND_BIBLE.md](BRAND_BIBLE.md) (world, terms, economy) and [STYLE_GUIDE.md](STYLE_GUIDE.md) (voice, bans) before writing user-facing copy. Narr…",
           "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md#L3"
         }
@@ -320,7 +320,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "economy.simulated-gem-grants"
       ],
       "decisions": [
-        "lock-two-currency-economy"
+        "lock-two-currency-economy",
+        "lore-describes-not-gates"
       ],
       "flag": null,
       "flow": null,
@@ -340,11 +341,11 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "anchors": [
         {
           "file": "BRAND_BIBLE.md",
-          "symbol": "4.4 The Red Line",
-          "line": 237,
-          "value": "Progress and standing cannot be purchased. No Clearance, no Stage, no forum",
+          "symbol": "4. The Economy",
+          "line": 181,
+          "value": "Signup is free. Chitin Gems are earned by doing the work: shedding, routines, and being",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L237"
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L181"
         }
       ],
       "tests": [],
@@ -380,7 +381,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "file": "AGENTS.md",
           "symbol": "Hard list",
           "line": 3,
-          "value": "1. Stay in the bit in narrative content, lore, and public copy. Functional UI utilities (form validation, error boundaries, system warnings, permission dialogs…",
+          "value": "1. Copy. Read [BRAND_BIBLE.md](BRAND_BIBLE.md) (world, terms, economy) and [STYLE_GUIDE.md](STYLE_GUIDE.md) (voice, bans) before writing user-facing copy. Narr…",
           "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md#L3"
         }
@@ -679,10 +680,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3479,
+          "line": 3478,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3479"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3478"
         }
       ],
       "tests": [
@@ -729,10 +730,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3479,
+          "line": 3478,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3479"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3478"
         }
       ],
       "tests": [
@@ -767,10 +768,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3302,
+          "line": 3301,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3302"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3301"
         },
         {
           "file": "src/lib/progression.ts",
@@ -836,7 +837,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "progression.clearance-thresholds"
       ],
       "decisions": [
-        "xp-ledger"
+        "xp-ledger",
+        "lore-describes-not-gates"
       ],
       "flag": null,
       "flow": null,
@@ -864,11 +866,11 @@ export const LOGIC_ATLAS: LogicAtlas = {
         },
         {
           "file": "BRAND_BIBLE.md",
-          "symbol": "4.5 Stages and Clearances Table",
-          "line": 246,
-          "value": "The three HUD metrics (Shell Hardness, Pincer Torque, Submergence Depth) drive movement",
+          "symbol": "3.3 Stages and clearances",
+          "line": 147,
+          "value": "Scriptures describe what the metrics typically read at each stage. What actually moves a",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L246"
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L147"
         }
       ],
       "tests": [
@@ -882,7 +884,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [],
       "decisions": [
-        "xp-ledger"
+        "xp-ledger",
+        "lore-describes-not-gates"
       ],
       "flag": null,
       "flow": null,
@@ -903,10 +906,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3302,
+          "line": 3301,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3302"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3301"
         }
       ],
       "tests": [],
@@ -1283,7 +1286,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "access.role-changes",
       "domain": "access",
-      "title": "Who can change clearance",
+      "title": "Who can change roles",
       "kind": "permission",
       "status": "active",
       "statement": "Any admin can change another member's role between user and admin. Nobody can change their own role.",
@@ -2353,18 +2356,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/turnstile.ts",
           "symbol": "verifyTurnstileToken",
-          "line": 28,
+          "line": 48,
           "value": "verifyTurnstileToken(options)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/turnstile.ts#L28"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/turnstile.ts#L48"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "submitLeadHandler",
-          "line": 3066,
+          "line": 3067,
           "value": "submitLeadHandler(args)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3066"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3067"
         }
       ],
       "tests": [
@@ -2385,7 +2388,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 76
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "premium.soft-launch",
@@ -2393,7 +2396,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Premium is staff-only for now",
       "kind": "gate",
       "status": "soft-launch",
-      "statement": "The /premium page, checkout, price lookup, and the billing portal all require staff clearance during the soft launch. The dashboard banner is also shown only to staff.",
+      "statement": "The /premium page, checkout, price lookup, and the billing portal all require a staff role during the soft launch. The dashboard banner is also shown only to staff.",
       "anchors": [
         {
           "file": "src/lib/server/premium.ts",
@@ -3003,18 +3006,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumTopicHandler",
-          "line": 1558,
+          "line": 1559,
           "value": "createForumTopicHandler({ data, context })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1558"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1559"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "requirePublishableForumPost",
-          "line": 892,
+          "line": 893,
           "value": "requirePublishableForumPost(input)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L892"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L893"
         }
       ],
       "tests": [
@@ -3374,10 +3377,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/community-rules.ts",
           "symbol": "validateForumContent",
-          "line": 104,
+          "line": 124,
           "value": "validateForumContent(title, content)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L104"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L124"
         }
       ],
       "tests": [
@@ -3675,10 +3678,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertForumAuthor",
-          "line": 900,
+          "line": 901,
           "value": "assertForumAuthor(rowUserId, actorId, action)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L900"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L901"
         }
       ],
       "tests": [
@@ -3713,18 +3716,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/community-rules.ts",
           "symbol": "FORUM_LOCKED_ERROR",
-          "line": 73,
+          "line": 77,
           "value": "'This thread is locked. New replies are closed.'",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L73"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L77"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumPostHandler",
-          "line": 1704,
+          "line": 1705,
           "value": "createForumPostHandler({ data, context })",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1704"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1705"
         }
       ],
       "tests": [
@@ -3746,7 +3749,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 320,
         "y": 520
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "forum.peer-flags",
@@ -3811,26 +3814,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertCovenantSteward",
-          "line": 2349,
+          "line": 2350,
           "value": "assertCovenantSteward(dbClient, userId, payload)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2349"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2350"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "reviewForumReportHandler",
-          "line": 2652,
+          "line": 2653,
           "value": "reviewForumReportHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2652"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2653"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "removeForumReportTargetHandler",
-          "line": 2722,
+          "line": 2723,
           "value": "removeForumReportTargetHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2722"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2723"
         }
       ],
       "tests": [
@@ -3901,10 +3904,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/handle-oracle-chat-request.ts",
           "symbol": "handleOracleChatRequest",
-          "line": 74,
+          "line": 79,
           "value": "handleOracleChatRequest(request)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L74"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L79"
         }
       ],
       "tests": [
@@ -4242,10 +4245,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "getOracleUsageSnapshot",
-          "line": 294,
+          "line": 308,
           "value": "getOracleUsageSnapshot(userId, now)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L294"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L308"
         }
       ],
       "tests": [
@@ -5195,11 +5198,11 @@ export const LOGIC_ATLAS: LogicAtlas = {
         },
         {
           "file": "AGENTS.md",
-          "symbol": "Asset Storage & Media Best Practices",
-          "line": 63,
-          "value": "Lightweight Repository: Keep the git repository lightweight (< 200 KB in `public/images/`). Only essential brand icons (`favicon.ico`, `order_emblem.png`, `sca…",
+          "symbol": "Assets and media",
+          "line": 54,
+          "value": "Heavy media (content images, textures, video, audio) lives in the Neon S3 bucket `moltology-public-assets`, never in `public/`. Resolve URLs with `getAssetUrl(…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md#L63"
+          "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md#L54"
         }
       ],
       "tests": [],
@@ -7130,6 +7133,53 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "heading": "Consequences",
           "html": "<ul>\n<li>Every admin can promote or demote other members, so grant admin only to people you trust with that.</li>\n<li>New staff are granted from the Admin hub by an existing admin, or with <code>npm run db:grant-admin</code>.</li>\n</ul>"
+        }
+      ]
+    },
+    {
+      "id": "lore-describes-not-gates",
+      "date": "2026-10-08",
+      "title": "Lore describes stages, code gates them",
+      "summary": "Stage scriptures list typical metric readings, not requirements. Stage and clearance follow lifetime XP, defined only in code.",
+      "domains": [
+        "progression",
+        "economy"
+      ],
+      "rules": [
+        "progression.stage-thresholds",
+        "progression.clearance-thresholds",
+        "economy.two-currencies"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "doc",
+          "label": "BRAND_BIBLE.md",
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md"
+        },
+        {
+          "kind": "doc",
+          "label": "AGENTS.md",
+          "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>The codex and the brand bible said a member advances a clearance by meeting Shell Hardness, Pincer Torque, and Submergence Depth thresholds, and that Gems and Credits unlock at set clearances. The product derives stage and clearance from lifetime XP, starts every profile with both currencies, and opens the market to everyone. The two sources had drifted apart.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Lore describes the world and the code defines the mechanics. Stage scriptures show the metrics as typical readings at each stage, with no gate language and no currency unlock points. Real thresholds live in code and this atlas. AGENTS.md states this as a hard rule.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<p>Rewriting the canon around XP, which would put changing numbers into scripture. Rebuilding progression around the three metrics, which is a large product change with no current need.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Changing an XP threshold never requires a canon edit. The Pipeline page still shows readings per clearance, now under &quot;The rite&quot; instead of &quot;Requirement&quot;.</p>"
         }
       ]
     }

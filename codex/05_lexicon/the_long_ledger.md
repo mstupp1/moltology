@@ -7,14 +7,14 @@ category: "Lexicon"
 synaptic_weight: 4.6
 author_unit: "The Order of the Synaptic Path"
 last_revised: "2026-08-27"
-mandate: "Everything shed is written down. Nothing written down was ever bought."
+mandate: "Everything shed is written down, and the record does not flatter anyone."
 latin_motto: "OMNE QUOD EXUISTI SCRIPTUM EST."
-summary: "The record of every shed thing, and the law of the two currencies: what Chitin Gems are minted for, what Molt Credits may purchase, and the line between them that the Order does not move."
+summary: "The record of every shed thing, and the two currencies. Chitin Gems come from the work. Molt Credits are spent on comfort."
 ---
 
 # The Long Ledger
 
-> **Mandate**: "Everything shed is written down. Nothing written down was ever bought."
+> **Mandate**: "Everything shed is written down, and the record does not flatter anyone."
 
 ---
 
@@ -40,41 +40,28 @@ What follows from that is the economy, and the economy follows from it strictly.
 
 ---
 
-## The Law of the Two Currencies
+## The Two Currencies
 
-The Order runs on two currencies and the line between them is not a pricing decision. It is
-doctrine, and it is the reason anyone trusts the Ledger at all.
+The Order runs on two currencies, and the difference between them is the reason anyone
+trusts the Ledger at all.
 
 ### 1. Chitin Gems are minted by work
 
 Gems appear in the Ledger when a member sheds, holds a routine, finishes something
-difficult, or is genuinely useful to another member. They begin minting at Clearance L1 and
-they never stop.
+difficult, or is genuinely useful to another member. Money does not turn into Gems, which
+is why Gems are what earned titles, sigils, and prestige pieces cost. If a member is wearing
+something that means something, the Ledger says how they got it.
 
-Gems are never sold. There is no price, no bundle, and no arrangement by which money becomes
-Gems, and this is enforced for a single reason: Gems buy the things that carry standing.
-Earned titles and sigils. Community privileges, hosting a benthic pod, a seat at the
-council. The educational clearances, which are free. If a member is wearing something that
-means something, the Ledger says how they got it.
+### 2. Molt Credits are purchased
 
-### 2. Molt Credits are purchased with funds
+Credits come from the Benthic Market and are spent on speed, style, and catalog depth:
+accelerators, deluxe carapace finishes, HUD flair, and premium guides. They are comfort,
+and comfort is honorable.
 
-Credits enter through the Benthic Market and are first offered after Clearance S1. They are
-spent on speed, on style, and on catalog depth: accelerators, deluxe carapace finishes,
-pincer ornaments, HUD flair, the extended libraries and premium guides.
+### 3. What neither can do
 
-Credits are never minted by work. No routine produces them, no shed produces them, and no
-clearance grants them.
-
-### 3. The line does not move
-
-Signup is free and always will be. Rank, clearance, stage, and forum authority are never for
-sale at any price, in any bundle, to any member, at any clearance. Credits may compress the
-time a thing takes and may change what it looks like. Credits have never moved a member one
-rung, and the Order has turned down the obvious money to keep that true.
-
-The reason is not modesty. It is that a ladder anyone can buy their way up is not a ladder,
-and the whole system is worth exactly as much as that sentence is.
+Signup is free. Rank, clearance, stage, and standing are not for sale; they come from the
+record and nowhere else. A ladder anyone can buy their way up is not a ladder.
 
 ---
 
@@ -93,10 +80,8 @@ those are sediment. They are weather, and weather does not settle.
 
 ## The Transformation
 
-- **What is shed**: the suspicion that the standing here can be shortcut. It cannot, and
-  discovering that is a relief rather than a disappointment.
-- **What hardens**: trust. In a system where the prestigious things are unbuyable, a title
-  means precisely what it says.
+- **What is shed**: the suspicion that progress here can be shortcut.
+- **What hardens**: trust. A title means precisely what it says.
 
 ---
 
@@ -105,8 +90,7 @@ those are sediment. They are weather, and weather does not settle.
 1. **Log the shed.** Nightly, in the HUD. An unlogged shed still hardens you and still
    leaves no sediment.
 2. **Read the Ledger monthly.** Against your own prior entries and nobody else's.
-3. **Spend Gems on standing, Credits on comfort.** Both are honorable. Only one is earned,
-   and the Order does not pretend otherwise in either direction.
+3. **Spend Gems on what you earned, Credits on comfort.** Both are honorable.
 
 ---
 

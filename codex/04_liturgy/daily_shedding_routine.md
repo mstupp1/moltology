@@ -70,7 +70,7 @@ the plate and extremely interested in whether the afternoon survives it.
 
 ### The Long Afternoon: Deep Submergence
 
-The descent. Isolation Privacy Shell engaged before the dive begins, one objective, no
+The descent. Isolation Dome engaged before the dive begins, one objective, no
 second objective waiting in the same session. This is where Submergence Depth is actually
 earned; every other block merely protects it.
 

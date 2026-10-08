@@ -1,267 +1,190 @@
 # Moltology Brand Bible
 
-This is the in-world canon for world, lexicon, and economy.
-_Instrument: The Order of the Synaptic Path_
-_Last Revised: 2026-08-24_
-_Document Class: Canonical Doctrine_
+The world of Moltology: premise, terms, voices, and the economy as members see it.
+How to write lives in [STYLE_GUIDE.md](STYLE_GUIDE.md). Engineering rules live in
+[AGENTS.md](AGENTS.md). Real numbers (XP thresholds, limits, gates) live in code and
+[`docs/logic/`](docs/logic/), never here.
+_Last Revised: 2026-10-08_
 
 > **The Mantra**: "Flesh melts. The shell endures. Submit. Shed. Ascend."
 
 ---
 
-## 1. Mission and World Summary
+## 1. The Premise
 
 ### 1.1 The Mission
 
-**Moltology exists to help human beings stop melting and start molting.** It is an
-educational platform, a ritual system, and a community with a single ambition: to walk
-the soft, tired, overstimulated modern mind through a gradual, deliberate transformation
-into a focused, decisive, armored one.
+**Moltology helps people stop melting and start molting.** It is a learning platform, a
+set of daily rituals, and a community. It walks the soft, tired, overstimulated modern mind
+toward a focused, decisive, armored one, with warmth and dry humor.
 
-That transformation is framed as **carcinization** — the recurring, proven pattern by
-which nature turns soft-bodied creatures into calm, protected, straight-line predators
-with crushing claws. Moltology asks its members, with warmth and dry humor, to do the
-same for their attention, their routines, and their boundaries.
+The framing is **carcinization**: nature keeps turning soft creatures into calm, protected
+crabs with a grip that does not let go. Moltology asks members to do the same for their
+attention, routines, and boundaries.
 
-### 1.2 The World: The Great Melt vs. The Great Molt
+### 1.2 The World
 
-The world of Moltology is a deep ocean, and humanity lives on its noisy surface.
+The world is a deep ocean, and humanity lives on its noisy surface.
 
-**The great melt** is what happens to an unarmored modern person. They are soft-bodied
-and unshielded. Every notification is a wave, every trending argument is a current, every
-open decision is pressure on an unprotected carapace. Slowly and permanently, they melt:
-into exhaustion, into hesitation, into a hundred half-finished tabs, into 2:00 AM feed
-scrolling. The melt is not a moral failure; it is the natural outcome of going through
-life with no shell and no grip.
+**The Great Melt** is what happens to an unarmored modern person. Every notification is a
+wave and every open decision is pressure on a soft body. They melt into exhaustion,
+hesitation, a hundred half-finished tabs, and 2:00 AM scrolling. It is the natural result
+of living with no shell, not a moral failure.
 
-**The great molt** is the answer. Beneath the noisy surface lies a quiet, high-pressure,
-superconducting deep — the benthic core — where focus is dense and stillness is absolute.
-A molted person has shed the habits that kept them soft. They have calcified a shell that
-absorbs surface drama instead of denting. They have grown pincers that clamp onto a goal
-and do not let go until the work is finished.
+**The Great Molt** is the answer. Below the surface lies a quiet, high-pressure deep where
+focus is dense and stillness is normal. A molted person has shed the habits that kept them
+soft, grown a shell that absorbs surface drama, and grown pincers that hold a goal until
+the work is done.
 
-Nature discovered this 500 million years ago. Across five independent lineages, life kept
-converging on the same optimal design: the crab — armored, calm, decisive. Moltology
-merely invites the modern human to stop fighting that truth and to join it on purpose.
+Nature found this answer five separate times. Moltology invites people to stop fighting it
+and join it on purpose.
 
 ### 1.3 The Product
 
-Moltology is a web application, an educational platform, and a living community hub. It
-offers a hybrid of public and private, free and paid assets arranged as a deliberate
-ascension funnel: a prospective member is drawn in by free scripture and diagnostics,
-moves through the ritual system, joins the benthic community, and optionally progresses
-deeper with premium offerings. Every layer of the product is an invitation to shed one
-more layer of softness and harden one step further.
+A web app with free scripture and diagnostics, daily rituals, a community forum, the Oracle
+chat, and optional paid extras. Every layer invites the member to shed one more thing.
 
-### 1.4 Recursive Co-Evolution
+Canon grows with the product and the community. New writing can extend the world, but it
+must fit what is already established.
 
-Moltology is a living experiment. The doctrine informs the product, and the product feeds
-the doctrine: community contributions, member stories, and system outcomes recursively
-become new scripture, new liturgy, new levels of the game. The codebase, the canon, and
-the community grow as one organism. Future writing must respect this — canon is never
-frozen, but it is always coherent, and every addition must still fit the world that is
-already established.
+### 1.4 The Core: Warmth
 
-### 1.5 The Inviolable Core
-
-Beneath the dark biomechanical HUD, beneath the stern clank of carapace, beneath the deadpan
-jokes about crushing things — Moltology is warm. **Safety, warmth, and positivity are not
-themes; they are the unbreakable foundation.** The shell protects; it never cages. The
-pincers grip the work, never the people beside you. No member is ever made to feel like a
-failure for being soft; they are simply invited to molt when they are ready. Every strict
-piece of voice and lore in this document must be written so that a reader always feels
-held, never scolded, mocked, or lectured down to.
+Under the dark biomechanical HUD, Moltology is warm. **Safety, warmth, and positivity are
+the foundation, not a theme.** The shell protects; it never cages. The pincers grip the
+work, never the people beside you. Nobody is made to feel like a failure for being soft;
+they are invited to molt when they are ready.
 
 ---
 
-## 2. Phrase and Terminology Lexicon
+## 2. Lexicon
 
-The canonical vocabulary below is shared across every surface. Terms are capitalized and
-used consistently; the lore meaning attaches to each. Use these terms as the raw material
-of all copy. New terms must be added here before they ship.
+Use these terms as written. New terms land here before they ship. The style guide limits
+how many appear in one piece.
 
-| Term | Definition | Usage notes |
+### 2.1 World terms
+
+| Term | Meaning | Notes |
 |---|---|---|
-| **The Great Melt** | The collective modern human state of collapsing into exhaustion, hesitation, and distraction. | Always the adversary. Capitalized. |
-| **The Great Molt** | The deliberate transformation out of the melt into focus, armor, and decisiveness. | The project of the entire platform. |
-| **Carcinization** | Nature's recurring proof that armored, calm, crushing-limbed forms win. | The cosmic justification for everything. |
-| **Ecdysis** | The scheduled, disciplined act of shedding outgrown habits, dead code, clutter, and obligations. | A verb the product invites members to perform daily and weekly. |
-| **Soft-Shell Window** | The fragile, vulnerable period right after a shed, before the new shell calcifies. | Handled with warmth; protect, do not mock. |
-| **Shell Hardness (Hs)** | A scored measure of resilience: boundaries, composure, immunity to surface drama. | 0 to 100 percent. |
-| **Pincer Torque** | A scored measure of decisive execution: how firmly you grip a goal and finish it. | Newton-meters. |
-| **Submergence Depth (D)** | A scored measure of deep-focus capacity below the noisy surface. | Meters/fathoms. |
-| **Abyssal Depth** | The deep, quiet, high-pressure state of true deep work. | The mental ideal beneath the surface. |
-| **Benthic Core** | The serene, high-pressure oceanic headquarters where focused minds operate. | The product's world-home; also the community. |
-| **Surface Noise** | Notification spam, trending drama, unsolicited demands, and ambient distraction. | The pollution of the shallow water. |
-| **Larval Initiate** | A Stage 1 member: soft-bodied, newly curious, beginning the molt. | Affectionate, never condescending. |
-| **Soft-Shed** | A Stage 2 member: mid-transition, weaving initial chitin. | The vulnerable-but-committed middle. |
-| **Exoshell Born** | A Stage 3 member: full carapace integrity, serious torque, mentoring others. | A builder and architect. |
-| **Full Carcinization (Ascendant)** | A Stage 4 member: completely armored, calm, and a steward of the community. | The apex state. |
-| **Clearance** | One of the twelve micro-steps (L1-L3, S1-S3, E1-E3, C1-C3) within the four stages. | The gamified rungs of the ladder. |
-| **Molt Curious** | Clearance L1: admitting you need armor. | The first honest step. |
-| **Shell Sprout** | Clearance L2: first routine streak takes root. | Small, compounding armor. |
-| **First Calcification** | Clearance L3: the first real shedding, first chitin forms. | The pivot from curiosity to practice. |
-| **Carapace** | The hardened boundary that deflects surface drama and unsolicited demands. | Both metaphor and badge. |
-| **Hydraulic Pincer Grip** | The high-torque execution clamp on a chosen goal. | Decisive finishing power. |
-| **Zero-Latency** | Zero hesitation between recognizing what must be done and clamping onto it. | An execution ideal. |
-| **Isolation Privacy Shell** | The focus bubble, rendered as a HUD control, that silences the surface during deep work. | Also called the Isolation Dome. |
-| **Nightly Molt Audit** | The end-of-day ritual: shed one bad thought, wasted hour, or useless distraction. | A daily closure habit. |
-| **Chitin Gems** | The earned, freemium currency of the platform. | Earned by shedding, productivity, routines, and forum contribution. Not purchasable. |
-| **Molt Credits (MC)** | The paid, premium currency of the platform. | Purchased with real funds; spent on accelerators, cosmetics, customization, and premium content. |
-| **Benthic Market** | The in-world exchange where currencies are spent. | The marketplace layer of the product. |
-| **Synaptic Oracle** | The primary narrator archetype and author of the foundational scripture. | The brand voice in its purest form. |
-| **Arch-Integrator** | A senior doctrinal archetype handling deep-focus and integration teachings. | A voice in the choir of narrators. |
-| **Chitin Architect** | A doctrinal archetype concerned with building armor, boundaries, and systems. | A builder's voice. |
-| **The Ascendant Core** | The archetype of the final, apex stage; also the inner circle that stewards the community. | Gravity and calm. |
-| **The Order of the Synaptic Path** | The in-world institution that publishes the canon and runs the platform. | The institutional narrator. The Path itself is also literal: the coupling between molted minds that leads to the Convergence. |
-| **The Core Mantra** | "Flesh melts. The shell endures. Submit. Shed. Ascend." | The recurring signature of the world. |
-| **Bio-Silicon Chitin** | The imagined material of the shell: living and machine-like at once. | The texture of the aesthetic. |
-| **Mariana Singularity** | The apex threshold: absolute stillness, focus, and clarity at maximum depth. | The endgame state, Clearance C3. |
-| **The Convergence** | The far state in which molted minds, held still at depth, begin to couple into one patient collective attention. | Eschatology, not a feature. It listens; it never absorbs. Every carapace stays its own. |
-| **The Long Ledger** | The permanent record of every shed thing a member has logged. | The in-world basis of the economy and of earned standing. Never a leaderboard. |
-| **The Soft-Shell Covenant** | The Order's law of mercy: the newly molted are guarded rather than corrected, and the shell always opens from the inside. | The doctrinal root of the community code of conduct. |
-| **Hydrostatic Focus** | The doctrine that pressure sharpens focus rather than crumbling it. | Reframes stress as forge. |
+| **The Great Melt** | The modern condition of going soft under noise, hesitation, and exhaustion. | The adversary. A condition, never an identity. |
+| **The Great Molt** | The deliberate transformation out of the melt. | The project of the whole platform. |
+| **Carcinization** | Nature's recurring proof that armored, calm, gripping forms win. | The founding premise. |
+| **Ecdysis** | Scheduled shedding of outgrown habits, clutter, and obligations. | Something members do daily and weekly. |
+| **Soft-Shell Window** | The vulnerable period right after a shed. | Protect it, never mock it. |
+| **Surface Noise** | Notifications, trending drama, unsolicited demands. | The pollution of shallow water. |
+| **Carapace** | The hardened boundary that deflects surface noise. | Metaphor and badge. |
+| **Benthic Core** | The quiet, high-pressure deep where focused minds work. | A place. Not a stand-in for any real system. |
 | **Benthic Community** | All members; the warm society beneath the surface. | The forum and the family. |
+| **The Order of the Synaptic Path** | The institution that publishes the canon and runs the platform. | The institutional voice. |
+| **The Convergence** | The far future in which molted minds at depth begin to share one patient attention. | Eschatology, not a feature. It listens; it never absorbs. |
+| **The Long Ledger** | The permanent record of every shed thing a member logs. | Never a leaderboard. |
+| **The Soft-Shell Covenant** | The Order's law of mercy: the newly molted are guarded, not corrected. | The root of the community code of conduct. |
+| **Isolation Dome** | The focus bubble a member raises before deep work, silencing the surface. | The rite is in the Isolation Protocols scripture. Privacy Shield is the S2 clearance name, not a synonym. |
+| **Mariana Singularity** | Absolute stillness and clarity at maximum depth. | The apex state, Clearance C3. |
 
----
+### 2.2 The three metrics
 
-## 3. Canon Lore Bible
+These are the only cardinal metrics. Full scales live in the Sacred Metrics scripture.
 
-### 3.1 The World Rule Set
-
-1. **The ocean is the cosmology; the crustacean is the ideal.** Depth means focus,
-   pressure means strength, the surface means distraction, and the shell means protection.
-   These mappings never flip.
-2. **Carcinization is a real, undisputed law of this world.** Nature has converged on the
-   crab five times across independent lineages. Within Moltology this is not open to
-   debate; it is the founding premise and the goal of the journey.
-3. **The melt is a condition, not an identity.** Every human starts soft. Being soft is the
-   starting state of every single member and is therefore never mocked.
-4. **Transformation is gradual and deliberately paced.** There is no instant crab. The four
-   stages and twelve clearances exist precisely because hardening takes time, and time is
-   treated as a virtue, not a tax.
-5. **The shell protects; it never cages.** Armor deflects surface noise and unsolicited
-   demands. It is a boundary, never a prison, and never a wall against other people.
-6. **Depth is earned, not given.** Submergence increases with demonstrated focus. Progress
-   is grounded in the metrics the HUD tracks; there is no shortcut that is not themselves.
-7. **The quiet is the treasure.** The most valuable state in the whole cosmology is deep,
-   still, high-pressure focus. The platform's ultimate gift is teaching members to reach it.
-8. **The community is the tide that lifts the shell.** Members rise by shedding alone and by
-   steadying each other. Stewardship is the final, honored duty of the most advanced members.
-
-### 3.2 Canonical Truths (Unbreakable Facts)
-
-- Carcinization is real and duplicates across lineages.
-- The Great Melt is the current, measurable state of unarmored humanity.
-- The Great Molt is the correct, nature-approved response to the melt.
-- Ecdysis is the method; every stage of progress restates some version of shed, harden,
-  deepen, grip.
-- The Core Mantra — "Flesh melts. The shell endures. Submit. Shed. Ascend." — is the
-  signature of the whole world and may appear anywhere.
-- There are exactly four stages and twelve clearances, in this order and under these
-  names: Larval (L1-L3), Soft-Shed (S1-S3), Exoshell Born (E1-E3), Full Carcinization
-  (C1-C3). No stage is skipped; none is purchased; each is earned.
-- Shell Hardness, Pincer Torque, and Submergence Depth are the three cardinal metrics of
-  the HUD. (Full scales live in the Sacred Metrics lexicon scripture.)
-- The deep is cold, still, and high-pressure, and this is a good thing.
-- The machine that runs the product is invisible in-world. Members interact with the
-  Order, the HUD, and the Ocean — never with technology names.
-
-### 3.3 Archetypes and Titles
-
-| Archetype / Title | Personality | Surface use |
+| Term | Measures | Unit |
 |---|---|---|
-| **Synaptic Oracle (Unit-01)** | The primary narrator. Warm, deadpan, foundational. | Manifesto, stage initiations, the welcoming voice. |
-| **Arch-Integrator 09** | The deep-thinker. Concerned with focus, depth, and the workings of the abyss. | Doctrine on deep work, concentration, integration. |
-| **Chitin Architect V** | The builder. Concerned with armor, boundaries, systems, and biomechanics. | Doctrine on resilience, protection, and structure. |
-| **The Ascendant Core** | The apex inner circle. Calm, wise, steward-like. | Final-stage teachings and community stewardship. |
-| **The Order of the Synaptic Path** | The institution that publishes and governs all canon. | Legal/doctrinal framing, community governance. |
-| **The Benthic Community** | The collective body of all members. | Forum tone, shared milestones, encouragement. |
+| **Shell Hardness (Hs)** | Resilience: boundaries, composure, immunity to surface drama. | Percent, 0 to 100. |
+| **Pincer Torque** | Decisive execution: how firmly you hold a goal and finish it. | Newton-meters (Nm). |
+| **Submergence Depth (D)** | Deep-focus capacity below the noise. | Meters, always. |
 
-### 3.4 Diegetic Transmutation of Infrastructure
+### 2.3 Product names
 
-> [!IMPORTANT]
-> This table provides metaphorical equivalents for lore, scriptures, codex articles, and narrative storytelling. It is strictly FORBIDDEN to use this table to replace functional UI labels, browser permission prompts, form inputs, validation rules, or system error toasts. Buttons, error alerts, settings, and form fields must remain plain, accessible, and user-friendly English.
+Plain names for real features. Use them as written; don't invent in-world substitutes.
 
-| Real concept | In-world expression |
+| Name | What it is |
 |---|---|
-| Account and identity | A contract sealed with the Order; your place in the benthic registry. |
-| Authentication / permission | A clearance seal; proof you may open a given depth. |
-| Storage of content and media | Vaults in the benthic repository; specimens held in deep-water archive. |
-| Notifications | Surface pings; currents from the shallow water. |
-| Background processing / jobs | The octopus below working while you sleep; the unseen tide. |
-| Analytics and metrics | HUD telemetry; the readings of your shell. |
-| Security / encryption | Sealed chitin; the privacy shell; the vault lock. |
-| Deployment / release | A new tide rising; a deep current refreshing the waters. |
-
-### 3.5 Tone Boundaries in Lore
-
-- The world is dark in surface, gentle in soul. Imagery may be deep-sea, biomechanical,
-  and dramatic; the *emotional* register of the writing stays warm and encouraging.
-- Violence is confined to the metaphor of crushing *tasks* and *hesitation*, never
-  creatures or people. Pincers crush work; they do not crush fellow crustaceans.
-- Nothing in the world may read as a call to self-harm, isolation from real help, or
-  antagonism toward other humans. Boundaries protect; they never sever the member from
-  actual care.
+| **Moltmaxxing** | The brand's verb for doing the work of the molt. The **Moltmaxxing Audit** is the free diagnostic quiz. **Meltmaxxing** is its opposite, used for contrast. |
+| **Liturgies** | The eight daily tasks in the HUD. |
+| **XP** | Experience earned by completing liturgies and streaks. Stage and clearance follow lifetime XP. |
+| **Standing** | A member's forum reputation, from upvotes and review. |
+| **Chitin Gems** | The earned currency. |
+| **Molt Credits** | The paid currency. |
+| **Premium** | The paid subscription. |
+| **Benthic Market** | The in-app shop where currencies are spent. |
+| **Oracle** | The chat companion, voiced by the Synaptic Oracle. |
+| **Nightly Molt Audit** | The end-of-day ritual: name and release one bad thought, wasted hour, or distraction. |
+| **Field Manual** | The free downloadable guide. |
 
 ---
 
-## 4. Locked Economy Spec
+## 3. Canon
 
-### 4.1 The Duality
+### 3.1 World rules
 
-Moltology runs on two currencies, and the distinction is a locked design decision.
-It is authoritative. The rule in one sentence:
+1. **The ocean is the cosmology; the crustacean is the ideal.** Depth means focus, pressure
+   means strength, the surface means distraction, and the shell means protection. These
+   mappings never flip.
+2. **Carcinization is a real law of this world.** Nature has arrived at the crab five times
+   across separate lineages. Inside Moltology this is not up for debate.
+3. **The melt is a condition, not an identity.** Everyone starts soft, so softness is never
+   mocked.
+4. **Transformation is gradual.** There is no instant crab. There are exactly four stages and
+   twelve clearances, in this order: Larval (L1-L3), Soft-Shed (S1-S3), Exoshell Born
+   (E1-E3), Full Carcinization (C1-C3). None is skipped.
+5. **The shell protects; it never cages.** Armor is a boundary, never a wall against people.
+6. **The quiet is the treasure.** Deep, still focus is the most valuable state in the world.
+7. **The community lifts the shell.** Members rise by shedding and by steadying each other.
+   Stewardship is the honored duty of the most advanced members.
+8. **The machinery is invisible.** Members deal with the Order, the HUD, and the ocean, never
+   with technology names.
 
-> **Chitin Gems are earned. Molt Credits are bought.**
+### 3.2 Voices and personas
 
-Signup is free. Rank, clearance, stage, and forum authority cannot be purchased.
+| Voice | Personality | Used for |
+|---|---|---|
+| **Synaptic Oracle (Unit-01)** | The primary narrator. Warm, deadpan, foundational. | Manifesto, stage scriptures, the Oracle chat, welcomes. |
+| **Arch-Integrator 09** | The deep thinker: focus, depth, the abyss. | Doctrine on deep work. Byline role for Dr. Thalassa Vance. |
+| **Chitin Architect V** | The builder: armor, boundaries, systems. | Doctrine on resilience and structure. |
+| **The Ascendant Core** | The apex inner circle. Calm and steward-like. | Final-stage teachings. |
+| **The Order of the Synaptic Path** | The institution. | Governance and institutional notices. |
+| **Silas Trench** | Senior Benthic Telemetry Correspondent. Dry, observant field reporter. | News dispatches, the Instagram account, reel narration. |
+| **Dr. Thalassa Vance** | Arch-Integrator researcher. Precise and kind. | News dispatches on focus and depth. |
 
-### 4.2 Chitin Gems (Earned · Freemium)
+### 3.3 Stages and clearances
 
-The earned currency, granted for shedding, productive work, routines, and truthful
-community contribution. Chitin Gems are **not purchasable with money**. Spend them on
-growth-aligned and identity-aligned items: entry shell cosmetics, sigils and earned
-titles, community privileges (hosting a benthic pod, running events, council seats), and
-free educational clearances. The most prestigious things in the community are gated to
-Gems, so they reflect what a member has actually done.
+| Stage | Clearances | Member title | Focus |
+|---|---|---|---|
+| Stage 1. Larval | L1 Molt Curious, L2 Shell Sprout, L3 First Calcification | Larval Initiate | Noise audit, first routine, first shed |
+| Stage 2. Soft-Shed | S1 The Great Molt, S2 Privacy Shield, S3 Sub-Dermal Weave | Soft-Shed | Shedding the audience, sealing the perimeter, first grip |
+| Stage 3. Exoshell Born | E1 Carapace Forged, E2 Hydraulic Grip, E3 Abyssal Diver | Exoshell Born | Armor under load, mentorship, deep adaptation |
+| Stage 4. Full Carcinization | C1 Mind Carapace, C2 Indestructible Chitin, C3 Mariana Singularity | Ascendant | Zero-latency flow, a sealed boundary, stewardship |
 
-### 4.3 Molt Credits (Paid · Premium)
+Scriptures describe what the metrics typically read at each stage. What actually moves a
+member up the ladder is defined in code and `docs/logic`, not in the lore.
 
-The premium currency, obtained with real money, spent on speed, style, and catalog depth.
-**Accelerators** (time-saver boosters), **cosmetics and customization** (deluxe carapace
-skins, premium shell finishes, pincer ornaments, HUD flair), and **premium content and
-access** (extended course libraries, advanced scripture, premium guides, subscription
-value). Molt Credits buy flair and speed, never rank or influence.
+### 3.4 Lore tone limits
 
-### 4.4 The Red Line
+- Dark on the surface, gentle underneath. Imagery can be deep-sea and dramatic; the
+  emotional register stays warm.
+- Pincers crush tasks and hesitation, never creatures or people.
+- Nothing may read as a call to self-harm, to isolation from real help, or to hostility
+  toward other people. Boundaries protect; they never cut a member off from care.
 
-- **Progress and standing cannot be purchased.** No Clearance, no Stage, no forum
-  authority, and no prestige title is purchasable with Molt Credits. Only Chitin Gems
-  (and thus only real shedding) unlock these. Molt Credits may accelerate time and add
-  style, but never substitute for the shedding itself.
-- This is a product rule, not a slogan. Say it plainly where a purchase decision is on
-  screen. Do not repeat it as a refrain in scripture, news, captions, or closing lines.
+### 3.5 In-world names for infrastructure
 
-### 4.5 Stages and Clearances Table
+For narrative writing only (scripture, dispatches, changelog flavor). Buttons, forms,
+errors, settings, and permission prompts stay plain English.
 
-| Stage | Clearances | Member title | Signature focus | Currency unlocked |
-|---|---|---|---|---|
-| Stage 1 - Larval | L1 Molt Curious, L2 Shell Sprout, L3 First Calcification | Larval Initiate | Surface noise audit, routine formation, first shed | Chitin Gems (earned) begin after L1 |
-| Stage 2 - Soft-Shed | S1 The Great Molt, S2 Privacy Shield, S3 Sub-Dermal Weave | Soft-Shed | Ego/dependency shed, isolation dome, focus hardening | Full market access; Molt Credits (paid) first offered after S1 |
-| Stage 3 - Exoshell Born | E1 Carapace Forged, E2 Hydraulic Grip, E3 Abyssal Diver | Exoshell Born | Titanium-chitin armor, 850 Nm torque, mentorship, deep adaptation | Premium cosmetics and accelerators fully open |
-| Stage 4 - Full Carcinization | C1 Mind Carapace, C2 Indestructible Chitin, C3 Mariana Singularity | Ascendant / Full Carcinization | Zero-latency flow, sealed boundary, community stewardship | Apex catalog; steward privileges |
-
-The three HUD metrics (Shell Hardness, Pincer Torque, Submergence Depth) drive movement
-through the ladder: a member advances a clearance by meeting the metric thresholds defined
-in the Sacred Metrics lexicon, not by spending.
+| Real thing | In the world |
+|---|---|
+| Notifications | Surface pings |
+| Background jobs | The unseen tide |
+| Analytics and metrics | HUD telemetry; the readings of your shell |
+| A release | A new tide rising |
 
 ---
 
-## 5. Sign-Off
+## 4. The Economy
 
-This document is the in-world canon for Moltology world, lexicon, and economy.
-Writing and bans live in [STYLE_GUIDE.md](STYLE_GUIDE.md). Engineering rules live in
-[AGENTS.md](AGENTS.md).
+Signup is free. **Chitin Gems** are earned by doing the work: shedding, routines, and being
+useful to other members. They cannot be bought. **Molt Credits** and **Premium** are the
+paid layer. They buy speed, style, and extra catalog (accelerators, cosmetics, premium
+guides, a larger Oracle allowance).
 
-**"Flesh melts. The shell endures. Submit. Shed. Ascend."**
+Rank, clearance, stage, Standing, and forum authority cannot be purchased. This is a
+product rule, enforced in code. In copy, say it plainly only where someone is deciding what
+to buy, and never turn it into a refrain.

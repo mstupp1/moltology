@@ -58,7 +58,7 @@ What is shed, and what hardens in its place. Two short entries, both concrete.
 ## The Rite
 
 The practice. This is the part a member performs, so it must be doable tonight and it must
-land on a real surface of the Order — the Audit, a clearance, the Isolation Privacy Shell,
+land on a real surface of the Order — the Audit, a clearance, the Isolation Dome,
 the Nightly Molt Audit, the Benthic Community, the Benthic Market.
 
 1. **The first act**: one instruction, one sentence.

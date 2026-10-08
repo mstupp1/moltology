@@ -43,8 +43,7 @@ Every changelog entry must be a **high-level, plain explanation** of what was ch
 - **Only create entries for significant changes**: If a day or update is just minor tweaks, small styling fixes, internal developer scripts, or backend plumbing, **do not create an entry**. Only create entries for meaningful feature releases, major UI overhauls, or significant platform additions.
 - **High-level, plain English**: Explain what the user gained in clear, simple language. Lead with the tangible benefit.
 - **No heavy jargon or pseudo-science word salad**: Avoid dense techno-babble or over-complicated lore terms (e.g. avoid *"benthic telemetry"*, *"ingestion CLI"*, *"session armor"*, *"policy siege"*, *"sub-surface scanline textures"*, *"diegetic discipline"*).
-- **No tech-stack leaks**: NEVER surface real-world framework/library names (React, TanStack, Vite, Nitro, Drizzle, Neon, PostgreSQL, JWT, RLS, S3, pgPolicy, etc.).
-- **No slash-pair titles** (STYLE_GUIDE BAN 1). Use a period, a colon, or a middle dot (`·`).
+- **Follow STYLE_GUIDE §3.5 and the bans**, especially no tech-stack names (BAN 5) and no slash-pair titles (BAN 1).
 - **Keep it concise**: 1–2 sentence `summary`, and a short `content` body with 2–3 clear sections and 2–3 plain bullets each.
 - **Category & Tags**: Pick one standard primary category, and add overlapping tags to describe all areas touched by the release.
 

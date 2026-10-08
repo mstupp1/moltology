@@ -182,7 +182,7 @@ export const SACRAMENTS: Sacrament[] = [
       'The surface cannot be silenced from below. Raise the dome first: notifications sealed, one objective, nothing waiting in the same session. This is where depth is made.',
     steps: [
       'Pick one objective. A second objective is a leak.',
-      'Raise the Isolation Privacy Shell before you start.',
+      'Raise the Isolation Dome before you start.',
       'Surface on purpose, not because something pinged.',
     ],
     video: STORY_MEDIA.faultIsolation,
@@ -411,7 +411,7 @@ export const DAILY_PRACTICES = [
   },
   {
     time: 'Mid-morning',
-    title: 'Isolation Privacy Shell',
+    title: 'Isolation Dome',
     body: 'Raise the dome before the dive so two hours belong to the work. Not a bunker personality. A door closed beforehand.',
   },
   {
