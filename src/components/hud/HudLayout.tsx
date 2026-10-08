@@ -21,6 +21,8 @@ import { usePwaInstall } from '@/hooks/usePwaInstall'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAssetUrl } from '@/lib/assets'
 
+const UNDERWATER_BACKGROUND = '/images/hud/underwater-looking-up-hq-v2.webp'
+
 function HudContent() {
   const [isAIDrawerOpen, setIsAIDrawerOpen] = useState(false)
   const [showWelcome, setShowWelcome] = useState(false)
@@ -114,7 +116,7 @@ function HudContent() {
       const img1 = new Image()
       img1.src = getAssetUrl('/images/subterranean_vats_bg.jpg')
       const img2 = new Image()
-      img2.src = getAssetUrl('/images/underwater_looking_up.jpg')
+      img2.src = getAssetUrl(UNDERWATER_BACKGROUND)
     }
   }, [])
 
@@ -138,7 +140,7 @@ function HudContent() {
           className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-150 ${
             isSubterranean ? 'opacity-0' : 'opacity-95'
           }`}
-          style={{ backgroundImage: `url('${getAssetUrl('/images/underwater_looking_up.jpg')}')` }}
+          style={{ backgroundImage: `url('${getAssetUrl(UNDERWATER_BACKGROUND)}')` }}
         />
 
         {/* Full-Bleed Nuclear Subterranean Vats Background */}
@@ -163,7 +165,7 @@ function HudContent() {
           className={`absolute inset-0 z-[2] transition-opacity duration-150 pointer-events-none ${
             isSubterranean
               ? 'bg-[radial-gradient(circle_at_center,rgba(57,255,20,0.45)_0%,rgba(16,185,129,0.22)_55%,transparent_85%)]'
-              : 'bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.45)_0%,rgba(0,195,255,0.2)_55%,transparent_85%)]'
+              : 'bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.35)_0%,rgba(0,195,255,0.16)_55%,transparent_85%)]'
           }`}
         />
 
