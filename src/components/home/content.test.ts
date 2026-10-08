@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { HOME_FAQ, HOME_MELT_MOMENTS, HOME_READINGS, HOME_STEPS, HOME_VOICES } from './content'
 import { litMomentForProgress } from './HomeSections'
+import { pointerOffset } from './HomeDepth'
 
 describe('homepage content', () => {
   it('picks three member voices that exist in the About content', () => {
@@ -38,5 +39,19 @@ describe('litMomentForProgress', () => {
     expect(litMomentForProgress(0.45, count)).toBe(1)
     expect(litMomentForProgress(0.62, count)).toBe(3)
     expect(litMomentForProgress(1, count)).toBe(count - 1)
+  })
+})
+
+describe('pointerOffset', () => {
+  const rect = { left: 100, top: 200, width: 400, height: 200 }
+
+  it('is zero at the centre and half at the edges', () => {
+    expect(pointerOffset(300, 300, rect)).toEqual({ x: 0, y: 0 })
+    expect(pointerOffset(500, 200, rect)).toEqual({ x: 0.5, y: -0.5 })
+  })
+
+  it('clamps outside the element and ignores empty boxes', () => {
+    expect(pointerOffset(-1000, 9999, rect)).toEqual({ x: -0.5, y: 0.5 })
+    expect(pointerOffset(10, 10, { left: 0, top: 0, width: 0, height: 0 })).toEqual({ x: 0, y: 0 })
   })
 })

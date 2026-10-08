@@ -13,7 +13,8 @@ import {
   useScrollProgress,
 } from '@/components/what-is-moltology/story/motion'
 import { VOICE_STAGE_ACCENTS, VOICE_STAGE_LABELS } from '@/components/what-is-moltology/story/content'
-import { HOME_FAQ, HOME_FINAL_IMAGE, HOME_MELT_MOMENTS, HOME_READINGS, HOME_STEPS, HOME_VOICES, type HomeStep } from './content'
+import { DepthLayer, SectionBackdrop, useTilt } from './HomeDepth'
+import { HOME_BACKDROPS, HOME_FAQ, HOME_FINAL_IMAGE, HOME_MELT_MOMENTS, HOME_READINGS, HOME_STEPS, HOME_VOICES, type HomeReading, type HomeStep } from './content'
 
 const LazyLandingAuthCtas = React.lazy(() =>
   import('@/components/LandingAuthCtas').then((m) => ({ default: m.LandingAuthCtas }))
@@ -51,7 +52,13 @@ export const HomeMelt: React.FC = () => {
   })
 
   return (
-    <section aria-labelledby="home-melt-title" className="relative py-24 sm:py-36">
+    <section
+      aria-labelledby="home-melt-title"
+      className="relative isolate overflow-hidden py-24 sm:py-36 bg-gradient-to-b from-[#020408] via-[#061722] to-[#020408]"
+    >
+      <SectionBackdrop image={HOME_BACKDROPS.surface} position="50% 20%" />
+      <DepthLayer kind="shafts" className="-z-10 opacity-80" />
+      <DepthLayer kind="snow" className="-z-10 opacity-60" />
       <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-20 items-center">
         <ScrollReveal>
           <Eyebrow color="#ff6358">Sound familiar?</Eyebrow>
@@ -99,11 +106,41 @@ export const HomeMelt: React.FC = () => {
 
 /* ── The idea: carcinization, and what a shell is made of ────────────── */
 
+const ReadingCard: React.FC<{ reading: HomeReading }> = ({ reading }) => {
+  const tilt = useTilt<HTMLElement>()
+  return (
+    <article
+      ref={tilt.ref}
+      onPointerMove={tilt.onPointerMove}
+      onPointerLeave={tilt.onPointerLeave}
+      className="home-tilt group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-[#05090c] shadow-[0_30px_60px_rgba(0,0,0,0.45)] hover:border-white/20"
+    >
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <StoryImg
+          image={reading.image}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
+        />
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#05090c] to-transparent" />
+      </div>
+      <div className="p-6 sm:p-7 pt-2 sm:pt-3">
+        <p className="font-grotesk text-[11px] font-bold tracking-[0.22em] uppercase" style={{ color: reading.accent }}>
+          {reading.name}
+        </p>
+        <h3 className="mt-2 font-grotesk font-bold text-2xl text-white">{reading.plain}</h3>
+        <p className="mt-2 text-[15px] text-[#b4c0c0] leading-relaxed">{reading.body}</p>
+      </div>
+      <span className="home-tilt-glare" aria-hidden="true" />
+    </article>
+  )
+}
+
 export const HomeIdea: React.FC = () => (
   <section
     aria-labelledby="home-idea-title"
-    className="relative py-24 sm:py-32 bg-gradient-to-b from-[#020408] via-[#03101a] to-[#020408]"
+    className="relative isolate overflow-hidden py-24 sm:py-32 bg-gradient-to-b from-[#020408] via-[#03101a] to-[#020408]"
   >
+    <SectionBackdrop image={HOME_BACKDROPS.seabed} fade="bottom" position="50% 75%" drift={14} />
+    <div className="absolute inset-x-0 top-0 h-2/3 -z-10 bg-gradient-to-b from-[#020408] via-[#020408]/60 to-transparent" aria-hidden="true" />
     <div className="max-w-6xl mx-auto px-5 sm:px-8">
       <ScrollReveal className="max-w-3xl">
         <Eyebrow>The strange part</Eyebrow>
@@ -118,23 +155,8 @@ export const HomeIdea: React.FC = () => (
 
       <div className="mt-14 sm:mt-16 grid gap-5 md:grid-cols-3">
         {HOME_READINGS.map((reading, index) => (
-          <ScrollReveal key={reading.id} delayMs={index * 110}>
-            <article className="group h-full overflow-hidden rounded-3xl border border-white/10 bg-[#05090c]">
-              <div className="relative aspect-[4/3] overflow-hidden">
-                <StoryImg
-                  image={reading.image}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
-                />
-                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#05090c] to-transparent" />
-              </div>
-              <div className="p-6 sm:p-7 pt-2 sm:pt-3">
-                <p className="font-grotesk text-[11px] font-bold tracking-[0.22em] uppercase" style={{ color: reading.accent }}>
-                  {reading.name}
-                </p>
-                <h3 className="mt-2 font-grotesk font-bold text-2xl text-white">{reading.plain}</h3>
-                <p className="mt-2 text-[15px] text-[#b4c0c0] leading-relaxed">{reading.body}</p>
-              </div>
-            </article>
+          <ScrollReveal key={reading.id} delayMs={index * 110} className="h-full">
+            <ReadingCard reading={reading} />
           </ScrollReveal>
         ))}
       </div>
@@ -160,39 +182,46 @@ const ScreenFrame: React.FC<{ step: HomeStep; onExpand: () => void; children: Re
   step,
   onExpand,
   children,
-}) => (
-  <button
-    type="button"
-    onClick={onExpand}
-    aria-label={`Expand screenshot: ${step.title}`}
-    className="group relative block w-full text-left cursor-zoom-in rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-4 focus-visible:ring-offset-[#020408]"
-  >
-    <div
-      className="absolute -inset-6 sm:-inset-10 rounded-[2rem] bg-[radial-gradient(ellipse_at_center,rgba(0,195,255,0.18),transparent_70%)] blur-2xl pointer-events-none"
-      aria-hidden="true"
-    />
-    <div className="relative overflow-hidden rounded-xl border border-white/15 bg-[#061014] shadow-[0_30px_80px_rgba(0,0,0,0.6)] transition-colors duration-500 group-hover:border-cyan-300/40">
-      <div className="flex items-center gap-3 px-3 sm:px-4 h-8 sm:h-9 border-b border-white/[0.06] bg-[#0a161b]" aria-hidden="true">
-        <div className="flex gap-1.5">
-          <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-white/15" />
-          <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-white/15" />
-          <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-white/15" />
+}) => {
+  const tilt = useTilt<HTMLButtonElement>(3)
+  return (
+    <button
+      ref={tilt.ref}
+      onPointerMove={tilt.onPointerMove}
+      onPointerLeave={tilt.onPointerLeave}
+      type="button"
+      onClick={onExpand}
+      aria-label={`Expand screenshot: ${step.title}`}
+      className="home-tilt group relative block w-full text-left cursor-zoom-in rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-4 focus-visible:ring-offset-[#020408]"
+    >
+      <div
+        className="absolute -inset-6 sm:-inset-10 rounded-[2rem] bg-[radial-gradient(ellipse_at_center,rgba(0,195,255,0.18),transparent_70%)] blur-2xl pointer-events-none"
+        aria-hidden="true"
+      />
+      <div className="relative overflow-hidden rounded-xl border border-white/15 bg-[#061014] shadow-[0_30px_80px_rgba(0,0,0,0.6)] transition-colors duration-500 group-hover:border-cyan-300/40">
+        <div className="flex items-center gap-3 px-3 sm:px-4 h-8 sm:h-9 border-b border-white/[0.06] bg-[#0a161b]" aria-hidden="true">
+          <div className="flex gap-1.5">
+            <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-white/15" />
+            <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-white/15" />
+            <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-white/15" />
+          </div>
+          <div className="mx-auto max-w-[220px] w-full rounded-md bg-white/[0.05] border border-white/[0.06] px-3 py-0.5 text-[10px] sm:text-[11px] text-white/55 text-center truncate">
+            {step.url}
+          </div>
+          <div className="w-[34px] sm:w-[42px]" />
         </div>
-        <div className="mx-auto max-w-[220px] w-full rounded-md bg-white/[0.05] border border-white/[0.06] px-3 py-0.5 text-[10px] sm:text-[11px] text-white/55 text-center truncate">
-          {step.url}
+        <div className="relative aspect-[16/10] overflow-hidden">
+          {children}
+          <span className="absolute bottom-3 right-3 z-10 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-[#03080a]/85 backdrop-blur-sm px-3 py-1.5 text-xs font-medium text-white/90 shadow-lg transition-colors group-hover:border-cyan-300/50 group-hover:text-cyan-100">
+            <Maximize2 className="w-3.5 h-3.5" aria-hidden="true" />
+            Click to expand
+          </span>
+          <span className="home-tilt-glare" aria-hidden="true" />
         </div>
-        <div className="w-[34px] sm:w-[42px]" />
       </div>
-      <div className="relative aspect-[16/10] overflow-hidden">
-        {children}
-        <span className="absolute bottom-3 right-3 z-10 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-[#03080a]/85 backdrop-blur-sm px-3 py-1.5 text-xs font-medium text-white/90 shadow-lg transition-colors group-hover:border-cyan-300/50 group-hover:text-cyan-100">
-          <Maximize2 className="w-3.5 h-3.5" aria-hidden="true" />
-          Click to expand
-        </span>
-      </div>
-    </div>
-  </button>
-)
+    </button>
+  )
+}
 
 const stepScreenshotClass = 'absolute inset-0 h-full w-full object-cover object-top'
 
@@ -255,7 +284,8 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
 
   if (!pinned) {
     return (
-      <section ref={sectionRef} aria-labelledby="home-how-title" className="relative py-24 sm:py-32">
+      <section ref={sectionRef} aria-labelledby="home-how-title" className="relative isolate overflow-hidden py-24 sm:py-32">
+        <SectionBackdrop image={HOME_BACKDROPS.pod} position="50% 60%" />
         <div className="max-w-3xl mx-auto px-5 sm:px-8">
           <ScrollReveal>
             <HowItWorksIntro />
@@ -290,7 +320,9 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
       className="relative"
       style={{ height: `${HOME_STEPS.length * 70 + 40}svh` }}
     >
-      <div className="sticky top-0 h-[100svh] overflow-hidden flex items-center pt-16">
+      <div className="sticky top-0 isolate h-[100svh] overflow-hidden flex items-center pt-16">
+        <SectionBackdrop image={HOME_BACKDROPS.pod} position="50% 60%" drift={0} />
+        <DepthLayer kind="caustics" className="-z-10" />
         <div className="w-full max-w-6xl mx-auto px-8 grid grid-cols-[0.8fr_1.2fr] gap-16 items-center">
           <div>
             <HowItWorksIntro />
@@ -332,8 +364,8 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
             {HOME_STEPS.map((step, index) => (
               <div
                 key={step.id}
-                className="absolute inset-0 transition-opacity duration-700 ease-out"
-                style={{ opacity: index === active ? 1 : 0 }}
+                className="absolute inset-0 transition-[opacity,transform] duration-700 ease-out"
+                style={{ opacity: index === active ? 1 : 0, transform: index === active ? 'none' : 'scale(1.04)' }}
                 aria-hidden={index === active ? undefined : true}
               >
                 <StoryImg
@@ -354,7 +386,9 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
 /* ── Voices: three members, three small wins ─────────────────────────── */
 
 export const HomeVoices: React.FC = () => (
-  <section aria-labelledby="home-voices-title" className="relative py-24 sm:py-32">
+  <section aria-labelledby="home-voices-title" className="relative isolate overflow-hidden py-24 sm:py-32">
+    <SectionBackdrop image={HOME_BACKDROPS.gallery} position="60% 50%" />
+    <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#020408]/70 via-transparent to-transparent" aria-hidden="true" />
     <div className="max-w-6xl mx-auto px-5 sm:px-8">
       <ScrollReveal className="max-w-3xl">
         <Eyebrow color="#00ffcc">From the community</Eyebrow>
@@ -366,7 +400,7 @@ export const HomeVoices: React.FC = () => (
       <div className="mt-12 sm:mt-14 grid gap-5 md:grid-cols-3">
         {HOME_VOICES.map((voice, index) => (
           <ScrollReveal key={voice.name} delayMs={index * 110}>
-            <figure className="flex h-full flex-col justify-between rounded-3xl border border-white/10 bg-white/[0.03] p-7 sm:p-8">
+            <figure className="flex h-full flex-col justify-between rounded-3xl border border-white/10 bg-[#03080b]/85 p-7 sm:p-8">
               <blockquote className="font-grotesk text-lg sm:text-xl text-white leading-snug [text-wrap:pretty]">
                 &ldquo;{voice.quote}&rdquo;
               </blockquote>
@@ -395,7 +429,11 @@ export const HomeVoices: React.FC = () => (
 /* ── Questions people ask right before they join ─────────────────────── */
 
 export const HomeFaq: React.FC = () => (
-  <section aria-labelledby="home-faq-title" className="relative py-24 sm:py-32 border-t border-white/[0.06]">
+  <section aria-labelledby="home-faq-title" className="relative isolate overflow-hidden py-24 sm:py-32">
+    <div
+      className="absolute -z-10 left-[-10%] top-1/3 h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,rgba(0,195,255,0.08),transparent_65%)]"
+      aria-hidden="true"
+    />
     <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[0.8fr_1.2fr] gap-10 lg:gap-20">
       <ScrollReveal>
         <Eyebrow>Questions</Eyebrow>
@@ -428,6 +466,8 @@ export const HomeFinalCta: React.FC<HomeSectionProps> = ({ authReady, onNavigate
     <ScrollReveal animation="scale-up">
       <div className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-[#00c3ff]/20 bg-gradient-to-br from-[#04161c] via-[#03090d] to-[#020408] grid md:grid-cols-[1.15fr_0.85fr] items-center">
         <div className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-[#00c3ff]/10 blur-3xl -z-10" aria-hidden="true" />
+        <DepthLayer kind="caustics" className="-z-10" />
+        <DepthLayer kind="snow" className="-z-10 opacity-50" />
         <div className="px-6 py-12 sm:p-14 lg:p-16">
           <h2
             id="home-final-title"
