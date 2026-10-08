@@ -33,8 +33,8 @@ describe('LandingPage Component', () => {
     expect(screen.getByRole('link', { name: /Take the free Moltmax diagnostic/ })).toHaveAttribute('href', '/moltmax')
 
     // Guest CTA buttons present
-    expect(await screen.findByText('JOIN FREE', {}, { timeout: 5000 })).toBeInTheDocument()
-    expect(screen.getByText('TRY THE DEMO')).toBeInTheDocument()
+    expect(await screen.findAllByText('JOIN FREE', {}, { timeout: 5000 })).toHaveLength(2)
+    expect(screen.getAllByText('TRY THE DEMO')).toHaveLength(2)
   })
 
   it('renders graceful subtle skeleton while session resolution is pending without flashing wrong guest buttons', () => {
@@ -47,12 +47,11 @@ describe('LandingPage Component', () => {
 
     // Skeletons are rendered in place of CTA buttons to prevent flash of wrong unauthenticated state
     expect(screen.getByTestId('hero-auth-skeleton')).toBeInTheDocument()
-    expect(screen.getByTestId('pillars-auth-skeleton')).toBeInTheDocument()
+    
     expect(screen.getByTestId('bottom-auth-skeleton')).toBeInTheDocument()
 
     // Non-logged in CTAs should NOT be visible during pending state
     expect(screen.queryByText('JOIN FREE')).not.toBeInTheDocument()
-    expect(screen.queryByText('INITIATE ASCENSION')).not.toBeInTheDocument()
     expect(screen.queryByText('TRY THE DEMO')).not.toBeInTheDocument()
   })
 
@@ -61,9 +60,9 @@ describe('LandingPage Component', () => {
 
     render(<LandingPage />)
 
-    expect(await screen.findByText('JOIN FREE', {}, { timeout: 5000 })).toBeInTheDocument()
-    expect(screen.getByText('TRY THE DEMO')).toBeInTheDocument()
-    expect(screen.getAllByText('INITIATE ASCENSION').length).toBeGreaterThan(0)
+    expect(await screen.findAllByText('JOIN FREE', {}, { timeout: 5000 })).toHaveLength(2)
+    expect(screen.getAllByText('TRY THE DEMO')).toHaveLength(2)
+    expect(screen.getAllByText('JOIN FREE')).toHaveLength(2)
     expect(screen.queryByTestId('hero-auth-skeleton')).not.toBeInTheDocument()
   })
 
@@ -111,52 +110,73 @@ describe('LandingPage Component', () => {
     expect(dashboardButtons.length).toBeGreaterThan(0)
     // Non-logged in CTAs are NEVER flashed
     expect(screen.queryByText('JOIN FREE')).not.toBeInTheDocument()
-    expect(screen.queryByText('INITIATE ASCENSION')).not.toBeInTheDocument()
     expect(screen.queryByText('TRY THE DEMO')).not.toBeInTheDocument()
   })
 
-  it('renders the three core features as benefit-led rows with real screenshots', () => {
+  it('walks through the four steps with real screenshots and a way in after each', () => {
     render(<LandingPage />)
 
-    expect(screen.getByRole('heading', { level: 2, name: 'Everything you need to finish what you start.' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { level: 3, name: 'Know what to do the moment you sit down.' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { level: 3, name: 'Get unstuck in a single conversation.' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { level: 3, name: 'Keep going with people who get it.' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'Small enough to start today.' })).toBeInTheDocument()
+    for (const title of ['Find your starting point', 'Shed one small thing a day', 'Ask when you are stuck', 'Keep going together']) {
+      expect(screen.getByRole('heading', { level: 3, name: title })).toBeInTheDocument()
+    }
 
-    fireEvent.click(screen.getByRole('button', { name: /Open the dashboard/ }))
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })
+    fireEvent.click(screen.getByRole('button', { name: /Take the diagnostic/ }))
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/moltmax' })
     fireEvent.click(screen.getByRole('button', { name: /Ask the Oracle/ }))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/oracle' })
     fireEvent.click(screen.getByRole('button', { name: /Visit the community/ }))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/forum' })
 
-    expect(screen.getByAltText('Dashboard showing a featured lesson and community news')).toBeInTheDocument()
+    expect(screen.getByAltText('A Moltmax diagnostic question with four answers to choose from')).toBeInTheDocument()
+    expect(screen.getByAltText('The dashboard with a featured lesson and community news')).toBeInTheDocument()
     expect(screen.getByAltText('A new conversation with the Oracle')).toBeInTheDocument()
-    expect(screen.getByAltText('The Moltology community boards and latest posts')).toBeInTheDocument()
-
-    expect(screen.getByText('Free to join. No card needed.')).toBeInTheDocument()
+    expect(screen.getByAltText('The community boards and latest posts')).toBeInTheDocument()
   })
 
-  it('shows no backdrop artwork behind the core features', () => {
-    render(<LandingPage />)
-    const section = document.getElementById('core-pillars')!
-    const sources = Array.from(section.querySelectorAll('img')).map((img) => img.getAttribute('src') ?? '')
-    expect(sources).toHaveLength(3)
-    expect(sources.every((src) => src.includes('/images/marketing/'))).toBe(true)
-  })
-
-  it('renders the live interactive laptop and smartphone device showcase', async () => {
+  it('opens step screenshots in a gallery lightbox', () => {
     render(<LandingPage />)
 
-    const showcase = await screen.findByLabelText('Interactive System Showcase')
-    expect(showcase).toBeInTheDocument()
-    expect(within(showcase).getByText('moltology.org/dashboard')).toBeInTheDocument()
-    expect(screen.getByAltText('Safari preview')).toBeInTheDocument()
-    expect(screen.getByAltText('iPhone 15 Pro preview')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /LAUNCH GUEST DEMO/i })).toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Expand screenshot: Find your starting point' }))
+
+    const dialog = screen.getByRole('dialog', { name: 'Find your starting point' })
+    expect(within(dialog).getByText('1 / 4')).toBeInTheDocument()
+
+    fireEvent.click(within(dialog).getByRole('button', { name: /Next image/i }))
+    expect(within(dialog).getByText('2 / 4')).toBeInTheDocument()
+
+    fireEvent.click(within(dialog).getByRole('button', { name: /Close image preview/i }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  it('eager-loads a single LCP hero still and lazy-loads below-fold artwork', async () => {
+  it('introduces the idea briefly and links out to the About pages for the long version', () => {
+    render(<LandingPage />)
+
+    expect(screen.getByRole('heading', { level: 2, name: 'You are not lazy. You are unarmored.' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'Nature keeps turning things into crabs.' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Boundaries that hold' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'A grip that finishes' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Focus that goes deep' })).toBeInTheDocument()
+
+    expect(screen.getByRole('link', { name: /Read the whole story/ })).toHaveAttribute('href', '/what-is-moltology')
+    expect(screen.getByRole('link', { name: /What Moltologists believe/ })).toHaveAttribute('href', '/what-is-moltology/beliefs')
+    expect(screen.getByRole('link', { name: /Hear more from members/ })).toHaveAttribute(
+      'href',
+      '/what-is-moltology/what-moltologists-say',
+    )
+  })
+
+  it('answers the questions people ask before joining', () => {
+    render(<LandingPage />)
+
+    expect(screen.getByRole('heading', { level: 2, name: 'Before you dive in.' })).toBeInTheDocument()
+    expect(screen.getByText('Is it really free?')).toBeInTheDocument()
+    expect(screen.getByText(/Progress and rank cannot be bought/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Get the free field manual/ })).toHaveAttribute('href', '/guide')
+  })
+
+  it('eager-loads a single LCP hero still and lazy-loads below-fold artwork', () => {
     render(<LandingPage />)
 
     const heroArtwork = screen.getByTestId('hero-artwork')
@@ -167,61 +187,13 @@ describe('LandingPage Component', () => {
     expect(heroPreview.getAttribute('loading')).toBe('eager')
     expect(heroPreview.getAttribute('fetchpriority')).toBe('low')
 
-    const safariPreview = await screen.findByAltText('Safari preview')
-    expect(safariPreview.getAttribute('loading')).toBe('lazy')
-    expect(screen.getByAltText('iPhone 15 Pro preview').getAttribute('loading')).toBe('lazy')
+    const stepShot = screen.getByAltText('A new conversation with the Oracle')
+    expect(stepShot.getAttribute('loading')).toBe('lazy')
   })
 
-  it('ships no hero video on the homepage', () => {
+  it('ships no video on the homepage', () => {
     const { container } = render(<LandingPage />)
     expect(container.querySelectorAll('video')).toHaveLength(0)
-  })
-
-  it('renders the 4 Benthic Sacraments with protocol enforcement actions', () => {
-    render(<LandingPage />)
-
-    expect(screen.getByText('ASSET & HABIT SHEDDING')).toBeInTheDocument()
-    expect(screen.getByText('CHITIN HARDENING')).toBeInTheDocument()
-    expect(screen.getAllByText('ISOLATION DOME').length).toBeGreaterThan(0)
-    expect(screen.getByText('PIPELINE ASCENT')).toBeInTheDocument()
-
-    const enforceButtons = screen.getAllByText('LEARN MORE')
-    expect(enforceButtons.length).toBe(4)
-  })
-
-  it('allows switching between the 4 Stages of Carcinization with transformation metrics', () => {
-    render(<LandingPage />)
-
-    expect(screen.getByText('THE 4 STAGES OF CARCINIZATION')).toBeInTheDocument()
-
-    // Stage 1 active by default
-    expect(screen.getByText('STAGE 01: LARVAL HUMAN')).toBeInTheDocument()
-    expect(screen.getByText('75% REDUCED')).toBeInTheDocument()
-
-    // Click Stage 4 tab
-    const stage4Tab = screen.getByRole('button', { name: 'STAGE 04' })
-    fireEvent.click(stage4Tab)
-
-    expect(screen.getByText('STAGE 04: TOTAL CARCINIZATION')).toBeInTheDocument()
-    expect(screen.getByText('0% REDUCED')).toBeInTheDocument()
-    expect(screen.getByText('100% HARDENED')).toBeInTheDocument()
-  })
-
-  it('opens core feature screenshots in a gallery lightbox', () => {
-    render(<LandingPage />)
-
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Expand the dashboard screenshot' }))
-
-    const dialog = screen.getByRole('dialog', { name: 'The dashboard' })
-    expect(within(dialog).getByText('1 / 3')).toBeInTheDocument()
-
-    fireEvent.click(within(dialog).getByRole('button', { name: /Next image/i }))
-    expect(within(dialog).getByText('The Oracle')).toBeInTheDocument()
-    expect(within(dialog).getByText('2 / 3')).toBeInTheDocument()
-
-    fireEvent.click(within(dialog).getByRole('button', { name: /Close image preview/i }))
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
   it('renders responsive, SSR-safe footer with brand motto and high-value navigation links', () => {
@@ -244,16 +216,5 @@ describe('LandingPage Component', () => {
     expect(within(footer).getByText('RSS FEED')).toBeInTheDocument()
     expect(within(footer).getByText('Privacy Policy')).toBeInTheDocument()
     expect(within(footer).getByText('Terms of Service')).toBeInTheDocument()
-  })
-
-  it('renders peppered quiz characters and companions across homepage corners and sections', () => {
-    render(<LandingPage />)
-
-    // Verify presence of character overlays
-    expect(screen.getByAltText('Hero Lobster Pointing to Action')).toBeInTheDocument()
-    expect(screen.getByAltText('Hero Lobster Peeking Over Card')).toBeInTheDocument()
-    expect(screen.getByAltText('Sub-Benthic Abyss Scroll Reveal')).toBeInTheDocument()
-    expect(screen.getByAltText('Ascended Stage Background Mascot')).toBeInTheDocument()
-    expect(screen.getByAltText('Hero Lobster Giving Thumbs-Up')).toBeInTheDocument()
   })
 })

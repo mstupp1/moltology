@@ -282,6 +282,168 @@
   }
 }
 
+/* Homepage depth layers: marine snow, surface light shafts, and drifting caustics.
+   Each layer animates transform only, and only while its section is on screen (.is-live). */
+@keyframes homeSnowFall {
+  from { transform: translate3d(0, -50%, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+@keyframes homeCausticsDrift {
+  from { transform: translate3d(-4%, -2%, 0); }
+  to { transform: translate3d(4%, 3%, 0); }
+}
+.home-snow {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.home-snow::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 200%;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20px 30px, rgba(200, 240, 255, 0.55), transparent 60%),
+    radial-gradient(1px 1px at 140px 90px, rgba(200, 240, 255, 0.45), transparent 60%),
+    radial-gradient(1.5px 1.5px at 230px 170px, rgba(160, 230, 255, 0.4), transparent 60%),
+    radial-gradient(1px 1px at 80px 210px, rgba(220, 245, 255, 0.5), transparent 60%),
+    radial-gradient(2px 2px at 190px 260px, rgba(150, 225, 255, 0.3), transparent 60%);
+  background-size: 280px 300px;
+  will-change: transform;
+}
+.home-snow.is-live::before {
+  animation: homeSnowFall 60s linear infinite;
+}
+.home-caustics {
+  position: absolute;
+  inset: -15%;
+  pointer-events: none;
+  background:
+    radial-gradient(28% 18% at 22% 30%, rgba(0, 195, 255, 0.16), transparent 70%),
+    radial-gradient(22% 16% at 70% 22%, rgba(0, 255, 204, 0.1), transparent 70%),
+    radial-gradient(30% 20% at 55% 70%, rgba(56, 189, 248, 0.1), transparent 70%);
+  will-change: transform;
+}
+.home-caustics.is-live {
+  animation: homeCausticsDrift 22s ease-in-out infinite alternate;
+}
+.home-shafts {
+  position: absolute;
+  inset: 0 -10%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    100deg,
+    transparent 0 70px,
+    rgba(125, 211, 252, 0.07) 90px,
+    transparent 130px 210px
+  );
+  mask-image: linear-gradient(to bottom, #000, transparent 70%);
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 70%);
+}
+/* Sonar: three thin rings that ping outward from one point, staggered. Transform and opacity only. */
+@keyframes homeSonarPing {
+  from { transform: translate(-50%, -50%) scale(0.15); opacity: 0; }
+  15% { opacity: 0.7; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+.home-sonar {
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.home-sonar > span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: min(80vw, 760px);
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 255, 204, 0.22);
+  transform: translate(-50%, -50%) scale(0.15);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.home-sonar.is-live > span {
+  animation: homeSonarPing 12s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+.home-sonar.is-live > span:nth-child(2) { animation-delay: -4s; }
+.home-sonar.is-live > span:nth-child(3) { animation-delay: -8s; }
+/* Contours: a sonar map of the seafloor, drawn once as SVG. It stays still; the sonar ping supplies the motion. */
+.home-contours {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.home-contours > svg {
+  position: absolute;
+  left: var(--contour-x, 50%);
+  top: var(--contour-y, 50%);
+  width: max(140vw, 1500px);
+  height: auto;
+  transform: translate(-50%, -50%) rotate(-8deg);
+}
+/* Final invitation art: fades out on every side into the card, so there is no image edge. Static. */
+.home-final-art {
+  -webkit-mask-image: radial-gradient(ellipse 75% 80% at 50% 38%, #000 35%, transparent 75%);
+  mask-image: radial-gradient(ellipse 75% 80% at 50% 38%, #000 35%, transparent 75%);
+}
+@media (min-width: 768px) {
+  .home-final-art {
+    -webkit-mask-image: radial-gradient(ellipse 56% 66% at 56% 46%, #000 42%, transparent 84%);
+    mask-image: radial-gradient(ellipse 56% 66% at 56% 46%, #000 42%, transparent 84%);
+  }
+}
+/* Cards that tilt toward the pointer. JS writes --rx/--ry for the tilt and --gx/--gy for the glare. */
+.home-tilt {
+  transition: transform 500ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.home-tilt[data-tilting],
+.home-tilt[data-settling] {
+  transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+}
+.home-tilt[data-tilting] {
+  transition-duration: 120ms;
+}
+/* Backdrop photos drift slower than the page, on the compositor, where the browser supports it. */
+@keyframes homeDrift {
+  from { transform: translate3d(0, calc(var(--drift, 5%) * -1), 0); }
+  to { transform: translate3d(0, var(--drift, 5%), 0); }
+}
+@supports (animation-timeline: view()) {
+  .home-drift {
+    animation: homeDrift linear both;
+    animation-timeline: view();
+  }
+}
+.home-tilt-glare {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgba(200, 240, 255, 0.12), transparent 50%);
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+.home-tilt[data-tilting] .home-tilt-glare {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-snow.is-live::before,
+  .home-caustics.is-live,
+  .home-sonar.is-live > span {
+    animation: none;
+  }
+  .home-tilt[data-tilting],
+  .home-tilt[data-settling] {
+    transform: none;
+  }
+  .home-drift {
+    animation: none;
+  }
+}
+
 /* Field manual lead capture: modal entrance and the launcher's attention cues */
 @keyframes guideFadeIn {
   from { opacity: 0; }
