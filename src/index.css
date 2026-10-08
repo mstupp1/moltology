@@ -292,25 +292,43 @@
   from { transform: translate3d(-4%, -2%, 0); }
   to { transform: translate3d(4%, 3%, 0); }
 }
-/* Grade decorative artwork independently of copy and screenshots. */
-.home-hero-art {
-  filter: brightness(0.72) saturate(0.58) contrast(0.96) blur(1.4px);
-  transform: scale(1.015);
-}
-.home-hero-vignette {
+/* Hero particle stage. The depth wash and the glow behind the shell are plain CSS, so the first
+   screen already has its light before the particle canvas fades in over it. */
+.home-hero-depth {
   background:
-    linear-gradient(to right, rgba(2, 4, 8, 0.85), transparent 22%, transparent 78%, rgba(2, 4, 8, 0.85)),
-    radial-gradient(ellipse 76% 72% at 50% 45%, transparent 25%, rgba(2, 4, 8, 0.62) 72%, #020408 100%);
+    radial-gradient(ellipse 70% 55% at 50% 0%, rgba(0, 120, 160, 0.16), transparent 70%),
+    radial-gradient(ellipse 60% 60% at 50% 100%, rgba(0, 60, 90, 0.12), transparent 70%);
 }
-.home-hero-atmosphere {
-  background:
-    radial-gradient(ellipse 30% 38% at 18% 58%, rgba(0, 120, 145, 0.1), transparent 80%),
-    radial-gradient(ellipse 30% 34% at 82% 62%, rgba(0, 150, 140, 0.08), transparent 80%);
+.home-hero-particles {
+  opacity: 0;
+  transition: opacity 900ms ease-out;
+}
+.home-hero-particles[data-ready='true'] {
+  opacity: 1;
+}
+.home-hero-shell {
+  background: radial-gradient(circle at 50% 50%, rgba(0, 190, 230, 0.16), rgba(0, 120, 170, 0.06) 38%, transparent 66%);
+  pointer-events: none;
+}
+.home-shell-companion {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0) scale(0.9);
+  transition: opacity 600ms ease-out, transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  border-radius: 9999px;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 150, 190, 0.18), rgba(2, 4, 8, 0.55) 55%, transparent 72%);
+}
+.home-shell-companion[data-visible='true'] {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-shell-companion {
+    transition: opacity 300ms linear;
+    transform: none;
+  }
 }
 .home-hero-veil {
-  background:
-    radial-gradient(ellipse 60% 58% at 50% 42%, rgba(2, 4, 8, 0.58), rgba(2, 4, 8, 0.22) 65%, transparent),
-    linear-gradient(to bottom, #020408, rgba(2, 4, 8, 0.3) 16%, transparent 30%, transparent 56%, rgba(2, 4, 8, 0.72) 80%, #020408 100%);
+  background: linear-gradient(to bottom, rgba(2, 4, 8, 0.6), transparent 14%, transparent 70%, rgba(2, 4, 8, 0.75) 88%, #020408 100%);
 }
 /* Section artwork. Each tone grades its art lightly and lights it where the art's own light falls.
    --light-a / --light-b are the two light pools; --edge-blur is how far out of focus the edges go. */
@@ -381,11 +399,6 @@
   background: radial-gradient(ellipse 95% 90% at 65% 45%, transparent 50%, rgba(2, 4, 8, 0.6) 100%);
 }
 @media (max-width: 767px) {
-  .home-hero-vignette {
-    background:
-      linear-gradient(to right, rgba(2, 4, 8, 0.55), transparent 28%, transparent 72%, rgba(2, 4, 8, 0.55)),
-      radial-gradient(ellipse 100% 72% at 50% 42%, transparent 28%, rgba(2, 4, 8, 0.6) 78%, #020408 100%);
-  }
   .home-final-vignette {
     background: radial-gradient(ellipse 100% 70% at 50% 25%, transparent 40%, rgba(2, 4, 8, 0.6) 90%);
   }
