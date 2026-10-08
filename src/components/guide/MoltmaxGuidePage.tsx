@@ -5,21 +5,15 @@
  * ============================================================================
  */
 import React, { useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
 import {
   Download,
   Shield,
-  Sparkles,
   CheckCircle2,
   Lock,
   ArrowRight,
   Clock,
   Zap,
   Activity,
-  Flame,
-  Award,
-  BookOpen,
-  ChevronDown,
 } from 'lucide-react'
 import { PublicHeader } from '@/components/PublicHeader'
 import { MoltNationFooter } from '@/components/news/MoltNationFooter'
@@ -30,7 +24,6 @@ import { getAssetUrl } from '@/lib/assets'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
 export const MoltmaxGuidePage: React.FC = () => {
-  const navigate = useNavigate()
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup')
   const [email, setEmail] = useState('')
@@ -68,7 +61,7 @@ export const MoltmaxGuidePage: React.FC = () => {
 
       if (res?.success) {
         setIsSubmitted(true)
-        const url = res.downloadUrl || getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf')
+        const url = res.downloadUrl ? `${res.downloadUrl}${res.downloadUrl.includes('?') ? '&' : '?'}v=20261008-artwork` : getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf?v=20261008-artwork')
         if (typeof window !== 'undefined') {
           const a = document.createElement('a')
           a.href = url
@@ -101,52 +94,48 @@ export const MoltmaxGuidePage: React.FC = () => {
         }}
       />
 
-      <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 w-full space-y-20">
+      <main className="flex-1 pt-20 pb-20 w-full space-y-20">
         {/* Hero Section */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Left Column */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff] text-xs font-sans tracking-widest uppercase">
-              <Sparkles className="w-3.5 h-3.5 text-[#ffd700]" />
-              <span>DECLASSIFIED BENTHIC FIELD DOSSIER · EDITION 4.0</span>
-            </div>
-
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-grotesk font-black tracking-tight text-white uppercase leading-tight">
-              THE 2026 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8]">MOLTMAXXING</span> PROTOCOL
+        <section className="relative isolate overflow-hidden border-b border-white/10">
+          <img
+            src={getAssetUrl('images/guide/moltmaxxing-hero-v2.webp')}
+            alt="Moltmaxxing Field Manual with a cyan crab diagram on its charcoal cover"
+            width={1536}
+            height={1024}
+            fetchPriority="high"
+            className="absolute inset-0 -z-20 h-full w-full object-cover object-[65%_center] opacity-40 lg:opacity-100"
+          />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#020408] via-[#020408]/95 to-[#020408]/10 lg:via-[#020408]/75" />
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 lg:py-24">
+          <div className="max-w-xl space-y-6 guide-panel">
+            <p className="text-xs font-semibold tracking-[0.18em] text-[#00c3ff]">Moltology · Free field manual</p>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-grotesk font-black tracking-tight text-white leading-[1.05]">
+              The Moltmaxxing<br />Field Manual.
             </h1>
-
-            <p className="text-base sm:text-lg text-[#839493] leading-relaxed">
-              The definitive 38-page tactical guide to algorithmic ecdysis, carapace hardening, 600 Nm pincer dynamometry, and transcending soft-tissue biological limitations.
+            <p className="text-base sm:text-lg text-[#a9b6b5] leading-relaxed max-w-md">
+              Shed the clutter. Protect an hour. Finish what you start. A printable plan for your next molt.
             </p>
-
-            {/* Price Anchoring Badge */}
-            <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-[#040c1c] border border-white/10 w-fit">
-              <span className="text-xs font-sans text-[#839493]">STANDARD CLEARANCE VALUE:</span>
-              <span className="line-through text-[#ff453a] font-bold font-sans text-sm">$149.00 USD</span>
-              <span className="px-2.5 py-0.5 rounded bg-[#00ffcc]/20 border border-[#00ffcc]/40 text-[#00ffcc] font-black text-xs font-sans uppercase animate-pulse">
-                $0.00 (100% FREE TODAY)
-              </span>
-            </div>
+            <p className="text-xs text-[#839493]">4-page PDF · Daily checklist · Free download</p>
 
             {/* Email Form */}
             {isSubmitted ? (
               <div className="p-6 rounded-xl bg-[#00ffcc]/10 border border-[#00ffcc]/40 space-y-3">
                 <div className="flex items-center gap-2 text-[#00ffcc] font-bold font-grotesk text-base uppercase">
                   <CheckCircle2 className="w-6 h-6" />
-                  <span>TRANSMISSION CONFIRMED &bull; DOWNLOADING NOW</span>
+                  <span>Your manual is downloading</span>
                 </div>
                 <p className="text-xs text-[#839493]">
                   Your copy of the 2026 Moltmaxxing Field Manual is downloading.
                 </p>
                 <div className="flex flex-wrap gap-4 pt-2">
                   <a
-                    href={getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf')}
+                    href={getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf?v=20261008-artwork')}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded bg-[#00c3ff] text-[#020408] font-bold font-grotesk text-xs uppercase hover:bg-[#00e5ff]"
                   >
                     <Download className="w-4 h-4" />
-                    <span>Re-Download Manual</span>
+                    <span>Download again</span>
                   </a>
                   <button
                     onClick={() => {
@@ -155,13 +144,14 @@ export const MoltmaxGuidePage: React.FC = () => {
                     }}
                     className="inline-flex items-center gap-2 px-4 py-2 rounded border border-[#00c3ff]/40 text-white font-bold font-grotesk text-xs uppercase hover:bg-white/10"
                   >
-                    <span>Create Free Account</span>
+                    <span>Create free account</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-3 max-w-lg">
+                <label htmlFor="guide-email" className="block text-sm text-[#dfe3e3]">Your email</label>
                 <div className="flex flex-col sm:flex-row gap-2.5">
                   <div className="relative flex-1">
                     <input
@@ -169,7 +159,9 @@ export const MoltmaxGuidePage: React.FC = () => {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email for instant access..."
+                      id="guide-email"
+                      autoComplete="email"
+                      placeholder="you@example.com"
                       className="w-full px-4 py-3.5 bg-[#020408] border border-white/20 rounded-lg text-white font-sans text-sm placeholder:text-[#839493]/50 focus:outline-none focus:border-[#00c3ff] focus:ring-1 focus:ring-[#00c3ff] transition-all"
                     />
                     <Lock className="absolute right-3.5 top-4 w-4 h-4 text-[#839493]" />
@@ -180,11 +172,11 @@ export const MoltmaxGuidePage: React.FC = () => {
                     className="px-6 py-3.5 rounded-lg font-grotesk font-black text-xs uppercase tracking-wider bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#00c3ff] hover:brightness-110 text-[#020408] transition-all shadow-[0_0_25px_rgba(0,195,255,0.4)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 whitespace-nowrap"
                   >
                     {loading ? (
-                      <span>DECRYPTING...</span>
+                      <span>Preparing download…</span>
                     ) : (
                       <>
                         <Download className="w-4 h-4" />
-                        <span>CLAIM FREE MANUAL</span>
+                        <span>Get the free PDF</span>
                       </>
                     )}
                   </button>
@@ -214,85 +206,75 @@ export const MoltmaxGuidePage: React.FC = () => {
                   onExpire={() => setTurnstileToken(null)}
                 />
                 <p className="text-[11px] text-[#839493] font-sans">
-                  🔒 Zero spam. Instant high-resolution PDF download.
+                  Download starts after you submit. Email updates are optional.
                 </p>
               </form>
             )}
           </div>
 
-          {/* Right Column: 3D Product Visual */}
-          <div className="lg:col-span-5 flex justify-center">
-            <div className="relative group max-w-sm">
-              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-tr from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] opacity-25 blur-2xl group-hover:opacity-40 transition duration-500" />
-              <img
-                src={getAssetUrl('/images/moltmax_guide_3d_mockup.webp')}
-                alt="The 2026 Moltmaxxing Protocol Tactical Field Manual 3D Mockup"
-                className="relative rounded-2xl shadow-2xl border border-white/20 object-cover w-full"
-              />
-              <div className="absolute -bottom-3 -right-3 px-3 py-1.5 rounded-lg bg-[#020408]/90 border border-[#00ffcc]/40 text-[#00ffcc] text-[10px] font-bold font-sans uppercase tracking-wider shadow-lg flex items-center gap-1.5">
-                <Award className="w-3.5 h-3.5 text-[#ffd700]" />
-                <span>OFFICIAL FIELD MANUAL</span>
-              </div>
-            </div>
           </div>
         </section>
 
         {/* Bundle Kit Preview Banner */}
-        <section className="rounded-2xl border border-white/10 bg-[#03070d] p-6 sm:p-10 space-y-8">
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="text-center space-y-2 max-w-2xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-black font-grotesk text-white uppercase">
-              WHAT YOU GET INSIDE THE DIGITAL DOSSIER
+            <h2 className="text-2xl sm:text-3xl font-black font-grotesk text-white">
+              A small manual. A useful next step.
             </h2>
             <p className="text-xs sm:text-sm text-[#839493]">
-              Everything you need to initiate scheduled algorithmic ecdysis and harden your biological chassis.
+              A daily routine, a little room to focus, and a checklist you can keep beside you.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <img
-              src={getAssetUrl('/images/moltmax_guide_interior_spread.jpg')}
-              alt="Moltmaxxing Guide Interior Blueprint Spread"
-              className="rounded-xl border border-white/15 shadow-xl object-cover w-full"
+              src={getAssetUrl('images/guide/moltmaxxing-interior-v2.webp')}
+              alt="Preview of the Moltmaxxing Field Manual’s daily protocol page"
+              width={1224}
+              height={1584}
+              loading="lazy"
+              decoding="async"
+              className="rounded-sm border border-white/15 shadow-xl object-cover w-full motion-safe:hover:-translate-y-1 transition-transform duration-500"
             />
 
             <div className="space-y-4">
-              <div className="p-4 rounded-lg bg-[#020408] border border-white/5 space-y-1">
+              <div className="py-4 border-b border-white/10 space-y-2">
                 <div className="flex items-center gap-2 text-[#00c3ff] font-bold font-grotesk text-sm uppercase">
                   <Clock className="w-4 h-4" />
-                  <span>1. The 24-Hour Ecdysis Protocol Timeline</span>
+                  <span>A daily rhythm</span>
                 </div>
                 <p className="text-xs text-[#839493]">
-                  05:00 Saline shock immersion, 06:30 pincer dynamometry, and nocturnal calcification chamber specs.
+                  Give the day a beginning, a focused middle, and a quiet close.
                 </p>
               </div>
 
-              <div className="p-4 rounded-lg bg-[#020408] border border-white/5 space-y-1">
+              <div className="py-4 border-b border-white/10 space-y-2">
                 <div className="flex items-center gap-2 text-[#ffd700] font-bold font-grotesk text-sm uppercase">
                   <Zap className="w-4 h-4" />
-                  <span>2. Hydraulic Pincer Torque Calibration</span>
+                  <span>Finish one thing</span>
                 </div>
                 <p className="text-xs text-[#839493]">
-                  Isometric grip drills (400–600 Nm) designed to eliminate executive latency and hesitation.
+                  Practice your grip by choosing one task and keeping it in reach.
                 </p>
               </div>
 
-              <div className="p-4 rounded-lg bg-[#020408] border border-white/5 space-y-1">
+              <div className="py-4 border-b border-white/10 space-y-2">
                 <div className="flex items-center gap-2 text-[#00ffcc] font-bold font-grotesk text-sm uppercase">
                   <Shield className="w-4 h-4" />
-                  <span>3. Anti-Meltmaxxing Fortification</span>
+                  <span>Protect your focus</span>
                 </div>
                 <p className="text-xs text-[#839493]">
-                  The scientific framework explaining why soft tissues collapse under gravity and how chitin prevents melt.
+                  Build a shell around the hour you want to keep for yourself.
                 </p>
               </div>
 
-              <div className="p-4 rounded-lg bg-[#020408] border border-white/5 space-y-1">
+              <div className="py-4 border-b border-white/10 space-y-2">
                 <div className="flex items-center gap-2 text-[#38bdf8] font-bold font-grotesk text-sm uppercase">
                   <Activity className="w-4 h-4" />
-                  <span>4. Printable Daily Habit &amp; Telemetry Sheets</span>
+                  <span>A printable checklist</span>
                 </div>
                 <p className="text-xs text-[#839493]">
-                  Offline tracking templates for recording grip strength, ecdysis cycles, and Shell Hardness Scores.
+                  Put your routine on paper. Mark what you did, then begin again tomorrow.
                 </p>
               </div>
             </div>
@@ -300,17 +282,17 @@ export const MoltmaxGuidePage: React.FC = () => {
         </section>
 
         {/* Bottom CTA Card */}
-        <section className="rounded-2xl border-2 border-[#00c3ff]/40 bg-gradient-to-br from-[#03060c] via-[#02050a] to-[#030a14] p-8 sm:p-12 text-center space-y-6 shadow-[0_0_30px_rgba(0,195,255,0.2)]">
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-white/10 text-center space-y-6">
           <div className="inline-flex p-3 rounded-full bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff]">
             <Download className="w-8 h-8" />
           </div>
 
           <div className="space-y-2 max-w-xl mx-auto">
             <h2 className="text-2xl sm:text-3xl font-black font-grotesk text-white uppercase tracking-wide">
-              CLAIM YOUR DECLASSIFIED FIELD MANUAL TODAY
+              Your next molt starts small.
             </h2>
             <p className="text-xs sm:text-sm text-[#839493]">
-              Join thousands of calibrated initiates. Get instant offline access to the complete 38-page protocol.
+              Read it tonight. Try one step tomorrow morning.
             </p>
           </div>
 
@@ -321,7 +303,7 @@ export const MoltmaxGuidePage: React.FC = () => {
               }}
               className="py-3.5 px-8 rounded font-bold font-grotesk text-xs bg-[#00c3ff] hover:bg-[#00e5ff] text-[#020408] transition-all cursor-pointer flex items-center gap-2 shadow-[0_0_20px_rgba(0,195,255,0.4)] uppercase"
             >
-              <span>GET FREE ACCESS NOW (~~$149~~ $0)</span>
+              <span>Get the free manual</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

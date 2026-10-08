@@ -34,7 +34,7 @@ export interface MoltmaxGuideModalProps {
   source?: string
 }
 
-const GUIDE_PDF_PATH = 'downloads/the-2026-moltmaxxing-protocol-guide.pdf'
+const GUIDE_PDF_PATH = 'downloads/the-2026-moltmaxxing-protocol-guide.pdf?v=20261008-artwork'
 const GUIDE_PDF_FILENAME = 'the-2026-moltmaxxing-protocol-guide.pdf'
 
 const GUIDE_BENEFITS = [
@@ -136,7 +136,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
       })
 
       if (res?.success) {
-        const url = res.downloadUrl || getAssetUrl(GUIDE_PDF_PATH)
+        const url = res.downloadUrl ? `${res.downloadUrl}${res.downloadUrl.includes('?') ? '&' : '?'}v=20261008-artwork` : getAssetUrl(GUIDE_PDF_PATH)
         setDownloadUrl(url)
         setStep('success')
 
@@ -209,14 +209,14 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
           {step === 'claim' ? (
             <div className="md:grid md:grid-cols-[280px_minmax(0,1fr)]">
               {/* Cover column (desktop) */}
-              <div className="hidden md:flex flex-col items-center justify-center gap-6 px-8 py-10 border-r border-white/10 bg-[radial-gradient(ellipse_at_50%_45%,rgba(0,195,255,0.22),transparent_65%),linear-gradient(to_bottom,#06101f,#030812)]">
+              <div className="hidden md:flex flex-col items-center justify-center gap-6 px-8 py-10 border-r border-white/10 bg-[#02070d]">
                 <img
-                  src={getAssetUrl('/images/moltmax_guide_3d_mockup.webp')}
+                  src={getAssetUrl('images/guide/moltmaxxing-cover-v2.webp')}
                   alt="Cover of the 2026 Moltmaxxing Field Manual"
                   width={208}
-                  height={208}
+                  height={312}
                   decoding="async"
-                  className="w-48 rounded-xl border border-white/15 shadow-[0_24px_60px_rgba(0,0,0,0.6),0_0_40px_rgba(0,195,255,0.2)] -rotate-3"
+                  className="w-48 aspect-[2/3] object-cover rounded-sm border border-white/15 shadow-[0_24px_60px_rgba(0,0,0,0.6),0_0_40px_rgba(0,195,255,0.2)] -rotate-3"
                 />
                 <p className="text-xs text-[#839493] font-sans text-center">
                   4-page PDF · Printable · Free
@@ -227,12 +227,12 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
               <div className="px-5 pt-4 pb-6 sm:px-8 sm:pt-7 sm:pb-7 space-y-5">
                 <div className="flex items-start gap-4 pr-8">
                   <img
-                    src={getAssetUrl('/images/moltmax_guide_3d_mockup_sm.webp')}
+                    src={getAssetUrl('images/guide/moltmaxxing-cover-v2-sm.webp')}
                     alt=""
                     width={64}
-                    height={72}
+                    height={96}
                     decoding="async"
-                    className="md:hidden shrink-0 w-16 h-[72px] object-cover rounded-lg border border-white/15 shadow-lg -rotate-3"
+                    className="md:hidden shrink-0 w-16 h-24 object-cover rounded-lg border border-white/15 shadow-lg -rotate-3"
                   />
                   <div className="space-y-2 min-w-0">
                     <p className="text-[11px] font-sans font-bold text-[#00ffcc] uppercase tracking-wider">

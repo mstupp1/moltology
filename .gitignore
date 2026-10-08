@@ -26,3 +26,6 @@ ds-bundle/
 .design-sync/.cache/
 .design-sync/learnings/
 .design-sync/node_modules
+
+# Generated guide downloads are published to the asset bucket.
+output/guide/*.pdf

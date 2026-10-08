@@ -38,14 +38,14 @@ vi.mock('@/lib/server/turnstile', () => ({
 }))
 
 describe('Moltmax Guide Lead Capture Components', () => {
-  it('renders MoltmaxGuideCard with price anchoring, features, and opt-in checkbox', () => {
+  it('renders MoltmaxGuideCard with manual details, features, and opt-in checkbox', () => {
     render(<MoltmaxGuideCard />)
 
-    expect(screen.getByText(/DOWNLOAD THE DEFINITIVE 2026/i)).toBeDefined()
-    expect(screen.getByText(/REGULAR \$149\.00/i)).toBeDefined()
-    expect(screen.getByText(/\$0\.00 \(100% FREE TODAY\)/i)).toBeDefined()
-    expect(screen.getByText(/The 24-Hour Ecdysis Protocol/i)).toBeDefined()
-    expect(screen.getByText(/400–600 Nm Pincer Grip Holds/i)).toBeDefined()
+    expect(screen.getByText(/Your next molt starts here/i)).toBeDefined()
+    expect(screen.queryByText(/149/)).toBeNull()
+    expect(screen.getByText(/4-page PDF/i)).toBeDefined()
+    expect(screen.getByText(/A daily routine/i)).toBeDefined()
+    expect(screen.getByText(/One task to finish/i)).toBeDefined()
     expect(screen.getByPlaceholderText(/Enter email to claim free copy\.\.\./i)).toBeDefined()
     expect(screen.getByText(/Send me occasional updates, new field manuals, and articles/i)).toBeDefined()
   })
