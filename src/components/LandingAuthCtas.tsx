@@ -58,7 +58,7 @@ export function LandingAuthCtas({ variant, onNavigate, onOpenAuth }: LandingAuth
           onClick={() => onOpenAuth('signup')}
         >
           <span className="flex items-center justify-center gap-2.5 leading-none">
-            <span>INITIATE ASCENSION</span>
+            <span>JOIN FREE</span>
             <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
           </span>
         </BenthicCTAButton>
@@ -71,7 +71,7 @@ export function LandingAuthCtas({ variant, onNavigate, onOpenAuth }: LandingAuth
         >
           <span className="flex items-center justify-center gap-2.5 leading-none">
             <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-            <span>TRY GUEST DEMO</span>
+            <span>TRY THE DEMO</span>
           </span>
         </BenthicCTAButton>
       </>

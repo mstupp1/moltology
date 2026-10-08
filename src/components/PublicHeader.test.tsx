@@ -25,13 +25,13 @@ describe('PublicHeader Navigation Component', () => {
     expect(screen.getByText('MOLTOLOGY.ORG FOUNDATION')).toBeInTheDocument()
 
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
-    expect(within(nav).getByRole('button', { name: /THE SYNAPTIC PATH/i })).toBeInTheDocument()
-    expect(within(nav).getByRole('button', { name: /^MOLTMAX$/i })).toBeInTheDocument()
+    expect(within(nav).getByRole('link', { name: /^HOME$/i })).toBeInTheDocument()
+    expect(within(nav).getByRole('link', { name: /^MOLTMAX$/i })).toBeInTheDocument()
     expect(within(nav).getByText('ABOUT')).toBeInTheDocument()
     expect(within(nav).getByText('ORGANIZATION')).toBeInTheDocument()
 
-    const aboutBtn = within(nav).getByRole('button', { name: /^ABOUT$/i })
-    const orgBtn = within(nav).getByRole('button', { name: /ORGANIZATION/i })
+    const aboutBtn = within(nav).getByRole('link', { name: /^ABOUT$/i })
+    const orgBtn = within(nav).getByRole('link', { name: /ORGANIZATION/i })
     expect(
       aboutBtn.compareDocumentPosition(orgBtn) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
@@ -53,8 +53,9 @@ describe('PublicHeader Navigation Component', () => {
     } as never)
     render(<PublicHeader activePage="home" />)
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
-    expect(within(nav).queryByRole('link', { name: /STORE/i })).not.toBeInTheDocument()
-    expect(within(nav).getByRole('button', { name: /STORE/i })).toBeInTheDocument()
+    const storeLink = within(nav).getByRole('link', { name: /STORE/i })
+    expect(storeLink).toHaveAttribute('href', '/store')
+    expect(storeLink).not.toHaveAttribute('target')
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as never)
   })
 
@@ -62,17 +63,17 @@ describe('PublicHeader Navigation Component', () => {
     mockPathname = '/'
     const { rerender } = render(<PublicHeader activePage="home" />)
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
-    const homeBtn = within(nav).getByRole('button', { name: /THE SYNAPTIC PATH/i })
+    const homeBtn = within(nav).getByRole('link', { name: /^HOME$/i })
     expect(homeBtn.className).toContain('text-cyan-300')
 
     mockPathname = '/news'
     rerender(<PublicHeader activePage="news" />)
-    const newsBtn = within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('button', { name: /NEWS/i })
+    const newsBtn = within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('link', { name: /NEWS/i })
     expect(newsBtn.className).toContain('text-cyan-300')
 
     mockPathname = '/org'
     rerender(<PublicHeader activePage="org" />)
-    const orgBtn = within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('button', { name: /ORGANIZATION/i })
+    const orgBtn = within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('link', { name: /ORGANIZATION/i })
     expect(orgBtn.className).toContain('text-sky-700')
   })
 
@@ -95,7 +96,7 @@ describe('PublicHeader Navigation Component', () => {
     mockPathname = '/news/some-article'
     render(<PublicHeader />)
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
-    const blogBtn = within(nav).getByRole('button', { name: /NEWS/i })
+    const blogBtn = within(nav).getByRole('link', { name: /NEWS/i })
     expect(blogBtn.className).toContain('text-cyan-300')
   })
 
@@ -103,12 +104,12 @@ describe('PublicHeader Navigation Component', () => {
     mockPathname = '/what-is-moltology'
     const { rerender } = render(<PublicHeader />)
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
-    expect(within(nav).getByRole('button', { name: /^ABOUT$/i }).className).toContain('text-cyan-300')
+    expect(within(nav).getByRole('link', { name: /^ABOUT$/i }).className).toContain('text-cyan-300')
 
     mockPathname = '/what-is-moltology/beliefs'
     rerender(<PublicHeader />)
     expect(
-      within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('button', {
+      within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('link', {
         name: /^ABOUT$/i,
       }).className,
     ).toContain('text-cyan-300')
@@ -219,7 +220,7 @@ describe('PublicHeader Navigation Component', () => {
     fireEvent.click(toggle)
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
 
-    const moltmaxMobileBtn = screen.getAllByRole('button', { name: /^MOLTMAX$/i })
+    const moltmaxMobileBtn = screen.getAllByRole('link', { name: /^MOLTMAX$/i })
     expect(moltmaxMobileBtn.length).toBeGreaterThanOrEqual(2) // 1 desktop, 1 mobile
 
     const mobileLogin = (await screen.findAllByRole('button', { name: /LOG IN/i })).at(-1)!
@@ -268,5 +269,33 @@ describe('PublicHeader Navigation Component', () => {
     expect((await screen.findAllByRole('button', { name: /LOG IN/i })).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('button', { name: /JOIN PATH/i }).length).toBeGreaterThan(0)
     expect(screen.queryByTestId('public-header-auth-skeleton')).not.toBeInTheDocument()
+  })
+
+  it('keeps the current page highlighted while the lens previews a hovered tab', () => {
+    mockPathname = '/news'
+    render(<PublicHeader activePage="news" />)
+    const nav = screen.getByRole('navigation', { name: /main navigation/i })
+    const newsLink = within(nav).getByRole('link', { name: /NEWS/i })
+    const forumLink = within(nav).getByRole('link', { name: /^FORUM$/i })
+
+    expect(newsLink).toHaveAttribute('aria-current', 'page')
+    expect(newsLink).toHaveAttribute('href', '/news')
+    expect(forumLink).not.toHaveAttribute('aria-current')
+
+    fireEvent.mouseEnter(forumLink)
+    expect(newsLink.className).toContain('text-cyan-300')
+    expect(forumLink.className).toContain('text-gray-100')
+
+    fireEvent.focus(within(nav).getByRole('link', { name: /^MOLTMAX$/i }))
+    expect(newsLink.className).toContain('text-cyan-300')
+  })
+
+  it('closes the mobile menu with Escape', () => {
+    render(<PublicHeader activePage="home" />)
+    const toggle = screen.getByRole('button', { name: /toggle navigation menu/i })
+    fireEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
   })
 })

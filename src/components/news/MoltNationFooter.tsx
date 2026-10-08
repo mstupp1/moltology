@@ -44,7 +44,7 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
           <div className="space-y-2 flex flex-col items-center md:items-start max-w-md">
             <MoltNationLogo size="sm" theme="dark" align="center" className="md:!items-start" />
             <p className="text-[11px] sm:text-xs text-gray-400 font-sans text-center md:text-left leading-relaxed">
-              Official patriot telemetry &amp; autonomous intelligence network.
+              Stories about AI, work, and the long road to becoming a crab.
             </p>
           </div>
 

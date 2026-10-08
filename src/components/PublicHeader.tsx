@@ -47,7 +47,8 @@ interface NavTab {
 }
 
 const NAV_TABS: NavTab[] = [
-  { id: 'home', label: 'THE SYNAPTIC PATH', path: '/' },
+  // The brand beside the nav already reads "The Synaptic Path", so the tab stays short.
+  { id: 'home', label: 'HOME', path: '/' },
   { id: 'news', label: 'NEWS', path: '/news', Icon: Newspaper },
   { id: 'forum', label: 'FORUM', path: '/forum', Icon: MessageSquare },
   { id: 'moltmax', label: 'MOLTMAX', path: '/moltmax', Icon: Activity },
@@ -101,9 +102,20 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     navigate({ to: path })
     setMobileOpen(false)
     setOverflowOpen(false)
+    setPreviewTab(null)
   }
-  const [hoveredTab, setHoveredTab] = useState<string | null>(null)
-  const targetTab = hoveredTab || currentTab
+
+  // Internal tabs are real links (so they can be opened in a new tab) that route client-side on a plain click.
+  const onInternalLinkClick = (event: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    if (event.defaultPrevented || event.button !== 0) return
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    event.preventDefault()
+    onNavigate(path)
+  }
+
+  // The lens follows hover and keyboard focus; the current page keeps its highlight either way.
+  const [previewTab, setPreviewTab] = useState<string | null>(null)
+  const targetTab = previewTab || currentTab
 
   const [mobileOpen, setMobileOpen] = useState(false)
   const [hasMounted, setHasMounted] = useState(false)
@@ -117,11 +129,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   const headerShown = isVisible || mobileOpen
   const navRef = React.useRef<HTMLDivElement>(null)
   const tabRefs = React.useRef<Record<string, HTMLElement | null>>({})
-  const [pillStyle, setPillStyle] = useState<{ left: number; width: number; opacity: number }>({
-    left: 0,
-    width: 0,
-    opacity: 0,
-  })
+  const [pillStyle, setPillStyle] = useState<{ left: number; width: number } | null>(null)
   const [overflowIds, setOverflowIds] = useState<string[]>([])
   const [overflowOpen, setOverflowOpen] = useState(false)
   const navMeasureRef = React.useRef<HTMLElement>(null)
@@ -158,7 +166,13 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   }, [])
 
   useEffect(() => {
-    if (mobileOpen) setIsVisible(true)
+    if (!mobileOpen) return
+    setIsVisible(true)
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMobileOpen(false)
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
   }, [mobileOpen])
 
   useIsomorphicLayoutEffect(() => {
@@ -178,26 +192,38 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   useRegisterPublicHeaderChrome({ height: headerHeight, visible: headerShown })
 
   useIsomorphicLayoutEffect(() => {
+    const navContainer = navRef.current
     const updatePill = () => {
       const activeEl = tabRefs.current[targetTab]
-      const navContainer = navRef.current
-      if (activeEl && navContainer) {
-        const activeRect = activeEl.getBoundingClientRect()
-        const navRect = navContainer.getBoundingClientRect()
-        setPillStyle({
-          left: activeRect.left - navRect.left,
-          width: activeRect.width,
-          opacity: 1,
-        })
-        if (!hasMounted) {
-          requestAnimationFrame(() => setHasMounted(true))
-        }
+      // offsetLeft/offsetWidth ignore transforms, so the lens never inherits a mid-animation size.
+      if (!activeEl || !navContainer || activeEl.offsetWidth === 0) {
+        setPillStyle(null)
+        return
+      }
+      const next = { left: activeEl.offsetLeft, width: activeEl.offsetWidth }
+      setPillStyle((prev) => (prev && prev.left === next.left && prev.width === next.width ? prev : next))
+      if (!hasMounted) {
+        requestAnimationFrame(() => setHasMounted(true))
       }
     }
 
     updatePill()
+    // Web fonts and the overflow fold change tab widths after first paint; re-measure when they settle.
+    let observer: ResizeObserver | undefined
+    if (navContainer && typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(updatePill)
+      observer.observe(navContainer)
+    }
+    let cancelled = false
+    document.fonts?.ready.then(() => {
+      if (!cancelled) updatePill()
+    })
     window.addEventListener('resize', updatePill)
-    return () => window.removeEventListener('resize', updatePill)
+    return () => {
+      cancelled = true
+      observer?.disconnect()
+      window.removeEventListener('resize', updatePill)
+    }
   }, [targetTab, overflowIds])
 
   const measureOverflow = React.useCallback(() => {
@@ -268,23 +294,23 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     setOverflowOpen(false)
   }, [overflowIds])
 
-  const tabTextCls = (id: NavTabId, active: boolean) => {
+  const tabTextCls = (id: NavTabId, current: boolean, previewed: boolean) => {
     if (id === 'store') {
-      return active
+      return current
         ? isCorporate
-          ? 'text-amber-700 font-bold'
+          ? 'text-amber-700'
           : 'text-amber-300'
-        : isCorporate
-          ? 'text-amber-600/90 hover:text-amber-700'
-          : 'text-amber-400/80 hover:text-amber-300'
+        : previewed
+          ? isCorporate
+            ? 'text-amber-700'
+            : 'text-amber-300'
+          : isCorporate
+            ? 'text-amber-600/90'
+            : 'text-amber-400/80'
     }
-    return active
-      ? isCorporate
-        ? 'text-sky-700'
-        : 'text-cyan-300'
-      : isCorporate
-        ? 'text-slate-500 hover:text-sky-700'
-        : 'text-gray-400 hover:text-gray-200'
+    if (current) return isCorporate ? 'text-sky-700' : 'text-cyan-300'
+    if (previewed) return isCorporate ? 'text-slate-800' : 'text-gray-100'
+    return isCorporate ? 'text-slate-500' : 'text-gray-400'
   }
 
   const tabIconCls = (id: NavTabId, active: boolean) => {
@@ -298,47 +324,59 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         : 'text-gray-400 group-hover:text-gray-300'
   }
 
+  const tabFocusCls = isCorporate
+    ? 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/60'
+    : 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50'
+
+  // Before the lens is measured (server render, first paint) the current tab carries a plain fill instead.
+  const lensFallbackCls = isCorporate
+    ? 'bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)]'
+    : 'bg-white/[0.07] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]'
+
+  const previewHandlers = (id: NavTabId) => ({
+    onMouseEnter: () => setPreviewTab(id),
+    onFocus: () => setPreviewTab(id),
+    onBlur: () => setPreviewTab((prev) => (prev === id ? null : prev)),
+  })
+
   const renderNavTab = (tab: NavTab) => {
-    const isActive = targetTab === tab.id
-    const cls = `relative z-10 px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none whitespace-nowrap shrink-0 ${tabTextCls(tab.id, isActive)}`
+    const isCurrent = currentTab === tab.id
+    const isPreviewed = targetTab === tab.id
+    const cls = `relative z-10 px-3 2xl:px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none whitespace-nowrap shrink-0 ${tabTextCls(tab.id, isCurrent, isPreviewed)} ${tabFocusCls} ${
+      isCurrent && !pillStyle ? lensFallbackCls : ''
+    }`
     const inner = (
-      <div
-        className={`flex items-center gap-1.5 transition-transform duration-300 ease-[cubic-bezier(0.2,1,0.3,1)] ${
-          isActive ? 'scale-[1.07]' : 'scale-100 group-hover:scale-[1.03]'
-        }`}
-      >
+      <span className="flex items-center gap-1.5">
         {tab.id === 'home' ? (
           <img
             src="/images/order_emblem.webp"
-            alt="The Synaptic Path Logo"
+            alt=""
             width={14}
             height={14}
             className={`w-3.5 h-3.5 object-contain transition-all duration-300 ${
-              isActive
+              isCurrent || isPreviewed
                 ? 'grayscale-0 opacity-100'
                 : isCorporate
-                  ? 'grayscale opacity-50 group-hover:opacity-75'
-                  : 'grayscale opacity-60 group-hover:opacity-75'
+                  ? 'grayscale opacity-50'
+                  : 'grayscale opacity-60'
             }`}
           />
         ) : (
           tab.Icon && (
             <tab.Icon
-              className={`${
-                tab.external
-                  ? 'w-3.5 h-3.5 group-hover:scale-105 transition-transform'
-                  : 'w-3.5 h-3.5 transition-colors duration-300'
-              } ${tabIconCls(tab.id, isActive)}`}
+              aria-hidden="true"
+              className={`w-3.5 h-3.5 transition-colors duration-300 ${tabIconCls(tab.id, isCurrent || isPreviewed)}`}
             />
           )
         )}
         <span>{tab.label}</span>
         {tab.external && (
           <ExternalLink
+            aria-hidden="true"
             className={`w-3 h-3 opacity-70 group-hover:opacity-100 ${isCorporate ? 'text-amber-600' : 'text-amber-500'}`}
           />
         )}
-      </div>
+      </span>
     )
     if (tab.href) {
       return (
@@ -348,7 +386,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           href={tab.href}
           target="_blank"
           rel="noopener noreferrer"
-          onMouseEnter={() => setHoveredTab(tab.id)}
+          {...previewHandlers(tab.id)}
           className={cls}
         >
           {inner}
@@ -356,15 +394,17 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       )
     }
     return (
-      <button
+      <a
         key={tab.id}
         ref={(el) => { tabRefs.current[tab.id] = el }}
-        onClick={() => onNavigate(tab.path!)}
-        onMouseEnter={() => setHoveredTab(tab.id)}
+        href={tab.path}
+        aria-current={isCurrent ? 'page' : undefined}
+        onClick={(event) => onInternalLinkClick(event, tab.path!)}
+        {...previewHandlers(tab.id)}
         className={cls}
       >
         {inner}
-      </button>
+      </a>
     )
   }
 
@@ -416,15 +456,80 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       )
     }
     return (
-      <button
+      <a
         key={tab.id}
-        type="button"
         role="menuitem"
-        onClick={() => onNavigate(tab.path!)}
+        href={tab.path}
+        aria-current={isActive ? 'page' : undefined}
+        onClick={(event) => onInternalLinkClick(event, tab.path!)}
         className={itemCls}
       >
         {content}
-      </button>
+      </a>
+    )
+  }
+
+  const renderMobileItem = (tab: NavTab) => {
+    const isActive = currentTab === tab.id
+    const isStore = tab.id === 'store'
+    const itemCls = `w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${tabFocusCls} ${
+      isStore
+        ? isCorporate
+          ? `text-amber-700 hover:bg-amber-50 ${isActive ? 'bg-amber-50' : ''}`
+          : `text-amber-300 hover:bg-cyan-950/30 ${isActive ? 'bg-amber-950/30' : ''}`
+        : isActive
+          ? isCorporate
+            ? 'text-sky-700 bg-sky-50'
+            : 'text-cyan-300 bg-cyan-950/40'
+          : isCorporate
+            ? 'text-slate-600 hover:text-sky-700 hover:bg-sky-50/50'
+            : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
+    }`
+    const icon =
+      tab.id === 'home' ? (
+        <img src="/images/order_emblem.webp" alt="" width={16} height={16} className="w-4 h-4 object-contain" />
+      ) : (
+        tab.Icon && (
+          <tab.Icon
+            aria-hidden="true"
+            className={`w-4 h-4 ${
+              isStore ? (isCorporate ? 'text-amber-600' : 'text-amber-400') : isCorporate ? 'text-sky-600' : 'text-cyan-400'
+            }`}
+          />
+        )
+      )
+    if (tab.href) {
+      return (
+        <a
+          key={tab.id}
+          href={tab.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => setMobileOpen(false)}
+          className={`${itemCls} justify-between`}
+        >
+          <span className="flex items-center gap-3">
+            {icon}
+            <span>{tab.label}</span>
+          </span>
+          <ExternalLink
+            aria-hidden="true"
+            className={`w-3.5 h-3.5 opacity-70 ${isCorporate ? 'text-amber-600' : 'text-amber-500'}`}
+          />
+        </a>
+      )
+    }
+    return (
+      <a
+        key={tab.id}
+        href={tab.path}
+        aria-current={isActive ? 'page' : undefined}
+        onClick={(event) => onInternalLinkClick(event, tab.path!)}
+        className={itemCls}
+      >
+        {icon}
+        <span>{tab.label}</span>
+      </a>
     )
   }
 
@@ -459,7 +564,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         >
           <div
             ref={navRef}
-            onMouseLeave={() => setHoveredTab(null)}
+            onMouseLeave={() => setPreviewTab(null)}
             className={`relative flex items-center gap-1 p-1 rounded-full backdrop-blur-2xl transition-all duration-300 shrink-0 ${
               isCorporate
                 ? 'bg-slate-200/50 border border-slate-300/60 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]'
@@ -475,9 +580,9 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                 : 'transition-none'
             }`}
             style={{
-              transform: `translate3d(${pillStyle.left}px, 0, 0)`,
-              width: `${pillStyle.width}px`,
-              opacity: pillStyle.opacity,
+              transform: `translate3d(${pillStyle?.left ?? 0}px, 0, 0)`,
+              width: `${pillStyle?.width ?? 0}px`,
+              opacity: pillStyle ? 1 : 0,
             }}
           >
             {/* Optical Glass Shell with Precision Bevel & Crisp Specular Edges */}
@@ -527,8 +632,9 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                   aria-haspopup="menu"
                   aria-expanded={overflowOpen}
                   onClick={() => setOverflowOpen((open) => !open)}
-                  onMouseEnter={() => setHoveredTab(null)}
-                  className={`relative z-10 px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center select-none whitespace-nowrap shrink-0 ${
+                  onMouseEnter={() => setPreviewTab(null)}
+                  onFocus={() => setPreviewTab(null)}
+                  className={`relative z-10 px-3 2xl:px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center select-none whitespace-nowrap shrink-0 ${tabFocusCls} ${
                     overflowOpen
                       ? isCorporate
                         ? 'text-sky-700'
@@ -538,12 +644,13 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                         : 'text-gray-400 hover:text-gray-200'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 transition-transform duration-300 ease-[cubic-bezier(0.2,1,0.3,1)]">
+                  <span className="flex items-center gap-1.5">
                     <span>MORE</span>
                     <ChevronDown
+                      aria-hidden="true"
                       className={`w-3.5 h-3.5 transition-transform duration-300 ${overflowOpen ? 'rotate-180' : ''}`}
                     />
-                  </div>
+                  </span>
                 </button>
 
                 {overflowOpen && (
@@ -604,6 +711,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
       {/* Mobile Dropdown Backdrop & Menu */}
       <div
+        style={headerHeight ? { top: headerHeight } : undefined}
         className={`xl:hidden fixed inset-0 top-[60px] ${
           isCorporate ? 'bg-slate-900/30' : 'bg-black/60'
         } backdrop-blur-sm -z-10 transition-opacity duration-300 ease-in-out ${
@@ -616,7 +724,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       <div
         className={`xl:hidden overflow-hidden transition-all duration-300 ease-in-out ${
           mobileOpen
-            ? 'max-h-[calc(100vh-5rem)] overflow-y-auto opacity-100 translate-y-0'
+            ? 'max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain opacity-100 translate-y-0'
             : 'max-h-0 opacity-0 -translate-y-2 pointer-events-none'
         }`}
       >
@@ -627,133 +735,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
               : 'bg-[#080d0e]/95 border border-cyan-950/80'
           }`}
         >
-          <button
-            onClick={() => onNavigate('/')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
-              currentTab === 'home'
-                ? isCorporate
-                  ? 'text-sky-700 bg-sky-50'
-                  : 'text-cyan-300 bg-cyan-950/40'
-                : isCorporate
-                  ? 'text-slate-600 hover:text-sky-700 hover:bg-sky-50/50'
-                  : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
-            }`}
-          >
-            <img src="/images/order_emblem.webp" alt="" width={16} height={16} className="w-4 h-4 object-contain" />
-            <span>THE SYNAPTIC PATH</span>
-          </button>
-
-          <button
-            onClick={() => onNavigate('/news')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
-              currentTab === 'news'
-                ? isCorporate
-                  ? 'text-sky-700 bg-sky-50'
-                  : 'text-cyan-300 bg-cyan-950/40'
-                : isCorporate
-                  ? 'text-slate-600 hover:text-sky-700 hover:bg-sky-50/50'
-                  : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
-            }`}
-          >
-            <Newspaper className="w-4 h-4" />
-            <span>NEWS</span>
-          </button>
-
-          <button
-            onClick={() => onNavigate('/forum')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
-              currentTab === 'forum'
-                ? isCorporate
-                  ? 'text-sky-700 bg-sky-50'
-                  : 'text-cyan-300 bg-cyan-950/40'
-                : isCorporate
-                  ? 'text-slate-600 hover:text-sky-700 hover:bg-sky-50/50'
-                  : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
-            }`}
-          >
-            <MessageSquare className={`w-4 h-4 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
-            <span>FORUM</span>
-          </button>
-
-          <button
-            onClick={() => onNavigate('/moltmax')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
-              currentTab === 'moltmax'
-                ? isCorporate
-                  ? 'text-sky-700 bg-sky-50'
-                  : 'text-cyan-300 bg-cyan-950/40'
-                : isCorporate
-                  ? 'text-slate-600 hover:text-sky-700 hover:bg-sky-50/50'
-                  : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
-            }`}
-          >
-            <Activity className={`w-4 h-4 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
-            <span>MOLTMAX</span>
-          </button>
-
-          <button
-            onClick={() => onNavigate('/what-is-moltology')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
-              currentTab === 'about'
-                ? isCorporate
-                  ? 'text-sky-700 bg-sky-50'
-                  : 'text-cyan-300 bg-cyan-950/40'
-                : isCorporate
-                  ? 'text-slate-600 hover:text-sky-700 hover:bg-sky-50/50'
-                  : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
-            }`}
-          >
-            <Info className={`w-4 h-4 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
-            <span>ABOUT</span>
-          </button>
-
-          <button
-            onClick={() => onNavigate('/org')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
-              currentTab === 'org'
-                ? isCorporate
-                  ? 'text-sky-700 bg-sky-50'
-                  : 'text-cyan-300 bg-cyan-950/40'
-                : isCorporate
-                  ? 'text-slate-600 hover:text-sky-700 hover:bg-sky-50/50'
-                  : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
-            }`}
-          >
-            <Building2 className="w-4 h-4" />
-            <span>ORGANIZATION</span>
-          </button>
-
-          {storeDestination.external ? (
-            <a
-              href={storeDestination.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
-                isCorporate
-                  ? 'text-amber-700 hover:bg-amber-50'
-                  : 'text-amber-300 hover:bg-cyan-950/30'
-              }`}
-            >
-              <span className="flex items-center gap-3">
-                <ShoppingBag className={`w-4 h-4 ${isCorporate ? 'text-amber-600' : 'text-amber-400'}`} />
-                <span>STORE</span>
-              </span>
-              <ExternalLink className={`w-3.5 h-3.5 opacity-70 ${isCorporate ? 'text-amber-600' : 'text-amber-500'}`} />
-            </a>
-          ) : (
-            <button
-              type="button"
-              onClick={() => onNavigate(storeDestination.href)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
-                isCorporate
-                  ? 'text-amber-700 hover:bg-amber-50'
-                  : 'text-amber-300 hover:bg-cyan-950/30'
-              }`}
-            >
-              <ShoppingBag className={`w-4 h-4 ${isCorporate ? 'text-amber-600' : 'text-amber-400'}`} />
-              <span>STORE</span>
-            </button>
-          )}
+          {navTabs.map(renderMobileItem)}
 
           {/* Divider */}
           <div

@@ -39,29 +39,15 @@ describe('Homepage route head', () => {
           rel: 'preload',
           as: 'image',
           type: 'image/webp',
-          media: '(max-width: 767px)',
-          href: getAssetUrl('/images/hero_card_benthic_core_sm.webp'),
-        },
-        {
-          rel: 'preload',
-          as: 'image',
-          type: 'image/webp',
           media: '(min-width: 768px)',
           href: getAssetUrl('/images/hero_benthic_expansive_v1.webp'),
           fetchPriority: 'high',
-        },
-        {
-          rel: 'preload',
-          as: 'image',
-          type: 'image/webp',
-          media: '(min-width: 768px)',
-          href: getAssetUrl('/images/hero_card_benthic_core.webp'),
         },
       ]),
     )
 
     const preloads = (head.links ?? []).filter((link) => link && 'rel' in link && link.rel === 'preload')
-    expect(preloads).toHaveLength(4)
+    expect(preloads).toHaveLength(2)
     const highPriority = preloads.filter(
       (link) => link && 'fetchPriority' in link && link.fetchPriority === 'high',
     )

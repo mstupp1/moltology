@@ -23,7 +23,7 @@ const dimensions: Array<{ key: QuizDimension; label: string; color: string }> = 
   { key: 'shellHardness', label: 'Carapace resilience', color: '#00ffcc' },
   { key: 'pincerTorque', label: 'Pincer torque', color: '#ffd700' },
   { key: 'neuralLatency', label: 'Synaptic speed', color: '#38bdf8' },
-  { key: 'ecdysisDiscipline', label: 'Ecdysis shedding', color: '#00c3ff' },
+  { key: 'ecdysisDiscipline', label: 'Ecdysis shedding', color: '#c084fc' },
   { key: 'depthTolerance', label: 'Depth composure', color: '#ff7b72' },
 ]
 

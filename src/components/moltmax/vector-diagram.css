@@ -1,0 +1,105 @@
+/* Five vectors diagram on the Moltmax landing page. Every loop here is transform or opacity only. */
+
+.vd-orbit {
+  animation: vdOrbit 90s linear infinite;
+}
+.vd-orbit--reverse {
+  animation-duration: 140s;
+  animation-direction: reverse;
+}
+.vd-paused .vd-orbit,
+.vd-paused .vd-pulse,
+.vd-paused .vd-node-ping {
+  animation-play-state: paused;
+}
+
+/* A bead of light that travels out along the active spoke. Pixels are viewBox units inside the SVG. */
+.vd-pulse {
+  animation: vdPulse 2.4s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+}
+
+.vd-node-ping {
+  animation: vdPing 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.vd-autoplay-bar {
+  transform-origin: left center;
+  animation: vdAutoplay var(--vd-autoplay, 6s) linear forwards;
+}
+.vd-autoplay-hold .vd-autoplay-bar {
+  animation-play-state: paused;
+}
+
+.vd-panel-enter {
+  animation: vdPanelIn 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes vdOrbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes vdPulse {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(var(--vd-reach, -136px));
+    opacity: 0;
+  }
+}
+
+@keyframes vdPing {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  80%,
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+@keyframes vdAutoplay {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes vdPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vd-orbit,
+  .vd-pulse,
+  .vd-node-ping,
+  .vd-autoplay-bar,
+  .vd-panel-enter {
+    animation: none;
+  }
+  .vd-pulse,
+  .vd-node-ping,
+  .vd-autoplay-bar {
+    display: none;
+  }
+}

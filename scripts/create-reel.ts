@@ -7,7 +7,7 @@ import matter from 'gray-matter'
 import { generateVoiceover } from './lib/tts-engine'
 import { getRandomFishVoice } from './lib/tts-providers/fish-audio'
 import { compositeReel, renderCtaOutroFrame, ColorGradingPreset } from './lib/reel-compositor'
-import { generateVeoVideo } from './generate-video'
+import { generateVeoVideo, DEFAULT_VIDEO_MODEL } from './generate-video'
 import { generateGeminiImage } from './generate-image'
 import { resolveThematicOutroCard } from './lib/outro-catalog'
 import {
@@ -451,7 +451,7 @@ export interface CreateReelOptions {
   colorGrading?: ColorGradingPreset | ColorGradingPreset[] | string
   bgAudioVolume?: number
   bgAudioOffsetSeconds?: number
-  veoModel?: 'veo-3.1-lite-generate-preview' | 'veo-3.1-fast-generate-preview' | 'veo-3.1-generate-preview' | string
+  veoModel?: 'gemini-omni-1.1-flash' | 'veo-3.1-lite-generate-preview' | 'veo-3.1-fast-generate-preview' | 'veo-3.1-generate-preview' | string
   /** Automatically commit updated continuity ledger to git (default: false, enabled via --commit). */
   commit?: boolean
 }
@@ -2202,11 +2202,11 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
           }
         }
 
-        console.log(`\n🎬 Rendering Scene ${i + 1}/${scenePrompts.length} with Veo 3.1 (${veoSceneDuration}s for a ${(beatDurations[i] ?? 0).toFixed(1)}s beat)...`)
+        console.log(`\n🎬 Rendering Scene ${i + 1}/${scenePrompts.length} with ${options.veoModel || DEFAULT_VIDEO_MODEL} (${veoSceneDuration}s for a ${(beatDurations[i] ?? 0).toFixed(1)}s beat)...`)
         const veoResult = await generateVeoVideo({
           prompt,
           negativePrompt: SCENE_NEGATIVE_PROMPT,
-          model: options.veoModel || 'veo-3.1-fast-generate-preview',
+          model: options.veoModel || DEFAULT_VIDEO_MODEL,
           aspectRatio: '9:16',
           durationSeconds: veoSceneDuration,
           uploadToS3: false,
@@ -2468,7 +2468,7 @@ Options:
   --voice <name>            Fish Audio catalog voice (default: BOOK RECORD REGULAR, or env FISH_VOICE_REFERENCE_ID; "random" rotates) or Edge TTS voice for fallback (default: en-US-ChristopherNeural). Fish voices: Ethan, Mommy, Just Many, Twilight Sparkle, Young Creative Voice, Friendly Young Woman, Laura, BOOK RECORD REGULAR, Friendly Young Female
   --bg-volume <number>      Background soundtrack volume multiplier (default: 0.14)
   --bg-offset <seconds>     Soundtrack start point in seconds (e.g. 0, 18, 36, 54, 72, 95, 120)
-  --veo-model <name>        Veo Model ID (default: veo-3.1-lite-generate-preview)
+  --veo-model <name>        Video model ID (default: gemini-omni-1.1-flash; veo-3.1-*-generate-preview until October 22, 2026)
   --custom-outro <path>     Path to bespoke elevated outro card image (from Antigravity generate_image or user polish)
   --render-base-outro       Render Composite Studio base outro frame to tmp/ and print Antigravity prompt
   --commit                  Automatically commit updated continuity ledger to git
