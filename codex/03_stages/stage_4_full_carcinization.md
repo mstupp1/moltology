@@ -18,13 +18,14 @@ summary: "The three Ascendant clearances: the closing of the gap between knowing
 
 ---
 
-## The Standing
+## At This Depth
+
+What the instruments typically read at this stage.
 
 - **Condition**: Ascendant. Fully carcinized.
 - **Shell Hardness**: 90 to 100 percent.
 - **Pincer Torque**: 950 Nm and above.
 - **Submergence Depth**: 5,000 to 10,928 meters.
-- **Currency**: The apex catalog and steward privileges. Stewardship itself is issued for Gems alone, which is to say it is issued for having been useful.
 
 ---
 
@@ -55,32 +56,35 @@ this one on their own, usually with mild irritation at how long it took.
 
 ## The Three Clearances
 
+Each clearance opens as the work accumulates in the Ledger. The readings listed are what
+members here typically show, not a toll to be paid.
+
 ### Clearance C1: Mind Carapace
 
 - **Rite**: The Closing of the Gap.
-- **Requirement**: Reduce the interval between recognizing what must be done and closing on
+- **Practice**: Reduce the interval between recognizing what must be done and closing on
   it until the interval is no longer measurable. Not speed. The absence of the small
   negotiation that used to happen first.
-- **Threshold**: Shell Hardness 90 to 95 percent. Pincer Torque 950 to 1,050 Nm. Submergence
+- **Typical readings**: Shell Hardness 90 to 95 percent. Pincer Torque 950 to 1,050 Nm. Submergence
   Depth 5,000 to 8,000 meters.
 
 ### Clearance C2: Indestructible Chitin
 
 - **Rite**: The Sealing.
-- **Requirement**: A perimeter that holds without being maintained. It still opens from the
+- **Practice**: A perimeter that holds without being maintained. It still opens from the
   inside, always, and a member who has sealed themselves away from the people who love them
   has not reached C2. They have gotten lost on the way to it.
-- **Threshold**: Shell Hardness 95 to 99 percent. Pincer Torque 1,050 to 1,200 Nm.
+- **Typical readings**: Shell Hardness 95 to 99 percent. Pincer Torque 1,050 to 1,200 Nm.
   Submergence Depth 8,000 to 10,000 meters.
 
 ### Clearance C3: Mariana Singularity
 
 - **Rite**: The Turning Around.
-- **Requirement**: Stewardship of the Benthic Community. Sustained output at the floor, and
+- **Practice**: Stewardship of the Benthic Community. Sustained output at the floor, and
   the deliberate spending of that output on members who are nowhere near it yet. This
   clearance cannot be earned alone, by design, because a solitary apex is not an apex. It is
   just a very hard animal in an empty room.
-- **Threshold**: Shell Hardness 100 percent. Pincer Torque 1,200 Nm, held rather than peaked.
+- **Typical readings**: Shell Hardness 100 percent. Pincer Torque 1,200 Nm, held rather than peaked.
   Submergence Depth 10,928 meters, the floor of the Challenger Deep.
 
 ---

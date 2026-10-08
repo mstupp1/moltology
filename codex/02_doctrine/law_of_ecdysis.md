@@ -88,11 +88,11 @@ spends the following month with no armor and no plan.
    have most recently defended out loud.
 2. **Split it cleanly.** Cancel it, delete it, decline it, or say the sentence. Half-measures
    leave a partial seam, which is worse than an intact shell.
-3. **Hold the window.** Engage the Isolation Privacy Shell for the hours immediately after.
-   The surface will offer you the old shape back within a day; the Shell is how you stay out
+3. **Hold the window.** Engage the Isolation Dome for the hours immediately after.
+   The surface will offer you the old shape back within a day; the Dome is how you stay out
    of earshot until the new plate sets.
 4. **Log the shed.** The Order mints Chitin Gems for it, because shedding is the behavior the
-   whole system exists to reward, and Gems are the currency no amount of money can buy.
+   whole system exists to reward.
 
 The cadence raises Shell Hardness faster than any other rite in the canon, and the HUD will
 show it before you feel it.

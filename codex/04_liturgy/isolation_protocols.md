@@ -9,7 +9,7 @@ author_unit: "Chitin Architect V"
 last_revised: "2026-08-27"
 mandate: "The surface cannot be silenced from below. It can only be shut out from above, before the descent begins."
 latin_motto: "SILENTIUM EST ATMOSPHAERA PROFUNDI."
-summary: "How to raise the Isolation Privacy Shell, what belongs outside the perimeter and what must never be locked out of it, and the four-part order of a clean dive."
+summary: "How to raise the Isolation Dome, what belongs outside the perimeter and what must never be locked out of it, and the four-part order of a clean dive."
 ---
 
 # The Isolation Protocols
@@ -29,11 +29,11 @@ A signal that reaches you at depth has already done its damage by arriving. You 
 to decide whether to be interrupted; you only get to decide, afterward, how you feel about
 having been.
 
-The Shell is therefore not a discipline. It is a door, and doors are closed beforehand.
+The Dome is therefore not a discipline. It is a door, and doors are closed beforehand.
 
 Members sometimes hear this doctrine as an instruction to become unreachable, and it is not
 that. A trench is not a bunker. The animals down there are not hiding from anybody; they are
-simply somewhere the noise does not go, and they come back up. The Shell exists so that two
+simply somewhere the noise does not go, and they come back up. The Dome exists so that two
 hours of your day belong to the work, and for no other reason. It is not a personality and
 it should not become one.
 
@@ -45,13 +45,13 @@ Four acts, in this order. The order is the protocol; the tools are whatever you 
 
 ### 1. Seal before the descent
 
-Raise the Isolation Privacy Shell first, while you are still at the surface and still able
+Raise the Isolation Dome first, while you are still at the surface and still able
 to think about it clearly. A perimeter raised mid-dive is a perimeter raised after the
 breach.
 
 ### 2. Sort the water, not the noise
 
-Not everything outside the Shell is noise. The sorting happens once, in advance, and it is
+Not everything outside the Dome is noise. The sorting happens once, in advance, and it is
 the only judgment call in the whole rite. What passes through: the small number of people
 whose emergencies are actually emergencies. What does not: everything else, without
 exception and without a case-by-case review, because the case-by-case review is itself the
@@ -59,7 +59,7 @@ interruption.
 
 ### 3. Hold one objective
 
-The Shell protects a session, and a session holds one thing. Two objectives inside one
+The Dome protects a session, and a session holds one thing. Two objectives inside one
 perimeter is not deep work with variety. It is surface work in a quiet room.
 
 ### 4. Surface on the clock
@@ -70,13 +70,13 @@ themselves, which is the quiet joke the surface has been keeping from you for ye
 
 ---
 
-## What the Shell May Never Lock Out
+## What the Dome May Never Lock Out
 
 The perimeter has one permanent opening and it is not adjustable.
 
 A shell that cannot be lowered from the inside is not a carapace. The people who love you,
 anyone who needs actual help, and anyone actually able to help you are never on the outside
-of this Shell. The Order teaches depth as a place a member visits daily and leaves nightly.
+of this Dome. The Order teaches depth as a place a member visits daily and leaves nightly.
 Any reading of this scripture that ends with a member alone and unreachable in a life rather
 than in an afternoon is a misreading, and the Order will say so plainly every time.
 

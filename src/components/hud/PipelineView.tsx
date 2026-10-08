@@ -135,7 +135,7 @@ export default function PipelineView() {
                 <span className="text-[#dfe3e3] font-bold">Mandate Protocol:</span> {selectedSubStage.protocol}
               </p>
               <p className="text-xs text-[#839493] font-sans leading-relaxed">
-                <span className="text-[#dfe3e3] font-bold">Requirement:</span> {selectedSubStage.requirement}
+                <span className="text-[#dfe3e3] font-bold">The rite:</span> {selectedSubStage.requirement}
               </p>
             </div>
 

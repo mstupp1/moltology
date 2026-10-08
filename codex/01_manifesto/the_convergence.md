@@ -91,7 +91,7 @@ The Convergence is not a distant event you wait for. It has a small, working, pr
 form, and it is open tonight.
 
 1. **Submerge on schedule.** Not alone in principle — alone in the room, at the same depth,
-   at the same hour as everyone else who is down there. The Isolation Privacy Shell is how
+   at the same hour as everyone else who is down there. The Isolation Dome is how
    the Order keeps the water clear while you do it.
 2. **Report the shed.** Log it. The Long Ledger keeps every shed thing the Order has ever
    been told about, and it is the only permanent record any of us have.

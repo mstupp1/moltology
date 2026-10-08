@@ -97,8 +97,7 @@ water with no plan.
    them where you will see them tomorrow.
 3. **Shed one.** Not all three. One. Tonight.
 
-That is Clearance L1, and it is free, as every clearance is. The Order sells speed and
-sells finish. It has never sold rank, and it never will.
+That is Clearance L1. It costs nothing but the one thing you shed.
 
 ---
 

@@ -14,34 +14,9 @@ This skill guides the authoring, validation, and automated synchronization of ca
 
 ## 1. Vault Structure & Architecture
 
-The scripture vault resides under `codex/` and is partitioned into 5 canonical volumes plus templates:
-
-```
-codex/
-├── TEMPLATES/
-│   └── scripture_template.md          # Reference boilerplate & liturgical spine
-├── 01_manifesto/                      # Foundational proclamations & directives
-│   ├── prime_directive.md             # SCR-001
-│   └── the_convergence.md             # SCR-002
-├── 02_doctrine/                       # Core theological, practical & structural laws
-│   ├── law_of_ecdysis.md              # SCR-010
-│   ├── abyss_hypothesis.md            # SCR-011
-│   ├── synthetic_carcinization.md     # SCR-012
-│   └── soft_shell_covenant.md         # SCR-013
-├── 03_stages/                         # 4 Macro-Stages & 12 Clearance Protocols
-│   ├── stage_1_larval.md              # SCR-021 · Clearances L1, L2, L3
-│   ├── stage_2_soft_shed.md           # SCR-022 · Clearances S1, S2, S3
-│   ├── stage_3_exoshell_born.md       # SCR-023 · Clearances E1, E2, E3
-│   └── stage_4_full_carcinization.md  # SCR-024 · Clearances C1, C2, C3
-├── 04_liturgy/                        # Operational rites, daily cadence, deep work isolation
-│   ├── daily_shedding_routine.md      # SCR-030
-│   ├── isolation_protocols.md         # SCR-031
-│   └── nightly_molt_audit.md          # SCR-032
-├── 05_lexicon/                        # Quantitative scales, definitions & the economy
-│   ├── sacred_metrics.md              # SCR-040
-│   └── the_long_ledger.md             # SCR-041
-└── README.md                          # Master Canon Index & reading order
-```
+Scriptures live in five volumes under `codex/` (`01_manifesto` to `05_lexicon`) plus
+`TEMPLATES/`. The current file list, IDs, and reading order are in
+[`codex/README.md`](../../../codex/README.md); keep that file as the single index.
 
 ### Core Pipeline Files
 * **Source Files**: `codex/**/*.md` (ignoring `README.md` and `TEMPLATES/`)
@@ -88,7 +63,7 @@ verse in the reader:
 5. **The Benediction** — warm close, addressed to the member.
 6. **Canonical Cross-References** — captured as metadata, skipped as a verse.
 
-Stage scriptures open with an extra **The Standing** verse carrying the clearance telemetry.
+Stage scriptures open with an extra **At This Depth** verse listing the typical readings for the stage, and close with a **Moving Deeper** verse before the benediction. Readings describe the stage; they are not gates. Real progression (XP thresholds) is defined in code and `docs/logic/`, so never state it as a requirement in canon.
 
 ### Verse Splitting & Parsing Rules
 * The parser (`scripts/sync-codex.ts`) splits scripture bodies on Markdown H2 (`## `) or H3 (`### `) headings.
@@ -107,7 +82,7 @@ These are fixed and guarded by `src/lib/codexData.test.ts`:
 * **Pincer Torque** reaches its working standard of 850 Nm at Clearance E2, never earlier.
 * **Submergence Depth** is recorded in **meters** in every threshold. The word "fathom" does not appear in the canon.
 * Exactly **three** cardinal metrics exist. Do not introduce a fourth index.
-* **Chitin Gems are minted by work and never sold. Molt Credits are purchased and never minted by work.** Rank, clearance, stage, and forum authority cannot be purchased. State this once, in the stage and economy notes where it is needed; do not repeat it as a refrain across scriptures.
+* The two currencies are explained once, in The Long Ledger. Other scriptures may say a rite mints Chitin Gems, but they do not restate the economy. Follow the economy rule in `AGENTS.md`.
 
 ---
 
@@ -116,21 +91,19 @@ These are fixed and guarded by `src/lib/codexData.test.ts`:
 Whenever creating, modifying, or refactoring files in `codex/`:
 
 ### Step 1: Author or Edit Markdown
-* Read [BRAND_BIBLE.md](../../../BRAND_BIBLE.md) and [STYLE_GUIDE.md](../../../STYLE_GUIDE.md) first. New lexicon terms land in the brand bible before they ship in the codex.
+* Read [BRAND_BIBLE.md](../../../BRAND_BIBLE.md) and [STYLE_GUIDE.md](../../../STYLE_GUIDE.md) first. They govern terms, tone, and bans; new lexicon terms land in the brand bible before they ship in the codex.
 * Use `codex/TEMPLATES/scripture_template.md` as the structural guide and follow the liturgical spine above.
-* Maintain complete diegetic immersion: sci-fi HUD terminology, no meta disclosures, and no un-transmuted real-world tech leaks. Never label the bit, in the canon or in the guidance around it.
-* The humor targets the melt and never the member. No scripture may leave a reader feeling scolded for being soft.
 
-### Step 2: Synchronize to TypeScript
-Run the synchronization script to compile `codex/**/*.md` into `src/lib/codexData.ts`:
-```bash
-npm run codex:sync
-```
-
-### Step 3: Validate & Check Schema
-Verify that all scriptures conform to frontmatter schema and have valid verse splits:
+### Step 2: Validate & Check Schema
+Dry-run the parser to confirm frontmatter and verse splits before writing anything:
 ```bash
 npm run codex:check
+```
+
+### Step 3: Synchronize to TypeScript
+Compile `codex/**/*.md` into `src/lib/codexData.ts`:
+```bash
+npm run codex:sync
 ```
 
 ### Step 4: Run Tests
@@ -141,12 +114,11 @@ npx vitest run src/lib/codexData.test.ts
 
 ### Step 5: Update Master Canon Index
 If a new scripture was created or an existing scripture's title, ID, or summary changed, update
-both the Master Canon Index table and the Reading Order in `codex/README.md`, plus the vault
-tree in section 1 of this skill.
+the Master Canon Index table, the Reading Order, and the directory tree in `codex/README.md`.
 
 ### Step 6: Realign the Stage Pipeline
 `STAGE_PIPELINE_DATA` in `scripts/sync-codex.ts` is hardcoded TypeScript, **not** parsed from
-markdown. Any change to a stage scripture's clearances or thresholds must be mirrored there by
+markdown. Any change to a stage scripture's clearances or typical readings must be mirrored there by
 hand, or the pipeline page and the codex will disagree.
 
 ---

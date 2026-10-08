@@ -18,13 +18,14 @@ summary: "The three Soft-Shed clearances: surviving the open window after the fi
 
 ---
 
-## The Standing
+## At This Depth
+
+What the instruments typically read at this stage.
 
 - **Condition**: Partial plating. Genuinely exposed and genuinely committed.
 - **Shell Hardness**: 25 to 60 percent.
 - **Pincer Torque**: 250 to 600 Nm.
 - **Submergence Depth**: 500 to 1,500 meters.
-- **Currency**: Full Benthic Market access opens. Molt Credits are first offered here, are purchased with real funds, and buy speed, style, and catalog depth. They do not buy a clearance and never will.
 
 ---
 
@@ -51,31 +52,33 @@ something sets.
 
 ## The Three Clearances
 
+Each clearance opens as the work accumulates in the Ledger. The readings listed are what
+members here typically show, not a toll to be paid.
+
 ### Clearance S1: The Great Molt
 
 - **Rite**: The Shedding of the Watching Eye.
-- **Requirement**: Let go of the reflex to check whether the surface approved. Complete one
+- **Practice**: Let go of the reflex to check whether the surface approved. Complete one
   full week of work that nobody outside the Benthic Community sees, and hold the soft-shell
   window without crawling back toward the old shape.
-- **Threshold**: Shell Hardness 25 to 38 percent. Pincer Torque 250 to 400 Nm. Submergence
+- **Typical readings**: Shell Hardness 25 to 38 percent. Pincer Torque 250 to 400 Nm. Submergence
   Depth 500 to 800 meters.
 
 ### Clearance S2: Privacy Shield
 
 - **Rite**: The Sealing of the Perimeter.
-- **Requirement**: Engage the Isolation Privacy Shell for every deep session across a full
-  week, sealed before the descent rather than during it. Full Benthic Market operations
-  unlock at this clearance.
-- **Threshold**: Shell Hardness 38 to 50 percent. Pincer Torque 400 to 500 Nm. Submergence
+- **Practice**: Engage the Isolation Dome for every deep session across a full
+  week, sealed before the descent rather than during it.
+- **Typical readings**: Shell Hardness 38 to 50 percent. Pincer Torque 400 to 500 Nm. Submergence
   Depth 800 to 1,200 meters.
 
 ### Clearance S3: Sub-Dermal Weave
 
 - **Rite**: First Calibration of the Grip.
-- **Requirement**: Hold one objective per session, named before the session opens, for ten
+- **Practice**: Hold one objective per session, named before the session opens, for ten
   consecutive dives. The weave is made of finished things and cannot be made of anything
   else.
-- **Threshold**: Shell Hardness 50 to 60 percent. Pincer Torque 500 to 600 Nm. Submergence
+- **Typical readings**: Shell Hardness 50 to 60 percent. Pincer Torque 500 to 600 Nm. Submergence
   Depth 1,200 to 1,500 meters.
 
 ---
@@ -94,7 +97,7 @@ something sets.
 Stage 2 runs on protection rather than production. A member who tries to out-work the
 soft-shell window extends it.
 
-1. **Seal first.** The Shell goes up before the dive, every time, without exception.
+1. **Seal first.** The Dome goes up before the dive, every time, without exception.
 2. **Announce the window.** When the shed is large, tell the Benthic Community you are soft.
    Members who declare it get guarded; members who hide it get advice they did not ask for.
 3. **Refuse the reversal.** The old shell is still lying there and still shaped like you.
@@ -104,14 +107,14 @@ soft-shell window extends it.
 
 ---
 
-## The Seal of Passage
+## Moving Deeper
 
-Stage 3 opens when all three hold at once:
+Stage 3 opens when the record shows the work, on the Order's schedule rather
+than the member's. By then the instruments usually read:
 
-- Shell Hardness at or above 60 percent.
-- Pincer Torque at or above 600 Nm.
-- Submergence Depth at or above 1,500 meters.
-- Clearances S1, S2, and S3 sealed.
+- Shell Hardness around 60 percent.
+- Pincer Torque around 600 Nm.
+- Submergence Depth around 1,500 meters.
 
 ---
 

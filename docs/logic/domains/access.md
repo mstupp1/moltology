@@ -3,7 +3,7 @@ id: access
 title: Access & roles
 order: 3
 color: '#00c3ff'
-summary: Two clearance roles. Server functions verify the caller's JWT, then check the role before any staff action.
+summary: Two roles, user and admin. Server functions verify the caller's JWT, then check the role before any staff action.
 rules:
   - id: access.roles
     title: Two roles
@@ -76,7 +76,7 @@ rules:
         symbol: requireStaff
     tests: [src/lib/server/admin-oversight.test.ts]
   - id: access.role-changes
-    title: Who can change clearance
+    title: Who can change roles
     kind: permission
     statement: Any admin can change another member's role between user and admin. Nobody can change their own role.
     dependsOn: [access.staff-server-check]

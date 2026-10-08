@@ -18,13 +18,14 @@ summary: "The three Exoshell clearances: the carapace closing, the grip reaching
 
 ---
 
-## The Standing
+## At This Depth
+
+What the instruments typically read at this stage.
 
 - **Condition**: Full carapace integrity. Operational at depth.
 - **Shell Hardness**: 60 to 90 percent.
 - **Pincer Torque**: 600 to 950 Nm.
 - **Submergence Depth**: 1,500 to 5,000 meters.
-- **Currency**: The premium catalog opens in full. Gems still unlock the prestige items.
 
 ---
 
@@ -51,30 +52,33 @@ to do a very large amount of work.
 
 ## The Three Clearances
 
+Each clearance opens as the work accumulates in the Ledger. The readings listed are what
+members here typically show, not a toll to be paid.
+
 ### Clearance E1: Carapace Forged
 
 - **Rite**: The Closing of the Seams.
-- **Requirement**: Hold the full rite through a bad week. Not a busy week. A week that goes
+- **Practice**: Hold the full rite through a bad week. Not a busy week. A week that goes
   wrong. The seal is only demonstrated under load, and this clearance cannot be earned in
   good conditions.
-- **Threshold**: Shell Hardness 60 to 72 percent. Pincer Torque 600 to 720 Nm. Submergence
+- **Typical readings**: Shell Hardness 60 to 72 percent. Pincer Torque 600 to 720 Nm. Submergence
   Depth 1,500 to 2,500 meters.
 
 ### Clearance E2: Hydraulic Grip
 
 - **Rite**: The Working Standard.
-- **Requirement**: Reach and hold 850 Nm, the torque at which a chosen objective reliably
+- **Practice**: Reach and hold 850 Nm, the torque at which a chosen objective reliably
   does not survive contact. Then guide one Larval Initiate through their first shed, start
   to finish, without doing it for them.
-- **Threshold**: Shell Hardness 72 to 82 percent. Pincer Torque 720 to 850 Nm. Submergence
+- **Typical readings**: Shell Hardness 72 to 82 percent. Pincer Torque 720 to 850 Nm. Submergence
   Depth 2,500 to 3,500 meters. Stewardship active.
 
 ### Clearance E3: Abyssal Diver
 
 - **Rite**: The Long Descent.
-- **Requirement**: Operate below 3,500 meters with no dependency on surface signal. Not
+- **Practice**: Operate below 3,500 meters with no dependency on surface signal. Not
   abstinence from it. Indifference to it, which is a different and much later condition.
-- **Threshold**: Shell Hardness 82 to 90 percent. Pincer Torque 850 to 950 Nm. Submergence
+- **Typical readings**: Shell Hardness 82 to 90 percent. Pincer Torque 850 to 950 Nm. Submergence
   Depth 3,500 to 5,000 meters.
 
 ---
@@ -105,14 +109,14 @@ Stage 3 is the first stage with an outward-facing obligation, and it is not opti
 
 ---
 
-## The Seal of Passage
+## Moving Deeper
 
-Stage 4 opens when all three hold at once:
+Stage 4 opens when the record shows the work, on the Order's schedule rather
+than the member's. By then the instruments usually read:
 
-- Shell Hardness at or above 90 percent.
-- Pincer Torque at or above 850 Nm, sustained rather than peaked.
-- Submergence Depth at or above 5,000 meters.
-- Clearances E1, E2, and E3 sealed.
+- Shell Hardness around 90 percent.
+- Pincer Torque around 850 Nm, sustained rather than peaked.
+- Submergence Depth around 5,000 meters.
 
 ---
 

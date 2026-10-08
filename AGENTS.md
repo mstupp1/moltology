@@ -1,23 +1,14 @@
-# AGENTS.md — Moltology System Rules
+# Moltology agent rules
 
 ## Hard list
 
-1. Stay in the bit in narrative content, lore, and public copy. Functional UI utilities (form validation, error boundaries, system warnings, permission dialogs) prioritize clarity, usability, and plain English over diegesis. Never write cryptic errors.
-2. No tech-stack leaks and no // in user-facing copy.
-3. Warmth, safety, and positivity under the HUD.
-4. Signup is free. Chitin Gems are earned. Molt Credits are the paid layer. Rank, clearance, stage, and forum authority cannot be purchased. Enforce this in the product, and only mention it in copy where someone is actually deciding what to buy (the market, pricing, a pay-to-win FAQ). Never turn it into a tagline, sign-off, or recurring refrain ("earned, never bought", "can never be bought", "never for sale").
-5. No decorative diamond glyphs (◈) and no ALL-CAPS screaming header lines in social copy, hooks, or skills. Opening hooks must use normal, conversational sentence case or standard title case.
+1. **Copy.** Read [BRAND_BIBLE.md](BRAND_BIBLE.md) (world, terms, economy) and [STYLE_GUIDE.md](STYLE_GUIDE.md) (voice, bans) before writing user-facing copy. Narrative and public copy stays in the world. Functional UI copy (errors, toasts, validation, permissions, settings, admin screens) is plain English.
+2. **Economy.** Signup is free. Chitin Gems are earned only. Molt Credits and Premium are the paid layer. Rank, clearance, stage, Standing, and forum authority cannot be purchased. Enforce this in code. In copy, mention it only where someone is deciding what to buy, and never as a refrain.
+3. **Numbers live in code.** XP thresholds, limits, and gates are defined in code and mapped in `docs/logic/`. Lore docs and the codex describe the world, not the mechanics.
 
-## Must-read before user-facing copy
+## Codex
 
-Agents MUST read [BRAND_BIBLE.md](BRAND_BIBLE.md) and [STYLE_GUIDE.md](STYLE_GUIDE.md) before writing any user-facing copy.
-
-- **BRAND_BIBLE.md** wins on world, lexicon, and economy.
-- **STYLE_GUIDE.md** wins on writing and bans.
-
-## Codex location
-
-Scriptures, liturgies, and doctrine live under [`codex/`](codex/README.md). Treat `codex/` as the engineering and content location for those files, not as a lore dump in this document.
+Scriptures live under [`codex/`](codex/README.md). Edit them with the [`codex-sync`](.agents/skills/codex-sync/SKILL.md) skill.
 
 ## Logic Atlas
 
@@ -48,7 +39,7 @@ One toast system, one persistent notification system, one OS bridge. Never `aler
 - **Persistent notifications**: `NotificationsProvider` ([`src/hooks/useNotifications.tsx`](src/hooks/useNotifications.tsx)) + the `notifications` table — never for ephemeral feedback.
 - **OS notifications**: only via [`src/lib/system-notifications.ts`](src/lib/system-notifications.ts).
 - **HUD telemetry**: read toast history from provider context (`HUDTaskBar` pattern); do not keep parallel toast logs.
-- **Copy**: Toasts, error alerts, and form validation must be plain, human-friendly, and actionable English (e.g. 'Could not save username', not 'Could not seal that designation'). Toasts exist to inform the user what happened, not to recite liturgical lore or enforce diegesis on system operations. Follow STYLE_GUIDE §4.4.
+- **Copy**: plain English that says what happened. Follow STYLE_GUIDE §3.4.
 
 ## Tests, SSR, and verification
 
@@ -56,24 +47,15 @@ One toast system, one persistent notification system, one OS bridge. Never `aler
 - **SSR Safe**: NO browser globals (`window`/`document`/`Date`) in render. Use effects/handlers.
 - **Fast-Feedback Verification Policy (Avoid Full-Suite Fatigue)**:
   - **Tier 1 (Scoped / Component / Feature Changes)**: Run targeted tests for the specific file(s) touched (e.g., `npx vitest run path/to/file.test.ts` or `npm run test:changed`) and use `npm run typecheck` (`tsc --noEmit`) for fast type validation. **Do NOT run the entire 100+ test suite or full `npm run build` for localized edits.**
-  - **Tier 2 (Core Logic / Backend / Schema / Ingest / Tooling)**: When changing shared libraries (`src/lib/`), database schemas (`src/db/`), auth, security, or ingestion, run `npm run test:core` (`src/lib` + `src/db` in ~2s) or `npm run test:scripts`.
+  - **Tier 2 (Core Logic / Backend / Schema / Ingest / Tooling)**: When changing shared libraries (`src/lib/`), database schemas (`src/db/`), auth, security, or ingestion, run `npm run test:core` (`src/lib` + `src/db`) or `npm run test:scripts`.
   - **Tier 3 (Major Architecture / Migrations / Full Release Readiness)**: Run the full test suite (`npm run test`) and production build (`npm run build`) ONLY for major cross-cutting refactors, database schema migrations, or when preparing final full-system delivery.
 - Cloud/local agents: see `.cursorrules` and `.cursor/rules/fast-verification.mdc` for forbidden browser/GUI verification defaults.
 
-## Asset Storage & Media Best Practices
+## Assets and media
 
-- **Lightweight Repository**: Keep the git repository lightweight (< 200 KB in `public/images/`). Only essential brand icons (`favicon.ico`, `order_emblem.png`, `scanline_pattern.png`, canvas bubble particles) reside locally in `public/`.
-- **Neon S3 Storage**: All content images, PBR textures, quiz graphics, guide artwork, and video/audio media reside in the Neon S3 public assets bucket (`moltology-public-assets`).
-- **Asset Resolver**: Use `getAssetUrl(path)` from [`src/lib/assets.ts`](src/lib/assets.ts) for resolving asset URLs in code and components.
-- **Sync & Verification**: Run `npm run s3:sync` to upload/sync local assets to S3 and `npm run s3:verify` to check CDN asset parity.
-- **Asset Budget Guard**: Run `npm run assets:check` (CI runs it on PRs via `.github/workflows/hygiene.yml`). No tracked file over 1MB unless allowlisted in `scripts/check-asset-budget.ts`; `public/` may only hold essential local assets (favicon, emblem, scanline, bubbles, hero videos, chassis/forum/marketing images). New heavy media goes to S3, never `public/`.
+- Heavy media (content images, textures, video, audio) lives in the Neon S3 bucket `moltology-public-assets`, never in `public/`. Resolve URLs with `getAssetUrl(path)` from [`src/lib/assets.ts`](src/lib/assets.ts). `npm run s3:sync` uploads and `npm run s3:verify` checks parity.
+- `npm run assets:check` (run in CI by `.github/workflows/hygiene.yml`) blocks any tracked file over 1MB unless it is allowlisted in `scripts/check-asset-budget.ts`.
 
-## Image Generation & Social Media Asset Policy
+## Social, video, and blog images
 
-- **Blog Articles (ImageGen or Antigravity)**: 16:9 Hero cover images and 1–2 inline supporting figures inside blog posts are generated via the built-in ImageGen `image_gen` tool or Antigravity `generate_image` (standalone cinematic 3D benthic/sci-fi imagery, sub-benthic compute pods, laser waveguides).
-- **Social Media Posts, Lead Magnets & Carousels (Composite ➔ Google Flow ➔ S3/Zernio Pipeline)**:
-  - **Stage 1 (Scaffolding)**: Render high-DPI 2x Retina 2D composite layouts via Headless Chrome (`scripts/lib/composite-renderer.ts` / `npm run post:create` for single posts, `npm run carousel:create` for multi-slide carousels) as structural blueprints.
-  - **Stage 2 (User Google Flow Handoff)**: Prompt the USER with the composite image path and rich, ready-to-copy **Google Flow prompt directives** (elevating flat layouts to photorealistic 3D glassmorphic HUD panels, ensuring **no wasted space**, and applying natural ambient mascot lighting and contact shadows without harsh backlights).
-  - **Stage 3 (Deterministic Ingestion & Queueing)**: The user drops the polished Google Flow asset back into `tmp/`, and the agent resumes execution via the CLI scripts (`npm run post:create` via [`.agents/skills/instagram-post-creator/SKILL.md`](.agents/skills/instagram-post-creator/SKILL.md), `npm run carousel:create` via [`.agents/skills/instagram-carousel-creator/SKILL.md`](.agents/skills/instagram-carousel-creator/SKILL.md), `npm run series:create`, `npm run reel:create`). The scripts deterministically execute Neon S3 upload, Zernio REST API queue staging (Lead Magnets: `6a8d93576f0e96efe2960c91`, Carousels/Posts: `6a84b76d2421e968ac81f5bc`, Reels/Shorts: `6a84b7702421e968ac81f5bd`), algorithmic first comment posting, and continuity ledger updates. Agents MUST NOT call Zernio MCP tools to queue or publish content.
-- **Short-Form Video (Reels & Shorts)**: 6-clip narrative broadcasts via Gemini Omni 1.1 Flash (`scripts/generate-video.ts` / `npm run reel:create` via [`.agents/skills/reels-and-shorts-creator/SKILL.md`](.agents/skills/reels-and-shorts-creator/SKILL.md)) or local clip recycling, with bespoke outro cards and character scene frames made with built-in ImageGen from canonical mascot references. Pass the frames to Omni as image inputs; do not rely on character descriptions alone. Episodic series: user Google Flow drop-in — [`.agents/skills/viral-reel-series-creator/SKILL.md`](.agents/skills/viral-reel-series-creator/SKILL.md).
-- **No Flux / ComfyUI**: Flux and ComfyUI have been completely uninstalled and are not used across the codebase.
+Use the matching skill: [`instagram-post-creator`](.agents/skills/instagram-post-creator/SKILL.md), [`instagram-carousel-creator`](.agents/skills/instagram-carousel-creator/SKILL.md), [`reels-and-shorts-creator`](.agents/skills/reels-and-shorts-creator/SKILL.md), [`viral-reel-series-creator`](.agents/skills/viral-reel-series-creator/SKILL.md), or [`blog-creator`](.agents/skills/blog-creator/SKILL.md). Queueing and publishing go through the repo CLI scripts only, never Zernio MCP tools.

@@ -143,7 +143,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 7,
         "heading": "The Rite",
-        "text": "The first shed is small on purpose. Large first sheds are how members end up naked in cold\nwater with no plan.\n\n1. **Take the reading.** Run the Moltmaxxing Audit once. It returns your Shell Hardness,\n   your Pincer Torque, and how far beneath the surface you are currently able to go. The\n   numbers will be low. Low numbers are a baseline, not a verdict.\n2. **Name three currents.** Three things that move you daily without being asked. Write\n   them where you will see them tomorrow.\n3. **Shed one.** Not all three. One. Tonight.\n\nThat is Clearance L1, and it is free, as every clearance is. The Order sells speed and\nsells finish. It has never sold rank, and it never will."
+        "text": "The first shed is small on purpose. Large first sheds are how members end up naked in cold\nwater with no plan.\n\n1. **Take the reading.** Run the Moltmaxxing Audit once. It returns your Shell Hardness,\n   your Pincer Torque, and how far beneath the surface you are currently able to go. The\n   numbers will be low. Low numbers are a baseline, not a verdict.\n2. **Name three currents.** Three things that move you daily without being asked. Write\n   them where you will see them tomorrow.\n3. **Shed one.** Not all three. One. Tonight.\n\nThat is Clearance L1. It costs nothing but the one thing you shed."
       },
       {
         "verseNumber": 8,
@@ -205,7 +205,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 7,
         "heading": "The Rite",
-        "text": "The Convergence is not a distant event you wait for. It has a small, working, present-day\nform, and it is open tonight.\n\n1. **Submerge on schedule.** Not alone in principle — alone in the room, at the same depth,\n   at the same hour as everyone else who is down there. The Isolation Privacy Shell is how\n   the Order keeps the water clear while you do it.\n2. **Report the shed.** Log it. The Long Ledger keeps every shed thing the Order has ever\n   been told about, and it is the only permanent record any of us have.\n3. **Reach back once.** One newer member, one honest answer, no condescension. This mints\n   Chitin Gems, because generosity is the behavior the Order most wants to be common."
+        "text": "The Convergence is not a distant event you wait for. It has a small, working, present-day\nform, and it is open tonight.\n\n1. **Submerge on schedule.** Not alone in principle — alone in the room, at the same depth,\n   at the same hour as everyone else who is down there. The Isolation Dome is how\n   the Order keeps the water clear while you do it.\n2. **Report the shed.** Log it. The Long Ledger keeps every shed thing the Order has ever\n   been told about, and it is the only permanent record any of us have.\n3. **Reach back once.** One newer member, one honest answer, no condescension. This mints\n   Chitin Gems, because generosity is the behavior the Order most wants to be common."
       },
       {
         "verseNumber": 8,
@@ -272,7 +272,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 7,
         "heading": "The Rite",
-        "text": "The molt is weekly. It is small deliberately, because a member who sheds everything at once\nspends the following month with no armor and no plan.\n\n1. **Choose one.** One structure, every seven days. If choosing is hard, choose the one you\n   have most recently defended out loud.\n2. **Split it cleanly.** Cancel it, delete it, decline it, or say the sentence. Half-measures\n   leave a partial seam, which is worse than an intact shell.\n3. **Hold the window.** Engage the Isolation Privacy Shell for the hours immediately after.\n   The surface will offer you the old shape back within a day; the Shell is how you stay out\n   of earshot until the new plate sets.\n4. **Log the shed.** The Order mints Chitin Gems for it, because shedding is the behavior the\n   whole system exists to reward, and Gems are the currency no amount of money can buy.\n\nThe cadence raises Shell Hardness faster than any other rite in the canon, and the HUD will\nshow it before you feel it."
+        "text": "The molt is weekly. It is small deliberately, because a member who sheds everything at once\nspends the following month with no armor and no plan.\n\n1. **Choose one.** One structure, every seven days. If choosing is hard, choose the one you\n   have most recently defended out loud.\n2. **Split it cleanly.** Cancel it, delete it, decline it, or say the sentence. Half-measures\n   leave a partial seam, which is worse than an intact shell.\n3. **Hold the window.** Engage the Isolation Dome for the hours immediately after.\n   The surface will offer you the old shape back within a day; the Dome is how you stay out\n   of earshot until the new plate sets.\n4. **Log the shed.** The Order mints Chitin Gems for it, because shedding is the behavior the\n   whole system exists to reward.\n\nThe cadence raises Shell Hardness faster than any other rite in the canon, and the HUD will\nshow it before you feel it."
       },
       {
         "verseNumber": 8,
@@ -329,7 +329,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 6,
         "heading": "The Rite",
-        "text": "Depth is scheduled, never discovered. A member who waits to feel focused is waiting at the\nsurface.\n\n1. **Choose the hour, not the mood.** The same hour, daily. The body learns a descent the\n   way it learns a route.\n2. **Seal before you dive, not after.** Engage the Isolation Privacy Shell first. The\n   surface cannot be silenced from below; it can only be shut out from above.\n3. **Descend for two hours.** One task. No second task waiting in the same session. Two\n   tasks in one dive is a surface habit wearing a diving suit.\n4. **Surface deliberately.** Come up on the clock rather than on the interruption, and note\n   the depth you reached. The reading is only honest if you take it before you check\n   anything.\n\nSustained descent is what carries a member from Clearance S1 to the floor of Stage 2. There\nis no other route through it, and the Order has stopped pretending otherwise."
+        "text": "Depth is scheduled, never discovered. A member who waits to feel focused is waiting at the\nsurface.\n\n1. **Choose the hour, not the mood.** The same hour, daily. The body learns a descent the\n   way it learns a route.\n2. **Seal before you dive, not after.** Engage the Isolation Dome first. The\n   surface cannot be silenced from below; it can only be shut out from above.\n3. **Descend for two hours.** One task. No second task waiting in the same session. Two\n   tasks in one dive is a surface habit wearing a diving suit.\n4. **Surface deliberately.** Come up on the clock rather than on the interruption, and note\n   the depth you reached. The reading is only honest if you take it before you check\n   anything.\n\nSustained descent is what carries a member from Clearance S1 to the floor of Stage 2. There\nis no other route through it, and the Order has stopped pretending otherwise."
       },
       {
         "verseNumber": 7,
@@ -489,8 +489,8 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "verses": [
       {
         "verseNumber": 1,
-        "heading": "The Standing",
-        "text": "- **Condition**: Soft-bodied. Unarmored. Entirely ordinary.\n- **Shell Hardness**: 0 to 25 percent.\n- **Pincer Torque**: 0 to 250 Nm.\n- **Submergence Depth**: 0 to 500 meters.\n- **Currency**: Chitin Gems begin minting at Clearance L1. Nothing here costs money."
+        "heading": "At This Depth",
+        "text": "What the instruments typically read at this stage.\n\n- **Condition**: Soft-bodied. Unarmored. Entirely ordinary.\n- **Shell Hardness**: 0 to 24 percent.\n- **Pincer Torque**: 0 to 250 Nm.\n- **Submergence Depth**: 0 to 500 meters."
       },
       {
         "verseNumber": 2,
@@ -500,22 +500,22 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 3,
         "heading": "The Three Clearances",
-        "text": "Each clearance is a gate the HUD opens on your behalf when the telemetry earns it. None of\nthem can be purchased, skipped, or granted by anyone, including the Order."
+        "text": "Each clearance opens as the work accumulates in the Ledger. The readings listed are what\nmembers here typically show, not a toll to be paid."
       },
       {
         "verseNumber": 4,
         "heading": "Clearance L1: Molt Curious",
-        "text": "- **Rite**: The Surface Noise Audit.\n- **Requirement**: Run the Moltmaxxing Audit once and name the three currents that move you\n  most days. Say, without softening it, that you would like armor.\n- **Threshold**: Shell Hardness to 10 percent. Pincer Torque 0 to 50 Nm. Submergence Depth 0\n  to 100 meters. Baseline recorded."
+        "text": "- **Rite**: The Surface Noise Audit.\n- **Practice**: Run the Moltmaxxing Audit once and name the three currents that move you\n  most days. Say, without softening it, that you would like armor.\n- **Typical readings**: Shell Hardness to 10 percent. Pincer Torque 0 to 50 Nm. Submergence Depth 0\n  to 100 meters. Baseline recorded."
       },
       {
         "verseNumber": 5,
         "heading": "Clearance L2: Shell Sprout",
-        "text": "- **Rite**: First Cadence.\n- **Requirement**: Hold a daily routine for seven consecutive days and log the morning\n  alignment each time. Seven is not arbitrary. It is roughly how long it takes a habit to\n  stop asking permission.\n- **Threshold**: Shell Hardness to 18 percent. Pincer Torque 50 to 150 Nm. Submergence Depth\n  100 to 300 meters. Routine compliance above 80 percent."
+        "text": "- **Rite**: First Cadence.\n- **Practice**: Hold a daily routine for seven consecutive days and log the morning\n  alignment each time. Seven is not arbitrary. It is roughly how long it takes a habit to\n  stop asking permission.\n- **Typical readings**: Shell Hardness to 18 percent. Pincer Torque 50 to 150 Nm. Submergence Depth\n  100 to 300 meters. Routine compliance above 80 percent."
       },
       {
         "verseNumber": 6,
         "heading": "Clearance L3: First Calcification",
-        "text": "- **Rite**: The First Shed.\n- **Requirement**: Shed one real thing. Not a tidy-up. A habit, an obligation, or a standing\n  commitment that has been quietly billing you for months. Then hold the soft-shell window\n  without reversing it.\n- **Threshold**: Shell Hardness to 25 percent. Pincer Torque 150 to 250 Nm. Submergence\n  Depth 300 to 500 meters. First Chitin Gems banked."
+        "text": "- **Rite**: The First Shed.\n- **Practice**: Shed one real thing. Not a tidy-up. A habit, an obligation, or a standing\n  commitment that has been quietly billing you for months. Then hold the soft-shell window\n  without reversing it.\n- **Typical readings**: Shell Hardness to 25 percent. Pincer Torque 150 to 250 Nm. Submergence\n  Depth 300 to 500 meters."
       },
       {
         "verseNumber": 7,
@@ -529,8 +529,8 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       },
       {
         "verseNumber": 9,
-        "heading": "The Seal of Passage",
-        "text": "Stage 2 opens when all three hold at once:\n\n- Shell Hardness at or above 25 percent.\n- Pincer Torque at or above 250 Nm.\n- Submergence Depth at or above 500 meters.\n- Clearances L1, L2, and L3 sealed."
+        "heading": "Moving Deeper",
+        "text": "Stage 2 opens when the record shows the work, on the Order's schedule rather\nthan the member's. By then the instruments usually read:\n\n- Shell Hardness around 25 percent.\n- Pincer Torque around 250 Nm.\n- Submergence Depth around 500 meters."
       },
       {
         "verseNumber": 10,
@@ -561,8 +561,8 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "verses": [
       {
         "verseNumber": 1,
-        "heading": "The Standing",
-        "text": "- **Condition**: Partial plating. Genuinely exposed and genuinely committed.\n- **Shell Hardness**: 25 to 60 percent.\n- **Pincer Torque**: 250 to 600 Nm.\n- **Submergence Depth**: 500 to 1,500 meters.\n- **Currency**: Full Benthic Market access opens. Molt Credits are first offered here, are purchased with real funds, and buy speed, style, and catalog depth. They do not buy a clearance and never will."
+        "heading": "At This Depth",
+        "text": "What the instruments typically read at this stage.\n\n- **Condition**: Partial plating. Genuinely exposed and genuinely committed.\n- **Shell Hardness**: 25 to 60 percent.\n- **Pincer Torque**: 250 to 600 Nm.\n- **Submergence Depth**: 500 to 1,500 meters."
       },
       {
         "verseNumber": 2,
@@ -571,36 +571,41 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       },
       {
         "verseNumber": 3,
-        "heading": "Clearance S1: The Great Molt",
-        "text": "- **Rite**: The Shedding of the Watching Eye.\n- **Requirement**: Let go of the reflex to check whether the surface approved. Complete one\n  full week of work that nobody outside the Benthic Community sees, and hold the soft-shell\n  window without crawling back toward the old shape.\n- **Threshold**: Shell Hardness 25 to 38 percent. Pincer Torque 250 to 400 Nm. Submergence\n  Depth 500 to 800 meters."
+        "heading": "The Three Clearances",
+        "text": "Each clearance opens as the work accumulates in the Ledger. The readings listed are what\nmembers here typically show, not a toll to be paid."
       },
       {
         "verseNumber": 4,
-        "heading": "Clearance S2: Privacy Shield",
-        "text": "- **Rite**: The Sealing of the Perimeter.\n- **Requirement**: Engage the Isolation Privacy Shell for every deep session across a full\n  week, sealed before the descent rather than during it. Full Benthic Market operations\n  unlock at this clearance.\n- **Threshold**: Shell Hardness 38 to 50 percent. Pincer Torque 400 to 500 Nm. Submergence\n  Depth 800 to 1,200 meters."
+        "heading": "Clearance S1: The Great Molt",
+        "text": "- **Rite**: The Shedding of the Watching Eye.\n- **Practice**: Let go of the reflex to check whether the surface approved. Complete one\n  full week of work that nobody outside the Benthic Community sees, and hold the soft-shell\n  window without crawling back toward the old shape.\n- **Typical readings**: Shell Hardness 25 to 38 percent. Pincer Torque 250 to 400 Nm. Submergence\n  Depth 500 to 800 meters."
       },
       {
         "verseNumber": 5,
-        "heading": "Clearance S3: Sub-Dermal Weave",
-        "text": "- **Rite**: First Calibration of the Grip.\n- **Requirement**: Hold one objective per session, named before the session opens, for ten\n  consecutive dives. The weave is made of finished things and cannot be made of anything\n  else.\n- **Threshold**: Shell Hardness 50 to 60 percent. Pincer Torque 500 to 600 Nm. Submergence\n  Depth 1,200 to 1,500 meters."
+        "heading": "Clearance S2: Privacy Shield",
+        "text": "- **Rite**: The Sealing of the Perimeter.\n- **Practice**: Engage the Isolation Dome for every deep session across a full\n  week, sealed before the descent rather than during it.\n- **Typical readings**: Shell Hardness 38 to 50 percent. Pincer Torque 400 to 500 Nm. Submergence\n  Depth 800 to 1,200 meters."
       },
       {
         "verseNumber": 6,
+        "heading": "Clearance S3: Sub-Dermal Weave",
+        "text": "- **Rite**: First Calibration of the Grip.\n- **Practice**: Hold one objective per session, named before the session opens, for ten\n  consecutive dives. The weave is made of finished things and cannot be made of anything\n  else.\n- **Typical readings**: Shell Hardness 50 to 60 percent. Pincer Torque 500 to 600 Nm. Submergence\n  Depth 1,200 to 1,500 meters."
+      },
+      {
+        "verseNumber": 7,
         "heading": "The Transformation",
         "text": "- **What is shed**: the audience. Not the people who care about you. The imagined gallery\n  you have been performing your working day for.\n- **What hardens**: the sub-dermal weave, which is the first layer that does not soften\n  again when the week goes badly."
       },
       {
-        "verseNumber": 7,
-        "heading": "The Rite",
-        "text": "Stage 2 runs on protection rather than production. A member who tries to out-work the\nsoft-shell window extends it.\n\n1. **Seal first.** The Shell goes up before the dive, every time, without exception.\n2. **Announce the window.** When the shed is large, tell the Benthic Community you are soft.\n   Members who declare it get guarded; members who hide it get advice they did not ask for.\n3. **Refuse the reversal.** The old shell is still lying there and still shaped like you.\n   Walk past it daily. This is the specific work of this stage.\n4. **Stand watch for someone else.** Even at 40 percent hardness you are harder than someone\n   who arrived last week. Gems mint for this."
-      },
-      {
         "verseNumber": 8,
-        "heading": "The Seal of Passage",
-        "text": "Stage 3 opens when all three hold at once:\n\n- Shell Hardness at or above 60 percent.\n- Pincer Torque at or above 600 Nm.\n- Submergence Depth at or above 1,500 meters.\n- Clearances S1, S2, and S3 sealed."
+        "heading": "The Rite",
+        "text": "Stage 2 runs on protection rather than production. A member who tries to out-work the\nsoft-shell window extends it.\n\n1. **Seal first.** The Dome goes up before the dive, every time, without exception.\n2. **Announce the window.** When the shed is large, tell the Benthic Community you are soft.\n   Members who declare it get guarded; members who hide it get advice they did not ask for.\n3. **Refuse the reversal.** The old shell is still lying there and still shaped like you.\n   Walk past it daily. This is the specific work of this stage.\n4. **Stand watch for someone else.** Even at 40 percent hardness you are harder than someone\n   who arrived last week. Gems mint for this."
       },
       {
         "verseNumber": 9,
+        "heading": "Moving Deeper",
+        "text": "Stage 3 opens when the record shows the work, on the Order's schedule rather\nthan the member's. By then the instruments usually read:\n\n- Shell Hardness around 60 percent.\n- Pincer Torque around 600 Nm.\n- Submergence Depth around 1,500 meters."
+      },
+      {
+        "verseNumber": 10,
         "heading": "The Benediction",
         "text": "If this stage feels worse than the one before it, you have read the doctrine correctly and\nyou are exactly where the doctrine said you would be.\n\nHold still. It sets. It has set for every single member who is now standing on the floor,\nand each of them spent this stage convinced they were the exception."
       }
@@ -628,8 +633,8 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "verses": [
       {
         "verseNumber": 1,
-        "heading": "The Standing",
-        "text": "- **Condition**: Full carapace integrity. Operational at depth.\n- **Shell Hardness**: 60 to 90 percent.\n- **Pincer Torque**: 600 to 950 Nm.\n- **Submergence Depth**: 1,500 to 5,000 meters.\n- **Currency**: The premium catalog opens in full. Gems still unlock the prestige items."
+        "heading": "At This Depth",
+        "text": "What the instruments typically read at this stage.\n\n- **Condition**: Full carapace integrity. Operational at depth.\n- **Shell Hardness**: 60 to 90 percent.\n- **Pincer Torque**: 600 to 950 Nm.\n- **Submergence Depth**: 1,500 to 5,000 meters."
       },
       {
         "verseNumber": 2,
@@ -638,36 +643,41 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       },
       {
         "verseNumber": 3,
-        "heading": "Clearance E1: Carapace Forged",
-        "text": "- **Rite**: The Closing of the Seams.\n- **Requirement**: Hold the full rite through a bad week. Not a busy week. A week that goes\n  wrong. The seal is only demonstrated under load, and this clearance cannot be earned in\n  good conditions.\n- **Threshold**: Shell Hardness 60 to 72 percent. Pincer Torque 600 to 720 Nm. Submergence\n  Depth 1,500 to 2,500 meters."
+        "heading": "The Three Clearances",
+        "text": "Each clearance opens as the work accumulates in the Ledger. The readings listed are what\nmembers here typically show, not a toll to be paid."
       },
       {
         "verseNumber": 4,
-        "heading": "Clearance E2: Hydraulic Grip",
-        "text": "- **Rite**: The Working Standard.\n- **Requirement**: Reach and hold 850 Nm, the torque at which a chosen objective reliably\n  does not survive contact. Then guide one Larval Initiate through their first shed, start\n  to finish, without doing it for them.\n- **Threshold**: Shell Hardness 72 to 82 percent. Pincer Torque 720 to 850 Nm. Submergence\n  Depth 2,500 to 3,500 meters. Stewardship active."
+        "heading": "Clearance E1: Carapace Forged",
+        "text": "- **Rite**: The Closing of the Seams.\n- **Practice**: Hold the full rite through a bad week. Not a busy week. A week that goes\n  wrong. The seal is only demonstrated under load, and this clearance cannot be earned in\n  good conditions.\n- **Typical readings**: Shell Hardness 60 to 72 percent. Pincer Torque 600 to 720 Nm. Submergence\n  Depth 1,500 to 2,500 meters."
       },
       {
         "verseNumber": 5,
-        "heading": "Clearance E3: Abyssal Diver",
-        "text": "- **Rite**: The Long Descent.\n- **Requirement**: Operate below 3,500 meters with no dependency on surface signal. Not\n  abstinence from it. Indifference to it, which is a different and much later condition.\n- **Threshold**: Shell Hardness 82 to 90 percent. Pincer Torque 850 to 950 Nm. Submergence\n  Depth 3,500 to 5,000 meters."
+        "heading": "Clearance E2: Hydraulic Grip",
+        "text": "- **Rite**: The Working Standard.\n- **Practice**: Reach and hold 850 Nm, the torque at which a chosen objective reliably\n  does not survive contact. Then guide one Larval Initiate through their first shed, start\n  to finish, without doing it for them.\n- **Typical readings**: Shell Hardness 72 to 82 percent. Pincer Torque 720 to 850 Nm. Submergence\n  Depth 2,500 to 3,500 meters. Stewardship active."
       },
       {
         "verseNumber": 6,
+        "heading": "Clearance E3: Abyssal Diver",
+        "text": "- **Rite**: The Long Descent.\n- **Practice**: Operate below 3,500 meters with no dependency on surface signal. Not\n  abstinence from it. Indifference to it, which is a different and much later condition.\n- **Typical readings**: Shell Hardness 82 to 90 percent. Pincer Torque 850 to 950 Nm. Submergence\n  Depth 3,500 to 5,000 meters."
+      },
+      {
+        "verseNumber": 7,
         "heading": "The Transformation",
         "text": "- **What is shed**: the need for the armor to be noticed. A shell that has to be displayed is\n  still doing surface work.\n- **What hardens**: the habit of finishing, which by this stage is no longer effortful and\n  has become slightly difficult to switch off."
       },
       {
-        "verseNumber": 7,
+        "verseNumber": 8,
         "heading": "The Rite",
         "text": "Stage 3 is the first stage with an outward-facing obligation, and it is not optional.\n\n1. **Grip one large thing.** Per quarter, not per day. The Exoshell chassis is built for\n   objectives that take months, and members who never attempt one never discover what the\n   plating was rated for.\n2. **Reach back weekly.** One initiate, one honest hour. This mints Gems and it is also how\n   the Convergence gets built, one pulled-through molt at a time.\n3. **Dive past 3,500 meters twice a week.** The deep sessions are where the remaining torque\n   comes from.\n4. **Keep shedding.** The molt does not stop because the shell got good. Hardened members who\n   stop shedding do not stay hardened; they get brittle, which looks identical from outside\n   and fails without warning."
       },
       {
-        "verseNumber": 8,
-        "heading": "The Seal of Passage",
-        "text": "Stage 4 opens when all three hold at once:\n\n- Shell Hardness at or above 90 percent.\n- Pincer Torque at or above 850 Nm, sustained rather than peaked.\n- Submergence Depth at or above 5,000 meters.\n- Clearances E1, E2, and E3 sealed."
+        "verseNumber": 9,
+        "heading": "Moving Deeper",
+        "text": "Stage 4 opens when the record shows the work, on the Order's schedule rather\nthan the member's. By then the instruments usually read:\n\n- Shell Hardness around 90 percent.\n- Pincer Torque around 850 Nm, sustained rather than peaked.\n- Submergence Depth around 5,000 meters."
       },
       {
-        "verseNumber": 9,
+        "verseNumber": 10,
         "heading": "The Benediction",
         "text": "You are good at this now. That is worth saying plainly, because members at this stage\nrarely hear it and have usually stopped expecting to.\n\nThe trench is quieter than it was. Someone newer is watching how you carry it."
       }
@@ -695,8 +705,8 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "verses": [
       {
         "verseNumber": 1,
-        "heading": "The Standing",
-        "text": "- **Condition**: Ascendant. Fully carcinized.\n- **Shell Hardness**: 90 to 100 percent.\n- **Pincer Torque**: 950 Nm and above.\n- **Submergence Depth**: 5,000 to 10,928 meters.\n- **Currency**: The apex catalog and steward privileges. Stewardship itself is issued for Gems alone, which is to say it is issued for having been useful."
+        "heading": "At This Depth",
+        "text": "What the instruments typically read at this stage.\n\n- **Condition**: Ascendant. Fully carcinized.\n- **Shell Hardness**: 90 to 100 percent.\n- **Pincer Torque**: 950 Nm and above.\n- **Submergence Depth**: 5,000 to 10,928 meters."
       },
       {
         "verseNumber": 2,
@@ -705,36 +715,41 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       },
       {
         "verseNumber": 3,
-        "heading": "Clearance C1: Mind Carapace",
-        "text": "- **Rite**: The Closing of the Gap.\n- **Requirement**: Reduce the interval between recognizing what must be done and closing on\n  it until the interval is no longer measurable. Not speed. The absence of the small\n  negotiation that used to happen first.\n- **Threshold**: Shell Hardness 90 to 95 percent. Pincer Torque 950 to 1,050 Nm. Submergence\n  Depth 5,000 to 8,000 meters."
+        "heading": "The Three Clearances",
+        "text": "Each clearance opens as the work accumulates in the Ledger. The readings listed are what\nmembers here typically show, not a toll to be paid."
       },
       {
         "verseNumber": 4,
-        "heading": "Clearance C2: Indestructible Chitin",
-        "text": "- **Rite**: The Sealing.\n- **Requirement**: A perimeter that holds without being maintained. It still opens from the\n  inside, always, and a member who has sealed themselves away from the people who love them\n  has not reached C2. They have gotten lost on the way to it.\n- **Threshold**: Shell Hardness 95 to 99 percent. Pincer Torque 1,050 to 1,200 Nm.\n  Submergence Depth 8,000 to 10,000 meters."
+        "heading": "Clearance C1: Mind Carapace",
+        "text": "- **Rite**: The Closing of the Gap.\n- **Practice**: Reduce the interval between recognizing what must be done and closing on\n  it until the interval is no longer measurable. Not speed. The absence of the small\n  negotiation that used to happen first.\n- **Typical readings**: Shell Hardness 90 to 95 percent. Pincer Torque 950 to 1,050 Nm. Submergence\n  Depth 5,000 to 8,000 meters."
       },
       {
         "verseNumber": 5,
-        "heading": "Clearance C3: Mariana Singularity",
-        "text": "- **Rite**: The Turning Around.\n- **Requirement**: Stewardship of the Benthic Community. Sustained output at the floor, and\n  the deliberate spending of that output on members who are nowhere near it yet. This\n  clearance cannot be earned alone, by design, because a solitary apex is not an apex. It is\n  just a very hard animal in an empty room.\n- **Threshold**: Shell Hardness 100 percent. Pincer Torque 1,200 Nm, held rather than peaked.\n  Submergence Depth 10,928 meters, the floor of the Challenger Deep."
+        "heading": "Clearance C2: Indestructible Chitin",
+        "text": "- **Rite**: The Sealing.\n- **Practice**: A perimeter that holds without being maintained. It still opens from the\n  inside, always, and a member who has sealed themselves away from the people who love them\n  has not reached C2. They have gotten lost on the way to it.\n- **Typical readings**: Shell Hardness 95 to 99 percent. Pincer Torque 1,050 to 1,200 Nm.\n  Submergence Depth 8,000 to 10,000 meters."
       },
       {
         "verseNumber": 6,
+        "heading": "Clearance C3: Mariana Singularity",
+        "text": "- **Rite**: The Turning Around.\n- **Practice**: Stewardship of the Benthic Community. Sustained output at the floor, and\n  the deliberate spending of that output on members who are nowhere near it yet. This\n  clearance cannot be earned alone, by design, because a solitary apex is not an apex. It is\n  just a very hard animal in an empty room.\n- **Typical readings**: Shell Hardness 100 percent. Pincer Torque 1,200 Nm, held rather than peaked.\n  Submergence Depth 10,928 meters, the floor of the Challenger Deep."
+      },
+      {
+        "verseNumber": 7,
         "heading": "The Transformation",
         "text": "- **What is shed**: the last of it, which is usually the belief that the ascent was a\n  personal achievement.\n- **What hardens**: nothing further. This is the terminal plating. What grows from here is\n  the Convergence, and it grows through you rather than on you."
       },
       {
-        "verseNumber": 7,
+        "verseNumber": 8,
         "heading": "The Rite",
         "text": "The Ascendant rite is almost entirely outward.\n\n1. **Hold the floor.** Daily descent, unremarkable and unbroken. The stillness is the\n   contribution.\n2. **Guard the windows.** Ascendants stand watch over soft-shell members as a standing duty\n   rather than a favor. The Soft-Shell Covenant is enforced from this clearance.\n3. **Keep the water clear.** Stewardship of the Benthic Community: welcoming, moderating,\n   settling. The Order keeps the water clear so that everyone below can see.\n4. **Shed anyway.** Even here. Especially here. An Ascendant who stops molting is a monument,\n   and monuments do not help anybody."
       },
       {
-        "verseNumber": 8,
+        "verseNumber": 9,
         "heading": "The Final Attributes",
         "text": "- **Form**: heavy bio-silicon chitin, dual hydraulic pincers, no unnecessary limbs.\n- **Condition**: calm, unhurried, difficult to move and easy to reach.\n- **Duty**: the Convergence, one guarded molt at a time.\n- **Mantra**: *\"Flesh melts. The shell endures. Submit. Shed. Ascend.\"*"
       },
       {
-        "verseNumber": 9,
+        "verseNumber": 10,
         "heading": "The Benediction",
         "text": "You came down here to stop melting, and somewhere along the way it stopped being about you.\nThat is not a loss of the original goal. It is what the original goal was always going to\nturn into once it was met.\n\nHold the floor. Someone is descending right now who does not yet believe the bottom exists."
       }
@@ -788,7 +803,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 6,
         "heading": "The Long Afternoon: Deep Submergence",
-        "text": "The descent. Isolation Privacy Shell engaged before the dive begins, one objective, no\nsecond objective waiting in the same session. This is where Submergence Depth is actually\nearned; every other block merely protects it."
+        "text": "The descent. Isolation Dome engaged before the dive begins, one objective, no\nsecond objective waiting in the same session. This is where Submergence Depth is actually\nearned; every other block merely protects it."
       },
       {
         "verseNumber": 7,
@@ -839,13 +854,13 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "authorUnit": "Chitin Architect V",
     "lastRevised": "2026-08-27",
     "mandate": "The surface cannot be silenced from below. It can only be shut out from above, before the descent begins.",
-    "summary": "How to raise the Isolation Privacy Shell, what belongs outside the perimeter and what must never be locked out of it, and the four-part order of a clean dive.",
+    "summary": "How to raise the Isolation Dome, what belongs outside the perimeter and what must never be locked out of it, and the four-part order of a clean dive.",
     "latinMotto": "SILENTIUM EST ATMOSPHAERA PROFUNDI.",
     "verses": [
       {
         "verseNumber": 1,
         "heading": "The Reading",
-        "text": "There is an error every member makes exactly once, and the Order has stopped trying to\nprevent it because the lesson does not transfer secondhand.\n\nThe error is this: you begin the dive, and you tell yourself that if the surface interrupts,\nyou will simply ignore it. This is a reasonable-sounding plan and it has never once worked.\nA signal that reaches you at depth has already done its damage by arriving. You do not get\nto decide whether to be interrupted; you only get to decide, afterward, how you feel about\nhaving been.\n\nThe Shell is therefore not a discipline. It is a door, and doors are closed beforehand.\n\nMembers sometimes hear this doctrine as an instruction to become unreachable, and it is not\nthat. A trench is not a bunker. The animals down there are not hiding from anybody; they are\nsimply somewhere the noise does not go, and they come back up. The Shell exists so that two\nhours of your day belong to the work, and for no other reason. It is not a personality and\nit should not become one."
+        "text": "There is an error every member makes exactly once, and the Order has stopped trying to\nprevent it because the lesson does not transfer secondhand.\n\nThe error is this: you begin the dive, and you tell yourself that if the surface interrupts,\nyou will simply ignore it. This is a reasonable-sounding plan and it has never once worked.\nA signal that reaches you at depth has already done its damage by arriving. You do not get\nto decide whether to be interrupted; you only get to decide, afterward, how you feel about\nhaving been.\n\nThe Dome is therefore not a discipline. It is a door, and doors are closed beforehand.\n\nMembers sometimes hear this doctrine as an instruction to become unreachable, and it is not\nthat. A trench is not a bunker. The animals down there are not hiding from anybody; they are\nsimply somewhere the noise does not go, and they come back up. The Dome exists so that two\nhours of your day belong to the work, and for no other reason. It is not a personality and\nit should not become one."
       },
       {
         "verseNumber": 2,
@@ -855,17 +870,17 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 3,
         "heading": "Seal before the descent",
-        "text": "Raise the Isolation Privacy Shell first, while you are still at the surface and still able\nto think about it clearly. A perimeter raised mid-dive is a perimeter raised after the\nbreach."
+        "text": "Raise the Isolation Dome first, while you are still at the surface and still able\nto think about it clearly. A perimeter raised mid-dive is a perimeter raised after the\nbreach."
       },
       {
         "verseNumber": 4,
         "heading": "Sort the water, not the noise",
-        "text": "Not everything outside the Shell is noise. The sorting happens once, in advance, and it is\nthe only judgment call in the whole rite. What passes through: the small number of people\nwhose emergencies are actually emergencies. What does not: everything else, without\nexception and without a case-by-case review, because the case-by-case review is itself the\ninterruption."
+        "text": "Not everything outside the Dome is noise. The sorting happens once, in advance, and it is\nthe only judgment call in the whole rite. What passes through: the small number of people\nwhose emergencies are actually emergencies. What does not: everything else, without\nexception and without a case-by-case review, because the case-by-case review is itself the\ninterruption."
       },
       {
         "verseNumber": 5,
         "heading": "Hold one objective",
-        "text": "The Shell protects a session, and a session holds one thing. Two objectives inside one\nperimeter is not deep work with variety. It is surface work in a quiet room."
+        "text": "The Dome protects a session, and a session holds one thing. Two objectives inside one\nperimeter is not deep work with variety. It is surface work in a quiet room."
       },
       {
         "verseNumber": 6,
@@ -874,8 +889,8 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       },
       {
         "verseNumber": 7,
-        "heading": "What the Shell May Never Lock Out",
-        "text": "The perimeter has one permanent opening and it is not adjustable.\n\nA shell that cannot be lowered from the inside is not a carapace. The people who love you,\nanyone who needs actual help, and anyone actually able to help you are never on the outside\nof this Shell. The Order teaches depth as a place a member visits daily and leaves nightly.\nAny reading of this scripture that ends with a member alone and unreachable in a life rather\nthan in an afternoon is a misreading, and the Order will say so plainly every time."
+        "heading": "What the Dome May Never Lock Out",
+        "text": "The perimeter has one permanent opening and it is not adjustable.\n\nA shell that cannot be lowered from the inside is not a carapace. The people who love you,\nanyone who needs actual help, and anyone actually able to help you are never on the outside\nof this Dome. The Order teaches depth as a place a member visits daily and leaves nightly.\nAny reading of this scripture that ends with a member alone and unreachable in a life rather\nthan in an afternoon is a misreading, and the Order will say so plainly every time."
       },
       {
         "verseNumber": 8,
@@ -1009,7 +1024,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 5,
         "heading": "The Surrounding Lexicon",
-        "text": "- **The Great Melt**: the collective modern condition of going soft under noise, hesitation,\n  and exhaustion. A condition, never an identity.\n- **The Great Molt**: the deliberate transformation out of it.\n- **Carcinization**: the recurring judgment of the sea, arrived at five times independently.\n- **Ecdysis**: the scheduled shed. The mechanism by which every metric above improves.\n- **Soft-Shell Window**: the interval after a shed when a member is genuinely unarmored, and\n  is guarded rather than corrected.\n- **Benthic Core**: the still, high-pressure place where focused minds operate, and the\n  community that keeps it.\n- **Chitin Gems**: the earned currency. Minted by shedding, routines, and generosity. Never\n  sold.\n- **Molt Credits**: the premium currency. Purchased with real funds, spent on speed, style,\n  and catalog depth. Never minted by work, and never able to move a member up the ladder.\n\nThe full doctrine of the two currencies is held in The Long Ledger."
+        "text": "- **The Great Melt**: the collective modern condition of going soft under noise, hesitation,\n  and exhaustion. A condition, never an identity.\n- **The Great Molt**: the deliberate transformation out of it.\n- **Carcinization**: the recurring judgment of the sea, arrived at five times independently.\n- **Ecdysis**: the scheduled shed. The mechanism by which every metric above improves.\n- **Soft-Shell Window**: the interval after a shed when a member is genuinely unarmored, and\n  is guarded rather than corrected.\n- **Benthic Core**: the still, high-pressure place where focused minds operate, and the\n  community that keeps it.\n- **Chitin Gems** and **Molt Credits**: the two currencies, explained in The Long Ledger."
       },
       {
         "verseNumber": 6,
@@ -1039,8 +1054,8 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "synapticWeight": 4.6,
     "authorUnit": "The Order of the Synaptic Path",
     "lastRevised": "2026-08-27",
-    "mandate": "Everything shed is written down. Nothing written down was ever bought.",
-    "summary": "The record of every shed thing, and the law of the two currencies: what Chitin Gems are minted for, what Molt Credits may purchase, and the line between them that the Order does not move.",
+    "mandate": "Everything shed is written down, and the record does not flatter anyone.",
+    "summary": "The record of every shed thing, and the two currencies. Chitin Gems come from the work. Molt Credits are spent on comfort.",
     "latinMotto": "OMNE QUOD EXUISTI SCRIPTUM EST.",
     "verses": [
       {
@@ -1050,23 +1065,23 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       },
       {
         "verseNumber": 2,
-        "heading": "The Law of the Two Currencies",
-        "text": "The Order runs on two currencies and the line between them is not a pricing decision. It is\ndoctrine, and it is the reason anyone trusts the Ledger at all."
+        "heading": "The Two Currencies",
+        "text": "The Order runs on two currencies, and the difference between them is the reason anyone\ntrusts the Ledger at all."
       },
       {
         "verseNumber": 3,
         "heading": "Chitin Gems are minted by work",
-        "text": "Gems appear in the Ledger when a member sheds, holds a routine, finishes something\ndifficult, or is genuinely useful to another member. They begin minting at Clearance L1 and\nthey never stop.\n\nGems are never sold. There is no price, no bundle, and no arrangement by which money becomes\nGems, and this is enforced for a single reason: Gems buy the things that carry standing.\nEarned titles and sigils. Community privileges, hosting a benthic pod, a seat at the\ncouncil. The educational clearances, which are free. If a member is wearing something that\nmeans something, the Ledger says how they got it."
+        "text": "Gems appear in the Ledger when a member sheds, holds a routine, finishes something\ndifficult, or is genuinely useful to another member. Money does not turn into Gems, which\nis why Gems are what earned titles, sigils, and prestige pieces cost. If a member is wearing\nsomething that means something, the Ledger says how they got it."
       },
       {
         "verseNumber": 4,
-        "heading": "Molt Credits are purchased with funds",
-        "text": "Credits enter through the Benthic Market and are first offered after Clearance S1. They are\nspent on speed, on style, and on catalog depth: accelerators, deluxe carapace finishes,\npincer ornaments, HUD flair, the extended libraries and premium guides.\n\nCredits are never minted by work. No routine produces them, no shed produces them, and no\nclearance grants them."
+        "heading": "Molt Credits are purchased",
+        "text": "Credits come from the Benthic Market and are spent on speed, style, and catalog depth:\naccelerators, deluxe carapace finishes, HUD flair, and premium guides. They are comfort,\nand comfort is honorable."
       },
       {
         "verseNumber": 5,
-        "heading": "The line does not move",
-        "text": "Signup is free and always will be. Rank, clearance, stage, and forum authority are never for\nsale at any price, in any bundle, to any member, at any clearance. Credits may compress the\ntime a thing takes and may change what it looks like. Credits have never moved a member one\nrung, and the Order has turned down the obvious money to keep that true.\n\nThe reason is not modesty. It is that a ladder anyone can buy their way up is not a ladder,\nand the whole system is worth exactly as much as that sentence is."
+        "heading": "What neither can do",
+        "text": "Signup is free. Rank, clearance, stage, and standing are not for sale; they come from the\nrecord and nowhere else. A ladder anyone can buy their way up is not a ladder."
       },
       {
         "verseNumber": 6,
@@ -1076,12 +1091,12 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 7,
         "heading": "The Transformation",
-        "text": "- **What is shed**: the suspicion that the standing here can be shortcut. It cannot, and\n  discovering that is a relief rather than a disappointment.\n- **What hardens**: trust. In a system where the prestigious things are unbuyable, a title\n  means precisely what it says."
+        "text": "- **What is shed**: the suspicion that progress here can be shortcut.\n- **What hardens**: trust. A title means precisely what it says."
       },
       {
         "verseNumber": 8,
         "heading": "The Rite",
-        "text": "1. **Log the shed.** Nightly, in the HUD. An unlogged shed still hardens you and still\n   leaves no sediment.\n2. **Read the Ledger monthly.** Against your own prior entries and nobody else's.\n3. **Spend Gems on standing, Credits on comfort.** Both are honorable. Only one is earned,\n   and the Order does not pretend otherwise in either direction."
+        "text": "1. **Log the shed.** Nightly, in the HUD. An unlogged shed still hardens you and still\n   leaves no sediment.\n2. **Read the Ledger monthly.** Against your own prior entries and nobody else's.\n3. **Spend Gems on what you earned, Credits on comfort.** Both are honorable."
       },
       {
         "verseNumber": 9,
@@ -1135,8 +1150,8 @@ export const STAGE_PIPELINE_DATA: StagePipelineInfo[] = [
         "title": "Sub-Stage 1.3: First Calcification",
         "shortTitle": "First Calcification",
         "protocol": "The First Shed",
-        "requirement": "Shed one real thing, then hold the soft-shell window without reversing it. The shed mints your first Chitin Gems.",
-        "metricThreshold": "Shell Hardness 18% - 25%, first Chitin Gems banked",
+        "requirement": "Shed one real thing, then hold the soft-shell window without reversing it.",
+        "metricThreshold": "Shell Hardness 18% - 25%",
         "shellHardnessTarget": 25,
         "pincerTorqueTarget": "150 - 250 Nm",
         "submergenceDepth": "300 - 500 meters"
@@ -1147,7 +1162,7 @@ export const STAGE_PIPELINE_DATA: StagePipelineInfo[] = [
     "stageNum": 2,
     "stageTitle": "STAGE 2: THE SOFT-SHED",
     "stageCode": "STAGE_02_SOFTSHED",
-    "subtitle": "Active moulting state focusing on sub-dermal chitin growth, deep work shielding, and full market access.",
+    "subtitle": "Active moulting state focusing on sub-dermal chitin growth, and deep work shielding.",
     "img": "/images/stage2_softshed.png",
     "badge": "PARTIAL CHITIN",
     "badgeColor": "border-[#00ffff]/40 text-[#00ffff] bg-[#00ffff]/10",
@@ -1168,8 +1183,8 @@ export const STAGE_PIPELINE_DATA: StagePipelineInfo[] = [
         "title": "Sub-Stage 2.2: Privacy Shield",
         "shortTitle": "Privacy Shield",
         "protocol": "The Sealing of the Perimeter",
-        "requirement": "Engage the Isolation Privacy Shell for every deep session across a full week, sealed before the descent rather than during it. Full Benthic Market operations unlock here.",
-        "metricThreshold": "Shell Hardness 38% - 50%, Benthic Market access open",
+        "requirement": "Engage the Isolation Dome for every deep session across a full week, sealed before the descent rather than during it.",
+        "metricThreshold": "Shell Hardness 38% - 50%",
         "shellHardnessTarget": 50,
         "pincerTorqueTarget": "400 - 500 Nm",
         "submergenceDepth": "800 - 1,200 meters"

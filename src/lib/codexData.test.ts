@@ -106,7 +106,7 @@ describe('Codex canon locks', () => {
   it('states the earned-versus-bought law somewhere in the canon', () => {
     expect(ALL_CANON_FLAT).toMatch(/Chitin Gems[^.]{0,80}minted by work/i)
     expect(ALL_CANON_FLAT).toMatch(/Molt Credits[^.]{0,80}purchased/i)
-    expect(ALL_CANON_FLAT).toMatch(/never for sale/i)
+    expect(ALL_CANON_FLAT).toMatch(/not for sale/i)
     expect(ALL_CANON_FLAT).toMatch(/[Ss]ignup is free/)
   })
 

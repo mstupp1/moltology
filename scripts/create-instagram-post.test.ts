@@ -98,7 +98,7 @@ describe('create-instagram-post', () => {
     }
   })
 
-  it('strictly forbids decorative diamond glyphs (◈) and screaming all-caps hooks (BAN 11)', () => {
+  it('strictly forbids decorative diamond glyphs (◈) and screaming all-caps hooks (BAN 8)', () => {
     const themes = [
       'oracle-prompts',
       'moltmaxxing-guide',
