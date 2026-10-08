@@ -33,7 +33,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
   return (
     <section
       aria-labelledby="home-hero-title"
-      className="relative w-full overflow-hidden bg-[#030608] border-b border-cyan-900/40 pt-28 sm:pt-32 lg:pt-28"
+      className="relative w-full overflow-hidden bg-[#020408] pt-28 sm:pt-32 lg:pt-28"
     >
       {/*
         The artwork is sized to the first screen, not the whole section, so it keeps its framing
@@ -53,9 +53,9 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
             data-testid="hero-artwork"
           />
         </picture>
-        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#030608] to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_50%_42%,rgba(3,6,8,0.62),rgba(3,6,8,0.25)_60%,transparent_100%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-[#030608] via-[#030608]/80 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#020408] to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_50%_42%,rgba(2,4,8,0.62),rgba(2,4,8,0.25)_60%,transparent_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-[#020408] via-[#020408]/80 to-transparent" />
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-8 text-center">
@@ -153,7 +153,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
               </picture>
             </div>
           </div>
-          <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#030608] via-[#030608]/70 to-transparent pointer-events-none" aria-hidden="true" />
+          <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#020408] via-[#020408]/70 to-transparent pointer-events-none" aria-hidden="true" />
         </div>
       </div>
     </section>
