@@ -35,7 +35,7 @@ Dispatches MUST comply with [BRAND_BIBLE.md](../../../BRAND_BIBLE.md) and [STYLE
 
 ```mermaid
 flowchart TD
-    A["Step 1: Scout Real-World AI / Robotics / Workflow News<br/>(Web search, lab announcements, deduplicate vs blog-history.json)"] --> B["Step 2: Draft Dispatch with 4-Part MoltNation Arc<br/>(Human Hook → Telemetry & Filing → Moltology Contrast → Quiet Directive)"]
+    A["Step 1: Scout Real-World AI / Robotics / Workflow News<br/>(Web search, Google Trends demand check, deduplicate vs blog-history.json)"] --> B["Step 2: Draft Dispatch with 4-Part MoltNation Arc<br/>(Human Hook → Telemetry & Filing → Moltology Contrast → Quiet Directive)"]
     B --> C["Step 3: Generate 16:9 Visuals via ImageGen or Antigravity<br/>(Hero Cover, Figure 1 Macro 3D, Figure 2 Cinematic Wide)"]
     C --> D["Step 4: Stage Markdown Locally in content/news/<slug>.md<br/>(Wire local image paths & Field Telemetry citations)"]
     D --> E["Step 5: Ingest to Neon DB & Upload Images to S3<br/>(npx tsx scripts/ingest.ts content/news/<slug>.md --commit)"]
@@ -62,7 +62,20 @@ A news item is ready for a MoltNation dispatch when it answers:
 * *How does this expose the "Melt" (friction-free defaults that erode human sovereignty, fake convenience, or unasked automation)?*
 * *How does this illustrate the "Molt" (hardening boundaries, apprenticeships over empty demos, intentional friction, protective carapaces)?*
 
-#### 3. Continuity Check & Slug Deduplication
+#### 3. Search-Demand Check (Google Trends)
+News picks the story; search demand picks how we frame and title it. Before drafting, ground the angle in what people actually search for so the dispatch can rank, not just exist.
+
+1. **List 3–5 plain search phrases** a curious reader would type to find this story, in their words rather than ours (e.g. `ai agents`, `claude computer use`, `humanoid robot jobs`). Never test lore terms like "the melt" or "carapace"; nobody outside the Order searches for them.
+2. **Compare them:**
+   ```bash
+   npm run blog:trends -- "ai agents" "computer use" "ai browser agent"
+   ```
+   This prints relative interest (0–100, comparable only within one run), whether each phrase is rising, steady, or falling, and the top and rising related searches for the leader. Add `--range past_12_months` for evergreen topics or `--global` for non-US stories. It needs `DATAFORSEO_LOGIN` / `DATAFORSEO_PASSWORD` and costs about $0.02 a run.
+3. **Pick the target query.** Prefer a rising or steady phrase with real interest. A rising related search that matches the story is often the best target because competition has not caught up yet. If every candidate reads near zero, prefer the plainer wording or pick a different story among the ones you scouted.
+4. **Carry the target query through the dispatch** (see Step 2 frontmatter): it goes in the slug, the subtitle after the colon, the summary, the first tag, and naturally in the first two sections of the body. Never stuff it; once in the hook area and once in the reports section is plenty.
+5. **No credentials?** The script exits with code 2 and prints a Google Trends compare link. Continue without demand data, pick the plainest phrase yourself, and tell the user the demand check was skipped.
+
+#### 4. Continuity Check & Slug Deduplication
 * Inspect `content/news/blog-history.json` or check existing slugs in `content/news/` to verify that this topic or slug has not already been published.
 * Confirm the angle is distinct from the last 3–5 published articles.
 
@@ -74,14 +87,22 @@ A news item is ready for a MoltNation dispatch when it answers:
 
 Every MoltNation dispatch is 800–1,200 words (5–6 minute read) and adheres strictly to this structure:
 
+#### Search-Friendly Headline, Slug & Summary
+The poetic hook stays, but the page must also say plainly what it is about in the words people search.
+* **Title:** Keep the colon headline. The evocative hook goes before the colon; the subtitle after the colon names the subject in plain words and contains the target query from Step 1. Example: `The Tabs You Kept: How Claude's Computer Use Browser Works Without Your Passwords`.
+* **Slug:** Built from the target query plus one distinguishing word, 3–6 words (e.g. `claude-computer-use-browser`), not from the poetic hook.
+* **Summary:** This becomes the search snippet. Lead with the plain subject and the target query in the first sentence; keep it under about 160 characters for the part that matters.
+* **Tags:** The first tag is the target query in plain words. Lore tags like "The Great Melt" can follow.
+
 #### Frontmatter Standard
 ```yaml
 ---
-title: "Evocative Human Hook: The Real-World Engineering Telemetry"
-slug: "clean-hyphenated-slug"
-summary: "2-3 sentence executive summary connecting the physical human observation to the breakthrough and key metrics."
+title: "Evocative Human Hook: Plain Subtitle With the Target Query"
+slug: "target-query-slug"
+summary: "2-3 sentences. The first names the subject and target query plainly; then connect the human observation to the breakthrough and key metrics."
 category: "TELEMETRY" # Options: TELEMETRY, SWARM ARCHITECTURE, DEEP RESEARCH, SACRED DOCTRINE, PATRIOT TELEMETRY
 tags:
+  - "target query" # First tag is the Step 1 target query
   - "Embodiment"
   - "Attention"
   - "The Great Melt"
