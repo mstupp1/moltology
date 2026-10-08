@@ -18,6 +18,8 @@ export interface HeroParticlesOptions {
   /** Element that listens for the pointer, for a little parallax. */
   host?: HTMLElement | null
   reducedMotion?: boolean
+  /** 0..1 share of the full particle budget, lower on low-end devices. */
+  budget?: number
   /** Skip the static-to-shell opening and start already formed. */
   skipIntro?: boolean
   /** Called once the first frame is on the canvas. */
@@ -110,10 +112,19 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
   let stride = 1
   /** Jitter source; still frames swap in a seeded one so they are stable. */
   let noise: () => number = Math.random
+  // Scroll: the shell turns and lags behind the page as the hero scrolls away.
+  let canvasTop = 0
+  let scrollEased = 0
+  // A tap or click sends a ring of noise out from the pointer; the shell flares as it holds.
+  let pulseX = 0
+  let pulseY = 0
+  let pulseAge = Infinity
+  let flash = 0
 
   function measure() {
     const rect = canvas.getBoundingClientRect()
     const a = anchor.getBoundingClientRect()
+    canvasTop = rect.top + window.scrollY
     width = Math.max(1, rect.width)
     height = Math.max(1, rect.height)
     dpr = Math.min(window.devicePixelRatio || 1, 1.75)
@@ -130,7 +141,8 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
 
   function allocate(formed: boolean) {
     const area = width * height
-    total = Math.round(Math.min(4200, Math.max(1400, area / 320)))
+    const budget = Math.min(1, Math.max(0.3, opts.budget ?? 1))
+    total = Math.round(Math.min(4200, Math.max(1400, area / 320)) * budget)
     shellN = Math.round(total * 0.68)
     ambientN = total - shellN
     shell = buildShell(shellN)
@@ -192,8 +204,8 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
 
   function orient() {
     // A three-quarter view from above, head upper left, turning slowly back and forth.
-    const yaw = -0.75 + Math.sin(time * 0.21) * 0.28 + easedX * 0.22
-    const pitch = -0.5 + Math.sin(time * 0.17 + 1) * 0.07 + easedY * 0.12
+    const yaw = -0.75 + Math.sin(time * 0.21) * 0.28 + easedX * 0.22 + scrollEased * 0.9
+    const pitch = -0.5 + Math.sin(time * 0.17 + 1) * 0.07 + easedY * 0.12 - scrollEased * 0.35
     const roll = Math.sin(time * 0.13) * 0.05
     const cyw = Math.cos(yaw), syw = Math.sin(yaw)
     const cp = Math.cos(pitch), sp = Math.sin(pitch)
@@ -205,7 +217,7 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
     m00 = cr * a00 - sr * a10; m01 = cr * a01 - sr * a11; m02 = cr * a02 - sr * a12
     m10 = sr * a00 + cr * a10; m11 = sr * a01 + cr * a11; m12 = sr * a02 + cr * a12
     m20 = a20; m21 = a21; m22 = a22
-    bob = Math.sin(time * 0.6) * scale * 0.025
+    bob = Math.sin(time * 0.6) * scale * 0.025 + scrollEased * height * 0.22
   }
 
   /** Projects shell targets into drawX/drawY and returns nothing; depth lands in drawW. */
@@ -239,6 +251,16 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
     if (anchorSeen) growClock += dt
     easedX += (pointerX - easedX) * Math.min(1, dt * 2.5)
     easedY += (pointerY - easedY) * Math.min(1, dt * 2.5)
+    const scrolled = Math.min(1, Math.max(0, (window.scrollY - canvasTop) / height))
+    scrollEased += (scrolled - scrollEased) * Math.min(1, dt * 6)
+    pulseAge += dt
+    const pulseR = pulseAge * 620
+    const pulseLive = pulseAge < 1.6
+    if (pulseLive) {
+      const reach = Math.hypot(cx - pulseX, cy - pulseY) - scale * 0.6
+      const hit = Math.exp(-(((pulseR - reach) / 140) ** 2))
+      flash = Math.max(flash * Math.exp(-dt * 3), hit)
+    } else flash *= Math.exp(-dt * 3)
     project(dt)
 
     const sweep = ((time * 0.16) % 1.6) - 0.3
@@ -288,9 +310,10 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
         const glint = Math.exp(-((shell.along[i] - sweep) ** 2) / 0.006)
         let lum = (0.25 + 0.75 * lit) * (0.45 + 0.55 * near) * (0.25 + 0.95 * shade[i]) * (0.8 + 0.2 * Math.sin(time * 1.3 + seedPhase[i]))
         let family = 2
-        if (glint * lit > 0.35) {
+        const flare = flash * lit
+        if (glint * lit > 0.35 || flare > 0.45) {
           family = 3
-          lum = Math.min(1, lum + glint * 0.5)
+          lum = Math.min(1, lum + glint * 0.5 + flare * 0.6)
         }
         lum = Math.min(1, lum * 1.45) * (1 - ag * 0.6) * dim
         bucketOf[i] = family * LEVELS + Math.min(LEVELS - 1, Math.max(0, Math.floor(lum * LEVELS)))
@@ -307,7 +330,7 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
       if (settled) agitation[i] *= Math.exp(-dt * 0.75)
       const ag = agitation[i]
       const t = time * 0.25 + seedPhase[i]
-      const fx = 14 + 16 * Math.sin(py[i] * 0.0065 + t) * (0.4 + ag)
+      const fx = (14 + 16 * Math.sin(py[i] * 0.0065 + t) * (0.4 + ag)) * (1 + scrollEased * 2.5)
       const fy = 9 * Math.cos(px[i] * 0.0052 - t * 0.8)
       vx[i] += (fx - vx[i]) * dt * 0.9
       vy[i] += (fy - vy[i]) * dt * 0.9
@@ -324,6 +347,18 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
         vx[i] += (nx / len) * push * dt * 1.4 - (ny / len) * push * dt * 0.6 * Math.sign(dy || 1)
         vy[i] += (ny / len) * push * dt * 1.4
         if (e < 1.1) agitation[i] *= Math.exp(-dt * 2)
+      }
+      if (pulseLive) {
+        const qx = px[i] - pulseX
+        const qy = py[i] - pulseY
+        const d = Math.hypot(qx, qy) || 1
+        const band = Math.abs(d - pulseR)
+        if (band < 36) {
+          const f = (1 - band / 36) * 380
+          vx[i] += (qx / d) * f * dt
+          vy[i] += (qy / d) * f * dt
+          agitation[i] = Math.max(agitation[i], 0.85 * (1 - pulseAge / 1.6))
+        }
       }
       if (hasPointer) {
         const qx = px[i] - pxPointer
@@ -449,6 +484,14 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
     pointerX = ((e.clientX - rect.left) / Math.max(1, rect.width)) * 2 - 1
     pointerY = ((e.clientY - rect.top) / Math.max(1, rect.height)) * 2 - 1
   }
+  const onDown = (e: PointerEvent) => {
+    const target = e.target as Element | null
+    if (target?.closest?.('a, button, input, textarea, select, label, [role="button"]')) return
+    const rect = canvas.getBoundingClientRect()
+    pulseX = e.clientX - rect.left
+    pulseY = e.clientY - rect.top
+    pulseAge = 0
+  }
   const onLeave = () => {
     hasPointer = false
     pointerX = 0
@@ -484,6 +527,7 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
   if (!opts.reducedMotion) {
     opts.host?.addEventListener('pointermove', onPointer, { passive: true })
     opts.host?.addEventListener('pointerleave', onLeave)
+    opts.host?.addEventListener('pointerdown', onDown, { passive: true })
   }
   if (opts.reducedMotion) render(0)
   else play()
@@ -498,6 +542,7 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
       document.removeEventListener('visibilitychange', onVisibility)
       opts.host?.removeEventListener('pointermove', onPointer)
       opts.host?.removeEventListener('pointerleave', onLeave)
+      opts.host?.removeEventListener('pointerdown', onDown)
     },
   }
 }
