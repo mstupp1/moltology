@@ -1,0 +1,73 @@
+{
+  "date": "2026-10-08",
+  "generator": "Built-in image_gen",
+  "sourceArchive": "scratch/home-backgrounds/2026-10-08 (ignored; original PNGs also retained in Codex generated_images)",
+  "priorAssetsRetained": [
+    "images/hero_benthic_expansive_v1.webp",
+    "images/hero_benthic_mobile_v2.webp",
+    "images/home/bg_surface_soft.webp",
+    "images/home/bg_surface_soft_sm.webp",
+    "images/home/bg_seabed_soft.webp",
+    "images/home/bg_seabed_soft_sm.webp",
+    "images/home/bg_gallery_soft.webp",
+    "images/home/bg_gallery_soft_sm.webp",
+    "images/home/home_final_descent.webp",
+    "images/home/home_final_descent_sm.webp",
+    "images/home/2026-10-08/hero-shell-desktop-v1.webp",
+    "images/home/2026-10-08/hero-shell-mobile-v1.webp"
+  ],
+  "prompts": [
+    {
+      "key": "hero",
+      "prompt": "Use case: stylized-concept. Asset: full bleed homepage hero background, landscape 16:9. Moltology is a daily practice of shedding distraction and growing protective boundaries around attention, visualized through deep ocean and crustacean armor. Create a dark, mysterious, sophisticated cinematic abstract image: a vast broken carapace suspended in near-black ocean water, layered crescent plates of midnight chitin opening around a small still turquoise inner core. Chaotic fine shards and currents near the upper edges settle into coherent protective shell layers at depth. The shell is readable as crustacean armor but also feels like a mind becoming calm. No literal brain, people, monster or machinery. Sculptural macro detail, organic mineral texture, faint cyan rim light, tiny warm amber reflection. Asymmetric shell arcs flank the frame, middle 55% very dark and low detail for centered white headline and paragraph. Hints of surface turbulence at top, still depth below. Very dark ink navy #020408, muted teal, restrained bioluminescence. No text, logos, interface, watermark. Strong negative space, premium art direction, not a bright coral landscape."
+    },
+    {
+      "key": "hero_mobile",
+      "prompt": "Use case: stylized-concept. Asset: mobile homepage hero background portrait 9:16. Deep near-black ocean and enormous sculptural midnight chitin shell arcs forming a protective boundary around a quiet turquoise core. Abstract metaphor for shedding distracting noise and growing a calm armored attention. Chaotic fragments in the upper corners become coherent organic carapace layers framing left and right edges. Keep central 65% and middle vertical 65% exceptionally dark and spare for a centered tall block of headline, description and buttons. Subject detail at edges, no central glowing orb behind text. Fine shell texture, faint turquoise rim light and small amber trace. Mysterious calm cinematic macro sculpture, subtle marine snow, mostly #020408 ink navy. No text, people, literal brain, UI, logos, watermark. Portrait composition made for a phone, not a crop of a landscape."
+    },
+    {
+      "key": "surface",
+      "prompt": "Use case: stylized-concept. Asset: full bleed website section background landscape 16:9. Cinematic view just below an unsettled night ocean surface, tangled soft currents and scattered faint rusty amber reflections overhead evoke constant interruption. Lower water becomes dark and still. Abstract translucent strands dissolving into water, no objects or literal screens. Moody deep ocean realism with painterly atmospheric depth. Midnight navy #020408, steel teal, tiny restrained copper accents. Wide composition with dark low-detail middle for two columns of white copy; subtle detailed ripples only near upper outer edges. Must also survive center portrait crop. No bright sunlight, coral, creatures, text, interface, watermark. Keep visible atmosphere, sophisticated and dark."
+    },
+    {
+      "key": "seabed",
+      "prompt": "Use case: stylized-concept. Asset: landscape 16:9 full bleed background behind a website introduction and three feature cards. A calm abyssal seabed sculpted into overlapping natural chitin-like ridges, organic armor suggested by rock contours, quiet blue-green seams barely illuminated between protective plates. Far distant ocean void overhead, hazy suspended marine snow. Dark cinematic macro-landscape with mineral texture, midnight #020408 and restrained cyan light. Wide calm composition; middle upper 65% low detail and very dark for text. Terrain anchored along lower quarter and edges, center crop safe. No crab characters, people, buildings, text, UI, logos or watermark."
+    },
+    {
+      "key": "gallery",
+      "prompt": "Use case: stylized-concept. Asset: landscape 16:9 full bleed website community section background. Quiet deep ocean refuge, a few subtle cyan and warm amber bioluminescent lights nestling among curved shell-like stone formations, hinting at a warm community sheltering together at depth. Expansive dark water with soft atmospheric haze and sculptural mineral surfaces, cinematic believable materials. Keep middle 65% nearly black and low detail because three testimonial cards cover it; tiny lights near edges and lower third. Center crop safe, no concrete characters. Palette #020408 deep ink, muted teal, minute amber warmth. No text, buildings, sci-fi city, interface, logos, watermark."
+    },
+    {
+      "key": "practice",
+      "prompt": "Use case: stylized-concept. Asset: landscape 16:9 background for website how-it-works section called Small enough to start today. A quiet sheltered deep-sea basin: a small translucent shed crustacean shell resting near lower right of center on smooth dark seabed, faint turquoise bioluminescent filaments trace a gentle short path through sediment, illustrating one tiny deliberate step and room to grow. Broad dark water above with very subtle drifting particles, calm and welcoming, mysterious mineral realism. Composition must work cropped centrally into a tall mobile background: most detail near lower edge, central area dark and unobtrusive behind screenshots and text. Deep #020408 midnight navy, restrained teal with faint warm amber on shell. No text, UI, people, cartoon mascot, logos, watermark."
+    },
+    {
+      "key": "final",
+      "prompt": "Use case: stylized-concept. Asset: landscape 16:9 full bleed website invitation card background, artwork must fill an entire wide card. Deep sea first molt: one small empty translucent crustacean shell resting on a sculptural dark seabed, a delicate turquoise light escaping along its open seam. Shell placed in rightmost third, softly illuminated by restrained cyan light, warm amber inner glow, sheltered and hopeful. The whole environment continues across frame: left 60% is near-black tranquil water with very soft rock silhouettes so large white headline and signup buttons stay legible. Organic shell ridges and faint marine snow, cinematic material realism, ink navy #020408 with muted teal. No literal wooden shed or house, no people, text, UI, logos, watermark. Edges dark. Fine detail on right, generous dark copy space on left."
+    },
+    {
+      "key": "final_mobile",
+      "prompt": "Use case: stylized-concept. Asset: mobile portrait 9:16 full-card homepage invitation background. One small translucent empty crustacean shell on sheltered deep-sea rock near the TOP third, faint cyan outer edge and warm amber glow inside its open seam. Quiet mysterious hopeful midnight ocean #020408 with teal light. Entire lower two thirds are nearly black calm water with minimal texture for a large white headline and stacked buttons. Environment fills the whole portrait, shell provides one tiny deliberate first step. Cinematic realistic mineral and shell materials. No people, text, UI, logos, watermark, no literal house or shed."
+    },
+    {
+      "key": "practice_mobile",
+      "prompt": "Use case stylized-concept. Portrait 9:16 deep ocean website background. Quiet sheltered basin, tiny translucent empty shed crustacean shell at bottom center on smooth dark seabed, a delicate cyan bioluminescent filament winding across bottom fifth. Most upper 80% dark open water, nearly black #020408, very subtle marine snow and faint distant rocks at side edges. Illustration of starting small and finding calm. Cinematic believable mineral and shell texture, muted teal with tiny warm amber edge on shell. No text UI characters people logos watermark. Composition explicitly portrait, centered shell survives tall cover cropping."
+    },
+    {
+      "key": "hero-molt-desktop-v2",
+      "prompt": "Use case: stylized-concept. Asset: Moltology homepage hero background landscape 16:9. Retain an elegant mysterious cinematic deep ocean mood but make the premise immediately readable: shedding distraction and growing a calm protective shell. Depict a recognizable beautifully sculpted dark blue CRAB in three-quarter side view in the RIGHT third of frame, centered vertically, walking slowly out of its pale translucent empty old exoskeleton behind it. A clear broad curved carapace, two anatomically plausible strong pincers, and compact legs establish crustacean silhouette; no lobster, no shrimp. Carapace is midnight chitin with delicate turquoise rim light and natural mineral texture; crab feels calm and protected, not aggressive. The empty brittle shell trails into scattered fine shards that dissolve into soft blurred currents toward the left and upper margins, metaphor for noisy habits being shed. A faint warm amber glow underneath the new shell suggests sheltered life. Environment: still abyssal water, barely visible stone ground at bottom, subtle suspended marine snow, distant turbulent surface near upper border. Composition: LEFT AND CENTRAL 65 percent are quiet near-black water for centered white headline and paragraph. Crab occupies right outer third, medium sized, whole crab readable and not clipped, stronger subject definition than abstract rocks; shell remains on right behind crab. Camera level, generous negative space, sculptural photoreal CGI with poetic abstraction in atmosphere, understated premium materials. Dominant #020408 ink navy, muted teal, minute warm amber. Dark but readable, no bright sea garden. No text, UI, logos, symbols, people, buildings, machinery, horror, fighting or watermark. Wide landscape."
+    },
+    {
+      "key": "hero-molt-mobile-v2",
+      "prompt": "Use case: stylized-concept. Asset: mobile portrait 9:16 Moltology homepage hero background. Dark mysterious ocean; clearer visual narrative of shedding distraction and growing a protective shell. A recognizable calm dark blue CRAB in three-quarter view with broad curved carapace, two pincers and compact legs emerges from its translucent pale empty old exoskeleton. Position the small but clearly readable whole crab in the LOWER RIGHT quarter near 75 percent down, beside the empty shell; do not turn it into a shrimp or lobster. Sculptural midnight chitin with restrained turquoise rim light and a tiny amber glow beneath the shell. Old shell fragments dissolve into restless soft currents along upper outer edges, still water below. Keep central 65 percent and top 65 percent very dark low detail for white headline, paragraph and signup buttons. Vertical composition, generous near-black #020408 water, faint marine snow, subtle stone seabed at bottom, atmospheric realistic CGI with abstract currents. Calm warm protected emotion, no aggression, no cartoons. No text, UI, logos, people, machinery, symbols or watermark."
+    },
+    {
+      "key": "hero-ecdysis-desktop-v3",
+      "prompt": "Use case: stylized-concept. Asset: wide 16:9 homepage hero background for Moltology. Make an entirely new abstract concept, not a crab and not a rocky tunnel. Moltology helps people shed distracting habits and grow resilient attention, framed as molting and descending beneath the noisy ocean surface. Visualize an elegant suspended organic carapace-like seed: a smooth solid midnight blue inner shell protected by a few curved overlapping chitin plates, surrounded by delicate translucent outer membranes peeling away and drifting into fine fragments. Sculptural silhouette should suggest layered armor forming and old layers being released, not a literal animal. Main sculpture sits on the RIGHT third, with a secondary much softer detached translucent membrane curling at far left edge. Broad quiet near-black central 60% for white centered headline. Surrounding water has a subtle transition from blurred restless particles near top corners to calm dense stillness around the inner shell. Cinematic macro material study: smooth obsidian chitin, translucent smoky nacre, fine organic ridges, restrained cyan rim light and barely warm amber inside. Atmospheric deep ocean, marine snow minimal, no visible ground or coral reef. Elegant mysterious and hopeful rather than threatening. No vortex, tunnel, giant rocks, crab, lobster, shrimp, literal brain, person, chrome technology, machinery, buildings, typography, logos, UI, watermark. Palette #020408 ink navy, smoky teal and subdued cyan, small amber trace. Image will be darkened, blurred and heavily vignetted by CSS; keep the main organic silhouette readable in the right-middle and leave central negative space."
+    },
+    {
+      "key": "hero-ecdysis-mobile-v3",
+      "prompt": "Use case: stylized-concept. Asset: portrait 9:16 mobile homepage hero background for Moltology. New abstract material study, no crab and no rocky tunnel. A smooth solid midnight-blue organic carapace-like seed protected by curved overlapping chitin plates, delicate translucent smoky nacre membranes peel away from it into fine fragments suspended in deep dark water. Show shedding old layers and forming calm protective armor. Main small sculpture sits near right edge at 65% down; soft translucent membrane curls along far upper-left edge. Central 65% and upper-middle area remain near-black and empty for a tall block of white headline and text. Quiet water around the protected core contrasts with blurred tiny restless fragments at upper outer edges. Cinematic sculptural CGI, obsidian shell, smoky translucency, organic ridges, subtle turquoise rim light and tiny warm amber interior. Minimal marine snow, no ground or reef. Mostly #020408 ink navy, smoky teal, subdued cyan. Image receives strong vignette, subtle blur and darkening in CSS, so leave an intelligible simple silhouette near right-middle. No literal animal, people, brain, rocky tunnel, vortex, machine, city, typography, logo, UI, watermark."
+    }
+  ]
+}

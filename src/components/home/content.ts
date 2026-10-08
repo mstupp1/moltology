@@ -170,26 +170,33 @@ export const HOME_FAQ: HomeQuestion[] = [
   },
 ]
 
+/** Versioned backgrounds: prior S3 keys remain available for rollback. */
+export const HOME_HERO_IMAGE = {
+  src: getAssetUrl('/images/home/2026-10-08/hero-ecdysis-desktop-v3.webp'),
+  srcSm: getAssetUrl('/images/home/2026-10-08/hero-ecdysis-mobile-v3.webp'),
+} satisfies StoryImage
+
 export const HOME_FINAL_IMAGE: StoryImage = {
-  src: getAssetUrl('/images/home/home_final_descent.webp'),
-  srcSm: getAssetUrl('/images/home/home_final_descent_sm.webp'),
+  src: getAssetUrl('/images/home/2026-10-08/first-shed-desktop-v1.webp'),
+  srcSm: getAssetUrl('/images/home/2026-10-08/first-shed-mobile-v1.webp'),
 }
 
-/**
- * Deep-sea photos laid low behind sections, ordered from the surface down. They are pre-dimmed,
- * desaturated and vignetted into the page colour, so the page never composites a translucent full-width layer.
- */
+/** Quiet backgrounds follow the page from the noisy surface into a sheltered deep. */
 export const HOME_BACKDROPS = {
   surface: {
-    src: getAssetUrl('/images/home/bg_surface_soft.webp'),
-    srcSm: getAssetUrl('/images/home/bg_surface_soft_sm.webp'),
+    src: getAssetUrl('/images/home/2026-10-08/surface-desktop-v1.webp'),
+    srcSm: getAssetUrl('/images/home/2026-10-08/surface-mobile-v1.webp'),
   },
   seabed: {
-    src: getAssetUrl('/images/home/bg_seabed_soft.webp'),
-    srcSm: getAssetUrl('/images/home/bg_seabed_soft_sm.webp'),
+    src: getAssetUrl('/images/home/2026-10-08/seabed-desktop-v1.webp'),
+    srcSm: getAssetUrl('/images/home/2026-10-08/seabed-mobile-v1.webp'),
   },
   gallery: {
-    src: getAssetUrl('/images/home/bg_gallery_soft.webp'),
-    srcSm: getAssetUrl('/images/home/bg_gallery_soft_sm.webp'),
+    src: getAssetUrl('/images/home/2026-10-08/community-desktop-v1.webp'),
+    srcSm: getAssetUrl('/images/home/2026-10-08/community-mobile-v1.webp'),
+  },
+  practice: {
+    src: getAssetUrl('/images/home/2026-10-08/practice-desktop-v1.webp'),
+    srcSm: getAssetUrl('/images/home/2026-10-08/practice-mobile-v1.webp'),
   },
 } satisfies Record<string, StoryImage>

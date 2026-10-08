@@ -56,9 +56,9 @@ export const HomeMelt: React.FC = () => {
       aria-labelledby="home-melt-title"
       className="relative isolate overflow-hidden py-24 sm:py-36 bg-gradient-to-b from-[#020408] via-[#061722] to-[#020408]"
     >
-      <SectionBackdrop image={HOME_BACKDROPS.surface} position="50% 20%" />
-      <DepthLayer kind="shafts" className="-z-10 opacity-50" />
-      <DepthLayer kind="snow" className="-z-10 opacity-50" />
+      <SectionBackdrop image={HOME_BACKDROPS.surface} position="50% 20%" tone="surface" />
+      <DepthLayer kind="shafts" className="-z-10 opacity-25" />
+      <DepthLayer kind="snow" className="-z-10 opacity-25" />
       <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-20 items-center">
         <ScrollReveal>
           <Eyebrow color="#ff6358">Sound familiar?</Eyebrow>
@@ -139,7 +139,7 @@ export const HomeIdea: React.FC = () => (
     aria-labelledby="home-idea-title"
     className="relative isolate overflow-hidden py-24 sm:py-32 bg-gradient-to-b from-[#020408] via-[#03101a] to-[#020408]"
   >
-    <SectionBackdrop image={HOME_BACKDROPS.seabed} position="50% 75%" drift={14} />
+    <SectionBackdrop image={HOME_BACKDROPS.seabed} position="50% 75%" drift={14} tone="seabed" />
     <div className="absolute inset-x-0 top-0 h-2/3 -z-10 bg-gradient-to-b from-[#020408] via-[#020408]/60 to-transparent" aria-hidden="true" />
     <div className="max-w-6xl mx-auto px-5 sm:px-8">
       <ScrollReveal className="max-w-3xl">
@@ -236,29 +236,10 @@ const StepAction: React.FC<{ step: HomeStep; onNavigate: (path: string) => void 
   </button>
 )
 
-/** No photo here: a soft glow, a still sonar map of the seabed, and a slow ping behind the screen. */
-const HowBackdrop: React.FC<{ sonarAt?: 'right' | 'top' }> = ({ sonarAt = 'top' }) => {
-  const centre = sonarAt === 'right' ? 'left-[64%] top-[55%]' : 'left-[80%] top-24'
-  return (
-    <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden="true">
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            sonarAt === 'right'
-              ? 'radial-gradient(45% 55% at 64% 55%, rgba(0, 195, 255, 0.09), transparent 70%), radial-gradient(35% 40% at 15% 30%, rgba(0, 255, 204, 0.05), transparent 70%)'
-              : 'radial-gradient(70% 35% at 80% 8%, rgba(0, 195, 255, 0.08), transparent 70%)',
-        }}
-      />
-      <DepthLayer
-        kind="contours"
-        style={{ ['--contour-x' as string]: sonarAt === 'right' ? '64%' : '80%', ['--contour-y' as string]: sonarAt === 'right' ? '55%' : '6rem' }}
-      />
-      <DepthLayer kind="sonar" className={`absolute ${centre}`} />
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, #020408, transparent 15%, transparent 85%, #020408)' }} />
-    </div>
-  )
-}
+/** Quiet artwork supports the steps without decorative map or sonar rings. */
+const HowBackdrop: React.FC = () => (
+  <SectionBackdrop image={HOME_BACKDROPS.practice} tone="practice" drift={0} />
+)
 
 const HowItWorksIntro: React.FC = () => (
   <>
@@ -345,7 +326,7 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
       style={{ height: `${HOME_STEPS.length * 70 + 40}svh` }}
     >
       <div className="sticky top-0 isolate h-[100svh] overflow-hidden flex items-center pt-16">
-        <HowBackdrop sonarAt="right" />
+        <HowBackdrop />
         <div className="w-full max-w-6xl mx-auto px-8 grid grid-cols-[0.8fr_1.2fr] gap-16 items-center">
           <div>
             <HowItWorksIntro />
@@ -410,7 +391,7 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
 
 export const HomeVoices: React.FC = () => (
   <section aria-labelledby="home-voices-title" className="relative isolate overflow-hidden py-24 sm:py-32">
-    <SectionBackdrop image={HOME_BACKDROPS.gallery} position="60% 50%" />
+    <SectionBackdrop image={HOME_BACKDROPS.gallery} position="60% 50%" tone="gallery" />
     <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#020408]/70 via-transparent to-transparent" aria-hidden="true" />
     <div className="max-w-6xl mx-auto px-5 sm:px-8">
       <ScrollReveal className="max-w-3xl">
@@ -423,7 +404,7 @@ export const HomeVoices: React.FC = () => (
       <div className="mt-12 sm:mt-14 grid gap-5 md:grid-cols-3">
         {HOME_VOICES.map((voice, index) => (
           <ScrollReveal key={voice.name} delayMs={index * 110}>
-            <figure className="flex h-full flex-col justify-between rounded-3xl border border-white/10 bg-[#03080b]/85 p-7 sm:p-8">
+            <figure className="home-voice-glass flex h-full flex-col justify-between rounded-3xl border border-white/10 p-7 sm:p-8">
               <blockquote className="font-grotesk text-lg sm:text-xl text-white leading-snug [text-wrap:pretty]">
                 &ldquo;{voice.quote}&rdquo;
               </blockquote>
@@ -488,23 +469,14 @@ export const HomeFinalCta: React.FC<HomeSectionProps> = ({ authReady, onNavigate
   <section aria-labelledby="home-final-title" className="relative px-5 sm:px-8 pb-24 sm:pb-32">
     <ScrollReveal animation="scale-up">
       <div className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-[#00c3ff]/20 bg-gradient-to-br from-[#04161c] via-[#03090d] to-[#020408] grid md:grid-cols-[1.15fr_0.85fr] items-center">
-        <div className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-[#00c3ff]/10 blur-3xl -z-10" aria-hidden="true" />
-        <div
-          className="absolute inset-0 -z-10 md:hidden"
-          style={{ background: 'radial-gradient(40% 55% at 50% 30%, rgba(0, 195, 255, 0.14), transparent 70%)' }}
-          aria-hidden="true"
-        />
-        <div
-          className="absolute inset-0 -z-10 hidden md:block"
-          style={{ background: 'radial-gradient(32% 60% at 70% 50%, rgba(0, 195, 255, 0.16), transparent 70%)' }}
-          aria-hidden="true"
-        />
-        {/* The art bleeds into the card through a soft mask over a glow, instead of sitting in its own box. */}
-        <div className="home-final-art absolute inset-x-0 top-0 h-[22rem] md:inset-y-0 md:left-auto md:h-auto md:w-[64%] -z-10" aria-hidden="true">
-          <StoryImg image={HOME_FINAL_IMAGE} className="h-full w-full object-cover" />
+        {/* Separate desktop and portrait compositions cover the whole invitation. */}
+        <div className="absolute inset-0 -z-10" aria-hidden="true">
+          <StoryImg image={HOME_FINAL_IMAGE} className="home-final-art h-full w-full object-cover" />
+          <div className="home-final-vignette absolute inset-0" />
         </div>
-        <DepthLayer kind="caustics" className="-z-10" />
-        <DepthLayer kind="snow" className="-z-10 opacity-50" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-[#020408]/60 to-[#020408]/85 md:bg-gradient-to-r md:from-[#020408]/75 md:via-[#020408]/30 md:to-transparent" aria-hidden="true" />
+        <DepthLayer kind="caustics" className="-z-10 opacity-30" />
+        <DepthLayer kind="snow" className="-z-10 opacity-25" />
         <div className="px-6 py-12 sm:p-14 lg:p-16">
           <h2
             id="home-final-title"

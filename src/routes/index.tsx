@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { LandingPage } from '@/components/LandingPage'
 import { HOMEPAGE_SEO, SITE_ORIGIN, canonicalLink, seo } from '@/lib/seo'
-import { getAssetUrl } from '@/lib/assets'
+import { HOME_HERO_IMAGE } from '@/components/home/content'
 
 export const Route = createFileRoute('/')({
   head: () => ({
@@ -14,7 +14,7 @@ export const Route = createFileRoute('/')({
         as: 'image',
         type: 'image/webp',
         media: '(max-width: 767px)',
-        href: getAssetUrl('/images/hero_benthic_mobile_v2.webp'),
+        href: HOME_HERO_IMAGE.srcSm,
         fetchPriority: 'high',
       },
       // Desktop LCP backdrop
@@ -23,7 +23,7 @@ export const Route = createFileRoute('/')({
         as: 'image',
         type: 'image/webp',
         media: '(min-width: 768px)',
-        href: getAssetUrl('/images/hero_benthic_expansive_v1.webp'),
+        href: HOME_HERO_IMAGE.src,
         fetchPriority: 'high',
       },
     ],
