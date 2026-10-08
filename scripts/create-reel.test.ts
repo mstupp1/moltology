@@ -1,4 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
 import {
   generateDailyReelScript,
   buildDynamicScenePrompts,
@@ -9,8 +12,38 @@ import {
   resolveColorGradingPresets,
   buildAntigravityOutroPrompt,
   autoCommitReelPublish,
+  checkReelVideoBudget,
+  resolveReelSceneFrames,
+  loadReviewedReelScript,
 } from './create-reel'
 import { getImageMimeType } from './generate-video'
+
+describe('Reviewed reel production inputs', () => {
+  it('allows a longer Omni plan inside the budget and stops an expensive plan', () => {
+    expect(checkReelVideoBudget([4, 6, 4, 6, 4, 6], 'gemini-omni-1.1-flash')).toBe(3)
+    expect(() => checkReelVideoBudget([6, 6, 6, 6, 6, 6], 'gemini-omni-1.1-flash')).toThrow('exceeds')
+    expect(() => checkReelVideoBudget([4, 4, 4, 4, 4, 4], 'unknown-model')).toThrow('verified video rate')
+  })
+
+  it('requires images for all character scenes and preserves authored narration', () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'reel-inputs-'))
+    try {
+      expect(() => resolveReelSceneFrames(directory)).toThrow('scene-4.png')
+      for (const n of [4, 5, 6]) fs.writeFileSync(path.join(directory, `scene-${n}.png`), 'image')
+      const frames = resolveReelSceneFrames(directory)
+      expect(frames.slice(0, 3)).toEqual([undefined, undefined, undefined])
+      expect(frames[3]).toBe(path.join(directory, 'scene-4.png'))
+      const draft = { title: 'A quiet hour', topic: 'A quiet hour', hookHeadline: 'One more meeting?', narrationScript: 'Close one tab. Finish the task you chose.', caption: 'Let the surface wait.', firstComment: 'Take the audit.', youtubeTitle: 'One more meeting?', youtubeDescription: 'Take the audit.', scenePrompts: Array(6).fill('A concrete shot'), hashtags: ['#Moltology'] }
+      const file = path.join(directory, 'draft.json')
+      fs.writeFileSync(file, JSON.stringify(draft))
+      expect(loadReviewedReelScript(file).narrationScript).toBe(draft.narrationScript)
+      fs.writeFileSync(file, JSON.stringify({ ...draft, scenePrompts: [] }))
+      expect(() => loadReviewedReelScript(file)).toThrow('six scene prompts')
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true })
+    }
+  })
+})
 
 describe('Reels & Shorts Dynamic Script Formulation & Clip Recycling', () => {
   it('generates a complete 6-scene narrative script with custom topic', () => {

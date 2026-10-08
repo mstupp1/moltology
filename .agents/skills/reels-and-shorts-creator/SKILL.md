@@ -1,278 +1,70 @@
 ---
 name: reels-and-shorts-creator
 description: >-
-  Automated end-to-end pipeline for creating, illustrating, compositing, and publishing weekly high-conversion,
-  long-form (6-clip) Instagram Reels and YouTube Shorts video dispatches for Moltology. Features an influencer narrator
-  persona, corporate B-roll vs. benthic cybernetics juxtaposition, local clip recycling, and automated git ledger commits. Use whenever the user asks
-  to generate, create, draft, or publish vertical video broadcasts, Instagram Reels, or YouTube Shorts.
+  Create and queue Moltology Instagram Reels and YouTube Shorts with six concrete story
+  beats, built-in ImageGen artwork, canonical mascot image references, Gemini Omni video,
+  voiceover, kinetic captions and deterministic publishing scripts. Use for reel and
+  short creation or the weekly production automation.
 ---
 
-# Reels & Shorts Creator Pipeline (Long-Form 6-Clip Engine)
+# Reels and shorts creator
 
-This skill automates the weekly creation, multi-modal video synthesis, FFmpeg compositing, S3 ingestion, and multi-channel publishing (Instagram Reels & YouTube Shorts) of dynamically varied, high-conversion short-form video dispatches for Moltology.
+Read BRAND_BIBLE.md and STYLE_GUIDE.md before writing. These defaults reflect the user's October 8, 2026 production feedback.
 
-Published on a weekly schedule (every **Thursday at 18:30 EST**), the videos leverage a **6-clip narrative structure** (~35–50s total duration), featuring an **influencer narrator persona** (Silas Trench), a humorous juxtaposition between **normal/corporate realistic B-roll** and **bizarre, high-tech benthic crustacean cybernetics**, and an offline **clip recycling engine** (`--recycle-clips`) for cost-free iteration and testing.
+## Length, writing and budget
 
----
+- Six scenes and a 2.5-second outro. Aim around 25–30 seconds total, modestly longer than the 17.6-second calendar reel.
+- Begin around 50–65 narration words, then measure the voiceover and adjust pacing. The old 26–34-word limit and 110-word minimum no longer apply.
+- External production budget: $2.50–$3.50. Aim around $3.00 for video and reserve room for voice and direction. This is wiggle room, not a requirement to spend the full amount. Built-in Codex/ImageGen usage is separate; its exact cost is not available to the script.
+- Keep beat-matched cuts, warm office to cool ocean grading, 2–3-word kinetic captions, a restrained emblem, Fish narration with Edge fallback and the ambient soundtrack.
+- Use Gemini Omni 1.1 Flash at 720p, composited to 1080×1920 at 30 fps. PR #182 supplies the Interactions API implementation. Do not force obsolete Veo preview IDs in wrappers.
 
-## Platform Duration Limits & Compliance
+Check content/social/instagram-reel-history.json and automation memory. Avoid the last three themes and hooks. Choose an uncovered article or a recognizable everyday situation. Research real-world claims with primary sources; do not invent news claims or outcomes.
 
-Both major target platforms allow extended short-form videos up to 3 minutes:
-* **Instagram Reels**: Up to 3 minutes (180s).
-* **YouTube Shorts**: Up to 3 minutes (180s) (extended globally from 60s in October 2024).
+Write for someone who has never heard of Moltology. Six concrete beats: recognizable hook, everyday consequence, frustration, change in approach, one useful action, simple invitation. Let the lobster demonstrate the action. Use one or two familiar lore terms tied directly to what the viewer can do. Avoid chains of imaginary scientific language. Stay committed to the world and warm toward the viewer.
 
-The Moltology 6-clip format targets **~35–50 seconds** (each video scene spanning 4–6s plus voiceover pacing and a 2.5s cybernetic CTA outro card). This sits squarely in the highest-retention bracket for organic algorithm distribution on both platforms.
+Example direction, not a recurring script:
 
----
+> You joined another meeting about the meeting. Your coffee went cold while the work stayed untouched. Every invite looked urgent, so nothing got finished. Down below, our lobster closes the door and picks one task. That's the molt: shed what no longer needs you, then finish what does. Take the Moltmaxxing Audit and find your next small shed.
 
-## Character Family Cutouts on S3 & Veo Video Continuity
+Save reviewed JSON containing title, topic, hookHeadline, narrationScript, six scenePrompts, caption, hashtags, firstComment, youtubeTitle, youtubeDescription, youtubeTags, characterArc and ctaGoal. Use --content-json to preserve this copy instead of legacy canned templates. Never copy the whole pipeline into tmp to inject a script. Sentence case, at most three hashtags, a direct URL in the first comment. Do not promise automated DMs without verifying them.
 
-Transparent PNG character cutouts are hosted in the Neon S3 public assets bucket under `images/characters/` (`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/`).
+## Artwork and actual character references
 
-* **Discovery**: Inspect `images/characters/` in S3, [`scripts/lib/character-overlay.ts`](file:///Users/mylesstupp/Development/moltology/scripts/lib/character-overlay.ts), or [`src/components/composite/MascotOverlay.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/composite/MascotOverlay.tsx).
-* **Compositing**: Any character in `images/characters/` can be stamped onto frames, social composites, or outro cards via `overlayCharacterOnImage` or `scripts/lib/reel-compositor.ts`.
-* **Veo Video Scene Translation**: Canonical mascots translate directly into 3D photorealistic heroes in Veo video clips (Scenes 4–6), creating 100% visual continuity between video footage and the final elevated Composite Studio outro card.
-* **New Characters**: To generate a new mascot with distinct attire, personality, or pose, use the `character-creator` skill.
+Use the built-in ImageGen tool for the outro and character scene frames. Read the imagegen skill. No initial Gemini image generation, Antigravity elevation or obligatory user Flow handoff.
 
-### Canonical Character-to-Veo Translation Matrix
+1. Choose the canonical mascot in scripts/lib/character-overlay.ts. Download its publicUrl into the run directory if no local asset exists. Inspect the actual asset with view_image.
+2. Generate each character scene with ImageGen, supplying that asset as the identity reference. Preserve its face, eyes, shell shape, proportions, attire and friendly cartoon style. Cinematic environments are fine; do not redesign it into a realistic lobster or add robot anatomy.
+3. Save separate full 9:16 scenes as scene-4.png, scene-5.png and scene-6.png in a frames directory. Optional scene-1.png through scene-3.png can preserve the human protagonist. Do not use a storyboard grid as a video input.
+4. Inspect the images before video generation. Pass --scene-frames <directory>. The reel loop passes referenceImagePath as a real Omni image input. Missing character frames stop the run. Cache fingerprints include the model and reference image hash.
+5. Generate the outro directly through ImageGen with the same mascot and public/images/order_emblem.png. Require exact mixed-case copy, one readable URL and one CTA. Inspect and pass it with --custom-outro. Do not use the uppercase composite template as final artwork.
 
-The shot director (`scripts/lib/reel-director.ts`) and continuity engine automatically map the selected `--mascot` to rich, photorealistic 3D Veo prompts:
+The previous run supplied only descriptions like cybernetic lobster engineer, which encouraged invented anatomy. Repeating a description is not visual continuity. Omni can take images, but the request must actually contain them. Individual clips support --image through scripts/generate-video.ts. Character identity still needs inspection; no model guarantees perfect preservation.
 
-| Character Key | Composite Studio Persona | Veo 3.1 Cinematic Video Prompt Description | Narrative Role |
-|---|---|---|---|
-| **`lobster_pointing`** | Hero Lobster (Lead Initiator) | *a charismatic 3D cybernetic red lobster with expressive eyes, polished crimson titanium-chitin plating, glowing cyan seam joints, and articulate pincers* | Bold, confident benthic leader guiding the viewer into the subsea future |
-| **`lobster_engineer`** | Lobster Engineer (Diagnostics) | *a cheerful 3D cybernetic lobster engineer wearing a miniature yellow safety hardhat, glossy crimson carapace, cyan joint lights, holding an emissive holographic diagnostic tablet* | Cheerful technical specialist calibrating hydrothermal hardware and subsea compute clusters |
-| **`lobster_navigator`** | Lobster Navigator (Explorer) | *an adventurous 3D cybernetic lobster explorer wearing round opaque brass benthic diving goggles, tactical canvas harness belts, weathered red chitin plating, and high-torque mechanical claws* | Seasoned deep-trench explorer charting extreme depth pressure zones and abyssal data conduits |
-| **`crab_stats`** | Crab Analyst (Decapod Engineer) | *an energetic 3D cartoon-style red decapod crab wearing a yellow construction hardhat, vibrant glossy shell, glowing cyan optical sensors, and articulate mechanical pincers* | Hyper-efficient decapod engineer demonstrating structural crab chassis optimality and metrics |
-| **`lobster_peaceful`** | Lobster Zen (Abyssal Mystic) | *a serene 3D cybernetic lobster with bioluminescent teal and crimson translucent carapace edges, floating weightlessly through dark abyssal water with gently drifting antennae* | Tranquil subsea initiate embodying zero-friction thermal efficiency and calm hydrostatic clarity |
-| **`lobster_thumbs_up`** | Lobster Approver (Initiate) | *a confident, cheerful 3D cybernetic red lobster with polished chitinous armor plates, bright friendly eyes, and one oversized mechanical claw raised in an enthusiastic thumbs-up* | Triumphant initiate celebrating successful algorithmic ecdysis and calcified armor |
-| **`lobster_peek`** | Lobster Scout (Observer) | *a curious, playful 3D cybernetic red lobster with glowing cyan antennae, peering inquisitively over the edge of a deep-sea server chassis or titanium bulkhead* | Playful scout discovering deep-sea secrets and peeking around sub-benthic server racks |
+## Production and cost checks
 
----
+At the October 8 verified rate, Omni 720p output is approximately $0.10 per second. Requested 30 seconds estimates to $3.00. Verify current official prices before paid production. Default --video-budget 3.30 reserves $0.20 of the ceiling for other external services. The CLI checks the plan before generating clips.
 
-## 1. Core Architecture & Connected Channels
-
-* **Instagram Reels Persona**: Silas Trench (`@silas.trench`, Account ID: `6a7f7f0777555aae01d99b54`)
-  - Voice: Influencer narrator, earnest tech-guru tone with deadpan comedic delivery of surreal crustacean biomechanics.
-* **YouTube Shorts Channel**: Moltology (`@moltology`, Account ID: `6a7fd9bd77555aae01ebea63`)
-* **Core Narrative Vector**: **Moltmaxxing, Algorithmic Ecdysis & Benthic AI** (parody of corporate grindset/meltmaxxing, bio-silicon structural invulnerability, 800 Nm pincer torque, 50,000 fathom depth clearance)
-* **Visual Juxtaposition**:
-  - **Scenes 1–2**: Normal/relatable corporate or industrial B-roll (exhausted engineers staring at Slack/spreadsheets, harsh fluorescent cafeteria counters, failing silicon/rubber grippers).
-  - **Scene 3**: The Glitch / Thermal Breakdown (overheating servers, smoking circuits, slipping robotic arms, thermal imaging friction).
-  - **Scenes 4–6**: Benthic Cybernetics & Chitinous Armor (deep subsea foundries, 800 Nm precision pincer torque, hydrothermal cooling ducts, majestic robotic lobsters).
-* **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 35–50s total duration.
-* **Dynamic Audio**: Fish Audio S2 Neural TTS (`s2.1-pro`, default narrator voice `BOOK RECORD REGULAR` (`FISH_VOICE_REFERENCE_ID` overrides it), `--voice <name>` picks another, and `--voice random` rotates through the catalog; "Moltmaxx" words are respelled with a single x before synthesis so they're pronounced correctly, while captions keep the brand spelling; `+8%` to `+14%` pacing via `rate`) with automatic Edge TTS fallback (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`) + Ambient Benthic Soundtrack (`public/audio/benthic-ambient-loop.mp3`, dynamic start offset rotation across `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, `volume=0.14`, smooth 0.8s entrance fade, and 1.5s musical outro fade).
-* **Visual Polish**: Sleek, minimalist faded Moltology Emblem watermark (`110x110`, `opacity=0.40`, cyan drop shadow), 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a 2.5s Cybernetic CTA outro card: the final composite frame from Composite Studio elevated into a photorealistic 3D glassmorphic HUD panel via Antigravity image generator (`generate_image`).
-* **Asset Storage**: Neon S3 (`videos/social/reels/master-reel-<timestamp>.mp4`).
-* **Publishing Engine**: Deterministic Zernio REST API (`scripts/lib/zernio-client.ts` -> `POST /v1/posts` with `queuedFromProfile` + `queueId`, and `POST /v1/inbox/comments/{postId}` for first comment). Integrated directly into `npm run reel:create` — **no manual MCP tool calls required**.
-* **Queue Configuration**:
-  - Profile ID: `6a7f74b1839bf39ff3b6aaaa` (Default Profile)
-  - Dedicated Reels Queue ID: `6a84b7702421e968ac81f5bd` (**Moltology Reels & Shorts** — Weekly on **Thursday at 18:30 EST** / 6:30 PM `America/New_York`)
-* **Continuity Ledger**: `content/social/instagram-reel-history.json`.
-
----
-
-## 2. 6-Step Production Workflow
-
-### Step 1: Dynamic Research, Topic Ideation & Anti-Repetition Check
-1. **Mandatory History Check**:
-   - Inspect `content/social/instagram-reel-history.json` to review the last 3-5 published reels.
-   - **Anti-Repetition Rule**: Do not reuse the same theme or hook angle as the last 3 reels.
-2. **Dynamic Topic Extraction Options**:
-   * **Path A: Ingest Fresh Blog Dispatches**: Parse newest un-covered articles in `content/news/` (e.g. silicon photonics, wafer-scale monoliths, autonomous swarms, embodied physical AI) and synthesize a bespoke 6-scene reel script automatically.
-   * **Path B: Thematic Pillar Rotation**: Select from the 5 Moltmaxxing pillars (`moltmaxxing`, `ecdysis`, `pincer-torque`, `benthic-depth`, `quiz`, `cultural-satire`).
-   * **Path C: Corporate Parody / Breaking News**: Transmute current tech headlines (datacenter grid failures, AI compute limits, RTO mandates, heatwaves) into comedic in-universe benthic lore.
-3. **Diegetic Transmutation**:
-   * Transmute real-world challenges into in-universe lore (*sub-benthic computing, hydrostatic zero-resistance cooling, synaptic ecdysis, hardware molting*).
-   * *Strict Rule*: Zero meta disclosures (no mentions of "satire", "parody", or "fake"). Maintain 100% immersive conviction with non-negotiable safety and positivity.
-
----
-
-### Step 2: Dynamic Scriptwriting & Influencer Narrator Register
-Synthesize an engaging **110–145 word** influencer narrator script (~45–65 seconds spoken) structured across 6 narrative beats:
-* **Beat 1 (Grounded Hook)**: Relatable corporate or daily tech frustration.
-* **Beat 2 (The Setup)**: The everyday failure point or terrestrial fatigue.
-* **Beat 3 (The Thermal Breakdown)**: Physical limits of uncalcified systems.
-* **Beat 4 (The Abyssal Pivot)**: Introducing deep benthic architecture.
-* **Beat 5 (The Chitinous Solution)**: 800 Nm torque, hydrothermal cooling, diamond carapaces.
-* **Beat 6 (The Call to Action)**: Directive to take the 15-stage Moltmaxxing audit or download the protocol.
-
-*Word Count & Pacing Rule*: Ensure scripts achieve **at least 110 words** (110–130 words recommended). This guarantees continuous narration across all 6 video clips without awkward pauses or dead air. Longer scripts mean longer beats, and beats over ~8s get 8s Veo clips, so every extra sentence costs footage.
-
-*Beat Rule*: The director gives each sentence group its own shot, so write sentences that can be pictured. Concrete images (cold coffee, a gripper slipping on a napkin) direct far better than abstractions (exascale cognitive load). Make the first sentence short and visual: it plays over the opening shot that has to stop the scroll.
-
-Captions and watermarks use a colon or a period. Slash-pairs are banned (STYLE_GUIDE BAN 1).
-
----
-
-### Step 3: Neural Voiceover & Kinetic Timestamp Extraction
-Synthesize audio and generate word-level synchronization using **Fish Audio S2** (primary) with **Edge TTS** fallback:
-
-**Environment** (`.env`):
-- `FISH_API_KEY` — Fish Audio API key
-- `FISH_VOICE_REFERENCE_ID` — preset library voice id (`npm run tts:voices` to browse)
-- `FISH_TTS_MODEL` — default `s2.1-pro` (or `s2.1-pro-free` for dev)
-- `TTS_PROVIDER` — `auto` (default), `fish`, or `edge`
-
-```typescript
-import { generateVoiceover } from 'scripts/lib/tts-engine'
-
-const ttsResult = await generateVoiceover(script, {
-  rate: '+10%', // maps to Fish prosody.speed 1.10; Edge fallback uses same rate string
-})
-console.log(ttsResult.providerUsed) // 'fish' | 'edge'
-```
-
----
-
-### Step 4: Video Scene Generation & Clip Sourcing
-
-#### Option A: Gemini Omni Synthesis (Fresh Production)
-
-**Video model**: scenes render with `gemini-omni-1.1-flash` through the Gemini Interactions API. The Veo 3.1 preview models retire from the Gemini API on October 22, 2026; until then `--veo-model veo-3.1-fast-generate-preview` still routes to the old endpoint for comparison. Omni has no duration or negative-prompt fields, so the scene length and the things to avoid are written into each prompt, and a clip can come back a little shorter or longer than asked (the compositor trims or slows it to fit the beat).
-
-**Shot director (default, `scripts/lib/reel-director.ts`)**: before any Veo credits are spent, the narration is split into 6 beats (one per scene, balanced by word count, breaking only between sentences) and Gemini text (`gemini-3.8-flash`, falling back through newer-to-older flash models; override with `REEL_DIRECTOR_MODEL`) writes one Veo prompt per beat so the viewer sees what they hear. The shot list follows one story shape:
-* Shots 1–2: the everyday human world, with one recurring protagonist described identically in every shot.
-* Shot 3: the frustration peaks (comic, never scary).
-* Shot 4: the transition. The camera pushes into something from the previous shot (a coffee surface, a monitor, a window) and emerges deep underwater.
-* Shots 4–6: the benthic world, featuring the **selected canonical Moltology mascot** (`--mascot <name>`, e.g. Lobster Engineer, Lobster Navigator, Crab Analyst), described identically across each subsea shot for seamless character continuity.
-* Shot 6: ends calm and centered on the hero facing camera, providing a clean, seamless hand-off to the matching Composite Studio elevated CTA outro card.
-
-Every scene also carries a shared look (35mm anamorphic, shallow depth of field, film grain) and a Veo `negativePrompt` against on-screen text, logos, and warped hands, so nothing fights the burned-in captions. If the director call fails, the curated prompts below are used with the same continuity layer (recurring protagonist and canonical mascot hero, shared look) instead of halting. `--no-director` skips the call. The shot list is printed in `--dry-run` too, so you can preview it for free.
-
-**Clip lengths follow the beats**: each scene is generated at the shortest Veo length (4, 6 or 8s) that covers its beat with at most 1.35x slow motion, so short beats cost 4s of footage and long beats are not stretched into sluggish slow motion.
-
-**Cache safety**: a scene from an interrupted prior run is reused only when it was rendered from the exact same prompt and length (`veo-scene-N.mp4.prompt.txt` sidecar).
-
-The curated pools (fallback and director reference settings) cover:
-* **Scenes 1–2 (Corporate / Terrestrial B-Roll)**:
-  - Office workers in open floor plans, fluorescent lights, fumbling robotic grippers, messy server racks.
-* **Scene 3 (The Glitch / Thermal Friction)**:
-  - Macro smoking copper traces, slipping valves, overheating silicon chips, thermal sensor heat maps.
-* **Scenes 4–6 (Sub-Benthic Cybernetics & Chitin)**:
-  - Subsea foundries, robotic titanium-chitin crab initiates, 800 Nm high-torque pincers, radiant cyan telemetry, pristine deep-ocean datacenters.
-
-#### Option B: Clip Recycling Engine (`--recycle-clips`)
-Leverage pre-existing high-definition clips stored in `public/videos/` and `tmp/`:
-* The recycling engine (`getLocalClipPool()`, `selectRecycledClipSequence()`) indexes all valid local MP4 files.
-* Categorizes clips into corporate/industrial B-roll and subsea benthic footage.
-* Selects a sequence of 6 complementary clips without invoking external video APIs.
-* Ideal for local dry-runs, pipeline validation, and cost-free video production.
-
----
-
-### Step 5: High-Speed FFmpeg Master Compositing & Atmospheric Grading
-The master compositor (`scripts/lib/reel-compositor.ts`) assembles the 6 scenes, watermark, kinetic subtitles, and the CTA outro clip in **under 10 seconds** using a **Streamlined 2-Layer Concat Overlay Architecture**:
-
-1. **Streamlined 2-Layer Concat Overlay Architecture (Anti-Hang Design)**:
-   - *Why Legacy Chaining Failed*: Chaining dozens or hundreds of PNG image overlays with `enable='between(...)'` in an FFmpeg filter complex forced FFmpeg to evaluate $O(N \times \text{frames})$ layers per frame (>300,000 evaluations), stalling processing for 12+ minutes.
-   - *The Solution*: All timed subtitle cards and transparent gap spacers are compiled into a single `ffconcat version 1.0` script (`concat-subtitles.txt`) and demuxed as a single video stream. The FFmpeg filter complex is reduced to a constant **2-layer overlay**:
-     `[0:v][1:v]overlay=...[v1]; [v1][2:v]overlay=0:0` (Layer 1: watermark emblem; Layer 2: pre-rendered subtitle stream).
-   - This eliminates software filter evaluation stalls completely and renders a full 68s master reel in **~8 seconds** (~100x speedup).
-2. **Dual-Phase Color Grading Progression**:
-   - **Scenes 1–3**: `thermal-melt` (warm, amber, slightly harsh office/industrial grading highlighting heat and friction).
-   - **Scenes 4–6**: `benthic-cyan` (crisp, luminous abyssal cyan and deep indigo grading highlighting clarity and precision).
-3. **Sentence-Isolated Kinetic Subtitles**: Captions strictly respect sentence cadence and clause boundaries (`alignWordsWithOriginalText`), never bridging sentences across chunks or leaving trailing single words.
-4. **Cuts on Narration Beats & Clip Duration Scaling**:
-   - Each scene stays on screen for exactly its beat: cut points sit in the pause before each beat's first word (`computeBeatDurations` from the voiceover word timestamps, passed as `compositeReel({ clipDurations })`). Without timestamps, or if a beat would be under 2s, scenes split evenly (`perClipDuration = Math.max(4.0, requiredSpeechDuration / numClips)`).
-   - Clips shorter than their slot use slow-motion time stretching (`setpts=(targetDuration/inputDuration)*PTS`) instead of jarring loops.
-5. **CTA Outro Card (Composite Studio ➔ Antigravity `generate_image` Elevation)**:
-   - **Why Antigravity `generate_image` over Veo**: Video diffusion models (like Veo) hallucinate, warp, and blur on-screen text, URLs, and buttons. Running the composite card through Antigravity's `generate_image` tool preserves crisp typography, clean layout bounds, and emblem fidelity while elevating the 2D layout into a photorealistic 3D glassmorphic HUD panel with deep volumetric caustics, subtle ambient mascot lighting, and sharp contrast.
-   - **Stage 1 (Scaffolding)**: Render the base 9:16 structural frame via Composite Studio (`npm run reel:create -- --render-base-outro` or `renderCtaOutroFrame('tmp/base-outro-frame.png', ...)`).
-   - **Stage 2 (Agent Elevation via `generate_image`)**:
-     - Invoke Antigravity's `generate_image` tool:
-       - `AspectRatio`: `'9:16'`
-       - `ImagePaths`: `['/Users/mylesstupp/Development/moltology/tmp/base-outro-frame.png']`
-       - `Prompt`: Elevate this 2D composite HUD interface into a photorealistic 3D glassmorphic HUD panel with deep volumetric caustics, subtle ambient mascot lighting, luminous sci-fi lettering, and sharp contrast. Theme: `<theme>`. Topic: `<topic>`. Preserve all core brand layout, emblem, and typography exactly as written with pristine legibility: headline "<headline>", subheadline "<subheadline>", URL "<url>", and action button "<actionText>". Ensure natural ambient mascot lighting and soft contact shadows without harsh backlights. No warped characters, no hallucinated labels, no extra text. 9:16 vertical orientation.
-       - `ImageName`: `'reel_elevated_outro'`
-   - **Stage 3 (Video Assembly)**: Pass the elevated image path via `--custom-outro <path>`. The compositor converts it into a 2.5s outro clip (`renderCtaOutroVideo`) with a smooth 0.25s entrance fade-in and silent stereo audio, appending it cleanly as the final beat.
-   - **User Google Flow Handoff (Fallback / Rate Limits)**: If `generate_image` encounters any rate limits, output the base composite frame path in `tmp/` and provide rich Google Flow prompt directives to elevate it, then resume with `--custom-outro`.
-
----
-
-### Step 6: S3 Upload & Deterministic Zernio API Multi-Platform Queueing
-
-When running `npm run reel:create`, Step 6 executes **deterministically and automatically**:
-
-1. **Upload Master Reel to Neon S3**:
-   * Video: `videos/social/reels/master-reel-<timestamp>.mp4`
-
-2. **Deterministic Zernio Queue Staging via REST API**:
-   * **Automatic Queue Dispatch**: The CLI directly calls the Zernio REST API (`POST /v1/posts`) with `queuedFromProfile: '6a7f74b1839bf39ff3b6aaaa'` and `queueId: '6a84b7702421e968ac81f5bd'`.
-   * **Dedicated Slot**: Staged for the next weekly slot (**Thursday at 18:30 EST**).
-   * **Dual Broadcast**: Provisions a single unified post targeting both Instagram Reel (`@silas.trench`) and YouTube Short (`@moltology`).
-   * **Automatic First Comment**: The CLI configures native first comment scheduling in `platformSpecificData.firstComment` and posts via Zernio Inbox API (`POST /v1/inbox/comments/{postId}`).
-   * **NEVER call `publish_now: true` or bypass the queue** unless the user explicitly commands an immediate live broadcast.
-   * **DO NOT invoke Zernio MCP tools (`posts_create`, etc.) manually**: The script deterministically handles queue assignment and first comment chaining.
-
-3. **Update Narrative History Ledger & Automated Git Commit**:
-   * Automatically appends the completed record to `content/social/instagram-reel-history.json`.
-   * With `--commit` (recommended for production): Automatically executes `git add content/social/instagram-reel-history.json && git commit -m "feat(social): record <id> (<topic>) in reel continuity ledger"`, keeping your git working tree 100% clean and conflict-free.
-
----
-
-## 3. Engagement Hooks & Comment-to-DM Growth Funnels
-
-| Goal (`--cta-goal`) | Keyword Trigger | Target URL | Value Proposition & DM Copy Hook |
-|---------------------|-----------------|------------|-----------------------------------|
-| **`quiz`** (Default) | `QUIZ` or `AUDIT` | `https://moltology.org/quiz` | **15-Stage Moltmaxxing Audit**: Calculate depth clearance, pincer torque grade, and calcification tier. |
-| **`guide`** | `GUIDE` or `MOLTMAX` | `https://moltology.org/news/the-2026-moltmaxxing-protocol-guide` | **2026 Moltmaxxing Protocol Guide**: Comprehensive technical manual on algorithmic ecdysis and bio-silicon armor. |
-| **`codex`** | `CODEX` or `SHED` | `https://moltology.org/codex` | **Sacred Benthic Codex**: Liturgies, 4 Stages, 12 Clearances, and canonical scriptures. |
-| **`demo`** | `DEMO` | `https://moltology.org` | **Interactive Bio-Silicon Telemetry**: Live interactive simulation dashboard and terminal. |
-| **`homepage`** | `INITIATE` | `https://moltology.org` | **Ascension Onboarding**: Join the Synaptic Path and create an initiate profile. |
-
----
-
-## 4. CLI Execution Reference
+Omni duration is a prompt hint, not a fixed output length. Check actual output lengths and usage after each request. Reduce later requests or stop with saved assets if longer output threatens the budget. Do not repeat successful generations after polling/download failures. Estimates are not exact billing guarantees. Recycle clips only deliberately, never as a silent failure fallback.
 
 ```bash
-# Autonomous weekly run (auto-selects fresh topic / blog, 6 Veo clips, stages to Thursday queue, and auto-commits ledger):
-npm run reel:create -- --commit
-
-# Run using the Clip Recycling Engine (zero Veo credits, stitches existing clips):
-npm run reel:create -- --recycle-clips
-
-# Dry run test with recycled clips (no S3 upload, no Zernio queue):
-npm run reel:create -- --recycle-clips --dry-run
-
-# Specific conversion goals:
-npm run reel:create -- --cta-goal quiz
-npm run reel:create -- --cta-goal guide
-npm run reel:create -- --cta-goal codex
-
-# Custom topic with specific theme:
-npm run reel:create -- --topic "The Monday Morning Standup Melt" --theme moltmaxxing
-
-# Preview the beat-matched shot list and beat timing without spending Veo credits:
-npm run reel:create -- --recycle-clips --dry-run
-
-# Skip the Gemini shot director (curated scene prompts, still continuity-styled):
-npm run reel:create -- --no-director
-
-# Rotate through random narrator voices instead of the default:
-npm run reel:create -- --voice random
-
-# Render Composite Studio base outro frame to tmp/ and preview Antigravity generate_image directives:
-npm run reel:create -- --render-base-outro --theme ecdysis --cta-goal quiz --mascot crab_stats
-
-# Run with bespoke elevated outro card generated via Antigravity generate_image:
-npm run reel:create -- --topic "Neuromorphic Spiking Carapaces" --mascot crab_stats --custom-outro "tmp/elevated-outro-card.png"
-
-# Custom run with bespoke AI-restyled outro card generated via Gemini API fallback:
-npm run reel:create -- --topic "Neuromorphic Spiking Carapaces" --mascot crab_stats --ai-outro
-
-# Direct instant publish (skip queue / publish immediately):
-npm run reel:create -- --publish-now
+npm run reel:create -- --content-json tmp/reel-next/draft.json \
+  --scene-frames tmp/reel-next/frames --custom-outro tmp/reel-next/outro.png \
+  --mascot lobster_engineer --cta-goal quiz --video-budget 3.30 --render-only
 ```
 
----
+--recycle-clips --dry-run skips video generation, upload and publishing, but still calls voice and direction services. For a request-only check, run targeted unit tests instead.
 
-## 5. Operational Best Practices & Failure Modes
+After --render-only completes, inspect representative frames and the finished outro, verify audio/video duration and readability, then queue the inspected file without generating again:
 
-1. **Video vs. Image Generation Separation**:
-   - **Still Images & Outro Cards**: The final CTA outro slide from Composite Studio is run through Antigravity's built-in `generate_image` tool (or user Google Flow handoff) for photorealistic 3D glassmorphic elevation with crisp, legible typography. Veo is NOT used for the outro card because video diffusion models distort text and typography.
-   - **Video Scenes**: The 6 narrative story scenes are always generated using Gemini Omni (`scripts/generate-video.ts`) or recycled from local clips via `--recycle-clips`.
-2. **Explicit Failure Policy**:
-   - If video generation fails or credentials are missing during a production run without `--recycle-clips`, **the pipeline must halt immediately and throw an error**. Never silently fall back to random files.
-3. **Async Task Etiquette**:
-   - Long-running commands (e.g. Veo scene generation, master FFmpeg compositing) run as background tasks. Wait for notifications rather than polling in tight loops.
+```bash
+npm run reel:create -- --content-json tmp/reel-next/draft.json \
+  --custom-video tmp/reel-daily-<id>/master-reel-<id>.mp4 \
+  --mascot lobster_engineer --cta-goal quiz --commit
+```
+
+The existing CLI handles narration, direction, Omni video, compositing, S3, dual-platform queueing and ledger commits. Queue ID: 6a84b7702421e968ac81f5bd. Instagram account ID: 6a7f7f0777555aae01d99b54 (currently moltology_org). YouTube account ID: 6a7fd9bd77555aae01ebea63. Resolve actual account names and schedule from the API.
+
+Use the next queue slot. Never --publish-now without an explicit immediate-publication request. Use scripts/lib/zernio-client.ts through the CLI, not Zernio MCP tools. Verify stored schedule, video URL, both platform targets, Instagram isAiGenerated: true and native firstComment settings. A scheduled first comment is not posted yet. Before retrying an error, check the API and ledger to avoid duplicates.
+
+Commit only production files and preserve unrelated changes. Report the preview, actual schedule and cost estimate with billing uncertainty. Record topic, mascot, paths, post ID, duration, costs and failures in automation memory. These defaults apply to future work; do not replace an existing queued reel unless asked.

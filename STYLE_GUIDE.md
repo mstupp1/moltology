@@ -489,8 +489,11 @@ copy. Both cuts stay sharp.
 
 ### Reel / Short (9:16)
 
-- Script 26–34 words, one hook formula (curiosity gap, contrarian, hard-metric shock,
-  scheduled-shedding alert, or ascension diagnostic).
+- Default script: roughly 50–65 words across six concrete beats, targeting 25–30 seconds
+  including the outro. Pace the measured voiceover, not a rigid word quota.
+- Open with a recognizable human situation. Show the problem, offer one useful action,
+  then invite the viewer to try it. One or two familiar Moltology terms are enough;
+  explain their meaning through the action. No chains of invented scientific jargon.
 - Voiceover stays 100% in the bit. Kinetic captions 2–3 words, sentence-boundary clean.
 - Outro card: SUBMIT. SHED. ASCEND. + CALCULATE YOUR MOLT CLEARANCE + moltology.org. One
   mascot, clearly lit.

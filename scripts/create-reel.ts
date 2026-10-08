@@ -2,7 +2,8 @@
 import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
-import { execSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
+import { execSync, execFileSync } from 'node:child_process'
 import matter from 'gray-matter'
 import { generateVoiceover } from './lib/tts-engine'
 import { getRandomFishVoice } from './lib/tts-providers/fish-audio'
@@ -412,6 +413,14 @@ export interface DailyReelScript {
 }
 
 export interface CreateReelOptions {
+  /** Reviewed script and platform copy, authored before production. */
+  contentJsonPath?: string
+  /** ImageGen scene-N.png starting frames; scenes 4–6 preserve the canonical mascot. */
+  sceneFramesDir?: string
+  /** Estimated video generation ceiling; reserves $0.20 of the $3.50 production budget. */
+  videoBudgetUsd?: number
+  /** Generate locally for inspection before a separate custom-video queue run. */
+  renderOnly?: boolean
   topic?: string
   theme?: 'moltmaxxing' | 'meltmaxxing' | 'ecdysis' | 'pincer-torque' | 'benthic-depth' | 'quiz' | string
   ctaGoal?: CtaGoal
@@ -458,6 +467,38 @@ export interface CreateReelOptions {
 
 export type CreateDailyReelOptions = CreateReelOptions
 export type ReelScript = DailyReelScript
+
+export function loadReviewedReelScript(filePath: string): DailyReelScript {
+  const draft = JSON.parse(fs.readFileSync(filePath, 'utf8'))
+  for (const key of ['title', 'topic', 'hookHeadline', 'narrationScript', 'caption', 'firstComment', 'youtubeTitle', 'youtubeDescription']) {
+    if (typeof draft[key] !== 'string' || !draft[key].trim()) throw new Error(`Reel draft needs ${key}.`)
+  }
+  if (!Array.isArray(draft.scenePrompts) || draft.scenePrompts.length !== 6 || draft.scenePrompts.some((p: unknown) => typeof p !== 'string' || !p.trim())) {
+    throw new Error('Reel draft needs six scene prompts.')
+  }
+  if (!Array.isArray(draft.hashtags) || draft.hashtags.length > 3) throw new Error('Use at most three hashtags.')
+  return draft
+}
+
+export function resolveReelSceneFrames(directory: string, sceneCount = 6): (string | undefined)[] {
+  return Array.from({ length: sceneCount }, (_, i) => {
+    const frame = path.resolve(directory, `scene-${i + 1}.png`)
+    if (fs.existsSync(frame)) return frame
+    if (i >= Math.ceil(sceneCount / 2)) throw new Error(`Missing character scene frame: ${frame}`)
+    return undefined
+  })
+}
+
+export function checkReelVideoBudget(durations: number[], model: string, budgetUsd = 3.30): number {
+  // Standard 720p rates; Omni duration is a prompt hint, so this is an estimate, not a billing cap.
+  const rate = model.startsWith('gemini-omni-') || model.includes('fast') ? 0.10 : model.includes('lite') ? 0.05 : model.startsWith('veo-') ? 0.40 : undefined
+  if (rate === undefined) throw new Error(`No verified video rate for ${model}.`)
+  if (!Number.isFinite(budgetUsd) || budgetUsd <= 0) throw new Error('Video budget must be positive.')
+  if (durations.some((seconds) => !Number.isFinite(seconds) || seconds <= 0)) throw new Error('Scene durations must be positive.')
+  const estimate = Math.round(durations.reduce((sum, seconds) => sum + seconds, 0) * rate * 100) / 100
+  if (estimate > budgetUsd) throw new Error(`Estimated video cost $${estimate.toFixed(2)} exceeds $${budgetUsd.toFixed(2)}. Shorten the narration before generating clips.`)
+  return estimate
+}
 
 export interface LocalClipItem {
   path: string
@@ -2070,7 +2111,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
 
   // 1. Script Generation & Topical Formulation
   console.log(`\n1️⃣ Formulating Topical Script & Curiosity Hook...`)
-  const scriptData = generateDailyReelScript(options)
+  const scriptData = options.contentJsonPath ? loadReviewedReelScript(options.contentJsonPath) : generateDailyReelScript(options)
   console.log(`   • Topic: "${scriptData.topic}"`)
   console.log(`   • Hook Headline: "${scriptData.hookHeadline}"`)
   console.log(`   • Narration: "${scriptData.narrationScript}"`)
@@ -2095,6 +2136,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
   let durationSeconds = 13.3
   let compositeResult: any = null
   let resolvedOutroPath = options.customOutroImagePath
+  const sceneFrames = options.sceneFramesDir ? resolveReelSceneFrames(options.sceneFramesDir) : []
 
   if (options.customVideo) {
     console.log(`\n🎬 Using pre-rendered custom video: ${options.customVideo}`)
@@ -2174,17 +2216,27 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     if (useVeo) {
       const sceneDurations = scenePrompts.map((_, i) => pickVeoClipDuration(beatDurations[i] ?? requiredSpeechDuration / numScenes))
       const veoSeconds = sceneDurations.reduce((a, b) => a + b, 0)
+      const model = options.veoModel || 'gemini-omni-1.1-flash'
+      const estimatedCost = checkReelVideoBudget(sceneDurations, model, options.videoBudgetUsd)
+      console.log(`   • Estimated 720p video cost: $${estimatedCost.toFixed(2)} (duration-dependent)`)
       console.log(`\n3️⃣ Generating Video Scenes (${scenePrompts.length} scenes, ${veoSeconds}s of Veo footage: ${sceneDurations.join('s, ')}s)...`)
       const recentRunDirs = fs
         .readdirSync(path.resolve(process.cwd(), 'tmp'))
         .filter((d) => d.startsWith('reel-daily-') && d !== path.basename(tempDir))
         .sort()
         .reverse()
+      const measuredSceneDurations: number[] = []
       for (let i = 0; i < scenePrompts.length; i++) {
-        const prompt = scenePrompts[i]
+        // Omni can return more footage than requested. Stop before the next paid request if the revised plan exceeds the budget.
+        checkReelVideoBudget([...measuredSceneDurations, ...sceneDurations.slice(i)], model, options.videoBudgetUsd)
+        const referenceImagePath = sceneFrames[i]
+        const prompt = referenceImagePath
+          ? `${scenePrompts[i]} The supplied image defines the character's identity. Preserve its face, eyes, shell, proportions, clothing and friendly cartoon design. Animate the existing character; do not redesign it into a realistic animal or add cybernetic armor.`
+          : scenePrompts[i]
         const veoSceneDuration = sceneDurations[i]
         const sceneOut = path.join(tempDir, `veo-scene-${i + 1}.mp4`)
-        const promptSidecar = `${prompt}\n${veoSceneDuration}s`
+        const referenceHash = referenceImagePath ? createHash('sha256').update(fs.readFileSync(referenceImagePath)).digest('hex') : 'none'
+        const promptSidecar = `${prompt}\n${veoSceneDuration}s\n${model}\nreference:${referenceHash}`
 
         // Recover a scene from the prior partial run only when it was rendered from the same prompt and length.
         if (!fs.existsSync(sceneOut) && recentRunDirs.length > 0) {
@@ -2205,6 +2257,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
         console.log(`\n🎬 Rendering Scene ${i + 1}/${scenePrompts.length} with ${options.veoModel || DEFAULT_VIDEO_MODEL} (${veoSceneDuration}s for a ${(beatDurations[i] ?? 0).toFixed(1)}s beat)...`)
         const veoResult = await generateVeoVideo({
           prompt,
+          referenceImagePath,
           negativePrompt: SCENE_NEGATIVE_PROMPT,
           model: options.veoModel || DEFAULT_VIDEO_MODEL,
           aspectRatio: '9:16',
@@ -2215,6 +2268,13 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
         })
         fs.writeFileSync(`${sceneOut}.prompt.txt`, promptSidecar, 'utf8')
         sceneVideoPaths.push(veoResult.localPath || sceneOut)
+        const measuredDuration = Number(execFileSync('ffprobe', [
+          '-v', 'error', '-show_entries', 'format=duration',
+          '-of', 'default=noprint_wrappers=1:nokey=1', veoResult.localPath || sceneOut,
+        ], { encoding: 'utf8' }).trim())
+        if (!Number.isFinite(measuredDuration) || measuredDuration <= 0) throw new Error('Could not measure generated clip duration before continuing.')
+        measuredSceneDurations.push(measuredDuration)
+        console.log(`   • Actual source footage so far: ${measuredSceneDurations.reduce((sum, seconds) => sum + seconds, 0).toFixed(1)}s`)
       }
     } else {
       const modeLabel = options.recycleClips ? '♻️ Recycling Preexisting Stored Clips' : '⚠️ Local Assembly / Dry-Run'
@@ -2326,6 +2386,11 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     durationSeconds = compositeResult.durationSeconds
   }
 
+  if (options.renderOnly) {
+    console.log(`\nLocal reel ready for inspection: ${masterReelPath}`)
+    return { masterReelPath, scriptData, compositeResult, renderOnly: true }
+  }
+
   // 5. Upload Master Video to Neon S3
   let platformTarget: 'all' | 'instagram' | 'youtube' = options.platform || 'all'
   if (options.platforms && options.platforms.length === 1) {
@@ -2349,8 +2414,8 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       queueResult = await queueDualReelAndShort({
         videoUrl: publicUrl,
         instagramCaption: scriptData.caption,
-        youtubeTitle: `${scriptData.hookHeadline}: The 2026 Benthic Shift #Shorts`,
-        youtubeDescription: `${scriptData.narrationScript}\n\n🔗 Calculate your Molt Clearance: ${ctaConfig.url}\n\n#Shorts #Moltmaxxing #BenthicAI`,
+        youtubeTitle: scriptData.youtubeTitle || `${scriptData.hookHeadline} #Shorts`,
+        youtubeDescription: scriptData.youtubeDescription || `${scriptData.narrationScript}\n\nTake the Moltmaxxing Audit: ${ctaConfig.url}`,
         youtubeTags: ['Shorts', 'Moltmaxxing', 'BenthicAI', 'Carcinization', 'Tech'],
         firstComment: scriptData.firstComment,
         queueId: DEFAULT_REELS_QUEUE_ID,
@@ -2412,8 +2477,8 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     queueResult = await queueDualReelAndShort({
       videoUrl: publicUrl || `https://placeholder.storage.neon.tech/moltology-public-assets/videos/social/reels/${path.basename(masterReelPath)}`,
       instagramCaption: scriptData.caption,
-      youtubeTitle: `${scriptData.hookHeadline}: The 2026 Benthic Shift #Shorts`,
-      youtubeDescription: `${scriptData.narrationScript}\n\n🔗 Calculate your Molt Clearance: ${ctaConfig.url}\n\n#Shorts #Moltmaxxing #BenthicAI`,
+      youtubeTitle: scriptData.youtubeTitle || `${scriptData.hookHeadline} #Shorts`,
+      youtubeDescription: scriptData.youtubeDescription || `${scriptData.narrationScript}\n\nTake the Moltmaxxing Audit: ${ctaConfig.url}`,
       youtubeTags: ['Shorts', 'Moltmaxxing', 'BenthicAI', 'Carcinization', 'Tech'],
       firstComment: scriptData.firstComment,
       queueId: DEFAULT_REELS_QUEUE_ID,
@@ -2454,6 +2519,10 @@ Usage:
   npx tsx scripts/create-reel.ts [options]
 
 Options:
+  --content-json <path>     Reviewed six-scene narration and platform copy
+  --scene-frames <dir>      ImageGen scene-N.png inputs (character scenes 4–6 required)
+  --video-budget <usd>     Estimated video budget (default 3.30; excludes other services)
+  --render-only           Generate locally for inspection without upload or queueing
   --theme <name>            Moltmaxxing theme: moltmaxxing | meltmaxxing | ecdysis | pincer-torque | benthic-depth | quiz
   --cta-goal <name>         Conversion goal: quiz | guide | codex | demo | homepage
   --mascot <name>           Outro mascot: lobster_pointing | lobster_thumbs_up | lobster_navigator | crab_stats | lobster_peek | lobster_peaceful | lobster_engineer | random | none
@@ -2493,6 +2562,10 @@ Examples:
   }
 
   let topic: string | undefined
+  let contentJsonPath: string | undefined
+  let sceneFramesDir: string | undefined
+  let videoBudgetUsd: number | undefined
+  let renderOnly = false
   let theme: string | undefined
   let ctaGoal: any
   let mascot: any
@@ -2525,6 +2598,10 @@ Examples:
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--topic' && args[i + 1]) topic = args[++i]
+    else if (args[i] === '--content-json' && args[i + 1]) contentJsonPath = args[++i]
+    else if (args[i] === '--scene-frames' && args[i + 1]) sceneFramesDir = args[++i]
+    else if (args[i] === '--video-budget' && args[i + 1]) videoBudgetUsd = Number(args[++i])
+    else if (args[i] === '--render-only') renderOnly = true
     else if (args[i] === '--theme' && args[i + 1]) theme = args[++i]
     else if (args[i] === '--cta-goal' && args[i + 1]) ctaGoal = args[++i]
     else if (args[i] === '--cta-headline' && args[i + 1]) ctaHeadline = args[++i]
@@ -2595,10 +2672,18 @@ Examples:
 
   try {
     await createDailyReel({
+      contentJsonPath,
+      sceneFramesDir,
+      videoBudgetUsd,
+      renderOnly,
       topic,
       theme,
       ctaGoal,
       ctaTexture,
+      ctaHeadline,
+      ctaSubheadline,
+      ctaUrl,
+      ctaActionText,
       mascot,
       holidayOrEvent,
       colorGrading,
