@@ -3,7 +3,7 @@ import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
 import matter from 'gray-matter'
-import { captureComposite } from './lib/composite-renderer'
+import { openCompositeSession } from './lib/composite-renderer'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
 import { CharacterKey, getRandomCharacterRotation, getCharacterInfo } from './lib/character-overlay'
@@ -879,23 +879,29 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
   const compositePaths: string[] = []
   const flowPrompts: string[] = []
 
-  for (const config of slideConfigs) {
-    const outPath = path.join(tempDir, config.file)
-    console.log(`   📸 Capturing Slide ${config.num} (${config.template} with mascot: ${config.mascot})...`)
-    await captureComposite({
-      template: config.template,
-      theme,
-      aspectRatio: '3:4',
-      mascot: config.mascot as any,
-      outputPath: outPath,
-      scaleFactor: 2,
-      data: config.data,
-    })
-    compositePaths.push(outPath)
-    const prompt =
-      blogData?.flowPrompts[config.num - 1] ||
-      buildSlideGoogleFlowPrompt(config.num, config.template, theme, config.mascot)
-    flowPrompts.push(prompt)
+  // One server and browser for every slide instead of a cold start per slide.
+  const compositeSession = await openCompositeSession()
+  try {
+    for (const config of slideConfigs) {
+      const outPath = path.join(tempDir, config.file)
+      console.log(`   📸 Capturing Slide ${config.num} (${config.template} with mascot: ${config.mascot})...`)
+      await compositeSession.capture({
+        template: config.template,
+        theme,
+        aspectRatio: '3:4',
+        mascot: config.mascot as any,
+        outputPath: outPath,
+        scaleFactor: 2,
+        data: config.data,
+      })
+      compositePaths.push(outPath)
+      const prompt =
+        blogData?.flowPrompts[config.num - 1] ||
+        buildSlideGoogleFlowPrompt(config.num, config.template, theme, config.mascot)
+      flowPrompts.push(prompt)
+    }
+  } finally {
+    await compositeSession.close()
   }
 
   console.log(`\n✅ All 3 Composite Scaffolding Slides Captured in tmp/!`)

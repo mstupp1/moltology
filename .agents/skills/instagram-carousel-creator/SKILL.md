@@ -24,6 +24,7 @@ Carousels can be created in two primary modes:
 * **Aspect Ratio & Canvas Dimensions**: Native 3:4 Portrait (`1080x1440` matching Google Flow portrait mode). Never force-crop 3:4 to 4:5; Instagram natively supports 3:4 portrait.
 * **Image Synthesis Pipeline**:
   - **Stage 1 (Scaffolding)**: Web-Native High-DPI Composite Studio via Headless Chrome 2x Retina rendering (`scripts/lib/composite-renderer.ts`)
+    - Built-in templates or JSON layout specs from `content/composite-layouts/` (`template: 'layout'`, `data: { spec }`). Batch slides through one `openCompositeSession()` so the server and browser start once.
   - **Stage 2 (Visual Polish Pass)**: User-facing AI (**Google Flow**) using rich, structured prompt directives
 * **Asset Storage**: Neon S3 (`images/social/carousels/carousel-<timestamp>/slide<N>.png`)
 * **Publishing Engine**: Deterministic Zernio REST API (`scripts/lib/zernio-client.ts` -> `POST /v1/posts` with `queuedFromProfile` + `queueId`, and `POST /v1/inbox/comments/{postId}` for first comment). Built directly into the CLI script (`npm run carousel:create`). **Never call Zernio MCP tools (`posts_create`, etc.) manually.**

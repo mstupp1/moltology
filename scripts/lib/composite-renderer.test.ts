@@ -72,3 +72,29 @@ describe('Composite Renderer Utility', () => {
     })
   })
 })
+
+describe('payload injection and local images', () => {
+  it('leaves data out of the URL when the payload is injected', async () => {
+    const { buildCompositeUrl } = await import('./composite-renderer')
+    const url = new URL(buildCompositeUrl({ baseUrl: 'http://127.0.0.1:3088', template: 'layout', data: { a: 1 }, payload: 'inject' }))
+    expect(url.searchParams.get('payload')).toBe('inject')
+    expect(url.searchParams.get('data')).toBeNull()
+  })
+
+  it('inlines existing local image paths and leaves S3 paths alone', async () => {
+    const fs = await import('node:fs')
+    const os = await import('node:os')
+    const path = await import('node:path')
+    const { inlineLocalImages } = await import('./composite-image-tools')
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'inline-'))
+    fs.writeFileSync(path.join(dir, 'plate.png'), Buffer.from('89504e47', 'hex'))
+    const out = inlineLocalImages(
+      { background: { image: './plate.png' }, layers: [{ src: 'images/characters/x.webp' }, { src: './missing.png' }] },
+      dir
+    )
+    expect(out.background.image).toMatch(/^data:image\/png;base64,/)
+    expect(out.layers[0].src).toBe('images/characters/x.webp')
+    expect(out.layers[1].src).toBe('./missing.png')
+    fs.rmSync(dir, { recursive: true, force: true })
+  })
+})
