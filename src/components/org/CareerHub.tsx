@@ -41,7 +41,7 @@ import { ScrollReveal } from '@/components/ui/ScrollReveal'
 export interface JobListing {
   id: string
   title: string
-  department: 'engineering' | 'spiritual' | 'operations' | 'people' | 'assets'
+  department: 'engineering' | 'spiritual' | 'operations' | 'people'
   departmentLabel: string
   clearance: string
   location: string
@@ -233,31 +233,6 @@ export const JOB_LISTINGS: JobListing[] = [
     ],
     perks: ['Unlimited Premium Espresso & Kelp Smoothies', 'Master Kitchen Studio Access', 'Staff Dining Pass'],
   },
-  {
-    id: 'job-asset-transmutation-deputy',
-    title: 'VP of Soft-Asset Liquidation (Deputy)',
-    department: 'assets',
-    departmentLabel: 'Asset Transmutation',
-    clearance: 'Stage 4 (Full Carcinization C1-C2)',
-    location: 'Chamber 03 Cryo-Vaults / Executive Suite',
-    type: 'Full-Time On-Site',
-    compensation: '$220,000 – $280,000 USD + 100,000 MC/yr + Wall Plaque',
-    description:
-      'Work alongside Sister Vane to oversee non-profit asset conversions. Help high-net-worth recruits smoothly transmute soft biological liabilities and paper assets into immutable Molt Credits.',
-    responsibilities: [
-      'Conduct confidential, compassionate wealth shedding consultations with recruits',
-      'Ensure 100% fiduciary compliance and transparent non-profit asset allocation',
-      'Prepare quarterly public financial impact reports on Benthic Core reinvestment',
-      'Facilitate Chamber 03 commemorative wall plaque dedications for major patrons',
-    ],
-    requirements: [
-      '7+ years experience in non-profit fiduciary management, legal, or wealth planning',
-      'Impeccable ethical standing, discretion, and deep interpersonal empathy',
-      'Ability to explain complex economic transmutations in clear, uplifting terms',
-      'Commitment to our mission of freeing humanity from biological debt cycles',
-    ],
-    perks: ['Executive Chamber 03 Suite', 'Named Cryo-Pod Dedication', 'High Synod Golden Badge'],
-  },
 ]
 
 export const CORPORATE_BENEFITS = [
@@ -277,10 +252,10 @@ export const CORPORATE_BENEFITS = [
   },
   {
     icon: DollarSign,
-    title: 'Sovereign 401(k) & Molt Credits',
+    title: 'Retirement Plan & Anniversary Shells',
     description:
-      '8% dollar-for-dollar 401(k) match in US Dollars, plus quarterly performance distributions in sovereign Molt Credits (MC) and sparkling Chitin Gems.',
-    badge: 'DUAL-CURRENCY SAVINGS',
+      'An 8% 401(k) match, plus a commemorative polished shell at every work anniversary.',
+    badge: 'RETIREMENT MATCH',
   },
   {
     icon: Heart,
@@ -584,7 +559,6 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
             { key: 'spiritual', label: 'Spiritual & Chaplaincy' },
             { key: 'operations', label: 'Trench Operations' },
             { key: 'people', label: 'People & Culture' },
-            { key: 'assets', label: 'Asset Transmutation' },
           ].map((dept) => (
             <button
               key={dept.key}

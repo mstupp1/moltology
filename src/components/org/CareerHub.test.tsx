@@ -20,7 +20,7 @@ describe('CareerHub Component', () => {
     expect(screen.getByText(/PERKS THAT KEEP YOUR SHELL HARDENED/i)).toBeInTheDocument()
     expect(screen.getByText('100% Comprehensive Carapace Care')).toBeInTheDocument()
     expect(screen.getByText('Hydrothermal Nap Pods & Spa')).toBeInTheDocument()
-    expect(screen.getByText('Sovereign 401(k) & Molt Credits')).toBeInTheDocument()
+    expect(screen.getByText('Retirement Plan & Anniversary Shells')).toBeInTheDocument()
   })
 
   it('renders all default open positions in the job board', () => {
