@@ -69,31 +69,40 @@ const ContourMap: React.FC = () => (
 )
 
 const FADES = {
-  both: 'linear-gradient(to bottom, #020408, transparent 25%, transparent 70%, #020408)',
-  top: 'linear-gradient(to bottom, transparent 30%, #020408)',
-  bottom: 'linear-gradient(to bottom, #020408, transparent 50%)',
+  both: 'linear-gradient(to bottom, #020408, rgba(2, 4, 8, 0.5) 10%, transparent 24%, transparent 76%, rgba(2, 4, 8, 0.5) 90%, #020408)',
+  top: 'linear-gradient(to bottom, transparent 70%, #020408)',
+  bottom: 'linear-gradient(to bottom, #020408, transparent 30%)',
 } as const
 
+export type BackdropTone = 'surface' | 'seabed' | 'gallery' | 'practice'
+
+
+
 /**
- * A photo from the deep, laid low behind a section and faded into the page at its edges.
- * Where the browser supports scroll-driven animation it drifts a little slower than the page,
- * on the compositor with no script. The fades are painted gradients rather than masks.
+ * Artwork from the deep behind a section. The centre stays sharp and the edges go out of focus,
+ * like a lens: a blurred copy sits under a sharp copy that fades out toward the edges. Each tone
+ * sets its own grade and lighting in CSS. Where the browser supports scroll-driven animation the
+ * art drifts a little slower than the page, on the compositor with no script. The blur and mask
+ * sit on still children of the drifting layer, so they are painted once.
  */
 export const SectionBackdrop: React.FC<{
   image: StoryImage
   fade?: keyof typeof FADES
   position?: string
   drift?: number
-  tone?: 'surface' | 'seabed' | 'gallery' | 'practice'
+  tone?: BackdropTone
   className?: string
 }> = ({ image, fade = 'both', position = '50% 50%', drift = 10, tone = 'seabed', className = '' }) => (
   <div className={`home-backdrop home-backdrop--${tone} absolute inset-0 -z-10 overflow-hidden pointer-events-none ${className}`} aria-hidden="true">
     <div
-      className={`absolute -inset-y-[12%] inset-x-0 ${drift ? 'home-drift' : ''}`}
+      className={`absolute inset-x-0 ${drift ? '-inset-y-[12%] home-drift' : 'inset-y-0'}`}
       style={{ ['--drift' as string]: `${drift / 2}%` }}
     >
-      <StoryImg image={image} className="home-backdrop-art h-full w-full object-cover" style={{ objectPosition: position }} />
+      <StoryImg image={image} className="home-backdrop-soft absolute inset-0 h-full w-full object-cover" style={{ objectPosition: position }} />
+      <StoryImg image={image} className="home-backdrop-art absolute inset-0 h-full w-full object-cover" style={{ objectPosition: position }} />
     </div>
+    {/* Soft pools of light where the art's own light falls. */}
+    <div className="home-backdrop-light absolute inset-0" />
     <div className="home-backdrop-vignette absolute inset-0" />
     <div className="absolute inset-0" style={{ background: FADES[fade] }} />
   </div>

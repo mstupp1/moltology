@@ -140,7 +140,7 @@ export const HomeIdea: React.FC = () => (
     className="relative isolate overflow-hidden py-24 sm:py-32 bg-gradient-to-b from-[#020408] via-[#03101a] to-[#020408]"
   >
     <SectionBackdrop image={HOME_BACKDROPS.seabed} position="50% 75%" drift={14} tone="seabed" />
-    <div className="absolute inset-x-0 top-0 h-2/3 -z-10 bg-gradient-to-b from-[#020408] via-[#020408]/60 to-transparent" aria-hidden="true" />
+    <div className="absolute inset-x-0 top-0 h-1/2 -z-10 bg-gradient-to-b from-[#020408]/80 via-[#020408]/35 to-transparent" aria-hidden="true" />
     <div className="max-w-6xl mx-auto px-5 sm:px-8">
       <ScrollReveal className="max-w-3xl">
         <Eyebrow>The strange part</Eyebrow>
@@ -392,7 +392,7 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
 export const HomeVoices: React.FC = () => (
   <section aria-labelledby="home-voices-title" className="relative isolate overflow-hidden py-24 sm:py-32">
     <SectionBackdrop image={HOME_BACKDROPS.gallery} position="60% 50%" tone="gallery" />
-    <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#020408]/70 via-transparent to-transparent" aria-hidden="true" />
+    <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#020408]/45 via-transparent to-transparent" aria-hidden="true" />
     <div className="max-w-6xl mx-auto px-5 sm:px-8">
       <ScrollReveal className="max-w-3xl">
         <Eyebrow color="#00ffcc">From the community</Eyebrow>
@@ -434,10 +434,16 @@ export const HomeVoices: React.FC = () => (
 
 export const HomeFaq: React.FC = () => (
   <section aria-labelledby="home-faq-title" className="relative isolate overflow-hidden py-24 sm:py-32">
+    {/* No artwork here: a breather between the voices and the invitation, lit faintly from above. */}
     <div
-      className="absolute -z-10 left-[-10%] top-1/3 h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,rgba(0,195,255,0.08),transparent_65%)]"
+      className="absolute inset-0 -z-10"
+      style={{
+        background:
+          'radial-gradient(ellipse 45% 40% at 22% 18%, rgba(0, 195, 255, 0.1), transparent 70%), radial-gradient(ellipse 40% 35% at 75% 85%, rgba(0, 255, 204, 0.05), transparent 70%)',
+      }}
       aria-hidden="true"
     />
+    <DepthLayer kind="shafts" className="-z-10 opacity-40" />
     <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[0.8fr_1.2fr] gap-10 lg:gap-20">
       <ScrollReveal>
         <Eyebrow>Questions</Eyebrow>
@@ -474,7 +480,7 @@ export const HomeFinalCta: React.FC<HomeSectionProps> = ({ authReady, onNavigate
           <StoryImg image={HOME_FINAL_IMAGE} className="home-final-art h-full w-full object-cover" />
           <div className="home-final-vignette absolute inset-0" />
         </div>
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-[#020408]/60 to-[#020408]/85 md:bg-gradient-to-r md:from-[#020408]/75 md:via-[#020408]/30 md:to-transparent" aria-hidden="true" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-[#020408]/55 to-[#020408]/80 md:bg-gradient-to-r md:from-[#020408]/70 md:via-[#020408]/15 md:to-transparent" aria-hidden="true" />
         <DepthLayer kind="caustics" className="-z-10 opacity-30" />
         <DepthLayer kind="snow" className="-z-10 opacity-25" />
         <div className="px-6 py-12 sm:p-14 lg:p-16">
