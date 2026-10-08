@@ -9,6 +9,24 @@ This skill guides the execution, scheduling, monitoring, and telemetry validatio
 
 ---
 
+## Production target (default)
+
+Scheduled and ordinary simulation runs are intended to populate the **production app at moltology.org**, using Neon `main`. A request to run this skill authorizes its normal production simulation cycle. Use development only when the user explicitly requests a development run or test.
+
+Local `.env` `DATABASE_URL` normally points to **dev**. Never run the bare commands below against that default for a production cycle. Load `.env`, require `PROD_DATABASE_URL`, and pass it as `DATABASE_URL` to the child process without changing `.env` or printing credentials. For example, from the repository root:
+
+```bash
+node -e 'const { config } = require("dotenv"); const { spawnSync } = require("node:child_process"); config({ quiet: true }); const target = process.env.PROD_DATABASE_URL; if (!target) throw new Error("PROD_DATABASE_URL is required; production simulation was not started"); console.log("Simulation target: production", new URL(target).hostname); const result = spawnSync("npm", process.argv.slice(1), { stdio: "inherit", env: { ...process.env, DATABASE_URL: target } }); if (result.error) throw result.error; process.exit(result.status ?? 1);' -- run simulate:activity
+```
+
+For two-phase generation, use this same wrapper with `run simulate:prepare` and then `run simulate:apply`; both phases must use the same production target. Scoped flags and `--dry-run` follow the npm command after `--`. Dry-run does not write, but still explicitly select the intended database.
+
+In GitHub Actions, `secrets.DATABASE_URL` must target production Neon `main`. The recurring schedule is currently a local Codex automation; the workflow's scheduled trigger is disabled. Local recurring runs require the host to be awake and able to execute the automation.
+
+After applying a cycle, query the production database to confirm the returned topic/reply IDs exist. Report the production target, actual inserted activity, and a verified `https://moltology.org/forum/<categorySlug>/<topicSlug>` link when a topic or reply was created. A successful command or `dryRun=false` alone does not prove the production app received it. Save target and verification in automation memory. Do not repeat a committed tick just because later verification fails; investigate the committed IDs first.
+
+---
+
 ## 1. Architecture & Execution Modes
 
 The activity simulation operates on a 12-hour cycle and supports two distinct execution modes:
@@ -102,7 +120,7 @@ To run recurringly in Antigravity using **in-prompt generation** (zero external 
   4. Report a concise telemetry summary of the simulation tick.
   ```
 
-### Managing the Scheduled Task
+### Managing a legacy Antigravity Scheduled Task
 * **View / Monitor**: Open the **Scheduled Tasks** panel from the left sidebar in Antigravity to see status, next run time, and execution logs.
 * **Inspect Active Tasks via Tool**: Use `manage_task` with `Action: 'list'`.
 * **Cancel / Re-schedule**: Use `manage_task` with `Action: 'kill'` passing the task ID, then re-call `schedule`.
@@ -136,7 +154,7 @@ When running Mode 2 (`npm run simulate:activity`), the engine automatically fall
 
 ## 6. Verification & Telemetry Inspection
 
-After each cycle completes, verify:
+After each cycle completes, verify the production target and inserted IDs as described above, then check:
 * **Result Summary**: Ensure the JSON output reports `driveBackfill`, `routines`, `forum`, `votes`, `mutation`, `connection`, and `relationship`.
 * **Storage Budget**: Keep total simulated users capped at 30 (`MAX_SIMULATED_POPULATION`) to preserve Neon database storage limits.
 * **Unit Tests**:
