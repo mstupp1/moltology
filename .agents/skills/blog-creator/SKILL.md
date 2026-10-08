@@ -62,18 +62,19 @@ A news item is ready for a MoltNation dispatch when it answers:
 * *How does this expose the "Melt" (friction-free defaults that erode human sovereignty, fake convenience, or unasked automation)?*
 * *How does this illustrate the "Molt" (hardening boundaries, apprenticeships over empty demos, intentional friction, protective carapaces)?*
 
-#### 3. Search-Demand Check (Google Trends)
+#### 3. Search-Demand Check (free, no API keys)
 News picks the story; search demand picks how we frame and title it. Before drafting, ground the angle in what people actually search for so the dispatch can rank, not just exist.
 
-1. **List 3–5 plain search phrases** a curious reader would type to find this story, in their words rather than ours (e.g. `ai agents`, `claude computer use`, `humanoid robot jobs`). Never test lore terms like "the melt" or "carapace"; nobody outside the Order searches for them.
+1. **List 3–5 plain search phrases** a curious reader would type to find this story, in their words rather than ours (e.g. `ai agents`, `claude computer use`, `humanoid robots`). Never test lore terms like "the melt" or "carapace"; nobody outside the Order searches for them.
 2. **Compare them:**
    ```bash
-   npm run blog:trends -- "ai agents" "computer use" "ai browser agent"
+   npm run blog:trends -- "ai agents" "computer use" "ai browser"
    ```
-   This prints relative interest (0–100, comparable only within one run), whether each phrase is rising, steady, or falling, and the top and rising related searches for the leader. Add `--range past_12_months` for evergreen topics or `--global` for non-US stories. It needs `DATAFORSEO_LOGIN` / `DATAFORSEO_PASSWORD` and costs about $0.02 a run.
-3. **Pick the target query.** Prefer a rising or steady phrase with real interest. A rising related search that matches the story is often the best target because competition has not caught up yet. If every candidate reads near zero, prefer the plainer wording or pick a different story among the ones you scouted.
+   For each phrase this prints daily Wikipedia views for the closest article over the last 90 days, with rising, steady, or falling momentum. It also shows whether Google autocomplete offers the phrase as typed, and how many Google and YouTube suggestions it has. For the leader it lists the long-tail phrasings people type. A row marked "loose match" landed on a broader article, so ignore its view count. Add `--trending` to also see today's breakout US searches, which helps only when a tech story is spiking. Each run is free and needs no keys.
+3. **Pick the target query.** Prefer a phrase people type as-is, with real and rising or steady views. A specific long-tail phrasing from the leader's suggestions (e.g. `ai agents explained`, `ai agents vs agentic ai`) is often the best target, because it matches the dispatch's angle and has less competition than the head term. If nothing shows demand, use plainer wording or pick a different story you scouted.
 4. **Carry the target query through the dispatch** (see Step 2 frontmatter): it goes in the slug, the subtitle after the colon, the summary, the first tag, and naturally in the first two sections of the body. Never stuff it; once in the hook area and once in the reports section is plenty.
-5. **No credentials?** The script exits with code 2 and prints a Google Trends compare link. Continue without demand data, pick the plainest phrase yourself, and tell the user the demand check was skipped.
+5. **Optional manual check:** the script prints a Google Trends compare link. Mention it to the user if relative interest would settle a close call; Google Trends has no free API, so the script doesn't fetch it.
+6. **If a source fails** (rate limit, network), the script reports it and keeps the others. Continue with whatever came back and tell the user which signal was missing.
 
 #### 4. Continuity Check & Slug Deduplication
 * Inspect `content/news/blog-history.json` or check existing slugs in `content/news/` to verify that this topic or slug has not already been published.

@@ -1,92 +1,70 @@
 /**
- * Search-demand helpers for the blog-creator skill.
+ * Free search-demand signals for the blog-creator skill. No API keys, no cost.
  *
- * Wraps DataForSEO's Google Trends "explore" endpoint (Google's own Trends API
- * is still an invite-only alpha). Values are Google Trends relative interest:
- * 0-100 within one request, so keywords are only comparable when they are
- * fetched together (max 5 per request).
+ * - Google and YouTube autocomplete: the exact wording people type, ordered by
+ *   popularity. A phrase with no suggestions has little search demand.
+ * - Wikipedia pageviews: real daily view counts for the closest article, which
+ *   makes candidates comparable and shows whether interest is rising.
+ * - Google Trends "trending now" RSS: today's breakout US searches (optional).
+ *
+ * Google Trends itself has no free API (the official one is an invite-only
+ * alpha and the web endpoints rate-limit scripts), so the CLI prints a compare
+ * link for a person to open instead.
  */
 
-export const DATAFORSEO_EXPLORE_URL = 'https://api.dataforseo.com/v3/keywords_data/google_trends/explore/live'
-export const MAX_KEYWORDS_PER_REQUEST = 5
+export const USER_AGENT = 'MoltologyBlogTrends/1.0 (https://moltology.org)'
+export const MAX_KEYWORDS = 5
 
-export type TrendsTimeRange =
-  | 'past_7_days'
-  | 'past_30_days'
-  | 'past_90_days'
-  | 'past_12_months'
-  | 'past_5_years'
-
-/** United States or worldwide. Other markets can be added with their DataForSEO location codes. */
 export type TrendsGeo = 'US' | 'global'
-
 export type Momentum = 'rising' | 'steady' | 'falling' | 'no data'
+export type SuggestSource = 'google' | 'youtube'
 
-export interface KeywordInterest {
-  keyword: string
-  /** Mean relative interest over the whole range (0-100). */
+export interface SeriesSummary {
+  /** Mean daily views over the whole window. */
   average: number
-  /** Mean interest over the most recent quarter of the range. */
+  /** Mean daily views over the most recent quarter of the window. */
   recent: number
   momentum: Momentum
 }
 
-export interface RelatedQuery {
-  query: string
-  /** Top: relative popularity 0-100. Rising: percent increase (or "Breakout"). */
-  value: string
+export interface WikipediaInterest extends SeriesSummary {
+  article: string
+  /** False when the closest article is only loosely related (e.g. "computer use" finding "Computing"). */
+  closeMatch: boolean
 }
 
-export interface RelatedQueries {
+export interface KeywordDemand {
   keyword: string
-  top: RelatedQuery[]
-  rising: RelatedQuery[]
+  wikipedia: WikipediaInterest | null
+  google: string[]
+  youtube: string[]
+  /** True when autocomplete offers the phrase itself, a sign people type it as-is. */
+  suggestedAsIs: boolean
+  errors: string[]
 }
 
-export interface DataForSeoCredentials {
-  login: string
-  password: string
+export interface TrendingSearch {
+  query: string
+  traffic: string
+  headline?: string
 }
 
-interface GraphPoint {
-  values?: Array<number | null> | number | null
-  missing_data?: boolean
-}
+export type FetchLike = (input: string, init?: RequestInit) => Promise<Pick<Response, 'ok' | 'status' | 'json' | 'text'>>
 
-interface ExploreItem {
-  type?: string
-  keywords?: string[]
-  data?: unknown
-}
+const defaultFetch: FetchLike = (input, init) => fetch(input, init)
 
-interface ExploreResponse {
-  status_code?: number
-  status_message?: string
-  tasks?: Array<{
-    status_code?: number
-    status_message?: string
-    result?: Array<{ items?: ExploreItem[] | null }> | null
-  }>
-}
-
-type FetchLike = (input: string, init: RequestInit) => Promise<Pick<Response, 'ok' | 'status' | 'json'>>
-
-export function readDataForSeoCredentials(env: NodeJS.ProcessEnv = process.env): DataForSeoCredentials | null {
-  const login = env.DATAFORSEO_LOGIN?.trim()
-  const password = env.DATAFORSEO_PASSWORD?.trim()
-  return login && password ? { login, password } : null
-}
-
-/** Public Google Trends compare link, for a person to eyeball the same data for free. */
-export function buildTrendsExploreUrl(keywords: string[], geo: TrendsGeo = 'US', range: TrendsTimeRange = 'past_90_days'): string {
-  const dateByRange: Record<TrendsTimeRange, string> = {
-    past_7_days: 'now 7-d',
-    past_30_days: 'today 1-m',
-    past_90_days: 'today 3-m',
-    past_12_months: 'today 12-m',
-    past_5_years: 'today 5-y',
+export function validateKeywords(keywords: string[]): string[] {
+  const cleaned = [...new Set(keywords.map((k) => k.replace(/\s+/g, ' ').trim().toLowerCase()).filter(Boolean))]
+  if (cleaned.length === 0) throw new Error('Pass at least one candidate keyword to compare.')
+  if (cleaned.length > MAX_KEYWORDS) {
+    throw new Error(`Compare at most ${MAX_KEYWORDS} keywords at once (got ${cleaned.length}). Trim the list or run it in rounds.`)
   }
-  const params = new URLSearchParams({ date: dateByRange[range], q: keywords.join(',') })
+  return cleaned
+}
+
+/** Public Google Trends compare link, for a person to eyeball relative interest for free. */
+export function buildTrendsExploreUrl(keywords: string[], geo: TrendsGeo = 'US'): string {
+  const params = new URLSearchParams({ date: 'today 3-m', q: keywords.join(',') })
   if (geo === 'US') params.set('geo', 'US')
   return `https://trends.google.com/trends/explore?${params.toString()}`
 }
@@ -95,8 +73,8 @@ function mean(nums: number[]): number {
   return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : 0
 }
 
-function round1(n: number): number {
-  return Math.round(n * 10) / 10
+function round(n: number): number {
+  return Math.round(n)
 }
 
 export function classifyMomentum(earlier: number, recent: number): Momentum {
@@ -108,106 +86,157 @@ export function classifyMomentum(earlier: number, recent: number): Momentum {
   return 'steady'
 }
 
-/** Turns a google_trends_graph series into per-keyword averages and momentum. */
-export function summarizeGraph(keywords: string[], points: GraphPoint[]): KeywordInterest[] {
-  const usable = points.filter((p) => !p.missing_data)
-  const recentCount = Math.max(1, Math.ceil(usable.length / 4))
-
-  return keywords
-    .map((keyword, idx) => {
-      const series = usable.map((p) => {
-        const raw = Array.isArray(p.values) ? p.values[idx] : idx === 0 ? p.values : null
-        return typeof raw === 'number' ? raw : 0
-      })
-      const recentSlice = series.slice(-recentCount)
-      const earlierSlice = series.slice(0, Math.max(0, series.length - recentCount))
-      const recent = mean(recentSlice)
-      return {
-        keyword,
-        average: round1(mean(series)),
-        recent: round1(recent),
-        momentum: classifyMomentum(mean(earlierSlice), recent),
-      }
-    })
-    .sort((a, b) => b.recent - a.recent || b.average - a.average)
+export function summarizeSeries(series: number[]): SeriesSummary {
+  const recentCount = Math.max(1, Math.ceil(series.length / 4))
+  const recentSlice = series.slice(-recentCount)
+  const earlierSlice = series.slice(0, Math.max(0, series.length - recentCount))
+  const recent = mean(recentSlice)
+  return { average: round(mean(series)), recent: round(recent), momentum: classifyMomentum(mean(earlierSlice), recent) }
 }
 
-export function parseRelatedQueries(keyword: string, data: unknown, limit = 10): RelatedQueries {
-  const block = (data ?? {}) as { top?: unknown; rising?: unknown }
-  const pick = (list: unknown): RelatedQuery[] =>
-    (Array.isArray(list) ? list : [])
-      .filter((q): q is { query: string; value?: unknown } => typeof q?.query === 'string')
-      .slice(0, limit)
-      .map((q) => ({ query: q.query, value: q.value == null ? '' : String(q.value) }))
-  return { keyword, top: pick(block.top), rising: pick(block.rising) }
+/** Parses the `client=firefox` autocomplete shape: [query, [suggestions...], ...]. */
+export function parseSuggestions(body: unknown): string[] {
+  if (!Array.isArray(body) || !Array.isArray(body[1])) return []
+  return body[1].filter((s): s is string => typeof s === 'string').map((s) => s.toLowerCase())
 }
 
-export function validateKeywords(keywords: string[]): string[] {
-  const cleaned = [...new Set(keywords.map((k) => k.replace(/,/g, ' ').replace(/\s+/g, ' ').trim()).filter(Boolean))]
-  if (cleaned.length === 0) throw new Error('Pass at least one candidate keyword to compare.')
-  if (cleaned.length > MAX_KEYWORDS_PER_REQUEST) {
-    throw new Error(
-      `Google Trends compares at most ${MAX_KEYWORDS_PER_REQUEST} keywords at once (got ${cleaned.length}). Trim the list or run it in rounds with the winner carried forward.`,
-    )
-  }
-  const tooLong = cleaned.find((k) => k.length > 100)
-  if (tooLong) throw new Error(`Keyword is longer than 100 characters: "${tooLong.slice(0, 40)}..."`)
-  return cleaned
-}
-
-export interface ExploreOptions {
-  geo?: TrendsGeo
-  range?: TrendsTimeRange
-  fetchImpl?: FetchLike
-}
-
-async function exploreItems(
-  creds: DataForSeoCredentials,
-  task: Record<string, unknown>,
-  { fetchImpl = fetch as FetchLike }: ExploreOptions,
-): Promise<ExploreItem[]> {
-  const auth = Buffer.from(`${creds.login}:${creds.password}`).toString('base64')
-  const res = await fetchImpl(DATAFORSEO_EXPLORE_URL, {
-    method: 'POST',
-    headers: { Authorization: `Basic ${auth}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify([task]),
+export async function fetchSuggestions(
+  query: string,
+  source: SuggestSource,
+  geo: TrendsGeo = 'US',
+  fetchImpl: FetchLike = defaultFetch,
+): Promise<string[]> {
+  const params = new URLSearchParams({ client: 'firefox', hl: 'en', q: query })
+  if (geo === 'US') params.set('gl', 'us')
+  if (source === 'youtube') params.set('ds', 'yt')
+  const res = await fetchImpl(`https://suggestqueries.google.com/complete/search?${params.toString()}`, {
+    headers: { 'User-Agent': USER_AGENT },
   })
-  if (!res.ok) throw new Error(`DataForSEO request failed with HTTP ${res.status}.`)
-  const body = (await res.json()) as ExploreResponse
-  const t = body.tasks?.[0]
-  if (!t || (t.status_code && t.status_code >= 40000)) {
-    throw new Error(`DataForSEO returned an error: ${t?.status_message ?? body.status_message ?? 'no task in response'}`)
-  }
-  return t.result?.[0]?.items ?? []
+  if (!res.ok) throw new Error(`${source} autocomplete returned HTTP ${res.status}`)
+  return parseSuggestions(await res.json())
 }
 
-function baseTask(keywords: string[], opts: ExploreOptions): Record<string, unknown> {
-  // location_code 2840 = United States; omitting it means worldwide.
-  return {
-    keywords,
-    ...((opts.geo ?? 'US') === 'US' ? { location_code: 2840 } : {}),
-    language_code: 'en',
-    time_range: opts.range ?? 'past_90_days',
-  }
+/** Every keyword word of 3+ letters must appear (by its first 5 letters) in the article title. */
+export function isCloseMatch(keyword: string, article: string): boolean {
+  const title = article.toLowerCase()
+  return keyword
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((w) => w.length >= 3)
+    .every((w) => title.includes(w.slice(0, 5)))
 }
 
-export async function fetchInterest(
-  creds: DataForSeoCredentials,
-  keywords: string[],
-  opts: ExploreOptions = {},
-): Promise<KeywordInterest[]> {
-  const items = await exploreItems(creds, { ...baseTask(keywords, opts), item_types: ['google_trends_graph'] }, opts)
-  const graph = items.find((i) => i.type === 'google_trends_graph')
-  const points = Array.isArray(graph?.data) ? (graph.data as GraphPoint[]) : []
-  return summarizeGraph(graph?.keywords?.length ? graph.keywords : keywords, points)
+function yyyymmdd(d: Date): string {
+  return d.toISOString().slice(0, 10).replace(/-/g, '')
 }
 
-export async function fetchRelatedQueries(
-  creds: DataForSeoCredentials,
+/** Wikipedia pageviews lag about a day, so the window ends yesterday. */
+export function pageviewWindow(now: Date, days = 90): { start: string; end: string } {
+  const end = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+  const start = new Date(end.getTime() - (days - 1) * 24 * 60 * 60 * 1000)
+  return { start: yyyymmdd(start), end: yyyymmdd(end) }
+}
+
+export async function fetchWikipediaInterest(
   keyword: string,
-  opts: ExploreOptions = {},
-): Promise<RelatedQueries> {
-  const items = await exploreItems(creds, { ...baseTask([keyword], opts), item_types: ['google_trends_queries_list'] }, opts)
-  const list = items.find((i) => i.type === 'google_trends_queries_list')
-  return parseRelatedQueries(keyword, list?.data)
+  now: Date,
+  fetchImpl: FetchLike = defaultFetch,
+): Promise<WikipediaInterest | null> {
+  const headers = { 'User-Agent': USER_AGENT, 'Api-User-Agent': USER_AGENT }
+  const searchParams = new URLSearchParams({
+    action: 'opensearch',
+    search: keyword,
+    limit: '1',
+    namespace: '0',
+    redirects: 'resolve',
+    format: 'json',
+  })
+  const search = await fetchImpl(`https://en.wikipedia.org/w/api.php?${searchParams.toString()}`, { headers })
+  if (!search.ok) throw new Error(`Wikipedia search returned HTTP ${search.status}`)
+  const found = (await search.json()) as unknown
+  const article = Array.isArray(found) && Array.isArray(found[1]) ? found[1][0] : undefined
+  if (typeof article !== 'string') return null
+
+  const { start, end } = pageviewWindow(now)
+  const title = encodeURIComponent(article.replace(/ /g, '_'))
+  const views = await fetchImpl(
+    `https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/user/${title}/daily/${start}/${end}`,
+    { headers },
+  )
+  if (!views.ok) throw new Error(`Wikipedia pageviews returned HTTP ${views.status}`)
+  const body = (await views.json()) as { items?: Array<{ views?: number }> }
+  const series = (body.items ?? []).map((i) => (typeof i.views === 'number' ? i.views : 0))
+  return { article, closeMatch: isCloseMatch(keyword, article), ...summarizeSeries(series) }
+}
+
+function errorText(err: unknown): string {
+  return err instanceof Error ? err.message : String(err)
+}
+
+/** Gathers every free signal for one keyword; a failing source is reported, never fatal. */
+export async function fetchKeywordDemand(
+  keyword: string,
+  opts: { geo?: TrendsGeo; now?: Date; fetchImpl?: FetchLike } = {},
+): Promise<KeywordDemand> {
+  const { geo = 'US', now = new Date(), fetchImpl = defaultFetch } = opts
+  const errors: string[] = []
+  const settle = async <T>(p: Promise<T>, fallback: T): Promise<T> => {
+    try {
+      return await p
+    } catch (err) {
+      errors.push(errorText(err))
+      return fallback
+    }
+  }
+  const [wikipedia, google, youtube] = await Promise.all([
+    settle(fetchWikipediaInterest(keyword, now, fetchImpl), null),
+    settle(fetchSuggestions(keyword, 'google', geo, fetchImpl), [] as string[]),
+    settle(fetchSuggestions(keyword, 'youtube', geo, fetchImpl), [] as string[]),
+  ])
+  return { keyword, wikipedia, google, youtube, suggestedAsIs: google.includes(keyword), errors }
+}
+
+/** Ranks by Wikipedia daily views (close matches only), then by how much autocomplete offers. */
+export function rankDemand(results: KeywordDemand[]): KeywordDemand[] {
+  const views = (r: KeywordDemand) => (r.wikipedia?.closeMatch ? r.wikipedia.recent : -1)
+  const score = (r: KeywordDemand) => r.google.length + r.youtube.length + (r.suggestedAsIs ? 5 : 0)
+  return [...results].sort((a, b) => views(b) - views(a) || score(b) - score(a))
+}
+
+/** Long-tail ideas: suggestions that extend the keyword, Google first, deduped. */
+export function longTail(result: KeywordDemand, limit = 12): string[] {
+  return [...new Set([...result.google, ...result.youtube])].filter((s) => s !== result.keyword).slice(0, limit)
+}
+
+function decodeXml(s: string): string {
+  return s
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+    .replace(/&apos;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .trim()
+}
+
+export function parseTrendingRss(xml: string): TrendingSearch[] {
+  const items = xml.match(/<item>[\s\S]*?<\/item>/g) ?? []
+  return items.map((item) => {
+    const tag = (name: string) => item.match(new RegExp(`<${name}>([\\s\\S]*?)</${name}>`))?.[1]
+    const headline = tag('ht:news_item_title')
+    return {
+      query: decodeXml(tag('title') ?? ''),
+      traffic: decodeXml(tag('ht:approx_traffic') ?? ''),
+      ...(headline ? { headline: decodeXml(headline) } : {}),
+    }
+  }).filter((t) => t.query)
+}
+
+/** United States only; the feed needs a country. */
+export async function fetchTrendingNow(fetchImpl: FetchLike = defaultFetch): Promise<TrendingSearch[]> {
+  const res = await fetchImpl('https://trends.google.com/trending/rss?geo=US', {
+    headers: { 'User-Agent': USER_AGENT },
+  })
+  if (!res.ok) throw new Error(`Google Trends trending feed returned HTTP ${res.status}`)
+  return parseTrendingRss(await res.text())
 }
