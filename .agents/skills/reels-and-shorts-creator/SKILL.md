@@ -127,7 +127,9 @@ console.log(ttsResult.providerUsed) // 'fish' | 'edge'
 
 ### Step 4: Video Scene Generation & Clip Sourcing
 
-#### Option A: Google Veo 3.1 Synthesis (Fresh Production)
+#### Option A: Gemini Omni Synthesis (Fresh Production)
+
+**Video model**: scenes render with `gemini-omni-1.1-flash` through the Gemini Interactions API. The Veo 3.1 preview models retire from the Gemini API on October 22, 2026; until then `--veo-model veo-3.1-fast-generate-preview` still routes to the old endpoint for comparison. Omni has no duration or negative-prompt fields, so the scene length and the things to avoid are written into each prompt, and a clip can come back a little shorter or longer than asked (the compositor trims or slows it to fit the beat).
 
 **Shot director (default, `scripts/lib/reel-director.ts`)**: before any Veo credits are spent, the narration is split into 6 beats (one per scene, balanced by word count, breaking only between sentences) and Gemini text (`gemini-3.8-flash`, falling back through newer-to-older flash models; override with `REEL_DIRECTOR_MODEL`) writes one Veo prompt per beat so the viewer sees what they hear. The shot list follows one story shape:
 * Shots 1–2: the everyday human world, with one recurring protagonist described identically in every shot.
@@ -269,8 +271,8 @@ npm run reel:create -- --publish-now
 
 1. **Video vs. Image Generation Separation**:
    - **Still Images & Outro Cards**: The final CTA outro slide from Composite Studio is run through Antigravity's built-in `generate_image` tool (or user Google Flow handoff) for photorealistic 3D glassmorphic elevation with crisp, legible typography. Veo is NOT used for the outro card because video diffusion models distort text and typography.
-   - **Video Scenes**: The 6 narrative story scenes are always generated using Google Veo 3.1 (`scripts/generate-video.ts`) or recycled from local clips via `--recycle-clips`.
+   - **Video Scenes**: The 6 narrative story scenes are always generated using Gemini Omni (`scripts/generate-video.ts`) or recycled from local clips via `--recycle-clips`.
 2. **Explicit Failure Policy**:
-   - If Veo 3.1 video generation fails or credentials are missing during a production run without `--recycle-clips`, **the pipeline must halt immediately and throw an error**. Never silently fall back to random files.
+   - If video generation fails or credentials are missing during a production run without `--recycle-clips`, **the pipeline must halt immediately and throw an error**. Never silently fall back to random files.
 3. **Async Task Etiquette**:
    - Long-running commands (e.g. Veo scene generation, master FFmpeg compositing) run as background tasks. Wait for notifications rather than polling in tight loops.
