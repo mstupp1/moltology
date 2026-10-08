@@ -5,6 +5,7 @@ import { HomeHero } from '@/components/HomeHero'
 import { HomeFaq, HomeFinalCta, HomeHowItWorks, HomeIdea, HomeMelt, HomeVoices } from '@/components/home/HomeSections'
 import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
 import { MainFooter } from '@/components/MainFooter'
+import { ShellCompanion } from '@/components/home/hero-particles/ShellCompanion'
 import { useIdleReady } from '@/hooks/useIdleReady'
 import { useDeferredStylesheet } from '@/hooks/useDeferredStylesheet'
 import '@/styles/pbr-textures.css'
@@ -64,6 +65,8 @@ export const LandingPage: React.FC = () => {
       </main>
 
       <MainFooter />
+
+      <ShellCompanion />
 
       <MoltmaxGuideFloatingPill onOpenGuideModal={() => setIsGuideModalOpen(true)} />
 

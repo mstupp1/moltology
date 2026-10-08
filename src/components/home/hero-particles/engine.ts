@@ -37,14 +37,25 @@ const FAMILIES = [
   [70, 225, 255], // 2 shell
   [255, 178, 120], // 3 glint, the warm light that sweeps the shell
   [120, 190, 215], // 4 calm drift
+  [150, 255, 215], // 5 firefly, sea green
+  [255, 214, 140], // 6 firefly, amber
 ] as const
-const FAMILY_MAX_ALPHA = [0.85, 0.9, 1, 1, 0.42]
+const FAMILY_MAX_ALPHA = [0.85, 0.9, 1, 1, 0.62, 1, 1]
 const LEVELS = 10
 const BUCKETS = FAMILIES.length * LEVELS
 
 const INTRO_HOLD = 0.75
 const GROW_SPAN = 2.6
+/** Seconds between molts once the shell has formed, and how long the old layer takes to leave. */
+const MOLT_PERIOD = 24
+const MOLT_LIFT = 2.6
+const FIREFLY_SHARE = 0.07
 const CAMERA = 3.4
+
+function smooth(x: number): number {
+  const t = Math.min(1, Math.max(0, x))
+  return t * t * (3 - 2 * t)
+}
 
 export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHandle | null {
   const { canvas, anchor } = opts
@@ -59,6 +70,22 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
       styles.push(`rgba(${r},${g},${b},${a.toFixed(3)})`)
     }
   }
+
+  // Soft glow sprites for fireflies, drawn once and stamped with drawImage.
+  const glow = [FAMILIES[5], FAMILIES[6]].map(([r, g, b]) => {
+    const sprite = document.createElement('canvas')
+    sprite.width = sprite.height = 48
+    const sctx = sprite.getContext('2d')
+    if (sctx) {
+      const grad = sctx.createRadialGradient(24, 24, 0, 24, 24, 24)
+      grad.addColorStop(0, `rgba(${r},${g},${b},0.55)`)
+      grad.addColorStop(0.35, `rgba(${r},${g},${b},0.16)`)
+      grad.addColorStop(1, `rgba(${r},${g},${b},0)`)
+      sctx.fillStyle = grad
+      sctx.fillRect(0, 0, 48, 48)
+    }
+    return sprite
+  })
 
   const rand = mulberry32(20261008)
   let width = 0
@@ -82,6 +109,11 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
   let start = new Float32Array(0)
   let agitation = new Float32Array(0)
   let hue = new Uint8Array(0)
+  /** Fireflies: 0 none, 1 sea green, 2 amber. Each blinks at its own rate. */
+  let firefly = new Uint8Array(0)
+  let blinkRate = new Float32Array(0)
+  let fireflyList = new Uint32Array(0)
+  let fireflyGlow = new Float32Array(0)
   let seedPhase = new Float32Array(0)
   // Per frame draw lists.
   let drawX = new Float32Array(0)
@@ -120,6 +152,20 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
   let pulseY = 0
   let pulseAge = Infinity
   let flash = 0
+  // Molting: every so often a third of the shell lifts off as a ghost husk, dissolves into noise,
+  // and is pulled back in plate by plate as the new layer.
+  let lastMolt = 0
+  let moltAge = Infinity
+  let moltRegrown = true
+  // Slow eddies that wander the field and curl the drifting motes around them.
+  const eddies = [
+    { ax: 0.18, ay: 0.3, fx: 0.031, fy: 0.047, spin: 1 },
+    { ax: 0.42, ay: 0.72, fx: 0.023, fy: 0.037, spin: -1 },
+    { ax: 0.78, ay: 0.2, fx: 0.041, fy: 0.029, spin: 1 },
+    { ax: 0.9, ay: 0.82, fx: 0.027, fy: 0.043, spin: -1 },
+  ]
+  const eddyX = new Float32Array(eddies.length)
+  const eddyY = new Float32Array(eddies.length)
 
   function measure() {
     const rect = canvas.getBoundingClientRect()
@@ -153,6 +199,9 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
     start = new Float32Array(total)
     agitation = new Float32Array(total)
     hue = new Uint8Array(total)
+    firefly = new Uint8Array(total)
+    blinkRate = new Float32Array(total)
+    fireflyGlow = new Float32Array(total)
     seedPhase = new Float32Array(total)
     drawX = new Float32Array(total)
     drawY = new Float32Array(total)
@@ -167,6 +216,8 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
       vx[i] = (rand() - 0.5) * 40
       vy[i] = (rand() - 0.5) * 40
       hue[i] = rand() < 0.22 ? 1 : 0
+      blinkRate[i] = 0.45 + rand() * 0.9
+      if (i >= shellN && rand() < FIREFLY_SHARE) firefly[i] = rand() < 0.7 ? 1 : 2
       seedPhase[i] = rand() * Math.PI * 2
       if (i < shellN) {
         start[i] = INTRO_HOLD + shell.order[i] * GROW_SPAN + rand() * 0.35
@@ -176,6 +227,9 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
         agitation[i] = formed ? rand() * 0.15 : 1
       }
     }
+    const flies: number[] = []
+    for (let i = shellN; i < total; i++) if (firefly[i]) flies.push(i)
+    fireflyList = Uint32Array.from(flies)
     if (formed) {
       project(0)
       for (let i = 0; i < shellN; i++) {
@@ -263,6 +317,29 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
     } else flash *= Math.exp(-dt * 3)
     project(dt)
 
+    // Molt clock: starts once the shell has fully formed and stayed a while.
+    const formedAt = INTRO_HOLD + GROW_SPAN + 2
+    if (!opts.reducedMotion && dt > 0 && growClock > formedAt) {
+      if (!lastMolt) lastMolt = growClock - MOLT_PERIOD + 9
+      if (growClock - lastMolt > MOLT_PERIOD) {
+        lastMolt = growClock
+        moltAge = 0
+        moltRegrown = false
+        flash = Math.max(flash, 0.7)
+      }
+    }
+    moltAge += dt
+    const molting = moltAge < MOLT_LIFT
+    const lift = molting ? smooth(moltAge / MOLT_LIFT) : 0
+    const huskX = -scale * 0.55 * lift
+    const huskY = -scale * 0.75 * lift
+    const huskAg = molting ? smooth((moltAge - 0.7) / (MOLT_LIFT - 0.7)) : 0
+    if (!molting && !moltRegrown) {
+      // The husk has dissolved: send its particles back in, head first, as the new layer.
+      moltRegrown = true
+      for (let i = 0; i < shellN; i += 3) start[i] = growClock + 0.5 + shell.order[i] * 2.2 + noise() * 0.3
+    }
+
     const sweep = ((time * 0.16) % 1.6) - 0.3
     const jitterAmp = 7
     const k = 30
@@ -270,13 +347,14 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
 
     // Shell particles: static until their plate's turn, then pulled onto it.
     for (let i = 0; i < shellN; i++) {
-      const tx = drawX[i]
-      const ty = drawY[i]
+      const shed = molting && i % 3 === 0
+      const tx = drawX[i] + (shed ? huskX : 0)
+      const ty = drawY[i] + (shed ? huskY : 0)
       const depth = drawW[i]
       const since = growClock - start[i]
       let ag = 1
       if (since > 0) {
-        ag = Math.exp(-since * 2.4)
+        ag = Math.max(Math.exp(-since * 2.4), shed ? huskAg : 0)
         const ax = (tx - px[i]) * k
         const ay = (ty - py[i]) * k
         // A brief swirl as they come in, so they spiral onto the plate instead of snapping.
@@ -315,10 +393,17 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
           family = 3
           lum = Math.min(1, lum + glint * 0.5 + flare * 0.6)
         }
-        lum = Math.min(1, lum * 1.45) * (1 - ag * 0.6) * dim
+        lum = Math.min(1, lum * 1.45) * (1 - ag * 0.6) * (shed ? 1 - lift * 0.45 : 1) * dim
         bucketOf[i] = family * LEVELS + Math.min(LEVELS - 1, Math.max(0, Math.floor(lum * LEVELS)))
       }
     }
+
+    for (let e = 0; e < eddies.length; e++) {
+      const ed = eddies[e]
+      eddyX[e] = width * (ed.ax + 0.12 * Math.sin(time * ed.fx * 6.28 + e))
+      eddyY[e] = height * (ed.ay + 0.1 * Math.cos(time * ed.fy * 6.28 + e * 2))
+    }
+    const eddyR2 = (Math.min(width, 900) * 0.2) ** 2
 
     // Ambient particles: noise that calms into slow drift and flows around the shell.
     const rx = scale * 1.1
@@ -331,9 +416,22 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
       const ag = agitation[i]
       const t = time * 0.25 + seedPhase[i]
       const fx = (14 + 16 * Math.sin(py[i] * 0.0065 + t) * (0.4 + ag)) * (1 + scrollEased * 2.5)
-      const fy = 9 * Math.cos(px[i] * 0.0052 - t * 0.8)
-      vx[i] += (fx - vx[i]) * dt * 0.9
-      vy[i] += (fy - vy[i]) * dt * 0.9
+      let flowX = fx
+      let flowY = 9 * Math.cos(px[i] * 0.0052 - t * 0.8)
+      // Curl around the nearest eddies.
+      for (let e = 0; e < eddies.length; e++) {
+        const ex = px[i] - eddyX[e]
+        const ey = py[i] - eddyY[e]
+        const r2 = ex * ex + ey * ey
+        if (r2 > eddyR2 * 4) continue
+        const w = Math.exp(-r2 / eddyR2) * 110 * eddies[e].spin
+        const r = Math.sqrt(r2) + 30
+        flowX += (-ey / r) * w
+        flowY += (ex / r) * w
+      }
+      const calm = firefly[i] ? 0.45 : 1
+      vx[i] += (flowX * calm - vx[i]) * dt * 0.9
+      vy[i] += (flowY * calm - vy[i]) * dt * 0.9
 
       // Deflect off the shell: push out along the ellipse normal and around it.
       const dx = px[i] - cx
@@ -379,7 +477,7 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
         px[i] = -10 - noise() * 40
         py[i] = noise() * height
         vx[i] = 30 + noise() * 30
-        agitation[i] = noise() < 0.6 ? 1 : 0.4
+        agitation[i] = firefly[i] ? 0 : noise() < 0.6 ? 1 : 0.4
       } else if (px[i] < -60) {
         px[i] = width + 10
       }
@@ -387,7 +485,18 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
       const jit = ag * jitterAmp
       drawX[i] = px[i] + (noise() - 0.5) * jit * 2
       drawY[i] = py[i] + (noise() - 0.5) * jit
-      if (ag > 0.45) {
+      if (firefly[i] && ag < 0.45) {
+        // Fireflies: dark most of the time, then a slow glow and fade.
+        const wave = Math.max(0, Math.sin(time * blinkRate[i] + seedPhase[i] * 3))
+        const blink = wave ** 6
+        fireflyGlow[i] = blink * dim
+        const size = 1.4 + blink * 1.6
+        drawW[i] = size
+        drawH[i] = size
+        const lum = (0.12 + 0.88 * blink) * dim
+        bucketOf[i] = (4 + firefly[i]) * LEVELS + Math.min(LEVELS - 1, Math.max(0, Math.floor(lum * LEVELS)))
+      } else if (ag > 0.45) {
+        fireflyGlow[i] = 0
         drawW[i] = 1.4 + noise() * 4.2
         drawH[i] = 1.1
         const flick = noise()
@@ -443,6 +552,15 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
       }
       ctx!.fill()
     }
+    for (let j = 0; j < fireflyList.length; j++) {
+      const i = fireflyList[j]
+      const g = fireflyGlow[i]
+      if (g < 0.08) continue
+      const size = 30 * pointScale
+      ctx!.globalAlpha = g
+      ctx!.drawImage(glow[firefly[i] - 1], drawX[i] - size / 2, drawY[i] - size / 2, size, size)
+    }
+    ctx!.globalAlpha = 1
     ctx!.globalCompositeOperation = 'source-over'
 
     if (!readySent) {
@@ -519,7 +637,7 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
             anchorSeen = true
             anchorIo?.disconnect()
           }
-        }, { threshold: 0.3 })
+        }, { threshold: 0.1 })
       : null
   if (anchorIo) anchorIo.observe(anchor)
   else anchorSeen = true
