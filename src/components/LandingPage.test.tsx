@@ -176,12 +176,13 @@ describe('LandingPage Component', () => {
     expect(screen.getByRole('link', { name: /Get the free field manual/ })).toHaveAttribute('href', '/guide')
   })
 
-  it('eager-loads a single LCP hero still and lazy-loads below-fold artwork', () => {
-    render(<LandingPage />)
+  it('keeps the hero headline as text with a decorative particle canvas instead of backdrop art', () => {
+    const { container } = render(<LandingPage />)
 
-    const heroArtwork = screen.getByTestId('hero-artwork')
-    expect(heroArtwork.getAttribute('loading')).toBe('eager')
-    expect(heroArtwork.getAttribute('fetchpriority')).toBe('high')
+    const hero = container.querySelector('section[aria-labelledby="home-hero-title"]') as HTMLElement
+    expect(screen.getByRole('heading', { level: 1, name: /Shed the noise\.\s*Grow a shell\./ })).toBeInTheDocument()
+    expect(screen.getByTestId('hero-particles')).toHaveAttribute('aria-hidden', 'true')
+    expect(hero.querySelectorAll('img[fetchpriority="high"]')).toHaveLength(0)
 
     const heroPreview = screen.getByAltText(/The Moltology dashboard/)
     expect(heroPreview.getAttribute('loading')).toBe('eager')

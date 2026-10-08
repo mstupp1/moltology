@@ -171,11 +171,6 @@ export const HOME_FAQ: HomeQuestion[] = [
 ]
 
 /** Versioned backgrounds: prior S3 keys remain available for rollback. */
-export const HOME_HERO_IMAGE = {
-  src: getAssetUrl('/images/home/2026-10-08/hero-ecdysis-desktop-v3.webp'),
-  srcSm: getAssetUrl('/images/home/2026-10-08/hero-ecdysis-mobile-v3.webp'),
-} satisfies StoryImage
-
 export const HOME_FINAL_IMAGE: StoryImage = {
   src: getAssetUrl('/images/home/2026-10-08/first-shed-desktop-v1.webp'),
   srcSm: getAssetUrl('/images/home/2026-10-08/first-shed-mobile-v1.webp'),
