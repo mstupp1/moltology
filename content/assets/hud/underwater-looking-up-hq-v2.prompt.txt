@@ -1,0 +1,6 @@
+Tool: built-in ImageGen
+Reference: images/underwater_looking_up.jpg (1376x768)
+Output: underwater-looking-up-hq-v2.webp (1672x941, quality 92, 344872 bytes)
+S3 key: images/hud/underwater-looking-up-hq-v2.webp
+
+Use case: lighting-weather. Asset type: full bleed underwater background behind a translucent app HUD. Remake the reference image as a higher-quality, crisp cinematic underwater environment, at 3840x2160 landscape if supported. Preserve its composition and subject: looking upward from a deep ocean rocky canyon, rippling water surface at top center, turquoise sun shafts, dark rocky walls framing both sides, distant reef floor, subtle tiny fish, sparse suspended particles and a tiny underwater exploration vehicle near bottom center. Keep the same teal/cyan palette and framing. Improve natural rock/coral detail and smooth volumetric lighting, no JPEG artifacts or smeared details. Make the overall scene a little darker, about 15–20 percent lower luminance, especially soften the bright top center and shafts so white HUD text remains legible; retain visible detail in shadows. Quiet open middle area. No new objects, no text, no logos, no borders or watermark.
