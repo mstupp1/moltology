@@ -13,9 +13,9 @@ export const Route = createFileRoute('/guide')({
     meta: [
       ...seo({
         title: 'Free 2026 Moltmaxxing Protocol Field Manual | Moltology',
-        description: 'Download the official 38-page Moltmaxxing Protocol Field Manual (Edition 4.0). Master algorithmic ecdysis, 600 Nm pincer torque, and carapace fortification.',
+        description: 'Download the free 4-page Moltmaxxing Protocol Field Manual (Edition 4.0). Build a daily routine, protect your focus, and finish what you start.',
         keywords: 'free moltmaxxing guide, moltmaxxing protocol pdf, algorithmic ecdysis manual, carcinization protocol, pincer torque dynamometry',
-        ogImage: getAssetUrl('/images/moltmax_guide_bundle_hero.jpg'),
+        ogImage: getAssetUrl('images/guide/moltmaxxing-hero-v2.webp'),
         canonical: 'https://moltology.org/guide',
         siteName: 'Moltology Codex',
         twitterCard: 'summary_large_image',

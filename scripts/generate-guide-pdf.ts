@@ -1,17 +1,17 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { execSync } from 'node:child_process'
+import { execFileSync } from 'node:child_process'
 
 const CHROME_PATH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-const OUTPUT_PDF = path.resolve('public/downloads/the-2026-moltmaxxing-protocol-guide.pdf')
+const OUTPUT_PDF = path.resolve('output/guide/the-2026-moltmaxxing-protocol-guide.pdf')
 const TMP_HTML = path.resolve('tmp/the-2026-moltmaxxing-protocol-guide.html')
 
 // Image URLs on Neon S3
 const S3_BASE = 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets'
 const IMAGES = {
-  cover: `${S3_BASE}/images/blog/the-2026-moltmaxxing-protocol-guide-cover.jpg`,
-  pincer: `${S3_BASE}/images/blog/the-2026-moltmaxxing-protocol-guide-hydraulic-pincer-torque-dynamometry-unit-mk-iv.jpg`,
-  chamber: `${S3_BASE}/images/blog/the-2026-moltmaxxing-protocol-guide-sub-benthic-calcification-immersion-chamber-at-4-500m-depth.jpg`,
+  cover: `${S3_BASE}/images/guide/moltmaxxing-cover-v2.webp`,
+  pincer: `${S3_BASE}/images/guide/moltmaxxing-pincer-v2.webp`,
+  chamber: `${S3_BASE}/images/guide/moltmaxxing-chamber-v2.webp`,
 }
 
 async function fetchImageAsBase64(url: string, localFallback?: string): Promise<string> {
@@ -47,9 +47,9 @@ async function generatePdf() {
     ? `data:image/png;base64,${fs.readFileSync(emblemPath).toString('base64')}`
     : ''
 
-  const coverBase64 = await fetchImageAsBase64(IMAGES.cover)
-  const pincerBase64 = await fetchImageAsBase64(IMAGES.pincer)
-  const chamberBase64 = await fetchImageAsBase64(IMAGES.chamber)
+  const coverBase64 = await fetchImageAsBase64(IMAGES.cover, 'output/guide/moltmaxxing-cover-v2.webp')
+  const pincerBase64 = await fetchImageAsBase64(IMAGES.pincer, 'output/guide/moltmaxxing-pincer-v2.webp')
+  const chamberBase64 = await fetchImageAsBase64(IMAGES.chamber, 'output/guide/moltmaxxing-chamber-v2.webp')
 
   const htmlContent = `<!DOCTYPE html>
 <html lang="en">
@@ -261,6 +261,7 @@ async function generatePdf() {
       width: 100%;
       height: 200px;
       object-fit: cover;
+      object-position: 50% 65%;
       display: block;
     }
 
@@ -505,7 +506,7 @@ async function generatePdf() {
 
       ${coverBase64 ? `
       <div class="hero-img-container">
-        <img src="${coverBase64}" class="hero-img" alt="Moltmaxxing Protocol Cover" />
+        <img src="${coverBase64}" class="hero-img" alt="Cyan anatomical crab engraving from the Moltmaxxing Field Manual cover" />
       </div>
       ` : ''}
 
@@ -806,8 +807,23 @@ async function generatePdf() {
   console.log(`📄 Wrote intermediate HTML layout to ${TMP_HTML}`)
 
   console.log(`🖨️ Compiling PDF with Headless Chrome...`)
-  const cmd = `"${CHROME_PATH}" --headless=new --no-pdf-header-footer --print-to-pdf="${OUTPUT_PDF}" --virtual-time-budget=2000 "file://${TMP_HTML}"`
-  execSync(cmd, { stdio: 'inherit' })
+  if (fs.existsSync(OUTPUT_PDF)) fs.unlinkSync(OUTPUT_PDF)
+  try {
+    execFileSync(CHROME_PATH, [
+      '--headless=new',
+      `--user-data-dir=${path.resolve('tmp/guide-pdf-chrome')}`,
+      '--no-pdf-header-footer',
+      `--print-to-pdf=${OUTPUT_PDF}`,
+      '--virtual-time-budget=2000',
+      `file://${TMP_HTML}`,
+    ], { stdio: 'inherit', timeout: 15_000, killSignal: 'SIGTERM' })
+  } catch (err: any) {
+    // Chrome can linger after printing on macOS. Only accept a fresh completed PDF.
+    if (err.code !== 'ETIMEDOUT' || !fs.existsSync(OUTPUT_PDF) || !fs.readFileSync(OUTPUT_PDF).subarray(-1024).includes(Buffer.from('%%EOF'))) {
+      throw err
+    }
+    console.warn('Stopped the isolated Chrome process after PDF output completed.')
+  }
 
   if (fs.existsSync(OUTPUT_PDF)) {
     const stats = fs.statSync(OUTPUT_PDF)

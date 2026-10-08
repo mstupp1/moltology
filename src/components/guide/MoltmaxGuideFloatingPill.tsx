@@ -87,13 +87,13 @@ export const MoltmaxGuideFloatingPill: React.FC<MoltmaxGuideFloatingPillProps> =
 
         {/* Cover peeks out above the card and gives a small hop every few seconds */}
         <img
-          src={getAssetUrl('/images/moltmax_guide_3d_mockup_sm.webp')}
+          src={getAssetUrl('images/guide/moltmaxxing-cover-v2-sm.webp')}
           alt=""
           loading="lazy"
           decoding="async"
           width={48}
-          height={56}
-          className="guide-pill-book pointer-events-none absolute left-3 -top-4 w-12 h-14 rounded-md object-cover border border-white/25 shadow-[0_10px_24px_rgba(0,0,0,0.6)] transition-transform"
+          height={72}
+          className="guide-pill-book pointer-events-none absolute left-3 -top-4 w-12 h-[72px] rounded-md object-cover border border-white/25 shadow-[0_10px_24px_rgba(0,0,0,0.6)] transition-transform"
         />
 
         <button
