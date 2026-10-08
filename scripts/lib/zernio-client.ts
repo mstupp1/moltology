@@ -445,6 +445,7 @@ export async function queueDualReelAndShort(
       platformSpecificData: {
         contentType: 'reel',
         shareToFeed: true,
+        isAiGenerated: options.isAiGenerated ?? true,
         ...(options.firstComment ? { firstComment: options.firstComment } : {}),
       },
     })
@@ -489,7 +490,7 @@ export async function queueDualReelAndShort(
     console.log(`   💬 Posting algorithmic first comment on Instagram...`)
     try {
       const commentRes = await postZernioComment(post._id, igAccountId, options.firstComment)
-      commentId = commentRes?.comment?._id || commentRes?._id || 'posted'
+      commentId = commentRes ? (commentRes.comment?._id || commentRes._id || 'posted') : null
       if (commentId) {
         console.log(`   ✅ First comment registered successfully!`)
       }

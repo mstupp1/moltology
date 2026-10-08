@@ -188,6 +188,19 @@ describe('zernio-client', () => {
     expect(postPayload.mediaItems[0].url).toBe('https://cdn.moltology.org/s1.png')
   })
 
+  it('keeps a deferred reel comment pending when the inbox rejects a scheduled post', async () => {
+    vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce({ ok: true, text: async () => JSON.stringify({ post: { _id: 'scheduled_reel', status: 'scheduled' } }) } as any)
+      .mockResolvedValueOnce({ ok: false, text: async () => JSON.stringify({ message: 'No platform post ID yet' }) } as any)
+    const result = await queueDualReelAndShort({
+      videoUrl: 'https://cdn.moltology.org/reel.mp4',
+      instagramCaption: 'A quiet hour', youtubeTitle: 'A quiet hour',
+      youtubeDescription: 'Take the audit', firstComment: 'Audit link',
+    })
+    expect(result.postId).toBe('scheduled_reel')
+    expect(result.commentId).toBeNull()
+  })
+
   it('queues a unified dual broadcast for Reel and Short into Reels & Shorts queue', async () => {
     const mockPost = { _id: 'unified_reel_1', status: 'scheduled', scheduledFor: '2026-09-05T22:30:00.000Z' }
     const mockComment = { comment: { _id: 'comm_ig_reel_1' } }
@@ -231,6 +244,7 @@ describe('zernio-client', () => {
     expect(postPayload.platforms[0].customContent).toBe('IG Reel caption')
     expect(postPayload.platforms[0].platformSpecificData.contentType).toBe('reel')
     expect(postPayload.platforms[0].platformSpecificData.shareToFeed).toBe(true)
+    expect(postPayload.platforms[0].platformSpecificData.isAiGenerated).toBe(true)
     expect(postPayload.platforms[0].platformSpecificData.firstComment).toBe('Comment QUIZ')
 
     // YouTube platform target
@@ -285,4 +299,3 @@ describe('zernio-client', () => {
     expect(postPayload.platforms[0].platformSpecificData.title).toBe('YouTube Short Title #Shorts')
   })
 })
-

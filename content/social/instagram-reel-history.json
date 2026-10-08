@@ -1425,6 +1425,44 @@
       },
       "createdAt": "2026-09-30T14:27:50.753Z",
       "updatedAt": "2026-10-02T19:24:10.941Z"
+    },
+    {
+      "id": "reel-1791464431126",
+      "topic": "Your calendar kept the chair warm",
+      "hookHeadline": "Your calendar kept the chair warm",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": null,
+      "characterArc": "Silas Trench: A quiet task beneath the meetings",
+      "narrationScript": "Your calendar kept the chair warm. The work waited outside. Surface Noise booked another meeting. Below, a lobster closes the hatch. One task gets the Hydraulic Pincer Grip. Take the Moltmaxxing Audit.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1791464431126-v2.mp4",
+      "s3Key": "videos/social/reels/master-reel-1791464431126-v2.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 17.6,
+      "status": "queued",
+      "scheduledFor": "2026-10-15T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6ac7963287aa6598a1f5ad3d",
+      "zernioYouTubePostId": "6ac7963287aa6598a1f5ad3d",
+      "zernioPostId": "6ac7963287aa6598a1f5ad3d",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "firstComment": "Take the Moltmaxxing Audit: https://moltology.org/quiz\nWhich meeting could you shed this week?\n\n#Moltology\n#Moltmaxxing\n#DeepWork",
+      "caption": "Your calendar kept the chair warm.\n\nSurface Noise can fill a day without moving the work. Shed one meeting that no longer needs you. Give the task you chose a little Hydrostatic Focus.\n\nTake the Moltmaxxing Audit. The link is in the first comment.",
+      "hashtags": [
+        "#Moltology",
+        "#Moltmaxxing",
+        "#DeepWork"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-10-08T13:10:11.632Z",
+      "firstCommentStatus": "scheduled",
+      "updatedAt": "2026-10-08T13:14:13.580Z"
     }
   ]
 }

@@ -702,9 +702,11 @@ export function autoCommitReelPublish(
   options: {
     customHistoryPath?: string
     outroImagePath?: string
+    runGit?: typeof execSync
   } = {}
 ): { success: boolean; message: string } {
   const historyPath = options.customHistoryPath || path.resolve(process.cwd(), 'content/social/instagram-reel-history.json')
+  const runGit = options.runGit || execSync
   try {
     const filesToStage: string[] = [historyPath]
     if (options.outroImagePath && fs.existsSync(options.outroImagePath)) {
@@ -715,15 +717,15 @@ export function autoCommitReelPublish(
     }
 
     const stageCmd = `git add ${filesToStage.map((f) => `"${f}"`).join(' ')}`
-    execSync(stageCmd, { stdio: 'pipe' })
+    runGit(stageCmd, { stdio: 'pipe' })
 
-    const diffCheck = execSync('git diff --cached --name-only', { encoding: 'utf8' }).trim()
+    const diffCheck = runGit('git diff --cached --name-only', { encoding: 'utf8' }).toString().trim()
     if (!diffCheck) {
       return { success: true, message: 'No staged changes to commit (already up to date).' }
     }
 
     const commitMsg = `feat(social): record ${reelId} (${topic}) in reel continuity ledger`
-    execSync(`git commit -m "${commitMsg}"`, { stdio: 'pipe' })
+    runGit(`git commit -m "${commitMsg}"`, { stdio: 'pipe' })
 
     return { success: true, message: `Committed changes with message: "${commitMsg}"` }
   } catch (err: any) {
@@ -2092,6 +2094,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
   let queueResult: QueueDualReelAndShortResult | null = null
   let durationSeconds = 13.3
   let compositeResult: any = null
+  let resolvedOutroPath = options.customOutroImagePath
 
   if (options.customVideo) {
     console.log(`\n🎬 Using pre-rendered custom video: ${options.customVideo}`)
@@ -2234,8 +2237,6 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       sceneVideoPaths.length,
       options.colorGrading
     )
-
-    let resolvedOutroPath = options.customOutroImagePath
 
     // The final composite: the rendered CTA card that the AI outro builds from.
     const renderBaseOutroFrame = async (): Promise<string> => {

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import {
   generateDailyReelScript,
   buildDynamicScenePrompts,
@@ -272,9 +272,12 @@ describe('Antigravity CTA outro elevation', () => {
 
 describe('autoCommitReelPublish', () => {
   it('handles git staging and commit gracefully without throwing', () => {
-    const res = autoCommitReelPublish('reel-test-123', 'Test Topic')
-    expect(res).toBeDefined()
-    expect(typeof res.success).toBe('boolean')
-    expect(typeof res.message).toBe('string')
+    const execSpy = vi.fn()
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('content/social/instagram-reel-history.json')
+      .mockReturnValueOnce('')
+    const res = autoCommitReelPublish('reel-test-123', 'Test Topic', { runGit: execSpy })
+    expect(res.success).toBe(true)
+    expect(execSpy).toHaveBeenCalledTimes(3)
   })
 })
