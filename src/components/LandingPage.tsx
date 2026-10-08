@@ -11,8 +11,6 @@ import { useNavigate } from '@tanstack/react-router'
 import {
   Shield,
   Sparkles,
-  ArrowRight,
-  CheckCircle2,
   Terminal,
   ChevronRight,
   ChevronLeft,
@@ -20,12 +18,11 @@ import {
   Users,
   Instagram,
   Youtube,
-  Maximize2,
 } from 'lucide-react'
 import { PublicHeader } from '@/components/PublicHeader'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { HomeHero } from '@/components/HomeHero'
-import { ImageLightbox } from '@/components/ui/ImageLightbox'
+import { HomeFeatures } from '@/components/HomeFeatures'
 import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
 import { MainFooter } from '@/components/MainFooter'
 import { LandingAuthCtaSkeleton } from '@/components/LandingAuthCtaSkeleton'
@@ -54,7 +51,6 @@ export const LandingPage: React.FC = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)
-  const [activeLightboxIndex, setActiveLightboxIndex] = useState<number | null>(null)
 
 
   // Quotes / Hymns Auto-scroll State
@@ -160,66 +156,6 @@ export const LandingPage: React.FC = () => {
       imageSm: getAssetUrl('/images/sacrament_04_pipeline_ascent_sm.webp'),
       borderColor: 'border-emerald-500/60 shadow-[0_0_25px_rgba(16,185,129,0.25)]',
       glowColor: 'drop-shadow-[0_0_20px_rgba(16,185,129,0.5)]',
-    },
-  ]
-
-  const corePillars = [
-    {
-      id: '01',
-      title: 'ADVANCED BENTHIC HUD',
-      description:
-        'A centralized command dashboard featuring daily habit routines, deep-trench modules, and focus tracking built for daily high-density execution.',
-      image: getAssetUrl('/images/gallery/benthic_abyss_shrine.webp'),
-      imageSm: getAssetUrl('/images/gallery/benthic_abyss_shrine_sm.webp'),
-      previewImage: getAssetUrl('/images/marketing/dashboard_feature_preview.webp'),
-      previewImageSm: getAssetUrl('/images/marketing/dashboard_feature_preview_sm.webp'),
-      previewUrl: 'moltology.org/dashboard',
-      imagePosition: 'center 40%',
-      borderColor: 'border-cyan-500/50 hover:border-cyan-400',
-      shadowColor: 'shadow-[0_0_30px_rgba(0,195,255,0.12)] hover:shadow-[0_0_40px_rgba(0,195,255,0.22)]',
-      dotColor: 'bg-cyan-400',
-      btnGlow: 'bg-cyan-950/50 hover:bg-cyan-900/60 border-cyan-500/50 hover:border-cyan-400 text-cyan-300',
-      specs: ['Daily Habit & Shedding Tracker', 'Deep-Trench Focus Dome', 'Real-Time Telemetry & Streaks'],
-      actionText: 'EXPLORE HUD CONSOLE',
-      actionRoute: '/dashboard',
-    },
-    {
-      id: '02',
-      title: 'SYNAPTIC HIVE COMMUNITY',
-      description:
-        'Connect with an active network of ascendant operators. Share routines, exchange insights, and co-evolve alongside a supportive, global collective.',
-      image: getAssetUrl('/images/gallery/synapse_crystal.webp'),
-      imageSm: getAssetUrl('/images/gallery/synapse_crystal_sm.webp?v=2'),
-      previewImage: getAssetUrl('/images/marketing/forum_feature_preview.webp'),
-      previewImageSm: getAssetUrl('/images/marketing/forum_feature_preview_sm.webp'),
-      previewUrl: 'moltology.org/forum',
-      imagePosition: 'center 35%',
-      borderColor: 'border-cyan-500/50 hover:border-cyan-400',
-      shadowColor: 'shadow-[0_0_30px_rgba(0,195,255,0.12)] hover:shadow-[0_0_40px_rgba(0,195,255,0.22)]',
-      dotColor: 'bg-cyan-400',
-      btnGlow: 'bg-cyan-950/50 hover:bg-cyan-900/60 border-cyan-500/50 hover:border-cyan-400 text-cyan-300',
-      specs: ['Live Swarm Social Feed', 'Peer Co-Evolution Discussions', 'Shared Metamorphosis Logs'],
-      actionText: 'JOIN SYNAPTIC SWARM',
-      actionRoute: '/forum',
-    },
-    {
-      id: '03',
-      title: 'INTELLIGENT AI ORACLE',
-      description:
-        'Leverage specialized AI mentors designed to eliminate overthinking, answer doctrine questions, and guide your daily molts with pinpoint precision.',
-      image: getAssetUrl('/images/gallery/ascendant_crab_god.webp'),
-      imageSm: getAssetUrl('/images/gallery/ascendant_crab_god_sm.webp?v=2'),
-      previewImage: getAssetUrl('/images/marketing/oracle_feature_preview.webp'),
-      previewImageSm: getAssetUrl('/images/marketing/oracle_feature_preview_sm.webp'),
-      previewUrl: 'moltology.org/oracle',
-      imagePosition: 'center 30%',
-      borderColor: 'border-cyan-500/50 hover:border-cyan-400',
-      shadowColor: 'shadow-[0_0_30px_rgba(0,195,255,0.12)] hover:shadow-[0_0_40px_rgba(0,195,255,0.22)]',
-      dotColor: 'bg-cyan-400',
-      btnGlow: 'bg-cyan-950/50 hover:bg-cyan-900/60 border-cyan-500/50 hover:border-cyan-400 text-cyan-300',
-      specs: ['Hesitation Quarantine Assistant', 'Codex Liturgy Search', 'Adaptive Growth Coaching'],
-      actionText: 'CONSULT AI ORACLE',
-      actionRoute: '/oracle',
     },
   ]
 
@@ -335,216 +271,7 @@ export const LandingPage: React.FC = () => {
           </ScrollReveal>
         </section>
 
-        {/* SECTION 2: 3 Core Features of the App (Frameless Open Grid) */}
-        <section id="core-pillars" className="max-w-[1700px] mx-auto px-4 sm:px-12 relative">
-          <ScrollReveal animation="fade-up" durationMs={800}>
-            {/* Section Header */}
-            <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-14 relative z-10">
-              <h2 className="font-grotesk font-black text-2xl sm:text-4xl lg:text-6xl text-white tracking-tight uppercase leading-tight drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
-                THE 3 CORE FEATURES OF <span className="whitespace-nowrap bg-gradient-to-r from-cyan-300 via-purple-300 to-red-400 bg-clip-text text-transparent">THE SYNAPTIC PATH</span>
-              </h2>
-            </div>
-
-            {/* 3 Core Pillars Grid - Image-Based Biomechanical HUD Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 relative z-10 mb-8 sm:mb-12">
-              {corePillars.map((pillar, idx) => {
-                return (
-                  <ScrollReveal
-                    key={pillar.id}
-                    animation="fade-up"
-                    delayMs={idx * 150}
-                    durationMs={700}
-                  >
-                    <div
-                      className="border-2 border-cyan-500/50 hover:border-cyan-400 shadow-[0_0_30px_rgba(0,195,255,0.12)] hover:shadow-[0_0_40px_rgba(0,195,255,0.22)] chamfer-corner-lg overflow-hidden !bg-[#020508] flex flex-col justify-between h-full transition-all duration-500 hover:-translate-y-1.5 group relative"
-                    >
-                      {/* ── 1. 100% SOLID BLACK CARD BASE (ZERO TRANSPARENCY / ZERO SEE-THROUGH) ── */}
-                      <div className="absolute inset-0 bg-[#020508] pointer-events-none" />
-
-                      {/* ── 2. TOP SCREENSHOT STAGE (SOLID BLACK WITH THEMED AMBIENT GLOW) ── */}
-                      <div
-                        className="absolute top-6 left-1/2 -translate-x-1/2 w-72 h-44 rounded-full blur-[85px] opacity-25 group-hover:opacity-40 transition-opacity pointer-events-none bg-cyan-500"
-                      />
-
-                      {/* ── 3. LOWER BACKGROUND ARTWORK (SEAMLESSLY BLENDED INTO SOLID BLACK TOP) ── */}
-                      <div className="absolute inset-x-0 bottom-0 h-[68%] overflow-hidden pointer-events-none">
-                        <picture className="w-full h-full">
-                          <source
-                            type="image/webp"
-                            media="(max-width: 767px)"
-                            srcSet={pillar.imageSm || pillar.image}
-                          />
-                          <img
-                            src={pillar.image}
-                            alt={pillar.title}
-                            style={pillar.imagePosition ? { objectPosition: pillar.imagePosition } : { objectPosition: 'center 40%' }}
-                            {...lazyImageProps}
-                            width={640}
-                            height={400}
-                            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 filter brightness-[0.48] contrast-[1.12] group-hover:brightness-[0.58] [mask-image:linear-gradient(to_bottom,transparent_0%,black_35%,black_100%)]"
-                          />
-                        </picture>
-                        {/* Top-edge gradient blend into solid black */}
-                        <div className="absolute top-0 inset-x-0 h-28 bg-gradient-to-b from-[#020508] via-[#020508]/80 to-transparent pointer-events-none" />
-                        {/* Bottom & middle readability scrim */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#020508]/98 via-[#020508]/85 to-[#020508]/40 pointer-events-none" />
-                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,transparent_20%,rgba(2,5,8,0.85)_100%)] pointer-events-none" />
-                      </div>
-
-                      {/* ── CARD-WIDE SUBTLE SCANLINES & GRID ── */}
-                      <div className="absolute inset-0 pointer-events-none opacity-10 bg-[linear-gradient(rgba(0,255,255,0.12)_1px,transparent_1px)] bg-[size:100%_4px]" />
-                      <div className="absolute inset-0 bg-sacred-grid opacity-10 pointer-events-none" />
-
-                      {/* ── TOP SECTION: 3D Perspective Floating UI Screenshot Slate (Clickable Zoom Trigger) ── */}
-                      <div className="relative z-10 pt-5 sm:pt-6 px-3.5 sm:px-5 pb-2 flex items-center justify-center min-h-[200px] sm:min-h-[240px] md:min-h-[220px] lg:min-h-[280px]">
-                        <button
-                          type="button"
-                          onClick={() => setActiveLightboxIndex(idx)}
-                          aria-label={`Enlarge ${pillar.title} screenshot preview`}
-                          className={`relative w-full max-w-[96%] sm:max-w-[92%] transition-all duration-500 drop-shadow-[0_20px_40px_rgba(0,0,0,0.95)] cursor-zoom-in text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 rounded ${
-                            idx === 0
-                              ? 'lg:[transform:perspective(1100px)_rotateX(9deg)_rotateY(-7deg)_rotateZ(1.5deg)] group-hover:lg:[transform:perspective(1100px)_rotateX(0deg)_rotateY(0deg)_rotateZ(0deg)_scale(1.04)]'
-                              : idx === 1
-                              ? 'lg:[transform:perspective(1100px)_rotateX(11deg)_rotateY(0deg)_rotateZ(0deg)_scale(1.02)] group-hover:lg:[transform:perspective(1100px)_rotateX(0deg)_rotateY(0deg)_rotateZ(0deg)_scale(1.05)]'
-                              : 'lg:[transform:perspective(1100px)_rotateX(9deg)_rotateY(7deg)_rotateZ(-1.5deg)] group-hover:lg:[transform:perspective(1100px)_rotateX(0deg)_rotateY(0deg)_rotateZ(0deg)_scale(1.04)]'
-                          }`}
-                        >
-                          <div className="relative overflow-hidden chamfer-corner border border-cyan-500/40 group-hover/preview:border-cyan-400/80 bg-[#030708] shadow-2xl aspect-[16/10] group/preview">
-                            {/* High-DPI Screenshot */}
-                            <picture>
-                              <source
-                                type="image/webp"
-                                media="(max-width: 767px)"
-                                srcSet={pillar.previewImageSm}
-                              />
-                              <source
-                                type="image/webp"
-                                media="(min-width: 768px)"
-                                srcSet={pillar.previewImage}
-                              />
-                              <img
-                                src={pillar.previewImage}
-                                alt={`${pillar.title} Screenshot Preview`}
-                                {...lazyImageProps}
-                                width={640}
-                                height={400}
-                                className="w-full h-full object-cover object-top filter brightness-95 group-hover:brightness-105 transition-all duration-500"
-                              />
-                            </picture>
-
-                            {/* Interactive Hover Zoom Affordance Badge */}
-                            <div className="absolute inset-0 bg-black/45 opacity-0 group-hover/preview:opacity-100 transition-opacity duration-200 flex items-center justify-center p-2 backdrop-blur-[1px]">
-                              <span className="flex items-center gap-1.5 px-3 py-1 rounded bg-[#03080a]/92 border border-cyan-500/50 font-sans text-xs font-bold tracking-wider uppercase shadow-xl transform translate-y-1 group-hover/preview:translate-y-0 transition-transform duration-200 text-cyan-300">
-                                <Maximize2 className="w-3.5 h-3.5 text-cyan-300" />
-                                <span>Click to expand</span>
-                              </span>
-                            </div>
-
-                            {/* Subtle Glass Sheen & Scanlines */}
-                            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none opacity-30 group-hover:opacity-60 transition-opacity" />
-                            <div className="absolute inset-0 pointer-events-none opacity-10 bg-[linear-gradient(rgba(0,255,255,0.1)_1px,transparent_1px)] bg-[size:100%_3px]" />
-                          </div>
-                        </button>
-                      </div>
-
-                      {/* ── CARD BODY CONTENT (CRYSTAL CLEAR LEGIBILITY OVER CRISP ARTWORK) ── */}
-                      <div className="p-5 sm:p-6 lg:p-7 space-y-4 flex-1 flex flex-col justify-between relative z-10 bg-gradient-to-t from-[#020508]/90 via-[#020508]/60 to-transparent">
-                        <div className="space-y-2">
-                          <h3 className="font-grotesk font-black text-xl sm:text-2xl text-white uppercase tracking-wider group-hover:text-cyan-200 transition-colors drop-shadow-[0_2px_10px_rgba(0,0,0,1)]">
-                            {pillar.title}
-                          </h3>
-                          <p className="text-xs sm:text-sm text-gray-200 font-sans leading-relaxed drop-shadow-[0_1px_6px_rgba(0,0,0,0.95)]">
-                            {pillar.description}
-                          </p>
-                        </div>
-
-                        <div className="space-y-3.5 pt-2">
-                          {/* Feature Specs */}
-                          <div className="space-y-1.5 pt-3 border-t border-white/15">
-                            {pillar.specs.map((spec, i) => (
-                              <div key={i} className="flex items-center gap-2 text-xs font-sans text-gray-200 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
-                                <div className={`w-1.5 h-1.5 rounded-full ${pillar.dotColor} shrink-0 shadow-[0_0_8px_currentColor]`} />
-                                <span className="font-medium">{spec}</span>
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Action CTA Button */}
-                          <button
-                            onClick={() => onNavigate(pillar.actionRoute)}
-                            className={`w-full py-2.5 px-4 text-xs font-grotesk font-bold uppercase tracking-wider rounded chamfer-corner border flex items-center justify-center gap-2 transition-all duration-300 group/btn shadow-lg ${pillar.btnGlow}`}
-                          >
-                            <span>{pillar.actionText}</span>
-                            <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </ScrollReveal>
-                )
-              })}
-            </div>
-
-            {/* 3 Core Features High-DPI Expandable Lightbox Modal */}
-            <ImageLightbox
-              isOpen={activeLightboxIndex !== null}
-              onClose={() => setActiveLightboxIndex(null)}
-              currentIndex={activeLightboxIndex ?? 0}
-              onIndexChange={(idx) => setActiveLightboxIndex(idx)}
-              onNavigate={onNavigate}
-              images={corePillars.map((p) => ({
-                src: p.previewImage,
-                alt: `${p.title} Full Resolution Preview`,
-                title: p.title,
-                description: p.description,
-                specs: p.specs,
-                actionRoute: p.actionRoute,
-                actionText: p.actionText,
-              }))}
-            />
-
-            {/* Safety & Zero-Risk Banner */}
-            <div className="p-4 sm:p-6 bg-[#04090b]/90 border border-cyan-500/40 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 relative z-10 mb-8 sm:mb-10">
-              <div className="flex items-start sm:items-center gap-3 sm:gap-4 relative z-10">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-950/80 border border-emerald-500/60 flex items-center justify-center text-emerald-400 shrink-0 shadow-[0_0_15px_rgba(16,185,129,0.3)] mt-0.5 sm:mt-0">
-                  <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
-                </div>
-                <div>
-                  <h4 className="font-grotesk font-bold text-sm sm:text-lg text-white uppercase tracking-wide flex items-center gap-2 flex-wrap">
-                    <span>100% SAFE & FREE TO GET STARTED</span>
-                    <span className="text-[10px] sm:text-xs bg-emerald-950 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-sans">ZERO FRICTION</span>
-                  </h4>
-                  <p className="text-xs sm:text-sm text-gray-300 font-sans mt-0.5">
-                    No credit card required. Explore the full guest sandbox risk-free or create your account in seconds.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 sm:gap-4 shrink-0 font-sans text-xs text-gray-300 flex-wrap pt-2 md:pt-0 border-t md:border-t-0 border-cyan-950/80 w-full md:w-auto justify-between sm:justify-start relative z-10">
-                <span className="flex items-center gap-1.5 text-emerald-400 text-xs">
-                  <CheckCircle2 className="w-4 h-4 shrink-0" /> Free Access
-                </span>
-                <span className="flex items-center gap-1.5 text-cyan-400 text-xs">
-                  <CheckCircle2 className="w-4 h-4 shrink-0" /> Instant Demo
-                </span>
-                <span className="flex items-center gap-1.5 text-purple-400 text-xs">
-                  <CheckCircle2 className="w-4 h-4 shrink-0" /> Safe Sandbox
-                </span>
-              </div>
-            </div>
-
-            {/* Action Call to Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 sm:gap-4 relative z-10 w-full sm:w-auto">
-              <Suspense fallback={<LandingAuthCtaSkeleton variant="pillars" />}>
-                {authReady ? (
-                  <LazyLandingAuthCtas variant="pillars" onNavigate={onNavigate} onOpenAuth={openAuth} />
-                ) : (
-                  <LandingAuthCtaSkeleton variant="pillars" />
-                )}
-              </Suspense>
-            </div>
-          </ScrollReveal>
-        </section>
+        <HomeFeatures authReady={authReady} onNavigate={onNavigate} onOpenAuth={openAuth} />
 
         {/* SCROLL-REVEAL BACKGROUND IMAGE BANNER 1: MARIANA TRENCH ABYSS (PBR Deep Basalt Rock Theme) */}
         <ScrollReveal animation="fade-in" durationMs={900}>

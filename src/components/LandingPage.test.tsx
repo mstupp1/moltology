@@ -115,36 +115,34 @@ describe('LandingPage Component', () => {
     expect(screen.queryByText('TRY THE DEMO')).not.toBeInTheDocument()
   })
 
-  it('renders all 3 synaptic ecosystem core features as image-based cards and handles navigation', () => {
+  it('renders the three core features as benefit-led rows with real screenshots', () => {
     render(<LandingPage />)
 
-    expect(screen.getByText('THE 3 CORE FEATURES OF')).toBeInTheDocument()
-    expect(screen.getByText('ADVANCED BENTHIC HUD')).toBeInTheDocument()
-    expect(screen.getByText('SYNAPTIC HIVE COMMUNITY')).toBeInTheDocument()
-    expect(screen.getByText('INTELLIGENT AI ORACLE')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'Everything you need to finish what you start.' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Know what to do the moment you sit down.' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Get unstuck in a single conversation.' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Keep going with people who get it.' })).toBeInTheDocument()
 
-    // Action buttons
-    const hudBtn = screen.getByRole('button', { name: /EXPLORE HUD CONSOLE/i })
-    const swarmBtn = screen.getByRole('button', { name: /JOIN SYNAPTIC SWARM/i })
-    const oracleBtn = screen.getByRole('button', { name: /CONSULT AI ORACLE/i })
-
-    expect(hudBtn).toBeInTheDocument()
-    expect(swarmBtn).toBeInTheDocument()
-    expect(oracleBtn).toBeInTheDocument()
-
-    // Test button click navigation
-    fireEvent.click(swarmBtn)
+    fireEvent.click(screen.getByRole('button', { name: /Open the dashboard/ }))
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })
+    fireEvent.click(screen.getByRole('button', { name: /Ask the Oracle/ }))
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/oracle' })
+    fireEvent.click(screen.getByRole('button', { name: /Visit the community/ }))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/forum' })
 
-    fireEvent.click(oracleBtn)
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/oracle' })
+    expect(screen.getByAltText('Dashboard showing a featured lesson and community news')).toBeInTheDocument()
+    expect(screen.getByAltText('A new conversation with the Oracle')).toBeInTheDocument()
+    expect(screen.getByAltText('The Moltology community boards and latest posts')).toBeInTheDocument()
 
-    // Layered UI Screenshot previews
-    expect(screen.getByAltText('ADVANCED BENTHIC HUD Screenshot Preview')).toBeInTheDocument()
-    expect(screen.getByAltText('SYNAPTIC HIVE COMMUNITY Screenshot Preview')).toBeInTheDocument()
-    expect(screen.getByAltText('INTELLIGENT AI ORACLE Screenshot Preview')).toBeInTheDocument()
+    expect(screen.getByText('Free to join. No card needed.')).toBeInTheDocument()
+  })
 
-    expect(screen.getByText('100% SAFE & FREE TO GET STARTED')).toBeInTheDocument()
+  it('shows no backdrop artwork behind the core features', () => {
+    render(<LandingPage />)
+    const section = document.getElementById('core-pillars')!
+    const sources = Array.from(section.querySelectorAll('img')).map((img) => img.getAttribute('src') ?? '')
+    expect(sources).toHaveLength(3)
+    expect(sources.every((src) => src.includes('/images/marketing/'))).toBe(true)
   })
 
   it('renders the live interactive laptop and smartphone device showcase', async () => {
@@ -209,34 +207,20 @@ describe('LandingPage Component', () => {
     expect(screen.getByText('100% HARDENED')).toBeInTheDocument()
   })
 
-  it('allows clicking core feature screenshots to open high-res lightbox modal and navigate gallery', () => {
+  it('opens core feature screenshots in a gallery lightbox', () => {
     render(<LandingPage />)
 
-    // Click first screenshot preview trigger
-    const hudScreenshotBtn = screen.getByRole('button', { name: /Enlarge ADVANCED BENTHIC HUD screenshot preview/i })
-    expect(hudScreenshotBtn).toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Expand the dashboard screenshot' }))
 
-    // Lightbox modal initially not open
-    expect(screen.queryByRole('dialog', { name: /ADVANCED BENTHIC HUD/i })).not.toBeInTheDocument()
-
-    // Click screenshot trigger to open lightbox
-    fireEvent.click(hudScreenshotBtn)
-
-    const dialog = screen.getByRole('dialog', { name: /ADVANCED BENTHIC HUD/i })
-    expect(dialog).toBeInTheDocument()
+    const dialog = screen.getByRole('dialog', { name: 'The dashboard' })
     expect(within(dialog).getByText('1 / 3')).toBeInTheDocument()
 
-    // Next image navigation in lightbox
-    const nextBtn = within(dialog).getByRole('button', { name: /Next image/i })
-    fireEvent.click(nextBtn)
-
-    expect(within(dialog).getByText('SYNAPTIC HIVE COMMUNITY')).toBeInTheDocument()
+    fireEvent.click(within(dialog).getByRole('button', { name: /Next image/i }))
+    expect(within(dialog).getByText('The Oracle')).toBeInTheDocument()
     expect(within(dialog).getByText('2 / 3')).toBeInTheDocument()
 
-    // Close lightbox
-    const closeBtn = within(dialog).getByRole('button', { name: /Close image preview/i })
-    fireEvent.click(closeBtn)
-
+    fireEvent.click(within(dialog).getByRole('button', { name: /Close image preview/i }))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
