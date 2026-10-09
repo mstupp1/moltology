@@ -20,6 +20,8 @@ Carousels can be created in two primary modes:
 
 ## Architecture & Publishing Setup
 
+Read [comment-to-DM delivery guidance](../instagram-post-creator/references/comment-to-dm.md) before writing a CTA. Delivery is disabled / unverified by default. Use direct resource links, remove DM promises from generated copy and slide artwork, and do not provision rules during content creation.
+
 * **Instagram Persona**: Silas Trench (`@silas.trench`, Account ID: `6a7f7f0777555aae01d99b54`)
 * **Aspect Ratio & Canvas Dimensions**: Native 3:4 Portrait (`1080x1440` matching Google Flow portrait mode). Never force-crop 3:4 to 4:5; Instagram natively supports 3:4 portrait.
 * **Image Synthesis Pipeline**:
