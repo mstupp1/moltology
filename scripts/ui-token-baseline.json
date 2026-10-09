@@ -176,11 +176,6 @@
     "hex-color": 25,
     "tiny-text": 9
   },
-  "src/components/hud/PipelineView.tsx": {
-    "hex-color": 90,
-    "chamfer": 9,
-    "tiny-text": 10
-  },
   "src/components/hud/PremiumBadge.tsx": {
     "hex-color": 3,
     "chamfer": 1,
