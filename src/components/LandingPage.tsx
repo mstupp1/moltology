@@ -39,7 +39,7 @@ export const LandingPage: React.FC = () => {
   const sectionProps = { authReady, onNavigate, onOpenAuth: openAuth }
 
   return (
-    <div className="min-h-screen bg-[#020408] text-[#dfe3e3] font-sans selection:bg-[#00c3ff]/30 selection:text-white flex flex-col overflow-x-clip">
+    <div className="min-h-screen bg-[#020408] text-ink-body font-sans selection:bg-cyan-glow/30 selection:text-ink flex flex-col overflow-x-clip">
       {isAuthModalOpen && (
         <React.Suspense fallback={null}>
           <AuthModal

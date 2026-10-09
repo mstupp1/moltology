@@ -61,7 +61,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
         />
 
         <div className="relative order-1 text-center lg:text-left">
-          <p className="home-hero-rise inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-[#04161c]/70 backdrop-blur-md px-3.5 py-1.5 text-xs sm:text-sm text-cyan-100">
+          <p className="home-hero-rise inline-flex items-center gap-2 rounded-chip border border-line bg-surface-1/70 backdrop-blur-md px-3.5 py-1.5 text-xs sm:text-sm text-ink-body">
             <span className="relative flex h-2 w-2" aria-hidden="true">
               <span className="absolute inline-flex h-full w-full rounded-full bg-[#00ffcc] opacity-60 motion-safe:animate-ping" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00ffcc]" />
@@ -96,11 +96,11 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
             </Suspense>
           </div>
 
-          <p className="home-hero-rise mt-5 text-sm text-[#9fb0b0]" style={{ animationDelay: '220ms' }}>
+          <p className="home-hero-rise mt-5 text-sm text-ink-muted" style={{ animationDelay: '220ms' }}>
             Not sure where you stand?{' '}
             <Link
               to="/moltmax"
-              className="group inline-flex items-center gap-1 font-semibold text-cyan-300 hover:text-cyan-200 underline-offset-4 hover:underline"
+              className="group inline-flex items-center gap-1 rounded-control font-semibold text-cyan-glow hover:text-cyan-hover underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               Take the free Moltmax diagnostic
               <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
@@ -108,7 +108,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
           </p>
 
           <ul
-            className="home-hero-rise mt-7 sm:mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-sm text-[#dfe3e3]"
+            className="home-hero-rise mt-7 sm:mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-sm text-ink-body"
             style={{ animationDelay: '280ms' }}
             aria-label="What you get"
           >
@@ -129,13 +129,13 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
           <div className="relative rounded-t-[2.25rem] sm:rounded-t-[1.25rem] border-[6px] sm:border border-b-0 sm:border-b-0 border-[#0f1d22] sm:border-cyan-300/25 ring-1 ring-cyan-300/25 sm:ring-0 bg-[#061014]/95 shadow-[0_-20px_80px_rgba(0,195,255,0.18)] overflow-hidden">
             {/* Phone: a notch. Wider screens: browser chrome. */}
             <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 z-10 h-5 w-20 rounded-full bg-black" aria-hidden="true" />
-            <div className="hidden sm:flex items-center gap-3 px-4 h-10 border-b border-white/[0.06] bg-[#0a161b]">
+            <div className="hidden sm:flex items-center gap-3 px-4 h-10 border-b border-line-subtle bg-surface-2">
               <div className="flex gap-1.5" aria-hidden="true">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]/80" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]/80" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]/80" />
               </div>
-              <div className="mx-auto max-w-[260px] w-full rounded-md bg-white/[0.05] border border-white/[0.06] px-3 py-0.5 text-[11px] text-white/55 text-center truncate">
+              <div className="mx-auto max-w-[260px] w-full rounded-control bg-surface-1 border border-line-subtle px-3 py-0.5 text-[11px] text-ink-muted text-center truncate">
                 moltology.org/dashboard
               </div>
               <div className="w-[42px]" aria-hidden="true" />
