@@ -15,17 +15,17 @@ export function PwaInstallBanner() {
     <div
       role="region"
       aria-label="Install Command Hub"
-      className="pointer-events-auto mx-3 mb-2 sm:mx-4 md:mx-auto md:mb-4 md:w-full md:max-w-md rounded-sm border border-[#00c3ff]/35 bg-[#0a1212] shadow-[0_0_24px_rgba(0,195,255,0.12)]"
+      className="pointer-events-auto mx-3 mb-2 sm:mx-4 md:mx-auto md:mb-4 md:w-full md:max-w-md rounded-card border border-line bg-surface-1 hud-sheen shadow-menu"
     >
       <div className="flex items-start gap-3 p-3 sm:p-3.5">
-        <div className="mt-0.5 shrink-0 text-[#00c3ff]">
+        <div className="mt-0.5 shrink-0 text-cyan-glow">
           <Download className="h-4 w-4" aria-hidden />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="font-grotesk text-xs font-bold uppercase tracking-widest text-[#dfe3e3]">
+          <p className="font-grotesk text-xs font-bold uppercase tracking-[0.08em] text-ink">
             Install Command Hub
           </p>
-          <p className="mt-0.5 text-xs text-[#839493] font-sans leading-snug">
+          <p className="mt-0.5 text-xs text-ink-body font-sans leading-snug">
             Keep the benthic shell on your home screen for faster rites and quieter focus.
           </p>
           <div className="mt-2.5 flex flex-wrap items-center gap-2">
@@ -34,14 +34,14 @@ export function PwaInstallBanner() {
               onClick={() => {
                 void install()
               }}
-              className="px-3 py-1.5 bg-[#00c3ff]/20 hover:bg-[#00c3ff]/30 border border-[#00c3ff]/60 text-[#00c3ff] font-grotesk font-bold text-[10px] uppercase tracking-widest chamfer-corner transition-colors"
+              className="px-3 py-1.5 min-h-8 rounded-control bg-cyan-glow hover:bg-cyan-hover text-abyss font-grotesk font-bold text-[11px] uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               Install
             </button>
             <button
               type="button"
               onClick={dismissBanner}
-              className="px-3 py-1.5 text-[#839493] hover:text-[#dfe3e3] font-grotesk font-bold text-[10px] uppercase tracking-widest transition-colors"
+              className="px-3 py-1.5 min-h-8 rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 font-grotesk font-bold text-[11px] uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               Not now
             </button>
@@ -51,7 +51,7 @@ export function PwaInstallBanner() {
           type="button"
           onClick={dismissBanner}
           aria-label="Dismiss install invitation"
-          className="shrink-0 p-1 text-[#839493] hover:text-[#dfe3e3] transition-colors"
+          className="shrink-0 p-1 rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
           <X className="h-3.5 w-3.5" />
         </button>

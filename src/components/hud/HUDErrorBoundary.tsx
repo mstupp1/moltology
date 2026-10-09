@@ -103,56 +103,56 @@ export function HUDErrorFallback({
   }
 
   return (
-    <div className="min-h-[400px] w-full flex items-center justify-center p-4 sm:p-6 bg-[#090d0e] text-[#dfe3e3] font-sans">
-      <div className="w-full max-w-2xl bg-[#111719] border border-red-500/20 rounded-lg p-6 shadow-xl">
+    <div className="min-h-[400px] w-full flex items-center justify-center p-4 sm:p-6 bg-abyss text-ink font-sans">
+      <div className="w-full max-w-2xl rounded-card border border-line-subtle bg-surface-1 hud-sheen p-6 shadow-menu">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-[#232d30] mb-5">
+        <div className="flex items-center justify-between pb-4 border-b border-line-subtle mb-5">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-red-500" />
-            <span className="text-xs font-semibold text-red-400 uppercase tracking-wider">
+            <span className="w-2 h-2 rounded-full bg-crimson-aggro" />
+            <span className="text-xs font-semibold text-crimson-text uppercase tracking-[0.08em]">
               Application Error
             </span>
           </div>
-          <span className="text-xs font-sans text-[#8a999e] bg-[#0c1011] px-2 py-0.5 rounded border border-[#232d30]">
+          <span className="text-xs font-sans text-ink-muted bg-surface-2 px-2 py-0.5 rounded-chip border border-line-subtle">
             {errorCode}
           </span>
         </div>
 
         {/* Error Info */}
         <div className="flex items-start gap-3.5 mb-5">
-          <div className="p-2.5 rounded-md bg-red-500/10 border border-red-500/20 shrink-0 mt-0.5">
-            <AlertCircle className="w-5 h-5 text-red-400" />
+          <div className="p-2.5 rounded-control bg-crimson-soft border border-crimson-aggro/20 shrink-0 mt-0.5">
+            <AlertCircle className="w-5 h-5 text-crimson-text" />
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-semibold text-[#ffffff] mb-1">
+            <h2 className="text-lg font-semibold text-ink mb-1">
               Something went wrong
             </h2>
-            <p className="text-xs text-[#9ab0b5] leading-relaxed">
+            <p className="text-xs text-ink-body leading-relaxed">
               An unhandled exception occurred during application execution.
             </p>
           </div>
         </div>
 
         {/* Error Message Box */}
-        <div className="p-3.5 mb-5 rounded bg-[#0b0e0f] border border-red-500/20 text-xs font-sans text-red-300 leading-relaxed break-words">
+        <div className="p-3.5 mb-5 rounded-control bg-surface-2 border border-crimson-aggro/20 text-xs font-sans text-crimson-text leading-relaxed break-words">
           {errorMessage}
         </div>
 
         {/* Expandable Stack Trace */}
         {errorStack && (
-          <div className="mb-5 border border-[#232d30] rounded-md overflow-hidden bg-[#090d0e]">
+          <div className="mb-5 border border-line-subtle rounded-card overflow-hidden bg-surface-1">
             <button
               onClick={() => setShowDetails(!showDetails)}
-              className="w-full flex items-center justify-between p-3 text-xs text-[#9ab0b5] hover:text-[#ffffff] bg-[#0d1214] transition-colors"
+              className="w-full flex items-center justify-between p-3 text-xs text-ink-body hover:text-ink bg-surface-2 hover:bg-surface-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow focus-visible:-outline-offset-2"
             >
               <span className="flex items-center gap-2 font-medium">
-                {showDetails ? <ChevronDown className="w-4 h-4 text-[#00c3ff]" /> : <ChevronRight className="w-4 h-4" />}
+                {showDetails ? <ChevronDown className="w-4 h-4 text-cyan-glow" /> : <ChevronRight className="w-4 h-4" />}
                 {showDetails ? 'Hide technical details' : 'Show technical details'}
               </span>
-              <span className="text-[11px] text-[#63757a] font-sans">Stack Trace</span>
+              <span className="text-[11px] text-ink-muted font-sans">Stack Trace</span>
             </button>
             {showDetails && (
-              <pre className="p-4 bg-[#06090a] text-[11px] text-[#88c0d0] font-sans overflow-x-auto max-h-48 border-t border-[#232d30] whitespace-pre-wrap leading-relaxed select-text">
+              <pre className="p-4 bg-abyss text-[11px] text-ink-body font-sans overflow-x-auto max-h-48 border-t border-line-subtle whitespace-pre-wrap leading-relaxed select-text">
                 {errorStack}
               </pre>
             )}
@@ -163,15 +163,15 @@ export function HUDErrorFallback({
         <div className="flex flex-wrap items-center gap-2.5 pt-1">
           <button
             onClick={handleCopy}
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded bg-[#1a2326] hover:bg-[#232d31] text-[#dfe3e3] border border-[#2e3b3f] transition-colors text-xs font-medium"
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong transition-colors text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
-            {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-[#9ab0b5]" />}
+            {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-ink-muted" />}
             {copied ? 'Copied' : 'Copy Error Details'}
           </button>
 
           <button
             onClick={handleReset}
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/30 transition-colors text-xs font-medium"
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-control bg-surface-1 hover:bg-crimson-soft text-crimson-text border border-crimson-aggro/55 hover:border-crimson-aggro transition-colors text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             <RefreshCw className="w-4 h-4" />
             Reload Page
@@ -179,7 +179,7 @@ export function HUDErrorFallback({
 
           <a
             href="/"
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded bg-[#142228] hover:bg-[#1a2b33] text-[#00c3ff] border border-[#00c3ff]/30 transition-colors text-xs font-medium sm:ml-auto"
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-control border border-line bg-surface-1 hud-sheen text-cyan-glow hover:bg-surface-2 hover:border-line-strong transition-colors text-xs font-medium sm:ml-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             <Home className="w-4 h-4" />
             Go to Home

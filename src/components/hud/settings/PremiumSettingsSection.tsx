@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { PremiumBadge } from '@/components/hud/PremiumBadge'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
+import { HudButton } from '@/components/ui/HudButton'
 import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { getAuthJWTToken } from '@/lib/jwt'
@@ -67,45 +68,47 @@ export function PremiumSettingsSection() {
 
   if (!membership) {
     return (
-      <section data-testid="premium-settings" className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl" aria-busy="true">
-        <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase">
+      <section data-testid="premium-settings" className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5" aria-busy="true">
+        <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">
           {PREMIUM_PAGE_COPY.settingsTitle}
         </h2>
-        <p className="text-xs text-[#839493] mt-1">Loading membership.</p>
+        <p className="text-xs text-ink-muted mt-1">Loading membership.</p>
       </section>
     )
   }
 
   return (
-    <section data-testid="premium-settings" className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
+    <section data-testid="premium-settings" className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5 space-y-3">
       <div className="flex flex-wrap items-center gap-2">
-        <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase">
+        <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">
           {PREMIUM_PAGE_COPY.settingsTitle}
         </h2>
         {membership.isPremium ? <PremiumBadge /> : null}
       </div>
-      <p className="text-xs text-[#839493]">{premiumStatusMessage(membership)}</p>
+      <p className="text-xs text-ink-muted">{premiumStatusMessage(membership)}</p>
       {access.canView ? (
         membership.isPremium ? (
-          <button
+          <HudButton
             type="button"
+            variant="danger"
+            size="md"
             onClick={() => void update('cancel')}
             disabled={busy !== null}
-            className="px-4 py-2 border border-[#3a4a49] hover:border-[#00c3ff]/50 text-[#dfe3e3] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40"
           >
             {busy === 'cancel' ? 'Canceling' : PREMIUM_PAGE_COPY.cancel}
-          </button>
+          </HudButton>
         ) : (
           <div className="space-y-2">
-            <p className="text-xs text-[#839493]">{PREMIUM_PAGE_COPY.activateHint}</p>
-            <button
+            <p className="text-xs text-ink-muted">{PREMIUM_PAGE_COPY.activateHint}</p>
+            <HudButton
               type="button"
+              variant="secondary"
+              size="md"
               onClick={() => void update('grant')}
               disabled={busy !== null}
-              className="px-4 py-2 bg-[#00c3ff]/20 hover:bg-[#00c3ff]/30 border border-[#00c3ff]/60 text-[#00c3ff] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40"
             >
               {busy === 'grant' ? 'Activating' : PREMIUM_PAGE_COPY.purchase}
-            </button>
+            </HudButton>
           </div>
         )
       ) : null}

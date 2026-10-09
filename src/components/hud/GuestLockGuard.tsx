@@ -3,6 +3,7 @@ import { Lock, UserPlus, LogIn } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { HudButton } from '@/components/ui/HudButton'
 
 export interface GuestLockGuardProps {
   children: React.ReactNode
@@ -60,47 +61,49 @@ export const GuestLockGuard: React.FC<GuestLockGuardProps> = ({
       </div>
 
       {/* Main Workspace Dimming Overlay & Centered Lock Modal Card (Fixed to Viewport) */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#030708]/85 backdrop-blur-[2px] animate-fadeIn">
-        <div className="w-full max-w-md bg-[#090f12]/95 border border-[#3a4a49] shadow-[0_0_60px_rgba(0,0,0,0.9)] chamfer-corner p-6 sm:p-8 text-center space-y-5 relative overflow-hidden my-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-abyss/80 backdrop-blur-sm animate-fadeIn">
+        <div className="w-full max-w-md rounded-card border border-line bg-surface-1 hud-sheen shadow-menu p-6 sm:p-8 text-center space-y-5 relative overflow-hidden my-auto">
           {/* Top Subtle Crimson Edge Line */}
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#ff453a] to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-crimson-aggro to-transparent" />
 
-          {/* Centered Glowing Lock Icon */}
-          <div className="mx-auto w-16 h-16 rounded-full bg-[#04080a] border border-[#ff453a]/60 text-[#ff5540] flex items-center justify-center shadow-[0_0_25px_rgba(255,69,58,0.35)]">
+          {/* Centered Lock Icon */}
+          <div className="mx-auto w-16 h-16 rounded-full bg-abyss border border-crimson-aggro/60 text-crimson-text flex items-center justify-center">
             <Lock className="w-8 h-8" />
           </div>
 
           {/* Status Badge */}
-          <div className="inline-block px-3 py-1 bg-[#ff453a]/10 border border-[#ff453a]/40 text-[#ff5540] text-[10px] font-bold tracking-widest uppercase chamfer-corner">
+          <div className="inline-block px-3 py-1 rounded-chip bg-crimson-soft border border-crimson-aggro/40 text-crimson-text text-[11px] font-bold tracking-[0.08em] uppercase">
             RESTRICTED ACCESS
           </div>
 
           {/* Header Title & Concise Message */}
           <div className="space-y-2">
-            <h2 className="text-xl sm:text-2xl font-grotesk font-extrabold text-[#dfe3e3] uppercase tracking-wider">
+            <h2 className="text-xl sm:text-2xl font-grotesk font-extrabold text-ink uppercase tracking-wider">
               {displayTitle}
             </h2>
-            <p className="text-xs sm:text-[13px] text-[#839493] leading-relaxed max-w-sm mx-auto font-sans">
+            <p className="text-xs sm:text-[13px] text-ink-body leading-relaxed max-w-sm mx-auto font-sans">
               {displayMessage}
             </p>
           </div>
 
           {/* CTAs: Sign Up Button & Sign In Link */}
           <div className="pt-2 space-y-3">
-            <button
+            <HudButton
               type="button"
+              variant="primary"
+              size="lg"
+              fullWidth
               onClick={() => handleOpenAuth('signup')}
-              className="w-full py-3 px-6 bg-[#ff453a] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs sm:text-sm uppercase tracking-wider chamfer-corner shadow-[0_0_20px_rgba(255,69,58,0.4)] flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer"
+              icon={<UserPlus className="w-4 h-4" />}
             >
-              <UserPlus className="w-4 h-4" />
-              <span>SIGN UP TO UNLOCK</span>
-            </button>
+              SIGN UP TO UNLOCK
+            </HudButton>
 
             <div className="text-center">
               <button
                 type="button"
                 onClick={() => handleOpenAuth('login')}
-                className="text-xs text-[#00c3ff] hover:text-white underline underline-offset-4 tracking-wider uppercase font-sans transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                className="rounded-control text-xs text-cyan-glow hover:text-ink underline underline-offset-4 tracking-wider uppercase font-sans transition-colors cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
                 <LogIn className="w-3.5 h-3.5" />
                 <span>Already have an account? Sign In</span>

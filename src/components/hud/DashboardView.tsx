@@ -47,29 +47,29 @@ export default function DashboardView() {
     <div className="space-y-3.5 sm:space-y-5 font-sans relative">
       {/* Changelog Detail Modal */}
       {activeChangelogModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150">
-          <div className="w-full max-w-2xl bg-[#0b0f0f] border border-[#00ffff]/60 shadow-[0_0_30px_rgba(0,255,255,0.25)] chamfer-corner overflow-hidden font-sans text-sm space-y-4">
-            <div className="bg-[#171c1c] border-b border-[#3a4a49] p-4 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 bg-abyss/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="w-full max-w-2xl rounded-card border border-line bg-surface-1 shadow-menu overflow-hidden font-sans text-sm space-y-4">
+            <div className="bg-surface-2 border-b border-line-subtle p-4 flex items-center justify-between">
               <div className="flex flex-wrap items-center gap-2">
-                <GitCommit className="w-4 h-4 text-[#00ffff]" />
-                <span className="text-xs text-[#00ffff] font-bold tracking-widest uppercase">
+                <GitCommit className="w-4 h-4 text-cyan-glow" />
+                <span className="text-xs text-cyan-glow font-bold tracking-[0.08em] uppercase">
                   RELEASE {activeChangelogModal.version}
                 </span>
-                <span className="text-xs text-[#839493] bg-[#070b0b] px-2 py-0.5 border border-[#3a4a49]">
+                <span className="text-xs text-ink-muted bg-surface-1 px-2 py-0.5 border border-line-subtle rounded-chip">
                   {activeChangelogModal.category}
                 </span>
                 {Array.isArray(activeChangelogModal.tags) &&
                   activeChangelogModal.tags
                     .filter((t) => t.toLowerCase() !== activeChangelogModal.category?.toLowerCase())
                     .map((tag) => (
-                      <span key={tag} className="text-[10px] text-[#00ffff]/80 bg-[#00ffff]/10 px-1.5 py-0.5 border border-[#00ffff]/30">
+                      <span key={tag} className="text-[11px] text-cyan-glow bg-cyan-soft px-1.5 py-0.5 border border-line-subtle rounded-chip">
                         {tag}
                       </span>
                     ))}
               </div>
               <button
                 onClick={() => setActiveChangelogModal(null)}
-                className="text-[#839493] hover:text-[#ff5540] p-1 transition-colors"
+                className="rounded-control text-ink-muted hover:text-crimson-text hover:bg-surface-3 p-1 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 title="Close Modal"
               >
                 <X className="w-5 h-5" />
@@ -77,20 +77,20 @@ export default function DashboardView() {
             </div>
 
             <div className="p-5 space-y-3 max-h-[70vh] overflow-y-auto">
-              <h3 className="font-grotesk text-base sm:text-lg font-bold text-[#dfe3e3] uppercase leading-snug">
+              <h3 className="font-grotesk text-base sm:text-lg font-bold text-ink uppercase leading-snug">
                 {activeChangelogModal.title}
               </h3>
 
-              <p className="text-xs text-[#839493] leading-relaxed border-l-2 border-[#00ffff] pl-3">
+              <p className="text-xs text-ink-muted leading-relaxed border-l-2 border-cyan-glow pl-3">
                 {activeChangelogModal.summary}
               </p>
 
-              <div className="chitin-card-inset p-4 text-xs leading-relaxed text-[#dfe3e3] border border-[#3a4a49]">
+              <div className="rounded-card bg-abyss p-4 text-xs leading-relaxed text-ink-body border border-line-subtle">
                 <NewsArticleBody content={activeChangelogModal.content} />
               </div>
             </div>
 
-            <div className="bg-[#070b0b] border-t border-[#3a4a49] p-3 flex items-center justify-between text-xs text-[#839493]">
+            <div className="bg-surface-2 border-t border-line-subtle p-3 flex items-center justify-between text-xs text-ink-muted">
               <span>
                 RELEASED:{' '}
                 {new Date(activeChangelogModal.releasedAt).toLocaleDateString('en-US', {
@@ -101,7 +101,7 @@ export default function DashboardView() {
               </span>
               <button
                 onClick={() => setActiveChangelogModal(null)}
-                className="px-4 py-1.5 bg-[#0f1414] hover:bg-[#171c1c] border border-[#3a4a49] text-[#dfe3e3] font-bold chamfer-corner transition-colors"
+                className="px-4 py-1.5 rounded-control border border-line bg-surface-1 hud-sheen text-ink font-bold hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
                 CLOSE
               </button>
@@ -142,16 +142,16 @@ export default function DashboardView() {
 
         {/* Right Column (5 cols): System Changelog & Releases */}
         <div className="lg:col-span-5 flex flex-col">
-          <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3 sm:space-y-3.5 h-full flex flex-col justify-between">
+          <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 md:p-5 space-y-3 sm:space-y-3.5 h-full flex flex-col justify-between">
             <div className="space-y-3">
-              <div className="flex items-center justify-between border-b border-[#3a4a49] pb-3">
+              <div className="flex items-center justify-between border-b border-line-subtle pb-3">
                 <div className="flex items-center gap-2">
-                  <GitCommit className="w-4 h-4 text-[#00ffff]" />
+                  <GitCommit className="w-4 h-4 text-cyan-glow" />
                   <div>
-                    <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase">
+                    <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">
                       SYSTEM CHANGELOG
                     </h2>
-                    <p className="text-xs text-[#839493]">
+                    <p className="text-xs text-ink-muted">
                       Protocol updates & release history.
                     </p>
                   </div>
@@ -163,8 +163,8 @@ export default function DashboardView() {
                 <div className="relative space-y-2.5 font-sans py-1">
                   {/* Timeline Vertical Track */}
                   <div className="absolute left-2.5 top-3 bottom-3 w-[2px] -translate-x-1/2 pointer-events-none z-0">
-                    <div className="absolute inset-0 bg-gradient-to-b from-[#00ffff] via-[#00ffff]/40 to-transparent opacity-60 rounded-full" />
-                    <div className="absolute inset-0 bg-[repeating-linear-gradient(to_bottom,transparent,transparent_6px,rgba(0,255,255,0.35)_6px,rgba(0,255,255,0.35)_7px)]" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-cyan-glow via-cyan-glow/40 to-transparent opacity-60 rounded-full" />
+                    <div className="absolute inset-0 bg-[repeating-linear-gradient(to_bottom,transparent,transparent_6px,rgba(0,195,255,0.3)_6px,rgba(0,195,255,0.3)_7px)]" />
                   </div>
 
                   {changelogsList.slice(0, 15).map((item) => (
@@ -175,24 +175,23 @@ export default function DashboardView() {
                     >
                       {/* Timeline Indicator Node */}
                       <div className="absolute left-2.5 top-3.5 -translate-x-1/2 group-hover:scale-125 transition-transform duration-300">
-                        <div className="w-3 h-3 rounded-full bg-[#05080a] border-2 border-[#00ffff] shadow-[0_0_8px_rgba(0,255,255,0.5)] relative flex items-center justify-center">
-                          <div className="w-1 h-1 rounded-full bg-[#00ffff]" />
+                        <div className="w-3 h-3 rounded-full bg-abyss border-2 border-cyan-glow relative flex items-center justify-center">
+                          <div className="w-1 h-1 rounded-full bg-cyan-glow" />
                         </div>
-                        <div className="absolute inset-0 rounded-full bg-[#00ffff]/40 blur-[5px] -z-10" />
                       </div>
 
                       {/* Card Container */}
-                      <div className="chitin-card-inset p-3 border border-[#3a4a49] group-hover:border-[#00ffff]/60 transition-all chamfer-corner space-y-1.5 bg-[#070b0b]/60">
-                        <div className="flex items-center justify-between text-[10px]">
+                      <div className="rounded-card p-3 border border-line-subtle bg-abyss/60 group-hover:bg-surface-2 group-hover:border-line-strong transition-all space-y-1.5">
+                        <div className="flex items-center justify-between text-[11px]">
                           <div className="flex items-center gap-1.5">
-                            <span className="font-bold text-[#00ffff] bg-[#030606] px-1.5 py-0.2 border border-[#00ffff]/40">
+                            <span className="font-bold text-cyan-glow bg-cyan-soft px-1.5 py-0.2 border border-line-subtle rounded-chip">
                               {item.version}
                             </span>
-                            <span className="text-[#839493] bg-[#070b0b] px-1.5 py-0.2 border border-[#3a4a49]">
+                            <span className="text-ink-muted bg-surface-1 px-1.5 py-0.2 border border-line-subtle rounded-chip">
                               {item.category}
                             </span>
                           </div>
-                          <span className="text-[#839493] text-[9px]">
+                          <span className="text-ink-muted text-[11px]">
                             {new Date(item.releasedAt).toLocaleDateString('en-US', {
                               month: 'short',
                               day: '2-digit',
@@ -200,17 +199,17 @@ export default function DashboardView() {
                           </span>
                         </div>
 
-                        <h4 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase line-clamp-1 leading-snug">
+                        <h4 className="font-grotesk text-xs font-bold text-ink group-hover:text-cyan-glow transition-colors uppercase line-clamp-1 leading-snug">
                           {item.title}
                         </h4>
 
-                        <p className="text-[11px] text-[#839493] line-clamp-2 leading-relaxed">
+                        <p className="text-[11px] text-ink-muted line-clamp-2 leading-relaxed">
                           {item.summary}
                         </p>
 
-                        <div className="pt-1 border-t border-[#3a4a49]/40 flex items-center justify-between text-[9px] text-[#839493]">
+                        <div className="pt-1 border-t border-line-subtle flex items-center justify-between text-[11px] text-ink-muted">
                           <span>CLICK TO INSPECT NOTES</span>
-                          <span className="text-[#00ffff] font-bold group-hover:translate-x-0.5 transition-transform flex items-center">
+                          <span className="text-cyan-glow font-bold group-hover:translate-x-0.5 transition-transform flex items-center">
                             <span>VIEW</span>
                             <ChevronRight className="w-2.5 h-2.5" />
                           </span>
@@ -223,21 +222,21 @@ export default function DashboardView() {
             </div>
 
             {/* Bottom Actions */}
-            <div className="pt-2 border-t border-[#3a4a49]/60 space-y-2">
+            <div className="pt-2 border-t border-line-subtle space-y-2">
               <button
                 onClick={() => navigate({ to: '/changelog' })}
-                className="w-full py-1.5 bg-[#070b0b] hover:bg-[#0f1414] border border-[#3a4a49] hover:border-[#00ffff]/60 text-[10px] font-bold font-grotesk text-[#00ffff] uppercase tracking-wider chamfer-corner transition-all flex items-center justify-center gap-1.5"
+                className="w-full py-1.5 rounded-control border border-line bg-surface-1 hud-sheen hover:bg-surface-2 hover:border-line-strong text-[11px] font-bold font-grotesk text-cyan-glow uppercase tracking-[0.08em] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center justify-center gap-1.5"
               >
                 <span>VIEW ALL {changelogsList.length} RELEASES</span>
                 <ExternalLink className="w-3 h-3" />
               </button>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-[#839493] text-[10px]">
+                <span className="text-ink-muted text-[11px]">
                   FULL AUDIT LOGS IN SUPPORT HUB
                 </span>
                 <button
                   onClick={() => navigate({ to: '/support' })}
-                  className="px-3 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 text-[#00ffff] border border-[#00ffff]/50 text-[10px] font-bold chamfer-corner flex items-center gap-1 transition-all"
+                  className="px-3 py-1.5 rounded-control border border-line bg-surface-1 hud-sheen hover:bg-surface-2 hover:border-line-strong text-ink text-[11px] font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center gap-1 transition-all"
                 >
                   <span>SUPPORT HUB</span>
                   <ExternalLink className="w-3 h-3" />

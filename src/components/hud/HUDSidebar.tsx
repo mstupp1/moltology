@@ -511,7 +511,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
       if (!isMobile && isCollapsed) {
         return (
-          <div key={group.id} className={groupIdx > 0 ? 'border-t border-[#1e2d37]/80 pt-1' : ''}>
+          <div key={group.id} className={groupIdx > 0 ? 'border-t border-line-subtle pt-1' : ''}>
             {group.items.map((item) => {
               const Icon = item.icon
               const isActive =
@@ -527,31 +527,31 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   onFocus={() => handlePrefetch(item.path)}
                   data-hidden={hidden ? 'true' : undefined}
                   title={hidden ? 'Hidden page' : undefined}
-                  className={`w-full text-left relative flex flex-col items-center justify-center py-2 px-1 gap-1 transition-colors duration-150 group/navitem cursor-pointer ${
+                  className={`w-full text-left relative flex flex-col items-center justify-center py-2 px-1 gap-1 transition-colors duration-150 group/navitem cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
                     isActive
-                      ? 'bg-[#ff3b30]/10'
-                      : 'bg-transparent hover:bg-white/[0.04]'
+                      ? 'bg-surface-2'
+                      : 'bg-transparent hover:bg-surface-2'
                   }`}
                 >
 
 
                   {isActive && (
-                    <div className={`absolute left-0 top-0 bottom-0 w-[3px] bg-[#ff3b30] shadow-[0_0_8px_rgba(255,59,48,0.6)] ${hidden ? 'opacity-45' : ''}`} />
+                    <div className={`absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-glow ${hidden ? 'opacity-45' : ''}`} />
                   )}
 
                   <Icon
                     className={`w-4 h-4 shrink-0 ${hidden ? 'opacity-40' : ''} ${
                       isActive
-                        ? 'text-[#ff5555]'
-                        : 'text-[#7a8e9e] group-hover/navitem:text-[#dfe3e3] transition-colors duration-150'
+                        ? 'text-cyan-glow'
+                        : 'text-ink-muted group-hover/navitem:text-ink transition-colors duration-150'
                     }`}
                   />
 
                   <span
-                    className={`inline-flex items-center justify-center gap-0.5 text-[8.5px] font-sans font-bold tracking-wider uppercase leading-none text-center max-w-[62px] transition-colors duration-150 ${
+                    className={`inline-flex items-center justify-center gap-0.5 text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center max-w-[64px] transition-colors duration-150 ${
                       isActive
-                        ? 'text-[#ff5555]'
-                        : 'text-[#7a8e9e] group-hover/navitem:text-[#dfe3e3]'
+                        ? 'text-ink'
+                        : 'text-ink-muted group-hover/navitem:text-ink'
                     }`}
                   >
                     <span className={`truncate ${hidden ? 'opacity-40' : ''}`}>
@@ -561,7 +561,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       <EyeOff
                         data-testid="hidden-page-icon"
                         aria-hidden
-                        className="w-2.5 h-2.5 shrink-0 text-[#8aa0b0]"
+                        className="w-2.5 h-2.5 shrink-0 text-ink-muted"
                       />
                     )}
                   </span>
@@ -569,9 +569,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
                   {/* Clean Floating Tooltip */}
                   <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/navitem:opacity-100 transition-opacity duration-150">
-                    <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-sans font-bold shadow-lg whitespace-nowrap flex items-center gap-2 chamfer-corner">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff]" />
-                      <span className="tracking-wider uppercase">
+                    <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1.5 text-xs font-sans font-bold shadow-menu whitespace-nowrap flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow" />
+                      <span className="tracking-[0.08em] uppercase">
                         {item.label}
                         {hidden ? ' · Hidden' : ''}
                       </span>
@@ -585,21 +585,21 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       }
 
       return (
-        <div key={group.id} className="border-b border-[#1e2d37]/80">
+        <div key={group.id} className="border-b border-line-subtle">
           <button
             onClick={() => toggleGroup(group.id)}
             className={`w-full flex items-center justify-between ${
               isMobile ? 'px-4 py-3' : 'px-3.5 py-2'
-            } bg-[#091014] hover:bg-[#0e171d] border-b border-[#1e2d37]/50 text-left transition-colors duration-150 group/groupheader cursor-pointer select-none`}
+            } bg-surface-1 hover:bg-surface-2 border-b border-line-subtle text-left transition-colors duration-150 group/groupheader cursor-pointer select-none focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow`}
           >
             <div className="flex items-center gap-2 min-w-0">
               {isGroupActive && !isOpen && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#ff3b30] shadow-[0_0_8px_rgba(255,59,48,0.9)] shrink-0 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow shrink-0 animate-pulse" />
               )}
               <span
                 className={`font-sans ${
-                  isMobile ? 'text-xs' : 'text-[10px]'
-                } font-bold text-[#00c3ff]/80 group-hover/groupheader:text-[#00c3ff] tracking-wider uppercase truncate transition-colors duration-150`}
+                  isMobile ? 'text-xs' : 'text-[11px]'
+                } font-bold text-ink-muted group-hover/groupheader:text-ink tracking-[0.08em] uppercase truncate transition-colors duration-150`}
               >
                 {group.title}
               </span>
@@ -609,7 +609,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 className={`${
                   isMobile ? 'w-4 h-4' : 'w-3.5 h-3.5'
                 } transition-transform duration-200 ease-in-out ${
-                  isOpen ? 'rotate-90 text-[#00c3ff]' : 'rotate-0 text-[#566878] group-hover/groupheader:text-[#00c3ff]'
+                  isOpen ? 'rotate-90 text-ink' : 'rotate-0 text-ink-muted group-hover/groupheader:text-ink'
                 }`}
               />
             </div>
@@ -623,7 +623,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 : 'grid-rows-[0fr] opacity-0 pointer-events-none'
             }`}
           >
-            <div className="overflow-hidden divide-y divide-[#1e2d37]/40 bg-[#080d10]">
+            <div className="overflow-hidden divide-y divide-line-subtle bg-surface-1">
               {group.items.map((item) => {
                 const Icon = item.icon
                 const isActive =
@@ -641,23 +641,23 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     title={hidden ? 'Hidden page' : undefined}
                     className={`w-full text-left relative flex items-center min-h-[44px] transition-colors duration-150 group/navitem ${
                       isMobile ? 'px-5 py-3 gap-3.5' : 'px-4 py-2.5 pl-5 gap-3'
-                    } cursor-pointer ${
+                    } cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
                       isActive
-                        ? 'bg-[#ff3b30]/10'
-                        : 'bg-transparent hover:bg-white/[0.04]'
+                        ? 'bg-surface-2'
+                        : 'bg-transparent hover:bg-surface-2'
                     }`}
                   >
 
 
                     {isActive && (
-                      <div className={`absolute left-0 top-0 bottom-0 w-[3px] bg-[#ff3b30] shadow-[0_0_8px_rgba(255,59,48,0.6)] ${hidden ? 'opacity-45' : ''}`} />
+                      <div className={`absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-glow ${hidden ? 'opacity-45' : ''}`} />
                     )}
 
                     <Icon
                       className={`${isMobile ? 'w-4.5 h-4.5' : 'w-4 h-4'} shrink-0 ${hidden ? 'opacity-40' : ''} ${
                         isActive
-                          ? 'text-[#ff5555]'
-                          : 'text-[#7a8e9e] group-hover/navitem:text-[#dfe3e3] transition-colors duration-150'
+                          ? 'text-cyan-glow'
+                          : 'text-ink-muted group-hover/navitem:text-ink transition-colors duration-150'
                       }`}
                     />
 
@@ -667,8 +667,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                           isMobile ? 'text-xs md:text-sm' : 'text-xs md:text-[12.5px]'
                         } font-sans font-medium tracking-wide uppercase leading-tight transition-colors duration-150 ${
                           isActive
-                            ? 'text-white font-semibold'
-                            : 'text-[#9eb0c0] group-hover/navitem:text-[#dfe3e3]'
+                            ? 'text-ink font-semibold'
+                            : 'text-ink-body group-hover/navitem:text-ink'
                         }`}
                       >
                         {item.label}
@@ -679,13 +679,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       <EyeOff
                         data-testid="hidden-page-icon"
                         aria-hidden
-                        className="w-3.5 h-3.5 text-[#8aa0b0] shrink-0"
+                        className="w-3.5 h-3.5 text-ink-muted shrink-0"
                       />
                     )}
                     {hidden && <span className="sr-only">Hidden</span>}
 
                     {!isSessionPending && !user?.id && GUEST_LOCKED_PATHS.has(item.path) && (
-                      <Lock className="w-3.5 h-3.5 text-[#ff5540]/80 shrink-0 ml-auto" />
+                      <Lock className="w-3.5 h-3.5 text-crimson-text/80 shrink-0 ml-auto" />
                     )}
                   </button>
                 )
@@ -712,12 +712,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         suppressHydrationWarning
         className={`w-full ${
           isCollapsed ? 'md:w-[72px]' : 'md:w-72'
-        } h-auto md:h-full md:min-h-0 md:max-h-full bg-[#060a0b] border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none relative z-40 md:z-50 shrink-0 shadow-2xl ${
+        } h-auto md:h-full md:min-h-0 md:max-h-full bg-surface-1 border-b md:border-b-0 md:border-r border-line-subtle flex flex-col select-none relative z-40 md:z-50 shrink-0 shadow-2xl ${
           isMounted ? 'transition-all duration-300 ease-in-out' : ''
         } group/sidebar overflow-visible`}
       >
         {/* Mobile Top Bar (Transitions between HeaderBrand and Progress Bar when hamburger menu is toggled) */}
-        <div className="flex md:hidden items-center justify-between gap-2 px-2.5 py-2 h-14 bg-[#060a0b] border-b border-[#3a4a49]/65 relative z-50 shrink-0 overflow-hidden">
+        <div className="flex md:hidden items-center justify-between gap-2 px-2.5 py-2 h-14 bg-surface-1 border-b border-line-subtle relative z-50 shrink-0 overflow-hidden">
           {/* HUD scanline overlay in mobile header */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
             <div
@@ -769,10 +769,10 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               aria-label={isMobileHeaderOpen ? 'Close HUD Menu' : 'Open HUD Menu'}
               aria-expanded={isMobileHeaderOpen}
               title={isMobileHeaderOpen ? 'Close HUD Menu' : 'Open HUD Menu'}
-              className={`w-9 h-9 flex items-center justify-center rounded-lg border transition-all duration-300 active:scale-95 focus:outline-none focus:ring-2 shrink-0 cursor-pointer ${
+              className={`w-9 h-9 flex items-center justify-center rounded-control border transition-all duration-300 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow shrink-0 cursor-pointer ${
                 isMobileHeaderOpen
-                  ? 'bg-red-950/50 border-red-800/80 text-red-400 hover:bg-red-900/60 focus:ring-red-500/50'
-                  : 'bg-[#080d0e]/90 border-cyan-800/80 text-cyan-300 hover:bg-cyan-900/60 focus:ring-cyan-500/50'
+                  ? 'bg-surface-2 border-line-strong text-ink hover:bg-surface-3'
+                  : 'bg-surface-1 border-line text-cyan-glow hover:bg-surface-2 hover:border-line-strong'
               }`}
             >
               <AnimatedHamburger isOpen={isMobileHeaderOpen} />
@@ -782,7 +782,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
         {/* Desktop Header Logo */}
         <div
-          className={`hidden md:flex items-center shrink-0 relative group/brand border-b border-[#1e2d37]/60 h-16 overflow-visible ${
+          className={`hidden md:flex items-center shrink-0 relative group/brand border-b border-line-subtle h-16 overflow-visible ${
             isMounted ? 'transition-all duration-300' : ''
           } ${
             isCollapsed ? 'justify-center px-2' : 'justify-start px-3'
@@ -797,9 +797,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           {/* Brand Tooltip when collapsed */}
           {isCollapsed && (
             <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/brand:opacity-100 transition-all duration-200">
-              <div className="bg-[#060a0b] border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1 text-xs font-sans font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner">
-                <span className="text-[#00c3ff] drop-shadow-[0_0_8px_rgba(0,195,255,0.6)]">THE SYNAPTIC PATH</span>
-                <span className="block text-[9px] text-[#7a8e9e] font-sans">BENTHIC CORE • Click or drag edge to expand (⌘B)</span>
+              <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1 text-xs font-sans font-bold shadow-menu whitespace-nowrap">
+                <span className="text-cyan-glow">THE SYNAPTIC PATH</span>
+                <span className="block text-[11px] text-ink-muted font-sans">BENTHIC CORE • Click or drag edge to expand (⌘B)</span>
               </div>
             </div>
           )}
@@ -819,14 +819,14 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               toggleCollapse()
             }
           }}
-          className="hidden md:block absolute top-0 bottom-0 -right-1.5 w-3 z-50 cursor-col-resize select-none group/rail transition-colors"
+          className="hidden md:block absolute top-0 bottom-0 -right-1.5 w-3 z-50 cursor-col-resize select-none group/rail transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow"
         >
           {/* Glowing Vertical Cyber Rail Line */}
           <div
             className={`absolute top-0 bottom-0 left-[5px] w-[2px] transition-all duration-200 ${
               isDragging
-                ? 'bg-[#00c3ff] shadow-[0_0_10px_rgba(0,195,255,0.9)] opacity-100'
-                : 'bg-transparent group-hover/rail:bg-[#00c3ff]/80 group-hover/rail:shadow-[0_0_8px_rgba(0,195,255,0.7)] opacity-0 group-hover/rail:opacity-100'
+                ? 'bg-cyan-glow shadow-[0_0_10px_rgba(0,195,255,0.9)] opacity-100'
+                : 'bg-transparent group-hover/rail:bg-cyan-glow/80 opacity-0 group-hover/rail:opacity-100'
             }`}
           />
         </div>
@@ -834,23 +834,23 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         {/* Desktop Sidebar Navigation Container */}
         <div className="hidden md:flex flex-1 flex-col justify-between space-y-0 overflow-visible min-h-0">
           {/* Search Bar — full width, above nav */}
-          <div className="shrink-0 border-b border-[#1e2d37]/80">
+          <div className="shrink-0 border-b border-line-subtle">
             <button
               onClick={handleOpenCommandPalette}
-              className={`w-full flex items-center justify-between px-4 py-3 bg-[#080d10] hover:bg-[#0d1415] text-xs font-sans text-[#839493] hover:text-[#dfe3e3] transition-all group ${
+              className={`w-full flex items-center justify-between px-4 py-3 bg-surface-1 hover:bg-surface-2 text-xs font-sans text-ink-muted hover:text-ink transition-all group focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
                 isCollapsed ? 'justify-center px-0' : ''
               }`}
               title="Search commands & protocols (⌘K)"
             >
               {isCollapsed ? (
-                <Search className="w-4 h-4 text-[#00c3ff] group-hover:scale-110 transition-transform mx-auto" />
+                <Search className="w-4 h-4 text-cyan-glow group-hover:scale-110 transition-transform mx-auto" />
               ) : (
                 <>
                   <div className="flex items-center gap-2 truncate">
-                    <Search className="w-3.5 h-3.5 text-[#00c3ff] group-hover:scale-110 transition-transform shrink-0" />
+                    <Search className="w-3.5 h-3.5 text-cyan-glow group-hover:scale-110 transition-transform shrink-0" />
                     <span className="truncate">Search commands & protocols...</span>
                   </div>
-                  <div className="flex items-center gap-0.5 bg-[#0f1414] border border-[#3a4a49] text-[#00c3ff] px-1.5 py-0.5 text-[10px] font-bold shrink-0 ml-2">
+                  <div className="flex items-center gap-0.5 rounded-chip bg-surface-2 border border-line text-ink-muted px-1.5 py-0.5 text-[11px] font-bold shrink-0 ml-2">
                     <Command className="w-3 h-3" />
                     <span>K</span>
                   </div>
@@ -860,46 +860,46 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           </div>
 
           {/* Desktop Navigation Items List */}
-          <nav className="flex-1 divide-y divide-[#1e2d37]/80 bg-[#080d10] overflow-y-auto overflow-x-hidden min-h-0 overscroll-y-contain">
+          <nav className="flex-1 divide-y divide-line-subtle bg-surface-1 overflow-y-auto overflow-x-hidden min-h-0 overscroll-y-contain">
             {renderNavGroupContent(false)}
           </nav>
 
           {/* Desktop Bottom Controls: Help & Profile/Auth */}
-          <div className="mt-auto shrink-0 border-t border-[#1e2d37]/80 divide-y divide-[#1e2d37]/60 bg-[#060a0b] relative z-40 overflow-visible">
+          <div className="mt-auto shrink-0 border-t border-line-subtle divide-y divide-line-subtle bg-surface-1 relative z-40 overflow-visible">
             {/* Desktop Bottom Controls: Help & Support + User Avatar / Auth */}
             {isCollapsed ? (
-              <div className="flex flex-col divide-y divide-[#1e2d37]/80 relative overflow-visible">
+              <div className="flex flex-col divide-y divide-line-subtle relative overflow-visible">
                 {/* Help & Support Nav Item (Stacked on Top) */}
                 <div
                   className={`relative transition-colors duration-150 overflow-visible ${
                     currentRoute === '/support'
-                      ? 'bg-[#00c3ff]/10'
-                      : 'bg-[#080d10] hover:bg-white/[0.04]'
+                      ? 'bg-surface-2'
+                      : 'bg-surface-1 hover:bg-surface-2'
                   }`}
                 >
                   <button
                     onClick={() => handleNavClick('/support')}
                     onMouseEnter={() => handlePrefetch('/support')}
                     onFocus={() => handlePrefetch('/support')}
-                    className="w-full text-left relative flex flex-col items-center justify-center py-2 px-1 gap-1 transition-colors duration-150 group/help cursor-pointer"
+                    className="w-full text-left relative flex flex-col items-center justify-center py-2 px-1 gap-1 transition-colors duration-150 group/help cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
                   >
                     {currentRoute === '/support' && (
-                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00c3ff] shadow-[0_0_8px_rgba(0,195,255,0.6)]" />
+                      <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-glow" />
                     )}
 
                     <LifeBuoy
                       className={`w-4 h-4 shrink-0 transition-colors duration-150 ${
                         currentRoute === '/support'
-                          ? 'text-[#00ffff]'
-                          : 'text-[#7a8e9e] group-hover/help:text-[#dfe3e3]'
+                          ? 'text-cyan-glow'
+                          : 'text-ink-muted group-hover/help:text-ink'
                       }`}
                     />
 
                     <span
-                      className={`text-[8.5px] font-sans font-bold tracking-wider uppercase leading-none text-center truncate max-w-[62px] transition-colors duration-150 ${
+                      className={`text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center truncate max-w-[64px] transition-colors duration-150 ${
                         currentRoute === '/support'
-                          ? 'text-[#00ffff]'
-                          : 'text-[#7a8e9e] group-hover/help:text-[#dfe3e3]'
+                          ? 'text-cyan-glow'
+                          : 'text-ink-muted group-hover/help:text-ink'
                       }`}
                     >
                       SUPPORT
@@ -907,9 +907,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
                     {/* Tooltip */}
                     <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/help:opacity-100 transition-opacity duration-150">
-                      <div className="bg-[#060a0b] border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-sans font-bold shadow-lg whitespace-nowrap flex items-center gap-2 chamfer-corner">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff]" />
-                        <span className="tracking-wider uppercase">
+                      <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1.5 text-xs font-sans font-bold shadow-menu whitespace-nowrap flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow" />
+                        <span className="tracking-[0.08em] uppercase">
                           HELP &amp; SUPPORT
                         </span>
                       </div>
@@ -918,7 +918,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 </div>
 
                 {/* User Avatar Menu / Auth Button (Stacked on Bottom) */}
-                <div className="bg-[#080d10] py-2 px-1 flex items-center justify-center relative overflow-visible">
+                <div className="bg-surface-1 py-2 px-1 flex items-center justify-center relative overflow-visible">
                   {isSessionPending ? (
                     <div className="flex items-center justify-center p-1" data-testid="sidebar-auth-skeleton">
                       <HudGhostSkeleton variant="neutral" preset="avatar" width={28} height={28} />
@@ -926,7 +926,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   ) : !user ? (
                     <div className="relative group/auth flex justify-center overflow-visible">
                       <BenthicCTAButton
-                        variant="red"
+                        variant="cyan"
                         size="sm"
                         onClick={() => setIsAuthModalOpen(true)}
                         className="!px-2.5 !py-1.5 flex items-center justify-center active:scale-95"
@@ -938,9 +938,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       </BenthicCTAButton>
                       {/* Tooltip */}
                       <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/auth:opacity-100 transition-opacity duration-150">
-                        <div className="bg-[#060a0b] border border-[#ff3b30]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-sans font-bold shadow-lg whitespace-nowrap flex items-center gap-2 chamfer-corner">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#ff3b30]" />
-                          <span className="tracking-wider uppercase">SIGN UP</span>
+                        <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1.5 text-xs font-sans font-bold shadow-menu whitespace-nowrap flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow" />
+                          <span className="tracking-[0.08em] uppercase">SIGN UP</span>
                         </div>
                       </div>
                     </div>
@@ -961,10 +961,10 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             ) : (
               /* Combined Row: Help & Support + User Avatar / Auth (Expanded) */
               <div
-                className={`flex items-center justify-between relative border-t border-[#1e2d37]/80 transition-colors duration-150 overflow-visible ${
+                className={`flex items-center justify-between relative border-t border-line-subtle transition-colors duration-150 overflow-visible ${
                   currentRoute === '/support'
-                    ? 'bg-[#00c3ff]/10'
-                    : 'bg-[#080d10] hover:bg-white/[0.04]'
+                    ? 'bg-surface-2'
+                    : 'bg-surface-1 hover:bg-surface-2'
                 }`}
               >
                 {/* Help & Support Nav Item */}
@@ -972,26 +972,26 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   onClick={() => handleNavClick('/support')}
                   onMouseEnter={() => handlePrefetch('/support')}
                   onFocus={() => handlePrefetch('/support')}
-                  className="flex-1 text-left relative flex items-center px-4 py-2.5 pl-5 gap-3 transition-colors duration-150 group/help cursor-pointer"
+                  className="flex-1 text-left relative flex items-center px-4 py-2.5 pl-5 gap-3 transition-colors duration-150 group/help cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
                   title={SUPPORT_PAGE_COPY.pageTitle}
                 >
                   {currentRoute === '/support' && (
-                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00c3ff] shadow-[0_0_8px_rgba(0,195,255,0.6)]" />
+                    <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-glow" />
                   )}
 
                   <LifeBuoy
                     className={`w-4 h-4 shrink-0 transition-colors duration-150 ${
                       currentRoute === '/support'
-                        ? 'text-[#00ffff]'
-                        : 'text-[#7a8e9e] group-hover/help:text-[#dfe3e3]'
+                        ? 'text-cyan-glow'
+                        : 'text-ink-muted group-hover/help:text-ink'
                     }`}
                   />
 
                   <span
                     className={`text-xs md:text-[12.5px] font-sans font-medium tracking-wide uppercase leading-tight transition-colors duration-150 ${
                       currentRoute === '/support'
-                        ? 'text-white font-semibold'
-                        : 'text-[#9eb0c0] group-hover/help:text-[#dfe3e3]'
+                        ? 'text-ink font-semibold'
+                        : 'text-ink-body group-hover/help:text-ink'
                     }`}
                   >
                     HELP &amp; SUPPORT
@@ -1006,7 +1006,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     </div>
                   ) : !user ? (
                     <BenthicCTAButton
-                      variant="red"
+                      variant="cyan"
                       size="sm"
                       onClick={() => setIsAuthModalOpen(true)}
                       className="!px-2.5 !py-1"
@@ -1044,26 +1044,26 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             role="dialog"
             aria-modal="true"
             aria-label="Navigation Menu"
-            className={`md:hidden fixed inset-x-0 bottom-0 top-14 z-[99990] w-screen h-[calc(100dvh-3.5rem)] bg-[#030708] flex flex-col font-sans text-[#dfe3e3] select-none overflow-hidden transition-all duration-250 ease-out ${
+            className={`md:hidden fixed inset-x-0 bottom-0 top-14 z-[99990] w-screen h-[calc(100dvh-3.5rem)] bg-abyss flex flex-col font-sans text-ink select-none overflow-hidden transition-all duration-250 ease-out ${
               isMobileVisible && !isMobileClosing
                 ? 'opacity-100 translate-y-0'
                 : 'opacity-0 -translate-y-2 pointer-events-none'
             }`}
           >
             {/* Search Bar (Click opens Command Palette & closes mobile menu) */}
-            <div className="shrink-0 border-b border-[#1e2d37]/80 bg-[#080d10]">
+            <div className="shrink-0 border-b border-line-subtle bg-surface-1">
               <button
                 onClick={() => {
                   closeMobileMenu(() => handleOpenCommandPalette())
                 }}
-                className="w-full flex items-center justify-between px-4 py-3 text-xs font-sans text-[#839493] hover:text-[#dfe3e3] transition-all group active:bg-[#0e1618]"
+                className="w-full flex items-center justify-between px-4 py-3 text-xs font-sans text-ink-muted hover:text-ink transition-all group active:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
                 title="Search commands & protocols (⌘K)"
               >
                 <div className="flex items-center gap-2.5 truncate">
-                  <Search className="w-4 h-4 text-[#00c3ff] shrink-0" />
-                  <span className="truncate text-xs font-sans text-[#a8b8b8]">Search commands & protocols...</span>
+                  <Search className="w-4 h-4 text-cyan-glow shrink-0" />
+                  <span className="truncate text-xs font-sans text-ink-body">Search commands & protocols...</span>
                 </div>
-                <div className="flex items-center gap-0.5 bg-[#0f1414] border border-[#3a4a49] text-[#00c3ff] px-2 py-0.5 text-[10px] font-bold shrink-0 ml-2">
+                <div className="flex items-center gap-0.5 rounded-chip bg-surface-2 border border-line text-ink-muted px-2 py-0.5 text-[11px] font-bold shrink-0 ml-2">
                   <Command className="w-3 h-3" />
                   <span>K</span>
                 </div>
@@ -1071,44 +1071,44 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             </div>
 
             {/* Full-Screen Scrollable Navigation Groups List */}
-            <nav className="flex-1 divide-y divide-[#1e2d37]/80 bg-[#080d10] overflow-y-auto overflow-x-hidden min-h-0 overscroll-contain">
+            <nav className="flex-1 divide-y divide-line-subtle bg-surface-1 overflow-y-auto overflow-x-hidden min-h-0 overscroll-contain">
               {renderNavGroupContent(true)}
             </nav>
 
             {/* Mobile Bottom Controls: Help & Support + Operative Account / Auth */}
-            <div className="mt-auto shrink-0 border-t border-[#1e2d37]/80 divide-y divide-[#1e2d37]/60 bg-[#060a0b] pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+            <div className="mt-auto shrink-0 border-t border-line-subtle divide-y divide-line-subtle bg-surface-1 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
               {/* Help & Support Nav Item (Full width row) */}
               <div
                 className={`transition-colors duration-150 ${
                   currentRoute === '/support'
-                    ? 'bg-[#00c3ff]/10'
-                    : 'bg-[#060a0b] hover:bg-white/[0.04]'
+                    ? 'bg-surface-2'
+                    : 'bg-surface-1 hover:bg-surface-2'
                 }`}
               >
                 <button
                   onClick={() => handleNavClick('/support')}
                   onMouseEnter={() => handlePrefetch('/support')}
                   onFocus={() => handlePrefetch('/support')}
-                  className="w-full text-left relative flex items-center transition-colors duration-150 group/help cursor-pointer px-4 py-2.5 pl-5 gap-3"
+                  className="w-full text-left relative flex items-center transition-colors duration-150 group/help cursor-pointer px-4 py-2.5 pl-5 gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
                   title={SUPPORT_PAGE_COPY.pageTitle}
                 >
                   {currentRoute === '/support' && (
-                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00c3ff] shadow-[0_0_8px_rgba(0,195,255,0.6)]" />
+                    <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-glow" />
                   )}
 
                   <LifeBuoy
                     className={`w-4 h-4 shrink-0 transition-colors duration-150 ${
                       currentRoute === '/support'
-                        ? 'text-[#00ffff]'
-                        : 'text-[#7a8e9e] group-hover/help:text-[#dfe3e3]'
+                        ? 'text-cyan-glow'
+                        : 'text-ink-muted group-hover/help:text-ink'
                     }`}
                   />
 
                   <span
                     className={`text-xs md:text-[12.5px] font-sans font-medium tracking-wide uppercase leading-tight transition-colors duration-150 ${
                       currentRoute === '/support'
-                        ? 'text-white font-semibold'
-                        : 'text-[#9eb0c0] group-hover/help:text-[#dfe3e3]'
+                        ? 'text-ink font-semibold'
+                        : 'text-ink-body group-hover/help:text-ink'
                     }`}
                   >
                     HELP &amp; SUPPORT
@@ -1117,7 +1117,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               </div>
 
               {/* Dedicated Operative Account / Auth Separate Row (matching homepage mobile header pattern) */}
-              <div className="p-3 bg-[#060a0b]">
+              <div className="p-3 bg-surface-1">
                 {isSessionPending ? (
                   <div className="flex items-center justify-center py-2" data-testid="mobile-sidebar-auth-skeleton">
                     <HudGhostSkeleton variant="neutral" preset="avatar" width={32} height={32} />
@@ -1132,7 +1132,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   />
                 ) : (
                   <BenthicCTAButton
-                    variant="red"
+                    variant="cyan"
                     size="md"
                     fullWidth
                     onClick={() => {

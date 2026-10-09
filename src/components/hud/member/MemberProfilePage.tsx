@@ -118,10 +118,10 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
   if (error || !profile) {
     return (
       <div className="space-y-3.5 sm:space-y-5 font-sans relative">
-        <div className="chitin-card p-5 chamfer-corner border border-[#ff453a]/40 text-[#ff453a]">
-          <h1 className="font-grotesk text-sm font-bold uppercase tracking-wider">Profile unavailable</h1>
-          <p className="text-xs mt-2 text-[#839493]">{error || 'Member not found.'}</p>
-          <Link to="/connections" className="inline-block mt-4 text-xs text-[#00c3ff] underline">
+        <div className="rounded-card p-5 border border-crimson-aggro/40 bg-surface-crimson hud-sheen text-crimson-text">
+          <h1 className="font-grotesk text-sm font-bold uppercase tracking-[0.08em]">Profile unavailable</h1>
+          <p className="text-xs mt-2 text-ink-muted">{error || 'Member not found.'}</p>
+          <Link to="/connections" className="inline-block mt-4 text-xs text-cyan-glow underline rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
             Back to Connections
           </Link>
         </div>
@@ -137,7 +137,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
 
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans relative">
-      <div className="relative overflow-hidden rounded-sm border border-[#3a4a49] border-l-4 border-l-[#00c3ff] bg-gradient-to-br from-[#0a1214] via-[#071012] to-[#050808] p-4 sm:p-5 shadow-2xl chamfer-corner">
+      <div className="relative overflow-hidden rounded-card border border-line-subtle border-l-2 border-l-cyan-glow bg-gradient-to-br from-[#0a1214] via-[#071012] to-[#050808] hud-sheen p-4 sm:p-5 shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center">
           <LobsterAvatarPortrait
             config={effectiveAvatarConfig}
@@ -149,37 +149,37 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
           />
           <div className="min-w-0 flex-1 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="font-grotesk text-lg sm:text-xl font-bold text-[#dfe3e3] tracking-wider uppercase truncate">
+              <h1 className="font-grotesk text-lg sm:text-xl font-bold text-ink tracking-wider uppercase truncate">
                 {profile.displayName}
               </h1>
-              <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border border-[#00c3ff]/40 text-[#00c3ff] bg-[#00c3ff]/10 chamfer-corner">
+              <span className="px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] border border-cyan-glow/40 text-cyan-glow bg-cyan-soft rounded-chip">
                 Stage {profile.stage} · {profile.stageLabel}
               </span>
               {profile.isPremium ? <PremiumBadge /> : null}
             </div>
             {profile.handle && profile.displayName !== profile.larvaId && (
-              <p className="text-xs text-[#839493] font-mono tracking-wider">
+              <p className="text-xs text-ink-muted font-mono tracking-wider">
                 {profile.larvaId}
               </p>
             )}
-            <p className="text-xs text-[#839493] flex items-center gap-1.5">
+            <p className="text-xs text-ink-muted flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" />
               Member since {memberSinceLabel}
             </p>
             {profile.bio && (
-              <p className="text-sm text-[#9aa8a7] leading-relaxed">{profile.bio}</p>
+              <p className="text-sm text-ink-body leading-relaxed">{profile.bio}</p>
             )}
             {profile.joinStory && (
               profile.referredBy ? (
                 <Link
                   to="/member/$profileId"
                   params={{ profileId: profile.referredBy.handle || profile.referredBy.id }}
-                  className="inline-block text-xs text-[#00c3ff] hover:underline"
+                  className="inline-block text-xs text-cyan-glow hover:underline rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   {profile.joinStory}
                 </Link>
               ) : (
-                <p className="text-xs text-[#839493]">{profile.joinStory}</p>
+                <p className="text-xs text-ink-muted">{profile.joinStory}</p>
               )
             )}
             {(profile.traits ?? []).length > 0 && (
@@ -187,7 +187,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
                 {(profile.traits ?? []).map((trait) => (
                   <li
                     key={trait.id}
-                    className="px-2 py-0.5 text-[10px] font-medium tracking-wide text-[#dfe3e3] border border-[#3a4a49] bg-[#0d1819] chamfer-corner"
+                    className="px-2 py-0.5 text-[11px] font-medium tracking-wide text-ink border border-line-subtle bg-surface-2 rounded-chip"
                   >
                     {trait.label}
                   </li>
@@ -201,7 +201,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
                     <Link
                       to="/member/$profileId"
                       params={{ profileId: bond.memberHandle || bond.memberId }}
-                      className="text-xs text-[#839493] hover:text-[#00c3ff] hover:underline"
+                      className="text-xs text-ink-muted hover:text-cyan-glow hover:underline rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     >
                       {bond.label}
                     </Link>
@@ -232,23 +232,23 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 sm:gap-5">
-        <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
-          <div className="border-b border-[#3a4a49] pb-3">
-            <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase flex items-center gap-2">
-              <Shield className="w-4 h-4 text-[#00c3ff]" />
+        <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5 space-y-3">
+          <div className="border-b border-line-subtle pb-3">
+            <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
+              <Shield className="w-4 h-4 text-cyan-glow" />
               Biometrics
             </h2>
-            <p className="text-xs text-[#839493] mt-0.5">Public chassis readings.</p>
+            <p className="text-xs text-ink-muted mt-0.5">Public chassis readings.</p>
           </div>
           {profile.stats ? (
             <ul className="space-y-2">
               {STAT_ROWS.map(({ key, label }) => (
                 <li
                   key={key}
-                  className="flex items-center justify-between gap-3 border-b border-[#3a4a49]/60 pb-2 last:border-0 last:pb-0"
+                  className="flex items-center justify-between gap-3 border-b border-line-subtle pb-2 last:border-0 last:pb-0"
                 >
-                  <span className="text-xs uppercase tracking-wider text-[#9aa8a7]">{label}</span>
-                  <span className="text-sm font-bold text-[#dfe3e3] tabular-nums">
+                  <span className="text-xs uppercase tracking-[0.08em] text-ink-body">{label}</span>
+                  <span className="text-sm font-bold text-ink tabular-nums">
                     {key === 'submergenceDepthRating'
                       ? `${profile.stats![key]} m`
                       : profile.stats![key]}
@@ -257,30 +257,30 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
               ))}
             </ul>
           ) : (
-            <p className="text-xs text-[#839493]">No biometric readings on record yet.</p>
+            <p className="text-xs text-ink-muted">No biometric readings on record yet.</p>
           )}
 
           {profile.moltmax?.score != null && (
-            <div className="mt-3 pt-3 border-t border-[#3a4a49] space-y-1">
-              <div className="text-[10px] uppercase tracking-wider text-[#839493]">Moltmax</div>
-              <div className="text-sm text-[#dfe3e3] font-bold">
+            <div className="mt-3 pt-3 border-t border-line-subtle space-y-1">
+              <div className="text-[11px] uppercase tracking-[0.08em] text-ink-muted">Moltmax</div>
+              <div className="text-sm text-ink font-bold">
                 Score {profile.moltmax.score}
                 {profile.moltmax.clearance ? ` · ${profile.moltmax.clearance}` : ''}
               </div>
               {profile.moltmax.stage && (
-                <div className="text-xs text-[#839493]">{profile.moltmax.stage}</div>
+                <div className="text-xs text-ink-muted">{profile.moltmax.stage}</div>
               )}
             </div>
           )}
         </div>
 
-        <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
-          <div className="border-b border-[#3a4a49] pb-3">
-            <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase flex items-center gap-2">
-              <Users className="w-4 h-4 text-[#00c3ff]" />
+        <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5 space-y-3">
+          <div className="border-b border-line-subtle pb-3">
+            <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
+              <Users className="w-4 h-4 text-cyan-glow" />
               Equipped Loadout
             </h2>
-            <p className="text-xs text-[#839493] mt-0.5">Read-only hardpoints currently worn.</p>
+            <p className="text-xs text-ink-muted mt-0.5">Read-only hardpoints currently worn.</p>
           </div>
           {loadout && loadout.items.length > 0 ? (
             <>
@@ -288,7 +288,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
               <LoadoutStatsPanel totals={loadout.totals} variant="strip" />
             </>
           ) : (
-            <p className="text-xs text-[#839493] py-6 text-center">No gear equipped yet.</p>
+            <p className="text-xs text-ink-muted py-6 text-center">No gear equipped yet.</p>
           )}
         </div>
       </div>
