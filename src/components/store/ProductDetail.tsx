@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { BrandAwareImage } from '@/components/ui/BrandMark'
 import { Link } from '@tanstack/react-router'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { HudButton } from '@/components/ui/HudButton'
@@ -84,13 +85,13 @@ export function ProductDetail({ slug }: { slug: string }) {
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
       <div className="space-y-3">
         <div className="flex min-h-80 items-center justify-center rounded-card border border-line-subtle bg-surface-1 hud-sheen p-6">
-          {image ? <img src={image} alt="" className="max-h-80 object-contain" /> : <span className="text-sm text-ink-muted">No preview</span>}
+          {image ? <BrandAwareImage src={image} alt="" className="max-h-80 object-contain" /> : <span className="text-sm text-ink-muted">No preview</span>}
         </div>
         {gallery.length > 1 ? (
           <div className="flex gap-2">
             {gallery.map((src) => (
               <div key={src} className="h-16 w-16 rounded-control border border-line-subtle bg-surface-1 p-1">
-                <img src={src} alt="" className="h-full w-full object-contain" />
+                <BrandAwareImage src={src} alt="" className="h-full w-full object-contain" />
               </div>
             ))}
           </div>

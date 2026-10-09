@@ -1,7 +1,7 @@
 import React from 'react'
+import { BrandIcon } from '@/components/ui/BrandMark'
 import { CompositeContainer } from './CompositeContainer'
 import { MascotOverlay, MascotKey } from './MascotOverlay'
-import { getAssetUrl } from '@/lib/assets'
 
 export interface ReelThumbnailCardProps {
   headline?: string
@@ -28,9 +28,8 @@ export const ReelThumbnailCard: React.FC<ReelThumbnailCardProps> = ({
     >
       {/* 1. Top HUD Header (Y = 160) */}
       <div className="flex items-center gap-4">
-        <img
-          src={getAssetUrl('/images/order_emblem.png')}
-          alt="Order Emblem"
+        <BrandIcon
+          label="Order Emblem"
           className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(0,195,255,0.4)]"
         />
         <div className="font-mono font-bold text-3xl text-cyan-400 tracking-wider">

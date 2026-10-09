@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import { BrandAwareImage } from '@/components/ui/BrandMark'
 import { useNavigate, Link, useLoaderData } from '@tanstack/react-router'
 import {
   ArrowLeft,
@@ -217,7 +218,7 @@ export function NewsPostDetail() {
             {/* Author bar & actions */}
             <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 pt-4 border-t border-line-subtle">
               <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                <img
+                <BrandAwareImage
                   src={post.authorAvatar}
                   alt={post.authorName}
                   className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-line object-cover shrink-0"

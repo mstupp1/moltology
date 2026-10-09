@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { BrandAwareImage } from '@/components/ui/BrandMark'
 import { Link } from '@tanstack/react-router'
 import { ShoppingBag } from 'lucide-react'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -152,7 +153,7 @@ function ProductCard({ product }: { product: MerchProductView }) {
     >
       <div className="flex h-48 items-center justify-center bg-surface-2">
         {product.featuredImageUrl ? (
-          <img src={product.featuredImageUrl} alt="" className="h-28 w-28 object-contain" />
+          <BrandAwareImage src={product.featuredImageUrl} alt="" className="h-28 w-28 object-contain" />
         ) : (
           <span className="text-xs text-ink-muted">No preview</span>
         )}

@@ -1,7 +1,7 @@
 /* Moltology Command Hub service worker — network-first navigations, asset caching, notification click. */
 /* global self, caches, clients, fetch, Response */
 
-const VERSION = 'moltology-hub-v3-brand-2b98c7781e25'
+const VERSION = 'moltology-hub-v3-brand-f32bacae0bf5'
 const PRECACHE = `${VERSION}-precache`
 const RUNTIME = `${VERSION}-runtime`
 const PAGES = `${VERSION}-pages`

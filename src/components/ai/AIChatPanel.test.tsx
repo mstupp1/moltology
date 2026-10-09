@@ -150,10 +150,10 @@ describe('AIChatPanel Guest Mode Gating', () => {
 
   it('renders a faded grayscale watermark of the logo in the background', () => {
     const { container } = render(<AIChatPanel userId="usr_valid_user" />)
-    const watermarkImg = container.querySelector('img[src*="order_emblem.png"].grayscale')
+    const watermarkImg = container.querySelector('svg[aria-hidden="true"].grayscale')
     expect(watermarkImg).toBeInTheDocument()
-    expect(watermarkImg?.className).toContain('grayscale')
-    expect(watermarkImg?.className).toContain('opacity-[0.035]')
+    expect(watermarkImg).toHaveClass('grayscale')
+    expect(watermarkImg).toHaveClass('opacity-[0.035]')
     expect(watermarkImg?.parentElement?.className).toContain('pointer-events-none')
   })
 
@@ -161,7 +161,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
     const { container } = render(<AIChatPanel userId="usr_valid_user" personaName="SYNAPTIC ORACLE" />)
     const header = container.querySelector('.border-b')
     expect(header).toBeInTheDocument()
-    const headerLogo = header?.querySelector('img[src*="order_emblem.png"]')
+    const headerLogo = header?.querySelector('svg path[fill-rule="evenodd"]')
     expect(headerLogo).toBeNull()
     expect(screen.getByText('SYNAPTIC ORACLE')).toBeInTheDocument()
   })

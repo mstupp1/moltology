@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import { BrandAwareImage } from '@/components/ui/BrandMark'
 import { useNavigate } from '@tanstack/react-router'
 import {
   Newspaper,
@@ -126,7 +127,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                   <div className="flex flex-wrap items-center gap-3 text-xs text-ink-muted mt-2 font-sans">
                     <div className="flex items-center gap-1.5">
                       {activePost.authorAvatar && (
-                        <img
+                        <BrandAwareImage
                           src={getAssetUrl(activePost.authorAvatar)}
                           alt={activePost.authorName}
                           className="w-4 h-4 rounded-full border border-line"
@@ -292,7 +293,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                 <div className="pt-1 border-t border-line-subtle flex items-center justify-between text-[11px] font-sans">
                   <div className="flex items-center gap-1.5 text-ink-muted">
                     {featuredPost.authorAvatar && (
-                      <img
+                      <BrandAwareImage
                         src={getAssetUrl(featuredPost.authorAvatar)}
                         alt={featuredPost.authorName}
                         className="w-3.5 h-3.5 rounded-full border border-line"
@@ -408,7 +409,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                 <div className="pt-2 border-t border-line-subtle flex items-center justify-between text-xs font-sans">
                   <div className="flex items-center gap-2 text-ink-muted">
                     {featuredPost.authorAvatar && (
-                      <img
+                      <BrandAwareImage
                         src={getAssetUrl(featuredPost.authorAvatar)}
                         alt={featuredPost.authorName}
                         className="w-4 h-4 rounded-full border border-line"

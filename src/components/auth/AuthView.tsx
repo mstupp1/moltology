@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { BrandIcon } from '@/components/ui/BrandMark'
 import { useNavigate, Link } from '@tanstack/react-router'
 import {
   Lock,
@@ -321,7 +322,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
           <div className="relative z-10 pt-3 sm:pt-4 border-t border-line-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 max-w-xl">
             <div className="flex items-center gap-2.5 sm:gap-3">
               <div className="flex -space-x-2">
-                <img className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-line object-cover" src={getAssetUrl('/images/order_emblem.png')} alt="Ascendant 1" />
+                <BrandIcon className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-line object-cover" label="Ascendant 1" />
                 <img className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-line object-cover" src={getAssetUrl('/images/stage2_softshed.png')} alt="Ascendant 2" />
                 <img className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-line object-cover" src={getAssetUrl('/images/stage3_exoshell.png')} alt="Ascendant 3" />
               </div>

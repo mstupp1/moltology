@@ -23,6 +23,12 @@
     "referenceRed": "#ef174c",
     "tokensSource": "tailwind.config.js",
     "generator": "scripts/build-brand-assets.mjs",
-    "legacyBackup": "legacy/manifest.json"
+    "legacyBackup": "legacy/manifest.json",
+    "framing": {
+      "uiVisibleHeightFraction": 0.96,
+      "appVisibleHeightFraction": 0.765,
+      "roomyAlternate": "parts/variants/icon-roomy.svg",
+      "note": "Original paths preserved; framing tightened through the group transform and app tile inset."
+    }
   }
 }

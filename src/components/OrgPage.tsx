@@ -9,6 +9,7 @@
  * ============================================================================
  */
 import React, { useState, useEffect } from 'react'
+import { BrandIcon } from '@/components/ui/BrandMark'
 import { useNavigate } from '@tanstack/react-router'
 import {
   Shield,
@@ -374,9 +375,8 @@ export const OrgPage: React.FC = () => {
         <div className="max-w-[1200px] mx-auto relative z-10 text-center w-full pb-4 sm:pb-6">
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
             <div className="inline-flex items-center gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-white/95 backdrop-blur-md border-2 border-sky-200 text-sky-900 text-xs sm:text-sm md:text-base font-extrabold tracking-wider uppercase rounded-control shadow-xl hover:bg-white transition-all">
-              <img
-                src={getAssetUrl('/images/order_emblem.png')}
-                alt="Moltology Emblem"
+              <BrandIcon
+                label="Moltology Emblem"
                 className="w-6 h-6 sm:w-7 sm:h-7 object-contain"
               />
               <span>MOLTOLOGY FOUNDATION · EST. 2022</span>

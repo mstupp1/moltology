@@ -1,9 +1,9 @@
 import React from 'react'
+import { BrandIcon } from '@/components/ui/BrandMark'
 import { ArrowLeft, Lock, UserPlus, X } from 'lucide-react'
 import { ThreadList } from './ThreadList'
 import type { ManagedThread } from './useThreadActions'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
-import { getAssetUrl } from '../../lib/assets'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 
 export type OracleChatsLayout = 'takeover' | 'column'
@@ -88,9 +88,8 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
         ) : userId ? (
           isLoadingThreads ? (
             <div className="py-6 text-center text-xs text-ink-muted flex flex-col items-center justify-center gap-2">
-              <img
-                src={getAssetUrl('/images/order_emblem.png')}
-                alt="Loading"
+              <BrandIcon
+                label="Loading"
                 className="w-4 h-4 object-contain animate-pulse"
               />
               <span className="text-[11px] text-cyan-glow animate-pulse">Accessing archives...</span>

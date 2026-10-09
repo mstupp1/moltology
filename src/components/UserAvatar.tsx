@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { BrandAwareImage } from '@/components/ui/BrandMark'
 
 export interface UserAvatarProps {
   user?: {
@@ -76,7 +77,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(({
           isCorporate ? 'bg-slate-100' : 'bg-[#030606]'
         } ${sizeClasses} ${className}`}
       >
-        <img
+        <BrandAwareImage
           src={imageUrl}
           alt={displayAlt}
           className="w-full h-full object-cover rounded-full"
@@ -94,7 +95,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(({
           isCorporate ? 'bg-slate-100' : 'bg-[#030606]'
         } ${sizeClasses} ${className}`}
       >
-        <img
+        <BrandAwareImage
           src={fallbackSrc}
           alt={displayAlt}
           className="w-full h-full object-cover rounded-full"

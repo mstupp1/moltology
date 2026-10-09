@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
+import { BrandIcon } from '@/components/ui/BrandMark'
 import {
   X,
   Pencil,
@@ -23,7 +24,6 @@ import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel, DEFAULT_ORACLE_
 import { AuthModal } from '../AuthModal'
 import { useAuthSession } from '../../hooks/useAuthSession'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
-import { getAssetUrl } from '../../lib/assets'
 import { isAdmin } from '../../lib/permissions'
 import { resolveMemberPublicName } from '../../lib/member-handle'
 import { getAuthJWTToken } from '../../lib/jwt'
@@ -544,9 +544,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden"
         aria-hidden="true"
       >
-        <img
-          src={getAssetUrl('/images/order_emblem.png')}
-          alt=""
+        <BrandIcon
+          aria-hidden="true"
           className="w-56 h-56 sm:w-72 sm:h-72 md:w-96 md:h-96 max-w-[65%] max-h-[65%] object-contain grayscale opacity-[0.035] pointer-events-none select-none"
         />
       </div>

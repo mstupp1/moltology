@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { BrandIcon } from '@/components/ui/BrandMark'
 import { getAssetUrl } from '@/lib/assets'
 import { COMPOSITE_DIMENSIONS, type CompositeAspectRatio } from './CompositeContainer'
 import { getMascotUrl, type MascotKey } from './MascotOverlay'
@@ -246,11 +247,8 @@ function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKe
       return (
         <div key={key} className="flex items-center" style={{ ...base, justifyContent: justify, gap: size * 0.3 }}>
           {variant !== 'wordmark' && (
-            <img
-              src={getAssetUrl('/images/order_emblem.png')}
-              alt=""
-              loading="eager"
-              decoding="sync"
+            <BrandIcon
+              aria-hidden="true"
               style={{ width: size * 1.2, height: size * 1.2, objectFit: 'contain', filter: 'drop-shadow(0 0 18px rgba(0,195,255,0.35))' }}
             />
           )}
