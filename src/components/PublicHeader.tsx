@@ -7,6 +7,7 @@
  * ============================================================================
  */
 import React, { useState, useEffect, useMemo, Suspense, lazy } from 'react'
+import { BrandIcon } from '@/components/ui/BrandMark'
 import { useNavigate, useLocation } from '@tanstack/react-router'
 import {
   Building2,
@@ -361,9 +362,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     const inner = (
       <span className="flex items-center gap-1.5">
         {tab.id === 'home' ? (
-          <img
-            src="/images/order_emblem.svg"
-            alt=""
+          <BrandIcon
+            aria-hidden="true"
             width={14}
             height={14}
             className={`w-3.5 h-3.5 object-contain transition-all duration-300 ${
@@ -440,9 +440,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     const content = (
       <>
         {tab.id === 'home' ? (
-          <img
-            src="/images/order_emblem.svg"
-            alt=""
+          <BrandIcon
+            aria-hidden="true"
             width={16}
             height={16}
             className="w-4 h-4 object-contain"
@@ -501,7 +500,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     }`
     const icon =
       tab.id === 'home' ? (
-        <img src="/images/order_emblem.svg" alt="" width={16} height={16} className="w-4 h-4 object-contain" />
+        <BrandIcon aria-hidden="true" width={16} height={16} className="w-4 h-4 object-contain" />
       ) : (
         tab.Icon && (
           <tab.Icon

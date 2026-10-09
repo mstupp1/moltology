@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { BrandIcon } from '@/components/ui/BrandMark'
 import { ChevronUp } from 'lucide-react'
-import { getAssetUrl } from '@/lib/assets'
 import { DEFAULT_ORACLE_PLACEHOLDER } from '@/lib/ai/oracle-models'
 import { AIChatPanel } from '../ai/AIChatPanel'
 import { HudBottomSheet } from '../ui/HudBottomSheet'
@@ -46,9 +46,8 @@ export function OracleLauncherPillContent() {
     <>
       <div className="flex items-center gap-2.5 min-w-0 flex-1 pointer-events-none">
         <div className="relative shrink-0 flex items-center justify-center">
-          <img
-            src={getAssetUrl('/images/order_emblem.png')}
-            alt="Oracle AI"
+          <BrandIcon
+            label="Oracle AI"
             className="w-5 h-5 object-contain group-hover:scale-105 transition-transform"
           />
         </div>

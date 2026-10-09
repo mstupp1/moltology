@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { BrandAwareImage } from '@/components/ui/BrandMark'
 import {
   ChevronLeft,
   ChevronRight,
@@ -180,7 +181,7 @@ export function BlogTopSlider({
             {/* Author & Read Time Meta */}
             <div className="flex flex-wrap items-center gap-4 text-xs font-sans pt-2">
               <div className="flex items-center gap-2.5 bg-surface-2 px-3 py-1.5 border border-line-subtle rounded-control">
-                <img
+                <BrandAwareImage
                   src={currentPost.authorAvatar}
                   alt={currentPost.authorName}
                   className="w-6 h-6 rounded-full border border-line object-cover"

@@ -9,6 +9,8 @@ import { createCanvas, loadImage } from '@napi-rs/canvas'
 import tailwind from '../tailwind.config.js'
 
 const PART_NAMES = ['icon', 'primary', 'secondary-benthic', 'secondary-foundation']
+// Part framing is tight; app tiles add only the space needed for platform masks.
+export const ICON_LAYOUT = { appInset: 52 }
 
 export function makePalettes(colors) {
   const app = colors.crimson.aggro
@@ -119,10 +121,10 @@ export async function buildBrandAssets() {
   const palettes = makePalettes(colors)
   const parts = {}
   for (const name of PART_NAMES) parts[name] = parsePart(await fs.readFile(path.join(KIT, 'parts', `${name}.svg`), 'utf8'))
-  const version = createHash('sha256').update(JSON.stringify({ parts, palettes })).digest('hex').slice(0, 12)
+  const version = createHash('sha256').update(JSON.stringify({ parts, palettes, layout: ICON_LAYOUT })).digest('hex').slice(0, 12)
   await fs.writeFile(path.join(KIT, 'palettes.json'), JSON.stringify(palettes, null, 2) + '\n')
   await fs.writeFile(path.join(ROOT, 'src/components/ui/brand-geometry.json'), JSON.stringify({ version, parts }, null, 2) + '\n')
-  await fs.writeFile(path.join(ROOT, 'src/components/ui/brand-assets.json'), JSON.stringify({ version }, null, 2) + '\n')
+  await fs.writeFile(path.join(ROOT, 'src/components/ui/brand-assets.json'), JSON.stringify({ version, layout: ICON_LAYOUT }, null, 2) + '\n')
 
   // Canonical part colors plus one-color and reference-red exports.
   await fs.mkdir(path.join(KIT, 'parts/variants'), { recursive: true })
@@ -141,7 +143,7 @@ export async function buildBrandAssets() {
   if (generated.status !== 0) throw new Error(generated.stderr || 'Logo composition failed')
 
   const svg = iconSvg(parts.icon, colors.crimson.aggro)
-  const appSvg = iconSvg(parts.icon, colors.crimson.aggro, 512, colors.benthic.bg, 76)
+  const appSvg = iconSvg(parts.icon, colors.crimson.aggro, 512, colors.benthic.bg, ICON_LAYOUT.appInset)
   await fs.writeFile(path.join(KIT, 'app-icon.svg'), appSvg)
   await fs.writeFile(path.join(ROOT, 'public/images/order_emblem.svg'), svg)
   await fs.writeFile(path.join(ROOT, 'public/favicon.svg'), svg)

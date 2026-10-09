@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react'
+import { BrandIcon } from '@/components/ui/BrandMark'
 import {
   Play,
   Pause,
@@ -402,15 +403,11 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
                         animation: 'pulse 2.5s ease-in-out infinite',
                       }}
                     >
-                      <img
-                        src="/images/order_emblem.svg"
-                        alt="Order Emblem"
+                      <BrandIcon
+                        label="Order Emblem"
                         width={40}
                         height={40}
                         className="w-8 h-8 sm:w-10 sm:h-10 object-contain opacity-90"
-                        onError={(e) => {
-                          ;(e.target as HTMLImageElement).style.display = 'none'
-                        }}
                       />
                     </div>
                     <div

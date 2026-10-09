@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import { BrandAwareImage } from '@/components/ui/BrandMark'
 import { useNavigate, useLoaderData } from '@tanstack/react-router'
 import { Search, Rss, ArrowRight } from 'lucide-react'
 import { PublicHeader } from '@/components/PublicHeader'
@@ -66,7 +67,7 @@ function Byline({ post, withAvatar = false }: { post: BlogPostData; withAvatar?:
   return (
     <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-sans text-ink-muted">
       {withAvatar && post.authorAvatar && (
-        <img
+        <BrandAwareImage
           src={post.authorAvatar}
           alt=""
           {...lazyImageProps}

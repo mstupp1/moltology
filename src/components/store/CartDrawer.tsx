@@ -1,4 +1,5 @@
 import React from 'react'
+import { BrandAwareImage } from '@/components/ui/BrandMark'
 import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
 import { HudButton } from '@/components/ui/HudButton'
 import { formatMerchPrice } from '@/lib/merch'
@@ -22,7 +23,7 @@ export function CartDrawer() {
             {cart.lines.map((line) => (
               <li key={line.variantId} className="flex gap-3 rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3">
                 {line.imageUrl ? (
-                  <img src={line.imageUrl} alt="" className="h-16 w-16 rounded-control object-contain bg-surface-2" />
+                  <BrandAwareImage src={line.imageUrl} alt="" className="h-16 w-16 rounded-control object-contain bg-surface-2" />
                 ) : null}
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-ink">{line.productTitle}</p>

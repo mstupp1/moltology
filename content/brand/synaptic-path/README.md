@@ -100,9 +100,17 @@ lockups should be approximately 380 px wide or larger; use a subtitle-free logo
 below that. Keep a quarter of the visible emblem height clear around it.
 Preserve aspect ratios; avoid adding small glows, shadows or outlines.
 
+The standard UI emblem occupies approximately 96% of its canvas height, leaving
+2% above and below for clean rendering. External clear space belongs to the UI
+layout, rather than being baked into the icon. The previous 84%-height framing
+is retained as parts/variants/icon-roomy.svg for optional reuse.
+
 App icons have opaque square backgrounds without baked-in rounded corners.
 Artwork fits inside the central mask-safe circle; the operating system supplies
 the final mask. Favicons, UI emblems and notification badges are transparent.
+The app tile's emblem fills approximately 76.5% of the tile height. Its additional
+inset is defined by ICON_LAYOUT in scripts/build-brand-assets.mjs and participates
+in the asset revision, so framing changes refresh installed/cached image URLs.
 
 The original icon is preserved in legacy/images/order_emblem.png and .webp.
 Original favicons and all four original install icons are also included.

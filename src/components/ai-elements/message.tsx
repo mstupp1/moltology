@@ -1,6 +1,6 @@
 import React from 'react'
 import { MarkdownRenderer } from '../ui/MarkdownRenderer'
-import { getAssetUrl } from '@/lib/assets'
+import { BrandAwareImage, BrandIcon } from '../ui/BrandMark'
 import { UserAvatar } from '../UserAvatar'
 
 export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -36,7 +36,7 @@ export const Message: React.FC<MessageProps> = ({
     if (avatar) {
       if (typeof avatar === 'string') {
         return (
-          <img
+          <BrandAwareImage
             src={avatar}
             alt={senderLabel || (isUser ? 'User avatar' : 'Oracle')}
             className="w-4 h-4 rounded-full object-cover shrink-0"
@@ -59,9 +59,13 @@ export const Message: React.FC<MessageProps> = ({
       )
     }
 
+    if (!avatarSrc) {
+      return <BrandIcon label={senderLabel || 'Oracle'} className="w-3.5 h-3.5 shrink-0" />
+    }
+
     return (
-      <img
-        src={avatarSrc || getAssetUrl('/images/order_emblem.png')}
+      <BrandAwareImage
+        src={avatarSrc}
         alt={senderLabel || 'Oracle'}
         className="w-3.5 h-3.5 object-contain shrink-0"
       />

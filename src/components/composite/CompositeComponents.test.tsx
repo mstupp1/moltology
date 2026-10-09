@@ -159,7 +159,7 @@ describe('Composite UI Components', () => {
       />
     )
 
-    expect(screen.getByAltText('Moltology Order Emblem')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Moltology Order Emblem' })).toBeInTheDocument()
     expect(screen.getByText('Moltology')).toBeInTheDocument()
     expect(screen.getByText('THE SYNAPTIC PATH')).toBeInTheDocument()
     expect(screen.getByText('moltology.org')).toBeInTheDocument()

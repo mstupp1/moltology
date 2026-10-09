@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import { BrandAwareImage } from '@/components/ui/BrandMark'
 import { cn } from '@/lib/utils'
 import {
   LOBSTER_AVATAR_STYLE,
@@ -125,7 +126,7 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
       data-testid="forum-avatar-container"
     >
       {hasCustomImage && !imageError ? (
-        <img
+        <BrandAwareImage
           src={src!}
           alt={displayAlt}
           className="w-full h-full object-cover rounded-full"

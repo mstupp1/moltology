@@ -62,7 +62,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
   it('navigates to /dashboard when brand emblem logo is clicked', () => {
     render(<HUDSidebar />)
 
-    const brandLogos = screen.getAllByAltText('Order Emblem')
+    const brandLogos = screen.getAllByRole('img', { name: 'Order Emblem' })
     fireEvent.click(brandLogos[0])
 
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })

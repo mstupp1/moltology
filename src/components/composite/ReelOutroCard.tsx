@@ -1,4 +1,5 @@
 import React from 'react'
+import { BrandIcon } from '@/components/ui/BrandMark'
 import { CompositeContainer } from './CompositeContainer'
 import { MascotOverlay, MascotKey } from './MascotOverlay'
 import { getAssetUrl } from '@/lib/assets'
@@ -58,9 +59,8 @@ export const ReelOutroCard: React.FC<ReelOutroCardProps> = ({
           <div className="flex flex-col items-center text-center space-y-3">
             <div className="relative">
               <div className="absolute inset-0 rounded-full bg-cyan-400/20 blur-2xl scale-125 pointer-events-none" />
-              <img
-                src={getAssetUrl('/images/order_emblem.png')}
-                alt="Moltology Order Emblem"
+              <BrandIcon
+                label="Moltology Order Emblem"
                 className="w-56 h-56 object-contain relative z-10 drop-shadow-[0_0_30px_rgba(0,195,255,0.5)]"
               />
             </div>

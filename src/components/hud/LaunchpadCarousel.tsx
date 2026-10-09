@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import { BrandAwareImage } from '@/components/ui/BrandMark'
 import { useNavigate } from '@tanstack/react-router'
 import {
   BookOpen,
@@ -242,7 +243,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                   <div className="flex flex-wrap items-center gap-3 text-xs text-ink-muted mt-2 font-sans">
                     <div className="flex items-center gap-1.5">
                       {activeNewsPost.authorAvatar && (
-                        <img
+                        <BrandAwareImage
                           src={getAssetUrl(activeNewsPost.authorAvatar)}
                           alt={activeNewsPost.authorName}
                           className="w-4 h-4 rounded-full border border-line"

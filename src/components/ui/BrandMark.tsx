@@ -1,4 +1,4 @@
-import type { CSSProperties, SVGProps } from 'react'
+import type { CSSProperties, ImgHTMLAttributes, SVGProps } from 'react'
 import geometry from './brand-geometry.json'
 
 export const BRAND_ASSET_VERSION = geometry.version
@@ -42,6 +42,27 @@ export function BrandIcon({ label = 'Order Emblem', tone = 'app', className = ''
       {...props}
     />
   )
+}
+
+/** Stored avatar/product URLs may still name a raster export. Render the current vector locally. */
+type BrandAwareImageProps = ImgHTMLAttributes<HTMLImageElement> & { 'data-testid'?: string }
+
+export function BrandAwareImage({ src, alt, className, style, width, height, ...props }: BrandAwareImageProps) {
+  const isEmblem = typeof src === 'string' && /^(?:https?:\/\/(?:www\.)?moltology\.org)?\/?images\/order_emblem\.(?:png|webp|svg)(?:[?#].*)?$/i.test(src)
+  if (isEmblem) {
+    return (
+      <BrandIcon
+        label={props['aria-label'] ?? alt}
+        aria-hidden={alt === '' ? true : props['aria-hidden']}
+        className={className}
+        style={style}
+        width={width ?? 512}
+        height={height ?? 512}
+        data-testid={props['data-testid']}
+      />
+    )
+  }
+  return <img src={src} alt={alt} className={className} style={style} width={width} height={height} {...props} />
 }
 
 const WORDMARK_PARTS: Record<string, PartName> = {
