@@ -26,7 +26,6 @@ const COMMAND_ICONS = new Set<CommandIconId>([
   'codex',
   'lectures',
   'market',
-  'subterranean',
   'premium',
   'pipeline',
   'journal',

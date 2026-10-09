@@ -7,17 +7,13 @@ import {
 } from './hidden-pages'
 
 describe('hidden pages', () => {
-  it('treats subterranean vats as a hidden page', () => {
-    expect(HIDDEN_PAGES.map((page) => page.path)).toEqual(['/subterranean', '/premium', '/store'])
+  it('treats premium and store as hidden pages', () => {
+    expect(HIDDEN_PAGES.map((page) => page.path)).toEqual(['/premium', '/store'])
     expect(isHiddenPagePath('/store')).toBe(true)
     expect(isHiddenPagePath('/store/')).toBe(true)
     expect(isHiddenPagePath('/store?checkout=success')).toBe(true)
     expect(isHiddenPagePath('/store/benthic-shell-tee')).toBe(true)
     expect(isHiddenPagePath('/storefront')).toBe(false)
-    expect(isHiddenPagePath('/subterranean')).toBe(true)
-    expect(isHiddenPagePath('/subterranean/')).toBe(true)
-    expect(isHiddenPagePath('/subterranean?vat=1')).toBe(true)
-    expect(isHiddenPagePath('/subterranean/vault')).toBe(true)
     expect(isHiddenPagePath('/premium')).toBe(true)
     expect(isHiddenPagePath('/premium/')).toBe(true)
     expect(isHiddenPagePath('/premium?checkout=success')).toBe(true)
@@ -26,7 +22,7 @@ describe('hidden pages', () => {
   it('leaves ordinary chambers visible', () => {
     expect(isHiddenPagePath('/dashboard')).toBe(false)
     expect(isHiddenPagePath('/codex')).toBe(false)
-    expect(isHiddenPagePath('/subterranean-extra')).toBe(false)
+    expect(isHiddenPagePath('/vault')).toBe(false)
     expect(isHiddenPagePath(null)).toBe(false)
     expect(normalizeAppPath('/codex/')).toBe('/codex')
   })

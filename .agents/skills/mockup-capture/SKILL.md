@@ -87,7 +87,7 @@ npm run mockups:capture -- --target=oracle
 # Capture Dashboard previews (full desktop, mobile, and main hub area)
 npm run mockups:capture -- --target=dashboard
 
-# Capture Subterranean Market
+# Capture Benthic Market
 npm run mockups:capture -- --target=market
 
 # Capture Carapace/Chassis Builder

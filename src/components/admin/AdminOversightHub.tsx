@@ -162,11 +162,6 @@ const SECTORS = [
     to: '/admin/logic' as const,
   },
   {
-    title: 'Subterranean',
-    detail: 'Hidden bio-vault chamber.',
-    to: '/subterranean' as const,
-  },
-  {
     title: 'Premium',
     detail: 'Membership tools for this account.',
     to: '/premium' as const,

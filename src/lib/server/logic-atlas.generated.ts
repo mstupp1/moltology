@@ -523,7 +523,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "MarketShopPage",
           "line": 22,
           "value": "MarketShopPage()",
-          "drift": "ok",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx#L22"
         }
       ],
@@ -549,7 +549,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 904,
         "y": 388
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "economy.simulated-gem-grants",
@@ -1153,23 +1153,23 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Hidden pages",
       "kind": "gate",
       "status": "active",
-      "statement": "Pages listed in HIDDEN_PAGES (Subterranean Vats, Premium, and the merch Store) stay out of navigation and search for members and show a plain unavailable notice. Staff see them faded in the sidebar and can open them.",
+      "statement": "Pages listed in HIDDEN_PAGES (Premium and the merch Store) stay out of navigation and search for members and show a plain unavailable notice. Staff see them faded in the sidebar and can open them.",
       "anchors": [
         {
           "file": "src/lib/hidden-pages.ts",
           "symbol": "HIDDEN_PAGES",
           "line": 8,
-          "value": "[ { id: 'subterranean', path: '/subterranean', }, { id: 'premium', path: '/premium', }, { id: 'store', path: '/store', }, ] as const",
+          "value": "[ { id: 'premium', path: '/premium', }, { id: 'store', path: '/store', }, ] as const",
           "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/hidden-pages.ts#L8"
         },
         {
           "file": "src/lib/hidden-pages.ts",
           "symbol": "canViewHiddenPages",
-          "line": 47,
+          "line": 43,
           "value": "canViewHiddenPages(user, profileRole)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/hidden-pages.ts#L47"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/hidden-pages.ts#L43"
         }
       ],
       "tests": [
@@ -1193,7 +1193,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 388
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "access.admin-only-paths",
@@ -6730,7 +6730,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "sections": [
         {
           "heading": "Context",
-          "html": "<p>Some chambers, starting with Subterranean Vats, were not ready for members, but staff still needed to use and test them in production.</p>"
+          "html": "<p>Some chambers, such as Premium, were not ready for members, but staff still needed to use and test them in production.</p>"
         },
         {
           "heading": "Decision",

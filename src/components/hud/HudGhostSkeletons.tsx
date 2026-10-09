@@ -141,32 +141,6 @@ export function DashboardNewsGhost() {
   )
 }
 
-/**
- * Clean Ghost Skeleton composite for the Subterranean Vats & Telemetry Hub.
- */
-export function SubterraneanHubGhost() {
-  return (
-    <div className="space-y-5 font-sans select-none">
-      {/* Subterranean Header Banner Ghost */}
-      <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-4 space-y-2.5">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1.5">
-            <HudGhostSkeleton variant="crimson" preset="heading" width={240} height={18} />
-            <HudGhostSkeleton variant="neutral" preset="text" width={360} height={12} />
-          </div>
-          <HudGhostSkeleton variant="crimson" preset="badge" width={90} height={24} />
-        </div>
-      </div>
-
-      {/* Grid of Bio-Vat Specimen Cards Ghost */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <HudGhostCard key={i} variant="neutral" lines={4} className={`${GHOST_CARD} min-h-[200px]`} />
-        ))}
-      </div>
-    </div>
-  )
-}
 
 /**
  * Clean Ghost Skeleton composite for Initiate Activity Feed list.

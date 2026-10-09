@@ -12,7 +12,7 @@ sources:
 
 ## Context
 
-Some chambers, starting with Subterranean Vats, were not ready for members, but staff still needed to use and test them in production.
+Some chambers, such as Premium, were not ready for members, but staff still needed to use and test them in production.
 
 ## Decision
 

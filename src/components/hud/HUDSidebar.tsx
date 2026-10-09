@@ -22,7 +22,6 @@ import {
   ChevronRight,
   Plus,
   Minus,
-  Biohazard,
   Sparkles,
   Microscope,
   Lock,
@@ -49,7 +48,7 @@ import { HUDProgressBar } from './HUDProgressBar'
 import { HUDTaskBar } from './HUDTaskBar'
 import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 
-const GUEST_LOCKED_PATHS = new Set(['/lectures', '/subterranean', '/chassis', '/connections', '/member', '/stream'])
+const GUEST_LOCKED_PATHS = new Set(['/lectures', '/chassis', '/connections', '/member', '/stream'])
 
 interface HUDSidebarProps {
   larvaId?: string
@@ -383,13 +382,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           shortLabel: 'CHASSIS',
           icon: Sliders,
           path: '/chassis',
-        },
-        {
-          id: 'subterranean',
-          label: 'SUBTERRANEAN VATS',
-          shortLabel: 'VATS',
-          icon: Biohazard,
-          path: '/subterranean',
         },
         {
           id: 'premium',

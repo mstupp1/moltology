@@ -74,13 +74,13 @@ describe('GuestLockGuard Component', () => {
     } as any)
 
     render(
-      <GuestLockGuard featureName="Subterranean Vats">
+      <GuestLockGuard featureName="Benthic Archive">
         <div>Unlocked Biological Specimens</div>
       </GuestLockGuard>
     )
 
     expect(screen.getByText('Unlocked Biological Specimens')).toBeInTheDocument()
-    expect(screen.queryByText('SUBTERRANEAN VATS LOCKED')).not.toBeInTheDocument()
+    expect(screen.queryByText('BENTHIC ARCHIVE LOCKED')).not.toBeInTheDocument()
     expect(screen.queryByText('RESTRICTED ACCESS')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /SIGN UP TO UNLOCK/i })).not.toBeInTheDocument()
   })
@@ -131,16 +131,16 @@ describe('GuestLockGuard Component', () => {
 
     render(
       <GuestLockGuard
-        featureName="Subterranean Vats"
-        skeleton={<div data-testid="custom-vat-skeleton">Loading Vats...</div>}
+        featureName="Benthic Archive"
+        skeleton={<div data-testid="custom-archive-skeleton">Loading Archive...</div>}
       >
-        <div>Vat Content</div>
+        <div>Archive Content</div>
       </GuestLockGuard>
     )
 
-    expect(screen.getByTestId('custom-vat-skeleton')).toBeInTheDocument()
-    expect(screen.queryByText('SUBTERRANEAN VATS LOCKED')).not.toBeInTheDocument()
-    expect(screen.queryByText('Vat Content')).not.toBeInTheDocument()
+    expect(screen.getByTestId('custom-archive-skeleton')).toBeInTheDocument()
+    expect(screen.queryByText('BENTHIC ARCHIVE LOCKED')).not.toBeInTheDocument()
+    expect(screen.queryByText('Archive Content')).not.toBeInTheDocument()
   })
 })
 

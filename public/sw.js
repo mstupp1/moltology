@@ -28,7 +28,6 @@ const HUB_PATH_PREFIXES = [
   '/journal',
   '/market',
   '/chassis',
-  '/subterranean',
   '/gallery',
   '/forum',
   '/connections',

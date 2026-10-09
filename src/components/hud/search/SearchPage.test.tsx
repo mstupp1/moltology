@@ -117,23 +117,23 @@ describe('SearchPage', () => {
   it('filters the shared command list on the Pages tab', () => {
     renderSearch({ query: 'Codex', type: 'pages' })
     expect(screen.getByText('Open Sacred Codex & Canonical Scriptures')).toBeInTheDocument()
-    expect(screen.queryByText('Open Subterranean Vats & Level -7 Bio-Vault')).not.toBeInTheDocument()
+    expect(screen.queryByText('Open Premium membership')).not.toBeInTheDocument()
     fireEvent.click(screen.getByText('Open Sacred Codex & Canonical Scriptures'))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/codex' })
   })
 
-  it('shows subterranean vats on Pages for admins', () => {
+  it('shows hidden pages on Pages for admins', () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'admin-1', email: 'ops@example.com', role: 'admin' } },
       isPending: false,
     } as any)
-    renderSearch({ query: 'vats', type: 'pages' })
-    expect(screen.getByText('Open Subterranean Vats & Level -7 Bio-Vault')).toBeInTheDocument()
+    renderSearch({ query: 'premium', type: 'pages' })
+    expect(screen.getByText('Open Premium membership')).toBeInTheDocument()
   })
 
-  it('keeps subterranean vats off Pages for members', () => {
-    renderSearch({ query: 'vats', type: 'pages' })
-    expect(screen.queryByText('Open Subterranean Vats & Level -7 Bio-Vault')).not.toBeInTheDocument()
+  it('keeps hidden pages off Pages for members', () => {
+    renderSearch({ query: 'premium', type: 'pages' })
+    expect(screen.queryByText('Open Premium membership')).not.toBeInTheDocument()
   })
 
   it('surfaces HUD chambers and news dispatches on Pages for obvious queries', () => {
