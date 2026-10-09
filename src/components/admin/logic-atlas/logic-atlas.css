@@ -15,14 +15,14 @@
   --xy-controls-button-background-color-hover-default: #172325;
   --xy-controls-button-color-default: #8fa0a0;
   --xy-controls-button-color-hover-default: #00c3ff;
-  --xy-controls-button-border-color-default: rgba(150, 170, 170, 0.26);
+  --xy-controls-button-border-color-default: rgba(150, 170, 170, 0.55);
   --xy-controls-box-shadow-default: none;
   --xy-attribution-background-color-default: transparent;
   background: radial-gradient(ellipse at 30% 0%, rgba(0, 195, 255, 0.06), transparent 60%), #0a1112;
 }
 
 .logic-atlas-flow .react-flow__controls {
-  border: 1px solid rgba(150, 170, 170, 0.26);
+  border: 1px solid rgba(150, 170, 170, 0.55);
   border-radius: 4px;
   overflow: hidden;
 }
