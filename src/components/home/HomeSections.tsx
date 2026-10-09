@@ -13,7 +13,7 @@ import {
   useScrollProgress,
 } from '@/components/what-is-moltology/story/motion'
 import { VOICE_STAGE_ACCENTS, VOICE_STAGE_LABELS } from '@/components/what-is-moltology/story/content'
-import { DepthLayer, SectionBackdrop, useTilt } from './HomeDepth'
+import { DepthLayer, SeamFade, SectionBackdrop, useTilt } from './HomeDepth'
 import { HOME_BACKDROPS, HOME_FAQ, HOME_FINAL_IMAGE, HOME_MELT_MOMENTS, HOME_READINGS, HOME_STEPS, HOME_VOICES, type HomeReading, type HomeStep } from './content'
 
 const LazyLandingAuthCtas = React.lazy(() =>
@@ -59,7 +59,8 @@ export const HomeMelt: React.FC = () => {
       <SectionBackdrop image={HOME_BACKDROPS.surface} position="50% 20%" tone="surface" />
       <DepthLayer kind="shafts" className="-z-10 opacity-25" />
       <DepthLayer kind="snow" className="-z-10 opacity-25" />
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-20 items-center">
+      <SeamFade />
+      <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-16 lg:gap-20 items-center">
         <ScrollReveal>
           <Eyebrow color="#ff6358">Sound familiar?</Eyebrow>
           <h2 id="home-melt-title" className={`mt-5 ${sectionTitle}`}>
@@ -89,7 +90,7 @@ export const HomeMelt: React.FC = () => {
             })}
           </ol>
           <ScrollReveal>
-            <p className="mt-10 max-w-lg text-base sm:text-lg text-ink-body leading-relaxed [text-wrap:pretty]">
+            <p className="mt-12 sm:mt-14 max-w-lg text-base sm:text-lg text-ink-body leading-relaxed [text-wrap:pretty]">
               Moltology has a name for this: the Great Melt. It isn’t a character flaw. It is what happens to
               anything soft that lives on the surface.
             </p>
@@ -153,7 +154,7 @@ export const HomeIdea: React.FC = () => (
         </p>
       </ScrollReveal>
 
-      <div className="mt-14 sm:mt-16 grid gap-5 md:grid-cols-3">
+      <div className="mt-16 sm:mt-20 grid gap-6 md:grid-cols-3">
         {HOME_READINGS.map((reading, index) => (
           <ScrollReveal key={reading.id} delayMs={index * 110} className="h-full">
             <ReadingCard reading={reading} />
@@ -162,7 +163,7 @@ export const HomeIdea: React.FC = () => (
       </div>
 
       <ScrollReveal>
-        <div className="mt-10 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
+        <div className="mt-12 sm:mt-14 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
           <p className="text-sm sm:text-base text-ink-muted">
             Your dashboard reads all three from what you actually do, not what you hoped to do.
           </p>
@@ -291,7 +292,7 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
           <ScrollReveal>
             <HowItWorksIntro />
           </ScrollReveal>
-          <ol className="mt-14 space-y-16 sm:space-y-20">
+          <ol className="mt-16 space-y-20 sm:space-y-24">
             {HOME_STEPS.map((step, index) => (
               <li key={step.id}>
                 <ScrollReveal>
@@ -397,7 +398,7 @@ export const HomeVoices: React.FC = () => (
         </h2>
       </ScrollReveal>
 
-      <div className="mt-12 sm:mt-14 grid gap-5 md:grid-cols-3">
+      <div className="mt-14 sm:mt-16 grid gap-6 md:grid-cols-3">
         {HOME_VOICES.map((voice, index) => (
           <ScrollReveal key={voice.name} delayMs={index * 110}>
             <figure className="home-voice-glass flex h-full flex-col justify-between rounded-card border border-line-subtle p-7 sm:p-8">
@@ -417,7 +418,7 @@ export const HomeVoices: React.FC = () => (
       </div>
 
       <ScrollReveal>
-        <Link to="/what-is-moltology/what-moltologists-say" className={`mt-10 text-[#00ffcc] ${textLink}`}>
+        <Link to="/what-is-moltology/what-moltologists-say" className={`mt-12 text-[#00ffcc] ${textLink}`}>
           Hear more from members
           <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
         </Link>
@@ -440,7 +441,8 @@ export const HomeFaq: React.FC = () => (
       aria-hidden="true"
     />
     <DepthLayer kind="shafts" className="-z-10 opacity-40" />
-    <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[0.8fr_1.2fr] gap-10 lg:gap-20">
+    <SeamFade />
+    <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[0.8fr_1.2fr] gap-12 lg:gap-20">
       <ScrollReveal>
         <Eyebrow>Questions</Eyebrow>
         <h2 id="home-faq-title" className={`mt-5 ${sectionTitle}`}>

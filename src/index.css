@@ -486,8 +486,9 @@
     rgba(125, 211, 252, 0.07) 90px,
     transparent 130px 210px
   );
-  mask-image: linear-gradient(to bottom, #000, transparent 70%);
-  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 70%);
+  /* Lit from above, but eased in from the section's top edge so the light never starts on a line. */
+  mask-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.6) 8%, #000 18%, transparent 72%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.6) 8%, #000 18%, transparent 72%);
 }
 /* Sonar: three thin rings that ping outward from one point, staggered. Transform and opacity only. */
 @keyframes homeSonarPing {
