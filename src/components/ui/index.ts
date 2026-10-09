@@ -33,6 +33,7 @@ export { HudBottomSheet, type HudBottomSheetProps } from './HudBottomSheet'
 export { Slider } from './slider'
 export { GuestLockGuard, type GuestLockGuardProps } from '../hud/GuestLockGuard'
 export { HudPagination, type HudPaginationProps } from './HudPagination'
+export { HudTabs, type HudTabsProps, type HudTabItem } from './HudTabs'
 export {
   HudDropdownMenu,
   HudDropdownMenuTrigger,

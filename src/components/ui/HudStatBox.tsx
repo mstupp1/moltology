@@ -40,30 +40,15 @@ export const HudStatBox = React.forwardRef<HTMLDivElement, HudStatBoxProps>(
       none: '',
     }[texture]
     const variantStyles = {
-      cyan: {
-        container: 'border-[#00c3ff]/40 bg-[#0a1012]/80 shadow-[0_0_10px_rgba(0,195,255,0.15)]',
-        label: 'text-[#839493]',
-        value: 'text-[#00c3ff] drop-shadow-[0_0_6px_rgba(0,195,255,0.3)]',
-        bracket: 'border-[#00c3ff]',
-      },
-      crimson: {
-        container: 'border-[#ff453a]/40 bg-[#140809]/80 shadow-[0_0_10px_rgba(255,69,58,0.15)]',
-        label: 'text-[#839493]',
-        value: 'text-[#ff453a] drop-shadow-[0_0_6px_rgba(255,69,58,0.3)]',
-        bracket: 'border-[#ff453a]',
-      },
-      neutral: {
-        container: 'border-[#3a4a49] bg-[#0f1414]',
-        label: 'text-[#839493]',
-        value: 'text-[#dfe3e3]',
-        bracket: 'border-[#3a4a49]',
-      },
+      cyan: { container: 'border-line-subtle bg-surface-1/90', label: 'text-ink-muted', value: 'text-cyan-glow' },
+      crimson: { container: 'border-crimson-aggro/35 bg-surface-crimson/90', label: 'text-ink-muted', value: 'text-crimson-text' },
+      neutral: { container: 'border-line-subtle bg-surface-1', label: 'text-ink-muted', value: 'text-ink' },
     }[variant]
 
     const trendColor = {
-      up: 'text-[#10b981]',
-      down: 'text-[#ff453a]',
-      neutral: 'text-[#839493]',
+      up: 'text-emerald-500',
+      down: 'text-crimson-text',
+      neutral: 'text-ink-muted',
     }
 
     const trendSymbol = {
@@ -76,35 +61,27 @@ export const HudStatBox = React.forwardRef<HTMLDivElement, HudStatBoxProps>(
       <div
         ref={ref}
         className={cn(
-          'relative border p-4 rounded-none font-sans flex flex-col justify-between gap-2 backdrop-blur-md',
+          'relative border p-4 rounded-card hud-sheen shadow-sheen-inset font-sans flex flex-col justify-between gap-2 backdrop-blur-md',
           variantStyles.container,
+          showCornerBrackets && 'hud-ticks',
           textureClass,
           className
         )}
         {...props}
       >
-        {showCornerBrackets && (
-          <>
-            <span className={cn('absolute -top-[1px] -left-[1px] w-2 h-2 border-t-2 border-l-2 pointer-events-none', variantStyles.bracket)} />
-            <span className={cn('absolute -top-[1px] -right-[1px] w-2 h-2 border-t-2 border-r-2 pointer-events-none', variantStyles.bracket)} />
-            <span className={cn('absolute -bottom-[1px] -left-[1px] w-2 h-2 border-b-2 border-l-2 pointer-events-none', variantStyles.bracket)} />
-            <span className={cn('absolute -bottom-[1px] -right-[1px] w-2 h-2 border-b-2 border-r-2 pointer-events-none', variantStyles.bracket)} />
-          </>
-        )}
-
         <div className="flex items-center justify-between gap-2">
-          <span className={cn('text-[11px] font-bold uppercase tracking-wider truncate', variantStyles.label)}>
+          <span className={cn('text-[11px] font-bold uppercase tracking-[0.08em] truncate', variantStyles.label)}>
             {label}
           </span>
-          {icon && <span className="text-[#00c3ff] shrink-0">{icon}</span>}
+          {icon && <span className="text-cyan-glow shrink-0">{icon}</span>}
         </div>
 
         <div className="flex items-baseline justify-between gap-2">
-          <div className={cn('text-xl sm:text-2xl font-bold tracking-tight', variantStyles.value)}>
+          <div className={cn('text-xl sm:text-2xl font-bold tracking-tight tabular-nums', variantStyles.value)}>
             {value}
           </div>
           {trend && trendValue && (
-            <span className={cn('text-[10px] font-bold tracking-wider flex items-center gap-1', trendColor[trend])}>
+            <span className={cn('text-[11px] font-bold tracking-[0.08em] flex items-center gap-1 tabular-nums', trendColor[trend])}>
               <span>{trendSymbol[trend]}</span>
               <span>{trendValue}</span>
             </span>
@@ -112,7 +89,7 @@ export const HudStatBox = React.forwardRef<HTMLDivElement, HudStatBoxProps>(
         </div>
 
         {subtext && (
-          <div className="text-[10px] text-[#839493] tracking-tight border-t border-[#3a4a49]/30 pt-1.5 mt-0.5">
+          <div className="text-xs text-ink-muted border-t border-line-subtle pt-2 mt-0.5">
             {subtext}
           </div>
         )}

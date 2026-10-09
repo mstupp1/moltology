@@ -20,37 +20,19 @@ export const HudBadge = React.forwardRef<HTMLSpanElement, HudBadgeProps>(
     ref
   ) => {
     const variantStyles = {
-      cyan: {
-        badge: 'border-[#00c3ff]/50 bg-[#00c3ff]/10 text-[#00c3ff] shadow-[0_0_6px_rgba(0,195,255,0.2)]',
-        dot: 'bg-[#00c3ff] shadow-[0_0_6px_#00c3ff]',
-      },
-      crimson: {
-        badge: 'border-[#ff453a]/50 bg-[#ff453a]/10 text-[#ff453a] shadow-[0_0_6px_rgba(255,69,58,0.2)]',
-        dot: 'bg-[#ff453a] shadow-[0_0_6px_#ff453a]',
-      },
-      emerald: {
-        badge: 'border-[#10b981]/50 bg-[#10b981]/10 text-[#10b981] shadow-[0_0_6px_rgba(16,185,129,0.2)]',
-        dot: 'bg-[#10b981] shadow-[0_0_6px_#10b981]',
-      },
-      warning: {
-        badge: 'border-[#f59e0b]/50 bg-[#f59e0b]/10 text-[#f59e0b] shadow-[0_0_6px_rgba(245,158,11,0.2)]',
-        dot: 'bg-[#f59e0b] shadow-[0_0_6px_#f59e0b]',
-      },
-      sacred: {
-        badge: 'border-[#ff453a] bg-gradient-to-r from-[#4d1014] to-[#7a1820] text-white shadow-[0_0_8px_rgba(255,69,58,0.4)]',
-        dot: 'bg-[#ff6358] shadow-[0_0_6px_#ff6358]',
-      },
-      neutral: {
-        badge: 'border-[#3a4a49] bg-[#0f1414] text-[#839493]',
-        dot: 'bg-[#839493]',
-      },
+      cyan: { badge: 'border-cyan-glow/40 bg-cyan-soft text-cyan-glow', dot: 'bg-cyan-glow' },
+      crimson: { badge: 'border-crimson-aggro/45 bg-crimson-soft text-crimson-text', dot: 'bg-crimson-aggro' },
+      emerald: { badge: 'border-emerald-500/40 text-emerald-500', dot: 'bg-emerald-500' },
+      warning: { badge: 'border-amber-500/40 text-amber-500', dot: 'bg-amber-500' },
+      sacred: { badge: 'border-crimson-aggro/60 bg-crimson-soft text-crimson-text', dot: 'bg-sacred-glow' },
+      neutral: { badge: 'border-line text-ink-muted', dot: 'bg-ink-muted' },
     }[variant]
 
     return (
       <span
         ref={ref}
         className={cn(
-          'inline-flex items-center gap-1.5 font-sans text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 border rounded-none select-none',
+          'inline-flex items-center gap-1.5 min-h-[22px] font-sans text-[11px] leading-none font-bold tracking-[0.08em] uppercase px-2 border rounded-chip select-none',
           variantStyles.badge,
           className
         )}

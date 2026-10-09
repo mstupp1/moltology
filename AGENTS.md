@@ -16,7 +16,7 @@ Business rules and the decisions behind them are mapped in [`docs/logic/`](docs/
 
 ## Visual source of truth
 
-Visual truth is Tailwind + HUD CSS — [`tailwind.config.js`](tailwind.config.js) and [`src/index.css`](src/index.css) — not a design.md. shadcn/ui primitives live in `src/components/ui/`.
+Visual truth is Tailwind + HUD CSS — [`tailwind.config.js`](tailwind.config.js) and [`src/index.css`](src/index.css) — not a design.md. Token names and when to use them: [`docs/design/ui-tokens.md`](docs/design/ui-tokens.md). shadcn/ui primitives live in `src/components/ui/`.
 
 ## Tech Stack
 

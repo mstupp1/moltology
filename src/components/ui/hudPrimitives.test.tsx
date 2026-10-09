@@ -1,3 +1,4 @@
+import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import {
@@ -13,6 +14,7 @@ import {
   HudBadge,
   HudStatBox,
   HudSkeleton,
+  HudTabs,
 } from './index'
 
 describe('HUD Primitive Component Library', () => {
@@ -38,18 +40,29 @@ describe('HUD Primitive Component Library', () => {
       expect(handleClick).not.toHaveBeenCalled()
     })
 
-    it('applies cyan, crimson, sacred, and dark variant classes', () => {
+    it('maps legacy variant names onto the four button styles', () => {
       const { rerender } = render(<HudButton variant="cyan">Cyan</HudButton>)
-      expect(screen.getByRole('button')).toHaveClass('border-[#00c3ff]')
+      expect(screen.getByRole('button')).toHaveAttribute('data-variant', 'primary')
+      expect(screen.getByTestId('hud-button-fill')).toHaveClass('bg-cyan-glow', 'hud-cut')
 
       rerender(<HudButton variant="crimson">Crimson</HudButton>)
-      expect(screen.getByRole('button')).toHaveClass('border-[#ff453a]')
+      expect(screen.getByTestId('hud-button-fill')).toHaveClass('bg-crimson-aggro')
 
       rerender(<HudButton variant="sacred">Sacred</HudButton>)
-      expect(screen.getByRole('button')).toHaveClass('bg-[#ff453a]/10')
+      expect(screen.getByRole('button')).toHaveAttribute('data-variant', 'danger')
+      expect(screen.queryByTestId('hud-button-fill')).not.toBeInTheDocument()
 
       rerender(<HudButton variant="dark">Dark</HudButton>)
-      expect(screen.getByRole('button')).toHaveClass('border-[#3a4a49]')
+      expect(screen.getByRole('button')).toHaveAttribute('data-variant', 'secondary')
+      expect(screen.getByRole('button')).toHaveClass('border-line')
+    })
+
+    it('uses the control radius and lets a caller override it', () => {
+      const { rerender } = render(<HudButton>Soft</HudButton>)
+      expect(screen.getByRole('button')).toHaveClass('rounded-control')
+      rerender(<HudButton className="rounded-none">Square</HudButton>)
+      expect(screen.getByRole('button')).toHaveClass('rounded-none')
+      expect(screen.getByRole('button')).not.toHaveClass('rounded-control')
     })
 
     it('renders icons when provided', () => {
@@ -59,9 +72,9 @@ describe('HUD Primitive Component Library', () => {
   })
 
   describe('HudCard & HudContainer', () => {
-    it('renders HudCard container with sharp 0px corners', () => {
+    it('renders HudCard container with the card radius', () => {
       const { container } = render(<HudCard>Card Content</HudCard>)
-      expect(container.firstChild).toHaveClass('rounded-none')
+      expect(container.firstChild).toHaveClass('rounded-card')
       expect(screen.getByText('Card Content')).toBeInTheDocument()
     })
 
@@ -162,6 +175,39 @@ describe('HUD Primitive Component Library', () => {
       const element = container.firstChild as HTMLElement
       expect(element).toHaveClass('animate-pulse')
       expect(element).toHaveStyle({ width: '200px', height: '40px' })
+    })
+  })
+
+  describe('HudTabs', () => {
+    function Harness() {
+      const [value, setValue] = React.useState('latest')
+      return (
+        <HudTabs
+          label="Sort threads"
+          value={value}
+          onValueChange={setValue}
+          items={[
+            { value: 'latest', label: 'Latest' },
+            { value: 'top', label: 'Top' },
+            { value: 'following', label: 'Following' },
+          ]}
+        />
+      )
+    }
+
+    it('marks the current tab and switches on click', () => {
+      render(<Harness />)
+      expect(screen.getByRole('tab', { name: 'Latest' })).toHaveAttribute('aria-selected', 'true')
+      fireEvent.click(screen.getByRole('tab', { name: 'Top' }))
+      expect(screen.getByRole('tab', { name: 'Top' })).toHaveAttribute('aria-selected', 'true')
+      expect(screen.getByRole('tab', { name: 'Latest' })).toHaveAttribute('tabindex', '-1')
+    })
+
+    it('moves with arrow keys and wraps', () => {
+      render(<Harness />)
+      fireEvent.keyDown(screen.getByRole('tab', { name: 'Latest' }), { key: 'ArrowLeft' })
+      expect(screen.getByRole('tab', { name: 'Following' })).toHaveAttribute('aria-selected', 'true')
+      expect(screen.getByRole('tab', { name: 'Following' })).toHaveFocus()
     })
   })
 })

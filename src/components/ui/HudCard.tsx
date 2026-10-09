@@ -25,11 +25,11 @@ export const HudCard = React.forwardRef<HTMLDivElement, HudCardProps>(
     ref
   ) => {
     const borderVariantMap = {
-      teal: 'border-[#00c3ff]/40 bg-[#0a1012]/80 text-[#dfe3e3]',
-      cyan: 'border-[#00c3ff] bg-[#051c24]/80 text-[#dfe3e3]',
-      crimson: 'border-[#ff453a]/40 bg-[#140809]/80 text-[#dfe3e3]',
-      dark: 'border-[#3a4a49] bg-[#0f1414]/90 text-[#dfe3e3]',
-      ghost: 'border-[#3a4a49]/40 bg-transparent text-[#dfe3e3]',
+      teal: 'border-line-subtle bg-surface-1/90 text-ink',
+      cyan: 'border-cyan-glow/40 bg-surface-1/90 text-ink',
+      crimson: 'border-crimson-aggro/40 bg-surface-crimson/90 text-ink',
+      dark: 'border-line bg-surface-1 text-ink',
+      ghost: 'border-line-subtle bg-transparent text-ink',
     }[variant]
 
     const textureClass = {
@@ -42,11 +42,12 @@ export const HudCard = React.forwardRef<HTMLDivElement, HudCardProps>(
       none: '',
     }[texture]
 
+    // Resting cards stay quiet; glow is opt-in and soft.
     const glowMap = {
-      teal: 'shadow-[0_4px_20px_rgba(0,0,0,0.6),0_0_12px_rgba(0,195,255,0.2)]',
-      cyan: 'shadow-[0_4px_20px_rgba(0,0,0,0.6),0_0_18px_rgba(0,195,255,0.35)]',
-      crimson: 'shadow-[0_4px_20px_rgba(0,0,0,0.6),0_0_12px_rgba(255,69,58,0.25)]',
-      dark: 'shadow-[0_4px_20px_rgba(0,0,0,0.8)]',
+      teal: 'shadow-[0_4px_20px_rgba(0,0,0,0.45)]',
+      cyan: 'shadow-[0_4px_20px_rgba(0,0,0,0.45),0_0_16px_rgba(0,195,255,0.18)]',
+      crimson: 'shadow-[0_4px_20px_rgba(0,0,0,0.45),0_0_16px_rgba(255,69,58,0.18)]',
+      dark: 'shadow-[0_4px_20px_rgba(0,0,0,0.6)]',
       ghost: '',
     }[variant]
 
@@ -54,23 +55,18 @@ export const HudCard = React.forwardRef<HTMLDivElement, HudCardProps>(
       <div
         ref={ref}
         className={cn(
-          'relative border rounded-none backdrop-blur-md transition-all duration-200',
+          'relative border rounded-card backdrop-blur-md transition-[border-color,transform,box-shadow] duration-200',
+          variant !== 'ghost' && 'hud-sheen shadow-sheen-inset',
           borderVariantMap,
           textureClass,
           glow && glowMap,
-          interactive && 'hover:border-[#00c3ff]/80 hover:shadow-[0_0_16px_rgba(0,195,255,0.3)] hover:-translate-y-0.5 cursor-pointer',
+          showCornerBrackets && 'hud-ticks',
+          interactive &&
+            'cursor-pointer hover:border-line-strong hover:-translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
           className
         )}
         {...props}
       >
-        {showCornerBrackets && (
-          <>
-            <span className="absolute -top-[1px] -left-[1px] w-2 h-2 border-t-2 border-l-2 border-[#00c3ff] pointer-events-none z-10" />
-            <span className="absolute -top-[1px] -right-[1px] w-2 h-2 border-t-2 border-r-2 border-[#00c3ff] pointer-events-none z-10" />
-            <span className="absolute -bottom-[1px] -left-[1px] w-2 h-2 border-b-2 border-l-2 border-[#00c3ff] pointer-events-none z-10" />
-            <span className="absolute -bottom-[1px] -right-[1px] w-2 h-2 border-b-2 border-r-2 border-[#00c3ff] pointer-events-none z-10" />
-          </>
-        )}
         {children}
       </div>
     )
@@ -86,7 +82,7 @@ export const HudCardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttribut
     <div
       ref={ref}
       className={cn(
-        'px-5 py-3 border-b border-[#3a4a49]/40 flex items-center justify-between font-sans text-xs uppercase tracking-wider',
+        'px-4 py-3.5 border-b border-line-subtle flex items-center justify-between gap-3 font-sans text-xs uppercase tracking-[0.08em]',
         className
       )}
       {...props}
@@ -101,7 +97,7 @@ export const HudCardTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttri
   ({ className = '', children, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn('font-grotesk font-bold text-sm tracking-wider text-[#00c3ff] uppercase flex items-center gap-2', className)}
+      className={cn('font-grotesk font-bold text-xs tracking-[0.08em] text-ink uppercase flex items-center gap-2', className)}
       {...props}
     >
       {children}
@@ -112,7 +108,7 @@ HudCardTitle.displayName = 'HudCardTitle'
 
 export const HudCardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className = '', children, ...props }, ref) => (
-    <div ref={ref} className={cn('p-5 font-sans text-xs text-[#dfe3e3]', className)} {...props}>
+    <div ref={ref} className={cn('p-4 font-sans text-sm text-ink-body', className)} {...props}>
       {children}
     </div>
   )
@@ -123,7 +119,7 @@ export const HudCardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttribut
   ({ className = '', children, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('px-5 py-3 border-t border-[#3a4a49]/40 flex items-center justify-between font-sans text-xs text-[#839493]', className)}
+      className={cn('px-4 py-3 border-t border-line-subtle flex items-center justify-between gap-3 font-sans text-xs text-ink-muted', className)}
       {...props}
     >
       {children}
