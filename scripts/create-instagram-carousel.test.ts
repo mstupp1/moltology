@@ -1,11 +1,88 @@
-import { describe, it, expect } from 'vitest'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+import { afterEach, describe, it, expect, vi } from 'vitest'
 import {
   generateCarouselCopy,
   buildSlideGoogleFlowPrompt,
   DEFAULT_CAROUSEL_QUEUE_ID,
   DEFAULT_PROFILE_ID,
   DEFAULT_INSTAGRAM_ACCOUNT_ID,
+  parseCarouselCopy,
+  resolveCarouselCopy,
+  createInstagramCarousel,
 } from './create-instagram-carousel'
+
+// These copy/ingestion tests never render images or require an installed browser.
+vi.mock('./lib/composite-renderer', () => ({ openCompositeSession: vi.fn() }))
+
+describe('reviewed carousel copy', () => {
+  const reviewed = {
+    title: 'Your calendar ate the work',
+    topic: 'Shed one meeting',
+    caption: 'Shed one meeting that no longer needs you. Save this before planning Monday.',
+    hashtags: ['#DeepWork'],
+    firstComment: 'The Moltmaxxing Audit: https://moltology.org/quiz',
+  }
+  const directories: string[] = []
+  afterEach(() => {
+    for (const directory of directories.splice(0)) fs.rmSync(directory, { recursive: true, force: true })
+    vi.restoreAllMocks()
+  })
+
+  function writeDraft(value: unknown): string {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'carousel-reviewed-'))
+    directories.push(directory)
+    const file = path.join(directory, 'content.json')
+    fs.writeFileSync(file, JSON.stringify(value))
+    return file
+  }
+
+  it('preserves the reviewed caption and first comment instead of invoking campaign defaults', () => {
+    const fallback = vi.fn(() => generateCarouselCopy('ecdysis'))
+    const copy = resolveCarouselCopy({ contentJson: writeDraft(reviewed), theme: 'ecdysis' }, fallback)
+    expect(copy).toEqual(reviewed)
+    expect(fallback).not.toHaveBeenCalled()
+  })
+
+  it('retains the existing generator when no reviewed file is supplied', () => {
+    const fallback = vi.fn(() => generateCarouselCopy('pincer-torque'))
+    expect(resolveCarouselCopy({}, fallback)).toEqual(generateCarouselCopy('pincer-torque'))
+    expect(fallback).toHaveBeenCalledOnce()
+  })
+
+  it('rejects incomplete reviewed copy instead of silently replacing it with defaults', () => {
+    const fallback = vi.fn(() => generateCarouselCopy('ecdysis'))
+    expect(() => resolveCarouselCopy({ contentJson: writeDraft({ ...reviewed, firstComment: '' }) }, fallback)).toThrow('firstComment')
+    expect(fallback).not.toHaveBeenCalled()
+  })
+
+  it('rejects keyword copy before selecting a caption for ingestion', () => {
+    expect(() => parseCarouselCopy({ ...reviewed, firstComment: 'Comment QUIZ for the audit.' })).toThrow('retired')
+  })
+
+  it('blocks legacy presets and incomplete decks before checking files or uploading', async () => {
+    await expect(createInstagramCarousel({ polishedSlides: Array(5).fill('missing.png') })).rejects.toThrow('--content-json')
+    await expect(createInstagramCarousel({ contentJson: 'missing.json', polishedSlides: Array(3).fill('missing.png') })).rejects.toThrow('5–8')
+    await expect(createInstagramCarousel({ contentJson: 'missing.json', polishedSlides: Array(9).fill('missing.png') })).rejects.toThrow('5–8')
+  })
+
+  it.each([5, 8])('preserves reviewed copy through a %i-slide ingestion dry run', async (count) => {
+    const contentJson = writeDraft(reviewed)
+    const fixture = path.join(path.dirname(contentJson), 'slide.png')
+    fs.writeFileSync(fixture, 'image fixture; no rendering or upload in this test')
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+    const result = await createInstagramCarousel({ contentJson, polishedSlides: Array(count).fill(fixture), dryRun: true })
+    expect(result.copy).toEqual(reviewed)
+    expect(result.slidePaths).toHaveLength(count)
+    expect(result.queueResult?.dryRun).toBe(true)
+  })
+
+  it.each([null, [], { ...reviewed, hashtags: ['#One', '#Two', '#Three', '#Four'] }, { ...reviewed, hashtags: [42] }])(
+    'rejects malformed content or invalid hashtag lists: %j',
+    (draft) => expect(() => parseCarouselCopy(draft)).toThrow(),
+  )
+})
 
 describe('create-instagram-carousel', () => {
   it('generates on-brand carousel copy and caption', () => {

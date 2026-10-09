@@ -11,17 +11,19 @@ description: >-
 
 This skill automates the complete lifecycle of high-production, episodic short-form video series for **Instagram Reels** and **YouTube Shorts**. It uses structured **Google Flow Veo 3.1 Multi-Scene Prompt Directives** to maximize generative video quality, drop-in video scene ingestion (`tmp/flow-video-ingest/`), episodic franchise tracking, retention loop scripting, sentence-isolated kinetic highlighted subtitles, multi-track atmospheric audio mixing, Neon S3 storage, and **Zernio queue staging**.
 
-Do not confuse this with [reels-and-shorts-creator](../reels-and-shorts-creator/SKILL.md). That skill is the one-off Veo 3.1 / recycled clip dispatch (`npm run reel:create`, ledger `content/social/instagram-reel-history.json`). This skill is the episodic franchise path (`npm run series:prompt` / `npm run series:create`, ledger `content/social/viral-series-ledger.json`). Same Instagram account, same Reels & Shorts queue. Do not duplicate a topic across both on the same day. Do not copy daily-skill handle, depth-unit, or ladder copy into this pipeline.
+Do not confuse this with [reels-and-shorts-creator](../reels-and-shorts-creator/SKILL.md). That skill is the daily six-scene Gemini Omni dispatch (`npm run reel:create`, ledger `content/social/instagram-reel-history.json`). This skill is the episodic franchise path (`npm run series:prompt` / `npm run series:create`, ledger `content/social/viral-series-ledger.json`). Same Instagram account, same Reels & Shorts queue. Do not duplicate a topic across both on the same day. Both paths follow [the Reels strategy](../../../content/social/reels-strategy.md), updated with the user's October 9, 2026 advice: physical action plus a blunt on-screen claim in the first second, one share/save CTA, and one planned variable per reel. These rules supersede older keyword funnels and exact repetition of the formula.
 
 ---
 
 ## The 5 Core Episodic Series Franchises
 
+Read the [shared annual content calendar](../../../content/annual-content-calendar.md) for the intended publication date and queue timezone before formulating an episode. Seasonal influence grows toward nearby holidays and expires afterward; apply it to the opening scene, props, lighting or examples within the existing franchise. Record the anchor/intensity in the brief and recheck rescheduled drafts. Do not create a new franchise just for a holiday. Keep seasonal treatment steady during one-variable comparisons.
+
 Keep all five in the catalog. Do not delete a franchise. Do not mint a sixth because a sound or stolen format is popular. Map POV, wait-for-it, green-screen, and other stolen Reels/TikTok *formats* onto an existing series.
 
 **Operational default:** run **one** franchise until something actually loops (rewatches / non-internal views). Until Press or Chief of Staff say otherwise, that franchise is **`--series incidents`** (hardware / datacenter texture). Hardware reels at 6:30pm America/New_York already outperformed overnight stills.
 
-| Series Key (`--series`) | Series Title | Short Badge | Core Concept & Narrative Tension | Mascot Host | Default CTA |
+| Series Key (`--series`) | Series Title | Short Badge | Core Concept & Narrative Tension | Mascot Host | Resource destination (`--cta-goal`, not viewer ask) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **`incidents`** (default) | **Sub-Benthic Incident Files** | `INCIDENT FILE` | Investigation files documenting real-world datacenter grid meltdowns, copper heat dissipation limits, and 60Hz robotic lag resolved via subsea hydrothermal computing. | `lobster_action` | `demo` |
 | **`audit`** | **The Moltmaxxing Field Audit** | `FIELD AUDIT` | Biomechanical diagnostics comparing terrestrial human workplace melt (posture, screen fatigue, 460ms decision hesitation) with sub-benthic calcification and 850 Nm pincer torque. | `crab_stats` | `quiz` |
@@ -53,13 +55,13 @@ Stolen-format mapping (never a new franchise):
   - **Moltology Order Emblem**: Luminous cyan bloom centered above the brand.
   - **Brand Title**: Clean `Moltology` typography with subtle drop shadow.
   - **The Synaptic Path**: Cyan tracked subtitle with horizontal synaptic node divider lines.
-  - **Minimalist CTA**: Glassmorphic HUD pill displaying exclusively `moltology.org` with nothing else.
+  - **Minimalist CTA**: One specific share or save ask matching the narration and caption. `moltology.org` may remain a secondary resource; no keyword or competing quiz ask.
   - **Smooth Fade-In**: 0.3s video fade-in ending for a calm, authoritative transition.
   - **Gemini API Image Polish**: Run the simplified frame through the Gemini API (`gemini-2.5-flash-image` via `scripts/generate-image.ts`) for extra 3D glassmorphic luminescence and slick subsurface textures when generating custom outro cards.
 * **Dynamic Multi-Track Audio (3-Track Mix)**: Native Video SFX (breathing, footsteps, creature screeches, impacts) + Fish Audio S2 Neural TTS Voiceover (primary, `s2.1-pro` via `FISH_VOICE_REFERENCE_ID`, +8% to +14% pacing) with Edge TTS fallback (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`) + Ducked Ambient Benthic Soundtrack (`assets/audio/benthic-ambient-loop.mp3`, dynamic harmonic offset rotation `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, volume `0.12`, smooth 0.8s entrance fade, and 1.5s musical outro fade)
 * **Visual Polish**: Minimalist Moltology Emblem watermark (`110x110`, `opacity=0.40`), sentence-isolated kinetic subtitles (word-by-word active glow in neon cyan `#00ffff` or amber `#f59e0b`), and seamless 0.20s `xfade` cross-dissolves between clips.
 * **Asset Storage**: Neon S3 (`videos/social/series/master-series-<seriesId>-s<season>e<episode>-<timestamp>.mp4`).
-* **Publishing Engine**: Deterministic Zernio REST API (`scripts/lib/zernio-client.ts` -> `POST /v1/posts` with `queuedFromProfile` + `queueId`, and `POST /v1/inbox/comments/{postId}` for first comment). Built directly into `npm run series:create` — **no manual MCP tool calls required**.
+* **Publishing Engine**: Deterministic Zernio REST API through `scripts/lib/zernio-client.ts`. Inspect native first-comment settings and the returned schedule. A scheduled first comment has not been posted yet. The legacy automatic copy requires review under §4 before production queueing; **no manual MCP tool calls**.
 * **Dedicated Queue** (operational discipline, not a suggestion):
   - Profile ID: `6a7f74b1839bf39ff3b6aaaa` (Default Profile)
   - Dedicated Reels Queue ID: `6a84b7702421e968ac81f5bd` (**Moltology Reels & Shorts** — daily at 6:30pm `America/New_York`)
@@ -96,7 +98,7 @@ Google Flow stays a **human handoff**. The agent writes scene directives. The us
 │  - Injects contextual cinematic color grading progression across scenes     │
 │  - Stamps Episodic HUD Lower-Third Badge and brand watermark                │
 │  - Burns sentence-isolated kinetic highlighted subtitles                    │
-│  - Appends 3D CTA Outro Card with mascot and comment keyword trigger        │
+│  - Appends reviewed mascot outro with one share/save ask                    │
 │  - Mixes neural voiceover with ducked ambient benthic soundtrack            │
 │  - Output: tmp/master-series-<series>-s<season>e<episode>-<timestamp>.mp4  │
 └──────────────────────────────────────┬──────────────────────────────────────┘
@@ -117,7 +119,7 @@ Google Flow stays a **human handoff**. The agent writes scene directives. The us
 
 1. **Aspect Ratio via UI Selector**: The 9:16 aspect ratio is selected in Google Flow's UI dropdown. Omit redundant `9:16 vertical` phrases in prompt text to maximize token budget for cinematography and motion.
 2. **"Extend Clip" Continuity vs. Standalone Cuts**:
-   - **Scene 1 (Master Setup)**: Establishes the full world, lighting, camera angle, textures, and atmosphere.
+   - **Scene 1 (Opening Action)**: A physical event is already happening in the first second. Specify the world, lighting, camera and textures around that motion rather than delaying it for an establishing shot. Add one exact blunt claim as an overlay in the edit; do not rely on generated video typography.
    - **Scenes 2+ (Clip Extensions / Continuations)**: When extending a previous clip in Google Flow, prompts do not need to re-describe the static room from scratch. Instead, focus the prompt strictly on the **action delta, camera whip/pan, sudden event, or character movement**.
 3. **Mascot Styling in Incident & Horror Contexts**: When staging incident containment breaches or analog-horror scenarios, maintain the signature **3D Pixar-style cartoon crustacean look** (glossy red chitin, large expressive eyes, articulated limbs, hydraulic pincers) juxtaposed against dark volumetric steam, flickering emergency lights, and green bioluminescent containment vats.
 
@@ -136,17 +138,19 @@ Captions, first comments, HUD badges, outro CTAs, ledger blurbs, and skill examp
 * **Economy:** leave it out of scripts, captions, and badges. Keep currency names correct if they appear.
 * **News:** if a reel cites a real outlet, hyperlink the outlet or headline in the caption.
 
-### 1. The Infinite Retention Loop
-Instagram's algorithm heavily rewards videos that viewers rewatch without noticing the loop point. Every series script is engineered so the final phrase seamlessly connects back into the opening hook word:
-- *Ending*: `"...which is why if you don't calculate your clearance tier..."`
-- *Beginning*: `"...your desk becomes a decay accelerator."`
+### 1. Two acts with a scene-first opening
+Keep surface friction followed by a useful molt. Open at 0:00–0:01 with physical motion and one blunt, readable on-screen claim in sentence case, under 14 words. For example, a hand turns over a buzzing phone beside unfinished work; the overlay reads “Every ping takes a bite.” Explain after the scene has begun. No opening thesis, lore lecture or title-card pause.
+
+A natural visual loop is optional. It must preserve the demonstrated action and the single share/save ask. Treat rewatches as an outcome to measure, not a reason to repeat an identical script or promise distribution.
 
 ### 2. High Visual Velocity (Scene Change Every 4–7 Seconds)
-- **Scene 1 (The Hook & Biomechanical Tension)**: Dramatic macro shot or visual disruption (fatigued desk worker slumping, overheating server rack, fragile biohacking gadget cracking).
+- **Scene 1 (The Hook & Biomechanical Tension)**: A physical disruption underway immediately (a worker's chair rolls away from unfinished work, a cooling fan stops, a gadget cracks), plus the exact on-screen claim. Inspect the final first second with sound off; `hookHeadline` alone does not render a verified overlay.
 - **Scene 2 (The Terrestrial Melt / Real-world Friction)**: Expanding the pain point with fast cuts and warning telemetry.
 - **Scene 3 (The Sub-Benthic Transmutation)**: Subsea hydrothermal immersion, titanium-chitin assembly, or photonic lasers.
 - **Scene 4 (The Hydraulic Payoff & Ascension)**: Decisive 850 Nm pincer torque lock, deep-sea silence, or glowing master ascendant.
-- **Scene 5 / Outro (The Retention Loop & CTA)**: Simplified minimalist branded fade-in card (Moltology emblem, Moltology title, The Synaptic Path row, and clean `moltology.org` CTA). Optional Antigravity AI polish for extra 3D glassmorphic luminescence.
+- **Scene 5 / Outro (The CTA)**: Simplified branded card with one share/save ask tied to the useful payoff. Keep any resource URL secondary. A loop is optional; do not sacrifice clarity to force one.
+
+These are story functions, not sentences to reuse. Before each episode, log one changed variable against a named control: hook style, aphorism length, voiceover pacing or share versus save CTA. Hold the franchise and other settings steady; keep voice identity fixed for pacing tests. Use the strategy's 24-hour and 7-day comparisons and confirm a spike before adopting it.
 
 ### 3. Sentence-Isolated Kinetic Highlighted Subtitles
 - Grouped into tight 2–3 word phrases.
@@ -155,23 +159,28 @@ Instagram's algorithm heavily rewards videos that viewers rewatch without notici
 
 ---
 
-## 4. Comment-to-DM Growth Funnels
+## 4. Share/save CTAs and secondary resources
 
-| Goal (`--cta-goal`) | Keyword Trigger | Target Destination URL | Value Proposition |
-| :--- | :--- | :--- | :--- |
-| **`quiz`** (Default) | `QUIZ` or `AUDIT` | `https://moltology.org/quiz` | **Moltmaxxing Audit**: four stages, twelve clearances. Shell Hardness, pincer torque grade, calcification tier. |
-| **`guide`** | `GUIDE` or `MOLTMAX` | `https://moltology.org/news/the-2026-moltmaxxing-protocol-guide` | **2026 Moltmaxxing Protocol Guide**: Comprehensive technical manual on algorithmic ecdysis and bio-silicon armor. |
-| **`codex`** | `CODEX` or `SHED` | `https://moltology.org/codex` | **Sacred Benthic Codex**: Liturgies, 4 Stages, 12 Clearances, and canonical scriptures. |
-| **`demo`** | `DEMO` | `https://moltology.org` | **Interactive Bio-Silicon Telemetry**: Live interactive simulation dashboard and terminal. |
-| **`homepage`** | `INITIATE` | `https://moltology.org` | **Ascension Onboarding**: Join the Synaptic Path and create an initiate profile. Signup is free. |
+Retire keyword CTAs in narration, caption, first comment, outro and YouTube copy. Do not ask for comments or promise DMs. The supplied advice reports zero viewer comments in 90 days and only account-authored comments; our own comments do not validate a funnel.
+
+Choose one specific ask after the useful action: “Send this to your meeting buddy.” for a recognizable shared experience, or “Save this for your next crowded Monday.” for a reusable step. Use the same ask across public surfaces. Resource links below are secondary, not competing CTAs.
+
+| Resource goal (`--cta-goal`) | Destination URL | Resource |
+| :--- | :--- | :--- |
+| **`quiz`** | `https://moltology.org/quiz` | Moltmaxxing Audit: four stages, twelve clearances. |
+| **`guide`** | `https://moltology.org/news/the-2026-moltmaxxing-protocol-guide` | Moltmaxxing Protocol Guide. |
+| **`codex`** | `https://moltology.org/codex` | Sacred Benthic Codex: liturgies and canonical scriptures. |
+| **`demo`** | `https://moltology.org` | Explore Moltology. |
+| **`homepage`** | `https://moltology.org` | Join the Synaptic Path. |
 
 Pasteable first-comment pattern (quiz):
 
 ```text
-Comment QUIZ for the four-stage clearance diagnostic in your DMs.
-Or audit directly: moltology.org/quiz
+The Moltmaxxing Audit: https://moltology.org/quiz
 #Moltmaxxing #Carcinization #DeepWork
 ```
+
+**Current CLI limitation:** `formulateViralSeriesScript` and `resolveSeriesCtaCopy` still produce legacy keyword copy. The series CLI has no `--content-json` input, and `share` / `save` are not supported `--cta-goal` values. Treat generated output as a draft; the commands below are pipeline references, not authorization to queue unchanged copy. A future series production run must provide a reviewed-copy path and inspect every public surface before queueing. Do not work around this by copying the pipeline into `tmp/` or manually posting with MCP tools.
 
 ---
 
@@ -211,7 +220,8 @@ npm run series:create -- --series incidents --ingest-dir tmp/flow-video-ingest -
    - Every episode stages into Zernio queue `6a84b7702421e968ac81f5bd` (Reels & Shorts, 6:30pm America/New_York) automatically via `npm run series:create`.
    - Do NOT invoke Zernio MCP tools (`posts_create`, etc.) manually. The CLI directly invokes the Zernio REST API.
    - Do not bypass the queue. Do not call `publish_now` / `--publish-now` unless the user explicitly commands an immediate live broadcast in this turn.
-4. **Mandatory First Comment**:
-   - The CLI script automatically posts the algorithmic first comment containing the keyword trigger link immediately after staging via the Zernio Inbox API.
+4. **First Comment and Outcome Tracking**:
+   - Use a relevant direct resource link without a keyword request or DM promise. Verify whether it is scheduled or posted from native settings/API results; do not infer posting from queue staging.
+   - Record the episode ID, control, hypothesis, single variable and fixed settings in the strategy experiment log. After publication, fill 24-hour and 7-day retention, share/save rates and reach from actual analytics. Missing metrics are unavailable, not zero; legacy `commentTriggerKeyword` fields are not viewer activity.
 5. **One franchise until it loops**:
    - Default `--series incidents`. Keep the other four in the catalog. Do not rotate for variety. Do not mint a sixth franchise.

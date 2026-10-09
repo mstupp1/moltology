@@ -1,12 +1,17 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import {
   generatePostContent,
   parsePostContent,
+  createInstagramPost,
   DEFAULT_INSTAGRAM_ACCOUNT_ID,
   DEFAULT_PROFILE_ID,
   DEFAULT_POST_QUEUE_ID,
 } from './create-instagram-post'
 import { hasSlashPair } from '../src/lib/copy-slash-pair'
+import { assertNoKeywordCta } from './lib/instagram-copy-policy'
+
+// Content tests do not render images or need a browser installation.
+vi.mock('./lib/composite-renderer', () => ({ captureComposite: vi.fn() }))
 
 describe('create-instagram-post', () => {
   it('keeps reviewed content instead of regenerating campaign defaults', () => {
@@ -18,6 +23,12 @@ describe('create-instagram-post', () => {
     expect(() => parsePostContent({ caption: 'Partial draft' })).toThrow('title')
     const content = generatePostContent('sacred-codex')
     expect(() => parsePostContent({ ...content, hashtags: ['a', 'b', 'c', 'd'] })).toThrow('three')
+  })
+
+  it('blocks keyword copy and legacy presets before media ingestion', async () => {
+    const content = { title: 'Quiet hour', topic: 'Focus', hookHeadline: 'Protect your hour.', imagePrompt: 'Book', caption: 'Comment "GUIDE" for access.', firstComment: 'Open the Codex.', hashtags: ['#Moltology'] }
+    expect(() => parsePostContent(content)).toThrow('retired')
+    await expect(createInstagramPost({ polishedImage: 'missing.png' })).rejects.toThrow('--content-json')
   })
   it('generates on-brand Moltmaxxing post content', () => {
     const post = generatePostContent('moltmaxxing')
@@ -39,25 +50,25 @@ describe('create-instagram-post', () => {
     const post = generatePostContent('moltmaxxing-guide', undefined, 'lobster_pointing')
     expect(post.title).toContain('Protocol Guide')
     expect(post.hookHeadline).toContain('STOP MELTING')
-    expect(post.commentKeyword).toBe('GUIDE')
-    expect(post.caption).toContain('Comment "GUIDE"')
-    expect(post.firstComment).toContain('GUIDE')
+    expect(post).not.toHaveProperty('commentKeyword')
+    expect(post.caption).not.toMatch(/comment|\bdms?\b/i)
+    expect(post.firstComment).toContain('https://moltology.org/news/the-2026-moltmaxxing-protocol-guide')
     expect(post.mascot).toBe('lobster_pointing')
   })
 
   it('generates 15-Stage Quiz marketing post content', () => {
     const post = generatePostContent('moltmax-quiz', undefined, 'crab_stats')
     expect(post.title).toContain('Diagnostic Audit')
-    expect(post.commentKeyword).toBe('QUIZ')
-    expect(post.caption).toContain('Comment "QUIZ"')
+    expect(post).not.toHaveProperty('commentKeyword')
+    expect(post.caption).not.toMatch(/comment|\bdms?\b/i)
     expect(post.mascot).toBe('crab_stats')
   })
 
   it('generates Benthic Core App marketing post content with dynamic mascot', () => {
     const post = generatePostContent('benthic-app', undefined, 'lobster_engineer')
     expect(post.title).toContain('Benthic Core')
-    expect(post.commentKeyword).toBe('APP')
-    expect(post.caption).toContain('Comment "APP"')
+    expect(post).not.toHaveProperty('commentKeyword')
+    expect(post.caption).not.toMatch(/comment|\bdms?\b/i)
     expect(post.mascot).toBe('lobster_engineer')
   })
 
@@ -65,9 +76,9 @@ describe('create-instagram-post', () => {
     const post = generatePostContent('oracle-prompts', undefined, 'lobster_navigator')
     expect(post.title).toContain('Synaptic Oracle')
     expect(post.hookHeadline).toContain('UNLOCK THE ORACLE')
-    expect(post.commentKeyword).toBe('PROMPTS')
-    expect(post.caption).toContain('Comment "PROMPTS"')
-    expect(post.firstComment).toContain('PROMPTS')
+    expect(post).not.toHaveProperty('commentKeyword')
+    expect(post.caption).not.toMatch(/comment|\bdms?\b/i)
+    expect(post.firstComment).toContain('https://moltology.org/oracle')
     expect(post.mascot).toBe('lobster_navigator')
   })
 
@@ -95,6 +106,9 @@ describe('create-instagram-post', () => {
       expect(hasSlashPair(post.caption), theme).toBe(false)
       expect(hasSlashPair(post.hookHeadline), theme).toBe(false)
       expect(hasSlashPair(post.title), theme).toBe(false)
+      expect(() => assertNoKeywordCta(post as unknown as Record<string, unknown>), theme).not.toThrow()
+      expect(post, theme).not.toHaveProperty('commentKeyword')
+      expect(post.firstComment, theme).toContain('https://moltology.org')
     }
   })
 

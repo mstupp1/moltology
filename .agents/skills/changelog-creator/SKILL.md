@@ -38,6 +38,8 @@ Select the workflow matching the request:
 
 ## 1.1 Tone, Style & Significance Checklist (Non-Negotiable)
 
+Read the [shared annual content calendar](../../../content/annual-content-calendar.md) for the actual release period. A relevant seasonal context can shape a brief example or release illustration, but significant shipped work determines whether an entry exists. Preserve historical release dates and benefits; do not invent holiday releases, promotions or decorative entries to fill the calendar.
+
 Every changelog entry must be a **high-level, plain explanation** of what was changed and what users gain.
 
 - **Only create entries for significant changes**: If a day or update is just minor tweaks, small styling fixes, internal developer scripts, or backend plumbing, **do not create an entry**. Only create entries for meaningful feature releases, major UI overhauls, or significant platform additions.

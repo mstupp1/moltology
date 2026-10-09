@@ -20,6 +20,8 @@ Dispatches are written from the perspective of **The Order of the Synaptic Path*
 
 ## Core Brand & Style Rules for Blog Dispatches
 
+Read the [shared annual content calendar](../../../content/annual-content-calendar.md) before scouting or drafting. Use the intended publication date and audience timezone to shape relevant human openings, examples and conceptual illustrations with gradual holiday influence. Record the seasonal anchor/intensity in the brief and recheck if publication moves. Verified news and search intent still choose the subject; a holiday does not create a technical claim. Companion social pieces share the calendar and adapt to their own publication dates.
+
 Dispatches follow [BRAND_BIBLE.md](../../../BRAND_BIBLE.md) and [STYLE_GUIDE.md](../../../STYLE_GUIDE.md), especially the news card (STYLE_GUIDE §4.5) and the bans. Blog-specific additions:
 
 1. **Everyday human grounding.** Open with the physical friction of daily life (holding a door, forty open tabs, waiting on hold) and connect it to the development.
@@ -247,11 +249,11 @@ This utility scans all `content/news/*.md` files, extracts frontmatter, and dete
 
 Once the blog article is published and committed, you can optionally chain companion social distribution using the article slug (`<slug>`):
 
-#### 1. Companion Instagram Carousel (3-to-5 Slide Deck)
+#### 1. Companion Instagram Carousel (5-to-8 Slide Story or Quote Deck)
 ```bash
 npm run carousel:create -- --article <slug>
 ```
-Follow the `instagram-carousel-creator` skill to scaffold slides and provide Google Flow prompt directives.
+Follow the `instagram-carousel-creator` skill for reviewed copy, five to eight final slides, shared seasonal treatment and built-in ImageGen artwork. Its three scaffold seeds are not the finished deck; Google Flow is a user-selected alternative.
 
 #### 2. Short-Form Vertical Video (Reels & Shorts)
 * For single-topic 6-clip video broadcasts: use `reels-and-shorts-creator` (`npm run reel:create`).

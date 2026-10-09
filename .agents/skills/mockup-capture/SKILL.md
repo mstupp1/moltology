@@ -14,6 +14,8 @@ This skill guides the automated generation and synchronization of high-DPI, pixe
 
 ## 1. Architecture & Asset Flow
 
+For marketing presentations, read the [shared annual content calendar](../../../content/annual-content-calendar.md) and inherit the campaign's publication date and seasonal treatment. Apply seasonal styling to surrounding marketing artwork or copy when relevant. Keep the captured UI factual: do not invent holiday features, offers or on-screen states, or alter the underlying product merely to match the season.
+
 ```
 Benthic OS Routes (/dashboard, /forum, /oracle, /market, /chassis, /codex)
          │

@@ -12,6 +12,8 @@ Read repository `BRAND_BIBLE.md` and `STYLE_GUIDE.md` before public character co
 
 ## Scope and reference inputs
 
+For content/campaign artwork, read the [shared annual content calendar](../../../content/annual-content-calendar.md) and inherit the intended publication date, seasonal anchor and intensity from the brief. Seasonal lighting, poses and removable props may support the story; preserve canonical face, anatomy and signature attire, and save seasonal variants separately from reusable masters. Character design work follows the requested brief rather than automatically redesigning the cast for a holiday.
+
 Design tests and explorations produce local experiments. Requests to add, replace, or publish a mascot may include [deployment](references/deployment.md). Follow existing session authorization; do not require another approval when deployment was already requested.
 
 Discover characters in `src/components/composite/MascotOverlay.tsx`, `scripts/lib/character-overlay.ts`, and `scratch/character_refs/`. If a local reference is missing, retrieve its actual registered public asset. Prefer master PNG; WebP is usable when PNG is unavailable. Keep experimental inputs in the experiment folder.

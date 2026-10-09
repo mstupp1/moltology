@@ -13,6 +13,8 @@ References come in by the dozen. Each one goes through the same loop: ingest, an
 
 ## Where things live
 
+For content/campaign recreations, read the [shared annual content calendar](../../../content/annual-content-calendar.md) and adapt copy, props and accents to the intended publication date. Borrow the reference's structure while following the campaign's current seasonal treatment; do not carry an expired holiday over merely because it appears in a reference. Keep reusable base layouts distinct from seasonal variants.
+
 | What | Where |
 | --- | --- |
 | Drop zone | `<root>/inbox/` (any folder depth; folder names become tags; `x.txt` or `x.md` beside `x.png` becomes notes) |

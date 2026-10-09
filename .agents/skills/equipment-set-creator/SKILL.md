@@ -12,6 +12,8 @@ This skill guides the design, visual generation, asset optimization, and codebas
 
 ## 1. Equipment Philosophy & Set-First Architecture
 
+Read the [shared annual content calendar](../../../content/annual-content-calendar.md) when choosing a seasonal set concept or producing campaign illustrations. Inherit the intended publication date and treatment from the brief. The calendar may inform requested materials, accents and presentation; it does not by itself authorize a new set, catalog registration, promotion or changes to existing equipment stats/assets. Preserve the requested whole-set scope and canonical hardpoints.
+
 In Moltology, individual equipment pieces do not exist in isolation. They are designed and generated **in complete, cohesive sets at once** to guarantee visual harmony, identical material rendering, matching lighting palettes, and unified benthic lore.
 
 ### The Mandatory Whole-Set Generation Rule

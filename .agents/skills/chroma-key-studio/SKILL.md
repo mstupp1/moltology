@@ -12,6 +12,8 @@ This skill automates the complete lifecycle of generating and extracting transpa
 
 ## The Chroma Key Strategy
 
+For campaign/content cutouts, read the [shared annual content calendar](../../../content/annual-content-calendar.md) and use the brief's intended publication date, seasonal anchor and intensity. Keep seasonal props in separate variants, preserve character identity, and choose an extraction color absent from the full seasonal subject, including its props. A seasonal palette is not permission to overwrite reusable master assets.
+
 When generating isolated subjects or mascots, the goal is to produce an image on a high-contrast, perfectly flat background of a single solid color that **does not exist anywhere on the subject**.
 
 ### 1. Key Color Selection Matrix
