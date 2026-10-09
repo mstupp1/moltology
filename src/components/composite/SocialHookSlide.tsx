@@ -1,8 +1,18 @@
 import React from 'react'
 import { CompositeContainer, CompositeAspectRatio } from './CompositeContainer'
+import { isCrabMascot } from '@/lib/mascots'
 import { MascotOverlay, MascotKey } from './MascotOverlay'
-import { MoltNationLogo } from '@/components/news/MoltNationLogo'
-import { ArrowRight, Sparkles } from 'lucide-react'
+import { displayCopy } from '@/lib/composite-copy'
+import {
+  CompositeBrand,
+  CompositeBullets,
+  CompositeFooter,
+  CompositeHeadline,
+  CompositeLabel,
+  CompositeMetric,
+  CompositePanel,
+  CompositePill,
+} from './CompositeKit'
 
 export interface MetricPanel {
   label: string
@@ -130,7 +140,7 @@ export const SocialHookSlide: React.FC<SocialHookSlideProps> = ({
   bulletPoints,
   mascot = 'lobster_thumbs_up',
   backgroundImageUrl,
-  swipeCta = 'SWIPE FOR HARD DATA',
+  swipeCta = 'Swipe for the numbers',
   bulletsTitle = 'Key takeaways',
 }) => {
   const preset = THEME_PRESETS[theme] || {}
@@ -166,152 +176,54 @@ export const SocialHookSlide: React.FC<SocialHookSlideProps> = ({
       'Zero hallucination reasoning drift',
     ]
   return (
-    <CompositeContainer
-      aspectRatio={aspectRatio}
-      backgroundImageUrl={backgroundImageUrl}
-      showScanlines={true}
-      showCornerBrackets={false}
-    >
-      {/* 1. Category Pill Badge (clean. No slash-pair.) */}
-      <div className="flex items-center gap-3">
-        <div className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-xl bg-cyan-950/70 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,195,255,0.25)]">
-          <span className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse" />
-          <span className="font-mono font-bold text-lg tracking-widest text-cyan-300 uppercase">
-            {finalBadge}
-          </span>
-        </div>
+    <CompositeContainer aspectRatio={aspectRatio} backgroundImageUrl={backgroundImageUrl}>
+      <div className="flex items-start justify-between gap-6">
+        <CompositePill>{finalBadge}</CompositePill>
+        <CompositeBrand size="sm" />
       </div>
 
-      {/* 2. Punchy Main Headline */}
-      <div className="mt-5 space-y-1">
-        {finalH1 && (
-          <h1 className="text-[64px] leading-[1.02] font-black text-white tracking-tight uppercase">
-            {finalH1}
-          </h1>
-        )}
-        {finalH2 && (
-          <h2 className="text-[64px] leading-[1.02] font-black text-white tracking-tight uppercase">
-            {finalH2}
-          </h2>
-        )}
-        {finalHighlight && (
-          <h2 className="text-[64px] leading-[1.02] font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-cyan-400 to-sky-400 drop-shadow-[0_0_20px_rgba(0,255,230,0.4)] tracking-tight uppercase">
-            {finalHighlight}
-          </h2>
-        )}
-      </div>
+      <CompositeHeadline
+        lines={[finalH1, finalH2]}
+        accent={finalHighlight}
+        size={70}
+        className="mt-7"
+      />
 
-      {/* 3. Narrative Paragraph (Clean, Border Removed) */}
       {finalNarrative && (
-        <div className="mt-5">
-          <p className="text-[29px] leading-snug font-medium text-slate-100">
-            {finalNarrative}
-          </p>
-        </div>
+        <p className="mt-6 max-w-[920px] text-[27px] leading-[1.4] text-ink-body">{displayCopy(finalNarrative)}</p>
       )}
 
-      {/* 4. Two Comparison Metric Panels */}
-      <div className="mt-6 grid grid-cols-2 gap-6">
-        {/* Left Panel */}
-        <div
-          className={`p-7 rounded-2xl border backdrop-blur-md ${
-            finalLeftMetric.variant === 'red'
-              ? 'bg-[#1a080c]/90 border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
-              : 'bg-[#041822]/90 border-cyan-400/80 shadow-[0_0_20px_rgba(0,255,230,0.2)]'
-          }`}
-        >
-          <div
-            className={`font-mono font-bold text-[18px] tracking-wider uppercase ${
-              finalLeftMetric.variant === 'red' ? 'text-red-400' : 'text-cyan-400'
-            }`}
-          >
-            {finalLeftMetric.label}
-          </div>
-          <div className="mt-3.5 font-mono font-black text-[64px] leading-none text-white tracking-tight">
-            {finalLeftMetric.value}
-          </div>
-          <div
-            className={`mt-2 font-mono font-bold text-[20px] tracking-wide uppercase ${
-              finalLeftMetric.variant === 'red' ? 'text-red-300' : 'text-cyan-300'
-            }`}
-          >
-            {finalLeftMetric.sublabel}
-          </div>
-          {finalLeftMetric.description && (
-            <p className="mt-3.5 text-[19px] text-slate-200 font-sans leading-snug">
-              {finalLeftMetric.description}
-            </p>
-          )}
-        </div>
-
-        {/* Right Panel */}
-        <div
-          className={`p-7 rounded-2xl border backdrop-blur-md ${
-            finalRightMetric.variant === 'red'
-              ? 'bg-[#1a080c]/90 border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
-              : 'bg-[#041822]/90 border-cyan-400/80 shadow-[0_0_20px_rgba(0,255,230,0.2)]'
-          }`}
-        >
-          <div
-            className={`font-mono font-bold text-[18px] tracking-wider uppercase ${
-              finalRightMetric.variant === 'red' ? 'text-red-400' : 'text-cyan-400'
-            }`}
-          >
-            {finalRightMetric.label}
-          </div>
-          <div className="mt-3.5 font-mono font-black text-[64px] leading-none text-white tracking-tight">
-            {finalRightMetric.value}
-          </div>
-          <div
-            className={`mt-2 font-mono font-bold text-[20px] tracking-wide uppercase ${
-              finalRightMetric.variant === 'red' ? 'text-red-300' : 'text-cyan-300'
-            }`}
-          >
-            {finalRightMetric.sublabel}
-          </div>
-          {finalRightMetric.description && (
-            <p className="mt-3.5 text-[19px] text-slate-200 font-sans leading-snug">
-              {finalRightMetric.description}
-            </p>
-          )}
-        </div>
+      <div className="mt-8 grid grid-cols-2 gap-6">
+        {[finalLeftMetric, finalRightMetric].map((m, i) => (
+          <CompositeMetric
+            key={i}
+            label={m.label}
+            value={m.value}
+            caption={m.sublabel}
+            description={m.description}
+            tone={m.variant === 'red' ? 'crimson' : 'cyan'}
+            valueSize={64}
+          />
+        ))}
       </div>
 
-      {/* 5. Lower Highlight Banner & Mascot */}
-      <div className="mt-6 relative flex-1 flex items-center">
-        <div className="w-[60%] h-fit p-7 rounded-2xl bg-[#061a26]/90 border border-cyan-500/50 backdrop-blur-md shadow-lg flex flex-col">
-          <div className="flex items-center gap-3 text-sky-300 font-black text-2xl mb-3.5">
-            <Sparkles className="w-6 h-6 text-cyan-300" />
-            <span>{bulletsTitle}</span>
-          </div>
-          <ul className="space-y-2.5 text-slate-100 text-[21px]">
-            {finalBullets.map((pt, i) => (
-              <li key={i} className="flex items-center gap-3">
-                <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shrink-0" />
-                <span className="font-semibold">{pt}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className="relative mt-8 flex flex-1 items-center">
+        <CompositePanel className="w-[58%]">
+          <CompositeLabel tone="neutral">{bulletsTitle}</CompositeLabel>
+          <CompositeBullets items={finalBullets} className="mt-5" />
+        </CompositePanel>
 
-        {/* Mascot */}
-        <MascotOverlay
-          mascot={mascot}
-          position="bottom-right"
-          width={mascot === 'crab_stats' ? 330 : 360}
-          className="bottom-0 -right-2"
-        />
       </div>
 
-      {/* 6. Bottom Navigation Cue & Watermark */}
-      <div className="pt-5 flex items-center justify-between border-t border-slate-800/80">
-        <div className="flex items-center gap-3 font-mono font-bold text-[22px] text-slate-300">
-          <span>{swipeCta}</span>
-          <ArrowRight className="w-7 h-7 text-cyan-400 animate-pulse" />
-        </div>
+      <CompositeFooter cue={swipeCta} right={null} className="mt-6 w-[58%]" />
 
-        <MoltNationLogo size="md" theme="dark" />
-      </div>
+      <MascotOverlay
+        mascot={mascot}
+        position="bottom-right"
+        width={isCrabMascot(mascot) ? 380 : 330}
+        glow={false}
+        className="bottom-0 right-6"
+      />
     </CompositeContainer>
   )
 }

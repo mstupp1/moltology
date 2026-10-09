@@ -207,9 +207,9 @@ describe('directScenePrompts', () => {
     })
     expect(result.source).toBe('fallback')
     expect(result.bible.mascotKey).toBe('lobster_engineer')
-    expect(result.bible.hero).toContain('yellow safety hardhat')
-    expect(result.bible.hero).toContain('holographic diagnostic tablet')
-    expect(result.prompts[1]).toContain('yellow safety hardhat')
+    expect(result.bible.hero).toContain('yellow hardhat')
+    expect(result.bible.hero).toContain('blueprint tablet')
+    expect(result.prompts[1]).toContain('yellow hardhat')
   })
 })
 

@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { S3_BASE_URL } from '@/lib/assets'
+import {
+  DEFAULT_MASCOT_KEY,
+  MASCOT_CAST,
+  MASCOT_S3_PREFIX,
+  getMascotKeys,
+  resolveMascotAlias,
+} from '@/lib/mascots'
 import { cn } from '@/lib/utils'
 
-export type MascotKey =
-  | 'lobster_pointing'
-  | 'lobster_thumbs_up'
-  | 'lobster_navigator'
-  | 'lobster_action'
-  | 'crab_stats'
-  | 'lobster_peek'
-  | 'lobster_peaceful'
-  | 'lobster_engineer'
-  | 'random'
-  | 'none'
-  | (string & {})
+export type MascotKey = 'random' | 'none' | (string & {})
 
 export interface MascotInfo {
   key: string
@@ -23,63 +19,17 @@ export interface MascotInfo {
   description?: string
 }
 
-export const MASCOT_REGISTRY: Record<string, MascotInfo> = {
-  lobster_pointing: {
-    key: 'lobster_pointing',
-    name: 'Lobster Pointing (CTA / Hero)',
-    filename: 'char_lobster_pointing_cta.webp',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_pointing_cta.webp`,
-    description: 'Hero lobster pointing directly at call to action buttons or key links',
-  },
-  lobster_thumbs_up: {
-    key: 'lobster_thumbs_up',
-    name: 'Lobster Thumbs Up (Approval)',
-    filename: 'char_lobster_thumbs_up.webp',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.webp?v=4`,
-    description: 'Cheerful lobster giving a thumbs-up approval sign',
-  },
-  lobster_navigator: {
-    key: 'lobster_navigator',
-    name: 'Lobster Navigator (Benthic Explorer)',
-    filename: 'char_lobster_navigator.webp',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_navigator.webp?v=3`,
-    description: 'Adventurous lobster explorer wearing opaque goggles and tactical benthic harness belt',
-  },
-  crab_stats: {
-    key: 'crab_stats',
-    name: 'Crab Pointing Stats (Metrics)',
-    filename: 'char_crab_pointing_stats.webp',
-    s3Url: `${S3_BASE_URL}/images/characters/char_crab_pointing_stats.webp`,
-    description: 'Energetic crab pointing at quantitative metrics and charts',
-  },
-  lobster_peek: {
-    key: 'lobster_peek',
-    name: 'Lobster Corner Peek (Surprise)',
-    filename: 'char_lobster_corner_peek.webp',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_corner_peek.webp`,
-    description: 'Playful lobster peeking over top or side container bezels',
-  },
-  lobster_peaceful: {
-    key: 'lobster_peaceful',
-    name: 'Lobster Peaceful (Zen Benthic)',
-    filename: 'char_lobster_floating_peaceful.webp',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_floating_peaceful.webp`,
-    description: 'Calm cyber-lobster floating peacefully in deep benthic waters',
-  },
-  lobster_engineer: {
-    key: 'lobster_engineer',
-    name: 'Lobster Engineer (Hardhat Diagnostic)',
-    filename: 'char_lobster_engineer.webp',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_engineer.webp`,
-    description: 'Cheerful lobster engineer wearing safety hardhat with holographic tablet',
-  },
-}
+const mascotS3Url = (filename: string) => `${S3_BASE_URL}/${MASCOT_S3_PREFIX}/${filename}`
+
+export const MASCOT_REGISTRY: Record<string, MascotInfo> = Object.fromEntries(
+  MASCOT_CAST.map((m) => [m.key, { ...m, s3Url: mascotS3Url(m.filename) }])
+)
 
 /**
  * Get a list of all registered mascot keys (excluding 'none' and meta keys)
  */
 export function getAllMascotKeys(): string[] {
-  return Object.keys(MASCOT_REGISTRY)
+  return getMascotKeys()
 }
 
 /**
@@ -113,31 +63,15 @@ export function getRandomMascotRotation(count: number): string[] {
 }
 
 /**
- * Normalizes character keys and aliases to registry keys
+ * Normalizes character keys, aliases and file names to registry keys
  */
 export function normalizeMascotKey(rawKey: string): string {
-  if (!rawKey) return 'lobster_thumbs_up'
-  let raw = rawKey.trim().toLowerCase()
+  if (!rawKey) return DEFAULT_MASCOT_KEY
+  const raw = rawKey.trim().toLowerCase()
   if (raw === 'random' || raw === 'dice' || raw === 'shuffle') {
     return getRandomMascotKey()
   }
-  if (raw.endsWith('.png') || raw.endsWith('.jpg') || raw.endsWith('.webp')) {
-    raw = raw.replace(/\.[^/.]+$/, '')
-  }
-  if (raw.startsWith('char_')) {
-    raw = raw.replace(/^char_/, '')
-  }
-
-  // Comprehensive alias normalization
-  if (raw === 'lobster_pointing_cta' || raw === 'pointing' || raw === 'cta' || raw === 'lobster_cta') return 'lobster_pointing'
-  if (raw === 'lobster_corner_peek' || raw === 'peek' || raw === 'corner_peek') return 'lobster_peek'
-  if (raw === 'crab_pointing_stats' || raw === 'crab_stats' || raw === 'stats' || raw === 'pointing_stats') return 'crab_stats'
-  if (raw === 'lobster_navigator' || raw === 'navigator' || raw === 'explorer' || raw === 'lobster_speed_action' || raw === 'speed_action' || raw === 'lobster_action' || raw === 'action' || raw === 'speed') return 'lobster_navigator'
-  if (raw === 'lobster_floating_peaceful' || raw === 'floating_peaceful' || raw === 'peaceful' || raw === 'zen' || raw === 'floating') return 'lobster_peaceful'
-  if (raw === 'lobster_engineer' || raw === 'engineer' || raw === 'diagnostic' || raw === 'hardhat') return 'lobster_engineer'
-  if (raw === 'thumbs_up' || raw === 'thumbs' || raw === 'approval' || raw === 'lobster_thumbs') return 'lobster_thumbs_up'
-
-  return raw
+  return resolveMascotAlias(raw)
 }
 
 /**
@@ -158,7 +92,7 @@ export function getMascotInfo(mascotKey: string): MascotInfo {
     key: normKey,
     name: normKey.replace(/_/g, ' ').toUpperCase(),
     filename,
-    s3Url: `${S3_BASE_URL}/images/characters/${filename}`,
+    s3Url: mascotS3Url(filename),
   }
 }
 
@@ -179,7 +113,7 @@ export interface MascotOverlayProps {
 }
 
 export const MascotOverlay: React.FC<MascotOverlayProps> = ({
-  mascot = 'lobster_thumbs_up',
+  mascot = DEFAULT_MASCOT_KEY,
   position = 'bottom-right',
   width = 380,
   glow = true,
@@ -203,8 +137,8 @@ export const MascotOverlay: React.FC<MascotOverlayProps> = ({
   const handleImageError = () => {
     if (!hasFailed) {
       setHasFailed(true)
-      // Fallback to S3 default thumbs-up WebP
-      setCurrentSrc(`${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.webp?v=4`)
+      // Fall back to the default mascot cutout
+      setCurrentSrc(MASCOT_REGISTRY[DEFAULT_MASCOT_KEY].s3Url)
     }
   }
 

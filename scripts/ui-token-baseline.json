@@ -99,13 +99,6 @@
     "chamfer": 18,
     "tiny-text": 13
   },
-  "src/components/composite/BlogSchematicCard.tsx": {
-    "hex-color": 2,
-    "off-scale-radius": 1
-  },
-  "src/components/composite/CompositeContainer.tsx": {
-    "hex-color": 12
-  },
   "src/components/composite/CompositeRenderView.tsx": {
     "hex-color": 2
   },
@@ -114,36 +107,9 @@
     "tiny-text": 18,
     "off-scale-radius": 10
   },
-  "src/components/composite/ReelOutroCard.tsx": {
-    "hex-color": 5,
-    "off-scale-radius": 2
-  },
-  "src/components/composite/ReelSimpleOutroCard.tsx": {
-    "hex-color": 7,
-    "off-scale-radius": 2
-  },
-  "src/components/composite/ReelThumbnailCard.tsx": {
-    "off-scale-radius": 1
-  },
-  "src/components/composite/SocialDirectivesSlide.tsx": {
-    "hex-color": 3,
-    "off-scale-radius": 5
-  },
-  "src/components/composite/SocialHookSlide.tsx": {
-    "hex-color": 5,
-    "off-scale-radius": 4
-  },
   "src/components/composite/SocialMarketingSlide.tsx": {
-    "hex-color": 113,
-    "off-scale-radius": 8
-  },
-  "src/components/composite/SocialPromptVaultSlide.tsx": {
-    "hex-color": 70,
-    "off-scale-radius": 13
-  },
-  "src/components/composite/SocialSpecShowdownSlide.tsx": {
-    "hex-color": 4,
-    "off-scale-radius": 3
+    "hex-color": 34,
+    "off-scale-radius": 4
   },
   "src/components/guide/MoltmaxGuideCard.tsx": {
     "hex-color": 14

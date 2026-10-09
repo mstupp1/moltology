@@ -2,8 +2,16 @@ import React from 'react'
 import { CompositeContainer, CompositeAspectRatio } from './CompositeContainer'
 import { MascotOverlay, MascotKey } from './MascotOverlay'
 import { ThreeBookCover } from './ThreeBookCover'
-import { MoltNationLogo } from '@/components/news/MoltNationLogo'
-import { HeaderBrand } from '@/components/ui/HeaderBrand'
+import { isCrabMascot } from '@/lib/mascots'
+import { displayCopy } from '@/lib/composite-copy'
+import {
+  CompositeBrand,
+  CompositeCta,
+  CompositeHeadline,
+  CompositeLabel,
+  CompositePanel,
+  CompositePill,
+} from './CompositeKit'
 import { Safari } from '@/components/ui/magicui/safari'
 import { Iphone15Pro } from '@/components/ui/magicui/iphone-15-pro'
 import {
@@ -459,190 +467,67 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
   const isCodex = theme === 'sacred-codex' || theme === 'codex'
   const isRoutine = theme === 'pincer-routine' || theme === 'routine'
 
+  const accentTone = isCodex ? 'cyan' : 'crimson'
+
   return (
-    <CompositeContainer
-      aspectRatio={aspectRatio}
-      backgroundImageUrl={backgroundImageUrl}
-      showScanlines={true}
-      showCornerBrackets={false}
-      className="bg-gradient-to-b from-[#010812] via-[#02182b] to-[#01060e] flex flex-col justify-between p-8"
-    >
-      {/* Top-Right Crustacean Mascot (Layered underneath the nearby badge & book) */}
+    <CompositeContainer aspectRatio={aspectRatio} backgroundImageUrl={backgroundImageUrl}>
+      {/* Top-right mascot sits behind the mockup; the headline column stays clear of it. */}
       {finalMascot && finalMascot !== 'none' && (
         <MascotOverlay
           mascot={finalMascot}
           position="top-right"
-          width={440}
+          width={isCrabMascot(finalMascot) ? 360 : 300}
           glow={false}
-          className="top-2 right-0 z-0 drop-shadow-[0_20px_35px_rgba(0,0,0,0.95)]"
+          className="right-8 top-8 z-0"
         />
       )}
 
-      {/* Background Subtle Tech Dot Grid */}
-      <div className="absolute top-40 left-8 grid grid-cols-6 gap-2.5 opacity-30 pointer-events-none">
-        {Array.from({ length: 36 }).map((_, i) => (
-          <span key={i} className="w-1.5 h-1.5 rounded-full bg-[#00c3ff]" />
-        ))}
+      <div className="relative z-10 max-w-[640px] shrink-0">
+        <CompositePill tone={accentTone}>{finalEyebrow}</CompositePill>
+        <CompositeHeadline
+          lines={[finalH1, finalH2]}
+          accent={finalHighlight}
+          accentTone={accentTone}
+          size={62}
+          className="mt-6"
+        />
+        <p className="mt-5 text-[26px] leading-snug text-ink-body [text-wrap:balance]">{displayCopy(finalSub)}</p>
       </div>
 
-      {/* 1. Header Section: Eyebrow Badge & Punchy Impact Headline */}
-      {/* Narrower than the canvas so the top-right mascot never sits on the copy */}
-      <div className="z-10 shrink-0 max-w-[615px]">
-        {/* Eyebrow Pill */}
-        <div
-          className={`inline-flex items-center gap-2.5 px-4 py-2 rounded-xl border-2 shadow-lg ${
-            isCodex
-              ? 'bg-gradient-to-r from-[#00c3ff]/20 via-[#00ffff]/30 to-[#00c3ff]/20 border-[#00ffff] shadow-[0_0_20px_rgba(0,255,255,0.35)]'
-              : 'bg-gradient-to-r from-[#ff453a] to-[#ff5540] border-[#ff6358] shadow-[0_4px_14px_rgba(255,69,58,0.4)]'
-          }`}
-        >
-          <span
-            className={`w-3 h-3 rounded-full ${
-              isCodex ? 'bg-[#00ffff] shadow-[0_0_8px_#00ffff]' : 'bg-[#01060e]'
-            }`}
-          />
-          <span
-            className={`font-mono font-black text-[15px] tracking-wider uppercase ${
-              isCodex ? 'text-[#00ffff]' : 'text-white'
-            }`}
-          >
-            {finalEyebrow}
-          </span>
-        </div>
-
-        {/* 3-Line Massive Headline */}
-        <div className="mt-4 space-y-1">
-          <h1 className="text-[58px] leading-[0.98] font-black text-white tracking-tight uppercase drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">
-            {finalH1}
-          </h1>
-          <h2 className="text-[58px] leading-[0.98] font-black text-white tracking-tight uppercase drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">
-            {finalH2}
-          </h2>
-          <h2
-            className={`text-[64px] leading-[0.98] font-black text-transparent bg-clip-text tracking-tight uppercase ${
-              isCodex
-                ? 'bg-gradient-to-r from-[#00ffff] via-[#38bdf8] to-[#00e5ff] drop-shadow-[0_0_25px_rgba(0,255,255,0.65)]'
-                : 'bg-gradient-to-r from-[#ff5540] via-[#ff453a] to-[#cc1a10] drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]'
-            }`}
-          >
-            {finalHighlight}
-          </h2>
-        </div>
-
-        {/* Sub-headline / Hook */}
-        <div className="mt-3.5 flex items-center gap-3">
-          <div
-            className={`w-2.5 h-7 rounded-full shadow-sm ${
-              isCodex ? 'bg-[#00ffff] shadow-[0_0_12px_#00ffff]' : 'bg-[#ff453a]'
-            }`}
-          />
-          <p className="text-[24px] leading-snug font-bold text-slate-100 tracking-wide [text-wrap:balance]">
-            {finalSub}
-          </p>
-        </div>
-      </div>
-
-      {/* 2. Main Content Split: Left Benefits Column + Right 3D Mockup */}
-      <div className="mt-4 mb-2 grid grid-cols-12 gap-6 items-center flex-1 relative z-10">
-        
-        {/* Left Column (5.2 Cols): 4 Benefit Cards with Circular Badges */}
-        <div className="col-span-5 flex flex-col justify-center space-y-4">
+      <div className="relative z-10 mt-6 grid flex-1 grid-cols-12 items-center gap-6">
+        <div className="col-span-5 flex flex-col gap-3.5">
           {finalBenefits.map((item, idx) => (
-            <div
-              key={idx}
-              className={`flex items-center gap-4 p-5 rounded-2xl bg-[#041b30]/95 border-2 shadow-[0_8px_30px_rgba(0,0,0,0.8)] backdrop-blur-md transition-transform ${
-                isCodex
-                  ? 'border-[#00ffff]/50 shadow-[0_8px_30px_rgba(0,0,0,0.8),0_0_15px_rgba(0,255,255,0.15)]'
-                  : 'border-[#00c3ff]/50'
-              }`}
-            >
-              {/* Circular Icon Badge */}
+            <CompositePanel key={idx} className="flex items-center gap-4 p-5">
               <div
-                className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 shadow-lg ${
-                  isCodex
-                    ? item.badgeVariant === 'emerald'
-                      ? 'bg-gradient-to-tr from-emerald-500 to-teal-300 text-slate-950 border-2 border-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
-                      : 'bg-gradient-to-tr from-[#0088cc] via-[#00c3ff] to-[#00ffff] text-slate-950 border-2 border-[#00ffff]/60 shadow-[0_0_15px_rgba(0,255,255,0.4)]'
-                    : item.badgeVariant === 'amber'
-                    ? 'bg-gradient-to-tr from-[#ff453a] to-[#ff5540] text-white border-2 border-[#ff6358]/40'
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-control border ${
+                  item.badgeVariant === 'amber'
+                    ? 'border-crimson-aggro/40 bg-crimson-soft text-crimson-text'
                     : item.badgeVariant === 'emerald'
-                    ? 'bg-gradient-to-tr from-emerald-600 to-teal-300 text-slate-950 border-2 border-emerald-100'
-                    : 'bg-gradient-to-tr from-[#00c3ff] to-[#38bdf8] text-slate-950 border-2 border-[#00c3ff]/30'
+                      ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
+                      : 'border-line-strong bg-cyan-soft text-cyan-glow'
                 }`}
               >
                 {renderBenefitIcon(item.icon)}
               </div>
-
-              {/* Text Info */}
               <div className="min-w-0 flex-1">
-                <h4 className="font-mono font-black text-[20px] tracking-wide text-white uppercase leading-tight">
-                  {item.title}
-                </h4>
-                <p className="text-[18px] text-slate-200 font-sans font-medium leading-snug mt-1 line-clamp-2">
-                  {item.description}
-                </p>
+                <h4 className="text-[21px] font-bold leading-tight text-ink">{displayCopy(item.title)}</h4>
+                <p className="mt-1 line-clamp-2 text-[17px] leading-snug text-ink-muted">{displayCopy(item.description)}</p>
               </div>
-            </div>
+            </CompositePanel>
           ))}
         </div>
 
-        {/* Right Column (7 Cols): 3D Mockup + Trust Badge + Quote Bubble */}
-        <div className="col-span-7 relative flex flex-col items-center justify-center h-full min-h-[560px]">
-          {/* Atmospheric Stage Back-Glow linking character, badge, and platter */}
-          <div
-            className={`absolute inset-0 -z-10 pointer-events-none ${
-              isCodex
-                ? 'bg-[radial-gradient(ellipse_at_50%_52%,rgba(0,255,255,0.18)_0%,rgba(0,195,255,0.08)_40%,transparent_72%)]'
-                : 'bg-[radial-gradient(ellipse_at_50%_52%,rgba(0,195,255,0.14)_0%,rgba(255,69,58,0.07)_40%,transparent_72%)]'
-            }`}
-          />
-
-          {/* Top-Right Circular Trust Certification Seal */}
-          <div className="absolute -top-2 -right-1 z-30 flex flex-col items-center justify-center shrink-0">
-            <div
-              className={`w-[148px] h-[148px] rounded-full p-1.5 shadow-[0_16px_35px_rgba(0,0,0,0.95)] shrink-0 ${
-                isCodex
-                  ? 'bg-gradient-to-br from-[#00ffff] via-[#00c3ff] to-[#0284c7] shadow-[0_16px_35px_rgba(0,0,0,0.95),0_0_20px_rgba(0,255,255,0.35)]'
-                  : 'bg-gradient-to-br from-[#ff6358] via-[#ff453a] to-[#991510]'
-              }`}
-            >
-              <div
-                className={`w-full h-full rounded-full bg-[#041322] border-2 flex flex-col items-center justify-center text-center p-2.5 ${
-                  isCodex ? 'border-[#00ffff]' : 'border-[#ff453a]'
-                }`}
-              >
-                {/* No review stars: STYLE_GUIDE bans invented ratings. */}
-                <div
-                  className={`font-mono font-black text-[15px] uppercase leading-tight ${
-                    isCodex ? 'text-[#00ffff]' : 'text-[#ff453a]'
-                  }`}
-                >
-                  {finalTrustText}
-                </div>
-                <div
-                  className={`w-12 h-[1.5px] my-1 ${
-                    isCodex ? 'bg-[#00ffff]' : 'bg-[#ff453a]'
-                  }`}
-                />
-                <div
-                  className={`font-mono font-bold text-[12px] tracking-wider uppercase ${
-                    isCodex ? 'text-[#67e8f9]' : 'text-[#ff6358]'
-                  }`}
-                >
-                  {finalTrustYear}
-                </div>
-              </div>
+        <div className="relative col-span-7 flex h-full min-h-[560px] flex-col items-center justify-center">
+          {finalTrustText && (
+            <div className="absolute -right-1 -top-2 z-30 rounded-card border border-line-subtle bg-surface-1/95 px-5 py-3 text-right hud-sheen">
+              <CompositeLabel tone={accentTone} className="text-[15px]">
+                {displayCopy(finalTrustText)}
+              </CompositeLabel>
+              {finalTrustYear && <div className="mt-1 text-[15px] text-ink-muted">{displayCopy(finalTrustYear)}</div>}
             </div>
-          </div>
+          )}
 
-          {/* 3D Realistic Hardcover Book / Tablet HUD / Device Showcase Container */}
-          <div
-            className="relative z-20 flex flex-col items-center justify-center w-full"
-            style={{
-              perspective: '1400px',
-            }}
-          >
-            {/* 3D Mockup Graphic */}
+          <div className="relative z-20 flex w-full flex-col items-center justify-center" style={{ perspective: '1400px' }}>
             <div className="relative z-20 w-full">
               {finalMockupType === 'megaphone-banner' ? (
                 /* Dynamic Early Access Megaphone Announcement Banner */
@@ -745,115 +630,32 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
             </div>
           </div>
 
-          {/* Floating Quote Callout on Lower Right */}
-          <div
-            className={`absolute -bottom-2 right-1 z-30 max-w-[300px] p-4 rounded-2xl bg-[#031522]/[0.98] border-2 shadow-[0_15px_35px_rgba(0,0,0,0.95)] backdrop-blur-md ${
-              isCodex
-                ? 'border-[#00ffff]/80 shadow-[0_15px_35px_rgba(0,0,0,0.95),0_0_20px_rgba(0,255,255,0.25)]'
-                : 'border-[#ff453a]'
-            }`}
-          >
-            <div className="flex items-start gap-1.5">
-              <span
-                className={`font-serif text-2xl leading-none ${
-                  isCodex ? 'text-[#00ffff]' : 'text-[#ff453a]'
-                }`}
-              >
-                "
-              </span>
-              <p className="text-[17px] font-semibold text-slate-100 leading-snug">
-                {finalQuote}
-              </p>
-              <span
-                className={`font-serif text-2xl leading-none self-end ${
-                  isCodex ? 'text-[#00ffff]' : 'text-[#ff453a]'
-                }`}
-              >
-                "
-              </span>
-            </div>
-          </div>
+          {finalQuote && (
+            <CompositePanel className="absolute -bottom-2 right-1 z-30 max-w-[320px] p-5">
+              <p className="text-[18px] leading-snug text-ink">“{displayCopy(finalQuote)}”</p>
+            </CompositePanel>
+          )}
         </div>
       </div>
 
-      {/* 3. Massive High-Contrast Comment-to-DM Bottom CTA Banner */}
-      <div className="mt-2 z-20 shrink-0">
-        <div
-          className={`w-full py-6 px-9 rounded-3xl bg-[#01060e] border-4 shadow-[0_20px_45px_rgba(0,0,0,0.95)] flex items-center justify-between relative overflow-hidden ${
-            isCodex
-              ? 'border-[#00ffff] shadow-[0_20px_45px_rgba(0,0,0,0.95),0_0_35px_rgba(0,255,255,0.45)]'
-              : 'border-[#ff453a]'
-          }`}
-        >
-          {/* Subtle background glow */}
-          <div
-            className={`absolute inset-0 pointer-events-none ${
-              isCodex
-                ? 'bg-gradient-to-r from-[#00ffff]/10 via-[#00c3ff]/15 to-[#00ffff]/10'
-                : 'bg-gradient-to-r from-[#ff453a]/10 via-[#ff5540]/15 to-[#ff453a]/10'
-            }`}
-          />
-
-          {/* Left Arrow Accents */}
-          <div
-            className={`flex items-center gap-2 font-black text-3xl hidden sm:flex ${
-              isCodex ? 'text-[#00ffff]' : 'text-[#ff453a]'
-            }`}
-          >
-            <span>👉</span>
-          </div>
-
-          {/* Center Callout: Comment "KEYWORD" below */}
-          <div className="flex items-center justify-center gap-4 mx-auto">
-            <div
-              className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl font-black shrink-0 border-2 ${
-                isCodex
-                  ? 'bg-gradient-to-tr from-[#00c3ff] to-[#00ffff] text-slate-950 border-[#00ffff] shadow-[0_0_20px_rgba(0,255,255,0.6)]'
-                  : 'bg-gradient-to-tr from-[#ff453a] to-[#ff5540] text-white border-[#ff6358]/40'
-              }`}
-            >
-              <MessageSquare className={`w-8 h-8 ${isCodex ? 'fill-slate-950 text-slate-950' : 'fill-white text-white'}`} />
-            </div>
-            <div className="flex items-baseline gap-3.5">
-              <span className="font-grotesk font-black text-3xl md:text-4xl text-white tracking-wide uppercase drop-shadow-md">
-                Comment
+      <div className="relative z-20 mt-5 flex items-center gap-6">
+        <CompositeCta size="lg" arrow={false} className="flex-1 [&>div]:w-full">
+          <span className="inline-flex items-center gap-4">
+            <MessageSquare className="h-8 w-8" />
+            {finalCommentCta.includes(`"${finalKeyword}"`) ? (
+              <span>
+                Comment “{finalKeyword}” below
               </span>
-              <span
-                className={`font-grotesk font-black text-4xl md:text-5xl tracking-wider uppercase ${
-                  isCodex
-                    ? 'text-[#00ffff] drop-shadow-[0_0_18px_rgba(0,255,255,0.85)]'
-                    : 'text-[#ff453a] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]'
-                }`}
-              >
-                "{finalKeyword}"
-              </span>
-              <span className="font-grotesk font-black text-3xl md:text-4xl text-white tracking-wide uppercase drop-shadow-md">
-                below
-              </span>
-            </div>
-          </div>
-
-          {/* Right Arrow Accents */}
-          <div
-            className={`flex items-center gap-2 font-black text-3xl hidden sm:flex ${
-              isCodex ? 'text-[#00ffff]' : 'text-[#ff453a]'
-            }`}
-          >
-            <span>👈</span>
-          </div>
-        </div>
+            ) : (
+              <span>{displayCopy(finalCommentCta)}</span>
+            )}
+          </span>
+        </CompositeCta>
       </div>
 
-      {/* 4. Sub-footer Link in Bio & Watermark */}
-      <div className="mt-3 flex items-center justify-between text-sm font-mono text-slate-400 z-10 shrink-0">
-        <div className="flex items-center gap-2 font-bold text-base">
-          <span className="text-[#00c3ff]">🔗 Link in bio & story</span>
-        </div>
-        <HeaderBrand
-          logoSize="sm"
-          subtext="MOLTOLOGY.ORG · JOIN THE ORDER"
-          className="opacity-90"
-        />
+      <div className="relative z-10 mt-5 flex items-center justify-between">
+        <span className="text-[20px] text-ink-muted">Link in bio</span>
+        <CompositeBrand size="sm" />
       </div>
     </CompositeContainer>
   )

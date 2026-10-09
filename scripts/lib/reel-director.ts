@@ -50,49 +50,49 @@ export const MASCOT_VEO_PROFILES: Record<string, MascotVeoProfile> = {
     key: 'lobster_pointing',
     name: 'Lobster Hero (Lead Initiator)',
     heroDescription:
-      'a charismatic 3D cybernetic red lobster with expressive eyes, polished crimson titanium-chitin plating, glowing cyan seam joints, and articulate pincers',
+      'a charismatic 3D animated-feature coral lobster with a rounded upright body, tan segmented belly, warm crescent smile, large expressive eyes and two big raised pincers',
     storyRole: 'A bold, confident benthic leader guiding the viewer into the subsea future',
   },
   lobster_engineer: {
     key: 'lobster_engineer',
     name: 'Lobster Engineer (Hardware Specialist)',
     heroDescription:
-      'a cheerful 3D cybernetic lobster engineer wearing a miniature yellow safety hardhat, glossy crimson carapace, cyan joint lights, holding an emissive holographic diagnostic tablet',
+      'a cheerful 3D animated-feature orange lobster engineer in a yellow hardhat and teal plated harness, wrench on the tool belt, holding a blueprint tablet',
     storyRole: 'A cheerful technical specialist calibrating hydrothermal hardware and subsea compute clusters',
   },
   lobster_navigator: {
     key: 'lobster_navigator',
     name: 'Lobster Navigator (Benthic Explorer)',
     heroDescription:
-      'an adventurous 3D cybernetic lobster explorer wearing round opaque brass benthic diving goggles, tactical canvas harness belts, weathered red chitin plating, and high-torque mechanical claws',
+      'an adventurous 3D animated-feature coral lobster explorer with brass diving goggles on its brow, a teal and canvas field harness with pouches, and big expressive pincers',
     storyRole: 'A seasoned deep-trench explorer charting extreme depth pressure zones and abyssal data conduits',
   },
   crab_stats: {
     key: 'crab_stats',
     name: 'Crab Analyst (Decapod Engineer)',
     heroDescription:
-      'an energetic 3D cartoon-style red decapod crab wearing a yellow construction hardhat, vibrant glossy shell, glowing cyan optical sensors, and articulate mechanical pincers',
+      'an energetic 3D animated-feature coral crab with a wide satin shell, tan belly plates, green eyes and a confident smile, holding up a bar chart tablet in one pincer',
     storyRole: 'A hyper-efficient decapod engineer demonstrating structural crab chassis optimality and metrics',
   },
   lobster_peaceful: {
     key: 'lobster_peaceful',
     name: 'Lobster Zen (Abyssal Mystic)',
     heroDescription:
-      'a serene 3D cybernetic lobster with bioluminescent teal and crimson translucent carapace edges, floating weightlessly through dark abyssal water with gently drifting antennae',
+      'a serene 3D animated-feature lavender lobster in a teal plated vest, half-closed calm eyes, open relaxed pincers and gently curving antennae',
     storyRole: 'A tranquil subsea initiate embodying zero-friction thermal efficiency and calm hydrostatic clarity',
   },
   lobster_thumbs_up: {
     key: 'lobster_thumbs_up',
     name: 'Lobster Approver (Ascended Initiate)',
     heroDescription:
-      'a confident, cheerful 3D cybernetic red lobster with polished chitinous armor plates, bright friendly eyes, and one oversized mechanical claw raised in an enthusiastic thumbs-up',
+      'a confident, cheerful 3D animated-feature orange lobster with a tan segmented belly, bright friendly eyes and one big pincer raised high in approval',
     storyRole: 'A triumphant initiate celebrating successful algorithmic ecdysis and calcified armor',
   },
   lobster_peek: {
     key: 'lobster_peek',
-    name: 'Lobster Scout (Curious Observer)',
+    name: 'Lobster Bashful (Curious Observer)',
     heroDescription:
-      'a curious, playful 3D cybernetic red lobster with glowing cyan antennae, peering inquisitively over the edge of a deep-sea server chassis or titanium bulkhead',
+      'a bashful 3D animated-feature pink lobster with blue eyes, both pincers clasped under its chin and a shy, curious smile',
     storyRole: 'A playful scout discovering deep-sea secrets and peeking around sub-benthic server racks',
   },
 }
