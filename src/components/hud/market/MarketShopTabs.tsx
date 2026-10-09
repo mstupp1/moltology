@@ -9,7 +9,7 @@ interface MarketShopTabsProps {
 
 export function MarketShopTabs({ activeTab, onTabChange }: MarketShopTabsProps) {
   return (
-    <div className="chitin-card p-1 sm:p-1.5 chamfer-corner shadow-xl">
+    <div className="border-b border-line-subtle">
       <div
         className="grid grid-cols-3 gap-1"
         role="tablist"
@@ -25,26 +25,24 @@ export function MarketShopTabs({ activeTab, onTabChange }: MarketShopTabsProps) 
               aria-selected={isActive}
               onClick={() => onTabChange(tab.id)}
               className={cn(
-                'relative px-2 py-2.5 sm:py-3 rounded-sm text-center transition-all touch-manipulation',
+                '-mb-px px-2 py-2.5 sm:py-3 rounded-t-control border-b-2 text-center transition-colors duration-200 touch-manipulation',
+                'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
                 isActive
-                  ? 'bg-gradient-to-b from-[#00c3ff]/20 to-[#00c3ff]/5 border border-[#00c3ff]/60 shadow-[0_0_14px_rgba(0,195,255,0.2)]'
-                  : 'bg-[#050808]/60 border border-transparent hover:border-[#3a4a49] hover:bg-[#0a1010]'
+                  ? 'bg-surface-2 border-cyan-glow'
+                  : 'border-transparent hover:bg-surface-2'
               )}
             >
               <span
                 className={cn(
-                  'block font-grotesk text-[10px] sm:text-xs font-bold uppercase tracking-wider',
-                  isActive ? 'text-[#00c3ff]' : 'text-[#839493]'
+                  'block font-grotesk text-[11px] sm:text-xs font-bold uppercase tracking-[0.08em]',
+                  isActive ? 'text-ink' : 'text-ink-muted'
                 )}
               >
                 {tab.label}
               </span>
-              <span className="hidden sm:block text-[9px] text-[#839493] mt-0.5 leading-tight">
+              <span className="hidden sm:block text-[11px] text-ink-muted mt-0.5 leading-tight">
                 {tab.hint}
               </span>
-              {isActive ? (
-                <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-[#00c3ff] rounded-full" />
-              ) : null}
             </button>
           )
         })}

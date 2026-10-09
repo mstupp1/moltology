@@ -15,17 +15,17 @@ function PackBadge({ badge }: { badge: MoltCreditPack['badge'] }) {
   const config = {
     'best-value': {
       label: 'Best Value',
-      className: 'bg-[#ff5540] text-white border-[#ff5540]',
+      className: 'bg-crimson-soft text-crimson-text',
       icon: TrendingUp,
     },
     limited: {
       label: 'Limited',
-      className: 'bg-[#ff5540]/15 text-[#ff8066] border-[#ff5540]/50',
+      className: 'bg-crimson-soft text-crimson-text',
       icon: Clock,
     },
     popular: {
       label: 'Popular',
-      className: 'bg-[#00c3ff]/15 text-[#00c3ff] border-[#00c3ff]/50',
+      className: 'bg-cyan-soft text-cyan-glow',
       icon: Sparkles,
     },
   }[badge]
@@ -35,7 +35,7 @@ function PackBadge({ badge }: { badge: MoltCreditPack['badge'] }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm border',
+        'inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.08em] px-2 py-0.5 rounded-chip',
         config.className
       )}
     >
@@ -51,54 +51,53 @@ export function MoltCreditStorePanel({ onPurchase }: MoltCreditStorePanelProps) 
 
   return (
     <div className="space-y-3 sm:space-y-4">
-      <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl relative overflow-hidden border border-[#ff5540]/30">
+      <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen hud-ticks p-3 sm:p-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#ff5540]/8 via-transparent to-[#00c3ff]/5 pointer-events-none" />
         <div className="relative grid grid-cols-1 md:grid-cols-[1.1fr_0.9fr] gap-4 items-center">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <PackBadge badge={featured.badge} />
-              <span className="text-[10px] text-[#839493] uppercase tracking-widest">
+              <span className="text-[11px] text-ink-muted uppercase tracking-[0.08em]">
                 Featured bundle
               </span>
             </div>
-            <h2 className="font-grotesk text-lg sm:text-xl font-extrabold text-[#dfe3e3] uppercase tracking-wide">
+            <h2 className="font-grotesk text-lg sm:text-xl font-extrabold text-ink uppercase tracking-wide">
               {featured.name}
             </h2>
-            <p className="text-xs text-[#839493] leading-relaxed max-w-md">
+            <p className="text-xs text-ink-body leading-relaxed max-w-md">
               Molt Credits buy speed, style, and catalog depth.
             </p>
             <div className="flex flex-wrap items-baseline gap-2 pt-1">
-              <span className="font-grotesk text-2xl sm:text-3xl font-extrabold text-[#00c3ff] tabular-nums">
+              <span className="font-grotesk text-2xl sm:text-3xl font-extrabold text-cyan-glow tabular-nums">
                 {(featured.credits + (featured.bonusCredits ?? 0)).toLocaleString()}
               </span>
-              <span className="text-xs text-[#839493] uppercase tracking-wider">Molt Credits</span>
+              <span className="text-xs text-ink-muted uppercase tracking-[0.08em]">Molt Credits</span>
               {featured.bonusCredits ? (
-                <span className="text-xs text-[#ff8066] font-bold">
+                <span className="text-xs text-crimson-text font-bold">
                   includes +{featured.bonusCredits.toLocaleString()} bonus
                 </span>
               ) : null}
             </div>
-            <BenthicCTAButton price={featured.priceUsd} size="lg" onClick={() => onPurchase(featured)}>
+            <BenthicCTAButton price={featured.priceUsd} size="lg" variant="cyan" onClick={() => onPurchase(featured)}>
               Buy Bundle
             </BenthicCTAButton>
           </div>
           <div className="relative mx-auto w-full max-w-[220px] aspect-square">
-            <div className="absolute inset-0 rounded-full bg-[#00c3ff]/10 blur-2xl" />
             <img
               src={getAssetUrl(featured.imagePath)}
               alt=""
-              className="relative w-full h-full object-contain drop-shadow-[0_8px_24px_rgba(0,195,255,0.35)]"
+              className="relative w-full h-full object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
             />
           </div>
         </div>
       </div>
 
-      <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl space-y-3">
-        <div className="flex items-center justify-between gap-2 border-b border-[#3a4a49]/60 pb-2">
-          <h2 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
+      <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 space-y-3">
+        <div className="flex items-center justify-between gap-2 border-b border-line-subtle pb-2">
+          <h2 className="font-grotesk text-xs font-bold tracking-[0.08em] text-ink uppercase">
             Credit Packs
           </h2>
-          <span className="text-[9px] text-[#839493] uppercase tracking-wider">
+          <span className="text-[11px] text-ink-muted uppercase tracking-[0.08em]">
             Chitin Gems are earned — not sold here
           </span>
         </div>
@@ -112,8 +111,8 @@ export function MoltCreditStorePanel({ onPurchase }: MoltCreditStorePanelProps) 
               <div
                 key={pack.id}
                 className={cn(
-                  'chitin-card-inset p-3 chamfer-corner flex flex-col items-center text-center gap-2 border transition-transform hover:-translate-y-0.5',
-                  isHighlight ? 'border-[#ff5540]/50' : 'border-[#3a4a49]'
+                  'market-pack-card rounded-card bg-surface-2 p-3 flex flex-col items-center text-center gap-2 border transition-[transform,border-color] hover:-translate-y-0.5 hover:border-line-strong',
+                  isHighlight ? 'border-crimson-aggro/40' : 'border-line-subtle'
                 )}
               >
                 {pack.badge ? (
@@ -131,14 +130,14 @@ export function MoltCreditStorePanel({ onPurchase }: MoltCreditStorePanelProps) 
                   />
                 </div>
                 <div className="space-y-0.5 flex-1">
-                  <h3 className="font-grotesk text-[10px] sm:text-xs font-bold text-[#dfe3e3] uppercase leading-tight">
+                  <h3 className="font-grotesk text-[11px] sm:text-xs font-bold text-ink uppercase leading-tight">
                     {pack.name}
                   </h3>
-                  <p className="text-[10px] text-[#00c3ff] font-bold tabular-nums">
+                  <p className="text-[11px] text-cyan-glow font-bold tabular-nums">
                     {total.toLocaleString()} MC
                   </p>
                   {pack.bonusCredits ? (
-                    <p className="text-[9px] text-[#ff8066] font-semibold">
+                    <p className="text-[11px] text-crimson-text font-semibold">
                       +{pack.bonusCredits.toLocaleString()} bonus
                     </p>
                   ) : null}
@@ -146,6 +145,7 @@ export function MoltCreditStorePanel({ onPurchase }: MoltCreditStorePanelProps) 
                 <BenthicCTAButton
                   price={pack.priceUsd}
                   size="sm"
+                  variant="cyan"
                   fullWidth
                   onClick={() => onPurchase(pack)}
                 >

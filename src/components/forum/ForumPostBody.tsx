@@ -11,17 +11,17 @@ const MAX_QUOTE_NEST = 4
 
 function QuoteAttribution({ attribution }: { attribution: ForumQuoteAttribution }) {
   return (
-    <p className="text-[10px] text-[#839493]" data-testid="forum-quote-attribution">
+    <p className="text-[11px] text-ink-muted" data-testid="forum-quote-attribution">
       {attribution.handle ? (
         <Link
           to="/member/$profileId"
           params={{ profileId: attribution.handle }}
-          className="text-[#00c3ff] font-bold hover:text-[#00ffff] transition-colors"
+          className="text-cyan-glow font-bold hover:text-cyan-hover transition-colors"
         >
           @{attribution.handle}
         </Link>
       ) : (
-        <span className="text-[#dfe3e3] font-bold">{attribution.name}</span>
+        <span className="text-ink font-bold">{attribution.name}</span>
       )}
       <span> held</span>
     </p>
@@ -42,11 +42,11 @@ function ForumQuoteChrome({
   return (
     <blockquote
       data-testid="forum-quote-block"
-      className="border-l-2 border-[#00ffff]/60 bg-[#00ffff]/[0.04] pl-3 pr-2 py-2 chamfer-corner space-y-1.5"
+      className="border-l-2 border-cyan-glow/50 bg-surface-2/60 pl-3 pr-2 py-2 rounded-r-control space-y-1.5"
     >
       {attribution && <QuoteAttribution attribution={attribution} />}
       {withdrawn ? (
-        <p className="text-xs text-[#839493] italic leading-relaxed">{inner.trim()}</p>
+        <p className="text-xs text-ink-muted italic leading-relaxed">{inner.trim()}</p>
       ) : (
         <ForumPostBody content={inner} depth={depth + 1} className="space-y-1.5" />
       )}
@@ -67,7 +67,7 @@ export function ForumPostBody({
 }) {
   const blocks = parseForumContentBlocks(content)
   const mentionClass =
-    'text-xs sm:text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap'
+    'text-xs sm:text-sm text-ink-body leading-relaxed whitespace-pre-wrap'
 
   if (depth >= MAX_QUOTE_NEST) {
     return <ForumMentionBody content={content} className={mentionClass} testId={testId} />

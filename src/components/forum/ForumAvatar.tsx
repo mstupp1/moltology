@@ -118,7 +118,7 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
   return (
     <div
       className={cn(
-        'relative rounded-full overflow-hidden shrink-0 border border-[#3a4a49] bg-[#081419] flex items-center justify-center transition-all',
+        'relative rounded-full overflow-hidden shrink-0 border border-line bg-surface-2 flex items-center justify-center transition-all',
         SIZE_CLASSES[size],
         className
       )}

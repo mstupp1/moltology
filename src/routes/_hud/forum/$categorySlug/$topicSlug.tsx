@@ -58,13 +58,13 @@ function TopicShareButton() {
     <button
       type="button"
       onClick={handleCopy}
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-[#839493] hover:text-[#00ffff] hover:bg-[#00ffff]/10 border border-[#3a4a49] hover:border-[#00ffff]/50 chamfer-corner transition-all shrink-0"
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink rounded-control border border-line bg-surface-1 hover:bg-surface-2 hover:border-line-strong transition-colors shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
       title={copied ? 'Link copied!' : 'Share discussion'}
     >
       {copied ? (
         <>
-          <Check className="w-3.5 h-3.5 text-[#00ffff]" />
-          <span className="text-[#00ffff]">Copied</span>
+          <Check className="w-3.5 h-3.5 text-cyan-glow" />
+          <span className="text-cyan-glow">Copied</span>
         </>
       ) : (
         <>
@@ -197,12 +197,12 @@ function ForumThreadPage() {
     return (
       <ForumShell>
         <div className="max-w-2xl mx-auto w-full py-16 text-center font-sans space-y-4">
-          <Terminal className="w-10 h-10 text-[#ff5540] mx-auto" />
-          <h1 className="font-grotesk font-bold text-xl text-[#dfe3e3] uppercase">Post Not Found</h1>
-          <p className="text-xs text-[#839493]">This post does not exist or was removed.</p>
+          <Terminal className="w-10 h-10 text-crimson-text mx-auto" />
+          <h1 className="font-grotesk font-bold text-xl text-ink uppercase">Post Not Found</h1>
+          <p className="text-xs text-ink-muted">This post does not exist or was removed.</p>
           <Link
             to="/forum"
-            className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#070b0b] hover:bg-[#171c1c] border border-[#00ffff]/60 text-[#00ffff] text-xs font-bold uppercase chamfer-corner transition-all"
+            className="inline-flex items-center gap-2 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.08em] rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             Back to Community
@@ -337,7 +337,7 @@ function ForumThreadPage() {
           <Link
             to="/forum/$categorySlug"
             params={{ categorySlug }}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#00ffff] hover:underline uppercase transition-all"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-glow hover:underline uppercase transition-colors rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>{topic.categoryName || 'Back to board'}</span>
@@ -349,16 +349,15 @@ function ForumThreadPage() {
           {/* Left Column (8 cols): Original Topic Post, Reply Composer, Comments Stream */}
           <div className="lg:col-span-8 flex flex-col space-y-3.5 sm:space-y-5">
             {/* Topic Main Card */}
-            <article className="chitin-card p-4 sm:p-5 chamfer-corner shadow-2xl space-y-3.5 relative overflow-hidden bg-[#0a1012]/70">
+            <article className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-4 sm:p-5 space-y-3.5 relative overflow-hidden">
               <div className="flex items-start justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-2 text-[10px]">
+                <div className="flex flex-wrap items-center gap-2 text-[11px]">
                   {topic.categoryName && (
                     <span
-                      className="px-1.5 py-0.2 font-sans font-bold uppercase tracking-wider chamfer-corner border"
+                      className="px-1.5 py-0.2 font-sans font-bold uppercase tracking-[0.08em] rounded-chip"
                       style={{
-                        borderColor: `${topic.categoryColor || '#00ffff'}80`,
-                        color: topic.categoryColor || '#00ffff',
-                        backgroundColor: `${topic.categoryColor || '#00ffff'}10`,
+                        color: topic.categoryColor || '#00c3ff',
+                        backgroundColor: `${topic.categoryColor || '#00c3ff'}26`,
                       }}
                     >
                       {topic.categoryName}
@@ -369,8 +368,8 @@ function ForumThreadPage() {
                   {topicWithdrawn && <WithdrawnBadge />}
                 </div>
 
-                <div className="text-[10px] text-[#839493] flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-[#3a4a49]" />
+                <div className="text-[11px] text-ink-muted flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-ink-muted/60" />
                   <span>{relativeTime(topic.createdAt)}</span>
                   <ForumRevisedMark
                     createdAt={topic.createdAt}
@@ -380,12 +379,12 @@ function ForumThreadPage() {
                 </div>
               </div>
 
-              <h1 className="font-grotesk font-extrabold text-lg sm:text-xl md:text-2xl text-[#dfe3e3] leading-snug uppercase">
+              <h1 className="font-grotesk font-extrabold text-lg sm:text-xl md:text-2xl text-ink leading-snug uppercase">
                 {topic.title}
               </h1>
 
               {/* Author & Stats Strip */}
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#3a4a49]/60 pb-3.5">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line-subtle pb-3.5">
                 <div className="flex items-center gap-3 min-w-0">
                   {topic.userId ? (
                     <Link
@@ -408,7 +407,7 @@ function ForumThreadPage() {
                         avatarConfig={topic.authorAvatarConfig}
                         alt=""
                         size="lg"
-                        className="ring-2 ring-[#3a4a49] group-hover/topic-avatar:ring-[#00ffff] transition-all shadow-md"
+                        className="ring-2 ring-line group-hover/topic-avatar:ring-line-strong transition-all shadow-md"
                       />
                     </Link>
                   ) : (
@@ -419,7 +418,7 @@ function ForumThreadPage() {
                       userId={topic.userId}
                       avatarConfig={topic.authorAvatarConfig}
                       size="lg"
-                      className="ring-2 ring-[#3a4a49] shadow-md"
+                      className="ring-2 ring-line shadow-md"
                     />
                   )}
 
@@ -434,37 +433,37 @@ function ForumThreadPage() {
                               handle: topic.authorHandle,
                             }),
                           }}
-                          className="text-[#dfe3e3] font-grotesk font-bold text-sm sm:text-base hover:text-[#00c3ff] transition-colors truncate"
+                          className="text-ink font-grotesk font-bold text-sm sm:text-base hover:text-cyan-glow transition-colors truncate"
                         >
                           {topic.authorName}
                         </Link>
                       ) : (
-                        <span className="text-[#dfe3e3] font-grotesk font-bold text-sm sm:text-base truncate">
+                        <span className="text-ink font-grotesk font-bold text-sm sm:text-base truncate">
                           {topic.authorName}
                         </span>
                       )}
 
                       {topic.authorHandle && (
-                        <span className="text-xs text-[#839493]/80 hidden sm:inline truncate">
+                        <span className="text-xs text-ink-muted hidden sm:inline truncate">
                           @{topic.authorHandle.replace(/^@/, '')}
                         </span>
                       )}
 
-                      <span className="px-1.5 py-0.2 text-[9px] font-sans font-bold uppercase tracking-wider bg-[#00ffff]/10 text-[#00ffff] border border-[#00ffff]/30 chamfer-corner">
+                      <span className="px-1.5 py-0.2 text-[11px] font-sans font-bold uppercase tracking-[0.08em] bg-cyan-soft text-cyan-glow rounded-chip">
                         AUTHOR
                       </span>
 
                       <StageBadge stage={topic.authorStage} />
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11px] text-[#839493] mt-0.5">
+                    <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11px] text-ink-muted mt-0.5">
                       <span className="flex items-center gap-1" title={new Date(topic.createdAt).toLocaleString()}>
-                        <Clock className="w-3 h-3 text-[#3a4a49]" />
+                        <Clock className="w-3 h-3 text-ink-muted/60" />
                         <span>{relativeTime(topic.createdAt)}</span>
                       </span>
-                      <span className="text-[#3a4a49]">·</span>
+                      <span className="text-ink-muted/60">·</span>
                       <span className="flex items-center gap-1">
-                        <Eye className="w-3.5 h-3.5 text-[#3a4a49]" />
+                        <Eye className="w-3.5 h-3.5 text-ink-muted/60" />
                         <span>{topic.views} views</span>
                       </span>
                     </div>
@@ -476,13 +475,13 @@ function ForumThreadPage() {
 
               {/* Topic Body */}
               {topicWithdrawn ? (
-                <div className="chitin-card-inset p-3.5 sm:p-4 chamfer-corner border border-[#3a4a49]">
-                  <ForumWithdrawnBody className="text-xs sm:text-sm text-[#839493] leading-relaxed italic" />
+                <div className="rounded-control border border-line-subtle bg-abyss/60 p-3.5 sm:p-4">
+                  <ForumWithdrawnBody className="text-xs sm:text-sm text-ink-muted leading-relaxed italic" />
                 </div>
               ) : editingTopic ? (
                 <form onSubmit={handleTopicSave} className="space-y-2.5" data-testid="forum-revise-topic-form">
                   {topicError && (
-                    <div className="p-2.5 bg-[#2d0f0f] border border-[#ff5540] text-[#ff5540] text-xs flex items-center gap-2 chamfer-corner">
+                    <div className="p-2.5 bg-crimson-soft border border-crimson-aggro/55 text-crimson-text text-xs flex items-center gap-2 rounded-control">
                       <AlertTriangle className="w-4 h-4 shrink-0" />
                       <span>{topicError}</span>
                     </div>
@@ -492,7 +491,7 @@ function ForumThreadPage() {
                     value={topicTitleDraft}
                     onChange={(e) => setTopicTitleDraft(e.target.value)}
                     aria-label="Revise topic title"
-                    className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-sm text-[#dfe3e3] outline-none chamfer-corner"
+                    className="w-full bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus p-3 text-sm text-ink outline-none rounded-control transition-[border-color,box-shadow]"
                   />
                   <div className="space-y-0">
                     <ForumFormattingToolbar
@@ -505,13 +504,13 @@ function ForumThreadPage() {
                     />
                     {previewTopicEdit ? (
                       <div
-                        className="w-full min-h-[110px] max-h-[300px] bg-[#070b0b]/60 border border-[#3a4a49] p-3 text-xs text-[#dfe3e3] chamfer-corner-bottom overflow-y-auto"
+                        className="w-full min-h-[110px] max-h-[300px] bg-abyss/60 border border-line p-3 text-xs text-ink-body rounded-b-control overflow-y-auto"
                         data-testid="topic-edit-preview"
                       >
                         {topicBodyDraft.trim() ? (
                           <ForumPostBody content={topicBodyDraft} />
                         ) : (
-                          <p className="text-xs text-[#839493]/60 italic">
+                          <p className="text-xs text-ink-muted italic">
                             Nothing to preview yet. Transmit some thoughts or apply formatting above...
                           </p>
                         )}
@@ -527,7 +526,7 @@ function ForumThreadPage() {
                         }}
                         autoFocus
                         aria-label="Revise topic body"
-                        className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner-bottom transition-colors"
+                        className="w-full bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus p-3 text-xs text-ink outline-none resize-y rounded-b-control transition-[border-color,box-shadow] placeholder:text-ink-muted"
                       />
                     )}
                   </div>
@@ -538,27 +537,27 @@ function ForumThreadPage() {
                         setEditingTopic(false)
                         setTopicError(null)
                       }}
-                      className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#839493] hover:text-[#dfe3e3] transition-colors"
+                      className="px-3 py-1.5 rounded-control text-xs font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={topicBusy || topicTitleDraft.trim().length < 5 || topicBodyDraft.trim().length < 10}
-                      className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] disabled:opacity-50 text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all"
+                      className="px-4 py-1.5 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     >
                       {topicBusy ? 'Sealing...' : 'Seal revision'}
                     </button>
                   </div>
                 </form>
               ) : (
-                <div className="chitin-card-inset p-3.5 sm:p-4 chamfer-corner text-xs sm:text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap border border-[#3a4a49]">
+                <div className="rounded-control border border-line-subtle bg-abyss/60 p-3.5 sm:p-4 text-xs sm:text-sm text-ink-body leading-relaxed whitespace-pre-wrap">
                   <ForumPostBody content={topic.content} />
                 </div>
               )}
 
               {/* Action Footer */}
-              <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between gap-2">
+              <div className="pt-2 border-t border-line-subtle flex items-center justify-between gap-2">
                 <VoteButton
                   count={topic.upvotes}
                   voted={topic.voted}
@@ -598,15 +597,15 @@ function ForumThreadPage() {
                     <button
                       type="button"
                       onClick={handleQuoteTopic}
-                      className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#839493] hover:text-[#00ffff] transition-colors"
+                      className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                       data-testid="forum-quote-topic"
                     >
                       <Quote className="w-3.5 h-3.5" />
                       Quote
                     </button>
                   )}
-                  <div className="text-[11px] text-[#839493] flex items-center gap-1">
-                    <MessageSquare className="w-3.5 h-3.5 text-[#00ffff]" />
+                  <div className="text-[11px] text-ink-muted flex items-center gap-1">
+                    <MessageSquare className="w-3.5 h-3.5 text-cyan-glow" />
                     <span>{topic.repliesCount} comments</span>
                   </div>
                 </div>
@@ -616,11 +615,11 @@ function ForumThreadPage() {
             {/* Reply Composer */}
             {topic.isLocked ? (
               <div
-                className="chitin-card p-4 sm:p-5 chamfer-corner shadow-2xl text-center space-y-1.5"
+                className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-4 sm:p-5 text-center space-y-1.5"
                 data-testid="forum-thread-locked"
               >
-                <p className="text-xs text-[#dfe3e3] font-bold">Thread locked</p>
-                <p className="text-xs text-[#839493]">{FORUM_LOCKED_ERROR}</p>
+                <p className="text-xs text-ink font-bold">Thread locked</p>
+                <p className="text-xs text-ink-muted">{FORUM_LOCKED_ERROR}</p>
               </div>
             ) : (
               <ReplyComposer ref={topComposerRef} topicId={topic.id} onPosted={handlePosted} />
@@ -629,13 +628,13 @@ function ForumThreadPage() {
             {/* Comments Stream */}
             <section className="space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h2 className="text-xs sm:text-sm font-grotesk font-bold uppercase tracking-widest text-[#dfe3e3] flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-[#00ffff]" />
+                <h2 className="text-xs sm:text-sm font-grotesk font-bold uppercase tracking-[0.08em] text-ink flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-cyan-glow" />
                   <span>{posts.length} Comments</span>
                 </h2>
                 {posts.length > 0 && (
                   <div
-                    className="flex items-center gap-1 text-[10px]"
+                    className="flex items-center gap-1 text-[11px]"
                     role="group"
                     aria-label="Sort comments"
                     data-testid="forum-reply-sort"
@@ -645,10 +644,10 @@ function ForumThreadPage() {
                         key={opt.id}
                         type="button"
                         onClick={() => setReplySort(opt.id)}
-                        className={`px-2 py-1 font-bold uppercase tracking-wider chamfer-corner transition-colors ${
+                        className={`px-2 py-1 font-bold uppercase tracking-[0.08em] rounded-t-control border-b-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                           replySort === opt.id
-                            ? 'bg-[#00ffff]/15 text-[#00ffff] border border-[#00ffff]/50'
-                            : 'text-[#839493] border border-transparent hover:text-[#dfe3e3]'
+                            ? 'bg-surface-2 text-ink border-cyan-glow'
+                            : 'text-ink-muted border-transparent hover:text-ink hover:bg-surface-2'
                         }`}
                       >
                         {opt.label}
@@ -659,7 +658,7 @@ function ForumThreadPage() {
               </div>
 
               {posts.length === 0 ? (
-                <div className="p-8 text-center text-xs text-[#839493] chitin-card-inset chamfer-corner border border-[#3a4a49]">
+                <div className="p-8 text-center text-xs text-ink-muted rounded-card border border-line-subtle bg-surface-1">
                   No replies yet. Be the first to respond.
                 </div>
               ) : (
@@ -692,48 +691,48 @@ function ForumThreadPage() {
           {/* Right Column (4 cols): Transmission Intel & Guidelines */}
           <div className="lg:col-span-4 flex flex-col space-y-3.5 sm:space-y-5">
             {/* Transmission Intel Card */}
-            <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl space-y-2.5">
-              <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2.5">
+            <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 space-y-2.5">
+              <div className="flex items-center justify-between border-b border-line-subtle pb-2.5">
                 <div className="flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-[#00ffff]" />
-                  <h3 className="font-grotesk text-xs sm:text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
+                  <Activity className="w-4 h-4 text-cyan-glow" />
+                  <h3 className="font-grotesk text-xs sm:text-sm font-bold text-ink uppercase tracking-[0.08em]">
                     THREAD INFO
                   </h3>
                 </div>
-                <span className="text-[10px] font-sans font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00ffff]/30 px-2 py-0.5 chamfer-corner">
+                <span className="text-[11px] font-sans font-bold tracking-[0.08em] text-cyan-glow bg-cyan-soft px-2 py-0.5 rounded-chip">
                   LIVE
                 </span>
               </div>
 
               <div className="space-y-1.5 font-sans text-xs">
-                <div className="chitin-card-inset p-2 border border-[#3a4a49] chamfer-corner flex items-center justify-between">
-                  <span className="text-[#839493] text-[10px] uppercase font-bold">BOARD</span>
-                  <span className="text-[#dfe3e3] font-bold uppercase">{topic.categoryName || 'General'}</span>
+                <div className="rounded-control border border-line-subtle bg-abyss/60 p-2 flex items-center justify-between">
+                  <span className="text-ink-muted text-[11px] uppercase font-bold tracking-[0.08em]">BOARD</span>
+                  <span className="text-ink font-bold uppercase">{topic.categoryName || 'General'}</span>
                 </div>
-                <div className="chitin-card-inset p-2 border border-[#3a4a49] chamfer-corner flex items-center justify-between">
-                  <span className="text-[#839493] text-[10px] uppercase font-bold">AUTHOR STAGE</span>
+                <div className="rounded-control border border-line-subtle bg-abyss/60 p-2 flex items-center justify-between">
+                  <span className="text-ink-muted text-[11px] uppercase font-bold tracking-[0.08em]">AUTHOR STAGE</span>
                   <StageBadge stage={topic.authorStage} />
                 </div>
-                <div className="chitin-card-inset p-2 border border-[#3a4a49] chamfer-corner flex items-center justify-between">
-                  <span className="text-[#839493] text-[10px] uppercase font-bold">TOTAL VIEWS</span>
-                  <span className="text-[#00ffff] font-bold">{topic.views}</span>
+                <div className="rounded-control border border-line-subtle bg-abyss/60 p-2 flex items-center justify-between">
+                  <span className="text-ink-muted text-[11px] uppercase font-bold tracking-[0.08em]">TOTAL VIEWS</span>
+                  <span className="text-cyan-glow font-bold">{topic.views}</span>
                 </div>
-                <div className="chitin-card-inset p-2 border border-[#3a4a49] chamfer-corner flex items-center justify-between">
-                  <span className="text-[#839493] text-[10px] uppercase font-bold">TOTAL REPLIES</span>
-                  <span className="text-[#dfe3e3] font-bold">{topic.repliesCount}</span>
+                <div className="rounded-control border border-line-subtle bg-abyss/60 p-2 flex items-center justify-between">
+                  <span className="text-ink-muted text-[11px] uppercase font-bold tracking-[0.08em]">TOTAL REPLIES</span>
+                  <span className="text-ink font-bold">{topic.repliesCount}</span>
                 </div>
               </div>
             </div>
 
             {/* Directives Reminder */}
-            <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl space-y-2.5">
-              <div className="flex items-center gap-2 border-b border-[#3a4a49] pb-2.5">
-                <ShieldCheck className="w-4 h-4 text-[#00ffff]" />
-                <h3 className="font-grotesk text-xs sm:text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
+            <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 space-y-2.5">
+              <div className="flex items-center gap-2 border-b border-line-subtle pb-2.5">
+                <ShieldCheck className="w-4 h-4 text-cyan-glow" />
+                <h3 className="font-grotesk text-xs sm:text-sm font-bold text-ink uppercase tracking-[0.08em]">
                   COMMUNITY RULES
                 </h3>
               </div>
-              <p className="text-xs text-[#839493] leading-relaxed">
+              <p className="text-xs text-ink-muted leading-relaxed">
                 Be constructive and civil. Keep credentials private, and encourage growth across every stage.
               </p>
             </div>

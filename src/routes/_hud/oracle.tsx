@@ -53,7 +53,7 @@ function OracleSidebarContent({
     return (
       <div className="flex flex-col h-full space-y-3 font-sans" data-testid="oracle-auth-skeleton">
         {!hideHeader && (
-          <div className="flex items-center justify-between border-b border-cyan-950 pb-1.5 shrink-0">
+          <div className="flex items-center justify-between border-b border-line-subtle pb-1.5 shrink-0">
             <HudGhostSkeleton variant="cyan" preset="badge" width={64} height={12} />
             <HudGhostSkeleton variant="neutral" preset="button" width={72} height={20} />
           </div>
@@ -71,31 +71,31 @@ function OracleSidebarContent({
     return (
       <div className="flex flex-col h-full space-y-3 font-sans">
         {!hideHeader && (
-          <div className="flex items-center justify-between border-b border-cyan-950 pb-1.5 shrink-0">
-            <span className="text-[11px] font-bold text-cyan-500 tracking-wider uppercase">
+          <div className="flex items-center justify-between border-b border-line-subtle pb-1.5 shrink-0">
+            <span className="text-[11px] font-bold text-ink-muted tracking-[0.08em] uppercase">
               CHATS
             </span>
             {onNewChat && (
               <button
                 type="button"
                 onClick={onNewChat}
-                className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-cyan-300 transition-colors p-1 group cursor-pointer chamfer-corner hover:bg-cyan-950/50"
+                className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-ink transition-colors p-1 group cursor-pointer rounded-control hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 title="New Chat"
                 aria-label="New Chat"
               >
-                <span className="text-[10px] tracking-wider uppercase font-medium text-gray-400 group-hover:text-cyan-300">
+                <span className="text-[11px] tracking-[0.08em] uppercase font-medium text-ink-muted group-hover:text-ink">
                   New Chat
                 </span>
-                <Pencil className="w-3.5 h-3.5 text-cyan-400 group-hover:text-cyan-200" />
+                <Pencil className="w-3.5 h-3.5 text-cyan-glow" />
               </button>
             )}
           </div>
         )}
 
         {isLoadingThreads ? (
-          <div className="text-xs text-gray-500 py-4 text-center">Loading threads...</div>
+          <div className="text-xs text-ink-muted py-4 text-center">Loading threads...</div>
         ) : threads.length === 0 ? (
-          <div className="text-xs text-gray-500 py-4 text-center">No recorded threads yet.</div>
+          <div className="text-xs text-ink-muted py-4 text-center">No recorded threads yet.</div>
         ) : (
           <div className="flex-1 overflow-y-auto pr-0.5">
             <ThreadList
@@ -117,19 +117,19 @@ function OracleSidebarContent({
   return (
     <div className="flex flex-col justify-between h-full space-y-4 font-sans">
       <div className="space-y-3">
-        <div className="flex items-center space-x-2 text-cyan-400">
+        <div className="flex items-center space-x-2 text-cyan-glow">
           <Lock className="w-4 h-4" />
-          <span className="text-xs font-bold tracking-wider uppercase">GUEST MODE</span>
+          <span className="text-xs font-bold tracking-[0.08em] uppercase">GUEST MODE</span>
         </div>
-        <p className="text-[11px] text-gray-400 leading-relaxed">
+        <p className="text-[11px] text-ink-muted leading-relaxed">
           You are exploring the Oracle as a guest. Chats in guest mode are temporary and limited.
         </p>
-        <div className="p-2.5 bg-cyan-950/30 border border-cyan-800/35 backdrop-blur-xs chamfer-corner space-y-1.5 text-[10px] text-cyan-300">
-          <div className="font-bold text-cyan-200 flex items-center gap-1">
-            <Shield className="w-3 h-3 text-cyan-400" />
+        <div className="p-2.5 rounded-card border border-line-subtle bg-surface-1 hud-sheen space-y-1.5 text-[11px] text-ink-body">
+          <div className="font-bold text-ink flex items-center gap-1">
+            <Shield className="w-3 h-3 text-cyan-glow" />
             <span>MEMBER BENEFITS:</span>
           </div>
-          <ul className="space-y-1 text-gray-400 list-disc list-inside">
+          <ul className="space-y-1 text-ink-muted list-disc list-inside">
             <li>Full, detailed Oracle answers</li>
             <li>Saved consultation history</li>
             <li>Personalized progress tracking</li>
@@ -137,12 +137,12 @@ function OracleSidebarContent({
         </div>
       </div>
       <BenthicCTAButton
-        variant="red"
+        variant="cyan"
         size="md"
         fullWidth
         onClick={onOpenAuthModal}
       >
-        <span className="flex items-center justify-center gap-2 text-xs font-bold font-grotesk tracking-wider">
+        <span className="flex items-center justify-center gap-2 text-xs font-bold font-grotesk tracking-[0.08em]">
           <UserPlus className="w-4 h-4" />
           <span>SIGN UP</span>
         </span>
@@ -290,12 +290,12 @@ function OracleRouteComponent() {
   }
 
   return (
-    <div className="h-full flex flex-col font-sans text-[#dfe3e3]">
+    <div className="h-full flex flex-col font-sans text-ink">
       {/* Full-Screen Unified Container with Translucent Glass Backdrop */}
-      <div className="flex-1 h-full bg-[#060a0c]/40 backdrop-blur-md flex overflow-hidden relative">
+      <div className="flex-1 h-full bg-abyss/40 backdrop-blur-md flex overflow-hidden relative">
         
         {/* Desktop Sidebar with Translucent Glass Styling */}
-        <aside className="hidden md:flex w-64 lg:w-72 bg-[#050809]/75 backdrop-blur-md border-r border-cyan-900/40 p-3 flex-col shrink-0 overflow-y-auto z-10">
+        <aside className="hidden md:flex w-64 lg:w-72 bg-surface-1/75 backdrop-blur-md border-r border-line-subtle p-3 flex-col shrink-0 overflow-y-auto z-10">
           <OracleSidebarContent
             userId={userId}
             isAuthPending={isAuthPending}
@@ -328,7 +328,7 @@ function OracleRouteComponent() {
 
         {/* Mobile Slide-Over Overlay Backdrop */}
         <div
-          className={`fixed md:hidden inset-0 bg-black/75 backdrop-blur-xs z-40 transition-opacity duration-300 ${
+          className={`fixed md:hidden inset-0 bg-abyss/80 backdrop-blur-sm z-40 transition-opacity duration-300 ${
             isMobileDrawerOpen
               ? 'opacity-100 pointer-events-auto'
               : 'opacity-0 pointer-events-none'
@@ -339,7 +339,7 @@ function OracleRouteComponent() {
 
         {/* Mobile Slide-Over Chats Drawer */}
         <div
-          className={`fixed md:hidden top-0 bottom-0 left-0 w-72 sm:w-80 max-w-[85vw] bg-[#050809]/95 backdrop-blur-md border-r border-cyan-900/60 shadow-2xl z-50 flex flex-col h-full transform transition-transform duration-300 ease-in-out ${
+          className={`fixed md:hidden top-0 bottom-0 left-0 w-72 sm:w-80 max-w-[85vw] bg-surface-1/95 backdrop-blur-md border-r border-line shadow-menu z-50 flex flex-col h-full transform transition-transform duration-300 ease-in-out ${
             isMobileDrawerOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
           role="dialog"
@@ -347,8 +347,8 @@ function OracleRouteComponent() {
           aria-label="Chats"
         >
           {/* Mobile Drawer Header */}
-          <div className="flex items-center justify-between p-3 border-b border-cyan-900/50 bg-[#090e0f]/90 shrink-0">
-            <span className="text-xs font-bold text-cyan-300 tracking-wider uppercase font-sans">
+          <div className="flex items-center justify-between p-3 border-b border-line-subtle bg-surface-2/90 shrink-0">
+            <span className="text-xs font-bold text-ink tracking-[0.08em] uppercase font-sans">
               CHATS
             </span>
             <div className="flex items-center gap-2">
@@ -359,19 +359,19 @@ function OracleRouteComponent() {
                     handleCreateNewThread()
                     setIsMobileDrawerOpen(false)
                   }}
-                  className="flex items-center gap-1 text-xs text-gray-400 hover:text-cyan-300 transition-colors p-1 group cursor-pointer chamfer-corner hover:bg-cyan-950/50"
+                  className="flex items-center gap-1 text-xs text-ink-muted hover:text-ink transition-colors p-1 group cursor-pointer rounded-control hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                   title="New Chat"
                   aria-label="New Chat"
                 >
-                  <span className="text-[10px] tracking-wider uppercase font-medium text-gray-400 group-hover:text-cyan-300">
+                  <span className="text-[11px] tracking-[0.08em] uppercase font-medium text-ink-muted group-hover:text-ink">
                     New Chat
                   </span>
-                  <Pencil className="w-3.5 h-3.5 text-cyan-400 group-hover:text-cyan-200" />
+                  <Pencil className="w-3.5 h-3.5 text-cyan-glow" />
                 </button>
               )}
               <button
                 onClick={() => setIsMobileDrawerOpen(false)}
-                className="p-1 text-gray-400 hover:text-red-400 hover:bg-red-950/40 rounded transition-colors"
+                className="p-1 text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 aria-label="Close Chats"
               >
                 <X className="w-4 h-4" />

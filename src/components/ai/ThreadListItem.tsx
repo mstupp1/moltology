@@ -79,17 +79,17 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
   }
 
   const isComfortable = density === 'comfortable'
-  const kebabClasses = `inline-flex items-center justify-center shrink-0 transition-all cursor-pointer text-current hover:text-cyan-200 hover:bg-cyan-950/60 ${
+  const kebabClasses = `inline-flex items-center justify-center shrink-0 transition-all cursor-pointer text-current rounded-control hover:text-ink hover:bg-surface-3 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
     isComfortable ? 'min-w-11 min-h-11 p-2.5' : 'p-1'
   }`
 
   return (
     <div
       data-density={density}
-      className={`group relative w-full flex items-center text-xs transition-all chamfer-corner select-none ${
+      className={`group relative w-full flex items-center text-xs transition-all rounded-control overflow-hidden select-none ${
         isActive
-          ? 'bg-cyan-950/70 text-cyan-200 shadow-md backdrop-blur-xs'
-          : 'bg-[#080d0e]/50 hover:bg-cyan-950/40 text-gray-400 backdrop-blur-xs'
+          ? 'bg-surface-2 text-ink before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[2px] before:bg-cyan-glow'
+          : 'bg-surface-1/50 hover:bg-surface-2 text-ink-muted hover:text-ink-body'
       }`}
       style={{ WebkitTapHighlightColor: 'transparent' }}
     >
@@ -109,7 +109,7 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
           }}
           onBlur={commitRename}
           aria-label="Rename chat"
-          className="flex-1 min-w-0 mx-2 my-1 px-2 py-1 bg-[#041014]/80 border border-cyan-800/60 focus:border-cyan-400 text-cyan-100 text-xs outline-none"
+          className="flex-1 min-w-0 mx-2 my-1 px-2 py-1 rounded-control bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus text-ink text-xs outline-none"
         />
       ) : (
         <>
@@ -117,19 +117,19 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
             type="button"
             onClick={onSelect}
             title={thread.title}
-            className={`flex-1 min-w-0 text-left bg-transparent border-none outline-none cursor-pointer select-none focus:outline-none focus-visible:outline-none focus:ring-0 active:outline-none ${
+            className={`flex-1 min-w-0 text-left bg-transparent border-none outline-none cursor-pointer select-none focus:outline-none focus:ring-0 active:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
               isComfortable ? 'px-3 py-3' : 'px-2 py-1.5'
             }`}
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             <span className="flex items-center gap-1 min-w-0">
               {isPinned && !archived && (
-                <Pin className="w-2.5 h-2.5 text-cyan-400 shrink-0" fill="currentColor" />
+                <Pin className="w-2.5 h-2.5 text-cyan-glow shrink-0" fill="currentColor" />
               )}
               <span className="block truncate">{thread.title || 'Untitled Consultation'}</span>
             </span>
             {dateSource && (
-              <span className="block text-[9px] text-gray-500 font-mono mt-0.5 select-none">
+              <span className="block text-[11px] text-ink-muted font-mono mt-0.5 select-none">
                 {formatDate(dateSource)}
               </span>
             )}

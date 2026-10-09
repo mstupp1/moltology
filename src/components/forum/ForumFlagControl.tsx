@@ -93,7 +93,7 @@ export function ForumFlagControl({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#839493] hover:text-[#ffb703] hover:bg-[#ffb703]/10 rounded transition-colors"
+          className="inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           data-testid="forum-flag"
         >
           <Flag className="w-3.5 h-3.5" />
@@ -103,18 +103,18 @@ export function ForumFlagControl({
 
       {open && (
         <div
-          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150"
+          className="fixed inset-0 z-50 bg-abyss/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150"
           data-testid="forum-flag-dialog"
         >
-          <div className="w-full max-w-md bg-[#0b0f0f] border border-[#00ffff]/50 shadow-[0_0_30px_rgba(0,255,255,0.18)] chamfer-corner overflow-hidden font-sans">
-            <div className="bg-[#171c1c] border-b border-[#3a4a49] p-4 flex items-center justify-between">
-              <h2 className="text-xs text-[#00ffff] font-bold tracking-widest uppercase">
+          <div className="w-full max-w-md rounded-card border border-line bg-surface-1 shadow-menu overflow-hidden font-sans">
+            <div className="bg-surface-2 border-b border-line-subtle p-4 flex items-center justify-between">
+              <h2 className="text-xs text-ink font-bold tracking-[0.08em] uppercase">
                 {FORUM_REPORT_COPY.dialogTitle}
               </h2>
               <button
                 type="button"
                 onClick={reset}
-                className="text-[#839493] hover:text-[#ff5540] p-1 transition-colors"
+                className="p-1 text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 aria-label="Close"
               >
                 <X className="w-5 h-5" />
@@ -122,10 +122,10 @@ export function ForumFlagControl({
             </div>
 
             <form onSubmit={handleSubmit} className="p-4 space-y-3">
-              <p className="text-xs text-[#839493] leading-relaxed">{FORUM_REPORT_COPY.dialogLead}</p>
+              <p className="text-xs text-ink-muted leading-relaxed">{FORUM_REPORT_COPY.dialogLead}</p>
 
               {error && (
-                <p className="text-xs text-[#ff5540]" data-testid="forum-flag-error">
+                <p className="text-xs text-crimson-text" data-testid="forum-flag-error">
                   {error}
                 </p>
               )}
@@ -135,10 +135,10 @@ export function ForumFlagControl({
                 {FORUM_REPORT_REASON_OPTIONS.map((option) => (
                   <label
                     key={option.id}
-                    className={`flex items-start gap-2.5 p-2.5 border chamfer-corner cursor-pointer transition-colors ${
+                    className={`flex items-start gap-2.5 p-2.5 border rounded-control cursor-pointer transition-colors ${
                       reason === option.id
-                        ? 'border-[#00ffff]/60 bg-[#00ffff]/8'
-                        : 'border-[#3a4a49] hover:border-[#00ffff]/30'
+                        ? 'border-cyan-glow/40 bg-cyan-soft'
+                        : 'border-line hover:border-line-hover hover:bg-surface-2'
                     }`}
                   >
                     <input
@@ -147,11 +147,11 @@ export function ForumFlagControl({
                       value={option.id}
                       checked={reason === option.id}
                       onChange={() => setReason(option.id)}
-                      className="mt-0.5 accent-[#00ffff]"
+                      className="mt-0.5 accent-cyan-glow"
                     />
                     <span className="space-y-0.5">
-                      <span className="block text-xs font-bold text-[#dfe3e3]">{option.label}</span>
-                      <span className="block text-[11px] text-[#839493] leading-relaxed">
+                      <span className="block text-xs font-bold text-ink">{option.label}</span>
+                      <span className="block text-[11px] text-ink-muted leading-relaxed">
                         {option.description}
                       </span>
                     </span>
@@ -160,7 +160,7 @@ export function ForumFlagControl({
               </fieldset>
 
               <label className="block space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#839493]">
+                <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
                   {FORUM_REPORT_COPY.noteLabel}
                 </span>
                 <textarea
@@ -169,7 +169,7 @@ export function ForumFlagControl({
                   maxLength={FORUM_REPORT_NOTE_MAX}
                   rows={3}
                   placeholder={FORUM_REPORT_COPY.notePlaceholder}
-                  className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-2.5 text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner"
+                  className="w-full bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus p-2.5 text-xs text-ink outline-none resize-y rounded-control transition-[border-color,box-shadow] placeholder:text-ink-muted"
                   data-testid="forum-flag-note"
                 />
               </label>
@@ -178,14 +178,14 @@ export function ForumFlagControl({
                 <button
                   type="button"
                   onClick={reset}
-                  className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#839493] hover:text-[#dfe3e3] transition-colors"
+                  className="px-3 py-1.5 rounded-control text-xs font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   {FORUM_REPORT_COPY.cancel}
                 </button>
                 <button
                   type="submit"
                   disabled={busy}
-                  className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] disabled:opacity-50 text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all"
+                  className="px-4 py-1.5 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                   data-testid="forum-flag-submit"
                 >
                   {busy ? FORUM_REPORT_COPY.submitting : FORUM_REPORT_COPY.submit}

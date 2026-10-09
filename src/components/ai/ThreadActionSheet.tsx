@@ -31,7 +31,7 @@ export const ThreadActionSheet: React.FC<ThreadActionSheetProps> = ({
   }
 
   const rowClasses =
-    'w-full flex items-center gap-3 px-3 py-3 text-xs font-medium rounded-none transition-colors cursor-pointer select-none'
+    'w-full flex items-center gap-3 px-3 py-3 text-xs font-medium rounded-none transition-colors cursor-pointer select-none focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow'
 
   return (
     <HudBottomSheet
@@ -41,22 +41,22 @@ export const ThreadActionSheet: React.FC<ThreadActionSheetProps> = ({
       ariaLabel={`Options for ${thread.title || 'Untitled Consultation'}`}
       className="max-w-md mx-auto"
     >
-      <p className="text-[10px] text-cyan-500 tracking-wider uppercase font-bold px-3 pb-1 truncate">
+      <p className="text-[11px] text-ink-muted tracking-[0.08em] uppercase font-bold px-3 pb-1 truncate">
         {thread.title || 'Untitled Consultation'}
       </p>
 
-      <div className="divide-y divide-cyan-950/80">
+      <div className="divide-y divide-line-subtle">
         {!archived && (
           <button
             type="button"
             onClick={() => run(onPin)}
-            className={`${rowClasses} text-gray-200 hover:bg-cyan-950/60 hover:text-cyan-200`}
+            className={`${rowClasses} text-ink-body hover:bg-surface-2 hover:text-ink`}
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             {isPinned ? (
-              <PinOff className="w-4 h-4 text-cyan-400 shrink-0" />
+              <PinOff className="w-4 h-4 text-cyan-glow shrink-0" />
             ) : (
-              <Pin className="w-4 h-4 text-cyan-400 shrink-0" />
+              <Pin className="w-4 h-4 text-cyan-glow shrink-0" />
             )}
             {isPinned ? 'Unpin chat' : 'Pin to top'}
           </button>
@@ -66,10 +66,10 @@ export const ThreadActionSheet: React.FC<ThreadActionSheetProps> = ({
           <button
             type="button"
             onClick={() => run(onRename)}
-            className={`${rowClasses} text-gray-200 hover:bg-cyan-950/60 hover:text-cyan-200`}
+            className={`${rowClasses} text-ink-body hover:bg-surface-2 hover:text-ink`}
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
-            <Pencil className="w-4 h-4 text-cyan-400 shrink-0" />
+            <Pencil className="w-4 h-4 text-cyan-glow shrink-0" />
             Rename
           </button>
         )}
@@ -77,13 +77,13 @@ export const ThreadActionSheet: React.FC<ThreadActionSheetProps> = ({
         <button
           type="button"
           onClick={() => run(onArchive)}
-          className={`${rowClasses} text-gray-200 hover:bg-cyan-950/60 hover:text-cyan-200`}
+          className={`${rowClasses} text-ink-body hover:bg-surface-2 hover:text-ink`}
           style={{ WebkitTapHighlightColor: 'transparent' }}
         >
           {archived ? (
-            <ArchiveRestore className="w-4 h-4 text-cyan-400 shrink-0" />
+            <ArchiveRestore className="w-4 h-4 text-cyan-glow shrink-0" />
           ) : (
-            <Archive className="w-4 h-4 text-cyan-400 shrink-0" />
+            <Archive className="w-4 h-4 text-cyan-glow shrink-0" />
           )}
           {archived ? 'Unarchive' : 'Archive'}
         </button>
@@ -91,7 +91,7 @@ export const ThreadActionSheet: React.FC<ThreadActionSheetProps> = ({
         <button
           type="button"
           onClick={() => run(onDelete)}
-          className={`${rowClasses} text-red-400 hover:bg-red-950/60 hover:text-red-300`}
+          className={`${rowClasses} text-crimson-text hover:bg-crimson-soft`}
           style={{ WebkitTapHighlightColor: 'transparent' }}
         >
           <Trash2 className="w-4 h-4 shrink-0" />

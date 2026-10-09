@@ -12,7 +12,7 @@ const pinnedAtMs = (value?: string | Date | null) => {
 }
 
 const SECTION_LABEL =
-  'flex items-center gap-1.5 px-1 py-1 text-[10px] font-bold tracking-wider uppercase text-gray-500 select-none'
+  'flex items-center gap-1.5 px-1 py-1 text-[11px] font-bold tracking-[0.08em] uppercase text-ink-muted select-none'
 
 export interface ThreadListProps {
   threads: ManagedThread[]
@@ -90,11 +90,11 @@ export const ThreadList: React.FC<ThreadListProps> = ({
   )
 
   if (isLoadingThreads) {
-    return <div>{loadingNode || <div className="text-xs text-gray-500 py-4 text-center">{loadingMessage}</div>}</div>
+    return <div>{loadingNode || <div className="text-xs text-ink-muted py-4 text-center">{loadingMessage}</div>}</div>
   }
 
   if (threads.length === 0) {
-    return <div className="text-xs text-gray-500 py-4 text-center">{emptyMessage}</div>
+    return <div className="text-xs text-ink-muted py-4 text-center">{emptyMessage}</div>
   }
 
   return (
@@ -103,7 +103,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
         <div data-testid="pinned-threads">
           <div className={SECTION_LABEL}>
             <span>Pinned</span>
-            <span className="text-gray-600 font-mono">({pinnedThreads.length})</span>
+            <span className="text-ink-muted font-mono">({pinnedThreads.length})</span>
           </div>
           <div className="space-y-1.5 mt-1.5">{pinnedThreads.map((t) => renderItem(t, false))}</div>
         </div>
@@ -116,12 +116,12 @@ export const ThreadList: React.FC<ThreadListProps> = ({
       )}
 
       {archivedThreads.length > 0 && (
-        <div className="mt-3 pt-2 border-t border-cyan-950/70">
+        <div className="mt-3 pt-2 border-t border-line-subtle">
           <button
             type="button"
             onClick={() => setIsArchivedOpen((v) => !v)}
             aria-expanded={isArchivedOpen}
-            className={`w-full ${SECTION_LABEL} hover:text-cyan-300 transition-colors cursor-pointer`}
+            className={`w-full ${SECTION_LABEL} hover:text-ink rounded-control transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow`}
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             {isArchivedOpen ? (
@@ -130,7 +130,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
               <ChevronRight className="w-3 h-3 shrink-0" />
             )}
             <span>Archived</span>
-            <span className="text-gray-600 font-mono">({archivedThreads.length})</span>
+            <span className="text-ink-muted font-mono">({archivedThreads.length})</span>
           </button>
           {isArchivedOpen && <div className="space-y-1.5 mt-1.5">{archivedThreads.map((t) => renderItem(t, true))}</div>}
         </div>

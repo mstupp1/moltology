@@ -78,7 +78,7 @@ describe('SynapticOracleWidget', () => {
     expect(screen.getAllByText('SYNAPTIC ORACLE').length).toBeGreaterThan(0)
     expect(screen.queryByTitle(/Drag header to move chat window/i)).not.toBeInTheDocument()
 
-    const popout = container.querySelector('.chamfer-corner')
+    const popout = container.querySelector('.fixed.rounded-card')
     expect(popout).not.toBeNull()
     expect(popout).toHaveClass('right-6', 'bottom-4')
     expect(localStorage.getItem('moltology:oracle_button_pos')).toBeNull()
@@ -128,7 +128,7 @@ describe('SynapticOracleWidget', () => {
     fireEvent.click(screen.getByRole('button', { name: /Open Oracle AI Popout/i }))
     act(() => { vi.advanceTimersByTime(50) })
 
-    const firstPopout = container.querySelector('.chamfer-corner')
+    const firstPopout = container.querySelector('.fixed.rounded-card')
     expect(firstPopout).toHaveClass('right-6', 'bottom-4')
 
     fireEvent.click(screen.getByTitle('Close Panel'))
@@ -137,7 +137,7 @@ describe('SynapticOracleWidget', () => {
     fireEvent.click(screen.getByRole('button', { name: /Open Oracle AI Popout/i }))
     act(() => { vi.advanceTimersByTime(50) })
 
-    const reopened = container.querySelector('.chamfer-corner')
+    const reopened = container.querySelector('.fixed.rounded-card')
     expect(reopened).toHaveClass('right-6', 'bottom-4')
     expect(localStorage.getItem('moltology:oracle_popout_pos')).toBeNull()
 
@@ -350,7 +350,7 @@ describe('SynapticOracleWidget', () => {
       expect(cursor).toHaveClass('animate-caret-blink')
       expect(cursor).toHaveClass('w-[1.5px]')
       expect(cursor).toHaveClass('h-3.5')
-      expect(cursor).toHaveClass('bg-[#00c3ff]')
+      expect(cursor).toHaveClass('bg-cyan-glow')
     }
   })
 })

@@ -116,7 +116,7 @@ export function MarketShopPage() {
         }
       />
 
-      <div className="sticky top-0 z-20 -mx-0.5 px-0.5 pt-0.5 pb-1 bg-[#070b0b]">
+      <div className="sticky top-0 z-20 -mx-0.5 px-0.5 pt-0.5 pb-1 bg-abyss">
         <MarketShopTabs activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 
@@ -137,7 +137,7 @@ export function MarketShopPage() {
         />
       ) : null}
 
-      <p className="text-center text-[9px] text-[#839493] uppercase tracking-widest pt-1">
+      <p className="text-center text-[11px] text-ink-muted uppercase tracking-[0.08em] pt-1">
         Molt Credits buy cosmetics and boosts. Rank and clearance can't be purchased.
       </p>
     </div>

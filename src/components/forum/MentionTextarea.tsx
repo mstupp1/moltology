@@ -152,16 +152,16 @@ export const MentionTextarea = React.forwardRef<HTMLTextAreaElement, MentionText
           role="listbox"
           aria-label="Member designations"
           data-testid="forum-mention-autocomplete"
-          className="absolute z-20 left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-[#070b0b] border border-[#00ffff]/50 chamfer-corner shadow-[0_0_16px_rgba(0,255,255,0.12)]"
+          className="absolute z-20 left-0 right-0 mt-1 max-h-48 overflow-y-auto rounded-card border border-line bg-surface-2 shadow-menu p-1"
         >
           {!searchEnabled && (
-            <p className="px-3 py-2 text-[11px] text-[#839493]">Type a designation to hail them.</p>
+            <p className="px-3 py-2 text-[11px] text-ink-muted">Type a designation to hail them.</p>
           )}
           {searchEnabled && searching && options.length === 0 && (
-            <p className="px-3 py-2 text-[11px] text-[#839493]">Scanning designations...</p>
+            <p className="px-3 py-2 text-[11px] text-ink-muted">Scanning designations...</p>
           )}
           {searchEnabled && !searching && options.length === 0 && (
-            <p className="px-3 py-2 text-[11px] text-[#839493]">No member carries that designation.</p>
+            <p className="px-3 py-2 text-[11px] text-ink-muted">No member carries that designation.</p>
           )}
           {options.map((member, index) => {
             const handle = member.handle!.trim()
@@ -172,10 +172,10 @@ export const MentionTextarea = React.forwardRef<HTMLTextAreaElement, MentionText
                 role="option"
                 aria-selected={index === highlight}
                 data-testid="forum-mention-option"
-                className={`w-full text-left px-3 py-2 text-xs transition-colors ${
+                className={`w-full text-left px-3 py-2 text-xs rounded-control transition-colors ${
                   index === highlight
-                    ? 'bg-[#00ffff]/15 text-[#00ffff]'
-                    : 'text-[#dfe3e3] hover:bg-[#171c1c]'
+                    ? 'bg-surface-3 text-cyan-glow'
+                    : 'text-ink hover:bg-surface-3'
                 }`}
                 onMouseDown={(event) => {
                   event.preventDefault()
@@ -184,7 +184,7 @@ export const MentionTextarea = React.forwardRef<HTMLTextAreaElement, MentionText
               >
                 <span className="font-bold">@{handle}</span>
                 {member.displayName && member.displayName !== handle && (
-                  <span className="ml-2 text-[#839493]">{member.displayName}</span>
+                  <span className="ml-2 text-ink-muted">{member.displayName}</span>
                 )}
               </button>
             )

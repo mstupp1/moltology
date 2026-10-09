@@ -148,7 +148,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
       return (
         <div
           ref={containerRef}
-          className={`chitin-card p-3 sm:p-4 chamfer-corner shadow-md space-y-2.5 ${className}`}
+          className={`rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 space-y-2.5 ${className}`}
           data-testid="inline-composer-loading"
         >
           <HudGhostSkeleton variant="neutral" preset="text" width="50%" height={14} />
@@ -161,16 +161,16 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
       return (
         <div
           ref={containerRef}
-          className={`chitin-card p-3 sm:p-4 chamfer-corner shadow-lg border border-[#3a4a49] flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left ${className}`}
+          className={`rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left ${className}`}
           data-testid="inline-composer-guest"
         >
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 chamfer-corner bg-[#070b0b] border border-[#3a4a49] flex items-center justify-center shrink-0">
-              <Terminal className="w-4 h-4 text-[#00ffff]" />
+            <div className="w-8 h-8 rounded-control bg-surface-2 border border-line flex items-center justify-center shrink-0">
+              <Terminal className="w-4 h-4 text-cyan-glow" />
             </div>
             <div>
-              <p className="text-xs font-bold text-[#dfe3e3]">Join the Discussion</p>
-              <p className="text-[11px] text-[#839493]">
+              <p className="text-xs font-bold text-ink">Join the Discussion</p>
+              <p className="text-[11px] text-ink-muted">
                 Sign in to transmit posts and questions to the community.
               </p>
             </div>
@@ -178,7 +178,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
           <button
             type="button"
             onClick={() => openAuth('signup')}
-            className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] px-4 py-2 bg-[#00ffff] hover:bg-[#00e6e6] text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all shadow-[0_0_12px_rgba(0,255,255,0.25)] shrink-0 touch-manipulation"
+            className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] px-4 py-2 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow shrink-0 touch-manipulation"
           >
             Sign In / Join
           </button>
@@ -190,15 +190,15 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
       return (
         <div
           ref={containerRef}
-          className={`chitin-card p-3 sm:p-4 chamfer-corner shadow-lg border border-[#3a4a49] flex items-start gap-2.5 ${className}`}
+          className={`rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 flex items-start gap-2.5 ${className}`}
           data-testid="inline-composer-locked"
         >
-          <div className="w-8 h-8 chamfer-corner bg-[#070b0b] border border-[#3a4a49] flex items-center justify-center shrink-0">
-            <Terminal className="w-4 h-4 text-[#839493]" />
+          <div className="w-8 h-8 rounded-control bg-surface-2 border border-line flex items-center justify-center shrink-0">
+            <Terminal className="w-4 h-4 text-ink-muted" />
           </div>
           <div>
-            <p className="text-xs font-bold text-[#dfe3e3]">New threads aren't open to you yet</p>
-            <p className="text-[11px] text-[#839493] leading-relaxed">{standing.topicLockReason}</p>
+            <p className="text-xs font-bold text-ink">New threads aren't open to you yet</p>
+            <p className="text-[11px] text-ink-muted leading-relaxed">{standing.topicLockReason}</p>
           </div>
         </div>
       )
@@ -228,21 +228,21 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
               handleExpand()
             }
           }}
-          className={`group chitin-card p-3 sm:p-3.5 chamfer-corner shadow-lg border border-[#3a4a49] hover:border-[#00ffff]/60 transition-all cursor-pointer flex items-center justify-between gap-3 focus:outline-none focus:border-[#00ffff] ${className}`}
+          className={`group rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset hover:border-line-strong hover:bg-surface-2 transition-colors p-3 sm:p-3.5 cursor-pointer flex items-center justify-between gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${className}`}
           data-testid="inline-composer-collapsed"
         >
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-            <div className="w-8 h-8 chamfer-corner bg-[#070b0b] border border-[#3a4a49] group-hover:border-[#00ffff]/60 flex items-center justify-center shrink-0 transition-colors">
-              <Plus className="w-4 h-4 text-[#00ffff]" />
+            <div className="w-8 h-8 rounded-control bg-surface-2 border border-line group-hover:border-line-strong flex items-center justify-center shrink-0 transition-colors">
+              <Plus className="w-4 h-4 text-cyan-glow" />
             </div>
-            <span className="text-xs sm:text-xs text-[#839493] group-hover:text-[#dfe3e3] truncate transition-colors">
+            <span className="text-xs sm:text-xs text-ink-muted group-hover:text-ink truncate transition-colors">
               {promptText}
             </span>
           </div>
 
           <button
             type="button"
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 bg-[#00ffff]/10 hover:bg-[#00ffff]/20 border border-[#00ffff]/40 text-[#00ffff] text-[11px] font-bold uppercase tracking-wider chamfer-corner transition-colors shrink-0"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-control border border-line bg-surface-2 group-hover:border-line-strong text-cyan-glow text-[11px] font-bold uppercase tracking-[0.08em] transition-colors shrink-0"
             tabIndex={-1}
           >
             <span>New Post</span>
@@ -255,21 +255,21 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
       <div
         ref={containerRef}
         id="topic-composer"
-        className={`chitin-card p-3 sm:p-5 chamfer-corner shadow-2xl border border-[#00ffff]/60 space-y-3.5 sm:space-y-4 animate-in fade-in duration-200 ${className}`}
+        className={`rounded-card border border-cyan-glow/40 bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-5 space-y-3.5 sm:space-y-4 animate-in fade-in duration-200 ${className}`}
         data-testid="inline-composer-expanded"
       >
-        <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2.5 sm:pb-3">
+        <div className="flex items-center justify-between border-b border-line-subtle pb-2.5 sm:pb-3">
           <div className="flex items-center gap-2">
-            <Terminal className="w-4 h-4 text-[#00ffff]" />
-            <h2 className="text-xs text-[#00ffff] font-bold tracking-widest uppercase">
+            <Terminal className="w-4 h-4 text-cyan-glow" />
+            <h2 className="text-xs text-cyan-glow font-bold tracking-[0.08em] uppercase">
               TRANSMIT NEW TOPIC
             </h2>
             {fixedCategory && currentCategory && (
               <span
-                className="hidden sm:inline-block text-[10px] font-bold px-2 py-0.5 chamfer-corner border bg-[#070b0b]"
+                className="hidden sm:inline-block text-[11px] font-bold tracking-[0.08em] px-2 py-0.5 rounded-chip"
                 style={{
-                  color: currentCategory.color || '#00ffff',
-                  borderColor: currentCategory.color ? `${currentCategory.color}60` : '#00ffff60',
+                  color: currentCategory.color || '#00c3ff',
+                  backgroundColor: `${currentCategory.color || '#00c3ff'}26`,
                 }}
               >
                 {currentCategory.name.toUpperCase()}
@@ -280,7 +280,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
           <button
             type="button"
             onClick={handleCollapse}
-            className="min-w-[44px] min-h-[44px] sm:min-w-[32px] sm:min-h-[32px] p-2 sm:p-1 text-[#839493] hover:text-[#ff5540] transition-colors flex items-center justify-center touch-manipulation"
+            className="min-w-[44px] min-h-[44px] sm:min-w-[32px] sm:min-h-[32px] p-2 sm:p-1 text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center justify-center touch-manipulation"
             aria-label="Close composer"
           >
             <X className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -289,7 +289,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
 
         <form onSubmit={handleSubmit} className="space-y-3.5 sm:space-y-4">
           {error && (
-            <div className="p-3 bg-[#2d0f0f] border border-[#ff5540] text-[#ff5540] text-xs flex items-center gap-2 chamfer-corner">
+            <div className="p-3 bg-crimson-soft border border-crimson-aggro/55 text-crimson-text text-xs flex items-center gap-2 rounded-control">
               <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -299,7 +299,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
             <div className="space-y-1.5">
               <label
                 htmlFor="composer-category-select"
-                className="text-[11px] sm:text-xs text-[#839493] font-bold uppercase tracking-wider block"
+                className="text-[11px] sm:text-xs text-ink-muted font-bold uppercase tracking-[0.08em] block"
               >
                 Discussion Board
               </label>
@@ -308,10 +308,10 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
                 value={activeCategoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
                 disabled={fixedCategory}
-                className="w-full min-h-[44px] sm:min-h-[38px] bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] px-3 py-2 text-[16px] sm:text-xs text-[#dfe3e3] outline-none chamfer-corner transition-colors disabled:opacity-75"
+                className="w-full min-h-[44px] sm:min-h-[38px] bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus px-3 py-2 text-[16px] sm:text-xs text-ink outline-none rounded-control transition-[border-color,box-shadow] disabled:opacity-75"
               >
                 {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id} className="bg-[#070b0b] text-[#dfe3e3]">
+                  <option key={cat.id} value={cat.id} className="bg-surface-2 text-ink">
                     {cat.name}
                   </option>
                 ))}
@@ -323,11 +323,11 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
             <div className="flex items-center justify-between text-xs">
               <label
                 htmlFor="composer-title-input"
-                className="text-[11px] sm:text-xs text-[#839493] font-bold uppercase tracking-wider"
+                className="text-[11px] sm:text-xs text-ink-muted font-bold uppercase tracking-[0.08em]"
               >
                 Title
               </label>
-              <span className="text-[11px] text-[#839493]">{title.trim().length} / 150</span>
+              <span className="text-[11px] text-ink-muted">{title.trim().length} / 150</span>
             </div>
             <input
               id="composer-title-input"
@@ -337,7 +337,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
               onChange={(e) => setTitle(e.target.value)}
               placeholder="What would you like to discuss?"
               maxLength={150}
-              className="w-full min-h-[44px] sm:min-h-[38px] bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] px-3 py-2 text-[16px] sm:text-xs text-[#dfe3e3] outline-none chamfer-corner transition-colors placeholder:text-[#839493]/50"
+              className="w-full min-h-[44px] sm:min-h-[38px] bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus px-3 py-2 text-[16px] sm:text-xs text-ink outline-none rounded-control transition-[border-color,box-shadow] placeholder:text-ink-muted"
             />
           </div>
 
@@ -345,11 +345,11 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
             <div className="flex items-center justify-between text-xs">
               <label
                 htmlFor="composer-content-textarea"
-                className="text-[11px] sm:text-xs text-[#839493] font-bold uppercase tracking-wider"
+                className="text-[11px] sm:text-xs text-ink-muted font-bold uppercase tracking-[0.08em]"
               >
                 Content
               </label>
-              <span className="text-[11px] text-[#839493]">
+              <span className="text-[11px] text-ink-muted">
                 {content.trim().length} characters (min 10)
               </span>
             </div>
@@ -364,13 +364,13 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
               />
               {preview ? (
                 <div
-                  className="w-full min-h-[110px] max-h-[300px] bg-[#070b0b]/60 border border-[#3a4a49] p-3 text-xs text-[#dfe3e3] chamfer-corner-bottom overflow-y-auto"
+                  className="w-full min-h-[110px] max-h-[300px] bg-abyss/60 border border-line p-3 text-xs text-ink-body rounded-b-control overflow-y-auto"
                   data-testid="inline-composer-preview"
                 >
                   {content.trim() ? (
                     <ForumPostBody content={content} />
                   ) : (
-                    <p className="text-xs text-[#839493]/60 italic">
+                    <p className="text-xs text-ink-muted italic">
                       Nothing to preview yet. Transmit some thoughts or apply formatting above...
                     </p>
                   )}
@@ -386,28 +386,28 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
                     handleFormattingShortcuts(e, textareaRef.current, setContent)
                   }}
                   placeholder="Share your thoughts, questions, or ideas... Hail a member with @designation."
-                  className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-[16px] sm:text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner-bottom transition-colors placeholder:text-[#839493]/50 min-h-[110px]"
+                  className="w-full bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus p-3 text-[16px] sm:text-xs text-ink outline-none resize-y rounded-b-control transition-[border-color,box-shadow] placeholder:text-ink-muted min-h-[110px]"
                 />
               )}
             </div>
           </div>
 
-          <p className="text-[11px] text-[#839493] leading-relaxed border-l-2 border-[#3a4a49] pl-2.5">
+          <p className="text-[11px] text-ink-muted leading-relaxed border-l-2 border-line pl-2.5">
             Be civil and constructive. Keep private credentials, keys, and tokens out of public posts.
           </p>
 
-          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 pt-2 border-t border-[#3a4a49]">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 pt-2 border-t border-line-subtle">
             <button
               type="button"
               onClick={handleCollapse}
-              className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] px-4 py-2 border border-[#3a4a49] hover:bg-[#171c1c] text-[#839493] hover:text-[#dfe3e3] text-xs font-bold uppercase chamfer-corner transition-colors touch-manipulation text-center"
+              className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] px-4 py-2 text-xs font-bold uppercase tracking-[0.08em] rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow touch-manipulation text-center"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={creating || title.trim().length < 5 || content.trim().length < 10}
-              className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] px-5 py-2 bg-[#00ffff] hover:bg-[#00e6e6] disabled:opacity-50 text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all shadow-[0_0_12px_rgba(0,255,255,0.2)] flex items-center justify-center gap-2 touch-manipulation"
+              className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] px-5 py-2 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center justify-center gap-2 touch-manipulation"
             >
               <Send className="w-3.5 h-3.5" />
               <span>{creating ? 'Transmitting...' : 'Transmit Post'}</span>
