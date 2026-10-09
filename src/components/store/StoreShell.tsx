@@ -9,7 +9,7 @@ import { MerchCartProvider } from './MerchCartProvider'
 
 export function StoreShell() {
   return (
-    <div className="min-h-screen bg-[#030607] text-[#dfe3e3]">
+    <div className="min-h-screen bg-abyss text-ink">
       <PublicHeader activePage="store" />
       <HiddenPageGuard skeleton={<div className="mx-auto max-w-6xl px-4 py-10"><HUDPageLoader /></div>}>
         <MerchCartProvider>

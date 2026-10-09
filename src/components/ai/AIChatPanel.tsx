@@ -537,7 +537,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   return (
     <div
       ref={rootRef}
-      className={`flex flex-col bg-[#070c0e]/60 backdrop-blur-md border border-cyan-900/40 shadow-2xl font-sans overflow-hidden h-full w-full relative ${className}`}
+      className={`flex flex-col bg-surface-1/60 backdrop-blur-md border border-line-subtle shadow-menu font-sans overflow-hidden h-full w-full relative ${className}`}
     >
       {/* Faded Grayscale Watermark Logo Background */}
       <div
@@ -552,14 +552,14 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       </div>
 
       {/* Shared Simplified Header */}
-      <div className="bg-[#070c0e]/75 backdrop-blur-md border-b border-cyan-900/40 px-3 py-2 flex items-center justify-between gap-2 shrink-0 select-none relative z-10">
+      <div className="bg-surface-2/75 backdrop-blur-md border-b border-line-subtle px-3 py-2 flex items-center justify-between gap-2 shrink-0 select-none relative z-10">
         {/* Left Section: Icon, Title & Chats Button */}
         <div className="flex items-center space-x-2 min-w-0 flex-1 truncate">
           {onToggleConversations ? (
             <button
               type="button"
               onClick={onToggleConversations}
-              className={`text-gray-400 hover:text-cyan-300 ${chatsToggleSize} md:hidden transition-colors cursor-pointer shrink-0`}
+              className={`text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control ${chatsToggleSize} md:hidden transition-colors cursor-pointer shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow`}
               title="Chats"
               aria-label="Toggle Chats"
             >
@@ -570,10 +570,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               ref={chatsButtonRef}
               type="button"
               onClick={handleToggleChats}
-              className={`${chatsToggleSize} transition-colors cursor-pointer shrink-0 ${
+              className={`${chatsToggleSize} rounded-control transition-colors cursor-pointer shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                 isChatsOpen
-                  ? 'text-cyan-300 bg-cyan-950/60 rounded-xs'
-                  : 'text-gray-400 hover:text-cyan-300'
+                  ? 'text-cyan-glow bg-surface-2'
+                  : 'text-ink-muted hover:text-ink hover:bg-surface-2'
               }`}
               title="Chats"
               aria-label="Toggle Chats"
@@ -583,7 +583,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             </button>
           )}
 
-          <span className="text-xs font-bold text-cyan-300 tracking-wider truncate pointer-events-none">
+          <span className="text-xs font-bold text-ink tracking-[0.08em] truncate pointer-events-none">
             {personaName}
           </span>
         </div>
@@ -597,10 +597,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             <>
               <button
                 onClick={() => handleModeSwitch(oracle.mode === 'sidebar' ? 'popout' : 'sidebar')}
-                className={`hidden md:inline-flex p-1 transition-colors cursor-pointer ${
+                className={`hidden md:inline-flex p-1 rounded-control transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                   oracle.mode === 'sidebar'
-                    ? 'text-cyan-300 bg-cyan-950/60'
-                    : 'text-gray-400 hover:text-cyan-300'
+                    ? 'text-cyan-glow bg-surface-2'
+                    : 'text-ink-muted hover:text-ink hover:bg-surface-2'
                 }`}
                 title="Sidebar"
                 aria-label="Sidebar"
@@ -609,10 +609,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               </button>
               <button
                 onClick={() => handleModeSwitch(oracle.mode === 'page' ? 'popout' : 'page')}
-                className={`p-1 transition-colors cursor-pointer ${
+                className={`p-1 rounded-control transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                   oracle.mode === 'page'
-                    ? 'text-cyan-300 bg-cyan-950/60'
-                    : 'text-gray-400 hover:text-cyan-300'
+                    ? 'text-cyan-glow bg-surface-2'
+                    : 'text-ink-muted hover:text-ink hover:bg-surface-2'
                 }`}
                 title={oracle.mode === 'page' ? 'Popout' : 'Expand'}
                 aria-label={oracle.mode === 'page' ? 'Popout' : 'Expand'}
@@ -628,7 +628,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
           <button
             onClick={handleNewChat}
-            className="text-gray-400 hover:text-cyan-300 p-1 transition-colors cursor-pointer"
+            className="text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control p-1 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             title="New Chat"
             aria-label="New Chat"
           >
@@ -637,7 +637,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-red-400 p-1 transition-colors cursor-pointer"
+            className="text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control p-1 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             title="Close Panel"
           >
             <X className="w-3.5 h-3.5" />
@@ -647,12 +647,12 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
       {/* Error Alert */}
       {errorMessage && (
-        <div className="bg-red-950/80 border-b border-red-800 px-3 py-1.5 text-[11px] text-red-300 flex items-center justify-between shrink-0">
+        <div className="bg-crimson-soft border-b border-crimson-aggro/40 px-3 py-1.5 text-[11px] text-crimson-text flex items-center justify-between shrink-0">
           <div className="flex items-center gap-1.5">
-            <AlertCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+            <AlertCircle className="w-3.5 h-3.5 text-crimson-text shrink-0" />
             <span>{errorMessage}</span>
           </div>
-          <button onClick={() => setErrorMessage(null)} className="text-red-400 hover:text-red-200">
+          <button onClick={() => setErrorMessage(null)} className="text-crimson-text hover:text-ink rounded-control px-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
             ×
           </button>
         </div>
@@ -724,18 +724,18 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                       <MessageThinkingDots />
                     ) : null}
                     {msg.role === 'assistant' && (msg.isGuest || isGuest) && msg.content && (
-                      <div className="mt-2 pt-2 border-t border-[#ff453a]/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-[#0e0506]/85 px-2.5 py-1.5 chamfer-corner border border-[#ff453a]/30 shadow-[0_0_12px_rgba(255,69,58,0.06)]">
-                        <div className="text-[10.5px] text-red-200/90 font-sans flex items-center gap-1.5 min-w-0">
-                          <Shield className="w-3 h-3 text-[#ff453a] shrink-0" />
+                      <div className="mt-2 pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-surface-2 px-2.5 py-1.5 rounded-control border border-line-subtle">
+                        <div className="text-[11px] text-ink-body font-sans flex items-center gap-1.5 min-w-0">
+                          <Shield className="w-3 h-3 text-cyan-glow shrink-0" />
                           <span>Sign up free to unlock</span>
                         </div>
                         <BenthicCTAButton
-                          variant="red"
+                          variant="cyan"
                           size="sm"
                           onClick={() => setIsAuthModalOpen(true)}
                           className="w-full sm:w-auto shrink-0 !min-h-0 !py-0.5 !px-2.5"
                         >
-                          <span className="flex items-center justify-center gap-1 text-[10px] font-bold font-grotesk tracking-wider uppercase">
+                          <span className="flex items-center justify-center gap-1 text-[11px] font-bold font-grotesk tracking-[0.08em] uppercase">
                             <UserPlus className="w-3 h-3" />
                             <span>Sign Up</span>
                           </span>

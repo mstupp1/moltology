@@ -18,10 +18,10 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
 
   return (
     <div
-      className={`chitin-card-inset p-3 sm:p-3.5 border transition-all chamfer-corner group flex items-start gap-3 sm:gap-3.5 bg-[#070b0b]/60 ${
+      className={`p-3 sm:p-3.5 border transition-all rounded-card group flex items-start gap-3 sm:gap-3.5 bg-surface-1 hud-sheen hover:bg-surface-2 ${
         topic.unread
-          ? 'border-[#00ffff]/45 hover:border-[#00ffff]/80'
-          : 'border-[#3a4a49] hover:border-[#00ffff]/60'
+          ? 'border-cyan-glow/40 hover:border-line-strong'
+          : 'border-line-subtle hover:border-line-strong'
       }`}
     >
       <VoteButton
@@ -33,14 +33,13 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
       />
 
       <div className="min-w-0 flex-1 space-y-1">
-        <div className="flex flex-wrap items-center gap-2 text-[10px] text-[#839493]">
+        <div className="flex flex-wrap items-center gap-2 text-[11px] text-ink-muted">
           {showCategory && topic.categoryName && (
             <span
-              className="px-1.5 py-0.2 font-sans font-bold uppercase tracking-wider chamfer-corner border"
+              className="px-1.5 py-0.2 font-sans font-bold uppercase tracking-[0.08em] rounded-chip border border-line-subtle"
               style={{
-                borderColor: `${topic.categoryColor || '#00ffff'}80`,
-                color: topic.categoryColor || '#00ffff',
-                backgroundColor: `${topic.categoryColor || '#00ffff'}10`,
+                color: topic.categoryColor || '#00c3ff',
+                backgroundColor: `${topic.categoryColor || '#00c3ff'}26`,
               }}
             >
               {topic.categoryName}
@@ -55,17 +54,17 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
         <Link
           to="/forum/$categorySlug/$topicSlug"
           params={{ categorySlug, topicSlug: topic.slug }}
-          className="block"
+          className="block rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
-          <h3 className="font-grotesk font-bold text-sm sm:text-base text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors leading-snug uppercase line-clamp-2 sm:line-clamp-1">
+          <h3 className="font-grotesk font-bold text-sm sm:text-base text-ink group-hover:text-cyan-glow transition-colors leading-snug uppercase line-clamp-2 sm:line-clamp-1">
             {topic.title}
           </h3>
-          <p className="text-xs text-[#839493] line-clamp-1 leading-relaxed mt-0.5">
+          <p className="text-xs text-ink-muted line-clamp-1 leading-relaxed mt-0.5">
             {isForumEntryWithdrawn(topic) ? FORUM_WITHDRAWN_PREVIEW : topic.content}
           </p>
         </Link>
 
-        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 pt-1 text-[11px] text-[#839493]">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 pt-1 text-[11px] text-ink-muted">
           <span className="flex items-center gap-1.5 min-w-0">
             {topic.userId ? (
               <Link
@@ -86,9 +85,9 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
                   userId={topic.userId}
                   avatarConfig={topic.authorAvatarConfig}
                   size="sm"
-                  className="ring-1 ring-[#3a4a49] group-hover:ring-[#00ffff]/60"
+                  className="ring-1 ring-line group-hover:ring-line-strong"
                 />
-                <span className="text-[#dfe3e3] font-bold truncate max-w-[120px] sm:max-w-[160px] hover:text-[#00c3ff] transition-colors">
+                <span className="text-ink font-bold truncate max-w-[120px] sm:max-w-[160px] hover:text-cyan-glow transition-colors">
                   {topic.authorName}
                 </span>
               </Link>
@@ -101,26 +100,26 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
                   userId={topic.userId}
                   avatarConfig={topic.authorAvatarConfig}
                   size="sm"
-                  className="ring-1 ring-[#3a4a49]"
+                  className="ring-1 ring-line"
                 />
-                <span className="text-[#dfe3e3] font-bold truncate max-w-[120px] sm:max-w-[160px]">
+                <span className="text-ink font-bold truncate max-w-[120px] sm:max-w-[160px]">
                   {topic.authorName}
                 </span>
               </>
             )}
             <StageBadge stage={topic.authorStage} />
           </span>
-          <span className="text-[#3a4a49]">·</span>
+          <span className="text-ink-muted/50">·</span>
           <span className="flex items-center gap-1">
-            <Clock className="w-3 h-3 text-[#3a4a49] group-hover:text-[#839493] transition-colors" />
+            <Clock className="w-3 h-3 text-ink-muted/60 group-hover:text-ink-muted transition-colors" />
             <span>{relativeTime(topic.createdAt)}</span>
           </span>
-          <span className="text-[#3a4a49]">·</span>
+          <span className="text-ink-muted/50">·</span>
           <span className="flex items-center gap-1">
-            <MessageSquare className="w-3 h-3 text-[#00ffff]" />
+            <MessageSquare className="w-3 h-3 text-cyan-glow" />
             <span>{topic.repliesCount} comments</span>
           </span>
-          <span className="text-[#3a4a49]">·</span>
+          <span className="text-ink-muted/50">·</span>
           <span className="flex items-center gap-1">
             <Eye className="w-3 h-3" />
             <span>{topic.views}</span>

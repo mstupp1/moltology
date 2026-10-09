@@ -149,14 +149,14 @@ export function ForumPostCard({
   return (
     <div
       id={`post-${post.id}`}
-      className={`space-y-2 scroll-mt-24 ${indent > 0 ? 'border-l-2 border-[#3a4a49]/60 hover:border-[#00ffff]/40 transition-colors pl-2 sm:pl-3.5' : ''}`}
+      className={`space-y-2 scroll-mt-24 ${indent > 0 ? 'border-l-2 border-line-subtle hover:border-line-strong transition-colors pl-2 sm:pl-3.5' : ''}`}
       style={{ marginLeft: indent > 0 ? `${indent * 0.75}rem` : undefined }}
       data-testid="forum-post-card"
       data-depth={depth}
     >
       <div
-        className={`chitin-card-inset p-3 sm:p-4 border chamfer-corner space-y-3 bg-[#070b0b]/75 target:border-[#00ffff] target:shadow-[0_0_16px_rgba(0,195,255,0.3)] transition-all ${
-          continued ? 'border-l-[#00ffff]/50 border-[#3a4a49]' : 'border-[#3a4a49]'
+        className={`rounded-card border bg-surface-1 hud-sheen p-3 sm:p-4 space-y-3 target:border-cyan-glow/40 transition-colors ${
+          continued ? 'border-line-subtle border-l-cyan-glow/40' : 'border-line-subtle'
         } ${withdrawn ? 'opacity-80' : ''}`}
       >
         {/* Header: Avatar, Author Metadata, Timestamp & Actions */}
@@ -166,7 +166,7 @@ export function ForumPostCard({
               <button
                 type="button"
                 onClick={() => setCollapsed((v) => !v)}
-                className="mt-1 sm:mt-0 p-1 -ml-1 text-[#839493] hover:text-[#00ffff] hover:bg-[#00ffff]/10 rounded transition-colors shrink-0"
+                className="mt-1 sm:mt-0 p-1 -ml-1 text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow shrink-0"
                 aria-label={collapsed ? 'Expand replies' : 'Collapse replies'}
                 title={collapsed ? 'Expand replies' : 'Collapse replies'}
                 data-testid="forum-collapse-toggle"
@@ -198,7 +198,7 @@ export function ForumPostCard({
                   alt=""
                   className={`${
                     depth === 0 ? 'w-9 h-9 sm:w-10 sm:h-10' : 'w-8 h-8 sm:w-9 sm:h-9'
-                  } ring-1 ring-[#3a4a49] group-hover/avatar:ring-[#00ffff]/80 transition-all shadow-sm`}
+                  } ring-1 ring-line group-hover/avatar:ring-line-strong transition-all shadow-sm`}
                 />
               </Link>
             ) : (
@@ -210,7 +210,7 @@ export function ForumPostCard({
                 avatarConfig={post.authorAvatarConfig}
                 className={`${
                   depth === 0 ? 'w-9 h-9 sm:w-10 sm:h-10' : 'w-8 h-8 sm:w-9 sm:h-9'
-                } ring-1 ring-[#3a4a49] shadow-sm`}
+                } ring-1 ring-line shadow-sm`}
               />
             )}
 
@@ -226,25 +226,25 @@ export function ForumPostCard({
                         handle: post.authorHandle,
                       }),
                     }}
-                    className="text-[#dfe3e3] font-bold text-xs sm:text-sm truncate hover:text-[#00c3ff] transition-colors"
+                    className="text-ink font-bold text-xs sm:text-sm truncate hover:text-cyan-glow transition-colors"
                   >
                     {post.authorName}
                   </Link>
                 ) : (
-                  <span className="text-[#dfe3e3] font-bold text-xs sm:text-sm truncate">
+                  <span className="text-ink font-bold text-xs sm:text-sm truncate">
                     {post.authorName}
                   </span>
                 )}
 
                 {post.authorHandle && (
-                  <span className="text-[11px] text-[#839493]/80 hidden sm:inline truncate">
+                  <span className="text-[11px] text-ink-muted hidden sm:inline truncate">
                     @{post.authorHandle.replace(/^@/, '')}
                   </span>
                 )}
 
                 {isOp && (
                   <span
-                    className="px-1.5 py-0.2 text-[9px] font-sans font-bold uppercase tracking-wider bg-[#00ffff]/15 text-[#00ffff] border border-[#00ffff]/40 chamfer-corner"
+                    className="px-1.5 py-0.2 text-[11px] font-sans font-bold uppercase tracking-[0.08em] bg-cyan-soft text-cyan-glow rounded-chip"
                     title="Original Poster"
                   >
                     OP
@@ -255,8 +255,8 @@ export function ForumPostCard({
               </div>
 
               {/* Timestamp & Collapse Info */}
-              <div className="flex items-center gap-1.5 text-[10px] text-[#839493] mt-0.5">
-                <Clock className="w-3 h-3 text-[#3a4a49]" />
+              <div className="flex items-center gap-1.5 text-[11px] text-ink-muted mt-0.5">
+                <Clock className="w-3 h-3 text-ink-muted/60" />
                 <span title={new Date(post.createdAt).toLocaleString()}>
                   {relativeTime(post.createdAt)}
                 </span>
@@ -266,7 +266,7 @@ export function ForumPostCard({
                   deletedAt={post.deletedAt}
                 />
                 {collapsed && childCount > 0 && (
-                  <span className="text-[#00ffff]/80 font-medium">
+                  <span className="text-cyan-glow font-medium">
                     · {childCount} {childCount === 1 ? 'reply' : 'replies'} hidden
                   </span>
                 )}
@@ -280,10 +280,10 @@ export function ForumPostCard({
             onClick={handleCopyLink}
             aria-label="Copy permalink"
             title={copied ? 'Link copied!' : 'Copy link to post'}
-            className="p-1.5 text-[#839493] hover:text-[#00ffff] hover:bg-[#00ffff]/10 rounded transition-colors shrink-0"
+            className="p-1.5 text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow shrink-0"
           >
             {copied ? (
-              <Check className="w-3.5 h-3.5 text-[#00ffff]" />
+              <Check className="w-3.5 h-3.5 text-cyan-glow" />
             ) : (
               <Link2 className="w-3.5 h-3.5" />
             )}
@@ -292,27 +292,27 @@ export function ForumPostCard({
 
         {/* Collapsed summary indicator */}
         {collapsed && childCount > 0 ? (
-          <div className="text-xs text-[#839493] italic py-1 pl-1">
+          <div className="text-xs text-ink-muted italic py-1 pl-1">
             Thread collapsed. Click the chevron above to expand {childCount}{' '}
             {childCount === 1 ? 'reply' : 'replies'}.
           </div>
         ) : (
           <>
             {withdrawn ? (
-              <ForumWithdrawnBody className="text-xs sm:text-sm text-[#839493] leading-relaxed italic" />
+              <ForumWithdrawnBody className="text-xs sm:text-sm text-ink-muted leading-relaxed italic" />
             ) : post.sunk && !showSunk && !editing ? (
               <button
                 type="button"
                 onClick={() => setShowSunk(true)}
                 data-testid="forum-sunk-reply"
-                className="text-xs text-[#839493] italic py-1 pl-1 hover:text-[#00ffff] transition-colors text-left"
+                className="text-xs text-ink-muted italic py-1 pl-1 hover:text-ink rounded-control transition-colors text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
                 Low-signal reply, hidden by default. Show it anyway.
               </button>
             ) : editing ? (
               <form onSubmit={handleSave} className="space-y-2" data-testid="forum-revise-reply-form">
                 {error && (
-                  <div className="p-2.5 bg-[#2d0f0f] border border-[#ff5540] text-[#ff5540] text-xs flex items-center gap-2 chamfer-corner">
+                  <div className="p-2.5 bg-crimson-soft border border-crimson-aggro/55 text-crimson-text text-xs flex items-center gap-2 rounded-control">
                     <AlertTriangle className="w-4 h-4 shrink-0" />
                     <span>{error}</span>
                   </div>
@@ -323,7 +323,7 @@ export function ForumPostCard({
                   onChange={setDraft}
                   autoFocus
                   aria-label="Revise reply"
-                  className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner transition-colors placeholder:text-[#839493]/50"
+                  className="w-full bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus p-3 text-xs text-ink outline-none resize-y rounded-control transition-[border-color,box-shadow] placeholder:text-ink-muted"
                 />
                 <div className="flex items-center justify-end gap-2">
                   <button
@@ -333,14 +333,14 @@ export function ForumPostCard({
                       setDraft(post.content)
                       setError(null)
                     }}
-                    className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#839493] hover:text-[#dfe3e3] transition-colors"
+                    className="px-3 py-1.5 rounded-control text-xs font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={busy || draft.trim().length < 10}
-                    className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] disabled:opacity-50 text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all"
+                    className="px-4 py-1.5 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                   >
                     {busy ? 'Sealing...' : 'Seal revision'}
                   </button>
@@ -349,12 +349,12 @@ export function ForumPostCard({
             ) : (
               <ForumPostBody
                 content={post.content}
-                className="space-y-2 text-xs sm:text-sm text-[#dfe3e3] leading-relaxed"
+                className="space-y-2 text-xs sm:text-sm text-ink-body leading-relaxed"
               />
             )}
 
             {/* Bottom Actions Bar */}
-            <div className="pt-2 border-t border-[#3a4a49]/40 flex items-center justify-between gap-2">
+            <div className="pt-2 border-t border-line-subtle flex items-center justify-between gap-2">
               <VoteButton
                 count={post.upvotes}
                 voted={post.voted}
@@ -369,7 +369,7 @@ export function ForumPostCard({
                   <button
                     type="button"
                     onClick={() => onQuoteClick(post.id)}
-                    className="inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-[#839493] hover:text-[#00ffff] hover:bg-[#00ffff]/10 rounded transition-colors"
+                    className="inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     data-testid="forum-quote-post"
                   >
                     <Quote className="w-3.5 h-3.5" />
@@ -380,7 +380,7 @@ export function ForumPostCard({
                   <button
                     type="button"
                     onClick={() => onReplyClick(post.id)}
-                    className="inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-[#839493] hover:text-[#00ffff] hover:bg-[#00ffff]/10 rounded transition-colors"
+                    className="inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     data-testid="forum-reply-to-comment"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
@@ -396,7 +396,7 @@ export function ForumPostCard({
                       aria-label="Post options"
                       title="More options"
                       data-testid="forum-post-actions-menu"
-                      className="p-1 text-[#839493] hover:text-[#00ffff] hover:bg-[#00ffff]/10 rounded transition-colors focus:outline-none"
+                      className="p-1 text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     >
                       <MoreHorizontal className="w-4 h-4" />
                     </button>
@@ -407,7 +407,7 @@ export function ForumPostCard({
                       data-testid="forum-copy-link-menu-item"
                     >
                       {copied ? (
-                        <Check className="w-3.5 h-3.5 text-[#00ffff] shrink-0" />
+                        <Check className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
                       ) : (
                         <Link2 className="w-3.5 h-3.5 shrink-0" />
                       )}
@@ -440,10 +440,10 @@ export function ForumPostCard({
                       customTrigger={(openFlagDialog) => (
                         <HudDropdownMenuItem
                           onSelect={openFlagDialog}
-                          className="text-[#839493] hover:text-[#ffb703] data-[highlighted]:text-[#ffb703] data-[highlighted]:bg-[#ffb703]/10"
+                          className="text-ink-muted data-[highlighted]:text-ink data-[highlighted]:bg-surface-3"
                           data-testid="forum-flag"
                         >
-                          <Flag className="w-3.5 h-3.5 shrink-0 text-[#ffb703]" />
+                          <Flag className="w-3.5 h-3.5 shrink-0 text-amber-400" />
                           <span>Report</span>
                         </HudDropdownMenuItem>
                       )}
@@ -473,10 +473,10 @@ export function ForumPostCard({
             {/* Inline Withdraw Confirmation */}
             {confirmingWithdraw && (
               <div
-                className="p-2.5 bg-[#2d0f0f]/60 border border-[#ff5540]/60 chamfer-corner flex flex-wrap items-center justify-between gap-2 text-xs animate-in fade-in duration-150"
+                className="p-2.5 bg-crimson-soft border border-crimson-aggro/55 rounded-control flex flex-wrap items-center justify-between gap-2 text-xs animate-in fade-in duration-150"
                 data-testid="forum-withdraw-confirm"
               >
-                <span className="text-xs text-[#dfe3e3]">
+                <span className="text-xs text-ink-body">
                   Withdraw this transmission? The body will be sealed. Replies stay in the thread.
                 </span>
                 <div className="flex items-center gap-2 ml-auto">
@@ -484,7 +484,7 @@ export function ForumPostCard({
                     type="button"
                     onClick={() => setConfirmingWithdraw(false)}
                     disabled={busy}
-                    className="px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-[#839493] hover:text-[#dfe3e3] transition-colors disabled:opacity-50"
+                    className="px-2.5 py-1 rounded-control text-xs font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow disabled:opacity-50"
                   >
                     Keep it
                   </button>
@@ -492,7 +492,7 @@ export function ForumPostCard({
                     type="button"
                     onClick={handleWithdraw}
                     disabled={busy}
-                    className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-[#ff5540] hover:bg-[#ff7766] text-black chamfer-corner transition-all disabled:opacity-50"
+                    className="px-3 py-1 text-xs font-bold uppercase tracking-[0.08em] bg-crimson-aggro hover:bg-crimson-hover text-abyss rounded-control transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     data-testid="forum-withdraw-confirm-btn"
                   >
                     {busy ? 'Withdrawing...' : 'Withdraw'}

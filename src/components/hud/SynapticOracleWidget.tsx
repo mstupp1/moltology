@@ -36,7 +36,7 @@ function clearStalePositionKeys() {
  * Shared styling classes for the rounded pill launcher (both mobile dock and desktop floating button).
  */
 export const ORACLE_PILL_BASE_CLASSES =
-  'bg-[#060b0ef2] backdrop-blur-xl border border-[#00c3ff]/40 hover:border-[#00c3ff]/80 shadow-[0_8px_32px_rgba(0,0,0,0.85),0_0_20px_rgba(0,195,255,0.2)] hover:shadow-[0_8px_36px_rgba(0,0,0,0.9),0_0_25px_rgba(0,195,255,0.35)] rounded-full px-4 py-2.5 flex items-center justify-between gap-3 group select-none text-left'
+  'bg-surface-1/95 hud-sheen backdrop-blur-xl border border-line hover:border-line-strong hover:bg-surface-2 shadow-menu rounded-card px-4 py-2.5 flex items-center justify-between gap-3 group select-none text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 
 /**
  * Shared interior content for the Oracle launcher pill (emblem, placeholder, realistic caret, chevron).
@@ -49,21 +49,21 @@ export function OracleLauncherPillContent() {
           <img
             src={getAssetUrl('/images/order_emblem.png')}
             alt="Oracle AI"
-            className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(0,195,255,0.6)] group-hover:scale-105 transition-transform"
+            className="w-5 h-5 object-contain group-hover:scale-105 transition-transform"
           />
         </div>
         <div className="flex items-center min-w-0">
-          <span className="text-xs tracking-wide text-cyan-200/90 font-medium group-hover:text-cyan-100 transition-colors truncate">
+          <span className="text-xs tracking-wide text-ink-body font-medium group-hover:text-ink transition-colors truncate">
             {DEFAULT_ORACLE_PLACEHOLDER}
           </span>
           <span
             data-testid="oracle-caret-cursor"
             aria-hidden="true"
-            className="inline-block w-[1.5px] h-3.5 ml-1 bg-[#00c3ff] shadow-[0_0_4px_#00c3ff] animate-caret-blink shrink-0"
+            className="inline-block w-[1.5px] h-3.5 ml-1 bg-cyan-glow animate-caret-blink shrink-0"
           />
         </div>
       </div>
-      <ChevronUp className="w-4 h-4 text-cyan-400/60 group-hover:text-cyan-300 transition-transform group-hover:-translate-y-0.5 shrink-0 ml-auto pointer-events-none" />
+      <ChevronUp className="w-4 h-4 text-ink-muted group-hover:text-cyan-glow transition-transform group-hover:-translate-y-0.5 shrink-0 ml-auto pointer-events-none" />
     </>
   )
 }
@@ -354,7 +354,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
           maxHeight="85dvh"
           ariaLabel="Synaptic Oracle AI Assistant"
           containerClassName="sm:hidden font-sans"
-          className="bg-[#080d0d] border-t border-cyan-500/40 rounded-t-2xl shadow-[0_-20px_50px_rgba(0,0,0,0.95),0_0_30px_rgba(0,195,255,0.15)]"
+          className="bg-surface-1 border-t border-line rounded-t-card shadow-menu"
         >
           <AIChatPanel
             userId={userId}
@@ -384,7 +384,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
       {/* ── Desktop: Bottom-right popout with fade + scale-in ── */}
       {!isMobile && isRendered && (
         <div
-          className={`fixed z-40 right-6 bottom-4 font-sans overflow-hidden shadow-2xl shadow-cyan-950/90 bg-[#080d0d] chamfer-corner border border-cyan-900/80 rounded-none hidden sm:block ${
+          className={`fixed z-40 right-6 bottom-4 font-sans overflow-hidden shadow-menu bg-surface-1 rounded-card border border-line hidden sm:block ${
             activeResizeDir ? 'select-none' : ''
           }`}
           style={{

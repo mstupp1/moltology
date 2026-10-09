@@ -19,7 +19,7 @@ function renderInlineFormatting(text: string, keyPrefix: string): React.ReactNod
       return (
         <code
           key={key}
-          className="bg-[#040708] border border-cyan-900/60 text-cyan-200 px-1.5 py-0.5 rounded font-mono text-[11px] sm:text-xs"
+          className="bg-abyss border border-line-subtle text-ink px-1.5 py-0.5 rounded-chip font-mono text-[11px] sm:text-xs"
         >
           {token.slice(1, -1)}
         </code>
@@ -29,7 +29,7 @@ function renderInlineFormatting(text: string, keyPrefix: string): React.ReactNod
     // Bold: **text**
     if (token.startsWith('**') && token.endsWith('**') && token.length > 4) {
       return (
-        <strong key={key} className="font-bold text-white">
+        <strong key={key} className="font-bold text-ink">
           {token.slice(2, -2)}
         </strong>
       )
@@ -38,7 +38,7 @@ function renderInlineFormatting(text: string, keyPrefix: string): React.ReactNod
     // Italic: *text*
     if (token.startsWith('*') && token.endsWith('*') && token.length > 2) {
       return (
-        <em key={key} className="italic text-cyan-200">
+        <em key={key} className="italic text-ink">
           {token.slice(1, -1)}
         </em>
       )
@@ -53,7 +53,7 @@ function renderInlineFormatting(text: string, keyPrefix: string): React.ReactNod
           href={linkMatch[2]}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-cyan-400 hover:text-cyan-300 underline underline-offset-2 transition-colors font-medium"
+          className="text-cyan-glow hover:text-cyan-hover underline underline-offset-2 transition-colors font-medium"
         >
           {linkMatch[1]}
         </a>
@@ -90,7 +90,7 @@ export function ForumMentionBody({
             key={`m-${index}-${part.handle}`}
             to="/member/$profileId"
             params={{ profileId: part.handle }}
-            className="text-[#00c3ff] font-bold hover:text-[#00ffff] transition-colors"
+            className="text-cyan-glow font-bold hover:text-cyan-hover transition-colors"
             data-testid="forum-mention-link"
           >
             @{part.handle}

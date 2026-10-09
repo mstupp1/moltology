@@ -157,11 +157,11 @@ export function ForumFormattingToolbar({
   }
 
   const buttonBaseClass =
-    'p-1.5 text-[#839493] hover:text-[#00ffff] hover:bg-[#00ffff]/10 rounded-sm transition-colors disabled:opacity-40 disabled:pointer-events-none focus:outline-none focus-visible:ring-1 focus-visible:ring-[#00ffff]'
+    'p-1.5 text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow disabled:opacity-40 disabled:pointer-events-none'
 
   return (
     <div
-      className={`flex items-center justify-between px-2 py-1 bg-[#05090a] border border-[#3a4a49] border-b-0 chamfer-corner-top text-xs select-none ${className}`}
+      className={`flex items-center justify-between px-2 py-1 bg-surface-1 border border-line border-b-0 rounded-t-control text-xs select-none ${className}`}
       data-testid="forum-formatting-toolbar"
     >
       {/* Formatting Tools Strip */}
@@ -214,7 +214,7 @@ export function ForumFormattingToolbar({
           <Link2 className="w-3.5 h-3.5" />
         </button>
 
-        <span className="w-px h-3.5 bg-[#3a4a49] mx-1" aria-hidden="true" />
+        <span className="w-px h-3.5 bg-line mx-1" aria-hidden="true" />
 
         <button
           type="button"
@@ -246,10 +246,10 @@ export function ForumFormattingToolbar({
         type="button"
         onClick={onTogglePreview}
         disabled={disabled}
-        className={`flex items-center gap-1 px-2 py-1 rounded-sm text-[11px] font-bold uppercase tracking-wider transition-all focus:outline-none focus-visible:ring-1 focus-visible:ring-[#00ffff] ${
+        className={`flex items-center gap-1 px-2 py-1 rounded-control text-[11px] font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
           preview
-            ? 'bg-[#00ffff]/15 text-[#00ffff] border border-[#00ffff]/40 shadow-[0_0_8px_rgba(0,255,255,0.15)]'
-            : 'text-[#839493] hover:text-[#00ffff] hover:bg-[#00ffff]/10 border border-transparent'
+            ? 'bg-cyan-soft text-cyan-glow border border-cyan-glow/40'
+            : 'text-ink-muted hover:text-ink hover:bg-surface-2 border border-transparent'
         }`}
         aria-label={preview ? 'Switch to edit' : 'Switch to preview'}
         title={preview ? 'Switch back to editor' : 'Preview formatted transmission'}

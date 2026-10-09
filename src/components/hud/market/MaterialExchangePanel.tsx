@@ -28,18 +28,18 @@ export function MaterialExchangePanel({
   return (
     <div className="space-y-3 sm:space-y-4">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
-        <div className="lg:col-span-5 chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl space-y-3">
-          <div className="flex items-start justify-between gap-2 border-b border-[#3a4a49]/60 pb-2">
+        <div className="lg:col-span-5 rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 space-y-3">
+          <div className="flex items-start justify-between gap-2 border-b border-line-subtle pb-2">
             <div>
-              <h2 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
+              <h2 className="font-grotesk text-xs font-bold tracking-[0.08em] text-ink uppercase">
                 Shed Material
               </h2>
-              <p className="text-[10px] text-[#839493] mt-1 leading-relaxed">
+              <p className="text-[11px] text-ink-muted mt-1 leading-relaxed">
                 Liquidate terrestrial attachments into Molt Credits. Biological trace removed;
                 shell upgraded.
               </p>
             </div>
-            <Zap className="w-4 h-4 text-[#00c3ff] shrink-0" />
+            <Zap className="w-4 h-4 text-cyan-glow shrink-0" />
           </div>
 
           <div className="grid grid-cols-2 gap-2">
@@ -48,7 +48,7 @@ export function MaterialExchangePanel({
                 key={material.id}
                 type="button"
                 onClick={() => onQuickShed(material)}
-                className="chitin-card-inset p-2.5 chamfer-corner border border-[#3a4a49] hover:border-[#00c3ff]/50 transition-all text-left group"
+                className="rounded-card border border-line bg-surface-2 p-2.5 hover:bg-surface-3 hover:border-line-strong transition-colors text-left group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
                 <div className="flex items-center gap-2">
                   <div className="w-10 h-10 shrink-0 flex items-center justify-center overflow-hidden">
@@ -69,10 +69,10 @@ export function MaterialExchangePanel({
                     )}
                   </div>
                   <div className="min-w-0">
-                    <div className="text-[10px] font-bold text-[#dfe3e3] uppercase truncate">
+                    <div className="text-[11px] font-bold text-ink uppercase truncate">
                       {material.name}
                     </div>
-                    <div className="text-[9px] text-[#00c3ff] font-bold tabular-nums">
+                    <div className="text-[11px] text-cyan-glow font-bold tabular-nums">
                       +{material.yieldCredits.toLocaleString()} MC
                     </div>
                   </div>
@@ -89,17 +89,17 @@ export function MaterialExchangePanel({
           </BenthicCTAButton>
         </div>
 
-        <div className="lg:col-span-7 chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl space-y-3">
-          <div className="flex items-center justify-between gap-2 border-b border-[#3a4a49]/60 pb-2">
+        <div className="lg:col-span-7 rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 space-y-3">
+          <div className="flex items-center justify-between gap-2 border-b border-line-subtle pb-2">
             <div>
-              <h2 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
+              <h2 className="font-grotesk text-xs font-bold tracking-[0.08em] text-ink uppercase">
                 Spend Molt Credits
               </h2>
-              <p className="text-[10px] text-[#839493] mt-1">
+              <p className="text-[11px] text-ink-muted mt-1">
                 Accelerators, premium cosmetics, and catalog boosts — never rank.
               </p>
             </div>
-            <span className="text-[10px] font-bold text-[#00c3ff] tabular-nums shrink-0">
+            <span className="text-[11px] font-bold text-cyan-glow tabular-nums shrink-0">
               {moltCredits.toLocaleString()} MC
             </span>
           </div>
@@ -113,13 +113,11 @@ export function MaterialExchangePanel({
                 <div
                   key={listing.id}
                   className={cn(
-                    'chitin-card-inset p-3 chamfer-corner border-2 flex gap-3 items-stretch',
-                    rarity.border,
-                    rarity.glow,
+                    'rounded-card border border-line-subtle bg-surface-2 p-3 flex gap-3 items-stretch',
                     !canAfford && 'opacity-70'
                   )}
                 >
-                  <div className="w-14 h-14 shrink-0 rounded-sm overflow-hidden border border-[#3a4a49]/60 bg-[#030606]">
+                  <div className="w-14 h-14 shrink-0 rounded-control overflow-hidden border border-line-subtle bg-abyss">
                     <img
                       src={getAssetUrl(listing.imagePath)}
                       alt=""
@@ -129,20 +127,20 @@ export function MaterialExchangePanel({
                   <div className="flex flex-col flex-1 min-w-0 justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className={cn('text-[8px] font-bold uppercase', rarity.text)}>
+                        <span className={cn('text-[11px] font-bold uppercase tracking-[0.08em]', rarity.text)}>
                           {listing.category}
                         </span>
                       </div>
-                      <h3 className="font-grotesk text-[11px] font-bold text-[#dfe3e3] uppercase leading-tight">
+                      <h3 className="font-grotesk text-[11px] font-bold text-ink uppercase leading-tight">
                         {listing.name}
                       </h3>
-                      <p className="text-[9px] text-[#839493] leading-snug line-clamp-2 mt-0.5">
+                      <p className="text-[11px] text-ink-muted leading-snug line-clamp-2 mt-0.5">
                         {listing.description}
                       </p>
                     </div>
                     <BenthicCTAButton
                       size="sm"
-                      variant={canAfford ? 'red' : 'dark'}
+                      variant={canAfford ? 'cyan' : 'dark'}
                       disabled={!canAfford}
                       onClick={() => onExchange(listing)}
                     >
