@@ -16,6 +16,14 @@ describe('Character Overlay & Registry', () => {
       'lobster_navigator',
       'crab_stats',
       'lobster_engineer',
+      'lobster_archivist',
+      'lobster_oracle_attendant',
+      'crab_builder',
+      'crab_explorer',
+      'crab_sentinel',
+      'crab_ritual_keeper',
+      'lobster_pointing_junior',
+      'crab_explorer_junior',
     ]
 
     for (const key of keys) {
@@ -53,6 +61,12 @@ describe('Character Overlay & Registry', () => {
     const randomInfo = getCharacterInfo('random')
     expect(randomInfo).toBeDefined()
     expect(allKeys).toContain(randomInfo.key)
+  })
+
+  it('maps retired art file names to the current renders', () => {
+    expect(getCharacterInfo('char_lobster_pointing_cta.png').filename).toBe('char_lobster_pointing_adult_v2.webp')
+    expect(getCharacterInfo('lobster_speed_action').key).toBe('lobster_navigator')
+    expect(getCharacterInfo('char_crab_pointing_stats.webp').filename).toBe('char_crab_stats_adult_v2.webp')
   })
 
   it('generates unique random rotations without duplicates', () => {

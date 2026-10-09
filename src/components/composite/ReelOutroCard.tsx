@@ -1,6 +1,7 @@
 import React from 'react'
 import { BrandIcon } from '@/components/ui/BrandMark'
 import { CompositeContainer } from './CompositeContainer'
+import { isCrabMascot } from '@/lib/mascots'
 import { MascotOverlay, MascotKey } from './MascotOverlay'
 import { getAssetUrl } from '@/lib/assets'
 import { ArrowRight, Sparkles } from 'lucide-react'
@@ -132,10 +133,10 @@ export const ReelOutroCard: React.FC<ReelOutroCardProps> = ({
           mascot={mascot}
           glow={false}
           position="bottom-right"
-          width={mascot === 'crab_stats' ? 360 : 400}
+          width={isCrabMascot(mascot) ? 440 : 400}
           className={
-            mascot === 'crab_stats'
-              ? '-bottom-44 -right-4 z-30 pointer-events-none'
+            isCrabMascot(mascot)
+              ? '-bottom-6 right-0 z-30 pointer-events-none'
               : '-bottom-28 right-2 z-30 pointer-events-none'
           }
         />

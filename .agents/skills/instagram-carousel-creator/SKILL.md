@@ -41,7 +41,7 @@ Read [comment-to-DM delivery guidance](../instagram-post-creator/references/comm
 
 Transparent WebP/PNG character cutouts reside in the Neon S3 public assets bucket under `images/characters/` (`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/`).
 
-* **Dynamic & Random Rotation**: The carousel generator automatically selects unique, randomized characters per slide from the registry (`lobster_pointing`, `lobster_thumbs_up`, `lobster_navigator`, `crab_stats`, `lobster_peek`, `lobster_peaceful`, `lobster_engineer`) when `--mascot` is omitted or set to `random`. Characters never duplicate across consecutive slides.
+* **Dynamic & Random Rotation**: The carousel generator automatically selects unique, randomized characters per slide from the mascot cast in `src/lib/mascots.ts` when `--mascot` is omitted or set to `random`. Characters never duplicate across consecutive slides.
 * **Character Visibility & Natural Scene Blending**: Characters must be clearly visible with strong contrast against backgrounds, naturally blended with ambient scene shading rather than obvious lighting effects (avoid artificial backlight halos or stark rim lines). When layout space allows, characters **can be sized slightly larger than reference** to maximize personality, engagement, and readability.
 * **Custom Mascots**: To generate new character cutouts, use the `character-creator` skill.
 

@@ -98,7 +98,7 @@ export const BlogSchematicCard: React.FC<BlogSchematicCardProps> = ({
         {panel('cyan', rightTitle, rightMetric, rightCaption, rightBullets)}
       </div>
 
-      <MascotOverlay mascot={mascot} position="bottom-right" width={300} className="bottom-6 right-6" />
+      <MascotOverlay mascot={mascot} position="bottom-right" width={260} className="bottom-6 right-4" />
     </CompositeContainer>
   )
 }

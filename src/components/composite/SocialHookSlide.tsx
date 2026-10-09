@@ -1,5 +1,6 @@
 import React from 'react'
 import { CompositeContainer, CompositeAspectRatio } from './CompositeContainer'
+import { isCrabMascot } from '@/lib/mascots'
 import { MascotOverlay, MascotKey } from './MascotOverlay'
 import { MoltNationLogo } from '@/components/news/MoltNationLogo'
 import { ArrowRight, Sparkles } from 'lucide-react'
@@ -298,7 +299,7 @@ export const SocialHookSlide: React.FC<SocialHookSlideProps> = ({
         <MascotOverlay
           mascot={mascot}
           position="bottom-right"
-          width={mascot === 'crab_stats' ? 330 : 360}
+          width={isCrabMascot(mascot) ? 330 : 360}
           className="bottom-0 -right-2"
         />
       </div>

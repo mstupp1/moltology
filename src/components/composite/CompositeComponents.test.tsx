@@ -332,7 +332,9 @@ describe('Composite UI Components', () => {
     expect(new Set(rotation).size).toBe(3)
 
     // Verify all registry items have valid Neon S3 CDN URLs
-    expect(Object.keys(MASCOT_REGISTRY).length).toBe(7)
+    expect(Object.keys(MASCOT_REGISTRY).length).toBe(22)
+    expect(normalizeMascotKey('char_crab_builder_adult_v2.webp')).toBe('crab_builder')
+    expect(normalizeMascotKey('lobster_peek_junior')).toBe('lobster_peek_junior')
     for (const key of Object.keys(MASCOT_REGISTRY)) {
       const info = getMascotInfo(key)
       expect(info.s3Url).toContain('moltology-public-assets/images/characters/')
@@ -348,7 +350,7 @@ describe('Composite UI Components', () => {
 
     const img = container.querySelector('img')
     expect(img).toBeInTheDocument()
-    expect(img?.getAttribute('src')).toContain('char_lobster_pointing_cta.webp')
+    expect(img?.getAttribute('src')).toContain('char_lobster_pointing_adult_v2.webp')
     expect(img?.getAttribute('loading')).toBe('eager')
   })
 

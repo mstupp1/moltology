@@ -2525,7 +2525,7 @@ Options:
   --render-only           Generate locally for inspection without upload or queueing
   --theme <name>            Moltmaxxing theme: moltmaxxing | meltmaxxing | ecdysis | pincer-torque | benthic-depth | quiz
   --cta-goal <name>         Conversion goal: quiz | guide | codex | demo | homepage
-  --mascot <name>           Outro mascot: lobster_pointing | lobster_thumbs_up | lobster_navigator | crab_stats | lobster_peek | lobster_peaceful | lobster_engineer | random | none
+  --mascot <name>           Outro mascot: any key in src/lib/mascots.ts (e.g. lobster_pointing, crab_builder) | random | none
   --topic <string>          Specific topic or breaking news story
   --holiday <string>        Specific holiday or cultural event
   --color-grade <preset>    Cinematic color grading: auto | benthic-cyan | thermal-melt | photonics-matrix | calcified-armor | none
