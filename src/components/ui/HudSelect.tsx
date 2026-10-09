@@ -37,7 +37,7 @@ export const HudSelect = React.forwardRef<HTMLSelectElement, HudSelectProps>(
     return (
       <div className={cn('flex flex-col gap-1.5 font-sans', fullWidth && 'w-full')}>
         {label && (
-          <label htmlFor={selectId} className="text-[11px] font-bold uppercase tracking-wider text-[#839493]">
+          <label htmlFor={selectId} className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
             {label}
           </label>
         )}
@@ -47,33 +47,33 @@ export const HudSelect = React.forwardRef<HTMLSelectElement, HudSelectProps>(
             ref={ref}
             disabled={disabled}
             className={cn(
-              'w-full bg-[#070b0b] text-[#dfe3e3] text-xs font-sans rounded-none appearance-none cursor-pointer',
-              'border border-[#3a4a49] py-2 pl-3 pr-8 transition-all duration-200 outline-none',
-              'focus:border-[#00c3ff] focus:bg-[#070b0b] focus:shadow-[0_0_10px_rgba(0,195,255,0.35)]',
-              'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#030606]',
-              error && 'border-[#ff453a] focus:border-[#ff453a] focus:shadow-[0_0_10px_rgba(255,69,58,0.4)]',
+              'w-full min-h-10 bg-surface-2 text-ink text-sm font-sans rounded-control appearance-none cursor-pointer',
+              'border border-line py-2 pl-3 pr-9 transition-[border-color,box-shadow] duration-200 outline-none hover:border-line-hover',
+              'focus:border-cyan-glow focus:shadow-field-focus',
+              'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-surface-1',
+              error && 'border-crimson-aggro hover:border-crimson-aggro focus:border-crimson-aggro focus:shadow-field-error',
               className
             )}
             {...props}
           >
             {options
               ? options.map((opt) => (
-                  <option key={opt.value} value={opt.value} disabled={opt.disabled} className="bg-[#0f1414] text-[#dfe3e3]">
+                  <option key={opt.value} value={opt.value} disabled={opt.disabled} className="bg-surface-2 text-ink">
                     {opt.label}
                   </option>
                 ))
               : children}
           </select>
-          <span className="absolute right-2.5 pointer-events-none text-[#839493]">
+          <span className="absolute right-3 pointer-events-none text-ink-muted">
             <ChevronDown size={14} />
           </span>
         </div>
         {error ? (
-          <span className="text-[10px] text-[#ff453a] font-sans tracking-tight flex items-center gap-1">
+          <span className="text-xs text-crimson-text font-sans flex items-center gap-1">
             ⚠ {error}
           </span>
         ) : helperText ? (
-          <span className="text-[10px] text-[#839493] font-sans tracking-tight">{helperText}</span>
+          <span className="text-xs text-ink-muted font-sans">{helperText}</span>
         ) : null}
       </div>
     )

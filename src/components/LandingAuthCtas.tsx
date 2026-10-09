@@ -50,8 +50,8 @@ export function LandingAuthCtas({ variant, onNavigate, onOpenAuth }: LandingAuth
         className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full sm:w-auto${variant === 'hero' ? ' min-h-[114px] sm:min-h-[54px]' : ''}`}
         data-testid={`${variant}-auth-skeleton`}
       >
-        <div className="w-full sm:w-[220px] min-h-[50px] sm:min-h-[54px] rounded-xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
-        <div className="w-full sm:w-[180px] min-h-[50px] sm:min-h-[54px] rounded-xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
+        <div className="w-full sm:w-[220px] min-h-[50px] sm:min-h-[54px] rounded-control bg-surface-1 border border-line-subtle animate-pulse" />
+        <div className="w-full sm:w-[180px] min-h-[50px] sm:min-h-[54px] rounded-control bg-surface-1 border border-line-subtle animate-pulse" />
       </div>
     )
   }
@@ -60,6 +60,7 @@ export function LandingAuthCtas({ variant, onNavigate, onOpenAuth }: LandingAuth
     <>
       <BenthicCTAButton
         size="lg"
+        variant="cyan"
         containerClassName="w-full sm:w-auto"
         className={buttonClass}
         onClick={() => onOpenAuth('signup')}
@@ -71,7 +72,7 @@ export function LandingAuthCtas({ variant, onNavigate, onOpenAuth }: LandingAuth
       </BenthicCTAButton>
       <BenthicCTAButton
         size="lg"
-        variant="cyan"
+        variant="dark"
         containerClassName="w-full sm:w-auto"
         className={buttonClass}
         onClick={() => onNavigate('/dashboard')}

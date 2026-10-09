@@ -19,9 +19,9 @@ export const HudDropdownMenuContent = React.forwardRef<
       sideOffset={sideOffset}
       collisionPadding={collisionPadding}
       className={cn(
-        'z-[99995] min-w-[168px] p-1 bg-[#050a0c]/95 backdrop-blur-md',
-        'border border-cyan-900/70 shadow-[0_8px_30px_rgba(0,0,0,0.85),0_0_12px_rgba(0,195,255,0.12)]',
-        'font-sans text-xs text-[#dfe3e3] chamfer-corner',
+        'z-[99995] min-w-[180px] p-1 bg-surface-2/95 backdrop-blur-md',
+        'border border-line rounded-card shadow-menu',
+        'font-sans text-sm text-ink',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         className
       )}
@@ -43,12 +43,12 @@ export const HudDropdownMenuItem = React.forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      'flex items-center gap-2 px-2.5 py-1.5 text-xs cursor-pointer select-none outline-none',
-      'transition-colors rounded-none border-none',
+      'flex items-center gap-2 min-h-[34px] px-2.5 text-sm cursor-pointer select-none outline-none',
+      'transition-colors rounded-control border-none',
       'data-[disabled]:pointer-events-none data-[disabled]:opacity-40',
       destructive
-        ? 'text-red-400 data-[highlighted]:bg-red-950/60 data-[highlighted]:text-red-200'
-        : 'text-gray-300 data-[highlighted]:bg-cyan-950/60 data-[highlighted]:text-cyan-200',
+        ? 'text-crimson-text data-[highlighted]:bg-crimson-soft'
+        : 'text-ink data-[highlighted]:bg-surface-3',
       className
     )}
     {...props}
@@ -62,7 +62,7 @@ export const HudDropdownMenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.Separator
     ref={ref}
-    className={cn('my-1 h-px bg-cyan-900/50', className)}
+    className={cn('my-1 h-px bg-line-subtle', className)}
     {...props}
   />
 ))

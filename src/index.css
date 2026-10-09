@@ -74,6 +74,43 @@
   padding-top: env(safe-area-inset-top, 0px);
 }
 
+/* UI tightening utilities (docs/design/ui-tokens.md) */
+/* Faint light from above on a surface; pair with a bg-surface-* colour. */
+.hud-sheen {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0) 45%);
+}
+
+/* The one cut corner (top right) used on filled primary buttons. Apply to the fill layer, not
+   the focusable element, so the focus outline is not clipped. */
+.hud-cut {
+  clip-path: polygon(0 0, calc(100% - var(--hud-cut, 10px)) 0, 100% var(--hud-cut, 10px), 100% 100%, 0 100%);
+}
+
+/* Cyan corner ticks (top left, bottom right) for featured panels. Needs position: relative. */
+.hud-ticks::before,
+.hud-ticks::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  z-index: 1;
+}
+.hud-ticks::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid #00c3ff;
+  border-left: 2px solid #00c3ff;
+  border-top-left-radius: inherit;
+}
+.hud-ticks::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid #00c3ff;
+  border-right: 2px solid #00c3ff;
+  border-bottom-right-radius: inherit;
+}
+
 /* Sleek HUD buttons and panels with standard continuous borders (No diagonal cut corners) */
 .chamfer-corner {
   clip-path: none !important;
