@@ -51,7 +51,7 @@ export function MoltCreditStorePanel({ onPurchase }: MoltCreditStorePanelProps) 
 
   return (
     <div className="space-y-3 sm:space-y-4">
-      <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen hud-ticks p-3 sm:p-4 relative overflow-hidden">
+      <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#ff5540]/8 via-transparent to-[#00c3ff]/5 pointer-events-none" />
         <div className="relative grid grid-cols-1 md:grid-cols-[1.1fr_0.9fr] gap-4 items-center">
           <div className="space-y-2">

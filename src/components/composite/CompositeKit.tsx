@@ -116,16 +116,14 @@ export function CompositeHeadline({
   )
 }
 
-/** Card surface. `featured` adds the cyan corner ticks used on the site's featured panels. */
+/** Card surface. */
 export function CompositePanel({
   children,
   tone = 'neutral',
-  featured = false,
   className,
 }: {
   children: React.ReactNode
   tone?: CompositeTone
-  featured?: boolean
   className?: string
 }) {
   return (
@@ -137,7 +135,6 @@ export function CompositePanel({
           : tone === 'cyan'
             ? 'border-line-strong bg-surface-1/95'
             : 'border-line-subtle bg-surface-1/90',
-        featured && 'hud-ticks',
         className
       )}
     >
@@ -165,7 +162,7 @@ export function CompositeMetric({
   className?: string
 }) {
   return (
-    <CompositePanel tone={tone === 'cyan' ? 'cyan' : tone} featured={tone === 'cyan'} className={className}>
+    <CompositePanel tone={tone === 'cyan' ? 'cyan' : tone} className={className}>
       <CompositeLabel tone={tone}>{label}</CompositeLabel>
       <div
         className="mt-4 font-bold tracking-[-0.02em] text-ink"

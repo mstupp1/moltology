@@ -48,7 +48,6 @@ icons or geometry and verifies the original-icon backups.
 
 - `.hud-cut`: the single cut corner (top right) on filled buttons. Put it on the fill layer, never on the
   focusable element, so the focus outline is not clipped. Size comes from `--hud-cut`.
-- `.hud-ticks`: cyan corner ticks for a featured panel (`showCornerBrackets` on `HudCard` and `HudStatBox`).
 - `.hud-sheen`: faint light from above on a surface, paired with a `bg-surface-*` colour.
 
 ## Sizes and states

@@ -83,7 +83,7 @@ export const SocialSpecShowdownSlide: React.FC<SocialSpecShowdownSlideProps> = (
         {cards.map((card, idx) => {
           const tone = card.variant === 'red' ? 'crimson' : card.variant === 'dark' ? 'neutral' : 'cyan'
           return (
-            <CompositePanel key={idx} tone={card.variant === 'sky' ? 'neutral' : tone} featured={card.variant === 'cyan'} className="p-6">
+            <CompositePanel key={idx} tone={card.variant === 'sky' ? 'neutral' : tone} className="p-6">
               <div className="flex items-baseline gap-4">
                 <span className="text-[18px] font-bold tabular-nums text-ink-muted">{card.number}</span>
                 <CompositeLabel tone={tone}>{displayCopy(card.title)}</CompositeLabel>

@@ -475,7 +475,7 @@ export const HomeFaq: React.FC = () => (
 export const HomeFinalCta: React.FC<HomeSectionProps> = ({ authReady, onNavigate, onOpenAuth }) => (
   <section aria-labelledby="home-final-title" className="relative px-5 sm:px-8 pb-24 sm:pb-32">
     <ScrollReveal animation="scale-up">
-      <div className="hud-ticks relative isolate mx-auto max-w-6xl overflow-hidden rounded-panel border border-cyan-glow/40 bg-gradient-to-br from-[#04161c] via-[#03090d] to-[#020408] grid md:grid-cols-[1.15fr_0.85fr] items-center">
+      <div className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-panel border border-cyan-glow/40 bg-gradient-to-br from-[#04161c] via-[#03090d] to-[#020408] grid md:grid-cols-[1.15fr_0.85fr] items-center">
         {/* Separate desktop and portrait compositions cover the whole invitation. */}
         <div className="absolute inset-0 -z-10" aria-hidden="true">
           <StoryImg image={HOME_FINAL_IMAGE} className="home-final-art h-full w-full object-cover" />

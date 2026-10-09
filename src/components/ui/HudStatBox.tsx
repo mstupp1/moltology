@@ -10,7 +10,6 @@ export interface HudStatBoxProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: React.ReactNode
   variant?: 'cyan' | 'crimson' | 'neutral'
   texture?: 'chitin' | 'hex' | 'alloy' | 'carbon' | 'basalt' | 'circuit' | 'none'
-  showCornerBrackets?: boolean
 }
 
 export const HudStatBox = React.forwardRef<HTMLDivElement, HudStatBoxProps>(
@@ -24,7 +23,6 @@ export const HudStatBox = React.forwardRef<HTMLDivElement, HudStatBoxProps>(
       icon,
       variant = 'cyan',
       texture = 'none',
-      showCornerBrackets = false,
       className = '',
       ...props
     },
@@ -63,7 +61,6 @@ export const HudStatBox = React.forwardRef<HTMLDivElement, HudStatBoxProps>(
         className={cn(
           'relative border p-4 rounded-card hud-sheen shadow-sheen-inset font-sans flex flex-col justify-between gap-2 backdrop-blur-md',
           variantStyles.container,
-          showCornerBrackets && 'hud-ticks',
           textureClass,
           className
         )}

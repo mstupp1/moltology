@@ -6,7 +6,6 @@ export interface HudCardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'cyan' | 'teal' | 'crimson' | 'dark' | 'ghost'
   texture?: 'chitin' | 'hex' | 'alloy' | 'carbon' | 'basalt' | 'circuit' | 'none'
   glow?: boolean
-  showCornerBrackets?: boolean
   interactive?: boolean
 }
 
@@ -17,7 +16,6 @@ export const HudCard = React.forwardRef<HTMLDivElement, HudCardProps>(
       variant = 'teal',
       texture = 'none',
       glow = false,
-      showCornerBrackets = false,
       interactive = false,
       className = '',
       ...props
@@ -60,7 +58,6 @@ export const HudCard = React.forwardRef<HTMLDivElement, HudCardProps>(
           borderVariantMap,
           textureClass,
           glow && glowMap,
-          showCornerBrackets && 'hud-ticks',
           interactive &&
             'cursor-pointer hover:border-line-strong hover:-translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
           className

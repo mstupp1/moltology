@@ -85,7 +85,7 @@ describe('HUD Primitive Component Library', () => {
 
     it('renders subcomponents (Header, Title, Content, Footer)', () => {
       render(
-        <HudCard showCornerBrackets>
+        <HudCard>
           <HudCardHeader>
             <HudCardTitle>Header Title</HudCardTitle>
           </HudCardHeader>
@@ -158,7 +158,6 @@ describe('HUD Primitive Component Library', () => {
           trend="up"
           trendValue="+2.1%"
           subtext="Updated 1m ago"
-          showCornerBrackets
         />
       )
 
