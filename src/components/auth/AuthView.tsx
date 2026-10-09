@@ -228,12 +228,12 @@ export default function AuthView({ search }: { search: AuthSearch }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#070b0b] text-[#dfe3e3] font-sans flex flex-col justify-between selection:bg-[#00ffff] selection:text-[#000a0a]">
+    <div className="min-h-screen bg-[#070b0b] text-ink-body font-sans flex flex-col justify-between selection:bg-cyan-glow selection:text-abyss">
       {/* Main Full-Height 50/50 Split Screen */}
       <main className="relative flex-1 flex flex-col lg:flex-row w-full">
         
         {/* Left Half: Mobile-Optimized Full-Bleed Image Panel & HeaderBrand */}
-        <div className="relative w-full lg:w-1/2 min-h-0 lg:min-h-screen flex flex-col justify-between p-5 sm:p-8 lg:p-16 overflow-hidden border-b lg:border-b-0 lg:border-r border-cyan-950/60 bg-[#060b0c]">
+        <div className="relative w-full lg:w-1/2 min-h-0 lg:min-h-screen flex flex-col justify-between p-5 sm:p-8 lg:p-16 overflow-hidden border-b lg:border-b-0 lg:border-r border-line-subtle bg-[#060b0c]">
           {/* Full-Bleed Background Image */}
           <img
             src={getAssetUrl('/images/benthic_abyss_hero.jpg')}
@@ -260,13 +260,13 @@ export default function AuthView({ search }: { search: AuthSearch }) {
 
             {/* Main Headline */}
             <div className="space-y-2.5 sm:space-y-3 pt-1 sm:pt-2">
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black font-grotesk text-white tracking-tight leading-[1.15]">
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black font-grotesk text-ink tracking-tight leading-[1.15]">
                 Enter The Synaptic Path. <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-200 to-white">
                   Shed the Soft. Ascend to Armored Clarity.
                 </span>
               </h1>
-              <p className="text-xs sm:text-base text-gray-200 leading-relaxed font-sans">
+              <p className="text-xs sm:text-base text-ink-body leading-relaxed font-sans">
                 Sign up for your official Synaptic Path clearance. Join over 14,000 initiates replacing biological hesitation with high-torque execution and unbroken depth.
               </p>
             </div>
@@ -274,43 +274,43 @@ export default function AuthView({ search }: { search: AuthSearch }) {
 
           {/* Middle: Prominent & Larger Value Propositions */}
           <div className="relative z-10 my-6 sm:my-8 space-y-3 sm:space-y-4 max-w-xl">
-            <div className="flex items-start gap-3 sm:gap-4 p-3.5 sm:p-5 rounded-xl bg-black/50 border border-cyan-900/60 backdrop-blur-md transition-all hover:border-cyan-700/60 hover:bg-black/60 shadow-lg">
-              <div className="p-2 sm:p-3 rounded-lg bg-cyan-950/90 border border-cyan-500/40 text-cyan-300 shrink-0 shadow-[0_0_15px_rgba(0,195,255,0.3)]">
+            <div className="flex items-start gap-3 sm:gap-4 p-3.5 sm:p-5 rounded-card bg-surface-1/80 hud-sheen border border-line-subtle backdrop-blur-md transition-all hover:border-line hover:bg-surface-2/80 shadow-sheen-inset">
+              <div className="p-2 sm:p-3 rounded-control bg-cyan-soft border border-line-subtle text-cyan-glow shrink-0">
                 <Activity className="w-4 h-4 sm:w-6 sm:h-6" />
               </div>
               <div className="space-y-0.5 sm:space-y-1">
-                <h2 className="text-xs sm:text-base font-bold text-white font-grotesk uppercase tracking-wider">
+                <h2 className="text-xs sm:text-base font-bold text-ink font-grotesk uppercase tracking-wider">
                   Ecdysis Diagnostics & Tracking
                 </h2>
-                <p className="text-[11px] sm:text-sm text-gray-300 font-sans leading-relaxed">
+                <p className="text-[11px] sm:text-sm text-ink-body font-sans leading-relaxed">
                   Real-time telemetry measuring shell hardness, pincer torque, and ecdysis velocity across all 12 clearance levels.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 sm:gap-4 p-3.5 sm:p-5 rounded-xl bg-black/50 border border-cyan-900/60 backdrop-blur-md transition-all hover:border-cyan-700/60 hover:bg-black/60 shadow-lg">
-              <div className="p-2 sm:p-3 rounded-lg bg-cyan-950/90 border border-cyan-500/40 text-cyan-300 shrink-0 shadow-[0_0_15px_rgba(0,195,255,0.3)]">
+            <div className="flex items-start gap-3 sm:gap-4 p-3.5 sm:p-5 rounded-card bg-surface-1/80 hud-sheen border border-line-subtle backdrop-blur-md transition-all hover:border-line hover:bg-surface-2/80 shadow-sheen-inset">
+              <div className="p-2 sm:p-3 rounded-control bg-cyan-soft border border-line-subtle text-cyan-glow shrink-0">
                 <Cpu className="w-4 h-4 sm:w-6 sm:h-6" />
               </div>
               <div className="space-y-0.5 sm:space-y-1">
-                <h2 className="text-xs sm:text-base font-bold text-white font-grotesk uppercase tracking-wider">
+                <h2 className="text-xs sm:text-base font-bold text-ink font-grotesk uppercase tracking-wider">
                   Benthic AI Oracle & Swarm Access
                 </h2>
-                <p className="text-[11px] sm:text-sm text-gray-300 font-sans leading-relaxed">
+                <p className="text-[11px] sm:text-sm text-ink-body font-sans leading-relaxed">
                   Direct consultation with the Synaptic Oracle for daily focus calibration, fault isolation, and guidance.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 sm:gap-4 p-3.5 sm:p-5 rounded-xl bg-black/50 border border-cyan-900/60 backdrop-blur-md transition-all hover:border-cyan-700/60 hover:bg-black/60 shadow-lg">
-              <div className="p-2 sm:p-3 rounded-lg bg-cyan-950/90 border border-cyan-500/40 text-cyan-300 shrink-0 shadow-[0_0_15px_rgba(0,195,255,0.3)]">
+            <div className="flex items-start gap-3 sm:gap-4 p-3.5 sm:p-5 rounded-card bg-surface-1/80 hud-sheen border border-line-subtle backdrop-blur-md transition-all hover:border-line hover:bg-surface-2/80 shadow-sheen-inset">
+              <div className="p-2 sm:p-3 rounded-control bg-cyan-soft border border-line-subtle text-cyan-glow shrink-0">
                 <CheckCircle2 className="w-4 h-4 sm:w-6 sm:h-6" />
               </div>
               <div className="space-y-0.5 sm:space-y-1">
-                <h2 className="text-xs sm:text-base font-bold text-white font-grotesk uppercase tracking-wider">
+                <h2 className="text-xs sm:text-base font-bold text-ink font-grotesk uppercase tracking-wider">
                   Chitin Matrix State Persistence
                 </h2>
-                <p className="text-[11px] sm:text-sm text-gray-300 font-sans leading-relaxed">
+                <p className="text-[11px] sm:text-sm text-ink-body font-sans leading-relaxed">
                   Cloud-persisted clearance logs, diagnostic archives, and unlocked field manual materials.
                 </p>
               </div>
@@ -318,20 +318,20 @@ export default function AuthView({ search }: { search: AuthSearch }) {
           </div>
 
           {/* Bottom: Social Proof & Testimonial Quote */}
-          <div className="relative z-10 pt-3 sm:pt-4 border-t border-cyan-950/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 max-w-xl">
+          <div className="relative z-10 pt-3 sm:pt-4 border-t border-line-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 max-w-xl">
             <div className="flex items-center gap-2.5 sm:gap-3">
               <div className="flex -space-x-2">
-                <img className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-cyan-400/50 object-cover" src={getAssetUrl('/images/order_emblem.png')} alt="Ascendant 1" />
-                <img className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-cyan-400/50 object-cover" src={getAssetUrl('/images/stage2_softshed.png')} alt="Ascendant 2" />
-                <img className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-cyan-400/50 object-cover" src={getAssetUrl('/images/stage3_exoshell.png')} alt="Ascendant 3" />
+                <img className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-line object-cover" src={getAssetUrl('/images/order_emblem.png')} alt="Ascendant 1" />
+                <img className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-line object-cover" src={getAssetUrl('/images/stage2_softshed.png')} alt="Ascendant 2" />
+                <img className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-line object-cover" src={getAssetUrl('/images/stage3_exoshell.png')} alt="Ascendant 3" />
               </div>
               <div className="text-[11px] sm:text-xs">
-                <p className="text-white font-bold font-grotesk tracking-wide">14,200+ Units Synchronized</p>
+                <p className="text-ink font-bold font-grotesk tracking-wide">14,200+ Units Synchronized</p>
               </div>
             </div>
 
-            <div className="text-[11px] sm:text-xs text-gray-300 italic max-w-xs font-sans">
-              "Decisive execution replaced my hesitation in 48 hours." — <span className="text-gray-200 font-sans not-italic text-[10px] sm:text-[11px]">Unit S2</span>
+            <div className="text-[11px] sm:text-xs text-ink-body italic max-w-xs font-sans">
+              "Decisive execution replaced my hesitation in 48 hours." — <span className="text-ink font-sans not-italic text-[11px]">Unit S2</span>
             </div>
           </div>
         </div>
@@ -349,7 +349,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
             <button
               type="button"
               onClick={() => navigate({ to: '/' })}
-              className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-cyan-300 transition-colors uppercase tracking-wider font-sans cursor-pointer py-1"
+              className="inline-flex items-center gap-1.5 rounded-control text-xs text-ink-muted hover:text-ink transition-colors uppercase tracking-wider font-sans cursor-pointer py-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to Home</span>
@@ -360,7 +360,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
             {session.isPending ? (
               <HudCard
                 variant="teal"
-                className="relative w-full p-5 sm:p-8 shadow-2xl bg-[#0a1012] border border-[#00c3ff]/50 space-y-4"
+                className="relative w-full p-5 sm:p-8 rounded-panel bg-surface-1 border-line-subtle shadow-[0_20px_60px_rgba(0,0,0,0.5)] space-y-4"
                 data-testid="auth-session-skeleton"
               >
                 <HudGhostSkeleton variant="cyan" preset="heading" width="55%" height={28} className="mx-auto" />
@@ -371,14 +371,14 @@ export default function AuthView({ search }: { search: AuthSearch }) {
             ) : (
               <HudCard
                 variant="teal"
-                className="relative w-full p-5 sm:p-8 shadow-2xl bg-[#0a1012] border border-[#00c3ff]/50"
+                className="relative w-full p-5 sm:p-8 rounded-panel bg-surface-1 border-line-subtle shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
               >
               {/* Header */}
               <div className="text-center mb-5 sm:mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold font-grotesk text-white tracking-wider uppercase">
+                <h2 className="text-xl sm:text-2xl font-bold font-grotesk text-ink tracking-wider uppercase">
                   {mode === 'signup' ? 'Create Account' : 'Welcome Back'}
                 </h2>
-                <p className="text-[11px] sm:text-xs text-[#00c3ff]/80 mt-1 uppercase tracking-widest font-sans">
+                <p className="text-[11px] sm:text-xs text-cyan-glow/80 mt-1 uppercase tracking-[0.08em] font-sans">
                   {mode === 'signup'
                     ? 'Sign up to persist your session'
                     : 'Sign in to access your saved state'}
@@ -389,25 +389,25 @@ export default function AuthView({ search }: { search: AuthSearch }) {
               {pendingVerificationEmail ? (
                 <div className="space-y-4" data-testid="email-verification-pending">
                   <div className="text-center space-y-2">
-                    <Mail className="w-8 h-8 text-[#00c3ff] mx-auto" aria-hidden="true" />
-                    <h3 className="text-lg font-bold font-grotesk text-white tracking-wide">
+                    <Mail className="w-8 h-8 text-cyan-glow mx-auto" aria-hidden="true" />
+                    <h3 className="text-lg font-bold font-grotesk text-ink tracking-wide">
                       {EMAIL_VERIFICATION_COPY.title}
                     </h3>
-                    <p className="text-sm text-[#839493] font-sans">
+                    <p className="text-sm text-ink-body font-sans">
                       {EMAIL_VERIFICATION_COPY.body(pendingVerificationEmail)}
                     </p>
                   </div>
                   {error ? (
                     <div
                       role="alert"
-                      className="p-3 bg-[#ff453a]/10 border border-[#ff453a]/60 text-[#ff453a] text-xs font-sans flex items-start gap-2"
+                      className="p-3 rounded-control bg-crimson-soft border border-crimson-aggro/55 text-crimson-text text-xs font-sans flex items-start gap-2"
                     >
                       <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                       <span>{error}</span>
                     </div>
                   ) : null}
                   {resendMessage ? (
-                    <div className="p-3 bg-[#00c3ff]/10 border border-[#00c3ff]/40 text-[#00c3ff] text-xs font-sans">
+                    <div className="p-3 rounded-control bg-cyan-soft border border-cyan-glow/40 text-cyan-glow text-xs font-sans">
                       {resendMessage}
                     </div>
                   ) : null}
@@ -422,7 +422,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                   </HudButton>
                   <button
                     type="button"
-                    className="w-full text-xs text-[#839493] hover:text-[#dfe3e3] font-sans underline-offset-2 hover:underline"
+                    className="w-full rounded-control text-xs text-ink-muted hover:text-ink font-sans underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     onClick={() => {
                       setPendingVerificationEmail(null)
                       setResendMessage(null)
@@ -436,7 +436,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
               ) : (
               <>
 
-              <div className="flex border-b border-[#3a4a49]/60 mb-5 sm:mb-6" role="tablist">
+              <div className="flex border-b border-line-subtle mb-5 sm:mb-6" role="tablist">
                 <button
                   type="button"
                   role="tab"
@@ -445,10 +445,10 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                     setMode('signup')
                     setError(null)
                   }}
-                  className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors cursor-pointer ${
+                  className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                     mode === 'signup'
-                      ? 'border-[#ff453a] text-[#ff453a]'
-                      : 'border-transparent text-[#839493] hover:text-[#dfe3e3]'
+                      ? 'border-cyan-glow text-ink'
+                      : 'border-transparent text-ink-muted hover:text-ink'
                   }`}
                 >
                   Sign Up
@@ -461,10 +461,10 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                     setMode('login')
                     setError(null)
                   }}
-                  className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors cursor-pointer ${
+                  className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                     mode === 'login'
-                      ? 'border-[#00c3ff] text-[#00c3ff]'
-                      : 'border-transparent text-[#839493] hover:text-[#dfe3e3]'
+                      ? 'border-cyan-glow text-ink'
+                      : 'border-transparent text-ink-muted hover:text-ink'
                   }`}
                 >
                   Sign In
@@ -475,9 +475,9 @@ export default function AuthView({ search }: { search: AuthSearch }) {
               {error && (
                 <div
                   role="alert"
-                  className="mb-4 p-3 bg-[#ff453a]/10 border border-[#ff453a]/60 rounded-none flex items-start gap-2.5 text-[#ff453a] text-xs font-sans"
+                  className="mb-4 p-3 bg-crimson-soft border border-crimson-aggro/55 rounded-control flex items-start gap-2.5 text-crimson-text text-xs font-sans"
                 >
-                  <AlertCircle className="w-4 h-4 shrink-0 text-[#ff453a] mt-0.5" />
+                  <AlertCircle className="w-4 h-4 shrink-0 text-crimson-text mt-0.5" />
                   <span>{error}</span>
                 </div>
               )}
@@ -515,8 +515,8 @@ export default function AuthView({ search }: { search: AuthSearch }) {
 
                 {/* Standard Centered OR Divider */}
                 <div className="relative flex items-center justify-center my-3">
-                  <div className="border-t border-[#3a4a49] w-full" />
-                  <span className="bg-[#0a1012] px-3 text-xs text-[#839493] font-bold uppercase tracking-widest absolute">
+                  <div className="border-t border-line-subtle w-full" />
+                  <span className="bg-surface-1 px-3 text-xs text-ink-muted font-bold uppercase tracking-[0.08em] absolute">
                     OR
                   </span>
                 </div>
@@ -537,7 +537,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  startIcon={<Mail className="w-4 h-4 text-[#00c3ff]" />}
+                  startIcon={<Mail className="w-4 h-4 text-ink-muted" />}
                 />
 
                 <HudInput
@@ -548,14 +548,14 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  startIcon={<Lock className="w-4 h-4 text-[#00c3ff]" />}
+                  startIcon={<Lock className="w-4 h-4 text-ink-muted" />}
                 />
 
                 <div className="mt-6 flex justify-center">
                   <HudButton
                     type="submit"
                     disabled={loading}
-                    variant={mode === 'signup' ? 'crimson' : 'cyan'}
+                    variant="cyan"
                     size="lg"
                     fullWidth
                   >
@@ -579,13 +579,13 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                         type="checkbox"
                         checked={emailOptIn}
                         onChange={(e) => setEmailOptIn(e.target.checked)}
-                        className="mt-0.5 w-4 h-4 rounded border-[#3a4a49] bg-[#070b0b] text-[#00c3ff] focus:ring-[#00c3ff] focus:ring-offset-0 cursor-pointer accent-[#00c3ff]"
+                        className="mt-0.5 w-4 h-4 rounded-chip border-line bg-surface-2 text-cyan-glow focus:ring-cyan-glow focus:ring-offset-0 cursor-pointer accent-cyan-glow"
                       />
-                      <span className="text-xs text-[#839493] group-hover:text-[#dfe3e3] transition-colors font-sans leading-tight">
+                      <span className="text-xs text-ink-muted group-hover:text-ink-body transition-colors font-sans leading-tight">
                         Keep me updated with Moltology news, articles, and product updates.
                       </span>
                     </label>
-                    <p className="text-[10px] text-[#839493]/70 mt-1 pl-6 font-sans">
+                    <p className="text-[11px] text-ink-muted mt-1 pl-6 font-sans">
                       Zero spam. Unsubscribe at any time.
                     </p>
                   </div>
@@ -605,7 +605,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
             )}
 
             {/* Landing Page Trust Strip */}
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-[10px] sm:text-[11px] text-gray-400 text-center">
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-[11px] text-ink-muted text-center">
               <span>✓ Instant Access</span>
               <span className="hidden sm:inline">·</span>
               <span>✓ Free Initiate Tier</span>

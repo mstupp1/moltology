@@ -35,8 +35,8 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
           height={40}
           className={`w-full h-full object-contain transition-all duration-300 ${
             isCorporate
-              ? 'filter drop-shadow-[0_2px_4px_rgba(2,132,199,0.25)] group-hover:drop-shadow-[0_0_8px_rgba(2,132,199,0.45)]'
-              : 'filter drop-shadow-[0_2px_5px_rgba(0,195,255,0.35)] group-hover:drop-shadow-[0_0_10px_rgba(0,195,255,0.6)]'
+              ? 'filter drop-shadow-[0_1px_2px_rgba(15,23,42,0.18)]'
+              : 'filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]'
           }`}
         />
       </div>
@@ -48,16 +48,16 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
             className={`font-grotesk font-extrabold ${titleSizeClasses} tracking-widest uppercase flex items-center gap-2 transition-all duration-300 leading-tight ${
               isCorporate
                 ? 'text-sky-950 group-hover:text-sky-700'
-                : 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] [text-shadow:0_0_12px_rgba(0,195,255,0.3)] group-hover:[text-shadow:0_0_18px_rgba(0,195,255,0.65)]'
+                : 'text-ink drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] group-hover:text-white'
             }`}
           >
             <span>THE SYNAPTIC PATH</span>
           </div>
           <div
-            className={`text-[10px] font-bold tracking-widest uppercase truncate mt-0.5 ${
+            className={`text-[11px] font-bold tracking-widest uppercase truncate mt-0.5 ${
               isCorporate
                 ? 'text-sky-600'
-                : 'text-cyan-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] [text-shadow:0_0_8px_rgba(0,195,255,0.5)]'
+                : 'text-cyan-glow drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]'
             }`}
           >
             <span className="truncate">{subtext}</span>

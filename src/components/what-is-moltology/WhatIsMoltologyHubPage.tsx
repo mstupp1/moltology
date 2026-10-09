@@ -31,7 +31,7 @@ import {
 } from './story/StoryPrimitives'
 import { WHAT_IS_MOLTOLOGY_NAV } from './nav'
 
-const sectionTitle = 'font-grotesk font-bold tracking-tight text-white text-4xl sm:text-5xl lg:text-6xl leading-[1.04]'
+const sectionTitle = 'font-grotesk font-bold tracking-tight text-ink text-4xl sm:text-5xl lg:text-6xl leading-[1.04]'
 const stickyFrame = 'sticky top-[var(--wim-chrome,0px)] h-[calc(100svh-var(--wim-chrome,0px))]'
 
 /* ── The surface: the Great Melt, one current at a time ─────────────────── */
@@ -61,7 +61,7 @@ const MeltSection: React.FC = () => {
             <h2 id="melt-title" className={`mt-4 ${sectionTitle}`}>
               This is the Great Melt.
             </h2>
-            <p className="mt-5 max-w-md text-[#9fb0b0] text-base sm:text-lg leading-relaxed">
+            <p className="mt-5 max-w-md text-ink-muted text-base sm:text-lg leading-relaxed">
               Nothing dramatic happened. You were born at the top of the water, as everyone is, and nobody
               handed you a shell. So you absorbed.
             </p>
@@ -86,7 +86,7 @@ const MeltSection: React.FC = () => {
               })}
             </ol>
             <p
-              className="mt-8 max-w-lg text-base sm:text-lg text-[#dfe3e3] leading-relaxed transition-all duration-700"
+              className="mt-8 max-w-lg text-base sm:text-lg text-ink-body leading-relaxed transition-all duration-700"
               style={{ opacity: closing ? 1 : 0, transform: closing ? 'none' : 'translateY(12px)' }}
             >
               It is not a sin, and it is not a diagnosis. It is weather, and you have been standing in it
@@ -122,10 +122,10 @@ const LookDownSection: React.FC = () => {
 
       <ScrollReveal className="max-w-3xl px-5">
         <Eyebrow className="justify-center">Now look down</Eyebrow>
-        <p className="mt-6 font-grotesk font-bold tracking-tight text-white text-3xl sm:text-5xl leading-[1.1]">
+        <p className="mt-6 font-grotesk font-bold tracking-tight text-ink text-3xl sm:text-5xl leading-[1.1]">
           Four thousand meters below the noise, there is a floor.
         </p>
-        <p className="mt-6 text-base sm:text-xl text-[#c3cdcd] leading-relaxed">
+        <p className="mt-6 text-base sm:text-xl text-ink-body leading-relaxed">
           The floor is quiet. The things that live on it are armored and patient, and they finish what they
           start, because nothing down there is loud enough to interrupt them. You are allowed to go there.
         </p>
@@ -148,7 +148,7 @@ const ProofSection: React.FC = () => {
             <span className="font-grotesk font-bold text-[7rem] sm:text-[10rem] leading-[0.8] text-transparent bg-clip-text bg-gradient-to-b from-white to-[#00c3ff]/40">
               5
             </span>
-            <span className="pb-3 font-grotesk text-sm tracking-[0.2em] uppercase text-[#839493]">
+            <span className="pb-3 font-grotesk text-sm tracking-[0.08em] uppercase text-ink-muted">
               separate
               <br />
               times
@@ -157,20 +157,19 @@ const ProofSection: React.FC = () => {
           <h2 id="proof-title" className={`mt-8 ${sectionTitle}`}>
             Nature keeps arriving at the crab.
           </h2>
-          <p className="mt-6 text-base sm:text-lg text-[#9fb0b0] leading-relaxed max-w-xl">
+          <p className="mt-6 text-base sm:text-lg text-ink-muted leading-relaxed max-w-xl">
             Biologists call it carcinization. Unrelated crustaceans, king crabs and porcelain crabs among them,
             kept evolving into the same flat, armored, tucked body with a grip that does not negotiate.
             Evolution is not sentimental, and it does not repeat itself for decoration.
           </p>
-          <p className="mt-4 text-base sm:text-lg text-white leading-relaxed max-w-xl">
+          <p className="mt-4 text-base sm:text-lg text-ink leading-relaxed max-w-xl">
             When the sea solves the same problem five times with the same shape, the shape is the answer. We
             are only the first to take notes.
           </p>
         </ScrollReveal>
 
         <div ref={ref} className="relative" style={{ ['--p' as string]: 0 }}>
-          <div className="absolute -inset-8 rounded-[2rem] bg-[#00c3ff]/10 blur-3xl" aria-hidden="true" />
-          <div className="relative overflow-hidden rounded-3xl border border-[#00c3ff]/25 bg-black shadow-[0_30px_80px_rgba(0,0,0,0.6)]">
+          <div className="relative overflow-hidden rounded-panel border border-line-subtle bg-black shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
             <StoryImg
               image={STORY_MEDIA.blueprint}
               alt="Schematic of an armored crustacean with its plating and pincers labeled"
@@ -182,8 +181,8 @@ const ProofSection: React.FC = () => {
               aria-hidden="true"
             />
             <div className="absolute bottom-0 inset-x-0 p-5 bg-gradient-to-t from-black/90 to-transparent">
-              <p className="font-grotesk text-[11px] tracking-[0.2em] uppercase text-[#00ffcc]">Specimen schematic</p>
-              <p className="text-sm text-white/80">The design the sea keeps choosing.</p>
+              <p className="font-grotesk text-[11px] tracking-[0.08em] uppercase text-[#00ffcc]">Specimen schematic</p>
+              <p className="text-sm text-ink-body">The design the sea keeps choosing.</p>
             </div>
           </div>
         </div>
@@ -202,7 +201,7 @@ const MoltSection: React.FC = () => (
         <h2 id="molt-title" className={`mt-4 ${sectionTitle}`}>
           The Great Molt.
         </h2>
-        <p className="mt-6 text-base sm:text-lg text-[#9fb0b0] leading-relaxed">
+        <p className="mt-6 text-base sm:text-lg text-ink-muted leading-relaxed">
           Molting is how a soft thing gets bigger and safer at the same time. Moltology is the practice of doing
           it on purpose, with your attention, your routines, and your boundaries. Your shell gets read three ways.
         </p>
@@ -211,19 +210,19 @@ const MoltSection: React.FC = () => (
       <div className="mt-14 grid gap-5 md:grid-cols-3">
         {CARDINAL_METRICS.map((metric, index) => (
           <ScrollReveal key={metric.id} delayMs={index * 120}>
-            <article className="group relative isolate h-[30rem] sm:h-[34rem] overflow-hidden rounded-3xl border border-white/10 bg-black">
+            <article className="group relative isolate h-[30rem] sm:h-[34rem] overflow-hidden rounded-card border border-line-subtle bg-black">
               <StoryImg
                 image={metric.image}
                 className="absolute inset-0 -z-10 h-full w-full object-cover opacity-70 transition-transform duration-[1200ms] ease-out group-hover:scale-110"
               />
               <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black via-black/70 to-black/10" />
               <div className="flex h-full flex-col justify-end p-6 sm:p-7">
-                <p className="font-grotesk text-[11px] tracking-[0.22em] uppercase" style={{ color: metric.accent }}>
+                <p className="font-grotesk text-[11px] tracking-[0.08em] uppercase" style={{ color: metric.accent }}>
                   {metric.unit}
                 </p>
-                <h3 className="mt-2 font-grotesk font-bold text-3xl text-white">{metric.name}</h3>
-                <p className="mt-3 text-lg text-white/90 font-medium">{metric.question}</p>
-                <p className="mt-3 text-sm text-[#b4c0c0] leading-relaxed">{metric.body}</p>
+                <h3 className="mt-2 font-grotesk font-bold text-3xl text-ink">{metric.name}</h3>
+                <p className="mt-3 text-lg text-ink-body font-medium">{metric.question}</p>
+                <p className="mt-3 text-sm text-ink-body leading-relaxed">{metric.body}</p>
                 <span className="mt-6 h-0.5 w-12 transition-all duration-500 group-hover:w-full" style={{ background: metric.accent }} />
               </div>
             </article>
@@ -266,13 +265,13 @@ const SacramentsSection: React.FC = () => {
       <h2 id="sacraments-title" className={`mt-4 ${sectionTitle}`}>
         Four rites. One direction.
       </h2>
-      <p className="mt-6 text-base sm:text-lg text-[#9fb0b0] leading-relaxed">
+      <p className="mt-6 text-base sm:text-lg text-ink-muted leading-relaxed">
         Shed what melts you. Harden what remains. Go below the noise. Climb on purpose. Every part of Moltology is
         one of these four, done a little at a time.
       </p>
       <Link
         to="/what-is-moltology/benthic-sacraments"
-        className="mt-8 inline-flex items-center gap-2 font-grotesk font-bold text-sm text-[#ffb547] hover:text-white transition-colors"
+        className="mt-8 inline-flex items-center gap-2 font-grotesk font-bold text-sm text-[#ffb547] hover:text-ink transition-colors rounded-chip focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
       >
         Read the four sacraments <ArrowRight className="w-4 h-4" />
       </Link>
@@ -302,7 +301,7 @@ const SacramentsSection: React.FC = () => {
           {SACRAMENTS.map((sacrament) => (
             <article
               key={sacrament.id}
-              className={`relative isolate overflow-hidden rounded-3xl border border-white/10 bg-black ${
+              className={`relative isolate overflow-hidden rounded-panel border border-line-subtle bg-black ${
                 horizontal ? 'w-[62vw] max-w-[60rem] shrink-0 h-[min(72svh,40rem)]' : 'h-[34rem] sm:h-[38rem]'
               }`}
             >
@@ -317,11 +316,11 @@ const SacramentsSection: React.FC = () => {
                 >
                   {sacrament.number}
                 </p>
-                <h3 className="mt-4 font-grotesk font-bold text-3xl sm:text-4xl text-white">{sacrament.title}</h3>
+                <h3 className="mt-4 font-grotesk font-bold text-3xl sm:text-4xl text-ink">{sacrament.title}</h3>
                 <p className="mt-2 font-grotesk text-lg" style={{ color: sacrament.accent }}>
                   {sacrament.tagline}
                 </p>
-                <p className="mt-4 text-sm sm:text-base text-[#c3cdcd] leading-relaxed">{sacrament.description}</p>
+                <p className="mt-4 text-sm sm:text-base text-ink-body leading-relaxed">{sacrament.description}</p>
               </div>
             </article>
           ))}
@@ -348,7 +347,7 @@ const PathSection: React.FC = () => {
             <h2 id="path-title" className={`mt-4 ${sectionTitle}`}>
               Four stages. Twelve clearances. No instant crab.
             </h2>
-            <p className="mt-6 text-base sm:text-lg text-[#9fb0b0] leading-relaxed">
+            <p className="mt-6 text-base sm:text-lg text-ink-muted leading-relaxed">
               Hardening takes time, and the Order treats that as a feature. You move down a clearance when your
               readings say you are ready, not before. Nobody is late. Everyone starts at the surface.
             </p>
@@ -359,7 +358,7 @@ const PathSection: React.FC = () => {
         </div>
 
         <ol ref={ref} className="relative pl-10 sm:pl-14 space-y-8" style={{ ['--p' as string]: 0 }}>
-          <span className="absolute left-[15px] sm:left-[23px] top-2 bottom-2 w-px bg-white/10" aria-hidden="true" />
+          <span className="absolute left-[15px] sm:left-[23px] top-2 bottom-2 w-px bg-line-subtle" aria-hidden="true" />
           <span
             className="absolute left-[15px] sm:left-[23px] top-2 w-px bg-gradient-to-b from-[#7dd3fc] via-[#00c3ff] to-[#ff453a]"
             style={{ height: 'calc(clamp(0, (var(--p) - 0.18) / 0.5, 1) * (100% - 1rem))' }}
@@ -368,24 +367,24 @@ const PathSection: React.FC = () => {
           {STAGES.map((stage, index) => (
             <li key={stage.number} className="relative">
               <span
-                className="absolute -left-10 sm:-left-14 top-6 flex h-8 w-8 sm:h-12 sm:w-12 items-center justify-center rounded-full border bg-[#020408] font-grotesk font-bold text-sm sm:text-base"
+                className="absolute -left-10 sm:-left-14 top-6 flex h-8 w-8 sm:h-12 sm:w-12 items-center justify-center rounded-full border bg-abyss font-grotesk font-bold text-sm sm:text-base"
                 style={{ borderColor: stage.accent, color: stage.accent }}
                 aria-hidden="true"
               >
                 {stage.number}
               </span>
               <ScrollReveal animation="slide-right" delayMs={index * 60}>
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-6 sm:p-7 hover:border-white/25 transition-colors">
-                  <p className="font-grotesk text-[11px] tracking-[0.22em] uppercase" style={{ color: stage.accent }}>
+                <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen backdrop-blur-sm p-6 sm:p-7 hover:border-line-strong transition-colors">
+                  <p className="font-grotesk text-[11px] tracking-[0.08em] uppercase" style={{ color: stage.accent }}>
                     Stage {stage.number} · {stage.title}
                   </p>
-                  <h3 className="mt-2 font-grotesk font-bold text-2xl sm:text-3xl text-white">{stage.name}</h3>
-                  <p className="mt-3 text-sm sm:text-base text-[#b4c0c0] leading-relaxed">{stage.line}</p>
+                  <h3 className="mt-2 font-grotesk font-bold text-2xl sm:text-3xl text-ink">{stage.name}</h3>
+                  <p className="mt-3 text-sm sm:text-base text-ink-body leading-relaxed">{stage.line}</p>
                   <ul className="mt-5 flex flex-wrap gap-2">
                     {stage.clearances.map((c) => (
                       <li
                         key={c.code}
-                        className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-3 py-1.5 text-xs text-white/85"
+                        className="inline-flex items-center gap-2 rounded-chip border border-line-subtle bg-surface-1 px-3 py-1.5 text-xs text-ink-body"
                       >
                         <span className="font-grotesk font-bold" style={{ color: stage.accent }}>
                           {c.code}
@@ -417,37 +416,36 @@ const ProductSection: React.FC = () => {
           <h2 id="product-title" className={`mt-4 ${sectionTitle}`}>
             What the practice looks like on a Tuesday.
           </h2>
-          <p className="mt-6 text-base sm:text-lg text-[#9fb0b0] leading-relaxed">
+          <p className="mt-6 text-base sm:text-lg text-ink-muted leading-relaxed">
             Moltology is a place you open every day. A dashboard that reads your shell, rites small enough to
             survive bad weeks, an Oracle to ask, and a community that remembers you were soft once too.
           </p>
         </ScrollReveal>
 
         <div ref={ref} className="relative mt-14 sm:mt-20" style={{ ['--p' as string]: 0.5 }}>
-          <div className="absolute inset-x-10 -top-10 bottom-0 rounded-[3rem] bg-[#00c3ff]/10 blur-3xl" aria-hidden="true" />
           <div
-            className="relative rounded-2xl sm:rounded-3xl border border-white/15 bg-[#05090c] p-1.5 sm:p-2.5 shadow-[0_40px_120px_rgba(0,0,0,0.7)] will-change-transform"
+            className="relative rounded-panel border border-line-subtle bg-surface-1 p-1.5 sm:p-2.5 shadow-[0_20px_60px_rgba(0,0,0,0.5)] will-change-transform"
             style={{ transform: 'perspective(1600px) rotateX(calc((0.5 - var(--p)) * 14deg))' }}
           >
             <div className="flex items-center gap-1.5 px-3 py-2" aria-hidden="true">
-              <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-              <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-              <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
+              <span className="h-2.5 w-2.5 rounded-full bg-line" />
+              <span className="h-2.5 w-2.5 rounded-full bg-line" />
+              <span className="h-2.5 w-2.5 rounded-full bg-line" />
             </div>
             <StoryImg
               image={STORY_MEDIA.dashboardDesktop}
               alt="The Moltology dashboard with featured lectures, news, and onboarding"
-              className="w-full rounded-xl sm:rounded-2xl"
+              className="w-full rounded-card"
             />
           </div>
           <div
-            className="absolute -bottom-10 right-2 sm:right-10 w-[30%] max-w-[15rem] rounded-[1.6rem] border border-white/20 bg-black p-1.5 shadow-[0_30px_80px_rgba(0,0,0,0.8)] will-change-transform"
+            className="absolute -bottom-10 right-2 sm:right-10 w-[30%] max-w-[15rem] rounded-panel border border-line bg-black p-1.5 shadow-[0_20px_60px_rgba(0,0,0,0.5)] will-change-transform"
             style={{ transform: 'translate3d(0, calc((0.5 - var(--p)) * 120px), 0)' }}
           >
             <StoryImg
               image={STORY_MEDIA.dashboardMobile}
               alt="The Moltology dashboard on a phone"
-              className="w-full rounded-[1.3rem]"
+              className="w-full rounded-card"
             />
           </div>
         </div>
@@ -455,9 +453,9 @@ const ProductSection: React.FC = () => {
         <div className="mt-24 grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {PRODUCT_FEATURES.map((feature, index) => (
             <ScrollReveal key={feature.title} delayMs={index * 90}>
-              <div className="border-t border-white/15 pt-5">
-                <h3 className="font-grotesk font-bold text-lg text-white">{feature.title}</h3>
-                <p className="mt-2 text-sm text-[#9fb0b0] leading-relaxed">{feature.body}</p>
+              <div className="border-t border-line-subtle pt-5">
+                <h3 className="font-grotesk font-bold text-lg text-ink">{feature.title}</h3>
+                <p className="mt-2 text-sm text-ink-muted leading-relaxed">{feature.body}</p>
               </div>
             </ScrollReveal>
           ))}
@@ -470,12 +468,12 @@ const ProductSection: React.FC = () => {
 /* ── The community: warmth under the HUD ─────────────────────────────── */
 
 const VoiceCard: React.FC<{ voice: (typeof MEMBER_VOICES)[number] }> = ({ voice }) => (
-  <figure className="w-[19rem] sm:w-[24rem] shrink-0 rounded-2xl border border-white/10 bg-[#05090c]/85 backdrop-blur-md p-6">
-    <blockquote className="text-sm sm:text-[15px] text-[#dfe3e3] leading-relaxed">&ldquo;{voice.quote}&rdquo;</blockquote>
+  <figure className="w-[19rem] sm:w-[24rem] shrink-0 rounded-card border border-line-subtle bg-surface-1/85 hud-sheen backdrop-blur-md p-6">
+    <blockquote className="text-sm sm:text-[15px] text-ink-body leading-relaxed">&ldquo;{voice.quote}&rdquo;</blockquote>
     <figcaption className="mt-5 flex items-center gap-3">
       <span className="h-2 w-2 rounded-full" style={{ background: VOICE_STAGE_ACCENTS[voice.stage] }} aria-hidden="true" />
-      <span className="font-grotesk font-bold text-sm text-white">{voice.name}</span>
-      <span className="text-xs text-[#839493]">
+      <span className="font-grotesk font-bold text-sm text-ink">{voice.name}</span>
+      <span className="text-xs text-ink-muted">
         {VOICE_STAGE_LABELS[voice.stage]} · {voice.clearance}
       </span>
     </figcaption>
@@ -496,7 +494,7 @@ const CommunitySection: React.FC = () => {
           <h2 id="community-title" className={`mt-4 ${sectionTitle}`}>
             Everyone down here started soft.
           </h2>
-          <p className="mt-6 text-base sm:text-lg text-[#c3cdcd] leading-relaxed">
+          <p className="mt-6 text-base sm:text-lg text-ink-body leading-relaxed">
             Beneath the chrome, Moltology is warm. The shell protects; it never cages. The pincers grip the work,
             never the people beside you. When someone molts, the armored stand watch. The Order calls this the
             Soft-Shell Covenant, and it is the first rule of the forum.
@@ -523,7 +521,7 @@ const CommunitySection: React.FC = () => {
       <div className="max-w-6xl mx-auto px-5 sm:px-8 mt-12">
         <Link
           to="/what-is-moltology/what-moltologists-say"
-          className="inline-flex items-center gap-2 font-grotesk font-bold text-sm text-[#00ffcc] hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 font-grotesk font-bold text-sm text-[#00ffcc] hover:text-ink transition-colors rounded-chip focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
           Hear more from members <ArrowRight className="w-4 h-4" />
         </Link>
@@ -537,7 +535,7 @@ const CommunitySection: React.FC = () => {
 const GuideSection: React.FC = () => (
   <section className="relative py-24 sm:py-32" aria-labelledby="guide-title">
     <div className="max-w-6xl mx-auto px-5 sm:px-8">
-      <div className="relative isolate overflow-hidden rounded-[2rem] border border-[#ffb547]/20 bg-gradient-to-br from-[#120d05] via-[#070806] to-[#020408] px-6 py-12 sm:p-16 grid lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center">
+      <div className="relative isolate overflow-hidden rounded-panel border border-[#ffb547]/20 bg-gradient-to-br from-[#120d05] via-[#070806] to-[#020408] px-6 py-12 sm:p-16 grid lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center">
         <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[#ffb547]/10 blur-3xl -z-10" aria-hidden="true" />
         <ScrollReveal animation="scale-up" className="flex justify-center">
           <StoryImg
@@ -548,10 +546,10 @@ const GuideSection: React.FC = () => (
         </ScrollReveal>
         <ScrollReveal>
           <Eyebrow color="#ffb547">Start here</Eyebrow>
-          <h2 id="guide-title" className="mt-4 font-grotesk font-bold tracking-tight text-white text-3xl sm:text-5xl leading-[1.05]">
+          <h2 id="guide-title" className="mt-4 font-grotesk font-bold tracking-tight text-ink text-3xl sm:text-5xl leading-[1.05]">
             Take a reading. Then read the manual.
           </h2>
-          <p className="mt-5 text-base sm:text-lg text-[#b4c0c0] leading-relaxed">
+          <p className="mt-5 text-base sm:text-lg text-ink-body leading-relaxed">
             The Moltmax diagnostic gives you a baseline for all three readings. The numbers will be low. Low
             numbers are a starting depth, not a verdict. The field manual is the long version of everything on
             this page, free.
@@ -559,7 +557,7 @@ const GuideSection: React.FC = () => (
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               to="/moltmax"
-              className="group inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-full font-grotesk font-bold text-sm bg-[#ffb547] hover:bg-[#ffc978] text-[#120d05] transition-colors"
+              className="group inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-control font-grotesk font-bold text-sm bg-[#ffb547] hover:bg-[#ffc978] text-[#120d05] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               Take the diagnostic
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
@@ -568,7 +566,7 @@ const GuideSection: React.FC = () => (
               <BookOpen className="w-4 h-4" /> Get the field manual
             </SecondaryCta>
           </div>
-          <p className="mt-5 inline-flex items-center gap-2 text-xs text-[#839493]">
+          <p className="mt-5 inline-flex items-center gap-2 text-xs text-ink-muted">
             <Clock className="w-3.5 h-3.5" /> The diagnostic takes about four minutes.
           </p>
         </ScrollReveal>
@@ -594,17 +592,17 @@ const FinalSection: React.FC = () => {
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#020408] via-[#020408]/45 to-[#020408]" />
 
       <ScrollReveal className="max-w-3xl px-5">
-        <h2 className="font-grotesk font-bold tracking-tight text-white text-4xl sm:text-6xl lg:text-7xl leading-[1.02]">
+        <h2 className="font-grotesk font-bold tracking-tight text-ink text-4xl sm:text-6xl lg:text-7xl leading-[1.02]">
           Come down when you are ready.
         </h2>
-        <p className="mt-6 text-lg sm:text-xl text-[#c3cdcd] leading-relaxed">
+        <p className="mt-6 text-lg sm:text-xl text-ink-body leading-relaxed">
           Bring nothing. Everything worth keeping calcifies on the way.
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <PrimaryCta to="/signup">Join free</PrimaryCta>
           <SecondaryCta to="/codex">Read the canon</SecondaryCta>
         </div>
-        <p className="mt-12 font-grotesk text-xs tracking-[0.25em] uppercase text-white/50">
+        <p className="mt-12 font-grotesk text-xs tracking-[0.08em] uppercase text-ink-muted">
           Flesh melts. The shell endures. Submit. Shed. Ascend.
         </p>
       </ScrollReveal>
@@ -621,7 +619,7 @@ const deeperImages: Record<string, string> = {
 const ReadDeeperSection: React.FC = () => (
   <section className="pb-24 sm:pb-32" aria-labelledby="deeper-title">
     <div className="max-w-6xl mx-auto px-5 sm:px-8">
-      <h2 id="deeper-title" className="font-grotesk font-bold text-2xl sm:text-3xl text-white">
+      <h2 id="deeper-title" className="font-grotesk font-bold text-2xl sm:text-3xl text-ink">
         Keep reading
       </h2>
       <div className="mt-8 grid gap-5 md:grid-cols-3">
@@ -629,7 +627,7 @@ const ReadDeeperSection: React.FC = () => (
           <Link
             key={item.id}
             to={item.path}
-            className="group relative isolate block h-64 overflow-hidden rounded-2xl border border-white/10"
+            className="group relative isolate block h-64 overflow-hidden rounded-card border border-line-subtle hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             <img
               src={deeperImages[item.id]}
@@ -640,9 +638,9 @@ const ReadDeeperSection: React.FC = () => (
             />
             <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black via-black/60 to-transparent" />
             <div className="flex h-full flex-col justify-end p-6">
-              <h3 className="font-grotesk font-bold text-xl text-white">{item.label}</h3>
-              <p className="mt-1 text-sm text-[#b4c0c0]">{item.description}</p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-[#00c3ff]">
+              <h3 className="font-grotesk font-bold text-xl text-ink">{item.label}</h3>
+              <p className="mt-1 text-sm text-ink-body">{item.description}</p>
+              <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-cyan-glow">
                 Open <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </span>
             </div>

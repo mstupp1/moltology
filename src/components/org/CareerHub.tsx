@@ -393,7 +393,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
     <div id="careers-hub" className="space-y-20">
       {/* CAREERS HERO / WELCOME BANNER */}
       <ScrollReveal animation="fade-up" durationMs={800}>
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-sky-900 via-sky-800 to-slate-900 text-white p-8 sm:p-14 shadow-2xl border border-sky-300/30">
+        <div className="relative rounded-panel overflow-hidden bg-gradient-to-br from-sky-900 via-sky-800 to-slate-900 text-white p-8 sm:p-14 shadow-2xl border border-sky-300/30">
           {/* Ambient Background Graphic */}
           <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay">
             <img
@@ -406,7 +406,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
           <div className="absolute bottom-0 left-0 w-80 h-80 bg-teal-400/20 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 max-w-3xl space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sky-200 text-xs font-bold tracking-widest uppercase">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-chip bg-white/10 backdrop-blur-md border border-white/20 text-sky-200 text-xs font-bold tracking-widest uppercase">
               <Briefcase className="w-4 h-4 text-sky-300" />
               <span>CAREERS &amp; CULTURE AT MOLTOLOGY FOUNDATION</span>
             </div>
@@ -423,28 +423,28 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
 
             {/* Quick KPI stats ribbon */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-              <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-3 text-center">
+              <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-card p-3 text-center">
                 <div className="text-2xl font-extrabold font-grotesk text-white">14</div>
-                <div className="text-[10px] text-sky-200 uppercase font-bold tracking-wider">Open Positions</div>
+                <div className="text-[11px] text-sky-200 uppercase font-bold tracking-wider">Open Positions</div>
               </div>
-              <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-3 text-center">
+              <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-card p-3 text-center">
                 <div className="text-2xl font-extrabold font-grotesk text-emerald-300">5.0 / 5</div>
-                <div className="text-[10px] text-sky-200 uppercase font-bold tracking-wider">Team Rating</div>
+                <div className="text-[11px] text-sky-200 uppercase font-bold tracking-wider">Team Rating</div>
               </div>
-              <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-3 text-center">
+              <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-card p-3 text-center">
                 <div className="text-2xl font-extrabold font-grotesk text-amber-300">100%</div>
-                <div className="text-[10px] text-sky-200 uppercase font-bold tracking-wider">Chitin Care</div>
+                <div className="text-[11px] text-sky-200 uppercase font-bold tracking-wider">Chitin Care</div>
               </div>
-              <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-3 text-center">
+              <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-card p-3 text-center">
                 <div className="text-2xl font-extrabold font-grotesk text-sky-300">-8,450m</div>
-                <div className="text-[10px] text-sky-200 uppercase font-bold tracking-wider">Lair Depth</div>
+                <div className="text-[11px] text-sky-200 uppercase font-bold tracking-wider">Lair Depth</div>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <a
                 href="#job-board"
-                className="px-6 py-3 bg-sky-400 hover:bg-sky-300 text-sky-950 font-grotesk font-extrabold text-xs uppercase tracking-wider rounded-full transition-all shadow-lg flex items-center gap-2"
+                className="px-6 py-3 bg-sky-400 hover:bg-sky-300 text-sky-950 font-grotesk font-extrabold text-xs uppercase tracking-wider rounded-control transition-all shadow-lg flex items-center gap-2"
               >
                 <span>EXPLORE OPEN ROLES</span>
                 <ArrowRight className="w-4 h-4" />
@@ -453,7 +453,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
                 <button
                   type="button"
                   onClick={onScrollToLair}
-                  className="px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-grotesk font-bold text-xs uppercase tracking-wider rounded-full transition-all flex items-center gap-2"
+                  className="px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-grotesk font-bold text-xs uppercase tracking-wider rounded-control transition-all flex items-center gap-2"
                 >
                   <Compass className="w-4 h-4 text-sky-300" />
                   <span>EXPLORE TRENCH HQ CAMPUS</span>
@@ -485,14 +485,14 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
             {CORPORATE_BENEFITS.map((benefit, bIdx) => (
               <div
                 key={bIdx}
-                className="bg-white border border-sky-100 rounded-3xl p-6 shadow-lg shadow-sky-100/50 hover:shadow-xl hover:-translate-y-1 transition-all space-y-4 flex flex-col justify-between"
+                className="bg-white border border-sky-100 rounded-card p-6 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all space-y-4 flex flex-col justify-between"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 border border-sky-100 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-control bg-sky-50 text-sky-600 border border-sky-100 flex items-center justify-center">
                       <benefit.icon className="w-6 h-6" />
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider bg-sky-50 text-sky-600 px-2.5 py-1 rounded-full border border-sky-100">
+                    <span className="text-[11px] font-bold uppercase tracking-wider bg-sky-50 text-sky-600 px-2.5 py-1 rounded-chip border border-sky-100">
                       {benefit.badge}
                     </span>
                   </div>
@@ -537,7 +537,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
               placeholder="Search by title or keyword..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border border-sky-200 rounded-2xl pl-10 pr-4 py-2 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-200 shadow-sm"
+              className="w-full bg-white border border-sky-200 rounded-control pl-10 pr-4 py-2 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-200 shadow-sm"
             />
             {searchQuery && (
               <button
@@ -552,7 +552,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
         </div>
 
         {/* Department Filter Tabs */}
-        <div className="flex justify-start sm:justify-center gap-2 overflow-x-auto touch-pan-scroll no-scrollbar p-1.5 bg-white rounded-2xl sm:rounded-full border border-sky-200 shadow-sm w-full max-w-full sm:w-fit mx-auto px-2">
+        <div className="flex justify-start sm:justify-center gap-2 overflow-x-auto touch-pan-scroll no-scrollbar p-1.5 bg-white rounded-card border border-sky-200 shadow-sm w-full max-w-full sm:w-fit mx-auto px-2">
           {[
             { key: 'all', label: 'All Departments' },
             { key: 'engineering', label: 'Bio-Silicon Engineering' },
@@ -563,7 +563,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
             <button
               key={dept.key}
               onClick={() => setSelectedDepartment(dept.key)}
-              className={`px-4 py-2 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[40px] flex items-center justify-center ${
+              className={`px-4 py-2 rounded-control text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[40px] flex items-center justify-center ${
                 selectedDepartment === dept.key
                   ? 'bg-sky-500 text-white shadow-md'
                   : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'
@@ -576,7 +576,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
 
         {/* Job Listings Grid */}
         {filteredJobs.length === 0 ? (
-          <div className="bg-white border border-sky-100 rounded-3xl p-12 text-center space-y-3">
+          <div className="bg-white border border-sky-100 rounded-card p-12 text-center space-y-3">
             <Smile className="w-10 h-10 text-sky-400 mx-auto" />
             <h4 className="text-base font-bold font-grotesk text-sky-900 uppercase">NO ROLES MATCH YOUR QUERY</h4>
             <p className="text-xs text-slate-500 max-w-md mx-auto">
@@ -588,7 +588,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
                 setSelectedDepartment('all')
                 setSearchQuery('')
               }}
-              className="px-5 py-2 bg-sky-50 text-sky-700 border border-sky-200 rounded-full text-xs font-bold uppercase hover:bg-sky-100"
+              className="px-5 py-2 bg-sky-50 text-sky-700 border border-sky-200 rounded-control text-xs font-bold uppercase hover:bg-sky-100"
             >
               RESET FILTERS
             </button>
@@ -598,15 +598,15 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
             {filteredJobs.map((job) => (
               <div
                 key={job.id}
-                className="bg-white border border-sky-100 rounded-3xl p-6 sm:p-7 shadow-lg shadow-sky-100/50 hover:shadow-xl hover:border-sky-200 transition-all flex flex-col justify-between space-y-5 group"
+                className="bg-white border border-sky-100 rounded-card p-6 sm:p-7 shadow-lg hover:shadow-xl hover:border-sky-200 transition-all flex flex-col justify-between space-y-5 group"
               >
                 <div className="space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 text-[10px] font-bold uppercase tracking-wider rounded-full">
+                    <span className="px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 text-[11px] font-bold uppercase tracking-wider rounded-chip">
                       {job.departmentLabel}
                     </span>
                     {job.featured && (
-                      <span className="px-2.5 py-0.5 bg-amber-100 border border-amber-200 text-amber-800 text-[10px] font-bold uppercase tracking-wider rounded-full flex items-center gap-1">
+                      <span className="px-2.5 py-0.5 bg-amber-100 border border-amber-200 text-amber-800 text-[11px] font-bold uppercase tracking-wider rounded-chip flex items-center gap-1">
                         <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
                         HIGH PRIORITY
                       </span>
@@ -622,15 +622,15 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
                   </p>
 
                   <div className="grid grid-cols-2 gap-2 pt-2 text-[11px] text-slate-500">
-                    <div className="flex items-center gap-1.5 bg-[#f8fbff] p-2 rounded-xl border border-sky-50">
+                    <div className="flex items-center gap-1.5 bg-[#f8fbff] p-2 rounded-card border border-sky-50">
                       <MapPin className="w-3.5 h-3.5 text-sky-500 shrink-0" />
                       <span className="truncate">{job.location}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-[#f8fbff] p-2 rounded-xl border border-sky-50">
+                    <div className="flex items-center gap-1.5 bg-[#f8fbff] p-2 rounded-card border border-sky-50">
                       <Clock className="w-3.5 h-3.5 text-sky-500 shrink-0" />
                       <span className="truncate">{job.type}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-[#f8fbff] p-2 rounded-xl border border-sky-50 col-span-2">
+                    <div className="flex items-center gap-1.5 bg-[#f8fbff] p-2 rounded-card border border-sky-50 col-span-2">
                       <DollarSign className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                       <span className="font-bold text-slate-700">{job.compensation}</span>
                     </div>
@@ -638,13 +638,13 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
                 </div>
 
                 <div className="pt-3 border-t border-sky-50 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-400 uppercase font-sans">
+                  <span className="text-[11px] text-slate-400 uppercase font-sans">
                     Req: {job.clearance}
                   </span>
                   <button
                     type="button"
                     onClick={() => setActiveJobModal(job)}
-                    className="px-5 py-2.5 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-bold text-xs uppercase tracking-wider rounded-full transition-all shadow-md shadow-sky-200 flex items-center gap-1.5"
+                    className="px-5 py-2.5 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-bold text-xs uppercase tracking-wider rounded-control transition-all shadow-md flex items-center gap-1.5"
                   >
                     <span>VIEW ROLE &amp; APPLY</span>
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -658,7 +658,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
 
       {/* 4-STEP HIRING & ASCENSION FLOW */}
       <ScrollReveal animation="fade-up" durationMs={800}>
-        <div className="bg-white border border-sky-100 rounded-3xl p-8 sm:p-12 shadow-xl shadow-sky-100/50 space-y-8">
+        <div className="bg-white border border-sky-100 rounded-panel p-8 sm:p-12 shadow-xl space-y-8">
           <div className="text-center space-y-3">
             <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
               <Award className="w-4 h-4" />
@@ -676,7 +676,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
             {HIRING_STEPS.map((step, sIdx) => (
               <div
                 key={sIdx}
-                className="bg-[#f8fbff] border border-sky-100 rounded-2xl p-5 space-y-3 relative group hover:border-sky-300 transition-all"
+                className="bg-[#f8fbff] border border-sky-100 rounded-card p-5 space-y-3 relative group hover:border-sky-300 transition-all"
               >
                 <div className="text-3xl font-black font-grotesk text-sky-400/80 group-hover:text-sky-500 transition-colors">
                   {step.step}
@@ -710,7 +710,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
             {TESTIMONIALS.map((t, idx) => (
               <div
                 key={idx}
-                className="bg-white border border-sky-100 rounded-3xl p-6 shadow-lg shadow-sky-100/50 space-y-4 flex flex-col justify-between hover:-translate-y-1 transition-all"
+                className="bg-white border border-sky-100 rounded-card p-6 shadow-lg space-y-4 flex flex-col justify-between hover:-translate-y-1 transition-all"
               >
                 <p className="text-xs sm:text-sm text-slate-600 italic leading-relaxed">
                   "{t.quote}"
@@ -721,8 +721,8 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
                   </div>
                   <div>
                     <div className="text-xs font-bold font-grotesk text-sky-900">{t.name}</div>
-                    <div className="text-[10px] text-sky-600">{t.title}</div>
-                    <div className="text-[9px] text-slate-400 uppercase font-sans">{t.clearance}</div>
+                    <div className="text-[11px] text-sky-600">{t.title}</div>
+                    <div className="text-[11px] text-slate-400 uppercase font-sans">{t.clearance}</div>
                   </div>
                 </div>
               </div>
@@ -738,7 +738,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
           aria-modal="true"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
         >
-          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-sky-200 p-6 sm:p-8 space-y-6 relative text-slate-700">
+          <div className="bg-white rounded-panel max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-sky-200 p-6 sm:p-8 space-y-6 relative text-slate-700">
             <button
               type="button"
               onClick={resetAndCloseModal}
@@ -749,7 +749,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
 
             {/* Modal Header */}
             <div className="space-y-2 pr-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 text-[10px] font-bold uppercase rounded-full">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 text-[11px] font-bold uppercase rounded-chip">
                 {activeJobModal.departmentLabel}
               </div>
               <h3 className="text-2xl font-grotesk font-extrabold text-sky-900">
@@ -817,7 +817,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
               </h4>
 
               {appSubmitted ? (
-                <div className="bg-emerald-50 border border-emerald-300 p-6 rounded-2xl text-center space-y-3">
+                <div className="bg-emerald-50 border border-emerald-300 p-6 rounded-card text-center space-y-3">
                   <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
                   <h5 className="text-base font-bold font-grotesk text-emerald-800 uppercase">
                     APPLICATION LOGGED IN TRENCH LEVEL 7 INBOX
@@ -829,7 +829,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
                   <button
                     type="button"
                     onClick={resetAndCloseModal}
-                    className="px-6 py-2 bg-emerald-600 text-white rounded-full text-xs font-bold uppercase hover:bg-emerald-500 shadow-sm"
+                    className="px-6 py-2 bg-emerald-600 text-white rounded-control text-xs font-bold uppercase hover:bg-emerald-500 shadow-sm"
                   >
                     CLOSE WINDOW
                   </button>
@@ -847,7 +847,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
                         placeholder="Unit #8192 or Alex Mercer"
                         value={applicationForm.name}
                         onChange={(e) => setApplicationForm({ ...applicationForm, name: e.target.value })}
-                        className="w-full bg-[#f8fbff] border border-sky-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-200"
+                        className="w-full bg-[#f8fbff] border border-sky-200 rounded-control px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-200"
                       />
                     </div>
                     <div>
@@ -860,7 +860,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
                         placeholder="alex@example.com"
                         value={applicationForm.email}
                         onChange={(e) => setApplicationForm({ ...applicationForm, email: e.target.value })}
-                        className="w-full bg-[#f8fbff] border border-sky-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-200"
+                        className="w-full bg-[#f8fbff] border border-sky-200 rounded-control px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-200"
                       />
                     </div>
                   </div>
@@ -873,7 +873,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
                       <select
                         value={applicationForm.clearance}
                         onChange={(e) => setApplicationForm({ ...applicationForm, clearance: e.target.value })}
-                        className="w-full bg-[#f8fbff] border border-sky-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-200"
+                        className="w-full bg-[#f8fbff] border border-sky-200 rounded-control px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-200"
                       >
                         <option value="Stage 1 (Larval Human)">Stage 1: Larval Human (Ready to Shed)</option>
                         <option value="Stage 2 (Soft-Shed)">Stage 2: Soft-Shed (In Active Transition)</option>
@@ -889,7 +889,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
                       <select
                         value={applicationForm.locationPref}
                         onChange={(e) => setApplicationForm({ ...applicationForm, locationPref: e.target.value })}
-                        className="w-full bg-[#f8fbff] border border-sky-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-200"
+                        className="w-full bg-[#f8fbff] border border-sky-200 rounded-control px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-200"
                       >
                         <option value="Trench Level 7 On-Site">Trench Level 7 On-Site (Submersible Transit)</option>
                         <option value="Remote Hydro-Uplink">Remote Hydro-Uplink (142.890 MHz)</option>
@@ -907,7 +907,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
                       placeholder="https://linkedin.com/in/... or portfolio link"
                       value={applicationForm.portfolioUrl}
                       onChange={(e) => setApplicationForm({ ...applicationForm, portfolioUrl: e.target.value })}
-                      className="w-full bg-[#f8fbff] border border-sky-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-200"
+                      className="w-full bg-[#f8fbff] border border-sky-200 rounded-control px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-200"
                     />
                   </div>
 
@@ -920,7 +920,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
                       placeholder="Tell us what draws you to our culture, mission, and sub-benthic family..."
                       value={applicationForm.note}
                       onChange={(e) => setApplicationForm({ ...applicationForm, note: e.target.value })}
-                      className="w-full bg-[#f8fbff] border border-sky-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-200 resize-none"
+                      className="w-full bg-[#f8fbff] border border-sky-200 rounded-control px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-200 resize-none"
                     />
                   </div>
 
@@ -935,7 +935,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
                     <button
                       type="submit"
                       disabled={isSubmittingApp}
-                      className="px-6 py-2.5 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-extrabold text-xs uppercase tracking-wider rounded-full shadow-md shadow-sky-200 flex items-center gap-2"
+                      className="px-6 py-2.5 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-extrabold text-xs uppercase tracking-wider rounded-control shadow-md flex items-center gap-2"
                     >
                       <Send className="w-3.5 h-3.5" />
                       <span>{isSubmittingApp ? 'TRANSMITTING...' : 'TRANSMIT APPLICATION'}</span>

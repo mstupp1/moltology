@@ -88,15 +88,12 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
   }
 
   return (
-    <div className="rounded-2xl border border-white/15 bg-[#030910] p-6 sm:p-10  text-[#dfe3e3] relative overflow-hidden">
-      {/* Decorative Glow */}
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-[#00c3ff]/10 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="rounded-panel border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-6 sm:p-10 text-ink-body relative overflow-hidden">
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         {/* Left Column: 3D Graphic Mockup */}
         <div className="lg:col-span-5 flex flex-col items-center justify-center text-center space-y-3">
           <div className="relative group max-w-[240px]">
-            <div className="absolute -inset-2 rounded-2xl bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] opacity-30 blur-lg group-hover:opacity-60 transition duration-500" />
+            <div className="absolute -inset-2 rounded-card bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] opacity-0 blur-lg group-hover:opacity-40 transition duration-500" aria-hidden="true" />
             <img
               src={getAssetUrl('images/guide/moltmaxxing-cover-v2.webp')}
               alt="The 2026 Moltmaxxing Protocol Field Manual"
@@ -104,11 +101,11 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
               height={1536}
               loading="lazy"
               decoding="async"
-              className="relative w-full aspect-[2/3] rounded-sm shadow-2xl border border-white/20 object-cover motion-safe:group-hover:-translate-y-1 transition-transform duration-500"
+              className="relative w-full aspect-[2/3] rounded-control shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-line object-cover motion-safe:group-hover:-translate-y-1 transition-transform duration-500"
             />
           </div>
 
-          <div className="inline-flex items-center gap-1.5 text-[11px] font-sans text-[#839493]">
+          <div className="inline-flex items-center gap-1.5 text-[11px] font-sans text-ink-muted">
             <Shield className="w-3.5 h-3.5 text-[#00ffcc]" />
             <span>4-page PDF · Printable · Free</span>
           </div>
@@ -117,32 +114,32 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
         {/* Right Column: Copy, Price Anchor & Form */}
         <div className="lg:col-span-7 space-y-6">
           <div className="space-y-3">
-            <p className="text-xs font-semibold tracking-wider text-[#00c3ff]">Free field manual</p>
+            <p className="text-xs font-semibold tracking-[0.08em] text-cyan-glow">Free field manual</p>
 
-            <h3 className="text-2xl sm:text-3xl font-black font-grotesk text-white tracking-tight leading-tight">
+            <h3 className="text-2xl sm:text-3xl font-black font-grotesk text-ink tracking-tight leading-tight">
               Your next molt starts here. The <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00c3ff] to-[#00ffcc]">MOLTMAXXING</span> Field Manual
             </h3>
 
-            <p className="text-xs sm:text-sm text-[#839493] leading-relaxed">
+            <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
               Shed the clutter, protect your focus, and finish one thing. Keep a practical daily plan beside you.
             </p>
           </div>
 
           {/* Bullet Highlights */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-            <div className="flex items-center gap-2 text-[#dfe3e3]">
+            <div className="flex items-center gap-2 text-ink-body">
               <CheckCircle2 className="w-4 h-4 text-[#00ffcc] shrink-0" />
               <span>A daily routine</span>
             </div>
-            <div className="flex items-center gap-2 text-[#dfe3e3]">
+            <div className="flex items-center gap-2 text-ink-body">
               <CheckCircle2 className="w-4 h-4 text-[#00ffcc] shrink-0" />
               <span>One task to finish</span>
             </div>
-            <div className="flex items-center gap-2 text-[#dfe3e3]">
+            <div className="flex items-center gap-2 text-ink-body">
               <CheckCircle2 className="w-4 h-4 text-[#00ffcc] shrink-0" />
               <span>Room to focus</span>
             </div>
-            <div className="flex items-center gap-2 text-[#dfe3e3]">
+            <div className="flex items-center gap-2 text-ink-body">
               <CheckCircle2 className="w-4 h-4 text-[#00ffcc] shrink-0" />
               <span>A printable checklist</span>
             </div>
@@ -150,19 +147,19 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
 
           {/* Form or Trigger */}
           {isSubmitted ? (
-            <div className="p-4 rounded-xl bg-[#00ffcc]/10 border border-[#00ffcc]/40 space-y-2">
+            <div className="p-4 rounded-card bg-[#00ffcc]/10 border border-[#00ffcc]/40 space-y-2">
               <div className="flex items-center gap-2 text-[#00ffcc] font-bold font-grotesk text-sm uppercase">
                 <CheckCircle2 className="w-5 h-5" />
                 <span>Your manual is downloading</span>
               </div>
-              <p className="text-xs text-[#839493]">
+              <p className="text-xs text-ink-muted">
                 Your download has started. Check your browser downloads folder or click below to re-open.
               </p>
               <a
                 href={getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf?v=20261008-artwork')}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-xs font-bold text-[#00c3ff] hover:underline pt-1"
+                className="inline-flex items-center gap-2 rounded-control text-xs font-bold text-cyan-glow hover:underline pt-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Open the manual</span>
@@ -178,14 +175,14 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter email to claim free copy..."
-                    className="w-full px-4 py-3 bg-[#020408] border border-white/20 rounded-lg text-white font-sans text-sm placeholder:text-[#839493]/50 focus:outline-none focus:border-[#00c3ff] focus:ring-1 focus:ring-[#00c3ff] transition-all"
+                    className="w-full px-4 py-3 bg-surface-2 border border-line rounded-control text-ink font-sans text-sm placeholder:text-ink-muted/70 hover:border-line-hover focus:outline-none focus:border-cyan-glow focus:shadow-field-focus transition-all"
                   />
-                  <Lock className="absolute right-3.5 top-3.5 w-4 h-4 text-[#839493]" />
+                  <Lock className="absolute right-3.5 top-3.5 w-4 h-4 text-ink-muted" />
                 </div>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-6 py-3 rounded-lg font-grotesk font-black text-xs uppercase tracking-wider bg-[#00c3ff] hover:bg-[#00e5ff] text-[#020408] transition-all shadow-[0_0_20px_rgba(0,195,255,0.4)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 whitespace-nowrap"
+                  className="px-6 py-3 rounded-control font-grotesk font-black text-xs uppercase tracking-[0.08em] bg-cyan-glow hover:bg-cyan-hover text-abyss transition-all hover:drop-shadow-[0_0_10px_rgba(0,195,255,0.45)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 whitespace-nowrap"
                 >
                   {loading ? (
                     <span>Preparing download…</span>
@@ -205,9 +202,9 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
                     type="checkbox"
                     checked={emailOptIn}
                     onChange={(e) => setEmailOptIn(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 rounded border-white/20 bg-[#020408] text-[#00c3ff] focus:ring-[#00c3ff] focus:ring-offset-0 cursor-pointer accent-[#00c3ff]"
+                    className="mt-0.5 w-4 h-4 rounded-chip border-line bg-surface-2 text-cyan-glow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow cursor-pointer accent-[#00c3ff]"
                   />
-                  <span className="text-xs text-[#839493] group-hover:text-[#dfe3e3] transition-colors font-sans leading-tight">
+                  <span className="text-xs text-ink-muted group-hover:text-ink-body transition-colors font-sans leading-tight">
                     Send me occasional updates, new field manuals, and articles.
                   </span>
                 </label>
@@ -221,8 +218,8 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
                 onExpire={() => setTurnstileToken(null)}
               />
 
-              {error && <p className="text-xs text-[#ff453a] font-sans">{error}</p>}
-              <p className="text-[10px] text-[#839493] font-sans">
+              {error && <p className="text-xs text-crimson-text font-sans">{error}</p>}
+              <p className="text-[11px] text-ink-muted font-sans">
                 Download starts after you submit. Email updates are optional.
               </p>
             </form>

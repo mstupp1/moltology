@@ -27,10 +27,10 @@ export interface HomeSectionProps {
 }
 
 const sectionTitle =
-  'font-grotesk font-bold tracking-[-0.03em] text-white text-[2.4rem] sm:text-5xl lg:text-6xl leading-[1.04] [text-wrap:balance]'
-const lede = 'text-base sm:text-lg text-[#9fb0b0] leading-relaxed [text-wrap:pretty]'
+  'font-grotesk font-bold tracking-[-0.03em] text-ink text-[2.4rem] sm:text-5xl lg:text-6xl leading-[1.04] [text-wrap:balance]'
+const lede = 'text-base sm:text-lg text-ink-muted leading-relaxed [text-wrap:pretty]'
 const textLink =
-  'group inline-flex items-center gap-2 font-grotesk font-bold text-sm transition-colors hover:text-white'
+  'group inline-flex items-center gap-2 rounded-control font-grotesk font-bold text-sm transition-colors hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 
 /**
  * The moment of the list that is lit, given how far the list has travelled through the viewport.
@@ -89,11 +89,11 @@ export const HomeMelt: React.FC = () => {
             })}
           </ol>
           <ScrollReveal>
-            <p className="mt-10 max-w-lg text-base sm:text-lg text-[#dfe3e3] leading-relaxed [text-wrap:pretty]">
+            <p className="mt-10 max-w-lg text-base sm:text-lg text-ink-body leading-relaxed [text-wrap:pretty]">
               Moltology has a name for this: the Great Melt. It isn’t a character flaw. It is what happens to
               anything soft that lives on the surface.
             </p>
-            <Link to="/what-is-moltology" className={`mt-6 text-[#ff6358] ${textLink}`}>
+            <Link to="/what-is-moltology" className={`mt-6 text-crimson-text ${textLink}`}>
               Read the whole story
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
             </Link>
@@ -113,7 +113,7 @@ const ReadingCard: React.FC<{ reading: HomeReading }> = ({ reading }) => {
       ref={tilt.ref}
       onPointerMove={tilt.onPointerMove}
       onPointerLeave={tilt.onPointerLeave}
-      className="home-tilt group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-[#05090c] shadow-[0_30px_60px_rgba(0,0,0,0.45)] hover:border-white/20"
+      className="home-tilt group relative h-full overflow-hidden rounded-card border border-line-subtle bg-[#05090c] shadow-[0_20px_60px_rgba(0,0,0,0.5)] hover:border-line-hover"
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         <StoryImg
@@ -123,11 +123,11 @@ const ReadingCard: React.FC<{ reading: HomeReading }> = ({ reading }) => {
         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#05090c] to-transparent" />
       </div>
       <div className="p-6 sm:p-7 pt-2 sm:pt-3">
-        <p className="font-grotesk text-[11px] font-bold tracking-[0.22em] uppercase" style={{ color: reading.accent }}>
+        <p className="font-grotesk text-[11px] font-bold tracking-[0.08em] uppercase" style={{ color: reading.accent }}>
           {reading.name}
         </p>
-        <h3 className="mt-2 font-grotesk font-bold text-2xl text-white">{reading.plain}</h3>
-        <p className="mt-2 text-[15px] text-[#b4c0c0] leading-relaxed">{reading.body}</p>
+        <h3 className="mt-2 font-grotesk font-bold text-2xl text-ink">{reading.plain}</h3>
+        <p className="mt-2 text-[15px] text-ink-body leading-relaxed">{reading.body}</p>
       </div>
       <span className="home-tilt-glare" aria-hidden="true" />
     </article>
@@ -163,10 +163,10 @@ export const HomeIdea: React.FC = () => (
 
       <ScrollReveal>
         <div className="mt-10 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
-          <p className="text-sm sm:text-base text-[#9fb0b0]">
+          <p className="text-sm sm:text-base text-ink-muted">
             Your dashboard reads all three from what you actually do, not what you hoped to do.
           </p>
-          <Link to="/what-is-moltology/beliefs" className={`shrink-0 text-[#00c3ff] ${textLink}`}>
+          <Link to="/what-is-moltology/beliefs" className={`shrink-0 text-cyan-glow ${textLink}`}>
             What Moltologists believe
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
           </Link>
@@ -192,27 +192,23 @@ const ScreenFrame: React.FC<{ step: HomeStep; onExpand: () => void; children: Re
       type="button"
       onClick={onExpand}
       aria-label={`Expand screenshot: ${step.title}`}
-      className="home-tilt group relative block w-full text-left cursor-zoom-in rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-4 focus-visible:ring-offset-[#020408]"
+      className="home-tilt group relative block w-full text-left cursor-zoom-in rounded-panel focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
     >
-      <div
-        className="absolute -inset-6 sm:-inset-10 rounded-[2rem] bg-[radial-gradient(ellipse_at_center,rgba(0,195,255,0.18),transparent_70%)] blur-2xl pointer-events-none"
-        aria-hidden="true"
-      />
-      <div className="relative overflow-hidden rounded-xl border border-white/15 bg-[#061014] shadow-[0_30px_80px_rgba(0,0,0,0.6)] transition-colors duration-500 group-hover:border-cyan-300/40">
-        <div className="flex items-center gap-3 px-3 sm:px-4 h-8 sm:h-9 border-b border-white/[0.06] bg-[#0a161b]" aria-hidden="true">
+      <div className="relative overflow-hidden rounded-panel border border-line-subtle bg-surface-1 shadow-[0_20px_60px_rgba(0,0,0,0.5)] transition-colors duration-500 group-hover:border-line-strong">
+        <div className="flex items-center gap-3 px-3 sm:px-4 h-8 sm:h-9 border-b border-line-subtle bg-surface-2" aria-hidden="true">
           <div className="flex gap-1.5">
             <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-white/15" />
             <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-white/15" />
             <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-white/15" />
           </div>
-          <div className="mx-auto max-w-[220px] w-full rounded-md bg-white/[0.05] border border-white/[0.06] px-3 py-0.5 text-[10px] sm:text-[11px] text-white/55 text-center truncate">
+          <div className="mx-auto max-w-[220px] w-full rounded-control bg-surface-1 border border-line-subtle px-3 py-0.5 text-[11px] text-ink-muted text-center truncate">
             {step.url}
           </div>
           <div className="w-[34px] sm:w-[42px]" />
         </div>
         <div className="relative aspect-[16/10] overflow-hidden">
           {children}
-          <span className="absolute bottom-3 right-3 z-10 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-[#03080a]/85 backdrop-blur-sm px-3 py-1.5 text-xs font-medium text-white/90 shadow-lg transition-colors group-hover:border-cyan-300/50 group-hover:text-cyan-100">
+          <span className="absolute bottom-3 right-3 z-10 inline-flex items-center gap-1.5 rounded-control border border-line bg-surface-1/85 backdrop-blur-sm px-3 py-1.5 text-xs font-medium text-ink shadow-menu transition-colors group-hover:border-line-strong group-hover:text-cyan-glow">
             <Maximize2 className="w-3.5 h-3.5" aria-hidden="true" />
             Click to expand
           </span>
@@ -229,7 +225,7 @@ const StepAction: React.FC<{ step: HomeStep; onNavigate: (path: string) => void 
   <button
     type="button"
     onClick={() => onNavigate(step.actionRoute)}
-    className="group/cta mt-5 inline-flex items-center gap-2 font-grotesk font-bold text-sm text-[#00c3ff] hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 rounded"
+    className="group/cta mt-5 inline-flex items-center gap-2 font-grotesk font-bold text-sm text-cyan-glow hover:text-ink transition-colors focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control"
   >
     {step.actionText}
     <ArrowRight className="w-4 h-4 transition-transform group-hover/cta:translate-x-0.5" aria-hidden="true" />
@@ -300,8 +296,8 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
               <li key={step.id}>
                 <ScrollReveal>
                   <p className="font-grotesk text-sm font-bold text-[#00ffcc]">Step {index + 1}</p>
-                  <h3 className="mt-2 font-grotesk font-bold text-2xl sm:text-3xl text-white">{step.title}</h3>
-                  <p className="mt-3 text-base text-[#b4c0c0] leading-relaxed [text-wrap:pretty]">{step.body}</p>
+                  <h3 className="mt-2 font-grotesk font-bold text-2xl sm:text-3xl text-ink">{step.title}</h3>
+                  <p className="mt-3 text-base text-ink-body leading-relaxed [text-wrap:pretty]">{step.body}</p>
                   <div className="mt-6">
                     <ScreenFrame step={step} onExpand={() => setExpanded(index)}>
                       <StoryImg image={step.screenshot} alt={step.screenshotAlt} className={stepScreenshotClass} />
@@ -330,7 +326,7 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
         <div className="w-full max-w-6xl mx-auto px-8 grid grid-cols-[0.8fr_1.2fr] gap-16 items-center">
           <div>
             <HowItWorksIntro />
-            <ol className="mt-10 space-y-1 border-l border-white/10">
+            <ol className="mt-10 space-y-1 border-l border-line-subtle">
               {HOME_STEPS.map((step, index) => {
                 const isActive = index === active
                 return (
@@ -354,7 +350,7 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
                       style={{ gridTemplateRows: isActive ? '1fr' : '0fr', opacity: isActive ? 1 : 0 }}
                     >
                       <div className="overflow-hidden">
-                        <p className="pt-2 text-[15px] text-[#b4c0c0] leading-relaxed max-w-md">{step.body}</p>
+                        <p className="pt-2 text-[15px] text-ink-body leading-relaxed max-w-md">{step.body}</p>
                         <StepAction step={step} onNavigate={onNavigate} />
                       </div>
                     </div>
@@ -404,14 +400,14 @@ export const HomeVoices: React.FC = () => (
       <div className="mt-12 sm:mt-14 grid gap-5 md:grid-cols-3">
         {HOME_VOICES.map((voice, index) => (
           <ScrollReveal key={voice.name} delayMs={index * 110}>
-            <figure className="home-voice-glass flex h-full flex-col justify-between rounded-3xl border border-white/10 p-7 sm:p-8">
-              <blockquote className="font-grotesk text-lg sm:text-xl text-white leading-snug [text-wrap:pretty]">
+            <figure className="home-voice-glass flex h-full flex-col justify-between rounded-card border border-line-subtle p-7 sm:p-8">
+              <blockquote className="font-grotesk text-lg sm:text-xl text-ink leading-snug [text-wrap:pretty]">
                 &ldquo;{voice.quote}&rdquo;
               </blockquote>
               <figcaption className="mt-8 flex items-center gap-3">
                 <span className="h-2 w-2 rounded-full" style={{ background: VOICE_STAGE_ACCENTS[voice.stage] }} aria-hidden="true" />
-                <span className="font-grotesk font-bold text-sm text-white">{voice.name}</span>
-                <span className="text-xs text-[#839493]">
+                <span className="font-grotesk font-bold text-sm text-ink">{voice.name}</span>
+                <span className="text-xs text-ink-muted">
                   {VOICE_STAGE_LABELS[voice.stage]} · {voice.clearance}
                 </span>
               </figcaption>
@@ -451,17 +447,20 @@ export const HomeFaq: React.FC = () => (
           Before you dive in.
         </h2>
       </ScrollReveal>
-      <div className="divide-y divide-white/10 border-y border-white/10">
+      <div className="space-y-3">
         {HOME_FAQ.map((item) => (
-          <details key={item.question} className="group">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 sm:py-6 font-grotesk font-bold text-lg sm:text-xl text-white hover:text-[#00c3ff] transition-colors [&::-webkit-details-marker]:hidden focus:outline-none focus-visible:text-[#00c3ff]">
+          <details
+            key={item.question}
+            className="group rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset px-5 sm:px-6 transition-colors hover:border-line open:border-line"
+          >
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 sm:py-6 font-grotesk font-bold text-lg sm:text-xl text-ink hover:text-cyan-glow transition-colors [&::-webkit-details-marker]:hidden focus:outline-none focus-visible:text-cyan-glow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control">
               {item.question}
               <Plus
-                className="h-5 w-5 shrink-0 text-[#00c3ff] transition-transform duration-300 group-open:rotate-45"
+                className="h-5 w-5 shrink-0 text-cyan-glow transition-transform duration-300 group-open:rotate-45"
                 aria-hidden="true"
               />
             </summary>
-            <p className="pb-6 -mt-1 max-w-2xl text-base text-[#b4c0c0] leading-relaxed [text-wrap:pretty]">{item.answer}</p>
+            <p className="pb-6 -mt-1 max-w-2xl text-base text-ink-body leading-relaxed [text-wrap:pretty]">{item.answer}</p>
           </details>
         ))}
       </div>
@@ -474,7 +473,7 @@ export const HomeFaq: React.FC = () => (
 export const HomeFinalCta: React.FC<HomeSectionProps> = ({ authReady, onNavigate, onOpenAuth }) => (
   <section aria-labelledby="home-final-title" className="relative px-5 sm:px-8 pb-24 sm:pb-32">
     <ScrollReveal animation="scale-up">
-      <div className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-[#00c3ff]/20 bg-gradient-to-br from-[#04161c] via-[#03090d] to-[#020408] grid md:grid-cols-[1.15fr_0.85fr] items-center">
+      <div className="hud-ticks relative isolate mx-auto max-w-6xl overflow-hidden rounded-panel border border-cyan-glow/40 bg-gradient-to-br from-[#04161c] via-[#03090d] to-[#020408] grid md:grid-cols-[1.15fr_0.85fr] items-center">
         {/* Separate desktop and portrait compositions cover the whole invitation. */}
         <div className="absolute inset-0 -z-10" aria-hidden="true">
           <StoryImg image={HOME_FINAL_IMAGE} className="home-final-art h-full w-full object-cover" />
@@ -486,11 +485,11 @@ export const HomeFinalCta: React.FC<HomeSectionProps> = ({ authReady, onNavigate
         <div className="px-6 py-12 sm:p-14 lg:p-16">
           <h2
             id="home-final-title"
-            className="font-grotesk font-bold tracking-[-0.03em] text-white text-4xl sm:text-5xl lg:text-6xl leading-[1.02] [text-wrap:balance]"
+            className="font-grotesk font-bold tracking-[-0.03em] text-ink text-4xl sm:text-5xl lg:text-6xl leading-[1.02] [text-wrap:balance]"
           >
             Start with one small shed.
           </h2>
-          <p className="mt-5 max-w-md text-base sm:text-lg text-[#c3cdcd] leading-relaxed">
+          <p className="mt-5 max-w-md text-base sm:text-lg text-ink-body leading-relaxed">
             Free to join, no card needed. Try the demo first if you’d rather look around.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4">
@@ -502,7 +501,7 @@ export const HomeFinalCta: React.FC<HomeSectionProps> = ({ authReady, onNavigate
               )}
             </Suspense>
           </div>
-          <Link to="/guide" className="mt-7 group inline-flex items-center gap-2 text-sm text-[#9fb0b0] hover:text-white transition-colors">
+          <Link to="/guide" className="mt-7 group inline-flex items-center gap-2 rounded-control text-sm text-ink-muted hover:text-ink transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
             <BookOpen className="w-4 h-4 text-[#ffb547]" aria-hidden="true" />
             Not ready yet? Get the free field manual.
           </Link>

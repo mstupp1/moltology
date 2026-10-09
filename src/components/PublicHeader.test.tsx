@@ -64,12 +64,13 @@ describe('PublicHeader Navigation Component', () => {
     const { rerender } = render(<PublicHeader activePage="home" />)
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
     const homeBtn = within(nav).getByRole('link', { name: /^HOME$/i })
-    expect(homeBtn.className).toContain('text-cyan-300')
+    expect(homeBtn).toHaveClass('text-ink', 'bg-surface-2')
+    expect(within(homeBtn).getByTestId('public-header-current-mark')).toHaveClass('bg-cyan-glow')
 
     mockPathname = '/news'
     rerender(<PublicHeader activePage="news" />)
     const newsBtn = within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('link', { name: /NEWS/i })
-    expect(newsBtn.className).toContain('text-cyan-300')
+    expect(newsBtn).toHaveClass('text-ink', 'bg-surface-2')
 
     mockPathname = '/org'
     rerender(<PublicHeader activePage="org" />)
@@ -97,22 +98,22 @@ describe('PublicHeader Navigation Component', () => {
     render(<PublicHeader />)
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
     const blogBtn = within(nav).getByRole('link', { name: /NEWS/i })
-    expect(blogBtn.className).toContain('text-cyan-300')
+    expect(blogBtn).toHaveClass('text-ink', 'bg-surface-2')
   })
 
   it('highlights ABOUT for the what-is-moltology hub and subroutes', () => {
     mockPathname = '/what-is-moltology'
     const { rerender } = render(<PublicHeader />)
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
-    expect(within(nav).getByRole('link', { name: /^ABOUT$/i }).className).toContain('text-cyan-300')
+    expect(within(nav).getByRole('link', { name: /^ABOUT$/i })).toHaveClass('text-ink', 'bg-surface-2')
 
     mockPathname = '/what-is-moltology/beliefs'
     rerender(<PublicHeader />)
     expect(
       within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('link', {
         name: /^ABOUT$/i,
-      }).className,
-    ).toContain('text-cyan-300')
+      }),
+    ).toHaveClass('text-ink', 'bg-surface-2')
   })
 
   it('triggers authentication modal callback when clicking desktop LOG IN / JOIN PATH', async () => {
@@ -283,11 +284,14 @@ describe('PublicHeader Navigation Component', () => {
     expect(forumLink).not.toHaveAttribute('aria-current')
 
     fireEvent.mouseEnter(forumLink)
-    expect(newsLink.className).toContain('text-cyan-300')
-    expect(forumLink.className).toContain('text-gray-100')
+    expect(newsLink).toHaveClass('text-ink', 'bg-surface-2')
+    expect(within(newsLink).getByTestId('public-header-current-mark')).toBeInTheDocument()
+    expect(forumLink).toHaveClass('text-ink')
+    expect(forumLink).not.toHaveClass('text-ink-muted')
+    expect(within(forumLink).queryByTestId('public-header-current-mark')).not.toBeInTheDocument()
 
     fireEvent.focus(within(nav).getByRole('link', { name: /^MOLTMAX$/i }))
-    expect(newsLink.className).toContain('text-cyan-300')
+    expect(newsLink).toHaveClass('text-ink', 'bg-surface-2')
   })
 
   it('closes the mobile menu with Escape', () => {

@@ -20,6 +20,7 @@ import {
 } from '@/lib/server/api'
 import { AuthModal } from '@/components/AuthModal'
 import { HudGhostCard } from '@/components/ui/HudGhostLoader'
+import { HudButton } from '@/components/ui/HudButton'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
 interface BlogCommentsSectionProps {
@@ -160,21 +161,21 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
   const isOverLimit = charCount > MAX_CHAR_LIMIT
 
   return (
-    <section className="mt-12 sm:mt-16 pt-8 sm:pt-10 border-t border-cyan-900/40">
+    <section className="mt-12 sm:mt-16 pt-8 sm:pt-10 border-t border-line-subtle">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 sm:mb-8">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-cyan-950/80 border border-cyan-500/30 chamfer-corner text-cyan-400 shrink-0">
+          <div className="p-2 bg-surface-1 border border-line-subtle rounded-control text-cyan-glow shrink-0">
             <MessageSquare className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-grotesk font-black text-lg sm:text-xl text-gray-100 uppercase tracking-wide flex items-center gap-2">
+            <h3 className="font-grotesk font-black text-lg sm:text-xl text-ink uppercase tracking-[0.08em] flex items-center gap-2">
               <span>COMMUNICATIONS LOG</span>
-              <span className="text-xs px-2 py-0.5 bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-sans chamfer-corner">
+              <span className="text-xs px-2 py-0.5 bg-surface-2 border border-line text-ink-body font-sans rounded-chip">
                 {comments.length}
               </span>
             </h3>
-            <p className="text-xs text-gray-400 font-sans">
+            <p className="text-xs text-ink-muted font-sans">
               Synaptic telemetry & initiate responses
             </p>
           </div>
@@ -184,26 +185,26 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
       {/* Input Box / Auth Lock */}
       <div className="mb-8 sm:mb-12">
         {session.isPending ? (
-          <div className="chitin-card p-4 sm:p-5 border border-cyan-900/60 chamfer-corner bg-[#080d0f]/90 space-y-3" data-testid="blog-comments-auth-skeleton">
+          <div className="chitin-card p-4 sm:p-5 border border-line-subtle rounded-card bg-surface-1 hud-sheen space-y-3" data-testid="blog-comments-auth-skeleton">
             <HudGhostCard lines={2} />
           </div>
         ) : user ? (
-          <form onSubmit={handleSubmit} className="chitin-card p-4 sm:p-5 border border-cyan-900/60 chamfer-corner space-y-4 shadow-hud-cyan bg-[#080d0f]/90">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-cyan-900/40 pb-3">
+          <form onSubmit={handleSubmit} className="chitin-card p-4 sm:p-5 border border-line-subtle rounded-card bg-surface-1 hud-sheen space-y-4 shadow-sheen-inset">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-subtle pb-3">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-7 h-7 rounded-full bg-cyan-950 border border-cyan-500/40 flex items-center justify-center overflow-hidden shrink-0">
-                  <span className="font-sans text-xs font-bold text-cyan-300 uppercase">
+                <div className="w-7 h-7 rounded-full bg-surface-2 border border-line flex items-center justify-center overflow-hidden shrink-0">
+                  <span className="font-sans text-xs font-bold text-cyan-glow uppercase">
                     {(user.name || user.email || 'I')[0]}
                   </span>
                 </div>
-                <span className="font-sans text-xs text-cyan-300 font-semibold truncate max-w-[140px] sm:max-w-[220px]">
+                <span className="font-sans text-xs text-ink font-semibold truncate max-w-[140px] sm:max-w-[220px]">
                   {user.name || user.email}
                 </span>
-                <span className="text-[9px] sm:text-[10px] px-2 py-0.5 bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 font-sans uppercase chamfer-corner shrink-0">
+                <span className="text-[11px] px-2 py-0.5 bg-cyan-soft border border-line-subtle text-cyan-glow font-sans uppercase tracking-[0.08em] rounded-chip shrink-0">
                   REGISTERED INITIATE
                 </span>
               </div>
-              <span className={`font-sans text-[11px] shrink-0 ${isOverLimit ? 'text-red-400 font-bold' : 'text-gray-500'}`}>
+              <span className={`font-sans text-[11px] shrink-0 ${isOverLimit ? 'text-crimson-text font-bold' : 'text-ink-muted'}`}>
                 {charCount} / {MAX_CHAR_LIMIT}
               </span>
             </div>
@@ -214,27 +215,29 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
                 onChange={(e) => setCommentInput(e.target.value)}
                 placeholder="Log your thoughts or synaptic telemetry..."
                 rows={3}
-                className="w-full bg-[#050809] border border-cyan-900/50 rounded-none p-3 font-sans text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-cyan-500/80 focus:ring-1 focus:ring-cyan-500/40 transition-all resize-y"
+                className="w-full bg-surface-2 border border-line hover:border-line-hover rounded-control p-3 font-sans text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:border-cyan-glow focus:shadow-field-focus transition-all resize-y"
               />
             </div>
 
             {errorMessage && (
-              <div className="flex items-center gap-2 text-xs font-sans text-red-400 bg-red-950/40 border border-red-800/40 p-2.5 chamfer-corner">
+              <div className="flex items-center gap-2 text-xs font-sans text-crimson-text bg-crimson-soft border border-crimson-aggro/40 p-2.5 rounded-control">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span className="break-words">{errorMessage}</span>
               </div>
             )}
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
-              <span className="text-[10px] font-sans text-gray-500 flex items-center gap-1">
-                <Shield className="w-3 h-3 text-cyan-500 shrink-0" />
+              <span className="text-[11px] font-sans text-ink-muted flex items-center gap-1">
+                <Shield className="w-3 h-3 text-cyan-glow shrink-0" />
                 <span>Encrypted Initiate Feed • Standard Guardrails Enforced</span>
               </span>
 
-              <button
+              <HudButton
                 type="submit"
+                variant="primary"
+                size="md"
                 disabled={isSubmitting || isOverLimit || commentInput.trim().length < MIN_CHAR_LIMIT}
-                className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-black font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center justify-center gap-2 transition-all shadow-md active:scale-95"
+                className="w-full sm:w-auto px-5"
               >
                 {isSubmitting ? (
                   <>
@@ -247,7 +250,7 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
                     <span>TRANSMIT COMMENT</span>
                   </>
                 )}
-              </button>
+              </HudButton>
             </div>
 
             <TurnstileWidget
@@ -259,42 +262,46 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
             />
           </form>
         ) : (
-          <div className="chitin-card p-5 sm:p-8 border border-cyan-900/60 chamfer-corner bg-[#080d0f]/90 text-center relative overflow-hidden">
+          <div className="chitin-card p-5 sm:p-8 border border-line-subtle rounded-card bg-surface-1 hud-sheen text-center relative overflow-hidden">
             <div className="absolute top-0 right-0 p-3 opacity-10 pointer-events-none">
-              <Lock className="w-24 h-24 text-cyan-400" />
+              <Lock className="w-24 h-24 text-cyan-glow" />
             </div>
 
             <div className="max-w-md mx-auto relative z-10 space-y-4">
-              <div className="w-10 h-10 bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 rounded-full flex items-center justify-center mx-auto">
+              <div className="w-10 h-10 bg-surface-2 border border-line text-cyan-glow rounded-full flex items-center justify-center mx-auto">
                 <Lock className="w-5 h-5" />
               </div>
 
               <div>
-                <h4 className="font-grotesk font-bold text-sm sm:text-base text-gray-100 uppercase tracking-wide">
+                <h4 className="font-grotesk font-bold text-sm sm:text-base text-ink uppercase tracking-wide">
                   AUTHENTICATION REQUIRED TO JOIN DISCUSSION
                 </h4>
-                <p className="text-xs text-gray-400 font-sans mt-1 leading-relaxed">
+                <p className="text-xs text-ink-muted font-sans mt-1 leading-relaxed">
                   Commentary is restricted to verified initiates of the Benthic Collective. Sign in or initialize your registration to transmit.
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 pt-2 w-full sm:w-auto">
-                <button
+                <HudButton
                   type="button"
+                  variant="secondary"
+                  size="md"
                   onClick={() => handleOpenAuth('login')}
-                  className="w-full sm:w-auto px-4 py-2.5 bg-cyan-950 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-xs uppercase chamfer-corner flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                  className="w-full sm:w-auto px-4"
                 >
                   <UserCheck className="w-3.5 h-3.5" />
                   <span>SIGN IN</span>
-                </button>
-                <button
+                </HudButton>
+                <HudButton
                   type="button"
+                  variant="primary"
+                  size="md"
                   onClick={() => handleOpenAuth('signup')}
-                  className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-black font-grotesk font-bold text-xs uppercase chamfer-corner flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
+                  className="w-full sm:w-auto px-4"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-black" />
+                  <Sparkles className="w-3.5 h-3.5" />
                   <span>REGISTER INITIATE</span>
-                </button>
+                </HudButton>
               </div>
             </div>
           </div>
@@ -309,12 +316,12 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
             <HudGhostCard lines={2} />
           </div>
         ) : comments.length === 0 ? (
-          <div className="p-6 sm:p-8 text-center chitin-card border border-cyan-900/30 chamfer-corner space-y-2">
-            <Terminal className="w-7 h-7 sm:w-8 sm:h-8 text-gray-600 mx-auto mb-2" />
-            <h5 className="font-grotesk font-bold text-xs sm:text-sm text-gray-300 uppercase">
+          <div className="p-6 sm:p-8 text-center chitin-card border border-line-subtle rounded-card bg-surface-1 space-y-2">
+            <Terminal className="w-7 h-7 sm:w-8 sm:h-8 text-ink-muted/60 mx-auto mb-2" />
+            <h5 className="font-grotesk font-bold text-xs sm:text-sm text-ink-body uppercase">
               NO TRANSMISSIONS RECORDED YET
             </h5>
-            <p className="font-sans text-[11px] sm:text-xs text-gray-500">
+            <p className="font-sans text-[11px] sm:text-xs text-ink-muted">
               Be the first initiate to log commentary on this post.
             </p>
           </div>
@@ -322,28 +329,28 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
           comments.map((comment) => (
             <div
               key={comment.id}
-              className="chitin-card p-3.5 sm:p-4 border border-cyan-900/40 chamfer-corner bg-[#080d0f]/60 hover:border-cyan-500/40 transition-all space-y-2"
+              className="chitin-card p-3.5 sm:p-4 border border-line-subtle rounded-card bg-surface-1 hud-sheen hover:border-line-hover transition-all space-y-2"
             >
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-cyan-950 pb-2">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-subtle pb-2">
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-6 h-6 rounded-full bg-cyan-950 border border-cyan-500/30 flex items-center justify-center overflow-hidden shrink-0">
-                    <span className="font-sans text-[10px] font-bold text-cyan-300 uppercase">
+                  <div className="w-6 h-6 rounded-full bg-surface-2 border border-line flex items-center justify-center overflow-hidden shrink-0">
+                    <span className="font-sans text-[11px] font-bold text-cyan-glow uppercase">
                       {(comment.authorName || 'A')[0]}
                     </span>
                   </div>
-                  <span className="font-sans text-xs font-bold text-cyan-200 truncate max-w-[140px] sm:max-w-[200px]">
+                  <span className="font-sans text-xs font-bold text-ink truncate max-w-[140px] sm:max-w-[200px]">
                     {comment.authorName}
                   </span>
-                  <span className="text-[9px] sm:text-[10px] px-2 py-0.5 bg-cyan-950/60 border border-cyan-900 text-cyan-400 font-sans chamfer-corner shrink-0">
+                  <span className="text-[11px] px-2 py-0.5 bg-surface-2 border border-line-subtle text-ink-muted font-sans rounded-chip shrink-0">
                     {formatStageLabel(comment.authorStage)}
                   </span>
                 </div>
-                <span className="font-sans text-[10px] text-gray-500 shrink-0">
+                <span className="font-sans text-[11px] text-ink-muted shrink-0">
                   {formatTimestamp(comment.createdAt)}
                 </span>
               </div>
 
-              <p className="font-sans text-xs sm:text-sm text-gray-300 leading-relaxed whitespace-pre-wrap break-words pl-1">
+              <p className="font-sans text-xs sm:text-sm text-ink-body leading-relaxed whitespace-pre-wrap break-words pl-1">
                 {comment.content}
               </p>
             </div>

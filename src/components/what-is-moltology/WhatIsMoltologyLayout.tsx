@@ -12,7 +12,7 @@ export const WhatIsMoltologyLayout: React.FC = () => {
 
   return (
     <PublicHeaderChromeProvider>
-      <div className="min-h-screen bg-[#020408] text-[#dfe3e3] font-sans selection:bg-[#00c3ff]/30 selection:text-white flex flex-col">
+      <div className="min-h-screen bg-abyss text-ink-body font-sans selection:bg-cyan-glow/30 selection:text-ink flex flex-col">
         <PublicHeader
           activePage="about"
           onOpenAuth={(mode) => {
