@@ -24,6 +24,6 @@ export const Variants = () => (
 
 export const CornerBracketsTextured = () => (
   <Deep>
-    <HudStatBox className="w-64" label="Pincer Torque" value="850 Nm" texture="carbon" showCornerBrackets subtext="Clearance E2 · Hydraulic Grip" />
+    <HudStatBox className="w-64" label="Pincer Torque" value="850 Nm" texture="carbon" subtext="Clearance E2 · Hydraulic Grip" />
   </Deep>
 )

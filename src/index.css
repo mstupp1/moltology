@@ -86,31 +86,6 @@
   clip-path: polygon(0 0, calc(100% - var(--hud-cut, 10px)) 0, 100% var(--hud-cut, 10px), 100% 100%, 0 100%);
 }
 
-/* Cyan corner ticks (top left, bottom right) for featured panels. Needs position: relative. */
-.hud-ticks::before,
-.hud-ticks::after {
-  content: '';
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  pointer-events: none;
-  z-index: 1;
-}
-.hud-ticks::before {
-  top: -1px;
-  left: -1px;
-  border-top: 2px solid #00c3ff;
-  border-left: 2px solid #00c3ff;
-  border-top-left-radius: inherit;
-}
-.hud-ticks::after {
-  bottom: -1px;
-  right: -1px;
-  border-bottom: 2px solid #00c3ff;
-  border-right: 2px solid #00c3ff;
-  border-bottom-right-radius: inherit;
-}
-
 /* Sleek HUD buttons and panels with standard continuous borders (No diagonal cut corners) */
 .chamfer-corner {
   clip-path: none !important;

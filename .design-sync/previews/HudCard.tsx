@@ -47,7 +47,7 @@ export const Variants = () => (
 
 export const CornerBrackets = () => (
   <Deep>
-  <HudCard variant="cyan" showCornerBrackets glow className="w-[320px]">
+  <HudCard variant="cyan" glow className="w-[320px]">
     <HudCardContent>
       <div className="text-[11px] font-bold uppercase tracking-wider text-[#839493]">Shell Hardness</div>
       <div className="mt-1 text-2xl font-bold text-[#00c3ff]">61%</div>

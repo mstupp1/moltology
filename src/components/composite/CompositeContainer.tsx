@@ -25,7 +25,6 @@ export interface CompositeContainerProps extends React.HTMLAttributes<HTMLDivEle
   backgroundOpacity?: number
   vignette?: 'benthic' | 'subsea' | 'dark' | 'none'
   showScanlines?: boolean
-  showCornerBrackets?: boolean
   scale?: number
   className?: string
   children: React.ReactNode
@@ -55,7 +54,6 @@ export const CompositeContainer: React.FC<CompositeContainerProps> = ({
   backgroundOpacity = 0.35,
   vignette = 'benthic',
   showScanlines = false,
-  showCornerBrackets = false,
   scale = 1,
   className = '',
   children,
@@ -155,9 +153,6 @@ export const CompositeContainer: React.FC<CompositeContainerProps> = ({
           }}
         />
       )}
-
-      {/* 4. Corner ticks around the safe area, as on the site's featured panels. */}
-      {showCornerBrackets && <div className="hud-ticks absolute inset-6 z-[4] pointer-events-none rounded-card" />}
 
       {/* 5. Main foreground content canvas */}
       <div className="relative z-10 box-border flex h-full w-full flex-col p-14">{children}</div>

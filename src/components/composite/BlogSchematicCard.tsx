@@ -49,7 +49,7 @@ export const BlogSchematicCard: React.FC<BlogSchematicCardProps> = ({
     const red = tone === 'red'
     const Icon = red ? Activity : Cpu
     return (
-      <CompositePanel tone={red ? 'crimson' : 'cyan'} featured={!red} className="flex flex-col p-8">
+      <CompositePanel tone={red ? 'crimson' : 'cyan'} className="flex flex-col p-8">
         <div className={`flex items-center gap-3 ${red ? 'text-crimson-text' : 'text-cyan-glow'}`}>
           <Icon className="h-6 w-6 shrink-0" />
           <CompositeLabel tone={red ? 'crimson' : 'cyan'}>{title}</CompositeLabel>

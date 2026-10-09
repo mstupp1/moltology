@@ -146,7 +146,7 @@ export const SocialPromptVaultSlide: React.FC<SocialPromptVaultSlideProps> = ({
 
         <div className="col-span-6 flex flex-col gap-5">
           {promptCards.slice(0, 2).map((card, i) => (
-            <CompositePanel key={i} tone={i === 0 ? 'cyan' : 'neutral'} featured={i === 0} className="p-6">
+            <CompositePanel key={i} tone={i === 0 ? 'cyan' : 'neutral'} className="p-6">
               <div className="flex items-center gap-3">
                 {i === 0 ? (
                   <MessageSquare className="h-5 w-5 text-cyan-glow" />
