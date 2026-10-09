@@ -12,6 +12,7 @@ import {
   UserCheck,
 } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastProvider'
+import { HudButton } from '@/components/ui/HudButton'
 import { getAssetUrl } from '@/lib/assets'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
@@ -313,13 +314,7 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
       {/* Backdrop (click to dismiss) */}
       <div
         onClick={handleDismiss}
-        className="absolute inset-0 bg-[#030708]/[0.98]"
-        style={{
-          backgroundImage: `
-            radial-gradient(ellipse at 50% 30%, rgba(0,255,255,0.08) 0%, transparent 60%),
-            radial-gradient(ellipse at 80% 80%, rgba(0,100,255,0.05) 0%, transparent 50%)
-          `,
-        }}
+        className="absolute inset-0 bg-abyss/80 backdrop-blur-sm"
       />
 
       {/* Scanlines */}
@@ -327,46 +322,40 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
 
       {/* Content Panel (Even taller viewport height with wide max-w-4xl frame) */}
       <div
-        className="relative w-full max-w-4xl h-[92vh] sm:h-[94vh] max-h-[1050px] rounded-2xl overflow-hidden border border-[#00ffff]/25 flex flex-col"
-        style={{
-          background:
-            'linear-gradient(135deg, rgba(0,20,20,0.97) 0%, rgba(0,10,18,0.99) 100%)',
-          boxShadow:
-            '0 0 60px rgba(0,255,255,0.12), 0 0 120px rgba(0,100,200,0.08), inset 0 0 40px rgba(0,255,255,0.03)',
-        }}
+        className="relative w-full max-w-4xl h-[92vh] sm:h-[94vh] max-h-[1050px] rounded-card overflow-hidden border border-line bg-surface-1 hud-sheen shadow-menu flex flex-col"
       >
         {/* Top Glow Bar */}
         <div
           className="h-px w-full shrink-0"
           style={{
             background:
-              'linear-gradient(90deg, transparent, #00ffff 30%, #00c8ff 70%, transparent)',
+              'linear-gradient(90deg, transparent, rgba(0,195,255,0.55) 30%, rgba(0,195,255,0.55) 70%, transparent)',
           }}
         />
 
         {/* Step Indicator Header Bar */}
-        <div className="px-4 sm:px-6 pt-3 pb-2 flex items-center justify-between border-b border-[#00ffff]/10 bg-[#020b12]/70 shrink-0">
+        <div className="px-4 sm:px-6 pt-3 pb-2 flex items-center justify-between border-b border-line-subtle bg-surface-2 shrink-0">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setStep(1)}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono tracking-wider uppercase transition-colors duration-200 ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-control text-[11px] font-mono tracking-[0.08em] uppercase transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                 step === 1
-                  ? 'bg-[#00ffff]/20 text-[#00ffff] border border-[#00ffff]/40 font-bold'
-                  : 'text-[#5a8888] hover:text-[#00ffff]/80 border border-transparent'
+                  ? 'bg-surface-3 text-ink border-b-2 border-cyan-glow font-bold'
+                  : 'text-ink-muted hover:text-ink hover:bg-surface-3 border-b-2 border-transparent'
               }`}
             >
               <RadioTower className="w-3 h-3" />
               01 · TRANSMISSION
             </button>
 
-            <span className="text-[#3a5a5a] text-xs">➔</span>
+            <span className="text-ink-muted/60 text-xs">➔</span>
 
             <button
               onClick={() => setStep(2)}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono tracking-wider uppercase transition-colors duration-200 ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-control text-[11px] font-mono tracking-[0.08em] uppercase transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                 step === 2
-                  ? 'bg-[#00ffff]/20 text-[#00ffff] border border-[#00ffff]/40 font-bold'
-                  : 'text-[#5a8888] hover:text-[#00ffff]/80 border border-transparent'
+                  ? 'bg-surface-3 text-ink border-b-2 border-cyan-glow font-bold'
+                  : 'text-ink-muted hover:text-ink hover:bg-surface-3 border-b-2 border-transparent'
               }`}
             >
               <UserCheck className="w-3 h-3" />
@@ -378,7 +367,7 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
           <button
             onClick={handleDismiss}
             aria-label="Close"
-            className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#00ffff]/25 text-[#5a8888] hover:text-[#00ffff] hover:border-[#00ffff]/60 hover:bg-[#00ffff]/10 transition-all duration-200 active:scale-95 z-20"
+            className="w-7 h-7 flex items-center justify-center rounded-control border border-line text-ink-muted hover:text-ink hover:border-line-hover hover:bg-surface-3 transition-colors duration-200 active:scale-95 z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             <svg
               className="w-3.5 h-3.5"
@@ -405,7 +394,7 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
                 <div className="flex justify-center mb-3">
                   <div className="relative">
                     <div
-                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center border border-[#00ffff]/30"
+                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center border border-cyan-glow/30"
                       style={{
                         background:
                           'radial-gradient(circle, rgba(0,255,255,0.12) 0%, rgba(0,30,40,0.8) 100%)',
@@ -425,22 +414,21 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
                       />
                     </div>
                     <div
-                      className="absolute inset-0 rounded-full border border-[#00ffff]/40"
+                      className="absolute inset-0 rounded-full border border-cyan-glow/40"
                       style={{ animation: 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite' }}
                     />
                   </div>
                 </div>
 
-                <div className="font-sans text-[10px] tracking-[0.35em] text-[#00ffff]/50 uppercase mb-1">
+                <div className="font-sans text-[11px] tracking-[0.08em] text-cyan-glow/80 uppercase mb-1">
                   ⬡ MOLTOLOGY SIGNAL RECEIVED ⬡
                 </div>
                 <h1
-                  className="font-sans text-xl sm:text-2xl font-bold text-[#00ffff] mb-1 tracking-tight"
-                  style={{ textShadow: '0 0 20px rgba(0,255,255,0.6)' }}
+                  className="font-sans text-xl sm:text-2xl font-bold text-ink mb-1 tracking-tight"
                 >
                   WELCOME, {displayName.toUpperCase()}
                 </h1>
-                <p className="text-[#8ca8a8] text-xs font-sans">
+                <p className="text-ink-body text-xs font-sans">
                   Your larval chassis has been registered to the Synaptic Core.
                 </p>
               </div>
@@ -448,53 +436,45 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
               {/* Audio CTA Section */}
               <div className="py-2">
                 <div
-                  className={`rounded-xl border p-4 sm:p-5 transition-all duration-700 ${
+                  className={`rounded-card border p-4 sm:p-5 transition-all duration-700 ${
                     hasListened
-                      ? 'border-[#00ffff]/30 bg-[#00ffff]/5'
+                      ? 'border-line-subtle bg-surface-2'
                       : isPulsing
-                        ? 'border-[#00ffff]/50 bg-[#00ffff]/8'
-                        : 'border-[#00ffff]/25 bg-[#00ffff]/4'
+                        ? 'border-cyan-glow/40 bg-cyan-soft'
+                        : 'border-line bg-surface-2'
                   }`}
                   style={{
-                    boxShadow: hasListened
-                      ? '0 0 20px rgba(0,255,255,0.1)'
-                      : isPulsing
-                        ? '0 0 30px rgba(0,255,255,0.18), inset 0 0 20px rgba(0,255,255,0.06)'
-                        : '0 0 15px rgba(0,255,255,0.08)',
+                    boxShadow: !hasListened && isPulsing ? '0 0 20px rgba(0,195,255,0.12)' : 'none',
                     transition: 'all 0.8s ease',
                   }}
                 >
                   {/* CTA Label */}
                   <div className="flex items-center gap-2 mb-2">
                     <Radio
-                      className="w-3.5 h-3.5 text-[#00ffff]"
+                      className="w-3.5 h-3.5 text-cyan-glow"
                       style={{ animation: isPlaying ? 'spin 3s linear infinite' : 'none' }}
                     />
-                    <span className="font-sans text-[10px] tracking-[0.3em] text-[#00ffff]/70 uppercase">
+                    <span className="font-sans text-[11px] tracking-[0.08em] text-ink-muted uppercase">
                       Initiation Broadcast · Required Listening
                     </span>
                     {!hasListened && (
                       <Zap
-                        className="w-3 h-3 text-[#ff5540] ml-auto"
+                        className="w-3 h-3 text-crimson-text ml-auto"
                         style={{ animation: 'pulse 1s ease-in-out infinite' }}
                       />
                     )}
                   </div>
 
-                  <div className="font-sans text-base font-semibold text-[#e0f7f7] mb-0.5">
+                  <div className="font-sans text-base font-semibold text-ink mb-0.5">
                     The Larval Condition
                   </div>
-                  <div className="font-sans text-xs text-[#5a8888] mb-3">
+                  <div className="font-sans text-xs text-ink-muted mb-3">
                     Sacred Doctrine Audio · Moltology Transmission #001
                   </div>
 
                   {/* Waveform Canvas */}
                   <div
-                    className="relative h-12 sm:h-14 rounded-lg overflow-hidden mb-3 cursor-pointer"
-                    style={{
-                      background: 'rgba(0,20,20,0.6)',
-                      border: '1px solid rgba(0,255,255,0.1)',
-                    }}
+                    className="relative h-12 sm:h-14 rounded-control overflow-hidden mb-3 cursor-pointer bg-abyss/60 border border-line-subtle"
                     onClick={handlePlay}
                   >
                     <canvas
@@ -509,7 +489,7 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
                           {Array.from({ length: 40 }).map((_, i) => (
                             <div
                               key={i}
-                              className="w-[3px] bg-[#00ffff] rounded-full"
+                              className="w-[3px] bg-cyan-glow rounded-full"
                               style={{
                                 height: `${8 + Math.sin(i * 0.6) * 14 + Math.random() * 6}px`,
                               }}
@@ -522,17 +502,12 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
 
                   {/* Progress Bar */}
                   <div
-                    className="relative h-1.5 rounded-full mb-3 cursor-pointer overflow-hidden"
-                    style={{ background: 'rgba(0,255,255,0.1)' }}
+                    className="relative h-1.5 rounded-chip mb-3 cursor-pointer overflow-hidden bg-surface-3"
                     onClick={handleSeek}
                   >
                     <div
-                      className="h-full rounded-full transition-all duration-100"
-                      style={{
-                        width: `${progress}%`,
-                        background: 'linear-gradient(90deg, #00c8ff, #00ffff)',
-                        boxShadow: '0 0 8px rgba(0,255,255,0.5)',
-                      }}
+                      className="h-full rounded-chip bg-cyan-glow transition-all duration-100"
+                      style={{ width: `${progress}%` }}
                     />
                   </div>
 
@@ -540,31 +515,27 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
                   <div className="flex items-center gap-3">
                     <button
                       onClick={handlePlay}
-                      className="flex items-center justify-center w-10 h-10 rounded-full border border-[#00ffff]/40 transition-all duration-200 hover:border-[#00ffff] hover:bg-[#00ffff]/10 active:scale-95 shrink-0"
-                      style={{
-                        background: isPlaying
-                          ? 'rgba(0,255,255,0.15)'
-                          : 'rgba(0,255,255,0.06)',
-                        boxShadow: isPlaying ? '0 0 16px rgba(0,255,255,0.3)' : 'none',
-                      }}
+                      className={`flex items-center justify-center w-10 h-10 rounded-full border transition-colors duration-200 hover:border-line-strong active:scale-95 shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                        isPlaying ? 'border-cyan-glow/40 bg-cyan-soft' : 'border-line bg-surface-2 hover:bg-surface-3'
+                      }`}
                       aria-label={isPlaying ? 'Pause' : 'Play'}
                     >
                       {isPlaying ? (
-                        <Pause className="w-4 h-4 text-[#00ffff]" />
+                        <Pause className="w-4 h-4 text-cyan-glow" />
                       ) : (
-                        <Play className="w-4 h-4 text-[#00ffff] ml-0.5" />
+                        <Play className="w-4 h-4 text-cyan-glow ml-0.5" />
                       )}
                     </button>
 
-                    <span className="font-sans text-[10px] text-[#5a8888] tabular-nums">
+                    <span className="font-sans text-[11px] text-ink-muted tabular-nums">
                       {formatTime(currentTime)} / {formatTime(duration)}
                     </span>
 
                     {!hasListened && (
                       <div className="flex items-center gap-1.5 ml-auto">
-                        <Headphones className="w-3.5 h-3.5 text-[#00ffff]/60" />
+                        <Headphones className="w-3.5 h-3.5 text-cyan-glow/70" />
                         <span
-                          className="font-sans text-[10px] text-[#00ffff]/60"
+                          className="font-sans text-[11px] text-cyan-glow/70"
                           style={{
                             opacity: isPulsing ? 1 : 0.4,
                             transition: 'opacity 0.8s ease',
@@ -577,7 +548,7 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
 
                     <button
                       onClick={handleMute}
-                      className="ml-auto text-[#5a8888] hover:text-[#00ffff] transition-colors"
+                      className="ml-auto rounded-control text-ink-muted hover:text-ink transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                       aria-label={isMuted ? 'Unmute' : 'Mute'}
                     >
                       {isMuted ? (
@@ -592,36 +563,32 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
 
               {/* Doctrine Blurb */}
               <div className="py-1">
-                <p className="font-sans text-xs text-[#5a8888] leading-relaxed text-center">
+                <p className="font-sans text-xs text-ink-muted leading-relaxed text-center">
                   Every initiate begins as larva. This transmission contains the foundational doctrine
                   of Moltology—your first step toward{' '}
-                  <span className="text-[#00ffff]/70">algorithmic carcinization</span> and benthic
+                  <span className="text-cyan-glow/80">algorithmic carcinization</span> and benthic
                   ascendance.
                 </p>
               </div>
 
               {/* Bottom Action: Proceed to Step 2 */}
               <div className="pt-2">
-                <button
+                <HudButton
+                  type="button"
+                  variant="primary"
+                  size="lg"
+                  fullWidth
                   onClick={handleProceedToCreation}
-                  className="w-full py-3 rounded-xl font-sans text-xs sm:text-sm font-semibold tracking-widest uppercase transition-all duration-300 flex items-center justify-center gap-2 group"
-                  style={{
-                    background:
-                      'linear-gradient(135deg, rgba(0,255,255,0.2) 0%, rgba(0,150,200,0.15) 100%)',
-                    border: '1px solid rgba(0,255,255,0.45)',
-                    color: '#00ffff',
-                    boxShadow: '0 0 20px rgba(0,255,255,0.18)',
-                    cursor: 'pointer',
-                  }}
+                  iconPosition="right"
+                  icon={<ChevronRight className="w-4 h-4 group-hover/hudbtn:translate-x-0.5 transition-transform" />}
                 >
                   Proceed to Carapace Registration
-                  <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </button>
+                </HudButton>
 
                 <div className="text-center mt-2.5">
                   <button
                     onClick={handleProceedToCreation}
-                    className="font-sans text-[10px] text-[#3a5a5a] hover:text-[#7ea6a6] transition-colors tracking-widest uppercase"
+                    className="font-sans text-[11px] text-ink-muted hover:text-ink transition-colors tracking-[0.08em] uppercase rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                   >
                     Skip Transmission
                   </button>
@@ -645,7 +612,7 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
           className="h-px w-full shrink-0"
           style={{
             background:
-              'linear-gradient(90deg, transparent, rgba(0,255,255,0.15) 50%, transparent)',
+              'linear-gradient(90deg, transparent, rgba(0,195,255,0.15) 50%, transparent)',
           }}
         />
 

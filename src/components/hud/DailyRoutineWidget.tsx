@@ -193,14 +193,14 @@ function buildHeatmapGrid(
 }
 
 function heatmapColor(count: number, isFuture: boolean, isToday: boolean): string {
-  if (isFuture) return 'bg-[#0d1414] border-[#1a2626]'
-  if (count === 0) return 'bg-[#0d1414] border-[#1e2e2e]'
-  if (count <= 2) return 'bg-[#00c3ff]/20 border-[#00c3ff]/25'
-  if (count <= 4) return 'bg-[#00c3ff]/55 border-[#00c3ff]/45'
+  if (isFuture) return 'bg-surface-1 border-line-subtle'
+  if (count === 0) return 'bg-surface-3 border-line-subtle'
+  if (count <= 2) return 'bg-cyan-glow/20 border-cyan-glow/25'
+  if (count <= 4) return 'bg-cyan-glow/55 border-cyan-glow/45'
   if (count <= 6) return 'bg-emerald-600/80 border-emerald-500/70'
   // 7–8: full or near-full — bright green at the peak
   return isToday
-    ? 'bg-gradient-to-br from-emerald-400 to-[#00ff88] border-emerald-300 shadow-[0_0_8px_#00ff88]'
+    ? 'bg-gradient-to-br from-emerald-400 to-emerald-300 border-emerald-200'
     : 'bg-emerald-400 border-emerald-300/80'
 }
 
@@ -251,16 +251,16 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
   const VISIBLE_DOW = new Set([0, 2, 4, 6]) // Sun, Tue, Thu, Sat
 
   return (
-    <div className="bg-[#070b0b] border border-[#3a4a49] p-3 sm:p-4 chamfer-corner space-y-3 text-xs min-w-0 overflow-hidden">
+    <div className="rounded-card border border-line-subtle bg-abyss/60 p-3 sm:p-4 space-y-3 text-xs min-w-0 overflow-hidden">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-1 border-b border-[#3a4a49]/60 pb-2">
+      <div className="flex flex-wrap items-center justify-between gap-1 border-b border-line-subtle pb-2">
         <div className="flex items-center gap-2 min-w-0">
-          <BarChart3 className="w-4 h-4 text-[#00c3ff] shrink-0" />
-          <span className="text-xs font-bold font-grotesk text-[#dfe3e3] uppercase tracking-wider truncate">
+          <BarChart3 className="w-4 h-4 text-cyan-glow shrink-0" />
+          <span className="text-xs font-bold font-grotesk text-ink uppercase tracking-[0.08em] truncate">
             Activity
           </span>
         </div>
-        <span className="text-[10px] text-[#839493] shrink-0" data-testid="alignment-heatmap-weeks">
+        <span className="text-[11px] text-ink-muted shrink-0" data-testid="alignment-heatmap-weeks">
           {layout.weeks}-wk
         </span>
       </div>
@@ -287,7 +287,7 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
               {monthLabels.map(({ label, colIndex }) => (
                 <span
                   key={`${label}-${colIndex}`}
-                  className="absolute text-[10px] text-[#839493] font-sans"
+                  className="absolute text-[11px] text-ink-muted font-sans"
                   style={{ left: colIndex * colW }}
                 >
                   {label}
@@ -306,7 +306,7 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
               {DOW_LABELS.map((label, i) => (
                 <div key={`${label}-${i}`} style={{ height: layout.cell }} className="flex items-center">
                   <span
-                    className={`text-[9px] text-[#839493] leading-none ${VISIBLE_DOW.has(i) ? '' : 'invisible'}`}
+                    className={`text-[11px] text-ink-muted leading-none ${VISIBLE_DOW.has(i) ? '' : 'invisible'}`}
                   >
                     {label}
                   </span>
@@ -329,7 +329,7 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
                           ? 'no tasks done'
                           : `${cell.count} of ${totalTasks} tasks done`
                       }`}
-                      className={`border rounded-[2px] cursor-pointer transition-opacity hover:opacity-70 touch-manipulation p-0 ${heatmapColor(cell.count, cell.isFuture, cell.isToday)}`}
+                      className={`border rounded-chip cursor-pointer transition-opacity hover:opacity-70 touch-manipulation p-0 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-1 focus-visible:outline-cyan-glow ${heatmapColor(cell.count, cell.isFuture, cell.isToday)}`}
                       style={{ width: layout.cell, height: layout.cell }}
                       onMouseEnter={(e) => showCellTooltip(cell, e.currentTarget)}
                       onFocus={(e) => showCellTooltip(cell, e.currentTarget)}
@@ -344,13 +344,13 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
           {/* Tooltip — positioned inside the scrolling container so it tracks correctly */}
           {tooltip && (
             <div
-              className="absolute z-30 pointer-events-none bg-[#0b1010] border border-[#00c3ff] px-2 py-1 text-[10px] whitespace-nowrap text-[#dfe3e3] shadow-lg chamfer-corner"
+              className="absolute z-30 pointer-events-none rounded-control bg-surface-2 border border-line px-2 py-1 text-[11px] whitespace-nowrap text-ink shadow-menu"
               style={{
                 left: tooltip.x,
                 top: Math.max(0, tooltip.y - 36),
               }}
             >
-              <span className="text-[#00c3ff] font-bold">{tooltip.cell.date}</span>
+              <span className="text-cyan-glow font-bold">{tooltip.cell.date}</span>
               {' — '}
               {tooltip.cell.isFuture
                 ? 'future'
@@ -363,16 +363,16 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-[#3a4a49]/40">
-        <span className="text-[10px] text-[#839493]">Less</span>
+      <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-line-subtle">
+        <span className="text-[11px] text-ink-muted">Less</span>
         {[0, 2, 4, 6, 8].map((lvl) => (
           <div
             key={lvl}
-            className={`border rounded-[2px] ${heatmapColor(lvl, false, false)}`}
+            className={`border rounded-chip ${heatmapColor(lvl, false, false)}`}
             style={{ width: layout.cell, height: layout.cell }}
           />
         ))}
-        <span className="text-[10px] text-[#839493]">More</span>
+        <span className="text-[11px] text-ink-muted">More</span>
       </div>
     </div>
   )
@@ -414,27 +414,27 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
       <HudCard
         id={DAILY_ALIGNMENT_HUB_ID}
         variant="teal"
-        className="p-3 sm:p-4 md:p-6 relative space-y-4 sm:space-y-5 font-sans shadow-2xl border-[#00c3ff]/40 min-w-0 overflow-hidden"
+        className="p-3 sm:p-4 md:p-6 relative space-y-4 sm:space-y-5 font-sans min-w-0 overflow-hidden"
       >
         {/* Main Header Banner */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-[#3a4a49]/80 pb-3 sm:pb-4 gap-3 sm:gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-line-subtle pb-3 sm:pb-4 gap-3 sm:gap-4">
           <button
             type="button"
             onClick={openAlignmentPanel}
             aria-label="Open daily alignment liturgies"
             data-testid="daily-alignment-card-open"
-            className="space-y-1 min-w-0 text-left group cursor-pointer bg-transparent border-0 p-0 touch-manipulation"
+            className="space-y-1 min-w-0 text-left group cursor-pointer bg-transparent border-0 p-0 touch-manipulation rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             <div className="flex flex-wrap items-center gap-2">
-              <Calendar className="w-5 h-5 text-[#00c3ff] shrink-0" />
-              <h2 className="font-grotesk text-sm sm:text-base md:text-lg font-bold tracking-wider text-[#dfe3e3] group-hover:text-[#00c3ff] transition-colors uppercase leading-tight">
+              <Calendar className="w-5 h-5 text-cyan-glow shrink-0" />
+              <h2 className="font-grotesk text-sm sm:text-base md:text-lg font-bold tracking-wider text-ink group-hover:text-cyan-glow transition-colors uppercase leading-tight">
                 DAILY ALIGNMENT ROUTINE
               </h2>
-              <HudBadge variant="cyan" className="text-[10px] shrink-0">
+              <HudBadge variant="cyan" className="text-[11px] shrink-0">
                 MANDATORY LITURGY
               </HudBadge>
             </div>
-            <p className="text-xs text-[#839493] leading-relaxed">
+            <p className="text-xs text-ink-body leading-relaxed">
               Complete your 8 scheduled alignment items daily to maintain carapace density and preserve your active streak.
             </p>
           </button>
@@ -442,7 +442,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
           {/* Stats Summary Badges */}
           <div className="flex flex-wrap items-center gap-2 text-xs shrink-0">
             <HudBadge variant="crimson" dot pulse className="px-2.5 sm:px-3 py-1.5 font-bold">
-              <Flame className="w-4 h-4 text-[#ff453a] fill-[#ff453a] inline mr-1.5" />
+              <Flame className="w-4 h-4 text-crimson-text fill-crimson-aggro inline mr-1.5" />
               {streakDays} DAY STREAK
             </HudBadge>
             <HudBadge variant={completedCount === totalCount ? 'emerald' : 'cyan'} className="px-2.5 sm:px-3 py-1.5 font-bold">
@@ -456,21 +456,21 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 min-w-0">
           {/* Left Column (7 cols): Clean Vertical List of 8 Tasks */}
           <div className="lg:col-span-7 space-y-3 min-w-0">
-            <div className="flex flex-wrap items-center justify-between border-b border-[#3a4a49]/60 pb-2 gap-2">
-              <span className="font-grotesk text-xs font-bold text-[#dfe3e3] uppercase tracking-wider flex items-center gap-2 min-w-0">
-                <TrendingUp className="w-4 h-4 text-[#00c3ff] shrink-0" />
+            <div className="flex flex-wrap items-center justify-between border-b border-line-subtle pb-2 gap-2">
+              <span className="font-grotesk text-xs font-bold text-ink uppercase tracking-[0.08em] flex items-center gap-2 min-w-0">
+                <TrendingUp className="w-4 h-4 text-cyan-glow shrink-0" />
                 SCHEDULE ({completedCount}/{totalCount})
               </span>
 
               <button
                 type="button"
                 onClick={toggleReminders}
-                className="flex items-center gap-1 text-[10px] font-bold min-h-[44px] px-2.5 py-1 border border-[#3a4a49] hover:border-[#00c3ff] bg-[#030606] text-[#00c3ff] transition-colors touch-manipulation shrink-0"
+                className="flex items-center gap-1 text-[11px] font-bold min-h-[44px] px-2.5 py-1 rounded-control border border-line bg-surface-1 hud-sheen hover:bg-surface-2 hover:border-line-strong text-cyan-glow transition-colors touch-manipulation shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 title="Toggle automated 10-minute prior toast reminders"
                 aria-label={remindersEnabled ? 'Turn reminders off' : 'Turn reminders on'}
                 aria-pressed={remindersEnabled}
               >
-                {remindersEnabled ? <Bell className="w-3 h-3 text-[#00c3ff]" /> : <BellOff className="w-3 h-3 text-[#ff453a]" />}
+                {remindersEnabled ? <Bell className="w-3 h-3 text-cyan-glow" /> : <BellOff className="w-3 h-3 text-crimson-text" />}
                 <span>{remindersEnabled ? 'ON' : 'OFF'}</span>
               </button>
             </div>
@@ -482,22 +482,22 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                   type="button"
                   onClick={() => toggleTask(task.key || task.id)}
                   aria-pressed={task.completed}
-                  className={`w-full min-h-[44px] px-2.5 py-2.5 sm:p-3 border transition-all cursor-pointer flex items-center gap-2.5 sm:gap-3 chamfer-corner group text-left touch-manipulation ${
+                  className={`w-full min-h-[44px] px-2.5 py-2.5 sm:p-3 border transition-all cursor-pointer flex items-center gap-2.5 sm:gap-3 rounded-control group text-left touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                     task.completed
-                      ? 'bg-[#0b1010] border-[#00c3ff]/50 text-[#839493]'
-                      : 'bg-[#0f1414] border-[#3a4a49] text-[#dfe3e3] hover:border-[#00c3ff] hover:bg-[#121919]'
+                      ? 'bg-abyss/60 border-line-subtle text-ink-muted hover:border-line'
+                      : 'bg-surface-1 hud-sheen border-line text-ink hover:border-line-strong hover:bg-surface-2'
                   }`}
                 >
                   {task.completed ? (
-                    <CheckSquare className="w-5 h-5 text-[#00c3ff] shrink-0" />
+                    <CheckSquare className="w-5 h-5 text-emerald-400 shrink-0" />
                   ) : (
-                    <Square className="w-5 h-5 text-[#839493] shrink-0 group-hover:text-[#00c3ff]" />
+                    <Square className="w-5 h-5 text-ink-muted shrink-0 group-hover:text-cyan-glow" />
                   )}
                   <div className="min-w-0 flex-1 space-y-0.5">
-                    <span className="text-[10px] font-bold text-[#00c3ff] bg-[#030606] px-1.5 py-0.5 border border-[#3a4a49] inline-block">
+                    <span className="text-[11px] font-bold text-cyan-glow bg-cyan-soft px-1.5 py-0.5 border border-line-subtle rounded-chip inline-block">
                       {task.time}
                     </span>
-                    <span className={`text-xs font-bold block whitespace-normal ${task.completed ? 'line-through opacity-75 text-[#839493]' : 'text-[#dfe3e3]'}`}>
+                    <span className={`text-xs font-bold block whitespace-normal ${task.completed ? 'line-through opacity-75 text-ink-muted' : 'text-ink'}`}>
                       {task.title}
                     </span>
                   </div>
@@ -509,20 +509,20 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
           {/* Right Column (5 cols): Streak Calendar, Heatmap & Alignment Stats */}
           <div className="lg:col-span-5 space-y-4 min-w-0">
             {/* 14-Day Streak Calendar Grid */}
-            <div className="bg-[#070b0b] border border-[#3a4a49] p-3 sm:p-4 chamfer-corner space-y-3 min-w-0">
-              <div className="flex flex-wrap items-center justify-between gap-1 border-b border-[#3a4a49]/60 pb-2">
+            <div className="rounded-card border border-line-subtle bg-abyss/60 p-3 sm:p-4 space-y-3 min-w-0">
+              <div className="flex flex-wrap items-center justify-between gap-1 border-b border-line-subtle pb-2">
                 <div className="flex items-center gap-2 min-w-0">
-                  <BarChart3 className="w-4 h-4 text-[#00c3ff] shrink-0" />
-                  <span className="text-xs font-bold font-grotesk text-[#dfe3e3] uppercase tracking-wider">
+                  <BarChart3 className="w-4 h-4 text-cyan-glow shrink-0" />
+                  <span className="text-xs font-bold font-grotesk text-ink uppercase tracking-[0.08em]">
                     STREAK MATRIX
                   </span>
                 </div>
-                <span className="text-[10px] text-[#00c3ff] font-bold shrink-0">14-DAY RECORD</span>
+                <span className="text-[11px] text-cyan-glow font-bold shrink-0">14-DAY RECORD</span>
               </div>
 
               {/* Streak Bar Graph */}
               <div className="space-y-2 pt-1">
-                <div className="grid grid-cols-7 gap-1 sm:gap-1.5 items-end h-24 pt-4 px-0.5 sm:px-1 border-b border-[#3a4a49]/40 pb-2">
+                <div className="grid grid-cols-7 gap-1 sm:gap-1.5 items-end h-24 pt-4 px-0.5 sm:px-1 border-b border-line-subtle pb-2">
                   {streakHistory.slice(-7).map((item, idx) => {
                     const heightPct = Math.max(item.pct, 15)
                     const isFull = item.pct === 100
@@ -536,24 +536,24 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                         onFocus={() => setHoveredDay(item)}
                         onBlur={() => setHoveredDay(null)}
                         onClick={() => setHoveredDay((prev) => (prev?.day === item.day ? null : item))}
-                        className="flex flex-col items-center gap-1.5 h-full justify-end cursor-pointer group relative min-w-0 touch-manipulation bg-transparent p-0 border-0"
+                        className="flex flex-col items-center gap-1.5 h-full justify-end cursor-pointer group relative min-w-0 touch-manipulation bg-transparent p-0 border-0 rounded-chip focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                         aria-label={`${item.dayName}: ${item.completed} of ${item.total} tasks`}
                       >
                         {/* Tooltip */}
                         {hoveredDay?.day === item.day && (
-                          <div className="absolute -top-9 left-1/2 -translate-x-1/2 z-30 bg-[#0b1010] border border-[#00c3ff] px-2 py-0.5 text-[9px] whitespace-nowrap text-[#dfe3e3] shadow-lg chamfer-corner">
-                            <span className="text-[#00c3ff] font-bold">{item.day}:</span> {item.completed}/{item.total}
+                          <div className="absolute -top-9 left-1/2 -translate-x-1/2 z-30 rounded-control bg-surface-2 border border-line px-2 py-0.5 text-[11px] whitespace-nowrap text-ink shadow-menu">
+                            <span className="text-cyan-glow font-bold">{item.day}:</span> {item.completed}/{item.total}
                           </div>
                         )}
 
                         {/* Bar */}
-                        <div className="w-full bg-[#0d1414] border border-[#3a4a49] relative overflow-hidden group-hover:border-[#00c3ff] transition-all rounded-none h-full flex items-end">
+                        <div className="w-full bg-surface-3 border border-line-subtle relative overflow-hidden group-hover:border-line-strong transition-all rounded-chip h-full flex items-end">
                           <div
                             className={`w-full transition-all duration-500 relative ${
                               item.isToday
-                                ? 'bg-gradient-to-t from-[#00c3ff] to-emerald-400 shadow-[0_0_8px_#00c3ff]'
+                                ? 'bg-gradient-to-t from-cyan-glow to-emerald-400'
                                 : isFull
-                                ? 'bg-[#00c3ff]'
+                                ? 'bg-cyan-glow'
                                 : 'bg-emerald-500/80'
                             }`}
                             style={{ height: `${heightPct}%` }}
@@ -561,7 +561,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                         </div>
 
                         {/* Day Name — short labels so the 7-col grid stays even */}
-                        <span className={`text-[8px] sm:text-[9px] font-sans leading-none ${item.isToday ? 'text-[#00c3ff] font-bold' : 'text-[#839493]'}`}>
+                        <span className={`text-[11px] font-sans leading-none ${item.isToday ? 'text-cyan-glow font-bold' : 'text-ink-muted'}`}>
                           {item.isToday ? 'TD' : item.dayName.slice(0, 2)}
                         </span>
                       </button>
@@ -571,17 +571,17 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
 
                 {/* Progress Readout */}
                 <div className="space-y-1 pt-1">
-                  <div className="flex flex-wrap justify-between gap-x-2 gap-y-0.5 text-[10px] text-[#839493]">
+                  <div className="flex flex-wrap justify-between gap-x-2 gap-y-0.5 text-[11px] text-ink-muted">
                     <span>TODAY'S ALIGNMENT ({completionPercent}%)</span>
-                    <span className="text-[#00c3ff] font-bold">{completedCount} / {totalCount} TASKS</span>
+                    <span className="text-cyan-glow font-bold">{completedCount} / {totalCount} TASKS</span>
                   </div>
-                  <div className="w-full h-2.5 bg-[#030606] border border-[#3a4a49] overflow-hidden relative">
+                  <div className="w-full h-2.5 bg-surface-3 rounded-chip overflow-hidden relative">
                     <div
-                      className="h-full bg-gradient-to-r from-[#00c3ff] via-emerald-400 to-[#00ff88] transition-all duration-500 relative"
+                      className={`h-full transition-all duration-500 relative ${
+                        completionPercent >= 100 ? 'bg-emerald-500' : 'bg-cyan-glow'
+                      }`}
                       style={{ width: `${completionPercent}%` }}
-                    >
-                      <div className="absolute top-0 right-0 bottom-0 w-1.5 bg-white shadow-[0_0_6px_#fff]" />
-                    </div>
+                    />
                   </div>
                 </div>
               </div>

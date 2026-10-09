@@ -115,9 +115,9 @@ export function toForumHubPulse(boards: ForumHubBoardView[]): ForumHubPulse {
 
 function PulseChip({ label, count }: { label: string; count: number }) {
   return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border border-[#3a4a49] text-[#839493] chamfer-corner bg-[#070b0b]/60">
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em] border border-line-subtle text-ink-muted rounded-chip bg-surface-1">
       {label}
-      <span className="tabular-nums text-[#00ffff]">{count}</span>
+      <span className="tabular-nums text-cyan-glow">{count}</span>
     </span>
   )
 }
@@ -127,16 +127,16 @@ function ForumHubListGhost() {
     <div className="space-y-2.5" aria-hidden="true">
       <div className="flex gap-2">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="h-7 flex-1 border border-[#3a4a49]/50 bg-[#070b0b]/40 chamfer-corner" />
+          <div key={i} className="h-7 flex-1 border border-line-subtle bg-surface-1 rounded-chip" />
         ))}
       </div>
       <div className="flex gap-1.5">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-7 w-24 shrink-0 border border-[#3a4a49]/50 bg-[#070b0b]/40 chamfer-corner" />
+          <div key={i} className="h-7 w-24 shrink-0 border border-line-subtle bg-surface-1 rounded-control" />
         ))}
       </div>
       {Array.from({ length: HUB_THREAD_LIMIT }).map((_, i) => (
-        <div key={i} className="chitin-card-inset h-20 border border-[#3a4a49]/50 bg-[#070b0b]/40 chamfer-corner" />
+        <div key={i} className="h-20 border border-line-subtle bg-surface-1 rounded-card" />
       ))}
     </div>
   )
@@ -189,17 +189,17 @@ export function ForumHubCard() {
 
   return (
     <div
-      className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3.5 sm:space-y-4 h-full flex flex-col justify-between"
+      className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5 space-y-3.5 sm:space-y-4 h-full flex flex-col justify-between"
       data-testid="forum-hub-card"
     >
       <div className="space-y-3">
-        <div className="flex items-start justify-between gap-3 border-b border-[#3a4a49] pb-3">
+        <div className="flex items-start justify-between gap-3 border-b border-line-subtle pb-3">
           <div>
-            <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-[#00ffff]" />
+            <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
+              <MessageSquare className="w-4 h-4 text-cyan-glow" />
               {FORUM_HUB_TITLE}
             </h2>
-            <p className="text-xs text-[#839493] mt-0.5">{FORUM_HUB_SUBTITLE}</p>
+            <p className="text-xs text-ink-muted mt-0.5">{FORUM_HUB_SUBTITLE}</p>
           </div>
           {pulse.unreadCount > 0 && (
             <ForumUnreadMark label={formatForumUnreadCount(pulse.unreadCount)} />
@@ -226,17 +226,17 @@ export function ForumHubCard() {
                     key={board.id}
                     to="/forum/$categorySlug"
                     params={{ categorySlug: board.slug }}
-                    className="inline-flex items-center gap-1.5 px-2 py-1 text-[9px] font-bold uppercase tracking-wider chamfer-corner border shrink-0 bg-[#070b0b]/70 hover:bg-[#00ffff]/10 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] rounded-control border shrink-0 bg-surface-1 hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     style={{
                       borderColor: `${board.color}80`,
                       color: board.color,
                     }}
                   >
                     <span className="truncate max-w-[9.5rem]">{board.name}</span>
-                    <span className="tabular-nums text-[#dfe3e3]">{board.topicCount}</span>
+                    <span className="tabular-nums text-ink">{board.topicCount}</span>
                     {board.unreadCount > 0 && (
                       <span
-                        className="w-1.5 h-1.5 rounded-full bg-[#00ffff] shadow-[0_0_6px_rgba(0,255,255,0.7)]"
+                        className="w-1.5 h-1.5 rounded-full bg-cyan-glow"
                         aria-label={formatForumUnreadCount(board.unreadCount)}
                       />
                     )}
@@ -247,10 +247,10 @@ export function ForumHubCard() {
 
             {threads.length === 0 ? (
               <div className="p-6 text-center space-y-1.5">
-                <p className="font-grotesk text-xs font-bold text-[#dfe3e3] tracking-wide uppercase">
+                <p className="font-grotesk text-xs font-bold text-ink tracking-[0.08em] uppercase">
                   {FORUM_HUB_EMPTY_COPY.title}
                 </p>
-                <p className="text-xs text-[#839493] leading-relaxed">{FORUM_HUB_EMPTY_COPY.body}</p>
+                <p className="text-xs text-ink-muted leading-relaxed">{FORUM_HUB_EMPTY_COPY.body}</p>
               </div>
             ) : (
               <div className="space-y-2 font-sans">
@@ -263,12 +263,12 @@ export function ForumHubCard() {
         </HudGhostWidget>
       </div>
 
-      <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-xs">
-        <span className="text-[#839493] text-[10px]">OPEN THE BOARDS</span>
+      <div className="pt-2 border-t border-line-subtle flex items-center justify-between text-xs">
+        <span className="text-ink-muted text-[11px] tracking-[0.08em]">OPEN THE BOARDS</span>
         <button
           type="button"
           onClick={() => navigate({ to: '/forum' })}
-          className="px-3 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 text-[#00ffff] border border-[#00ffff]/50 text-[10px] font-bold chamfer-corner flex items-center gap-1 transition-all"
+          className="px-3 py-1.5 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong text-[11px] font-bold tracking-[0.08em] flex items-center gap-1 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
           <span>{FORUM_HUB_CTA}</span>
           <ChevronRight className="w-3 h-3" />
@@ -281,10 +281,10 @@ export function ForumHubCard() {
 function HubThreadRow({ thread }: { thread: ForumHubThreadView }) {
   return (
     <div
-      className={`chitin-card-inset p-3 border transition-all chamfer-corner group bg-[#070b0b]/60 ${
+      className={`p-3 border transition-colors rounded-card group bg-surface-1 hover:bg-surface-2 ${
         thread.unread
-          ? 'border-[#00ffff]/45 hover:border-[#00ffff]/80'
-          : 'border-[#3a4a49] hover:border-[#00ffff]/60'
+          ? 'border-cyan-glow/40 hover:border-line-strong'
+          : 'border-line-subtle hover:border-line-strong'
       }`}
     >
       <div className="flex items-start gap-2.5">
@@ -308,7 +308,7 @@ function HubThreadRow({ thread }: { thread: ForumHubThreadView }) {
               userId={thread.userId}
               avatarConfig={thread.authorAvatarConfig}
               size="sm"
-              className="ring-1 ring-[#3a4a49] group-hover:ring-[#00ffff]/60"
+              className="ring-1 ring-line group-hover:ring-line-strong"
             />
           </Link>
         ) : (
@@ -319,14 +319,14 @@ function HubThreadRow({ thread }: { thread: ForumHubThreadView }) {
             userId={thread.userId}
             avatarConfig={thread.authorAvatarConfig}
             size="sm"
-            className="ring-1 ring-[#3a4a49] mt-0.5"
+            className="ring-1 ring-line mt-0.5"
           />
         )}
 
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex flex-wrap items-center gap-1.5">
             <span
-              className="px-1.5 py-0.5 font-sans font-bold uppercase tracking-wider chamfer-corner border text-[9px] truncate max-w-[70%]"
+              className="px-1.5 py-0.5 font-sans font-bold uppercase tracking-[0.08em] rounded-chip border text-[11px] truncate max-w-[70%]"
               style={{
                 borderColor: `${thread.categoryColor}80`,
                 color: thread.categoryColor,
@@ -344,23 +344,23 @@ function HubThreadRow({ thread }: { thread: ForumHubThreadView }) {
             params={{ categorySlug: thread.categorySlug, topicSlug: thread.slug }}
             className="block space-y-0.5"
           >
-            <h3 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase line-clamp-1 leading-snug">
+            <h3 className="font-grotesk text-xs font-bold text-ink group-hover:text-cyan-glow transition-colors uppercase line-clamp-1 leading-snug">
               {thread.title}
             </h3>
             {thread.preview ? (
-              <p className="text-[11px] text-[#839493] line-clamp-1 leading-relaxed">{thread.preview}</p>
+              <p className="text-[11px] text-ink-muted line-clamp-1 leading-relaxed">{thread.preview}</p>
             ) : null}
           </Link>
 
-          <div className="flex items-center justify-between gap-2 text-[10px] text-[#839493]">
-            <span className="truncate text-[#dfe3e3] font-bold">{thread.authorName}</span>
+          <div className="flex items-center justify-between gap-2 text-[11px] text-ink-muted">
+            <span className="truncate text-ink font-bold">{thread.authorName}</span>
             <span className="flex items-center gap-2.5 shrink-0">
               <span className="flex items-center gap-1">
-                <MessageSquare className="w-3 h-3 text-[#00ffff]" />
+                <MessageSquare className="w-3 h-3 text-cyan-glow" />
                 <span>{thread.repliesCount}</span>
               </span>
               <span className="flex items-center gap-1">
-                <Clock className="w-3 h-3 text-[#3a4a49] group-hover:text-[#839493] transition-colors" />
+                <Clock className="w-3 h-3 text-ink-muted/60 group-hover:text-ink-muted transition-colors" />
                 <span>{thread.ageLabel}</span>
               </span>
             </span>

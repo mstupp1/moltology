@@ -122,7 +122,7 @@ function HudContent() {
 
   return (
     <div
-      className={`fixed inset-0 w-full h-full text-[#dfe3e3] flex flex-col font-sans overflow-hidden bg-[#030708] overscroll-none select-none ${
+      className={`fixed inset-0 w-full h-full text-ink flex flex-col font-sans overflow-hidden bg-abyss overscroll-none select-none ${
         isSubterranean ? 'theme-subterranean' : ''
       }`}
     >
@@ -134,7 +134,7 @@ function HudContent() {
         />
       )}
       {/* Dedicated Portal CRT Screen Background (Behind UI) */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-[#030708]">
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-abyss">
         {/* Full-Bleed Default Aqua Underwater Background */}
         <div
           className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-150 ${
@@ -203,10 +203,10 @@ function HudContent() {
                 isFullscreenRoute
                   ? 'p-0 overflow-hidden'
                   : 'p-2.5 pb-16 sm:p-4 sm:pb-4 md:p-6 md:pb-6 overflow-y-auto overscroll-y-contain'
-              } bg-[#070b0b]/50 ${
+              } bg-surface-1/50 ${
                 isMainOnly
                   ? 'border-0 shadow-none'
-                  : 'border-t md:border-t-0 md:border-l border-[#3a4a49]/40 shadow-2xl'
+                  : 'border-t md:border-t-0 md:border-l border-line-subtle shadow-2xl'
               } flex flex-col`}
             >
               <Outlet />

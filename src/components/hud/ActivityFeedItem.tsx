@@ -19,24 +19,24 @@ import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 
 function KindIcon({ kind }: { kind: string }) {
   if (kind === ACTIVITY_EVENT_KIND_STREAK_MILESTONE) {
-    return <Flame className="w-3.5 h-3.5 text-[#f59e0b]" />
+    return <Flame className="w-3.5 h-3.5 text-amber-500" />
   }
   if (kind === ACTIVITY_EVENT_KIND_STAGE_REACHED) {
-    return <Layers className="w-3.5 h-3.5 text-[#00c3ff]" />
+    return <Layers className="w-3.5 h-3.5 text-cyan-glow" />
   }
   if (kind === ACTIVITY_EVENT_KIND_DAY_ALIGNED) {
-    return <Sparkles className="w-3.5 h-3.5 text-[#00ffff]" />
+    return <Sparkles className="w-3.5 h-3.5 text-cyan-glow" />
   }
   if (kind === ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED) {
-    return <Users className="w-3.5 h-3.5 text-[#00ffff]" />
+    return <Users className="w-3.5 h-3.5 text-cyan-glow" />
   }
   if (kind === ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED || kind === ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED) {
-    return <MessageSquare className="w-3.5 h-3.5 text-[#00ffff]" />
+    return <MessageSquare className="w-3.5 h-3.5 text-cyan-glow" />
   }
   if (kind === ACTIVITY_EVENT_KIND_ORACLE_MILESTONE) {
-    return <Sparkles className="w-3.5 h-3.5 text-[#c4b5fd]" />
+    return <Sparkles className="w-3.5 h-3.5 text-violet-300" />
   }
-  return <CheckCircle2 className="w-3.5 h-3.5 text-[#00ffff]" />
+  return <CheckCircle2 className="w-3.5 h-3.5 text-cyan-glow" />
 }
 
 function EventTitleLink({
@@ -121,16 +121,9 @@ function EventTitleLink({
   )
 }
 
-function kindAccent(kind: string): string {
-  if (kind === ACTIVITY_EVENT_KIND_STREAK_MILESTONE) return 'border-[#f59e0b]/45'
-  if (kind === ACTIVITY_EVENT_KIND_STAGE_REACHED) return 'border-[#00c3ff]/45'
-  if (kind === ACTIVITY_EVENT_KIND_DAY_ALIGNED) return 'border-[#00ffff]/40'
-  if (kind === ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED) return 'border-[#00ffff]/45'
-  if (kind === ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED || kind === ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED) {
-    return 'border-[#00ffff]/40'
-  }
-  if (kind === ACTIVITY_EVENT_KIND_ORACLE_MILESTONE) return 'border-[#c4b5fd]/40'
-  return 'border-[#3a4a49]'
+// Kind is carried by the icon and category chip; card edges stay quiet.
+function kindAccent(_kind: string): string {
+  return 'border-line-subtle'
 }
 
 export function ActivityFeedItem({
@@ -149,7 +142,7 @@ export function ActivityFeedItem({
 
   return (
     <article
-      className={`chitin-card-inset p-2.5 sm:p-3 border transition-colors chamfer-corner bg-[#070b0b]/60 hover:border-[#00ffff]/50 ${kindAccent(event.kind)}`}
+      className={`p-2.5 sm:p-3 border transition-colors rounded-card bg-surface-1 hover:bg-surface-2 hover:border-line-strong ${kindAccent(event.kind)}`}
       data-testid="activity-feed-item"
       data-kind={event.kind}
     >
@@ -171,7 +164,7 @@ export function ActivityFeedItem({
             />
           </Link>
         ) : (
-          <div className="p-1.5 bg-[#070b0b] border border-[#3a4a49] shrink-0 mt-0.5">
+          <div className="p-1.5 bg-surface-2 border border-line-subtle rounded-control shrink-0 mt-0.5">
             <KindIcon kind={event.kind} />
           </div>
         )}
@@ -183,20 +176,20 @@ export function ActivityFeedItem({
                 <Link
                   to={dossier.to}
                   params={dossier.params}
-                  className="text-[11px] font-bold text-[#dfe3e3] hover:text-[#00ffff] truncate"
+                  className="text-[11px] font-bold text-ink hover:text-cyan-glow truncate"
                 >
                   {event.isOwn ? 'You' : event.actor.displayName}
                 </Link>
-                <span className="text-[9px] font-bold uppercase tracking-wider text-[#00ffff] bg-[#070b0b] border border-[#3a4a49] px-1.5 py-0.5 shrink-0">
+                <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-cyan-glow bg-surface-2 border border-line-subtle rounded-chip px-1.5 py-0.5 shrink-0">
                   {event.categoryLabel}
                 </span>
                 {event.isOwn && !compact ? (
-                  <span className="text-[9px] text-[#839493] border border-[#3a4a49] px-1.5 py-0.5">You</span>
+                  <span className="text-[11px] text-ink-muted border border-line-subtle rounded-chip px-1.5 py-0.5">You</span>
                 ) : null}
               </div>
               <EventTitleLink event={event} className="block">
                 <h3
-                  className={`font-grotesk font-bold text-[#dfe3e3] leading-snug ${
+                  className={`font-grotesk font-bold text-ink leading-snug ${
                     compact ? 'text-xs line-clamp-1' : 'text-sm'
                   }`}
                 >
@@ -205,13 +198,13 @@ export function ActivityFeedItem({
               </EventTitleLink>
             </div>
             {event.valueBadge ? (
-              <span className="text-[10px] font-sans font-bold text-[#00ffff] bg-[#070b0b] border border-[#3a4a49] px-1.5 py-0.5 shrink-0 tabular-nums">
+              <span className="text-[11px] font-sans font-bold text-cyan-glow bg-surface-2 border border-line-subtle rounded-chip px-1.5 py-0.5 shrink-0 tabular-nums">
                 {event.valueBadge}
               </span>
             ) : null}
           </div>
 
-          <p className={`text-[11px] text-[#839493] leading-snug ${compact ? 'line-clamp-1' : 'line-clamp-2'}`}>
+          <p className={`text-[11px] text-ink-muted leading-snug ${compact ? 'line-clamp-1' : 'line-clamp-2'}`}>
             {event.detail}
           </p>
 
@@ -220,16 +213,16 @@ export function ActivityFeedItem({
               {stats.map((stat) => (
                 <span
                   key={`${stat.label}-${stat.value}`}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] border border-[#3a4a49] bg-[#050808]/80 text-[#839493] chamfer-corner"
+                  className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] border border-line-subtle bg-surface-2 text-ink-muted rounded-chip"
                 >
-                  <span className="uppercase tracking-wider">{stat.label}</span>
-                  <span className="text-[#dfe3e3] font-bold tabular-nums">{stat.value}</span>
+                  <span className="uppercase tracking-[0.08em]">{stat.label}</span>
+                  <span className="text-ink font-bold tabular-nums">{stat.value}</span>
                 </span>
               ))}
             </div>
           ) : null}
 
-          <div className="text-[10px] text-[#3a4a49] flex items-center gap-1 pt-0.5">
+          <div className="text-[11px] text-ink-muted/70 flex items-center gap-1 pt-0.5">
             <Clock className="w-3 h-3" />
             <span>{event.occurredLabel}</span>
           </div>

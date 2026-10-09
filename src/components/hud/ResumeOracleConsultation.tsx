@@ -58,16 +58,16 @@ export function ResumeOracleConsultation() {
 
   return (
     <div
-      className="chitin-card p-3 sm:p-4 chamfer-corner flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+      className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
       data-testid="resume-oracle-consultation"
     >
       <div className="flex items-start gap-2.5 min-w-0">
-        <Atom className="w-4 h-4 text-[#00ffff] shrink-0 mt-0.5" aria-hidden="true" />
+        <Atom className="w-4 h-4 text-cyan-glow shrink-0 mt-0.5" aria-hidden="true" />
         <div className="min-w-0 space-y-0.5">
-          <p className="text-[10px] font-bold tracking-wider uppercase text-[#00ffff]">
+          <p className="text-[11px] font-bold tracking-[0.08em] uppercase text-cyan-glow">
             Last consultation
           </p>
-          <p className="font-grotesk text-sm font-bold text-[#dfe3e3] uppercase truncate">
+          <p className="font-grotesk text-sm font-bold text-ink uppercase truncate">
             {title}
           </p>
         </div>

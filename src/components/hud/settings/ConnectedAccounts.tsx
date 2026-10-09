@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { KeyRound, Link2, Unlink } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastProvider'
+import { HudButton } from '@/components/ui/HudButton'
 import { authClient } from '@/lib/auth-client'
 import { isEmailVerificationEnabled, isGoogleAuthEnabled } from '@/lib/auth-config'
 import { EMAIL_VERIFICATION_COPY } from '@/lib/auth-email-verification'
@@ -125,10 +126,10 @@ export function ConnectedAccounts({ oauthError }: { oauthError?: string }) {
 
 
   return (
-    <div className="chitin-card-inset p-3 sm:p-4 space-y-3 rounded-sm">
+    <div className="rounded-card border border-line-subtle bg-abyss/50 p-3 sm:p-4 space-y-3">
       <div>
-        <h3 className="text-sm font-grotesk font-bold text-[#dfe3e3]">Sign-in methods</h3>
-        <p className="text-xs text-[#839493] font-sans mt-0.5">
+        <h3 className="text-sm font-grotesk font-bold text-ink">Sign-in methods</h3>
+        <p className="text-xs text-ink-muted font-sans mt-0.5">
           Use Google or email and password to sign in to this account.
         </p>
       </div>
@@ -136,10 +137,10 @@ export function ConnectedAccounts({ oauthError }: { oauthError?: string }) {
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <KeyRound className="w-5 h-5 shrink-0 text-[#00c3ff]" />
+            <KeyRound className="w-5 h-5 shrink-0 text-cyan-glow" />
             <div className="min-w-0">
-              <span className="text-sm font-grotesk font-bold text-[#dfe3e3] block">Email and password</span>
-              <span className="text-xs text-[#839493] font-sans">
+              <span className="text-sm font-grotesk font-bold text-ink block">Email and password</span>
+              <span className="text-xs text-ink-muted font-sans">
                 {accounts === null
                   ? 'Loading…'
                   : emailConnected
@@ -153,50 +154,53 @@ export function ConnectedAccounts({ oauthError }: { oauthError?: string }) {
             </div>
           </div>
           {showVerification && !emailVerified ? (
-            <button
+            <HudButton
               type="button"
+              variant="secondary"
+              size="sm"
               onClick={() => void handleResendVerification()}
               disabled={resendBusy || busy !== null}
               aria-label="Resend confirmation"
-              className="px-3 py-1.5 border border-[#00c3ff]/60 text-[#00c3ff] font-grotesk font-bold text-[11px] uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {resendBusy ? 'Sending…' : EMAIL_VERIFICATION_COPY.resend}
-            </button>
+            </HudButton>
           ) : null}
         </div>
 
         {googleEnabled ? (
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <Link2 className="w-5 h-5 shrink-0 text-[#00c3ff]" />
+              <Link2 className="w-5 h-5 shrink-0 text-cyan-glow" />
               <div className="min-w-0">
-                <span className="text-sm font-grotesk font-bold text-[#dfe3e3] block">Google</span>
-                <span className="text-xs text-[#839493] font-sans">
+                <span className="text-sm font-grotesk font-bold text-ink block">Google</span>
+                <span className="text-xs text-ink-muted font-sans">
                   {accounts === null ? 'Loading…' : googleConnected ? 'Connected' : 'Not connected'}
                 </span>
               </div>
             </div>
             {googleConnected ? (
-              <button
+              <HudButton
                 type="button"
+                variant="danger"
+                size="sm"
                 onClick={handleDisconnectGoogle}
                 disabled={busy !== null || !canDisconnectGoogle}
                 aria-label="Disconnect Google"
-                className="px-3 py-1.5 border border-[#3a4a49] hover:border-[#ff453a]/60 text-[#dfe3e3] font-grotesk font-bold text-[11px] uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
+                icon={<Unlink className="w-3.5 h-3.5" />}
               >
-                <Unlink className="w-3.5 h-3.5" />
                 Disconnect
-              </button>
+              </HudButton>
             ) : (
-              <button
+              <HudButton
                 type="button"
+                variant="secondary"
+                size="sm"
                 onClick={handleConnectGoogle}
                 disabled={busy !== null || accounts === null}
                 aria-label="Connect Google"
-                className="px-3 py-1.5 bg-[#00c3ff]/20 hover:bg-[#00c3ff]/30 border border-[#00c3ff]/60 text-[#00c3ff] font-grotesk font-bold text-[11px] uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Connect Google
-              </button>
+              </HudButton>
             )}
           </div>
         ) : null}

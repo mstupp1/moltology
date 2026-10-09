@@ -44,14 +44,14 @@ const HUB_SEARCH_RESULT_LIMIT = 3
 function ConnectionsHubListGhost() {
   return (
     <div className="space-y-2" aria-hidden="true">
-      <div className="h-9 border border-[#3a4a49]/50 bg-[#070b0b]/40 chamfer-corner" />
+      <div className="h-9 border border-line-subtle bg-surface-1 rounded-control" />
       <div className="flex gap-2">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="h-7 flex-1 border border-[#3a4a49]/50 bg-[#070b0b]/40 chamfer-corner" />
+          <div key={i} className="h-7 flex-1 border border-line-subtle bg-surface-1 rounded-control" />
         ))}
       </div>
       {Array.from({ length: 2 }).map((_, i) => (
-        <div key={i} className="chitin-card-inset h-14 border border-[#3a4a49]/50 bg-[#070b0b]/40 chamfer-corner" />
+        <div key={i} className="h-14 border border-line-subtle bg-surface-1 rounded-card" />
       ))}
     </div>
   )
@@ -73,14 +73,14 @@ function CountChip({
     <button
       type="button"
       onClick={onOpen}
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border chamfer-corner transition-colors ${
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em] border rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
         lit
-          ? 'border-[#00ffff]/50 text-[#00ffff] bg-[#00ffff]/10 hover:bg-[#00ffff]/20'
-          : 'border-[#3a4a49] text-[#839493] bg-[#070b0b]/60 hover:border-[#00ffff]/50'
+          ? 'border-cyan-glow/40 text-cyan-glow bg-cyan-soft hover:bg-surface-2'
+          : 'border-line text-ink-muted bg-surface-1 hover:bg-surface-2 hover:border-line-strong'
       }`}
     >
       {label}
-      <span className="tabular-nums text-[#00ffff]">{count}</span>
+      <span className="tabular-nums text-cyan-glow">{count}</span>
     </button>
   )
 }
@@ -92,7 +92,7 @@ function HubAvatarStack({ members, overflow }: { members: ConnectionsListView['f
     <div className="flex items-center shrink-0" aria-hidden="true">
       <div className="flex -space-x-2">
         {members.map((member) => (
-          <div key={member.id} className="ring-2 ring-[#0b0f0f] rounded-full">
+          <div key={member.id} className="ring-2 ring-surface-1 rounded-full">
             <LobsterAvatarPortrait
               config={(member.avatarConfig as LobsterAvatarConfig | null) ?? null}
               className="w-7 h-7"
@@ -105,7 +105,7 @@ function HubAvatarStack({ members, overflow }: { members: ConnectionsListView['f
         ))}
       </div>
       {overflow > 0 && (
-        <span className="ml-1.5 text-[10px] font-bold tabular-nums text-[#839493]">+{overflow}</span>
+        <span className="ml-1.5 text-[11px] font-bold tabular-nums text-ink-muted">+{overflow}</span>
       )}
     </div>
   )
@@ -179,26 +179,26 @@ export function ConnectionsHubCard() {
 
   return (
     <div
-      className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3.5 sm:space-y-4 h-full flex flex-col justify-between"
+      className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5 space-y-3.5 sm:space-y-4 h-full flex flex-col justify-between"
       data-testid="connections-hub-card"
     >
       <div className="space-y-3">
-        <div className="flex items-start justify-between gap-3 border-b border-[#3a4a49] pb-3">
+        <div className="flex items-start justify-between gap-3 border-b border-line-subtle pb-3">
           <div className="min-w-0">
-            <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase flex items-center gap-2">
-              <Users className="w-4 h-4 text-[#00ffff] shrink-0" />
+            <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
+              <Users className="w-4 h-4 text-cyan-glow shrink-0" />
               {CONNECTIONS_HUB_TITLE}
               {incomingCount > 0 && (
                 <button
                   type="button"
                   onClick={() => openConnections('incoming')}
-                  className="text-[9px] font-sans font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00ffff]/40 px-1.5 py-0.5 chamfer-corner tracking-wider hover:bg-[#00ffff]/20"
+                  className="text-[11px] font-sans font-bold text-cyan-glow bg-cyan-soft border border-cyan-glow/40 px-1.5 py-0.5 rounded-chip tracking-[0.08em] hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   {incomingCount} INCOMING
                 </button>
               )}
             </h2>
-            <p className="text-xs text-[#839493] mt-0.5">{CONNECTIONS_HUB_SUBTITLE}</p>
+            <p className="text-xs text-ink-muted mt-0.5">{CONNECTIONS_HUB_SUBTITLE}</p>
           </div>
           <HubAvatarStack members={circle} overflow={Math.max(0, friendCount - circle.length)} />
         </div>
@@ -207,17 +207,17 @@ export function ConnectionsHubCard() {
           <div className="space-y-2.5">
             {canSearch && (
               <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#839493]" />
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-muted" />
                 <input
                   type="search"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder={CONNECTIONS_HUB_SEARCH_PLACEHOLDER}
                   aria-label="Search members"
-                  className="w-full pl-8 pr-8 py-2 bg-[#050808] border border-[#3a4a49] text-xs text-[#dfe3e3] placeholder:text-[#4a5a59] focus:outline-none focus:border-[#00c3ff] chamfer-corner"
+                  className="w-full pl-8 pr-8 py-2 bg-surface-2 border border-line text-xs text-ink placeholder:text-ink-muted/70 hover:border-line-hover focus:outline-none focus:border-cyan-glow focus:shadow-field-focus transition-[border-color,box-shadow] rounded-control"
                 />
                 {searching && (
-                  <Loader2 className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#00c3ff] animate-spin" />
+                  <Loader2 className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-cyan-glow animate-spin" />
                 )}
               </div>
             )}
@@ -253,17 +253,17 @@ export function ConnectionsHubCard() {
             )}
 
             {showSearchResults && !searching && searchResults.length === 0 && (
-              <p className="text-xs text-[#839493] text-center py-3">
+              <p className="text-xs text-ink-muted text-center py-3">
                 The trench stayed quiet. No designation, larva unit, or name surfaced for that call.
               </p>
             )}
 
             {showPreview && preview.length === 0 && (
               <div className="p-6 text-center space-y-1.5">
-                <p className="font-grotesk text-xs font-bold text-[#dfe3e3] tracking-wide uppercase">
+                <p className="font-grotesk text-xs font-bold text-ink tracking-[0.08em] uppercase">
                   {CONNECTIONS_HUB_EMPTY_COPY.title}
                 </p>
-                <p className="text-xs text-[#839493] leading-relaxed">{CONNECTIONS_HUB_EMPTY_COPY.body}</p>
+                <p className="text-xs text-ink-muted leading-relaxed">{CONNECTIONS_HUB_EMPTY_COPY.body}</p>
               </div>
             )}
 
@@ -282,14 +282,14 @@ export function ConnectionsHubCard() {
         </HudGhostWidget>
       </div>
 
-      <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-xs">
-        <span className="text-[#839493] text-[10px]">
+      <div className="pt-2 border-t border-line-subtle flex items-center justify-between text-xs">
+        <span className="text-ink-muted text-[11px] tracking-[0.08em]">
           {incomingCount > 0 ? 'REVIEW REQUESTS' : 'FIND MEMBERS'}
         </span>
         <button
           type="button"
           onClick={() => openConnections()}
-          className="px-3 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 text-[#00ffff] border border-[#00ffff]/50 text-[10px] font-bold chamfer-corner flex items-center gap-1 transition-all"
+          className="px-3 py-1.5 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong text-[11px] font-bold tracking-[0.08em] flex items-center gap-1 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
           <span>{incomingCount > 0 ? 'OPEN INCOMING' : 'OPEN CONNECTIONS'}</span>
           <ChevronRight className="w-3 h-3" />
@@ -312,8 +312,8 @@ function HubConnectionRow({
 
   return (
     <li
-      className={`chitin-card-inset p-2.5 border transition-colors chamfer-corner bg-[#070b0b]/60 ${
-        incoming ? 'border-[#00ffff]/45' : 'border-[#3a4a49] hover:border-[#00ffff]/50'
+      className={`p-2.5 border transition-colors rounded-card bg-surface-1 ${
+        incoming ? 'border-cyan-glow/40' : 'border-line-subtle hover:border-line-strong'
       }`}
     >
       <div className="flex items-center gap-2.5 min-w-0">
@@ -333,10 +333,10 @@ function HubConnectionRow({
           params={{ profileId: resolveMemberPublicParam(member) }}
           className="min-w-0 flex-1"
         >
-          <p className="font-grotesk text-xs font-bold text-[#dfe3e3] hover:text-[#00ffff] transition-colors truncate">
+          <p className="font-grotesk text-xs font-bold text-ink hover:text-cyan-glow transition-colors truncate">
             {member.displayName}
           </p>
-          <p className="text-[10px] uppercase tracking-wider text-[#839493] truncate">
+          <p className="text-[11px] uppercase tracking-[0.08em] text-ink-muted truncate">
             Stage {member.stage} · {member.stageLabel}
             {ageLabel ? ` · ${ageLabel}` : ''}
           </p>

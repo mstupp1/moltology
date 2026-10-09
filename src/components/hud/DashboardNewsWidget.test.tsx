@@ -31,7 +31,7 @@ describe('DashboardNewsWidget Component', () => {
     const doctrineTab = screen.getByRole('button', { name: /SYNAPTIC DOCTRINE/i })
     fireEvent.click(doctrineTab)
 
-    expect(doctrineTab).toHaveClass('bg-[#00ffff]')
+    expect(doctrineTab).toHaveClass('border-b-cyan-glow')
   })
 
   it('opens in-HUD dispatch article modal reader when clicking a featured post card', () => {

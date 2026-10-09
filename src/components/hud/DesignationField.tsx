@@ -40,12 +40,12 @@ export function DesignationField({
         placeholder="your_designation"
         aria-invalid={Boolean(value && parsed && !parsed.ok)}
         aria-describedby={`${id}-hint`}
-        startIcon={<Radio className="w-4 h-4 text-[#00c3ff]" />}
+        startIcon={<Radio className="w-4 h-4 text-cyan-glow" />}
       />
       <p
         id={`${id}-hint`}
         className={`text-[11px] font-sans leading-snug ${
-          value && parsed && !parsed.ok ? 'text-[#ff453a]' : 'text-[#839493]'
+          value && parsed && !parsed.ok ? 'text-crimson-text' : 'text-ink-muted'
         }`}
       >
         {hint}

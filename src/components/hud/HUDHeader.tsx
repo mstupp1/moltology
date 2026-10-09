@@ -16,7 +16,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
   const scanlineRef = useRef<HTMLDivElement>(null)
 
   return (
-    <header className={`hidden md:flex w-full bg-[#020608]/95 border-b border-[#00c3ff]/20 px-2.5 sm:px-4 py-1.5 sm:py-2 items-center gap-2 sm:gap-3 font-sans select-none relative z-30 shadow-[0_2px_20px_rgba(0,195,255,0.1)] shrink-0 ${className}`}>
+    <header className={`hidden md:flex w-full bg-abyss/95 border-b border-line-subtle px-2.5 sm:px-4 py-1.5 sm:py-2 items-center gap-2 sm:gap-3 font-sans select-none relative z-30 shrink-0 ${className}`}>
 
       {/* HUD scanline overlay */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>

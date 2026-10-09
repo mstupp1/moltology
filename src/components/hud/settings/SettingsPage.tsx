@@ -4,6 +4,7 @@ import { useToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
+import { HudButton } from '@/components/ui/HudButton'
 import { HubSurfaceControls } from '@/components/hud/HubSurfaceControls'
 import { getAuthJWTToken } from '@/lib/jwt'
 import {
@@ -144,8 +145,8 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
   if (loading) {
     return (
       <div className="space-y-3.5 sm:space-y-5 font-sans relative">
-        <div className="chitin-card p-5 chamfer-corner shadow-2xl animate-pulse h-32" />
-        <div className="chitin-card p-5 chamfer-corner shadow-2xl animate-pulse h-64" />
+        <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-5 animate-pulse h-32" />
+        <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-5 animate-pulse h-64" />
       </div>
     )
   }
@@ -166,15 +167,15 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
 
       <PremiumSettingsSection />
 
-      <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl">
+      <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {/* Left: Avatar */}
           <div className="space-y-4">
             <div>
-              <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase">
+              <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">
                 Avatar
               </h2>
-              <p className="text-xs text-[#839493] font-sans mt-0.5">
+              <p className="text-xs text-ink-muted font-sans mt-0.5">
                 Build your character. It shows on your chassis page, in the forum, and across the HUD once saved.
               </p>
             </div>
@@ -187,57 +188,59 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
                 </>
               ) : null}
 
-              <button
+              <HudButton
                 type="button"
+                variant="secondary"
+                size="md"
                 onClick={handleSaveAvatar}
                 disabled={!draftConfig?.seed.trim()}
-                className="px-4 py-2 bg-[#00c3ff]/20 hover:bg-[#00c3ff]/30 border border-[#00c3ff]/60 text-[#00c3ff] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Save Avatar
-              </button>
+              </HudButton>
             </div>
           </div>
 
           {/* Right: Preferences */}
           <div className="space-y-4">
             <div>
-              <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase">
+              <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">
                 Preferences
               </h2>
-              <p className="text-xs text-[#839493] font-sans mt-0.5">
+              <p className="text-xs text-ink-muted font-sans mt-0.5">
                 Communication, sign-in methods, display, and onboarding options.
               </p>
             </div>
 
             <div className="space-y-3">
-              <div className="chitin-card-inset p-3 sm:p-4 space-y-3 rounded-sm">
+              <div className="rounded-card border border-line-subtle bg-abyss/50 p-3 sm:p-4 space-y-3">
                 <div>
-                  <h3 className="text-sm font-grotesk font-bold text-[#dfe3e3]">Designation</h3>
-                  <p className="text-xs text-[#839493] font-sans mt-0.5">
+                  <h3 className="text-sm font-grotesk font-bold text-ink">Designation</h3>
+                  <p className="text-xs text-ink-muted font-sans mt-0.5">
                     Your public name on the hub and forum. Your larva unit stays on file.
                   </p>
                 </div>
                 <DesignationField value={designation} onChange={setDesignation} />
-                <button
+                <HudButton
                   type="button"
+                  variant="secondary"
+                  size="md"
                   onClick={handleSaveDesignation}
                   disabled={!parseMemberHandle(designation).ok || designation === savedDesignation}
-                  className="px-4 py-2 bg-[#00c3ff]/20 hover:bg-[#00c3ff]/30 border border-[#00c3ff]/60 text-[#00c3ff] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Seal designation
-                </button>
+                </HudButton>
               </div>
 
               <ConnectedAccounts oauthError={oauthError} />
 
-              <div className="chitin-card-inset p-3 sm:p-4 flex items-center justify-between gap-3 rounded-sm">
+              <div className="rounded-card border border-line-subtle bg-abyss/50 p-3 sm:p-4 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <Mail className="w-5 h-5 shrink-0 text-[#00c3ff]" />
+                  <Mail className="w-5 h-5 shrink-0 text-cyan-glow" />
                   <div className="min-w-0">
-                    <span className="text-sm font-grotesk font-bold text-[#dfe3e3] block">
+                    <span className="text-sm font-grotesk font-bold text-ink block">
                       Email Updates
                     </span>
-                    <span className="text-xs text-[#839493] font-sans">
+                    <span className="text-xs text-ink-muted font-sans">
                       {emailOptIn ? 'Subscribed to news and updates' : 'Not subscribed'}
                     </span>
                   </div>
@@ -248,30 +251,30 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
                   aria-checked={emailOptIn}
                   aria-label="Toggle email updates"
                   onClick={toggleEmailOptIn}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#00c3ff] ${
-                    emailOptIn ? 'bg-[#00c3ff]' : 'bg-cyan-950 border-cyan-800'
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                    emailOptIn ? 'bg-cyan-glow border-transparent' : 'bg-surface-3 border-line'
                   }`}
                 >
                   <span
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                      emailOptIn ? 'translate-x-5' : 'translate-x-0 bg-slate-300'
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full shadow-md ring-0 transition duration-200 ease-in-out ${
+                      emailOptIn ? 'translate-x-5 bg-ink' : 'translate-x-0 bg-ink-muted'
                     }`}
                   />
                 </button>
               </div>
 
-              <div className="chitin-card-inset p-3 sm:p-4 flex items-center justify-between gap-3 rounded-sm">
+              <div className="rounded-card border border-line-subtle bg-abyss/50 p-3 sm:p-4 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   {heavyVfxDisabled ? (
                     <EyeOff className="w-5 h-5 shrink-0 text-amber-400" />
                   ) : (
-                    <Sparkles className="w-5 h-5 shrink-0 text-[#00c3ff]" />
+                    <Sparkles className="w-5 h-5 shrink-0 text-cyan-glow" />
                   )}
                   <div className="min-w-0">
-                    <span className="text-sm font-grotesk font-bold text-[#dfe3e3] block">
+                    <span className="text-sm font-grotesk font-bold text-ink block">
                       Underwater Bubbles
                     </span>
-                    <span className="text-xs text-[#839493] font-sans">
+                    <span className="text-xs text-ink-muted font-sans">
                       {heavyVfxDisabled
                         ? 'Hidden — reduces motion and battery use'
                         : 'Visible across the hub'}
@@ -284,13 +287,13 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
                   aria-checked={!heavyVfxDisabled}
                   aria-label="Toggle underwater bubbles"
                   onClick={toggleHeavyVfx}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#00c3ff] ${
-                    !heavyVfxDisabled ? 'bg-[#00c3ff]' : 'bg-cyan-950 border-cyan-800'
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                    !heavyVfxDisabled ? 'bg-cyan-glow border-transparent' : 'bg-surface-3 border-line'
                   }`}
                 >
                   <span
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                      !heavyVfxDisabled ? 'translate-x-5' : 'translate-x-0 bg-slate-300'
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full shadow-md ring-0 transition duration-200 ease-in-out ${
+                      !heavyVfxDisabled ? 'translate-x-5 bg-ink' : 'translate-x-0 bg-ink-muted'
                     }`}
                   />
                 </button>
@@ -299,25 +302,25 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
               <button
                 type="button"
                 onClick={handleRestartWelcome}
-                className="w-full chitin-card-inset p-3 sm:p-4 flex items-center gap-3 rounded-sm text-left hover:bg-white/[0.03] transition-colors group"
+                className="w-full rounded-card border border-line-subtle bg-abyss/50 p-3 sm:p-4 flex items-center gap-3 text-left hover:bg-surface-2 hover:border-line-hover transition-colors group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
-                <Radio className="w-5 h-5 shrink-0 text-[#00c3ff] group-hover:text-[#00ffff] transition-colors" />
+                <Radio className="w-5 h-5 shrink-0 text-cyan-glow group-hover:text-cyan-hover transition-colors" />
                 <div className="min-w-0 flex-1">
-                  <span className="text-sm font-grotesk font-bold text-[#dfe3e3] block">
+                  <span className="text-sm font-grotesk font-bold text-ink block">
                     Replay Initiation Broadcast
                   </span>
-                  <span className="text-xs text-[#839493] font-sans">
+                  <span className="text-xs text-ink-muted font-sans">
                     Restart the welcome guide from the beginning
                   </span>
                 </div>
               </button>
 
-              <div className="pt-2 border-t border-[#3a4a49]/60 space-y-2">
+              <div className="pt-2 border-t border-line-subtle space-y-2">
                 <div>
-                  <h3 className="font-grotesk text-xs font-bold text-[#dfe3e3] tracking-wider uppercase">
+                  <h3 className="font-grotesk text-xs font-bold text-ink tracking-[0.08em] uppercase">
                     Command Surface
                   </h3>
-                  <p className="text-xs text-[#839493] font-sans mt-0.5">
+                  <p className="text-xs text-ink-muted font-sans mt-0.5">
                     Install the hub shell and arm surface alerts for Activity Center transmissions.
                   </p>
                 </div>

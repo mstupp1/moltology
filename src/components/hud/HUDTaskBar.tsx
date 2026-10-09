@@ -265,7 +265,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
         className={`${className} inline-flex items-center justify-center min-w-[2.25rem]`}
         aria-hidden
       >
-        <span className="inline-block h-2 w-4 rounded-full bg-[#00c3ff]/40 animate-pulse" />
+        <span className="inline-block h-2 w-4 rounded-chip bg-cyan-glow/40 animate-pulse" />
       </span>
     )
 
@@ -273,33 +273,33 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   const renderActivityContent = () => (
     <>
       {/* Header: Title & Close Button */}
-      <div className="flex items-center justify-between border-b border-[#00c3ff]/20 pb-2.5">
+      <div className="flex items-center justify-between border-b border-line-subtle pb-2.5">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-[#00c3ff] animate-pulse" />
-          <span className="font-grotesk text-xs font-bold text-[#dfe3e3] tracking-widest uppercase">
+          <div className="w-2 h-2 rounded-full bg-cyan-glow animate-pulse" />
+          <span className="font-grotesk text-xs font-bold text-ink tracking-[0.08em] uppercase">
             DAILY ALIGNMENT SCHEDULE
           </span>
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); setIsScheduleOpen(false); }}
           aria-label="Close activity center"
-          className="text-[#839493] hover:text-[#00c3ff] p-1 rounded-full hover:bg-[#ffffff]/10 transition-colors"
+          className="text-ink-muted hover:text-ink p-1 rounded-control hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
           <X className="w-4 h-4" />
         </button>
       </div>
 
       {/* Segmented Control Tabs (iOS / Dynamic Island Style) */}
-      <div className="grid grid-cols-2 gap-1 p-1 bg-[#020507] border border-[#00c3ff]/20 rounded-lg">
+      <div className="grid grid-cols-2 gap-1 p-1 bg-abyss border border-line-subtle rounded-card">
         <button
           onClick={() => setActiveTab('liturgies')}
-          className={`py-1.5 sm:py-1 px-2 rounded font-sans text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 ${
+          className={`py-1.5 sm:py-1 px-2 rounded-control font-sans text-[11px] font-bold tracking-[0.08em] transition-colors flex items-center justify-center gap-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
             activeTab === 'liturgies'
-              ? 'bg-[#00c3ff]/20 border border-[#00c3ff]/60 text-[#00ffff] shadow-[0_0_10px_rgba(0,195,255,0.3)]'
-              : 'text-[#839493] hover:text-[#dfe3e3]'
+              ? 'bg-surface-2 text-ink shadow-[inset_0_-2px_0_theme(colors.cyan.glow)]'
+              : 'text-ink-muted hover:text-ink hover:bg-surface-2'
           }`}
         >
-          <Zap className="w-3 h-3 text-[#00c3ff]" />
+          <Zap className="w-3 h-3 text-cyan-glow" />
           <span>
             {countReady ? `LITURGIES (${liturgyCountText})` : 'LITURGIES'}
           </span>
@@ -307,16 +307,16 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
 
         <button
           onClick={() => setActiveTab('transmissions')}
-          className={`py-1.5 sm:py-1 px-2 rounded font-sans text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 relative ${
+          className={`py-1.5 sm:py-1 px-2 rounded-control font-sans text-[11px] font-bold tracking-[0.08em] transition-colors flex items-center justify-center gap-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow relative ${
             activeTab === 'transmissions'
-              ? 'bg-[#00c3ff]/20 border border-[#00c3ff]/60 text-[#00ffff] shadow-[0_0_10px_rgba(0,195,255,0.3)]'
-              : 'text-[#839493] hover:text-[#dfe3e3]'
+              ? 'bg-surface-2 text-ink shadow-[inset_0_-2px_0_theme(colors.cyan.glow)]'
+              : 'text-ink-muted hover:text-ink hover:bg-surface-2'
           }`}
         >
-          <Radio className="w-3 h-3 text-[#ff5540]" />
+          <Radio className="w-3 h-3 text-crimson-text" />
           <span>ALERTS ({alertsBadgeCount})</span>
           {(toastsList.length > 0 || notificationUnread > 0) && (
-            <span className="w-2 h-2 rounded-full bg-[#ff5540] animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-crimson-aggro animate-pulse" />
           )}
         </button>
       </div>
@@ -326,23 +326,23 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
         <div className="space-y-3 animate-in fade-in duration-150">
           {/* Spotlight "Next Up" Live Activity Card */}
           {nextTask && !allTasksCompleted ? (
-            <div className="p-3 bg-gradient-to-r from-[#00c3ff]/15 via-[#006f85]/10 to-[#02080a] border border-[#00c3ff]/60 rounded-xl shadow-[0_0_15px_rgba(0,195,255,0.15)] space-y-2">
+            <div className="p-3 rounded-card border border-cyan-glow/40 bg-surface-2 hud-sheen space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-sans font-bold text-[#00ffff] tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3 h-3 text-[#ff5540] animate-pulse" />
+                <span className="text-[11px] font-sans font-bold text-cyan-glow tracking-[0.08em] flex items-center gap-1.5">
+                  <Sparkles className="w-3 h-3 text-crimson-text animate-pulse" />
                   NEXT IMPENDING LITURGY
                 </span>
-                <span className="text-[9px] font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00c3ff]/40 px-1.5 py-0.2 rounded font-sans">
+                <span className="text-[11px] font-bold text-cyan-glow bg-cyan-soft border border-line-subtle px-1.5 py-0.2 rounded-chip font-sans">
                   {nextTask.time}
                 </span>
               </div>
 
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <span className="text-[11px] font-sans font-bold text-[#ff5540] mr-1.5">
+                  <span className="text-[11px] font-sans font-bold text-crimson-text mr-1.5">
                     [{nextTask.time}]
                   </span>
-                  <span className="text-xs font-bold text-[#dfe3e3] truncate">
+                  <span className="text-xs font-bold text-ink truncate">
                     {nextTask.title}
                   </span>
                 </div>
@@ -352,7 +352,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                     e.stopPropagation()
                     handleToggleTask(nextTask.id)
                   }}
-                  className="shrink-0 px-2.5 py-1.5 sm:py-1 bg-gradient-to-r from-[#0099cc] to-[#00c3ff] hover:from-[#00c3ff] hover:to-[#00ffff] text-[#02080a] font-bold text-[10px] uppercase rounded-md shadow-[0_0_10px_rgba(0,195,255,0.4)] transition-transform active:scale-95 flex items-center gap-1"
+                  className="shrink-0 px-2.5 py-1.5 sm:py-1 bg-cyan-glow hover:bg-cyan-hover text-abyss font-bold text-[11px] uppercase tracking-[0.08em] rounded-control transition-colors active:scale-95 flex items-center gap-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   <CheckCircle2 className="w-3 h-3" />
                   <span>COMPLETE</span>
@@ -360,32 +360,32 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
               </div>
             </div>
           ) : allTasksCompleted ? (
-            <div className="p-3 bg-[#00ff88]/10 border border-[#00ff88]/40 rounded-xl flex items-center gap-2 text-xs font-bold text-[#00ff88]">
-              <CheckCircle2 className="w-4 h-4 text-[#00ff88] shrink-0" />
+            <div className="p-3 bg-emerald-500/10 border border-emerald-500/40 rounded-card flex items-center gap-2 text-xs font-bold text-emerald-400">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>ALL DAILY LITURGIES VERIFIED FOR TODAY</span>
             </div>
           ) : null}
 
           {/* Progress bar */}
           <div className="space-y-1">
-            <div className="flex justify-between text-[10px] text-[#839493]">
+            <div className="flex justify-between text-[11px] text-ink-muted">
               {countReady ? (
                 <>
                   <span>PROGRESS: {liturgyCountText} COMPLETED</span>
-                  <span className="text-[#00ffff] font-bold">
+                  <span className="text-cyan-glow font-bold">
                     {Math.round((completedCount / Math.max(localTasks.length, 1)) * 100)}%
                   </span>
                 </>
               ) : (
                 <span
-                  className="inline-block h-2 w-28 rounded-full bg-[#00c3ff]/25 animate-pulse"
+                  className="inline-block h-2 w-28 rounded-chip bg-cyan-glow/25 animate-pulse"
                   aria-hidden
                 />
               )}
             </div>
-            <div className="w-full h-1.5 bg-[#020608] rounded-full overflow-hidden border border-[#00c3ff]/30">
+            <div className="w-full h-1.5 bg-surface-3 rounded-chip overflow-hidden">
               <div
-                className={`h-full bg-gradient-to-r from-[#0099cc] via-[#00c3ff] to-[#00ff88] ${
+                className={`h-full rounded-chip ${allTasksCompleted ? 'bg-emerald-500' : 'bg-cyan-glow'} ${
                   countReady ? 'transition-all duration-300' : 'animate-pulse opacity-40'
                 }`}
                 style={{
@@ -406,12 +406,12 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                 <div
                   key={t.id}
                   onClick={() => handleToggleTask(t.id)}
-                  className={`flex items-center justify-between p-2 rounded-lg border transition-all cursor-pointer ${
+                  className={`flex items-center justify-between p-2 rounded-card border transition-colors cursor-pointer ${
                     isNext
-                      ? 'bg-[#00c3ff]/10 border-[#00c3ff]/70 shadow-[0_0_10px_rgba(0,195,255,0.2)]'
+                      ? 'bg-cyan-soft border-cyan-glow/40'
                       : t.completed
-                      ? 'bg-[#020608]/80 border-[#3a4a49]/40 opacity-70'
-                      : 'bg-[#040a0d] border-[#00c3ff]/20 hover:border-[#00c3ff]/50'
+                      ? 'bg-surface-1 border-line-subtle opacity-70'
+                      : 'bg-surface-1 border-line-subtle hover:bg-surface-2 hover:border-line-strong'
                   }`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
@@ -420,35 +420,35 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                         e.stopPropagation()
                         handleToggleTask(t.id)
                       }}
-                      className="text-[#00ffff] hover:scale-110 transition-transform"
+                      className="rounded-chip text-cyan-glow hover:scale-110 transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     >
                       {t.completed ? (
-                        <CheckSquare className="w-3.5 h-3.5 text-[#00ffff]" />
+                        <CheckSquare className="w-3.5 h-3.5 text-cyan-glow" />
                       ) : (
-                        <Square className="w-3.5 h-3.5 text-[#839493]" />
+                        <Square className="w-3.5 h-3.5 text-ink-muted" />
                       )}
                     </button>
 
                     <div className="flex items-center gap-1.5">
-                      <span className={`text-[10px] font-sans font-bold ${isNext ? 'text-[#ff5540]' : 'text-[#839493]'}`}>
+                      <span className={`text-[11px] font-sans font-bold ${isNext ? 'text-crimson-text' : 'text-ink-muted'}`}>
                         [{t.time}]
                       </span>
                       {reminderTime && (
-                        <span className="text-[8px] text-[#ffb700] bg-[#091214] px-1 rounded border border-[#ffb700]/30 hidden xs:inline-flex items-center gap-0.5">
-                          <Bell className="w-2 h-2" /> {reminderTime}
+                        <span className="text-[11px] text-amber-400 bg-amber-500/15 px-1 rounded-chip border border-amber-500/30 hidden xs:inline-flex items-center gap-0.5">
+                          <Bell className="w-2.5 h-2.5" /> {reminderTime}
                         </span>
                       )}
                     </div>
 
                     <span className={`text-[11px] font-sans font-bold truncate ${
-                      t.completed ? 'line-through text-[#839493]' : 'text-[#dfe3e3]'
+                      t.completed ? 'line-through text-ink-muted' : 'text-ink'
                     }`}>
                       {t.title}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-[9px] font-sans text-[#00c3ff] bg-[#070b0b] px-1.5 py-0.2 border border-[#3a4a49] rounded">
+                    <span className="text-[11px] font-sans text-cyan-glow bg-surface-2 px-1.5 py-0.2 border border-line-subtle rounded-chip">
                       {t.completed ? 'COMPLETE' : 'PENDING'}
                     </span>
                   </div>
@@ -462,7 +462,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
       {/* ── TAB 2: TRANSMISSIONS & TOAST ALERTS ── */}
       {activeTab === 'transmissions' && (
         <div className="space-y-2.5 animate-in fade-in duration-150">
-          <div className="flex items-center justify-between text-[10px] text-[#839493]">
+          <div className="flex items-center justify-between text-[11px] text-ink-muted">
             <span>{ACTIVITY_INBOX_LABEL}</span>
             <div className="flex items-center gap-2">
               {notificationUnread > 0 && (
@@ -471,7 +471,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                     e.stopPropagation()
                     void markAllRead()
                   }}
-                  className="text-[#00c3ff] hover:text-[#00ffff] font-bold"
+                  className="rounded-control text-cyan-glow hover:text-ink font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   MARK ALL READ
                 </button>
@@ -479,7 +479,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
               {toastHistoryList.length > 0 && (
                 <button
                   onClick={(e) => { e.stopPropagation(); clearToastsFn(); }}
-                  className="text-[#ff453a] hover:text-[#ff6b6b] flex items-center gap-1 font-bold"
+                  className="rounded-control text-crimson-text hover:text-crimson-hover flex items-center gap-1 font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   <Trash2 className="w-2.5 h-2.5" /> CLEAR
                 </button>
@@ -489,25 +489,25 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
 
           {actionableNotifications.length > 0 && (
             <div className="space-y-1.5">
-              <div className="text-[9px] font-bold tracking-wider text-[#00ffff] uppercase">
+              <div className="text-[11px] font-bold tracking-[0.08em] text-cyan-glow uppercase">
                 Action Required
               </div>
               <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
                 {actionableNotifications.map((n) => (
                   <div
                     key={n.id}
-                    className="p-2 rounded-lg bg-[#040a0d] border border-[#00ff9d]/30 space-y-2"
+                    className="p-2 rounded-card bg-surface-1 hud-sheen border border-line space-y-2"
                   >
-                    <div className="text-[10px] font-bold text-[#00ffff] font-grotesk tracking-wider">
+                    <div className="text-[11px] font-bold text-cyan-glow font-grotesk tracking-[0.08em]">
                       {n.title}
                     </div>
-                    <div className="text-[#dfe3e3] text-[11px] leading-tight">{n.detail}</div>
+                    <div className="text-ink-body text-[11px] leading-tight">{n.detail}</div>
                     <div className="flex flex-wrap gap-1.5">
                       {n.payload.requestId && (
                         <>
                           <button
                             type="button"
-                            className="px-2 py-1 text-[9px] font-bold uppercase border border-[#00ff9d]/50 text-[#00ff9d] rounded"
+                            className="px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] border border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/15 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                             onClick={(e) => {
                               e.stopPropagation()
                               void acceptFriendRequest(n.payload.requestId!, n.id)
@@ -517,7 +517,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                           </button>
                           <button
                             type="button"
-                            className="px-2 py-1 text-[9px] font-bold uppercase border border-[#3a4a49] text-[#839493] hover:border-[#ff453a] hover:text-[#ff453a] rounded"
+                            className="px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] border border-line text-ink-muted hover:border-crimson-aggro hover:text-crimson-text rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                             onClick={(e) => {
                               e.stopPropagation()
                               void declineFriendRequest(n.payload.requestId!, n.id)
@@ -536,7 +536,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                               handle: n.actorHandle,
                             }),
                           }}
-                          className="px-2 py-1 text-[9px] font-bold uppercase border border-[#00c3ff]/40 text-[#00c3ff] rounded"
+                          className="px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] border border-line text-cyan-glow hover:border-line-strong hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                           onClick={() => setIsScheduleOpen(false)}
                         >
                           View Profile
@@ -551,26 +551,26 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
 
           {recentNotifications.length > 0 && (
             <div className="space-y-1.5">
-              <div className="text-[9px] font-bold tracking-wider text-[#839493] uppercase">
+              <div className="text-[11px] font-bold tracking-[0.08em] text-ink-muted uppercase">
                 Recent Transmissions
               </div>
               <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
                 {recentNotifications.map((n) => {
-                  const rowClass = `w-full text-left p-2 rounded-lg bg-[#040a0d] border flex items-start gap-2 text-xs ${
-                    n.readAt ? 'border-[#3a4a49]/60 opacity-80' : 'border-[#00c3ff]/30'
+                  const rowClass = `w-full text-left p-2 rounded-card bg-surface-1 hover:bg-surface-2 border flex items-start gap-2 text-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                    n.readAt ? 'border-line-subtle opacity-80' : 'border-line'
                   }`
                   const body = (
                     <>
                       <div
                         className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${
-                          n.readAt ? 'bg-[#3a4a49]' : 'bg-[#00c3ff]'
+                          n.readAt ? 'bg-ink-muted/40' : 'bg-cyan-glow'
                         }`}
                       />
                       <div className="min-w-0 flex-1 space-y-0.5">
-                        <div className="text-[10px] font-bold text-[#00ffff] font-grotesk tracking-wider">
+                        <div className="text-[11px] font-bold text-cyan-glow font-grotesk tracking-[0.08em]">
                           {n.title}
                         </div>
-                        <div className="text-[#dfe3e3] text-[11px] leading-tight">{n.detail}</div>
+                        <div className="text-ink-body text-[11px] leading-tight">{n.detail}</div>
                       </div>
                     </>
                   )
@@ -632,22 +632,22 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           )}
 
           <div className="space-y-1.5">
-            <div className="text-[9px] font-bold tracking-wider text-[#839493] uppercase">
+            <div className="text-[11px] font-bold tracking-[0.08em] text-ink-muted uppercase">
               Ephemeral Toasts
             </div>
             {toastHistoryList.length === 0 ? (
-              <div className="p-4 text-center text-xs text-[#839493] space-y-1">
+              <div className="p-4 text-center text-xs text-ink-muted space-y-1">
                 {dbNotifications.length === 0 && (
                   <>
-                    <Radio className="w-6 h-6 text-[#3a4a49] mx-auto animate-pulse" />
+                    <Radio className="w-6 h-6 text-ink-muted/40 mx-auto animate-pulse" />
                     <div>ALL FREQUENCIES QUIET</div>
-                    <div className="text-[10px] text-[#839493]/60">
+                    <div className="text-[11px] text-ink-muted">
                       No hails, replies, or friend alerts in the log.
                     </div>
                   </>
                 )}
                 {dbNotifications.length > 0 && (
-                  <div className="text-[10px] text-[#839493]/60">No recent toast alerts.</div>
+                  <div className="text-[11px] text-ink-muted">No recent toast alerts.</div>
                 )}
               </div>
             ) : (
@@ -655,16 +655,16 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                 {toastHistoryList.map((t) => (
                   <div
                     key={t.id}
-                    className="p-2 rounded-lg bg-[#040a0d] border border-[#00c3ff]/20 flex items-start gap-2 text-xs"
+                    className="p-2 rounded-card bg-surface-1 border border-line-subtle flex items-start gap-2 text-xs"
                   >
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] mt-1.5 shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-cyan-glow mt-1.5 shrink-0" />
                     <div className="min-w-0 flex-1 space-y-0.5">
                       {t.title && (
-                        <div className="text-[10px] font-bold text-[#00ffff] font-grotesk tracking-wider">
+                        <div className="text-[11px] font-bold text-cyan-glow font-grotesk tracking-[0.08em]">
                           {t.title}
                         </div>
                       )}
-                      <div className="text-[#dfe3e3] text-[11px] leading-tight">
+                      <div className="text-ink-body text-[11px] leading-tight">
                         {t.message}
                       </div>
                     </div>
@@ -677,13 +677,13 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
       )}
 
       {/* Footer Status Controls */}
-      <div className="pt-2 border-t border-[#00c3ff]/20 flex items-center justify-between text-[10px]">
+      <div className="pt-2 border-t border-line-subtle flex items-center justify-between text-[11px]">
         <button
           onClick={toggleReminders}
-          className="flex items-center gap-1 px-2 py-0.5 border border-[#3a4a49] hover:border-[#00c3ff] bg-[#030606] text-[#00c3ff] transition-colors rounded text-[9px] font-bold"
+          className="flex items-center gap-1 px-2 py-0.5 border border-line hover:border-line-strong bg-surface-1 hover:bg-surface-2 text-cyan-glow transition-colors rounded-control text-[11px] font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           title="Toggle automated 10-minute prior toast reminders"
         >
-          {remindersEnabled ? <Bell className="w-2.5 h-2.5 text-[#00c3ff]" /> : <BellOff className="w-2.5 h-2.5 text-[#ff453a]" />}
+          {remindersEnabled ? <Bell className="w-2.5 h-2.5 text-cyan-glow" /> : <BellOff className="w-2.5 h-2.5 text-crimson-text" />}
           <span>{remindersEnabled ? '10M REMINDERS: ON' : 'REMINDERS: OFF'}</span>
         </button>
       </div>
@@ -702,25 +702,25 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             e.stopPropagation()
             setIsScheduleOpen((prev) => !prev)
           }}
-          className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded-full bg-[#03090b]/90 hover:bg-[#061417] border border-[#00c3ff]/40 hover:border-[#00c3ff] text-[#dfe3e3] shadow-[0_0_12px_rgba(0,195,255,0.2)] transition-all select-none group"
+          className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded-control bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink transition-colors select-none group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           title="Open Activity Center & Liturgy Schedule"
           aria-label="Daily alignment tasks schedule"
           aria-expanded={isScheduleOpen}
           aria-busy={!countReady}
         >
           {/* Alignment status: next liturgy, or complete once 8/8 is sealed */}
-          <span className="text-[10px] text-[#839493] hidden md:inline truncate max-w-[130px] font-sans">
+          <span className="text-[11px] text-ink-muted hidden md:inline truncate max-w-[130px] font-sans">
             {countReady ? (
               allTasksCompleted ? (
-                <span className="text-[#00ff88] font-semibold">COMPLETE</span>
+                <span className="text-emerald-400 font-semibold">COMPLETE</span>
               ) : (
                 <>
-                  NEXT: <span className="text-[#dfe3e3] font-semibold">{nextTask?.title || 'None'}</span>
+                  NEXT: <span className="text-ink font-semibold">{nextTask?.title || 'None'}</span>
                 </>
               )
             ) : (
               <span
-                className="inline-block h-2 w-20 rounded-full bg-[#839493]/30 animate-pulse align-middle"
+                className="inline-block h-2 w-20 rounded-chip bg-ink-muted/30 animate-pulse align-middle"
                 aria-hidden
               />
             )}
@@ -728,20 +728,20 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
 
           {/* Liturgy Count Badge */}
           {renderLiturgyCount(
-            'text-[9px] font-sans font-bold px-1.5 py-0.2 rounded-full bg-[#00c3ff]/15 text-[#00ffff] border border-[#00c3ff]/30',
+            'text-[11px] font-sans font-bold px-1.5 py-0.2 rounded-chip bg-cyan-soft text-cyan-glow border border-line-subtle',
           )}
 
           {notificationUnread > 0 && (
-            <span className="text-[9px] font-sans font-bold px-1.5 py-0.2 rounded-full bg-[#ff5540]/20 text-[#ff5540] border border-[#ff5540]/40 animate-pulse">
+            <span className="text-[11px] font-sans font-bold px-1.5 py-0.2 rounded-chip bg-crimson-soft text-crimson-text border border-crimson-aggro/40 animate-pulse">
               {notificationUnread}
             </span>
           )}
 
           {/* Chevron Indicator */}
           {isScheduleOpen ? (
-            <ChevronUp className="w-3 h-3 text-[#00c3ff]" />
+            <ChevronUp className="w-3 h-3 text-cyan-glow" />
           ) : (
-            <ChevronDown className="w-3 h-3 text-[#839493] group-hover:text-[#00c3ff]" />
+            <ChevronDown className="w-3 h-3 text-ink-muted group-hover:text-cyan-glow" />
           )}
         </button>
 
@@ -749,7 +749,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
         {isScheduleOpen && !isMobileScreen && (
           <div
             ref={dropdownRef}
-            className="absolute top-full right-0 mt-2 w-80 sm:w-96 bg-[#03090b] border border-[#00c3ff]/50 rounded-2xl shadow-[0_10px_35px_rgba(0,0,0,0.9),0_0_20px_rgba(0,195,255,0.25)] p-3.5 z-50 font-sans space-y-3 animate-in fade-in slide-in-from-top-2 duration-150"
+            className="absolute top-full right-0 mt-2 w-80 sm:w-96 rounded-card border border-line bg-surface-1 shadow-menu p-3.5 z-50 font-sans space-y-3 animate-in fade-in slide-in-from-top-2 duration-150"
           >
             {renderActivityContent()}
           </div>
@@ -776,28 +776,28 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   return (
     <HudCard
       variant="cyan"
-      className={`p-4 sm:p-5 relative font-sans shadow-2xl border-[#00c3ff]/50 ${className}`}
+      className={`p-4 sm:p-5 relative font-sans ${className}`}
     >
       {/* ── TOP BAR: Mode Selector & Resync ── */}
-      <div className="flex flex-wrap items-center justify-between border-b border-[#00c3ff]/30 pb-3 gap-2">
+      <div className="flex flex-wrap items-center justify-between border-b border-line-subtle pb-3 gap-2">
         <div className="flex items-center space-x-2">
-          <Clock className="w-4 h-4 text-[#00ffff] animate-pulse" />
-          <span className="font-grotesk text-xs sm:text-sm font-bold tracking-widest text-[#dfe3e3] uppercase">
+          <Clock className="w-4 h-4 text-cyan-glow animate-pulse" />
+          <span className="font-grotesk text-xs sm:text-sm font-bold tracking-[0.08em] text-ink uppercase">
             BENTHIC CHRONOMETER
           </span>
-          <span className="text-[10px] text-[#839493] hidden xs:inline">• {label}</span>
+          <span className="text-[11px] text-ink-muted hidden xs:inline">• {label}</span>
         </div>
 
         {/* Timezone Switcher Tabs & Resync */}
-        <div className="flex items-center space-x-1 sm:space-x-1.5 text-[10px]">
+        <div className="flex items-center space-x-1 sm:space-x-1.5 text-[11px]">
           {(['LOCAL', 'UTC', 'BENTHIC', 'STARDATE'] as TimezoneMode[]).map((m) => (
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`px-2 py-0.5 rounded font-sans font-semibold transition-all ${
+              className={`px-2 py-0.5 rounded-control font-sans font-semibold border border-line transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                 mode === m
-                  ? 'bg-[#00c3ff] text-[#02080a] font-bold shadow-[0_0_8px_rgba(0,195,255,0.6)]'
-                  : 'bg-[#03090b] text-[#839493] hover:text-[#dfe3e3] border border-[#3a4a49]'
+                  ? 'bg-surface-2 text-ink font-bold shadow-[inset_0_-2px_0_theme(colors.cyan.glow)]'
+                  : 'bg-surface-1 text-ink-muted hover:text-ink hover:bg-surface-2'
               }`}
             >
               {m}
@@ -807,7 +807,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           {/* 12H / 24H Toggle */}
           <button
             onClick={() => setIs24Hour(!is24Hour)}
-            className="px-1.5 py-0.5 rounded bg-[#03090b] text-[#839493] hover:text-[#00ffff] border border-[#3a4a49] font-sans font-semibold text-[9px] transition-colors"
+            className="px-1.5 py-0.5 rounded-control bg-surface-1 text-ink-muted hover:text-ink hover:bg-surface-2 border border-line font-sans font-semibold text-[11px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             title="Toggle 12h/24h format"
           >
             {is24Hour ? '24H' : '12H'}
@@ -816,10 +816,10 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           {/* Resync Button */}
           <button
             onClick={handleResync}
-            className="p-1 rounded bg-[#03090b] text-[#839493] hover:text-[#00ffff] border border-[#3a4a49] transition-colors"
+            className="p-1 rounded-control bg-surface-1 text-ink-muted hover:text-ink hover:bg-surface-2 border border-line transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             title="Resync internal clock cycle"
           >
-            <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin text-[#00ffff]' : ''}`} />
+            <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin text-cyan-glow' : ''}`} />
           </button>
         </div>
       </div>
@@ -830,50 +830,50 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
         <div className="flex items-baseline space-x-1 sm:space-x-2 select-none">
           {/* Hours */}
           <div className="flex flex-col items-center">
-            <span className="font-mono text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-[#00ffff] drop-shadow-[0_0_20px_rgba(0,255,255,0.5)]">
+            <span className="font-mono text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-cyan-glow">
               {hours}
             </span>
-            <span className="text-[9px] text-[#839493] font-sans">HOURS</span>
+            <span className="text-[11px] text-ink-muted font-sans">HOURS</span>
           </div>
 
           {/* Colon Separator (Blinking) */}
-          <span className="font-mono text-3xl sm:text-5xl md:text-6xl text-[#00c3ff] animate-pulse">
+          <span className="font-mono text-3xl sm:text-5xl md:text-6xl text-cyan-glow animate-pulse">
             :
           </span>
 
           {/* Minutes */}
           <div className="flex flex-col items-center">
-            <span className="font-mono text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-[#00ffff] drop-shadow-[0_0_20px_rgba(0,255,255,0.5)]">
+            <span className="font-mono text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-cyan-glow">
               {minutes}
             </span>
-            <span className="text-[9px] text-[#839493] font-sans">MINUTES</span>
+            <span className="text-[11px] text-ink-muted font-sans">MINUTES</span>
           </div>
 
           {/* Colon Separator */}
-          <span className="font-mono text-3xl sm:text-5xl md:text-6xl text-[#00c3ff]/60">
+          <span className="font-mono text-3xl sm:text-5xl md:text-6xl text-cyan-glow/60">
             :
           </span>
 
           {/* Seconds */}
           <div className="flex flex-col items-center">
-            <span className="font-mono text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#00c3ff]">
+            <span className="font-mono text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight text-cyan-glow">
               {seconds}
             </span>
-            <span className="text-[9px] text-[#839493] font-sans">SECONDS</span>
+            <span className="text-[11px] text-ink-muted font-sans">SECONDS</span>
           </div>
 
           {/* Milliseconds (Tactical Hud Accent) */}
           <div className="flex flex-col items-center hidden sm:flex">
-            <span className="font-mono text-lg sm:text-2xl font-bold text-[#ff5540]">
+            <span className="font-mono text-lg sm:text-2xl font-bold text-crimson-text">
               .{millis}
             </span>
-            <span className="text-[8px] text-[#839493] font-sans">MS</span>
+            <span className="text-[11px] text-ink-muted font-sans">MS</span>
           </div>
 
           {/* AM/PM or Mode Badge */}
           {ampm && (
             <div className="self-start ml-1 mt-1">
-              <span className="font-mono text-xs sm:text-sm font-bold text-[#ffb076] bg-[#ffb076]/10 border border-[#ffb076]/40 px-1.5 py-0.5 rounded">
+              <span className="font-mono text-xs sm:text-sm font-bold text-amber-400 bg-amber-500/15 border border-amber-500/40 px-1.5 py-0.5 rounded-chip">
                 {ampm}
               </span>
             </div>
@@ -881,50 +881,50 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
         </div>
 
         {/* Date & Global Sync Telemetry */}
-        <div className="flex items-center space-x-3 text-xs text-[#839493] pt-1">
+        <div className="flex items-center space-x-3 text-xs text-ink-muted pt-1">
           <div className="flex items-center space-x-1 font-mono">
-            <Calendar className="w-3.5 h-3.5 text-[#00ffff]" />
+            <Calendar className="w-3.5 h-3.5 text-cyan-glow" />
             <span>{formatDateString()}</span>
           </div>
           <span>•</span>
-          <span className="font-mono text-[#00c3ff]">SYNC: OPTIMAL (±0.02ms)</span>
+          <span className="font-mono text-cyan-glow">SYNC: OPTIMAL (±0.02ms)</span>
         </div>
       </div>
 
       {/* ── BOTTOM: Alignment Liturgies Hub & Next Task ── */}
-      <div className="border-t border-[#00c3ff]/30 pt-3 space-y-3">
+      <div className="border-t border-line-subtle pt-3 space-y-3">
         {/* Next Task Banner */}
-        <div className="bg-[#03090b]/80 border border-[#00c3ff]/40 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="rounded-card border border-cyan-glow/40 bg-surface-2 hud-sheen p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div
             onClick={() => setIsScheduleOpen(!isScheduleOpen)}
             className="cursor-pointer group flex-1"
           >
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-xs text-[#839493]">
-                <Sparkles className="w-3.5 h-3.5 text-[#ff5540] animate-pulse" />
-                <span className="font-bold text-[#00ffff] uppercase tracking-wider">
+              <div className="flex items-center gap-1.5 text-xs text-ink-muted">
+                <Sparkles className="w-3.5 h-3.5 text-crimson-text animate-pulse" />
+                <span className="font-bold text-cyan-glow uppercase tracking-[0.08em]">
                   NEXT UPCOMING ALIGNMENT TASK
                 </span>
               </div>
-              <div className="text-[#00c3ff] group-hover:text-[#00ffff] transition-colors">
+              <div className="text-cyan-glow group-hover:text-ink transition-colors">
                 {isScheduleOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
               </div>
             </div>
 
             {allTasksCompleted ? (
-              <div className="text-xs sm:text-sm font-bold text-[#00ffff] flex items-center gap-2 pt-1">
-                <CheckCircle2 className="w-4 h-4 text-[#00ffff]" />
+              <div className="text-xs sm:text-sm font-bold text-emerald-400 flex items-center gap-2 pt-1">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                 <span>ALL DAILY ALIGNMENT LITURGIES VERIFIED FOR TODAY!</span>
               </div>
             ) : (
               <div className="flex items-baseline gap-2 flex-wrap pt-0.5">
-                <span className="text-xs sm:text-sm font-bold text-[#ff5540] font-sans">
+                <span className="text-xs sm:text-sm font-bold text-crimson-text font-sans">
                   [{nextTask.time}]
                 </span>
-                <span className="text-xs sm:text-sm font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors truncate">
+                <span className="text-xs sm:text-sm font-bold text-ink group-hover:text-cyan-glow transition-colors truncate">
                   {nextTask.title}
                 </span>
-                <span className="text-[10px] text-[#839493] underline decoration-dotted">
+                <span className="text-[11px] text-ink-muted underline decoration-dotted">
                   (Click to view full day schedule)
                 </span>
               </div>
@@ -938,7 +938,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                 e.stopPropagation()
                 handleToggleTask(nextTask.id)
               }}
-              className="shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0099cc] to-[#00c3ff] hover:from-[#00c3ff] hover:to-[#00ffff] text-[#02080a] font-bold text-xs uppercase tracking-wider rounded shadow-[0_0_15px_rgba(0,195,255,0.4)] transition-all active:scale-95"
+              className="shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-cyan-glow hover:bg-cyan-hover hover:drop-shadow-[0_0_10px_rgba(0,195,255,0.45)] text-abyss font-bold text-xs uppercase tracking-[0.08em] rounded-control transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>COMPLETE ALIGNMENT</span>
@@ -948,19 +948,19 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
 
         {/* ═══ EXPANDABLE FULL DAY SCHEDULE DROPDOWN ═══ */}
         {isScheduleOpen && (
-          <div className="mt-4 pt-3 border-t border-[#00c3ff]/20 space-y-3 animate-in fade-in duration-200">
+          <div className="mt-4 pt-3 border-t border-line-subtle space-y-3 animate-in fade-in duration-200">
             {/* Dropdown Summary Bar */}
-            <div className="flex items-center justify-between text-xs text-[#839493] font-sans px-1">
+            <div className="flex items-center justify-between text-xs text-ink-muted font-sans px-1">
               <div className="flex items-center gap-2">
-                <Award className="w-4 h-4 text-[#00ffff]" />
-                <span className="font-bold text-[#dfe3e3] uppercase">FULL DAY LITURGY SCHEDULE</span>
+                <Award className="w-4 h-4 text-cyan-glow" />
+                <span className="font-bold text-ink uppercase">FULL DAY LITURGY SCHEDULE</span>
               </div>
-              <div className="text-[11px] text-[#00ffff] font-sans">
+              <div className="text-[11px] text-cyan-glow font-sans">
                 {countReady ? (
                   `${completedCount} of ${localTasks.length} COMPLETED`
                 ) : (
                   <span
-                    className="inline-block h-2 w-24 rounded-full bg-[#00c3ff]/40 animate-pulse"
+                    className="inline-block h-2 w-24 rounded-chip bg-cyan-glow/40 animate-pulse"
                     aria-hidden
                   />
                 )}
@@ -968,9 +968,9 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             </div>
 
             {/* Progress bar */}
-            <div className="w-full h-1.5 bg-[#03090b] rounded-full overflow-hidden border border-[#00c3ff]/30">
+            <div className="w-full h-1.5 bg-surface-3 rounded-chip overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-[#0099cc] via-[#00c3ff] to-[#00ff88] transition-all duration-300"
+                className={`h-full rounded-chip transition-all duration-300 ${allTasksCompleted ? 'bg-emerald-500' : 'bg-cyan-glow'}`}
                 style={{
                   width: countReady
                     ? `${Math.round((completedCount / Math.max(localTasks.length, 1)) * 100)}%`
@@ -987,12 +987,12 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                   <div
                     key={t.id}
                     onClick={() => handleToggleTask(t.id)}
-                    className={`flex items-center justify-between p-2.5 rounded border transition-all cursor-pointer ${
+                    className={`flex items-center justify-between p-2.5 rounded-card border transition-colors cursor-pointer ${
                       isNext
-                        ? 'bg-[#00c3ff]/15 border-[#00c3ff] shadow-[0_0_12px_rgba(0,195,255,0.25)] ring-1 ring-[#00c3ff]/50'
+                        ? 'bg-cyan-soft border-cyan-glow/40'
                         : t.completed
-                        ? 'bg-[#03090b]/60 border-[#3a4a49]/60 opacity-75 hover:opacity-100'
-                        : 'bg-[#071417] border-[#00c3ff]/20 hover:border-[#00c3ff]/50'
+                        ? 'bg-surface-1 border-line-subtle opacity-75 hover:opacity-100'
+                        : 'bg-surface-1 border-line-subtle hover:bg-surface-2 hover:border-line-strong'
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0">
@@ -1001,28 +1001,28 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                           e.stopPropagation()
                           handleToggleTask(t.id)
                         }}
-                        className="text-[#00ffff] hover:scale-110 transition-transform"
+                        className="rounded-chip text-cyan-glow hover:scale-110 transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                       >
                         {t.completed ? (
-                          <CheckSquare className="w-4 h-4 text-[#00ffff]" />
+                          <CheckSquare className="w-4 h-4 text-cyan-glow" />
                         ) : (
-                          <Square className="w-4 h-4 text-[#839493]" />
+                          <Square className="w-4 h-4 text-ink-muted" />
                         )}
                       </button>
 
-                      <span className={`text-xs font-sans font-bold ${isNext ? 'text-[#ff5540]' : 'text-[#839493]'}`}>
+                      <span className={`text-xs font-sans font-bold ${isNext ? 'text-crimson-text' : 'text-ink-muted'}`}>
                         [{t.time}]
                       </span>
 
                       <span className={`text-xs font-sans font-bold truncate ${
-                        t.completed ? 'line-through text-[#839493]' : 'text-[#dfe3e3]'
+                        t.completed ? 'line-through text-ink-muted' : 'text-ink'
                       }`}>
                         {t.title}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-[10px] font-bold text-[#00c3ff] bg-[#00c3ff]/10 border border-[#00c3ff]/30 px-1.5 py-0.5 rounded font-sans">
+                      <span className="text-[11px] font-bold text-cyan-glow bg-cyan-soft border border-line-subtle px-1.5 py-0.5 rounded-chip font-sans">
                         {t.completed ? 'COMPLETE' : 'PENDING'}
                       </span>
                     </div>
