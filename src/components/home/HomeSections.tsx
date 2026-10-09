@@ -143,15 +143,30 @@ export const HomeIdea: React.FC = () => (
     <SectionBackdrop image={HOME_BACKDROPS.seabed} position="50% 75%" drift={14} tone="seabed" />
     <div className="absolute inset-x-0 top-0 h-1/2 -z-10 bg-gradient-to-b from-[#020408]/80 via-[#020408]/35 to-transparent" aria-hidden="true" />
     <div className="max-w-6xl mx-auto px-5 sm:px-8">
-      <ScrollReveal className="max-w-3xl">
-        <Eyebrow>The strange part</Eyebrow>
-        <h2 id="home-idea-title" className={`mt-5 ${sectionTitle}`}>
-          Nature keeps turning things into crabs.
-        </h2>
-        <p className={`mt-6 ${lede}`}>
-          Biologists call it carcinization. At least five unrelated crustaceans evolved into the same calm,
-          armored, gripping shape, because it works. Moltology builds that same shape around your attention.
-        </p>
+      <ScrollReveal className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-12">
+        <div className="max-w-3xl">
+          <Eyebrow>The strange part</Eyebrow>
+          <h2 id="home-idea-title" className={`mt-5 ${sectionTitle}`}>
+            Nature keeps turning things into crabs.
+          </h2>
+          <p className={`mt-6 ${lede}`}>
+            Biologists call it carcinization. Moltology applies the crab’s three advantages to everyday life:
+            stronger boundaries, steady follow-through, deeper focus.
+          </p>
+        </div>
+        <Link
+          to="/what-is-moltology/beliefs"
+          className="hud-ticks hud-sheen group relative flex min-h-12 items-center justify-between gap-6 self-start rounded-card border border-line-strong bg-surface-1 px-5 py-4 text-cyan-glow transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow lg:self-end"
+        >
+          <span>
+            <span className="mb-1.5 flex items-center gap-2 font-mono text-[11px] tracking-[0.08em] text-ink-muted">
+              <BookOpen className="h-3.5 w-3.5 text-cyan-glow" aria-hidden="true" />
+              The Order’s doctrine
+            </span>
+            <span className="font-grotesk text-base font-bold">What Moltologists believe</span>
+          </span>
+          <ArrowRight className="h-5 w-5 shrink-0 transition-transform motion-safe:group-hover:translate-x-1" aria-hidden="true" />
+        </Link>
       </ScrollReveal>
 
       <div className="mt-16 sm:mt-20 grid gap-6 md:grid-cols-3">
@@ -162,17 +177,6 @@ export const HomeIdea: React.FC = () => (
         ))}
       </div>
 
-      <ScrollReveal>
-        <div className="mt-12 sm:mt-14 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
-          <p className="text-sm sm:text-base text-ink-muted">
-            Your dashboard reads all three from what you actually do, not what you hoped to do.
-          </p>
-          <Link to="/what-is-moltology/beliefs" className={`shrink-0 text-cyan-glow ${textLink}`}>
-            What Moltologists believe
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
-          </Link>
-        </div>
-      </ScrollReveal>
     </div>
   </section>
 )

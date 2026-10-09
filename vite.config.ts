@@ -1,9 +1,10 @@
 /// <reference types="vitest" />
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig, loadEnv, searchForWorkspaceRoot } from 'vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import { nitro } from 'nitro/vite'
 import viteReact from '@vitejs/plugin-react'
 import path from 'path'
+import { realpathSync } from 'node:fs'
 import { resolveViteEmailVerificationEnabled, resolveViteGoogleAuthEnabled } from './src/lib/auth-config'
 
 const isTest = Boolean(process.env.VITEST)
@@ -69,6 +70,10 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
       host: true,
+      // Worktrees can share node_modules through a symlink outside the workspace.
+      fs: {
+        allow: [searchForWorkspaceRoot(process.cwd()), realpathSync(path.resolve(process.cwd(), 'node_modules'))],
+      },
       hmr: {
         overlay: true,
       },
