@@ -156,7 +156,8 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
               </picture>
             </div>
           </div>
-          <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#020408] via-[#020408]/70 to-transparent pointer-events-none" aria-hidden="true" />
+          {/* Wider than the device so its ring and glow sink into the page colour too, leaving no edge where the next section starts. */}
+          <div className="absolute -inset-x-16 -bottom-px h-2/3 bg-gradient-to-t from-[#020408] from-[8%] via-[#020408]/70 to-transparent pointer-events-none" aria-hidden="true" />
         </div>
       </div>
     </section>
