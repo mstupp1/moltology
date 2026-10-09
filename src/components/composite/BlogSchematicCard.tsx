@@ -1,7 +1,9 @@
 import React from 'react'
 import { CompositeContainer } from './CompositeContainer'
 import { MascotOverlay, MascotKey } from './MascotOverlay'
-import { Cpu, Zap, Activity } from 'lucide-react'
+import { Cpu, Activity } from 'lucide-react'
+import { displayCopy } from '@/lib/composite-copy'
+import { CompositeBrand, CompositeBullets, CompositeHeadline, CompositeLabel, CompositePanel } from './CompositeKit'
 
 export interface BlogSchematicCardProps {
   categoryBadge?: string
@@ -47,58 +49,35 @@ export const BlogSchematicCard: React.FC<BlogSchematicCardProps> = ({
     const red = tone === 'red'
     const Icon = red ? Activity : Cpu
     return (
-      <div
-        className={`p-8 rounded-2xl flex flex-col ${
-          red
-            ? 'bg-[#14080c]/90 border border-red-500/60 shadow-[0_0_25px_rgba(239,68,68,0.18)]'
-            : 'bg-[#041a26]/90 border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,195,255,0.28)]'
-        }`}
-      >
-        <div className={`flex items-center gap-2.5 font-mono font-bold text-lg tracking-wider uppercase ${red ? 'text-red-400' : 'text-cyan-400'}`}>
-          <Icon className="w-6 h-6 shrink-0" />
-          <span>{title}</span>
+      <CompositePanel tone={red ? 'crimson' : 'cyan'} featured={!red} className="flex flex-col p-8">
+        <div className={`flex items-center gap-3 ${red ? 'text-crimson-text' : 'text-cyan-glow'}`}>
+          <Icon className="h-6 w-6 shrink-0" />
+          <CompositeLabel tone={red ? 'crimson' : 'cyan'}>{title}</CompositeLabel>
         </div>
-        <div className="mt-4 font-mono font-black text-6xl text-white tracking-tight leading-none">{metric}</div>
-        {caption && (
-          <div className={`mt-3 font-mono font-bold text-base uppercase tracking-wide ${red ? 'text-red-300' : 'text-cyan-300'}`}>
-            {caption}
-          </div>
-        )}
-        <ul className="mt-7 space-y-3 text-xl leading-snug text-slate-200">
-          {bullets.map((b, i) => (
-            <li key={i} className="flex items-start gap-3">
-              <span className={`w-2.5 h-2.5 rounded-full mt-2 shrink-0 ${red ? 'bg-red-400' : 'bg-cyan-400'}`} />
-              <span>{b}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+        <div className="mt-5 text-[60px] font-bold leading-none tracking-[-0.02em] text-ink">{displayCopy(metric)}</div>
+        {caption && <div className="mt-3 text-[20px] font-medium text-ink-muted">{displayCopy(caption)}</div>}
+        <CompositeBullets items={bullets} tone={red ? 'crimson' : 'cyan'} size={21} className="mt-7" />
+      </CompositePanel>
     )
   }
 
   return (
-    <CompositeContainer
-      aspectRatio="16:9"
-      backgroundImageUrl={backgroundImageUrl}
-      showScanlines={true}
-      showCornerBrackets={false}
-    >
-      {/* 1. Header: badge, headline and the (previously unused) subtitle */}
-      <div className={hasMascot ? 'pr-[300px]' : ''}>
-        <div className="font-mono font-bold text-lg text-cyan-400 tracking-[0.18em] uppercase">{categoryBadge}</div>
-        <h1 className="font-black text-5xl text-white tracking-tight uppercase mt-2 leading-[1.05] [text-wrap:balance]">
-          {headline}
-        </h1>
-        {subtitle && <p className="mt-3 font-mono text-lg text-slate-400 tracking-wide uppercase">{subtitle}</p>}
+    <CompositeContainer aspectRatio="16:9" backgroundImageUrl={backgroundImageUrl} vignette="dark">
+      <div className="flex items-start justify-between gap-10">
+        <div className="max-w-[1080px]">
+          <CompositeLabel>{categoryBadge}</CompositeLabel>
+          <CompositeHeadline lines={[headline]} size={54} className="mt-3" />
+          {subtitle && <p className="mt-3 text-[22px] text-ink-muted">{displayCopy(subtitle)}</p>}
+        </div>
+        <CompositeBrand size="sm" />
       </div>
 
-      {/* 2. Side-by-side panels; the right column is left clear for the mascot */}
-      <div className={`grid grid-cols-2 gap-8 my-auto ${hasMascot ? 'mr-[250px]' : ''}`}>
+      <div className={`my-auto grid grid-cols-2 gap-8 ${hasMascot ? 'mr-[250px]' : ''}`}>
         {panel('red', leftTitle, leftMetric, leftCaption, leftBullets)}
         {panel('cyan', rightTitle, rightMetric, rightCaption, rightBullets)}
       </div>
 
-      <MascotOverlay mascot={mascot} position="bottom-right" width={260} className="bottom-6 right-4" />
+      <MascotOverlay mascot={mascot} position="bottom-right" width={260} glow={false} className="bottom-6 right-6" />
     </CompositeContainer>
   )
 }
