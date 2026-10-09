@@ -329,12 +329,88 @@
   from { transform: translate3d(-4%, -2%, 0); }
   to { transform: translate3d(4%, 3%, 0); }
 }
-/* Hero particle stage. The depth wash and the glow behind the shell are plain CSS, so the first
-   screen already has its light before the particle canvas fades in over it. */
-.home-hero-depth {
+/* Night sky → horizon → ocean. Static CSS/SVG paints with the headline, without media or JS.
+   Keep the light on the shell's side and the right-hand reading column quiet. */
+.home-hero-seascape {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  --sea-horizon: 67%;
+  background: linear-gradient(#050914, #081424 42%, #071721 67%, #020408 100%);
+}
+.home-hero-sky {
+  position: absolute;
+  inset: 0 0 33%;
   background:
-    radial-gradient(ellipse 70% 55% at 50% 0%, rgba(0, 120, 160, 0.16), transparent 70%),
-    radial-gradient(ellipse 60% 60% at 50% 100%, rgba(0, 60, 90, 0.12), transparent 70%);
+    radial-gradient(ellipse 50% 80% at 24% 12%, rgba(76, 97, 157, 0.15), transparent 75%),
+    radial-gradient(ellipse 70% 55% at 35% 95%, rgba(31, 119, 156, 0.15), transparent 75%);
+}
+.home-hero-sky::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  background:
+    radial-gradient(1px 1px at 9% 21%, #c2d9ef 65%, transparent),
+    radial-gradient(1px 1px at 23% 42%, #abcce4 65%, transparent),
+    radial-gradient(1.5px 1.5px at 37% 18%, #d6e8fa 50%, transparent),
+    radial-gradient(1px 1px at 58% 32%, #abcce4 65%, transparent),
+    radial-gradient(1px 1px at 79% 12%, #c2d9ef 65%, transparent),
+    radial-gradient(1px 1px at 91% 48%, #abcce4 65%, transparent);
+  background-size: 347px 263px;
+  mask-image: linear-gradient(#000, rgba(0, 0, 0, 0.6) 55%, transparent 100%);
+}
+.home-hero-horizon {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 55% 14% at 29% var(--sea-horizon), rgba(87, 158, 187, 0.2), transparent 75%),
+    radial-gradient(ellipse 35% 30% at 20% 56%, rgba(43, 92, 130, 0.13), transparent 75%);
+}
+.home-hero-horizon::after {
+  content: '';
+  position: absolute;
+  top: var(--sea-horizon);
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(154, 209, 224, 0.28) 28%, rgba(88, 159, 183, 0.1) 60%, transparent);
+}
+.home-hero-ocean {
+  position: absolute;
+  inset: var(--sea-horizon) 0 0;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 28% 100% at 28% 0%, rgba(76, 157, 180, 0.12), transparent 80%),
+    linear-gradient(rgba(3, 14, 24, 0.5), #020408);
+}
+.home-hero-ocean svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: rgba(118, 186, 203, 0.22);
+  mask-image: radial-gradient(ellipse 65% 95% at 28% 0%, #000, transparent 90%);
+}
+/* Progressive, compositor-only parallax: no perpetual work while the visitor reads. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .home-hero { view-timeline-name: --hero-sea; }
+    .home-hero-sky {
+      animation: homeSkyRecede linear both;
+      animation-timeline: --hero-sea;
+      animation-range: exit 0% exit 100%;
+    }
+  }
+}
+@keyframes homeSkyRecede {
+  to { transform: translateY(45px); }
+}
+@media (max-width: 1023px) {
+  .home-hero-seascape { --sea-horizon: 60%; }
+  .home-hero-sky { bottom: 40%; }
+  .home-hero-sky::before { opacity: 0.35; }
 }
 .home-hero-particles {
   opacity: 0;
@@ -365,7 +441,14 @@
   }
 }
 .home-hero-veil {
-  background: linear-gradient(to bottom, rgba(2, 4, 8, 0.6), transparent 14%, transparent 70%, rgba(2, 4, 8, 0.75) 88%, #020408 100%);
+  background:
+    linear-gradient(90deg, transparent 30%, rgba(2, 4, 8, 0.45) 68%, rgba(2, 4, 8, 0.55)),
+    linear-gradient(to bottom, rgba(2, 4, 8, 0.5), transparent 14%, transparent 70%, rgba(2, 4, 8, 0.75) 88%, #020408 100%);
+}
+@media (max-width: 1023px) {
+  .home-hero-veil {
+    background: linear-gradient(to bottom, rgba(2, 4, 8, 0.55), rgba(2, 4, 8, 0.35) 35%, transparent 60%, rgba(2, 4, 8, 0.75) 88%, #020408);
+  }
 }
 /* Section artwork. Each tone grades its art lightly and lights it where the art's own light falls.
    --light-a / --light-b are the two light pools; --edge-blur is how far out of focus the edges go. */
