@@ -13,6 +13,8 @@ Read BRAND_BIBLE.md and STYLE_GUIDE.md before writing. These defaults reflect th
 
 ## Length, writing and budget
 
+Read [comment-to-DM delivery guidance](../instagram-post-creator/references/comment-to-dm.md) before writing a CTA. Delivery is disabled / unverified by default. Check narration, captions, first comments, subtitles and outro artwork; use direct resource links and do not provision rules during content creation.
+
 - Six scenes and a 2.5-second outro. Aim around 25–30 seconds total, modestly longer than the 17.6-second calendar reel.
 - Begin around 50–65 narration words, then measure the voiceover and adjust pacing. The old 26–34-word limit and 110-word minimum no longer apply.
 - External production budget: $2.50–$3.50. Aim around $3.00 for video and reserve room for voice and direction. This is wiggle room, not a requirement to spend the full amount. Built-in Codex/ImageGen usage is separate; its exact cost is not available to the script.
