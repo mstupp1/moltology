@@ -23,10 +23,12 @@ export const S3_BASE_URL = getEndpoint()
  * Local assets that stay in public/ for zero-latency initial HTML/CSS render
  */
 const LOCAL_ASSET_WHITELIST = new Set([
+  'favicon.svg',
   'favicon.ico',
   'favicon.png',
   'images/order_emblem.png',
   'images/order_emblem.webp',
+  'images/order_emblem.svg',
   'images/scanline_pattern.png',
   'images/bubble_variant_1.jpg',
   'images/bubble_variant_2.jpg',

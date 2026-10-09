@@ -19,6 +19,17 @@ says when to use each. New UI uses these and the primitives in `src/components/u
 
 The `line-*` and `*-soft` tokens are rgba, so Tailwind's `/50` opacity modifier does not apply to them.
 
+### Brand artwork
+
+The Synaptic Path emblem uses `crimson-aggro` (`#ff453a`) in production. The
+approved artwork also keeps reference-red, pure black/white and inherited-color
+exports in [`content/brand/synaptic-path/`](../../content/brand/synaptic-path/README.md).
+Use `BrandIcon` / `BrandWordmark` from `src/components/ui/BrandMark.tsx` for inline
+branding and `HeaderBrand` for the navigation lockup. Their paths inherit color;
+do not apply filters to approximate a different brand color. `npm run brand:build`
+regenerates exports from these tokens; `npm run brand:check` detects stale colors,
+icons or geometry and verifies the original-icon backups.
+
 ## Corners
 
 | Token | Size | Use |

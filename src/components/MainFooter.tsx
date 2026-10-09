@@ -15,6 +15,7 @@ import {
   Info,
 } from 'lucide-react'
 import { useStoreDestination } from '@/components/store/useStoreDestination'
+import { HeaderBrand } from '@/components/ui/HeaderBrand'
 
 export interface MainFooterProps {
   className?: string
@@ -64,42 +65,7 @@ export const MainFooter: React.FC<MainFooterProps> = ({
               to="/"
               className="inline-flex items-center gap-3 cursor-pointer group select-none max-w-fit"
             >
-              {/* Emblem Logo */}
-              <div className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center shrink-0">
-                <img
-                  src="/images/order_emblem.webp"
-                  alt="Order Emblem"
-                  width={40}
-                  height={40}
-                  className={`w-full h-full object-contain transition-all duration-300 ${
-                    isCorporate
-                      ? 'filter drop-shadow-[0_1px_2px_rgba(15,23,42,0.18)]'
-                      : 'filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]'
-                  }`}
-                />
-              </div>
-
-              {/* Brand Title & Subtext */}
-              <div className="overflow-hidden whitespace-nowrap min-w-0 text-left">
-                <div
-                  className={`font-grotesk font-extrabold text-base sm:text-lg tracking-widest uppercase flex items-center gap-2 transition-all duration-300 leading-tight ${
-                    isCorporate
-                      ? 'text-sky-950 group-hover:text-sky-700'
-                      : 'text-ink drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] group-hover:text-white'
-                  }`}
-                >
-                  <span>{brandTitle}</span>
-                </div>
-                <div
-                  className={`text-[11px] font-bold tracking-widest uppercase truncate mt-0.5 ${
-                    isCorporate
-                      ? 'text-sky-600'
-                      : 'text-cyan-glow drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]'
-                  }`}
-                >
-                  <span className="truncate">{brandSubtext}</span>
-                </div>
-              </div>
+              <HeaderBrand brandTitle={brandTitle} subtext={brandSubtext} variant={variant} />
             </Link>
 
             {brandTagline && (
@@ -322,4 +288,3 @@ export const MainFooter: React.FC<MainFooterProps> = ({
     </footer>
   )
 }
-

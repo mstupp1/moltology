@@ -33,6 +33,7 @@ const PUBLIC_IMAGE_ALLOW_PREFIXES = [
 ]
 
 const PUBLIC_ALLOWED_ROOT_FILES = new Set([
+  'public/favicon.svg',
   'public/favicon.ico',
   'public/favicon.png',
   'public/robots.txt',
@@ -62,6 +63,7 @@ function isEssentialPublicAsset(relPath: string): boolean {
       PUBLIC_IMAGE_ALLOW_PREFIXES.some((prefix) => relPath.startsWith(prefix)) ||
       relPath === 'public/images/order_emblem.png' ||
       relPath === 'public/images/order_emblem.webp' ||
+      relPath === 'public/images/order_emblem.svg' ||
       relPath === 'public/images/scanline_pattern.png' ||
       relPath.startsWith('public/images/bubble_variant_') ||
       relPath.startsWith('public/images/pwa/')

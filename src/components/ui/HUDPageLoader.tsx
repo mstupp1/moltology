@@ -36,7 +36,7 @@ export function HUDPageLoader() {
 
         {/* Muted Emblem Logo */}
         <img
-          src={getAssetUrl('/images/order_emblem.webp')}
+          src={getAssetUrl('/images/order_emblem.svg')}
           alt="Loading"
           width={36}
           height={36}

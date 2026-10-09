@@ -13,7 +13,7 @@ describe('HUDPageLoader Component', () => {
 
     const emblem = screen.getByAltText('Loading')
     expect(emblem).toBeInTheDocument()
-    expect(emblem).toHaveAttribute('src', '/images/order_emblem.webp')
+    expect(emblem).toHaveAttribute('src', '/images/order_emblem.svg')
   })
 
   it('renders cleanly without extra text paragraphs or boot logs', () => {

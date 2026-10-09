@@ -118,7 +118,7 @@ export async function showSystemNotification(
     body: payload.body,
     tag,
     icon: '/images/pwa/icon-192.png',
-    badge: '/images/pwa/icon-192.png',
+    badge: '/images/pwa/badge-96.png',
     data: { url: payload.url || '/dashboard' },
   }
 

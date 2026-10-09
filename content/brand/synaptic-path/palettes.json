@@ -1,0 +1,47 @@
+{
+  "dark": {
+    "icon": "#ff453a",
+    "primary": "#e4e9e9",
+    "secondary": "#00c3ff"
+  },
+  "light": {
+    "icon": "#ff453a",
+    "primary": "#0f1414",
+    "secondary": "#006080"
+  },
+  "mono-dark": {
+    "icon": "#e4e9e9",
+    "primary": "#e4e9e9",
+    "secondary": "#e4e9e9"
+  },
+  "mono-light": {
+    "icon": "#0f1414",
+    "primary": "#0f1414",
+    "secondary": "#0f1414"
+  },
+  "black": {
+    "icon": "#000000",
+    "primary": "#000000",
+    "secondary": "#000000"
+  },
+  "white": {
+    "icon": "#ffffff",
+    "primary": "#ffffff",
+    "secondary": "#ffffff"
+  },
+  "inherit": {
+    "icon": "currentColor",
+    "primary": "currentColor",
+    "secondary": "currentColor"
+  },
+  "reference-dark": {
+    "icon": "#ef174c",
+    "primary": "#e4e9e9",
+    "secondary": "#00c3ff"
+  },
+  "reference-light": {
+    "icon": "#ef174c",
+    "primary": "#0f1414",
+    "secondary": "#006080"
+  }
+}

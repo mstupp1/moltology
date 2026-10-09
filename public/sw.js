@@ -1,7 +1,7 @@
 /* Moltology Command Hub service worker — network-first navigations, asset caching, notification click. */
 /* global self, caches, clients, fetch, Response */
 
-const VERSION = 'moltology-hub-v2'
+const VERSION = 'moltology-hub-v3-brand-2b98c7781e25'
 const PRECACHE = `${VERSION}-precache`
 const RUNTIME = `${VERSION}-runtime`
 const PAGES = `${VERSION}-pages`
@@ -11,11 +11,14 @@ const PRECACHE_URLS = [
   '/manifest.webmanifest',
   '/favicon.ico',
   '/favicon.png',
+  '/favicon.svg',
   '/images/order_emblem.png',
+  '/images/order_emblem.svg',
   '/images/pwa/icon-192.png',
   '/images/pwa/icon-512.png',
   '/images/pwa/icon-maskable-512.png',
   '/images/pwa/apple-touch-icon.png',
+  '/images/pwa/badge-96.png',
 ]
 
 /** Soft-guest + signed-in hub paths worth keeping for offline revisit. */
@@ -179,7 +182,7 @@ self.addEventListener('push', (event) => {
     self.registration.showNotification(payload.title || 'Moltology', {
       body: payload.body || '',
       icon: '/images/pwa/icon-192.png',
-      badge: '/images/pwa/icon-192.png',
+      badge: '/images/pwa/badge-96.png',
       tag: payload.tag || 'moltology-push',
       data: { url: payload.url || '/dashboard' },
     })
