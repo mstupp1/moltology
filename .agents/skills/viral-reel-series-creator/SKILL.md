@@ -96,7 +96,7 @@ Google Flow stays a **human handoff**. The agent writes scene directives. The us
 │  - Injects contextual cinematic color grading progression across scenes     │
 │  - Stamps Episodic HUD Lower-Third Badge and brand watermark                │
 │  - Burns sentence-isolated kinetic highlighted subtitles                    │
-│  - Appends 3D CTA Outro Card with mascot and comment keyword trigger        │
+│  - Appends CTA Outro Card with mascot and direct resource URL              │
 │  - Mixes neural voiceover with ducked ambient benthic soundtrack            │
 │  - Output: tmp/master-series-<series>-s<season>e<episode>-<timestamp>.mp4  │
 └──────────────────────────────────────┬──────────────────────────────────────┘
@@ -155,9 +155,11 @@ Instagram's algorithm heavily rewards videos that viewers rewatch without notici
 
 ---
 
-## 4. Comment-to-DM Growth Funnels
+## 4. Resource CTAs and future comment-to-DM funnels
 
-| Goal (`--cta-goal`) | Keyword Trigger | Target Destination URL | Value Proposition |
+Read [comment-to-DM delivery guidance](../instagram-post-creator/references/comment-to-dm.md) before writing or queueing an episode. Delivery is disabled / unverified by default. The keywords below are proposed mappings, not active automation rules. Remove delivery promises from CLI-generated captions, first comments, narration, subtitles and outro artwork before queueing. Use direct links until the intended rule has passed a real delivery test; do not provision rules during content creation.
+
+| Goal (`--cta-goal`) | Proposed keywords (inactive) | Target Destination URL | Value Proposition |
 | :--- | :--- | :--- | :--- |
 | **`quiz`** (Default) | `QUIZ` or `AUDIT` | `https://moltology.org/quiz` | **Moltmaxxing Audit**: four stages, twelve clearances. Shell Hardness, pincer torque grade, calcification tier. |
 | **`guide`** | `GUIDE` or `MOLTMAX` | `https://moltology.org/news/the-2026-moltmaxxing-protocol-guide` | **2026 Moltmaxxing Protocol Guide**: Comprehensive technical manual on algorithmic ecdysis and bio-silicon armor. |
@@ -168,8 +170,8 @@ Instagram's algorithm heavily rewards videos that viewers rewatch without notici
 Pasteable first-comment pattern (quiz):
 
 ```text
-Comment QUIZ for the four-stage clearance diagnostic in your DMs.
-Or audit directly: moltology.org/quiz
+Take the Moltmaxxing Audit and find your next small shed:
+https://moltology.org/quiz
 #Moltmaxxing #Carcinization #DeepWork
 ```
 
@@ -212,6 +214,6 @@ npm run series:create -- --series incidents --ingest-dir tmp/flow-video-ingest -
    - Do NOT invoke Zernio MCP tools (`posts_create`, etc.) manually. The CLI directly invokes the Zernio REST API.
    - Do not bypass the queue. Do not call `publish_now` / `--publish-now` unless the user explicitly commands an immediate live broadcast in this turn.
 4. **Mandatory First Comment**:
-   - The CLI script automatically posts the algorithmic first comment containing the keyword trigger link immediately after staging via the Zernio Inbox API.
+   - Review the CLI's first comment for a direct resource URL and remove unverified DM promises before queueing. Scheduling or posting a first comment does not register a comment-to-DM automation or prove delivery.
 5. **One franchise until it loops**:
    - Default `--series incidents`. Keep the other four in the catalog. Do not rotate for variety. Do not mint a sixth franchise.

@@ -35,6 +35,8 @@ Verify claims against the product. Do not reuse unsupported counts, invented rev
 
 ## Copy and scaffold
 
+Read [comment-to-DM delivery guidance](references/comment-to-dm.md) before writing a CTA. Delivery is disabled / unverified by default; use direct resource links and preserve the saved keyword mappings for future activation.
+
 Write a relatable sentence-case hook, a short grounded value body, and one clear invitation. Follow the brand/style guide, including a maximum of three hashtags and no decorative diamonds or shouting headers.
 
 Save reviewed content JSON with these fields: `title`, `topic`, `hookHeadline`, `imagePrompt`, `caption`, `hashtags` (at most three strings), `firstComment`, and optional `mascot`/`commentKeyword`. This file is the publishing source of truth; pass it with `--content-json` so campaign defaults cannot replace approved copy.
