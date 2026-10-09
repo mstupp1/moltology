@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useId, useRef, useState } from 'react'
+import { forumVisibleLength } from '@/lib/forum-markdown'
 import { X, AlertTriangle, MessageSquare } from 'lucide-react'
 import { createForumTopicFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
@@ -6,7 +7,7 @@ import { validateForumContent } from '@/lib/community-rules'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { useForumStanding } from '@/hooks/useForumStanding'
 import { useForumAuth } from './ForumShell'
-import { MentionTextarea } from '@/components/forum/MentionTextarea'
+import { ForumEditor } from '@/components/forum/ForumEditor'
 import { HudButton } from '@/components/ui/HudButton'
 
 interface NewTopicDialogProps {
@@ -31,6 +32,8 @@ export function NewTopicDialog({
   const [content, setContent] = useState('')
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const formRef = useRef<HTMLFormElement>(null)
+  const contentLabelId = useId()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -81,7 +84,7 @@ export function NewTopicDialog({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+        <form ref={formRef} onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-4 max-h-[75vh] overflow-y-auto">
           {locked && !error && (
             <div
               className="p-3 bg-surface-2 border border-line-subtle text-ink-body text-xs flex items-center gap-2 rounded-card"
@@ -134,19 +137,22 @@ export function NewTopicDialog({
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <label className="text-ink-muted font-bold uppercase tracking-[0.08em]">
+              <span id={contentLabelId} className="text-ink-muted font-bold uppercase tracking-[0.08em]">
                 Content
-              </label>
+              </span>
               <span className="text-[11px] text-ink-muted">
-                {content.trim().length} characters (min 10)
+                {forumVisibleLength(content)} characters (min 10)
               </span>
             </div>
-            <MentionTextarea
-              rows={6}
+            <ForumEditor
               value={content}
               onChange={setContent}
-              placeholder="Share your thoughts, questions, or ideas... Hail a member with @designation."
-              className="w-full bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-none rounded-control transition-colors p-3 resize-y placeholder:text-ink-muted"
+              onSubmit={() => formRef.current?.requestSubmit()}
+              disabled={creating}
+              size="tall"
+              aria-labelledby={contentLabelId}
+              placeholder="Share your thoughts, questions, or ideas. Type @ to mention someone."
+              testId="new-topic-editor"
             />
           </div>
 
@@ -162,7 +168,7 @@ export function NewTopicDialog({
               type="submit"
               variant="primary"
               size="sm"
-              disabled={creating || locked || title.trim().length < 5 || content.trim().length < 10}
+              disabled={creating || locked || title.trim().length < 5 || forumVisibleLength(content) < 10}
             >
               {creating ? 'Posting...' : 'Post'}
             </HudButton>

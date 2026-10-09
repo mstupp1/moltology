@@ -2,6 +2,7 @@
  * Community Rules & Guardrails for Moltology Neural Hub
  */
 
+import { forumVisibleLength } from './forum-markdown'
 import { checkRateLimit } from './ai/guardrails'
 import {
   CONTENT_HARM_ERROR,
@@ -143,7 +144,8 @@ export function validateForumContent(
     }
   }
 
-  if (trimmedContent.length < 10) {
+  // Count what readers see, so markdown syntax alone cannot pass the minimum.
+  if (forumVisibleLength(trimmedContent) < 10) {
     return {
       valid: false,
       error: 'Content must be at least 10 characters long.',

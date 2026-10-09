@@ -3,8 +3,6 @@ import {
   extractMentionHandles,
   forumMentionHubPath,
   forumMentionSourceKey,
-  insertMentionAtCursor,
-  mentionQueryAtCursor,
   presentForumMentionNotification,
   splitForumMentionParts,
 } from './forum-mentions'
@@ -28,20 +26,6 @@ describe('forum mentions', () => {
       'golf',
       'hotel',
     ])
-  })
-
-  it('detects an open @ query at the cursor', () => {
-    expect(mentionQueryAtCursor('Hail @cla', 9)).toEqual({ start: 5, query: 'cla' })
-    expect(mentionQueryAtCursor('Hail @', 6)).toEqual({ start: 5, query: '' })
-    expect(mentionQueryAtCursor('Hail claw', 9)).toBeNull()
-    expect(mentionQueryAtCursor('write initiate@cla', 18)).toBeNull()
-  })
-
-  it('inserts a designation over the active @ query', () => {
-    const next = insertMentionAtCursor('Hail @cla more', 9, 'claw_lord')
-    expect(next.text).toBe('Hail @claw_lord  more')
-    expect(next.cursor).toBe(16)
-    expect(next.text.slice(0, next.cursor)).toBe('Hail @claw_lord ')
   })
 
   it('splits saved copy into mention links and surrounding text', () => {

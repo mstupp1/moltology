@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
+import { forumVisibleLength } from '@/lib/forum-markdown'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import {
   ArrowLeft,
@@ -20,8 +21,7 @@ import { ForumPostCard } from '@/components/forum/ForumPostCard'
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { ForumAuthorTools, ForumRevisedMark, ForumWithdrawnBody } from '@/components/forum/ForumAuthorTools'
 import { ForumFlagControl } from '@/components/forum/ForumFlagControl'
-import { MentionTextarea } from '@/components/forum/MentionTextarea'
-import { ForumFormattingToolbar, handleFormattingShortcuts } from '@/components/forum/ForumFormattingToolbar'
+import { ForumEditor } from '@/components/forum/ForumEditor'
 import {
   getForumTopicDetailFn,
   updateForumTopicFn,
@@ -144,10 +144,9 @@ function ForumThreadPage() {
   const [confirmingTopicWithdraw, setConfirmingTopicWithdraw] = useState(false)
   const [topicTitleDraft, setTopicTitleDraft] = useState('')
   const [topicBodyDraft, setTopicBodyDraft] = useState('')
-  const [previewTopicEdit, setPreviewTopicEdit] = useState(false)
   const [topicBusy, setTopicBusy] = useState(false)
   const [topicError, setTopicError] = useState<string | null>(null)
-  const topicBodyTextareaRef = useRef<HTMLTextAreaElement>(null)
+  const topicFormRef = useRef<HTMLFormElement>(null)
   const topComposerRef = useRef<ReplyComposerHandle>(null)
   const persist = useHudPersist()
   const toast = useOptionalToast()
@@ -479,7 +478,7 @@ function ForumThreadPage() {
                   <ForumWithdrawnBody className="text-xs sm:text-sm text-ink-muted leading-relaxed italic" />
                 </div>
               ) : editingTopic ? (
-                <form onSubmit={handleTopicSave} className="space-y-2.5" data-testid="forum-revise-topic-form">
+                <form ref={topicFormRef} onSubmit={handleTopicSave} className="space-y-2.5" data-testid="forum-revise-topic-form">
                   {topicError && (
                     <div className="p-2.5 bg-crimson-soft border border-crimson-aggro/55 text-crimson-text text-xs flex items-center gap-2 rounded-control">
                       <AlertTriangle className="w-4 h-4 shrink-0" />
@@ -493,43 +492,16 @@ function ForumThreadPage() {
                     aria-label="Revise topic title"
                     className="w-full bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus p-3 text-sm text-ink outline-none rounded-control transition-[border-color,box-shadow]"
                   />
-                  <div className="space-y-0">
-                    <ForumFormattingToolbar
-                      textareaRef={topicBodyTextareaRef}
-                      value={topicBodyDraft}
-                      onChange={setTopicBodyDraft}
-                      preview={previewTopicEdit}
-                      onTogglePreview={() => setPreviewTopicEdit((v) => !v)}
-                      disabled={topicBusy}
-                    />
-                    {previewTopicEdit ? (
-                      <div
-                        className="w-full min-h-[110px] max-h-[300px] bg-abyss/60 border border-line p-3 text-xs text-ink-body rounded-b-control overflow-y-auto"
-                        data-testid="topic-edit-preview"
-                      >
-                        {topicBodyDraft.trim() ? (
-                          <ForumPostBody content={topicBodyDraft} />
-                        ) : (
-                          <p className="text-xs text-ink-muted italic">
-                            Nothing to preview yet. Transmit some thoughts or apply formatting above...
-                          </p>
-                        )}
-                      </div>
-                    ) : (
-                      <MentionTextarea
-                        ref={topicBodyTextareaRef}
-                        rows={5}
-                        value={topicBodyDraft}
-                        onChange={setTopicBodyDraft}
-                        onKeyDown={(e) => {
-                          handleFormattingShortcuts(e, topicBodyTextareaRef.current, setTopicBodyDraft)
-                        }}
-                        autoFocus
-                        aria-label="Revise topic body"
-                        className="w-full bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus p-3 text-xs text-ink outline-none resize-y rounded-b-control transition-[border-color,box-shadow] placeholder:text-ink-muted"
-                      />
-                    )}
-                  </div>
+                  <ForumEditor
+                    value={topicBodyDraft}
+                    onChange={setTopicBodyDraft}
+                    onSubmit={() => topicFormRef.current?.requestSubmit()}
+                    disabled={topicBusy}
+                    size="tall"
+                    autoFocus
+                    aria-label="Revise topic body"
+                    testId="forum-revise-topic-editor"
+                  />
                   <div className="flex items-center justify-end gap-2">
                     <button
                       type="button"
@@ -543,7 +515,7 @@ function ForumThreadPage() {
                     </button>
                     <button
                       type="submit"
-                      disabled={topicBusy || topicTitleDraft.trim().length < 5 || topicBodyDraft.trim().length < 10}
+                      disabled={topicBusy || topicTitleDraft.trim().length < 5 || forumVisibleLength(topicBodyDraft) < 10}
                       className="px-4 py-1.5 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     >
                       {topicBusy ? 'Sealing...' : 'Seal revision'}
@@ -551,7 +523,7 @@ function ForumThreadPage() {
                   </div>
                 </form>
               ) : (
-                <div className="rounded-control border border-line-subtle bg-abyss/60 p-3.5 sm:p-4 text-xs sm:text-sm text-ink-body leading-relaxed whitespace-pre-wrap">
+                <div className="rounded-control border border-line-subtle bg-abyss/60 p-3.5 sm:p-4 text-xs sm:text-sm text-ink-body leading-relaxed">
                   <ForumPostBody content={topic.content} />
                 </div>
               )}

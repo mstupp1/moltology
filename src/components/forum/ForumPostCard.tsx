@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { forumVisibleLength } from '@/lib/forum-markdown'
 import { Link } from '@tanstack/react-router'
 import { AlertTriangle, ChevronDown, ChevronRight, Clock, MessageSquare, Link2, Check, Quote, MoreHorizontal, Pencil, Undo2, Flag } from 'lucide-react'
 import { VoteButton, StageBadge } from '@/components/forum/ForumBits'
@@ -12,7 +13,7 @@ import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { ForumPostBody } from '@/components/forum/ForumPostBody'
 import { ForumRevisedMark, ForumWithdrawnBody } from '@/components/forum/ForumAuthorTools'
 import { ForumFlagControl } from '@/components/forum/ForumFlagControl'
-import { MentionTextarea } from '@/components/forum/MentionTextarea'
+import { ForumEditor } from '@/components/forum/ForumEditor'
 import { isForumQuoteSourceWithdrawn } from '@/lib/forum-quotes'
 import { useForumAuth } from '@/components/forum/ForumShell'
 import { useHudPersist } from '@/hooks/useHudPersist'
@@ -87,8 +88,8 @@ export function ForumPostCard({
     }
   }
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSave = async (e?: React.FormEvent) => {
+    e?.preventDefault()
     const validation = validateForumContent(undefined, draft)
     if (!validation.valid) {
       setError(validation.error || 'Invalid content')
@@ -317,13 +318,17 @@ export function ForumPostCard({
                     <span>{error}</span>
                   </div>
                 )}
-                <MentionTextarea
-                  rows={3}
+                <ForumEditor
                   value={draft}
                   onChange={setDraft}
+                  onSubmit={() => {
+                    if (!busy && forumVisibleLength(draft) >= 10) void handleSave()
+                  }}
+                  disabled={busy}
+                  size="compact"
                   autoFocus
                   aria-label="Revise reply"
-                  className="w-full bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus p-3 text-xs text-ink outline-none resize-y rounded-control transition-[border-color,box-shadow] placeholder:text-ink-muted"
+                  testId="forum-revise-reply-editor"
                 />
                 <div className="flex items-center justify-end gap-2">
                   <button
@@ -339,7 +344,7 @@ export function ForumPostCard({
                   </button>
                   <button
                     type="submit"
-                    disabled={busy || draft.trim().length < 10}
+                    disabled={busy || forumVisibleLength(draft) < 10}
                     className="px-4 py-1.5 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                   >
                     {busy ? 'Sealing...' : 'Seal revision'}

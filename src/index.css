@@ -762,3 +762,81 @@
     transition: none;
   }
 }
+
+/* Forum editor (src/components/forum/ForumEditor.tsx). Matches ForumPostBody so writing looks like the post. */
+.forum-editor-content > * + * {
+  margin-top: 0.5rem;
+}
+
+.forum-editor-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: theme('colors.ink.muted');
+}
+
+.forum-editor-content strong {
+  font-weight: 700;
+}
+
+.forum-editor-content em {
+  font-style: italic;
+}
+
+.forum-editor-content a {
+  color: theme('colors.cyan.glow');
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.forum-editor-content ul,
+.forum-editor-content ol {
+  padding-left: 1.25rem;
+}
+
+.forum-editor-content ul {
+  list-style: disc;
+}
+
+.forum-editor-content ol {
+  list-style: decimal;
+}
+
+.forum-editor-content li::marker {
+  color: theme('colors.ink.muted');
+}
+
+.forum-editor-content li > * + * {
+  margin-top: 0.25rem;
+}
+
+.forum-editor-content blockquote {
+  border-left: 2px solid rgba(0, 195, 255, 0.5);
+  background: theme('colors.surface.1');
+  border-radius: 0 4px 4px 0;
+  padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+  color: theme('colors.ink.body');
+}
+
+.forum-editor-content .forum-editor-code {
+  background: theme('colors.abyss');
+  border: 1px solid theme('colors.line.subtle');
+  border-radius: 2px;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.875em;
+}
+
+.forum-editor-content .forum-editor-codeblock {
+  background: theme('colors.abyss');
+  border: 1px solid theme('colors.line.subtle');
+  border-radius: 4px;
+  padding: 0.75rem;
+  overflow-x: auto;
+  white-space: pre;
+  font-size: 0.875em;
+}
+
+.forum-editor-content .suggestion {
+  color: theme('colors.cyan.glow');
+}

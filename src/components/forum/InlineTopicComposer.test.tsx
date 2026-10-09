@@ -9,6 +9,8 @@ import { ForumShell } from './ForumShell'
 import { authClient } from '@/lib/auth-client'
 import { createForumTopicFn, ForumCategoryEntry } from '@/lib/server/api'
 
+vi.mock('@/components/forum/ForumEditor')
+
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
     useSession: vi.fn(),
@@ -95,9 +97,7 @@ describe('InlineTopicComposer', () => {
     // Mobile viewport verification: font size 16px to prevent iOS Safari auto-zoom
     const titleInput = screen.getByLabelText(/title/i)
     expect(titleInput.className).toContain('text-[16px]')
-
-    const contentTextarea = screen.getByLabelText(/content/i)
-    expect(contentTextarea.className).toContain('text-[16px]')
+    // The content editor's 16px phone size is covered in ForumEditor.test.tsx.
   })
 
   it('collapses back when Cancel is clicked', () => {

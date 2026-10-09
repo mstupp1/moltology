@@ -12,6 +12,8 @@ const mockRedirect = vi.fn((args: unknown) => {
   throw err
 })
 
+vi.mock('@/components/forum/ForumEditor')
+
 vi.mock('@tanstack/react-router', () => ({
   createFileRoute: () => (config: any) => ({
     ...config,
@@ -245,7 +247,9 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
     expect(screen.getByText('LARVA UNIT #1111')).toBeInTheDocument()
     expect(screen.getByText('LARVA UNIT #2468')).toBeInTheDocument()
     expect(screen.getByText('Reply body from member B, long enough to count.')).toBeInTheDocument()
-    const replyCard = screen.getByText('Reply body from member B, long enough to count.').closest('div')
+    const replyCard = screen
+      .getByText('Reply body from member B, long enough to count.')
+      .closest('[data-testid="forum-post-card"]')
     expect(replyCard).toHaveTextContent('LARVA UNIT #2468')
     expect(replyCard).not.toHaveTextContent('LARVA UNIT #1111')
   })

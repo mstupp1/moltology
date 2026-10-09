@@ -221,6 +221,7 @@ describe('forum list helpers', () => {
     expect(long.length).toBeLessThanOrEqual(FORUM_TOPIC_PREVIEW_CHARS)
     expect(long.endsWith('…')).toBe(true)
     expect(forumTopicPreview(null)).toBe('')
+    expect(forumTopicPreview('**Molt** \\*now\\* and [read](https://e.com)')).toBe('Molt *now* and read')
   })
 
   it('escapes LIKE wildcards so searches match literally', () => {

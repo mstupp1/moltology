@@ -1,4 +1,5 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { forumVisibleLength } from '@/lib/forum-markdown'
 import { AlertTriangle, Send } from 'lucide-react'
 import { useForumAuth } from '@/components/forum/ForumShell'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -7,11 +8,9 @@ import { getAuthJWTToken } from '@/lib/jwt'
 import { validateForumContent } from '@/lib/community-rules'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
-import { MentionTextarea } from '@/components/forum/MentionTextarea'
+import { ForumEditor, type ForumEditorHandle } from '@/components/forum/ForumEditor'
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { prependForumQuote } from '@/lib/forum-quotes'
-import { ForumFormattingToolbar, handleFormattingShortcuts } from '@/components/forum/ForumFormattingToolbar'
-import { ForumPostBody } from '@/components/forum/ForumPostBody'
 
 export type ReplyComposerHandle = {
   insertQuote: (markup: string) => void
@@ -44,9 +43,8 @@ export const ReplyComposer = forwardRef<
   const { user } = useAuthSession()
   const persist = useHudPersist()
   const formRef = useRef<HTMLFormElement>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const editorRef = useRef<ForumEditorHandle>(null)
   const [content, setContent] = useState(initialContent)
-  const [preview, setPreview] = useState(false)
   const [posting, setPosting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -58,16 +56,15 @@ export const ReplyComposer = forwardRef<
   useImperativeHandle(ref, () => ({
     insertQuote: (markup: string) => {
       setContent((prev) => prependForumQuote(prev, markup))
-      setPreview(false)
       requestAnimationFrame(() => {
-        textareaRef.current?.focus()
+        editorRef.current?.focus()
       })
     },
   }))
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (isPending) return
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault()
+    if (isPending || posting) return
     if (!isAuthenticated) {
       openAuth('signup')
       return
@@ -93,7 +90,6 @@ export const ReplyComposer = forwardRef<
       })
       onPosted(post)
       setContent('')
-      setPreview(false)
     } catch (err: any) {
       setError(err?.message || 'Failed to post reply. Please try again.')
     } finally {
@@ -102,16 +98,8 @@ export const ReplyComposer = forwardRef<
     }
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (handleFormattingShortcuts(e, textareaRef.current, setContent)) {
-      return
-    }
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      e.preventDefault()
-      if (!posting && content.trim().length >= 10) {
-        handleSubmit(e as unknown as React.FormEvent)
-      }
-    }
+  const handleShortcutSubmit = () => {
+    if (!posting && forumVisibleLength(content) >= 10) void handleSubmit()
   }
 
   if (isPending) {
@@ -186,41 +174,18 @@ export const ReplyComposer = forwardRef<
         </div>
       )}
 
-      <div className="space-y-0">
-        <ForumFormattingToolbar
-          textareaRef={textareaRef}
-          value={content}
-          onChange={setContent}
-          preview={preview}
-          onTogglePreview={() => setPreview((v) => !v)}
-          disabled={posting}
-        />
-        {preview ? (
-          <div
-            className="w-full min-h-[90px] sm:min-h-[110px] max-h-[260px] bg-abyss/60 border border-line p-3 text-xs text-ink-body rounded-b-control overflow-y-auto"
-            data-testid="forum-reply-preview"
-          >
-            {content.trim() ? (
-              <ForumPostBody content={content} />
-            ) : (
-              <p className="text-xs text-ink-muted italic">
-                Nothing to preview yet. Write your thoughts or apply formatting above...
-              </p>
-            )}
-          </div>
-        ) : (
-          <MentionTextarea
-            ref={textareaRef}
-            rows={compact ? 3 : 4}
-            value={content}
-            onChange={setContent}
-            onKeyDown={handleKeyDown}
-            placeholder="Write your constructive reply... Hail a member with @designation. (min 10 characters)"
-            autoFocus={autoFocus}
-            className="w-full bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus p-3 text-xs text-ink outline-none resize-y rounded-b-control transition-[border-color,box-shadow] placeholder:text-ink-muted"
-          />
-        )}
-      </div>
+      <ForumEditor
+        ref={editorRef}
+        value={content}
+        onChange={setContent}
+        onSubmit={handleShortcutSubmit}
+        disabled={posting}
+        size={compact ? 'compact' : 'default'}
+        autoFocus={autoFocus}
+        aria-label={parentId ? 'Reply to comment' : 'Write a reply'}
+        placeholder="Write a reply. Type @ to mention someone."
+        testId="forum-reply-editor"
+      />
 
       <div className="flex items-center justify-between gap-2">
         <span className="text-[11px] text-ink-muted/70 hidden sm:inline">
@@ -238,7 +203,7 @@ export const ReplyComposer = forwardRef<
           )}
           <button
             type="submit"
-            disabled={posting || content.trim().length < 10}
+            disabled={posting || forumVisibleLength(content) < 10}
             className="px-4 py-1.5 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             {posting ? 'Posting...' : 'Reply'}

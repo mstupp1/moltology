@@ -2,6 +2,8 @@
  * Shared forum helpers: slugification, hot scoring, relative time, and reply trees.
  */
 
+import { forumMarkdownPlainText } from './forum-markdown'
+
 /** Sibling order within a threaded reply tree. */
 export type ForumReplySort = 'oldest' | 'newest' | 'top'
 
@@ -139,7 +141,10 @@ export const FORUM_HOT_CANDIDATE_POOL = 300
 export const FORUM_TOPIC_PREVIEW_CHARS = 280
 
 export function forumTopicPreview(content: string | null | undefined): string {
-  const flat = (content || '').replace(/\s+/g, ' ').trim()
+  // Previews show the words, not the markdown around them. Only the head of a
+  // long post can reach the preview, so only that much is parsed.
+  const head = (content || '').slice(0, FORUM_TOPIC_PREVIEW_CHARS * 8)
+  const flat = forumMarkdownPlainText(head).replace(/\s+/g, ' ').trim()
   return flat.length > FORUM_TOPIC_PREVIEW_CHARS
     ? `${flat.slice(0, FORUM_TOPIC_PREVIEW_CHARS - 1).trimEnd()}…`
     : flat
