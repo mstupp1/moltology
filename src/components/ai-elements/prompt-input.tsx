@@ -59,7 +59,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
 
   return (
     <div className={`p-2.5 sm:p-3 bg-surface-1/85 backdrop-blur-md border-t border-line-subtle select-none ${className}`}>
-      <div className="bg-surface-2 border border-line rounded-control p-2 sm:p-2.5 transition-[border-color,box-shadow] focus-within:border-cyan-glow focus-within:shadow-field-focus">
+      <div className="bg-surface-2 border border-line-subtle rounded-control p-2 sm:p-2.5 transition-colors focus-within:border-line">
         <form onSubmit={handleSubmit} className="flex flex-col">
           <textarea
             ref={textareaRef}

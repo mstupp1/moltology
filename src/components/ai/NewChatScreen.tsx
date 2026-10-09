@@ -245,7 +245,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
         </div>
 
         {/* Centered Main Prompt Card */}
-        <div className="relative bg-surface-2 border border-line rounded-control p-2 sm:p-2.5 transition-[border-color,box-shadow] focus-within:border-cyan-glow focus-within:shadow-field-focus">
+        <div className="relative bg-surface-2 border border-line-subtle rounded-control p-2 sm:p-2.5 transition-colors focus-within:border-line">
           <form onSubmit={handleSubmit} className="flex flex-col">
             {/* Multiline Textarea Input */}
             <textarea
