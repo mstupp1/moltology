@@ -5,6 +5,7 @@ import { LandingAuthCtaSkeleton } from '@/components/LandingAuthCtaSkeleton'
 import { getAssetUrl } from '@/lib/assets'
 import { eagerImageProps } from '@/lib/media-priority'
 import { HeroParticleField } from '@/components/home/hero-particles/HeroParticleField'
+import { HeroSeascape } from '@/components/home/HeroSeascape'
 
 const LazyLandingAuthCtas = React.lazy(() =>
   import('@/components/LandingAuthCtas').then((m) => ({ default: m.LandingAuthCtas }))
@@ -39,16 +40,15 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
     <section
       ref={sectionRef}
       aria-labelledby="home-hero-title"
-      className="relative w-full overflow-hidden bg-[#020408] pt-28 sm:pt-32 lg:pt-28"
+      className="home-hero relative w-full overflow-hidden bg-[#020408] pt-28 sm:pt-32 lg:pt-28"
     >
       {/*
-        The first screen is a particle field: static that calms and calcifies into a shell, with
-        new noise streaming around it. It is drawn on a canvas loaded after hydration, so the
-        headline and copy below are plain server-rendered HTML and paint first. On phones the
-        shell sits below the copy, so the stage covers the whole section there.
+        A server-rendered night sea sits behind the shell and copy on first paint. The particle
+        canvas loads after hydration. On phones the shell sits below the copy, so the stage
+        covers the whole section there.
       */}
       <div className="home-hero-stage absolute inset-0 lg:bottom-auto lg:h-[100svh] lg:min-h-[760px] pointer-events-none select-none" aria-hidden="true">
-        <div className="home-hero-depth absolute inset-0" />
+        <HeroSeascape />
         <HeroParticleField anchorRef={shellRef} hostRef={sectionRef} className="absolute inset-0 h-full w-full" />
         <div className="home-hero-veil absolute inset-0" />
       </div>
