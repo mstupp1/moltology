@@ -1,0 +1,453 @@
+{
+  "src/components/HomeHero.tsx": {
+    "hex-color": 12,
+    "off-scale-radius": 3
+  },
+  "src/components/LandingAuthCtaSkeleton.tsx": {
+    "off-scale-radius": 2
+  },
+  "src/components/LandingPage.tsx": {
+    "hex-color": 1
+  },
+  "src/components/MainFooter.tsx": {
+    "hex-color": 10
+  },
+  "src/components/MoltMaxPage.tsx": {
+    "hex-color": 94,
+    "tiny-text": 2,
+    "off-scale-radius": 10
+  },
+  "src/components/MoltmaxxingPillarPage.tsx": {
+    "hex-color": 101,
+    "tiny-text": 5,
+    "off-scale-radius": 13
+  },
+  "src/components/OrgPage.tsx": {
+    "hex-color": 11
+  },
+  "src/components/PrivacyPolicyPage.tsx": {
+    "hex-color": 2,
+    "tiny-text": 3
+  },
+  "src/components/TermsOfServicePage.tsx": {
+    "hex-color": 2,
+    "tiny-text": 3
+  },
+  "src/components/UserAvatar.tsx": {
+    "hex-color": 7,
+    "tiny-text": 2
+  },
+  "src/components/academy/AcademyCertificateViews.tsx": {
+    "hex-color": 16,
+    "chamfer": 2,
+    "tiny-text": 2
+  },
+  "src/components/academy/AcademyChrome.tsx": {
+    "hex-color": 17,
+    "chamfer": 3,
+    "tiny-text": 2
+  },
+  "src/components/academy/AcademyCourseView.tsx": {
+    "hex-color": 30,
+    "chamfer": 5,
+    "tiny-text": 1
+  },
+  "src/components/academy/AcademyHome.tsx": {
+    "hex-color": 32,
+    "chamfer": 5,
+    "tiny-text": 4
+  },
+  "src/components/academy/AcademyLessonView.tsx": {
+    "hex-color": 32,
+    "chamfer": 5,
+    "tiny-text": 3
+  },
+  "src/components/academy/AcademyTrackView.tsx": {
+    "hex-color": 19,
+    "chamfer": 3,
+    "tiny-text": 2
+  },
+  "src/components/academy/AcademyVideo.tsx": {
+    "hex-color": 5,
+    "chamfer": 3
+  },
+  "src/components/auth/AuthView.tsx": {
+    "hex-color": 8
+  },
+  "src/components/changelog/ChangelogDetailPage.tsx": {
+    "hex-color": 7,
+    "chamfer": 8,
+    "tiny-text": 3
+  },
+  "src/components/changelog/ChangelogFilterBar.tsx": {
+    "hex-color": 5,
+    "chamfer": 4,
+    "tiny-text": 7,
+    "off-scale-radius": 1
+  },
+  "src/components/changelog/ChangelogIndexPage.tsx": {
+    "hex-color": 5,
+    "chamfer": 7,
+    "tiny-text": 3
+  },
+  "src/components/codex/CodexDocumentSheet.tsx": {
+    "tiny-text": 3,
+    "off-scale-radius": 1
+  },
+  "src/components/codex/SacredCodexReader.tsx": {
+    "hex-color": 130,
+    "chamfer": 18,
+    "tiny-text": 13
+  },
+  "src/components/composite/BlogSchematicCard.tsx": {
+    "hex-color": 2,
+    "off-scale-radius": 1
+  },
+  "src/components/composite/CompositeContainer.tsx": {
+    "hex-color": 12
+  },
+  "src/components/composite/CompositeRenderView.tsx": {
+    "hex-color": 2
+  },
+  "src/components/composite/CompositeStudioUI.tsx": {
+    "hex-color": 31,
+    "tiny-text": 18,
+    "off-scale-radius": 10
+  },
+  "src/components/composite/ReelOutroCard.tsx": {
+    "hex-color": 5,
+    "off-scale-radius": 2
+  },
+  "src/components/composite/ReelSimpleOutroCard.tsx": {
+    "hex-color": 7,
+    "off-scale-radius": 2
+  },
+  "src/components/composite/ReelThumbnailCard.tsx": {
+    "off-scale-radius": 1
+  },
+  "src/components/composite/SocialDirectivesSlide.tsx": {
+    "hex-color": 3,
+    "off-scale-radius": 5
+  },
+  "src/components/composite/SocialHookSlide.tsx": {
+    "hex-color": 5,
+    "off-scale-radius": 4
+  },
+  "src/components/composite/SocialMarketingSlide.tsx": {
+    "hex-color": 113,
+    "off-scale-radius": 8
+  },
+  "src/components/composite/SocialPromptVaultSlide.tsx": {
+    "hex-color": 70,
+    "off-scale-radius": 13
+  },
+  "src/components/composite/SocialSpecShowdownSlide.tsx": {
+    "hex-color": 4,
+    "off-scale-radius": 3
+  },
+  "src/components/guide/MoltmaxGuideCard.tsx": {
+    "hex-color": 14
+  },
+  "src/components/guide/MoltmaxGuideFloatingPill.tsx": {
+    "hex-color": 9,
+    "tiny-text": 1,
+    "off-scale-radius": 4
+  },
+  "src/components/guide/MoltmaxGuideModal.tsx": {
+    "hex-color": 48,
+    "off-scale-radius": 9
+  },
+  "src/components/guide/MoltmaxGuidePage.tsx": {
+    "hex-color": 52,
+    "off-scale-radius": 4
+  },
+  "src/components/home/HomeSections.tsx": {
+    "hex-color": 21
+  },
+  "src/components/hud/ActivityStreamPage.tsx": {
+    "hex-color": 12,
+    "chamfer": 4
+  },
+  "src/components/hud/AssetSheddingWidget.tsx": {
+    "hex-color": 5,
+    "tiny-text": 3
+  },
+  "src/components/hud/AssetTransmutationModal.tsx": {
+    "hex-color": 30,
+    "chamfer": 4,
+    "tiny-text": 3
+  },
+  "src/components/hud/CommandCatalogIcon.tsx": {
+    "hex-color": 14
+  },
+  "src/components/hud/HiddenPageGuard.tsx": {
+    "hex-color": 6
+  },
+  "src/components/hud/HubSurfaceControls.tsx": {
+    "hex-color": 13,
+    "chamfer": 1,
+    "tiny-text": 1,
+    "off-scale-radius": 2
+  },
+  "src/components/hud/HudLayout.tsx": {
+    "hex-color": 1
+  },
+  "src/components/hud/HudPromoBentoCard.tsx": {
+    "hex-color": 17
+  },
+  "src/components/hud/LobsterAvatarDisplay.tsx": {
+    "hex-color": 4,
+    "off-scale-radius": 1
+  },
+  "src/components/hud/LobsterAvatarFullBody.tsx": {
+    "hex-color": 1,
+    "off-scale-radius": 1
+  },
+  "src/components/hud/LobsterAvatarPortrait.tsx": {
+    "hex-color": 1
+  },
+  "src/components/hud/MoltMaxxingStudio.tsx": {
+    "hex-color": 25,
+    "tiny-text": 9
+  },
+  "src/components/hud/PipelineView.tsx": {
+    "hex-color": 90,
+    "chamfer": 9,
+    "tiny-text": 10
+  },
+  "src/components/hud/PremiumBadge.tsx": {
+    "hex-color": 3,
+    "chamfer": 1,
+    "tiny-text": 1
+  },
+  "src/components/hud/RitualGateModal.tsx": {
+    "hex-color": 57,
+    "chamfer": 10,
+    "tiny-text": 3
+  },
+  "src/components/hud/SupportPortalView.tsx": {
+    "hex-color": 133,
+    "chamfer": 22,
+    "tiny-text": 9,
+    "off-scale-radius": 1
+  },
+  "src/components/hud/SupportTicketForm.tsx": {
+    "hex-color": 28,
+    "chamfer": 5
+  },
+  "src/components/hud/WelcomeInitiateHero.tsx": {
+    "hex-color": 8,
+    "chamfer": 1
+  },
+  "src/components/hud/avatar/AvatarCreatorPanel.tsx": {
+    "hex-color": 26,
+    "tiny-text": 1,
+    "off-scale-radius": 6
+  },
+  "src/components/hud/avatar/AvatarCreatorPreview.tsx": {
+    "hex-color": 2,
+    "tiny-text": 1,
+    "off-scale-radius": 2
+  },
+  "src/components/hud/chassis/AbilitiesPanel.tsx": {
+    "hex-color": 16,
+    "chamfer": 3,
+    "tiny-text": 3
+  },
+  "src/components/hud/chassis/ChassisStatusPage.tsx": {
+    "hex-color": 4,
+    "chamfer": 3,
+    "tiny-text": 1
+  },
+  "src/components/hud/chassis/GearItemCard.tsx": {
+    "hex-color": 5,
+    "tiny-text": 4,
+    "off-scale-radius": 1
+  },
+  "src/components/hud/chassis/GearTooltip.tsx": {
+    "hex-color": 6,
+    "chamfer": 2,
+    "tiny-text": 1
+  },
+  "src/components/hud/chassis/LoadoutStatsPanel.tsx": {
+    "hex-color": 9,
+    "chamfer": 3,
+    "tiny-text": 1
+  },
+  "src/components/hud/chassis/PaperDoll.tsx": {
+    "hex-color": 5,
+    "tiny-text": 2,
+    "off-scale-radius": 1
+  },
+  "src/components/hud/chassis/VaultGrid.tsx": {
+    "hex-color": 5,
+    "tiny-text": 1,
+    "off-scale-radius": 1
+  },
+  "src/components/hud/connections/ConnectionsPage.tsx": {
+    "hex-color": 32,
+    "chamfer": 6,
+    "tiny-text": 4
+  },
+  "src/components/hud/connections/MemberSearchRow.tsx": {
+    "hex-color": 7,
+    "chamfer": 2,
+    "tiny-text": 1
+  },
+  "src/components/hud/connections/SynapticNearbyStrip.tsx": {
+    "hex-color": 4,
+    "chamfer": 1
+  },
+  "src/components/hud/market/GemVaultPanel.tsx": {
+    "hex-color": 2
+  },
+  "src/components/hud/market/MoltCreditStorePanel.tsx": {
+    "hex-color": 2
+  },
+  "src/components/hud/member/MemberProfilePage.tsx": {
+    "hex-color": 3
+  },
+  "src/components/hud/search/SearchPage.tsx": {
+    "hex-color": 35,
+    "chamfer": 8,
+    "tiny-text": 4
+  },
+  "src/components/hud/welcome/CharacterCreationStep.tsx": {
+    "hex-color": 55,
+    "tiny-text": 4,
+    "off-scale-radius": 7
+  },
+  "src/components/journal/JournalPaperSheet.tsx": {
+    "chamfer": 1,
+    "tiny-text": 3
+  },
+  "src/components/journal/JournalReaderWorkspace.tsx": {
+    "hex-color": 99,
+    "chamfer": 11,
+    "tiny-text": 13
+  },
+  "src/components/journal/ScientificTable.tsx": {
+    "hex-color": 23,
+    "chamfer": 2,
+    "tiny-text": 7
+  },
+  "src/components/moltmax/QuizProgressHUD.tsx": {
+    "hex-color": 6
+  },
+  "src/components/moltmax/QuizQuestionCard.tsx": {
+    "hex-color": 43,
+    "off-scale-radius": 8
+  },
+  "src/components/moltmax/QuizResultsReveal.tsx": {
+    "hex-color": 57,
+    "tiny-text": 1,
+    "off-scale-radius": 13
+  },
+  "src/components/moltmax/VectorCarapaceDiagram.tsx": {
+    "hex-color": 4,
+    "tiny-text": 2,
+    "off-scale-radius": 5
+  },
+  "src/components/news/MoltNationBannerBg.tsx": {
+    "hex-color": 2
+  },
+  "src/components/news/MoltNationLogo.tsx": {
+    "tiny-text": 3
+  },
+  "src/components/news/NewsIndexPage.tsx": {
+    "hex-color": 5
+  },
+  "src/components/news/NewsPostDetail.tsx": {
+    "hex-color": 6
+  },
+  "src/components/org/CareerHub.tsx": {
+    "hex-color": 10
+  },
+  "src/components/reader/FullscreenDocumentReader.tsx": {
+    "hex-color": 51,
+    "chamfer": 8,
+    "tiny-text": 5
+  },
+  "src/components/ui/BrandMark.tsx": {
+    "hex-color": 1
+  },
+  "src/components/ui/ChromaElement.tsx": {
+    "hex-color": 3,
+    "off-scale-radius": 2
+  },
+  "src/components/ui/HUDPageLoader.tsx": {
+    "hex-color": 4
+  },
+  "src/components/ui/HUDSpinner.tsx": {
+    "hex-color": 1
+  },
+  "src/components/ui/HeroBackground.tsx": {
+    "hex-color": 9,
+    "tiny-text": 2
+  },
+  "src/components/ui/HudBottomSheet.tsx": {
+    "hex-color": 5,
+    "off-scale-radius": 1
+  },
+  "src/components/ui/HudButton.tsx": {
+    "off-scale-radius": 1
+  },
+  "src/components/ui/HudGhostLoader.tsx": {
+    "hex-color": 18,
+    "chamfer": 1,
+    "off-scale-radius": 3
+  },
+  "src/components/ui/HudSkeleton.tsx": {
+    "hex-color": 12
+  },
+  "src/components/ui/ImageLightbox.tsx": {
+    "hex-color": 6,
+    "chamfer": 3
+  },
+  "src/components/ui/MarkdownRenderer.tsx": {
+    "hex-color": 7,
+    "chamfer": 1
+  },
+  "src/components/ui/ToastProvider.tsx": {
+    "hex-color": 40,
+    "tiny-text": 1,
+    "off-scale-radius": 1
+  },
+  "src/components/ui/magicui/iphone-15-pro.tsx": {
+    "hex-color": 16,
+    "off-scale-radius": 10
+  },
+  "src/components/ui/magicui/safari.tsx": {
+    "hex-color": 14,
+    "tiny-text": 1,
+    "off-scale-radius": 4
+  },
+  "src/components/ui/slider.tsx": {
+    "hex-color": 4
+  },
+  "src/components/what-is-moltology/BeliefsAndCodesPage.tsx": {
+    "hex-color": 11
+  },
+  "src/components/what-is-moltology/BenthicSacramentsPage.tsx": {
+    "hex-color": 5
+  },
+  "src/components/what-is-moltology/WhatIsMoltologyHubPage.tsx": {
+    "hex-color": 37
+  },
+  "src/components/what-is-moltology/WhatMoltologistsSayPage.tsx": {
+    "hex-color": 4
+  },
+  "src/components/what-is-moltology/story/StoryPrimitives.tsx": {
+    "hex-color": 8
+  },
+  "src/emails/email-verification.tsx": {
+    "off-scale-radius": 2
+  },
+  "src/routes/__root.tsx": {
+    "hex-color": 4
+  },
+  "src/routes/_hud/journal/$slug.tsx": {
+    "hex-color": 7,
+    "chamfer": 2
+  }
+}

@@ -1,32 +1,36 @@
 /* Logic Atlas: React Flow restyled for the HUD. Scoped to .logic-atlas-flow. */
 
 .logic-atlas-flow {
-  --xy-background-color: #070c0d;
+  --xy-background-color: #0a1112;
   --xy-background-pattern-dots-color-default: rgba(0, 195, 255, 0.14);
   --xy-edge-stroke-default: rgba(131, 148, 147, 0.38);
   --xy-edge-stroke-width-default: 1.25;
-  --xy-edge-label-background-color-default: #0b1011;
-  --xy-edge-label-color-default: #9fb3b2;
+  --xy-edge-label-background-color-default: #0a1112;
+  --xy-edge-label-color-default: #8fa0a0;
   --xy-minimap-background-color-default: rgba(11, 16, 17, 0.92);
   --xy-minimap-mask-background-color-default: rgba(7, 12, 13, 0.72);
   --xy-minimap-mask-stroke-color-default: rgba(0, 195, 255, 0.55);
   --xy-minimap-mask-stroke-width-default: 2;
-  --xy-controls-button-background-color-default: #0e181b;
-  --xy-controls-button-background-color-hover-default: #122028;
-  --xy-controls-button-color-default: #9fb3b2;
-  --xy-controls-button-color-hover-default: #00ffff;
-  --xy-controls-button-border-color-default: #243233;
+  --xy-controls-button-background-color-default: #101a1c;
+  --xy-controls-button-background-color-hover-default: #172325;
+  --xy-controls-button-color-default: #8fa0a0;
+  --xy-controls-button-color-hover-default: #00c3ff;
+  --xy-controls-button-border-color-default: rgba(150, 170, 170, 0.55);
   --xy-controls-box-shadow-default: none;
   --xy-attribution-background-color-default: transparent;
-  background: radial-gradient(ellipse at 30% 0%, rgba(0, 195, 255, 0.06), transparent 60%), #070c0d;
+  background: radial-gradient(ellipse at 30% 0%, rgba(0, 195, 255, 0.06), transparent 60%), #0a1112;
 }
 
 .logic-atlas-flow .react-flow__controls {
-  border: 1px solid #243233;
+  border: 1px solid rgba(150, 170, 170, 0.55);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .logic-atlas-flow .react-flow__minimap {
-  border: 1px solid #243233;
+  border: 1px solid rgba(150, 170, 170, 0.26);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .logic-atlas-flow .react-flow__node {
@@ -72,9 +76,10 @@
   position: relative;
   width: 264px;
   height: 104px;
-  background: #0e181b;
-  border: 1px solid #243233;
-  border-left: 3px solid var(--domain);
+  background: #101a1c;
+  border: 1px solid rgba(150, 170, 170, 0.14);
+  border-left: 2px solid var(--domain);
+  border-radius: 8px;
   transition:
     opacity 180ms ease,
     box-shadow 180ms ease,
@@ -83,7 +88,7 @@
 }
 
 .atlas-rule:hover {
-  border-color: color-mix(in srgb, var(--domain) 70%, #243233);
+  border-color: color-mix(in srgb, var(--domain) 70%, rgba(150, 170, 170, 0.26));
   border-left-color: var(--domain);
 }
 
@@ -92,7 +97,7 @@
 }
 
 .atlas-rule[data-state='neighbor'] {
-  border-color: color-mix(in srgb, var(--domain) 55%, #243233);
+  border-color: color-mix(in srgb, var(--domain) 55%, rgba(150, 170, 170, 0.26));
   border-left-color: var(--domain);
 }
 
@@ -116,7 +121,7 @@
 
 /* Overview: rule cards become tinted tiles; flagged rules glow. */
 .atlas-rule[data-lod='overview'] {
-  background: color-mix(in srgb, var(--domain) 16%, #0b1011);
+  background: color-mix(in srgb, var(--domain) 16%, #0a1112);
   border-color: color-mix(in srgb, var(--domain) 30%, transparent);
 }
 
@@ -172,7 +177,7 @@
 }
 
 .logic-atlas-flow .react-flow__edge.atlas-edge-active path.react-flow__edge-path {
-  stroke: #00ffff;
+  stroke: #00c3ff;
   stroke-width: 2;
   opacity: 1;
   filter: drop-shadow(0 0 4px rgba(0, 255, 255, 0.55));
@@ -189,9 +194,9 @@
   text-align: center;
   font-size: 11.5px;
   line-height: 1.2;
-  color: #dfe3e3;
-  background: #0e181b;
-  border: 1px solid #2c3d3e;
+  color: #e4e9e9;
+  background: #101a1c;
+  border: 1px solid rgba(150, 170, 170, 0.26);
 }
 
 .atlas-flow-step[data-kind='start'] {
@@ -258,7 +263,7 @@
 }
 
 .atlas-prose strong {
-  color: #dfe3e3;
+  color: #e4e9e9;
 }
 
 @media (prefers-reduced-motion: reduce) {

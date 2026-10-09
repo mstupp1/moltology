@@ -30,5 +30,8 @@ jobs:
       - name: Verify Brand Assets and Legacy Backups
         run: npm run brand:check
 
+      - name: Guard UI Tokens
+        run: npm run ui:check
+
       - name: Typecheck
         run: npm run typecheck

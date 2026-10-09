@@ -18,8 +18,8 @@ export default {
         },
         line: {
           subtle: 'rgba(150, 170, 170, 0.14)',
-          DEFAULT: 'rgba(150, 170, 170, 0.26)',
-          hover: 'rgba(150, 170, 170, 0.45)',
+          DEFAULT: 'rgba(150, 170, 170, 0.55)',
+          hover: 'rgba(150, 170, 170, 0.72)',
           strong: 'rgba(0, 195, 255, 0.55)'
         },
         ink: {

@@ -32,7 +32,7 @@ export const KIND_ICONS: Record<RuleKind, LucideIcon> = {
 export function KindTag({ kind, className = '' }: { kind: RuleKind; className?: string }) {
   const Icon = KIND_ICONS[kind]
   return (
-    <span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-[#9fb3b2] ${className}`}>
+    <span className={`inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted ${className}`}>
       <Icon className="h-3 w-3" aria-hidden />
       {RULE_KIND_LABELS[kind]}
     </span>
@@ -43,20 +43,20 @@ export function StatusTag({ status }: { status: RuleStatus }) {
   if (status === 'active') return null
   const tone =
     status === 'soft-launch'
-      ? 'border-[#d27bff]/50 text-[#e3b4ff]'
-      : 'border-[#3a4a49] text-[#839493] line-through'
+      ? 'border-transparent bg-purple-500/15 text-purple-300'
+      : 'border-line text-ink-muted line-through'
   return (
-    <span className={`border px-1.5 py-px text-[9px] font-bold uppercase tracking-widest ${tone}`}>
+    <span className={`rounded-chip border px-1.5 py-px text-[11px] font-bold uppercase tracking-[0.08em] ${tone}`}>
       {RULE_STATUS_LABELS[status]}
     </span>
   )
 }
 
 const DRIFT_TONES: Record<DriftState, string> = {
-  ok: 'bg-[#7cff6b]',
-  unverified: 'bg-[#839493]',
-  changed: 'bg-[#ffb020]',
-  missing: 'bg-[#ff5540]',
+  ok: 'bg-emerald-500',
+  unverified: 'bg-ink-muted',
+  changed: 'bg-amber-500',
+  missing: 'bg-crimson-aggro',
 }
 
 export function DriftDot({ drift, className = '' }: { drift: DriftState; className?: string }) {
@@ -72,14 +72,14 @@ export function DriftDot({ drift, className = '' }: { drift: DriftState; classNa
 export function DriftBadge({ drift }: { drift: DriftState }) {
   const tone =
     drift === 'ok'
-      ? 'border-[#7cff6b]/40 text-[#b8ffae]'
+      ? 'border-transparent bg-emerald-500/15 text-emerald-400'
       : drift === 'changed'
-        ? 'border-[#ffb020]/60 text-[#ffd27a]'
+        ? 'border-transparent bg-amber-500/15 text-amber-400'
         : drift === 'missing'
-          ? 'border-[#ff5540]/60 text-[#ffb0a4]'
-          : 'border-[#3a4a49] text-[#9fb3b2]'
+          ? 'border-transparent bg-crimson-soft text-crimson-text'
+          : 'border-line text-ink-muted'
   return (
-    <span className={`inline-flex items-center gap-1.5 border px-1.5 py-px text-[9px] font-bold uppercase tracking-widest ${tone}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-chip border px-1.5 py-px text-[11px] font-bold uppercase tracking-[0.08em] ${tone}`}>
       <DriftDot drift={drift} />
       {DRIFT_LABELS[drift]}
     </span>
@@ -88,20 +88,24 @@ export function DriftBadge({ drift }: { drift: DriftState }) {
 
 export function FlagIcon({ flag, className = 'h-3.5 w-3.5' }: { flag: AtlasFlag; className?: string }) {
   const Icon = flag.level === 'gap' ? TriangleAlert : CircleAlert
-  const tone = flag.level === 'gap' ? 'text-[#ff5540]' : 'text-[#ffb020]'
+  const tone = flag.level === 'gap' ? 'text-crimson-text' : 'text-amber-400'
   return <Icon className={`${className} ${tone}`} aria-label={flag.level === 'gap' ? 'Known gap' : 'Watch'} />
 }
 
 export function FlagCallout({ flag }: { flag: AtlasFlag }) {
   const tone =
     flag.level === 'gap'
-      ? 'border-[#ff5540]/50 bg-[#ff5540]/[0.07] text-[#ffc2b8]'
-      : 'border-[#ffb020]/50 bg-[#ffb020]/[0.07] text-[#ffe0a6]'
+      ? 'border-l-crimson-aggro bg-crimson-soft'
+      : 'border-l-amber-500 bg-amber-500/15'
+  const labelTone = flag.level === 'gap' ? 'text-crimson-text' : 'text-amber-400'
   return (
-    <div className={`flex gap-2.5 border p-3 text-xs leading-relaxed ${tone}`} role="note">
+    <div
+      className={`flex gap-2.5 rounded-card border border-line-subtle border-l-2 p-3 text-xs leading-relaxed text-ink-body ${tone}`}
+      role="note"
+    >
       <FlagIcon flag={flag} className="mt-0.5 h-4 w-4 shrink-0" />
       <div>
-        <p className="text-[10px] font-bold uppercase tracking-widest">
+        <p className={`text-[11px] font-bold uppercase tracking-[0.08em] ${labelTone}`}>
           {flag.level === 'gap' ? 'Known gap' : 'Watch'}
         </p>
         <p className="mt-1">{flag.note}</p>
@@ -127,14 +131,14 @@ export function DomainChip({
     <>
       <span className="h-2 w-2 shrink-0 rotate-45" style={{ background: color }} aria-hidden />
       <span className="truncate">{title}</span>
-      {count !== undefined ? <span className="text-[#5f7170]">{count}</span> : null}
+      {count !== undefined ? <span className="text-ink-muted">{count}</span> : null}
     </>
   )
   const base =
-    'inline-flex min-h-[30px] max-w-full items-center gap-1.5 border px-2 py-1 text-[11px] font-semibold transition-colors'
+    'inline-flex min-h-[30px] max-w-full items-center gap-1.5 rounded-control border px-2 py-1 text-[11px] font-semibold transition-colors'
   if (!onClick) {
     return (
-      <span className={`${base} border-[#243233] bg-[#0e181b] text-[#b9c6c5]`}>{content}</span>
+      <span className={`${base} border-line-subtle bg-surface-2 text-ink-body`}>{content}</span>
     )
   }
   return (
@@ -142,10 +146,10 @@ export function DomainChip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`${base} ${
+      className={`${base} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
         active
-          ? 'bg-[#122028] text-[#dfe3e3]'
-          : 'border-[#243233] bg-[#0b1011] text-[#9fb3b2] hover:border-[#3a4a49] hover:text-[#dfe3e3]'
+          ? 'bg-surface-2 text-ink'
+          : 'border-line-subtle bg-surface-1 text-ink-muted hover:border-line-hover hover:bg-surface-2 hover:text-ink'
       }`}
       style={active ? { borderColor: color } : undefined}
     >
