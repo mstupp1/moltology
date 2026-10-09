@@ -283,6 +283,8 @@ export interface QueueInstagramCarouselOptions {
   profileId?: string
   accountId?: string
   isAiGenerated?: boolean
+  /** Use provider delivery after publication instead of an immediate inbox comment. */
+  nativeFirstCommentOnly?: boolean
   dryRun?: boolean
   publishNow?: boolean
 }
@@ -317,7 +319,7 @@ export async function queueInstagramCarousel(
       postId: `dry-run-carousel-${Date.now()}`,
       scheduledFor: '2026-09-04T17:00:00.000Z',
       queueId,
-      commentId: options.firstComment ? `dry-run-comment-${Date.now()}` : null,
+      commentId: options.firstComment && !options.nativeFirstCommentOnly ? `dry-run-comment-${Date.now()}` : null,
       status: options.publishNow ? 'published' : 'queued',
       dryRun: true,
     }
@@ -334,6 +336,7 @@ export async function queueInstagramCarousel(
         accountId,
         platformSpecificData: {
           ...(options.firstComment ? { firstComment: options.firstComment } : {}),
+          ...(options.isAiGenerated !== undefined ? { isAiGenerated: options.isAiGenerated } : {}),
         },
       },
     ],
@@ -347,7 +350,7 @@ export async function queueInstagramCarousel(
   }
 
   let commentId: string | null = null
-  if (options.firstComment) {
+  if (options.firstComment && !options.nativeFirstCommentOnly) {
     console.log(`   💬 Posting algorithmic first comment...`)
     const commentRes = await postZernioComment(post._id, accountId, options.firstComment)
     commentId = commentRes?.comment?._id || commentRes?._id || 'posted'

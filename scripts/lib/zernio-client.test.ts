@@ -188,6 +188,27 @@ describe('zernio-client', () => {
     expect(postPayload.mediaItems[0].url).toBe('https://cdn.moltology.org/s1.png')
   })
 
+  it('queues reviewed carousel copy with AI disclosure and one native first comment', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      text: async () => JSON.stringify({ post: { _id: 'swipe_lab_1', status: 'scheduled' } }),
+    } as any)
+    const result = await queueInstagramCarousel({
+      mediaUrls: ['https://cdn.moltology.org/s1.png', 'https://cdn.moltology.org/s2.png'],
+      caption: 'One task can fit inside a quiet hour.',
+      firstComment: 'https://moltology.org/quiz',
+      isAiGenerated: true,
+      nativeFirstCommentOnly: true,
+    })
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+    expect(result.commentId).toBeNull()
+    expect(result.status).toBe('scheduled')
+    const payload = JSON.parse(fetchSpy.mock.calls[0][1]?.body as string)
+    expect(payload.platforms[0].platformSpecificData).toEqual({
+      isAiGenerated: true, firstComment: 'https://moltology.org/quiz',
+    })
+  })
+
   it('keeps a deferred reel comment pending when the inbox rejects a scheduled post', async () => {
     vi.spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce({ ok: true, text: async () => JSON.stringify({ post: { _id: 'scheduled_reel', status: 'scheduled' } }) } as any)

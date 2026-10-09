@@ -32,6 +32,7 @@ export interface CreateCarouselOptions {
   dryRun?: boolean
   publishNow?: boolean
   polishedSlides?: string[]
+  contentJson?: string
 }
 
 export interface BlogPostData {
@@ -50,6 +51,29 @@ export interface CarouselCopy {
   caption: string
   hashtags: string[]
   firstComment: string
+}
+
+export function parseCarouselContent(value: unknown): CarouselCopy {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error('Carousel content must be a JSON object')
+  }
+  const data = value as Record<string, unknown>
+  for (const key of ['title', 'topic', 'caption', 'firstComment']) {
+    if (typeof data[key] !== 'string' || !(data[key] as string).trim()) {
+      throw new Error(`Carousel content requires a non-empty ${key}`)
+    }
+  }
+  if (!Array.isArray(data.hashtags) || data.hashtags.length > 3 ||
+      data.hashtags.some(tag => typeof tag !== 'string' || !tag.trim())) {
+    throw new Error('Carousel content requires at most three non-empty string hashtags')
+  }
+  return {
+    title: data.title as string,
+    topic: data.topic as string,
+    caption: data.caption as string,
+    firstComment: data.firstComment as string,
+    hashtags: data.hashtags as string[],
+  }
 }
 
 export const DEFAULT_INSTAGRAM_ACCOUNT_ID = CANONICAL_INSTAGRAM_ACCOUNT_ID // moltology_org / Silas Trench
@@ -720,6 +744,9 @@ Output Style: Ultra high-resolution, cinematic 8k aesthetic, pristine lighting, 
  * Main Carousel Generator
  */
 export async function createInstagramCarousel(options: CreateCarouselOptions = {}) {
+  if (options.contentJson && (!options.polishedSlides || options.polishedSlides.length < 2)) {
+    throw new Error('--content-json requires at least two --polished-slides; render custom layouts separately')
+  }
   const timestamp = Date.now()
   const theme = options.theme || 'moltmaxxing'
   const mascot = options.mascot || 'lobster_pointing'
@@ -729,7 +756,9 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
   // Resolve blog post if available
   const blogPost = resolveBlogPost(options)
   const blogData = blogPost ? synthesizeBlogCarouselData(blogPost, options) : null
-  const copy = blogData ? blogData.copy : generateCarouselCopy(theme, options.topic)
+  const copy = options.contentJson
+    ? parseCarouselContent(JSON.parse(fs.readFileSync(path.resolve(options.contentJson), 'utf8')))
+    : blogData ? blogData.copy : generateCarouselCopy(theme, options.topic)
 
   console.log(`\n======================================================`)
   console.log(`🦞 MOLTOLOGY INSTAGRAM CAROUSEL GENERATOR (Composite Studio)`)
@@ -774,6 +803,7 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
           profileId: DEFAULT_PROFILE_ID,
           accountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
           isAiGenerated: true,
+          nativeFirstCommentOnly: !!options.contentJson,
           publishNow: options.publishNow,
         })
       }
@@ -814,6 +844,7 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
         accountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
         isAiGenerated: true,
         dryRun: true,
+        nativeFirstCommentOnly: !!options.contentJson,
         publishNow: options.publishNow,
       })
     }
@@ -951,6 +982,7 @@ if (process.argv[1] && process.argv[1].endsWith('create-instagram-carousel.ts'))
   const publishNow = args.includes('--publish-now')
   const polishedSlidesArg = getArg('--polished-slides') || getArg('--input-slides')
   const polishedSlides = polishedSlidesArg ? polishedSlidesArg.split(',').map((s) => s.trim()) : undefined
+  const contentJson = getArg('--content-json')
 
   createInstagramCarousel({
     theme,
@@ -960,6 +992,7 @@ if (process.argv[1] && process.argv[1].endsWith('create-instagram-carousel.ts'))
     dryRun,
     publishNow,
     polishedSlides,
+    contentJson,
   }).catch((err) => {
     console.error('❌ Carousel Generation Failed:', err)
     process.exit(1)
