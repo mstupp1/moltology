@@ -13,6 +13,8 @@ describe('Asset URL Resolver', () => {
   })
 
   it('preserves local whitelisted brand assets', () => {
+    expect(getAssetUrl('/images/order_emblem.svg')).toBe('/images/order_emblem.svg')
+    expect(getAssetUrl('/favicon.svg?v=brand')).toBe('/favicon.svg?v=brand')
     expect(getAssetUrl('/images/order_emblem.png')).toBe('/images/order_emblem.png')
     expect(getAssetUrl('images/order_emblem.png')).toBe('/images/order_emblem.png')
     expect(getAssetUrl('/images/order_emblem.webp')).toBe('/images/order_emblem.webp')

@@ -10,6 +10,7 @@ import { HUDErrorBoundary, HUDErrorFallback } from '@/components/hud/HUDErrorBou
 import { ToastProvider } from '@/components/ui/ToastProvider'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import { Analytics } from '@vercel/analytics/react'
+import brandAssets from '@/components/ui/brand-assets.json'
 
 const LazyHUDNotFound = lazy(() =>
   import('@/components/hud/HUDNotFound').then((m) => ({ default: m.HUDNotFound }))
@@ -34,8 +35,9 @@ export const Route = createRootRoute({
         ...(notFound ? notFoundSeo() : []),
       ],
       links: [
-        { rel: 'icon', type: 'image/png', href: '/images/order_emblem.png' },
-        { rel: 'apple-touch-icon', href: '/images/pwa/apple-touch-icon.png' },
+        { rel: 'icon', type: 'image/svg+xml', sizes: 'any', href: `/favicon.svg?v=${brandAssets.version}` },
+        { rel: 'icon', type: 'image/x-icon', sizes: '16x16 32x32 48x48', href: `/favicon.ico?v=${brandAssets.version}` },
+        { rel: 'apple-touch-icon', href: `/images/pwa/apple-touch-icon.png?v=${brandAssets.version}` },
         { rel: 'manifest', href: '/manifest.webmanifest' },
         { rel: 'alternate', type: 'application/rss+xml', title: 'MoltNation News RSS Feed', href: `${SITE_ORIGIN}/rss.xml` },
         { rel: 'sitemap', type: 'application/xml', title: 'Sitemap', href: `${SITE_ORIGIN}/sitemap.xml` },

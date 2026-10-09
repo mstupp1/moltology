@@ -403,7 +403,7 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
                       }}
                     >
                       <img
-                        src="/images/order_emblem.webp"
+                        src="/images/order_emblem.svg"
                         alt="Order Emblem"
                         width={40}
                         height={40}

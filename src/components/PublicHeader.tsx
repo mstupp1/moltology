@@ -362,7 +362,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       <span className="flex items-center gap-1.5">
         {tab.id === 'home' ? (
           <img
-            src="/images/order_emblem.webp"
+            src="/images/order_emblem.svg"
             alt=""
             width={14}
             height={14}
@@ -441,7 +441,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       <>
         {tab.id === 'home' ? (
           <img
-            src="/images/order_emblem.webp"
+            src="/images/order_emblem.svg"
             alt=""
             width={16}
             height={16}
@@ -501,7 +501,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     }`
     const icon =
       tab.id === 'home' ? (
-        <img src="/images/order_emblem.webp" alt="" width={16} height={16} className="w-4 h-4 object-contain" />
+        <img src="/images/order_emblem.svg" alt="" width={16} height={16} className="w-4 h-4 object-contain" />
       ) : (
         tab.Icon && (
           <tab.Icon

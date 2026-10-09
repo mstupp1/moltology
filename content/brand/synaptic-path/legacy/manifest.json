@@ -1,0 +1,45 @@
+{
+  "description": "Original brand assets preserved before the Synaptic Path SVG rollout",
+  "files": [
+    {
+      "original": "public/images/order_emblem.png",
+      "backup": "images/order_emblem.png",
+      "sha256": "85fe8bb0cf8653deb36813757f0b60e156d09fbd98f29344da06cac31ed196ce"
+    },
+    {
+      "original": "public/images/order_emblem.webp",
+      "backup": "images/order_emblem.webp",
+      "sha256": "2e24e812386743cd99c852772ebdbf2fb4d13927c7a85bbaee8d87dc15f292d7"
+    },
+    {
+      "original": "public/favicon.png",
+      "backup": "favicon.png",
+      "sha256": "c11b22ad4236ae98f979e284592e0eab21d70fe3977f71f4ddf96f1c9533e3ce"
+    },
+    {
+      "original": "public/favicon.ico",
+      "backup": "favicon.ico",
+      "sha256": "23c37a706136c605b74fae122929da18b826ae17a578e8d8af7b3c991aa8358c"
+    },
+    {
+      "original": "public/images/pwa/icon-192.png",
+      "backup": "images/pwa/icon-192.png",
+      "sha256": "1b098835450eb5344e5411909a49652694ae26019ca9b6ae621cf09509265abf"
+    },
+    {
+      "original": "public/images/pwa/icon-512.png",
+      "backup": "images/pwa/icon-512.png",
+      "sha256": "42e2b7ecb26e8e0730dde0d1589eb14304ed0121519f6b4ed25c29876fe75ed1"
+    },
+    {
+      "original": "public/images/pwa/icon-maskable-512.png",
+      "backup": "images/pwa/icon-maskable-512.png",
+      "sha256": "94d83fe012c30a931305325dca057ebbd515a0570ade00c06e73c86323db6770"
+    },
+    {
+      "original": "public/images/pwa/apple-touch-icon.png",
+      "backup": "images/pwa/apple-touch-icon.png",
+      "sha256": "5070f1ef266aad468ebc6d70ecac66f08ab428658996f6560f5793e824ddd01d"
+    }
+  ]
+}
