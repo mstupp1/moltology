@@ -54,21 +54,21 @@ function StatCard({
 }) {
   const body = (
     <>
-      <p className="text-[10px] font-bold uppercase tracking-widest text-[#839493]">{label}</p>
-      <p className={`mt-1 font-grotesk text-xl font-bold ${tone === 'amber' ? 'text-[#ffb020]' : 'text-[#00ffff]'}`}>
+      <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">{label}</p>
+      <p className={`mt-1 font-grotesk text-xl font-bold ${tone === 'amber' ? 'text-amber-400' : 'text-cyan-glow'}`}>
         {value}
       </p>
-      {detail ? <p className="mt-0.5 truncate text-[11px] text-[#5f7170]">{detail}</p> : null}
+      {detail ? <p className="mt-0.5 truncate text-[11px] text-ink-muted">{detail}</p> : null}
     </>
   )
-  if (!onClick) return <div className="chitin-card chamfer-corner p-3 sm:p-4">{body}</div>
+  if (!onClick) return <div className="hud-sheen rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4">{body}</div>
   return (
     <button
       type="button"
       onClick={onClick}
       aria-pressed={pressed}
-      className={`chitin-card chamfer-corner border p-3 text-left transition-colors sm:p-4 ${
-        pressed ? 'border-[#ffb020]/70' : 'border-transparent hover:border-[#ffb020]/40'
+      className={`hud-sheen rounded-card border bg-surface-1 p-3 text-left transition-colors sm:p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+        pressed ? 'border-amber-500/70 bg-surface-2' : 'border-line-subtle hover:border-line-hover hover:bg-surface-2'
       }`}
     >
       {body}
@@ -201,7 +201,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
         actions={
           <Link
             to="/admin"
-            className="inline-flex min-h-[36px] items-center gap-1.5 border border-[#3a4a49] px-3 text-[11px] font-bold uppercase tracking-wider text-[#9fb3b2] chamfer-corner hover:border-[#00c3ff]/60 hover:text-[#dfe3e3]"
+            className="hud-sheen inline-flex min-h-[36px] items-center gap-1.5 rounded-control border border-line bg-surface-1 px-3 text-[11px] font-bold uppercase tracking-[0.08em] text-ink transition-colors hover:border-line-strong hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Admin
@@ -236,13 +236,13 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
       </section>
 
       {error ? (
-        <div className="flex flex-wrap items-center gap-3 border border-[#ff5540]/50 bg-[#ff5540]/[0.07] p-3 text-sm text-[#ffc2b8]" role="alert">
-          <TriangleAlert className="h-4 w-4" />
+        <div className="flex flex-wrap items-center gap-3 rounded-card border border-line-subtle border-l-2 border-l-crimson-aggro bg-crimson-soft p-3 text-sm text-ink-body" role="alert">
+          <TriangleAlert className="h-4 w-4 text-crimson-text" />
           <span className="flex-1">{error}</span>
           <button
             type="button"
             onClick={onRetry}
-            className="inline-flex min-h-[36px] items-center gap-1.5 border border-[#ff5540]/50 px-3 text-xs font-bold uppercase tracking-wider hover:bg-[#ff5540]/10"
+            className="hud-sheen inline-flex min-h-[36px] items-center gap-1.5 rounded-control border border-line bg-surface-1 px-3 text-xs font-bold uppercase tracking-[0.08em] text-ink transition-colors hover:border-line-strong hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             Try again
@@ -269,10 +269,10 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
                   aria-selected={selected}
                   data-testid={`atlas-tab-${item.id}`}
                   onClick={() => update({ tab: item.id })}
-                  className={`inline-flex min-h-[40px] flex-1 items-center justify-center gap-2 border px-3 py-2 text-xs font-bold uppercase tracking-wider chamfer-corner transition-colors sm:flex-none ${
+                  className={`inline-flex min-h-[40px] flex-1 items-center justify-center gap-2 rounded-t-control border-b-2 px-3 py-2 text-xs font-bold uppercase tracking-[0.08em] transition-colors sm:flex-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                     selected
-                      ? 'border-[#00c3ff] bg-[#00c3ff]/10 text-[#dfe3e3]'
-                      : 'border-[#3a4a49] bg-[#122028] text-[#839493] hover:border-[#00c3ff]/50 hover:text-[#dfe3e3]'
+                      ? 'border-cyan-glow bg-surface-2 text-ink'
+                      : 'border-transparent text-ink-muted hover:bg-surface-2 hover:text-ink'
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5" />
@@ -282,14 +282,14 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
             })}
           </div>
           <label className="relative flex min-h-[40px] flex-1 items-center">
-            <Search className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-[#5f7170]" aria-hidden />
+            <Search className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-ink-muted" aria-hidden />
             <span className="sr-only">Search rules and decisions</span>
             <input
               type="search"
               value={search.q ?? ''}
               onChange={(event) => update({ q: event.target.value.slice(0, 80) })}
               placeholder="Search rules, code symbols, and decisions"
-              className="h-10 w-full border border-[#3a4a49] bg-[#0b1011] pl-9 pr-9 text-sm text-[#dfe3e3] placeholder:text-[#5f7170] focus:border-[#00c3ff] focus:outline-none"
+              className="h-10 w-full rounded-control border border-line bg-surface-2 pl-9 pr-9 text-sm text-ink placeholder:text-ink-muted transition-colors hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus focus:outline-none"
               data-testid="atlas-search"
             />
             {search.q ? (
@@ -297,7 +297,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
                 type="button"
                 onClick={() => update({ q: undefined })}
                 aria-label="Clear search"
-                className="absolute right-2 inline-flex h-7 w-7 items-center justify-center text-[#839493] hover:text-[#dfe3e3]"
+                className="absolute right-2 inline-flex h-7 w-7 items-center justify-center rounded-control text-ink-muted hover:bg-surface-3 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -333,8 +333,8 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
                   type="button"
                   aria-pressed={active}
                   onClick={() => toggleKind(kind)}
-                  className={`inline-flex min-h-[28px] items-center gap-1 text-[10px] font-bold uppercase tracking-widest transition-colors ${
-                    active ? 'text-[#00ffff]' : 'text-[#5f7170] hover:text-[#9fb3b2]'
+                  className={`inline-flex min-h-[28px] items-center gap-1 rounded-control text-[11px] font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                    active ? 'text-cyan-glow' : 'text-ink-muted hover:text-ink'
                   }`}
                 >
                   <Icon className="h-3 w-3" />
@@ -342,8 +342,8 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
                 </button>
               )
             })}
-            <span className="hidden h-3 w-px bg-[#243233] sm:inline-block" aria-hidden />
-            <span className="inline-flex items-center gap-3 text-[10px] uppercase tracking-widest text-[#5f7170]">
+            <span className="hidden h-3 w-px bg-line-subtle sm:inline-block" aria-hidden />
+            <span className="inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.08em] text-ink-muted">
               <span className="inline-flex items-center gap-1">
                 <DriftDot drift="ok" /> Verified
               </span>
@@ -351,7 +351,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
                 <DriftDot drift="changed" /> Code changed
               </span>
               <span className="inline-flex items-center gap-1">
-                <TriangleAlert className="h-3 w-3 text-[#ff5540]" /> Gap
+                <TriangleAlert className="h-3 w-3 text-crimson-text" /> Gap
               </span>
             </span>
           </div>
@@ -359,12 +359,12 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
       </div>
 
       {!atlas && !error ? (
-        <div className="chitin-card chamfer-corner h-[60dvh] min-h-[420px] animate-pulse" aria-busy="true" aria-label="Loading the Logic Atlas" />
+        <div className="rounded-card border border-line-subtle bg-surface-1 h-[60dvh] min-h-[420px] animate-pulse" aria-busy="true" aria-label="Loading the Logic Atlas" />
       ) : null}
 
       {atlas && tab === 'map' ? (
-        <div className="relative h-[72dvh] min-h-[520px] overflow-hidden border border-[#243233] chamfer-corner">
-          <Suspense fallback={<div className="h-full w-full animate-pulse bg-[#070c0d]" aria-busy="true" />}>
+        <div className="relative h-[72dvh] min-h-[520px] overflow-hidden rounded-card border border-line-subtle">
+          <Suspense fallback={<div className="h-full w-full animate-pulse bg-abyss" aria-busy="true" />}>
             <LazyAtlasCanvas
               atlas={atlas}
               selectedRuleId={selectedRule?.id ?? null}
@@ -376,18 +376,18 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
           </Suspense>
           {selectedRule?.flow && flowOpen ? (
             <div
-              className="absolute inset-0 z-20 flex flex-col bg-[#070c0d] min-[900px]:right-[440px] min-[900px]:z-[5]"
+              className="absolute inset-0 z-20 flex flex-col bg-abyss min-[900px]:right-[440px] min-[900px]:z-[5]"
               data-testid="atlas-flow-overlay"
             >
-              <div className="flex items-center justify-between gap-2 border-b border-[#243233] px-4 py-2.5">
-                <p className="flex min-w-0 items-center gap-2 text-sm font-semibold text-[#dfe3e3]">
-                  <Workflow className="h-4 w-4 shrink-0 text-[#00c3ff]" />
+              <div className="flex items-center justify-between gap-2 border-b border-line-subtle bg-surface-2 px-4 py-2.5">
+                <p className="flex min-w-0 items-center gap-2 text-sm font-semibold text-ink">
+                  <Workflow className="h-4 w-4 shrink-0 text-cyan-glow" />
                   <span className="truncate">{selectedRule.title}</span>
                 </p>
                 <button
                   type="button"
                   onClick={() => setFlowOpen(false)}
-                  className="inline-flex min-h-[36px] items-center gap-1.5 border border-[#3a4a49] px-3 text-[11px] font-bold uppercase tracking-wider text-[#9fb3b2] hover:border-[#00c3ff]/60 hover:text-[#dfe3e3]"
+                  className="hud-sheen inline-flex min-h-[36px] items-center gap-1.5 rounded-control border border-line bg-surface-1 px-3 text-[11px] font-bold uppercase tracking-[0.08em] text-ink transition-colors hover:border-line-strong hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   <X className="h-3.5 w-3.5" />
                   Back to map
@@ -410,7 +410,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
             />
           ) : null}
           {matches && matches.size === 0 ? (
-            <p className="pointer-events-none absolute left-1/2 top-4 -translate-x-1/2 border border-[#243233] bg-[#0b1011] px-3 py-1.5 text-xs text-[#9fb3b2]">
+            <p className="pointer-events-none absolute left-1/2 top-4 -translate-x-1/2 rounded-control border border-line bg-surface-1 px-3 py-1.5 text-xs text-ink-muted">
               No rules match these filters.
             </p>
           ) : null}

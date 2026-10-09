@@ -34,6 +34,7 @@
     "s3:sync": "tsx scripts/sync-s3-assets.ts",
     "s3:verify": "tsx scripts/sync-s3-assets.ts --verify",
     "assets:check": "tsx scripts/check-asset-budget.ts",
+    "ui:check": "tsx scripts/check-ui-tokens.ts",
     "brand:build": "node scripts/build-brand-assets.mjs",
     "brand:check": "node scripts/check-brand-assets.mjs",
     "image:generate": "tsx scripts/generate-image.ts",

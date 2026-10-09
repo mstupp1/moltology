@@ -63,3 +63,11 @@ icons or geometry and verifies the original-icon backups.
 
 `HudButton` variants: `primary` (alias `cyan`), `crimson`, `secondary` (alias `dark`), `ghost`, `danger`
 (alias `sacred`). One `primary` per screen. `HudTabs` is the underline tab list for in-page sections.
+
+## Guard
+
+`npm run ui:check` (run in CI by `.github/workflows/hygiene.yml`) fails when a component adds an arbitrary
+hex colour class (`bg-[#…]`, `text-[#…]`, `border-[#…]` …), a `chamfer-corner`, text under 11px, or a radius
+off the scale above (`rounded-lg`, `rounded-[28px]` …). Older hits are recorded per file in
+`scripts/ui-token-baseline.json` and may only go down. After cleaning a file up, run
+`npm run ui:check -- --update` to lock in the lower count.

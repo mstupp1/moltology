@@ -56,7 +56,7 @@ export function FlowDiagram({ flow, mode = 'preview' }: { flow: AtlasFlow; mode?
         type: 'smoothstep',
         markerEnd: { type: MarkerType.ArrowClosed, width: 14, height: 14, color: 'rgba(159, 179, 178, 0.7)' },
         style: { stroke: 'rgba(159, 179, 178, 0.55)' },
-        labelStyle: { fontSize: 10, fill: '#9fb3b2', fontWeight: 600 },
+        labelStyle: { fontSize: 11, fill: '#8fa0a0', fontWeight: 600 },
         labelBgPadding: [4, 2] as [number, number],
         selectable: false,
       })),
@@ -66,7 +66,7 @@ export function FlowDiagram({ flow, mode = 'preview' }: { flow: AtlasFlow; mode?
 
   return (
     <div
-      className={`logic-atlas-flow ${full ? '' : 'pointer-events-none'} border border-[#243233]`}
+      className={`logic-atlas-flow ${full ? '' : 'pointer-events-none'} overflow-hidden rounded-card border border-line-subtle`}
       style={{ height }}
       data-testid={full ? 'atlas-flow-full' : 'atlas-flow-diagram'}
     >
