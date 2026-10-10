@@ -2,8 +2,7 @@ import React, { Suspense, useRef } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, ListChecks, MessagesSquare, Sparkles } from 'lucide-react'
 import { LandingAuthCtaSkeleton } from '@/components/LandingAuthCtaSkeleton'
-import { getAssetUrl } from '@/lib/assets'
-import { eagerImageProps } from '@/lib/media-priority'
+import { DevicePreviewCarousel } from '@/components/home/DevicePreviewCarousel'
 import { HeroParticleField } from '@/components/home/hero-particles/HeroParticleField'
 import { HeroSeascape } from '@/components/home/HeroSeascape'
 
@@ -29,10 +28,6 @@ export interface HomeHeroProps {
  * in, so it is the first paint and the page's largest contentful element.
  */
 export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpenAuth }) => {
-  const dashboard = getAssetUrl('/images/marketing/dashboard_desktop_preview.webp')
-  const dashboardSm = getAssetUrl('/images/marketing/dashboard_desktop_preview_sm.webp')
-  const dashboardPhone = getAssetUrl('/images/marketing/dashboard_mobile_preview_sm.webp')
-
   const sectionRef = useRef<HTMLElement>(null)
   const shellRef = useRef<HTMLDivElement>(null)
 
@@ -122,40 +117,11 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
         </div>
       </div>
 
-      {/* The dashboard rises out of the deep and settles flat as it scrolls into view. */}
+      {/* The device preview rises out of the deep and settles flat as it scrolls into view. */}
       <div className="relative z-10 mt-10 sm:mt-12 px-4 sm:px-8 [perspective:1800px]">
         <div className="home-hero-device relative mx-auto max-w-[300px] sm:max-w-[1180px]">
           <div className="absolute -inset-x-10 -top-10 bottom-0 rounded-[3rem] bg-[radial-gradient(ellipse_at_top,rgba(0,195,255,0.35),transparent_65%)] blur-2xl pointer-events-none" aria-hidden="true" />
-          <div className="relative rounded-t-[2.25rem] sm:rounded-t-[1.25rem] border-[6px] sm:border border-b-0 sm:border-b-0 border-[#0f1d22] sm:border-cyan-300/25 ring-1 ring-cyan-300/25 sm:ring-0 bg-[#061014]/95 shadow-[0_-20px_80px_rgba(0,195,255,0.18)] overflow-hidden">
-            {/* Phone: a notch. Wider screens: browser chrome. */}
-            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 z-10 h-5 w-20 rounded-full bg-black" aria-hidden="true" />
-            <div className="hidden sm:flex items-center gap-3 px-4 h-10 border-b border-line-subtle bg-surface-2">
-              <div className="flex gap-1.5" aria-hidden="true">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]/80" />
-                <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]/80" />
-                <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]/80" />
-              </div>
-              <div className="mx-auto max-w-[260px] w-full rounded-control bg-surface-1 border border-line-subtle px-3 py-0.5 text-[11px] text-ink-muted text-center truncate">
-                moltology.org/dashboard
-              </div>
-              <div className="w-[42px]" aria-hidden="true" />
-            </div>
-            <div className="relative aspect-[540/790] sm:aspect-[1280/600] overflow-hidden">
-              <picture className="absolute inset-x-0 bottom-0 top-8 sm:top-0">
-                <source media="(max-width: 639px)" srcSet={dashboardPhone} width={540} height={1170} />
-                <img
-                  src={dashboardSm}
-                  srcSet={`${dashboardSm} 1280w, ${dashboard} 3520w`}
-                  sizes="(min-width: 1280px) 1180px, 94vw"
-                  alt="The Moltology dashboard, with daily modules, lectures and community news"
-                  {...eagerImageProps}
-                  width={1280}
-                  height={800}
-                  className="absolute inset-0 w-full h-auto"
-                />
-              </picture>
-            </div>
-          </div>
+          <DevicePreviewCarousel />
           {/* Wider than the device so its ring and glow sink into the page colour too, leaving no edge where the next section starts. */}
           <div className="absolute -inset-x-16 -bottom-px h-2/3 bg-gradient-to-t from-[#020408] from-[8%] via-[#020408]/70 to-transparent pointer-events-none" aria-hidden="true" />
         </div>
