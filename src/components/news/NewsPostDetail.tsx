@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import { getAssetUrl } from '@/lib/assets'
 import { BrandAwareImage } from '@/components/ui/BrandMark'
 import { useNavigate, Link, useLoaderData } from '@tanstack/react-router'
 import {
@@ -250,7 +251,7 @@ export function NewsPostDetail() {
         <div className="max-w-5xl mx-auto px-4 sm:px-8 lg:px-12 -mt-6 sm:-mt-8 relative z-20">
           <div className="relative border border-line-subtle rounded-panel overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-surface-1">
             <img
-              src={post.coverImageUrl}
+              src={getAssetUrl(post.coverImageUrl)}
               alt={post.title}
               className="w-full h-[220px] sm:h-[360px] md:h-[450px] object-cover"
             />

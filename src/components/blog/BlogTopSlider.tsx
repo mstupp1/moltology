@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { getAssetUrl } from '@/lib/assets'
 import { BrandAwareImage } from '@/components/ui/BrandMark'
 import {
   ChevronLeft,
@@ -213,7 +214,7 @@ export function BlogTopSlider({
           <div className="lg:col-span-5 relative group/img cursor-pointer" onClick={() => onSelectPost(currentPost.slug)}>
             <div className="relative border border-line-subtle rounded-card overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-abyss transition-all duration-500 group-hover/img:border-line-strong">
               <img
-                src={currentPost.coverImageUrl}
+                src={getAssetUrl(currentPost.coverImageUrl)}
                 alt={currentPost.title}
                 className="w-full h-56 sm:h-72 object-cover transform group-hover/img:scale-105 transition-transform duration-700 filter brightness-95 group-hover/img:brightness-100"
               />

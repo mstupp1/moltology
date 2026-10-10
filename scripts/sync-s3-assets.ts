@@ -3,7 +3,8 @@ import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
 import { uploadObject, getS3Client, DEFAULT_BUCKET } from '../src/lib/s3-client'
-import { getMimeType, getPublicS3Url } from '../src/lib/ingest/s3-upload'
+import { getMimeType, getPublicS3Url, uploadWebpTwin } from '../src/lib/ingest/s3-upload'
+import { hasWebpTwin, webpTwinKey } from '../src/lib/asset-formats'
 import { HeadObjectCommand } from '@aws-sdk/client-s3'
 
 const PUBLIC_IMAGES_DIR = path.resolve(process.cwd(), 'public', 'images')
@@ -62,11 +63,12 @@ async function syncAssets() {
     const publicUrl = getPublicS3Url(file.key, DEFAULT_BUCKET)
 
     if (isVerifyOnly) {
-      const exists = await verifyS3Object(file.key)
+      const exists =
+        (await verifyS3Object(file.key)) && (!hasWebpTwin(file.key) || (await verifyS3Object(webpTwinKey(file.key))))
       if (exists) {
         console.log(`  ✓ [VERIFIED] ${file.key} (${sizeKB} KB) -> ${publicUrl}`)
       } else {
-        console.error(`  ❌ [MISSING]  ${file.key} not found on S3`)
+        console.error(`  ❌ [MISSING]  ${file.key} (or its .webp twin) not found on S3`)
         errorCount++
       }
       continue
@@ -85,6 +87,7 @@ async function syncAssets() {
         contentType,
         bucket: DEFAULT_BUCKET,
       })
+      await uploadWebpTwin(file.key, fileBuffer, DEFAULT_BUCKET)
       uploadedCount++
       console.log(`  ✓ [UPLOADED] ${file.key} (${sizeKB} KB) -> ${publicUrl}`)
     } catch (err: any) {

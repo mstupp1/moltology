@@ -89,7 +89,7 @@ function StoryCard({ post }: { post: BlogPostData }) {
     <StoryLink slug={post.slug} className="group flex flex-col gap-3 text-inherit no-underline rounded-card focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
       <div className="aspect-[16/10] overflow-hidden rounded-card bg-surface-1">
         <img
-          src={post.coverImageUrl}
+          src={getAssetUrl(post.coverImageUrl)}
           alt={post.title}
           {...lazyImageProps}
           className="w-full h-full object-cover brightness-90 group-hover:brightness-100 group-hover:scale-[1.03] transition duration-500"
@@ -287,7 +287,7 @@ export function NewsIndexPage() {
                     {/* Image leads on phones; headline leads on desktop so it sits above the fold. */}
                     <div className="aspect-[16/9] overflow-hidden rounded-card bg-surface-1 lg:order-last">
                       <img
-                        src={leadPost.coverImageUrl}
+                        src={getAssetUrl(leadPost.coverImageUrl)}
                         alt={leadPost.title}
                         {...eagerImageProps}
                         className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
@@ -339,7 +339,7 @@ export function NewsIndexPage() {
                               </div>
                               <div className="w-24 h-24 sm:w-28 sm:h-28 shrink-0 overflow-hidden rounded-control bg-surface-1">
                                 <img
-                                  src={post.coverImageUrl}
+                                  src={getAssetUrl(post.coverImageUrl)}
                                   alt={post.title}
                                   {...lazyImageProps}
                                   className="w-full h-full object-cover brightness-90 group-hover:brightness-100 transition"

@@ -63,7 +63,7 @@ import { FORUM_REPORT_COPY, forumReportReasonLabel, validateForumReportInput } f
 import { isAdmin } from '../permissions'
 import { assertCanReply, assertCanStartTopic, loadForumStanding } from './forum-standing'
 import { shouldSinkReply, type ForumStandingDecision } from '../forum-standing'
-import { getAbsoluteAssetUrl, getAssetUrl } from '../assets'
+import { getAbsoluteAssetUrl, getMediaPath } from '../assets'
 import { AVATAR_STORED_OPTIONAL_KEYS, avatarConfigShape } from '../avatar/config-schema'
 import {
   CANONICAL_ALIGNMENT_TASKS,
@@ -577,7 +577,7 @@ export const getBlogPostsHandler = async ({ context }: ServerFnArgs) => {
         title: r.title,
         summary: r.summary,
         content: '',
-        coverImageUrl: getAssetUrl(r.coverImageUrl || 'images/ai_learning_ascension_cover.jpg'),
+        coverImageUrl: getMediaPath(r.coverImageUrl || 'images/ai_learning_ascension_cover.jpg'),
         authorName: r.authorName,
         authorAvatar: r.authorAvatar,
         authorRole: r.authorRole || 'Stage 4 Ascendant',
@@ -619,7 +619,7 @@ export const getBlogPostBySlugHandler = async ({ data: slug, context }: ServerFn
         title: r.title,
         summary: r.summary,
         content: r.content,
-        coverImageUrl: getAssetUrl(r.coverImageUrl || 'images/ai_learning_ascension_cover.jpg'),
+        coverImageUrl: getMediaPath(r.coverImageUrl || 'images/ai_learning_ascension_cover.jpg'),
         authorName: r.authorName,
         authorAvatar: r.authorAvatar,
         authorRole: r.authorRole || 'Stage 4 Ascendant',

@@ -8,11 +8,11 @@ Keep master `char_<name>.png` and alpha-preserving `char_<name>.webp`. Native-tr
 
 Copy selected files to `scratch/characters/` and `scratch/character_refs/`. Retain experimental sources and old versions before overwriting references.
 
-Upload through the repo CLI with the actual selected filename:
+Upload through the repo CLI with the actual selected filename. Upload the PNG first: it writes an automatic `.webp` twin at quality 78, which the second command replaces with the hand-checked quality-90 WebP.
 
 ```bash
-npx tsx scripts/upload-asset.ts scratch/characters/char_name.webp --key images/characters/char_name.webp
 npx tsx scripts/upload-asset.ts scratch/characters/char_name.png --key images/characters/char_name.png
+npx tsx scripts/upload-asset.ts scratch/characters/char_name.webp --key images/characters/char_name.webp
 ```
 
 Resolve public URLs through `src/lib/assets.ts`; do not hardcode the bucket hostname in consumers. Verify both objects are accessible with expected format and dimensions before changing consumers.

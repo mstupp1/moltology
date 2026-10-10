@@ -54,25 +54,32 @@ describe('Asset URL Resolver', () => {
   })
 
   it('maps heavy content and quiz assets to the cached /media route', () => {
-    expect(getAssetUrl('/images/quiz/q01_criticism.jpg')).toBe('/media/images/quiz/q01_criticism.jpg')
+    expect(getAssetUrl('/images/quiz/q01_criticism.jpg')).toBe('/media/images/quiz/q01_criticism.webp')
     expect(getAssetUrl('images/characters/char_lobster_thumbs_up.png')).toBe(
-      '/media/images/characters/char_lobster_thumbs_up.png'
+      '/media/images/characters/char_lobster_thumbs_up.webp'
     )
+    expect(getAssetUrl('images/social/posts/post-1.png')).toBe('/media/images/social/posts/post-1.png')
+    expect(getAssetUrl('downloads/guide.pdf')).toBe('/media/downloads/guide.pdf')
     expect(getAssetUrl('/images/pbr_circuit_matrix.webp')).toBe('/media/images/pbr_circuit_matrix.webp')
   })
 
   it('folds absolute bucket URLs into /media and leaves /media paths alone', () => {
-    expect(getAssetUrl(`${S3_BASE_URL}/images/blog/a-cover.jpg`)).toBe('/media/images/blog/a-cover.jpg')
+    expect(getAssetUrl(`${S3_BASE_URL}/images/blog/a-cover.jpg`)).toBe('/media/images/blog/a-cover.webp')
     expect(
       getAssetUrl(
         'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/x.webp?v=2',
       ),
     ).toBe('/media/images/x.webp?v=2')
     expect(getAssetUrl('/media/images/x.webp')).toBe('/media/images/x.webp')
+    expect(getAssetUrl('/media/images/blog/a-cover.png')).toBe('/media/images/blog/a-cover.webp')
   })
 
   it('builds absolute site URLs for off-site consumers', () => {
     expect(getAbsoluteAssetUrl('downloads/guide.pdf')).toBe('https://moltology.org/media/downloads/guide.pdf')
+    expect(getAbsoluteAssetUrl('images/blog/a-cover.jpg')).toBe('https://moltology.org/media/images/blog/a-cover.jpg')
+    expect(getAbsoluteAssetUrl('/media/images/blog/a-cover.jpg')).toBe(
+      'https://moltology.org/media/images/blog/a-cover.jpg'
+    )
     expect(getAbsoluteAssetUrl('/images/order_emblem.png')).toBe('https://moltology.org/images/order_emblem.png')
     expect(getAbsoluteAssetUrl('https://example.com/a.png')).toBe('https://example.com/a.png')
   })
