@@ -217,7 +217,7 @@
   },
   "src/components/hud/chassis/ChassisStatusPage.tsx": {
     "hex-color": 4,
-    "chamfer": 3,
+    "chamfer": 2,
     "tiny-text": 1
   },
   "src/components/hud/chassis/GearItemCard.tsx": {

@@ -1,3 +1,4 @@
+import { getAssetUrl } from './assets'
 import {
   generateLobsterAvatarDataUri,
   type LobsterAvatarConfig,
@@ -62,9 +63,23 @@ function stillPortraitConfig(config: LobsterAvatarConfig): LobsterAvatarConfig {
   }
 }
 
+export interface ResolveLobsterAvatarAssetsOptions {
+  portraitSize?: number
+  fullBodySize?: number
+  /**
+   * Live kit portrait instead of the saved one (character creator preview). The result is a
+   * kit SVG, so it must go through `LobsterAvatarDisplay`, which renders it inline.
+   */
+  livePortrait?: boolean
+}
+
+/**
+ * Portrait order: the server-rendered webp when the config has one (cheap `<img>` everywhere),
+ * else the vector rig. Full body uses the painted kit when the race has art.
+ */
 export function resolveLobsterAvatarAssets(
   config: LobsterAvatarConfig | null | undefined,
-  options?: { portraitSize?: number; fullBodySize?: number }
+  options?: ResolveLobsterAvatarAssetsOptions
 ): LobsterAvatarAssets {
   if (!config?.seed) {
     return { portraitUrl: null, fullBody: null }
@@ -73,14 +88,19 @@ export function resolveLobsterAvatarAssets(
   const portraitSize = normalizePortraitSourcePx(options?.portraitSize)
   const fullBodySize = options?.fullBodySize ?? 256
 
-  const portraitUrl = generateLobsterAvatarDataUri(stillPortraitConfig(config), portraitSize, {
-    frame: 'portrait',
-    staticMotion: true,
-  })
+  const portraitUrl =
+    config.portraitKey && !options?.livePortrait
+      ? getAssetUrl(config.portraitKey)
+      : generateLobsterAvatarDataUri(stillPortraitConfig(config), portraitSize, {
+          frame: 'portrait',
+          staticMotion: true,
+          kit: Boolean(options?.livePortrait),
+        })
 
   const fullBodyUrl = generateLobsterAvatarDataUri(config, fullBodySize, {
     frame: 'fullBody',
     staticMotion: false,
+    kit: true,
   })
 
   return {

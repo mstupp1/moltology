@@ -764,6 +764,18 @@ export type EquipSlotId =
   | 'claws-1'
   | 'claws-2'
 
+/** Look slots worn over gear. Cosmetics only; they change the drawing, never the stats. */
+export type LookSlotId =
+  | 'look-head'
+  | 'look-carapace'
+  | 'look-claws'
+  | 'look-belt'
+  | 'look-legs'
+  | 'look-antennae'
+
+/** Gear carries stats; cosmetics only change how the avatar looks. */
+export type EquipmentKind = 'gear' | 'cosmetic'
+
 /** Classic rarity ladder for chassis gear. */
 export type EquipmentRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
 
@@ -789,6 +801,9 @@ export const equipmentCatalog = pgTable('equipment_catalog', {
   category: text('category').$type<EquipmentCategory>().notNull(),
   rarity: text('rarity').$type<EquipmentRarity>().notNull(),
   visualType: text('visualType').$type<ChassisVisualType>().default('carapace').notNull(),
+  kind: text('kind').$type<EquipmentKind>().default('gear').notNull(),
+  /** Cosmetics only: avatar kit art key (`images/avatar-kit/<race>/look/<artKey>`). */
+  artKey: text('artKey'),
   primaryStat: integer('primaryStat').notNull(),
   affixes: jsonb('affixes').$type<EquipmentAffix[]>().default([]).notNull(),
   uniquePower: jsonb('uniquePower').$type<EquipmentUniquePower | null>(),
@@ -807,7 +822,8 @@ export const userGearItems = pgTable('user_gear_items', {
   id: uuid('id').defaultRandom().primaryKey(),
   userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   catalogItemId: uuid('catalogItemId').notNull().references(() => equipmentCatalog.id, { onDelete: 'restrict' }),
-  equippedSlot: text('equippedSlot').$type<EquipSlotId | 'claws'>(),
+  /** Gear hardpoint, a look slot (`look-*`, cosmetics only), or null when vaulted / in the wardrobe. */
+  equippedSlot: text('equippedSlot').$type<EquipSlotId | LookSlotId | 'claws'>(),
   vaultIndex: integer('vaultIndex'),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),
