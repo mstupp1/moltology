@@ -1,0 +1,1119 @@
+[
+  {
+    "batch": 1,
+    "file": "lobster/antenna/whip.png",
+    "what": "One antenna, screen-left only, rooted where it meets the head. Variant: whip.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side.",
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 1,
+    "file": "lobster/arm/default.png",
+    "what": "Screen-left arm from shoulder to wrist, raised in the cheer pose. No claw.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side."
+    ]
+  },
+  {
+    "batch": 1,
+    "file": "lobster/belly/classic.png",
+    "what": "Segmented belly plates on the front of the torso. Variant: classic.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 1,
+    "file": "lobster/body/classic.png",
+    "what": "Torso shell from neck to hips, without the belly plate or head. Variant: classic.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 1,
+    "file": "lobster/claw/classic.png",
+    "what": "Screen-left claw only, attached at the wrist of the arm layer. Variant: classic.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side."
+    ]
+  },
+  {
+    "batch": 1,
+    "file": "lobster/eyes/round.png",
+    "what": "Both eyes as seated in the face: whites, coloured irises, pupils, catchlights, attached brows. No eyestalks. The app splits the irises out to recolour them. Variant: round.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 1,
+    "file": "lobster/gear/belt.png",
+    "what": "Utility belt around the waist.",
+    "colour": "kept as painted",
+    "notes": [
+      "Neutral metal and chitin tones; rarity glow is added by the app.",
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 1,
+    "file": "lobster/gear/carapace.png",
+    "what": "Chest armour plate strapped over the torso shell.",
+    "colour": "kept as painted",
+    "notes": [
+      "Neutral metal and chitin tones; rarity glow is added by the app.",
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 1,
+    "file": "lobster/gear/helm.png",
+    "what": "Armoured helm worn on the head, leaving both eyes and the mouth visible.",
+    "colour": "kept as painted",
+    "notes": [
+      "Neutral metal and chitin tones; rarity glow is added by the app.",
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 1,
+    "file": "lobster/gear/pincer.png",
+    "what": "Armoured pincer that replaces the screen-left claw, attached at the wrist.",
+    "colour": "kept as painted",
+    "notes": [
+      "Neutral metal and chitin tones; rarity glow is added by the app.",
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 1,
+    "file": "lobster/head/bean.png",
+    "what": "Head shell with cheeks, without eyes or mouth. Variant: bean.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 1,
+    "file": "lobster/iris/round.png",
+    "what": "Both irises only, exactly where they sit in the eyes layer. Usually not needed: the app splits irises out of the eyes. Variant: round.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 1,
+    "file": "lobster/legs/default.png",
+    "what": "All six walking legs, three per side, feet resting on the ground line.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 1,
+    "file": "lobster/lids/round.png",
+    "what": "Both eyelids fully closed, covering exactly where the eyes are (used for blinking). Variant: round.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 1,
+    "file": "lobster/look/reef-crown.png",
+    "what": "Reef Crown (head). Grown, not forged. Coral takes a century and it still took less time than your inbox.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 1,
+    "file": "lobster/master.png",
+    "what": "The full lobster in the house style: front view, cheer pose, every default part, no gear.",
+    "colour": "kept as painted",
+    "notes": [
+      "Match guides/lobster-pose.png for pose, proportions, and framing.",
+      "Every other file is cut from or painted over this one."
+    ]
+  },
+  {
+    "batch": 1,
+    "file": "lobster/mouth/grin.png",
+    "what": "Mouth only, full colour, on the face. Variant: grin.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 1,
+    "file": "lobster/tail/default.png",
+    "what": "Tail fan and the tail segments that show below the body.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 2,
+    "file": "crab/antenna/whip.png",
+    "what": "One antenna, screen-left only, rooted where it meets the head. Variant: whip.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side.",
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 2,
+    "file": "crab/arm/default.png",
+    "what": "Screen-left arm from shoulder to wrist, raised in the cheer pose. No claw.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side."
+    ]
+  },
+  {
+    "batch": 2,
+    "file": "crab/body/bean.png",
+    "what": "Whole crab shell (the face is on the shell), without eyes or mouth. Variant: bean.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 2,
+    "file": "crab/claw/classic.png",
+    "what": "Screen-left claw only, attached at the wrist of the arm layer. Variant: classic.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side."
+    ]
+  },
+  {
+    "batch": 2,
+    "file": "crab/eyes/round.png",
+    "what": "Both eyes as seated in the face: whites, coloured irises, pupils, catchlights, attached brows. No eyestalks. The app splits the irises out to recolour them. Variant: round.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 2,
+    "file": "crab/gear/antennae.png",
+    "what": "Sensor antenna that replaces the screen-left antenna.",
+    "colour": "kept as painted",
+    "notes": [
+      "Neutral metal and chitin tones; rarity glow is added by the app.",
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 2,
+    "file": "crab/gear/belt.png",
+    "what": "Utility belt around the waist.",
+    "colour": "kept as painted",
+    "notes": [
+      "Neutral metal and chitin tones; rarity glow is added by the app.",
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 2,
+    "file": "crab/gear/carapace.png",
+    "what": "Chest armour plate strapped over the torso shell.",
+    "colour": "kept as painted",
+    "notes": [
+      "Neutral metal and chitin tones; rarity glow is added by the app.",
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 2,
+    "file": "crab/gear/greaves.png",
+    "what": "Leg armour over the walking legs on both sides.",
+    "colour": "kept as painted",
+    "notes": [
+      "Neutral metal and chitin tones; rarity glow is added by the app.",
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 2,
+    "file": "crab/gear/hammer.png",
+    "what": "Crusher hammer claw that replaces the screen-left claw, attached at the wrist.",
+    "colour": "kept as painted",
+    "notes": [
+      "Neutral metal and chitin tones; rarity glow is added by the app.",
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 2,
+    "file": "crab/gear/helm.png",
+    "what": "Armoured helm worn on the head, leaving both eyes and the mouth visible.",
+    "colour": "kept as painted",
+    "notes": [
+      "Neutral metal and chitin tones; rarity glow is added by the app.",
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 2,
+    "file": "crab/gear/pincer.png",
+    "what": "Armoured pincer that replaces the screen-left claw, attached at the wrist.",
+    "colour": "kept as painted",
+    "notes": [
+      "Neutral metal and chitin tones; rarity glow is added by the app.",
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 2,
+    "file": "crab/iris/round.png",
+    "what": "Both irises only, exactly where they sit in the eyes layer. Usually not needed: the app splits irises out of the eyes. Variant: round.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 2,
+    "file": "crab/legs/default.png",
+    "what": "All six walking legs, three per side, feet resting on the ground line.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 2,
+    "file": "crab/lids/round.png",
+    "what": "Both eyelids fully closed, covering exactly where the eyes are (used for blinking). Variant: round.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 2,
+    "file": "crab/master.png",
+    "what": "The full crab in the house style: front view, cheer pose, every default part, no gear.",
+    "colour": "kept as painted",
+    "notes": [
+      "Match guides/crab-pose.png for pose, proportions, and framing.",
+      "Every other file is cut from or painted over this one."
+    ]
+  },
+  {
+    "batch": 2,
+    "file": "crab/mouth/grin.png",
+    "what": "Mouth only, full colour, on the face. Variant: grin.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 2,
+    "file": "lobster/gear/antennae.png",
+    "what": "Sensor antenna that replaces the screen-left antenna.",
+    "colour": "kept as painted",
+    "notes": [
+      "Neutral metal and chitin tones; rarity glow is added by the app.",
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 2,
+    "file": "lobster/gear/greaves.png",
+    "what": "Leg armour over the walking legs on both sides.",
+    "colour": "kept as painted",
+    "notes": [
+      "Neutral metal and chitin tones; rarity glow is added by the app.",
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 2,
+    "file": "lobster/gear/hammer.png",
+    "what": "Crusher hammer claw that replaces the screen-left claw, attached at the wrist.",
+    "colour": "kept as painted",
+    "notes": [
+      "Neutral metal and chitin tones; rarity glow is added by the app.",
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "crab/look/abyssal-antennae.png",
+    "what": "Abyssal Antennae Array (antennae). Deep-listening finials. They pick up the quiet.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically.",
+      "Screen-left only; drawn on both sides by the app."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "crab/look/ascendant-helm.png",
+    "what": "Ascendant Core Helm (head). A steward crest. It sits on members who kept showing up.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "crab/look/benthic-sigil.png",
+    "what": "Benthic Council Sigil (belt). A steward badge worn at the waist.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "crab/look/chitin-plated-chassis.png",
+    "what": "Chitin-Plated Chassis (carapace). A polished plate finish. Same shell underneath, better light.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "crab/look/gilded-pincer.png",
+    "what": "Gilded Pincer Ornament (claws). Gold trim on both claws. The grip stays exactly as strong as you are.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically.",
+      "Screen-left only; drawn on both sides by the app."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "crab/look/hydraulic-pincer-skin.png",
+    "what": "Hydraulic Pincer Skin (claws). Pistons and hoses on both claws. For members who shed in public.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically.",
+      "Screen-left only; drawn on both sides by the app."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "crab/look/kelp-sash.png",
+    "what": "Kelp Sash (belt). Tied once, never retied. It moves with the current so you do not have to.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "crab/look/lantern-feelers.png",
+    "what": "Lantern Feelers (antennae). Two small lights for dark water. Good for finding the next step.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically.",
+      "Screen-left only; drawn on both sides by the app."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "crab/look/larval-memorial.png",
+    "what": "Larval Memorial Shell (carapace). Honors your first shed. Warm, never mockery.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "crab/look/reef-crown.png",
+    "what": "Reef Crown (head). Grown, not forged. Coral takes a century and it still took less time than your inbox.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "crab/look/tide-runners.png",
+    "what": "Tide Runners (legs). Light leg wraps for walking the shelf. Silt does not stick.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "lobster/look/abyssal-antennae.png",
+    "what": "Abyssal Antennae Array (antennae). Deep-listening finials. They pick up the quiet.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically.",
+      "Screen-left only; drawn on both sides by the app."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "lobster/look/ascendant-helm.png",
+    "what": "Ascendant Core Helm (head). A steward crest. It sits on members who kept showing up.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "lobster/look/benthic-sigil.png",
+    "what": "Benthic Council Sigil (belt). A steward badge worn at the waist.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "lobster/look/chitin-plated-chassis.png",
+    "what": "Chitin-Plated Chassis (carapace). A polished plate finish. Same shell underneath, better light.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "lobster/look/gilded-pincer.png",
+    "what": "Gilded Pincer Ornament (claws). Gold trim on both claws. The grip stays exactly as strong as you are.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically.",
+      "Screen-left only; drawn on both sides by the app."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "lobster/look/hydraulic-pincer-skin.png",
+    "what": "Hydraulic Pincer Skin (claws). Pistons and hoses on both claws. For members who shed in public.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically.",
+      "Screen-left only; drawn on both sides by the app."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "lobster/look/kelp-sash.png",
+    "what": "Kelp Sash (belt). Tied once, never retied. It moves with the current so you do not have to.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "lobster/look/lantern-feelers.png",
+    "what": "Lantern Feelers (antennae). Two small lights for dark water. Good for finding the next step.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically.",
+      "Screen-left only; drawn on both sides by the app."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "lobster/look/larval-memorial.png",
+    "what": "Larval Memorial Shell (carapace). Honors your first shed. Warm, never mockery.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 3,
+    "file": "lobster/look/tide-runners.png",
+    "what": "Tide Runners (legs). Light leg wraps for walking the shelf. Silt does not stick.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/accessory/beanie.png",
+    "what": "Creator accessory: beanie, worn on the head.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/accessory/bow.png",
+    "what": "Creator accessory: bow, worn on the head.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/accessory/crown.png",
+    "what": "Creator accessory: crown, worn on the head.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/accessory/halo.png",
+    "what": "Creator accessory: halo, worn on the head.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/accessory/hard_hat.png",
+    "what": "Creator accessory: hard hat, worn on the head.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/accessory/headset.png",
+    "what": "Creator accessory: headset, worn on the head.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/accessory/visor.png",
+    "what": "Creator accessory: visor, worn on the head.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/antenna/beacon.png",
+    "what": "One antenna, screen-left only, rooted where it meets the head. Variant: beacon.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side.",
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/antenna/bolt.png",
+    "what": "One antenna, screen-left only, rooted where it meets the head. Variant: bolt.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side.",
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/antenna/curl.png",
+    "what": "One antenna, screen-left only, rooted where it meets the head. Variant: curl.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side.",
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/antenna/plume.png",
+    "what": "One antenna, screen-left only, rooted where it meets the head. Variant: plume.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side.",
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/body/heart.png",
+    "what": "Whole crab shell (the face is on the shell), without eyes or mouth. Variant: heart.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "crab/body/round.png",
+    "what": "Whole crab shell (the face is on the shell), without eyes or mouth. Variant: round.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "crab/body/square.png",
+    "what": "Whole crab shell (the face is on the shell), without eyes or mouth. Variant: square.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "crab/body/tall.png",
+    "what": "Whole crab shell (the face is on the shell), without eyes or mouth. Variant: tall.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "crab/body/wide.png",
+    "what": "Whole crab shell (the face is on the shell), without eyes or mouth. Variant: wide.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "crab/claw/crusher.png",
+    "what": "Screen-left claw only, attached at the wrist of the arm layer. Variant: crusher.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/claw/mitten.png",
+    "what": "Screen-left claw only, attached at the wrist of the arm layer. Variant: mitten.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/claw/slim.png",
+    "what": "Screen-left claw only, attached at the wrist of the arm layer. Variant: slim.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/eyes/tall.png",
+    "what": "Both eyes as seated in the face: whites, coloured irises, pupils, catchlights, attached brows. No eyestalks. The app splits the irises out to recolour them. Variant: tall.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "crab/eyes/wide.png",
+    "what": "Both eyes as seated in the face: whites, coloured irises, pupils, catchlights, attached brows. No eyestalks. The app splits the irises out to recolour them. Variant: wide.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "crab/iris/tall.png",
+    "what": "Both irises only, exactly where they sit in the eyes layer. Usually not needed: the app splits irises out of the eyes. Variant: tall.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/iris/wide.png",
+    "what": "Both irises only, exactly where they sit in the eyes layer. Usually not needed: the app splits irises out of the eyes. Variant: wide.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/lids/tall.png",
+    "what": "Both eyelids fully closed, covering exactly where the eyes are (used for blinking). Variant: tall.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/lids/wide.png",
+    "what": "Both eyelids fully closed, covering exactly where the eyes are (used for blinking). Variant: wide.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/mouth/beam.png",
+    "what": "Mouth only, full colour, on the face. Variant: beam.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "crab/mouth/fang.png",
+    "what": "Mouth only, full colour, on the face. Variant: fang.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "crab/mouth/oh.png",
+    "what": "Mouth only, full colour, on the face. Variant: oh.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "crab/mouth/smile.png",
+    "what": "Mouth only, full colour, on the face. Variant: smile.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "crab/mouth/smirk.png",
+    "what": "Mouth only, full colour, on the face. Variant: smirk.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "crab/mouth/tongue.png",
+    "what": "Mouth only, full colour, on the face. Variant: tongue.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/accessory/beanie.png",
+    "what": "Creator accessory: beanie, worn on the head.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/accessory/bow.png",
+    "what": "Creator accessory: bow, worn on the head.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/accessory/crown.png",
+    "what": "Creator accessory: crown, worn on the head.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/accessory/halo.png",
+    "what": "Creator accessory: halo, worn on the head.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/accessory/hard_hat.png",
+    "what": "Creator accessory: hard hat, worn on the head.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/accessory/headset.png",
+    "what": "Creator accessory: headset, worn on the head.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/accessory/visor.png",
+    "what": "Creator accessory: visor, worn on the head.",
+    "colour": "kept as painted",
+    "notes": [
+      "Deliver as the master wearing it; the item is cut out automatically."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/antenna/beacon.png",
+    "what": "One antenna, screen-left only, rooted where it meets the head. Variant: beacon.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side.",
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/antenna/bolt.png",
+    "what": "One antenna, screen-left only, rooted where it meets the head. Variant: bolt.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side.",
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/antenna/curl.png",
+    "what": "One antenna, screen-left only, rooted where it meets the head. Variant: curl.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side.",
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/antenna/plume.png",
+    "what": "One antenna, screen-left only, rooted where it meets the head. Variant: plume.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side.",
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/belly/barrel.png",
+    "what": "Segmented belly plates on the front of the torso. Variant: barrel.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/belly/chunky.png",
+    "what": "Segmented belly plates on the front of the torso. Variant: chunky.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/belly/slim.png",
+    "what": "Segmented belly plates on the front of the torso. Variant: slim.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/belly/tapered.png",
+    "what": "Segmented belly plates on the front of the torso. Variant: tapered.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/body/barrel.png",
+    "what": "Torso shell from neck to hips, without the belly plate or head. Variant: barrel.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/body/chunky.png",
+    "what": "Torso shell from neck to hips, without the belly plate or head. Variant: chunky.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/body/slim.png",
+    "what": "Torso shell from neck to hips, without the belly plate or head. Variant: slim.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/body/tapered.png",
+    "what": "Torso shell from neck to hips, without the belly plate or head. Variant: tapered.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/claw/crusher.png",
+    "what": "Screen-left claw only, attached at the wrist of the arm layer. Variant: crusher.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/claw/mitten.png",
+    "what": "Screen-left claw only, attached at the wrist of the arm layer. Variant: mitten.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/claw/slim.png",
+    "what": "Screen-left claw only, attached at the wrist of the arm layer. Variant: slim.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Screen-left only. The app mirrors it for the right side."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/eyes/tall.png",
+    "what": "Both eyes as seated in the face: whites, coloured irises, pupils, catchlights, attached brows. No eyestalks. The app splits the irises out to recolour them. Variant: tall.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/eyes/wide.png",
+    "what": "Both eyes as seated in the face: whites, coloured irises, pupils, catchlights, attached brows. No eyestalks. The app splits the irises out to recolour them. Variant: wide.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/head/heart.png",
+    "what": "Head shell with cheeks, without eyes or mouth. Variant: heart.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/head/round.png",
+    "what": "Head shell with cheeks, without eyes or mouth. Variant: round.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/head/square.png",
+    "what": "Head shell with cheeks, without eyes or mouth. Variant: square.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/head/tall.png",
+    "what": "Head shell with cheeks, without eyes or mouth. Variant: tall.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/head/wide.png",
+    "what": "Head shell with cheeks, without eyes or mouth. Variant: wide.",
+    "colour": "recoloured by the app",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/iris/tall.png",
+    "what": "Both irises only, exactly where they sit in the eyes layer. Usually not needed: the app splits irises out of the eyes. Variant: tall.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/iris/wide.png",
+    "what": "Both irises only, exactly where they sit in the eyes layer. Usually not needed: the app splits irises out of the eyes. Variant: wide.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/lids/tall.png",
+    "what": "Both eyelids fully closed, covering exactly where the eyes are (used for blinking). Variant: tall.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/lids/wide.png",
+    "what": "Both eyelids fully closed, covering exactly where the eyes are (used for blinking). Variant: wide.",
+    "colour": "recoloured by the app",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/mouth/beam.png",
+    "what": "Mouth only, full colour, on the face. Variant: beam.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/mouth/fang.png",
+    "what": "Mouth only, full colour, on the face. Variant: fang.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/mouth/oh.png",
+    "what": "Mouth only, full colour, on the face. Variant: oh.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/mouth/smile.png",
+    "what": "Mouth only, full colour, on the face. Variant: smile.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/mouth/smirk.png",
+    "what": "Mouth only, full colour, on the face. Variant: smirk.",
+    "colour": "kept as painted",
+    "notes": []
+  },
+  {
+    "batch": 4,
+    "file": "lobster/mouth/tongue.png",
+    "what": "Mouth only, full colour, on the face. Variant: tongue.",
+    "colour": "kept as painted",
+    "notes": []
+  }
+]

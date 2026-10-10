@@ -2,6 +2,7 @@ import type {
   ChassisVisualType,
   EquipmentAffix,
   EquipmentCategory,
+  EquipmentKind,
   EquipmentRarity,
   EquipmentUniquePower,
 } from '../db/schema'
@@ -19,6 +20,8 @@ export interface EquipmentCatalogSeed {
   uniquePower: EquipmentUniquePower | null
   imageUrl: string
   sortOrder: number
+  kind?: EquipmentKind
+  artKey?: string | null
 }
 
 const VISUAL_TYPE_SLOT: Record<ChassisVisualType, EquipmentCategory> = {
@@ -355,6 +358,154 @@ export const INITIAL_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
   }),
 ]
 
+const CATEGORY_VISUAL: Record<EquipmentCategory, ChassisVisualType> = {
+  head: 'helm',
+  carapace: 'carapace',
+  claws: 'pincer',
+  antennae: 'antennae',
+  legs: 'greaves',
+  belt: 'belt',
+}
+
+function look(partial: {
+  id: string
+  slug: string
+  name: string
+  flavorText: string
+  category: EquipmentCategory
+  rarity: EquipmentRarity
+  sortOrder: number
+}): EquipmentCatalogSeed {
+  const visualType = CATEGORY_VISUAL[partial.category]
+  return {
+    ...partial,
+    visualType,
+    kind: 'cosmetic',
+    artKey: partial.slug,
+    primaryStat: 0,
+    affixes: [],
+    uniquePower: null,
+    imageUrl: typeImage(visualType),
+  }
+}
+
+/**
+ * Cosmetics: worn in look slots over gear. They change the drawing and nothing else.
+ * `artKey` (= slug) names the kit art: `images/avatar-kit/<race>/look/<slug>.webp`.
+ */
+export const COSMETIC_CATALOG: EquipmentCatalogSeed[] = [
+  look({
+    id: 'b2000000-0000-4000-8000-000000000001',
+    slug: 'reef-crown',
+    name: 'Reef Crown',
+    flavorText: 'Grown, not forged. Coral takes a century and it still took less time than your inbox.',
+    category: 'head',
+    rarity: 'uncommon',
+    sortOrder: 101,
+  }),
+  look({
+    id: 'b2000000-0000-4000-8000-000000000002',
+    slug: 'ascendant-helm',
+    name: 'Ascendant Core Helm',
+    flavorText: 'A steward crest. It sits on members who kept showing up.',
+    category: 'head',
+    rarity: 'legendary',
+    sortOrder: 102,
+  }),
+  look({
+    id: 'b2000000-0000-4000-8000-000000000003',
+    slug: 'chitin-plated-chassis',
+    name: 'Chitin-Plated Chassis',
+    flavorText: 'A polished plate finish. Same shell underneath, better light.',
+    category: 'carapace',
+    rarity: 'epic',
+    sortOrder: 103,
+  }),
+  look({
+    id: 'b2000000-0000-4000-8000-000000000004',
+    slug: 'larval-memorial',
+    name: 'Larval Memorial Shell',
+    flavorText: 'Honors your first shed. Warm, never mockery.',
+    category: 'carapace',
+    rarity: 'rare',
+    sortOrder: 104,
+  }),
+  look({
+    id: 'b2000000-0000-4000-8000-000000000005',
+    slug: 'gilded-pincer',
+    name: 'Gilded Pincer Ornament',
+    flavorText: 'Gold trim on both claws. The grip stays exactly as strong as you are.',
+    category: 'claws',
+    rarity: 'epic',
+    sortOrder: 105,
+  }),
+  look({
+    id: 'b2000000-0000-4000-8000-000000000006',
+    slug: 'hydraulic-pincer-skin',
+    name: 'Hydraulic Pincer Skin',
+    flavorText: 'Pistons and hoses on both claws. For members who shed in public.',
+    category: 'claws',
+    rarity: 'rare',
+    sortOrder: 106,
+  }),
+  look({
+    id: 'b2000000-0000-4000-8000-000000000007',
+    slug: 'benthic-sigil',
+    name: 'Benthic Council Sigil',
+    flavorText: 'A steward badge worn at the waist.',
+    category: 'belt',
+    rarity: 'epic',
+    sortOrder: 107,
+  }),
+  look({
+    id: 'b2000000-0000-4000-8000-000000000008',
+    slug: 'kelp-sash',
+    name: 'Kelp Sash',
+    flavorText: 'Tied once, never retied. It moves with the current so you do not have to.',
+    category: 'belt',
+    rarity: 'common',
+    sortOrder: 108,
+  }),
+  look({
+    id: 'b2000000-0000-4000-8000-000000000009',
+    slug: 'abyssal-antennae',
+    name: 'Abyssal Antennae Array',
+    flavorText: 'Deep-listening finials. They pick up the quiet.',
+    category: 'antennae',
+    rarity: 'epic',
+    sortOrder: 109,
+  }),
+  look({
+    id: 'b2000000-0000-4000-8000-00000000000a',
+    slug: 'lantern-feelers',
+    name: 'Lantern Feelers',
+    flavorText: 'Two small lights for dark water. Good for finding the next step.',
+    category: 'antennae',
+    rarity: 'uncommon',
+    sortOrder: 110,
+  }),
+  look({
+    id: 'b2000000-0000-4000-8000-00000000000b',
+    slug: 'tide-runners',
+    name: 'Tide Runners',
+    flavorText: 'Light leg wraps for walking the shelf. Silt does not stick.',
+    category: 'legs',
+    rarity: 'common',
+    sortOrder: 111,
+  }),
+]
+
+/** Cosmetics every member starts with in the wardrobe. */
+export const STARTER_COSMETIC_CATALOG_IDS: string[] = [
+  'b2000000-0000-4000-8000-000000000001', // reef crown
+  'b2000000-0000-4000-8000-000000000008', // kelp sash
+  'b2000000-0000-4000-8000-00000000000a', // lantern feelers
+  'b2000000-0000-4000-8000-00000000000b', // tide runners
+]
+
+/** Gear plus cosmetics: everything the chassis loader keeps in the catalog table. */
+export const ALL_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [...INITIAL_EQUIPMENT_CATALOG, ...COSMETIC_CATALOG]
+
 /** Catalog IDs granted into an empty (or incomplete) vault on chassis load. */
 export const STARTER_EQUIPMENT_CATALOG_IDS: string[] = [
   'a1000000-0000-4000-8000-000000000001', // larval plate
@@ -389,5 +540,7 @@ export function catalogSeedInsertValues(item: EquipmentCatalogSeed) {
     uniquePower: item.uniquePower,
     imageUrl: item.imageUrl,
     sortOrder: item.sortOrder,
+    kind: item.kind ?? 'gear',
+    artKey: item.artKey ?? null,
   }
 }

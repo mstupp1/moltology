@@ -786,6 +786,24 @@ export const moveGearItemFn = createServerFn({ method: 'POST' })
     return moveGearItemHandler(args)
   })
 
+/** Wear (or remove) a cosmetic look. */
+export const setLookFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { itemId: string; wear: boolean; token?: string; userId?: string }) =>
+    z
+      .object({
+        itemId: z.string().uuid(),
+        wear: z.boolean(),
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(async (args) => {
+    const { setLookHandler } = await import('./db-services')
+    return setLookHandler(args)
+  })
+
 export const getPublicProfileFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: { profileId: string; token?: string; userId?: string }) =>
