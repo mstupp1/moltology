@@ -67,7 +67,7 @@ function stillConfig(config: LobsterAvatarConfig): LobsterAvatarConfig {
 
 /** True when this config would be drawn with kit art (so it needs a rendered portrait). */
 export function needsKitPortrait(config: LobsterAvatarConfig): boolean {
-  return isKitRaceReady(resolveAvatarTraits(config).race)
+  return config.kit === true && isKitRaceReady(resolveAvatarTraits(config).race)
 }
 
 /**

@@ -196,6 +196,11 @@ export interface LobsterAvatarConfig {
   loadout?: string
   /** Pre-rendered static portrait in the bucket, written by the server on save. */
   portraitKey?: string
+  /**
+   * Draw with painted kit art. Written by the server only for members in the `avatar-kit`
+   * experiment; without it the avatar stays on the vector rig and loadout/portrait are ignored.
+   */
+  kit?: boolean
 }
 
 /** Every look trait, fully resolved from a config plus its seed. */
@@ -306,6 +311,7 @@ export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | nu
   if (typeof obj.transparentBackground === 'boolean') config.transparentBackground = obj.transparentBackground
   if (typeof obj.loadout === 'string' && obj.loadout.length <= 600) config.loadout = obj.loadout
   if (typeof obj.portraitKey === 'string' && isAvatarPortraitKey(obj.portraitKey)) config.portraitKey = obj.portraitKey
+  if (obj.kit === true) config.kit = true
   return config
 }
 

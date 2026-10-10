@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { Activity, Boxes, Eye, ShieldCheck, Users } from 'lucide-react'
+import { Activity, Boxes, Eye, FlaskConical, ShieldCheck, Users } from 'lucide-react'
 import { CovenantWatchPage } from '@/components/forum/CovenantWatchPage'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
@@ -8,22 +8,26 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import {
   getAdminTelemetryFn,
+  getMyExperimentsFn,
   listAdminPurchasesFn,
   searchAdminMembersFn,
   setAdminMemberRoleFn,
+  setExperimentFn,
   type AdminMemberDirectory,
   type AdminMemberRole,
   type AdminPurchaseRow,
   type AdminTelemetry,
+  type ExperimentRow,
 } from '@/lib/server/api'
 
-type AdminTab = 'watch' | 'sectors' | 'members' | 'purchases'
+type AdminTab = 'watch' | 'sectors' | 'members' | 'purchases' | 'experiments'
 
 const TABS: { id: AdminTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'watch', label: 'Covenant Watch', icon: Eye },
   { id: 'sectors', label: 'Sectors', icon: Boxes },
   { id: 'members', label: 'Members', icon: Users },
   { id: 'purchases', label: 'Purchases', icon: Activity },
+  { id: 'experiments', label: 'Experiments', icon: FlaskConical },
 ]
 
 const ROLE_OPTIONS: { value: AdminMemberRole; label: string }[] = [
@@ -132,6 +136,7 @@ export function AdminOversightHub() {
         <MemberDirectory userId={session.userId} onChanged={() => void loadTelemetry()} />
       ) : null}
       {tab === 'purchases' ? <PurchaseLedger userId={session.userId} /> : null}
+      {tab === 'experiments' ? <ExperimentSwitches userId={session.userId} /> : null}
     </div>
   )
 }
@@ -397,6 +402,97 @@ function PurchaseLedger({ userId }: { userId: string | null }) {
               <p className="text-[11px] text-ink-muted">
                 {row.moltCredits} Molt Credits · {row.chitinGems} Chitin Gems
               </p>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </section>
+  )
+}
+
+function ExperimentSwitches({ userId }: { userId: string | null }) {
+  const toast = useOptionalToast()
+  const [rows, setRows] = useState<ExperimentRow[] | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [savingId, setSavingId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!userId) return
+    let cancelled = false
+    void (async () => {
+      try {
+        const next = await getMyExperimentsFn({ data: await authData(userId) })
+        if (!cancelled) {
+          setRows(next)
+          setError(null)
+        }
+      } catch (err: unknown) {
+        if (!cancelled) {
+          setRows([])
+          setError(err instanceof Error ? err.message : 'Could not load experiments.')
+        }
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [userId])
+
+  const toggle = async (row: ExperimentRow) => {
+    if (!userId || savingId) return
+    setSavingId(row.id)
+    try {
+      const next = await setExperimentFn({ data: { ...(await authData(userId)), id: row.id, on: !row.on } })
+      setRows(next)
+      toast?.toast.success(`${row.title} is ${row.on ? 'off' : 'on'} for you.`, { id: `admin-experiment-${row.id}` })
+    } catch (err: unknown) {
+      toast?.toast.error(err instanceof Error ? err.message : 'Could not change that experiment.', {
+        id: `admin-experiment-${row.id}`,
+      })
+    } finally {
+      setSavingId(null)
+    }
+  }
+
+  return (
+    <section className="hud-sheen rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 md:p-5 space-y-3" data-testid="admin-experiments">
+      <div className="flex items-center gap-2">
+        <FlaskConical className="w-4 h-4 text-cyan-glow" />
+        <h2 className="font-grotesk text-sm font-bold uppercase tracking-[0.08em] text-ink">Experiments</h2>
+      </div>
+      <p className="text-xs text-ink-muted">
+        Unfinished features you can try on your own account. Switches apply to you only; every other member keeps the current version.
+      </p>
+      {error ? <p className="text-xs text-crimson-text">{error}</p> : null}
+      {rows && rows.length === 0 && !error ? (
+        <p className="text-xs text-ink-muted">There are no experiments right now.</p>
+      ) : null}
+      {rows && rows.length > 0 ? (
+        <ul className="space-y-2" data-testid="admin-experiment-list">
+          {rows.map((row) => (
+            <li key={row.id} className="flex items-start justify-between gap-3 rounded-card border border-line-subtle bg-surface-2 p-3">
+              <div className="space-y-1">
+                <p className="text-sm font-bold text-ink">{row.title}</p>
+                <p className="text-xs text-ink-muted">{row.description}</p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={row.on}
+                aria-label={row.title}
+                disabled={savingId === row.id}
+                data-testid={`admin-experiment-${row.id}`}
+                onClick={() => void toggle(row)}
+                className={`relative mt-0.5 inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition-colors disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                  row.on ? 'border-cyan-glow bg-cyan-glow/30' : 'border-line bg-surface-1'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 rounded-full transition-transform ${
+                    row.on ? 'translate-x-6 bg-cyan-glow' : 'translate-x-1 bg-ink-muted'
+                  }`}
+                />
+              </button>
             </li>
           ))}
         </ul>

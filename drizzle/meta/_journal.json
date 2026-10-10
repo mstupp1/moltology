@@ -330,6 +330,13 @@
       "when": 1791650481125,
       "tag": "0046_equipment_cosmetics",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1791672150457,
+      "tag": "0047_profile_experiments",
+      "breakpoints": true
     }
   ]
 }

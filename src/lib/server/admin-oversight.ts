@@ -207,6 +207,14 @@ export async function setAdminMemberRoleHandler(
     throw new Error(MEMBER_MISSING)
   }
 
+  // Experiments only apply to admins, so a role change can switch the painted avatar on or off.
+  try {
+    const { syncAvatarLook } = await import('./db-services')
+    await syncAvatarLook(auth.dbClient, profileId)
+  } catch (e) {
+    console.warn('[setAdminMemberRole] Avatar sync failed:', e)
+  }
+
   return {
     id: updated.id,
     handle: updated.handle?.trim() || target.handle?.trim() || null,

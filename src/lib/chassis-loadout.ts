@@ -666,6 +666,8 @@ export interface ChassisLoadoutPayload {
   vaultSize: number
   /** The member's saved avatar config, so the paper doll can draw them wearing the loadout. */
   avatarConfig?: { style: string; seed: string; [trait: string]: string | number | boolean } | null
+  /** The avatar-kit experiment is on: show the avatar paper doll and the wardrobe. */
+  avatarKit?: boolean
 }
 
 let chassisLoadoutCache: { userId: string; payload: ChassisLoadoutPayload } | null = null

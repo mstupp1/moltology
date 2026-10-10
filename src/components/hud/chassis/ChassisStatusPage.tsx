@@ -76,6 +76,8 @@ export const ChassisStatusPage: React.FC = () => {
   const [savedAvatar, setSavedAvatar] = useState<LobsterAvatarConfig | null>(() =>
     parseLobsterAvatarConfig(cached?.avatarConfig ?? null)
   )
+  // The avatar paper doll and the wardrobe belong to the avatar-kit experiment (admins only for now).
+  const [avatarKit, setAvatarKit] = useState(() => cached?.avatarKit === true)
   const [error, setError] = useState<string | null>(null)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [detailItemId, setDetailItemId] = useState<string | null>(null)
@@ -123,6 +125,7 @@ export const ChassisStatusPage: React.FC = () => {
       setTotals(payload.totals)
       setVaultSize(payload.vaultSize)
       setSavedAvatar(parseLobsterAvatarConfig(payload.avatarConfig ?? null))
+      setAvatarKit(payload.avatarKit === true)
       if (userId) setCachedChassisLoadout(userId, payload)
     },
     [userId]
@@ -340,7 +343,7 @@ export const ChassisStatusPage: React.FC = () => {
                   onSelectItem={handleSelectItem}
                   onSlotActivate={handleSlotActivate}
                   onHoverItem={setHoverTarget}
-                  avatarConfig={liveAvatar}
+                  avatarConfig={avatarKit ? liveAvatar : null}
                 />
               </div>
 
@@ -361,14 +364,16 @@ export const ChassisStatusPage: React.FC = () => {
                 />
               </div>
 
-              <div className="chitin-card p-3 sm:p-4 md:p-5 rounded-card shadow-2xl shrink-0 overflow-hidden min-w-0">
-                <WardrobePanel
-                  items={items}
-                  catalogById={catalogById}
-                  onToggleLook={(itemId, wear) => void persistLook(itemId, wear)}
-                  onHoverItem={setHoverTarget}
-                />
-              </div>
+              {avatarKit ? (
+                <div className="chitin-card p-3 sm:p-4 md:p-5 rounded-card shadow-2xl shrink-0 overflow-hidden min-w-0">
+                  <WardrobePanel
+                    items={items}
+                    catalogById={catalogById}
+                    onToggleLook={(itemId, wear) => void persistLook(itemId, wear)}
+                    onHoverItem={setHoverTarget}
+                  />
+                </div>
+              ) : null}
             </div>
 
             <div className="order-3 hidden md:flex md:flex-col md:min-h-0">

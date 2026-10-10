@@ -143,6 +143,8 @@ export const profiles = pgTable('profiles', {
   emailOptInSource: text('emailOptInSource'),
   isSimulated: boolean('isSimulated').default(false).notNull(),
   simulatedPersona: jsonb('simulatedPersona').$type<SimulatedPersonaConfig>(),
+  /** Experiments this admin has switched on (see src/lib/experiments.ts). Ignored for non-admins. */
+  experiments: jsonb('experiments').$type<string[]>().default([]).notNull(),
   /** How the member found the Order: organic, word of mouth, or brought in. */
   joinSource: text('joinSource').$type<MemberJoinSource>(),
   referredByUserId: text('referredByUserId').references((): AnyPgColumn => profiles.id, { onDelete: 'set null' }),

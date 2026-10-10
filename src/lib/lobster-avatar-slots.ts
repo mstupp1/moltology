@@ -75,7 +75,8 @@ export interface ResolveLobsterAvatarAssetsOptions {
 
 /**
  * Portrait order: the server-rendered webp when the config has one (cheap `<img>` everywhere),
- * else the vector rig. Full body uses the painted kit when the race has art.
+ * else the vector rig. Painted art (and the saved portrait) only apply when the server set
+ * `kit` on the config, which it does for members in the avatar-kit experiment.
  */
 export function resolveLobsterAvatarAssets(
   config: LobsterAvatarConfig | null | undefined,
@@ -88,19 +89,21 @@ export function resolveLobsterAvatarAssets(
   const portraitSize = normalizePortraitSourcePx(options?.portraitSize)
   const fullBodySize = options?.fullBodySize ?? 256
 
+  // Painted art only for avatars the server marked as in the avatar-kit experiment.
+  const kit = config.kit === true
   const portraitUrl =
-    config.portraitKey && !options?.livePortrait
+    kit && config.portraitKey && !options?.livePortrait
       ? getAssetUrl(config.portraitKey)
       : generateLobsterAvatarDataUri(stillPortraitConfig(config), portraitSize, {
           frame: 'portrait',
           staticMotion: true,
-          kit: Boolean(options?.livePortrait),
+          kit: kit && Boolean(options?.livePortrait),
         })
 
   const fullBodyUrl = generateLobsterAvatarDataUri(config, fullBodySize, {
     frame: 'fullBody',
     staticMotion: false,
-    kit: true,
+    kit,
   })
 
   return {
