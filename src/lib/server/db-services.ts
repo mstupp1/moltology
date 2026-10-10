@@ -6,7 +6,7 @@ import {
 } from '../notifications-refresh'
 import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, forumTopicVisits, forumBoardVisits, leads, equipmentCatalog, userGearItems, friendRequests, friendships, suggestionDismissals, memberBonds, notifications, xpTransactions, type NotificationKind, type NotificationPayload } from '../../db/schema'
 import { getDb } from '../../db'
-import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, notInArray, isNull } from 'drizzle-orm'
+import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, notInArray, isNull, getTableColumns } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
 import { resolveWriteAuth } from './write-auth'
 import { ensureUserProfile } from '../user-sync'
@@ -63,7 +63,7 @@ import { FORUM_REPORT_COPY, forumReportReasonLabel, validateForumReportInput } f
 import { isAdmin } from '../permissions'
 import { assertCanReply, assertCanStartTopic, loadForumStanding } from './forum-standing'
 import { shouldSinkReply, type ForumStandingDecision } from '../forum-standing'
-import { getAssetUrl } from '../assets'
+import { getAbsoluteAssetUrl, getAssetUrl } from '../assets'
 import { AVATAR_STORED_OPTIONAL_KEYS, avatarConfigShape } from '../avatar/config-schema'
 import {
   CANONICAL_ALIGNMENT_TASKS,
@@ -556,12 +556,16 @@ export const deleteAIThreadHandler = async ({ data, context }: ServerFnArgs<Muta
 
 /**
  * Server Function: Get all published blog posts from database or fallback to seed data.
+ *
+ * Listings never need article bodies, and the bodies are most of the table's bytes, so
+ * `content` is left empty here. Readers load the full post with getBlogPostBySlugFn.
  */
 export const getBlogPostsHandler = async ({ context }: ServerFnArgs) => {
   const dbClient = context?.db || getDb()
   try {
+    const { content: _content, ...listingColumns } = getTableColumns(blogPosts)
     const records = await dbClient
-      .select()
+      .select(listingColumns)
       .from(blogPosts)
       .where(eq(blogPosts.isPublished, true))
       .orderBy(desc(blogPosts.publishedAt))
@@ -572,8 +576,8 @@ export const getBlogPostsHandler = async ({ context }: ServerFnArgs) => {
         slug: r.slug,
         title: r.title,
         summary: r.summary,
-        content: r.content,
-        coverImageUrl: r.coverImageUrl || '/images/ai_learning_ascension_cover.jpg',
+        content: '',
+        coverImageUrl: getAssetUrl(r.coverImageUrl || 'images/ai_learning_ascension_cover.jpg'),
         authorName: r.authorName,
         authorAvatar: r.authorAvatar,
         authorRole: r.authorRole || 'Stage 4 Ascendant',
@@ -615,7 +619,7 @@ export const getBlogPostBySlugHandler = async ({ data: slug, context }: ServerFn
         title: r.title,
         summary: r.summary,
         content: r.content,
-        coverImageUrl: r.coverImageUrl || '/images/ai_learning_ascension_cover.jpg',
+        coverImageUrl: getAssetUrl(r.coverImageUrl || 'images/ai_learning_ascension_cover.jpg'),
         authorName: r.authorName,
         authorAvatar: r.authorAvatar,
         authorRole: r.authorRole || 'Stage 4 Ascendant',
@@ -3081,7 +3085,7 @@ export async function submitLeadHandler(args: ServerFnArgs<SubmitLeadInput>) {
     throw new Error(verification.errorMessage || 'Bot protection check failed. Please try again.')
   }
 
-  const downloadUrl = getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf')
+  const downloadUrl = getAbsoluteAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf')
 
   try {
     const db = getDb()

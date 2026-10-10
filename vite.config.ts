@@ -9,6 +9,15 @@ import { resolveViteEmailVerificationEnabled, resolveViteGoogleAuthEnabled } fro
 
 const isTest = Boolean(process.env.VITEST)
 
+// Bucket media is served at /media/* by a cached Vercel rewrite (vercel.json). Locally we proxy
+// to the live site so dev servers and screenshot runs hit the CDN cache, not the Neon bucket.
+const mediaProxy = {
+  '/media': {
+    target: process.env.MEDIA_PROXY_ORIGIN || 'https://moltology.org',
+    changeOrigin: true,
+  },
+}
+
 function syncPublicGoogleAuthFlag(mode: string) {
   if (isTest) return
   const env = loadEnv(mode, process.cwd(), '')
@@ -74,12 +83,16 @@ export default defineConfig(({ mode }) => {
       fs: {
         allow: [searchForWorkspaceRoot(process.cwd()), realpathSync(path.resolve(process.cwd(), 'node_modules'))],
       },
+      proxy: mediaProxy,
       hmr: {
         overlay: true,
       },
       watch: {
         usePolling: false,
       },
+    },
+    preview: {
+      proxy: mediaProxy,
     },
     test: {
       globals: true,

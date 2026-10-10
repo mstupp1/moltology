@@ -55,11 +55,6 @@ export const Route = createRootRoute({
           href: '/fonts/inter-latin.woff2',
           crossOrigin: 'anonymous',
         },
-        {
-          rel: 'preconnect',
-          href: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech',
-        },
-        { rel: 'dns-prefetch', href: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech' },
       ],
     }
   },

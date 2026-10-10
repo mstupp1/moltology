@@ -26,6 +26,7 @@ import { getAssetUrl } from '@/lib/assets'
 import { INITIAL_BLOG_POSTS, formatNewsTitle, type BlogPostData } from '@/lib/blog-data'
 import { getBlogPostsFn } from '@/lib/server/api'
 import { NewsArticleBody } from '@/components/news/NewsArticleBody'
+import { useBlogPostBody } from '@/hooks/useBlogPostBody'
 
 export interface LaunchpadCarouselProps {
   isLoading?: boolean
@@ -129,6 +130,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
   // News Feed State (capped at 20 most recent articles)
   const [posts, setPosts] = useState<BlogPostData[]>(() => INITIAL_BLOG_POSTS.slice(0, 20))
   const [activeNewsPost, setActiveNewsPost] = useState<BlogPostData | null>(null)
+  const activeNewsPostBody = useBlogPostBody(activeNewsPost)
   const [featuredNewsIndex, setFeaturedNewsIndex] = useState(0)
 
   useEffect(() => {
@@ -273,7 +275,11 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                 )}
 
                 <div className="rounded-card bg-abyss p-4 sm:p-5 border border-line-subtle">
-                  <NewsArticleBody content={activeNewsPost.content} />
+                  {activeNewsPostBody === null ? (
+                    <p className="text-sm text-ink-muted">Loading article…</p>
+                  ) : (
+                    <NewsArticleBody content={activeNewsPostBody} />
+                  )}
                 </div>
               </div>
 
