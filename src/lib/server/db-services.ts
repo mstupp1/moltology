@@ -61,6 +61,7 @@ import {
 } from '../forum-visits'
 import { FORUM_REPORT_COPY, forumReportReasonLabel, validateForumReportInput } from '../forum-reports'
 import { isAdmin } from '../permissions'
+import { hasExperiment } from '../experiments'
 import { assertCanReply, assertCanStartTopic, loadForumStanding } from './forum-standing'
 import { shouldSinkReply, type ForumStandingDecision } from '../forum-standing'
 import { getAbsoluteAssetUrl, getMediaPath } from '../assets'
@@ -3769,12 +3770,25 @@ type StoredAvatarConfig = NonNullable<typeof profiles.$inferSelect['avatarConfig
 
 export async function syncAvatarLook(dbClient: Db, userId: string): Promise<StoredAvatarConfig | null> {
   const [profile] = await dbClient
-    .select({ avatarConfig: profiles.avatarConfig })
+    .select({ avatarConfig: profiles.avatarConfig, role: profiles.role, experiments: profiles.experiments })
     .from(profiles)
     .where(eq(profiles.id, userId))
     .limit(1)
   const current = profile?.avatarConfig
   if (!current?.seed) return current ?? null
+
+  // Outside the avatar-kit experiment the avatar stays on the vector rig: no kit flag,
+  // loadout, or rendered portrait (this also clears them when the experiment is switched off).
+  if (!hasExperiment(profile.role, profile.experiments, 'avatar-kit')) {
+    const legacy: Record<string, string | number | boolean> = { ...current }
+    delete legacy.kit
+    delete legacy.loadout
+    delete legacy.portraitKey
+    if (Object.keys(legacy).length === Object.keys(current).length) return current
+    const legacyConfig = legacy as StoredAvatarConfig
+    await dbClient.update(profiles).set({ avatarConfig: legacyConfig, updatedAt: new Date() }).where(eq(profiles.id, userId))
+    return legacyConfig
+  }
 
   const catalogRows = await dbClient.select().from(equipmentCatalog)
   const gearRows = await dbClient.select().from(userGearItems).where(eq(userGearItems.userId, userId))
@@ -3783,7 +3797,7 @@ export async function syncAvatarLook(dbClient: Db, userId: string): Promise<Stor
   const loadout = serializeKitLoadout(buildKitLoadout(gearRows.map(toGearState), catalogById))
 
   const { parseLobsterAvatarConfig } = await import('../lobster-avatar')
-  const next: Record<string, string | number | boolean> = { ...current }
+  const next: Record<string, string | number | boolean> = { ...current, kit: true }
   if (loadout) next.loadout = loadout
   else delete next.loadout
 
@@ -3800,7 +3814,7 @@ export async function syncAvatarLook(dbClient: Db, userId: string): Promise<Stor
   if (portraitKey) next.portraitKey = portraitKey
   else delete next.portraitKey
 
-  const unchanged = next.loadout === current.loadout && next.portraitKey === current.portraitKey
+  const unchanged = current.kit === true && next.loadout === current.loadout && next.portraitKey === current.portraitKey
   if (unchanged) return current
   const nextConfig = next as StoredAvatarConfig
   await dbClient
@@ -3874,8 +3888,15 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<Chassis
       .where(eq(userGearItems.userId, userId))
   }
 
+  const [profile] = await dbClient
+    .select({ avatarConfig: profiles.avatarConfig, role: profiles.role, experiments: profiles.experiments })
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+  const avatarKit = hasExperiment(profile?.role, profile?.experiments, 'avatar-kit')
+
   if (catalogRows.length > 0) {
-    const cosmeticGrants = planStarterCosmetics(
+    const cosmeticGrants = !avatarKit ? [] : planStarterCosmetics(
       gearRows.map(toGearState),
       catalogRows.map((c) => c.id),
       STARTER_COSMETIC_CATALOG_IDS
@@ -3917,13 +3938,7 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<Chassis
   const catalogById = new Map(catalog.map((c) => [c.id, c]))
   const totals = computeLoadoutTotals(items, catalogById)
 
-  const [profile] = await dbClient
-    .select({ avatarConfig: profiles.avatarConfig })
-    .from(profiles)
-    .where(eq(profiles.id, userId))
-    .limit(1)
-
-  return { catalog, items, totals, vaultSize: VAULT_SIZE, avatarConfig: profile?.avatarConfig ?? null }
+  return { catalog, items, totals, vaultSize: VAULT_SIZE, avatarConfig: profile?.avatarConfig ?? null, avatarKit }
 }
 
 export const getChassisLoadoutHandler = async ({
