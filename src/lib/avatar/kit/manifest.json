@@ -1,5 +1,132 @@
 {
   "version": 1,
   "races": {},
-  "assets": {}
+  "assets": {
+    "lobster/antenna/whip": {
+      "src": "images/avatar-kit/lobster/antenna/whip.4c3927f9a8.webp",
+      "x": 278.4561403508772,
+      "y": 12.248803827751196,
+      "w": 227.01116427432217,
+      "h": 206.59649122807016
+    },
+    "lobster/arm/default": {
+      "src": "images/avatar-kit/lobster/arm/default.18feeac3d2.webp",
+      "x": 254.77511961722487,
+      "y": 422.17543859649123,
+      "w": 132.28708133971293,
+      "h": 154.33492822966508
+    },
+    "lobster/belly/classic": {
+      "src": "images/avatar-kit/lobster/belly/classic.e6350c985c.webp",
+      "x": 405.84370015948963,
+      "y": 441.77352472089314,
+      "w": 209.8628389154705,
+      "h": 369.097288676236
+    },
+    "lobster/body/classic": {
+      "src": "images/avatar-kit/lobster/body/classic.4ef3c1c691.webp",
+      "x": 345.4162679425837,
+      "y": 366.6475279106858,
+      "w": 333.9840510366826,
+      "h": 458.10526315789474
+    },
+    "lobster/brows/round": {
+      "src": "images/avatar-kit/lobster/brows/round.2d0c88ee40.svg",
+      "x": 418.09250398724083,
+      "y": 190.2647527910686,
+      "w": 187.81499202551834,
+      "h": 31.84688995215311
+    },
+    "lobster/claw/classic": {
+      "src": "images/avatar-kit/lobster/claw/classic.6f905bb90e.webp",
+      "x": 182.0988835725678,
+      "y": 223.74481658692184,
+      "w": 156.7846889952153,
+      "h": 224.56140350877192
+    },
+    "lobster/eyes/round": {
+      "src": "images/avatar-kit/lobster/eyes/round.ebe8a6111b.svg",
+      "x": 408.2934609250399,
+      "y": 227.82775119617224,
+      "w": 207.41307814992027,
+      "h": 98.80701754385964
+    },
+    "lobster/gear/belt": {
+      "src": "images/avatar-kit/lobster/gear/belt.429f46a33e.webp",
+      "x": 454.02232854864434,
+      "y": 635.304625199362,
+      "w": 134.73684210526315,
+      "h": 81.65869218500798
+    },
+    "lobster/gear/carapace": {
+      "src": "images/avatar-kit/lobster/gear/carapace.66afd6e6ff.webp",
+      "x": 365.8309409888357,
+      "y": 449.12280701754383,
+      "w": 289.8883572567783,
+      "h": 359.29824561403507
+    },
+    "lobster/gear/helm": {
+      "src": "images/avatar-kit/lobster/gear/helm.0f7ea49ec2.webp",
+      "x": 338.066985645933,
+      "y": 123.30462519936204,
+      "w": 350.3157894736842,
+      "h": 300.50398724082936
+    },
+    "lobster/gear/pincer": {
+      "src": "images/avatar-kit/lobster/gear/pincer.511068f52e.webp",
+      "x": 177.1993620414673,
+      "y": 223.74481658692184,
+      "w": 165.76714513556618,
+      "h": 252.32535885167465
+    },
+    "lobster/head/bean": {
+      "src": "images/avatar-kit/lobster/head/bean.3bba890782.webp",
+      "x": 350.3157894736842,
+      "y": 194.347687400319,
+      "w": 323.36842105263156,
+      "h": 300.50398724082936
+    },
+    "lobster/iris/round": {
+      "src": "images/avatar-kit/lobster/iris/round.ca15667d52.svg",
+      "x": 426.25837320574163,
+      "y": 248.24242424242425,
+      "w": 171.48325358851676,
+      "h": 66.96012759170654
+    },
+    "lobster/legs/default": {
+      "src": "images/avatar-kit/lobster/legs/default.bea2774f53.webp",
+      "x": 272.74003189792666,
+      "y": 592.8421052631579,
+      "w": 478.51993620414675,
+      "h": 416.4593301435407
+    },
+    "lobster/lids/round": {
+      "src": "images/avatar-kit/lobster/lids/round.a5aefd80f3.svg",
+      "x": 409.92663476874003,
+      "y": 229.46092503987242,
+      "w": 204.14673046251994,
+      "h": 95.54066985645933
+    },
+    "lobster/look/reef-crown": {
+      "src": "images/avatar-kit/lobster/look/reef-crown.2833c583e9.webp",
+      "x": 358.481658692185,
+      "y": 52.261562998405104,
+      "w": 311.93620414673046,
+      "h": 225.37799043062202
+    },
+    "lobster/mouth/grin": {
+      "src": "images/avatar-kit/lobster/mouth/grin.1f2043bc34.svg",
+      "x": 427.07496012759174,
+      "y": 336.43381180223287,
+      "w": 166.58373205741626,
+      "h": 102.88995215311004
+    },
+    "lobster/tail/default": {
+      "src": "images/avatar-kit/lobster/tail/default.eb689707dd.webp",
+      "x": 338.066985645933,
+      "y": 805.9712918660288,
+      "w": 347.86602870813397,
+      "h": 147.80223285486443
+    }
+  }
 }

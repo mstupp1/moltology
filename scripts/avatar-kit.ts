@@ -538,7 +538,7 @@ async function main() {
   }
 }
 
-main().catch((e) => {
+main().then(() => process.exit(process.exitCode ?? 0)).catch((e) => {
   console.error(e instanceof Error ? e.message : e)
   process.exit(1)
 })

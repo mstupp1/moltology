@@ -186,6 +186,7 @@ function makeGeometry(heightScale: number) {
       return `style="transform-box:view-box;transform-origin:${r2(vx)}px ${r2(sy(point[1]))}px"`
     },
     toVbY: sy,
+    scale: k,
   }
 }
 
@@ -305,16 +306,35 @@ export function renderKitCharacter(input: KitCharacterInput, options: KitRenderO
   const upper = `<g class="lobster-idle-layer lobster-idle-carapace">${antennae}${tailGroup}${torso}${face}${arms}</g>`
   const markup = `<g class="avatar-character" data-race="${race}" data-kit="1"${glowFinish ? ` filter="url(#${uid}-kit-finish)"` : ''}>${legs}${upper}</g>`
 
-  return { defs: defs.join(''), markup, portraitViewBox: kitPortraitViewBox(input, manifest, geo.toVbY) }
+  return { defs: defs.join(''), markup, portraitViewBox: kitPortraitViewBox(input, manifest, geo) }
 }
 
-/** Same framing rule as the vector rig: a 118-unit square that follows the eyes. */
-function kitPortraitViewBox(input: KitCharacterInput, manifest: KitManifest, toVbY: (px: number) => number): string {
+/** Portrait frame width, as a multiple of the face shell's painted width. */
+const PORTRAIT_FRAME_PER_FACE = 1.9
+/** Where the face's centre sits down the frame (0 = top, 1 = bottom). */
+const PORTRAIT_FACE_Y = 0.44
+
+/**
+ * Head-and-shoulders crop sized to the painted face (the head, or the crab's shell), so it
+ * holds whatever proportions the art has. Falls back to the vector rig's eye-led square.
+ */
+function kitPortraitViewBox(
+  input: KitCharacterInput,
+  manifest: KitManifest,
+  geo: { toVbY: (px: number) => number; scale: number }
+): string {
+  const offset = manifest.races[input.race]?.portraitOffsetY ?? 0
+  const faceSpec = KIT_RACE_LAYERS[input.race].find((s) => s.id === (input.race === 'crab' ? 'body' : 'head'))
+  const face = faceSpec ? pickKitAsset(input.race, faceSpec, input.variants[faceSpec.trait ?? 'headShape'] as string, manifest) : null
+  if (face) {
+    const size = face.w * KIT_UNIT * geo.scale * PORTRAIT_FRAME_PER_FACE
+    const faceCenterY = geo.toVbY(face.y + face.h / 2 + offset)
+    return `${r2(MIRROR_AXIS_VB - size / 2)} ${r2(faceCenterY - size * PORTRAIT_FACE_Y)} ${r2(size)} ${r2(size)}`
+  }
   const spec = KIT_RACE_LAYERS[input.race].find((s) => s.id === 'eyes')
   const eyes = spec ? pickKitAsset(input.race, spec, input.variants.eyeVariant, manifest) : null
-  const offset = manifest.races[input.race]?.portraitOffsetY ?? 0
   const eyeCenterPx = eyes ? eyes.y + eyes.h / 2 : KIT_VIEWBOX.size / 2 / KIT_UNIT
-  const eyeY = toVbY(eyeCenterPx + offset)
+  const eyeY = geo.toVbY(eyeCenterPx + offset)
   const lead = input.race === 'crab' ? 36 : 35
   return `-9 ${r2(eyeY - lead)} 118 118`
 }

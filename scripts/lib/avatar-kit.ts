@@ -571,7 +571,9 @@ export async function prepareKitParts(
       } else {
         const found = await registerToMaster(raw, master)
         const moved = Math.abs(found.dx) <= MAX_SHIFT && Math.abs(found.dy) <= MAX_SHIFT
-        if (moved && found.score < found.identity * 0.9) fit = found
+        // Only move a part that is clearly off: parts hidden under other layers in the master
+        // (the body under the belly) score poorly in place and attract false matches.
+        if (moved && found.score < found.identity * 0.6) fit = found
         else if (!moved) issues.push({ file: rel, level: 'warning', message: 'could not find where it sits on the master; used as delivered' })
       }
       if (fit && (fit.dx || fit.dy || fit.scale !== 1)) {
