@@ -93,6 +93,21 @@ describe('renderKitCharacter', () => {
     expect(out.markup).toMatch(/lobster-idle-claw-left" style="transform-box:view-box;transform-origin:/)
   })
 
+  it('renders optional eyebrows outside the blinking eyes group', () => {
+    const out = render(manifestFor([...LOBSTER_REQUIRED, 'lobster/brows/round', 'lobster/lids/round']))!
+    expect(out.markup).toMatch(/lobster-idle-eyes">.*lobster\/lids\/round.*?<\/g><\/g><image[^>]*lobster\/mouth\/grin[^>]*\/><image[^>]*lobster\/brows\/round/)
+    expect(render(manifest)!.markup).not.toContain('lobster/brows/round')
+  })
+
+  it('keeps eyebrows visible above head gear, looks, and accessories', () => {
+    const withBrows = manifestFor([...LOBSTER_REQUIRED, 'lobster/brows/round', 'lobster/gear/helm', 'lobster/look/reef-crown', 'lobster/accessory/crown'])
+    for (const [loadout, top] of [['head=helm.common', 'gear/helm'], ['@head=reef-crown', 'look/reef-crown'], ['', 'accessory/crown']]) {
+      const out = render(withBrows, { loadout: parseKitLoadout(loadout), variants: { ...input().variants, accessory: 'crown' } })!
+      expect(out.markup.indexOf('lobster/brows/round')).toBeGreaterThan(out.markup.indexOf(`lobster/${top}`))
+      expect(out.markup).toContain(`lobster/${top}`)
+    }
+  })
+
   it('swaps a claw for hammer gear on that side only, with a rarity glow', () => {
     const out = render(manifest, { loadout: parseKitLoadout('claws-2=hammer.legendary') })!
     expect(out.markup.match(/lobster\/claw\/classic/g)).toHaveLength(1)

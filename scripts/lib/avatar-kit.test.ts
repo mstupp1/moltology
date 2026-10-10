@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import sharp from 'sharp'
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
+import { createHash } from 'node:crypto'
 import {
   allowedVariants,
   extractAddition,
@@ -11,6 +15,11 @@ import {
   splitIris,
   toClay,
   transformRgba,
+  trimKitImage,
+  validateKitSvg,
+  prepareKitParts,
+  checkKitFolder,
+  localKitManifest,
 } from './avatar-kit'
 
 describe('avatar kit file names', () => {
@@ -29,6 +38,9 @@ describe('avatar kit file names', () => {
     expect(typeof parseKitPath('lobster/claw/laser.png')).toBe('string')
     expect(typeof parseKitPath('lobster/claw/classic.jpg')).toBe('string')
     expect(typeof parseKitPath('lobster/claw.png')).toBe('string')
+    expect(parseKitPath('lobster/eyes/round.svg')).toMatchObject({ group: 'eyes' })
+    expect(typeof parseKitPath('lobster/body/classic.svg')).toBe('string')
+    expect(typeof parseKitPath('lobster/master.svg')).toBe('string')
   })
 
   it('lists variants from the spec and catalog', () => {
@@ -46,6 +58,53 @@ describe('avatar kit pixel tools', () => {
       ${inner}</svg>`)
   const body = '<ellipse cx="512" cy="560" rx="220" ry="300" fill="url(#g)"/><rect x="420" y="380" width="60" height="40" fill="#203040"/>'
   const eye = '<circle cx="600" cy="420" r="40" fill="#ffffff"/><circle cx="600" cy="420" r="22" fill="#2a8a3a"/><circle cx="600" cy="420" r="8" fill="#000"/>'
+
+  it('preserves native pixels and normalizes placement without lossy compression', async () => {
+    const source = await sharp({ create: { width: 2048, height: 2048, channels: 4, background: '#00000000' } })
+      .composite([{ input: await sharp({ create: { width: 400, height: 600, channels: 4, background: '#de8459' } }).png().toBuffer(), left: 500, top: 700 }])
+      .png().toBuffer()
+    const trimmed = await trimKitImage(source)
+    expect(trimmed).toMatchObject({ x: 249, y: 349, w: 202, h: 302 })
+    expect((await sharp(trimmed.webp).metadata()).width).toBe(404)
+    expect(trimmed.hash).toBe(createHash('sha256').update(trimmed.webp).digest('hex').slice(0, 10))
+    expect(await sharp(trimmed.webp).ensureAlpha().raw().toBuffer()).toEqual(await sharp(trimmed.png).ensureAlpha().raw().toBuffer())
+  })
+
+  it('keeps facial SVG geometry after trimming instead of rasterizing the delivery', async () => {
+    const source = svg('<ellipse cx="600" cy="420" rx="40" ry="50" fill="#ffffff"/>')
+    const trimmed = await trimKitImage(source)
+    expect(trimmed.svg?.toString()).toContain('<ellipse')
+    expect(trimmed.svg?.toString()).toContain('viewBox=')
+    expect((await sharp(trimmed.svg!).metadata()).width).toBe(trimmed.w)
+    expect(() => validateKitSvg('<svg><script>bad()</script></svg>')).toThrow()
+    expect(() => validateKitSvg('<svg><image href="https://example.com/image"/></svg>')).toThrow()
+  })
+
+  it('prepares native raster and vector parts together and rejects duplicate formats', async () => {
+    const root = await mkdtemp(path.join(tmpdir(), 'kit-hybrid-test-'))
+    try {
+      await mkdir(path.join(root, 'lobster/eyes'), { recursive: true })
+      await mkdir(path.join(root, 'lobster/arm'), { recursive: true })
+      await mkdir(path.join(root, 'lobster/iris'), { recursive: true })
+      const vector = svg('<ellipse cx="600" cy="420" rx="40" ry="50" fill="#ffffff"/>')
+      const raster = await sharp(svg('<rect x="300" y="400" width="120" height="200" fill="#c08060"/>')).resize(2048, 2048).png().toBuffer()
+      await writeFile(path.join(root, 'lobster/eyes/round.svg'), vector)
+      await writeFile(path.join(root, 'lobster/iris/round.svg'), vector)
+      await writeFile(path.join(root, 'lobster/arm/default.png'), raster)
+      const checked = await checkKitFolder(root)
+      expect(checked.issues).toEqual([])
+      const prepared = await prepareKitParts(root, checked.files, {})
+      expect(prepared.issues).toEqual([])
+      expect((await sharp(prepared.parts.find(p => p.ref.group === 'arm')!.png).metadata()).width).toBe(2048)
+      expect(prepared.parts.find(p => p.ref.group === 'eyes')!.svg).toEqual(vector)
+      const { manifest, href } = await localKitManifest(prepared.parts)
+      expect(href(manifest.assets['lobster/eyes/round'])).toMatch(/^data:image\/svg\+xml;base64,/)
+      await writeFile(path.join(root, 'lobster/eyes/round.png'), await sharp(vector).png().toBuffer())
+      expect((await checkKitFolder(root)).issues).toContainEqual(expect.objectContaining({ level: 'error', message: 'duplicate layer; deliver one format per part' }))
+    } finally {
+      await rm(root, { recursive: true, force: true })
+    }
+  })
 
   it('snaps a shifted, rescaled part back onto the master', async () => {
     const master = await sharp(svg(body + eye)).png().toBuffer()

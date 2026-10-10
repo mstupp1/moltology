@@ -36,6 +36,15 @@
   },
   {
     "batch": 1,
+    "file": "lobster/brows/round.svg",
+    "what": "Both eyebrows only, in neutral dark tones, without surrounding face shell. Match the eye positions. Variant: round.",
+    "colour": "kept as painted",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 1,
     "file": "lobster/claw/classic.png",
     "what": "Screen-left claw only, attached at the wrist of the arm layer. Variant: classic.",
     "colour": "recoloured by the app",
@@ -45,8 +54,8 @@
   },
   {
     "batch": 1,
-    "file": "lobster/eyes/round.png",
-    "what": "Both eyes as seated in the face: whites, coloured irises, pupils, catchlights, attached brows. No eyestalks. The app splits the irises out to recolour them. Variant: round.",
+    "file": "lobster/eyes/round.svg",
+    "what": "Both seated eyes: whites, pupils, and catchlights. No brows, surrounding shell, or eyestalks. SVG eyes need a matching separate iris layer. Variant: round.",
     "colour": "kept as painted",
     "notes": []
   },
@@ -99,8 +108,8 @@
   },
   {
     "batch": 1,
-    "file": "lobster/iris/round.png",
-    "what": "Both irises only, exactly where they sit in the eyes layer. Usually not needed: the app splits irises out of the eyes. Variant: round.",
+    "file": "lobster/iris/round.svg",
+    "what": "Both iris rings, exactly where they sit in the eyes, without pupils or catchlights. SVG irises use neutral grey shading; raster irises can be split from painted eyes. Variant: round.",
     "colour": "recoloured by the app",
     "notes": [
       "Optional for launch."
@@ -115,7 +124,7 @@
   },
   {
     "batch": 1,
-    "file": "lobster/lids/round.png",
+    "file": "lobster/lids/round.svg",
     "what": "Both eyelids fully closed, covering exactly where the eyes are (used for blinking). Variant: round.",
     "colour": "recoloured by the app",
     "notes": [
@@ -143,7 +152,7 @@
   },
   {
     "batch": 1,
-    "file": "lobster/mouth/grin.png",
+    "file": "lobster/mouth/grin.svg",
     "what": "Mouth only, full colour, on the face. Variant: grin.",
     "colour": "kept as painted",
     "notes": []
@@ -185,6 +194,15 @@
   },
   {
     "batch": 2,
+    "file": "crab/brows/round.svg",
+    "what": "Both eyebrows only, in neutral dark tones, without surrounding face shell. Match the eye positions. Variant: round.",
+    "colour": "kept as painted",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 2,
     "file": "crab/claw/classic.png",
     "what": "Screen-left claw only, attached at the wrist of the arm layer. Variant: classic.",
     "colour": "recoloured by the app",
@@ -194,8 +212,8 @@
   },
   {
     "batch": 2,
-    "file": "crab/eyes/round.png",
-    "what": "Both eyes as seated in the face: whites, coloured irises, pupils, catchlights, attached brows. No eyestalks. The app splits the irises out to recolour them. Variant: round.",
+    "file": "crab/eyes/round.svg",
+    "what": "Both seated eyes: whites, pupils, and catchlights. No brows, surrounding shell, or eyestalks. SVG eyes need a matching separate iris layer. Variant: round.",
     "colour": "kept as painted",
     "notes": []
   },
@@ -271,8 +289,8 @@
   },
   {
     "batch": 2,
-    "file": "crab/iris/round.png",
-    "what": "Both irises only, exactly where they sit in the eyes layer. Usually not needed: the app splits irises out of the eyes. Variant: round.",
+    "file": "crab/iris/round.svg",
+    "what": "Both iris rings, exactly where they sit in the eyes, without pupils or catchlights. SVG irises use neutral grey shading; raster irises can be split from painted eyes. Variant: round.",
     "colour": "recoloured by the app",
     "notes": [
       "Optional for launch."
@@ -287,7 +305,7 @@
   },
   {
     "batch": 2,
-    "file": "crab/lids/round.png",
+    "file": "crab/lids/round.svg",
     "what": "Both eyelids fully closed, covering exactly where the eyes are (used for blinking). Variant: round.",
     "colour": "recoloured by the app",
     "notes": [
@@ -306,7 +324,7 @@
   },
   {
     "batch": 2,
-    "file": "crab/mouth/grin.png",
+    "file": "crab/mouth/grin.svg",
     "what": "Mouth only, full colour, on the face. Variant: grin.",
     "colour": "kept as painted",
     "notes": []
@@ -678,6 +696,24 @@
   },
   {
     "batch": 4,
+    "file": "crab/brows/tall.svg",
+    "what": "Both eyebrows only, in neutral dark tones, without surrounding face shell. Match the eye positions. Variant: tall.",
+    "colour": "kept as painted",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "crab/brows/wide.svg",
+    "what": "Both eyebrows only, in neutral dark tones, without surrounding face shell. Match the eye positions. Variant: wide.",
+    "colour": "kept as painted",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
     "file": "crab/claw/crusher.png",
     "what": "Screen-left claw only, attached at the wrist of the arm layer. Variant: crusher.",
     "colour": "recoloured by the app",
@@ -705,22 +741,22 @@
   },
   {
     "batch": 4,
-    "file": "crab/eyes/tall.png",
-    "what": "Both eyes as seated in the face: whites, coloured irises, pupils, catchlights, attached brows. No eyestalks. The app splits the irises out to recolour them. Variant: tall.",
+    "file": "crab/eyes/tall.svg",
+    "what": "Both seated eyes: whites, pupils, and catchlights. No brows, surrounding shell, or eyestalks. SVG eyes need a matching separate iris layer. Variant: tall.",
     "colour": "kept as painted",
     "notes": []
   },
   {
     "batch": 4,
-    "file": "crab/eyes/wide.png",
-    "what": "Both eyes as seated in the face: whites, coloured irises, pupils, catchlights, attached brows. No eyestalks. The app splits the irises out to recolour them. Variant: wide.",
+    "file": "crab/eyes/wide.svg",
+    "what": "Both seated eyes: whites, pupils, and catchlights. No brows, surrounding shell, or eyestalks. SVG eyes need a matching separate iris layer. Variant: wide.",
     "colour": "kept as painted",
     "notes": []
   },
   {
     "batch": 4,
-    "file": "crab/iris/tall.png",
-    "what": "Both irises only, exactly where they sit in the eyes layer. Usually not needed: the app splits irises out of the eyes. Variant: tall.",
+    "file": "crab/iris/tall.svg",
+    "what": "Both iris rings, exactly where they sit in the eyes, without pupils or catchlights. SVG irises use neutral grey shading; raster irises can be split from painted eyes. Variant: tall.",
     "colour": "recoloured by the app",
     "notes": [
       "Optional for launch."
@@ -728,8 +764,8 @@
   },
   {
     "batch": 4,
-    "file": "crab/iris/wide.png",
-    "what": "Both irises only, exactly where they sit in the eyes layer. Usually not needed: the app splits irises out of the eyes. Variant: wide.",
+    "file": "crab/iris/wide.svg",
+    "what": "Both iris rings, exactly where they sit in the eyes, without pupils or catchlights. SVG irises use neutral grey shading; raster irises can be split from painted eyes. Variant: wide.",
     "colour": "recoloured by the app",
     "notes": [
       "Optional for launch."
@@ -737,7 +773,7 @@
   },
   {
     "batch": 4,
-    "file": "crab/lids/tall.png",
+    "file": "crab/lids/tall.svg",
     "what": "Both eyelids fully closed, covering exactly where the eyes are (used for blinking). Variant: tall.",
     "colour": "recoloured by the app",
     "notes": [
@@ -746,7 +782,7 @@
   },
   {
     "batch": 4,
-    "file": "crab/lids/wide.png",
+    "file": "crab/lids/wide.svg",
     "what": "Both eyelids fully closed, covering exactly where the eyes are (used for blinking). Variant: wide.",
     "colour": "recoloured by the app",
     "notes": [
@@ -755,42 +791,42 @@
   },
   {
     "batch": 4,
-    "file": "crab/mouth/beam.png",
+    "file": "crab/mouth/beam.svg",
     "what": "Mouth only, full colour, on the face. Variant: beam.",
     "colour": "kept as painted",
     "notes": []
   },
   {
     "batch": 4,
-    "file": "crab/mouth/fang.png",
+    "file": "crab/mouth/fang.svg",
     "what": "Mouth only, full colour, on the face. Variant: fang.",
     "colour": "kept as painted",
     "notes": []
   },
   {
     "batch": 4,
-    "file": "crab/mouth/oh.png",
+    "file": "crab/mouth/oh.svg",
     "what": "Mouth only, full colour, on the face. Variant: oh.",
     "colour": "kept as painted",
     "notes": []
   },
   {
     "batch": 4,
-    "file": "crab/mouth/smile.png",
+    "file": "crab/mouth/smile.svg",
     "what": "Mouth only, full colour, on the face. Variant: smile.",
     "colour": "kept as painted",
     "notes": []
   },
   {
     "batch": 4,
-    "file": "crab/mouth/smirk.png",
+    "file": "crab/mouth/smirk.svg",
     "what": "Mouth only, full colour, on the face. Variant: smirk.",
     "colour": "kept as painted",
     "notes": []
   },
   {
     "batch": 4,
-    "file": "crab/mouth/tongue.png",
+    "file": "crab/mouth/tongue.svg",
     "what": "Mouth only, full colour, on the face. Variant: tongue.",
     "colour": "kept as painted",
     "notes": []
@@ -964,6 +1000,24 @@
   },
   {
     "batch": 4,
+    "file": "lobster/brows/tall.svg",
+    "what": "Both eyebrows only, in neutral dark tones, without surrounding face shell. Match the eye positions. Variant: tall.",
+    "colour": "kept as painted",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
+    "file": "lobster/brows/wide.svg",
+    "what": "Both eyebrows only, in neutral dark tones, without surrounding face shell. Match the eye positions. Variant: wide.",
+    "colour": "kept as painted",
+    "notes": [
+      "Optional for launch."
+    ]
+  },
+  {
+    "batch": 4,
     "file": "lobster/claw/crusher.png",
     "what": "Screen-left claw only, attached at the wrist of the arm layer. Variant: crusher.",
     "colour": "recoloured by the app",
@@ -991,15 +1045,15 @@
   },
   {
     "batch": 4,
-    "file": "lobster/eyes/tall.png",
-    "what": "Both eyes as seated in the face: whites, coloured irises, pupils, catchlights, attached brows. No eyestalks. The app splits the irises out to recolour them. Variant: tall.",
+    "file": "lobster/eyes/tall.svg",
+    "what": "Both seated eyes: whites, pupils, and catchlights. No brows, surrounding shell, or eyestalks. SVG eyes need a matching separate iris layer. Variant: tall.",
     "colour": "kept as painted",
     "notes": []
   },
   {
     "batch": 4,
-    "file": "lobster/eyes/wide.png",
-    "what": "Both eyes as seated in the face: whites, coloured irises, pupils, catchlights, attached brows. No eyestalks. The app splits the irises out to recolour them. Variant: wide.",
+    "file": "lobster/eyes/wide.svg",
+    "what": "Both seated eyes: whites, pupils, and catchlights. No brows, surrounding shell, or eyestalks. SVG eyes need a matching separate iris layer. Variant: wide.",
     "colour": "kept as painted",
     "notes": []
   },
@@ -1040,8 +1094,8 @@
   },
   {
     "batch": 4,
-    "file": "lobster/iris/tall.png",
-    "what": "Both irises only, exactly where they sit in the eyes layer. Usually not needed: the app splits irises out of the eyes. Variant: tall.",
+    "file": "lobster/iris/tall.svg",
+    "what": "Both iris rings, exactly where they sit in the eyes, without pupils or catchlights. SVG irises use neutral grey shading; raster irises can be split from painted eyes. Variant: tall.",
     "colour": "recoloured by the app",
     "notes": [
       "Optional for launch."
@@ -1049,8 +1103,8 @@
   },
   {
     "batch": 4,
-    "file": "lobster/iris/wide.png",
-    "what": "Both irises only, exactly where they sit in the eyes layer. Usually not needed: the app splits irises out of the eyes. Variant: wide.",
+    "file": "lobster/iris/wide.svg",
+    "what": "Both iris rings, exactly where they sit in the eyes, without pupils or catchlights. SVG irises use neutral grey shading; raster irises can be split from painted eyes. Variant: wide.",
     "colour": "recoloured by the app",
     "notes": [
       "Optional for launch."
@@ -1058,7 +1112,7 @@
   },
   {
     "batch": 4,
-    "file": "lobster/lids/tall.png",
+    "file": "lobster/lids/tall.svg",
     "what": "Both eyelids fully closed, covering exactly where the eyes are (used for blinking). Variant: tall.",
     "colour": "recoloured by the app",
     "notes": [
@@ -1067,7 +1121,7 @@
   },
   {
     "batch": 4,
-    "file": "lobster/lids/wide.png",
+    "file": "lobster/lids/wide.svg",
     "what": "Both eyelids fully closed, covering exactly where the eyes are (used for blinking). Variant: wide.",
     "colour": "recoloured by the app",
     "notes": [
@@ -1076,42 +1130,42 @@
   },
   {
     "batch": 4,
-    "file": "lobster/mouth/beam.png",
+    "file": "lobster/mouth/beam.svg",
     "what": "Mouth only, full colour, on the face. Variant: beam.",
     "colour": "kept as painted",
     "notes": []
   },
   {
     "batch": 4,
-    "file": "lobster/mouth/fang.png",
+    "file": "lobster/mouth/fang.svg",
     "what": "Mouth only, full colour, on the face. Variant: fang.",
     "colour": "kept as painted",
     "notes": []
   },
   {
     "batch": 4,
-    "file": "lobster/mouth/oh.png",
+    "file": "lobster/mouth/oh.svg",
     "what": "Mouth only, full colour, on the face. Variant: oh.",
     "colour": "kept as painted",
     "notes": []
   },
   {
     "batch": 4,
-    "file": "lobster/mouth/smile.png",
+    "file": "lobster/mouth/smile.svg",
     "what": "Mouth only, full colour, on the face. Variant: smile.",
     "colour": "kept as painted",
     "notes": []
   },
   {
     "batch": 4,
-    "file": "lobster/mouth/smirk.png",
+    "file": "lobster/mouth/smirk.svg",
     "what": "Mouth only, full colour, on the face. Variant: smirk.",
     "colour": "kept as painted",
     "notes": []
   },
   {
     "batch": 4,
-    "file": "lobster/mouth/tongue.png",
+    "file": "lobster/mouth/tongue.svg",
     "what": "Mouth only, full colour, on the face. Variant: tongue.",
     "colour": "kept as painted",
     "notes": []

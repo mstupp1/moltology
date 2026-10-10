@@ -7,7 +7,7 @@ import rawManifest from './manifest.json'
 import type { KitRacePivots } from './spec'
 
 export interface KitAsset {
-  /** Bucket key of the trimmed webp, e.g. `images/avatar-kit/lobster/claw/classic.a1b2c3d4.webp`. */
+  /** Bucket key of a trimmed lossless WebP or facial SVG. */
   src: string
   /** Offset and size of the trimmed image on the 1024 canvas. */
   x: number

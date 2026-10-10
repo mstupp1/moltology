@@ -287,7 +287,8 @@ export function renderKitCharacter(input: KitCharacterInput, options: KitRenderO
     base('head', v.headShape) +
     `<g class="lobster-idle-layer lobster-idle-eyes">${base('eyes', v.eyeVariant)}${base('iris', v.eyeVariant)}${lids}</g>` +
     base('mouth', v.mouth) +
-    headTop
+    headTop +
+    base('brows', v.eyeVariant)
 
   const arms =
     `<g class="lobster-idle-layer lobster-idle-claw-left" ${geo.pivotStyle(pivots.shoulder)}>${base('arm', 'default')}${claw('claws-1', false)}</g>` +

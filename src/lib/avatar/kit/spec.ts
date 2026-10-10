@@ -1,8 +1,9 @@
 /**
  * Avatar kit: the painted (raster) version of the member character.
  *
- * Every part is a transparent image painted on the same 1024 × 1024 canvas as its race's
- * master drawing, so parts line up by construction. The ingest script trims each file and
+ * Every part uses its race master's square frame, with placement normalized to a 1024 ×
+ * 1024 reference canvas. Painted parts retain native pixels and facial SVGs retain vector
+ * geometry. The ingest script trims each file and
  * records its offset in `manifest.json`; this file says which parts exist, how they stack,
  * which trait picks the variant, how they are tinted, and where they pivot.
  *
@@ -21,7 +22,7 @@ import {
 } from '../traits'
 import { GROUND_Y } from '../races'
 
-/** Every kit image is painted on this square canvas. */
+/** Reference canvas for placement; source images may have higher native resolution. */
 export const KIT_CANVAS_PX = 1024
 
 /**
@@ -55,6 +56,7 @@ export type KitLayerId =
   | 'belly'
   | 'head'
   | 'eyes'
+  | 'brows'
   | 'iris'
   | 'lids'
   | 'mouth'
@@ -137,7 +139,18 @@ const EYES = layer({
   tint: null,
   mirrored: false,
   required: true,
-  brief: 'Both eyes as seated in the face: whites, coloured irises, pupils, catchlights, attached brows. No eyestalks. The app splits the irises out to recolour them.',
+  brief: 'Both seated eyes: whites, pupils, and catchlights. No brows, surrounding shell, or eyestalks. SVG eyes need a matching separate iris layer.',
+})
+
+const BROWS = layer({
+  id: 'brows',
+  trait: 'eyeVariant',
+  variants: EYE_VARIANTS,
+  defaultVariant: 'round',
+  tint: null,
+  mirrored: false,
+  required: false,
+  brief: 'Both eyebrows only, in neutral dark tones, without surrounding face shell. Match the eye positions.',
 })
 
 const IRIS = layer({
@@ -148,7 +161,7 @@ const IRIS = layer({
   tint: 'iris',
   mirrored: false,
   required: false,
-  brief: 'Both irises only, exactly where they sit in the eyes layer. Usually not needed: the app splits irises out of the eyes.',
+  brief: 'Both iris rings, exactly where they sit in the eyes, without pupils or catchlights. SVG irises use neutral grey shading; raster irises can be split from painted eyes.',
 })
 
 const LIDS = layer({
@@ -221,6 +234,7 @@ export const KIT_RACE_LAYERS: Readonly<Record<AvatarRace, readonly KitLayerSpec[
       brief: 'Head shell with cheeks, without eyes or mouth.',
     }),
     EYES,
+    BROWS,
     IRIS,
     LIDS,
     MOUTH,
@@ -241,6 +255,7 @@ export const KIT_RACE_LAYERS: Readonly<Record<AvatarRace, readonly KitLayerSpec[
       brief: 'Whole crab shell (the face is on the shell), without eyes or mouth.',
     }),
     EYES,
+    BROWS,
     IRIS,
     LIDS,
     MOUTH,

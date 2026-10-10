@@ -10,6 +10,7 @@ import { AVATAR_RACES, type AvatarRace } from '../../src/lib/avatar/traits'
 import {
   KIT_ACCESSORIES,
   KIT_CANVAS_PX,
+  KIT_CENTER_X,
   KIT_GEAR_BRIEFS,
   KIT_RACE_LAYERS,
   type KitLayerSpec,
@@ -22,7 +23,8 @@ import type { ChassisVisualType } from '../../src/db/schema'
 export const KIT_BUCKET_PREFIX = 'images/avatar-kit/'
 export const KIT_SOURCE_PREFIX = 'avatar-kit/source/'
 export const KIT_INBOX_PREFIX = 'avatar-kit/inbox/'
-const IMAGE_EXT = /\.(png|webp)$/i
+const IMAGE_EXT = /\.(png|webp|svg)$/i
+const VECTOR_GROUPS = new Set(['eyes', 'iris', 'brows', 'lids', 'mouth'])
 
 export type KitGroup = KitLayerSpec['id'] | 'gear' | 'look' | 'accessory'
 
@@ -57,15 +59,17 @@ export function allowedVariants(race: AvatarRace, group: string): readonly strin
  */
 export function parseKitPath(relPath: string): KitFileRef | string {
   const clean = relPath.split(path.sep).join('/')
-  if (!IMAGE_EXT.test(clean)) return `${clean}: not a .png or .webp file`
+  if (!IMAGE_EXT.test(clean)) return `${clean}: not a .png, .webp, or .svg file`
   const parts = clean.replace(IMAGE_EXT, '').split('/')
   const race = parts[0] as AvatarRace
   if (!AVATAR_RACES.includes(race)) return `${clean}: first folder must be one of ${AVATAR_RACES.join(', ')}`
   if (parts.length === 2 && parts[1] === 'master') {
+    if (/\.svg$/i.test(clean)) return `${clean}: the master must be a raster image`
     return { race, group: 'master', variant: 'master', tinted: false, mirrored: false }
   }
-  if (parts.length !== 3) return `${clean}: expected <race>/<layer>/<variant>.png`
+  if (parts.length !== 3) return `${clean}: expected <race>/<layer>/<variant> with a supported image extension`
   const [, group, variant] = parts
+  if (/\.svg$/i.test(clean) && !VECTOR_GROUPS.has(group)) return `${clean}: SVG is supported only for facial layers`
   const allowed = allowedVariants(race, group)
   if (!allowed) return `${clean}: "${group}" is not a ${race} layer`
   if (!allowed.includes(variant)) return `${clean}: "${variant}" is not a known ${group} variant (${allowed.join(', ')})`
@@ -103,6 +107,15 @@ export interface Trimmed {
   w: number
   h: number
   hash: string
+  svg?: Buffer
+}
+
+/** Facial vectors are self-contained shapes, never executable or externally linked SVG. */
+export function validateKitSvg(source: string): void {
+  const tags = new Set(['svg', 'defs', 'g', 'path', 'ellipse', 'circle', 'rect', 'linearGradient', 'radialGradient', 'stop', 'mask', 'clipPath'])
+  if (!/^\s*<svg\b/.test(source) || /<!|<\?|\bon\w+\s*=|\bhref\s*=|\bstyle\s*=|<style\b/i.test(source)) throw new Error('SVG must contain only self-contained vector shapes')
+  for (const tag of source.matchAll(/<\/?([\w:-]+)\b/g)) if (!tags.has(tag[1])) throw new Error(`unsupported SVG element: ${tag[1]}`)
+  for (const url of source.matchAll(/url\(([^)]*)\)/g)) if (!/^#[\w-]+$/.test(url[1])) throw new Error('SVG references must point to local gradients')
 }
 
 export interface PixelStats {
@@ -159,9 +172,17 @@ export async function trimKitImage(input: Buffer | string): Promise<Trimmed> {
   const h = Math.min(stats.height - y, stats.bbox.h + pad * 2)
   const cropped = sharp(input).ensureAlpha().extract({ left: x, top: y, width: w, height: h })
   const png = await cropped.clone().png({ compressionLevel: 9 }).toBuffer()
-  const webp = await cropped.clone().webp({ quality: 90, alphaQuality: 100, effort: 5 }).toBuffer()
-  const hash = createHash('sha256').update(png).digest('hex').slice(0, 10)
-  return { webp, png, x, y, w, h, hash }
+  const webp = await cropped.clone().webp({ lossless: true, alphaQuality: 100, effort: 5 }).toBuffer()
+  const meta = await sharp(input).metadata()
+  let svg: Buffer | undefined
+  if (meta.format === 'svg') {
+    const source = (typeof input === 'string' ? await readFile(input) : input).toString('utf8')
+    validateKitSvg(source)
+    svg = Buffer.from(source.replace(/<svg\b[^>]*>/, `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="${x} ${y} ${w} ${h}">`))
+  }
+  const hash = createHash('sha256').update(svg ?? webp).digest('hex').slice(0, 10)
+  const unit = KIT_CANVAS_PX / stats.width
+  return { webp, png, svg, x: x * unit, y: y * unit, w: w * unit, h: h * unit, hash }
 }
 
 export interface CheckIssue {
@@ -209,7 +230,8 @@ export async function checkKitFolder(root: string): Promise<{ files: { rel: stri
   const issues: CheckIssue[] = []
   const files: { rel: string; ref: KitFileRef }[] = []
   const rels = await listImageFiles(root)
-  if (rels.length === 0) issues.push({ file: root, level: 'error', message: 'no .png or .webp files found' })
+  if (rels.length === 0) issues.push({ file: root, level: 'error', message: 'no .png, .webp, or .svg files found' })
+  const keys = new Set<string>()
 
   for (const rel of rels) {
     const ref = parseKitPath(rel)
@@ -218,6 +240,18 @@ export async function checkKitFolder(root: string): Promise<{ files: { rel: stri
       continue
     }
     const full = path.join(root, rel)
+    const key = `${ref.race}/${ref.group}/${ref.variant}`
+    if (keys.has(key)) {
+      issues.push({ file: rel, level: 'error', message: 'duplicate layer; deliver one format per part' })
+      continue
+    }
+    keys.add(key)
+    if (/\.svg$/i.test(rel)) {
+      try { validateKitSvg(await readFile(full, 'utf8')) } catch (e) {
+        issues.push({ file: rel, level: 'error', message: (e as Error).message })
+        continue
+      }
+    }
     const stats = await pixelStats(full)
     if (stats.width !== stats.height || stats.width < KIT_CANVAS_PX) {
       issues.push({ file: rel, level: 'error', message: `canvas is ${stats.width}x${stats.height}; must be a square of at least ${KIT_CANVAS_PX}px, uncropped` })
@@ -414,8 +448,10 @@ export function splitIris(img: Rgba): { eyes: Rgba; iris: Rgba; irisShare: numbe
  */
 export async function extractAddition(master: Buffer | string, edited: Buffer | string): Promise<{ layer: Rgba; fit: Fit }> {
   const fit = await registerToMaster(edited, master)
-  const e = await transformRgba(await loadRgba(edited), fit.dx, fit.dy, fit.scale)
-  const m = await loadRgba(master)
+  const size = (await sharp(edited).metadata()).width ?? KIT_CANVAS_PX
+  const unit = size / KIT_CANVAS_PX
+  const e = await transformRgba(await loadRgba(edited, size), fit.dx * unit, fit.dy * unit, fit.scale)
+  const m = await loadRgba(master, size)
   const n = e.w * e.h
   const mask = new Float32Array(n)
   for (let i = 0; i < n; i++) {
@@ -458,8 +494,10 @@ export interface PreparedPart {
   /** Manifest key, `<race>/<group>/<variant>`. */
   key: string
   ref: KitFileRef
-  /** Full 1024 canvas, aligned and recoloured, ready to trim. */
+  /** Full native-resolution canvas, aligned and recoloured, ready to trim. */
   png: Buffer
+  /** Original facial vector, preserved for resolution-independent display. */
+  svg?: Buffer
   /** Delivered file this came from (iris split from eyes shares the eyes file). */
   rel: string
   notes: string[]
@@ -504,7 +542,20 @@ export async function prepareKitParts(
     const notes: string[] = []
     const raw = await readFile(path.join(root, rel))
     const master = masters[ref.race]
-    let img = await loadRgba(raw)
+    const size = (await sharp(raw).metadata()).width ?? KIT_CANVAS_PX
+    const unit = size / KIT_CANVAS_PX
+    const vector = /\.svg$/i.test(rel)
+    let img = await loadRgba(raw, size)
+
+    if (vector && ref.group === 'eyes' && !delivered.has(`${ref.race}/iris/${ref.variant}`)) {
+      issues.push({ file: rel, level: 'error', message: 'vector eyes need a matching iris layer for eye colour changes' })
+      continue
+    }
+
+    if (vector && ref.tinted && (await pixelStats(raw)).meanSaturation > 0.02) {
+      issues.push({ file: rel, level: 'error', message: 'recoloured vector layers must be painted in neutral grey tones' })
+      continue
+    }
 
     if (OVERLAY_GROUPS.has(ref.group)) {
       if (master && (await isFullFigure(raw, master))) {
@@ -512,7 +563,7 @@ export async function prepareKitParts(
         img = layer
         notes.push(`cut out of a full drawing (${fitLabel(fit)})`)
       }
-    } else if (master) {
+    } else if (master && !vector) {
       let fit: Fit | undefined
       if (ref.group === 'iris' || ref.group === 'lids') {
         const spec = layerSpec(ref.race, 'eyes')
@@ -524,7 +575,7 @@ export async function prepareKitParts(
         else if (!moved) issues.push({ file: rel, level: 'warning', message: 'could not find where it sits on the master; used as delivered' })
       }
       if (fit && (fit.dx || fit.dy || fit.scale !== 1)) {
-        img = await transformRgba(img, fit.dx, fit.dy, fit.scale)
+        img = await transformRgba(img, fit.dx * unit, fit.dy * unit, fit.scale)
         notes.push(`aligned to master (${fitLabel(fit)})`)
       }
       if (ref.group === 'eyes') eyeFits.set(`${ref.race}/${ref.variant}`, fit ?? { dx: 0, dy: 0, scale: 1, score: 0 })
@@ -539,7 +590,7 @@ export async function prepareKitParts(
         notes.push('irises split out')
       }
     }
-    if (ref.tinted) {
+    if (ref.tinted && !vector) {
       img = toClay(img)
       notes.push('grey clay')
     }
@@ -549,10 +600,11 @@ export async function prepareKitParts(
       issues.push({ file: rel, level: 'error', message: 'nothing left after preparing it (was the edit identical to the master?)' })
       continue
     }
-    if (ref.mirrored && bbox.x + bbox.w / 2 > KIT_CENTER_X) {
+    if (ref.mirrored && (bbox.x + bbox.w / 2) / unit > KIT_CENTER_X) {
       issues.push({ file: rel, level: 'warning', message: 'should sit on the screen-left half (the app mirrors it for the right side)' })
     }
-    parts.push({ key, ref, rel, png, notes })
+    if (vector) notes.push('vector geometry preserved')
+    parts.push({ key, ref, rel, png, svg: vector ? raw : undefined, notes })
   }
 
   // Default base parts should land on the master once aligned.
@@ -601,9 +653,9 @@ export async function localKitManifest(parts: PreparedPart[], races: KitManifest
   const manifest: KitManifest = { version: 1, races, assets: {} }
   const dataUris = new Map<string, string>()
   for (const part of parts) {
-    const t = await trimKitImage(part.png)
+    const t = await trimKitImage(part.svg ?? part.png)
     manifest.assets[part.key] = { src: part.key, x: t.x, y: t.y, w: t.w, h: t.h } satisfies KitAsset
-    dataUris.set(part.key, `data:image/png;base64,${t.png.toString('base64')}`)
+    dataUris.set(part.key, `data:${t.svg ? 'image/svg+xml' : 'image/png'};base64,${(t.svg ?? t.png).toString('base64')}`)
   }
   return { manifest, href: (asset: KitAsset) => dataUris.get(asset.src) ?? '' }
 }
