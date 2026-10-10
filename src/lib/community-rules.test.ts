@@ -34,6 +34,10 @@ describe('Community Rules & Guardrails', () => {
     expect(shortContent.valid).toBe(false)
     expect(shortContent.error).toContain('Content must be at least 10 characters long')
 
+    // Markdown syntax does not count toward the minimum.
+    expect(validateForumContent(undefined, '** ** ** ** ** **').valid).toBe(false)
+    expect(validateForumContent(undefined, '[hi](https://example.com)').valid).toBe(false)
+
     const validContent = validateForumContent(undefined, 'This is a long enough reply content for the forum.')
     expect(validContent.valid).toBe(true)
   })

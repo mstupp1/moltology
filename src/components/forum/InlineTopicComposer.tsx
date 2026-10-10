@@ -1,4 +1,5 @@
 import React, { useState, useRef, useImperativeHandle, forwardRef, useEffect } from 'react'
+import { forumVisibleLength } from '@/lib/forum-markdown'
 import { X, AlertTriangle, Send, Plus, Terminal } from 'lucide-react'
 import { createForumTopicFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
@@ -9,9 +10,7 @@ import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { isForumStaffBoard } from '@/lib/forum-utils'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { useForumAuth } from './ForumShell'
-import { MentionTextarea } from '@/components/forum/MentionTextarea'
-import { ForumFormattingToolbar, handleFormattingShortcuts } from '@/components/forum/ForumFormattingToolbar'
-import { ForumPostBody } from '@/components/forum/ForumPostBody'
+import { ForumEditor } from '@/components/forum/ForumEditor'
 
 export interface InlineTopicComposerHandle {
   expandAndFocus: () => void
@@ -54,13 +53,12 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
       : categories[0]?.id || ''
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
-    const [preview, setPreview] = useState(false)
     const [creating, setCreating] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
     const containerRef = useRef<HTMLDivElement>(null)
     const titleInputRef = useRef<HTMLInputElement>(null)
-    const textareaRef = useRef<HTMLTextAreaElement>(null)
+    const formRef = useRef<HTMLFormElement>(null)
 
     // Keep category in sync if initialCategoryId changes
     useEffect(() => {
@@ -101,7 +99,6 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
 
     const handleCollapse = () => {
       setIsExpanded(false)
-      setPreview(false)
       setError(null)
     }
 
@@ -134,7 +131,6 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
         onCreated(topic)
         setTitle('')
         setContent('')
-        setPreview(false)
         setIsExpanded(false)
       } catch (err: any) {
         setError(err?.message || 'Failed to create post. Please try again.')
@@ -287,7 +283,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3.5 sm:space-y-4">
+        <form ref={formRef} onSubmit={handleSubmit} className="space-y-3.5 sm:space-y-4">
           {error && (
             <div className="p-3 bg-crimson-soft border border-crimson-aggro/55 text-crimson-text text-xs flex items-center gap-2 rounded-control">
               <AlertTriangle className="w-4 h-4 shrink-0" />
@@ -343,53 +339,25 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <label
-                htmlFor="composer-content-textarea"
+              <span
+                id="composer-content-label"
                 className="text-[11px] sm:text-xs text-ink-muted font-bold uppercase tracking-[0.08em]"
               >
                 Content
-              </label>
+              </span>
               <span className="text-[11px] text-ink-muted">
-                {content.trim().length} characters (min 10)
+                {forumVisibleLength(content)} characters (min 10)
               </span>
             </div>
-            <div className="space-y-0">
-              <ForumFormattingToolbar
-                textareaRef={textareaRef}
-                value={content}
-                onChange={setContent}
-                preview={preview}
-                onTogglePreview={() => setPreview((v) => !v)}
-                disabled={creating}
-              />
-              {preview ? (
-                <div
-                  className="w-full min-h-[110px] max-h-[300px] bg-abyss/60 border border-line p-3 text-xs text-ink-body rounded-b-control overflow-y-auto"
-                  data-testid="inline-composer-preview"
-                >
-                  {content.trim() ? (
-                    <ForumPostBody content={content} />
-                  ) : (
-                    <p className="text-xs text-ink-muted italic">
-                      Nothing to preview yet. Transmit some thoughts or apply formatting above...
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <MentionTextarea
-                  id="composer-content-textarea"
-                  ref={textareaRef}
-                  rows={5}
-                  value={content}
-                  onChange={setContent}
-                  onKeyDown={(e) => {
-                    handleFormattingShortcuts(e, textareaRef.current, setContent)
-                  }}
-                  placeholder="Share your thoughts, questions, or ideas... Hail a member with @designation."
-                  className="w-full bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus p-3 text-[16px] sm:text-xs text-ink outline-none resize-y rounded-b-control transition-[border-color,box-shadow] placeholder:text-ink-muted min-h-[110px]"
-                />
-              )}
-            </div>
+            <ForumEditor
+              value={content}
+              onChange={setContent}
+              onSubmit={() => formRef.current?.requestSubmit()}
+              disabled={creating}
+              aria-labelledby="composer-content-label"
+              placeholder="Share your thoughts, questions, or ideas. Type @ to mention someone."
+              testId="inline-composer-editor"
+            />
           </div>
 
           <p className="text-[11px] text-ink-muted leading-relaxed border-l-2 border-line pl-2.5">
@@ -406,7 +374,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
             </button>
             <button
               type="submit"
-              disabled={creating || title.trim().length < 5 || content.trim().length < 10}
+              disabled={creating || title.trim().length < 5 || forumVisibleLength(content) < 10}
               className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] px-5 py-2 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center justify-center gap-2 touch-manipulation"
             >
               <Send className="w-3.5 h-3.5" />

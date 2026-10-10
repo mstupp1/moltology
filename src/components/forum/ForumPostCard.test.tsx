@@ -7,6 +7,8 @@ import { updateForumPostFn, deleteForumPostFn, type ForumPostEntry } from '@/lib
 import type { ForumPostTreeNode } from '@/lib/forum-utils'
 import { FORUM_WITHDRAWN_BODY } from '@/lib/forum-utils'
 
+vi.mock('@/components/forum/ForumEditor')
+
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children, to, params, ...props }: any) => (
     <a href={params?.profileId ? `/member/${params.profileId}` : to} {...props}>
