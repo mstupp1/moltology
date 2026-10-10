@@ -80,6 +80,39 @@ rules:
     anchors:
       - file: src/lib/server/simulation-engine.ts
         symbol: simulateDailyRoutines
+  - id: economy.cosmetics-no-stats
+    title: Cosmetics carry no stats
+    kind: invariant
+    statement: Cosmetic items change only how the avatar looks. They add nothing to loadout stats, so no look can be bought or worn for an advantage.
+    dependsOn: [economy.red-line]
+    anchors:
+      - file: src/lib/chassis-loadout.ts
+        symbol: computeLoadoutTotals
+      - file: src/lib/chassis-loadout.ts
+        symbol: isCosmetic
+    tests: [src/lib/chassis-loadout.test.ts]
+  - id: economy.look-slots
+    title: Looks have their own slots
+    kind: invariant
+    statement: Cosmetics are worn in six look slots (head, carapace, claws, belt, legs, antennae), one per category, and wearing one takes off the previous look in that slot. Cosmetics are refused from gear hardpoints and vault cells, and gear is refused from look slots.
+    dependsOn: [economy.cosmetics-no-stats]
+    anchors:
+      - file: src/lib/chassis-loadout.ts
+        symbol: planLookChange
+      - file: src/lib/chassis-loadout.ts
+        symbol: planGearMove
+    tests: [src/lib/chassis-loadout.test.ts]
+  - id: economy.starter-looks
+    title: Four starter looks
+    kind: flow
+    statement: Every member is granted four starter cosmetics (Reef Crown, Kelp Sash, Lantern Feelers, Tide Runners) the next time their chassis loads. Grants are skipped for looks they already own.
+    dependsOn: [economy.cosmetics-no-stats]
+    anchors:
+      - file: src/lib/equipment-seed-data.ts
+        symbol: STARTER_COSMETIC_CATALOG_IDS
+      - file: src/lib/chassis-loadout.ts
+        symbol: planStarterCosmetics
+    tests: [src/lib/equipment-seed-data.test.ts]
 ---
 
 The economy is a locked design decision in `BRAND_BIBLE.md` §4 and hard rule 2 in `AGENTS.md`. Every paid feature must be checked against the red line before it ships.
