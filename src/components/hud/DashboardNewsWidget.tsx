@@ -20,6 +20,7 @@ import { DashboardNewsGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
 import { getAssetUrl } from '@/lib/assets'
 import { NewsArticleBody } from '@/components/news/NewsArticleBody'
+import { useBlogPostBody } from '@/hooks/useBlogPostBody'
 
 export interface DashboardNewsWidgetProps {
   isLoading?: boolean
@@ -31,6 +32,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
   const [posts, setPosts] = useState<BlogPostData[]>(INITIAL_BLOG_POSTS)
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
   const [activePost, setActivePost] = useState<BlogPostData | null>(null)
+  const activePostBody = useBlogPostBody(activePost)
 
   // Attempt to fetch fresh news from server API on mount
   useEffect(() => {
@@ -157,7 +159,11 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                 )}
 
                 <div className="rounded-card bg-abyss p-4 sm:p-5 border border-line-subtle">
-                  <NewsArticleBody content={activePost.content} />
+                  {activePostBody === null ? (
+                    <p className="text-sm text-ink-muted">Loading article…</p>
+                  ) : (
+                    <NewsArticleBody content={activePostBody} />
+                  )}
                 </div>
               </div>
 

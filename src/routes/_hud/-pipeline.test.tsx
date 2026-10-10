@@ -51,7 +51,7 @@ describe('Moltology science pipeline', () => {
     expect(within(panel).getByText('The Working Standard')).toBeInTheDocument()
 
     const img = within(panel).getByAltText('the exoshell born specimen') as HTMLImageElement
-    expect(img.src).toBe(getAssetUrl('/images/stage3_exoshell.webp'))
+    expect(img.getAttribute('src')).toBe(getAssetUrl('/images/stage3_exoshell.webp'))
     expect(within(panel).getByRole('link', { name: /Stage 3 scripture/ })).toHaveAttribute('href', expect.stringMatching(/^\/codex\/scr-\d+$/))
   })
 
