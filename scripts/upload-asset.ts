@@ -10,6 +10,9 @@ async function runCli() {
 Usage:
   npx tsx scripts/upload-asset.ts <filePath> [options]
 
+Site images (jpg/png under images/, except images/social/) also get a compressed .webp
+twin, resized to at most 1920px. Reference the original key in code; getAssetUrl serves the twin.
+
 Options:
   --key <s3Key>     Custom S3 key/path (e.g. images/blog/my-image.png)
   --bucket <name>   Target S3 bucket (default: ${DEFAULT_BUCKET})
@@ -40,6 +43,9 @@ Examples:
     console.log(`  • Key: ${result.key}`)
     console.log(`  • Size: ${result.size} bytes`)
     console.log(`  • Public URL: ${result.publicUrl}`)
+    if (result.webp) {
+      console.log(`  • Webp twin: ${result.webp.key} (${result.size} → ${result.webp.size} bytes; pages load this one)`)
+    }
   } catch (err: any) {
     console.error(`❌ Upload failed: ${err.message}`)
     process.exit(1)

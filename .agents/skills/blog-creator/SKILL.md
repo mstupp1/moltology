@@ -222,7 +222,7 @@ npx tsx scripts/ingest.ts content/news/<slug>.md --commit
 ```
 
 **What this command accomplishes automatically:**
-1. Detects local image paths, uploads them to Neon S3 (`moltology-public-assets/images/blog/`), and rewrites the markdown with public HTTPS S3 URLs.
+1. Detects local image paths, uploads them to Neon S3 (`moltology-public-assets/images/blog/`), and rewrites the markdown with public HTTPS S3 URLs. Each image also gets a compressed `.webp` twin (max 1920px), which is what readers download; the original stays for og:image. Export images from the image chat as PNG or JPG at full quality and let the upload handle compression.
 2. Upserts the dispatch into Neon PostgreSQL (`blog_posts` table).
 3. Automatically records the article metadata, title, author, and hook into `content/news/blog-history.json`.
 4. Executes `git add content/news/<slug>.md content/news/blog-history.json && git commit -m "feat(news): publish <slug> and update continuity ledger"`.

@@ -11,6 +11,7 @@
 
 import { MARKETING_ASSET_VERSION } from './marketing-assets-version'
 import { SITE_ORIGIN } from './seo'
+import { webpTwinKey } from './asset-formats'
 
 export { MARKETING_ASSET_VERSION }
 
@@ -66,22 +67,23 @@ const LOCAL_ASSET_WHITELIST = new Set([
   'images/forum/forum_market_bg.jpg',
 ])
 
-/**
- * Resolves an asset path to either a local static route or the CDN-cached `/media/*` route.
- * Absolute bucket URLs (as stored on blog posts) are folded into `/media/*` too.
- */
-export function getAssetUrl(assetPath: string): string {
+interface ResolveOptions {
+  /** Serve the compressed `.webp` twin of raster site images (see asset-formats.ts). */
+  preferWebp: boolean
+}
+
+function resolveAssetUrl(assetPath: string, { preferWebp }: ResolveOptions): string {
   if (!assetPath) return ''
+  const mediaUrl = (key: string) => `${MEDIA_BASE_PATH}/${preferWebp ? webpTwinKey(key) : key}`
+
   const bucketPrefix = BUCKET_URL_PREFIXES.find((prefix) => assetPath.startsWith(prefix))
-  if (bucketPrefix) {
-    return `${MEDIA_BASE_PATH}/${assetPath.slice(bucketPrefix.length)}`
-  }
+  if (bucketPrefix) return mediaUrl(assetPath.slice(bucketPrefix.length))
   if (assetPath.startsWith('http://') || assetPath.startsWith('https://') || assetPath.startsWith('data:')) {
     return assetPath
   }
 
   const cleanPath = assetPath.replace(/^\/+/, '')
-  if (cleanPath.startsWith('media/')) return `/${cleanPath}`
+  if (cleanPath.startsWith('media/')) return mediaUrl(cleanPath.slice('media/'.length))
   const pathWithoutQuery = cleanPath.split('?')[0]
 
   if (
@@ -95,13 +97,31 @@ export function getAssetUrl(assetPath: string): string {
     return `/${cleanPath}`
   }
 
-  return `${MEDIA_BASE_PATH}/${cleanPath}`
+  return mediaUrl(cleanPath)
 }
 
 /**
- * Absolute form of `getAssetUrl` for places that leave the site: emails, og:image, download links.
+ * Resolves an asset path to either a local static route or the CDN-cached `/media/*` route.
+ * Absolute bucket URLs (as stored on blog posts) are folded into `/media/*` too, and raster
+ * site images resolve to their compressed `.webp` twin.
+ */
+export function getAssetUrl(assetPath: string): string {
+  return resolveAssetUrl(assetPath, { preferWebp: true })
+}
+
+/**
+ * Site-relative URL in the original format. For data handed to clients that also builds
+ * og:image tags (blog covers); render it through getAssetUrl to get the webp twin.
+ */
+export function getMediaPath(assetPath: string): string {
+  return resolveAssetUrl(assetPath, { preferWebp: false })
+}
+
+/**
+ * Absolute URL for places that leave the site: emails, og:image, download links.
+ * Keeps the original format, since some link unfurlers still skip webp.
  */
 export function getAbsoluteAssetUrl(assetPath: string): string {
-  const url = getAssetUrl(assetPath)
+  const url = resolveAssetUrl(assetPath, { preferWebp: false })
   return url.startsWith('/') ? `${SITE_ORIGIN}${url}` : url
 }
