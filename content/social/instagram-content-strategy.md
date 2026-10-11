@@ -132,3 +132,22 @@ Analytics/attribution source and observation timestamps:
 Decision and evidence: pending
 Next test / confirmation post:
 ```
+
+### October 11, 2026: audit headline statement
+
+- Post / ledger ID and format: post-1791752690962; Zernio 6acbf9f6d0d046307d91c4f1; single image, 3:4.
+- Goal: attributable Moltmaxxing Audit starts.
+- Control: post-1791468428046, confirmed published October 8; https://www.instagram.com/p/DePbGP6jmH0/ .
+- Hypothesis: A direct description of attention drift makes the audit invitation easier to recognize and increases attributable audit starts.
+- Variable: question headline → declarative headline.
+- Fixed settings: Same audit topic, engineer mascot, 3:4 frame, cyan/navy palette, card layout, useful steps, resource CTA, daily queue at 13:00 America/New_York; caption body preserved.
+- Confirmed schedule: October 12, 13:00 America/New_York (2026-10-12T17:00:00Z); evergreen, no seasonal props, matching the control.
+- Claim: Your open tabs keep pulling you to the surface.
+- Payoff: Notice the drift. Choose one small shed. Existing distraction, decision, habit and next-step cards retained.
+- CTA: Take the audit. Link in first comment.
+- Confounders: Monday versus Thursday; first comment removes secondary discussion ask to comply with current single-invitation rule; generation can vary subtly.
+- Published at UTC: pending.
+- 24h / 7d: pending publication; attributable clicks/audit starts unavailable until measured, not zero. Reach, shares, saves, viewer comments and non-follower reach pending.
+- Analytics source / decision / next test: pending; compare equal-age snapshots and repeat before adopting.
+
+- Queue verification: GET /posts/6acbf9f6d0d046307d91c4f1 at 2026-10-11T21:05Z confirmed scheduled, Instagram pending, isAiGenerated=true and reviewed first comment. No publication URL yet. October 12 remains in the light Halloween window; evergreen matches the control. The independently queued shutdown carousel occupies the same time in the editorial queue, a possible audience-exposure confounder.
