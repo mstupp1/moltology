@@ -41,12 +41,12 @@ describe('HeroReel', () => {
 
   it('plays the full homepage film in order', () => {
     expect(STORY_MEDIA.heroReel.map((clip) => clip.src)).toEqual([
-      '/videos/hero_benthic_core.mp4',
-      '/videos/hero_asset_shedding.mp4',
-      '/videos/hero_chitin_hardening.mp4',
-      '/videos/hero_total_carcinization.mp4',
-      '/videos/hero_fault_isolation.mp4',
-      '/videos/hero_synaptic_path.mp4',
+      '/media/videos/hero_benthic_core.mp4',
+      '/media/videos/hero_asset_shedding.mp4',
+      '/media/videos/hero_chitin_hardening.mp4',
+      '/media/videos/hero_total_carcinization.mp4',
+      '/media/videos/hero_fault_isolation.mp4',
+      '/media/videos/hero_synaptic_path.mp4',
     ])
   })
 
@@ -61,22 +61,22 @@ describe('HeroReel', () => {
     vi.useFakeTimers()
     mockMatchMedia(false)
     const { container } = render(<HeroReel clips={STORY_MEDIA.heroReel} />)
-    expect(srcs(container)).toEqual(['/videos/hero_benthic_core.mp4'])
+    expect(srcs(container)).toEqual(['/media/videos/hero_benthic_core.mp4'])
 
     act(() => {
       fireEvent.canPlay(container.querySelector('video')!)
     })
-    expect(srcs(container)).toEqual(['/videos/hero_benthic_core.mp4', '/videos/hero_asset_shedding.mp4'])
+    expect(srcs(container)).toEqual(['/media/videos/hero_benthic_core.mp4', '/media/videos/hero_asset_shedding.mp4'])
 
     act(() => {
       fireEvent.ended(container.querySelector('video')!)
     })
     // The finished clip stays mounted just long enough to crossfade out.
-    expect(srcs(container)).toEqual(['/videos/hero_benthic_core.mp4', '/videos/hero_asset_shedding.mp4'])
+    expect(srcs(container)).toEqual(['/media/videos/hero_benthic_core.mp4', '/media/videos/hero_asset_shedding.mp4'])
 
     act(() => {
       vi.runAllTimers()
     })
-    expect(srcs(container)).toEqual(['/videos/hero_asset_shedding.mp4'])
+    expect(srcs(container)).toEqual(['/media/videos/hero_asset_shedding.mp4'])
   })
 })
