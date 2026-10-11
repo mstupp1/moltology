@@ -729,7 +729,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             }`}
           >
             <HeaderBrand
-              subtext="BENTHIC CORE"
               logoSize="sm"
               onClick={() => handleNavClick('/dashboard')}
             />
@@ -781,7 +780,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           }`}
         >
           <HeaderBrand
-            subtext="BENTHIC CORE"
             isCollapsed={isCollapsed}
             onClick={() => handleNavClick('/dashboard')}
           />
@@ -790,8 +788,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           {isCollapsed && (
             <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/brand:opacity-100 transition-all duration-200">
               <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1 text-xs font-sans font-bold shadow-menu whitespace-nowrap">
-                <span className="text-cyan-glow">THE SYNAPTIC PATH</span>
-                <span className="block text-[11px] text-ink-muted font-sans">BENTHIC CORE • Click or drag edge to expand (⌘B)</span>
+                <span className="text-cyan-glow">Moltology</span>
+                <span className="block text-[11px] text-ink-muted font-sans">Click or drag edge to expand (⌘B)</span>
               </div>
             </div>
           )}

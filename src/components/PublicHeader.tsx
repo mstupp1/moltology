@@ -48,7 +48,7 @@ interface NavTab {
 }
 
 const NAV_TABS: NavTab[] = [
-  // The brand beside the nav already reads "The Synaptic Path", so the tab stays short.
+  // The brand beside the nav reads "Moltology", so the tab stays short.
   { id: 'home', label: 'HOME', path: '/' },
   { id: 'news', label: 'NEWS', path: '/news', Icon: Newspaper },
   { id: 'forum', label: 'FORUM', path: '/forum', Icon: MessageSquare },
@@ -572,7 +572,6 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-4">
         {/* Shared Brand Logo & Emblem */}
         <HeaderBrand
-          subtext="MOLTOLOGY.ORG FOUNDATION"
           variant={isCorporate ? 'corporate' : 'benthic'}
           onClick={() => onNavigate('/')}
         />

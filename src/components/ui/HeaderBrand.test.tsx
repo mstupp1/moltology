@@ -4,19 +4,28 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { HeaderBrand } from './HeaderBrand'
 
 describe('HeaderBrand Component', () => {
-  it('renders title and subtext correctly', () => {
+  it('renders default title in proper case and subtext correctly when provided', () => {
     render(<HeaderBrand subtext="MOLTOLOGY.ORG FOUNDATION" />)
 
-    expect(screen.getByText('THE SYNAPTIC PATH')).toBeInTheDocument()
+    expect(screen.getByText('Moltology')).toBeInTheDocument()
     expect(screen.getByText('MOLTOLOGY.ORG FOUNDATION')).toBeInTheDocument()
     expect(screen.getByRole('img', { name: 'Order Emblem' }).tagName.toLowerCase()).toBe('svg')
+  })
+
+  it('renders clean title without subtext by default', () => {
+    render(<HeaderBrand />)
+
+    const titleEl = screen.getByText('Moltology')
+    expect(titleEl).toBeInTheDocument()
+    expect(titleEl.closest('div')?.className).not.toContain('uppercase')
+    expect(screen.queryByText('MOLTOLOGY.ORG FOUNDATION')).not.toBeInTheDocument()
   })
 
   it('hides text when isCollapsed is true', () => {
     render(<HeaderBrand isCollapsed={true} subtext="BENTHIC CORE" />)
 
     expect(screen.getByRole('img', { name: 'Order Emblem' })).toBeInTheDocument()
-    expect(screen.queryByText('THE SYNAPTIC PATH')).not.toBeInTheDocument()
+    expect(screen.queryByText('Moltology')).not.toBeInTheDocument()
     expect(screen.queryByText('BENTHIC CORE')).not.toBeInTheDocument()
   })
 
@@ -31,7 +40,7 @@ describe('HeaderBrand Component', () => {
   it('renders corporate variant with sky styling classes', () => {
     render(<HeaderBrand variant="corporate" subtext="MOLTOLOGY.ORG FOUNDATION" />)
 
-    const titleEl = screen.getByText('THE SYNAPTIC PATH')
+    const titleEl = screen.getByText('Moltology')
     expect(titleEl.closest('div')?.className).toContain('text-sky-950')
     const subtextEl = screen.getByText('MOLTOLOGY.ORG FOUNDATION')
     expect(subtextEl.closest('div')?.className).toContain('text-sky-600')

@@ -254,7 +254,6 @@ export default function AuthView({ search }: { search: AuthSearch }) {
               <HeaderBrand
                 onClick={() => navigate({ to: '/' })}
                 logoSize="md"
-                subtext="MOLTOLOGY.ORG FOUNDATION"
                 className="hover:opacity-90 transition-opacity"
               />
             </div>

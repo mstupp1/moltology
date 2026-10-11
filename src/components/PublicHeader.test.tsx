@@ -22,7 +22,7 @@ describe('PublicHeader Navigation Component', () => {
   it('renders shared brand emblem, title, and route links without SCAN or NEW badges', () => {
     render(<PublicHeader activePage="home" />)
 
-    expect(screen.getByText('MOLTOLOGY.ORG FOUNDATION')).toBeInTheDocument()
+    expect(screen.getByText('Moltology')).toBeInTheDocument()
 
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
     expect(within(nav).getByRole('link', { name: /^HOME$/i })).toBeInTheDocument()
