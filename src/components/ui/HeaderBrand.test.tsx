@@ -58,4 +58,39 @@ describe('HeaderBrand Component', () => {
     expect(screen.getByText('SYNAPTIC VAULT')).toBeVisible()
     expect(screen.getByText('CUSTOM SUBTITLE')).toBeVisible()
   })
+
+  it('renders badge next to title when expanded and hides badge when collapsed', () => {
+    const { rerender } = render(
+      <HeaderBrand badge={<span data-testid="test-badge">Go Premium</span>} />
+    )
+    expect(screen.getByTestId('test-badge')).toBeInTheDocument()
+
+    rerender(
+      <HeaderBrand isCollapsed={true} badge={<span data-testid="test-badge">Go Premium</span>} />
+    )
+    expect(screen.queryByTestId('test-badge')).not.toBeInTheDocument()
+  })
+
+  it('handles badge clicks independently without triggering brand onClick', () => {
+    const handleBrandClick = vi.fn()
+    const handleBadgeClick = vi.fn()
+
+    render(
+      <HeaderBrand
+        onClick={handleBrandClick}
+        badge={
+          <button data-testid="badge-btn" onClick={handleBadgeClick}>
+            Go Premium
+          </button>
+        }
+      />
+    )
+
+    const badgeBtn = screen.getByTestId('badge-btn')
+    fireEvent.click(badgeBtn)
+
+    expect(handleBadgeClick).toHaveBeenCalledTimes(1)
+    expect(handleBrandClick).not.toHaveBeenCalled()
+  })
 })
+
