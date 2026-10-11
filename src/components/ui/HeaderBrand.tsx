@@ -9,6 +9,7 @@ export interface HeaderBrandProps {
   className?: string
   logoSize?: 'sm' | 'md'
   variant?: 'benthic' | 'corporate'
+  badge?: React.ReactNode
 }
 
 export const HeaderBrand: React.FC<HeaderBrandProps> = ({
@@ -19,18 +20,13 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
   className = '',
   logoSize = 'md',
   variant = 'benthic',
+  badge,
 }) => {
   const sizeClasses = logoSize === 'sm' ? 'w-6 h-6 sm:w-7 sm:h-7' : 'w-8 h-8 sm:w-9 sm:h-9'
   const titleSizeClasses = logoSize === 'sm' ? 'text-sm' : 'text-lg sm:text-xl'
   const isCorporate = variant === 'corporate'
-  const Container = onClick ? 'button' : 'div'
-
-  return (
-    <Container
-      {...(onClick ? { type: 'button' as const } : {})}
-      onClick={onClick}
-      className={`inline-flex items-center gap-2.5 sm:gap-3 group shrink-0 select-none max-w-full overflow-hidden text-left ${onClick ? 'cursor-pointer rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow' : ''} ${className}`}
-    >
+  const brandContent = (
+    <>
       {/* Emblem Logo */}
       <div className={`${sizeClasses} flex items-center justify-center shrink-0`}>
         <BrandIcon className="w-full h-full shrink-0" />
@@ -61,6 +57,47 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
           )}
         </div>
       )}
+    </>
+  )
+
+  if (badge) {
+    const BrandTrigger = onClick ? 'button' : 'div'
+    return (
+      <div
+        className={`inline-flex items-center gap-2.5 shrink-0 select-none max-w-full overflow-hidden text-left ${className}`}
+      >
+        <BrandTrigger
+          {...(onClick ? { type: 'button' as const, onClick } : {})}
+          className={`inline-flex items-center gap-2.5 sm:gap-3 group shrink-0 select-none max-w-full overflow-hidden text-left ${
+            onClick
+              ? 'cursor-pointer rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
+              : ''
+          }`}
+        >
+          {brandContent}
+        </BrandTrigger>
+
+        {!isCollapsed && (
+          <div data-header-badge="true" className="shrink-0 flex items-center">
+            {badge}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  const Container = onClick ? 'button' : 'div'
+  return (
+    <Container
+      {...(onClick ? { type: 'button' as const } : {})}
+      onClick={onClick}
+      className={`inline-flex items-center gap-2.5 sm:gap-3 group shrink-0 select-none max-w-full overflow-hidden text-left ${
+        onClick
+          ? 'cursor-pointer rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
+          : ''
+      } ${className}`}
+    >
+      {brandContent}
     </Container>
   )
 }

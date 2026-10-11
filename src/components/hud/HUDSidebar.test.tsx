@@ -1,7 +1,7 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { HUDSidebar } from './HUDSidebar'
+import { HUDSidebar, computeNavItemHidden } from './HUDSidebar'
 import { authClient } from '@/lib/auth-client'
 
 const mockNavigate = vi.fn()
@@ -365,7 +365,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.queryByText(/LARVA UNIT/)).not.toBeInTheDocument()
   })
 
-  it('hides hidden pages like premium from members', async () => {
+  it('hides admin tools and Go Premium badge from members', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -384,11 +384,11 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     await waitFor(() => {
       expect(mockGetUserProfileFn).toHaveBeenCalled()
     })
-    expect(screen.queryByRole('button', { name: /PREMIUM/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Go Premium/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^ADMIN$/i })).not.toBeInTheDocument()
   })
 
-  it('shows hidden pages faded, with a hidden icon, for admins', async () => {
+  it('shows admin nav item above support and Go Premium badge normally for admins', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -404,16 +404,19 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     render(<HUDSidebar />)
 
     const adminItem = screen.getByRole('button', { name: /^ADMIN$/i })
+    expect(adminItem).toBeInTheDocument()
     expect(adminItem).not.toHaveAttribute('data-hidden', 'true')
 
-    const hiddenItem = screen.getByRole('button', { name: /PREMIUM/i })
-    expect(hiddenItem).toHaveAttribute('data-hidden', 'true')
-    expect(hiddenItem).toHaveAttribute('title', 'Hidden page')
-    expect(hiddenItem.querySelector('[data-testid="hidden-page-icon"]')).toBeTruthy()
-    expect(hiddenItem.querySelector('.opacity-40')).toBeTruthy()
+    const premiumBadge = screen.getByRole('button', { name: /Go Premium/i })
+    expect(premiumBadge).toBeInTheDocument()
+    expect(premiumBadge).not.toHaveAttribute('data-hidden', 'true')
+
+    // Admin item should be positioned above Help & Support in bottom controls
+    const supportItem = screen.getByRole('button', { name: /HELP & SUPPORT/i })
+    expect(adminItem.compareDocumentPosition(supportItem)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
   })
 
-  it('shows a hidden page when admin clearance lives only on the profile', async () => {
+  it('shows admin nav item and Go Premium badge when admin clearance lives only on the profile', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -429,10 +432,40 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     render(<HUDSidebar />)
 
-    expect(await screen.findByRole('button', { name: /PREMIUM/i })).toHaveAttribute(
-      'data-hidden',
-      'true',
-    )
+    expect(await screen.findByRole('button', { name: /^ADMIN$/i })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /Go Premium/i })).toBeInTheDocument()
+  })
+
+  it('stacks admin above support and hides Go Premium badge when sidebar is collapsed', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: {
+        user: {
+          id: 'admin-1',
+          name: 'Admin',
+          email: 'ops@example.com',
+          role: 'admin',
+        },
+      } as any,
+      isPending: false,
+    } as any)
+
+    render(<HUDSidebar />)
+
+    // Initially expanded: badge visible
+    expect(screen.getByRole('button', { name: /Go Premium/i })).toBeInTheDocument()
+
+    // Collapse via Cmd+B
+    fireEvent.keyDown(window, { key: 'b', metaKey: true })
+
+    // Badge is hidden when collapsed
+    expect(screen.queryByRole('button', { name: /Go Premium/i })).not.toBeInTheDocument()
+
+    // Admin button is stacked above support
+    const collapsedAdmin = screen.getByRole('button', { name: /^ADMIN$/i })
+    const collapsedSupport = screen.getByRole('button', { name: /SUPPORT/i })
+    expect(collapsedAdmin).toBeInTheDocument()
+    expect(collapsedSupport).toBeInTheDocument()
+    expect(collapsedAdmin.compareDocumentPosition(collapsedSupport)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
   })
 
   it('shows the larva unit in the account menu when no designation is claimed', async () => {
@@ -458,5 +491,24 @@ describe('HUDSidebar Component Navigation & Animations', () => {
       expect(screen.getByText('LARVA UNIT #2468')).toBeInTheDocument()
     })
     expect(screen.queryByText('claw_lord')).not.toBeInTheDocument()
+  })
+
+  describe('computeNavItemHidden', () => {
+    it('returns true for items on a hidden page path', () => {
+      expect(computeNavItemHidden({ path: '/store' }, { role: 'admin' })).toBe(true)
+    })
+
+    it('returns true for tabs gated by an admin-only feature flag when viewed by admin', () => {
+      expect(computeNavItemHidden({ path: '/demo', featureFlag: 'premium' }, { role: 'admin' })).toBe(true)
+    })
+
+    it('returns false for tabs gated by an admin-only feature flag when viewed by regular member', () => {
+      expect(computeNavItemHidden({ path: '/demo', featureFlag: 'premium' }, { role: 'user' })).toBe(false)
+    })
+
+    it('returns false for standard public tabs', () => {
+      expect(computeNavItemHidden({ path: '/dashboard' }, { role: 'admin' })).toBe(false)
+      expect(computeNavItemHidden({ path: '/dashboard' }, { role: 'user' })).toBe(false)
+    })
   })
 })
