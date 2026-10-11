@@ -4,11 +4,14 @@ import fs from 'node:fs'
 import path from 'node:path'
 import http from 'node:http'
 import os from 'node:os'
+import { chromium } from 'playwright-core'
+import { resolveChromeExecutable } from './lib/composite-renderer'
+import { REGISTERED_TARGETS, DEFAULT_CAPTURE_TARGETS, type CaptureTarget } from './lib/mockup-targets'
+import { advanceServiceWorkerVersion } from './lib/mockup-cache-version'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
 
 const PORT = 3019
 const BASE_URL = `http://127.0.0.1:${PORT}`
-const CHROME_PATH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 const OUTPUT_DIR = path.resolve('public/images/marketing')
 
 // Ensure output directory exists
@@ -21,14 +24,15 @@ function waitForServer(url: string, timeoutMs = 25000): Promise<void> {
   return new Promise((resolve, reject) => {
     const check = () => {
       const req = http.get(url, (res) => {
+        res.resume()
         if (res.statusCode && res.statusCode < 500) {
           resolve()
         } else {
           retry()
         }
       })
+      req.setTimeout(3000, () => req.destroy())
       req.on('error', () => retry())
-      req.end()
     }
 
     const retry = () => {
@@ -91,143 +95,34 @@ export const MARKETING_ASSET_VERSION = '${nextVersion}'
   let nextSwVer = 2
   const swFile = path.resolve('public/sw.js')
   if (fs.existsSync(swFile)) {
-    let swContent = fs.readFileSync(swFile, 'utf8')
-    const swMatch = swContent.match(/const VERSION = 'moltology-hub-v(\d+)'/)
-    if (swMatch) {
-      const currentSwVer = parseInt(swMatch[1], 10)
-      nextSwVer = currentSwVer + 1
-      swContent = swContent.replace(
-        /const VERSION = 'moltology-hub-v\d+'/,
-        `const VERSION = 'moltology-hub-v${nextSwVer}'`
-      )
-      fs.writeFileSync(swFile, swContent, 'utf8')
-      console.log(`⚙️ Bumped Service Worker cache to moltology-hub-v${nextSwVer} (in public/sw.js)`)
-    }
+    const refreshed = advanceServiceWorkerVersion(fs.readFileSync(swFile, 'utf8'))
+    nextSwVer = refreshed.version
+    fs.writeFileSync(swFile, refreshed.content, 'utf8')
+    console.log(`Advanced service worker cache to v${nextSwVer}, preserving its brand suffix.`)
   }
 
   return { newAssetVersion: nextVersion, newSwVersion: nextSwVer }
 }
 
-interface CaptureTarget {
-  name: string
-  route: string
-  windowSize: string
-  scaleFactor: number
-  isMobile?: boolean
-  outputBase: string
-}
-
-const REGISTERED_TARGETS: Record<string, CaptureTarget> = {
-  // ── Multi-Device Interactive Showcase (Full Browser & Mobile) ──
-  dashboard_desktop: {
-    name: 'dashboard_desktop',
-    route: '/dashboard',
-    windowSize: '1760,1100',
-    scaleFactor: 2,
-    outputBase: 'dashboard_desktop_preview',
-  },
-  dashboard_mobile: {
-    name: 'dashboard_mobile',
-    route: '/dashboard',
-    windowSize: '540,1170',
-    scaleFactor: 2,
-    isMobile: true,
-    outputBase: 'dashboard_mobile_preview',
-  },
-
-  // ── 3 Core Features (Main Hub Area Only — No Sidebar or Top Bar) ──
-  dashboard_feature: {
-    name: 'dashboard_feature',
-    route: '/dashboard?view=main',
-    windowSize: '1760,1100',
-    scaleFactor: 2,
-    outputBase: 'dashboard_feature_preview',
-  },
-  forum_feature: {
-    name: 'forum_feature',
-    route: '/forum?view=main',
-    windowSize: '1760,1100',
-    scaleFactor: 2,
-    outputBase: 'forum_feature_preview',
-  },
-  oracle_feature: {
-    name: 'oracle_feature',
-    route: '/oracle?view=main',
-    windowSize: '1760,1100',
-    scaleFactor: 2,
-    outputBase: 'oracle_feature_preview',
-  },
-
-  // ── Full Desktop Sector Previews ──
-  forum_desktop: {
-    name: 'forum_desktop',
-    route: '/forum',
-    windowSize: '1760,1100',
-    scaleFactor: 2,
-    outputBase: 'forum_desktop_preview',
-  },
-  oracle_desktop: {
-    name: 'oracle_desktop',
-    route: '/oracle',
-    windowSize: '1760,1100',
-    scaleFactor: 2,
-    outputBase: 'oracle_desktop_preview',
-  },
-  market_desktop: {
-    name: 'market_desktop',
-    route: '/market',
-    windowSize: '1760,1100',
-    scaleFactor: 2,
-    outputBase: 'market_desktop_preview',
-  },
-  market_feature: {
-    name: 'market_feature',
-    route: '/market?view=main',
-    windowSize: '1760,1100',
-    scaleFactor: 2,
-    outputBase: 'market_feature_preview',
-  },
-  chassis_desktop: {
-    name: 'chassis_desktop',
-    route: '/chassis',
-    windowSize: '1760,1100',
-    scaleFactor: 2,
-    outputBase: 'chassis_desktop_preview',
-  },
-  chassis_feature: {
-    name: 'chassis_feature',
-    route: '/chassis?view=main',
-    windowSize: '1760,1100',
-    scaleFactor: 2,
-    outputBase: 'chassis_feature_preview',
-  },
-  codex_desktop: {
-    name: 'codex_desktop',
-    route: '/codex',
-    windowSize: '1760,1100',
-    scaleFactor: 2,
-    outputBase: 'codex_desktop_preview',
-  },
-  codex_feature: {
-    name: 'codex_feature',
-    route: '/codex?view=main',
-    windowSize: '1760,1100',
-    scaleFactor: 2,
-    outputBase: 'codex_feature_preview',
-  },
-}
-
 async function main() {
   const args = process.argv.slice(2)
-  const targetFilter = args.find((a) => a.startsWith('--target='))?.split('=')[1]
-  const customUrl = args.find((a) => a.startsWith('--url='))?.split('=')[1]
-  const customOutput = args.find((a) => a.startsWith('--output='))?.split('=')[1]
+  const targetFilter = args.find((a) => a.startsWith('--target='))?.slice('--target='.length)
+  const customUrl = args.find((a) => a.startsWith('--url='))?.slice('--url='.length)
+  const customOutput = args.find((a) => a.startsWith('--output='))?.slice('--output='.length)
+
+  const baseUrl = args.find((arg) => arg.startsWith('--base-url='))?.slice('--base-url='.length) || BASE_URL
+  const mediaOrigin = args.find((arg) => arg.startsWith('--media-origin='))?.slice('--media-origin='.length)
+  const mediaCache = new Map<string, { body: Buffer; contentType: string }>()
+  const executablePath = process.env.MOCKUP_CHROME_PATH || resolveChromeExecutable()
+  if (!executablePath) throw new Error('Install Chrome/Chromium or set MOCKUP_CHROME_PATH.')
 
   console.log('📸 Starting automated marketing mockups & UI capture pipeline...')
 
   // Determine active targets
   let activeTargets: CaptureTarget[] = []
 
+  if (Boolean(customUrl) !== Boolean(customOutput)) throw new Error('--url and --output must be supplied together.')
+  if (customOutput && !/^[a-z0-9_-]+$/i.test(customOutput)) throw new Error('--output must be a simple filename without an extension.')
   if (customUrl && customOutput) {
     activeTargets = [
       {
@@ -240,7 +135,7 @@ async function main() {
     ]
   } else if (targetFilter) {
     const keys = Object.keys(REGISTERED_TARGETS).filter((k) =>
-      k.toLowerCase().includes(targetFilter.toLowerCase())
+      targetFilter === 'device' ? DEFAULT_CAPTURE_TARGETS.some((target) => target.name === k) && /_(desktop|mobile)$/.test(k) : k.toLowerCase().includes(targetFilter.toLowerCase())
     )
     if (keys.length === 0) {
       console.error(`❌ Unknown target: "${targetFilter}". Available targets: ${Object.keys(REGISTERED_TARGETS).join(', ')}`)
@@ -248,83 +143,89 @@ async function main() {
     }
     activeTargets = keys.map((k) => REGISTERED_TARGETS[k])
   } else {
-    // Default: capture the multi-device showcase set AND 3 core features set
-    activeTargets = [
-      REGISTERED_TARGETS.dashboard_desktop,
-      REGISTERED_TARGETS.dashboard_mobile,
-      REGISTERED_TARGETS.dashboard_feature,
-      REGISTERED_TARGETS.forum_feature,
-      REGISTERED_TARGETS.oracle_feature,
-    ]
+    activeTargets = DEFAULT_CAPTURE_TARGETS
   }
 
-  // 1. Compile production bundle
-  console.log('⚙️ Compiling production bundle...')
-  execSync('npm run build', { stdio: 'inherit' })
-
-  // 2. Start server on PORT 3019
-  console.log(`🚀 Spawning Benthic OS server on port ${PORT}...`)
-  const serverProcess = spawn('node', ['.output/server/index.mjs'], {
-    env: {
-      ...process.env,
-      PORT: String(PORT),
-      NODE_ENV: 'production',
-      BETTER_AUTH_SECRET:
-        process.env.BETTER_AUTH_SECRET || 'dev-secret-key-at-least-16-chars-long',
-    },
-    stdio: ['ignore', 'ignore', 'inherit'],
-  })
-
+  // --base-url reuses a running local server; default remains an isolated production build.
+  let serverProcess: ReturnType<typeof spawn> | undefined
+  if (baseUrl === BASE_URL && !args.some((arg) => arg.startsWith('--base-url='))) {
+    execSync('npm run build', {
+      stdio: 'inherit',
+      env: { ...process.env, NODE_OPTIONS: process.env.NODE_OPTIONS || '--max-old-space-size=8192' },
+    })
+    serverProcess = spawn('node', ['.output/server/index.mjs'], {
+      env: { ...process.env, PORT: String(PORT), NODE_ENV: 'production' },
+      stdio: ['ignore', 'ignore', 'inherit'],
+    })
+  }
+  const stage = fs.mkdtempSync(path.join(os.tmpdir(), 'moltology-mockups-'))
+  let browser: Awaited<ReturnType<typeof chromium.launch>> | undefined
   try {
-    console.log('⏳ Waiting for server to be responsive...')
-    await waitForServer(`${BASE_URL}/dashboard?preview=true`)
-    console.log('✅ Server ready!')
-
-    // Give 2.5 seconds for server and assets to initialize
-    await new Promise((r) => setTimeout(r, 2500))
-
-    const iphoneUA =
-      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1'
-
-    const pngsToCleanup: string[] = []
-
+    await waitForServer(`${baseUrl}/dashboard?preview=true`, 60000)
+    browser = await chromium.launch({ executablePath, headless: true, args: ['--hide-scrollbars'] })
     for (const target of activeTargets) {
-      const pngPath = path.join(OUTPUT_DIR, `${target.outputBase}.png`)
-      pngsToCleanup.push(pngPath)
-
-      // Guarantee preview=true to bypass all welcome screens, splash dialogs & animation delays
-      const separator = target.route.includes('?') ? '&' : '?'
-      const captureUrl = `${BASE_URL}${target.route}${separator}preview=true`
-
-      console.log(`📸 Capturing ${target.name} (${target.windowSize} @ ${target.scaleFactor}x) from ${captureUrl}...`)
-      
-      const uaFlag = target.isMobile ? ` --user-agent="${iphoneUA}"` : ''
-      execSync(
-        `"${CHROME_PATH}" --headless=new --disable-gpu --hide-scrollbars --no-first-run --no-default-browser-check --window-size=${target.windowSize} --force-device-scale-factor=${target.scaleFactor}${uaFlag} --screenshot="${pngPath}" "${captureUrl}"`,
-        { stdio: 'inherit' }
-      )
-      console.log(`✅ ${target.name} captured successfully!`)
-
-      const webpFull = path.join(OUTPUT_DIR, `${target.outputBase}.webp`)
-      const webpSm = path.join(OUTPUT_DIR, `${target.outputBase}_sm.webp`)
-      const maxSmWidth = target.isMobile ? 540 : 1280
-
-      await encodeMarketingWebp(pngPath, webpFull, 90)
-      await encodeMarketingWebp(pngPath, webpSm, 86, maxSmWidth)
+      const [width, height] = target.windowSize.split(',').map(Number)
+      const context = await browser.newContext({
+        viewport: { width, height }, deviceScaleFactor: target.scaleFactor,
+        isMobile: Boolean(target.isMobile), hasTouch: Boolean(target.isMobile),
+        reducedMotion: 'reduce', serviceWorkers: 'block',
+      })
+      try {
+        const page = await context.newPage()
+        // Capture-only source override for environments without access to the production CDN.
+        if (mediaOrigin) await page.route('**/media/**', async (route) => {
+          const key = new URL(route.request().url()).pathname.slice('/media/'.length)
+          let asset = mediaCache.get(key)
+          if (!asset) {
+            const response = await fetch(`${mediaOrigin.replace(/\/$/, '')}/${key}`, { signal: AbortSignal.timeout(15000) })
+            if (!response.ok) { await route.fulfill({ status: response.status, body: '' }); return }
+            asset = { body: Buffer.from(await response.arrayBuffer()), contentType: response.headers.get('content-type') || 'application/octet-stream' }
+            mediaCache.set(key, asset)
+          }
+          await route.fulfill({ status: 200, ...asset })
+        })
+        const captureUrl = new URL(target.route, baseUrl)
+        captureUrl.searchParams.set('preview', 'true')
+        console.log(`Capturing ${target.name} (${width}x${height} @ ${target.scaleFactor}x)`)
+        const response = await page.goto(captureUrl.toString(), { waitUntil: 'domcontentloaded', timeout: 60000 })
+        if (!response?.ok()) throw new Error(`Capture route failed: ${captureUrl.pathname}`)
+        await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => undefined)
+        if (target.name.startsWith('moltmax')) {
+          await page.getByRole('button', { name: 'Start the quiz', exact: true }).last().click()
+          await page.locator('[role=progressbar]').first().waitFor()
+        }
+        await page.evaluate(async () => {
+          await document.fonts.ready
+          await Promise.all(Array.from(document.images).filter((image) => image.getBoundingClientRect().top < innerHeight)
+            .map((image) => Promise.race([image.decode().catch(() => undefined), new Promise((resolve) => setTimeout(resolve, 10000))])))
+        })
+        await page.waitForTimeout(1500)
+        const text = await page.locator('body').innerText()
+        if (text.trim().length < 30 || /Something went wrong|Internal Server Error|Cannot read properties|Cannot destructure|Could not load equipment/.test(text)) {
+          throw new Error(`Invalid or empty UI for ${target.name}; existing library preserved.`)
+        }
+        await page.mouse.move(0, 0)
+        await page.addStyleTag({ content: '* { scrollbar-width: none !important; } ::-webkit-scrollbar { display: none !important; }' })
+        const pngPath = path.join(stage, `${target.outputBase}.png`)
+        await page.screenshot({ path: pngPath, animations: 'disabled' })
+        await encodeMarketingWebp(pngPath, path.join(stage, `${target.outputBase}.webp`), 90)
+        await encodeMarketingWebp(pngPath, path.join(stage, `${target.outputBase}_sm.webp`), 86, target.isMobile ? 540 : 1280)
+      } finally {
+        await context.close()
+      }
     }
-
-    // Cleanup raw PNGs
-    for (const png of pngsToCleanup) {
-      if (fs.existsSync(png)) fs.unlinkSync(png)
+    // Publish only after the whole selected set succeeds, so pairs stay consistent.
+    for (const filename of fs.readdirSync(stage).filter((name) => name.endsWith('.webp'))) {
+      fs.copyFileSync(path.join(stage, filename), path.join(OUTPUT_DIR, filename))
     }
-    console.log('✅ Marketing WebP variants encoded for first-paint payload!')
-
     // Automatically bump marketing asset version & Service Worker version to bust browser and CDN caches
     bumpMarketingAssetVersion()
 
-    console.log('\n🎉 ALL MOCKUP SCREENSHOTS CAPTURED WITH 100% VISUAL FIDELITY (ZERO WELCOME SCREENS)!')
+    console.log(`Captured ${activeTargets.length} previews with full and responsive WebP variants.`)
   } finally {
-    serverProcess.kill('SIGTERM')
+    await browser?.close()
+    serverProcess?.kill('SIGTERM')
+    fs.rmSync(stage, { recursive: true, force: true })
   }
 
   // 3. Automated End-to-End Neon S3 CDN Sync

@@ -1,145 +1,94 @@
 ---
 name: mockup-capture
 description: >-
-  Automated high-DPI platform UI screenshot capture and marketing showcase asset pipeline.
-  Use whenever the user asks to capture, update, refresh, or regenerate platform UI screenshots,
-  marketing mockups, device frames, or preview screenshots across any sector (Dashboard, Forum, Oracle, Market, Chassis, Codex).
+  Capture or refresh platform UI screenshots, marketing mockups, device frames,
+  and preview screenshots with matched desktop/mobile assets.
 ---
 
-# Platform UI Mockup Capture & Screenshot Engine
+# Platform UI screenshot library
 
-This skill guides the automated generation and synchronization of high-DPI, pixel-perfect screenshots of any Moltology sector into marketing preview assets (`public/images/marketing/`) and homepage showcase components ([`DashboardMarketingShowcase.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/hud/DashboardMarketingShowcase.tsx), [`LandingPage.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/LandingPage.tsx)).
-
----
-
-## 1. Architecture & Asset Flow
+The source of truth is [`src/components/home/device-preview-library.ts`](../../../src/components/home/device-preview-library.ts).
+Every entry defines an ID, route, label, and alt text.
+Chassis has an explicit capture target but is excluded from the default library:
+its preview currently renders a missing-catalog error. Capture it with
+`--target=chassis` after the preview works, inspect both outputs, then add it to
+the homepage registry. Never publish an error screenshot. The homepage
+[`DevicePreviewCarousel.tsx`](../../../src/components/home/DevicePreviewCarousel.tsx)
+and [`scripts/capture-dashboard-mockups.ts`](../../../scripts/capture-dashboard-mockups.ts)
+consume the same registry. Add new sectors there; never add a desktop-only carousel entry.
 
 For marketing presentations, read the [shared annual content calendar](../../../content/annual-content-calendar.md) and inherit the campaign's publication date and seasonal treatment. Apply seasonal styling to surrounding marketing artwork or copy when relevant. Keep the captured UI factual: do not invent holiday features, offers or on-screen states, or alter the underlying product merely to match the season.
 
-```
-Benthic OS Routes (/dashboard, /forum, /oracle, /market, /chassis, /codex)
-         │
-         ▼  Headless Chrome (2x Retina, Scrollbars Hidden, Clean Profile)
-┌────────────────────────────────────────────────────────────────────────┐
-│ scripts/capture-dashboard-mockups.ts                                   │
-│  • Automatic ?preview=true injection (suppresses welcome splashes)     │
-│  • Automatic ?view=main for 3 Core Features (hides sidebar & top bar)  │
-│  • Isolated port 3019 production instance                              │
-└────────────────────────────────────────────────────────────────────────┘
-         │
-         ├──► @napi-rs/canvas WebP encoding (q=90 & responsive q=86)
-         │
-         │  ── Multi-Device Showcase (Safari Frame & Mobile Phone) ──
-         ├──► public/images/marketing/dashboard_desktop_preview.webp     (1760x1100 @ 2x, Full View)
-         ├──► public/images/marketing/dashboard_desktop_preview_sm.webp  (1280px max width)
-         ├──► public/images/marketing/dashboard_mobile_preview.webp      (540x1170 @ 2x, Full Mobile)
-         ├──► public/images/marketing/dashboard_mobile_preview_sm.webp   (540px max width)
-         │
-         │  ── 3 Core Features (Main Hub Area Only — No Sidebar / Top Bar) ──
-         ├──► public/images/marketing/dashboard_feature_preview.webp     (1760x1100 @ 2x, Main Hub Area)
-         ├──► public/images/marketing/dashboard_feature_preview_sm.webp  (1280px max width)
-         ├──► public/images/marketing/forum_feature_preview.webp         (1760x1100 @ 2x, Main Hub Area)
-         ├──► public/images/marketing/forum_feature_preview_sm.webp      (1280px max width)
-         ├──► public/images/marketing/oracle_feature_preview.webp        (1760x1100 @ 2x, Main Hub Area)
-         ├──► public/images/marketing/oracle_feature_preview_sm.webp     (1280px max width)
-         │
-         ├──► Automated Neon S3 CDN Sync (`npm run s3:sync`)
-         │    • Uploads all WebPs to Neon S3 (`moltology-public-assets/images/marketing/`)
-         │    • Verifies 100% S3 Asset Parity
-         │
-         ▼  Responsive <picture> / <source> WebP Resolution in UI
-┌────────────────────────────────────────────────────────────────────────┐
-│ src/components/LandingPage.tsx (3 Core Pillars Main Hub Slates)        │
-│ src/components/hud/DashboardMarketingShowcase.tsx (Multi-Device Stage) │
-└────────────────────────────────────────────────────────────────────────┘
-```
-
-### Core Pipeline Files
-* **Capture Script**: [`scripts/capture-dashboard-mockups.ts`](file:///Users/mylesstupp/Development/moltology/scripts/capture-dashboard-mockups.ts)
-* **NPM Command**: `npm run mockups:capture`
-* **Local Asset Resolver**: [`src/lib/assets.ts`](file:///Users/mylesstupp/Development/moltology/src/lib/assets.ts) (`images/marketing/` resolved locally in dev)
-* **Consumer Components**:
-  - 3 Core Features (Main Hub Area): [`src/components/LandingPage.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/LandingPage.tsx)
-  - Interactive Showcase (Safari + iPhone): [`src/components/hud/DashboardMarketingShowcase.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/hud/DashboardMarketingShowcase.tsx)
-* **Unit Tests**:
-  - [`src/components/LandingPage.test.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/LandingPage.test.tsx)
-  - [`src/components/hud/DashboardMarketingShowcase.test.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/hud/DashboardMarketingShowcase.test.tsx)
-  - [`src/lib/assets.test.ts`](file:///Users/mylesstupp/Development/moltology/src/lib/assets.test.ts)
-
----
-
-## 2. Automated Capture Commands
-
-### Capture All Core Marketing Screenshots (Showcase + 3 Core Features)
+## Refresh commands
 ```bash
+# All six showcase sectors: dashboard, forum, oracle, moltmax, market, codex.
+# Captures desktop/mobile pairs plus the four homepage feature images.
 npm run mockups:capture
-```
 
-### Capture Specific Targets
-```bash
-# Capture 3 Core Feature Main-Area previews (Dashboard, Forum, Oracle with no chrome)
-npm run mockups:capture -- --target=feature
+# Refresh only the complete carousel library, preserving feature crops:
+npm run mockups:capture -- --target=device
 
-# Capture Forum (both main area feature and full desktop preview)
+# One sector, including both devices and its feature image if registered:
 npm run mockups:capture -- --target=forum
 
-# Capture Oracle (both main area feature and full desktop preview)
-npm run mockups:capture -- --target=oracle
+# All desktop or all mobile shots:
+npm run mockups:capture -- --target=mobile
 
-# Capture Dashboard previews (full desktop, mobile, and main hub area)
-npm run mockups:capture -- --target=dashboard
+# Feature-only refresh:
+npm run mockups:capture -- --target=feature
 
-# Capture Benthic Market
-npm run mockups:capture -- --target=market
+# Reuse a running local server without a production build; local assets only:
+npm run mockups:capture -- --base-url=http://127.0.0.1:3019 --skip-s3
 
-# Capture Carapace/Chassis Builder
-npm run mockups:capture -- --target=chassis
-
-# Capture Sacred Codex Reader
-npm run mockups:capture -- --target=codex
-```
-
-### Capture a Custom URL Route
-```bash
+# Custom desktop route (not automatically added to the homepage):
 npm run mockups:capture -- --url=/journal --output=journal_desktop_preview
 ```
 
----
+Default mode builds production and starts an isolated server on port 3019.
+`--base-url` uses an existing server and never stops it.
+For a restricted cloud environment, `--media-origin=<public bucket origin>`
+can route capture-only `/media/*` reads through Node’s inherited proxy. This never
+changes page asset URLs or the site’s CDN configuration. Use only an allowed origin. Chrome is discovered on
+macOS/Linux through the existing composite renderer resolver; override with
+`MOCKUP_CHROME_PATH`. Requires `playwright-core` and `@napi-rs/canvas` from package.json.
 
-## 3. Welcome Splash & Authenticated Session Resolution
+## Capture contract
 
-To guarantee clean, un-obscured, and fully authenticated UI screenshots without guest overlays or welcome splashes:
-1. **Automatic `?preview=true`**: The capture script automatically appends `?preview=true` (or `&preview=true`) to all route URLs.
-2. **Deterministic Authenticated Session**: In `auth-session.ts`, the presence of `preview=true` automatically resolves an authenticated member operative session (`Operative Unit #8971`) if no cached session exists, ensuring screenshots are **always logged in** (showing operative rank/avatar, active member console, and zero guest mode banners or "Sign Up" prompts).
-3. **`HudLayout.tsx` & `usePwaInstall.ts` Splash & Banner Suppression**: The HUD layout and PWA install hook check `window.location.search.includes('preview=true')` to completely bypass `WelcomeSplash`, first-time initiate modals, and the `PwaInstallBanner`.
-4. **Headless Chrome Flags**: Chrome runs with `--no-first-run --no-default-browser-check --hide-scrollbars --headless=new` to avoid background setup pauses and hide scrollbars.
+- Desktop viewport: 1760 × 1100 at 2×, full WebP 3520 × 2200, small 1280 × 800.
+- Mobile viewport: 540 × 1170 at 2×, full WebP 1080 × 2340, small 540 × 1170.
+- Use Playwright mobile viewport/touch emulation, not just a user-agent string.
+- Each capture uses a fresh browser context, blocked service workers, reduced motion,
+  hidden scrollbars, and `preview=true` to suppress splashes and use the existing preview session.
+  This is display-only preview data, not a real authenticated account.
+- Feature shots use `view=main`. Moltmax starts the quiz to show a real diagnostic question.
+- Wait for route readiness, network settling, fonts, visible image decoding, and UI settling.
+  Reject HTTP errors, empty pages, and visible runtime errors (including missing-catalog errors). Inspect representative desktop/mobile outputs;
+  readiness checks cannot establish visual correctness.
+- Stage a complete selected batch in a temporary directory before replacing assets.
+  Capture failure preserves existing files and version tokens. Temporary files, contexts,
+  the browser, and any owned server are cleaned up.
+- Emit `${id}_${device}_preview.webp` and `${id}_${device}_preview_sm.webp` into
+  `public/images/marketing/`. These are explicitly permitted local marketing assets.
+- After success, bump `src/lib/marketing-assets-version.ts` and `public/sw.js`.
+  `getAssetUrl()` adds the marketing cache token.
+- Default execution also runs the existing `s3:sync` parity pipeline. `--skip-s3`
+  keeps the refresh local. Uploads are not required for homepage images served locally.
 
----
+## Homepage behavior and checks
 
-## 4. Automated Cache Invalidation & Parity Sync
+The responsive device frame switches between matched mobile and desktop captures.
+It crossfades every six seconds, waits for image load, skips failed images, pauses on
+hover/focus, pauses offscreen/in a hidden tab, and respects reduced motion.
+Visitors can select a sector or pause/play. Only the first screenshot loads on SSR;
+subsequent screenshots load as needed.
 
-To eliminate stale browser disk cache and PWA Service Worker caching traps across production:
-1. **Automated Marketing Version Bumping (`MARKETING_ASSET_VERSION`)**:
-   `npm run mockups:capture` automatically increments the version token in [`src/lib/marketing-assets-version.ts`](file:///Users/mylesstupp/Development/moltology/src/lib/marketing-assets-version.ts). [`getAssetUrl()`](file:///Users/mylesstupp/Development/moltology/src/lib/assets.ts) automatically appends `?v=${MARKETING_ASSET_VERSION}` to all marketing images across the homepage and UI showcase components, completely bypassing 1-year browser HTTP disk caching (`max-age=31536000`).
-2. **Automated Service Worker Eviction (`public/sw.js`)**:
-   `npm run mockups:capture` automatically increments the cache `VERSION` in [`public/sw.js`](file:///Users/mylesstupp/Development/moltology/public/sw.js), forcing client devices to activate the new service worker and purge stale runtime caches.
-3. **Automated Neon S3 CDN Sync**:
-   `npm run mockups:capture` automatically triggers `npm run s3:sync` upon completing capture, uploading all generated WebP mockups to the Neon S3 public assets bucket (`moltology-public-assets/images/marketing/`) and verifying 100% asset parity. No manual upload or query-parameter editing is required.
+```bash
+npx vitest run src/components/home/DevicePreviewCarousel.test.tsx src/components/LandingPage.test.tsx
+npm run test:scripts
+npm run typecheck
+npm run assets:check
+```
 
----
-
-## 5. Verification Commands
-
-1. **Verify UI Integration Tests**:
-   ```bash
-   npx vitest run src/components/LandingPage.test.tsx src/components/hud/DashboardMarketingShowcase.test.tsx src/lib/assets.test.ts
-   ```
-
-2. **Manual S3 Parity Verification** (if ever needed):
-   ```bash
-   npm run s3:verify
-
-   # Pass --skip-s3 to mockups:capture to bypass S3 upload during isolated local testing:
-   npm run mockups:capture -- --skip-s3
-   ```
-
+The user requesting capture authorizes this headless browser pipeline under the
+project's fast-verification rules. Do not use a full build solely to verify a
+localized UI edit; reuse a local server with `--base-url` for capture when appropriate.
