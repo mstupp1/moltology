@@ -22,6 +22,7 @@ export type {
   AdminPurchaseRow,
   AdminTelemetry,
 } from './admin-oversight'
+export type { ExperimentRow } from './experiments'
 
 // ============================================================================
 // SERVER FUNCTIONS (Thin RPC Proxies - Bundled for Client & Server)
@@ -786,6 +787,24 @@ export const moveGearItemFn = createServerFn({ method: 'POST' })
     return moveGearItemHandler(args)
   })
 
+/** Wear (or remove) a cosmetic look. */
+export const setLookFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { itemId: string; wear: boolean; token?: string; userId?: string }) =>
+    z
+      .object({
+        itemId: z.string().uuid(),
+        wear: z.boolean(),
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(async (args) => {
+    const { setLookHandler } = await import('./db-services')
+    return setLookHandler(args)
+  })
+
 export const getPublicProfileFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: { profileId: string; token?: string; userId?: string }) =>
@@ -1051,4 +1070,27 @@ export const getLogicAtlasFn = createServerFn({ method: 'POST' })
   .handler(async (args) => {
     const { getLogicAtlasHandler } = await import('./logic-atlas')
     return getLogicAtlasHandler(args)
+  })
+
+export const getMyExperimentsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data?: { token?: string; userId?: string }) => adminAuthSchema.parse(data ?? {}))
+  .handler(async (args) => {
+    const { getMyExperimentsHandler } = await import('./experiments')
+    return getMyExperimentsHandler(args)
+  })
+
+export const setExperimentFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { token?: string; userId?: string; id: string; on: boolean }) =>
+    adminAuthSchema
+      .extend({
+        id: z.string().min(1).max(64),
+        on: z.boolean(),
+      })
+      .parse(data),
+  )
+  .handler(async (args) => {
+    const { setExperimentHandler } = await import('./experiments')
+    return setExperimentHandler(args)
   })

@@ -16,7 +16,7 @@ Business rules and the decisions behind them are mapped in [`docs/logic/`](docs/
 
 ## Visual source of truth
 
-Visual truth is Tailwind + HUD CSS — [`tailwind.config.js`](tailwind.config.js) and [`src/index.css`](src/index.css) — not a design.md. shadcn/ui primitives live in `src/components/ui/`.
+Visual truth is Tailwind + HUD CSS — [`tailwind.config.js`](tailwind.config.js) and [`src/index.css`](src/index.css) — not a design.md. Token names and when to use them: [`docs/design/ui-tokens.md`](docs/design/ui-tokens.md). shadcn/ui primitives live in `src/components/ui/`.
 
 ## Tech Stack
 
@@ -53,7 +53,8 @@ One toast system, one persistent notification system, one OS bridge. Never `aler
 
 ## Assets and media
 
-- Heavy media (content images, textures, video, audio) lives in the Neon S3 bucket `moltology-public-assets`, never in `public/`. Resolve URLs with `getAssetUrl(path)` from [`src/lib/assets.ts`](src/lib/assets.ts). `npm run s3:sync` uploads and `npm run s3:verify` checks parity.
+- Heavy media (content images, textures, video, audio) lives in the Neon S3 bucket `moltology-public-assets`, never in `public/`. Resolve URLs with `getAssetUrl(path)` from [`src/lib/assets.ts`](src/lib/assets.ts). Pages load bucket media through `/media/*`, a CDN-cached rewrite in `vercel.json`, because direct bucket reads count against Neon's 5 GB monthly transfer that the database shares. Never point a page, CSS file, or og:image at the bucket URL; use `getAssetUrl` (or `getAbsoluteAssetUrl` for emails and og:image). Every upload path (`npm run s3:upload`, blog ingest, `npm run s3:sync`) writes a compressed `.webp` twin (max 1920px) for jpg/png under `images/` except `images/social/`; `getAssetUrl` serves the twin and `getAbsoluteAssetUrl` the original. Reference the original key in code and content. `npm run s3:optimize -- --check` lists images missing a twin. `npm run s3:sync` uploads and `npm run s3:verify` checks parity.
+- Avatar kit art (layered member avatar parts) is painted with the [`avatar-kit-art`](.agents/skills/avatar-kit-art/SKILL.md) skill and ingested with `npm run avatar:kit -- ingest`; parts live under `images/avatar-kit/`.
 - `npm run assets:check` (run in CI by `.github/workflows/hygiene.yml`) blocks any tracked file over 1MB unless it is allowlisted in `scripts/check-asset-budget.ts`.
 
 ## Social, video, and blog images

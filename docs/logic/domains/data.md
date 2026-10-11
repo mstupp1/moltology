@@ -75,6 +75,29 @@ rules:
         symbol: MAX_FILE_MB
       - file: AGENTS.md
         symbol: Assets and media
+  - id: data.avatar-look-server
+    title: Server writes the worn look
+    kind: invariant
+    statement: What a member's avatar wears, and its cached portrait, are written by the server from their equipped gear and worn looks after each gear move, look change, or avatar save. Avatar saves from the app cannot set either field.
+    dependsOn: [economy.look-slots]
+    anchors:
+      - file: src/lib/server/db-services.ts
+        symbol: syncAvatarLook
+      - file: src/lib/avatar/config-schema.ts
+        symbol: avatarConfigShape
+  - id: data.avatar-portraits
+    title: Portraits are rendered once
+    kind: invariant
+    statement: Avatars drawn with painted art get a 256px WebP portrait rendered on the server when their look changes, stored under a content hash with a one-year immutable cache, and served through the cached media route. Pages show that image instead of drawing the avatar. A failed render keeps the save and falls back to the drawn portrait.
+    dependsOn: [data.avatar-look-server]
+    flag:
+      level: watch
+      note: Members who saved an avatar before painted art existed get their first portrait on their next chassis load or avatar save, or when staff run npm run avatar:kit -- sync-all.
+    anchors:
+      - file: src/lib/server/avatar-portrait.ts
+        symbol: renderAvatarPortrait
+      - file: src/lib/lobster-avatar-slots.ts
+        symbol: resolveLobsterAvatarAssets
 ---
 
 Most cost decisions trace back to two limits: Neon Free compute hours and Vercel Hobby Active CPU. Anything that polls, keeps compute awake, or grows storage without bound has to justify itself here.

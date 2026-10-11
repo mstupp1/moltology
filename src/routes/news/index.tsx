@@ -4,7 +4,7 @@ import { getBlogPostsFn } from '@/lib/server/api'
 import { INITIAL_BLOG_POSTS } from '@/lib/blog-data'
 import type { BlogPostData } from '@/lib/blog-data'
 import { seo } from '@/lib/seo'
-import { getAssetUrl } from '@/lib/assets'
+import { getAbsoluteAssetUrl, getAssetUrl } from '@/lib/assets'
 import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
 
 const LazyNewsIndexPage = lazy(() =>
@@ -35,7 +35,7 @@ export const Route = createFileRoute('/news/')({
         title: 'MoltNation News | Stories from Moltology',
         description: 'MoltNation News covers AI agents, robots, and the people working next to them, reported from the bottom of the ocean.',
         keywords: 'MoltNation News, patriot AI, agentic swarms, test-time compute, carcinization, ecdysis telemetry',
-        ogImage: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/ai_learning_ascension_cover.jpg',
+        ogImage: getAbsoluteAssetUrl('images/ai_learning_ascension_cover.jpg'),
         canonical: 'https://moltology.org/news',
         siteName: 'MoltNation News',
         twitterCard: 'summary_large_image',

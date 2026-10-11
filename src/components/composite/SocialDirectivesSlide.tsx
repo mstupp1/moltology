@@ -1,8 +1,16 @@
 import React from 'react'
 import { CompositeContainer, CompositeAspectRatio } from './CompositeContainer'
 import { MascotOverlay, MascotKey } from './MascotOverlay'
-import { MoltNationLogo } from '@/components/news/MoltNationLogo'
-import { ArrowUpRight } from 'lucide-react'
+import { isCrabMascot } from '@/lib/mascots'
+import { displayCopy } from '@/lib/composite-copy'
+import {
+  CompositeBrand,
+  CompositeCta,
+  CompositeHeadline,
+  CompositeLabel,
+  CompositePanel,
+  CompositePill,
+} from './CompositeKit'
 
 export interface DirectiveItem {
   number: string
@@ -45,99 +53,48 @@ export const SocialDirectivesSlide: React.FC<SocialDirectivesSlideProps> = ({
       description: 'Retain 1.2M+ active reasoning tokens across high-speed optical NVMe tiers with zero memory stalls.',
     },
   ],
-  ctaHeader = 'READ THE FULL DISPATCH & SCHEMATICS',
-  ctaButtonText = 'EXPLORE: MOLTOLOGY.ORG/NEWS',
-  ctaSubtitle = '🔗 Link in bio & live story telemetry feed',
+  ctaHeader = 'Read the full dispatch',
+  ctaButtonText = 'moltology.org/news',
+  ctaSubtitle = 'Link in bio',
   mascot = 'lobster_pointing',
   backgroundImageUrl,
 }) => {
+  const hasMascot = Boolean(mascot && mascot !== 'none')
   return (
-    <CompositeContainer
-      aspectRatio={aspectRatio}
-      backgroundImageUrl={backgroundImageUrl}
-      showScanlines={true}
-      showCornerBrackets={false}
-    >
-      {/* 1. Category Pill Badge */}
-      <div className="flex items-center gap-3">
-        <div className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-xl bg-cyan-950/70 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,195,255,0.25)]">
-          <span className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse" />
-          <span className="font-mono font-bold text-lg tracking-widest text-cyan-300 uppercase">
-            {categoryBadge}
-          </span>
-        </div>
+    <CompositeContainer aspectRatio={aspectRatio} backgroundImageUrl={backgroundImageUrl}>
+      <div className="flex items-start justify-between gap-6">
+        <CompositePill>{categoryBadge}</CompositePill>
+        <CompositeBrand size="sm" />
       </div>
 
-      {/* 2. Headline */}
-      <div className="mt-4 space-y-1">
-        <h1 className="text-[76px] leading-[1.0] font-black text-white tracking-tight uppercase">
-          {headlinePart1}
-        </h1>
-        <h2 className="text-[76px] leading-[1.0] font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-sky-400 drop-shadow-[0_0_20px_rgba(0,255,230,0.4)] tracking-tight uppercase">
-          {headlinePart2}
-        </h2>
-      </div>
+      <CompositeHeadline lines={[headlinePart1]} accent={headlinePart2} size={76} className="mt-7" />
 
-      {/* 3 + 4. Directives and CTA share the free height so nothing pools at the bottom */}
-      <div className="flex-1 flex flex-col justify-center gap-7 py-8">
-      <div className="space-y-5">
+      <div className="mt-12 flex flex-col gap-4">
         {directives.map((item, idx) => (
-          <div
-            key={idx}
-            className="relative z-30 p-7 rounded-2xl bg-[#04141e]/90 border border-cyan-500/40 backdrop-blur-md shadow-lg flex items-start gap-6"
-          >
-            {/* Number Pill */}
-            <div className="w-20 h-20 rounded-2xl bg-cyan-950/80 border border-cyan-400/90 text-cyan-300 font-mono font-black text-4xl flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(0,195,255,0.25)]">
+          <CompositePanel key={idx} className="flex items-start gap-6 p-6">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-control border border-line-strong bg-cyan-soft text-[28px] font-bold tabular-nums text-cyan-glow">
               {item.number}
             </div>
-
-            <div className="flex-1 min-w-0">
-              <h3 className="font-mono font-bold text-[28px] leading-tight text-white tracking-wide uppercase">
-                {item.title}
-              </h3>
-              <p className="mt-2 text-[23px] text-slate-200 font-sans leading-snug">
-                {item.description}
-              </p>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-[28px] font-bold leading-tight text-ink">{displayCopy(item.title)}</h3>
+              <p className="mt-2 text-[22px] leading-snug text-ink-body">{displayCopy(item.description)}</p>
             </div>
-          </div>
+          </CompositePanel>
         ))}
       </div>
 
-      {/* 4. Hero CTA Card */}
-      <div className="relative">
-        <div className="w-[66%] h-fit p-6 rounded-3xl bg-[#041a26]/95 border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,255,230,0.25)] flex flex-col">
-          <div className="font-mono font-bold text-lg text-sky-400 uppercase tracking-wider mb-3">
-            {ctaHeader}
-          </div>
-          <div className="w-full py-5 px-7 rounded-2xl bg-cyan-400 hover:bg-cyan-300 text-[#020b10] font-mono font-black text-[27px] uppercase tracking-tight flex items-center justify-between shadow-[0_0_20px_rgba(0,255,230,0.4)] cursor-pointer">
-            <span>{ctaButtonText}</span>
-            <ArrowUpRight className="w-7 h-7 stroke-[3.5]" />
-          </div>
-
-          {ctaSubtitle && (
-            <div className="text-[19px] font-medium text-slate-300 font-sans pt-3">
-              {ctaSubtitle}
-            </div>
-          )}
-        </div>
-      </div>
+      <div className={`mt-auto ${hasMascot ? 'w-[64%]' : ''}`}>
+        <CompositeLabel tone="neutral">{displayCopy(ctaHeader)}</CompositeLabel>
+        <CompositeCta size="md" className="mt-4">{displayCopy(ctaButtonText)}</CompositeCta>
+        {ctaSubtitle && <p className="mt-4 text-[20px] text-ink-muted">{displayCopy(ctaSubtitle)}</p>}
       </div>
 
-      {/* 5. Bottom Logo & Watermark */}
-      <div className="pt-5 flex items-center justify-between border-t border-slate-800/80">
-        <div className="font-mono text-base text-slate-400 tracking-wider">
-          ONE NATION UNDER CHITIN
-        </div>
-
-        <MoltNationLogo size="md" theme="dark" />
-      </div>
-
-      {/* 6. Mascot - Positioned down in the bottom-right corner below Directive 03 */}
       <MascotOverlay
         mascot={mascot}
         position="bottom-right"
-        width={340}
-        className="bottom-20 right-0 z-[25]"
+        width={isCrabMascot(mascot) ? 340 : 280}
+        glow={false}
+        className="bottom-6 right-6 z-[25]"
       />
     </CompositeContainer>
   )

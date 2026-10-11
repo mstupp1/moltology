@@ -4,6 +4,7 @@ import { getBlogPostBySlugFn } from '@/lib/server/api'
 import { INITIAL_BLOG_POSTS } from '@/lib/blog-data'
 import type { BlogPostData } from '@/lib/blog-data'
 import { seo } from '@/lib/seo'
+import { getAbsoluteAssetUrl } from '@/lib/assets'
 import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
 
 const LazyNewsPostDetail = lazy(() =>
@@ -33,7 +34,7 @@ export const Route = createFileRoute('/news/$slug')({
     const title = post?.title ? `${post.title} | MoltNation News` : 'News Dispatch | MoltNation News'
     const description = post?.summary || 'Patriot Telemetry & AI Intelligence from the MoltNation Benthic Desk.'
     const url = post?.slug ? `https://moltology.org/news/${post.slug}` : 'https://moltology.org/news'
-    const imageUrl = post?.coverImageUrl || 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/ai_learning_ascension_cover.jpg'
+    const imageUrl = getAbsoluteAssetUrl(post?.coverImageUrl || 'images/ai_learning_ascension_cover.jpg')
     const publishedTime = post?.publishedAt ? new Date(post.publishedAt).toISOString() : new Date().toISOString()
     const author = post?.authorName || 'High Ascendant Carcinus'
     const tags = post?.tags || ['MoltNation', 'AI Intelligence', 'Sub-Benthic Compute']

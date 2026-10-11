@@ -1,14 +1,17 @@
 import React from 'react'
 import { HudGhostSkeleton, HudGhostCard, HudGhostStatBox } from '@/components/ui/HudGhostLoader'
 
+/** Card shell overrides so ghost primitives match the live card shape. */
+const GHOST_CARD = 'rounded-card border-line-subtle bg-surface-1 shadow-none'
+
 /**
  * Clean Ghost Skeleton composite for the Launchpad Carousel.
  */
 export function LaunchpadCarouselGhost() {
   return (
-    <div className="bg-[#070b0c]/90 border border-[#3a4a49]/60 p-4 sm:p-5 rounded-sm space-y-4 shadow-sm relative lg:h-[785px] flex flex-col justify-between">
+    <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-4 sm:p-5 space-y-4 relative lg:h-[785px] flex flex-col justify-between">
       {/* Header bar skeleton */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#3a4a49]/40 pb-3 shrink-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line-subtle pb-3 shrink-0">
         <div className="flex items-center gap-3">
           <HudGhostSkeleton variant="cyan" preset="avatar" width={32} height={32} />
           <div className="space-y-1">
@@ -24,12 +27,12 @@ export function LaunchpadCarouselGhost() {
 
       {/* Hero launchpad card skeleton grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch flex-1 min-h-0 py-2">
-        <HudGhostCard variant="neutral" lines={4} className="md:col-span-2 min-h-[200px] h-full" />
-        <HudGhostCard variant="cyan" lines={6} className="min-h-[200px] h-full" />
+        <HudGhostCard variant="neutral" lines={4} className={`${GHOST_CARD} md:col-span-2 min-h-[200px] h-full`} />
+        <HudGhostCard variant="cyan" lines={6} className={`${GHOST_CARD} min-h-[200px] h-full`} />
       </div>
 
       {/* Footer / dots skeleton */}
-      <div className="flex items-center justify-between pt-2 border-t border-[#3a4a49]/30">
+      <div className="flex items-center justify-between pt-2 border-t border-line-subtle">
         <div className="flex items-center gap-1.5">
           {Array.from({ length: 4 }).map((_, i) => (
             <HudGhostSkeleton key={i} variant={i === 0 ? 'cyan' : 'neutral'} width={20} height={6} cornerCut={false} />
@@ -46,9 +49,9 @@ export function LaunchpadCarouselGhost() {
  */
 export function DailyRoutineGhost() {
   return (
-    <div className="bg-[#070b0c]/90 border border-[#3a4a49]/60 p-3 sm:p-5 rounded-sm space-y-4 shadow-sm relative min-w-0 overflow-hidden">
+    <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-5 space-y-4 relative min-w-0 overflow-hidden">
       {/* Widget Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#3a4a49]/40 pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line-subtle pb-3">
         <div className="flex items-center gap-3 min-w-0">
           <HudGhostSkeleton variant="teal" preset="avatar" width={28} height={28} />
           <div className="space-y-1 min-w-0">
@@ -60,7 +63,7 @@ export function DailyRoutineGhost() {
       </div>
 
       {/* Progress Meter skeleton */}
-      <div className="bg-[#090e0f]/80 border border-[#3a4a49]/50 p-3 rounded-sm space-y-2">
+      <div className="rounded-card border border-line-subtle bg-surface-2 p-3 space-y-2">
         <div className="flex items-center justify-between">
           <HudGhostSkeleton variant="neutral" preset="text" width={100} height={12} />
           <HudGhostSkeleton variant="teal" preset="heading" width={50} height={16} />
@@ -71,7 +74,7 @@ export function DailyRoutineGhost() {
       {/* Routine Items List skeleton */}
       <div className="space-y-2.5">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="bg-[#090e0f]/60 border border-[#3a4a49]/40 p-2.5 rounded-sm flex items-center justify-between gap-3">
+          <div key={i} className="rounded-card border border-line-subtle bg-surface-2 p-2.5 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 flex-1">
               <HudGhostSkeleton variant="neutral" width={16} height={16} cornerCut={false} />
               <div className="space-y-1 flex-1">
@@ -92,9 +95,9 @@ export function DailyRoutineGhost() {
  */
 export function DashboardNewsGhost() {
   return (
-    <div className="bg-[#070b0c]/90 border border-[#3a4a49]/60 p-4 sm:p-5 rounded-sm space-y-4 shadow-sm relative">
+    <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-4 sm:p-5 space-y-4 relative">
       {/* Header bar */}
-      <div className="flex items-center justify-between border-b border-[#3a4a49]/40 pb-3">
+      <div className="flex items-center justify-between border-b border-line-subtle pb-3">
         <div className="flex items-center gap-3">
           <HudGhostSkeleton variant="crimson" preset="avatar" width={28} height={28} />
           <div className="space-y-1">
@@ -107,7 +110,7 @@ export function DashboardNewsGhost() {
 
       {/* Featured News Post Banner Skeleton */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-2 bg-[#090e0f]/80 border border-[#3a4a49]/50 p-4 rounded-sm space-y-3">
+        <div className="md:col-span-2 rounded-card border border-line-subtle bg-surface-2 p-4 space-y-3">
           <div className="flex items-center justify-between">
             <HudGhostSkeleton variant="crimson" preset="badge" width={80} height={18} />
             <HudGhostSkeleton variant="neutral" preset="text" width={70} height={11} />
@@ -124,7 +127,7 @@ export function DashboardNewsGhost() {
         {/* Headlines List Skeleton */}
         <div className="space-y-2.5">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="bg-[#090e0f]/50 border border-[#3a4a49]/40 p-2.5 rounded-sm space-y-1.5">
+            <div key={i} className="rounded-card border border-line-subtle bg-surface-2 p-2.5 space-y-1.5">
               <div className="flex items-center justify-between">
                 <HudGhostSkeleton variant="neutral" preset="badge" width={50} height={14} />
                 <HudGhostSkeleton variant="neutral" preset="text" width={50} height={9} />
@@ -138,32 +141,6 @@ export function DashboardNewsGhost() {
   )
 }
 
-/**
- * Clean Ghost Skeleton composite for the Subterranean Vats & Telemetry Hub.
- */
-export function SubterraneanHubGhost() {
-  return (
-    <div className="space-y-5 font-sans select-none">
-      {/* Subterranean Header Banner Ghost */}
-      <div className="bg-[#070b0c]/90 border border-[#3a4a49]/60 p-4 rounded-sm space-y-2.5 shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1.5">
-            <HudGhostSkeleton variant="crimson" preset="heading" width={240} height={18} />
-            <HudGhostSkeleton variant="neutral" preset="text" width={360} height={12} />
-          </div>
-          <HudGhostSkeleton variant="crimson" preset="badge" width={90} height={24} />
-        </div>
-      </div>
-
-      {/* Grid of Bio-Vat Specimen Cards Ghost */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <HudGhostCard key={i} variant="neutral" lines={4} className="min-h-[200px]" />
-        ))}
-      </div>
-    </div>
-  )
-}
 
 /**
  * Clean Ghost Skeleton composite for Initiate Activity Feed list.
@@ -172,7 +149,7 @@ export function ActivityFeedGhost() {
   return (
     <div className="space-y-2.5">
       {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="bg-[#080d0e]/80 border border-[#3a4a49]/50 p-3 rounded-sm flex items-center justify-between gap-3">
+        <div key={i} className="rounded-card border border-line-subtle bg-surface-2 p-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 flex-1">
             <HudGhostSkeleton variant="neutral" preset="avatar" width={28} height={28} />
             <div className="space-y-1 flex-1">
@@ -198,7 +175,7 @@ export function HudWorkspaceGhost() {
   return (
     <div className="space-y-4 font-sans select-none animate-in fade-in duration-150" data-testid="hud-workspace-ghost">
       {/* Top Banner Skeleton */}
-      <div className="bg-[#070b0c]/90 border border-[#3a4a49]/60 p-4 sm:p-5 chamfer-corner space-y-3 shadow-sm">
+      <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-4 sm:p-5 space-y-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <HudGhostSkeleton variant="cyan" preset="avatar" width={32} height={32} />
@@ -213,17 +190,17 @@ export function HudWorkspaceGhost() {
 
       {/* Main Grid Content Skeletons */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <HudGhostCard variant="neutral" lines={4} className="md:col-span-2 min-h-[220px]" />
+        <HudGhostCard variant="neutral" lines={4} className={`${GHOST_CARD} md:col-span-2 min-h-[220px]`} />
         <div className="space-y-3 flex flex-col justify-between">
-          <HudGhostStatBox variant="cyan" />
-          <HudGhostStatBox variant="neutral" />
+          <HudGhostStatBox variant="cyan" className={GHOST_CARD} />
+          <HudGhostStatBox variant="neutral" className={GHOST_CARD} />
         </div>
       </div>
 
       {/* Secondary Row Skeletons */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <HudGhostCard variant="neutral" lines={3} />
-        <HudGhostCard variant="neutral" lines={3} />
+        <HudGhostCard variant="neutral" lines={3} className={GHOST_CARD} />
+        <HudGhostCard variant="neutral" lines={3} className={GHOST_CARD} />
       </div>
     </div>
   )

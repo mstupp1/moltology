@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-router'
 import { ArrowLeft, Plus, Search, MessageSquare, Terminal, ChevronRight, Compass } from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
+import { HudButton } from '@/components/ui/HudButton'
 import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
 import { InlineTopicComposer, InlineTopicComposerHandle } from '@/components/forum/InlineTopicComposer'
 import { getForumCategoryBySlugFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
@@ -154,15 +155,15 @@ function ForumBoardPage() {
         <div className="flex items-center gap-2">
           <Link
             to="/forum"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#00ffff] hover:underline uppercase transition-all"
+            className="inline-flex items-center gap-1.5 rounded-control text-xs font-bold tracking-[0.08em] text-cyan-glow hover:underline uppercase transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>COMMUNITY</span>
           </Link>
           {category && (
             <>
-              <span className="text-[#3a4a49]">/</span>
-              <span className="text-xs text-[#839493] font-bold uppercase truncate">
+              <span className="text-ink-muted/50">/</span>
+              <span className="text-xs text-ink-muted font-bold tracking-[0.08em] uppercase truncate">
                 {category.name}
               </span>
             </>
@@ -172,8 +173,8 @@ function ForumBoardPage() {
         {/* Board Header Bento Banner */}
         {category ? (
           <div
-            className="relative overflow-hidden bg-[#070b0b] border border-[#3a4a49] p-4 sm:p-5 chamfer-corner shadow-2xl transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-            style={{ borderLeftWidth: '4px', borderLeftColor: category.color || '#00ffff' }}
+            className="relative overflow-hidden rounded-card border border-line-subtle bg-surface-1 p-4 sm:p-5 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+            style={{ borderLeftWidth: '2px', borderLeftColor: category.color || '#00c3ff' }}
           >
             {/* Background Image with Dark Gradient Overlay */}
             <img
@@ -181,7 +182,7 @@ function ForumBoardPage() {
               alt=""
               className="absolute inset-0 w-full h-full object-cover object-center opacity-40 pointer-events-none"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b] via-[#070b0b]/80 to-[#070b0b]/40 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-r from-surface-1 via-surface-1/80 to-surface-1/40 pointer-events-none" />
 
             <div className="relative z-10 space-y-1.5 max-w-2xl">
               <div className="flex flex-wrap items-center gap-2.5">
@@ -191,35 +192,38 @@ function ForumBoardPage() {
                 >
                   {category.name}
                 </h1>
-                <span className="text-[10px] font-sans font-bold text-[#00ffff] bg-[#070b0b]/90 border border-[#00ffff]/40 px-2 py-0.5 chamfer-corner backdrop-blur-sm shadow-md">
+                <span className="text-[11px] font-sans font-bold text-cyan-glow bg-surface-1/90 border border-line-subtle px-2 py-0.5 rounded-chip backdrop-blur-sm">
                   {formatForumTopicCount(category.topicCount)}
                 </span>
                 {typeof category.unreadCount === 'number' && category.unreadCount > 0 && (
                   <ForumUnreadMark label={formatForumUnreadCount(category.unreadCount)} />
                 )}
               </div>
-              <p className="text-xs text-[#dfe3e3]/90 leading-relaxed drop-shadow-sm font-sans">
+              <p className="text-xs text-ink-body leading-relaxed drop-shadow-sm font-sans">
                 {category.description}
               </p>
             </div>
 
             {canStartTopic && (
-            <button
+            <HudButton
+              type="button"
+              variant="primary"
+              size="sm"
               onClick={() => composerRef.current?.expandAndFocus()}
-              className="relative z-10 px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] text-black text-xs font-bold uppercase tracking-wider chamfer-corner shadow-[0_0_12px_rgba(0,255,255,0.25)] transition-all flex items-center gap-1.5 self-start sm:self-center shrink-0"
+              icon={<Plus className="w-4 h-4" />}
+              className="z-10 self-start sm:self-center shrink-0"
             >
-              <Plus className="w-4 h-4" />
               <span>New Post</span>
-            </button>
+            </HudButton>
             )}
           </div>
         ) : (
-          <div className="p-10 text-center chitin-card chamfer-corner border border-[#ff5540]/50 space-y-2">
-            <Terminal className="w-8 h-8 text-[#ff5540] mx-auto" />
-            <h1 className="font-grotesk font-bold text-lg text-[#dfe3e3] uppercase">
+          <div className="p-10 text-center rounded-card border border-line-subtle bg-surface-1 hud-sheen space-y-2">
+            <Terminal className="w-8 h-8 text-crimson-text mx-auto" />
+            <h1 className="font-grotesk font-bold text-lg text-ink uppercase">
               Board Not Found
             </h1>
-            <p className="text-xs text-[#839493]">This discussion board does not exist.</p>
+            <p className="text-xs text-ink-muted">This discussion board does not exist.</p>
           </div>
         )}
 
@@ -246,19 +250,19 @@ function ForumBoardPage() {
               />
             )}
 
-            <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3.5 h-full flex flex-col justify-between">
+            <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 md:p-5 space-y-3.5 h-full flex flex-col justify-between">
               <div className="space-y-3">
                 {/* Toolbar */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 border-b border-[#3a4a49] pb-3">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 border-b border-line-subtle pb-3">
                   <div className="flex items-center gap-1">
                     {sortTabs.map((tab) => (
                       <button
                         key={tab.key}
                         onClick={() => setSortBy(tab.key)}
-                        className={`px-2.5 py-1 text-[10px] font-sans font-bold uppercase transition-all chamfer-corner border ${
+                        className={`px-2.5 py-1 text-[11px] font-sans font-bold uppercase tracking-[0.08em] transition-all rounded-control border-b-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                           sortBy === tab.key
-                            ? 'bg-[#00ffff]/20 text-[#00ffff] border-[#00ffff]'
-                            : 'bg-[#070b0b] text-[#839493] border-[#3a4a49] hover:text-[#dfe3e3]'
+                            ? 'bg-surface-2 text-ink border-cyan-glow'
+                            : 'border-transparent text-ink-muted hover:text-ink hover:bg-surface-2'
                         }`}
                       >
                         {tab.label}
@@ -267,13 +271,13 @@ function ForumBoardPage() {
                   </div>
 
                   <div className="relative w-full sm:w-56">
-                    <Search className="w-3.5 h-3.5 text-[#839493] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                    <Search className="w-3.5 h-3.5 text-ink-muted absolute left-2.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search this board..."
-                      className="w-full pl-8 pr-2.5 py-1 bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] text-xs text-[#dfe3e3] outline-none chamfer-corner transition-colors placeholder:text-[#839493]/50"
+                      className="w-full pl-8 pr-2.5 py-1 bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-none rounded-control transition-colors placeholder:text-ink-muted"
                     />
                   </div>
                 </div>
@@ -281,22 +285,24 @@ function ForumBoardPage() {
                 {/* Topics Stream */}
                 {loading ? (
                   <div className="space-y-2">
-                    <div className="h-16 bg-[#070b0b] border border-[#3a4a49] chamfer-corner animate-pulse" />
-                    <div className="h-16 bg-[#070b0b] border border-[#3a4a49] chamfer-corner animate-pulse" />
+                    <div className="h-16 bg-surface-1 border border-line-subtle rounded-card animate-pulse" />
+                    <div className="h-16 bg-surface-1 border border-line-subtle rounded-card animate-pulse" />
                   </div>
                 ) : topics.length === 0 ? (
-                  <div className="p-10 text-center chitin-card-inset chamfer-corner border border-[#3a4a49] space-y-3">
-                    <MessageSquare className="w-6 h-6 text-[#839493] mx-auto opacity-60" />
-                    <p className="text-xs text-[#839493]">
+                  <div className="p-10 text-center border border-line-subtle bg-surface-2 rounded-card space-y-3">
+                    <MessageSquare className="w-6 h-6 text-ink-muted mx-auto opacity-60" />
+                    <p className="text-xs text-ink-muted">
                       No posts found{searchQuery ? ' matching your search' : ' in this board yet'}.
                     </p>
                     {!searchQuery && canStartTopic && (
-                      <button
+                      <HudButton
+                        type="button"
+                        variant="secondary"
+                        size="sm"
                         onClick={() => composerRef.current?.expandAndFocus()}
-                        className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all"
                       >
                         Start a Discussion
-                      </button>
+                      </HudButton>
                     )}
                   </div>
                 ) : (
@@ -313,31 +319,31 @@ function ForumBoardPage() {
           {/* Right Column (4 cols): Board Context & Quick Navigation */}
           <div className="lg:col-span-4 flex flex-col space-y-3.5 sm:space-y-5">
             {/* Board Directive Card */}
-            <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl space-y-2.5">
-              <div className="flex items-center gap-2 border-b border-[#3a4a49] pb-2.5">
-                <Compass className="w-4 h-4 text-[#00ffff]" />
-                <h3 className="font-grotesk text-xs sm:text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
+            <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 space-y-2.5">
+              <div className="flex items-center gap-2 border-b border-line-subtle pb-2.5">
+                <Compass className="w-4 h-4 text-cyan-glow" />
+                <h3 className="font-grotesk text-xs sm:text-sm font-bold text-ink uppercase tracking-[0.08em]">
                   BOARD GUIDE
                 </h3>
               </div>
-              <p className="text-xs text-[#839493] leading-relaxed">
+              <p className="text-xs text-ink-body leading-relaxed">
                 Keep posts focused on {category?.name || 'this board\'s subject'}. Clear, constructive dialogue helps everyone.
               </p>
-              <div className="chitin-card-inset p-2.5 border border-[#3a4a49] chamfer-corner text-[11px] text-[#dfe3e3] space-y-1">
-                <div className="text-[#00ffff] font-bold">Posting Guidelines:</div>
-                <div className="text-[#839493]">· Check existing threads before posting.</div>
-                <div className="text-[#839493]">· Use descriptive, informative titles.</div>
-                <div className="text-[#839493]">· Respect members of all stages.</div>
+              <div className="p-2.5 border border-line-subtle bg-surface-2 rounded-card text-[11px] text-ink space-y-1">
+                <div className="text-cyan-glow font-bold">Posting Guidelines:</div>
+                <div className="text-ink-body">· Check existing threads before posting.</div>
+                <div className="text-ink-body">· Use descriptive, informative titles.</div>
+                <div className="text-ink-body">· Respect members of all stages.</div>
               </div>
             </div>
 
             {/* Other Discussion Boards Switcher */}
-            <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl space-y-2.5">
-              <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2.5">
-                <h3 className="font-grotesk text-xs sm:text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
+            <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 space-y-2.5">
+              <div className="flex items-center justify-between border-b border-line-subtle pb-2.5">
+                <h3 className="font-grotesk text-xs sm:text-sm font-bold text-ink uppercase tracking-[0.08em]">
                   OTHER BOARDS
                 </h3>
-                <span className="text-[10px] text-[#839493] font-bold">JUMP TO</span>
+                <span className="text-[11px] text-ink-muted font-bold tracking-[0.08em]">JUMP TO</span>
               </div>
               <div className="space-y-1.5 font-sans">
                 {otherCategories.map((c) => (
@@ -345,18 +351,18 @@ function ForumBoardPage() {
                     key={c.id}
                     to="/forum/$categorySlug"
                     params={{ categorySlug: c.slug }}
-                    className="chitin-card-inset p-2 border border-[#3a4a49] hover:border-[#00ffff]/60 chamfer-corner flex items-center justify-between group transition-all"
+                    className="p-2 border border-line-subtle bg-surface-2 hover:bg-surface-3 hover:border-line-strong rounded-control flex items-center justify-between group transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <span
                         className="w-2 h-2 rounded-full shrink-0"
                         style={{ backgroundColor: c.color }}
                       />
-                      <span className="text-xs text-[#dfe3e3] group-hover:text-[#00ffff] font-bold uppercase truncate transition-colors">
+                      <span className="text-xs text-ink group-hover:text-cyan-glow font-bold uppercase truncate transition-colors">
                         {c.name}
                       </span>
                     </div>
-                    <ChevronRight className="w-3 h-3 text-[#839493] group-hover:text-[#00ffff] group-hover:translate-x-0.5 transition-all shrink-0" />
+                    <ChevronRight className="w-3 h-3 text-ink-muted group-hover:text-cyan-glow group-hover:translate-x-0.5 transition-all shrink-0" />
                   </Link>
                 ))}
               </div>

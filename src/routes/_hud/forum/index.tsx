@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
+import { HudButton } from '@/components/ui/HudButton'
 import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
 import { InlineTopicComposer, InlineTopicComposerHandle } from '@/components/forum/InlineTopicComposer'
 import { ForumRulesDialog } from '@/components/forum/ForumRulesDialog'
@@ -173,20 +174,24 @@ function ForumIndexPage() {
           description="Discussions, questions, and ideas across every stage of the Order."
           actions={
             <>
-              <button
+              <HudButton
+                type="button"
+                variant="secondary"
+                size="sm"
                 onClick={() => setShowRules(true)}
-                className="px-3.5 py-1.5 bg-[#070b0b] hover:bg-[#171c1c] border border-[#3a4a49] hover:border-[#00ffff]/50 text-[#dfe3e3] text-xs font-bold uppercase tracking-wider chamfer-corner transition-all flex items-center gap-1.5"
+                icon={<ShieldCheck className="w-3.5 h-3.5 text-cyan-glow" />}
               >
-                <ShieldCheck className="w-3.5 h-3.5 text-[#00ffff]" />
                 <span>Rules</span>
-              </button>
-              <button
+              </HudButton>
+              <HudButton
+                type="button"
+                variant="primary"
+                size="sm"
                 onClick={() => composerRef.current?.expandAndFocus()}
-                className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] text-black text-xs font-bold uppercase tracking-wider chamfer-corner shadow-[0_0_12px_rgba(0,255,255,0.25)] transition-all flex items-center gap-1.5"
+                icon={<Plus className="w-4 h-4" />}
               >
-                <Plus className="w-4 h-4" />
                 <span>New Post</span>
-              </button>
+              </HudButton>
             </>
           }
         />
@@ -194,11 +199,11 @@ function ForumIndexPage() {
         {/* Bento Discussion Boards Grid */}
         <section className="space-y-2.5">
           <div className="flex items-center justify-between">
-            <h2 className="font-grotesk text-xs sm:text-sm font-bold text-[#dfe3e3] tracking-wider uppercase flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-[#00ffff]" />
+            <h2 className="font-grotesk text-xs sm:text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
+              <MessageSquare className="w-4 h-4 text-cyan-glow" />
               Discussion Boards
             </h2>
-            <span className="text-[10px] font-sans font-bold text-[#839493]">
+            <span className="text-[11px] font-sans font-bold tracking-[0.08em] text-ink-muted">
               {categoriesState.length} BOARDS ACTIVE
             </span>
           </div>
@@ -209,7 +214,7 @@ function ForumIndexPage() {
                 key={cat.id}
                 to="/forum/$categorySlug"
                 params={{ categorySlug: cat.slug }}
-                className="chitin-card p-4 sm:p-5 chamfer-corner hover:border-[#00ffff]/80 transition-all duration-300 group flex flex-col justify-between space-y-3 relative overflow-hidden bg-[#070b0b] min-h-[165px] sm:min-h-[180px] shadow-2xl"
+                className="p-4 sm:p-5 rounded-card border border-line-subtle bg-surface-1 hover:border-line-strong transition-all duration-300 group flex flex-col justify-between space-y-3 relative overflow-hidden min-h-[165px] sm:min-h-[180px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
                 {/* Background Image with Hover Parallax / Zoom */}
                 <img
@@ -219,7 +224,7 @@ function ForumIndexPage() {
                 />
 
                 {/* Dark Gradient Overlay for Sharp Text Legibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-[#070b0b]/75 to-[#070b0b]/35 group-hover:via-[#070b0b]/60 transition-colors pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface-1 via-surface-1/75 to-surface-1/35 group-hover:via-surface-1/60 transition-colors pointer-events-none" />
 
                 {/* Top Accent Color Line */}
                 <div
@@ -230,23 +235,23 @@ function ForumIndexPage() {
                 {/* Top Row: Category Title + Topic Count Badge (No Icons) */}
                 <div className="relative z-10 flex items-start justify-between gap-2.5">
                   <h3
-                    className="font-grotesk font-extrabold text-base sm:text-lg text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase leading-snug drop-shadow-md"
+                    className="font-grotesk font-extrabold text-base sm:text-lg text-ink transition-colors uppercase leading-snug drop-shadow-md"
                     style={{ color: cat.color }}
                   >
                     {cat.name}
                   </h3>
-                  <span className="text-[10px] font-sans font-bold text-[#00ffff] bg-[#070b0b]/90 border border-[#00ffff]/40 px-2 py-0.5 chamfer-corner shrink-0 shadow-md backdrop-blur-sm">
+                  <span className="text-[11px] font-sans font-bold text-cyan-glow bg-surface-1/90 border border-line-subtle px-2 py-0.5 rounded-chip shrink-0 backdrop-blur-sm">
                     {formatForumTopicCount(cat.topicCount)}
                   </span>
                 </div>
 
                 {/* Middle: Description */}
-                <p className="relative z-10 text-xs text-[#dfe3e3]/90 group-hover:text-[#dfe3e3] line-clamp-2 leading-relaxed drop-shadow-sm font-sans">
+                <p className="relative z-10 text-xs text-ink-body group-hover:text-ink line-clamp-2 leading-relaxed drop-shadow-sm font-sans">
                   {cat.description}
                 </p>
 
                 {/* Bottom: Action Footer */}
-                <div className="relative z-10 pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-[10px] font-sans font-bold text-[#839493] group-hover:text-[#00ffff] transition-colors">
+                <div className="relative z-10 pt-2 border-t border-line-subtle flex items-center justify-between text-[11px] font-sans font-bold tracking-[0.08em] text-ink-muted group-hover:text-cyan-glow transition-colors">
                   <span>VIEW BOARD</span>
                   <span className="flex items-center gap-2">
                     {typeof cat.unreadCount === 'number' && cat.unreadCount > 0 && (
@@ -279,28 +284,28 @@ function ForumIndexPage() {
               }}
             />
 
-            <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3.5 sm:space-y-4 h-full flex flex-col justify-between">
+            <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 md:p-5 space-y-3.5 sm:space-y-4 h-full flex flex-col justify-between">
               <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#3a4a49] pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line-subtle pb-3">
                   <div>
-                    <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase flex items-center gap-2">
-                      <Radio className="w-4 h-4 text-[#00ffff]" />
+                    <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
+                      <Radio className="w-4 h-4 text-cyan-glow" />
                       LATEST POSTS
                     </h2>
-                    <p className="text-xs text-[#839493] mt-0.5">
+                    <p className="text-xs text-ink-muted mt-0.5">
                       Recent threads from across the boards.
                     </p>
                   </div>
 
                   {/* Search Bar */}
                   <div className="relative w-full sm:w-48 shrink-0">
-                    <Search className="w-3.5 h-3.5 text-[#839493] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                    <Search className="w-3.5 h-3.5 text-ink-muted absolute left-2.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search posts..."
-                      className="w-full pl-8 pr-2.5 py-1 bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] text-xs text-[#dfe3e3] outline-none chamfer-corner transition-colors placeholder:text-[#839493]/50"
+                      className="w-full pl-8 pr-2.5 py-1 bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-none rounded-control transition-colors placeholder:text-ink-muted"
                     />
                   </div>
                 </div>
@@ -309,10 +314,10 @@ function ForumIndexPage() {
                 <div className="flex items-center gap-1 overflow-x-auto pb-1">
                   <button
                     onClick={() => setSelectedCategoryFilter('ALL')}
-                    className={`px-2 py-0.5 text-[9px] font-bold font-sans transition-all chamfer-corner border shrink-0 ${
+                    className={`px-2 py-0.5 text-[11px] font-bold font-sans tracking-[0.08em] transition-all rounded-control border-b-2 shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                       selectedCategoryFilter === 'ALL'
-                        ? 'bg-[#00ffff]/20 text-[#00ffff] border-[#00ffff]'
-                        : 'bg-[#070b0b] text-[#839493] border-[#3a4a49] hover:text-[#dfe3e3]'
+                        ? 'bg-surface-2 text-ink border-cyan-glow'
+                        : 'border-transparent text-ink-muted hover:text-ink hover:bg-surface-2'
                     }`}
                   >
                     ALL BOARDS
@@ -321,10 +326,10 @@ function ForumIndexPage() {
                     <button
                       key={cat.id}
                       onClick={() => setSelectedCategoryFilter(cat.slug)}
-                      className={`px-2 py-0.5 text-[9px] font-bold font-sans transition-all chamfer-corner border shrink-0 ${
+                      className={`px-2 py-0.5 text-[11px] font-bold font-sans tracking-[0.08em] transition-all rounded-control border-b-2 shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                         selectedCategoryFilter === cat.slug
-                          ? 'bg-[#00ffff]/20 text-[#00ffff] border-[#00ffff]'
-                          : 'bg-[#070b0b] text-[#839493] border-[#3a4a49] hover:text-[#dfe3e3]'
+                          ? 'bg-surface-2 text-ink border-cyan-glow'
+                          : 'border-transparent text-ink-muted hover:text-ink hover:bg-surface-2'
                       }`}
                     >
                       {cat.name.toUpperCase()}
@@ -335,7 +340,7 @@ function ForumIndexPage() {
                 {/* Topics Stream List */}
                 <div className="space-y-2">
                   {filteredTopics.length === 0 ? (
-                    <div className="p-8 text-center text-xs text-[#839493] chitin-card-inset chamfer-corner border border-[#3a4a49]">
+                    <div className="p-8 text-center text-xs text-ink-muted border border-line-subtle bg-surface-2 rounded-card">
                       No posts found{searchQuery ? ' matching your search' : ' in this board'}.
                     </div>
                   ) : (
@@ -351,60 +356,60 @@ function ForumIndexPage() {
           {/* Right Column (5 cols): Sidebar Modules */}
           <div className="lg:col-span-5 flex flex-col space-y-3.5 sm:space-y-5">
             {/* Sidebar Card 1: Community Directives */}
-            <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
-              <div className="flex items-center justify-between border-b border-[#3a4a49] pb-3">
+            <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 md:p-5 space-y-3">
+              <div className="flex items-center justify-between border-b border-line-subtle pb-3">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-[#00ffff]" />
+                  <ShieldCheck className="w-4 h-4 text-cyan-glow" />
                   <div>
-                    <h3 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase">
+                    <h3 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">
                       COMMUNITY RULES
                     </h3>
-                    <p className="text-xs text-[#839493]">
+                    <p className="text-xs text-ink-muted">
                       How we keep the boards healthy.
                     </p>
                   </div>
                 </div>
-                <span className="text-[10px] font-sans font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00ffff]/30 px-2 py-0.5 chamfer-corner">
+                <span className="text-[11px] font-sans font-bold tracking-[0.08em] text-cyan-glow bg-cyan-soft border border-line-subtle px-2 py-0.5 rounded-chip">
                   STANDARDS
                 </span>
               </div>
 
               <div className="space-y-2 font-sans text-xs">
-                <div className="chitin-card-inset p-2.5 border border-[#3a4a49] chamfer-corner space-y-0.5">
-                  <div className="font-grotesk font-bold text-[11px] text-[#dfe3e3] uppercase">
+                <div className="p-2.5 border border-line-subtle bg-surface-2 rounded-card space-y-0.5">
+                  <div className="font-grotesk font-bold text-[11px] text-ink uppercase">
                     1. Constructive Discourse
                   </div>
-                  <p className="text-[11px] text-[#839493] leading-snug">
+                  <p className="text-[11px] text-ink-body leading-snug">
                     Keep discussion positive and useful for every stage.
                   </p>
                 </div>
 
-                <div className="chitin-card-inset p-2.5 border border-[#3a4a49] chamfer-corner space-y-0.5">
-                  <div className="font-grotesk font-bold text-[11px] text-[#dfe3e3] uppercase">
+                <div className="p-2.5 border border-line-subtle bg-surface-2 rounded-card space-y-0.5">
+                  <div className="font-grotesk font-bold text-[11px] text-ink uppercase">
                     2. Keep Secrets Private
                   </div>
-                  <p className="text-[11px] text-[#839493] leading-snug">
+                  <p className="text-[11px] text-ink-body leading-snug">
                     Never share credentials, API keys, or private tokens in public posts.
                   </p>
                 </div>
 
-                <div className="chitin-card-inset p-2.5 border border-[#3a4a49] chamfer-corner space-y-0.5">
-                  <div className="font-grotesk font-bold text-[11px] text-[#dfe3e3] uppercase">
+                <div className="p-2.5 border border-line-subtle bg-surface-2 rounded-card space-y-0.5">
+                  <div className="font-grotesk font-bold text-[11px] text-ink uppercase">
                     3. Safety & Warmth
                   </div>
-                  <p className="text-[11px] text-[#839493] leading-snug">
+                  <p className="text-[11px] text-ink-body leading-snug">
                     Beneath the dark HUD look, mutual growth is non-negotiable.
                   </p>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-xs">
-                <span className="text-[#839493] text-[10px]">
+              <div className="pt-2 border-t border-line-subtle flex items-center justify-between text-xs">
+                <span className="text-ink-muted text-[11px] tracking-[0.08em]">
                   5 RULES ACTIVE
                 </span>
                 <button
                   onClick={() => setShowRules(true)}
-                  className="px-3 py-1 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 text-[#00ffff] border border-[#00ffff]/50 text-[10px] font-bold chamfer-corner flex items-center gap-1 transition-all"
+                  className="px-3 py-1 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong text-[11px] font-bold tracking-[0.08em] flex items-center gap-1 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   <span>FULL RULES</span>
                   <ChevronRight className="w-3 h-3" />
@@ -413,45 +418,45 @@ function ForumIndexPage() {
             </div>
 
             {/* Sidebar Card 2: Community Pulse / Vitals */}
-            <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
-              <div className="flex items-center justify-between border-b border-[#3a4a49] pb-3">
+            <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 md:p-5 space-y-3">
+              <div className="flex items-center justify-between border-b border-line-subtle pb-3">
                 <div className="flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-[#00ffff]" />
+                  <Activity className="w-4 h-4 text-cyan-glow" />
                   <div>
-                    <h3 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase">
+                    <h3 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">
                       COMMUNITY PULSE
                     </h3>
-                    <p className="text-xs text-[#839493]">
+                    <p className="text-xs text-ink-muted">
                       Network metrics & activity.
                     </p>
                   </div>
                 </div>
-                <span className="text-[10px] font-sans font-bold text-[#39ff14] bg-[#39ff14]/10 border border-[#39ff14]/30 px-2 py-0.5 chamfer-corner">
+                <span className="text-[11px] font-sans font-bold tracking-[0.08em] text-emerald-400 bg-emerald-500/15 border border-line-subtle px-2 py-0.5 rounded-chip">
                   SYNCHRONIZED
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-2 font-sans">
-                <div className="chitin-card-inset p-2.5 border border-[#3a4a49] chamfer-corner space-y-0.5">
-                  <span className="text-[10px] text-[#839493] uppercase font-bold">TOTAL TOPICS</span>
-                  <div className="font-grotesk font-bold text-base text-[#dfe3e3]">
+                <div className="p-2.5 border border-line-subtle bg-surface-2 rounded-card space-y-0.5">
+                  <span className="text-[11px] text-ink-muted uppercase font-bold tracking-[0.08em]">TOTAL TOPICS</span>
+                  <div className="font-grotesk font-bold text-base text-ink">
                     {totalTopicsCount}
                   </div>
                 </div>
-                <div className="chitin-card-inset p-2.5 border border-[#3a4a49] chamfer-corner space-y-0.5">
-                  <span className="text-[10px] text-[#839493] uppercase font-bold">ACTIVE BOARDS</span>
-                  <div className="font-grotesk font-bold text-base text-[#00ffff]">
+                <div className="p-2.5 border border-line-subtle bg-surface-2 rounded-card space-y-0.5">
+                  <span className="text-[11px] text-ink-muted uppercase font-bold tracking-[0.08em]">ACTIVE BOARDS</span>
+                  <div className="font-grotesk font-bold text-base text-cyan-glow">
                     {categoriesState.length}
                   </div>
                 </div>
               </div>
 
-              <div className="chitin-card-inset p-2.5 border border-[#3a4a49] chamfer-corner flex items-center justify-between text-xs">
+              <div className="p-2.5 border border-line-subtle bg-surface-2 rounded-card flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-3.5 h-3.5 text-[#00ffff]" />
-                  <span className="text-[11px] text-[#dfe3e3]">Open Access for All Stages</span>
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-glow" />
+                  <span className="text-[11px] text-ink-body">Open Access for All Stages</span>
                 </div>
-                <span className="text-[9px] text-[#00ffff] font-bold">STAGE 1–4</span>
+                <span className="text-[11px] text-cyan-glow font-bold">STAGE 1–4</span>
               </div>
             </div>
           </div>

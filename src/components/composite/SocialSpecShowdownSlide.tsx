@@ -1,8 +1,17 @@
 import React from 'react'
 import { CompositeContainer, CompositeAspectRatio } from './CompositeContainer'
 import { MascotOverlay, MascotKey } from './MascotOverlay'
-import { MoltNationLogo } from '@/components/news/MoltNationLogo'
-import { ArrowRight } from 'lucide-react'
+import { isCrabMascot } from '@/lib/mascots'
+import { displayCopy } from '@/lib/composite-copy'
+import {
+  CompositeBrand,
+  CompositeBullets,
+  CompositeFooter,
+  CompositeHeadline,
+  CompositeLabel,
+  CompositePanel,
+  CompositePill,
+} from './CompositeKit'
 
 export interface SpecCard {
   number: string
@@ -58,105 +67,46 @@ export const SocialSpecShowdownSlide: React.FC<SocialSpecShowdownSlideProps> = (
   ],
   mascot = 'crab_stats',
   backgroundImageUrl,
-  swipeCta = 'SWIPE FOR ASCENSION PROTOCOL',
+  swipeCta = 'Swipe for the protocol',
 }) => {
+  const hasMascot = Boolean(mascot && mascot !== 'none')
   return (
-    <CompositeContainer
-      aspectRatio={aspectRatio}
-      backgroundImageUrl={backgroundImageUrl}
-      showScanlines={true}
-      showCornerBrackets={false}
-    >
-      {/* 1. Category Pill Badge */}
-      <div className="flex items-center gap-3">
-        <div className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-xl bg-cyan-950/70 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,195,255,0.25)]">
-          <span className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse" />
-          <span className="font-mono font-bold text-lg tracking-widest text-cyan-300 uppercase">
-            {categoryBadge}
-          </span>
-        </div>
+    <CompositeContainer aspectRatio={aspectRatio} backgroundImageUrl={backgroundImageUrl}>
+      <div className="flex items-start justify-between gap-6">
+        <CompositePill>{categoryBadge}</CompositePill>
+        <CompositeBrand size="sm" />
       </div>
 
-      {/* 2. Headline */}
-      <div className="mt-4">
-        <h1 className="text-[72px] leading-[1.0] [text-wrap:balance] font-black text-white tracking-tight uppercase">
-          {headline}
-        </h1>
-      </div>
+      <CompositeHeadline lines={[headline]} size={76} className="mt-7" />
 
-      {/* 3. Three Structured Comparison Cards */}
-      <div className="flex-1 flex flex-col justify-center gap-5 py-7">
+      <div className={`flex flex-1 flex-col justify-center gap-5 py-8 ${hasMascot ? 'w-[66%]' : ''}`}>
         {cards.map((card, idx) => {
-          const variantClasses = {
-            red: 'bg-[#1a080c]/90 border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.2)]',
-            cyan: 'bg-[#041822]/90 border-cyan-400/85 shadow-[0_0_20px_rgba(0,255,230,0.25)]',
-            sky: 'bg-[#061a26]/90 border-sky-400/80 shadow-[0_0_20px_rgba(56,189,248,0.2)]',
-            dark: 'bg-[#081014]/90 border-slate-700',
-          }[card.variant || 'cyan']
-
-          const headerColor = {
-            red: 'text-red-400',
-            cyan: 'text-cyan-400',
-            sky: 'text-sky-400',
-            dark: 'text-slate-300',
-          }[card.variant || 'cyan']
-
+          const tone = card.variant === 'red' ? 'crimson' : card.variant === 'dark' ? 'neutral' : 'cyan'
           return (
-            <div
-              key={idx}
-              className={`w-[60%] p-7 rounded-2xl border backdrop-blur-md transition-all ${variantClasses}`}
-            >
-              <div className="flex items-center gap-3">
-                <span className="px-3 py-1 rounded-md bg-black/50 border border-white/25 font-mono font-black text-base text-white">
-                  {card.number}
-                </span>
-                <span className={`font-mono font-bold text-[21px] leading-tight tracking-wider uppercase ${headerColor}`}>
-                  {card.title}
-                </span>
+            <CompositePanel key={idx} tone={card.variant === 'sky' ? 'neutral' : tone} className="p-6">
+              <div className="flex items-baseline gap-4">
+                <span className="text-[18px] font-bold tabular-nums text-ink-muted">{card.number}</span>
+                <CompositeLabel tone={tone}>{displayCopy(card.title)}</CompositeLabel>
               </div>
-
-              <div className="mt-3 font-mono font-black text-[48px] leading-[1.05] text-white tracking-tight">
-                {card.metric}
-              </div>
-
+              <div className="mt-3 text-[46px] font-bold leading-[1.05] tracking-[-0.02em] text-ink">{displayCopy(card.metric)}</div>
               {card.description && (
-                <p className="mt-2.5 text-[20px] text-slate-200 font-sans leading-snug">
-                  {card.description}
-                </p>
+                <p className="mt-2.5 text-[20px] leading-snug text-ink-body">{displayCopy(card.description)}</p>
               )}
-
-              {card.bullets && (
-                <ul className="mt-3 space-y-2 text-[18px] text-slate-200">
-                  {card.bullets.map((b, i) => (
-                    <li key={i} className="flex items-center gap-2.5">
-                      <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0" />
-                      <span className="font-medium">{b}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+              {card.bullets && <CompositeBullets items={card.bullets} size={19} className="mt-3 space-y-2" />}
+            </CompositePanel>
           )
         })}
-
-        {/* Mascot overlay */}
-        <MascotOverlay
-          mascot={mascot}
-          position="bottom-right"
-          width={360}
-          className="bottom-28 -right-2"
-        />
       </div>
 
-      {/* 4. Bottom Navigation & Logo */}
-      <div className="pt-5 flex items-center justify-between border-t border-slate-800/80">
-        <div className="flex items-center gap-3 font-mono font-bold text-[22px] text-slate-300">
-          <span>{swipeCta}</span>
-          <ArrowRight className="w-7 h-7 text-cyan-400 animate-pulse" />
-        </div>
+      <CompositeFooter cue={swipeCta} right={null} className={hasMascot ? 'w-[66%]' : ''} />
 
-        <MoltNationLogo size="md" theme="dark" />
-      </div>
+      <MascotOverlay
+        mascot={mascot}
+        position="bottom-right"
+        width={isCrabMascot(mascot) ? 360 : 300}
+        glow={false}
+        className="bottom-6 right-4"
+      />
     </CompositeContainer>
   )
 }

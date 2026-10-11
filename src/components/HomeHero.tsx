@@ -5,6 +5,7 @@ import { LandingAuthCtaSkeleton } from '@/components/LandingAuthCtaSkeleton'
 import { getAssetUrl } from '@/lib/assets'
 import { eagerImageProps } from '@/lib/media-priority'
 import { HeroParticleField } from '@/components/home/hero-particles/HeroParticleField'
+import { HeroSeascape } from '@/components/home/HeroSeascape'
 
 const LazyLandingAuthCtas = React.lazy(() =>
   import('@/components/LandingAuthCtas').then((m) => ({ default: m.LandingAuthCtas }))
@@ -39,16 +40,15 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
     <section
       ref={sectionRef}
       aria-labelledby="home-hero-title"
-      className="relative w-full overflow-hidden bg-[#020408] pt-28 sm:pt-32 lg:pt-28"
+      className="home-hero relative w-full overflow-hidden bg-[#020408] pt-28 sm:pt-32 lg:pt-28"
     >
       {/*
-        The first screen is a particle field: static that calms and calcifies into a shell, with
-        new noise streaming around it. It is drawn on a canvas loaded after hydration, so the
-        headline and copy below are plain server-rendered HTML and paint first. On phones the
-        shell sits below the copy, so the stage covers the whole section there.
+        A server-rendered night sea sits behind the shell and copy on first paint. The particle
+        canvas loads after hydration. On phones the shell sits below the copy, so the stage
+        covers the whole section there.
       */}
       <div className="home-hero-stage absolute inset-0 lg:bottom-auto lg:h-[100svh] lg:min-h-[760px] pointer-events-none select-none" aria-hidden="true">
-        <div className="home-hero-depth absolute inset-0" />
+        <HeroSeascape />
         <HeroParticleField anchorRef={shellRef} hostRef={sectionRef} className="absolute inset-0 h-full w-full" />
         <div className="home-hero-veil absolute inset-0" />
       </div>
@@ -61,7 +61,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
         />
 
         <div className="relative order-1 text-center lg:text-left">
-          <p className="home-hero-rise inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-[#04161c]/70 backdrop-blur-md px-3.5 py-1.5 text-xs sm:text-sm text-cyan-100">
+          <p className="home-hero-rise inline-flex items-center gap-2 rounded-chip border border-line bg-surface-1/70 backdrop-blur-md px-3.5 py-1.5 text-xs sm:text-sm text-ink-body">
             <span className="relative flex h-2 w-2" aria-hidden="true">
               <span className="absolute inline-flex h-full w-full rounded-full bg-[#00ffcc] opacity-60 motion-safe:animate-ping" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00ffcc]" />
@@ -96,11 +96,11 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
             </Suspense>
           </div>
 
-          <p className="home-hero-rise mt-5 text-sm text-[#9fb0b0]" style={{ animationDelay: '220ms' }}>
+          <p className="home-hero-rise mt-5 text-sm text-ink-muted" style={{ animationDelay: '220ms' }}>
             Not sure where you stand?{' '}
             <Link
               to="/moltmax"
-              className="group inline-flex items-center gap-1 font-semibold text-cyan-300 hover:text-cyan-200 underline-offset-4 hover:underline"
+              className="group inline-flex items-center gap-1 rounded-control font-semibold text-cyan-glow hover:text-cyan-hover underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               Take the free Moltmax diagnostic
               <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
@@ -108,7 +108,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
           </p>
 
           <ul
-            className="home-hero-rise mt-7 sm:mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-sm text-[#dfe3e3]"
+            className="home-hero-rise mt-7 sm:mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-sm text-ink-body"
             style={{ animationDelay: '280ms' }}
             aria-label="What you get"
           >
@@ -129,13 +129,13 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
           <div className="relative rounded-t-[2.25rem] sm:rounded-t-[1.25rem] border-[6px] sm:border border-b-0 sm:border-b-0 border-[#0f1d22] sm:border-cyan-300/25 ring-1 ring-cyan-300/25 sm:ring-0 bg-[#061014]/95 shadow-[0_-20px_80px_rgba(0,195,255,0.18)] overflow-hidden">
             {/* Phone: a notch. Wider screens: browser chrome. */}
             <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 z-10 h-5 w-20 rounded-full bg-black" aria-hidden="true" />
-            <div className="hidden sm:flex items-center gap-3 px-4 h-10 border-b border-white/[0.06] bg-[#0a161b]">
+            <div className="hidden sm:flex items-center gap-3 px-4 h-10 border-b border-line-subtle bg-surface-2">
               <div className="flex gap-1.5" aria-hidden="true">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]/80" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]/80" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]/80" />
               </div>
-              <div className="mx-auto max-w-[260px] w-full rounded-md bg-white/[0.05] border border-white/[0.06] px-3 py-0.5 text-[11px] text-white/55 text-center truncate">
+              <div className="mx-auto max-w-[260px] w-full rounded-control bg-surface-1 border border-line-subtle px-3 py-0.5 text-[11px] text-ink-muted text-center truncate">
                 moltology.org/dashboard
               </div>
               <div className="w-[42px]" aria-hidden="true" />
@@ -156,7 +156,8 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
               </picture>
             </div>
           </div>
-          <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#020408] via-[#020408]/70 to-transparent pointer-events-none" aria-hidden="true" />
+          {/* Wider than the device so its ring and glow sink into the page colour too, leaving no edge where the next section starts. */}
+          <div className="absolute -inset-x-16 -bottom-px h-2/3 bg-gradient-to-t from-[#020408] from-[8%] via-[#020408]/70 to-transparent pointer-events-none" aria-hidden="true" />
         </div>
       </div>
     </section>

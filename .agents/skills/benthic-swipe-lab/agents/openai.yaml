@@ -1,0 +1,4 @@
+interface:
+  display_name: "Benthic Swipe Lab"
+  short_description: "Create Moltology posts from saved inspiration formats"
+  default_prompt: "Use $benthic-swipe-lab to create an original Moltology field kit inspired by the saved Instagram collection."

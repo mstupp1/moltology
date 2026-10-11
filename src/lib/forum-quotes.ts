@@ -97,7 +97,7 @@ function stripQuotePrefix(line: string): string | null {
   return null
 }
 
-function parseAttribution(line: string): ForumQuoteAttribution | null {
+export function parseForumQuoteAttribution(line: string): ForumQuoteAttribution | null {
   const match = line.match(ATTRIBUTION_RE)
   if (!match) return null
   const handle = match[1] ?? null
@@ -124,7 +124,7 @@ export function parseForumContentBlocks(content: string): ForumContentBlock[] {
         innerLines.push(next)
         i += 1
       }
-      const attribution = parseAttribution(innerLines[0] ?? '')
+      const attribution = parseForumQuoteAttribution(innerLines[0] ?? '')
       const inner = (attribution ? innerLines.slice(1) : innerLines).join('\n')
       blocks.push({ type: 'quote', attribution, inner })
       continue

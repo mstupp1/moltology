@@ -11,9 +11,9 @@ describe('HUDPageLoader Component', () => {
     expect(statusEl).toBeInTheDocument()
     expect(statusEl).toHaveAttribute('aria-label', 'Loading')
 
-    const emblem = screen.getByAltText('Loading')
+    const emblem = screen.getByRole('img', { name: 'Loading' })
     expect(emblem).toBeInTheDocument()
-    expect(emblem).toHaveAttribute('src', '/images/order_emblem.webp')
+    expect(emblem.tagName.toLowerCase()).toBe('svg')
   })
 
   it('renders cleanly without extra text paragraphs or boot logs', () => {

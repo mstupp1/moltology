@@ -48,7 +48,7 @@ describe('MarketShopPage', () => {
 
   it('increases Molt Credits when purchasing a pack', () => {
     renderMarket()
-    const starterCard = screen.getByText('Starter Drip').closest('.chitin-card-inset')
+    const starterCard = screen.getByText('Starter Drip').closest('.market-pack-card')
     expect(starterCard).toBeTruthy()
     fireEvent.click(within(starterCard as HTMLElement).getByRole('button', { name: /Buy/i }))
     expect(screen.getByText('1,950')).toBeInTheDocument()
@@ -57,7 +57,7 @@ describe('MarketShopPage', () => {
   it('deducts gems when unlocking a vault cosmetic', () => {
     renderMarket()
     fireEvent.click(screen.getByRole('tab', { name: /Gem Vault/i }))
-    const polishCard = screen.getByText('Shell Polish Kit').closest('.chitin-card-inset')
+    const polishCard = screen.getByText('Shell Polish Kit').closest('.market-vault-card')
     expect(polishCard).toBeTruthy()
     fireEvent.click(within(polishCard as HTMLElement).getByRole('button'))
     expect(screen.getByText('Unlocked')).toBeInTheDocument()

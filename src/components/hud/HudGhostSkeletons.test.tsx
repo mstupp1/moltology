@@ -5,7 +5,6 @@ import {
   LaunchpadCarouselGhost,
   DailyRoutineGhost,
   DashboardNewsGhost,
-  SubterraneanHubGhost,
   ActivityFeedGhost,
   HudWorkspaceGhost,
 } from './HudGhostSkeletons'
@@ -23,11 +22,6 @@ describe('HudGhostSkeletons Composite Views', () => {
 
   it('renders DashboardNewsGhost without crashing', () => {
     const { container } = render(<DashboardNewsGhost />)
-    expect(container.firstChild).toBeInTheDocument()
-  })
-
-  it('renders SubterraneanHubGhost without crashing', () => {
-    const { container } = render(<SubterraneanHubGhost />)
     expect(container.firstChild).toBeInTheDocument()
   })
 

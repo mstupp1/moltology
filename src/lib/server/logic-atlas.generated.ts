@@ -7,18 +7,18 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-10-08",
+  "syncedAt": "2026-10-10",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 11,
-    "rules": 96,
-    "decisions": 35,
-    "anchors": 169,
-    "drifted": 15,
-    "flagged": 12
+    "rules": 101,
+    "decisions": 36,
+    "anchors": 179,
+    "drifted": 16,
+    "flagged": 13
   },
   "canvas": {
-    "width": 5693,
+    "width": 5737,
     "height": 2820
   },
   "domains": [
@@ -31,8 +31,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "box": {
         "x": 0,
         "y": 0,
-        "width": 1488,
-        "height": 520
+        "width": 1532,
+        "height": 676
       },
       "ruleIds": [
         "economy.two-currencies",
@@ -41,7 +41,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "economy.starting-balances",
         "economy.market-catalog",
         "economy.market-local-preview",
-        "economy.simulated-gem-grants"
+        "economy.simulated-gem-grants",
+        "economy.cosmetics-no-stats",
+        "economy.look-slots",
+        "economy.starter-looks"
       ]
     },
     {
@@ -51,7 +54,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Daily liturgies earn XP into an append-only ledger. Stage and clearance are derived from lifetime XP, never set directly.",
       "overviewHtml": "<p>Progression is the earned half of the economy. The XP ledger is the source of truth, and <code>profiles.xp</code> and <code>profiles.stage</code> are caches rebuilt from it after every change.</p>",
       "box": {
-        "x": 1584,
+        "x": 1628,
         "y": 0,
         "width": 948,
         "height": 988
@@ -75,7 +78,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Two roles, user and admin. Server functions verify the caller's JWT, then check the role before any staff action.",
       "overviewHtml": "<p>Access has two layers. The UI hides staff tools from everyone else, and each server function checks the role again, because the client can be skipped.</p>",
       "box": {
-        "x": 2628,
+        "x": 2672,
         "y": 0,
         "width": 1196,
         "height": 676
@@ -99,7 +102,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Self-hosted Better Auth with email and password plus Google. Sessions are cookie-cached, and writes use short-lived JWTs.",
       "overviewHtml": "<p>Auth moved off Managed Neon Auth because its background polling kept Neon compute awake and blew the compute budget. Identity for writes is always a verified JWT, never a client-supplied id.</p>",
       "box": {
-        "x": 3920,
+        "x": 3964,
         "y": 0,
         "width": 1773,
         "height": 538
@@ -258,7 +261,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "data.retention-dry-run",
         "data.canonical-content",
         "data.migrations-via-ci",
-        "data.asset-budget"
+        "data.asset-budget",
+        "data.avatar-look-server",
+        "data.avatar-portraits"
       ]
     },
     {
@@ -326,7 +331,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 116,
+        "x": 160,
         "y": 76
       },
       "drift": "ok"
@@ -353,6 +358,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "economy.two-currencies"
       ],
       "usedBy": [
+        "economy.cosmetics-no-stats",
         "progression.stage-from-xp",
         "premium.no-standing",
         "oracle.usage-allowance",
@@ -364,7 +370,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 28,
+        "x": 72,
         "y": 232
       },
       "drift": "ok"
@@ -397,7 +403,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 364,
         "y": 232
       },
       "drift": "ok"
@@ -441,7 +447,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 612,
+        "x": 656,
         "y": 232
       },
       "drift": "ok"
@@ -497,7 +503,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 904,
+        "x": 948,
         "y": 232
       },
       "drift": "ok"
@@ -523,7 +529,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "MarketShopPage",
           "line": 22,
           "value": "MarketShopPage()",
-          "drift": "ok",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx#L22"
         }
       ],
@@ -546,10 +552,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       },
       "flow": null,
       "position": {
-        "x": 904,
+        "x": 948,
         "y": 388
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "economy.simulated-gem-grants",
@@ -580,8 +586,151 @@ export const LOGIC_ATLAS: LogicAtlas = {
       },
       "flow": null,
       "position": {
-        "x": 1196,
+        "x": 1240,
         "y": 232
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "economy.cosmetics-no-stats",
+      "domain": "economy",
+      "title": "Cosmetics carry no stats",
+      "kind": "invariant",
+      "status": "active",
+      "statement": "Cosmetic items change only how the avatar looks. They add nothing to loadout stats, so no look can be bought or worn for an advantage.",
+      "anchors": [
+        {
+          "file": "src/lib/chassis-loadout.ts",
+          "symbol": "computeLoadoutTotals",
+          "line": 275,
+          "value": "computeLoadoutTotals(items, catalogById)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L275"
+        },
+        {
+          "file": "src/lib/chassis-loadout.ts",
+          "symbol": "isCosmetic",
+          "line": 247,
+          "value": "isCosmetic(catalog)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L247"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/chassis-loadout.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "economy.red-line"
+      ],
+      "usedBy": [
+        "economy.look-slots",
+        "economy.starter-looks"
+      ],
+      "decisions": [
+        "equippable-cosmetics"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 72,
+        "y": 388
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "economy.look-slots",
+      "domain": "economy",
+      "title": "Looks have their own slots",
+      "kind": "invariant",
+      "status": "active",
+      "statement": "Cosmetics are worn in six look slots (head, carapace, claws, belt, legs, antennae), one per category, and wearing one takes off the previous look in that slot. Cosmetics are refused from gear hardpoints and vault cells, and gear is refused from look slots.",
+      "anchors": [
+        {
+          "file": "src/lib/chassis-loadout.ts",
+          "symbol": "planLookChange",
+          "line": 563,
+          "value": "planLookChange(items, catalogById, itemId, wear)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L563"
+        },
+        {
+          "file": "src/lib/chassis-loadout.ts",
+          "symbol": "planGearMove",
+          "line": 387,
+          "value": "planGearMove(items, catalogById, itemId, target, vaultSize)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L387"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/chassis-loadout.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "economy.cosmetics-no-stats"
+      ],
+      "usedBy": [
+        "data.avatar-look-server"
+      ],
+      "decisions": [
+        "equippable-cosmetics"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 28,
+        "y": 544
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "economy.starter-looks",
+      "domain": "economy",
+      "title": "Four starter looks",
+      "kind": "flow",
+      "status": "active",
+      "statement": "Every member is granted four starter cosmetics (Reef Crown, Kelp Sash, Lantern Feelers, Tide Runners) the next time their chassis loads. Grants are skipped for looks they already own.",
+      "anchors": [
+        {
+          "file": "src/lib/equipment-seed-data.ts",
+          "symbol": "STARTER_COSMETIC_CATALOG_IDS",
+          "line": 499,
+          "value": "[ 'b2000000-0000-4000-8000-000000000001', // reef crown 'b2000000-0000-4000-8000-000000000008', // kelp sash 'b2000000-0000-4000-8000-00000000000a', // lantern…",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/equipment-seed-data.ts#L499"
+        },
+        {
+          "file": "src/lib/chassis-loadout.ts",
+          "symbol": "planStarterCosmetics",
+          "line": 621,
+          "value": "planStarterCosmetics(existing, catalogIdsPresent, starterIds)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L621"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/equipment-seed-data.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/equipment-seed-data.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "economy.cosmetics-no-stats"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "equippable-cosmetics"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 320,
+        "y": 544
       },
       "drift": "ok"
     },
@@ -680,10 +829,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3478,
+          "line": 3490,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3478"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3490"
         }
       ],
       "tests": [
@@ -730,10 +879,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3478,
+          "line": 3490,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3478"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3490"
         }
       ],
       "tests": [
@@ -768,10 +917,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3301,
+          "line": 3313,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3301"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3313"
         },
         {
           "file": "src/lib/progression.ts",
@@ -906,10 +1055,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3301,
+          "line": 3313,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3301"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3313"
         }
       ],
       "tests": [],
@@ -1153,23 +1302,23 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Hidden pages",
       "kind": "gate",
       "status": "active",
-      "statement": "Pages listed in HIDDEN_PAGES (Subterranean Vats, Premium, and the merch Store) stay out of navigation and search for members and show a plain unavailable notice. Staff see them faded in the sidebar and can open them.",
+      "statement": "Pages listed in HIDDEN_PAGES (Premium and the merch Store) stay out of navigation and search for members and show a plain unavailable notice. Staff see them faded in the sidebar and can open them.",
       "anchors": [
         {
           "file": "src/lib/hidden-pages.ts",
           "symbol": "HIDDEN_PAGES",
           "line": 8,
-          "value": "[ { id: 'subterranean', path: '/subterranean', }, { id: 'premium', path: '/premium', }, { id: 'store', path: '/store', }, ] as const",
+          "value": "[ { id: 'premium', path: '/premium', }, { id: 'store', path: '/store', }, ] as const",
           "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/hidden-pages.ts#L8"
         },
         {
           "file": "src/lib/hidden-pages.ts",
           "symbol": "canViewHiddenPages",
-          "line": 47,
+          "line": 43,
           "value": "canViewHiddenPages(user, profileRole)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/hidden-pages.ts#L47"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/hidden-pages.ts#L43"
         }
       ],
       "tests": [
@@ -1193,7 +1342,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 388
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "access.admin-only-paths",
@@ -2364,10 +2513,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "submitLeadHandler",
-          "line": 3067,
+          "line": 3077,
           "value": "submitLeadHandler(args)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3067"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3077"
         }
       ],
       "tests": [
@@ -3006,18 +3155,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumTopicHandler",
-          "line": 1559,
+          "line": 1569,
           "value": "createForumTopicHandler({ data, context })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1559"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1569"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "requirePublishableForumPost",
-          "line": 893,
+          "line": 903,
           "value": "requirePublishableForumPost(input)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L893"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L903"
         }
       ],
       "tests": [
@@ -3320,18 +3469,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/community-rules.ts",
           "symbol": "FORUM_WRITE_RATE_LIMIT",
-          "line": 70,
+          "line": 71,
           "value": "10",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L70"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L71"
         },
         {
           "file": "src/lib/community-rules.ts",
           "symbol": "FORUM_WRITE_RATE_WINDOW_MS",
-          "line": 71,
+          "line": 72,
           "value": "60 * 1000",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L71"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L72"
         },
         {
           "file": "src/lib/ai/guardrails.ts",
@@ -3377,10 +3526,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/community-rules.ts",
           "symbol": "validateForumContent",
-          "line": 124,
+          "line": 125,
           "value": "validateForumContent(title, content)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L124"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L125"
         }
       ],
       "tests": [
@@ -3402,7 +3551,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 520
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "forum.content-safety",
@@ -3678,10 +3827,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertForumAuthor",
-          "line": 901,
+          "line": 911,
           "value": "assertForumAuthor(rowUserId, actorId, action)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L901"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L911"
         }
       ],
       "tests": [
@@ -3716,18 +3865,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/community-rules.ts",
           "symbol": "FORUM_LOCKED_ERROR",
-          "line": 77,
+          "line": 78,
           "value": "'This thread is locked. New replies are closed.'",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L77"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L78"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumPostHandler",
-          "line": 1705,
+          "line": 1715,
           "value": "createForumPostHandler({ data, context })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1705"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1715"
         }
       ],
       "tests": [
@@ -3814,26 +3963,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertCovenantSteward",
-          "line": 2350,
+          "line": 2360,
           "value": "assertCovenantSteward(dbClient, userId, payload)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2350"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2360"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "reviewForumReportHandler",
-          "line": 2653,
+          "line": 2663,
           "value": "reviewForumReportHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2653"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2663"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "removeForumReportTargetHandler",
-          "line": 2723,
+          "line": 2733,
           "value": "removeForumReportTargetHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2723"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2733"
         }
       ],
       "tests": [
@@ -3870,10 +4019,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/community-rules.ts",
           "symbol": "COMMUNITY_RULES",
-          "line": 22,
+          "line": 23,
           "value": "[ { id: 1, title: 'CIVILITY & CONSTRUCTIVE DIALOGUE', shortSummary: 'Maintain intellectual rigor and mutual respect across all initiate stages.', description: …",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L22"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L23"
         }
       ],
       "tests": [
@@ -5020,7 +5169,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 72,
+        "x": 364,
         "y": 208
       },
       "drift": "ok"
@@ -5069,7 +5218,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 72,
+        "x": 364,
         "y": 364
       },
       "drift": "ok"
@@ -5113,7 +5262,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       },
       "flow": null,
       "position": {
-        "x": 28,
+        "x": 320,
         "y": 520
       },
       "drift": "ok"
@@ -5146,7 +5295,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 612,
         "y": 520
       },
       "drift": "ok"
@@ -5216,6 +5365,93 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "position": {
         "x": 612,
         "y": 76
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "data.avatar-look-server",
+      "domain": "data",
+      "title": "Server writes the worn look",
+      "kind": "invariant",
+      "status": "active",
+      "statement": "What a member's avatar wears, and its cached portrait, are written by the server from their equipped gear and worn looks after each gear move, look change, or avatar save. Avatar saves from the app cannot set either field.",
+      "anchors": [
+        {
+          "file": "src/lib/server/db-services.ts",
+          "symbol": "syncAvatarLook",
+          "line": 3770,
+          "value": "syncAvatarLook(dbClient, userId)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3770"
+        },
+        {
+          "file": "src/lib/avatar/config-schema.ts",
+          "symbol": "avatarConfigShape",
+          "line": 19,
+          "value": "{ style: z.string().min(1).max(64), seed: z.string().min(1).max(128), race: z.enum(AVATAR_RACES).optional(), shellColor: z.enum(shellColorIds).optional(), shel…",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/config-schema.ts#L19"
+        }
+      ],
+      "tests": [],
+      "dependsOn": [
+        "economy.look-slots"
+      ],
+      "usedBy": [
+        "data.avatar-portraits"
+      ],
+      "decisions": [
+        "equippable-cosmetics"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 28,
+        "y": 208
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "data.avatar-portraits",
+      "domain": "data",
+      "title": "Portraits are rendered once",
+      "kind": "invariant",
+      "status": "active",
+      "statement": "Avatars drawn with painted art get a 256px WebP portrait rendered on the server when their look changes, stored under a content hash with a one-year immutable cache, and served through the cached media route. Pages show that image instead of drawing the avatar. A failed render keeps the save and falls back to the drawn portrait.",
+      "anchors": [
+        {
+          "file": "src/lib/server/avatar-portrait.ts",
+          "symbol": "renderAvatarPortrait",
+          "line": 77,
+          "value": "renderAvatarPortrait(config)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/avatar-portrait.ts#L77"
+        },
+        {
+          "file": "src/lib/lobster-avatar-slots.ts",
+          "symbol": "resolveLobsterAvatarAssets",
+          "line": 80,
+          "value": "resolveLobsterAvatarAssets(config, options)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar-slots.ts#L80"
+        }
+      ],
+      "tests": [],
+      "dependsOn": [
+        "data.avatar-look-server"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "equippable-cosmetics"
+      ],
+      "flag": {
+        "level": "watch",
+        "note": "Members who saved an avatar before painted art existed get their first portrait on their next chassis load or avatar save, or when staff run npm run avatar:kit -- sync-all."
+      },
+      "flow": null,
+      "position": {
+        "x": 28,
+        "y": 364
       },
       "drift": "ok"
     },
@@ -6730,7 +6966,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "sections": [
         {
           "heading": "Context",
-          "html": "<p>Some chambers, starting with Subterranean Vats, were not ready for members, but staff still needed to use and test them in production.</p>"
+          "html": "<p>Some chambers, such as Premium, were not ready for members, but staff still needed to use and test them in production.</p>"
         },
         {
           "heading": "Decision",
@@ -7182,6 +7418,50 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "html": "<p>Changing an XP threshold never requires a canon edit. The Pipeline page still shows readings per clearance, now under &quot;The rite&quot; instead of &quot;Requirement&quot;.</p>"
         }
       ]
+    },
+    {
+      "id": "equippable-cosmetics",
+      "date": "2026-10-10",
+      "title": "Cosmetics are equipment with no stats, worn in look slots",
+      "summary": "Cosmetic looks live in the equipment catalog, sit in their own six slots, add no stats, and are drawn on the avatar with gear; the server writes the worn look and a cached portrait.",
+      "domains": [
+        "economy",
+        "data"
+      ],
+      "rules": [
+        "economy.cosmetics-no-stats",
+        "economy.look-slots",
+        "economy.starter-looks",
+        "data.avatar-look-server",
+        "data.avatar-portraits"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "pr",
+          "label": "PR #217",
+          "url": "https://github.com/mstupp1/moltology/pull/217"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Members wanted gear to show on their avatar, and cosmetics they could equip. The chassis equipment display was separate from the avatar, and the only cosmetics were free creator accessories. The avatar was moving to painted, layered art, and portraits across the site had to stay cheap static images.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Cosmetics are rows in the equipment catalog with kind <code>cosmetic</code> and an art key. They are owned like gear but worn in six look slots, one per category, never in hardpoints or the vault, and they add nothing to stats. A worn look draws over gear in the same category. Four starter looks are granted on chassis load. The server derives what the avatar wears from equipped items and renders a 256px portrait when the look changes; clients cannot set either field.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>A separate cosmetics table and inventory: more schema and screens for the same ownership model.</li>\n<li>Letting cosmetics occupy hardpoints: would force members to choose between stats and looks.</li>\n<li>Rendering avatars live everywhere: too heavy for lists and feeds, so portraits stay pre-rendered images.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Selling looks for Molt Credits later stays inside the economy red line, since looks carry no stats. Existing members get the new loadout and portrait on their next chassis load or avatar save, or through <code>npm run avatar:kit -- sync-all</code>. A race keeps the vector avatar until its painted art is ingested.</p>"
+        }
+      ]
     }
   ],
   "edges": [
@@ -7219,6 +7499,24 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "economy.two-currencies->economy.simulated-gem-grants",
       "source": "economy.two-currencies",
       "target": "economy.simulated-gem-grants",
+      "crossDomain": false
+    },
+    {
+      "id": "economy.red-line->economy.cosmetics-no-stats",
+      "source": "economy.red-line",
+      "target": "economy.cosmetics-no-stats",
+      "crossDomain": false
+    },
+    {
+      "id": "economy.cosmetics-no-stats->economy.look-slots",
+      "source": "economy.cosmetics-no-stats",
+      "target": "economy.look-slots",
+      "crossDomain": false
+    },
+    {
+      "id": "economy.cosmetics-no-stats->economy.starter-looks",
+      "source": "economy.cosmetics-no-stats",
+      "target": "economy.starter-looks",
       "crossDomain": false
     },
     {
@@ -7705,6 +8003,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "data.retention-windows->data.canonical-content",
       "source": "data.retention-windows",
       "target": "data.canonical-content",
+      "crossDomain": false
+    },
+    {
+      "id": "economy.look-slots->data.avatar-look-server",
+      "source": "economy.look-slots",
+      "target": "data.avatar-look-server",
+      "crossDomain": true
+    },
+    {
+      "id": "data.avatar-look-server->data.avatar-portraits",
+      "source": "data.avatar-look-server",
+      "target": "data.avatar-portraits",
       "crossDomain": false
     },
     {

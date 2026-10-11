@@ -28,7 +28,6 @@ function HudContent() {
   const [showWelcome, setShowWelcome] = useState(false)
   const oracle = useSafeOracle()
   const location = useLocation()
-  const isSubterranean = location.pathname.startsWith('/subterranean')
   const isFullscreenRoute = location.pathname.startsWith('/oracle')
   const session = useAuthSession()
   const user = session.user
@@ -110,21 +109,17 @@ function HudContent() {
     return () => window.removeEventListener('launch-welcome-splash', handleRelaunch)
   }, [])
 
-  // Preload background images so transitions happen instantly without network delay
+  // Preload background image so transitions happen instantly without network delay
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const img1 = new Image()
-      img1.src = getAssetUrl('/images/subterranean_vats_bg.jpg')
-      const img2 = new Image()
-      img2.src = getAssetUrl(UNDERWATER_BACKGROUND)
+      const img = new Image()
+      img.src = getAssetUrl(UNDERWATER_BACKGROUND)
     }
   }, [])
 
   return (
     <div
-      className={`fixed inset-0 w-full h-full text-[#dfe3e3] flex flex-col font-sans overflow-hidden bg-[#030708] overscroll-none select-none ${
-        isSubterranean ? 'theme-subterranean' : ''
-      }`}
+      className="fixed inset-0 w-full h-full text-ink flex flex-col font-sans overflow-hidden bg-abyss overscroll-none select-none"
     >
       {/* First-time welcome splash */}
       {showWelcome && (
@@ -134,21 +129,11 @@ function HudContent() {
         />
       )}
       {/* Dedicated Portal CRT Screen Background (Behind UI) */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-[#030708]">
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-abyss">
         {/* Full-Bleed Default Aqua Underwater Background */}
         <div
-          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-150 ${
-            isSubterranean ? 'opacity-0' : 'opacity-95'
-          }`}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-95"
           style={{ backgroundImage: `url('${getAssetUrl(UNDERWATER_BACKGROUND)}')` }}
-        />
-
-        {/* Full-Bleed Nuclear Subterranean Vats Background */}
-        <div
-          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-150 ${
-            isSubterranean ? 'opacity-95' : 'opacity-0'
-          }`}
-          style={{ backgroundImage: `url('${getAssetUrl('/images/subterranean_vats_bg.jpg')}')` }}
         />
 
         {/* 3D Hydro Dynamic Bubbling Effect with Custom Chroma-Keyed Bubble Variants */}
@@ -160,13 +145,9 @@ function HudContent() {
           className="absolute inset-0 pointer-events-none z-[1] opacity-85"
         />
 
-        {/* Phosphor Ambient Radial Glow (Electric Cyan or Nuclear Scary Green) */}
+        {/* Phosphor Ambient Radial Glow (Electric Cyan) */}
         <div
-          className={`absolute inset-0 z-[2] transition-opacity duration-150 pointer-events-none ${
-            isSubterranean
-              ? 'bg-[radial-gradient(circle_at_center,rgba(57,255,20,0.45)_0%,rgba(16,185,129,0.22)_55%,transparent_85%)]'
-              : 'bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.35)_0%,rgba(0,195,255,0.16)_55%,transparent_85%)]'
-          }`}
+          className="absolute inset-0 z-[2] transition-opacity duration-150 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.35)_0%,rgba(0,195,255,0.16)_55%,transparent_85%)]"
         />
 
         {/* High-Tech CRT Scanlines Overlay on Background Image */}
@@ -203,10 +184,10 @@ function HudContent() {
                 isFullscreenRoute
                   ? 'p-0 overflow-hidden'
                   : 'p-2.5 pb-16 sm:p-4 sm:pb-4 md:p-6 md:pb-6 overflow-y-auto overscroll-y-contain'
-              } bg-[#070b0b]/50 ${
+              } bg-surface-1/50 ${
                 isMainOnly
                   ? 'border-0 shadow-none'
-                  : 'border-t md:border-t-0 md:border-l border-[#3a4a49]/40 shadow-2xl'
+                  : 'border-t md:border-t-0 md:border-l border-line-subtle shadow-2xl'
               } flex flex-col`}
             >
               <Outlet />

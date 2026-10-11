@@ -16,7 +16,6 @@ export type CommandIconId =
   | 'codex'
   | 'lectures'
   | 'market'
-  | 'subterranean'
   | 'premium'
   | 'pipeline'
   | 'journal'
@@ -43,7 +42,6 @@ export type CommandNavTo =
   | '/codex/$slug'
   | '/lectures'
   | '/market'
-  | '/subterranean'
   | '/premium'
   | '/pipeline'
   | '/journal'
@@ -177,16 +175,6 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     icon: 'chassis',
     to: '/chassis',
     keywords: ['chassis', 'loadout', 'gear', 'configurator'],
-  },
-  {
-    id: 'nav-subterranean',
-    label: 'Open Subterranean Vats & Level -7 Bio-Vault',
-    category: 'Navigation',
-    icon: 'subterranean',
-    shortcut: 'G S',
-    to: '/subterranean',
-    keywords: ['vats', 'bio-vault'],
-    // Members do not see this chamber. HIDDEN_PAGES is the registry.
   },
   {
     id: 'nav-premium',

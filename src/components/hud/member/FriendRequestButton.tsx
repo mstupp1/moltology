@@ -35,7 +35,7 @@ export const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({
   const [busy, setBusy] = useState(false)
   const { toast } = useToast()
   const persist = useHudPersist()
-  const pad = compact ? 'px-2 py-1 text-[10px]' : 'px-3 py-2 text-xs'
+  const pad = compact ? 'px-2 py-1 text-[11px]' : 'px-3 py-2 text-xs'
   const iconCls = compact ? 'w-3 h-3' : 'w-3.5 h-3.5'
   const gap = compact ? 'gap-1' : 'gap-1.5'
 
@@ -57,7 +57,7 @@ export const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({
     return (
       <Link
         to="/connections"
-        className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-wider border border-[#3a4a49] text-[#00c3ff] hover:border-[#00c3ff] chamfer-corner transition-colors`}
+        className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-[0.08em] rounded-control border border-line bg-surface-1 hud-sheen text-cyan-glow hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow`}
       >
         Manage Connections
       </Link>
@@ -67,7 +67,7 @@ export const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({
   if (relationship === 'friends') {
     return (
       <div className="flex flex-wrap items-center gap-2">
-        <span className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-wider border border-[#00ff9d]/40 text-[#00ff9d] bg-[#00ff9d]/10 chamfer-corner`}>
+        <span className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-[0.08em] rounded-chip border border-emerald-500/40 text-emerald-400 bg-emerald-500/10`}>
           <UserCheck className={iconCls} />
           Friends
         </span>
@@ -83,7 +83,7 @@ export const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({
                 toast.success('Connection removed.')
               })
             }
-            className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-wider border border-[#3a4a49] text-[#839493] hover:border-[#ff453a] hover:text-[#ff453a] chamfer-corner transition-colors disabled:opacity-50`}
+            className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-[0.08em] rounded-control border border-line text-ink-muted hover:border-crimson-aggro/55 hover:text-crimson-text hover:bg-crimson-soft transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow`}
           >
             {busy ? <Loader2 className={`${iconCls} animate-spin`} /> : <UserX className={iconCls} />}
             Remove
@@ -96,7 +96,7 @@ export const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({
   if (relationship === 'pending_sent') {
     return (
       <div className="flex flex-wrap items-center gap-2">
-        <span className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-wider border border-[#00c3ff]/40 text-[#00c3ff] bg-[#00c3ff]/10 chamfer-corner`}>
+        <span className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-[0.08em] rounded-chip border border-line text-cyan-glow bg-cyan-soft`}>
           <Clock className={iconCls} />
           Pending
         </span>
@@ -114,7 +114,7 @@ export const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({
                 toast.info('Friend request cancelled.')
               })
             }
-            className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-wider border border-[#3a4a49] text-[#839493] hover:border-[#ff453a] hover:text-[#ff453a] chamfer-corner transition-colors disabled:opacity-50`}
+            className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-[0.08em] rounded-control border border-line text-ink-muted hover:border-crimson-aggro/55 hover:text-crimson-text hover:bg-crimson-soft transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow`}
           >
             Cancel
           </button>
@@ -143,7 +143,7 @@ export const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({
               toast.success('You are now friends.')
             })
           }
-          className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-wider border border-[#00ff9d]/50 text-[#00ff9d] bg-[#00ff9d]/10 hover:bg-[#00ff9d]/20 chamfer-corner transition-colors disabled:opacity-50`}
+          className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-[0.08em] rounded-control border border-emerald-500/40 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 hover:border-emerald-500/70 transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow`}
         >
           {busy ? <Loader2 className={`${iconCls} animate-spin`} /> : <UserCheck className={iconCls} />}
           Accept
@@ -165,7 +165,7 @@ export const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({
               toast.info('Friend request declined.')
             })
           }
-          className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-wider border border-[#3a4a49] text-[#839493] hover:border-[#ff453a] hover:text-[#ff453a] chamfer-corner transition-colors disabled:opacity-50`}
+          className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-[0.08em] rounded-control border border-line text-ink-muted hover:border-crimson-aggro/55 hover:text-crimson-text hover:bg-crimson-soft transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow`}
         >
           Decline
         </button>
@@ -190,7 +190,7 @@ export const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({
           toast.success('Friend request sent.')
         })
       }
-      className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-wider border border-[#00c3ff]/50 text-[#00c3ff] bg-[#00c3ff]/10 hover:bg-[#00c3ff]/20 chamfer-corner transition-colors disabled:opacity-50`}
+      className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-[0.08em] rounded-control border border-cyan-glow/40 text-cyan-glow bg-cyan-soft hover:bg-surface-2 hover:border-line-strong transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow`}
     >
       {busy ? <Loader2 className={`${iconCls} animate-spin`} /> : <UserPlus className={iconCls} />}
       Add Friend

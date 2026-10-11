@@ -1,6 +1,6 @@
 import React from 'react'
 import { MarkdownRenderer } from '../ui/MarkdownRenderer'
-import { getAssetUrl } from '@/lib/assets'
+import { BrandAwareImage, BrandIcon } from '../ui/BrandMark'
 import { UserAvatar } from '../UserAvatar'
 
 export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -36,7 +36,7 @@ export const Message: React.FC<MessageProps> = ({
     if (avatar) {
       if (typeof avatar === 'string') {
         return (
-          <img
+          <BrandAwareImage
             src={avatar}
             alt={senderLabel || (isUser ? 'User avatar' : 'Oracle')}
             className="w-4 h-4 rounded-full object-cover shrink-0"
@@ -59,11 +59,15 @@ export const Message: React.FC<MessageProps> = ({
       )
     }
 
+    if (!avatarSrc) {
+      return <BrandIcon label={senderLabel || 'Oracle'} className="w-3.5 h-3.5 shrink-0" />
+    }
+
     return (
-      <img
-        src={avatarSrc || getAssetUrl('/images/order_emblem.png')}
+      <BrandAwareImage
+        src={avatarSrc}
         alt={senderLabel || 'Oracle'}
-        className="w-3.5 h-3.5 object-contain drop-shadow-[0_0_4px_rgba(0,195,255,0.4)] shrink-0"
+        className="w-3.5 h-3.5 object-contain shrink-0"
       />
     )
   }
@@ -76,16 +80,16 @@ export const Message: React.FC<MessageProps> = ({
       className={`flex flex-col w-full ${isUser ? 'items-end' : 'items-start'} ${className}`}
       {...props}
     >
-      <div className="flex items-center gap-1.5 mb-1.5 text-[10px] sm:text-[11px] text-cyan-400 font-bold uppercase tracking-wider">
+      <div className="flex items-center gap-1.5 mb-1.5 text-[11px] text-ink-muted font-bold uppercase tracking-[0.08em]">
         {renderAvatar()}
         <span>{effectiveSenderLabel}</span>
-        {timestamp && <span className="text-gray-500 font-normal">[{timestamp}]</span>}
+        {timestamp && <span className="text-ink-muted/80 font-normal">[{timestamp}]</span>}
       </div>
       <div
-        className={`max-w-[92%] sm:max-w-[88%] p-3.5 sm:p-4 text-xs sm:text-[13px] leading-[1.7] chamfer-corner ${
+        className={`max-w-[92%] sm:max-w-[88%] p-3.5 sm:p-4 text-xs sm:text-[13px] leading-[1.7] rounded-card ${
           isUser
-            ? 'bg-cyan-950/70 backdrop-blur-xs border border-cyan-600/50 text-cyan-100 shadow-md shadow-cyan-950/40'
-            : 'bg-[#0a1214]/80 backdrop-blur-sm border border-cyan-800/45 text-gray-200 shadow-lg shadow-cyan-950/40'
+            ? 'bg-surface-2 border border-line text-ink'
+            : 'bg-surface-1/80 backdrop-blur-sm border border-line-subtle hud-sheen text-ink-body'
         }`}
       >
         {children}
@@ -116,13 +120,13 @@ export const MessageThinkingDots: React.FC<{ className?: string }> = ({
 }) => {
   return (
     <div
-      className={`flex items-center gap-1.5 py-1 px-0.5 text-cyan-400 select-none ${className}`}
+      className={`flex items-center gap-1.5 py-1 px-0.5 text-cyan-glow select-none ${className}`}
       aria-label="Thinking..."
       role="status"
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce [animation-delay:-0.3s] drop-shadow-[0_0_4px_rgba(0,195,255,0.6)]" />
-      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce [animation-delay:-0.15s] drop-shadow-[0_0_4px_rgba(0,195,255,0.6)]" />
-      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce drop-shadow-[0_0_4px_rgba(0,195,255,0.6)]" />
+      <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow animate-bounce [animation-delay:-0.3s]" />
+      <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow animate-bounce [animation-delay:-0.15s]" />
+      <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow animate-bounce" />
       <span className="sr-only">Thinking...</span>
     </div>
   )

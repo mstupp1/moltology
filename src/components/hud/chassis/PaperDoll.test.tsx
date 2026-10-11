@@ -101,4 +101,20 @@ describe('PaperDoll', () => {
     const flipped = container.querySelector('img.scale-x-\\[-1\\]')
     expect(flipped).toBeInTheDocument()
   })
+  it('flanks the live avatar with hardpoints when the member has one', () => {
+    const { container } = render(
+      <PaperDoll
+        items={items}
+        catalogById={catalogById}
+        selectedItemId={null}
+        onSelectItem={vi.fn()}
+        onSlotActivate={vi.fn()}
+        avatarConfig={{ style: 'critters', seed: 'paper-doll-test' }}
+      />
+    )
+    expect(screen.getByTestId('lobster-avatar-full-body')).toBeInTheDocument()
+    expect(container.querySelector('img[src*="chassis_stencil.webp"]')).toBeNull()
+    expect(screen.getAllByRole('button', { name: 'Claws slot' }).length).toBe(2)
+    expect(screen.getByRole('button', { name: 'Legs slot' })).toBeInTheDocument()
+  })
 })

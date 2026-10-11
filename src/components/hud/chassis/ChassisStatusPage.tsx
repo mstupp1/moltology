@@ -12,11 +12,16 @@ import {
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { getChassisLoadoutFn, moveGearItemFn } from '@/lib/server/api'
+import { getChassisLoadoutFn, moveGearItemFn, setLookFn } from '@/lib/server/api'
+import { clearCachedProfileAvatarUrl, parseLobsterAvatarConfig, type LobsterAvatarConfig } from '@/lib/lobster-avatar'
+import { serializeKitLoadout } from '@/lib/avatar/kit/loadout'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import {
+  applyLookUpdates,
   applyMoveUpdates,
+  buildKitLoadout,
   computeLoadoutTotals,
+  planLookChange,
   deriveSynapticAbilities,
   emptyTotals,
   getCachedChassisLoadout,
@@ -39,6 +44,7 @@ import { LoadoutStatsPanel } from './LoadoutStatsPanel'
 import { AbilitiesPanel } from './AbilitiesPanel'
 import { PaperDoll } from './PaperDoll'
 import { VaultGrid } from './VaultGrid'
+import { WardrobePanel } from './WardrobePanel'
 
 function parseDropTarget(overId: string | number): MoveTarget | null {
   const id = String(overId)
@@ -67,6 +73,11 @@ export const ChassisStatusPage: React.FC = () => {
   const [items, setItems] = useState<GearItemState[]>(() => cached?.items ?? [])
   const [totals, setTotals] = useState<LoadoutTotals>(() => cached?.totals ?? emptyTotals())
   const [vaultSize, setVaultSize] = useState(() => cached?.vaultSize ?? VAULT_SIZE)
+  const [savedAvatar, setSavedAvatar] = useState<LobsterAvatarConfig | null>(() =>
+    parseLobsterAvatarConfig(cached?.avatarConfig ?? null)
+  )
+  // The avatar paper doll and the wardrobe belong to the avatar-kit experiment (admins only for now).
+  const [avatarKit, setAvatarKit] = useState(() => cached?.avatarKit === true)
   const [error, setError] = useState<string | null>(null)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [detailItemId, setDetailItemId] = useState<string | null>(null)
@@ -94,6 +105,14 @@ export const ChassisStatusPage: React.FC = () => {
     [items, catalogById]
   )
 
+  // The paper doll draws what is on screen right now, before the server confirms the move.
+  const liveAvatar = useMemo((): LobsterAvatarConfig | null => {
+    if (!savedAvatar) return null
+    const { portraitKey: _portraitKey, ...rest } = savedAvatar
+    const loadout = serializeKitLoadout(buildKitLoadout(items, catalogById))
+    return loadout ? { ...rest, loadout } : { ...rest, loadout: undefined }
+  }, [savedAvatar, items, catalogById])
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
@@ -105,6 +124,8 @@ export const ChassisStatusPage: React.FC = () => {
       setItems(payload.items)
       setTotals(payload.totals)
       setVaultSize(payload.vaultSize)
+      setSavedAvatar(parseLobsterAvatarConfig(payload.avatarConfig ?? null))
+      setAvatarKit(payload.avatarKit === true)
       if (userId) setCachedChassisLoadout(userId, payload)
     },
     [userId]
@@ -140,6 +161,13 @@ export const ChassisStatusPage: React.FC = () => {
     }
   }, [userId, applyPayload])
 
+  /** Gear and looks are drawn on the avatar, so headers and menus re-read the portrait. */
+  const announceAvatarChange = useCallback(() => {
+    if (!userId || typeof window === 'undefined') return
+    clearCachedProfileAvatarUrl(userId)
+    window.dispatchEvent(new CustomEvent('profile-avatar-changed'))
+  }, [userId])
+
   const persistMove = useCallback(
     async (itemId: string, target: MoveTarget) => {
       const plan = planGearMove(items, catalogById, itemId, target, vaultSize)
@@ -166,6 +194,7 @@ export const ChassisStatusPage: React.FC = () => {
           },
         })
         applyPayload(payload)
+        announceAvatarChange()
       } catch (e) {
         setItems(prevItems)
         setTotals(computeLoadoutTotals(prevItems, catalogById))
@@ -177,7 +206,37 @@ export const ChassisStatusPage: React.FC = () => {
         persist.end('chassis-gear')
       }
     },
-    [items, catalogById, vaultSize, persist, userId, applyPayload]
+    [items, catalogById, vaultSize, persist, userId, applyPayload, announceAvatarChange]
+  )
+
+  const persistLook = useCallback(
+    async (itemId: string, wear: boolean) => {
+      const plan = planLookChange(items, catalogById, itemId, wear)
+      if (!plan.ok) {
+        toast?.warning(plan.error)
+        return
+      }
+      if (plan.updates.length === 0) return
+
+      const prevItems = items
+      setItems(applyLookUpdates(items, plan.updates))
+
+      persist.begin('chassis-look')
+      try {
+        const token = await getAuthJWTToken()
+        const payload = await setLookFn({
+          data: { itemId, wear, token: token ?? undefined, userId: userId ?? undefined },
+        })
+        applyPayload(payload)
+        announceAvatarChange()
+      } catch (e) {
+        setItems(prevItems)
+        toast?.error(e instanceof Error ? e.message : 'Could not change your look. Please try again.')
+      } finally {
+        persist.end('chassis-look')
+      }
+    },
+    [items, catalogById, persist, userId, applyPayload, toast, announceAvatarChange]
   )
 
   const handleSelectItem = useCallback(
@@ -284,6 +343,7 @@ export const ChassisStatusPage: React.FC = () => {
                   onSelectItem={handleSelectItem}
                   onSlotActivate={handleSlotActivate}
                   onHoverItem={setHoverTarget}
+                  avatarConfig={avatarKit ? liveAvatar : null}
                 />
               </div>
 
@@ -292,7 +352,7 @@ export const ChassisStatusPage: React.FC = () => {
                 <AbilitiesPanel abilities={abilities} variant="strip" />
               </div>
 
-              <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl shrink-0 overflow-hidden min-w-0">
+              <div className="chitin-card p-3 sm:p-4 md:p-5 rounded-card shadow-2xl shrink-0 overflow-hidden min-w-0">
                 <VaultGrid
                   items={items}
                   catalogById={catalogById}
@@ -303,6 +363,17 @@ export const ChassisStatusPage: React.FC = () => {
                   onHoverItem={setHoverTarget}
                 />
               </div>
+
+              {avatarKit ? (
+                <div className="chitin-card p-3 sm:p-4 md:p-5 rounded-card shadow-2xl shrink-0 overflow-hidden min-w-0">
+                  <WardrobePanel
+                    items={items}
+                    catalogById={catalogById}
+                    onToggleLook={(itemId, wear) => void persistLook(itemId, wear)}
+                    onHoverItem={setHoverTarget}
+                  />
+                </div>
+              ) : null}
             </div>
 
             <div className="order-3 hidden md:flex md:flex-col md:min-h-0">

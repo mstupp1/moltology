@@ -216,13 +216,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     >
       <HudCard
         variant="teal"
-        className="relative w-full max-w-md my-auto p-6 sm:p-8 shadow-2xl bg-[#0a1012] border border-[#00c3ff]/50"
+        className="relative w-full max-w-md my-auto p-6 sm:p-8 rounded-panel bg-surface-1 border-line-subtle shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 text-[#839493] hover:text-[#00c3ff] transition-colors p-1 rounded-none hover:bg-[#172020] cursor-pointer"
+          className="absolute top-4 right-4 z-10 text-ink-muted hover:text-ink transition-colors p-1 rounded-control hover:bg-surface-2 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
@@ -230,10 +230,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Modal Header */}
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold font-grotesk text-white tracking-wider uppercase">
+          <h2 className="text-2xl font-bold font-grotesk text-ink tracking-wider uppercase">
             {mode === 'signup' ? 'Create Account' : 'Welcome Back'}
           </h2>
-          <p className="text-xs text-[#00c3ff]/80 mt-1 uppercase tracking-widest font-sans">
+          <p className="text-xs text-cyan-glow/80 mt-1 uppercase tracking-[0.08em] font-sans">
             {mode === 'signup'
               ? 'Sign up to persist your session'
               : 'Sign in to access your saved state'}
@@ -243,25 +243,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {pendingVerificationEmail ? (
           <div className="space-y-4" data-testid="email-verification-pending">
             <div className="text-center space-y-2">
-              <Mail className="w-8 h-8 text-[#00c3ff] mx-auto" aria-hidden="true" />
-              <h3 className="text-lg font-bold font-grotesk text-white tracking-wide">
+              <Mail className="w-8 h-8 text-cyan-glow mx-auto" aria-hidden="true" />
+              <h3 className="text-lg font-bold font-grotesk text-ink tracking-wide">
                 {EMAIL_VERIFICATION_COPY.title}
               </h3>
-              <p className="text-sm text-[#839493] font-sans">
+              <p className="text-sm text-ink-body font-sans">
                 {EMAIL_VERIFICATION_COPY.body(pendingVerificationEmail)}
               </p>
             </div>
             {error ? (
               <div
                 role="alert"
-                className="mb-2 p-3 bg-[#ff453a]/10 border border-[#ff453a]/60 flex items-start gap-2.5 text-[#ff453a] text-xs font-sans"
+                className="mb-2 p-3 rounded-control bg-crimson-soft border border-crimson-aggro/55 flex items-start gap-2.5 text-crimson-text text-xs font-sans"
               >
-                <AlertCircle className="w-4 h-4 shrink-0 text-[#ff453a] mt-0.5" />
+                <AlertCircle className="w-4 h-4 shrink-0 text-crimson-text mt-0.5" />
                 <span>{error}</span>
               </div>
             ) : null}
             {resendMessage ? (
-              <div className="p-3 bg-[#00c3ff]/10 border border-[#00c3ff]/40 text-[#00c3ff] text-xs font-sans">
+              <div className="p-3 rounded-control bg-cyan-soft border border-cyan-glow/40 text-cyan-glow text-xs font-sans">
                 {resendMessage}
               </div>
             ) : null}
@@ -276,7 +276,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </HudButton>
             <button
               type="button"
-              className="w-full text-xs text-[#839493] hover:text-[#dfe3e3] font-sans"
+              className="w-full rounded-control text-xs text-ink-muted hover:text-ink font-sans focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               onClick={() => {
                 setPendingVerificationEmail(null)
                 setResendMessage(null)
@@ -290,17 +290,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         ) : (
         <>
         {/* Tab Selector */}
-        <div className="flex border-b border-[#3a4a49]/60 mb-6">
+        <div className="flex border-b border-line-subtle mb-6">
           <button
             type="button"
             onClick={() => {
               setMode('signup')
               setError(null)
             }}
-            className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors cursor-pointer ${
+            className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
               mode === 'signup'
-                ? 'border-[#ff453a] text-[#ff453a]'
-                : 'border-transparent text-[#839493] hover:text-[#dfe3e3]'
+                ? 'border-cyan-glow text-ink'
+                : 'border-transparent text-ink-muted hover:text-ink'
             }`}
           >
             Sign Up
@@ -311,10 +311,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               setMode('login')
               setError(null)
             }}
-            className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors cursor-pointer ${
+            className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
               mode === 'login'
-                ? 'border-[#00c3ff] text-[#00c3ff]'
-                : 'border-transparent text-[#839493] hover:text-[#dfe3e3]'
+                ? 'border-cyan-glow text-ink'
+                : 'border-transparent text-ink-muted hover:text-ink'
             }`}
           >
             Sign In
@@ -323,8 +323,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-4 p-3 bg-[#ff453a]/10 border border-[#ff453a]/60 rounded-none flex items-start gap-2.5 text-[#ff453a] text-xs font-sans">
-            <AlertCircle className="w-4 h-4 shrink-0 text-[#ff453a] mt-0.5" />
+          <div className="mb-4 p-3 bg-crimson-soft border border-crimson-aggro/55 rounded-control flex items-start gap-2.5 text-crimson-text text-xs font-sans">
+            <AlertCircle className="w-4 h-4 shrink-0 text-crimson-text mt-0.5" />
             <span>{error}</span>
           </div>
         )}
@@ -362,8 +362,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
           {/* Standard Centered OR Divider */}
           <div className="relative flex items-center justify-center my-3">
-            <div className="border-t border-[#3a4a49] w-full" />
-            <span className="bg-[#0a1012] px-3 text-xs text-[#839493] font-bold uppercase tracking-widest absolute">OR</span>
+            <div className="border-t border-line-subtle w-full" />
+            <span className="bg-surface-1 px-3 text-xs text-ink-muted font-bold uppercase tracking-[0.08em] absolute">OR</span>
           </div>
         </div>
         )}
@@ -382,7 +382,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="name@example.com"
-            startIcon={<Mail className="w-4 h-4 text-[#00c3ff]" />}
+            startIcon={<Mail className="w-4 h-4 text-ink-muted" />}
           />
 
           <HudInput
@@ -393,14 +393,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
-            startIcon={<Lock className="w-4 h-4 text-[#00c3ff]" />}
+            startIcon={<Lock className="w-4 h-4 text-ink-muted" />}
           />
 
           <div className="mt-6 flex justify-center">
             <HudButton
               type="submit"
               disabled={loading}
-              variant={mode === 'signup' ? 'crimson' : 'cyan'}
+              variant="cyan"
               size="lg"
               fullWidth
             >
@@ -424,13 +424,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   type="checkbox"
                   checked={emailOptIn}
                   onChange={(e) => setEmailOptIn(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 rounded border-[#3a4a49] bg-[#070b0b] text-[#00c3ff] focus:ring-[#00c3ff] focus:ring-offset-0 cursor-pointer accent-[#00c3ff]"
+                  className="mt-0.5 w-4 h-4 rounded-chip border-line bg-surface-2 text-cyan-glow focus:ring-cyan-glow focus:ring-offset-0 cursor-pointer accent-cyan-glow"
                 />
-                <span className="text-xs text-[#839493] group-hover:text-[#dfe3e3] transition-colors font-sans leading-tight">
+                <span className="text-xs text-ink-muted group-hover:text-ink-body transition-colors font-sans leading-tight">
                   Keep me updated with Moltology news, articles, and product updates.
                 </span>
               </label>
-              <p className="text-[10px] text-[#839493]/70 mt-1 pl-6 font-sans">
+              <p className="text-[11px] text-ink-muted mt-1 pl-6 font-sans">
                 Zero spam. Unsubscribe at any time.
               </p>
             </div>

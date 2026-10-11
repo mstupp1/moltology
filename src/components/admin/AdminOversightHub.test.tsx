@@ -42,6 +42,12 @@ vi.mock('@/lib/server/api', () => ({
   searchAdminMembersFn: vi.fn().mockResolvedValue({ members: [] }),
   setAdminMemberRoleFn: vi.fn(),
   listAdminPurchasesFn: vi.fn().mockResolvedValue([]),
+  getMyExperimentsFn: vi.fn().mockResolvedValue([
+    { id: 'avatar-kit', title: 'Painted avatars and cosmetics', description: 'Try the painted avatar.', on: false },
+  ]),
+  setExperimentFn: vi.fn().mockResolvedValue([
+    { id: 'avatar-kit', title: 'Painted avatars and cosmetics', description: 'Try the painted avatar.', on: true },
+  ]),
 }))
 
 describe('Admin access and oversight hub', () => {
@@ -80,5 +86,19 @@ describe('Admin access and oversight hub', () => {
     expect(screen.getByRole('link', { name: /Composite Studio/i })).toHaveAttribute('href', '/render/composite')
     expect(screen.getByRole('link', { name: /Logic Atlas/i })).toHaveAttribute('href', '/admin/logic')
     expect(screen.queryByTestId('covenant-watch')).not.toBeInTheDocument()
+  })
+
+  it('switches an experiment on for the signed-in admin', async () => {
+    access.canView = true
+    const api = await import('@/lib/server/api')
+    render(<AdminOversightHub />)
+    fireEvent.click(screen.getByTestId('admin-tab-experiments'))
+    const toggle = await screen.findByRole('switch', { name: 'Painted avatars and cosmetics' })
+    expect(toggle).toHaveAttribute('aria-checked', 'false')
+    fireEvent.click(toggle)
+    await waitFor(() => expect(toggle).toHaveAttribute('aria-checked', 'true'))
+    expect(api.setExperimentFn).toHaveBeenCalledWith({
+      data: { userId: 'staff-1', token: 'token', id: 'avatar-kit', on: true },
+    })
   })
 })

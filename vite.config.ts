@@ -1,12 +1,22 @@
 /// <reference types="vitest" />
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig, loadEnv, searchForWorkspaceRoot } from 'vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import { nitro } from 'nitro/vite'
 import viteReact from '@vitejs/plugin-react'
 import path from 'path'
+import { realpathSync } from 'node:fs'
 import { resolveViteEmailVerificationEnabled, resolveViteGoogleAuthEnabled } from './src/lib/auth-config'
 
 const isTest = Boolean(process.env.VITEST)
+
+// Bucket media is served at /media/* by a cached Vercel rewrite (vercel.json). Locally we proxy
+// to the live site so dev servers and screenshot runs hit the CDN cache, not the Neon bucket.
+const mediaProxy = {
+  '/media': {
+    target: process.env.MEDIA_PROXY_ORIGIN || 'https://moltology.org',
+    changeOrigin: true,
+  },
+}
 
 function syncPublicGoogleAuthFlag(mode: string) {
   if (isTest) return
@@ -69,12 +79,20 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
       host: true,
+      // Worktrees can share node_modules through a symlink outside the workspace.
+      fs: {
+        allow: [searchForWorkspaceRoot(process.cwd()), realpathSync(path.resolve(process.cwd(), 'node_modules'))],
+      },
+      proxy: mediaProxy,
       hmr: {
         overlay: true,
       },
       watch: {
         usePolling: false,
       },
+    },
+    preview: {
+      proxy: mediaProxy,
     },
     test: {
       globals: true,

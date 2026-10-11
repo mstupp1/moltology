@@ -58,7 +58,7 @@ export const WhatIsMoltologySubnav: React.FC = () => {
       <nav
         ref={navRef}
         aria-label="About Moltology sections"
-        className="fixed top-0 left-0 right-0 z-40 border-b border-cyan-900/40 bg-[#020408]/90 backdrop-blur-md transition-transform duration-300 ease-in-out"
+        className="fixed top-0 left-0 right-0 z-40 border-b border-line-subtle bg-abyss/90 backdrop-blur-md transition-transform duration-300 ease-in-out"
         style={{ transform: `translateY(${offset}px)` }}
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -69,10 +69,10 @@ export const WhatIsMoltologySubnav: React.FC = () => {
                 <li key={item.id} className="shrink-0">
                   <Link
                     to={item.path}
-                    className={`inline-flex items-center min-h-11 px-3.5 text-xs sm:text-sm font-grotesk font-bold tracking-wide transition-colors rounded-lg ${
+                    className={`relative inline-flex items-center min-h-11 px-3.5 text-xs sm:text-sm font-grotesk font-bold tracking-wide transition-colors rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                       active
-                        ? 'text-cyan-200 bg-cyan-950/50 border border-cyan-500/40'
-                        : 'text-gray-400 hover:text-cyan-300 hover:bg-cyan-950/30 border border-transparent'
+                        ? 'text-ink bg-surface-2 after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:bg-cyan-glow'
+                        : 'text-ink-muted hover:text-ink hover:bg-surface-2'
                     }`}
                     aria-current={active ? 'page' : undefined}
                   >

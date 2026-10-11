@@ -448,6 +448,17 @@
       "coreHook": "Closing the laptop used to feel like putting the work away. Anthropic's October 6 change moves new Cowork tasks on Pro and Max into the cloud, inviting a fresh look at what we hand over and when we call a task finished.",
       "keyMetrics": [],
       "relatedReelIds": []
+    },
+    {
+      "slug": "robot-simulation-contact",
+      "title": "The Cup You Nearly Dropped: Robot Simulation Has to Earn Its Grip",
+      "format": "autonomous-dispatch",
+      "category": "TELEMETRY",
+      "author": "Chitin Architect V",
+      "publishedAt": "2026-10-09T12:32:36.450Z",
+      "coreHook": "Robot simulation needs more than a convincing image. NVIDIA's new walkthrough separates a working rehearsal from a grip proven against the physical world.",
+      "keyMetrics": [],
+      "relatedReelIds": []
     }
   ]
 }

@@ -10,6 +10,7 @@ import {
   resolveLobsterAvatarAssets,
 } from '@/lib/lobster-avatar-slots'
 import { LobsterAvatarDisplay } from './LobsterAvatarDisplay'
+import { isKitSvgDataUri } from '@/lib/lobster-avatar'
 import { LobsterAvatarSilhouette } from './LobsterAvatarSilhouette'
 
 /** Upper-body / face crop for critters full-body sprites in a circular frame */
@@ -41,6 +42,8 @@ export interface LobsterAvatarPortraitProps {
    * When false (default), renders the static face-focused portrait image.
    */
   animated?: boolean
+  /** Draw from the config as it is now (creator preview), ignoring the saved portrait image. */
+  live?: boolean
 }
 
 /**
@@ -57,6 +60,7 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
   interactive = false,
   animationSeed,
   fallbackSeed,
+  live = false,
   vignette = true,
   specularSheen = true,
   fisheyeLens = true,
@@ -96,10 +100,10 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
     if (animated) return null
     if (src) return src
     if (!effectiveConfig?.seed) return null
-    const assets = resolveLobsterAvatarAssets(effectiveConfig, { portraitSize: sourcePx })
+    const assets = resolveLobsterAvatarAssets(effectiveConfig, { portraitSize: sourcePx, livePortrait: live })
     const picked = pickLobsterAvatarSlot(assets, 'portrait')
     return picked?.slot === 'portrait' ? picked.url : null
-  }, [animated, src, effectiveConfig, sourcePx])
+  }, [animated, src, effectiveConfig, sourcePx, live])
 
   const portraitClassName = useMemo(
     () =>
@@ -150,6 +154,24 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
             fisheyeLens ? 'scale-[1.06] [filter:url(#benthic-fisheye-disp)]' : ''
           }`}
         >
+          {isKitSvgDataUri(staticPortraitUrl) ? (
+            <LobsterAvatarDisplay
+              src={staticPortraitUrl}
+              alt={alt}
+              pixelated={false}
+              crt={false}
+              animated={false}
+              outputSize={size}
+              maskRadial={false}
+              terminalEffects={false}
+              lightingSource="none"
+              vignette={false}
+              glowColor="none"
+              containerClassName="relative w-full h-full flex items-center justify-center overflow-hidden"
+              className="w-full h-full overflow-hidden"
+              imgClassName="w-full h-full object-cover"
+            />
+          ) : (
           <img
             src={staticPortraitUrl}
             alt={alt}
@@ -162,6 +184,7 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
               interactive ? 'transition-transform duration-300 group-hover:scale-[1.03]' : ''
             }`}
           />
+          )}
         </div>
       ) : (
         <div

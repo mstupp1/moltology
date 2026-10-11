@@ -25,6 +25,8 @@ Read the [shared annual content calendar](../../../content/annual-content-calend
 
 ## Opening, useful arc and CTA
 
+Read [comment-to-DM delivery guidance](../instagram-post-creator/references/comment-to-dm.md) before writing a CTA. Delivery is disabled / unverified by default. Use direct resource links, remove DM promises from generated copy and slide artwork, and do not provision rules during content creation.
+
 Start with a recognizable situation and one blunt sentence-case claim under 14 words. The cover should make sense without the caption and give a concrete reason to swipe. A crowded calendar beside an untouched notebook could read “Your calendar ate the work,” with “Find one meeting you can shed.” Quote-deck covers may establish the situation through a short, immediately readable line with restrained artwork. Static covers need immediate recognition; first-second motion is a Reels requirement.
 
 Keep a flexible problem → useful explanation → practical payoff arc. These are functions, not mandatory templates or sentences to repeat:
@@ -34,6 +36,10 @@ Keep a flexible problem → useful explanation → practical payoff arc. These a
 3. **Final slide:** deliver the usable checklist, action or reminder and one invitation. Add slides only when the explanation needs them or slide count is the declared experiment.
 
 Choose the goal before writing. Editorial carousels end with one specific share/save ask, such as “Save this before planning Monday.” Lead magnets retain one direct resource invitation when downloads, audits or signups are the goal. Show useful value before the ask; avoid a closing slide that is only an advertisement. Keep the caption aligned with the same invitation and a relevant URL in the first comment. Retire keyword-comment requests and DM promises across every public surface.
+
+* **Dynamic & Random Rotation**: The carousel generator automatically selects unique, randomized characters per slide from the mascot cast in `src/lib/mascots.ts` when `--mascot` is omitted or set to `random`. Characters never duplicate across consecutive slides.
+* **Character Visibility & Natural Scene Blending**: Characters must be clearly visible with strong contrast against backgrounds, naturally blended with ambient scene shading rather than obvious lighting effects (avoid artificial backlight halos or stark rim lines). When layout space allows, characters **can be sized slightly larger than reference** to maximize personality, engagement, and readability.
+* **Custom Mascots**: To generate new character cutouts, use the `character-creator` skill.
 
 Keep mobile text readable, natural breathing room, at most one meaningful category pill per slide, rounded panels and restrained brand colors. Vary scenes to serve the story while preserving visual continuity; different backgrounds on every slide are not compulsory. Inspect source-backed numbers and clearly distinguish fictional HUD readings. No fake reviews, certification seals, decorative glyphs or unsupported product claims.
 

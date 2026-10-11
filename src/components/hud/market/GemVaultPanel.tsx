@@ -15,29 +15,29 @@ interface GemVaultPanelProps {
 export function GemVaultPanel({ chitinGems, ownedIds, onUnlock }: GemVaultPanelProps) {
   return (
     <div className="space-y-3 sm:space-y-4">
-      <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl border border-[#ff5540]/25 relative overflow-hidden">
+      <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-[#ff5540]/5 via-transparent to-[#a855f7]/5 pointer-events-none" />
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-[#ff8066]">
+            <div className="flex items-center gap-2 text-crimson-text">
               <Crown className="w-4 h-4" />
-              <span className="text-[10px] font-bold uppercase tracking-widest">Prestige Vault</span>
+              <span className="text-[11px] font-bold uppercase tracking-[0.08em]">Prestige Vault</span>
             </div>
-            <h2 className="font-grotesk text-sm sm:text-base font-extrabold text-[#dfe3e3] uppercase tracking-wide">
+            <h2 className="font-grotesk text-sm sm:text-base font-extrabold text-ink uppercase tracking-wide">
               Chitin Gems Unlock the Coolest Cosmetics
             </h2>
-            <p className="text-xs text-[#839493] max-w-xl leading-relaxed">
+            <p className="text-xs text-ink-body max-w-xl leading-relaxed">
               The apex catalog lives here. Gems are earned through shedding, routines, and
               community contribution.
             </p>
           </div>
-          <div className="flex items-center gap-2 px-3 py-2 rounded-sm border border-[#ff5540]/35 bg-[#030606]/70 shrink-0">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-card border border-line-subtle bg-surface-2 shrink-0">
             <img
               src={getAssetUrl('/images/chitin_gem.png')}
               alt=""
               className="w-6 h-6 object-contain"
             />
-            <span className="font-grotesk text-lg font-extrabold text-[#ff8066] tabular-nums">
+            <span className="font-grotesk text-lg font-extrabold text-crimson-text tabular-nums">
               {chitinGems.toLocaleString()}
             </span>
           </div>
@@ -55,19 +55,17 @@ export function GemVaultPanel({ chitinGems, ownedIds, onUnlock }: GemVaultPanelP
             <div
               key={item.id}
               className={cn(
-                'relative chitin-card-inset rounded-sm border-2 overflow-hidden flex flex-col',
-                rarity.border,
-                rarity.glow,
-                owned && 'ring-1 ring-[#39ff14]/50'
+                'market-vault-card relative rounded-card border border-line-subtle bg-surface-1 hud-sheen overflow-hidden flex flex-col',
+                owned && 'border-emerald-500/50'
               )}
             >
-              <div className={cn('h-1 w-full shrink-0', rarity.bar)} />
+              <div className={cn('h-0.5 w-full shrink-0', rarity.bar)} />
               {item.exclusive ? (
-                <span className="absolute top-2 right-2 z-10 text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-[#ff5540] text-white">
+                <span className="absolute top-2 right-2 z-10 text-[11px] font-bold uppercase tracking-[0.08em] px-1.5 py-0.5 rounded-chip bg-crimson-aggro text-abyss">
                   Gems Only
                 </span>
               ) : null}
-              <div className="relative aspect-[4/3] bg-[#030606]">
+              <div className="relative aspect-[4/3] bg-abyss">
                 <img
                   src={getAssetUrl(item.imagePath)}
                   alt=""
@@ -77,30 +75,30 @@ export function GemVaultPanel({ chitinGems, ownedIds, onUnlock }: GemVaultPanelP
                   )}
                 />
                 {locked ? (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/35">
-                    <Lock className="w-8 h-8 text-[#839493]" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-abyss/40">
+                    <Lock className="w-8 h-8 text-ink-muted" />
                   </div>
                 ) : null}
                 {owned ? (
-                  <div className="absolute inset-x-0 bottom-0 py-1 text-center text-[9px] font-bold uppercase tracking-wider bg-[#39ff14]/20 text-[#39ff14] border-t border-[#39ff14]/40">
+                  <div className="absolute inset-x-0 bottom-0 py-1 text-center text-[11px] font-bold uppercase tracking-[0.08em] bg-emerald-500/15 text-emerald-400 border-t border-emerald-500/40">
                     Unlocked
                   </div>
                 ) : null}
               </div>
               <div className="p-2.5 flex flex-col flex-1 gap-2">
                 <div className="space-y-0.5">
-                  <span className={cn('text-[8px] font-bold uppercase', rarity.text)}>
+                  <span className={cn('text-[11px] font-bold uppercase tracking-[0.08em]', rarity.text)}>
                     {item.slot}
                   </span>
-                  <h3 className="font-grotesk text-[10px] sm:text-[11px] font-bold text-[#dfe3e3] uppercase leading-tight">
+                  <h3 className="font-grotesk text-[11px] font-bold text-ink uppercase leading-tight">
                     {item.name}
                   </h3>
-                  <p className="text-[9px] text-[#839493] leading-snug line-clamp-2">
+                  <p className="text-[11px] text-ink-muted leading-snug line-clamp-2">
                     {item.description}
                   </p>
                 </div>
                 {owned ? (
-                  <span className="mt-auto text-[10px] text-center font-bold text-[#39ff14] uppercase">
+                  <span className="mt-auto text-[11px] text-center font-bold text-emerald-400 uppercase">
                     Equip in Chassis
                   </span>
                 ) : (

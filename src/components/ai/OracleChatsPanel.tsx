@@ -1,9 +1,9 @@
 import React from 'react'
+import { BrandIcon } from '@/components/ui/BrandMark'
 import { ArrowLeft, Lock, UserPlus, X } from 'lucide-react'
 import { ThreadList } from './ThreadList'
 import type { ManagedThread } from './useThreadActions'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
-import { getAssetUrl } from '../../lib/assets'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 
 export type OracleChatsLayout = 'takeover' | 'column'
@@ -45,24 +45,24 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
       aria-label="Chats"
       data-testid="oracle-chats-panel"
       data-chats-layout={layout}
-      className={`flex flex-col min-h-0 h-full bg-[#060a0d]/95 backdrop-blur-xl font-sans ${
+      className={`flex flex-col min-h-0 h-full bg-surface-1/95 backdrop-blur-xl font-sans ${
         layout === 'column'
-          ? 'w-64 lg:w-72 shrink-0 border-r border-cyan-900/40'
+          ? 'w-64 lg:w-72 shrink-0 border-r border-line-subtle'
           : 'flex-1 w-full'
       }`}
     >
-      <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-cyan-950 bg-[#080e11]/90 shrink-0 select-none">
+      <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-line-subtle bg-surface-2 shrink-0 select-none">
         <div className="flex items-center gap-1.5 min-w-0">
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex items-center justify-center min-w-11 min-h-11 p-2.5 text-gray-400 hover:text-cyan-300 transition-colors cursor-pointer rounded"
+            className="inline-flex items-center justify-center min-w-11 min-h-11 p-2.5 text-ink-muted hover:text-ink hover:bg-surface-3 transition-colors cursor-pointer rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             title="Back to conversation"
             aria-label="Back to conversation"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
-          <span className="text-[11px] font-bold text-cyan-500 tracking-wider uppercase font-sans">
+          <span className="text-[11px] font-bold text-ink-muted tracking-[0.08em] uppercase font-sans">
             CHATS
           </span>
         </div>
@@ -70,7 +70,7 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
         <button
           type="button"
           onClick={onClose}
-          className="inline-flex items-center justify-center min-w-11 min-h-11 p-2.5 text-gray-400 hover:text-red-400 transition-colors cursor-pointer rounded"
+          className="inline-flex items-center justify-center min-w-11 min-h-11 p-2.5 text-ink-muted hover:text-ink hover:bg-surface-3 transition-colors cursor-pointer rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           title="Close Chats"
           aria-label="Close Chats"
         >
@@ -87,17 +87,16 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
           </div>
         ) : userId ? (
           isLoadingThreads ? (
-            <div className="py-6 text-center text-xs text-gray-400 flex flex-col items-center justify-center gap-2">
-              <img
-                src={getAssetUrl('/images/order_emblem.png')}
-                alt="Loading"
-                className="w-4 h-4 object-contain animate-pulse drop-shadow-[0_0_6px_rgba(0,195,255,0.4)]"
+            <div className="py-6 text-center text-xs text-ink-muted flex flex-col items-center justify-center gap-2">
+              <BrandIcon
+                label="Loading"
+                className="w-4 h-4 object-contain animate-pulse"
               />
-              <span className="text-[11px] text-cyan-400/80 animate-pulse">Accessing archives...</span>
+              <span className="text-[11px] text-cyan-glow animate-pulse">Accessing archives...</span>
             </div>
           ) : threads.length === 0 ? (
-            <div className="py-6 px-3 text-center text-xs text-gray-400 space-y-2">
-              <p className="text-[11px] text-gray-400">No recorded chats yet.</p>
+            <div className="py-6 px-3 text-center text-xs text-ink-muted space-y-2">
+              <p className="text-[11px] text-ink-muted">No recorded chats yet.</p>
             </div>
           ) : (
             <ThreadList
@@ -114,20 +113,20 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
           )
         ) : (
           <div className="p-3 space-y-3 font-sans">
-            <div className="flex items-center space-x-2 text-cyan-400">
-              <Lock className="w-4 h-4 text-cyan-400 shrink-0" />
-              <span className="text-xs font-bold tracking-wider uppercase">GUEST MODE</span>
+            <div className="flex items-center space-x-2 text-cyan-glow">
+              <Lock className="w-4 h-4 text-cyan-glow shrink-0" />
+              <span className="text-xs font-bold tracking-[0.08em] uppercase">GUEST MODE</span>
             </div>
-            <p className="text-[11px] text-gray-400 leading-relaxed">
+            <p className="text-[11px] text-ink-muted leading-relaxed">
               Chats in guest mode are temporary. Create a free initiate account to preserve your neural consultations.
             </p>
             <BenthicCTAButton
-              variant="red"
+              variant="cyan"
               size="sm"
               fullWidth
               onClick={onOpenAuthModal}
             >
-              <span className="flex items-center justify-center gap-1.5 text-xs font-bold font-grotesk tracking-wider uppercase">
+              <span className="flex items-center justify-center gap-1.5 text-xs font-bold font-grotesk tracking-[0.08em] uppercase">
                 <UserPlus className="w-3.5 h-3.5" />
                 <span>SIGN UP FREE</span>
               </span>

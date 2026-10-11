@@ -54,10 +54,10 @@ function DecisionRhythm({
 
   if (columns.length === 0) return null
   return (
-    <div className="chitin-card chamfer-corner p-3 sm:p-4" aria-label="Decisions over time">
+    <div className="hud-sheen rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4" aria-label="Decisions over time">
       <div className="flex items-baseline justify-between gap-2">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-[#839493]">Decision rhythm</p>
-        <p className="text-[11px] text-[#5f7170]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">Decision rhythm</p>
+        <p className="text-[11px] text-ink-muted">
           {shortDate(decisions[0].date)} to {shortDate(decisions[decisions.length - 1].date)}
         </p>
       </div>
@@ -75,11 +75,11 @@ function DecisionRhythm({
                 style={{
                   background: colors.get(decision.domains[0]) ?? '#00c3ff',
                   opacity: selectedId && selectedId !== decision.id ? 0.35 : 0.9,
-                  outline: selectedId === decision.id ? '1px solid #dfe3e3' : undefined,
+                  outline: selectedId === decision.id ? '1px solid #e4e9e9' : undefined,
                 }}
               />
             ))}
-            {bucket.length === 0 ? <div className="h-px w-full bg-[#243233]" /> : null}
+            {bucket.length === 0 ? <div className="h-px w-full bg-line-subtle" /> : null}
           </div>
         ))}
       </div>
@@ -114,14 +114,14 @@ function DecisionCard({
     <article
       ref={ref}
       id={`decision-${decision.id}`}
-      className={`relative border bg-[#0e181b] transition-colors ${
-        expanded ? 'border-[#3a4a49]' : 'border-[#243233] hover:border-[#3a4a49]'
+      className={`hud-sheen relative rounded-card border bg-surface-1 transition-colors ${
+        expanded ? 'border-line bg-surface-2' : 'border-line-subtle hover:border-line-hover'
       }`}
-      style={{ borderLeft: `3px solid ${color}` }}
+      style={{ borderLeft: `2px solid ${color}` }}
       data-testid={`atlas-decision-${decision.id}`}
     >
       <span
-        className="absolute -left-[26px] top-4 h-2.5 w-2.5 rotate-45 ring-4 ring-[#0b1011] sm:-left-[30px]"
+        className="absolute -left-[26px] top-4 h-2.5 w-2.5 rotate-45 ring-4 ring-abyss sm:-left-[30px]"
         style={{ background: color }}
         aria-hidden
       />
@@ -129,18 +129,18 @@ function DecisionCard({
         type="button"
         onClick={onToggle}
         aria-expanded={expanded}
-        className="flex w-full items-start gap-3 px-3.5 py-3 text-left sm:px-4"
+        className="flex w-full items-start gap-3 rounded-card px-3.5 py-3 text-left sm:px-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
       >
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[#5f7170]">
+          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
             {shortDate(decision.date)}
-            {decision.status === 'superseded' ? <span className="ml-2 text-[#ffb020]">Superseded</span> : null}
+            {decision.status === 'superseded' ? <span className="ml-2 text-amber-400">Superseded</span> : null}
           </p>
-          <h3 className="mt-0.5 font-grotesk text-[15px] font-bold leading-snug text-[#dfe3e3]">{decision.title}</h3>
-          <p className="mt-1 text-[13px] leading-snug text-[#8fa2a1]">{decision.summary}</p>
+          <h3 className="mt-0.5 font-grotesk text-[15px] font-bold leading-snug text-ink">{decision.title}</h3>
+          <p className="mt-1 text-[13px] leading-snug text-ink-muted">{decision.summary}</p>
         </div>
         <ChevronDown
-          className={`mt-1 h-4 w-4 shrink-0 text-[#839493] transition-transform ${expanded ? 'rotate-180' : ''}`}
+          className={`mt-1 h-4 w-4 shrink-0 text-ink-muted transition-transform ${expanded ? 'rotate-180' : ''}`}
           aria-hidden
         />
       </button>
@@ -158,7 +158,7 @@ function DecisionCard({
               href={source.url}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex min-h-[30px] items-center gap-1 border border-[#243233] px-2 text-[11px] font-semibold text-[#9fb3b2] hover:border-[#00c3ff]/50 hover:text-[#00c3ff]"
+              className="inline-flex min-h-[30px] items-center gap-1 rounded-control border border-line-subtle px-2 text-[11px] font-semibold text-ink-muted transition-colors hover:border-line-strong hover:text-cyan-glow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Icon className="h-3 w-3" />
               {source.label}
@@ -169,18 +169,18 @@ function DecisionCard({
       </div>
 
       {expanded ? (
-        <div className="border-t border-[#243233] px-3.5 py-4 sm:px-4">
+        <div className="border-t border-line-subtle px-3.5 py-4 sm:px-4">
           <div className="grid grid-cols-1 gap-x-6 gap-y-4 lg:grid-cols-2">
             {decision.sections.map((section) => (
               <section key={section.heading}>
-                <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#839493]">{section.heading}</h4>
+                <h4 className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">{section.heading}</h4>
                 <div className="atlas-prose mt-1.5" dangerouslySetInnerHTML={{ __html: section.html }} />
               </section>
             ))}
           </div>
           {decision.rules.length > 0 ? (
             <div className="mt-4">
-              <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#839493]">Rules this shaped</h4>
+              <h4 className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">Rules this shaped</h4>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {decision.rules.map((id) => {
                   const rule = ruleTitles.get(id)
@@ -190,7 +190,7 @@ function DecisionCard({
                       key={id}
                       type="button"
                       onClick={() => onOpenRule(id)}
-                      className="inline-flex min-h-[30px] items-center gap-1.5 border border-[#243233] bg-[#0b1011] px-2 text-[11px] text-[#b9c6c5] hover:border-[#00c3ff]/50 hover:text-[#dfe3e3]"
+                      className="inline-flex min-h-[30px] items-center gap-1.5 rounded-control border border-line-subtle bg-surface-1 px-2 text-[11px] text-ink-body transition-colors hover:border-line-strong hover:bg-surface-2 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     >
                       <span className="h-1.5 w-1.5 rotate-45" style={{ background: colors.get(rule.domain) }} aria-hidden />
                       {rule.title}
@@ -221,17 +221,17 @@ export function DecisionTimeline({ atlas, filter, selectedDecisionId, onSelectDe
       />
 
       {months.length === 0 ? (
-        <p className="chitin-card chamfer-corner p-4 text-sm text-[#839493]">No decisions match these filters.</p>
+        <p className="hud-sheen rounded-card border border-line-subtle bg-surface-1 p-4 text-sm text-ink-muted">No decisions match these filters.</p>
       ) : (
-        <div className="relative ml-3 border-l border-[#243233] pl-5 sm:ml-4 sm:pl-6">
+        <div className="relative ml-3 border-l border-line-subtle pl-5 sm:ml-4 sm:pl-6">
           {months.map((month) => (
             <section key={month.key} className="pb-6 last:pb-0" aria-label={month.label}>
               <h2 className="-ml-5 mb-3 flex items-center gap-2 sm:-ml-6">
-                <span className="-ml-[5px] h-2.5 w-2.5 border border-[#3a4a49] bg-[#0b1011]" aria-hidden />
-                <span className="font-grotesk text-xs font-bold uppercase tracking-[0.2em] text-[#9fb3b2]">
+                <span className="-ml-[5px] h-2.5 w-2.5 rounded-chip border border-line bg-surface-1" aria-hidden />
+                <span className="font-grotesk text-xs font-bold uppercase tracking-[0.08em] text-ink-muted">
                   {month.label}
                 </span>
-                <span className="text-[11px] text-[#5f7170]">{month.decisions.length}</span>
+                <span className="text-[11px] text-ink-muted">{month.decisions.length}</span>
               </h2>
               <div className="space-y-2.5">
                 {month.decisions.map((decision) => (

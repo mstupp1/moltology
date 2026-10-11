@@ -1,0 +1,30 @@
+{
+  "tool": "built-in image_gen",
+  "date": "2026-10-09",
+  "assets": [
+    {
+      "name": "shell-hardness",
+      "prompt": "Use case: concept-art. Create one premium cinematic raster illustration for a Moltology homepage card. Deep ocean cyber mystique, photorealistic physical materials with restrained biomechanical details, blue-black water, suspended fine particles, dramatic rim lighting, calm protective atmosphere. Landscape 4:3 composition, focal subject fully readable in central 70%, softly darken bottom edge for seamless card crop. No text, letters, numbers, logos, UI, panels, collage, humans, or violence. Subject: Shell Hardness, boundaries that hold. A close-up of an imposing rounded crab carapace, layered black chitin armor with fine natural grain and subtle cyan-lit seams. Bright scattered surface streaks deflect around the intact convex shell, leaving a calm dark zone beneath it. Make the protective shell unmistakable; elegant organic armor rather than a metal helmet.",
+      "source": "Generated images are saved to /Users/mylesstupp/.codex/generated_images/01a12289-f98d-7171-b4d4-4d16fb0986f3 as /Users/mylesstupp/.codex/generated_images/01a12289-f98d-7171-b4d4-4d16fb0986f3/exec-f7a46117-421f-43a5-9637-77ef1c940276.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+      "desktop": "shell-hardness-v1.webp",
+      "mobile": "shell-hardness-v1-sm.webp",
+      "s3Prefix": "images/home/2026-10-09/"
+    },
+    {
+      "name": "pincer-torque",
+      "prompt": "Use case: concept-art. Create one premium cinematic raster illustration for a Moltology homepage card. Deep ocean cyber mystique, photorealistic physical materials with restrained biomechanical details, blue-black water, suspended fine particles, dramatic rim lighting, calm protective atmosphere. Landscape 4:3 composition, focal subject fully readable in central 70%, softly darken bottom edge for seamless card crop. No text, letters, numbers, logos, UI, panels, collage, humans, or violence. Subject: Pincer Torque, a grip that finishes. One powerful crab pincer in close-up gripping a single dark stone firmly between its closed claw tips, confident and steady. Black textured chitin, restrained warm coral light along joints and edges, cold blue-black surrounding water. Strong silhouette of claw and visibly secure grip. No crushing, broken pieces, creatures in the claw, or weapons.",
+      "source": "Generated images are saved to /Users/mylesstupp/.codex/generated_images/01a12289-f98d-7171-b4d4-4d16fb0986f3 as /Users/mylesstupp/.codex/generated_images/01a12289-f98d-7171-b4d4-4d16fb0986f3/exec-a23dd3d8-c401-4204-b433-38b6bafe489d.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+      "desktop": "pincer-torque-v1.webp",
+      "mobile": "pincer-torque-v1-sm.webp",
+      "s3Prefix": "images/home/2026-10-09/"
+    },
+    {
+      "name": "submergence-depth",
+      "prompt": "Use case: concept-art. Create one premium cinematic raster illustration for a Moltology homepage card. Deep ocean cyber mystique, photorealistic physical materials with restrained biomechanical details, blue-black water, suspended fine particles, dramatic rim lighting, calm protective atmosphere. Landscape 4:3 composition, focal subject fully readable in central 70%, softly darken bottom edge for seamless card crop. No text, letters, numbers, logos, UI, panels, collage, humans, or violence. Subject: Submergence Depth, focus below distraction. A solitary biomechanical crab viewed from behind and slightly above descending through a vast dark ocean toward a still pool of cyan-green light on the distant seabed. Faint turbulent white-blue streaks high at the surface, expansive clear quiet water below. Clearly visible crab silhouette in middle foreground, richly detailed shell and legs, vertical light shaft implying depth. No diving humans, fish, or text.",
+      "source": "Generated images are saved to /Users/mylesstupp/.codex/generated_images/01a12289-f98d-7171-b4d4-4d16fb0986f3 as /Users/mylesstupp/.codex/generated_images/01a12289-f98d-7171-b4d4-4d16fb0986f3/exec-c65602c5-e865-46b1-9443-660fd78bc678.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+      "desktop": "submergence-depth-v1.webp",
+      "mobile": "submergence-depth-v1-sm.webp",
+      "s3Prefix": "images/home/2026-10-09/"
+    }
+  ]
+}

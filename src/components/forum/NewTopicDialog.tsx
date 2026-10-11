@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useId, useRef, useState } from 'react'
+import { forumVisibleLength } from '@/lib/forum-markdown'
 import { X, AlertTriangle, MessageSquare } from 'lucide-react'
 import { createForumTopicFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
@@ -6,7 +7,8 @@ import { validateForumContent } from '@/lib/community-rules'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { useForumStanding } from '@/hooks/useForumStanding'
 import { useForumAuth } from './ForumShell'
-import { MentionTextarea } from '@/components/forum/MentionTextarea'
+import { ForumEditor } from '@/components/forum/ForumEditor'
+import { HudButton } from '@/components/ui/HudButton'
 
 interface NewTopicDialogProps {
   categories: ForumCategoryEntry[]
@@ -30,6 +32,8 @@ export function NewTopicDialog({
   const [content, setContent] = useState('')
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const formRef = useRef<HTMLFormElement>(null)
+  const contentLabelId = useId()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -62,53 +66,53 @@ export function NewTopicDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150">
-      <div className="w-full max-w-2xl bg-[#0b0f0f] border border-[#00ffff]/60 shadow-[0_0_30px_rgba(0,255,255,0.25)] chamfer-corner overflow-hidden font-sans text-sm space-y-0">
-        <div className="bg-[#171c1c] border-b border-[#3a4a49] p-4 flex items-center justify-between">
+    <div className="fixed inset-0 z-50 bg-abyss/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
+      <div className="w-full max-w-2xl bg-surface-1 border border-line shadow-menu rounded-card overflow-hidden font-sans text-sm space-y-0">
+        <div className="bg-surface-2 border-b border-line-subtle p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <MessageSquare className="w-4 h-4 text-[#00ffff]" />
-            <h2 className="text-xs text-[#00ffff] font-bold tracking-widest uppercase">
+            <MessageSquare className="w-4 h-4 text-cyan-glow" />
+            <h2 className="text-xs text-ink font-bold tracking-[0.08em] uppercase">
               NEW POST
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="text-[#839493] hover:text-[#ff5540] p-1 transition-colors"
+            className="rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 p-1 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+        <form ref={formRef} onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-4 max-h-[75vh] overflow-y-auto">
           {locked && !error && (
             <div
-              className="p-3 bg-[#171c1c] border border-[#3a4a49] text-[#dfe3e3] text-xs flex items-center gap-2 chamfer-corner"
+              className="p-3 bg-surface-2 border border-line-subtle text-ink-body text-xs flex items-center gap-2 rounded-card"
               data-testid="new-topic-locked"
             >
-              <AlertTriangle className="w-4 h-4 shrink-0 text-[#839493]" />
+              <AlertTriangle className="w-4 h-4 shrink-0 text-ink-muted" />
               <span>{standing?.topicLockReason}</span>
             </div>
           )}
 
           {error && (
-            <div className="p-3 bg-[#2d0f0f] border border-[#ff5540] text-[#ff5540] text-xs flex items-center gap-2 chamfer-corner">
+            <div className="p-3 bg-crimson-soft border border-crimson-aggro/55 text-crimson-text text-xs flex items-center gap-2 rounded-card">
               <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           <div className="space-y-1.5">
-            <label className="text-xs text-[#839493] font-bold uppercase tracking-wider">
+            <label className="text-xs text-ink-muted font-bold uppercase tracking-[0.08em]">
               Discussion Board
             </label>
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-2.5 text-xs text-[#dfe3e3] outline-none chamfer-corner transition-colors"
+              className="w-full bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-none rounded-control transition-colors p-2.5"
             >
               {categories.map((cat) => (
-                <option key={cat.id} value={cat.id} className="bg-[#070b0b] text-[#dfe3e3]">
+                <option key={cat.id} value={cat.id} className="bg-surface-2 text-ink">
                   {cat.name}
                 </option>
               ))}
@@ -117,57 +121,57 @@ export function NewTopicDialog({
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <label className="text-[#839493] font-bold uppercase tracking-wider">
+              <label className="text-ink-muted font-bold uppercase tracking-[0.08em]">
                 Title
               </label>
-              <span className="text-[11px] text-[#839493]">{title.trim().length} / 150</span>
+              <span className="text-[11px] text-ink-muted">{title.trim().length} / 150</span>
             </div>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="What would you like to discuss?"
-              className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-2.5 text-xs text-[#dfe3e3] outline-none chamfer-corner transition-colors placeholder:text-[#839493]/50"
+              className="w-full bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-none rounded-control transition-colors p-2.5 placeholder:text-ink-muted"
             />
           </div>
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <label className="text-[#839493] font-bold uppercase tracking-wider">
+              <span id={contentLabelId} className="text-ink-muted font-bold uppercase tracking-[0.08em]">
                 Content
-              </label>
-              <span className="text-[11px] text-[#839493]">
-                {content.trim().length} characters (min 10)
+              </span>
+              <span className="text-[11px] text-ink-muted">
+                {forumVisibleLength(content)} characters (min 10)
               </span>
             </div>
-            <MentionTextarea
-              rows={6}
+            <ForumEditor
               value={content}
               onChange={setContent}
-              placeholder="Share your thoughts, questions, or ideas... Hail a member with @designation."
-              className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner transition-colors placeholder:text-[#839493]/50"
+              onSubmit={() => formRef.current?.requestSubmit()}
+              disabled={creating}
+              size="tall"
+              aria-labelledby={contentLabelId}
+              placeholder="Share your thoughts, questions, or ideas. Type @ to mention someone."
+              testId="new-topic-editor"
             />
           </div>
 
-          <p className="text-[11px] text-[#839493] leading-relaxed border-l-2 border-[#3a4a49] pl-2.5">
+          <p className="text-[11px] text-ink-muted leading-relaxed border-l-2 border-line pl-2.5">
             Be civil and constructive. Keep private credentials, keys, and tokens out of public posts.
           </p>
 
-          <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-[#3a4a49]">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-1.5 border border-[#3a4a49] hover:bg-[#171c1c] text-[#839493] hover:text-[#dfe3e3] text-xs font-bold uppercase chamfer-corner transition-colors"
-            >
+          <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-line-subtle">
+            <HudButton type="button" variant="secondary" size="sm" onClick={onClose}>
               Cancel
-            </button>
-            <button
+            </HudButton>
+            <HudButton
               type="submit"
-              disabled={creating || locked || title.trim().length < 5 || content.trim().length < 10}
-              className="px-5 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] disabled:opacity-50 text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all shadow-[0_0_12px_rgba(0,255,255,0.2)]"
+              variant="primary"
+              size="sm"
+              disabled={creating || locked || title.trim().length < 5 || forumVisibleLength(content) < 10}
             >
               {creating ? 'Posting...' : 'Post'}
-            </button>
+            </HudButton>
           </div>
         </form>
       </div>

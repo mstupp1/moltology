@@ -188,7 +188,7 @@ export const Eyebrow: React.FC<{ children: React.ReactNode; color?: string; clas
   className = '',
 }) => (
   <p
-    className={`inline-flex items-center gap-2 text-[11px] sm:text-xs font-grotesk font-bold tracking-[0.22em] uppercase ${className}`}
+    className={`inline-flex items-center gap-2 text-[11px] sm:text-xs font-grotesk font-bold tracking-[0.08em] uppercase ${className}`}
     style={{ color }}
   >
     <span className="h-px w-6" style={{ background: color }} aria-hidden="true" />
@@ -201,7 +201,7 @@ type CtaProps = { to: string; children: React.ReactNode; className?: string }
 export const PrimaryCta: React.FC<CtaProps> = ({ to, children, className = '' }) => (
   <Link
     to={to}
-    className={`group inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-full font-grotesk font-bold text-sm bg-[#00c3ff] hover:bg-[#5cdcff] text-[#020408] shadow-[0_0_30px_rgba(0,195,255,0.35)] transition-colors ${className}`}
+    className={`group inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-control font-grotesk font-bold text-sm bg-cyan-glow hover:bg-cyan-hover text-abyss hover:drop-shadow-[0_0_10px_rgba(0,195,255,0.45)] transition-[background-color,filter] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${className}`}
   >
     {children}
     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
@@ -211,7 +211,7 @@ export const PrimaryCta: React.FC<CtaProps> = ({ to, children, className = '' })
 export const SecondaryCta: React.FC<CtaProps> = ({ to, children, className = '' }) => (
   <Link
     to={to}
-    className={`inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-full font-grotesk font-bold text-sm border border-white/25 bg-white/5 backdrop-blur-md text-white hover:bg-white/10 hover:border-white/40 transition-colors ${className}`}
+    className={`inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-control font-grotesk font-bold text-sm border border-line bg-surface-1/80 hud-sheen backdrop-blur-md text-ink hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${className}`}
   >
     {children}
   </Link>
@@ -263,10 +263,10 @@ export const StoryHero: React.FC<{
         style={{ opacity: 'calc(1 - max(0, var(--p) - 0.5) * 2.4)' }}
       >
         <Eyebrow>{eyebrow}</Eyebrow>
-        <h1 className="mt-5 max-w-4xl font-grotesk font-bold tracking-tight text-white text-[2.6rem] leading-[1.02] sm:text-6xl lg:text-7xl">
+        <h1 className="mt-5 max-w-4xl font-grotesk font-bold tracking-tight text-ink text-[2.6rem] leading-[1.02] sm:text-6xl lg:text-7xl">
           {title}
         </h1>
-        <div className="mt-6 max-w-2xl text-base sm:text-lg text-[#c3cdcd] leading-relaxed [text-wrap:pretty]">{lede}</div>
+        <div className="mt-6 max-w-2xl text-base sm:text-lg text-ink-body leading-relaxed [text-wrap:pretty]">{lede}</div>
         {actions && <div className="mt-9 flex flex-wrap gap-3">{actions}</div>}
       </div>
 
@@ -275,14 +275,14 @@ export const StoryHero: React.FC<{
           type="button"
           onClick={() => setReelPaused((value) => !value)}
           aria-label={reelPaused ? 'Play background video' : 'Pause background video'}
-          className="absolute bottom-5 right-5 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/80 backdrop-blur-md hover:bg-black/60 hover:text-white transition-colors"
+          className="absolute bottom-5 right-5 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface-1/70 text-ink-body backdrop-blur-md hover:bg-surface-2 hover:text-ink transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
           {reelPaused ? <Play className="h-4 w-4" aria-hidden="true" /> : <Pause className="h-4 w-4" aria-hidden="true" />}
         </button>
       )}
 
       {cue && (
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-1 text-[11px] font-grotesk tracking-[0.2em] uppercase text-white/60">
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-1 text-[11px] font-grotesk tracking-[0.08em] uppercase text-ink-muted">
           {cue}
           <ChevronDown className="w-4 h-4 animate-bounce motion-reduce:animate-none" aria-hidden="true" />
         </div>
@@ -326,11 +326,11 @@ export const DepthGauge: React.FC<{ targetRef: React.RefObject<HTMLElement | nul
       aria-hidden="true"
     >
       <div className="text-right font-grotesk">
-        <p className="text-[10px] tracking-[0.25em] uppercase text-white/45">Depth</p>
-        <p className="text-lg font-bold text-white tabular-nums">{meters.toLocaleString('en-US')} m</p>
-        <p className="text-[10px] tracking-[0.18em] uppercase text-[#00c3ff]">{zone}</p>
+        <p className="text-[11px] tracking-[0.08em] uppercase text-ink-muted">Depth</p>
+        <p className="text-lg font-bold text-ink tabular-nums">{meters.toLocaleString('en-US')} m</p>
+        <p className="text-[11px] tracking-[0.08em] uppercase text-cyan-glow">{zone}</p>
       </div>
-      <div className="relative h-48 w-[3px] rounded-full bg-white/10 overflow-hidden">
+      <div className="relative h-48 w-[3px] rounded-full bg-surface-3 overflow-hidden">
         <div
           className="absolute inset-x-0 top-0 rounded-full bg-gradient-to-b from-[#38bdf8] via-[#00c3ff] to-[#00ffcc]"
           style={{ height: `${progress * 100}%` }}

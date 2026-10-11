@@ -59,6 +59,13 @@ describe('lobster-avatar-slots', () => {
     expect(isLobsterAvatarSlot('thumbnail')).toBe(false)
   })
 
+  it('uses the rendered portrait only for avatars in the avatar-kit experiment', () => {
+    const stale = resolveLobsterAvatarAssets({ ...config, portraitKey: 'images/avatar-portraits/abc.webp' })
+    expect(stale.portraitUrl).toMatch(/^data:image\/svg\+xml/)
+    const kit = resolveLobsterAvatarAssets({ ...config, kit: true, portraitKey: 'images/avatar-portraits/abc.webp' })
+    expect(kit.portraitUrl).toContain('images/avatar-portraits/abc.webp')
+  })
+
   it('returns empty assets when config is missing', () => {
     expect(resolveLobsterAvatarAssets(null)).toEqual({ portraitUrl: null, fullBody: null })
     expect(pickLobsterAvatarSlot({ portraitUrl: null, fullBody: null }, 'portrait')).toBeNull()

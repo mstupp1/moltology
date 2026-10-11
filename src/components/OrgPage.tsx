@@ -9,6 +9,7 @@
  * ============================================================================
  */
 import React, { useState, useEffect } from 'react'
+import { BrandIcon } from '@/components/ui/BrandMark'
 import { useNavigate } from '@tanstack/react-router'
 import {
   Shield,
@@ -331,7 +332,7 @@ export const OrgPage: React.FC = () => {
   }
 
   const inputClass =
-    'w-full bg-[#f8fbff] border border-sky-200 rounded-2xl px-3.5 py-2.5 text-xs text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100'
+    'w-full bg-[#f8fbff] border border-sky-200 rounded-control px-3.5 py-2.5 text-xs text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100'
 
   return (
     <div className="min-h-screen bg-[#f4f7f9] text-slate-700 font-sans relative flex flex-col justify-between overflow-x-hidden">
@@ -373,10 +374,9 @@ export const OrgPage: React.FC = () => {
 
         <div className="max-w-[1200px] mx-auto relative z-10 text-center w-full pb-4 sm:pb-6">
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-            <div className="inline-flex items-center gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-white/95 backdrop-blur-md border-2 border-sky-200 text-sky-900 text-xs sm:text-sm md:text-base font-extrabold tracking-wider uppercase rounded-full shadow-xl hover:bg-white transition-all">
-              <img
-                src={getAssetUrl('/images/order_emblem.png')}
-                alt="Moltology Emblem"
+            <div className="inline-flex items-center gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-white/95 backdrop-blur-md border-2 border-sky-200 text-sky-900 text-xs sm:text-sm md:text-base font-extrabold tracking-wider uppercase rounded-control shadow-xl hover:bg-white transition-all">
+              <BrandIcon
+                label="Moltology Emblem"
                 className="w-6 h-6 sm:w-7 sm:h-7 object-contain"
               />
               <span>MOLTOLOGY FOUNDATION · EST. 2022</span>
@@ -384,7 +384,7 @@ export const OrgPage: React.FC = () => {
 
             <a
               href="#contact"
-              className="px-8 sm:px-10 py-3.5 sm:py-4 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-extrabold text-xs sm:text-sm md:text-base uppercase tracking-wider rounded-full transition-all shadow-xl shadow-sky-500/30 flex items-center gap-2.5 hover:-translate-y-0.5"
+              className="px-8 sm:px-10 py-3.5 sm:py-4 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-extrabold text-xs sm:text-sm md:text-base uppercase tracking-wider rounded-control transition-all shadow-xl flex items-center gap-2.5 hover:-translate-y-0.5"
             >
               <Mail className="w-5 h-5" />
               <span>SAY HELLO</span>
@@ -397,35 +397,35 @@ export const OrgPage: React.FC = () => {
       <section className="relative z-10 w-full px-6 sm:px-12 -mt-2 sm:-mt-4 mb-8 max-w-[1200px] mx-auto">
         <ScrollReveal animation="fade-up" durationMs={800}>
           <div className="grid grid-cols-3 gap-3 sm:gap-6">
-            <div className="bg-white rounded-3xl border border-sky-100 shadow-xl shadow-sky-100/60 p-4 sm:p-6 text-center space-y-1.5 hover:-translate-y-1 hover:shadow-2xl transition-all">
-              <div className="text-[10px] sm:text-xs text-sky-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
+            <div className="bg-white rounded-card border border-sky-100 shadow-xl p-4 sm:p-6 text-center space-y-1.5 hover:-translate-y-1 hover:shadow-2xl transition-all">
+              <div className="text-[11px] sm:text-xs text-sky-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
                 <Anchor className="w-4 h-4 hidden sm:block" />
                 LAIR DEPTH
               </div>
               <div className="text-xl sm:text-4xl font-black text-sky-600 font-grotesk tracking-tight whitespace-nowrap">
                 <RollingNumber value={8450} duration={2000} prefix="-" suffix="m" triggerOnView={true} />
               </div>
-              <div className="text-[10px] sm:text-xs text-slate-500">Mariana Trench</div>
+              <div className="text-[11px] sm:text-xs text-slate-500">Mariana Trench</div>
             </div>
 
-            <div className="bg-white rounded-3xl border border-emerald-100 shadow-xl shadow-emerald-100/60 p-4 sm:p-6 text-center space-y-1.5 hover:-translate-y-1 hover:shadow-2xl transition-all">
-              <div className="text-[10px] sm:text-xs text-emerald-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
+            <div className="bg-white rounded-card border border-emerald-100 shadow-xl p-4 sm:p-6 text-center space-y-1.5 hover:-translate-y-1 hover:shadow-2xl transition-all">
+              <div className="text-[11px] sm:text-xs text-emerald-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
                 <Gauge className="w-4 h-4 hidden sm:block" />
                 PRESSURE
               </div>
               <div className="text-xl sm:text-4xl font-black text-emerald-600 font-grotesk tracking-tight whitespace-nowrap">
                 <RollingNumber value={850} duration={2000} suffix=" atm" triggerOnView={true} />
               </div>
-              <div className="text-[10px] sm:text-xs text-slate-500">Cozy, honestly</div>
+              <div className="text-[11px] sm:text-xs text-slate-500">Cozy, honestly</div>
             </div>
 
-            <div className="bg-white rounded-3xl border border-amber-100 shadow-xl shadow-amber-100/60 p-4 sm:p-6 text-center space-y-1.5 hover:-translate-y-1 hover:shadow-2xl transition-all">
-              <div className="text-[10px] sm:text-xs text-amber-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
+            <div className="bg-white rounded-card border border-amber-100 shadow-xl p-4 sm:p-6 text-center space-y-1.5 hover:-translate-y-1 hover:shadow-2xl transition-all">
+              <div className="text-[11px] sm:text-xs text-amber-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
                 <Coffee className="w-4 h-4 hidden sm:block" />
                 COFFEE
               </div>
               <div className="text-xl sm:text-4xl font-black text-amber-600 font-grotesk tracking-tight whitespace-nowrap">24/7</div>
-              <div className="text-[10px] sm:text-xs text-slate-500">On the house</div>
+              <div className="text-[11px] sm:text-xs text-slate-500">On the house</div>
             </div>
           </div>
         </ScrollReveal>
@@ -433,11 +433,11 @@ export const OrgPage: React.FC = () => {
 
       {/* TOP SUB-NAVIGATION MODE SWITCHER */}
       <section className="relative z-10 w-full px-6 sm:px-12 mb-10 max-w-[1200px] mx-auto">
-        <div className="flex flex-wrap justify-center items-center gap-2 p-2 bg-white/90 backdrop-blur-md rounded-2xl sm:rounded-full border border-sky-200 shadow-lg shadow-sky-100/60 max-w-fit mx-auto">
+        <div className="flex flex-wrap justify-center items-center gap-2 p-2 bg-white/90 backdrop-blur-md rounded-card border border-sky-200 shadow-lg max-w-fit mx-auto">
           <button
             type="button"
             onClick={() => setViewMode('overview')}
-            className={`px-5 py-2.5 rounded-xl sm:rounded-full text-xs font-grotesk font-bold tracking-wider uppercase transition-all flex items-center gap-2 ${
+            className={`px-5 py-2.5 rounded-control text-xs font-grotesk font-bold tracking-wider uppercase transition-all flex items-center gap-2 ${
               viewMode === 'overview'
                 ? 'bg-sky-500 text-white shadow-md'
                 : 'text-slate-600 hover:text-sky-700 hover:bg-sky-50'
@@ -450,7 +450,7 @@ export const OrgPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setViewMode('careers')}
-            className={`px-5 py-2.5 rounded-xl sm:rounded-full text-xs font-grotesk font-bold tracking-wider uppercase transition-all flex items-center gap-2 ${
+            className={`px-5 py-2.5 rounded-control text-xs font-grotesk font-bold tracking-wider uppercase transition-all flex items-center gap-2 ${
               viewMode === 'careers'
                 ? 'bg-sky-500 text-white shadow-md'
                 : 'text-slate-600 hover:text-sky-700 hover:bg-sky-50'
@@ -478,13 +478,13 @@ export const OrgPage: React.FC = () => {
               </h3>
             </div>
 
-            <div className="flex justify-start sm:justify-center gap-2 overflow-x-auto touch-pan-scroll no-scrollbar p-1.5 bg-white rounded-2xl sm:rounded-full border border-sky-200 shadow-sm w-full max-w-full sm:w-fit mx-auto px-2">
+            <div className="flex justify-start sm:justify-center gap-2 overflow-x-auto touch-pan-scroll no-scrollbar p-1.5 bg-white rounded-card border border-sky-200 shadow-sm w-full max-w-full sm:w-fit mx-auto px-2">
               {galleryItems.map((item, idx) => (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => setActiveGalleryIndex(idx)}
-                  className={`px-4 sm:px-5 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center gap-1.5 ${
+                  className={`px-4 sm:px-5 py-2.5 rounded-control text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center gap-1.5 ${
                     activeGalleryIndex === idx
                       ? 'bg-sky-500 text-white shadow-md'
                       : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'
@@ -495,7 +495,7 @@ export const OrgPage: React.FC = () => {
               ))}
             </div>
 
-            <div className="bg-white border border-sky-100 rounded-3xl overflow-hidden shadow-xl shadow-sky-100 grid lg:grid-cols-12 gap-0">
+            <div className="bg-white border border-sky-100 rounded-panel overflow-hidden shadow-xl grid lg:grid-cols-12 gap-0">
               <div className="lg:col-span-7 relative h-72 sm:h-96 lg:h-auto min-h-[340px] bg-slate-900 overflow-hidden group">
                 <img
                   key={galleryItems[activeGalleryIndex].id}
@@ -520,7 +520,7 @@ export const OrgPage: React.FC = () => {
                   </p>
                   <ul className="space-y-2 text-xs text-slate-700">
                     {galleryItems[activeGalleryIndex].highlights.map((highlight) => (
-                      <li key={highlight} className="flex items-start gap-2 bg-[#f8fbff] p-2.5 rounded-xl border border-sky-100">
+                      <li key={highlight} className="flex items-start gap-2 bg-[#f8fbff] p-2.5 rounded-card border border-sky-100">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                         <span className="leading-snug">{highlight}</span>
                       </li>
@@ -535,7 +535,7 @@ export const OrgPage: React.FC = () => {
                       type="button"
                       aria-label={`Show ${thumb.title}`}
                       onClick={() => setActiveGalleryIndex(tIdx)}
-                      className={`relative aspect-video rounded-xl overflow-hidden border-2 transition-all ${
+                      className={`relative aspect-video rounded-card overflow-hidden border-2 transition-all ${
                         activeGalleryIndex === tIdx
                           ? 'border-sky-500 ring-2 ring-sky-300 scale-105'
                           : 'border-transparent opacity-70 hover:opacity-100'
@@ -567,7 +567,7 @@ export const OrgPage: React.FC = () => {
                 {values.map((value) => (
                   <div
                     key={value.title}
-                    className="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100 p-6 space-y-3 hover:-translate-y-1 hover:shadow-xl transition-all"
+                    className="bg-white rounded-card border border-sky-100 shadow-lg p-6 space-y-3 hover:-translate-y-1 hover:shadow-xl transition-all"
                   >
                     <div className="w-12 h-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center">
                       <value.icon className="w-6 h-6" />
@@ -596,13 +596,13 @@ export const OrgPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="flex justify-start sm:justify-center gap-1.5 sm:gap-2 mb-10 overflow-x-auto touch-pan-scroll no-scrollbar p-1.5 bg-white rounded-2xl sm:rounded-full border border-sky-200 shadow-sm w-full max-w-full sm:w-fit mx-auto px-2">
+              <div className="flex justify-start sm:justify-center gap-1.5 sm:gap-2 mb-10 overflow-x-auto touch-pan-scroll no-scrollbar p-1.5 bg-white rounded-card border border-sky-200 shadow-sm w-full max-w-full sm:w-fit mx-auto px-2">
                 {ABOUT_TABS.map((tab) => (
                   <button
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveTab(tab.id)}
-                    className={`px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center ${
+                    className={`px-4 sm:px-6 py-2.5 rounded-control text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center ${
                       activeTab === tab.id
                         ? tab.id === 'safety'
                           ? 'bg-emerald-500 text-white shadow-md'
@@ -615,7 +615,7 @@ export const OrgPage: React.FC = () => {
                 ))}
               </div>
 
-              <div className="bg-white border border-sky-100 p-8 sm:p-12 rounded-3xl shadow-xl shadow-sky-100">
+              <div className="bg-white border border-sky-100 p-8 sm:p-12 rounded-panel shadow-xl">
                 {activeTab === 'mission' && (
                   <div className="space-y-5 max-w-3xl">
                     <h3 className="text-2xl font-grotesk font-bold text-sky-700 uppercase">
@@ -665,7 +665,7 @@ export const OrgPage: React.FC = () => {
                           copy: 'Everyone focused, nobody hesitating, and every shell built to last.',
                         },
                       ].map((phase) => (
-                        <div key={phase.title} className="bg-[#f8fbff] p-5 border border-sky-100 rounded-3xl">
+                        <div key={phase.title} className="bg-[#f8fbff] p-5 border border-sky-100 rounded-card">
                           <Target className="w-6 h-6 text-sky-500 mb-3" />
                           <div className="text-sky-700 font-bold text-lg font-grotesk mb-2">{phase.title}</div>
                           <p className="text-xs text-slate-500">{phase.copy}</p>
@@ -686,10 +686,10 @@ export const OrgPage: React.FC = () => {
                       Everyone is a friend.
                     </p>
                     <div className="grid sm:grid-cols-2 gap-4 text-xs">
-                      <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-3xl text-emerald-800">
+                      <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-card text-emerald-800">
                         <strong>Your pace, your call.</strong> Every step happens when you're ready, with full consent.
                       </div>
-                      <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-3xl text-emerald-800">
+                      <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-card text-emerald-800">
                         <strong>Chaplains on call.</strong> Someone is always around to listen, reassure, and put the
                         kettle on.
                       </div>
@@ -728,9 +728,9 @@ export const OrgPage: React.FC = () => {
                         key={chamber.id}
                         type="button"
                         onClick={() => setActiveChamber(index)}
-                        className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between shadow-sm ${
+                        className={`w-full text-left p-4 rounded-card border transition-all flex items-center justify-between shadow-sm ${
                           activeChamber === index
-                            ? 'bg-sky-500 border-sky-500 text-white shadow-lg shadow-sky-200'
+                            ? 'bg-sky-500 border-sky-500 text-white shadow-lg'
                             : 'bg-white border-sky-100 text-slate-600 hover:border-sky-300 hover:text-sky-800'
                         }`}
                       >
@@ -748,10 +748,10 @@ export const OrgPage: React.FC = () => {
                       </button>
                     ))}
 
-                    <div className="bg-[#f8fbff] border border-sky-100 p-5 rounded-3xl text-xs space-y-2 mt-6">
+                    <div className="bg-[#f8fbff] border border-sky-100 p-5 rounded-card text-xs space-y-2 mt-6">
                       <div className="text-sky-700 font-bold uppercase flex items-center justify-between border-b border-sky-100 pb-2">
                         <span>TODAY IN THE LAIR</span>
-                        <span className="text-[10px] text-emerald-600">ALL GOOD</span>
+                        <span className="text-[11px] text-emerald-600">ALL GOOD</span>
                       </div>
                       <div className="flex justify-between text-slate-600">
                         <span>Air scrubbers:</span>
@@ -772,7 +772,7 @@ export const OrgPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="lg:col-span-8 bg-white border border-sky-100 rounded-3xl overflow-hidden shadow-xl shadow-sky-100 flex flex-col justify-between">
+                  <div className="lg:col-span-8 bg-white border border-sky-100 rounded-panel overflow-hidden shadow-xl flex flex-col justify-between">
                     <div className="relative h-64 sm:h-80 overflow-hidden border-b border-sky-100 bg-slate-900">
                       <img
                         key={chambers[activeChamber].id}
@@ -782,10 +782,10 @@ export const OrgPage: React.FC = () => {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
                       <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between">
-                        <div className="bg-white/90 backdrop-blur-md px-3 py-1.5 border border-sky-200 rounded-full text-sky-700 text-xs font-bold shadow-sm">
+                        <div className="bg-white/90 backdrop-blur-md px-3 py-1.5 border border-sky-200 rounded-chip text-sky-700 text-xs font-bold shadow-sm">
                           {chambers[activeChamber].depth}
                         </div>
-                        <div className="bg-emerald-500 text-white px-3 py-1.5 rounded-full text-[11px] font-bold shadow-sm">
+                        <div className="bg-emerald-500 text-white px-3 py-1.5 rounded-chip text-[11px] font-bold shadow-sm">
                           {chambers[activeChamber].status}
                         </div>
                       </div>
@@ -800,7 +800,7 @@ export const OrgPage: React.FC = () => {
                         {chambers[activeChamber].features.map((feat) => (
                           <div
                             key={feat}
-                            className="bg-[#f8fbff] border border-sky-100 p-3 rounded-2xl text-xs text-slate-700 flex items-center gap-2"
+                            className="bg-[#f8fbff] border border-sky-100 p-3 rounded-card text-xs text-slate-700 flex items-center gap-2"
                           >
                             <Zap className="w-3.5 h-3.5 text-sky-500 shrink-0" />
                             <span>{feat}</span>
@@ -844,7 +844,7 @@ export const OrgPage: React.FC = () => {
                 {milestones.map((item) => (
                   <div
                     key={item.year}
-                    className="bg-white border border-sky-100 p-6 rounded-3xl shadow-lg shadow-sky-100 space-y-3 relative hover:-translate-y-1 hover:shadow-xl transition-all group"
+                    className="bg-white border border-sky-100 p-6 rounded-card shadow-lg space-y-3 relative hover:-translate-y-1 hover:shadow-xl transition-all group"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-2xl font-extrabold font-grotesk text-sky-600 group-hover:text-sky-500">
@@ -882,7 +882,7 @@ export const OrgPage: React.FC = () => {
                   {leadership.map((member) => (
                     <div
                       key={member.name}
-                      className="bg-[#f8fbff] border border-sky-100 rounded-3xl p-6 flex flex-col items-center text-center hover:-translate-y-1 hover:shadow-xl transition-all group"
+                      className="bg-[#f8fbff] border border-sky-100 rounded-card p-6 flex flex-col items-center text-center hover:-translate-y-1 hover:shadow-xl transition-all group"
                     >
                       <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-sky-200 bg-sky-50 mb-4">
                         <img
@@ -901,7 +901,7 @@ export const OrgPage: React.FC = () => {
                 </div>
 
                 {/* CAREERS CTA */}
-                <div className="bg-gradient-to-r from-sky-500 to-teal-400 rounded-3xl p-8 sm:p-10 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl shadow-sky-200">
+                <div className="bg-gradient-to-r from-sky-500 to-teal-400 rounded-panel p-8 sm:p-10 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
                   <div className="space-y-2 text-center sm:text-left">
                     <h3 className="text-2xl font-grotesk font-bold uppercase tracking-tight">
                       JOIN OUR GROWING FAMILY!
@@ -917,7 +917,7 @@ export const OrgPage: React.FC = () => {
                       setViewMode('careers')
                       setTimeout(() => scrollToElement('careers-hub'), 50)
                     }}
-                    className="shrink-0 px-7 py-3.5 bg-white text-sky-600 font-grotesk font-extrabold text-sm uppercase tracking-wider rounded-full shadow-lg hover:bg-sky-50 transition-all flex items-center gap-2 cursor-pointer"
+                    className="shrink-0 px-7 py-3.5 bg-white text-sky-600 font-grotesk font-extrabold text-sm uppercase tracking-wider rounded-control shadow-lg hover:bg-sky-50 transition-all flex items-center gap-2 cursor-pointer"
                   >
                     VIEW OPEN ROLES
                     <ArrowRight className="w-4 h-4" />
@@ -948,14 +948,14 @@ export const OrgPage: React.FC = () => {
             </div>
 
             <div className="grid md:grid-cols-12 gap-8">
-              <div className="md:col-span-5 bg-[#f8fbff] border border-sky-100 p-6 rounded-3xl space-y-6">
+              <div className="md:col-span-5 bg-[#f8fbff] border border-sky-100 p-6 rounded-panel space-y-6">
                 <h3 className="text-lg font-bold font-grotesk text-sky-700 uppercase border-b border-sky-100 pb-3">
                   HEADQUARTERS
                 </h3>
 
                 <div className="space-y-4 text-xs">
                   <div>
-                    <div className="text-slate-400 uppercase text-[10px]">ADDRESS</div>
+                    <div className="text-slate-400 uppercase text-[11px]">ADDRESS</div>
                     <div className="text-slate-700 font-bold mt-1">
                       Lair Alpha, Trench Level 7
                       <br />
@@ -966,12 +966,12 @@ export const OrgPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <div className="text-slate-400 uppercase text-[10px]">VISITING HOURS</div>
+                    <div className="text-slate-400 uppercase text-[11px]">VISITING HOURS</div>
                     <div className="text-slate-700 mt-1">Always open. The vents never switch off, and neither does the kettle.</div>
                   </div>
 
                   <div>
-                    <div className="text-slate-400 uppercase text-[10px]">EMAIL</div>
+                    <div className="text-slate-400 uppercase text-[11px]">EMAIL</div>
                     <a href={`mailto:${SUPPORT_INBOX}`} className="text-sky-600 font-bold mt-1 inline-block hover:underline">
                       {SUPPORT_INBOX}
                     </a>
@@ -979,7 +979,7 @@ export const OrgPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="md:col-span-7 bg-white border border-sky-100 p-6 sm:p-8 rounded-3xl shadow-xl shadow-sky-100">
+              <div className="md:col-span-7 bg-white border border-sky-100 p-6 sm:p-8 rounded-panel shadow-xl">
                 {contactSentTo ? (
                   <div className="py-12 text-center space-y-4" role="status">
                     <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
@@ -990,7 +990,7 @@ export const OrgPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setContactSentTo(null)}
-                      className="px-6 py-2.5 bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold uppercase rounded-full shadow-md"
+                      className="px-6 py-2.5 bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold uppercase rounded-control shadow-md"
                     >
                       SEND ANOTHER
                     </button>
@@ -1081,7 +1081,7 @@ export const OrgPage: React.FC = () => {
                     <button
                       type="submit"
                       disabled={isContactSubmitting}
-                      className="w-full py-3 bg-sky-500 hover:bg-sky-400 disabled:opacity-60 text-white font-grotesk font-bold text-xs uppercase tracking-wider rounded-full transition-all shadow-lg shadow-sky-200 flex items-center justify-center gap-2"
+                      className="w-full py-3 bg-sky-500 hover:bg-sky-400 disabled:opacity-60 text-white font-grotesk font-bold text-xs uppercase tracking-wider rounded-control transition-all shadow-lg flex items-center justify-center gap-2"
                     >
                       <Send className="w-4 h-4" />
                       <span>{isContactSubmitting ? 'SENDING...' : 'SEND MESSAGE'}</span>
@@ -1092,7 +1092,7 @@ export const OrgPage: React.FC = () => {
                         type="checkbox"
                         checked={contactForm.emailOptIn}
                         onChange={(e) => setContactForm({ ...contactForm, emailOptIn: e.target.checked })}
-                        className="mt-0.5 w-4 h-4 rounded border-sky-300 bg-[#f8fbff] text-sky-500 focus:ring-sky-400 focus:ring-offset-0 cursor-pointer accent-sky-500"
+                        className="mt-0.5 w-4 h-4 rounded-control border-sky-300 bg-[#f8fbff] text-sky-500 focus:ring-sky-400 focus:ring-offset-0 cursor-pointer accent-sky-500"
                       />
                       <span className="text-xs text-slate-600 group-hover:text-slate-900 transition-colors font-sans leading-tight">
                         Email me Moltology news and releases.

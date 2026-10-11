@@ -54,8 +54,8 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
             title={`Current Clearance Stage ${progression.stage}: ${progression.stageTitle}`}
             aria-label={`Stage ${progression.stage} Badge`}
           >
-            <span className="text-[9px] sm:text-[10px] font-semibold text-[#839493] tracking-wider uppercase">STAGE</span>
-            <span className="text-[10px] sm:text-xs font-bold text-[#00ffff] drop-shadow-[0_0_6px_rgba(0,255,255,0.7)] leading-none">
+            <span className="text-[11px] font-semibold text-ink-muted tracking-[0.08em] uppercase">STAGE</span>
+            <span className="text-[11px] sm:text-xs font-bold text-cyan-glow leading-none">
               {progression.stage}
             </span>
           </div>
@@ -67,8 +67,8 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
               title={`Next Ascension Clearance: Stage ${nextStage}`}
               aria-label={`Next Stage ${nextStage} Badge`}
             >
-              <span className="text-[9px] sm:text-[10px] font-semibold text-[#b58060] tracking-wider uppercase">STAGE</span>
-              <span className="text-[10px] sm:text-xs font-bold text-[#ffb076] drop-shadow-[0_0_6px_rgba(255,140,66,0.7)] leading-none">
+              <span className="text-[11px] font-semibold text-ink-muted tracking-[0.08em] uppercase">STAGE</span>
+              <span className="text-[11px] sm:text-xs font-bold text-ink leading-none">
                 {nextStage}
               </span>
             </div>
@@ -78,7 +78,7 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
               title="Apex Carcinization Stage Reached (Stage 4 Max)"
               aria-label="Apex Stage Badge"
             >
-              <span className="text-[9px] sm:text-[10px] font-extrabold text-[#00ff88] drop-shadow-[0_0_6px_rgba(0,255,136,0.6)] tracking-widest uppercase leading-none">
+              <span className="text-[11px] font-extrabold text-emerald-400 tracking-[0.08em] uppercase leading-none">
                 APEX
               </span>
             </div>
@@ -103,28 +103,21 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
 
           {/* Track shell */}
           <div
-            className="relative flex-1 rounded-full overflow-visible"
-            style={{
-              height: '10px',
-              background: 'linear-gradient(to bottom, #040b0d, #010405)',
-              border: '1px solid rgba(0,195,255,0.3)',
-              boxShadow: 'inset 0 0 8px rgba(0,0,0,0.95), 0 0 8px rgba(0,195,255,0.1)',
-            }}
+            className="relative flex-1 rounded-chip overflow-visible bg-surface-3 border border-line-subtle"
+            style={{ height: '10px' }}
           >
             {/* ── FILL ── */}
             <div
-              className="absolute top-0 left-0 h-full rounded-full overflow-hidden transition-all duration-500 ease-out"
-              style={{
-                width: `${fillPercent}%`,
-                background: 'linear-gradient(90deg, #003a55 0%, #006f85 20%, #00c3ff 45%, #ff6b35 72%, #ff2a1a 85%, #cc0000 100%)',
-                boxShadow: '0 0 10px rgba(255,69,58,0.7), inset 0 1px 0 rgba(255,255,255,0.25)',
-              }}
+              className={`absolute top-0 left-0 h-full rounded-chip overflow-hidden transition-all duration-500 ease-out ${
+                isMaxStage ? 'bg-emerald-500' : 'bg-cyan-glow'
+              }`}
+              style={{ width: `${fillPercent}%` }}
             >
               {/* Shimmer sweep - Hardware Accelerated GPU Transform */}
               <div
                 className="absolute inset-y-0 w-1/2 pointer-events-none"
                 style={{
-                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.22) 50%, transparent 100%)',
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%)',
                   animation: 'shimmerSweep 2.2s ease-in-out infinite',
                   willChange: 'transform',
                 }}
@@ -133,15 +126,14 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
               <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-b from-white/30 to-transparent pointer-events-none" />
             </div>
 
-            {/* ── GLOWING PROGRESS EDGE ── */}
+            {/* ── PROGRESS EDGE ── */}
             {fillPercent > 0 && (
               <div
                 className="absolute top-0 h-full pointer-events-none transition-all duration-500 ease-out"
                 style={{
                   left: `calc(${fillPercent}% - 1.5px)`,
                   width: '3px',
-                  background: 'white',
-                  boxShadow: '0 0 8px 2px rgba(255,255,255,0.9), 0 0 14px 4px rgba(255,100,50,0.8)',
+                  background: 'rgba(255,255,255,0.85)',
                   borderRadius: '1px',
                 }}
               />

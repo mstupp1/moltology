@@ -49,7 +49,7 @@ export const NewsArticleBody: React.FC<NewsArticleBodyProps> = ({ content, class
   }
 
   return (
-    <div className={`prose prose-invert max-w-none space-y-4 sm:space-y-6 text-[#dfe3e3] font-sans break-words ${className}`}>
+    <div className={`prose prose-invert max-w-none space-y-4 sm:space-y-6 text-ink-body font-sans break-words ${className}`}>
       {blocks.map((block, idx) => {
         if (block.type === 'code') {
           return <ArticleCodeBlock key={`code-${idx}`} language={block.language || 'telemetry'} code={block.raw} />
@@ -70,18 +70,18 @@ const ArticleCodeBlock: React.FC<{ language: string; code: string }> = ({ langua
   }
 
   return (
-    <div className="relative my-6 sm:my-8 bg-[#040708] border border-cyan-900/80 chamfer-corner overflow-hidden shadow-hud-cyan w-full">
-      <div className="bg-[#090e10] border-b border-cyan-950 px-3 sm:px-4 py-2 flex items-center justify-between text-xs text-cyan-400 font-sans gap-2">
+    <div className="relative my-6 sm:my-8 bg-surface-1 border border-line-subtle rounded-card overflow-hidden shadow-sheen-inset w-full">
+      <div className="bg-surface-2 border-b border-line-subtle px-3 sm:px-4 py-2 flex items-center justify-between text-xs text-cyan-glow font-sans gap-2">
         <div className="flex items-center space-x-2 min-w-0 truncate">
-          <Terminal className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-          <span className="uppercase tracking-widest font-bold text-[11px] sm:text-xs truncate">
+          <Terminal className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
+          <span className="uppercase tracking-[0.08em] font-bold text-[11px] sm:text-xs truncate">
             {language || 'TELEMETRY DATA'}
           </span>
         </div>
         <button
           type="button"
           onClick={handleCopy}
-          className="flex items-center gap-1 text-[11px] text-gray-400 hover:text-cyan-300 transition-colors px-2 py-1 bg-cyan-950/40 hover:bg-cyan-950/80 border border-cyan-900/40 chamfer-corner shrink-0 active:scale-95"
+          className="flex items-center gap-1 text-[11px] text-ink-muted hover:text-ink transition-colors px-2 py-1 bg-surface-1 hover:bg-surface-2 border border-line hover:border-line-strong rounded-control shrink-0 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           title="Copy code"
         >
           {copied ? (
@@ -98,7 +98,7 @@ const ArticleCodeBlock: React.FC<{ language: string; code: string }> = ({ langua
         </button>
       </div>
       <div className="relative">
-        <pre className="p-3.5 sm:p-4 overflow-x-auto touch-pan-scroll text-[11px] sm:text-xs md:text-sm font-sans text-cyan-200 leading-relaxed no-scrollbar select-text bg-[#030607]">
+        <pre className="p-3.5 sm:p-4 overflow-x-auto touch-pan-scroll text-[11px] sm:text-xs md:text-sm font-sans text-ink-body leading-relaxed no-scrollbar select-text bg-abyss">
           <code>{code}</code>
         </pre>
       </div>
@@ -133,7 +133,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
           elements.push(
             <p
               key={key}
-              className="text-sm sm:text-base text-gray-300 font-sans leading-relaxed my-3 sm:my-4 break-words"
+              className="text-sm sm:text-base text-ink-body font-sans leading-relaxed my-3 sm:my-4 break-words"
               dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(text) }}
             />
           )
@@ -148,10 +148,10 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
       const isOrdered = currentListItems[0].ordered
       if (isOrdered) {
         elements.push(
-          <ol key={key} className="space-y-2.5 my-3 sm:my-4 pl-1 sm:pl-2 font-sans text-sm sm:text-base text-gray-300">
+          <ol key={key} className="space-y-2.5 my-3 sm:my-4 pl-1 sm:pl-2 font-sans text-sm sm:text-base text-ink-body">
             {currentListItems.map((item, i) => (
               <li key={`${key}-item-${i}`} className="flex items-start gap-3 leading-relaxed">
-                <span className="font-bold text-cyan-400 font-sans text-xs sm:text-sm shrink-0 min-w-[1.25rem] mt-0.5">
+                <span className="font-bold text-cyan-glow font-sans text-xs sm:text-sm shrink-0 min-w-[1.25rem] mt-0.5">
                   {item.number || i + 1}.
                 </span>
                 <span className="break-words" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(item.text) }} />
@@ -161,10 +161,10 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
         )
       } else {
         elements.push(
-          <ul key={key} className="space-y-2.5 my-3 sm:my-4 pl-1 sm:pl-2 font-sans text-sm sm:text-base text-gray-300">
+          <ul key={key} className="space-y-2.5 my-3 sm:my-4 pl-1 sm:pl-2 font-sans text-sm sm:text-base text-ink-body">
             {currentListItems.map((item, i) => (
               <li key={`${key}-item-${i}`} className="flex items-start gap-3 leading-relaxed">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-2.5 shrink-0 opacity-80" />
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow mt-2.5 shrink-0 opacity-80" />
                 <span className="break-words" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(item.text) }} />
               </li>
             ))}
@@ -181,7 +181,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
       elements.push(
         <blockquote
           key={key}
-          className="border-l-2 border-cyan-400 pl-4 py-2 my-4 sm:my-5 italic font-sans text-sm sm:text-base text-cyan-100/90 bg-cyan-950/20 chamfer-corner break-words leading-relaxed"
+          className="border-l-2 border-cyan-glow pl-4 py-2 my-4 sm:my-5 italic font-sans text-sm sm:text-base text-ink-body bg-surface-1 rounded-r-control break-words leading-relaxed"
           dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(text) }}
         />
       )
@@ -205,20 +205,20 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
       const dataRows = rows.slice(1).filter((r) => !r.every((c) => /^:?-+:?$/.test(c)))
 
       elements.push(
-        <div key={key} className="my-6 overflow-x-auto border border-cyan-900/50 chamfer-corner bg-[#070c0e] shadow-hud-cyan w-full touch-pan-scroll">
+        <div key={key} className="my-6 overflow-x-auto border border-line-subtle rounded-card bg-surface-1 w-full touch-pan-scroll">
           <table className="w-full text-left font-sans text-xs sm:text-sm border-collapse min-w-[500px]">
             <thead>
-              <tr className="bg-[#0b1417] border-b border-cyan-900 text-cyan-300 font-bold uppercase tracking-wider">
+              <tr className="bg-surface-2 border-b border-line text-ink font-bold uppercase tracking-[0.08em]">
                 {headerCells.map((h, hIdx) => (
-                  <th key={`${key}-h-${hIdx}`} className="p-3 sm:p-3.5 border-r border-cyan-950/60 last:border-r-0" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(h) }} />
+                  <th key={`${key}-h-${hIdx}`} className="p-3 sm:p-3.5 border-r border-line-subtle last:border-r-0" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(h) }} />
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-cyan-950/40 text-gray-300">
+            <tbody className="divide-y divide-line-subtle text-ink-body">
               {dataRows.map((row, rIdx) => (
-                <tr key={`${key}-r-${rIdx}`} className="hover:bg-cyan-950/20 transition-colors">
+                <tr key={`${key}-r-${rIdx}`} className="hover:bg-surface-2 transition-colors">
                   {row.map((cell, cIdx) => (
-                    <td key={`${key}-c-${rIdx}-${cIdx}`} className="p-3 sm:p-3.5 border-r border-cyan-950/40 last:border-r-0 font-sans" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(cell) }} />
+                    <td key={`${key}-c-${rIdx}-${cIdx}`} className="p-3 sm:p-3.5 border-r border-line-subtle last:border-r-0 font-sans" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(cell) }} />
                   ))}
                 </tr>
               ))}
@@ -264,7 +264,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     // Horizontal Rule (---, ***, ___)
     if (/^(\-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
       flushAll(lineKey)
-      elements.push(<hr key={lineKey} className="border-cyan-900/40 my-6 sm:my-10" />)
+      elements.push(<hr key={lineKey} className="border-line-subtle my-6 sm:my-10" />)
       continue
     }
 
@@ -286,7 +286,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     if (trimmed.startsWith('# ')) {
       flushAll(lineKey)
       elements.push(
-        <h1 key={lineKey} className="font-grotesk font-bold text-2xl sm:text-3xl md:text-4xl text-gray-100 mt-8 sm:mt-10 mb-3 sm:mb-4 border-b border-cyan-900/40 pb-2 break-words leading-tight">
+        <h1 key={lineKey} className="font-grotesk font-bold text-2xl sm:text-3xl md:text-4xl text-ink mt-8 sm:mt-10 mb-3 sm:mb-4 border-b border-line-subtle pb-2 break-words leading-tight">
           {trimmed.slice(2)}
         </h1>
       )
@@ -297,7 +297,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     if (trimmed.startsWith('## ')) {
       flushAll(lineKey)
       elements.push(
-        <h2 key={lineKey} className="font-grotesk font-bold text-xl sm:text-2xl text-gray-100 mt-7 sm:mt-9 mb-3 border-b border-cyan-900/30 pb-2 text-cyan-200 break-words leading-snug">
+        <h2 key={lineKey} className="font-grotesk font-bold text-xl sm:text-2xl text-ink mt-7 sm:mt-9 mb-3 border-b border-line-subtle pb-2 break-words leading-snug">
           {trimmed.slice(3)}
         </h2>
       )
@@ -308,7 +308,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     if (trimmed.startsWith('### ')) {
       flushAll(lineKey)
       elements.push(
-        <h3 key={lineKey} className="font-grotesk font-bold text-base sm:text-lg text-cyan-300 mt-6 sm:mt-8 mb-2 break-words leading-snug">
+        <h3 key={lineKey} className="font-grotesk font-bold text-base sm:text-lg text-cyan-glow mt-6 sm:mt-8 mb-2 break-words leading-snug">
           {trimmed.slice(4)}
         </h3>
       )
@@ -319,7 +319,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     if (trimmed.startsWith('#### ')) {
       flushAll(lineKey)
       elements.push(
-        <h4 key={lineKey} className="font-grotesk font-semibold text-sm sm:text-base text-gray-200 mt-4 sm:mt-6 mb-2 break-words">
+        <h4 key={lineKey} className="font-grotesk font-semibold text-sm sm:text-base text-ink mt-4 sm:mt-6 mb-2 break-words">
           {trimmed.slice(5)}
         </h4>
       )
@@ -330,7 +330,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     if (trimmed.startsWith('##### ')) {
       flushAll(lineKey)
       elements.push(
-        <h5 key={lineKey} className="font-grotesk font-medium text-xs sm:text-sm text-cyan-400 mt-3 sm:mt-4 mb-1.5 break-words">
+        <h5 key={lineKey} className="font-grotesk font-medium text-xs sm:text-sm text-cyan-glow mt-3 sm:mt-4 mb-1.5 break-words">
           {trimmed.slice(6)}
         </h5>
       )
@@ -386,13 +386,13 @@ function RenderFigure({ alt, src }: { alt: string; src: string }) {
   const [hasError, setHasError] = React.useState(false)
 
   return (
-    <figure className="my-6 sm:my-8 rounded-none border-2 border-cyan-500/50 bg-[#050809] chamfer-corner-lg overflow-hidden shadow-hud-cyan-lg">
-      <div className="relative overflow-hidden group min-h-[140px] flex items-center justify-center bg-[#070b0c]">
+    <figure className="my-6 sm:my-8 border border-line-subtle bg-surface-1 rounded-card overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
+      <div className="relative overflow-hidden group min-h-[140px] flex items-center justify-center bg-surface-1">
         {hasError ? (
-          <div className="p-6 text-center text-xs text-cyan-400/80 font-sans flex flex-col items-center gap-2">
-            <Shield className="w-6 h-6 text-cyan-500/50" />
-            <span className="uppercase tracking-widest text-[11px] font-bold">VISUAL TELEMETRY ARCHIVED</span>
-            <span className="text-[10px] text-gray-400">{alt}</span>
+          <div className="p-6 text-center text-xs text-ink-muted font-sans flex flex-col items-center gap-2">
+            <Shield className="w-6 h-6 text-ink-muted" />
+            <span className="uppercase tracking-[0.08em] text-[11px] font-bold">VISUAL TELEMETRY ARCHIVED</span>
+            <span className="text-[11px] text-ink-muted">{alt}</span>
           </div>
         ) : (
           <img
@@ -403,11 +403,11 @@ function RenderFigure({ alt, src }: { alt: string; src: string }) {
             loading="lazy"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#050809] via-transparent to-transparent opacity-30 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-surface-1 via-transparent to-transparent opacity-30 pointer-events-none" />
       </div>
       {alt && (
-        <figcaption className="px-3 sm:px-4 py-2.5 sm:py-3 bg-[#090e10] border-t border-cyan-950 flex items-center min-w-0 text-xs font-sans text-cyan-300">
-          <span className="font-semibold text-gray-200 truncate">{alt}</span>
+        <figcaption className="px-3 sm:px-4 py-2.5 sm:py-3 bg-surface-2 border-t border-line-subtle flex items-center min-w-0 text-xs font-sans text-ink-muted">
+          <span className="font-semibold text-ink truncate">{alt}</span>
         </figcaption>
       )}
     </figure>
@@ -439,32 +439,32 @@ function formatInlineMarkdown(text: string): string {
   // Handle standalone block math $$...$$
   formatted = formatted.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
     const cleaned = cleanLatexMath(math.trim())
-    return `<div class="my-4 py-2.5 px-4 bg-[#030607] border border-cyan-800/60 text-cyan-300 font-sans text-center text-xs sm:text-sm chamfer-corner shadow-hud-cyan overflow-x-auto select-all leading-relaxed tracking-wider">${cleaned}</div>`
+    return `<div class="my-4 py-2.5 px-4 bg-surface-1 border border-line-subtle text-cyan-glow font-sans text-center text-xs sm:text-sm rounded-control overflow-x-auto select-all leading-relaxed tracking-wider">${cleaned}</div>`
   })
 
   // Handle inline math $...$
   formatted = formatted.replace(/\$([^$\n]+)\$/g, (_, math) => {
     const cleaned = cleanLatexMath(math.trim())
-    return `<code class="bg-cyan-950/90 border border-cyan-700/60 text-cyan-300 px-1.5 py-0.5 font-sans text-[11px] sm:text-xs font-semibold chamfer-corner select-text">${cleaned}</code>`
+    return `<code class="bg-surface-2 border border-line text-cyan-glow px-1.5 py-0.5 font-sans text-[11px] sm:text-xs font-semibold rounded-chip select-text">${cleaned}</code>`
   })
 
   // Handle inline markdown images if any in paragraph: ![alt](url)
   formatted = formatted.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, src) => {
     const resolvedUrl = getAssetUrl(src.trim())
-    return `<img src="${resolvedUrl}" alt="${alt}" class="rounded border border-cyan-900 my-4 max-h-[300px] sm:max-h-[400px] w-full object-cover" />`
+    return `<img src="${resolvedUrl}" alt="${alt}" class="rounded-card border border-line-subtle my-4 max-h-[300px] sm:max-h-[400px] w-full object-cover" />`
   })
 
   // Bold: **text**
-  formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-gray-100 font-sans">$1</strong>')
+  formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-ink font-sans">$1</strong>')
 
   // Italic: *text*
-  formatted = formatted.replace(/\*(.*?)\*/g, '<em class="italic text-cyan-200">$1</em>')
+  formatted = formatted.replace(/\*(.*?)\*/g, '<em class="italic text-ink">$1</em>')
 
   // Inline Code: `code`
-  formatted = formatted.replace(/`([^`]+)`/g, '<code class="bg-cyan-950/80 border border-cyan-800/60 text-cyan-300 px-1.5 py-0.5 font-sans text-[11px] sm:text-xs chamfer-corner break-all">$1</code>')
+  formatted = formatted.replace(/`([^`]+)`/g, '<code class="bg-surface-2 border border-line text-cyan-glow px-1.5 py-0.5 font-sans text-[11px] sm:text-xs rounded-chip break-all">$1</code>')
 
   // Links: [label](url)
-  formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 underline underline-offset-2 transition-colors font-sans font-bold break-words">$1</a>')
+  formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-cyan-glow hover:text-cyan-hover underline underline-offset-2 transition-colors font-sans font-bold break-words">$1</a>')
 
   return formatted
 }

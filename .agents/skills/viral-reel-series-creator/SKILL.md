@@ -161,7 +161,7 @@ These are story functions, not sentences to reuse. Before each episode, log one 
 
 ## 4. Share/save CTAs and secondary resources
 
-Retire keyword CTAs in narration, caption, first comment, outro and YouTube copy. Do not ask for comments or promise DMs. The supplied advice reports zero viewer comments in 90 days and only account-authored comments; our own comments do not validate a funnel.
+Read [comment-to-DM delivery guidance](../instagram-post-creator/references/comment-to-dm.md) before writing or queueing an episode. Delivery is disabled / unverified by default. Retire keyword CTAs in narration, caption, first comment, outro and YouTube copy. Do not ask for comments or promise DMs. The supplied advice reports zero viewer comments in 90 days and only account-authored comments; our own comments do not validate a funnel.
 
 Choose one specific ask after the useful action: “Send this to your meeting buddy.” for a recognizable shared experience, or “Save this for your next crowded Monday.” for a reusable step. Use the same ask across public surfaces. Resource links below are secondary, not competing CTAs.
 
@@ -221,7 +221,7 @@ npm run series:create -- --series incidents --ingest-dir tmp/flow-video-ingest -
    - Do NOT invoke Zernio MCP tools (`posts_create`, etc.) manually. The CLI directly invokes the Zernio REST API.
    - Do not bypass the queue. Do not call `publish_now` / `--publish-now` unless the user explicitly commands an immediate live broadcast in this turn.
 4. **First Comment and Outcome Tracking**:
-   - Use a relevant direct resource link without a keyword request or DM promise. Verify whether it is scheduled or posted from native settings/API results; do not infer posting from queue staging.
+   - Review the CLI's first comment for a direct resource URL and remove unverified DM promises and keyword requests before queueing. Verify whether it is scheduled or posted from native settings/API results; do not infer posting from queue staging. Scheduling or posting a first comment does not register an automation or prove delivery.
    - Record the episode ID, control, hypothesis, single variable and fixed settings in the strategy experiment log. After publication, fill 24-hour and 7-day retention, share/save rates and reach from actual analytics. Missing metrics are unavailable, not zero; legacy `commentTriggerKeyword` fields are not viewer activity.
 5. **One franchise until it loops**:
    - Default `--series incidents`. Keep the other four in the catalog. Do not rotate for variety. Do not mint a sixth franchise.

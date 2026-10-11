@@ -6,7 +6,7 @@ import {
 } from '../notifications-refresh'
 import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, forumTopicVisits, forumBoardVisits, leads, equipmentCatalog, userGearItems, friendRequests, friendships, suggestionDismissals, memberBonds, notifications, xpTransactions, type NotificationKind, type NotificationPayload } from '../../db/schema'
 import { getDb } from '../../db'
-import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, notInArray, isNull } from 'drizzle-orm'
+import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, notInArray, isNull, getTableColumns } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
 import { resolveWriteAuth } from './write-auth'
 import { ensureUserProfile } from '../user-sync'
@@ -61,9 +61,10 @@ import {
 } from '../forum-visits'
 import { FORUM_REPORT_COPY, forumReportReasonLabel, validateForumReportInput } from '../forum-reports'
 import { isAdmin } from '../permissions'
+import { hasExperiment } from '../experiments'
 import { assertCanReply, assertCanStartTopic, loadForumStanding } from './forum-standing'
 import { shouldSinkReply, type ForumStandingDecision } from '../forum-standing'
-import { getAssetUrl } from '../assets'
+import { getAbsoluteAssetUrl, getMediaPath } from '../assets'
 import { AVATAR_STORED_OPTIONAL_KEYS, avatarConfigShape } from '../avatar/config-schema'
 import {
   CANONICAL_ALIGNMENT_TASKS,
@@ -84,7 +85,8 @@ import {
   type ProgressionState,
 } from '../progression'
 import {
-  INITIAL_EQUIPMENT_CATALOG,
+  ALL_EQUIPMENT_CATALOG,
+  STARTER_COSMETIC_CATALOG_IDS,
   STARTER_EQUIPMENT_CATALOG_IDS,
   catalogSeedInsertValues,
 } from '../equipment-seed-data'
@@ -93,11 +95,16 @@ import {
   chassisTypeImageUrl,
   computeLoadoutTotals,
   planGearMove,
+  planLookChange,
+  planStarterCosmetics,
   planStarterGrants,
+  buildKitLoadout,
+  isLookSlot,
   resolveVisualType,
   normalizeEquipSlot,
   EQUIP_SLOT_IDS,
   type CatalogRef,
+  type ChassisLoadoutPayload,
   type GearItemState,
   type LoadoutTotals,
   type MoveTarget,
@@ -556,12 +563,16 @@ export const deleteAIThreadHandler = async ({ data, context }: ServerFnArgs<Muta
 
 /**
  * Server Function: Get all published blog posts from database or fallback to seed data.
+ *
+ * Listings never need article bodies, and the bodies are most of the table's bytes, so
+ * `content` is left empty here. Readers load the full post with getBlogPostBySlugFn.
  */
 export const getBlogPostsHandler = async ({ context }: ServerFnArgs) => {
   const dbClient = context?.db || getDb()
   try {
+    const { content: _content, ...listingColumns } = getTableColumns(blogPosts)
     const records = await dbClient
-      .select()
+      .select(listingColumns)
       .from(blogPosts)
       .where(eq(blogPosts.isPublished, true))
       .orderBy(desc(blogPosts.publishedAt))
@@ -572,8 +583,8 @@ export const getBlogPostsHandler = async ({ context }: ServerFnArgs) => {
         slug: r.slug,
         title: r.title,
         summary: r.summary,
-        content: r.content,
-        coverImageUrl: r.coverImageUrl || '/images/ai_learning_ascension_cover.jpg',
+        content: '',
+        coverImageUrl: getMediaPath(r.coverImageUrl || 'images/ai_learning_ascension_cover.jpg'),
         authorName: r.authorName,
         authorAvatar: r.authorAvatar,
         authorRole: r.authorRole || 'Stage 4 Ascendant',
@@ -615,7 +626,7 @@ export const getBlogPostBySlugHandler = async ({ data: slug, context }: ServerFn
         title: r.title,
         summary: r.summary,
         content: r.content,
-        coverImageUrl: r.coverImageUrl || '/images/ai_learning_ascension_cover.jpg',
+        coverImageUrl: getMediaPath(r.coverImageUrl || 'images/ai_learning_ascension_cover.jpg'),
         authorName: r.authorName,
         authorAvatar: r.authorAvatar,
         authorRole: r.authorRole || 'Stage 4 Ascendant',
@@ -3081,7 +3092,7 @@ export async function submitLeadHandler(args: ServerFnArgs<SubmitLeadInput>) {
     throw new Error(verification.errorMessage || 'Bot protection check failed. Please try again.')
   }
 
-  const downloadUrl = getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf')
+  const downloadUrl = getAbsoluteAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf')
 
   try {
     const db = getDb()
@@ -3225,9 +3236,11 @@ export async function saveLobsterAvatarHandler({ data, context }: ServerFnArgs<S
     .where(eq(profiles.id, userId))
     .returning()
 
+  const synced = await syncAvatarLook(dbClient, userId)
+
   return {
     success: true,
-    avatarConfig: updated?.avatarConfig ?? avatarConfig,
+    avatarConfig: synced ?? updated?.avatarConfig ?? avatarConfig,
   }
 }
 
@@ -3732,24 +3745,86 @@ function toCatalogRef(row: typeof equipmentCatalog.$inferSelect): CatalogRef {
     uniquePower: row.uniquePower ?? null,
     imageUrl,
     sortOrder: row.sortOrder,
+    kind: row.kind ?? 'gear',
+    artKey: row.artKey ?? null,
   }
 }
 
 function toGearState(row: typeof userGearItems.$inferSelect): GearItemState {
+  const look = isLookSlot(row.equippedSlot) ? row.equippedSlot : null
   return {
     id: row.id,
     catalogItemId: row.catalogItemId,
-    equippedSlot: normalizeEquipSlot(row.equippedSlot),
+    equippedSlot: look ? null : normalizeEquipSlot(row.equippedSlot as EquipSlotId | 'claws' | null),
     vaultIndex: row.vaultIndex ?? null,
+    lookSlot: look,
   }
 }
 
-async function loadChassisPayload(dbClient: Db, userId: string): Promise<{
-  catalog: CatalogRef[]
-  items: GearItemState[]
-  totals: LoadoutTotals
-  vaultSize: number
-}> {
+/**
+ * Write what the member wears onto their avatar config (`loadout`) and refresh the static
+ * portrait. Runs after gear moves, look changes, and avatar saves. A portrait failure never
+ * blocks the save; the member keeps their vector portrait until the next successful render.
+ */
+type StoredAvatarConfig = NonNullable<typeof profiles.$inferSelect['avatarConfig']>
+
+export async function syncAvatarLook(dbClient: Db, userId: string): Promise<StoredAvatarConfig | null> {
+  const [profile] = await dbClient
+    .select({ avatarConfig: profiles.avatarConfig, role: profiles.role, experiments: profiles.experiments })
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+  const current = profile?.avatarConfig
+  if (!current?.seed) return current ?? null
+
+  // Outside the avatar-kit experiment the avatar stays on the vector rig: no kit flag,
+  // loadout, or rendered portrait (this also clears them when the experiment is switched off).
+  if (!hasExperiment(profile.role, profile.experiments, 'avatar-kit')) {
+    const legacy: Record<string, string | number | boolean> = { ...current }
+    delete legacy.kit
+    delete legacy.loadout
+    delete legacy.portraitKey
+    if (Object.keys(legacy).length === Object.keys(current).length) return current
+    const legacyConfig = legacy as StoredAvatarConfig
+    await dbClient.update(profiles).set({ avatarConfig: legacyConfig, updatedAt: new Date() }).where(eq(profiles.id, userId))
+    return legacyConfig
+  }
+
+  const catalogRows = await dbClient.select().from(equipmentCatalog)
+  const gearRows = await dbClient.select().from(userGearItems).where(eq(userGearItems.userId, userId))
+  const catalogById = new Map(catalogRows.map((row) => [row.id, toCatalogRef(row)]))
+  const { serializeKitLoadout } = await import('../avatar/kit/loadout')
+  const loadout = serializeKitLoadout(buildKitLoadout(gearRows.map(toGearState), catalogById))
+
+  const { parseLobsterAvatarConfig } = await import('../lobster-avatar')
+  const next: Record<string, string | number | boolean> = { ...current, kit: true }
+  if (loadout) next.loadout = loadout
+  else delete next.loadout
+
+  let portraitKey: string | null = null
+  try {
+    const parsed = parseLobsterAvatarConfig(next)
+    if (parsed) {
+      const { renderAvatarPortrait } = await import('./avatar-portrait')
+      portraitKey = await renderAvatarPortrait(parsed)
+    }
+  } catch (e) {
+    console.warn('[syncAvatarLook] Portrait render failed:', e)
+  }
+  if (portraitKey) next.portraitKey = portraitKey
+  else delete next.portraitKey
+
+  const unchanged = current.kit === true && next.loadout === current.loadout && next.portraitKey === current.portraitKey
+  if (unchanged) return current
+  const nextConfig = next as StoredAvatarConfig
+  await dbClient
+    .update(profiles)
+    .set({ avatarConfig: nextConfig, updatedAt: new Date() })
+    .where(eq(profiles.id, userId))
+  return nextConfig
+}
+
+async function loadChassisPayload(dbClient: Db, userId: string): Promise<ChassisLoadoutPayload> {
   let catalogRows = await dbClient
     .select()
     .from(equipmentCatalog)
@@ -3757,7 +3832,7 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<{
 
   // Auto-sync any seed catalog entries missing from the database
   const existingIds = new Set(catalogRows.map((r) => r.id))
-  const missingSeeds = INITIAL_EQUIPMENT_CATALOG.filter((item) => !existingIds.has(item.id))
+  const missingSeeds = ALL_EQUIPMENT_CATALOG.filter((item) => !existingIds.has(item.id))
 
   if (missingSeeds.length > 0) {
     try {
@@ -3780,6 +3855,8 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<{
               uniquePower: values.uniquePower,
               imageUrl: values.imageUrl,
               sortOrder: values.sortOrder,
+              kind: values.kind,
+              artKey: values.artKey,
             },
           })
       }
@@ -3811,7 +3888,29 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<{
       .where(eq(userGearItems.userId, userId))
   }
 
+  const [profile] = await dbClient
+    .select({ avatarConfig: profiles.avatarConfig, role: profiles.role, experiments: profiles.experiments })
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+  const avatarKit = hasExperiment(profile?.role, profile?.experiments, 'avatar-kit')
+
   if (catalogRows.length > 0) {
+    const cosmeticGrants = !avatarKit ? [] : planStarterCosmetics(
+      gearRows.map(toGearState),
+      catalogRows.map((c) => c.id),
+      STARTER_COSMETIC_CATALOG_IDS
+    )
+    if (cosmeticGrants.length > 0) {
+      await dbClient.insert(userGearItems).values(
+        cosmeticGrants.map((catalogItemId) => ({ userId, catalogItemId, equippedSlot: null, vaultIndex: null }))
+      )
+      gearRows = await dbClient
+        .select()
+        .from(userGearItems)
+        .where(eq(userGearItems.userId, userId))
+    }
+
     const grants = planStarterGrants(
       gearRows.map(toGearState),
       catalogRows.map((c) => c.id),
@@ -3839,7 +3938,7 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<{
   const catalogById = new Map(catalog.map((c) => [c.id, c]))
   const totals = computeLoadoutTotals(items, catalogById)
 
-  return { catalog, items, totals, vaultSize: VAULT_SIZE }
+  return { catalog, items, totals, vaultSize: VAULT_SIZE, avatarConfig: profile?.avatarConfig ?? null, avatarKit }
 }
 
 export const getChassisLoadoutHandler = async ({
@@ -3912,6 +4011,49 @@ export const moveGearItemHandler = async ({ data, context }: ServerFnArgs<MoveGe
         })
         .where(and(eq(userGearItems.id, update.id), eq(userGearItems.userId, userId)))
     }
+    await syncAvatarLook(dbClient, userId)
+  }
+
+  return loadChassisPayload(dbClient, userId)
+}
+
+interface SetLookInput {
+  itemId: string
+  wear: boolean
+  token?: string
+  userId?: string
+}
+
+/** Wear or remove a cosmetic. Looks change the drawing only, so totals never move. */
+export const setLookHandler = async ({ data, context }: ServerFnArgs<SetLookInput>) => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to update your look.')
+  if (!data?.itemId) throw new Error('Missing cosmetic.')
+  const { userId, dbClient } = auth
+
+  const catalogRows = await dbClient.select().from(equipmentCatalog)
+  const gearRows = await dbClient.select().from(userGearItems).where(eq(userGearItems.userId, userId))
+  const catalogById = new Map(catalogRows.map((row) => [row.id, toCatalogRef(row)]))
+
+  const plan = planLookChange(gearRows.map(toGearState), catalogById, data.itemId, Boolean(data.wear))
+  if (!plan.ok) throw new Error(plan.error)
+
+  if (plan.updates.length > 0) {
+    // Clear first so the per-slot unique index never sees two looks in one slot.
+    for (const update of plan.updates) {
+      await dbClient
+        .update(userGearItems)
+        .set({ equippedSlot: null, updatedAt: new Date() })
+        .where(and(eq(userGearItems.id, update.id), eq(userGearItems.userId, userId)))
+    }
+    for (const update of plan.updates) {
+      if (!update.lookSlot) continue
+      await dbClient
+        .update(userGearItems)
+        .set({ equippedSlot: update.lookSlot, vaultIndex: null, updatedAt: new Date() })
+        .where(and(eq(userGearItems.id, update.id), eq(userGearItems.userId, userId)))
+    }
+    await syncAvatarLook(dbClient, userId)
   }
 
   return loadChassisPayload(dbClient, userId)

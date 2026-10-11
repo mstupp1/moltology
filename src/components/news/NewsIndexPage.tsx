@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import { BrandAwareImage } from '@/components/ui/BrandMark'
 import { useNavigate, useLoaderData } from '@tanstack/react-router'
 import { Search, Rss, ArrowRight } from 'lucide-react'
 import { PublicHeader } from '@/components/PublicHeader'
@@ -56,7 +57,7 @@ function StoryLink({
 
 function Kicker({ category }: { category: string }) {
   return (
-    <span className="text-[11px] font-sans font-bold uppercase tracking-[0.16em] text-cyan-400">
+    <span className="text-[11px] font-sans font-bold uppercase tracking-[0.08em] text-cyan-glow">
       {formatSectionName(category)}
     </span>
   )
@@ -64,19 +65,19 @@ function Kicker({ category }: { category: string }) {
 
 function Byline({ post, withAvatar = false }: { post: BlogPostData; withAvatar?: boolean }) {
   return (
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-sans text-gray-400">
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-sans text-ink-muted">
       {withAvatar && post.authorAvatar && (
-        <img
+        <BrandAwareImage
           src={post.authorAvatar}
           alt=""
           {...lazyImageProps}
-          className="w-6 h-6 rounded-full border border-cyan-900/80 object-cover"
+          className="w-6 h-6 rounded-full border border-line object-cover"
         />
       )}
-      <span className="text-gray-200 font-semibold">{post.authorName}</span>
-      <span aria-hidden="true" className="text-gray-600">·</span>
+      <span className="text-ink font-semibold">{post.authorName}</span>
+      <span aria-hidden="true" className="text-ink-muted/60">·</span>
       <time dateTime={String(post.publishedAt)}>{formatPostDate(post.publishedAt)}</time>
-      <span aria-hidden="true" className="text-gray-600">·</span>
+      <span aria-hidden="true" className="text-ink-muted/60">·</span>
       <span>{post.readTimeMinutes} min read</span>
     </div>
   )
@@ -85,21 +86,21 @@ function Byline({ post, withAvatar = false }: { post: BlogPostData; withAvatar?:
 function StoryCard({ post }: { post: BlogPostData }) {
   const { headline, subtitle } = formatNewsTitle(post.title)
   return (
-    <StoryLink slug={post.slug} className="group flex flex-col gap-3 text-inherit no-underline">
-      <div className="aspect-[16/10] overflow-hidden rounded-sm bg-[#0a1114]">
+    <StoryLink slug={post.slug} className="group flex flex-col gap-3 text-inherit no-underline rounded-card focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
+      <div className="aspect-[16/10] overflow-hidden rounded-card bg-surface-1">
         <img
-          src={post.coverImageUrl}
+          src={getAssetUrl(post.coverImageUrl)}
           alt={post.title}
           {...lazyImageProps}
           className="w-full h-full object-cover brightness-90 group-hover:brightness-100 group-hover:scale-[1.03] transition duration-500"
         />
       </div>
       <Kicker category={post.category} />
-      <h3 className="font-garamond text-2xl leading-tight text-gray-100 group-hover:text-cyan-200 transition-colors">
+      <h3 className="font-garamond text-2xl leading-tight text-ink group-hover:text-cyan-glow transition-colors">
         {headline}
-        {subtitle && <span className="block italic text-gray-400 text-lg mt-1">{subtitle}</span>}
+        {subtitle && <span className="block italic text-ink-muted text-lg mt-1">{subtitle}</span>}
       </h3>
-      <p className="text-sm text-gray-400 font-sans leading-relaxed line-clamp-3">{post.summary}</p>
+      <p className="text-sm text-ink-muted font-sans leading-relaxed line-clamp-3">{post.summary}</p>
       <Byline post={post} />
     </StoryLink>
   )
@@ -158,7 +159,7 @@ export function NewsIndexPage() {
   const lastUpdated = formatPostDate(leadPost?.publishedAt)
 
   return (
-    <div className="min-h-screen bg-[#05080a] text-gray-200 font-sans relative flex flex-col justify-between">
+    <div className="min-h-screen bg-[#05080a] text-ink font-sans relative flex flex-col justify-between">
       <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-60" />
 
       <AuthModal
@@ -182,14 +183,14 @@ export function NewsIndexPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#05080a] via-transparent to-[#030608] pointer-events-none" />
         <div className="relative z-10 flex flex-col items-center gap-4 text-center">
           <MoltNationLogo size="lg" theme="dark" align="center" />
-          <p className="font-garamond italic text-lg sm:text-xl text-gray-300 max-w-xl leading-snug">
+          <p className="font-garamond italic text-lg sm:text-xl text-ink-body max-w-xl leading-snug">
             News from the bottom of the ocean, for people still living on the surface.
           </p>
         </div>
       </header>
 
       {/* Section bar */}
-      <div className="w-full border-y border-gray-800/80 bg-[#05080a]/95 backdrop-blur relative z-20">
+      <div className="w-full border-y border-line-subtle bg-[#05080a]/95 backdrop-blur relative z-20">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-8 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 py-2">
           <nav
             aria-label="News sections"
@@ -203,10 +204,10 @@ export function NewsIndexPage() {
                   type="button"
                   onClick={() => setSelectedCategory(cat)}
                   aria-pressed={active}
-                  className={`shrink-0 min-h-[40px] text-sm font-sans border-b-2 transition-colors ${
+                  className={`shrink-0 min-h-[40px] text-sm font-sans border-b-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                     active
-                      ? 'border-cyan-400 text-white font-semibold'
-                      : 'border-transparent text-gray-400 hover:text-gray-100'
+                      ? 'border-cyan-glow text-ink font-semibold'
+                      : 'border-transparent text-ink-muted hover:text-ink'
                   }`}
                 >
                   {cat === ALL ? 'Front page' : formatSectionName(cat)}
@@ -215,7 +216,7 @@ export function NewsIndexPage() {
             })}
           </nav>
           <div className="relative w-full md:w-64 shrink-0">
-            <Search className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-ink-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <label htmlFor="news-search" className="sr-only">
               Search stories
             </label>
@@ -225,7 +226,7 @@ export function NewsIndexPage() {
               placeholder="Search stories"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-[#0a1013] border border-gray-800 focus:border-cyan-500 rounded-sm text-gray-100 text-sm outline-none placeholder-gray-500 transition-colors"
+              className="w-full pl-9 pr-3 py-2 bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus rounded-control text-ink text-sm outline-none placeholder:text-ink-muted transition-colors"
             />
           </div>
         </div>
@@ -233,11 +234,11 @@ export function NewsIndexPage() {
 
       <main className="flex-1 max-w-[1280px] mx-auto px-4 sm:px-8 py-6 sm:py-8 w-full relative z-10">
         {/* Edition line */}
-        <div className="flex items-center justify-between gap-4 text-xs font-sans text-gray-500 pb-6">
+        <div className="flex items-center justify-between gap-4 text-xs font-sans text-ink-muted pb-6">
           <span>{lastUpdated && `Updated ${lastUpdated}`}</span>
           <span className="flex items-center gap-4">
             <span>{posts.length} stories</span>
-            <a href="/rss.xml" className="flex items-center gap-1 hover:text-cyan-300 transition-colors">
+            <a href="/rss.xml" className="flex items-center gap-1 rounded-chip hover:text-cyan-glow transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
               <Rss className="w-3.5 h-3.5" />
               RSS
             </a>
@@ -246,24 +247,24 @@ export function NewsIndexPage() {
 
         {isFiltering ? (
           <section aria-labelledby="results-heading" className="space-y-8">
-            <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-gray-800 pb-3">
-              <h1 id="results-heading" className="font-garamond text-3xl sm:text-4xl text-gray-100">
+            <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-line-subtle pb-3">
+              <h1 id="results-heading" className="font-garamond text-3xl sm:text-4xl text-ink">
                 {selectedCategory !== ALL ? formatSectionName(selectedCategory) : 'Search results'}
               </h1>
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-ink-muted">
                 {filteredPosts.length} {filteredPosts.length === 1 ? 'story' : 'stories'}
               </span>
             </div>
             {filteredPosts.length === 0 ? (
               <div className="py-16 text-center space-y-3">
-                <p className="font-garamond text-2xl text-gray-200">No stories match that search.</p>
+                <p className="font-garamond text-2xl text-ink">No stories match that search.</p>
                 <button
                   type="button"
                   onClick={() => {
                     setSearchQuery('')
                     setSelectedCategory(ALL)
                   }}
-                  className="text-sm text-cyan-300 hover:text-cyan-200 underline underline-offset-4"
+                  className="text-sm text-cyan-glow hover:text-cyan-hover underline underline-offset-4 rounded-chip focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   Back to the front page
                 </button>
@@ -282,11 +283,11 @@ export function NewsIndexPage() {
             {leadPost && (
               <section className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12">
                 <article className="lg:col-span-8">
-                  <StoryLink slug={leadPost.slug} className="group flex flex-col gap-5 text-inherit no-underline">
+                  <StoryLink slug={leadPost.slug} className="group flex flex-col gap-5 text-inherit no-underline rounded-card focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
                     {/* Image leads on phones; headline leads on desktop so it sits above the fold. */}
-                    <div className="aspect-[16/9] overflow-hidden rounded-sm bg-[#0a1114] lg:order-last">
+                    <div className="aspect-[16/9] overflow-hidden rounded-card bg-surface-1 lg:order-last">
                       <img
-                        src={leadPost.coverImageUrl}
+                        src={getAssetUrl(leadPost.coverImageUrl)}
                         alt={leadPost.title}
                         {...eagerImageProps}
                         className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
@@ -294,16 +295,16 @@ export function NewsIndexPage() {
                     </div>
                     <div className="space-y-3">
                       <Kicker category={leadPost.category} />
-                      <h1 className="font-garamond text-4xl sm:text-5xl lg:text-[3.5rem] leading-[1.05] text-gray-50 group-hover:text-cyan-100 transition-colors">
+                      <h1 className="font-garamond text-4xl sm:text-5xl lg:text-[3.5rem] leading-[1.05] text-ink group-hover:text-cyan-glow transition-colors">
                         {formatNewsTitle(leadPost.title).headline}
                       </h1>
                       {formatNewsTitle(leadPost.title).subtitle && (
-                        <p className="font-garamond italic text-xl sm:text-2xl text-gray-300 leading-snug">
+                        <p className="font-garamond italic text-xl sm:text-2xl text-ink-body leading-snug">
                           {formatNewsTitle(leadPost.title).subtitle}
                         </p>
                       )}
                     </div>
-                    <p className="text-base sm:text-lg text-gray-300 leading-relaxed max-w-2xl">
+                    <p className="text-base sm:text-lg text-ink-body leading-relaxed max-w-2xl">
                       {leadPost.summary}
                     </p>
                     <Byline post={leadPost} withAvatar />
@@ -311,34 +312,34 @@ export function NewsIndexPage() {
                 </article>
 
                 {latestPosts.length > 0 && (
-                  <aside aria-labelledby="latest-heading" className="lg:col-span-4 lg:border-l lg:border-gray-800 lg:pl-10">
+                  <aside aria-labelledby="latest-heading" className="lg:col-span-4 lg:border-l lg:border-line-subtle lg:pl-10">
                     <h2
                       id="latest-heading"
-                      className="font-sans text-xs font-bold uppercase tracking-[0.2em] text-gray-400 border-b border-gray-800 pb-3"
+                      className="font-sans text-xs font-bold uppercase tracking-[0.08em] text-ink-muted border-b border-line-subtle pb-3"
                     >
                       Latest
                     </h2>
-                    <ol className="divide-y divide-gray-800/80">
+                    <ol className="divide-y divide-line-subtle">
                       {latestPosts.map((post) => {
                         const { headline, subtitle } = formatNewsTitle(post.title)
                         return (
                           <li key={post.slug}>
-                            <StoryLink slug={post.slug} className="group flex gap-4 py-5 text-inherit no-underline">
+                            <StoryLink slug={post.slug} className="group flex gap-4 py-5 text-inherit no-underline rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
                               <div className="flex-1 min-w-0 space-y-1.5">
                                 <Kicker category={post.category} />
-                                <h3 className="font-garamond text-xl leading-snug text-gray-100 group-hover:text-cyan-200 transition-colors">
+                                <h3 className="font-garamond text-xl leading-snug text-ink group-hover:text-cyan-glow transition-colors">
                                   {headline}
                                 </h3>
                                 {subtitle && (
-                                  <p className="text-sm text-gray-400 leading-snug line-clamp-2">{subtitle}</p>
+                                  <p className="text-sm text-ink-muted leading-snug line-clamp-2">{subtitle}</p>
                                 )}
-                                <time dateTime={String(post.publishedAt)} className="block text-xs text-gray-500 pt-0.5">
+                                <time dateTime={String(post.publishedAt)} className="block text-xs text-ink-muted pt-0.5">
                                   {formatPostDate(post.publishedAt, 'short')}
                                 </time>
                               </div>
-                              <div className="w-24 h-24 sm:w-28 sm:h-28 shrink-0 overflow-hidden rounded-sm bg-[#0a1114]">
+                              <div className="w-24 h-24 sm:w-28 sm:h-28 shrink-0 overflow-hidden rounded-control bg-surface-1">
                                 <img
-                                  src={post.coverImageUrl}
+                                  src={getAssetUrl(post.coverImageUrl)}
                                   alt={post.title}
                                   {...lazyImageProps}
                                   className="w-full h-full object-cover brightness-90 group-hover:brightness-100 transition"
@@ -359,7 +360,7 @@ export function NewsIndexPage() {
               <section aria-labelledby="more-heading" className="space-y-8">
                 <h2
                   id="more-heading"
-                  className="font-sans text-xs font-bold uppercase tracking-[0.2em] text-gray-400 border-t-2 border-gray-200/80 pt-3"
+                  className="font-sans text-xs font-bold uppercase tracking-[0.08em] text-ink-muted border-t-2 border-ink/80 pt-3"
                 >
                   More stories
                 </h2>
@@ -374,32 +375,32 @@ export function NewsIndexPage() {
             {/* Archive */}
             {archivePosts.length > 0 && (
               <nav aria-label="News archive" className="space-y-4">
-                <h2 className="font-sans text-xs font-bold uppercase tracking-[0.2em] text-gray-400 border-t-2 border-gray-200/80 pt-3">
+                <h2 className="font-sans text-xs font-bold uppercase tracking-[0.08em] text-ink-muted border-t-2 border-ink/80 pt-3">
                   From the archive
                 </h2>
                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
                   {archivePosts.map((post) => (
-                    <li key={post.slug} className="border-b border-gray-800/80">
+                    <li key={post.slug} className="border-b border-line-subtle">
                       <a
                         href={`/news/${post.slug}`}
-                        className="group flex items-baseline gap-4 py-4 text-inherit no-underline"
+                        className="group flex items-baseline gap-4 py-4 text-inherit no-underline rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                       >
                         <time
                           dateTime={String(post.publishedAt)}
-                          className="hidden sm:block w-24 shrink-0 text-xs text-gray-500 tabular-nums"
+                          className="hidden sm:block w-24 shrink-0 text-xs text-ink-muted tabular-nums"
                         >
                           {formatPostDate(post.publishedAt, 'short')}
                         </time>
                         <span className="flex-1 min-w-0">
-                          <span className="block font-garamond text-lg leading-snug text-gray-200 group-hover:text-cyan-200 transition-colors">
+                          <span className="block font-garamond text-lg leading-snug text-ink group-hover:text-cyan-glow transition-colors">
                             {formatNewsTitle(post.title).headline}
                           </span>
-                          <span className="block text-xs text-gray-500 mt-1">
+                          <span className="block text-xs text-ink-muted mt-1">
                             <span className="sm:hidden">{formatPostDate(post.publishedAt, 'short')} · </span>
                             {formatSectionName(post.category)} · {post.readTimeMinutes} min read
                           </span>
                         </span>
-                        <ArrowRight className="w-4 h-4 text-gray-600 group-hover:text-cyan-300 shrink-0 self-center transition-colors" />
+                        <ArrowRight className="w-4 h-4 text-ink-muted/60 group-hover:text-cyan-glow shrink-0 self-center transition-colors" />
                       </a>
                     </li>
                   ))}

@@ -84,7 +84,7 @@ describe('Message Component Avatar Rendering', () => {
 
     const oracleImg = screen.getByRole('img', { name: 'SYNAPTIC ORACLE' })
     expect(oracleImg).toBeInTheDocument()
-    expect(oracleImg.getAttribute('src')).toContain('order_emblem.png')
+    expect(oracleImg.tagName.toLowerCase()).toBe('svg')
     expect(screen.getByText('SYNAPTIC ORACLE')).toBeInTheDocument()
   })
 

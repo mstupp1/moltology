@@ -62,7 +62,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
   it('navigates to /dashboard when brand emblem logo is clicked', () => {
     render(<HUDSidebar />)
 
-    const brandLogos = screen.getAllByAltText('Order Emblem')
+    const brandLogos = screen.getAllByRole('img', { name: 'Order Emblem' })
     fireEvent.click(brandLogos[0])
 
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })
@@ -160,7 +160,6 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getByText('JOURNAL')).toBeInTheDocument()
     expect(screen.getByText('MARKET')).toBeInTheDocument()
     expect(screen.getByText('CHASSIS')).toBeInTheDocument()
-    expect(screen.queryByText('VATS')).not.toBeInTheDocument()
     expect(screen.getByText('LINKS')).toBeInTheDocument()
     expect(screen.getAllByText('COMMUNITY').length).toBeGreaterThan(0)
     expect(screen.getByText('SUPPORT')).toBeInTheDocument()
@@ -366,7 +365,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.queryByText(/LARVA UNIT/)).not.toBeInTheDocument()
   })
 
-  it('hides subterranean vats from members', async () => {
+  it('hides hidden pages like premium from members', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -385,7 +384,6 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     await waitFor(() => {
       expect(mockGetUserProfileFn).toHaveBeenCalled()
     })
-    expect(screen.queryByRole('button', { name: /SUBTERRANEAN VATS/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /PREMIUM/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^ADMIN$/i })).not.toBeInTheDocument()
   })
@@ -408,7 +406,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     const adminItem = screen.getByRole('button', { name: /^ADMIN$/i })
     expect(adminItem).not.toHaveAttribute('data-hidden', 'true')
 
-    const hiddenItem = screen.getByRole('button', { name: /SUBTERRANEAN VATS/i })
+    const hiddenItem = screen.getByRole('button', { name: /PREMIUM/i })
     expect(hiddenItem).toHaveAttribute('data-hidden', 'true')
     expect(hiddenItem).toHaveAttribute('title', 'Hidden page')
     expect(hiddenItem.querySelector('[data-testid="hidden-page-icon"]')).toBeTruthy()
@@ -431,7 +429,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     render(<HUDSidebar />)
 
-    expect(await screen.findByRole('button', { name: /SUBTERRANEAN VATS/i })).toHaveAttribute(
+    expect(await screen.findByRole('button', { name: /PREMIUM/i })).toHaveAttribute(
       'data-hidden',
       'true',
     )

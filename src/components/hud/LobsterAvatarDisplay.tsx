@@ -4,6 +4,7 @@ import {
   getCachedPixelatedImage,
   type PixelateOptions,
 } from '@/lib/pixelate-avatar'
+import { isKitSvgDataUri } from '@/lib/lobster-avatar'
 import {
   decodeSvgDataUri,
   resolveIdleAnimationPhase,
@@ -80,11 +81,13 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
 
   const useAnimatedSvg =
     animated && !reducedMotion && !documentHidden && src.startsWith('data:image/svg+xml')
+  // Kit SVGs reference bucket images, which an <img> will not load, so they always render inline.
+  const useInlineSvg = useAnimatedSvg || isKitSvgDataUri(src)
 
   const animatedSvgMarkup = useMemo(() => {
-    if (!useAnimatedSvg) return null
+    if (!useInlineSvg) return null
     return decodeSvgDataUri(src)
-  }, [useAnimatedSvg, src])
+  }, [useInlineSvg, src])
 
   const idlePhase = useMemo(
     () => resolveIdleAnimationPhase(src, animationSeed),
@@ -102,7 +105,7 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
     [useAnimatedSvg, idlePhase]
   )
 
-  const shouldPixelate = pixelated && !useAnimatedSvg
+  const shouldPixelate = pixelated && !useInlineSvg
 
   const cachedSrc = shouldPixelate
     ? getCachedPixelatedImage(src, { pixelResolution, outputSize })
@@ -237,11 +240,11 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
 
       {/* 5. Synchronized Character Layer (Wraps sprite + all silhouette-masked overlays together so all transforms/scales stay 1:1) */}
       <div className={`relative z-10 w-full h-full flex items-center justify-center ${className}`}>
-        {useAnimatedSvg && animatedSvgMarkup ? (
+        {useInlineSvg && animatedSvgMarkup ? (
           <div
             ref={animatedRef}
             data-testid="lobster-avatar-inline-svg"
-            className={`lobster-avatar-animated ${spriteClasses} [&>svg]:w-full [&>svg]:h-full`}
+            className={`${useAnimatedSvg ? 'lobster-avatar-animated ' : ''}${spriteClasses} [&>svg]:w-full [&>svg]:h-full`}
             style={idleStyle}
             dangerouslySetInnerHTML={{ __html: animatedSvgMarkup }}
             role="img"

@@ -33,22 +33,22 @@ const SacramentChapter: React.FC<{ sacrament: Sacrament; onActive: (id: string) 
           >
             {sacrament.number}
           </p>
-          <p className="mt-6 font-grotesk text-xs tracking-[0.22em] uppercase" style={{ color: sacrament.accent }}>
+          <p className="mt-6 font-grotesk text-xs tracking-[0.08em] uppercase" style={{ color: sacrament.accent }}>
             Sacrament {Number(sacrament.number)} of 4
           </p>
-          <h2 id={`${sacrament.id}-title`} className="mt-2 font-grotesk font-bold tracking-tight text-white text-4xl sm:text-6xl leading-[1.02]">
+          <h2 id={`${sacrament.id}-title`} className="mt-2 font-grotesk font-bold tracking-tight text-ink text-4xl sm:text-6xl leading-[1.02]">
             {sacrament.title}
           </h2>
-          <p className="mt-3 font-grotesk text-xl sm:text-2xl text-white/85">{sacrament.tagline}</p>
-          <p className="mt-6 text-base sm:text-lg text-[#c3cdcd] leading-relaxed">{sacrament.description}</p>
+          <p className="mt-3 font-grotesk text-xl sm:text-2xl text-ink-body">{sacrament.tagline}</p>
+          <p className="mt-6 text-base sm:text-lg text-ink-body leading-relaxed">{sacrament.description}</p>
 
-          <div className="mt-8 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md p-6">
-            <p className="font-grotesk text-xs tracking-[0.22em] uppercase text-white/60">The rite</p>
+          <div className="mt-8 rounded-card border border-line-subtle bg-surface-1/80 hud-sheen backdrop-blur-md p-6">
+            <p className="font-grotesk text-xs tracking-[0.08em] uppercase text-ink-muted">The rite</p>
             <ol className="mt-4 space-y-3">
               {sacrament.steps.map((step, index) => (
-                <li key={step} className="flex gap-3 text-sm sm:text-base text-white/90 leading-relaxed">
+                <li key={step} className="flex gap-3 text-sm sm:text-base text-ink-body leading-relaxed">
                   <span
-                    className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-grotesk font-bold text-xs text-[#020408]"
+                    className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-grotesk font-bold text-xs text-abyss"
                     style={{ background: sacrament.accent }}
                     aria-hidden="true"
                   >
@@ -103,14 +103,14 @@ export const BenthicSacramentsPage: React.FC = () => {
                   <a
                     href={`#${sacrament.id}`}
                     aria-current={isActive ? 'step' : undefined}
-                    className="group flex items-center gap-3 font-grotesk text-xs"
+                    className="group flex items-center gap-3 rounded-chip font-grotesk text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                   >
                     <span
                       className="h-px transition-all duration-500"
                       style={{ width: isActive ? 40 : 16, background: isActive ? sacrament.accent : 'rgba(255,255,255,0.3)' }}
                       aria-hidden="true"
                     />
-                    <span className={`transition-colors ${isActive ? 'text-white' : 'text-white/45 group-hover:text-white/80'}`}>
+                    <span className={`transition-colors ${isActive ? 'text-ink' : 'text-ink-muted group-hover:text-ink-body'}`}>
                       {sacrament.number}
                     </span>
                   </a>
@@ -129,10 +129,10 @@ export const BenthicSacramentsPage: React.FC = () => {
         <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center">
           <ScrollReveal>
             <Eyebrow className="justify-center">Begin</Eyebrow>
-            <h2 className="mt-4 font-grotesk font-bold tracking-tight text-white text-4xl sm:text-5xl leading-[1.05]">
+            <h2 className="mt-4 font-grotesk font-bold tracking-tight text-ink text-4xl sm:text-5xl leading-[1.05]">
               Start with the first one.
             </h2>
-            <p className="mt-5 text-base sm:text-lg text-[#9fb0b0] leading-relaxed">
+            <p className="mt-5 text-base sm:text-lg text-ink-muted leading-relaxed">
               Take a baseline reading, then shed one thing tonight. The rest of the sacraments wait patiently. They
               have waited five hundred million years already.
             </p>
@@ -140,9 +140,9 @@ export const BenthicSacramentsPage: React.FC = () => {
               <PrimaryCta to="/moltmax">Take the diagnostic</PrimaryCta>
               <SecondaryCta to="/moltmaxxing">Read Moltmaxxing</SecondaryCta>
             </div>
-            <p className="mt-8 text-sm text-[#839493]">
+            <p className="mt-8 text-sm text-ink-muted">
               Want the why behind the rites?{' '}
-              <Link to="/what-is-moltology/beliefs" className="text-[#00c3ff] hover:text-white underline-offset-4 hover:underline">
+              <Link to="/what-is-moltology/beliefs" className="rounded-chip text-cyan-glow hover:text-ink underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
                 Read the beliefs and codes
               </Link>
               .

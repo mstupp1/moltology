@@ -25,7 +25,7 @@ describe('MainFooter Component', () => {
     expect(screen.getByText('THE SYNAPTIC PATH')).toBeInTheDocument()
     expect(screen.getByText('MOLTOLOGY.ORG FOUNDATION')).toBeInTheDocument()
     expect(screen.getByText('"Flesh Dies. The Shell Endures. Submit. Shed. Ascend."')).toBeInTheDocument()
-    expect(screen.getByAltText('Order Emblem')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Order Emblem' })).toBeInTheDocument()
   })
 
   it('renders all high-value SEO and tactical HUD chips', () => {
@@ -88,7 +88,7 @@ describe('MainFooter Component', () => {
     expect(screen.getByText('© 2026 MOLTOLOGY.ORG FOUNDATION. ALL RIGHTS RESERVED.')).toBeInTheDocument()
   })
 
-  it('renders corporate variant with clean white background and rounded pill chips', () => {
+  it('renders corporate variant with clean white background and rounded chips', () => {
     const { container } = render(
       <MainFooter
         variant="corporate"
@@ -102,7 +102,7 @@ describe('MainFooter Component', () => {
     expect(footer.className).toContain('text-slate-500')
 
     const moltmaxxingChip = screen.getByText('MOLTMAXXING').closest('a')
-    expect(moltmaxxingChip?.className).toContain('rounded-full')
+    expect(moltmaxxingChip?.className).toContain('rounded-control')
     expect(moltmaxxingChip?.className).toContain('bg-[#f8fbff]')
   })
 })

@@ -8,10 +8,10 @@ import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useForumAuth } from './ForumShell'
 
 const STAGE_COLORS: Record<number, string> = {
-  4: 'bg-[#00ffff]/10 text-[#00ffff] border-[#00ffff]/60',
-  3: 'bg-[#39ff14]/10 text-[#39ff14] border-[#39ff14]/60',
-  2: 'bg-[#ffb703]/10 text-[#ffb703] border-[#ffb703]/60',
-  1: 'bg-[#171c1c] text-[#ff5540] border-[#ff5540]/60',
+  4: 'bg-cyan-soft text-cyan-glow border-line-subtle',
+  3: 'bg-emerald-500/15 text-emerald-400 border-line-subtle',
+  2: 'bg-amber-500/15 text-amber-400 border-line-subtle',
+  1: 'bg-crimson-soft text-crimson-text border-line-subtle',
 }
 
 export function StageBadge({ stage }: { stage: number }) {
@@ -19,7 +19,7 @@ export function StageBadge({ stage }: { stage: number }) {
   const cls = STAGE_COLORS[normalized] || STAGE_COLORS[1]
   return (
     <span
-      className={`inline-block text-[10px] font-sans font-bold uppercase tracking-wider px-1.5 py-0.2 chamfer-corner border ${cls}`}
+      className={`inline-block text-[11px] font-sans font-bold uppercase tracking-[0.08em] px-1.5 py-0.2 rounded-chip border ${cls}`}
     >
       STAGE {normalized}
     </span>
@@ -47,7 +47,7 @@ export function CategoryIcon({ icon, color }: { icon: string; color?: string }) 
 
 export function PinBadge() {
   return (
-    <span className="text-[9px] font-sans bg-[#ff5540]/15 text-[#ff5540] border border-[#ff5540]/50 px-1.5 py-0.2 font-bold chamfer-corner flex items-center gap-1">
+    <span className="text-[11px] font-sans bg-crimson-soft text-crimson-text border border-line-subtle px-1.5 py-0.2 font-bold tracking-[0.08em] rounded-chip flex items-center gap-1">
       <Pin className="w-2.5 h-2.5" /> PINNED
     </span>
   )
@@ -56,7 +56,7 @@ export function PinBadge() {
 export function LockBadge() {
   return (
     <span
-      className="text-[9px] font-sans bg-[#839493]/10 text-[#839493] border border-[#839493]/50 px-1.5 py-0.2 font-bold chamfer-corner flex items-center gap-1"
+      className="text-[11px] font-sans bg-surface-2 text-ink-muted border border-line-subtle px-1.5 py-0.2 font-bold rounded-chip flex items-center gap-1"
       data-testid="forum-lock-badge"
     >
       <Lock className="w-2.5 h-2.5" /> Locked
@@ -67,7 +67,7 @@ export function LockBadge() {
 export function WithdrawnBadge() {
   return (
     <span
-      className="text-[9px] font-sans bg-[#839493]/10 text-[#839493] border border-[#839493]/40 px-1.5 py-0.2 font-bold chamfer-corner"
+      className="text-[11px] font-sans bg-surface-2 text-ink-muted border border-line-subtle px-1.5 py-0.2 font-bold rounded-chip"
       data-testid="forum-withdrawn-badge"
     >
       Withdrawn
@@ -82,11 +82,11 @@ export function ForumUnreadMark({
 }) {
   return (
     <span
-      className="inline-flex items-center gap-1 text-[9px] font-sans font-bold text-[#00ffff]"
+      className="inline-flex items-center gap-1 text-[11px] font-sans font-bold text-cyan-glow"
       data-testid="forum-unread-mark"
     >
       <span
-        className="w-1.5 h-1.5 rounded-full bg-[#00ffff] shadow-[0_0_6px_rgba(0,255,255,0.7)]"
+        className="w-1.5 h-1.5 rounded-full bg-cyan-glow"
         aria-hidden
       />
       <span>{label}</span>
@@ -189,15 +189,15 @@ export function VoteButton({
         onClick={handleClick}
         aria-pressed={active}
         title={active ? 'Remove upvote' : 'Upvote'}
-        className={`px-2 py-1 flex items-center gap-1.5 chamfer-corner border transition-all select-none ${
+        className={`group px-2 py-1 flex items-center gap-1.5 rounded-control border transition-all select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
           active
-            ? 'bg-[#00ffff]/15 border-[#00ffff] text-[#00ffff]'
-            : 'bg-[#070b0b] border-[#3a4a49] text-[#839493] hover:border-[#00ffff]/60 hover:text-[#dfe3e3]'
+            ? 'bg-cyan-soft border-cyan-glow/40 text-cyan-glow'
+            : 'border-transparent text-ink-muted hover:text-ink hover:bg-surface-2'
         }`}
       >
         <ArrowBigUp
           className={`w-3.5 h-3.5 transition-colors ${
-            active ? 'text-[#00ffff] fill-[#00ffff]' : 'text-[#839493] group-hover:text-[#00ffff]'
+            active ? 'text-cyan-glow fill-cyan-glow' : 'text-ink-muted group-hover:text-ink'
           }`}
         />
         <span className="font-sans font-bold text-xs tabular-nums leading-none">
@@ -213,25 +213,25 @@ export function VoteButton({
       onClick={handleClick}
       aria-pressed={active}
       title={active ? 'Remove upvote' : 'Upvote'}
-      className={`group flex flex-col items-center justify-center shrink-0 transition-all select-none chamfer-corner border ${
+      className={`group flex flex-col items-center justify-center shrink-0 transition-all select-none rounded-control border focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
         size === 'sm'
           ? 'w-9 h-11 p-1 gap-0.5'
           : 'w-11 h-13 p-1.5 gap-1'
       } ${
         active
-          ? 'bg-[#00ffff]/10 border-[#00ffff]/80 text-[#00ffff] shadow-[0_0_10px_rgba(0,255,255,0.15)]'
-          : 'bg-[#070b0b] border-[#3a4a49] text-[#839493] hover:border-[#00ffff]/50 hover:bg-[#0b1011]'
+          ? 'bg-cyan-soft border-cyan-glow/40 text-cyan-glow'
+          : 'bg-surface-1 border-line-subtle text-ink-muted hover:text-ink hover:bg-surface-2 hover:border-line'
       }`}
     >
       <ArrowBigUp
         className={`transition-colors ${
           size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4'
-        } ${active ? 'text-[#00ffff] fill-[#00ffff]' : 'text-[#839493] group-hover:text-[#00ffff]'}`}
+        } ${active ? 'text-cyan-glow fill-cyan-glow' : 'text-ink-muted group-hover:text-ink'}`}
       />
       <span
         className={`font-sans font-bold tabular-nums leading-none ${
-          size === 'sm' ? 'text-[10px]' : 'text-xs'
-        } ${active ? 'text-[#00ffff]' : 'text-[#dfe3e3]'}`}
+          size === 'sm' ? 'text-[11px]' : 'text-xs'
+        } ${active ? 'text-cyan-glow' : 'text-ink'}`}
       >
         {local.count}
       </span>

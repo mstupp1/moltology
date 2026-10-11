@@ -2,19 +2,9 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
 import { S3_BASE_URL } from '../../src/lib/assets'
+import { DEFAULT_MASCOT_KEY, MASCOT_CAST, MASCOT_S3_PREFIX, resolveMascotAlias } from '../../src/lib/mascots'
 
-export type CharacterKey =
-  | 'lobster_pointing'
-  | 'lobster_peek'
-  | 'lobster_thumbs_up'
-  | 'lobster_peaceful'
-  | 'lobster_navigator'
-  | 'lobster_action'
-  | 'crab_stats'
-  | 'lobster_engineer'
-  | 'random'
-  | 'none'
-  | (string & {})
+export type CharacterKey = 'random' | 'none' | (string & {})
 
 export interface CharacterInfo {
   key: string
@@ -24,57 +14,17 @@ export interface CharacterInfo {
   description?: string
 }
 
-export const CHARACTER_REGISTRY: Record<string, CharacterInfo> = {
-  lobster_pointing: {
-    key: 'lobster_pointing',
-    filename: 'char_lobster_pointing_cta.webp',
-    s3Path: 'images/characters/char_lobster_pointing_cta.webp',
-    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_pointing_cta.webp`,
-    description: 'Hero lobster pointing directly at call to action buttons or key links',
-  },
-  lobster_peek: {
-    key: 'lobster_peek',
-    filename: 'char_lobster_corner_peek.webp',
-    s3Path: 'images/characters/char_lobster_corner_peek.webp',
-    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_corner_peek.webp`,
-    description: 'Playful lobster peeking over top or side container bezels',
-  },
-  lobster_thumbs_up: {
-    key: 'lobster_thumbs_up',
-    filename: 'char_lobster_thumbs_up.webp',
-    s3Path: 'images/characters/char_lobster_thumbs_up.webp',
-    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.webp`,
-    description: 'Cheerful lobster giving a thumbs-up approval sign',
-  },
-  lobster_peaceful: {
-    key: 'lobster_peaceful',
-    filename: 'char_lobster_floating_peaceful.webp',
-    s3Path: 'images/characters/char_lobster_floating_peaceful.webp',
-    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_floating_peaceful.webp`,
-    description: 'Calm cyber-lobster floating peacefully in deep benthic waters',
-  },
-  lobster_navigator: {
-    key: 'lobster_navigator',
-    filename: 'char_lobster_navigator.webp',
-    s3Path: 'images/characters/char_lobster_navigator.webp',
-    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_navigator.webp?v=3`,
-    description: 'Adventurous lobster explorer wearing opaque goggles and tactical benthic harness belt',
-  },
-  crab_stats: {
-    key: 'crab_stats',
-    filename: 'char_crab_pointing_stats.webp',
-    s3Path: 'images/characters/char_crab_pointing_stats.webp',
-    publicUrl: `${S3_BASE_URL}/images/characters/char_crab_pointing_stats.webp`,
-    description: 'Energetic crab pointing at quantitative metrics and charts',
-  },
-  lobster_engineer: {
-    key: 'lobster_engineer',
-    filename: 'char_lobster_engineer.webp',
-    s3Path: 'images/characters/char_lobster_engineer.webp',
-    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_engineer.webp`,
-    description: 'Cheerful lobster engineer wearing yellow safety hardhat with holographic diagnostic tablet',
-  },
-}
+const characterInfo = (key: string, filename: string, description?: string): CharacterInfo => ({
+  key,
+  filename,
+  s3Path: `${MASCOT_S3_PREFIX}/${filename}`,
+  publicUrl: `${S3_BASE_URL}/${MASCOT_S3_PREFIX}/${filename}`,
+  description,
+})
+
+export const CHARACTER_REGISTRY: Record<string, CharacterInfo> = Object.fromEntries(
+  MASCOT_CAST.map((m) => [m.key, characterInfo(m.key, m.filename, m.description)])
+)
 
 /**
  * Get a list of all registered character keys
@@ -116,37 +66,18 @@ export function getRandomCharacterRotation(count: number): CharacterKey[] {
  * Resolve character metadata dynamically from key or filename
  */
 export function getCharacterInfo(characterKeyOrFilename: string): CharacterInfo {
-  let raw = characterKeyOrFilename.trim()
+  const raw = characterKeyOrFilename.trim()
   if (raw === 'random' || raw === 'dice' || raw === 'shuffle') {
     return CHARACTER_REGISTRY[getRandomCharacterKey()]
   }
-  if (raw.endsWith('.png') || raw.endsWith('.jpg') || raw.endsWith('.webp')) {
-    raw = raw.replace(/\.[^/.]+$/, '')
-  }
-
-  const normKey = (
-    raw === 'lobster_pointing_cta' || raw === 'pointing' ? 'lobster_pointing' :
-    raw === 'lobster_corner_peek' || raw === 'peek' ? 'lobster_peek' :
-    raw === 'crab_pointing_stats' || raw === 'crab_stats' || raw === 'stats' ? 'crab_stats' :
-    raw === 'lobster_navigator' || raw === 'navigator' || raw === 'explorer' || raw === 'lobster_speed_action' || raw === 'speed_action' || raw === 'action' ? 'lobster_navigator' :
-    raw === 'lobster_floating_peaceful' || raw === 'peaceful' ? 'lobster_peaceful' :
-    raw === 'lobster_engineer' || raw === 'engineer' || raw === 'diagnostic' ? 'lobster_engineer' :
-    raw === 'thumbs_up' ? 'lobster_thumbs_up' :
-    raw
-  )
+  const normKey = resolveMascotAlias(raw)
 
   if (CHARACTER_REGISTRY[normKey]) {
     return CHARACTER_REGISTRY[normKey]
   }
 
   // Dynamic S3 fallback for any character file in images/characters/
-  const filename = normKey.startsWith('char_') ? `${normKey}.png` : `char_${normKey}.png`
-  return {
-    key: normKey,
-    filename,
-    s3Path: `images/characters/${filename}`,
-    publicUrl: `${S3_BASE_URL}/images/characters/${filename}`,
-  }
+  return characterInfo(normKey, `char_${normKey}.png`)
 }
 
 /**
@@ -283,17 +214,6 @@ export async function overlayCharacterOnImage(
  * Normalize any alias, casing, or variation to standard mascot key
  */
 export function normalizeMascotKey(rawKey?: string): string {
-  if (!rawKey) return 'lobster_thumbs_up'
-  const raw = rawKey.toLowerCase().trim()
-
-  if (raw === 'lobster_pointing_cta' || raw === 'pointing' || raw === 'cta' || raw === 'lobster_cta') return 'lobster_pointing'
-  if (raw === 'lobster_corner_peek' || raw === 'peek' || raw === 'corner_peek') return 'lobster_peek'
-  if (raw === 'crab_pointing_stats' || raw === 'crab_stats' || raw === 'stats' || raw === 'pointing_stats') return 'crab_stats'
-  if (raw === 'lobster_navigator' || raw === 'navigator' || raw === 'explorer' || raw === 'lobster_speed_action' || raw === 'speed_action' || raw === 'lobster_action' || raw === 'action' || raw === 'speed') return 'lobster_navigator'
-  if (raw === 'lobster_floating_peaceful' || raw === 'floating_peaceful' || raw === 'peaceful' || raw === 'zen' || raw === 'floating') return 'lobster_peaceful'
-  if (raw === 'lobster_engineer' || raw === 'engineer' || raw === 'diagnostic' || raw === 'hardhat') return 'lobster_engineer'
-  if (raw === 'thumbs_up' || raw === 'thumbs' || raw === 'approval' || raw === 'lobster_thumbs') return 'lobster_thumbs_up'
-
-  return raw
+  if (!rawKey) return DEFAULT_MASCOT_KEY
+  return resolveMascotAlias(rawKey)
 }
-

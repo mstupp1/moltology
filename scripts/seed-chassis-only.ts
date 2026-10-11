@@ -11,7 +11,7 @@ import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 import * as schema from '../src/db/schema'
 import {
-  INITIAL_EQUIPMENT_CATALOG,
+  ALL_EQUIPMENT_CATALOG,
   catalogSeedInsertValues,
 } from '../src/lib/equipment-seed-data'
 
@@ -24,7 +24,7 @@ async function main() {
 
   const db = drizzle(neon(url), { schema })
 
-  for (const item of INITIAL_EQUIPMENT_CATALOG) {
+  for (const item of ALL_EQUIPMENT_CATALOG) {
     const values = catalogSeedInsertValues(item)
     await db
       .insert(schema.equipmentCatalog)
@@ -43,11 +43,13 @@ async function main() {
           uniquePower: values.uniquePower,
           imageUrl: values.imageUrl,
           sortOrder: values.sortOrder,
+          kind: values.kind,
+          artKey: values.artKey,
         },
       })
   }
 
-  console.log(`✓ Upserted ${INITIAL_EQUIPMENT_CATALOG.length} equipment catalog entries`)
+  console.log(`✓ Upserted ${ALL_EQUIPMENT_CATALOG.length} equipment catalog entries`)
   console.log('Chassis catalog seed complete. Signed-in members receive starter vault pieces on next Chassis load.')
 }
 

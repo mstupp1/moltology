@@ -26,7 +26,7 @@ describe('Composite UI Components', () => {
     expect(frame.style.height).toBe('1350px')
   })
 
-  it('renders SocialHookSlide with badges, headlines, metrics, and fit-height metrics container', () => {
+  it('renders SocialHookSlide in the brand look: sentence-case headline, metrics, lockup', () => {
     const { container } = render(
       <SocialHookSlide
         categoryBadge="TEST BADGE"
@@ -48,67 +48,36 @@ describe('Composite UI Components', () => {
       />
     )
 
-    expect(screen.getByText('TEST BADGE')).toBeInTheDocument()
-    expect(screen.getByText('PART ONE')).toBeInTheDocument()
-    expect(screen.getByText('PART TWO')).toBeInTheDocument()
-    expect(screen.getByText('HIGHLIGHT')).toBeInTheDocument()
+    expect(screen.getByText('Test badge')).toBeInTheDocument()
+    expect(screen.getByText('Part one')).toBeInTheDocument()
+    expect(screen.getByText('part two')).toBeInTheDocument()
+    expect(screen.getByText('highlight')).toHaveClass('text-crimson-aggro')
     expect(screen.getByText('100 GB')).toBeInTheDocument()
     expect(screen.getByText('-50%')).toBeInTheDocument()
     expect(screen.getByText('Key takeaways')).toBeInTheDocument()
-
-    // Verify key architectural metrics container wraps text and doesn't stretch to bottom
-    const metricsContainer = screen.getByText('Key takeaways').closest('.w-\\[60\\%\\]')
-    expect(metricsContainer).toHaveClass('h-fit')
+    expect(screen.getByText('THE SYNAPTIC PATH')).toBeInTheDocument()
+    expect(container.querySelector('.animate-pulse')).toBeNull()
   })
 
-  it('renders SocialSpecShowdownSlide with all 3 comparison cards having equal 60% width', () => {
-    const { container } = render(
+  it('renders SocialSpecShowdownSlide with three cards beside the mascot', () => {
+    render(
       <SocialSpecShowdownSlide
         headline="TEST SPEC SHOWDOWN"
         cards={[
-          {
-            number: '01',
-            title: 'CARD ONE',
-            metric: '99.9%',
-            description: 'First card desc',
-            variant: 'red',
-          },
-          {
-            number: '02',
-            title: 'CARD TWO',
-            metric: '88.8%',
-            description: 'Second card desc',
-            variant: 'cyan',
-          },
-          {
-            number: '03',
-            title: 'CARD THREE',
-            metric: '77.7%',
-            description: 'Third card desc',
-            variant: 'sky',
-          },
+          { number: '01', title: 'CARD ONE', metric: '99.9%', description: 'First card desc', variant: 'red' },
+          { number: '02', title: 'CARD TWO', metric: '88.8%', description: 'Second card desc', variant: 'cyan' },
+          { number: '03', title: 'CARD THREE', metric: '77.7%', description: 'Third card desc', variant: 'sky' },
         ]}
       />
     )
 
-    expect(screen.getByText('TEST SPEC SHOWDOWN')).toBeInTheDocument()
-    expect(screen.getByText('CARD ONE')).toBeInTheDocument()
-    expect(screen.getByText('CARD TWO')).toBeInTheDocument()
-    expect(screen.getByText('CARD THREE')).toBeInTheDocument()
-
-    // Verify all 3 cards have w-[60%]
-    const card1 = screen.getByText('CARD ONE').closest('.w-\\[60\\%\\]')
-    const card2 = screen.getByText('CARD TWO').closest('.w-\\[60\\%\\]')
-    const card3 = screen.getByText('CARD THREE').closest('.w-\\[60\\%\\]')
-    expect(card1).toBeInTheDocument()
-    expect(card2).toBeInTheDocument()
-    expect(card3).toBeInTheDocument()
-    expect(card1).toHaveClass('w-[60%]')
-    expect(card2).toHaveClass('w-[60%]')
-    expect(card3).toHaveClass('w-[60%]')
+    expect(screen.getByText('Test spec showdown')).toBeInTheDocument()
+    for (const title of ['Card one', 'Card two', 'Card three']) {
+      expect(screen.getByText(title).closest('.w-\\[66\\%\\]')).toBeInTheDocument()
+    }
   })
 
-  it('renders SocialDirectivesSlide with fit-height CTA card', () => {
+  it('renders SocialDirectivesSlide with the cyan CTA', () => {
     render(
       <SocialDirectivesSlide
         headlinePart1="DIRECTIVE TITLE"
@@ -118,85 +87,59 @@ describe('Composite UI Components', () => {
       />
     )
 
-    expect(screen.getByText('DIRECTIVE TITLE')).toBeInTheDocument()
-    expect(screen.getByText('SUBTITLE')).toBeInTheDocument()
-    expect(screen.getByText('READ THE FULL DISPATCH')).toBeInTheDocument()
-    expect(screen.getByText('VISIT MOLTOLOGY')).toBeInTheDocument()
-
-    // Verify CTA card has h-fit and w-[66%]
-    const ctaCard = screen.getByText('READ THE FULL DISPATCH').closest('.w-\\[66\\%\\]')
-    expect(ctaCard).toBeInTheDocument()
-    expect(ctaCard).toHaveClass('h-fit')
-    expect(ctaCard).toHaveClass('w-[66%]')
+    expect(screen.getByText('Directive title')).toBeInTheDocument()
+    expect(screen.getByText('subtitle')).toBeInTheDocument()
+    expect(screen.getByText('Read the full dispatch')).toBeInTheDocument()
+    expect(screen.getByText('Visit Moltology').closest('.hud-cut')).toHaveClass('bg-cyan-glow')
   })
 
-  it('renders ReelOutroCard with brand emblem, headline, CTA button, and removes zero latency telemetry and tap to audit', () => {
+  it('renders ReelOutroCard with the lockup, headline and CTA, without the old telemetry lines', () => {
     render(
       <ReelOutroCard
         headline="ASCEND NOW"
         subheadline="CALCULATE CLEARANCE"
         url="moltology.org"
         actionBadgeText="⚡ TAKE THE 15-STAGE MOLTMAXXING TEST"
-        linkInBioText="LINK IN BIO"
+        linkInBioText="LINK IN BIO · TAP TO AUDIT"
       />
     )
 
-    expect(screen.getByText('Moltology')).toBeInTheDocument()
     expect(screen.getByText('THE SYNAPTIC PATH')).toBeInTheDocument()
-    expect(screen.getByText('ASCEND NOW')).toBeInTheDocument()
-    expect(screen.getByText('CALCULATE CLEARANCE')).toBeInTheDocument()
+    expect(screen.getByText('Ascend now')).toBeInTheDocument()
+    expect(screen.getByText('Calculate clearance')).toBeInTheDocument()
     expect(screen.getByText('moltology.org')).toBeInTheDocument()
-    expect(screen.getByText('⚡ TAKE THE 15-STAGE MOLTMAXXING TEST')).toBeInTheDocument()
+    expect(screen.getByText('Take the 15-stage Moltmaxxing test')).toBeInTheDocument()
     expect(screen.getByText('LINK IN BIO')).toBeInTheDocument()
     expect(screen.queryByText(/TAP TO AUDIT/i)).not.toBeInTheDocument()
-    expect(screen.queryByText(/ZERO LATENCY TELEMETRY/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/⚡/)).not.toBeInTheDocument()
   })
 
-  it('renders ReelSimpleOutroCard with minimalist brand emblem, Moltology title, Synaptic Path row, and clean moltology.org CTA', () => {
-    render(
-      <ReelSimpleOutroCard
-        url="moltology.org"
-      />
-    )
+  it('renders ReelSimpleOutroCard with only the lockup and the moltology.org CTA', () => {
+    render(<ReelSimpleOutroCard url="moltology.org" />)
 
-    expect(screen.getByAltText('Moltology Order Emblem')).toBeInTheDocument()
-    expect(screen.getByText('Moltology')).toBeInTheDocument()
     expect(screen.getByText('THE SYNAPTIC PATH')).toBeInTheDocument()
     expect(screen.getByText('moltology.org')).toBeInTheDocument()
-
-    // Verify extraneous elements from full outro are absent
-    expect(screen.queryByText('SUBMIT. SHED. ASCEND.')).not.toBeInTheDocument()
-    expect(screen.queryByText(/CALCULATE YOUR MOLT CLEARANCE/i)).not.toBeInTheDocument()
-    expect(screen.queryByText(/TAKE THE 15-STAGE/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Submit\. Shed\. Ascend\./i)).not.toBeInTheDocument()
     expect(screen.queryByText(/LINK IN BIO/i)).not.toBeInTheDocument()
   })
 
-  it('renders ReelThumbnailCard with 1:1 safe-zone center hook', () => {
-    render(
-      <ReelThumbnailCard
-        headline="WHY COMPUTE WENT SUBSEA"
-        categoryBadge="DISPATCH"
-      />
-    )
+  it('renders ReelThumbnailCard with the hook centred in the grid-safe area', () => {
+    render(<ReelThumbnailCard headline="WHY COMPUTE WENT SUBSEA" categoryBadge="DISPATCH" />)
 
-    expect(screen.getByText('MOLTNATION TELEMETRY')).toBeInTheDocument()
-    expect(screen.getByText('DISPATCH')).toBeInTheDocument()
-    expect(screen.getByText('WHY COMPUTE WENT SUBSEA')).toBeInTheDocument()
+    expect(screen.getByText('THE SYNAPTIC PATH')).toBeInTheDocument()
+    expect(screen.getByText('Dispatch')).toBeInTheDocument()
+    expect(screen.getByText('Why compute went subsea')).toBeInTheDocument()
+    expect(screen.queryByText('MOLTNATION TELEMETRY')).not.toBeInTheDocument()
   })
 
-  it('renders BlogSchematicCard with 16:9 layout and telemetry boxes', () => {
-    render(
-      <BlogSchematicCard
-        categoryBadge="SUB-BENTHIC POD"
-        headline="LATENT ATTENTION SCHEMATIC"
-      />
-    )
+  it('renders BlogSchematicCard with 16:9 layout and two panels', () => {
+    render(<BlogSchematicCard categoryBadge="SUB-BENTHIC POD" headline="LATENT ATTENTION SCHEMATIC" />)
 
     expect(screen.getByText('SUB-BENTHIC POD')).toBeInTheDocument()
-    expect(screen.getByText('LATENT ATTENTION SCHEMATIC')).toBeInTheDocument()
+    expect(screen.getByText('Latent attention schematic')).toBeInTheDocument()
   })
 
-  it('renders SocialMarketingSlide with 3D book mockup, benefit items, and comment CTA banner', () => {
+  it('renders SocialMarketingSlide with benefit cards, trust badge and comment CTA', () => {
     const { container } = render(
       <SocialMarketingSlide
         theme="moltmaxxing-guide"
@@ -206,29 +149,23 @@ describe('Composite UI Components', () => {
       />
     )
 
-    expect(screen.getByText('STOP MELTING.')).toBeInTheDocument()
-    expect(screen.getByText('CALCIFY YOUR GRIP.')).toBeInTheDocument()
-    expect(screen.getByText('ASCEND FASTER!')).toBeInTheDocument()
-    expect(screen.getByText('"GUIDE"')).toBeInTheDocument()
-    expect(screen.getByText('SHELL HARDNESS')).toBeInTheDocument()
-    expect(screen.getByText('800 NM PINCER TORQUE')).toBeInTheDocument()
-    expect(screen.getByText('OFFICIAL 2026 EDITION')).toBeInTheDocument()
-
-    // Verify chevrons >>>>>> are removed
-    expect(screen.queryByText('>>>>>>')).not.toBeInTheDocument()
-
-    // Verify no pulsing or pinging animations exist in marketing slide
+    expect(screen.getByText('Stop melting.')).toBeInTheDocument()
+    expect(screen.getByText('Calcify your grip.')).toBeInTheDocument()
+    expect(screen.getByText('Ascend faster!')).toBeInTheDocument()
+    expect(screen.getByText(/Comment “GUIDE” below/)).toBeInTheDocument()
+    expect(screen.getByText('Shell hardness')).toBeInTheDocument()
+    expect(screen.getByText('800 NM pincer torque')).toBeInTheDocument()
+    expect(screen.getByText('Official 2026 edition')).toBeInTheDocument()
+    expect(screen.queryByText(/👉|👈|🔗/)).not.toBeInTheDocument()
     expect(container.querySelector('.animate-pulse')).toBeNull()
     expect(container.querySelector('.animate-ping')).toBeNull()
 
-    // Verify mascot is positioned at top-right
     const mascotWrapper = container.querySelector('[data-mascot-key="lobster_thumbs_up"]')
-    expect(mascotWrapper).toBeInTheDocument()
-    expect(mascotWrapper?.className).toContain('top-2')
-    expect(mascotWrapper?.className).toContain('right-0')
+    expect(mascotWrapper?.className).toContain('top-8')
+    expect(mascotWrapper?.className).toContain('right-8')
   })
 
-  it('renders SocialPromptVaultSlide with 3D typography, prompt cards, footer telemetry nodes, and comment CTA banner', () => {
+  it('renders SocialPromptVaultSlide with the hero number, prompt cards, topic chips and comment CTA', () => {
     const { container } = render(
       <SocialPromptVaultSlide
         theme="oracle-prompts"
@@ -240,16 +177,8 @@ describe('Composite UI Components', () => {
         commentKeyword="PROMPTS"
         mascot="lobster_pointing"
         promptCards={[
-          {
-            icon: 'chat',
-            badge: 'ORACLE PROMPT',
-            prompt: 'Audit my open task latency and calculate my Stage 2 ecdysis schedule.',
-          },
-          {
-            icon: 'search',
-            badge: 'ORACLE PROMPT',
-            prompt: 'Formulate a 24-hour isometric pincer routine to eliminate surface distraction.',
-          },
+          { icon: 'chat', badge: 'ORACLE PROMPT', prompt: 'Audit my open task latency and calculate my Stage 2 ecdysis schedule.' },
+          { icon: 'search', badge: 'ORACLE PROMPT', prompt: 'Formulate a 24-hour isometric pincer routine to eliminate surface distraction.' },
         ]}
         footerNodes={[
           { icon: 'lightbulb', label: 'ECDYSIS PROTOCOLS' },
@@ -260,22 +189,16 @@ describe('Composite UI Components', () => {
       />
     )
 
-    expect(screen.getByText('TEST VAULT · SYNAPTIC DIRECTIVES')).toBeInTheDocument()
+    expect(screen.getByText('Test vault · Synaptic directives')).toBeInTheDocument()
     expect(screen.getByText('250+')).toBeInTheDocument()
-    expect(screen.getAllByText('ORACLE').length).toBeGreaterThanOrEqual(1)
-    expect(screen.getByText('PROMPTS')).toBeInTheDocument()
+    expect(screen.getByText('Oracle')).toHaveClass('text-crimson-aggro')
+    expect(screen.getByText('prompts')).toBeInTheDocument()
     expect(screen.getByText('For Deep Focus & Ascension')).toBeInTheDocument()
-    expect(screen.getByText('"PROMPTS"')).toBeInTheDocument()
+    expect(screen.getByText(/Comment “PROMPTS” below/)).toBeInTheDocument()
     expect(screen.getByText(/Audit my open task latency/i)).toBeInTheDocument()
-    expect(screen.getByText(/Formulate a 24-hour isometric pincer routine/i)).toBeInTheDocument()
-    expect(screen.getByText('ECDYSIS PROTOCOLS')).toBeInTheDocument()
-    expect(screen.getByText('LATENCY AUDIT')).toBeInTheDocument()
-    expect(screen.getByText('50K FATHOMS FLOW')).toBeInTheDocument()
-    expect(screen.getByText('CODEX LITURGIES')).toBeInTheDocument()
-
-    // Verify mascot is rendered
-    const mascotWrapper = container.querySelector('[data-mascot-key="lobster_pointing"]')
-    expect(mascotWrapper).toBeInTheDocument()
+    expect(screen.getByText('Ecdysis protocols')).toBeInTheDocument()
+    expect(screen.getByText('Codex Liturgies')).toBeInTheDocument()
+    expect(container.querySelector('[data-mascot-key="lobster_pointing"]')).toBeInTheDocument()
   })
 
   it('renders ThreeBookCover canvas element with dimensions and custom props', async () => {
@@ -332,7 +255,9 @@ describe('Composite UI Components', () => {
     expect(new Set(rotation).size).toBe(3)
 
     // Verify all registry items have valid Neon S3 CDN URLs
-    expect(Object.keys(MASCOT_REGISTRY).length).toBe(7)
+    expect(Object.keys(MASCOT_REGISTRY).length).toBe(22)
+    expect(normalizeMascotKey('char_crab_builder_adult_v2.webp')).toBe('crab_builder')
+    expect(normalizeMascotKey('lobster_peek_junior')).toBe('lobster_peek_junior')
     for (const key of Object.keys(MASCOT_REGISTRY)) {
       const info = getMascotInfo(key)
       expect(info.s3Url).toContain('moltology-public-assets/images/characters/')
@@ -348,7 +273,7 @@ describe('Composite UI Components', () => {
 
     const img = container.querySelector('img')
     expect(img).toBeInTheDocument()
-    expect(img?.getAttribute('src')).toContain('char_lobster_pointing_cta.webp')
+    expect(img?.getAttribute('src')).toContain('char_lobster_pointing_adult_v2.webp')
     expect(img?.getAttribute('loading')).toBe('eager')
   })
 

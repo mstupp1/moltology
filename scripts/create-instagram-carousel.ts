@@ -35,6 +35,7 @@ export interface CreateCarouselOptions {
   dryRun?: boolean
   publishNow?: boolean
   polishedSlides?: string[]
+  contentJson?: string
 }
 
 export interface BlogPostData {
@@ -57,16 +58,16 @@ export interface CarouselCopy {
 
 export function parseCarouselCopy(value: unknown): CarouselCopy {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    throw new Error('Carousel content must be an object.')
+    throw new Error('Carousel content must be a JSON object.')
   }
   const draft = value as Record<string, unknown>
   for (const key of ['title', 'topic', 'caption', 'firstComment']) {
     if (typeof draft[key] !== 'string' || !draft[key].trim()) {
-      throw new Error(`Carousel content needs ${key}.`)
+      throw new Error(`Carousel content requires a non-empty ${key}.`)
     }
   }
   if (!Array.isArray(draft.hashtags) || draft.hashtags.length > 3 || draft.hashtags.some((tag) => typeof tag !== 'string' || !tag.trim())) {
-    throw new Error('Carousel content needs at most three non-empty hashtag strings.')
+    throw new Error('Carousel content requires at most three non-empty string hashtags.')
   }
   assertNoKeywordCta(draft)
   return {
@@ -78,13 +79,14 @@ export function parseCarouselCopy(value: unknown): CarouselCopy {
   }
 }
 
+export const parseCarouselContent = parseCarouselCopy
+
 export function resolveCarouselCopy(options: CreateCarouselOptions, fallback: () => CarouselCopy): CarouselCopy {
   if (options.contentJson) {
     return parseCarouselCopy(JSON.parse(fs.readFileSync(path.resolve(options.contentJson), 'utf8')))
   }
   return fallback()
 }
-
 export const DEFAULT_INSTAGRAM_ACCOUNT_ID = CANONICAL_INSTAGRAM_ACCOUNT_ID // moltology_org / Silas Trench
 export const DEFAULT_PROFILE_ID = CANONICAL_PROFILE_ID // Moltology Default Profile
 export const DEFAULT_CAROUSEL_QUEUE_ID = QUEUE_IDS.CAROUSELS_AND_POSTS // Moltology Carousels (Mon, Wed, Fri at 13:00 EST)
@@ -753,9 +755,15 @@ Output Style: Ultra high-resolution, cinematic 8k aesthetic, pristine lighting, 
  * Main Carousel Generator
  */
 export async function createInstagramCarousel(options: CreateCarouselOptions = {}) {
+  if (options.theme === 'swipe-lab' && (!options.polishedSlides || options.polishedSlides.length < 2)) {
+    throw new Error('--content-json requires at least two --polished-slides; render custom layouts separately')
+  }
   if (options.polishedSlides?.length) {
     if (!options.contentJson) throw new Error('Carousel ingestion requires --content-json with reviewed copy. Legacy campaign defaults cannot be queued.')
-    if (options.polishedSlides.length < 5 || options.polishedSlides.length > 8) throw new Error('A finished carousel needs 5–8 slides, depending on the story.')
+    const minSlides = options.theme === 'swipe-lab' ? 2 : 5
+    if (options.polishedSlides.length < minSlides || options.polishedSlides.length > 8) {
+      throw new Error(options.theme === 'swipe-lab' ? 'Swipe Lab requires 2–8 slides.' : 'A finished carousel needs 5–8 slides, depending on the story.')
+    }
   }
   const timestamp = Date.now()
   const theme = options.theme || 'moltmaxxing'
@@ -811,6 +819,7 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
           profileId: DEFAULT_PROFILE_ID,
           accountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
           isAiGenerated: true,
+          nativeFirstCommentOnly: !!options.contentJson,
           publishNow: options.publishNow,
         })
       }
@@ -851,6 +860,7 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
         accountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
         isAiGenerated: true,
         dryRun: true,
+        nativeFirstCommentOnly: !!options.contentJson,
         publishNow: options.publishNow,
       })
     }

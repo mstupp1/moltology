@@ -196,30 +196,30 @@ export const CommandPalette: React.FC = () => {
       {isOpen && (
         <div
           data-testid="command-palette-overlay"
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-start justify-center pt-8 sm:pt-20 px-3 sm:px-4 animate-in fade-in duration-150"
+          className="fixed inset-0 z-50 bg-abyss/80 backdrop-blur-sm flex items-start justify-center pt-8 sm:pt-20 px-3 sm:px-4 animate-in fade-in duration-150"
           onClick={() => setIsOpen(false)}
         >
           <div
             data-testid="command-palette-modal"
-            className="w-full max-w-2xl bg-[#0b0f0f] border border-cyan-500/40 shadow-2xl shadow-cyan-950/60 overflow-hidden chamfer-corner-lg font-sans text-sm max-h-[85vh] flex flex-col"
+            className="w-full max-w-2xl rounded-card bg-surface-1 border border-line shadow-menu overflow-hidden font-sans text-sm max-h-[85vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
             onKeyDown={handleKeyDownMenu}
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-cyan-900/40 bg-[#0f1414] shrink-0">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-line-subtle bg-surface-2 shrink-0">
               <div className="flex items-center space-x-3 flex-1">
-                <Search className="w-5 h-5 text-cyan-400 shrink-0" />
+                <Search className="w-5 h-5 text-cyan-glow shrink-0" />
                 <input
                   type="text"
                   autoFocus
                   placeholder="Type a command or search protocol (e.g. Market, Purge, a designation)..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  className="bg-transparent text-gray-100 placeholder-gray-500 focus:outline-none w-full text-xs sm:text-sm font-sans"
+                  className="bg-transparent text-ink placeholder:text-ink-muted focus:outline-none w-full text-xs sm:text-sm font-sans"
                 />
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-gray-500 hover:text-red-400 p-1 min-w-[36px] min-h-[36px] flex items-center justify-center"
+                className="rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow p-1 min-w-[36px] min-h-[36px] flex items-center justify-center"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -229,7 +229,7 @@ export const CommandPalette: React.FC = () => {
               {showRecents && (
                 <div data-testid="command-palette-recents" className="px-1 pt-1 pb-2 space-y-2">
                   <div className="flex items-center justify-between gap-2 px-1">
-                    <div className="text-[10px] uppercase tracking-widest text-cyan-600 font-semibold flex items-center gap-1.5">
+                    <div className="text-[11px] uppercase tracking-[0.08em] text-ink-muted font-semibold flex items-center gap-1.5">
                       <History className="w-3 h-3" />
                       Recents
                     </div>
@@ -237,7 +237,7 @@ export const CommandPalette: React.FC = () => {
                       type="button"
                       data-testid="command-palette-recents-clear"
                       onClick={shedTrail}
-                      className="text-[10px] uppercase tracking-widest text-[#839493] hover:text-cyan-300 transition-colors min-h-[36px] px-1"
+                      className="rounded-control text-[11px] uppercase tracking-[0.08em] text-ink-muted hover:text-cyan-glow transition-colors min-h-[36px] px-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                       aria-label="Clear recents"
                     >
                       Shed trail
@@ -257,23 +257,23 @@ export const CommandPalette: React.FC = () => {
 
               {showPeopleSection && (
                 <div data-testid="command-palette-people" className="space-y-1">
-                  <div className="px-2 pt-1 pb-0.5 text-[10px] uppercase tracking-widest text-cyan-600 font-semibold flex items-center gap-1.5">
+                  <div className="px-2 pt-1 pb-0.5 text-[11px] uppercase tracking-[0.08em] text-ink-muted font-semibold flex items-center gap-1.5">
                     <Users className="w-3 h-3" />
                     People
                   </div>
                   {!signedIn && (
-                    <p className="px-3 py-2 text-xs text-[#839493]">
+                    <p className="px-3 py-2 text-xs text-ink-muted">
                       Sign in to search fellow members. Page jumps stay open.
                     </p>
                   )}
                   {signedIn && searchingPeople && people.length === 0 && (
-                    <p className="px-3 py-2 text-xs text-[#839493]">Listening for designations…</p>
+                    <p className="px-3 py-2 text-xs text-ink-muted">Listening for designations…</p>
                   )}
                   {signedIn &&
                     !searchingPeople &&
                     people.length === 0 &&
                     trimmed.length >= MEMBER_SEARCH_MIN_CHARS && (
-                      <p className="px-3 py-2 text-xs text-[#839493]">
+                      <p className="px-3 py-2 text-xs text-ink-muted">
                         The trench stayed quiet. No designation, larva unit, or name surfaced.
                       </p>
                     )}
@@ -287,10 +287,10 @@ export const CommandPalette: React.FC = () => {
                         data-testid={`command-palette-person-${member.id}`}
                         onClick={() => activateRow({ kind: 'person', member })}
                         onMouseEnter={() => setSelectedIndex(idx)}
-                        className={`w-full text-left px-3 py-2.5 min-h-[44px] flex items-center gap-3 transition-colors ${
+                        className={`w-full text-left rounded-control px-3 py-2.5 min-h-[44px] flex items-center gap-3 transition-colors ${
                           isSelected
-                            ? 'bg-cyan-950/60 border-l-2 border-cyan-400 text-cyan-200'
-                            : 'text-gray-300 hover:bg-gray-900/60'
+                            ? 'bg-surface-2 border-l-2 border-cyan-glow text-ink'
+                            : 'text-ink-body hover:bg-surface-2'
                         }`}
                       >
                         <LobsterAvatarPortrait
@@ -302,7 +302,7 @@ export const CommandPalette: React.FC = () => {
                           <div className="font-semibold text-xs tracking-wide truncate">
                             {member.displayName}
                           </div>
-                          <div className="text-[10px] text-cyan-600 uppercase tracking-widest">
+                          <div className="text-[11px] text-ink-muted uppercase tracking-[0.08em]">
                             Stage {member.stage} · {member.stageLabel}
                           </div>
                         </div>
@@ -314,13 +314,13 @@ export const CommandPalette: React.FC = () => {
 
               <div data-testid="command-palette-pages" className="space-y-1">
                 {trimmed.length >= MEMBER_SEARCH_MIN_CHARS && (
-                  <div className="px-2 pt-2 pb-0.5 text-[10px] uppercase tracking-widest text-cyan-600 font-semibold flex items-center gap-1.5">
+                  <div className="px-2 pt-2 pb-0.5 text-[11px] uppercase tracking-[0.08em] text-ink-muted font-semibold flex items-center gap-1.5">
                     <FileText className="w-3 h-3" />
                     Pages
                   </div>
                 )}
                 {filteredCommands.length === 0 && !trimmed ? (
-                  <div className="p-6 text-center text-gray-500 text-xs tracking-wider">
+                  <div className="p-6 text-center text-ink-muted text-xs tracking-wider">
                     The Path is listening. Name a chamber or a rite.
                   </div>
                 ) : filteredCommands.length === 0 ? null : (
@@ -333,25 +333,25 @@ export const CommandPalette: React.FC = () => {
                         type="button"
                         onClick={() => activateRow({ kind: 'page', command: cmd })}
                         onMouseEnter={() => setSelectedIndex(idx)}
-                        className={`w-full text-left px-3 py-2.5 min-h-[44px] flex items-center justify-between transition-colors ${
+                        className={`w-full text-left rounded-control px-3 py-2.5 min-h-[44px] flex items-center justify-between transition-colors ${
                           isSelected
-                            ? 'bg-cyan-950/60 border-l-2 border-cyan-400 text-cyan-200'
-                            : 'text-gray-300 hover:bg-gray-900/60'
+                            ? 'bg-surface-2 border-l-2 border-cyan-glow text-ink'
+                            : 'text-ink-body hover:bg-surface-2'
                         }`}
                       >
                         <div className="flex items-center space-x-3">
-                          <div className="p-1.5 bg-[#0f1414] border border-cyan-900/40">
+                          <div className="p-1.5 rounded-control bg-surface-2 border border-line-subtle">
                             <CommandCatalogIcon icon={cmd.icon} />
                           </div>
                           <div>
                             <div className="font-semibold text-xs tracking-wide">{cmd.label}</div>
-                            <div className="text-[10px] text-cyan-600 uppercase tracking-widest">
+                            <div className="text-[11px] text-ink-muted uppercase tracking-[0.08em]">
                               {cmd.category}
                             </div>
                           </div>
                         </div>
                         {cmd.shortcut && (
-                          <span className="text-[10px] bg-black/60 border border-gray-800 text-gray-400 px-2 py-0.5 font-sans">
+                          <span className="text-[11px] rounded-chip bg-surface-2 border border-line text-ink-muted px-2 py-0.5 font-sans">
                             {cmd.shortcut}
                           </span>
                         )}
@@ -367,35 +367,35 @@ export const CommandPalette: React.FC = () => {
                   data-testid="command-palette-see-all"
                   onClick={() => goToSearch(people.length > 0 ? 'people' : 'pages')}
                   onMouseEnter={() => setSelectedIndex(rows.length - 1)}
-                  className={`w-full text-left px-3 py-2.5 min-h-[44px] flex items-center justify-between transition-colors ${
+                  className={`w-full text-left rounded-control px-3 py-2.5 min-h-[44px] flex items-center justify-between transition-colors ${
                     selectedIndex === rows.length - 1
-                      ? 'bg-cyan-950/60 border-l-2 border-cyan-400 text-cyan-200'
-                      : 'text-gray-300 hover:bg-gray-900/60'
+                      ? 'bg-surface-2 border-l-2 border-cyan-glow text-ink'
+                      : 'text-ink-body hover:bg-surface-2'
                   }`}
                 >
                   <div>
                     <div className="font-semibold text-xs tracking-wide">See all</div>
-                    <div className="text-[10px] text-cyan-600 uppercase tracking-widest">
+                    <div className="text-[11px] text-ink-muted uppercase tracking-[0.08em]">
                       Open full search for {trimmed}
                     </div>
                   </div>
-                  <Search className="w-4 h-4 text-cyan-400" />
+                  <Search className="w-4 h-4 text-cyan-glow" />
                 </button>
               )}
 
               {rows.length === 0 && (
-                <div className="p-6 text-center text-gray-500 text-xs tracking-wider">
+                <div className="p-6 text-center text-ink-muted text-xs tracking-wider">
                   The Path heard you. No shells or chambers answered.
                 </div>
               )}
             </div>
 
-            <div className="px-4 py-2 bg-[#070b0b] border-t border-cyan-950 text-[10px] text-gray-500 flex justify-between items-center">
+            <div className="px-4 py-2 bg-surface-2 border-t border-line-subtle text-[11px] text-ink-muted flex justify-between items-center">
               <div>
-                Navigation: <span className="text-cyan-400">↑ ↓</span> to move,{' '}
-                <span className="text-cyan-400">↵</span> to select
+                Navigation: <span className="text-cyan-glow">↑ ↓</span> to move,{' '}
+                <span className="text-cyan-glow">↵</span> to select
               </div>
-              <div className="text-red-500 font-semibold uppercase tracking-widest">
+              <div className="text-crimson-text font-semibold uppercase tracking-[0.08em]">
                 SYNAPTIC PATH COMMAND CORE
               </div>
             </div>
@@ -438,10 +438,10 @@ function RecentChip({
       type="button"
       data-testid={testId}
       onClick={onOpen}
-      className="max-w-full inline-flex items-center gap-1.5 px-2.5 py-1.5 min-h-[36px] border border-[#3a4a49] bg-[#0f1414] text-[#dfe3e3] hover:border-cyan-400/60 hover:text-cyan-100 chamfer-corner transition-colors"
+      className="max-w-full inline-flex items-center gap-1.5 px-2.5 py-1.5 min-h-[36px] rounded-control border border-line bg-surface-2 text-ink hover:border-line-strong hover:bg-surface-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
     >
       {entry.kind === 'query' ? (
-        <Search className="w-3 h-3 text-cyan-400 shrink-0" />
+        <Search className="w-3 h-3 text-cyan-glow shrink-0" />
       ) : entry.kind === 'person' ? (
         <LobsterAvatarPortrait
           config={(entry.avatarConfig as LobsterAvatarConfig | null) ?? null}

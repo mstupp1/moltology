@@ -2,11 +2,12 @@
  * ============================================================================
  * PUBLIC TOP NAVIGATION HEADER
  * Shared navigation bar across top-level public pages (Landing / Org).
- * Features a modern glassmorphic HUD pill nav, high-tech glowing tab indicators,
+ * Features a rounded card tab bar with a sliding highlight that follows hover and focus,
  * Members keep the Etsy store link. Admins go to /store.
  * ============================================================================
  */
 import React, { useState, useEffect, useMemo, Suspense, lazy } from 'react'
+import { BrandIcon } from '@/components/ui/BrandMark'
 import { useNavigate, useLocation } from '@tanstack/react-router'
 import {
   Building2,
@@ -308,9 +309,9 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             ? 'text-amber-600/90'
             : 'text-amber-400/80'
     }
-    if (current) return isCorporate ? 'text-sky-700' : 'text-cyan-300'
-    if (previewed) return isCorporate ? 'text-slate-800' : 'text-gray-100'
-    return isCorporate ? 'text-slate-500' : 'text-gray-400'
+    if (current) return isCorporate ? 'text-sky-700' : 'text-ink'
+    if (previewed) return isCorporate ? 'text-slate-800' : 'text-ink'
+    return isCorporate ? 'text-slate-500' : 'text-ink-muted'
   }
 
   const tabIconCls = (id: NavTabId, active: boolean) => {
@@ -318,20 +319,24 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     return active
       ? isCorporate
         ? 'text-sky-600'
-        : 'text-cyan-300'
+        : 'text-cyan-glow'
       : isCorporate
         ? 'text-slate-400 group-hover:text-sky-600'
-        : 'text-gray-400 group-hover:text-gray-300'
+        : 'text-ink-muted group-hover:text-ink-body'
   }
 
   const tabFocusCls = isCorporate
     ? 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/60'
-    : 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50'
+    : 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 
   // Before the lens is measured (server render, first paint) the current tab carries a plain fill instead.
-  const lensFallbackCls = isCorporate
-    ? 'bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)]'
-    : 'bg-white/[0.07] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]'
+  // On dark grounds the current tab always keeps its own surface-2 fill, so the lens only adds the hover preview.
+  const lensFallbackCls = isCorporate ? 'bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)]' : ''
+  const currentTabCls = isCorporate ? '' : 'bg-surface-2'
+
+  // Current item in a menu list: a 2px cyan left edge.
+  const activeEdgeCls =
+    "before:content-[''] before:absolute before:left-0 before:top-2 before:bottom-2 before:w-0.5 before:rounded-chip before:bg-cyan-glow"
 
   const previewHandlers = (id: NavTabId) => ({
     onMouseEnter: () => setPreviewTab(id),
@@ -342,15 +347,23 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   const renderNavTab = (tab: NavTab) => {
     const isCurrent = currentTab === tab.id
     const isPreviewed = targetTab === tab.id
-    const cls = `relative z-10 px-3 2xl:px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none whitespace-nowrap shrink-0 ${tabTextCls(tab.id, isCurrent, isPreviewed)} ${tabFocusCls} ${
-      isCurrent && !pillStyle ? lensFallbackCls : ''
-    }`
+    const cls = `relative z-10 px-3 2xl:px-3.5 py-1.5 rounded-control text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none whitespace-nowrap shrink-0 ${tabTextCls(tab.id, isCurrent, isPreviewed)} ${tabFocusCls} ${
+      isCurrent ? currentTabCls : ''
+    } ${isCurrent && !pillStyle ? lensFallbackCls : ''}`
+    // Dark grounds mark the current page with a short cyan underline instead of a glowing pill.
+    const currentMark =
+      isCurrent && !isCorporate ? (
+        <span
+          aria-hidden="true"
+          data-testid="public-header-current-mark"
+          className="pointer-events-none absolute bottom-0 left-1/2 h-0.5 w-5 -translate-x-1/2 rounded-chip bg-cyan-glow"
+        />
+      ) : null
     const inner = (
       <span className="flex items-center gap-1.5">
         {tab.id === 'home' ? (
-          <img
-            src="/images/order_emblem.webp"
-            alt=""
+          <BrandIcon
+            aria-hidden="true"
             width={14}
             height={14}
             className={`w-3.5 h-3.5 object-contain transition-all duration-300 ${
@@ -376,6 +389,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             className={`w-3 h-3 opacity-70 group-hover:opacity-100 ${isCorporate ? 'text-amber-600' : 'text-amber-500'}`}
           />
         )}
+        {currentMark}
       </span>
     )
     if (tab.href) {
@@ -410,25 +424,24 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
   const renderOverflowItem = (tab: NavTab) => {
     const isActive = currentTab === tab.id
-    const itemCls = `w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-xs font-grotesk font-bold tracking-wider transition-colors whitespace-nowrap ${
+    const itemCls = `relative w-full flex items-center gap-3 px-4 py-2.5 rounded-control text-xs font-grotesk font-bold tracking-wider transition-colors whitespace-nowrap ${tabFocusCls} ${
       isActive
         ? isCorporate
           ? 'text-sky-700 bg-sky-50'
-          : 'text-cyan-300 bg-cyan-950/40'
+          : `text-ink bg-surface-3 ${activeEdgeCls}`
         : tab.id === 'store'
           ? isCorporate
             ? 'text-amber-600/90 hover:text-amber-700 hover:bg-sky-50/50'
-            : 'text-amber-400/80 hover:text-amber-300 hover:bg-cyan-950/30'
+            : 'text-amber-400/80 hover:text-amber-300 hover:bg-surface-3'
           : isCorporate
             ? 'text-slate-600 hover:text-sky-700 hover:bg-sky-50/50'
-            : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
+            : 'text-ink-body hover:text-ink hover:bg-surface-3'
     }`
     const content = (
       <>
         {tab.id === 'home' ? (
-          <img
-            src="/images/order_emblem.webp"
-            alt=""
+          <BrandIcon
+            aria-hidden="true"
             width={16}
             height={16}
             className="w-4 h-4 object-contain"
@@ -472,28 +485,36 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   const renderMobileItem = (tab: NavTab) => {
     const isActive = currentTab === tab.id
     const isStore = tab.id === 'store'
-    const itemCls = `w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${tabFocusCls} ${
+    const itemCls = `relative w-full flex items-center gap-3 px-4 py-3 rounded-control text-sm font-grotesk font-bold tracking-wider transition-colors ${tabFocusCls} ${
       isStore
         ? isCorporate
           ? `text-amber-700 hover:bg-amber-50 ${isActive ? 'bg-amber-50' : ''}`
-          : `text-amber-300 hover:bg-cyan-950/30 ${isActive ? 'bg-amber-950/30' : ''}`
+          : `text-amber-300 hover:bg-surface-2 ${isActive ? `bg-surface-2 ${activeEdgeCls}` : ''}`
         : isActive
           ? isCorporate
             ? 'text-sky-700 bg-sky-50'
-            : 'text-cyan-300 bg-cyan-950/40'
+            : `text-ink bg-surface-2 ${activeEdgeCls}`
           : isCorporate
             ? 'text-slate-600 hover:text-sky-700 hover:bg-sky-50/50'
-            : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
+            : 'text-ink-body hover:text-ink hover:bg-surface-2'
     }`
     const icon =
       tab.id === 'home' ? (
-        <img src="/images/order_emblem.webp" alt="" width={16} height={16} className="w-4 h-4 object-contain" />
+        <BrandIcon aria-hidden="true" width={16} height={16} className="w-4 h-4 object-contain" />
       ) : (
         tab.Icon && (
           <tab.Icon
             aria-hidden="true"
             className={`w-4 h-4 ${
-              isStore ? (isCorporate ? 'text-amber-600' : 'text-amber-400') : isCorporate ? 'text-sky-600' : 'text-cyan-400'
+              isStore
+                ? isCorporate
+                  ? 'text-amber-600'
+                  : 'text-amber-400'
+                : isCorporate
+                  ? 'text-sky-600'
+                  : isActive
+                    ? 'text-cyan-glow'
+                    : 'text-ink-muted'
             }`}
           />
         )
@@ -544,8 +565,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             ? 'bg-white/95 backdrop-blur-2xl border-b border-sky-200/80 shadow-md'
             : 'bg-white/85 backdrop-blur-xl border-b border-sky-100 shadow-sm'
           : isScrolled
-            ? 'bg-[#030606]/90 backdrop-blur-2xl border-b border-[#121c1d]/80 shadow-xl'
-            : 'bg-[#030606]/75 backdrop-blur-xl border-b border-cyan-950/40 shadow-md'
+            ? 'bg-abyss/90 backdrop-blur-2xl border-b border-line-subtle shadow-xl'
+            : 'bg-abyss/75 backdrop-blur-xl border-b border-line-subtle shadow-md'
       }`}
     >
       <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-4">
@@ -556,7 +577,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           onClick={() => onNavigate('/')}
         />
 
-        {/* Central Apple-Grade Glass Navigation Capsule */}
+        {/* Central navigation bar */}
         <nav
           ref={navMeasureRef}
           aria-label="Main Navigation"
@@ -565,16 +586,16 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           <div
             ref={navRef}
             onMouseLeave={() => setPreviewTab(null)}
-            className={`relative flex items-center gap-1 p-1 rounded-full backdrop-blur-2xl transition-all duration-300 shrink-0 ${
+            className={`relative flex items-center gap-1 p-1 rounded-card backdrop-blur-2xl transition-all duration-300 shrink-0 ${
               isCorporate
                 ? 'bg-slate-200/50 border border-slate-300/60 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]'
-                : 'bg-black/40 border border-white/[0.08] shadow-[inset_0_1px_3px_rgba(0,0,0,0.8)]'
+                : 'bg-surface-1 hud-sheen border border-line-subtle shadow-sheen-inset'
             }`}
           >
-          {/* Smooth Continuous Sliding Active Optical Glass Lens (Apple Glass Morphism) */}
+          {/* Sliding highlight lens: follows hover and keyboard focus */}
           <div
             aria-hidden="true"
-            className={`absolute top-1 bottom-1 left-0 rounded-full pointer-events-none z-0 ${
+            className={`absolute top-1 bottom-1 left-0 rounded-control pointer-events-none z-0 ${
               hasMounted
                 ? 'transition-[transform,width] duration-300 ease-[cubic-bezier(0.2,1,0.3,1)]'
                 : 'transition-none'
@@ -585,41 +606,13 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
               opacity: pillStyle ? 1 : 0,
             }}
           >
-            {/* Optical Glass Shell with Precision Bevel & Crisp Specular Edges */}
             <div
-              className={`relative w-full h-full rounded-full overflow-hidden transition-all duration-300 ${
+              className={`relative w-full h-full rounded-control overflow-hidden transition-all duration-300 ${
                 isCorporate
-                  ? 'bg-gradient-to-b from-white/95 via-white/85 to-white/75 border border-white shadow-[0_4px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,1),inset_0_-1px_0_rgba(0,0,0,0.04)]'
-                  : 'bg-[#081419]/65 bg-gradient-to-b from-white/[0.14] via-white/[0.04] to-transparent border border-white/[0.18] shadow-[0_4px_20px_-2px_rgba(0,0,0,0.7),0_1px_4px_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.45),inset_0_-1px_0_0_rgba(255,255,255,0.06)]'
-              } backdrop-blur-2xl`}
-            >
-              {/* Convex Lens Specular Reflection Highlight (Top Crest) */}
-              <div
-                className={`absolute top-0 inset-x-3 h-[1px] rounded-t-full pointer-events-none ${
-                  isCorporate
-                    ? 'bg-gradient-to-r from-transparent via-white to-transparent'
-                    : 'bg-gradient-to-r from-transparent via-white/80 to-transparent'
-                }`}
-              />
-
-              {/* Internal Radial Light Gathering (Lens Flare Center Catch) */}
-              <div
-                className={`absolute inset-0 rounded-full pointer-events-none ${
-                  isCorporate
-                    ? 'bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.8),transparent_60%)]'
-                    : 'bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.15),transparent_65%)]'
-                }`}
-              />
-
-              {/* Micro-Fine Optical Refraction Rim (Bottom Lip) */}
-              <div
-                className={`absolute bottom-0 inset-x-4 h-[1px] rounded-b-full pointer-events-none ${
-                  isCorporate
-                    ? 'bg-gradient-to-r from-transparent via-slate-300/40 to-transparent'
-                    : 'bg-gradient-to-r from-transparent via-white/10 to-transparent'
-                }`}
-              />
-            </div>
+                  ? 'bg-gradient-to-b from-white/95 via-white/85 to-white/75 border border-white shadow-[0_4px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,1),inset_0_-1px_0_rgba(0,0,0,0.04)] backdrop-blur-2xl'
+                  : 'bg-surface-2 border border-line-subtle shadow-sheen-inset'
+              }`}
+            />
           </div>
 
             {navTabs.filter((tab) => !overflowIds.includes(tab.id)).map(renderNavTab)}
@@ -634,14 +627,14 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                   onClick={() => setOverflowOpen((open) => !open)}
                   onMouseEnter={() => setPreviewTab(null)}
                   onFocus={() => setPreviewTab(null)}
-                  className={`relative z-10 px-3 2xl:px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center select-none whitespace-nowrap shrink-0 ${tabFocusCls} ${
+                  className={`relative z-10 px-3 2xl:px-3.5 py-1.5 rounded-control text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center select-none whitespace-nowrap shrink-0 ${tabFocusCls} ${
                     overflowOpen
                       ? isCorporate
                         ? 'text-sky-700'
-                        : 'text-cyan-300'
+                        : 'text-ink bg-surface-2'
                       : isCorporate
                         ? 'text-slate-500 hover:text-sky-700'
-                        : 'text-gray-400 hover:text-gray-200'
+                        : 'text-ink-muted hover:text-ink hover:bg-surface-2'
                   }`}
                 >
                   <span className="flex items-center gap-1.5">
@@ -657,10 +650,10 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                   <div
                     role="menu"
                     aria-label="More pages"
-                    className={`absolute right-0 top-full mt-3 w-56 rounded-xl border p-2 shadow-2xl backdrop-blur-xl z-50 ${
+                    className={`absolute right-0 top-full mt-3 w-56 rounded-card border p-2 backdrop-blur-xl z-50 ${
                       isCorporate
-                        ? 'bg-white/95 border border-sky-100 shadow-sky-100'
-                        : 'bg-[#080d0e]/95 border border-cyan-950/80'
+                        ? 'bg-white/95 border border-sky-100 shadow-2xl shadow-sky-100'
+                        : 'bg-surface-2 border border-line-subtle shadow-menu'
                     }`}
                   >
                     {navTabs.filter((tab) => overflowIds.includes(tab.id)).map(renderOverflowItem)}
@@ -679,14 +672,16 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             onClick={() => setMobileOpen((o) => !o)}
             aria-label="Toggle navigation menu"
             aria-expanded={mobileOpen}
-            className={`xl:hidden flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 rounded-lg active:scale-95 transition-all duration-300 focus:outline-none ${
+            className={`xl:hidden flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 rounded-control active:scale-95 transition-all duration-300 ${
               isCorporate
                 ? mobileOpen
-                  ? 'bg-rose-50/80 border border-rose-200 text-rose-500 hover:bg-rose-100/70 shadow-sm'
-                  : 'bg-white border border-sky-200 text-sky-700 hover:bg-sky-50 shadow-sm'
-                : mobileOpen
-                  ? 'bg-red-950/40 border border-red-800/80 text-red-400 hover:bg-red-900/60 focus:ring-2 focus:ring-red-500/50'
-                  : 'bg-[#080d0e]/90 border border-cyan-800/80 text-cyan-300 hover:bg-cyan-900/60 focus:ring-2 focus:ring-cyan-500/50'
+                  ? 'bg-rose-50/80 border border-rose-200 text-rose-500 hover:bg-rose-100/70 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400/60'
+                  : 'bg-white border border-sky-200 text-sky-700 hover:bg-sky-50 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/60'
+                : `focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                    mobileOpen
+                      ? 'bg-crimson-soft border border-crimson-aggro/55 text-crimson-text hover:border-crimson-aggro'
+                      : 'bg-surface-1 hud-sheen border border-line text-ink hover:bg-surface-2 hover:border-line-strong'
+                  }`
             }`}
           >
             <AnimatedHamburger isOpen={mobileOpen} />
@@ -729,10 +724,10 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         }`}
       >
         <div
-          className={`mt-3 p-3 space-y-2 rounded-2xl backdrop-blur-md shadow-2xl ${
+          className={`mt-3 p-3 space-y-2 rounded-card backdrop-blur-md ${
             isCorporate
-              ? 'bg-white/95 border border-sky-100 shadow-sky-100'
-              : 'bg-[#080d0e]/95 border border-cyan-950/80'
+              ? 'bg-white/95 border border-sky-100 shadow-2xl shadow-sky-100'
+              : 'bg-surface-1 border border-line-subtle shadow-menu'
           }`}
         >
           {navTabs.map(renderMobileItem)}
@@ -740,7 +735,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           {/* Divider */}
           <div
             className={`border-t pt-2 mt-1 ${
-              isCorporate ? 'border-sky-100' : 'border-cyan-950/80'
+              isCorporate ? 'border-sky-100' : 'border-line-subtle'
             }`}
           />
 

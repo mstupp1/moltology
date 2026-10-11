@@ -57,14 +57,14 @@ export function HudPagination({
   return (
     <nav
       aria-label="Pagination Navigation"
-      className={`flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 pb-2 text-xs font-sans border-t border-cyan-900/40 select-none ${className}`}
+      className={`flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 pb-2 text-xs font-sans border-t border-line-subtle select-none ${className}`}
     >
       {/* Items Counter Summary */}
       {showItemCount && (
-        <div className="text-[#839493] text-xs">
-          Showing <strong className="text-cyan-300 font-mono">{startIndex}</strong>–
-          <strong className="text-cyan-300 font-mono">{endIndex}</strong> of{' '}
-          <strong className="text-gray-100 font-mono">{totalItems}</strong> {itemName}
+        <div className="text-ink-muted text-xs">
+          Showing <strong className="text-ink tabular-nums">{startIndex}</strong>–
+          <strong className="text-ink tabular-nums">{endIndex}</strong> of{' '}
+          <strong className="text-ink tabular-nums">{totalItems}</strong> {itemName}
         </div>
       )}
 
@@ -77,7 +77,7 @@ export function HudPagination({
             onClick={() => onPageChange(1)}
             disabled={currentPage === 1}
             aria-label="Go to first page"
-            className="p-1.5 bg-[#060a0c] border border-cyan-900/60 hover:border-cyan-500 text-gray-300 hover:text-white disabled:opacity-30 disabled:pointer-events-none chamfer-corner transition-all"
+            className="min-h-8 min-w-8 flex items-center justify-center bg-surface-1 border border-line hover:border-line-strong text-ink-body hover:text-ink disabled:opacity-30 disabled:pointer-events-none rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             title="First Page"
           >
             <ChevronsLeft className="w-3.5 h-3.5" />
@@ -89,7 +89,7 @@ export function HudPagination({
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
             aria-label="Go to previous page"
-            className="px-2.5 py-1.5 bg-[#060a0c] border border-cyan-900/60 hover:border-cyan-500 text-gray-300 hover:text-white disabled:opacity-30 disabled:pointer-events-none chamfer-corner transition-all flex items-center gap-1 font-grotesk font-bold"
+            className="min-h-8 px-2.5 bg-surface-1 border border-line hover:border-line-strong text-ink-body hover:text-ink disabled:opacity-30 disabled:pointer-events-none rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center gap-1 font-grotesk font-bold"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
             <span className="hidden xs:inline">PREV</span>
@@ -102,7 +102,7 @@ export function HudPagination({
                 return (
                   <span
                     key={`ellipsis-${idx}`}
-                    className="px-2 py-1 text-gray-500 font-mono"
+                    className="px-2 py-1 text-ink-muted"
                     aria-hidden="true"
                   >
                     …
@@ -119,10 +119,10 @@ export function HudPagination({
                   onClick={() => onPageChange(p)}
                   aria-current={isActive ? 'page' : undefined}
                   aria-label={`Page ${p}`}
-                  className={`min-w-[30px] h-[30px] px-2 text-xs font-mono font-bold chamfer-corner transition-all flex items-center justify-center ${
+                  className={`min-w-8 h-8 px-2 text-xs font-bold tabular-nums rounded-control transition-colors flex items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                     isActive
-                      ? 'bg-cyan-500 text-black shadow-hud-cyan font-black'
-                      : 'bg-[#060a0c] text-gray-300 hover:text-white border border-cyan-900/60 hover:border-cyan-500'
+                      ? 'bg-cyan-glow text-abyss'
+                      : 'bg-surface-1 text-ink-body hover:text-ink border border-line hover:border-line-strong'
                   }`}
                 >
                   {p}
@@ -137,7 +137,7 @@ export function HudPagination({
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
             aria-label="Go to next page"
-            className="px-2.5 py-1.5 bg-[#060a0c] border border-cyan-900/60 hover:border-cyan-500 text-gray-300 hover:text-white disabled:opacity-30 disabled:pointer-events-none chamfer-corner transition-all flex items-center gap-1 font-grotesk font-bold"
+            className="min-h-8 px-2.5 bg-surface-1 border border-line hover:border-line-strong text-ink-body hover:text-ink disabled:opacity-30 disabled:pointer-events-none rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center gap-1 font-grotesk font-bold"
           >
             <span className="hidden xs:inline">NEXT</span>
             <ChevronRight className="w-3.5 h-3.5" />
@@ -149,7 +149,7 @@ export function HudPagination({
             onClick={() => onPageChange(totalPages)}
             disabled={currentPage === totalPages}
             aria-label="Go to last page"
-            className="p-1.5 bg-[#060a0c] border border-cyan-900/60 hover:border-cyan-500 text-gray-300 hover:text-white disabled:opacity-30 disabled:pointer-events-none chamfer-corner transition-all"
+            className="min-h-8 min-w-8 flex items-center justify-center bg-surface-1 border border-line hover:border-line-strong text-ink-body hover:text-ink disabled:opacity-30 disabled:pointer-events-none rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             title="Last Page"
           >
             <ChevronsRight className="w-3.5 h-3.5" />

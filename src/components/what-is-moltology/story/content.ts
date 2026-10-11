@@ -58,7 +58,6 @@ export const STORY_MEDIA = {
   },
   archive: { src: getAssetUrl('/images/bento_community.jpg') },
   lectures: { src: getAssetUrl('/images/bento_lectures.jpg') },
-  vats: { src: getAssetUrl('/images/bento_pipeline.jpg') },
   abyss: { src: getAssetUrl('/images/benthic_abyss_hero.jpg') },
   dashboardDesktop: {
     src: getAssetUrl('/images/marketing/dashboard_desktop_preview.webp'),

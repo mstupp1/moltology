@@ -7,6 +7,7 @@ import {
   SLOT_DEFAULT_VISUAL,
   VISUAL_TYPE_LABELS,
   formatAffixLine,
+  isCosmetic,
   primaryStatLine,
 } from '@/lib/chassis-loadout'
 import {
@@ -43,14 +44,19 @@ export const GearTooltip: React.FC<GearTooltipProps> = ({ catalog, className = '
         </h3>
         <p className="text-[10px] sm:text-xs text-[#839493] uppercase tracking-widest mt-0.5">
           {RARITY_LABELS[catalog.rarity]} · {CATEGORY_LABELS[catalog.category]}
-          {catalog.visualType && catalog.visualType !== SLOT_DEFAULT_VISUAL[catalog.category]
+          {isCosmetic(catalog) ? ' · Cosmetic' : ''}
+          {!isCosmetic(catalog) && catalog.visualType && catalog.visualType !== SLOT_DEFAULT_VISUAL[catalog.category]
             ? ` · ${VISUAL_TYPE_LABELS[catalog.visualType]}`
             : ''}
         </p>
       </div>
 
       <div className="px-3 py-2 space-y-1">
-        <p className="text-lg sm:text-xl font-bold text-[#dfe3e3]">{primaryStatLine(catalog)}</p>
+        {isCosmetic(catalog) ? (
+          <p className="text-xs sm:text-sm text-ink">Changes how your avatar looks. No stats.</p>
+        ) : (
+          <p className="text-lg sm:text-xl font-bold text-[#dfe3e3]">{primaryStatLine(catalog)}</p>
+        )}
         {(catalog.affixes ?? []).map((affix, index) => (
           <p key={`${affix.stat}-${index}`} className="text-xs sm:text-sm text-[#9ae6b4]">
             {formatAffixLine(affix)}

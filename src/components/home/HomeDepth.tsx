@@ -68,8 +68,16 @@ const ContourMap: React.FC = () => (
   </svg>
 )
 
+/**
+ * Every homepage section meets its neighbours on the page colour. The fade eases out of solid
+ * (smoothstep stops) rather than ramping linearly, so there is no visible crease where one
+ * section's art starts and the last one's ends.
+ */
+export const SEAM_FADE =
+  'linear-gradient(to bottom, #020408, rgba(2, 4, 8, 0.94) 4%, rgba(2, 4, 8, 0.78) 8%, rgba(2, 4, 8, 0.58) 12%, rgba(2, 4, 8, 0.35) 16%, rgba(2, 4, 8, 0.16) 20%, rgba(2, 4, 8, 0.03) 24%, transparent 27%, transparent 73%, rgba(2, 4, 8, 0.03) 76%, rgba(2, 4, 8, 0.16) 80%, rgba(2, 4, 8, 0.35) 84%, rgba(2, 4, 8, 0.58) 88%, rgba(2, 4, 8, 0.78) 92%, rgba(2, 4, 8, 0.94) 96%, #020408)'
+
 const FADES = {
-  both: 'linear-gradient(to bottom, #020408, rgba(2, 4, 8, 0.5) 10%, transparent 24%, transparent 76%, rgba(2, 4, 8, 0.5) 90%, #020408)',
+  both: SEAM_FADE,
   top: 'linear-gradient(to bottom, transparent 70%, #020408)',
   bottom: 'linear-gradient(to bottom, #020408, transparent 30%)',
 } as const
@@ -106,6 +114,11 @@ export const SectionBackdrop: React.FC<{
     <div className="home-backdrop-vignette absolute inset-0" />
     <div className="absolute inset-0" style={{ background: FADES[fade] }} />
   </div>
+)
+
+/** The same seam fade on its own, laid over ambient layers that sit above a section's art. */
+export const SeamFade: React.FC = () => (
+  <div className="absolute inset-0 -z-10 pointer-events-none" style={{ background: SEAM_FADE }} aria-hidden="true" />
 )
 
 const MAX_TILT_DEG = 5

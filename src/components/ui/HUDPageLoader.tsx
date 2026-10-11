@@ -1,5 +1,5 @@
 import React from 'react'
-import { getAssetUrl } from '@/lib/assets'
+import { BrandIcon } from '@/components/ui/BrandMark'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HUDPageLoader
@@ -35,9 +35,8 @@ export function HUDPageLoader() {
         />
 
         {/* Muted Emblem Logo */}
-        <img
-          src={getAssetUrl('/images/order_emblem.webp')}
-          alt="Loading"
+        <BrandIcon
+          label="Loading"
           width={36}
           height={36}
           className="relative z-10 w-9 h-9 object-contain opacity-60 transition-opacity duration-300"

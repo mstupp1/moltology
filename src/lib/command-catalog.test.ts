@@ -44,7 +44,6 @@ describe('command catalog', () => {
       'nav-journal',
       'nav-market',
       'nav-chassis',
-      'nav-subterranean',
       'nav-premium',
       'nav-forum',
       'nav-stream',
@@ -86,7 +85,6 @@ describe('command catalog', () => {
     const codex = filterCommandCatalog('Codex')
     expect(codex.map((cmd) => cmd.id)).toEqual(['nav-codex'])
     expect(filterCommandCatalog('rituals').map((cmd) => cmd.id)).toEqual(['ritual-purge'])
-    expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-subterranean')
     expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-premium')
     expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-admin')
     expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-watch')
@@ -98,10 +96,6 @@ describe('command catalog', () => {
   })
 
   it('keeps hidden pages out of search unless the viewer can see them', () => {
-    expect(filterCommandCatalog('vats').map((cmd) => cmd.id)).not.toContain('nav-subterranean')
-    expect(
-      filterCommandCatalog('vats', undefined, { includeHidden: true }).map((cmd) => cmd.id),
-    ).toContain('nav-subterranean')
     expect(filterCommandCatalog('premium').map((cmd) => cmd.id)).not.toContain('nav-premium')
     expect(
       filterCommandCatalog('premium', undefined, { includeHidden: true }).map((cmd) => cmd.id),

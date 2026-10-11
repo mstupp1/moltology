@@ -46,26 +46,26 @@ export function PremiumOfferPanel({
       />
 
       {checkout === 'success' ? (
-        <p data-testid="premium-checkout-success" className="text-sm text-[#dfe3e3]">
+        <p data-testid="premium-checkout-success" className="text-sm text-ink">
           {PREMIUM_PAGE_COPY.checkoutSuccess}
         </p>
       ) : null}
       {checkout === 'cancel' ? (
-        <p data-testid="premium-checkout-cancel" className="text-sm text-[#dfe3e3]">
+        <p data-testid="premium-checkout-cancel" className="text-sm text-ink">
           {PREMIUM_PAGE_COPY.checkoutCancel}
         </p>
       ) : null}
 
-      <section className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
+      <section className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 md:p-5 space-y-3">
         <div>
-          <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase">Membership</h2>
-          <p className="text-xs text-[#839493] mt-1">{premiumStatusMessage(offer)}</p>
+          <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">Membership</h2>
+          <p className="text-xs text-ink-muted mt-1">{premiumStatusMessage(offer)}</p>
         </div>
-        <p className="text-sm text-[#dfe3e3]">
+        <p className="text-sm text-ink">
           {offer.priceLabel ?? PREMIUM_PAGE_COPY.pricePending}
         </p>
         {offer.configMessage ? (
-          <p data-testid="premium-config-message" className="text-sm text-[#ffb4a8]">
+          <p data-testid="premium-config-message" className="text-sm text-crimson-text">
             {offer.configMessage}
           </p>
         ) : null}
@@ -84,7 +84,7 @@ export function PremiumOfferPanel({
               {busy === 'grant' ? 'Activating' : PREMIUM_PAGE_COPY.activate}
             </HudButton>
           ) : (
-            <HudButton type="button" variant="dark" onClick={onCancel} disabled={busy !== null}>
+            <HudButton type="button" variant="danger" onClick={onCancel} disabled={busy !== null}>
               {busy === 'cancel' ? 'Canceling' : PREMIUM_PAGE_COPY.cancel}
             </HudButton>
           )}
@@ -94,16 +94,16 @@ export function PremiumOfferPanel({
             </HudButton>
           ) : null}
         </div>
-        {!offer.isPremium ? <p className="text-xs text-[#839493]">{PREMIUM_PAGE_COPY.activateHint}</p> : null}
+        {!offer.isPremium ? <p className="text-xs text-ink-muted">{PREMIUM_PAGE_COPY.activateHint}</p> : null}
       </section>
 
-      <section className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-2">
-        <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase">
+      <section className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 md:p-5 space-y-2">
+        <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">
           {PREMIUM_PAGE_COPY.benefitsTitle}
         </h2>
-        <p className="text-xs text-[#839493]">{PREMIUM_PAGE_COPY.benefitsBody}</p>
+        <p className="text-xs text-ink-body">{PREMIUM_PAGE_COPY.benefitsBody}</p>
         {entitlements.length === 0 ? null : (
-          <ul className="list-disc pl-4 text-xs text-[#dfe3e3] space-y-1">
+          <ul className="list-disc pl-4 text-xs text-ink-body space-y-1">
             {entitlements.map((item) => (
               <li key={item}>{item}</li>
             ))}

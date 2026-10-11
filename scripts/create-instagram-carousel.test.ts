@@ -9,6 +9,7 @@ import {
   DEFAULT_PROFILE_ID,
   DEFAULT_INSTAGRAM_ACCOUNT_ID,
   parseCarouselCopy,
+  parseCarouselContent,
   resolveCarouselCopy,
   createInstagramCarousel,
 } from './create-instagram-carousel'
@@ -85,6 +86,44 @@ describe('reviewed carousel copy', () => {
 })
 
 describe('create-instagram-carousel', () => {
+  const reviewedCopy = {
+    title: 'Five ways to close the day',
+    topic: 'Benthic Swipe Lab',
+    caption: 'Your unfinished tasks need a place to rest.\nSave one next step for tomorrow.',
+    hashtags: ['DeepWork'],
+    firstComment: 'https://moltology.org/quiz',
+  }
+
+  it('rejects incomplete reviewed copy before publication', () => {
+    expect(() => parseCarouselContent([])).toThrow('JSON object')
+    expect(() => parseCarouselContent({ ...reviewedCopy, caption: ' ' })).toThrow('caption')
+    expect(() => parseCarouselContent({ ...reviewedCopy, hashtags: ['a', 'b', 'c', 'd'] })).toThrow('hashtags')
+    expect(() => parseCarouselContent({ ...reviewedCopy, hashtags: [42] })).toThrow('hashtags')
+  })
+
+  it('requires finished custom slides instead of generating preset artwork for reviewed swipe-lab copy', async () => {
+    await expect(createInstagramCarousel({ contentJson: 'unused.json', theme: 'swipe-lab', dryRun: true }))
+      .rejects.toThrow('at least two')
+  })
+
+  it('preserves reviewed copy through the carousel ingest dry run', async () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'swipe-copy-'))
+    try {
+      const contentJson = path.join(directory, 'content.json')
+      fs.writeFileSync(contentJson, JSON.stringify(reviewedCopy))
+      const slide = path.join(directory, 'slide.png')
+      fs.writeFileSync(slide, Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a3i8AAAAASUVORK5CYII=', 'base64'))
+      const result = await createInstagramCarousel({
+        contentJson, polishedSlides: [slide, slide], theme: 'swipe-lab', dryRun: true,
+      })
+      expect(result.copy).toEqual(reviewedCopy)
+      expect(result.publicUrls).toEqual([])
+      expect(result.slidePaths).toEqual([slide, slide])
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true })
+    }
+  })
+
   it('generates on-brand carousel copy and caption', () => {
     const copy = generateCarouselCopy('pincer-torque')
     expect(copy.title).toBeDefined()

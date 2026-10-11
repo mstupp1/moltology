@@ -1,0 +1,34 @@
+{
+  "provider": "Recraft MCP",
+  "selectedIcon": {
+    "model": "recraftv4_1_pro_vector",
+    "assetId": "78b1b7b9-b093-486d-9541-9083fef0bc92",
+    "prompt": "A single professional flat vector brand emblem, NO TEXT. Pure red shapes on white background. Perfect vertical mirror symmetry. The emblem resembles an abstract protective crustacean carapace with two tall smoothly curving pincer crowns: two upper lobes curve inward at their upper tips around an open central teardrop notch, merge into one compact tapering central shell, ending in a short centered downward point. Exactly ONE smoothly unified main red silhouette plus ONE separated curved side plate on each side, THREE red filled shapes in total. The two detached lateral plates wrap closely around the central shell, separated by uniform generous negative space, and end near the lower central point. No black or colored outlines. Flat solid vivid crimson red only, white empty negative space. Elegant flowing near-geometric smooth vector Bezier contours, optically balanced broad gaps, bold silhouette, stable simple 24px icon. Modern refined restrained app identity, like a premium design studio brand symbol. Absolutely NO eyes, mouth, face, skull, legs, antennas, veins, texture, gradients, shadows, thin details, feather, ornaments, border, badge or text. Center the icon with generous whitespace. All corners and curves deliberately smooth. Use minimal closed filled vector paths."
+  },
+  "selectedWordmarks": {
+    "model": "recraftv4_1_pro_vector",
+    "assetId": "859c5e4a-60ee-472b-8303-529a512fb7e3",
+    "prompt": "Clean restrained PROFESSIONAL TYPOGRAPHIC WORDMARK SPECIMEN, three rows of clean typeset digital sans serif lettering. Use a NORMAL WIDTH (NOT condensed or narrow) geometric sans-serif inspired by Space Grotesk Medium, Helvetica Neue Medium, or Inter Semibold. Uniform mechanical precision, absolutely straight stems, moderately thick medium-weight strokes, perfect clean geometric letterforms, tasteful letter spacing, comfortable open counters. White background, flat black text. EXACT text, each row on ONE complete horizontal line: first row THE SYNAPTIC PATH; second row BENTHIC CORE; third row MOLTOLOGY.ORG FOUNDATION. All three rows use the SAME typeface, SAME cap height, SAME medium weight. This is a font specimen where all 3 rows are equally prominent, NOT a logo composition and NOT a hierarchy. Left aligned rows. Generous gaps between all three rows. Normal width standard grotesk, not tall condensed display type. Crisp precision, no hand drawing, no illustration, no curves in straight stems, no distress, no ornament, no icon, no border, no texture, no shadow, no perspective, no additional words. True vector lettering paths. All three lines fit fully inside canvas."
+  },
+  "preparation": [
+    "Removed canvas backgrounds and metadata from production parts.",
+    "Unified emblem fills and removed two tiny edge-color fragments.",
+    "Converted separate white letter counters into transparent even-odd compound paths.",
+    "Normalized module dimensions without changing letter aspect ratios.",
+    "Composed self-contained SVG lockups from the four parts."
+  ],
+  "production": {
+    "defaultRed": "#ff453a",
+    "defaultRedToken": "crimson.aggro",
+    "referenceRed": "#ef174c",
+    "tokensSource": "tailwind.config.js",
+    "generator": "scripts/build-brand-assets.mjs",
+    "legacyBackup": "legacy/manifest.json",
+    "framing": {
+      "uiVisibleHeightFraction": 0.96,
+      "appVisibleHeightFraction": 0.765,
+      "roomyAlternate": "parts/variants/icon-roomy.svg",
+      "note": "Original paths preserved; framing tightened through the group transform and app tile inset."
+    }
+  }
+}

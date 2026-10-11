@@ -6,6 +6,8 @@ import {
   equipSlotCategory,
 } from '@/lib/chassis-loadout'
 import { getAssetUrl } from '@/lib/assets'
+import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
+import { LobsterAvatarFullBody } from '../LobsterAvatarFullBody'
 import { DraggableGear } from './DraggableGear'
 import { GearItemCard } from './GearItemCard'
 import type { GearHoverTarget, TooltipAnchor } from './gear-tooltip-position'
@@ -17,6 +19,8 @@ export interface PaperDollProps {
   onSelectItem: (id: string | null) => void
   onSlotActivate: (slot: EquipSlotId) => void
   onHoverItem?: (target: GearHoverTarget | null) => void
+  /** The member wearing this loadout. With it, hardpoints flank the live avatar. */
+  avatarConfig?: LobsterAvatarConfig | null
 }
 
 const SLOT_LABELS: Record<EquipSlotId, string> = {
@@ -36,10 +40,12 @@ function EquipSlot({
   selected,
   hasSelection,
   flipped = false,
+  small = false,
   onSelect,
   onActivate,
   onHoverChange,
 }: {
+  small?: boolean
   equipSlot: EquipSlotId
   item: GearItemState | undefined
   catalog: CatalogRef | undefined
@@ -66,7 +72,7 @@ function EquipSlot({
     <div
       ref={setNodeRef}
       className={`
-        relative w-16 md:w-20 aspect-[9/16] min-h-[44px] shrink-0 rounded-sm border cursor-pointer
+        relative ${small ? 'w-12 md:w-14' : 'w-16 md:w-20'} aspect-[9/16] min-h-[44px] shrink-0 rounded-sm border cursor-pointer
         ${isOver ? 'border-[#00c3ff] bg-[#00c3ff]/10' : 'border-dashed border-[#3a4a49]/80 bg-[#050808]/90'}
         flex items-center justify-center transition-colors
       `}
@@ -110,6 +116,7 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
   onSelectItem,
   onSlotActivate,
   onHoverItem,
+  avatarConfig,
 }) => {
   const equipped = new Map(
     items
@@ -117,7 +124,7 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
       .map((i) => [i.equippedSlot as EquipSlotId, i])
   )
 
-  const renderSlot = (equipSlot: EquipSlotId, options?: { flipped?: boolean }) => {
+  const renderSlot = (equipSlot: EquipSlotId, options?: { flipped?: boolean; small?: boolean }) => {
     const item = equipped.get(equipSlot)
     const catalog = item ? catalogById.get(item.catalogItemId) : undefined
     return (
@@ -129,6 +136,7 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
         selected={item?.id === selectedItemId}
         hasSelection={Boolean(selectedItemId)}
         flipped={options?.flipped}
+        small={options?.small}
         onSelect={() => onSelectItem(item?.id ?? null)}
         onActivate={() => onSlotActivate(equipSlot)}
         onHoverChange={(hovered, anchor) =>
@@ -137,6 +145,32 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
           )
         }
       />
+    )
+  }
+
+  if (avatarConfig?.seed) {
+    return (
+      <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 sm:gap-3 w-full min-w-0 flex-1 min-h-0 overflow-y-auto overflow-x-hidden select-none py-1">
+        <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+          {renderSlot('antennae', { small: true })}
+          {renderSlot('head', { small: true })}
+          {renderSlot('claws-1', { small: true })}
+        </div>
+        <div className="flex items-center justify-center min-w-0 h-full">
+          <LobsterAvatarFullBody
+            config={avatarConfig}
+            size={360}
+            alt="Your avatar wearing this loadout"
+            className="w-full max-w-[320px] aspect-[4/5]"
+          />
+        </div>
+        <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+          {renderSlot('carapace', { small: true })}
+          {renderSlot('claws-2', { flipped: true, small: true })}
+          {renderSlot('belt', { small: true })}
+          {renderSlot('legs', { small: true })}
+        </div>
+      </div>
     )
   }
 

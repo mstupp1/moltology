@@ -597,7 +597,7 @@ export const MoltMaxPage: React.FC = () => {
         <section className="relative w-full overflow-hidden border-y border-cyan-900/60 bg-[#030608] py-12 sm:py-16">
           <div className="pbr-underlay pbr-underlay-carbon opacity-40 pointer-events-none" />
           <img
-            src={getAssetUrl('/images/subterranean_vats_bg.jpg')}
+            src={getAssetUrl('/images/benthic_abyss_hero.jpg')}
             alt=""
             loading="lazy"
             className="pointer-events-none absolute inset-0 h-full w-full scale-105 object-cover opacity-25 mix-blend-luminosity blur-[6px]"
