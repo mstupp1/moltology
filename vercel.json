@@ -1,5 +1,6 @@
 {
   "framework": "tanstack-start",
+  "ignoreCommand": "bash scripts/vercel-ignore-build.sh",
   "rewrites": [
     {
       "source": "/media/:path*",

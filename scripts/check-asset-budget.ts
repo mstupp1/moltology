@@ -18,7 +18,6 @@ const MAX_FILE_MB = 1
 const IMAGE_BUDGET_KB = 600
 
 const ALLOWLIST_PREFIXES = [
-  'public/videos/',
   'assets/audio/',
   // Video/social pipeline render sources: never deployed, kept local for
   // compositing fidelity. Do not grow this list with deployable assets.
@@ -56,7 +55,6 @@ function isAllowed(relPath: string): boolean {
 
 function isEssentialPublicAsset(relPath: string): boolean {
   if (PUBLIC_ALLOWED_ROOT_FILES.has(relPath)) return true
-  if (relPath.startsWith('public/videos/')) return true
   if (relPath.startsWith('public/fonts/')) return true
   if (relPath.startsWith('public/images/')) {
     return (

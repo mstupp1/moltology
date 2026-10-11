@@ -13,8 +13,8 @@ export interface StoryVideo {
 }
 
 const heroVideo = (name: string): StoryVideo => ({
-  src: `/videos/hero_${name}.mp4`,
-  srcSm: `/videos/hero_${name}_sm.mp4`,
+  src: getAssetUrl(`/videos/hero_${name}.mp4`),
+  srcSm: getAssetUrl(`/videos/hero_${name}_sm.mp4`),
   poster: getAssetUrl(`/images/hero_card_${name}.webp`),
   posterSm: getAssetUrl(`/images/hero_card_${name}_sm.webp`),
 })

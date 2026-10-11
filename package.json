@@ -35,6 +35,7 @@
     "s3:verify": "tsx scripts/sync-s3-assets.ts --verify",
     "s3:optimize": "tsx scripts/optimize-s3-images.ts",
     "assets:check": "tsx scripts/check-asset-budget.ts",
+    "vercel:clean": "node scripts/clean-vercel-deployments.mjs",
     "avatar:kit": "tsx scripts/avatar-kit.ts",
     "ui:check": "tsx scripts/check-ui-tokens.ts",
     "brand:build": "node scripts/build-brand-assets.mjs",
