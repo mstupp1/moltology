@@ -149,7 +149,10 @@ async function main() {
   // --base-url reuses a running local server; default remains an isolated production build.
   let serverProcess: ReturnType<typeof spawn> | undefined
   if (baseUrl === BASE_URL && !args.some((arg) => arg.startsWith('--base-url='))) {
-    execSync('npm run build', { stdio: 'inherit' })
+    execSync('npm run build', {
+      stdio: 'inherit',
+      env: { ...process.env, NODE_OPTIONS: process.env.NODE_OPTIONS || '--max-old-space-size=8192' },
+    })
     serverProcess = spawn('node', ['.output/server/index.mjs'], {
       env: { ...process.env, PORT: String(PORT), NODE_ENV: 'production' },
       stdio: ['ignore', 'ignore', 'inherit'],

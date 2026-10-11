@@ -97,7 +97,7 @@ for (const icon of manifest.icons) {
   await fs.access(path.join(ROOT, 'public', icon.src.split('?')[0]))
 }
 const sw = await read('public/sw.js')
-assert(sw.includes(`moltology-hub-v3-brand-${version}`), 'Service worker brand revision is stale')
+assert(new RegExp(`moltology-hub-v\\d+-brand-${version}`).test(sw), 'Service worker brand revision is stale')
 const precache = sw.match(/const PRECACHE_URLS = \[([\s\S]+?)\]/)?.[1]
 assert(precache)
 for (const [, url] of precache.matchAll(/'([^']+)'/g)) await fs.access(path.join(ROOT, 'public', url))
