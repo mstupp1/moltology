@@ -297,11 +297,6 @@ function PagesResults({
                 </div>
               </div>
             </div>
-            {cmd.shortcut && (
-              <span className="text-[10px] bg-black/60 border border-gray-800 text-gray-400 px-2 py-0.5 font-sans">
-                {cmd.shortcut}
-              </span>
-            )}
           </button>
         </li>
       ))}
