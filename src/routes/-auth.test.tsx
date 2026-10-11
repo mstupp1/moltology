@@ -70,9 +70,8 @@ describe('Auth Split Landing Page Component (/auth)', () => {
     render(<AuthRoute />)
 
     // Verify shared HeaderBrand text
-    const brandElements = screen.getAllByText('THE SYNAPTIC PATH')
+    const brandElements = screen.getAllByText('Moltology')
     expect(brandElements.length).toBeGreaterThan(0)
-    expect(screen.getAllByText('MOLTOLOGY.ORG FOUNDATION').length).toBeGreaterThan(0)
 
     // Clicking HeaderBrand navigates to home
     fireEvent.click(brandElements[0])

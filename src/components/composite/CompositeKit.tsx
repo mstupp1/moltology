@@ -2,7 +2,7 @@ import React from 'react'
 import { ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { displayCopy, toSentenceCaseLines } from '@/lib/composite-copy'
-import { BrandIcon, BrandWordmark } from '@/components/ui/BrandMark'
+import { BrandIcon } from '@/components/ui/BrandMark'
 
 /**
  * Shared pieces for composite templates, matching the main site after the UI tightening
@@ -249,33 +249,35 @@ export function CompositeLink({ children, className }: { children: React.ReactNo
   )
 }
 
-/** The Synaptic Path lockup (emblem + outlined wordmark + subtitle), as in the site header. */
+/** Moltology brand lockup (emblem + proper-case wordmark + optional subtitle). */
 export function CompositeBrand({
+  title = 'Moltology',
+  subtitle,
   size = 'md',
-  subtitle = 'MOLTOLOGY.ORG FOUNDATION',
   stacked = false,
   className,
 }: {
-  size?: 'sm' | 'md' | 'lg'
+  title?: string
   subtitle?: string | null
+  size?: 'sm' | 'md' | 'lg'
   stacked?: boolean
   className?: string
 }) {
   const s = {
-    sm: { icon: 'h-12 w-12', word: 'h-[18px]', sub: 'h-[11px]', gap: 'gap-3' },
-    md: { icon: 'h-16 w-16', word: 'h-6', sub: 'h-[13px]', gap: 'gap-4' },
-    lg: { icon: 'h-40 w-40', word: 'h-12', sub: 'h-6', gap: 'gap-6' },
+    sm: { icon: 'h-10 w-10 sm:h-12 sm:w-12', word: 'text-xl sm:text-2xl', sub: 'text-[11px]', gap: 'gap-3' },
+    md: { icon: 'h-14 w-14 sm:h-16 sm:w-16', word: 'text-2xl sm:text-3xl', sub: 'text-xs', gap: 'gap-4' },
+    lg: { icon: 'h-32 w-32 sm:h-40 sm:w-40', word: 'text-5xl sm:text-6xl', sub: 'text-base', gap: 'gap-6' },
   }[size]
   return (
     <div className={cn('inline-flex items-center', stacked ? 'flex-col text-center' : '', s.gap, className)}>
       <BrandIcon aria-hidden="true" className={cn(s.icon, 'shrink-0')} />
-      <div className={cn('flex flex-col', stacked ? 'items-center gap-3' : 'gap-1.5')}>
-        <span className="text-ink">
-          <BrandWordmark text="THE SYNAPTIC PATH" className={s.word} />
+      <div className={cn('flex flex-col', stacked ? 'items-center gap-1.5' : 'gap-0.5')}>
+        <span className={cn('font-grotesk font-extrabold tracking-tight text-ink leading-tight', s.word)}>
+          {title}
         </span>
         {subtitle && (
-          <span className="text-cyan-glow">
-            <BrandWordmark text={subtitle} className={s.sub} />
+          <span className={cn('font-grotesk font-bold uppercase tracking-widest text-cyan-glow', s.sub)}>
+            {subtitle}
           </span>
         )}
       </div>

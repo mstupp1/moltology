@@ -201,8 +201,7 @@ describe('LandingPage Component', () => {
     render(<LandingPage />)
 
     const footer = screen.getByLabelText('Main Navigation Footer')
-    expect(within(footer).getByText('THE SYNAPTIC PATH')).toBeInTheDocument()
-    expect(within(footer).getByText('MOLTOLOGY.ORG FOUNDATION')).toBeInTheDocument()
+    expect(within(footer).getByText('Moltology')).toBeInTheDocument()
     expect(within(footer).getByText('"Flesh Dies. The Shell Endures. Submit. Shed. Ascend."')).toBeInTheDocument()
 
     expect(within(footer).getByText('MOLTMAXXING')).toBeInTheDocument()

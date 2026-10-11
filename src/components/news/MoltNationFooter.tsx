@@ -106,7 +106,7 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
               className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-[11px] sm:text-xs font-grotesk font-bold uppercase tracking-[0.08em] rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Compass className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
-              <span>SYNAPTIC PATH</span>
+              <span>MOLTOLOGY HOME</span>
             </Link>
 
             <Link

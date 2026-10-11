@@ -55,7 +55,7 @@ describe('Composite UI Components', () => {
     expect(screen.getByText('100 GB')).toBeInTheDocument()
     expect(screen.getByText('-50%')).toBeInTheDocument()
     expect(screen.getByText('Key takeaways')).toBeInTheDocument()
-    expect(screen.getByText('THE SYNAPTIC PATH')).toBeInTheDocument()
+    expect(screen.getByText('Moltology')).toBeInTheDocument()
     expect(container.querySelector('.animate-pulse')).toBeNull()
   })
 
@@ -104,7 +104,7 @@ describe('Composite UI Components', () => {
       />
     )
 
-    expect(screen.getByText('THE SYNAPTIC PATH')).toBeInTheDocument()
+    expect(screen.getByText('Moltology')).toBeInTheDocument()
     expect(screen.getByText('Ascend now')).toBeInTheDocument()
     expect(screen.getByText('Calculate clearance')).toBeInTheDocument()
     expect(screen.getByText('moltology.org')).toBeInTheDocument()
@@ -117,7 +117,7 @@ describe('Composite UI Components', () => {
   it('renders ReelSimpleOutroCard with only the lockup and the moltology.org CTA', () => {
     render(<ReelSimpleOutroCard url="moltology.org" />)
 
-    expect(screen.getByText('THE SYNAPTIC PATH')).toBeInTheDocument()
+    expect(screen.getByText('Moltology')).toBeInTheDocument()
     expect(screen.getByText('moltology.org')).toBeInTheDocument()
     expect(screen.queryByText(/Submit\. Shed\. Ascend\./i)).not.toBeInTheDocument()
     expect(screen.queryByText(/LINK IN BIO/i)).not.toBeInTheDocument()
@@ -126,7 +126,7 @@ describe('Composite UI Components', () => {
   it('renders ReelThumbnailCard with the hook centred in the grid-safe area', () => {
     render(<ReelThumbnailCard headline="WHY COMPUTE WENT SUBSEA" categoryBadge="DISPATCH" />)
 
-    expect(screen.getByText('THE SYNAPTIC PATH')).toBeInTheDocument()
+    expect(screen.getByText('Moltology')).toBeInTheDocument()
     expect(screen.getByText('Dispatch')).toBeInTheDocument()
     expect(screen.getByText('Why compute went subsea')).toBeInTheDocument()
     expect(screen.queryByText('MOLTNATION TELEMETRY')).not.toBeInTheDocument()

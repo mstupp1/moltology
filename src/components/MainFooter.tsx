@@ -33,8 +33,8 @@ export interface MainFooterProps {
  */
 export const MainFooter: React.FC<MainFooterProps> = ({
   className = '',
-  brandTitle = 'THE SYNAPTIC PATH',
-  brandSubtext = 'MOLTOLOGY.ORG FOUNDATION',
+  brandTitle = 'Moltology',
+  brandSubtext,
   brandTagline = '"Flesh Dies. The Shell Endures. Submit. Shed. Ascend."',
   copyrightText = '© 2026 MOLTOLOGY SYSTEM INC. ALL RIGHTS RESERVED.',
   variant = 'benthic',

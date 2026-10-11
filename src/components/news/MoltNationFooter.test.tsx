@@ -38,7 +38,7 @@ describe('MoltNationFooter Component', () => {
     expect(screen.getByText('FIELD MANUAL')).toBeInTheDocument()
     expect(screen.getByText('MOLTMAX QUIZ')).toBeInTheDocument()
     expect(screen.getByText('SACRED CODEX')).toBeInTheDocument()
-    expect(screen.getByText('SYNAPTIC PATH')).toBeInTheDocument()
+    expect(screen.getByText('MOLTOLOGY HOME')).toBeInTheDocument()
     expect(screen.getByText('ORGANIZATION')).toBeInTheDocument()
     expect(screen.getByText('STORE').closest('a')).toHaveAttribute('href', 'https://www.etsy.com/shop/SaasTrash')
     expect(screen.getByText('INSTAGRAM')).toBeInTheDocument()

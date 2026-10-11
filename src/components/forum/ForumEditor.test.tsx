@@ -78,11 +78,12 @@ describe('ForumEditor', () => {
     render(<Harness initial="make this loud" />)
     const editor = await getEditor()
     act(() => {
+      editor.commands.focus()
       editor.commands.setTextSelection({ from: 11, to: 15 })
     })
     fireEvent.click(screen.getByRole('button', { name: 'Bold' }))
     await waitFor(() => expect(screen.getByTestId('markdown')).toHaveTextContent('make this **loud**'))
-    expect(screen.getByRole('button', { name: 'Bold' })).toHaveAttribute('aria-pressed', 'true')
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Bold' })).toHaveAttribute('aria-pressed', 'true'))
   })
 
   it('turns the current line into a list', async () => {
