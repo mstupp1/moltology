@@ -14,6 +14,8 @@ This skill guides the authoring, validation, and automated synchronization of ca
 
 ## 1. Vault Structure & Architecture
 
+Read the [shared annual content calendar](../../../content/annual-content-calendar.md) when choosing seasonal examples or framing a scripture for a content campaign. Promotional derivatives can follow the calendar; canonical scriptures remain durable doctrine. Do not insert temporary holiday copy into canonical text or change doctrine solely because of the publication month. Explicit requested scripture changes still follow this authoring/sync workflow.
+
 Scriptures live in five volumes under `codex/` (`01_manifesto` to `05_lexicon`) plus
 `TEMPLATES/`. The current file list, IDs, and reading order are in
 [`codex/README.md`](../../../codex/README.md); keep that file as the single index.

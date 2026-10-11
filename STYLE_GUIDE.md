@@ -3,7 +3,7 @@
 How to write every human-facing string: product UI, HUD readouts, news, changelogs, social,
 forum, and onboarding. Terms, voices, and the economy live in
 [BRAND_BIBLE.md](BRAND_BIBLE.md). This guide wins on voice, bans, and formatting.
-_Last Revised: 2026-10-08_
+_Last Revised: 2026-10-09_
 
 ---
 
@@ -171,6 +171,12 @@ answer, and the first step is tiny. One step, then guidance, never pressure.
 
 ## 4. Channels
 
+All content uses the [shared annual content calendar](content/annual-content-calendar.md)
+as a seasonal reference. Match the intended publication date and audience context,
+increase holiday influence gradually, and reset after the occasion. Let setting,
+examples, props and restrained accents carry the season while the useful payoff stays
+clear. A relevant seasonal angle is welcome; evergreen pieces remain part of the mix.
+
 ### 4.1 Hooks
 
 A relatable human truth or a crisp contrast, first or second person, under 14 words.
@@ -187,8 +193,12 @@ A headline that states the claim in the world, plus one line with the human payo
 
 ### 4.3 Captions
 
-Hook (one line), two or three tight lines with one concrete payoff, a soft in-world call to
-action, then up to three tags. The link goes in the first comment.
+Hook (one line), two or three tight lines with one concrete payoff, one in-world call to
+action, then up to three tags. Editorial posts and carousels use a specific share/save
+ask after the useful payoff. Lead magnets retain one direct resource invitation when
+downloads, audits or signups are the goal. Retire keyword-comment requests and DM
+promises. The relevant resource link goes in the first comment. The example below is a
+resource invitation, not the default for editorial content.
 
 > Your soft tissue degrades in direct sunlight and direct email.
 > The Moltmaxxing Audit reads your Shell Hardness in two minutes. No scales, just answers.
@@ -217,21 +227,45 @@ zooming out.
   stack leak.
 - No ASCII boxes or decorative code. Tables only when they carry real numbers.
 
-### 4.6 Instagram carousel (4:5)
+### 4.6 Instagram images and carousels
 
-One- or two-line hook headline plus one sub-line. HUD numbers are welcome when real or
-clearly in-world. Caption per §4.3.
+- Single image: recognizable situation, one blunt sentence-case claim under 14 words,
+  and one useful step, comparison or reminder. Understandable before opening the caption.
+- Carousel: a cover with a recognizable problem, clear claim and specific swipe promise;
+  middle slides that explain or demonstrate; a final useful payoff and one invitation.
+  Keep one main idea per slide. Five to eight slides depending on the story, with no compulsory spec
+  matrix or identical three-slide script.
+- Quote decks are an optional save-focused carousel: five to eight short, self-contained
+  lines on one theme with a clear sequence. Let readable typography lead; use original
+  in-world lines or verified external quotes with correct attribution. Deliver a closing
+  line before one save ask. Measure saves with our audience before adopting a default.
+- HUD numbers are welcome when real or clearly in-world. Caption and CTA per §4.3.
+- Carousels default to full-frame 3:4; single posts may use 3:4, 4:5 or square. Preserve
+  the approved frame and mobile readability.
+- Change one planned variable against a named comparable control. Fix the mascot and
+  other settings during comparisons. Follow [the Instagram content strategy](content/social/instagram-content-strategy.md)
+  for post/carousel metrics and experiment records; video timing rules stay in §4.7.
+- Image artwork and polish use the built-in `image_gen.imagegen` tool by default.
+  Google Flow is a user-selected alternative. Keep tool names out of public copy.
 
 ### 4.7 Reels and Shorts (9:16)
 
 - About 50 to 65 words across six concrete beats, 25 to 30 seconds with the outro.
-- Open with a recognizable situation, show the problem, give one useful action, invite the
-  viewer to try it.
+- Keep two acts: recognizable surface friction, then a useful molt. The six beats are
+  functions, not a script to repeat word for word.
+- First second: a physical action already happening plus one blunt on-screen claim in
+  sentence case, under 14 words. Open on the scene; let the explanation follow.
 - Voiceover stays in the world all the way through, including the last three seconds.
 - Kinetic captions are two or three words and break at sentence boundaries.
-- Outro card: "Submit. Shed. Ascend.", "Calculate your molt clearance", moltology.org, and
-  one clearly lit mascot.
+- End with one specific share or save ask after delivering the useful action. No keyword
+  comment requests or DM promises in narration, caption, first comment or outro.
+- Outro card: one clearly lit mascot and the same share/save ask. A URL can be secondary;
+  resource links belong in the first comment. This overrides the general caption CTA
+  pattern in §4.3 for Reels and Shorts.
 - Thumbnail: one headline, one pill, one mascot.
+- Change one planned variable per reel against a named control: hook style, aphorism
+  length, voiceover pacing or CTA. Follow [the Reels strategy](content/social/reels-strategy.md)
+  for experiment records and performance review.
 
 ### 4.8 Stories
 

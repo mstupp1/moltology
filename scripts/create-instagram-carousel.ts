@@ -7,6 +7,7 @@ import { openCompositeSession } from './lib/composite-renderer'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
 import { CharacterKey, getRandomCharacterRotation, getCharacterInfo } from './lib/character-overlay'
+import { assertNoKeywordCta } from './lib/instagram-copy-policy'
 import {
   queueInstagramCarousel,
   QueueInstagramCarouselResult,
@@ -24,6 +25,8 @@ export interface CarouselSlideConfig {
 }
 
 export interface CreateCarouselOptions {
+  /** Reviewed caption and first comment; takes precedence over campaign defaults. */
+  contentJson?: string
   theme?: string
   topic?: string
   articleSlug?: string
@@ -53,29 +56,37 @@ export interface CarouselCopy {
   firstComment: string
 }
 
-export function parseCarouselContent(value: unknown): CarouselCopy {
+export function parseCarouselCopy(value: unknown): CarouselCopy {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    throw new Error('Carousel content must be a JSON object')
+    throw new Error('Carousel content must be a JSON object.')
   }
-  const data = value as Record<string, unknown>
+  const draft = value as Record<string, unknown>
   for (const key of ['title', 'topic', 'caption', 'firstComment']) {
-    if (typeof data[key] !== 'string' || !(data[key] as string).trim()) {
-      throw new Error(`Carousel content requires a non-empty ${key}`)
+    if (typeof draft[key] !== 'string' || !draft[key].trim()) {
+      throw new Error(`Carousel content requires a non-empty ${key}.`)
     }
   }
-  if (!Array.isArray(data.hashtags) || data.hashtags.length > 3 ||
-      data.hashtags.some(tag => typeof tag !== 'string' || !tag.trim())) {
-    throw new Error('Carousel content requires at most three non-empty string hashtags')
+  if (!Array.isArray(draft.hashtags) || draft.hashtags.length > 3 || draft.hashtags.some((tag) => typeof tag !== 'string' || !tag.trim())) {
+    throw new Error('Carousel content requires at most three non-empty string hashtags.')
   }
+  assertNoKeywordCta(draft)
   return {
-    title: data.title as string,
-    topic: data.topic as string,
-    caption: data.caption as string,
-    firstComment: data.firstComment as string,
-    hashtags: data.hashtags as string[],
+    title: draft.title as string,
+    topic: draft.topic as string,
+    caption: draft.caption as string,
+    firstComment: draft.firstComment as string,
+    hashtags: draft.hashtags as string[],
   }
 }
 
+export const parseCarouselContent = parseCarouselCopy
+
+export function resolveCarouselCopy(options: CreateCarouselOptions, fallback: () => CarouselCopy): CarouselCopy {
+  if (options.contentJson) {
+    return parseCarouselCopy(JSON.parse(fs.readFileSync(path.resolve(options.contentJson), 'utf8')))
+  }
+  return fallback()
+}
 export const DEFAULT_INSTAGRAM_ACCOUNT_ID = CANONICAL_INSTAGRAM_ACCOUNT_ID // moltology_org / Silas Trench
 export const DEFAULT_PROFILE_ID = CANONICAL_PROFILE_ID // Moltology Default Profile
 export const DEFAULT_CAROUSEL_QUEUE_ID = QUEUE_IDS.CAROUSELS_AND_POSTS // Moltology Carousels (Mon, Wed, Fri at 13:00 EST)
@@ -744,8 +755,15 @@ Output Style: Ultra high-resolution, cinematic 8k aesthetic, pristine lighting, 
  * Main Carousel Generator
  */
 export async function createInstagramCarousel(options: CreateCarouselOptions = {}) {
-  if (options.contentJson && (!options.polishedSlides || options.polishedSlides.length < 2)) {
+  if (options.theme === 'swipe-lab' && (!options.polishedSlides || options.polishedSlides.length < 2)) {
     throw new Error('--content-json requires at least two --polished-slides; render custom layouts separately')
+  }
+  if (options.polishedSlides?.length) {
+    if (!options.contentJson) throw new Error('Carousel ingestion requires --content-json with reviewed copy. Legacy campaign defaults cannot be queued.')
+    const minSlides = options.theme === 'swipe-lab' ? 2 : 5
+    if (options.polishedSlides.length < minSlides || options.polishedSlides.length > 8) {
+      throw new Error(options.theme === 'swipe-lab' ? 'Swipe Lab requires 2–8 slides.' : 'A finished carousel needs 5–8 slides, depending on the story.')
+    }
   }
   const timestamp = Date.now()
   const theme = options.theme || 'moltmaxxing'
@@ -756,9 +774,7 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
   // Resolve blog post if available
   const blogPost = resolveBlogPost(options)
   const blogData = blogPost ? synthesizeBlogCarouselData(blogPost, options) : null
-  const copy = options.contentJson
-    ? parseCarouselContent(JSON.parse(fs.readFileSync(path.resolve(options.contentJson), 'utf8')))
-    : blogData ? blogData.copy : generateCarouselCopy(theme, options.topic)
+  const copy = resolveCarouselCopy(options, () => blogData ? blogData.copy : generateCarouselCopy(theme, options.topic))
 
   console.log(`\n======================================================`)
   console.log(`🦞 MOLTOLOGY INSTAGRAM CAROUSEL GENERATOR (Composite Studio)`)
@@ -771,7 +787,7 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
   console.log(`🎭 Mascot:  ${mascot}`)
   console.log(`======================================================\n`)
 
-  // PATH A: Resuming with user's polished Google Flow slides
+  // PATH A: Ingest inspected slides from built-in ImageGen or a user-selected alternative.
   if (options.polishedSlides && options.polishedSlides.length > 0) {
     const slidePaths = options.polishedSlides.map((p) => path.resolve(process.cwd(), p))
     for (const sp of slidePaths) {
@@ -780,7 +796,7 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
       }
     }
 
-    console.log(`💎 Using ${slidePaths.length} User Polished Slides (Google Flow)...`)
+    console.log(`💎 Using ${slidePaths.length} inspected polished slides...`)
     const publicUrls: string[] = []
     let queueResult: QueueInstagramCarouselResult | null = null
 
@@ -938,7 +954,7 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
   console.log(`\n✅ All 3 Composite Scaffolding Slides Captured in tmp/!`)
 
   console.log(`\n==============================================================================`)
-  console.log(`🎨 GOOGLE FLOW AI POLISH DIRECTIVES FOR ALL 3 SLIDES`)
+  console.log(`🎨 LEGACY VISUAL POLISH DRAFTS FOR ALL 3 SLIDES`)
   console.log(`==============================================================================`)
   for (let i = 0; i < flowPrompts.length; i++) {
     console.log(`\n📍 SLIDE ${i + 1} FILE: ${compositePaths[i]}`)
@@ -949,14 +965,16 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
   console.log(`==============================================================================\n`)
 
   console.log(`==============================================================================`)
-  console.log(`👉 NEXT STEPS FOR GOOGLE FLOW POLISH PASS:`)
-  console.log(`1. Upload each slide scaffolding image to Google Flow.`)
-  console.log(`2. Paste each slide's prompt directive into Google Flow.`)
-  console.log(`3. Save polished slides to tmp/ (e.g. 'tmp/polished_slide1.png', 'tmp/polished_slide2.png', 'tmp/polished_slide3.png').`)
+  console.log(`👉 NEXT STEPS FOR BUILT-IN IMAGEGEN POLISH:`)
+  console.log(`1. Inspect each scaffold and edit it with the built-in image_gen.imagegen tool.`)
+  console.log(`2. Follow instagram-carousel-creator: replace legacy text and CTA defaults with reviewed copy.`)
+  console.log(`3. Save inspected slides to tmp/ and reviewed title/topic/caption/hashtags/firstComment to tmp/carousel-content.json.`)
+  console.log(`   Plan 5–8 final slides for the story or quote deck; these 3 scaffolds are seeds. Author the remaining slides before ingestion.`)
+  console.log(`   Google Flow is an alternative when the user requests it.`)
   const resumeCmd = blogPost
-    ? `npm run carousel:create -- --article ${blogPost.slug} --polished-slides tmp/polished_slide1.png,tmp/polished_slide2.png,tmp/polished_slide3.png`
-    : `npm run carousel:create -- --theme ${theme} --polished-slides tmp/polished_slide1.png,tmp/polished_slide2.png,tmp/polished_slide3.png`
-  console.log(`   ${resumeCmd}`)
+    ? `npm run carousel:create -- --article ${blogPost.slug} --polished-slides tmp/polished_slide1.png,tmp/polished_slide2.png,tmp/polished_slide3.png,tmp/polished_slide4.png,tmp/polished_slide5.png`
+    : `npm run carousel:create -- --theme ${theme} --polished-slides tmp/polished_slide1.png,tmp/polished_slide2.png,tmp/polished_slide3.png,tmp/polished_slide4.png,tmp/polished_slide5.png`
+  console.log(`   ${resumeCmd} --content-json tmp/carousel-content.json`)
   console.log(`==============================================================================\n`)
 
   return {

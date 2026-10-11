@@ -17,8 +17,9 @@ the homepage registry. Never publish an error screenshot. The homepage
 and [`scripts/capture-dashboard-mockups.ts`](../../../scripts/capture-dashboard-mockups.ts)
 consume the same registry. Add new sectors there; never add a desktop-only carousel entry.
 
-## Refresh commands
+For marketing presentations, read the [shared annual content calendar](../../../content/annual-content-calendar.md) and inherit the campaign's publication date and seasonal treatment. Apply seasonal styling to surrounding marketing artwork or copy when relevant. Keep the captured UI factual: do not invent holiday features, offers or on-screen states, or alter the underlying product merely to match the season.
 
+## Refresh commands
 ```bash
 # All six showcase sectors: dashboard, forum, oracle, moltmax, market, codex.
 # Captures desktop/mobile pairs plus the four homepage feature images.
