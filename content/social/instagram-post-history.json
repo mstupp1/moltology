@@ -418,6 +418,37 @@
       "zernioCommentId": null,
       "isAiGenerated": true,
       "createdAt": "2026-10-08T14:07:10.460Z"
+    },
+    {
+      "id": "carousel-1791686507270",
+      "type": "carousel",
+      "topic": "A three-step workday shutdown ritual",
+      "theme": "swipe-lab",
+      "mascot": "lobster_engineer",
+      "articleSlug": null,
+      "slideUrls": [
+        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/carousels/carousel-1791686507270/slide1.png",
+        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/carousels/carousel-1791686507270/slide2.png",
+        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/carousels/carousel-1791686507270/slide3.png",
+        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/carousels/carousel-1791686507270/slide4.png",
+        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/carousels/carousel-1791686507270/slide5.png"
+      ],
+      "slideCount": 5,
+      "aspectRatio": "3:4",
+      "caption": "Your workday ended. Your tabs did not.\n\nGive loose tasks a home. Leave one starting point for tomorrow. Then close the work surface.\nThe deep can hold the work until morning.\n\nSave this for your next shutdown.",
+      "hashtags": [
+        "#Moltology",
+        "#DeepWork",
+        "#Focus"
+      ],
+      "firstComment": "https://moltology.org",
+      "status": "scheduled",
+      "scheduledFor": "2026-10-12T17:00:00.000Z",
+      "queueId": "6a84b76d2421e968ac81f5bc",
+      "zernioPostId": "6acaf770ed8610257fa3d441",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "createdAt": "2026-10-11T02:41:52.438Z"
     }
   ]
 }

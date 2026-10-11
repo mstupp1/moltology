@@ -247,6 +247,10 @@ zooming out.
   for post/carousel metrics and experiment records; video timing rules stay in §4.7.
 - Image artwork and polish use the built-in `image_gen.imagegen` tool by default.
   Google Flow is a user-selected alternative. Keep tool names out of public copy.
+- In generated artwork, use exact official logo assets wherever branding naturally
+  belongs, including laptop lids, notebook covers, equipment plates, and sign-offs.
+  Reserve clean surfaces and composite the supplied logo after generation. Never
+  substitute a shell icon, redraw the emblem, or invent a wordmark or flourish.
 
 ### 4.7 Reels and Shorts (9:16)
 
