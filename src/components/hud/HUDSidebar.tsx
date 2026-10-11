@@ -812,14 +812,14 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   }}
                   onMouseEnter={() => handlePrefetch('/premium')}
                   onFocus={() => handlePrefetch('/premium')}
-                  className={`inline-flex items-center gap-1 font-sans text-[10px] font-bold tracking-[0.06em] uppercase px-1.5 py-0.5 rounded-chip border transition-all cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow shrink-0 ${
+                  className={`inline-flex items-center gap-1 font-sans text-[11px] font-bold tracking-[0.06em] uppercase px-1.5 py-0.5 rounded-chip border transition-all cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow shrink-0 ${
                     effectiveRoute === '/premium'
                       ? 'border-cyan-glow bg-cyan-soft text-cyan-glow shadow-[0_0_8px_rgba(0,195,255,0.35)]'
                       : 'border-cyan-glow/40 hover:border-cyan-glow bg-cyan-soft/50 hover:bg-cyan-soft text-cyan-glow'
                   }`}
                   title="Go Premium"
                 >
-                  <Sparkles className="w-2.5 h-2.5 shrink-0" />
+                  <Sparkles className="w-3 h-3 shrink-0" />
                   <span>Go Premium</span>
                 </button>
               ) : undefined
