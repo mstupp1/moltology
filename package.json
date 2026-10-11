@@ -67,7 +67,8 @@
     "simulate:prepare": "tsx scripts/simulate-activity.ts --prepare",
     "simulate:apply": "tsx scripts/simulate-activity.ts --apply",
     "db:retention-report": "tsx scripts/db-retention-report.ts",
-    "vercel:prune": "tsx scripts/prune-vercel-deployments.ts"
+    "vercel:prune": "tsx scripts/prune-vercel-deployments.ts",
+    "gh:ruleset": "tsx scripts/setup-github-ruleset.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.27",
