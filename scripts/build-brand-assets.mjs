@@ -162,7 +162,8 @@ export async function buildBrandAssets() {
   await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n')
   const swPath = path.join(ROOT, 'public/sw.js')
   const sw = await fs.readFile(swPath, 'utf8')
-  await fs.writeFile(swPath, sw.replace(/const VERSION = '[^']+'/, `const VERSION = 'moltology-hub-v3-brand-${version}'`))
+  const currentHubVersion = sw.match(/const VERSION = 'moltology-hub-(v\d+)-brand-/)?.[1] || 'v3'
+  await fs.writeFile(swPath, sw.replace(/const VERSION = '[^']+'/, `const VERSION = 'moltology-hub-${currentHubVersion}-brand-${version}'`))
   await buildReview(KIT, ROOT, version, palettes)
   // Keep the downloadable kit synchronized with the production source.
   const archive = spawnSync('python3', ['-c', `from pathlib import Path\nimport zipfile\np=Path(${JSON.stringify(KIT)})\nwith zipfile.ZipFile(p.parent/'synaptic-path-logo-kit.zip','w',zipfile.ZIP_DEFLATED) as z:\n for f in sorted(p.rglob('*')):\n  if f.is_file() and '__pycache__' not in f.parts:z.write(f,f.relative_to(p.parent))\n`], { cwd: ROOT, encoding: 'utf8' })
