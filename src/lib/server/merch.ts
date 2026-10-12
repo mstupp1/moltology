@@ -2,7 +2,7 @@ import Stripe from 'stripe'
 import { and, asc, eq, inArray, isNull } from 'drizzle-orm'
 import { getDb } from '../../db'
 import { authUser, merchOrders, merchProducts, merchVariants, profiles } from '../../db/schema'
-import { canViewHiddenPages } from '../hidden-pages'
+import { hasExperiment } from '../experiments'
 import {
   buildMerchCheckoutSessionParams,
   buildPricedCheckoutLines,
@@ -67,6 +67,7 @@ async function requireMerchOperator(args: HandlerArgs) {
   const [profile] = await auth.dbClient
     .select({
       role: profiles.role,
+      experiments: profiles.experiments,
       stripeCustomerId: profiles.stripeCustomerId,
     })
     .from(profiles)
@@ -74,7 +75,7 @@ async function requireMerchOperator(args: HandlerArgs) {
     .limit(1)
   if (!profile) throw new Error('This page is not available.')
   const email = typeof auth.payload?.email === 'string' ? auth.payload.email : null
-  if (!canViewHiddenPages({ email, role: profile.role }, profile.role)) {
+  if (!hasExperiment(profile.role, profile.experiments, 'new-store')) {
     throw new Error('This page is not available.')
   }
   return { auth, profile, email }

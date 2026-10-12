@@ -1,17 +1,19 @@
 import React from 'react'
+import type { ExperimentId } from '@/lib/experiments'
 import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 
 export interface HiddenPageGuardProps {
   children: React.ReactNode
   skeleton?: React.ReactNode
+  experiment?: ExperimentId
 }
 
 /**
  * Renders a hidden page for admins.
  * Everyone else gets a plain unavailable notice, with no preview of the page.
  */
-export const HiddenPageGuard: React.FC<HiddenPageGuardProps> = ({ children, skeleton }) => {
-  const access = useHiddenPageAccess()
+export const HiddenPageGuard: React.FC<HiddenPageGuardProps> = ({ children, skeleton, experiment }) => {
+  const access = useHiddenPageAccess(experiment)
 
   if (access.pending) {
     return <>{skeleton ?? null}</>

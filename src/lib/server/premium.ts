@@ -2,7 +2,7 @@ import Stripe from 'stripe'
 import { eq } from 'drizzle-orm'
 import { getDb } from '../../db'
 import { authUser, profiles } from '../../db/schema'
-import { canViewHiddenPages } from '../hidden-pages'
+import { hasExperiment } from '../experiments'
 import {
   buildPremiumCheckoutSessionParams,
   buildPremiumPortalParams,
@@ -94,8 +94,7 @@ async function requirePremiumOperator(args: HandlerArgs) {
     .where(eq(profiles.id, auth.userId))
     .limit(1)
   if (!profile) throw new Error('Could not load your membership. Try again.')
-  const email = typeof auth.payload?.email === 'string' ? auth.payload.email : null
-  if (!canViewHiddenPages({ email, role: profile.role }, profile.role)) {
+  if (!hasExperiment(profile.role, profile.experiments, 'premium')) {
     throw new Error('This page is not available.')
   }
   return { auth, profile }

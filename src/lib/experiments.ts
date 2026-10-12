@@ -8,6 +8,14 @@
 import { isAdmin } from './permissions'
 
 export const EXPERIMENTS = {
+  premium: {
+    title: 'Premium',
+    description: 'Show Premium membership, settings, and dashboard offers for your account.',
+  },
+  'new-store': {
+    title: 'New store',
+    description: 'Open the on-site store and checkout. Store links use Etsy while this is off.',
+  },
   'avatar-kit': {
     title: 'Painted avatars and cosmetics',
     description:

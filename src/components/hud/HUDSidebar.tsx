@@ -35,6 +35,7 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
 import { ChromaElement, HeaderBrand, AnimatedHamburger } from '../ui'
+import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { getEffectiveRole, isAdmin } from '../../lib/permissions'
 import { isHiddenPagePath } from '../../lib/hidden-pages'
 import {
@@ -56,7 +57,7 @@ const GUEST_LOCKED_PATHS = new Set(['/lectures', '/chassis', '/connections', '/m
 
 export function computeNavItemHidden(
   item: { path: string; featureFlag?: FeatureFlagId },
-  user?: { email?: string | null; role?: string | null } | null,
+  user?: { email?: string | null; role?: string | null; experiments?: unknown } | null,
   userRole?: string | null,
 ): boolean {
   return (
@@ -446,7 +447,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   const canViewHiddenPages = isAdmin(user, userRole)
   const canViewAdmin = canViewHiddenPages
-  const showPremiumBadge = isFeatureFlagEnabled('premium', user, userRole)
+  const premiumAccess = useHiddenPageAccess('premium')
+  const showPremiumBadge = !premiumAccess.pending && premiumAccess.canView
   const isAdminActive =
     effectiveRoute === '/admin' ||
     (effectiveRoute !== '/' && effectiveRoute.startsWith('/admin'))

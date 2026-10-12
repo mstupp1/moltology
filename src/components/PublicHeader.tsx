@@ -3,7 +3,7 @@
  * PUBLIC TOP NAVIGATION HEADER
  * Shared navigation bar across top-level public pages (Landing / Org).
  * Features a rounded card tab bar with a sliding highlight that follows hover and focus,
- * Members keep the Etsy store link. Admins go to /store.
+ * The new-store experiment switches opted-in admins from Etsy to /store.
  * ============================================================================
  */
 import React, { useState, useEffect, useMemo, Suspense, lazy } from 'react'

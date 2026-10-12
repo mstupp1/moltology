@@ -68,10 +68,20 @@ describe('setPremiumAccessHandler staff gate', () => {
     expect(db.update).not.toHaveBeenCalled()
   })
 
+  it('refuses an admin who has not enabled the Premium experiment', async () => {
+    const db = membershipDb([[{ ...freeMembership, role: 'admin', experiments: ['new-store'] }]])
+    vi.mocked(getDb).mockReturnValue(db as never)
+    await expect(setPremiumAccessHandler({
+      data: { action: 'grant' },
+      context: { user: { sub: 'member-1', role: 'admin' } },
+    })).rejects.toThrow('This page is not available.')
+    expect(db.update).not.toHaveBeenCalled()
+  })
+
   it('lets staff activate Premium without a charge', async () => {
     const db = membershipDb([
-      [{ ...freeMembership, id: 'staff-1', role: 'admin' }],
-      [{ ...freeMembership, id: 'staff-1', role: 'admin' }],
+      [{ ...freeMembership, id: 'staff-1', role: 'admin', experiments: ['premium'] }],
+      [{ ...freeMembership, id: 'staff-1', role: 'admin', experiments: ['premium'] }],
     ])
     vi.mocked(getDb).mockReturnValue(db as never)
 
