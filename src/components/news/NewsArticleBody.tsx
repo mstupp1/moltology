@@ -181,7 +181,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
       elements.push(
         <blockquote
           key={key}
-          className="border-l-2 border-cyan-glow pl-4 py-2 my-4 sm:my-5 italic font-sans text-sm sm:text-base text-ink-body bg-surface-1 rounded-r-control break-words leading-relaxed"
+          className="border-l-2 border-cyan-glow pl-4 py-2 my-4 sm:my-5 italic font-garamond text-xl sm:text-2xl text-ink-body bg-surface-1 rounded-r-control break-words leading-relaxed"
           dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(text) }}
         />
       )
@@ -286,7 +286,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     if (trimmed.startsWith('# ')) {
       flushAll(lineKey)
       elements.push(
-        <h1 key={lineKey} className="font-grotesk font-bold text-2xl sm:text-3xl md:text-4xl text-ink mt-8 sm:mt-10 mb-3 sm:mb-4 border-b border-line-subtle pb-2 break-words leading-tight">
+        <h1 key={lineKey} className="font-garamond text-2xl sm:text-3xl md:text-4xl text-ink mt-8 sm:mt-10 mb-3 sm:mb-4 border-b border-line-subtle pb-2 break-words leading-tight">
           {trimmed.slice(2)}
         </h1>
       )
@@ -297,7 +297,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     if (trimmed.startsWith('## ')) {
       flushAll(lineKey)
       elements.push(
-        <h2 key={lineKey} className="font-grotesk font-bold text-xl sm:text-2xl text-ink mt-7 sm:mt-9 mb-3 border-b border-line-subtle pb-2 break-words leading-snug">
+        <h2 key={lineKey} className="font-garamond text-xl sm:text-2xl text-ink mt-7 sm:mt-9 mb-3 border-b border-line-subtle pb-2 break-words leading-snug">
           {trimmed.slice(3)}
         </h2>
       )
@@ -308,7 +308,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     if (trimmed.startsWith('### ')) {
       flushAll(lineKey)
       elements.push(
-        <h3 key={lineKey} className="font-grotesk font-bold text-base sm:text-lg text-cyan-glow mt-6 sm:mt-8 mb-2 break-words leading-snug">
+        <h3 key={lineKey} className="font-garamond text-xl sm:text-2xl text-ink mt-6 sm:mt-8 mb-2 break-words leading-snug">
           {trimmed.slice(4)}
         </h3>
       )
@@ -319,7 +319,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     if (trimmed.startsWith('#### ')) {
       flushAll(lineKey)
       elements.push(
-        <h4 key={lineKey} className="font-grotesk font-semibold text-sm sm:text-base text-ink mt-4 sm:mt-6 mb-2 break-words">
+        <h4 key={lineKey} className="font-garamond text-lg sm:text-xl text-ink mt-4 sm:mt-6 mb-2 break-words">
           {trimmed.slice(5)}
         </h4>
       )
@@ -330,7 +330,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     if (trimmed.startsWith('##### ')) {
       flushAll(lineKey)
       elements.push(
-        <h5 key={lineKey} className="font-grotesk font-medium text-xs sm:text-sm text-cyan-glow mt-3 sm:mt-4 mb-1.5 break-words">
+        <h5 key={lineKey} className="font-garamond text-base sm:text-lg text-ink mt-3 sm:mt-4 mb-1.5 break-words">
           {trimmed.slice(6)}
         </h5>
       )

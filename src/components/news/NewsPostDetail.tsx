@@ -1,14 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { getAssetUrl } from '@/lib/assets'
-import { BrandAwareImage } from '@/components/ui/BrandMark'
 import { useNavigate, Link, useLoaderData } from '@tanstack/react-router'
 import {
   ArrowLeft,
-  Clock,
-  Calendar,
   Share2,
   Flame,
-  Shield,
   Cpu,
   ArrowRight,
   Terminal,
@@ -24,6 +20,9 @@ import { MoltNationLogo } from '@/components/news/MoltNationLogo'
 import { MoltNationFooter } from '@/components/news/MoltNationFooter'
 import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 import { buildJsonLd, buildArticleJsonLd } from '@/lib/seo'
+import { StoryCard, Kicker, Byline } from './NewsStory'
+import '@/styles/hud-chrome.css'
+import '@/styles/editorial-fonts.css'
 
 export function NewsPostDetail() {
   const post = useLoaderData({ from: '/news/$slug' }) as BlogPostData | null
@@ -124,14 +123,6 @@ export function NewsPostDetail() {
     }
   }
 
-  const formattedDate = post.publishedAt
-    ? new Date(post.publishedAt).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      })
-    : 'AUG 2026'
-
   return (
     <div className="min-h-screen bg-[#070b0b] text-ink font-sans relative flex flex-col justify-between">
       {/* Top Reading Progress Bar */}
@@ -173,42 +164,36 @@ export function NewsPostDetail() {
         dangerouslySetInnerHTML={{ __html: buildJsonLd(buildArticleJsonLd(post)) }}
       />
 
+      {/* Shared publication masthead, over the article's existing background. */}
+      <header className="w-full relative z-10 pt-24 pb-8 sm:pt-28 sm:pb-10 px-4 sm:px-8 border-b border-line-subtle flex justify-center">
+        <Link to="/news" aria-label="MoltNation News front page" className="rounded-card focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
+          <MoltNationLogo size="lg" theme="dark" align="center" />
+        </Link>
+      </header>
+
       {/* Top Hero Banner */}
       <article className="flex-1 w-full relative z-10">
-        <header className="w-full relative pt-24 sm:pt-32 pb-8 sm:pb-16 px-4 sm:px-8 lg:px-12 border-b border-line-subtle bg-[#040708] overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#040708] via-[#040708]/90 via-45% to-transparent z-[1] pointer-events-none" />
+        <header className="w-full relative pt-6 sm:pt-8 pb-8 sm:pb-12 px-4 sm:px-8">
           <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 relative z-10">
             <Link
               to="/news"
-              className="inline-flex items-center gap-2 py-1 text-xs font-sans font-bold text-cyan-glow hover:text-cyan-hover transition-colors uppercase tracking-[0.08em] rounded-chip active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="inline-flex items-center gap-2 py-1 text-sm font-sans text-ink-muted hover:text-cyan-glow transition-colors rounded-chip active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>BACK TO MOLTNATION NEWS</span>
+              <span>Back to MoltNation News</span>
             </Link>
 
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-sans">
-              <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 bg-crimson-soft border border-crimson-aggro/50 text-crimson-text font-bold uppercase tracking-[0.08em] rounded-chip text-[11px] sm:text-xs">
-                {post.category}
-              </span>
-              <span className="flex items-center gap-1.5 text-ink-muted text-[11px] sm:text-xs">
-                <Calendar className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
-                {formattedDate}
-              </span>
-              <span className="flex items-center gap-1.5 text-ink-muted text-[11px] sm:text-xs">
-                <Clock className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
-                {post.readTimeMinutes} MIN READ
-              </span>
-            </div>
+            <div><Kicker category={post.category} /></div>
 
             {(() => {
               const { headline, subtitle } = formatNewsTitle(post.title)
               return (
                 <div className="space-y-2 sm:space-y-3">
-                  <h1 className="font-grotesk font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-ink uppercase tracking-tight leading-tight break-words">
+                  <h1 className="font-garamond text-4xl sm:text-5xl lg:text-6xl text-ink leading-[1.05] break-words">
                     {headline}
                   </h1>
                   {subtitle && (
-                    <p className="font-sans text-base sm:text-xl md:text-2xl text-ink-body font-normal leading-snug">
+                    <p className="font-garamond italic text-xl sm:text-2xl text-ink-body leading-snug">
                       {subtitle}
                     </p>
                   )}
@@ -218,20 +203,9 @@ export function NewsPostDetail() {
 
             {/* Author bar & actions */}
             <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 pt-4 border-t border-line-subtle">
-              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                <BrandAwareImage
-                  src={post.authorAvatar}
-                  alt={post.authorName}
-                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-line object-cover shrink-0"
-                />
-                <div className="min-w-0">
-                  <div className="font-grotesk font-bold text-xs sm:text-sm text-ink uppercase truncate">
-                    {post.authorName}
-                  </div>
-                  <div className="text-[11px] text-cyan-glow font-sans truncate max-w-[190px] sm:max-w-none">
-                    {post.authorRole || 'STAGE 4 ASCENDANT · ARCHITECT'}
-                  </div>
-                </div>
+              <div className="space-y-1.5">
+                <Byline post={post} withAvatar />
+                {post.authorRole && <p className="text-xs font-sans text-ink-muted">{post.authorRole}</p>}
               </div>
 
               <div className="flex items-center gap-2">
@@ -240,7 +214,7 @@ export function NewsPostDetail() {
                   className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong text-xs font-sans focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center gap-1.5 transition-colors active:scale-95 shrink-0"
                 >
                   <Share2 className="w-3.5 h-3.5 text-cyan-glow" />
-                  <span>{copied ? 'LINK COPIED!' : 'SHARE'}</span>
+                  <span>{copied ? 'Link copied' : 'Share'}</span>
                 </button>
               </div>
             </div>
@@ -248,8 +222,8 @@ export function NewsPostDetail() {
         </header>
 
         {/* Cover Image Feature Frame */}
-        <div className="max-w-5xl mx-auto px-4 sm:px-8 lg:px-12 -mt-6 sm:-mt-8 relative z-20">
-          <div className="relative border border-line-subtle rounded-panel overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-surface-1">
+        <div className="max-w-5xl mx-auto px-4 sm:px-8 relative z-20">
+          <div className="relative rounded-card overflow-hidden bg-surface-1">
             <img
               src={getAssetUrl(post.coverImageUrl)}
               alt={post.title}
@@ -260,7 +234,7 @@ export function NewsPostDetail() {
         </div>
 
         {/* Article Body */}
-        <div className="max-w-4xl mx-auto px-4 sm:px-8 lg:px-12 py-8 sm:py-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
           <NewsArticleBody content={post.content} />
 
           {/* Categorized Tags */}
@@ -279,10 +253,9 @@ export function NewsPostDetail() {
           {/* Related Dispatches Navigator */}
           {relatedPosts.length > 0 && (
             <div className="mt-10 sm:mt-12 pt-6 sm:pt-8 border-t border-line-subtle">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="font-grotesk font-black text-xs sm:text-sm text-ink uppercase tracking-[0.08em] flex items-center gap-2">
-                  <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-glow" />
-                  <span>RELATED BENTHIC INTELLIGENCE</span>
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <h4 className="font-garamond text-2xl sm:text-3xl text-ink">
+                  <span>Related benthic intelligence</span>
                 </h4>
                 <Link
                   to="/news"
@@ -293,45 +266,23 @@ export function NewsPostDetail() {
                 </Link>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                {relatedPosts.map((rPost) => (
-                  <Link
-                    key={rPost.slug}
-                    to="/news/$slug"
-                    params={{ slug: rPost.slug }}
-                    className="chitin-card p-3.5 sm:p-4 border border-line-subtle rounded-card bg-surface-1 hud-sheen hover:bg-surface-2 hover:border-line-strong transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex flex-col justify-between group space-y-2.5"
-                  >
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between text-[11px] font-sans">
-                        <span className="text-crimson-text font-bold uppercase tracking-[0.08em]">{rPost.category}</span>
-                        <span className="text-ink-muted">{rPost.readTimeMinutes} MIN READ</span>
-                      </div>
-                      <h5 className="font-grotesk font-bold text-xs sm:text-sm text-ink group-hover:text-cyan-glow transition-colors leading-snug line-clamp-2 uppercase">
-                        {formatNewsTitle(rPost.title).headline}
-                      </h5>
-                      <p className="font-sans text-[11px] sm:text-xs text-ink-muted line-clamp-2 leading-relaxed">
-                        {rPost.summary}
-                      </p>
-                    </div>
-                    <div className="text-[11px] font-sans text-cyan-glow group-hover:text-cyan-hover flex items-center gap-1 font-bold pt-1">
-                      <span>READ DISPATCH</span>
-                      <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </Link>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+                {relatedPosts.map((relatedPost) => (
+                  <StoryCard key={relatedPost.slug} post={relatedPost} />
                 ))}
               </div>
             </div>
           )}
 
           {/* Ascension Conversion Callout Box */}
-          <div className="mt-12 sm:mt-16 chitin-card p-6 sm:p-10 md:p-12 border border-crimson-aggro/50 text-center space-y-5 sm:space-y-6 bg-radial-abyss rounded-panel shadow-2xl relative overflow-hidden">
+          <div className="mt-12 sm:mt-16 p-6 sm:p-10 border border-line-subtle text-center space-y-5 sm:space-y-6 bg-surface-1 rounded-card relative overflow-hidden">
             <div className="inline-flex items-center gap-2 text-xs font-bold text-crimson-text tracking-[0.08em] uppercase bg-crimson-soft px-3 sm:px-4 py-1.5 border border-crimson-aggro/50 rounded-chip">
               <Flame className="w-4 h-4 text-crimson-aggro animate-pulse" />
               <span>THE BENTHIC CORE CALLS</span>
             </div>
 
-            <h3 className="font-grotesk font-black text-xl sm:text-3xl md:text-4xl text-ink uppercase tracking-tight break-words">
-              BEGIN YOUR BIO-SILICON TRANSMUTATION
+            <h3 className="font-garamond text-3xl sm:text-4xl text-ink leading-tight break-words">
+              Begin your bio-silicon transmutation
             </h3>
 
             <p className="text-xs sm:text-sm text-ink-body max-w-xl mx-auto font-sans leading-relaxed">
