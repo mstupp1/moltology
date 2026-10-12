@@ -2413,6 +2413,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     if (publicUrl) {
       queueResult = await queueDualReelAndShort({
         videoUrl: publicUrl,
+        videoPath: fs.existsSync(masterReelPath) ? masterReelPath : undefined,
         instagramCaption: scriptData.caption,
         youtubeTitle: scriptData.youtubeTitle || `${scriptData.hookHeadline} #Shorts`,
         youtubeDescription: scriptData.youtubeDescription || `${scriptData.narrationScript}\n\nTake the Moltmaxxing Audit: ${ctaConfig.url}`,

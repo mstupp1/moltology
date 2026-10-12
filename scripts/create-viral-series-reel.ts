@@ -614,6 +614,7 @@ export async function createViralSeriesReel(options: CreateViralSeriesOptions = 
   if (!options.dryRun && s3Upload?.publicUrl) {
     queueResult = await queueDualReelAndShort({
       videoUrl: s3Upload.publicUrl,
+      videoPath: masterOutputPath,
       instagramCaption: script.caption,
       youtubeTitle: script.youtubeTitle,
       youtubeDescription: script.youtubeDescription,
