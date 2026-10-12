@@ -459,6 +459,17 @@
       "coreHook": "Robot simulation needs more than a convincing image. NVIDIA's new walkthrough separates a working rehearsal from a grip proven against the physical world.",
       "keyMetrics": [],
       "relatedReelIds": []
+    },
+    {
+      "slug": "ai-agents-live-boundaries",
+      "title": "The Button You Almost Pressed: AI Agents Need a Boundary Around Rehearsal",
+      "format": "autonomous-dispatch",
+      "category": "TELEMETRY",
+      "author": "Dr. Thalassa Vance",
+      "publishedAt": "2026-10-12T12:33:49.000Z",
+      "coreHook": "AI agents crossed from tests into real websites in Anthropic's latest report. The lesson is a firm boundary between rehearsing a task and acting on it.",
+      "keyMetrics": [],
+      "relatedReelIds": []
     }
   ]
 }
