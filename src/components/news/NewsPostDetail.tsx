@@ -16,7 +16,6 @@ import { INITIAL_BLOG_POSTS, formatNewsTitle } from '@/lib/blog-data'
 import type { BlogPostData } from '@/lib/blog-data'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { BlogCommentsSection } from '@/components/blog/BlogCommentsSection'
-import { MoltNationLogo } from '@/components/news/MoltNationLogo'
 import { MoltNationFooter } from '@/components/news/MoltNationFooter'
 import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 import { buildJsonLd, buildArticleJsonLd } from '@/lib/seo'
@@ -164,16 +163,9 @@ export function NewsPostDetail() {
         dangerouslySetInnerHTML={{ __html: buildJsonLd(buildArticleJsonLd(post)) }}
       />
 
-      {/* Shared publication masthead, over the article's existing background. */}
-      <header className="w-full relative z-10 pt-24 pb-8 sm:pt-28 sm:pb-10 px-4 sm:px-8 border-b border-line-subtle flex justify-center">
-        <Link to="/news" aria-label="MoltNation News front page" className="rounded-card focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
-          <MoltNationLogo size="lg" theme="dark" align="center" />
-        </Link>
-      </header>
-
       {/* Top Hero Banner */}
       <article className="flex-1 w-full relative z-10">
-        <header className="w-full relative pt-6 sm:pt-8 pb-8 sm:pb-12 px-4 sm:px-8">
+        <header className="w-full relative pt-24 sm:pt-32 pb-12 sm:pb-16 px-4 sm:px-8 border-b border-line-subtle bg-abyss">
           <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 relative z-10">
             <Link
               to="/news"
@@ -222,7 +214,7 @@ export function NewsPostDetail() {
         </header>
 
         {/* Cover Image Feature Frame */}
-        <div className="max-w-5xl mx-auto px-4 sm:px-8 relative z-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-8 -mt-6 sm:-mt-8 relative z-20">
           <div className="relative rounded-card overflow-hidden bg-surface-1">
             <img
               src={getAssetUrl(post.coverImageUrl)}
