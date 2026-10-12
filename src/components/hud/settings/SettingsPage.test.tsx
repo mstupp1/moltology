@@ -75,7 +75,7 @@ describe('SettingsPage', () => {
       expect(screen.getByText('Underwater Bubbles')).toBeInTheDocument()
     })
 
-    expect(await screen.findByTestId('premium-settings')).toBeInTheDocument()
+    expect(screen.queryByTestId('premium-settings')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Purchase Premium/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Cancel Premium/i })).not.toBeInTheDocument()
     expect(screen.getByText('Visible across the hub')).toBeInTheDocument()

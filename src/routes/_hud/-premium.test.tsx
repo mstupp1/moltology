@@ -71,7 +71,19 @@ describe('Premium HUD route', () => {
     expect(getPremiumOfferFn).not.toHaveBeenCalled()
   })
 
-  it('renders the membership page for admins', async () => {
+  it('hides the page from admins with the experiment off', async () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'admin-1', role: 'admin' } }, isPending: false,
+    } as never)
+    vi.mocked(getUserProfileFn).mockResolvedValue({ role: 'admin', experiments: [] } as never)
+    const Component = Route.options.component!
+    render(<Component />)
+    expect(await screen.findByTestId('hidden-page-unavailable')).toBeInTheDocument()
+    expect(getPremiumOfferFn).not.toHaveBeenCalled()
+  })
+
+  it('renders the membership page for opted-in admins', async () => {
+    vi.mocked(getUserProfileFn).mockResolvedValue({ role: 'admin', experiments: ['premium'] } as never)
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'admin-1', name: 'Admin', email: 'ops@example.com', role: 'admin' } },
       isPending: false,

@@ -8,7 +8,7 @@ const LazyPremiumView = lazy(() => import('@/components/hud/PremiumView'))
 
 function PremiumPage() {
   return (
-    <HiddenPageGuard skeleton={<HudWorkspaceGhost />}>
+    <HiddenPageGuard experiment="premium" skeleton={<HudWorkspaceGhost />}>
       <Suspense fallback={<HudWorkspaceGhost />}>
         <LazyPremiumView />
       </Suspense>

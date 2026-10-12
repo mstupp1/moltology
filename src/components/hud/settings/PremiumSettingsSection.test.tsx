@@ -34,7 +34,8 @@ describe('Premium settings section', () => {
         <PremiumSettingsSection />
       </ToastProvider>,
     )
-    expect(await screen.findByText(/do not have an active Premium membership/i)).toBeInTheDocument()
+    expect(screen.queryByTestId('premium-settings')).not.toBeInTheDocument()
+    expect(getPremiumMembershipFn).not.toHaveBeenCalled()
     expect(screen.queryByRole('button', { name: /Purchase Premium/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Cancel Premium/i })).not.toBeInTheDocument()
     expect(screen.queryByText(/No payment is taken/i)).not.toBeInTheDocument()

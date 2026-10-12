@@ -35,7 +35,7 @@ export function PremiumBanner({ hasPurchasedPremium }: { hasPurchasedPremium: bo
  * and hidden from members who cannot open the soft-launch page.
  */
 export function PremiumDashboardBanner() {
-  const access = useHiddenPageAccess()
+  const access = useHiddenPageAccess('premium')
   const session = useAuthSession()
   const [membership, setMembership] = useState<{ hasPurchasedPremium: boolean; isPremium: boolean } | null>(null)
 

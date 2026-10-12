@@ -3,6 +3,10 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, within } from '@testing-library/react'
 import { PublicHeader } from './PublicHeader'
 import { authClient } from '@/lib/auth-client'
+import { getUserProfileFn } from '@/lib/server/api'
+
+vi.mock('@/lib/jwt', () => ({ getAuthJWTToken: vi.fn().mockResolvedValue(null) }))
+vi.mock('@/lib/server/api', () => ({ getUserProfileFn: vi.fn().mockResolvedValue({ role: 'admin', experiments: ['new-store'] }) }))
 
 let mockPathname = '/'
 
@@ -46,7 +50,7 @@ describe('PublicHeader Navigation Component', () => {
     expect(screen.queryByText('NEW')).not.toBeInTheDocument()
   })
 
-  it('points STORE at the on-site catalog for admins', () => {
+  it('points STORE at the on-site catalog for opted-in admins', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'admin-1', email: 'ops@example.com', role: 'admin' } },
       isPending: false,
@@ -54,8 +58,19 @@ describe('PublicHeader Navigation Component', () => {
     render(<PublicHeader activePage="home" />)
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
     const storeLink = within(nav).getByRole('link', { name: /STORE/i })
-    expect(storeLink).toHaveAttribute('href', '/store')
+    await vi.waitFor(() => expect(storeLink).toHaveAttribute('href', '/store'))
     expect(storeLink).not.toHaveAttribute('target')
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as never)
+  })
+
+  it('keeps Etsy for admins with the store experiment off', async () => {
+    vi.mocked(getUserProfileFn).mockResolvedValueOnce({ role: 'admin', experiments: [] } as never)
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'admin-off', role: 'admin' } }, isPending: false,
+    } as never)
+    render(<PublicHeader activePage="home" />)
+    await vi.waitFor(() => expect(getUserProfileFn).toHaveBeenCalled())
+    expect(within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('link', { name: /STORE/i })).toHaveAttribute('href', 'https://www.etsy.com/shop/SaasTrash')
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as never)
   })
 

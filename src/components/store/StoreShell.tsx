@@ -11,7 +11,7 @@ export function StoreShell() {
   return (
     <div className="min-h-screen bg-abyss text-ink">
       <PublicHeader activePage="store" />
-      <HiddenPageGuard skeleton={<div className="mx-auto max-w-6xl px-4 py-10"><HUDPageLoader /></div>}>
+      <HiddenPageGuard experiment="new-store" skeleton={<div className="mx-auto max-w-6xl px-4 py-10"><HUDPageLoader /></div>}>
         <MerchCartProvider>
           <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
             <Outlet />
