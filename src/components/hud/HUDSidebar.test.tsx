@@ -388,7 +388,8 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.queryByRole('button', { name: /^ADMIN$/i })).not.toBeInTheDocument()
   })
 
-  it('shows admin nav item above support and Go Premium badge normally for admins', async () => {
+  it('shows admin nav and Go Premium for opted-in admins', async () => {
+    mockGetUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['premium'] })
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -407,7 +408,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(adminItem).toBeInTheDocument()
     expect(adminItem).not.toHaveAttribute('data-hidden', 'true')
 
-    const premiumBadge = screen.getByRole('button', { name: /Go Premium/i })
+    const premiumBadge = await screen.findByRole('button', { name: /Go Premium/i })
     expect(premiumBadge).toBeInTheDocument()
     expect(premiumBadge).not.toHaveAttribute('data-hidden', 'true')
 
@@ -428,7 +429,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
       } as any,
       isPending: false,
     } as any)
-    mockGetUserProfileFn.mockResolvedValue({ role: 'admin', handle: null, larvaId: null })
+    mockGetUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['premium'], handle: null, larvaId: null })
 
     render(<HUDSidebar />)
 
@@ -436,7 +437,8 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(await screen.findByRole('button', { name: /Go Premium/i })).toBeInTheDocument()
   })
 
-  it('stacks admin above support and hides Go Premium badge when sidebar is collapsed', () => {
+  it('stacks admin above support and hides Go Premium badge when sidebar is collapsed', async () => {
+    mockGetUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['premium'] })
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -452,7 +454,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     render(<HUDSidebar />)
 
     // Initially expanded: badge visible
-    expect(screen.getByRole('button', { name: /Go Premium/i })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /Go Premium/i })).toBeInTheDocument()
 
     // Collapse via Cmd+B
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
@@ -499,7 +501,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     })
 
     it('returns true for tabs gated by an admin-only feature flag when viewed by admin', () => {
-      expect(computeNavItemHidden({ path: '/demo', featureFlag: 'premium' }, { role: 'admin' })).toBe(true)
+      expect(computeNavItemHidden({ path: '/demo', featureFlag: 'premium' }, { role: 'admin', experiments: ['premium'] })).toBe(true)
     })
 
     it('returns false for tabs gated by an admin-only feature flag when viewed by regular member', () => {

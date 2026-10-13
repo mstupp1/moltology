@@ -66,7 +66,6 @@ export type CommandCatalogItem = {
   label: string
   category: CommandCategory
   icon: CommandIconId
-  shortcut?: string
   to?: CommandNavTo
   params?: Record<string, string>
   keywords?: string[]
@@ -104,7 +103,6 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'Open Portal Command Hub (Mainpage)',
     category: 'Navigation',
     icon: 'dashboard',
-    shortcut: 'G H',
     to: '/dashboard',
     keywords: ['hub', 'dashboard', 'mainpage'],
   },
@@ -121,7 +119,6 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'Open Sacred Codex & Canonical Scriptures',
     category: 'Navigation',
     icon: 'codex',
-    shortcut: 'G C',
     to: '/codex',
   },
   {
@@ -138,7 +135,6 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'Open Molt Academy & Neural Courses',
     category: 'Navigation',
     icon: 'lectures',
-    shortcut: 'G L',
     to: '/lectures',
     keywords: ['academy', 'courses', 'lectures', 'tracks', 'certifications', 'lessons'],
   },
@@ -147,7 +143,6 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'Inspect Transmutation Pipeline & Stages',
     category: 'Navigation',
     icon: 'pipeline',
-    shortcut: 'G P',
     to: '/pipeline',
     keywords: ['science', 'pipeline', 'stages'],
   },
@@ -156,7 +151,6 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'Open The Benthic Compendium Science Journal',
     category: 'Navigation',
     icon: 'journal',
-    shortcut: 'G J',
     to: '/journal',
   },
   {
@@ -164,7 +158,6 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'Open Benthic Market & Transmutation Artifacts',
     category: 'Navigation',
     icon: 'market',
-    shortcut: 'G M',
     to: '/market',
     keywords: ['market', 'shop', 'store'],
   },
@@ -190,7 +183,6 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'Open Community',
     category: 'Navigation',
     icon: 'forum',
-    shortcut: 'G F',
     to: '/forum',
     keywords: ['community', 'forum'],
   },
@@ -199,7 +191,6 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'Open Activity Stream',
     category: 'Navigation',
     icon: 'stream',
-    shortcut: 'G A',
     to: '/stream',
     keywords: ['stream', 'activity'],
   },
@@ -248,7 +239,6 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'View Order Landing Portal',
     category: 'Navigation',
     icon: 'landing',
-    shortcut: 'G L',
     to: '/landing',
   },
   {
@@ -256,7 +246,6 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'Open Support',
     category: 'Navigation',
     icon: 'support',
-    shortcut: 'G S',
     to: '/support',
   },
   {
@@ -280,7 +269,6 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'Initiate Purge Protocol (Clear Neural Cache)',
     category: 'Rituals',
     icon: 'purge',
-    shortcut: 'ALT P',
     toast: {
       id: 'command-palette-purge',
       title: 'Purge Complete',
@@ -292,7 +280,6 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'Execute System Diagnostic Scan',
     category: 'System',
     icon: 'scan',
-    shortcut: 'CTRL S',
     toast: {
       id: 'command-palette-diagnostic',
       title: 'Diagnostic Complete',

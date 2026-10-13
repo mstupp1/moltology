@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
+import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { Link } from '@tanstack/react-router'
 import { Activity, Boxes, Eye, FlaskConical, ShieldCheck, Users } from 'lucide-react'
 import { CovenantWatchPage } from '@/components/forum/CovenantWatchPage'
@@ -179,9 +180,10 @@ const SECTORS = [
 ]
 
 function SectorDirectory() {
+  const premiumAccess = useHiddenPageAccess('premium')
   return (
     <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2.5" data-testid="admin-sectors">
-      {SECTORS.map((sector) => (
+      {SECTORS.filter((sector) => sector.to !== '/premium' || (!premiumAccess.pending && premiumAccess.canView)).map((sector) => (
         <Link
           key={sector.to}
           to={sector.to}
@@ -444,6 +446,7 @@ function ExperimentSwitches({ userId }: { userId: string | null }) {
     try {
       const next = await setExperimentFn({ data: { ...(await authData(userId)), id: row.id, on: !row.on } })
       setRows(next)
+      window.dispatchEvent(new CustomEvent('experiments-changed'))
       toast?.toast.success(`${row.title} is ${row.on ? 'off' : 'on'} for you.`, { id: `admin-experiment-${row.id}` })
     } catch (err: unknown) {
       toast?.toast.error(err instanceof Error ? err.message : 'Could not change that experiment.', {

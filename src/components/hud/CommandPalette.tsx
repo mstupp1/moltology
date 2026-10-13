@@ -98,10 +98,7 @@ export const CommandPalette: React.FC = () => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault()
-        setIsOpen((prev) => !prev)
-      } else if (e.key === 'Escape' && isOpen) {
+      if (e.key === 'Escape' && isOpen) {
         setIsOpen(false)
       }
     }
@@ -350,11 +347,6 @@ export const CommandPalette: React.FC = () => {
                             </div>
                           </div>
                         </div>
-                        {cmd.shortcut && (
-                          <span className="text-[11px] rounded-chip bg-surface-2 border border-line text-ink-muted px-2 py-0.5 font-sans">
-                            {cmd.shortcut}
-                          </span>
-                        )}
                       </button>
                     )
                   })

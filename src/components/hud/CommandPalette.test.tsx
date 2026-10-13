@@ -77,14 +77,13 @@ describe('CommandPalette Component', () => {
     expect(screen.queryByTestId('command-palette-overlay')).not.toBeInTheDocument()
   })
 
-  it('opens on Meta+K or Ctrl+K shortcut', () => {
+  it('does not open on Meta+K or Ctrl+K shortcut', () => {
     render(<ToastProvider><CommandPalette /></ToastProvider>)
 
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
-    expect(screen.getByTestId('command-palette-overlay')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText(/Type a command or search protocol/i)).toBeInTheDocument()
+    expect(screen.queryByTestId('command-palette-overlay')).not.toBeInTheDocument()
 
-    fireEvent.keyDown(window, { key: 'k', metaKey: true })
+    fireEvent.keyDown(window, { key: 'k', ctrlKey: true })
     expect(screen.queryByTestId('command-palette-overlay')).not.toBeInTheDocument()
   })
 

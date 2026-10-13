@@ -15,7 +15,7 @@ type Membership = {
 
 export function PremiumSettingsSection() {
   const persist = useHudPersist()
-  const access = useHiddenPageAccess()
+  const access = useHiddenPageAccess('premium')
   const toast = useOptionalToast()
   const toastRef = useRef(toast)
   toastRef.current = toast
@@ -33,8 +33,8 @@ export function PremiumSettingsSection() {
   }, [])
 
   useEffect(() => {
-    void load()
-  }, [load])
+    if (!access.pending && access.canView) void load()
+  }, [load, access.pending, access.canView])
 
   async function update(action: 'grant' | 'cancel') {
     if (!membership || busy) return
@@ -65,6 +65,8 @@ export function PremiumSettingsSection() {
       setBusy(null)
     }
   }
+
+  if (access.pending || !access.canView) return null
 
   if (!membership) {
     return (

@@ -1,4 +1,5 @@
-import { isAdmin } from './permissions'
+import { hasExperiment, type ExperimentId } from './experiments'
+import { getEffectiveRole, isAdmin } from './permissions'
 
 export type FeatureFlagAudience = 'admin-only' | 'public' | 'disabled'
 
@@ -7,11 +8,13 @@ export interface FeatureFlagDefinition {
   label: string
   description?: string
   audience: FeatureFlagAudience
+  experiment?: ExperimentId
 }
 
 export const FEATURE_FLAGS = {
   premium: {
     id: 'premium',
+    experiment: 'premium',
     label: 'Go Premium',
     description: 'Monthly premium subscription badge and access',
     audience: 'admin-only',
@@ -24,6 +27,7 @@ export interface FeatureFlagUserContext {
   role?: string | null
   email?: string | null
   emailVerified?: boolean | null
+  experiments?: unknown
 }
 
 /**
@@ -39,7 +43,7 @@ export function isFeatureFlagEnabled(
   if (flag.audience === 'public') return true
   if (flag.audience === 'disabled') return false
   if (flag.audience === 'admin-only') {
-    return isAdmin(user, profileRole)
+    return isAdmin(user, profileRole) && (!flag.experiment || hasExperiment(getEffectiveRole(user, profileRole), user?.experiments, flag.experiment))
   }
   return false
 }
@@ -58,7 +62,7 @@ export function isFeatureFlagPreview(
   const flag = (FEATURE_FLAGS as Record<string, FeatureFlagDefinition>)[flagId]
   if (!flag) return false
   if (flag.audience === 'admin-only') {
-    return isAdmin(user, profileRole)
+    return isAdmin(user, profileRole) && (!flag.experiment || hasExperiment(getEffectiveRole(user, profileRole), user?.experiments, flag.experiment))
   }
   return false
 }

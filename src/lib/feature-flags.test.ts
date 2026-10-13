@@ -12,8 +12,8 @@ describe('feature-flags', () => {
   })
 
   it('evaluates admin-only feature flag correctly for admins vs members', () => {
-    const adminUser = { role: 'admin' }
-    const memberUser = { role: 'user' }
+    const adminUser = { role: 'admin', experiments: ['premium'] }
+    const memberUser = { role: 'user', experiments: ['premium'] }
     const guestUser = null
 
     expect(isFeatureFlagEnabled('premium', adminUser)).toBe(true)
@@ -23,15 +23,20 @@ describe('feature-flags', () => {
   })
 
   it('marks admin-only flags as preview when viewed by an admin', () => {
-    const adminUser = { role: 'admin' }
-    const memberUser = { role: 'user' }
+    const adminUser = { role: 'admin', experiments: ['premium'] }
+    const memberUser = { role: 'user', experiments: ['premium'] }
 
     expect(isFeatureFlagPreview('premium', adminUser)).toBe(true)
     expect(isFeatureFlagPreview('premium', memberUser)).toBe(false)
   })
 
+  it('requires admins to opt in to Premium', () => {
+    expect(isFeatureFlagEnabled('premium', { role: 'admin' })).toBe(false)
+    expect(isFeatureFlagEnabled('premium', { role: 'admin', experiments: ['new-store'] })).toBe(false)
+  })
+
   it('returns false for unknown feature flags', () => {
-    expect(isFeatureFlagEnabled('non-existent-flag', { role: 'admin' })).toBe(false)
-    expect(isFeatureFlagPreview('non-existent-flag', { role: 'admin' })).toBe(false)
+    expect(isFeatureFlagEnabled('non-existent-flag', { role: 'admin', experiments: ['premium'] })).toBe(false)
+    expect(isFeatureFlagPreview('non-existent-flag', { role: 'admin', experiments: ['premium'] })).toBe(false)
   })
 })

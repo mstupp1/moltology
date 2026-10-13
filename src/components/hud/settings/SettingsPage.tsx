@@ -162,7 +162,7 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
           </>
         }
         title="Settings"
-        description="Choose your avatar, email preferences, sign-in methods, display ambience, command surface options, and Premium membership."
+        description="Choose your avatar, email preferences, sign-in methods, display ambience, and command surface options."
       />
 
       <PremiumSettingsSection />

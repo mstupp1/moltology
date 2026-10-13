@@ -12,7 +12,6 @@ import {
   Users,
   Atom,
   Search,
-  Command,
   LogOut,
   UserPlus,
   UserCheck,
@@ -36,6 +35,7 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
 import { ChromaElement, HeaderBrand, AnimatedHamburger } from '../ui'
+import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { getEffectiveRole, isAdmin } from '../../lib/permissions'
 import { isHiddenPagePath } from '../../lib/hidden-pages'
 import {
@@ -57,7 +57,7 @@ const GUEST_LOCKED_PATHS = new Set(['/lectures', '/chassis', '/connections', '/m
 
 export function computeNavItemHidden(
   item: { path: string; featureFlag?: FeatureFlagId },
-  user?: { email?: string | null; role?: string | null } | null,
+  user?: { email?: string | null; role?: string | null; experiments?: unknown } | null,
   userRole?: string | null,
 ): boolean {
   return (
@@ -447,7 +447,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   const canViewHiddenPages = isAdmin(user, userRole)
   const canViewAdmin = canViewHiddenPages
-  const showPremiumBadge = isFeatureFlagEnabled('premium', user, userRole)
+  const premiumAccess = useHiddenPageAccess('premium')
+  const showPremiumBadge = !premiumAccess.pending && premiumAccess.canView
   const isAdminActive =
     effectiveRoute === '/admin' ||
     (effectiveRoute !== '/' && effectiveRoute.startsWith('/admin'))
@@ -872,21 +873,15 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               className={`w-full flex items-center justify-between px-4 py-3 bg-surface-1 hover:bg-surface-2 text-xs font-sans text-ink-muted hover:text-ink transition-all group focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
                 isCollapsed ? 'justify-center px-0' : ''
               }`}
-              title="Search commands & protocols (⌘K)"
+              title="Search commands & protocols"
             >
               {isCollapsed ? (
                 <Search className="w-4 h-4 text-cyan-glow group-hover:scale-110 transition-transform mx-auto" />
               ) : (
-                <>
-                  <div className="flex items-center gap-2 truncate">
-                    <Search className="w-3.5 h-3.5 text-cyan-glow group-hover:scale-110 transition-transform shrink-0" />
-                    <span className="truncate">Search commands & protocols...</span>
-                  </div>
-                  <div className="flex items-center gap-0.5 rounded-chip bg-surface-2 border border-line text-ink-muted px-1.5 py-0.5 text-[11px] font-bold shrink-0 ml-2">
-                    <Command className="w-3 h-3" />
-                    <span>K</span>
-                  </div>
-                </>
+                <div className="flex items-center gap-2 truncate">
+                  <Search className="w-3.5 h-3.5 text-cyan-glow group-hover:scale-110 transition-transform shrink-0" />
+                  <span className="truncate">Search commands & protocols...</span>
+                </div>
               )}
             </button>
           </div>
@@ -1184,15 +1179,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   closeMobileMenu(() => handleOpenCommandPalette())
                 }}
                 className="w-full flex items-center justify-between px-4 py-3 text-xs font-sans text-ink-muted hover:text-ink transition-all group active:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
-                title="Search commands & protocols (⌘K)"
+                title="Search commands & protocols"
               >
                 <div className="flex items-center gap-2.5 truncate">
                   <Search className="w-4 h-4 text-cyan-glow shrink-0" />
                   <span className="truncate text-xs font-sans text-ink-body">Search commands & protocols...</span>
-                </div>
-                <div className="flex items-center gap-0.5 rounded-chip bg-surface-2 border border-line text-ink-muted px-2 py-0.5 text-[11px] font-bold shrink-0 ml-2">
-                  <Command className="w-3 h-3" />
-                  <span>K</span>
                 </div>
               </button>
             </div>
