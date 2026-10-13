@@ -813,6 +813,7 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
       if (publicUrls.length > 0) {
         queueResult = await queueInstagramCarousel({
           mediaUrls: publicUrls,
+          mediaPaths: slidePaths,
           caption: copy.caption,
           firstComment: copy.firstComment,
           queueId: DEFAULT_CAROUSEL_QUEUE_ID,

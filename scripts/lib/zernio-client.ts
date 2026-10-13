@@ -2,6 +2,9 @@ import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
 import os from 'node:os'
+import { createHash } from 'node:crypto'
+import { getMimeType } from '../../src/lib/ingest/s3-upload'
+import { getAbsoluteAssetUrl } from '../../src/lib/assets'
 
 export const ZERNIO_API_BASE_URL = 'https://zernio.com/api/v1'
 
@@ -154,13 +157,74 @@ export async function deleteZernioPost(postId: string): Promise<any> {
  * Core primitive to create and queue a post via Zernio POST /v1/posts.
  */
 export async function createZernioPost(
-  payload: ZernioCreatePostPayload
+  payload: ZernioCreatePostPayload,
+  localMediaPaths: Record<string, string> = {}
 ): Promise<ZernioPostResult> {
+  // Re-uploads get fresh URLs. Keep retries tied to the original logical payload.
+  const idempotencyKey = createHash('sha256').update(JSON.stringify(payload)).digest('hex')
+  // Stage all media before creating a post. Never fall back to an origin URL on failure.
+  const hostedUrls = new Map<string, string>()
+  const mediaItems: ZernioMediaItem[] = []
+  for (const item of payload.mediaItems || []) {
+    let url = hostedUrls.get(item.url)
+    if (!url) {
+      url = await uploadZernioMedia(item, localMediaPaths[item.url])
+      hostedUrls.set(item.url, url)
+    }
+    mediaItems.push({ ...item, url })
+  }
   const res = await fetchZernio<{ post: ZernioPostResult }>('/posts', {
     method: 'POST',
-    body: JSON.stringify(payload),
+    headers: { 'Idempotency-Key': idempotencyKey },
+    body: JSON.stringify({ ...payload, ...(payload.mediaItems ? { mediaItems } : {}) }),
   })
   return res.post
+}
+
+/** Upload local production media to Zernio; URL-only inputs are copied once. */
+export async function uploadZernioMedia(item: ZernioMediaItem, localFilePath?: string): Promise<string> {
+  const sourceUrl = new URL(item.url)
+  if (sourceUrl.protocol !== 'https:') throw new Error('Publishing media must use HTTPS.')
+  if (sourceUrl.hostname === 'media.zernio.com' && !localFilePath) return item.url
+
+  let filename: string
+  let contentType: string
+  let bytes: Uint8Array<ArrayBuffer>
+  if (localFilePath) {
+    filename = path.basename(localFilePath)
+    contentType = getMimeType(filename)
+    bytes = new Uint8Array(await fs.promises.readFile(localFilePath))
+  } else {
+    // Existing Neon URLs go through the site's CDN; normal production uses local files.
+    const response = await fetch(getAbsoluteAssetUrl(item.url))
+    if (!response.ok) throw new Error(`Could not read publishing media (HTTP ${response.status}).`)
+    filename = path.basename(sourceUrl.pathname)
+    contentType = response.headers.get('content-type')?.split(';')[0].trim() || getMimeType(filename)
+    bytes = new Uint8Array(await response.arrayBuffer())
+  }
+  if (!contentType.startsWith(`${item.type}/`)) {
+    throw new Error(`Expected ${item.type} media, received ${contentType}.`)
+  }
+  if (!bytes.byteLength || bytes.byteLength > 5 * 1024 ** 3) {
+    throw new Error('Publishing media must be nonempty and no larger than 5 GB.')
+  }
+  const presigned = await fetchZernio<{ uploadUrl: string; publicUrl: string }>('/media/presign', {
+    method: 'POST',
+    body: JSON.stringify({ filename, contentType, size: bytes.byteLength }),
+  })
+  if (new URL(presigned.uploadUrl).protocol !== 'https:' ||
+      new URL(presigned.publicUrl).protocol !== 'https:' ||
+      new URL(presigned.publicUrl).hostname !== 'media.zernio.com') {
+    throw new Error('Zernio returned an invalid media upload destination.')
+  }
+  // Signed storage PUTs must not receive the Zernio API Authorization header.
+  const upload = await fetch(presigned.uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': contentType },
+    body: bytes,
+  })
+  if (!upload.ok) throw new Error(`Zernio media upload failed (HTTP ${upload.status}).`)
+  return presigned.publicUrl
 }
 
 /**
@@ -192,6 +256,7 @@ export async function postZernioComment(
 
 export interface QueueInstagramPostOptions {
   mediaUrl: string
+  mediaPath?: string
   caption: string
   firstComment?: string
   queueId?: string
@@ -256,7 +321,7 @@ export async function queueInstagramPost(
     publishNow: options.publishNow || false,
   }
 
-  const post = await createZernioPost(postPayload)
+  const post = await createZernioPost(postPayload, options.mediaPath ? { [options.mediaUrl]: options.mediaPath } : {})
   console.log(`   ✅ Post queued successfully! Zernio ID: ${post._id}`)
   if (post.scheduledFor) {
     console.log(`   ⏰ Scheduled For: ${post.scheduledFor}`)
@@ -277,6 +342,7 @@ export async function queueInstagramPost(
 
 export interface QueueInstagramCarouselOptions {
   mediaUrls: string[]
+  mediaPaths?: string[]
   caption: string
   firstComment?: string
   queueId?: string
@@ -343,7 +409,12 @@ export async function queueInstagramCarousel(
     publishNow: options.publishNow || false,
   }
 
-  const post = await createZernioPost(postPayload)
+  if (options.mediaPaths && options.mediaPaths.length !== options.mediaUrls.length) {
+    throw new Error('Carousel file count must match its media URL count.')
+  }
+  const localMediaPaths = Object.fromEntries(options.mediaUrls.flatMap((url, i) =>
+    options.mediaPaths ? [[url, options.mediaPaths[i]]] : []))
+  const post = await createZernioPost(postPayload, localMediaPaths)
   console.log(`   ✅ Carousel queued successfully! Zernio ID: ${post._id}`)
   if (post.scheduledFor) {
     console.log(`   ⏰ Scheduled For: ${post.scheduledFor}`)
@@ -371,6 +442,7 @@ export async function queueInstagramCarousel(
 
 export interface QueueDualReelAndShortOptions {
   videoUrl: string
+  videoPath?: string
   instagramCaption: string
   youtubeTitle: string
   youtubeDescription: string
@@ -482,7 +554,7 @@ export async function queueDualReelAndShort(
     publishNow: options.publishNow || false,
   }
 
-  const post = await createZernioPost(postPayload)
+  const post = await createZernioPost(postPayload, options.videoPath ? { [options.videoUrl]: options.videoPath } : {})
   console.log(`   ✅ Reel / Short queued! Zernio Post ID: ${post._id}`)
   if (post.scheduledFor) {
     console.log(`   ⏰ Scheduled For: ${post.scheduledFor}`)

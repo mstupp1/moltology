@@ -115,7 +115,7 @@ describe('zernio-client', () => {
       } as any)
 
     const result = await queueInstagramPost({
-      mediaUrl: 'https://cdn.moltology.org/post.png',
+      mediaUrl: 'https://media.zernio.com/post.png',
       caption: 'Awesome caption',
       firstComment: 'Comment "GUIDE" for link',
       queueId: QUEUE_IDS.LEAD_MAGNETS_DAILY,
@@ -132,7 +132,7 @@ describe('zernio-client', () => {
 
   it('publishes immediately without queue scheduling fields and preserves failed status', async () => {
     const spy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({ ok: true, text: async () => JSON.stringify({ post: { _id: 'failed_1', status: 'failed' } }) } as any)
-    const result = await queueInstagramPost({ mediaUrl: 'https://cdn.moltology.org/post.png', caption: 'A quiet hour.', publishNow: true })
+    const result = await queueInstagramPost({ mediaUrl: 'https://media.zernio.com/post.png', caption: 'A quiet hour.', publishNow: true })
     const payload = JSON.parse(spy.mock.calls[0][1]?.body as string)
     expect(payload.publishNow).toBe(true)
     expect(payload).not.toHaveProperty('queueId')
@@ -143,7 +143,7 @@ describe('zernio-client', () => {
   it('supports dry-run mode for Instagram posts without making HTTP calls', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch')
     const result = await queueInstagramPost({
-      mediaUrl: 'https://cdn.moltology.org/post.png',
+      mediaUrl: 'https://media.zernio.com/post.png',
       caption: 'Awesome caption',
       firstComment: 'Comment "GUIDE"',
       dryRun: true,
@@ -172,7 +172,7 @@ describe('zernio-client', () => {
       } as any)
 
     const result = await queueInstagramCarousel({
-      mediaUrls: ['https://cdn.moltology.org/s1.png', 'https://cdn.moltology.org/s2.png'],
+      mediaUrls: ['https://media.zernio.com/s1.png', 'https://media.zernio.com/s2.png'],
       caption: 'Carousel caption',
       firstComment: 'Swipe to see',
       queueId: QUEUE_IDS.CAROUSELS_AND_POSTS,
@@ -185,7 +185,7 @@ describe('zernio-client', () => {
 
     const postPayload = JSON.parse(fetchSpy.mock.calls[0][1]?.body as string)
     expect(postPayload.mediaItems).toHaveLength(2)
-    expect(postPayload.mediaItems[0].url).toBe('https://cdn.moltology.org/s1.png')
+    expect(postPayload.mediaItems[0].url).toBe('https://media.zernio.com/s1.png')
   })
 
   it('queues reviewed carousel copy with AI disclosure and one native first comment', async () => {
@@ -194,7 +194,7 @@ describe('zernio-client', () => {
       text: async () => JSON.stringify({ post: { _id: 'swipe_lab_1', status: 'scheduled' } }),
     } as any)
     const result = await queueInstagramCarousel({
-      mediaUrls: ['https://cdn.moltology.org/s1.png', 'https://cdn.moltology.org/s2.png'],
+      mediaUrls: ['https://media.zernio.com/s1.png', 'https://media.zernio.com/s2.png'],
       caption: 'One task can fit inside a quiet hour.',
       firstComment: 'https://moltology.org/quiz',
       isAiGenerated: true,
@@ -214,7 +214,7 @@ describe('zernio-client', () => {
       .mockResolvedValueOnce({ ok: true, text: async () => JSON.stringify({ post: { _id: 'scheduled_reel', status: 'scheduled' } }) } as any)
       .mockResolvedValueOnce({ ok: false, text: async () => JSON.stringify({ message: 'No platform post ID yet' }) } as any)
     const result = await queueDualReelAndShort({
-      videoUrl: 'https://cdn.moltology.org/reel.mp4',
+      videoUrl: 'https://media.zernio.com/reel.mp4',
       instagramCaption: 'A quiet hour', youtubeTitle: 'A quiet hour',
       youtubeDescription: 'Take the audit', firstComment: 'Audit link',
     })
@@ -238,7 +238,7 @@ describe('zernio-client', () => {
       } as any)
 
     const result = await queueDualReelAndShort({
-      videoUrl: 'https://cdn.moltology.org/reel.mp4',
+      videoUrl: 'https://media.zernio.com/reel.mp4',
       instagramCaption: 'IG Reel caption',
       youtubeTitle: 'Epic YouTube Title #Shorts',
       youtubeDescription: 'Full description',
@@ -257,7 +257,7 @@ describe('zernio-client', () => {
     const postPayload = JSON.parse(fetchSpy.mock.calls[0][1]?.body as string)
     expect(postPayload.queueId).toBe(QUEUE_IDS.REELS_AND_SHORTS)
     expect(postPayload.mediaItems).toHaveLength(1)
-    expect(postPayload.mediaItems[0].url).toBe('https://cdn.moltology.org/reel.mp4')
+    expect(postPayload.mediaItems[0].url).toBe('https://media.zernio.com/reel.mp4')
     expect(postPayload.platforms).toHaveLength(2)
 
     // Instagram platform target
@@ -280,7 +280,7 @@ describe('zernio-client', () => {
   it('supports dry-run mode for unified Reel and Short without making HTTP calls', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch')
     const result = await queueDualReelAndShort({
-      videoUrl: 'https://cdn.moltology.org/reel.mp4',
+      videoUrl: 'https://media.zernio.com/reel.mp4',
       instagramCaption: 'IG Reel caption',
       youtubeTitle: 'Epic YouTube Title #Shorts',
       youtubeDescription: 'Full description',
@@ -302,7 +302,7 @@ describe('zernio-client', () => {
     } as any)
 
     const result = await queueDualReelAndShort({
-      videoUrl: 'https://cdn.moltology.org/reel.mp4',
+      videoUrl: 'https://media.zernio.com/reel.mp4',
       instagramCaption: 'IG caption',
       youtubeTitle: 'YouTube Short Title #Shorts',
       youtubeDescription: 'Full YT description',

@@ -354,6 +354,7 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
       if (publicUrl) {
         queueResult = await queueInstagramPost({
           mediaUrl: publicUrl,
+          mediaPath: finalImagePath,
           caption: postData.caption,
           firstComment: postData.firstComment,
           queueId: targetQueueId,
