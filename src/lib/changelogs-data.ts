@@ -14,6 +14,62 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    slug: '2026-10-09-forum-writing-and-progression-explorer',
+    version: '2026.10.09',
+    title: 'Better Forum Writing and a Clearer Progression Path',
+    category: 'Feature',
+    tags: ['Feature', 'Community', 'UI/UX', 'Guides', 'Media'],
+    summary: 'Write and format forum posts in a live editor, explore every clearance in a clearer progression view, and read a new report on robot simulation.',
+    content: `### Write More Easily in the Forum
+- Replaced raw Markdown editing and a separate preview with a rich-text editor that shows your formatting as you write.
+- Keep headings, lists, links, quotes, and member mentions together in one writing space.
+
+### Explore Your Progression Path
+- Rebuilt the progression view as an interactive guide to stages, clearances, and your current position.
+- Choose a daily routine pace to see an estimate of when later clearances may open, using the actual progression rules.
+
+### New from MoltNation
+- Published “The Cup You Nearly Dropped,” a report on why robot simulations need to be checked against physical conditions.
+- The story explains why realistic on-screen demonstrations still need to hold up in the physical world.`,
+    releasedAt: '2026-10-09T23:59:00Z',
+  },
+  {
+    slug: '2026-10-08-a-clearer-path-into-moltology',
+    version: '2026.10.08',
+    title: 'A Clearer Path into Moltology',
+    category: 'Design',
+    tags: ['Design', 'Improvement', 'UI/UX', 'Navigation'],
+    summary: 'The homepage now explains what Moltology offers and gives visitors a shorter path to the diagnostic, daily routine, learning, Oracle, and community.',
+    content: `### A More Useful First Visit
+- Rebuilt the homepage around a concise introduction and a clear sequence of ways to get started.
+- Gives visitors direct paths to the free diagnostic, daily routine, learning, Oracle, and community.
+
+### A Living Descent
+- Added layered artwork and gentle motion that reveal the page's ideas as you move down it.
+- Reworked the section illustrations so each part of the story has a clearer visual focus.`,
+    releasedAt: '2026-10-08T23:59:00Z',
+  },
+  {
+    slug: '2026-10-07-guided-moltmaxxing-and-public-pages',
+    version: '2026.10.07',
+    title: 'A More Guided Moltmaxxing Experience',
+    category: 'Feature',
+    tags: ['Feature', 'UI/UX', 'Guides', 'Navigation', 'Media'],
+    summary: 'Explore Moltology through a clearer story, understand your free diagnostic results with a new interactive map, and browse MoltNation from its new editorial front page.',
+    content: `### A Guided Introduction
+- Reworked the What Is Moltology pages into a guided descent that explains the ideas one step at a time.
+- Added clearer paths between the core ideas, practices, and member stories.
+
+### A Clearer Diagnostic and Field Manual
+- Turned the diagnostic's five results into an interactive map so you can explore each area and what it means.
+- Improved the quiz and Field Manual reader for phones and desktop, making it easier to work through the questions and revisit the guide.
+
+### New from MoltNation
+- Published “The Lid You Closed,” a dispatch about setting clear boundaries when work continues beyond the desk.
+- Redesigned the news front page to make new dispatches and useful reads easier to find.`,
+    releasedAt: '2026-10-07T23:59:00Z',
+  },
+  {
     slug: '2026-10-05-character-creator-head-shapes-builds-crab-heights',
     version: '2026.10.05',
     title: 'Character Creator: Head Shapes, Builds & Taller Crabs',

@@ -29,3 +29,6 @@ ds-bundle/
 
 # Generated guide downloads are published to the asset bucket.
 output/guide/*.pdf
+
+# Generated local Codex environment configuration (contains checkout-specific paths).
+/.codex/environments/environment.toml

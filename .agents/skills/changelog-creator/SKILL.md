@@ -29,10 +29,10 @@ Select the workflow matching the request:
 * **Database Target**: `scripts/ingest.ts` connects directly to Neon PostgreSQL (`changelogs` table). Defaults to the production database unless `--dev` is passed.
 * **Slug-Based Permalinks**: Each changelog entry generates a clean, URL-safe slug, served dynamically at `https://moltology.org/changelog/<slug>`.
 * **Flexible Versioning**: Strict SemVer is not required. Version tags can be custom (e.g. `v1.6.0`), date-based (e.g. `2026.08.20`), or auto-defaulted for daily updates. **For daily digests use date-based versions** (e.g. `2026.08.20`).
-* **Draft & Clean Workflow**: Drafts are authored temporarily in `content/changelogs/<slug>.md`, ingested via `scripts/ingest.ts --clean`, and automatically purged upon successful database commit.
+* **Draft & Archive Workflow**: Author temporary drafts in ignored `tmp/changelogs/<run-id>/<slug>.md`. After successful ingestion and verification in both databases, preserve the published Markdown in tracked `content/changelogs/<slug>.md` and commit it with the fallback data (§3 Step 6).
 * **One Post Per Day**: Keep the timeline clean — **at most one entry per calendar day**. Group all of a day's work into a single digest entry.
 * **Incremental Ingestion (No Full Re-verification Needed)**: Regular runs only need to validate and ingest the newly drafted entries. Do NOT wipe or batch re-verify the entire historical database for normal daily additions.
-* **Idempotent Upsert**: The ingestion CLI upserts on `slug`, so re-running is safe and drafts double as the durable source of truth.
+* **Idempotent Upsert**: The ingestion CLI upserts on `slug`, so re-running is safe. Committed Markdown archives are the durable source of truth; retain failed drafts in ignored `tmp/` for retry.
 
 ---
 
@@ -66,7 +66,7 @@ Every changelog entry must be a **high-level, plain explanation** of what was ch
 
 ## 2. Frontmatter & Schema Specification
 
-Every changelog draft created in `content/changelogs/<slug>.md` must include YAML frontmatter matching this schema:
+Every changelog draft created in `tmp/changelogs/<run-id>/<slug>.md` must include YAML frontmatter matching this schema:
 
 ```markdown
 ---
@@ -107,6 +107,8 @@ Use this default workflow whenever adding today's entry or ensuring recent runs 
 
 ### Step 1: Check Latest Date & Identify Missed Recent Days
 
+Record `git status --porcelain=v1` and inspect staged files before making changes. Track run-owned files and edits; preserve pre-existing and concurrent work.
+
 1. Check the latest release version in `src/lib/changelogs-data.ts` (or query the DB for the newest `version`).
 2. List recent git commit dates since that release:
 ```bash
@@ -119,7 +121,7 @@ git log --format='%ad|%s' --date=short | grep '^<YYYY-MM-DD>|'
 
 ### Step 2: Draft Temporary Markdown File(s)
 
-Create `content/changelogs/<slug>.md` only for the new / missed days.
+Create `tmp/changelogs/<run-id>/<slug>.md` only for the new / missed days. Use a fresh run directory so batch ingestion cannot pick up older drafts or the archive template.
 * **Significance Check**: Verify that each day contains meaningful user-facing features or major UI additions before authoring. Do not create entries for minor tweaks.
 * **Plain English**: Use plain, high-level explanations of what the user gained (no pseudo-scientific word salad, no heavy techno-babble, no slash-pair titles).
 * **Benefit-First**: Lead with what is now possible or improved for the user, followed by how it works.
@@ -128,7 +130,7 @@ Create `content/changelogs/<slug>.md` only for the new / missed days.
 
 Validate only the newly drafted markdown files without writing to the database:
 ```bash
-npx tsx scripts/ingest.ts content/changelogs/<new-slug>.md --dry-run
+npx tsx scripts/ingest.ts tmp/changelogs/<run-id>/<new-slug>.md --dry-run
 ```
 
 ### Step 4: Ingest to Neon Database & Prepend Seed
@@ -136,12 +138,12 @@ npx tsx scripts/ingest.ts content/changelogs/<new-slug>.md --dry-run
 1. Ingest only the new entries to development and production:
 ```bash
 # Ingest to DEV database:
-npx tsx scripts/ingest.ts content/changelogs/<new-slug>.md --dev
+npx tsx scripts/ingest.ts tmp/changelogs/<run-id>/<new-slug>.md --dev
 
 # Ingest to PROD database:
-npx tsx scripts/ingest.ts content/changelogs/<new-slug>.md
+npx tsx scripts/ingest.ts tmp/changelogs/<run-id>/<new-slug>.md
 ```
-*(Optionally add `--clean` if you want the temporary draft file automatically deleted after ingestion).*
+Do not use `--clean` on either write: keep the draft until both databases are verified, then archive it in Step 6. On partial failure, keep the draft in `tmp/`, check which database succeeded, and retry only the missing write. The CLI’s `--commit` currently commits blog posts only; changelogs need the explicit Git step below.
 
 2. Prepend the new entry/entries to `INITIAL_CHANGELOGS` in `src/lib/changelogs-data.ts` to keep the SSR fallback and seed data in sync.
 
@@ -156,6 +158,22 @@ Verify the latest records directly in Neon DB:
 ```bash
 npx tsx -e "require('dotenv').config(); const { neon } = require('@neondatabase/serverless'); const sql = neon(process.env.PROD_DATABASE_URL || process.env.DATABASE_URL); sql\`SELECT slug, version, title, \"releasedAt\" FROM changelogs ORDER BY \"releasedAt\" DESC LIMIT 5\`.then(r => console.log(r));"
 ```
+
+
+### Step 6: Archive, Commit & Confirm Cleanup (Required)
+
+1. After both database writes and verification succeed, move each run-owned draft to `content/changelogs/<slug>.md`. If an archive exists, compare it first and update it only when this run intentionally revised that entry. Never purge tracked archives with `--clean`.
+2. Review the archive and `src/lib/changelogs-data.ts` diff. Validate only the new archives with `--dry-run`; run `npm run test:core` and `npm run typecheck` when fallback data changed. Include any skill instructions or intentional production metadata changed by this run in its scoped review and commit.
+3. Commit reviewed run-owned files using explicit paths, for example:
+```bash
+git add -- content/changelogs/<slug>.md src/lib/changelogs-data.ts
+git commit --only -m "chore(changelog): archive <release-date> and sync fallback" -- content/changelogs/<slug>.md src/lib/changelogs-data.ts
+```
+`--only` keeps unrelated staged paths out of the commit. If a selected file contains unrelated edits, stage only this run's hunks and use an isolated index or separate worktree to commit them without consuming the user's staging. Do not commit the whole file in that case. Never use blanket `git add .` or `git add -A`.
+4. Keep temporary runners, logs, and failed drafts in ignored `tmp/`. Do not ignore `content/changelogs/` or fallback source changes to hide them. Remove only this run's disposable files if needed; do not use `reset --hard`, `clean -fd`, or a hidden stash to manufacture cleanliness.
+5. Check `git status --porcelain=v1` before returning. A run that starts clean must finish clean. A run that starts dirty must leave no new uncommitted or untracked work of its own; preserve and report unrelated leftovers. If publication, checks, or committing fails, retain recoverable files and report the failure rather than claiming completion. Push only when authorized; local commits satisfy this cleanup step.
+
+When the user explicitly requests cleanup of existing changelog leftovers, inspect and validate them, preserve legitimate Markdown in the tracked archive, and commit matching fallback changes. Do not re-publish existing entries just to clean Git status.
 
 ---
 
@@ -175,7 +193,7 @@ git log --format='%ad|%s' --date=short | grep '^<YYYY-MM-DD>|'
 * **Filter out insignificant days**: If a day only had minor styling adjustments, internal scripts, or backend maintenance, skip it.
 
 ### Step B: Draft one file per significant day
-Create `content/changelogs/<YYYY-MM-DD>-<theme>.md` per the schema, with:
+Create `tmp/changelogs/<run-id>/<YYYY-MM-DD>-<theme>.md` per the schema, with:
 * `version` = `YYYY.MM.DD` and `slug` = `YYYY-MM-DD-<theme>`.
 * `releasedAt` = `<YYYY-MM-DD>T23:59:00Z`.
 * One dominant `category` (see mapping) and plain, high-level, benefit-focused copy.
@@ -183,23 +201,23 @@ Create `content/changelogs/<YYYY-MM-DD>-<theme>.md` per the schema, with:
 
 ### Step C: Validate all drafts
 ```bash
-npx tsx scripts/ingest.ts --dir content/changelogs/ --dry-run
+npx tsx scripts/ingest.ts --dir tmp/changelogs/<run-id>/ --dry-run
 ```
 
 ### Step D: Stage in dev, then ship to prod
 1. Wipe the dev changelogs, ingest there, and visually verify `/changelog` (via local dev server):
 ```bash
 npx tsx -e "import { neon } from '@neondatabase/serverless'; const sql=neon(process.env.DEV_DATABASE_URL!); await sql\`DELETE FROM changelogs\`"
-npx tsx scripts/ingest.ts --dir content/changelogs/ --dev
+npx tsx scripts/ingest.ts --dir tmp/changelogs/<run-id>/ --dev
 ```
 2. After confirming dev looks right, wipe prod and ingest:
 ```bash
 npx tsx -e "import { neon } from '@neondatabase/serverless'; const sql=neon(process.env.PROD_DATABASE_URL!); await sql\`DELETE FROM changelogs\`"
-npx tsx scripts/ingest.ts --dir content/changelogs/
+npx tsx scripts/ingest.ts --dir tmp/changelogs/<run-id>/
 ```
 
 ### Step E: Sync the fallback seed
-`src/lib/changelogs-data.ts` (`INITIAL_CHANGELOGS`) is used as the loader fallback and for `db:seed`. Mirror the new timeline there so dev seed and the empty-DB fallback match production.
+`src/lib/changelogs-data.ts` (`INITIAL_CHANGELOGS`) is used as the loader fallback and for `db:seed`. Mirror the new timeline there so dev seed and the empty-DB fallback match production. Then follow §3 Step 6 to archive, commit, and verify cleanup for the full run.
 
 ---
 
@@ -211,6 +229,8 @@ Test submissions (e.g. "wrty", "fghfghfg", "hooray now Automated System Test Ent
 # Remove junk by known slug/version (point URL at the target branch):
 npx tsx -e "import { neon } from '@neondatabase/serverless'; const sql=neon(process.env.PROD_DATABASE_URL!); await sql\`DELETE FROM changelogs WHERE slug IN ('wrty','ghffghfgh','v1-5-1-test') OR version IN ('wrty','ghffghfgh','v1-5-1-test')\`"
 ```
+Update any affected tracked archives and fallback data, and follow §3 Step 6 to commit intentional changes and verify Git status.
+
 Then confirm none remain:
 ```bash
 npx tsx -e "import { neon } from '@neondatabase/serverless'; const sql=neon(process.env.PROD_DATABASE_URL!); console.log((await sql\`SELECT count(*)::int c FROM changelogs WHERE slug IN ('wrty','ghffghfgh','v1-5-1-test')\`)[0].c)"
@@ -222,12 +242,12 @@ npx tsx -e "import { neon } from '@neondatabase/serverless'; const sql=neon(proc
 
 | Command | Action |
 | :--- | :--- |
-| `npx tsx scripts/ingest.ts content/changelogs/<file>.md --dry-run` | Validates changelog markdown frontmatter without modifying the database. |
-| `npx tsx scripts/ingest.ts content/changelogs/<file>.md --clean` | Ingests changelog to production Neon DB and deletes local draft upon success. |
-| `npx tsx scripts/ingest.ts content/changelogs/<file>.md --dev --clean` | Ingests changelog to dev Neon DB and deletes local draft upon success. |
-| `npx tsx scripts/ingest.ts --dir content/changelogs/` | Batch ingests all markdown files in `content/changelogs/`. |
-| `npx tsx scripts/ingest.ts --dir content/changelogs/ --dev` | Batch ingest to dev branch. |
-| `npx tsx scripts/ingest.ts --dir content/changelogs/ --dry-run` | Batch validate all drafts without writing. |
+| `npx tsx scripts/ingest.ts tmp/changelogs/<run-id>/<file>.md --dry-run` | Validates changelog markdown frontmatter without modifying the database. |
+| `npx tsx scripts/ingest.ts tmp/changelogs/<run-id>/<file>.md --clean` | Ingests to production and deletes the draft; use only when both databases are already verified and a durable archive exists. |
+| `npx tsx scripts/ingest.ts tmp/changelogs/<run-id>/<file>.md --dev --clean` | Ingests to dev and deletes the draft; use only when both databases are already verified and a durable archive exists. |
+| `npx tsx scripts/ingest.ts --dir tmp/changelogs/<run-id>/` | Batch ingests only this run’s drafts. |
+| `npx tsx scripts/ingest.ts --dir tmp/changelogs/<run-id>/ --dev` | Batch ingest to dev branch. |
+| `npx tsx scripts/ingest.ts --dir tmp/changelogs/<run-id>/ --dry-run` | Batch validate all drafts without writing. |
 | `git log --format='%ad' --date=short | sort -r | uniq` | List distinct work days for a backfill. |
 
 > **Keep seed in sync**: whenever the timeline changes, update `INITIAL_CHANGELOGS` in `src/lib/changelogs-data.ts` so dev `db:seed` and the empty-DB fallback stay consistent with production.
