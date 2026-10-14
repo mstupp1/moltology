@@ -65,6 +65,7 @@
     "guide:pdf": "tsx scripts/generate-guide-pdf.ts",
     "tts:voices": "tsx scripts/list-fish-voices.ts",
     "simulate:activity": "tsx scripts/simulate-activity.ts",
+    "simulate:daily": "tsx scripts/simulate-activity.ts --daily",
     "simulate:prepare": "tsx scripts/simulate-activity.ts --prepare",
     "simulate:apply": "tsx scripts/simulate-activity.ts --apply",
     "db:retention-report": "tsx scripts/db-retention-report.ts",

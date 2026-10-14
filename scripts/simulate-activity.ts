@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import { runSimulationBatch } from './lib/simulation-batch'
 import {
   runSimulationCycle,
   prepareSimulationPlan,
@@ -7,6 +8,7 @@ import {
 
 async function main() {
   const args = process.argv.slice(2)
+  const daily = args.includes('--daily')
   const dryRun = args.includes('--dry-run')
   const forceSpawn = args.includes('--force-spawn')
   const spawnOnly = args.includes('--spawn-only')
@@ -32,6 +34,9 @@ async function main() {
       : 'tmp/simulation-plan.json'
 
   try {
+    if (daily && (isPrepare || isApply)) {
+      throw new Error('--daily is for autonomous execution. For in-prompt generation, prepare, generate, and apply each of the two ticks sequentially.')
+    }
     if (isPrepare) {
       console.log(`[SIMULATE] Preparing simulation plan for in-prompt generation...`)
       const plan = await prepareSimulationPlan({
@@ -64,7 +69,7 @@ async function main() {
     }
 
     // Default: Option 1 end-to-end execution via AI Gateway
-    const results = await runSimulationCycle({
+    const runTick = () => runSimulationCycle({
       dryRun,
       forceSpawn,
       spawnOnly,
@@ -75,6 +80,7 @@ async function main() {
       socialOnly,
       reviewOnly,
     })
+    const results = daily ? await runSimulationBatch(runTick) : await runTick()
     console.log('[SIMULATE] Result summary:', JSON.stringify(results, null, 2))
     process.exit(0)
   } catch (err) {

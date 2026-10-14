@@ -1838,7 +1838,7 @@ function shouldRunPhase(
 }
 
 /**
- * Primary simulation orchestrator. Runs every 12 hours via GitHub Actions.
+ * Single-tick simulation orchestrator. The daily CLI runs two ticks sequentially.
  */
 export async function runSimulationCycle(options: {
   dryRun?: boolean
@@ -1859,7 +1859,7 @@ export async function runSimulationCycle(options: {
   // Fail fast immediately if AI Gateway key is missing
   assertAiGatewayKey()
 
-  console.log('[SimulationCycle] Starting 12-hour activity simulation tick...')
+  console.log('[SimulationCycle] Starting activity simulation tick...')
   if (options.dryRun) {
     console.log('[SimulationCycle] Running in DRY-RUN mode (no database writes).')
   }
@@ -2121,7 +2121,7 @@ export interface PrepareSimulationPlanOptions {
 }
 
 /**
- * Deterministically prepares the 12-hour simulation cycle plan and extracts all
+ * Deterministically prepares a single simulation tick plan and extracts all
  * text generation prompts (for acolyte spawning and forum topics/replies) without calling an LLM.
  */
 export async function prepareSimulationPlan(
