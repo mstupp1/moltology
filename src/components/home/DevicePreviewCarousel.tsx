@@ -14,6 +14,7 @@ const ImageLightbox = React.lazy(() => import('@/components/ui/ImageLightbox').t
  */
 export function DevicePreviewCarousel() {
   const hostRef = useRef<HTMLDivElement>(null)
+  const tabRowRef = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(0)
   const [requested, setRequested] = useState<number | null>(null)
   const [mounted, setMounted] = useState<Set<number>>(() => new Set([0]))
@@ -108,23 +109,35 @@ export function DevicePreviewCarousel() {
     return () => window.clearInterval(timer)
   }, [active, loaded, failed, paused, hovered, focused, visible, pageVisible, reducedMotion, zoomed])
 
+  // Keep the active tab in view when the row scrolls sideways (phones). Scrolls the row only, never the page.
+  useEffect(() => {
+    const row = tabRowRef.current
+    const tab = row?.children[active] as HTMLElement | undefined
+    if (!row || !tab || row.scrollWidth <= row.clientWidth) return
+    const target = tab.offsetLeft - (row.clientWidth - tab.offsetWidth) / 2
+    row.scrollTo({ left: Math.max(0, target), behavior: reducedMotion ? 'auto' : 'smooth' })
+  }, [active, reducedMotion])
+
   return (
     <div ref={hostRef} role="region" aria-roledescription="carousel" aria-label="Platform screenshots" aria-busy={requested !== null}
       onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
       onFocusCapture={() => setFocused(true)}
       onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false) }}>
-      <div className="relative z-20 mb-4 flex flex-wrap items-center justify-center gap-1">
+      {/* On phones the tabs are one row that scrolls sideways, with the pause control pinned beside it. */}
+      <div className="relative z-20 mb-4 -mx-4 sm:mx-0 flex items-center justify-center gap-1">
+        <div ref={tabRowRef} className="home-preview-tabs relative flex min-w-0 items-center gap-1 overflow-x-auto px-4 sm:px-0 sm:overflow-visible sm:flex-wrap sm:justify-center">
         {DEVICE_PREVIEW_LIBRARY.map((shot, index) => (
           <button key={shot.id} type="button" aria-label={`Show ${shot.label} screenshot`} aria-pressed={active === index}
             disabled={failed.has(index)}
             onClick={() => { setPaused(true); setRequested(loaded.has(index) ? null : index); if (loaded.has(index)) setActive(index) }}
-            className={`rounded-control px-2 py-2 text-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow ${active === index ? 'bg-cyan-glow/10 text-cyan-glow' : 'text-ink-muted hover:text-ink-heading disabled:opacity-40'}`}>
+            className={`shrink-0 whitespace-nowrap rounded-control px-2.5 py-2 text-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow ${active === index ? 'bg-cyan-glow/10 text-cyan-glow' : 'text-ink-muted hover:text-ink-heading disabled:opacity-40'}`}>
             {shot.label}
           </button>
         ))}
+        </div>
         {!reducedMotion && <button type="button" onClick={() => setPaused(!paused)}
           aria-label={paused ? 'Play screenshot rotation' : 'Pause screenshot rotation'}
-          className="rounded-control p-2 text-ink-muted hover:text-ink-heading focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow">
+          className="shrink-0 mr-4 sm:mr-0 rounded-control p-2 text-ink-muted hover:text-ink-heading focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow">
           {paused ? <Play size={14} aria-hidden="true" /> : <Pause size={14} aria-hidden="true" />}
         </button>}
       </div>

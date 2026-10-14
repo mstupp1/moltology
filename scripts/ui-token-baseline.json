@@ -275,7 +275,7 @@
   "src/components/hud/search/SearchPage.tsx": {
     "hex-color": 35,
     "chamfer": 8,
-    "tiny-text": 4
+    "tiny-text": 3
   },
   "src/components/hud/welcome/CharacterCreationStep.tsx": {
     "hex-color": 55,

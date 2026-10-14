@@ -1,7 +1,8 @@
 import React, { Suspense, useRef, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { ArrowRight, BookOpen, Maximize2, Plus } from 'lucide-react'
+import { ArrowRight, BookOpen, Maximize2, Pin, Plus } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { ImageLightbox } from '@/components/ui/ImageLightbox'
 import { LandingAuthCtaSkeleton } from '@/components/LandingAuthCtaSkeleton'
 import { Eyebrow, StoryImg } from '@/components/what-is-moltology/story/StoryPrimitives'
@@ -54,7 +55,7 @@ export const HomeMelt: React.FC = () => {
   return (
     <section
       aria-labelledby="home-melt-title"
-      className="relative isolate overflow-hidden py-24 sm:py-36 bg-gradient-to-b from-[#020408] via-[#061722] to-[#020408]"
+      className="relative isolate overflow-hidden py-16 sm:py-36 bg-gradient-to-b from-[#020408] via-[#061722] to-[#020408]"
     >
       <SectionBackdrop image={HOME_BACKDROPS.surface} position="50% 20%" tone="surface" />
       <DepthLayer kind="shafts" className="-z-10 opacity-25" />
@@ -138,7 +139,7 @@ const ReadingCard: React.FC<{ reading: HomeReading }> = ({ reading }) => {
 export const HomeIdea: React.FC = () => (
   <section
     aria-labelledby="home-idea-title"
-    className="relative isolate overflow-hidden py-24 sm:py-32 bg-gradient-to-b from-[#020408] via-[#03101a] to-[#020408]"
+    className="relative isolate overflow-hidden py-16 sm:py-32 bg-gradient-to-b from-[#020408] via-[#03101a] to-[#020408]"
   >
     <SectionBackdrop image={HOME_BACKDROPS.seabed} position="50% 75%" drift={14} tone="seabed" />
     <div className="absolute inset-x-0 top-0 h-1/2 -z-10 bg-gradient-to-b from-[#020408]/80 via-[#020408]/35 to-transparent" aria-hidden="true" />
@@ -238,8 +239,8 @@ const StepAction: React.FC<{ step: HomeStep; onNavigate: (path: string) => void 
 )
 
 /** Quiet artwork supports the steps without decorative map or sonar rings. */
-const HowBackdrop: React.FC = () => (
-  <SectionBackdrop image={HOME_BACKDROPS.practice} tone="practice" drift={0} />
+const HowBackdrop: React.FC<{ className?: string }> = ({ className }) => (
+  <SectionBackdrop image={HOME_BACKDROPS.practice} tone="practice" drift={0} className={className} />
 )
 
 const HowItWorksIntro: React.FC = () => (
@@ -290,13 +291,15 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
 
   if (!pinned) {
     return (
-      <section ref={sectionRef} aria-labelledby="home-how-title" className="relative isolate overflow-hidden py-24 sm:py-32">
-        <HowBackdrop />
+      <section ref={sectionRef} aria-labelledby="home-how-title" className="relative isolate overflow-hidden py-16 sm:py-32">
+        {/* Stacked steps make the section several screens tall, which blows the art up behind the
+            step text, so narrow screens get the plain deep instead. */}
+        <HowBackdrop className="max-lg:hidden" />
         <div className="max-w-3xl mx-auto px-5 sm:px-8">
           <ScrollReveal>
             <HowItWorksIntro />
           </ScrollReveal>
-          <ol className="mt-16 space-y-20 sm:space-y-24">
+          <ol className="mt-16 space-y-16 sm:space-y-24">
             {HOME_STEPS.map((step, index) => (
               <li key={step.id}>
                 <ScrollReveal>
@@ -390,39 +393,103 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
 
 /* ── Voices: three members, three small wins ─────────────────────────── */
 
+/** Bubbles drifting up past the posts, as [left %, top %, size px, rise px]. Scroll-driven only. */
+const VOICE_BUBBLES: Array<[number, number, number, number]> = [
+  [6, 78, 6, 120], [11, 40, 3, 80], [18, 92, 4, 160], [47, 18, 3, 70], [52, 86, 7, 190],
+  [63, 55, 3, 110], [81, 30, 5, 140], [88, 72, 3, 90], [94, 12, 4, 60],
+]
+
+/** How far each post drifts against the scroll on wide screens, so they sit at different depths. */
+const VOICE_DRIFT = ['0px', '56px', '28px']
+
+/** Wide-screen placement: the pinned post leads, the other two offset beside and below it. */
+const VOICE_PLACEMENT = [
+  'md:col-span-7 md:row-span-2 md:self-start md:mt-4',
+  // Rises up beside the headline, which wraps short of this column on wide screens.
+  'md:col-start-8 md:col-span-5 md:row-start-1 md:-mt-40 lg:-mt-48',
+  'md:col-start-8 md:col-span-5 md:row-start-2 md:mt-2 lg:ml-10',
+]
+
+const VoicePost: React.FC<{ voice: (typeof HOME_VOICES)[number]; pinned: boolean }> = ({ voice, pinned }) => {
+  const accent = VOICE_STAGE_ACCENTS[voice.stage]
+  return (
+    <figure
+      className={`home-voice-post relative flex h-full flex-col rounded-card border p-6 sm:p-7 ${pinned ? 'border-cyan-glow/30 lg:p-9' : 'border-line-subtle'}`}
+    >
+      {pinned && (
+        <span className="absolute -top-3 right-5 inline-flex items-center gap-1 rounded-full border border-cyan-glow/40 bg-[#04131b] px-2.5 py-1 text-[11px] font-bold text-cyan-glow">
+          <Pin className="h-3 w-3" aria-hidden="true" />
+          Pinned
+        </span>
+      )}
+      <figcaption className="flex items-center gap-3">
+        <ForumAvatar authorName={voice.name} size={pinned ? 'lg' : 'md'} alt="" />
+        <span className="min-w-0">
+          <span className="block font-grotesk font-bold text-sm text-ink truncate">{voice.name}</span>
+          <span className="mt-1 inline-flex items-center gap-1.5 whitespace-nowrap text-xs text-ink-muted">
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: accent }} aria-hidden="true" />
+            <span style={{ color: accent }}>{VOICE_STAGE_LABELS[voice.stage]}</span>
+            <span aria-hidden="true">·</span>
+            {voice.clearance}
+          </span>
+        </span>
+      </figcaption>
+      <blockquote
+        className={`mt-5 font-grotesk text-ink leading-snug [text-wrap:pretty] ${pinned ? 'text-xl sm:text-2xl lg:text-[1.75rem]' : 'text-lg sm:text-xl'}`}
+      >
+        &ldquo;{voice.quote}&rdquo;
+      </blockquote>
+    </figure>
+  )
+}
+
+/**
+ * Three member posts rising through dark water. On wide screens they are staggered and drift at
+ * different depths as the page scrolls; on phones they are one row you swipe, the next post
+ * peeking in from the edge.
+ */
 export const HomeVoices: React.FC = () => (
-  <section aria-labelledby="home-voices-title" className="relative isolate overflow-hidden py-24 sm:py-32">
-    <SectionBackdrop image={HOME_BACKDROPS.gallery} position="60% 50%" tone="gallery" />
-    <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#020408]/45 via-transparent to-transparent" aria-hidden="true" />
+  <section aria-labelledby="home-voices-title" className="home-voices relative isolate overflow-hidden py-16 sm:py-32">
+    <div className="home-voices-water absolute inset-0 -z-10" aria-hidden="true" />
+    <DepthLayer kind="caustics" className="-z-10 opacity-50" />
+    <div className="absolute inset-0 -z-10 pointer-events-none" aria-hidden="true">
+      {VOICE_BUBBLES.map(([left, top, size, rise], i) => (
+        <span
+          key={i}
+          className="home-voices-bubble"
+          style={{ left: `${left}%`, top: `${top}%`, width: size, height: size, ['--rise' as string]: `${rise}px` }}
+        />
+      ))}
+    </div>
+    <SeamFade />
     <div className="max-w-6xl mx-auto px-5 sm:px-8">
-      <ScrollReveal className="max-w-3xl">
+      <ScrollReveal className="max-w-3xl md:max-w-[55%]">
         <Eyebrow color="#00ffcc">From the community</Eyebrow>
         <h2 id="home-voices-title" className={`mt-5 ${sectionTitle}`}>
           Nobody arrives armored.
         </h2>
       </ScrollReveal>
 
-      <div className="mt-14 sm:mt-16 grid gap-6 md:grid-cols-3">
+      <ul
+        className="home-voices-row mt-6 sm:mt-10 -mx-5 px-5 pt-4 pb-2 scroll-px-5 flex gap-4 overflow-x-auto snap-x snap-mandatory md:mx-0 md:px-0 md:pb-0 md:grid md:grid-cols-12 md:gap-6 md:overflow-visible"
+        aria-label="Member posts"
+      >
         {HOME_VOICES.map((voice, index) => (
-          <ScrollReveal key={voice.name} delayMs={index * 110}>
-            <figure className="home-voice-glass flex h-full flex-col justify-between rounded-card border border-line-subtle p-7 sm:p-8">
-              <blockquote className="font-grotesk text-lg sm:text-xl text-ink leading-snug [text-wrap:pretty]">
-                &ldquo;{voice.quote}&rdquo;
-              </blockquote>
-              <figcaption className="mt-8 flex items-center gap-3">
-                <span className="h-2 w-2 rounded-full" style={{ background: VOICE_STAGE_ACCENTS[voice.stage] }} aria-hidden="true" />
-                <span className="font-grotesk font-bold text-sm text-ink">{voice.name}</span>
-                <span className="text-xs text-ink-muted">
-                  {VOICE_STAGE_LABELS[voice.stage]} · {voice.clearance}
-                </span>
-              </figcaption>
-            </figure>
-          </ScrollReveal>
+          <li
+            key={voice.name}
+            className={`w-[84%] shrink-0 snap-center md:w-auto ${VOICE_PLACEMENT[index]}`}
+          >
+            <div className="home-voice-drift h-full md:h-auto" style={{ ['--drift-y' as string]: VOICE_DRIFT[index] }}>
+              <ScrollReveal delayMs={index * 110} className="h-full">
+                <VoicePost voice={voice} pinned={index === 0} />
+              </ScrollReveal>
+            </div>
+          </li>
         ))}
-      </div>
+      </ul>
 
       <ScrollReveal>
-        <Link to="/what-is-moltology/what-moltologists-say" className={`mt-12 text-[#00ffcc] ${textLink}`}>
+        <Link to="/what-is-moltology/what-moltologists-say" className={`mt-10 sm:mt-12 text-[#00ffcc] ${textLink}`}>
           Hear more from members
           <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
         </Link>
@@ -434,7 +501,7 @@ export const HomeVoices: React.FC = () => (
 /* ── Questions people ask right before they join ─────────────────────── */
 
 export const HomeFaq: React.FC = () => (
-  <section aria-labelledby="home-faq-title" className="relative isolate overflow-hidden py-24 sm:py-32">
+  <section aria-labelledby="home-faq-title" className="relative isolate overflow-hidden py-16 sm:py-32">
     {/* No artwork here: a breather between the voices and the invitation, lit faintly from above. */}
     <div
       className="absolute inset-0 -z-10"

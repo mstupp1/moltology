@@ -59,12 +59,12 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
           <HeroSea />
         </div>
 
-        <div className="relative z-[3] order-1 text-center lg:text-left">
+        <div className="home-hero-copy relative z-[3] order-1 text-center lg:text-left">
           <h1
             id="home-hero-title"
-            className="font-grotesk font-bold tracking-[-0.035em] text-white text-[clamp(3rem,13vw,4.5rem)] sm:text-[clamp(4.25rem,8vw,6.75rem)] lg:text-[clamp(4rem,5.6vw,6rem)] leading-[0.95] [text-shadow:0_10px_40px_rgba(0,0,0,0.85)]"
+            className="home-hero-title font-grotesk font-bold tracking-[-0.035em] text-white text-[clamp(3rem,13vw,4.5rem)] sm:text-[clamp(4.25rem,8vw,6.75rem)] lg:text-[clamp(4rem,5.6vw,6rem)] leading-[0.95] [text-shadow:0_10px_40px_rgba(0,0,0,0.85)]"
           >
-            <span className="block">Shed the noise.</span>
+            <span className="block whitespace-nowrap">Shed the noise.</span>
             <span className="home-hero-gradient block pb-[0.08em] [text-shadow:none]">Grow a shell.</span>
           </h1>
 

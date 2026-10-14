@@ -68,7 +68,7 @@ export const LandingPage: React.FC = () => {
 
       <ShellCompanion />
 
-      <MoltmaxGuideFloatingPill onOpenGuideModal={() => setIsGuideModalOpen(true)} />
+      <MoltmaxGuideFloatingPill onOpenGuideModal={() => setIsGuideModalOpen(true)} showAfterViewports={0.8} />
 
       {isGuideModalOpen && (
         <React.Suspense fallback={null}>

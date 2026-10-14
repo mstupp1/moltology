@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
 import { MoltmaxGuideCard } from '@/components/guide/MoltmaxGuideCard'
 import { MoltmaxGuideModal } from '@/components/guide/MoltmaxGuideModal'
@@ -97,6 +97,17 @@ describe('Moltmax Guide Lead Capture Components', () => {
     expect(onOpen).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: /Hide field manual offer/i }))
     expect(screen.queryByText(/Moltmaxxing Field Manual/i)).toBeNull()
+  })
+
+  it('keeps MoltmaxGuideFloatingPill hidden until the visitor scrolls past the opening screen', () => {
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true, writable: true })
+    render(<MoltmaxGuideFloatingPill onOpenGuideModal={vi.fn()} showAfterViewports={0.8} />)
+    expect(screen.queryByText(/Moltmaxxing Field Manual/i)).toBeNull()
+    act(() => {
+      window.scrollY = window.innerHeight
+      window.dispatchEvent(new Event('scroll'))
+    })
+    expect(screen.getByText(/Moltmaxxing Field Manual/i)).toBeDefined()
   })
 
   it('submitLeadHandler rejects a lead with no bot check token', async () => {
