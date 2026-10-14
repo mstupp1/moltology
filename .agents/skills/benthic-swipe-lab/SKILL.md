@@ -67,7 +67,7 @@ ImageGen may change a character's pose, expression, camera angle, and interactio
 
 Inspect local edit targets and identity references with `view_image` before using them. Label each input's role in the prompt: scaffold/edit target, character identity reference, or style reference. Keep exact reviewed text, hierarchy, margins, and factual diagrams intact during scaffold edits. For dense prompts, labels, or screenshots, generate the supporting artwork first and compose the exact text or factual layers with the renderer afterward. Visual polish must preserve the reader's ability to use the content.
 
-Inspect every final frame for spelling, margins, order, legibility, claims, identity, and consistency with the shared art direction. Iterate with targeted changes. Save each final prompt and its input reference roles beside the draft. Copy selected built-in outputs from their returned save paths into `tmp/swipe-lab/<slug>/` before finishing and record the final artifact paths; do not leave deliverables only in the tool's default output directory. Generated media belongs in workspace `tmp/` until publication; original Moltology media goes to S3, never tracked `public/`.
+Inspect every final frame for spelling, margins, order, legibility, claims, identity, and consistency with the shared art direction. Iterate with targeted changes. Save each final prompt and its input reference roles beside the draft. Copy selected built-in outputs from their returned save paths into `tmp/swipe-lab/<slug>/` before finishing and record the final artifact paths; do not leave deliverables only in the tool's default output directory. Generated media belongs in workspace `tmp/` until publication; finished Moltology social media and reviewed metadata go to the Google Drive social archive through the social CLI, with publishing media uploaded directly to Zernio, never tracked `public/`. Website and character source assets remain on S3.
 
 ## Ingest, queue and verify
 
@@ -88,3 +88,7 @@ Use the editorial queue through this CLI, never Zernio MCP tools. Reviewed-conte
 For a single image, follow `../instagram-post-creator/SKILL.md` with the Swipe Lab art direction and its reviewed JSON fields. For a video adaptation, follow `../reels-and-shorts-creator/SKILL.md` for references, budget, audio, six concrete beats, render inspection, and queueing; translate the selected format into those beats without recycling third-party clips. These handoffs preserve this skill's format choice, not the usual canned content.
 
 Return the chosen format, reference IDs, finished previews, draft path, and verified queue status, scheduled date/time with timezone, and Zernio post ID. For a draft-only request, report that it was not queued. Record confirmed queue/publishing results in the existing continuity ledger; preserve unrelated work and keep raw references private.
+
+## Social archive and retries
+
+See `docs/social-archive.md`. `SOCIAL_ARCHIVE_ROOT` overrides the existing Moltology folder, which must be available before queueing. The CLI preserves final files after publishing failures and saves confirmed Zernio media URLs, IDs, status and schedule in archive metadata and Git ledgers. A confirmed archived result is reused on retry. Dry-run/render-only modes do not write to Drive or publish. Do not reupload finished social archives to Neon.

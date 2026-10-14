@@ -9,7 +9,7 @@ description: >-
 
 # Viral Video Series Creator Pipeline (Google Flow ➔ Multi-Scene Ingest ➔ Zernio)
 
-This skill automates the complete lifecycle of high-production, episodic short-form video series for **Instagram Reels** and **YouTube Shorts**. It uses structured **Google Flow Veo 3.1 Multi-Scene Prompt Directives** to maximize generative video quality, drop-in video scene ingestion (`tmp/flow-video-ingest/`), episodic franchise tracking, retention loop scripting, sentence-isolated kinetic highlighted subtitles, multi-track atmospheric audio mixing, Neon S3 storage, and **Zernio queue staging**.
+This skill automates the complete lifecycle of high-production, episodic short-form video series for **Instagram Reels** and **YouTube Shorts**. It uses structured **Google Flow Veo 3.1 Multi-Scene Prompt Directives** to maximize generative video quality, drop-in video scene ingestion (`tmp/flow-video-ingest/`), episodic franchise tracking, retention loop scripting, sentence-isolated kinetic highlighted subtitles, multi-track atmospheric audio mixing, Google Drive archiving and direct Zernio media upload, and **Zernio queue staging**.
 
 Do not confuse this with [reels-and-shorts-creator](../reels-and-shorts-creator/SKILL.md). That skill is the daily six-scene Gemini Omni dispatch (`npm run reel:create`, ledger `content/social/instagram-reel-history.json`). This skill is the episodic franchise path (`npm run series:prompt` / `npm run series:create`, ledger `content/social/viral-series-ledger.json`). Same Instagram account, same Reels & Shorts queue. Do not duplicate a topic across both on the same day. Both paths follow [the Reels strategy](../../../content/social/reels-strategy.md), updated with the user's October 9, 2026 advice: physical action plus a blunt on-screen claim in the first second, one share/save CTA, and one planned variable per reel. These rules supersede older keyword funnels and exact repetition of the formula.
 
@@ -60,7 +60,7 @@ Stolen-format mapping (never a new franchise):
   - **Gemini API Image Polish**: Run the simplified frame through the Gemini API (`gemini-2.5-flash-image` via `scripts/generate-image.ts`) for extra 3D glassmorphic luminescence and slick subsurface textures when generating custom outro cards.
 * **Dynamic Multi-Track Audio (3-Track Mix)**: Native Video SFX (breathing, footsteps, creature screeches, impacts) + Fish Audio S2 Neural TTS Voiceover (primary, `s2.1-pro` via `FISH_VOICE_REFERENCE_ID`, +8% to +14% pacing) with Edge TTS fallback (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`) + Ducked Ambient Benthic Soundtrack (`assets/audio/benthic-ambient-loop.mp3`, dynamic harmonic offset rotation `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, volume `0.12`, smooth 0.8s entrance fade, and 1.5s musical outro fade)
 * **Visual Polish**: Minimalist Moltology Emblem watermark (`110x110`, `opacity=0.40`), sentence-isolated kinetic subtitles (word-by-word active glow in neon cyan `#00ffff` or amber `#f59e0b`), and seamless 0.20s `xfade` cross-dissolves between clips.
-* **Asset Storage**: Neon S3 (`videos/social/series/master-series-<seriesId>-s<season>e<episode>-<timestamp>.mp4`).
+* **Asset Storage**: Google Drive (`Projects/Moltology/Social Archive/YYYY/MM/<content-id>/`), written before direct Zernio upload.
 * **Publishing Engine**: Deterministic Zernio REST API through `scripts/lib/zernio-client.ts`. Inspect native first-comment settings and the returned schedule. A scheduled first comment has not been posted yet. The legacy automatic copy requires review under §4 before production queueing; **no manual MCP tool calls**.
 * **Dedicated Queue** (operational discipline, not a suggestion):
   - Profile ID: `6a7f74b1839bf39ff3b6aaaa` (Default Profile)
@@ -105,8 +105,8 @@ Google Flow stays a **human handoff**. The agent writes scene directives. The us
                                        │
                                        ▼ (Autonomous Publishing & Telemetry)
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  STAGE 4: S3 Ingestion, Deterministic Zernio Queueing & 1st Comment (CLI)   │
-│  - CLI uploads master video to Neon S3                                      │
+│  STAGE 4: Drive Archive, Deterministic Zernio Queueing & 1st Comment (CLI)   │
+│  - CLI archives master video in Drive, uploads directly to Zernio                                      │
 │  - CLI queues unified broadcast (Instagram Reel + YouTube Short, 1 slot)    │
 │  - Deterministically routes into Reels Queue (6a84b7702421e968ac81f5bd)     │
 │  - Configures algorithmic First Comment via native firstComment & API       │
@@ -201,7 +201,7 @@ npm run series:prompt -- --series ascension
 npm run series:create -- --series incidents --ingest-dir tmp/flow-video-ingest
 npm run series:create -- --series incidents --ingest-dir tmp/flow-video-ingest --cta-goal demo
 
-# 3. Dry-run test (local composite without S3 upload or Zernio staging):
+# 3. Dry-run test (local composite without Drive archive, media upload or Zernio staging):
 npm run series:create -- --series incidents --dry-run
 
 # 4. Immediate live publish. FORBIDDEN unless the user explicitly commands it this turn:
@@ -225,3 +225,7 @@ npm run series:create -- --series incidents --ingest-dir tmp/flow-video-ingest -
    - Record the episode ID, control, hypothesis, single variable and fixed settings in the strategy experiment log. After publication, fill 24-hour and 7-day retention, share/save rates and reach from actual analytics. Missing metrics are unavailable, not zero; legacy `commentTriggerKeyword` fields are not viewer activity.
 5. **One franchise until it loops**:
    - Default `--series incidents`. Keep the other four in the catalog. Do not rotate for variety. Do not mint a sixth franchise.
+
+## Social archive and retries
+
+See `docs/social-archive.md`. `SOCIAL_ARCHIVE_ROOT` overrides the existing Moltology folder, which must be available before queueing. The CLI preserves final files after publishing failures and saves confirmed Zernio media URLs, IDs, status and schedule in archive metadata and Git ledgers. A confirmed archived result is reused on retry. Dry-run/render-only modes do not write to Drive or publish. Do not reupload finished social archives to Neon.

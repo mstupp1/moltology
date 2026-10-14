@@ -59,6 +59,7 @@
     "composite:render": "tsx scripts/render-composite.ts",
     "composite:capture": "tsx scripts/render-composite.ts",
     "refs": "tsx scripts/composite-references.ts",
+    "social:archive": "tsx scripts/migrate-social-archive.ts",
     "post:create": "tsx scripts/create-instagram-post.ts",
     "carousel:create": "tsx scripts/create-instagram-carousel.ts",
     "guide:pdf": "tsx scripts/generate-guide-pdf.ts",

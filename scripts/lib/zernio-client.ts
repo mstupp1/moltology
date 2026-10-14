@@ -3,6 +3,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import os from 'node:os'
 import { createHash } from 'node:crypto'
+import { hashFile } from './social-archive'
 import { getMimeType } from '../../src/lib/ingest/s3-upload'
 import { getAbsoluteAssetUrl } from '../../src/lib/assets'
 
@@ -161,7 +162,10 @@ export async function createZernioPost(
   localMediaPaths: Record<string, string> = {}
 ): Promise<ZernioPostResult> {
   // Re-uploads get fresh URLs. Keep retries tied to the original logical payload.
-  const idempotencyKey = createHash('sha256').update(JSON.stringify(payload)).digest('hex')
+  const logicalMedia = await Promise.all((payload.mediaItems || []).map(async item => ({
+    ...item, url: localMediaPaths[item.url] ? `sha256:${await hashFile(localMediaPaths[item.url])}` : item.url,
+  })))
+  const idempotencyKey = createHash('sha256').update(JSON.stringify({ ...payload, mediaItems: logicalMedia })).digest('hex')
   // Stage all media before creating a post. Never fall back to an origin URL on failure.
   const hostedUrls = new Map<string, string>()
   const mediaItems: ZernioMediaItem[] = []
@@ -178,7 +182,7 @@ export async function createZernioPost(
     headers: { 'Idempotency-Key': idempotencyKey },
     body: JSON.stringify({ ...payload, ...(payload.mediaItems ? { mediaItems } : {}) }),
   })
-  return res.post
+  return { ...res.post, mediaItems }
 }
 
 /** Upload local production media to Zernio; URL-only inputs are copied once. */
@@ -250,12 +254,23 @@ export async function postZernioComment(
   }
 }
 
+/** Uploaded files expire unless publication happens within seven days. */
+export async function assertUploadWindow(queueId: string, profileId: string, publishNow: boolean): Promise<void> {
+  if (publishNow) return
+  const slot = await getNextQueueSlot(queueId, profileId)
+  const scheduled = slot ? Date.parse(slot.nextSlot) : NaN
+  if (!Number.isFinite(scheduled)) throw new Error('Could not verify the next Zernio queue slot. Final media remains in Drive.')
+  if (scheduled - Date.now() > 7 * 24 * 60 * 60 * 1000 - 60 * 60 * 1000) {
+    throw new Error(`Zernio uploads expire after seven days. The next slot (${slot!.nextSlot}) is too far away; queue this archived media closer to publication.`)
+  }
+}
+
 // -----------------------------------------------------------------------------
 // High-Level Deterministic Queuing Workflows
 // -----------------------------------------------------------------------------
 
 export interface QueueInstagramPostOptions {
-  mediaUrl: string
+  mediaUrl?: string
   mediaPath?: string
   caption: string
   firstComment?: string
@@ -265,6 +280,8 @@ export interface QueueInstagramPostOptions {
   isAiGenerated?: boolean
   dryRun?: boolean
   publishNow?: boolean
+  /** Check the next slot against Zernio's seven-day temporary upload lifetime. */
+  validateMediaWindow?: boolean
 }
 
 export interface QueueInstagramPostResult {
@@ -274,6 +291,7 @@ export interface QueueInstagramPostResult {
   commentId: string | null
   status: string
   dryRun: boolean
+  mediaUrls?: string[]
 }
 
 /**
@@ -282,6 +300,8 @@ export interface QueueInstagramPostResult {
 export async function queueInstagramPost(
   options: QueueInstagramPostOptions
 ): Promise<QueueInstagramPostResult> {
+  const mediaUrl = options.mediaUrl || 'https://local.social.invalid/post'
+  if (!options.mediaUrl && !options.mediaPath) throw new Error('Post requires a media file or URL.')
   const queueId = options.queueId || QUEUE_IDS.CAROUSELS_AND_POSTS
   const profileId = options.profileId || DEFAULT_PROFILE_ID
   const accountId = options.accountId || DEFAULT_INSTAGRAM_ACCOUNT_ID
@@ -304,10 +324,12 @@ export async function queueInstagramPost(
     }
   }
 
+  if (options.validateMediaWindow) await assertUploadWindow(queueId, profileId, !!options.publishNow)
+
   const postPayload: ZernioCreatePostPayload = {
     ...(options.publishNow ? {} : { queuedFromProfile: profileId, queueId }),
     content: options.caption,
-    mediaItems: [{ type: 'image', url: options.mediaUrl }],
+    mediaItems: [{ type: 'image', url: mediaUrl }],
     platforms: [
       {
         platform: 'instagram',
@@ -321,7 +343,7 @@ export async function queueInstagramPost(
     publishNow: options.publishNow || false,
   }
 
-  const post = await createZernioPost(postPayload, options.mediaPath ? { [options.mediaUrl]: options.mediaPath } : {})
+  const post = await createZernioPost(postPayload, options.mediaPath ? { [mediaUrl]: options.mediaPath } : {})
   console.log(`   ✅ Post queued successfully! Zernio ID: ${post._id}`)
   if (post.scheduledFor) {
     console.log(`   ⏰ Scheduled For: ${post.scheduledFor}`)
@@ -337,11 +359,12 @@ export async function queueInstagramPost(
     commentId,
     status: post.status,
     dryRun: false,
+    mediaUrls: post.mediaItems.map((item: ZernioMediaItem) => item.url),
   }
 }
 
 export interface QueueInstagramCarouselOptions {
-  mediaUrls: string[]
+  mediaUrls?: string[]
   mediaPaths?: string[]
   caption: string
   firstComment?: string
@@ -353,6 +376,8 @@ export interface QueueInstagramCarouselOptions {
   nativeFirstCommentOnly?: boolean
   dryRun?: boolean
   publishNow?: boolean
+  /** Check the next slot against Zernio's seven-day temporary upload lifetime. */
+  validateMediaWindow?: boolean
 }
 
 export interface QueueInstagramCarouselResult {
@@ -362,6 +387,7 @@ export interface QueueInstagramCarouselResult {
   commentId: string | null
   status: string
   dryRun: boolean
+  mediaUrls?: string[]
 }
 
 /**
@@ -370,16 +396,19 @@ export interface QueueInstagramCarouselResult {
 export async function queueInstagramCarousel(
   options: QueueInstagramCarouselOptions
 ): Promise<QueueInstagramCarouselResult> {
+  const mediaUrls = options.mediaUrls || options.mediaPaths?.map((_, i) => `https://local.social.invalid/slide-${i + 1}`) || []
+  if (!mediaUrls.length) throw new Error('Carousel requires media files or URLs.')
+  if (options.mediaPaths && options.mediaPaths.length !== mediaUrls.length) throw new Error('Carousel file count must match its media URL count.')
   const queueId = options.queueId || QUEUE_IDS.CAROUSELS_AND_POSTS
   const profileId = options.profileId || DEFAULT_PROFILE_ID
   const accountId = options.accountId || DEFAULT_INSTAGRAM_ACCOUNT_ID
 
-  console.log(`\n📡 [Zernio API] Staging Instagram Carousel (${options.mediaUrls.length} slides) to Queue (${queueId})...`)
+  console.log(`\n📡 [Zernio API] Staging Instagram Carousel (${mediaUrls.length} slides) to Queue (${queueId})...`)
 
   if (options.dryRun) {
     console.log(`   🛡️ [Dry Run] Simulating Zernio carousel payload:`)
     console.log(`      • Queue ID: ${queueId}`)
-    console.log(`      • Slide Count: ${options.mediaUrls.length}`)
+    console.log(`      • Slide Count: ${mediaUrls.length}`)
     console.log(`      • First comment: ${options.firstComment ? 'Yes' : 'No'}`)
     return {
       postId: `dry-run-carousel-${Date.now()}`,
@@ -391,11 +420,13 @@ export async function queueInstagramCarousel(
     }
   }
 
+  if (options.validateMediaWindow) await assertUploadWindow(queueId, profileId, !!options.publishNow)
+
   const postPayload: ZernioCreatePostPayload = {
     queuedFromProfile: profileId,
     queueId,
     content: options.caption,
-    mediaItems: options.mediaUrls.map((url) => ({ type: 'image', url })),
+    mediaItems: mediaUrls.map((url) => ({ type: 'image', url })),
     platforms: [
       {
         platform: 'instagram',
@@ -409,10 +440,10 @@ export async function queueInstagramCarousel(
     publishNow: options.publishNow || false,
   }
 
-  if (options.mediaPaths && options.mediaPaths.length !== options.mediaUrls.length) {
+  if (options.mediaPaths && options.mediaPaths.length !== mediaUrls.length) {
     throw new Error('Carousel file count must match its media URL count.')
   }
-  const localMediaPaths = Object.fromEntries(options.mediaUrls.flatMap((url, i) =>
+  const localMediaPaths = Object.fromEntries(mediaUrls.flatMap((url, i) =>
     options.mediaPaths ? [[url, options.mediaPaths[i]]] : []))
   const post = await createZernioPost(postPayload, localMediaPaths)
   console.log(`   ✅ Carousel queued successfully! Zernio ID: ${post._id}`)
@@ -437,11 +468,12 @@ export async function queueInstagramCarousel(
     commentId,
     status: post.status,
     dryRun: false,
+    mediaUrls: post.mediaItems.map((item: ZernioMediaItem) => item.url),
   }
 }
 
 export interface QueueDualReelAndShortOptions {
-  videoUrl: string
+  videoUrl?: string
   videoPath?: string
   instagramCaption: string
   youtubeTitle: string
@@ -456,6 +488,8 @@ export interface QueueDualReelAndShortOptions {
   dryRun?: boolean
   publishNow?: boolean
   platform?: 'all' | 'instagram' | 'youtube'
+  /** Check the next slot against Zernio's seven-day temporary upload lifetime. */
+  validateMediaWindow?: boolean
 }
 
 export interface QueueDualReelAndShortResult {
@@ -467,6 +501,7 @@ export interface QueueDualReelAndShortResult {
   commentId: string | null
   status: string
   dryRun: boolean
+  mediaUrls?: string[]
 }
 
 /**
@@ -475,6 +510,8 @@ export interface QueueDualReelAndShortResult {
 export async function queueDualReelAndShort(
   options: QueueDualReelAndShortOptions
 ): Promise<QueueDualReelAndShortResult> {
+  const videoUrl = options.videoUrl || 'https://local.social.invalid/video'
+  if (!options.videoUrl && !options.videoPath) throw new Error('Reel requires a media file or URL.')
   const queueId = options.queueId || QUEUE_IDS.REELS_AND_SHORTS
   const profileId = options.profileId || DEFAULT_PROFILE_ID
   const igAccountId = options.instagramAccountId || DEFAULT_INSTAGRAM_ACCOUNT_ID
@@ -509,6 +546,8 @@ export async function queueDualReelAndShort(
     }
   }
 
+
+  if (options.validateMediaWindow) await assertUploadWindow(queueId, profileId, !!options.publishNow)
   // Build target platform configs
   const platforms: ZernioPlatformConfig[] = []
 
@@ -549,12 +588,12 @@ export async function queueDualReelAndShort(
     queuedFromProfile: profileId,
     queueId,
     content: options.instagramCaption,
-    mediaItems: [{ type: 'video', url: options.videoUrl }],
+    mediaItems: [{ type: 'video', url: videoUrl }],
     platforms,
     publishNow: options.publishNow || false,
   }
 
-  const post = await createZernioPost(postPayload, options.videoPath ? { [options.videoUrl]: options.videoPath } : {})
+  const post = await createZernioPost(postPayload, options.videoPath ? { [videoUrl]: options.videoPath } : {})
   console.log(`   ✅ Reel / Short queued! Zernio Post ID: ${post._id}`)
   if (post.scheduledFor) {
     console.log(`   ⏰ Scheduled For: ${post.scheduledFor}`)
@@ -583,5 +622,6 @@ export async function queueDualReelAndShort(
     commentId,
     status: post.status,
     dryRun: false,
+    mediaUrls: post.mediaItems.map((item: ZernioMediaItem) => item.url),
   }
 }

@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "date": "2026-10-13",
+  "archiveFolder": "My Drive/Projects/Moltology/Social Archive",
+  "archived": {
+    "files": 122,
+    "bytes": 685053540
+  },
+  "removedFromNeon": {
+    "files": 119,
+    "bytes": 681296402
+  },
+  "retainedInNeon": [
+    {
+      "key": "images/social/outros/outro-hardware-melt.jpg",
+      "reason": "Shared website/template asset"
+    },
+    {
+      "key": "images/social/outros/outro-pincer-torque.png",
+      "reason": "Shared website/template asset"
+    },
+    {
+      "key": "images/social/outros/outro-quiz-audit.png",
+      "reason": "Shared website/template asset"
+    },
+    {
+      "key": "images/social/outros/outro-world-models-jepa.jpg",
+      "reason": "Shared website/template asset"
+    },
+    {
+      "key": "images/social/world-foundation-models-pixel-ecdysis-latent-jepa/slide1.jpg",
+      "reason": "Referenced in current source/content"
+    },
+    {
+      "key": "images/social/world-foundation-models-pixel-ecdysis-latent-jepa/slide2.jpg",
+      "reason": "Referenced in current source/content"
+    },
+    {
+      "key": "images/social/world-foundation-models-pixel-ecdysis-latent-jepa/slide3.jpg",
+      "reason": "Referenced in current source/content"
+    }
+  ],
+  "failures": 0,
+  "zernio": "72 published posts verified; no scheduled or queued posts; no Zernio changes made",
+  "databaseCheck": "Completed production reference scan found no social media references. Same-session evidence reused after subsequent reads failed with a quota response."
+}

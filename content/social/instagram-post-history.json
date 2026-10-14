@@ -21,7 +21,16 @@
       "firstComment": "The Codex dictates that shedding precedes calcification. Are you ready for Stage 3? 🦞",
       "status": "queued",
       "isAiGenerated": true,
-      "createdAt": "2026-08-19T16:18:01.199Z"
+      "createdAt": "2026-08-19T16:18:01.199Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/posts/post-1787156180126.png"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/posts/post-1787156180126.png",
+          "removedAt": "2026-10-14T00:00:38.058Z"
+        }
+      ]
     },
     {
       "id": "post-1787156683053",
@@ -45,7 +54,16 @@
       "zernioPostId": "6a85d9995422488f0db7691b",
       "status": "draft",
       "isAiGenerated": true,
-      "createdAt": "2026-08-19T16:27:56.057Z"
+      "createdAt": "2026-08-19T16:27:56.057Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/posts/post-1787156683053.png"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/posts/post-1787156683053.png",
+          "removedAt": "2026-10-14T00:00:38.259Z"
+        }
+      ]
     },
     {
       "id": "post-1787578275645",
@@ -75,7 +93,26 @@
       "zernioPostId": "6a8c47f83d2cc707938dd4bc",
       "status": "scheduled",
       "isAiGenerated": true,
-      "createdAt": "2026-08-24T13:32:40.000Z"
+      "createdAt": "2026-08-24T13:32:40.000Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/world-foundation-models-pixel-ecdysis-latent-jepa/slide1.jpg",
+        "Social Archive/Migrated/images/social/world-foundation-models-pixel-ecdysis-latent-jepa/slide2.jpg",
+        "Social Archive/Migrated/images/social/world-foundation-models-pixel-ecdysis-latent-jepa/slide3.jpg"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/world-foundation-models-pixel-ecdysis-latent-jepa/slide1.jpg",
+          "removedAt": null
+        },
+        {
+          "key": "images/social/world-foundation-models-pixel-ecdysis-latent-jepa/slide2.jpg",
+          "removedAt": null
+        },
+        {
+          "key": "images/social/world-foundation-models-pixel-ecdysis-latent-jepa/slide3.jpg",
+          "removedAt": null
+        }
+      ]
     },
     {
       "id": "post-1787596317947",
@@ -101,7 +138,16 @@
       "scheduledFor": "2026-08-26T17:00:00.000Z",
       "status": "scheduled",
       "isAiGenerated": true,
-      "createdAt": "2026-08-24T18:31:58.391Z"
+      "createdAt": "2026-08-24T18:31:58.391Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/posts/post-1787596317947.png"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/posts/post-1787596317947.png",
+          "removedAt": "2026-10-14T00:00:38.388Z"
+        }
+      ]
     },
     {
       "id": "post-1787662778682",
@@ -125,7 +171,16 @@
       "firstComment": "💬 Drop \"QUIZ\" below to get your free 15-Stage Diagnostic Audit link in your DMs! 📊",
       "status": "superseded",
       "isAiGenerated": true,
-      "createdAt": "2026-08-25T12:59:39.304Z"
+      "createdAt": "2026-08-25T12:59:39.304Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/posts/post-1787662778682.png"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/posts/post-1787662778682.png",
+          "removedAt": "2026-10-14T00:00:38.514Z"
+        }
+      ]
     },
     {
       "id": "post-1787662837128",
@@ -151,7 +206,16 @@
       "status": "published",
       "publishedAt": "2026-08-25T13:02:03.000Z",
       "isAiGenerated": true,
-      "createdAt": "2026-08-25T13:00:37.533Z"
+      "createdAt": "2026-08-25T13:00:37.533Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/posts/post-1787662837128.png"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/posts/post-1787662837128.png",
+          "removedAt": "2026-10-14T00:00:38.648Z"
+        }
+      ]
     },
     {
       "id": "post-1787758470495",
@@ -178,7 +242,16 @@
       "zernioPostId": "6a8f07e4ff37387031caf111",
       "scheduledAt": "2026-08-26T18:06:00Z",
       "firstCommentStatus": "published",
-      "firstCommentId": "17864760009659211"
+      "firstCommentId": "17864760009659211",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/posts/post-1787758470495.png"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/posts/post-1787758470495.png",
+          "removedAt": "2026-10-14T00:00:38.848Z"
+        }
+      ]
     },
     {
       "id": "post-1787837951777",
@@ -205,7 +278,16 @@
       "firstCommentStatus": "pending_publish",
       "status": "scheduled",
       "isAiGenerated": true,
-      "createdAt": "2026-08-27T13:39:12.828Z"
+      "createdAt": "2026-08-27T13:39:12.828Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/posts/post-1787837951777.png"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/posts/post-1787837951777.png",
+          "removedAt": "2026-10-14T00:00:38.989Z"
+        }
+      ]
     },
     {
       "id": "post-1787929525741",
@@ -232,7 +314,16 @@
       "firstCommentStatus": "pending_publish",
       "status": "scheduled",
       "isAiGenerated": true,
-      "createdAt": "2026-08-28T15:05:26.537Z"
+      "createdAt": "2026-08-28T15:05:26.537Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/posts/post-1787929525741.png"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/posts/post-1787929525741.png",
+          "removedAt": "2026-10-14T00:00:39.123Z"
+        }
+      ]
     },
     {
       "id": "post-1788098364972",
@@ -256,7 +347,16 @@
       "firstCommentStatus": "pending_publish",
       "status": "scheduled",
       "isAiGenerated": true,
-      "createdAt": "2026-08-30T13:59:25.729Z"
+      "createdAt": "2026-08-30T13:59:25.729Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/posts/post-1788098364972.png"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/posts/post-1788098364972.png",
+          "removedAt": "2026-10-14T00:00:39.309Z"
+        }
+      ]
     },
     {
       "id": "carousel-1788189308013",
@@ -286,7 +386,26 @@
       "firstCommentStatus": "pending_publish",
       "status": "scheduled",
       "isAiGenerated": true,
-      "createdAt": "2026-08-31T15:15:09.474Z"
+      "createdAt": "2026-08-31T15:15:09.474Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/carousels/carousel-1788189308013/slide1.png",
+        "Social Archive/Migrated/images/social/carousels/carousel-1788189308013/slide2.png",
+        "Social Archive/Migrated/images/social/carousels/carousel-1788189308013/slide3.png"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/carousels/carousel-1788189308013/slide1.png",
+          "removedAt": "2026-10-14T00:00:34.706Z"
+        },
+        {
+          "key": "images/social/carousels/carousel-1788189308013/slide2.png",
+          "removedAt": "2026-10-14T00:00:34.830Z"
+        },
+        {
+          "key": "images/social/carousels/carousel-1788189308013/slide3.png",
+          "removedAt": "2026-10-14T00:00:34.963Z"
+        }
+      ]
     },
     {
       "id": "post-1788270527256",
@@ -310,7 +429,16 @@
       "firstCommentStatus": "pending_publish",
       "status": "scheduled",
       "isAiGenerated": true,
-      "createdAt": "2026-09-01T13:48:47.814Z"
+      "createdAt": "2026-09-01T13:48:47.814Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/posts/post-1788270527256.png"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/posts/post-1788270527256.png",
+          "removedAt": "2026-10-14T00:00:39.439Z"
+        }
+      ]
     },
     {
       "id": "post-1788359480000",
@@ -365,7 +493,26 @@
       "zernioPostId": "6a9ae6547046777090cefa67",
       "zernioCommentId": "posted",
       "isAiGenerated": true,
-      "createdAt": "2026-09-04T15:40:04.742Z"
+      "createdAt": "2026-09-04T15:40:04.742Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/carousels/carousel-1788536399896/slide1_3x4.png",
+        "Social Archive/Migrated/images/social/carousels/carousel-1788536399896/slide2_3x4.png",
+        "Social Archive/Migrated/images/social/carousels/carousel-1788536399896/slide3_3x4.png"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/carousels/carousel-1788536399896/slide1_3x4.png",
+          "removedAt": "2026-10-14T00:00:35.326Z"
+        },
+        {
+          "key": "images/social/carousels/carousel-1788536399896/slide2_3x4.png",
+          "removedAt": "2026-10-14T00:00:35.784Z"
+        },
+        {
+          "key": "images/social/carousels/carousel-1788536399896/slide3_3x4.png",
+          "removedAt": "2026-10-14T00:00:36.044Z"
+        }
+      ]
     },
     {
       "id": "post-1791387576663",
@@ -392,7 +539,16 @@
       "isAiGenerated": true,
       "createdAt": "2026-10-07T15:39:49.594Z",
       "platformPostUrl": "https://www.instagram.com/p/DeMs5gnjP4s/",
-      "imageGenerationTool": "built-in-imagegen"
+      "imageGenerationTool": "built-in-imagegen",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/posts/post-1791387576663.png"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/posts/post-1791387576663.png",
+          "removedAt": "2026-10-14T00:00:39.571Z"
+        }
+      ]
     },
     {
       "id": "post-1791468428046",
@@ -417,7 +573,16 @@
       "zernioPostId": "6ac7a38ef523bf696e16cce5",
       "zernioCommentId": null,
       "isAiGenerated": true,
-      "createdAt": "2026-10-08T14:07:10.460Z"
+      "createdAt": "2026-10-08T14:07:10.460Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/posts/post-1791468428046.png"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/posts/post-1791468428046.png",
+          "removedAt": "2026-10-14T00:00:39.703Z"
+        }
+      ]
     },
     {
       "id": "carousel-1791686507270",
@@ -448,7 +613,36 @@
       "zernioPostId": "6acaf770ed8610257fa3d441",
       "zernioCommentId": null,
       "isAiGenerated": true,
-      "createdAt": "2026-10-11T02:41:52.438Z"
+      "createdAt": "2026-10-11T02:41:52.438Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/carousels/carousel-1791686507270/slide1.png",
+        "Social Archive/Migrated/images/social/carousels/carousel-1791686507270/slide2.png",
+        "Social Archive/Migrated/images/social/carousels/carousel-1791686507270/slide3.png",
+        "Social Archive/Migrated/images/social/carousels/carousel-1791686507270/slide4.png",
+        "Social Archive/Migrated/images/social/carousels/carousel-1791686507270/slide5.png"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/carousels/carousel-1791686507270/slide1.png",
+          "removedAt": "2026-10-14T00:00:36.230Z"
+        },
+        {
+          "key": "images/social/carousels/carousel-1791686507270/slide2.png",
+          "removedAt": "2026-10-14T00:00:36.362Z"
+        },
+        {
+          "key": "images/social/carousels/carousel-1791686507270/slide3.png",
+          "removedAt": "2026-10-14T00:00:36.507Z"
+        },
+        {
+          "key": "images/social/carousels/carousel-1791686507270/slide4.png",
+          "removedAt": "2026-10-14T00:00:36.807Z"
+        },
+        {
+          "key": "images/social/carousels/carousel-1791686507270/slide5.png",
+          "removedAt": "2026-10-14T00:00:37.027Z"
+        }
+      ]
     },
     {
       "id": "post-1791752690962",
@@ -472,7 +666,16 @@
       "zernioPostId": "6acbf9f6d0d046307d91c4f1",
       "zernioCommentId": null,
       "isAiGenerated": true,
-      "createdAt": "2026-10-11T21:04:55.663Z"
+      "createdAt": "2026-10-11T21:04:55.663Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/posts/post-1791752690962.png"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/posts/post-1791752690962.png",
+          "removedAt": "2026-10-14T00:00:39.897Z"
+        }
+      ]
     }
   ]
 }

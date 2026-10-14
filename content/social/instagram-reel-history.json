@@ -57,7 +57,16 @@
         "#Cybernetics",
         "#Moltology"
       ],
-      "createdAt": "2026-08-15T02:39:31.589Z"
+      "createdAt": "2026-08-15T02:39:31.589Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1786761448359.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1786761448359.mp4",
+          "removedAt": "2026-10-14T00:00:45.270Z"
+        }
+      ]
     },
     {
       "id": "reel-1786802669332",
@@ -88,7 +97,21 @@
         "#Moltology",
         "#Shorts"
       ],
-      "createdAt": "2026-08-15T14:06:10.711Z"
+      "createdAt": "2026-08-15T14:06:10.711Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/thumbnails/custom-thumbnail-1786802669332.jpg",
+        "Social Archive/Migrated/videos/social/reels/master-reel-1786802669332.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/thumbnails/custom-thumbnail-1786802669332.jpg",
+          "removedAt": "2026-10-14T00:00:42.450Z"
+        },
+        {
+          "key": "videos/social/reels/master-reel-1786802669332.mp4",
+          "removedAt": "2026-10-14T00:00:45.397Z"
+        }
+      ]
     },
     {
       "id": "reel-1786825223832",
@@ -155,7 +178,21 @@
         "#Moltology",
         "#Shorts"
       ],
-      "createdAt": "2026-08-16T14:05:41.354Z"
+      "createdAt": "2026-08-16T14:05:41.354Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/thumbnails/custom-thumbnail-1786889027858.jpg",
+        "Social Archive/Migrated/videos/social/reels/master-reel-1786889027858.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/thumbnails/custom-thumbnail-1786889027858.jpg",
+          "removedAt": "2026-10-14T00:00:42.594Z"
+        },
+        {
+          "key": "videos/social/reels/master-reel-1786889027858.mp4",
+          "removedAt": "2026-10-14T00:00:45.595Z"
+        }
+      ]
     },
     {
       "id": "reel-1786975428599",
@@ -185,7 +222,21 @@
         "#Moltology",
         "#Shorts"
       ],
-      "createdAt": "2026-08-17T14:05:25.018Z"
+      "createdAt": "2026-08-17T14:05:25.018Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/thumbnails/custom-thumbnail-1786975428599.jpg",
+        "Social Archive/Migrated/videos/social/reels/master-reel-1786975428599.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/thumbnails/custom-thumbnail-1786975428599.jpg",
+          "removedAt": "2026-10-14T00:00:42.737Z"
+        },
+        {
+          "key": "videos/social/reels/master-reel-1786975428599.mp4",
+          "removedAt": "2026-10-14T00:00:45.728Z"
+        }
+      ]
     },
     {
       "id": "reel-1786975456242",
@@ -218,7 +269,21 @@
         "#Moltology",
         "#Shorts"
       ],
-      "createdAt": "2026-08-17T14:06:08.101Z"
+      "createdAt": "2026-08-17T14:06:08.101Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/thumbnails/custom-thumbnail-1786975456242.jpg",
+        "Social Archive/Migrated/videos/social/reels/master-reel-1786975456242.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/thumbnails/custom-thumbnail-1786975456242.jpg",
+          "removedAt": "2026-10-14T00:00:42.878Z"
+        },
+        {
+          "key": "videos/social/reels/master-reel-1786975456242.mp4",
+          "removedAt": "2026-10-14T00:00:45.851Z"
+        }
+      ]
     },
     {
       "id": "reel-1787061867270",
@@ -248,7 +313,21 @@
         "#Moltology",
         "#Shorts"
       ],
-      "createdAt": "2026-08-18T14:04:55.385Z"
+      "createdAt": "2026-08-18T14:04:55.385Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/thumbnails/custom-thumbnail-1787061867270.jpg",
+        "Social Archive/Migrated/videos/social/reels/master-reel-1787061867270.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/thumbnails/custom-thumbnail-1787061867270.jpg",
+          "removedAt": "2026-10-14T00:00:43.093Z"
+        },
+        {
+          "key": "videos/social/reels/master-reel-1787061867270.mp4",
+          "removedAt": "2026-10-14T00:00:45.993Z"
+        }
+      ]
     },
     {
       "id": "reel-1787076467659",
@@ -278,7 +357,21 @@
         "#Moltology",
         "#Shorts"
       ],
-      "createdAt": "2026-08-18T18:10:09.039Z"
+      "createdAt": "2026-08-18T18:10:09.039Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/thumbnails/custom-thumbnail-1787076467659.jpg",
+        "Social Archive/Migrated/videos/social/reels/master-reel-1787076467659.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/thumbnails/custom-thumbnail-1787076467659.jpg",
+          "removedAt": "2026-10-14T00:00:43.223Z"
+        },
+        {
+          "key": "videos/social/reels/master-reel-1787076467659.mp4",
+          "removedAt": "2026-10-14T00:00:46.193Z"
+        }
+      ]
     },
     {
       "id": "reel-1787148318027",
@@ -309,7 +402,21 @@
         "#Moltology",
         "#Shorts"
       ],
-      "createdAt": "2026-08-19T14:05:40.504Z"
+      "createdAt": "2026-08-19T14:05:40.504Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/thumbnails/custom-thumbnail-1787148318027.jpg",
+        "Social Archive/Migrated/videos/social/reels/master-reel-1787148318027.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/thumbnails/custom-thumbnail-1787148318027.jpg",
+          "removedAt": "2026-10-14T00:00:43.498Z"
+        },
+        {
+          "key": "videos/social/reels/master-reel-1787148318027.mp4",
+          "removedAt": "2026-10-14T00:00:46.326Z"
+        }
+      ]
     },
     {
       "id": "reel-1787148838631",
@@ -340,7 +447,21 @@
         "#Moltology",
         "#Shorts"
       ],
-      "createdAt": "2026-08-19T14:15:38.384Z"
+      "createdAt": "2026-08-19T14:15:38.384Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/thumbnails/custom-thumbnail-1787148838631.jpg",
+        "Social Archive/Migrated/videos/social/reels/master-reel-1787148838631.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/thumbnails/custom-thumbnail-1787148838631.jpg",
+          "removedAt": "2026-10-14T00:00:43.627Z"
+        },
+        {
+          "key": "videos/social/reels/master-reel-1787148838631.mp4",
+          "removedAt": "2026-10-14T00:00:46.456Z"
+        }
+      ]
     },
     {
       "id": "reel-1787234609927",
@@ -375,7 +496,21 @@
         "#Moltology",
         "#Shorts"
       ],
-      "createdAt": "2026-08-20T14:05:25.923Z"
+      "createdAt": "2026-08-20T14:05:25.923Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/thumbnails/custom-thumbnail-1787234609927.jpg",
+        "Social Archive/Migrated/videos/social/reels/master-reel-1787234609927.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/thumbnails/custom-thumbnail-1787234609927.jpg",
+          "removedAt": "2026-10-14T00:00:43.756Z"
+        },
+        {
+          "key": "videos/social/reels/master-reel-1787234609927.mp4",
+          "removedAt": "2026-10-14T00:00:46.646Z"
+        }
+      ]
     },
     {
       "id": "reel-1787321492615",
@@ -408,7 +543,21 @@
         "#Moltology",
         "#Shorts"
       ],
-      "createdAt": "2026-08-21T14:13:30.388Z"
+      "createdAt": "2026-08-21T14:13:30.388Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/thumbnails/custom-thumbnail-1787321492615.jpg",
+        "Social Archive/Migrated/videos/social/reels/master-reel-1787321492615.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/thumbnails/custom-thumbnail-1787321492615.jpg",
+          "removedAt": "2026-10-14T00:00:44.094Z"
+        },
+        {
+          "key": "videos/social/reels/master-reel-1787321492615.mp4",
+          "removedAt": "2026-10-14T00:00:46.915Z"
+        }
+      ]
     },
     {
       "id": "reel-1787407434423",
@@ -443,7 +592,21 @@
         "#Moltology",
         "#Shorts"
       ],
-      "createdAt": "2026-08-22T14:06:25.343Z"
+      "createdAt": "2026-08-22T14:06:25.343Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/thumbnails/custom-thumbnail-1787407434423.jpg",
+        "Social Archive/Migrated/videos/social/reels/master-reel-1787407434423.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/thumbnails/custom-thumbnail-1787407434423.jpg",
+          "removedAt": "2026-10-14T00:00:44.241Z"
+        },
+        {
+          "key": "videos/social/reels/master-reel-1787407434423.mp4",
+          "removedAt": "2026-10-14T00:00:47.057Z"
+        }
+      ]
     },
     {
       "id": "reel-1787493908939",
@@ -479,7 +642,21 @@
         "#Moltology",
         "#Shorts"
       ],
-      "createdAt": "2026-08-23T14:07:44.360Z"
+      "createdAt": "2026-08-23T14:07:44.360Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/thumbnails/custom-thumbnail-1787493908939.jpg",
+        "Social Archive/Migrated/videos/social/reels/master-reel-1787493908939.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/thumbnails/custom-thumbnail-1787493908939.jpg",
+          "removedAt": "2026-10-14T00:00:44.371Z"
+        },
+        {
+          "key": "videos/social/reels/master-reel-1787493908939.mp4",
+          "removedAt": "2026-10-14T00:00:47.236Z"
+        }
+      ]
     },
     {
       "id": "reel-1787580318424",
@@ -515,7 +692,21 @@
       "ctaGoal": "quiz",
       "commentTriggerKeyword": "QUIZ",
       "commentTriggerUrl": "https://moltology.org/quiz",
-      "createdAt": "2026-08-24T14:07:51.455Z"
+      "createdAt": "2026-08-24T14:07:51.455Z",
+      "archivePaths": [
+        "Social Archive/Migrated/images/social/thumbnails/custom-thumbnail-1787580318424.jpg",
+        "Social Archive/Migrated/videos/social/reels/master-reel-1787580318424.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "images/social/thumbnails/custom-thumbnail-1787580318424.jpg",
+          "removedAt": "2026-10-14T00:00:44.547Z"
+        },
+        {
+          "key": "videos/social/reels/master-reel-1787580318424.mp4",
+          "removedAt": "2026-10-14T00:00:47.373Z"
+        }
+      ]
     },
     {
       "id": "reel-1787666684548",
@@ -553,7 +744,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-08-25T14:07:44.583Z"
+      "createdAt": "2026-08-25T14:07:44.583Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1787666684548.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1787666684548.mp4",
+          "removedAt": "2026-10-14T00:00:47.515Z"
+        }
+      ]
     },
     {
       "id": "reel-1787753155790",
@@ -589,7 +789,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-08-26T14:07:51.006Z"
+      "createdAt": "2026-08-26T14:07:51.006Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1787753155790.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1787753155790.mp4",
+          "removedAt": "2026-10-14T00:00:47.693Z"
+        }
+      ]
     },
     {
       "id": "reel-1787839499239",
@@ -624,7 +833,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-08-27T14:06:57.868Z"
+      "createdAt": "2026-08-27T14:06:57.868Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1787839499239.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1787839499239.mp4",
+          "removedAt": "2026-10-14T00:00:47.823Z"
+        }
+      ]
     },
     {
       "id": "reel-1787925864275",
@@ -661,7 +879,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-08-28T14:06:03.491Z"
+      "createdAt": "2026-08-28T14:06:03.491Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1787925864275.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1787925864275.mp4",
+          "removedAt": "2026-10-14T00:00:47.965Z"
+        }
+      ]
     },
     {
       "id": "reel-1788012281358",
@@ -701,7 +928,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-08-29T14:06:44.483Z"
+      "createdAt": "2026-08-29T14:06:44.483Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1788012281358.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1788012281358.mp4",
+          "removedAt": "2026-10-14T00:00:48.097Z"
+        }
+      ]
     },
     {
       "id": "reel-1788098716073",
@@ -738,7 +974,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-08-30T14:07:04.824Z"
+      "createdAt": "2026-08-30T14:07:04.824Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1788098716073.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1788098716073.mp4",
+          "removedAt": "2026-10-14T00:00:48.287Z"
+        }
+      ]
     },
     {
       "id": "reel-1788185071247",
@@ -779,7 +1024,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-08-31T14:06:47.488Z"
+      "createdAt": "2026-08-31T14:06:47.488Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1788185071247.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1788185071247.mp4",
+          "removedAt": "2026-10-14T00:00:48.410Z"
+        }
+      ]
     },
     {
       "id": "reel-1788271485345",
@@ -820,7 +1074,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-09-01T14:07:30.118Z"
+      "createdAt": "2026-09-01T14:07:30.118Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1788271485345.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1788271485345.mp4",
+          "removedAt": "2026-10-14T00:00:48.550Z"
+        }
+      ]
     },
     {
       "id": "reel-1788357888935",
@@ -861,7 +1124,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-09-02T14:06:55.207Z"
+      "createdAt": "2026-09-02T14:06:55.207Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1788363051233.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1788363051233.mp4",
+          "removedAt": "2026-10-14T00:00:48.881Z"
+        }
+      ]
     },
     {
       "id": "reel-1788444573873",
@@ -901,7 +1173,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-09-03T14:12:05.153Z"
+      "createdAt": "2026-09-03T14:12:05.153Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1788444573873.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1788444573873.mp4",
+          "removedAt": "2026-10-14T00:00:49.022Z"
+        }
+      ]
     },
     {
       "id": "reel-1788530703803",
@@ -941,7 +1222,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-09-04T14:07:47.601Z"
+      "createdAt": "2026-09-04T14:07:47.601Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1788530703803.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1788530703803.mp4",
+          "removedAt": "2026-10-14T00:00:49.168Z"
+        }
+      ]
     },
     {
       "id": "reel-1788803223224",
@@ -982,7 +1272,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-09-07T17:48:55.407Z"
+      "createdAt": "2026-09-07T17:48:55.407Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1788803223224.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1788803223224.mp4",
+          "removedAt": "2026-10-14T00:00:49.386Z"
+        }
+      ]
     },
     {
       "id": "reel-1788876613403",
@@ -1022,7 +1321,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-09-08T14:12:32.071Z"
+      "createdAt": "2026-09-08T14:12:32.071Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1788876613403.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1788876613403.mp4",
+          "removedAt": "2026-10-14T00:00:49.526Z"
+        }
+      ]
     },
     {
       "id": "reel-1788965158995",
@@ -1063,7 +1371,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-09-09T14:48:23.223Z"
+      "createdAt": "2026-09-09T14:48:23.223Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1788965158995.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1788965158995.mp4",
+          "removedAt": "2026-10-14T00:00:49.676Z"
+        }
+      ]
     },
     {
       "id": "reel-1789049222923",
@@ -1103,7 +1420,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-09-10T14:08:55.511Z"
+      "createdAt": "2026-09-10T14:08:55.511Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1789049222923.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1789049222923.mp4",
+          "removedAt": "2026-10-14T00:00:49.861Z"
+        }
+      ]
     },
     {
       "id": "reel-1789135568773",
@@ -1143,7 +1469,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-09-11T14:07:55.806Z"
+      "createdAt": "2026-09-11T14:07:55.806Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1789135568773.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1789135568773.mp4",
+          "removedAt": "2026-10-14T00:00:50.002Z"
+        }
+      ]
     },
     {
       "id": "reel-1789402502553",
@@ -1183,7 +1518,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-09-14T16:15:04.655Z"
+      "createdAt": "2026-09-14T16:15:04.655Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1789394770057.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1789394770057.mp4",
+          "removedAt": "2026-10-14T00:00:50.131Z"
+        }
+      ]
     },
     {
       "id": "reel-1789741150012",
@@ -1223,7 +1567,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-09-18T14:21:24.643Z"
+      "createdAt": "2026-09-18T14:21:24.643Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1789741150012.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1789741150012.mp4",
+          "removedAt": "2026-10-14T00:00:50.316Z"
+        }
+      ]
     },
     {
       "id": "reel-1790000224981",
@@ -1263,7 +1616,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-09-21T14:19:09.585Z"
+      "createdAt": "2026-09-21T14:19:09.585Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1790000224981.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1790000224981.mp4",
+          "removedAt": "2026-10-14T00:00:50.447Z"
+        }
+      ]
     },
     {
       "id": "reel-1790172883701",
@@ -1303,7 +1665,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-09-23T14:16:56.132Z"
+      "createdAt": "2026-09-23T14:16:56.132Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1790172883701.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1790172883701.mp4",
+          "removedAt": "2026-10-14T00:00:50.585Z"
+        }
+      ]
     },
     {
       "id": "reel-1790477447942",
@@ -1343,7 +1714,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-09-27T02:53:32.276Z"
+      "createdAt": "2026-09-27T02:53:32.276Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1790477447942.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1790477447942.mp4",
+          "removedAt": "2026-10-14T00:00:50.714Z"
+        }
+      ]
     },
     {
       "id": "reel-1790604757901",
@@ -1383,7 +1763,16 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-09-28T14:14:54.823Z"
+      "createdAt": "2026-09-28T14:14:54.823Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1790604757901.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1790604757901.mp4",
+          "removedAt": "2026-10-14T00:00:50.912Z"
+        }
+      ]
     },
     {
       "id": "reel-1790778412859",
@@ -1424,7 +1813,16 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-09-30T14:27:50.753Z",
-      "updatedAt": "2026-10-02T19:24:10.941Z"
+      "updatedAt": "2026-10-02T19:24:10.941Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1790778412859-v2.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1790778412859-v2.mp4",
+          "removedAt": "2026-10-14T00:00:51.436Z"
+        }
+      ]
     },
     {
       "id": "reel-1790870583502",
@@ -1466,7 +1864,16 @@
       },
       "createdAt": "2026-10-01T16:13:15.863Z",
       "publishedAt": "2026-10-08T22:30:00.000Z",
-      "updatedAt": "2026-10-08T22:33:43.744Z"
+      "updatedAt": "2026-10-08T22:33:43.744Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1790870583502.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1790870583502.mp4",
+          "removedAt": "2026-10-14T00:00:51.728Z"
+        }
+      ]
     },
     {
       "id": "reel-1791464431126",
@@ -1504,7 +1911,16 @@
       },
       "createdAt": "2026-10-08T13:10:11.632Z",
       "firstCommentStatus": "scheduled",
-      "updatedAt": "2026-10-08T13:14:13.580Z"
+      "updatedAt": "2026-10-08T13:14:13.580Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/reels/master-reel-1791464431126-v2.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/reels/master-reel-1791464431126-v2.mp4",
+          "removedAt": "2026-10-14T00:00:51.949Z"
+        }
+      ]
     }
   ]
 }

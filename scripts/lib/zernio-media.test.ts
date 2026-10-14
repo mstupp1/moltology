@@ -126,6 +126,47 @@ describe('Zernio hosted publishing media', () => {
     expect(spy).not.toHaveBeenCalled()
   })
 
+  it('stops before uploading when the next queue slot exceeds temporary media lifetime', async () => {
+    const spy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(json({ nextSlot: new Date(Date.now() + 10 * 86400000).toISOString(), timezone: 'America/New_York' }))
+    await expect(queueInstagramPost({ mediaPath: path.join(tempDir, 'post.png'), caption: 'Caption', validateMediaWindow: true })).rejects.toThrow('expire after seven days')
+    expect(spy).toHaveBeenCalledOnce()
+  })
+
+  it('accepts local-only inputs and returns the hosted media URLs', async () => {
+    const spy = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(json({ uploadUrl: storageUrl, publicUrl: hosted }))
+      .mockResolvedValueOnce(new Response(null))
+      .mockResolvedValueOnce(json({ post: { _id: 'local', status: 'scheduled' } }))
+    const result = await queueInstagramPost({ mediaPath: path.join(tempDir, 'post.png'), caption: 'Caption' })
+    expect(result.mediaUrls).toEqual([hosted])
+    expect(spy).toHaveBeenCalledTimes(3)
+  })
+
+  it('rejects missing media and mismatched local slide counts before uploading', async () => {
+    const spy = vi.spyOn(globalThis, 'fetch')
+    await expect(queueInstagramPost({ caption: 'Caption' })).rejects.toThrow('requires')
+    await expect(queueInstagramCarousel({ mediaUrls: [hosted], mediaPaths: [], caption: 'Caption' })).rejects.toThrow('count')
+    expect(spy).not.toHaveBeenCalled()
+  })
+
+  it('keeps local-only retry identities stable across file renames and changes them for different bytes', async () => {
+    const spy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (url) => {
+      if (String(url).endsWith('/media/presign')) return json({ uploadUrl: storageUrl, publicUrl: hosted })
+      if (url === storageUrl) return new Response(null)
+      return json({ post: { _id: 'id', status: 'scheduled' } })
+    })
+    const original = path.join(tempDir, 'post.png')
+    await queueInstagramPost({ mediaPath: original, caption: 'Caption' })
+    const renamed = path.join(tempDir, 'renamed.png')
+    fs.renameSync(original, renamed)
+    await queueInstagramPost({ mediaPath: renamed, caption: 'Caption' })
+    fs.writeFileSync(renamed, new Uint8Array([9, 8, 7]))
+    await queueInstagramPost({ mediaPath: renamed, caption: 'Caption' })
+    const keys = [2, 5, 8].map(i => (spy.mock.calls[i][1]!.headers as Record<string, string>)['Idempotency-Key'])
+    expect(keys[0]).toBe(keys[1])
+    expect(keys[2]).not.toBe(keys[0])
+  })
+
   it('keeps an identical idempotency key when a retry uploads a fresh hosted URL', async () => {
     const spy = vi.spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce(json({ uploadUrl: storageUrl, publicUrl: hosted }))
