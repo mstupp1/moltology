@@ -15,6 +15,11 @@ import { getAssetUrl } from '@/lib/assets'
 export interface MoltmaxGuideFloatingPillProps {
   onOpenGuideModal: () => void
   cooldownSeconds?: number
+  /**
+   * Keep the pill out of the way until the visitor has scrolled this many viewport heights,
+   * so it never sits on a page's opening frame. Off (shown at once) by default.
+   */
+  showAfterViewports?: number
 }
 
 const STORAGE_KEY_DISMISSED_AT = 'moltmax_guide_pill_dismissed_at_ts'
@@ -23,9 +28,11 @@ const DEFAULT_COOLDOWN_MS = 90_000 // 90 seconds gentle reappearance cooldown
 export const MoltmaxGuideFloatingPill: React.FC<MoltmaxGuideFloatingPillProps> = ({
   onOpenGuideModal,
   cooldownSeconds,
+  showAfterViewports,
 }) => {
   const cooldownMs = cooldownSeconds ? cooldownSeconds * 1000 : DEFAULT_COOLDOWN_MS
   const [isDismissed, setIsDismissed] = useState(false)
+  const [scrolledIn, setScrolledIn] = useState(!showAfterViewports)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
@@ -54,6 +61,16 @@ export const MoltmaxGuideFloatingPill: React.FC<MoltmaxGuideFloatingPillProps> =
     }
   }, [cooldownMs])
 
+  useEffect(() => {
+    if (!showAfterViewports || scrolledIn) return
+    const check = () => {
+      if (window.scrollY > window.innerHeight * showAfterViewports) setScrolledIn(true)
+    }
+    check()
+    window.addEventListener('scroll', check, { passive: true })
+    return () => window.removeEventListener('scroll', check)
+  }, [showAfterViewports, scrolledIn])
+
   const handleDismiss = () => {
     setIsDismissed(true)
     try {
@@ -74,7 +91,7 @@ export const MoltmaxGuideFloatingPill: React.FC<MoltmaxGuideFloatingPillProps> =
     }, cooldownMs)
   }
 
-  if (isDismissed) return null
+  if (isDismissed || !scrolledIn) return null
 
   return (
     <div data-guide-pill className="guide-pill fixed bottom-3 right-3 sm:bottom-6 sm:right-6 z-40">

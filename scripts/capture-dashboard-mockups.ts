@@ -5,7 +5,7 @@ import path from 'node:path'
 import http from 'node:http'
 import https from 'node:https'
 import os from 'node:os'
-import { chromium } from 'playwright-core'
+import { chromium, type Page } from 'playwright-core'
 import { resolveChromeExecutable } from './lib/composite-renderer'
 import { REGISTERED_TARGETS, DEFAULT_CAPTURE_TARGETS, type CaptureTarget } from './lib/mockup-targets'
 import { advanceServiceWorkerVersion } from './lib/mockup-cache-version'
@@ -192,6 +192,7 @@ async function main() {
         const response = await page.goto(captureUrl.toString(), { waitUntil: 'domcontentloaded', timeout: 60000 })
         if (!response?.ok()) throw new Error(`Capture route failed: ${captureUrl.pathname}`)
         await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => undefined)
+        if (target.name.startsWith('oracle')) await stageOracleConversation(page)
         if (target.name.startsWith('moltmax')) {
           await page.getByRole('button', { name: 'Start the quiz', exact: true }).last().click()
           await page.locator('[role=progressbar]').first().waitFor()
@@ -239,6 +240,34 @@ async function main() {
   } else {
     console.log('\n⏭️ Skipped S3 sync (--skip-s3 passed).')
   }
+}
+
+/**
+ * A guest Oracle opens on an empty chat, which reads as nothing on the homepage. Ask one sample
+ * question and answer it from a fixed reply, so the capture shows a real exchange without
+ * calling the model.
+ */
+const ORACLE_SAMPLE = {
+  question: 'I have a report due Friday and I keep opening my inbox instead. Where do I start?',
+  answer: [
+    'Start smaller than feels respectable.',
+    '',
+    '1. **Close the inbox tab.** Not forever. Just until the first shed is done.',
+    "2. **Write the report's worst first paragraph.** Twenty minutes, timer on, no editing.",
+    '3. **Check messages once at 11:30**, then go back to the draft.',
+    '',
+    'Friday leaves room for three of these. Want me to add them to today’s routine?',
+  ].join('\n'),
+}
+
+async function stageOracleConversation(page: Page) {
+  await page.route('**/api/chat', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ text: ORACLE_SAMPLE.answer, threadId: null, isGuest: false }) }))
+  const input = page.getByPlaceholder(/Ask/).first()
+  await input.waitFor({ timeout: 15000 })
+  await input.fill(ORACLE_SAMPLE.question)
+  await input.press('Enter')
+  await page.getByText('Start smaller than feels respectable.').first().waitFor({ timeout: 15000 })
 }
 
 main().catch((err) => {

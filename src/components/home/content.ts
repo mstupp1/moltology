@@ -186,10 +186,6 @@ export const HOME_BACKDROPS = {
     src: getAssetUrl('/images/home/2026-10-08/seabed-desktop-v1.webp'),
     srcSm: getAssetUrl('/images/home/2026-10-08/seabed-mobile-v1.webp'),
   },
-  gallery: {
-    src: getAssetUrl('/images/home/2026-10-08/community-desktop-v1.webp'),
-    srcSm: getAssetUrl('/images/home/2026-10-08/community-mobile-v1.webp'),
-  },
   practice: {
     src: getAssetUrl('/images/home/2026-10-08/practice-desktop-v1.webp'),
     srcSm: getAssetUrl('/images/home/2026-10-08/practice-mobile-v1.webp'),

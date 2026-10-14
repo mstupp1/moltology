@@ -82,7 +82,7 @@ const FADES = {
   bottom: 'linear-gradient(to bottom, #020408, transparent 30%)',
 } as const
 
-export type BackdropTone = 'surface' | 'seabed' | 'gallery' | 'practice'
+export type BackdropTone = 'surface' | 'seabed' | 'practice'
 
 
 

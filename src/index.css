@@ -371,6 +371,30 @@
   border-radius: 9999px;
   background: radial-gradient(circle, rgba(150, 190, 225, 0.12), transparent 62%);
 }
+/*
+  "Shed the noise." always sits on one line: the headline never grows past what fits its column.
+  It is ~6.95em wide, so 100cqi / 7.2 leaves a little room. The breakpoints mirror the Tailwind
+  clamps on the h1, which stay as the fallback where container units are not supported.
+*/
+@supports (width: 1cqi) {
+  .home-hero .home-hero-copy { container-type: inline-size; }
+  .home-hero .home-hero-title { font-size: min(clamp(3rem, 13vw, 4.5rem), 100cqi / 7.2); }
+  @media (min-width: 640px) {
+    .home-hero .home-hero-title { font-size: min(clamp(4.25rem, 8vw, 6.75rem), 100cqi / 7.2); }
+  }
+  @media (min-width: 1024px) {
+    .home-hero .home-hero-title { font-size: min(clamp(4rem, 5.6vw, 6rem), 100cqi / 7.2); }
+  }
+}
+/* The phone tab row scrolls sideways without a scrollbar and fades at its edges. */
+.home-preview-tabs {
+  scrollbar-width: none;
+  mask-image: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent);
+}
+.home-preview-tabs::-webkit-scrollbar { display: none; }
+@media (min-width: 640px) {
+  .home-preview-tabs { mask-image: none; }
+}
 .home-hero-sea {
   --sea-top: 84%;
   position: absolute;
@@ -384,6 +408,17 @@
 }
 @media (min-width: 1024px) {
   .home-hero-sea { --sea-top: 94%; }
+}
+/* Carries the water's gradient past the sea's own width, so the horizon reaches both edges of any screen. */
+.home-hero-sea::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  left: -4000px;
+  right: -4000px;
+  background: linear-gradient(#0a1d2b, #061420 10%, #040d16 26%, #020408 55%);
 }
 .home-hero-sea-haze {
   /* Haze over the horizon, lit from the shell above it. */
@@ -542,13 +577,6 @@
   --light-a: radial-gradient(ellipse 22% 24% at 66% 80%, rgba(255, 196, 120, 0.12), transparent 70%);
   --light-b: radial-gradient(ellipse 50% 40% at 50% 0%, rgba(0, 195, 255, 0.08), transparent 70%);
 }
-.home-backdrop--gallery {
-  --art-brightness: 1.15;
-  --art-saturation: 0.95;
-  --focus: ellipse 85% 70% at 50% 60%;
-  --light-a: radial-gradient(ellipse 22% 30% at 14% 62%, rgba(255, 170, 90, 0.1), transparent 70%);
-  --light-b: radial-gradient(ellipse 22% 30% at 88% 66%, rgba(255, 170, 90, 0.09), transparent 70%);
-}
 /* The out-of-focus copy, scaled a touch so the blur never pulls dark in from the frame edge. */
 .home-backdrop-soft {
   filter: brightness(var(--art-brightness)) saturate(var(--art-saturation)) blur(var(--edge-blur));
@@ -566,10 +594,57 @@
 .home-backdrop-vignette {
   background: radial-gradient(ellipse 90% 85% at 50% 50%, transparent 55%, rgba(2, 4, 8, 0.55) 100%);
 }
-.home-voice-glass {
-  /* No backdrop-filter: the art behind drifts while scrolling, and re-blurring it every frame is costly. */
-  background: linear-gradient(145deg, rgba(9, 22, 28, 0.82), rgba(3, 8, 11, 0.9));
-  box-shadow: inset 0 1px 0 rgba(200, 240, 255, 0.035), 0 18px 44px rgba(0, 0, 0, 0.18);
+/* Voices: member posts rising through dark water. */
+.home-voices-water {
+  background:
+    radial-gradient(ellipse 60% 45% at 30% 0%, rgba(0, 195, 255, 0.1), transparent 70%),
+    radial-gradient(ellipse 45% 40% at 85% 100%, rgba(0, 255, 204, 0.05), transparent 70%),
+    linear-gradient(#020408, #04121b 45%, #020408);
+}
+.home-voice-post {
+  background: linear-gradient(160deg, rgba(10, 26, 34, 0.92), rgba(3, 9, 13, 0.94));
+  box-shadow: inset 0 1px 0 rgba(200, 240, 255, 0.05), 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+.home-voice-post::before {
+  /* A thin light along the top edge, like a post catching light from the surface. */
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(150, 230, 255, 0.45), transparent);
+}
+.home-voices-bubble {
+  position: absolute;
+  border-radius: 9999px;
+  border: 1px solid rgba(160, 225, 245, 0.5);
+  background: radial-gradient(circle at 35% 30%, rgba(220, 245, 255, 0.35), transparent 60%);
+}
+.home-voices-row { scrollbar-width: none; }
+.home-voices-row::-webkit-scrollbar { display: none; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .home-voices-bubble {
+      animation: homeBubbleRise linear both;
+      animation-timeline: view();
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
+    .home-voice-drift {
+      animation: homeVoiceDrift linear both;
+      animation-timeline: view();
+    }
+  }
+}
+@keyframes homeBubbleRise {
+  from { transform: translate3d(0, var(--rise), 0); opacity: 0; }
+  30% { opacity: 1; }
+  to { transform: translate3d(0, calc(var(--rise) * -1), 0); opacity: 0.2; }
+}
+@keyframes homeVoiceDrift {
+  from { transform: translate3d(0, var(--drift-y), 0); }
+  to { transform: translate3d(0, calc(var(--drift-y) * -1), 0); }
 }
 .home-final-art {
   filter: brightness(1.05) saturate(0.95) contrast(1.04);
