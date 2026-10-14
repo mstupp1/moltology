@@ -1,10 +1,12 @@
 import { buildShell, mulberry32, type ShellCloud } from './shell'
+import { BADGE_KINDS, BADGE_SIZE, badgeFrame, drawBadgeSprite, introBadges, makeBadge, type Badge } from './badges'
 
 /**
- * Homepage hero particles. The field opens as flickering static, then calms: most of it is
- * pulled in plate by plate to calcify into a slowly turning shell, and the rest settles into
- * slow drifting motes that stream around the shell instead of through it. New noise keeps
- * arriving from the left edge and quiets as it passes.
+ * Homepage hero particles. The field opens as a cloud of flickering static around the shell,
+ * with a few red, amber and orange alert badges caught in it. Then it calms: the static is
+ * pulled in plate by plate to calcify into a slowly turning shell, the badges are absorbed one
+ * by one, and the rest settles into slow drifting motes that stream around the shell instead
+ * of through it. Static only shows near the shell, so it never crosses the copy as noise.
  *
  * Canvas 2D only. Points are batched by colour, so a frame is a few dozen fills. The loop
  * stops while the hero is off screen or the tab is hidden, and reduced motion gets one still
@@ -44,17 +46,26 @@ const FAMILY_MAX_ALPHA = [0.85, 0.9, 1, 1, 0.62, 1, 1]
 const LEVELS = 10
 const BUCKETS = FAMILIES.length * LEVELS
 
-const INTRO_HOLD = 0.75
+const INTRO_HOLD = 1.1
 const GROW_SPAN = 2.6
 /** Seconds between molts once the shell has formed, and how long the old layer takes to leave. */
 const MOLT_PERIOD = 24
 const MOLT_LIFT = 2.6
 const FIREFLY_SHARE = 0.07
 const CAMERA = 3.4
+/** Static shows only within this many shell radii of the shell, fading out over STATIC_FADE. */
+const STATIC_REACH = 1
+const STATIC_FADE = 0.5
 
 function smooth(x: number): number {
   const t = Math.min(1, Math.max(0, x))
   return t * t * (3 - 2 * t)
+}
+
+/** 1 near the shell, fading to 0 by STATIC_REACH + STATIC_FADE shell radii out. */
+export function staticWeight(dx: number, dy: number, scale: number): number {
+  const e = Math.sqrt((dx / (scale * 1.2)) ** 2 + (dy / (scale * 0.95)) ** 2)
+  return 1 - smooth((e - STATIC_REACH) / STATIC_FADE)
 }
 
 export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHandle | null {
@@ -164,6 +175,11 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
     { ax: 0.78, ay: 0.2, fx: 0.041, fy: 0.029, spin: 1 },
     { ax: 0.9, ay: 0.82, fx: 0.027, fy: 0.043, spin: -1 },
   ]
+  // Alert badges caught in the noise, absorbed as the shell forms; a stray one now and then after.
+  let badges: Badge[] = []
+  let nextStray = Infinity
+  let copyAbove = false
+  const badgeSprites = new Map<string, HTMLCanvasElement>()
   const eddyX = new Float32Array(eddies.length)
   const eddyY = new Float32Array(eddies.length)
 
@@ -181,6 +197,8 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
     pointScale = Math.min(1, Math.max(0.65, scale / 300))
     // The antennae sweep high, so the body sits below the cloud's centre; lift it to the middle.
     cy = a.top - rect.top + a.height / 2 - scale * 0.12
+    // On phones the shell sits centred below the copy; on wide layouts it sits to the right of it.
+    copyAbove = cx > width * 0.35 && cx < width * 0.65
     const raw = parseFloat(getComputedStyle(anchor).getPropertyValue('--shell-dim'))
     dim = Number.isFinite(raw) ? Math.min(1, Math.max(0, raw)) : 1
   }
@@ -211,8 +229,16 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
     bucketOf = new Uint8Array(total)
     sorted = new Uint32Array(total)
     for (let i = 0; i < total; i++) {
-      px[i] = rand() * width
-      py[i] = rand() * height
+      if (i < shellN) {
+        // The opening static is a cloud around the shell, not a screen of snow over the copy.
+        const angle = rand() * Math.PI * 2
+        const r = Math.sqrt(rand()) * scale * 0.85
+        px[i] = cx + Math.cos(angle) * r * 1.2
+        py[i] = cy + Math.sin(angle) * r * 0.95
+      } else {
+        px[i] = rand() * width
+        py[i] = rand() * height
+      }
       vx[i] = (rand() - 0.5) * 40
       vy[i] = (rand() - 0.5) * 40
       hue[i] = rand() < 0.22 ? 1 : 0
@@ -227,6 +253,8 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
         agitation[i] = formed ? rand() * 0.15 : 1
       }
     }
+    badges = formed || opts.reducedMotion ? [] : introBadges(budget < 1 ? 3 : copyAbove ? 4 : 5, rand, copyAbove, INTRO_HOLD)
+    nextStray = INTRO_HOLD + GROW_SPAN + 7
     const flies: number[] = []
     for (let i = shellN; i < total; i++) if (firefly[i]) flies.push(i)
     fireflyList = Uint32Array.from(flies)
@@ -271,7 +299,9 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
     m00 = cr * a00 - sr * a10; m01 = cr * a01 - sr * a11; m02 = cr * a02 - sr * a12
     m10 = sr * a00 + cr * a10; m11 = sr * a01 + cr * a11; m12 = sr * a02 + cr * a12
     m20 = a20; m21 = a21; m22 = a22
-    bob = Math.sin(time * 0.6) * scale * 0.025 + scrollEased * height * 0.22
+    // On wide layouts the shell lags behind the page as it scrolls away. On phones it sits just
+    // above the horizon below the copy, so it stays put there rather than sinking into the sea.
+    bob = Math.sin(time * 0.6) * scale * 0.025 + (copyAbove ? 0 : scrollEased * height * 0.22)
   }
 
   /** Projects shell targets into drawX/drawY and returns nothing; depth lands in drawW. */
@@ -298,6 +328,61 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
         shade[i] = 0.12 + 0.5 * diffuse + 0.38 * facing
       }
     }
+  }
+
+  /** Static dash near the shell; further out the same particle draws as a quiet mote. */
+  function drawStatic(i: number, weight: number) {
+    if (weight < 0.3) {
+      const size = 1 + (i % 3) * 0.35
+      drawW[i] = size
+      drawH[i] = size
+      bucketOf[i] = 4 * LEVELS + Math.min(LEVELS - 1, Math.max(0, Math.floor(0.4 * LEVELS * dim)))
+      return
+    }
+    drawW[i] = 1.4 + noise() * 4.2
+    drawH[i] = 1.1
+    const flick = noise()
+    bucketOf[i] = hue[i] * LEVELS + Math.min(LEVELS - 1, Math.floor((0.3 + 0.7 * flick) * weight * LEVELS * dim))
+  }
+
+  function stepBadges() {
+    const t = growClock
+    for (const b of badges) {
+      if (!b.landed && t >= b.absorbAt + b.pull) {
+        b.landed = true
+        // The shell flares a little as it takes one in.
+        flash = Math.max(flash, 0.55)
+      }
+    }
+    if (badges.length && badges.every((b) => b.landed)) badges = []
+    const formedAt = INTRO_HOLD + GROW_SPAN + 2
+    if (!opts.reducedMotion && t > nextStray && t > formedAt && badges.length < 2) {
+      const kind = BADGE_KINDS[Math.floor(noise() * BADGE_KINDS.length)]
+      badges.push(makeBadge(kind, noise, copyAbove, t, t + 2.4 + noise() * 1.4))
+      nextStray = t + 8 + noise() * 6
+    }
+  }
+
+  function drawBadges() {
+    for (const b of badges) {
+      const f = badgeFrame(b, growClock)
+      if (!f || f.alpha <= 0.01) continue
+      const key = `${b.kind}:${b.label}`
+      let sprite = badgeSprites.get(key)
+      if (!sprite) {
+        sprite = drawBadgeSprite(b.kind, b.label, Math.max(2, dpr))
+        badgeSprites.set(key, sprite)
+      }
+      const [w, h] = BADGE_SIZE[b.kind]
+      const k = f.scale * Math.max(0.85, pointScale) * 1.15
+      const sw = (w + 12) * k
+      const sh = (h + 12) * k
+      const x = Math.min(width - sw / 2 - 6, Math.max(sw / 2 + 6, cx + f.x * scale))
+      const y = cy + bob + f.y * scale
+      ctx!.globalAlpha = Math.min(1, f.alpha) * dim
+      ctx!.drawImage(sprite, x - sw / 2, y - sh / 2, sw, sh)
+    }
+    ctx!.globalAlpha = 1
   }
 
   function step(dt: number) {
@@ -328,6 +413,7 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
         flash = Math.max(flash, 0.7)
       }
     }
+    stepBadges()
     moltAge += dt
     const molting = moltAge < MOLT_LIFT
     const lift = molting ? smooth(moltAge / MOLT_LIFT) : 0
@@ -374,10 +460,7 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
         // Static: short flickering dashes.
         drawX[i] = px[i] + (noise() - 0.5) * jit * 2
         drawY[i] = py[i] + (noise() - 0.5) * jit
-        drawW[i] = 1.4 + noise() * 4.2
-        drawH[i] = 1.1
-        const flick = noise()
-        bucketOf[i] = hue[i] * LEVELS + Math.min(LEVELS - 1, Math.floor((0.3 + 0.7 * flick) * LEVELS * dim))
+        drawStatic(i, staticWeight(px[i] - cx, py[i] - cy, scale))
       } else {
         drawX[i] = px[i] + (noise() - 0.5) * jit
         drawY[i] = py[i] + (noise() - 0.5) * jit
@@ -497,10 +580,7 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
         bucketOf[i] = (4 + firefly[i]) * LEVELS + Math.min(LEVELS - 1, Math.max(0, Math.floor(lum * LEVELS)))
       } else if (ag > 0.45) {
         fireflyGlow[i] = 0
-        drawW[i] = 1.4 + noise() * 4.2
-        drawH[i] = 1.1
-        const flick = noise()
-        bucketOf[i] = hue[i] * LEVELS + Math.min(LEVELS - 1, Math.floor((0.3 + 0.7 * flick) * LEVELS * dim))
+        drawStatic(i, staticWeight(px[i] - cx, py[i] - cy, scale))
       } else {
         const size = 1 + (i % 3) * 0.35
         drawW[i] = size
@@ -562,6 +642,7 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
     }
     ctx!.globalAlpha = 1
     ctx!.globalCompositeOperation = 'source-over'
+    drawBadges()
 
     if (!readySent) {
       readySent = true
@@ -637,7 +718,7 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
             anchorSeen = true
             anchorIo?.disconnect()
           }
-        }, { threshold: 0.1 })
+        }, { threshold: 0.35 })
       : null
   if (anchorIo) anchorIo.observe(anchor)
   else anchorSeen = true

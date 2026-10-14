@@ -3,6 +3,7 @@ import { spawn, execSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import http from 'node:http'
+import https from 'node:https'
 import os from 'node:os'
 import { chromium } from 'playwright-core'
 import { resolveChromeExecutable } from './lib/composite-renderer'
@@ -23,7 +24,8 @@ function waitForServer(url: string, timeoutMs = 25000): Promise<void> {
   const start = Date.now()
   return new Promise((resolve, reject) => {
     const check = () => {
-      const req = http.get(url, (res) => {
+      // --base-url may point at a deployed https site as well as a local server.
+      const req = (url.startsWith('https:') ? https : http).get(url, (res) => {
         res.resume()
         if (res.statusCode && res.statusCode < 500) {
           resolve()

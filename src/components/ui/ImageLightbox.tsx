@@ -31,6 +31,8 @@ export interface ImageLightboxProps {
   images?: LightboxImageItem[]
   currentIndex?: number
   onIndexChange?: (index: number) => void
+  /** `wide` uses most of the viewport, for screenshots that need to be read. */
+  size?: 'default' | 'wide'
 }
 
 export const ImageLightbox: React.FC<ImageLightboxProps> = ({
@@ -48,7 +50,9 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
   images,
   currentIndex = 0,
   onIndexChange,
+  size = 'default',
 }) => {
+  const wide = size === 'wide'
   const [internalIndex, setInternalIndex] = useState(currentIndex)
   const touchStartX = useRef<number | null>(null)
 
@@ -150,7 +154,7 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
     >
       {/* Main Lightbox Card with Neutral Border */}
       <div
-        className="relative w-full max-w-5xl my-auto bg-[#030709] border border-white/10 chamfer-corner-lg overflow-hidden flex flex-col shadow-2xl transition-all duration-300"
+        className={`relative w-full ${wide ? 'max-w-[min(96vw,1600px)]' : 'max-w-5xl'} my-auto bg-[#030709] border border-white/10 chamfer-corner-lg overflow-hidden flex flex-col shadow-2xl transition-all duration-300`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* ── 1. MODAL TOP HEADER BAR ── */}
@@ -179,7 +183,7 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
         </div>
 
         {/* ── 2. MAIN IMAGE STAGE ── */}
-        <div className="relative z-10 p-3 sm:p-6 flex items-center justify-center bg-[#020406] min-h-[260px] sm:min-h-[380px] max-h-[72vh] overflow-hidden group">
+        <div className={`relative z-10 ${wide ? 'p-2 sm:p-3' : 'p-3 sm:p-6'} flex items-center justify-center bg-[#020406] min-h-[260px] sm:min-h-[380px] ${wide ? 'max-h-[84vh]' : 'max-h-[72vh]'} overflow-hidden group`}>
           {/* Multi-Item Prev Button */}
           {galleryItems && galleryItems.length > 1 && (
             <button
@@ -192,12 +196,12 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
           )}
 
           {/* Screenshot Image Display */}
-          <div className="relative max-w-full max-h-[66vh] flex items-center justify-center overflow-hidden rounded border border-white/10 shadow-2xl bg-[#010203]">
+          <div className={`relative max-w-full ${wide ? 'max-h-[80vh]' : 'max-h-[66vh]'} flex items-center justify-center overflow-hidden rounded border border-white/10 shadow-2xl bg-[#010203]`}>
             <img
               key={activeSrc}
               src={activeSrc}
               alt={activeAlt}
-              className="w-auto h-auto max-w-full max-h-[64vh] object-contain transition-opacity duration-200"
+              className={`w-auto h-auto max-w-full ${wide ? 'max-h-[78vh]' : 'max-h-[64vh]'} object-contain transition-opacity duration-200`}
             />
           </div>
 
