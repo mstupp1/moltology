@@ -26,6 +26,10 @@ export interface HeroParticlesOptions {
   skipIntro?: boolean
   /** Called once the first frame is on the canvas. */
   onReady?: () => void
+  /** Called after each animated frame is drawn, with the clock and the shell's flare (0..1). */
+  onFrame?: (time: number, flash: number) => void
+  /** Called once if the device can't keep up, after the field drops to half its drifting motes. */
+  onSlow?: () => void
 }
 
 export interface HeroParticlesHandle {
@@ -644,6 +648,7 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
     ctx!.globalCompositeOperation = 'source-over'
     drawBadges()
 
+    if (dt > 0) opts.onFrame?.(time, flash)
     if (!readySent) {
       readySent = true
       opts.onReady?.()
@@ -658,7 +663,10 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
     // If the device can't keep up once the shell has formed, draw half the drifting motes.
     if (time > 6 && stride === 1) {
       slowFrames = dt > 0.026 ? slowFrames + 1 : Math.max(0, slowFrames - 1)
-      if (slowFrames > 45) stride = 2
+      if (slowFrames > 45) {
+        stride = 2
+        opts.onSlow?.()
+      }
     }
     render(dt)
     raf = requestAnimationFrame(frameLoop)

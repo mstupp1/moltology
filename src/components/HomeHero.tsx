@@ -30,6 +30,7 @@ export interface HomeHeroProps {
 export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpenAuth }) => {
   const sectionRef = useRef<HTMLElement>(null)
   const shellRef = useRef<HTMLDivElement>(null)
+  const waterRef = useRef<HTMLCanvasElement>(null)
 
   return (
     <section
@@ -46,7 +47,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
       */}
       <div className="home-hero-stage absolute inset-0 lg:bottom-auto lg:h-[100svh] lg:min-h-[760px] pointer-events-none select-none" aria-hidden="true">
         <HeroSky />
-        <HeroParticleField anchorRef={shellRef} hostRef={sectionRef} className="absolute inset-0 z-[2] h-full w-full" />
+        <HeroParticleField anchorRef={shellRef} hostRef={sectionRef} waterRef={waterRef} className="absolute inset-0 z-[2] h-full w-full" />
       </div>
 
       <div className="relative mx-auto max-w-[1280px] px-4 sm:px-8 flex flex-col lg:grid lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)] lg:items-center lg:gap-6 lg:min-h-[calc(min(100svh,940px)-11rem)]">
@@ -119,6 +120,9 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
           </ul>
         </div>
       </div>
+
+      {/* WebGL water, placed over the CSS sea's horizon once it loads (see hero-particles/water.ts). */}
+      <canvas ref={waterRef} className="home-hero-water absolute inset-x-0 top-0 z-[1] h-0 w-full pointer-events-none" aria-hidden="true" />
 
       {/* The device preview rises out of the deep and settles flat as it scrolls into view. */}
       <div className="relative z-10 mt-10 sm:mt-12 px-4 sm:px-8 [perspective:1800px]">

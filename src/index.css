@@ -424,6 +424,18 @@
   mask-image: linear-gradient(#000 20%, transparent 95%);
 }
 .home-hero-glint-set--1 { opacity: 0.35; }
+.home-hero-water {
+  opacity: 0;
+  transition: opacity 1200ms ease-out;
+}
+.home-hero-water[data-ready='true'] { opacity: 1; }
+/* Once the WebGL water is up, the CSS ripples and glints under it step aside. */
+.home-hero-sea-ripples,
+.home-hero-sea-glints,
+.home-hero-sea-line { transition: opacity 1200ms ease-out; }
+.home-hero[data-water='webgl'] .home-hero-sea-ripples,
+.home-hero[data-water='webgl'] .home-hero-sea-glints,
+.home-hero[data-water='webgl'] .home-hero-sea-line { opacity: 0; }
 @media (prefers-reduced-motion: no-preference) {
   /* Two sets of glints trade places: opacity only, so the compositor handles it. */
   .home-hero-glint-set { animation: homeGlint 2.8s ease-in-out infinite alternate; }
