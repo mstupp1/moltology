@@ -2,6 +2,9 @@
 import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
+import { pipeline } from 'node:stream/promises'
+import { Readable } from 'node:stream'
+import { getAbsoluteAssetUrl } from '../src/lib/assets'
 import { createHash } from 'node:crypto'
 import { execSync, execFileSync } from 'node:child_process'
 import matter from 'gray-matter'
@@ -18,8 +21,7 @@ import {
   directScenePrompts,
   SCENE_NEGATIVE_PROMPT,
 } from './lib/reel-director'
-import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
-import { DEFAULT_BUCKET } from '../src/lib/s3-client'
+import { publishArchivedSocial } from './lib/social-archive'
 import { getRandomCharacterKey, CharacterKey } from './lib/character-overlay'
 import {
   queueDualReelAndShort,
@@ -726,6 +728,7 @@ function loadReelHistory(): any {
 function recordReelInHistory(entry: any): void {
   const historyPath = path.resolve(process.cwd(), 'content/social/instagram-reel-history.json')
   const history = loadReelHistory()
+  if (entry.zernioPostId && history.reels.some((p: any) => p.zernioPostId === entry.zernioPostId)) return
   history.reels.push({
     ...entry,
     createdAt: new Date().toISOString(),
@@ -2131,7 +2134,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
 
   let masterReelPath: string
   let publicUrl: string | undefined
-  let s3Key: string | undefined
+  let archivePath: string | undefined
   let queueResult: QueueDualReelAndShortResult | null = null
   let durationSeconds = 13.3
   let compositeResult: any = null
@@ -2391,43 +2394,35 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     return { masterReelPath, scriptData, compositeResult, renderOnly: true }
   }
 
-  // 5. Upload Master Video to Neon S3
+  // 5. Archive final media in Drive and publish directly to Zernio
   let platformTarget: 'all' | 'instagram' | 'youtube' = options.platform || 'all'
   if (options.platforms && options.platforms.length === 1) {
     platformTarget = options.platforms[0]
   }
 
   if (!options.dryRun) {
-    if (!publicUrl) {
-      console.log(`\n5️⃣ Uploading Master Reel to Neon S3...`)
-      s3Key = `videos/social/reels/${path.basename(masterReelPath)}`
-      const s3Result = await uploadLocalFileToS3(masterReelPath, s3Key, DEFAULT_BUCKET)
-      publicUrl = s3Result.publicUrl
-      console.log(`   🚀 Public S3 Video URL: ${publicUrl}`)
-    } else {
-      console.log(`\n5️⃣ Video S3 URL: ${publicUrl}`)
-      s3Key = `videos/social/reels/${path.basename(publicUrl.split('?')[0])}`
-    }
-
-    // 6️⃣ Deterministically Queue Dual Broadcast to Zernio (Reels & Shorts Queue) & First Comment
+    // URL-only inputs are downloaded once, then archived and uploaded locally.
     if (publicUrl) {
-      queueResult = await queueDualReelAndShort({
-        videoUrl: publicUrl,
-        videoPath: fs.existsSync(masterReelPath) ? masterReelPath : undefined,
-        instagramCaption: scriptData.caption,
-        youtubeTitle: scriptData.youtubeTitle || `${scriptData.hookHeadline} #Shorts`,
-        youtubeDescription: scriptData.youtubeDescription || `${scriptData.narrationScript}\n\nTake the Moltmaxxing Audit: ${ctaConfig.url}`,
-        youtubeTags: ['Shorts', 'Moltmaxxing', 'BenthicAI', 'Carcinization', 'Tech'],
-        firstComment: scriptData.firstComment,
-        queueId: DEFAULT_REELS_QUEUE_ID,
-        profileId: DEFAULT_PROFILE_ID,
-        instagramAccountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
-        youtubeAccountId: DEFAULT_YOUTUBE_ACCOUNT_ID,
-        isAiGenerated: true,
-        publishNow: options.publishNow,
-        platform: platformTarget,
-      })
+      const response = await fetch(getAbsoluteAssetUrl(publicUrl))
+      if (!response.ok) throw new Error(`Could not download final reel (HTTP ${response.status}).`)
+      masterReelPath = path.join(tempDir, 'master.mp4')
+      await pipeline(Readable.fromWeb(response.body as any), fs.createWriteStream(masterReelPath))
     }
+    const publication = {
+      instagramCaption: scriptData.caption,
+      youtubeTitle: scriptData.youtubeTitle || `${scriptData.hookHeadline} #Shorts`,
+      youtubeDescription: scriptData.youtubeDescription || `${scriptData.narrationScript}\n\nTake the Moltmaxxing Audit: ${ctaConfig.url}`,
+      youtubeTags: ['Shorts', 'Moltmaxxing', 'BenthicAI', 'Carcinization', 'Tech'],
+      firstComment: scriptData.firstComment, queueId: DEFAULT_REELS_QUEUE_ID, profileId: DEFAULT_PROFILE_ID,
+      instagramAccountId: DEFAULT_INSTAGRAM_ACCOUNT_ID, youtubeAccountId: DEFAULT_YOUTUBE_ACCOUNT_ID,
+      isAiGenerated: true, validateMediaWindow: true, publishNow: !!options.publishNow, platform: platformTarget,
+    }
+    const archived = await publishArchivedSocial({
+      kind: 'reel', files: [masterReelPath], metadata: { script: scriptData, durationSeconds, publication },
+    }, ([videoPath]) => queueDualReelAndShort({ ...publication, videoPath }))
+    archivePath = archived.archive.relativePath
+    queueResult = archived.result
+    publicUrl = queueResult.mediaUrls?.[0]
 
     // Record to Social History Ledger
     recordReelInHistory({
@@ -2438,8 +2433,8 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       relatedBlogSlug: scriptData.relatedBlogSlug || null,
       characterArc: scriptData.characterArc,
       narrationScript: scriptData.narrationScript,
-      s3Url: publicUrl || null,
-      s3Key: s3Key || null,
+      archivePath,
+      zernioMediaUrls: queueResult.mediaUrls || [],
       thumbnailUrl: null,
       s3ThumbKey: null,
       durationSeconds,
@@ -2474,7 +2469,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       }
     }
   } else {
-    console.log(`\n5️⃣ [Dry Run] Skipped S3 upload. Master video saved at: ${masterReelPath}`)
+    console.log(`\n5️⃣ [Dry Run] Skipped Drive archive and uploads. Master video saved at: ${masterReelPath}`)
     queueResult = await queueDualReelAndShort({
       videoUrl: publicUrl || `https://placeholder.storage.neon.tech/moltology-public-assets/videos/social/reels/${path.basename(masterReelPath)}`,
       instagramCaption: scriptData.caption,
@@ -2505,7 +2500,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
   return {
     masterReelPath,
     publicUrl,
-    s3Key,
+    archivePath,
     scriptData,
     compositeResult,
     queueResult,
@@ -2533,7 +2528,7 @@ Options:
   --publish-now             Publish directly to Instagram immediately (skip draft)
   --schedule-best-time      Schedule for optimal audience engagement time via Zernio
   --no-veo                  Skip Google Veo rendering (use local benthic footage)
-  --dry-run                 Local test without uploading to S3 or Zernio
+  --dry-run                 Local test without archiving to Drive or uploading to Zernio
   --recycle-clips           Assemble reel from pre-existing stored video clips without generating new Veo footage
   --voice <name>            Fish Audio catalog voice (default: BOOK RECORD REGULAR, or env FISH_VOICE_REFERENCE_ID; "random" rotates) or Edge TTS voice for fallback (default: en-US-ChristopherNeural). Fish voices: Ethan, Mommy, Just Many, Twilight Sparkle, Young Creative Voice, Friendly Young Woman, Laura, BOOK RECORD REGULAR, Friendly Young Female
   --bg-volume <number>      Background soundtrack volume multiplier (default: 0.14)

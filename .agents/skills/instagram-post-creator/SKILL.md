@@ -2,7 +2,7 @@
 name: instagram-post-creator
 description: >-
   Create Moltology single-image Instagram posts and lead magnets using high-DPI composite scaffolds,
-  built-in ImageGen polish or a user-selected Google Flow handoff, and deterministic S3 ingestion and
+  built-in ImageGen polish or a user-selected Google Flow handoff, and deterministic Google Drive archiving and
   Zernio publishing. Use for creating, drafting, illustrating, queueing or publishing a single social post.
   For multi-slide decks, use instagram-carousel-creator.
 ---
@@ -20,7 +20,7 @@ Read the [shared annual content calendar](../../../content/annual-content-calend
 - Lead magnet daily queue: `6a8d93576f0e96efe2960c91` (daily at 13:00 America/New_York).
 - Editorial queue: `6a84b76d2421e968ac81f5bc` (Monday, Wednesday, Friday at 13:00 America/New_York).
 - Formats: 3:4 portrait (`1080x1440`), 4:5 portrait (`1080x1350`), or square (`1080x1080`). Preserve the polished image's full frame; never force-crop a 3:4 image to 4:5.
-- Content media lives in Neon S3, under `images/social/posts/`; use local workspace `tmp/` for production artifacts, not tracked `public/` media.
+- Final social media and metadata are archived by the CLI in Google Drive under `Projects/Moltology/Social Archive/YYYY/MM/<content-id>/`. `SOCIAL_ARCHIVE_ROOT` overrides the existing Moltology folder. Intermediate production artifacts stay in ignored `tmp/`, not tracked `public/`.
 - Publishing engine: `npm run post:create`, backed by `scripts/lib/zernio-client.ts`. Never call Zernio MCP tools to queue, publish or comment.
 
 | Campaign theme | Asset | Target |
@@ -90,10 +90,14 @@ npm run post:create -- --theme sacred-codex --content-json tmp/post-content.json
 npm run post:create -- --theme sacred-codex --content-json tmp/post-content.json --polished-image tmp/post_polished.png --dry-run
 ```
 
-The CLI uploads to S3, sends `platformSpecificData.isAiGenerated: true`, supplies `platformSpecificData.firstComment` for Zernio to deliver after publication, and appends confirmed result metadata to the continuity ledger. Do not additionally post the same comment through the inbox API.
+The CLI archives final media and reviewed metadata in Drive before uploading local files directly to Zernio, sends `platformSpecificData.isAiGenerated: true`, supplies `platformSpecificData.firstComment` for Zernio to deliver after publication, and appends confirmed result metadata to the continuity ledger. Do not additionally post the same comment through the inbox API.
 
 Ingestion requires reviewed `--content-json`. The reader rejects keyword fields, keyword-comment requests and DM copy before uploading; do not bypass it by using legacy generated presets. Artwork text also requires visual inspection because the copy guard cannot read pixels.
 
 Inspect the returned post status. Fetch `/posts/<id>` using the existing REST client if needed, and verify `status` and `platformPostUrl`. A successful HTTP response can still contain `failed` or `partial`: never label those published. Record actual status rather than requested intent. Save and inspect an existing returned ID before any retry; do not blindly repeat post creation after a timeout or ambiguous response. Report the final image path and the confirmed publication link or scheduled slot.
 
 Record the goal, control, chosen variable, fixed settings and ledger ID in the strategy experiment log. Outcomes remain pending until publication. Preserve unrelated work and keep generated files under ignored `tmp/`; commit intentional skill/strategy/source changes with explicit paths. Check the final working tree and report any pre-existing changes left in place.
+
+## Social archive and retries
+
+See `docs/social-archive.md`. `SOCIAL_ARCHIVE_ROOT` overrides the existing Moltology folder, which must be available before queueing. The CLI preserves final files after publishing failures and saves confirmed Zernio media URLs, IDs, status and schedule in archive metadata and Git ledgers. A confirmed archived result is reused on retry. Dry-run/render-only modes do not write to Drive or publish. Do not reupload finished social archives to Neon.

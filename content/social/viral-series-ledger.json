@@ -83,7 +83,16 @@
       "ctaGoal": "quiz",
       "commentTriggerKeyword": "QUIZ",
       "commentTriggerUrl": "https://moltology.org/quiz",
-      "createdAt": "2026-08-29T15:22:00.000Z"
+      "createdAt": "2026-08-29T15:22:00.000Z",
+      "archivePaths": [
+        "Social Archive/Migrated/videos/social/series/master-series-incidents-s01e01-containment-breach.mp4"
+      ],
+      "s3ArchiveObjects": [
+        {
+          "key": "videos/social/series/master-series-incidents-s01e01-containment-breach.mp4",
+          "removedAt": "2026-10-14T00:00:52.230Z"
+        }
+      ]
     }
   ]
 }

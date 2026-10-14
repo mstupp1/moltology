@@ -2,7 +2,7 @@
 name: instagram-carousel-creator
 description: >-
   Create Moltology 5-to-8-slide Instagram carousels and quote decks with reviewed copy, high-DPI
-  composite scaffolds, built-in ImageGen artwork and polish, full-frame S3 ingestion,
+  composite scaffolds, built-in ImageGen artwork and polish, full-frame Google Drive archiving,
   and deterministic Zernio queueing. Use for multi-slide editorial posts, lead magnets
   or companion carousels for published news. Google Flow is a user-selected alternative.
 ---
@@ -20,7 +20,7 @@ Read the [shared annual content calendar](../../../content/annual-content-calend
 - Carousels and editorial queue: `6a84b76d2421e968ac81f5bc`, Monday/Wednesday/Friday at 13:00 `America/New_York`. Resolve the actual slot from the API; daylight saving time changes the UTC offset.
 - Default canvas: native 3:4 portrait (`1080×1440`). Preserve every polished slide's full frame and consistent dimensions; never force-crop 3:4 to 4:5.
 - Five to eight slides, chosen by the story. Plan the complete deck before generating artwork. The scaffold CLI generates only three seed slides; author slides 4–8 as needed with matching layouts or built-in ImageGen. Adapt the third seed into a middle slide when necessary and reserve the payoff/CTA for the actual final slide. Supply the complete deck in order with `--polished-slides`; three seeds are not a finished carousel.
-- Media belongs in S3 under `images/social/carousels/`; local images, drafts, prompts and previews belong in ignored `tmp/`.
+- Final ordered slides and metadata belong in Google Drive under `Projects/Moltology/Social Archive/YYYY/MM/<content-id>/`, written by the CLI before direct Zernio upload. `SOCIAL_ARCHIVE_ROOT` overrides the existing Moltology folder. Intermediate production artifacts stay in ignored `tmp/`.
 - Queue through `npm run carousel:create` and `scripts/lib/zernio-client.ts`. Never publish or comment through Zernio MCP tools. `--publish-now` requires an explicit immediate-publication request.
 
 ## Opening, useful arc and CTA
@@ -112,3 +112,7 @@ Ingestion requires reviewed `--content-json` and five to eight final slides. The
 Inspect the returned result and fetch the stored post through the existing REST client when necessary. Verify actual status, schedule, ordered slide URLs, caption, first comment and publication link. A post ID, successful HTTP response or local ledger label alone does not prove publication; `failed`/`partial` results remain failures. Check any returned ID before retrying to avoid duplicates. Inspect actual image dimensions because legacy ledger aspect-ratio labels may be stale.
 
 Report final slide paths and confirmed publication link or schedule. Link the ledger ID in the strategy experiment log and leave results pending until publication. Preserve unrelated work, keep generated files under ignored `tmp/`, and commit intentional skill/strategy/source changes with explicit paths. Check final working-tree status and report pre-existing changes left in place.
+
+## Social archive and retries
+
+See `docs/social-archive.md`. `SOCIAL_ARCHIVE_ROOT` overrides the existing Moltology folder, which must be available before queueing. The CLI preserves final files after publishing failures and saves confirmed Zernio media URLs, IDs, status and schedule in archive metadata and Git ledgers. A confirmed archived result is reused on retry. Dry-run/render-only modes do not write to Drive or publish. Do not reupload finished social archives to Neon.

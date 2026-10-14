@@ -7,8 +7,7 @@ import { generateVoiceover } from './lib/tts-engine'
 import { getRandomFishVoice } from './lib/tts-providers/fish-audio'
 import { compositeSeriesReel } from './lib/series-compositor'
 import { ColorGradingPreset } from './lib/reel-compositor'
-import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
-import { DEFAULT_BUCKET } from '../src/lib/s3-client'
+import { publishArchivedSocial } from './lib/social-archive'
 import {
   CtaGoal,
   resolveCtaGoalConfig,
@@ -252,6 +251,7 @@ export function recordEpisodeInLedger(entry: any): void {
     )
   }
 
+  if (entry.zernioPostId && ledger.episodes.some((p: any) => p.zernioPostId === entry.zernioPostId)) return
   ledger.episodes.push({
     ...entry,
     createdAt: new Date().toISOString(),
@@ -567,9 +567,9 @@ export async function createViralSeriesReel(options: CreateViralSeriesOptions = 
     tempDir,
   })
 
-  // 6. S3 Upload & Zernio Queue Staging (unless dry-run)
+  // 6. Drive archive & Zernio Queue Staging (unless dry-run)
   if (options.dryRun) {
-    console.log(`\n🛡️ Dry-run mode active. Skipping S3 upload and Zernio queue staging.`)
+    console.log(`\n🛡️ Dry-run mode active. Skipping Drive archive and upload and Zernio queue staging.`)
     console.log(`   • Master Reel local file: ${masterOutputPath}`)
     recordEpisodeInLedger({
       id: `series-${script.seriesId}-s${script.seasonNumber}e${script.episodeNumber}-${Date.now()}`,
@@ -596,54 +596,17 @@ export async function createViralSeriesReel(options: CreateViralSeriesOptions = 
     return
   }
 
-  // Upload to Neon S3
-  const s3Key = `videos/social/series/master-series-${script.seriesId}-s${script.seasonNumber}e${script.episodeNumber}-${Date.now()}.mp4`
-  console.log(`\n☁️ Uploading Master Viral Reel to Neon S3 (${s3Key})...`)
-
-  const s3Upload = await uploadLocalFileToS3(masterOutputPath, s3Key, {
-    bucketName: DEFAULT_BUCKET,
-    contentType: 'video/mp4',
-    cacheControl: 'public, max-age=31536000, immutable',
-  })
-
-  console.log(`   • Public CDN S3 URL: ${s3Upload.publicUrl}`)
-
-  // Zernio Queue Staging
-  let queueResult: QueueDualReelAndShortResult | null = null
-
-  if (!options.dryRun && s3Upload?.publicUrl) {
-    queueResult = await queueDualReelAndShort({
-      videoUrl: s3Upload.publicUrl,
-      videoPath: masterOutputPath,
-      instagramCaption: script.caption,
-      youtubeTitle: script.youtubeTitle,
-      youtubeDescription: script.youtubeDescription,
-      youtubeTags: script.youtubeTags,
-      firstComment: script.firstComment,
-      queueId: DEFAULT_REELS_QUEUE_ID,
-      profileId: DEFAULT_PROFILE_ID,
-      instagramAccountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
-      youtubeAccountId: DEFAULT_YOUTUBE_ACCOUNT_ID,
-      isAiGenerated: true,
-      publishNow: options.publishNow,
-    })
-  } else if (options.dryRun) {
-    queueResult = await queueDualReelAndShort({
-      videoUrl: `https://placeholder.storage.neon.tech/moltology-public-assets/${s3Key}`,
-      instagramCaption: script.caption,
-      youtubeTitle: script.youtubeTitle,
-      youtubeDescription: script.youtubeDescription,
-      youtubeTags: script.youtubeTags,
-      firstComment: script.firstComment,
-      queueId: DEFAULT_REELS_QUEUE_ID,
-      profileId: DEFAULT_PROFILE_ID,
-      instagramAccountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
-      youtubeAccountId: DEFAULT_YOUTUBE_ACCOUNT_ID,
-      isAiGenerated: true,
-      dryRun: true,
-      publishNow: options.publishNow,
-    })
+  const publication = {
+    instagramCaption: script.caption, youtubeTitle: script.youtubeTitle,
+    youtubeDescription: script.youtubeDescription, youtubeTags: script.youtubeTags,
+    firstComment: script.firstComment, queueId: DEFAULT_REELS_QUEUE_ID, profileId: DEFAULT_PROFILE_ID,
+    instagramAccountId: DEFAULT_INSTAGRAM_ACCOUNT_ID, youtubeAccountId: DEFAULT_YOUTUBE_ACCOUNT_ID,
+    isAiGenerated: true, validateMediaWindow: true, publishNow: !!options.publishNow,
   }
+  const archived = await publishArchivedSocial({
+    kind: 'series', files: [masterOutputPath], metadata: { script, durationSeconds: compositeResult.durationSeconds, publication },
+  }, ([videoPath]) => queueDualReelAndShort({ ...publication, videoPath }))
+  const queueResult = archived.result
 
   // Update Continuity Ledger
   recordEpisodeInLedger({
@@ -658,14 +621,14 @@ export async function createViralSeriesReel(options: CreateViralSeriesOptions = 
     retentionLoopAnchor: script.retentionLoopAnchor,
     narrationScript: script.narrationScript,
     durationSeconds: compositeResult.durationSeconds,
-    status: options.publishNow ? 'published' : (options.dryRun ? 'dry-run' : 'queued'),
+    status: queueResult.status,
     scheduledFor: queueResult?.scheduledFor || null,
     queueId: DEFAULT_REELS_QUEUE_ID,
-    s3Url: s3Upload?.publicUrl || null,
-    s3Key,
+    archivePath: archived.archive.relativePath,
+    zernioMediaUrls: queueResult.mediaUrls || [],
     zernioInstagramPostId: queueResult?.instagramPostId || null,
     zernioYouTubePostId: queueResult?.youtubePostId || null,
-    zernioPostId: queueResult?.instagramPostId || null,
+    zernioPostId: queueResult?.postId || null,
     zernioCommentId: queueResult?.commentId || null,
     caption: script.caption,
     hashtags: script.hashtags,

@@ -4,8 +4,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { overlayCharacterOnImage, CharacterKey, getRandomCharacterKey, getCharacterInfo } from './lib/character-overlay'
 import { captureComposite } from './lib/composite-renderer'
-import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
-import { DEFAULT_BUCKET } from '../src/lib/s3-client'
+import { publishArchivedSocial } from './lib/social-archive'
 import { assertNoKeywordCta } from './lib/instagram-copy-policy'
 import {
   queueInstagramPost,
@@ -80,6 +79,7 @@ function loadPostHistory(): any {
 function recordPostInHistory(entry: any): void {
   const historyPath = path.resolve(process.cwd(), 'content/social/instagram-post-history.json')
   const history = loadPostHistory()
+  if (entry.zernioPostId && history.posts.some((p: any) => p.zernioPostId === entry.zernioPostId)) return
   history.posts.push({
     ...entry,
     createdAt: new Date().toISOString(),
@@ -336,34 +336,26 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
     console.log(`💎 Using inspected polished image: ${resolvedPath}`)
     const finalImagePath = resolvedPath
 
-    // Upload to Neon S3
+    // Archive final media before publishing
     let publicUrl: string | undefined
-    let s3Key: string | undefined
+    let archivePath: string | undefined
 
     const targetQueueId = isMarketingCampaign ? DEFAULT_LEADMAGNET_QUEUE_ID : DEFAULT_POST_QUEUE_ID
     let queueResult: QueueInstagramPostResult | null = null
 
     if (!options.dryRun) {
-      console.log(`\n1️⃣ Uploading Polished Post Image to Neon S3...`)
-      s3Key = `images/social/posts/post-${timestamp}.png`
-      const s3Result = await uploadLocalFileToS3(finalImagePath, s3Key, DEFAULT_BUCKET)
-      publicUrl = s3Result.publicUrl
-      console.log(`   🚀 Public S3 Image URL: ${publicUrl}`)
-
-      // 2️⃣ Deterministically Queue to Zernio & Post Algorithmic First Comment
-      if (publicUrl) {
-        queueResult = await queueInstagramPost({
-          mediaUrl: publicUrl,
-          mediaPath: finalImagePath,
-          caption: postData.caption,
-          firstComment: postData.firstComment,
-          queueId: targetQueueId,
-          profileId: DEFAULT_PROFILE_ID,
-          accountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
-          isAiGenerated: true,
-          publishNow: options.publishNow,
-        })
+      const publication = {
+        caption: postData.caption, firstComment: postData.firstComment,
+        queueId: targetQueueId, profileId: DEFAULT_PROFILE_ID,
+        accountId: DEFAULT_INSTAGRAM_ACCOUNT_ID, isAiGenerated: true, validateMediaWindow: true, publishNow: !!options.publishNow,
       }
+      const archived = await publishArchivedSocial({
+        kind: 'post', files: [finalImagePath],
+        metadata: { ...postData, theme, aspect, publication, draft: options.contentJson ? JSON.parse(fs.readFileSync(options.contentJson, 'utf8')) : undefined },
+      }, ([mediaPath]) => queueInstagramPost({ ...publication, mediaPath }))
+      archivePath = archived.archive.relativePath
+      queueResult = archived.result
+      publicUrl = queueResult.mediaUrls?.[0]
 
       // Record to Continuity Ledger
       recordPostInHistory({
@@ -372,8 +364,8 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
         hookHeadline: postData.hookHeadline,
         theme,
         mascot: postData.mascot,
-        s3Url: publicUrl || null,
-        s3Key: s3Key || null,
+        archivePath,
+        zernioMediaUrls: queueResult.mediaUrls || [],
         aspectRatio: aspect,
         caption: postData.caption,
         hashtags: postData.hashtags,
@@ -386,9 +378,9 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
         isAiGenerated: true,
       })
     } else {
-      console.log(`\n1️⃣ [Dry Run] Skipped S3 upload. Polished image saved at: ${finalImagePath}`)
+      console.log(`\n1️⃣ [Dry Run] Skipped Drive archive and uploads. Polished image saved at: ${finalImagePath}`)
       queueResult = await queueInstagramPost({
-        mediaUrl: `https://placeholder.storage.neon.tech/moltology-public-assets/images/social/posts/post-${timestamp}.png`,
+        mediaPath: finalImagePath,
         caption: postData.caption,
         firstComment: postData.firstComment,
         queueId: targetQueueId,
@@ -414,7 +406,7 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
     return {
       finalImagePath,
       publicUrl,
-      s3Key,
+      archivePath,
       postData,
       queueResult,
       queueConfig: {
