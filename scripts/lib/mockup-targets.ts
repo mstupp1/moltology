@@ -14,8 +14,9 @@ export const REGISTERED_TARGETS: Record<string, CaptureTarget> = Object.fromEntr
     ...(['desktop', 'mobile'] as const).map((device) => ({
       name: `${sector.id}_${device}`,
       route: sector.route,
-      windowSize: device === 'mobile' ? '540,1170' : '1760,1100',
-      scaleFactor: 2,
+      // Mobile captures use a real phone width so the homepage frame shows them near actual size.
+      windowSize: device === 'mobile' ? '390,844' : '1760,1100',
+      scaleFactor: device === 'mobile' ? 3 : 2,
       isMobile: device === 'mobile',
       outputBase: `${sector.id}_${device}_preview`,
     })),

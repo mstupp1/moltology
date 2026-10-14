@@ -1,11 +1,17 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Pause, Play } from 'lucide-react'
+import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react'
+import { Maximize2, Pause, Play } from 'lucide-react'
 import { getAssetUrl } from '@/lib/assets'
 import { DEVICE_PREVIEW_LIBRARY, devicePreviewPath } from './device-preview-library'
 
 export const PREVIEW_INTERVAL_MS = 6000
 
-/** Fixed device frame, gently crossfading real desktop/mobile captures after they load. */
+const ImageLightbox = React.lazy(() => import('@/components/ui/ImageLightbox').then((m) => ({ default: m.ImageLightbox })))
+
+/**
+ * Fixed device frame, gently crossfading real desktop/mobile captures after they load. On wider
+ * screens each capture is zoomed into its main panel so the text reads near its real size, and
+ * any capture opens full size in a lightbox.
+ */
 export function DevicePreviewCarousel() {
   const hostRef = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(0)
@@ -19,6 +25,7 @@ export function DevicePreviewCarousel() {
   const [visible, setVisible] = useState(false)
   const [pageVisible, setPageVisible] = useState(true)
   const [reducedMotion, setReducedMotion] = useState(true)
+  const [zoomed, setZoomed] = useState<{ index: number; device: 'desktop' | 'mobile' } | null>(null)
   const current = DEVICE_PREVIEW_LIBRARY[active]
   const next = (active + 1) % DEVICE_PREVIEW_LIBRARY.length
 
@@ -81,8 +88,14 @@ export function DevicePreviewCarousel() {
     else if (loaded.has(requested)) { setActive(requested); setRequested(null) }
   }, [requested, loaded, failed])
 
+  const openFull = () => {
+    const device = window.matchMedia?.('(max-width: 639px)').matches ? 'mobile' : 'desktop'
+    setPaused(true)
+    setZoomed({ index: active, device })
+  }
+
   useEffect(() => {
-    if (paused || hovered || focused || reducedMotion || !visible || !pageVisible) return
+    if (zoomed || paused || hovered || focused || reducedMotion || !visible || !pageVisible) return
     const timer = window.setInterval(() => {
       // Skip failed captures and never fade into an image that has not loaded.
       for (let offset = 1; offset < DEVICE_PREVIEW_LIBRARY.length; offset++) {
@@ -93,7 +106,7 @@ export function DevicePreviewCarousel() {
       }
     }, PREVIEW_INTERVAL_MS)
     return () => window.clearInterval(timer)
-  }, [active, loaded, failed, paused, hovered, focused, visible, pageVisible, reducedMotion])
+  }, [active, loaded, failed, paused, hovered, focused, visible, pageVisible, reducedMotion, zoomed])
 
   return (
     <div ref={hostRef} role="region" aria-roledescription="carousel" aria-label="Platform screenshots" aria-busy={requested !== null}
@@ -115,7 +128,10 @@ export function DevicePreviewCarousel() {
           {paused ? <Play size={14} aria-hidden="true" /> : <Pause size={14} aria-hidden="true" />}
         </button>}
       </div>
-      <div className="relative rounded-t-[2.25rem] sm:rounded-t-[1.25rem] border-[6px] sm:border border-b-0 border-[#0f1d22] sm:border-cyan-300/25 ring-1 ring-cyan-300/25 sm:ring-0 bg-[#061014]/95 shadow-[0_-20px_80px_rgba(0,195,255,0.18)] overflow-hidden">
+      <p className="relative z-20 mx-auto mb-5 min-h-[2.5rem] sm:min-h-0 max-w-[34rem] px-2 text-center text-sm sm:text-base text-ink-body [text-wrap:balance]" aria-live={paused ? 'polite' : 'off'}>
+        {current.caption}
+      </p>
+      <div className="group/frame relative mx-auto max-w-[340px] sm:max-w-none rounded-t-[2.25rem] sm:rounded-t-[1.25rem] border-[6px] sm:border border-b-0 border-[#0f1d22] sm:border-cyan-300/25 ring-1 ring-cyan-300/25 sm:ring-0 bg-[#061014]/95 shadow-[0_-20px_80px_rgba(0,195,255,0.18)] overflow-hidden">
         <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 z-10 h-5 w-20 rounded-full bg-black" aria-hidden="true" />
         <div className="hidden sm:flex items-center gap-3 px-4 h-10 border-b border-line-subtle bg-surface-2">
           <div className="flex gap-1.5" aria-hidden="true">
@@ -126,17 +142,23 @@ export function DevicePreviewCarousel() {
           <div className="mx-auto max-w-[260px] w-full rounded-control bg-surface-1 border border-line-subtle px-3 py-0.5 text-[11px] text-ink-muted text-center truncate">moltology.org{current.route}</div>
           <div className="w-[42px]" aria-hidden="true" />
         </div>
-        <div className="relative aspect-[540/790] sm:aspect-[1280/600] overflow-hidden" aria-live={paused ? 'polite' : 'off'}>
+        <div className="relative aspect-[540/790] sm:aspect-[1280/600] overflow-hidden">
           {DEVICE_PREVIEW_LIBRARY.map((shot, index) => {
             // Load the first image on SSR, then only the next capture and visited captures.
             const shouldLoad = index === requested || mounted.has(index)
+            // Zoom into the capture's main panel on wider screens (see `focus` in the library).
+            const zoom = {
+              '--zw': `${100 / shot.focus.w}%`,
+              '--zx': `${(-shot.focus.x / shot.focus.w) * 100}%`,
+              '--zy': `${-shot.focus.y * 100}%`,
+            } as React.CSSProperties
             return <picture key={shot.id} aria-hidden={index !== active}
               className={`absolute inset-x-0 bottom-0 top-8 sm:top-0 transition-opacity duration-[900ms] ease-in-out motion-reduce:transition-none ${index === active ? 'opacity-100' : 'opacity-0'}`}>
               {shouldLoad && <>
-                <source media="(max-width: 639px)" srcSet={getAssetUrl(devicePreviewPath(shot.id, 'mobile', true))} width={540} height={1170} />
+                <source media="(max-width: 639px)" srcSet={`${getAssetUrl(devicePreviewPath(shot.id, 'mobile', true))} 540w, ${getAssetUrl(devicePreviewPath(shot.id, 'mobile'))} 1170w`} sizes="340px" width={540} height={1170} />
                 <img src={getAssetUrl(devicePreviewPath(shot.id, 'desktop', true))}
                   srcSet={`${getAssetUrl(devicePreviewPath(shot.id, 'desktop', true))} 1280w, ${getAssetUrl(devicePreviewPath(shot.id, 'desktop'))} 3520w`}
-                  sizes="(min-width: 1280px) 1180px, 94vw" alt={shot.alt}
+                  sizes={`(min-width: 1280px) ${Math.round(1180 / shot.focus.w)}px, ${Math.round(94 / shot.focus.w)}vw`} alt={shot.alt}
                   loading="eager" fetchPriority="low" decoding="async" width={1280} height={800}
                   onLoad={(event) => {
                     const image = event.currentTarget
@@ -144,12 +166,38 @@ export function DevicePreviewCarousel() {
                     else markReady(index)
                   }}
                   onError={() => setFailed((previous) => new Set(previous).add(index))}
-                  className="absolute inset-0 w-full h-auto" />
+                  style={zoom}
+                  className="absolute inset-0 w-full h-auto max-w-none sm:left-[var(--zx)] sm:w-[var(--zw)] sm:[transform:translateY(var(--zy))]" />
               </>}
             </picture>
           })}
+          <button type="button" onClick={openFull} disabled={!loaded.has(active)}
+            aria-label={`Open the ${current.label} screenshot full size`}
+            className="absolute inset-0 z-10 cursor-zoom-in focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-cyan-glow disabled:cursor-default">
+            <span className="absolute right-3 top-10 sm:top-3 inline-flex items-center gap-1.5 rounded-control border border-line bg-surface-1/85 px-2.5 py-1.5 text-xs text-ink-heading backdrop-blur-sm transition-colors group-hover/frame:border-cyan-glow/60 group-hover/frame:text-cyan-glow">
+              <Maximize2 size={13} aria-hidden="true" />
+              Full size
+            </span>
+          </button>
         </div>
       </div>
+      {zoomed && (
+        <Suspense fallback={null}>
+          <ImageLightbox
+            isOpen
+            size="wide"
+            onClose={() => setZoomed(null)}
+            currentIndex={zoomed.index}
+            onIndexChange={(index) => setZoomed({ ...zoomed, index })}
+            images={DEVICE_PREVIEW_LIBRARY.map((shot) => ({
+              src: getAssetUrl(devicePreviewPath(shot.id, zoomed.device)),
+              alt: shot.alt,
+              title: shot.label,
+              description: shot.caption,
+            }))}
+          />
+        </Suspense>
+      )}
     </div>
   )
 }

@@ -1,11 +1,14 @@
 import React, { useEffect, useRef } from 'react'
 import type { HeroParticlesHandle } from './engine'
+import type { HeroWaterHandle } from './water'
 
 export interface HeroParticleFieldProps {
   /** Box the shell is drawn into. */
   anchorRef: React.RefObject<HTMLElement | null>
-  /** Element that reports the pointer for parallax. */
+  /** Element that reports the pointer for parallax; also the box the water canvas is placed in. */
   hostRef?: React.RefObject<HTMLElement | null>
+  /** Canvas for the WebGL water below the horizon. Without it (or WebGL) the CSS sea stays. */
+  waterRef?: React.RefObject<HTMLCanvasElement | null>
   className?: string
 }
 
@@ -14,7 +17,7 @@ export interface HeroParticleFieldProps {
  * chunk loaded once the page has loaded and gone idle, and the canvas fades in after its first
  * frame, so the headline and copy paint first and never wait on it.
  */
-export const HeroParticleField: React.FC<HeroParticleFieldProps> = ({ anchorRef, hostRef, className = '' }) => {
+export const HeroParticleField: React.FC<HeroParticleFieldProps> = ({ anchorRef, hostRef, waterRef, className = '' }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -22,6 +25,7 @@ export const HeroParticleField: React.FC<HeroParticleFieldProps> = ({ anchorRef,
     const anchor = anchorRef.current
     if (!canvas || !anchor || typeof canvas.getContext !== 'function') return
     let handle: HeroParticlesHandle | null = null
+    let water: HeroWaterHandle | null = null
     let cancelled = false
     let idleId: number | undefined
     let timeoutId: ReturnType<typeof setTimeout> | undefined
@@ -33,17 +37,38 @@ export const HeroParticleField: React.FC<HeroParticleFieldProps> = ({ anchorRef,
 
     const boot = () => {
       if (cancelled) return
-      import('./engine')
-        .then(({ startHeroParticles }) => {
+      const waterCanvas = waterRef?.current
+      const host = hostRef?.current
+      const sea = anchor.querySelector<HTMLElement>('.home-hero-sea')
+      // The water mirrors the moving field, so a still frame keeps the CSS sea instead.
+      const wantWater = !reducedMotion && waterCanvas && host && sea
+      Promise.all([import('./engine'), wantWater ? import('./water').catch(() => null) : null])
+        .then(([{ startHeroParticles }, waterModule]) => {
           if (cancelled) return
           handle = startHeroParticles({
             canvas,
             anchor,
-            host: hostRef?.current,
+            host,
             reducedMotion,
             budget: lowEnd ? 0.6 : 1,
             onReady: () => canvas.setAttribute('data-ready', 'true'),
+            onFrame: (time, flash) => water?.render(time, flash),
+            // A device that can't hold the frame rate gets the CSS sea back.
+            onSlow: () => {
+              water?.destroy()
+              water = null
+            },
           })
+          if (waterModule && waterCanvas && host && sea) {
+            water = waterModule.startHeroWater({
+              canvas: waterCanvas,
+              source: canvas,
+              sea,
+              host,
+              anchor,
+              moon: host.querySelector<HTMLElement>('.home-hero-moon'),
+            })
+          }
         })
         .catch(() => {
           // Decorative only: without the engine the hero keeps its static glow.
@@ -64,8 +89,9 @@ export const HeroParticleField: React.FC<HeroParticleFieldProps> = ({ anchorRef,
       if (idleId !== undefined) window.cancelIdleCallback?.(idleId)
       if (timeoutId !== undefined) clearTimeout(timeoutId)
       handle?.destroy()
+      water?.destroy()
     }
-  }, [anchorRef, hostRef])
+  }, [anchorRef, hostRef, waterRef])
 
   return <canvas ref={canvasRef} className={`home-hero-particles ${className}`} aria-hidden="true" data-testid="hero-particles" />
 }

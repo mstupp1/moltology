@@ -9,8 +9,8 @@ describe('marketing capture registry', () => {
         const target = REGISTERED_TARGETS[`${sector.id}_${device}`]
         expect(target.route).toBe(sector.route)
         expect(target.isMobile).toBe(device === 'mobile')
-        expect(target.windowSize).toBe(device === 'mobile' ? '540,1170' : '1760,1100')
-        expect(target.scaleFactor).toBe(2)
+        expect(target.windowSize).toBe(device === 'mobile' ? '390,844' : '1760,1100')
+        expect(target.scaleFactor).toBe(device === 'mobile' ? 3 : 2)
         expect(devicePreviewPath(sector.id, device)).toBe(`/images/marketing/${target.outputBase}.webp`)
         expect(devicePreviewPath(sector.id, device, true)).toBe(`/images/marketing/${target.outputBase}_sm.webp`)
       }
