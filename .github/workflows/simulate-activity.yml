@@ -1,9 +1,10 @@
-name: 12-Hour Activity Simulation
+name: Daily Activity Simulation
 
 on:
-  # Recurring 12-hour cadence is now managed via Antigravity Scheduled Tasks.
+  # Recurring cadence is managed by a local Codex automation.
+  # Daily mode runs two sequential ticks. Keep this trigger disabled to avoid duplicates.
   # schedule:
-  #   - cron: '0 */12 * * *'
+  #   - cron: '0 0 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -58,4 +59,4 @@ jobs:
           if [ "${{ inputs.force_spawn }}" = "true" ]; then
             ARGS="$ARGS --force-spawn"
           fi
-          npx tsx scripts/simulate-activity.ts $ARGS
+          npm run simulate:daily -- $ARGS
