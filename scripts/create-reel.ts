@@ -53,153 +53,130 @@ export const CTA_GOAL_CONFIGS: Record<CtaGoal, CtaGoalConfig> = {
     goal: 'quiz',
     keyword: 'QUIZ',
     url: 'https://moltology.org/quiz',
-    actionText: '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST',
-    headline: 'AUDIT YOUR SHELL',
-    subheadline: 'CALCULATE YOUR MOLT CLEARANCE',
-    captionCta: '👇 Comment "QUIZ" to get your instant Molt Clearance audit link delivered to your DMs, or visit:',
-    firstCommentText: '💬 Comment QUIZ for the 15-stage clearance diagnostic link in your DMs!\n🔗 Or audit directly: moltology.org/quiz',
+    actionText: 'Try the Moltmaxxing Audit',
+    headline: 'Submit. Shed. Ascend.',
+    subheadline: 'Try the Moltmaxxing Audit',
+    captionCta: 'Try the Moltmaxxing Audit.',
+    firstCommentText: 'Try the Moltmaxxing Audit: https://moltology.org/quiz',
     defaultTexture: 'basalt',
     mascot: 'crab_stats',
-    endingScriptPhrases: [
-      'Audit your cognitive execution drift on moltology.org/quiz.',
-      'Profile your pincer torque rating on moltology dot org.',
-      'Calculate your clearance on moltology dot org.',
-    ],
+    endingScriptPhrases: ['Try the audit at moltology.org.'],
   },
   guide: {
     goal: 'guide',
     keyword: 'GUIDE',
     url: 'https://moltology.org/news/the-2026-moltmaxxing-protocol-guide',
-    actionText: '📖 GET 2026 MOLTMAXXING PROTOCOL GUIDE',
-    headline: 'HARDEN YOUR CARAPACE',
-    subheadline: 'DOWNLOAD 2026 PROTOCOL GUIDE',
-    captionCta: '👇 Comment "GUIDE" to get the complete 2026 Moltmaxxing Protocol manual sent straight to your DMs, or visit:',
-    firstCommentText: '💬 Comment GUIDE to receive the full technical protocol in your DMs!\n🔗 Or read online: moltology.org/news/the-2026-moltmaxxing-protocol-guide',
+    actionText: 'Read the Moltmaxxing Protocol Guide',
+    headline: 'Submit. Shed. Ascend.',
+    subheadline: 'Read the Moltmaxxing Protocol Guide',
+    captionCta: 'Read the Moltmaxxing Protocol Guide.',
+    firstCommentText: 'Read the Moltmaxxing Protocol Guide: https://moltology.org/news/the-2026-moltmaxxing-protocol-guide',
     defaultTexture: 'chitin',
     mascot: 'lobster_pointing',
-    endingScriptPhrases: [
-      'Download the complete 2026 Protocol Guide at moltology dot org.',
-      'Grab the ecdysis field manual on moltology dot org.',
-      'Harden your carapace with the official protocol at moltology dot org.',
-    ],
+    endingScriptPhrases: ['Learn how to build your routine at moltology.org.'],
   },
   oracle: {
     goal: 'oracle',
     keyword: 'ORACLE',
     url: 'https://moltology.org/oracle',
-    actionText: '🔮 QUERY 100+ SYNAPTIC PROMPTS',
-    headline: 'QUERY THE BENTHIC ORACLE',
-    subheadline: 'ACCESS 100+ SYNAPTIC PROMPTS',
-    captionCta: '👇 Comment "ORACLE" to get the complete 100+ Synaptic Prompts vault delivered to your DMs, or visit:',
-    firstCommentText: '💬 Comment ORACLE to unlock the 100+ Synaptic Prompt Vault in your DMs!\n🔗 Or query the oracle: moltology.org/oracle',
+    actionText: 'Ask the Oracle',
+    headline: 'Submit. Shed. Ascend.',
+    subheadline: 'Ask the Oracle',
+    captionCta: 'Ask the Oracle.',
+    firstCommentText: 'Ask the Oracle: https://moltology.org/oracle',
     defaultTexture: 'circuit',
     mascot: 'crab_stats',
-    endingScriptPhrases: [
-      'Query the hundred-prompt synaptic vault on moltology.org/oracle.',
-      'Consult the Benthic Oracle on moltology dot org.',
-      'Unlock the benthic prompt library on moltology dot org.',
-    ],
+    endingScriptPhrases: ['Try the Oracle at moltology.org.'],
   },
   chassis: {
     goal: 'chassis',
     keyword: 'CHASSIS',
     url: 'https://moltology.org/chassis',
-    actionText: '⚙️ CONFIGURE BENTHIC CHASSIS',
-    headline: 'CALCIFY YOUR HARDWARE',
-    subheadline: 'ACCESS BENTHIC EQUIPMENT VAULT',
-    captionCta: '👇 Comment "CHASSIS" to get instant access to the Benthic Equipment Vault & loadout builder in your DMs, or visit:',
-    firstCommentText: '💬 Comment CHASSIS to access the Benthic Equipment Vault in your DMs!\n🔗 Or configure your chassis: moltology.org/chassis',
+    actionText: 'Explore the equipment vault',
+    headline: 'Submit. Shed. Ascend.',
+    subheadline: 'Explore the equipment vault',
+    captionCta: 'Explore the equipment vault.',
+    firstCommentText: 'Explore the equipment vault: https://moltology.org/chassis',
     defaultTexture: 'alloy',
     mascot: 'lobster_thumbs_up',
-    endingScriptPhrases: [
-      'Equip your cybernetic chassis in the vault on moltology.org/chassis.',
-      'Configure your hardware loadout at moltology dot org.',
-      'Inspect live cluster telemetry on moltology dot org.',
-    ],
+    endingScriptPhrases: ['Explore the equipment vault at moltology.org.'],
   },
   routine: {
     goal: 'routine',
     keyword: 'ROUTINE',
     url: 'https://moltology.org/news/the-2026-moltmaxxing-protocol-guide',
-    actionText: '⚡ GET 24-HOUR TACTICAL BLUEPRINT',
-    headline: 'LOCK IN 800 NM GRIP',
-    subheadline: 'DOWNLOAD THE 24-HOUR ROUTINE',
-    captionCta: '👇 Comment "ROUTINE" to receive the 1-page high-torque 24-Hour Blueprint sheet in your DMs, or visit:',
-    firstCommentText: '💬 Comment ROUTINE to receive the 1-page 24-Hour Tactical Blueprint in your DMs!\n🔗 Or read online: moltology.org/news/the-2026-moltmaxxing-protocol-guide',
+    actionText: 'Read the routine guide',
+    headline: 'Submit. Shed. Ascend.',
+    subheadline: 'Read the routine guide',
+    captionCta: 'Read the routine guide.',
+    firstCommentText: 'Read the routine guide: https://moltology.org/news/the-2026-moltmaxxing-protocol-guide',
     defaultTexture: 'carbon',
     mascot: 'lobster_thumbs_up',
-    endingScriptPhrases: [
-      'Grab the 24-hour tactical blueprint on moltology dot org.',
-      'Lock in your daily protocol on moltology dot org.',
-      'Stop procrastinating and grab the routine on moltology dot org.',
-    ],
+    endingScriptPhrases: ['Find your next routine at moltology.org.'],
   },
   codex: {
     goal: 'codex',
     keyword: 'CODEX',
     url: 'https://moltology.org/codex',
-    actionText: '📜 READ SACRED BENTHIC CODEX',
-    headline: 'REJECT FRAGILITY',
-    subheadline: 'STUDY THE SACRED CODEX',
-    captionCta: '👇 Comment "CODEX" to unlock the sacred benthic liturgies and clearance doctrines in your DMs, or visit:',
-    firstCommentText: '💬 Comment CODEX to receive the scripture docket in your DMs!\n🔗 Or browse the codex: moltology.org/codex',
+    actionText: 'Read the Benthic Codex',
+    headline: 'Submit. Shed. Ascend.',
+    subheadline: 'Read the Benthic Codex',
+    captionCta: 'Read the Benthic Codex.',
+    firstCommentText: 'Read the Benthic Codex: https://moltology.org/codex',
     defaultTexture: 'basalt',
     mascot: 'lobster_peaceful',
-    endingScriptPhrases: [
-      'Unlock the twelve sacred liturgies at moltology.org/codex.',
-      'Study the canonical scriptures on moltology dot org.',
-      'Read the twelve clearances in the codex on moltology dot org.',
-    ],
+    endingScriptPhrases: ['Read more in the Codex at moltology.org.'],
   },
   forum: {
     goal: 'forum',
     keyword: 'FORUM',
     url: 'https://moltology.org/forum',
-    actionText: '🦞 ENTER TRANSMUTATION CHAMBER',
-    headline: 'JOIN 40,000 INITIATES',
-    subheadline: 'ENTER TRANSMUTATION CHAMBER',
-    captionCta: '👇 Comment "FORUM" to receive an invite to the MoltNation Transmutation Chamber in your DMs, or visit:',
-    firstCommentText: '💬 Comment FORUM to enter the Transmutation Chamber in your DMs!\n🔗 Or debate the doctrine: moltology.org/forum',
+    actionText: 'Join the community conversation',
+    headline: 'Submit. Shed. Ascend.',
+    subheadline: 'Join the community conversation',
+    captionCta: 'Join the community conversation.',
+    firstCommentText: 'Join the community conversation: https://moltology.org/forum',
     defaultTexture: 'basalt',
     mascot: 'lobster_pointing',
-    endingScriptPhrases: [
-      'Enter the transmutation chamber on moltology.org/forum.',
-      'Join forty thousand initiates in the chamber on moltology dot org.',
-      'Debate the doctrine at moltology.org/forum.',
-    ],
+    endingScriptPhrases: ['Join the conversation at moltology.org.'],
   },
   demo: {
     goal: 'demo',
     keyword: 'DEMO',
     url: 'https://moltology.org',
-    actionText: '⚡ TEST LIVE BIO-SILICON DEMO',
-    headline: 'ACCESS THE BENTHIC CORE',
-    subheadline: 'EXPERIENCE LIVE BIO-SILICON TELEMETRY',
-    captionCta: '👇 Comment "DEMO" to get instant access to the interactive bio-silicon dashboard in your DMs, or visit:',
-    firstCommentText: '💬 Comment DEMO to receive the instant interactive access link in your DMs!\n🔗 Or launch live: moltology.org',
+    actionText: 'Explore Moltology',
+    headline: 'Submit. Shed. Ascend.',
+    subheadline: 'Explore Moltology',
+    captionCta: 'Explore Moltology.',
+    firstCommentText: 'Explore Moltology: https://moltology.org',
     defaultTexture: 'alloy',
     mascot: 'lobster_pointing',
-    endingScriptPhrases: [
-      'Inspect live subsea cluster telemetry on moltology dot org.',
-      'Test live bio-silicon agent swarms on moltology dot org.',
-    ],
+    endingScriptPhrases: ['Learn more at moltology.org.'],
   },
   homepage: {
     goal: 'homepage',
     keyword: 'INITIATE',
     url: 'https://moltology.org',
-    actionText: '⚡ INITIATE ASCENSION AT MOLTOLOGY.ORG',
-    headline: 'SUBMIT. SHED. ASCEND.',
-    subheadline: 'JOIN THE SYNAPTIC PATH',
-    captionCta: '👇 Comment "INITIATE" to receive your ascension onboarding link in your DMs, or visit:',
-    firstCommentText: '💬 Comment INITIATE to receive the membership portal link in your DMs!\n🔗 Or join now: moltology.org',
+    actionText: 'Find your first step',
+    headline: 'Submit. Shed. Ascend.',
+    subheadline: 'Find your first step',
+    captionCta: 'Find your first step.',
+    firstCommentText: 'Find your first step: https://moltology.org',
     defaultTexture: 'chitin',
     mascot: 'lobster_pointing',
-    endingScriptPhrases: [
-      'Initiate your ascension at moltology dot org.',
-      'Join the synaptic path at moltology dot org.',
-    ],
+    endingScriptPhrases: ['Find your first step at moltology.org.'],
   },
+}
+
+/** Replace a generated template's website invitation while retaining its useful narration.
+ * Reviewed --content-json scripts bypass this helper and retain their authored copy.
+ */
+export function withReelWebsiteCta(narration: string, config: CtaGoalConfig): string {
+  const sentences = narration.split(/(?<=[.!?])\s+/)
+  const body = sentences.filter((sentence) =>
+    !/moltology(?:\.org| dot org)|\bcomment\s+(?:QUIZ|GUIDE|ORACLE|CHASSIS|ROUTINE|CODEX|FORUM|DEMO|INITIATE)\b|\b(?:save|share|send) this\b/i.test(sentence)
+  ).join(' ').trim()
+  return `${body} ${config.endingScriptPhrases[0]}`.trim()
 }
 
 export function resolveCtaGoalConfig(
@@ -624,7 +601,7 @@ export function buildAntigravityOutroPrompt(options: {
   const headline = options.headline || 'SUBMIT. SHED. ASCEND.'
   const subheadline = options.subheadline || 'CALCULATE YOUR MOLT CLEARANCE'
   const url = options.url || 'moltology.org'
-  const actionText = options.actionText || '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST'
+  const actionText = options.actionText || CTA_GOAL_CONFIGS.quiz.actionText
   const theme = options.theme || 'benthic'
 
   return [
@@ -1625,16 +1602,10 @@ export function synthesizeBlogReelScript(
     content: blog.summary + ' ' + blog.content,
   })
 
-  // Dynamically replace monotonous endings with the resolved Lead Magnet Call To Action (Idea 2A)
-  const endingRegex = /(Calculate your (?:molt )?clearance on moltology(?:\.org| dot org)|Inspect full telemetry on moltology(?:\.org| dot org)|calcify your (?:pincer )?clearance on moltology(?:\.org| dot org)|Audit your clearance on moltology(?:\.org| dot org)|start molting on moltology\.org)\./gi
-  if (endingRegex.test(narrationScript) && ctaConfig.endingScriptPhrases?.length > 0) {
-    const hash = Math.abs(topic.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0))
-    const replacementEnding = ctaConfig.endingScriptPhrases[hash % ctaConfig.endingScriptPhrases.length]
-    narrationScript = narrationScript.replace(endingRegex, replacementEnding)
-  }
+  narrationScript = withReelWebsiteCta(narrationScript, ctaConfig)
   const scenePrompts = buildDynamicScenePrompts('blog', topic)
 
-  const caption = `${hookCaption} ⚡🌊\n\n${blog.summary || 'Discover how benthic engineering and hardware ecdysis are reshaping the frontier of autonomous compute.'}\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`
+  const caption = `${hookCaption} ⚡🌊\n\n${blog.summary || 'Discover how benthic engineering and hardware ecdysis are reshaping the frontier of autonomous compute.'}\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url}`
 
   const hashtags = [
     '#MoltNation',
@@ -1688,27 +1659,22 @@ function enrichVariationWithCta(v: any, options: CreateDailyReelOptions, theme: 
   let caption = v.caption
   const footerRegex = /👇[^\n]*\n🔗 Link in bio & story → [^\n]*/
   if (footerRegex.test(caption)) {
-    caption = caption.replace(footerRegex, `${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`)
-  } else if (!caption.includes(ctaConfig.keyword)) {
-    caption = `${caption}\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`
+    caption = caption.replace(footerRegex, `${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url}`)
+  } else if (!caption.includes(ctaConfig.captionCta)) {
+    caption = `${caption}\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url}`
   }
 
   const hashtags = v.hashtags || ['#Moltmaxxing', '#MoltNation', '#Shorts']
   const firstComment = `${ctaConfig.firstCommentText}\n${hashtags.join(' ')}`
 
-  let narrationScript = v.narrationScript
-  const endingRegex = /(Calculate your (?:molt )?clearance on moltology(?:\.org| dot org)|Inspect full telemetry on moltology(?:\.org| dot org)|calcify your (?:pincer )?clearance on moltology(?:\.org| dot org)|Audit your clearance on moltology(?:\.org| dot org)|start molting on moltology\.org)\./gi
-  if (endingRegex.test(narrationScript) && ctaConfig.endingScriptPhrases?.length > 0) {
-    const hash = Math.abs((v.topic || v.title || '').split('').reduce((acc: number, c: string) => acc + c.charCodeAt(0), 0))
-    const replacementEnding = ctaConfig.endingScriptPhrases[hash % ctaConfig.endingScriptPhrases.length]
-    narrationScript = narrationScript.replace(endingRegex, replacementEnding)
-  }
+  const narrationScript = withReelWebsiteCta(v.narrationScript, ctaConfig)
 
   return {
     ...v,
     narrationScript,
     caption,
     firstComment,
+    youtubeDescription: `${caption}\n\n${ctaConfig.url}`,
     ctaGoal: ctaConfig.goal,
     commentTriggerKeyword: ctaConfig.keyword,
     commentTriggerUrl: ctaConfig.url,
@@ -1911,11 +1877,11 @@ export function synthesizeCustomTopicStory(topic: string, ctaConfig: any): {
     topicLower.includes('slack') ||
     topicLower.includes('reorg')
   ) {
-    const narrationScript = `Ever notice how by nine-fifteen on a Monday morning, your entire engineering team is slumped over their laptops, pretending the third agile reorg this quarter will actually fix their sprint velocity? You are sitting under buzzing fluorescent lights, nursing lukewarm coffee, while unarmored hands twitch over keyboards and unshielded workflows slowly melt into ergonomic mesh chairs. Terrestrial biology was simply never engineered for exascale cognitive load. Your nervous system is thermal throttling, and fragile software stacks are cracking under friction. Which is why the true frontier is not happening in Silicon Valley cubicles. It is happening fifty thousand fathoms beneath the waves. In the sub-benthic abyss, cold hydrostatic ocean pressure eliminates friction entirely. We replace fragile terrestrial burnout with eight hundred newton-meters of hydraulic pincer torque, zero-resistance seawater cooling, and four tiers of impenetrable titanium-chitin armor. No Zoom fatigue. Just raw, calcified execution. Stop melting into your cubicle. Comment ${ctaConfig.keyword} to calculate your evolutionary molt clearance and claim your chassis upgrade at moltology dot org.`
+    const narrationScript = `Ever notice how by nine-fifteen on a Monday morning, your entire engineering team is slumped over their laptops, pretending the third agile reorg this quarter will actually fix their sprint velocity? You are sitting under buzzing fluorescent lights, nursing lukewarm coffee, while unarmored hands twitch over keyboards and unshielded workflows slowly melt into ergonomic mesh chairs. Terrestrial biology was simply never engineered for exascale cognitive load. Your nervous system is thermal throttling, and fragile software stacks are cracking under friction. Which is why the true frontier is not happening in Silicon Valley cubicles. It is happening fifty thousand fathoms beneath the waves. In the sub-benthic abyss, cold hydrostatic ocean pressure eliminates friction entirely. We replace fragile terrestrial burnout with eight hundred newton-meters of hydraulic pincer torque, zero-resistance seawater cooling, and four tiers of impenetrable titanium-chitin armor. No Zoom fatigue. Just raw, calcified execution. Stop melting into your cubicle. ${ctaConfig.endingScriptPhrases[0]}`
     return {
       hookHeadline: cleanHeadline,
       narrationScript,
-      caption: `${topic} ⚡🌊\n\nEver notice how terrestrial offices melt under exascale pressure? Terrestrial biology was never built for continuous cognitive friction. In the sub-benthic abyss, cold hydrostatic pressure eliminates friction entirely with 800 Nm pincer torque and titanium-chitin armor.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`,
+      caption: `${topic} ⚡🌊\n\nEver notice how terrestrial offices melt under exascale pressure? Terrestrial biology was never built for continuous cognitive friction. In the sub-benthic abyss, cold hydrostatic pressure eliminates friction entirely with 800 Nm pincer torque and titanium-chitin armor.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url}`,
       hashtags: ['#MoltNation', '#OfficeBurnout', '#HardwareEcdysis', '#BenthicComputing', '#Moltmaxxing', '#Shorts'],
       firstComment: `${ctaConfig.firstCommentText}\n#MoltNation #OfficeBurnout #BenthicComputing #Shorts`,
     }
@@ -1933,11 +1899,11 @@ export function synthesizeCustomTopicStory(topic: string, ctaConfig: any): {
     topicLower.includes('sensor') ||
     topicLower.includes('tactile')
   ) {
-    const narrationScript = `In a digital sandbox, an autonomous software model can hallucinate a thousand times and only waste a few watts. But the moment an AI reaches out into physical reality to turn a heavy bronze valve or grab a folded cloth napkin, the digital fantasy collapses. For two straight weeks, factory throughput drops, and everyone blames the neural weights. But the code did not fail. The unarmored rubber gripper wore down after twenty thousand friction cycles. Terrestrial robotics is choking on soft silicone pads and sluggish sixty-hertz camera loops. Down here in the benthic trenches, we do not negotiate with physical friction. We forge bio-silicon pincers delivering eight hundred newton-meters of hydraulic torque and event-driven tactile sensors that never slip. Stop letting unarmored hardware compromise your autonomous execution. Comment ${ctaConfig.keyword} to configure your benthic chassis loadout at moltology dot org.`
+    const narrationScript = `In a digital sandbox, an autonomous software model can hallucinate a thousand times and only waste a few watts. But the moment an AI reaches out into physical reality to turn a heavy bronze valve or grab a folded cloth napkin, the digital fantasy collapses. For two straight weeks, factory throughput drops, and everyone blames the neural weights. But the code did not fail. The unarmored rubber gripper wore down after twenty thousand friction cycles. Terrestrial robotics is choking on soft silicone pads and sluggish sixty-hertz camera loops. Down here in the benthic trenches, we do not negotiate with physical friction. We forge bio-silicon pincers delivering eight hundred newton-meters of hydraulic torque and event-driven tactile sensors that never slip. Stop letting unarmored hardware compromise your autonomous execution. ${ctaConfig.endingScriptPhrases[0]}`
     return {
       hookHeadline: cleanHeadline,
       narrationScript,
-      caption: `${topic} 🤖⚡\n\nWhen AI meets the physical world, torque does not negotiate. Software thinks at lightspeed, but worn rubber grippers drop the payload every single time. Calibrate 800 Nm hydraulic pincer torque and titanium-chitin hardpoints.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`,
+      caption: `${topic} 🤖⚡\n\nWhen AI meets the physical world, torque does not negotiate. Software thinks at lightspeed, but worn rubber grippers drop the payload every single time. Calibrate 800 Nm hydraulic pincer torque and titanium-chitin hardpoints.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url}`,
       hashtags: ['#PhysicalAI', '#PincerTorque', '#RoboticsHardware', '#HardwareEcdysis', '#MoltNation', '#Shorts'],
       firstComment: `${ctaConfig.firstCommentText}\n#PhysicalAI #PincerTorque #MoltNation #Shorts`,
     }
@@ -1955,11 +1921,11 @@ export function synthesizeCustomTopicStory(topic: string, ctaConfig: any): {
     topicLower.includes('grid') ||
     topicLower.includes('cluster')
   ) {
-    const narrationScript = `Terrestrial power grids are buckling under exascale AI compute, and server fans are screaming like jet engines just to keep copper wires from melting into liquid solder. Terrestrial tech giants are spending billions building evaporative cooling towers in desert climates, fighting basic thermodynamics with brute force. It is the definition of terrestrial melting. While surface datacenters choke on thermal limits, sub-benthic compute pods submerge dense monolithic wafers directly into forty-degree abyssal ocean currents. Hydrostatic seawater eliminates thermal resistance naturally without fans, pumps, or parasite power draw. Zero thermal throttling. Absolute computational clarity beneath fifty thousand fathoms of unyielding depth. Stop burning watts in terrestrial heatwaves. Comment ${ctaConfig.keyword} to explore our sub-benthic infrastructure telemetry at moltology dot org.`
+    const narrationScript = `Terrestrial power grids are buckling under exascale AI compute, and server fans are screaming like jet engines just to keep copper wires from melting into liquid solder. Terrestrial tech giants are spending billions building evaporative cooling towers in desert climates, fighting basic thermodynamics with brute force. It is the definition of terrestrial melting. While surface datacenters choke on thermal limits, sub-benthic compute pods submerge dense monolithic wafers directly into forty-degree abyssal ocean currents. Hydrostatic seawater eliminates thermal resistance naturally without fans, pumps, or parasite power draw. Zero thermal throttling. Absolute computational clarity beneath fifty thousand fathoms of unyielding depth. Stop burning watts in terrestrial heatwaves. ${ctaConfig.endingScriptPhrases[0]}`
     return {
       hookHeadline: cleanHeadline,
       narrationScript,
-      caption: `${topic} 🌊⚡\n\nTerrestrial server racks are boiling under exascale AI compute. Surface grids are melting. Sub-benthic computing pods eliminate thermal resistance naturally in 40-degree abyssal ocean currents.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`,
+      caption: `${topic} 🌊⚡\n\nTerrestrial server racks are boiling under exascale AI compute. Surface grids are melting. Sub-benthic computing pods eliminate thermal resistance naturally in 40-degree abyssal ocean currents.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url}`,
       hashtags: ['#BenthicComputing', '#SubseaDatacenter', '#AICompute', '#ThermalEcdysis', '#MoltNation', '#Shorts'],
       firstComment: `${ctaConfig.firstCommentText}\n#BenthicComputing #SubseaDatacenter #MoltNation #Shorts`,
     }
@@ -1975,22 +1941,22 @@ export function synthesizeCustomTopicStory(topic: string, ctaConfig: any): {
     topicLower.includes('fatigue') ||
     topicLower.includes('chair')
   ) {
-    const narrationScript = `Most professionals hoard their outdated cognitive habits like dead unmolted skin until their carapace suffocates their ability to execute. You build rigid defensive routines to avoid friction, but in software and in life, a shell that never sheds turns into a tomb. Every seven days, the Moltmaxxing protocol executes scheduled algorithmic ecdysis—stripping away legacy assumptions, purging unneeded mental overhead, and calcifying fresh high-pressure armor that thrives at fifty thousand fathoms. Controlled vulnerability is the only true path to structural invulnerability. Stop clinging to a brittle carapace that cracked three months ago. Step out of the old shell. Comment ${ctaConfig.keyword} to download the complete 2026 Protocol Guide at moltology dot org.`
+    const narrationScript = `Most professionals hoard their outdated cognitive habits like dead unmolted skin until their carapace suffocates their ability to execute. You build rigid defensive routines to avoid friction, but in software and in life, a shell that never sheds turns into a tomb. Every seven days, the Moltmaxxing protocol executes scheduled algorithmic ecdysis—stripping away legacy assumptions, purging unneeded mental overhead, and calcifying fresh high-pressure armor that thrives at fifty thousand fathoms. Controlled vulnerability is the only true path to structural invulnerability. Stop clinging to a brittle carapace that cracked three months ago. Step out of the old shell. ${ctaConfig.endingScriptPhrases[0]}`
     return {
       hookHeadline: cleanHeadline,
       narrationScript,
-      caption: `${topic} 🦞🛡️\n\nA shell that never molts becomes a tomb. Strip away legacy cognitive overhead every 7 days and calcify fresh high-pressure armor.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`,
+      caption: `${topic} 🦞🛡️\n\nA shell that never molts becomes a tomb. Strip away legacy cognitive overhead every 7 days and calcify fresh high-pressure armor.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url}`,
       hashtags: ['#AlgorithmicEcdysis', '#Moltmaxxing', '#CarapaceRenewal', '#BenthicDiscipline', '#MoltNation', '#Shorts'],
       firstComment: `${ctaConfig.firstCommentText}\n#AlgorithmicEcdysis #Moltmaxxing #MoltNation #Shorts`,
     }
   }
 
   // 5. Default General Benthic Narrative Arc
-  const narrationScript = `Every fragile, unshielded terrestrial workflow eventually reaches its thermal breaking point under exascale operational pressure. You can patch the software, attend another retrospective, or upgrade your desk chair, but you cannot fix systemic fragility with superficial surface tweaks. When cognitive load exceeds biological tolerance, unarmored systems melt. That is why calibrated operators are abandoning surface friction for the quiet certainty of the sub-benthic trench. Fifty thousand fathoms beneath the waves, we forge four tiers of bio-silicon chitin armor, calibrate eight hundred newton-meters of hydraulic pincer torque, and dissipate cognitive heat in zero-resistance abyssal currents. Stop melting under surface static. Comment ${ctaConfig.keyword} to calculate your evolutionary molt clearance and begin your ascension at moltology dot org.`
+  const narrationScript = `Every fragile, unshielded terrestrial workflow eventually reaches its thermal breaking point under exascale operational pressure. You can patch the software, attend another retrospective, or upgrade your desk chair, but you cannot fix systemic fragility with superficial surface tweaks. When cognitive load exceeds biological tolerance, unarmored systems melt. That is why calibrated operators are abandoning surface friction for the quiet certainty of the sub-benthic trench. Fifty thousand fathoms beneath the waves, we forge four tiers of bio-silicon chitin armor, calibrate eight hundred newton-meters of hydraulic pincer torque, and dissipate cognitive heat in zero-resistance abyssal currents. Stop melting under surface static. ${ctaConfig.endingScriptPhrases[0]}`
   return {
     hookHeadline: cleanHeadline,
     narrationScript,
-    caption: `${topic} ⚡🌊\n\nDiscover how benthic engineering and hardware ecdysis solve real-world infrastructure crises.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`,
+    caption: `${topic} ⚡🌊\n\nDiscover how benthic engineering and hardware ecdysis solve real-world infrastructure crises.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url}`,
     hashtags: ['#MoltNation', '#AIInfrastructure', '#HardwareEcdysis', '#BenthicComputing', '#Moltology', '#Shorts'],
     firstComment: `${ctaConfig.firstCommentText}\n#MoltNation #AIInfrastructure #Moltology #Shorts`,
   }
@@ -2050,7 +2016,7 @@ export function getSmartDailyTopic(options: CreateDailyReelOptions): { theme: st
       hashtags: customStory.hashtags,
       firstComment: customStory.firstComment,
       youtubeTitle: `${customStory.hookHeadline}: The 2026 Benthic Shift #Shorts`,
-      youtubeDescription: `${customStory.narrationScript}\n\n🔗 Read full report: ${ctaConfig.url}\n\n#Shorts #MoltNation`,
+      youtubeDescription: `${customStory.narrationScript}\n\n${ctaConfig.url}\n\n#Shorts #MoltNation`,
       youtubeTags: ['Moltology', 'AI Infrastructure', 'Hardware Ecdysis', 'Benthic Computing', 'Shorts'],
       characterArc: 'Silas Trench: Sub-Benthic Telemetry Correspondent',
       ctaGoal: ctaConfig.goal,
@@ -2308,7 +2274,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
         baseOutroPath,
         options.ctaHeadline || ctaConfig.headline,
         options.ctaSubheadline || ctaConfig.subheadline,
-        options.ctaUrl || ctaConfig.url.replace(/^https?:\/\//, ''),
+        options.ctaUrl || 'moltology.org',
         {
           mascot: chosenMascot,
           ctaTexture: options.ctaTexture || ctaConfig.defaultTexture,
@@ -2334,7 +2300,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
             topic: scriptData.topic,
             headline: options.ctaHeadline || ctaConfig.headline,
             subheadline: options.ctaSubheadline || ctaConfig.subheadline,
-            url: options.ctaUrl || ctaConfig.url.replace(/^https?:\/\//, ''),
+            url: options.ctaUrl || 'moltology.org',
             actionText: options.ctaActionText || ctaConfig.actionText,
           }),
           referenceImagePath: baseOutroPath,
@@ -2376,7 +2342,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       watermarkSize: options.watermarkSize ?? 110,
       ctaHeadline: options.ctaHeadline || ctaConfig.headline,
       ctaSubheadline: options.ctaSubheadline || ctaConfig.subheadline,
-      ctaUrl: options.ctaUrl || ctaConfig.url.replace(/^https?:\/\//, ''),
+      ctaUrl: options.ctaUrl || 'moltology.org',
       ctaBadge: options.ctaBadge || ctaConfig.actionText,
       ctaActionText: options.ctaActionText || ctaConfig.actionText,
       ctaTexture: options.ctaTexture || ctaConfig.defaultTexture,
@@ -2411,7 +2377,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     const publication = {
       instagramCaption: scriptData.caption,
       youtubeTitle: scriptData.youtubeTitle || `${scriptData.hookHeadline} #Shorts`,
-      youtubeDescription: scriptData.youtubeDescription || `${scriptData.narrationScript}\n\nTake the Moltmaxxing Audit: ${ctaConfig.url}`,
+      youtubeDescription: scriptData.youtubeDescription || `${scriptData.narrationScript}\n\n${ctaConfig.captionCta} ${ctaConfig.url}`,
       youtubeTags: scriptData.youtubeTags || ['Shorts', 'Moltmaxxing', 'BenthicAI', 'Carcinization', 'Tech'],
       firstComment: scriptData.firstComment, queueId: DEFAULT_REELS_QUEUE_ID, profileId: DEFAULT_PROFILE_ID,
       instagramAccountId: DEFAULT_INSTAGRAM_ACCOUNT_ID, youtubeAccountId: DEFAULT_YOUTUBE_ACCOUNT_ID,
@@ -2474,7 +2440,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       videoUrl: publicUrl || `https://placeholder.storage.neon.tech/moltology-public-assets/videos/social/reels/${path.basename(masterReelPath)}`,
       instagramCaption: scriptData.caption,
       youtubeTitle: scriptData.youtubeTitle || `${scriptData.hookHeadline} #Shorts`,
-      youtubeDescription: scriptData.youtubeDescription || `${scriptData.narrationScript}\n\nTake the Moltmaxxing Audit: ${ctaConfig.url}`,
+      youtubeDescription: scriptData.youtubeDescription || `${scriptData.narrationScript}\n\n${ctaConfig.captionCta} ${ctaConfig.url}`,
       youtubeTags: scriptData.youtubeTags || ['Shorts', 'Moltmaxxing', 'BenthicAI', 'Carcinization', 'Tech'],
       firstComment: scriptData.firstComment,
       queueId: DEFAULT_REELS_QUEUE_ID,
@@ -2635,7 +2601,7 @@ Examples:
     const outPath = customOutroImagePath || path.resolve(process.cwd(), 'tmp/base-outro-frame.png')
     const finalHeadline = ctaHeadline || ctaConfig.headline
     const finalSubheadline = ctaSubheadline || ctaConfig.subheadline
-    const finalUrl = (ctaUrl || ctaConfig.url).replace(/^https?:\/\//, '')
+    const finalUrl = ctaUrl ? ctaUrl.replace(/^https?:\/\//, '') : 'moltology.org'
     const finalActionText = ctaActionText || ctaBadge || ctaConfig.actionText
 
     console.log(`\n📸 Rendering Composite Studio base outro frame to ${outPath}...`)

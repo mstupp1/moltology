@@ -149,7 +149,7 @@ describe('Viral Episodic Series Formulation Engine', () => {
     const scriptQuiz = formulateViralSeriesScript('audit', { ctaGoal: 'quiz' }, mockEmptyLedger)
     expect(scriptQuiz.commentTriggerKeyword).toBe('QUIZ')
     expect(scriptQuiz.commentTriggerUrl).toContain('/quiz')
-    expect(scriptQuiz.firstComment).toMatch(/four-stage/)
+    expect(scriptQuiz.firstComment).toContain('https://moltology.org/quiz')
     expect(scriptQuiz.firstComment).not.toMatch(/15-stage/i)
 
     const scriptGuide = formulateViralSeriesScript('heresies', { ctaGoal: 'guide' }, mockEmptyLedger)
@@ -185,5 +185,23 @@ describe('Viral Episodic Series Formulation Engine', () => {
     const stats = fs.statSync(result)
     expect(stats.size).toBeGreaterThan(500)
     fs.unlinkSync(result)
+  })
+})
+
+
+describe('Series website invitations', () => {
+  it('uses the selected destination for every franchise and supported goal', () => {
+    const goals = ['quiz', 'guide', 'oracle', 'chassis', 'routine', 'codex', 'forum', 'demo', 'homepage'] as const
+    for (const franchise of ['audit', 'incidents', 'heresies', 'mysteries', 'ascension'] as const) {
+      for (const ctaGoal of goals) {
+        const script = formulateViralSeriesScript(franchise, { ctaGoal }, { episodes: [] })
+        expect(script.narrationScript).toContain('at moltology.org.')
+        for (const surface of [script.caption, script.firstComment, script.youtubeDescription]) {
+          expect(surface).toContain(script.commentTriggerUrl.replace('https://', ''))
+        }
+        expect([script.narrationScript, script.caption, script.firstComment, script.youtubeDescription].join('\n'))
+          .not.toMatch(/comment\s+(?:QUIZ|GUIDE|ORACLE|CHASSIS|ROUTINE|CODEX|FORUM|DEMO|INITIATE)|\bDMs?\b|(?:save|share|send) this/i)
+      }
+    }
   })
 })

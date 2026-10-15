@@ -11,7 +11,7 @@ description: >-
 
 This skill automates the complete lifecycle of high-production, episodic short-form video series for **Instagram Reels** and **YouTube Shorts**. It uses structured **Google Flow Veo 3.1 Multi-Scene Prompt Directives** to maximize generative video quality, drop-in video scene ingestion (`tmp/flow-video-ingest/`), episodic franchise tracking, retention loop scripting, sentence-isolated kinetic highlighted subtitles, multi-track atmospheric audio mixing, Google Drive archiving and direct Zernio media upload, and **Zernio queue staging**.
 
-Do not confuse this with [reels-and-shorts-creator](../reels-and-shorts-creator/SKILL.md). That skill is the daily six-scene Gemini Omni dispatch (`npm run reel:create`, ledger `content/social/instagram-reel-history.json`). This skill is the episodic franchise path (`npm run series:prompt` / `npm run series:create`, ledger `content/social/viral-series-ledger.json`). Same Instagram account, same Reels & Shorts queue. Do not duplicate a topic across both on the same day. Both paths follow [the Reels strategy](../../../content/social/reels-strategy.md), updated with the user's October 9, 2026 advice: physical action plus a blunt on-screen claim in the first second, one share/save CTA, and one planned variable per reel. These rules supersede older keyword funnels and exact repetition of the formula.
+Do not confuse this with [reels-and-shorts-creator](../reels-and-shorts-creator/SKILL.md). That skill is the daily six-scene Gemini Omni dispatch (`npm run reel:create`, ledger `content/social/instagram-reel-history.json`). This skill is the episodic franchise path (`npm run series:prompt` / `npm run series:create`, ledger `content/social/viral-series-ledger.json`). Same Instagram account, same Reels & Shorts queue. Do not duplicate a topic across both on the same day. Both paths follow [the Reels strategy](../../../content/social/reels-strategy.md), updated with the user's October 9 and October 15, 2026 feedback: physical action plus a blunt on-screen claim in the first second, one relevant website invitation, and one planned variable per reel. These rules supersede older keyword funnels and exact repetition of the formula.
 
 ---
 
@@ -55,13 +55,13 @@ Stolen-format mapping (never a new franchise):
   - **Moltology Order Emblem**: Luminous cyan bloom centered above the brand.
   - **Brand Title**: Clean `Moltology` typography with subtle drop shadow.
   - **The Synaptic Path**: Cyan tracked subtitle with horizontal synaptic node divider lines.
-  - **Minimalist CTA**: One specific share or save ask matching the narration and caption. `moltology.org` may remain a secondary resource; no keyword or competing quiz ask.
+  - **Minimalist CTA**: One relevant website invitation matching narration and caption. Display `moltology.org`; use the same full resource URL in accompanying copy. No save/share asks, keyword requests or DM promises.
   - **Smooth Fade-In**: 0.3s video fade-in ending for a calm, authoritative transition.
   - **Gemini API Image Polish**: Run the simplified frame through the Gemini API (`gemini-2.5-flash-image` via `scripts/generate-image.ts`) for extra 3D glassmorphic luminescence and slick subsurface textures when generating custom outro cards.
 * **Dynamic Multi-Track Audio (3-Track Mix)**: Native Video SFX (breathing, footsteps, creature screeches, impacts) + Fish Audio S2 Neural TTS Voiceover (primary, `s2.1-pro` via `FISH_VOICE_REFERENCE_ID`, +8% to +14% pacing) with Edge TTS fallback (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`) + Ducked Ambient Benthic Soundtrack (`assets/audio/benthic-ambient-loop.mp3`, dynamic harmonic offset rotation `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, volume `0.12`, smooth 0.8s entrance fade, and 1.5s musical outro fade)
-* **Visual Polish**: Minimalist Moltology Emblem watermark (`110x110`, `opacity=0.40`), sentence-isolated kinetic subtitles (word-by-word active glow in neon cyan `#00ffff` or amber `#f59e0b`), and seamless 0.20s `xfade` cross-dissolves between clips.
+* **Visual Polish**: Minimalist Moltology Emblem watermark (`110x110`, `opacity=0.40`), sentence-isolated kinetic subtitles (bold white text with amber `#f59e0b` spoken-word highlight, dark outline and soft shadow), and seamless 0.20s `xfade` cross-dissolves between clips.
 * **Asset Storage**: Google Drive (`Projects/Moltology/Social Archive/YYYY/MM/<content-id>/`), written before direct Zernio upload.
-* **Publishing Engine**: Deterministic Zernio REST API through `scripts/lib/zernio-client.ts`. Inspect native first-comment settings and the returned schedule. A scheduled first comment has not been posted yet. The legacy automatic copy requires review under §4 before production queueing; **no manual MCP tool calls**.
+* **Publishing Engine**: Deterministic Zernio REST API through `scripts/lib/zernio-client.ts`. Inspect native first-comment settings and the returned schedule. A scheduled first comment has not been posted yet. Generated copy requires review under §4 before production queueing; **no manual MCP tool calls**.
 * **Dedicated Queue** (operational discipline, not a suggestion):
   - Profile ID: `6a7f74b1839bf39ff3b6aaaa` (Default Profile)
   - Dedicated Reels Queue ID: `6a84b7702421e968ac81f5bd` (**Moltology Reels & Shorts** — daily at 6:30pm `America/New_York`)
@@ -98,7 +98,7 @@ Google Flow stays a **human handoff**. The agent writes scene directives. The us
 │  - Injects contextual cinematic color grading progression across scenes     │
 │  - Stamps Episodic HUD Lower-Third Badge and brand watermark                │
 │  - Burns sentence-isolated kinetic highlighted subtitles                    │
-│  - Appends reviewed mascot outro with one share/save ask                    │
+│  - Appends reviewed mascot outro with one website invitation               │
 │  - Mixes neural voiceover with ducked ambient benthic soundtrack            │
 │  - Output: tmp/master-series-<series>-s<season>e<episode>-<timestamp>.mp4  │
 └──────────────────────────────────────┬──────────────────────────────────────┘
@@ -141,29 +141,30 @@ Captions, first comments, HUD badges, outro CTAs, ledger blurbs, and skill examp
 ### 1. Two acts with a scene-first opening
 Keep surface friction followed by a useful molt. Open at 0:00–0:01 with physical motion and one blunt, readable on-screen claim in sentence case, under 14 words. For example, a hand turns over a buzzing phone beside unfinished work; the overlay reads “Every ping takes a bite.” Explain after the scene has begun. No opening thesis, lore lecture or title-card pause.
 
-A natural visual loop is optional. It must preserve the demonstrated action and the single share/save ask. Treat rewatches as an outcome to measure, not a reason to repeat an identical script or promise distribution.
+A natural visual loop is optional. It must preserve the demonstrated action and the single website invitation. Treat rewatches as an outcome to measure, not a reason to repeat an identical script or promise distribution.
 
 ### 2. High Visual Velocity (Scene Change Every 4–7 Seconds)
 - **Scene 1 (The Hook & Biomechanical Tension)**: A physical disruption underway immediately (a worker's chair rolls away from unfinished work, a cooling fan stops, a gadget cracks), plus the exact on-screen claim. Inspect the final first second with sound off; `hookHeadline` alone does not render a verified overlay.
 - **Scene 2 (The Terrestrial Melt / Real-world Friction)**: Expanding the pain point with fast cuts and warning telemetry.
 - **Scene 3 (The Sub-Benthic Transmutation)**: Subsea hydrothermal immersion, titanium-chitin assembly, or photonic lasers.
 - **Scene 4 (The Hydraulic Payoff & Ascension)**: Decisive 850 Nm pincer torque lock, deep-sea silence, or glowing master ascendant.
-- **Scene 5 / Outro (The CTA)**: Simplified branded card with one share/save ask tied to the useful payoff. Keep any resource URL secondary. A loop is optional; do not sacrifice clarity to force one.
+- **Scene 5 / Outro (The CTA)**: Simplified branded card with one relevant website invitation tied to the useful payoff. Display moltology.org and use the same resource destination in accompanying copy. A loop is optional; do not sacrifice clarity to force one.
 
-These are story functions, not sentences to reuse. Before each episode, log one changed variable against a named control: hook style, aphorism length, voiceover pacing or share versus save CTA. Hold the franchise and other settings steady; keep voice identity fixed for pacing tests. Use the strategy's 24-hour and 7-day comparisons and confirm a spike before adopting it.
+These are story functions, not sentences to reuse. Before each episode, log one changed variable against a named control: hook style, aphorism length, voiceover pacing or opening framing. Hold the franchise and other settings steady; keep voice identity fixed for pacing tests. Use the strategy's 24-hour and 7-day comparisons and confirm a spike before adopting it.
 
 ### 3. Sentence-Isolated Kinetic Highlighted Subtitles
 - Grouped into tight 2–3 word phrases.
-- Active word flashes with bright neon cyan `#00ffff` or golden amber `#f59e0b` glow.
+- Bold sentence-case white text; spoken word changes to amber `#f59e0b`, with a dark outline and soft shadow. No glowing pill, bounce or weight change.
+- Keep word positions stable, preserve timing and punctuation, and cut captions before the outro. At 1080×1920, start at 64px, fit within 820px and center y=1180. Suppress narration subtitles on the very first rendered frame only; preserve word timestamps and audio, with subtitles eligible from frame one (33ms at 30fps). Keep the opening headline visible. Keep headline/platform controls clear and inspect at phone size on bright and dark frames.
 - Captions strictly respect natural pauses and punctuation—zero trailing words or jarring mid-sentence splits.
 
 ---
 
-## 4. Share/save CTAs and secondary resources
+## 4. Relevant website invitations
 
 Read [comment-to-DM delivery guidance](../instagram-post-creator/references/comment-to-dm.md) before writing or queueing an episode. Delivery is disabled / unverified by default. Retire keyword CTAs in narration, caption, first comment, outro and YouTube copy. Do not ask for comments or promise DMs. The supplied advice reports zero viewer comments in 90 days and only account-authored comments; our own comments do not validate a funnel.
 
-Choose one specific ask after the useful action: “Send this to your meeting buddy.” for a recognizable shared experience, or “Save this for your next crowded Monday.” for a reusable step. Use the same ask across public surfaces. Resource links below are secondary, not competing CTAs.
+After the useful action, invite the viewer to continue with the relevant resource: “Try the audit at moltology.org” or “Read more in the Codex at moltology.org.” Do not ask for saves or shares. Match the promise to the destination. Keep one invitation and destination across narration, caption, outro, first comment and YouTube copy. Show the short domain in the video; provide the full URL in accompanying copy.
 
 | Resource goal (`--cta-goal`) | Destination URL | Resource |
 | :--- | :--- | :--- |
@@ -180,7 +181,7 @@ The Moltmaxxing Audit: https://moltology.org/quiz
 #Moltmaxxing #Carcinization #DeepWork
 ```
 
-**Current CLI limitation:** `formulateViralSeriesScript` and `resolveSeriesCtaCopy` still produce legacy keyword copy. The series CLI has no `--content-json` input, and `share` / `save` are not supported `--cta-goal` values. Treat generated output as a draft; the commands below are pipeline references, not authorization to queue unchanged copy. A future series production run must provide a reviewed-copy path and inspect every public surface before queueing. Do not work around this by copying the pipeline into `tmp/` or manually posting with MCP tools.
+**CLI behavior:** `formulateViralSeriesScript` and `resolveSeriesCtaCopy` use the shared direct-resource CTA defaults. The series CLI has no `--content-json` input. Inspect all generated copy before queueing; correcting CTA defaults does not approve unrelated template claims. Do not work around this by copying the pipeline into `tmp/` or manually posting with MCP tools.
 
 ---
 

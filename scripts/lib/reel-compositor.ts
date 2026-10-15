@@ -152,9 +152,10 @@ export async function renderHudWatermarkCard(
   return outputPath
 }
 
-/**
- * Render Kinetic Subtitle Card with active word glowing cyan (Sentence-Isolated 2-3 word chunks)
- */
+// Suppress subtitles only at timestamp zero; keep the caption stream and audio in place.
+export const CAPTION_ENABLE_EXPRESSION = 'gt(t,0)'
+
+/** Render compact narration phrases without shifting words as the highlight advances. */
 export async function renderKineticCaptionCard(
   wordsInPhrase: WordBoundaryEvent[],
   activeWordIndex: number,
@@ -162,106 +163,46 @@ export async function renderKineticCaptionCard(
 ): Promise<string> {
   const canvas = createCanvas(1080, 1920)
   const ctx = canvas.getContext('2d')
-
-  const centerY = 1380
-  const maxLineWidth = 920
-
-  const getWordSpacing = (idx: number) => {
-    const w = wordsInPhrase[idx]?.word || ''
-    if (w.endsWith('-') || w.endsWith('—') || w.endsWith('–') || w.endsWith('/')) {
-      return 0
-    }
-    return spaceWidth
+  const centerY = 1180
+  const maxLineWidth = 820
+  const fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  const hasSpaceAfter = (index: number) => !/[-—–/]$/.test(wordsInPhrase[index].word)
+  let fontSize = 64
+  ctx.font = `bold ${fontSize}px ${fontFamily}`
+  const measure = () => {
+    const spaceWidth = ctx.measureText(' ').width
+    const words = wordsInPhrase.map(({ word }, i) => ({
+      text: word,
+      width: ctx.measureText(word).width,
+      spacing: i < wordsInPhrase.length - 1 && hasSpaceAfter(i) ? spaceWidth : 0,
+    }))
+    return { words, width: words.reduce((sum, word) => sum + word.width + word.spacing, 0) }
   }
-
-  let phraseText = ''
-  for (let i = 0; i < wordsInPhrase.length; i++) {
-    phraseText += wordsInPhrase[i].word
-    if (
-      i < wordsInPhrase.length - 1 &&
-      !wordsInPhrase[i].word.endsWith('-') &&
-      !wordsInPhrase[i].word.endsWith('—') &&
-      !wordsInPhrase[i].word.endsWith('–') &&
-      !wordsInPhrase[i].word.endsWith('/')
-    ) {
-      phraseText += ' '
-    }
+  let layout = measure()
+  // Reserve room for the outline and shadow inside the safe text width.
+  while (layout.width > maxLineWidth - 24 && fontSize > 1) {
+    fontSize = Math.max(1, Math.min(fontSize - 1, Math.floor(fontSize * (maxLineWidth - 24) / layout.width)))
+    ctx.font = `bold ${fontSize}px ${fontFamily}`
+    layout = measure()
   }
-  let baseFontSize = 64
-  if (phraseText.length > 24) baseFontSize = 54
-  if (phraseText.length > 34) baseFontSize = 46
-
-  ctx.font = `900 ${baseFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
-  let phraseMetrics = ctx.measureText(phraseText)
-
-  if (phraseMetrics.width > maxLineWidth) {
-    baseFontSize = Math.floor(baseFontSize * (maxLineWidth / phraseMetrics.width))
-    ctx.font = `900 ${baseFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
-    phraseMetrics = ctx.measureText(phraseText)
-  }
-
-  const spaceWidth = ctx.measureText(' ').width
-  const wordMeasurements = wordsInPhrase.map((w) => {
-    ctx.font = `900 ${baseFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
-    return {
-      text: w.word,
-      width: ctx.measureText(w.word).width,
-    }
-  })
-
-  const totalCalculatedWidth =
-    wordMeasurements.reduce((acc, curr, idx) => acc + curr.width + (idx < wordsInPhrase.length - 1 ? getWordSpacing(idx) : 0), 0)
-
-  let currentX = (1080 - totalCalculatedWidth) / 2
-
-  ctx.textAlign = 'center'
+  let x = (1080 - layout.width) / 2
+  ctx.textAlign = 'left'
   ctx.textBaseline = 'middle'
-
-  for (let i = 0; i < wordsInPhrase.length; i++) {
-    const item = wordMeasurements[i]
-    const wordCenterX = currentX + item.width / 2
-
-    if (i === activeWordIndex) {
-      // Glow background pill behind active word
-      ctx.save()
-      const pillPadX = 16
-      const pillPadY = 10
-      const pillH = baseFontSize + pillPadY * 2
-      const pillW = item.width + pillPadX * 2
-      const pillX = currentX - pillPadX
-      const pillY = centerY - pillH / 2
-
-      ctx.fillStyle = 'rgba(0, 45, 60, 0.75)'
-      ctx.strokeStyle = '#00c3ff'
-      ctx.lineWidth = 2
-      ctx.shadowColor = 'rgba(0, 195, 255, 0.7)'
-      ctx.shadowBlur = 18
-
-      ctx.beginPath()
-      ctx.roundRect(pillX, pillY, pillW, pillH, 8)
-      ctx.fill()
-      ctx.stroke()
-      ctx.restore()
-
-      // Luminous active word text
-      ctx.font = `900 ${baseFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
-      ctx.shadowColor = 'rgba(0, 195, 255, 0.95)'
-      ctx.shadowBlur = 14
-      ctx.fillStyle = '#00ffff'
-      ctx.fillText(item.text, wordCenterX, centerY)
-      ctx.shadowBlur = 0
-    } else {
-      ctx.font = `bold ${baseFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.95)'
-      ctx.shadowBlur = 10
-      ctx.fillStyle = '#ffffff'
-      ctx.fillText(item.text, wordCenterX, centerY)
-      ctx.shadowBlur = 0
-    }
-
-    currentX += item.width + (i < wordsInPhrase.length - 1 ? getWordSpacing(i) : 0)
+  ctx.lineJoin = 'round'
+  ctx.lineWidth = 6
+  ctx.strokeStyle = 'rgba(12, 16, 20, 0.95)'
+  for (let i = 0; i < layout.words.length; i++) {
+    const word = layout.words[i]
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.65)'
+    ctx.shadowBlur = 6
+    ctx.shadowOffsetY = 3
+    ctx.strokeText(word.text, x, centerY)
+    ctx.shadowBlur = 0
+    ctx.shadowOffsetY = 0
+    ctx.fillStyle = i === activeWordIndex ? '#f59e0b' : '#ffffff'
+    ctx.fillText(word.text, x, centerY)
+    x += word.width + word.spacing
   }
-
   fs.writeFileSync(outputPath, canvas.toBuffer('image/png'))
   return outputPath
 }
@@ -1097,7 +1038,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
       '-i',
       concatFilePath,
       '-filter_complex',
-      `[0:v][1:v]overlay=0:0:enable='between(t,0,${totalSceneDuration})'[v1];[v1][2:v]overlay=0:0:shortest=1[out]`,
+      `[0:v][1:v]overlay=0:0:enable='between(t,0,${totalSceneDuration})'[v1];[v1][2:v]overlay=0:0:shortest=1:enable='${CAPTION_ENABLE_EXPRESSION}'[out]`,
       '-map',
       '[out]',
       '-t',

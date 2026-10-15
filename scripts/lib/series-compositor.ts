@@ -5,6 +5,7 @@ import { promisify } from 'node:util'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
 import { WordBoundaryEvent, chunkWordsIntoPhrases } from './tts-engine'
 import {
+  CAPTION_ENABLE_EXPRESSION,
   ColorGradingPreset,
   getColorGradingFilter,
   normalizeVideoClip,
@@ -506,7 +507,7 @@ export async function compositeSeriesReel(
     const inStreamIndex = idx + captionStartIdx
     ffmpegInputs.push('-loop', '1', '-i', ev.pngPath)
     const currentOut = `v_cap_${idx}`
-    filterStr += `;[${lastOut}][${inStreamIndex}:v]overlay=0:0:enable='between(t,${ev.startSec.toFixed(
+    filterStr += `;[${lastOut}][${inStreamIndex}:v]overlay=0:0:enable='${CAPTION_ENABLE_EXPRESSION}*between(t,${ev.startSec.toFixed(
       3
     )},${ev.endSec.toFixed(3)})'[${currentOut}]`
     lastOut = currentOut

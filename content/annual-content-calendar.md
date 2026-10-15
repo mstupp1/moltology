@@ -1,6 +1,6 @@
 # Shared annual content calendar
 
-Updated October 9, 2026. This is the seasonal reference for every content skill:
+Updated October 15, 2026. This is the seasonal reference for every content skill:
 posts, carousels and quote decks, Reels and Shorts, episodic series, blog dispatches,
 release communications and their supporting artwork. Read it with
 [BRAND_BIBLE.md](../BRAND_BIBLE.md) and [STYLE_GUIDE.md](../STYLE_GUIDE.md).
@@ -20,12 +20,19 @@ not a requirement to publish on every holiday.
    queue context. A specified audience, region or hemisphere takes precedence. A holiday
    need not be relevant to everyone to inspire a piece; do not assume every viewer observes it.
 3. Select a natural connection to the piece's useful purpose: a situation, example,
-   story angle, quote-deck theme, prop, light or restrained color accent. Keep a mix of
-   evergreen and seasonal work. If the connection feels forced, use evergreen framing.
+   story angle or visual premise. Seasonal treatment should change the creative idea,
+   not amount to a tiny decorative prop placed into an otherwise unrelated scene.
+   Keep a mix of evergreen and seasonal work. If the connection feels forced, use
+   evergreen framing rather than inserting token holiday imagery.
 4. Increase seasonal influence as the date approaches using the lead-in below. Apply
    one coherent treatment across a blog and its companion social pieces, using each
    piece's own publication date. Later companions may need an updated treatment.
-5. Record the planned date, timezone, seasonal anchor (or evergreen), intensity and
+5. Plan weekly batches **slot by slot**. A batch drafted today may span two proximity
+   bands or cross the event itself. Assign the treatment using each item's scheduled
+   local publication date; do not give the whole batch the drafting day's intensity.
+   Let a week build toward the occasion through connected situations and scripts,
+   rather than repeating the same decorative object. Recheck rescheduled items.
+6. Record the planned date, timezone, seasonal anchor (or evergreen), intensity and
    concrete creative choice in the production brief. These are authoring notes, not new
    CLI flags. In experiments, keep seasonal treatment fixed between control and variant
    unless it is the declared test; record proximity differences as confounders.
@@ -39,18 +46,53 @@ a news claim, release, promotion or scarcity claim by itself.
 
 ## Lead-in and expiry
 
-Use these levels as creative guidance for relevant anchors, not posting quotas:
+Use these default bands for relevant holidays and events. They guide creative
+choices, not posting quotas. General seasonal atmosphere is separate from explicit
+holiday imagery: autumn light does not require a pumpkin, and winter does not
+require Christmas decorations.
 
 | Proximity to the event | Influence | How it appears |
 | --- | --- | --- |
-| 15–28 days before | Light | Seasonal setting, one prop or accent; evergreen usefulness leads. |
-| 8–14 days before | Noticeable | The situation, examples or quote theme can connect directly to the occasion. |
-| 0–7 days before, including the day | Strong when relevant | The holiday can frame the story and artwork while the practical payoff stays clear. |
-| After the event | Reset | Remove time-sensitive lead-in imagery and “coming soon” language. Use a brief aftermath/reflection only when it helps the story, then return to the month's next context. |
+| More than 28 days before | Outside the event window | No event-specific imagery or event-led script. Ordinary seasonal context is fine where it naturally fits. |
+| 15–28 days before | Season only | Match the general season through setting, weather, light or everyday circumstances. No explicit holiday symbols, costumes or decorations. |
+| 8–14 days before | Recognizable, restrained | Use actual event imagery when it supports the central scene or example. Make the connection legible without overloading the composition; a tiny unrelated prop is not a seasonal concept. |
+| 0–7 days before, including the day | Strong and story-led | Give relevant pieces a clearly recognizable event treatment. Let the occasion directly influence the script, problem, examples, action and artwork; heavier imagery is welcome when coherent. Keep the useful payoff clear. |
+| After the event | Reset | Remove expired event imagery and anticipatory language. A brief aftermath/reflection is appropriate only when the topic calls for it; otherwise move to the season or next relevant anchor. |
 
-Not every piece becomes a holiday piece, even in the final week. When anchors overlap,
-choose the one that best fits the topic; avoid stacking unrelated holiday decorations.
-Do not leave expired holiday treatment on a reused draft.
+For a multi-day event, use its verified opening date for the lead-in and sustain the
+strong band through its relevant active dates. Reset after it ends. For a broad
+period such as back-to-school, identify a specific audience-relevant target week
+in the brief instead of pretending it has one universal holiday date.
+
+Not every piece becomes a holiday piece, even in the final week. Once a piece is
+chosen for strong treatment, the occasion must affect its story rather than only
+its background. News and release facts still determine factual claims. When anchors
+overlap, choose the one that best fits the topic; avoid stacking unrelated holiday
+decorations. Do not leave expired treatment on a reused draft.
+
+### Christmas exception
+
+Christmas gets a longer runway. For December 25 campaigns, use these recurring
+publication windows instead of the standard bands:
+
+| Publication window | Influence | Direction |
+| --- | --- | --- |
+| Before Nov 1 | Outside the event window | No Christmas-specific imagery or Christmas-led scripts. |
+| Nov 1–14 | Season only | Late-autumn or approaching-winter atmosphere, without explicit Christmas decorations. |
+| Nov 15–Dec 10 | Recognizable, restrained | Christmas imagery and situations can begin: gift lists, festive preparations, lights or crowded obligations when connected to the useful idea. |
+| Dec 11–25 | Strong and story-led | Christmas can shape the script and main visual premise directly, with a richer festive treatment and a clear useful action. |
+| Dec 26 onward | Reset | End the Christmas lead-in. Shift to rest, reflection, winter or the approaching New Year; use Christmas aftermath only when it serves the piece. |
+
+The longer Christmas window does not override a more relevant local event or turn
+every November/December piece into Christmas content.
+
+### Weekly scheduling example
+
+For a batch publishing October 19–25, October 19–23 pieces fall in Halloween's
+recognizable, restrained band; October 24–25 pieces fall in its strong band. Those
+later scripts should use the occasion in the actual situation and action. A batch
+that crosses October 31 must reset November items, even if all assets were created
+together. Record each item's band and scheduled date in its brief.
 
 ## Annual themes and anchors
 
@@ -71,28 +113,30 @@ when relevant and verify the date rather than carrying it over from a previous y
 | July | Vacation boundaries, time away, leave room for rest. | Independence Day Jul 4 (US), when relevant; summer travel. | A closed laptop, travel bag, warm surface light and cool water. |
 | August | Return from travel, prepare routines, make a manageable next step. | Back-to-school and return-to-work periods vary by region; late-summer transition. | Packing a bag, clearing a workspace, choosing one notebook or task. |
 | September | A fresh work rhythm, focus under renewed demands, early autumn. | Labor Day, first Monday (US); school/work transitions; September equinox, verify date. | Rain on a window, a clear work surface, warmer lamps and restrained autumn accents. |
-| October | What keeps returning, clutter that haunts the day, protective boundaries, a useful shed. | Halloween Oct 31; build influence progressively through October. | Increasing amber accents, dusk, one pumpkin or playful ghost motif; warm rather than threatening. |
+| October | What keeps returning, clutter that haunts the day, protective boundaries, a useful shed. | Halloween Oct 31; build influence progressively through October. | Autumn light first; recognizable Halloween scenes only within the explicit-imagery window, becoming central to the story in the final week. Warm rather than threatening. |
 | November | Gratitude, shared effort, protect time from crowded schedules and shopping noise. | Thanksgiving, fourth Thursday (US); Black Friday the next day; Cyber Monday the following Monday. | Gathering, warmth, a quieter inbox; no invented sale, offer or deadline. |
-| December | Year-end reflection, finish or release unfinished work, protect rest amid obligations. | Christmas Dec 25 when relevant; winter/summer solstice by hemisphere, verify date; New Year's Eve Dec 31. | Warm lights, a final notebook page, quiet evenings; gradual New Year transition after Christmas. |
+| December | Year-end reflection, finish or release unfinished work, protect rest amid obligations. | Christmas Dec 25 when relevant; winter/summer solstice by hemisphere, verify date; New Year's Eve Dec 31. | Use the earlier Christmas bands above; a final notebook page and quiet evenings support rest and reflection. Reset toward New Year after Christmas. |
 
 ## October → Halloween example
 
-Halloween lands on October 31 every year. On October 9, the reference level is **light**;
-the final week can be much more recognizable. This progression applies to new pieces
-whose topics fit; it does not require replacing queued content.
+Halloween lands on October 31 every year. The publication date determines the
+band. For example, October 15 calls for autumn atmosphere, not a token pumpkin.
+This progression applies to relevant new pieces; it does not require replacing
+queued content.
 
 | Publication window | Treatment | Example |
 | --- | --- | --- |
-| Oct 1–3 | Early autumn | Longer shadows or warm desk light; no forced Halloween story. |
-| Oct 4–16 | Light Halloween lead-in | One small pumpkin beside an unfinished notebook; keep the useful hook prominent. |
-| Oct 17–23 | Noticeable | A recurring meeting becomes the thing that keeps haunting the calendar; the payoff is choosing one meeting to shed. |
-| Oct 24–31 | Strong when relevant | A friendly lobster shuts the hatch on ghostly meeting invites; one blunt claim and a concrete action still lead. |
-| Nov 1 onward | Halloween expires | Remove Halloween lead-in props and shift toward autumn, gratitude and protecting time. An aftermath piece must have a clear reason. |
+| Before Oct 3 | Outside Halloween's window | No Halloween imagery. Use ordinary seasonal context where relevant. |
+| Oct 3–16 | Season only | Autumn dusk, rain at the window or warm task lighting. No pumpkin, ghost, costume or Halloween decoration. |
+| Oct 17–23 | Recognizable, restrained | A recurring meeting visibly haunts the calendar; a restrained ghostly invite helps explain the repeated interruption. The useful action is choosing one meeting to shed. |
+| Oct 24–31 | Strong and story-led | Ghostly task cards keep returning as a lobster tries to bury them; the script names the haunting and demonstrates giving one task a first step. Halloween shapes the problem and resolution. |
+| Nov 1 onward | Halloween expires | Remove Halloween imagery and move to autumn, gratitude or the next relevant anchor. Use aftermath only for a story that needs it. |
 
 Format adaptations:
 
-- **Single post:** a recognizable unfinished task with one restrained seasonal prop and
-  a useful reminder. The reader should understand it before opening the caption.
+- **Single post:** let the selected band shape the main visual idea and useful reminder.
+  Do not use a tiny prop as the sole connection. The reader should understand the idea
+  before opening the caption.
 - **Story carousel:** five to eight slides explaining how to shed a recurring obligation;
   the cover's seasonal scene invites the swipe and the final slide delivers the action.
 - **Quote deck:** five to eight short original lines about the obligations that keep
@@ -102,7 +146,8 @@ Format adaptations:
   second. For example: “That meeting keeps coming back.” The useful molt follows.
 - **Blog:** a seasonal everyday opening can introduce a verified workflow or technical
   story. Keep reporting, dates and diagrams accurate; illustrations are conceptual.
-- **Artwork:** seasonal scene lighting and removable props support the campaign. Preserve
+- **Artwork:** use seasonal atmosphere in the early band, explicit imagery in the next,
+  and an event-led scene near the occasion. Preserve
   canonical anatomy, signature attire and reusable base assets; keep variants separate.
 - **Changelog:** mention the season only if a real release connects to it. Release facts
   and the user's concrete benefit determine whether an entry exists.

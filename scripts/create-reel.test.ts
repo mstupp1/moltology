@@ -4,6 +4,8 @@ import os from 'node:os'
 import path from 'node:path'
 import {
   generateDailyReelScript,
+  CTA_GOAL_CONFIGS,
+  withReelWebsiteCta,
   buildDynamicScenePrompts,
   synthesizeBlogReelScript,
   getThematicVariations,
@@ -62,7 +64,7 @@ describe('Reels & Shorts Dynamic Script Formulation & Clip Recycling', () => {
     expect(script.characterArc).toContain('Silas Trench')
   })
 
-  it('generates rich dynamic variations for multiple themes with 6 scenes and influencer narrator length', () => {
+  it('generates complete dynamic variations for multiple themes with 6 scenes', () => {
     const themes = ['moltmaxxing', 'ecdysis', 'pincer-torque', 'benthic-depth', 'quiz']
 
     for (const theme of themes) {
@@ -72,9 +74,9 @@ describe('Reels & Shorts Dynamic Script Formulation & Clip Recycling', () => {
       const script = generateDailyReelScript({ theme })
       expect(script.hookHeadline).toBeDefined()
       expect(script.narrationScript).toBeDefined()
-      // Long-form narration: at least 95 words for complete 6-clip storytelling
+      // A shorter website invitation still leaves a complete six-beat script.
       const wordCount = script.narrationScript.split(/\s+/).length
-      expect(wordCount).toBeGreaterThanOrEqual(95)
+      expect(wordCount).toBeGreaterThanOrEqual(50)
       // Exactly 6 scenes per video
       expect(script.scenePrompts.length).toBe(6)
       expect(script.caption).toContain('moltology.org')
@@ -161,15 +163,25 @@ describe('Reels & Shorts Dynamic Script Formulation & Clip Recycling', () => {
   })
 
   it('indexes local clips and selects a non-empty sequence of 6 recycled clips', () => {
-    const pool = getLocalClipPool()
-    expect(pool.length).toBeGreaterThanOrEqual(1)
-
-    const sequence = selectRecycledClipSequence(6, 'Test Topic', 'moltmaxxing')
-    expect(sequence.length).toBe(6)
-    expect(sequence.every((p) => typeof p === 'string' && p.endsWith('.mp4'))).toBe(true)
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'reel-clip-pool-'))
+    const cwd = vi.spyOn(process, 'cwd').mockReturnValue(directory)
+    try {
+      fs.mkdirSync(path.join(directory, 'tmp'), { recursive: true })
+      // This test checks indexing and selection only, not video decoding.
+      fs.writeFileSync(path.join(directory, 'tmp', 'veo-scene-1.mp4'), '')
+      fs.writeFileSync(path.join(directory, 'tmp', 'veo-scene-2.mp4'), '')
+      const pool = getLocalClipPool()
+      expect(pool).toHaveLength(2)
+      const sequence = selectRecycledClipSequence(6, 'Test Topic', 'moltmaxxing')
+      expect(sequence).toHaveLength(6)
+      expect(sequence.every((file) => pool.some((clip) => clip.path === file))).toBe(true)
+    } finally {
+      cwd.mockRestore()
+      fs.rmSync(directory, { recursive: true, force: true })
+    }
   })
 
-  it('supports all distinct CTA goals with matching comment keywords and target URLs', () => {
+  it('supports all CTA goals with legacy metadata and direct destination copy', () => {
     const goals: Array<{ goal: any; keyword: string; urlFragment: string }> = [
       { goal: 'quiz', keyword: 'QUIZ', urlFragment: 'moltology.org/quiz' },
       { goal: 'guide', keyword: 'GUIDE', urlFragment: 'moltology.org/news/the-2026-moltmaxxing-protocol-guide' },
@@ -190,9 +202,9 @@ describe('Reels & Shorts Dynamic Script Formulation & Clip Recycling', () => {
 
       expect(script.ctaGoal).toBe(goal)
       expect(script.commentTriggerKeyword).toBe(keyword)
-      expect(script.caption).toContain(keyword)
+      expect(script.caption).toContain(CTA_GOAL_CONFIGS[goal as keyof typeof CTA_GOAL_CONFIGS].captionCta)
       expect(script.caption).toContain(urlFragment)
-      expect(script.firstComment).toContain(keyword)
+      expect(script.firstComment).toContain(urlFragment)
       expect(script.trialParams).toEqual({ graduationStrategy: 'SS_PERFORMANCE' })
     }
   })
@@ -206,7 +218,7 @@ describe('Reels & Shorts Dynamic Script Formulation & Clip Recycling', () => {
     }
     const scriptA = synthesizeBlogReelScript(blogA, {})
     expect(scriptA.ctaGoal).toBe('chassis')
-    expect(scriptA.narrationScript).toMatch(/(chassis|hardware|telemetry)/)
+    expect(scriptA.narrationScript).toMatch(/(equipment|chassis|hardware|telemetry)/)
     expect(scriptA.commentTriggerKeyword).toBe('CHASSIS')
 
     const blogB = {
@@ -312,5 +324,35 @@ describe('autoCommitReelPublish', () => {
     const res = autoCommitReelPublish('reel-test-123', 'Test Topic', { runGit: execSpy })
     expect(res.success).toBe(true)
     expect(execSpy).toHaveBeenCalledTimes(3)
+  })
+})
+
+
+describe('Website invitations', () => {
+  it('replaces legacy endings without losing narration, punctuation or decimals', () => {
+    const body = 'Pick one task. Work for 2.5 minutes! Close the tab?'
+    expect(withReelWebsiteCta(`${body} Comment QUIZ at moltology dot org.`, CTA_GOAL_CONFIGS.codex))
+      .toBe(`${body} ${CTA_GOAL_CONFIGS.codex.endingScriptPhrases[0]}`)
+    expect(withReelWebsiteCta(`${body} Learn more at moltology.org/quiz.`, CTA_GOAL_CONFIGS.guide))
+      .toBe(`${body} ${CTA_GOAL_CONFIGS.guide.endingScriptPhrases[0]}`)
+    const rewritten = withReelWebsiteCta(`${body} Save this for Monday.`, CTA_GOAL_CONFIGS.quiz)
+    expect(withReelWebsiteCta(rewritten, CTA_GOAL_CONFIGS.quiz)).toBe(rewritten)
+  })
+
+  it('keeps each generated daily destination consistent across public copy', () => {
+    for (const config of Object.values(CTA_GOAL_CONFIGS)) {
+      for (const script of [
+        generateDailyReelScript({ topic: 'A crowded Monday', ctaGoal: config.goal }),
+        ...getThematicVariations('moltmaxxing', { ctaGoal: config.goal }),
+        synthesizeBlogReelScript({ slug: 'a-quiet-hour', title: 'A quiet hour', summary: 'Close one tab.', content: 'Pick one task.' }, { ctaGoal: config.goal }),
+      ]) {
+        expect(script.narrationScript).toContain(config.endingScriptPhrases[0])
+        for (const surface of [script.caption, script.firstComment, script.youtubeDescription]) {
+          expect(surface).toContain(config.url.replace('https://', ''))
+        }
+        const copy = [script.narrationScript, script.caption, script.firstComment, script.youtubeDescription, config.actionText].join('\n')
+        expect(copy).not.toMatch(/comment\s+(?:QUIZ|GUIDE|ORACLE|CHASSIS|ROUTINE|CODEX|FORUM|DEMO|INITIATE)|\bDMs?\b|(?:save|share|send) this/i)
+      }
+    }
   })
 })
