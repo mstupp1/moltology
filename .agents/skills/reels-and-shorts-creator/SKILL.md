@@ -9,7 +9,7 @@ description: >-
 
 # Reels and shorts creator
 
-Read BRAND_BIBLE.md, STYLE_GUIDE.md and [the Reels strategy](../../../content/social/reels-strategy.md) before writing. These defaults include the user's October 8 production feedback and October 9 strategy advice. The October 9 opening, CTA and experiment rules supersede older campaign templates.
+Read BRAND_BIBLE.md, STYLE_GUIDE.md and [the Reels strategy](../../../content/social/reels-strategy.md) before writing. These defaults include the user's October 8 production feedback, October 9 strategy advice and October 15 visual-opening feedback. The opening, CTA and experiment rules below supersede older campaign templates.
 
 ## Opening, CTA and experiment rules
 
@@ -17,7 +17,9 @@ Read the [shared annual content calendar](../../../content/annual-content-calend
 
 - Keep the two-act structure: surface friction, then a useful molt. The six beats below support those acts; they are story functions, not six sentences to repeat verbatim.
 - At 0:00–0:01, show a physical action already happening and one blunt claim as readable on-screen text. A hand silences a buzzing phone; a chair rolls into another meeting; a claw closes a distracting tab. Begin on the action, without a logo intro, thesis, establishing pause or lore explanation.
+- Art-direct the opening through ImageGen before video generation. Default to cinematic exaggeration: a recognizable human problem made visually striking through scale, silhouette, framing and warm amber against deep teal light. Use one clear subject and action; avoid generic desk footage whose meaning depends on the headline. For example, a hand already pulling one card from a towering, leaning stack of unfinished tasks. Vary the visual with the topic rather than repeating this example.
 - Use `hookHeadline` for the claim, in sentence case and under 14 words. It is metadata, not proof of a rendered overlay. Add the exact text in the edit and inspect the first second of the final video with sound off. Video prompts should describe motion; do not rely on the video model to spell the claim.
+- Let the artwork dominate. Place compact, phone-readable headline type in planned negative space, with minimal backing only where contrast requires it. Avoid a large opaque rounded text panel covering the focal action. Review the opening image with the headline hidden: the situation and visual tension should still be clear. Animate this image as scene one, not as a static title card before the reel; select a cover from the opening where suitable.
 - Retire keyword CTAs everywhere: narration, caption, first comment, outro and YouTube copy. Do not ask viewers to comment QUIZ, GUIDE or another keyword, and do not promise a DM. Choose one share or save ask with a specific reason: “Send this to your meeting buddy.” or “Save this for your next crowded Monday.” Give the useful action before the ask.
 - Keep any relevant direct URL in the first comment as a secondary resource. `ctaGoal` / `--cta-goal quiz` selects a legacy resource destination, not the viewer action; share/save are not supported CLI goal values. Reviewed `--content-json` and `--custom-outro` must supply the public copy instead of keyword campaign defaults. Inspect all public surfaces before queueing; a legacy `commentTriggerKeyword` ledger field is not engagement evidence.
 - Change exactly one planned variable per reel relative to a named recent control: hook style, aphorism length, voiceover pacing, or share versus save CTA. Record the hypothesis and fixed settings before production, then record 24-hour and 7-day results in the strategy's experiment log. For pacing tests, hold voice identity fixed. Every hook variant must still meet the physical-action plus claim opening rule.
@@ -47,12 +49,12 @@ Save reviewed JSON containing title, topic, hookHeadline, narrationScript, six s
 
 ## Artwork and actual character references
 
-Use the built-in ImageGen tool for the outro and character scene frames. Read the imagegen skill. No initial Gemini image generation, Antigravity elevation or obligatory user Flow handoff.
+Use the built-in ImageGen tool for the opening image, outro and character scene frames. Read the imagegen skill. No initial Gemini image generation, Antigravity elevation or obligatory user Flow handoff.
 
 1. Choose the canonical mascot in scripts/lib/character-overlay.ts. Download its publicUrl into the run directory if no local asset exists. Inspect the actual asset with view_image.
 2. Generate each character scene with ImageGen, supplying that asset as the identity reference. Preserve its face, eyes, shell shape, proportions, attire and friendly cartoon style. Cinematic environments are fine; do not redesign it into a realistic lobster or add robot anatomy.
-3. Save separate full 9:16 scenes as scene-4.png, scene-5.png and scene-6.png in a frames directory. Optional scene-1.png through scene-3.png can preserve the human protagonist. Do not use a storyboard grid as a video input.
-4. Inspect the images before video generation. Pass --scene-frames <directory>. The reel loop passes referenceImagePath as a real Omni image input. Missing character frames stop the run. Cache fingerprints include the model and reference image hash.
+3. Generate a dedicated full 9:16 opening image as scene-1.png in the same frames directory as scene-4.png, scene-5.png and scene-6.png. Compose the opening for the cinematic exaggeration direction above, with no generated headline text and room for the exact overlay. Inspect it at phone size before paid video generation; revise weak composition at the image stage. Optional scene-2.png and scene-3.png can preserve the human protagonist. Do not use a storyboard grid as a video input.
+4. Inspect the images before video generation. Require scene-1.png as an authoring check, then pass --scene-frames <directory>. The reel loop passes referenceImagePath as a real Omni image input. Direct scene one's motion to begin immediately from the supplied composition, with one simple physical action and no establishing pause or fade-in. The CLI stops for missing character frames; it does not enforce the opening-image requirement. Cache fingerprints include the model and reference image hash.
 5. Generate the outro directly through ImageGen with the same mascot and public/images/order_emblem.png. Require exact mixed-case copy and the same single share/save CTA chosen for the reel. A readable URL may remain secondary; do not add a competing quiz or keyword ask. Inspect and pass it with --custom-outro. Do not use the uppercase composite template as final artwork.
 
 The previous run supplied only descriptions like cybernetic lobster engineer, which encouraged invented anatomy. Repeating a description is not visual continuity. Omni can take images, but the request must actually contain them. Individual clips support --image through scripts/generate-video.ts. Character identity still needs inspection; no model guarantees perfect preservation.
@@ -71,7 +73,7 @@ npm run reel:create -- --content-json tmp/reel-next/draft.json \
 
 --recycle-clips --dry-run skips video generation, upload and publishing, but still calls voice and direction services. For a request-only check, run targeted unit tests instead.
 
-After --render-only completes, inspect the first second with sound off for visible physical motion and the exact readable claim. Inspect representative frames and the finished outro, verify audio/video duration and readability, and check narration, caption, first comment and YouTube copy for a single share/save CTA without keyword or DM prompts. Then queue the inspected file without generating again:
+After --render-only completes, inspect the opening frame at phone size and the first second with sound off: require striking composition, immediate physical motion, the exact readable claim and an unobscured focal action. Compare against the text-free opening image to confirm the visual carries the situation independently. Inspect representative frames and the finished outro, verify audio/video duration and readability, and check narration, caption, first comment and YouTube copy for a single share/save CTA without keyword or DM prompts. Then queue the inspected file without generating again:
 
 ```bash
 npm run reel:create -- --content-json tmp/reel-next/draft.json \
