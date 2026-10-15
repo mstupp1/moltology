@@ -68,7 +68,9 @@ text, amber (#f59e0b) spoken-word highlight, dark outline and soft shadow. No ne
 glow, active-word box or bouncing text. Keep identical font weight and positions
 as the highlight moves. Preserve narration words, punctuation, timing, 2–3-word
 phrases and outro cutoff. At 1080×1920, start at 64px, fit within 820px and center
-around y=1180. Keep the opening headline and platform controls clear. Inspect
+around y=1180. Hide narration subtitles on the very first rendered frame only;
+keep word timestamps and audio unchanged. The opening headline remains visible.
+Keep the opening headline and platform controls clear. Inspect
 phone-size samples on bright and dark footage before queueing.
 
 ## Change one variable per reel

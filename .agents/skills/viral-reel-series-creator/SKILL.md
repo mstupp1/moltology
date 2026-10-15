@@ -155,7 +155,7 @@ These are story functions, not sentences to reuse. Before each episode, log one 
 ### 3. Sentence-Isolated Kinetic Highlighted Subtitles
 - Grouped into tight 2–3 word phrases.
 - Bold sentence-case white text; spoken word changes to amber `#f59e0b`, with a dark outline and soft shadow. No glowing pill, bounce or weight change.
-- Keep word positions stable, preserve timing and punctuation, and cut captions before the outro. At 1080×1920, start at 64px, fit within 820px and center y=1180. Keep headline/platform controls clear and inspect at phone size on bright and dark frames.
+- Keep word positions stable, preserve timing and punctuation, and cut captions before the outro. At 1080×1920, start at 64px, fit within 820px and center y=1180. Suppress narration subtitles on the very first rendered frame only; preserve word timestamps and audio, with subtitles eligible from frame one (33ms at 30fps). Keep the opening headline visible. Keep headline/platform controls clear and inspect at phone size on bright and dark frames.
 - Captions strictly respect natural pauses and punctuation—zero trailing words or jarring mid-sentence splits.
 
 ---

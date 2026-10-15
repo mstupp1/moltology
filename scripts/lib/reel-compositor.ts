@@ -152,6 +152,9 @@ export async function renderHudWatermarkCard(
   return outputPath
 }
 
+// Suppress subtitles only at timestamp zero; keep the caption stream and audio in place.
+export const CAPTION_ENABLE_EXPRESSION = 'gt(t,0)'
+
 /** Render compact narration phrases without shifting words as the highlight advances. */
 export async function renderKineticCaptionCard(
   wordsInPhrase: WordBoundaryEvent[],
@@ -1035,7 +1038,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
       '-i',
       concatFilePath,
       '-filter_complex',
-      `[0:v][1:v]overlay=0:0:enable='between(t,0,${totalSceneDuration})'[v1];[v1][2:v]overlay=0:0:shortest=1[out]`,
+      `[0:v][1:v]overlay=0:0:enable='between(t,0,${totalSceneDuration})'[v1];[v1][2:v]overlay=0:0:shortest=1:enable='${CAPTION_ENABLE_EXPRESSION}'[out]`,
       '-map',
       '[out]',
       '-t',

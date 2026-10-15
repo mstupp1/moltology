@@ -1,9 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import fs from 'node:fs'
+import { execFileSync } from 'node:child_process'
 import os from 'node:os'
 import path from 'node:path'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
-import { renderKineticCaptionCard } from './reel-compositor'
+import { CAPTION_ENABLE_EXPRESSION, renderKineticCaptionCard } from './reel-compositor'
 
 async function pixels(file: string) {
   const canvas = createCanvas(1080, 1920)
@@ -69,5 +70,29 @@ describe('Clean reel subtitles', () => {
       expect(bottom).toBeLessThan(1250)
       expect(right - left).toBeGreaterThan(600)
     } finally { fs.rmSync(directory, { recursive: true, force: true }) }
+  })
+})
+
+
+describe('Subtitle-free opening frame', () => {
+  it('hides frame zero and retains later subtitle times and cutoff at 30 fps', () => {
+    // Use the real compositor expression with an event starting immediately, then
+    // a second event after a gap. The text layer is white; the underlying video black.
+    const eventWindows = 'between(t,0,0.09)+between(t,0.133,0.15)'
+    const frames = execFileSync('ffmpeg', [
+      '-v', 'error',
+      '-f', 'lavfi', '-i', 'color=black:s=16x16:r=30:d=0.2',
+      '-f', 'lavfi', '-i', 'color=white:s=16x16:r=30:d=0.2',
+      '-filter_complex', `[0:v][1:v]overlay=enable='${CAPTION_ENABLE_EXPRESSION}*(${eventWindows})':shortest=1`,
+      '-frames:v', '6', '-f', 'rawvideo', '-pix_fmt', 'rgb24', 'pipe:1',
+    ])
+    const frameSize = 16 * 16 * 3
+    expect(frames.length).toBe(frameSize * 6)
+    // 0ms: hidden. 33/67ms: first event. 100ms: gap. 133ms: second event. 167ms: ended.
+    const expectedVisible = [false, true, true, false, true, false]
+    expectedVisible.forEach((visible, frame) => {
+      const value = frames[frame * frameSize]
+      expect(value, `frame ${frame} at ${frame / 30}s`).toBe(visible ? 255 : 0)
+    })
   })
 })
