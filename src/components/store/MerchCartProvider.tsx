@@ -10,6 +10,7 @@ import {
   upsertCartLine,
   type MerchCartLine,
 } from '@/lib/merch'
+import { MERCH_PREVIEW, MERCH_PREVIEW_CHECKOUT_ERROR } from '@/lib/merch-preview'
 import { createMerchCheckoutSessionFn } from '@/lib/server/merch-api'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 
@@ -72,6 +73,10 @@ export function MerchCartProvider({ children }: { children: React.ReactNode }) {
 
   const checkout = useCallback(
     async (items: Array<{ variantId: string; quantity: number }>, options?: { clearCart?: boolean }) => {
+      if (MERCH_PREVIEW) {
+        toastApi?.toast.info(MERCH_PREVIEW_CHECKOUT_ERROR, { id: 'merch-checkout' })
+        return
+      }
       setCheckingOut(true)
       try {
         const token = await getAuthJWTToken()

@@ -18,6 +18,8 @@ import {
   type MerchVariantView,
   type PricedVariant,
 } from '../merch'
+import { MERCH_PREVIEW, MERCH_PREVIEW_CHECKOUT_ERROR } from '../merch-preview'
+import { merchCatalogView } from '../merch-seed-data'
 import { readStripePremiumConfig, resolvePremiumReturnOrigin } from '../premium-membership'
 import { ensureUserProfile } from '../user-sync'
 import { resolveWriteAuth, type WriteAuthContext } from './write-auth'
@@ -38,6 +40,7 @@ const PUBLIC_MERCH_ERRORS = new Set([
   'This page is not available.',
   'Add at least one piece before checkout.',
   'Could not start checkout. Try again.',
+  MERCH_PREVIEW_CHECKOUT_ERROR,
 ])
 
 export class MerchOrderMissingError extends Error {
@@ -111,6 +114,7 @@ function toVariantView(row: {
 }
 
 export async function getMerchCatalogHandler(args: HandlerArgs): Promise<MerchProductView[]> {
+  if (MERCH_PREVIEW) return merchCatalogView()
   try {
     const { auth } = await requireMerchOperator(args)
     const products = await auth.dbClient
@@ -155,6 +159,7 @@ export async function getMerchProductBySlugHandler(args: HandlerArgs): Promise<M
   try {
     const slug = args.data?.slug?.trim()
     if (!slug) return null
+    if (MERCH_PREVIEW) return merchCatalogView().find((product) => product.slug === slug) ?? null
     const { auth } = await requireMerchOperator(args)
     const [product] = await auth.dbClient
       .select()
@@ -187,6 +192,7 @@ export async function getMerchProductBySlugHandler(args: HandlerArgs): Promise<M
 export async function createMerchCheckoutSessionHandler(args: HandlerArgs): Promise<{ url: string }> {
   const db = getDb()
   let orderId: string | null = null
+  if (MERCH_PREVIEW) throw new Error(MERCH_PREVIEW_CHECKOUT_ERROR)
   try {
     const { auth, profile } = await requireMerchOperator(args)
     const requested = args.data?.items ?? []
