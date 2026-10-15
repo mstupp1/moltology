@@ -3068,7 +3068,7 @@ export const toggleForumPostVoteHandler = async ({ data, context }: ServerFnArgs
 const submitLeadSchema = z.object({
   email: z.string().email('Valid email telemetry is required for decryption transmission.'),
   source: z.string().optional().default('moltmax_guide'),
-  referrer: z.string().optional(),
+  referrer: z.string().max(300).optional(),
   turnstileToken: z.string().optional(),
   emailOptIn: z.boolean().optional().default(false),
 })

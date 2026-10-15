@@ -53,6 +53,7 @@
     "codex:check": "tsx scripts/sync-codex.ts --check",
     "blog:sync-history": "tsx scripts/sync-blog-history.ts",
     "blog:trends": "tsx scripts/blog-trends.ts",
+    "yt:research": "tsx scripts/yt-research.ts",
     "logic:sync": "tsx scripts/sync-logic-atlas.ts",
     "logic:check": "tsx scripts/sync-logic-atlas.ts --check",
     "mockups:capture": "tsx scripts/capture-dashboard-mockups.ts",

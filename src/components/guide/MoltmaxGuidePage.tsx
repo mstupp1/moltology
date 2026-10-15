@@ -19,6 +19,7 @@ import { PublicHeader } from '@/components/PublicHeader'
 import { MoltNationFooter } from '@/components/news/MoltNationFooter'
 import { AuthModal } from '@/components/AuthModal'
 import { submitLeadFn } from '@/lib/server/api'
+import { currentLeadReferrer } from '@/lib/attribution'
 import { LEAD_CAPTURE_CHECK_PENDING, LEAD_CAPTURE_TURNSTILE_ACTION } from '@/lib/lead-capture'
 import { getAssetUrl } from '@/lib/assets'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
@@ -53,7 +54,7 @@ export const MoltmaxGuidePage: React.FC = () => {
         data: {
           email: email.trim(),
           source: 'moltmax_guide_page_hero',
-          referrer: typeof window !== 'undefined' ? window.location.pathname : undefined,
+          referrer: currentLeadReferrer(),
           turnstileToken,
           emailOptIn,
         },

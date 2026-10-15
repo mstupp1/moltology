@@ -14,6 +14,7 @@ import {
   Shield,
 } from 'lucide-react'
 import { submitLeadFn } from '@/lib/server/api'
+import { currentLeadReferrer } from '@/lib/attribution'
 import { LEAD_CAPTURE_CHECK_PENDING, LEAD_CAPTURE_TURNSTILE_ACTION } from '@/lib/lead-capture'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 import { getAssetUrl } from '@/lib/assets'
@@ -56,7 +57,7 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
         data: {
           email: email.trim(),
           source,
-          referrer: typeof window !== 'undefined' ? window.location.pathname : undefined,
+          referrer: currentLeadReferrer(),
           turnstileToken,
           emailOptIn,
         },
