@@ -1,6 +1,19 @@
 {
-  "version": "f32bacae0bf5",
+  "version": "58da5cd3ec3d",
   "layout": {
-    "appInset": 52
+    "favicon": {
+      "scale": 0.92,
+      "radius": 0.2
+    },
+    "tile": {
+      "scale": 0.835,
+      "radius": 0.22
+    },
+    "apple": {
+      "scale": 0.86
+    },
+    "maskable": {
+      "scale": 0.82
+    }
   }
 }

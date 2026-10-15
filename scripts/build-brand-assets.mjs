@@ -9,8 +9,18 @@ import { createCanvas, loadImage } from '@napi-rs/canvas'
 import tailwind from '../tailwind.config.js'
 
 const PART_NAMES = ['icon', 'primary', 'secondary-benthic', 'secondary-foundation']
-// Part framing is tight; app tiles add only the space needed for platform masks.
-export const ICON_LAYOUT = { appInset: 52 }
+// Part framing is tight. Each icon format sets how much of its canvas the emblem box
+// fills (the emblem is ~96% of that box) and whether it carries its own rounded tile.
+// - favicon: rounded abyss tile, framed tight because browsers draw it at 16px.
+// - tile: desktop "any" install icons, the same tile with more breathing room.
+// - apple: iOS rounds the corners itself, so a full square with a larger emblem.
+// - maskable: emblem stays inside the 80% safe circle Android crops to.
+export const ICON_LAYOUT = { favicon: { scale: 0.92, radius: 0.2 }, tile: { scale: 0.835, radius: 0.22 }, apple: { scale: 0.86 }, maskable: { scale: 0.82 } }
+
+// Bumps whenever artwork, colors or icon framing change, so cached icon URLs refresh.
+export function brandRevision(parts, palettes, colors) {
+  return createHash('sha256').update(JSON.stringify({ parts, palettes, layout: ICON_LAYOUT, tile: colors.abyss })).digest('hex').slice(0, 12)
+}
 
 export function makePalettes(colors) {
   const app = colors.crimson.aggro
@@ -58,9 +68,12 @@ export function encodeIco(pngs) {
   return Buffer.concat([header, ...pngs.map(({ png }) => png)])
 }
 
-function iconSvg(part, color, size = 512, background, inset = 0) {
-  const innerSize = size - inset * 2
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}"><title>The Synaptic Path emblem</title>${background ? `<rect width="${size}" height="${size}" fill="${background}"/>` : ''}<svg x="${inset}" y="${inset}" width="${innerSize}" height="${innerSize}" viewBox="${part.viewBox}"><g fill="${color}" transform="${part.transform}"><path fill-rule="evenodd" d="${part.d}"/></g></svg></svg>\n`
+export function iconSvg(part, color, size = 512, { background, scale = 1, radius = 0 } = {}) {
+  const round = (n) => Math.round(n * 100) / 100
+  const innerSize = round(size * scale)
+  const inset = round((size - innerSize) / 2)
+  const tile = background ? `<rect width="${size}" height="${size}"${radius ? ` rx="${round(size * radius)}"` : ''} fill="${background}"/>` : ''
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}"><title>The Synaptic Path emblem</title>${tile}<svg x="${inset}" y="${inset}" width="${innerSize}" height="${innerSize}" viewBox="${part.viewBox}"><g fill="${color}" transform="${part.transform}"><path fill-rule="evenodd" d="${part.d}"/></g></svg></svg>\n`
 }
 
 async function rasterize(svg, size, format = 'png') {
@@ -121,7 +134,7 @@ export async function buildBrandAssets() {
   const palettes = makePalettes(colors)
   const parts = {}
   for (const name of PART_NAMES) parts[name] = parsePart(await fs.readFile(path.join(KIT, 'parts', `${name}.svg`), 'utf8'))
-  const version = createHash('sha256').update(JSON.stringify({ parts, palettes, layout: ICON_LAYOUT })).digest('hex').slice(0, 12)
+  const version = brandRevision(parts, palettes, colors)
   await fs.writeFile(path.join(KIT, 'palettes.json'), JSON.stringify(palettes, null, 2) + '\n')
   await fs.writeFile(path.join(ROOT, 'src/components/ui/brand-geometry.json'), JSON.stringify({ version, parts }, null, 2) + '\n')
   await fs.writeFile(path.join(ROOT, 'src/components/ui/brand-assets.json'), JSON.stringify({ version, layout: ICON_LAYOUT }, null, 2) + '\n')
@@ -142,17 +155,21 @@ export async function buildBrandAssets() {
   const generated = spawnSync('python3', ['-c', `import importlib.util\nfrom pathlib import Path\np=Path(${JSON.stringify(KIT)})\ns=importlib.util.spec_from_file_location('brand_compose',p/'compose.py')\nm=importlib.util.module_from_spec(s);s.loader.exec_module(m)\nfor layout in ['horizontal','stacked']:\n for subtitle in ['foundation','benthic','none']:\n  for palette in m.PALETTES:m.compose(subtitle,palette,layout)\n`], { cwd: ROOT, encoding: 'utf8', env: { ...process.env, PYTHONDONTWRITEBYTECODE: '1' } })
   if (generated.status !== 0) throw new Error(generated.stderr || 'Logo composition failed')
 
-  const svg = iconSvg(parts.icon, colors.crimson.aggro)
-  const appSvg = iconSvg(parts.icon, colors.crimson.aggro, 512, colors.benthic.bg, ICON_LAYOUT.appInset)
-  await fs.writeFile(path.join(KIT, 'app-icon.svg'), appSvg)
+  const red = colors.crimson.aggro
+  const svg = iconSvg(parts.icon, red)
+  const tileSvg = iconSvg(parts.icon, red, 512, { background: colors.abyss, ...ICON_LAYOUT.tile })
+  const faviconSvg = iconSvg(parts.icon, red, 512, { background: colors.abyss, ...ICON_LAYOUT.favicon })
+  const appleSvg = iconSvg(parts.icon, red, 512, { background: colors.abyss, scale: ICON_LAYOUT.apple.scale })
+  const maskableSvg = iconSvg(parts.icon, red, 512, { background: colors.abyss, scale: ICON_LAYOUT.maskable.scale })
+  await fs.writeFile(path.join(KIT, 'app-icon.svg'), tileSvg)
   await fs.writeFile(path.join(ROOT, 'public/images/order_emblem.svg'), svg)
-  await fs.writeFile(path.join(ROOT, 'public/favicon.svg'), svg)
+  await fs.writeFile(path.join(ROOT, 'public/favicon.svg'), faviconSvg)
   await fs.writeFile(path.join(ROOT, 'public/images/order_emblem.png'), await rasterize(svg, 512))
   await fs.writeFile(path.join(ROOT, 'public/images/order_emblem.webp'), await rasterize(svg, 512, 'webp'))
-  await fs.writeFile(path.join(ROOT, 'public/favicon.png'), await rasterize(svg, 64))
-  await fs.writeFile(path.join(ROOT, 'public/favicon.ico'), encodeIco(await Promise.all([16, 32, 48].map(async (size) => ({ size, png: await rasterize(svg, size) })))))
-  for (const [file, size] of [['icon-192.png', 192], ['icon-512.png', 512], ['icon-maskable-512.png', 512], ['apple-touch-icon.png', 180]]) {
-    await fs.writeFile(path.join(ROOT, 'public/images/pwa', file), await rasterize(appSvg, size))
+  await fs.writeFile(path.join(ROOT, 'public/favicon.png'), await rasterize(faviconSvg, 64))
+  await fs.writeFile(path.join(ROOT, 'public/favicon.ico'), encodeIco(await Promise.all([16, 32, 48].map(async (size) => ({ size, png: await rasterize(faviconSvg, size) })))))
+  for (const [file, size, source] of [['icon-192.png', 192, tileSvg], ['icon-512.png', 512, tileSvg], ['icon-maskable-512.png', 512, maskableSvg], ['apple-touch-icon.png', 180, appleSvg]]) {
+    await fs.writeFile(path.join(ROOT, 'public/images/pwa', file), await rasterize(source, size))
   }
   // Android notification badges need an alpha silhouette, independent of app tiles.
   await fs.writeFile(path.join(ROOT, 'public/images/pwa/badge-96.png'), await rasterize(iconSvg(parts.icon, '#ffffff'), 96))
