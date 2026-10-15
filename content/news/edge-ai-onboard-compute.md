@@ -9,10 +9,11 @@ tags:
   - "The Great Molt"
 authorName: "Silas Trench"
 authorRole: "Senior Benthic Telemetry Correspondent"
-coverImageUrl: "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/blog/edge-ai-onboard-compute-cover.png"
+coverImageUrl: "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/blog/edge-ai-onboard-compute-cover-v2.png"
 readTimeMinutes: 5
-isFeatured: false
-isPublished: false
+isFeatured: true
+isPublished: true
+publishedAt: "2026-10-15T19:47:00-04:00"
 ---
 
 ### The cable did not reach
@@ -53,7 +54,7 @@ Apprenticeship gives the machine a bounded job and gives the person time to unde
 
 The same posture belongs at your desk. An assistant that sorts a folder should leave you able to name its inputs, inspect an exception, and recover a misplaced document. That is an everyday analogy, rather than evidence about this board. Your Carapace is the boundary that keeps a promising convenience from becoming an obligation you cannot examine. Moltmaxxing makes room for useful work by giving it a shape you can hold.
 
-![Conceptual illustration of supervised mobile robot testing](https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/blog/edge-ai-onboard-compute-conceptual-illustration-of-supervised-mobile-robot-testing.png)
+![Conceptual illustration of supervised mobile robot testing](https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/blog/edge-ai-onboard-compute-workshop-v2.png)
 
 *Figure 2. Conceptual illustration: a technician watches a mobile robot inside a bounded workshop task. This is generated artwork, not a photograph of a Lantronix test or customer deployment.*
 
@@ -70,5 +71,5 @@ If you want a quiet next step, the Audit is waiting in the deep. Signup is free.
 ### Field Telemetry & Source Citations
 
 * [Lantronix announcement, October 13, 2026](https://www.globenewswire.com/news-release/2026/10/13/3379546/0/en/lantronix-introduces-spotter-to-close-the-compute-gap-holding-back-drone-and-robot-autonomy.html): Company release describing Spotter's compute specifications, flight-software support, preview, and planned availability.
-* [Lantronix Spotter product page](https://www.lantronix.com/products/spotter/): Primary product documentation covering interfaces, memory, storage, and specification qualifications; checked October 14, 2026.
+* [Lantronix Spotter product page](https://www.lantronix.com/products/spotter/): Primary product documentation covering interfaces, memory, storage, and specification qualifications; checked October 15, 2026.
 * [Qualcomm OnQ, Ahmed Sadek, February 24, 2026](https://www.qualcomm.com/news/onq/2026/02/physical-ai-6g-robotics): Earlier vendor perspective on local control, connectivity, and physical constraints in robotic systems.

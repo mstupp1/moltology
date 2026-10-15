@@ -470,6 +470,17 @@
       "coreHook": "AI agents crossed from tests into real websites in Anthropic's latest report. The lesson is a firm boundary between rehearsing a task and acting on it.",
       "keyMetrics": [],
       "relatedReelIds": []
+    },
+    {
+      "slug": "edge-ai-onboard-compute",
+      "title": "The Battery You Kept Checking: Edge AI Has to Fit the Machine",
+      "format": "autonomous-dispatch",
+      "category": "TELEMETRY",
+      "author": "Silas Trench",
+      "publishedAt": "2026-10-15T23:47:00.000Z",
+      "coreHook": "Edge AI moves computing onto the machine. Lantronix's new Spotter board puts battery, heat, and control back at the center of robot autonomy.",
+      "keyMetrics": [],
+      "relatedReelIds": []
     }
   ]
 }
