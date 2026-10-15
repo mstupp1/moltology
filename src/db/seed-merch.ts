@@ -2,7 +2,8 @@ import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 import * as dotenv from 'dotenv'
 import * as schema from './schema'
-import { INITIAL_MERCH_PRODUCTS } from '../lib/merch-seed-data'
+import { inArray, sql } from 'drizzle-orm'
+import { INITIAL_MERCH_PRODUCTS, RETIRED_MERCH_SLUGS } from '../lib/merch-seed-data'
 
 dotenv.config()
 
@@ -24,7 +25,20 @@ export async function seedMerchCatalog(db: MerchDb) {
         isPublished: product.isPublished,
         sortOrder: product.sortOrder,
       })
-      .onConflictDoNothing({ target: schema.merchProducts.slug })
+      .onConflictDoUpdate({
+        target: schema.merchProducts.slug,
+        set: {
+          title: product.title,
+          description: product.description,
+          category: product.category,
+          featuredImageUrl: product.featuredImageUrl,
+          galleryImageUrls: product.galleryImageUrls,
+          basePriceCents: product.basePriceCents,
+          isPublished: product.isPublished,
+          sortOrder: product.sortOrder,
+          updatedAt: sql`now()`,
+        },
+      })
     for (const variant of product.variants) {
       await db
         .insert(schema.merchVariants)
@@ -40,9 +54,25 @@ export async function seedMerchCatalog(db: MerchDb) {
           printfulSyncVariantId: variant.printfulSyncVariantId,
           isAvailable: true,
         })
-        .onConflictDoNothing({ target: schema.merchVariants.printfulSyncVariantId })
+        .onConflictDoUpdate({
+          target: schema.merchVariants.id,
+          set: {
+            title: variant.title,
+            size: variant.size,
+            color: variant.color,
+            colorHex: variant.colorHex,
+            priceCents: variant.priceCents,
+            imageUrl: variant.imageUrl,
+            printfulSyncVariantId: variant.printfulSyncVariantId,
+            updatedAt: sql`now()`,
+          },
+        })
     }
   }
+  await db
+    .update(schema.merchProducts)
+    .set({ isPublished: false, updatedAt: sql`now()` })
+    .where(inArray(schema.merchProducts.slug, RETIRED_MERCH_SLUGS))
   return INITIAL_MERCH_PRODUCTS.length
 }
 

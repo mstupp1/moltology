@@ -521,3 +521,40 @@ export function uniqueVariantLabels(variants: MerchVariantView[], key: 'size' | 
   }
   return labels
 }
+
+/** Store price label: "$30.00", or "From $18.00" when variants differ. */
+export function merchPriceLabel(product: Pick<MerchProductView, 'basePriceCents' | 'variants'>): string {
+  const prices = product.variants.map((variant) => variant.priceCents)
+  if (prices.length === 0) return formatMerchPrice(product.basePriceCents)
+  const low = Math.min(...prices)
+  return Math.max(...prices) > low ? `From ${formatMerchPrice(low)}` : formatMerchPrice(low)
+}
+
+export interface MerchCategoryInfo {
+  details: string[]
+  care: string[]
+  /** Tee size chart rows: size, chest width, body length (inches). */
+  sizeChart?: Array<[string, string, string]>
+}
+
+/** Product facts by category. Shown on product pages; the blanks are fixed per category. */
+export const MERCH_CATEGORY_INFO: Record<string, MerchCategoryInfo> = {
+  Mugs: {
+    details: ['Glossy white ceramic, printed edge to edge', '11 oz or 15 oz', 'Lead and BPA free'],
+    care: ['Dishwasher and microwave safe', 'Not for the oven or stovetop'],
+  },
+  Tees: {
+    details: ['100% combed and ring-spun cotton, 4.2 oz', 'Unisex regular fit, true to size', 'Printed direct to garment, soft to the touch'],
+    care: ['Machine wash cold, inside out', 'Tumble dry low or hang dry', 'Do not iron the print'],
+    sizeChart: [
+      ['S', '18', '28'],
+      ['M', '20', '29'],
+      ['L', '22', '30'],
+      ['XL', '24', '31'],
+      ['2XL', '26', '32'],
+    ],
+  },
+}
+
+export const MERCH_SHIPPING_NOTE =
+  'Each piece is printed when you order. Most orders ship within 2 to 5 business days, then take 3 to 8 business days to arrive.'
