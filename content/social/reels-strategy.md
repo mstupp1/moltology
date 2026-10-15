@@ -1,6 +1,6 @@
 # Instagram Reels strategy
 
-Updated October 9, 2026. Applies to daily Reels and episodic series, including their
+Updated October 15, 2026. Applies to daily Reels and episodic series, including their
 YouTube Shorts copies. Read with [STYLE_GUIDE.md](../../STYLE_GUIDE.md),
 [the daily skill](../../.agents/skills/reels-and-shorts-creator/SKILL.md) and
 [the series skill](../../.agents/skills/viral-reel-series-creator/SKILL.md).
@@ -19,9 +19,10 @@ These are supplied observations, not analytics independently verified here. The
 declining metric and comparison period were not specified. Treat the opening frame
 as the first hypothesis to investigate; keep the two-act structure.
 
-The new baseline combines scene-first openings with share/save CTAs. Compare its
-overall performance with published historical reels, but do not attribute a result
-to one correction when both changed. Subsequent reels test one variable at a time.
+The October 15 baseline combines cinematic ImageGen openings, clean white-and-amber
+subtitles and one relevant website invitation. Compare overall performance with
+historical reels without attributing changes to a single cause. Test one variable
+at a time after establishing this baseline.
 
 ## Open on the action
 
@@ -47,25 +48,28 @@ functions while changing the wording, imagery and selected experiment variable.
 An aphorism earns its place by explaining the demonstrated action; it cannot replace
 the opening scene or practical payoff.
 
-## Ask for a share or a save
+## Invite viewers to continue on Moltology
 
-Retire keyword comment prompts across every public surface, including first comments
-and outro cards. Do not promise DMs. Account-authored comments are publishing
-activity, not viewer engagement or evidence that a comment funnel works.
+Deliver the useful action, then give one relevant next step at moltology.org:
+“Try the audit at moltology.org” or “Read more in the Codex at moltology.org.”
+Match the benefit to the actual destination; reading pages offer reading, not a
+promised interactive tool or download. Do not ask viewers to save, share, comment
+a keyword, or await a DM.
 
-Choose one action with a reason that fits the reel:
+Keep the invitation and destination consistent in narration, caption, outro,
+first comment and YouTube description. Show the short domain in the video; put the
+full resource URL in accompanying copy. Account-authored comments are publishing
+activity, not viewer engagement.
 
-- Share when the scene names an experience someone else will recognize: “Send this
-  to your meeting buddy.”
-- Save when the reel gives a step worth returning to: “Save this for your next
-  crowded Monday.”
+## Subtitle treatment
 
-Deliver the value first. Keep the same ask in narration, caption and outro rather
-than piling on comment, follow, quiz and share requests. A relevant resource URL may
-remain in the first comment without becoming a competing spoken CTA.
-
-Treat shares and saves as the distribution signals to test. No guaranteed reach
-increase or claim about an exact ranking weight; verify the outcome in analytics.
+Use the shared renderer for daily and episodic reels: bold sentence-case white
+text, amber (#f59e0b) spoken-word highlight, dark outline and soft shadow. No neon
+glow, active-word box or bouncing text. Keep identical font weight and positions
+as the highlight moves. Preserve narration words, punctuation, timing, 2–3-word
+phrases and outro cutoff. At 1080×1920, start at 64px, fit within 820px and center
+around y=1180. Keep the opening headline and platform controls clear. Inspect
+phone-size samples on bright and dark footage before queueing.
 
 ## Change one variable per reel
 
@@ -80,11 +84,10 @@ exact topics/hooks; use a comparable new situation in the same topic family.
 | Hook style | Close-up of an interruption versus a wider view of its consequence; both begin with motion and a claim. | Claim length, pacing, CTA, payoff. |
 | Aphorism length | One short line versus one longer line explaining the same action. Record word counts. | Hook, voice rate, CTA; keep total duration close. |
 | Voiceover pacing | Measured baseline rate versus a modestly faster rate. Record actual words/second. | Script, speaker, hook, CTA, visual sequence; record duration change. |
-| CTA | A specific share ask versus a specific save ask. | Hook style, aphorism length, voice rate, useful action. |
 
 Start with hook style because the supplied diagnosis points to the first frame.
 Then test aphorism length and voiceover pacing against the best confirmed control.
-Run share versus save as its own experiment. Do not change all four at once or
+Keep the website invitation and subtitle treatment fixed during these tests. Do not
 rotate franchises simply to create variation. Repeat a promising variant on a
 comparable reel before making it the default; a single spike is a candidate.
 
@@ -92,7 +95,8 @@ comparable reel before making it the default; a single spike is a candidate.
 
 Record snapshots at 24 hours and 7 days after publication, using the same age for
 control and variant. Prioritize opening retention for hook tests and shares/reach
-and saves/reach for distribution and CTA tests. Also record reach, plays, average
+and saves/reach as secondary distribution measures. Record website visits or resource
+actions only when attribution is available; do not infer clicks from reach. Also record reach, plays, average
 watch time, completion and non-follower reach when available. Keep Instagram and
 YouTube results separate. Use the platform's actual metric names and definitions.
 
@@ -139,13 +143,12 @@ Next test / confirmation reel:
 
 Use reviewed `--content-json` and a reviewed `--custom-outro` for daily reels. Current
 `--cta-goal` values select resource destinations; there are no share/save goal flags.
-Legacy generators still contain keyword copy. The series CLI currently has no
-reviewed-content JSON input, so its automatic script and CTA output do not meet this
-strategy. Treat that output as a draft; do not queue it unchanged or invent a flag.
-Future series production needs a reviewed-copy path before automatic queueing.
+Both generators now use direct resource invitations. The series CLI has no reviewed
+content JSON input: inspect its generated draft and public surfaces before production;
+do not invent an input flag or assume its unrelated template copy has been reviewed.
 
 Before queueing, verify physical motion and exact readable text in the first second,
-the demonstrated payoff, one share/save ask, no keyword prompts or DM promises, and
+the demonstrated payoff, one relevant website invitation, no keyword prompts or DM promises, and
 the recorded single-variable hypothesis. Continue existing budget, character,
 queue, disclosure and asset checks. Apply this strategy to new work; replacing an
 existing queued reel needs a request to replace it.
@@ -173,3 +176,11 @@ existing queued reel needs a request to replace it.
 - Validation: typecheck passed; script tests 262 passed, one unrelated `clean-jwks` test failed because database network access was unavailable. Its database mutation path was not retried.
 - 24h and 7d Instagram / YouTube: reach, plays, shares, saves, rates, retention, watch time, completion, non-follower reach and viewer comments pending publication; unavailable metrics remain unavailable.
 - Analytics source / observation: queue API verification `2026-10-15T13:14:42.965Z` establishes scheduling only. No performance snapshot claimed. Decision: pending.
+
+
+### October 15, 2026: Subtitle and website invitation baseline
+
+- Future production uses stable white subtitles with an amber spoken-word highlight, dark outline and soft shadow, replacing cyan glow and the active-word box.
+- Replace share/save invitations with one relevant next step at moltology.org across daily and episodic reels. Preserve full destination URLs in accompanying copy.
+- Preserve existing published and queued reels and the historical experiment above.
+- This combined reset is a production preference, not an isolated experiment or a performance claim. Keep subtitles and website invitations fixed for the next hook test; outcomes remain pending publication and actual analytics.

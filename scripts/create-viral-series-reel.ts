@@ -11,6 +11,7 @@ import { publishArchivedSocial } from './lib/social-archive'
 import {
   CtaGoal,
   resolveCtaGoalConfig,
+  withReelWebsiteCta,
   DEFAULT_INSTAGRAM_ACCOUNT_ID,
   DEFAULT_YOUTUBE_ACCOUNT_ID,
   DEFAULT_PROFILE_ID,
@@ -41,41 +42,9 @@ interface SeriesCtaCopy {
   firstComment: string
 }
 
-const SERIES_CTA_COPY: Record<CtaGoal, SeriesCtaCopy> = {
-  quiz: {
-    actionText: 'TAKE THE MOLTMAXXING AUDIT',
-    captionCta: 'Comment QUIZ to receive the Molt Clearance audit in your DMs, or visit:',
-    firstComment:
-      'Comment QUIZ for the four-stage, twelve-clearance diagnostic in your DMs.\nOr audit directly: moltology.org/quiz',
-  },
-  guide: {
-    actionText: 'GET THE 2026 MOLTMAXXING PROTOCOL',
-    captionCta: 'Comment GUIDE to receive the 2026 Moltmaxxing Protocol in your DMs, or visit:',
-    firstComment:
-      'Comment GUIDE to receive the protocol in your DMs.\nOr read online: moltology.org/news/the-2026-moltmaxxing-protocol-guide',
-  },
-  codex: {
-    actionText: 'READ THE SACRED BENTHIC CODEX',
-    captionCta: 'Comment CODEX to receive the liturgies and twelve clearances in your DMs, or visit:',
-    firstComment:
-      'Comment CODEX to receive the scripture docket in your DMs.\nOr browse the codex: moltology.org/codex',
-  },
-  demo: {
-    actionText: 'OPEN LIVE BIO-SILICON TELEMETRY',
-    captionCta: 'Comment DEMO to receive the live telemetry link in your DMs, or visit:',
-    firstComment:
-      'Comment DEMO to receive the interactive access link in your DMs.\nOr launch live: moltology.org',
-  },
-  homepage: {
-    actionText: 'JOIN THE SYNAPTIC PATH',
-    captionCta: 'Comment INITIATE to receive your onboarding link in your DMs, or visit:',
-    firstComment:
-      'Comment INITIATE to receive the membership portal link in your DMs.\nOr join now: moltology.org',
-  },
-}
-
 export function resolveSeriesCtaCopy(goal: CtaGoal): SeriesCtaCopy {
-  return SERIES_CTA_COPY[goal] || SERIES_CTA_COPY.quiz
+  const config = resolveCtaGoalConfig(goal)
+  return { actionText: config.actionText, captionCta: config.captionCta, firstComment: config.firstCommentText }
 }
 
 export type ViralSeriesId = 'audit' | 'incidents' | 'heresies' | 'mysteries' | 'ascension'
@@ -389,9 +358,10 @@ export function formulateViralSeriesScript(
     hookText = `Are you a fragile terrestrial organism or a calcified Stage 4 Ascendant? Take the Moltmaxxing audit.`
   }
 
+  narrationScript = withReelWebsiteCta(narrationScript, ctaConfig)
   const scenePrompts = buildGoogleFlowPrompts(seriesId, episodeTitle, 4)
   const seriesCta = resolveSeriesCtaCopy(ctaGoal)
-  const displayUrl = ctaConfig.url.replace(/^https?:\/\//, '')
+  const displayUrl = ctaConfig.url
   const hashtags = [...SERIES_HASHTAGS]
 
   const caption = `${hookHeadline}\n\n${hookText}\n\n${seriesConfig.name} · Season ${seasonNumber}, Episode ${episodeNumber}.\n\n${seriesCta.captionCta}\n${displayUrl}`
@@ -558,7 +528,7 @@ export async function createViralSeriesReel(options: CreateViralSeriesOptions = 
     backgroundAudioOffsetSeconds: options.bgAudioOffsetSeconds,
     ctaHeadline: ctaConfig.headline,
     ctaSubheadline: ctaConfig.subheadline,
-    ctaUrl: ctaConfig.url.replace(/^https?:\/\//, ''),
+    ctaUrl: 'moltology.org',
     ctaBadge: seriesCta.actionText,
     ctaActionText: seriesCta.actionText,
     customOutroImagePath: options.customOutroImagePath,
