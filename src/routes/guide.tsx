@@ -13,7 +13,7 @@ export const Route = createFileRoute('/guide')({
     meta: [
       ...seo({
         title: 'Free 2026 Moltmaxxing Protocol Field Manual | Moltology',
-        description: 'Download the free 4-page Moltmaxxing Protocol Field Manual (Edition 4.0). Build a daily routine, protect your focus, and finish what you start.',
+        description: 'Download the free Moltmaxxing Field Manual: a 14-page guided descent with a weekly reset, focus rituals, decision drills, and a printable daily checklist.',
         keywords: 'free moltmaxxing guide, moltmaxxing protocol pdf, algorithmic ecdysis manual, carcinization protocol, pincer torque dynamometry',
         ogImage: getAssetUrl('images/guide/moltmaxxing-hero-v2.webp'),
         canonical: 'https://moltology.org/guide',

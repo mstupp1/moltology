@@ -25,6 +25,7 @@ import {
 import { submitLeadFn } from '@/lib/server/api'
 import { LEAD_CAPTURE_CHECK_PENDING, LEAD_CAPTURE_TURNSTILE_ACTION } from '@/lib/lead-capture'
 import { getAssetUrl } from '@/lib/assets'
+import { GUIDE_PDF_FILENAME, GUIDE_PDF_PAGES, guidePdfUrl } from '@/lib/guide-pdf'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
 export interface MoltmaxGuideModalProps {
@@ -34,8 +35,6 @@ export interface MoltmaxGuideModalProps {
   source?: string
 }
 
-const GUIDE_PDF_PATH = 'downloads/the-2026-moltmaxxing-protocol-guide.pdf?v=20261008-artwork'
-const GUIDE_PDF_FILENAME = 'the-2026-moltmaxxing-protocol-guide.pdf'
 
 const GUIDE_BENEFITS = [
   {
@@ -80,7 +79,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
   const [step, setStep] = useState<'claim' | 'success'>('claim')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [downloadUrl, setDownloadUrl] = useState(getAssetUrl(GUIDE_PDF_PATH))
+  const [downloadUrl, setDownloadUrl] = useState(guidePdfUrl())
 
   useEffect(() => {
     if (isOpen) {
@@ -136,7 +135,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
       })
 
       if (res?.success) {
-        const url = res.downloadUrl ? `${res.downloadUrl}${res.downloadUrl.includes('?') ? '&' : '?'}v=20261008-artwork` : getAssetUrl(GUIDE_PDF_PATH)
+        const url = guidePdfUrl(res.downloadUrl)
         setDownloadUrl(url)
         setStep('success')
 
@@ -219,7 +218,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                   className="w-48 aspect-[2/3] object-cover rounded-sm border border-white/15 shadow-[0_24px_60px_rgba(0,0,0,0.6),0_0_40px_rgba(0,195,255,0.2)] -rotate-3"
                 />
                 <p className="text-xs text-[#839493] font-sans text-center">
-                  4-page PDF · Printable · Free
+                  {GUIDE_PDF_PAGES}-page PDF · Printable · Free
                 </p>
               </div>
 
