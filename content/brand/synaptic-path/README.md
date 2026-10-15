@@ -14,7 +14,7 @@ lettering is outlined with no font or raster dependencies.
 | parts/secondary-foundation.svg | Moltology.org Foundation subtitle |
 | parts/variants/ | True black, white and currentColor for every part; alternate red emblems |
 | lockups/ | 54 SVGs: horizontal/stacked × foundation/benthic/no subtitle × nine palettes |
-| app-icon.svg | Opaque square app tile with mask-safe padding |
+| app-icon.svg | Rounded abyss tile used for desktop install icons |
 | legacy/ | Eight byte-for-byte originals, with a SHA-256 manifest |
 
 The two selected original Recraft SVGs remain in source/. The provenance JSON
@@ -105,11 +105,18 @@ The standard UI emblem occupies approximately 96% of its canvas height, leaving
 layout, rather than being baked into the icon. The previous 84%-height framing
 is retained as parts/variants/icon-roomy.svg for optional reuse.
 
-App icons have opaque square backgrounds without baked-in rounded corners.
-Artwork fits inside the central mask-safe circle; the operating system supplies
-the final mask. Favicons, UI emblems and notification badges are transparent.
-The app tile's emblem fills approximately 76.5% of the tile height. Its additional
-inset is defined by ICON_LAYOUT in scripts/build-brand-assets.mjs and participates
+Favicons and app icons sit on the abyss token (#030708). The emblem box fills a
+set share of each canvas, defined by ICON_LAYOUT in scripts/build-brand-assets.mjs:
+
+| Format | Tile | Emblem height |
+| --- | --- | --- |
+| favicon.svg, favicon.ico (16/32/48), favicon.png (64) | Rounded, 20% radius, transparent corners | ~88% |
+| icon-192.png, icon-512.png (desktop "any") | Rounded, 22% radius, transparent corners | ~80% |
+| apple-touch-icon.png (180) | Full square; iOS supplies the corners | ~82% |
+| icon-maskable-512.png | Full square; inside Android's 80% safe circle | ~79% |
+
+The favicon is framed tighter because browsers draw it at 16px. UI emblems and
+notification badges stay transparent. ICON_LAYOUT and the tile color participate
 in the asset revision, so framing changes refresh installed/cached image URLs.
 
 The original icon is preserved in legacy/images/order_emblem.png and .webp.

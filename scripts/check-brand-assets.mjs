@@ -7,18 +7,19 @@ import { fileURLToPath } from 'node:url'
 import { createHash } from 'node:crypto'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
 import tailwind from '../tailwind.config.js'
-import { ICON_LAYOUT, makePalettes, parsePart } from './build-brand-assets.mjs'
+import { ICON_LAYOUT, brandRevision, makePalettes, parsePart } from './build-brand-assets.mjs'
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url))
 const KIT = path.join(ROOT, 'content/brand/synaptic-path')
 const read = (file) => fs.readFile(path.join(ROOT, file), 'utf8')
-const palettes = makePalettes(tailwind.theme.extend.colors)
+const colors = tailwind.theme.extend.colors
+const palettes = makePalettes(colors)
 const generated = JSON.parse(await read('src/components/ui/brand-geometry.json'))
 const parts = {}
 for (const name of Object.keys(generated.parts)) parts[name] = parsePart(await fs.readFile(path.join(KIT, 'parts', `${name}.svg`), 'utf8'))
 assert.deepEqual(parts, generated.parts, 'SVG parts changed: run npm run brand:build')
 assert.deepEqual(JSON.parse(await fs.readFile(path.join(KIT, 'palettes.json'), 'utf8')), palettes, 'HUD colors changed: run npm run brand:build')
-const version = createHash('sha256').update(JSON.stringify({ parts, palettes, layout: ICON_LAYOUT })).digest('hex').slice(0, 12)
+const version = brandRevision(parts, palettes, colors)
 assert.equal(generated.version, version)
 const metadata = JSON.parse(await read('src/components/ui/brand-assets.json'))
 assert.equal(metadata.version, version)
@@ -61,22 +62,37 @@ for (let i = 0; i < icon.length; i += 4) if (icon[i+3] > 128) paintedRows.add(Ma
 const uiHeight = Math.max(...paintedRows) - Math.min(...paintedRows) + 1
 assert(uiHeight >= 512*0.95 && uiHeight <= 512*0.97, 'UI emblem framing is too loose or clips the artwork')
 await pixels('public/images/order_emblem.webp', 512)
-await pixels('public/favicon.png', 64)
-for (const [file, size] of [['icon-192.png', 192], ['icon-512.png', 512], ['icon-maskable-512.png', 512], ['apple-touch-icon.png', 180]]) {
-  const data = await pixels(`public/images/pwa/${file}`, size)
-  const bg = tailwind.theme.extend.colors.benthic.bg.match(/\w{2}/g).map((hex) => parseInt(hex, 16))
+// Favicons and desktop "any" icons sit on a rounded abyss tile; iOS and maskable tiles are full squares.
+const hex = (value) => value.match(/\w{2}/g).map((pair) => parseInt(pair, 16))
+const tileRgb = hex(colors.abyss)
+const redRgb = hex(colors.crimson.aggro)
+function checkTile(file, data, size, { rounded, minHeight, maxHeight, safeCircle = false }) {
+  const at = (x, y) => data.subarray((y*size+x)*4, (y*size+x)*4+4)
+  const near = (px, rgb, tolerance = 6) => px[3] === 255 && rgb.every((value, i) => Math.abs(px[i]-value) <= tolerance)
+  if (rounded) assert(at(0, 0)[3] < 64 && at(size-1, size-1)[3] < 64, `${file}: tile corners must be rounded and transparent`)
+  else for (let i = 3; i < data.length; i += 4) assert.equal(data[i], 255, `${file}: tile must be opaque`)
+  for (const [x, y] of [[0, size>>1], [size>>1, 0], [size-1, size>>1], [size>>1, size-1]]) assert(near(at(x, y), tileRgb), `${file}: tile must reach the canvas edge in abyss`)
   let minY = size, maxY = -1
-  for (let i = 0; i < data.length; i += 4) {
-    assert.equal(data[i+3], 255, `${file}: app tile must be opaque`)
-    if (data[i] > bg[0]+30 || data[i+1] > bg[1]+30 || data[i+2] > bg[2]+30) {
-      const x = (i/4)%size + 0.5, y = Math.floor(i/4/size) + 0.5
-      minY = Math.min(minY, y)
-      maxY = Math.max(maxY, y)
-      assert(Math.hypot(x-size/2, y-size/2) < size*0.4, `${file}: emblem crosses maskable safe circle`)
-    }
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const px = at(x, y)
+    if (px[3] < 128 || px[0]-px[1] < (redRgb[0]-redRgb[1])/2) continue
+    minY = Math.min(minY, y)
+    maxY = Math.max(maxY, y)
+    if (safeCircle) assert(Math.hypot(x+0.5-size/2, y+0.5-size/2) < size*0.4, `${file}: emblem crosses maskable safe circle`)
   }
-  assert(maxY-minY+1 > size*0.74, `${file}: app emblem is unnecessarily small`)
+  const height = (maxY-minY+1)/size
+  assert(height >= minHeight && height <= maxHeight, `${file}: emblem fills ${(height*100).toFixed(0)}% of the tile height`)
 }
+const tileFit = { rounded: true, minHeight: 0.76, maxHeight: 0.84 }
+const faviconFit = { rounded: true, minHeight: 0.84, maxHeight: 0.92 }
+checkTile('favicon.png', await pixels('public/favicon.png', 64), 64, faviconFit)
+assert.match(await read('public/favicon.svg'), new RegExp(`<rect [^>]*rx="[\\d.]+" fill="${colors.abyss}"/>`), 'favicon.svg must draw the rounded abyss tile')
+for (const [file, size, fit] of [
+  ['icon-192.png', 192, tileFit],
+  ['icon-512.png', 512, tileFit],
+  ['apple-touch-icon.png', 180, { minHeight: 0.8, maxHeight: 0.86 }],
+  ['icon-maskable-512.png', 512, { minHeight: 0.76, maxHeight: 0.8, safeCircle: true }],
+]) checkTile(file, await pixels(`public/images/pwa/${file}`, size), size, fit)
 const badge = await pixels('public/images/pwa/badge-96.png', 96)
 assert.equal(badge[3], 0, 'Notification badge must have a transparent canvas')
 for (let i = 0; i < badge.length; i += 4) if (badge[i+3] > 128) assert(badge[i] > 250 && badge[i+1] > 250 && badge[i+2] > 250)
@@ -90,6 +106,9 @@ for (const [i, size] of [16, 32, 48].entries()) {
   const bytes = ico.readUInt32LE(position+8), offset = ico.readUInt32LE(position+12)
   const image = await loadImage(ico.subarray(offset, offset+bytes))
   assert.equal(image.width, size)
+  const canvas = createCanvas(size, size)
+  canvas.getContext('2d').drawImage(image, 0, 0)
+  checkTile(`favicon.ico ${size}px`, canvas.getContext('2d').getImageData(0, 0, size, size).data, size, { ...faviconFit, minHeight: 0.8, maxHeight: 0.94 })
 }
 const manifest = JSON.parse(await read('public/manifest.webmanifest'))
 for (const icon of manifest.icons) {
@@ -101,4 +120,4 @@ assert(new RegExp(`moltology-hub-v\\d+-brand-${version}`).test(sw), 'Service wor
 const precache = sw.match(/const PRECACHE_URLS = \[([\s\S]+?)\]/)?.[1]
 assert(precache)
 for (const [, url] of precache.matchAll(/'([^']+)'/g)) await fs.access(path.join(ROOT, 'public', url))
-console.log('Brand kit verified: 54 SVG lockups, token colors, 8 original backups, transparent emblem/badge, safe app tiles, ICO, and offline references.')
+console.log('Brand kit verified: 54 SVG lockups, token colors, 8 original backups, transparent emblem/badge, abyss favicon and app tiles, ICO, and offline references.')

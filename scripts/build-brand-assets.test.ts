@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { encodeIco, makePalettes, parsePart } from './build-brand-assets.mjs'
+import { ICON_LAYOUT, brandRevision, encodeIco, iconSvg, makePalettes, parsePart } from './build-brand-assets.mjs'
 
 describe('brand asset generation', () => {
   it('uses application tokens and keeps reference, pure mono and inherited palettes distinct', () => {
@@ -30,5 +30,18 @@ describe('brand asset generation', () => {
     expect(() => parsePart(part.replace('</svg>', '<image href="remote.png"/></svg>'))).toThrow()
     expect(() => parsePart(part.replace('</svg>', '<script>alert(1)</script></svg>'))).toThrow()
     expect(() => parsePart(part.replace('</g>', '<path d="M1 1 Z"/></g>'))).toThrow()
+  })
+
+  it('centres the emblem on a rounded tile when a background is given', () => {
+    const part = { viewBox: '0 0 100 100', transform: 'scale(1)', d: 'M0 0 L1 1 Z' }
+    const svg = iconSvg(part, '#ff453a', 512, { background: '#030708', ...ICON_LAYOUT.favicon })
+    expect(svg).toContain(`<rect width="512" height="512" rx="102.4" fill="#030708"/>`)
+    expect(svg).toContain('<svg x="20.48" y="20.48" width="471.04" height="471.04"')
+    expect(iconSvg(part, '#fff')).not.toContain('<rect')
+  })
+
+  it('changes the asset revision when the tile colour changes', () => {
+    const parts = {}, palettes = {}
+    expect(brandRevision(parts, palettes, { abyss: '#030708' })).not.toBe(brandRevision(parts, palettes, { abyss: '#070b0b' }))
   })
 })

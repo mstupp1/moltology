@@ -1,0 +1,6 @@
+{
+  "note": "Written by `npm run merch -- sync`. Maps merch variant ids to Printful sync variant ids.",
+  "syncedAt": null,
+  "products": {},
+  "variants": {}
+}
