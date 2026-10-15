@@ -1,4 +1,4 @@
-import React, { lazy } from 'react'
+import React, { lazy, useEffect } from 'react'
 import { createRootRoute, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
 import '@/index.css'
 import { SITE_ORIGIN, buildJsonLd, notFoundSeo, xRobotsNoindexHeaders } from '@/lib/seo'
@@ -11,10 +11,19 @@ import { ToastProvider } from '@/components/ui/ToastProvider'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import { Analytics } from '@vercel/analytics/react'
 import brandAssets from '@/components/ui/brand-assets.json'
+import { captureAttribution } from '@/lib/attribution'
 
 const LazyHUDNotFound = lazy(() =>
   import('@/components/hud/HUDNotFound').then((m) => ({ default: m.HUDNotFound }))
 )
+
+/** Remembers the first utm-tagged visit so lead forms can credit the video or post that sent it. */
+function AttributionCapture() {
+  useEffect(() => {
+    captureAttribution()
+  }, [])
+  return null
+}
 
 function isNotFoundMatch(match: { status?: string; globalNotFound?: boolean }) {
   return match.status === 'notFound' || match.globalNotFound === true
@@ -129,6 +138,7 @@ function RootDocument() {
         <Scripts />
         <SpeedInsights />
         <Analytics />
+        <AttributionCapture />
       </body>
 
 
