@@ -1921,6 +1921,44 @@
           "removedAt": "2026-10-14T00:00:51.949Z"
         }
       ]
+    },
+    {
+      "id": "reel-1792070069106",
+      "topic": "The unfinished task that keeps returning",
+      "hookHeadline": "That task needs a first step.",
+      "holidayOrEvent": "Light Halloween lead-in: one pumpkin, autumn dusk",
+      "relatedBlogSlug": null,
+      "characterArc": "Lobster Engineer: turns a vague task into a visible first step",
+      "narrationScript": "You move the same task onto tomorrow's list again. The page changes, but the task still has no starting point. By Friday, that little note is haunting the whole desk. Below, a lobster sheds the vague label and names one visible action. Replace work on report with open the draft and write one heading. Save this for your next stuck task.",
+      "archivePath": "Social Archive/2026/10/reel-3d227a5acc6a7229d2809250",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1792070070100_pmq3pcz8_01.mp4"
+      ],
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 26.5,
+      "status": "queued",
+      "scheduledFor": "2026-10-15T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6ad0d1b82711861a4c991f3d",
+      "zernioYouTubePostId": "6ad0d1b82711861a4c991f3d",
+      "zernioPostId": "6ad0d1b82711861a4c991f3d",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "firstComment": "A quiet place to choose your next small shed: https://moltology.org/quiz",
+      "caption": "That task needs a first step.\n\nThe same note keeps coming back. Give it something your pincers can actually do: replace ‘work on report’ with ‘open the draft and write one heading.’\n\nSave this for your next stuck task.",
+      "hashtags": [
+        "#Moltology",
+        "#Focus",
+        "#DeepWork"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-10-15T13:14:34.802Z"
     }
   ]
 }
