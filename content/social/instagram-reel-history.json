@@ -1958,7 +1958,17 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-10-15T13:14:34.802Z"
+      "createdAt": "2026-10-15T13:14:34.802Z",
+      "firstCommentStatus": "scheduled",
+      "productionCostEstimateUsd": 2.518,
+      "videoOutputCostUsd": 2.43264,
+      "videoOutputTokens": 139008,
+      "sourceFootageSeconds": 24.06,
+      "videoModel": "gemini-omni-1.1-flash",
+      "mascot": "lobster_engineer",
+      "youtubeContainsSyntheticMedia": true,
+      "productionExperiment": "Action-first plus save CTA baseline reset; historical control confounded",
+      "verifiedAt": "2026-10-15T13:14:42.965Z"
     }
   ]
 }

@@ -573,6 +573,7 @@ export async function queueDualReelAndShort(
       platformSpecificData: {
         title: options.youtubeTitle,
         visibility: 'public',
+        containsSyntheticMedia: options.isAiGenerated ?? true,
         ...(options.youtubeTags && options.youtubeTags.length > 0 ? { tags: options.youtubeTags } : {}),
         ...(options.firstComment ? { firstComment: options.firstComment } : {}),
       },

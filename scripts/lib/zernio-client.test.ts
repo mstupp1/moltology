@@ -275,6 +275,7 @@ describe('zernio-client', () => {
     expect(postPayload.platforms[1].platformSpecificData.visibility).toBe('public')
     expect(postPayload.platforms[1].platformSpecificData.tags).toEqual(['shorts', 'molt'])
     expect(postPayload.platforms[1].platformSpecificData.firstComment).toBe('Comment QUIZ')
+    expect(postPayload.platforms[1].platformSpecificData.containsSyntheticMedia).toBe(true)
   })
 
   it('supports dry-run mode for unified Reel and Short without making HTTP calls', async () => {
