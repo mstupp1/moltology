@@ -18,6 +18,9 @@ export async function resetDatabase(databaseUrl?: string) {
     await sql`
       TRUNCATE TABLE 
         routine_completions,
+        routine_day_summaries,
+        routine_streak_carries,
+        ai_usage_daily_summaries,
         routines, 
         user_stats, 
         profiles, 
@@ -31,6 +34,9 @@ export async function resetDatabase(databaseUrl?: string) {
   } catch (error) {
     console.warn('[RESET] Truncate encountered missing tables (first run?), falling back to individual table drops/truncates:', error)
     try {
+      await sql`DROP TABLE IF EXISTS ai_usage_daily_summaries CASCADE;`
+      await sql`DROP TABLE IF EXISTS routine_day_summaries CASCADE;`
+      await sql`DROP TABLE IF EXISTS routine_streak_carries CASCADE;`
       await sql`DROP TABLE IF EXISTS ai_messages CASCADE;`
       await sql`DROP TABLE IF EXISTS ai_threads CASCADE;`
       await sql`DROP TABLE IF EXISTS routine_completions CASCADE;`

@@ -337,6 +337,20 @@
       "when": 1791672150457,
       "tag": "0047_profile_experiments",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1792108506899,
+      "tag": "0048_fresh_pixie",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1792112202775,
+      "tag": "0049_lively_jocasta",
+      "breakpoints": true
     }
   ]
 }

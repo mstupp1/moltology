@@ -21,6 +21,8 @@ async function applyRLS() {
     await sql`ALTER TABLE IF EXISTS user_stats ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS routines ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS routine_completions ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS routine_day_summaries ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS routine_streak_carries ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS activity_events ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS user_avatars ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS equipment_catalog ENABLE ROW LEVEL SECURITY;`
@@ -31,7 +33,8 @@ async function applyRLS() {
     await sql`ALTER TABLE IF EXISTS member_bonds ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS notifications ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS xp_transactions ENABLE ROW LEVEL SECURITY;`
-    console.log('✓ RLS enabled on profiles, user_stats, routines, routine_completions, activity_events, user_avatars, equipment_catalog, user_gear_items, friend_requests, friendships, suggestion_dismissals, member_bonds, notifications, xp_transactions')
+    await sql`ALTER TABLE IF EXISTS ai_usage_daily_summaries ENABLE ROW LEVEL SECURITY;`
+    console.log('✓ RLS enabled on profiles, user_stats, routines, routine_completions, routine_day_summaries, routine_streak_carries, activity_events, user_avatars, equipment_catalog, user_gear_items, friend_requests, friendships, suggestion_dismissals, member_bonds, notifications, xp_transactions, ai_usage_daily_summaries')
 
     // 2. Drop existing policies if any to ensure clean idempotent script
     await sql`DROP POLICY IF EXISTS profiles_isolation_policy ON profiles;`
@@ -39,6 +42,8 @@ async function applyRLS() {
     await sql`DROP POLICY IF EXISTS user_stats_isolation_policy ON user_stats;`
     await sql`DROP POLICY IF EXISTS routines_isolation_policy ON routines;`
     await sql`DROP POLICY IF EXISTS routine_completions_isolation_policy ON routine_completions;`
+    await sql`DROP POLICY IF EXISTS routine_day_summaries_isolation_policy ON routine_day_summaries;`
+    await sql`DROP POLICY IF EXISTS ai_usage_daily_summaries_server_only_policy ON ai_usage_daily_summaries;`
     await sql`DROP POLICY IF EXISTS activity_events_isolation_policy ON activity_events;`
     await sql`DROP POLICY IF EXISTS activity_events_select_policy ON activity_events;`
     await sql`DROP POLICY IF EXISTS activity_events_owner_insert_policy ON activity_events;`
@@ -99,6 +104,35 @@ async function applyRLS() {
         "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
         OR (current_setting('request.jwt.claims', true) IS NULL)
       );
+    `
+
+    await sql`
+      CREATE POLICY routine_day_summaries_isolation_policy ON routine_day_summaries
+      FOR ALL
+      USING (
+        "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+
+    await sql`
+      DROP POLICY IF EXISTS routine_streak_carries_isolation_policy ON routine_streak_carries;
+    `
+
+    await sql`
+      CREATE POLICY routine_streak_carries_isolation_policy ON routine_streak_carries
+      FOR ALL
+      USING (
+        "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+
+    await sql`
+      CREATE POLICY ai_usage_daily_summaries_server_only_policy ON ai_usage_daily_summaries
+      FOR ALL
+      USING (NULLIF(current_setting('request.jwt.claims', true), '') IS NULL)
+      WITH CHECK (NULLIF(current_setting('request.jwt.claims', true), '') IS NULL);
     `
 
     await sql`

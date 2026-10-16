@@ -5,6 +5,7 @@ import {
   DailyRoutineWidget,
   ALIGNMENT_HEATMAP,
   ALIGNMENT_HEATMAP_DEFAULT,
+  buildHeatmapGrid,
   computeHeatmapLayout,
 } from './DailyRoutineWidget'
 import { AlignmentProvider } from '@/hooks/useDailyAlignment'
@@ -39,7 +40,7 @@ function renderWidget() {
 }
 
 describe('computeHeatmapLayout', () => {
-  const { maxWeeks, minWeeks, minCell, maxCell, gap, dowGutter } = ALIGNMENT_HEATMAP
+  const { maxWeeks, minCell, maxCell, gap, dowGutter } = ALIGNMENT_HEATMAP
 
   it('returns the SSR default for invalid widths', () => {
     expect(computeHeatmapLayout(0)).toMatchObject({
@@ -56,17 +57,15 @@ describe('computeHeatmapLayout', () => {
     const available = 340 - dowGutter
     const gridWidth = layout.weeks * (layout.cell + gap)
 
-    expect(layout.weeks).toBeGreaterThanOrEqual(minWeeks)
-    expect(layout.weeks).toBeLessThan(maxWeeks)
+    expect(layout.weeks).toBe(maxWeeks)
     expect(layout.cell).toBeGreaterThan(minCell)
     expect(layout.cell).toBeLessThanOrEqual(maxCell)
     expect(layout.scrolls).toBe(false)
     expect(layout.fillsWidth).toBe(true)
-    // Remainder must be smaller than one more max-sized week column
-    expect(available - gridWidth).toBeLessThan(maxCell + gap)
+    expect(gridWidth).toBeLessThanOrEqual(available)
   })
 
-  it('uses up to 52 weeks and grows cells on a wide container', () => {
+  it('caps the grid at the 90-day calendar width and grows cells on a wide container', () => {
     const layout = computeHeatmapLayout(900)
     expect(layout.weeks).toBe(maxWeeks)
     expect(layout.cell).toBeGreaterThanOrEqual(minCell)
@@ -78,6 +77,23 @@ describe('computeHeatmapLayout', () => {
     const layout = computeHeatmapLayout(dowGutter + 4)
     expect(layout.scrolls).toBe(true)
     expect(layout.cell).toBe(minCell)
+  })
+
+  it('marks exactly the trailing 90 dates as in range and blanks calendar padding', () => {
+    const today = '2026-10-15'
+    const result = buildHeatmapGrid([], today)
+    const cells = result.grid.flat()
+    const inRange = cells.filter((cell) => !cell.isOutsideRange)
+    const expectedStart = new Date(`${today}T12:00:00`)
+    expectedStart.setDate(expectedStart.getDate() - 89)
+
+    expect(inRange).toHaveLength(90)
+    expect(inRange[0].date).toBe(
+      `${expectedStart.getFullYear()}-${String(expectedStart.getMonth() + 1).padStart(2, '0')}-${String(expectedStart.getDate()).padStart(2, '0')}`
+    )
+    expect(inRange.at(-1)?.date).toBe(today)
+    expect(result.grid.length).toBeLessThanOrEqual(maxWeeks)
+    expect(cells.filter((cell) => cell.isOutsideRange).every((cell) => cell.count === 0)).toBe(true)
   })
 })
 
@@ -187,15 +203,22 @@ describe('DailyRoutineWidget Component', () => {
     expect(['true', 'false']).toContain(reminderToggle.getAttribute('aria-pressed'))
   })
 
-  it('shows a dynamic week badge for the activity heatmap', () => {
+  it('shows the 90-day range and disables blank calendar padding', () => {
     renderWidget()
 
     const badge = screen.getByTestId('alignment-heatmap-weeks')
-    expect(badge.textContent).toMatch(/^\d+-wk$/)
+    expect(badge.textContent).toBe('90 days')
 
     const heatmap = screen.getByTestId('alignment-heatmap-scroll')
-    const weeks = Number(badge.textContent!.replace('-wk', ''))
-    expect(heatmap.querySelectorAll('button')).toHaveLength(weeks * 7)
+    const allCells = heatmap.querySelectorAll('button')
+    const activeCells = heatmap.querySelectorAll('button:not(:disabled)')
+    const blankCells = heatmap.querySelectorAll('button:disabled')
+    expect(allCells.length % 7).toBe(0)
+    expect(allCells.length / 7).toBeLessThanOrEqual(ALIGNMENT_HEATMAP.maxWeeks)
+    expect(activeCells).toHaveLength(90)
+    expect(blankCells.length).toBe(allCells.length - 90)
+    expect(Array.from(blankCells).every((cell) => cell.className.includes('border-transparent'))).toBe(true)
+    expect(Array.from(blankCells).every((cell) => cell.getAttribute('aria-label')?.includes('outside 90-day history'))).toBe(true)
   })
 
   it('opens the header liturgies panel when the Daily Alignment card is activated', () => {

@@ -5,6 +5,7 @@ import { ensureUserProfile } from '../user-sync'
 
 import { ORACLE_TITLE_MODEL_ID } from './oracle-models'
 import type { OracleUsageCounts } from './usage-limits'
+import { createChatThreadWithinLimit, getChatLimitError } from './chat-retention'
 
 export interface CreateThreadInput {
   /** Pre-assigned thread id so clients can receive the header before insert completes. */
@@ -77,17 +78,16 @@ export async function summarizeThreadTitle(
 export async function createAIThread(input: CreateThreadInput) {
   await ensureUserProfile(input.userId)
   const dbClient = getDb()
-  const [thread] = await dbClient
-    .insert(aiThreads)
-    .values({
-      ...(input.id ? { id: input.id } : {}),
-      userId: input.userId,
-      title: input.title || 'Ascendance Consultation',
-      persona: input.persona || 'oracle',
-    })
-    .returning()
+  const result = await createChatThreadWithinLimit(dbClient.$client, {
+    ...(input.id ? { id: input.id } : {}),
+    userId: input.userId,
+    title: input.title || 'Ascendance Consultation',
+    persona: input.persona || 'oracle',
+  })
+  if (!result) throw getChatLimitError()
+  const { thread, created } = result
 
-  if ((input.persona || 'oracle') === 'oracle' && thread?.id) {
+  if (created && (input.persona || 'oracle') === 'oracle' && thread?.id) {
     try {
       const { maybeRecordOracleConsultationMilestone } = await import('../server/activity-log')
       await maybeRecordOracleConsultationMilestone(dbClient, input.userId, thread.id)

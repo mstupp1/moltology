@@ -4,6 +4,72 @@ Lean-by-default plan for `moltology-prod`. Flip to a more lenient overlay later 
 
 Measured against Neon project `soft-poetry-99961537` on 2026-09-06. Re-run `npm run db:retention-report` before changing windows.
 
+Latest read-only production audit: [2026-10-15 findings](neon-retention-audit-2026-10-15.md). The measurements and plan settings below are historical unless explicitly reverified. Retention windows are policy, not evidence that deletion or archive jobs are deployed.
+
+## Implemented cleanup tooling (2026-10-15)
+
+The working tree now contains bounded hot-record cleanup, routine task-key compaction, daily usage rollups, archived-chat expiry, and a weekly cleanup/report workflow. Migrations `0048` (summaries) and `0049` (streak carries) were applied on **dev**; production has not been migrated or cleaned by this change. Scheduled deletion stays disabled until deployed and explicitly enabled; the weekly run reports only until then. Deploy through the normal migration workflow before running the summary commands in production.
+
+| Command | Behavior |
+| :--- | :--- |
+| `npm run db:retention-report -- --target=prod` | Read-only production inventory; default without a target remains `DATABASE_URL` for the existing weekly report. |
+| `npm run db:retention-apply -- --target=dev` | Preview activity, eligible notifications, and eligible closed requests. |
+| `npm run db:retention-completions -- --target=dev` | Preview task-key compaction and expiry outside the retained history window. |
+| `npm run db:retention-usage -- --target=dev` | Preview raw usage compaction and old daily-summary expiry. |
+| `npm run db:retention-chats -- --target=dev` | Preview deletion of conversations archived for 30 days, with message cascade. |
+| `npm run db:retention-verify -- --target=dev` | Verify SQL on isolated fixture tables cloned from the migrated dev schema, then remove the fixture schema. Does not modify existing dev records. |
+
+All cleanup/compaction commands default to dry-run and require an explicit target; they never silently fall back to the other connection. `--apply` executes bounded batches. Production apply requires an explicit recovery choice: `--recovery=pitr` for the user-selected Neon recovery policy, or `--backup-reference=<reference>` for an optional verified snapshot/export. Neither flag verifies recovery availability. Check the actual production PITR window before enabling scheduled deletion; the current setting has not been reverified.
+
+`--as-of=<past ISO timestamp>` freezes cutoffs for retries; future timestamps are rejected. Every committed batch is logged immediately. A batch limit returns nonzero; rerun with the same `--as-of` until complete. Statements are atomic, but an entire multi-command run is not one transaction: earlier successful batches remain committed if a later batch fails. Retries preserve summary totals and task keys.
+
+The manual **DB Retention Cleanup** workflow supports `hot`, `completions`, `usage`, `chats`, or `all`, with preview as the default. It freezes one timestamp across scopes and accepts it again for retries. Its recovery choice defaults to PITR; a backup reference remains optional when selecting that alternative.
+
+### Ongoing operations and chat controls
+
+**Weekly DB Retention Cleanup** is scheduled for Mondays at 09:17 UTC. GitHub runs the job on its hosted runner; no local computer or application server needs to stay running. The job connects to production using the existing `DATABASE_URL` repository secret:
+
+1. Freeze one cutoff for the run.
+2. When `DB_RETENTION_ENABLED=true`, run bounded hot-record deletion, routine compaction, usage rollups, and archived-chat deletion using `--recovery=pitr`.
+3. Report storage and remaining candidates. Until enabled, the scheduled job performs only this read-only report.
+4. Keep per-batch logs in the Actions run. A cap/failure leaves earlier successful batches committed; resume using the logged cutoff through a manual run.
+
+There is no dump, encryption key, or backup artifact in this workflow. The separate **DB Retention Report** workflow remains available manually; its schedule was removed to avoid duplicate weekly runs.
+
+After deployment and production migrations, verify the configured PITR window, run the manual cleanup workflow in preview mode, and inspect its candidates. Supervise its first `apply=true` run, then set the repository variable `DB_RETENTION_ENABLED=true` to enable weekly apply. No enabling variable or production setting has been changed by this work.
+
+Windows define eligibility, not an exact deletion time. A weekly sweep normally removes an archived chat between 30 and 37 days after archiving, assuming successful runs. Other storage windows can similarly run up to a week beyond their threshold. The product still displays only 90 days of routine history, and the 50-chat cap is enforced immediately when creating a chat.
+
+Chat controls already exist, but they have different effects:
+
+| Operation | Current behavior | Storage effect |
+| :--- | :--- | :--- |
+| Archive in Oracle | Set `ai_threads.archivedAt`; show thread in the Archived list | Messages stay in Neon until the 30-day archive timer expires and cleanup runs |
+| Unarchive | Clear `archivedAt`; return thread to the main list | Stops archive expiry; archiving again restarts the clock |
+| Pin | Set `pinnedAt` | Active pinned chats remain; archived pinned chats follow the same 30-day timer |
+| Delete | Delete the owner's thread; the FK cascades to its messages | Removes application records from Neon; not an instant purge of backup/history copies |
+| Archived-chat expiry | Implemented in the cleanup command; production scheduling pending | Deletes threads archived for 30 days and cascades their messages |
+| Private transcript archive/retrieval | Superseded by the user's simpler delete-after-archive policy | Not required |
+
+Do not describe the Archive button as object-storage archival. The selected policy is 30 days after `archivedAt`, irrespective of message age or pin state. Active chats are not expired merely because they are old. Usage records are independent: deleting a chat does not remove recent usage-limit events. Chat deletion is a separate cleanup scope and is included in `all`.
+
+Each member may keep 50 total conversations, including archived and pinned ones. At the cap, creating another returns a clear error and the UI directs the member to delete a conversation. Existing conversations remain usable. Creation uses a serializable transaction with bounded conflict retries so concurrent tabs cannot both claim the last slot. Existing accounts above the cap are not trimmed automatically; they must get below 50 to create another.
+
+Safety details:
+
+- Pending requests and their request alerts survive ordinary notification expiry. Accepted requests without a matching friendship remain for repair.
+- Closed request deletion atomically removes its original actionable request alert. Accepted/rejected confirmation notifications retain their own windows.
+- The visible product history horizon is 90 days. An extra internal date protects members whose local calendar is one day behind UTC: retention holds 91 dates, while the API/UI display only the requested 90.
+- A compact per-member streak carry preserves the current long streak and existing XP milestones when older daily records expire. It does not preserve older daily task details.
+- Summaries retain simulated and real completion history for the same horizon and timezone boundary buffer. No shorter simulated TTL truncates the visible heatmap.
+- Usage events older than the raw window move atomically into per-user UTC-day/kind/model totals. Request counts, known token sums, and missing-token counts survive; rolling 24-hour limits continue to use recent raw events.
+- XP, screening history, community content, active chats, pending requests, friendships, and member bonds are not log-cleanup targets.
+- The user explicitly selected deletion 30 days after archiving rather than transcript summarization/private archival. No private transcript service is required for this policy.
+
+### Added usage policy
+
+Raw `ai_usage_events` are retained for 30 days lean / 90 days lenient, with daily request/token totals for 400 / 1,095 days. The typed source remains `src/lib/data-retention.ts`. Token totals include known measurements only; separate missing-token counts avoid presenting unreported usage as zero cost.
+
 ## Current constraints
 
 | Fact | Value |
@@ -22,13 +88,13 @@ Largest tables today: `blog_posts` (248 kB, 20 rows — TOAST), `ai_messages` (1
 
 ### Product mismatches to fix while implementing
 
-- The HUD heatmap is a **52-week** grid, but `getDailyAlignmentData` only loads **31 days** of completions. Retention should keep compact daily counts for ~400 days and extend that query — not keep per-task rows forever.
-- The activity stream loads **8** events. Keeping every completion event indefinitely duplicates `routine_completions`.
+- The original HUD heatmap covered **52 weeks**. The user selected **90 days** instead; the product/query and retention horizon now use that shared limit, with a separate compact streak carry.
+- The compact activity stream loads **8** events, but the full personal/friends feed is paginated (20 by default, up to 50 per page). Expiring events changes accessible feed history; it is not equivalent to keeping the latest eight.
 - Oracle `archivedAt` is a **UI partition**, not storage reduction. Messages stay in Postgres until we archive them.
 
 ## Design principles
 
-1. **Lean default, lenient overlay.** `RETENTION_PROFILE=lean` (default) vs `lenient`. Every lean window is strictly shorter. Loosening is an env change plus a report re-run, not a schema rewrite.
+1. **Lean default, lenient overlay.** `RETENTION_PROFILE=lean` (default) vs `lenient`. Operational buffers can lengthen with the overlay; the selected 90-day routine-history limit is the same in both profiles.
 2. **Postgres holds working set, not history.** Media already lives in S3. Chat transcripts and old task logs follow the same split.
 3. **Summarize before archive, archive before delete.** Never drop Oracle transcripts without a thread summary row plus a private JSONL dump.
 4. **Canonical community is not a log.** Forum topics/posts, blog, changelogs, equipment catalog stay. Cap the 12-hour simulator instead of deleting public texture.
@@ -43,7 +109,7 @@ Largest tables today: `blog_posts` (248 kB, 20 rows — TOAST), `ai_messages` (1
 | Canonical | Keep for the life of the account / publication | `profiles`, `user_stats`, `routines`, `friendships`, `user_gear_items`, `user_avatars`, `equipment_catalog`, forum, blog, changelogs |
 | Hot → delete | Drop past the window. No archive. | `activity_events`, `notifications`, closed `friend_requests` |
 | Hot → summarize → delete | Compact, then drop source rows | `routine_completions` |
-| Hot → summarize → archive → delete | Summary in DB, JSONL in private storage, then drop | `ai_messages` (keep `ai_threads` + summary) |
+| Archived → delete | After 30 days archived, delete thread and cascade messages | `ai_threads`, `ai_messages` |
 | Legal | Anonymize, don't hard-delete until the legal window | `leads` |
 | Auth-managed | Do not TTL from app code | `session`, `verification`, leftover `neon_auth.session` / `neon_auth.verification` |
 
@@ -54,15 +120,16 @@ Largest tables today: `blog_posts` (248 kB, 20 rows — TOAST), `ai_messages` (1
 | Activity events | 14 days | 90 days |
 | Notifications (read) | 14 days after `readAt` | 90 days |
 | Notifications (unread) | 90 days after create | 365 days |
-| Completions, per-task rows | 45 days | 120 days |
-| Completions, daily counts (heatmap) | 400 days | 1,095 days (3 years) |
-| Oracle messages (unpinned) | 90 days, then archive | 365 days, then archive |
-| Archived Oracle thread shell | 180 days after archive | 730 days |
+| Completions, per-task rows | 45 days | 60 days |
+| Completions, daily task-key summaries (heatmap) | 91 dates (90 visible + timezone boundary) | Same |
+| Streak carry | One current anchor/count per member | One current anchor/count per member |
+| Archived Oracle conversations and messages | Delete after 30 days archived | Same |
+| Total conversations per member | 50; delete before creating another at cap | Same |
 | Closed friend requests | 30 days after `respondedAt` | 90 days |
 | Unconverted leads | 730 days, then anonymize | 1,825 days |
 | Simulated telemetry | 14 days | 90 days |
 
-Pinned Oracle threads never auto-archive. User-deleted threads already cascade messages.
+No conversation is automatically moved into Archived. Archiving starts the deletion clock, including for pinned chats; unarchiving stops it. User-deleted threads cascade messages immediately at the application-data level.
 
 Account deletion (privacy policy): personal identifiers purged within 90 days of close. That path is separate from these TTLs and must remain cascade-based (`onDelete: 'cascade'` already covers most member tables).
 
@@ -70,7 +137,7 @@ Account deletion (privacy policy): personal identifiers purged within 90 days of
 
 ### `activity_events`
 
-HUD only lists 8 rows. Unique on `(userId, sourceKey)` so they grow 1:1 with completions.
+The compact HUD stream lists 8 rows; the full feed is paginated. Unique on `(userId, sourceKey)`, so ordinary task events grow with completions. Expiry intentionally bounds accessible feed history.
 
 **Lean:** delete rows older than 14 days (simulated: 14 days, already the same). No summarize, no S3.
 
@@ -86,37 +153,35 @@ Unread older than 90 days is abandoned inbox, not a legal hold.
 
 ### `routine_completions`
 
-Needed for: today toggles, 14-day matrix, streak, 52-week heatmap (counts only).
+Needed for: today toggles, 14-day matrix, and the trailing 90-day activity view. Long streaks use a compact carry beyond that view.
 
-**Shape later (Phase 2):**
+**Implemented compact shape:**
 
 ```text
-routine_day_summaries (userId, date, completedCount)  -- unique (userId, date)
+routine_day_summaries (userId, completedOn, taskKeys[])  -- unique (userId, completedOn)
 ```
 
 **Lean pipeline:**
 
 1. Keep per-task rows for 45 days (toggle + 14-day matrix).
-2. Upsert a daily count before dropping per-task rows past 45 days.
-3. Keep daily counts for 400 days so the heatmap is honest (and extend `getDailyAlignmentData` past the current 31-day select).
-4. After 400 days, drop daily counts. Streaks only need a recent tail.
+2. Atomically merge the exact daily task-key set while dropping per-task rows past 45 days.
+3. Keep 91 UTC calendar dates internally, so every member can view the trailing 90 local dates. Counts derive from task-key cardinality; date views inside that horizon retain task identities.
+4. Before older daily records expire, advance the member's compact streak anchor/count. A gap resets the carry. The reader combines that carry with recent days, so the existing 180-day XP milestone does not require keeping 180 days of daily detail.
+5. Drop daily keys and older raw records beyond the timezone boundary buffer. The lenient profile does not silently extend the visible product limit.
 
-Simulated completions use the 14-day simulated window for both grains.
+Simulated completions keep the same 90-day horizon as real members. The shorter simulated telemetry window applies to feed events, not completion history.
 
 ### `ai_threads` / `ai_messages`
 
-This is the storage bomb: 69 messages already occupy 144 kB because of JSONB `parts`. A thousand members with modest Oracle use will dominate the 512 MB cap.
+The chosen policy replaces the earlier private-archive proposal:
 
-**Lean pipeline:**
+1. Cap each member at 50 total threads. Active, archived, and pinned threads count.
+2. Leave active threads alone. Archiving stamps `archivedAt`; unarchiving clears it.
+3. Delete a thread once it has remained archived for 30 days. The timer is based on archiving time, not creation or last message time. Pinning does not exempt an archived thread.
+4. Foreign-key cascade deletes its messages. Usage accounting stays independent.
+5. The cleanup statement locks eligible threads, rechecks archive eligibility, and deletes in bounded batches. A concurrent unarchive that wins the lock preserves the thread.
 
-1. Select unpinned threads whose last message (or `archivedAt`) is older than 90 days.
-2. Write `ai_thread_summaries (threadId, summary, messageCount, archiveKey, summarizedAt)`.
-3. Dump messages as JSONL to `archives/ai-thread/{yyyy}/{mm}/{userId}/{threadId}.jsonl` in a **private** bucket.
-4. `DELETE FROM ai_messages WHERE "threadId" = …` (cascade is on thread delete; here we keep the thread).
-5. HUD list shows title + summary; opening an archived thread hydrates from S3 on demand or says the transcript is in deep storage.
-6. After 180 days, delete the thread shell if still archived/unpinned (messages already gone).
-
-Do not send archive payloads through the public CDN.
+No transcript summary, JSONL object, private-storage retrieval, or later thread-shell expiry is required. Application deletion does not imply immediate erasure from PITR or backup copies.
 
 ### `friend_requests`
 
@@ -136,7 +201,7 @@ No TTL. Control growth with:
 
 ### Leftover `member_bonds`
 
-Empty public table, not in `schema.ts`. Drop in a dedicated migration when convenient. Not a storage issue.
+The 2026-10-15 audit found five rows, a current schema definition, and active readers/writers in member profiles and simulation. Keep this table. The earlier classification as an empty legacy table was stale.
 
 ### Better Auth + leftover `neon_auth.*`
 
@@ -144,58 +209,23 @@ Self-hosted Better Auth owns `session`, `account`, `verification`, and `jwks`. D
 
 Leftover Managed Auth `neon_auth.session` / `neon_auth.verification` can stay until CoS disables Auth on `main`. Leave to autovacuum.
 
-## Archive storage
+## Backup storage
 
-Create a **private** Neon Object Storage bucket, e.g. `moltology-db-archive`.
+A private object-storage bucket remains an option for long-term backup operations. Transcript objects are not part of the selected chat policy.
 
 | Prefix | Contents | Retention of objects |
 | :--- | :--- | :--- |
-| `archives/ai-thread/` | JSONL transcripts | 2 years lean / 5 years lenient, then expire |
-| `archives/routine-day/` | Optional monthly rollups if we ever drop daily counts | same |
 | `backups/pgdump/` | Custom-format `pg_dump` | 14 days lean / 35 days lenient |
 
 Public assets bucket stays images/audio/video only.
 
-## Backups (Free plan reality)
+## Recovery policy for routine cleanup
 
-Three layers. PITR alone is not a backup.
+The selected approach uses Neon PITR for short-term recovery. Routine retention does not require a separate encrypted export or rotating snapshot job. Verify the current restore window in Neon before enabling cleanup; the six-hour Free-plan setting recorded earlier in this document is historical, not a current account check.
 
-### 1. Instant restore (already on)
+PITR can recover a mistake only while the relevant point remains in that window. A weekly cleanup schedule does not extend that window. If cleanup fails, review its Actions logs promptly and resume with the same cutoff when appropriate.
 
-Keep `history_retention_seconds = 21600` (6 hours). Free cannot go longer. This recovers fat-finger deletes noticed the same day. It does **not** survive a bad migration discovered next week.
-
-### 2. Rotating manual snapshot (1 slot)
-
-Free allows **one** manual snapshot. Scheduled snapshots require a paid plan.
-
-Runbook:
-
-1. Before any prod migration or retention `--apply`, create snapshot `pre-<reason>-<date>` on `main`.
-2. Weekly (Monday): delete the previous weekly snapshot, create `weekly-<date>`, set `expires_at` ~14 days out if the API allows (manual snapshots have no max expiration; still set one so the slot can turn).
-3. After restore drills, delete leftover `main (old)` branches immediately — they count toward the 10-branch cap and copy-on-write storage.
-
-Do not enable a snapshot schedule until Launch; the API will reject it on Free.
-
-### 3. Weekly `pg_dump` off-platform
-
-GitHub Action, same pattern as Neon’s S3 backup guide:
-
-- Direct (unpooled) `DATABASE_URL`.
-- `pg_dump -Fc` of `neondb` (includes `public` + leftover `neon_auth` + `drizzle`).
-- Upload to `backups/pgdump/neondb-YYYYMMDD.dump` in the private bucket.
-- Delete dumps older than 14 days (lean).
-
-This is the disaster-recovery copy if the Neon project is gone. Restore into a new project with `pg_restore`, then cut `DATABASE_URL`.
-
-### When to buy Launch
-
-Upgrade when any of these is true:
-
-- Logical size ≥ 40% of 512 MB (warn) or you want **7-day PITR**.
-- You want automated daily snapshots (paid schedules, 35-day max retention).
-- You need more than one kept snapshot at a time.
-
-Launch default history is 1 day (max 7). Set 7 days in production when you upgrade. Snapshot storage bills at $0.09/GB-month; scheduled snapshots after the first are incremental.
+Independent snapshots or private exports remain optional if the product later needs recovery beyond the PITR window or a copy outside the Neon project. They have their own storage, access, and restore-testing overhead and are not part of the weekly workflow.
 
 ## Branch and compute hygiene
 
@@ -230,9 +260,9 @@ Do not auto-delete simulated forum posts. Throttle creation instead.
 | Branch logical size / 512 MB | 40% (~205 MB) | 70% (~358 MB) |
 | `ai_messages` relation size | 32 MB | 80 MB |
 | Dry-run candidate rows (lean) | informational | n/a |
-| Failed backup Action | page | page |
+| Failed retention Action | investigate | investigate |
 
-Weekly Action: `npm run db:retention-report`. Exit 1 only on critical headroom. Log candidate counts; do not delete.
+The weekly workflow runs cleanup only when enabled, then `npm run db:retention-report -- --target=prod`. The report exits 1 on critical headroom. Inspect failed runs in GitHub Actions.
 
 ## Implementation phases
 
@@ -245,34 +275,33 @@ No calendar estimates. Each phase is a mergeable slice.
 - This document.
 - Weekly report workflow.
 
-### Phase 1 — Backups without schema changes
+### Phase 1 — Recovery and activation
 
-- Private archive/backup bucket.
-- Protect `main`.
-- Create the first manual snapshot (`baseline-<date>`).
-- Weekly snapshot rotation Action (delete previous weekly + create new).
-- Weekly `pg_dump` Action to private storage.
-- Reset stale `dev` from `main` (operator step).
+- Verify the actual production PITR window.
+- Use PITR for routine cleanup; independent exports and snapshot rotation are optional future work.
+- Deploy migrations through the normal production migration workflow.
+- Preview candidates, supervise the first apply, then enable weekly cleanup.
 
-### Phase 2 — Hot-delete jobs
+### Phase 2 — Hot-delete jobs (tooling implemented; production activation pending)
 
-- GitHub Action `db:retention-apply --only=hot-delete` behind `workflow_dispatch` (not on a schedule until the first dry-runs look right).
-- Batched deletes for `activity_events`, eligible `notifications`, closed `friend_requests`.
-- Snapshot immediately before the first apply.
+- Manual preview/apply workflow and weekly cleanup/report workflow.
+- Batched deletes for `activity_events`, eligible `notifications`, and closed `friend_requests`.
+- Explicit recovery choice and per-batch logging.
 
-### Phase 3 — Completions compact
+### Phase 3 — Completions and usage compact (implemented; production activation pending)
 
-- `routine_day_summaries` table + backfill from existing completions.
-- Extend alignment history query to 400 days of **counts**.
-- Drop per-task rows past 45 days after the summary upsert.
-- Drop leftover `member_bonds`.
+- `routine_day_summaries` table + atomic compaction from existing completions.
+- Keep 90 days of activity/task identities, plus a compact streak carry for longer active streaks and XP milestones.
+- Drop per-task rows past 45 days in the same statement as the summary upsert.
+- `ai_usage_daily_summaries` with atomic usage request/token rollups and bounded expiry.
+- Keep `member_bonds`; it is active product data.
 
-### Phase 4 — Oracle summarize → archive → delete
+### Phase 4 — Archived-chat expiry and total cap (implemented; production activation pending)
 
-- `ai_thread_summaries`.
-- JSONL dump + delete messages.
-- HUD: archived thread opens summary; “load full transcript” from private storage for the owner.
-- 180-day drop of empty archived thread shells.
+- Shared 30-day archive timer and 50-total-chat cap.
+- Transactional creation cap, including concurrent requests and caller-id replay.
+- Bounded archived-thread deletion with message cascade; usage limits remain independent.
+- UI count, delete-to-create guidance, and visible archive-expiry copy.
 
 ### Phase 5 — Legal + account close
 
@@ -285,7 +314,7 @@ No calendar estimates. Each phase is a mergeable slice.
 1. Set `RETENTION_PROFILE=lenient` on the report/apply Actions.
 2. Confirm headroom is `ok` under the new windows (`npm run db:retention-report`).
 3. Lengthen private dump/archive object expiry to match.
-4. If Oracle should become “keep until the member deletes it,” set `aiMessagesHotDays` to a sentinel and skip Phase 4 for pinned **and** active threads — that is a one-line policy change in `src/lib/data-retention.ts`.
+4. Routine history remains 90 visible days (plus its internal timezone boundary date), and chat archive expiry/cap remain 30 days/50 threads in both profiles. Change these shared product constants deliberately rather than using a retention-profile overlay.
 
 Do not jump to “keep everything” while still on the 512 MB Free cap.
 

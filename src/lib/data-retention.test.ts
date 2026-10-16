@@ -11,7 +11,6 @@ import {
   cutoffDateString,
   evaluateStorageHeadroom,
   getRetentionWindows,
-  isAiMessageEligibleForArchive,
   isClosedFriendRequestEligibleForDelete,
   isNotificationEligibleForDelete,
   isPastCutoff,
@@ -37,10 +36,16 @@ describe('retention profile', () => {
     expect(getRetentionWindows('lean')).toEqual(LEAN_WINDOWS)
   })
 
-  it('keeps lean windows strictly shorter than lenient on every knob', () => {
+  it('keeps lean windows shorter except for shared chat and routine retention limits', () => {
     for (const key of Object.keys(LEAN_WINDOWS) as Array<keyof typeof LEAN_WINDOWS>) {
+      if (key === 'routineDaySummaryDays' || key === 'chatArchivedDays') continue
       expect(LEAN_WINDOWS[key]).toBeLessThan(LENIENT_WINDOWS[key])
     }
+    expect(LEAN_WINDOWS.routineDaySummaryDays).toBe(91)
+    expect(LENIENT_WINDOWS.routineDaySummaryDays).toBe(91)
+    expect(LEAN_WINDOWS.chatArchivedDays).toBe(30)
+    expect(LENIENT_WINDOWS.chatArchivedDays).toBe(30)
+    expect(LENIENT_WINDOWS.routineCompletionsHotDays).toBeLessThanOrEqual(90)
   })
 })
 
@@ -53,21 +58,35 @@ describe('table policies', () => {
     expect(byTable.activity_events.deleteAfterDays).toBe(14)
     expect(byTable.routine_completions.retentionClass).toBe('hot-summarize-delete')
     expect(byTable.routine_completions.summarizeAfterDays).toBe(45)
-    expect(byTable.ai_messages.retentionClass).toBe('hot-summarize-archive-delete')
-    expect(byTable.ai_messages.archiveAfterDays).toBe(90)
+    expect(byTable.ai_threads.retentionClass).toBe('hot-delete')
+    expect(byTable.ai_threads.hotDays).toBe(30)
+    expect(byTable.ai_threads.deleteAfterDays).toBe(30)
+    expect(byTable.ai_messages.retentionClass).toBe('canonical')
+    expect(byTable.ai_messages.hotDays).toBeNull()
+    expect(byTable.ai_messages.deleteAfterDays).toBeUndefined()
     expect(byTable.profiles.hotDays).toBeNull()
     expect(byTable.forum_posts.hotDays).toBeNull()
     expect(byTable.blog_posts.hotDays).toBeNull()
     expect(byTable.leads.retentionClass).toBe('legal')
     expect(byTable.support_tickets.retentionClass).toBe('legal')
     expect(byTable.support_tickets.hotDays).toBeNull()
+    expect(byTable.xp_transactions.hotDays).toBeNull()
+    expect(byTable.signup_risk_events.hotDays).toBeNull()
+    expect(byTable.member_bonds.hotDays).toBeNull()
+    // Both member types need the same 90-day UI horizon; a telemetry TTL would truncate it.
+    expect(byTable.routine_completions.simulatedDays).toBeUndefined()
+    expect(byTable.routine_day_summaries.hotDays).toBe(91)
+    // Usage retention must not remove any event inside the rolling 24-hour limit.
+    expect(byTable.ai_usage_events.hotDays).toBeGreaterThan(1)
+    expect(byTable.ai_usage_daily_summaries.hotDays).toBe(400)
   })
 
-  it('lengthens Oracle and heatmap windows under the lenient overlay', () => {
+  it('keeps chat retention shared while lenient mode extends other retention windows', () => {
     const lean = Object.fromEntries(buildTablePolicies(LEAN_WINDOWS).map((policy) => [policy.table, policy]))
     const lenient = Object.fromEntries(buildTablePolicies(LENIENT_WINDOWS).map((policy) => [policy.table, policy]))
-    expect(lenient.ai_messages.hotDays).toBeGreaterThan(lean.ai_messages.hotDays ?? 0)
-    expect(lenient.routine_completions.deleteAfterDays).toBe(1095)
+    expect(lenient.ai_threads.deleteAfterDays).toBe(lean.ai_threads.deleteAfterDays)
+    expect(lenient.ai_messages.hotDays).toBeNull()
+    expect(lenient.routine_completions.deleteAfterDays).toBe(91)
   })
 })
 
@@ -142,42 +161,6 @@ describe('friend request eligibility', () => {
     expect(
       isClosedFriendRequestEligibleForDelete(
         { status: 'accepted', createdAt: daysAgo(40), respondedAt: daysAgo(10) },
-        NOW,
-        LEAN_WINDOWS
-      )
-    ).toBe(false)
-  })
-})
-
-describe('oracle archive eligibility', () => {
-  it('keeps pinned threads hot even when old', () => {
-    expect(
-      isAiMessageEligibleForArchive(
-        { createdAt: daysAgo(400), threadPinned: true, threadArchivedAt: daysAgo(400) },
-        NOW,
-        LEAN_WINDOWS
-      )
-    ).toBe(false)
-  })
-
-  it('archives aged unpinned threads and aged user-archived threads', () => {
-    expect(
-      isAiMessageEligibleForArchive(
-        { createdAt: daysAgo(91), threadPinned: false, threadArchivedAt: null },
-        NOW,
-        LEAN_WINDOWS
-      )
-    ).toBe(true)
-    expect(
-      isAiMessageEligibleForArchive(
-        { createdAt: daysAgo(5), threadPinned: false, threadArchivedAt: daysAgo(91) },
-        NOW,
-        LEAN_WINDOWS
-      )
-    ).toBe(true)
-    expect(
-      isAiMessageEligibleForArchive(
-        { createdAt: daysAgo(10), threadPinned: false, threadArchivedAt: null },
         NOW,
         LEAN_WINDOWS
       )

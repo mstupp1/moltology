@@ -6,7 +6,7 @@ import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { DailyRoutineGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
 import { openAlignmentPanel } from '@/lib/alignment-panel'
-import { DAILY_ALIGNMENT_HUB_ID, localDateString, parseLocalDate, TOTAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
+import { ALIGNMENT_HISTORY_DAYS, DAILY_ALIGNMENT_HUB_ID, localDateString, parseLocalDate, TOTAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
 import type { DailyStreakDay } from '@/lib/alignment-tasks'
 
 // ---------------------------------------------------------------------------
@@ -14,18 +14,17 @@ import type { DailyStreakDay } from '@/lib/alignment-tasks'
 // ---------------------------------------------------------------------------
 
 export const ALIGNMENT_HEATMAP = {
-  maxWeeks: 52,
-  minWeeks: 12,
+  maxWeeks: Math.ceil((ALIGNMENT_HISTORY_DAYS + 6) / 7),
   minCell: 11,
-  maxCell: 16,
+  maxCell: 20,
   gap: 2,
   dowGutter: 16,
 } as const
 
 /** SSR / pre-measure fallback — fills a typical phone card without a dead gutter once measured. */
 export const ALIGNMENT_HEATMAP_DEFAULT = {
-  weeks: 20,
-  cell: 11,
+  weeks: ALIGNMENT_HEATMAP.maxWeeks,
+  cell: 20,
   gap: ALIGNMENT_HEATMAP.gap,
   dowGutter: ALIGNMENT_HEATMAP.dowGutter,
 } as const
@@ -41,24 +40,23 @@ export type HeatmapLayout = {
 
 /**
  * Pick week count + cell size so the grid fills `containerWidth` when possible.
- * Fits the full 52-week year when the container is wide enough at MIN_CELL;
- * otherwise prefers larger cells (up to MAX_CELL) so phone cards do not leave
- * a dead horizontal gutter.
+ * Keeps the complete 90-day history visible, growing cells up to MAX_CELL when
+ * the container allows it and scrolling only when the card is exceptionally narrow.
  */
-export function computeHeatmapLayout(containerWidth: number): HeatmapLayout {
-  const { maxWeeks, minWeeks, minCell, maxCell, gap, dowGutter } = ALIGNMENT_HEATMAP
+export function computeHeatmapLayout(containerWidth: number, weeks = ALIGNMENT_HEATMAP.maxWeeks): HeatmapLayout {
+  const { minCell, maxCell, gap, dowGutter } = ALIGNMENT_HEATMAP
 
   if (!Number.isFinite(containerWidth) || containerWidth <= 0) {
-    return { ...ALIGNMENT_HEATMAP_DEFAULT, fillsWidth: true, scrolls: false }
+    return { ...ALIGNMENT_HEATMAP_DEFAULT, weeks, fillsWidth: true, scrolls: false }
   }
 
   const available = Math.max(0, Math.floor(containerWidth) - dowGutter)
   const minStride = minCell + gap
   const maxStride = maxCell + gap
 
-  if (available < minStride) {
+  if (available < weeks * minStride) {
     return {
-      weeks: minWeeks,
+      weeks,
       cell: minCell,
       gap,
       dowGutter,
@@ -67,42 +65,16 @@ export function computeHeatmapLayout(containerWidth: number): HeatmapLayout {
     }
   }
 
-  let weeks: number
-  let cell: number
-  let scrolls = false
-
-  const yearMinWidth = maxWeeks * minStride
-  if (available >= yearMinWidth) {
-    // Full year fits — grow cells toward MAX_CELL to absorb leftover width
-    weeks = maxWeeks
-    cell = Math.min(maxCell, Math.max(minCell, Math.floor(available / weeks) - gap))
-  } else {
-    // Prefer larger cells so the grid fills the card; keep as many weeks as fit
-    weeks = Math.max(1, Math.floor(available / maxStride))
-    if (weeks < minWeeks && available >= minWeeks * minStride) {
-      weeks = minWeeks
-    }
-    if (weeks < 1) {
-      weeks = maxWeeks
-      cell = minCell
-      scrolls = true
-    } else {
-      cell = Math.min(maxCell, Math.max(minCell, Math.floor(available / weeks) - gap))
-    }
-  }
+  const cell = Math.min(maxCell, Math.max(minCell, Math.floor(available / weeks) - gap))
 
   const gridWidth = weeks * (cell + gap)
-  if (gridWidth > available) {
-    scrolls = true
-  }
-
   const remainder = available - gridWidth
-  const fillsWidth = !scrolls && remainder < maxStride
+  const fillsWidth = remainder < maxStride
 
-  return { weeks, cell, gap, dowGutter, fillsWidth, scrolls }
+  return { weeks, cell, gap, dowGutter, fillsWidth, scrolls: false }
 }
 
-function useHeatmapLayout(containerRef: React.RefObject<HTMLElement | null>): HeatmapLayout {
+function useHeatmapLayout(containerRef: React.RefObject<HTMLElement | null>, weeks: number): HeatmapLayout {
   const [layout, setLayout] = useState<HeatmapLayout>(() => ({
     ...ALIGNMENT_HEATMAP_DEFAULT,
     fillsWidth: true,
@@ -114,14 +86,14 @@ function useHeatmapLayout(containerRef: React.RefObject<HTMLElement | null>): He
     if (!el || typeof ResizeObserver === 'undefined') return
 
     const update = () => {
-      setLayout(computeHeatmapLayout(el.clientWidth))
+      setLayout(computeHeatmapLayout(el.clientWidth, weeks))
     }
     update()
 
     const observer = new ResizeObserver(update)
     observer.observe(el)
     return () => observer.disconnect()
-  }, [containerRef])
+  }, [containerRef, weeks])
 
   return layout
 }
@@ -130,30 +102,27 @@ interface HeatmapCell {
   date: string
   count: number
   isToday: boolean
-  isFuture: boolean
+  isOutsideRange: boolean
 }
 
-function buildHeatmapGrid(
+export function buildHeatmapGrid(
   history: Array<{ date: string; completedCount: number }>,
-  todayDate: string,
-  totalTasks: number = TOTAL_ALIGNMENT_TASKS,
-  weeks: number = ALIGNMENT_HEATMAP.maxWeeks
+  todayDate: string
 ): { grid: HeatmapCell[][]; monthLabels: Array<{ label: string; colIndex: number }> } {
   const countMap = new Map<string, number>()
   for (const item of history) {
     countMap.set(item.date, item.completedCount)
   }
 
-  // Anchor end of grid to the Saturday of the week containing today
+  // Start on Sunday for the week containing the first retained date; end on
+  // Saturday for today's week. Padding dates outside the exact window are blank.
   const todayObj = parseLocalDate(todayDate)
-  const todayDow = todayObj.getDay()                    // 0=Sun … 6=Sat
-  const daysToSat = (6 - todayDow + 7) % 7
-  const gridEnd = new Date(todayObj)
-  gridEnd.setDate(todayObj.getDate() + daysToSat)
-
-  // Grid starts `weeks` back (Sun of that week)
-  const gridStart = new Date(gridEnd)
-  gridStart.setDate(gridEnd.getDate() - weeks * 7 + 1)
+  const historyStart = new Date(todayObj)
+  historyStart.setDate(todayObj.getDate() - (ALIGNMENT_HISTORY_DAYS - 1))
+  const gridStart = new Date(historyStart)
+  gridStart.setDate(historyStart.getDate() - historyStart.getDay())
+  const daysFromStartToToday = Math.round((todayObj.getTime() - gridStart.getTime()) / 86_400_000)
+  const weeks = Math.floor(daysFromStartToToday / 7) + 1
 
   const cols: HeatmapCell[][] = []
   const monthLabels: Array<{ label: string; colIndex: number }> = []
@@ -169,13 +138,20 @@ function buildHeatmapGrid(
 
       const dateStr = localDateString(cellDate)
       const isToday = dateStr === todayDate
-      const isFuture = cellDate > todayObj && !isToday
+      const isBeforeRange = cellDate < historyStart
+      const isOutsideRange = isBeforeRange || cellDate > todayObj
 
-      col.push({ date: dateStr, count: isFuture ? 0 : (countMap.get(dateStr) ?? 0), isToday, isFuture })
+      col.push({
+        date: dateStr,
+        count: isOutsideRange ? 0 : (countMap.get(dateStr) ?? 0),
+        isToday,
+        isOutsideRange,
+      })
     }
 
     // Month label: emit when month changes AND minimum gap from last label is respected
-    const refDate = parseLocalDate(col[0].date)
+    const firstInRangeDate = col.find((cell) => !cell.isOutsideRange)?.date ?? col[0].date
+    const refDate = parseLocalDate(firstInRangeDate)
     const month = refDate.getMonth()
     if (month !== lastMonth && w - lastLabelCol >= MIN_MONTH_GAP) {
       lastMonth = month
@@ -192,8 +168,8 @@ function buildHeatmapGrid(
   return { grid: cols, monthLabels }
 }
 
-function heatmapColor(count: number, isFuture: boolean, isToday: boolean): string {
-  if (isFuture) return 'bg-surface-1 border-line-subtle'
+function heatmapColor(count: number, isOutsideRange: boolean, isToday: boolean): string {
+  if (isOutsideRange) return 'bg-transparent border-transparent'
   if (count === 0) return 'bg-surface-3 border-line-subtle'
   if (count <= 2) return 'bg-cyan-glow/20 border-cyan-glow/25'
   if (count <= 4) return 'bg-cyan-glow/55 border-cyan-glow/45'
@@ -213,13 +189,12 @@ interface ActivityHeatmapProps {
 function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TASKS }: ActivityHeatmapProps) {
   const [tooltip, setTooltip] = useState<{ cell: HeatmapCell; x: number; y: number } | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const layout = useHeatmapLayout(scrollRef)
-  const colW = layout.cell + layout.gap
-
   const { grid, monthLabels } = useMemo(
-    () => buildHeatmapGrid(history, currentDate, totalTasks, layout.weeks),
-    [history, currentDate, totalTasks, layout.weeks]
+    () => buildHeatmapGrid(history, currentDate),
+    [history, currentDate]
   )
+  const layout = useHeatmapLayout(scrollRef, grid.length)
+  const colW = layout.cell + layout.gap
 
   // Auto-scroll to the rightmost position (most recent week = today) on mount & whenever grid changes
   useEffect(() => {
@@ -261,7 +236,7 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
           </span>
         </div>
         <span className="text-[11px] text-ink-muted shrink-0" data-testid="alignment-heatmap-weeks">
-          {layout.weeks}-wk
+          {ALIGNMENT_HISTORY_DAYS} days
         </span>
       </div>
 
@@ -274,7 +249,7 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
         data-testid="alignment-heatmap-scroll"
       >
         {/* Inner content — w-max keeps everything together and lets overflow-x-auto work */}
-        <div className="w-max">
+        <div className="w-max mx-auto">
           {/* Month labels row */}
           <div className="flex mb-2">
             {/* DOW gutter spacer */}
@@ -322,18 +297,19 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
                     <button
                       key={dIdx}
                       type="button"
+                      disabled={cell.isOutsideRange}
                       aria-label={`${cell.date}: ${
-                        cell.isFuture
-                          ? 'future'
+                        cell.isOutsideRange
+                          ? `outside ${ALIGNMENT_HISTORY_DAYS}-day history`
                           : cell.count === 0
                           ? 'no tasks done'
                           : `${cell.count} of ${totalTasks} tasks done`
                       }`}
-                      className={`border rounded-chip cursor-pointer transition-opacity hover:opacity-70 touch-manipulation p-0 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-1 focus-visible:outline-cyan-glow ${heatmapColor(cell.count, cell.isFuture, cell.isToday)}`}
+                      className={`border rounded-chip ${cell.isOutsideRange ? 'cursor-default' : 'cursor-pointer transition-opacity hover:opacity-70 touch-manipulation focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-1 focus-visible:outline-cyan-glow'} p-0 ${heatmapColor(cell.count, cell.isOutsideRange, cell.isToday)}`}
                       style={{ width: layout.cell, height: layout.cell }}
-                      onMouseEnter={(e) => showCellTooltip(cell, e.currentTarget)}
-                      onFocus={(e) => showCellTooltip(cell, e.currentTarget)}
-                      onClick={(e) => showCellTooltip(cell, e.currentTarget)}
+                      onMouseEnter={cell.isOutsideRange ? undefined : (e) => showCellTooltip(cell, e.currentTarget)}
+                      onFocus={cell.isOutsideRange ? undefined : (e) => showCellTooltip(cell, e.currentTarget)}
+                      onClick={cell.isOutsideRange ? undefined : (e) => showCellTooltip(cell, e.currentTarget)}
                     />
                   ))}
                 </div>
@@ -352,9 +328,7 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
             >
               <span className="text-cyan-glow font-bold">{tooltip.cell.date}</span>
               {' — '}
-              {tooltip.cell.isFuture
-                ? 'future'
-                : tooltip.cell.count === 0
+              {tooltip.cell.count === 0
                 ? 'no tasks done'
                 : `${tooltip.cell.count} / ${totalTasks} tasks done`}
             </div>

@@ -8,6 +8,7 @@ import {
   shiftDays,
   mergeCompletions,
   computeStreak,
+  computeStreakWithCarry,
   buildStreakHistory,
 } from './alignment-tasks'
 
@@ -101,6 +102,24 @@ describe('alignment-tasks catalog and helpers', () => {
 
     const streak = computeStreak(history, today)
     expect(streak).toBe(0)
+  })
+
+  it('adds a compacted streak carry only when recent history is continuous to its anchor', () => {
+    const today = '2026-10-15'
+    const continuous = [
+      { date: '2026-10-13', completedCount: 8 },
+      { date: '2026-10-14', completedCount: 8 },
+      { date: '2026-10-15', completedCount: 2 },
+    ]
+    expect(computeStreakWithCarry(continuous, today, { anchorDate: '2026-10-12', streakDays: 178 })).toBe(180)
+    expect(computeStreakWithCarry(continuous, today, { anchorDate: '2026-10-11', streakDays: 178 })).toBe(2)
+
+    const gap = [
+      { date: '2026-10-13', completedCount: 8 },
+      { date: '2026-10-14', completedCount: 3 },
+      { date: '2026-10-15', completedCount: 2 },
+    ]
+    expect(computeStreakWithCarry(gap, today, { anchorDate: '2026-10-12', streakDays: 178 })).toBe(0)
   })
 
   it('builds streak history with 14 days including today and correct percentages', () => {
