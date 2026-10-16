@@ -22,6 +22,7 @@ import { submitLeadFn } from '@/lib/server/api'
 import { currentLeadReferrer } from '@/lib/attribution'
 import { LEAD_CAPTURE_CHECK_PENDING, LEAD_CAPTURE_TURNSTILE_ACTION } from '@/lib/lead-capture'
 import { getAssetUrl } from '@/lib/assets'
+import { GUIDE_PDF_FILENAME, GUIDE_PDF_PAGES, guidePdfUrl } from '@/lib/guide-pdf'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
 export const MoltmaxGuidePage: React.FC = () => {
@@ -62,13 +63,13 @@ export const MoltmaxGuidePage: React.FC = () => {
 
       if (res?.success) {
         setIsSubmitted(true)
-        const url = res.downloadUrl ? `${res.downloadUrl}${res.downloadUrl.includes('?') ? '&' : '?'}v=20261008-artwork` : getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf?v=20261008-artwork')
+        const url = guidePdfUrl(res.downloadUrl)
         if (typeof window !== 'undefined') {
           const a = document.createElement('a')
           a.href = url
           a.target = '_blank'
           a.rel = 'noopener noreferrer'
-          a.download = 'the-2026-moltmaxxing-protocol-guide.pdf'
+          a.download = GUIDE_PDF_FILENAME
           document.body.appendChild(a)
           a.click()
           document.body.removeChild(a)
@@ -116,7 +117,7 @@ export const MoltmaxGuidePage: React.FC = () => {
             <p className="text-base sm:text-lg text-[#a9b6b5] leading-relaxed max-w-md">
               Shed the clutter. Protect an hour. Finish what you start. A printable plan for your next molt.
             </p>
-            <p className="text-xs text-[#839493]">4-page PDF · Daily checklist · Free download</p>
+            <p className="text-xs text-[#839493]">{GUIDE_PDF_PAGES}-page PDF · Daily checklist · Free download</p>
 
             {/* Email Form */}
             {isSubmitted ? (
@@ -130,7 +131,7 @@ export const MoltmaxGuidePage: React.FC = () => {
                 </p>
                 <div className="flex flex-wrap gap-4 pt-2">
                   <a
-                    href={getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf?v=20261008-artwork')}
+                    href={guidePdfUrl()}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded bg-[#00c3ff] text-[#020408] font-bold font-grotesk text-xs uppercase hover:bg-[#00e5ff]"

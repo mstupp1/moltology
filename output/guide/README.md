@@ -1,14 +1,17 @@
 # Moltmaxxing Field Manual artwork
 
-Created with the built-in ImageGen tool on 2026-10-08. Optimized WebP files are published under `images/guide/` in the public asset bucket. The small cover is a resized export; the interior preview is a rendered page of the actual four-page PDF, not generated page text. PNG originals remain in `tmp/guide-artwork/` and the original ImageGen output directory.
+The artwork below was created with the built-in ImageGen tool on 2026-10-08. Optimized WebP files are published under `images/guide/` in the public asset bucket and drive the /guide page and the download modal.
 
-Visual thesis: tactile graphite field-guide materials, delicate cyan crab engravings, and quiet underwater research spaces.
+## The PDF (2026-10-15 rebuild)
 
-Page composition: full-width book photograph and email form, actual manual preview and a short contents list, final download action. Existing entrance, cover hover, and floating-prompt motion honor reduced-motion preferences.
+The Field Manual is a 14-page guided descent: each page sits deeper than the last, and a margin gauge tracks real ocean depth from the surface to the Challenger Deep. Copy lives in `scripts/lib/field-manual/content.ts`, layout in `scripts/lib/field-manual/template.ts`. It reuses this folder's cover, chamber and pincer art plus repo images (chassis carapace, forum backdrops, app phone previews); diagrams are drawn as vector SVG.
 
-Files: `moltmaxxing-hero-v2.webp`, `moltmaxxing-cover-v2.webp`, `moltmaxxing-cover-v2-sm.webp`, `moltmaxxing-pincer-v2.webp`, `moltmaxxing-chamber-v2.webp`, `moltmaxxing-interior-v2.webp`, and `the-2026-moltmaxxing-protocol-guide.pdf`.
+Rebuild and publish:
 
-Rebuild the PDF with `npm run guide:pdf`. The generator uses local artwork when available and otherwise fetches these versioned assets. It writes the PDF here and uses an isolated temporary Chrome profile.
+    npm run guide:pdf
+    npm run s3:upload -- output/guide/the-2026-moltmaxxing-protocol-guide.pdf --key downloads/the-2026-moltmaxxing-protocol-guide.pdf
+
+Then bump `GUIDE_PDF_VERSION` (and `GUIDE_PDF_PAGES` if the count changed) in `src/lib/guide-pdf.ts`. The build reads only local files and uses any installed Chrome or Playwright Chromium.
 
 ## hero
 

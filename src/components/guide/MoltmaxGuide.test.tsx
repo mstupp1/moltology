@@ -43,7 +43,7 @@ describe('Moltmax Guide Lead Capture Components', () => {
 
     expect(screen.getByText(/Your next molt starts here/i)).toBeDefined()
     expect(screen.queryByText(/149/)).toBeNull()
-    expect(screen.getByText(/4-page PDF/i)).toBeDefined()
+    expect(screen.getByText(/14-page PDF/i)).toBeDefined()
     expect(screen.getByText(/A daily routine/i)).toBeDefined()
     expect(screen.getByText(/One task to finish/i)).toBeDefined()
     expect(screen.getByPlaceholderText(/Enter email to claim free copy\.\.\./i)).toBeDefined()

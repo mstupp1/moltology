@@ -66,6 +66,7 @@ import { hasExperiment } from '../experiments'
 import { assertCanReply, assertCanStartTopic, loadForumStanding } from './forum-standing'
 import { shouldSinkReply, type ForumStandingDecision } from '../forum-standing'
 import { getAbsoluteAssetUrl, getMediaPath } from '../assets'
+import { GUIDE_PDF_KEY } from '../guide-pdf'
 import { AVATAR_STORED_OPTIONAL_KEYS, avatarConfigShape } from '../avatar/config-schema'
 import {
   CANONICAL_ALIGNMENT_TASKS,
@@ -3094,7 +3095,7 @@ export async function submitLeadHandler(args: ServerFnArgs<SubmitLeadInput>) {
     throw new Error(verification.errorMessage || 'Bot protection check failed. Please try again.')
   }
 
-  const downloadUrl = getAbsoluteAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf')
+  const downloadUrl = getAbsoluteAssetUrl(GUIDE_PDF_KEY)
 
   try {
     const db = getDb()

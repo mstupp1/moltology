@@ -18,6 +18,7 @@ import { currentLeadReferrer } from '@/lib/attribution'
 import { LEAD_CAPTURE_CHECK_PENDING, LEAD_CAPTURE_TURNSTILE_ACTION } from '@/lib/lead-capture'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 import { getAssetUrl } from '@/lib/assets'
+import { GUIDE_PDF_FILENAME, GUIDE_PDF_PAGES, guidePdfUrl } from '@/lib/guide-pdf'
 
 export interface MoltmaxGuideCardProps {
   onOpenGuideModal?: () => void
@@ -65,13 +66,13 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
 
       if (res?.success) {
         setIsSubmitted(true)
-        const url = res.downloadUrl ? `${res.downloadUrl}${res.downloadUrl.includes('?') ? '&' : '?'}v=20261008-artwork` : getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf?v=20261008-artwork')
+        const url = guidePdfUrl(res.downloadUrl)
         if (typeof window !== 'undefined') {
           const a = document.createElement('a')
           a.href = url
           a.target = '_blank'
           a.rel = 'noopener noreferrer'
-          a.download = 'the-2026-moltmaxxing-protocol-guide.pdf'
+          a.download = GUIDE_PDF_FILENAME
           document.body.appendChild(a)
           a.click()
           document.body.removeChild(a)
@@ -108,7 +109,7 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
 
           <div className="inline-flex items-center gap-1.5 text-[11px] font-sans text-ink-muted">
             <Shield className="w-3.5 h-3.5 text-[#00ffcc]" />
-            <span>4-page PDF · Printable · Free</span>
+            <span>{GUIDE_PDF_PAGES}-page PDF · Printable · Free</span>
           </div>
         </div>
 
@@ -157,7 +158,7 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
                 Your download has started. Check your browser downloads folder or click below to re-open.
               </p>
               <a
-                href={getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf?v=20261008-artwork')}
+                href={guidePdfUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-control text-xs font-bold text-cyan-glow hover:underline pt-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
