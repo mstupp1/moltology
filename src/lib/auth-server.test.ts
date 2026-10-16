@@ -7,7 +7,6 @@ import {
   ensureValidJwks,
   getAuthApiErrorUrl,
   isGoogleSocialConfigured,
-  resolveAccountLinkingOptions,
   sendVerificationEmail,
 } from './auth-server'
 
@@ -18,6 +17,11 @@ describe('auth-server', () => {
     expect(auth.api.signInEmail).toBeDefined()
     expect(auth.api.signOut).toBeDefined()
     expect(auth.api.getSession).toBeDefined()
+  })
+
+  it('requires 8-character passwords for new accounts', () => {
+    const options = (auth as { options?: { emailAndPassword?: { minPasswordLength?: number } } }).options
+    expect(options?.emailAndPassword?.minPasswordLength).toBe(8)
   })
 
   it('caches session data in a signed cookie so get-session can skip Neon', () => {
@@ -32,10 +36,10 @@ describe('auth-server', () => {
     expect(isGoogleSocialConfigured()).toBe(expected)
   })
 
-  it('auto-links Google onto existing same-email accounts', () => {
+  it('auto-links Google only onto verified same-email accounts', () => {
     expect(ACCOUNT_LINKING_OPTIONS.enabled).toBe(true)
     expect(ACCOUNT_LINKING_OPTIONS.trustedProviders).toEqual(['google'])
-    expect(ACCOUNT_LINKING_OPTIONS.requireLocalEmailVerified).toBe(false)
+    expect(ACCOUNT_LINKING_OPTIONS.requireLocalEmailVerified).toBe(true)
     expect(getAuthApiErrorUrl('https://moltology.org/')).toBe('https://moltology.org/auth')
     expect(auth.api.linkSocialAccount).toBeDefined()
     expect(auth.api.listUserAccounts).toBeDefined()
@@ -45,13 +49,6 @@ describe('auth-server', () => {
   it('exposes ensureValidJwks for runtime self-healing', async () => {
     expect(typeof ensureValidJwks).toBe('function')
     await expect(ensureValidJwks()).resolves.not.toThrow()
-  })
-})
-
-describe('account linking with email verification flag', () => {
-  it('requires a verified local email when verification is on', () => {
-    expect(resolveAccountLinkingOptions(true).requireLocalEmailVerified).toBe(true)
-    expect(resolveAccountLinkingOptions(false).requireLocalEmailVerified).toBe(false)
   })
 })
 

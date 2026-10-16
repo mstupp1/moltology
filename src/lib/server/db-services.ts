@@ -117,6 +117,7 @@ import {
 
 import { verifyTurnstileToken } from './turnstile'
 import { assertForumWriteLimit } from './forum-write-limit'
+import { moltmaxLabelsForScore } from '../moltmax-quiz'
 import { LEAD_CAPTURE_TURNSTILE_ACTION } from '../lead-capture'
 import {
   ACTIVITY_FEED_FILTER_IDS,
@@ -378,6 +379,7 @@ interface UserStatsInput {
   moltmaxStage?: string
   moltmaxDimensionScores?: Record<string, number>
   token?: string
+  userId?: string
 }
 
 /**
@@ -394,10 +396,12 @@ export const updateUserStatsHandler = async ({ data, context }: ServerFnArgs<Use
     .onConflictDoNothing()
 
   const input = data ?? {}
-  const { token: _token, ...statsFields } = input
-  const statsData = statsFields.moltmaxScore === undefined
-    ? statsFields
-    : { ...statsFields, moltmaxCompletedAt: new Date() }
+  // Clearance and stage labels are derived from the score here, never taken from the client.
+  const { token: _token, userId: _userId, moltmaxClearance: _clearance, moltmaxStage: _stage, ...statsFields } = input
+  const labels = statsFields.moltmaxScore === undefined ? null : moltmaxLabelsForScore(statsFields.moltmaxScore)
+  const statsData = labels
+    ? { ...statsFields, moltmaxClearance: labels.clearance, moltmaxStage: labels.stage, moltmaxCompletedAt: new Date() }
+    : statsFields
   const [updated] = await dbClient
     .update(userStats)
     .set({ ...statsData, updatedAt: new Date() })
@@ -752,15 +756,13 @@ export const createBlogCommentHandler = async ({ data, context }: ServerFnArgs<C
     throw new Error('Invalid input: Post ID and comment content are required.')
   }
 
-  // Canonical Turnstile bot verification check
-  if (data?.turnstileToken) {
-    const verification = await verifyTurnstileToken({
-      token: data.turnstileToken,
-      expectedAction: 'blog_comment',
-    })
-    if (!verification.success) {
-      throw new Error(verification.errorMessage || 'Bot verification check failed.')
-    }
+  // The comment form always sends a Turnstile token, so a missing one is treated as a bot.
+  const verification = await verifyTurnstileToken({
+    token: data.turnstileToken,
+    expectedAction: 'blog_comment',
+  })
+  if (!verification.success) {
+    throw new Error(verification.errorMessage || 'Bot verification check failed.')
   }
 
   // Guardrail 1: Clean & sanitize input
@@ -781,6 +783,19 @@ export const createBlogCommentHandler = async ({ data, context }: ServerFnArgs<C
       throw new Error('Your comment contains restricted external links or promotional content.')
     }
   }
+
+  const [post] = await dbClient
+    .select({ id: blogPosts.id })
+    .from(blogPosts)
+    .where(and(eq(blogPosts.id, data.postId), eq(blogPosts.isPublished, true)))
+    .limit(1)
+  if (!post) {
+    throw new Error('This post is no longer available.')
+  }
+
+  // Comments share the forum's per-member write budget and moderation gate.
+  await assertForumWriteLimit(userId)
+  await requirePublishableForumPost({ body: sanitizedContent })
 
   const [userProfile] = await dbClient
     .select()

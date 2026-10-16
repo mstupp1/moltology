@@ -34,6 +34,10 @@ export const CONTACT_COPY = {
   botCheckFailed: 'Bot check failed. Refresh the challenge and try again.',
   genericError: 'Could not send your message. Please try again.',
   toastSent: 'Message sent.',
+  optInPending: 'To get news emails, open the confirmation link we sent to that address.',
+  emailConfirmed: 'Email confirmed. You will get Moltology news and releases.',
+  emailConfirmExpired: 'That confirmation link is invalid or expired. Send the form again with the box ticked to get a new one.',
+  emailConfirmError: 'Could not confirm your email. Try the link again.',
 } as const
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/

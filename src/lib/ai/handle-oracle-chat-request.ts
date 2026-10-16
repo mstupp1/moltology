@@ -55,6 +55,8 @@ function queueOracleUserMessagePersistence(params: {
   })()
 }
 
+export const ORACLE_USAGE_UNAVAILABLE_MESSAGE = 'The Oracle is unavailable right now. Try again in a minute.'
+
 export interface OracleChatRequestBody {
   messages?: OracleChatMessageInput[]
   userId?: string
@@ -135,8 +137,13 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
       )
     }
   } catch (err) {
-    // The per-instance guard above still applies while the usage table is unreachable.
+    // Without the usage table the daily and per-minute limits cannot be enforced,
+    // so the paid model call does not run.
     console.warn('[handleOracleChatRequest] Usage check unavailable:', err)
+    return Response.json(
+      { error: ORACLE_USAGE_UNAVAILABLE_MESSAGE },
+      { status: 503, headers: { 'Retry-After': '30' } }
+    )
   }
 
   const preflight = await screenOraclePrompt(guardrail.sanitizedText || userText)

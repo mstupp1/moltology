@@ -56,6 +56,9 @@ export const AUTH_SESSION_CLIENT_OPTIONS = {
  * HMAC-signed (Better Auth compact strategy). Revocation can lag up to maxAge;
  * mutating server fns still verify JWTs. 5 minutes is Better Auth's default.
  */
+/** Minimum length for new email/password passwords. Sign-in accepts existing shorter ones. */
+export const MIN_PASSWORD_LENGTH = 8
+
 export const AUTH_SESSION_COOKIE_CACHE = {
   enabled: true,
   maxAge: 5 * 60,

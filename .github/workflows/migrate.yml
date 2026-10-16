@@ -11,6 +11,9 @@ on:
       - 'src/db/enable-rls.ts'
       - '.github/workflows/migrate.yml'
 
+permissions:
+  contents: read
+
 jobs:
   migrate:
     name: Run Drizzle SQL Migrations & RLS

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Lock, Mail, AlertCircle, Loader2 } from 'lucide-react'
 import { authClient } from '../lib/auth-client'
-import { isEmailVerificationEnabled, isGoogleAuthEnabled } from '../lib/auth-config'
+import { isEmailVerificationEnabled, isGoogleAuthEnabled, MIN_PASSWORD_LENGTH } from '../lib/auth-config'
 import {
   EMAIL_VERIFICATION_COPY,
   isEmailNotVerifiedError,
@@ -389,7 +389,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             label="Password"
             type="password"
             required
-            minLength={6}
+            minLength={mode === 'signup' ? MIN_PASSWORD_LENGTH : undefined}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"

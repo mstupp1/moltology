@@ -253,3 +253,11 @@ describe('Sitemap and RSS XML Generators', () => {
     expect(xml).toContain('<link>https://moltology.org/news/first-dispatch</link>')
   })
 })
+
+describe('buildJsonLd escaping', () => {
+  it('cannot close its script tag', () => {
+    const json = buildJsonLd({ headline: '</script><script>alert(1)</script>' })
+    expect(json).not.toContain('</script>')
+    expect(JSON.parse(json).headline).toBe('</script><script>alert(1)</script>')
+  })
+})

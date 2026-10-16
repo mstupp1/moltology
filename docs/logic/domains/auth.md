@@ -24,14 +24,14 @@ rules:
   - id: auth.password-length
     title: Minimum password length
     kind: limit
-    statement: Email and password accounts need a password of at least 6 characters.
+    statement: New email and password accounts need a password of at least 8 characters. Sign-in still accepts older passwords of 6 or 7 characters.
     dependsOn: [auth.better-auth]
-    flag:
-      level: watch
-      note: Six characters is below common guidance of 8 or more. Consider raising it with the signup screening work.
     anchors:
       - file: src/lib/auth-server.ts
         symbol: auth.minPasswordLength
+      - file: src/lib/auth-config.ts
+        symbol: MIN_PASSWORD_LENGTH
+    tests: [src/lib/auth-server.test.ts]
   - id: auth.jwt-for-writes
     title: JWTs carry identity to writes
     kind: flow
@@ -58,14 +58,14 @@ rules:
         symbol: AUTH_SESSION_CLIENT_OPTIONS
     tests: [src/lib/auth-config.test.ts]
   - id: auth.google-linking
-    title: Google links to existing accounts
+    title: Google links only to verified accounts
     kind: permission
-    statement: Google is a trusted provider, so a Google sign-in with the same email links to an existing email account. When email verification is on, the local email must be verified first.
+    statement: A Google sign-in with the same email links to an existing email account only when that account's email is verified. Otherwise the member signs in with their password and connects Google from Settings. This holds whether or not global email verification is on.
     dependsOn: [auth.better-auth, auth.email-verification-flag]
     anchors:
       - file: src/lib/auth-server.ts
         symbol: ACCOUNT_LINKING_OPTIONS
-    tests: [src/lib/auth-accounts.test.ts]
+    tests: [src/lib/auth-accounts.test.ts, src/lib/auth-server.test.ts]
   - id: auth.email-verification-flag
     title: Global email verification is off
     kind: gate

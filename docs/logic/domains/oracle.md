@@ -8,7 +8,7 @@ rules:
   - id: oracle.request-pipeline
     title: Oracle request pipeline
     kind: flow
-    statement: Every Oracle message passes the flood guard, a last-turn check, and local input guardrails. Guests then get a canned reply with no model call. Members are checked against their usage allowance and the jailbreak preflight before a routed, streamed answer.
+    statement: Every Oracle message passes the flood guard, a last-turn check, and local input guardrails. Guests then get a canned reply with no model call. Members are checked against their usage allowance and the jailbreak preflight before a routed, streamed answer. If the allowance cannot be read, the request is refused with a 503 instead of calling the model.
     anchors:
       - file: src/lib/ai/handle-oracle-chat-request.ts
         symbol: handleOracleChatRequest
@@ -48,7 +48,12 @@ rules:
         label: Over minute or daily allowance?
         next:
           - { to: over, label: 'yes' }
+          - { to: unavailable, label: 'unreadable' }
           - { to: preflight, label: 'no' }
+      - id: unavailable
+        label: 503, no model call
+        kind: outcome
+        tone: warn
       - id: over
         label: 429 with Retry-After
         kind: outcome

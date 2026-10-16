@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { handleOracleChatRequest } from './handle-oracle-chat-request'
+import { handleOracleChatRequest, ORACLE_USAGE_UNAVAILABLE_MESSAGE } from './handle-oracle-chat-request'
 import { ORACLE_THREAD_ID_HEADER, ORACLE_UNAVAILABLE_MESSAGE } from './oracle-chat'
 import { ORACLE_MODELS } from './oracle-models'
 import { buildSystemPrompt } from './codex-prompt'
@@ -496,6 +496,16 @@ describe('handleOracleChatRequest', () => {
     expect(data.limit).toBe('day')
     expect(data.error).toContain('Premium')
     expect(screenOraclePrompt).not.toHaveBeenCalled()
+    expect(streamTextMock).not.toHaveBeenCalled()
+  })
+
+  it('does not call the model when the usage table cannot be read', async () => {
+    vi.mocked(getOracleUsageSnapshot).mockRejectedValueOnce(new Error('db down'))
+    const res = await handleOracleChatRequest(
+      await authedRequest({ messages: [{ role: 'user', content: 'Teach me ecdysis' }] })
+    )
+    expect(res.status).toBe(503)
+    expect((await res.json()).error).toBe(ORACLE_USAGE_UNAVAILABLE_MESSAGE)
     expect(streamTextMock).not.toHaveBeenCalled()
   })
 

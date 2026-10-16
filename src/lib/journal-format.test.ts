@@ -71,3 +71,9 @@ describe('formatJournalInline', () => {
     expect(html).toContain('<strong class="font-bold">carcinization</strong>')
   })
 })
+
+describe('formatJournalInline escaping', () => {
+  it('escapes raw markup before adding bold tags', () => {
+    expect(formatJournalInline('<img src=x onerror=alert(1)> **ok**', 'b')).toBe('&lt;img src=x onerror=alert(1)&gt; <strong class="b">ok</strong>')
+  })
+})

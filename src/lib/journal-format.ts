@@ -85,6 +85,10 @@ export function extractFeedTags(raw: string): { text: string; feeds: string[] } 
   }
 }
 
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
 /**
  * Renders a journal paragraph's inline syntax into HTML: converts $...$ math
  * and **bold** segments. Feed tags are expected to have been stripped already.
@@ -92,7 +96,7 @@ export function extractFeedTags(raw: string): { text: string; feeds: string[] } 
  * dark HUD chrome; paper themes should pass a color-free class like 'font-bold').
  */
 export function formatJournalInline(raw: string, boldClass = 'text-[#e8f6ff] font-bold'): string {
-  return raw
+  return escapeHtml(raw)
     .replace(/\$([^$]+)\$/g, (_, math: string) => convertScienceMath(math))
     .replace(/\*\*(.*?)\*\*/g, `<strong class="${boldClass}">$1</strong>`)
     .replace(/\\n/g, ' ')

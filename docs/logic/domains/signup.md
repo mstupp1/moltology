@@ -160,18 +160,19 @@ rules:
       - file: src/lib/server/signup-risk-events.ts
         symbol: recordSignupRiskEvent
   - id: signup.turnstile-optional
-    title: Turnstile only checks tokens it gets
+    title: Turnstile required on public writes
     kind: gate
-    statement: Blog comments and lead capture verify a Cloudflare Turnstile token when one is sent. A request with no token skips the check.
-    flag:
-      level: gap
-      note: Bots can skip Turnstile by leaving the token out. Require it on public write paths, and fail closed when TURNSTILE_SECRET_KEY is missing in production.
+    statement: Lead capture, the contact form and blog comments require a passing Cloudflare Turnstile token. A request with no token is treated as a bot. In production a missing TURNSTILE_SECRET_KEY blocks the request instead of passing it.
     anchors:
       - file: src/lib/server/turnstile.ts
         symbol: verifyTurnstileToken
+      - file: src/lib/server/turnstile.ts
+        symbol: resolveTurnstileSecret
       - file: src/lib/server/db-services.ts
         symbol: submitLeadHandler
-    tests: [src/lib/server/turnstile.test.ts]
+      - file: src/lib/server/db-services.ts
+        symbol: createBlogCommentHandler
+    tests: [src/lib/server/turnstile.test.ts, src/lib/server/blog-comment-guards.test.ts]
 ---
 
 Screening uses cheap local checks first, then asks Jev only when needed. Every path fails open, because a false block costs a real member.

@@ -410,12 +410,29 @@ function cleanLatexMath(math: string): string {
     .replace(/\^([a-zA-Z0-9])/g, '<sup>$1</sup>')
 }
 
-function formatInlineMarkdown(text: string): string {
+/** http(s), mailto and site-relative URLs only; anything else (javascript:, data:) renders as text. */
+export function safeInlineUrl(raw: string): string | null {
+  const url = raw.trim()
+  if (!url) return null
+  if (url.startsWith('/') && !url.startsWith('//')) return url
+  if (url.startsWith('#')) return url
+  if (/^(https?:|mailto:)/i.test(url)) return url
+  // Bare bucket keys such as images/foo.jpg resolve through getAssetUrl.
+  if (/^[a-z0-9][\w./-]*$/i.test(url) && !url.includes(':')) return url
+  return null
+}
+
+function escapeAttr(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+export function formatInlineMarkdown(text: string): string {
   // First escape angle brackets and ampersands so raw symbols like <15ms or >100 are preserved
   let formatted = text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
 
   // Handle standalone block math $$...$$
   formatted = formatted.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
@@ -431,7 +448,9 @@ function formatInlineMarkdown(text: string): string {
 
   // Handle inline markdown images if any in paragraph: ![alt](url)
   formatted = formatted.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, src) => {
-    const resolvedUrl = getAssetUrl(src.trim())
+    const safeSrc = safeInlineUrl(src.trim().replace(/&amp;/g, '&'))
+    if (!safeSrc) return alt
+    const resolvedUrl = escapeAttr(getAssetUrl(safeSrc))
     return `<img src="${resolvedUrl}" alt="${alt}" class="rounded-card border border-line-subtle my-4 h-auto w-full" />`
   })
 
@@ -445,7 +464,11 @@ function formatInlineMarkdown(text: string): string {
   formatted = formatted.replace(/`([^`]+)`/g, '<code class="bg-surface-2 border border-line text-cyan-glow px-1.5 py-0.5 font-sans text-[11px] sm:text-xs rounded-chip break-all">$1</code>')
 
   // Links: [label](url)
-  formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-cyan-glow hover:text-cyan-hover underline underline-offset-2 transition-colors font-sans font-bold break-words">$1</a>')
+  formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label: string, href: string) => {
+    const safeHref = safeInlineUrl(href.trim().replace(/&amp;/g, '&'))
+    if (!safeHref) return label
+    return `<a href="${escapeAttr(safeHref)}" target="_blank" rel="noopener noreferrer" class="text-cyan-glow hover:text-cyan-hover underline underline-offset-2 transition-colors font-sans font-bold break-words">${label}</a>`
+  })
 
   return formatted
 }

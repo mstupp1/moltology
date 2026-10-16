@@ -65,11 +65,9 @@ describe('oracle-chat helpers', () => {
     expect(orderOracleModels('zai/glm-5.3-flash')[0]).toBe(DEFAULT_ORACLE_MODEL_ID)
   })
 
-  it('formats plain unavailable messages with optional gateway detail', () => {
+  it('never shows provider error text to the member', () => {
     expect(formatOracleUnavailableMessage()).toBe(ORACLE_UNAVAILABLE_MESSAGE)
-    expect(formatOracleUnavailableMessage({ message: 'Model not found' })).toBe(
-      `${ORACLE_UNAVAILABLE_MESSAGE} (Model not found)`
-    )
+    expect(formatOracleUnavailableMessage({ message: 'Model not found' })).toBe(ORACLE_UNAVAILABLE_MESSAGE)
   })
 
   it('maps chat input messages into model message payloads', () => {

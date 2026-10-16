@@ -289,7 +289,10 @@ async function rememberStripeCustomer(userId: string | null, customerId: string 
   }
 }
 
-export async function fulfillMerchCheckoutEvent(event: { data?: { object?: unknown } | null }): Promise<void> {
+export async function fulfillMerchCheckoutEvent(event: {
+  type?: string
+  data?: { object?: unknown } | null
+}): Promise<void> {
   const completion = readMerchCheckoutCompletion((event.data?.object ?? {}) as LooseCheckoutSession)
   if (!completion) return
 
@@ -308,6 +311,23 @@ export async function fulfillMerchCheckoutEvent(event: { data?: { object?: unkno
   const order = byId[0]
   if (!order) throw new MerchOrderMissingError()
   if (order.fulfillmentStatus === 'submitted_to_printful' || order.fulfillmentStatus === 'fulfillment_failed') {
+    return
+  }
+
+  // A delayed payment method completes checkout before the money arrives. Nothing
+  // goes to Printful until Stripe reports the session as paid.
+  if (event.type === 'checkout.session.async_payment_failed' || !completion.paid) {
+    const failed = event.type === 'checkout.session.async_payment_failed'
+    await db
+      .update(merchOrders)
+      .set({
+        stripeCheckoutSessionId: completion.sessionId ?? order.stripeCheckoutSessionId,
+        customerEmail: completion.email ?? order.customerEmail,
+        shippingAddress: completion.shipping ?? order.shippingAddress,
+        fulfillmentStatus: failed ? 'payment_failed' : 'awaiting_payment',
+        updatedAt: new Date(),
+      })
+      .where(eq(merchOrders.id, order.id))
     return
   }
 

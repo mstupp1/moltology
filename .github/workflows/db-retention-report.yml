@@ -12,6 +12,9 @@ on:
           - lenient
         default: lean
 
+permissions:
+  contents: read
+
 jobs:
   report:
     name: Dry-run retention inventory
