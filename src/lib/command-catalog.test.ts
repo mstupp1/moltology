@@ -41,7 +41,6 @@ describe('command catalog', () => {
       'nav-isolation-protocols',
       'nav-lectures',
       'nav-pipeline',
-      'nav-journal',
       'nav-market',
       'nav-chassis',
       'nav-premium',

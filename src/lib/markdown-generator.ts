@@ -1,6 +1,5 @@
 import { CANONICAL_SCRIPTURES, CODEX_VOLUMES, STAGE_PIPELINE_DATA } from './codexData'
 import { INITIAL_BLOG_POSTS, BlogPostData } from './blog-data'
-import { INITIAL_JOURNAL_PAPERS, JOURNAL_META } from './journal-data'
 
 /**
  * Clean markdown generators for serving AI agents, autonomous web scrapers, and content negotiation.
@@ -91,54 +90,6 @@ export function generateSinglePostMarkdown(post: BlogPostData): string {
   md += `${post.content.trim()}\n\n`
   md += `---\n`
   md += `*Canonical Transmission from MoltNation News Desk. All rights reserved by Moltology System Inc.*\n`
-
-  return md.trim()
-}
-
-export function generateJournalMarkdown(): string {
-  let md = `# ${JOURNAL_META.name}\n`
-  md += `## ${JOURNAL_META.subtitle}\n\n`
-  md += `> ${JOURNAL_META.tagline}\n`
-  md += `> **Volume**: ${JOURNAL_META.volume} | **Issue**: ${JOURNAL_META.issue} | **ISSN**: ${JOURNAL_META.issn} | **Edition**: ${JOURNAL_META.editionDate}\n\n`
-  md += `---\n\n`
-
-  for (const paper of INITIAL_JOURNAL_PAPERS) {
-    md += `### ${paper.paperNumber}: ${paper.title}\n`
-    md += `*${paper.subtitle}*\n\n`
-    md += `- **Category**: ${paper.category}\n`
-    md += `- **DOI**: ${paper.doi}\n`
-    md += `- **Authors**: ${paper.authors.map((a) => `${a.name} (${a.affiliation})`).join(', ')}\n`
-    md += `- **Correspondence**: ${paper.correspondence}\n`
-    md += `- **Keywords**: ${paper.keywords.join(', ')}\n\n`
-    md += `#### Abstract\n${paper.abstract}\n\n`
-
-    for (const section of paper.sections) {
-      md += `#### ${section.number} ${section.title}\n`
-      for (const block of section.blocks) {
-        if (block.type === 'subheading') {
-          md += `\n##### ${block.title}\n`
-        } else if (block.type === 'paragraph') {
-          md += `${block.text}\n\n`
-        } else if (block.type === 'table') {
-          md += `\n*Table: ${block.caption}*\n\n`
-          md += `| ${block.headers.join(' | ')} |\n`
-          md += `| ${block.headers.map(() => '---').join(' | ')} |\n`
-          for (const row of block.rows) {
-            md += `| ${row.join(' | ')} |\n`
-          }
-          md += `\n`
-        }
-      }
-    }
-
-    md += `#### Integration & Notes\n`
-    md += `${paper.integrationIntro}\n\n`
-    for (const note of paper.integrationNotes) {
-      md += `- ${note}\n`
-    }
-    md += `\n#### Citation\n\`${paper.citation}\`\n\n`
-    md += `---\n\n`
-  }
 
   return md.trim()
 }

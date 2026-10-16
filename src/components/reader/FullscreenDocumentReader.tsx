@@ -43,7 +43,7 @@ interface FullscreenDocumentReaderProps {
 }
 
 /**
- * Immersive fullscreen document reader shared by the codex and journal. Owns
+ * Immersive fullscreen document reader for the codex. Owns
  * the viewport chrome (auto-hiding bars, zoom, pinch and double-tap scaling,
  * keyboard navigation, table-of-contents drawer) while the caller renders the
  * actual page content through renderItem.
