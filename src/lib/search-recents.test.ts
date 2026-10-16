@@ -98,4 +98,21 @@ describe('search recents', () => {
     if (stored.kind !== 'page') return
     expect(pageFromRecent(stored).to).toBe('/connections')
   })
+
+  it('ignores saved journal entries after the section is removed', () => {
+    localStorage.setItem(
+      searchRecentsStorageKey(MEMBER_A),
+      JSON.stringify([{
+        kind: 'page',
+        commandId: 'nav-journal',
+        label: 'Open The Benthic Compendium Science Journal',
+        category: 'Navigation',
+        icon: 'journal',
+        to: '/journal',
+        openedAt: Date.now(),
+      }]),
+    )
+
+    expect(getSearchRecents(MEMBER_A)).toEqual([])
+  })
 })

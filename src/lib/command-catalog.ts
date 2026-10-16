@@ -18,7 +18,6 @@ export type CommandIconId =
   | 'market'
   | 'premium'
   | 'pipeline'
-  | 'journal'
   | 'forum'
   | 'stream'
   | 'landing'
@@ -44,7 +43,6 @@ export type CommandNavTo =
   | '/market'
   | '/premium'
   | '/pipeline'
-  | '/journal'
   | '/forum'
   | '/forum/$categorySlug'
   | '/stream'
@@ -145,13 +143,6 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     icon: 'pipeline',
     to: '/pipeline',
     keywords: ['science', 'pipeline', 'stages'],
-  },
-  {
-    id: 'nav-journal',
-    label: 'Open The Benthic Compendium Science Journal',
-    category: 'Navigation',
-    icon: 'journal',
-    to: '/journal',
   },
   {
     id: 'nav-market',

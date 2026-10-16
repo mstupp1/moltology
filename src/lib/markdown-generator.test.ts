@@ -3,7 +3,6 @@ import {
   generateCodexMarkdown,
   generateNewsIndexMarkdown,
   generateSinglePostMarkdown,
-  generateJournalMarkdown,
   generateOrgMarkdown,
   generatePrivacyMarkdown,
   generateTermsMarkdown,
@@ -32,12 +31,6 @@ describe('Markdown Generator', () => {
     expect(postMd).toContain(`# ${post.title}`)
     expect(postMd).toContain(post.authorName)
     expect(postMd).toContain(post.summary)
-  })
-
-  it('generates academic journal markdown', () => {
-    const journalMd = generateJournalMarkdown()
-    expect(journalMd).toContain('THE BENTHIC COMPENDIUM')
-    expect(journalMd).toContain('BEN-COMP-2026-001')
   })
 
   it('generates organization, privacy, and terms markdown', () => {
