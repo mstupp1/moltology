@@ -51,6 +51,33 @@ Execution Latency is <15ms (Streaming) and pressure is >50000 Fathoms with **chi
     expect(screen.getByText(/chitin armor/i)).toBeDefined()
   })
 
+  it('places an authored image caption inside the figure without a second description', () => {
+    const { container } = render(<NewsArticleBody content={`![Robot illustration](images/robot.png)
+
+*Conceptual illustration: imagined equipment, not test evidence.*
+
+The article continues here.`} />)
+
+    const caption = container.querySelector('figcaption')!
+    expect(caption.textContent).toBe('Conceptual illustration: imagined equipment, not test evidence.')
+    expect(screen.getAllByText(/imagined equipment, not test evidence/)).toHaveLength(1)
+    expect(screen.queryByText('Robot illustration')).toBeNull()
+    expect(screen.getByRole('img', { name: 'Robot illustration' })).toBeDefined()
+    expect(screen.getByText('The article continues here.').closest('figure')).toBeNull()
+  })
+
+  it('supports multiline underscore captions and preserves linked attribution', () => {
+    const { container } = render(<NewsArticleBody content={`![Equipment](images/equipment.png)
+_Conceptual illustration.
+Credit: [Source](https://example.com)._
+
+## Next section`} />)
+
+    expect(container.querySelector('figcaption')?.textContent).toBe('Conceptual illustration. Credit: Source.')
+    expect(screen.getByRole('link', { name: 'Source' }).closest('figcaption')).toBeDefined()
+    expect(screen.getByRole('heading', { name: 'Next section' })).toBeDefined()
+  })
+
   it('renders code blocks and telemetry frames with copy button and mobile touch classes', () => {
     const markdown = `
 \`\`\`telemetry
