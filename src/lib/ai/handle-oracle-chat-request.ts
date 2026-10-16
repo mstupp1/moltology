@@ -19,6 +19,7 @@ import {
   recordOracleUsage,
   finalizeOracleUsage,
 } from './service'
+import { getChatLimitMessage, isChatLimitError } from './chat-retention'
 import {
   decideOracleUsage,
   ORACLE_MAX_HISTORY_MESSAGES,
@@ -35,24 +36,13 @@ import {
   type OracleChatMessageInput,
 } from './oracle-chat'
 
-function queueOracleThreadPersistence(params: {
+function queueOracleUserMessagePersistence(params: {
   userId: string
   threadId: string
-  isNewThread: boolean
   userText: string
-  initialThreadTitle: string
 }) {
   void (async () => {
     try {
-      if (params.isNewThread) {
-        await createAIThread({
-          id: params.threadId,
-          userId: params.userId,
-          title: params.initialThreadTitle,
-          persona: 'oracle',
-        })
-      }
-
       await saveAIMessage({
         threadId: params.threadId,
         userId: params.userId,
@@ -178,13 +168,27 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   const initialThreadTitle =
     userText.trim().split('\n')[0].slice(0, 60) || 'Ascendance Consultation'
 
-  queueOracleThreadPersistence({
-    userId,
-    threadId: activeThreadId,
-    isNewThread,
-    userText,
-    initialThreadTitle,
-  })
+  if (isNewThread) {
+    try {
+      await createAIThread({
+        id: activeThreadId,
+        userId,
+        title: initialThreadTitle,
+        persona: 'oracle',
+      })
+    } catch (error) {
+      if (isChatLimitError(error)) {
+        return Response.json({ error: getChatLimitMessage() }, { status: 409 })
+      }
+      console.warn('[handleOracleChatRequest] Could not reserve new conversation:', error)
+      return Response.json(
+        { error: 'Could not start a new conversation right now. Please try again.' },
+        { status: 503 },
+      )
+    }
+  }
+
+  queueOracleUserMessagePersistence({ userId, threadId: activeThreadId, userText })
 
   const systemPrompt = buildSystemPrompt(DEFAULT_ORACLE_PERSONA, preflight.context)
   // History comes from saved messages, never the client, so a caller cannot forge

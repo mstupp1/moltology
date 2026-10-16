@@ -71,6 +71,11 @@
     "simulate:prepare": "tsx scripts/simulate-activity.ts --prepare",
     "simulate:apply": "tsx scripts/simulate-activity.ts --apply",
     "db:retention-report": "tsx scripts/db-retention-report.ts",
+    "db:retention-apply": "tsx scripts/db-retention-apply.ts",
+    "db:retention-completions": "tsx scripts/db-retention-completions.ts",
+    "db:retention-usage": "tsx scripts/db-retention-usage.ts",
+    "db:retention-chats": "tsx scripts/db-retention-chats.ts",
+    "db:retention-verify": "tsx scripts/verify-db-retention.ts",
     "vercel:prune": "tsx scripts/prune-vercel-deployments.ts",
     "gh:ruleset": "tsx scripts/setup-github-ruleset.ts"
   },

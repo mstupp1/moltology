@@ -4,9 +4,10 @@ import {
   DISABLED_REMOTE_INBOX_MARK_READ,
   isRemoteInboxEnabled,
 } from '../notifications-refresh'
-import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, forumTopicVisits, forumBoardVisits, leads, equipmentCatalog, userGearItems, friendRequests, friendships, suggestionDismissals, memberBonds, notifications, xpTransactions, type NotificationKind, type NotificationPayload } from '../../db/schema'
+import { changelogs, profiles, users, userStats, routines, routineCompletions, routineDaySummaries, routineStreakCarries, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, forumTopicVisits, forumBoardVisits, leads, equipmentCatalog, userGearItems, friendRequests, friendships, suggestionDismissals, memberBonds, notifications, xpTransactions, type NotificationKind, type NotificationPayload } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, notInArray, isNull, getTableColumns } from 'drizzle-orm'
+import { union } from 'drizzle-orm/pg-core'
 import type { ChangelogEntry } from '../changelogs-data'
 import { resolveWriteAuth } from './write-auth'
 import { ensureUserProfile } from '../user-sync'
@@ -70,7 +71,8 @@ import {
   CANONICAL_ALIGNMENT_TASKS,
   TOTAL_ALIGNMENT_TASKS,
   mergeCompletions,
-  computeStreak,
+  ALIGNMENT_HISTORY_DAYS,
+  computeStreakWithCarry,
   shiftDays,
   localDateString,
   isAlignmentDateWritable,
@@ -3373,38 +3375,72 @@ export const getDailyAlignmentData = async (
   userId: string,
   targetDate: string
 ): Promise<DailyAlignmentResponse> => {
-  const todayCompletions = await dbClient
-    .select({
-      taskKey: routineCompletions.taskKey,
-    })
-    .from(routineCompletions)
-    .where(
-      and(
-        eq(routineCompletions.userId, userId),
-        eq(routineCompletions.completedOn, targetDate)
-      )
-    )
-
-  const completedKeys = todayCompletions.map((r) => r.taskKey)
-  const tasks = mergeCompletions(completedKeys)
-  const completedCount = completedKeys.length
-
-  // Match max 52-week heatmap span (52×7 − 1 lookback → 364 daily buckets)
-  const HISTORY_LOOKBACK_DAYS = 52 * 7 - 1
-  const startDate = shiftDays(targetDate, -HISTORY_LOOKBACK_DAYS)
-  const pastCompletions = await dbClient
+  // Keep the streak scan bounded to the legacy 364-day ceiling when a carry
+  // has not been created yet; the member-facing history remains exactly 90d.
+  const STREAK_FALLBACK_LOOKBACK_DAYS = 52 * 7 - 1
+  const queryStartDate = shiftDays(targetDate, -STREAK_FALLBACK_LOOKBACK_DAYS)
+  const streakScanStartDate = sql<string>`COALESCE(
+    (
+      SELECT to_char(("anchorDate"::date + 1), 'YYYY-MM-DD')
+      FROM routine_streak_carries
+      WHERE "userId" = ${userId} AND "anchorDate" < ${targetDate}
+      LIMIT 1
+    ),
+    ${queryStartDate}
+  )`
+  const rawCompletions = dbClient
     .select({
       completedOn: routineCompletions.completedOn,
       taskKey: routineCompletions.taskKey,
+      rowKind: sql<string>`'task'`,
+      streakDays: sql<number | null>`NULL::integer`,
     })
     .from(routineCompletions)
     .where(
       and(
         eq(routineCompletions.userId, userId),
-        sql`${routineCompletions.completedOn} >= ${startDate}`,
+        sql`${routineCompletions.completedOn} >= ${streakScanStartDate}`,
         sql`${routineCompletions.completedOn} <= ${targetDate}`
       )
     )
+  const summarizedCompletions = dbClient
+    .select({
+      completedOn: routineDaySummaries.completedOn,
+      taskKey: sql<string>`unnest(${routineDaySummaries.taskKeys})`,
+      rowKind: sql<string>`'task'`,
+      streakDays: sql<number | null>`NULL::integer`,
+    })
+    .from(routineDaySummaries)
+    .where(
+      and(
+        eq(routineDaySummaries.userId, userId),
+        sql`${routineDaySummaries.completedOn} >= ${streakScanStartDate}`,
+        sql`${routineDaySummaries.completedOn} <= ${targetDate}`
+      )
+    )
+  const streakCarry = dbClient
+    .select({
+      completedOn: routineStreakCarries.anchorDate,
+      taskKey: sql<string>`''`,
+      rowKind: sql<string>`'carry'`,
+      streakDays: routineStreakCarries.streakDays,
+    })
+    .from(routineStreakCarries)
+    .where(eq(routineStreakCarries.userId, userId))
+  // One SQL statement gives raw, compacted task keys, and the carry the same
+  // snapshot while cleanup advances the retention boundary.
+  const alignmentRows = await union(rawCompletions, summarizedCompletions, streakCarry)
+  const carryRow = alignmentRows.find((row) => row.rowKind === 'carry')
+  const carry = carryRow
+    ? { anchorDate: carryRow.completedOn, streakDays: Number(carryRow.streakDays ?? 0) }
+    : null
+  const pastCompletions = alignmentRows.filter((row) => row.rowKind === 'task')
+
+  const completedKeys = pastCompletions
+    .filter((row) => row.completedOn === targetDate)
+    .map((row) => row.taskKey)
+  const tasks = mergeCompletions(completedKeys)
+  const completedCount = completedKeys.length
 
   const dayCounts = new Map<string, Set<string>>()
   for (const c of pastCompletions) {
@@ -3415,13 +3451,22 @@ export const getDailyAlignmentData = async (
   }
 
   const history: Array<{ date: string; completedCount: number }> = []
-  for (let i = HISTORY_LOOKBACK_DAYS; i >= 0; i--) {
+  for (let i = ALIGNMENT_HISTORY_DAYS - 1; i >= 0; i--) {
     const d = shiftDays(targetDate, -i)
     const count = dayCounts.get(d)?.size || 0
     history.push({ date: d, completedCount: count })
   }
 
-  const streakDays = computeStreak(history, targetDate)
+  const streakStartDate = carry && carry.anchorDate < targetDate
+    ? shiftDays(carry.anchorDate, 1)
+    : queryStartDate
+  const streakHistory: Array<{ date: string; completedCount: number }> = []
+  const streakDayCount = Math.max(0, Math.round((Date.parse(`${targetDate}T00:00:00Z`) - Date.parse(`${streakStartDate}T00:00:00Z`)) / 86_400_000))
+  for (let i = streakDayCount; i >= 0; i--) {
+    const d = shiftDays(targetDate, -i)
+    streakHistory.push({ date: d, completedCount: dayCounts.get(d)?.size || 0 })
+  }
+  const streakDays = computeStreakWithCarry(streakHistory, targetDate, carry)
 
   // Fetch or sync user XP and stage
   let xp = 0

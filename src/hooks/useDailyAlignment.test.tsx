@@ -337,6 +337,40 @@ describe('useDailyAlignment Hook Optimistic State & Rapid Clicks', () => {
     })
   })
 
+  it('keeps compacted streaks above 90 days during optimistic today toggles', async () => {
+    const today = localDateString()
+    const completedKeys = CANONICAL_ALIGNMENT_TASKS.slice(0, 7).map((task) => task.key)
+    const history = Array.from({ length: 90 }, (_, index) => ({
+      date: shiftDays(today, index - 89),
+      completedCount: 8,
+    }))
+    history[history.length - 1].completedCount = 7
+
+    vi.spyOn(serverApi, 'getDailyAlignmentFn').mockResolvedValue({
+      date: today,
+      tasks: mergeCompletions(completedKeys),
+      completedKeys,
+      completedCount: 7,
+      totalCount: 8,
+      isAllCompleted: false,
+      history,
+      streakDays: 180,
+    })
+    vi.spyOn(serverApi, 'toggleDailyAlignmentTaskFn').mockImplementation(
+      () => new Promise(() => {}),
+    )
+
+    const { result } = renderHook(() => useDailyAlignment(), { wrapper })
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+    expect(result.current.streakDays).toBe(180)
+
+    await act(async () => { await result.current.toggleTask(CANONICAL_ALIGNMENT_TASKS[7].key) })
+    expect(result.current.streakDays).toBe(181)
+
+    await act(async () => { await result.current.toggleTask(CANONICAL_ALIGNMENT_TASKS[0].key) })
+    expect(result.current.streakDays).toBe(180)
+  })
+
   it('keeps last-known progress when the JWT is not ready yet', async () => {
     const today = localDateString()
     const completedKeys = CANONICAL_ALIGNMENT_TASKS.slice(0, 4).map((t) => t.key)

@@ -1,4 +1,4 @@
-import { pgTable, pgSchema, text, integer, timestamp, boolean, uuid, decimal, jsonb, pgPolicy, uniqueIndex, index, foreignKey, type AnyPgColumn } from 'drizzle-orm/pg-core'
+import { pgTable, pgSchema, text, integer, bigint, timestamp, boolean, uuid, decimal, jsonb, pgPolicy, uniqueIndex, index, foreignKey, type AnyPgColumn } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 import type {
   AcademyCertificateScope,
@@ -234,10 +234,43 @@ export const routineCompletions = pgTable('routine_completions', {
   completedAt: timestamp('completedAt').notNull().defaultNow(),
 }, (table) => [
   uniqueIndex('routine_completions_user_task_date_unique').on(table.userId, table.taskKey, table.completedOn),
+  index('routine_completions_date_user_idx').on(table.completedOn, table.userId),
   pgPolicy('routine_completions_isolation_policy', {
     for: 'all',
     using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
   })
+])
+
+/**
+ * Compact completion history for alignment heatmaps and historical date views.
+ * Task keys preserve the same completed-key response as raw per-task rows.
+ */
+export const routineDaySummaries = pgTable('routine_day_summaries', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  completedOn: text('completedOn').notNull(),
+  taskKeys: text('taskKeys').array().notNull(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('routine_day_summaries_user_date_unique').on(table.userId, table.completedOn),
+  index('routine_day_summaries_date_user_idx').on(table.completedOn, table.userId),
+  pgPolicy('routine_day_summaries_isolation_policy', {
+    for: 'all',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+])
+
+/** Compact streak state immediately before the retained 90-day task history. */
+export const routineStreakCarries = pgTable('routine_streak_carries', {
+  userId: text('userId').primaryKey().references(() => profiles.id, { onDelete: 'cascade' }),
+  anchorDate: text('anchorDate').notNull(),
+  streakDays: integer('streakDays').notNull().default(0),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+}, (table) => [
+  pgPolicy('routine_streak_carries_isolation_policy', {
+    for: 'all',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
 ])
 
 export type ActivityEventVisibility = 'private' | 'friends' | 'public'
@@ -444,6 +477,29 @@ export const aiUsageEvents = pgTable('ai_usage_events', {
 }, (table) => [
   index('ai_usage_events_user_created_idx').on(table.userId, table.createdAt),
   pgPolicy('ai_usage_events_server_only_policy', {
+    for: 'all',
+    using: aiUsageServerOnly,
+    withCheck: aiUsageServerOnly,
+  }),
+])
+
+/** Daily token/call rollups after raw usage events leave their retention window. */
+export const aiUsageDailySummaries = pgTable('ai_usage_daily_summaries', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  date: text('date').notNull(),
+  kind: text('kind').notNull(),
+  model: text('model').notNull().default(''),
+  requestCount: integer('requestCount').notNull().default(0),
+  inputTokens: bigint('inputTokens', { mode: 'number' }).notNull().default(0),
+  outputTokens: bigint('outputTokens', { mode: 'number' }).notNull().default(0),
+  missingInputTokenCount: integer('missingInputTokenCount').notNull().default(0),
+  missingOutputTokenCount: integer('missingOutputTokenCount').notNull().default(0),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('ai_usage_daily_summaries_user_date_kind_model_unique')
+    .on(table.userId, table.date, table.kind, table.model),
+  pgPolicy('ai_usage_daily_summaries_server_only_policy', {
     for: 'all',
     using: aiUsageServerOnly,
     withCheck: aiUsageServerOnly,

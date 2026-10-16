@@ -5,6 +5,7 @@ import { ThreadList } from './ThreadList'
 import type { ManagedThread } from './useThreadActions'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
+import { CHAT_ARCHIVE_RETENTION_DAYS, CHAT_LIMIT } from '@/lib/ai/chat-retention'
 
 export type OracleChatsLayout = 'takeover' | 'column'
 
@@ -79,6 +80,12 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
       </div>
 
       <div className="flex-1 overflow-y-auto px-2 py-2 min-h-0">
+        {userId && !isAuthPending && !isLoadingThreads && (
+          <div className="px-2 pb-2 text-[11px] text-ink-muted leading-relaxed" data-testid="chat-retention-guidance">
+            <p>{threads.length}/{CHAT_LIMIT} chats used. Archived conversations become eligible for deletion after {CHAT_ARCHIVE_RETENTION_DAYS} days and are removed during weekly cleanup.</p>
+            {threads.length >= CHAT_LIMIT && <p className="mt-1 text-ink">Delete a chat to start another.</p>}
+          </div>
+        )}
         {isAuthPending ? (
           <div className="p-3 space-y-2 font-sans" data-testid="oracle-chats-auth-skeleton">
             <HudGhostSkeleton variant="cyan" preset="badge" width={88} height={14} />

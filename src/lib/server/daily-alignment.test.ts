@@ -40,11 +40,21 @@ describe('Daily Alignment Server Handlers', () => {
         from: vi.fn().mockImplementation(() => ({
           where: vi.fn().mockImplementation(() => {
             const rows = [
-              { taskKey: 'silent-synchronization', completedOn: '2026-08-24' },
-              { taskKey: 'prompt-construction', completedOn: '2026-08-24' },
+              { taskKey: 'prompt-construction', completedOn: '2026-08-24', rowKind: 'task', streakDays: null },
             ]
             const p = Promise.resolve(rows) as any
+            p.getSelectedFields = vi.fn(() => ({ completedOn: {}, taskKey: {}, rowKind: {}, streakDays: {} }))
+            p.addSetOperators = vi.fn(() => Promise.resolve([
+              { taskKey: 'prompt-construction', completedOn: '2026-08-24', rowKind: 'task', streakDays: null },
+              { taskKey: 'silent-synchronization', completedOn: '2026-08-24', rowKind: 'task', streakDays: null },
+              { taskKey: 'silent-synchronization', completedOn: '2026-06-10', rowKind: 'task', streakDays: null },
+            ]))
             p.limit = vi.fn().mockResolvedValue([{ xp: 150, stage: 1 }])
+            p.union = vi.fn().mockResolvedValue([
+              ...rows,
+              { taskKey: 'silent-synchronization', completedOn: '2026-08-24', rowKind: 'task', streakDays: null },
+              { taskKey: 'silent-synchronization', completedOn: '2026-06-10', rowKind: 'task', streakDays: null },
+            ])
             return p
           }),
         })),
@@ -76,10 +86,11 @@ describe('Daily Alignment Server Handlers', () => {
     expect(res.completedCount).toBe(2)
     expect(res.isAllCompleted).toBe(false)
     expect(Array.isArray(res.history)).toBe(true)
-    // 52×7 − 1 lookback inclusive → 364 daily buckets for the activity heatmap
-    expect(res.history).toHaveLength(52 * 7)
-    expect(res.history[0]?.date).toBe('2025-08-26')
+    // The visible alignment history contains exactly 90 inclusive dates.
+    expect(res.history).toHaveLength(90)
+    expect(res.history[0]?.date).toBe(shiftDays('2026-08-24', -89))
     expect(res.history[res.history.length - 1]?.date).toBe('2026-08-24')
+    expect(res.history.find((day) => day.date === '2026-06-10')?.completedCount).toBe(1)
     expect(res.xp).toBe(150)
     expect(res.stage).toBe(1)
     expect(res.progression).toBeDefined()
@@ -109,7 +120,10 @@ describe('Daily Alignment Server Handlers', () => {
               { taskKey: 'silent-synchronization', completedOn: '2026-08-24', totalXp: 10, xp: 10, stage: 1 },
             ]
             const p = Promise.resolve(rows) as any
+            p.getSelectedFields = vi.fn(() => ({ completedOn: {}, taskKey: {}, rowKind: {}, streakDays: {} }))
+            p.addSetOperators = vi.fn(() => Promise.resolve(rows.map((row) => ({ ...row, rowKind: 'task', streakDays: null }))))
             p.limit = vi.fn().mockResolvedValue([{ taskKey: 'silent-synchronization', totalXp: 10, xp: 10, stage: 1 }])
+            p.union = vi.fn().mockResolvedValue(rows)
             return p
           }),
         })),
@@ -166,7 +180,10 @@ describe('Daily Alignment Server Handlers', () => {
           where: vi.fn().mockImplementation(() => {
             const rows = [{ taskKey: 'silent-synchronization', totalXp: 10, xp: 10, stage: 1 }]
             const p = Promise.resolve(rows) as any
+            p.getSelectedFields = vi.fn(() => ({ completedOn: {}, taskKey: {}, rowKind: {}, streakDays: {} }))
+            p.addSetOperators = vi.fn(() => Promise.resolve(rows.map((row) => ({ ...row, rowKind: 'task', streakDays: null }))))
             p.limit = vi.fn().mockResolvedValue([{ xp: 10, stage: 1 }])
+            p.union = vi.fn().mockResolvedValue(rows)
             return p
           }),
         })),

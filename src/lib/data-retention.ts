@@ -2,10 +2,13 @@
  * Neon storage + retention policy (lean by default, lenient overlay).
  *
  * Windows live here so jobs, reports, and the plan stay in lockstep.
- * Destructive apply is a later phase — this module is classification only.
+ * Cleanup CLIs use these windows; production execution is an explicit operator action.
  *
  * Source of truth for the written plan: docs/neon-storage-retention.md
  */
+
+import { ALIGNMENT_HISTORY_DAYS } from './alignment-tasks'
+import { CHAT_ARCHIVE_RETENTION_DAYS } from './ai/chat-retention'
 
 export type RetentionProfile = 'lean' | 'lenient'
 
@@ -39,21 +42,25 @@ export type RetentionWindows = {
   notificationsUnreadDays: number
   routineCompletionsHotDays: number
   routineDaySummaryDays: number
-  aiMessagesHotDays: number
-  aiArchivedThreadKeepDays: number
+  chatArchivedDays: number
+  aiUsageEventsHotDays: number
+  aiUsageDailySummaryDays: number
   friendRequestClosedDays: number
   leadsUnconvertedDays: number
   simulatedTelemetryDays: number
 }
+
+const ROUTINE_DAY_SUMMARY_RETENTION_DAYS = ALIGNMENT_HISTORY_DAYS + 1
 
 export const LEAN_WINDOWS: RetentionWindows = {
   activityEventsHotDays: 14,
   notificationsReadDays: 14,
   notificationsUnreadDays: 90,
   routineCompletionsHotDays: 45,
-  routineDaySummaryDays: 400,
-  aiMessagesHotDays: 90,
-  aiArchivedThreadKeepDays: 180,
+  routineDaySummaryDays: ROUTINE_DAY_SUMMARY_RETENTION_DAYS,
+  chatArchivedDays: CHAT_ARCHIVE_RETENTION_DAYS,
+  aiUsageEventsHotDays: 30,
+  aiUsageDailySummaryDays: 400,
   friendRequestClosedDays: 30,
   leadsUnconvertedDays: 730,
   simulatedTelemetryDays: 14,
@@ -64,10 +71,11 @@ export const LENIENT_WINDOWS: RetentionWindows = {
   activityEventsHotDays: 90,
   notificationsReadDays: 90,
   notificationsUnreadDays: 365,
-  routineCompletionsHotDays: 120,
-  routineDaySummaryDays: 1095,
-  aiMessagesHotDays: 365,
-  aiArchivedThreadKeepDays: 730,
+  routineCompletionsHotDays: 60,
+  routineDaySummaryDays: ROUTINE_DAY_SUMMARY_RETENTION_DAYS,
+  chatArchivedDays: CHAT_ARCHIVE_RETENTION_DAYS,
+  aiUsageEventsHotDays: 90,
+  aiUsageDailySummaryDays: 1095,
   friendRequestClosedDays: 90,
   leadsUnconvertedDays: 1825,
   simulatedTelemetryDays: 90,
@@ -117,6 +125,24 @@ export function buildTablePolicies(windows: RetentionWindows): TableRetentionPol
       retentionClass: 'canonical',
       hotDays: null,
       notes: 'Active bonds. Keep while the account exists.',
+    },
+    {
+      table: 'member_bonds',
+      retentionClass: 'canonical',
+      hotDays: null,
+      notes: 'Active member-profile and simulation relationships. Not a legacy log.',
+    },
+    {
+      table: 'xp_transactions',
+      retentionClass: 'canonical',
+      hotDays: null,
+      notes: 'Progression is recalculated from the full ledger; never apply a log TTL.',
+    },
+    {
+      table: 'signup_risk_events',
+      retentionClass: 'canonical',
+      hotDays: null,
+      notes: 'Required by screening and Standing decisions; retain until equivalent decision state exists.',
     },
     {
       table: 'user_gear_items',
@@ -206,26 +232,47 @@ export function buildTablePolicies(windows: RetentionWindows): TableRetentionPol
       hotDays: windows.routineCompletionsHotDays,
       summarizeAfterDays: windows.routineCompletionsHotDays,
       deleteAfterDays: windows.routineDaySummaryDays,
-      simulatedDays: windows.simulatedTelemetryDays,
-      notes: `Per-task rows for ${windows.routineCompletionsHotDays}d (toggles + 14-day matrix). Daily counts for ${windows.routineDaySummaryDays}d (52-week heatmap).`,
+      notes: `Per-task rows for ${windows.routineCompletionsHotDays}d. Daily task-key summaries for ${windows.routineDaySummaryDays}d preserve the 90-day view; a per-member carry preserves longer streaks.`,
+    },
+    {
+      table: 'routine_day_summaries',
+      retentionClass: 'hot-delete',
+      hotDays: windows.routineDaySummaryDays,
+      deleteAfterDays: windows.routineDaySummaryDays,
+      notes: 'Compact task keys for the 90-day member history plus one UTC/local-date boundary day.',
+    },
+    {
+      table: 'routine_streak_carries',
+      retentionClass: 'canonical',
+      hotDays: null,
+      notes: 'One compact streak counter per member preserves the current streak without retaining daily history.',
+    },
+    {
+      table: 'ai_usage_events',
+      retentionClass: 'hot-summarize-delete',
+      hotDays: windows.aiUsageEventsHotDays,
+      summarizeAfterDays: windows.aiUsageEventsHotDays,
+      notes: 'Keep recent raw events for rolling 24-hour Oracle/forum limits; atomically roll older events into daily request/token totals before deletion.',
+    },
+    {
+      table: 'ai_usage_daily_summaries',
+      retentionClass: 'hot-delete',
+      hotDays: windows.aiUsageDailySummaryDays,
+      deleteAfterDays: windows.aiUsageDailySummaryDays,
+      notes: 'Per-member UTC day, kind, and model totals; missing-token counters distinguish unreported usage from zero.',
     },
     {
       table: 'ai_threads',
-      retentionClass: 'hot-summarize-archive-delete',
-      hotDays: windows.aiMessagesHotDays,
-      summarizeAfterDays: windows.aiMessagesHotDays,
-      archiveAfterDays: windows.aiMessagesHotDays,
-      deleteAfterDays: windows.aiArchivedThreadKeepDays,
-      notes: 'Keep the thread row + summary after messages are archived. Drop stale archived/unpinned threads later.',
+      retentionClass: 'hot-delete',
+      hotDays: windows.chatArchivedDays,
+      deleteAfterDays: windows.chatArchivedDays,
+      notes: `Delete only threads with archivedAt older than ${windows.chatArchivedDays}d. Active threads remain until account deletion; total conversations are capped at 50 per member.`,
     },
     {
       table: 'ai_messages',
-      retentionClass: 'hot-summarize-archive-delete',
-      hotDays: windows.aiMessagesHotDays,
-      summarizeAfterDays: windows.aiMessagesHotDays,
-      archiveAfterDays: windows.aiMessagesHotDays,
-      deleteAfterDays: windows.aiMessagesHotDays,
-      notes: 'Largest growth risk (JSONB `parts`). Summarize, dump JSONL to private storage, then delete.',
+      retentionClass: 'canonical',
+      hotDays: null,
+      notes: 'Keep messages while their thread exists. Delete only through the parent thread cascade.',
     },
     {
       table: 'leads',
@@ -339,27 +386,6 @@ export function isClosedFriendRequestEligibleForDelete(
   if (row.status === 'pending') return false
   const closedAt = row.respondedAt ?? row.createdAt
   return isPastCutoff(closedAt, now, windows.friendRequestClosedDays)
-}
-
-export type AiMessageArchiveEligibility = {
-  createdAt: Date
-  threadPinned: boolean
-  threadArchivedAt: Date | null
-}
-
-/**
- * Pinned threads stay hot. Archived or aged unpinned threads may leave hot storage.
- */
-export function isAiMessageEligibleForArchive(
-  row: AiMessageArchiveEligibility,
-  now: Date,
-  windows: RetentionWindows
-): boolean {
-  if (row.threadPinned) return false
-  if (row.threadArchivedAt) {
-    return isPastCutoff(row.threadArchivedAt, now, windows.aiMessagesHotDays)
-  }
-  return isPastCutoff(row.createdAt, now, windows.aiMessagesHotDays)
 }
 
 export function archiveObjectKey(kind: 'ai-thread' | 'routine-day', parts: {

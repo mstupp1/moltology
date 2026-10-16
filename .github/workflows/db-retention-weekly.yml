@@ -1,0 +1,84 @@
+name: Weekly DB Retention Cleanup
+
+on:
+  schedule:
+    - cron: '17 9 * * 1'
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Apply cleanup using Neon PITR for recovery (preview by default)'
+        required: true
+        type: boolean
+        default: false
+      as_of:
+        description: 'Optional past ISO timestamp for resuming a capped run'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-retention-cleanup-production
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    name: Preview or clean up production retention candidates
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PROD_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      RETENTION_PROFILE: lean
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      - name: Choose cleanup mode and cutoff
+        id: plan
+        shell: bash
+        env:
+          DB_RETENTION_ENABLED: ${{ vars.DB_RETENTION_ENABLED }}
+          MANUAL_APPLY: ${{ inputs.apply }}
+          MANUAL_AS_OF: ${{ inputs.as_of }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${PROD_DATABASE_URL//[[:space:]]/}" ]]; then
+            echo 'Retention requires the DATABASE_URL repository secret.' >&2
+            exit 2
+          fi
+          apply=false
+          if [[ "$GITHUB_EVENT_NAME" == "schedule" && "$DB_RETENTION_ENABLED" == "true" ]]; then
+            apply=true
+          elif [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" && "$MANUAL_APPLY" == "true" ]]; then
+            apply=true
+          fi
+          as_of="$MANUAL_AS_OF"
+          if [[ -z "${as_of//[[:space:]]/}" ]]; then
+            as_of="$(node -e 'process.stdout.write(new Date().toISOString())')"
+          fi
+          as_of="$(node -e 'const d = new Date(process.argv[1]); if (!Number.isFinite(d.getTime()) || d.getTime() > Date.now()) process.exit(1); process.stdout.write(d.toISOString())' "$as_of")"
+          echo "apply=$apply" >> "$GITHUB_OUTPUT"
+          echo "as-of=$as_of" >> "$GITHUB_OUTPUT"
+          echo "Retention cutoff frozen at $as_of; apply=$apply."
+
+      - name: Apply bounded retention using PITR recovery
+        if: ${{ steps.plan.outputs.apply == 'true' }}
+        shell: bash
+        env:
+          RETENTION_AS_OF: ${{ steps.plan.outputs.as-of }}
+        run: |
+          set -euo pipefail
+          echo 'Recovery strategy: Neon PITR. Verify the configured restore window before enabling scheduled cleanup.'
+          args=(--target=prod --apply --recovery=pitr "--as-of=$RETENTION_AS_OF")
+          npm run db:retention-apply -- "${args[@]}"
+          npm run db:retention-completions -- "${args[@]}"
+          npm run db:retention-usage -- "${args[@]}"
+          npm run db:retention-chats -- "${args[@]}"
+
+      - name: Report current storage and remaining retention candidates
+        run: npm run db:retention-report -- --target=prod

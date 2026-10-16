@@ -237,6 +237,33 @@ describe('AIChatPanel Chats List Panel', () => {
     expect(screen.getByRole('button', { name: /^Close Chats$/i })).toBeInTheDocument()
   })
 
+  it('shows total chat usage and archive expiry, and blocks starting chat 51', async () => {
+    const { getAIThreadsFn } = await import('@/lib/server/api')
+    const threads = Array.from({ length: 50 }, (_, index) => ({
+      id: `thread-${index}`,
+      title: `Chat ${index + 1}`,
+      archivedAt: index === 0 ? new Date().toISOString() : null,
+    }))
+    ;(getAIThreadsFn as any).mockResolvedValue(threads)
+
+    render(<AIChatPanel userId="usr_valid_user" isCompact />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /New Chat/i })).toBeDisabled()
+    })
+    expect(screen.getByRole('button', { name: /New Chat/i })).toHaveAttribute(
+      'title',
+      'You have 50 conversations. Delete one to start another.'
+    )
+    fireEvent.click(screen.getByRole('button', { name: /what is moltology/i }))
+    expect(await screen.findByText('You have 50 conversations. Delete one to start another.')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+    expect(await screen.findByText(/50\/50 chats used/i)).toBeInTheDocument()
+    expect(screen.getByText(/Archived conversations become eligible for deletion after 30 days and are removed during weekly cleanup/i)).toBeInTheDocument()
+    expect(screen.getByText('Delete a chat to start another.')).toBeInTheDocument()
+  })
+
   it('returns to the conversation after selecting a thread from the list', async () => {
     const { getAIThreadsFn, getAIMessagesFn } = await import('@/lib/server/api')
     ;(getAIThreadsFn as any).mockResolvedValue([

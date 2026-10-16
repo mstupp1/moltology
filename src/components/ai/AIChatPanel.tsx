@@ -28,6 +28,7 @@ import { isAdmin } from '../../lib/permissions'
 import { resolveMemberPublicName } from '../../lib/member-handle'
 import { getAuthJWTToken } from '../../lib/jwt'
 import { oracleAuthData } from '../../lib/ai/oracle-auth-client'
+import { CHAT_LIMIT, getChatLimitError } from '@/lib/ai/chat-retention'
 
 export const CHATS_COLUMN_MIN_WIDTH = 640
 
@@ -99,6 +100,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   const threads = oracle ? oracle.threads : localThreads
   const isLoadingThreads = oracle ? oracle.isLoadingThreads : localIsLoadingThreads
+  const isAtChatLimit = Boolean(userId) && threads.length >= CHAT_LIMIT
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSending, setIsSending] = useState(false)
@@ -379,6 +381,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   const handlePromptSubmit = async ({ text }: { text: string }) => {
     setErrorMessage(null)
+    if (userId && !activeThreadId && isAtChatLimit) {
+      setErrorMessage(getChatLimitError().message)
+      return
+    }
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
@@ -627,8 +633,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
           <button
             onClick={handleNewChat}
-            className="text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control p-1 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-            title="New Chat"
+            disabled={isAtChatLimit}
+            className="text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control p-1 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-ink-muted"
+            title={isAtChatLimit ? getChatLimitError().message : 'New Chat'}
             aria-label="New Chat"
           >
             <Pencil className="w-3.5 h-3.5" />

@@ -1,0 +1,105 @@
+name: DB Retention Cleanup
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Delete eligible hot records (false previews only)'
+        required: true
+        type: boolean
+        default: false
+      profile:
+        description: Retention profile
+        required: true
+        type: choice
+        options:
+          - lean
+          - lenient
+        default: lean
+      scope:
+        description: Records to preview or clean up
+        required: true
+        type: choice
+        options:
+          - all
+          - hot
+          - completions
+          - usage
+          - chats
+        default: all
+      backup_reference:
+        description: 'Required only when recovery is backup_reference'
+        required: false
+        type: string
+      recovery:
+        description: Recovery strategy for apply
+        required: true
+        type: choice
+        options:
+          - pitr
+          - backup_reference
+        default: pitr
+      as_of:
+        description: 'Optional past ISO timestamp for resuming a run with the same cutoffs'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-retention-cleanup-production
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    name: Preview or apply bounded hot-record cleanup
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Run retention cleanup
+        env:
+          PROD_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RETENTION_PROFILE: ${{ inputs.profile }}
+          RETENTION_APPLY: ${{ inputs.apply }}
+          RETENTION_BACKUP_REFERENCE: ${{ inputs.backup_reference }}
+          RETENTION_SCOPE: ${{ inputs.scope }}
+          RETENTION_AS_OF: ${{ inputs.as_of }}
+          RETENTION_RECOVERY: ${{ inputs.recovery }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "$RETENTION_AS_OF" ]]; then
+            RETENTION_AS_OF="$(node -e 'process.stdout.write(new Date().toISOString())')"
+          fi
+          echo "Retention cutoffs frozen at $RETENTION_AS_OF"
+          args=(--target=prod "--as-of=$RETENTION_AS_OF")
+          if [[ "$RETENTION_APPLY" == "true" ]]; then
+            if [[ "$RETENTION_RECOVERY" == "pitr" ]]; then
+              args+=(--apply --recovery=pitr)
+            elif [[ -z "${RETENTION_BACKUP_REFERENCE//[[:space:]]/}" ]]; then
+              echo 'Apply requires a reference to a fresh verified production snapshot or private backup.' >&2
+              exit 2
+            else
+              args+=(--apply "--backup-reference=$RETENTION_BACKUP_REFERENCE")
+            fi
+          fi
+          case "$RETENTION_SCOPE" in
+            all)
+              npm run db:retention-apply -- "${args[@]}"
+              npm run db:retention-completions -- "${args[@]}"
+              npm run db:retention-usage -- "${args[@]}"
+              npm run db:retention-chats -- "${args[@]}"
+              ;;
+            hot) npm run db:retention-apply -- "${args[@]}" ;;
+            completions) npm run db:retention-completions -- "${args[@]}" ;;
+            usage) npm run db:retention-usage -- "${args[@]}" ;;
+            chats) npm run db:retention-chats -- "${args[@]}" ;;
+            *) echo 'Unknown retention scope.' >&2; exit 2 ;;
+          esac

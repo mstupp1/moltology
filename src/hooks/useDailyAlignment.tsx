@@ -80,6 +80,8 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
   const [tasks, setTasks] = useState<AlignmentTaskItem[]>(() => mergeCompletions([]))
   const [history, setHistory] = useState<Array<{ date: string; completedCount: number }>>([])
   const [serverStreakDays, setServerStreakDays] = useState<number>(0)
+  const [serverTodayWasComplete, setServerTodayWasComplete] = useState(false)
+  const [hasServerStreakBaseline, setHasServerStreakBaseline] = useState(false)
   const [serverXp, setServerXp] = useState<number>(0)
   const [serverStage, setServerStage] = useState<number>(1)
   const [optimisticXpDelta, setOptimisticXpDelta] = useState<number>(0)
@@ -166,6 +168,12 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
         data: { date: targetDate, token },
       })
       if (data) {
+        const serverHistory = data.history || []
+        setServerStreakDays(data.streakDays || 0)
+        setServerTodayWasComplete(
+          serverHistory.find((day) => day.date === targetDate)?.completedCount === TOTAL_ALIGNMENT_TASKS,
+        )
+        setHasServerStreakBaseline(true)
         const mergedTasks = applyPendingOverrides(data.tasks)
         tasksRef.current = mergedTasks
         setTasks(mergedTasks)
@@ -175,13 +183,11 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
         setServerStage(data.stage ?? 1)
 
         if (pendingOverridesRef.current.size === 0) {
-          setHistory(data.history || [])
-          setServerStreakDays(data.streakDays || 0)
+          setHistory(serverHistory)
           setOptimisticXpDelta(0)
         } else {
           // If pending overrides are active, merge history while preserving currentDate's optimistic count
           const optimisticCount = mergedTasks.filter((t) => t.completed).length
-          const serverHistory = data.history || []
           const withoutToday = serverHistory.filter((h) => h.date !== targetDate)
           setHistory([...withoutToday, { date: targetDate, completedCount: optimisticCount }])
         }
@@ -321,15 +327,19 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
               const remainingOverridesCount = pendingOverridesRef.current.size
               setServerXp(response.xp ?? 0)
               setServerStage(response.stage ?? 1)
+              const responseHistory = response.history || []
+              setServerStreakDays(response.streakDays || 0)
+              setServerTodayWasComplete(
+                responseHistory.find((day) => day.date === currentDateRef.current)?.completedCount === TOTAL_ALIGNMENT_TASKS,
+              )
+              setHasServerStreakBaseline(true)
 
               if (remainingOverridesCount > 0) {
                 const optimisticCount = merged.filter((t) => t.completed).length
-                const serverHistory = response.history || []
-                const withoutToday = serverHistory.filter((h) => h.date !== currentDateRef.current)
+                const withoutToday = responseHistory.filter((h) => h.date !== currentDateRef.current)
                 setHistory([...withoutToday, { date: currentDateRef.current, completedCount: optimisticCount }])
               } else {
-                setHistory(response.history || [])
-                setServerStreakDays(response.streakDays || 0)
+                setHistory(responseHistory)
                 setOptimisticXpDelta(0)
               }
             }
@@ -361,11 +371,18 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
   const isAllCompleted = completedCount === TOTAL_ALIGNMENT_TASKS
 
   const streakDays = useMemo(() => {
-    if (userId && serverStreakDays > 0) {
+    if (userId && hasServerStreakBaseline) {
+      const optimisticTodayIsComplete = tasks.every((task) => task.completed)
+      if (serverTodayWasComplete && !optimisticTodayIsComplete) {
+        return Math.max(0, serverStreakDays - 1)
+      }
+      if (!serverTodayWasComplete && optimisticTodayIsComplete) {
+        return serverStreakDays + 1
+      }
       return serverStreakDays
     }
     return computeStreak(history, currentDate)
-  }, [userId, serverStreakDays, history, currentDate])
+  }, [userId, hasServerStreakBaseline, serverTodayWasComplete, serverStreakDays, tasks, history, currentDate])
 
   const streakHistory = useMemo(() => {
     return buildStreakHistory(history, currentDate, 14)

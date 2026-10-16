@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { getTableConfig } from 'drizzle-orm/pg-core'
-import { profiles, users, userStats, routines, routineCompletions, activityEvents, changelogs, neonAuthUser, authUser, authSession, authAccount, authVerification, authJwks, aiThreads, aiMessages, blogPosts, blogComments, leads, friendRequests, friendships, suggestionDismissals, memberBonds, notifications, academyTracks, academyCourses, academyTrackCourses, academyModules, academyLessons, academyQuizQuestions, academyEnrollments, academyLessonProgress, academyCertificates, academyCertificateAwards, signupRiskEvents } from './schema'
+import { profiles, users, userStats, routines, routineCompletions, routineDaySummaries, routineStreakCarries, activityEvents, changelogs, neonAuthUser, authUser, authSession, authAccount, authVerification, authJwks, aiThreads, aiMessages, aiUsageDailySummaries, blogPosts, blogComments, leads, friendRequests, friendships, suggestionDismissals, memberBonds, notifications, academyTracks, academyCourses, academyTrackCourses, academyModules, academyLessons, academyQuizQuestions, academyEnrollments, academyLessonProgress, academyCertificates, academyCertificateAwards, signupRiskEvents } from './schema'
 
 describe('Database Schema & RLS Policies', () => {
   it('exports all user-scoped and system tables', () => {
@@ -9,6 +9,8 @@ describe('Database Schema & RLS Policies', () => {
     expect(userStats).toBeDefined()
     expect(routines).toBeDefined()
     expect(routineCompletions).toBeDefined()
+    expect(routineDaySummaries).toBeDefined()
+    expect(routineStreakCarries).toBeDefined()
     expect(activityEvents).toBeDefined()
     expect(changelogs).toBeDefined()
     expect(neonAuthUser).toBeDefined()
@@ -19,6 +21,7 @@ describe('Database Schema & RLS Policies', () => {
     expect(authJwks).toBeDefined()
     expect(aiThreads).toBeDefined()
     expect(aiMessages).toBeDefined()
+    expect(aiUsageDailySummaries).toBeDefined()
     expect(blogPosts).toBeDefined()
     expect(blogComments).toBeDefined()
     expect(leads).toBeDefined()
@@ -149,6 +152,41 @@ describe('Database Schema & RLS Policies', () => {
     expect(routineCompletions.taskKey).toBeDefined()
     expect(routineCompletions.completedOn).toBeDefined()
     expect(routineCompletions.completedAt).toBeDefined()
+  })
+
+  it('defines task-key summaries with one row per member and date', () => {
+    expect(routineDaySummaries.userId).toBeDefined()
+    expect(routineDaySummaries.completedOn).toBeDefined()
+    expect(routineDaySummaries.taskKeys).toBeDefined()
+    const uniqueNames = getTableConfig(routineDaySummaries).indexes
+      .filter((idx) => idx.config.unique)
+      .map((idx) => idx.config.name)
+    expect(uniqueNames).toContain('routine_day_summaries_user_date_unique')
+    const indexNames = getTableConfig(routineDaySummaries).indexes.map((idx) => idx.config.name)
+    expect(indexNames).toContain('routine_day_summaries_date_user_idx')
+  })
+
+  it('defines one compacted streak carry per member', () => {
+    expect(routineStreakCarries.userId).toBeDefined()
+    expect(routineStreakCarries.anchorDate).toBeDefined()
+    expect(routineStreakCarries.streakDays).toBeDefined()
+    expect(getTableConfig(routineStreakCarries).columns.find((column) => column.name === 'userId')?.primary).toBe(true)
+  })
+
+  it('defines server-only AI usage rollups with an idempotent grouping key', () => {
+    expect(aiUsageDailySummaries.userId).toBeDefined()
+    expect(aiUsageDailySummaries.date).toBeDefined()
+    expect(aiUsageDailySummaries.kind).toBeDefined()
+    expect(aiUsageDailySummaries.model).toBeDefined()
+    expect(aiUsageDailySummaries.requestCount).toBeDefined()
+    expect(aiUsageDailySummaries.inputTokens).toBeDefined()
+    expect(aiUsageDailySummaries.outputTokens).toBeDefined()
+    expect(aiUsageDailySummaries.missingInputTokenCount).toBeDefined()
+    expect(aiUsageDailySummaries.missingOutputTokenCount).toBeDefined()
+    const uniqueNames = getTableConfig(aiUsageDailySummaries).indexes
+      .filter((idx) => idx.config.unique)
+      .map((idx) => idx.config.name)
+    expect(uniqueNames).toContain('ai_usage_daily_summaries_user_date_kind_model_unique')
   })
 
   it('defines a per-member activity event log with unique source keys', () => {

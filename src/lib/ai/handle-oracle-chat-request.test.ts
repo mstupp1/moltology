@@ -7,6 +7,7 @@ import { ORACLE_JAILBREAK_ERROR, screenOraclePrompt } from '../quality/oracle-pr
 import { getOracleUsageSnapshot, getRecentAIThreadTurns, recordOracleUsage } from './service'
 import { ORACLE_FREE_LIMITS, ORACLE_MAX_OUTPUT_TOKENS, ORACLE_PREMIUM_LIMITS } from './usage-limits'
 import { validateInputGuardrails } from './guardrails'
+import { getChatLimitError } from './chat-retention'
 
 vi.mock('../jwt', () => {
   const verifyAuthJWT = vi.fn().mockResolvedValue({ valid: false })
@@ -230,7 +231,7 @@ describe('handleOracleChatRequest', () => {
     expect(streamTextMock).not.toHaveBeenCalled()
   })
 
-  it('streams before slow DB persistence completes', async () => {
+  it('reserves a new thread before starting the model stream', async () => {
     const { createAIThread, saveAIMessage } = await import('./service')
     let resolveCreate: (() => void) | undefined
     vi.mocked(createAIThread).mockImplementationOnce(
@@ -255,15 +256,29 @@ describe('handleOracleChatRequest', () => {
       })
     )
 
-    await vi.waitFor(() => {
-      expect(streamTextMock).toHaveBeenCalled()
-    })
-    expect(saveAIMessage).not.toHaveBeenCalled()
-
+    await vi.waitFor(() => expect(createAIThread).toHaveBeenCalled())
+    expect(streamTextMock).not.toHaveBeenCalled()
     resolveCreate?.()
     const res = await requestPromise
     expect(res.status).toBe(200)
+    expect(streamTextMock).toHaveBeenCalled()
+    expect(saveAIMessage).toHaveBeenCalled()
     expect(await res.text()).toBe('Fast ')
+  })
+
+  it('returns a clear conflict when the member chat cap is reached', async () => {
+    const { createAIThread } = await import('./service')
+    vi.mocked(createAIThread).mockRejectedValueOnce(getChatLimitError())
+
+    const res = await handleOracleChatRequest(
+      await authedRequest({ messages: [{ role: 'user', content: 'Start another chat' }] }),
+    )
+
+    expect(res.status).toBe(409)
+    expect(await res.json()).toEqual({
+      error: 'You have 50 conversations. Delete one to start another.',
+    })
+    expect(streamTextMock).not.toHaveBeenCalled()
   })
 
   it('returns 400 when messages are missing', async () => {

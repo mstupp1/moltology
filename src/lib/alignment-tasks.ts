@@ -1,3 +1,6 @@
+/** Visible routine history and maximum per-day retention horizon. */
+export const ALIGNMENT_HISTORY_DAYS = 90
+
 export interface CanonicalAlignmentTask {
   key: string
   time: string
@@ -177,6 +180,36 @@ export function computeStreak(
     }
   }
 
+  return streak
+}
+
+/**
+ * Computes the visible streak and joins a compacted carry when the streak
+ * reaches the day immediately after the carry anchor without a gap.
+ */
+export function computeStreakWithCarry(
+  history: Array<{ date: string; completedCount: number }>,
+  todayDate: string,
+  carry?: { anchorDate: string; streakDays: number } | null,
+  totalTasks: number = TOTAL_ALIGNMENT_TASKS
+): number {
+  const streak = computeStreak(history, todayDate, totalTasks)
+  if (!carry || history.length === 0) return streak
+
+  const countMap = new Map(history.map(({ date, completedCount }) => [date, completedCount]))
+  let currentDate = countMap.get(todayDate) === totalTasks
+    ? todayDate
+    : shiftDays(todayDate, -1)
+  let counted = 0
+  while (countMap.get(currentDate) === totalTasks) {
+    counted++
+    currentDate = shiftDays(currentDate, -1)
+  }
+
+  const oldestDate = history[0].date
+  if (counted > 0 && currentDate < oldestDate && shiftDays(oldestDate, -1) === carry.anchorDate) {
+    return streak + Math.max(0, carry.streakDays)
+  }
   return streak
 }
 
