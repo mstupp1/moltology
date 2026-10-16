@@ -271,6 +271,12 @@ function getClearance(score: number) {
   return { ...stages, clearance: `${stages.code}-${level}` }
 }
 
+/** Stage and clearance labels for a score, so the server never stores client-written labels. */
+export function moltmaxLabelsForScore(score: number): { clearance: string; stage: string } {
+  const clearance = getClearance(Math.max(12, Math.min(99, Math.round(score))))
+  return { clearance: clearance.clearance, stage: `${clearance.stage} · ${clearance.name}` }
+}
+
 function hasVariance(answers: QuizAnswers) {
   const boundaryA = answers.q6
   const boundaryB = answers.q11

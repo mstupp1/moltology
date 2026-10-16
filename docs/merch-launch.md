@@ -10,7 +10,10 @@ these steps are done. Everyone else keeps the Etsy link. Item management lives i
 2. `createMerchCheckoutSessionHandler` re-prices every line from the database, writes a `pending`
    order, and opens Stripe Checkout with shipping address collection and flat-rate shipping.
 3. Stripe sends `checkout.session.completed` to `/api/stripe/webhook`. Orders with
-   `metadata.orderType=merch` are marked `paid`, then sent to Printful as a new order.
+   `metadata.orderType=merch` are marked `paid` and sent to Printful only when the session's
+   `payment_status` is `paid`. A delayed payment method (such as a bank debit) completes unpaid:
+   the order waits as `awaiting_payment` until `checkout.session.async_payment_succeeded`, or
+   becomes `payment_failed` on `checkout.session.async_payment_failed`.
 4. The order becomes `submitted_to_printful`, or `fulfillment_failed` with the reason stored on it.
 
 ## What is left
@@ -24,7 +27,8 @@ these steps are done. Everyone else keeps the Etsy link. Item management lives i
 - [ ] **Printful billing.** Add a card or fund the Printful wallet. Printful charges cost plus
       shipping for each order it prints.
 - [ ] **Stripe webhook.** In the Stripe dashboard, open the existing `/api/stripe/webhook` endpoint
-      and make sure `checkout.session.completed` is one of its events (Premium already uses this
+      and make sure `checkout.session.completed`, `checkout.session.async_payment_succeeded` and
+      `checkout.session.async_payment_failed` are among its events (Premium already uses this
       endpoint and secret).
 - [ ] **Stripe Tax** (optional). Turn it on in Stripe, then set `STRIPE_AUTOMATIC_TAX=true`.
 - [ ] **Shipping price.** `MERCH_SHIPPING_CENTS` defaults to 695 ($6.95 flat). Change it in Vercel

@@ -17,6 +17,7 @@ import {
   getAuthBaseUrl,
   getGoogleClientCredentials,
   isEmailVerificationEnabled,
+  MIN_PASSWORD_LENGTH,
 } from './auth-config'
 import { EMAIL_VERIFICATION_COPY } from './auth-email-verification'
 import { sendEmailVerificationEmail } from './server/mail'
@@ -78,31 +79,19 @@ function getTrustedOrigins(baseURL: string): string[] {
 const google = getGoogleClientCredentials()
 const baseURL = getAuthBaseUrl()
 
-/**
- * Google is a trusted IdP. `requireLocalEmailVerified` is false so an existing
- * email/password row (unverified in this app) can auto-link on Google sign-in.
- * Better Auth 1.7 marks that flag deprecated; keep Google trusted and do not
- * allow linking mismatched emails.
- */
 const emailVerificationEnabled = isEmailVerificationEnabled()
 
 /**
- * Google is a trusted IdP. When email verification is enabled, require a verified
- * local email before auto-linking. When the flag is off, keep the soft link so
- * existing unverified email/password rows can still connect Google.
+ * Google is a trusted IdP, but Google sign-in only auto-links onto an existing
+ * account whose email is already verified here. Otherwise anyone could register
+ * someone else's address with a password and keep access after the real owner
+ * signs in with Google. An unverified member links Google from Settings while
+ * signed in (explicit linking is not affected by this flag).
  */
 export const ACCOUNT_LINKING_OPTIONS = {
   enabled: true,
   trustedProviders: ['google'] as const,
-  requireLocalEmailVerified: emailVerificationEnabled,
-}
-
-export function resolveAccountLinkingOptions(verificationEnabled = isEmailVerificationEnabled()) {
-  return {
-    enabled: true as const,
-    trustedProviders: ['google'] as const,
-    requireLocalEmailVerified: verificationEnabled,
-  }
+  requireLocalEmailVerified: true,
 }
 
 export function getAuthApiErrorUrl(origin: string): string {
@@ -126,7 +115,7 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    minPasswordLength: 6,
+    minPasswordLength: MIN_PASSWORD_LENGTH,
     autoSignIn: true,
     requireEmailVerification: emailVerificationEnabled,
   },

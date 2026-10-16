@@ -97,6 +97,17 @@ rules:
       - file: src/lib/ai/guardrails.ts
         symbol: checkRateLimit
     tests: [src/lib/community-rules.test.ts]
+  - id: forum.blog-comments
+    title: Blog comments use the forum gates
+    kind: gate
+    statement: A blog comment needs a signed-in member, a passing bot check, and a published post. It counts against the same per-member forum write limits and goes through the same moderation gate as a forum reply before it is stored.
+    dependsOn: [forum.rate-limit, forum.quarantine, signup.turnstile-optional]
+    anchors:
+      - file: src/lib/server/db-services.ts
+        symbol: createBlogCommentHandler
+      - file: src/lib/server/forum-write-limit.ts
+        symbol: assertForumWriteLimit
+    tests: [src/lib/server/blog-comment-guards.test.ts]
   - id: forum.content-limits
     title: Length limits
     kind: limit

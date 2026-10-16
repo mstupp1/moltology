@@ -18,11 +18,12 @@ vi.mock('./turnstile', () => ({
 
 vi.mock('./mail', () => ({
   sendContactFormEmail: vi.fn(),
+  sendTransactionalEmail: vi.fn().mockResolvedValue({ sent: true }),
 }))
 
 import { submitContactFormHandler } from './contact-form'
 import { verifyTurnstileToken } from './turnstile'
-import { sendContactFormEmail } from './mail'
+import { sendContactFormEmail, sendTransactionalEmail } from './mail'
 
 const validData = {
   name: 'Tester Crab',
@@ -107,11 +108,15 @@ describe('submitContactFormHandler', () => {
     await expect(submitContactFormHandler({ data: validData })).rejects.toThrow(CONTACT_COPY.rateLimited)
   })
 
-  it('records a new opted-in lead without marking the guide as claimed', async () => {
+  it('records a pending lead and emails a confirmation link instead of opting in', async () => {
     const values = mockLeadLookup([])
     await submitContactFormHandler({ data: { ...validData, emailOptIn: true } })
     expect(values).toHaveBeenCalledWith(
-      expect.objectContaining({ email: 'crab@example.com', source: 'org_contact', claimedPdf: false, emailOptIn: true }),
+      expect.objectContaining({ email: 'crab@example.com', source: 'org_contact', claimedPdf: false, emailOptIn: false }),
+    )
+    expect(dbMock.update).not.toHaveBeenCalled()
+    expect(sendTransactionalEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ to: 'crab@example.com', text: expect.stringContaining('/api/email/confirm?token=') }),
     )
   })
 

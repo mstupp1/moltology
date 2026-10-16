@@ -42,9 +42,10 @@ export function orderOracleModels(requestedModelId?: string, preferredModelId?: 
   return getOracleCandidateModelIds(requestedModelId || preferredModelId)
 }
 
+/** The member sees a fixed message; provider error text stays in the server log. */
 export function formatOracleUnavailableMessage(lastError?: { message?: string } | null): string {
   if (lastError?.message) {
-    return `${ORACLE_UNAVAILABLE_MESSAGE} (${lastError.message})`
+    console.warn('[Oracle Chat] All model candidates failed:', lastError.message)
   }
   return ORACLE_UNAVAILABLE_MESSAGE
 }

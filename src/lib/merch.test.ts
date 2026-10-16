@@ -6,7 +6,7 @@ import {
   buildPrintfulOrderPayload,
   cartSubtotalCents,
   formatMerchPrice,
-  isMerchCheckoutCompletedEvent,
+  isMerchCheckoutEvent,
   readMerchCheckoutCompletion,
   readMerchShippingCents,
   readStoredCart,
@@ -94,6 +94,7 @@ describe('merch store helpers', () => {
         object: {
           id: 'cs_1',
           mode: 'payment',
+          payment_status: 'paid',
           metadata: { orderType: 'merch', orderId: 'order-1' },
           customer_details: {
             email: 'ops@example.com',
@@ -119,16 +120,26 @@ describe('merch store helpers', () => {
         },
       },
     }
-    expect(isMerchCheckoutCompletedEvent(event)).toBe(true)
+    expect(isMerchCheckoutEvent(event)).toBe(true)
     expect(interpretPremiumStripeEvent(event)).toEqual({ kind: 'ignore' })
     expect(readMerchCheckoutCompletion(event.data.object)).toMatchObject({
       orderId: 'order-1',
       email: 'ops@example.com',
+      paid: true,
       shippingCents: 695,
       totalCents: 3495,
       shipping: { city: 'Seattle', state: 'WA', country: 'US', phone: '555-0100' },
     })
-    expect(isMerchCheckoutCompletedEvent({ type: 'checkout.session.completed', data: { object: { metadata: { orderType: 'premium' } } } })).toBe(false)
+    expect(isMerchCheckoutEvent({ type: 'checkout.session.completed', data: { object: { metadata: { orderType: 'premium' } } } })).toBe(false)
+  })
+
+  it('treats delayed payments as unpaid until Stripe confirms them', () => {
+    const session = { id: 'cs_2', metadata: { orderType: 'merch', orderId: 'order-2' }, payment_status: 'unpaid' }
+    expect(readMerchCheckoutCompletion(session)?.paid).toBe(false)
+    expect(readMerchCheckoutCompletion({ ...session, payment_status: 'no_payment_required' })?.paid).toBe(true)
+    expect(isMerchCheckoutEvent({ type: 'checkout.session.async_payment_succeeded', data: { object: session } })).toBe(true)
+    expect(isMerchCheckoutEvent({ type: 'checkout.session.async_payment_failed', data: { object: session } })).toBe(true)
+    expect(isMerchCheckoutEvent({ type: 'checkout.session.expired', data: { object: session } })).toBe(false)
   })
 
   it('builds a Printful draft payload outside production', () => {

@@ -36,7 +36,13 @@ export const MERCH_SHIPPING_COUNTRIES = [
   'MX',
 ] as const
 
-export type MerchFulfillmentStatus = 'pending' | 'paid' | 'submitted_to_printful' | 'fulfillment_failed'
+export type MerchFulfillmentStatus =
+  | 'pending'
+  | 'awaiting_payment'
+  | 'payment_failed'
+  | 'paid'
+  | 'submitted_to_printful'
+  | 'fulfillment_failed'
 
 export interface MerchShippingAddress {
   name: string
@@ -420,6 +426,7 @@ export interface LooseCheckoutSession {
   id?: string | null
   mode?: string | null
   metadata?: Record<string, string> | null
+  payment_status?: string | null
   customer?: string | { id?: string | null } | null
   customer_email?: string | null
   customer_details?: { email?: string | null; phone?: string | null } | null
@@ -442,6 +449,8 @@ export interface MerchCheckoutCompletion {
   taxCents: number | null
   totalCents: number | null
   currency: string
+  /** True only once Stripe reports the money as collected. Delayed methods complete unpaid. */
+  paid: boolean
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -449,8 +458,15 @@ function asRecord(value: unknown): Record<string, unknown> | null {
   return value as Record<string, unknown>
 }
 
-export function isMerchCheckoutCompletedEvent(event: { type: string; data?: { object?: unknown } | null }): boolean {
-  if (event.type !== 'checkout.session.completed') return false
+/** Checkout events that move a merch order. Delayed payment methods finish with an async event. */
+export const MERCH_CHECKOUT_EVENT_TYPES = [
+  'checkout.session.completed',
+  'checkout.session.async_payment_succeeded',
+  'checkout.session.async_payment_failed',
+] as const
+
+export function isMerchCheckoutEvent(event: { type: string; data?: { object?: unknown } | null }): boolean {
+  if (!(MERCH_CHECKOUT_EVENT_TYPES as readonly string[]).includes(event.type)) return false
   const object = asRecord(event.data?.object)
   const metadata = asRecord(object?.metadata)
   return metadata?.orderType === MERCH_ORDER_TYPE
@@ -501,6 +517,7 @@ export function readMerchCheckoutCompletion(session: LooseCheckoutSession): Merc
     taxCents: typeof session.total_details?.amount_tax === 'number' ? session.total_details.amount_tax : null,
     totalCents: typeof session.amount_total === 'number' ? session.amount_total : null,
     currency: (session.currency || MERCH_CURRENCY).toLowerCase(),
+    paid: session.payment_status === 'paid' || session.payment_status === 'no_payment_required',
   }
 }
 

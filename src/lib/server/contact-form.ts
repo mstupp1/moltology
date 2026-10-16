@@ -1,7 +1,4 @@
-import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { getDb } from '../../db'
-import { leads } from '../../db/schema'
 import { checkRateLimit } from '../ai/guardrails'
 import {
   CONTACT_COPY,
@@ -18,6 +15,7 @@ import {
 } from '../contact-form'
 import { sendContactFormEmail } from './mail'
 import { verifyTurnstileToken } from './turnstile'
+import { requestEmailOptIn } from './email-opt-in'
 
 export const submitContactFormSchema = z.object({
   name: z.string().max(CONTACT_NAME_MAX + 64),
@@ -34,33 +32,6 @@ export type SubmitContactFormInput = z.input<typeof submitContactFormSchema>
 interface ServerFnArgs {
   data?: SubmitContactFormInput
   context?: { clientIp?: string | null } | null
-}
-
-/** Adds or opts in the sender on the leads list. Failure never blocks the message. */
-async function recordContactOptIn(email: string): Promise<void> {
-  try {
-    const db = getDb()
-    if (!db) return
-    const [existing] = await db.select().from(leads).where(eq(leads.email, email)).limit(1)
-    if (existing) {
-      if (!existing.emailOptIn) {
-        await db
-          .update(leads)
-          .set({ emailOptIn: true, emailOptInAt: new Date(), updatedAt: new Date() })
-          .where(eq(leads.id, existing.id))
-      }
-      return
-    }
-    await db.insert(leads).values({
-      email,
-      source: 'org_contact',
-      claimedPdf: false,
-      emailOptIn: true,
-      emailOptInAt: new Date(),
-    })
-  } catch (error) {
-    console.warn('[contact-form] Could not record email opt-in:', error)
-  }
 }
 
 /**
@@ -112,7 +83,7 @@ export async function submitContactFormHandler(args: ServerFnArgs): Promise<{ su
   }
 
   if (data.emailOptIn) {
-    await recordContactOptIn(validated.email)
+    await requestEmailOptIn(validated.email, 'org_contact')
   }
 
   return { success: true }

@@ -1,3 +1,4 @@
+import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { BlogCommentsSection } from './BlogCommentsSection'
@@ -13,6 +14,15 @@ vi.mock('@/lib/auth-client', () => ({
 
 vi.mock('@/lib/jwt', () => ({
   getAuthJWTToken: vi.fn().mockResolvedValue('mock-jwt'),
+}))
+
+vi.mock('@/components/TurnstileWidget', () => ({
+  TurnstileWidget: React.forwardRef(({ onVerify }: { onVerify?: (token: string) => void }, _ref) => {
+    React.useEffect(() => {
+      onVerify?.('turnstile-ok')
+    }, [onVerify])
+    return <div data-testid="turnstile-widget" />
+  }),
 }))
 
 vi.mock('@/lib/server/api', () => ({
@@ -136,6 +146,7 @@ describe('BlogCommentsSection', () => {
           postId: 'post-100',
           content: 'A thrilling bio-silicon perspective!',
           userId: 'usr-1',
+          turnstileToken: 'turnstile-ok',
         }),
       })
       expect(screen.getByText('A thrilling bio-silicon perspective!')).toBeInTheDocument()
