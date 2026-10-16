@@ -1,10 +1,10 @@
-name: Daily Activity Simulation
+name: Weekly Activity Simulation
 
 on:
-  # Recurring cadence is managed by a local Codex automation.
-  # Daily mode runs two sequential ticks. Keep this trigger disabled to avoid duplicates.
+  # Recurring cadence is managed by a local weekly automation.
+  # Weekly mode runs 14 sequential ticks. Keep this trigger disabled to avoid duplicates.
   # schedule:
-  #   - cron: '0 0 * * *'
+  #   - cron: '0 0 * * 0'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -59,4 +59,4 @@ jobs:
           if [ "${{ inputs.force_spawn }}" = "true" ]; then
             ARGS="$ARGS --force-spawn"
           fi
-          npm run simulate:daily -- $ARGS
+          npm run simulate:weekly -- $ARGS

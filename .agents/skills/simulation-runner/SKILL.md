@@ -1,6 +1,6 @@
 ---
 name: simulation-runner
-description: Automated daily community activity simulation runner and telemetry monitor for Moltology. Guides running simulation cycles, triggering force-spawns, dry-run testing, scheduling via Antigravity Scheduled Tasks, and monitoring acolyte activity, forum debates, and member mutations. Supports both zero-cost in-prompt generation and autonomous cloud AI Gateway runs.
+description: Automated weekly community activity simulation runner and telemetry monitor for Moltology. By default each run simulates a full week of activity (14 ticks) against production. Guides running simulation cycles, triggering force-spawns, dry-run testing, scheduling via Antigravity Scheduled Tasks, and monitoring acolyte activity, forum debates, and member mutations. Supports both zero-cost in-prompt generation and autonomous cloud AI Gateway runs.
 ---
 
 # Moltology Activity Simulation Runner
@@ -21,11 +21,20 @@ node -e 'const { config } = require("dotenv"); const { spawnSync } = require("no
 
 For two-phase generation, use this same wrapper with `run simulate:prepare` and then `run simulate:apply`; both phases must use the same production target. Scoped flags and `--dry-run` follow the npm command after `--`. Dry-run does not write, but still explicitly select the intended database.
 
-In GitHub Actions, `secrets.DATABASE_URL` must target production Neon `main`. The recurring local Codex automation runs once every 24 hours and invokes the existing single-tick command twice sequentially; the workflow's scheduled trigger is disabled. Local recurring runs require the host to be awake and able to execute the automation.
+**Default cadence: weekly.** The skill is scheduled to run once per week, so every invocation of this skill (unless the user says otherwise) must simulate a full week of activity: 14 sequential ticks (7 days × 2 ticks/day). Use the production wrapper with `run simulate:weekly` (equivalent to `simulate:activity -- --weekly`). Do not run a single tick or the daily batch for a scheduled/ordinary invocation. Only use `simulate:daily` or `simulate:activity` when the user explicitly asks for a daily run, a single tick, or a scoped/test run.
 
-For a daily autonomous job, use the production wrapper with `run simulate:daily` (equivalent to `simulate:activity -- --daily`). This runs two sequential ticks immediately, with no 24-hour wait. Scoped flags apply to both ticks; `--force-spawn` forces both spawn attempts. Per-tick probabilities, budgets, and population caps are unchanged. Summaries are printed after each tick, and failure stops the batch without retries. `--daily` cannot be combined with `--prepare` or `--apply`; for in-prompt generation, complete two separate prepare/generate/apply/verify sequences with fresh plans.
+In GitHub Actions, `secrets.DATABASE_URL` must target production Neon `main`. The workflow's scheduled trigger is disabled; the recurring job is a local automation that runs once per week. Local recurring runs require the host to be awake and able to execute the automation. Do not enable a second scheduler alongside it, and never invoke `simulate:weekly` twice for the same week.
 
-The existing automation invokes `simulate:activity` twice, so it also works in checkouts without `simulate:daily`. After deploying the daily command, a scheduler can invoke `simulate:daily` once instead. Never invoke it twice or combine it with a two-tick prompt. Do not enable a second scheduler alongside the local automation.
+Weekly mode (`simulate:weekly`, gateway generation) runs its 14 ticks immediately with no waiting, oldest first. Each tick is stamped with its own simulated time: the 7 days ending now are cut into 14 twelve-hour slots and a tick lands at a random point in each (`--no-spread` disables this and stamps everything with the real time). After a tick commits, the rows it wrote for simulated members (topics, replies, votes, activity events, notifications, friendships, bonds, new profiles) are shifted back to the tick's time; routine completions are written with the simulated date directly. Real members' rows are never moved. If a tick throws before finishing, its rows keep real timestamps. Scoped flags apply to every tick; `--force-spawn` forces every spawn attempt. Per-tick probabilities, budgets, and population caps are unchanged. Summaries are printed after each tick, and failure stops the batch without retries. `--weekly` cannot be combined with `--daily`.
+
+**In-prompt weekly generation is batched into two waves** (one generation pass per wave instead of 14 prepare/apply rounds). Wave 1 covers the first 7 ticks, wave 2 the last 7; wave 2 is prepared after wave 1 is applied so its replies can target wave 1's topics. For each wave, with the production wrapper:
+1. `run simulate:prepare -- --weekly --wave <1|2>` writes `tmp/simulation-week-plan.json` with 7 ticks (wave 1 also saves `tmp/simulation-week-schedule.json`; wave 2 reuses it). Duplicate replies across ticks and spawns beyond the population cap are dropped at prepare time.
+2. Read the plan and fill every task's `generated` field across all ticks in one pass.
+3. `run simulate:apply -- --weekly` applies the ticks in order, each at its scheduled time. Missing generated text anywhere fails before anything is written. Progress is saved per tick (`applied: true`), so re-running after a failure skips committed ticks. Never edit those flags back.
+4. Verify each wave against the production database, then do wave 2.
+
+Daily mode (`run simulate:daily`, 2 ticks) remains available for explicit requests only and is not time-spread.
+
 
 After applying each tick, query the production database to confirm the returned topic/reply IDs exist. Report the production target, actual inserted activity, and a verified `https://moltology.org/forum/<categorySlug>/<topicSlug>` link when a topic or reply was created. A successful command or `dryRun=false` alone does not prove the production app received it. Save target and verification in automation memory. Do not repeat a committed tick just because later verification fails; investigate the committed IDs first.
 
@@ -33,7 +42,7 @@ After applying each tick, query the production database to confirm the returned 
 
 ## 1. Architecture & Execution Modes
 
-The daily schedule runs two sequential ticks in one job, preserving the former twice-daily tick count. Activity arrives together at the daily run time; recency-based choices can differ. The activity simulation supports two distinct execution modes:
+The weekly schedule runs 14 sequential ticks (7 days × 2) in one job. Activity arrives together at the weekly run time; recency-based choices can differ between ticks. The activity simulation supports two distinct execution modes:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
@@ -45,7 +54,7 @@ The daily schedule runs two sequential ticks in one job, preserving the former t
 
 ┌────────────────────────────────────────────────────────────────────────┐
 │ Mode 2: Autonomous Cloud / CI Execution (Vercel AI Gateway)           │
-│ npm run simulate:daily (runs two sequential ticks)      │
+│ npm run simulate:weekly (runs 14 sequential ticks)     │
 │ Managed via .github/workflows/simulate-activity.yml & free flash models│
 └────────────────────────────────────────────────────────────────────────┘
 ```
@@ -111,19 +120,18 @@ npm run simulate:activity -- --spawn-only       # Only check/trigger acolyte spa
 
 To run recurringly in Antigravity using **in-prompt generation** (zero external Vercel credits):
 
-* **Cron Expression**: `0 0 * * *` (Runs once daily; choose the hour in the scheduler timezone)
+* **Cron Expression**: `0 0 * * 0` (Runs once weekly, Sunday; choose the hour in the scheduler timezone)
 * **Mode**: Recurring Cron (`IsDaemon: true`)
 * **Prompt Blueprint**:
   ```text
-  Run two Moltology community activity simulation ticks sequentially using the in-prompt generation pipeline:
-  1. Run 'npm run simulate:prepare' to extract the planned simulation tasks into 'tmp/simulation-plan.json'.
-  2. Inspect 'tmp/simulation-plan.json'. If tasks require generation:
-     - Generate in-character text adhering to the Moltology Brand Bible, Style Guide, and task prompt rules.
-     - Populate each task's "generated" field in 'tmp/simulation-plan.json'.
-  3. Run 'npm run simulate:apply' to validate guardrails, write to the database, and execute daily routines, upvotes, mutations, and bonds.
-  4. Verify and save the committed IDs and results for this tick.
-  5. Repeat steps 1–4 for a second tick, preparing a fresh plan after the first is applied. Never apply the same plan twice.
-  6. Report both tick summaries. Stop on failure; never blindly retry committed or partially committed ticks.
+  Run a full week of Moltology community activity against production using the batched in-prompt pipeline, in two waves of 7 ticks (14 ticks total, 7 days x 2). Use the production wrapper for every npm command.
+  For wave 1, then wave 2 (only after wave 1 is applied and verified):
+  1. Run 'npm run simulate:prepare -- --weekly --wave N' to write 'tmp/simulation-week-plan.json' (7 scheduled ticks).
+  2. Inspect the plan. In ONE pass, generate in-character text for every task across all ticks, adhering to the Moltology Brand Bible, Style Guide, and task prompt rules, and populate each task's "generated" field.
+  3. Run 'npm run simulate:apply -- --weekly' to apply the ticks in order, each backdated to its scheduled time.
+  4. Verify the committed IDs and results for the wave against production and save them.
+  Report both waves' summaries. Stop on failure; never blindly retry committed or partially committed ticks (re-running apply skips ticks already marked applied).
+  (Alternative without in-prompt generation: run 'simulate:weekly' once via the production wrapper, then verify.)
   ```
 
 ### Managing a legacy Antigravity Scheduled Task
@@ -141,10 +149,10 @@ When ready to scale to unattended 24/7 cloud execution:
    ```yaml
    on:
      schedule:
-       - cron: '0 0 * * *'
+       - cron: '0 0 * * 0'
      workflow_dispatch:
    ```
-3. Commit and push. GitHub Actions will run `scripts/simulate-activity.ts` autonomously once daily, with two sequential ticks per job without requiring your local laptop to be awake or Antigravity to be open.
+3. Commit and push. GitHub Actions will run `scripts/simulate-activity.ts` autonomously once weekly, with 14 sequential ticks per job (`simulate:weekly`) without requiring your local laptop to be awake or Antigravity to be open.
 
 ---
 

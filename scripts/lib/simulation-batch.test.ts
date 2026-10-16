@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { runSimulationBatch } from './simulation-batch'
+import { runSimulationBatch, WEEKLY_TICKS } from './simulation-batch'
 
 describe('daily simulation batch', () => {
   it('runs two sequential ticks and retains both summaries', async () => {
@@ -12,6 +12,21 @@ describe('daily simulation batch', () => {
     })
     expect(await runSimulationBatch(runTick)).toEqual({ ticks: [{ committed: 1 }, { committed: 2 }] })
     expect(runTick).toHaveBeenCalledTimes(2)
+  })
+
+  it('runs fourteen sequential ticks for a weekly batch', async () => {
+    const runTick = vi.fn(async () => ({ ok: true }))
+    const { ticks } = await runSimulationBatch(runTick, WEEKLY_TICKS)
+    expect(WEEKLY_TICKS).toBe(14)
+    expect(ticks).toHaveLength(14)
+    expect(runTick).toHaveBeenCalledTimes(14)
+  })
+
+  it('passes each tick its scheduled time in order', async () => {
+    const schedule = [new Date('2026-10-10T08:00:00Z'), new Date('2026-10-10T20:00:00Z')]
+    const runTick = vi.fn(async (at?: Date) => ({ at }))
+    const { ticks } = await runSimulationBatch(runTick, 2, schedule)
+    expect(ticks.map((t) => t.at)).toEqual(schedule)
   })
 
   it('stops without retrying a failed tick', async () => {

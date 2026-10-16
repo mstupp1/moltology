@@ -3,6 +3,7 @@ import path from 'node:path'
 import { generateText } from 'ai'
 import { eq, desc, or, inArray, sql } from 'drizzle-orm'
 import { getDb } from '../../db'
+import { backdateSimulationTick } from './simulation-backdate'
 import {
   profiles,
   userStats,
@@ -640,7 +641,7 @@ export async function spawnSimulatedUser(
 export async function simulateDailyRoutines(
   dbClient: ReturnType<typeof getDb>,
   config = DEFAULT_GROWTH_CONFIG,
-  options: { userCount?: number; dryRun?: boolean } = {}
+  options: { userCount?: number; dryRun?: boolean; at?: Date } = {}
 ) {
   const targetCount = options.userCount ?? 2
 
@@ -669,7 +670,7 @@ export async function simulateDailyRoutines(
   })
 
   const selectedUsers = eligible.slice(0, targetCount)
-  const today = new Date().toISOString().split('T')[0]
+  const today = (options.at ?? new Date()).toISOString().split('T')[0]
   const actions: Array<{ userId: string; handle: string | null; tasks: string[] }> = []
 
   for (const user of selectedUsers) {
@@ -684,6 +685,7 @@ export async function simulateDailyRoutines(
             userId: user.id,
             taskKey: task.key,
             completedOn: today,
+            ...(options.at ? { completedAt: options.at } : {}),
           })
           .onConflictDoNothing()
 
@@ -1850,6 +1852,8 @@ export async function runSimulationCycle(options: {
   mutationsOnly?: boolean
   socialOnly?: boolean
   reviewOnly?: boolean
+  /** Simulated moment for this tick. Rows written are backdated to land at or before it. */
+  at?: Date
 } = {}) {
   if (process.env.SIMULATION_ENABLED === 'false') {
     console.log('[SimulationCycle] ⏸ Simulation cycle skipped: SIMULATION_ENABLED is explicitly set to false.')
@@ -1866,6 +1870,8 @@ export async function runSimulationCycle(options: {
 
   const dbClient = getDb()
   const results: Record<string, unknown> = {}
+  // Small cushion so app/database clock skew can't hide the tick's first rows.
+  const tickSince = new Date(Date.now() - 30_000)
 
   console.log('[SimulationCycle] Backfilling missing simulated drives...')
   results.driveBackfill = await backfillSimulatedDrives(dbClient, { dryRun: options.dryRun })
@@ -1892,6 +1898,7 @@ export async function runSimulationCycle(options: {
     console.log('[SimulationCycle] Simulating daily routine alignment completions...')
     const routineRes = await simulateDailyRoutines(dbClient, DEFAULT_GROWTH_CONFIG, {
       dryRun: options.dryRun,
+      at: options.at,
     })
     results.routines = routineRes
     console.log(`[SimulationCycle] ✓ Completed ${routineRes.completed} daily alignment liturgies across ${routineRes.actions.length} members.`)
@@ -2002,6 +2009,15 @@ export async function runSimulationCycle(options: {
       console.warn('[SimulationCycle] - Member review failed:', err)
       results.review = { error: err instanceof Error ? err.message : String(err) }
     }
+  }
+
+  if (options.at && !options.dryRun) {
+    const backdate = await backdateSimulationTick(dbClient, {
+      since: tickSince,
+      at: options.at,
+      simulatedIds: (await listSimulatedMembers(dbClient)).map((member) => member.id),
+    })
+    results.backdated = { at: options.at.toISOString(), ...backdate }
   }
 
   console.log('[SimulationCycle] ✓ Simulation tick completed successfully!')
@@ -2520,7 +2536,7 @@ export async function prepareSimulationPlan(
  */
 export async function applySimulationPlan(
   planOrPath: SimulationPlan | string,
-  options: { dryRun?: boolean; dbClient?: DbClient; config?: SimulationGrowthConfig } = {}
+  options: { dryRun?: boolean; dbClient?: DbClient; config?: SimulationGrowthConfig; at?: Date } = {}
 ): Promise<Record<string, unknown>> {
   let plan: SimulationPlan
   if (typeof planOrPath === 'string') {
@@ -2537,6 +2553,8 @@ export async function applySimulationPlan(
   const dbClient = options.dbClient || getDb()
   const config = options.config || DEFAULT_GROWTH_CONFIG
   const results: Record<string, unknown> = {}
+  // Small cushion so app/database clock skew can't hide the first rows written.
+  const applySince = new Date(Date.now() - 30_000)
 
   // 1. Validate that all tasks have been generated
   for (const task of plan.tasks) {
@@ -2901,7 +2919,7 @@ export async function applySimulationPlan(
 
   // 5. Daily routines
   if (shouldRunPhase('routines', plan.options)) {
-    results.routines = await simulateDailyRoutines(dbClient, config, { dryRun })
+    results.routines = await simulateDailyRoutines(dbClient, config, { dryRun, at: options.at })
   }
 
   // 6. Upvotes
@@ -2931,6 +2949,15 @@ export async function applySimulationPlan(
     } catch (err) {
       results.review = { error: err instanceof Error ? err.message : String(err) }
     }
+  }
+
+  if (options.at && !dryRun) {
+    const backdate = await backdateSimulationTick(dbClient, {
+      since: applySince,
+      at: options.at,
+      simulatedIds: (await listSimulatedMembers(dbClient)).map((member) => member.id),
+    })
+    results.backdated = { at: options.at.toISOString(), ...backdate }
   }
 
   return results
