@@ -43,6 +43,7 @@ type PrepareOptions = Pick<
   | 'forceSpawn'
   | 'spawnOnly'
   | 'routinesOnly'
+  | 'blogOnly'
   | 'forumOnly'
   | 'votesOnly'
   | 'mutationsOnly'
@@ -78,6 +79,11 @@ export function dedupeBatchTasks(
           spawnsLeft -= 1
           return true
         }
+        if (task.kind === 'blog_comment') {
+          const key = `blog|${task.authorId}|${task.postId}`
+          if (seenReplies.has(key)) return false
+          seenReplies.add(key)
+        }
         if (task.kind === 'forum_reply') {
           const reply = task as SimulationPlanForumReplyTask
           const key = `${reply.authorId}|${reply.targetPostId ?? reply.topicId}`
@@ -101,7 +107,7 @@ export async function prepareSimulationBatchPlan(
   const { schedule, wave, outPath, ...prepareOptions } = options
   const plans: SimulationPlan[] = []
   for (let i = 0; i < schedule.length; i++) {
-    plans.push(await prepareSimulationPlan(prepareOptions))
+    plans.push(await prepareSimulationPlan({ ...prepareOptions, at: schedule[i] }))
   }
 
   const memberCount = plans[0]?.meta.simulatedMemberCount ?? 0

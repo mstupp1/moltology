@@ -3,6 +3,7 @@ import path from 'node:path'
 import { generateText } from 'ai'
 import { eq, desc, or, inArray, sql } from 'drizzle-orm'
 import { getDb } from '../../db'
+import { prepareBlogCommentTasks, applyBlogCommentTask, type SimulationPlanBlogCommentTask } from './simulation-blog'
 import { backdateSimulationTick } from './simulation-backdate'
 import {
   profiles,
@@ -1809,10 +1810,11 @@ export async function simulateRelationships(
 }
 
 function shouldRunPhase(
-  phase: 'spawn' | 'routines' | 'forum' | 'votes' | 'mutations' | 'social' | 'review',
+  phase: 'blog' | 'spawn' | 'routines' | 'forum' | 'votes' | 'mutations' | 'social' | 'review',
   options: {
     spawnOnly?: boolean
     routinesOnly?: boolean
+    blogOnly?: boolean
     forumOnly?: boolean
     votesOnly?: boolean
     mutationsOnly?: boolean
@@ -1821,7 +1823,8 @@ function shouldRunPhase(
   }
 ) {
   const anyOnly = Boolean(
-    options.spawnOnly ||
+    options.blogOnly ||
+      options.spawnOnly ||
       options.routinesOnly ||
       options.forumOnly ||
       options.votesOnly ||
@@ -1830,6 +1833,7 @@ function shouldRunPhase(
       options.reviewOnly
   )
   if (!anyOnly) return true
+  if (phase === 'blog') return Boolean(options.blogOnly)
   if (phase === 'review') return Boolean(options.reviewOnly)
   if (phase === 'spawn') return Boolean(options.spawnOnly)
   if (phase === 'routines') return Boolean(options.routinesOnly)
@@ -1847,6 +1851,7 @@ export async function runSimulationCycle(options: {
   forceSpawn?: boolean
   spawnOnly?: boolean
   routinesOnly?: boolean
+  blogOnly?: boolean
   forumOnly?: boolean
   votesOnly?: boolean
   mutationsOnly?: boolean
@@ -1932,6 +1937,16 @@ export async function runSimulationCycle(options: {
     if (revisionRes.revised) {
       console.log(`[SimulationCycle] ✓ Revised post ${revisionRes.postId} by ${revisionRes.authorName}`)
     }
+  }
+
+  if (shouldRunPhase('blog', options)) {
+    const tasks = await prepareBlogCommentTasks(dbClient, { at: options.at })
+    const comments = []
+    for (const task of tasks) {
+      task.generated = (await generateSimulationText({ prompt: task.prompt, temperature: 0.8 })).text
+      comments.push(await applyBlogCommentTask(dbClient, task, options))
+    }
+    results.blog = comments
   }
 
   // 4. Votes
@@ -2096,6 +2111,7 @@ export interface SimulationPlanForumTopicTask {
 }
 
 export type SimulationPlanTask =
+  | SimulationPlanBlogCommentTask
   | SimulationPlanSpawnTask
   | SimulationPlanForumReplyTask
   | SimulationPlanForumTopicTask
@@ -2108,6 +2124,7 @@ export interface SimulationPlan {
     forceSpawn?: boolean
     spawnOnly?: boolean
     routinesOnly?: boolean
+    blogOnly?: boolean
     forumOnly?: boolean
     votesOnly?: boolean
     mutationsOnly?: boolean
@@ -2126,12 +2143,14 @@ export interface PrepareSimulationPlanOptions {
   forceSpawn?: boolean
   spawnOnly?: boolean
   routinesOnly?: boolean
+  blogOnly?: boolean
   forumOnly?: boolean
   votesOnly?: boolean
   mutationsOnly?: boolean
   socialOnly?: boolean
   reviewOnly?: boolean
   config?: SimulationGrowthConfig
+  at?: Date
   outPath?: string
   dbClient?: DbClient
 }
@@ -2498,6 +2517,10 @@ export async function prepareSimulationPlan(
     }
   }
 
+  if (shouldRunPhase('blog', options)) {
+    tasks.push(...await prepareBlogCommentTasks(dbClient, { at: options.at }))
+  }
+
   const plan: SimulationPlan = {
     version: 1,
     createdAt: new Date().toISOString(),
@@ -2506,6 +2529,7 @@ export async function prepareSimulationPlan(
       forceSpawn: Boolean(options.forceSpawn),
       spawnOnly: Boolean(options.spawnOnly),
       routinesOnly: Boolean(options.routinesOnly),
+      blogOnly: Boolean(options.blogOnly),
       forumOnly: Boolean(options.forumOnly),
       votesOnly: Boolean(options.votesOnly),
       mutationsOnly: Boolean(options.mutationsOnly),
@@ -2915,6 +2939,16 @@ export async function applySimulationPlan(
   if (shouldRunPhase('forum', plan.options)) {
     results.forum = forumResults.length === 1 ? forumResults[0] : forumResults
     results.revision = await simulateForumRevision(dbClient, config, { dryRun })
+  }
+
+  if (shouldRunPhase('blog', plan.options)) {
+    const comments = []
+    for (const task of plan.tasks) {
+      if (task.kind === 'blog_comment') {
+        comments.push(await applyBlogCommentTask(dbClient, task, { dryRun, at: options.at }))
+      }
+    }
+    results.blog = comments
   }
 
   // 5. Daily routines

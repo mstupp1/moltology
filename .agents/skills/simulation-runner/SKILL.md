@@ -5,7 +5,7 @@ description: Automated weekly community activity simulation runner and telemetry
 
 # Moltology Activity Simulation Runner
 
-This skill guides the execution, scheduling, monitoring, and telemetry validation of the Moltology community activity simulation cycle. The simulation generates organic community growth, daily alignment routine completions, dialectic forum discussions, upvoting patterns, persona mutations, and member connections.
+This skill guides the execution, scheduling, monitoring, and telemetry validation of the Moltology community activity simulation cycle. The simulation generates organic community growth, daily alignment routine completions, dialectic forum discussions, upvoting patterns, persona mutations, member connections, and article-specific blog comments.
 
 ---
 
@@ -36,6 +36,8 @@ Weekly mode (`simulate:weekly`, gateway generation) runs its 14 ticks immediatel
 Daily mode (`run simulate:daily`, 2 ticks) remains available for explicit requests only and is not time-spread.
 
 
+Blog comments run in both Gateway and prepare/apply modes. The newest 30 published articles are eligible, weighted with a seven-day recency half-life. Only articles published by the simulated tick are eligible, and comments use that tick timestamp directly. A simulated member comments at most once per article; weekly plans also deduplicate member/article pairs across ticks. Skipped comments are not replaced by filler. Verify returned `blog` comment IDs in `blog_comments` and report the returned `/news/<slug>` URL when a comment was inserted.
+
 After applying each tick, query the production database to confirm the returned topic/reply IDs exist. Report the production target, actual inserted activity, and a verified `https://moltology.org/forum/<categorySlug>/<topicSlug>` link when a topic or reply was created. A successful command or `dryRun=false` alone does not prove the production app received it. Save target and verification in automation memory. Do not repeat a committed tick just because later verification fails; investigate the committed IDs first.
 
 ---
@@ -65,6 +67,7 @@ Pipeline Stages:
   ├── 2. Acolyte Spawn Check (probabilistic spawn capped at 30 simulated profiles)
   ├── 3. Daily Alignment Liturgies (records routine completions & activity events)
   ├── 4. Forum Topics & Threaded Replies (nested replies, quotes, canon citations, mentions)
+  ├── 4b. Blog Comments (recent published articles favored; one per tick, no repeat member/article pairs)
   ├── 5. Community Upvotes (topics and replies scored with affinity clustering)
   ├── 6. Persona Mutations (mild trait evolution based on activity)
   ├── 7. Member Connections & Bonds (friendships and member affinity pairs)
@@ -105,6 +108,7 @@ npm run simulate:activity -- --dry-run
 npm run simulate:activity -- --force-spawn
 
 # Scoped execution flags
+npm run simulate:activity -- --blog-only        # Only comment on published blog articles
 npm run simulate:activity -- --forum-only       # Only generate forum threads & replies
 npm run simulate:activity -- --routines-only    # Only complete daily alignment tasks
 npm run simulate:activity -- --votes-only       # Only cast community upvotes
@@ -169,7 +173,7 @@ When running Mode 2 (`npm run simulate:activity`), the engine automatically fall
 ## 6. Verification & Telemetry Inspection
 
 After each cycle completes, verify the production target and inserted IDs as described above, then check:
-* **Result Summary**: Ensure the JSON output reports `driveBackfill`, `routines`, `forum`, `votes`, `mutation`, `connection`, and `relationship`.
+* **Result Summary**: Ensure the JSON output reports `driveBackfill`, `routines`, `forum`, `blog`, `votes`, `mutation`, `connection`, and `relationship`.
 * **Storage Budget**: Keep total simulated users capped at 30 (`MAX_SIMULATED_POPULATION`) to preserve Neon database storage limits.
 * **Unit Tests**:
   ```bash
