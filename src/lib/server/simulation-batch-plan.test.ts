@@ -22,6 +22,13 @@ describe('dedupeBatchTasks', () => {
     expect(out[1]).toHaveLength(0)
   })
 
+  it('drops repeat member/article pairs across ticks while allowing other authors', () => {
+    const comment = (authorId: string) => ({ ...topic('c'), kind: 'blog_comment', authorId, postId: 'article' }) as SimulationPlanTask
+    const out = dedupeBatchTasks([[comment('a')], [comment('a'), comment('b')]], 0)
+    expect(out[0]).toHaveLength(1)
+    expect(out[1]).toHaveLength(1)
+  })
+
   it('caps spawns at the remaining population capacity', () => {
     const out = dedupeBatchTasks([[spawn('s')], [spawn('s')], [spawn('s')]], 2)
     expect(out.flat().filter((t) => t.kind === 'spawn_persona')).toHaveLength(2)

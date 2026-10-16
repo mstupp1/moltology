@@ -25,6 +25,7 @@ async function main() {
   const forceSpawn = args.includes('--force-spawn')
   const spawnOnly = args.includes('--spawn-only')
   const routinesOnly = args.includes('--routines-only')
+  const blogOnly = args.includes('--blog-only')
   const forumOnly = args.includes('--forum-only')
   const votesOnly = args.includes('--votes-only')
   const mutationsOnly = args.includes('--mutations-only')
@@ -65,6 +66,7 @@ async function main() {
         forceSpawn,
         spawnOnly,
         routinesOnly,
+        blogOnly,
         forumOnly,
         votesOnly,
         mutationsOnly,
@@ -90,6 +92,7 @@ async function main() {
         forceSpawn,
         spawnOnly,
         routinesOnly,
+        blogOnly,
         forumOnly,
         votesOnly,
         mutationsOnly,
@@ -121,6 +124,7 @@ async function main() {
       forceSpawn,
       spawnOnly,
       routinesOnly,
+      blogOnly,
       forumOnly,
       votesOnly,
       mutationsOnly,
