@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { getAssetUrl } from '@/lib/assets'
 import { useNavigate, Link, useLoaderData } from '@tanstack/react-router'
 import {
   ArrowLeft,
@@ -17,6 +16,7 @@ import type { BlogPostData } from '@/lib/blog-data'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { BlogCommentsSection } from '@/components/blog/BlogCommentsSection'
 import { MoltNationFooter } from '@/components/news/MoltNationFooter'
+import { NewsArticleFigure } from './NewsArticleFigure'
 import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 import { buildJsonLd, buildArticleJsonLd } from '@/lib/seo'
 import { StoryCard, Kicker, Byline } from './NewsStory'
@@ -215,14 +215,13 @@ export function NewsPostDetail() {
 
         {/* Cover Image Feature Frame */}
         <div className="max-w-5xl mx-auto px-4 sm:px-8 -mt-6 sm:-mt-8 relative z-20">
-          <div className="relative rounded-card overflow-hidden bg-surface-1">
-            <img
-              src={getAssetUrl(post.coverImageUrl)}
-              alt={post.title}
-              className="w-full h-[220px] sm:h-[360px] md:h-[450px] object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-transparent to-transparent opacity-60 pointer-events-none" />
-          </div>
+          <NewsArticleFigure
+            src={post.coverImageUrl}
+            alt={post.title}
+            caption={false}
+            priority
+            className="!my-0"
+          />
         </div>
 
         {/* Article Body */}
