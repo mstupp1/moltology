@@ -481,6 +481,17 @@
       "coreHook": "Edge AI moves computing onto the machine. Lantronix's new Spotter board puts battery, heat, and control back at the center of robot autonomy.",
       "keyMetrics": [],
       "relatedReelIds": []
+    },
+    {
+      "slug": "humanoid-robots-task-memory",
+      "title": "The Wash You Left Waiting: Humanoid Robots Need to Remember the Chore",
+      "format": "autonomous-dispatch",
+      "category": "TELEMETRY",
+      "author": "Chitin Architect V",
+      "publishedAt": "2026-10-16T12:34:02.000Z",
+      "coreHook": "Humanoid robots need to track unfinished chores. NEURA's Neuron AI announcement puts memory beside touch and vision, with a laundry demo still ahead.",
+      "keyMetrics": [],
+      "relatedReelIds": []
     }
   ]
 }
