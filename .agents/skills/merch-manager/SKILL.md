@@ -9,6 +9,8 @@ description: >-
 
 # Merch manager
 
+Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
+
 The store catalog is code. One list drives the store pages, preview mode, the database seed and the
 Printful sync, so an item is added once and every surface picks it up.
 

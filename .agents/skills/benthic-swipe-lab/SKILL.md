@@ -11,6 +11,8 @@ description: >-
 
 # Benthic Swipe Lab
 
+Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
+
 Turn an observed reference format into original Moltology content. This is a format-selection and art-direction skill, with its own content structures. It shares the existing render, asset, and publishing infrastructure, and runs finished visuals through the imagegen skill and built-in ImageGen tool by default. Complete the workflow through ingestion and Zernio queueing after inspecting the finished artwork. A request to run this skill includes queueing by default; stop at a draft only when the user requests draft-only, preview-only, or no queueing. Immediate publication still requires an explicit request.
 
 Read `BRAND_BIBLE.md`, `STYLE_GUIDE.md`, and `content/social/instagram-post-history.json` before writing. For video adaptations, also read the reel history. Keep Silas Trench's warm, deadpan voice, a recognizable everyday problem, and a concrete action for a newcomer.

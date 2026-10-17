@@ -6,6 +6,8 @@ description: >-
 
 # Chroma Key Studio & Character Extraction Pipeline
 
+Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
+
 This skill automates the complete lifecycle of generating and extracting transparent PNG cutouts, cartoon mascots, UI elements, and merchandise illustrations using **Antigravity's built-in `generate_image` tool** combined with the **high-precision multi-color chroma key engine** (`scripts/chroma_key.py`).
 
 ---

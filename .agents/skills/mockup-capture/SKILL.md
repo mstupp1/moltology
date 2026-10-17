@@ -7,6 +7,8 @@ description: >-
 
 # Platform UI screenshot library
 
+Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
+
 The source of truth is [`src/components/home/device-preview-library.ts`](../../../src/components/home/device-preview-library.ts).
 Every entry defines an ID, route, label, and alt text.
 Chassis has an explicit capture target but is excluded from the default library:

@@ -6,6 +6,8 @@ description: >-
 
 # Moltology character creator
 
+Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
+
 Use the **imagegen** skill and built-in `image_gen` tool by default. Request native transparency (`transparent_background: true`) and preserve alpha. Do not chroma key an image that already has alpha. This path needs no API key.
 
 Read repository `BRAND_BIBLE.md` and `STYLE_GUIDE.md` before public character copy. All paths below are relative to the current repository.
