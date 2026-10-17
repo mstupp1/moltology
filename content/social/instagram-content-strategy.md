@@ -151,3 +151,21 @@ Next test / confirmation post:
 - Analytics source / decision / next test: pending; compare equal-age snapshots and repeat before adopting.
 
 - Queue verification: GET /posts/6acbf9f6d0d046307d91c4f1 at 2026-10-11T21:05Z confirmed scheduled, Instagram pending, isAiGenerated=true and reviewed first comment. No publication URL yet. October 12 remains in the light Halloween window; evergreen matches the control. The independently queued shutdown carousel occupies the same time in the editorial queue, a possible audience-exposure confounder.
+
+### October 17, 2026: recurring-task object scenes
+
+- Format: five-slide Swipe Lab foundation-to-system guide; reference recipe `Dd9PginjDR2`. Private originals unavailable; no original-frame inspection claimed.
+- Goal and primary metric: editorial saves; saves/reach at 24 hours and 7 days after actual publication.
+- Published control: carousel-1791686507270; Zernio `6acaf770ed8610257fa3d441`; https://www.instagram.com/p/DeZugbKjg2K/ . Provider confirmed published October 12.
+- Hypothesis / intended variable: an object showing the recurring task makes the action easier to recognize; object-led cover replaces mascot-led cover.
+- Fixed: five slides, personal workflow topic family, editorial save goal, navy/cyan palette, Monday 13:00 America/New_York queue. Character assignment: none on all five slides; objects demonstrate the method.
+- Confounders: different workflow subject, object treatment across the deck, and restrained Halloween premise. This is an exploratory comparison, not an isolated causal test.
+- Planned publication: October 19, 2026, 13:00 America/New_York (17:00 UTC). Halloween anchor: recognizable, restrained. A ghost task card becomes a tangible first action; the example is a gathering invitation.
+- Opening: “That task keeps haunting your list.” Promise: a three-part method for a task that keeps returning.
+- Payoff: define a visible finished result, choose a physical action, set its stopping point; complete gathering-invitation example.
+- CTA: “Save this for the task that keeps returning.” First-comment destination: https://moltology.org .
+- Draft, prompts and artwork: ignored `tmp/swipe-lab/haunting-task-first-step/`.
+- Publication / 24h / 7d analytics: pending. Reach, saves, shares, viewer comments and non-follower reach unavailable until observed; zero reach makes rates unavailable. Swipe depth and completion unavailable. No conversion claim.
+- Decision: pending measured results; repeat any promising result before changing defaults.
+
+- Confirmed result: carousel-1792242233076; Zernio `6ad3723ee90847c0d1278f13`, scheduled October 19 at 13:00 America/New_York. Provider readback October 17 at 13:04:29 UTC confirmed five ordered 2160×2880 frames with SHA-256 matches, Instagram pending, AI disclosure enabled and native first comment pending. Drive bundle: `Social Archive/2026/10/carousel-cee4a4cf5aa981bb32423a2c`.

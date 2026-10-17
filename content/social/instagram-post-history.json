@@ -676,6 +676,50 @@
           "removedAt": "2026-10-14T00:00:39.897Z"
         }
       ]
+    },
+    {
+      "id": "carousel-1792242233076",
+      "type": "carousel",
+      "topic": "Turn a recurring unfinished task into a concrete first action",
+      "theme": "swipe-lab",
+      "mascot": "none",
+      "articleSlug": null,
+      "archivePath": "Social Archive/2026/10/carousel-cee4a4cf5aa981bb32423a2c",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/media/1792242234137_i453z9c4_01.png",
+        "https://media.zernio.com/media/1792242235013_vaw7b470_02.png",
+        "https://media.zernio.com/media/1792242235908_m0y165g1_03.png",
+        "https://media.zernio.com/media/1792242236747_4ipwlvdg_04.png",
+        "https://media.zernio.com/media/1792242237742_l8hcmv11_05.png"
+      ],
+      "slideUrls": [
+        "https://media.zernio.com/media/1792242234137_i453z9c4_01.png",
+        "https://media.zernio.com/media/1792242235013_vaw7b470_02.png",
+        "https://media.zernio.com/media/1792242235908_m0y165g1_03.png",
+        "https://media.zernio.com/media/1792242236747_4ipwlvdg_04.png",
+        "https://media.zernio.com/media/1792242237742_l8hcmv11_05.png"
+      ],
+      "slideCount": 5,
+      "aspectRatio": "3:4",
+      "caption": "That task keeps haunting your list.\n\nName the finished result. Choose the first physical action. Give that action a stopping point.\nThe gathering invitation becomes a draft with a date, place and start time. The deep can hold the rest.\n\nSave this for the task that keeps returning.",
+      "hashtags": [
+        "#Moltology",
+        "#DeepWork",
+        "#Focus"
+      ],
+      "firstComment": "https://moltology.org",
+      "status": "scheduled",
+      "scheduledFor": "2026-10-19T17:00:00.000Z",
+      "queueId": "6a84b76d2421e968ac81f5bc",
+      "zernioPostId": "6ad3723ee90847c0d1278f13",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "createdAt": "2026-10-17T13:04:05.303Z",
+      "verifiedDimensions": {
+        "width": 2160,
+        "height": 2880
+      },
+      "verifiedAt": "2026-10-17T13:04:29.479Z"
     }
   ]
 }
