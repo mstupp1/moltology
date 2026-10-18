@@ -169,3 +169,17 @@ Next test / confirmation post:
 - Decision: pending measured results; repeat any promising result before changing defaults.
 
 - Confirmed result: carousel-1792242233076; Zernio `6ad3723ee90847c0d1278f13`, scheduled October 19 at 13:00 America/New_York. Provider readback October 17 at 13:04:29 UTC confirmed five ordered 2160×2880 frames with SHA-256 matches, Instagram pending, AI disclosure enabled and native first comment pending. Drive bundle: `Social Archive/2026/10/carousel-cee4a4cf5aa981bb32423a2c`.
+
+### October 18, 2026: shorter audit card descriptions
+
+- Goal: attributable Moltmaxxing Audit starts; single-image 3:4 lead magnet.
+- Published control: post-1791468428046; Zernio `6ac7a38ef523bf696e16cce5`; https://www.instagram.com/p/DePbGP6jmH0/ . GET confirmed published October 18. October 11 variant ID returns Post not found; publication remains unverified and was not recreated.
+- Hypothesis: shorter card descriptions make the audit preview easier to scan and improve attributable audit starts.
+- Single variable: four descriptive sentences become four brief actions. Headings retained.
+- Fixed settings: control question headline, engineer mascot, 3:4 frame, composition, navy/cyan palette, tablet, caption body, audit CTA and daily 13:00 America/New_York slot. Existing 2x scaffold reused; approved control supplied for minimal text edit.
+- Planned publication: October 19, 2026, 13:00 America/New_York. Evergreen, fixed against control; Halloween is in the restrained band but not introduced during this comparison.
+- Exact payoff: Notice one distraction. Choose one next step. Name one old habit. Begin with one action. CTA: Take the audit. Link in first comment.
+- Confounders: Monday versus Thursday; secondary discussion question removed from first comment; generation variance; October 19 editorial carousel also occupies 13:00.
+- Confirmed result: post-1792357079169; Zernio `6ad532d9002abee2c195c5ac`; independent GET confirmed scheduled for October 19 at 13:00 America/New_York (17:00 UTC), Instagram pending, AI disclosure true and exact first comment. No publication URL yet. Drive bundle: `Social Archive/2026/10/post-2a450f382e1086863ec76f1e`.
+- 24h / 7d outcomes: unavailable until observed; historical equal-age snapshots and attributable audit starts unavailable. No zero or conversion inferred.
+- Decision: pending; repeat any promising result before changing defaults. Draft, prompt and final art: ignored `tmp/instagram-audit-2026-10-18/`.

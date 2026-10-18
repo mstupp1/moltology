@@ -720,6 +720,32 @@
         "height": 2880
       },
       "verifiedAt": "2026-10-17T13:04:29.479Z"
+    },
+    {
+      "id": "post-1792357079169",
+      "topic": "Moltmaxxing Audit: noticing where attention drifts",
+      "hookHeadline": "Your tabs are open. Where is your attention?",
+      "theme": "moltmax-quiz",
+      "mascot": "lobster_engineer",
+      "archivePath": "Social Archive/2026/10/post-2a450f382e1086863ec76f1e",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1792357080154_njz6lr4d_01.png"
+      ],
+      "aspectRatio": "3:4",
+      "caption": "Your tabs are open. Where is your attention?\n\nThe Moltmaxxing Audit asks how you meet distractions, decisions, and outgrown habits. Answer from the shell you have today, then choose one small shed from your results.\n\nTake the audit through the link in the first comment. The deep has room for your starting point.",
+      "hashtags": [
+        "#Moltology",
+        "#Moltmaxxing",
+        "#DeepWork"
+      ],
+      "firstComment": "Begin your Moltmaxxing Audit: https://moltology.org/moltmax\n\n#Moltology\n#Moltmaxxing\n#DeepWork",
+      "status": "scheduled",
+      "scheduledFor": "2026-10-19T17:00:00.000Z",
+      "queueId": "6a8d93576f0e96efe2960c91",
+      "zernioPostId": "6ad532d9002abee2c195c5ac",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "createdAt": "2026-10-18T20:58:03.303Z"
     }
   ]
 }
