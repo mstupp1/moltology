@@ -6,7 +6,6 @@ import {
   ShoppingBag,
   Sparkles,
   Layers,
-  Microscope,
   Users,
   Activity,
   Flame,
@@ -40,8 +39,6 @@ export function CommandCatalogIcon({ icon }: { icon: CommandIconId }) {
       return <Sparkles className={`${ICON_CLASS} text-[#00ffff]`} />
     case 'pipeline':
       return <Layers className={`${ICON_CLASS} text-purple-400`} />
-    case 'journal':
-      return <Microscope className={`${ICON_CLASS} text-[#00ffff]`} />
     case 'forum':
       return <Users className={`${ICON_CLASS} text-[#00ffff]`} />
     case 'stream':

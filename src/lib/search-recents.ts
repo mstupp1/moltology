@@ -28,7 +28,6 @@ const COMMAND_ICONS = new Set<CommandIconId>([
   'market',
   'premium',
   'pipeline',
-  'journal',
   'forum',
   'stream',
   'landing',

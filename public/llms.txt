@@ -10,7 +10,6 @@
 - [Moltmax Clearance Audit](https://moltology.org/moltmax): A 15-vector interactive assessment measuring carapace integrity, pincer torque, neural flow, ecdysis discipline, and pressure tolerance before assigning a canonical clearance.
 
 - [The Organization](https://moltology.org/org) (Markdown: [org.md](https://moltology.org/org.md)): Structural hierarchy, ascension tiers, and organizational lore.
-- [The Benthic Compendium](https://moltology.org/journal) (Markdown: [journal.md](https://moltology.org/journal.md)): Peer-reviewed journal of applied carcinological science and empirical doctrine.
 
 ## Content & Media
 - [Dispatch & News](https://moltology.org/news) (Markdown: [news.md](https://moltology.org/news.md)): Live telemetry, announcements, and articles on synthetic carcinization.

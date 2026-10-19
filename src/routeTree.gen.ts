@@ -16,7 +16,6 @@ import { Route as CodexDotmdRouteImport } from './routes/codex[.]md'
 import { Route as ErrorRouteImport } from './routes/error'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
 import { Route as GuideRouteImport } from './routes/guide'
-import { Route as JournalDotmdRouteImport } from './routes/journal[.]md'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MoltmaxRouteImport } from './routes/moltmax'
@@ -70,8 +69,6 @@ import { Route as HudAdminLogicRouteImport } from './routes/_hud/admin.logic'
 import { Route as HudCodexIndexRouteImport } from './routes/_hud/codex/index'
 import { Route as HudCodexSlugRouteImport } from './routes/_hud/codex/$slug'
 import { Route as HudForumIndexRouteImport } from './routes/_hud/forum/index'
-import { Route as HudJournalIndexRouteImport } from './routes/_hud/journal/index'
-import { Route as HudJournalSlugRouteImport } from './routes/_hud/journal/$slug'
 import { Route as HudLecturesIndexRouteImport } from './routes/_hud/lectures/index'
 import { Route as HudMemberProfileIdRouteImport } from './routes/_hud/member/$profileId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -118,11 +115,6 @@ const FeedDotxmlRoute = FeedDotxmlRouteImport.update({
 const GuideRoute = GuideRouteImport.update({
   id: '/guide',
   path: '/guide',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JournalDotmdRoute = JournalDotmdRouteImport.update({
-  id: '/journal.md',
-  path: '/journal.md',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LandingRoute = LandingRouteImport.update({
@@ -393,16 +385,6 @@ const HudForumIndexRoute = HudForumIndexRouteImport.update({
   path: '/forum/',
   getParentRoute: () => HudRoute,
 } as any)
-const HudJournalIndexRoute = HudJournalIndexRouteImport.update({
-  id: '/journal/',
-  path: '/journal/',
-  getParentRoute: () => HudRoute,
-} as any)
-const HudJournalSlugRoute = HudJournalSlugRouteImport.update({
-  id: '/journal/$slug',
-  path: '/journal/$slug',
-  getParentRoute: () => HudRoute,
-} as any)
 const HudLecturesIndexRoute = HudLecturesIndexRouteImport.update({
   id: '/lectures/',
   path: '/lectures/',
@@ -482,7 +464,6 @@ export interface FileRoutesByFullPath {
   '/error': typeof ErrorRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/guide': typeof GuideRoute
-  '/journal.md': typeof JournalDotmdRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/moltmax': typeof MoltmaxRoute
@@ -533,7 +514,6 @@ export interface FileRoutesByFullPath {
   '/what-is-moltology/': typeof WhatIsMoltologyIndexRoute
   '/admin/logic': typeof HudAdminLogicRoute
   '/codex/$slug': typeof HudCodexSlugRoute
-  '/journal/$slug': typeof HudJournalSlugRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/email/confirm': typeof ApiEmailConfirmRoute
@@ -541,7 +521,6 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof HudAdminIndexRoute
   '/codex/': typeof HudCodexIndexRoute
   '/forum/': typeof HudForumIndexRoute
-  '/journal/': typeof HudJournalIndexRoute
   '/lectures/': typeof HudLecturesIndexRoute
   '/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
   '/lectures/certificates/$credentialId': typeof HudLecturesCertificatesCredentialIdRoute
@@ -559,7 +538,6 @@ export interface FileRoutesByTo {
   '/error': typeof ErrorRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/guide': typeof GuideRoute
-  '/journal.md': typeof JournalDotmdRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/moltmax': typeof MoltmaxRoute
@@ -608,7 +586,6 @@ export interface FileRoutesByTo {
   '/what-is-moltology': typeof WhatIsMoltologyIndexRoute
   '/admin/logic': typeof HudAdminLogicRoute
   '/codex/$slug': typeof HudCodexSlugRoute
-  '/journal/$slug': typeof HudJournalSlugRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/email/confirm': typeof ApiEmailConfirmRoute
@@ -616,7 +593,6 @@ export interface FileRoutesByTo {
   '/admin': typeof HudAdminIndexRoute
   '/codex': typeof HudCodexIndexRoute
   '/forum': typeof HudForumIndexRoute
-  '/journal': typeof HudJournalIndexRoute
   '/lectures': typeof HudLecturesIndexRoute
   '/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
   '/lectures/certificates/$credentialId': typeof HudLecturesCertificatesCredentialIdRoute
@@ -635,7 +611,6 @@ export interface FileRoutesById {
   '/error': typeof ErrorRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/guide': typeof GuideRoute
-  '/journal.md': typeof JournalDotmdRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/moltmax': typeof MoltmaxRoute
@@ -686,7 +661,6 @@ export interface FileRoutesById {
   '/what-is-moltology/': typeof WhatIsMoltologyIndexRoute
   '/_hud/admin/logic': typeof HudAdminLogicRoute
   '/_hud/codex/$slug': typeof HudCodexSlugRoute
-  '/_hud/journal/$slug': typeof HudJournalSlugRoute
   '/_hud/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/email/confirm': typeof ApiEmailConfirmRoute
@@ -694,7 +668,6 @@ export interface FileRoutesById {
   '/_hud/admin/': typeof HudAdminIndexRoute
   '/_hud/codex/': typeof HudCodexIndexRoute
   '/_hud/forum/': typeof HudForumIndexRoute
-  '/_hud/journal/': typeof HudJournalIndexRoute
   '/_hud/lectures/': typeof HudLecturesIndexRoute
   '/_hud/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
   '/_hud/lectures/certificates/$credentialId': typeof HudLecturesCertificatesCredentialIdRoute
@@ -714,7 +687,6 @@ export interface FileRouteTypes {
     | '/error'
     | '/feed.xml'
     | '/guide'
-    | '/journal.md'
     | '/landing'
     | '/login'
     | '/moltmax'
@@ -765,7 +737,6 @@ export interface FileRouteTypes {
     | '/what-is-moltology/'
     | '/admin/logic'
     | '/codex/$slug'
-    | '/journal/$slug'
     | '/member/$profileId'
     | '/api/auth/$'
     | '/api/email/confirm'
@@ -773,7 +744,6 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/codex/'
     | '/forum/'
-    | '/journal/'
     | '/lectures/'
     | '/forum/$categorySlug/$topicSlug'
     | '/lectures/certificates/$credentialId'
@@ -791,7 +761,6 @@ export interface FileRouteTypes {
     | '/error'
     | '/feed.xml'
     | '/guide'
-    | '/journal.md'
     | '/landing'
     | '/login'
     | '/moltmax'
@@ -840,7 +809,6 @@ export interface FileRouteTypes {
     | '/what-is-moltology'
     | '/admin/logic'
     | '/codex/$slug'
-    | '/journal/$slug'
     | '/member/$profileId'
     | '/api/auth/$'
     | '/api/email/confirm'
@@ -848,7 +816,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/codex'
     | '/forum'
-    | '/journal'
     | '/lectures'
     | '/forum/$categorySlug/$topicSlug'
     | '/lectures/certificates/$credentialId'
@@ -866,7 +833,6 @@ export interface FileRouteTypes {
     | '/error'
     | '/feed.xml'
     | '/guide'
-    | '/journal.md'
     | '/landing'
     | '/login'
     | '/moltmax'
@@ -917,7 +883,6 @@ export interface FileRouteTypes {
     | '/what-is-moltology/'
     | '/_hud/admin/logic'
     | '/_hud/codex/$slug'
-    | '/_hud/journal/$slug'
     | '/_hud/member/$profileId'
     | '/api/auth/$'
     | '/api/email/confirm'
@@ -925,7 +890,6 @@ export interface FileRouteTypes {
     | '/_hud/admin/'
     | '/_hud/codex/'
     | '/_hud/forum/'
-    | '/_hud/journal/'
     | '/_hud/lectures/'
     | '/_hud/forum/$categorySlug/$topicSlug'
     | '/_hud/lectures/certificates/$credentialId'
@@ -945,7 +909,6 @@ export interface RootRouteChildren {
   ErrorRoute: typeof ErrorRoute
   FeedDotxmlRoute: typeof FeedDotxmlRoute
   GuideRoute: typeof GuideRoute
-  JournalDotmdRoute: typeof JournalDotmdRoute
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
   MoltmaxRoute: typeof MoltmaxRoute
@@ -1027,13 +990,6 @@ declare module '@tanstack/react-router' {
       path: '/guide'
       fullPath: '/guide'
       preLoaderRoute: typeof GuideRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/journal.md': {
-      id: '/journal.md'
-      path: '/journal.md'
-      fullPath: '/journal.md'
-      preLoaderRoute: typeof JournalDotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/landing': {
@@ -1407,20 +1363,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudForumIndexRouteImport
       parentRoute: typeof HudRoute
     }
-    '/_hud/journal/': {
-      id: '/_hud/journal/'
-      path: '/journal'
-      fullPath: '/journal/'
-      preLoaderRoute: typeof HudJournalIndexRouteImport
-      parentRoute: typeof HudRoute
-    }
-    '/_hud/journal/$slug': {
-      id: '/_hud/journal/$slug'
-      path: '/journal/$slug'
-      fullPath: '/journal/$slug'
-      preLoaderRoute: typeof HudJournalSlugRouteImport
-      parentRoute: typeof HudRoute
-    }
     '/_hud/lectures/': {
       id: '/_hud/lectures/'
       path: '/lectures'
@@ -1550,12 +1492,10 @@ interface HudRouteChildren {
   HudWatchRoute: typeof HudWatchRoute
   HudAdminLogicRoute: typeof HudAdminLogicRoute
   HudCodexSlugRoute: typeof HudCodexSlugRoute
-  HudJournalSlugRoute: typeof HudJournalSlugRoute
   HudMemberProfileIdRoute: typeof HudMemberProfileIdRoute
   HudAdminIndexRoute: typeof HudAdminIndexRoute
   HudCodexIndexRoute: typeof HudCodexIndexRoute
   HudForumIndexRoute: typeof HudForumIndexRoute
-  HudJournalIndexRoute: typeof HudJournalIndexRoute
   HudLecturesIndexRoute: typeof HudLecturesIndexRoute
   HudForumCategorySlugTopicSlugRoute: typeof HudForumCategorySlugTopicSlugRoute
   HudLecturesCertificatesCredentialIdRoute: typeof HudLecturesCertificatesCredentialIdRoute
@@ -1583,12 +1523,10 @@ const HudRouteChildren: HudRouteChildren = {
   HudWatchRoute: HudWatchRoute,
   HudAdminLogicRoute: HudAdminLogicRoute,
   HudCodexSlugRoute: HudCodexSlugRoute,
-  HudJournalSlugRoute: HudJournalSlugRoute,
   HudMemberProfileIdRoute: HudMemberProfileIdRoute,
   HudAdminIndexRoute: HudAdminIndexRoute,
   HudCodexIndexRoute: HudCodexIndexRoute,
   HudForumIndexRoute: HudForumIndexRoute,
-  HudJournalIndexRoute: HudJournalIndexRoute,
   HudLecturesIndexRoute: HudLecturesIndexRoute,
   HudForumCategorySlugTopicSlugRoute: HudForumCategorySlugTopicSlugRoute,
   HudLecturesCertificatesCredentialIdRoute:
@@ -1640,7 +1578,6 @@ const rootRouteChildren: RootRouteChildren = {
   ErrorRoute: ErrorRoute,
   FeedDotxmlRoute: FeedDotxmlRoute,
   GuideRoute: GuideRoute,
-  JournalDotmdRoute: JournalDotmdRoute,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
   MoltmaxRoute: MoltmaxRoute,
@@ -1675,12 +1612,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

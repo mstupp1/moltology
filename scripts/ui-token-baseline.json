@@ -282,20 +282,6 @@
     "tiny-text": 4,
     "off-scale-radius": 7
   },
-  "src/components/journal/JournalPaperSheet.tsx": {
-    "chamfer": 1,
-    "tiny-text": 3
-  },
-  "src/components/journal/JournalReaderWorkspace.tsx": {
-    "hex-color": 99,
-    "chamfer": 11,
-    "tiny-text": 13
-  },
-  "src/components/journal/ScientificTable.tsx": {
-    "hex-color": 23,
-    "chamfer": 2,
-    "tiny-text": 7
-  },
   "src/components/moltmax/QuizProgressHUD.tsx": {
     "hex-color": 6
   },
@@ -410,9 +396,5 @@
   },
   "src/routes/__root.tsx": {
     "hex-color": 4
-  },
-  "src/routes/_hud/journal/$slug.tsx": {
-    "hex-color": 7,
-    "chamfer": 2
   }
 }
