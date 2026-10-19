@@ -36,6 +36,7 @@ import { Route as TermsDotmdRouteImport } from './routes/terms[.]md'
 import { Route as WhatIsMoltologyRouteImport } from './routes/what-is-moltology'
 import { Route as HudAlignmentRouteImport } from './routes/_hud/alignment'
 import { Route as HudChassisRouteImport } from './routes/_hud/chassis'
+import { Route as HudCodexRouteRouteImport } from './routes/_hud/codex/route'
 import { Route as HudConnectionsRouteImport } from './routes/_hud/connections'
 import { Route as HudDashboardRouteImport } from './routes/_hud/dashboard'
 import { Route as HudHudRouteImport } from './routes/_hud/hud'
@@ -217,6 +218,11 @@ const HudChassisRoute = HudChassisRouteImport.update({
   path: '/chassis',
   getParentRoute: () => HudRoute,
 } as any)
+const HudCodexRouteRoute = HudCodexRouteRouteImport.update({
+  id: '/codex',
+  path: '/codex',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudConnectionsRoute = HudConnectionsRouteImport.update({
   id: '/connections',
   path: '/connections',
@@ -371,14 +377,14 @@ const HudAdminLogicRoute = HudAdminLogicRouteImport.update({
   getParentRoute: () => HudRoute,
 } as any)
 const HudCodexIndexRoute = HudCodexIndexRouteImport.update({
-  id: '/codex/',
-  path: '/codex/',
-  getParentRoute: () => HudRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => HudCodexRouteRoute,
 } as any)
 const HudCodexSlugRoute = HudCodexSlugRouteImport.update({
-  id: '/codex/$slug',
-  path: '/codex/$slug',
-  getParentRoute: () => HudRoute,
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => HudCodexRouteRoute,
 } as any)
 const HudForumIndexRoute = HudForumIndexRouteImport.update({
   id: '/forum/',
@@ -482,6 +488,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
   '/what-is-moltology': typeof WhatIsMoltologyRouteWithChildren
+  '/codex': typeof HudCodexRouteRouteWithChildren
   '/alignment': typeof HudAlignmentRoute
   '/chassis': typeof HudChassisRoute
   '/connections': typeof HudConnectionsRoute
@@ -629,6 +636,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
   '/what-is-moltology': typeof WhatIsMoltologyRouteWithChildren
+  '/_hud/codex': typeof HudCodexRouteRouteWithChildren
   '/_hud/alignment': typeof HudAlignmentRoute
   '/_hud/chassis': typeof HudChassisRoute
   '/_hud/connections': typeof HudConnectionsRoute
@@ -705,6 +713,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/terms.md'
     | '/what-is-moltology'
+    | '/codex'
     | '/alignment'
     | '/chassis'
     | '/connections'
@@ -851,6 +860,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/terms.md'
     | '/what-is-moltology'
+    | '/_hud/codex'
     | '/_hud/alignment'
     | '/_hud/chassis'
     | '/_hud/connections'
@@ -1132,6 +1142,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudChassisRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/codex': {
+      id: '/_hud/codex'
+      path: '/codex'
+      fullPath: '/codex'
+      preLoaderRoute: typeof HudCodexRouteRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/connections': {
       id: '/_hud/connections'
       path: '/connections'
@@ -1344,17 +1361,17 @@ declare module '@tanstack/react-router' {
     }
     '/_hud/codex/': {
       id: '/_hud/codex/'
-      path: '/codex'
+      path: '/'
       fullPath: '/codex/'
       preLoaderRoute: typeof HudCodexIndexRouteImport
-      parentRoute: typeof HudRoute
+      parentRoute: typeof HudCodexRouteRoute
     }
     '/_hud/codex/$slug': {
       id: '/_hud/codex/$slug'
-      path: '/codex/$slug'
+      path: '/$slug'
       fullPath: '/codex/$slug'
       preLoaderRoute: typeof HudCodexSlugRouteImport
-      parentRoute: typeof HudRoute
+      parentRoute: typeof HudCodexRouteRoute
     }
     '/_hud/forum/': {
       id: '/_hud/forum/'
@@ -1457,6 +1474,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface HudCodexRouteRouteChildren {
+  HudCodexSlugRoute: typeof HudCodexSlugRoute
+  HudCodexIndexRoute: typeof HudCodexIndexRoute
+}
+
+const HudCodexRouteRouteChildren: HudCodexRouteRouteChildren = {
+  HudCodexSlugRoute: HudCodexSlugRoute,
+  HudCodexIndexRoute: HudCodexIndexRoute,
+}
+
+const HudCodexRouteRouteWithChildren = HudCodexRouteRoute._addFileChildren(
+  HudCodexRouteRouteChildren,
+)
+
 interface HudLecturesCoursesSlugRouteChildren {
   HudLecturesCoursesSlugIndexRoute: typeof HudLecturesCoursesSlugIndexRoute
   HudLecturesCoursesSlugLessonsLessonSlugRoute: typeof HudLecturesCoursesSlugLessonsLessonSlugRoute
@@ -1475,6 +1506,7 @@ const HudLecturesCoursesSlugRouteWithChildren =
   )
 
 interface HudRouteChildren {
+  HudCodexRouteRoute: typeof HudCodexRouteRouteWithChildren
   HudAlignmentRoute: typeof HudAlignmentRoute
   HudChassisRoute: typeof HudChassisRoute
   HudConnectionsRoute: typeof HudConnectionsRoute
@@ -1491,10 +1523,8 @@ interface HudRouteChildren {
   HudSupportRoute: typeof HudSupportRoute
   HudWatchRoute: typeof HudWatchRoute
   HudAdminLogicRoute: typeof HudAdminLogicRoute
-  HudCodexSlugRoute: typeof HudCodexSlugRoute
   HudMemberProfileIdRoute: typeof HudMemberProfileIdRoute
   HudAdminIndexRoute: typeof HudAdminIndexRoute
-  HudCodexIndexRoute: typeof HudCodexIndexRoute
   HudForumIndexRoute: typeof HudForumIndexRoute
   HudLecturesIndexRoute: typeof HudLecturesIndexRoute
   HudForumCategorySlugTopicSlugRoute: typeof HudForumCategorySlugTopicSlugRoute
@@ -1506,6 +1536,7 @@ interface HudRouteChildren {
 }
 
 const HudRouteChildren: HudRouteChildren = {
+  HudCodexRouteRoute: HudCodexRouteRouteWithChildren,
   HudAlignmentRoute: HudAlignmentRoute,
   HudChassisRoute: HudChassisRoute,
   HudConnectionsRoute: HudConnectionsRoute,
@@ -1522,10 +1553,8 @@ const HudRouteChildren: HudRouteChildren = {
   HudSupportRoute: HudSupportRoute,
   HudWatchRoute: HudWatchRoute,
   HudAdminLogicRoute: HudAdminLogicRoute,
-  HudCodexSlugRoute: HudCodexSlugRoute,
   HudMemberProfileIdRoute: HudMemberProfileIdRoute,
   HudAdminIndexRoute: HudAdminIndexRoute,
-  HudCodexIndexRoute: HudCodexIndexRoute,
   HudForumIndexRoute: HudForumIndexRoute,
   HudLecturesIndexRoute: HudLecturesIndexRoute,
   HudForumCategorySlugTopicSlugRoute: HudForumCategorySlugTopicSlugRoute,
@@ -1612,3 +1641,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

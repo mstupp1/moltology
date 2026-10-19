@@ -33,7 +33,7 @@ export function formatCodexInline(text: string): React.ReactNode[] {
       parts.push(
         <code
           key={partKey}
-          className="bg-current/10 border border-current/20 px-1.5 py-0.5 rounded font-sans font-medium text-[0.88em]"
+          className="bg-current/10 border border-current/20 px-1.5 py-0.5 rounded-chip font-sans font-medium text-[0.88em]"
         >
           {matchedStr.slice(1, -1)}
         </code>
@@ -81,23 +81,63 @@ export function formatCodexInline(text: string): React.ReactNode[] {
   return parts
 }
 
-function renderVerseBlocks(rawText: string): React.ReactNode[] {
+type PendingItem = { kind: 'num' | 'bullet' | 'sub'; marker: string; parts: string[] }
+
+function renderVerseBlocks(rawText: string, dropCap = false): React.ReactNode[] {
   const lines = rawText.split('\n')
   const elements: React.ReactNode[] = []
 
   let currentPara: string[] = []
+  let currentItem: PendingItem | null = null
+  let capPending = dropCap
 
   const flushPara = (key: string) => {
     if (currentPara.length > 0) {
       const pText = currentPara.join(' ').trim()
       if (pText) {
         elements.push(
-          <p key={key} className="leading-relaxed my-1.5">
+          <p key={key} className={cn(capPending && 'codex-drop-cap')}>
             {formatCodexInline(pText)}
           </p>
         )
+        capPending = false
       }
       currentPara = []
+    }
+  }
+
+  // Source text is hard-wrapped, so a list item keeps the plain lines that follow it.
+  const flushItem = (key: string) => {
+    if (!currentItem) return
+    const item = currentItem
+    const text = item.parts.join(' ')
+    currentItem = null
+    capPending = false
+    if (item.kind === 'num') {
+      elements.push(
+        <div key={key} className="flex items-baseline gap-3 pl-1">
+          <span className="font-sans text-[0.72em] font-bold tabular-nums opacity-70 shrink-0 min-w-[1.25em]">
+            {item.marker}.
+          </span>
+          <div className="flex-1">{formatCodexInline(text)}</div>
+        </div>
+      )
+    } else if (item.kind === 'sub') {
+      elements.push(
+        <div key={key} className="flex items-baseline gap-2.5 pl-8 text-[0.95em] opacity-90">
+          <span aria-hidden="true" className="opacity-50 shrink-0">–</span>
+          <div className="flex-1">{formatCodexInline(text)}</div>
+        </div>
+      )
+    } else {
+      elements.push(
+        <div key={key} className="flex items-baseline gap-3 pl-1">
+          <span aria-hidden="true" className="text-[0.6em] opacity-60 shrink-0 -translate-y-[0.15em]">
+            ◆
+          </span>
+          <div className="flex-1">{formatCodexInline(text)}</div>
+        </div>
+      )
     }
   }
 
@@ -106,87 +146,60 @@ function renderVerseBlocks(rawText: string): React.ReactNode[] {
     const lineKey = `line-${idx}`
 
     if (trimmed === '') {
+      flushItem(`${lineKey}-item`)
       flushPara(`${lineKey}-flush`)
       return
     }
 
     const numMatch = line.match(/^\s*(\d+)\.\s+(.*)$/)
-    if (numMatch) {
+    const subMatch = !numMatch && /^\s{2,}[-*]\s+/.test(line)
+    const bulletMatch = !numMatch && !subMatch && /^\s*[-*]\s+/.test(line)
+
+    if (numMatch || subMatch || bulletMatch) {
+      flushItem(`${lineKey}-item`)
       flushPara(`${lineKey}-p`)
-      elements.push(
-        <div key={lineKey} className="flex items-start gap-2.5 my-1.5 pl-1">
-          <span className="font-sans text-xs font-bold opacity-80 shrink-0 mt-0.5">
-            {numMatch[1]}.
-          </span>
-          <div className="flex-1 leading-relaxed">{formatCodexInline(numMatch[2])}</div>
-        </div>
-      )
+      currentItem = numMatch
+        ? { kind: 'num', marker: numMatch[1], parts: [numMatch[2]] }
+        : subMatch
+          ? { kind: 'sub', marker: '', parts: [line.replace(/^\s{2,}[-*]\s+/, '')] }
+          : { kind: 'bullet', marker: '', parts: [line.replace(/^\s*[-*]\s+/, '')] }
       return
     }
 
-    if (/^\s{2,}[-*]\s+/.test(line)) {
-      flushPara(`${lineKey}-p`)
-      const subText = line.replace(/^\s{2,}[-*]\s+/, '')
-      elements.push(
-        <div key={lineKey} className="flex items-start gap-2 my-1 pl-6 opacity-90 text-[0.95em]">
-          <span className="opacity-50 font-sans text-[10px] shrink-0 mt-1">—</span>
-          <div className="flex-1 leading-relaxed">{formatCodexInline(subText)}</div>
-        </div>
-      )
-      return
-    }
-
-    if (/^\s*[-*]\s+/.test(line)) {
-      flushPara(`${lineKey}-p`)
-      const itemText = line.replace(/^\s*[-*]\s+/, '')
-      elements.push(
-        <div key={lineKey} className="flex items-start gap-2.5 my-1.5 pl-1">
-          <span className="opacity-70 font-sans text-[10px] shrink-0 mt-1">◆</span>
-          <div className="flex-1 leading-relaxed">{formatCodexInline(itemText)}</div>
-        </div>
-      )
+    if (currentItem) {
+      currentItem.parts.push(trimmed)
       return
     }
 
     currentPara.push(trimmed)
   })
 
+  flushItem('final-item')
   flushPara('final-p')
 
   return elements
 }
 
-export const CodexVerseBody: React.FC<{ text: string }> = ({ text }) => {
+/** Verse text with paragraphs and lists. `dropCap` sets an initial on the first paragraph. */
+export const CodexVerseBody: React.FC<{ text: string; dropCap?: boolean }> = ({ text, dropCap = false }) => {
   if (!text) return null
+  return <div className="codex-verse space-y-[0.9em]">{renderVerseBlocks(text, dropCap)}</div>
+}
 
-  const lines = text.split('\n')
-  const isListFirst = /^(\s*[-*]|\s*\d+\.)\s+/.test(lines[0])
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-  if (isListFirst) {
-    return <div className="space-y-2">{renderVerseBlocks(text)}</div>
-  }
+/** 2026-08-27 → 27 Aug 2026. Anything else is returned as written. */
+export function formatRevisedDate(value: string): string {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (!match) return value
+  const month = MONTHS[Number(match[2]) - 1]
+  if (!month) return value
+  return `${Number(match[3])} ${month} ${match[1]}`
+}
 
-  const match = lines[0].match(/^([^\w]*)([a-zA-Z0-9])(.*)$/)
-  if (!match) {
-    return <div className="space-y-3">{renderVerseBlocks(text)}</div>
-  }
-
-  const [, leadingPunct, dropChar, restOfFirstLine] = match
-  let adjustedFirstLine = restOfFirstLine
-  if (leadingPunct.includes('**') && !restOfFirstLine.startsWith('**')) {
-    adjustedFirstLine = `**${restOfFirstLine}`
-  }
-
-  const remainingText = [adjustedFirstLine, ...lines.slice(1)].join('\n')
-
-  return (
-    <div className="leading-relaxed">
-      <div className="drop-cap-illuminated text-3xl md:text-4xl font-extrabold opacity-95 select-none">
-        {dropChar.toUpperCase()}
-      </div>
-      <div className="space-y-3 pt-0.5">{renderVerseBlocks(remainingText)}</div>
-    </div>
-  )
+function findScriptureByTitle(title: string): ScriptureItem | undefined {
+  const needle = title.trim().toLowerCase()
+  return CANONICAL_SCRIPTURES.find((s) => s.title.toLowerCase() === needle)
 }
 
 export interface CodexDocumentSheetProps {
@@ -196,6 +209,9 @@ export interface CodexDocumentSheetProps {
   onPrev: () => void
   onNext: () => void
   onSelectScripture: (id: string) => void
+  /** Titles shown on the previous and next buttons. */
+  prevTitle?: string
+  nextTitle?: string
   compact?: boolean
 }
 
@@ -206,111 +222,116 @@ export function CodexDocumentSheet({
   onPrev,
   onNext,
   onSelectScripture,
+  prevTitle,
+  nextTitle,
   compact = false,
 }: CodexDocumentSheetProps) {
+  const hasPrev = pageIndex > 0
+  const hasNext = pageIndex < pageCount - 1
+
   return (
-    <div className={cn('relative space-y-6', compact ? 'space-y-5' : 'space-y-6')}>
-      <div className="border-b-2 border-current/20 pb-4 space-y-3 relative z-10">
-        <div className="text-xs font-sans tracking-widest uppercase opacity-75">
-          <div className="flex items-center gap-2 font-bold">
-            <span>MOLTOLOGY CANONICAL CODEX</span>
-            <span>•</span>
-            <span>{scripture.volumeName}</span>
-          </div>
+    <article className={cn('relative', compact ? 'space-y-7' : 'space-y-8 sm:space-y-10')}>
+      <header className="space-y-4">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-sans text-[11px] font-bold uppercase tracking-[0.14em] opacity-70">
+          <span>{scripture.volumeName}</span>
+          <span aria-hidden="true">·</span>
+          <span>{scripture.id}</span>
         </div>
 
-        <div className="pt-2 space-y-2">
-          <h2 className="font-garamond font-extrabold text-2xl sm:text-3xl md:text-4xl tracking-tight leading-tight uppercase">
-            {scripture.title}
-          </h2>
+        <h2 className="font-garamond font-bold text-[2rem] leading-[1.05] sm:text-[2.6rem] md:text-5xl tracking-[-0.01em] text-balance">
+          {scripture.title}
+        </h2>
 
-          <div className="flex flex-wrap items-center gap-4 text-xs font-serif opacity-80 pt-1 border-t border-current/10">
-            <span>
-              AUTHOR: <strong className="font-sans">{scripture.authorUnit}</strong>
-            </span>
-            <span>
-              REVISED: <strong className="font-sans">{scripture.lastRevised}</strong>
-            </span>
-          </div>
-        </div>
-      </div>
+        <p className="font-sans text-xs sm:text-[13px] opacity-75">
+          {scripture.authorUnit}
+          <span aria-hidden="true" className="mx-2">·</span>
+          Revised {formatRevisedDate(scripture.lastRevised)}
+        </p>
+      </header>
 
-      <div className="p-4 sm:p-5 border-l-4 border-current/60 bg-current/5 rounded-r-md space-y-2 relative z-10">
-        <div className="text-[11px] font-sans tracking-widest uppercase font-bold opacity-80 flex items-center justify-between gap-3">
-          <span>CANONICAL MANDATE</span>
-          {scripture.latinMotto && (
-            <span className="font-serif italic font-normal text-xs">{scripture.latinMotto}</span>
-          )}
-        </div>
-        <blockquote className="font-garamond italic font-semibold text-base sm:text-lg leading-relaxed">
-          "{scripture.mandate}"
+      <figure className="border-l-2 border-current/40 pl-4 sm:pl-6 space-y-2">
+        <figcaption className="font-sans text-[11px] font-bold uppercase tracking-[0.14em] opacity-70">
+          Mandate
+        </figcaption>
+        <blockquote className="font-garamond italic text-[1.3rem] sm:text-2xl leading-snug">
+          “{scripture.mandate}”
         </blockquote>
-      </div>
+        {scripture.latinMotto && (
+          <p className="font-garamond italic text-sm tracking-[0.04em] opacity-65">{scripture.latinMotto}</p>
+        )}
+      </figure>
 
-      <div className="space-y-8 relative z-10 font-garamond text-[18px]">
-        {scripture.verses.map((verse) => (
+      <div className="font-garamond text-[17px] sm:text-[19px] leading-[1.7] space-y-9 hyphens-auto sm:hyphens-none">
+        {scripture.verses.map((verse, index) => (
           <section key={verse.verseNumber} className="space-y-3">
             {verse.heading && (
-              <h3 className="font-sans font-bold text-xs uppercase tracking-widest opacity-80 pt-2 border-b border-current/10 pb-1">
+              <h3 className="font-sans text-[11px] font-bold uppercase tracking-[0.16em] opacity-70 pb-1.5 border-b border-current/15">
                 {verse.heading}
               </h3>
             )}
-            <CodexVerseBody text={verse.text} />
+            <CodexVerseBody text={verse.text} dropCap={index === 0} />
           </section>
         ))}
       </div>
 
       {scripture.crossReferences.length > 0 && (
-        <div className="pt-4 border-t border-current/20 text-xs font-serif space-y-2 relative z-10">
-          <div className="font-sans text-[10px] font-bold tracking-widest uppercase opacity-70">
-            CANONICAL CROSS-REFERENCES & FOOTNOTES:
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {scripture.crossReferences.map((ref, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  const matched = CANONICAL_SCRIPTURES.find(
-                    (s) => s.title.toLowerCase() === ref.toLowerCase()
-                  )
-                  if (matched) onSelectScripture(matched.id)
-                }}
-                className="px-2.5 py-1 rounded border border-current/30 text-xs font-serif bg-current/5 hover:bg-current/15 cursor-pointer transition-colors"
-              >
-                {ref}
-              </button>
-            ))}
-          </div>
-        </div>
+        <aside className="pt-5 border-t border-current/15 space-y-3">
+          <h3 className="font-sans text-[11px] font-bold uppercase tracking-[0.16em] opacity-70">See also</h3>
+          <ul className="flex flex-wrap gap-2">
+            {scripture.crossReferences.map((ref) => {
+              const matched = findScriptureByTitle(ref)
+              return (
+                <li key={ref}>
+                  {matched ? (
+                    <button
+                      type="button"
+                      onClick={() => onSelectScripture(matched.id)}
+                      className="min-h-8 px-3 rounded-control border border-current/25 font-garamond text-[15px] hover:bg-current/10 hover:border-current/50 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
+                    >
+                      {ref}
+                    </button>
+                  ) : (
+                    <span className="inline-flex min-h-8 items-center px-3 font-garamond text-[15px] opacity-70">{ref}</span>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+        </aside>
       )}
 
-      <div className="pt-6 border-t-2 border-current/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-sans opacity-80 relative z-10 no-print">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onPrev}
-            disabled={pageIndex <= 0}
-            className="px-3 py-1.5 rounded border border-current/30 hover:bg-current/10 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1 font-bold"
-          >
-            <span>PREVIOUS</span>
-          </button>
-
-          <button
-            onClick={onNext}
-            disabled={pageIndex >= pageCount - 1}
-            className="px-3 py-1.5 rounded border border-current/30 hover:bg-current/10 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1 font-bold"
-          >
-            <span>NEXT SCRIPTURE</span>
-          </button>
+      <nav
+        aria-label="Scripture pages"
+        className="no-print pt-5 border-t border-current/20 grid grid-cols-2 gap-3 font-sans"
+      >
+        <div>
+          {hasPrev && (
+            <button
+              type="button"
+              onClick={onPrev}
+              className="group w-full h-full text-left rounded-control border border-current/20 px-3 py-2.5 hover:bg-current/[0.06] hover:border-current/40 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
+            >
+              <span className="block text-[11px] font-bold uppercase tracking-[0.14em] opacity-65">← Previous</span>
+              {prevTitle && <span className="block font-garamond text-base leading-snug mt-0.5">{prevTitle}</span>}
+            </button>
+          )}
         </div>
-
-        <div className="text-center sm:text-right font-serif">
-          <span>
-            Page <strong>{pageIndex + 1}</strong> of <strong>{pageCount}</strong>
-          </span>
-          <span className="mx-2">•</span>
-          <span>Moltology Archival Canon</span>
+        <div>
+          {hasNext && (
+            <button
+              type="button"
+              onClick={onNext}
+              className="group w-full h-full text-right rounded-control border border-current/20 px-3 py-2.5 hover:bg-current/[0.06] hover:border-current/40 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
+            >
+              <span className="block text-[11px] font-bold uppercase tracking-[0.14em] opacity-65">Next →</span>
+              {nextTitle && <span className="block font-garamond text-base leading-snug mt-0.5">{nextTitle}</span>}
+            </button>
+          )}
         </div>
-      </div>
-    </div>
+        <p className="col-span-2 text-center text-[11px] uppercase tracking-[0.14em] opacity-60 tabular-nums">
+          {pageIndex + 1} of {pageCount}
+        </p>
+      </nav>
+    </article>
   )
 }

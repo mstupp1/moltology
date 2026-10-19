@@ -1,6 +1,4 @@
-import React from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { CodexChamber } from '@/components/codex/CodexChamber'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 
@@ -15,15 +13,12 @@ export const CODEX_VAULT_SEO = {
   twitterSite: '@moltology',
 } as const
 
-function CodexIndexRoute() {
-  return <CodexChamber />
-}
-
 export const Route = createFileRoute('/_hud/codex/')({
   head: () => ({
     meta: [...seo(CODEX_VAULT_SEO)],
     links: [{ rel: 'canonical', href: CODEX_VAULT_SEO.canonical }],
   }),
-  component: CodexIndexRoute,
+  // The reader lives in ./route.tsx so it stays mounted while the address changes.
+  component: () => null,
   pendingComponent: HudWorkspaceGhost,
 })
