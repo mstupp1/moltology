@@ -182,4 +182,17 @@ Next test / confirmation post:
 - Confounders: Monday versus Thursday; secondary discussion question removed from first comment; generation variance; October 19 editorial carousel also occupies 13:00.
 - Confirmed result: post-1792357079169; Zernio `6ad532d9002abee2c195c5ac`; independent GET confirmed scheduled for October 19 at 13:00 America/New_York (17:00 UTC), Instagram pending, AI disclosure true and exact first comment. No publication URL yet. Drive bundle: `Social Archive/2026/10/post-2a450f382e1086863ec76f1e`.
 - 24h / 7d outcomes: unavailable until observed; historical equal-age snapshots and attributable audit starts unavailable. No zero or conversion inferred.
-- Decision: pending; repeat any promising result before changing defaults. Draft, prompt and final art: ignored `tmp/instagram-audit-2026-10-18/`.
+- Decision: cancelled after user rejected the repeated audit concept. Provider confirmed the post no longer exists; no publication or results claimed. Retained draft, prompt and art for provenance only: ignored `tmp/instagram-audit-2026-10-18/`.
+
+### October 18, 2026: calendar boundary editorial baseline
+
+- User correction: the audit concept was already used. Stop treating small copy edits as fresh weekly content. The rejected post `post-1792357079169` / `6ad532d9002abee2c195c5ac` was already absent at replacement readback; local ledger and Drive archive now say cancelled. Do not recreate it.
+- New subject and opening: “An old yes is haunting your calendar.” A recurring meeting outlived its purpose; a ghostly calendar invite makes the inherited obligation visible.
+- Goal: editorial saves; primary metric saves/reach at 24 hours and 7 days after publication. No conversion ask.
+- Comparison: new single-image editorial baseline. Prior single-image audit controls are conversion posts; no like-for-like editorial single-image control exists. User requested a fresh concept, so this is not presented as an isolated one-variable test.
+- Creative hypothesis: a recognizable recurring-meeting scene plus one usable question earns saves before weekly planning.
+- Format / settings: 3:4 portrait, navy/cyan palette, lavender `lobster_peaceful` in canonical teal attire, scene-led rather than product pedestal or stacked benefit cards.
+- Planned slot: October 19, 2026, 13:00 America/New_York; next editorial queue preview. Halloween anchor: recognizable, restrained. The ghost is the obsolete meeting itself, not an unrelated seasonal prop. Recheck actual slot before claiming it.
+- Useful payoff: “What decision needs everyone here?” / “No decision? Suggest a written update.” CTA: “Save this before planning your next week.”
+- Confirmed result: `post-1792374607050`; Zernio `6ad5775109d84680d2be6d3a`; GET verified scheduled for October 19, 13:00 America/New_York (17:00 UTC), Instagram pending, AI disclosure true and exact first comment. Drive bundle `Social Archive/2026/10/post-2f80750f337adab84826e1d7`. No publication URL yet. 24h / 7d metrics unavailable until observed; reach, saves, shares, viewer comments and non-follower reach remain unmeasured. Zero reach makes rates unavailable.
+- Decision: establish fresh baseline; compare future editorial single images at equal age. No success inferred. Drafts, scaffold, reference and prompt: ignored `tmp/instagram-calendar-2026-10-18/`.

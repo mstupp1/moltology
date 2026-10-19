@@ -739,13 +739,41 @@
         "#DeepWork"
       ],
       "firstComment": "Begin your Moltmaxxing Audit: https://moltology.org/moltmax\n\n#Moltology\n#Moltmaxxing\n#DeepWork",
-      "status": "scheduled",
+      "status": "cancelled",
       "scheduledFor": "2026-10-19T17:00:00.000Z",
       "queueId": "6a8d93576f0e96efe2960c91",
       "zernioPostId": "6ad532d9002abee2c195c5ac",
       "zernioCommentId": null,
       "isAiGenerated": true,
-      "createdAt": "2026-10-18T20:58:03.303Z"
+      "createdAt": "2026-10-18T20:58:03.303Z",
+      "cancelledAt": "2026-10-19T01:47:28.960Z",
+      "cancellationReason": "User rejected repeated audit concept; provider readback confirmed post no longer exists before replacement."
+    },
+    {
+      "id": "post-1792374607050",
+      "topic": "Review a recurring meeting that no longer needs the room",
+      "hookHeadline": "An old yes is haunting your calendar.",
+      "theme": "calendar-boundaries",
+      "mascot": "lobster_peaceful",
+      "archivePath": "Social Archive/2026/10/post-2f80750f337adab84826e1d7",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1792374608022_552go413_01.png"
+      ],
+      "aspectRatio": "3:4",
+      "caption": "An old yes is haunting your calendar.\n\nBefore the next recurring meeting, ask what decision needs everyone there. If there isn't one, suggest a written update and offer the time back.\nEven a good shell needs room in the week.\n\nSave this before planning your next week.",
+      "hashtags": [
+        "#Moltology",
+        "#DeepWork",
+        "#Boundaries"
+      ],
+      "firstComment": "https://moltology.org\n\n#Moltology\n#DeepWork\n#Boundaries",
+      "status": "scheduled",
+      "scheduledFor": "2026-10-19T17:00:00.000Z",
+      "queueId": "6a84b76d2421e968ac81f5bc",
+      "zernioPostId": "6ad5775109d84680d2be6d3a",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "createdAt": "2026-10-19T01:50:11.537Z"
     }
   ]
 }
