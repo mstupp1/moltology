@@ -2,7 +2,8 @@
  * ============================================================================
  * PUBLIC TOP NAVIGATION HEADER
  * Shared navigation bar across top-level public pages (Landing / Org).
- * Features a rounded card tab bar with a sliding highlight that follows hover and focus,
+ * Features a rounded card tab bar: the current page is a lit tile and a faint lens follows hover and focus.
+ * Phones get a full-height menu sheet built from the same tab list.
  * The new-store experiment switches opted-in admins from Etsy to /store.
  * ============================================================================
  */
@@ -41,6 +42,8 @@ type NavTabId = 'home' | 'news' | 'forum' | 'moltmax' | 'about' | 'org' | 'store
 interface NavTab {
   id: NavTabId
   label: string
+  /** One line shown under the label in the phone menu. */
+  hint: string
   path?: string
   href?: string
   Icon?: React.ComponentType<{ className?: string }>
@@ -49,13 +52,13 @@ interface NavTab {
 
 const NAV_TABS: NavTab[] = [
   // The brand beside the nav reads "Moltology", so the tab stays short.
-  { id: 'home', label: 'HOME', path: '/' },
-  { id: 'news', label: 'NEWS', path: '/news', Icon: Newspaper },
-  { id: 'forum', label: 'FORUM', path: '/forum', Icon: MessageSquare },
-  { id: 'moltmax', label: 'MOLTMAX', path: '/moltmax', Icon: Activity },
-  { id: 'about', label: 'ABOUT', path: '/what-is-moltology', Icon: Info },
-  { id: 'org', label: 'ORGANIZATION', path: '/org', Icon: Building2 },
-  { id: 'store', label: 'STORE', href: 'https://www.etsy.com/shop/SaasTrash', Icon: ShoppingBag, external: true },
+  { id: 'home', label: 'Home', hint: 'Start here', path: '/' },
+  { id: 'news', label: 'News', hint: 'Updates, releases and the blog', path: '/news', Icon: Newspaper },
+  { id: 'forum', label: 'Forum', hint: 'Talk with other members', path: '/forum', Icon: MessageSquare },
+  { id: 'moltmax', label: 'Moltmax', hint: 'Take the clearance audit', path: '/moltmax', Icon: Activity },
+  { id: 'about', label: 'About', hint: 'What Moltology believes', path: '/what-is-moltology', Icon: Info },
+  { id: 'org', label: 'Organization', hint: 'Who runs it and how to reach us', path: '/org', Icon: Building2 },
+  { id: 'store', label: 'Store', hint: 'Merch and gear', href: 'https://www.etsy.com/shop/SaasTrash', Icon: ShoppingBag, external: true },
 ]
 
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect
@@ -126,6 +129,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   const lastScrollY = React.useRef(0)
   const mobileOpenRef = React.useRef(false)
   const headerRef = React.useRef<HTMLElement>(null)
+  const barRef = React.useRef<HTMLDivElement>(null)
+  const [barHeight, setBarHeight] = useState(0)
   mobileOpenRef.current = mobileOpen
   const headerShown = isVisible || mobileOpen
   const navRef = React.useRef<HTMLDivElement>(null)
@@ -172,8 +177,14 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setMobileOpen(false)
     }
+    // The sheet fills the screen, so the page behind it should not scroll.
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
     document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', onKeyDown)
+    }
   }, [mobileOpen])
 
   useIsomorphicLayoutEffect(() => {
@@ -182,11 +193,21 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     const measure = () => {
       const next = Math.round(el.getBoundingClientRect().height)
       setHeaderHeight((prev) => (prev === next ? prev : next))
+      // The top row alone (plus the header's vertical padding) sizes the phone sheet; the open sheet would feed back into headerHeight.
+      const bar = barRef.current
+      if (bar) {
+        const style = window.getComputedStyle(el)
+        const nextBar = Math.round(
+          bar.getBoundingClientRect().height + parseFloat(style.paddingTop) + parseFloat(style.paddingBottom)
+        )
+        setBarHeight((prev) => (prev === nextBar ? prev : nextBar))
+      }
     }
     measure()
     if (typeof ResizeObserver === 'undefined') return
     const observer = new ResizeObserver(measure)
     observer.observe(el)
+    if (barRef.current) observer.observe(barRef.current)
     return () => observer.disconnect()
   }, [])
 
@@ -309,9 +330,9 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             ? 'text-amber-600/90'
             : 'text-amber-400/80'
     }
-    if (current) return isCorporate ? 'text-sky-700' : 'text-ink'
-    if (previewed) return isCorporate ? 'text-slate-800' : 'text-ink'
-    return isCorporate ? 'text-slate-500' : 'text-ink-muted'
+    if (current) return isCorporate ? 'text-sky-800' : 'text-ink'
+    if (previewed) return isCorporate ? 'text-slate-900' : 'text-ink'
+    return isCorporate ? 'text-slate-600' : 'text-ink-muted'
   }
 
   const tabIconCls = (id: NavTabId, active: boolean) => {
@@ -329,10 +350,11 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     ? 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/60'
     : 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 
-  // Before the lens is measured (server render, first paint) the current tab carries a plain fill instead.
-  // On dark grounds the current tab always keeps its own surface-2 fill, so the lens only adds the hover preview.
-  const lensFallbackCls = isCorporate ? 'bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)]' : ''
-  const currentTabCls = isCorporate ? '' : 'bg-surface-2'
+  // The current page is a lit tile drawn on the tab itself, so it shows from the first server render.
+  // The lens rests underneath it and slides out to preview whatever is hovered or focused.
+  const currentTabCls = isCorporate
+    ? 'bg-white ring-1 ring-sky-300 shadow-[0_1px_3px_rgba(2,132,199,0.15)]'
+    : 'bg-surface-3 shadow-nav-current'
 
   // Current item in a menu list: a 2px cyan left edge.
   const activeEdgeCls =
@@ -347,26 +369,17 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   const renderNavTab = (tab: NavTab) => {
     const isCurrent = currentTab === tab.id
     const isPreviewed = targetTab === tab.id
-    const cls = `relative z-10 px-3 2xl:px-3.5 py-1.5 rounded-control text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none whitespace-nowrap shrink-0 ${tabTextCls(tab.id, isCurrent, isPreviewed)} ${tabFocusCls} ${
+    const cls = `relative z-10 px-3 2xl:px-3.5 py-2 rounded-control text-[13px] leading-none font-grotesk font-semibold tracking-[0.03em] transition-[color,background-color,box-shadow] duration-300 flex items-center justify-center group select-none whitespace-nowrap shrink-0 ${tabTextCls(tab.id, isCurrent, isPreviewed)} ${tabFocusCls} ${
       isCurrent ? currentTabCls : ''
-    } ${isCurrent && !pillStyle ? lensFallbackCls : ''}`
-    // Dark grounds mark the current page with a short cyan underline instead of a glowing pill.
-    const currentMark =
-      isCurrent && !isCorporate ? (
-        <span
-          aria-hidden="true"
-          data-testid="public-header-current-mark"
-          className="pointer-events-none absolute bottom-0 left-1/2 h-0.5 w-5 -translate-x-1/2 rounded-chip bg-cyan-glow"
-        />
-      ) : null
+    }`
     const inner = (
-      <span className="flex items-center gap-1.5">
+      <span className="flex items-center gap-2">
         {tab.id === 'home' ? (
           <BrandIcon
             aria-hidden="true"
             width={14}
             height={14}
-            className={`w-3.5 h-3.5 object-contain transition-all duration-300 ${
+            className={`w-4 h-4 object-contain transition-all duration-300 ${
               isCurrent || isPreviewed
                 ? 'grayscale-0 opacity-100'
                 : isCorporate
@@ -378,7 +391,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           tab.Icon && (
             <tab.Icon
               aria-hidden="true"
-              className={`w-3.5 h-3.5 transition-colors duration-300 ${tabIconCls(tab.id, isCurrent || isPreviewed)}`}
+              className={`w-4 h-4 transition-colors duration-300 ${tabIconCls(tab.id, isCurrent || isPreviewed)}`}
             />
           )
         )}
@@ -389,7 +402,6 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             className={`w-3 h-3 opacity-70 group-hover:opacity-100 ${isCorporate ? 'text-amber-600' : 'text-amber-500'}`}
           />
         )}
-        {currentMark}
       </span>
     )
     if (tab.href) {
@@ -424,7 +436,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
   const renderOverflowItem = (tab: NavTab) => {
     const isActive = currentTab === tab.id
-    const itemCls = `relative w-full flex items-center gap-3 px-4 py-2.5 rounded-control text-xs font-grotesk font-bold tracking-wider transition-colors whitespace-nowrap ${tabFocusCls} ${
+    const itemCls = `relative w-full flex items-center gap-3 px-4 py-2.5 rounded-control text-[13px] font-grotesk font-semibold tracking-[0.03em] transition-colors whitespace-nowrap ${tabFocusCls} ${
       isActive
         ? isCorporate
           ? 'text-sky-700 bg-sky-50'
@@ -485,40 +497,65 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   const renderMobileItem = (tab: NavTab) => {
     const isActive = currentTab === tab.id
     const isStore = tab.id === 'store'
-    const itemCls = `relative w-full flex items-center gap-3 px-4 py-3 rounded-control text-sm font-grotesk font-bold tracking-wider transition-colors ${tabFocusCls} ${
+    const itemCls = `relative w-full flex items-center gap-3.5 px-3.5 py-3 min-h-[56px] rounded-card transition-colors ${tabFocusCls} ${
+      isActive
+        ? isCorporate
+          ? 'bg-white ring-1 ring-sky-300'
+          : 'bg-surface-3 shadow-nav-current'
+        : isCorporate
+          ? 'hover:bg-sky-50 active:bg-sky-50'
+          : 'hover:bg-surface-2 active:bg-surface-2'
+    }`
+    const labelCls = `block font-grotesk font-semibold text-base leading-tight ${
       isStore
         ? isCorporate
-          ? `text-amber-700 hover:bg-amber-50 ${isActive ? 'bg-amber-50' : ''}`
-          : `text-amber-300 hover:bg-surface-2 ${isActive ? `bg-surface-2 ${activeEdgeCls}` : ''}`
-        : isActive
-          ? isCorporate
-            ? 'text-sky-700 bg-sky-50'
-            : `text-ink bg-surface-2 ${activeEdgeCls}`
-          : isCorporate
-            ? 'text-slate-600 hover:text-sky-700 hover:bg-sky-50/50'
-            : 'text-ink-body hover:text-ink hover:bg-surface-2'
+          ? 'text-amber-700'
+          : 'text-amber-300'
+        : isCorporate
+          ? isActive
+            ? 'text-sky-800'
+            : 'text-slate-800'
+          : 'text-ink'
     }`
+    const hintCls = `block text-xs leading-snug mt-0.5 ${isCorporate ? 'text-slate-500' : 'text-ink-muted'}`
     const icon =
       tab.id === 'home' ? (
-        <BrandIcon aria-hidden="true" width={16} height={16} className="w-4 h-4 object-contain" />
+        <BrandIcon aria-hidden="true" width={20} height={20} className="w-5 h-5 object-contain shrink-0" />
       ) : (
         tab.Icon && (
           <tab.Icon
             aria-hidden="true"
-            className={`w-4 h-4 ${
+            className={`w-5 h-5 shrink-0 ${
               isStore
                 ? isCorporate
                   ? 'text-amber-600'
                   : 'text-amber-400'
-                : isCorporate
-                  ? 'text-sky-600'
-                  : isActive
-                    ? 'text-cyan-glow'
+                : isActive
+                  ? isCorporate
+                    ? 'text-sky-600'
+                    : 'text-cyan-glow'
+                  : isCorporate
+                    ? 'text-slate-400'
                     : 'text-ink-muted'
             }`}
           />
         )
       )
+    const content = (
+      <>
+        {icon}
+        <span className="min-w-0 flex-1">
+          <span className={labelCls}>{tab.label}</span>
+          <span className={hintCls}>{tab.hint}</span>
+        </span>
+        {tab.external && (
+          <ExternalLink
+            aria-hidden="true"
+            className={`w-4 h-4 shrink-0 opacity-70 ${isCorporate ? 'text-amber-600' : 'text-amber-500'}`}
+          />
+        )}
+      </>
+    )
     if (tab.href) {
       return (
         <a
@@ -527,16 +564,9 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => setMobileOpen(false)}
-          className={`${itemCls} justify-between`}
+          className={itemCls}
         >
-          <span className="flex items-center gap-3">
-            {icon}
-            <span>{tab.label}</span>
-          </span>
-          <ExternalLink
-            aria-hidden="true"
-            className={`w-3.5 h-3.5 opacity-70 ${isCorporate ? 'text-amber-600' : 'text-amber-500'}`}
-          />
+          {content}
         </a>
       )
     }
@@ -548,8 +578,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         onClick={(event) => onInternalLinkClick(event, tab.path!)}
         className={itemCls}
       >
-        {icon}
-        <span>{tab.label}</span>
+        {content}
       </a>
     )
   }
@@ -560,7 +589,11 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       className={`w-full px-4 sm:px-8 lg:px-12 py-3 fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out ${
         headerShown ? 'translate-y-0' : '-translate-y-full pointer-events-none'
       } ${
-        isCorporate
+        mobileOpen
+          ? isCorporate
+            ? 'bg-white border-b border-sky-100 shadow-md'
+            : 'bg-abyss border-b border-line-subtle shadow-xl'
+          : isCorporate
           ? isScrolled
             ? 'bg-white/95 backdrop-blur-2xl border-b border-sky-200/80 shadow-md'
             : 'bg-white/85 backdrop-blur-xl border-b border-sky-100 shadow-sm'
@@ -569,7 +602,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             : 'bg-abyss/75 backdrop-blur-xl border-b border-line-subtle shadow-md'
       }`}
     >
-      <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-4">
+      <div ref={barRef} className="max-w-[1700px] mx-auto flex items-center justify-between gap-4">
         {/* Shared Brand Logo & Emblem */}
         <HeaderBrand
           variant={isCorporate ? 'corporate' : 'benthic'}
@@ -608,8 +641,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             <div
               className={`relative w-full h-full rounded-control overflow-hidden transition-all duration-300 ${
                 isCorporate
-                  ? 'bg-gradient-to-b from-white/95 via-white/85 to-white/75 border border-white shadow-[0_4px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,1),inset_0_-1px_0_rgba(0,0,0,0.04)] backdrop-blur-2xl'
-                  : 'bg-surface-2 border border-line-subtle shadow-sheen-inset'
+                  ? 'bg-white/60 border border-white/80'
+                  : 'bg-white/[0.06] border border-line-subtle'
               }`}
             />
           </div>
@@ -626,7 +659,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                   onClick={() => setOverflowOpen((open) => !open)}
                   onMouseEnter={() => setPreviewTab(null)}
                   onFocus={() => setPreviewTab(null)}
-                  className={`relative z-10 px-3 2xl:px-3.5 py-1.5 rounded-control text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center select-none whitespace-nowrap shrink-0 ${tabFocusCls} ${
+                  className={`relative z-10 px-3 2xl:px-3.5 py-2 rounded-control text-[13px] leading-none font-grotesk font-semibold tracking-[0.03em] transition-colors duration-300 flex items-center justify-center select-none whitespace-nowrap shrink-0 ${tabFocusCls} ${
                     overflowOpen
                       ? isCorporate
                         ? 'text-sky-700'
@@ -637,7 +670,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                   }`}
                 >
                   <span className="flex items-center gap-1.5">
-                    <span>MORE</span>
+                    <span>More</span>
                     <ChevronDown
                       aria-hidden="true"
                       className={`w-3.5 h-3.5 transition-transform duration-300 ${overflowOpen ? 'rotate-180' : ''}`}
@@ -671,6 +704,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             onClick={() => setMobileOpen((o) => !o)}
             aria-label="Toggle navigation menu"
             aria-expanded={mobileOpen}
+            aria-controls="public-header-mobile-menu"
             className={`xl:hidden flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 rounded-control active:scale-95 transition-all duration-300 ${
               isCorporate
                 ? mobileOpen
@@ -703,54 +737,40 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         </div>
       </div>
 
-      {/* Mobile Dropdown Backdrop & Menu */}
+      {/* Phone menu: a full-height sheet under the top row, with account actions pinned to the bottom. */}
       <div
-        style={headerHeight ? { top: headerHeight } : undefined}
-        className={`xl:hidden fixed inset-0 top-[60px] ${
-          isCorporate ? 'bg-slate-900/30' : 'bg-black/60'
-        } backdrop-blur-sm -z-10 transition-opacity duration-300 ease-in-out ${
-          mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
-        onClick={() => setMobileOpen(false)}
-        aria-hidden="true"
-      />
-
-      <div
-        className={`xl:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          mobileOpen
-            ? 'max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain opacity-100 translate-y-0'
-            : 'max-h-0 opacity-0 -translate-y-2 pointer-events-none'
+        id="public-header-mobile-menu"
+        aria-hidden={!mobileOpen}
+        inert={!mobileOpen}
+        style={{ height: mobileOpen ? `calc(100dvh - ${barHeight || 68}px)` : 0 }}
+        className={`xl:hidden -mx-4 sm:-mx-8 lg:-mx-12 overflow-hidden transition-[height,opacity] duration-300 ease-[cubic-bezier(0.2,1,0.3,1)] motion-reduce:transition-none ${
+          mobileOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
-        <div
-          className={`mt-3 p-3 space-y-2 rounded-card backdrop-blur-md ${
-            isCorporate
-              ? 'bg-white/95 border border-sky-100 shadow-2xl shadow-sky-100'
-              : 'bg-surface-1 border border-line-subtle shadow-menu'
-          }`}
-        >
-          {navTabs.map(renderMobileItem)}
+        <div className="h-full flex flex-col px-4 sm:px-8 lg:px-12 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <nav aria-label="Mobile Navigation" className="flex-1 min-h-0 overflow-y-auto overscroll-contain -mx-1 px-1">
+            <div className="max-w-xl mx-auto flex flex-col gap-1">{navTabs.map(renderMobileItem)}</div>
+          </nav>
 
-          {/* Divider */}
           <div
-            className={`border-t pt-2 mt-1 ${
+            className={`max-w-xl w-full mx-auto shrink-0 border-t pt-3 mt-3 ${
               isCorporate ? 'border-sky-100' : 'border-line-subtle'
             }`}
-          />
-
-          {authReady ? (
-            <Suspense fallback={<PublicHeaderAuthSkeleton isCorporate={isCorporate} layout="mobile" />}>
-              <LazyPublicHeaderAuthSlot
-                isCorporate={isCorporate}
-                layout="mobile"
-                onNavigate={onNavigate}
-                onOpenAuth={onOpenAuth}
-                onMobileClose={() => setMobileOpen(false)}
-              />
-            </Suspense>
-          ) : (
-            <PublicHeaderAuthSkeleton isCorporate={isCorporate} layout="mobile" />
-          )}
+          >
+            {authReady ? (
+              <Suspense fallback={<PublicHeaderAuthSkeleton isCorporate={isCorporate} layout="mobile" />}>
+                <LazyPublicHeaderAuthSlot
+                  isCorporate={isCorporate}
+                  layout="mobile"
+                  onNavigate={onNavigate}
+                  onOpenAuth={onOpenAuth}
+                  onMobileClose={() => setMobileOpen(false)}
+                />
+              </Suspense>
+            ) : (
+              <PublicHeaderAuthSkeleton isCorporate={isCorporate} layout="mobile" />
+            )}
+          </div>
         </div>
       </div>
     </header>

@@ -31,8 +31,8 @@ describe('PublicHeader Navigation Component', () => {
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
     expect(within(nav).getByRole('link', { name: /^HOME$/i })).toBeInTheDocument()
     expect(within(nav).getByRole('link', { name: /^MOLTMAX$/i })).toBeInTheDocument()
-    expect(within(nav).getByText('ABOUT')).toBeInTheDocument()
-    expect(within(nav).getByText('ORGANIZATION')).toBeInTheDocument()
+    expect(within(nav).getByText('About')).toBeInTheDocument()
+    expect(within(nav).getByText('Organization')).toBeInTheDocument()
 
     const aboutBtn = within(nav).getByRole('link', { name: /^ABOUT$/i })
     const orgBtn = within(nav).getByRole('link', { name: /ORGANIZATION/i })
@@ -79,18 +79,19 @@ describe('PublicHeader Navigation Component', () => {
     const { rerender } = render(<PublicHeader activePage="home" />)
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
     const homeBtn = within(nav).getByRole('link', { name: /^HOME$/i })
-    expect(homeBtn).toHaveClass('text-ink', 'bg-surface-2')
-    expect(within(homeBtn).getByTestId('public-header-current-mark')).toHaveClass('bg-cyan-glow')
+    expect(homeBtn).toHaveClass('text-ink', 'bg-surface-3', 'shadow-nav-current')
+    expect(within(homeBtn).queryByTestId('public-header-current-mark')).not.toBeInTheDocument()
 
     mockPathname = '/news'
     rerender(<PublicHeader activePage="news" />)
     const newsBtn = within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('link', { name: /NEWS/i })
-    expect(newsBtn).toHaveClass('text-ink', 'bg-surface-2')
+    expect(newsBtn).toHaveClass('text-ink', 'bg-surface-3')
 
     mockPathname = '/org'
     rerender(<PublicHeader activePage="org" />)
     const orgBtn = within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('link', { name: /ORGANIZATION/i })
-    expect(orgBtn.className).toContain('text-sky-700')
+    expect(orgBtn.className).toContain('text-sky-800')
+    expect(orgBtn.className).toContain('ring-sky-300')
   })
 
   it('renders corporate variant with clean light header, sky accents, and JOIN FAMILY CTA', async () => {
@@ -113,14 +114,14 @@ describe('PublicHeader Navigation Component', () => {
     render(<PublicHeader />)
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
     const blogBtn = within(nav).getByRole('link', { name: /NEWS/i })
-    expect(blogBtn).toHaveClass('text-ink', 'bg-surface-2')
+    expect(blogBtn).toHaveClass('text-ink', 'bg-surface-3')
   })
 
   it('highlights ABOUT for the what-is-moltology hub and subroutes', () => {
     mockPathname = '/what-is-moltology'
     const { rerender } = render(<PublicHeader />)
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
-    expect(within(nav).getByRole('link', { name: /^ABOUT$/i })).toHaveClass('text-ink', 'bg-surface-2')
+    expect(within(nav).getByRole('link', { name: /^ABOUT$/i })).toHaveClass('text-ink', 'bg-surface-3')
 
     mockPathname = '/what-is-moltology/beliefs'
     rerender(<PublicHeader />)
@@ -128,7 +129,7 @@ describe('PublicHeader Navigation Component', () => {
       within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('link', {
         name: /^ABOUT$/i,
       }),
-    ).toHaveClass('text-ink', 'bg-surface-2')
+    ).toHaveClass('text-ink', 'bg-surface-3')
   })
 
   it('triggers authentication modal callback when clicking desktop LOG IN / JOIN PATH', async () => {
@@ -226,18 +227,23 @@ describe('PublicHeader Navigation Component', () => {
   it('opens mobile menu with nav links and auth actions via hamburger toggle without badges', async () => {
     const onOpenAuth = vi.fn()
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
+    mockPathname = '/'
 
     render(<PublicHeader activePage="home" onOpenAuth={onOpenAuth} />)
 
     const toggle = screen.getByRole('button', { name: /toggle navigation menu/i })
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
 
-    // Mobile links are in the DOM but the dropdown is collapsed (max-h-0)
+    // The sheet is in the DOM but collapsed and inert until opened
+    expect(screen.queryByRole('navigation', { name: /mobile navigation/i })).not.toBeInTheDocument()
     fireEvent.click(toggle)
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    expect(document.body.style.overflow).toBe('hidden')
 
-    const moltmaxMobileBtn = screen.getAllByRole('link', { name: /^MOLTMAX$/i })
-    expect(moltmaxMobileBtn.length).toBeGreaterThanOrEqual(2) // 1 desktop, 1 mobile
+    const mobileNav = screen.getByRole('navigation', { name: /mobile navigation/i })
+    const moltmaxRow = within(mobileNav).getByRole('link', { name: /^Moltmax/i })
+    expect(moltmaxRow).toHaveTextContent('Take the clearance audit')
+    expect(within(mobileNav).getByRole('link', { name: /^Home/i })).toHaveAttribute('aria-current', 'page')
 
     const mobileLogin = (await screen.findAllByRole('button', { name: /LOG IN/i })).at(-1)!
     fireEvent.click(mobileLogin)
@@ -299,14 +305,12 @@ describe('PublicHeader Navigation Component', () => {
     expect(forumLink).not.toHaveAttribute('aria-current')
 
     fireEvent.mouseEnter(forumLink)
-    expect(newsLink).toHaveClass('text-ink', 'bg-surface-2')
-    expect(within(newsLink).getByTestId('public-header-current-mark')).toBeInTheDocument()
+    expect(newsLink).toHaveClass('text-ink', 'bg-surface-3')
     expect(forumLink).toHaveClass('text-ink')
-    expect(forumLink).not.toHaveClass('text-ink-muted')
-    expect(within(forumLink).queryByTestId('public-header-current-mark')).not.toBeInTheDocument()
+    expect(forumLink).not.toHaveClass('text-ink-muted', 'bg-surface-3')
 
     fireEvent.focus(within(nav).getByRole('link', { name: /^MOLTMAX$/i }))
-    expect(newsLink).toHaveClass('text-ink', 'bg-surface-2')
+    expect(newsLink).toHaveClass('text-ink', 'bg-surface-3')
   })
 
   it('closes the mobile menu with Escape', () => {
@@ -316,5 +320,6 @@ describe('PublicHeader Navigation Component', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(document.body.style.overflow).toBe('')
   })
 })

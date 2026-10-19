@@ -8,7 +8,7 @@ import { spawnSync } from 'node:child_process'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
 import tailwind from '../tailwind.config.js'
 
-const PART_NAMES = ['icon', 'primary', 'secondary-benthic', 'secondary-foundation']
+export const PART_NAMES = ['icon', 'primary', 'secondary-benthic', 'secondary-foundation']
 // Part framing is tight. Each icon format sets how much of its canvas the emblem box
 // fills (the emblem is ~96% of that box) and whether it carries its own rounded tile.
 // - favicon: rounded abyss tile, framed tight because browsers draw it at 16px.
@@ -136,7 +136,8 @@ export async function buildBrandAssets() {
   for (const name of PART_NAMES) parts[name] = parsePart(await fs.readFile(path.join(KIT, 'parts', `${name}.svg`), 'utf8'))
   const version = brandRevision(parts, palettes, colors)
   await fs.writeFile(path.join(KIT, 'palettes.json'), JSON.stringify(palettes, null, 2) + '\n')
-  await fs.writeFile(path.join(ROOT, 'src/components/ui/brand-geometry.json'), JSON.stringify({ version, parts }, null, 2) + '\n')
+  // The app only draws the emblem; the wordmark is live text (HeaderBrand), so the outlined word parts stay in the kit.
+  await fs.writeFile(path.join(ROOT, 'src/components/ui/brand-geometry.json'), JSON.stringify({ version, parts: { icon: parts.icon } }, null, 2) + '\n')
   await fs.writeFile(path.join(ROOT, 'src/components/ui/brand-assets.json'), JSON.stringify({ version, layout: ICON_LAYOUT }, null, 2) + '\n')
 
   // Canonical part colors plus one-color and reference-red exports.

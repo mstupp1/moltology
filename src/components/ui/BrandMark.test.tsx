@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent } from '@testing-library/react'
-import { BrandAwareImage, BrandIcon, BrandWordmark } from './BrandMark'
+import { BrandAwareImage, BrandIcon } from './BrandMark'
 
 describe('production brand vectors', () => {
   it('defaults to the application red and supports inherited color', () => {
@@ -20,18 +20,7 @@ describe('production brand vectors', () => {
     expect(container.querySelector('svg')).not.toHaveAttribute('aria-label')
   })
 
-  it('keeps canonical labels accessible while rendering outlined lettering', () => {
-    const { container } = render(<BrandWordmark text="BENTHIC CORE" />)
-    expect(screen.getByText('BENTHIC CORE')).toHaveClass('sr-only')
-    expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true')
-    expect(container.querySelector('path')).toHaveAttribute('fill-rule', 'evenodd')
-    expect(container.querySelector('image')).toBeNull()
-  })
-
-  it('preserves arbitrary live copy and handles server rendering without IDs', () => {
-    const { container } = render(<BrandWordmark text="CUSTOM FOUNDATION" />)
-    expect(screen.getByText('CUSTOM FOUNDATION')).toBeVisible()
-    expect(container.querySelector('svg')).toBeNull()
+  it('handles server rendering without IDs', () => {
     const html = renderToString(<><BrandIcon /><BrandIcon /></>)
     expect(html).not.toContain('id=')
     expect(html.match(/aria-label="Order Emblem"/g)).toHaveLength(2)
