@@ -62,17 +62,17 @@ export const WhatIsMoltologySubnav: React.FC = () => {
         style={{ transform: `translateY(${offset}px)` }}
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ul ref={listRef} className="flex gap-1 overflow-x-auto py-1.5 scrollbar-none">
+          <ul ref={listRef} className="flex gap-1.5 overflow-x-auto py-2 px-1 -mx-1 scrollbar-none">
             {WHAT_IS_MOLTOLOGY_NAV.map((item) => {
               const active = item.id === activeId
               return (
                 <li key={item.id} className="shrink-0">
                   <Link
                     to={item.path}
-                    className={`relative inline-flex items-center min-h-11 px-3.5 text-xs sm:text-sm font-grotesk font-bold tracking-wide transition-colors rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                    className={`relative inline-flex items-center min-h-11 px-3.5 text-[13px] sm:text-sm font-grotesk font-semibold tracking-[0.02em] transition-[color,background-color,box-shadow] duration-300 rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                       active
-                        ? 'text-ink bg-surface-2 after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:bg-cyan-glow'
-                        : 'text-ink-muted hover:text-ink hover:bg-surface-2'
+                        ? 'text-ink bg-surface-3 shadow-nav-current'
+                        : 'text-ink-muted hover:text-ink hover:bg-white/[0.06]'
                     }`}
                     aria-current={active ? 'page' : undefined}
                   >

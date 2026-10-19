@@ -64,7 +64,8 @@ icons or geometry and verifies the original-icon backups.
 ## Public header nav
 
 The current page is a lit tile (`bg-surface-3 shadow-nav-current`, cyan icon). A faint
-lens slides to whatever is hovered or focused. No underline marks. On phones the same
+lens slides to whatever is hovered or focused. No underline marks. Section sub-tabs
+(the About subnav) use the same lit tile for the current section. On phones the same
 tab list becomes a full-height sheet with a one-line hint per page and account actions
 pinned to the bottom.
 
