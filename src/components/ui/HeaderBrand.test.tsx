@@ -12,13 +12,21 @@ describe('HeaderBrand Component', () => {
     expect(screen.getByRole('img', { name: 'Order Emblem' }).tagName.toLowerCase()).toBe('svg')
   })
 
-  it('renders clean title without subtext by default', () => {
-    render(<HeaderBrand />)
+  it('renders the Synaptic Path tagline as live text under the title by default', () => {
+    const { container } = render(<HeaderBrand />)
 
     const titleEl = screen.getByText('Moltology')
-    expect(titleEl).toBeInTheDocument()
     expect(titleEl.closest('div')?.className).not.toContain('uppercase')
-    expect(screen.queryByText('MOLTOLOGY.ORG FOUNDATION')).not.toBeInTheDocument()
+    expect(screen.getByText('The Synaptic Path')).toHaveClass('sr-only')
+    expect(container.querySelector('.brand-lockup-letters')).toHaveAttribute('aria-hidden', 'true')
+    expect(container.querySelector('.brand-lockup-letters')?.textContent).toBe('THESYNAPTICPATH')
+    expect(container.querySelectorAll('svg')).toHaveLength(1)
+  })
+
+  it('hides the tagline when subtext is null', () => {
+    render(<HeaderBrand subtext={null} />)
+    expect(screen.getByText('Moltology')).toBeInTheDocument()
+    expect(screen.queryByText('The Synaptic Path')).not.toBeInTheDocument()
   })
 
   it('hides text when isCollapsed is true', () => {

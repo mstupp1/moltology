@@ -1,9 +1,12 @@
 import React from 'react'
 import { BrandIcon } from './BrandMark'
 
+export const BRAND_TAGLINE = 'The Synaptic Path'
+
 export interface HeaderBrandProps {
   brandTitle?: string
-  subtext?: string
+  /** Line under the title. Defaults to the tagline lockup; pass null to hide it. */
+  subtext?: string | null
   isCollapsed?: boolean
   onClick?: () => void
   className?: string
@@ -14,7 +17,7 @@ export interface HeaderBrandProps {
 
 export const HeaderBrand: React.FC<HeaderBrandProps> = ({
   brandTitle = 'Moltology',
-  subtext,
+  subtext = BRAND_TAGLINE,
   isCollapsed = false,
   onClick,
   className = '',
@@ -23,8 +26,9 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
   badge,
 }) => {
   const sizeClasses = logoSize === 'sm' ? 'w-6 h-6 sm:w-7 sm:h-7' : 'w-8 h-8 sm:w-9 sm:h-9'
-  const titleSizeClasses = logoSize === 'sm' ? 'text-sm' : 'text-lg sm:text-xl'
+  const titleSizeClasses = logoSize === 'sm' ? 'text-base' : 'text-lg sm:text-[22px]'
   const isCorporate = variant === 'corporate'
+  const isTagline = subtext === BRAND_TAGLINE
   const brandContent = (
     <>
       {/* Emblem Logo */}
@@ -34,9 +38,13 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
 
       {/* Brand Title & Subtext */}
       {!isCollapsed && (
-        <div className="overflow-hidden whitespace-nowrap min-w-0 animate-in fade-in slide-in-from-left-2 duration-300 motion-reduce:animate-none">
+        <div
+          className={`min-w-0 animate-in fade-in slide-in-from-left-2 duration-300 motion-reduce:animate-none ${
+            isTagline ? `brand-lockup ${titleSizeClasses}` : 'overflow-hidden whitespace-nowrap'
+          }`}
+        >
           <div
-            className={`font-grotesk font-extrabold ${titleSizeClasses} tracking-tight flex items-center gap-2 transition-all duration-300 leading-none ${
+            className={`font-grotesk font-extrabold ${isTagline ? '' : titleSizeClasses} tracking-tight flex items-center gap-2 transition-all duration-300 leading-none ${
               isCorporate
                 ? 'text-sky-950 group-hover:text-sky-700'
                 : 'text-ink group-hover:text-white'
@@ -44,7 +52,22 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
           >
             <span>{brandTitle}</span>
           </div>
-          {subtext && (
+          {subtext && isTagline && (
+            <div className={`brand-lockup-caption ${isCorporate ? 'text-sky-700' : 'text-ink-muted'}`}>
+              <span className="sr-only">{subtext}</span>
+              {/* Letters spread across the title's width so the two lines read as one block. */}
+              <span aria-hidden="true" className="brand-lockup-letters">
+                {Array.from(subtext.toUpperCase()).map((char, index) =>
+                  char === ' ' ? (
+                    <span key={index} className="brand-lockup-gap" />
+                  ) : (
+                    <span key={index}>{char}</span>
+                  )
+                )}
+              </span>
+            </div>
+          )}
+          {subtext && !isTagline && (
             <div
               className={`text-[11px] font-bold tracking-widest uppercase truncate mt-0.5 ${
                 isCorporate

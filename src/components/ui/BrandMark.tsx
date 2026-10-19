@@ -1,4 +1,4 @@
-import type { CSSProperties, ImgHTMLAttributes, SVGProps } from 'react'
+import type { ImgHTMLAttributes, SVGProps } from 'react'
 import geometry from './brand-geometry.json'
 
 export const BRAND_ASSET_VERSION = geometry.version
@@ -63,22 +63,4 @@ export function BrandAwareImage({ src, alt, className, style, width, height, ...
     )
   }
   return <img src={src} alt={alt} className={className} style={style} width={width} height={height} {...props} />
-}
-
-const WORDMARK_PARTS: Record<string, PartName> = {
-  'THE SYNAPTIC PATH': 'primary',
-  'BENTHIC CORE': 'secondary-benthic',
-  'MOLTOLOGY.ORG FOUNDATION': 'secondary-foundation',
-}
-
-/** Canonical copy is outlined; custom footer/subtitle copy stays live text. */
-export function BrandWordmark({ text, className = '', style }: { text: string; className?: string; style?: CSSProperties }) {
-  const part = WORDMARK_PARTS[text.trim().toUpperCase()]
-  if (!part) return <span>{text}</span>
-  return (
-    <span className="block">
-      <span className="sr-only">{text}</span>
-      <VectorPart part={part} aria-hidden="true" className={`block w-auto max-w-full ${className}`} style={style} />
-    </span>
-  )
 }
