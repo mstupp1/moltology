@@ -1,15 +1,8 @@
-import React from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { CodexChamber } from '@/components/codex/CodexChamber'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { findScriptureBySlug, normalizeScriptureSlug } from '@/lib/codex-links'
 import { seo } from '@/lib/seo'
 import { CODEX_VAULT_SEO } from './index'
-
-function CodexSlugRoute() {
-  const { slug } = Route.useParams()
-  return <CodexChamber scriptureSlug={slug} />
-}
 
 export const Route = createFileRoute('/_hud/codex/$slug')({
   head: ({ params }) => {
@@ -33,6 +26,7 @@ export const Route = createFileRoute('/_hud/codex/$slug')({
       links: [{ rel: 'canonical', href: canonical }],
     }
   },
-  component: CodexSlugRoute,
+  // The reader lives in ./route.tsx so it stays mounted while the address changes.
+  component: () => null,
   pendingComponent: HudWorkspaceGhost,
 })

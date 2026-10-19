@@ -5,7 +5,6 @@ import {
   ChevronRight,
   Menu,
   Printer,
-  RefreshCw,
   X,
   ZoomIn,
   ZoomOut,
@@ -26,6 +25,8 @@ export interface FullscreenDocumentItem {
   id: string
   title: string
   subtitle?: string
+  /** Contents heading shown above the first item of each group. */
+  group?: string
 }
 
 interface FullscreenDocumentReaderProps {
@@ -56,8 +57,8 @@ export function FullscreenDocumentReader({
   items,
   activeIndex,
   overlayLabel,
-  tocToggleTitle = 'Toggle Table of Contents Index',
-  mobileHint = 'Tap the page to rest the chrome',
+  tocToggleTitle = 'Show contents',
+  mobileHint = 'Tap the page to show or hide controls',
   renderItem,
   onPrev,
   onNext,
@@ -254,9 +255,13 @@ export function FullscreenDocumentReader({
     setChromeVisible((visible) => !visible)
   }
 
+  const focusRing =
+    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
+  const toolButton = `flex items-center justify-center min-w-10 min-h-10 rounded-control text-ink-muted hover:text-ink hover:bg-surface-3 disabled:opacity-30 disabled:pointer-events-none transition-colors ${focusRing}`
+
   return (
     <div
-      className="codex-reader-overlay fixed inset-0 z-[100000] h-dvh w-dvw bg-[#050708] flex flex-col overflow-hidden animate-in fade-in duration-200"
+      className="codex-reader-overlay fixed inset-0 z-[100000] h-dvh w-dvw bg-abyss flex flex-col overflow-hidden animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-label={overlayLabel}
@@ -273,113 +278,109 @@ export function FullscreenDocumentReader({
           if (!navOpen) revealChrome()
         }}
       >
-        <div className="codex-reader-chrome-bar flex items-center justify-between gap-2 px-2.5 sm:px-4 py-2 bg-[#0e1415]/95 backdrop-blur-md border-b border-[#293635] pt-[max(0.5rem,env(safe-area-inset-top))]">
+        <div className="codex-reader-chrome-bar grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-2 sm:px-4 py-1.5 bg-surface-1/95 backdrop-blur-md border-b border-line-subtle pt-[max(0.375rem,env(safe-area-inset-top))]">
           <div className="flex items-center gap-2 min-w-0">
             <button
+              type="button"
               onClick={() => {
                 setNavOpen((open) => !open)
                 setChromeVisible(true)
               }}
-              className={`p-2 chamfer-corner border flex items-center justify-center transition-all min-w-[40px] min-h-[40px] ${
-                navOpen
-                  ? 'bg-[#00ffff]/20 text-[#00ffff] border-[#00ffff]'
-                  : 'bg-[#151c1d] text-[#839493] border-[#293635] hover:text-white'
-              }`}
+              aria-pressed={navOpen}
+              className={`${toolButton} ${navOpen ? 'bg-surface-3 text-cyan-glow' : ''}`}
               title={tocToggleTitle}
               aria-label={tocToggleTitle}
             >
               <Menu className="w-4 h-4" />
             </button>
 
-            <div className="hidden sm:flex flex-col min-w-0">
-              <span className="text-xs font-cinzel font-bold text-[#f4ecd8] truncate">
-                {activeItem?.title}
-              </span>
+            <div className="hidden md:flex flex-col min-w-0">
+              <span className="text-sm font-garamond font-semibold text-ink truncate">{activeItem?.title}</span>
               {activeItem?.subtitle && (
-                <span className="text-[10px] font-sans text-[#839493] truncate">
-                  {activeItem.subtitle}
-                </span>
+                <span className="text-[11px] font-sans text-ink-muted truncate">{activeItem.subtitle}</span>
               )}
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <div className="flex items-center gap-0.5 bg-[#151c1d] border border-[#293635] chamfer-corner px-1 py-0.5 text-xs font-sans">
+          <div className="flex items-center gap-1 sm:gap-2 font-sans">
+            <div className="hidden sm:flex items-center rounded-control bg-surface-2 border border-line-subtle">
               <button
+                type="button"
                 onClick={onPrev}
                 disabled={activeIndex <= 0}
-                className="p-1.5 hover:bg-[#293635] rounded disabled:opacity-30 text-[#dfe3e3] transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
-                title="Previous Item"
+                className={toolButton}
+                title="Previous"
+                aria-label="Previous"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="px-1.5 text-[#00ffff] font-bold text-xs font-sans tabular-nums">
+              <span className="px-1 text-xs font-bold text-ink tabular-nums whitespace-nowrap">
                 {activeIndex + 1} / {items.length}
               </span>
               <button
+                type="button"
                 onClick={onNext}
                 disabled={activeIndex >= items.length - 1}
-                className="p-1.5 hover:bg-[#293635] rounded disabled:opacity-30 text-[#dfe3e3] transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
-                title="Next Item"
+                className={toolButton}
+                title="Next"
+                aria-label="Next"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="flex items-center gap-0.5 bg-[#151c1d] border border-[#293635] chamfer-corner px-1 py-0.5 text-xs font-sans">
+            <div className="flex items-center rounded-control bg-surface-2 border border-line-subtle">
               <button
+                type="button"
                 onClick={() => setZoomAt(stepCodexZoom(zoom, -1))}
-                className="p-1.5 hover:bg-[#293635] rounded text-[#839493] hover:text-white min-w-[36px] min-h-[36px] flex items-center justify-center"
+                className={toolButton}
                 title="Zoom Out"
                 aria-label="Zoom Out"
               >
-                <ZoomOut className="w-3.5 h-3.5" />
+                <ZoomOut className="w-4 h-4" />
               </button>
               <button
+                type="button"
                 onClick={() => fitPage(1)}
-                className="px-1.5 text-[11px] text-[#a3b0af] hover:text-[#00ffff] tabular-nums min-w-[3.25rem]"
+                className={`min-h-10 min-w-[3.25rem] px-1 text-xs text-ink-body hover:text-ink tabular-nums rounded-control ${focusRing}`}
                 title="Fit width"
                 aria-label={`Zoom ${formatCodexZoom(zoom)}. Reset to fit width.`}
               >
                 {formatCodexZoom(zoom)}
               </button>
               <button
+                type="button"
                 onClick={() => setZoomAt(stepCodexZoom(zoom, 1))}
-                className="p-1.5 hover:bg-[#293635] rounded text-[#839493] hover:text-white min-w-[36px] min-h-[36px] flex items-center justify-center"
+                className={toolButton}
                 title="Zoom In"
                 aria-label="Zoom In"
               >
-                <ZoomIn className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => fitPage(1)}
-                className="hidden sm:flex p-1.5 hover:bg-[#293635] rounded text-[#839493] hover:text-white"
-                title="Fit width"
-                aria-label="Fit width"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
+                <ZoomIn className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center justify-end gap-1">
             {onPrint && (
               <button
+                type="button"
                 onClick={onPrint}
-                className="hidden sm:flex p-2 text-[#00ffff] hover:bg-[#151c1d] chamfer-corner border border-[#293635] min-w-[40px] min-h-[40px] items-center justify-center"
-                title="Print / Export PDF"
+                className={`hidden sm:flex ${toolButton}`}
+                title="Print or save as PDF"
+                aria-label="Print or save as PDF"
               >
                 <Printer className="w-4 h-4" />
               </button>
             )}
 
             <button
+              type="button"
               onClick={onClose}
-              className="p-2 text-[#839493] hover:text-white hover:bg-[#ff5540]/20 hover:border-[#ff5540] chamfer-corner border border-[#293635] transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
-              title="Exit Fullscreen Overlay (ESC)"
-              aria-label="Exit Fullscreen Overlay (ESC)"
+              className={toolButton}
+              title="Close reader (Esc)"
+              aria-label="Close reader (Esc)"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -389,33 +390,47 @@ export function FullscreenDocumentReader({
         {navOpen && (
           <>
             <button
-              className="absolute inset-0 bg-black/50 z-20 md:hidden"
-              aria-label="Close contents drawer"
+              type="button"
+              className="absolute inset-0 bg-black/60 z-20 md:hidden"
+              aria-label="Close contents"
               onClick={() => setNavOpen(false)}
             />
-            <aside className="absolute md:relative inset-y-0 left-0 w-[min(20rem,86vw)] shrink-0 bg-[#0e1415] border-r border-[#293635] p-3 overflow-y-auto space-y-1.5 z-20 font-sans">
-              {items.map((item) => {
-                const isActive = item.id === activeItem?.id
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      onSelectItem(item.id)
-                      const width = viewportRef.current?.clientWidth || window.innerWidth
-                      if (isCompactCodexViewport(width)) setNavOpen(false)
-                    }}
-                    className={`w-full text-left p-2.5 chamfer-corner border transition-all text-xs font-serif ${
-                      isActive
-                        ? 'bg-[#1a2425] border-[#00ffff] text-[#00ffff] font-bold shadow-sm'
-                        : 'border-transparent text-[#839493] hover:text-[#dfe3e3] hover:bg-[#151c1d]'
-                    }`}
-                  >
-                    <div className="text-[10px] font-sans text-[#00ffff]">{item.id}</div>
-                    <div className="truncate font-semibold">{item.title}</div>
-                  </button>
-                )
-              })}
-            </aside>
+            <nav
+              aria-label="Contents"
+              className="absolute md:relative inset-y-0 left-0 w-[min(20rem,86vw)] shrink-0 bg-surface-1 border-r border-line-subtle py-2 overflow-y-auto overscroll-contain z-20 font-sans"
+            >
+              <ul>
+                {items.map((item, index) => {
+                  const isActive = item.id === activeItem?.id
+                  const showGroup = item.group && (index === 0 || items[index - 1].group !== item.group)
+                  return (
+                    <li key={item.id}>
+                      {showGroup && (
+                        <div className="px-4 pt-3 pb-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-ink-muted">
+                          {item.group}
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSelectItem(item.id)
+                          const width = viewportRef.current?.clientWidth || window.innerWidth
+                          if (isCompactCodexViewport(width)) setNavOpen(false)
+                        }}
+                        aria-current={isActive ? 'true' : undefined}
+                        className={`relative w-full text-left px-4 py-2.5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
+                          isActive ? 'bg-surface-2 text-ink' : 'text-ink-body hover:text-ink hover:bg-surface-2'
+                        }`}
+                      >
+                        {isActive && <span aria-hidden="true" className="absolute left-0 inset-y-0 w-[2px] bg-cyan-glow" />}
+                        <span className="block font-garamond text-base leading-snug">{item.title}</span>
+                        <span className="block text-[11px] text-ink-muted tabular-nums">{item.id}</span>
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
+            </nav>
           </>
         )}
 
@@ -425,7 +440,7 @@ export function FullscreenDocumentReader({
           onClick={handleViewportPointer}
           onMouseMove={revealChrome}
         >
-          <div className="codex-reader-well min-h-full flex justify-center items-start px-2 sm:px-6 py-8 sm:py-10 pb-24">
+          <div className="codex-reader-well min-h-full flex justify-center items-start px-2 sm:px-6 py-6 sm:py-10 pb-24">
             {renderItem({ zoom, pageWidth })}
           </div>
         </div>
@@ -435,21 +450,30 @@ export function FullscreenDocumentReader({
         className="codex-reader-chrome codex-reader-chrome-bottom no-print absolute inset-x-0 bottom-0 z-30 sm:hidden"
         data-hidden={showChrome ? 'false' : 'true'}
       >
-        <div className="flex items-center justify-between gap-2 px-3 py-2 bg-[#0e1415]/95 backdrop-blur-md border-t border-[#293635] pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-2 py-1.5 bg-surface-1/95 backdrop-blur-md border-t border-line-subtle pb-[max(0.375rem,env(safe-area-inset-bottom))] font-sans">
           <button
+            type="button"
             onClick={onPrev}
             disabled={activeIndex <= 0}
-            className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider border border-[#293635] text-[#dfe3e3] disabled:opacity-30 chamfer-corner"
+            className={toolButton}
+            aria-label="Previous"
           >
-            Previous
+            <ChevronLeft className="w-5 h-5" />
           </button>
-          <span className="text-[10px] font-sans text-[#839493]">{mobileHint}</span>
+          <div className="text-center min-w-0">
+            <div className="text-xs font-bold text-ink tabular-nums">
+              {activeIndex + 1} of {items.length}
+            </div>
+            <div className="text-[11px] text-ink-muted truncate">{mobileHint}</div>
+          </div>
           <button
+            type="button"
             onClick={onNext}
             disabled={activeIndex >= items.length - 1}
-            className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider border border-[#293635] text-[#dfe3e3] disabled:opacity-30 chamfer-corner"
+            className={toolButton}
+            aria-label="Next"
           >
-            Next
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
       </div>

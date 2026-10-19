@@ -1,51 +1,37 @@
 @import './editorial-fonts.css';
 
-/* Codex Professional PDF & Scripture Review Themes */
+/* Codex reading paper. The sheet is the one light surface in the app, so it keeps its own colours. */
 .codex-parchment-theme {
-  background-color: #fcfaf2;
-  color: #1c1917;
-  border-color: #d6ceb8;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.05);
+  background-color: #fbf8ef;
+  color: #1f1b16;
+  border-color: #e2d9c3;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
-.codex-sepia-theme {
-  background-color: #f4ecd8;
-  color: #2b2318;
-  border-color: #c7b896;
-  box-shadow: 0 10px 30px rgba(43, 35, 24, 0.2);
+.pdf-page-sheet {
+  border-radius: 8px;
 }
 
-.codex-dark-theme {
-  background-color: #12100e;
-  color: #e6dfd5;
-  border-color: #4a3e35;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.8);
+/* Initial on the first paragraph of a scripture. The paragraph contains the float so it never
+   pushes into the next paragraph when the opening line is short. */
+.codex-drop-cap {
+  display: flow-root;
 }
 
-/* Sacred Paper Drop Cap & PDF Watermarks */
-.drop-cap-illuminated {
+.codex-drop-cap::first-letter {
   float: left;
   font-family: 'Cinzel', 'EB Garamond', serif;
   font-weight: 700;
+  font-size: 3.1em;
   line-height: 0.8;
-  padding-right: 0.35rem;
-  padding-top: 0.15rem;
+  margin: 0.06em 0.1em 0 0;
 }
 
-/* Document Paper Texture & Double Margin Line */
-.pdf-page-sheet {
-  background-image: radial-gradient(#d6ceb8 0.5px, transparent 0.5px);
-  background-size: 16px 16px;
+.codex-verse strong {
+  font-weight: 700;
 }
 
 /* Immersive Codex e-reader overlay */
-.codex-scripture-focus {
-  box-shadow:
-    0 0 0 2px rgba(0, 255, 255, 0.45),
-    0 10px 30px rgba(0, 0, 0, 0.15),
-    0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
 .codex-reader-overlay {
   overscroll-behavior: none;
 }
@@ -55,8 +41,8 @@
   -webkit-overflow-scrolling: touch;
   touch-action: pan-x pan-y;
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(0, 255, 255, 0.05), transparent 42%),
-    #050708;
+    radial-gradient(ellipse at 50% 0%, rgba(0, 195, 255, 0.05), transparent 42%),
+    #030708;
 }
 
 .codex-reader-chrome {
@@ -83,9 +69,10 @@
   transform: translateY(6px);
 }
 
-.codex-dark-theme.pdf-page-sheet {
-  background-image: radial-gradient(#3a3129 0.5px, transparent 0.5px);
-  background-size: 16px 16px;
+@media (prefers-reduced-motion: reduce) {
+  .codex-reader-chrome {
+    transition: none;
+  }
 }
 
 /* Media Print Rules for Professional PDF Output */
