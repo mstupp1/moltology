@@ -20,8 +20,10 @@ describe('SacredCodexReader Component', () => {
 
   it('filters scriptures by volume tab and opens that volume', () => {
     render(<SacredCodexReader />)
-    fireEvent.click(screen.getByRole('tab', { name: /Doctrine/i }))
-    expect(screen.getByRole('tab', { name: /Doctrine/i })).toHaveAttribute('aria-selected', 'true')
+    const volumes = within(screen.getByRole('group', { name: 'Volumes' }))
+    fireEvent.click(volumes.getByRole('button', { name: /Doctrine/i }))
+    expect(volumes.getByRole('button', { name: /Doctrine/i })).toHaveAttribute('aria-pressed', 'true')
+    expect(volumes.getByRole('button', { name: /Doctrine/i })).toHaveClass('bg-surface-3', 'shadow-nav-current')
     expect(screen.getByTestId('codex-scripture-sheet').getAttribute('data-codex-scripture')).not.toBe('SCR-001')
     const contents = screen.getByRole('complementary', { name: 'Contents' })
     expect(within(contents).queryByRole('button', { name: /The Prime Directive/i })).not.toBeInTheDocument()

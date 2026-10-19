@@ -8,7 +8,6 @@ import { CodexDirectory, type CodexStageFilter } from './CodexDirectory'
 import { CodexPdfPage } from './CodexPdfPage'
 import { FullscreenDocumentReader } from '@/components/reader/FullscreenDocumentReader'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
-import { HudTabs } from '@/components/ui/HudTabs'
 import { HudButton } from '@/components/ui/HudButton'
 import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
 
@@ -268,14 +267,28 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
 
       {titlePanel}
 
-      <HudTabs
-        label="Volumes"
-        idPrefix="codex-volume"
-        items={VOLUME_TABS}
-        value={selectedVolume}
-        onValueChange={handleVolumeChange}
-        className="no-print flex-nowrap gap-6 overflow-x-auto no-scrollbar -mt-1 [&>button]:shrink-0 [&>button]:whitespace-nowrap"
-      />
+      <div
+        role="group"
+        aria-label="Volumes"
+        className="no-print -mt-1 flex gap-1 overflow-x-auto no-scrollbar border-b border-line-subtle pb-2"
+      >
+        {VOLUME_TABS.map((tab) => {
+          const selected = selectedVolume === tab.value
+          return (
+            <button
+              key={tab.value}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => handleVolumeChange(tab.value)}
+              className={`shrink-0 whitespace-nowrap min-h-10 px-3 rounded-control font-grotesk text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                selected ? 'text-ink bg-surface-3 shadow-nav-current' : 'text-ink-muted hover:text-ink hover:bg-surface-2'
+              }`}
+            >
+              {tab.label}
+            </button>
+          )
+        })}
+      </div>
 
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
         <aside
