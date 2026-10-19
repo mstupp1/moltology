@@ -61,5 +61,7 @@ describe('WhatIsMoltologySubnav', () => {
     const beliefs = screen.getByRole('link', { name: /beliefs & codes/i })
     expect(beliefs).toHaveAttribute('aria-current', 'page')
     expect(beliefs.className).toContain('min-h-11')
+    expect(beliefs).toHaveClass('bg-surface-3', 'shadow-nav-current')
+    expect(beliefs.className).not.toContain('after:bg-cyan-glow')
   })
 })
