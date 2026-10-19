@@ -1,7 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
-import { getMerchCatalogHandler, createMerchCheckoutSessionHandler } from './merch'
+import { getDb } from '../../db'
+import { getMerchCatalogHandler, createMerchCheckoutSessionHandler, fulfillMerchCheckoutEvent } from './merch'
+import { createPrintfulOrder } from './printful'
 
 vi.mock('../../db', () => ({ getDb: vi.fn(() => ({})) }))
+
+vi.mock('./printful', () => ({ createPrintfulOrder: vi.fn().mockResolvedValue({ id: 99 }) }))
 
 vi.mock('../user-sync', () => ({ ensureUserProfile: vi.fn().mockResolvedValue(null) }))
 
@@ -29,5 +33,49 @@ describe('new store experiment server gate', () => {
     const db = storeDb({ role: 'admin', experiments: ['new-store'] })
     await expect(getMerchCatalogHandler({ context: { user: { sub: 'admin-1' }, db: db as never } })).resolves.toEqual([])
     expect(db.select).toHaveBeenCalledTimes(2)
+  })
+})
+
+describe('merch fulfilment waits for payment', () => {
+  function orderDb() {
+    const order = { id: 'order-1', userId: 'u1', fulfillmentStatus: 'pending', subtotalCents: 2800, shippingCents: 695, taxCents: 0, lineItems: [] }
+    const sets: Array<Record<string, unknown>> = []
+    const query = { from: () => query, where: () => query, limit: vi.fn().mockResolvedValue([order]) }
+    const update = { set: (values: Record<string, unknown>) => { sets.push(values); return update }, where: vi.fn().mockResolvedValue([]) }
+    vi.mocked(getDb).mockReturnValue({ select: () => query, update: () => update } as never)
+    return sets
+  }
+
+  const session = (payment_status: string) => ({
+    id: 'cs_1',
+    payment_status,
+    metadata: { orderType: 'merch', orderId: 'order-1' },
+    customer_details: { email: 'ops@example.com' },
+    collected_information: {
+      shipping_details: { name: 'Ops', address: { line1: '1 Trench', city: 'Seattle', postal_code: '98101', country: 'US' } },
+    },
+  })
+
+  it('holds an unpaid checkout instead of sending it to Printful', async () => {
+    const sets = orderDb()
+    await fulfillMerchCheckoutEvent({ type: 'checkout.session.completed', data: { object: session('unpaid') } })
+    expect(sets.map((s) => s.fulfillmentStatus)).toEqual(['awaiting_payment'])
+    expect(createPrintfulOrder).not.toHaveBeenCalled()
+  })
+
+  it('marks a failed delayed payment without fulfilling', async () => {
+    const sets = orderDb()
+    await fulfillMerchCheckoutEvent({ type: 'checkout.session.async_payment_failed', data: { object: session('unpaid') } })
+    expect(sets.map((s) => s.fulfillmentStatus)).toEqual(['payment_failed'])
+    expect(createPrintfulOrder).not.toHaveBeenCalled()
+  })
+
+  it('fulfils once Stripe reports the session paid', async () => {
+    vi.stubEnv('PRINTFUL_API_TOKEN', 'pf-test')
+    const sets = orderDb()
+    await fulfillMerchCheckoutEvent({ type: 'checkout.session.async_payment_succeeded', data: { object: session('paid') } })
+    expect(sets.map((s) => s.fulfillmentError ?? s.fulfillmentStatus)).toEqual(['paid', 'submitted_to_printful'])
+    expect(createPrintfulOrder).toHaveBeenCalledTimes(1)
+    vi.unstubAllEnvs()
   })
 })

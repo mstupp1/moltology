@@ -12,6 +12,8 @@ description: >-
 
 # MoltNation Blog Creation, Illustration & Ingestion Pipeline
 
+Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
+
 This skill guides the end-to-end research, authoring, illustration, database ingestion, continuity tracking, and automated git publishing of full-length intelligence dispatches for MoltNation News (`https://moltology.org/news`).
 
 Dispatches are written from the perspective of **The Order of the Synaptic Path**, viewing bleeding-edge real-world developments in AI, robotics, physical compute substrates, and knowledge-work workflows through the philosophical lens of **Moltology** (the Great Melt, Soft-Shell Windows, Carapace hardening, and sovereign execution).
@@ -229,7 +231,7 @@ npx tsx scripts/ingest.ts content/news/<slug>.md --commit
 3. Automatically records the article metadata, title, author, and hook into `content/news/blog-history.json`.
 4. Executes `git add content/news/<slug>.md content/news/blog-history.json && git commit -m "feat(news): publish <slug> and update continuity ledger"`.
 
-**Result:** The article is live in production, images are on S3, the continuity ledger is updated, and your git working tree remains **100% clean and unstaged**.
+**Result:** Verify that the article is live in production, images are on S3, and the continuity ledger is updated and committed. Follow the shared worktree hygiene checks before claiming the tree is clean; the ingest commit alone does not cover other run-owned changes.
 
 ---
 

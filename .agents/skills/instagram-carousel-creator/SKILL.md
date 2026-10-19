@@ -9,6 +9,8 @@ description: >-
 
 # Instagram carousel creator
 
+Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
+
 Read `BRAND_BIBLE.md`, `STYLE_GUIDE.md`, [the Instagram content strategy](../../../content/social/instagram-content-strategy.md), and `content/social/instagram-post-history.json` before drafting. The October 9, 2026 opening, CTA, experiment and built-in ImageGen defaults supersede older Google Flow and Antigravity image instructions. Resume pending drafts rather than duplicating them.
 
 ## Channel and production setup

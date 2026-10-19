@@ -24,8 +24,11 @@ The `line-*` and `*-soft` tokens are rgba, so Tailwind's `/50` opacity modifier 
 The Synaptic Path emblem uses `crimson-aggro` (`#ff453a`) in production. The
 approved artwork also keeps reference-red, pure black/white and inherited-color
 exports in [`content/brand/synaptic-path/`](../../content/brand/synaptic-path/README.md).
-Use `BrandIcon` / `BrandWordmark` from `src/components/ui/BrandMark.tsx` for inline
-branding and `HeaderBrand` for the navigation lockup. Their paths inherit color;
+Use `BrandIcon` from `src/components/ui/BrandMark.tsx` for the inline emblem and
+`HeaderBrand` for the navigation lockup: "Moltology" over "The Synaptic Path" as live
+text, the tagline in tracked caps stretched to the title's width (`.brand-lockup` in
+`src/index.css`; it is part of the mark, so it may sit under the 11px floor). The
+outlined word SVGs live only in the downloadable kit. The emblem path inherits color;
 do not apply filters to approximate a different brand color. Use `BrandAwareImage`
 for data-driven avatars and product images: existing emblem PNG/WebP/SVG URLs render
 the current inline vector, while other images retain their source and fallbacks.
@@ -57,6 +60,13 @@ icons or geometry and verifies the original-icon backups.
 - Focus: `outline-2 outline-offset-2 outline-cyan-glow` on buttons and tabs; fields switch to a
   `cyan-glow` border with `shadow-field-focus` (`shadow-field-error` when invalid).
 - Glow is for the main action on hover and for live states only. Resting cards and buttons do not glow.
+
+## Public header nav
+
+The current page is a lit tile (`bg-surface-3 shadow-nav-current`, cyan icon). A faint
+lens slides to whatever is hovered or focused. No underline marks. On phones the same
+tab list becomes a full-height sheet with a one-line hint per page and account actions
+pinned to the bottom.
 
 ## Primitives
 

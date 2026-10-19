@@ -9,6 +9,8 @@ description: >-
 
 # Composite reference library
 
+Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
+
 References come in by the dozen. Each one goes through the same loop: ingest, analyze, recreate as a layout spec, compare, then promote the layouts worth reusing. The library is private working material; the layout specs are what join the system.
 
 ## Where things live

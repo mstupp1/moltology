@@ -9,6 +9,8 @@ description: >-
 
 # Reels and shorts creator
 
+Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
+
 Read BRAND_BIBLE.md, STYLE_GUIDE.md and [the Reels strategy](../../../content/social/reels-strategy.md) before writing. These defaults include the user's October 8 production feedback, October 9 strategy advice and October 15 visual-opening, subtitle and website-CTA feedback. The opening, CTA and experiment rules below supersede older campaign templates.
 
 ## Opening, CTA and experiment rules
@@ -90,7 +92,7 @@ Commit only production files and preserve unrelated changes. Report the preview,
 
 ## Finish with a clean working tree
 
-Record git status at the start of the run. Final queueing uses --commit for the tracked reel ledger. Commit any other intentional run-owned changes with explicit file paths; never blindly stage the entire working tree or include another task's changes. If a run updates the skill or other tracked production metadata, commit those too. A render-only run normally produces only ignored files.
+Record git status at the start of the run. Final queueing uses --commit for the tracked reel ledger only when the staged index and selected files contain solely run-owned changes; otherwise omit it and make the scoped manual commit required by the shared worktree hygiene rules. Commit any other intentional run-owned changes with explicit file paths; never blindly stage the entire working tree or include another task's changes. If a run updates the skill or other tracked production metadata, commit those too. A render-only run normally produces only ignored files.
 
 Keep generated images, video, audio, frame previews, draft JSON, logs and temporary runners under tmp/, which is already ignored. Final videos and metadata are archived by the CLI in Google Drive before direct Zernio upload. Website assets and reusable templates remain on S3. Add narrow .gitignore entries only when a new kind of disposable output genuinely falls outside the existing rules. Do not ignore tracked content/social ledgers or source files to hide changes.
 

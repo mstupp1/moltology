@@ -13,7 +13,7 @@ import {
   ArrowLeft,
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
-import { isEmailVerificationEnabled, isGoogleAuthEnabled } from '@/lib/auth-config'
+import { isEmailVerificationEnabled, isGoogleAuthEnabled, MIN_PASSWORD_LENGTH } from '@/lib/auth-config'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { abandonOAuthPendingIfCallbackError, rememberSessionUser, startGoogleSignIn } from '@/lib/auth-session'
 import { mapOAuthCallbackError } from '@/lib/auth-oauth-errors'
@@ -544,7 +544,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                   label="Password"
                   type="password"
                   required
-                  minLength={6}
+                  minLength={mode === 'signup' ? MIN_PASSWORD_LENGTH : undefined}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"

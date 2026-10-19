@@ -8,6 +8,8 @@ description: >-
 
 # Moltology Codex Sync & Authoring Pipeline
 
+Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
+
 This skill guides the authoring, validation, and automated synchronization of canonical scriptures, doctrine, liturgical rites, ascension stages, and sacred metrics from raw Markdown files in `codex/` into the application's compiled TypeScript data layer (`src/lib/codexData.ts`).
 
 ---

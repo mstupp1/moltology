@@ -78,6 +78,8 @@ export default {
       boxShadow: {
         menu: '0 12px 32px rgba(0, 0, 0, 0.55)',
         'sheen-inset': 'inset 0 1px 0 rgba(255, 255, 255, 0.03)',
+        // Current page in the public header nav: thin cyan edge and a soft glow.
+        'nav-current': 'inset 0 0 0 1px rgba(0, 195, 255, 0.35), 0 0 18px -6px rgba(0, 195, 255, 0.55)',
         'field-focus': '0 0 0 3px rgba(0, 195, 255, 0.18)',
         'field-error': '0 0 0 3px rgba(255, 69, 58, 0.18)',
         'hud-cyan': '0 0 15px rgba(0, 195, 255, 0.4), inset 0 0 10px rgba(0, 195, 255, 0.2)',

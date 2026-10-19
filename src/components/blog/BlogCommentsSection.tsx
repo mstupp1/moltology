@@ -95,6 +95,10 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
       setErrorMessage(`Comment cannot exceed ${MAX_CHAR_LIMIT} characters.`)
       return
     }
+    if (!turnstileToken) {
+      setErrorMessage('Finish the bot check below, then post again.')
+      return
+    }
 
     setIsSubmitting(true)
 

@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 import { createHash } from 'node:crypto'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
 import tailwind from '../tailwind.config.js'
-import { ICON_LAYOUT, brandRevision, makePalettes, parsePart } from './build-brand-assets.mjs'
+import { ICON_LAYOUT, PART_NAMES, brandRevision, makePalettes, parsePart } from './build-brand-assets.mjs'
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url))
 const KIT = path.join(ROOT, 'content/brand/synaptic-path')
@@ -16,8 +16,8 @@ const colors = tailwind.theme.extend.colors
 const palettes = makePalettes(colors)
 const generated = JSON.parse(await read('src/components/ui/brand-geometry.json'))
 const parts = {}
-for (const name of Object.keys(generated.parts)) parts[name] = parsePart(await fs.readFile(path.join(KIT, 'parts', `${name}.svg`), 'utf8'))
-assert.deepEqual(parts, generated.parts, 'SVG parts changed: run npm run brand:build')
+for (const name of PART_NAMES) parts[name] = parsePart(await fs.readFile(path.join(KIT, 'parts', `${name}.svg`), 'utf8'))
+assert.deepEqual({ icon: parts.icon }, generated.parts, 'SVG parts changed: run npm run brand:build')
 assert.deepEqual(JSON.parse(await fs.readFile(path.join(KIT, 'palettes.json'), 'utf8')), palettes, 'HUD colors changed: run npm run brand:build')
 const version = brandRevision(parts, palettes, colors)
 assert.equal(generated.version, version)

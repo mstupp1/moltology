@@ -72,6 +72,7 @@ import { Route as HudForumIndexRouteImport } from './routes/_hud/forum/index'
 import { Route as HudLecturesIndexRouteImport } from './routes/_hud/lectures/index'
 import { Route as HudMemberProfileIdRouteImport } from './routes/_hud/member/$profileId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiEmailConfirmRouteImport } from './routes/api/email/confirm'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
 import { Route as HudForumCategorySlugIndexRouteImport } from './routes/_hud/forum/$categorySlug/index'
 import { Route as HudForumCategorySlugTopicSlugRouteImport } from './routes/_hud/forum/$categorySlug/$topicSlug'
@@ -399,6 +400,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiEmailConfirmRoute = ApiEmailConfirmRouteImport.update({
+  id: '/api/email/confirm',
+  path: '/api/email/confirm',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
   id: '/api/stripe/webhook',
   path: '/api/stripe/webhook',
@@ -510,6 +516,7 @@ export interface FileRoutesByFullPath {
   '/codex/$slug': typeof HudCodexSlugRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/email/confirm': typeof ApiEmailConfirmRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/admin/': typeof HudAdminIndexRoute
   '/codex/': typeof HudCodexIndexRoute
@@ -581,6 +588,7 @@ export interface FileRoutesByTo {
   '/codex/$slug': typeof HudCodexSlugRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/email/confirm': typeof ApiEmailConfirmRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/admin': typeof HudAdminIndexRoute
   '/codex': typeof HudCodexIndexRoute
@@ -655,6 +663,7 @@ export interface FileRoutesById {
   '/_hud/codex/$slug': typeof HudCodexSlugRoute
   '/_hud/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/email/confirm': typeof ApiEmailConfirmRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/_hud/admin/': typeof HudAdminIndexRoute
   '/_hud/codex/': typeof HudCodexIndexRoute
@@ -730,6 +739,7 @@ export interface FileRouteTypes {
     | '/codex/$slug'
     | '/member/$profileId'
     | '/api/auth/$'
+    | '/api/email/confirm'
     | '/api/stripe/webhook'
     | '/admin/'
     | '/codex/'
@@ -801,6 +811,7 @@ export interface FileRouteTypes {
     | '/codex/$slug'
     | '/member/$profileId'
     | '/api/auth/$'
+    | '/api/email/confirm'
     | '/api/stripe/webhook'
     | '/admin'
     | '/codex'
@@ -874,6 +885,7 @@ export interface FileRouteTypes {
     | '/_hud/codex/$slug'
     | '/_hud/member/$profileId'
     | '/api/auth/$'
+    | '/api/email/confirm'
     | '/api/stripe/webhook'
     | '/_hud/admin/'
     | '/_hud/codex/'
@@ -925,6 +937,7 @@ export interface RootRouteChildren {
   ChangelogIndexRoute: typeof ChangelogIndexRoute
   NewsIndexRoute: typeof NewsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiEmailConfirmRoute: typeof ApiEmailConfirmRoute
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
 }
 
@@ -1371,6 +1384,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/email/confirm': {
+      id: '/api/email/confirm'
+      path: '/api/email/confirm'
+      fullPath: '/api/email/confirm'
+      preLoaderRoute: typeof ApiEmailConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/stripe/webhook': {
       id: '/api/stripe/webhook'
       path: '/api/stripe/webhook'
@@ -1586,6 +1606,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChangelogIndexRoute: ChangelogIndexRoute,
   NewsIndexRoute: NewsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiEmailConfirmRoute: ApiEmailConfirmRoute,
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport

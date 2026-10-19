@@ -60,6 +60,8 @@ One toast system, one persistent notification system, one OS bridge. Never `aler
 
 ## Social, video, and blog images
 
+Every content pipeline, including supporting asset and research skills, must follow [content worktree hygiene](docs/content-worktree-hygiene.md). Record the starting Git state, commit all intentional run-owned changes (including ledgers and skill updates), and verify final status before returning. A clean start must finish clean; preserve and report unrelated existing or concurrent work. Apply this to chained skills, drafts, and partial failures too.
+
 All content skills read the [shared annual content calendar](content/annual-content-calendar.md) before choosing topics, copy or artwork. Use the intended publication date and channel timezone; let seasonal/holiday influence grow as the date approaches and expire afterward. The calendar guides editorial treatment, while news and release claims remain grounded in actual sources and shipped work. Supporting asset skills inherit the campaign brief without changing canonical identities or factual screenshots.
 
 Use the matching skill: [`instagram-post-creator`](.agents/skills/instagram-post-creator/SKILL.md), [`instagram-carousel-creator`](.agents/skills/instagram-carousel-creator/SKILL.md), [`reels-and-shorts-creator`](.agents/skills/reels-and-shorts-creator/SKILL.md), [`viral-reel-series-creator`](.agents/skills/viral-reel-series-creator/SKILL.md), [`blog-creator`](.agents/skills/blog-creator/SKILL.md), or [`youtube-research`](.agents/skills/youtube-research/SKILL.md) (long-form YouTube topic validation). Queueing and publishing go through the repo CLI scripts only, never Zernio MCP tools.

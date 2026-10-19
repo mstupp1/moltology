@@ -6,6 +6,8 @@ description: >-
 
 # Avatar kit art
 
+Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
+
 The member avatar is drawn from painted layers stacked in code (`src/lib/avatar/kit/`). Your job is the pictures. The repo tools align, recolour, cut out, trim, and upload them. Claude ingests the batch and wires it in.
 
 Use the **imagegen** skill and the built-in `image_gen` tool with `transparent_background: true`. Pass references with `referenced_image_paths`. Follow the house style in `.agents/skills/character-creator/SKILL.md` (finished animated-feature 3D, soft satin chitin, eyes seated in the face, no eyestalks, two pincer arms, six walking legs, three per side).

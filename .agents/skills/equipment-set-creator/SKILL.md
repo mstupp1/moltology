@@ -6,6 +6,8 @@ description: >-
 
 # Moltology Equipment Set Creator Pipeline
 
+Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
+
 This skill guides the design, visual generation, asset optimization, and codebase registration of **cohesive, themed equipment sets** for the Moltology Chassis Configurator (`/chassis`) and Equipment Vault.
 
 ---

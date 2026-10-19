@@ -86,6 +86,35 @@
   clip-path: polygon(0 0, calc(100% - var(--hud-cut, 10px)) 0, 100% var(--hud-cut, 10px), 100% 100%, 0 100%);
 }
 
+/* Logo lockup: title over a tracked tagline stretched to the title's width (HeaderBrand).
+   Sizes are in em of the title so the pair scales together. The tagline is part of the mark,
+   so it sits below the 11px text floor on purpose. */
+.brand-lockup {
+  display: inline-grid;
+  justify-items: stretch;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.brand-lockup-caption {
+  margin-top: 0.3em;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.4em;
+  font-weight: 600;
+  line-height: 1;
+  transition: color 300ms;
+}
+
+.brand-lockup-letters {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.08em;
+}
+
+.brand-lockup-gap {
+  width: 0.3em;
+}
+
 /* Sleek HUD buttons and panels with standard continuous borders (No diagonal cut corners) */
 .chamfer-corner {
   clip-path: none !important;

@@ -261,6 +261,21 @@ export const OrgPage: React.FC = () => {
   const contactTurnstileRef = React.useRef<TurnstileWidgetRef>(null)
   const [isContactSubmitting, setIsContactSubmitting] = useState(false)
   const [contactSentTo, setContactSentTo] = useState<string | null>(null)
+  const [contactOptInPending, setContactOptInPending] = useState(false)
+
+  // Result of the news-email confirmation link (/api/email/confirm redirects here).
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    const status = params.get('email')
+    if (!status) return
+    if (status === 'confirmed') toast.success(CONTACT_COPY.emailConfirmed, { id: 'org-email-confirm' })
+    else if (status === 'expired') toast.warning(CONTACT_COPY.emailConfirmExpired, { id: 'org-email-confirm' })
+    else toast.error(CONTACT_COPY.emailConfirmError, { id: 'org-email-confirm' })
+    params.delete('email')
+    const query = params.toString()
+    window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`)
+  }, [])
 
   // Sync hash/URL query on initial client load
   useEffect(() => {
@@ -320,6 +335,7 @@ export const OrgPage: React.FC = () => {
     setIsContactSubmitting(false)
     setContactTurnstileToken(null)
     setContactSentTo(validated.email)
+    setContactOptInPending(contactForm.emailOptIn)
     setContactForm(EMPTY_CONTACT_FORM)
     toast.success(CONTACT_COPY.toastSent, { id: 'org-contact' })
   }
@@ -987,6 +1003,9 @@ export const OrgPage: React.FC = () => {
                     <p className="text-xs text-slate-600 max-w-md mx-auto">
                       Thanks for reaching out. We'll reply to {contactSentTo} as soon as we can.
                     </p>
+                    {contactOptInPending && (
+                      <p className="text-xs text-slate-600 max-w-md mx-auto">{CONTACT_COPY.optInPending}</p>
+                    )}
                     <button
                       type="button"
                       onClick={() => setContactSentTo(null)}

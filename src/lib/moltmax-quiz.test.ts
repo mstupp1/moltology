@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { computeMoltmaxResult, MOLTMAX_QUESTIONS, type QuizAnswers } from './moltmax-quiz'
+import { computeMoltmaxResult, moltmaxLabelsForScore, MOLTMAX_QUESTIONS, type QuizAnswers } from './moltmax-quiz'
 
 const answersFor = (highest: boolean): QuizAnswers => Object.fromEntries(
   MOLTMAX_QUESTIONS.map((question) => {
@@ -50,5 +50,12 @@ describe('moltmax quiz rubric', () => {
     const result = computeMoltmaxResult({})
     expect(result.score).toBe(12)
     expect(result.biometrics.submergenceDepth).toBe(1000)
+  })
+})
+
+describe('moltmaxLabelsForScore', () => {
+  it('derives the same labels the quiz shows', () => {
+    expect(moltmaxLabelsForScore(95)).toEqual({ clearance: 'C-2', stage: 'STAGE IV · FULL CARCINIZATION' })
+    expect(moltmaxLabelsForScore(12)).toEqual({ clearance: 'L-1', stage: 'STAGE I · LARVAL INITIATE' })
   })
 })

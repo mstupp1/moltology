@@ -1,5 +1,6 @@
 import React from 'react'
-import { Shield, Terminal, Copy, Check } from 'lucide-react'
+import { Terminal, Copy, Check } from 'lucide-react'
+import { NewsArticleFigure } from './NewsArticleFigure'
 import { getAssetUrl } from '@/lib/assets'
 
 export interface NewsArticleBodyProps {
@@ -123,7 +124,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
         const singleImageMatch = text.match(/^!\[([^\]]*)\]\(([^)]+)\)$/)
         if (singleImageMatch) {
           elements.push(
-            <RenderFigure
+            <NewsArticleFigure
               key={key}
               alt={singleImageMatch[1] || 'MoltNation Visual Telemetry'}
               src={singleImageMatch[2].trim()}
@@ -272,13 +273,26 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     const imageMatch = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/)
     if (imageMatch) {
       flushAll(lineKey)
+      // An emphasized paragraph directly after an image is its authored caption.
+      // Keep it inside the figure instead of showing a second description below it.
+      let captionStart = i + 1
+      while (captionStart < lines.length && !lines[captionStart].trim()) captionStart++
+      let captionEnd = captionStart
+      while (captionEnd < lines.length && lines[captionEnd].trim()) captionEnd++
+      const captionText = lines.slice(captionStart, captionEnd).map((line) => line.trim()).join(' ')
+      const captionMatch = captionText.match(/^\*(?!\*)(.+)\*$/) || captionText.match(/^_(?!_)(.+)_$/)
+      const caption = captionMatch ? (
+        <span dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(captionMatch[1]) }} />
+      ) : undefined
       elements.push(
-        <RenderFigure
+        <NewsArticleFigure
           key={lineKey}
           alt={imageMatch[1] || 'MoltNation Visual Telemetry'}
           src={imageMatch[2].trim()}
+          caption={caption}
         />
       )
+      if (captionMatch) i = captionEnd - 1
       continue
     }
 
@@ -381,39 +395,6 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
   return <React.Fragment>{elements}</React.Fragment>
 }
 
-function RenderFigure({ alt, src }: { alt: string; src: string }) {
-  const resolvedSrc = getAssetUrl(src)
-  const [hasError, setHasError] = React.useState(false)
-
-  return (
-    <figure className="my-6 sm:my-8 border border-line-subtle bg-surface-1 rounded-card overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
-      <div className="relative overflow-hidden group min-h-[140px] flex items-center justify-center bg-surface-1">
-        {hasError ? (
-          <div className="p-6 text-center text-xs text-ink-muted font-sans flex flex-col items-center gap-2">
-            <Shield className="w-6 h-6 text-ink-muted" />
-            <span className="uppercase tracking-[0.08em] text-[11px] font-bold">VISUAL TELEMETRY ARCHIVED</span>
-            <span className="text-[11px] text-ink-muted">{alt}</span>
-          </div>
-        ) : (
-          <img
-            src={resolvedSrc}
-            alt={alt}
-            onError={() => setHasError(true)}
-            className="w-full max-h-[280px] sm:max-h-[420px] md:max-h-[500px] object-cover transition-transform duration-700 group-hover:scale-[1.02]"
-            loading="lazy"
-          />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-surface-1 via-transparent to-transparent opacity-30 pointer-events-none" />
-      </div>
-      {alt && (
-        <figcaption className="px-3 sm:px-4 py-2.5 sm:py-3 bg-surface-2 border-t border-line-subtle flex items-center min-w-0 text-xs font-sans text-ink-muted">
-          <span className="font-semibold text-ink truncate">{alt}</span>
-        </figcaption>
-      )}
-    </figure>
-  )
-}
-
 function cleanLatexMath(math: string): string {
   return math
     .replace(/\\mathbf\{([^}]+)\}/g, '<strong>$1</strong>')
@@ -429,12 +410,29 @@ function cleanLatexMath(math: string): string {
     .replace(/\^([a-zA-Z0-9])/g, '<sup>$1</sup>')
 }
 
-function formatInlineMarkdown(text: string): string {
+/** http(s), mailto and site-relative URLs only; anything else (javascript:, data:) renders as text. */
+export function safeInlineUrl(raw: string): string | null {
+  const url = raw.trim()
+  if (!url) return null
+  if (url.startsWith('/') && !url.startsWith('//')) return url
+  if (url.startsWith('#')) return url
+  if (/^(https?:|mailto:)/i.test(url)) return url
+  // Bare bucket keys such as images/foo.jpg resolve through getAssetUrl.
+  if (/^[a-z0-9][\w./-]*$/i.test(url) && !url.includes(':')) return url
+  return null
+}
+
+function escapeAttr(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+export function formatInlineMarkdown(text: string): string {
   // First escape angle brackets and ampersands so raw symbols like <15ms or >100 are preserved
   let formatted = text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
 
   // Handle standalone block math $$...$$
   formatted = formatted.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
@@ -450,8 +448,10 @@ function formatInlineMarkdown(text: string): string {
 
   // Handle inline markdown images if any in paragraph: ![alt](url)
   formatted = formatted.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, src) => {
-    const resolvedUrl = getAssetUrl(src.trim())
-    return `<img src="${resolvedUrl}" alt="${alt}" class="rounded-card border border-line-subtle my-4 max-h-[300px] sm:max-h-[400px] w-full object-cover" />`
+    const safeSrc = safeInlineUrl(src.trim().replace(/&amp;/g, '&'))
+    if (!safeSrc) return alt
+    const resolvedUrl = escapeAttr(getAssetUrl(safeSrc))
+    return `<img src="${resolvedUrl}" alt="${alt}" class="rounded-card border border-line-subtle my-4 h-auto w-full" />`
   })
 
   // Bold: **text**
@@ -464,7 +464,11 @@ function formatInlineMarkdown(text: string): string {
   formatted = formatted.replace(/`([^`]+)`/g, '<code class="bg-surface-2 border border-line text-cyan-glow px-1.5 py-0.5 font-sans text-[11px] sm:text-xs rounded-chip break-all">$1</code>')
 
   // Links: [label](url)
-  formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-cyan-glow hover:text-cyan-hover underline underline-offset-2 transition-colors font-sans font-bold break-words">$1</a>')
+  formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label: string, href: string) => {
+    const safeHref = safeInlineUrl(href.trim().replace(/&amp;/g, '&'))
+    if (!safeHref) return label
+    return `<a href="${escapeAttr(safeHref)}" target="_blank" rel="noopener noreferrer" class="text-cyan-glow hover:text-cyan-hover underline underline-offset-2 transition-colors font-sans font-bold break-words">${label}</a>`
+  })
 
   return formatted
 }

@@ -10,6 +10,8 @@ description: >-
 
 # YouTube research
 
+Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
+
 No long-form video gets scripted unless it maps to a validated outlier pattern. Read the [shared annual content calendar](../../../content/annual-content-calendar.md) for the intended publish date first.
 
 ## Angle
