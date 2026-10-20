@@ -19,7 +19,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
   const tokens = marked.lexer(content, { gfm: true, breaks: true })
 
   return (
-    <div className={`space-y-3.5 text-xs sm:text-[13px] leading-[1.75] text-[#dfe3e3] font-sans ${className}`}>
+    <div className={`space-y-3.5 text-sm leading-[1.75] text-ink-body font-sans ${className}`}>
       <RenderTokens tokens={tokens} keyPrefix="root" />
     </div>
   )
@@ -111,7 +111,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
               return (
                 <h3
                   key={key}
-                  className="text-xs sm:text-[13px] font-semibold text-cyan-300 tracking-wide mt-3 mb-1.5 font-grotesk first:mt-0"
+                  className="text-sm font-semibold text-cyan-300 tracking-wide mt-3 mb-1.5 font-grotesk first:mt-0"
                 >
                   {inner}
                 </h3>
@@ -130,7 +130,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
           case 'paragraph': {
             const paragraphToken = token as Tokens.Paragraph
             return (
-              <p key={key} className="my-2 sm:my-2.5 leading-[1.75] text-[#dfe3e3] first:mt-0 last:mb-0">
+              <p key={key} className="my-2 sm:my-2.5 leading-[1.75] text-ink-body first:mt-0 last:mb-0">
                 <RenderTokens tokens={paragraphToken.tokens} keyPrefix={`${key}-p`} />
               </p>
             )
@@ -143,7 +143,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
                 key={key}
                 className="my-3.5 sm:my-4 overflow-x-auto rounded border border-cyan-900/60 bg-[#060a0d]/80 shadow-md"
               >
-                <table className="w-full text-left text-xs sm:text-[13px] border-collapse min-w-full">
+                <table className="w-full text-left text-sm border-collapse min-w-full">
                   <thead>
                     <tr className="border-b border-cyan-800/60 bg-cyan-950/40">
                       {tableToken.header.map((col, hIdx) => (
@@ -174,7 +174,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
                         {row.map((cell, cIdx) => (
                           <td
                             key={cIdx}
-                            className={`px-3.5 py-2.5 text-[#dfe3e3] text-xs sm:text-[13px] leading-relaxed ${
+                            className={`px-3.5 py-2.5 text-ink-body text-sm leading-relaxed ${
                               cell.align === 'center'
                                 ? 'text-center'
                                 : cell.align === 'right'
@@ -202,7 +202,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
             return (
               <ListTag
                 key={key}
-                className={`my-2.5 sm:my-3 space-y-1.5 pl-5 sm:pl-6 text-xs sm:text-[13px] text-[#dfe3e3] ${
+                className={`my-2.5 sm:my-3 space-y-1.5 pl-5 sm:pl-6 text-sm text-ink-body ${
                   listToken.ordered ? 'list-decimal' : 'list-disc'
                 }`}
                 start={typeof listToken.start === 'number' && listToken.start !== 1 ? listToken.start : undefined}
@@ -230,7 +230,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
             return (
               <blockquote
                 key={key}
-                className="border-l-2 border-cyan-500/70 pl-3.5 sm:pl-4 py-2 sm:py-2.5 my-3 sm:my-3.5 bg-cyan-950/25 text-cyan-200/90 text-xs sm:text-[13px] italic rounded-r leading-[1.75]"
+                className="border-l-2 border-cyan-500/70 pl-3.5 sm:pl-4 py-2 sm:py-2.5 my-3 sm:my-3.5 bg-cyan-950/25 text-cyan-200/90 text-sm italic rounded-r leading-[1.75]"
               >
                 <RenderTokens tokens={blockquoteToken.tokens} keyPrefix={`${key}-bq`} />
               </blockquote>

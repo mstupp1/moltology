@@ -88,8 +88,8 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
       data-density={density}
       className={`group relative w-full flex items-center text-xs transition-all rounded-control overflow-hidden select-none ${
         isActive
-          ? 'bg-surface-2 text-ink before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[2px] before:bg-cyan-glow'
-          : 'bg-surface-1/50 hover:bg-surface-2 text-ink-muted hover:text-ink-body'
+          ? 'bg-surface-3 shadow-nav-current text-ink'
+          : 'hover:bg-surface-2 text-ink-body hover:text-ink'
       }`}
       style={{ WebkitTapHighlightColor: 'transparent' }}
     >
@@ -103,6 +103,7 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
           onKeyDown={(e) => {
             if (e.key === 'Enter') commitRename()
             if (e.key === 'Escape') {
+              e.stopPropagation()
               committedRef.current = true
               onRenameCancel()
             }
@@ -117,6 +118,7 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
             type="button"
             onClick={onSelect}
             title={thread.title}
+            aria-current={isActive ? 'true' : undefined}
             className={`flex-1 min-w-0 text-left bg-transparent border-none outline-none cursor-pointer select-none focus:outline-none focus:ring-0 active:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
               isComfortable ? 'px-3 py-3' : 'px-2 py-1.5'
             }`}

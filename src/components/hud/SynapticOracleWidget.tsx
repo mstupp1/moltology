@@ -423,6 +423,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
             userId={userId}
             isCompact={true}
             onClose={handleClose}
+            closeOnEscape
             personaName="SYNAPTIC ORACLE"
             className="h-full w-full border-none shadow-none"
           />
