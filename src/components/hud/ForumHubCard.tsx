@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { ChevronRight, Clock, MessageSquare } from 'lucide-react'
+import { Clock, MessageSquare } from 'lucide-react'
 import {
   getForumCategoriesFn,
   getForumTopicsFn,
@@ -15,10 +15,11 @@ import { getAuthJWTToken } from '@/lib/jwt'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { ForumUnreadMark, PinBadge } from '@/components/forum/ForumBits'
+import { DashboardEmptyRow, DashboardPanel } from '@/components/hud/dashboard/DashboardPanel'
 
 export const FORUM_HUB_TITLE = 'COMMUNITY'
 export const FORUM_HUB_SUBTITLE = 'Live boards and the latest transmissions.'
-export const FORUM_HUB_CTA = 'ENTER COMMUNITY'
+export const FORUM_HUB_CTA = 'Open boards'
 export const FORUM_HUB_EMPTY_COPY = {
   title: 'The boards are quiet',
   body: 'No threads yet. Open Community to start one.',
@@ -188,93 +189,65 @@ export function ForumHubCard() {
   const pulse = toForumHubPulse(boards)
 
   return (
-    <div
-      className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5 space-y-3.5 sm:space-y-4 h-full flex flex-col justify-between"
+    <DashboardPanel
+      icon={<MessageSquare />}
+      title={FORUM_HUB_TITLE}
+      subtitle={FORUM_HUB_SUBTITLE}
+      meta={pulse.unreadCount > 0 ? <ForumUnreadMark label={formatForumUnreadCount(pulse.unreadCount)} /> : null}
+      action={{ label: FORUM_HUB_CTA, onClick: () => navigate({ to: '/forum' }) }}
+      className="h-full"
       data-testid="forum-hub-card"
     >
-      <div className="space-y-3">
-        <div className="flex items-start justify-between gap-3 border-b border-line-subtle pb-3">
-          <div>
-            <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-cyan-glow" />
-              {FORUM_HUB_TITLE}
-            </h2>
-            <p className="text-xs text-ink-muted mt-0.5">{FORUM_HUB_SUBTITLE}</p>
-          </div>
-          {pulse.unreadCount > 0 && (
-            <ForumUnreadMark label={formatForumUnreadCount(pulse.unreadCount)} />
+      <HudGhostWidget isLoading={isLoading} skeleton={<ForumHubListGhost />}>
+        <div className="space-y-2.5">
+          {boards.length > 0 && (
+            <div className="flex flex-wrap gap-1.5" data-testid="forum-hub-pulse">
+              <PulseChip label="Boards" count={pulse.boardCount} />
+              <PulseChip label="Topics" count={pulse.topicCount} />
+              {pulse.unreadCount > 0 && <PulseChip label="New" count={pulse.unreadCount} />}
+            </div>
+          )}
+          {boards.length > 0 && (
+            <div
+              className="flex items-center gap-1.5 overflow-x-auto pb-0.5"
+              data-testid="forum-hub-boards"
+            >
+              {boards.map((board) => (
+                <Link
+                  key={board.id}
+                  to="/forum/$categorySlug"
+                  params={{ categorySlug: board.slug }}
+                  className="inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] rounded-control border shrink-0 bg-surface-1 hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                  style={{
+                    borderColor: `${board.color}80`,
+                    color: board.color,
+                  }}
+                >
+                  <span className="truncate max-w-[9.5rem]">{board.name}</span>
+                  <span className="tabular-nums text-ink">{board.topicCount}</span>
+                  {board.unreadCount > 0 && (
+                    <span
+                      className="w-1.5 h-1.5 rounded-full bg-cyan-glow"
+                      aria-label={formatForumUnreadCount(board.unreadCount)}
+                    />
+                  )}
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {threads.length === 0 ? (
+            <DashboardEmptyRow title={FORUM_HUB_EMPTY_COPY.title} body={FORUM_HUB_EMPTY_COPY.body} />
+          ) : (
+            <div className="space-y-2 font-sans">
+              {threads.map((thread) => (
+                <HubThreadRow key={thread.id} thread={thread} />
+              ))}
+            </div>
           )}
         </div>
-
-        <HudGhostWidget isLoading={isLoading} skeleton={<ForumHubListGhost />}>
-          <div className="space-y-2.5">
-            {boards.length > 0 && (
-              <div className="flex flex-wrap gap-1.5" data-testid="forum-hub-pulse">
-                <PulseChip label="Boards" count={pulse.boardCount} />
-                <PulseChip label="Topics" count={pulse.topicCount} />
-                {pulse.unreadCount > 0 && <PulseChip label="New" count={pulse.unreadCount} />}
-              </div>
-            )}
-
-            {boards.length > 0 && (
-              <div
-                className="flex items-center gap-1.5 overflow-x-auto pb-0.5"
-                data-testid="forum-hub-boards"
-              >
-                {boards.map((board) => (
-                  <Link
-                    key={board.id}
-                    to="/forum/$categorySlug"
-                    params={{ categorySlug: board.slug }}
-                    className="inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] rounded-control border shrink-0 bg-surface-1 hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-                    style={{
-                      borderColor: `${board.color}80`,
-                      color: board.color,
-                    }}
-                  >
-                    <span className="truncate max-w-[9.5rem]">{board.name}</span>
-                    <span className="tabular-nums text-ink">{board.topicCount}</span>
-                    {board.unreadCount > 0 && (
-                      <span
-                        className="w-1.5 h-1.5 rounded-full bg-cyan-glow"
-                        aria-label={formatForumUnreadCount(board.unreadCount)}
-                      />
-                    )}
-                  </Link>
-                ))}
-              </div>
-            )}
-
-            {threads.length === 0 ? (
-              <div className="p-6 text-center space-y-1.5">
-                <p className="font-grotesk text-xs font-bold text-ink tracking-[0.08em] uppercase">
-                  {FORUM_HUB_EMPTY_COPY.title}
-                </p>
-                <p className="text-xs text-ink-muted leading-relaxed">{FORUM_HUB_EMPTY_COPY.body}</p>
-              </div>
-            ) : (
-              <div className="space-y-2 font-sans">
-                {threads.map((thread) => (
-                  <HubThreadRow key={thread.id} thread={thread} />
-                ))}
-              </div>
-            )}
-          </div>
-        </HudGhostWidget>
-      </div>
-
-      <div className="pt-2 border-t border-line-subtle flex items-center justify-between text-xs">
-        <span className="text-ink-muted text-[11px] tracking-[0.08em]">OPEN THE BOARDS</span>
-        <button
-          type="button"
-          onClick={() => navigate({ to: '/forum' })}
-          className="px-3 py-1.5 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong text-[11px] font-bold tracking-[0.08em] flex items-center gap-1 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-        >
-          <span>{FORUM_HUB_CTA}</span>
-          <ChevronRight className="w-3 h-3" />
-        </button>
-      </div>
-    </div>
+      </HudGhostWidget>
+    </DashboardPanel>
   )
 }
 
@@ -344,7 +317,7 @@ function HubThreadRow({ thread }: { thread: ForumHubThreadView }) {
             params={{ categorySlug: thread.categorySlug, topicSlug: thread.slug }}
             className="block space-y-0.5"
           >
-            <h3 className="font-grotesk text-xs font-bold text-ink group-hover:text-cyan-glow transition-colors uppercase line-clamp-1 leading-snug">
+            <h3 className="text-sm font-bold text-ink group-hover:text-cyan-glow transition-colors line-clamp-1 leading-snug">
               {thread.title}
             </h3>
             {thread.preview ? (

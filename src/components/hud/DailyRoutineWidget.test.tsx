@@ -110,9 +110,9 @@ describe('DailyRoutineWidget Component', () => {
   it('renders compact chrome with title, 8 canonical tasks, and streak matrix', () => {
     renderWidget()
 
-    expect(screen.getByText('DAILY ALIGNMENT ROUTINE')).toBeInTheDocument()
-    expect(screen.getByText('MANDATORY LITURGY')).toBeInTheDocument()
-    expect(screen.getByText('STREAK MATRIX')).toBeInTheDocument()
+    expect(screen.getByText('DAILY ALIGNMENT')).toBeInTheDocument()
+    expect(screen.queryByText('MANDATORY LITURGY')).not.toBeInTheDocument()
+    expect(screen.getByText('LAST 7 DAYS')).toBeInTheDocument()
     expect(screen.getByText('Activity')).toBeInTheDocument()
     expect(screen.getByText('SCHEDULE (0/8)')).toBeInTheDocument()
 

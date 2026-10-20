@@ -2,26 +2,20 @@ import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
 import React from 'react'
 import {
-  LaunchpadCarouselGhost,
   DailyRoutineGhost,
-  DashboardNewsGhost,
+  DashboardGhost,
   ActivityFeedGhost,
   HudWorkspaceGhost,
 } from './HudGhostSkeletons'
 
 describe('HudGhostSkeletons Composite Views', () => {
-  it('renders LaunchpadCarouselGhost without crashing', () => {
-    const { container } = render(<LaunchpadCarouselGhost />)
-    expect(container.firstChild).toBeInTheDocument()
-  })
-
   it('renders DailyRoutineGhost without crashing', () => {
     const { container } = render(<DailyRoutineGhost />)
     expect(container.firstChild).toBeInTheDocument()
   })
 
-  it('renders DashboardNewsGhost without crashing', () => {
-    const { container } = render(<DashboardNewsGhost />)
+  it('renders DashboardGhost without crashing', () => {
+    const { container } = render(<DashboardGhost />)
     expect(container.firstChild).toBeInTheDocument()
   })
 

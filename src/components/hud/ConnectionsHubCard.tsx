@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { ChevronRight, Loader2, Search, Users } from 'lucide-react'
+import { Loader2, Search, Users } from 'lucide-react'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { listConnectionsFn } from '@/lib/server/api'
@@ -17,6 +17,7 @@ import {
 } from '@/lib/connections'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
+import { DashboardEmptyRow, DashboardPanel } from '@/components/hud/dashboard/DashboardPanel'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import { MemberSearchRow } from '@/components/hud/connections/MemberSearchRow'
 import { FriendRequestButton } from '@/components/hud/member/FriendRequestButton'
@@ -26,7 +27,7 @@ import { relativeTime } from '@/lib/forum-utils'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 
 export const CONNECTIONS_HUB_TITLE = 'CONNECTIONS'
-export const CONNECTIONS_HUB_SUBTITLE = 'Find members, answer requests, and keep your circle close.'
+export const CONNECTIONS_HUB_SUBTITLE = 'Find members and keep your circle close.'
 export const CONNECTIONS_HUB_EMPTY_COPY = {
   title: 'The circle is quiet',
   body: 'Search a designation to send a request.',
@@ -178,124 +179,88 @@ export function ConnectionsHubCard() {
   }
 
   return (
-    <div
-      className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5 space-y-3.5 sm:space-y-4 h-full flex flex-col justify-between"
+    <DashboardPanel
+      icon={<Users />}
+      title={CONNECTIONS_HUB_TITLE}
+      subtitle={CONNECTIONS_HUB_SUBTITLE}
+      meta={<HubAvatarStack members={circle} overflow={Math.max(0, friendCount - circle.length)} />}
+      action={{ label: incomingCount > 0 ? 'Open incoming' : 'Open connections', onClick: () => openConnections() }}
+      className="h-full"
       data-testid="connections-hub-card"
     >
-      <div className="space-y-3">
-        <div className="flex items-start justify-between gap-3 border-b border-line-subtle pb-3">
-          <div className="min-w-0">
-            <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
-              <Users className="w-4 h-4 text-cyan-glow shrink-0" />
-              {CONNECTIONS_HUB_TITLE}
-              {incomingCount > 0 && (
-                <button
-                  type="button"
-                  onClick={() => openConnections('incoming')}
-                  className="text-[11px] font-sans font-bold text-cyan-glow bg-cyan-soft border border-cyan-glow/40 px-1.5 py-0.5 rounded-chip tracking-[0.08em] hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-                >
-                  {incomingCount} INCOMING
-                </button>
-              )}
-            </h2>
-            <p className="text-xs text-ink-muted mt-0.5">{CONNECTIONS_HUB_SUBTITLE}</p>
-          </div>
-          <HubAvatarStack members={circle} overflow={Math.max(0, friendCount - circle.length)} />
-        </div>
-
-        <HudGhostWidget isLoading={isLoading} skeleton={<ConnectionsHubListGhost />}>
-          <div className="space-y-2.5">
-            {canSearch && (
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-muted" />
-                <input
-                  type="search"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={CONNECTIONS_HUB_SEARCH_PLACEHOLDER}
-                  aria-label="Search members"
-                  className="w-full pl-8 pr-8 py-2 bg-surface-2 border border-line text-xs text-ink placeholder:text-ink-muted/70 hover:border-line-hover focus:outline-none focus:border-cyan-glow focus:shadow-field-focus transition-[border-color,box-shadow] rounded-control"
-                />
-                {searching && (
-                  <Loader2 className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-cyan-glow animate-spin" />
-                )}
-              </div>
-            )}
-
-            <div className="flex flex-wrap gap-1.5">
-              <CountChip label="Friends" count={friendCount} onOpen={() => openConnections('friends')} />
-              <CountChip
-                label="Incoming"
-                count={incomingCount}
-                accent
-                onOpen={() => openConnections('incoming')}
+      <HudGhostWidget isLoading={isLoading} skeleton={<ConnectionsHubListGhost />}>
+        <div className="space-y-2.5">
+          {canSearch && (
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-muted" />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={CONNECTIONS_HUB_SEARCH_PLACEHOLDER}
+                aria-label="Search members"
+                className="w-full pl-8 pr-8 py-2 bg-surface-2 border border-line text-xs text-ink placeholder:text-ink-muted/70 hover:border-line-hover focus:outline-none focus:border-cyan-glow focus:shadow-field-focus transition-[border-color,box-shadow] rounded-control"
               />
-              <CountChip label="Sent" count={sentCount} onOpen={() => openConnections('sent')} />
+              {searching && (
+                <Loader2 className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-cyan-glow animate-spin" />
+              )}
             </div>
+          )}
 
-            {showSearchResults && searchResults.length > 0 && (
-              <ul className="space-y-2 font-sans">
-                {searchResults.map((member) => {
-                  const { relationship, pendingRequestId } = relationshipForMember(connections, member.id)
-                  return (
-                    <MemberSearchRow
-                      key={member.id}
-                      member={member}
-                      relationship={relationship}
-                      pendingRequestId={pendingRequestId}
-                      compact
-                      allowRemove={false}
-                      onRelationshipChange={() => void refreshConnections()}
-                    />
-                  )
-                })}
-              </ul>
-            )}
+          <div className="flex flex-wrap gap-1.5">
+            <CountChip label="Friends" count={friendCount} onOpen={() => openConnections('friends')} />
+            <CountChip
+              label="Incoming"
+              count={incomingCount}
+              accent
+              onOpen={() => openConnections('incoming')}
+            />
+            <CountChip label="Sent" count={sentCount} onOpen={() => openConnections('sent')} />
+          </div>
 
-            {showSearchResults && !searching && searchResults.length === 0 && (
-              <p className="text-xs text-ink-muted text-center py-3">
-                The trench stayed quiet. No designation, larva unit, or name surfaced for that call.
-              </p>
-            )}
-
-            {showPreview && preview.length === 0 && (
-              <div className="p-6 text-center space-y-1.5">
-                <p className="font-grotesk text-xs font-bold text-ink tracking-[0.08em] uppercase">
-                  {CONNECTIONS_HUB_EMPTY_COPY.title}
-                </p>
-                <p className="text-xs text-ink-muted leading-relaxed">{CONNECTIONS_HUB_EMPTY_COPY.body}</p>
-              </div>
-            )}
-
-            {showPreview && preview.length > 0 && (
-              <ul className="space-y-2 font-sans">
-                {preview.map((member) => (
-                  <HubConnectionRow
-                    key={`${member.kind}-${member.id}`}
+          {showSearchResults && searchResults.length > 0 && (
+            <ul className="space-y-2 font-sans">
+              {searchResults.map((member) => {
+                const { relationship, pendingRequestId } = relationshipForMember(connections, member.id)
+                return (
+                  <MemberSearchRow
+                    key={member.id}
                     member={member}
+                    relationship={relationship}
+                    pendingRequestId={pendingRequestId}
+                    compact
+                    allowRemove={false}
                     onRelationshipChange={() => void refreshConnections()}
                   />
-                ))}
-              </ul>
-            )}
-          </div>
-        </HudGhostWidget>
-      </div>
+                )
+              })}
+            </ul>
+          )}
 
-      <div className="pt-2 border-t border-line-subtle flex items-center justify-between text-xs">
-        <span className="text-ink-muted text-[11px] tracking-[0.08em]">
-          {incomingCount > 0 ? 'REVIEW REQUESTS' : 'FIND MEMBERS'}
-        </span>
-        <button
-          type="button"
-          onClick={() => openConnections()}
-          className="px-3 py-1.5 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong text-[11px] font-bold tracking-[0.08em] flex items-center gap-1 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-        >
-          <span>{incomingCount > 0 ? 'OPEN INCOMING' : 'OPEN CONNECTIONS'}</span>
-          <ChevronRight className="w-3 h-3" />
-        </button>
-      </div>
-    </div>
+          {showSearchResults && !searching && searchResults.length === 0 && (
+            <p className="text-xs text-ink-muted text-center py-3">
+              The trench stayed quiet. No designation, larva unit, or name surfaced for that call.
+            </p>
+          )}
+
+          {showPreview && preview.length === 0 && (
+            <DashboardEmptyRow title={CONNECTIONS_HUB_EMPTY_COPY.title} body={CONNECTIONS_HUB_EMPTY_COPY.body} />
+          )}
+
+          {showPreview && preview.length > 0 && (
+            <ul className="space-y-2 font-sans">
+              {preview.map((member) => (
+                <HubConnectionRow
+                  key={`${member.kind}-${member.id}`}
+                  member={member}
+                  onRelationshipChange={() => void refreshConnections()}
+                />
+              ))}
+            </ul>
+          )}
+        </div>
+      </HudGhostWidget>
+    </DashboardPanel>
   )
 }
 
