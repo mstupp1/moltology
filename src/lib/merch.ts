@@ -41,6 +41,8 @@ export type MerchFulfillmentStatus =
   | 'awaiting_payment'
   | 'payment_failed'
   | 'paid'
+  | 'processing'
+  | 'printful_draft'
   | 'submitted_to_printful'
   | 'fulfillment_failed'
 
@@ -147,14 +149,22 @@ export function readAutomaticTaxEnabled(raw: string | undefined | null): boolean
   return raw?.trim().toLowerCase() === 'true'
 }
 
+/** Fulfillment is opt-in. Test payments and preview deployments can never print. */
 export function shouldDraftPrintfulOrder(env: {
   NODE_ENV?: string | null
+  VERCEL_ENV?: string | null
   PRINTFUL_DRAFT?: string | null
-}): boolean {
-  const flag = env.PRINTFUL_DRAFT?.trim().toLowerCase()
-  if (flag === 'true') return true
-  if (flag === 'false') return false
-  return env.NODE_ENV !== 'production'
+  STRIPE_SECRET_KEY?: string | null
+}, livemode = false): boolean {
+  return !livemode || env.NODE_ENV !== 'production' ||
+    (Boolean(env.VERCEL_ENV) && env.VERCEL_ENV !== 'production') ||
+    env.PRINTFUL_DRAFT?.trim().toLowerCase() !== 'false' ||
+    !/^(sk|rk)_live_/.test(env.STRIPE_SECRET_KEY ?? '')
+}
+
+/** Shared by catalog seeding and checkout; placeholder IDs must never be sold. */
+export function isOrderablePrintfulId(id: number): boolean {
+  return Number.isSafeInteger(id) && id > 0 && !(id >= 900000 && id < 1000000)
 }
 
 export function cartSubtotalCents(lines: MerchCartLine[]): number {
@@ -250,7 +260,7 @@ export function buildPricedCheckoutLines(
       return { ok: false, message: `Choose a quantity from 1 to ${MERCH_MAX_QUANTITY}.` }
     }
     const variant = byId.get(variantId)
-    if (!variant || !variant.productPublished || !variant.isAvailable || variant.printfulSyncVariantId <= 0) {
+    if (!variant || !variant.productPublished || !variant.isAvailable || !isOrderablePrintfulId(variant.printfulSyncVariantId)) {
       return { ok: false, message: 'One of those pieces is no longer available.' }
     }
     lines.push({
@@ -277,6 +287,7 @@ export function checkoutLineName(line: Pick<MerchLineItemSnapshot, 'productTitle
 
 export interface MerchCheckoutSessionParams {
   mode: 'payment'
+  managed_payments: { enabled: false }
   success_url: string
   cancel_url: string
   customer?: string
@@ -321,6 +332,8 @@ export function buildMerchCheckoutSessionParams(input: {
 }): MerchCheckoutSessionParams {
   const params: MerchCheckoutSessionParams = {
     mode: 'payment',
+    // This is a physical-goods checkout; account-level Managed Payments defaults reject shipping.
+    managed_payments: { enabled: false },
     success_url: `${input.origin}${NATIVE_STORE_PATH}?checkout=success`,
     cancel_url: `${input.origin}${NATIVE_STORE_PATH}?checkout=cancel`,
     client_reference_id: input.orderId,
@@ -379,6 +392,14 @@ export interface PrintfulOrderPayload {
   items: Array<{ sync_variant_id: number; quantity: number }>
 }
 
+/** Printful order external IDs allow at most 32 characters; compact UUIDs are collision-free. */
+export function printfulOrderExternalId(orderId: string): string {
+  const compact = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId)
+    ? orderId.replaceAll('-', '').toLowerCase() : orderId
+  if (!/^[a-zA-Z0-9_-]{1,32}$/.test(compact)) throw new Error('Order ID is not valid for Printful.')
+  return compact
+}
+
 export function buildPrintfulOrderPayload(input: {
   externalId: string
   email: string
@@ -387,7 +408,7 @@ export function buildPrintfulOrderPayload(input: {
   draft: boolean
 }): PrintfulOrderPayload {
   return {
-    external_id: input.externalId,
+    external_id: printfulOrderExternalId(input.externalId),
     shipping: 'STANDARD',
     draft: input.draft,
     recipient: {
@@ -424,6 +445,7 @@ interface LooseShippingDetails {
 
 export interface LooseCheckoutSession {
   id?: string | null
+  livemode?: boolean
   mode?: string | null
   metadata?: Record<string, string> | null
   payment_status?: string | null

@@ -1,0 +1,82 @@
+{
+  "verifiedAt": "2026-10-20T00:49:37.678Z",
+  "approval": "User approved the three-panel official Printful preview on October 19, 2026",
+  "storeId": 18931450,
+  "products": [
+    {
+      "slug": "moltology-mug-v2",
+      "id": 483250882,
+      "variants": 2,
+      "files": "all ok"
+    },
+    {
+      "slug": "moltology-tee-v2",
+      "id": 483250892,
+      "variants": 5,
+      "files": "all ok"
+    }
+  ],
+  "artwork": {
+    "title": "Moltology",
+    "caption": "THE SYNAPTIC PATH",
+    "descenderClearanceSourcePixels": 54,
+    "mug": "emblem and stacked text on opposite faces",
+    "tee": "large red emblem above stacked text",
+    "source": "content/brand/synaptic-path/parts/merch-v2/"
+  },
+  "files": [
+    {
+      "design": "mug-moltology-v2",
+      "key": "merch/print/mug-moltology-v2.png",
+      "sha256": "1f521bade3a2e6b835c784e584216f0f62068e695c42aae29969263eebb12305"
+    },
+    {
+      "design": "mug-moltology-v2-15oz",
+      "key": "merch/print/mug-moltology-v2-15oz.png",
+      "sha256": "e2607ccdee6e5ce0375a20fc76c794fa7748a5b5ec102fda0996bccea0517ee8"
+    },
+    {
+      "design": "tee-moltology-v2",
+      "key": "merch/print/tee-moltology-v2.png",
+      "sha256": "54f460ac45ab167f45d4f5258d0fbfed99ac5780473af8a4e94012791bc4c94c"
+    }
+  ],
+  "photos": [
+    {
+      "key": "images/merch/moltology-mug-v2-1.jpg",
+      "sha256": "8549e06e6fbc6b496461d2e8bbb3f4f518ef91972409deaf36063b9c7b05c7ff",
+      "webpTwinVerified": true
+    },
+    {
+      "key": "images/merch/moltology-mug-v2-2.jpg",
+      "sha256": "edb6b370257506a4ee3e87f082c431af6ed01af724695ae6ea73180bf2c61a0c",
+      "webpTwinVerified": true
+    },
+    {
+      "key": "images/merch/moltology-tee-v2-black.jpg",
+      "sha256": "247b5167e2b08b28b188f6d9122a400a27ac3dd427cd966411e9fd89cac32592",
+      "webpTwinVerified": true
+    }
+  ],
+  "dev": {
+    "published": [
+      "moltology-mug-v2",
+      "moltology-tee-v2"
+    ],
+    "availableVariants": 7,
+    "retired": [
+      "synaptic-mark-mug",
+      "synaptic-mark-tee"
+    ],
+    "prices": "verified against category catalog prices"
+  },
+  "historicalOrder": "Original Synaptic Mark mappings and draft 181851998 preserved; no new checkout or manufacturing run",
+  "verification": {
+    "core": "1157 passed; one network-dependent auth test passed on retry",
+    "scripts": "328 passed; network-dependent JWKS and video timeout checks passed on retry (9 retry tests passed)",
+    "typecheck": "passed",
+    "assetBudget": "passed",
+    "liveTemplates": "all seven variants passed",
+    "approvedPixels": "11oz mug and tee match approved preview exactly"
+  }
+}

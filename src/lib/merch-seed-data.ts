@@ -43,8 +43,8 @@ export interface MerchSeedProduct {
   variants: MerchSeedVariant[]
 }
 
-/** Older demo products. The seed unpublishes them. */
-export const RETIRED_MERCH_SLUGS = ['benthic-shell-tee', 'pressure-mug', 'order-emblem-sticker']
+/** Retired demos and superseded artwork. The seed unpublishes them. */
+export const RETIRED_MERCH_SLUGS = ['benthic-shell-tee', 'pressure-mug', 'order-emblem-sticker', 'synaptic-mark-mug', 'synaptic-mark-tee']
 
 export const MERCH_IMAGE_PREFIX = 'images/merch'
 export const MERCH_PRINT_PREFIX = 'merch/print'
@@ -90,6 +90,8 @@ function mug(input: {
   title: string
   description: string
   design: string
+  /** Override the print canvas for sizes with a different Printful template. */
+  sizeDesigns?: Record<string, string>
   /** Wrap color shown as the swatch. */
   wrap: { name: string; hex: string }
 }): MerchSeedProduct {
@@ -115,7 +117,7 @@ function mug(input: {
       priceCents: option.priceCents,
       imageUrl: featured,
       printfulSyncVariantId: placeholderSyncId(input.n, index + 1),
-      design: input.design,
+      design: input.sizeDesigns?.[option.size] ?? input.design,
     })),
   }
 }
@@ -163,7 +165,41 @@ function tee(input: {
   }
 }
 
+export const MERCH_PILOT_SLUGS = ['moltology-mug-v2', 'moltology-tee-v2'] as const
+
 const BASE_CATALOG: MerchSeedProduct[] = [
+  mug({
+    n: 10,
+    slug: 'moltology-mug-v2',
+    title: 'Moltology Mug',
+    description: 'White ceramic with the red emblem on one face and Moltology above The Synaptic Path on the other.',
+    design: 'mug-moltology-v2',
+    sizeDesigns: { '15 oz': 'mug-moltology-v2-15oz' },
+    wrap: { name: 'White', hex: '#ffffff' },
+  }),
+  tee({
+    n: 11,
+    slug: 'moltology-tee-v2',
+    title: 'Moltology Tee',
+    description: 'A black cotton tee with a large red emblem above Moltology and The Synaptic Path.',
+    designs: { Black: 'tee-moltology-v2' },
+  }),
+  mug({
+    n: 8,
+    slug: 'synaptic-mark-mug',
+    title: 'Synaptic Mark Mug',
+    description: 'White ceramic with the red Synaptic Path emblem on one face and the wordmark on the other.',
+    design: 'mug-synaptic-mark',
+    sizeDesigns: { '15 oz': 'mug-synaptic-mark-15oz' },
+    wrap: { name: 'White', hex: '#ffffff' },
+  }),
+  tee({
+    n: 9,
+    slug: 'synaptic-mark-tee',
+    title: 'Synaptic Mark Tee',
+    description: 'A black cotton tee with a centered red emblem and white Synaptic Path wordmark.',
+    designs: { Black: 'tee-synaptic-mark' },
+  }),
   mug({
     n: 1,
     slug: 'synaptic-path-mug',
@@ -245,7 +281,9 @@ export function isPlaceholderSyncId(id: number): boolean {
   return id >= 900000 && id < 1000000
 }
 
-export const INITIAL_MERCH_PRODUCTS: MerchSeedProduct[] = withPrintfulSync(BASE_CATALOG)
+export const INITIAL_MERCH_PRODUCTS: MerchSeedProduct[] = withPrintfulSync(
+  BASE_CATALOG.map(product => RETIRED_MERCH_SLUGS.includes(product.slug) ? { ...product, isPublished: false } : product),
+)
 
 /** The catalog in the shape the store pages read. Used by preview mode. */
 export function merchCatalogView(catalog: MerchSeedProduct[] = INITIAL_MERCH_PRODUCTS) {

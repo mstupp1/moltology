@@ -3,14 +3,15 @@ import { drizzle } from 'drizzle-orm/neon-http'
 import * as dotenv from 'dotenv'
 import * as schema from './schema'
 import { inArray, sql } from 'drizzle-orm'
-import { INITIAL_MERCH_PRODUCTS, RETIRED_MERCH_SLUGS } from '../lib/merch-seed-data'
+import { isOrderablePrintfulId } from '../lib/merch'
+import { INITIAL_MERCH_PRODUCTS, RETIRED_MERCH_SLUGS, type MerchSeedProduct } from '../lib/merch-seed-data'
 
 dotenv.config()
 
 type MerchDb = ReturnType<typeof drizzle<typeof schema>>
 
-export async function seedMerchCatalog(db: MerchDb) {
-  for (const product of INITIAL_MERCH_PRODUCTS) {
+export async function seedMerchCatalog(db: MerchDb, products: MerchSeedProduct[] = INITIAL_MERCH_PRODUCTS, retireLegacy = true) {
+  for (const product of products) {
     await db
       .insert(schema.merchProducts)
       .values({
@@ -22,7 +23,7 @@ export async function seedMerchCatalog(db: MerchDb) {
         featuredImageUrl: product.featuredImageUrl,
         galleryImageUrls: product.galleryImageUrls,
         basePriceCents: product.basePriceCents,
-        isPublished: product.isPublished,
+        isPublished: product.isPublished && product.variants.every(variant => isOrderablePrintfulId(variant.printfulSyncVariantId)),
         sortOrder: product.sortOrder,
       })
       .onConflictDoUpdate({
@@ -34,7 +35,7 @@ export async function seedMerchCatalog(db: MerchDb) {
           featuredImageUrl: product.featuredImageUrl,
           galleryImageUrls: product.galleryImageUrls,
           basePriceCents: product.basePriceCents,
-          isPublished: product.isPublished,
+          isPublished: product.isPublished && product.variants.every(variant => isOrderablePrintfulId(variant.printfulSyncVariantId)),
           sortOrder: product.sortOrder,
           updatedAt: sql`now()`,
         },
@@ -52,7 +53,7 @@ export async function seedMerchCatalog(db: MerchDb) {
           priceCents: variant.priceCents,
           imageUrl: variant.imageUrl,
           printfulSyncVariantId: variant.printfulSyncVariantId,
-          isAvailable: true,
+          isAvailable: isOrderablePrintfulId(variant.printfulSyncVariantId),
         })
         .onConflictDoUpdate({
           target: schema.merchVariants.id,
@@ -64,16 +65,17 @@ export async function seedMerchCatalog(db: MerchDb) {
             priceCents: variant.priceCents,
             imageUrl: variant.imageUrl,
             printfulSyncVariantId: variant.printfulSyncVariantId,
+            isAvailable: isOrderablePrintfulId(variant.printfulSyncVariantId),
             updatedAt: sql`now()`,
           },
         })
     }
   }
-  await db
+  if (retireLegacy) await db
     .update(schema.merchProducts)
     .set({ isPublished: false, updatedAt: sql`now()` })
     .where(inArray(schema.merchProducts.slug, RETIRED_MERCH_SLUGS))
-  return INITIAL_MERCH_PRODUCTS.length
+  return products.length
 }
 
 async function main() {

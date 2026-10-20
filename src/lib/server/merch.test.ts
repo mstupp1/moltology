@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 import { getDb } from '../../db'
 import { getMerchCatalogHandler, createMerchCheckoutSessionHandler, fulfillMerchCheckoutEvent } from './merch'
-import { createPrintfulOrder } from './printful'
+import { fulfillPaidMerchOrder } from './merch-fulfillment'
 
 vi.mock('../../db', () => ({ getDb: vi.fn(() => ({})) }))
 
-vi.mock('./printful', () => ({ createPrintfulOrder: vi.fn().mockResolvedValue({ id: 99 }) }))
+vi.mock('./merch-fulfillment', () => ({ fulfillPaidMerchOrder: vi.fn().mockResolvedValue(undefined) }))
 
 vi.mock('../user-sync', () => ({ ensureUserProfile: vi.fn().mockResolvedValue(null) }))
 
@@ -60,22 +60,23 @@ describe('merch fulfilment waits for payment', () => {
     const sets = orderDb()
     await fulfillMerchCheckoutEvent({ type: 'checkout.session.completed', data: { object: session('unpaid') } })
     expect(sets.map((s) => s.fulfillmentStatus)).toEqual(['awaiting_payment'])
-    expect(createPrintfulOrder).not.toHaveBeenCalled()
+    expect(fulfillPaidMerchOrder).not.toHaveBeenCalled()
   })
 
   it('marks a failed delayed payment without fulfilling', async () => {
     const sets = orderDb()
     await fulfillMerchCheckoutEvent({ type: 'checkout.session.async_payment_failed', data: { object: session('unpaid') } })
     expect(sets.map((s) => s.fulfillmentStatus)).toEqual(['payment_failed'])
-    expect(createPrintfulOrder).not.toHaveBeenCalled()
+    expect(fulfillPaidMerchOrder).not.toHaveBeenCalled()
   })
 
   it('fulfils once Stripe reports the session paid', async () => {
     vi.stubEnv('PRINTFUL_API_TOKEN', 'pf-test')
     const sets = orderDb()
     await fulfillMerchCheckoutEvent({ type: 'checkout.session.async_payment_succeeded', data: { object: session('paid') } })
-    expect(sets.map((s) => s.fulfillmentError ?? s.fulfillmentStatus)).toEqual(['paid', 'submitted_to_printful'])
-    expect(createPrintfulOrder).toHaveBeenCalledTimes(1)
+    expect(sets).toEqual([])
+    expect(fulfillPaidMerchOrder).toHaveBeenCalledWith(expect.anything(), 'order-1', expect.objectContaining({ paid: true }), false, false)
+    expect(fulfillPaidMerchOrder).toHaveBeenCalledTimes(1)
     vi.unstubAllEnvs()
   })
 })

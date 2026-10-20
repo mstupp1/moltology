@@ -46,6 +46,53 @@ const face = (side: 'left' | 'right', source: MerchLayerSource, scale = 0.72): M
 })
 
 export const MERCH_DESIGNS: MerchDesign[] = [
+  // Approved site wordmark: 54 source pixels of clear space below the g/y descenders.
+  ...[{ key: 'mug-moltology-v2', height: 1050 }, { key: 'mug-moltology-v2-15oz', height: 1140 }].map(({ key, height }): MerchDesign => ({
+    key, blank: 'mug', width: 2700, height, background: '#ffffff',
+    layers: [
+      face('left', { repo: `${KIT}/parts/icon.svg` }, 0.72),
+      { source: { repo: `${KIT}/parts/merch-v2/moltology-stacked-light.svg` }, cx: 0.75, cy: 0.5, maxWidth: 0.43, maxHeight: 0.60 },
+    ],
+  })),
+  {
+    key: 'tee-moltology-v2', blank: 'tee', ...TEE, background: null,
+    layers: [
+      { source: { repo: `${KIT}/parts/icon.svg` }, cx: 0.5, cy: 0.24, maxWidth: 0.42, maxHeight: 0.30 },
+      { source: { repo: `${KIT}/parts/merch-v2/moltology-stacked-dark.svg` }, cx: 0.5, cy: 0.51, maxWidth: 0.70, maxHeight: 0.21 },
+    ],
+  },
+
+  {
+    key: 'mug-synaptic-mark',
+    blank: 'mug',
+    ...MUG,
+    background: '#ffffff',
+    layers: [
+      face('left', { repo: `${KIT}/parts/icon.svg` }, 0.72),
+      face('right', { repo: `${KIT}/parts/primary.svg` }, 0.32),
+    ],
+  },
+  {
+    key: 'mug-synaptic-mark-15oz',
+    blank: 'mug',
+    width: 2700,
+    height: 1140,
+    background: '#ffffff',
+    layers: [
+      face('left', { repo: `${KIT}/parts/icon.svg` }, 0.72),
+      face('right', { repo: `${KIT}/parts/primary.svg` }, 0.32),
+    ],
+  },
+  {
+    key: 'tee-synaptic-mark',
+    blank: 'tee',
+    ...TEE,
+    background: null,
+    layers: [
+      { source: { repo: `${KIT}/parts/icon.svg` }, cx: 0.5, cy: 0.24, maxWidth: 0.42, maxHeight: 0.30 },
+      { source: { repo: `${KIT}/parts/variants/primary-white.svg` }, cx: 0.5, cy: 0.44, maxWidth: 0.7, maxHeight: 0.10 },
+    ],
+  },
   {
     key: 'mug-synaptic-path',
     blank: 'mug',

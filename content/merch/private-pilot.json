@@ -1,0 +1,103 @@
+{
+  "date": "2026-10-19",
+  "products": [
+    "synaptic-mark-mug",
+    "synaptic-mark-tee"
+  ],
+  "artwork": "canonical Synaptic Path vectors",
+  "templateValidation": "live Printful v1 templates, all seven pilot variants",
+  "files": [
+    {
+      "design": "mug-synaptic-mark",
+      "key": "merch/print/mug-synaptic-mark.png",
+      "width": 2700,
+      "height": 1050,
+      "dpi": 300,
+      "sha256": "462f90774779491600f559af9d7b513524fdab926dda880774b094b78dc253b3",
+      "uploaded": true
+    },
+    {
+      "design": "mug-synaptic-mark-15oz",
+      "key": "merch/print/mug-synaptic-mark-15oz.png",
+      "width": 2700,
+      "height": 1140,
+      "dpi": 300,
+      "sha256": "4ffc4e3b19d7867e2f6b98ca4bf78536df728cfd53d9e0977815e037a8fd04e7",
+      "uploaded": true
+    },
+    {
+      "design": "tee-synaptic-mark",
+      "key": "merch/print/tee-synaptic-mark.png",
+      "width": 3600,
+      "height": 4800,
+      "dpi": 300,
+      "sha256": "256de77b1289b1d235a8199fcf58e666905451ae14e0c38e92ae49b94534c082",
+      "uploaded": true
+    }
+  ],
+  "providerAcceptance": {
+    "manualStore": "verified",
+    "officialMockups": "generated, visually reviewed, uploaded",
+    "productSync": "verified: two products, seven variants, all print files status ok",
+    "devCatalogSeed": "verified: only the two pilot products published",
+    "stripeTestCheckoutToPrintfulDraft": "verified, including real paid test checkout, operator recovery and signed event replay"
+  },
+  "printfulStoreId": 18931450,
+  "photos": [
+    {
+      "key": "images/merch/synaptic-mark-mug-1.jpg",
+      "sha256": "8549e06e6fbc6b496461d2e8bbb3f4f518ef91972409deaf36063b9c7b05c7ff",
+      "provider": "Printful",
+      "uploaded": true
+    },
+    {
+      "key": "images/merch/synaptic-mark-mug-2.jpg",
+      "sha256": "b3bed28925dc09ac48bb6e96ea176bf06883ca6fdf48908419c72dd57cf88d2d",
+      "provider": "Printful",
+      "uploaded": true
+    },
+    {
+      "key": "images/merch/synaptic-mark-tee-black.jpg",
+      "sha256": "17d3a81daab20b0055e6e4f188d958c6950cc961c3feff19588a5f8f8253819e",
+      "provider": "Printful",
+      "uploaded": true
+    }
+  ],
+  "stripeListener": "configured and forwarding test events locally",
+  "checkoutOrderId": "c0aa7474-fd40-430f-8b9a-acb83712a95e",
+  "realCheckout": {
+    "verifiedAt": "2026-10-20T00:11:16.645Z",
+    "orderId": "c0aa7474-fd40-430f-8b9a-acb83712a95e",
+    "stripeSessionId": "cs_test_b1qfkJyUyxPjR6kO7lG0QL7gVoZVOFwr1EuhTFm4SnwwS9K4lmleTOppkB",
+    "stripeEventId": "evt_1USQc5L38EW6D7aTyzVbwdoL",
+    "livemode": false,
+    "paymentStatus": "paid",
+    "subtotalCents": 4800,
+    "totalCents": 5495,
+    "printful": {
+      "id": "181851998",
+      "externalId": "c0aa7474fd40430f8b9aacb83712a95e",
+      "status": "draft",
+      "items": [
+        {
+          "syncVariantId": 5583863824,
+          "quantity": 1
+        },
+        {
+          "syncVariantId": 5583863931,
+          "quantity": 1
+        }
+      ],
+      "matchingOrderCount": 1
+    },
+    "replayHttpStatus": 200
+  },
+  "verification": {
+    "pilotRegressionTests": "39 passed, including the signed webhook integration on Neon dev",
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "assetBudget": "passed",
+    "fullSuite": "two failures in unchanged homepage/news tests; details in docs/merch-launch.md",
+    "logicAtlas": "merch rules and changed webhook anchor verified; unrelated existing drift retained"
+  }
+}

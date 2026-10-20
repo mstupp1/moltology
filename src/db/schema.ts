@@ -1418,7 +1418,7 @@ export const merchVariants = pgTable('merch_variants', {
   priceCents: integer('priceCents').notNull(),
   imageUrl: text('imageUrl'),
   /** Printful sync variant id. Replace seed placeholders before a live order. */
-  printfulSyncVariantId: integer('printfulSyncVariantId').notNull(),
+  printfulSyncVariantId: bigint('printfulSyncVariantId', { mode: 'number' }).notNull(),
   isAvailable: boolean('isAvailable').default(true).notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),
