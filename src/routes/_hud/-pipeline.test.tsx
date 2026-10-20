@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, within } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import PipelineView from '@/components/hud/PipelineView'
 import { getAssetUrl } from '@/lib/assets'
 import { calculateProgression } from '@/lib/progression'
@@ -24,87 +24,58 @@ describe('Moltology science pipeline', () => {
     alignment.progression = calculateProgression(600)
   })
 
-  it('opens on the member’s own clearance', () => {
+  it('lights the member’s own clearance', () => {
     render(<PipelineView />)
 
     expect(screen.getByRole('heading', { name: 'The descent' })).toBeInTheDocument()
     expect(screen.getByText('600 XP')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Go to mine' })).toHaveAttribute('href', '#clearance-L-2')
 
-    const tab = screen.getByRole('tab', { name: /L-2 Shell Sprout, you are here/ })
-    expect(tab).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByRole('tab', { name: /L-1 Molt Curious, cleared/ })).toHaveAttribute('aria-selected', 'false')
-
-    const panel = screen.getByRole('tabpanel')
-    expect(within(panel).getByRole('heading', { level: 2 })).toHaveTextContent('L-2 Shell Sprout')
-    expect(within(panel).getByText(/600 XP to L-3/)).toBeInTheDocument()
+    const current = document.getElementById('clearance-L-2')!
+    expect(current).toHaveAttribute('aria-current', 'step')
+    expect(within(current).getByText('You are here')).toBeInTheDocument()
+    expect(within(current).getByText('600 XP to L-3')).toBeInTheDocument()
+    expect(within(current).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '14')
+    expect(within(document.getElementById('clearance-L-1')!).getByText('Cleared')).toBeInTheDocument()
   })
 
-  it('lists all twelve clearances and scans one when picked', () => {
+  it('lists every stage and clearance with its rite and readings', () => {
     render(<PipelineView />)
 
-    expect(screen.getAllByRole('tab')).toHaveLength(12)
-    fireEvent.click(screen.getByRole('tab', { name: /E-2 Hydraulic Grip/ }))
+    expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual([
+      'THE LARVAL INITIATE',
+      'THE SOFT-SHED',
+      'THE EXOSHELL BORN',
+      'FULL CARCINIZATION',
+      'About the readings',
+    ])
+    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(12)
 
-    const panel = screen.getByRole('tabpanel')
-    expect(within(panel).getByRole('heading', { level: 2 })).toHaveTextContent('E-2 Hydraulic Grip')
-    expect(within(panel).getByText(/Opens at 18,000 XP\. 17,400 XP to go\./)).toBeInTheDocument()
-    expect(within(panel).getByText('The Working Standard')).toBeInTheDocument()
+    const row = document.getElementById('clearance-E-2')!
+    expect(within(row).getByText('The Working Standard')).toBeInTheDocument()
+    expect(within(row).getByText(/Opens at 18,000 XP/)).toBeInTheDocument()
+    expect(within(row).getByText('Shell hardness')).toBeInTheDocument()
 
-    const img = within(panel).getByAltText('the exoshell born specimen') as HTMLImageElement
-    expect(img.getAttribute('src')).toBe(getAssetUrl('/images/stage3_exoshell.webp'))
-    expect(within(panel).getByRole('link', { name: /Stage 3 scripture/ })).toHaveAttribute('href', expect.stringMatching(/^\/codex\/scr-\d+$/))
+    const stage3 = document.getElementById('stage-3')!
+    expect(within(stage3).getByRole('link', { name: /Read the scripture/ })).toHaveAttribute('href', expect.stringMatching(/^\/codex\/scr-\d+$/))
   })
 
-  it('moves along the rail with the arrow keys', () => {
+  it('jumps to each stage from the contents row', () => {
     render(<PipelineView />)
 
-    fireEvent.keyDown(screen.getByRole('tab', { name: /L-2/ }), { key: 'ArrowDown' })
-    expect(screen.getByRole('tab', { name: /L-3/ })).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByRole('tab', { name: /L-3/ })).toHaveFocus()
-
-    fireEvent.keyDown(screen.getByRole('tab', { name: /L-3/ }), { key: 'End' })
-    expect(screen.getByRole('tab', { name: /C-3/ })).toHaveAttribute('aria-selected', 'true')
+    const nav = screen.getByRole('navigation', { name: 'Stages' })
+    const links = within(nav).getAllByRole('link')
+    expect(links.map((l) => l.getAttribute('href'))).toEqual(['#stage-1', '#stage-2', '#stage-3', '#stage-4'])
+    expect(links[0]).toHaveAttribute('aria-current', 'step')
+    const img = nav.querySelector('img')!
+    expect(img.getAttribute('src')).toBe(getAssetUrl('/images/stage1_larval.webp'))
   })
 
-  it('jumps to a stage from the strata row', () => {
-    render(<PipelineView />)
-
-    fireEvent.click(screen.getByRole('button', { name: /Stage 4/ }))
-    expect(screen.getByRole('tab', { name: /C-1 Mind Carapace/ })).toHaveAttribute('aria-selected', 'true')
-  })
-
-  it('switches the scan lens and opens hotspot readings', () => {
-    render(<PipelineView />)
-
-    const xray = screen.getByRole('radio', { name: 'X-ray' })
-    fireEvent.click(xray)
-    expect(xray).toHaveAttribute('aria-checked', 'true')
-
-    const hotspot = screen.getByRole('button', { name: 'Scan Pincer Torque' })
-    fireEvent.click(hotspot)
-    expect(hotspot).toHaveAttribute('aria-expanded', 'true')
-    expect(screen.getAllByText('Finishing the thing you started.').length).toBeGreaterThan(1)
-  })
-
-  it('projects when the next clearance opens at the chosen pace', () => {
-    render(<PipelineView />)
-
-    // 600 XP at 8 a day: 100 XP a day plus the 3-day streak bonus reaches 1,200 XP on day 6.
-    expect(screen.getByText(/At 8 a day,/).textContent).toContain('L-3 First Calcification opens in 6 days')
-
-    fireEvent.click(screen.getByRole('radio', { name: '2 a day' }))
-    // 20 XP a day, no streak bonus: 600 more XP takes 30 days.
-    expect(screen.getByText(/At 2 a day,/).textContent).toContain('opens in 30 days')
-
-    fireEvent.click(screen.getByRole('button', { name: /Scan S-3 Sub-Dermal Weave/ }))
-    expect(screen.getByRole('tab', { name: /S-3/ })).toHaveAttribute('aria-selected', 'true')
-  })
-
-  it('says so at the floor', () => {
+  it('says so at the last clearance', () => {
     alignment.progression = calculateProgression(120000)
     render(<PipelineView />)
 
-    expect(screen.getByText('You are here. This is the floor.')).toBeInTheDocument()
-    expect(screen.getByText(/You have reached the floor/)).toBeInTheDocument()
+    expect(screen.getByText('This is the last clearance.')).toBeInTheDocument()
+    expect(document.getElementById('clearance-C-3')).toHaveAttribute('aria-current', 'step')
   })
 })
