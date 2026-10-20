@@ -1,7 +1,7 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { ACADEMY_COPY, assembleAcademyHome, type AcademyHomePayload } from '@/lib/academy'
+import { ACADEMY_COPY, EMPTY_ACADEMY_HOME, assembleAcademyHome, type AcademyHomePayload } from '@/lib/academy'
 import { ACADEMY_COURSES, ACADEMY_TRACKS } from '@/lib/academy-catalog'
 import { clearCachedUser } from '@/lib/auth-session'
 
@@ -151,5 +151,21 @@ describe('Molt Academy home', () => {
     expect(screen.getByText('The Chitinous Mind')).toBeInTheDocument()
     expect(screen.queryByText('Biomechanical Armor')).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Open certification record/i })).toHaveAttribute('href', '/lectures/certificates')
+  })
+
+  it('shows one coming-soon panel instead of empty sections when nothing is published', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'user-1', name: 'Commander Craw' } },
+      isPending: false,
+    } as any)
+    mockUseLoaderData.mockReturnValue({ home: EMPTY_ACADEMY_HOME })
+    const Page = Route.options.component!
+    render(<Page />)
+
+    expect(screen.getByRole('heading', { name: ACADEMY_COPY.comingSoonTitle })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Tracks' })).toBeInTheDocument()
+    expect(screen.queryByPlaceholderText('Search by title, code, or instructor')).not.toBeInTheDocument()
+    expect(screen.queryByText(ACADEMY_COPY.emptyCatalog)).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Read the Codex/i })).toHaveAttribute('href', '/codex')
   })
 })

@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import type { AcademyLessonDetail } from '@/lib/academy'
 
 vi.mock('@tanstack/react-router', () => ({
@@ -17,7 +17,7 @@ vi.mock('@/lib/server/academy-api', () => ({
   submitAcademyQuizFn: vi.fn(),
 }))
 
-import { submitAcademyQuizFn } from '@/lib/server/academy-api'
+import { saveAcademyLessonFn, submitAcademyQuizFn } from '@/lib/server/academy-api'
 import { AcademyLessonView } from './AcademyLessonView'
 
 const lesson: AcademyLessonDetail = {
@@ -111,5 +111,46 @@ describe('AcademyLessonView quiz', () => {
     expect(screen.getByText('Enroll in this course to open the lesson.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Enroll' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Submit quiz' })).not.toBeInTheDocument()
+  })
+
+  it('lets a failed quiz be retaken with fresh answers', async () => {
+    vi.mocked(submitAcademyQuizFn).mockResolvedValue({
+      lesson,
+      grade: {
+        scorePercent: 50,
+        correctCount: 1,
+        total: 2,
+        passed: false,
+        results: [
+          { id: 'q1', selectedIndex: 1, correctIndex: 1, correct: true, explanation: 'One concrete stop.' },
+          { id: 'q2', selectedIndex: 1, correctIndex: 0, correct: false, explanation: 'A small shed needs room.' },
+        ],
+      },
+      awardedCredentialIds: [],
+    })
+    render(<AcademyLessonView lesson={lesson} />)
+    fireEvent.click(screen.getByLabelText('One habit you can stop this week'))
+    fireEvent.click(screen.getByLabelText('So nobody notices'))
+    fireEvent.click(screen.getByRole('button', { name: 'Submit quiz' }))
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Try again' }))
+    expect(screen.queryByText(/Score: 50%/)).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Submit quiz' })).toBeDisabled()
+  })
+
+  it('saves notes on blur and says so', async () => {
+    vi.mocked(saveAcademyLessonFn).mockResolvedValue({
+      lesson: { ...lesson, note: 'Shed the late-night scroll.' },
+      awardedCredentialIds: [],
+    } as any)
+    render(<AcademyLessonView lesson={lesson} />)
+    const notes = screen.getByLabelText('Your notes')
+    fireEvent.change(notes, { target: { value: 'Shed the late-night scroll.' } })
+    expect(screen.getByText('Unsaved changes')).toBeInTheDocument()
+    fireEvent.blur(notes)
+    await waitFor(() => expect(screen.getByText('Saved')).toBeInTheDocument())
+    expect(saveAcademyLessonFn).toHaveBeenCalledWith({
+      data: expect.objectContaining({ action: 'note', note: 'Shed the late-night scroll.' }),
+    })
   })
 })
