@@ -1,12 +1,14 @@
+import { getStoreAccessFn } from '@/lib/server/merch-api'
 import { createFileRoute } from '@tanstack/react-router'
 import { ProductDetail } from '@/components/store/ProductDetail'
-import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
+import { privatePageSeo, seo, xRobotsNoindexHeaders } from '@/lib/seo'
 
 export const Route = createFileRoute('/store/$slug')({
-  headers: () => xRobotsNoindexHeaders(),
-  head: () => ({
+  loader: () => getStoreAccessFn(),
+  headers: ({ loaderData }) => loaderData?.indexingEnabled ? {} : xRobotsNoindexHeaders(),
+  head: ({ loaderData }) => ({
     meta: [
-      ...privatePageSeo({
+      ...(loaderData?.indexingEnabled ? seo : privatePageSeo)({
         title: 'Store | Moltology',
         description: 'Piece details, sizes, and checkout.',
       }),

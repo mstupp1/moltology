@@ -1,6 +1,7 @@
+import { getStoreAccessFn } from '@/lib/server/merch-api'
 import { createFileRoute } from '@tanstack/react-router'
 import { StoreCatalog } from '@/components/store/StoreCatalog'
-import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
+import { privatePageSeo, seo, xRobotsNoindexHeaders } from '@/lib/seo'
 
 type StoreSearch = {
   category?: string
@@ -13,10 +14,11 @@ export const Route = createFileRoute('/store/')({
     const checkout = search.checkout === 'success' || search.checkout === 'cancel' ? search.checkout : undefined
     return { category, checkout }
   },
-  headers: () => xRobotsNoindexHeaders(),
-  head: () => ({
+  loader: () => getStoreAccessFn(),
+  headers: ({ loaderData }) => loaderData?.indexingEnabled ? {} : xRobotsNoindexHeaders(),
+  head: ({ loaderData }) => ({
     meta: [
-      ...privatePageSeo({
+      ...(loaderData?.indexingEnabled ? seo : privatePageSeo)({
         title: 'Store | Moltology',
         description: 'Shirts, mugs, and stickers. Payment happens on Stripe.',
       }),

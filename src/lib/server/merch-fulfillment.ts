@@ -40,15 +40,17 @@ export async function fulfillPaidMerchOrder(
   // Every completion is fenced to this lease, so a late worker cannot overwrite its successor.
   const owned = and(eq(merchOrders.id, orderId), eq(merchOrders.fulfillmentStatus, 'processing'), eq(merchOrders.updatedAt, claimedAt))
   try {
+    if (order.refundCents > 0) throw new Error('Order includes a refund; review in provider dashboards.')
     const token = process.env.PRINTFUL_API_TOKEN?.trim()
     if (!token) throw new Error('Printful is not configured.')
+    if (order.quoteSnapshot && order.quoteSnapshot.storeId !== process.env.PRINTFUL_STORE_ID) throw new Error('Printful store does not match the quoted order.')
     if (!order.shippingAddress || !order.customerEmail) throw new Error('Checkout did not include a shipping address and email.')
     if (!order.lineItems.length || order.lineItems.some(item => !isOrderablePrintfulId(item.printfulSyncVariantId))) {
       throw new Error('Order includes an unsynced Printful variant.')
     }
     const created = await ensurePrintfulOrder(token, buildPrintfulOrderPayload({
       externalId: order.id, email: order.customerEmail, shipping: order.shippingAddress,
-      items: order.lineItems, draft: shouldDraftPrintfulOrder(process.env, livemode),
+      items: order.lineItems, draft: order.fulfillmentMode !== 'automatic' || shouldDraftPrintfulOrder(process.env, livemode),
     }))
     // A cancelled/failed existing order requires attention, not a second manufacturing order.
     if (['canceled', 'failed'].includes(created.status)) throw new Error('Existing Printful order needs manual review.')

@@ -162,6 +162,7 @@ function StatusCard({
 }
 
 const SECTORS = [
+  { title: 'Store operations', detail: 'Payments, draft fulfillment, catalog availability, and shipping.', to: '/admin/store' as const },
   {
     title: 'Logic Atlas',
     detail: 'Map of business rules, where they live in code, and the decisions behind them.',

@@ -1,0 +1,113 @@
+{
+  "date": "2026-10-20",
+  "branch": "codex/private-store-pilot",
+  "startingGitState": "clean",
+  "scope": "Code/dev readiness only; no public opening, live charges, production writes, paid samples, manufacturing confirmation, Etsy changes, push or merge.",
+  "defaults": {
+    "public": false,
+    "indexing": false,
+    "countries": [
+      "US"
+    ],
+    "fulfillment": "manual"
+  },
+  "migrations": {
+    "devApplied": [
+      "0052_flat_yellowjacket",
+      "0053_merch_payment_backfill"
+    ],
+    "databaseHashesMatchSources": true,
+    "production": "existing CI path only; not executed",
+    "mergeResolution": "Renumbered after main Academy migration 0051; applied store SQL hashes and timestamps preserved."
+  },
+  "verification": {
+    "core": "1179 passed; 12 opt-in integration tests skipped in core run",
+    "scripts": "332 passed",
+    "devIntegration": "12 passed with real Neon dev and mocked Stripe/Printful/mail; includes guest snapshots, quotes, concurrency, audit, refunds and packages",
+    "recovery": "3 passed: stuck orders, alerts, independent mail and concurrency lease",
+    "typecheck": "passed",
+    "nodeBuild": "passed",
+    "vercelBuild": "passed; recovery .vc-config.json maxDuration=240",
+    "migrationConsistency": "drizzle-kit check passed",
+    "promotion": "dry run passed; approved pair only; no production execution",
+    "fullSuite": {
+      "passed": 2426,
+      "failed": 2,
+      "skipped": 12,
+      "existingFailures": [
+        "src/routes/-index.test.tsx: responsive homepage artwork preload expectation",
+        "src/routes/news/-slug.test.tsx: duplicate author text expectation"
+      ]
+    },
+    "logicAtlas": {
+      "storeRules": "11 verified",
+      "decisionAdded": "store-launch-controls",
+      "unrelatedExistingAnchorsNeedingReview": 26
+    }
+  },
+  "livePrintfulQuotes": {
+    "verifiedAt": "2026-10-20T17:49:34.114Z",
+    "storeId": "18931450",
+    "fixture": "Printful documented US address",
+    "checks": [
+      {
+        "cart": "mug",
+        "service": "STANDARD",
+        "serviceName": "Flat Rate (Estimated delivery: Oct 26\u2060\u201327) ",
+        "amountCents": 669
+      },
+      {
+        "cart": "tee",
+        "service": "STANDARD",
+        "serviceName": "Flat Rate (Estimated delivery: Oct 26\u2060\u201328) ",
+        "amountCents": 495
+      },
+      {
+        "cart": "mixed",
+        "service": "STANDARD",
+        "serviceName": "Flat Rate (Estimated delivery: Oct 26\u2060\u201328) ",
+        "amountCents": 1164
+      },
+      {
+        "cart": "multiple",
+        "service": "STANDARD",
+        "serviceName": "Flat Rate (Estimated delivery: Oct 26\u2060\u201328) ",
+        "amountCents": 2084
+      }
+    ],
+    "orderCreated": false
+  },
+  "stripeTestApiRequest": {
+    "verifiedAt": "2026-10-20T18:01:38.265Z",
+    "mode": "Stripe TEST",
+    "requestAccepted": true,
+    "approvedPair": true,
+    "shippingCents": 1164,
+    "subtotalCents": 4800,
+    "paymentStatus": "unpaid",
+    "shippingCollectionDisabled": true,
+    "orderMode": "manual",
+    "paymentCompleted": false,
+    "manufacturingCreated": false,
+    "scope": "Internal operator service path; guest access verified separately in integration fixtures; no personal checkout or purchase",
+    "checkoutExpired": true,
+    "fixtureCustomerDeleted": true,
+    "fixtureOrderAndQuoteDeleted": true
+  },
+  "newApprovedArtworkPaymentToDraft": "Not performed; requires the owner personal payment UI step. API session acceptance is not a purchase.",
+  "historicalOriginalArtworkDraft": {
+    "id": "181851998",
+    "preserved": true,
+    "status": "printful_draft",
+    "notReusedAsNewAcceptance": true
+  },
+  "remainingAcceptance": [
+    "Physical approved mug/tee samples",
+    "Live onboarding, billing and private deployment credentials",
+    "Approved margins, business policies and tax setup",
+    "STORE_SUPPORT_INBOX, verified sending domain and real email review",
+    "Deployed Stripe/Printful callbacks and scheduled recovery acceptance",
+    "Fresh approved-artwork guest Stripe TEST payment-to-draft journey",
+    "Explicit controlled-live-test and public-opening authorization"
+  ]
+}

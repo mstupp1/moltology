@@ -270,7 +270,11 @@ async function listen() {
   await listenForStripe(flag('configure-only') === 'true')
 }
 
-async function doctor() { if (!await merchDoctor(selected())) process.exitCode = 1 }
+async function promote() {
+  await (await import('./merch/promote')).promoteStoreCatalog({ execute: flag('execute') === 'true', endpoint: flag('target-endpoint') ?? '', authorization: flag('authorization') ?? '' })
+}
+
+async function doctor() { if (!await merchDoctor(selected(), flag('live') ? 'live' : 'test')) process.exitCode = 1 }
 
 async function orders() {
   requireMerchDevDatabase(process.env)
@@ -293,7 +297,7 @@ async function retry() {
   await orders()
 }
 
-const COMMANDS: Record<string, () => void | Promise<void>> = { check, doctor, templates, print, mockups, upload, blanks, sync, seed, orders, retry, listen }
+const COMMANDS: Record<string, () => void | Promise<void>> = { check, doctor, promote, templates, print, mockups, upload, blanks, sync, seed, orders, retry, listen }
 
 if (process.argv[1]?.includes('merch.ts')) {
   const command = process.argv[2]

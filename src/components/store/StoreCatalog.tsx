@@ -3,8 +3,9 @@ import { Link } from '@tanstack/react-router'
 import { Plus, ShoppingBag } from 'lucide-react'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { MERCH_SHIPPING_COUNTRIES, merchPriceLabel, uniqueVariantLabels, type MerchProductView } from '@/lib/merch'
+import { merchPriceLabel, uniqueVariantLabels, type MerchProductView } from '@/lib/merch'
 import { getMerchCatalogFn } from '@/lib/server/merch-api'
+import { StorePolicies } from './StorePolicies'
 import { MerchImage } from './MerchImage'
 import { useMerchCart } from './MerchCartProvider'
 
@@ -126,9 +127,10 @@ export function StoreCatalog({
 
       <section aria-label="How orders work" className="grid gap-px overflow-hidden rounded-card border border-line-subtle bg-line-subtle sm:grid-cols-3">
         <StorePromise title="Printed to order" body="Nothing sits in a warehouse. Your piece is printed after you check out." />
-        <StorePromise title="Ships in 2 to 5 business days" body={`Flat-rate shipping to ${MERCH_SHIPPING_COUNTRIES.length} countries, with tracking.`} />
+        <StorePromise title="Shipping quoted before payment" body="Enter your delivery address for current shipping options and cost." />
         <StorePromise title="Checkout on Stripe" body="Payment happens on Stripe's secure page. We never see your card number." />
       </section>
+      <StorePolicies />
     </div>
   )
 }

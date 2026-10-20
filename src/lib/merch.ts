@@ -596,4 +596,4 @@ export const MERCH_CATEGORY_INFO: Record<string, MerchCategoryInfo> = {
 }
 
 export const MERCH_SHIPPING_NOTE =
-  'Each piece is printed when you order. Most orders ship within 2 to 5 business days, then take 3 to 8 business days to arrive.'
+  'Shipping is quoted for your delivery address before payment. Production and delivery updates appear on your order status page.'

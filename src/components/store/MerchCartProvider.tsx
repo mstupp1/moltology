@@ -1,6 +1,4 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { useAuthSession } from '@/hooks/useAuthSession'
-import { getAuthJWTToken } from '@/lib/jwt'
 import {
   MERCH_CART_STORAGE_KEY,
   cartItemCount,
@@ -11,7 +9,7 @@ import {
   type MerchCartLine,
 } from '@/lib/merch'
 import { MERCH_PREVIEW, MERCH_PREVIEW_CHECKOUT_ERROR } from '@/lib/merch-preview'
-import { createMerchCheckoutSessionFn } from '@/lib/server/merch-api'
+import { DeliveryCheckout } from './DeliveryCheckout'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 
 const PENDING_CLEAR_KEY = 'moltology.merch.pendingClear'
@@ -27,6 +25,7 @@ interface MerchCartContextValue {
   setQuantity: (variantId: string, quantity: number) => void
   removeLine: (variantId: string) => void
   checkout: (items: Array<{ variantId: string; quantity: number }>, options?: { clearCart?: boolean }) => Promise<void>
+  completeVerifiedCheckout: (orderId: string) => void
   consumeCheckoutResult: (result: 'success' | 'cancel' | undefined) => void
 }
 
@@ -41,12 +40,12 @@ export function useMerchCart(): MerchCartContextValue {
 }
 
 export function MerchCartProvider({ children }: { children: React.ReactNode }) {
-  const session = useAuthSession()
   const toastApi = useOptionalToast()
   const [lines, setLines] = useState<MerchCartLine[]>([])
   const [ready, setReady] = useState(false)
   const [open, setOpen] = useState(false)
-  const [checkingOut, setCheckingOut] = useState(false)
+  const [delivery, setDelivery] = useState<{ items: Array<{ variantId: string; quantity: number }>; clearCart: boolean } | null>(null)
+  const checkingOut = delivery !== null
   const consumedResult = useRef<'success' | 'cancel' | undefined>(undefined)
 
   useEffect(() => {
@@ -78,28 +77,24 @@ export function MerchCartProvider({ children }: { children: React.ReactNode }) {
         toastApi?.toast.info(MERCH_PREVIEW_CHECKOUT_ERROR, { id: 'merch-checkout' })
         return
       }
-      setCheckingOut(true)
-      try {
-        const token = await getAuthJWTToken()
-        const result = await createMerchCheckoutSessionFn({
-          data: {
-            token: token ?? undefined,
-            userId: session.userId ?? undefined,
-            items,
-          },
-        })
-        if (options?.clearCart) {
-          window.sessionStorage.setItem(PENDING_CLEAR_KEY, '1')
-        }
-        window.location.assign(result.url)
-      } catch (error) {
-        const message = error instanceof Error ? error.message : 'Could not start checkout. Try again.'
-        toastApi?.toast.error(message, { id: 'merch-checkout' })
-        setCheckingOut(false)
-      }
+      setOpen(false)
+      setDelivery({ items, clearCart: options?.clearCart ?? false })
     },
-    [session.userId, toastApi],
+    [toastApi],
   )
+
+  const completeVerifiedCheckout = useCallback((orderId: string) => {
+    try {
+      const marker = JSON.parse(window.sessionStorage.getItem(PENDING_CLEAR_KEY) || 'null')
+      if (marker?.orderId !== orderId || !Array.isArray(marker.items)) return
+      window.sessionStorage.removeItem(PENDING_CLEAR_KEY)
+      setLines(current => current.flatMap(line => {
+        const purchased = marker.items.find((item: { variantId: string; quantity: number }) => item.variantId === line.variantId)
+        const quantity = line.quantity - (purchased?.quantity || 0)
+        return quantity > 0 ? [{ ...line, quantity }] : []
+      }))
+    } catch { /* Old or invalid cart markers cannot clear a cart. */ }
+  }, [])
 
   const consumeCheckoutResult = useCallback(
     (result: 'success' | 'cancel' | undefined) => {
@@ -108,14 +103,7 @@ export function MerchCartProvider({ children }: { children: React.ReactNode }) {
       if (consumedResult.current === result) return
       consumedResult.current = result
       if (result === 'success') {
-        if (window.sessionStorage.getItem(PENDING_CLEAR_KEY) === '1') {
-          // Child return effects can run before this provider restores the persisted cart.
-          // Clear storage first so hydration cannot resurrect the purchased lines.
-          window.localStorage.setItem(MERCH_CART_STORAGE_KEY, '[]')
-          setLines([])
-        }
-        window.sessionStorage.removeItem(PENDING_CLEAR_KEY)
-        toastApi?.toast.success('Payment received. We will print and ship this order.', { id: 'merch-checkout-result' })
+        toastApi?.toast.info('Check your order link for verified payment and fulfillment status.', { id: 'merch-checkout-result' })
         return
       }
       window.sessionStorage.removeItem(PENDING_CLEAR_KEY)
@@ -137,9 +125,10 @@ export function MerchCartProvider({ children }: { children: React.ReactNode }) {
       removeLine,
       checkout,
       consumeCheckoutResult,
+      completeVerifiedCheckout,
     }),
-    [addLine, checkingOut, checkout, consumeCheckoutResult, lines, open, removeLine, setQuantity],
+    [addLine, checkingOut, checkout, consumeCheckoutResult, completeVerifiedCheckout, lines, open, removeLine, setQuantity],
   )
 
-  return <MerchCartContext.Provider value={value}>{children}</MerchCartContext.Provider>
+  return <MerchCartContext.Provider value={value}>{children}{delivery && <DeliveryCheckout items={delivery.items} clearCart={delivery.clearCart} close={() => setDelivery(null)} />}</MerchCartContext.Provider>
 }

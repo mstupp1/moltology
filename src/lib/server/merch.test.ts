@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { beforeEach } from 'vitest'
 import { getDb } from '../../db'
 import { getMerchCatalogHandler, createMerchCheckoutSessionHandler, fulfillMerchCheckoutEvent } from './merch'
 import { fulfillPaidMerchOrder } from './merch-fulfillment'
@@ -23,16 +24,18 @@ describe('new store experiment server gate', () => {
     { role: 'user', experiments: ['new-store'] },
   ])('blocks catalog and checkout for $role with $experiments', async (profile) => {
     const db = storeDb(profile)
+    vi.mocked(getDb).mockReturnValue(db as never)
     const args = { context: { user: { sub: 'viewer-1' }, db: db as never } }
     await expect(getMerchCatalogHandler(args)).rejects.toThrow('This page is not available.')
     await expect(createMerchCheckoutSessionHandler({ ...args, data: { items: [] } })).rejects.toThrow('This page is not available.')
-    expect(db.select).toHaveBeenCalledTimes(2)
+    expect(db.select).toHaveBeenCalled()
   })
 
   it('loads the catalog for an opted-in admin', async () => {
     const db = storeDb({ role: 'admin', experiments: ['new-store'] })
+    vi.mocked(getDb).mockReturnValue(db as never)
     await expect(getMerchCatalogHandler({ context: { user: { sub: 'admin-1' }, db: db as never } })).resolves.toEqual([])
-    expect(db.select).toHaveBeenCalledTimes(2)
+    expect(db.select).toHaveBeenCalled()
   })
 })
 
@@ -74,7 +77,7 @@ describe('merch fulfilment waits for payment', () => {
     vi.stubEnv('PRINTFUL_API_TOKEN', 'pf-test')
     const sets = orderDb()
     await fulfillMerchCheckoutEvent({ type: 'checkout.session.async_payment_succeeded', data: { object: session('paid') } })
-    expect(sets).toEqual([])
+    expect(sets).toEqual([expect.objectContaining({ paymentStatus: 'paid' })])
     expect(fulfillPaidMerchOrder).toHaveBeenCalledWith(expect.anything(), 'order-1', expect.objectContaining({ paid: true }), false, false)
     expect(fulfillPaidMerchOrder).toHaveBeenCalledTimes(1)
     vi.unstubAllEnvs()

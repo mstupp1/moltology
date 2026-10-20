@@ -15,6 +15,7 @@ import {
   type MerchVariantView,
 } from '@/lib/merch'
 import { getMerchCatalogFn, getMerchProductBySlugFn } from '@/lib/server/merch-api'
+import { StorePolicies } from './StorePolicies'
 import { MerchImage } from './MerchImage'
 import { useMerchCart } from './MerchCartProvider'
 
@@ -323,10 +324,7 @@ export function ProductDetail({ slug }: { slug: string }) {
               </Disclosure>
             ) : null}
             <Disclosure title="Shipping and returns">
-              <p>
-                Flat-rate shipping, confirmed at checkout along with any tax. Pieces are made for you, so we replace anything
-                that arrives damaged or misprinted rather than taking returns. Write to support within 30 days of delivery.
-              </p>
+              <StorePolicies />
             </Disclosure>
           </div>
         </div>

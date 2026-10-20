@@ -16,7 +16,7 @@ const completion: MerchCheckoutCompletion = {
 function database(claims = 1, status = 'processing') {
   const changes: Array<Record<string, unknown>> = []
   const predicates: SQL[] = []
-  const snapshot = { id: 'order-1', customerEmail: completion.email, shippingAddress: completion.shipping, lineItems: [{ printfulSyncVariantId: 4123456789, quantity: 1 }] }
+  const snapshot = { fulfillmentMode: 'manual', refundCents: 0, id: 'order-1', customerEmail: completion.email, shippingAddress: completion.shipping, lineItems: [{ printfulSyncVariantId: 4123456789, quantity: 1 }] }
   const db = {
     update: () => ({ set: (values: Record<string, unknown>) => {
       changes.push(values)
@@ -57,6 +57,25 @@ describe('paid merch fulfillment', () => {
     expect(finish.sql).toContain('"updatedAt" =')
     expect(finish.params).toContain('processing')
     expect(MERCH_FULFILLMENT_LEASE_MS).toBeGreaterThan(60_000)
+  })
+  it('requires a new automatic order plus explicit live-production setup to confirm', async () => {
+    vi.stubEnv('NODE_ENV', 'production'); vi.stubEnv('PRINTFUL_DRAFT', 'false'); vi.stubEnv('STRIPE_SECRET_KEY', 'sk_live_example'); vi.stubEnv('VERCEL_ENV','production')
+    const automatic = database()
+    automatic.snapshot.fulfillmentMode = 'automatic'
+    await fulfillPaidMerchOrder(automatic.db, 'order-1', completion, true)
+    expect(ensurePrintfulOrder).toHaveBeenLastCalledWith('token', expect.objectContaining({ draft: false }))
+    const oldManual = database()
+    await fulfillPaidMerchOrder(oldManual.db, 'order-1', completion, true)
+    expect(ensurePrintfulOrder).toHaveBeenLastCalledWith('token', expect.objectContaining({ draft: true }))
+    vi.stubEnv('VERCEL_ENV','preview')
+    const preview = database(); preview.snapshot.fulfillmentMode = 'automatic'
+    await fulfillPaidMerchOrder(preview.db, 'order-1', completion, true)
+    expect(ensurePrintfulOrder).toHaveBeenLastCalledWith('token', expect.objectContaining({ draft: true }))
+  })
+  it('blocks a refunded order before provider submission', async () => {
+    const refunded = database(); refunded.snapshot.refundCents = 100
+    await expect(fulfillPaidMerchOrder(refunded.db,'order-1',completion,false)).rejects.toThrow('refund')
+    expect(ensurePrintfulOrder).not.toHaveBeenCalled()
   })
   it('only submits once when two deliveries compete for the claim', async () => {
     const { db } = database(1)

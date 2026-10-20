@@ -83,3 +83,37 @@ publication states without touching the placeholder catalog. `upload` uses `--ki
   as Printful proof or use them as launch acceptance. Queue social content through the social skills.
 - Record verified outcomes and outstanding account steps. Never call the real pilot complete on
   the strength of mocks, uploads alone, or a successful test suite. Finish with a commit and Git status.
+
+
+## Launch readiness and deployed operations
+
+- Keep `/store` private until separate launch authorization. Public browsing requires saved public
+  settings plus `STORE_PUBLIC_LAUNCH_AUTHORIZED=true`; indexing has a separate saved toggle.
+  Live Checkout also requires `STORE_LIVE_PAYMENTS_AUTHORIZED=true`. Never set these as part of
+  artwork or readiness work. Preserve US/manual defaults and all canonical artwork.
+- `/admin/store` is the audited production-capable operations interface: search orders, inspect
+  independent payment/fulfillment/refund/shipment state, retry after payment verification,
+  reconcile provider status, pause checkout, manage country and per-size publication controls,
+  and inspect health/mail/audit history. Catalog seed cannot overwrite operational overrides.
+- New checkouts require a ten-minute server-authoritative live Printful STANDARD/USD quote bound
+  to exact cart/email/address. Quote with catalog IDs, fulfill with sync IDs. Keep the same address
+  through the separate per-order Stripe customer, tax and saved fulfillment snapshot. Never
+  change the shared Premium customer's shipping address.
+- Manual paid orders create drafts. Automatic mode affects only newly eligible live orders and
+  requires explicit production setup. Changing settings never confirms old drafts; tests/previews
+  always remain drafts. No app button confirms production. Refunds never cancel manufacturing.
+- Customer payment/package mail uses the durable independent outbox. Recovery runs every fifteen
+  minutes through the authenticated endpoint and GitHub Actions workflow. Inspect deployed run
+  results and real emails; local tests do not prove delivery. Review old uncertain sends in the
+  provider before resending outside its idempotency-retention window.
+- Printful v1 callbacks use a private random URL token and authoritative selected-store API reads.
+  Never expose or log the callback URL token. Inspect its one-per-store configuration before
+  registering a new URL, and never touch Etsy. Deployment setup needs separate authorization.
+- `npm run merch -- promote` previews only the approved v2 mug/tee production catalog. Actual
+  `--execute --target-endpoint <id> --authorization approved-production-catalog` requires explicit
+  user production-write authorization and verified PROD_DATABASE_URL. Never execute it during
+  dev readiness. Production migrations use existing CI. Run doctor afterward and report blockers.
+- Keep approved business policy fields blank until supplied/approved; never invent legal or
+  commercial terms. Sizing facts already live in `MERCH_CATEGORY_INFO`. Physical samples,
+  onboarding/billing, policy/tax approval, sending-domain and deployed callback/recovery/payment
+  acceptance remain the owner's checklist in `docs/merch-launch.md`.
