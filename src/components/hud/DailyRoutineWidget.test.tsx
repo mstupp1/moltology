@@ -107,14 +107,15 @@ describe('DailyRoutineWidget Component', () => {
     vi.unstubAllGlobals()
   })
 
-  it('renders compact chrome with title, 8 canonical tasks, and streak matrix', () => {
+  it('renders compact chrome with title, 8 canonical tasks, and the week bars', () => {
     renderWidget()
 
-    expect(screen.getByText('DAILY ALIGNMENT')).toBeInTheDocument()
+    expect(screen.getByText('Daily alignment')).toBeInTheDocument()
     expect(screen.queryByText('MANDATORY LITURGY')).not.toBeInTheDocument()
-    expect(screen.getByText('LAST 7 DAYS')).toBeInTheDocument()
+    expect(screen.getByText('Last 7 days')).toBeInTheDocument()
     expect(screen.getByText('Activity')).toBeInTheDocument()
-    expect(screen.getByText('SCHEDULE (0/8)')).toBeInTheDocument()
+    expect(screen.getByText('Today’s schedule')).toBeInTheDocument()
+    expect(screen.queryByText(/COMPLETE$/)).not.toBeInTheDocument()
 
     // Long jargon chrome from the old desktop layout should be gone
     expect(screen.queryByText(/STREAK CALENDAR \& MATRIX/i)).not.toBeInTheDocument()
@@ -136,12 +137,12 @@ describe('DailyRoutineWidget Component', () => {
   it('toggles a task on click and updates completion count', () => {
     renderWidget()
 
-    expect(screen.getByText('0/8 COMPLETE')).toBeInTheDocument()
+    expect(screen.getByText('0/8 done')).toBeInTheDocument()
 
     const firstTask = screen.getByText('Silent Synchronization')
     fireEvent.click(firstTask)
 
-    expect(screen.getByText('1/8 COMPLETE')).toBeInTheDocument()
+    expect(screen.getByText('1/8 done')).toBeInTheDocument()
     expect(firstTask).toHaveClass('line-through')
     expect(screen.queryByText('SYNCING')).not.toBeInTheDocument()
   })
@@ -154,7 +155,7 @@ describe('DailyRoutineWidget Component', () => {
       fireEvent.click(taskEl)
     }
 
-    expect(screen.getByText('8/8 COMPLETE')).toBeInTheDocument()
+    expect(screen.getByText('8/8 done')).toBeInTheDocument()
 
     await waitFor(() => {
       expect(screen.getByText('DAILY ALIGNMENT COMPLETE')).toBeInTheDocument()
@@ -175,7 +176,7 @@ describe('DailyRoutineWidget Component', () => {
     fireEvent.click(task2)
     fireEvent.click(task3)
 
-    expect(screen.getByText('3/8 COMPLETE')).toBeInTheDocument()
+    expect(screen.getByText('3/8 done')).toBeInTheDocument()
     expect(task1).toHaveClass('line-through')
     expect(task2).toHaveClass('line-through')
     expect(task3).toHaveClass('line-through')
@@ -197,10 +198,9 @@ describe('DailyRoutineWidget Component', () => {
     expect(heatmap.className).toMatch(/overflow-x-auto/)
     expect(heatmap.className).toMatch(/min-w-0/)
 
-    const reminderToggle = screen.getByTitle('Toggle automated 10-minute prior toast reminders')
+    const reminderToggle = screen.getByRole('switch', { name: /reminders/i })
     expect(reminderToggle.className).toMatch(/min-h-\[44px\]/)
-    expect(reminderToggle.textContent).toMatch(/^(ON|OFF)$/)
-    expect(['true', 'false']).toContain(reminderToggle.getAttribute('aria-pressed'))
+    expect(['true', 'false']).toContain(reminderToggle.getAttribute('aria-checked'))
   })
 
   it('shows the 90-day range and disables blank calendar padding', () => {
@@ -247,10 +247,27 @@ describe('DailyRoutineWidget Component', () => {
 
     fireEvent.click(screen.getByText('Silent Synchronization'))
 
-    expect(screen.getByText('1/8 COMPLETE')).toBeInTheDocument()
+    expect(screen.getByText('1/8 done')).toBeInTheDocument()
     expect(listener).not.toHaveBeenCalled()
     expect(screen.queryByText('DAILY ALIGNMENT SCHEDULE')).not.toBeInTheDocument()
 
     window.removeEventListener(OPEN_ALIGNMENT_PANEL_EVENT, listener)
+  })
+})
+
+describe('DailyRoutineWidget next liturgy', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    sessionStorage.clear()
+  })
+
+  it('marks only the first open liturgy as next and moves the mark when it is done', () => {
+    renderWidget()
+    expect(screen.getAllByText('Next')).toHaveLength(1)
+    expect(screen.getByRole('button', { name: /Silent Synchronization/i }).textContent).toMatch(/Next$/)
+
+    fireEvent.click(screen.getByText('Silent Synchronization'))
+    expect(screen.getAllByText('Next')).toHaveLength(1)
+    expect(screen.getByRole('button', { name: /Prompt Construction/i }).textContent).toMatch(/Next$/)
   })
 })

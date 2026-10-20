@@ -37,10 +37,27 @@ function Meter({ ratio, done = false, label }: { ratio: number; done?: boolean; 
 
 function Readout({ label, children, footer }: { label: string; children: React.ReactNode; footer?: React.ReactNode }) {
   return (
-    <div className="min-w-0 rounded-control border border-line-subtle bg-abyss/40 px-3 py-2.5 flex flex-col gap-1.5">
-      <span className="text-[11px] font-bold tracking-[0.08em] uppercase text-ink-muted">{label}</span>
-      <div className="font-grotesk text-base font-bold text-ink leading-none tabular-nums truncate">{children}</div>
+    <div className="min-w-0 px-3 py-2.5 flex flex-col gap-1.5">
+      <span className="text-[11px] font-bold tracking-[0.08em] uppercase text-ink-muted truncate">{label}</span>
+      <div className="font-grotesk text-lg font-bold text-ink leading-none tabular-nums truncate">{children}</div>
       {footer}
+    </div>
+  )
+}
+
+/** Seven small marks, oldest to today: lit when that day's liturgies were all done. */
+function WeekMarks({ days }: { days: Array<{ date: string; pct: number; isToday?: boolean }> }) {
+  return (
+    <div className="flex items-center gap-1 h-1.5" aria-hidden="true">
+      {days.map((day) => (
+        <span
+          key={day.date}
+          className={cn(
+            'h-1.5 flex-1 rounded-chip',
+            day.pct >= 100 ? 'bg-cyan-glow' : day.pct > 0 ? 'bg-cyan-glow/35' : 'bg-surface-3',
+          )}
+        />
+      ))}
     </div>
   )
 }
@@ -52,7 +69,7 @@ function Readout({ label, children, footer }: { label: string; children: React.R
 export function DashboardTodayStrip() {
   const navigate = useNavigate()
   const session = useAuthSession()
-  const { completedCount, totalCount, streakDays, progression, isLoading } = useDailyAlignment()
+  const { completedCount, totalCount, streakDays, streakHistory, progression, isLoading } = useDailyAlignment()
   const lastThread = useLastOracleThread()
   const [dateLabel, setDateLabel] = useState('')
   const [isAuthOpen, setIsAuthOpen] = useState(false)
@@ -106,7 +123,7 @@ export function DashboardTodayStrip() {
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-2 min-w-0">
+      <div className="grid grid-cols-3 min-w-0 rounded-control border border-line-subtle bg-abyss/40 divide-x divide-line-subtle">
         <Readout
           label={`Stage ${progression.stage}`}
           footer={
@@ -130,7 +147,12 @@ export function DashboardTodayStrip() {
         </Readout>
         <Readout
           label="Streak"
-          footer={<span className="text-[11px] text-ink-muted">{streakDays === 1 ? 'day in a row' : 'days in a row'}</span>}
+          footer={
+            <>
+              <WeekMarks days={streakHistory.slice(-7)} />
+              <span className="text-[11px] text-ink-muted truncate">{streakDays === 1 ? 'day in a row' : 'days in a row'}</span>
+            </>
+          }
         >
           <span className="inline-flex items-center gap-1.5">
             <Flame className={cn('w-4 h-4 shrink-0', streakDays > 0 ? 'text-crimson-text' : 'text-ink-muted')} aria-hidden="true" />
@@ -143,7 +165,7 @@ export function DashboardTodayStrip() {
             <>
               <Meter ratio={completedCount / Math.max(totalCount, 1)} done={alignmentDone} label="Today’s alignment" />
               <span className={cn('text-[11px] truncate', alignmentDone ? 'text-emerald-500' : 'text-ink-muted')}>
-                {alignmentDone ? 'Done today' : 'liturgies done'}
+                {alignmentDone ? 'Done today' : 'done today'}
               </span>
             </>
           }

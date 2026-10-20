@@ -61,14 +61,16 @@ export interface DashboardPanelActionProps {
   label: string
   onClick: () => void
   ariaLabel?: string
+  testId?: string
 }
 
-export function DashboardPanelAction({ label, onClick, ariaLabel }: DashboardPanelActionProps) {
+export function DashboardPanelAction({ label, onClick, ariaLabel, testId }: DashboardPanelActionProps) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={ariaLabel}
+      data-testid={testId}
       className={cn(
         'inline-flex items-center gap-0.5 min-h-8 px-2 -mr-2 rounded-control text-xs font-bold text-cyan-glow hover:bg-surface-2 transition-colors whitespace-nowrap',
         FOCUS,

@@ -140,7 +140,7 @@ describe('ForumHubCard', () => {
     expect(screen.getByRole('button', { name: FORUM_HUB_CTA })).toBeInTheDocument()
   })
 
-  it('renders pulse chips, board shortcuts, and up to three active threads', async () => {
+  it('renders board shortcuts and up to three active threads', async () => {
     vi.mocked(getForumCategoriesFn).mockResolvedValue([
       category({ id: 'c1', slug: 'the-melt', name: 'The Melt', topicCount: 8, sortOrder: 1 }),
       category({ id: 'c2', slug: 'carcinization', name: 'Carcinization', topicCount: 3, sortOrder: 2 }),
@@ -171,8 +171,7 @@ describe('ForumHubCard', () => {
     expect(screen.queryByText('Fourth thread')).not.toBeInTheDocument()
     expect(screen.getByText('A quiet shed before the feed opens.')).toBeInTheDocument()
     expect(screen.getByText('abyssal_architect')).toBeInTheDocument()
-    expect(screen.getByText('Boards')).toBeInTheDocument()
-    expect(screen.getByText('Topics')).toBeInTheDocument()
+    expect(screen.queryByTestId('forum-hub-pulse')).not.toBeInTheDocument()
     expect(screen.getByTestId('forum-hub-boards')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /carcinization/i })).toHaveAttribute(
       'href',
@@ -200,8 +199,8 @@ describe('ForumHubCard', () => {
       expect(screen.getByText('Unread dispatch')).toBeInTheDocument()
     })
     expect(screen.getByText(FORUM_UNREAD_LABEL)).toBeInTheDocument()
-    expect(screen.getByText('PINNED')).toBeInTheDocument()
-    expect(screen.getByText('New')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Pinned' })).toBeInTheDocument()
+    expect(screen.getByTestId('forum-unread-mark')).toHaveTextContent('2 new')
     expect(getForumTopicsFn).toHaveBeenCalledWith({
       data: { sortBy: 'active', limit: 3, userId: 'user-hub', token: 'a.b.c' },
     })

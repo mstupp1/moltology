@@ -46,25 +46,33 @@ export function DashboardNewsPanel() {
               <Link
                 to="/news/$slug"
                 params={{ slug: post.slug }}
-                className={cn('group flex items-start gap-3 py-2.5 rounded-control hover:bg-surface-2 -mx-2 px-2 transition-colors', DASHBOARD_FOCUS)}
+                className={cn('group flex items-center gap-3 py-2.5 rounded-control hover:bg-surface-2 -mx-2 px-2 transition-colors', DASHBOARD_FOCUS)}
               >
-                {post.coverImageUrl ? (
-                  <img
-                    src={getAssetUrl(post.coverImageUrl)}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                    width={72}
-                    height={48}
-                    onError={(e) => {
-                      e.currentTarget.style.visibility = 'hidden'
-                    }}
-                    className="w-[72px] h-12 shrink-0 rounded-control object-cover border border-line-subtle bg-abyss"
-                  />
-                ) : null}
+                <span
+                  className="relative w-[72px] h-12 shrink-0 rounded-control overflow-hidden border border-line-subtle bg-surface-3 flex items-center justify-center"
+                  aria-hidden="true"
+                >
+                  <Newspaper className="w-4 h-4 text-ink-muted" />
+                  {post.coverImageUrl ? (
+                    <img
+                      src={getAssetUrl(post.coverImageUrl)}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      width={72}
+                      height={48}
+                      onError={(e) => {
+                        e.currentTarget.style.visibility = 'hidden'
+                      }}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  ) : null}
+                </span>
                 <span className="min-w-0 flex-1 flex flex-col gap-0.5">
                   <span className="block text-[11px] text-ink-muted truncate">
-                    <span className="text-cyan-glow font-bold">{post.category}</span> · {post.readTimeMinutes} min read
+                    <span className="text-cyan-glow font-bold">{post.category}</span>
+                    <span aria-hidden="true"> · </span>
+                    {post.readTimeMinutes} min read
                   </span>
                   <span className="text-sm font-bold text-ink group-hover:text-cyan-glow transition-colors leading-snug line-clamp-2">
                     {formatNewsTitle(post.title).headline}
