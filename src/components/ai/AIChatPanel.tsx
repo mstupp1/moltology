@@ -10,9 +10,17 @@ import {
   Shield,
   UserPlus,
   MessageSquare,
+  ArrowDown,
 } from 'lucide-react'
 import { Conversation, ConversationContent } from '../ai-elements/conversation'
-import { Message, MessageContent, MessageResponse, MessageThinkingDots } from '../ai-elements/message'
+import {
+  Message,
+  MessageContent,
+  MessageResponse,
+  MessageThinkingDots,
+  MessageCopyButton,
+  MessageRetryButton,
+} from '../ai-elements/message'
 import { PromptInput } from '../ai-elements/prompt-input'
 import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS } from './NewChatScreen'
 import { OracleChatsPanel, type OracleChatsLayout } from './OracleChatsPanel'
@@ -53,6 +61,8 @@ export interface AIChatPanelProps {
   showModeControls?: boolean
   onToggleConversations?: () => void
   placeholder?: string
+  /** Close the panel when Escape is pressed inside it (popout). */
+  closeOnEscape?: boolean
 }
 
 interface ChatMessage {
@@ -61,7 +71,17 @@ interface ChatMessage {
   content: string
   timestamp: string
   isGuest?: boolean
+  /** Set on a user message whose send failed before any reply arrived. */
+  failedError?: string
+  /** Set on an assistant reply the member stopped. */
+  stopped?: boolean
 }
+
+/** Distance from the bottom (px) that still counts as reading the latest turn. */
+const NEAR_BOTTOM_PX = 80
+
+const isAbortError = (err: unknown) =>
+  (err as { name?: string } | null)?.name === 'AbortError'
 
 export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   user: propUser,
@@ -75,6 +95,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   className = '',
   showModeControls = true,
   onToggleConversations,
+  closeOnEscape = false,
 }) => {
   const oracle = useSafeOracle()
   const session = useAuthSession()
@@ -110,8 +131,12 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const [profileRole, setProfileRole] = useState<string | null>(null)
   const [memberHandle, setMemberHandle] = useState<string | null>(null)
   const [memberLarvaId, setMemberLarvaId] = useState<string | null>(null)
+  const [draft, setDraft] = useState('')
+  const [isAwayFromBottom, setIsAwayFromBottom] = useState(false)
   const conversationRef = useRef<HTMLDivElement>(null)
   const hadUserMessagesRef = useRef(false)
+  const stickToBottomRef = useRef(true)
+  const abortRef = useRef<AbortController | null>(null)
 
   const canPickModel = isAdmin(user, profileRole)
 
@@ -368,23 +393,45 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
   }, [])
 
+  // Follow new text only while the member is at the bottom. Scrolling up to reread
+  // stops the pull and shows a Jump to latest button instead.
   useLayoutEffect(() => {
     if (!hasUserMessages) {
       hadUserMessagesRef.current = false
+      stickToBottomRef.current = true
+      setIsAwayFromBottom(false)
       return
     }
 
     const justEnteredConversation = !hadUserMessagesRef.current
     hadUserMessagesRef.current = true
+    if (justEnteredConversation) stickToBottomRef.current = true
+    if (!stickToBottomRef.current) return
     scrollConversationToBottom(justEnteredConversation || isSending ? 'auto' : 'smooth')
   }, [messages, isSending, hasUserMessages, scrollConversationToBottom])
 
-  const handlePromptSubmit = async ({ text }: { text: string }) => {
+  const handleConversationScroll = useCallback(() => {
+    const el = conversationRef.current
+    if (!el) return
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= NEAR_BOTTOM_PX
+    stickToBottomRef.current = nearBottom
+    setIsAwayFromBottom((prev) => (prev === !nearBottom ? prev : !nearBottom))
+  }, [])
+
+  const handleJumpToLatest = () => {
+    stickToBottomRef.current = true
+    setIsAwayFromBottom(false)
+    scrollConversationToBottom('smooth')
+  }
+
+  const sendMessage = async (text: string, baseMessages: ChatMessage[] = messages) => {
     setErrorMessage(null)
     if (userId && !activeThreadId && isAtChatLimit) {
       setErrorMessage(getChatLimitError().message)
+      setDraft((prev) => prev || text)
       return
     }
+    stickToBottomRef.current = true
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
@@ -393,8 +440,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
 
     const assistantId = (Date.now() + 1).toString()
-    setMessages((prev) => [
-      ...prev,
+    setMessages([
+      ...baseMessages,
       userMsg,
       {
         id: assistantId,
@@ -405,6 +452,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       },
     ])
     setIsSending(true)
+    const controller = new AbortController()
+    abortRef.current = controller
 
     let pendingStreamText = ''
     let streamFrameId: number | null = null
@@ -440,7 +489,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
 
     try {
-      const payloadMessages = [...messages, userMsg]
+      const payloadMessages = [...baseMessages, userMsg]
         .filter((m) => Boolean(m.content && m.content.trim()))
         .map((m) => ({
           role: m.role,
@@ -452,6 +501,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         userId: userId || undefined,
         threadId: activeThreadId || undefined,
         model: selectedModelId,
+        signal: controller.signal,
         onThreadId: applyThreadId,
         onChunk: queueStreamText,
       })
@@ -476,14 +526,60 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         )
       )
     } catch (err: any) {
-      setMessages((prev) => prev.filter((m) => !(m.id === assistantId && !m.content)))
-      setErrorMessage(err.message || 'Something went wrong sending your message. Please try again.')
+      if (streamFrameId != null) {
+        cancelAnimationFrame(streamFrameId)
+        streamFrameId = null
+      }
+      const partial = pendingStreamText
+      if (isAbortError(err) || controller.signal.aborted) {
+        // Keep whatever arrived and mark it, so a stopped reply never looks finished.
+        setMessages((prev) =>
+          prev.map((m) => (m.id === assistantId ? { ...m, content: partial, stopped: true } : m))
+        )
+      } else if (partial.trim()) {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === assistantId ? { ...m, content: partial } : m))
+        )
+        setErrorMessage(err?.message || 'The reply was cut off. Please try again.')
+      } else {
+        const failedError = err?.message || 'Something went wrong sending your message. Please try again.'
+        setMessages((prev) =>
+          prev
+            .filter((m) => m.id !== assistantId)
+            .map((m) => (m.id === userMsg.id ? { ...m, failedError } : m))
+        )
+      }
     } finally {
       if (streamFrameId != null) {
         cancelAnimationFrame(streamFrameId)
       }
+      if (abortRef.current === controller) abortRef.current = null
       setIsSending(false)
     }
+  }
+
+  const handlePromptSubmit = ({ text }: { text: string }) => {
+    void sendMessage(text)
+  }
+
+  const handleStop = () => {
+    abortRef.current?.abort()
+  }
+
+  // Abort an in-flight reply when the pane unmounts or switches threads.
+  useEffect(() => () => abortRef.current?.abort(), [])
+
+  const handleRetryFailed = (failedId: string) => {
+    const index = messages.findIndex((m) => m.id === failedId)
+    if (index < 0) return
+    void sendMessage(messages[index].content, messages.slice(0, index))
+  }
+
+  const handleEditFailed = (failedId: string) => {
+    const failed = messages.find((m) => m.id === failedId)
+    if (!failed) return
+    setMessages((prev) => prev.filter((m) => m.id !== failedId))
+    setDraft(failed.content)
   }
 
   const handleModeSwitch = (targetMode: OracleMode) => {
@@ -505,6 +601,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   const handleSelectThread = (selectedId: string) => {
     if (selectedId !== activeThreadId) {
+      abortRef.current?.abort()
       loadedThreadIdRef.current = null
       setMessages([])
     }
@@ -517,6 +614,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   }
 
   const handleNewChat = () => {
+    abortRef.current?.abort()
     if (oracle) {
       oracle.setActiveThreadId(null)
     } else {
@@ -537,12 +635,44 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   }
 
   const showConversation = !isChatsOpen || chatsLayout === 'column'
+  const isNewChat = !hasUserMessages && !activeThreadId
+  // Narrow panels (phone sheet, popout, sidebar) keep the prompt box docked at the bottom
+  // from the first message, so it sits above the keyboard and never jumps after sending.
+  const isNarrow = panelWidth < CHATS_COLUMN_MIN_WIDTH
+  const activeThreadTitle = activeThreadId
+    ? (threads.find((t: any) => t.id === activeThreadId)?.title as string | undefined) || null
+    : null
+  const lastAssistantId = [...messages].reverse().find((m) => m.role === 'assistant')?.id
+
+  const handleRootKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'Escape' || !closeOnEscape || isChatsOpen || isAuthModalOpen) return
+    const target = e.target as HTMLElement | null
+    if (target?.closest?.('[role="menu"], [role="dialog"], [role="alertdialog"], [role="listbox"]')) return
+    e.preventDefault()
+    handleClose()
+  }
+
+  const composer = (variant: 'docked' | 'inline') => (
+    <PromptInput
+      variant={variant}
+      value={draft}
+      onValueChange={setDraft}
+      onSubmit={handlePromptSubmit}
+      onStop={handleStop}
+      status={isSending ? 'streaming' : 'ready'}
+      placeholder={placeholder}
+      autoFocus
+      selectedModel={canPickModel ? selectedModel : undefined}
+      onSelectModel={canPickModel ? (id) => setSelectedModelId(id) : undefined}
+    />
+  )
   const chatsToggleSize = isCompact ? 'p-2 min-w-10 min-h-10' : 'p-1'
   const chatsIconSize = isCompact ? 'w-4 h-4' : 'w-3.5 h-3.5'
 
   return (
     <div
       ref={rootRef}
+      onKeyDown={handleRootKeyDown}
       className={`flex flex-col bg-surface-1/60 backdrop-blur-md border border-line-subtle shadow-menu font-sans overflow-hidden h-full w-full relative ${className}`}
     >
       {/* Faded Grayscale Watermark Logo Background */}
@@ -588,9 +718,18 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             </button>
           )}
 
-          <span className="text-xs font-bold text-ink tracking-[0.08em] truncate pointer-events-none">
-            {personaName}
-          </span>
+          {activeThreadTitle ? (
+            <span
+              className="text-sm font-medium text-ink truncate pointer-events-none"
+              title={activeThreadTitle}
+            >
+              {activeThreadTitle}
+            </span>
+          ) : (
+            <span className="text-xs font-bold text-ink tracking-[0.08em] truncate pointer-events-none">
+              {personaName}
+            </span>
+          )}
         </div>
 
         {/* Mode Switcher & Panel Controls */}
@@ -686,86 +825,128 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
           />
         )}
 
-        {showConversation && (!hasUserMessages && !activeThreadId ? (
-        <div className="flex-1 overflow-y-auto min-h-0 relative">
-          <NewChatScreen
-            userId={userId}
-            isGuest={isGuest}
-            selectedModel={selectedModel}
-            onSelectModel={(id) => setSelectedModelId(id)}
-            showModelPicker={canPickModel}
-            onSubmit={handlePromptSubmit}
-            isSending={isSending}
-            personaName={personaName}
-            placeholder={placeholder}
-            onOpenAuthModal={() => setIsAuthModalOpen(true)}
-            shortcuts={DEFAULT_PROMPT_SHORTCUTS}
-          />
-        </div>
-      ) : (
-        <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
-          {/* Message Canvas */}
-          <Conversation ref={conversationRef} className="flex-1 min-h-0">
-            <ConversationContent>
-              {messages.map((msg) => (
-                <Message
-                  key={msg.id}
-                  from={msg.role === 'user' ? 'user' : 'assistant'}
-                  timestamp={msg.timestamp}
-                  senderLabel={
-                    msg.role === 'user'
-                      ? resolveMemberPublicName({
-                          userId,
-                          handle: memberHandle,
-                          larvaId: memberLarvaId,
-                        })
-                      : undefined
-                  }
-                  user={msg.role === 'user' ? user : undefined}
+        {showConversation && (
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
+            {isNewChat ? (
+              <div className="flex-1 overflow-y-auto min-h-0 relative">
+                <NewChatScreen
+                  isGuest={isGuest}
+                  onSubmit={handlePromptSubmit}
+                  disabled={isSending}
+                  onOpenAuthModal={() => setIsAuthModalOpen(true)}
+                  shortcuts={DEFAULT_PROMPT_SHORTCUTS}
+                  composer={isNarrow ? undefined : composer('inline')}
+                />
+              </div>
+            ) : (
+              <div className="flex-1 min-h-0 relative flex flex-col">
+                <Conversation
+                  ref={conversationRef}
+                  onScroll={handleConversationScroll}
+                  className="flex-1 min-h-0"
+                  aria-live="polite"
+                  aria-busy={isSending}
                 >
-                  <MessageContent>
-                    {msg.content ? (
-                      <MessageResponse>{msg.content}</MessageResponse>
-                    ) : msg.role === 'assistant' ? (
-                      <MessageThinkingDots />
-                    ) : null}
-                    {msg.role === 'assistant' && (msg.isGuest || isGuest) && msg.content && (
-                      <div className="mt-2 pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-surface-2 px-2.5 py-1.5 rounded-control border border-line-subtle">
-                        <div className="text-[11px] text-ink-body font-sans flex items-center gap-1.5 min-w-0">
-                          <Shield className="w-3 h-3 text-cyan-glow shrink-0" />
-                          <span>Sign up free to unlock</span>
-                        </div>
-                        <BenthicCTAButton
-                          variant="cyan"
-                          size="sm"
-                          onClick={() => setIsAuthModalOpen(true)}
-                          className="w-full sm:w-auto shrink-0 !min-h-0 !py-0.5 !px-2.5"
-                        >
-                          <span className="flex items-center justify-center gap-1 text-[11px] font-bold font-grotesk tracking-[0.08em] uppercase">
-                            <UserPlus className="w-3 h-3" />
-                            <span>Sign Up</span>
-                          </span>
-                        </BenthicCTAButton>
-                      </div>
-                    )}
-                  </MessageContent>
-                </Message>
-              ))}
-            </ConversationContent>
-          </Conversation>
+                  <ConversationContent>
+                    {messages.map((msg) => {
+                      const isAssistant = msg.role === 'assistant'
+                      const isStreamingThis = isSending && msg.id === lastAssistantId
+                      const showGuestNudge =
+                        isAssistant && (msg.isGuest || isGuest) && Boolean(msg.content) && msg.id === lastAssistantId
+                      const actions = msg.failedError ? (
+                        <>
+                          <MessageRetryButton onRetry={() => handleRetryFailed(msg.id)} />
+                          <button
+                            type="button"
+                            onClick={() => handleEditFailed(msg.id)}
+                            className="inline-flex items-center h-7 px-1.5 rounded-control text-[11px] text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                          >
+                            Edit
+                          </button>
+                        </>
+                      ) : isAssistant && msg.content && !isStreamingThis ? (
+                        <MessageCopyButton text={msg.content} />
+                      ) : undefined
 
-          {/* Active Conversation Input Box */}
-          <div className="shrink-0">
-            <PromptInput
-              onSubmit={handlePromptSubmit}
-              status={isSending ? 'streaming' : 'ready'}
-              placeholder={placeholder}
-              selectedModel={canPickModel ? selectedModel : undefined}
-              onSelectModel={canPickModel ? (id) => setSelectedModelId(id) : undefined}
-            />
+                      return (
+                        <Message
+                          key={msg.id}
+                          from={msg.role === 'user' ? 'user' : 'assistant'}
+                          timestamp={msg.timestamp}
+                          senderLabel={
+                            msg.role === 'user'
+                              ? resolveMemberPublicName({
+                                  userId,
+                                  handle: memberHandle,
+                                  larvaId: memberLarvaId,
+                                })
+                              : undefined
+                          }
+                          user={msg.role === 'user' ? user : undefined}
+                          actions={actions}
+                          actionsAlwaysVisible={Boolean(msg.failedError)}
+                        >
+                          <MessageContent>
+                            {msg.role === 'user' ? (
+                              msg.content
+                            ) : msg.content ? (
+                              <MessageResponse>{msg.content}</MessageResponse>
+                            ) : msg.stopped ? null : (
+                              <MessageThinkingDots />
+                            )}
+                            {msg.stopped && (
+                              <p className="text-[11px] text-ink-muted">
+                                {msg.content ? 'Stopped.' : 'Stopped before a reply came through.'}
+                              </p>
+                            )}
+                            {showGuestNudge && (
+                              <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-surface-2 px-3 py-2 rounded-control border border-line-subtle">
+                                <div className="text-[11px] text-ink-body font-sans flex items-center gap-1.5 min-w-0">
+                                  <Shield className="w-3 h-3 text-cyan-glow shrink-0" />
+                                  <span>Sign up free for full answers and saved chats.</span>
+                                </div>
+                                <BenthicCTAButton
+                                  variant="cyan"
+                                  size="sm"
+                                  onClick={() => setIsAuthModalOpen(true)}
+                                  className="w-full sm:w-auto shrink-0 !min-h-0 !py-0.5 !px-2.5"
+                                >
+                                  <span className="flex items-center justify-center gap-1 text-[11px] font-bold font-grotesk tracking-[0.08em] uppercase">
+                                    <UserPlus className="w-3 h-3" />
+                                    <span>Sign Up</span>
+                                  </span>
+                                </BenthicCTAButton>
+                              </div>
+                            )}
+                          </MessageContent>
+                          {msg.failedError && (
+                            <p role="alert" className="mt-1.5 flex items-center gap-1.5 text-[11px] text-crimson-text">
+                              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                              <span>{msg.failedError}</span>
+                            </p>
+                          )}
+                        </Message>
+                      )
+                    })}
+                  </ConversationContent>
+                </Conversation>
+
+                {isAwayFromBottom && (
+                  <button
+                    type="button"
+                    onClick={handleJumpToLatest}
+                    className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-surface-2 border border-line shadow-menu text-xs text-ink-body hover:text-ink hover:border-line-hover transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow animate-in fade-in slide-in-from-bottom-1 duration-150"
+                  >
+                    <ArrowDown className="w-3.5 h-3.5" />
+                    <span>Jump to latest</span>
+                  </button>
+                )}
+              </div>
+            )}
+
+            {(!isNewChat || isNarrow) && <div className="shrink-0">{composer('docked')}</div>}
           </div>
-        </div>
-      ))}
+        )}
       </div>
 
       {/* Auth Modal Triggered from In-Chat Gating CTAs */}

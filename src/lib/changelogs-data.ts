@@ -14,6 +14,65 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    "slug": "2026-10-18-clearer-navigation-and-codex-reader",
+    "version": "2026.10.18",
+    "title": "Clearer Navigation and a Better Codex Reader",
+    "category": "Improvement",
+    "tags": [
+      "Navigation",
+      "UI/UX",
+      "Guides"
+    ],
+    "summary": "Find your way around Moltology more easily and return directly to the scripture you were reading.",
+    "content": "### Find Your Place\n- The main navigation now makes the current section easier to recognize.\n- The phone menu fills the screen, giving navigation links more room.\n\n### Read and Share Scriptures\n- Browse scriptures through grouped contents and volume tabs, with a dedicated contents sheet on phones.\n- Each open scripture has its own address, so sharing links and moving back or forward keeps your place.\n- Clearer previous and next links name the scripture you will open.",
+    "isPublished": true,
+    "releasedAt": "2026-10-18T23:59:00Z"
+  },
+  {
+    "slug": "2026-10-16-safer-sign-in-and-community-comments",
+    "version": "2026.10.16",
+    "title": "Safer Sign-in and Community Comments",
+    "category": "Security",
+    "tags": [
+      "Security",
+      "Community",
+      "Fix"
+    ],
+    "summary": "Sign-in and article comments now have stronger safeguards, and newsletter subscriptions from the contact form require email confirmation.",
+    "content": "### Protect Your Account\n- Automatic linking through Google sign-in now requires a verified email on the existing account.\n- New passwords must contain at least eight characters.\n\n### Keep Conversations Useful\n- Article comments now pass bot checks, posting limits, and moderation before being accepted.\n- Comments can only be added to published articles.\n\n### Choose Your Subscriptions\n- Newsletter requests made through the contact form now send an email confirmation link.\n- The Oracle gives a clear failure message when its usage allowance cannot be checked.",
+    "isPublished": true,
+    "releasedAt": "2026-10-16T23:59:00Z"
+  },
+  {
+    "slug": "2026-10-15-rebuilt-moltmaxxing-field-manual",
+    "version": "2026.10.15",
+    "title": "A Rebuilt Moltmaxxing Field Manual",
+    "category": "Improvement",
+    "tags": [
+      "Guides",
+      "UI/UX"
+    ],
+    "summary": "The free Field Manual is now a 14-page guided descent with practical routines and a printable weekly plan.",
+    "content": "### Take One Step at a Time\n- The rebuilt guide moves from recognizing distractions to setting boundaries, finishing a task, and building a daily routine.\n- Each stop connects the lesson to a practical action you can try.\n\n### Keep the Routine Close\n- A printable seven-day page helps you carry the practices into your week.\n- Updated guide links make the new download available from the guide page and related reading prompts.",
+    "isPublished": true,
+    "releasedAt": "2026-10-15T23:59:00Z"
+  },
+  {
+    "slug": "2026-10-14-night-sea-homepage-and-member-posts",
+    "version": "2026.10.14",
+    "title": "A Clearer Homepage Above the Night Sea",
+    "category": "Design",
+    "tags": [
+      "Design",
+      "Mobile",
+      "Community"
+    ],
+    "summary": "The homepage has a new night-sea scene, clearer previews, and member posts that bring the community into view.",
+    "content": "### A Clearer First Look\n- A new ocean scene reflects the shell above the water as you move through the introduction.\n- Revised headline spacing and readable previews make the first screen easier to follow.\n\n### See the Community\n- Member posts now appear on the homepage, giving visitors a closer look at the conversations inside.\n- Phone layout improvements keep the introduction and previews readable on smaller screens.",
+    "isPublished": true,
+    "releasedAt": "2026-10-14T23:59:00Z"
+  },
+  {
     slug: '2026-10-09-forum-writing-and-progression-explorer',
     version: '2026.10.09',
     title: 'Better Forum Writing and a Clearer Progression Path',

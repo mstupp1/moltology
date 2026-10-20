@@ -55,8 +55,8 @@ describe('AIChatPanel Guest Mode Gating', () => {
 
     expect(screen.queryByText(/Welcome! I am the/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/Welcome back!/i)).not.toBeInTheDocument()
-    expect(screen.getByText(/You're currently exploring in Guest Mode/i)).toBeInTheDocument()
-    expect(screen.getByText(/Sign up free to unlock/i)).toBeInTheDocument()
+    expect(screen.getByText(/You're exploring as a guest/i)).toBeInTheDocument()
+    expect(screen.getByText(/Sign up free for full answers/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Sign Up/i })).toBeInTheDocument()
   })
 
@@ -65,8 +65,8 @@ describe('AIChatPanel Guest Mode Gating', () => {
 
     expect(screen.queryByText(/Welcome! I am the/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/Welcome back!/i)).not.toBeInTheDocument()
-    expect(screen.queryByText(/Sign up free to unlock/i)).not.toBeInTheDocument()
-    expect(screen.queryByText(/You're currently exploring in Guest Mode/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Sign up free for full answers/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/You're exploring as a guest/i)).not.toBeInTheDocument()
     expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Select Cognition Model/i })).not.toBeInTheDocument()
   })
@@ -107,7 +107,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
     expect(screen.queryByText(/Welcome back!/i)).not.toBeInTheDocument()
 
     // In-message CTA card appears on assistant responses
-    expect(screen.getAllByText(/Sign up free to unlock/i).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/Sign up free for full answers/i).length).toBeGreaterThan(0)
     const accountButtons = screen.getAllByRole('button', { name: /Sign Up/i })
     expect(accountButtons.length).toBeGreaterThan(0)
   })
@@ -499,7 +499,7 @@ describe('AIChatPanel Chats List Panel', () => {
     render(<AIChatPanel />)
 
     expect(screen.queryByText(/GUEST MODE/i)).not.toBeInTheDocument()
-    expect(screen.queryByText(/You're currently exploring in Guest Mode/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/You're exploring as a guest/i)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /SIGN UP FREE/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^Sign Up$/i })).not.toBeInTheDocument()
   })
@@ -509,7 +509,7 @@ describe('AIChatPanel Chats List Panel', () => {
     render(<AIChatPanel userId={null} />)
 
     expect(screen.queryByText(/GUEST MODE/i)).not.toBeInTheDocument()
-    expect(screen.queryByText(/You're currently exploring in Guest Mode/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/You're exploring as a guest/i)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /SIGN UP FREE/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^Sign Up$/i })).not.toBeInTheDocument()
   })
@@ -563,6 +563,65 @@ describe('AIChatPanel Thinking State & Error Handling', () => {
       expect(screen.queryByRole('status', { name: /Thinking.../i })).not.toBeInTheDocument()
     })
   })
+
+  it('offers Retry on a failed send and resends the same question', async () => {
+    const { streamOracleChat } = await import('@/lib/ai/stream-oracle-chat-client')
+    ;(streamOracleChat as any).mockRejectedValueOnce(new Error('Daily limit reached.'))
+
+    render(<AIChatPanel userId="usr_valid_user" />)
+    fireEvent.click(screen.getByRole('button', { name: /what is moltology/i }))
+
+    const retry = await screen.findByRole('button', { name: 'Retry' })
+    expect(screen.getByRole('alert')).toHaveTextContent('Daily limit reached.')
+
+    fireEvent.click(retry)
+    await waitFor(() => {
+      expect(screen.getByText(/Stage 3 Exoshell requires complete chitin hardening/i)).toBeInTheDocument()
+    })
+    expect(screen.getAllByText('What is Moltology and why should I molt?')).toHaveLength(1)
+    expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument()
+  })
+
+  it('puts a failed message back in the box with Edit', async () => {
+    const { streamOracleChat } = await import('@/lib/ai/stream-oracle-chat-client')
+    ;(streamOracleChat as any).mockRejectedValueOnce(new Error('Network error.'))
+
+    render(<AIChatPanel userId="usr_valid_user" />)
+    fireEvent.click(screen.getByRole('button', { name: /what is moltology/i }))
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }))
+    const box = screen.getByRole('textbox', { name: 'Message' }) as HTMLTextAreaElement
+    expect(box.value).toBe('What is Moltology and why should I molt?')
+  })
+
+  it('stops a streaming reply and keeps what arrived', async () => {
+    const { streamOracleChat } = await import('@/lib/ai/stream-oracle-chat-client')
+    ;(streamOracleChat as any).mockImplementationOnce(
+      ({ signal, onChunk }: { signal: AbortSignal; onChunk: (t: string) => void }) =>
+        new Promise((_, reject) => {
+          onChunk('Partial wisdom')
+          signal.addEventListener('abort', () => {
+            const err = new Error('aborted')
+            err.name = 'AbortError'
+            reject(err)
+          })
+        })
+    )
+
+    render(<AIChatPanel userId="usr_valid_user" />)
+    fireEvent.click(screen.getByRole('button', { name: /what is moltology/i }))
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Stop reply' }))
+    await waitFor(() => {
+      expect(screen.getByText('Stopped.')).toBeInTheDocument()
+    })
+    expect(screen.getByText('Partial wisdom')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Send message' })).toBeInTheDocument()
+  })
+
+  it('shows Copy on finished replies', async () => {
+    render(<AIChatPanel userId="usr_valid_user" />)
+    fireEvent.click(screen.getByRole('button', { name: /what is moltology/i }))
+    expect(await screen.findByRole('button', { name: 'Copy message' })).toBeInTheDocument()
+  })
 })
-
-

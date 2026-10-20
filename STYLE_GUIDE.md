@@ -221,8 +221,11 @@ zooming out.
   splits it at the first colon. Title-only does not ship.
 - One category pill. Author persona and clearance in the byline. Rotate personas
   (BRAND_BIBLE §3.2).
-- Open with the human friction. Let the molt follow from the story. Close with one quiet
-  invitation, not a product recital and not an economy recital.
+- Before the colon, name something real or make a claim; no mystery-object hooks. Title
+  rules and the banned shapes live in the `blog-creator` skill.
+- Open with the human friction inside the story itself. Let the molt follow from the story.
+  Close with the takeaway. A single invitation to a specific feature is optional, used only
+  when one fits; never a product recital, an economy recital, or a stock sign-off.
 - When citing a real article, hyperlink the outlet or headline inline. A citation is not a
   stack leak.
 - No ASCII boxes or decorative code. Tables only when they carry real numbers.

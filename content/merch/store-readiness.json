@@ -13,11 +13,12 @@
   },
   "migrations": {
     "devApplied": [
-      "0051_flat_yellowjacket",
-      "0052_merch_payment_backfill"
+      "0052_flat_yellowjacket",
+      "0053_merch_payment_backfill"
     ],
     "databaseHashesMatchSources": true,
-    "production": "existing CI path only; not executed"
+    "production": "existing CI path only; not executed",
+    "mergeResolution": "Renumbered after main Academy migration 0051; applied store SQL hashes and timestamps preserved."
   },
   "verification": {
     "core": "1179 passed; 12 opt-in integration tests skipped in core run",

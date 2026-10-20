@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Search, X, Users, FileText, History } from 'lucide-react'
-import { useToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { useMemberSearch } from '@/hooks/useMemberSearch'
@@ -39,18 +38,10 @@ type PaletteRow =
 function runCatalogCommand(
   command: CommandCatalogItem,
   navigate: ReturnType<typeof useNavigate>,
-  toast: ReturnType<typeof useToast>['toast'],
   close: () => void,
 ) {
   const dest = catalogNavigateArgs(command)
-  if (dest) {
-    navigate(dest)
-  } else if (command.toast) {
-    toast.success(command.toast.message, {
-      id: command.toast.id,
-      title: command.toast.title,
-    })
-  }
+  if (dest) navigate(dest)
   close()
 }
 
@@ -59,7 +50,6 @@ export const CommandPalette: React.FC = () => {
   const [query, setQuery] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
   const navigate = useNavigate()
-  const { toast } = useToast()
   const session = useAuthSession()
   const hiddenAccess = useHiddenPageAccess()
   const includeHidden = hiddenAccess.canView && !hiddenAccess.pending
@@ -150,7 +140,7 @@ export const CommandPalette: React.FC = () => {
     }
     if (row.kind === 'page') {
       if (memberId) setRecents(rememberOpenedPage(memberId, row.command))
-      runCatalogCommand(row.command, navigate, toast, close)
+      runCatalogCommand(row.command, navigate, close)
       return
     }
     goToSearch(people.length > 0 ? 'people' : 'pages')
@@ -168,7 +158,7 @@ export const CommandPalette: React.FC = () => {
     activateRow({ kind: 'page', command: pageFromRecent(entry) })
   }
 
-  const shedTrail = () => {
+  const clearRecents = () => {
     setRecents(clearSearchRecents(memberId))
   }
 
@@ -208,13 +198,16 @@ export const CommandPalette: React.FC = () => {
                 <input
                   type="text"
                   autoFocus
-                  placeholder="Type a command or search protocol (e.g. Market, Purge, a designation)..."
+                  placeholder="Search pages and members"
+                  aria-label="Search"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   className="bg-transparent text-ink placeholder:text-ink-muted focus:outline-none w-full text-xs sm:text-sm font-sans"
                 />
               </div>
               <button
+                type="button"
+                aria-label="Close search"
                 onClick={() => setIsOpen(false)}
                 className="rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow p-1 min-w-[36px] min-h-[36px] flex items-center justify-center"
               >
@@ -233,11 +226,11 @@ export const CommandPalette: React.FC = () => {
                     <button
                       type="button"
                       data-testid="command-palette-recents-clear"
-                      onClick={shedTrail}
+                      onClick={clearRecents}
                       className="rounded-control text-[11px] uppercase tracking-[0.08em] text-ink-muted hover:text-cyan-glow transition-colors min-h-[36px] px-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                       aria-label="Clear recents"
                     >
-                      Shed trail
+                      Clear
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -260,18 +253,18 @@ export const CommandPalette: React.FC = () => {
                   </div>
                   {!signedIn && (
                     <p className="px-3 py-2 text-xs text-ink-muted">
-                      Sign in to search fellow members. Page jumps stay open.
+                      Sign in to search members. You can still search pages.
                     </p>
                   )}
                   {signedIn && searchingPeople && people.length === 0 && (
-                    <p className="px-3 py-2 text-xs text-ink-muted">Listening for designations…</p>
+                    <p className="px-3 py-2 text-xs text-ink-muted">Searching members…</p>
                   )}
                   {signedIn &&
                     !searchingPeople &&
                     people.length === 0 &&
                     trimmed.length >= MEMBER_SEARCH_MIN_CHARS && (
                       <p className="px-3 py-2 text-xs text-ink-muted">
-                        The trench stayed quiet. No designation, larva unit, or name surfaced.
+                        No members match that.
                       </p>
                     )}
                   {people.map((member) => {
@@ -318,7 +311,7 @@ export const CommandPalette: React.FC = () => {
                 )}
                 {filteredCommands.length === 0 && !trimmed ? (
                   <div className="p-6 text-center text-ink-muted text-xs tracking-wider">
-                    The Path is listening. Name a chamber or a rite.
+                    Search for a page, scripture or member.
                   </div>
                 ) : filteredCommands.length === 0 ? null : (
                   filteredCommands.map((cmd) => {
@@ -366,9 +359,9 @@ export const CommandPalette: React.FC = () => {
                   }`}
                 >
                   <div>
-                    <div className="font-semibold text-xs tracking-wide">See all</div>
+                    <div className="font-semibold text-xs tracking-wide">See all results</div>
                     <div className="text-[11px] text-ink-muted uppercase tracking-[0.08em]">
-                      Open full search for {trimmed}
+                      Full search for “{trimmed}”
                     </div>
                   </div>
                   <Search className="w-4 h-4 text-cyan-glow" />
@@ -377,19 +370,21 @@ export const CommandPalette: React.FC = () => {
 
               {rows.length === 0 && (
                 <div className="p-6 text-center text-ink-muted text-xs tracking-wider">
-                  The Path heard you. No shells or chambers answered.
+                  No results for “{trimmed}”.
                 </div>
               )}
             </div>
 
-            <div className="px-4 py-2 bg-surface-2 border-t border-line-subtle text-[11px] text-ink-muted flex justify-between items-center">
-              <div>
-                Navigation: <span className="text-cyan-glow">↑ ↓</span> to move,{' '}
-                <span className="text-cyan-glow">↵</span> to select
-              </div>
-              <div className="text-crimson-text font-semibold uppercase tracking-[0.08em]">
-                SYNAPTIC PATH COMMAND CORE
-              </div>
+            <div className="px-4 py-2 bg-surface-2 border-t border-line-subtle text-[11px] text-ink-muted flex flex-wrap gap-x-4 gap-y-1 items-center">
+              <span>
+                <span className="text-ink">↑ ↓</span> move
+              </span>
+              <span>
+                <span className="text-ink">↵</span> open
+              </span>
+              <span>
+                <span className="text-ink">Esc</span> close
+              </span>
             </div>
           </div>
         </div>

@@ -41,19 +41,19 @@ describe('HUDSidebar Component Navigation & Animations', () => {
   it('renders core navigation groups and items correctly', () => {
     render(<HUDSidebar />)
 
-    expect(screen.getByText('CORE COMMAND')).toBeInTheDocument()
-    expect(screen.getByText('KNOWLEDGE & DOCTRINE')).toBeInTheDocument()
-    expect(screen.getByText('OPERATIONS & GEAR')).toBeInTheDocument()
-    expect(screen.getAllByText('COMMUNITY').length).toBeGreaterThan(1)
+    expect(screen.getByText('MAIN')).toBeInTheDocument()
+    expect(screen.getByText('LEARN')).toBeInTheDocument()
+    expect(screen.getByText('COMMUNITY')).toBeInTheDocument()
+    expect(screen.getByText('GEAR & SHOP')).toBeInTheDocument()
 
-    expect(screen.getAllByText('COMMAND HUB').length).toBeGreaterThan(0)
-    expect(screen.getByText('SYNAPTIC ORACLE')).toBeInTheDocument()
+    expect(screen.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
+    expect(screen.getByText('ORACLE')).toBeInTheDocument()
   })
 
   it('navigates to route on nav item click', () => {
     render(<HUDSidebar />)
 
-    const codexBtn = screen.getByRole('button', { name: /THE SACRED CODEX/i })
+    const codexBtn = screen.getByRole('button', { name: /^CODEX$/i })
     fireEvent.click(codexBtn)
 
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/codex' })
@@ -71,7 +71,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
   it('toggles section open and closed on header click', () => {
     render(<HUDSidebar />)
 
-    const coreHeader = screen.getByRole('button', { name: /CORE COMMAND/i })
+    const coreHeader = screen.getByRole('button', { name: /MAIN/i })
     fireEvent.click(coreHeader)
 
     const accordionContent = coreHeader.parentElement?.querySelector('.grid')
@@ -152,17 +152,18 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(aside).toHaveClass('md:w-[72px]')
 
     // Check for short labels
-    expect(screen.getByText('CODEX')).toBeInTheDocument()
-    expect(screen.getByText('HUB')).toBeInTheDocument()
-    expect(screen.getByText('ORACLE')).toBeInTheDocument()
-    expect(screen.getByText('ACADEMY')).toBeInTheDocument()
-    expect(screen.getByText('SCIENCE')).toBeInTheDocument()
+    expect(screen.getAllByText('CODEX').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('ORACLE').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('ACADEMY').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('SCIENCE').length).toBeGreaterThan(0)
     expect(screen.queryByText('JOURNAL')).not.toBeInTheDocument()
-    expect(screen.getByText('MARKET')).toBeInTheDocument()
-    expect(screen.getByText('CHASSIS')).toBeInTheDocument()
-    expect(screen.getByText('LINKS')).toBeInTheDocument()
-    expect(screen.getAllByText('COMMUNITY').length).toBeGreaterThan(0)
-    expect(screen.getByText('SUPPORT')).toBeInTheDocument()
+    expect(screen.getAllByText('MARKET').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('GEAR').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('PEOPLE').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('FORUM').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('ACTIVITY').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('SUPPORT').length).toBeGreaterThan(0)
   })
 
   it('toggles mobile HUD menu state on mobile button click and renders icon-only with no text', () => {
@@ -171,13 +172,13 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     // When mobile menu is closed, task list button is present in header next to hamburger
     expect(screen.getByLabelText('Daily alignment tasks schedule')).toBeInTheDocument()
 
-    const mobileMenuBtn = screen.getByRole('button', { name: /Open HUD Menu/i })
+    const mobileMenuBtn = screen.getByRole('button', { name: /Open menu/i })
     expect(mobileMenuBtn).toBeInTheDocument()
     expect(mobileMenuBtn.textContent).toBe('')
 
     fireEvent.click(mobileMenuBtn)
 
-    const closeMenuBtn = screen.getByRole('button', { name: /Close HUD Menu/i })
+    const closeMenuBtn = screen.getByRole('button', { name: /Close menu/i })
     expect(closeMenuBtn).toBeInTheDocument()
     expect(closeMenuBtn.textContent).toBe('')
 
@@ -189,7 +190,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
   it('renders mobile menu as full-screen portal modal with body scroll locked', async () => {
     render(<HUDSidebar />)
 
-    const mobileMenuBtn = screen.getByRole('button', { name: /Open HUD Menu/i })
+    const mobileMenuBtn = screen.getByRole('button', { name: /Open menu/i })
     fireEvent.click(mobileMenuBtn)
 
     const dialog = screen.getByRole('dialog', { name: /Navigation Menu/i })
@@ -198,7 +199,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(document.body.style.overflow).toBe('hidden')
 
     // Close via close button
-    const closeBtn = screen.getByRole('button', { name: /Close HUD Menu/i })
+    const closeBtn = screen.getByRole('button', { name: /Close menu/i })
     fireEvent.click(closeBtn)
 
     await waitFor(() => {
@@ -210,7 +211,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
   it('closes mobile full-screen menu when Escape key is pressed', async () => {
     render(<HUDSidebar />)
 
-    const mobileMenuBtn = screen.getByRole('button', { name: /Open HUD Menu/i })
+    const mobileMenuBtn = screen.getByRole('button', { name: /Open menu/i })
     fireEvent.click(mobileMenuBtn)
 
     expect(screen.getByRole('dialog', { name: /Navigation Menu/i })).toBeInTheDocument()
@@ -225,14 +226,14 @@ describe('HUDSidebar Component Navigation & Animations', () => {
   it('navigates and closes mobile menu when nav item inside modal is clicked', async () => {
     render(<HUDSidebar />)
 
-    const mobileMenuBtn = screen.getByRole('button', { name: /Open HUD Menu/i })
+    const mobileMenuBtn = screen.getByRole('button', { name: /Open menu/i })
     fireEvent.click(mobileMenuBtn)
 
     const dialog = screen.getByRole('dialog', { name: /Navigation Menu/i })
     expect(dialog).toBeInTheDocument()
 
     // Find nav buttons inside the dialog
-    const codexBtns = screen.getAllByRole('button', { name: /THE SACRED CODEX/i })
+    const codexBtns = screen.getAllByRole('button', { name: /^CODEX$/i })
     // The second one is inside the mobile dialog
     const mobileCodexBtn = codexBtns[codexBtns.length - 1]
     fireEvent.click(mobileCodexBtn)

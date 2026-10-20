@@ -1,172 +1,47 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { NewChatScreen } from './NewChatScreen'
-import { getOracleModel } from '@/lib/ai/oracle-models'
+import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS } from './NewChatScreen'
 
-describe('NewChatScreen Component', () => {
-  const mockOnSubmit = vi.fn()
-  const mockOnSelectModel = vi.fn()
-  const mockOnOpenAuthModal = vi.fn()
+describe('NewChatScreen', () => {
+  const onSubmit = vi.fn()
 
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  it('renders centered new chat interface with workspace, model, and suggestions', () => {
-    render(
-      <NewChatScreen
-        userId="usr_test"
-        selectedModel={getOracleModel()}
-        onSelectModel={mockOnSelectModel}
-        onSubmit={mockOnSubmit}
-        onOpenAuthModal={mockOnOpenAuthModal}
-      />
-    )
+  it('shows the greeting and every suggestion at once, with no workspace picker', () => {
+    render(<NewChatScreen onSubmit={onSubmit} />)
 
-    // Workspace
-    expect(screen.getByRole('button', { name: /Workspace Context/i })).toBeInTheDocument()
-    expect(screen.getByText('moltology')).toBeInTheDocument()
-
-    // Main prompt card
-    expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Select Cognition Model/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Add Context/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Voice Dictation/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Transmit Query/i })).toBeInTheDocument()
-
-    // Subtle thought cycler
-    expect(screen.getByRole('button', { name: /what is moltology/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Ask the Oracle' })).toBeInTheDocument()
+    for (const s of DEFAULT_PROMPT_SHORTCUTS) {
+      expect(screen.getByRole('button', { name: s.label })).toBeInTheDocument()
+    }
+    expect(screen.queryByRole('button', { name: /Workspace/i })).not.toBeInTheDocument()
+    expect(screen.queryByText(/Target Workspace/i)).not.toBeInTheDocument()
   })
 
-  it('allows switching workspace via dropdown', () => {
-    render(
-      <NewChatScreen
-        userId="usr_test"
-        selectedModel={getOracleModel()}
-        onSelectModel={mockOnSelectModel}
-        onSubmit={mockOnSubmit}
-      />
-    )
-
-    const workspaceBtn = screen.getByRole('button', { name: /Workspace Context/i })
-    fireEvent.click(workspaceBtn)
-
-    expect(screen.getByText('benthic-vault')).toBeInTheDocument()
-    const targetOption = screen.getByRole('button', { name: /benthic-vault/i })
-    fireEvent.click(targetOption)
-
-    expect(screen.getByText('benthic-vault')).toBeInTheDocument()
+  it('sends a suggestion straight away', () => {
+    render(<NewChatScreen onSubmit={onSubmit} />)
+    fireEvent.click(screen.getByRole('button', { name: 'What is Moltology?' }))
+    expect(onSubmit).toHaveBeenCalledWith({ text: 'What is Moltology and why should I molt?' })
   })
 
-  it('allows viewing model info via cognition model dropdown when showModelPicker is enabled', () => {
-    render(
-      <NewChatScreen
-        userId="usr_test"
-        selectedModel={getOracleModel()}
-        onSelectModel={mockOnSelectModel}
-        onSubmit={mockOnSubmit}
-        showModelPicker
-      />
-    )
-
-    const modelBtn = screen.getByRole('button', { name: /Select Cognition Model/i })
-    fireEvent.click(modelBtn)
-
-    expect(screen.getAllByText('GLM 5.3 Flash').length).toBeGreaterThan(0)
-    const glmOptions = screen.getAllByRole('button', { name: /GLM 5.3 Flash/i })
-    fireEvent.click(glmOptions[glmOptions.length - 1])
-
-    expect(mockOnSelectModel).toHaveBeenCalledWith('zai/glm-5.3-flash')
+  it('renders the composer in the centered layout when given one', () => {
+    render(<NewChatScreen onSubmit={onSubmit} composer={<textarea aria-label="Message" />} />)
+    expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
   })
 
-  it('renders the Chat badge and pricing in model dropdown and allows selecting GLM 5.3 Flash', () => {
-    render(
-      <NewChatScreen
-        userId="usr_test"
-        selectedModel={getOracleModel()}
-        onSelectModel={mockOnSelectModel}
-        onSubmit={mockOnSubmit}
-        showModelPicker
-      />
-    )
-
-    const modelBtn = screen.getByRole('button', { name: /Select Cognition Model/i })
-    fireEvent.click(modelBtn)
-
-    expect(screen.getByText('Chat')).toBeInTheDocument()
-
-    // Tabular headers
-    expect(screen.getByText('In / 1M')).toBeInTheDocument()
-    expect(screen.getByText('Out / 1M')).toBeInTheDocument()
-    expect(screen.getByText('Latency')).toBeInTheDocument()
-
-    // Pricing & latency values for GLM Flash
-    expect(screen.getByText('$0.15')).toBeInTheDocument()
-    expect(screen.getByText('$0.50')).toBeInTheDocument()
-    expect(screen.getAllByText('0.4s').length).toBeGreaterThan(0)
-
-    const glmOption = screen.getAllByRole('button', { name: /GLM 5.3 Flash/i })[0]
-    fireEvent.click(glmOption)
-
-    expect(mockOnSelectModel).toHaveBeenCalledWith('zai/glm-5.3-flash')
+  it('suggests earning Chitin Gems, not Molt Credits', () => {
+    const prompts = DEFAULT_PROMPT_SHORTCUTS.map((s) => s.prompt).join(' ')
+    expect(prompts).not.toMatch(/earn Molt Credits/i)
+    expect(prompts).toMatch(/Chitin Gems/)
   })
 
-  it('submits typed prompt on submit click and Enter key press', () => {
-    render(
-      <NewChatScreen
-        userId="usr_test"
-        selectedModel={getOracleModel()}
-        onSelectModel={mockOnSelectModel}
-        onSubmit={mockOnSubmit}
-      />
-    )
-
-    const textarea = screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)
-    fireEvent.change(textarea, { target: { value: 'How do I start molting?' } })
-
-    const transmitBtn = screen.getByRole('button', { name: /Transmit Query/i })
-    fireEvent.click(transmitBtn)
-
-    expect(mockOnSubmit).toHaveBeenCalledWith({ text: 'How do I start molting?' })
-  })
-
-  it('submits immediately when clicking a suggestion chip', () => {
-    render(
-      <NewChatScreen
-        userId="usr_test"
-        selectedModel={getOracleModel()}
-        onSelectModel={mockOnSelectModel}
-        onSubmit={mockOnSubmit}
-      />
-    )
-
-    const suggestionBtn = screen.getByRole('button', { name: /what is moltology/i })
-    fireEvent.click(suggestionBtn)
-
-    expect(mockOnSubmit).toHaveBeenCalledWith({
-      text: 'What is Moltology and why should I molt?',
-    })
-  })
-
-  it('attaches directives from plus menu into textarea', () => {
-    render(
-      <NewChatScreen
-        userId="usr_test"
-        selectedModel={getOracleModel()}
-        onSelectModel={mockOnSelectModel}
-        onSubmit={mockOnSubmit}
-      />
-    )
-
-    const plusBtn = screen.getByRole('button', { name: /Add Context/i })
-    fireEvent.click(plusBtn)
-
-    expect(screen.getByText('Attach Codex Scripture')).toBeInTheDocument()
-    const scriptureBtn = screen.getByText('Attach Codex Scripture')
-    fireEvent.click(scriptureBtn)
-
-    const textarea = screen.getByPlaceholderText(/Ask Synaptic Oracle.../i) as HTMLTextAreaElement
-    expect(textarea.value).toContain('[Directive: Consult Scripture & Codex]')
+  it('shows the guest banner with a sign-up button', () => {
+    const onOpenAuthModal = vi.fn()
+    render(<NewChatScreen onSubmit={onSubmit} isGuest onOpenAuthModal={onOpenAuthModal} />)
+    fireEvent.click(screen.getByRole('button', { name: /Sign Up/i }))
+    expect(onOpenAuthModal).toHaveBeenCalled()
   })
 })

@@ -32,3 +32,6 @@ output/guide/*.pdf
 
 # Generated local Codex environment configuration (contains checkout-specific paths).
 /.codex/environments/environment.toml
+
+# Academy lecture media is uploaded to the bucket by npm run academy:ingest, never committed
+content/academy/**/media/
