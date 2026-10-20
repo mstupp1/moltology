@@ -1,18 +1,13 @@
-import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { seo } from '@/lib/seo'
-import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
-
-const LazyPrivacyPolicyPage = lazy(() =>
-  import('@/components/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage }))
-)
+import { PrivacyPolicyPage } from '@/components/PrivacyPolicyPage'
 
 export const Route = createFileRoute('/privacy')({
   head: () => ({
     meta: [
       ...seo({
-        title: 'Privacy Policy | Moltology Benthic Protocol',
-        description: 'Benthic data governance, telemetry privacy, and zero-leakage chitinous encryption standards.',
+        title: 'Privacy Policy | Moltology',
+        description: 'How Moltology collects, uses, stores, and shares personal information, including Google sign-in data, and how to request deletion.',
         canonical: 'https://moltology.org/privacy',
         siteName: 'Moltology',
         twitterSite: '@moltology',
@@ -22,10 +17,5 @@ export const Route = createFileRoute('/privacy')({
       { rel: 'canonical', href: 'https://moltology.org/privacy' },
     ],
   }),
-  component: () => (
-    <Suspense fallback={<HUDPageLoader />}>
-      <LazyPrivacyPolicyPage />
-    </Suspense>
-  ),
+  component: PrivacyPolicyPage,
 })
-

@@ -38,7 +38,7 @@ describe('Markdown Generator', () => {
     expect(orgMd).toContain('Moltology Organization — The Synaptic Path Structure & Mission')
 
     const privMd = generatePrivacyMarkdown()
-    expect(privMd).toContain('Benthic Data Covenant — Privacy Policy')
+    expect(privMd).toContain('Privacy Policy | Moltology')
 
     const termsMd = generateTermsMarkdown()
     expect(termsMd).toContain('Binding Initiation Covenant — Terms of Service')
