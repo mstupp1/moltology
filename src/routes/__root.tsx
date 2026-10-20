@@ -11,6 +11,7 @@ import { ToastProvider } from '@/components/ui/ToastProvider'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import { Analytics } from '@vercel/analytics/react'
 import brandAssets from '@/components/ui/brand-assets.json'
+import { filterPrivateStoreTelemetry } from '@/lib/store-privacy'
 import { captureAttribution } from '@/lib/attribution'
 
 const LazyHUDNotFound = lazy(() =>
@@ -136,8 +137,8 @@ function RootDocument() {
           </ToastProvider>
         </HUDErrorBoundary>
         <Scripts />
-        <SpeedInsights />
-        <Analytics />
+        <SpeedInsights beforeSend={filterPrivateStoreTelemetry} />
+        <Analytics beforeSend={filterPrivateStoreTelemetry} />
         <AttributionCapture />
       </body>
 

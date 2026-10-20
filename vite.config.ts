@@ -110,7 +110,7 @@ export default defineConfig(({ mode }) => {
                 autoCodeSplitting: true,
               },
             }),
-            nitro(),
+            nitro({ vercel: { functionRules: { '/api/store/recovery': { maxDuration: 240 } } } }),
           ]),
       viteReact(),
     ],

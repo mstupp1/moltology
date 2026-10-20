@@ -16,13 +16,13 @@ function ReturnPage({ result }: { result: 'success' | 'cancel' }) {
 }
 beforeEach(() => { vi.clearAllMocks(); localStorage.clear(); sessionStorage.clear(); localStorage.setItem(MERCH_CART_STORAGE_KEY, JSON.stringify([line])) })
 describe('checkout return and cart hydration', () => {
-  it('does not resurrect purchased lines when the child return effect runs before hydration', async () => {
+  it('keeps cart lines when an unverified redirect claims success', async () => {
     sessionStorage.setItem('moltology.merch.pendingClear', '1')
     render(<MerchCartProvider><ReturnPage result="success" /></MerchCartProvider>)
-    await waitFor(() => expect(screen.getByTestId('cart-count')).toHaveTextContent('0'))
-    expect(localStorage.getItem(MERCH_CART_STORAGE_KEY)).toBe('[]')
-    expect(toast.success).toHaveBeenCalledTimes(1)
-    expect(sessionStorage.getItem('moltology.merch.pendingClear')).toBeNull()
+    await waitFor(() => expect(screen.getByTestId('cart-count')).toHaveTextContent('1'))
+    expect(localStorage.getItem(MERCH_CART_STORAGE_KEY)).not.toBe('[]')
+    expect(toast.success).not.toHaveBeenCalled()
+    expect(sessionStorage.getItem('moltology.merch.pendingClear')).toBe('1')
   })
   it('preserves the cart on cancellation', async () => {
     sessionStorage.setItem('moltology.merch.pendingClear', '1')

@@ -1,0 +1,24 @@
+name: Store recovery
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: store-recovery
+  cancel-in-progress: false
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Recover paid orders and mail
+        env:
+          STORE_RECOVERY_URL: ${{ secrets.STORE_RECOVERY_URL }}
+          STORE_RECOVERY_SECRET: ${{ secrets.STORE_RECOVERY_SECRET }}
+        run: |
+          test -n "$STORE_RECOVERY_URL" && test -n "$STORE_RECOVERY_SECRET"
+          case "$STORE_RECOVERY_URL" in https://*/api/store/recovery) ;; *) exit 1 ;; esac
+          curl --fail --silent --show-error --max-time 240 --request POST \
+            --header "Authorization: Bearer $STORE_RECOVERY_SECRET" "$STORE_RECOVERY_URL"

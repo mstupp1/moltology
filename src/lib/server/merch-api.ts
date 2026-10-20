@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
+import { storeDeliverySchema } from '../store'
 import { publicMiddleware } from './functions'
 
 const authDataSchema = z.object({
@@ -36,25 +37,34 @@ export const getMerchProductBySlugFn = createServerFn({ method: 'POST' })
 
 export const createMerchCheckoutSessionFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data: unknown) => {
-    const parsed = authDataSchema
-      .extend({
-        items: z.array(checkoutItemSchema).max(30).optional(),
-      })
-      .safeParse(data ?? {})
-    if (!parsed.success) {
-      throw new Error('Add at least one piece before checkout.')
-    }
-    return {
-      token: parsed.data.token,
-      userId: parsed.data.userId,
-      items: (parsed.data.items ?? []).map((item) => ({
-        variantId: item.variantId ?? '',
-        quantity: item.quantity ?? 0,
-      })),
-    }
-  })
+  .validator((data: unknown) => storeDeliverySchema.extend({ token: z.string().optional(), userId: z.string().optional(), quoteId: z.uuid() }).parse(data))
   .handler(async (args) => {
-    const { createMerchCheckoutSessionHandler } = await import('./merch')
-    return createMerchCheckoutSessionHandler(args)
+    const { createQuotedCheckout } = await import('./store')
+    return createQuotedCheckout(args)
+  })
+
+export const quoteStoreShippingFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: unknown) => storeDeliverySchema.extend({ token: z.string().optional(), userId: z.string().optional() }).parse(data))
+  .handler(async args => {
+    const { createStoreQuote } = await import('./store')
+    return createStoreQuote(args)
+  })
+
+export const getStoreAccessFn = createServerFn({ method: 'GET' })
+  .middleware(publicMiddleware)
+  .handler(async () => {
+    const { readStoreSettings, isStorePublic } = await import('./store')
+    const settings = await readStoreSettings()
+    return { indexingEnabled: isStorePublic(settings) && settings.indexingEnabled, publicEnabled: isStorePublic(settings), countries: settings.enabledCountries, checkoutPaused: settings.checkoutPaused,
+      shippingPolicy: settings.shippingPolicy, returnsPolicy: settings.returnsPolicy, cancellationPolicy: settings.cancellationPolicy, supportEmail: settings.supportEmail }
+  })
+
+export const getStoreStatusFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: unknown) => z.object({ order: z.uuid(), key: z.string().regex(/^[a-f0-9]{64}$/) }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { getStoreStatus, limitStoreRequest } = await import('./store')
+    await limitStoreRequest(`status-ip:${(context as any)?.clientIp || 'unknown'}`, 90)
+    return getStoreStatus(data.order, data.key)
   })

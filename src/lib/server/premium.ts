@@ -452,6 +452,14 @@ export async function handleStripeWebhookRequest(request: Request): Promise<Resp
     return json({ error: 'Invalid Stripe signature.' }, 400)
   }
 
+  if (['charge.refunded', 'refund.created', 'refund.updated', 'refund.failed'].includes(event.type)) {
+    try {
+      const { handleStoreRefundEvent } = await import('./store-operations')
+      await handleStoreRefundEvent(event)
+      return json({ received: true }, 200)
+    } catch { return json({ error: 'Could not reconcile refund.' }, 500) }
+  }
+
   if (isMerchCheckoutEvent(event)) {
     try {
       const { fulfillMerchCheckoutEvent } = await import('./merch')

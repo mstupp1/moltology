@@ -61,12 +61,14 @@ import { Route as NewsChar123slugChar125DotmdRouteImport } from './routes/news/{
 import { Route as RenderCompositeRouteImport } from './routes/render/composite'
 import { Route as StoreIndexRouteImport } from './routes/store/index'
 import { Route as StoreSlugRouteImport } from './routes/store/$slug'
+import { Route as StoreStatusRouteImport } from './routes/store/status'
 import { Route as WhatIsMoltologyIndexRouteImport } from './routes/what-is-moltology/index'
 import { Route as WhatIsMoltologyBeliefsRouteImport } from './routes/what-is-moltology/beliefs'
 import { Route as WhatIsMoltologyBenthicSacramentsRouteImport } from './routes/what-is-moltology/benthic-sacraments'
 import { Route as WhatIsMoltologyWhatMoltologistsSayRouteImport } from './routes/what-is-moltology/what-moltologists-say'
 import { Route as HudAdminIndexRouteImport } from './routes/_hud/admin.index'
 import { Route as HudAdminLogicRouteImport } from './routes/_hud/admin.logic'
+import { Route as HudAdminStoreRouteImport } from './routes/_hud/admin.store'
 import { Route as HudCodexIndexRouteImport } from './routes/_hud/codex/index'
 import { Route as HudCodexSlugRouteImport } from './routes/_hud/codex/$slug'
 import { Route as HudForumIndexRouteImport } from './routes/_hud/forum/index'
@@ -74,6 +76,8 @@ import { Route as HudLecturesIndexRouteImport } from './routes/_hud/lectures/ind
 import { Route as HudMemberProfileIdRouteImport } from './routes/_hud/member/$profileId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiEmailConfirmRouteImport } from './routes/api/email/confirm'
+import { Route as ApiPrintfulWebhookRouteImport } from './routes/api/printful/webhook'
+import { Route as ApiStoreRecoveryRouteImport } from './routes/api/store/recovery'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
 import { Route as HudForumCategorySlugIndexRouteImport } from './routes/_hud/forum/$categorySlug/index'
 import { Route as HudForumCategorySlugTopicSlugRouteImport } from './routes/_hud/forum/$categorySlug/$topicSlug'
@@ -344,6 +348,11 @@ const StoreSlugRoute = StoreSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => StoreRoute,
 } as any)
+const StoreStatusRoute = StoreStatusRouteImport.update({
+  id: '/status',
+  path: '/status',
+  getParentRoute: () => StoreRoute,
+} as any)
 const WhatIsMoltologyIndexRoute = WhatIsMoltologyIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -374,6 +383,11 @@ const HudAdminIndexRoute = HudAdminIndexRouteImport.update({
 const HudAdminLogicRoute = HudAdminLogicRouteImport.update({
   id: '/admin/logic',
   path: '/admin/logic',
+  getParentRoute: () => HudRoute,
+} as any)
+const HudAdminStoreRoute = HudAdminStoreRouteImport.update({
+  id: '/admin/store',
+  path: '/admin/store',
   getParentRoute: () => HudRoute,
 } as any)
 const HudCodexIndexRoute = HudCodexIndexRouteImport.update({
@@ -409,6 +423,16 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 const ApiEmailConfirmRoute = ApiEmailConfirmRouteImport.update({
   id: '/api/email/confirm',
   path: '/api/email/confirm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPrintfulWebhookRoute = ApiPrintfulWebhookRouteImport.update({
+  id: '/api/printful/webhook',
+  path: '/api/printful/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiStoreRecoveryRoute = ApiStoreRecoveryRouteImport.update({
+  id: '/api/store/recovery',
+  path: '/api/store/recovery',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
@@ -511,6 +535,7 @@ export interface FileRoutesByFullPath {
   '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
   '/store/$slug': typeof StoreSlugRoute
+  '/store/status': typeof StoreStatusRoute
   '/what-is-moltology/beliefs': typeof WhatIsMoltologyBeliefsRoute
   '/what-is-moltology/benthic-sacraments': typeof WhatIsMoltologyBenthicSacramentsRoute
   '/what-is-moltology/what-moltologists-say': typeof WhatIsMoltologyWhatMoltologistsSayRoute
@@ -520,10 +545,13 @@ export interface FileRoutesByFullPath {
   '/store/': typeof StoreIndexRoute
   '/what-is-moltology/': typeof WhatIsMoltologyIndexRoute
   '/admin/logic': typeof HudAdminLogicRoute
+  '/admin/store': typeof HudAdminStoreRoute
   '/codex/$slug': typeof HudCodexSlugRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/email/confirm': typeof ApiEmailConfirmRoute
+  '/api/printful/webhook': typeof ApiPrintfulWebhookRoute
+  '/api/store/recovery': typeof ApiStoreRecoveryRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/admin/': typeof HudAdminIndexRoute
   '/codex/': typeof HudCodexIndexRoute
@@ -583,6 +611,7 @@ export interface FileRoutesByTo {
   '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
   '/store/$slug': typeof StoreSlugRoute
+  '/store/status': typeof StoreStatusRoute
   '/what-is-moltology/beliefs': typeof WhatIsMoltologyBeliefsRoute
   '/what-is-moltology/benthic-sacraments': typeof WhatIsMoltologyBenthicSacramentsRoute
   '/what-is-moltology/what-moltologists-say': typeof WhatIsMoltologyWhatMoltologistsSayRoute
@@ -592,10 +621,13 @@ export interface FileRoutesByTo {
   '/store': typeof StoreIndexRoute
   '/what-is-moltology': typeof WhatIsMoltologyIndexRoute
   '/admin/logic': typeof HudAdminLogicRoute
+  '/admin/store': typeof HudAdminStoreRoute
   '/codex/$slug': typeof HudCodexSlugRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/email/confirm': typeof ApiEmailConfirmRoute
+  '/api/printful/webhook': typeof ApiPrintfulWebhookRoute
+  '/api/store/recovery': typeof ApiStoreRecoveryRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/admin': typeof HudAdminIndexRoute
   '/codex': typeof HudCodexIndexRoute
@@ -659,6 +691,7 @@ export interface FileRoutesById {
   '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
   '/store/$slug': typeof StoreSlugRoute
+  '/store/status': typeof StoreStatusRoute
   '/what-is-moltology/beliefs': typeof WhatIsMoltologyBeliefsRoute
   '/what-is-moltology/benthic-sacraments': typeof WhatIsMoltologyBenthicSacramentsRoute
   '/what-is-moltology/what-moltologists-say': typeof WhatIsMoltologyWhatMoltologistsSayRoute
@@ -668,10 +701,13 @@ export interface FileRoutesById {
   '/store/': typeof StoreIndexRoute
   '/what-is-moltology/': typeof WhatIsMoltologyIndexRoute
   '/_hud/admin/logic': typeof HudAdminLogicRoute
+  '/_hud/admin/store': typeof HudAdminStoreRoute
   '/_hud/codex/$slug': typeof HudCodexSlugRoute
   '/_hud/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/email/confirm': typeof ApiEmailConfirmRoute
+  '/api/printful/webhook': typeof ApiPrintfulWebhookRoute
+  '/api/store/recovery': typeof ApiStoreRecoveryRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/_hud/admin/': typeof HudAdminIndexRoute
   '/_hud/codex/': typeof HudCodexIndexRoute
@@ -736,6 +772,7 @@ export interface FileRouteTypes {
     | '/news/{$slug}.md'
     | '/render/composite'
     | '/store/$slug'
+    | '/store/status'
     | '/what-is-moltology/beliefs'
     | '/what-is-moltology/benthic-sacraments'
     | '/what-is-moltology/what-moltologists-say'
@@ -745,10 +782,13 @@ export interface FileRouteTypes {
     | '/store/'
     | '/what-is-moltology/'
     | '/admin/logic'
+    | '/admin/store'
     | '/codex/$slug'
     | '/member/$profileId'
     | '/api/auth/$'
     | '/api/email/confirm'
+    | '/api/printful/webhook'
+    | '/api/store/recovery'
     | '/api/stripe/webhook'
     | '/admin/'
     | '/codex/'
@@ -808,6 +848,7 @@ export interface FileRouteTypes {
     | '/news/{$slug}.md'
     | '/render/composite'
     | '/store/$slug'
+    | '/store/status'
     | '/what-is-moltology/beliefs'
     | '/what-is-moltology/benthic-sacraments'
     | '/what-is-moltology/what-moltologists-say'
@@ -817,10 +858,13 @@ export interface FileRouteTypes {
     | '/store'
     | '/what-is-moltology'
     | '/admin/logic'
+    | '/admin/store'
     | '/codex/$slug'
     | '/member/$profileId'
     | '/api/auth/$'
     | '/api/email/confirm'
+    | '/api/printful/webhook'
+    | '/api/store/recovery'
     | '/api/stripe/webhook'
     | '/admin'
     | '/codex'
@@ -883,6 +927,7 @@ export interface FileRouteTypes {
     | '/news/{$slug}.md'
     | '/render/composite'
     | '/store/$slug'
+    | '/store/status'
     | '/what-is-moltology/beliefs'
     | '/what-is-moltology/benthic-sacraments'
     | '/what-is-moltology/what-moltologists-say'
@@ -892,10 +937,13 @@ export interface FileRouteTypes {
     | '/store/'
     | '/what-is-moltology/'
     | '/_hud/admin/logic'
+    | '/_hud/admin/store'
     | '/_hud/codex/$slug'
     | '/_hud/member/$profileId'
     | '/api/auth/$'
     | '/api/email/confirm'
+    | '/api/printful/webhook'
+    | '/api/store/recovery'
     | '/api/stripe/webhook'
     | '/_hud/admin/'
     | '/_hud/codex/'
@@ -948,6 +996,8 @@ export interface RootRouteChildren {
   NewsIndexRoute: typeof NewsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiEmailConfirmRoute: typeof ApiEmailConfirmRoute
+  ApiPrintfulWebhookRoute: typeof ApiPrintfulWebhookRoute
+  ApiStoreRecoveryRoute: typeof ApiStoreRecoveryRoute
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
 }
 
@@ -1317,6 +1367,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoreSlugRouteImport
       parentRoute: typeof StoreRoute
     }
+    '/store/status': {
+      id: '/store/status'
+      path: '/status'
+      fullPath: '/store/status'
+      preLoaderRoute: typeof StoreStatusRouteImport
+      parentRoute: typeof StoreRoute
+    }
     '/what-is-moltology/': {
       id: '/what-is-moltology/'
       path: '/'
@@ -1357,6 +1414,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/logic'
       fullPath: '/admin/logic'
       preLoaderRoute: typeof HudAdminLogicRouteImport
+      parentRoute: typeof HudRoute
+    }
+    '/_hud/admin/store': {
+      id: '/_hud/admin/store'
+      path: '/admin/store'
+      fullPath: '/admin/store'
+      preLoaderRoute: typeof HudAdminStoreRouteImport
       parentRoute: typeof HudRoute
     }
     '/_hud/codex/': {
@@ -1406,6 +1470,20 @@ declare module '@tanstack/react-router' {
       path: '/api/email/confirm'
       fullPath: '/api/email/confirm'
       preLoaderRoute: typeof ApiEmailConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/printful/webhook': {
+      id: '/api/printful/webhook'
+      path: '/api/printful/webhook'
+      fullPath: '/api/printful/webhook'
+      preLoaderRoute: typeof ApiPrintfulWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/store/recovery': {
+      id: '/api/store/recovery'
+      path: '/api/store/recovery'
+      fullPath: '/api/store/recovery'
+      preLoaderRoute: typeof ApiStoreRecoveryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/stripe/webhook': {
@@ -1523,6 +1601,7 @@ interface HudRouteChildren {
   HudSupportRoute: typeof HudSupportRoute
   HudWatchRoute: typeof HudWatchRoute
   HudAdminLogicRoute: typeof HudAdminLogicRoute
+  HudAdminStoreRoute: typeof HudAdminStoreRoute
   HudMemberProfileIdRoute: typeof HudMemberProfileIdRoute
   HudAdminIndexRoute: typeof HudAdminIndexRoute
   HudForumIndexRoute: typeof HudForumIndexRoute
@@ -1553,6 +1632,7 @@ const HudRouteChildren: HudRouteChildren = {
   HudSupportRoute: HudSupportRoute,
   HudWatchRoute: HudWatchRoute,
   HudAdminLogicRoute: HudAdminLogicRoute,
+  HudAdminStoreRoute: HudAdminStoreRoute,
   HudMemberProfileIdRoute: HudMemberProfileIdRoute,
   HudAdminIndexRoute: HudAdminIndexRoute,
   HudForumIndexRoute: HudForumIndexRoute,
@@ -1570,11 +1650,13 @@ const HudRouteWithChildren = HudRoute._addFileChildren(HudRouteChildren)
 
 interface StoreRouteChildren {
   StoreSlugRoute: typeof StoreSlugRoute
+  StoreStatusRoute: typeof StoreStatusRoute
   StoreIndexRoute: typeof StoreIndexRoute
 }
 
 const StoreRouteChildren: StoreRouteChildren = {
   StoreSlugRoute: StoreSlugRoute,
+  StoreStatusRoute: StoreStatusRoute,
   StoreIndexRoute: StoreIndexRoute,
 }
 
@@ -1636,6 +1718,8 @@ const rootRouteChildren: RootRouteChildren = {
   NewsIndexRoute: NewsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiEmailConfirmRoute: ApiEmailConfirmRoute,
+  ApiPrintfulWebhookRoute: ApiPrintfulWebhookRoute,
+  ApiStoreRecoveryRoute: ApiStoreRecoveryRoute,
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport

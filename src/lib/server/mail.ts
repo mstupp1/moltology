@@ -38,6 +38,7 @@ export interface TransactionalMailInput {
   to: string
   subject: string
   text: string
+  idempotencyKey?: string
   html?: string
   replyTo?: string
 }
@@ -129,6 +130,7 @@ export async function sendTransactionalEmail(
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
+        ...(input.idempotencyKey ? { 'Idempotency-Key': input.idempotencyKey } : {}),
       },
       body: JSON.stringify(payload),
       signal: controller.signal,

@@ -7,19 +7,19 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-10-19",
+  "syncedAt": "2026-10-20",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
-    "rules": 108,
-    "decisions": 38,
-    "anchors": 196,
+    "rules": 113,
+    "decisions": 39,
+    "anchors": 205,
     "drifted": 26,
     "flagged": 11
   },
   "canvas": {
     "width": 5737,
-    "height": 2820
+    "height": 2976
   },
   "domains": [
     {
@@ -271,13 +271,13 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "merch",
       "title": "Merch store",
       "color": "#ed695e",
-      "summary": "Private catalog-to-Printful pilot with Stripe test checkout and recoverable draft fulfillment.",
-      "overviewHtml": "<h1>Private merch pilot</h1>\n<p>One code catalog supplies the private store, Printful synchronization, and scoped dev seeding.\nOperational setup and pending provider acceptance are recorded in <code>docs/merch-launch.md</code>.</p>",
+      "summary": "Private-by-default guest checkout preparation with live quotes, audited operations, and recoverable draft fulfillment.",
+      "overviewHtml": "<h1>Store launch preparation</h1>\n<p>The store stays private, test-only and manual until separately authorized. Authored product data,\noperational controls and order snapshots have separate lifecycles. See <code>docs/merch-launch.md</code>.</p>",
       "box": {
         "x": 3336,
         "y": 1988,
-        "width": 612,
-        "height": 832
+        "width": 904,
+        "height": 988
       },
       "ruleIds": [
         "merch.private-pilot",
@@ -285,7 +285,12 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "merch.physical-checkout",
         "merch.draft-guard",
         "merch.fulfillment-claim",
-        "merch.dev-recovery"
+        "merch.dev-recovery",
+        "merch.shipping-quote",
+        "merch.operational-overrides",
+        "merch.customer-status",
+        "merch.provider-status",
+        "merch.durable-recovery"
       ]
     },
     {
@@ -295,7 +300,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Standing is a member's forum reputation, from upvotes plus review adjustments. It decides who can start threads, which replies sink, and who is limited.",
       "overviewHtml": "<p>Standing is the forum&#39;s reputation score. It comes from other members&#39; upvotes and gates the actions that cost the community the most: new threads and high reply volume.</p>",
       "box": {
-        "x": 4044,
+        "x": 4336,
         "y": 1988,
         "width": 1196,
         "height": 520
@@ -443,18 +448,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/db/schema.ts",
           "symbol": "profiles.moltCredits",
-          "line": 130,
+          "line": 131,
           "value": "decimal('moltCredits', { precision: 12, scale: 2 }).default('1450.00').notNull()",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L130"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L131"
         },
         {
           "file": "src/db/schema.ts",
           "symbol": "profiles.chitinGems",
-          "line": 131,
+          "line": 132,
           "value": "integer('chitinGems').default(250).notNull()",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L131"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L132"
         }
       ],
       "tests": [
@@ -845,10 +850,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/db/schema.ts",
           "symbol": "xpTransactions",
-          "line": 361,
+          "line": 362,
           "value": "pgTable('xp_transactions', { id: uuid('id').defaultRandom().primaryKey(), userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' …",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L361"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L362"
         },
         {
           "file": "src/lib/server/db-services.ts",
@@ -1164,10 +1169,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/db/schema.ts",
           "symbol": "profiles.role",
-          "line": 124,
+          "line": 125,
           "value": "text('role').default('user').notNull()",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L124"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L125"
         }
       ],
       "tests": [],
@@ -1295,10 +1300,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/db/schema.ts",
           "symbol": "profiles",
-          "line": 122,
+          "line": 123,
           "value": "pgTable('profiles', { id: text('id').primaryKey(), role: text('role').default('user').notNull(), // 'user' | 'admin' larvaId: text('larvaId').default('LARVA UN…",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L122"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L123"
         }
       ],
       "tests": [],
@@ -2727,10 +2732,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/db/schema.ts",
           "symbol": "profiles.hasPurchasedPremium",
-          "line": 155,
+          "line": 156,
           "value": "boolean('hasPurchasedPremium').default(false).notNull()",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L155"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L156"
         }
       ],
       "tests": [
@@ -2829,10 +2834,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/merch.ts",
           "symbol": "fulfillMerchCheckoutEvent",
-          "line": 290,
+          "line": 142,
           "value": "fulfillMerchCheckoutEvent(event, retry)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L290"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L142"
         }
       ],
       "tests": [
@@ -4951,10 +4956,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/db/schema.ts",
           "symbol": "profiles.handle",
-          "line": 127,
+          "line": 128,
           "value": "text('handle')",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L127"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L128"
         }
       ],
       "tests": [
@@ -5604,18 +5609,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "merch.private-pilot",
       "domain": "merch",
-      "title": "Store access requires the admin experiment",
+      "title": "Public access requires explicit launch controls",
       "kind": "gate",
       "status": "soft-launch",
-      "statement": "Catalog reads and checkout require an authenticated admin with the new-store experiment enabled. Other visitors retain the Etsy destination.",
+      "statement": "Public catalog reads and guest checkout require both the saved public setting and deployment launch authorization. Otherwise only opted-in new-store admins can enter; other visitors retain Etsy.",
       "anchors": [
         {
-          "file": "src/lib/server/merch.ts",
-          "symbol": "requireMerchOperator",
-          "line": 63,
-          "value": "requireMerchOperator(args)",
+          "file": "src/lib/server/store.ts",
+          "symbol": "requireStoreAccess",
+          "line": 26,
+          "value": "requireStoreAccess(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L63"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L26"
         }
       ],
       "tests": [
@@ -5628,15 +5633,17 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "economy.red-line"
       ],
       "usedBy": [
-        "merch.catalog-price"
+        "merch.catalog-price",
+        "merch.operational-overrides"
       ],
       "decisions": [
-        "private-merch-drafts"
+        "private-merch-drafts",
+        "store-launch-controls"
       ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 72,
+        "x": 568,
         "y": 76
       },
       "drift": "ok"
@@ -5678,7 +5685,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [
         "merch.physical-checkout",
-        "merch.draft-guard"
+        "merch.draft-guard",
+        "merch.shipping-quote"
       ],
       "decisions": [
         "private-merch-drafts"
@@ -5686,7 +5694,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 72,
+        "x": 320,
         "y": 232
       },
       "drift": "ok"
@@ -5694,18 +5702,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "merch.physical-checkout",
       "domain": "merch",
-      "title": "Physical checkout collects shipping",
+      "title": "Quoted checkout fixes the delivery address",
       "kind": "invariant",
       "status": "active",
-      "statement": "Merch Checkout sessions explicitly disable Managed Payments for that request so account defaults cannot prevent shipping-address collection. Account-wide billing settings are unchanged.",
+      "statement": "Checkout validates delivery and email before payment, then uses a separate Stripe customer for that order with the approved address and no hosted shipping edits. Tax uses that shipping address; Premium customers are unchanged.",
       "anchors": [
         {
-          "file": "src/lib/merch.ts",
-          "symbol": "buildMerchCheckoutSessionParams",
-          "line": 324,
-          "value": "buildMerchCheckoutSessionParams(input)",
+          "file": "src/lib/server/store.ts",
+          "symbol": "createQuotedCheckout",
+          "line": 100,
+          "value": "createQuotedCheckout(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/merch.ts#L324"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L100"
         }
       ],
       "tests": [
@@ -5719,7 +5727,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [],
       "decisions": [
-        "private-merch-drafts"
+        "private-merch-drafts",
+        "store-launch-controls"
       ],
       "flag": null,
       "flow": null,
@@ -5735,7 +5744,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Test payments always create drafts",
       "kind": "gate",
       "status": "active",
-      "statement": "Test payments, non-production environments, and preview deployments cannot confirm manufacturing. Confirmation also requires a live key and an explicit PRINTFUL_DRAFT=false setting; drafts are the default.",
+      "statement": "Test payments, non-production environments, and preview deployments cannot confirm manufacturing. Confirmation also requires a live key, explicit PRINTFUL_DRAFT=false, and automatic mode saved on a newly eligible order; drafts are the default and settings never confirm old drafts.",
       "anchors": [
         {
           "file": "src/lib/merch.ts",
@@ -5771,7 +5780,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "merch.fulfillment-claim"
       ],
       "decisions": [
-        "private-merch-drafts"
+        "private-merch-drafts",
+        "store-launch-controls"
       ],
       "flag": null,
       "flow": null,
@@ -5833,7 +5843,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "merch.draft-guard"
       ],
       "usedBy": [
-        "merch.dev-recovery"
+        "merch.dev-recovery",
+        "merch.provider-status"
       ],
       "decisions": [
         "private-merch-drafts"
@@ -5849,10 +5860,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "merch.dev-recovery",
       "domain": "merch",
-      "title": "Pilot operations use the configured dev target",
+      "title": "Recovery verifies payment and preserves snapshots",
       "kind": "permission",
       "status": "active",
-      "statement": "Catalog seed and operator retries require the configured dev endpoint and reject the production endpoint. Retry verifies the original paid Stripe session and uses the saved shipping and item snapshot while preserving the last failure reason.",
+      "statement": "CLI seed and retries remain dev-only. Verified admins can recover deployed orders through audited operations; retry verifies the paid Stripe session and saved address/items. Refunded orders require dashboard review. Production catalog promotion is dry-run by default and requires explicit target and execution authorization.",
       "anchors": [
         {
           "file": "scripts/merch/database.ts",
@@ -5865,10 +5876,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/merch.ts",
           "symbol": "retryMerchOrder",
-          "line": 323,
+          "line": 195,
           "value": "retryMerchOrder(orderId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L323"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L195"
         }
       ],
       "tests": [
@@ -5886,13 +5897,255 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [],
       "decisions": [
-        "private-merch-drafts"
+        "private-merch-drafts",
+        "store-launch-controls"
       ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 72,
         "y": 700
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "merch.shipping-quote",
+      "domain": "merch",
+      "title": "Shipping quotes bind cart and delivery",
+      "kind": "invariant",
+      "status": "active",
+      "statement": "Shipping uses live Printful USD standard rates with catalog variant IDs. Quotes expire after ten minutes and bind exact stored prices, quantities, email, address and store. Unavailable service, disabled destination, changed details or stale quotes block payment. US is the default allowlist.",
+      "anchors": [
+        {
+          "file": "src/lib/server/store.ts",
+          "symbol": "createStoreQuote",
+          "line": 69,
+          "value": "createStoreQuote(args)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L69"
+        },
+        {
+          "file": "src/lib/store.ts",
+          "symbol": "STORE_QUOTE_TTL_MS",
+          "line": 4,
+          "value": "10 * 60_000",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/store.ts#L4"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/store.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/store.test.ts"
+        },
+        {
+          "file": "src/lib/server/store.integration.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.integration.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "merch.catalog-price"
+      ],
+      "usedBy": [
+        "merch.customer-status"
+      ],
+      "decisions": [
+        "store-launch-controls"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 612,
+        "y": 388
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "merch.operational-overrides",
+      "domain": "merch",
+      "title": "Operational controls survive catalog seeds",
+      "kind": "permission",
+      "status": "active",
+      "statement": "Verified staff can change publication, per-variant availability, checkout pause, countries and production mode. Controls are stored separately from authored catalog data and every mutation/retry records actor, target and time.",
+      "anchors": [
+        {
+          "file": "src/lib/server/store-operations.ts",
+          "symbol": "mutateAdminStore",
+          "line": 188,
+          "value": "mutateAdminStore(args)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L188"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/server/store-admin.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-admin.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "merch.private-pilot"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "store-launch-controls"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 612,
+        "y": 232
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "merch.customer-status",
+      "domain": "merch",
+      "title": "Order status requires a private capability",
+      "kind": "permission",
+      "status": "active",
+      "statement": "Guest status reads require an order-specific high-entropy capability whose hash is saved on the order. A success redirect never proves payment. Quote, checkout and status operations use durable atomic rate limits.",
+      "anchors": [
+        {
+          "file": "src/lib/server/store.ts",
+          "symbol": "getStoreStatus",
+          "line": 160,
+          "value": "getStoreStatus(orderId, token)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L160"
+        },
+        {
+          "file": "src/lib/server/store.ts",
+          "symbol": "limitStoreRequest",
+          "line": 47,
+          "value": "limitStoreRequest(key, maximum, windowMs)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L47"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/server/store-http.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-http.test.ts"
+        },
+        {
+          "file": "src/lib/server/store.integration.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.integration.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "merch.shipping-quote"
+      ],
+      "usedBy": [
+        "merch.durable-recovery"
+      ],
+      "decisions": [
+        "store-launch-controls"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 612,
+        "y": 544
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "merch.provider-status",
+      "domain": "merch",
+      "title": "Provider facts are retrieved and reconciled",
+      "kind": "invariant",
+      "status": "active",
+      "statement": "Private-token Printful callbacks verify the selected store and retrieve authoritative order data. Per-order leases serialize reconciliation; package IDs deduplicate multi-package tracking and emails. Stripe cumulative refunds cannot regress and do not cancel manufacturing.",
+      "anchors": [
+        {
+          "file": "src/lib/server/store-operations.ts",
+          "symbol": "reconcileStoreOrder",
+          "line": 64,
+          "value": "reconcileStoreOrder(id)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L64"
+        },
+        {
+          "file": "src/lib/server/store-operations.ts",
+          "symbol": "syncStoreRefund",
+          "line": 107,
+          "value": "syncStoreRefund(paymentIntentId)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L107"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/server/store.integration.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.integration.test.ts"
+        },
+        {
+          "file": "src/lib/server/store-http.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-http.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "merch.fulfillment-claim"
+      ],
+      "usedBy": [
+        "merch.durable-recovery"
+      ],
+      "decisions": [
+        "store-launch-controls"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 364,
+        "y": 700
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "merch.durable-recovery",
+      "domain": "merch",
+      "title": "Recovery and mail are independent durable work",
+      "kind": "flow",
+      "status": "active",
+      "statement": "An authenticated recovery endpoint runs every fifteen minutes with bounded work and leases, scoped to the active Stripe mode. Customer mail has a deduplicated leased outbox and provider idempotency. Ambiguous mail older than the provider retention window requires review instead of risking duplicate delivery.",
+      "anchors": [
+        {
+          "file": "src/lib/server/store-operations.ts",
+          "symbol": "recoverStore",
+          "line": 137,
+          "value": "recoverStore()",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L137"
+        },
+        {
+          "file": "src/lib/server/store-operations.ts",
+          "symbol": "drainStoreOutbox",
+          "line": 31,
+          "value": "drainStoreOutbox(maximum)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L31"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/server/store.integration.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.integration.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "merch.provider-status",
+        "merch.customer-status"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "store-launch-controls"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 568,
+        "y": 856
       },
       "drift": "ok"
     },
@@ -7997,6 +8250,53 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "html": "<p>A successful test suite is distinct from real provider acceptance. Account permissions, official\nmockups, catalog synchronization, and a real test checkout must be verified before the pilot is\ncalled complete. Public launch, paid samples, customer messaging, and tracking remain separate work.</p>"
         }
       ]
+    },
+    {
+      "id": "store-launch-controls",
+      "date": "2026-10-20",
+      "title": "Prepare guest commerce behind explicit launch controls",
+      "summary": "Launch preparation uses US live quotes, manual drafts, independent payment/fulfillment states and audited recovery while public and live-payment gates remain closed.",
+      "domains": [
+        "merch"
+      ],
+      "rules": [
+        "merch.private-pilot",
+        "merch.physical-checkout",
+        "merch.draft-guard",
+        "merch.dev-recovery",
+        "merch.shipping-quote",
+        "merch.operational-overrides",
+        "merch.customer-status",
+        "merch.provider-status",
+        "merch.durable-recovery"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "doc",
+          "label": "merch-launch.md",
+          "url": "https://github.com/mstupp1/moltology/blob/main/docs/merch-launch.md"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>The private pilot proved one real Stripe test purchase of the original artwork pair and one\nunconfirmed Printful draft. The approved v2 artwork was separately verified. Neither proves\nphysical samples, deployed callbacks, commercial policies or live account readiness.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Prepare guest checkout and public browsing while retaining the admin experiment until launch.\nStart with US shipping and manual approval. Shipping is quoted for exact cart/address details;\na separate Stripe customer per order prevents concurrent carts or Premium billing from changing\nthe quoted tax/delivery location. Freeze production eligibility when each order is created.\nKeep seeded catalog data separate from operational overrides. Record staff mutations and retries.\nUse authoritative provider reads, leased reconciliation and a durable independent mail outbox.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<p>Flat shipping cannot support verified country expansion. A shared Stripe customer shipping\naddress introduces races between simultaneous checkouts. A redirect cannot prove payment.\nSettings changes cannot confirm existing drafts. Refunds cannot imply manufacturing cancellation.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Physical samples, live onboarding, business policy/tax approval, sending-domain verification,\ndeployed acceptance and explicit launch authorization remain separate requirements. Printful v1\ncallbacks use a private bearer URL and authoritative API reads; redact that URL from logs.\nResend idempotency has a finite retention period, so old uncertain sends require operator review.</p>"
+        }
+      ]
     }
   ],
   "edges": [
@@ -8616,6 +8916,42 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "merch.fulfillment-claim->merch.dev-recovery",
       "source": "merch.fulfillment-claim",
       "target": "merch.dev-recovery",
+      "crossDomain": false
+    },
+    {
+      "id": "merch.catalog-price->merch.shipping-quote",
+      "source": "merch.catalog-price",
+      "target": "merch.shipping-quote",
+      "crossDomain": false
+    },
+    {
+      "id": "merch.private-pilot->merch.operational-overrides",
+      "source": "merch.private-pilot",
+      "target": "merch.operational-overrides",
+      "crossDomain": false
+    },
+    {
+      "id": "merch.shipping-quote->merch.customer-status",
+      "source": "merch.shipping-quote",
+      "target": "merch.customer-status",
+      "crossDomain": false
+    },
+    {
+      "id": "merch.fulfillment-claim->merch.provider-status",
+      "source": "merch.fulfillment-claim",
+      "target": "merch.provider-status",
+      "crossDomain": false
+    },
+    {
+      "id": "merch.provider-status->merch.durable-recovery",
+      "source": "merch.provider-status",
+      "target": "merch.durable-recovery",
+      "crossDomain": false
+    },
+    {
+      "id": "merch.customer-status->merch.durable-recovery",
+      "source": "merch.customer-status",
+      "target": "merch.durable-recovery",
       "crossDomain": false
     },
     {

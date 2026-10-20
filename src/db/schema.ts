@@ -9,6 +9,7 @@ import type {
   AcademyPublishStatus,
   AcademyVideoProvider,
 } from '../lib/academy-types'
+import type { StoreSettings, ShippingQuoteSnapshot, StoreShipment } from '../lib/store'
 import type { MerchFulfillmentStatus, MerchLineItemSnapshot, MerchShippingAddress } from '../lib/merch'
 
 // Leftover Managed Neon Auth view (do not drop until CoS disables Auth on main).
@@ -1439,6 +1440,16 @@ export const merchOrders = pgTable('merch_orders', {
   shippingAddress: jsonb('shippingAddress').$type<MerchShippingAddress | null>(),
   stripeCheckoutSessionId: text('stripeCheckoutSessionId'),
   printfulOrderId: text('printfulOrderId'),
+  paymentStatus: text('paymentStatus').default('unpaid').notNull(),
+  livemode: boolean('livemode').default(false).notNull(),
+  fulfillmentMode: text('fulfillmentMode').default('manual').notNull(),
+  quoteSnapshot: jsonb('quoteSnapshot').$type<ShippingQuoteSnapshot>(),
+  statusTokenHash: text('statusTokenHash'),
+  stripePaymentIntentId: text('stripePaymentIntentId'),
+  refundCents: integer('refundCents').default(0).notNull(),
+  providerStatus: text('providerStatus'),
+  shipments: jsonb('shipments').$type<StoreShipment[]>().default([]).notNull(),
+  reconciledAt: timestamp('reconciledAt'),
   fulfillmentStatus: text('fulfillmentStatus').$type<MerchFulfillmentStatus>().default('pending').notNull(),
   subtotalCents: integer('subtotalCents').default(0).notNull(),
   shippingCents: integer('shippingCents').default(0).notNull(),
@@ -1459,3 +1470,54 @@ export const merchOrders = pgTable('merch_orders', {
     withCheck: merchServerOnly,
   }),
 ])
+
+
+// Operational controls are deliberately separate from authored/seeded catalog columns.
+export const storeSettings = pgTable('store_settings', {
+  id: text('id').primaryKey(),
+  value: jsonb('value').$type<StoreSettings>().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+}, () => [pgPolicy('store_settings_server_only', { for: 'all', using: merchServerOnly, withCheck: merchServerOnly })]).enableRLS()
+
+export const storeOverrides = pgTable('store_overrides', {
+  id: uuid('id').primaryKey(),
+  enabled: boolean('enabled').notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+}, () => [pgPolicy('store_overrides_server_only', { for: 'all', using: merchServerOnly, withCheck: merchServerOnly })]).enableRLS()
+
+export const storeQuotes = pgTable('store_quotes', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  snapshot: jsonb('snapshot').$type<ShippingQuoteSnapshot>().notNull(),
+  bindingHash: text('bindingHash').notNull(),
+  expiresAt: timestamp('expiresAt').notNull(),
+  orderId: uuid('orderId'),
+}, () => [pgPolicy('store_quotes_server_only', { for: 'all', using: merchServerOnly, withCheck: merchServerOnly })]).enableRLS()
+
+export const storeRateLimits = pgTable('store_rate_limits', {
+  key: text('key').primaryKey(),
+  count: integer('count').default(0).notNull(),
+  expiresAt: timestamp('expiresAt').notNull(),
+}, () => [pgPolicy('store_rate_limits_server_only', { for: 'all', using: merchServerOnly, withCheck: merchServerOnly })]).enableRLS()
+
+export const storeAudit = pgTable('store_audit', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  actor: text('actor').notNull(),
+  action: text('action').notNull(),
+  target: text('target').notNull(),
+  detail: jsonb('detail').$type<Record<string, unknown>>().default({}).notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+}, () => [pgPolicy('store_audit_server_only', { for: 'all', using: merchServerOnly, withCheck: merchServerOnly })]).enableRLS()
+
+export const storeOutbox = pgTable('store_outbox', {
+  key: text('key').primaryKey(),
+  orderId: uuid('orderId').references(() => merchOrders.id),
+  to: text('to').notNull(),
+  subject: text('subject').notNull(),
+  body: text('body').notNull(),
+  attempts: integer('attempts').default(0).notNull(),
+  availableAt: timestamp('availableAt').defaultNow().notNull(),
+  leaseUntil: timestamp('leaseUntil'),
+  sentAt: timestamp('sentAt'),
+  lastError: text('lastError'),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+}, (t) => [index('store_outbox_ready').on(t.sentAt, t.availableAt), pgPolicy('store_outbox_server_only', { for: 'all', using: merchServerOnly, withCheck: merchServerOnly })]).enableRLS()
