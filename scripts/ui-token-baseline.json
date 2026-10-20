@@ -37,40 +37,6 @@
     "hex-color": 7,
     "tiny-text": 2
   },
-  "src/components/academy/AcademyCertificateViews.tsx": {
-    "hex-color": 16,
-    "chamfer": 2,
-    "tiny-text": 2
-  },
-  "src/components/academy/AcademyChrome.tsx": {
-    "hex-color": 17,
-    "chamfer": 3,
-    "tiny-text": 2
-  },
-  "src/components/academy/AcademyCourseView.tsx": {
-    "hex-color": 30,
-    "chamfer": 5,
-    "tiny-text": 1
-  },
-  "src/components/academy/AcademyHome.tsx": {
-    "hex-color": 32,
-    "chamfer": 5,
-    "tiny-text": 4
-  },
-  "src/components/academy/AcademyLessonView.tsx": {
-    "hex-color": 32,
-    "chamfer": 5,
-    "tiny-text": 3
-  },
-  "src/components/academy/AcademyTrackView.tsx": {
-    "hex-color": 19,
-    "chamfer": 3,
-    "tiny-text": 2
-  },
-  "src/components/academy/AcademyVideo.tsx": {
-    "hex-color": 5,
-    "chamfer": 3
-  },
   "src/components/auth/AuthView.tsx": {
     "hex-color": 8
   },

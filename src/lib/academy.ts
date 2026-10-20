@@ -21,9 +21,13 @@ export {
 } from './academy-types'
 
 export const ACADEMY_COPY = {
-  emptyCatalog: 'No courses are published yet. Add a course to the catalog and it will show up here.',
-  emptyTracks: 'No tracks are published yet. A track is a path that groups courses in order.',
-  emptyCertificates: 'No certifications are published yet.',
+  comingSoonTitle: 'The first lectures are still being recorded',
+  comingSoonBody:
+    'Molt Academy opens with its first courses soon. Each one is a short run of video lectures, readings, and a quiz, and you keep your place as you go.',
+  emptyCatalog: 'No courses are published yet. They will show up here as soon as they open.',
+  emptyTracks: 'No tracks yet. A track groups courses into a path you take in order.',
+  emptyCertificates: 'No certifications are published yet. Each course and track will list its own.',
+  emptyFilter: 'No courses match that search. Clear a filter and look again.',
   emptyEarned: 'You have not earned a certification yet. Finish a course and it will be issued here.',
   enrollSuccess: 'You are enrolled. Start with the first lesson whenever you are ready.',
   enrollError: 'Could not enroll you. Please try again.',
@@ -36,7 +40,7 @@ export const ACADEMY_COPY = {
   missingTrack: 'This track is not in the catalog.',
   missingCertificate: 'This certification could not be found.',
   lessonLocked: 'Enroll in this course to open the lesson.',
-  videoWaiting: 'This lecture is waiting for a video. Drop a file URL on the lesson and it will play here.',
+  videoWaiting: 'The video for this lecture is not up yet. Read the summary, then mark it complete or come back later.',
   guestLock: 'Courses, tracks, and certifications need a free account. Sign up to enroll and keep your progress.',
 } as const
 

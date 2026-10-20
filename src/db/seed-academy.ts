@@ -7,7 +7,7 @@ type AcademySeedDb = {
 }
 
 /**
- * Inserts the placeholder academy catalog.
+ * Inserts the placeholder academy catalog as draft, so it never shows to members by accident.
  * Existing slugs are left untouched so later content edits in the database survive a re-seed.
  */
 export async function seedAcademyCatalog(db: AcademySeedDb) {
@@ -28,7 +28,7 @@ export async function seedAcademyCatalog(db: AcademySeedDb) {
         instructorTitle: course.instructorTitle,
         estimatedMinutes: course.estimatedMinutes,
         outcomes: course.outcomes,
-        status: 'published',
+        status: 'draft',
         sortOrder: course.sortOrder,
         publishedAt: new Date('2026-09-01T00:00:00.000Z'),
       })
@@ -118,7 +118,7 @@ export async function seedAcademyCatalog(db: AcademySeedDb) {
         coverImageUrl: track.coverImageUrl,
         estimatedHours: track.estimatedHours,
         outcomes: track.outcomes,
-        status: 'published',
+        status: 'draft',
         sortOrder: track.sortOrder,
       })
       .onConflictDoNothing({ target: schema.academyTracks.slug })
