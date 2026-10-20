@@ -17,7 +17,8 @@ import {
 } from '@/lib/connections'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
-import { DashboardEmptyRow, DashboardPanel } from '@/components/hud/dashboard/DashboardPanel'
+import { DASHBOARD_FOCUS, DashboardEmptyRow, DashboardPanel } from '@/components/hud/dashboard/DashboardPanel'
+import { cn } from '@/lib/utils'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import { MemberSearchRow } from '@/components/hud/connections/MemberSearchRow'
 import { FriendRequestButton } from '@/components/hud/member/FriendRequestButton'
@@ -32,7 +33,7 @@ export const CONNECTIONS_HUB_EMPTY_COPY = {
   title: 'The circle is quiet',
   body: 'Search a designation to send a request.',
 } as const
-export const CONNECTIONS_HUB_SEARCH_PLACEHOLDER = 'Search designations, larva units, or names…'
+export const CONNECTIONS_HUB_SEARCH_PLACEHOLDER = 'Search names or designations…'
 
 const EMPTY_CONNECTIONS: ConnectionsListView = {
   friends: [],
@@ -58,31 +59,32 @@ function ConnectionsHubListGhost() {
   )
 }
 
-function CountChip({
-  label,
-  count,
-  accent = false,
-  onOpen,
+/** The three lists as one segmented control; each segment opens that tab of the full page. */
+function CountTabs({
+  items,
 }: {
-  label: string
-  count: number
-  accent?: boolean
-  onOpen: () => void
+  items: Array<{ label: string; count: number; accent?: boolean; onOpen: () => void }>
 }) {
-  const lit = accent && count > 0
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em] border rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-        lit
-          ? 'border-cyan-glow/40 text-cyan-glow bg-cyan-soft hover:bg-surface-2'
-          : 'border-line text-ink-muted bg-surface-1 hover:bg-surface-2 hover:border-line-strong'
-      }`}
-    >
-      {label}
-      <span className="tabular-nums text-cyan-glow">{count}</span>
-    </button>
+    <div className="inline-flex items-stretch rounded-control border border-line-subtle bg-surface-1 divide-x divide-line-subtle overflow-hidden">
+      {items.map(({ label, count, accent = false, onOpen }) => {
+        const lit = accent && count > 0
+        return (
+          <button
+            key={label}
+            type="button"
+            onClick={onOpen}
+            className={cn(
+              'inline-flex items-center gap-1.5 min-h-8 px-2.5 text-xs font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow',
+              lit ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-2',
+            )}
+          >
+            {label}
+            <span className={cn('tabular-nums', lit ? 'text-cyan-glow' : 'text-ink-body font-normal')}>{count}</span>
+          </button>
+        )
+      })}
+    </div>
   )
 }
 
@@ -183,16 +185,15 @@ export function ConnectionsHubCard() {
       icon={<Users />}
       title={CONNECTIONS_HUB_TITLE}
       subtitle={CONNECTIONS_HUB_SUBTITLE}
-      meta={<HubAvatarStack members={circle} overflow={Math.max(0, friendCount - circle.length)} />}
       action={{ label: incomingCount > 0 ? 'Open incoming' : 'Open connections', onClick: () => openConnections() }}
       className="h-full"
       data-testid="connections-hub-card"
     >
       <HudGhostWidget isLoading={isLoading} skeleton={<ConnectionsHubListGhost />}>
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           {canSearch && (
             <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-muted" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-muted" aria-hidden="true" />
               <input
                 type="search"
                 value={query}
@@ -207,19 +208,19 @@ export function ConnectionsHubCard() {
             </div>
           )}
 
-          <div className="flex flex-wrap gap-1.5">
-            <CountChip label="Friends" count={friendCount} onOpen={() => openConnections('friends')} />
-            <CountChip
-              label="Incoming"
-              count={incomingCount}
-              accent
-              onOpen={() => openConnections('incoming')}
+          <div className="flex items-center justify-between gap-2">
+            <CountTabs
+              items={[
+                { label: 'Friends', count: friendCount, onOpen: () => openConnections('friends') },
+                { label: 'Incoming', count: incomingCount, accent: true, onOpen: () => openConnections('incoming') },
+                { label: 'Sent', count: sentCount, onOpen: () => openConnections('sent') },
+              ]}
             />
-            <CountChip label="Sent" count={sentCount} onOpen={() => openConnections('sent')} />
+            <HubAvatarStack members={circle} overflow={Math.max(0, friendCount - circle.length)} />
           </div>
 
           {showSearchResults && searchResults.length > 0 && (
-            <ul className="space-y-2 font-sans">
+            <ul className="space-y-1.5 font-sans">
               {searchResults.map((member) => {
                 const { relationship, pendingRequestId } = relationshipForMember(connections, member.id)
                 return (
@@ -248,7 +249,7 @@ export function ConnectionsHubCard() {
           )}
 
           {showPreview && preview.length > 0 && (
-            <ul className="space-y-2 font-sans">
+            <ul className="rounded-control border border-line-subtle divide-y divide-line-subtle overflow-hidden font-sans">
               {preview.map((member) => (
                 <HubConnectionRow
                   key={`${member.kind}-${member.id}`}
@@ -276,46 +277,36 @@ function HubConnectionRow({
   const incoming = member.kind === 'incoming'
 
   return (
-    <li
-      className={`p-2.5 border transition-colors rounded-card bg-surface-1 ${
-        incoming ? 'border-cyan-glow/40' : 'border-line-subtle hover:border-line-strong'
-      }`}
-    >
-      <div className="flex items-center gap-2.5 min-w-0">
-        <Link
-          to="/member/$profileId"
-          params={{ profileId: resolveMemberPublicParam(member) }}
-          className="shrink-0"
-        >
-          <LobsterAvatarPortrait
-            config={(member.avatarConfig as LobsterAvatarConfig | null) ?? null}
-            className="w-9 h-9"
-            size={96}
-          />
-        </Link>
-        <Link
-          to="/member/$profileId"
-          params={{ profileId: resolveMemberPublicParam(member) }}
-          className="min-w-0 flex-1"
-        >
-          <p className="font-grotesk text-xs font-bold text-ink hover:text-cyan-glow transition-colors truncate">
+    <li className={cn('flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2.5', incoming ? 'bg-surface-2' : 'bg-surface-1')}>
+      <Link
+        to="/member/$profileId"
+        params={{ profileId: resolveMemberPublicParam(member) }}
+        className={cn('flex items-center gap-2.5 min-w-[9rem] flex-1 rounded-control group', DASHBOARD_FOCUS)}
+      >
+        <LobsterAvatarPortrait
+          config={(member.avatarConfig as LobsterAvatarConfig | null) ?? null}
+          className="w-8 h-8 shrink-0"
+          size={96}
+        />
+        <span className="min-w-0 flex flex-col">
+          <span className="text-sm font-bold text-ink group-hover:text-cyan-glow transition-colors truncate leading-snug">
             {member.displayName}
-          </p>
-          <p className="text-[11px] uppercase tracking-[0.08em] text-ink-muted truncate">
-            Stage {member.stage} · {member.stageLabel}
+          </span>
+          <span className="text-[11px] text-ink-muted truncate">
+            {incoming ? 'Wants to connect' : member.kind === 'sent' ? 'Request sent' : `Stage ${member.stage} · ${member.stageLabel}`}
             {ageLabel ? ` · ${ageLabel}` : ''}
-          </p>
-        </Link>
-        <div className="shrink-0">
-          <FriendRequestButton
-            profileId={member.id}
-            relationship={relationship}
-            pendingRequestId={pendingRequestId}
-            compact
-            allowRemove={false}
-            onRelationshipChange={onRelationshipChange}
-          />
-        </div>
+          </span>
+        </span>
+      </Link>
+      <div className="shrink-0 ml-auto">
+        <FriendRequestButton
+          profileId={member.id}
+          relationship={relationship}
+          pendingRequestId={pendingRequestId}
+          compact
+          allowRemove={false}
+          onRelationshipChange={onRelationshipChange}
+        />
       </div>
     </li>
   )

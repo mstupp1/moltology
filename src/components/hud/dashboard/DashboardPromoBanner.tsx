@@ -47,7 +47,7 @@ export const DASHBOARD_PROMOS: DashboardPromo[] = [
 ]
 
 const NAV_BUTTON = cn(
-  'inline-flex items-center justify-center w-8 h-8 rounded-control border border-line text-ink-muted hover:text-ink hover:bg-surface-2 hover:border-line-hover transition-colors',
+  'inline-flex items-center justify-center w-8 h-8 rounded-control text-ink-muted hover:text-ink hover:bg-surface-3 transition-colors',
   DASHBOARD_FOCUS,
 )
 
@@ -77,10 +77,10 @@ export function DashboardPromoBanner({ promos = DASHBOARD_PROMOS }: { promos?: D
         <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-transparent via-transparent to-surface-1/80 pointer-events-none" />
       </div>
 
-      <div className="p-4 flex flex-col gap-3 min-w-0" aria-live="polite">
+      <div className="p-4 lg:p-5 flex flex-col justify-center gap-3 min-w-0" aria-live="polite">
         <div className="space-y-1 min-w-0">
           <p className="text-[11px] font-bold tracking-[0.08em] uppercase text-cyan-glow">{promo.eyebrow}</p>
-          <h2 className="font-grotesk text-base font-bold text-ink leading-snug">{promo.title}</h2>
+          <h2 className="font-grotesk text-lg font-bold text-ink leading-snug">{promo.title}</h2>
           <p className="text-xs text-ink-body leading-relaxed">{promo.description}</p>
         </div>
         <div className="flex items-center justify-between gap-3">
@@ -95,11 +95,11 @@ export function DashboardPromoBanner({ promos = DASHBOARD_PROMOS }: { promos?: D
             <ArrowRight className="w-3.5 h-3.5 text-cyan-glow" aria-hidden="true" />
           </Link>
           {promos.length > 1 && (
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-0.5 rounded-control border border-line-subtle bg-abyss/40">
               <button type="button" className={NAV_BUTTON} onClick={() => step(-1)} aria-label="Previous feature">
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="text-[11px] text-ink-muted tabular-nums min-w-[2.5rem] text-center" data-testid="dashboard-promo-position">
+              <span className="text-[11px] text-ink-muted tabular-nums min-w-[2.25rem] text-center" data-testid="dashboard-promo-position">
                 {index + 1} / {promos.length}
               </span>
               <button type="button" className={NAV_BUTTON} onClick={() => step(1)} aria-label="Next feature">
