@@ -1,5 +1,5 @@
 import { getAssetUrl } from '@/lib/assets'
-import { MAX_DEPTH_M, MAX_TORQUE_NM, type Clearance } from '@/lib/pipeline-explorer'
+import { stageXpRange, type Clearance } from '@/lib/pipeline-explorer'
 
 /** Per-stage accent. Classes are spelled out so Tailwind keeps them; hex is for SVG and gradients. */
 export const STAGE_ACCENT: Record<number, { hex: string; rgb: string; text: string; border: string; bg: string }> = {
@@ -23,62 +23,47 @@ export function stageName(stageTitle: string): string {
   return stageTitle.replace(/^STAGE \d+:\s*/i, '')
 }
 
-export type ScanLens = 'visible' | 'xray' | 'sonar'
-
-export const SCAN_LENSES: Array<{ value: ScanLens; label: string; filter: string }> = [
-  { value: 'visible', label: 'Visible', filter: 'none' },
-  { value: 'xray', label: 'X-ray', filter: 'grayscale(1) invert(1) contrast(1.35) brightness(0.95)' },
-  { value: 'sonar', label: 'Sonar', filter: 'grayscale(1) sepia(1) hue-rotate(150deg) saturate(4) brightness(0.9)' },
-]
-
-export type MetricKey = 'hardness' | 'torque' | 'depth'
-
-export interface MetricReading {
-  key: MetricKey
+export interface Reading {
   label: string
   /** The everyday thing the reading stands for. */
   meaning: string
-  value: string
-  ratio: number
-  /** Hotspot position over the specimen, in percent of the scanner. */
-  spot: { x: number; y: number }
 }
+
+export const READINGS: Reading[] = [
+  { label: 'Shell hardness', meaning: 'Not flinching at drama.' },
+  { label: 'Pincer torque', meaning: 'Finishing the thing you started.' },
+  { label: 'Depth', meaning: 'Holding focus below the noise.' },
+]
 
 function rangeLabel(from: number, to: number, unit: string): string {
   const fmt = (n: number) => n.toLocaleString('en-US')
   return from === to ? `${fmt(to)} ${unit}` : `${fmt(from)}–${fmt(to)} ${unit}`
 }
 
-export function metricReadings(clearance: Clearance): MetricReading[] {
+/** The typical readings for a clearance, in the same order as READINGS. */
+export function readingValues(clearance: Clearance): string[] {
   const { sub } = clearance
   return [
-    {
-      key: 'hardness',
-      label: 'Shell Hardness',
-      meaning: 'Not flinching at drama.',
-      value: `${sub.shellHardnessTarget}%`,
-      ratio: sub.shellHardnessTarget / 100,
-      spot: { x: 33, y: 34 },
-    },
-    {
-      key: 'torque',
-      label: 'Pincer Torque',
-      meaning: 'Finishing the thing you started.',
-      value: sub.pincerTorqueTarget.replace(/\s*-\s*/, '–'),
-      ratio: clearance.torqueNm / MAX_TORQUE_NM,
-      spot: { x: 69, y: 50 },
-    },
-    {
-      key: 'depth',
-      label: 'Submergence Depth',
-      meaning: 'Holding focus below the noise.',
-      value: rangeLabel(clearance.depthFromM, clearance.depthToM, 'm'),
-      ratio: clearance.depthToM / MAX_DEPTH_M,
-      spot: { x: 45, y: 71 },
-    },
+    `${sub.shellHardnessTarget}%`,
+    sub.pincerTorqueTarget.replace(/\s*-\s*/, '–'),
+    rangeLabel(clearance.depthFromM, clearance.depthToM, 'm'),
   ]
 }
 
 export function formatXp(xp: number): string {
   return `${Math.max(0, Math.floor(xp)).toLocaleString('en-US')} XP`
+}
+
+export function xpRangeLabel(stageNum: number): string {
+  const { minXp, maxXp } = stageXpRange(stageNum)
+  const fmt = (n: number) => n.toLocaleString('en-US')
+  return maxXp === null ? `${fmt(minXp)}+ XP` : `${fmt(minXp)}–${fmt(maxXp)} XP`
+}
+
+export function stageSectionId(stageNum: number): string {
+  return `stage-${stageNum}`
+}
+
+export function clearanceRowId(code: string): string {
+  return `clearance-${code}`
 }

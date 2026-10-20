@@ -4,11 +4,8 @@ import {
   PIPELINE_CLEARANCES,
   clearanceIndexForXp,
   clearanceStatus,
-  dailyLiturgyXp,
-  formatDayCount,
+  nextClearanceProgress,
   parseReadingRange,
-  projectDaysToTargets,
-  xpTrackPosition,
 } from './pipeline-explorer'
 import { SUB_STAGE_THRESHOLDS } from './progression'
 
@@ -49,46 +46,12 @@ describe('member position', () => {
     expect(clearanceStatus(2, 600)).toBe('ahead')
   })
 
-  it('places the member between clearances by XP', () => {
-    expect(xpTrackPosition(0)).toBe(0)
-    expect(xpTrackPosition(250)).toBeCloseTo(0.5)
-    expect(xpTrackPosition(100000)).toBe(11)
-    expect(xpTrackPosition(999999)).toBe(11)
-  })
-})
-
-describe('descent projection', () => {
-  it('pays 10 XP a liturgy and 20 more for all eight', () => {
-    expect(dailyLiturgyXp(0)).toBe(0)
-    expect(dailyLiturgyXp(3)).toBe(30)
-    expect(dailyLiturgyXp(8)).toBe(100)
-    expect(dailyLiturgyXp(12)).toBe(100)
-  })
-
-  it('counts days to each target at a steady cadence', () => {
-    // 4 a day = 40 XP, no streak milestones.
-    expect(projectDaysToTargets(0, 4, [500, 1200])).toEqual([13, 30])
-  })
-
-  it('adds streak milestones only on full days', () => {
-    // 8 a day = 100 XP; day 3 adds 50 and day 7 adds 150.
-    // Day 4: 400 + 50 = 450. Day 5: 550, so 500 lands on day 5.
-    expect(projectDaysToTargets(0, 8, [500])).toEqual([5])
-    // Without the milestones 7 a day (70 XP) needs ceil(500 / 70) = 8 days.
-    expect(projectDaysToTargets(0, 7, [500])).toEqual([8])
-  })
-
-  it('returns 0 for reached targets and null past the horizon', () => {
-    expect(projectDaysToTargets(600, 1, [500, 100000])).toEqual([0, null])
-    expect(projectDaysToTargets(0, 0, [500])).toEqual([null])
-  })
-
-  it('formats day counts in plain English', () => {
-    expect(formatDayCount(0)).toBe('reached')
-    expect(formatDayCount(1)).toBe('1 day')
-    expect(formatDayCount(45)).toBe('45 days')
-    expect(formatDayCount(120)).toBe('about 4 months')
-    expect(formatDayCount(1095)).toBe('about 3 years')
-    expect(formatDayCount(null)).toBe('over ten years')
+  it('measures progress to the next clearance', () => {
+    expect(nextClearanceProgress(0)).toMatchObject({ remainingXp: 500, percent: 0 })
+    expect(nextClearanceProgress(250)).toMatchObject({ remainingXp: 250, percent: 50 })
+    const progress = nextClearanceProgress(600)
+    expect(progress?.next.code).toBe('L-3')
+    expect(progress?.remainingXp).toBe(600)
+    expect(nextClearanceProgress(100000)).toBeNull()
   })
 })
