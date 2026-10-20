@@ -20,9 +20,9 @@ describe('merch catalog', () => {
 
   it('applies recorded Printful ids over placeholders', () => {
     const [mug] = INITIAL_MERCH_PRODUCTS
-    const variant = mug.variants[0]
+    const variant = { ...mug.variants[0], printfulSyncVariantId: 920001 }
     expect(isPlaceholderSyncId(variant.printfulSyncVariantId)).toBe(true)
-    const [synced] = withPrintfulSync([mug], { [variant.id]: { syncVariantId: 4123456789 } })
+    const [synced] = withPrintfulSync([{ ...mug, variants: [variant] }], { [variant.id]: { syncVariantId: 4123456789 } })
     expect(synced.variants[0].printfulSyncVariantId).toBe(4123456789)
     expect(isPlaceholderSyncId(4123456789)).toBe(false)
   })

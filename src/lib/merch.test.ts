@@ -4,6 +4,7 @@ import {
   buildMerchCheckoutSessionParams,
   buildPricedCheckoutLines,
   buildPrintfulOrderPayload,
+  printfulOrderExternalId,
   cartSubtotalCents,
   formatMerchPrice,
   isMerchCheckoutEvent,
@@ -27,12 +28,17 @@ const tee: PricedVariant = {
   variantTitle: 'Abyss / M',
   size: 'M',
   color: 'Abyss',
-  printfulSyncVariantId: 910002,
+  printfulSyncVariantId: 4123456789,
   priceCents: 2800,
   isAvailable: true,
 }
 
 describe('merch store helpers', () => {
+  it('encodes UUID order identifiers within Printful’s external-ID limit', () => {
+    expect(printfulOrderExternalId('c0aa7474-fd40-430f-8b9a-acb83712a95e')).toBe('c0aa7474fd40430f8b9aacb83712a95e')
+    expect(printfulOrderExternalId('order-1')).toBe('order-1')
+    expect(() => printfulOrderExternalId('a'.repeat(33))).toThrow('not valid')
+  })
   it('keeps the public store on Etsy until an admin can view the native store', () => {
     expect(resolveStoreHref(false)).toBe('https://www.etsy.com/shop/SaasTrash')
     expect(resolveStoreHref(true)).toBe('/store')
@@ -50,7 +56,7 @@ describe('merch store helpers', () => {
         variantId: 'var-tee',
         quantity: 3,
         unitPriceCents: 2800,
-        printfulSyncVariantId: 910002,
+        printfulSyncVariantId: 4123456789,
       }),
     ])
     expect(buildPricedCheckoutLines([tee], [{ variantId: 'missing', quantity: 1 }])).toEqual({
@@ -58,6 +64,8 @@ describe('merch store helpers', () => {
       message: 'One of those pieces is no longer available.',
     })
     expect(buildPricedCheckoutLines([tee], [{ variantId: 'var-tee', quantity: 11 }]).ok).toBe(false)
+    for (const id of [0, -1, 920801, 1.5, NaN]) expect(buildPricedCheckoutLines([{ ...tee, printfulSyncVariantId: id }], [{ variantId: 'var-tee', quantity: 1 }]).ok).toBe(false)
+    expect(buildPricedCheckoutLines([{ ...tee, isAvailable: false }], [{ variantId: 'var-tee', quantity: 1 }]).ok).toBe(false)
     expect(buildPricedCheckoutLines([{ ...tee, productPublished: false }], [{ variantId: 'var-tee', quantity: 1 }]).ok).toBe(false)
   })
 
@@ -74,12 +82,13 @@ describe('merch store helpers', () => {
       automaticTax: false,
     })
     expect(params.mode).toBe('payment')
+    expect(params.managed_payments).toEqual({ enabled: false })
     expect(params.customer).toBe('cus_1')
     expect(params.customer_email).toBeUndefined()
     expect(params.metadata).toEqual({ orderType: 'merch', orderId: 'order-1' })
     expect(params.success_url).toBe('https://moltology.org/store?checkout=success')
     expect(params.line_items[0]?.price_data.unit_amount).toBe(2800)
-    expect(params.line_items[0]?.price_data.product_data.metadata.printfulSyncVariantId).toBe('910002')
+    expect(params.line_items[0]?.price_data.product_data.metadata.printfulSyncVariantId).toBe('4123456789')
     expect(params.shipping_options[0]?.shipping_rate_data.fixed_amount.amount).toBe(695)
     expect(params.automatic_tax).toBeUndefined()
     expect(readMerchShippingCents('800')).toBe(800)
@@ -157,12 +166,15 @@ describe('merch store helpers', () => {
         country: 'US',
         phone: null,
       },
-      items: [{ printfulSyncVariantId: 910002, quantity: 1 }],
+      items: [{ printfulSyncVariantId: 4123456789, quantity: 1 }],
     })
     expect(payload.draft).toBe(true)
     expect(shouldDraftPrintfulOrder({ NODE_ENV: 'production', PRINTFUL_DRAFT: 'true' })).toBe(true)
-    expect(shouldDraftPrintfulOrder({ NODE_ENV: 'development', PRINTFUL_DRAFT: 'false' })).toBe(false)
-    expect(payload.items).toEqual([{ sync_variant_id: 910002, quantity: 1 }])
+    expect(shouldDraftPrintfulOrder({ NODE_ENV: 'development', PRINTFUL_DRAFT: 'false' })).toBe(true)
+    expect(shouldDraftPrintfulOrder({ NODE_ENV: 'production', STRIPE_SECRET_KEY: 'sk_test_example', PRINTFUL_DRAFT: 'false' }, false)).toBe(true)
+    expect(shouldDraftPrintfulOrder({ NODE_ENV: 'production', VERCEL_ENV: 'preview', STRIPE_SECRET_KEY: 'sk_live_example', PRINTFUL_DRAFT: 'false' }, true)).toBe(true)
+    expect(shouldDraftPrintfulOrder({ NODE_ENV: 'production', STRIPE_SECRET_KEY: 'sk_live_example', PRINTFUL_DRAFT: 'false' }, true)).toBe(false)
+    expect(payload.items).toEqual([{ sync_variant_id: 4123456789, quantity: 1 }])
     expect(payload.recipient.address1).toBe('1 Trench')
     expect(payload.recipient.address2).toBeUndefined()
   })

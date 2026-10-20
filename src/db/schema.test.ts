@@ -1,8 +1,12 @@
 import { describe, it, expect } from 'vitest'
 import { getTableConfig } from 'drizzle-orm/pg-core'
-import { profiles, users, userStats, routines, routineCompletions, routineDaySummaries, routineStreakCarries, activityEvents, changelogs, neonAuthUser, authUser, authSession, authAccount, authVerification, authJwks, aiThreads, aiMessages, aiUsageDailySummaries, blogPosts, blogComments, leads, friendRequests, friendships, suggestionDismissals, memberBonds, notifications, academyTracks, academyCourses, academyTrackCourses, academyModules, academyLessons, academyQuizQuestions, academyEnrollments, academyLessonProgress, academyCertificates, academyCertificateAwards, signupRiskEvents } from './schema'
+import { merchVariants, profiles, users, userStats, routines, routineCompletions, routineDaySummaries, routineStreakCarries, activityEvents, changelogs, neonAuthUser, authUser, authSession, authAccount, authVerification, authJwks, aiThreads, aiMessages, aiUsageDailySummaries, blogPosts, blogComments, leads, friendRequests, friendships, suggestionDismissals, memberBonds, notifications, academyTracks, academyCourses, academyTrackCourses, academyModules, academyLessons, academyQuizQuestions, academyEnrollments, academyLessonProgress, academyCertificates, academyCertificateAwards, signupRiskEvents } from './schema'
 
 describe('Database Schema & RLS Policies', () => {
+  it('stores large Printful variant identifiers without a 32-bit limit', () => {
+    expect(merchVariants.printfulSyncVariantId.getSQLType()).toBe('bigint')
+    expect(merchVariants.printfulSyncVariantId.mapFromDriverValue('4123456789')).toBe(4123456789)
+  })
   it('exports all user-scoped and system tables', () => {
     expect(profiles).toBeDefined()
     expect(users).toBeDefined()

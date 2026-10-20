@@ -4,8 +4,8 @@
  * scripts/merch/designs.ts. See .agents/skills/merch-manager/SKILL.md and docs/merch-launch.md.
  *
  *   npm run merch -- check                 Validate the catalog and list what still needs a Printful sync
- *   npm run merch -- print [--only key]    Render print files to tmp/merch/print/
- *   npm run merch -- mockups [--only slug] Generate placeholder product photos to tmp/merch/mockups/
+ *   npm run merch -- print [--pilot] [--only key|slug]    Render print files to tmp/merch/print/
+ *   npm run merch -- mockups [--only slug] Generate Printful product photos to tmp/merch/mockups/
  *   npm run merch -- upload                Upload print files and mockups to the bucket
  *   npm run merch -- blanks                Show the Printful blanks and their variants (needs PRINTFUL_API_TOKEN)
  *   npm run merch -- sync [--dry-run]      Create Printful products and record their ids
@@ -15,11 +15,16 @@ import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
 import sharp from 'sharp'
-import { INITIAL_MERCH_PRODUCTS, MERCH_PRINT_PREFIX, PRINTFUL_BLANKS, type MerchSeedProduct } from '../src/lib/merch-seed-data'
+import { MERCH_PRINT_PREFIX, PRINTFUL_BLANKS, type MerchSeedProduct } from '../src/lib/merch-seed-data'
 import { getAbsoluteAssetUrl } from '../src/lib/assets'
 import { MERCH_DESIGNS, getMerchDesign } from './merch/designs'
 import { renderPrintFile, renderReference } from './merch/render'
-import { PrintfulClient, buildSyncProductPayload, unsyncedVariants, type SyncFile } from './merch/printful-sync'
+import { selectMerchProducts, productAssetKeys } from './merch/selection'
+import { variantTemplate } from './merch/templates'
+import { requireMerchDevDatabase } from './merch/database'
+import { merchDoctor } from './merch/doctor'
+import { generatePrintfulMockups } from './merch/mockups'
+import { PrintfulClient, buildSyncProductPayload, ensureSyncProduct, validateSyncProduct, unsyncedVariants, type SyncFile } from './merch/printful-sync'
 
 const OUT = path.resolve('tmp/merch')
 const PRINT_DIR = path.join(OUT, 'print')
@@ -44,12 +49,14 @@ export function mockupJobs(product: MerchSeedProduct) {
   })
 }
 
+function selected() { return selectMerchProducts(flag('only'), flag('pilot') === 'true') }
+
 function check() {
   const problems: string[] = []
   const ids = new Set<string>()
   const syncIds = new Set<number>()
   const slugs = new Set<string>()
-  for (const product of INITIAL_MERCH_PRODUCTS) {
+  for (const product of selected()) {
     if (slugs.has(product.slug)) problems.push(`Duplicate slug ${product.slug}`)
     slugs.add(product.slug)
     for (const id of [product.id, ...product.variants.map((variant) => variant.id)]) {
@@ -63,14 +70,14 @@ function check() {
       if (variant.priceCents < 500) problems.push(`${product.slug} ${variant.title}: price looks wrong`)
     }
   }
-  for (const product of INITIAL_MERCH_PRODUCTS) {
+  for (const product of selected()) {
     const prices = product.variants.map((variant) => variant.priceCents)
     console.log(
       `${product.isPublished ? '●' : '○'} ${product.title.padEnd(22)} ${product.category.padEnd(5)} ` +
         `${product.variants.length} variants  $${Math.min(...prices) / 100}–$${Math.max(...prices) / 100}`,
     )
   }
-  const unsynced = unsyncedVariants(INITIAL_MERCH_PRODUCTS)
+  const unsynced = unsyncedVariants(selected())
   console.log(`\n${unsynced.length} variants still use placeholder Printful ids.`)
   if (problems.length) {
     console.error(`\n${problems.length} problem(s):\n- ${problems.join('\n- ')}`)
@@ -81,7 +88,8 @@ function check() {
 
 async function print() {
   const only = flag('only')
-  const designs = MERCH_DESIGNS.filter((design) => !only || design.key === only)
+  const designKeys = new Set(only && getMerchDesign(only) && !flag('pilot') ? [only] : selected().flatMap(product => product.variants.map(variant => variant.design)))
+  const designs = MERCH_DESIGNS.filter(design => designKeys.has(design.key))
   for (const design of designs) {
     const out = path.join(PRINT_DIR, `${design.key}.png`)
     await renderPrintFile(design, out, CACHE_DIR)
@@ -107,12 +115,11 @@ function mockupPrompt(product: MerchSeedProduct, color: string | null, angle: st
   )
 }
 
-async function mockups() {
-  const only = flag('only')
+async function placeholderMockups() {
   const model = flag('model') ?? 'nano-banana-pro'
   const { generateGeminiImage } = await import('./generate-image')
   fs.mkdirSync(MOCKUP_DIR, { recursive: true })
-  for (const product of INITIAL_MERCH_PRODUCTS.filter((item) => !only || item.slug === only)) {
+  for (const product of selected()) {
     for (const job of mockupJobs(product)) {
       const design = getMerchDesign(job.variant.design)
       if (!design) throw new Error(`Unknown design ${job.variant.design}`)
@@ -146,19 +153,34 @@ async function mockups() {
 
 async function upload() {
   const { uploadLocalFileToS3 } = await import('../src/lib/ingest/s3-upload')
-  const which = flag('only')
-  if (!which || which === 'print') {
-    for (const file of fs.existsSync(PRINT_DIR) ? fs.readdirSync(PRINT_DIR) : []) {
-      const key = `${MERCH_PRINT_PREFIX}/${file}`
-      await uploadLocalFileToS3(path.join(PRINT_DIR, file), key)
-      console.log(`✓ ${key}`)
-    }
+  const keys = productAssetKeys(selected())
+  const kind = flag('kind') ?? 'all'
+  if (!['all', 'print', 'mockups'].includes(kind)) throw new Error('--kind must be print, mockups or all.')
+  const jobs = [
+    ...(kind !== 'mockups' ? keys.print.map(key => ({ key, local: path.join(PRINT_DIR, path.basename(key)) })) : []),
+    ...(kind !== 'print' ? keys.mockups.map(key => ({ key, local: path.join(MOCKUP_DIR, path.basename(key)) })) : []),
+  ]
+  for (const job of jobs) if (!fs.existsSync(job.local)) throw new Error(`Missing ${job.local}; no uploads started.`)
+  for (const job of jobs) {
+    await uploadLocalFileToS3(job.local, job.key)
+    console.log(`✓ ${job.key}`)
   }
-  if (!which || which === 'mockups') {
-    for (const file of fs.existsSync(MOCKUP_DIR) ? fs.readdirSync(MOCKUP_DIR) : []) {
-      const key = `images/merch/${file}`
-      await uploadLocalFileToS3(path.join(MOCKUP_DIR, file), key)
-      console.log(`✓ ${key} (+ webp twin)`)
+}
+
+async function mockups() {
+  if (flag('provider') === 'gemini') return placeholderMockups()
+  if (flag('provider') && flag('provider') !== 'printful') throw new Error('--provider must be printful or gemini.')
+  await generatePrintfulMockups(printfulClient(), selected(), OUT, flag('refresh') === 'true')
+}
+
+async function templates() {
+  const client = printfulClient()
+  for (const product of selected()) {
+    const blanks = await client.catalogProduct(product.printful.catalogProductId)
+    const info = await client.printfiles(product.printful.catalogProductId)
+    for (const variant of product.variants) {
+      const { template, design } = variantTemplate(product, variant, blanks.variants, info)
+      console.log(`✓ ${product.slug} ${variant.title}: ${design.width}x${design.height}, template ${template.width}x${template.height} at ${template.dpi} dpi`)
     }
   }
 }
@@ -189,18 +211,19 @@ function readSyncFile(): SyncFile & Record<string, unknown> {
 
 async function sync() {
   const dryRun = flag('dry-run') === 'true'
-  const only = flag('only')
   const client = printfulClient()
+  const storeId = await client.requireManualStore()
   const file = readSyncFile()
+  if (file.storeId && file.storeId !== storeId) throw new Error('Sync ledger belongs to a different Printful store.')
+  file.storeId = storeId
+  if (flag('force')) throw new Error('--force recreation is disabled. Add a new design/product instead.')
   const catalogCache = new Map<number, Awaited<ReturnType<PrintfulClient['catalogProduct']>>>()
 
-  for (const product of INITIAL_MERCH_PRODUCTS.filter((item) => item.isPublished && (!only || item.slug === only))) {
-    if (file.products[product.slug] && flag('force') !== 'true') {
-      console.log(`· ${product.slug} already synced (pass --force to recreate)`)
-      continue
-    }
+  for (const product of selected().filter(item => item.isPublished)) {
     const blankId = product.printful.catalogProductId
     if (!catalogCache.has(blankId)) catalogCache.set(blankId, await client.catalogProduct(blankId))
+    const info = await client.printfiles(blankId)
+    for (const variant of product.variants) variantTemplate(product, variant, catalogCache.get(blankId)!.variants, info)
     const { payload, missing } = buildSyncProductPayload({
       product,
       catalogVariants: catalogCache.get(blankId)!.variants,
@@ -215,13 +238,16 @@ async function sync() {
       console.log(`~ ${product.slug}: would create ${payload.sync_variants.length} variants`)
       continue
     }
-    const created = await client.createSyncProduct(payload)
-    const detail = await client.syncProduct(created.id)
+    const detail = await ensureSyncProduct(client, product.id, payload)
+    validateSyncProduct(detail, payload.sync_variants)
+    const created = detail.sync_product
     file.products[product.slug] = { syncProductId: created.id, syncedAt: new Date().toISOString() }
     for (const variant of detail.sync_variants) {
       file.variants[variant.external_id] = { syncVariantId: variant.id, catalogVariantId: variant.variant_id }
     }
-    fs.writeFileSync(SYNC_FILE, `${JSON.stringify({ ...file, syncedAt: new Date().toISOString() }, null, 2)}\n`)
+    const temporary = `${SYNC_FILE}.tmp`
+    fs.writeFileSync(temporary, `${JSON.stringify({ ...file, syncedAt: new Date().toISOString() }, null, 2)}\n`)
+    fs.renameSync(temporary, SYNC_FILE)
     console.log(`✓ ${product.slug}: Printful product ${created.id}, ${detail.sync_variants.length} variants`)
   }
   if (!dryRun) console.log('\nCommit content/merch/printful-sync.json, then run `npm run merch -- seed`.')
@@ -232,13 +258,42 @@ async function seed() {
   const { drizzle } = await import('drizzle-orm/neon-http')
   const schema = await import('../src/db/schema')
   const { seedMerchCatalog } = await import('../src/db/seed-merch')
-  const url = process.env.DATABASE_URL
-  if (!url) throw new Error('DATABASE_URL is not set.')
-  const count = await seedMerchCatalog(drizzle(neon(url), { schema }))
+  const url = requireMerchDevDatabase(process.env)
+  const products = selected()
+  if (unsyncedVariants(products).length) throw new Error('Sync every selected variant before seeding. No database writes started.')
+  const count = await seedMerchCatalog(drizzle(neon(url), { schema }), products, !flag('only') && !flag('pilot'))
   console.log(`✓ Seeded ${count} merch products`)
 }
 
-const COMMANDS: Record<string, () => void | Promise<void>> = { check, print, mockups, upload, blanks, sync, seed }
+async function listen() {
+  const { listenForStripe } = await import('./merch/stripe-listener')
+  await listenForStripe(flag('configure-only') === 'true')
+}
+
+async function doctor() { if (!await merchDoctor(selected())) process.exitCode = 1 }
+
+async function orders() {
+  requireMerchDevDatabase(process.env)
+  const { getDb } = await import('../src/db')
+  const { merchOrders } = await import('../src/db/schema')
+  const { eq, desc } = await import('drizzle-orm')
+  const id = flag('order')
+  const db = getDb()
+  const rows = await db.select({ id: merchOrders.id, status: merchOrders.fulfillmentStatus, printfulOrderId: merchOrders.printfulOrderId, error: merchOrders.fulfillmentError, updatedAt: merchOrders.updatedAt }).from(merchOrders)
+    .where(id ? eq(merchOrders.id, id) : undefined).orderBy(desc(merchOrders.updatedAt)).limit(25)
+  for (const row of rows) console.log(JSON.stringify(row))
+}
+
+async function retry() {
+  requireMerchDevDatabase(process.env)
+  const id = flag('order')
+  if (!id || !/^[0-9a-f-]{36}$/i.test(id)) throw new Error('Use retry --order <order UUID>.')
+  const { retryMerchOrder } = await import('../src/lib/server/merch')
+  await retryMerchOrder(id)
+  await orders()
+}
+
+const COMMANDS: Record<string, () => void | Promise<void>> = { check, doctor, templates, print, mockups, upload, blanks, sync, seed, orders, retry, listen }
 
 if (process.argv[1]?.includes('merch.ts')) {
   const command = process.argv[2]

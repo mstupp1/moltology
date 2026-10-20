@@ -90,6 +90,8 @@ function mug(input: {
   title: string
   description: string
   design: string
+  /** Override the print canvas for sizes with a different Printful template. */
+  sizeDesigns?: Record<string, string>
   /** Wrap color shown as the swatch. */
   wrap: { name: string; hex: string }
 }): MerchSeedProduct {
@@ -115,7 +117,7 @@ function mug(input: {
       priceCents: option.priceCents,
       imageUrl: featured,
       printfulSyncVariantId: placeholderSyncId(input.n, index + 1),
-      design: input.design,
+      design: input.sizeDesigns?.[option.size] ?? input.design,
     })),
   }
 }
@@ -163,7 +165,25 @@ function tee(input: {
   }
 }
 
+export const MERCH_PILOT_SLUGS = ['synaptic-mark-mug', 'synaptic-mark-tee'] as const
+
 const BASE_CATALOG: MerchSeedProduct[] = [
+  mug({
+    n: 8,
+    slug: 'synaptic-mark-mug',
+    title: 'Synaptic Mark Mug',
+    description: 'White ceramic with the red Synaptic Path emblem on one face and the wordmark on the other.',
+    design: 'mug-synaptic-mark',
+    sizeDesigns: { '15 oz': 'mug-synaptic-mark-15oz' },
+    wrap: { name: 'White', hex: '#ffffff' },
+  }),
+  tee({
+    n: 9,
+    slug: 'synaptic-mark-tee',
+    title: 'Synaptic Mark Tee',
+    description: 'A black cotton tee with a centered red emblem and white Synaptic Path wordmark.',
+    designs: { Black: 'tee-synaptic-mark' },
+  }),
   mug({
     n: 1,
     slug: 'synaptic-path-mug',

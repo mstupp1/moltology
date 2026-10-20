@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import {
@@ -47,6 +47,7 @@ export function MerchCartProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false)
   const [open, setOpen] = useState(false)
   const [checkingOut, setCheckingOut] = useState(false)
+  const consumedResult = useRef<'success' | 'cancel' | undefined>(undefined)
 
   useEffect(() => {
     setLines(readStoredCart(window.localStorage.getItem(MERCH_CART_STORAGE_KEY)))
@@ -102,9 +103,15 @@ export function MerchCartProvider({ children }: { children: React.ReactNode }) {
 
   const consumeCheckoutResult = useCallback(
     (result: 'success' | 'cancel' | undefined) => {
-      if (!result) return
+      if (!result) { consumedResult.current = undefined; return }
+      // Toast context updates can change this callback's identity; consume each return once.
+      if (consumedResult.current === result) return
+      consumedResult.current = result
       if (result === 'success') {
         if (window.sessionStorage.getItem(PENDING_CLEAR_KEY) === '1') {
+          // Child return effects can run before this provider restores the persisted cart.
+          // Clear storage first so hydration cannot resurrect the purchased lines.
+          window.localStorage.setItem(MERCH_CART_STORAGE_KEY, '[]')
           setLines([])
         }
         window.sessionStorage.removeItem(PENDING_CLEAR_KEY)

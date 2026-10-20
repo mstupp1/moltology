@@ -6,12 +6,9 @@ import { hasExperiment } from '../experiments'
 import {
   buildMerchCheckoutSessionParams,
   buildPricedCheckoutLines,
-  buildPrintfulOrderPayload,
   readAutomaticTaxEnabled,
   readMerchCheckoutCompletion,
   readMerchShippingCents,
-  shortFulfillmentError,
-  shouldDraftPrintfulOrder,
   type CheckoutLineRequest,
   type LooseCheckoutSession,
   type MerchProductView,
@@ -23,7 +20,7 @@ import { merchCatalogView } from '../merch-seed-data'
 import { readStripePremiumConfig, resolvePremiumReturnOrigin } from '../premium-membership'
 import { ensureUserProfile } from '../user-sync'
 import { resolveWriteAuth, type WriteAuthContext } from './write-auth'
-import { createPrintfulOrder } from './printful'
+import { fulfillPaidMerchOrder } from './merch-fulfillment'
 
 type HandlerArgs = {
   data?: {
@@ -253,6 +250,7 @@ export async function createMerchCheckoutSessionHandler(args: HandlerArgs): Prom
           customerEmail: profile.stripeCustomerId ? null : email,
           automaticTax: readAutomaticTaxEnabled(process.env.STRIPE_AUTOMATIC_TAX),
         }),
+        { idempotencyKey: `merch-checkout-${orderId}` },
       )
     } catch (error) {
       await db.delete(merchOrders).where(eq(merchOrders.id, orderId))
@@ -292,111 +290,53 @@ async function rememberStripeCustomer(userId: string | null, customerId: string 
 export async function fulfillMerchCheckoutEvent(event: {
   type?: string
   data?: { object?: unknown } | null
-}): Promise<void> {
-  const completion = readMerchCheckoutCompletion((event.data?.object ?? {}) as LooseCheckoutSession)
+}, retry = false): Promise<void> {
+  const session = (event.data?.object ?? {}) as LooseCheckoutSession
+  const completion = readMerchCheckoutCompletion(session)
   if (!completion) return
-
   const db = getDb()
-  const bySession = completion.sessionId
-    ? await db
-        .select()
-        .from(merchOrders)
-        .where(eq(merchOrders.stripeCheckoutSessionId, completion.sessionId))
-        .limit(1)
+  const rows = completion.orderId
+    ? await db.select().from(merchOrders).where(eq(merchOrders.id, completion.orderId)).limit(1)
     : []
-  const byId =
-    bySession[0] || !completion.orderId
-      ? bySession
-      : await db.select().from(merchOrders).where(eq(merchOrders.id, completion.orderId)).limit(1)
-  const order = byId[0]
-  if (!order) throw new MerchOrderMissingError()
-  if (order.fulfillmentStatus === 'submitted_to_printful' || order.fulfillmentStatus === 'fulfillment_failed') {
-    return
+  const order = rows[0]
+  if (!order || !completion.sessionId) throw new MerchOrderMissingError()
+  if (order.stripeCheckoutSessionId && order.stripeCheckoutSessionId !== completion.sessionId) {
+    throw new Error('Stripe session does not match the merch order.')
   }
+  if (['printful_draft', 'submitted_to_printful'].includes(order.fulfillmentStatus)) return
 
-  // A delayed payment method completes checkout before the money arrives. Nothing
-  // goes to Printful until Stripe reports the session as paid.
   if (event.type === 'checkout.session.async_payment_failed' || !completion.paid) {
-    const failed = event.type === 'checkout.session.async_payment_failed'
-    await db
-      .update(merchOrders)
-      .set({
-        stripeCheckoutSessionId: completion.sessionId ?? order.stripeCheckoutSessionId,
-        customerEmail: completion.email ?? order.customerEmail,
-        shippingAddress: completion.shipping ?? order.shippingAddress,
-        fulfillmentStatus: failed ? 'payment_failed' : 'awaiting_payment',
-        updatedAt: new Date(),
-      })
-      .where(eq(merchOrders.id, order.id))
-    return
-  }
-
-  const subtotalCents = completion.subtotalCents ?? order.subtotalCents
-  const shippingCents = completion.shippingCents ?? order.shippingCents
-  const taxCents = completion.taxCents ?? order.taxCents
-  const totalCents = completion.totalCents ?? subtotalCents + shippingCents + taxCents
-
-  await db
-    .update(merchOrders)
-    .set({
-      stripeCheckoutSessionId: completion.sessionId ?? order.stripeCheckoutSessionId,
+    await db.update(merchOrders).set({
+      stripeCheckoutSessionId: completion.sessionId,
       customerEmail: completion.email ?? order.customerEmail,
       shippingAddress: completion.shipping ?? order.shippingAddress,
-      fulfillmentStatus: 'paid',
-      subtotalCents,
-      shippingCents,
-      taxCents,
-      totalCents,
-      currency: completion.currency,
+      fulfillmentStatus: event.type === 'checkout.session.async_payment_failed' ? 'payment_failed' : 'awaiting_payment',
       updatedAt: new Date(),
-    })
-    .where(eq(merchOrders.id, order.id))
-
+    }).where(and(eq(merchOrders.id, order.id), inArray(merchOrders.fulfillmentStatus, ['pending', 'awaiting_payment', 'payment_failed'])))
+    return
+  }
+  await fulfillPaidMerchOrder(db, order.id, completion, session.livemode === true, retry)
   await rememberStripeCustomer(order.userId, completion.customerId)
+}
 
-  const fail = async (message: string) => {
-    await db
-      .update(merchOrders)
-      .set({
-        fulfillmentStatus: 'fulfillment_failed',
-        fulfillmentError: message.slice(0, 240),
-        updatedAt: new Date(),
-      })
-      .where(eq(merchOrders.id, order.id))
+/** Operator-only CLI path: re-read Stripe payment before retrying the saved snapshot. */
+export async function retryMerchOrder(orderId: string): Promise<void> {
+  const [order] = await getDb().select().from(merchOrders).where(eq(merchOrders.id, orderId)).limit(1)
+  if (!order?.stripeCheckoutSessionId) throw new Error('Order has no Stripe checkout session.')
+  if (!['fulfillment_failed', 'processing', 'paid'].includes(order.fulfillmentStatus)) {
+    throw new Error('Only failed, interrupted, or paid orders can be retried.')
   }
-
-  const token = process.env.PRINTFUL_API_TOKEN?.trim()
-  if (!token) {
-    await fail('Printful is not configured.')
-    return
+  const key = process.env.STRIPE_SECRET_KEY
+  if (!key) throw new Error('STRIPE_SECRET_KEY is missing.')
+  const stripe = new Stripe(key, { apiVersion: '2026-07-29.dahlia' })
+  const session = await stripe.checkout.sessions.retrieve(order.stripeCheckoutSessionId)
+  if (session.metadata?.orderId !== order.id || session.metadata?.orderType !== 'merch' || session.payment_status !== 'paid') {
+    throw new Error('Stripe has not confirmed payment for this merch order.')
   }
-  if (!completion.shipping || !completion.email) {
-    await fail('Checkout did not include a shipping address.')
-    return
-  }
-
-  const lineItems = order.lineItems ?? []
-  try {
-    const created = await createPrintfulOrder(
-      token,
-      buildPrintfulOrderPayload({
-        externalId: order.id,
-        email: completion.email,
-        shipping: completion.shipping,
-        items: lineItems,
-        draft: shouldDraftPrintfulOrder(process.env),
-      }),
-    )
-    await db
-      .update(merchOrders)
-      .set({
-        fulfillmentStatus: 'submitted_to_printful',
-        printfulOrderId: created.id,
-        fulfillmentError: null,
-        updatedAt: new Date(),
-      })
-      .where(eq(merchOrders.id, order.id))
-  } catch (error) {
-    await fail(shortFulfillmentError(error))
-  }
+  // Shipping and items come from the persisted paid order, not mutable catalog records.
+  const completion = readMerchCheckoutCompletion(session)
+  if (!completion) throw new Error('Invalid merch checkout session.')
+  completion.shipping = order.shippingAddress
+  completion.email = order.customerEmail
+  await fulfillPaidMerchOrder(getDb(), order.id, completion, session.livemode, true)
 }

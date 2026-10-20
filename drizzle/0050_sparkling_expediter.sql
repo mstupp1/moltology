@@ -1,0 +1,1 @@
+ALTER TABLE "merch_variants" ALTER COLUMN "printfulSyncVariantId" SET DATA TYPE bigint;

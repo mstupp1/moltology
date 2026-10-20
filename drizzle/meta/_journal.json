@@ -351,6 +351,13 @@
       "when": 1792112202775,
       "tag": "0049_lively_jocasta",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1792453809830,
+      "tag": "0050_sparkling_expediter",
+      "breakpoints": true
     }
   ]
 }

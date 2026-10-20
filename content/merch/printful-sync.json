@@ -1,6 +1,45 @@
 {
   "note": "Written by `npm run merch -- sync`. Maps merch variant ids to Printful sync variant ids.",
-  "syncedAt": null,
-  "products": {},
-  "variants": {}
+  "syncedAt": "2026-10-20T00:02:42.952Z",
+  "products": {
+    "synaptic-mark-mug": {
+      "syncProductId": 483237197,
+      "syncedAt": "2026-10-20T00:02:40.041Z"
+    },
+    "synaptic-mark-tee": {
+      "syncProductId": 483237241,
+      "syncedAt": "2026-10-20T00:02:42.952Z"
+    }
+  },
+  "variants": {
+    "22222222-2222-4222-8222-000800000001": {
+      "syncVariantId": 5583863824,
+      "catalogVariantId": 1320
+    },
+    "22222222-2222-4222-8222-000800000002": {
+      "syncVariantId": 5583863826,
+      "catalogVariantId": 4830
+    },
+    "22222222-2222-4222-8222-000900000001": {
+      "syncVariantId": 5583863929,
+      "catalogVariantId": 4016
+    },
+    "22222222-2222-4222-8222-000900000002": {
+      "syncVariantId": 5583863931,
+      "catalogVariantId": 4017
+    },
+    "22222222-2222-4222-8222-000900000003": {
+      "syncVariantId": 5583863932,
+      "catalogVariantId": 4018
+    },
+    "22222222-2222-4222-8222-000900000004": {
+      "syncVariantId": 5583863934,
+      "catalogVariantId": 4019
+    },
+    "22222222-2222-4222-8222-000900000005": {
+      "syncVariantId": 5583863936,
+      "catalogVariantId": 4020
+    }
+  },
+  "storeId": 18931450
 }

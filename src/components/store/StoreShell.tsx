@@ -1,5 +1,5 @@
 import React from 'react'
-import { Outlet } from '@tanstack/react-router'
+import { Outlet, useNavigate } from '@tanstack/react-router'
 import { HiddenPageGuard } from '@/components/hud/HiddenPageGuard'
 import { MainFooter } from '@/components/MainFooter'
 import { PublicHeader } from '@/components/PublicHeader'
@@ -25,9 +25,10 @@ function StoreBody() {
 }
 
 export function StoreShell() {
+  const navigate = useNavigate()
   return (
     <div className="min-h-screen bg-abyss text-ink">
-      <PublicHeader activePage="store" />
+      <PublicHeader activePage="store" onOpenAuth={(mode) => { void navigate({ to: '/auth', search: { mode, redirect: '/store' } }) }} />
       {/* Clears the fixed header. */}
       <div className="pt-20">
         {MERCH_PREVIEW ? (
