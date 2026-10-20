@@ -20,7 +20,6 @@ import {
   type SearchTab,
 } from '@/lib/command-catalog'
 import { MEMBER_SEARCH_MIN_CHARS } from '@/lib/member-search'
-import { useToast } from '@/components/ui/ToastProvider'
 import { useNavigate } from '@tanstack/react-router'
 
 export function SearchPage({
@@ -39,7 +38,6 @@ export function SearchPage({
   const signedIn = session.isAuthenticated && !session.isGuest
   const { results, searching } = useMemberSearch(query, signedIn)
   const [connections, setConnections] = useState<ConnectionsListView | null>(null)
-  const { toast } = useToast()
   const navigate = useNavigate()
   const trimmed = query.trim()
   const staffCatalog = hiddenAccess.canView && !hiddenAccess.pending
@@ -67,16 +65,7 @@ export function SearchPage({
 
   const runPage = (command: CommandCatalogItem) => {
     const dest = catalogNavigateArgs(command)
-    if (dest) {
-      navigate(dest)
-      return
-    }
-    if (command.toast) {
-      toast.success(command.toast.message, {
-        id: command.toast.id,
-        title: command.toast.title,
-      })
-    }
+    if (dest) navigate(dest)
   }
 
   return (
@@ -84,7 +73,7 @@ export function SearchPage({
       <HudTitlePanel
         accent="teal"
         title="Search"
-        description="Find fellow members by designation, larva unit, or name. Jump to any chamber the Path already keeps."
+        description="Find members by name, handle or larva unit number, or jump to any page."
       />
 
       <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
@@ -94,7 +83,7 @@ export function SearchPage({
             type="search"
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
-            placeholder="Search designations, larva units, names, or pages…"
+            placeholder="Search members or pages"
             className="w-full pl-10 pr-3 py-2.5 bg-[#050808] border border-[#3a4a49] text-sm text-[#dfe3e3] placeholder:text-[#4a5a59] focus:outline-none focus:border-[#00c3ff] chamfer-corner"
             aria-label="Search query"
           />
@@ -175,7 +164,7 @@ function PeopleGuestLock() {
             MEMBER SEARCH LOCKED
           </h2>
           <p className="text-xs text-[#839493] leading-relaxed max-w-sm mx-auto font-sans">
-            Searching fellow members takes a signed-in account. Page jumps stay open to every guest.
+            Sign in to search members. You can still search pages.
           </p>
         </div>
         <div className="space-y-3 pt-1">
@@ -222,20 +211,19 @@ function PeopleResults({
   if (query.length < MEMBER_SEARCH_MIN_CHARS) {
     return (
       <p className="text-xs text-[#839493] text-center py-6">
-        Name a designation, a larva unit, or a name. The Path listens after two characters.
+        Type at least two characters of a name, handle or larva unit number.
       </p>
     )
   }
 
   if (searching && results.length === 0) {
-    return <p className="text-xs text-[#839493] text-center py-6">Listening for designations…</p>
+    return <p className="text-xs text-[#839493] text-center py-6">Searching members…</p>
   }
 
   if (results.length === 0) {
     return (
       <p className="text-xs text-[#839493] text-center py-6">
-        The trench stayed quiet. No designation, larva unit, or name surfaced for that call. The Path
-        still holds.
+        No members match that.
       </p>
     )
   }
@@ -271,8 +259,8 @@ function PagesResults({
     return (
       <p className="text-xs text-[#839493] text-center py-6">
         {query
-          ? 'No chambers answered that call. Try a shorter word, or a rite you already know.'
-          : 'Every chamber is listed. Type to narrow the Path.'}
+          ? 'No pages match that. Try a shorter word.'
+          : 'Showing every page. Type to narrow the list.'}
       </p>
     )
   }

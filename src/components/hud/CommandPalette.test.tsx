@@ -125,7 +125,7 @@ describe('CommandPalette Component', () => {
     fireEvent.click(modal)
     expect(screen.getByTestId('command-palette-overlay')).toBeInTheDocument()
 
-    const input = screen.getByPlaceholderText(/Type a command or search protocol/i)
+    const input = screen.getByPlaceholderText(/Search pages and members/i)
     fireEvent.click(input)
     expect(screen.getByTestId('command-palette-overlay')).toBeInTheDocument()
   })
@@ -134,7 +134,7 @@ describe('CommandPalette Component', () => {
     render(<ToastProvider><CommandPalette /></ToastProvider>)
 
     fireEvent(window, new CustomEvent('open-command-palette'))
-    const closeBtn = screen.getByRole('button', { name: '' })
+    const closeBtn = screen.getByRole('button', { name: 'Close search' })
     fireEvent.click(closeBtn)
 
     expect(screen.queryByTestId('command-palette-overlay')).not.toBeInTheDocument()
@@ -144,49 +144,49 @@ describe('CommandPalette Component', () => {
     render(<ToastProvider><CommandPalette /></ToastProvider>)
 
     fireEvent(window, new CustomEvent('open-command-palette'))
-    const input = screen.getByPlaceholderText(/Type a command or search protocol/i)
+    const input = screen.getByPlaceholderText(/Search pages and members/i)
 
     fireEvent.change(input, { target: { value: 'Codex' } })
-    expect(screen.getByText('Open Sacred Codex & Canonical Scriptures')).toBeInTheDocument()
-    expect(screen.queryByText('Open Premium membership')).not.toBeInTheDocument()
+    expect(screen.getByText('Codex')).toBeInTheDocument()
+    expect(screen.queryByText('Premium')).not.toBeInTheDocument()
   })
 
   it('lists hidden pages for admins and hides them from everyone else', () => {
     const view = render(<ToastProvider><CommandPalette /></ToastProvider>)
     fireEvent(window, new CustomEvent('open-command-palette'))
-    const input = screen.getByPlaceholderText(/Type a command or search protocol/i)
+    const input = screen.getByPlaceholderText(/Search pages and members/i)
     fireEvent.change(input, { target: { value: 'premium' } })
-    expect(screen.queryByText('Open Premium membership')).not.toBeInTheDocument()
+    expect(screen.queryByText('Premium')).not.toBeInTheDocument()
 
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'admin-1', email: 'ops@example.com', role: 'admin' } },
       isPending: false,
     } as any)
     view.rerender(<ToastProvider><CommandPalette /></ToastProvider>)
-    expect(screen.getByText('Open Premium membership')).toBeInTheDocument()
+    expect(screen.getByText('Premium')).toBeInTheDocument()
   })
 
   it('surfaces the shared chamber index for oracle, connections, and news', () => {
     render(<ToastProvider><CommandPalette /></ToastProvider>)
     fireEvent(window, new CustomEvent('open-command-palette'))
-    const input = screen.getByPlaceholderText(/Type a command or search protocol/i)
+    const input = screen.getByPlaceholderText(/Search pages and members/i)
 
     fireEvent.change(input, { target: { value: 'oracle' } })
-    expect(screen.getByText('Consult the Synaptic Oracle')).toBeInTheDocument()
+    expect(screen.getByText('Oracle')).toBeInTheDocument()
 
     fireEvent.change(input, { target: { value: 'connections' } })
-    expect(screen.getByText('Open Connections & Fellow Shells')).toBeInTheDocument()
+    expect(screen.getByText('Connections')).toBeInTheDocument()
 
     fireEvent.change(input, { target: { value: 'news' } })
-    expect(screen.getByText('Open MoltNation News')).toBeInTheDocument()
-    expect(screen.getAllByText(/Read Dispatch:/).length).toBeGreaterThan(0)
+    expect(screen.getAllByText('News').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('News').length).toBeGreaterThan(1)
   })
 
   it('executes command action and navigates on click', () => {
     render(<ToastProvider><CommandPalette /></ToastProvider>)
 
     fireEvent(window, new CustomEvent('open-command-palette'))
-    const codexOption = screen.getByText('Open Sacred Codex & Canonical Scriptures')
+    const codexOption = screen.getByText('Codex')
     fireEvent.click(codexOption)
 
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/codex' })
@@ -197,10 +197,10 @@ describe('CommandPalette Component', () => {
     render(<ToastProvider><CommandPalette /></ToastProvider>)
 
     fireEvent(window, new CustomEvent('open-command-palette'))
-    fireEvent.change(screen.getByPlaceholderText(/Type a command or search protocol/i), {
+    fireEvent.change(screen.getByPlaceholderText(/Search pages and members/i), {
       target: { value: 'SCR-010' },
     })
-    fireEvent.click(screen.getByText('Read Scripture: The Law of Ecdysis'))
+    fireEvent.click(screen.getByText('The Law of Ecdysis'))
 
     expect(mockNavigate).toHaveBeenCalledWith({
       to: '/codex/$slug',
@@ -212,14 +212,14 @@ describe('CommandPalette Component', () => {
     vi.mocked(searchMembersFn).mockResolvedValue([clawLord])
     render(<ToastProvider><CommandPalette /></ToastProvider>)
     fireEvent(window, new CustomEvent('open-command-palette'))
-    const input = screen.getByPlaceholderText(/Type a command or search protocol/i)
+    const input = screen.getByPlaceholderText(/Search pages and members/i)
     fireEvent.change(input, { target: { value: 'Codex' } })
 
-    expect(screen.getByText('Sign in to search fellow members. Page jumps stay open.')).toBeInTheDocument()
+    expect(screen.getByText('Sign in to search members. You can still search pages.')).toBeInTheDocument()
     expect(screen.queryByText('claw_lord')).not.toBeInTheDocument()
     expect(searchMembersFn).not.toHaveBeenCalled()
 
-    fireEvent.click(screen.getByText('Open Sacred Codex & Canonical Scriptures'))
+    fireEvent.click(screen.getByText('Codex'))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/codex' })
   })
 
@@ -229,7 +229,7 @@ describe('CommandPalette Component', () => {
 
     render(<ToastProvider><CommandPalette /></ToastProvider>)
     fireEvent(window, new CustomEvent('open-command-palette'))
-    const input = screen.getByPlaceholderText(/Type a command or search protocol/i)
+    const input = screen.getByPlaceholderText(/Search pages and members/i)
     fireEvent.change(input, { target: { value: 'claw' } })
 
     await waitFor(() => {
@@ -253,7 +253,7 @@ describe('CommandPalette Component', () => {
 
     render(<ToastProvider><CommandPalette /></ToastProvider>)
     fireEvent(window, new CustomEvent('open-command-palette'))
-    fireEvent.change(screen.getByPlaceholderText(/Type a command or search protocol/i), {
+    fireEvent.change(screen.getByPlaceholderText(/Search pages and members/i), {
       target: { value: 'claw' },
     })
     await waitFor(() => {
@@ -270,7 +270,7 @@ describe('CommandPalette Component', () => {
   it('sends Enter on a no-match query to /search pages', () => {
     render(<ToastProvider><CommandPalette /></ToastProvider>)
     fireEvent(window, new CustomEvent('open-command-palette'))
-    fireEvent.change(screen.getByPlaceholderText(/Type a command or search protocol/i), {
+    fireEvent.change(screen.getByPlaceholderText(/Search pages and members/i), {
       target: { value: 'zzzz-no-chamber' },
     })
     fireEvent.keyDown(screen.getByTestId('command-palette-modal'), { key: 'Enter' })
@@ -286,13 +286,13 @@ describe('CommandPalette Component', () => {
 
     render(<ToastProvider><CommandPalette /></ToastProvider>)
     fireEvent(window, new CustomEvent('open-command-palette'))
-    fireEvent.change(screen.getByPlaceholderText(/Type a command or search protocol/i), {
+    fireEvent.change(screen.getByPlaceholderText(/Search pages and members/i), {
       target: { value: 'cod' },
     })
     await waitFor(() => {
       expect(screen.getByText('claw_lord')).toBeInTheDocument()
     })
-    expect(screen.getByText('Open Sacred Codex & Canonical Scriptures')).toBeInTheDocument()
+    expect(screen.getByText('Codex')).toBeInTheDocument()
 
     const modal = screen.getByTestId('command-palette-modal')
     fireEvent.keyDown(modal, { key: 'ArrowDown' })
@@ -307,7 +307,7 @@ describe('CommandPalette Component', () => {
 
     render(<ToastProvider><CommandPalette /></ToastProvider>)
     fireEvent(window, new CustomEvent('open-command-palette'))
-    fireEvent.click(screen.getByText('Open Sacred Codex & Canonical Scriptures'))
+    fireEvent.click(screen.getByText('Codex'))
     expect(screen.queryByTestId('command-palette-overlay')).not.toBeInTheDocument()
 
     fireEvent(window, new CustomEvent('open-command-palette'))
@@ -315,7 +315,7 @@ describe('CommandPalette Component', () => {
     expect(screen.getByText('Recents')).toBeInTheDocument()
     expect(screen.getByTestId('command-palette-recent-page-nav-codex')).toBeInTheDocument()
 
-    fireEvent.change(screen.getByPlaceholderText(/Type a command or search protocol/i), {
+    fireEvent.change(screen.getByPlaceholderText(/Search pages and members/i), {
       target: { value: 'claw' },
     })
     await waitFor(() => {
@@ -335,7 +335,7 @@ describe('CommandPalette Component', () => {
 
     render(<ToastProvider><CommandPalette /></ToastProvider>)
     fireEvent(window, new CustomEvent('open-command-palette'))
-    fireEvent.change(screen.getByPlaceholderText(/Type a command or search protocol/i), {
+    fireEvent.change(screen.getByPlaceholderText(/Search pages and members/i), {
       target: { value: 'claw' },
     })
     await waitFor(() => {
@@ -347,27 +347,27 @@ describe('CommandPalette Component', () => {
     const queryChip = screen.getByTestId('command-palette-recent-query-claw')
     expect(queryChip).toBeInTheDocument()
     fireEvent.click(queryChip)
-    expect(screen.getByPlaceholderText(/Type a command or search protocol/i)).toHaveValue('claw')
+    expect(screen.getByPlaceholderText(/Search pages and members/i)).toHaveValue('claw')
     expect(screen.queryByTestId('command-palette-recents')).not.toBeInTheDocument()
 
-    fireEvent.change(screen.getByPlaceholderText(/Type a command or search protocol/i), {
+    fireEvent.change(screen.getByPlaceholderText(/Search pages and members/i), {
       target: { value: '' },
     })
     expect(screen.getByTestId('command-palette-recents')).toBeInTheDocument()
     fireEvent.click(screen.getByTestId('command-palette-recents-clear'))
     expect(screen.queryByTestId('command-palette-recents')).not.toBeInTheDocument()
-    expect(screen.queryByText('Shed trail')).not.toBeInTheDocument()
+    expect(screen.queryByText('Clear')).not.toBeInTheDocument()
   })
 
   it('keeps guests empty-honest: no Recents strip and no stored trail', () => {
     render(<ToastProvider><CommandPalette /></ToastProvider>)
     fireEvent(window, new CustomEvent('open-command-palette'))
-    fireEvent.click(screen.getByText('Open Sacred Codex & Canonical Scriptures'))
+    fireEvent.click(screen.getByText('Codex'))
 
     fireEvent(window, new CustomEvent('open-command-palette'))
     expect(screen.queryByTestId('command-palette-recents')).not.toBeInTheDocument()
     expect(screen.queryByText('Recents')).not.toBeInTheDocument()
-    expect(screen.queryByText('Shed trail')).not.toBeInTheDocument()
+    expect(screen.queryByText('Clear')).not.toBeInTheDocument()
     expect(localStorage.getItem(`${SEARCH_RECENTS_STORAGE_PREFIX}user-1`)).toBeNull()
     expect(
       Array.from({ length: localStorage.length }, (_, index) => localStorage.key(index)).every(
