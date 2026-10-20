@@ -11,7 +11,6 @@ export interface HeaderBrandProps {
   onClick?: () => void
   className?: string
   logoSize?: 'sm' | 'md'
-  variant?: 'benthic' | 'corporate'
   badge?: React.ReactNode
 }
 
@@ -22,12 +21,10 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
   onClick,
   className = '',
   logoSize = 'md',
-  variant = 'benthic',
   badge,
 }) => {
   const sizeClasses = logoSize === 'sm' ? 'w-6 h-6 sm:w-7 sm:h-7' : 'w-8 h-8 sm:w-9 sm:h-9'
   const titleSizeClasses = logoSize === 'sm' ? 'text-base' : 'text-lg sm:text-[22px]'
-  const isCorporate = variant === 'corporate'
   const isTagline = subtext === BRAND_TAGLINE
   const brandContent = (
     <>
@@ -44,16 +41,12 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
           }`}
         >
           <div
-            className={`font-grotesk font-extrabold ${isTagline ? '' : titleSizeClasses} tracking-tight flex items-center gap-2 transition-all duration-300 leading-none ${
-              isCorporate
-                ? 'text-sky-950 group-hover:text-sky-700'
-                : 'text-ink group-hover:text-white'
-            }`}
+            className={`font-grotesk font-extrabold ${isTagline ? '' : titleSizeClasses} tracking-tight flex items-center gap-2 transition-all duration-300 leading-none text-ink group-hover:text-white`}
           >
             <span>{brandTitle}</span>
           </div>
           {subtext && isTagline && (
-            <div className={`brand-lockup-caption ${isCorporate ? 'text-sky-700' : 'text-ink-muted'}`}>
+            <div className="brand-lockup-caption text-ink-muted">
               <span className="sr-only">{subtext}</span>
               {/* Letters spread across the title's width so the two lines read as one block. */}
               <span aria-hidden="true" className="brand-lockup-letters">
@@ -69,11 +62,7 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
           )}
           {subtext && !isTagline && (
             <div
-              className={`text-[11px] font-bold tracking-widest uppercase truncate mt-0.5 ${
-                isCorporate
-                  ? 'text-sky-600'
-                  : 'text-cyan-glow'
-              }`}
+              className="text-[11px] font-bold tracking-widest uppercase truncate mt-0.5 text-cyan-glow"
             >
               <span>{subtext}</span>
             </div>

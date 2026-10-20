@@ -9,39 +9,16 @@
  * ============================================================================
  */
 import React, { useState, useEffect } from 'react'
-import { BrandIcon } from '@/components/ui/BrandMark'
 import { useNavigate } from '@tanstack/react-router'
-import {
-  Shield,
-  Sparkles,
-  ArrowRight,
-  CheckCircle2,
-  Zap,
-  ChevronRight,
-  Compass,
-  History,
-  Mail,
-  Send,
-  Award,
-  Users,
-  Smile,
-  ThumbsUp,
-  Target,
-  Coffee,
-  Anchor,
-  Gauge,
-  Camera,
-  Briefcase,
-  Layers,
-} from 'lucide-react'
+import { Shield, CheckCircle2, Mail, Send, Users, Smile, Sparkles, Briefcase } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { MainFooter } from '@/components/MainFooter'
 import { getAssetUrl } from '@/lib/assets'
-import { RollingNumber } from '@/components/ui/RollingNumber'
 import { useToast } from '@/components/ui/ToastProvider'
 import { PublicHeader } from '@/components/PublicHeader'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
-import { CareerHub } from '@/components/org/CareerHub'
+import { HudButton } from '@/components/ui/HudButton'
+import { CareerHub, type JobListing } from '@/components/org/CareerHub'
 import { submitContactFormFn } from '@/lib/server/api'
 import { LEAD_CAPTURE_CHECK_PENDING } from '@/lib/lead-capture'
 import {
@@ -55,101 +32,33 @@ import {
 import { SUPPORT_INBOX } from '@/lib/support-tickets'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
-type AboutTab = 'mission' | 'vision' | 'safety'
+type ViewMode = 'overview' | 'careers'
 
-const ABOUT_TABS: { id: AboutTab; label: string }[] = [
-  { id: 'mission', label: 'OUR MISSION' },
-  { id: 'vision', label: 'THE ROADMAP' },
-  { id: 'safety', label: 'SAFETY FIRST' },
+const VIEW_TABS: { id: ViewMode; label: string; icon: typeof Users }[] = [
+  { id: 'overview', label: 'About us', icon: Users },
+  { id: 'careers', label: 'Careers', icon: Briefcase },
 ]
 
 const values = [
   {
     icon: Smile,
-    title: 'People First',
-    copy: 'Every member is family. Your comfort and consent come before everything else.',
+    title: 'People first',
+    copy: 'Your comfort and consent come before everything else.',
   },
   {
     icon: Shield,
-    title: 'Safety Always',
-    copy: 'Under the shell, warmth is the rule. No hostility, no pressure, ever.',
+    title: 'Safety always',
+    copy: 'No hostility and no pressure. Warmth is the rule.',
   },
   {
-    icon: ThumbsUp,
-    title: 'Growth Together',
-    copy: 'Nobody molts alone. Someone is always cheering you on.',
+    icon: Users,
+    title: 'Nobody molts alone',
+    copy: 'Someone is always in your corner, cheering you on.',
   },
   {
     icon: Sparkles,
-    title: 'Positivity Forever',
-    copy: 'Every shed is worth celebrating, and we will clap very enthusiastically.',
-  },
-]
-
-const chambers = [
-  {
-    id: 'chamber-1',
-    title: 'CHAMBER 01: THE VENT POWER PLANT',
-    depth: '-8,450 Meters',
-    status: 'OPERATIONAL',
-    image: getAssetUrl('/images/org_server_lab.jpg'),
-    description:
-      'Hydrothermal vents heat the water down here to 340°C. We use that heat to power the lair, grow new shell, and keep the coffee hot.',
-    features: ['Geothermal vent generators', 'Shell growth tanks', 'Very hot coffee'],
-  },
-  {
-    id: 'chamber-2',
-    title: 'CHAMBER 02: THE COUNCIL ROOM',
-    depth: '-8,520 Meters',
-    status: 'COUNCIL ONLY',
-    image: getAssetUrl('/images/org_boardroom_meeting.jpg'),
-    description:
-      'Where the leadership council plans the next molt. The pressure is 850 atmospheres, which keeps meetings short.',
-    features: ['Holographic trench map', 'A very long table', 'Strict 20-minute meetings'],
-  },
-  {
-    id: 'chamber-3',
-    title: 'CHAMBER 03: THE WORK FLOOR',
-    depth: '-8,600 Meters',
-    status: 'OPEN PLAN',
-    image: getAssetUrl('/images/org_open_office.jpg'),
-    description:
-      'Where the team builds the portal, answers your messages, and labels everything in the shared fridge.',
-    features: ['Standing desks', 'Salt-water hydration station', 'Clearly labeled fridge'],
-  },
-  {
-    id: 'chamber-4',
-    title: 'CHAMBER 04: THE THERMAL SPA',
-    depth: '-8,380 Meters',
-    status: 'OPEN TO ALL MEMBERS',
-    image: getAssetUrl('/images/org_cafeteria_break.jpg'),
-    description:
-      'Warm mineral pools and a low, steady sea hum. Members rest here between molts and let the day dissolve.',
-    features: ['Mineral brine pools', 'Deep-sea hum on loop', 'Nap pods'],
-  },
-]
-
-const milestones = [
-  {
-    year: '2021',
-    title: 'THE MARIANA SIGNAL',
-    description:
-      'A deep-sea microphone picked up a steady clicking from the trench floor. Our founders listened for a year and decided it was advice.',
-  },
-  {
-    year: '2022',
-    title: 'THE FOUNDATION OPENS',
-    description: 'Moltology.org is founded with one goal: help people shed the habits that slow them down.',
-  },
-  {
-    year: '2023',
-    title: 'LAIR ALPHA IS BUILT',
-    description: 'Trench Level 7 finishes construction. The coffee machine is the first thing installed.',
-  },
-  {
-    year: '2025',
-    title: 'THE PORTAL GOES LIVE',
-    description: 'Members can now molt from home. The submarine commute becomes optional.',
+    title: 'Every step counts',
+    copy: 'Small wins get celebrated here, loudly.',
   },
 ]
 
@@ -157,19 +66,19 @@ const leadership = [
   {
     name: 'Dr. Thaddeus Crust',
     title: 'Chief Executive',
-    bio: 'A former deep-sea engineer who heard the Mariana Signal and never came back up.',
+    bio: 'A former deep-sea engineer who heard the signal from the trench floor and never came back up.',
     image: getAssetUrl('/images/org_leader_thaddeus.jpg'),
   },
   {
     name: 'Sister Vane',
     title: 'Head of Member Care',
-    bio: 'Makes sure every new member feels welcome and nobody molts alone. Her tea is famous at three depths.',
+    bio: 'Makes sure every new member feels welcome. Her tea is famous on every floor.',
     image: getAssetUrl('/images/org_leader_vane.jpg'),
   },
   {
     name: 'Exoshell 9',
-    title: 'Director of Lair Safety',
-    bio: 'Keeps the lair sealed, pressurized, and running. Has never once lost a submarine.',
+    title: 'Director of Safety',
+    bio: 'Keeps the building sealed, pressurized and running. Has never lost a submarine.',
     image: getAssetUrl('/images/org_leader_exoshell.jpg'),
   },
   {
@@ -180,54 +89,65 @@ const leadership = [
   },
 ]
 
-const galleryItems = [
+const places = [
   {
-    id: 'gallery-atrium',
-    tag: 'ALL-HANDS',
-    title: 'The Grand Atrium',
-    subtitle: 'Reception and all-hands · Level 7',
+    id: 'atrium',
+    title: 'The atrium',
     image: getAssetUrl('/images/org_team_atrium.jpg'),
-    description:
-      'Every new member starts here: free kelp snacks, friendly lanyards, and a crowd in foam claws cheering you in.',
-    highlights: ['Free kelp snack bar', 'Foam claws for every all-hands', 'Glass elevators and a bronze crab fountain'],
+    description: 'Reception and all-hands meetings. Every new member starts here, to a cheering crowd.',
+    highlights: ['Free kelp snack bar', 'Foam claws at every all-hands', 'Glass elevators and a crab fountain'],
   },
   {
-    id: 'gallery-boardroom',
-    tag: 'PLANNING',
-    title: 'Conference Room Delta',
-    subtitle: 'Where the roadmap gets made',
+    id: 'meeting-room',
+    title: 'Meeting room',
     image: getAssetUrl('/images/org_boardroom_meeting.jpg'),
-    description:
-      'Planning the quarter over posture diagrams and strong coffee. The aquarium on the sideboard is technically a team member.',
-    highlights: ['Human-to-crab posture whiteboard', 'Gold-crested coffee mugs', 'Resident lobster morale advisor'],
+    description: 'Where the leadership team plans each quarter. The water pressure keeps meetings short.',
+    highlights: ['A map of the whole trench', 'Strong coffee', 'A lobster who sits in on every meeting'],
   },
   {
-    id: 'gallery-office',
-    tag: 'ENGINEERING',
-    title: 'The Engineering Floor',
-    subtitle: 'Where the portal gets built',
+    id: 'work-floor',
+    title: 'Work floor',
     image: getAssetUrl('/images/org_open_office.jpg'),
-    description: 'Standing desks, filtered daylight, and a salt-water station that keeps engineers focused and shipping.',
-    highlights: ['Robotic claw phone mounts', '"Shed the cold, embrace the shell" posters', 'Salt-water hydration station'],
+    description: 'Where the team builds the app and answers your messages.',
+    highlights: ['Standing desks', 'Salt-water drinks station', 'Claw-shaped phone stands'],
   },
   {
-    id: 'gallery-breakroom',
-    tag: 'BREAKROOM',
-    title: 'The Breakroom',
-    subtitle: 'Smoothies and team lunches',
+    id: 'breakroom',
+    title: 'Breakroom',
     image: getAssetUrl('/images/org_cafeteria_break.jpg'),
-    description: 'Coworkers bond over kelp smoothies. House rule: label your shed shell before it goes in the shared fridge.',
-    highlights: ['Kelp smoothies on tap', 'Calcium shakers on every table', 'Shared-fridge labeling rules'],
+    description: 'Team lunches and kelp smoothies. House rule: label your shed shell before it goes in the fridge.',
+    highlights: ['Kelp smoothies on tap', 'Calcium shakers on every table', 'A clearly labeled shared fridge'],
   },
   {
-    id: 'gallery-server-lab',
-    tag: 'SERVER LAB',
-    title: 'The Immersion Lab',
-    subtitle: 'The machines that run the portal',
+    id: 'power-room',
+    title: 'Power and servers',
     image: getAssetUrl('/images/org_server_lab.jpg'),
+    description: 'Heat from the hydrothermal vents powers the building. The servers sit in cooling tanks next door.',
+    highlights: ['Vent-powered generators', 'Liquid-cooled server tanks', 'Bright safety vests, always'],
+  },
+]
+
+const milestones = [
+  {
+    year: '2021',
+    title: 'We heard a signal',
     description:
-      'Engineers check on servers submerged in cooling fluid at trench pressure. Safety vests are mandatory and very flattering.',
-    highlights: ['Pressure-rated diagnostic tablets', 'Liquid-cooled server tanks', 'High-visibility safety vests'],
+      'A deep-sea microphone picked up a steady clicking from the trench floor. Our founders listened for a year and decided it was advice.',
+  },
+  {
+    year: '2022',
+    title: 'The foundation opens',
+    description: 'Moltology.org starts with one goal: help people shed the habits that slow them down.',
+  },
+  {
+    year: '2023',
+    title: 'Our headquarters is built',
+    description: 'The building on the trench floor is finished. The coffee machine goes in first.',
+  },
+  {
+    year: '2025',
+    title: 'The app goes live',
+    description: 'Members can molt from home. The submarine commute becomes optional.',
   },
 ]
 
@@ -239,6 +159,18 @@ const EMPTY_CONTACT_FORM = {
   emailOptIn: false,
 }
 
+const sectionLabel = 'font-grotesk text-[11px] sm:text-xs font-bold tracking-[0.08em] uppercase text-cyan-glow'
+const sectionTitle = 'mt-3 font-grotesk font-bold tracking-tight text-ink text-3xl sm:text-4xl leading-tight [text-wrap:balance]'
+const sectionLede = 'mt-4 text-base text-ink-muted leading-relaxed max-w-2xl [text-wrap:pretty]'
+const card = 'rounded-card border border-line-subtle bg-surface-1'
+const focusRing = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
+const tileBase = `inline-flex items-center justify-center gap-2 min-h-10 px-4 rounded-control font-grotesk font-bold text-xs uppercase tracking-wider transition-colors shrink-0 ${focusRing}`
+const tileOn = 'bg-surface-3 shadow-nav-current text-ink'
+const tileOff = 'text-ink-muted hover:text-ink hover:bg-surface-2'
+const fieldLabel = 'block text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted mb-1.5'
+const fieldClass =
+  'w-full min-h-10 bg-surface-2 text-ink placeholder:text-ink-muted/70 text-sm rounded-control border border-line py-2 px-3 transition-[border-color,box-shadow] duration-200 outline-none hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus'
+
 export const OrgPage: React.FC = () => {
   const navigate = useNavigate()
   const { toast } = useToast()
@@ -247,13 +179,9 @@ export const OrgPage: React.FC = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
 
-  // Top Page View Switcher (Overview vs Careers Hub)
-  const [viewMode, setViewMode] = useState<'overview' | 'careers'>('overview')
-  const [activeTab, setActiveTab] = useState<AboutTab>('mission')
-  const [activeChamber, setActiveChamber] = useState(0)
-  const [activeGalleryIndex, setActiveGalleryIndex] = useState(0)
+  const [viewMode, setViewMode] = useState<ViewMode>('overview')
+  const [activePlace, setActivePlace] = useState(0)
 
-  // Contact Form State
   const [contactForm, setContactForm] = useState(EMPTY_CONTACT_FORM)
   const [contactHoneypot, setContactHoneypot] = useState('')
   const [contactTurnstileToken, setContactTurnstileToken] = useState<string | null>(null)
@@ -277,26 +205,49 @@ export const OrgPage: React.FC = () => {
     window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`)
   }, [])
 
-  // Sync hash/URL query on initial client load
+  // Old careers links (#careers, ?tab=careers) open the Careers view.
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const hash = window.location.hash
-      const search = window.location.search
-      if (
-        hash === '#careers' ||
-        hash === '#careers-hub' ||
-        hash === '#job-board' ||
-        search.includes('tab=careers') ||
-        search.includes('view=careers')
-      ) {
-        setViewMode('careers')
-      }
+    if (typeof window === 'undefined') return
+    const hash = window.location.hash
+    const search = window.location.search
+    if (
+      hash === '#careers' ||
+      hash === '#careers-hub' ||
+      hash === '#job-board' ||
+      search.includes('tab=careers') ||
+      search.includes('view=careers')
+    ) {
+      setViewMode('careers')
     }
   }, [])
 
   const openAuth = (mode: 'login' | 'signup') => {
     setAuthMode(mode)
     setIsAuthModalOpen(true)
+  }
+
+  const scrollToElement = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  const showCareers = () => {
+    setViewMode('careers')
+    setTimeout(() => scrollToElement('org-views'), 50)
+  }
+
+  // Applying fills the contact form instead of a separate application form, so it reaches support@.
+  const applyForJob = (job: JobListing) => {
+    setContactSentTo(null)
+    setContactError(null)
+    setContactForm((form) => ({
+      ...form,
+      topic: 'careers',
+      message: form.message.trim() ? form.message : `I'd like to apply for the ${job.title} role.\n\nA little about me: `,
+    }))
+    setTimeout(() => {
+      scrollToElement('contact')
+      document.getElementById('org-contact-name')?.focus({ preventScroll: true })
+    }, 50)
   }
 
   const handleContactSubmit = async (e: React.FormEvent) => {
@@ -340,25 +291,10 @@ export const OrgPage: React.FC = () => {
     toast.success(CONTACT_COPY.toastSent, { id: 'org-contact' })
   }
 
-  const scrollToElement = (id: string) => {
-    const el = document.getElementById(id)
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
-  }
-
-  const inputClass =
-    'w-full bg-[#f8fbff] border border-sky-200 rounded-control px-3.5 py-2.5 text-xs text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100'
+  const place = places[activePlace]
 
   return (
-    <div className="min-h-screen bg-[#f4f7f9] text-slate-700 font-sans relative flex flex-col justify-between overflow-x-hidden">
-      {/* Soft Friendly Corporate Ambient Backdrops */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-sky-200/40 blur-3xl" />
-        <div className="absolute top-1/3 -left-48 w-[520px] h-[520px] rounded-full bg-amber-100/60 blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-[700px] h-[500px] rounded-full bg-teal-100/50 blur-3xl" />
-      </div>
-
+    <div className="min-h-screen bg-abyss text-ink-body font-sans relative flex flex-col overflow-x-hidden">
       <AuthModal
         isOpen={isAuthModalOpen}
         initialMode={authMode}
@@ -366,660 +302,260 @@ export const OrgPage: React.FC = () => {
         onSuccess={() => onNavigate('/dashboard')}
       />
 
-      {/* Shared Navigation Header */}
-      <PublicHeader activePage="org" variant="corporate" onOpenAuth={openAuth} />
+      <PublicHeader activePage="org" onOpenAuth={openAuth} />
 
-      {/* FRIENDLY WELCOME RIBBON */}
-      <div className="relative z-10 w-full bg-sky-500 text-white text-center text-[11px] sm:text-xs font-bold tracking-wider uppercase px-4 py-2 mt-20 sm:mt-24">
-        <span className="inline-flex items-center gap-2">
-          <Sparkles className="w-3.5 h-3.5" />
-          SO GLAD YOU'RE HERE. WELCOME TO THE FAMILY.
-          <Sparkles className="w-3.5 h-3.5" />
-        </span>
-      </div>
+      <main className="flex-1">
+        {/* HERO */}
+        <section className="relative isolate overflow-hidden min-h-[560px] sm:min-h-[640px] flex items-end pt-28 pb-14 sm:pb-20">
+          <img
+            src={getAssetUrl('/images/org_team_atrium.jpg')}
+            alt=""
+            className="absolute inset-0 -z-20 w-full h-full object-cover object-[center_18%]"
+          />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-b from-abyss/70 via-abyss/55 to-abyss" />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-abyss/85 via-abyss/30 to-transparent" />
 
-      {/* HERO SECTION */}
-      <section className="relative z-10 w-full overflow-hidden pt-12 sm:pt-16 pb-6 sm:pb-8 px-4 sm:px-8 min-h-[560px] sm:min-h-[660px] lg:min-h-[740px] flex flex-col justify-end items-center">
-        <img
-          src={getAssetUrl('/images/org_team_atrium.jpg')}
-          alt="Moltology Team in Grand Atrium"
-          className="absolute inset-0 w-full h-full object-cover object-[center_18%] pointer-events-none"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-sky-950/25 via-transparent to-[#f4f7f9] z-0 pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/10 via-transparent to-[#f4f7f9]/90 z-0 pointer-events-none" />
-
-        <div className="max-w-[1200px] mx-auto relative z-10 text-center w-full pb-4 sm:pb-6">
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-            <div className="inline-flex items-center gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-white/95 backdrop-blur-md border-2 border-sky-200 text-sky-900 text-xs sm:text-sm md:text-base font-extrabold tracking-wider uppercase rounded-control shadow-xl hover:bg-white transition-all">
-              <BrandIcon
-                label="Moltology Emblem"
-                className="w-6 h-6 sm:w-7 sm:h-7 object-contain"
-              />
-              <span>MOLTOLOGY FOUNDATION · EST. 2022</span>
-            </div>
-
-            <a
-              href="#contact"
-              className="px-8 sm:px-10 py-3.5 sm:py-4 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-extrabold text-xs sm:text-sm md:text-base uppercase tracking-wider rounded-control transition-all shadow-xl flex items-center gap-2.5 hover:-translate-y-0.5"
-            >
-              <Mail className="w-5 h-5" />
-              <span>SAY HELLO</span>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* KEY READOUTS (BELOW HERO) */}
-      <section className="relative z-10 w-full px-6 sm:px-12 -mt-2 sm:-mt-4 mb-8 max-w-[1200px] mx-auto">
-        <ScrollReveal animation="fade-up" durationMs={800}>
-          <div className="grid grid-cols-3 gap-3 sm:gap-6">
-            <div className="bg-white rounded-card border border-sky-100 shadow-xl p-4 sm:p-6 text-center space-y-1.5 hover:-translate-y-1 hover:shadow-2xl transition-all">
-              <div className="text-[11px] sm:text-xs text-sky-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
-                <Anchor className="w-4 h-4 hidden sm:block" />
-                LAIR DEPTH
-              </div>
-              <div className="text-xl sm:text-4xl font-black text-sky-600 font-grotesk tracking-tight whitespace-nowrap">
-                <RollingNumber value={8450} duration={2000} prefix="-" suffix="m" triggerOnView={true} />
-              </div>
-              <div className="text-[11px] sm:text-xs text-slate-500">Mariana Trench</div>
-            </div>
-
-            <div className="bg-white rounded-card border border-emerald-100 shadow-xl p-4 sm:p-6 text-center space-y-1.5 hover:-translate-y-1 hover:shadow-2xl transition-all">
-              <div className="text-[11px] sm:text-xs text-emerald-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
-                <Gauge className="w-4 h-4 hidden sm:block" />
-                PRESSURE
-              </div>
-              <div className="text-xl sm:text-4xl font-black text-emerald-600 font-grotesk tracking-tight whitespace-nowrap">
-                <RollingNumber value={850} duration={2000} suffix=" atm" triggerOnView={true} />
-              </div>
-              <div className="text-[11px] sm:text-xs text-slate-500">Cozy, honestly</div>
-            </div>
-
-            <div className="bg-white rounded-card border border-amber-100 shadow-xl p-4 sm:p-6 text-center space-y-1.5 hover:-translate-y-1 hover:shadow-2xl transition-all">
-              <div className="text-[11px] sm:text-xs text-amber-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
-                <Coffee className="w-4 h-4 hidden sm:block" />
-                COFFEE
-              </div>
-              <div className="text-xl sm:text-4xl font-black text-amber-600 font-grotesk tracking-tight whitespace-nowrap">24/7</div>
-              <div className="text-[11px] sm:text-xs text-slate-500">On the house</div>
+          <div className="w-full max-w-6xl mx-auto px-4 sm:px-8">
+            <p className={sectionLabel}>The organization</p>
+            <h1 className="mt-4 max-w-3xl font-grotesk font-bold tracking-tight text-ink text-[2.5rem] leading-[1.04] sm:text-6xl [text-wrap:balance]">
+              The people behind Moltology
+            </h1>
+            <p className="mt-5 max-w-xl text-base sm:text-lg text-ink-body leading-relaxed [text-wrap:pretty]">
+              A small foundation at the bottom of the Pacific. We build the app, write the codex and read every
+              message you send.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <HudButton variant="primary" size="lg" icon={<Mail className="w-4 h-4" />} onClick={() => scrollToElement('contact')}>
+                Say hello
+              </HudButton>
+              <HudButton variant="secondary" size="lg" icon={<Briefcase className="w-4 h-4" />} onClick={showCareers}>
+                See open roles
+              </HudButton>
             </div>
           </div>
-        </ScrollReveal>
-      </section>
+        </section>
 
-      {/* TOP SUB-NAVIGATION MODE SWITCHER */}
-      <section className="relative z-10 w-full px-6 sm:px-12 mb-10 max-w-[1200px] mx-auto">
-        <div className="flex flex-wrap justify-center items-center gap-2 p-2 bg-white/90 backdrop-blur-md rounded-card border border-sky-200 shadow-lg max-w-fit mx-auto">
-          <button
-            type="button"
-            onClick={() => setViewMode('overview')}
-            className={`px-5 py-2.5 rounded-control text-xs font-grotesk font-bold tracking-wider uppercase transition-all flex items-center gap-2 ${
-              viewMode === 'overview'
-                ? 'bg-sky-500 text-white shadow-md'
-                : 'text-slate-600 hover:text-sky-700 hover:bg-sky-50'
-            }`}
+        {/* VIEW SWITCHER */}
+        <div id="org-views" className="max-w-6xl mx-auto px-4 sm:px-8 scroll-mt-24">
+          <div
+            role="group"
+            aria-label="Page sections"
+            className="inline-flex gap-1 p-1 rounded-card border border-line-subtle bg-surface-1"
           >
-            <Layers className="w-4 h-4" />
-            <span>ABOUT US</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setViewMode('careers')}
-            className={`px-5 py-2.5 rounded-control text-xs font-grotesk font-bold tracking-wider uppercase transition-all flex items-center gap-2 ${
-              viewMode === 'careers'
-                ? 'bg-sky-500 text-white shadow-md'
-                : 'text-slate-600 hover:text-sky-700 hover:bg-sky-50'
-            }`}
-          >
-            <Briefcase className="w-4 h-4" />
-            <span>CAREERS</span>
-          </button>
+            {VIEW_TABS.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                aria-pressed={viewMode === tab.id}
+                onClick={() => setViewMode(tab.id)}
+                className={`${tileBase} ${viewMode === tab.id ? tileOn : tileOff}`}
+              >
+                <tab.icon className={`w-4 h-4 ${viewMode === tab.id ? 'text-cyan-glow' : ''}`} aria-hidden="true" />
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </section>
 
-      {viewMode === 'careers' ? (
-        <div className="relative z-10 w-full px-6 sm:px-12 max-w-[1200px] mx-auto space-y-20 pb-16">
-          <CareerHub onScrollToCulture={() => scrollToElement('culture')} />
-
-          {/* LIFE AT HQ GALLERY */}
-          <div id="culture" className="space-y-8 pt-10 border-t border-sky-200">
-            <div className="text-center space-y-3">
-              <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-                <Camera className="w-4 h-4" />
-                <span>LIFE AT HEADQUARTERS</span>
+        {viewMode === 'careers' ? (
+          <div className="max-w-6xl mx-auto px-4 sm:px-8 pt-12 pb-20">
+            <CareerHub onApply={applyForJob} />
+          </div>
+        ) : (
+          <>
+            {/* VALUES */}
+            <section className="max-w-6xl mx-auto px-4 sm:px-8 pt-14 pb-16 sm:pb-20" aria-labelledby="org-values-title">
+              <ScrollReveal>
+                <p className={sectionLabel}>What we care about</p>
+                <h2 id="org-values-title" className={sectionTitle}>
+                  Four things we never compromise on
+                </h2>
+              </ScrollReveal>
+              <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {values.map((value, index) => (
+                  <ScrollReveal key={value.title} delayMs={index * 60}>
+                    <div className={`${card} h-full p-5`}>
+                      <value.icon className="w-5 h-5 text-cyan-glow" aria-hidden="true" />
+                      <h3 className="mt-4 font-grotesk font-bold text-lg text-ink">{value.title}</h3>
+                      <p className="mt-1.5 text-sm text-ink-muted leading-relaxed">{value.copy}</p>
+                    </div>
+                  </ScrollReveal>
+                ))}
               </div>
-              <h3 className="text-2xl sm:text-3xl font-grotesk font-bold text-sky-900 tracking-tight">
-                A DAY AT TRENCH LEVEL 7
-              </h3>
-            </div>
+            </section>
 
-            <div className="flex justify-start sm:justify-center gap-2 overflow-x-auto touch-pan-scroll no-scrollbar p-1.5 bg-white rounded-card border border-sky-200 shadow-sm w-full max-w-full sm:w-fit mx-auto px-2">
-              {galleryItems.map((item, idx) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setActiveGalleryIndex(idx)}
-                  className={`px-4 sm:px-5 py-2.5 rounded-control text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center gap-1.5 ${
-                    activeGalleryIndex === idx
-                      ? 'bg-sky-500 text-white shadow-md'
-                      : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'
-                  }`}
-                >
-                  <span>{item.tag}</span>
-                </button>
-              ))}
-            </div>
-
-            <div className="bg-white border border-sky-100 rounded-panel overflow-hidden shadow-xl grid lg:grid-cols-12 gap-0">
-              <div className="lg:col-span-7 relative h-72 sm:h-96 lg:h-auto min-h-[340px] bg-slate-900 overflow-hidden group">
-                <img
-                  key={galleryItems[activeGalleryIndex].id}
-                  src={galleryItems[activeGalleryIndex].image}
-                  alt={galleryItems[activeGalleryIndex].title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <div className="font-bold text-base font-grotesk">{galleryItems[activeGalleryIndex].title}</div>
-                  <div className="text-sky-200 text-xs">{galleryItems[activeGalleryIndex].subtitle}</div>
+            {/* TEAM */}
+            <section className="border-y border-line-subtle bg-surface-1/40" aria-labelledby="org-team-title">
+              <div className="max-w-6xl mx-auto px-4 sm:px-8 py-16 sm:py-20">
+                <ScrollReveal>
+                  <p className={sectionLabel}>The team</p>
+                  <h2 id="org-team-title" className={sectionTitle}>
+                    Who runs the place
+                  </h2>
+                </ScrollReveal>
+                <div className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  {leadership.map((leader, index) => (
+                    <ScrollReveal key={leader.name} delayMs={index * 60}>
+                      <article className={`${card} h-full overflow-hidden`}>
+                        <div className="aspect-square bg-surface-2 overflow-hidden">
+                          <img src={leader.image} alt={leader.name} loading="lazy" className="w-full h-full object-cover" />
+                        </div>
+                        <div className="p-4 sm:p-5">
+                          <h3 className="font-grotesk font-bold text-base sm:text-lg text-ink">{leader.name}</h3>
+                          <p className="mt-0.5 text-xs font-bold uppercase tracking-[0.08em] text-cyan-glow">{leader.title}</p>
+                          <p className="mt-2 text-sm text-ink-muted leading-relaxed">{leader.bio}</p>
+                        </div>
+                      </article>
+                    </ScrollReveal>
+                  ))}
                 </div>
               </div>
+            </section>
 
-              <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between space-y-6">
-                <div className="space-y-4">
-                  <h4 className="text-xl sm:text-2xl font-grotesk font-bold text-sky-900 leading-tight">
-                    {galleryItems[activeGalleryIndex].title}
-                  </h4>
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    {galleryItems[activeGalleryIndex].description}
-                  </p>
-                  <ul className="space-y-2 text-xs text-slate-700">
-                    {galleryItems[activeGalleryIndex].highlights.map((highlight) => (
-                      <li key={highlight} className="flex items-start gap-2 bg-[#f8fbff] p-2.5 rounded-card border border-sky-100">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span className="leading-snug">{highlight}</span>
+            {/* WHERE WE WORK */}
+            <section className="max-w-6xl mx-auto px-4 sm:px-8 py-16 sm:py-20" aria-labelledby="org-places-title">
+              <ScrollReveal>
+                <p className={sectionLabel}>Where we work</p>
+                <h2 id="org-places-title" className={sectionTitle}>
+                  Headquarters, 8,450 meters down
+                </h2>
+                <p className={sectionLede}>Our building sits on the floor of the Mariana Trench. Here is a look around.</p>
+              </ScrollReveal>
+
+              <div className="mt-8 flex gap-1 overflow-x-auto touch-pan-scroll no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0" aria-label="Rooms">
+                {places.map((item, index) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    aria-pressed={activePlace === index}
+                    onClick={() => setActivePlace(index)}
+                    className={`${tileBase} ${activePlace === index ? tileOn : tileOff}`}
+                  >
+                    {item.title}
+                  </button>
+                ))}
+              </div>
+
+              <div className={`${card} mt-4 overflow-hidden grid lg:grid-cols-12`}>
+                <div className="lg:col-span-7 relative aspect-[16/10] lg:aspect-auto lg:min-h-[380px] bg-surface-2 overflow-hidden">
+                  <img key={place.id} src={place.image} alt={place.title} className="absolute inset-0 w-full h-full object-cover" />
+                </div>
+                <div className="lg:col-span-5 p-5 sm:p-7 flex flex-col">
+                  <h3 className="font-grotesk font-bold text-2xl text-ink">{place.title}</h3>
+                  <p className="mt-3 text-sm sm:text-base text-ink-body leading-relaxed">{place.description}</p>
+                  <ul className="mt-5 space-y-2.5">
+                    {place.highlights.map((highlight) => (
+                      <li key={highlight} className="flex items-start gap-2.5 text-sm text-ink-muted">
+                        <CheckCircle2 className="w-4 h-4 mt-0.5 text-cyan-glow shrink-0" aria-hidden="true" />
+                        <span>{highlight}</span>
                       </li>
                     ))}
                   </ul>
-                </div>
-
-                <div className="grid grid-cols-5 gap-2 pt-4 border-t border-sky-100">
-                  {galleryItems.map((thumb, tIdx) => (
-                    <button
-                      key={thumb.id}
-                      type="button"
-                      aria-label={`Show ${thumb.title}`}
-                      onClick={() => setActiveGalleryIndex(tIdx)}
-                      className={`relative aspect-video rounded-card overflow-hidden border-2 transition-all ${
-                        activeGalleryIndex === tIdx
-                          ? 'border-sky-500 ring-2 ring-sky-300 scale-105'
-                          : 'border-transparent opacity-70 hover:opacity-100'
-                      }`}
-                    >
-                      <img src={thumb.image} alt="" className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* OUR VALUES */}
-          <ScrollReveal animation="fade-up" durationMs={800}>
-            <section className="relative z-10 w-full py-16 px-6 sm:px-12 max-w-[1200px] mx-auto">
-              <div className="text-center space-y-4 mb-12">
-                <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-                  <ThumbsUp className="w-4 h-4" />
-                  <span>WHAT WE BELIEVE</span>
-                </div>
-                <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
-                  OUR VALUES, IN PLAIN WORDS
-                </h2>
-              </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {values.map((value) => (
-                  <div
-                    key={value.title}
-                    className="bg-white rounded-card border border-sky-100 shadow-lg p-6 space-y-3 hover:-translate-y-1 hover:shadow-xl transition-all"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center">
-                      <value.icon className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-base font-bold font-grotesk text-sky-900">{value.title}</h3>
-                    <p className="text-xs text-slate-500 leading-relaxed">{value.copy}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </ScrollReveal>
-
-          {/* ABOUT US */}
-          <ScrollReveal animation="fade-up" durationMs={800}>
-            <section className="relative z-10 w-full py-16 px-6 sm:px-12 max-w-[1200px] mx-auto">
-              <div className="text-center space-y-4 mb-10">
-                <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-                  <Award className="w-4 h-4" />
-                  <span>ABOUT MOLTOLOGY.ORG</span>
-                </div>
-                <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
-                  WHAT WE'RE HERE TO DO
-                </h2>
-                <p className="text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                  We're a friendly foundation with one simple idea: you'd be happier with a shell.
-                </p>
-              </div>
-
-              <div className="flex justify-start sm:justify-center gap-1.5 sm:gap-2 mb-10 overflow-x-auto touch-pan-scroll no-scrollbar p-1.5 bg-white rounded-card border border-sky-200 shadow-sm w-full max-w-full sm:w-fit mx-auto px-2">
-                {ABOUT_TABS.map((tab) => (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`px-4 sm:px-6 py-2.5 rounded-control text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center ${
-                      activeTab === tab.id
-                        ? tab.id === 'safety'
-                          ? 'bg-emerald-500 text-white shadow-md'
-                          : 'bg-sky-500 text-white shadow-md'
-                        : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="bg-white border border-sky-100 p-8 sm:p-12 rounded-panel shadow-xl">
-                {activeTab === 'mission' && (
-                  <div className="space-y-5 max-w-3xl">
-                    <h3 className="text-2xl font-grotesk font-bold text-sky-700 uppercase">
-                      HELP PEOPLE SHED WHAT SLOWS THEM DOWN
-                    </h3>
-                    <p className="text-sm text-slate-600 leading-relaxed">
-                      Soft tissue is lovely but drafty. It hesitates, it gets distracted, and it keeps forty-seven
-                      tabs open. We give every member a community and small daily practices to drop those habits and
-                      grow a tougher shell, at whatever pace feels right.
-                    </p>
-                    <ul className="space-y-2 text-xs text-sky-700">
-                      {[
-                        'Small daily practices, not big promises',
-                        'A community that cheers for every molt',
-                        'Your pace, always',
-                      ].map((line) => (
-                        <li key={line} className="flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                          <span>{line}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {activeTab === 'vision' && (
-                  <div className="space-y-6">
-                    <h3 className="text-2xl font-grotesk font-bold text-sky-700 uppercase">
-                      THE CARCINIZATION ROADMAP
-                    </h3>
-                    <p className="text-sm text-slate-600 leading-relaxed max-w-3xl">
-                      Evolution keeps turning unrelated animals into crabs. Scientists call it carcinization. We think
-                      nature is onto something, and we'd like to help it along, kindly.
-                    </p>
-                    <div className="grid sm:grid-cols-3 gap-6 pt-2">
-                      {[
-                        {
-                          title: 'PHASE 1: SHED THE HABITS',
-                          copy: 'Members drop one soft habit at a time and grow a harder one in its place.',
-                        },
-                        {
-                          title: 'PHASE 2: BUILD THE TRENCH',
-                          copy: 'We expand the lair so there is room for everyone who wants to come down.',
-                        },
-                        {
-                          title: 'PHASE 3: TOTAL SYNAPSE',
-                          copy: 'Everyone focused, nobody hesitating, and every shell built to last.',
-                        },
-                      ].map((phase) => (
-                        <div key={phase.title} className="bg-[#f8fbff] p-5 border border-sky-100 rounded-card">
-                          <Target className="w-6 h-6 text-sky-500 mb-3" />
-                          <div className="text-sky-700 font-bold text-lg font-grotesk mb-2">{phase.title}</div>
-                          <p className="text-xs text-slate-500">{phase.copy}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'safety' && (
-                  <div className="space-y-6 border-l-4 border-emerald-300 pl-6">
-                    <h3 className="text-2xl font-grotesk font-bold text-emerald-600 uppercase flex items-center gap-2">
-                      <Shield className="w-6 h-6" />
-                      SAFETY AND POSITIVITY, ALWAYS
-                    </h3>
-                    <p className="text-sm text-slate-600 leading-relaxed">
-                      The shell protects; it never cages. Hostility, pressure, and coercion are not allowed here.
-                      Everyone is a friend.
-                    </p>
-                    <div className="grid sm:grid-cols-2 gap-4 text-xs">
-                      <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-card text-emerald-800">
-                        <strong>Your pace, your call.</strong> Every step happens when you're ready, with full consent.
-                      </div>
-                      <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-card text-emerald-800">
-                        <strong>Chaplains on call.</strong> Someone is always around to listen, reassure, and put the
-                        kettle on.
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </section>
-          </ScrollReveal>
-
-          {/* OUR UNDERGROUND LAIR SECTION */}
-          <ScrollReveal animation="fade-up" durationMs={800}>
-            <section id="lair" className="relative z-10 w-full py-20 px-6 sm:px-12 bg-white border-y border-sky-100">
-              <div className="max-w-[1200px] mx-auto space-y-12">
-                <div className="text-center space-y-4">
-                  <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-                    <Compass className="w-4 h-4" />
-                    <span>HEADQUARTERS</span>
-                  </div>
-                  <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
-                    OUR UNDERGROUND LAIR: TRENCH LEVEL 7
-                  </h2>
-                  <p className="text-sm text-slate-600 max-w-2xl mx-auto">
-                    Come say hi! HQ is a short submarine ride below the Pacific. It's cozy, warmly lit, and built to
-                    handle crushing pressure. The coffee's on us.
-                  </p>
-                </div>
-
-                <div className="grid lg:grid-cols-12 gap-8 items-start">
-                  <div className="lg:col-span-4 space-y-3">
-                    <div className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">
-                      PICK A CHAMBER TO PEEK INSIDE:
-                    </div>
-                    {chambers.map((chamber, index) => (
+                  <div className="mt-auto pt-6 grid grid-cols-5 gap-2">
+                    {places.map((thumb, index) => (
                       <button
-                        key={chamber.id}
+                        key={thumb.id}
                         type="button"
-                        onClick={() => setActiveChamber(index)}
-                        className={`w-full text-left p-4 rounded-card border transition-all flex items-center justify-between shadow-sm ${
-                          activeChamber === index
-                            ? 'bg-sky-500 border-sky-500 text-white shadow-lg'
-                            : 'bg-white border-sky-100 text-slate-600 hover:border-sky-300 hover:text-sky-800'
+                        aria-label={`Show ${thumb.title}`}
+                        onClick={() => setActivePlace(index)}
+                        className={`relative aspect-video rounded-control overflow-hidden border transition-opacity ${focusRing} ${
+                          activePlace === index ? 'border-cyan-glow' : 'border-line-subtle opacity-60 hover:opacity-100'
                         }`}
                       >
-                        <div>
-                          <div className="text-xs font-bold font-grotesk uppercase">{chamber.title.split(':')[0]}</div>
-                          <div
-                            className={`text-[11px] truncate max-w-[240px] ${
-                              activeChamber === index ? 'text-sky-100' : 'text-slate-400'
-                            }`}
-                          >
-                            {chamber.title.split(':')[1]}
-                          </div>
-                        </div>
-                        <ChevronRight className={`w-4 h-4 transition-transform ${activeChamber === index ? 'rotate-90' : ''}`} />
+                        <img src={thumb.image} alt="" loading="lazy" className="w-full h-full object-cover" />
                       </button>
                     ))}
-
-                    <div className="bg-[#f8fbff] border border-sky-100 p-5 rounded-card text-xs space-y-2 mt-6">
-                      <div className="text-sky-700 font-bold uppercase flex items-center justify-between border-b border-sky-100 pb-2">
-                        <span>TODAY IN THE LAIR</span>
-                        <span className="text-[11px] text-emerald-600">ALL GOOD</span>
-                      </div>
-                      <div className="flex justify-between text-slate-600">
-                        <span>Air scrubbers:</span>
-                        <span className="text-emerald-600 font-bold">RUNNING</span>
-                      </div>
-                      <div className="flex justify-between text-slate-600">
-                        <span>Vent water:</span>
-                        <span className="text-amber-600 font-bold">340°C</span>
-                      </div>
-                      <div className="flex justify-between text-slate-600">
-                        <span>Nap pods:</span>
-                        <span className="text-emerald-600 font-bold">AVAILABLE</span>
-                      </div>
-                      <div className="flex justify-between text-slate-600">
-                        <span>Team morale:</span>
-                        <span className="text-emerald-600 font-bold">VERY HIGH</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="lg:col-span-8 bg-white border border-sky-100 rounded-panel overflow-hidden shadow-xl flex flex-col justify-between">
-                    <div className="relative h-64 sm:h-80 overflow-hidden border-b border-sky-100 bg-slate-900">
-                      <img
-                        key={chambers[activeChamber].id}
-                        src={chambers[activeChamber].image}
-                        alt={chambers[activeChamber].title}
-                        className="w-full h-full object-cover transition-all duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
-                      <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between">
-                        <div className="bg-white/90 backdrop-blur-md px-3 py-1.5 border border-sky-200 rounded-chip text-sky-700 text-xs font-bold shadow-sm">
-                          {chambers[activeChamber].depth}
-                        </div>
-                        <div className="bg-emerald-500 text-white px-3 py-1.5 rounded-chip text-[11px] font-bold shadow-sm">
-                          {chambers[activeChamber].status}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-6 sm:p-8 space-y-6">
-                      <h3 className="text-xl sm:text-2xl font-grotesk font-bold text-sky-900 uppercase">
-                        {chambers[activeChamber].title}
-                      </h3>
-                      <p className="text-sm text-slate-600 leading-relaxed">{chambers[activeChamber].description}</p>
-                      <div className="grid sm:grid-cols-3 gap-3">
-                        {chambers[activeChamber].features.map((feat) => (
-                          <div
-                            key={feat}
-                            className="bg-[#f8fbff] border border-sky-100 p-3 rounded-card text-xs text-slate-700 flex items-center gap-2"
-                          >
-                            <Zap className="w-3.5 h-3.5 text-sky-500 shrink-0" />
-                            <span>{feat}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
             </section>
-          </ScrollReveal>
 
-          {/* FRIENDLY BANNER */}
-          <ScrollReveal animation="fade-in" durationMs={900}>
-            <div className="relative z-10 w-full py-16 bg-gradient-to-r from-sky-500 via-sky-400 to-teal-400 overflow-hidden">
-              <div className="absolute inset-0 bg-white/10 pointer-events-none" />
-              <div className="relative z-10 max-w-[1200px] mx-auto px-6 text-center space-y-3">
-                <h2 className="font-grotesk font-black text-2xl sm:text-4xl text-white uppercase tracking-wider">
-                  "WHERE THE SOFT STUFF COMES OFF AND THE SHELL GROWS IN."
-                </h2>
-                <p className="text-white/90 text-sm">And where every new friend is welcomed with open pincers.</p>
-              </div>
-            </div>
-          </ScrollReveal>
-
-          {/* HISTORY & TIMELINE SECTION */}
-          <ScrollReveal animation="fade-up" durationMs={800}>
-            <section className="relative z-10 w-full py-20 px-6 sm:px-12 max-w-[1200px] mx-auto">
-              <div className="text-center space-y-4 mb-14">
-                <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-                  <History className="w-4 h-4" />
-                  <span>OUR STORY</span>
-                </div>
-                <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
-                  HOW WE GOT HERE
-                </h2>
-              </div>
-
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {milestones.map((item) => (
-                  <div
-                    key={item.year}
-                    className="bg-white border border-sky-100 p-6 rounded-card shadow-lg space-y-3 relative hover:-translate-y-1 hover:shadow-xl transition-all group"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-extrabold font-grotesk text-sky-600 group-hover:text-sky-500">
-                        {item.year}
-                      </span>
-                      <span className="w-2.5 h-2.5 rounded-full bg-sky-400 group-hover:scale-150 transition-transform" />
-                    </div>
-                    <h3 className="text-base font-bold font-grotesk text-sky-900 uppercase">{item.title}</h3>
-                    <p className="text-xs text-slate-500 leading-relaxed">{item.description}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </ScrollReveal>
-
-          {/* LEADERSHIP SECTION */}
-          <ScrollReveal animation="fade-up" durationMs={800}>
-            <section id="leadership" className="relative z-10 w-full py-20 px-6 sm:px-12 bg-white border-y border-sky-100">
-              <div className="max-w-[1200px] mx-auto space-y-12">
-                <div className="text-center space-y-4">
-                  <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-                    <Users className="w-4 h-4" />
-                    <span>MEET THE FAMILY</span>
-                  </div>
-                  <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
-                    OUR LEADERSHIP
+            {/* HISTORY */}
+            <section className="border-t border-line-subtle" aria-labelledby="org-history-title">
+              <div className="max-w-6xl mx-auto px-4 sm:px-8 py-16 sm:py-20 grid lg:grid-cols-[0.8fr_1.2fr] gap-10 lg:gap-16">
+                <ScrollReveal>
+                  <p className={sectionLabel}>Our story</p>
+                  <h2 id="org-history-title" className={sectionTitle}>
+                    How we got here
                   </h2>
-                  <p className="text-sm text-slate-600 max-w-2xl mx-auto">
-                    Marine engineers, chaplains, and one fully armored safety director, all of whom would love to
-                    meet you.
+                </ScrollReveal>
+                <ScrollReveal>
+                  <ol className="border-l border-line-subtle">
+                    {milestones.map((item) => (
+                      <li key={item.year} className="relative pl-6 sm:pl-8 pb-8 last:pb-0">
+                        <span className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-cyan-glow" aria-hidden="true" />
+                        <p className="font-grotesk text-xs font-bold tracking-[0.08em] text-ink-muted">{item.year}</p>
+                        <h3 className="mt-1 font-grotesk font-bold text-lg text-ink">{item.title}</h3>
+                        <p className="mt-1.5 text-sm text-ink-muted leading-relaxed max-w-xl">{item.description}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </ScrollReveal>
+              </div>
+            </section>
+          </>
+        )}
+
+        {/* CONTACT */}
+        <section id="contact" className="border-t border-line-subtle bg-surface-1/40 scroll-mt-20" aria-labelledby="org-contact-title">
+          <div className="max-w-6xl mx-auto px-4 sm:px-8 py-16 sm:py-20">
+            <p className={sectionLabel}>Contact</p>
+            <h2 id="org-contact-title" className={sectionTitle}>
+              Get in touch
+            </h2>
+            <p className={sectionLede}>
+              Questions, job applications, press or anything else. Every message goes to our support inbox and a person
+              replies by email.
+            </p>
+
+            <div className="mt-10 grid md:grid-cols-12 gap-4 sm:gap-6">
+              <div className={`${card} md:col-span-4 p-5 sm:p-6 space-y-5 text-sm self-start`}>
+                <div>
+                  <p className={fieldLabel}>Email</p>
+                  <a
+                    href={`mailto:${SUPPORT_INBOX}`}
+                    className={`text-cyan-glow font-bold hover:text-cyan-hover rounded-control ${focusRing}`}
+                  >
+                    {SUPPORT_INBOX}
+                  </a>
+                </div>
+                <div>
+                  <p className={fieldLabel}>Address</p>
+                  <p className="text-ink-body leading-relaxed">
+                    Trench Level 7
+                    <br />
+                    Mariana Trench, Pacific Ocean
                   </p>
                 </div>
-
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {leadership.map((member) => (
-                    <div
-                      key={member.name}
-                      className="bg-[#f8fbff] border border-sky-100 rounded-card p-6 flex flex-col items-center text-center hover:-translate-y-1 hover:shadow-xl transition-all group"
-                    >
-                      <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-sky-200 bg-sky-50 mb-4">
-                        <img
-                          src={member.image}
-                          alt={member.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      </div>
-                      <h3 className="text-lg font-bold font-grotesk text-sky-900 group-hover:text-sky-600 transition-colors">
-                        {member.name}
-                      </h3>
-                      <div className="text-[11px] text-sky-600 font-bold uppercase mb-2">{member.title}</div>
-                      <p className="text-xs text-slate-500 leading-relaxed">{member.bio}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* CAREERS CTA */}
-                <div className="bg-gradient-to-r from-sky-500 to-teal-400 rounded-panel p-8 sm:p-10 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
-                  <div className="space-y-2 text-center sm:text-left">
-                    <h3 className="text-2xl font-grotesk font-bold uppercase tracking-tight">
-                      JOIN OUR GROWING FAMILY!
-                    </h3>
-                    <p className="text-sm text-white/90 max-w-xl">
-                      We're hiring friendly humans (and gentle crustaceans) at Trench Level 7. Good pay, unlimited
-                      warm tea, and a short commute by submarine.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setViewMode('careers')
-                      setTimeout(() => scrollToElement('careers-hub'), 50)
-                    }}
-                    className="shrink-0 px-7 py-3.5 bg-white text-sky-600 font-grotesk font-extrabold text-sm uppercase tracking-wider rounded-control shadow-lg hover:bg-sky-50 transition-all flex items-center gap-2 cursor-pointer"
-                  >
-                    VIEW OPEN ROLES
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </section>
-          </ScrollReveal>
-        </>
-      )}
-
-      {/* CONTACT SECTION */}
-      <ScrollReveal animation="fade-up" durationMs={800}>
-        <section id="contact" className="relative z-10 w-full py-20 px-6 sm:px-12 bg-white border-t border-sky-100">
-          <div className="max-w-[1200px] mx-auto space-y-12">
-            <div className="text-center space-y-4">
-              <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-                <Mail className="w-4 h-4" />
-                <span>CONTACT</span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
-                GET IN TOUCH
-              </h2>
-              <p className="text-sm text-slate-600 max-w-xl mx-auto">
-                Questions about careers, visiting the lair, press, or anything else? Send us a note and we'll reply by
-                email.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-12 gap-8">
-              <div className="md:col-span-5 bg-[#f8fbff] border border-sky-100 p-6 rounded-panel space-y-6">
-                <h3 className="text-lg font-bold font-grotesk text-sky-700 uppercase border-b border-sky-100 pb-3">
-                  HEADQUARTERS
-                </h3>
-
-                <div className="space-y-4 text-xs">
-                  <div>
-                    <div className="text-slate-400 uppercase text-[11px]">ADDRESS</div>
-                    <div className="text-slate-700 font-bold mt-1">
-                      Lair Alpha, Trench Level 7
-                      <br />
-                      Mariana Trench, Pacific Ocean
-                      <br />
-                      8,450 meters down
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-slate-400 uppercase text-[11px]">VISITING HOURS</div>
-                    <div className="text-slate-700 mt-1">Always open. The vents never switch off, and neither does the kettle.</div>
-                  </div>
-
-                  <div>
-                    <div className="text-slate-400 uppercase text-[11px]">EMAIL</div>
-                    <a href={`mailto:${SUPPORT_INBOX}`} className="text-sky-600 font-bold mt-1 inline-block hover:underline">
-                      {SUPPORT_INBOX}
-                    </a>
-                  </div>
+                <div>
+                  <p className={fieldLabel}>Visiting</p>
+                  <p className="text-ink-body leading-relaxed">Always open. The kettle never switches off.</p>
                 </div>
               </div>
 
-              <div className="md:col-span-7 bg-white border border-sky-100 p-6 sm:p-8 rounded-panel shadow-xl">
+              <div className={`${card} md:col-span-8 p-5 sm:p-7`}>
                 {contactSentTo ? (
-                  <div className="py-12 text-center space-y-4" role="status">
-                    <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
-                    <h3 className="text-xl font-grotesk font-bold text-sky-900 uppercase">MESSAGE SENT</h3>
-                    <p className="text-xs text-slate-600 max-w-md mx-auto">
+                  <div className="py-10 text-center" role="status">
+                    <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" aria-hidden="true" />
+                    <h3 className="mt-4 font-grotesk font-bold text-xl text-ink">Message sent</h3>
+                    <p className="mt-2 text-sm text-ink-muted max-w-md mx-auto">
                       Thanks for reaching out. We'll reply to {contactSentTo} as soon as we can.
                     </p>
                     {contactOptInPending && (
-                      <p className="text-xs text-slate-600 max-w-md mx-auto">{CONTACT_COPY.optInPending}</p>
+                      <p className="mt-2 text-sm text-ink-muted max-w-md mx-auto">{CONTACT_COPY.optInPending}</p>
                     )}
-                    <button
-                      type="button"
-                      onClick={() => setContactSentTo(null)}
-                      className="px-6 py-2.5 bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold uppercase rounded-control shadow-md"
-                    >
-                      SEND ANOTHER
-                    </button>
+                    <div className="mt-6 flex justify-center">
+                      <HudButton variant="secondary" onClick={() => setContactSentTo(null)}>
+                        Send another
+                      </HudButton>
+                    </div>
                   </div>
                 ) : (
                   <form onSubmit={handleContactSubmit} className="space-y-4" noValidate>
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="org-contact-name" className="block text-xs font-bold text-slate-600 uppercase mb-1">
-                          NAME
+                        <label htmlFor="org-contact-name" className={fieldLabel}>
+                          Name
                         </label>
                         <input
                           id="org-contact-name"
@@ -1029,13 +565,12 @@ export const OrgPage: React.FC = () => {
                           placeholder="Your name"
                           value={contactForm.name}
                           onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                          className={inputClass}
+                          className={fieldClass}
                         />
                       </div>
-
                       <div>
-                        <label htmlFor="org-contact-email" className="block text-xs font-bold text-slate-600 uppercase mb-1">
-                          EMAIL
+                        <label htmlFor="org-contact-email" className={fieldLabel}>
+                          Email
                         </label>
                         <input
                           id="org-contact-email"
@@ -1045,20 +580,20 @@ export const OrgPage: React.FC = () => {
                           placeholder="you@example.com"
                           value={contactForm.email}
                           onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                          className={inputClass}
+                          className={fieldClass}
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label htmlFor="org-contact-topic" className="block text-xs font-bold text-slate-600 uppercase mb-1">
-                        TOPIC
+                      <label htmlFor="org-contact-topic" className={fieldLabel}>
+                        Topic
                       </label>
                       <select
                         id="org-contact-topic"
                         value={contactForm.topic}
                         onChange={(e) => setContactForm({ ...contactForm, topic: e.target.value })}
-                        className={inputClass}
+                        className={fieldClass}
                       >
                         {CONTACT_TOPICS.map((topic) => (
                           <option key={topic} value={topic}>
@@ -1069,17 +604,17 @@ export const OrgPage: React.FC = () => {
                     </div>
 
                     <div>
-                      <label htmlFor="org-contact-message" className="block text-xs font-bold text-slate-600 uppercase mb-1">
-                        MESSAGE
+                      <label htmlFor="org-contact-message" className={fieldLabel}>
+                        Message
                       </label>
                       <textarea
                         id="org-contact-message"
                         required
-                        rows={4}
+                        rows={5}
                         placeholder="How can we help?"
                         value={contactForm.message}
                         onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                        className={`${inputClass} resize-none`}
+                        className={`${fieldClass} resize-none`}
                       />
                     </div>
 
@@ -1097,55 +632,50 @@ export const OrgPage: React.FC = () => {
                       />
                     </div>
 
-                    <button
-                      type="submit"
-                      disabled={isContactSubmitting}
-                      className="w-full py-3 bg-sky-500 hover:bg-sky-400 disabled:opacity-60 text-white font-grotesk font-bold text-xs uppercase tracking-wider rounded-control transition-all shadow-lg flex items-center justify-center gap-2"
-                    >
-                      <Send className="w-4 h-4" />
-                      <span>{isContactSubmitting ? 'SENDING...' : 'SEND MESSAGE'}</span>
-                    </button>
-
-                    <label className="flex items-start gap-2.5 cursor-pointer group select-none pt-1">
+                    <label className="flex items-start gap-2.5 cursor-pointer select-none">
                       <input
                         type="checkbox"
                         checked={contactForm.emailOptIn}
                         onChange={(e) => setContactForm({ ...contactForm, emailOptIn: e.target.checked })}
-                        className="mt-0.5 w-4 h-4 rounded-control border-sky-300 bg-[#f8fbff] text-sky-500 focus:ring-sky-400 focus:ring-offset-0 cursor-pointer accent-sky-500"
+                        className="mt-0.5 w-4 h-4 rounded-chip cursor-pointer accent-cyan-glow"
                       />
-                      <span className="text-xs text-slate-600 group-hover:text-slate-900 transition-colors font-sans leading-tight">
-                        Email me Moltology news and releases.
-                      </span>
+                      <span className="text-sm text-ink-muted leading-tight">Email me Moltology news and releases.</span>
                     </label>
 
                     <TurnstileWidget
                       ref={contactTurnstileRef}
                       action={CONTACT_TURNSTILE_ACTION}
-                      theme="light"
+                      theme="dark"
                       size="flexible"
                       onVerify={(token) => setContactTurnstileToken(token)}
                       onExpire={() => setContactTurnstileToken(null)}
                     />
 
                     {contactError && (
-                      <p className="text-xs text-red-600 font-sans" role="alert">
+                      <p className="text-sm text-crimson-text" role="alert">
                         {contactError}
                       </p>
                     )}
+
+                    <HudButton
+                      type="submit"
+                      variant="primary"
+                      size="lg"
+                      fullWidth
+                      disabled={isContactSubmitting}
+                      icon={<Send className="w-4 h-4" />}
+                    >
+                      {isContactSubmitting ? 'Sending...' : 'Send message'}
+                    </HudButton>
                   </form>
                 )}
               </div>
             </div>
           </div>
         </section>
-      </ScrollReveal>
+      </main>
 
-      <MainFooter
-        variant="corporate"
-        brandTitle="MOLTOLOGY.ORG FOUNDATION"
-        brandTagline="A friendly foundation at the bottom of the Pacific."
-        copyrightText="© 2026 MOLTOLOGY.ORG FOUNDATION. ALL RIGHTS RESERVED."
-      />
+      <MainFooter />
     </div>
   )
 }

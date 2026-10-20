@@ -45,15 +45,6 @@ describe('HeaderBrand Component', () => {
     expect(handleClick).toHaveBeenCalledTimes(1)
   })
 
-  it('renders corporate variant with sky styling classes', () => {
-    render(<HeaderBrand variant="corporate" subtext="MOLTOLOGY.ORG FOUNDATION" />)
-
-    const titleEl = screen.getByText('Moltology')
-    expect(titleEl.closest('div')?.className).toContain('text-sky-950')
-    const subtextEl = screen.getByText('MOLTOLOGY.ORG FOUNDATION')
-    expect(subtextEl.closest('div')?.className).toContain('text-sky-600')
-  })
-
   it('only renders a keyboard-focusable button when it has an action', () => {
     const { rerender } = render(<HeaderBrand />)
     expect(screen.queryByRole('button')).not.toBeInTheDocument()

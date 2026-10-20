@@ -1,94 +1,45 @@
 import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { CareerHub, JOB_LISTINGS, CORPORATE_BENEFITS, HIRING_STEPS } from './CareerHub'
-import { ToastProvider } from '@/components/ui/ToastProvider'
+import { CareerHub, JOB_LISTINGS, PERKS, HIRING_STEPS } from './CareerHub'
 
-describe('CareerHub Component', () => {
-  const renderCareerHub = () => {
-    return render(
-      <ToastProvider>
-        <CareerHub />
-      </ToastProvider>
-    )
-  }
+describe('CareerHub', () => {
+  it('lists every open role, the perks and the hiring steps', () => {
+    render(<CareerHub />)
 
-  it('renders careers banner, KPI badges, and benefits section', () => {
-    renderCareerHub()
-
-    expect(screen.getByText(/BUILD YOUR FUTURE IN/i)).toBeInTheDocument()
-    expect(screen.getByText(/PERKS THAT KEEP YOUR SHELL HARDENED/i)).toBeInTheDocument()
-    expect(screen.getByText('100% Comprehensive Carapace Care')).toBeInTheDocument()
-    expect(screen.getByText('Hydrothermal Nap Pods & Spa')).toBeInTheDocument()
-    expect(screen.getByText('Retirement Plan & Anniversary Shells')).toBeInTheDocument()
+    expect(screen.getByText('Work with us')).toBeInTheDocument()
+    for (const job of JOB_LISTINGS) expect(screen.getByText(job.title)).toBeInTheDocument()
+    for (const perk of PERKS) expect(screen.getByText(perk.title)).toBeInTheDocument()
+    for (const step of HIRING_STEPS) expect(screen.getByText(step.title)).toBeInTheDocument()
   })
 
-  it('renders all default open positions in the job board', () => {
-    renderCareerHub()
+  it('filters roles by team', () => {
+    render(<CareerHub />)
 
-    expect(screen.getByText('JOIN THE CARCINIZATION EFFORT')).toBeInTheDocument()
-    expect(screen.getByText('Senior Bio-Silicon Systems Engineer')).toBeInTheDocument()
-    expect(screen.getByText('Pincer Torque Optimization Lead')).toBeInTheDocument()
-    expect(screen.getByText('Larval Onboarding & Softshed Chaplain')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Member care' }))
+    expect(screen.getByText('Member onboarding guide')).toBeInTheDocument()
+    expect(screen.queryByText('Platform engineer')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'All roles' }))
+    expect(screen.getByText('Platform engineer')).toBeInTheDocument()
   })
 
-  it('allows filtering open jobs by department', () => {
-    renderCareerHub()
+  it('shows role details on demand and hands the role to onApply', () => {
+    const onApply = vi.fn()
+    render(<CareerHub onApply={onApply} />)
 
-    // Filter by Spiritual & Chaplaincy
-    const spiritualTab = screen.getByRole('button', { name: /SPIRITUAL & CHAPLAINCY/i })
-    fireEvent.click(spiritualTab)
+    const details = screen.getAllByRole('button', { name: /Details/i })[0]
+    expect(screen.queryByText("What you'll do")).not.toBeInTheDocument()
+    fireEvent.click(details)
+    expect(details).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByText("What you'll do")).toBeInTheDocument()
 
-    expect(screen.getByText('Larval Onboarding & Softshed Chaplain')).toBeInTheDocument()
-    expect(screen.queryByText('Senior Bio-Silicon Systems Engineer')).not.toBeInTheDocument()
-
-    // Filter by Bio-Silicon Engineering
-    const engTab = screen.getByRole('button', { name: /BIO-SILICON ENGINEERING/i })
-    fireEvent.click(engTab)
-
-    expect(screen.getByText('Senior Bio-Silicon Systems Engineer')).toBeInTheDocument()
-    expect(screen.queryByText('Larval Onboarding & Softshed Chaplain')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Apply for Platform engineer' }))
+    expect(onApply).toHaveBeenCalledWith(JOB_LISTINGS[0])
   })
 
-  it('allows searching jobs by keyword', () => {
-    renderCareerHub()
-
-    const searchInput = screen.getByPlaceholderText(/Search by title or keyword/i)
-    fireEvent.change(searchInput, { target: { value: 'Pincer' } })
-
-    expect(screen.getByText('Pincer Torque Optimization Lead')).toBeInTheDocument()
-    expect(screen.queryByText('Deep-Sea Hydrothermal Grid Technician')).not.toBeInTheDocument()
-  })
-
-  it('opens job details and application modal and allows submitting an application', () => {
-    renderCareerHub()
-
-    const viewRoleButtons = screen.getAllByRole('button', { name: /VIEW ROLE & APPLY/i })
-    fireEvent.click(viewRoleButtons[0])
-
-    expect(screen.getByText('Transmit Candidate Neural Beacon')).toBeInTheDocument()
-    expect(screen.getByText('Key Responsibilities')).toBeInTheDocument()
-
-    const nameInput = screen.getByPlaceholderText(/Unit #8192 or Alex Mercer/i)
-    const emailInput = screen.getByPlaceholderText('alex@example.com')
-    const noteInput = screen.getByPlaceholderText(/Tell us what draws you to our culture/i)
-
-    fireEvent.change(nameInput, { target: { value: 'Crab Unit #77' } })
-    fireEvent.change(emailInput, { target: { value: 'unit77@moltology.org' } })
-    fireEvent.change(noteInput, { target: { value: 'Ready to optimize sub-benthic compute without hesitation.' } })
-
-    const submitBtn = screen.getByRole('button', { name: /TRANSMIT APPLICATION/i })
-    fireEvent.click(submitBtn)
-
-    expect(submitBtn).toBeInTheDocument()
-  })
-
-  it('renders 4-step hiring process and employee testimonials', () => {
-    renderCareerHub()
-
-    expect(screen.getByText('OUR 4-STEP HIRING & ASCENSION PROCESS')).toBeInTheDocument()
-    expect(screen.getByText('Neural Beacon Submission')).toBeInTheDocument()
-    expect(screen.getByText('VOICES FROM TRENCH LEVEL 7')).toBeInTheDocument()
-    expect(screen.getByText('Elena Rostova')).toBeInTheDocument()
+  it('has no mock application form', () => {
+    render(<CareerHub />)
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
   })
 })

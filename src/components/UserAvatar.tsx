@@ -17,13 +17,12 @@ export interface UserAvatarProps {
   size?: 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   className?: string
   alt?: string
-  variant?: 'benthic' | 'corporate'
 }
 
 /**
  * Standardized User Avatar component for Moltology portal & non-portal headers.
  * Supports SSO profile images (Google avatar) with automatic onError fallback
- * to a high-tech HUD styled letter avatar (or clean corporate light-mode avatar).
+ * to a high-tech HUD styled letter avatar.
  */
 export const UserAvatar: React.FC<UserAvatarProps> = React.memo(({
   user,
@@ -35,11 +34,8 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(({
   size = 'md',
   className = '',
   alt,
-  variant = 'benthic',
 }) => {
   const [imageError, setImageError] = useState(false)
-
-  const isCorporate = variant === 'corporate'
 
   const imageUrl = src ?? user?.image ?? user?.avatar ?? user?.picture ?? null
   const displayName = name ?? user?.name ?? email ?? user?.email ?? ''
@@ -73,9 +69,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(({
   if (imageUrl && !imageError) {
     return (
       <div
-        className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center ${
-          isCorporate ? 'bg-slate-100' : 'bg-[#030606]'
-        } ${sizeClasses} ${className}`}
+        className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-[#030606] ${sizeClasses} ${className}`}
       >
         <BrandAwareImage
           src={imageUrl}
@@ -91,9 +85,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(({
   if (fallbackSrc && !user) {
     return (
       <div
-        className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center ${
-          isCorporate ? 'bg-slate-100' : 'bg-[#030606]'
-        } ${sizeClasses} ${className}`}
+        className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-[#030606] ${sizeClasses} ${className}`}
       >
         <BrandAwareImage
           src={fallbackSrc}
@@ -109,11 +101,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(({
 
   return (
     <div
-      className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center font-sans font-bold ${
-        isCorporate
-          ? 'bg-gradient-to-br from-sky-100 via-sky-50 to-white border border-sky-300 text-sky-700 shadow-sm'
-          : 'bg-gradient-to-br from-[#0f1d22] via-[#091316] to-[#030606] border border-[#00c3ff]/60 text-[#00c3ff]'
-      } ${sizeClasses} ${className}`}
+      className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center font-sans font-bold bg-gradient-to-br from-[#0f1d22] via-[#091316] to-[#030606] border border-[#00c3ff]/60 text-[#00c3ff] ${sizeClasses} ${className}`}
       aria-label={displayAlt}
       title={displayName || 'User Avatar'}
     >

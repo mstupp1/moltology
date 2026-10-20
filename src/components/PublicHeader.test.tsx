@@ -90,23 +90,7 @@ describe('PublicHeader Navigation Component', () => {
     mockPathname = '/org'
     rerender(<PublicHeader activePage="org" />)
     const orgBtn = within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('link', { name: /ORGANIZATION/i })
-    expect(orgBtn.className).toContain('text-sky-800')
-    expect(orgBtn.className).toContain('ring-sky-300')
-  })
-
-  it('renders corporate variant with clean light header, sky accents, and JOIN FAMILY CTA', async () => {
-    const onOpenAuth = vi.fn()
-    const { container } = render(<PublicHeader activePage="org" variant="corporate" onOpenAuth={onOpenAuth} />)
-
-    const header = container.querySelector('header')!
-    expect(header.className).toContain('bg-white')
-
-    const joinBtn = await screen.findAllByRole('button', { name: /JOIN FAMILY/i })
-    expect(joinBtn.length).toBeGreaterThan(0)
-    expect(joinBtn[0].className).toContain('bg-sky-500')
-
-    fireEvent.click(joinBtn[0])
-    expect(onOpenAuth).toHaveBeenCalledWith('signup')
+    expect(orgBtn).toHaveClass('text-ink', 'bg-surface-3', 'shadow-nav-current')
   })
 
   it('automatically highlights NEWS tab for any /news sub-page article route', () => {
@@ -192,36 +176,6 @@ describe('PublicHeader Navigation Component', () => {
     expect(screen.getByRole('button', { name: /^settings$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
     expect(screen.queryByText('Underwater Bubbles')).not.toBeInTheDocument()
-  })
-
-  it('renders corporate light mode user avatar menu when variant="corporate"', async () => {
-    vi.mocked(authClient.useSession).mockReturnValue({
-      data: {
-        user: {
-          id: 'user-3',
-          name: 'Corp Exec',
-          email: 'exec@moltology.org',
-          image: null,
-        },
-      },
-    } as any)
-
-    const { container } = render(<PublicHeader activePage="org" variant="corporate" />)
-
-    const avatarBtns = await screen.findAllByRole('button', { name: /user account menu/i })
-    expect(avatarBtns.length).toBeGreaterThan(0)
-
-    const desktopAvatarBtn = avatarBtns[0]
-    expect(desktopAvatarBtn.className).toContain('bg-white')
-    expect(desktopAvatarBtn.className).toContain('border-sky-200')
-
-    fireEvent.click(desktopAvatarBtn)
-
-    const dropdown = container.querySelector('.bg-white\\/95')
-    expect(dropdown).toBeInTheDocument()
-    const execNames = screen.getAllByText('Corp Exec')
-    expect(execNames.length).toBeGreaterThan(0)
-    expect(execNames[0].className).toContain('text-slate-800')
   })
 
   it('opens mobile menu with nav links and auth actions via hamburger toggle without badges', async () => {
