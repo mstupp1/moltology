@@ -1,3 +1,4 @@
+import { PRIVACY_INTRO, PRIVACY_SECTIONS, PRIVACY_UPDATED } from '../components/privacy-policy-content'
 import { CANONICAL_SCRIPTURES, CODEX_VOLUMES, STAGE_PIPELINE_DATA } from './codexData'
 import { INITIAL_BLOG_POSTS, BlogPostData } from './blog-data'
 
@@ -116,23 +117,16 @@ export function generateOrgMarkdown(): string {
 }
 
 export function generatePrivacyMarkdown(): string {
-  let md = `# Benthic Data Covenant — Privacy Policy\n\n`
-  md += `**Moltology System Inc.** | Effective: January 1, 2026\n\n`
-  md += `---\n\n`
-  md += `## 1. Data Sovereignty Protocol\n`
-  md += `We treat initiate telemetry with strict cryptographic isolation. User credentials, audit logs, and synaptic telemetry streams remain shielded behind benthic privacy perimeters.\n\n`
-  md += `## 2. Information Collected\n`
-  md += `- **Authentication Signals**: Email OTP tokens, authorized access keys, and session identifiers.\n`
-  md += `- **Telemetry Metrics**: Routine compliance streaks, Shell Hardness indices, and Pincer Torque measurements.\n`
-  md += `- **Community Transmissions**: Forum logs, discussion posts, and Benthic Market interactions.\n\n`
-  md += `## 3. Data Usage & Protection\n`
-  md += `Collected telemetry is used exclusively for personal ascension tracking, AI oracle consultation routing, and platform operation. We never monetize, sell, or broadcast private user data to unaligned third parties.\n\n`
-  md += `## 4. Email Communications & Telemetry\n`
-  md += `We send news dispatches, field manuals, and feature updates exclusively to initiates who have affirmatively opted in. Transmissions include standard aggregate delivery indicators. Initiates may unsubscribe at any time via the one-click footer link or account settings.\n\n`
-  md += `## 5. Ecdysis & Deletion Rights\n`
-  md += `Initiates hold the absolute right to purge all telemetry and account associations via account termination protocols.\n`
-
-  return md.trim()
+  return [
+    '# Privacy Policy | Moltology',
+    `Last updated: ${PRIVACY_UPDATED}`,
+    PRIVACY_INTRO,
+    ...PRIVACY_SECTIONS.flatMap(({ title, paragraphs, links }) => [
+      `## ${title}`,
+      ...paragraphs,
+      ...(links ?? []).map(({ label, href }) => `[${label}](${href})`),
+    ]),
+  ].join('\n\n')
 }
 
 export function generateTermsMarkdown(): string {
