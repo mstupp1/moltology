@@ -116,9 +116,9 @@ describe('SearchPage', () => {
 
   it('filters the shared command list on the Pages tab', () => {
     renderSearch({ query: 'Codex', type: 'pages' })
-    expect(screen.getByText('Open Sacred Codex & Canonical Scriptures')).toBeInTheDocument()
-    expect(screen.queryByText('Open Premium membership')).not.toBeInTheDocument()
-    fireEvent.click(screen.getByText('Open Sacred Codex & Canonical Scriptures'))
+    expect(screen.getByText('Codex')).toBeInTheDocument()
+    expect(screen.queryByText('Premium')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByText('Codex'))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/codex' })
   })
 
@@ -128,39 +128,39 @@ describe('SearchPage', () => {
       isPending: false,
     } as any)
     renderSearch({ query: 'premium', type: 'pages' })
-    expect(screen.getByText('Open Premium membership')).toBeInTheDocument()
+    expect(screen.getByText('Premium')).toBeInTheDocument()
   })
 
   it('keeps hidden pages off Pages for members', () => {
     renderSearch({ query: 'premium', type: 'pages' })
-    expect(screen.queryByText('Open Premium membership')).not.toBeInTheDocument()
+    expect(screen.queryByText('Premium')).not.toBeInTheDocument()
   })
 
   it('surfaces HUD chambers and news dispatches on Pages for obvious queries', () => {
     renderSearch({ query: 'oracle', type: 'pages' })
-    expect(screen.getByText('Consult the Synaptic Oracle')).toBeInTheDocument()
-    fireEvent.click(screen.getByText('Consult the Synaptic Oracle'))
+    expect(screen.getByText('Oracle')).toBeInTheDocument()
+    fireEvent.click(screen.getByText('Oracle'))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/oracle' })
 
     renderSearch({ query: 'connections', type: 'pages' })
-    expect(screen.getByText('Open Connections & Fellow Shells')).toBeInTheDocument()
+    expect(screen.getByText('Connections')).toBeInTheDocument()
 
     renderSearch({ query: 'isolation', type: 'pages' })
-    expect(screen.getByText('Open the Isolation Protocols')).toBeInTheDocument()
-    fireEvent.click(screen.getByText('Open the Isolation Protocols'))
+    expect(screen.getByText('Isolation Protocols')).toBeInTheDocument()
+    fireEvent.click(screen.getByText('Isolation Protocols'))
     expect(mockNavigate).toHaveBeenCalledWith({
       to: '/codex/$slug',
       params: { slug: 'scr-031' },
     })
 
     renderSearch({ query: 'news', type: 'pages' })
-    expect(screen.getByText('Open MoltNation News')).toBeInTheDocument()
-    expect(screen.getAllByText(/Read Dispatch:/).length).toBeGreaterThan(0)
+    expect(screen.getAllByText('News').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('News').length).toBeGreaterThan(1)
   })
 
   it('opens a Codex scripture hit on the stable slug path', () => {
     renderSearch({ query: 'SCR-010', type: 'pages' })
-    fireEvent.click(screen.getByText('Read Scripture: The Law of Ecdysis'))
+    fireEvent.click(screen.getByText('The Law of Ecdysis'))
     expect(mockNavigate).toHaveBeenCalledWith({
       to: '/codex/$slug',
       params: { slug: 'scr-010' },
@@ -169,7 +169,7 @@ describe('SearchPage', () => {
 
   it('opens a forum board from Pages with the board route params', () => {
     renderSearch({ query: 'Rules & Directives', type: 'pages' })
-    fireEvent.click(screen.getByText('Open Forum Board: Rules & Directives'))
+    fireEvent.click(screen.getByText('Rules & Directives'))
     expect(mockNavigate).toHaveBeenCalledWith({
       to: '/forum/$categorySlug',
       params: { categorySlug: 'rules-announcements' },
@@ -200,7 +200,7 @@ describe('SearchPage', () => {
     expect(onQueryChange).toHaveBeenCalledWith('Codex')
 
     renderSearch({ query: 'Codex', type: 'pages' })
-    expect(screen.getByText('Open Sacred Codex & Canonical Scriptures')).toBeInTheDocument()
+    expect(screen.getByText('Codex')).toBeInTheDocument()
     expect(screen.queryByText('claw_lord')).not.toBeInTheDocument()
     expect(queryViewportLock()).toBeNull()
   })
@@ -232,7 +232,7 @@ describe('SearchPage', () => {
     vi.mocked(searchMembersFn).mockResolvedValue([])
     renderSearch({ query: 'zz', type: 'people' })
     await waitFor(() => {
-      expect(screen.getByText(/The trench stayed quiet/)).toBeInTheDocument()
+      expect(screen.getByText('No members match that.')).toBeInTheDocument()
     })
     expect(screen.queryByText(/0 results/i)).not.toBeInTheDocument()
   })

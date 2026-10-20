@@ -115,4 +115,32 @@ describe('search recents', () => {
 
     expect(getSearchRecents(MEMBER_A)).toEqual([])
   })
+
+  it('refreshes stored pages to their current names and drops retired ones', () => {
+    localStorage.setItem(
+      searchRecentsStorageKey(MEMBER_A),
+      JSON.stringify([
+        {
+          kind: 'page',
+          commandId: 'nav-hub',
+          label: 'Open Portal Command Hub (Mainpage)',
+          category: 'Navigation',
+          icon: 'dashboard',
+          to: '/dashboard',
+          openedAt: 2,
+        },
+        {
+          kind: 'page',
+          commandId: 'ritual-purge',
+          label: 'Initiate Purge Protocol (Clear Neural Cache)',
+          category: 'Rituals',
+          icon: 'dashboard',
+          openedAt: 1,
+        },
+      ]),
+    )
+    const recents = getSearchRecents(MEMBER_A)
+    expect(recents).toHaveLength(1)
+    expect(recents[0]).toMatchObject({ commandId: 'nav-hub', label: 'Dashboard', category: 'Page' })
+  })
 })

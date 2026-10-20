@@ -10,7 +10,6 @@ import {
   Activity,
   Flame,
   Terminal,
-  Zap,
   Atom,
   UserCheck,
   Sliders,
@@ -46,10 +45,6 @@ export function CommandCatalogIcon({ icon }: { icon: CommandIconId }) {
     case 'landing':
       return <Flame className={`${ICON_CLASS} text-red-500`} />
     case 'support':
-      return <Terminal className={`${ICON_CLASS} text-cyan-400`} />
-    case 'purge':
-      return <Zap className={`${ICON_CLASS} text-yellow-400`} />
-    case 'scan':
       return <Terminal className={`${ICON_CLASS} text-cyan-400`} />
     case 'oracle':
       return <Atom className={`${ICON_CLASS} text-[#00ffff]`} />

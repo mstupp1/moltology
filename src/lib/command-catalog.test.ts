@@ -21,18 +21,25 @@ describe('command catalog', () => {
   it('names support in plain English', () => {
     const supportNav = COMMAND_CATALOG.find((cmd) => cmd.id === 'nav-support')
     expect(supportNav?.to).toBe('/support')
-    expect(supportNav?.label).toBe('Open Support')
+    expect(supportNav?.label).toBe('Help & support')
     expect(supportNav?.label).not.toMatch(/benthic|neural|telemetry|dispatch|transmit/i)
   })
 
-  it('names the social surface Community, not Forum', () => {
+  it('labels pages by name, matching the sidebar', () => {
     const forumNav = COMMAND_CATALOG.find((cmd) => cmd.id === 'nav-forum')
     expect(forumNav?.to).toBe('/forum')
-    expect(forumNav?.label).toBe('Open Community')
-    expect(forumNav?.label).not.toMatch(/forum/i)
+    expect(forumNav?.label).toBe('Forum')
+    expect(COMMAND_CATALOG.map((cmd) => cmd.label).join(' ')).not.toMatch(/^Open |chamber|protocol \(|neural/i)
   })
 
-  it('keeps existing rites and lists live HUD chambers members search for', () => {
+  it('still finds pages by their old names', () => {
+    expect(filterCommandCatalog('command hub').map((cmd) => cmd.id)).toContain('nav-hub')
+    expect(filterCommandCatalog('chassis').map((cmd) => cmd.id)).toContain('nav-chassis')
+    expect(filterCommandCatalog('activity stream').map((cmd) => cmd.id)).toContain('nav-stream')
+    expect(filterCommandCatalog('community').map((cmd) => cmd.id)).toContain('nav-forum')
+  })
+
+  it('lists the live app pages members search for, in sidebar order', () => {
     expect(COMMAND_CATALOG.map((cmd) => cmd.id)).toEqual([
       'nav-home',
       'nav-hub',
@@ -41,23 +48,21 @@ describe('command catalog', () => {
       'nav-isolation-protocols',
       'nav-lectures',
       'nav-pipeline',
-      'nav-market',
-      'nav-chassis',
-      'nav-premium',
       'nav-forum',
       'nav-stream',
       'nav-connections',
+      'nav-chassis',
+      'nav-market',
+      'nav-premium',
       'nav-news',
+      'nav-profile',
+      'nav-settings',
+      'nav-support',
       'nav-watch',
       'nav-admin',
       'nav-logic-atlas',
-      'nav-landing',
-      'nav-support',
-      'nav-settings',
-      'nav-profile',
-      'ritual-purge',
-      'system-scan',
     ])
+    expect(COMMAND_CATALOG.every((cmd) => cmd.to)).toBe(true)
   })
 
   it('surfaces live HUD chambers for obvious page queries', () => {
@@ -80,10 +85,14 @@ describe('command catalog', () => {
     expect(isolation!.to).not.toBe('/isolation')
   })
 
-  it('filters pages by label and category the way the palette always has', () => {
+  it('filters pages by label and category', () => {
     const codex = filterCommandCatalog('Codex')
     expect(codex.map((cmd) => cmd.id)).toEqual(['nav-codex'])
-    expect(filterCommandCatalog('rituals').map((cmd) => cmd.id)).toEqual(['ritual-purge'])
+    expect(filterCommandCatalog('staff', undefined, { includeAdminOnly: true }).map((cmd) => cmd.id)).toEqual([
+      'nav-watch',
+      'nav-admin',
+      'nav-logic-atlas',
+    ])
     expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-premium')
     expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-admin')
     expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-watch')
@@ -132,7 +141,8 @@ describe('command catalog', () => {
   it('opens a scripture search hit on the stable Codex slug', () => {
     const hits = filterCommandCatalog('SCR-010')
     const scripture = hits.find((cmd) => cmd.id === 'codex-scr-010')
-    expect(scripture?.label).toBe('Read Scripture: The Law of Ecdysis')
+    expect(scripture?.label).toBe('The Law of Ecdysis')
+    expect(scripture?.category).toBe('Scripture')
     expect(catalogNavigateArgs(scripture!)).toEqual({
       to: '/codex/$slug',
       params: { slug: 'scr-010' },
