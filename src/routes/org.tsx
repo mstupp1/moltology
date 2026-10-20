@@ -11,9 +11,9 @@ export const Route = createFileRoute('/org')({
   head: () => ({
     meta: [
       ...seo({
-        title: 'The Organization | Moltology Hierarchy & Ascension Tiers',
-        description: 'Explore the structural hierarchy, ecdysis chambers, and organizational doctrines of the Order of the Synaptic Path.',
-        keywords: 'Moltology Organization, Ascension Tiers, Benthic Council, Ecdysis Chambers, Carcinization Hierarchy',
+        title: 'The Organization | Moltology',
+        description: 'Meet the team behind Moltology, see where we work, browse open roles and get in touch.',
+        keywords: 'Moltology organization, Moltology team, Moltology careers, contact Moltology',
         canonical: 'https://moltology.org/org',
         siteName: 'Moltology',
         twitterSite: '@moltology',

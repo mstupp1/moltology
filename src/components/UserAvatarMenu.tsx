@@ -22,7 +22,6 @@ export interface UserAvatarMenuProps {
   openDirection?: 'up' | 'down'
   inline?: boolean
   className?: string
-  variant?: 'benthic' | 'corporate'
   displayName?: string | null
 }
 
@@ -31,7 +30,6 @@ export interface UserAvatarMenuProps {
  * Supports both floating popover (desktop / sidebar) and inline accordion (mobile navigation drawers).
  * Displays user profile image / letter avatar badge which opens a menu
  * containing user details (name, email), settings, and sign-out action.
- * Supports dark 'benthic' and light 'corporate' themes.
  */
 export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   user,
@@ -41,10 +39,8 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   openDirection = 'down',
   inline = false,
   className = '',
-  variant = 'benthic',
   displayName: displayNameProp,
 }) => {
-  const isCorporate = variant === 'corporate'
   const [isOpen, setIsOpen] = useState(false)
   const [shouldRender, setShouldRender] = useState(isOpen)
   const [isExpanded, setIsExpanded] = useState(isOpen)
@@ -173,42 +169,27 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           aria-expanded={isOpen}
           aria-haspopup="true"
           aria-label="User account menu"
-          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-card transition-colors group cursor-pointer ${
-            isCorporate
-              ? 'bg-sky-50 hover:bg-sky-100 border border-sky-200/80 text-slate-800 hover:text-slate-950 focus:outline-none focus:ring-1 focus:ring-sky-400'
-              : 'bg-surface-1 hud-sheen hover:bg-surface-2 border border-line-subtle hover:border-line text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
-          }`}
+          className="w-full flex items-center justify-between px-3 py-2.5 rounded-card transition-colors group cursor-pointer bg-surface-1 hud-sheen hover:bg-surface-2 border border-line-subtle hover:border-line text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
           <div className="flex items-center gap-3 min-w-0">
             <UserAvatar
               user={user}
               name={displayName}
               size="sm"
-              variant={variant}
               className={
-                isCorporate
-                  ? 'border border-sky-300 group-hover:border-sky-500 shadow-sm transition-all shrink-0'
-                  : 'border border-line group-hover:border-line-strong transition-all shrink-0'
+                'border border-line group-hover:border-line-strong transition-all shrink-0'
               }
             />
             <div className="flex flex-col min-w-0 text-left">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span
-                  className={`text-xs font-bold truncate font-grotesk flex items-center gap-1.5 ${
-                    isCorporate
-                      ? 'text-slate-800 group-hover:text-sky-700'
-                      : 'text-ink group-hover:text-cyan-glow'
-                  }`}
+                  className="text-xs font-bold truncate font-grotesk flex items-center gap-1.5 text-ink group-hover:text-cyan-glow"
                 >
                   {displayName}
                 </span>
                 {effectiveRole === 'admin' && (
                   <span
-                    className={`text-[11px] font-sans font-extrabold tracking-[0.08em] uppercase px-1.5 py-0.5 rounded-chip shrink-0 ${
-                      isCorporate
-                        ? 'bg-sky-100 border border-sky-300 text-sky-700'
-                        : 'bg-cyan-soft border border-cyan-glow/40 text-cyan-glow'
-                    }`}
+                    className="text-[11px] font-sans font-extrabold tracking-[0.08em] uppercase px-1.5 py-0.5 rounded-chip shrink-0 bg-cyan-soft border border-cyan-glow/40 text-cyan-glow"
                   >
                     ADMIN
                   </span>
@@ -216,9 +197,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               </div>
               {user.email && (
                 <span
-                  className={`text-[11px] truncate mt-0.5 font-sans ${
-                    isCorporate ? 'text-slate-500' : 'text-ink-muted'
-                  }`}
+                  className="text-[11px] truncate mt-0.5 font-sans text-ink-muted"
                 >
                   {user.email}
                 </span>
@@ -227,11 +206,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           </div>
           <ChevronDown
             className={`w-4 h-4 transition-transform duration-300 ease-in-out shrink-0 ml-2 ${
-              isCorporate
-                ? isOpen
-                  ? 'rotate-180 text-sky-600'
-                  : 'rotate-0 text-sky-500 group-hover:text-sky-700'
-                : isOpen
+              isOpen
                 ? 'rotate-180 text-cyan-glow'
                 : 'rotate-0 text-ink-muted group-hover:text-ink'
             }`}
@@ -254,11 +229,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                   <button
                     type="button"
                     onClick={handleOpenProfile}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer ${
-                      isCorporate
-                        ? 'text-sky-700 hover:bg-sky-100 border border-sky-200/80'
-                        : 'text-ink-body hover:text-ink bg-surface-1 hover:bg-surface-2 border border-line-subtle hover:border-line focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
-                    }`}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer text-ink-body hover:text-ink bg-surface-1 hover:bg-surface-2 border border-line-subtle hover:border-line focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                   >
                     <User className="w-4 h-4 shrink-0" />
                     <span>YOUR PROFILE</span>
@@ -268,11 +239,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                 <button
                   type="button"
                   onClick={handleOpenSettings}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer ${
-                    isCorporate
-                      ? 'text-sky-700 hover:bg-sky-100 border border-sky-200/80'
-                      : 'text-ink-body hover:text-ink bg-surface-1 hover:bg-surface-2 border border-line-subtle hover:border-line focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
-                  }`}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer text-ink-body hover:text-ink bg-surface-1 hover:bg-surface-2 border border-line-subtle hover:border-line focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   <Settings className="w-4 h-4 shrink-0" />
                   <span>SETTINGS</span>
@@ -282,11 +249,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                 <button
                   type="button"
                   onClick={handleOpenHome}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer ${
-                    isCorporate
-                      ? 'text-sky-700 hover:bg-sky-100 border border-sky-200/80'
-                      : 'text-ink-body hover:text-ink bg-surface-1 hover:bg-surface-2 border border-line-subtle hover:border-line focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
-                  }`}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer text-ink-body hover:text-ink bg-surface-1 hover:bg-surface-2 border border-line-subtle hover:border-line focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   <Globe className="w-4 h-4 shrink-0" />
                   <span>MOLTOLOGY HOME</span>
@@ -295,11 +258,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                 {/* Sign Out Action Button */}
                 <button
                   {...signOutButtonProps}
-                  className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-control text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer active:scale-[0.99] ${
-                    isCorporate
-                      ? 'text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-500 border border-rose-200 hover:border-rose-500 shadow-xs'
-                      : 'text-crimson-text border border-crimson-aggro/55 hover:bg-crimson-soft hover:border-crimson-aggro focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
-                  }`}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-control text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer active:scale-[0.99] text-crimson-text border border-crimson-aggro/55 hover:bg-crimson-soft hover:border-crimson-aggro focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>SIGN OUT</span>
@@ -322,21 +281,14 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
         aria-expanded={isOpen}
         aria-haspopup="true"
         aria-label="User account menu"
-        className={`flex items-center justify-center p-1 rounded-full backdrop-blur-md transition-all group cursor-pointer active:scale-95 ${
-          isCorporate
-            ? 'bg-white hover:bg-sky-50 border border-sky-200 hover:border-sky-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-400/60'
-            : 'bg-surface-1 border border-line hover:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
-        }`}
+        className="flex items-center justify-center p-1 rounded-full backdrop-blur-md transition-all group cursor-pointer active:scale-95 bg-surface-1 border border-line hover:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
       >
         <UserAvatar
           user={user}
           name={displayName}
           size="sm"
-          variant={variant}
           className={
-            isCorporate
-              ? 'border border-sky-300 group-hover:border-sky-500 shadow-sm transition-all'
-              : 'border border-line group-hover:border-line-strong transition-all'
+            'border border-line group-hover:border-line-strong transition-all'
           }
         />
       </button>
@@ -354,11 +306,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             openDirection === 'up'
               ? 'bottom-full mb-2 origin-bottom'
               : 'top-full mt-2 origin-top'
-          } w-64 max-w-[calc(100vw-2rem)] rounded-card p-3.5 z-[200] backdrop-blur-2xl transition-all duration-200 ease-out ${
-            isCorporate
-              ? 'bg-white/95 border border-sky-200/90 shadow-[0_15px_35px_rgba(15,23,42,0.12)] font-sans'
-              : 'bg-surface-2 border border-line-subtle shadow-menu font-sans'
-          } ${
+          } w-64 max-w-[calc(100vw-2rem)] rounded-card p-3.5 z-[200] backdrop-blur-2xl transition-all duration-200 ease-out bg-surface-2 border border-line-subtle shadow-menu font-sans ${
             isExpanded
               ? 'opacity-100 scale-100 translate-y-0'
               : openDirection === 'up'
@@ -368,37 +316,26 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
         >
           {/* Top User Header Info Section */}
           <div
-            className={`flex items-center gap-3 pb-3 border-b ${
-              isCorporate ? 'border-sky-100' : 'border-line-subtle'
-            }`}
+            className="flex items-center gap-3 pb-3 border-b border-line-subtle"
           >
             <UserAvatar
               user={user}
               name={displayName}
               size="md"
-              variant={variant}
               className={
-                isCorporate
-                  ? 'border-2 border-sky-400 shadow-sm'
-                  : 'border-2 border-cyan-glow/40'
+                'border-2 border-cyan-glow/40'
               }
             />
             <div className="flex flex-col min-w-0 flex-1">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span
-                  className={`text-xs font-bold truncate font-grotesk flex items-center gap-1.5 ${
-                    isCorporate ? 'text-slate-800' : 'text-ink'
-                  }`}
+                  className="text-xs font-bold truncate font-grotesk flex items-center gap-1.5 text-ink"
                 >
                   {displayName}
                 </span>
                 {effectiveRole === 'admin' && (
                   <span
-                    className={`text-[11px] font-sans font-extrabold tracking-[0.08em] uppercase px-1.5 py-0.5 rounded-chip shrink-0 ${
-                      isCorporate
-                        ? 'bg-sky-100 border border-sky-300 text-sky-700 shadow-xs'
-                        : 'bg-cyan-soft border border-cyan-glow/40 text-cyan-glow'
-                    }`}
+                    className="text-[11px] font-sans font-extrabold tracking-[0.08em] uppercase px-1.5 py-0.5 rounded-chip shrink-0 bg-cyan-soft border border-cyan-glow/40 text-cyan-glow"
                   >
                     ADMIN
                   </span>
@@ -406,9 +343,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               </div>
               {user.email && (
                 <span
-                  className={`text-[11px] truncate mt-0.5 font-sans ${
-                    isCorporate ? 'text-slate-500' : 'text-ink-muted'
-                  }`}
+                  className="text-[11px] truncate mt-0.5 font-sans text-ink-muted"
                 >
                   {user.email}
                 </span>
@@ -422,16 +357,10 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               <button
                 type="button"
                 onClick={handleOpenProfile}
-                className={`w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer ${
-                  isCorporate
-                    ? 'text-sky-700 hover:bg-sky-50 border border-sky-200/80 hover:border-sky-300'
-                    : 'text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
-                }`}
+                className="w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
                 <User
-                  className={`w-4 h-4 shrink-0 ${
-                    isCorporate ? 'text-sky-600' : 'text-ink-muted group-hover:text-cyan-glow'
-                  }`}
+                  className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow"
                 />
                 <span>YOUR PROFILE</span>
               </button>
@@ -439,16 +368,10 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             <button
               type="button"
               onClick={handleOpenSettings}
-              className={`w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer ${
-                isCorporate
-                  ? 'text-sky-700 hover:bg-sky-50 border border-sky-200/80 hover:border-sky-300'
-                  : 'text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
-              }`}
+              className="w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Settings
-                className={`w-4 h-4 shrink-0 ${
-                  isCorporate ? 'text-sky-600' : 'text-ink-muted group-hover:text-cyan-glow'
-                }`}
+                className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow"
               />
               <span>SETTINGS</span>
             </button>
@@ -456,16 +379,10 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             <button
               type="button"
               onClick={handleOpenHome}
-              className={`w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer ${
-                isCorporate
-                  ? 'text-sky-700 hover:bg-sky-50 border border-sky-200/80 hover:border-sky-300'
-                  : 'text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
-              }`}
+              className="w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Globe
-                className={`w-4 h-4 shrink-0 ${
-                  isCorporate ? 'text-sky-600' : 'text-ink-muted group-hover:text-cyan-glow'
-                }`}
+                className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow"
               />
               <span>MOLTOLOGY HOME</span>
             </button>
@@ -473,16 +390,10 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             {/* Sign Out Action Button */}
             <button
               {...signOutButtonProps}
-              className={`w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer ${
-                isCorporate
-                  ? 'text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100/80 border border-rose-200 hover:border-rose-300'
-                  : 'text-crimson-text border border-crimson-aggro/55 hover:bg-crimson-soft hover:border-crimson-aggro focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
-              }`}
+              className="w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer text-crimson-text border border-crimson-aggro/55 hover:bg-crimson-soft hover:border-crimson-aggro focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <LogOut
-                className={`w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                  isCorporate ? 'text-rose-500' : 'text-crimson-text'
-                }`}
+                className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5 text-crimson-text"
               />
               <span>SIGN OUT</span>
             </button>

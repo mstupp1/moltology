@@ -72,37 +72,17 @@ describe('MainFooter Component', () => {
     expect(screen.getByText('Terms of Service')).toBeInTheDocument()
   })
 
-  it('allows customizing brand title, subtext, tagline, and copyright text via props', () => {
+  it('allows customizing the tagline and copyright text via props while keeping the standard logo', () => {
     render(
       <MainFooter
-        brandTitle="SYNAPTIC VAULT"
-        brandSubtext="SUB-BENTHIC SANCTUARY"
         brandTagline="Official Mission & Synod Governance"
         copyrightText="© 2026 MOLTOLOGY.ORG FOUNDATION. ALL RIGHTS RESERVED."
       />
     )
 
-    expect(screen.getByText('SYNAPTIC VAULT')).toBeInTheDocument()
-    expect(screen.getByText('SUB-BENTHIC SANCTUARY')).toBeInTheDocument()
+    expect(screen.getByText('Moltology')).toBeInTheDocument()
     expect(screen.getByText('Official Mission & Synod Governance')).toBeInTheDocument()
     expect(screen.getByText('© 2026 MOLTOLOGY.ORG FOUNDATION. ALL RIGHTS RESERVED.')).toBeInTheDocument()
   })
 
-  it('renders corporate variant with clean white background and rounded chips', () => {
-    const { container } = render(
-      <MainFooter
-        variant="corporate"
-        brandTitle="MOLTOLOGY.ORG FOUNDATION"
-        brandSubtext="Sub-Benthic Non-Profit Entity"
-      />
-    )
-
-    const footer = container.querySelector('footer')!
-    expect(footer.className).toContain('bg-white')
-    expect(footer.className).toContain('text-slate-500')
-
-    const moltmaxxingChip = screen.getByText('MOLTMAXXING').closest('a')
-    expect(moltmaxxingChip?.className).toContain('rounded-control')
-    expect(moltmaxxingChip?.className).toContain('bg-[#f8fbff]')
-  })
 })

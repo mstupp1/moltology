@@ -31,76 +31,57 @@ describe('OrgPage (Moltology Organization Page)', () => {
     )
   }
 
-  it('renders the hero with a contact call to action and no donation section', () => {
-    renderOrgPage()
+  it('renders on the dark theme with the standard logo and no donation section', () => {
+    const { container } = renderOrgPage()
 
-    expect(screen.getAllByText('MOLTOLOGY.ORG FOUNDATION').length).toBeGreaterThanOrEqual(1)
-    expect(screen.getByText('MOLTOLOGY FOUNDATION · EST. 2022')).toBeInTheDocument()
-    expect(screen.getByText('SAY HELLO').closest('a')).toHaveAttribute('href', '#contact')
-    expect(screen.getByText('-8,450m')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'The people behind Moltology' })).toBeInTheDocument()
+    expect(container.firstElementChild).toHaveClass('bg-abyss')
+    expect(container.innerHTML).not.toMatch(/bg-white\b(?!\/)|text-slate-|bg-sky-|border-sky-/)
+    expect(screen.queryByText(/MOLTOLOGY\.ORG FOUNDATION/i)).not.toBeInTheDocument()
+    expect(screen.getAllByText('Moltology').length).toBeGreaterThanOrEqual(2)
     expect(screen.queryByText(/SUPPORT ASCENSION FUND/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/TITHING/i)).not.toBeInTheDocument()
     expect(document.getElementById('donations')).toBeNull()
   })
 
-  it('allows switching between About tabs in Overview mode', () => {
+  it('shows values, team, places and history', () => {
     renderOrgPage()
 
-    expect(screen.getByText("WHAT WE'RE HERE TO DO")).toBeInTheDocument()
-    expect(screen.getByText('HELP PEOPLE SHED WHAT SLOWS THEM DOWN')).toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('button', { name: /THE ROADMAP/i }))
-    expect(screen.getByText('THE CARCINIZATION ROADMAP')).toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('button', { name: /SAFETY FIRST/i }))
-    expect(screen.getByText(/SAFETY AND POSITIVITY, ALWAYS/i)).toBeInTheDocument()
-  })
-
-  it('allows selecting lair chambers in the tour', () => {
-    renderOrgPage()
-
-    expect(screen.getByText('OUR UNDERGROUND LAIR: TRENCH LEVEL 7')).toBeInTheDocument()
-    expect(screen.getByText(/CHAMBER 01: THE VENT POWER PLANT/i)).toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('button', { name: /CHAMBER 02/i }))
-    expect(screen.getByText(/CHAMBER 02: THE COUNCIL ROOM/i)).toBeInTheDocument()
-  })
-
-  it('renders history and leadership', () => {
-    renderOrgPage()
-
-    expect(screen.getByText('HOW WE GOT HERE')).toBeInTheDocument()
-    expect(screen.getByText('THE MARIANA SIGNAL')).toBeInTheDocument()
+    expect(screen.getByText('People first')).toBeInTheDocument()
     expect(screen.getByText('Dr. Thaddeus Crust')).toBeInTheDocument()
     expect(screen.getByText('Head of Member Care')).toBeInTheDocument()
+    expect(screen.getByText('How we got here')).toBeInTheDocument()
+    expect(screen.getByText('We heard a signal')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Meeting room' }))
+    expect(screen.getByRole('heading', { level: 3, name: 'Meeting room' })).toBeInTheDocument()
   })
 
-  it('switches to Careers and shows open roles and the campus gallery', () => {
+  it('switches to Careers and applying fills the contact form', () => {
     renderOrgPage()
 
-    fireEvent.click(screen.getByRole('button', { name: /^CAREERS$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^Careers$/i }))
+    expect(screen.getByText('Work with us')).toBeInTheDocument()
+    expect(screen.getByText('Platform engineer')).toBeInTheDocument()
 
-    expect(screen.getByText(/BUILD YOUR FUTURE IN/i)).toBeInTheDocument()
-    expect(screen.getByText('Senior Bio-Silicon Systems Engineer')).toBeInTheDocument()
-    expect(screen.getByText('A DAY AT TRENCH LEVEL 7')).toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('button', { name: /^PLANNING$/i }))
-    expect(screen.getAllByText('Conference Room Delta').length).toBeGreaterThanOrEqual(1)
+    fireEvent.click(screen.getByRole('button', { name: 'Apply for Platform engineer' }))
+    expect(screen.getByLabelText('Topic')).toHaveValue('careers')
+    expect((screen.getByLabelText('Message') as HTMLTextAreaElement).value).toContain('Platform engineer')
   })
 
   it('validates the contact form inline and waits for the bot check before sending', async () => {
     const { submitContactFormFn } = await import('@/lib/server/api')
     renderOrgPage()
 
-    expect(screen.getByText('GET IN TOUCH')).toBeInTheDocument()
-    const sendBtn = screen.getByRole('button', { name: /SEND MESSAGE/i })
+    expect(screen.getByText('Get in touch')).toBeInTheDocument()
+    const sendBtn = screen.getByRole('button', { name: /Send message/i })
 
     fireEvent.click(sendBtn)
     expect(screen.getByRole('alert')).toHaveTextContent('Add your name.')
 
-    fireEvent.change(screen.getByLabelText('NAME'), { target: { value: 'Tester Crab' } })
-    fireEvent.change(screen.getByLabelText('EMAIL'), { target: { value: 'crab@example.com' } })
-    fireEvent.change(screen.getByLabelText('MESSAGE'), { target: { value: 'Requesting a tour of Chamber 04.' } })
+    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Tester Crab' } })
+    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'crab@example.com' } })
+    fireEvent.change(screen.getByLabelText('Message'), { target: { value: 'Requesting a tour of the spa.' } })
     fireEvent.click(sendBtn)
 
     // The bot check has not finished in the test DOM, so nothing is sent yet.
