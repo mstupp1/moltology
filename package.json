@@ -30,6 +30,7 @@
     "db:grant-admin": "tsx src/db/grant-admin.ts",
     "db:jwks:clean": "tsx scripts/clean-jwks.ts",
     "db:ingest": "tsx scripts/ingest.ts",
+    "academy:ingest": "tsx scripts/academy-ingest.ts",
     "s3:upload": "tsx scripts/upload-asset.ts",
     "s3:sync": "tsx scripts/sync-s3-assets.ts",
     "s3:verify": "tsx scripts/sync-s3-assets.ts --verify",

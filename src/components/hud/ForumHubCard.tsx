@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { ChevronRight, Clock, MessageSquare } from 'lucide-react'
+import { MessageSquare, Pin } from 'lucide-react'
 import {
   getForumCategoriesFn,
   getForumTopicsFn,
@@ -14,11 +14,13 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
-import { ForumUnreadMark, PinBadge } from '@/components/forum/ForumBits'
+import { ForumUnreadMark } from '@/components/forum/ForumBits'
+import { DASHBOARD_FOCUS, DashboardEmptyRow, DashboardPanel } from '@/components/hud/dashboard/DashboardPanel'
+import { cn } from '@/lib/utils'
 
 export const FORUM_HUB_TITLE = 'COMMUNITY'
 export const FORUM_HUB_SUBTITLE = 'Live boards and the latest transmissions.'
-export const FORUM_HUB_CTA = 'ENTER COMMUNITY'
+export const FORUM_HUB_CTA = 'Open boards'
 export const FORUM_HUB_EMPTY_COPY = {
   title: 'The boards are quiet',
   body: 'No threads yet. Open Community to start one.',
@@ -113,31 +115,19 @@ export function toForumHubPulse(boards: ForumHubBoardView[]): ForumHubPulse {
   }
 }
 
-function PulseChip({ label, count }: { label: string; count: number }) {
-  return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em] border border-line-subtle text-ink-muted rounded-chip bg-surface-1">
-      {label}
-      <span className="tabular-nums text-cyan-glow">{count}</span>
-    </span>
-  )
-}
-
 function ForumHubListGhost() {
   return (
-    <div className="space-y-2.5" aria-hidden="true">
-      <div className="flex gap-2">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="h-7 flex-1 border border-line-subtle bg-surface-1 rounded-chip" />
-        ))}
-      </div>
+    <div className="space-y-3" aria-hidden="true">
       <div className="flex gap-1.5">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-7 w-24 shrink-0 border border-line-subtle bg-surface-1 rounded-control" />
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="h-7 w-28 shrink-0 border border-line-subtle bg-surface-1 rounded-control" />
         ))}
       </div>
-      {Array.from({ length: HUB_THREAD_LIMIT }).map((_, i) => (
-        <div key={i} className="h-20 border border-line-subtle bg-surface-1 rounded-card" />
-      ))}
+      <div className="rounded-control border border-line-subtle divide-y divide-line-subtle">
+        {Array.from({ length: HUB_THREAD_LIMIT }).map((_, i) => (
+          <div key={i} className="h-16" />
+        ))}
+      </div>
     </div>
   )
 }
@@ -188,185 +178,119 @@ export function ForumHubCard() {
   const pulse = toForumHubPulse(boards)
 
   return (
-    <div
-      className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5 space-y-3.5 sm:space-y-4 h-full flex flex-col justify-between"
+    <DashboardPanel
+      icon={<MessageSquare />}
+      title={FORUM_HUB_TITLE}
+      subtitle={FORUM_HUB_SUBTITLE}
+      meta={pulse.unreadCount > 0 ? <ForumUnreadMark label={formatForumUnreadCount(pulse.unreadCount)} /> : null}
+      action={{ label: FORUM_HUB_CTA, onClick: () => navigate({ to: '/forum' }) }}
+      className="h-full"
       data-testid="forum-hub-card"
     >
-      <div className="space-y-3">
-        <div className="flex items-start justify-between gap-3 border-b border-line-subtle pb-3">
-          <div>
-            <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-cyan-glow" />
-              {FORUM_HUB_TITLE}
-            </h2>
-            <p className="text-xs text-ink-muted mt-0.5">{FORUM_HUB_SUBTITLE}</p>
-          </div>
-          {pulse.unreadCount > 0 && (
-            <ForumUnreadMark label={formatForumUnreadCount(pulse.unreadCount)} />
+      <HudGhostWidget isLoading={isLoading} skeleton={<ForumHubListGhost />}>
+        <div className="space-y-3">
+          {boards.length > 0 && (
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5" data-testid="forum-hub-boards">
+              {boards.map((board) => (
+                <Link
+                  key={board.id}
+                  to="/forum/$categorySlug"
+                  params={{ categorySlug: board.slug }}
+                  className={cn(
+                    'inline-flex items-center gap-1.5 min-h-8 px-2.5 text-xs font-bold text-ink rounded-control border border-line-subtle shrink-0 bg-surface-1 hover:bg-surface-3 hover:border-line transition-colors',
+                    DASHBOARD_FOCUS,
+                  )}
+                >
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: board.color }} aria-hidden="true" />
+                  <span className="truncate max-w-[9.5rem]">{board.name}</span>
+                  <span className="tabular-nums text-ink-muted font-normal">{board.topicCount}</span>
+                  {board.unreadCount > 0 && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow" role="img" aria-label={formatForumUnreadCount(board.unreadCount)} />
+                  )}
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {threads.length === 0 ? (
+            <DashboardEmptyRow title={FORUM_HUB_EMPTY_COPY.title} body={FORUM_HUB_EMPTY_COPY.body} />
+          ) : (
+            <ul className="rounded-control border border-line-subtle divide-y divide-line-subtle overflow-hidden font-sans">
+              {threads.map((thread) => (
+                <HubThreadRow key={thread.id} thread={thread} />
+              ))}
+            </ul>
           )}
         </div>
-
-        <HudGhostWidget isLoading={isLoading} skeleton={<ForumHubListGhost />}>
-          <div className="space-y-2.5">
-            {boards.length > 0 && (
-              <div className="flex flex-wrap gap-1.5" data-testid="forum-hub-pulse">
-                <PulseChip label="Boards" count={pulse.boardCount} />
-                <PulseChip label="Topics" count={pulse.topicCount} />
-                {pulse.unreadCount > 0 && <PulseChip label="New" count={pulse.unreadCount} />}
-              </div>
-            )}
-
-            {boards.length > 0 && (
-              <div
-                className="flex items-center gap-1.5 overflow-x-auto pb-0.5"
-                data-testid="forum-hub-boards"
-              >
-                {boards.map((board) => (
-                  <Link
-                    key={board.id}
-                    to="/forum/$categorySlug"
-                    params={{ categorySlug: board.slug }}
-                    className="inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] rounded-control border shrink-0 bg-surface-1 hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-                    style={{
-                      borderColor: `${board.color}80`,
-                      color: board.color,
-                    }}
-                  >
-                    <span className="truncate max-w-[9.5rem]">{board.name}</span>
-                    <span className="tabular-nums text-ink">{board.topicCount}</span>
-                    {board.unreadCount > 0 && (
-                      <span
-                        className="w-1.5 h-1.5 rounded-full bg-cyan-glow"
-                        aria-label={formatForumUnreadCount(board.unreadCount)}
-                      />
-                    )}
-                  </Link>
-                ))}
-              </div>
-            )}
-
-            {threads.length === 0 ? (
-              <div className="p-6 text-center space-y-1.5">
-                <p className="font-grotesk text-xs font-bold text-ink tracking-[0.08em] uppercase">
-                  {FORUM_HUB_EMPTY_COPY.title}
-                </p>
-                <p className="text-xs text-ink-muted leading-relaxed">{FORUM_HUB_EMPTY_COPY.body}</p>
-              </div>
-            ) : (
-              <div className="space-y-2 font-sans">
-                {threads.map((thread) => (
-                  <HubThreadRow key={thread.id} thread={thread} />
-                ))}
-              </div>
-            )}
-          </div>
-        </HudGhostWidget>
-      </div>
-
-      <div className="pt-2 border-t border-line-subtle flex items-center justify-between text-xs">
-        <span className="text-ink-muted text-[11px] tracking-[0.08em]">OPEN THE BOARDS</span>
-        <button
-          type="button"
-          onClick={() => navigate({ to: '/forum' })}
-          className="px-3 py-1.5 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong text-[11px] font-bold tracking-[0.08em] flex items-center gap-1 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-        >
-          <span>{FORUM_HUB_CTA}</span>
-          <ChevronRight className="w-3 h-3" />
-        </button>
-      </div>
-    </div>
+      </HudGhostWidget>
+    </DashboardPanel>
   )
 }
 
 function HubThreadRow({ thread }: { thread: ForumHubThreadView }) {
+  const avatar = (
+    <ForumAvatar
+      src={thread.authorAvatar}
+      authorName={thread.authorName}
+      authorHandle={thread.authorHandle}
+      userId={thread.userId}
+      avatarConfig={thread.authorAvatarConfig}
+      size="sm"
+      className="ring-1 ring-line"
+    />
+  )
+
   return (
-    <div
-      className={`p-3 border transition-colors rounded-card group bg-surface-1 hover:bg-surface-2 ${
-        thread.unread
-          ? 'border-cyan-glow/40 hover:border-line-strong'
-          : 'border-line-subtle hover:border-line-strong'
-      }`}
-    >
-      <div className="flex items-start gap-2.5">
-        {thread.userId ? (
-          <Link
-            to="/member/$profileId"
-            params={{
-              profileId: resolveMemberPublicParam({
-                id: thread.userId,
-                handle: thread.authorHandle,
-              }),
-            }}
-            className="shrink-0 mt-0.5 hover:opacity-90"
-            onClick={(e) => e.stopPropagation()}
-            aria-label={thread.authorName}
-          >
-            <ForumAvatar
-              src={thread.authorAvatar}
-              authorName={thread.authorName}
-              authorHandle={thread.authorHandle}
-              userId={thread.userId}
-              avatarConfig={thread.authorAvatarConfig}
-              size="sm"
-              className="ring-1 ring-line group-hover:ring-line-strong"
-            />
-          </Link>
-        ) : (
-          <ForumAvatar
-            src={thread.authorAvatar}
-            authorName={thread.authorName}
-            authorHandle={thread.authorHandle}
-            userId={thread.userId}
-            avatarConfig={thread.authorAvatarConfig}
-            size="sm"
-            className="ring-1 ring-line mt-0.5"
-          />
-        )}
+    <li className="relative flex items-start gap-3 px-3 py-2.5 bg-surface-1 hover:bg-surface-2 transition-colors group">
+      {thread.userId ? (
+        <Link
+          to="/member/$profileId"
+          params={{
+            profileId: resolveMemberPublicParam({ id: thread.userId, handle: thread.authorHandle }),
+          }}
+          className={cn('relative z-10 shrink-0 mt-0.5 rounded-full hover:opacity-90', DASHBOARD_FOCUS)}
+          aria-label={thread.authorName}
+        >
+          {avatar}
+        </Link>
+      ) : (
+        <span className="shrink-0 mt-0.5">{avatar}</span>
+      )}
 
-        <div className="min-w-0 flex-1 space-y-1">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span
-              className="px-1.5 py-0.5 font-sans font-bold uppercase tracking-[0.08em] rounded-chip border text-[11px] truncate max-w-[70%]"
-              style={{
-                borderColor: `${thread.categoryColor}80`,
-                color: thread.categoryColor,
-                backgroundColor: `${thread.categoryColor}10`,
-              }}
-            >
-              {thread.categoryName}
+      <div className="min-w-0 flex-1 space-y-0.5">
+        <Link
+          to="/forum/$categorySlug/$topicSlug"
+          params={{ categorySlug: thread.categorySlug, topicSlug: thread.slug }}
+          className="flex items-center gap-1.5 min-w-0 rounded-chip after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-cyan-glow"
+        >
+          {thread.unread && (
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow shrink-0">
+              <span className="sr-only">{FORUM_UNREAD_LABEL}</span>
             </span>
-            {thread.isPinned && <PinBadge />}
-            {thread.unread && <ForumUnreadMark label={FORUM_UNREAD_LABEL} />}
-          </div>
-
-          <Link
-            to="/forum/$categorySlug/$topicSlug"
-            params={{ categorySlug: thread.categorySlug, topicSlug: thread.slug }}
-            className="block space-y-0.5"
-          >
-            <h3 className="font-grotesk text-xs font-bold text-ink group-hover:text-cyan-glow transition-colors uppercase line-clamp-1 leading-snug">
-              {thread.title}
-            </h3>
-            {thread.preview ? (
-              <p className="text-[11px] text-ink-muted line-clamp-1 leading-relaxed">{thread.preview}</p>
-            ) : null}
-          </Link>
-
-          <div className="flex items-center justify-between gap-2 text-[11px] text-ink-muted">
-            <span className="truncate text-ink font-bold">{thread.authorName}</span>
-            <span className="flex items-center gap-2.5 shrink-0">
-              <span className="flex items-center gap-1">
-                <MessageSquare className="w-3 h-3 text-cyan-glow" />
-                <span>{thread.repliesCount}</span>
-              </span>
-              <span className="flex items-center gap-1">
-                <Clock className="w-3 h-3 text-ink-muted/60 group-hover:text-ink-muted transition-colors" />
-                <span>{thread.ageLabel}</span>
-              </span>
+          )}
+          {thread.isPinned && (
+            <Pin className="w-3 h-3 shrink-0 text-crimson-text" aria-label="Pinned" role="img" />
+          )}
+          <h3 className="text-sm font-bold text-ink group-hover:text-cyan-glow transition-colors truncate leading-snug">
+            {thread.title}
+          </h3>
+        </Link>
+        {thread.preview ? <p className="text-xs text-ink-muted truncate leading-relaxed">{thread.preview}</p> : null}
+        <div className="flex items-center gap-x-2 text-[11px] text-ink-muted min-w-0">
+          <span className="inline-flex items-center gap-1 min-w-0 font-bold" style={{ color: thread.categoryColor }}>
+            <span className="truncate">{thread.categoryName}</span>
+          </span>
+          <span aria-hidden="true">·</span>
+          <span className="truncate text-ink-body">{thread.authorName}</span>
+          <span className="ml-auto flex items-center gap-2.5 shrink-0 tabular-nums">
+            <span className="flex items-center gap-1" aria-label={`${thread.repliesCount} replies`}>
+              <MessageSquare className="w-3 h-3" aria-hidden="true" />
+              {thread.repliesCount}
             </span>
-          </div>
+            <span>{thread.ageLabel}</span>
+          </span>
         </div>
       </div>
-    </div>
+    </li>
   )
 }

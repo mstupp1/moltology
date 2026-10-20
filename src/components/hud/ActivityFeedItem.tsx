@@ -140,6 +140,8 @@ export function ActivityFeedItem({
   })
   const compact = variant === 'compact'
 
+  if (compact) return <ActivityFeedRow event={event} />
+
   return (
     <article
       className={`p-2.5 sm:p-3 border transition-colors rounded-card bg-surface-1 hover:bg-surface-2 hover:border-line-strong ${kindAccent(event.kind)}`}
@@ -227,6 +229,67 @@ export function ActivityFeedItem({
             <span>{event.occurredLabel}</span>
           </div>
         </div>
+      </div>
+    </article>
+  )
+}
+
+/** Dashboard row: one line of what happened, one line of who and the detail, time on the right. */
+function ActivityFeedRow({ event }: { event: ActivityEventView }) {
+  const dossier = memberDossierLocation({ id: event.actor.id, handle: event.actor.handle })
+  const who = event.isOwn ? 'You' : event.actor.displayName
+
+  return (
+    <article
+      className="relative flex items-start gap-3 px-3 py-2.5 bg-surface-1 hover:bg-surface-2 transition-colors group"
+      data-testid="activity-feed-item"
+      data-kind={event.kind}
+    >
+      {event.actor.id ? (
+        <Link
+          to={dossier.to}
+          params={dossier.params}
+          className="relative z-10 shrink-0 mt-0.5 rounded-full hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+          aria-label={event.actor.displayName}
+        >
+          <LobsterAvatarPortrait
+            config={(event.actor.avatarConfig as LobsterAvatarConfig | null) ?? null}
+            className="w-8 h-8"
+            size={64}
+            fisheyeLens={false}
+            vignette={false}
+            specularSheen={false}
+          />
+        </Link>
+      ) : (
+        <span className="w-8 h-8 shrink-0 mt-0.5 rounded-full bg-surface-3 flex items-center justify-center" aria-hidden="true">
+          <KindIcon kind={event.kind} />
+        </span>
+      )}
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-baseline gap-2 min-w-0">
+          <EventTitleLink
+            event={event}
+            className="min-w-0 flex-1 rounded-chip after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-cyan-glow"
+          >
+            <h3 className="text-sm font-bold text-ink group-hover:text-cyan-glow transition-colors truncate leading-snug">
+              {event.title}
+            </h3>
+          </EventTitleLink>
+          <span className="shrink-0 text-[11px] text-ink-muted tabular-nums">{event.occurredLabel}</span>
+        </div>
+        <p className="flex items-center gap-1.5 min-w-0 text-xs text-ink-muted leading-relaxed">
+          <span className="shrink-0 [&>svg]:w-3 [&>svg]:h-3" aria-hidden="true">
+            <KindIcon kind={event.kind} />
+          </span>
+          <span className="shrink-0 font-bold text-ink-body">{who}</span>
+          <span aria-hidden="true">·</span>
+          <span className="truncate">{event.detail}</span>
+          {event.valueBadge ? (
+            <span className="ml-auto shrink-0 pl-2 text-[11px] font-bold text-cyan-glow tabular-nums">{event.valueBadge}</span>
+          ) : null}
+        </p>
       </div>
     </article>
   )

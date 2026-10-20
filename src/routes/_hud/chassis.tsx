@@ -10,7 +10,7 @@ const LazyChassisStatusPage = lazy(() =>
 function ChassisRoute() {
   return (
     <GuestLockGuard
-      featureName="Chassis Configurator"
+      featureName="Gear"
       message="Chassis loadout, vault storage, and hardpoint calibration require an authorized initiate account."
     >
       <div className="flex flex-col flex-1 min-h-0 h-full w-full">

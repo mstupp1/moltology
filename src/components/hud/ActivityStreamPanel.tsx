@@ -1,31 +1,23 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { Activity, ChevronRight } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { Activity } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { getActivityFeedFn } from '@/lib/server/api'
-import {
-  ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
-  ACTIVITY_STREAM_EMPTY_COPY,
-  ACTIVITY_STREAM_SUBTITLE,
-  kindsForActivityFilter,
-  type ActivityEventView,
-} from '@/lib/activity-events'
+import type { ActivityEventView } from '@/lib/activity-events'
 import { ActivityFeedGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
 import { ActivityFeedItem } from '@/components/hud/ActivityFeedItem'
+import { DashboardEmptyRow, DashboardPanel } from '@/components/hud/dashboard/DashboardPanel'
 
 const HUB_STREAM_LIMIT = 5
 
-function PulseChip({ label, count }: { label: string; count: number }) {
-  if (count <= 0) return null
-  return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em] border border-line-subtle text-ink-muted rounded-chip bg-surface-1">
-      {label}
-      <span className="tabular-nums text-cyan-glow">{count}</span>
-    </span>
-  )
-}
+/** Shorter than the stream page copy, and distinct from the Connections empty state beside it. */
+export const ACTIVITY_HUB_SUBTITLE = 'Pulses from the members you keep close.'
+export const ACTIVITY_HUB_EMPTY_COPY = {
+  title: 'No pulses yet',
+  body: 'Liturgies, streaks and posts from your circle show up here.',
+} as const
 
 export function ActivityStreamPanel() {
   const navigate = useNavigate()
@@ -76,86 +68,28 @@ export function ActivityStreamPanel() {
     }
   }, [userId, isAuthPending])
 
-  const pulse = useMemo(() => {
-    const liturgies = kindsForActivityFilter('liturgies') ?? []
-    const streaks = kindsForActivityFilter('streaks') ?? []
-    const stages = kindsForActivityFilter('stages') ?? []
-    const community = kindsForActivityFilter('community') ?? []
-    return {
-      liturgies: events.filter((event) => liturgies.includes(event.kind)).length,
-      streaks: events.filter((event) => streaks.includes(event.kind)).length,
-      stages: events.filter((event) => stages.includes(event.kind)).length,
-      community: events.filter(
-        (event) => community.includes(event.kind) && event.kind !== ACTIVITY_EVENT_KIND_ORACLE_MILESTONE
-      ).length,
-      oracle: events.filter((event) => event.kind === ACTIVITY_EVENT_KIND_ORACLE_MILESTONE).length,
-    }
-  }, [events])
-
   return (
-    <div
-      className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5 space-y-3.5 sm:space-y-4 h-full flex flex-col justify-between"
+    <DashboardPanel
+      icon={<Activity />}
+      title="Activity stream"
+      subtitle={ACTIVITY_HUB_SUBTITLE}
+      action={{ label: 'Open stream', onClick: () => navigate({ to: '/stream' }) }}
+      className="h-full"
       data-testid="activity-stream-panel"
     >
-      <div className="space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-line-subtle pb-3 shrink-0">
-          <button
-            type="button"
-            onClick={() => navigate({ to: '/stream' })}
-            className="text-left min-w-0 hover:opacity-90 rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-          >
-            <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
-              <Activity className="w-4 h-4 text-cyan-glow" />
-              ACTIVITY STREAM
-            </h2>
-            <p className="text-xs text-ink-muted mt-0.5">{ACTIVITY_STREAM_SUBTITLE}</p>
-          </button>
-        </div>
-
-        <HudGhostWidget isLoading={isLoading} skeleton={<ActivityFeedGhost />}>
-          {events.length === 0 ? (
-            <div className="p-6 text-center space-y-1.5">
-              <p className="font-grotesk text-xs font-bold text-ink tracking-[0.08em] uppercase">
-                {ACTIVITY_STREAM_EMPTY_COPY.title}
-              </p>
-              <p className="text-xs text-ink-muted leading-relaxed">{ACTIVITY_STREAM_EMPTY_COPY.body}</p>
-            </div>
-          ) : (
-            <div className="space-y-2.5 font-sans">
-              {(pulse.liturgies > 0 ||
-                pulse.streaks > 0 ||
-                pulse.stages > 0 ||
-                pulse.community > 0 ||
-                pulse.oracle > 0) && (
-                <div className="flex flex-wrap gap-1.5">
-                  <PulseChip label="Liturgies" count={pulse.liturgies} />
-                  <PulseChip label="Streaks" count={pulse.streaks} />
-                  <PulseChip label="Stages" count={pulse.stages} />
-                  <PulseChip label="Community" count={pulse.community} />
-                  <PulseChip label="Oracle" count={pulse.oracle} />
-                </div>
-              )}
-              <div className="space-y-2">
-                {events.slice(0, HUB_STREAM_LIMIT).map((event) => (
-                  <ActivityFeedItem key={event.id} event={event} variant="compact" />
-                ))}
-              </div>
-            </div>
-          )}
-        </HudGhostWidget>
-      </div>
-
-      <div className="pt-2 border-t border-line-subtle flex items-center justify-between text-xs">
-        <span className="text-ink-muted text-[11px] tracking-[0.08em]">OPEN THE CIRCLE FEED</span>
-        <button
-          type="button"
-          onClick={() => navigate({ to: '/stream' })}
-          className="px-3 py-1.5 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong text-[11px] font-bold tracking-[0.08em] flex items-center gap-1 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-        >
-          <span>OPEN STREAM</span>
-          <ChevronRight className="w-3 h-3" />
-        </button>
-      </div>
-    </div>
+      <HudGhostWidget isLoading={isLoading} skeleton={<ActivityFeedGhost />}>
+        {events.length === 0 ? (
+          <DashboardEmptyRow title={ACTIVITY_HUB_EMPTY_COPY.title} body={ACTIVITY_HUB_EMPTY_COPY.body} />
+        ) : (
+          <ul className="rounded-control border border-line-subtle divide-y divide-line-subtle overflow-hidden font-sans">
+            {events.slice(0, HUB_STREAM_LIMIT).map((event) => (
+              <li key={event.id}>
+                <ActivityFeedItem event={event} variant="compact" />
+              </li>
+            ))}
+          </ul>
+        )}
+      </HudGhostWidget>
+    </DashboardPanel>
   )
 }

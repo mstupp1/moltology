@@ -5,30 +5,31 @@ description: >-
   publishing high-signal MoltNation News articles (moltology.org/news). Use
   whenever the user asks to create, draft, generate, or publish a blog post,
   news dispatch, or run the blog creation process. Features autonomous topic
-  scouting in frontier AI/robotics/workflows, the 4-part MoltNation narrative
-  blueprint, structured primary source citations, ImageGen or Antigravity 16:9 image
-  generation, Neon DB ingestion, and automated git ledger commits.
+  scouting in frontier AI/robotics/workflows, a thesis-first drafting method
+  with a revision pass, structured primary source citations, ImageGen or
+  Antigravity 16:9 image generation, Neon DB ingestion, and automated git
+  ledger commits.
 ---
 
 # MoltNation Blog Creation, Illustration & Ingestion Pipeline
 
 Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
 
-This skill guides the end-to-end research, authoring, illustration, database ingestion, continuity tracking, and automated git publishing of full-length intelligence dispatches for MoltNation News (`https://moltology.org/news`).
+This skill guides the end-to-end research, authoring, illustration, database ingestion, continuity tracking, and automated git publishing of full-length dispatches for MoltNation News (`https://moltology.org/news`).
 
-Dispatches are written from the perspective of **The Order of the Synaptic Path**, viewing bleeding-edge real-world developments in AI, robotics, physical compute substrates, and knowledge-work workflows through the philosophical lens of **Moltology** (the Great Melt, Soft-Shell Windows, Carapace hardening, and sovereign execution).
+Dispatches are written by one of the Order's correspondents about a real development in AI, robotics, compute hardware, or knowledge work. The correspondent has an opinion about it. A dispatch earns its place when a reader finishes it knowing something specific they didn't know, and holding a view they can argue with. The Moltology lens is the correspondent's point of view, not a glossary to recite.
 
 ---
 
 ## Core Brand & Style Rules for Blog Dispatches
 
-Read the [shared annual content calendar](../../../content/annual-content-calendar.md) before scouting or drafting. Use the intended publication date and audience timezone to shape relevant human openings, examples and conceptual illustrations with gradual holiday influence. Record the seasonal anchor/intensity in the brief and recheck if publication moves. Verified news and search intent still choose the subject; a holiday does not create a technical claim. Companion social pieces share the calendar and adapt to their own publication dates.
+Read the [shared annual content calendar](../../../content/annual-content-calendar.md) before scouting or drafting and record the seasonal anchor/intensity in the brief. In a dispatch, a season shows up only where it already belongs in the scene (an October deadline, a holiday shipping rush the story is about). Never add props such as a paper ghost on the window or a pumpkin on the desk to signal the date. Verified news and search intent choose the subject; a holiday does not create a technical claim. Companion social pieces share the calendar and adapt to their own publication dates.
 
 Dispatches follow [BRAND_BIBLE.md](../../../BRAND_BIBLE.md) and [STYLE_GUIDE.md](../../../STYLE_GUIDE.md), especially the news card (STYLE_GUIDE §4.5) and the bans. Blog-specific additions:
 
-1. **Everyday human grounding.** Open with the physical friction of daily life (holding a door, forty open tabs, waiting on hold) and connect it to the development.
-2. **Verified primary sources.** Cite real journalists, newsrooms, dates, filings, or papers. Link them inline and summarize them in a closing `### Field Telemetry & Source Citations` section. Real companies and outlets are citations, not stack leaks.
-3. **No ASCII telemetry boxes.** Markdown tables and blockquotes are fine when they carry real numbers.
+1. **Verified primary sources.** Cite real journalists, newsrooms, dates, filings, or papers. Link them inline and summarize them in a closing `### Field Telemetry & Source Citations` section. Real companies and outlets are citations, not stack leaks.
+2. **No ASCII telemetry boxes.** Markdown tables and blockquotes are fine when they carry real numbers.
+3. **Follow the writing rules in Step 2.** They exist because earlier dispatches read as templated: identical titles, abstract lessons, paper summaries, and the same sign-off every time. [references/example-rewrite.md](references/example-rewrite.md) shows a published dispatch before and after these rules.
 
 ---
 
@@ -36,7 +37,7 @@ Dispatches follow [BRAND_BIBLE.md](../../../BRAND_BIBLE.md) and [STYLE_GUIDE.md]
 
 ```mermaid
 flowchart TD
-    A["Step 1: Scout Real-World AI / Robotics / Workflow News<br/>(Web search, Google Trends demand check, deduplicate vs blog-history.json)"] --> B["Step 2: Draft Dispatch with 4-Part MoltNation Arc<br/>(Human Hook → Telemetry & Filing → Moltology Contrast → Quiet Directive)"]
+    A["Step 1: Scout Real-World AI / Robotics / Workflow News<br/>(Web search, search-demand check, deduplicate vs blog-history.json)"] --> B["Step 2: Find the Thesis, Draft, Run the Revision Pass<br/>(One claim, the detail that proves it, a takeaway the reader can use)"]
     B --> C["Step 3: Generate 16:9 Visuals via ImageGen or Antigravity<br/>(Hero Cover, Figure 1 Macro 3D, Figure 2 Cinematic Wide)"]
     C --> D["Step 4: Stage Markdown Locally in content/news/<slug>.md<br/>(Wire local image paths & Field Telemetry citations)"]
     D --> E["Step 5: Ingest to Neon DB & Upload Images to S3<br/>(npx tsx scripts/ingest.ts content/news/<slug>.md --commit)"]
@@ -57,11 +58,13 @@ Scout events from the last 24–72 hours across:
 * **Physical Hardware & Substrates:** Co-packaged optics (CPO), silicon photonics, wafer-scale compute (Cerebras), subsea data centers, modular nuclear power for AI clusters.
 * **Workflows & Daily Knowledge-Worker Friction:** Agent sandboxes, browser isolation, multi-seat household agents, terminal workflows, human-robot collaborative cells.
 
-#### 2. The Moltology Intersection Filter
-A news item is ready for a MoltNation dispatch when it answers:
-* *Where does bleeding-edge automation encounter the messy reality of the physical world or daily human routine?*
-* *How does this expose the "Melt" (friction-free defaults that erode human sovereignty, fake convenience, or unasked automation)?*
-* *How does this illustrate the "Molt" (hardening boundaries, apprenticeships over empty demos, intentional friction, protective carapaces)?*
+#### 2. The Story Filter
+A news item is ready for a dispatch when you can answer all three in one sentence each, without lore words:
+* **What actually happened?** Who did what, when, with what result. If the only facts are a launch video and a press quote, keep looking.
+* **What does it change for a person?** A specific person: the technician on that shift, the analyst who uses that tool, the reader at their desk. Name what gets easier, harder, riskier, or newly possible.
+* **What would we argue that the coverage didn't say?** This becomes the thesis in Step 2. "AI should have boundaries" is not an argument. "The interesting result is the round where the agents got worse" is.
+
+If the third answer is generic enough to fit last week's dispatch, pick another story or a sharper angle.
 
 #### 3. Search-Demand Check (free, no API keys)
 News picks the story; search demand picks how we frame and title it. Before drafting, ground the angle in what people actually search for so the dispatch can rank, not just exist.
@@ -73,7 +76,7 @@ News picks the story; search demand picks how we frame and title it. Before draf
    ```
    For each phrase this prints daily Wikipedia views for the closest article over the last 90 days, with rising, steady, or falling momentum. It also shows whether Google autocomplete offers the phrase as typed, and how many Google and YouTube suggestions it has. For the leader it lists the long-tail phrasings people type. A row marked "loose match" landed on a broader article, so ignore its view count. Add `--trending` to also see today's breakout US searches, which helps only when a tech story is spiking. Each run is free and needs no keys.
 3. **Pick the target query.** Prefer a phrase people type as-is, with real and rising or steady views. A specific long-tail phrasing from the leader's suggestions (e.g. `ai agents explained`, `ai agents vs agentic ai`) is often the best target, because it matches the dispatch's angle and has less competition than the head term. If nothing shows demand, use plainer wording or pick a different story you scouted.
-4. **Carry the target query through the dispatch** (see Step 2 frontmatter): it goes in the slug, the subtitle after the colon, the summary, the first tag, and naturally in the first two sections of the body. Never stuff it; once in the hook area and once in the reports section is plenty.
+4. **Carry the target query through the dispatch** (see Step 2 §2): it goes in the slug, the subtitle after the colon, the summary, the first tag, and naturally in the body. Never stuff it; once in the opening and once in the what-happened section is plenty.
 5. **Optional manual check:** the script prints a Google Trends compare link. Mention it to the user if relative interest would settle a close call; Google Trends has no free API, so the script doesn't fetch it.
 6. **If a source fails** (rate limit, network), the script reports it and keeps the others. Continue with whatever came back and tell the user which signal was missing.
 
@@ -85,29 +88,50 @@ News picks the story; search demand picks how we frame and title it. Before draf
 
 ---
 
-### Step 2: Dispatch Authoring & The 4-Part Narrative Blueprint
+### Step 2: Find the Thesis, Draft, and Revise
 
-Every MoltNation dispatch is 800–1,200 words (5–6 minute read) and adheres strictly to this structure:
+A dispatch is 700–1,100 words (4–5 minute read). Shorter is better than padded. Draft in three moves: write the thesis, build the draft around it, then run the revision pass before anything is staged.
 
-#### Search-Friendly Headline, Slug & Summary
-The poetic hook stays, but the page must also say plainly what it is about in the words people search.
-* **Title:** Keep the colon headline. The evocative hook goes before the colon; the subtitle after the colon names the subject in plain words and contains the target query from Step 1. Example: `The Tabs You Kept: How Claude's Computer Use Browser Works Without Your Passwords`.
-* **Slug:** Built from the target query plus one distinguishing word, 3–6 words (e.g. `claude-computer-use-browser`), not from the poetic hook.
-* **Summary:** This becomes the search snippet. Lead with the plain subject and the target query in the first sentence; keep it under about 160 characters for the part that matters.
-* **Tags:** The first tag is the target query in plain words. Lore tags like "The Great Melt" can follow.
+#### 1. Write the Thesis First
+Before drafting, write these down in the working brief (not in the article):
+* **Thesis:** one sentence the correspondent believes about this news, specific enough that someone could disagree. It must name the development. Bad: "Automation needs feedback." Good: "Google's lab agents only got good at designing aptamers after a round where their hit rate collapsed, and that failed round is the real result."
+* **The proving detail:** the one fact, number, quote, or moment from the sources that makes the thesis true. The dispatch gives this detail room and explains it fully.
+* **The reader's takeaway:** one thing the reader can do, check, or watch for afterward, tied to the thesis.
 
-#### Frontmatter Standard
+Everything in the draft must serve one of these three. A fact that doesn't goes in the citations list or nowhere.
+
+#### 2. Titles, Slug, Summary
+STYLE_GUIDE §4.5 requires `Title: Subtitle` (the page splits at the first colon). The title is where most dispatches have gone wrong, so hold it to these rules:
+* **The part before the colon makes a claim or names something real.** Use a company, product, number, or surprising result: something a reader could repeat to a friend. It is not a mystery object addressed to "you".
+* **The subtitle after the colon** names the subject in plain words and contains the Step 1 target query. It tells the reader what they'll learn or why it matters, not an abstract noun ("Needs Measured Feedback", "Has to Earn Its Grip").
+* **Aim for under 75 characters in total**, with eight words or fewer before the colon.
+* **Banned shapes**: these filled the 2026 archive, so don't use them:
+  * `The [Object] You [Verbed]: …` (The Spoon You Dipped Twice, The Lid You Closed, The Cup You Nearly Dropped)
+  * `The [Object] Still [Verb]ing: …` (The Parts Bin Still Teaching, The Fence Still Up)
+  * `…: [Topic] Needs/Has to [Abstract Noun]` (Needs a Boundary, Has to Fit the Machine, Needs Measured Feedback)
+* **Before you settle on one, check it against the last 10 titles** in `content/news/blog-history.json`. If it shares an opening or a sentence structure with any of them, rewrite it.
+* **Write five candidates** in the brief, using at least three of these shapes, and pick the one that is most specific:
+  * Surprising result: `Google's Lab Agents Got Worse Before They Got Better: What Laboratory Automation Learns From Failure`
+  * Number with meaning: `[N] Robots, One Night Shift: How [Company] Runs Warehouse Automation`
+  * The reader's question: `Can [Product] Use Your Browser Without Your Passwords? How Claude Computer Use Handles Logins`
+  * Direct claim: `[Company]'s Humanoid Isn't Ready for Your Kitchen: What the [Event] Demo Left Out`
+  * Contrast: `[Product] Ships Agents. [Rival] Ships Guardrails: AI Agents vs Agentic AI, Compared`
+  * Placeholders are for illustration only; every word in a real title comes from the sources.
+* **Slug:** the target query plus one distinguishing word, 3–6 words (e.g. `claude-computer-use-browser`), not built from the hook.
+* **Summary:** the search snippet. Its first sentence states the thesis in plain words with the target query. Keep the part that matters under about 160 characters. No scene-setting in the summary.
+* **Section headings** say what the section says, so a skimmer gets the argument from the headings alone. `### The failed round was the useful one` works. `### The soup has other plans` and `### Let the result disagree` don't. The only fixed heading is the citations section.
+
+#### 3. Frontmatter Standard
 ```yaml
 ---
-title: "Evocative Human Hook: Plain Subtitle With the Target Query"
+title: "Specific Claim or Real Name: Plain Subtitle With the Target Query"
 slug: "target-query-slug"
-summary: "2-3 sentences. The first names the subject and target query plainly; then connect the human observation to the breakthrough and key metrics."
+summary: "1-2 sentences. The first states the thesis plainly with the target query; the second, if needed, adds the proving detail."
 category: "TELEMETRY" # Options: TELEMETRY, SWARM ARCHITECTURE, DEEP RESEARCH, SACRED DOCTRINE, PATRIOT TELEMETRY
 tags:
   - "target query" # First tag is the Step 1 target query
   - "Embodiment"
   - "Attention"
-  - "The Great Melt"
 authorName: "Dr. Thalassa Vance" # Rotate: Dr. Thalassa Vance, Silas Trench, Chitin Architect V
 authorRole: "Arch-Integrator 09" # Silas Trench: Senior Benthic Telemetry Correspondent; Chitin Architect V: The Order of the Synaptic Path
 coverImageUrl: "/absolute/path/to/generated_cover.jpg"
@@ -118,52 +142,71 @@ publishedAt: "2026-10-02T08:00:00-04:00" # ISO-8601 with timezone
 ---
 ```
 
-#### The 4 Narrative Sections
+Pick the persona whose voice fits the story (BRAND_BIBLE §3.2): Silas Trench is the dry field reporter, Dr. Thalassa Vance is precise and kind on focus and depth, and Chitin Architect V writes about systems and structure. The persona changes how the piece sounds, not just the byline.
 
-1. **Section 1: The Human Grounding / The Soft / The Melt (`### [Sensory Human Hook]`)**
-   * *Length:* 3–5 paragraphs.
-   * *Content:* Open with an intimate, physical, relatable human scene: holding a heavy door for someone, staring at 40 browser tabs you refuse to close, walking past delivery robots on a sidewalk, waiting on hold with customer support, standing in front of dense component cubbies in a plant.
-   * *Core phrasing:* Introduce the golden truth: *"Soft is how every member starts."*
-   * *Name the melt:* Explain how the melt arrives—not as a violent break-in, but as an unasked favor, a convenient default, or an erosion of attention.
+#### 4. Shape of the Draft
+The sections follow the argument, not a fixed template. Most dispatches land in this order, but move or merge parts when the story calls for it:
 
-2. **Section 2: What the Report Filed / Primary Source Telemetry (`### What the Reports Filed` or Venue Header)**
-   * *Length:* 4–6 paragraphs.
-   * *Content:* Deliver the verified news. Cite the actual journalist, date, and publication with markdown hyperlinks:
-     * `[The Robot Report](https://...) filed it on September 24, 2026. Eugene Demaitre.`
-     * `[Nikkei Asia](https://...) reported on September 18, 2026. Ryo Asayama.`
-     * `[TechCrunch](https://...) filed it on September 18, 2026. Sarah Perez.`
-   * *Concrete telemetry:* Name the real hardware, partners, deployment sites (e.g. County Cork, Savannah Metaplant, Newcastle on Newgate Street), unit volumes, and quotes from engineers or executives.
-   * *Figure 1 insertion point:* Place Figure 1 immediately after this section.
+1. **Open on the stakes (1–3 paragraphs).** Start inside the story: the technician on the night shift, the researcher looking at a bad result, the reader's own browser asking for a password. If you use an everyday scene, it must be the same problem as the news, so the reader sees the link without being told. It must not be a separate parable such as a kitchen next to a lab robot. By the end of the opening, the reader knows the subject and what the correspondent thinks about it. Don't hold the thesis back as a reveal.
+2. **What happened (2–3 paragraphs).** Who, what, when, and the result, with inline source links (`[TechCrunch](https://...) reported on September 18, 2026.`). Lead with the proving detail and explain it until a non-specialist could retell it. Don't walk through the sources paragraph by paragraph. Place Figure 1 after this part.
+3. **The argument (3–5 paragraphs).** Here the correspondent earns the byline: why the proving detail matters more than the headline number, what the coverage missed, what the result doesn't show, and the strongest objection to the thesis. Each paragraph makes one point about this story. Connect it to the reader's own work through one concrete example that comes straight from the story's mechanism, not a general life lesson. Place Figure 2 after this part.
+4. **Close (1–2 paragraphs).** Deliver the takeaway from the brief: a specific thing to do, check, or watch for, stated once. End on the idea, not on a slogan.
+5. **Sources:**
+   ```markdown
+   ---
 
-3. **Section 3: The Deeper Moltology Contrast & Moltmaxxing Analysis (`### [The Contrast Header]`)**
-   * *Length:* 4–6 paragraphs.
-   * *Content:* Contrast the shallow public perception against the true mechanical and human reality:
-     * *"The surface noise is the viral video / the unit count / the product brochure... The grip is smaller."*
-   * *Moltology principles:*
-     * **The Soft-Shell Window:** The brief, vulnerable transition period right after a change or shed, where new habits or systems must be protected before calcifying.
-     * **Apprenticeship over Cleared Stages:** Praising systems that learn beside workers rather than demanding the room be emptied of people for a demo.
-     * **Carapace Integrity:** Boundaries that ask for credentials, open from the inside, and remember what passed through.
-     * **Relate back to the reader:** Connect the story back to the reader's desk, inbox, tabs, and daily workflows.
-   * *Figure 2 insertion point:* Place Figure 2 immediately after this section.
+   ### Field Telemetry & Source Citations
 
-4. **Section 4: The Directive & Quiet Sign-Off (`### Close the Latch` or `### Stop` or `### Stay Where You Are`)**
-   * *Length:* 2–3 paragraphs.
-   * *Content:* Provide a calm, actionable posture for tomorrow ("Tomorrow, pick one door in your day and let it ask again.", "Stay with the hour you already have.").
-   * *Canonical Order sign-off:*
-     ```markdown
-     If you want a quiet next step, the Audit is waiting in the deep. Signup is free. Stop.
-     ```
+   * [Publication / Lab Name](url): 1-sentence description of article, reporter, and filing date.
+   * [Company Announcement](url): Primary technical release notes and engineering specifications.
+   ```
 
-5. **Section 5: Field Telemetry & Source Citations (`### Field Telemetry & Source Citations`)**
-   * *Content:* A clean, clickable list of verified primary sources:
-     ```markdown
-     ---
+#### 5. Writing Rules
 
-     ### Field Telemetry & Source Citations
+**Be specific.**
+* Every paragraph must contain something only this story has: a name, a place, a number, a quote, a mechanism. **Swap test:** if a paragraph could be pasted into a different dispatch unchanged, cut or rewrite it.
+* Prefer the concrete noun and the active verb. "The simulation gate rejected a pipette arrangement too wide for the container" beats "proposed actions must fit physical reality".
+* Say what the correspondent thinks, plainly, once. Don't circle a point through metaphor without landing it.
 
-     * [Publication / Lab Name](url): 1-sentence description of article, reporter, and filing date.
-     * [Company Announcement](url): Primary technical release notes and engineering specifications.
-     ```
+**Don't info dump.**
+* Use at most three or four numbers in the body, and give each one its meaning ("33.5%, about one in three designs, up from fewer than one in twenty the round before"). Other figures belong in the source list or nowhere.
+* One source carries the story; others support it in a clause, not a paragraph each.
+* Hedge once, where it matters, in plain words. Do not attach a disclaimer sentence to every claim ("This is research, not…", "Those are results from this campaign, not…", "This is an everyday analogy, not…"). If the analogy needs a disclaimer, it's the wrong analogy.
+* Explain a term only if the argument depends on it, and do it in the same sentence.
+
+**Use lore sparingly.**
+* Use at most two Moltology terms per dispatch (STYLE_GUIDE), and only where they say something plain words can't. Use them as the correspondent's shorthand, without defining them as if in a glossary ("A Carapace is a boundary that…").
+* No required phrases. In particular, don't write "Soft is how every member starts", don't say "The Order's reading begins…", and don't introduce the Great Melt as a character that "enters" or "arrives". None of the four Moltology principles (Melt, Soft-Shell Window, apprenticeship, Carapace) is required in any dispatch.
+
+**Don't sell in the body.**
+* The article is the pitch. A reader who learned something will look around the site. Don't use mid-article asides about Moltology, members, or the Order's programs.
+* An invitation is **optional**. Include one only when a real, free Moltology feature directly serves the takeaway, and name it specifically and say what it does for this reader. For example, after a piece on reviewing what an agent did all day: "If you want a place to do that review, the Nightly Molt Audit asks one question at the end of each day." Leave it out when nothing fits; plenty of dispatches should end without one.
+* Never use the old canonical sign-off ("the Audit is waiting in the deep. Signup is free. Stop."), never state prices or the economy (AGENTS.md hard rule 2), and never repeat an invitation line used in the last five dispatches.
+
+**Cut these on sight.** They've become tics in the archive:
+* `Soft is how every member starts.`
+* `The Great Melt enters/arrives when…`, `not as X, but as Y`
+* `The Order's reading…`, `This is the distinction we should carry back to the desk.`
+* `The surface noise is… The grip is smaller.`
+* `There is warmth in…`, `Confidence becomes easier to assess when…`
+* `Tomorrow, choose/pick one…` as the opening of the close
+* Fragments used for drama (`Stop.`, `Same door. Same log.`) more than once per piece
+* Second-person scene openers that tell the reader what they did (`You followed the recipe.`) when the scene isn't the story
+
+#### 6. Revision Pass (required before Step 3)
+Re-read the full draft and fix every failure. Record in the brief that the pass ran.
+
+- [ ] The title follows §2, and neither the title nor its opening matches the last 10 titles.
+- [ ] A reader can state the thesis after the first three paragraphs.
+- [ ] The proving detail is explained well enough that a non-specialist could retell it.
+- [ ] Every paragraph passes the swap test.
+- [ ] Four numbers or fewer in the body, each with its meaning.
+- [ ] At most one hedge per claim, and no disclaimer sentences on analogies.
+- [ ] Two lore terms at most, none defined like a glossary entry, and nothing from the cut list.
+- [ ] Headings alone tell the argument.
+- [ ] The close gives the takeaway once, and any invitation names a real feature that fits.
+- [ ] No STYLE_GUIDE ban fires.
+- [ ] The word count is within 700–1,100. If it runs long, cut the source walkthrough first.
 
 ---
 
@@ -212,8 +255,9 @@ generate_image({
 
 Write the completed dispatch to `content/news/<slug>.md`:
 * Insert the generated image file paths into `coverImageUrl`, Figure 1, and Figure 2.
-* Captions for figures must be descriptive, non-redundant, and informative.
+* Figure captions add information the prose doesn't. For conceptual artwork, start with `Illustration:` and use one sentence; don't add a second disclaimer sentence.
 * Ensure markdown links in prose and citations are properly formatted.
+* Confirm the Step 2 revision pass ran on the final text, including any edits made while wiring images.
 
 ---
 
