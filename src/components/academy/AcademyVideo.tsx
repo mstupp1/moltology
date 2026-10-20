@@ -40,13 +40,15 @@ export function AcademyVideo({
     )
   }
 
-  if (url && (provider === 'file' || provider == null)) {
+  // Uploaded lecture files are stored as bucket keys and load through the cached /media path.
+  const fileSrc = url && (provider === 'file' || provider == null) ? coverSrc(url) : null
+  if (fileSrc) {
     return (
       <video
         className="w-full aspect-video bg-black border border-line-subtle rounded-card"
         controls
         poster={poster ?? undefined}
-        src={url}
+        src={fileSrc}
         aria-label={title}
         onLoadedMetadata={(event) => {
           if (startAt > 0 && event.currentTarget.currentTime < 1) {

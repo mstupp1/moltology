@@ -3,12 +3,12 @@ import { Link } from '@tanstack/react-router'
 import { ArrowLeft, ArrowRight, Check, CheckCircle2, Circle, ListOrdered, Lock } from 'lucide-react'
 import { HudButton } from '@/components/ui/HudButton'
 import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
+import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import {
   ACADEMY_COPY,
   formatLessonDuration,
   lessonKindLabel,
-  readingParagraphs,
   type AcademyLessonDetail,
   type QuizGradeResult,
 } from '@/lib/academy'
@@ -247,14 +247,17 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
 
               {detail.kind === 'reading' ? (
                 <article className={cn(ACADEMY_CARD, 'p-5 sm:p-8')}>
-                  <div className="max-w-[68ch] space-y-4">
-                    {readingParagraphs(detail.body).map((paragraph) => (
-                      <p key={paragraph.slice(0, 48)} className="text-[15px] text-ink-body leading-relaxed">
-                        {paragraph}
-                      </p>
-                    ))}
-                  </div>
+                  <MarkdownRenderer content={detail.body ?? ''} breaks={false} className="max-w-[68ch] text-[15px]" />
                 </article>
+              ) : null}
+
+              {detail.kind === 'video' && detail.body?.trim() ? (
+                <section className={cn(ACADEMY_CARD, 'p-4 sm:p-5 space-y-3')} aria-labelledby="lecture-notes-heading">
+                  <h2 id="lecture-notes-heading" className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+                    Lecture notes
+                  </h2>
+                  <MarkdownRenderer content={detail.body} breaks={false} className="max-w-[68ch]" />
+                </section>
               ) : null}
 
               {detail.kind === 'quiz' ? (

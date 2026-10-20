@@ -10,6 +10,10 @@
 
 Scriptures live under [`codex/`](codex/README.md). Edit them with the [`codex-sync`](.agents/skills/codex-sync/SKILL.md) skill.
 
+## Academy coursework
+
+Molt Academy courses and tracks are Markdown in [`content/academy/`](content/academy/README.md), written to the database with `npm run academy:ingest`. Write and publish them with the [`academy-course-creator`](.agents/skills/academy-course-creator/SKILL.md) skill.
+
 ## Logic Atlas
 
 Business rules and the decisions behind them are mapped in [`docs/logic/`](docs/logic/) and rendered for staff at `/admin/logic`. Refresh it with the [`logic-atlas`](.agents/skills/logic-atlas/SKILL.md) skill after merging changes to thresholds, access, the economy, screening, moderation, or data handling.

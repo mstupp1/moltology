@@ -5,6 +5,8 @@ import { Copy, Check, Terminal } from 'lucide-react'
 export interface MarkdownRendererProps {
   content: string
   className?: string
+  /** Treat single line breaks as <br>. On for chat replies; off for hard-wrapped Markdown files. */
+  breaks?: boolean
 }
 
 /**
@@ -12,11 +14,11 @@ export interface MarkdownRendererProps {
  * Parses standard GFM: Tables, Headings, Lists, Code Blocks, Inline Code,
  * Blockquotes, Horizontal Rules, Bold, Italic, Strikethrough, and Links.
  */
-export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className = '' }) => {
+export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className = '', breaks = true }) => {
   if (!content || !content.trim()) return null
 
   // Configure marked for standard GFM parsing
-  const tokens = marked.lexer(content, { gfm: true, breaks: true })
+  const tokens = marked.lexer(content, { gfm: true, breaks })
 
   return (
     <div className={`space-y-3.5 text-sm leading-[1.75] text-ink-body font-sans ${className}`}>
