@@ -46,7 +46,7 @@ describe('Chassis Configurator HUD Route', () => {
     const Component = Route.options.component!
     render(<Component />)
 
-    expect(screen.getByText('CHASSIS CONFIGURATOR LOCKED')).toBeInTheDocument()
+    expect(screen.getByText('GEAR LOCKED')).toBeInTheDocument()
     expect(screen.getByText('RESTRICTED ACCESS')).toBeInTheDocument()
     expect(
       screen.getByText(
@@ -62,7 +62,7 @@ describe('Chassis Configurator HUD Route', () => {
     render(<Component />)
 
     expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
-    expect(screen.queryByText('CHASSIS CONFIGURATOR LOCKED')).not.toBeInTheDocument()
+    expect(screen.queryByText('GEAR LOCKED')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /SIGN UP TO UNLOCK/i })).not.toBeInTheDocument()
   })
 

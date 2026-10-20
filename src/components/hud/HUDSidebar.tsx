@@ -342,69 +342,48 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const navGroups: NavGroup[] = [
     {
       id: 'core',
-      title: 'CORE COMMAND',
+      title: 'MAIN',
       items: [
         {
           id: 'hub',
-          label: 'COMMAND HUB',
-          shortLabel: 'HUB',
+          label: 'DASHBOARD',
+          shortLabel: 'DASHBOARD',
           icon: LayoutDashboard,
           path: '/dashboard',
         },
         {
           id: 'oracle',
-          label: 'SYNAPTIC ORACLE',
+          label: 'ORACLE',
           shortLabel: 'ORACLE',
           icon: Atom,
           path: '/oracle',
         },
-
       ],
     },
     {
       id: 'knowledge',
-      title: 'KNOWLEDGE & DOCTRINE',
+      title: 'LEARN',
       items: [
         {
           id: 'codex',
-          label: 'THE SACRED CODEX',
+          label: 'CODEX',
           shortLabel: 'CODEX',
           icon: Scroll,
           path: '/codex',
         },
         {
           id: 'lectures',
-          label: 'MOLT ACADEMY',
+          label: 'ACADEMY',
           shortLabel: 'ACADEMY',
           icon: BookOpen,
           path: '/lectures',
         },
         {
           id: 'science',
-          label: 'MOLTOLOGY SCIENCE',
+          label: 'SCIENCE',
           shortLabel: 'SCIENCE',
           icon: FlaskConical,
           path: '/pipeline',
-        },
-      ],
-    },
-    {
-      id: 'operations',
-      title: 'OPERATIONS & GEAR',
-      items: [
-        {
-          id: 'market',
-          label: 'THE MARKET',
-          shortLabel: 'MARKET',
-          icon: ShoppingCart,
-          path: '/market',
-        },
-        {
-          id: 'chassis',
-          label: 'CHASSIS CONFIGURATOR',
-          shortLabel: 'CHASSIS',
-          icon: Sliders,
-          path: '/chassis',
         },
       ],
     },
@@ -414,24 +393,44 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       items: [
         {
           id: 'forum',
-          label: 'COMMUNITY',
-          shortLabel: 'COMMUNITY',
+          label: 'FORUM',
+          shortLabel: 'FORUM',
           icon: Users,
           path: '/forum',
         },
         {
           id: 'stream',
-          label: 'ACTIVITY STREAM',
-          shortLabel: 'STREAM',
+          label: 'ACTIVITY',
+          shortLabel: 'ACTIVITY',
           icon: Activity,
           path: '/stream',
         },
         {
           id: 'connections',
           label: 'CONNECTIONS',
-          shortLabel: 'LINKS',
+          shortLabel: 'PEOPLE',
           icon: UserCheck,
           path: '/connections',
+        },
+      ],
+    },
+    {
+      id: 'operations',
+      title: 'GEAR & SHOP',
+      items: [
+        {
+          id: 'chassis',
+          label: 'GEAR',
+          shortLabel: 'GEAR',
+          icon: Sliders,
+          path: '/chassis',
+        },
+        {
+          id: 'market',
+          label: 'MARKET',
+          shortLabel: 'MARKET',
+          icon: ShoppingCart,
+          path: '/market',
         },
       ],
     },
@@ -770,9 +769,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             {/* Hamburger / Close Menu Toggle Button */}
             <button
               onClick={toggleMobileMenu}
-              aria-label={isMobileHeaderOpen ? 'Close HUD Menu' : 'Open HUD Menu'}
+              aria-label={isMobileHeaderOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isMobileHeaderOpen}
-              title={isMobileHeaderOpen ? 'Close HUD Menu' : 'Open HUD Menu'}
+              title={isMobileHeaderOpen ? 'Close menu' : 'Open menu'}
               className={`w-9 h-9 flex items-center justify-center rounded-control border transition-all duration-300 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow shrink-0 cursor-pointer ${
                 isMobileHeaderOpen
                   ? 'bg-surface-2 border-line-strong text-ink hover:bg-surface-3'
@@ -865,14 +864,14 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               className={`w-full flex items-center justify-between px-4 py-3 bg-surface-1 hover:bg-surface-2 text-xs font-sans text-ink-muted hover:text-ink transition-all group focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
                 isCollapsed ? 'justify-center px-0' : ''
               }`}
-              title="Search commands & protocols"
+              title="Search pages and members"
             >
               {isCollapsed ? (
                 <Search className="w-4 h-4 text-cyan-glow group-hover:scale-110 transition-transform mx-auto" />
               ) : (
                 <div className="flex items-center gap-2 truncate">
                   <Search className="w-3.5 h-3.5 text-cyan-glow group-hover:scale-110 transition-transform shrink-0" />
-                  <span className="truncate">Search commands & protocols...</span>
+                  <span className="truncate">Search pages and members…</span>
                 </div>
               )}
             </button>
@@ -1171,11 +1170,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   closeMobileMenu(() => handleOpenCommandPalette())
                 }}
                 className="w-full flex items-center justify-between px-4 py-3 text-xs font-sans text-ink-muted hover:text-ink transition-all group active:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
-                title="Search commands & protocols"
+                title="Search pages and members"
               >
                 <div className="flex items-center gap-2.5 truncate">
                   <Search className="w-4 h-4 text-cyan-glow shrink-0" />
-                  <span className="truncate text-xs font-sans text-ink-body">Search commands & protocols...</span>
+                  <span className="truncate text-xs font-sans text-ink-body">Search pages and members…</span>
                 </div>
               </button>
             </div>

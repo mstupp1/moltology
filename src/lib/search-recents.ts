@@ -32,8 +32,6 @@ const COMMAND_ICONS = new Set<CommandIconId>([
   'stream',
   'landing',
   'support',
-  'purge',
-  'scan',
   'oracle',
   'connections',
   'chassis',
@@ -72,11 +70,6 @@ export type SearchRecentPage = {
   icon: CommandIconId
   to?: CommandNavTo
   params?: Record<string, string>
-  toast?: {
-    id: string
-    title: string
-    message: string
-  }
   openedAt: number
 }
 
@@ -148,7 +141,8 @@ function isPageRecent(value: unknown): value is SearchRecentPage {
   if (record.kind !== 'page') return false
   if (typeof record.commandId !== 'string' || !record.commandId.trim()) return false
   if (typeof record.label !== 'string' || !record.label.trim()) return false
-  if (!isCategory(record.category) || !isIcon(record.icon)) return false
+  // Older trails stored retired categories; sanitizePageRecent refreshes or drops them.
+  if (typeof record.category !== 'string' || !isIcon(record.icon)) return false
   if (!isFiniteOpenedAt(record.openedAt)) return false
   return true
 }
@@ -180,7 +174,21 @@ function sanitizePersonRecent(entry: SearchRecentPerson): SearchRecentPerson {
   }
 }
 
-function sanitizePageRecent(entry: SearchRecentPage): SearchRecentPage {
+function sanitizePageRecent(entry: SearchRecentPage): SearchRecentPage | null {
+  const live = findCatalogCommand(entry.commandId)
+  if (live) {
+    return {
+      kind: 'page',
+      commandId: live.id,
+      label: live.label,
+      category: live.category,
+      icon: live.icon,
+      ...(live.to ? { to: live.to } : {}),
+      ...(live.params ? { params: live.params } : {}),
+      openedAt: entry.openedAt,
+    }
+  }
+  if (!isCategory(entry.category) || !entry.to) return null
   const next: SearchRecentPage = {
     kind: 'page',
     commandId: entry.commandId.trim(),
@@ -191,7 +199,6 @@ function sanitizePageRecent(entry: SearchRecentPage): SearchRecentPage {
   }
   if (entry.to) next.to = entry.to
   if (entry.params) next.params = entry.params
-  if (entry.toast) next.toast = entry.toast
   return next
 }
 
@@ -302,7 +309,6 @@ export function rememberOpenedPage(
     icon: command.icon,
     to: command.to,
     params: command.params,
-    toast: command.toast,
     openedAt: Date.now(),
   })
 }
@@ -339,6 +345,5 @@ export function pageFromRecent(entry: SearchRecentPage): CommandCatalogItem {
     icon: entry.icon,
     to: entry.to,
     params: entry.params,
-    toast: entry.toast,
   }
 }

@@ -8,7 +8,7 @@ import { INITIAL_FORUM_CATEGORIES } from './forum-seed-data'
 import { isAdminOnlyPath } from './admin-access'
 import { isHiddenPagePath } from './hidden-pages'
 
-export const COMMAND_CATEGORIES = ['Navigation', 'Rituals', 'System', 'Boards', 'News'] as const
+export const COMMAND_CATEGORIES = ['Page', 'Scripture', 'Forum board', 'News', 'Staff'] as const
 export type CommandCategory = (typeof COMMAND_CATEGORIES)[number]
 
 export type CommandIconId =
@@ -22,8 +22,6 @@ export type CommandIconId =
   | 'stream'
   | 'landing'
   | 'support'
-  | 'purge'
-  | 'scan'
   | 'oracle'
   | 'connections'
   | 'chassis'
@@ -67,11 +65,6 @@ export type CommandCatalogItem = {
   to?: CommandNavTo
   params?: Record<string, string>
   keywords?: string[]
-  toast?: {
-    id: string
-    title: string
-    message: string
-  }
 }
 
 export type CatalogNavigateArgs = {
@@ -82,7 +75,7 @@ export type CatalogNavigateArgs = {
 export type SearchTab = 'people' | 'pages'
 
 /**
- * First-class HUD chambers plus the existing rites.
+ * Top-level app pages.
  * Overlay Pages and /search?type=pages share this list.
  *
  * Isolation: the /isolation HUD route was removed. Isolation queries still land on a live
@@ -91,191 +84,165 @@ export type SearchTab = 'people' | 'pages'
 export const COMMAND_CATALOG: CommandCatalogItem[] = [
   {
     id: 'nav-home',
-    label: 'Open Moltology Home (Landing)',
-    category: 'Navigation',
+    label: 'Home page',
+    category: 'Page',
     icon: 'landing',
     to: '/',
+    keywords: ['home', 'landing', 'start'],
   },
   {
     id: 'nav-hub',
-    label: 'Open Portal Command Hub (Mainpage)',
-    category: 'Navigation',
+    label: 'Dashboard',
+    category: 'Page',
     icon: 'dashboard',
     to: '/dashboard',
-    keywords: ['hub', 'dashboard', 'mainpage'],
+    keywords: ['dashboard', 'hub', 'command hub', 'home', 'today'],
   },
   {
     id: 'nav-oracle',
-    label: 'Consult the Synaptic Oracle',
-    category: 'Navigation',
+    label: 'Oracle',
+    category: 'Page',
     icon: 'oracle',
     to: '/oracle',
-    keywords: ['oracle', 'synaptic', 'consultation'],
+    keywords: ['oracle', 'synaptic', 'chat', 'ask', 'ai'],
   },
   {
     id: 'nav-codex',
-    label: 'Open Sacred Codex & Canonical Scriptures',
-    category: 'Navigation',
+    label: 'Codex',
+    category: 'Page',
     icon: 'codex',
     to: '/codex',
+    keywords: ['codex', 'sacred codex', 'scriptures', 'doctrine', 'read'],
   },
   {
     id: 'nav-isolation-protocols',
-    label: 'Open the Isolation Protocols',
-    category: 'Navigation',
+    label: 'Isolation Protocols',
+    category: 'Scripture',
     icon: 'isolation',
     to: '/codex/$slug',
     params: { slug: isolationProtocolsSlug() },
-    keywords: ['isolation', 'dome', 'privacy shell', 'perimeter'],
+    keywords: ['isolation', 'privacy', 'dome', 'privacy shell', 'perimeter'],
   },
   {
     id: 'nav-lectures',
-    label: 'Open Molt Academy & Neural Courses',
-    category: 'Navigation',
+    label: 'Academy',
+    category: 'Page',
     icon: 'lectures',
     to: '/lectures',
-    keywords: ['academy', 'courses', 'lectures', 'tracks', 'certifications', 'lessons'],
+    keywords: ['academy', 'molt academy', 'courses', 'lectures', 'tracks', 'certificates', 'certifications', 'lessons'],
   },
   {
     id: 'nav-pipeline',
-    label: 'Inspect Transmutation Pipeline & Stages',
-    category: 'Navigation',
+    label: 'Science',
+    category: 'Page',
     icon: 'pipeline',
     to: '/pipeline',
-    keywords: ['science', 'pipeline', 'stages'],
-  },
-  {
-    id: 'nav-market',
-    label: 'Open Benthic Market & Transmutation Artifacts',
-    category: 'Navigation',
-    icon: 'market',
-    to: '/market',
-    keywords: ['market', 'shop', 'store'],
-  },
-  {
-    id: 'nav-chassis',
-    label: 'Open Chassis Configurator',
-    category: 'Navigation',
-    icon: 'chassis',
-    to: '/chassis',
-    keywords: ['chassis', 'loadout', 'gear', 'configurator'],
-  },
-  {
-    id: 'nav-premium',
-    label: 'Open Premium membership',
-    category: 'Navigation',
-    icon: 'premium',
-    to: '/premium',
-    keywords: ['premium', 'membership'],
-    // Members do not see this chamber. HIDDEN_PAGES is the registry.
+    keywords: ['science', 'moltology science', 'pipeline', 'stages', 'clearance', 'how it works'],
   },
   {
     id: 'nav-forum',
-    label: 'Open Community',
-    category: 'Navigation',
+    label: 'Forum',
+    category: 'Page',
     icon: 'forum',
     to: '/forum',
-    keywords: ['community', 'forum'],
+    keywords: ['forum', 'community', 'boards', 'topics', 'posts'],
   },
   {
     id: 'nav-stream',
-    label: 'Open Activity Stream',
-    category: 'Navigation',
+    label: 'Activity',
+    category: 'Page',
     icon: 'stream',
     to: '/stream',
-    keywords: ['stream', 'activity'],
+    keywords: ['activity', 'activity stream', 'stream', 'feed'],
   },
   {
     id: 'nav-connections',
-    label: 'Open Connections & Fellow Shells',
-    category: 'Navigation',
+    label: 'Connections',
+    category: 'Page',
     icon: 'connections',
     to: '/connections',
-    keywords: ['connections', 'fellows', 'friends', 'links'],
+    keywords: ['connections', 'people', 'fellows', 'friends', 'links', 'followers'],
+  },
+  {
+    id: 'nav-chassis',
+    label: 'Gear',
+    category: 'Page',
+    icon: 'chassis',
+    to: '/chassis',
+    keywords: ['gear', 'chassis', 'chassis configurator', 'loadout', 'cosmetics', 'avatar', 'configurator'],
+  },
+  {
+    id: 'nav-market',
+    label: 'Market',
+    category: 'Page',
+    icon: 'market',
+    to: '/market',
+    keywords: ['market', 'benthic market', 'shop', 'store', 'credits', 'gems'],
+  },
+  {
+    id: 'nav-premium',
+    label: 'Premium',
+    category: 'Page',
+    icon: 'premium',
+    to: '/premium',
+    // Members do not see this page. HIDDEN_PAGES is the registry.
+    keywords: ['premium', 'membership', 'subscription'],
   },
   {
     id: 'nav-news',
-    label: 'Open MoltNation News',
-    category: 'Navigation',
+    label: 'News',
+    category: 'Page',
     icon: 'news',
     to: '/news',
-    keywords: ['news', 'dispatch', 'moltnation'],
+    keywords: ['news', 'dispatch', 'moltnation', 'updates'],
+  },
+  {
+    id: 'nav-profile',
+    label: 'Your profile',
+    category: 'Page',
+    icon: 'profile',
+    to: '/profile',
+    keywords: ['profile', 'dossier', 'me'],
+  },
+  {
+    id: 'nav-settings',
+    label: 'Settings',
+    category: 'Page',
+    icon: 'settings',
+    to: '/settings',
+    keywords: ['settings', 'account', 'preferences', 'notifications'],
+  },
+  {
+    id: 'nav-support',
+    label: 'Help & support',
+    category: 'Page',
+    icon: 'support',
+    to: '/support',
+    keywords: ['support', 'help', 'contact', 'ticket', 'bug'],
   },
   {
     id: 'nav-watch',
-    label: 'Open Covenant Watch',
-    category: 'Navigation',
+    label: 'Covenant Watch',
+    category: 'Staff',
     icon: 'watch',
     to: '/watch',
-    keywords: ['watch', 'covenant', 'steward'],
+    keywords: ['watch', 'covenant', 'moderation', 'steward'],
   },
   {
     id: 'nav-admin',
-    label: 'Open Admin',
-    category: 'Navigation',
+    label: 'Admin',
+    category: 'Staff',
     icon: 'admin',
     to: '/admin',
     keywords: ['admin', 'steward', 'oversight'],
   },
   {
     id: 'nav-logic-atlas',
-    label: 'Open Logic Atlas',
-    category: 'Navigation',
+    label: 'Logic Atlas',
+    category: 'Staff',
     icon: 'admin',
     to: '/admin/logic',
     keywords: ['logic', 'atlas', 'rules', 'decisions', 'business logic'],
-  },
-  {
-    id: 'nav-landing',
-    label: 'View Order Landing Portal',
-    category: 'Navigation',
-    icon: 'landing',
-    to: '/landing',
-  },
-  {
-    id: 'nav-support',
-    label: 'Open Support',
-    category: 'Navigation',
-    icon: 'support',
-    to: '/support',
-  },
-  {
-    id: 'nav-settings',
-    label: 'Open Operative Settings',
-    category: 'Navigation',
-    icon: 'settings',
-    to: '/settings',
-    keywords: ['settings', 'account'],
-  },
-  {
-    id: 'nav-profile',
-    label: 'Open Your Profile Dossier',
-    category: 'Navigation',
-    icon: 'profile',
-    to: '/profile',
-    keywords: ['profile', 'dossier'],
-  },
-  {
-    id: 'ritual-purge',
-    label: 'Initiate Purge Protocol (Clear Neural Cache)',
-    category: 'Rituals',
-    icon: 'purge',
-    toast: {
-      id: 'command-palette-purge',
-      title: 'Purge Complete',
-      message: 'Cache cleared successfully.',
-    },
-  },
-  {
-    id: 'system-scan',
-    label: 'Execute System Diagnostic Scan',
-    category: 'System',
-    icon: 'scan',
-    toast: {
-      id: 'command-palette-diagnostic',
-      title: 'Diagnostic Complete',
-      message: 'All systems operational.',
-    },
   },
 ]
 
@@ -286,8 +253,8 @@ export function boardPagesFromCategories(
 ): CommandCatalogItem[] {
   return boards.map((board) => ({
     id: `board-${board.slug}`,
-    label: `Open Forum Board: ${board.name}`,
-    category: 'Boards',
+    label: board.name,
+    category: 'Forum board',
     icon: 'forum',
     to: '/forum/$categorySlug',
     params: { categorySlug: board.slug },
@@ -303,7 +270,7 @@ export function newsPagesFromPosts(
     .slice(0, PAGES_NEWS_LIMIT)
     .map((post) => ({
       id: `news-${post.slug}`,
-      label: `Read Dispatch: ${post.title}`,
+      label: post.title,
       category: 'News',
       icon: 'news',
       to: '/news/$slug',
@@ -319,8 +286,8 @@ export function scripturePagesFromCanon(
     const slug = scriptureSlugFromId(scripture.id)
     return {
       id: `codex-${slug}`,
-      label: `Read Scripture: ${scripture.title}`,
-      category: 'Navigation',
+      label: scripture.title,
+      category: 'Scripture',
       icon: 'codex',
       to: '/codex/$slug',
       params: { slug },

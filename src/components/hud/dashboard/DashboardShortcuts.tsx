@@ -14,12 +14,12 @@ export interface DashboardShortcut {
 
 /** Same names and order as the sidebar, so the dashboard and the nav never disagree. */
 export const DASHBOARD_SHORTCUTS: DashboardShortcut[] = [
-  { id: 'oracle', label: 'Synaptic Oracle', description: 'Ask for doctrine, calibration or molt advice.', to: '/oracle', icon: Atom },
-  { id: 'codex', label: 'Sacred Codex', description: 'Read the scriptures, one stage at a time.', to: '/codex', icon: Scroll },
-  { id: 'academy', label: 'Molt Academy', description: 'Courses and lectures for the next shed.', to: '/lectures', icon: BookOpen },
-  { id: 'science', label: 'Moltology Science', description: 'How the stages and clearances work.', to: '/pipeline', icon: FlaskConical },
-  { id: 'market', label: 'The Market', description: 'Molt Credits, shed exchange and cosmetics.', to: '/market', icon: ShoppingCart },
-  { id: 'chassis', label: 'Chassis', description: 'Seat your gear and read your loadout.', to: '/chassis', icon: Sliders },
+  { id: 'oracle', label: 'Oracle', description: 'Ask for doctrine, calibration or molt advice.', to: '/oracle', icon: Atom },
+  { id: 'codex', label: 'Codex', description: 'Read the scriptures, one stage at a time.', to: '/codex', icon: Scroll },
+  { id: 'academy', label: 'Academy', description: 'Courses and lectures for the next shed.', to: '/lectures', icon: BookOpen },
+  { id: 'science', label: 'Science', description: 'How the stages and clearances work.', to: '/pipeline', icon: FlaskConical },
+  { id: 'chassis', label: 'Gear', description: 'Equip your gear and cosmetics.', to: '/chassis', icon: Sliders },
+  { id: 'market', label: 'Market', description: 'Molt Credits, shed exchange and cosmetics.', to: '/market', icon: ShoppingCart },
 ]
 
 export function DashboardShortcuts() {
