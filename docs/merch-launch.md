@@ -3,7 +3,41 @@
 The native store (`/store`) remains behind the admin-only `new-store` experiment. Other visitors
 keep the Etsy link. Creation and operations use the [merch-manager skill](../.agents/skills/merch-manager/SKILL.md).
 
-## Current state — October 19, 2026
+## Approved artwork revision — October 19, 2026
+
+The active `--pilot` pair is now `moltology-mug-v2` and `moltology-tee-v2` (catalog IDs 10 and
+11). The approved design uses the original emblem and outlined site typography: Moltology
+above THE SYNAPTIC PATH, with 54 source pixels of clearance below the title descenders.
+The mug separates the emblem and text onto opposite faces; the tee stacks the emblem above
+the text. Mug sizes retain distinct 2700×1050 and 2700×1140 print files; the tee is 3600×4800.
+Prices and size options are unchanged.
+
+The earlier `synaptic-mark-mug` and `synaptic-mark-tee` are unpublished in dev, with their
+original Printful products, artwork, IDs, and historical order mappings preserved. No public
+launch or manufacturing confirmation is included. Revision evidence is recorded separately
+in `content/merch/moltology-v2.json`; the checkout evidence below belongs to the original pair.
+
+To repeat the selected dev update after sync:
+
+```bash
+npm run merch -- seed --only moltology-mug-v2,moltology-tee-v2,synaptic-mark-mug,synaptic-mark-tee
+```
+
+Including the original pair explicitly saves their unpublished state without broadly seeding
+the placeholder catalog. Resume mockups or sync with the normal `--pilot` commands; versioned
+asset keys avoid replacing the original print files or reusing cached product images.
+
+Revision verification: Printful products **483250882** (mug) and **483250892** (tee), all seven
+variant files processed `ok`; only these two products are published on dev, with all stored
+prices and IDs matching the catalog. All three website photos and their webp twins are reachable.
+The 11 oz and tee print pixels match the approved previews exactly. Both mug templates were
+validated live and the final images inspected. Typecheck and asset-budget checks pass. Core:
+1157 passed with one network-dependent auth test passing on retry; scripts: 328 passed with
+JWKS/network and video-timeout failures passing on retry (nine retry tests passed). Final
+catalog/workflow checks: 14 passed. No new payment or manufacturing order was needed for this
+artwork revision; the earlier checkout/draft evidence remains intact.
+
+## Original pilot verification — October 19, 2026
 
 - The new Synaptic Mark mug and black tee are in the shared catalog with stable IDs. Existing
   products retain their IDs, artwork, and prices.

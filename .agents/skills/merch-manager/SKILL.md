@@ -51,8 +51,12 @@ provider mappings in `content/merch/printful-sync.json`. See [launch state and o
 9. Use the existing private store/admin experiment. For checkout verification leave
    `VITE_MERCH_PREVIEW` unset. Preview mode is only for artwork/layout exploration and disables payment.
 
-The initial pair is selected with `--pilot` instead of `--only`: `synaptic-mark-mug` and
-`synaptic-mark-tee`. `upload` uses `--kind print|mockups|all`; never upload arbitrary folder contents.
+The current approved pair is selected with `--pilot` instead of `--only`: `moltology-mug-v2` and
+`moltology-tee-v2`. The original `synaptic-mark-*` pair is retired from dev; preserve its provider
+IDs and historical draft. The approved SVG wordmarks live in `content/brand/synaptic-path/parts/merch-v2/`: keep the 54-source-pixel clearance below the title descenders. Mug faces separate emblem/text; the tee stacks the emblem above the text.
+For this revision, seed the current and retired pairs explicitly with
+`seed --only moltology-mug-v2,moltology-tee-v2,synaptic-mark-mug,synaptic-mark-tee` to persist their
+publication states without touching the placeholder catalog. `upload` uses `--kind print|mockups|all`; never upload arbitrary folder contents.
 `print --only <design-key>` remains supported. Unknown product selectors fail explicitly.
 
 ## Stripe and order operations

@@ -10,15 +10,15 @@ const remote: SyncProductDetail = { sync_product: { id: 1, external_id: 'p' }, s
 describe('private merch workflow', () => {
   it('selects only the pilot and refuses unknown or conflicting selections', () => {
     const products = selectMerchProducts(undefined, true)
-    expect(products.map(product => product.slug)).toEqual(['synaptic-mark-mug', 'synaptic-mark-tee'])
+    expect(products.map(product => product.slug)).toEqual(['moltology-mug-v2', 'moltology-tee-v2'])
     expect(products.flatMap(product => product.variants)).toHaveLength(7)
     expect(selectMerchProducts('synaptic-mark-tee')).toHaveLength(1)
     expect(() => selectMerchProducts('typo')).toThrow('Unknown product')
     expect(() => selectMerchProducts('synaptic-mark-tee', true)).toThrow('not both')
     expect(productAssetKeys(products).print).toEqual([
-      'merch/print/mug-synaptic-mark.png', 'merch/print/mug-synaptic-mark-15oz.png', 'merch/print/tee-synaptic-mark.png',
+      'merch/print/mug-moltology-v2.png', 'merch/print/mug-moltology-v2-15oz.png', 'merch/print/tee-moltology-v2.png',
     ])
-    expect(productAssetKeys(products).mockups.every(key => key.includes('synaptic-mark'))).toBe(true)
+    expect(productAssetKeys(products).mockups.every(key => key.includes('moltology'))).toBe(true)
   })
   it('requires a verified dev endpoint and rejects production/other databases', () => {
     const env = { DATABASE_URL: 'postgres://owner:secret@ep-dev-pooler.us-east-2.aws.neon.tech/db', NEON_DEV_ENDPOINT_ID: 'ep-dev' }
