@@ -49,7 +49,7 @@ function CourseCard({ course }: { course: AcademyCourseCard }) {
   const href = courseHref(course)
   return (
     <Link to={href.to} params={href.params} className={cn(ACADEMY_CARD_LINK, 'group overflow-hidden flex flex-col h-full')}>
-      <AcademyCover url={course.coverImageUrl} label={course.code} className="aspect-[16/7] border-b border-line-subtle">
+      <AcademyCover url={course.coverImageUrl} className="aspect-[16/7] border-b border-line-subtle">
         <div className="flex h-full items-start justify-between gap-2 p-3">
           <span className="rounded-chip bg-abyss/70 px-1.5 py-0.5 text-[11px] font-bold tracking-[0.08em] text-ink">{course.code}</span>
           {course.completed ? (
