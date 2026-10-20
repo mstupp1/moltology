@@ -9,7 +9,7 @@ export const Conversation = React.forwardRef<HTMLDivElement, ConversationProps>(
     return (
       <div
         ref={ref}
-        className={`flex flex-col flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 font-sans text-xs sm:text-[13px] bg-transparent ${className}`}
+        className={`flex flex-col flex-1 overflow-y-auto px-4 py-5 sm:px-6 font-sans text-sm bg-transparent ${className}`}
         {...props}
       >
         {children}
@@ -21,7 +21,7 @@ Conversation.displayName = 'Conversation'
 
 export const ConversationContent: React.FC<ConversationProps> = ({ children, className = '', ...props }) => {
   return (
-    <div className={`space-y-4 sm:space-y-5 w-full ${className}`} {...props}>
+    <div className={`space-y-6 w-full max-w-3xl mx-auto ${className}`} {...props}>
       {children}
     </div>
   )

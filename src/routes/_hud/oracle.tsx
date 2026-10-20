@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import { Lock, UserPlus, Shield, X, Pencil } from 'lucide-react'
-import { ThreadList } from '@/components/ai/ThreadList'
+import { ThreadList, ThreadListSkeleton } from '@/components/ai/ThreadList'
 import { useThreadActions, type ThreadPatch } from '@/components/ai/useThreadActions'
 import { useSafeOracle } from '@/components/hud/OracleContext'
 import { getAIThreadsFn } from '@/lib/server/api'
@@ -58,10 +58,8 @@ function OracleSidebarContent({
             <HudGhostSkeleton variant="neutral" preset="button" width={72} height={20} />
           </div>
         )}
-        <div className="space-y-1.5 flex-1">
-          <HudGhostSkeleton variant="neutral" preset="text" width="90%" height={28} />
-          <HudGhostSkeleton variant="neutral" preset="text" width="80%" height={28} />
-          <HudGhostSkeleton variant="neutral" preset="text" width="70%" height={28} />
+        <div className="flex-1">
+          <ThreadListSkeleton rows={3} />
         </div>
       </div>
     )
@@ -92,10 +90,12 @@ function OracleSidebarContent({
           </div>
         )}
 
-        {isLoadingThreads ? (
-          <div className="text-xs text-ink-muted py-4 text-center">Loading threads...</div>
+        {isLoadingThreads && threads.length === 0 ? (
+          <ThreadListSkeleton />
         ) : threads.length === 0 ? (
-          <div className="text-xs text-ink-muted py-4 text-center">No recorded threads yet.</div>
+          <div className="text-xs text-ink-muted py-6 px-2 text-center leading-relaxed">
+            No chats yet. Your conversations will show up here.
+          </div>
         ) : (
           <div className="flex-1 overflow-y-auto pr-0.5">
             <ThreadList

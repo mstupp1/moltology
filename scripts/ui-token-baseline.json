@@ -339,7 +339,7 @@
     "chamfer": 3
   },
   "src/components/ui/MarkdownRenderer.tsx": {
-    "hex-color": 7,
+    "hex-color": 3,
     "chamfer": 1
   },
   "src/components/ui/ToastProvider.tsx": {
