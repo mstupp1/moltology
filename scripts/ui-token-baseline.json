@@ -139,7 +139,7 @@
     "tiny-text": 3
   },
   "src/components/hud/CommandCatalogIcon.tsx": {
-    "hex-color": 14
+    "hex-color": 13
   },
   "src/components/hud/HiddenPageGuard.tsx": {
     "hex-color": 6
@@ -152,9 +152,6 @@
   },
   "src/components/hud/HudLayout.tsx": {
     "hex-color": 1
-  },
-  "src/components/hud/HudPromoBentoCard.tsx": {
-    "hex-color": 17
   },
   "src/components/hud/LobsterAvatarDisplay.tsx": {
     "hex-color": 4,

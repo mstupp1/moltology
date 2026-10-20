@@ -1,13 +1,13 @@
 import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+import { DashboardGhost } from '@/components/hud/HudGhostSkeletons'
 import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 
 const LazyDashboardView = lazy(() => import('@/components/hud/DashboardView'))
 
 function DashboardRoute() {
   return (
-    <Suspense fallback={<HudWorkspaceGhost />}>
+    <Suspense fallback={<DashboardGhost />}>
       <LazyDashboardView />
     </Suspense>
   )
@@ -18,11 +18,11 @@ export const Route = createFileRoute('/_hud/dashboard')({
   head: () => ({
     meta: [
       ...privatePageSeo({
-        title: 'Central HUD | Moltology',
-        description: 'Initiate telemetry, daily alignment, and benthic workspace for authenticated units.',
+        title: 'Dashboard | Moltology',
+        description: 'Your day in Moltology: liturgies, streak, community and what is new.',
       }),
     ],
   }),
   component: DashboardRoute,
-  pendingComponent: HudWorkspaceGhost,
+  pendingComponent: DashboardGhost,
 })

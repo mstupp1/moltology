@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
-import { Calendar, CheckSquare, Square, Flame, TrendingUp, BarChart3, CheckCircle2, Bell, BellOff } from 'lucide-react'
+import { Calendar, CheckSquare, Square, TrendingUp, BarChart3, CheckCircle2, Bell, BellOff } from 'lucide-react'
 import { HudCard, HudBadge } from '@/components/ui'
 import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
@@ -362,7 +362,6 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
     tasks,
     completedCount,
     totalCount,
-    streakDays,
     streakHistory,
     history,
     currentDate,
@@ -388,7 +387,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
       <HudCard
         id={DAILY_ALIGNMENT_HUB_ID}
         variant="teal"
-        className="p-3 sm:p-4 md:p-6 relative space-y-4 sm:space-y-5 font-sans min-w-0 overflow-hidden"
+        className="p-4 lg:p-5 relative space-y-4 font-sans min-w-0 overflow-hidden"
       >
         {/* Main Header Banner */}
         <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-line-subtle pb-3 sm:pb-4 gap-3 sm:gap-4">
@@ -400,25 +399,18 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
             className="space-y-1 min-w-0 text-left group cursor-pointer bg-transparent border-0 p-0 touch-manipulation rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             <div className="flex flex-wrap items-center gap-2">
-              <Calendar className="w-5 h-5 text-cyan-glow shrink-0" />
-              <h2 className="font-grotesk text-sm sm:text-base md:text-lg font-bold tracking-wider text-ink group-hover:text-cyan-glow transition-colors uppercase leading-tight">
-                DAILY ALIGNMENT ROUTINE
+              <Calendar className="w-4 h-4 text-cyan-glow shrink-0" />
+              <h2 className="font-grotesk text-sm font-bold tracking-[0.08em] text-ink group-hover:text-cyan-glow transition-colors uppercase leading-tight">
+                DAILY ALIGNMENT
               </h2>
-              <HudBadge variant="cyan" className="text-[11px] shrink-0">
-                MANDATORY LITURGY
-              </HudBadge>
             </div>
             <p className="text-xs text-ink-body leading-relaxed">
-              Complete your 8 scheduled alignment items daily to maintain carapace density and preserve your active streak.
+              Eight liturgies a day keep the shell hard and the streak alive.
             </p>
           </button>
 
           {/* Stats Summary Badges */}
           <div className="flex flex-wrap items-center gap-2 text-xs shrink-0">
-            <HudBadge variant="crimson" dot pulse className="px-2.5 sm:px-3 py-1.5 font-bold">
-              <Flame className="w-4 h-4 text-crimson-text fill-crimson-aggro inline mr-1.5" />
-              {streakDays} DAY STREAK
-            </HudBadge>
             <HudBadge variant={completedCount === totalCount ? 'emerald' : 'cyan'} className="px-2.5 sm:px-3 py-1.5 font-bold">
               <CheckCircle2 className="w-3.5 h-3.5 inline mr-1" />
               {completedCount}/{totalCount} COMPLETE
@@ -456,7 +448,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                   type="button"
                   onClick={() => toggleTask(task.key || task.id)}
                   aria-pressed={task.completed}
-                  className={`w-full min-h-[44px] px-2.5 py-2.5 sm:p-3 border transition-all cursor-pointer flex items-center gap-2.5 sm:gap-3 rounded-control group text-left touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                  className={`w-full min-h-[44px] px-2.5 py-2 sm:px-3 border transition-all cursor-pointer flex items-center gap-2.5 sm:gap-3 rounded-control group text-left touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                     task.completed
                       ? 'bg-abyss/60 border-line-subtle text-ink-muted hover:border-line'
                       : 'bg-surface-1 hud-sheen border-line text-ink hover:border-line-strong hover:bg-surface-2'
@@ -467,11 +459,11 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                   ) : (
                     <Square className="w-5 h-5 text-ink-muted shrink-0 group-hover:text-cyan-glow" />
                   )}
-                  <div className="min-w-0 flex-1 space-y-0.5">
-                    <span className="text-[11px] font-bold text-cyan-glow bg-cyan-soft px-1.5 py-0.5 border border-line-subtle rounded-chip inline-block">
+                  <div className="min-w-0 flex-1 flex items-center gap-2.5">
+                    <span className="w-20 shrink-0 text-[11px] font-bold tabular-nums text-cyan-glow">
                       {task.time}
                     </span>
-                    <span className={`text-xs font-bold block whitespace-normal ${task.completed ? 'line-through opacity-75 text-ink-muted' : 'text-ink'}`}>
+                    <span className={`min-w-0 text-xs font-bold whitespace-normal ${task.completed ? 'line-through opacity-75 text-ink-muted' : 'text-ink'}`}>
                       {task.title}
                     </span>
                   </div>
@@ -488,11 +480,10 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                 <div className="flex items-center gap-2 min-w-0">
                   <BarChart3 className="w-4 h-4 text-cyan-glow shrink-0" />
                   <span className="text-xs font-bold font-grotesk text-ink uppercase tracking-[0.08em]">
-                    STREAK MATRIX
+                    LAST 7 DAYS
                   </span>
                 </div>
-                <span className="text-[11px] text-cyan-glow font-bold shrink-0">14-DAY RECORD</span>
-              </div>
+                              </div>
 
               {/* Streak Bar Graph */}
               <div className="space-y-2 pt-1">

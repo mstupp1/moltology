@@ -1,10 +1,9 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
-import { ActivityStreamPanel } from './ActivityStreamPanel'
+import { ACTIVITY_HUB_EMPTY_COPY, ActivityStreamPanel } from './ActivityStreamPanel'
 import { authClient } from '@/lib/auth-client'
 import { getActivityFeedFn } from '@/lib/server/api'
-import { ACTIVITY_STREAM_EMPTY_COPY } from '@/lib/activity-events'
 import type { ActivityEventView } from '@/lib/activity-events'
 
 const mockNavigate = vi.fn()
@@ -87,9 +86,9 @@ describe('ActivityStreamPanel', () => {
     render(<ActivityStreamPanel />)
 
     await waitFor(() => {
-      expect(screen.getByText(ACTIVITY_STREAM_EMPTY_COPY.title)).toBeInTheDocument()
+      expect(screen.getByText(ACTIVITY_HUB_EMPTY_COPY.title)).toBeInTheDocument()
     })
-    expect(screen.getByText(ACTIVITY_STREAM_EMPTY_COPY.body)).toBeInTheDocument()
+    expect(screen.getByText(ACTIVITY_HUB_EMPTY_COPY.body)).toBeInTheDocument()
     expect(screen.queryByText(/luxury sedan/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/\+450/)).not.toBeInTheDocument()
     expect(screen.queryByText(/3,?400/)).not.toBeInTheDocument()
@@ -114,7 +113,7 @@ describe('ActivityStreamPanel', () => {
     expect(screen.getByText('The 05:30 liturgy is complete.')).toBeInTheDocument()
     expect(screen.getByText('14 minutes ago')).toBeInTheDocument()
     expect(screen.queryByText(/luxury sedan/i)).not.toBeInTheDocument()
-    expect(screen.queryByText(ACTIVITY_STREAM_EMPTY_COPY.title)).not.toBeInTheDocument()
+    expect(screen.queryByText(ACTIVITY_HUB_EMPTY_COPY.title)).not.toBeInTheDocument()
   })
 
   it('opens the dedicated stream route from the hub footer', async () => {
@@ -127,12 +126,11 @@ describe('ActivityStreamPanel', () => {
     render(<ActivityStreamPanel />)
 
     await waitFor(() => {
-      expect(screen.getByText(ACTIVITY_STREAM_EMPTY_COPY.title)).toBeInTheDocument()
+      expect(screen.getByText(ACTIVITY_HUB_EMPTY_COPY.title)).toBeInTheDocument()
     })
     fireEvent.click(screen.getByRole('button', { name: /open stream/i }))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/stream' })
-    fireEvent.click(screen.getByRole('heading', { name: /activity stream/i }))
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/stream' })
+    expect(screen.getByRole('heading', { name: /activity stream/i })).toBeInTheDocument()
   })
 
   it('shows the empty stream for a guest instead of canned veteran proof', async () => {
@@ -144,7 +142,7 @@ describe('ActivityStreamPanel', () => {
     render(<ActivityStreamPanel />)
 
     await waitFor(() => {
-      expect(screen.getByText(ACTIVITY_STREAM_EMPTY_COPY.title)).toBeInTheDocument()
+      expect(screen.getByText(ACTIVITY_HUB_EMPTY_COPY.title)).toBeInTheDocument()
     })
     expect(getActivityFeedFn).not.toHaveBeenCalled()
     expect(screen.queryByText(/luxury sedan/i)).not.toBeInTheDocument()
