@@ -26,6 +26,7 @@ import { requireMerchDevDatabase } from './merch/database'
 import { merchDoctor } from './merch/doctor'
 import { generatePrintfulMockups } from './merch/mockups'
 import { generateOfficialGallery } from './merch/gallery'
+import { isCuratedMerchImage } from '../src/lib/merch-gallery'
 import { PrintfulClient, buildSyncProductPayload, ensureSyncProduct, validateSyncProduct, unsyncedVariants, type SyncFile } from './merch/printful-sync'
 
 const OUT = path.resolve('tmp/merch')
@@ -43,7 +44,7 @@ function flag(name: string): string | undefined {
 
 /** Mockup images a product needs: its featured image plus gallery, by bucket key. */
 export function mockupJobs(product: MerchSeedProduct) {
-  const keys = [...new Set([product.featuredImageUrl, ...product.galleryImageUrls])]
+  const keys = [...new Set([product.featuredImageUrl, ...product.galleryImageUrls])].filter(key => !isCuratedMerchImage(key))
   return keys.map((key, index) => {
     const variant =
       product.variants.find((item) => item.imageUrl === key) ?? product.variants[0]

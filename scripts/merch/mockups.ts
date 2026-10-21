@@ -5,6 +5,7 @@ import { getAbsoluteAssetUrl } from '../../src/lib/assets'
 import { MERCH_PRINT_PREFIX, type MerchSeedProduct } from '../../src/lib/merch-seed-data'
 import { PrintfulClient, type MockupTask } from './printful-sync'
 import { variantTemplate } from './templates'
+import { productAssetKeys } from './selection'
 
 /** Only completed provider tasks may produce website photos. */
 export function requireCompletedMockups(task: MockupTask) {
@@ -51,7 +52,7 @@ export async function generatePrintfulMockups(client: PrintfulClient, products: 
       }
       results.push(...requireCompletedMockups(task))
     }
-    const keys = [...new Set([product.featuredImageUrl, ...product.galleryImageUrls, ...product.variants.map(variant => variant.imageUrl).filter((key): key is string => Boolean(key))])]
+    const keys = productAssetKeys([product]).mockups
     for (const [index, key] of keys.entries()) {
       const variant = product.variants.find(item => item.imageUrl === key) ?? product.variants[Math.min(index, product.variants.length - 1)]
       const blank = variantTemplate(product, variant, blanks.variants, info).blank

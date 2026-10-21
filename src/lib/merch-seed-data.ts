@@ -8,6 +8,7 @@
  * placeholders below. See docs/merch-launch.md.
  */
 import printfulSync from '../../content/merch/printful-sync.json'
+import { MERCH_PRODUCT_GALLERIES } from './merch-gallery'
 
 export type MerchPrintPlacement = 'default' | 'front'
 
@@ -282,7 +283,11 @@ export function isPlaceholderSyncId(id: number): boolean {
 }
 
 export const INITIAL_MERCH_PRODUCTS: MerchSeedProduct[] = withPrintfulSync(
-  BASE_CATALOG.map(product => RETIRED_MERCH_SLUGS.includes(product.slug) ? { ...product, isPublished: false } : product),
+  BASE_CATALOG.map(product => ({
+    ...product,
+    galleryImageUrls: [...new Set([product.featuredImageUrl, ...product.galleryImageUrls, ...(MERCH_PRODUCT_GALLERIES[product.slug] ?? [])])],
+    isPublished: product.isPublished && !RETIRED_MERCH_SLUGS.includes(product.slug),
+  })),
 )
 
 /** The catalog in the shape the store pages read. Used by preview mode. */

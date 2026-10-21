@@ -81,5 +81,14 @@ Update catalog/gallery data only within the user's authorized scope; production
 listing changes remain separate from image production. Preserve existing product,
 variant, design, payment and fulfillment identities.
 
+Published supplementary selections live in `src/lib/merch-gallery.ts` and are merged
+into the canonical seed catalog. Keep this registry aligned with production gallery
+data. Normal `mockups`, placeholder rendering and catalog uploads exclude these
+curated assets so regenerating primary photos cannot overwrite lifestyle shots.
+The product detail view captions generated images and the official reference sizes.
+After an authorized release, update only the selected products' gallery fields,
+save the prior values, and read back the new galleries; do not run a broad seed
+that would overwrite unrelated authored catalog fields.
+
 Commit scripts, skill updates and the completed ledger, verify final Git status,
 and report saved previews, asset keys and whether listings were actually changed.
