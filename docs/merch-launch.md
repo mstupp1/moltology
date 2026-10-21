@@ -4,6 +4,33 @@ The native store (`/store`) remains private behind the admin-only `new-store` ex
 browsing, indexing, live charges and automatic production are separately gated. Other visitors keep
 the Etsy link. Creation and operations use the [merch-manager skill](../.agents/skills/merch-manager/SKILL.md).
 
+## Production catalog update — October 21, 2026
+
+With explicit owner authorization, promoted `moltology-mug-v2` and `moltology-tee-v2`
+to production `main` in Neon project `soft-poetry-99961537` (endpoint
+`ep-cold-breeze-aye6s748`). Production previously contained seven published demo products,
+all with placeholder fulfillment IDs; neither approved product was present. The approved
+artwork had only been seeded into dev, so deploying the code did not update production data.
+
+The approved pair is now published with two mug variants and five tee variants. The seven
+placeholder-only demo listings were unpublished, preserving their product and variant records.
+Store settings and availability overrides were compared before and after and remained unchanged.
+This update did not change public access, checkout authorization, or fulfillment mode.
+Read-back verification matched every authored product field and all seven variant mappings,
+prices, and availability states to the approved catalog; all three deployed WebP photos
+returned HTTP 200.
+
+The local `PROD_DATABASE_URL` was an HTTPS Neon Auth URL, not a PostgreSQL connection string.
+Vercel's production `DATABASE_URL` is sensitive and cannot be retrieved through its environment
+API. The existing Neon CLI login supplied the verified `main` connection directly in process
+memory; no database credential was printed, saved, or changed in Vercel or local `.env`.
+
+Post-promotion diagnostics with the local dev configuration verified the Manual/API Printful
+store, catalog mappings, schema, and a live STANDARD/USD shipping quote. Local webhook,
+email/status, deployed callback/recovery, and approved-policy setup remain incomplete; these
+dev diagnostics do not establish production checkout readiness. Recovery snapshots and
+verification runners are preserved under ignored `tmp/merch/diagnosis/`.
+
 ## Approved artwork revision — October 19, 2026
 
 The active `--pilot` pair is now `moltology-mug-v2` and `moltology-tee-v2` (catalog IDs 10 and
