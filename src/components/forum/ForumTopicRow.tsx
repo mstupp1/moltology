@@ -1,4 +1,5 @@
 import React from 'react'
+import { LocalTime } from '@/components/ui/LocalTime'
 import { Link } from '@tanstack/react-router'
 import { MessageSquare, Eye } from 'lucide-react'
 import type { ForumTopicEntry } from '@/lib/server/api'
@@ -101,7 +102,7 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
             )}
             <StageBadge stage={topic.authorStage} />
           </span>
-          <span>{relativeTime(topic.createdAt)}</span>
+          <LocalTime value={topic.createdAt} format={relativeTime} />
 
           <span className="ml-auto flex items-center gap-3 tabular-nums">
             <span className="flex items-center gap-1" title={`${topic.repliesCount} replies`}>

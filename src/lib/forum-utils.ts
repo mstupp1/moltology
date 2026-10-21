@@ -3,6 +3,7 @@
  */
 
 import { forumMarkdownPlainText } from './forum-markdown'
+import { formatDay, type DateInput } from './dates'
 
 /** Sibling order within a threaded reply tree. */
 export type ForumReplySort = 'oldest' | 'newest' | 'top'
@@ -250,9 +251,11 @@ export function toForumIso(value: string | Date | null | undefined): string | nu
 }
 
 /**
- * Formats an ISO timestamp as a short relative time string ("3h ago", "2d ago").
+ * Formats a timestamp as a short relative time string ("3h ago", "2d ago").
+ * Older dates fall back to a calendar day in `timeZone` (browser zone when unset).
+ * Render it through `<LocalTime format={relativeTime}>` so hydration matches the server.
  */
-export function relativeTime(iso: string): string {
+export function relativeTime(iso: DateInput, timeZone?: string): string {
   const then = new Date(iso).getTime()
   if (Number.isNaN(then)) return ''
   const diffSec = Math.floor((Date.now() - then) / 1000)
@@ -265,5 +268,5 @@ export function relativeTime(iso: string): string {
   if (diffDay < 7) return `${diffDay}d ago`
   const diffWk = Math.floor(diffDay / 7)
   if (diffWk < 5) return `${diffWk}w ago`
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  return formatDay(iso, timeZone)
 }

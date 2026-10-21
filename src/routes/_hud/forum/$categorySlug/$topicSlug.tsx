@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
+import { LocalTime } from '@/components/ui/LocalTime'
+import { formatDayTime } from '@/lib/dates'
 import { forumVisibleLength } from '@/lib/forum-markdown'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import {
@@ -369,7 +371,7 @@ function ForumThreadPage() {
 
                 <div className="text-[11px] text-ink-muted flex items-center gap-1">
                   <Clock className="w-3 h-3 text-ink-muted/60" />
-                  <span>{relativeTime(topic.createdAt)}</span>
+                  <LocalTime value={topic.createdAt} format={relativeTime} />
                   <ForumRevisedMark
                     createdAt={topic.createdAt}
                     updatedAt={topic.updatedAt}
@@ -456,9 +458,9 @@ function ForumThreadPage() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11px] text-ink-muted mt-0.5">
-                      <span className="flex items-center gap-1" title={new Date(topic.createdAt).toLocaleString()}>
+                      <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3 text-ink-muted/60" />
-                        <span>{relativeTime(topic.createdAt)}</span>
+                        <LocalTime value={topic.createdAt} format={relativeTime} titleFormat={formatDayTime} />
                       </span>
                       <span className="text-ink-muted/60">·</span>
                       <span className="flex items-center gap-1">

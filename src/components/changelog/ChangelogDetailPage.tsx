@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react'
+import { LocalTime } from '@/components/ui/LocalTime'
 import { useNavigate, Link, useLoaderData } from '@tanstack/react-router'
 import {
   ArrowLeft,
@@ -86,14 +87,6 @@ export function ChangelogDetailPage() {
       }
     }
   }
-
-  const formattedDate = entry.releasedAt
-    ? new Date(entry.releasedAt).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      })
-    : 'AUG 2026'
 
   const getCategoryBadgeClass = (category: string) => {
     switch (category?.toLowerCase()) {
@@ -203,7 +196,7 @@ export function ChangelogDetailPage() {
               ))}
               <span className="flex items-center gap-1.5 text-gray-400 text-xs">
                 <Calendar className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                {formattedDate}
+                {entry.releasedAt ? <LocalTime value={entry.releasedAt} /> : 'AUG 2026'}
               </span>
             </div>
 

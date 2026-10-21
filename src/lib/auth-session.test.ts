@@ -181,13 +181,14 @@ describe('resolveAuthSession', () => {
     expect(state.isGuest).toBe(false)
   })
 
-  it('still reveals a signed-in user during the hydration frame so member chrome can paint', () => {
+  it('holds pending chrome during the hydration frame even when the hook already has a user', () => {
+    setCachedUser({ id: 'usr_ready', name: 'Initiate' })
     const state = resolveAuthSession(
-      { data: { user: { id: 'usr_ready' } }, isPending: true },
+      { data: { user: { id: 'usr_ready' } }, isPending: false },
       { clientReady: false },
     )
-    expect(state.isAuthenticated).toBe(true)
-    expect(state.isPending).toBe(false)
+    expect(state.isPending).toBe(true)
+    expect(state.isAuthenticated).toBe(false)
     expect(state.isGuest).toBe(false)
   })
 

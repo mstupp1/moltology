@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { LocalTime } from '@/components/ui/LocalTime'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Users, Shield, Calendar } from 'lucide-react'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
@@ -129,11 +130,6 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
     )
   }
 
-  const memberSinceLabel = new Date(profile.memberSince).toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
 
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans relative">
@@ -164,7 +160,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
             )}
             <p className="text-xs text-ink-muted flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" />
-              Member since {memberSinceLabel}
+              Member since <LocalTime value={profile.memberSince} />
             </p>
             {profile.bio && (
               <p className="text-sm text-ink-body leading-relaxed">{profile.bio}</p>

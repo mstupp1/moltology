@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
+import { LocalTime } from '@/components/ui/LocalTime'
 import { Link } from '@tanstack/react-router'
 import { History, RotateCcw, ShieldAlert, ShieldCheck, Trash2 } from 'lucide-react'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
@@ -293,9 +294,13 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
                       ) : null}
                     </div>
                     <span className="text-[11px] text-ink-muted">
-                      {activeTab === 'resolved'
-                        ? `Resolved ${relativeTime(row.updatedAt || row.createdAt)}`
-                        : relativeTime(row.createdAt)}
+                      {activeTab === 'resolved' ? (
+                        <>
+                          Resolved <LocalTime value={row.updatedAt || row.createdAt} format={relativeTime} />
+                        </>
+                      ) : (
+                        <LocalTime value={row.createdAt} format={relativeTime} />
+                      )}
                     </span>
                   </div>
 

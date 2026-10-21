@@ -332,6 +332,10 @@ export function resolveAuthSession(
   const sessionError = readSessionError(sessionRes)
   const refetching = isSessionRefetching(sessionRes)
 
+  // The server always renders pending chrome (it has no session). The hydration
+  // pass must match it exactly, or React throws #418 and redraws the page.
+  if (options?.clientReady === false) return pendingState()
+
   if (signOutInFlight) {
     clearCachedUser()
     if (!userId && hookPending === false) {

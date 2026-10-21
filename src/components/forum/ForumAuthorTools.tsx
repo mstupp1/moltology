@@ -1,4 +1,5 @@
 import React from 'react'
+import { LocalTime } from '@/components/ui/LocalTime'
 import { Pencil, Undo2 } from 'lucide-react'
 import { FORUM_WITHDRAWN_BODY, isForumEntryRevised, relativeTime } from '@/lib/forum-utils'
 
@@ -28,7 +29,7 @@ export function ForumRevisedMark({
   if (!isForumEntryRevised({ createdAt, updatedAt, deletedAt }) || !updatedAt) return null
   return (
     <span className="text-[11px] text-ink-muted" data-testid="forum-revised-mark">
-      Revised {relativeTime(updatedAt)}
+      Revised <LocalTime value={updatedAt} format={relativeTime} />
     </span>
   )
 }
