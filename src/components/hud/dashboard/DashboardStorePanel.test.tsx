@@ -37,12 +37,12 @@ describe('DashboardStorePanel', () => {
   })
 
   it('uses separate transparent dashboard images without changing catalog photos', async () => {
-    vi.mocked(getMerchCatalogFn).mockResolvedValue(catalog.filter(product => ['moltology-mug-v2', 'moltology-tee-v2'].includes(product.slug)) as never)
+    vi.mocked(getMerchCatalogFn).mockResolvedValue(catalog.filter(product => ['moltology-mug', 'moltology-tee'].includes(product.slug)) as never)
     render(<DashboardStorePanel />)
     await screen.findByTestId('dashboard-store')
     expect(screen.getByAltText('White Moltology mug with red emblem')).toHaveAttribute('src', '/media/images/merch/dashboard/2026-10-21/moltology-mug-v2.webp')
     expect(screen.getByAltText('Black Moltology tee, front')).toHaveAttribute('src', '/media/images/merch/dashboard/2026-10-21/moltology-tee-v2.webp')
-    expect(catalog.find(product => product.slug === 'moltology-mug-v2')?.featuredImageUrl).toBe('images/merch/moltology-mug-v2-1.jpg')
+    expect(catalog.find(product => product.slug === 'moltology-mug')?.featuredImageUrl).toBe('images/merch/moltology-mug-v2-1.jpg')
   })
 
   it('stays hidden when the store is not open to this member', async () => {

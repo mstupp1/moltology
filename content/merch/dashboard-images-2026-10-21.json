@@ -11,7 +11,7 @@
   "transparentBackground": true,
   "assets": [
     {
-      "slug": "moltology-mug-v2",
+      "slug": "moltology-mug",
       "sourceKey": "images/merch/moltology-mug-v2-1.jpg",
       "localOutput": "tmp/merch/dashboard/moltology-mug-v2.png",
       "key": "images/merch/dashboard/2026-10-21/moltology-mug-v2.png",
@@ -47,7 +47,7 @@
       }
     },
     {
-      "slug": "moltology-tee-v2",
+      "slug": "moltology-tee",
       "sourceKey": "images/merch/moltology-tee-v2-black.jpg",
       "localOutput": "tmp/merch/dashboard/moltology-tee-v2.png",
       "key": "images/merch/dashboard/2026-10-21/moltology-tee-v2.png",
@@ -116,5 +116,8 @@
     "status": "clean",
     "workingBase": "e622004",
     "baseUpdate": "Fast-forwarded clean detached worktree to existing origin/main to include DashboardStorePanel."
-  }
+  },
+  "releaseNotes": [
+    "Dashboard mapping follows the plain product slugs merged in PR #273; legacy DB slugs resolve to the same images."
+  ]
 }
