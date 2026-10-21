@@ -50,6 +50,10 @@ vi.mock('@/lib/server/api', () => ({
   ]),
 }))
 
+vi.mock('@/components/admin/AdminShopOrders', () => ({
+  AdminShopOrders: () => <div data-testid="admin-shop">Shop orders</div>,
+}))
+
 describe('Admin access and oversight hub', () => {
   beforeEach(() => {
     access.canView = false
@@ -81,11 +85,13 @@ describe('Admin access and oversight hub', () => {
       expect(screen.getByText('Healthy')).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByTestId('admin-tab-sectors'))
+    // Tools sit above the tabs, so they show alongside whichever tab is open.
+    expect(screen.queryByTestId('admin-tab-sectors')).not.toBeInTheDocument()
     expect(screen.getByTestId('admin-sectors')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Composite Studio/i })).toHaveAttribute('href', '/render/composite')
     expect(screen.getByRole('link', { name: /Logic Atlas/i })).toHaveAttribute('href', '/admin/logic')
-    expect(screen.queryByTestId('covenant-watch')).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Store settings/i })).toHaveAttribute('href', '/admin/store')
+    expect(screen.getByRole('link', { name: /Storefront/i })).toHaveAttribute('href', '/store')
   })
 
   it('switches an experiment on for the signed-in admin', async () => {
@@ -100,5 +106,13 @@ describe('Admin access and oversight hub', () => {
     expect(api.setExperimentFn).toHaveBeenCalledWith({
       data: { userId: 'staff-1', token: 'token', id: 'avatar-kit', on: true },
     })
+  })
+
+  it('opens the Shop tab with orders above Premium members', async () => {
+    access.canView = true
+    render(<AdminOversightHub initialTab="shop" />)
+    expect(screen.getByTestId('admin-tab-shop')).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByTestId('admin-shop')).toBeInTheDocument()
+    expect(await screen.findByTestId('admin-purchases-empty')).toHaveTextContent('No Premium purchases')
   })
 })

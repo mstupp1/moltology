@@ -173,9 +173,11 @@ verified without accepting unrelated drift.
 
 ## October 20 readiness implementation
 
-`/admin/store` uses verified server-side staff authorization. It provides order search/detail,
-independent payment/fulfillment states, saved quote/address/items/totals, provider links, retry,
-status reconciliation, publication/per-size overrides, checkout pause, country allowlist,
+Admin pages use verified server-side staff authorization. Orders live in the Shop tab of
+`/admin` (`/admin?tab=shop`): a needs-attention/paid/all list with test orders opt-in, search,
+plain-English payment and shipping states, saved address/items/totals, tracking, provider links,
+retry and Printful refresh. Refunds and cancellations stay in the Stripe and Printful dashboards.
+`/admin/store` holds the settings: publication/per-size overrides, checkout pause, country allowlist,
 production mode, policy inputs, health indicators, pending mail and audit history. Operational
 settings and overrides are separate from authored catalog tables; a seed cannot erase a pause.
 

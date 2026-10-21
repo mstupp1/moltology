@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { Link } from '@tanstack/react-router'
-import { Activity, Boxes, Eye, FlaskConical, ShieldCheck, Users } from 'lucide-react'
+import { ChevronRight, Eye, FlaskConical, ShieldCheck, ShoppingBag, Users } from 'lucide-react'
+import { AdminShopOrders } from '@/components/admin/AdminShopOrders'
 import { CovenantWatchPage } from '@/components/forum/CovenantWatchPage'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
@@ -21,13 +22,12 @@ import {
   type ExperimentRow,
 } from '@/lib/server/api'
 
-type AdminTab = 'watch' | 'sectors' | 'members' | 'purchases' | 'experiments'
+export type AdminTab = 'watch' | 'members' | 'shop' | 'experiments'
 
 const TABS: { id: AdminTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'watch', label: 'Covenant Watch', icon: Eye },
-  { id: 'sectors', label: 'Sectors', icon: Boxes },
   { id: 'members', label: 'Members', icon: Users },
-  { id: 'purchases', label: 'Purchases', icon: Activity },
+  { id: 'shop', label: 'Shop', icon: ShoppingBag },
   { id: 'experiments', label: 'Experiments', icon: FlaskConical },
 ]
 
@@ -56,9 +56,9 @@ async function authData(userId: string) {
   return { userId, token: token ?? undefined }
 }
 
-export function AdminOversightHub() {
+export function AdminOversightHub({ initialTab = 'watch' }: { initialTab?: AdminTab }) {
   const session = useAuthSession()
-  const [tab, setTab] = useState<AdminTab>('watch')
+  const [tab, setTab] = useState<AdminTab>(initialTab)
   const [telemetry, setTelemetry] = useState<AdminTelemetry | null>(null)
   const [telemetryError, setTelemetryError] = useState<string | null>(null)
 
@@ -84,7 +84,7 @@ export function AdminOversightHub() {
         accent="cyan"
         eyebrow="Steward oversight"
         title="Admin"
-        description="Moderation, member clearance, purchases, and system status for staff."
+        description="Moderation, member clearance, shop orders, and system status for staff."
       />
 
       <section
@@ -105,6 +105,8 @@ export function AdminOversightHub() {
           {telemetryError}
         </p>
       ) : null}
+
+      <SectorDirectory />
 
       <div className="flex flex-wrap gap-2" role="tablist" aria-label="Admin sections">
         {TABS.map((item) => {
@@ -132,11 +134,15 @@ export function AdminOversightHub() {
       </div>
 
       {tab === 'watch' ? <CovenantWatchPage onChanged={() => void loadTelemetry()} /> : null}
-      {tab === 'sectors' ? <SectorDirectory /> : null}
       {tab === 'members' ? (
         <MemberDirectory userId={session.userId} onChanged={() => void loadTelemetry()} />
       ) : null}
-      {tab === 'purchases' ? <PurchaseLedger userId={session.userId} /> : null}
+      {tab === 'shop' ? (
+        <>
+          <AdminShopOrders />
+          <PurchaseLedger userId={session.userId} />
+        </>
+      ) : null}
       {tab === 'experiments' ? <ExperimentSwitches userId={session.userId} /> : null}
     </div>
   )
@@ -162,39 +168,35 @@ function StatusCard({
 }
 
 const SECTORS = [
-  { title: 'Store operations', detail: 'Payments, draft fulfillment, catalog availability, and shipping.', to: '/admin/store' as const },
-  {
-    title: 'Logic Atlas',
-    detail: 'Map of business rules, where they live in code, and the decisions behind them.',
-    to: '/admin/logic' as const,
-  },
-  {
-    title: 'Premium',
-    detail: 'Membership tools for this account.',
-    to: '/premium' as const,
-  },
-  {
-    title: 'Composite Studio',
-    detail: 'Preview layouts. Headless capture still runs from the project scripts.',
-    to: '/render/composite' as const,
-  },
+  { title: 'Store settings', detail: 'Checkout, policies, catalog', to: '/admin/store' as const },
+  { title: 'Storefront', detail: 'The shop as members see it', to: '/store' as const },
+  { title: 'Logic Atlas', detail: 'Business rules and where they live', to: '/admin/logic' as const },
+  { title: 'Premium', detail: 'Membership tools for this account', to: '/premium' as const },
+  { title: 'Composite Studio', detail: 'Preview render layouts', to: '/render/composite' as const },
 ]
 
 function SectorDirectory() {
   const premiumAccess = useHiddenPageAccess('premium')
   return (
-    <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2.5" data-testid="admin-sectors">
-      {SECTORS.filter((sector) => sector.to !== '/premium' || (!premiumAccess.pending && premiumAccess.canView)).map((sector) => (
-        <Link
-          key={sector.to}
-          to={sector.to}
-          className="hud-sheen rounded-card border border-line-subtle bg-surface-1 p-4 transition-colors hover:border-line-strong hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-        >
-          <h2 className="font-grotesk text-sm font-bold uppercase tracking-[0.08em] text-ink">{sector.title}</h2>
-          <p className="mt-1.5 text-xs leading-relaxed text-ink-muted">{sector.detail}</p>
-        </Link>
-      ))}
-    </section>
+    <nav aria-label="Admin tools" data-testid="admin-sectors">
+      <p className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">Tools</p>
+      <ul className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2">
+        {SECTORS.filter((sector) => sector.to !== '/premium' || (!premiumAccess.pending && premiumAccess.canView)).map((sector) => (
+          <li key={sector.to}>
+            <Link
+              to={sector.to}
+              className="flex h-full items-center justify-between gap-2 rounded-control border border-line-subtle bg-surface-1 px-3 py-2 transition-colors hover:border-line-strong hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            >
+              <span className="min-w-0">
+                <span className="block text-xs font-bold text-ink">{sector.title}</span>
+                <span className="block truncate text-[11px] text-ink-muted">{sector.detail}</span>
+              </span>
+              <ChevronRight className="h-3.5 w-3.5 shrink-0 text-ink-muted" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
   )
 }
 
@@ -379,7 +381,7 @@ function PurchaseLedger({ userId }: { userId: string | null }) {
     <section className="hud-sheen rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 md:p-5 space-y-3" data-testid="admin-purchases">
       <div className="flex items-center gap-2">
         <ShieldCheck className="w-4 h-4 text-amber-400" />
-        <h2 className="font-grotesk text-sm font-bold uppercase tracking-[0.08em] text-ink">Purchases</h2>
+        <h2 className="font-grotesk text-sm font-bold uppercase tracking-[0.08em] text-ink">Premium members</h2>
       </div>
       <p className="text-xs text-ink-muted">
         Premium status and currency balances. This view does not change billing.
@@ -387,7 +389,7 @@ function PurchaseLedger({ userId }: { userId: string | null }) {
       {error ? <p className="text-xs text-crimson-text">{error}</p> : null}
       {rows && rows.length === 0 && !error ? (
         <p className="text-xs text-ink-muted" data-testid="admin-purchases-empty">
-          No premium or Stripe purchases are on file.
+          No Premium purchases are on file.
         </p>
       ) : null}
       {rows && rows.length > 0 ? (
