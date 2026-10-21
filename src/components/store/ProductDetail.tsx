@@ -18,7 +18,7 @@ import { getMerchCatalogFn, getMerchProductBySlugFn } from '@/lib/server/merch-a
 import { StorePolicies } from './StorePolicies'
 import { MerchImage } from './MerchImage'
 import { useMerchCart } from './MerchCartProvider'
-import { merchGalleryCaption } from '@/lib/merch-gallery'
+import { merchGalleryAlt, merchGalleryCaption } from '@/lib/merch-gallery'
 
 const FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 
@@ -102,6 +102,7 @@ export function ProductDetail({ slug }: { slug: string }) {
   const info = MERCH_CATEGORY_INFO[product.category]
   const gallery = uniqueImages(product)
   const mainImage = activeImage ?? display.imageUrl ?? product.featuredImageUrl
+  const imageCaption = merchGalleryCaption(mainImage) ?? product.title
   const priceLabel = selected ? formatMerchPrice(selected.priceCents) : merchPriceLabel({ basePriceCents: product.basePriceCents, variants: pool })
 
   const chooseColor = (name: string) => {
@@ -142,10 +143,15 @@ export function ProductDetail({ slug }: { slug: string }) {
 
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-14">
         <div className="space-y-3">
-          <div className="aspect-square overflow-hidden rounded-card bg-surface-1">
-            <MerchImage src={mainImage} alt={`${product.title}${display.color ? `, ${display.color}` : ''}`} loading="eager" className="h-full w-full object-contain" />
-          </div>
-          {merchGalleryCaption(mainImage) ? <p className="text-xs text-ink-muted">{merchGalleryCaption(mainImage)}</p> : null}
+          <figure className="space-y-2">
+            <div className="aspect-square overflow-hidden rounded-card bg-surface-1">
+              <MerchImage src={mainImage} alt={merchGalleryAlt(mainImage, product.title)} loading="eager" className="h-full w-full object-contain" />
+            </div>
+            <figcaption className="flex items-center justify-between text-xs text-ink-muted" aria-live="polite">
+              <span>{imageCaption}</span>
+              <span className="tabular-nums">{Math.max(1, gallery.indexOf(mainImage ?? '') + 1)} / {gallery.length}</span>
+            </figcaption>
+          </figure>
           {gallery.length > 1 ? (
             <div className="grid grid-cols-4 gap-3 sm:grid-cols-5">
               {gallery.map((src, index) => (
@@ -153,7 +159,7 @@ export function ProductDetail({ slug }: { slug: string }) {
                   key={src}
                   type="button"
                   onClick={() => setActiveImage(src)}
-                  aria-label={`Show photo ${index + 1}`}
+                  aria-label={`Show ${merchGalleryCaption(src) ?? product.title}, photo ${index + 1}`}
                   aria-pressed={src === mainImage}
                   className={`aspect-square overflow-hidden rounded-control border bg-surface-1 transition-colors ${FOCUS} ${
                     src === mainImage ? 'border-cyan-glow' : 'border-line-subtle hover:border-line-hover'

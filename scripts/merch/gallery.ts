@@ -22,7 +22,7 @@ export async function generateOfficialGallery(client: PrintfulClient, products: 
   for (const product of products) {
     const info = await client.printfiles(product.printful.catalogProductId)
     const blanks = await client.catalogProduct(product.printful.catalogProductId)
-    const selectedGroups = groups ?? (product.category === 'Mugs' ? ['Default'] : ['Flat 2', 'Ghost', 'On Hanger'])
+    const selectedGroups = groups ?? (product.category === 'Mugs' ? ['Default'] : ['Flat 2', 'Ghost'])
     for (const group of selectedGroups) if (!info.option_groups?.includes(group)) throw new Error(`${product.slug}: unavailable mockup group ${group}. Available: ${info.option_groups?.join(' | ')}`)
     const folder = path.join(root, product.slug)
     fs.mkdirSync(folder, { recursive: true })

@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { INITIAL_MERCH_PRODUCTS } from './merch-seed-data'
-import { MERCH_PRODUCT_GALLERIES, merchGalleryCaption } from './merch-gallery'
+import { MERCH_PRODUCT_GALLERIES, MERCH_IMAGE_DESCRIPTIONS, merchGalleryAlt, merchGalleryCaption } from './merch-gallery'
 import { productAssetKeys } from '../../scripts/merch/selection'
 
 describe('reviewed product galleries', () => {
-  it('keeps official primaries first and protects curated media from mockup regeneration/uploads', () => {
-    const products = INITIAL_MERCH_PRODUCTS.filter(product => product.slug in MERCH_PRODUCT_GALLERIES)
+  const products = INITIAL_MERCH_PRODUCTS.filter(product => product.slug in MERCH_PRODUCT_GALLERIES)
+  it('keeps the primary first and protects curated media from regeneration and uploads', () => {
     expect(products).toHaveLength(2)
     for (const product of products) {
       expect(product.galleryImageUrls[0]).toBe(product.featuredImageUrl)
@@ -14,13 +14,24 @@ describe('reviewed product galleries', () => {
     }
     expect(productAssetKeys(products).mockups.some(key => key.includes('/library/'))).toBe(false)
   })
-  it('labels generated shots and actual reference sizes instead of the purchase selection', () => {
-    for (const images of Object.values(MERCH_PRODUCT_GALLERIES)) {
-      for (const key of images) expect(merchGalleryCaption(key)).toBeTruthy()
+  it('describes every gallery and variant image, including the originals, without production jargon', () => {
+    for (const product of products) {
+      const keys = [...product.galleryImageUrls, ...product.variants.map(variant => variant.imageUrl).filter(Boolean)]
+      for (const key of keys) {
+        expect(merchGalleryCaption(key)).toBeTruthy()
+        expect(MERCH_IMAGE_DESCRIPTIONS[key!]?.alt).toBeTruthy()
+        expect(merchGalleryCaption(key)).not.toMatch(/ai|printful|mockup|size M/i)
+      }
     }
-    expect(merchGalleryCaption(MERCH_PRODUCT_GALLERIES['moltology-mug-v2'][4])).toBe('AI-generated lifestyle image.')
-    expect(merchGalleryCaption(MERCH_PRODUCT_GALLERIES['moltology-mug-v2'][2])).toContain('15 oz')
-    expect(merchGalleryCaption(MERCH_PRODUCT_GALLERIES['moltology-tee-v2'][0])).toContain('size M')
-    expect(merchGalleryCaption('images/merch/legacy.jpg')).toBeNull()
+    expect(merchGalleryCaption('images/merch/moltology-mug-v2-1.jpg')).toBe('11 oz mug')
+    expect(merchGalleryCaption('images/merch/moltology-mug-v2-2.jpg')).toBe('15 oz mug')
+    expect(merchGalleryCaption('images/merch/moltology-tee-v2-black.jpg')).toBe('Black tee · front')
+    expect(merchGalleryAlt(null, 'Product')).toBe('Product')
+  })
+  it('keeps three square model images per product and removes redundant tee views', () => {
+    for (const product of products) expect(product.galleryImageUrls.filter(key => key.includes('/square-v2/'))).toHaveLength(3)
+    const tee = products.find(product => product.slug === 'moltology-tee-v2')!
+    expect(tee.galleryImageUrls.some(key => /on-hanger|ghost-1/.test(key))).toBe(false)
+    expect(tee.galleryImageUrls).toHaveLength(6)
   })
 })

@@ -6,7 +6,7 @@
     "seasonalIntensity": "none; durable store imagery",
     "direction": "Contemporary editorial, quiet architectural studios and autumn daylight; no holiday props"
   },
-  "listingStatus": "Published to existing production mug and tee galleries with owner authorization",
+  "listingStatus": "Production gallery selections: 8 mug images and 6 tee images; latest revision is galleryPolish",
   "official": [
     {
       "title": "Primary",
@@ -366,5 +366,234 @@
     "dataVerification": "Gallery-only SQL transaction followed by exact read-back; featured images preserved; no other product/variant/settings fields written",
     "backup": "tmp/merch/gallery-release/before-execute.json",
     "codeValidation": "Typecheck, 18 focused tests and required PR hygiene checks passed; broader core 1210 passed, 15 skipped with unrelated Neon connectivity and Premium env-example failures"
+  },
+  "galleryPolish": {
+    "revision": "square-v2",
+    "brief": "Evergreen editorial; square gallery imagery, three models per product, useful nonredundant product views, plain customer captions",
+    "promptSet": [
+      {
+        "name": "tee-studio",
+        "prompt": "Use case: compositing. Edit the supplied existing fashion product photo into a true SQUARE 1:1 commercial product gallery photograph. Preserve the SAME adult model's identity, face, outfit, setting, lighting, realistic texture, exact product geometry, exact red emblem and all printed typography, placement, scale and material. Recompose to square by extending the background at left and right and framing from the top of the head through waist/upper hips as appropriate. Keep entire head, all visible product artwork, and hands holding product fully in frame. Do not add bars, borders, blank margins, montage or padding; the scene must fill every pixel of the SQUARE. This is the same stylish architectural editorial campaign. Preserve exact readable lettering 'Moltology' and 'THE SYNAPTIC PATH' when visible, and supplied emblem geometry. Product is the focus, anatomically correct hands. No overlay text, no new marks, no watermark. Output one SQUARE image, 1:1 aspect ratio.",
+        "refs": [
+          "/Users/mylesstupp/.codex/worktrees/5578/moltology/tmp/merch/lifestyle/2026-10-21/tee-studio.png"
+        ]
+      },
+      {
+        "name": "tee-terrace",
+        "prompt": "Use case: compositing. Edit the supplied existing fashion product photo into a true SQUARE 1:1 commercial product gallery photograph. Preserve the SAME adult model's identity, face, outfit, setting, lighting, realistic texture, exact product geometry, exact red emblem and all printed typography, placement, scale and material. Recompose to square by extending the background at left and right and framing from the top of the head through waist/upper hips as appropriate. Keep entire head, all visible product artwork, and hands holding product fully in frame. Do not add bars, borders, blank margins, montage or padding; the scene must fill every pixel of the SQUARE. This is the same stylish architectural editorial campaign. Preserve exact readable lettering 'Moltology' and 'THE SYNAPTIC PATH' when visible, and supplied emblem geometry. Product is the focus, anatomically correct hands. No overlay text, no new marks, no watermark. Output one SQUARE image, 1:1 aspect ratio.",
+        "refs": [
+          "/Users/mylesstupp/.codex/worktrees/5578/moltology/tmp/merch/lifestyle/2026-10-21/tee-terrace.png"
+        ]
+      },
+      {
+        "name": "tee-gallery",
+        "prompt": "Use case: compositing. Edit the supplied existing fashion product photo into a true SQUARE 1:1 commercial product gallery photograph. Preserve the SAME adult model's identity, face, outfit, setting, lighting, realistic texture, exact product geometry, exact red emblem and all printed typography, placement, scale and material. Recompose to square by extending the background at left and right and framing from the top of the head through waist/upper hips as appropriate. Keep entire head, all visible product artwork, and hands holding product fully in frame. Do not add bars, borders, blank margins, montage or padding; the scene must fill every pixel of the SQUARE. This is the same stylish architectural editorial campaign. Preserve exact readable lettering 'Moltology' and 'THE SYNAPTIC PATH' when visible, and supplied emblem geometry. Product is the focus, anatomically correct hands. No overlay text, no new marks, no watermark. Output one SQUARE image, 1:1 aspect ratio.",
+        "refs": [
+          "/Users/mylesstupp/.codex/worktrees/5578/moltology/tmp/merch/lifestyle/2026-10-21/tee-gallery.png"
+        ]
+      },
+      {
+        "name": "mug-studio",
+        "prompt": "Use case: compositing. Edit the supplied existing fashion product photo into a true SQUARE 1:1 commercial product gallery photograph. Preserve the SAME adult model's identity, face, outfit, setting, lighting, realistic texture, exact product geometry, exact red emblem and all printed typography, placement, scale and material. Recompose to square by extending the background at left and right and framing from the top of the head through waist/upper hips as appropriate. Keep entire head, all visible product artwork, and hands holding product fully in frame. Do not add bars, borders, blank margins, montage or padding; the scene must fill every pixel of the SQUARE. This is the same stylish architectural editorial campaign. Preserve exact readable lettering 'Moltology' and 'THE SYNAPTIC PATH' when visible, and supplied emblem geometry. Product is the focus, anatomically correct hands. No overlay text, no new marks, no watermark. Output one SQUARE image, 1:1 aspect ratio.",
+        "refs": [
+          "/Users/mylesstupp/.codex/worktrees/5578/moltology/tmp/merch/lifestyle/2026-10-21/mug-studio.png"
+        ]
+      },
+      {
+        "name": "mug-reading",
+        "prompt": "Use case: compositing. Edit the supplied existing fashion product photo into a true SQUARE 1:1 commercial product gallery photograph. Preserve the SAME adult model's identity, face, outfit, setting, lighting, realistic texture, exact product geometry, exact red emblem and all printed typography, placement, scale and material. Recompose to square by extending the background at left and right and framing from the top of the head through waist/upper hips as appropriate. Keep entire head, all visible product artwork, and hands holding product fully in frame. Do not add bars, borders, blank margins, montage or padding; the scene must fill every pixel of the SQUARE. This is the same stylish architectural editorial campaign. Preserve exact readable lettering 'Moltology' and 'THE SYNAPTIC PATH' when visible, and supplied emblem geometry. Product is the focus, anatomically correct hands. No overlay text, no new marks, no watermark. Output one SQUARE image, 1:1 aspect ratio.",
+        "refs": [
+          "/Users/mylesstupp/.codex/worktrees/5578/moltology/tmp/merch/lifestyle/2026-10-21/mug-reading.png"
+        ]
+      },
+      {
+        "name": "mug-gallery",
+        "refs": [
+          "/Users/mylesstupp/.codex/worktrees/5578/moltology/tmp/merch/official-gallery/18931450/moltology-mug-v2/mug-moltology-v2-15oz-default-2.jpg"
+        ],
+        "prompt": "Use case: product-mockup. Create one photorealistic high-end editorial product lifestyle photo, SQUARE 1:1 composition, full-bleed with no borders. The supplied official reference is the exact white glossy 15 oz ceramic mug: preserve its taller 15 oz proportions, white interior and white rounded handle and the red printed emblem shape/scale/placement EXACTLY. Emblem face visible, handle on viewer left; the wordmark is on the opposite hidden side, so show NO printed words on visible face. Stylish adult woman around 32 with medium-brown skin and shoulder-length dark natural curls, wearing a luxurious charcoal cardigan over a slate-blue top, seated at a pale stone table in a warm minimalist gallery cafe. Holding mug naturally by handle at chest level with her right hand on viewer left, fingertips not covering emblem. Frame whole head, shoulders, waist and both hands in a beautiful SQUARE composition. Mug has realistic 15 oz scale relative to hand and face and does not look like a giant vase. Bright soft overcast window light, warm wood details and dark blue-gray architectural elements; sophisticated independent fashion editorial, subtle analog grain, relaxed candid expression looking slightly off camera. No holiday props, no extra graphics, no watermarks. Exact product fidelity is mandatory; never redesign emblem."
+      }
+    ],
+    "assets": [
+      {
+        "name": "tee-studio",
+        "key": "images/merch/library/2026-10-21/square-v2/moltology-tee-v2/tee-studio.jpg",
+        "webpKey": "images/merch/library/2026-10-21/square-v2/moltology-tee-v2/tee-studio.webp",
+        "local": "tmp/merch/lifestyle/2026-10-21/square-v2/tee-studio.jpg",
+        "width": 1600,
+        "height": 1600,
+        "provider": "built-in ImageGen",
+        "generated": true,
+        "referenceSize": "M",
+        "caption": "Black tee",
+        "inspection": "Reviewed square composition, product print and shape, hands and visible lettering against supplied references",
+        "delivery": "Original and WebP twin verified over media URLs"
+      },
+      {
+        "name": "tee-terrace",
+        "key": "images/merch/library/2026-10-21/square-v2/moltology-tee-v2/tee-terrace.jpg",
+        "webpKey": "images/merch/library/2026-10-21/square-v2/moltology-tee-v2/tee-terrace.webp",
+        "local": "tmp/merch/lifestyle/2026-10-21/square-v2/tee-terrace.jpg",
+        "width": 1600,
+        "height": 1600,
+        "provider": "built-in ImageGen",
+        "generated": true,
+        "referenceSize": "M",
+        "caption": "Black tee",
+        "inspection": "Reviewed square composition, product print and shape, hands and visible lettering against supplied references",
+        "delivery": "Original and WebP twin verified over media URLs"
+      },
+      {
+        "name": "tee-gallery",
+        "key": "images/merch/library/2026-10-21/square-v2/moltology-tee-v2/tee-gallery.jpg",
+        "webpKey": "images/merch/library/2026-10-21/square-v2/moltology-tee-v2/tee-gallery.webp",
+        "local": "tmp/merch/lifestyle/2026-10-21/square-v2/tee-gallery.jpg",
+        "width": 1600,
+        "height": 1600,
+        "provider": "built-in ImageGen",
+        "generated": true,
+        "referenceSize": "M",
+        "caption": "Black tee",
+        "inspection": "Reviewed square composition, product print and shape, hands and visible lettering against supplied references",
+        "delivery": "Original and WebP twin verified over media URLs"
+      },
+      {
+        "name": "mug-studio",
+        "key": "images/merch/library/2026-10-21/square-v2/moltology-mug-v2/mug-studio.jpg",
+        "webpKey": "images/merch/library/2026-10-21/square-v2/moltology-mug-v2/mug-studio.webp",
+        "local": "tmp/merch/lifestyle/2026-10-21/square-v2/mug-studio.jpg",
+        "width": 1600,
+        "height": 1600,
+        "provider": "built-in ImageGen",
+        "generated": true,
+        "referenceSize": "11 oz",
+        "caption": "11 oz mug",
+        "inspection": "Reviewed square composition, product print and shape, hands and visible lettering against supplied references",
+        "delivery": "Original and WebP twin verified over media URLs"
+      },
+      {
+        "name": "mug-reading",
+        "key": "images/merch/library/2026-10-21/square-v2/moltology-mug-v2/mug-reading.jpg",
+        "webpKey": "images/merch/library/2026-10-21/square-v2/moltology-mug-v2/mug-reading.webp",
+        "local": "tmp/merch/lifestyle/2026-10-21/square-v2/mug-reading.jpg",
+        "width": 1600,
+        "height": 1600,
+        "provider": "built-in ImageGen",
+        "generated": true,
+        "referenceSize": "11 oz",
+        "caption": "11 oz mug",
+        "inspection": "Reviewed square composition, product print and shape, hands and visible lettering against supplied references",
+        "delivery": "Original and WebP twin verified over media URLs"
+      },
+      {
+        "name": "mug-gallery",
+        "key": "images/merch/library/2026-10-21/square-v2/moltology-mug-v2/mug-gallery.jpg",
+        "webpKey": "images/merch/library/2026-10-21/square-v2/moltology-mug-v2/mug-gallery.webp",
+        "local": "tmp/merch/lifestyle/2026-10-21/square-v2/mug-gallery.jpg",
+        "width": 1600,
+        "height": 1600,
+        "provider": "built-in ImageGen",
+        "generated": true,
+        "referenceSize": "15 oz",
+        "caption": "15 oz mug",
+        "inspection": "Reviewed square composition, product print and shape, hands and visible lettering against supplied references",
+        "delivery": "Original and WebP twin verified over media URLs"
+      }
+    ],
+    "selectedGalleries": [
+      {
+        "slug": "moltology-mug-v2",
+        "images": [
+          {
+            "key": "images/merch/moltology-mug-v2-1.jpg",
+            "caption": "11 oz mug",
+            "alt": "11 oz white Moltology mug, red emblem facing forward"
+          },
+          {
+            "key": "images/merch/moltology-mug-v2-2.jpg",
+            "caption": "15 oz mug",
+            "alt": "15 oz white Moltology mug, wordmark facing forward"
+          },
+          {
+            "key": "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-default-1.jpg",
+            "caption": "11 oz mug",
+            "alt": "11 oz white Moltology mug, wordmark facing forward"
+          },
+          {
+            "key": "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-default-3.jpg",
+            "caption": "11 oz mug",
+            "alt": "11 oz white Moltology mug, wraparound design"
+          },
+          {
+            "key": "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-15oz-default-2.jpg",
+            "caption": "15 oz mug",
+            "alt": "15 oz white Moltology mug, red emblem facing forward"
+          },
+          {
+            "key": "images/merch/library/2026-10-21/square-v2/moltology-mug-v2/mug-studio.jpg",
+            "caption": "11 oz mug",
+            "alt": "11 oz white Moltology mug, held by a model in a studio"
+          },
+          {
+            "key": "images/merch/library/2026-10-21/square-v2/moltology-mug-v2/mug-reading.jpg",
+            "caption": "11 oz mug",
+            "alt": "11 oz white Moltology mug, held by a model beside a window"
+          },
+          {
+            "key": "images/merch/library/2026-10-21/square-v2/moltology-mug-v2/mug-gallery.jpg",
+            "caption": "15 oz mug",
+            "alt": "15 oz white Moltology mug, held by a model in a gallery cafe"
+          }
+        ]
+      },
+      {
+        "slug": "moltology-tee-v2",
+        "images": [
+          {
+            "key": "images/merch/moltology-tee-v2-black.jpg",
+            "caption": "Black tee · front",
+            "alt": "Black Moltology tee, front view"
+          },
+          {
+            "key": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-flat-2-2.jpg",
+            "caption": "Black tee · back",
+            "alt": "Black Moltology tee, back view"
+          },
+          {
+            "key": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-ghost-3.jpg",
+            "caption": "Black tee · side",
+            "alt": "Black Moltology tee, side view"
+          },
+          {
+            "key": "images/merch/library/2026-10-21/square-v2/moltology-tee-v2/tee-studio.jpg",
+            "caption": "Black tee",
+            "alt": "Model wearing the black Moltology tee in a sunlit studio"
+          },
+          {
+            "key": "images/merch/library/2026-10-21/square-v2/moltology-tee-v2/tee-terrace.jpg",
+            "caption": "Black tee",
+            "alt": "Model wearing the black Moltology tee on a terrace"
+          },
+          {
+            "key": "images/merch/library/2026-10-21/square-v2/moltology-tee-v2/tee-gallery.jpg",
+            "caption": "Black tee",
+            "alt": "Model wearing the black Moltology tee seated in a gallery"
+          }
+        ]
+      }
+    ],
+    "releaseStatus": "Production gallery data verified by exact read-back; plain caption UI included in this revision",
+    "production": {
+      "project": "soft-poetry-99961537",
+      "branch": "main",
+      "endpoint": "ep-cold-breeze-aye6s748",
+      "backup": "tmp/merch/gallery-polish/release/before-execute.json",
+      "verification": "Gallery-only transaction; featured images and all other product/variant/settings fields preserved"
+    },
+    "validation": {
+      "typecheck": "passed",
+      "focusedTests": "19 passed",
+      "coreTests": "1211 passed, 15 skipped; same unrelated Neon auth connectivity and Premium env-example failures"
+    }
   }
 }
