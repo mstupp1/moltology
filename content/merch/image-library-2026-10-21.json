@@ -6,7 +6,7 @@
     "seasonalIntensity": "none; durable store imagery",
     "direction": "Contemporary editorial, quiet architectural studios and autumn daylight; no holiday props"
   },
-  "listingStatus": "Asset library only; no production gallery writes",
+  "listingStatus": "Published to existing production mug and tee galleries with owner authorization",
   "official": [
     {
       "title": "Primary",
@@ -344,5 +344,27 @@
     "targetedMerchTests": "12 passed",
     "scriptTests": "333 passed; clean-jwks test failed because sandbox cannot reach Neon; separate existing test invoked build with missing index.html",
     "skillValidation": "Frontmatter parsed with js-yaml and linked reference exists; bundled Python validator unavailable because PyYAML is absent"
+  },
+  "release": {
+    "pullRequest": "https://github.com/mstupp1/moltology/pull/270",
+    "mergedCommit": "a81e3e69a15dbd35ede5acaae1632b0290790f27",
+    "deployment": "https://vercel.com/myles-projects-886f221f/moltology/4jfQjTWJBjZRuXV9u7P8rSVoDzZt",
+    "deploymentStatus": "success",
+    "productionProject": "soft-poetry-99961537",
+    "productionBranch": "main",
+    "productionEndpoint": "ep-cold-breeze-aye6s748",
+    "products": [
+      {
+        "slug": "moltology-mug-v2",
+        "galleryImages": 8
+      },
+      {
+        "slug": "moltology-tee-v2",
+        "galleryImages": 8
+      }
+    ],
+    "dataVerification": "Gallery-only SQL transaction followed by exact read-back; featured images preserved; no other product/variant/settings fields written",
+    "backup": "tmp/merch/gallery-release/before-execute.json",
+    "codeValidation": "Typecheck, 18 focused tests and required PR hygiene checks passed; broader core 1210 passed, 15 skipped with unrelated Neon connectivity and Premium env-example failures"
   }
 }
