@@ -6,7 +6,7 @@ const env = { DATABASE_URL: prod, PROD_DATABASE_URL: prod, DEV_DATABASE_URL: 'po
 describe('production catalog promotion fence', () => {
   it('only selects the approved pair and dry-run needs no production credentials', async () => {
     vi.spyOn(console,'log').mockImplementation(() => {})
-    expect(APPROVED_STORE_SLUGS).toEqual(['moltology-mug-v2','moltology-tee-v2'])
+    expect(APPROVED_STORE_SLUGS).toEqual(['moltology-mug','moltology-tee'])
     await expect(promoteStoreCatalog({ execute:false, endpoint:'', authorization:'' })).resolves.toBeUndefined()
   })
   it('requires explicit execution authorization and exact verified production configuration', () => {

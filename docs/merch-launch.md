@@ -28,6 +28,16 @@ private, other visitors keep the Etsy link. Creation and operations use the
 - The dev-only `VITE_MERCH_PREVIEW` mode was retired at this step; the store always reads the
   database.
 
+## Slug rename — October 21, 2026
+
+The approved pair's slugs dropped their revision suffix: `moltology-mug-v2` → `moltology-mug` and
+`moltology-tee-v2` → `moltology-tee`, so the public URLs are `/store/moltology-mug` and
+`/store/moltology-tee`. Product and variant IDs, Printful mappings (external IDs are product IDs),
+prices and orders are unchanged; the sync ledger's product keys were renamed to match. Photos keep
+their `moltology-*-v2` bucket names through `imageName` in the catalog. Old URLs are not redirected
+(the store had been public for minutes). Older sections below keep the slugs as they were then.
+Slugs are plain product names from now on; a catalog test rejects revision suffixes.
+
 ## Production catalog update — October 21, 2026
 
 With explicit owner authorization, promoted `moltology-mug-v2` and `moltology-tee-v2`
@@ -72,7 +82,7 @@ in `content/merch/moltology-v2.json`; the checkout evidence below belongs to the
 To repeat the selected dev update after sync:
 
 ```bash
-npm run merch -- seed --only moltology-mug-v2,moltology-tee-v2,synaptic-mark-mug,synaptic-mark-tee
+npm run merch -- seed --only moltology-mug,moltology-tee,synaptic-mark-mug,synaptic-mark-tee
 ```
 
 Including the original pair explicitly saves their unpublished state without broadly seeding
@@ -319,7 +329,7 @@ refunded orders require dashboard review. Confirming a draft is deliberately abs
 The migration is additive; apply on dev first. Production migration remains the existing
 `.github/workflows/migrate.yml` path. Do not manually migrate production during implementation.
 
-`npm run merch -- promote` is a dry run selecting only `moltology-mug-v2` and `moltology-tee-v2`.
+`npm run merch -- promote` is a dry run selecting only `moltology-mug` and `moltology-tee`.
 After separate explicit production-write authorization, an operator can run:
 
 ```bash

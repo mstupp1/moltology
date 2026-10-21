@@ -10,7 +10,7 @@ products, changing print files or touching fulfillment settings.
    response. Styles differ by blank; do not assume every product supports one style.
 2. Run `npm run merch -- gallery --pilot`, or `--only <slug>`. Defaults are `Default`
    for mugs and `Flat 2`, `Ghost` for tees. Override with an exact
-   pipe-separated selection, e.g. `--only moltology-tee-v2 --groups 'Flat|Ghost 2'`.
+   pipe-separated selection, e.g. `--only moltology-tee --groups 'Flat|Ghost 2'`.
    Keep clean catalog shots distinct from styled provider scenes. Seasonal styles
    are optional campaign assets, not a default for evergreen store galleries.
 3. Outputs are in `tmp/merch/official-gallery/<store-id>/<slug>/`: available styles,

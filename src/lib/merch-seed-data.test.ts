@@ -11,6 +11,21 @@ describe('merch catalog', () => {
     for (const id of ids) expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/)
   })
 
+  it('uses plain product names as slugs, never revision markers', () => {
+    // Slugs are permanent public URLs. Revisions belong in design keys and photo names.
+    for (const product of INITIAL_MERCH_PRODUCTS) {
+      expect(product.slug).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/)
+      expect(product.slug).not.toMatch(/-(v\d+|new|old|final|draft|test|copy|alt|rev\d*|\d{4,})$/)
+    }
+  })
+
+  it('keeps the approved pair on its existing photos after the slug rename', () => {
+    const mug = INITIAL_MERCH_PRODUCTS.find(product => product.slug === 'moltology-mug')!
+    const tee = INITIAL_MERCH_PRODUCTS.find(product => product.slug === 'moltology-tee')!
+    expect(mug.featuredImageUrl).toBe('images/merch/moltology-mug-v2-1.jpg')
+    expect(tee.featuredImageUrl).toBe('images/merch/moltology-tee-v2-black.jpg')
+  })
+
   it('keeps images as bucket keys', () => {
     for (const product of INITIAL_MERCH_PRODUCTS) {
       expect(product.featuredImageUrl).toMatch(/^images\/merch\/.+\.jpg$/)

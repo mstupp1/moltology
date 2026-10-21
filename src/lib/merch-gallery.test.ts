@@ -30,7 +30,7 @@ describe('reviewed product galleries', () => {
   })
   it('keeps three square model images per product and removes redundant tee views', () => {
     for (const product of products) expect(product.galleryImageUrls.filter(key => key.includes('/square-v2/'))).toHaveLength(3)
-    const tee = products.find(product => product.slug === 'moltology-tee-v2')!
+    const tee = products.find(product => product.slug === 'moltology-tee')!
     expect(tee.galleryImageUrls.some(key => /on-hanger|ghost-1/.test(key))).toBe(false)
     expect(tee.galleryImageUrls).toHaveLength(6)
   })

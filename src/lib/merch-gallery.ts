@@ -2,7 +2,7 @@
 const root = 'images/merch/library/2026-10-21'
 const square = `${root}/square-v2`
 export const MERCH_PRODUCT_GALLERIES: Record<string, string[]> = {
-  'moltology-mug-v2': [
+  'moltology-mug': [
     `${root}/moltology-mug-v2/mug-moltology-v2-default-1.jpg`,
     `${root}/moltology-mug-v2/mug-moltology-v2-default-3.jpg`,
     `${root}/moltology-mug-v2/mug-moltology-v2-15oz-default-2.jpg`,
@@ -10,7 +10,7 @@ export const MERCH_PRODUCT_GALLERIES: Record<string, string[]> = {
     `${square}/moltology-mug-v2/mug-reading.jpg`,
     `${square}/moltology-mug-v2/mug-gallery.jpg`,
   ],
-  'moltology-tee-v2': [
+  'moltology-tee': [
     `${root}/moltology-tee-v2/tee-moltology-v2-flat-2-2.jpg`,
     `${root}/moltology-tee-v2/tee-moltology-v2-ghost-3.jpg`,
     `${square}/moltology-tee-v2/tee-studio.jpg`,
