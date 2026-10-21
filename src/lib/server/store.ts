@@ -7,8 +7,8 @@ import { buildMerchCheckoutSessionParams, buildPricedCheckoutLines, buildPrintfu
 import { STORE_DEFAULTS, STORE_QUOTE_TTL_MS, quoteBinding, selectStandardRate, storeDeliverySchema, type StoreSettings } from '../store'
 import { resolveWriteAuth, type WriteAuthContext } from './write-auth'
 import { hasExperiment } from '../experiments'
+import { isAdmin } from '../permissions'
 import { profiles } from '../../db/schema'
-import { MERCH_PREVIEW, MERCH_PREVIEW_CHECKOUT_ERROR } from '../merch-preview'
 import sync from '../../../content/merch/printful-sync.json'
 
 export type StoreArgs = { data?: { token?: string; userId?: string }; context?: WriteAuthContext & { clientIp?: string | null } | null }
@@ -31,6 +31,16 @@ export async function requireStoreAccess(args: StoreArgs) {
     if (!profile || !hasExperiment(profile.role, profile.experiments, 'new-store')) throw new Error('This page is not available.')
   }
   return { settings, auth }
+}
+export const STORE_ORDERING_CLOSED = 'Ordering is unavailable right now.'
+/** Browsing can be public while ordering stays closed. Admins can still order, to test checkout. */
+export async function requireStoreOrdering(args: StoreArgs) {
+  const access = await requireStoreAccess(args)
+  if (access.settings.checkoutPaused) throw new Error('Checkout is paused.')
+  if (access.settings.orderingOpen) return access
+  const [profile] = access.auth ? await access.auth.dbClient.select({ role: profiles.role }).from(profiles).where(eq(profiles.id, access.auth.userId)).limit(1) : []
+  if (!profile || !isAdmin(null, profile.role)) throw new Error(STORE_ORDERING_CLOSED)
+  return access
 }
 export const hashStoreValue = (value: string) => createHash('sha256').update(value).digest('hex')
 export function storeStatusToken(orderId: string): string {
@@ -67,8 +77,7 @@ export async function storePricedLines(items: CheckoutLineRequest[]) {
   return priced.lines
 }
 export async function createStoreQuote(args: Omit<StoreArgs, 'data'> & { data: unknown }) {
-  const { settings } = await requireStoreAccess(args as StoreArgs)
-  if (settings.checkoutPaused) throw new Error('Checkout is paused.')
+  const { settings } = await requireStoreOrdering(args as StoreArgs)
   const input = storeDeliverySchema.parse(args.data)
   if (!settings.enabledCountries.includes(input.address.country)) throw new Error('Shipping is not enabled for this country.')
   await limitStoreRequest(`quote-ip:${args.context?.clientIp || 'unknown'}`, 30)
@@ -98,10 +107,9 @@ export async function createStoreQuote(args: Omit<StoreArgs, 'data'> & { data: u
 }
 
 export async function createQuotedCheckout(args: Omit<StoreArgs, 'data'> & { data: unknown }) {
-  if (MERCH_PREVIEW) throw new Error(MERCH_PREVIEW_CHECKOUT_ERROR)
-  const { settings, auth } = await requireStoreAccess(args as StoreArgs)
-  if (settings.checkoutPaused) throw new Error('Checkout is paused.')
-  const input = storeDeliverySchema.extend({ quoteId: (await import('zod')).z.uuid() }).parse(args.data)
+  const { settings, auth } = await requireStoreOrdering(args as StoreArgs)
+  const { z } = await import('zod')
+  const input = storeDeliverySchema.extend({ quoteId: z.uuid(), promoCode: z.string().max(40).optional() }).parse(args.data)
   if (!settings.enabledCountries.includes(input.address.country)) throw new Error('Shipping is not enabled for this country.')
   await limitStoreRequest(`checkout:${args.context?.clientIp || 'unknown'}`, 10)
   const lines = await storePricedLines(input.items)
@@ -116,6 +124,9 @@ export async function createQuotedCheckout(args: Omit<StoreArgs, 'data'> & { dat
   }
   const subtotalCents = lines.reduce((sum, line) => sum + line.unitPriceCents * line.quantity, 0)
   const stripe = storeStripe()
+  const promotion = input.promoCode?.trim()
+    ? await (await import('./store-coupons')).resolveStorePromotion({ code: input.promoCode, email: input.email, subtotalCents }, stripe)
+    : null
   const livemode = /^(sk|rk)_live_/.test(process.env.STRIPE_SECRET_KEY ?? '')
   // Live operation remains separately authorized, even for an admin private pilot.
   if (livemode && process.env.STORE_LIVE_PAYMENTS_AUTHORIZED !== 'true') throw new Error('Live store payments are not enabled.')
@@ -123,9 +134,11 @@ export async function createQuotedCheckout(args: Omit<StoreArgs, 'data'> & { dat
   await db.insert(merchOrders).values({ id: orderId, userId: auth?.userId ?? null, customerEmail: input.email,
     shippingAddress: quote.snapshot.address, subtotalCents, shippingCents: quote.snapshot.amountCents,
     totalCents: subtotalCents + quote.snapshot.amountCents, lineItems: lines, quoteSnapshot: quote.snapshot,
+    promotionCode: promotion?.code ?? null, promotionCodeId: promotion?.id ?? null,
     statusTokenHash: hashStoreValue(statusToken), fulfillmentMode: settings.fulfillmentMode === 'automatic' && !shouldDraftPrintfulOrder(process.env, livemode) ? 'automatic' : 'manual', livemode,
   }).onConflictDoNothing()
   const [existing] = await db.select().from(merchOrders).where(eq(merchOrders.id, orderId)).limit(1)
+  if ((existing.promotionCodeId ?? null) !== (promotion?.id ?? null)) throw new Error('The promo code changed. Quote shipping again.')
   if (existing.stripeCheckoutSessionId) {
     const session = await stripe.checkout.sessions.retrieve(existing.stripeCheckoutSessionId)
     if (!session.url || session.status !== 'open') throw new Error('This checkout is no longer open. Quote shipping again.')
@@ -150,10 +163,13 @@ export async function createQuotedCheckout(args: Omit<StoreArgs, 'data'> & { dat
     success_url: `${origin}/store/status?order=${orderId}&key=${statusToken}&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/store?checkout=cancel`,
     payment_intent_data: { metadata: { orderType: 'merch', orderId } },
+    ...(promotion ? { discounts: [{ promotion_code: promotion.id }] } : {}),
   }
   const session = await stripe.checkout.sessions.create(sessionParams, { idempotencyKey: `merch-checkout-${orderId}` })
   if (!session.url) throw new Error('Could not start checkout. Try again.')
-  await db.update(merchOrders).set({ stripeCheckoutSessionId: session.id, updatedAt: new Date() }).where(eq(merchOrders.id, orderId))
+  // Stripe's discount is the one the webhook checks the paid total against.
+  const discountCents = Math.max(0, session.total_details?.amount_discount ?? 0)
+  await db.update(merchOrders).set({ stripeCheckoutSessionId: session.id, discountCents, totalCents: subtotalCents + quote.snapshot.amountCents - discountCents, updatedAt: new Date() }).where(eq(merchOrders.id, orderId))
   return { url: session.url, orderId }
 }
 
@@ -170,6 +186,6 @@ export async function getStoreStatus(orderId: string, token: string) {
   const [current] = await getDb().select().from(merchOrders).where(eq(merchOrders.id, orderId)).limit(1)
   return { id: current.id, paymentStatus: current.paymentStatus, fulfillmentStatus: current.fulfillmentStatus,
     providerStatus: current.providerStatus, shipments: current.shipments, items: current.lineItems.map(l => ({ variantId: l.variantId, title: l.productTitle, variant: l.variantTitle, quantity: l.quantity, unitPriceCents: l.unitPriceCents })),
-    subtotalCents: current.subtotalCents, shippingCents: current.shippingCents, taxCents: current.taxCents, totalCents: current.totalCents, refundCents: current.refundCents,
+    subtotalCents: current.subtotalCents, shippingCents: current.shippingCents, taxCents: current.taxCents, discountCents: current.discountCents, promotionCode: current.promotionCode, totalCents: current.totalCents, refundCents: current.refundCents,
   }
 }

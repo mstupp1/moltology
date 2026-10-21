@@ -7,6 +7,7 @@ import { PremiumDashboardBanner } from '@/components/hud/PremiumDashboardBanner'
 import { DashboardTodayStrip } from '@/components/hud/dashboard/DashboardTodayStrip'
 import { DashboardPromoBanner } from '@/components/hud/dashboard/DashboardPromoBanner'
 import { DashboardShortcuts } from '@/components/hud/dashboard/DashboardShortcuts'
+import { DashboardStorePanel } from '@/components/hud/dashboard/DashboardStorePanel'
 import { DashboardNewsPanel } from '@/components/hud/dashboard/DashboardNewsPanel'
 import { DashboardChangelogPanel } from '@/components/hud/dashboard/DashboardChangelogPanel'
 
@@ -32,6 +33,8 @@ export default function DashboardView() {
       <PremiumDashboardBanner />
 
       <DashboardPromoBanner />
+
+      <DashboardStorePanel />
 
       <DashboardShortcuts />
 

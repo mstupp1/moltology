@@ -5,8 +5,6 @@ interface ImportMetaEnv {
   readonly VITE_GOOGLE_AUTH_ENABLED?: string
   readonly VITE_EMAIL_VERIFICATION_ENABLED?: string
   readonly VITE_GOOGLE_CLIENT_ID?: string
-  /** Dev-only merch preview mode, see src/lib/merch-preview.ts. */
-  readonly VITE_MERCH_PREVIEW?: string
 }
 
 interface ImportMeta {

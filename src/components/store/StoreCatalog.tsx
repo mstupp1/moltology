@@ -71,17 +71,23 @@ export function StoreCatalog({
             Mugs and tees carrying the Synaptic Path. Each one is printed when you order it.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => cart.setOpen(true)}
-          className={`inline-flex min-h-10 items-center gap-2 rounded-control border border-line bg-surface-1 px-4 text-sm text-ink hover:border-line-strong hover:bg-surface-2 ${FOCUS}`}
-        >
-          <ShoppingBag className="h-4 w-4" aria-hidden="true" />
-          Cart
-          {cart.count > 0 ? (
-            <span className="rounded-chip bg-cyan-glow px-1.5 text-xs font-semibold text-abyss">{cart.count}</span>
-          ) : null}
-        </button>
+        {cart.canOrder ? (
+          <button
+            type="button"
+            onClick={() => cart.setOpen(true)}
+            className={`inline-flex min-h-10 items-center gap-2 rounded-control border border-line bg-surface-1 px-4 text-sm text-ink hover:border-line-strong hover:bg-surface-2 ${FOCUS}`}
+          >
+            <ShoppingBag className="h-4 w-4" aria-hidden="true" />
+            Cart
+            {cart.count > 0 ? (
+              <span className="rounded-chip bg-cyan-glow px-1.5 text-xs font-semibold text-abyss">{cart.count}</span>
+            ) : null}
+          </button>
+        ) : cart.ordering === 'closed' ? (
+          <p className="rounded-control border border-line-subtle bg-surface-1 px-4 py-2 text-sm text-ink-body" data-testid="store-ordering-closed">
+            Ordering opens soon. Have a look around.
+          </p>
+        ) : null}
       </header>
 
       <nav className="flex flex-wrap items-baseline justify-between gap-3" aria-label="Categories">
@@ -219,7 +225,7 @@ function ProductCard({ product, eager }: { product: MerchProductView; eager: boo
             />
           ) : null}
         </Link>
-        {quickSizes.length > 0 ? (
+        {quickSizes.length > 0 && cart.canOrder ? (
           <div className="pointer-events-none absolute inset-x-3 bottom-3 hidden translate-y-2 opacity-0 transition duration-300 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 md:block">
             <div className="flex flex-wrap items-center gap-1.5 rounded-card border border-line-subtle bg-abyss/85 p-2 backdrop-blur">
               <span className="px-1 text-xs text-ink-muted">

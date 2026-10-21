@@ -1454,6 +1454,10 @@ export const merchOrders = pgTable('merch_orders', {
   subtotalCents: integer('subtotalCents').default(0).notNull(),
   shippingCents: integer('shippingCents').default(0).notNull(),
   taxCents: integer('taxCents').default(0).notNull(),
+  /** Stripe's discount on the items from a store promo code. Never covers shipping or tax. */
+  discountCents: integer('discountCents').default(0).notNull(),
+  promotionCode: text('promotionCode'),
+  promotionCodeId: text('promotionCodeId'),
   totalCents: integer('totalCents').default(0).notNull(),
   currency: text('currency').default('usd').notNull(),
   lineItems: jsonb('lineItems').$type<MerchLineItemSnapshot[]>().default([]).notNull(),
@@ -1464,6 +1468,7 @@ export const merchOrders = pgTable('merch_orders', {
   index('merch_orders_user_idx').on(table.userId),
   uniqueIndex('merch_orders_stripe_session_uidx').on(table.stripeCheckoutSessionId),
   index('merch_orders_printful_idx').on(table.printfulOrderId),
+  index('merch_orders_promotion_idx').on(table.promotionCodeId),
   pgPolicy('merch_orders_server_only_policy', {
     for: 'all',
     using: merchServerOnly,

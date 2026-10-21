@@ -9,8 +9,6 @@ import {
   type MerchProductView,
   type MerchVariantView,
 } from '../merch'
-import { MERCH_PREVIEW, MERCH_PREVIEW_CHECKOUT_ERROR } from '../merch-preview'
-import { merchCatalogView } from '../merch-seed-data'
 import { type WriteAuthContext } from './write-auth'
 import { requireStoreAccess, createQuotedCheckout } from './store'
 import { storeOverrides } from '../../db/schema'
@@ -31,7 +29,6 @@ const PUBLIC_MERCH_ERRORS = new Set([
   'This page is not available.',
   'Add at least one piece before checkout.',
   'Could not start checkout. Try again.',
-  MERCH_PREVIEW_CHECKOUT_ERROR,
 ])
 
 export class MerchOrderMissingError extends Error {
@@ -75,7 +72,6 @@ function toVariantView(row: {
 }
 
 export async function getMerchCatalogHandler(args: HandlerArgs): Promise<MerchProductView[]> {
-  if (MERCH_PREVIEW) return merchCatalogView()
   try {
     await requireStoreAccess(args)
     const auth = { dbClient: getDb() }
@@ -114,7 +110,6 @@ export async function getMerchProductBySlugHandler(args: HandlerArgs): Promise<M
   try {
     const slug = args.data?.slug?.trim()
     if (!slug) return null
-    if (MERCH_PREVIEW) return merchCatalogView().find((product) => product.slug === slug) ?? null
     const catalog = await getMerchCatalogHandler(args)
     return catalog.find(product => product.slug === slug) ?? null
   } catch (error) {
@@ -123,7 +118,6 @@ export async function getMerchProductBySlugHandler(args: HandlerArgs): Promise<M
 }
 
 export async function createMerchCheckoutSessionHandler(args: HandlerArgs): Promise<{ url: string }> {
-  if (MERCH_PREVIEW) throw new Error(MERCH_PREVIEW_CHECKOUT_ERROR)
   return createQuotedCheckout(args as Parameters<typeof createQuotedCheckout>[0])
 }
 
@@ -157,7 +151,7 @@ export async function fulfillMerchCheckoutEvent(event: {
   }
   if (order.quoteSnapshot) {
     if (Boolean(session.livemode) !== order.livemode) throw new Error('Stripe payment mode does not match the order.')
-    if (completion.paid && (completion.currency !== order.currency || completion.subtotalCents !== order.subtotalCents || completion.shippingCents !== order.shippingCents || completion.totalCents !== order.subtotalCents + order.shippingCents + (completion.taxCents ?? 0)))
+    if (completion.paid && (completion.currency !== order.currency || completion.subtotalCents !== order.subtotalCents || completion.shippingCents !== order.shippingCents || completion.discountCents !== order.discountCents || completion.totalCents !== order.subtotalCents + order.shippingCents - order.discountCents + (completion.taxCents ?? 0)))
       throw new Error('Stripe totals do not match the approved order snapshot.')
     completion.shipping = order.shippingAddress
     completion.email = order.customerEmail

@@ -3,13 +3,15 @@ import type { MerchLineItemSnapshot, MerchShippingAddress } from './merch'
 
 export const STORE_QUOTE_TTL_MS = 10 * 60_000
 export const STORE_DEFAULTS = {
-  indexingEnabled: false, publicEnabled: false, checkoutPaused: false, enabledCountries: ['US'],
+  indexingEnabled: false, publicEnabled: false, orderingOpen: false, checkoutPaused: false, enabledCountries: ['US'],
   fulfillmentMode: 'manual' as const,
   policiesApproved: false,
   shippingPolicy: '', returnsPolicy: '', cancellationPolicy: '', supportEmail: '',
 }
 export const storeSettingsSchema = z.object({
-  indexingEnabled: z.boolean().default(false), publicEnabled: z.boolean(), checkoutPaused: z.boolean(),
+  indexingEnabled: z.boolean().default(false), publicEnabled: z.boolean(),
+  /** Off: anyone may browse, only admins may order (for testing checkout). */
+  orderingOpen: z.boolean().default(false), checkoutPaused: z.boolean(),
   enabledCountries: z.array(z.string().regex(/^[A-Z]{2}$/)).min(1).max(30),
   fulfillmentMode: z.enum(['manual', 'automatic']), policiesApproved: z.boolean(),
   shippingPolicy: z.string().max(4000), returnsPolicy: z.string().max(4000),

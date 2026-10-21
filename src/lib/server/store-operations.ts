@@ -23,7 +23,9 @@ export async function enqueueOrderConfirmation(id: string) {
   await queueStoreMail(`payment:${id}`, id, order.customerEmail, 'Your Moltology payment was received', [
     `Order ${id}`, 'Payment received. Follow your order status for production and delivery updates.',
     ...order.lineItems.map(l => `${l.quantity} × ${l.productTitle} (${l.variantTitle}): ${formatMerchPrice(l.quantity * l.unitPriceCents)}`),
-    `Items: ${formatMerchPrice(order.subtotalCents)}`, `Shipping: ${formatMerchPrice(order.shippingCents)}`,
+    `Items: ${formatMerchPrice(order.subtotalCents)}`,
+    ...(order.discountCents > 0 ? [`Discount${order.promotionCode ? ` (${order.promotionCode})` : ''}: -${formatMerchPrice(order.discountCents)}`] : []),
+    `Shipping: ${formatMerchPrice(order.shippingCents)}`,
     `Tax: ${formatMerchPrice(order.taxCents)}`, `Total: ${formatMerchPrice(order.totalCents)}`, statusUrl(id),
   ].join('\n'))
 }
@@ -218,6 +220,7 @@ export async function listAdminShopOrders(args: StoreArgs & { data?: { token?: s
       printfulOrderId: order.printfulOrderId, stripeCheckoutSessionId: order.stripeCheckoutSessionId, stripePaymentIntentId: order.stripePaymentIntentId,
       lineItems: order.lineItems.map(l => ({ productTitle: l.productTitle, variantTitle: l.variantTitle, quantity: l.quantity, unitPriceCents: l.unitPriceCents })),
       shipments: order.shipments, subtotalCents: order.subtotalCents, shippingCents: order.shippingCents, taxCents: order.taxCents,
+      discountCents: order.discountCents, promotionCode: order.promotionCode,
       totalCents: order.totalCents, refundCents: order.refundCents, currency: order.currency,
       createdAt: order.createdAt.toISOString(), updatedAt: order.updatedAt.toISOString(), reconciledAt: order.reconciledAt?.toISOString() ?? null,
     })),

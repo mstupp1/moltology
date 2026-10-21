@@ -457,7 +457,7 @@ export interface LooseCheckoutSession {
   amount_total?: number | null
   currency?: string | null
   shipping_cost?: { amount_total?: number | null } | null
-  total_details?: { amount_tax?: number | null; amount_shipping?: number | null } | null
+  total_details?: { amount_tax?: number | null; amount_shipping?: number | null; amount_discount?: number | null } | null
 }
 
 export interface MerchCheckoutCompletion {
@@ -469,6 +469,7 @@ export interface MerchCheckoutCompletion {
   subtotalCents: number | null
   shippingCents: number | null
   taxCents: number | null
+  discountCents: number
   totalCents: number | null
   currency: string
   /** True only once Stripe reports the money as collected. Delayed methods complete unpaid. */
@@ -537,6 +538,7 @@ export function readMerchCheckoutCompletion(session: LooseCheckoutSession): Merc
           ? session.total_details.amount_shipping
           : null,
     taxCents: typeof session.total_details?.amount_tax === 'number' ? session.total_details.amount_tax : null,
+    discountCents: typeof session.total_details?.amount_discount === 'number' ? session.total_details.amount_discount : 0,
     totalCents: typeof session.amount_total === 'number' ? session.amount_total : null,
     currency: (session.currency || MERCH_CURRENCY).toLowerCase(),
     paid: session.payment_status === 'paid' || session.payment_status === 'no_payment_required',
