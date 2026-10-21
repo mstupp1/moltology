@@ -103,6 +103,8 @@ function OracleSidebarContent({
               activeThreadId={activeThreadId}
               isLoadingThreads={false}
               onSelectThread={(id) => onSelectThread(id)}
+              density={hideHeader ? 'comfortable' : 'compact'}
+              searchThreshold={hideHeader ? 0 : undefined}
               onPin={onPin}
               onArchive={onArchive}
               onRename={onRename}
@@ -348,9 +350,7 @@ function OracleRouteComponent() {
         >
           {/* Mobile Drawer Header */}
           <div className="flex items-center justify-between p-3 border-b border-line-subtle bg-surface-2/90 shrink-0">
-            <span className="text-xs font-bold text-ink tracking-[0.08em] uppercase font-sans">
-              CHATS
-            </span>
+            <span className="text-sm font-semibold text-ink font-sans">Chats</span>
             <div className="flex items-center gap-2">
               {userId && (
                 <button

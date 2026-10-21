@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
-import { BrandIcon } from '@/components/ui/BrandMark'
 import {
   X,
   Pencil,
@@ -20,7 +19,9 @@ import {
   MessageThinkingDots,
   MessageCopyButton,
   MessageRetryButton,
+  withStreamingCursor,
 } from '../ai-elements/message'
+import { useIsPhone, useKeyboardInset } from '../../hooks/useChatViewport'
 import { PromptInput } from '../ai-elements/prompt-input'
 import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS } from './NewChatScreen'
 import { OracleChatsPanel, type OracleChatsLayout } from './OracleChatsPanel'
@@ -639,10 +640,35 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   // Narrow panels (phone sheet, popout, sidebar) keep the prompt box docked at the bottom
   // from the first message, so it sits above the keyboard and never jumps after sending.
   const isNarrow = panelWidth < CHATS_COLUMN_MIN_WIDTH
+  // Phones: a new chat puts the box at the top (the keyboard opens below it); an ongoing
+  // chat docks it at the bottom and lifts it by the keyboard inset instead of panning the page.
+  const isPhone = useIsPhone()
+  const keyboardInset = useKeyboardInset(isPhone && !isNewChat)
+
+  // The keyboard shrinks the message pane, so keep the latest turn in view as it opens.
+  useLayoutEffect(() => {
+    if (keyboardInset > 0 && stickToBottomRef.current) scrollConversationToBottom('auto')
+  }, [keyboardInset, scrollConversationToBottom])
+
+  // Ctrl/Cmd+Shift+O starts a new chat, as in ChatGPT.
+  const newChatRef = useRef<() => void>(() => {})
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() !== 'o' || !e.shiftKey || !(e.metaKey || e.ctrlKey)) return
+      e.preventDefault()
+      newChatRef.current()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
   const activeThreadTitle = activeThreadId
     ? (threads.find((t: any) => t.id === activeThreadId)?.title as string | undefined) || null
     : null
   const lastAssistantId = [...messages].reverse().find((m) => m.role === 'assistant')?.id
+
+  newChatRef.current = () => {
+    if (!isAtChatLimit) handleNewChat()
+  }
 
   const handleRootKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key !== 'Escape' || !closeOnEscape || isChatsOpen || isAuthModalOpen) return
@@ -655,6 +681,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const composer = (variant: 'docked' | 'inline') => (
     <PromptInput
       variant={variant}
+      compact={isPhone}
+      footnote={isPhone ? undefined : 'The Oracle can be wrong. Check anything important.'}
       value={draft}
       onValueChange={setDraft}
       onSubmit={handlePromptSubmit}
@@ -673,19 +701,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     <div
       ref={rootRef}
       onKeyDown={handleRootKeyDown}
+      style={keyboardInset ? { paddingBottom: keyboardInset } : undefined}
       className={`flex flex-col bg-surface-1/60 backdrop-blur-md border border-line-subtle shadow-menu font-sans overflow-hidden h-full w-full relative ${className}`}
     >
-      {/* Faded Grayscale Watermark Logo Background */}
-      <div
-        className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden"
-        aria-hidden="true"
-      >
-        <BrandIcon
-          aria-hidden="true"
-          className="w-56 h-56 sm:w-72 sm:h-72 md:w-96 md:h-96 max-w-[65%] max-h-[65%] object-contain grayscale opacity-[0.035] pointer-events-none select-none"
-        />
-      </div>
-
       {/* Shared Simplified Header */}
       <div className="bg-surface-2/75 backdrop-blur-md border-b border-line-subtle px-3 py-2 flex items-center justify-between gap-2 shrink-0 select-none relative z-10">
         {/* Left Section: Icon, Title & Chats Button */}
@@ -774,7 +792,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             onClick={handleNewChat}
             disabled={isAtChatLimit}
             className="text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control p-1 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-ink-muted"
-            title={isAtChatLimit ? getChatLimitError().message : 'New Chat'}
+            title={isAtChatLimit ? getChatLimitError().message : 'New chat (Ctrl+Shift+O)'}
             aria-label="New Chat"
           >
             <Pencil className="w-3.5 h-3.5" />
@@ -814,6 +832,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             layout={chatsLayout}
             onSelectThread={handleSelectThread}
             onClose={() => setIsChatsOpen(false)}
+            onNewChat={handleNewChat}
+            canStartNewChat={!isAtChatLimit}
             onPin={pinThread}
             onArchive={archiveThread}
             onRename={renameThread}
@@ -835,7 +855,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                   disabled={isSending}
                   onOpenAuthModal={() => setIsAuthModalOpen(true)}
                   shortcuts={DEFAULT_PROMPT_SHORTCUTS}
-                  composer={isNarrow ? undefined : composer('inline')}
+                  composer={isPhone || !isNarrow ? composer('inline') : undefined}
+                  composerPosition={isPhone ? 'top' : 'center'}
                 />
               </div>
             ) : (
@@ -890,7 +911,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                             {msg.role === 'user' ? (
                               msg.content
                             ) : msg.content ? (
-                              <MessageResponse>{msg.content}</MessageResponse>
+                              <MessageResponse>
+                                {isStreamingThis ? withStreamingCursor(msg.content) : msg.content}
+                              </MessageResponse>
                             ) : msg.stopped ? null : (
                               <MessageThinkingDots />
                             )}
@@ -944,7 +967,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               </div>
             )}
 
-            {(!isNewChat || isNarrow) && <div className="shrink-0">{composer('docked')}</div>}
+            {(!isNewChat || (isNarrow && !isPhone)) && <div className="shrink-0">{composer('docked')}</div>}
           </div>
         )}
       </div>

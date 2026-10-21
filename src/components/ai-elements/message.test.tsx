@@ -99,3 +99,12 @@ describe('Message Component Avatar Rendering', () => {
   })
 })
 
+
+describe('withStreamingCursor', () => {
+  it('adds a cursor to plain text and skips an open code fence', async () => {
+    const { withStreamingCursor } = await import('./message')
+    expect(withStreamingCursor('Shed it')).toBe('Shed it ▍')
+    expect(withStreamingCursor('```ts\nconst a = 1')).toBe('```ts\nconst a = 1')
+    expect(withStreamingCursor('```ts\nx\n```')).toBe('```ts\nx\n``` ▍')
+  })
+})

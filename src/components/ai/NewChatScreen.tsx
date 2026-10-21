@@ -29,6 +29,11 @@ export interface NewChatScreenProps {
    * panels, where the panel docks the same box at the bottom so it sits above the keyboard.
    */
   composer?: React.ReactNode
+  /**
+   * `center` puts the box under the greeting (wide panels). `top` puts it first, right under
+   * the header, so a phone keyboard opens below it instead of covering it.
+   */
+  composerPosition?: 'center' | 'top'
   disabled?: boolean
   className?: string
 }
@@ -39,10 +44,12 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
   onOpenAuthModal,
   shortcuts = DEFAULT_PROMPT_SHORTCUTS,
   composer,
+  composerPosition = 'center',
   disabled = false,
   className = '',
 }) => {
-  const isCentered = Boolean(composer)
+  const isTop = Boolean(composer) && composerPosition === 'top'
+  const isCentered = Boolean(composer) && !isTop
 
   const greeting = (
     <div className={`flex flex-col gap-2 ${isCentered ? 'items-center text-center' : 'items-start'}`}>
@@ -105,6 +112,19 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
       )}
     </div>
   )
+
+  if (isTop) {
+    return (
+      <div className={`flex flex-col w-full px-3 pt-3 pb-6 gap-5 font-sans ${className}`}>
+        {composer}
+        <div className="flex flex-col gap-2 px-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">Try asking</p>
+          {suggestions}
+        </div>
+        {guestBanner}
+      </div>
+    )
+  }
 
   if (isCentered) {
     return (

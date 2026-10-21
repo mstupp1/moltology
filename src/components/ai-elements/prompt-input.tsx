@@ -120,6 +120,10 @@ export interface PromptInputProps {
   variant?: 'docked' | 'inline'
   /** Focus the box on mount (skipped on touch screens so the keyboard doesn't jump up). */
   autoFocus?: boolean
+  /** One row: the text grows on the left with mic and send on the right (phones). */
+  compact?: boolean
+  /** Small muted line under the box. */
+  footnote?: string
 }
 
 export const PromptInput: React.FC<PromptInputProps> = ({
@@ -135,6 +139,8 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   onValueChange,
   variant = 'docked',
   autoFocus = false,
+  compact = false,
+  footnote,
 }) => {
   const [localText, setLocalText] = useState('')
   const isControlled = value !== undefined
@@ -186,18 +192,82 @@ export const PromptInput: React.FC<PromptInputProps> = ({
     if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault()
       handleSubmit()
+      return
+    }
+    // Escape stops a streaming reply before it would close the popout.
+    if (e.key === 'Escape' && isStreaming && onStop) {
+      e.preventDefault()
+      e.stopPropagation()
+      onStop()
     }
   }
 
   const showStop = isStreaming && Boolean(onStop)
+  const hasModelPicker = Boolean(selectedModel && onSelectModel)
+  const oneRow = compact && !hasModelPicker
+
+  const actionButtons = (
+    <div className="flex items-center gap-1.5 shrink-0">
+      {dictation.isSupported && (
+        <button
+          type="button"
+          onClick={dictation.toggle}
+          disabled={disabled || isStreaming}
+          className={`w-8 h-8 inline-flex items-center justify-center rounded-control transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${FOCUS_RING} ${
+            dictation.isListening
+              ? 'text-crimson-text bg-crimson-soft'
+              : 'text-ink-muted hover:text-ink hover:bg-surface-3'
+          }`}
+          title={dictation.isListening ? 'Stop dictation' : 'Dictate'}
+          aria-label={dictation.isListening ? 'Stop dictation' : 'Start dictation'}
+          aria-pressed={dictation.isListening}
+        >
+          {dictation.isListening ? (
+            <span className="relative flex w-3.5 h-3.5 items-center justify-center" aria-hidden="true">
+              <span className="absolute inset-0 rounded-full bg-crimson-text/40 animate-ping motion-reduce:animate-none" />
+              <Mic className="relative w-3.5 h-3.5" />
+            </span>
+          ) : (
+            <Mic className="w-4 h-4" />
+          )}
+        </button>
+      )}
+
+      {showStop ? (
+        <button
+          type="button"
+          onClick={onStop}
+          className={`w-8 h-8 rounded-full bg-ink text-abyss hover:bg-ink-body flex items-center justify-center transition-colors cursor-pointer ${FOCUS_RING}`}
+          title="Stop reply"
+          aria-label="Stop reply"
+        >
+          <Square className="w-3 h-3 fill-current" />
+        </button>
+      ) : (
+        <button
+          type="submit"
+          disabled={disabled || isStreaming || !text.trim()}
+          className={`w-8 h-8 rounded-full bg-cyan-glow hover:bg-cyan-hover active:bg-cyan-dim disabled:opacity-40 disabled:hover:bg-cyan-glow text-abyss flex items-center justify-center transition-colors cursor-pointer disabled:cursor-not-allowed ${FOCUS_RING}`}
+          title="Send"
+          aria-label="Send message"
+        >
+          {isStreaming ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <ArrowUp className="w-4 h-4" strokeWidth={2.5} />
+          )}
+        </button>
+      )}
+    </div>
+  )
 
   const card = (
     <div
-      className={`bg-surface-2 border rounded-card p-2 sm:p-2.5 transition-colors focus-within:border-line ${
-        dictation.isListening ? 'border-line' : 'border-line-subtle'
-      }`}
+      className={`bg-surface-2 border rounded-card transition-colors focus-within:border-line ${
+        oneRow ? 'p-1.5' : 'p-2 sm:p-2.5'
+      } ${dictation.isListening ? 'border-line' : 'border-line-subtle'}`}
     >
-      <form onSubmit={handleSubmit} className="flex flex-col">
+      <form onSubmit={handleSubmit} className={oneRow ? 'flex items-end gap-1.5' : 'flex flex-col'}>
         <textarea
           ref={textareaRef}
           value={text}
@@ -207,11 +277,14 @@ export const PromptInput: React.FC<PromptInputProps> = ({
           disabled={disabled}
           rows={1}
           aria-label="Message"
-          className="w-full bg-transparent text-ink placeholder-ink-muted text-base sm:text-sm focus:outline-none resize-none min-h-[40px] max-h-[200px] leading-relaxed font-sans px-1.5 py-1"
+          className={`${oneRow ? 'flex-1 min-w-0' : 'w-full'} bg-transparent text-ink placeholder-ink-muted text-base sm:text-sm focus:outline-none resize-none min-h-[40px] max-h-[200px] leading-relaxed font-sans px-1.5 py-[0.4rem]`}
         />
 
-        <div className="flex items-center justify-between gap-2 pt-1.5 select-none">
-          <div className="flex items-center gap-1.5 min-w-0">
+        {oneRow ? (
+          actionButtons
+        ) : (
+          <div className="flex items-center justify-between gap-2 pt-1.5 select-none">
+            <div className="flex items-center gap-1.5 min-w-0">
             {selectedModel && onSelectModel && (
               <OracleModelPicker
                 selectedModel={selectedModel}
@@ -219,74 +292,33 @@ export const PromptInput: React.FC<PromptInputProps> = ({
                 compactLabel={variant === 'docked'}
               />
             )}
+            </div>
+            {actionButtons}
           </div>
-
-          <div className="flex items-center gap-1.5 shrink-0">
-            {dictation.isSupported && (
-              <button
-                type="button"
-                onClick={dictation.toggle}
-                disabled={disabled || isStreaming}
-                className={`w-8 h-8 inline-flex items-center justify-center rounded-control transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${FOCUS_RING} ${
-                  dictation.isListening
-                    ? 'text-crimson-text bg-crimson-soft'
-                    : 'text-ink-muted hover:text-ink hover:bg-surface-3'
-                }`}
-                title={dictation.isListening ? 'Stop dictation' : 'Dictate'}
-                aria-label={dictation.isListening ? 'Stop dictation' : 'Start dictation'}
-                aria-pressed={dictation.isListening}
-              >
-                {dictation.isListening ? (
-                  <span className="relative flex w-3.5 h-3.5 items-center justify-center" aria-hidden="true">
-                    <span className="absolute inset-0 rounded-full bg-crimson-text/40 animate-ping motion-reduce:animate-none" />
-                    <Mic className="relative w-3.5 h-3.5" />
-                  </span>
-                ) : (
-                  <Mic className="w-4 h-4" />
-                )}
-              </button>
-            )}
-
-            {showStop ? (
-              <button
-                type="button"
-                onClick={onStop}
-                className={`w-8 h-8 rounded-full bg-ink text-abyss hover:bg-ink-body flex items-center justify-center transition-colors cursor-pointer ${FOCUS_RING}`}
-                title="Stop reply"
-                aria-label="Stop reply"
-              >
-                <Square className="w-3 h-3 fill-current" />
-              </button>
-            ) : (
-              <button
-                type="submit"
-                disabled={disabled || isStreaming || !text.trim()}
-                className={`w-8 h-8 rounded-full bg-cyan-glow hover:bg-cyan-hover active:bg-cyan-dim disabled:opacity-40 disabled:hover:bg-cyan-glow text-abyss flex items-center justify-center transition-colors cursor-pointer disabled:cursor-not-allowed ${FOCUS_RING}`}
-                title="Send"
-                aria-label="Send message"
-              >
-                {isStreaming ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <ArrowUp className="w-4 h-4" strokeWidth={2.5} />
-                )}
-              </button>
-            )}
-          </div>
-        </div>
+        )}
       </form>
     </div>
   )
 
+  const withFootnote = (node: React.ReactNode) =>
+    footnote ? (
+      <>
+        {node}
+        <p className="mt-1.5 text-center text-[11px] text-ink-muted">{footnote}</p>
+      </>
+    ) : (
+      node
+    )
+
   if (variant === 'inline') {
-    return <div className={className}>{card}</div>
+    return <div className={className}>{withFootnote(card)}</div>
   }
 
   return (
     <div
       className={`px-2.5 pt-2 pb-[max(0.625rem,env(safe-area-inset-bottom))] sm:px-3 sm:pb-3 bg-surface-1/85 backdrop-blur-md border-t border-line-subtle ${className}`}
     >
-      <div className="mx-auto w-full max-w-3xl">{card}</div>
+      <div className="mx-auto w-full max-w-3xl">{withFootnote(card)}</div>
     </div>
   )
 }

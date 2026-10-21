@@ -244,11 +244,11 @@ describe('SynapticOracleWidget', () => {
     const panel = screen.getByTestId('oracle-chats-panel')
     expect(panel).toBeInTheDocument()
     expect(panel).toHaveAttribute('data-chats-layout', 'takeover')
-    expect(screen.getByText('CHATS')).toBeInTheDocument()
+    expect(screen.getByText('Chats')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: /^Close Chats$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /Back to conversation/i }))
     expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
-    expect(screen.queryByText('CHATS')).not.toBeInTheDocument()
+    expect(screen.queryByText('Chats')).not.toBeInTheDocument()
   })
 
   it('resets popout size when switching from sidebar mode to small window (popout) mode', () => {
