@@ -6,6 +6,7 @@
  *   npm run merch -- check                 Validate the catalog and list what still needs a Printful sync
  *   npm run merch -- print [--pilot] [--only key|slug]    Render print files to tmp/merch/print/
  *   npm run merch -- mockups [--only slug] Generate Printful product photos to tmp/merch/mockups/
+ *   npm run merch -- gallery --pilot     Download extra official views to tmp/merch/official-gallery/
  *   npm run merch -- upload                Upload print files and mockups to the bucket
  *   npm run merch -- blanks                Show the Printful blanks and their variants (needs PRINTFUL_API_TOKEN)
  *   npm run merch -- sync [--dry-run]      Create Printful products and record their ids
@@ -24,6 +25,7 @@ import { variantTemplate } from './merch/templates'
 import { requireMerchDevDatabase } from './merch/database'
 import { merchDoctor } from './merch/doctor'
 import { generatePrintfulMockups } from './merch/mockups'
+import { generateOfficialGallery } from './merch/gallery'
 import { PrintfulClient, buildSyncProductPayload, ensureSyncProduct, validateSyncProduct, unsyncedVariants, type SyncFile } from './merch/printful-sync'
 
 const OUT = path.resolve('tmp/merch')
@@ -173,6 +175,11 @@ async function mockups() {
   await generatePrintfulMockups(printfulClient(), selected(), OUT, flag('refresh') === 'true')
 }
 
+async function gallery() {
+  if (!flag('only') && !flag('pilot')) throw new Error('Select existing products with --only or --pilot.')
+  await generateOfficialGallery(printfulClient(), selected(), OUT, flag('groups')?.split('|').map(group => group.trim()), flag('refresh') === 'true')
+}
+
 async function templates() {
   const client = printfulClient()
   for (const product of selected()) {
@@ -297,7 +304,7 @@ async function retry() {
   await orders()
 }
 
-const COMMANDS: Record<string, () => void | Promise<void>> = { check, doctor, promote, templates, print, mockups, upload, blanks, sync, seed, orders, retry, listen }
+const COMMANDS: Record<string, () => void | Promise<void>> = { check, doctor, promote, templates, print, mockups, gallery, upload, blanks, sync, seed, orders, retry, listen }
 
 if (process.argv[1]?.includes('merch.ts')) {
   const command = process.argv[2]

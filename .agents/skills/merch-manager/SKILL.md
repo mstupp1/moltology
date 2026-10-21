@@ -3,6 +3,7 @@ name: merch-manager
 description: >-
   Add, change, price, publish or retire Moltology store items: compose canonical artwork,
   render print files, generate Printful mockups, synchronize products, seed the store,
+  create official product galleries and reference-guided ImageGen lifestyle/model photos,
   and inspect or recover Stripe-to-Printful orders.
 ---
 
@@ -83,6 +84,16 @@ publication states without touching the placeholder catalog. `upload` uses `--ki
   as Printful proof or use them as launch acceptance. Queue social content through the social skills.
 - Record verified outcomes and outstanding account steps. Never call the real pilot complete on
   the strength of mocks, uploads alone, or a successful test suite. Finish with a commit and Git status.
+
+## Additional product images and styled model photos
+
+For existing products, read [product photography](references/product-photography.md).
+Use `npm run merch -- gallery --pilot` (or `--only <slug>`) for a separate resumable
+library of official Printful shots, including alternate views. Use inspected official
+photos as product references for the built-in ImageGen tool when stylish models or
+lifestyle scenes are requested. Keep the official primary image and distinguish AI
+lifestyle images from provider mockups in the image ledger. Image creation or upload
+does not authorize changing live production listings.
 
 
 ## Launch readiness and deployed operations
