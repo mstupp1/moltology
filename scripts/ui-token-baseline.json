@@ -266,9 +266,6 @@
     "hex-color": 3,
     "off-scale-radius": 2
   },
-  "src/components/ui/HUDPageLoader.tsx": {
-    "hex-color": 4
-  },
   "src/components/ui/HUDSpinner.tsx": {
     "hex-color": 1
   },
