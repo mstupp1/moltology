@@ -75,7 +75,7 @@ describe('InlineTopicComposer', () => {
     )
 
     expect(screen.getByTestId('inline-composer-collapsed')).toBeInTheDocument()
-    expect(screen.getByText(/transmit a new discussion frequency/i)).toBeInTheDocument()
+    expect(screen.getByText(/start a post/i)).toBeInTheDocument()
   })
 
   it('expands into full form on click with mobile-safe input sizes', () => {
@@ -147,7 +147,7 @@ describe('InlineTopicComposer', () => {
 
     fireEvent.click(screen.getByTestId('inline-composer-collapsed'))
 
-    const transmitButton = screen.getByRole('button', { name: /transmit post/i })
+    const transmitButton = screen.getByRole('button', { name: /^post$/i })
     expect(transmitButton).toBeDisabled()
 
     // Enter title < 5 chars
@@ -191,7 +191,7 @@ describe('InlineTopicComposer', () => {
       target: { value: 'This is a sufficiently long message body.' },
     })
 
-    const transmitButton = screen.getByRole('button', { name: /transmit post/i })
+    const transmitButton = screen.getByRole('button', { name: /^post$/i })
     fireEvent.click(transmitButton)
 
     await waitFor(() => {
@@ -227,7 +227,7 @@ describe('InlineTopicComposer', () => {
     )
 
     expect(screen.getByTestId('inline-composer-guest')).toBeInTheDocument()
-    expect(screen.getByText('Join the Discussion')).toBeInTheDocument()
+    expect(screen.getByText('Join the discussion')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: /sign in \/ join/i }))
     expect(screen.getByTestId('auth-modal')).toBeInTheDocument()

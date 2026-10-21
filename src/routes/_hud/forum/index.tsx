@@ -1,28 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import {
-  Users,
-  Plus,
-  MessageSquare,
-  ShieldCheck,
-  ChevronRight,
-  Activity,
-  Radio,
-  Clock,
-  Sparkles,
-  Search,
-} from 'lucide-react'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { Users, Plus, MessageSquare, ShieldCheck, Search, LayoutGrid, SearchX } from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { HudButton } from '@/components/ui/HudButton'
 import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
+import { ForumBoardNav, ForumSortTabs, type ForumSortKey } from '@/components/forum/ForumBoardNav'
 import { InlineTopicComposer, InlineTopicComposerHandle } from '@/components/forum/InlineTopicComposer'
 import { ForumRulesDialog } from '@/components/forum/ForumRulesDialog'
+import { DashboardPanel } from '@/components/hud/dashboard/DashboardPanel'
 import { getForumCategoriesFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
-import { formatForumUnreadCount } from '@/lib/forum-visits'
-import { formatForumTopicCount } from '@/lib/forum-utils'
-import { ForumUnreadMark } from '@/components/forum/ForumBits'
-import { getCategoryBgImage } from '@/lib/forum-seed-data'
+import { COMMUNITY_RULES } from '@/lib/community-rules'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
@@ -61,6 +49,14 @@ export const Route = createFileRoute('/_hud/forum/')({
   pendingComponent: HudWorkspaceGhost,
 })
 
+const FIELD =
+  'w-full min-h-8 bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-none rounded-control transition-colors'
+
+function sentenceCase(text: string) {
+  const lower = text.toLowerCase()
+  return lower.charAt(0).toUpperCase() + lower.slice(1)
+}
+
 function ForumIndexPage() {
   const { categories, topics } = Route.useLoaderData()
   const navigate = useNavigate()
@@ -70,8 +66,11 @@ function ForumIndexPage() {
   const [showRules, setShowRules] = useState(false)
   const [topicsState, setTopicsState] = useState<ForumTopicEntry[]>(topics)
   const [categoriesState, setCategoriesState] = useState<ForumCategoryEntry[]>(categories)
+  const [sortBy, setSortBy] = useState<ForumSortKey>('hot')
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('ALL')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
+  const [boardFilter, setBoardFilter] = useState<string>('ALL')
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     setTopicsState(topics)
@@ -81,29 +80,17 @@ function ForumIndexPage() {
     setCategoriesState(categories)
   }, [categories])
 
-  // Hydrate per-user vote flags and unread after auth is available (SSR loaders cannot send JWT).
+  // Unread counts need the member's JWT, which SSR loaders cannot send.
   useEffect(() => {
     if (!userId) return
     let active = true
     ;(async () => {
       try {
         const token = await getAuthJWTToken()
-        const auth = { userId, token: token ?? undefined }
-        const [tops, cats] = await Promise.all([
-          getForumTopicsFn({
-            data: { sortBy: 'hot', ...auth },
-          }),
-          getForumCategoriesFn({ data: auth }),
-        ])
-        if (active && tops && tops.length > 0) {
-          syncForumVotesFromServer(userId, tops)
-          setTopicsState(tops)
-        }
-        if (active && cats && cats.length > 0) {
-          setCategoriesState(cats)
-        }
+        const cats = await getForumCategoriesFn({ data: { userId, token: token ?? undefined } })
+        if (active && cats && cats.length > 0) setCategoriesState(cats)
       } catch {
-        // Keep loader/seed topics if vote hydration fails
+        // Keep loader boards if hydration fails
       }
     })()
     return () => {
@@ -112,66 +99,82 @@ function ForumIndexPage() {
   }, [userId])
 
   // Lists carry previews, not whole bodies, so a search asks the server once typing pauses.
-  const [searchResults, setSearchResults] = useState<{ query: string; topics: ForumTopicEntry[] } | null>(null)
   useEffect(() => {
     const trimmed = searchQuery.trim()
     if (!trimmed) {
-      setSearchResults(null)
+      setDebouncedQuery('')
+      return
+    }
+    const timer = setTimeout(() => setDebouncedQuery(trimmed), 300)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  // Guests on the default view already have the loader's list; everything else asks the server.
+  useEffect(() => {
+    if (!userId && sortBy === 'hot' && !debouncedQuery) {
+      setTopicsState(topics)
       return
     }
     let active = true
-    const timer = setTimeout(async () => {
+    setLoading(true)
+    ;(async () => {
       try {
         const token = userId ? await getAuthJWTToken() : null
         const auth = userId ? { userId, token: token ?? undefined } : {}
-        const found = await getForumTopicsFn({ data: { sortBy: 'hot', query: trimmed, ...auth } })
-        if (active) setSearchResults({ query: trimmed, topics: found || [] })
+        const found = await getForumTopicsFn({
+          data: { sortBy, ...(debouncedQuery ? { query: debouncedQuery } : {}), ...auth },
+        })
+        if (!active) return
+        // An empty signed-in default view keeps the loader list rather than blanking the page.
+        if (found && (found.length > 0 || debouncedQuery || sortBy !== 'hot')) {
+          if (userId) syncForumVotesFromServer(userId, found)
+          setTopicsState(found)
+        }
       } catch {
-        if (active) setSearchResults({ query: trimmed, topics: [] })
+        if (active && debouncedQuery) setTopicsState([])
+      } finally {
+        if (active) setLoading(false)
       }
-    }, 300)
+    })()
     return () => {
       active = false
-      clearTimeout(timer)
     }
-  }, [searchQuery, userId])
+  }, [sortBy, debouncedQuery, userId, topics])
 
   const trimmedQuery = searchQuery.trim()
   const query = trimmedQuery.toLowerCase()
-  const serverMatches = searchResults?.query === trimmedQuery ? searchResults.topics : null
-  const filteredTopics = (serverMatches ?? topicsState).filter((topic) => {
-    const matchesCategory =
-      selectedCategoryFilter === 'ALL' ||
-      topic.categorySlug === selectedCategoryFilter ||
-      topic.categoryId === selectedCategoryFilter
-    // Narrow the loaded list right away while the server search is in flight.
+  // Narrow what is on screen right away while the server search is still in flight.
+  const waitingOnSearch = trimmedQuery !== debouncedQuery
+  const visibleTopics = topicsState.filter((topic) => {
+    const matchesBoard = boardFilter === 'ALL' || topic.categorySlug === boardFilter || topic.categoryId === boardFilter
     const matchesSearch =
+      !waitingOnSearch ||
       !query ||
-      serverMatches !== null ||
       topic.title.toLowerCase().includes(query) ||
       topic.content.toLowerCase().includes(query)
-    return matchesCategory && matchesSearch
+    return matchesBoard && matchesSearch
   })
 
-  const totalTopicsCount = categoriesState.reduce((sum, c) => sum + (c.topicCount || 0), 0)
+  const filtering = !!trimmedQuery || boardFilter !== 'ALL'
+  const clearFilters = () => {
+    setSearchQuery('')
+    setBoardFilter('ALL')
+  }
+
+  const startPost = () => composerRef.current?.expandAndFocus()
 
   return (
     <ForumShell>
-      <div className="space-y-3.5 sm:space-y-5 font-sans relative pb-8">
-        {/* Bento Hero / Header Banner */}
+      <div className="space-y-4 sm:space-y-5 font-sans relative pb-8">
         <HudTitlePanel
           eyebrow={
             <>
               <Users className="w-3.5 h-3.5" />
-              <span>Moltology Community</span>
+              <span>Moltology community</span>
             </>
           }
-          title={
-            <>
-              COMMUNITY
-            </>
-          }
-          description="Discussions, questions, and ideas across every stage of the Order."
+          title="Forum"
+          description="Ask questions, share progress and talk with other members."
           actions={
             <>
               <HudButton
@@ -179,96 +182,22 @@ function ForumIndexPage() {
                 variant="secondary"
                 size="sm"
                 onClick={() => setShowRules(true)}
-                icon={<ShieldCheck className="w-3.5 h-3.5 text-cyan-glow" />}
+                icon={<ShieldCheck className="w-3.5 h-3.5" />}
               >
                 <span>Rules</span>
               </HudButton>
-              <HudButton
-                type="button"
-                variant="primary"
-                size="sm"
-                onClick={() => composerRef.current?.expandAndFocus()}
-                icon={<Plus className="w-4 h-4" />}
-              >
-                <span>New Post</span>
+              <HudButton type="button" variant="primary" size="sm" onClick={startPost} icon={<Plus className="w-4 h-4" />}>
+                <span>New post</span>
               </HudButton>
             </>
           }
         />
 
-        {/* Bento Discussion Boards Grid */}
-        <section className="space-y-2.5">
-          <div className="flex items-center justify-between">
-            <h2 className="font-grotesk text-xs sm:text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-cyan-glow" />
-              Discussion Boards
-            </h2>
-            <span className="text-[11px] font-sans font-bold tracking-[0.08em] text-ink-muted">
-              {categoriesState.length} BOARDS ACTIVE
-            </span>
-          </div>
+        {/* Phones get the boards as one swipeable row above the feed; desktop keeps them in the rail. */}
+        <ForumBoardNav boards={categoriesState} variant="strip" className="lg:hidden" />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {categoriesState.map((cat) => (
-              <Link
-                key={cat.id}
-                to="/forum/$categorySlug"
-                params={{ categorySlug: cat.slug }}
-                className="p-4 sm:p-5 rounded-card border border-line-subtle bg-surface-1 hover:border-line-strong transition-all duration-300 group flex flex-col justify-between space-y-3 relative overflow-hidden min-h-[165px] sm:min-h-[180px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-              >
-                {/* Background Image with Hover Parallax / Zoom */}
-                <img
-                  src={cat.bgImage || getCategoryBgImage(cat.slug)}
-                  alt=""
-                  className="absolute inset-0 w-full h-full object-cover object-center opacity-45 group-hover:opacity-65 group-hover:scale-105 transition-all duration-500 pointer-events-none"
-                />
-
-                {/* Dark Gradient Overlay for Sharp Text Legibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-surface-1 via-surface-1/75 to-surface-1/35 group-hover:via-surface-1/60 transition-colors pointer-events-none" />
-
-                {/* Top Accent Color Line */}
-                <div
-                  className="absolute top-0 left-0 right-0 h-[2px] opacity-80 group-hover:opacity-100 transition-opacity"
-                  style={{ backgroundColor: cat.color }}
-                />
-
-                {/* Top Row: Category Title + Topic Count Badge (No Icons) */}
-                <div className="relative z-10 flex items-start justify-between gap-2.5">
-                  <h3
-                    className="font-grotesk font-extrabold text-base sm:text-lg text-ink transition-colors uppercase leading-snug drop-shadow-md"
-                    style={{ color: cat.color }}
-                  >
-                    {cat.name}
-                  </h3>
-                  <span className="text-[11px] font-sans font-bold text-cyan-glow bg-surface-1/90 border border-line-subtle px-2 py-0.5 rounded-chip shrink-0 backdrop-blur-sm">
-                    {formatForumTopicCount(cat.topicCount)}
-                  </span>
-                </div>
-
-                {/* Middle: Description */}
-                <p className="relative z-10 text-xs text-ink-body group-hover:text-ink line-clamp-2 leading-relaxed drop-shadow-sm font-sans">
-                  {cat.description}
-                </p>
-
-                {/* Bottom: Action Footer */}
-                <div className="relative z-10 pt-2 border-t border-line-subtle flex items-center justify-between text-[11px] font-sans font-bold tracking-[0.08em] text-ink-muted group-hover:text-cyan-glow transition-colors">
-                  <span>VIEW BOARD</span>
-                  <span className="flex items-center gap-2">
-                    {typeof cat.unreadCount === 'number' && cat.unreadCount > 0 && (
-                      <ForumUnreadMark label={formatForumUnreadCount(cat.unreadCount)} />
-                    )}
-                    <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* 2-Column Bento Split: Left (Latest Dispatches) + Right (Directives & Community Pulse) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
-          {/* Left Column (7 cols): Latest Topics Stream */}
-          <div className="lg:col-span-7 flex flex-col space-y-3.5 sm:space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
+          <div className="lg:col-span-8 space-y-4 min-w-0">
             <InlineTopicComposer
               ref={composerRef}
               categories={categoriesState}
@@ -284,182 +213,110 @@ function ForumIndexPage() {
               }}
             />
 
-            <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 md:p-5 space-y-3.5 sm:space-y-4 h-full flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line-subtle pb-3">
-                  <div>
-                    <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
-                      <Radio className="w-4 h-4 text-cyan-glow" />
-                      LATEST POSTS
-                    </h2>
-                    <p className="text-xs text-ink-muted mt-0.5">
-                      Recent threads from across the boards.
-                    </p>
-                  </div>
+            <section aria-labelledby="forum-posts-heading" className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <h2 id="forum-posts-heading" className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-cyan-glow" aria-hidden="true" />
+                  Posts
+                </h2>
+                <ForumSortTabs value={sortBy} onChange={setSortBy} />
+              </div>
 
-                  {/* Search Bar */}
-                  <div className="relative w-full sm:w-48 shrink-0">
-                    <Search className="w-3.5 h-3.5 text-ink-muted absolute left-2.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search posts..."
-                      className="w-full pl-8 pr-2.5 py-1 bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-none rounded-control transition-colors placeholder:text-ink-muted"
-                    />
-                  </div>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="relative flex-1 min-w-0">
+                  <Search className="w-3.5 h-3.5 text-ink-muted absolute left-2.5 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search posts"
+                    aria-label="Search posts"
+                    className={`${FIELD} pl-8 pr-2.5 py-1.5 placeholder:text-ink-muted`}
+                  />
                 </div>
-
-                {/* Filter Tabs */}
-                <div className="flex items-center gap-1 overflow-x-auto pb-1">
-                  <button
-                    onClick={() => setSelectedCategoryFilter('ALL')}
-                    className={`px-2 py-0.5 text-[11px] font-bold font-sans tracking-[0.08em] transition-all rounded-control border-b-2 shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                      selectedCategoryFilter === 'ALL'
-                        ? 'bg-surface-2 text-ink border-cyan-glow'
-                        : 'border-transparent text-ink-muted hover:text-ink hover:bg-surface-2'
-                    }`}
+                <label className="relative sm:w-56 shrink-0">
+                  <span className="sr-only">Filter by board</span>
+                  <LayoutGrid className="w-3.5 h-3.5 text-ink-muted absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+                  <select
+                    value={boardFilter}
+                    onChange={(e) => setBoardFilter(e.target.value)}
+                    className={`${FIELD} pl-8 pr-2.5 py-1.5`}
                   >
-                    ALL BOARDS
-                  </button>
-                  {categoriesState.map((cat) => (
-                    <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategoryFilter(cat.slug)}
-                      className={`px-2 py-0.5 text-[11px] font-bold font-sans tracking-[0.08em] transition-all rounded-control border-b-2 shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                        selectedCategoryFilter === cat.slug
-                          ? 'bg-surface-2 text-ink border-cyan-glow'
-                          : 'border-transparent text-ink-muted hover:text-ink hover:bg-surface-2'
-                      }`}
-                    >
-                      {cat.name.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
+                    <option value="ALL" className="bg-surface-2 text-ink">
+                      All boards
+                    </option>
+                    {categoriesState.map((cat) => (
+                      <option key={cat.id} value={cat.slug} className="bg-surface-2 text-ink">
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
 
-                {/* Topics Stream List */}
-                <div className="space-y-2">
-                  {filteredTopics.length === 0 ? (
-                    <div className="p-8 text-center text-xs text-ink-muted border border-line-subtle bg-surface-2 rounded-card">
-                      No posts found{searchQuery ? ' matching your search' : ' in this board'}.
-                    </div>
+              {loading && visibleTopics.length === 0 ? (
+                <div className="space-y-2" aria-busy="true">
+                  <div className="h-24 bg-surface-1 border border-line-subtle rounded-card animate-pulse" />
+                  <div className="h-24 bg-surface-1 border border-line-subtle rounded-card animate-pulse" />
+                </div>
+              ) : visibleTopics.length === 0 ? (
+                <div className="p-8 text-center rounded-card border border-line-subtle bg-surface-1 space-y-3" data-testid="forum-empty">
+                  {filtering ? (
+                    <>
+                      <SearchX className="w-6 h-6 text-ink-muted mx-auto" aria-hidden="true" />
+                      <p className="text-sm font-bold text-ink">No posts match</p>
+                      <p className="text-xs text-ink-muted">Try other words or look across every board.</p>
+                      <HudButton type="button" variant="secondary" size="sm" onClick={clearFilters}>
+                        Clear filters
+                      </HudButton>
+                    </>
                   ) : (
-                    filteredTopics.map((topic) => (
-                      <ForumTopicRow key={topic.id} topic={topic} />
-                    ))
+                    <>
+                      <MessageSquare className="w-6 h-6 text-ink-muted mx-auto" aria-hidden="true" />
+                      <p className="text-sm font-bold text-ink">No posts yet</p>
+                      <p className="text-xs text-ink-muted">Start the first conversation.</p>
+                      <HudButton type="button" variant="secondary" size="sm" onClick={startPost}>
+                        Start a post
+                      </HudButton>
+                    </>
                   )}
                 </div>
-              </div>
-            </div>
+              ) : (
+                <div className={`space-y-2 transition-opacity ${loading ? 'opacity-60' : ''}`}>
+                  {visibleTopics.map((topic) => (
+                    <ForumTopicRow key={topic.id} topic={topic} />
+                  ))}
+                </div>
+              )}
+            </section>
           </div>
 
-          {/* Right Column (5 cols): Sidebar Modules */}
-          <div className="lg:col-span-5 flex flex-col space-y-3.5 sm:space-y-5">
-            {/* Sidebar Card 1: Community Directives */}
-            <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 md:p-5 space-y-3">
-              <div className="flex items-center justify-between border-b border-line-subtle pb-3">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-cyan-glow" />
-                  <div>
-                    <h3 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">
-                      COMMUNITY RULES
-                    </h3>
-                    <p className="text-xs text-ink-muted">
-                      How we keep the boards healthy.
-                    </p>
-                  </div>
-                </div>
-                <span className="text-[11px] font-sans font-bold tracking-[0.08em] text-cyan-glow bg-cyan-soft border border-line-subtle px-2 py-0.5 rounded-chip">
-                  STANDARDS
-                </span>
-              </div>
+          <aside className="lg:col-span-4 space-y-4 lg:sticky lg:top-4">
+            <DashboardPanel
+              icon={<LayoutGrid />}
+              title="Boards"
+              subtitle="Pick a board to see everything posted there."
+              className="hidden lg:flex"
+            >
+              <ForumBoardNav boards={categoriesState} variant="list" />
+            </DashboardPanel>
 
-              <div className="space-y-2 font-sans text-xs">
-                <div className="p-2.5 border border-line-subtle bg-surface-2 rounded-card space-y-0.5">
-                  <div className="font-grotesk font-bold text-[11px] text-ink uppercase">
-                    1. Constructive Discourse
-                  </div>
-                  <p className="text-[11px] text-ink-body leading-snug">
-                    Keep discussion positive and useful for every stage.
-                  </p>
-                </div>
-
-                <div className="p-2.5 border border-line-subtle bg-surface-2 rounded-card space-y-0.5">
-                  <div className="font-grotesk font-bold text-[11px] text-ink uppercase">
-                    2. Keep Secrets Private
-                  </div>
-                  <p className="text-[11px] text-ink-body leading-snug">
-                    Never share credentials, API keys, or private tokens in public posts.
-                  </p>
-                </div>
-
-                <div className="p-2.5 border border-line-subtle bg-surface-2 rounded-card space-y-0.5">
-                  <div className="font-grotesk font-bold text-[11px] text-ink uppercase">
-                    3. Safety & Warmth
-                  </div>
-                  <p className="text-[11px] text-ink-body leading-snug">
-                    Beneath the dark HUD look, mutual growth is non-negotiable.
-                  </p>
-                </div>
-              </div>
-
-              <div className="pt-2 border-t border-line-subtle flex items-center justify-between text-xs">
-                <span className="text-ink-muted text-[11px] tracking-[0.08em]">
-                  5 RULES ACTIVE
-                </span>
-                <button
-                  onClick={() => setShowRules(true)}
-                  className="px-3 py-1 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong text-[11px] font-bold tracking-[0.08em] flex items-center gap-1 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-                >
-                  <span>FULL RULES</span>
-                  <ChevronRight className="w-3 h-3" />
-                </button>
-              </div>
-            </div>
-
-            {/* Sidebar Card 2: Community Pulse / Vitals */}
-            <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 md:p-5 space-y-3">
-              <div className="flex items-center justify-between border-b border-line-subtle pb-3">
-                <div className="flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-cyan-glow" />
-                  <div>
-                    <h3 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">
-                      COMMUNITY PULSE
-                    </h3>
-                    <p className="text-xs text-ink-muted">
-                      Network metrics & activity.
-                    </p>
-                  </div>
-                </div>
-                <span className="text-[11px] font-sans font-bold tracking-[0.08em] text-emerald-400 bg-emerald-500/15 border border-line-subtle px-2 py-0.5 rounded-chip">
-                  SYNCHRONIZED
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 font-sans">
-                <div className="p-2.5 border border-line-subtle bg-surface-2 rounded-card space-y-0.5">
-                  <span className="text-[11px] text-ink-muted uppercase font-bold tracking-[0.08em]">TOTAL TOPICS</span>
-                  <div className="font-grotesk font-bold text-base text-ink">
-                    {totalTopicsCount}
-                  </div>
-                </div>
-                <div className="p-2.5 border border-line-subtle bg-surface-2 rounded-card space-y-0.5">
-                  <span className="text-[11px] text-ink-muted uppercase font-bold tracking-[0.08em]">ACTIVE BOARDS</span>
-                  <div className="font-grotesk font-bold text-base text-cyan-glow">
-                    {categoriesState.length}
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-2.5 border border-line-subtle bg-surface-2 rounded-card flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-glow" />
-                  <span className="text-[11px] text-ink-body">Open Access for All Stages</span>
-                </div>
-                <span className="text-[11px] text-cyan-glow font-bold">STAGE 1–4</span>
-              </div>
-            </div>
-          </div>
+            <DashboardPanel
+              icon={<ShieldCheck />}
+              title="Rules"
+              subtitle="How we keep the boards useful."
+              action={{ label: 'Read all', onClick: () => setShowRules(true) }}
+            >
+              <ol className="space-y-1.5 text-xs text-ink-body">
+                {COMMUNITY_RULES.map((rule) => (
+                  <li key={rule.id} className="flex gap-2">
+                    <span className="text-ink-muted tabular-nums">{rule.id}.</span>
+                    <span>{sentenceCase(rule.title)}</span>
+                  </li>
+                ))}
+              </ol>
+            </DashboardPanel>
+          </aside>
         </div>
       </div>
 

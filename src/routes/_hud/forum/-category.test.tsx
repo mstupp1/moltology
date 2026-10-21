@@ -129,7 +129,7 @@ describe('ForumBoardPage (/_hud/forum/$categorySlug/)', () => {
 
     expect(screen.getAllByTestId('forum-unread-mark').some((node) => node.textContent === '2 new')).toBe(true)
     await waitFor(() => {
-      expect(screen.getByText('New transmission')).toBeInTheDocument()
+      expect(screen.getAllByTestId('forum-unread-mark').some((node) => node.textContent === 'New')).toBe(true)
     })
   })
 
@@ -176,7 +176,7 @@ describe('ForumBoardPage (/_hud/forum/$categorySlug/)', () => {
 
     await waitFor(() => {
       expect(screen.getAllByTestId('forum-unread-mark').some((node) => node.textContent === '2 new')).toBe(true)
-      expect(screen.getByText('New transmission')).toBeInTheDocument()
+      expect(screen.getAllByTestId('forum-unread-mark').some((node) => node.textContent === 'New')).toBe(true)
     })
     expect(getForumTopicsFn).toHaveBeenCalledWith({
       data: {

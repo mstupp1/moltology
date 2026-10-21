@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, Search, MessageSquare, Terminal, ChevronRight, Compass
 import { ForumShell } from '@/components/forum/ForumShell'
 import { HudButton } from '@/components/ui/HudButton'
 import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
+import { ForumSortTabs, type ForumSortKey } from '@/components/forum/ForumBoardNav'
 import { InlineTopicComposer, InlineTopicComposerHandle } from '@/components/forum/InlineTopicComposer'
 import { getForumCategoryBySlugFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { formatForumUnreadCount } from '@/lib/forum-visits'
@@ -61,7 +62,7 @@ export const Route = createFileRoute('/_hud/forum/$categorySlug/')({
   pendingComponent: HudWorkspaceGhost,
 })
 
-type SortKey = 'hot' | 'top' | 'latest' | 'active'
+type SortKey = ForumSortKey
 
 function ForumBoardPage() {
   const { categorySlug } = Route.useParams()
@@ -139,13 +140,6 @@ function ForumBoardPage() {
     }
   }, [categorySlug, sortBy, debouncedQuery, userId])
 
-  const sortTabs: { key: SortKey; label: string }[] = [
-    { key: 'hot', label: 'HOT' },
-    { key: 'top', label: 'TOP' },
-    { key: 'latest', label: 'NEW' },
-    { key: 'active', label: 'ACTIVE' },
-  ]
-
   const otherCategories = INITIAL_FORUM_CATEGORIES.filter((c) => c.slug !== categorySlug)
 
   return (
@@ -158,7 +152,7 @@ function ForumBoardPage() {
             className="inline-flex items-center gap-1.5 rounded-control text-xs font-bold tracking-[0.08em] text-cyan-glow hover:underline uppercase transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>COMMUNITY</span>
+            <span>FORUM</span>
           </Link>
           {category && (
             <>
@@ -254,21 +248,7 @@ function ForumBoardPage() {
               <div className="space-y-3">
                 {/* Toolbar */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 border-b border-line-subtle pb-3">
-                  <div className="flex items-center gap-1">
-                    {sortTabs.map((tab) => (
-                      <button
-                        key={tab.key}
-                        onClick={() => setSortBy(tab.key)}
-                        className={`px-2.5 py-1 text-[11px] font-sans font-bold uppercase tracking-[0.08em] transition-all rounded-control border-b-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                          sortBy === tab.key
-                            ? 'bg-surface-2 text-ink border-cyan-glow'
-                            : 'border-transparent text-ink-muted hover:text-ink hover:bg-surface-2'
-                        }`}
-                      >
-                        {tab.label}
-                      </button>
-                    ))}
-                  </div>
+                  <ForumSortTabs value={sortBy} onChange={setSortBy} options={['hot', 'latest', 'top', 'active']} />
 
                   <div className="relative w-full sm:w-56">
                     <Search className="w-3.5 h-3.5 text-ink-muted absolute left-2.5 top-1/2 -translate-y-1/2" />
