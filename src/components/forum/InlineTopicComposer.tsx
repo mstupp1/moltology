@@ -165,9 +165,9 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
               <Terminal className="w-4 h-4 text-cyan-glow" />
             </div>
             <div>
-              <p className="text-xs font-bold text-ink">Join the Discussion</p>
+              <p className="text-xs font-bold text-ink">Join the discussion</p>
               <p className="text-[11px] text-ink-muted">
-                Sign in to transmit posts and questions to the community.
+                Sign in to start posts and reply to members.
               </p>
             </div>
           </div>
@@ -206,8 +206,8 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
     const promptText =
       placeholder ||
       (fixedCategory && currentCategory
-        ? `Transmit a new frequency in ${currentCategory.name}...`
-        : 'Transmit a new discussion frequency...')
+        ? `Start a post in ${currentCategory.name}…`
+        : 'Start a post…')
 
     if (!isExpanded) {
       return (
@@ -258,7 +258,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
           <div className="flex items-center gap-2">
             <Terminal className="w-4 h-4 text-cyan-glow" />
             <h2 className="text-xs text-cyan-glow font-bold tracking-[0.08em] uppercase">
-              TRANSMIT NEW TOPIC
+              New post
             </h2>
             {fixedCategory && currentCategory && (
               <span
@@ -378,7 +378,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
               className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] px-5 py-2 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center justify-center gap-2 touch-manipulation"
             >
               <Send className="w-3.5 h-3.5" />
-              <span>{creating ? 'Transmitting...' : 'Transmit Post'}</span>
+              <span>{creating ? 'Posting…' : 'Post'}</span>
             </button>
           </div>
         </form>
