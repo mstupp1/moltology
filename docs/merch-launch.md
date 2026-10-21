@@ -238,7 +238,19 @@ and `refund.failed` in addition to current merch/Premium events. Refund totals a
 mode-checked. **A Stripe refund does not cancel Printful production.** Refunds and cancellations
 remain in provider dashboards, with a support alert to review both systems.
 
-`.github/workflows/store-recovery.yml` POSTs to `/api/store/recovery` every fifteen minutes.
+`.github/workflows/store-recovery.yml` POSTs to `/api/store/recovery`. Its 15-minute schedule is
+off until launch (manual runs only), because the secrets below are unset and every run failed.
+
+**Order recovery at launch (decide before going live).** The plan is to drop the 15-minute
+GitHub timer rather than turn it back on:
+1. In `src/lib/server/store.ts`, stop swallowing fulfillment errors in the Stripe webhook
+   (`fulfillMerchCheckoutEvent(...).catch(() => undefined)`). Return a non-2xx response so
+   Stripe's own webhook retries (up to 3 days) cover a failed Printful submission.
+2. Rely on the admin Shop tab's needs-attention list and Retry button for anything left stuck.
+3. Optionally run `/api/store/recovery` once a day from a Vercel cron for stuck emails and
+   status drift, and delete this workflow.
+
+The details below describe the endpoint as built.
 Set GitHub secrets `STORE_RECOVERY_URL` (HTTPS full endpoint) and `STORE_RECOVERY_SECRET`; the latter
 must match the deployment secret. The endpoint rejects missing/incorrect bearer tokens. A global
 lease prevents overlapping runs; each run processes up to four orders and eight emails, with

@@ -1,7 +1,6 @@
 name: Store recovery
+# Schedule off until the store launches (see docs/merch-launch.md, "Order recovery at launch").
 on:
-  schedule:
-    - cron: '*/15 * * * *'
   workflow_dispatch:
 permissions:
   contents: read
