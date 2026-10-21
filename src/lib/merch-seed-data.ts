@@ -290,7 +290,7 @@ export const INITIAL_MERCH_PRODUCTS: MerchSeedProduct[] = withPrintfulSync(
   })),
 )
 
-/** The catalog in the shape the store pages read. Used by preview mode. */
+/** The catalog in the shape the store pages read, straight from the catalog file (tests and local mocks). */
 export function merchCatalogView(catalog: MerchSeedProduct[] = INITIAL_MERCH_PRODUCTS) {
   return catalog
     .filter((product) => product.isPublished)

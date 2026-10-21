@@ -17,7 +17,7 @@ import {
 import { getMerchCatalogFn, getMerchProductBySlugFn } from '@/lib/server/merch-api'
 import { StorePolicies } from './StorePolicies'
 import { MerchImage } from './MerchImage'
-import { useMerchCart } from './MerchCartProvider'
+import { useMerchCart, type StoreOrderingState } from './MerchCartProvider'
 import { merchGalleryAlt, merchGalleryCaption } from '@/lib/merch-gallery'
 
 const FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
@@ -273,20 +273,29 @@ export function ProductDetail({ slug }: { slug: string }) {
               </div>
             </div>
 
-            <div className="hidden space-y-2 lg:block">
-              <HudButton size="lg" fullWidth disabled={!selected} onClick={addToCart}>
-                {addLabel}
-              </HudButton>
-              <HudButton
-                size="lg"
-                variant="secondary"
-                fullWidth
-                disabled={!selected || cart.checkingOut}
-                onClick={() => selected && void cart.checkout([{ variantId: selected.id, quantity }])}
-              >
-                {cart.checkingOut ? 'Starting checkout…' : 'Buy now'}
-              </HudButton>
-            </div>
+            {cart.canOrder ? (
+              <div className="hidden space-y-2 lg:block">
+                <HudButton size="lg" fullWidth disabled={!selected} onClick={addToCart}>
+                  {addLabel}
+                </HudButton>
+                <HudButton
+                  size="lg"
+                  variant="secondary"
+                  fullWidth
+                  disabled={!selected || cart.checkingOut}
+                  onClick={() => selected && void cart.checkout([{ variantId: selected.id, quantity }])}
+                >
+                  {cart.checkingOut ? 'Starting checkout…' : 'Buy now'}
+                </HudButton>
+              </div>
+            ) : (
+              <div className="hidden lg:block">
+                <HudButton size="lg" variant="secondary" fullWidth disabled>
+                  {cart.ordering === 'loading' ? 'Checking availability…' : 'Unavailable right now'}
+                </HudButton>
+              </div>
+            )}
+            <OrderingNote ordering={cart.ordering} />
             <p className="text-sm leading-relaxed text-ink-muted">{MERCH_SHIPPING_NOTE}</p>
           </div>
 
@@ -363,15 +372,38 @@ export function ProductDetail({ slug }: { slug: string }) {
         <div className="mx-auto flex max-w-xl items-center gap-3">
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm text-ink">{product.title}</p>
-            <p className="text-xs text-ink-muted">{selected ? selected.title : sizes.length > 1 ? 'Choose a size above' : priceLabel}</p>
+            <p className="text-xs text-ink-muted">{!cart.canOrder ? priceLabel : selected ? selected.title : sizes.length > 1 ? 'Choose a size above' : priceLabel}</p>
           </div>
-          <HudButton disabled={!selected} onClick={addToCart}>
-            {selected ? `Add · ${formatMerchPrice(selected.priceCents * quantity)}` : 'Choose a size'}
-          </HudButton>
+          {cart.canOrder ? (
+            <HudButton disabled={!selected} onClick={addToCart}>
+              {selected ? `Add · ${formatMerchPrice(selected.priceCents * quantity)}` : 'Choose a size'}
+            </HudButton>
+          ) : (
+            <HudButton variant="secondary" disabled>{cart.ordering === 'loading' ? 'Checking…' : 'Unavailable right now'}</HudButton>
+          )}
         </div>
       </div>
     </div>
   )
+}
+
+/** Says why the buy buttons are off, or reminds an admin that only staff can order for now. */
+export function OrderingNote({ ordering }: { ordering: StoreOrderingState }) {
+  if (ordering === 'closed') {
+    return (
+      <p className="rounded-control border border-line-subtle bg-surface-1 px-3 py-2 text-sm text-ink-body" data-testid="store-ordering-closed">
+        These pieces can't be ordered yet. Ordering opens soon.
+      </p>
+    )
+  }
+  if (ordering === 'testing') {
+    return (
+      <p className="rounded-control border border-line-subtle bg-surface-1 px-3 py-2 text-sm text-ink-body" data-testid="store-ordering-testing">
+        Test ordering. Members see "Unavailable right now". Only admins can order until ordering opens.
+      </p>
+    )
+  }
+  return null
 }
 
 function Disclosure({

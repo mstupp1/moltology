@@ -26,7 +26,7 @@ function StoreStatus() {
     {result ? <><p>Payment: {result.paymentStatus.replaceAll('_', ' ')}</p><p>Fulfillment: {(result.providerStatus || result.fulfillmentStatus).replaceAll('_',' ')}</p>
       {result.fulfillmentStatus === 'printful_draft' && <p>Payment is received. Your order is awaiting production review.</p>}
       <ul>{result.items.map((item, i) => <li key={i}>{item.quantity} × {item.title} · {item.variant}</li>)}</ul>
-      <p>Items {formatMerchPrice(result.subtotalCents)} · Shipping {formatMerchPrice(result.shippingCents)} · Tax {formatMerchPrice(result.taxCents)}</p>
+      <p>Items {formatMerchPrice(result.subtotalCents)}{result.discountCents > 0 && ` · Discount${result.promotionCode ? ` (${result.promotionCode})` : ''} −${formatMerchPrice(result.discountCents)}`} · Shipping {formatMerchPrice(result.shippingCents)} · Tax {formatMerchPrice(result.taxCents)}</p>
       <p>Total {formatMerchPrice(result.totalCents)}{result.refundCents > 0 && ` · Refunded ${formatMerchPrice(result.refundCents)}`}</p>
       {result.shipments.map(s => <p key={s.id}>{s.carrier} · {s.trackingNumber} {s.trackingUrl && <a href={s.trackingUrl} rel="noreferrer" target="_blank">Track package</a>}</p>)}
       <button type="button" onClick={refresh}>Refresh status</button></> : !error && <p>Checking verified payment and order status…</p>}

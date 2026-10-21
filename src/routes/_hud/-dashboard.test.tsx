@@ -23,6 +23,7 @@ describe('Dashboard view source', () => {
       '<ForumHubCard',
       '<ConnectionsHubCard',
       '<ActivityStreamPanel',
+      '<DashboardStorePanel',
       '<DashboardShortcuts',
       '<DashboardNewsPanel',
       '<DashboardChangelogPanel',

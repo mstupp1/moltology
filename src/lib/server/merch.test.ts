@@ -83,3 +83,28 @@ describe('merch fulfilment waits for payment', () => {
     vi.unstubAllEnvs()
   })
 })
+
+describe('merch webhook checks promo discounts', () => {
+  function quotedOrderDb(discountCents: number) {
+    const order = { id: 'order-1', userId: null, fulfillmentStatus: 'pending', paymentStatus: 'unpaid', livemode: false, currency: 'usd', subtotalCents: 3000, shippingCents: 695, taxCents: 0, discountCents,
+      quoteSnapshot: { storeId: '1' }, shippingAddress: null, customerEmail: 'a@example.com', statusTokenHash: null, stripeCheckoutSessionId: 'cs_1', lineItems: [] }
+    const sets: Array<Record<string, unknown>> = []
+    const query = { from: () => query, where: () => query, limit: vi.fn().mockResolvedValue([order]) }
+    const update = { set: (values: Record<string, unknown>) => { sets.push(values); return update }, where: vi.fn().mockResolvedValue([]) }
+    vi.mocked(getDb).mockReturnValue({ select: () => query, update: () => update } as never)
+    return sets
+  }
+  const paid = (amount_discount: number) => ({ id: 'cs_1', livemode: false, payment_status: 'paid', currency: 'usd', metadata: { orderType: 'merch', orderId: 'order-1' },
+    amount_subtotal: 3000, amount_total: 3000 + 695 - amount_discount, shipping_cost: { amount_total: 695 }, total_details: { amount_tax: 0, amount_discount } })
+
+  it('accepts a paid total that matches the saved discount', async () => {
+    const sets = quotedOrderDb(450)
+    await fulfillMerchCheckoutEvent({ type: 'checkout.session.completed', data: { object: paid(450) } })
+    expect(sets[0]).toMatchObject({ paymentStatus: 'paid', totalCents: 3245 })
+  })
+
+  it('refuses a discount the order did not record', async () => {
+    quotedOrderDb(0)
+    await expect(fulfillMerchCheckoutEvent({ type: 'checkout.session.completed', data: { object: paid(450) } })).rejects.toThrow('do not match')
+  })
+})

@@ -248,6 +248,7 @@ function OrderDetail({
         </ul>
         <dl className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-0.5 border-t border-line-subtle pt-2 tabular-nums">
           <dt>Items</dt><dd>{formatMerchPrice(order.subtotalCents)}</dd>
+          {order.discountCents > 0 ? (<><dt>Discount{order.promotionCode ? ` · ${order.promotionCode}` : ''}</dt><dd>−{formatMerchPrice(order.discountCents)}</dd></>) : null}
           <dt>Shipping</dt><dd>{formatMerchPrice(order.shippingCents)}</dd>
           <dt>Tax</dt><dd>{formatMerchPrice(order.taxCents)}</dd>
           <dt className="font-bold text-ink">Total</dt><dd className="font-bold text-ink">{formatMerchPrice(order.totalCents)}</dd>

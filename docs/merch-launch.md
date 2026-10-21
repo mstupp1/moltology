@@ -1,8 +1,32 @@
 # Store launch preparation
 
-The native store (`/store`) remains private behind the admin-only `new-store` experiment. Public
-browsing, indexing, live charges and automatic production are separately gated. Other visitors keep
-the Etsy link. Creation and operations use the [merch-manager skill](../.agents/skills/merch-manager/SKILL.md).
+The native store (`/store`) is private behind the admin-only `new-store` experiment until **Public
+browsing** is on in Store settings and `STORE_PUBLIC_LAUNCH_AUTHORIZED=true` is set. Ordering,
+indexing, live charges and automatic production are each gated separately. While the store is
+private, other visitors keep the Etsy link. Creation and operations use the
+[merch-manager skill](../.agents/skills/merch-manager/SKILL.md).
+
+## Browsing, ordering and promo codes
+
+- **Public browsing** (setting + `STORE_PUBLIC_LAUNCH_AUTHORIZED`) shows `/store` to everyone and
+  points the site's store links there instead of Etsy. The member dashboard gets a Store panel.
+- **Ordering open to everyone** (`orderingOpen`, off by default) decides who can buy. While it is
+  off, visitors see the products with an "Unavailable right now" button, no cart and no checkout,
+  and the dashboard panel says "Coming soon" without prices. The server refuses shipping quotes,
+  promo checks and checkout for anyone but admins, who can still order to test and see a "Test
+  ordering" note. **Pause checkout** stops everyone, admins included.
+- **Promo codes** live in Stripe and are managed in Store settings → Promo codes (create, list, turn
+  on/off). Each is a one-time Stripe coupon plus promotion code tagged `metadata.scope=merch`;
+  codes without that tag are refused, so codes made for anything else in Stripe never work here.
+  Shoppers apply a code in the delivery step; the server re-checks it and passes it to Checkout as
+  a `discounts` entry. Codes cover items only, never shipping or tax, so a 100%-off test order still
+  charges shipping. "One use per email" is enforced by the store (store customers are per order);
+  expiry, total uses and minimum order are enforced by Stripe. The order saves Stripe's
+  `discountCents` and code at session creation, and the webhook refuses a paid total or discount that
+  does not match. Test-mode codes do not exist in live mode: create launch codes again after
+  switching keys.
+- The dev-only `VITE_MERCH_PREVIEW` mode was retired at this step; the store always reads the
+  database.
 
 ## Production catalog update — October 21, 2026
 
@@ -158,8 +182,7 @@ require a dashboard webhook endpoint. For a hosted preview, configure its HTTPS 
 test mode and use that endpoint's own signing secret in the preview environment.
 
 Sign in as an admin with `new-store` enabled. Enter delivery details and obtain a current shipping
-quote in the app before continuing to Stripe. Leave `VITE_MERCH_PREVIEW` unset: preview mode disables
-checkout and bypasses the database, so it cannot prove this pilot. Buy either pilot item with Stripe
+quote in the app before continuing to Stripe. Buy either pilot item with Stripe
 test card details and a valid shipping address. For another run, confirm a single unconfirmed order appears in the
 Manual/API store and that its database state is `printful_draft`. Replay the same Stripe event and
 confirm the remote order count does not change. The initial acceptance run included both categories in one order.

@@ -10,7 +10,7 @@ vi.mock('./printful', () => ({ ensurePrintfulOrder: vi.fn() }))
 const completion: MerchCheckoutCompletion = {
   orderId: 'order-1', sessionId: 'cs_1', customerId: null, email: 'ops@example.com',
   shipping: { name: 'Ops', line1: '1 Test', line2: null, city: 'Seattle', state: 'WA', postalCode: '98101', country: 'US', phone: null },
-  subtotalCents: 1800, shippingCents: 695, taxCents: 0, totalCents: 2495, currency: 'usd', paid: true,
+  subtotalCents: 1800, shippingCents: 695, taxCents: 0, discountCents: 0, totalCents: 2495, currency: 'usd', paid: true,
 }
 
 function database(claims = 1, status = 'processing') {

@@ -13,7 +13,7 @@ Read [content worktree hygiene](../../../docs/content-worktree-hygiene.md) first
 Git state, preserve unrelated changes, commit intentional work (including sync/asset ledgers), and
 check final status. Keep generated media and task records in ignored `tmp/merch/`; preserve them on failure.
 
-The catalog is code: `src/lib/merch-seed-data.ts` drives Printful, the seed, preview, and store.
+The catalog is code: `src/lib/merch-seed-data.ts` drives Printful, the seed, and store.
 Print designs live in `scripts/merch/designs.ts`; product facts in `src/lib/merch.ts`;
 provider mappings in `content/merch/printful-sync.json`. See [launch state and operations](../../../docs/merch-launch.md).
 
@@ -49,8 +49,8 @@ provider mappings in `content/merch/printful-sync.json`. See [launch state and o
 8. `npm run merch -- seed --only <slug>` writes only that product to the verified dev database.
    The CLI requires the configured dev target and rejects production. Unsynced products cannot
    publish; checkout also rejects placeholder variants. Do not run a broad seed to publish one item.
-9. Use the existing private store/admin experiment. For checkout verification leave
-   `VITE_MERCH_PREVIEW` unset. Preview mode is only for artwork/layout exploration and disables payment.
+9. Use the existing private store/admin experiment (or the public store with ordering closed: admins
+   can still check out). Promo codes and the ordering switch are described in docs/merch-launch.md.
 
 The current approved pair is selected with `--pilot` instead of `--only`: `moltology-mug-v2` and
 `moltology-tee-v2`. The original `synaptic-mark-*` pair is retired from dev; preserve its provider

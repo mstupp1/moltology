@@ -8,13 +8,22 @@ import {
   upsertCartLine,
   type MerchCartLine,
 } from '@/lib/merch'
-import { MERCH_PREVIEW, MERCH_PREVIEW_CHECKOUT_ERROR } from '@/lib/merch-preview'
+import { getStoreAccessFn } from '@/lib/server/merch-api'
+import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { DeliveryCheckout } from './DeliveryCheckout'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 
 const PENDING_CLEAR_KEY = 'moltology.merch.pendingClear'
 
+/**
+ * closed: nobody can order. testing: ordering is closed to members but this viewer is an admin.
+ * Unknown until the store settings and the viewer's role have loaded; treated as closed.
+ */
+export type StoreOrderingState = 'loading' | 'open' | 'testing' | 'closed'
+
 interface MerchCartContextValue {
+  ordering: StoreOrderingState
+  canOrder: boolean
   lines: MerchCartLine[]
   open: boolean
   setOpen: (open: boolean) => void
@@ -47,6 +56,11 @@ export function MerchCartProvider({ children }: { children: React.ReactNode }) {
   const [delivery, setDelivery] = useState<{ items: Array<{ variantId: string; quantity: number }>; clearCart: boolean } | null>(null)
   const checkingOut = delivery !== null
   const consumedResult = useRef<'success' | 'cancel' | undefined>(undefined)
+  const [orderingOpen, setOrderingOpen] = useState<boolean | null>(null)
+  const admin = useHiddenPageAccess()
+  useEffect(() => { void getStoreAccessFn().then(a => setOrderingOpen(a.orderingOpen && !a.checkoutPaused)).catch(() => setOrderingOpen(false)) }, [])
+  const ordering: StoreOrderingState = orderingOpen === null ? 'loading' : orderingOpen ? 'open' : admin.pending ? 'loading' : admin.canView ? 'testing' : 'closed'
+  const canOrder = ordering === 'open' || ordering === 'testing'
 
   useEffect(() => {
     setLines(readStoredCart(window.localStorage.getItem(MERCH_CART_STORAGE_KEY)))
@@ -73,14 +87,14 @@ export function MerchCartProvider({ children }: { children: React.ReactNode }) {
 
   const checkout = useCallback(
     async (items: Array<{ variantId: string; quantity: number }>, options?: { clearCart?: boolean }) => {
-      if (MERCH_PREVIEW) {
-        toastApi?.toast.info(MERCH_PREVIEW_CHECKOUT_ERROR, { id: 'merch-checkout' })
+      if (!canOrder) {
+        toastApi?.toast.info('Ordering is unavailable right now.', { id: 'merch-checkout' })
         return
       }
       setOpen(false)
       setDelivery({ items, clearCart: options?.clearCart ?? false })
     },
-    [toastApi],
+    [canOrder, toastApi],
   )
 
   const completeVerifiedCheckout = useCallback((orderId: string) => {
@@ -114,6 +128,8 @@ export function MerchCartProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<MerchCartContextValue>(
     () => ({
+      ordering,
+      canOrder,
       lines,
       open,
       setOpen,
@@ -127,8 +143,8 @@ export function MerchCartProvider({ children }: { children: React.ReactNode }) {
       consumeCheckoutResult,
       completeVerifiedCheckout,
     }),
-    [addLine, checkingOut, checkout, consumeCheckoutResult, completeVerifiedCheckout, lines, open, removeLine, setQuantity],
+    [addLine, canOrder, checkingOut, checkout, consumeCheckoutResult, completeVerifiedCheckout, lines, open, ordering, removeLine, setQuantity],
   )
 
-  return <MerchCartContext.Provider value={value}>{children}{delivery && <DeliveryCheckout items={delivery.items} clearCart={delivery.clearCart} close={() => setDelivery(null)} />}</MerchCartContext.Provider>
+  return <MerchCartContext.Provider value={value}>{children}{delivery && <DeliveryCheckout items={delivery.items} clearCart={delivery.clearCart} testing={ordering === 'testing'} close={() => setDelivery(null)} />}</MerchCartContext.Provider>
 }

@@ -47,7 +47,7 @@ suite('store checkout and operations on Neon dev', () => {
   beforeAll(async () => { requireMerchDevDatabase(process.env); previousOverrides = await getDb().select().from(storeOverrides).where(eq(storeOverrides.id,mug)) })
   beforeEach(() => {
     vi.clearAllMocks()
-    mocks.settings = { ...STORE_DEFAULTS, publicEnabled: true }
+    mocks.settings = { ...STORE_DEFAULTS, publicEnabled: true, orderingOpen: true }
     vi.stubEnv('STORE_PUBLIC_LAUNCH_AUTHORIZED','true')
     vi.stubEnv('STORE_STATUS_SECRET','integration-status-secret-with-32-characters')
     vi.stubEnv('STRIPE_SECRET_KEY','sk_test_fixture')
