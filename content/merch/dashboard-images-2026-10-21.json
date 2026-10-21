@@ -1,0 +1,123 @@
+{
+  "date": "2026-10-21",
+  "timezone": "America/New_York",
+  "purpose": "Dashboard-only transparent product images; catalog, product galleries, carts and variants retain official photos.",
+  "brief": {
+    "treatment": "evergreen",
+    "seasonalIntensity": "none",
+    "choice": "Preserve canonical product identity without holiday props; use existing teal HUD tokens for contrast."
+  },
+  "provider": "built-in image_gen.imagegen",
+  "transparentBackground": true,
+  "assets": [
+    {
+      "slug": "moltology-mug",
+      "sourceKey": "images/merch/moltology-mug-v2-1.jpg",
+      "localOutput": "tmp/merch/dashboard/moltology-mug-v2.png",
+      "key": "images/merch/dashboard/2026-10-21/moltology-mug-v2.png",
+      "webpKey": "images/merch/dashboard/2026-10-21/moltology-mug-v2.webp",
+      "backgroundToken": "surface-3",
+      "prompt": "Use case: background-extraction. Asset type: dashboard-only product cutout. Remove only the white studio background and floor shadow from the supplied mug photograph. Return the same exact product with true transparent alpha surrounding it, including inside the mug handle. Preserve the product silhouette, material, perspective, every detail of the existing printed emblem and lettering, proportions, folds and lighting without redrawing any artwork. Keep all white parts of the product opaque. No new text, logos, props or background. Center the complete product with modest transparent breathing room on a square canvas.",
+      "status": "uploaded; CDN WebP downloaded and alpha verified",
+      "inspection": "User approved final appearance. White ceramic and red emblem retained; handle opening transparent. Small residual edge specks visible at source resolution; accepted with user approval. Edited promotional cutout, not unmodified Printful proof.",
+      "pngValidation": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "hasAlpha": true,
+        "alphaRange": [
+          0,
+          255
+        ],
+        "sha256": "7b9e3b19965eec8df15d917fda11e4fc7e97136b873e96792c0380609eb8a155"
+      },
+      "upload": {
+        "pngBytes": 1048974,
+        "webpBytes": 69156,
+        "cdnVerified": true,
+        "alphaRange": [
+          0,
+          255
+        ],
+        "dimensions": [
+          1254,
+          1254
+        ]
+      }
+    },
+    {
+      "slug": "moltology-tee",
+      "sourceKey": "images/merch/moltology-tee-v2-black.jpg",
+      "localOutput": "tmp/merch/dashboard/moltology-tee-v2.png",
+      "key": "images/merch/dashboard/2026-10-21/moltology-tee-v2.png",
+      "webpKey": "images/merch/dashboard/2026-10-21/moltology-tee-v2.webp",
+      "backgroundToken": "benthic-border",
+      "prompt": "Use case: background-extraction. Asset type: dashboard-only product cutout. Remove only the white studio background and floor shadow from the supplied tee photograph. Return the same exact product with true transparent alpha surrounding it. Preserve the product silhouette, material, perspective, every detail of the existing printed emblem and lettering, proportions, folds and lighting without redrawing any artwork. Keep all white parts of the product opaque. No new text, logos, props or background. Center the complete product with modest transparent breathing room on a square canvas.",
+      "status": "uploaded; CDN WebP downloaded and alpha verified",
+      "inspection": "Complete black tee, legible Moltology / THE SYNAPTIC PATH text, centered red emblem, transparent exterior; selected as edited promotional cutout, not physical print proof.",
+      "upload": {
+        "pngBytes": 1329438,
+        "webpBytes": 44384,
+        "cdnVerified": true,
+        "alphaRange": [
+          0,
+          255
+        ],
+        "dimensions": [
+          1254,
+          1254
+        ]
+      },
+      "pngValidation": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "hasAlpha": true,
+        "alphaRange": [
+          0,
+          255
+        ],
+        "sha256": "b417edd8ab15b4555d6aafe57917a4663144aa300fec76f647644f6d459a19c5"
+      }
+    }
+  ],
+  "mugRefinements": [
+    {
+      "prompt": "Use case: background-extraction. Clean up this transparent mug cutout. Remove every stray white speck, all disconnected pixels, every halo and floor-shadow remnant outside the mug and inside its handle opening. The background and handle opening must be completely alpha-transparent. Keep only the ceramic mug with a smooth precise antialiased silhouette. Preserve the mug and red emblem exactly as shown; no changes to product or printed design. Keep square framing and size. This is for display on dark teal so all white fringes and debris must be removed.",
+      "outcome": "Improved initial extraction, but rejected for remaining edge debris."
+    },
+    {
+      "prompt": "Produce a pristine professional e-commerce cutout of the provided ceramic mug for a dark-background dashboard. Use case background-extraction. Edit target is the supplied original product photograph. Extract ONLY the full ceramic mug, including its handle. Transparent background required with true alpha. Smooth precise silhouette; no outside white specks or shadow debris whatsoever, no ragged pixel edges. The opening inside the handle is entirely transparent. All ceramic including bright white highlights remains fully opaque. Retain the same camera angle, mug shape, and exact printed red emblem. No floor, no shadow, no props. Square image with centered mug and breathing room. Inspect against dark teal: all edges must be clean and polished.",
+      "outcome": "Rejected: white fringe and disconnected specks persisted."
+    },
+    {
+      "prompt": "Edit the provided official mug photograph. Change ONLY the white studio background and white floor to a perfectly flat solid dark teal #172325. The gap inside the mug handle must also be solid #172325. No shadow, no gradients, no floor, no floating specks or debris. Keep the white ceramic mug fully intact with smooth clean edges and every printed red emblem detail preserved. Product placement and angle remain the same. A pristine commercial product photo, all background is exactly the same flat #172325.",
+      "transparentBackground": false,
+      "localOutput": "tmp/merch/dashboard/mug-teal-intermediate.png",
+      "outcome": "Inspected clean contrasting intermediate; retained mug and emblem, clean handle opening."
+    },
+    {
+      "prompt": "Use case: background-extraction. Remove ONLY the solid dark teal background from this supplied mug image, including inside the handle. Make every dark teal backdrop pixel truly transparent with alpha. Preserve the white ceramic mug, its glossy highlights, red printed emblem, smooth clean silhouette, size and placement EXACTLY unchanged. No teal fringe, no shadow, no specks, no white background, no floor. Return a pristine square transparent product cutout.",
+      "transparentBackground": true,
+      "outcome": "Selected after user approval: \"This looks fine\"."
+    }
+  ],
+  "validation": [
+    "DashboardStorePanel.test.tsx: 4 tests passed",
+    "npm run typecheck: passed",
+    "UI token check: passed"
+  ],
+  "listingChanges": "none",
+  "deployment": "Code prepared locally; not deployed by this run.",
+  "startingGit": {
+    "head": "ad6740e",
+    "status": "clean",
+    "workingBase": "e622004",
+    "baseUpdate": "Fast-forwarded clean detached worktree to existing origin/main to include DashboardStorePanel."
+  },
+  "releaseNotes": [
+    "Dashboard mapping follows the plain product slugs merged in PR #273; legacy DB slugs resolve to the same images."
+  ]
+}

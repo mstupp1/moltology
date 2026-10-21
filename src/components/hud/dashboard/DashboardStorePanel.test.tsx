@@ -23,7 +23,8 @@ beforeEach(() => {
 describe('DashboardStorePanel', () => {
   it('promotes store pieces without prices while ordering is closed', async () => {
     render(<DashboardStorePanel />)
-    expect(await screen.findByTestId('dashboard-store')).toHaveTextContent('Ordering opens soon')
+    const panel = await screen.findByTestId('dashboard-store')
+    expect(panel).not.toHaveTextContent(/Mugs and tees|Ordering opens soon/)
     expect(screen.getAllByRole('link')).toHaveLength(Math.min(DASHBOARD_STORE_LIMIT, catalog.length))
     expect(screen.getAllByText('Coming soon').length).toBeGreaterThan(0)
     expect(screen.queryByText(/\$\d/)).toBeNull()
@@ -33,6 +34,15 @@ describe('DashboardStorePanel', () => {
     vi.mocked(getStoreAccessFn).mockResolvedValue({ orderingOpen: true, checkoutPaused: false } as never)
     render(<DashboardStorePanel />)
     expect((await screen.findAllByText(/\$\d/)).length).toBeGreaterThan(0)
+  })
+
+  it('uses separate transparent dashboard images without changing catalog photos', async () => {
+    vi.mocked(getMerchCatalogFn).mockResolvedValue(catalog.filter(product => ['moltology-mug', 'moltology-tee'].includes(product.slug)) as never)
+    render(<DashboardStorePanel />)
+    await screen.findByTestId('dashboard-store')
+    expect(screen.getByAltText('White Moltology mug with red emblem')).toHaveAttribute('src', '/media/images/merch/dashboard/2026-10-21/moltology-mug-v2.webp')
+    expect(screen.getByAltText('Black Moltology tee, front')).toHaveAttribute('src', '/media/images/merch/dashboard/2026-10-21/moltology-tee-v2.webp')
+    expect(catalog.find(product => product.slug === 'moltology-mug')?.featuredImageUrl).toBe('images/merch/moltology-mug-v2-1.jpg')
   })
 
   it('stays hidden when the store is not open to this member', async () => {

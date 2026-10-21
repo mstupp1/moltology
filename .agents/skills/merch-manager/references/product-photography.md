@@ -26,6 +26,37 @@ products, changing print files or touching fulfillment settings.
    Preserve original framing; avoid stretching, cropping or replacing backgrounds
    in anything described as an official Printful photo.
 
+## Dashboard cutouts
+
+Every new store item also needs a dashboard-only transparent product image. For existing
+items, create one when requested. Use an inspected official primary product photo as the
+edit target with the built-in ImageGen tool and `transparent_background: true`. Remove
+only the studio background and floor shadow, including enclosed background areas such as
+mug handle openings. Preserve opaque white ceramic, garment color, silhouette, perspective,
+printed artwork and lettering. Do not redraw branding or add new lighting or props.
+
+Use evergreen treatment with a complete centered product on a square canvas and modest
+transparent margins. Inspect the result beside the original and against the intended dark
+UI surface: no white rectangle, halo, missing product areas or altered artwork. Confirm real
+alpha transparency rather than a baked checkerboard. Treat these as edited promotional
+cutouts, not untouched provider photos or proof of physical print fidelity.
+If white-on-white extraction leaves specks or damages ceramic highlights, first use ImageGen
+to replace the background with a contrasting flat teal, inspect that intermediate, then
+request transparency from it. Reject dirty extractions instead of uploading them.
+
+Save PNGs under ignored `tmp/merch/dashboard/` and upload an explicit selected list through
+`npm run s3:upload -- <file.png> --key images/merch/dashboard/<date>/<slug>.png`.
+The uploader creates WebP twins; preserve alpha in both. Reference original PNG keys in
+`src/components/hud/dashboard/store-images.ts`, with descriptive alt text and a background
+class using existing brand tokens. Prefer `bg-surface-3` for light products and
+`bg-benthic-border` for black garments so their outlines remain visible. Use contain sizing
+and padding. Do not substitute cutouts into product-page galleries, variants or cart photos.
+Products without a registered cutout keep their normal primary image as a fallback.
+
+Record official source keys, full prompts, output keys, inspection notes and confirmed
+upload outcomes in a tracked `content/merch/` ledger. Verify the dashboard panel tests and
+typecheck, commit registry/skill/ledger changes, and report the final Git state.
+
 ## Styled people and lifestyle imagery
 
 Use the `imagegen` skill and built-in `image_gen.imagegen` by default. Do not route
