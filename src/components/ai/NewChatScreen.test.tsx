@@ -44,4 +44,14 @@ describe('NewChatScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: /Sign Up/i }))
     expect(onOpenAuthModal).toHaveBeenCalled()
   })
+
+  it('puts the composer first in the top layout used on phones', () => {
+    const { container } = render(
+      <NewChatScreen onSubmit={onSubmit} composer={<textarea aria-label="Message" />} composerPosition="top" />
+    )
+    const root = container.firstElementChild as HTMLElement
+    expect(root.firstElementChild?.tagName).toBe('TEXTAREA')
+    expect(screen.getByText('Try asking')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Ask the Oracle' })).not.toBeInTheDocument()
+  })
 })

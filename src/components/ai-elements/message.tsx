@@ -86,16 +86,19 @@ export const Message: React.FC<MessageProps> = ({
       className={`group/message flex flex-col w-full ${isUser ? 'items-end' : 'items-start'} ${className}`}
       {...props}
     >
-      <div className="flex items-center gap-1.5 mb-1.5 text-[11px] text-ink-muted font-bold uppercase tracking-[0.08em]">
+      {/* Member turns read as a plain bubble, like most chat apps; the name stays for screen readers. */}
+      <div
+        className={
+          isUser
+            ? 'sr-only'
+            : 'flex items-center gap-1.5 mb-1.5 text-[11px] text-ink-muted font-bold uppercase tracking-[0.08em]'
+        }
+      >
         {renderAvatar()}
         <span>{effectiveSenderLabel}</span>
-        {timestamp && (
-          <span className="text-ink-muted/80 font-normal normal-case tracking-normal tabular-nums">
-            {timestamp}
-          </span>
-        )}
       </div>
       <div
+        title={timestamp || undefined}
         className={
           isUser
             ? 'max-w-[88%] sm:max-w-[80%] px-3.5 py-2.5 text-sm leading-relaxed rounded-card bg-surface-2 border border-line-subtle text-ink whitespace-pre-wrap break-words'
@@ -180,6 +183,12 @@ export const MessageResponse: React.FC<{ children: React.ReactNode; className?: 
     return <MarkdownRenderer content={children} className={className} />
   }
   return <div className={`whitespace-pre-wrap ${className}`}>{children}</div>
+}
+
+/** Adds a cursor block to a reply while it streams, unless that would land inside a code fence. */
+export function withStreamingCursor(content: string): string {
+  const fences = content.match(/```/g)?.length ?? 0
+  return fences % 2 === 1 ? content : `${content} ▍`
 }
 
 export const MessageThinkingDots: React.FC<{ className?: string }> = ({

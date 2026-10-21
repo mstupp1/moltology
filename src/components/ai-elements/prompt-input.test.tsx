@@ -72,4 +72,17 @@ describe('PromptInput', () => {
     fireEvent.click(screen.getAllByRole('button', { name: /GLM 5.3 Flash/i }).at(-1)!)
     expect(onSelectModel).toHaveBeenCalledWith('zai/glm-5.3-flash')
   })
+
+  it('stops a streaming reply with Escape', () => {
+    const onStop = vi.fn()
+    render(<PromptInput onSubmit={vi.fn()} onStop={onStop} status="streaming" />)
+    fireEvent.keyDown(screen.getByRole('textbox', { name: 'Message' }), { key: 'Escape' })
+    expect(onStop).toHaveBeenCalled()
+  })
+
+  it('lays out on one row in compact mode and shows a footnote when given', () => {
+    const { container } = render(<PromptInput onSubmit={vi.fn()} compact footnote="Check anything important." />)
+    expect(container.querySelector('form')?.className).toContain('items-end')
+    expect(screen.getByText('Check anything important.')).toBeInTheDocument()
+  })
 })
