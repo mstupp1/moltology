@@ -1,0 +1,348 @@
+{
+  "date": "2026-10-21",
+  "timezone": "America/New_York",
+  "brief": {
+    "treatment": "evergreen",
+    "seasonalIntensity": "none; durable store imagery",
+    "direction": "Contemporary editorial, quiet architectural studios and autumn daylight; no holiday props"
+  },
+  "listingStatus": "Asset library only; no production gallery writes",
+  "official": [
+    {
+      "title": "Primary",
+      "variantIds": [
+        1320
+      ],
+      "filename": "mug-moltology-v2-default-1.jpg",
+      "provider": "printful",
+      "group": "Default",
+      "design": "mug-moltology-v2",
+      "size": "11 oz",
+      "color": "White",
+      "key": "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-default-1.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-default-1.webp",
+      "local": "tmp/merch/official-gallery/18931450/moltology-mug-v2/mug-moltology-v2-default-1.jpg",
+      "inspection": "Official provider output; alternate product views retained",
+      "uploaded": true
+    },
+    {
+      "title": "Handle on Left",
+      "variantIds": [
+        1320
+      ],
+      "filename": "mug-moltology-v2-default-2.jpg",
+      "provider": "printful",
+      "group": "Default",
+      "design": "mug-moltology-v2",
+      "size": "11 oz",
+      "color": "White",
+      "key": "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-default-2.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-default-2.webp",
+      "local": "tmp/merch/official-gallery/18931450/moltology-mug-v2/mug-moltology-v2-default-2.jpg",
+      "inspection": "Official provider output; alternate product views retained",
+      "uploaded": true
+    },
+    {
+      "title": "Front view",
+      "variantIds": [
+        1320
+      ],
+      "filename": "mug-moltology-v2-default-3.jpg",
+      "provider": "printful",
+      "group": "Default",
+      "design": "mug-moltology-v2",
+      "size": "11 oz",
+      "color": "White",
+      "key": "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-default-3.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-default-3.webp",
+      "local": "tmp/merch/official-gallery/18931450/moltology-mug-v2/mug-moltology-v2-default-3.jpg",
+      "inspection": "Official provider output; alternate product views retained",
+      "uploaded": true
+    },
+    {
+      "title": "Primary",
+      "variantIds": [
+        4830
+      ],
+      "filename": "mug-moltology-v2-15oz-default-1.jpg",
+      "provider": "printful",
+      "group": "Default",
+      "design": "mug-moltology-v2-15oz",
+      "size": "15 oz",
+      "color": "White",
+      "key": "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-15oz-default-1.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-15oz-default-1.webp",
+      "local": "tmp/merch/official-gallery/18931450/moltology-mug-v2/mug-moltology-v2-15oz-default-1.jpg",
+      "inspection": "Official provider output; alternate product views retained",
+      "uploaded": true
+    },
+    {
+      "title": "Handle on Left",
+      "variantIds": [
+        4830
+      ],
+      "filename": "mug-moltology-v2-15oz-default-2.jpg",
+      "provider": "printful",
+      "group": "Default",
+      "design": "mug-moltology-v2-15oz",
+      "size": "15 oz",
+      "color": "White",
+      "key": "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-15oz-default-2.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-15oz-default-2.webp",
+      "local": "tmp/merch/official-gallery/18931450/moltology-mug-v2/mug-moltology-v2-15oz-default-2.jpg",
+      "inspection": "Official provider output; alternate product views retained",
+      "uploaded": true
+    },
+    {
+      "title": "Front view",
+      "variantIds": [
+        4830
+      ],
+      "filename": "mug-moltology-v2-15oz-default-3.jpg",
+      "provider": "printful",
+      "group": "Default",
+      "design": "mug-moltology-v2-15oz",
+      "size": "15 oz",
+      "color": "White",
+      "key": "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-15oz-default-3.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-15oz-default-3.webp",
+      "local": "tmp/merch/official-gallery/18931450/moltology-mug-v2/mug-moltology-v2-15oz-default-3.jpg",
+      "inspection": "Official provider output; alternate product views retained",
+      "uploaded": true
+    },
+    {
+      "title": "Primary",
+      "variantIds": [
+        4017
+      ],
+      "filename": "tee-moltology-v2-flat-2-1.jpg",
+      "provider": "printful",
+      "group": "Flat 2",
+      "design": "tee-moltology-v2",
+      "size": "M",
+      "color": "Black",
+      "key": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-flat-2-1.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-flat-2-1.webp",
+      "local": "tmp/merch/official-gallery/18931450/moltology-tee-v2/tee-moltology-v2-flat-2-1.jpg",
+      "inspection": "Official provider output; alternate product views retained",
+      "uploaded": true
+    },
+    {
+      "title": "Back",
+      "variantIds": [
+        4017
+      ],
+      "filename": "tee-moltology-v2-flat-2-2.jpg",
+      "provider": "printful",
+      "group": "Flat 2",
+      "design": "tee-moltology-v2",
+      "size": "M",
+      "color": "Black",
+      "key": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-flat-2-2.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-flat-2-2.webp",
+      "local": "tmp/merch/official-gallery/18931450/moltology-tee-v2/tee-moltology-v2-flat-2-2.jpg",
+      "inspection": "Official provider output; alternate product views retained",
+      "uploaded": true
+    },
+    {
+      "title": "Primary",
+      "variantIds": [
+        4017
+      ],
+      "filename": "tee-moltology-v2-ghost-1.jpg",
+      "provider": "printful",
+      "group": "Ghost",
+      "design": "tee-moltology-v2",
+      "size": "M",
+      "color": "Black",
+      "key": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-ghost-1.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-ghost-1.webp",
+      "local": "tmp/merch/official-gallery/18931450/moltology-tee-v2/tee-moltology-v2-ghost-1.jpg",
+      "inspection": "Official provider output; alternate product views retained",
+      "uploaded": true
+    },
+    {
+      "title": "Back",
+      "variantIds": [
+        4017
+      ],
+      "filename": "tee-moltology-v2-ghost-2.jpg",
+      "provider": "printful",
+      "group": "Ghost",
+      "design": "tee-moltology-v2",
+      "size": "M",
+      "color": "Black",
+      "key": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-ghost-2.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-ghost-2.webp",
+      "local": "tmp/merch/official-gallery/18931450/moltology-tee-v2/tee-moltology-v2-ghost-2.jpg",
+      "inspection": "Official provider output; alternate product views retained",
+      "uploaded": true
+    },
+    {
+      "title": "Left",
+      "variantIds": [
+        4017
+      ],
+      "filename": "tee-moltology-v2-ghost-3.jpg",
+      "provider": "printful",
+      "group": "Ghost",
+      "design": "tee-moltology-v2",
+      "size": "M",
+      "color": "Black",
+      "key": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-ghost-3.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-ghost-3.webp",
+      "local": "tmp/merch/official-gallery/18931450/moltology-tee-v2/tee-moltology-v2-ghost-3.jpg",
+      "inspection": "Official provider output; alternate product views retained",
+      "uploaded": true
+    },
+    {
+      "title": "Right",
+      "variantIds": [
+        4017
+      ],
+      "filename": "tee-moltology-v2-ghost-4.jpg",
+      "provider": "printful",
+      "group": "Ghost",
+      "design": "tee-moltology-v2",
+      "size": "M",
+      "color": "Black",
+      "key": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-ghost-4.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-ghost-4.webp",
+      "local": "tmp/merch/official-gallery/18931450/moltology-tee-v2/tee-moltology-v2-ghost-4.jpg",
+      "inspection": "Official provider output; alternate product views retained",
+      "uploaded": true
+    },
+    {
+      "title": "Primary",
+      "variantIds": [
+        4017
+      ],
+      "filename": "tee-moltology-v2-on-hanger-1.jpg",
+      "provider": "printful",
+      "group": "On Hanger",
+      "design": "tee-moltology-v2",
+      "size": "M",
+      "color": "Black",
+      "key": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-on-hanger-1.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-on-hanger-1.webp",
+      "local": "tmp/merch/official-gallery/18931450/moltology-tee-v2/tee-moltology-v2-on-hanger-1.jpg",
+      "inspection": "Official provider output; alternate product views retained",
+      "uploaded": true
+    },
+    {
+      "title": "Back",
+      "variantIds": [
+        4017
+      ],
+      "filename": "tee-moltology-v2-on-hanger-2.jpg",
+      "provider": "printful",
+      "group": "On Hanger",
+      "design": "tee-moltology-v2",
+      "size": "M",
+      "color": "Black",
+      "key": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-on-hanger-2.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-on-hanger-2.webp",
+      "local": "tmp/merch/official-gallery/18931450/moltology-tee-v2/tee-moltology-v2-on-hanger-2.jpg",
+      "inspection": "Official provider output; alternate product views retained",
+      "uploaded": true
+    }
+  ],
+  "lifestyle": [
+    {
+      "key": "images/merch/library/2026-10-21/moltology-tee-v2/tee-studio.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-tee-v2/tee-studio.webp",
+      "local": "tmp/merch/lifestyle/2026-10-21/tee-studio.jpg",
+      "product": "moltology-tee-v2",
+      "provider": "built-in ImageGen",
+      "generated": true,
+      "promptKey": "teeStudio",
+      "references": [
+        "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-flat-2-1.jpg"
+      ],
+      "color": "Black",
+      "referenceSize": "M",
+      "inspection": "Visually reviewed against official reference for visible lettering, emblem, color, placement, product shape and hand anatomy; AI lifestyle illustration, not physical sample validation",
+      "uploaded": true
+    },
+    {
+      "key": "images/merch/library/2026-10-21/moltology-tee-v2/tee-terrace.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-tee-v2/tee-terrace.webp",
+      "local": "tmp/merch/lifestyle/2026-10-21/tee-terrace.jpg",
+      "product": "moltology-tee-v2",
+      "provider": "built-in ImageGen",
+      "generated": true,
+      "promptKey": "teeTerrace",
+      "references": [
+        "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-flat-2-1.jpg"
+      ],
+      "color": "Black",
+      "referenceSize": "M",
+      "inspection": "Visually reviewed against official reference for visible lettering, emblem, color, placement, product shape and hand anatomy; AI lifestyle illustration, not physical sample validation",
+      "uploaded": true
+    },
+    {
+      "key": "images/merch/library/2026-10-21/moltology-tee-v2/tee-gallery.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-tee-v2/tee-gallery.webp",
+      "local": "tmp/merch/lifestyle/2026-10-21/tee-gallery.jpg",
+      "product": "moltology-tee-v2",
+      "provider": "built-in ImageGen",
+      "generated": true,
+      "promptKey": "teeGallery",
+      "references": [
+        "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-flat-2-1.jpg"
+      ],
+      "color": "Black",
+      "referenceSize": "M",
+      "inspection": "Visually reviewed against official reference for visible lettering, emblem, color, placement, product shape and hand anatomy; AI lifestyle illustration, not physical sample validation",
+      "uploaded": true
+    },
+    {
+      "key": "images/merch/library/2026-10-21/moltology-mug-v2/mug-studio.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-mug-v2/mug-studio.webp",
+      "local": "tmp/merch/lifestyle/2026-10-21/mug-studio.jpg",
+      "product": "moltology-mug-v2",
+      "provider": "built-in ImageGen",
+      "generated": true,
+      "promptKey": "mugStudio",
+      "references": [
+        "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-default-1.jpg",
+        "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-default-2.jpg"
+      ],
+      "color": "White",
+      "referenceSize": "11 oz",
+      "inspection": "Visually reviewed against official reference for visible lettering, emblem, color, placement, product shape and hand anatomy; AI lifestyle illustration, not physical sample validation",
+      "uploaded": true
+    },
+    {
+      "key": "images/merch/library/2026-10-21/moltology-mug-v2/mug-reading.jpg",
+      "webpKey": "images/merch/library/2026-10-21/moltology-mug-v2/mug-reading.webp",
+      "local": "tmp/merch/lifestyle/2026-10-21/mug-reading.jpg",
+      "product": "moltology-mug-v2",
+      "provider": "built-in ImageGen",
+      "generated": true,
+      "promptKey": "mugReading",
+      "references": [
+        "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-default-1.jpg",
+        "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-default-2.jpg"
+      ],
+      "color": "White",
+      "referenceSize": "11 oz",
+      "inspection": "Visually reviewed against official reference for visible lettering, emblem, color, placement, product shape and hand anatomy; AI lifestyle illustration, not physical sample validation",
+      "uploaded": true
+    }
+  ],
+  "prompts": {
+    "mugStudio": "Use case: product-mockup. Create one photorealistic premium fashion editorial lifestyle photograph, portrait 4:5. The two supplied official Printful images show opposite sides of ONE white glossy 11 oz cylindrical ceramic mug. Preserve the exact mug proportions, white interior, rounded white handle, and printed design. Show ONLY the red emblem face toward the camera, handle on viewer left, matching reference 2 precisely; the wordmark is on the opposite hidden side, never combine both faces or invent branding. Scene: stylish adult woman around 30 with short dark bob, charcoal ribbed sweater, wide-leg dark trousers, seated at a minimal walnut desk in a beautiful concrete artist studio, holding the mug naturally at chest height in her LEFT hand, fingers through handle without covering emblem. Quiet confident candid presence; torso and face visible, mug prominent and sharply focused, realistic 11 oz scale. Late autumn daylight through tall window, soft warm practical light, deep charcoal and warm wood, subtle cool blue shadows, analog editorial grain, high-end independent fashion magazine. No Halloween or holiday decorations; evergreen store imagery. Natural skin and hands, anatomically correct fingers. No captions, no added logos, no extra mug, no watermark. Product fidelity takes priority over styling. Supplied product artwork is fixed, do not redesign emblem.",
+    "teeStudio": "Use case: product-mockup. Create ONE photorealistic high-end independent fashion editorial, portrait 4:5, for Moltology store. Supplied official Printful image is the exact product reference: BLACK Bella + Canvas 3001 unisex crewneck cotton T-shirt. Match regular fit, short sleeves, collar ribbing, true black color and centered chest print SCALE and POSITION precisely. Exact artwork: red emblem above white 'Moltology', smaller gray uppercase 'THE SYNAPTIC PATH'. Copy supplied emblem exactly, never redesign. Preserve generous vertical gap between emblem and title and separate subtitle, no added branding. Printed artwork must follow fabric naturally without losing geometry or legibility. Shirt chest unobstructed. Real skin texture, realistic fingers and ordinary cotton, no plastic skin, no glossy shirt, no extreme oversizing, no new print placements, no captions, no watermarks, no holiday props. Scene: stylish adult Black male model around 30, very short natural hair, calm direct gaze, wearing tee untucked with relaxed charcoal tailored trousers and a subtle silver watch. Standing beside a pale concrete wall in an architect's daylight studio, natural hands resting beside hips, framed head to upper thigh, nearly frontal torso, comfortable posture. Beautiful sculptural raking autumn daylight, gentle deep shadows, restrained warm-gray backdrop, rich blacks and red print as sole strong accent. Premium contemporary fashion campaign, tactile analog medium-format photography, elegant minimalism.",
+    "teeTerrace": "Use case: product-mockup. Create ONE photorealistic high-end independent fashion editorial, portrait 4:5, for Moltology store. Supplied official Printful image is the exact product reference: BLACK Bella + Canvas 3001 unisex crewneck cotton T-shirt. Match regular fit, short sleeves, collar ribbing, true black color and centered chest print SCALE and POSITION precisely. Exact artwork: red emblem above white 'Moltology', smaller gray uppercase 'THE SYNAPTIC PATH'. Copy supplied emblem exactly, never redesign. Preserve generous vertical gap between emblem and title and separate subtitle, no added branding. Printed artwork must follow fabric naturally without losing geometry or legibility. Shirt chest unobstructed. Real skin texture, realistic fingers and ordinary cotton, no plastic skin, no glossy shirt, no extreme oversizing, no new print placements, no captions, no watermarks, no holiday props. Scene: stylish adult East Asian female model around 28 with shoulder-length dark hair tucked behind ears, wearing the tee with high-waisted dark indigo straight-leg jeans, unbuttoned charcoal wool coat held open and behind the chest so whole shirt print remains visible. Walking slowly on a quiet brutalist gallery terrace, frontal torso and subtle three-quarter head, framed from head to mid-thigh. Soft overcast autumn light, concrete and muted slate-blue background, natural confident expression, candid fashion-magazine photograph with subtle film grain. Shirt regular fit, sleeves and chest visible, no jacket lapel hiding artwork.",
+    "teeGallery": "Use case: product-mockup. Create ONE photorealistic high-end independent fashion editorial, portrait 4:5, for Moltology store. Supplied official Printful image is the exact product reference: BLACK Bella + Canvas 3001 unisex crewneck cotton T-shirt. Match regular fit, short sleeves, collar ribbing, true black color and centered chest print SCALE and POSITION precisely. Exact artwork: red emblem above white 'Moltology', smaller gray uppercase 'THE SYNAPTIC PATH'. Copy supplied emblem exactly, never redesign. Preserve generous vertical gap between emblem and title and separate subtitle, no added branding. Printed artwork must follow fabric naturally without losing geometry or legibility. Shirt chest unobstructed. Real skin texture, realistic fingers and ordinary cotton, no plastic skin, no glossy shirt, no extreme oversizing, no new print placements, no captions, no watermarks, no holiday props. Scene: stylish adult female model around 35 with warm olive skin and short curly dark hair, minimal makeup, wearing the reference tee untucked with dark tailored trousers, seated on a pale sculptural stone bench in a minimalist gallery. Framed head to thighs, arms resting loosely at sides so print stays completely visible, torso facing camera. Dark blue-gray architectural wall, soft cool north-window daylight and a restrained warm side light, sophisticated independent designer campaign, tactile medium-format film quality, relaxed subtle smile. The product is the focal point; no other visible graphics.",
+    "mugReading": "Use case: product-mockup. Create one photorealistic premium fashion editorial lifestyle photograph, portrait 4:5. The two supplied official Printful images show opposite sides of ONE white glossy 11 oz cylindrical ceramic mug. Preserve the exact mug proportions, white interior, rounded white handle, and printed design. Show ONLY the black 'Moltology' and gray 'THE SYNAPTIC PATH' wordmark face toward camera, handle on viewer right, exactly matching reference 1. The red emblem is on the opposite hidden face and must not be visible. Keep exact typography, spacing and curved print perspective. Scene: stylish adult man around 35 with warm brown skin, short dark curls and trimmed beard, dark navy fine-knit sweater, seated in a beautiful quiet design-studio reading nook beside a large window. Holding the mug naturally at chest height by its handle, handle on viewer right, no fingers covering wordmark. Framed head to waist, calm candid gaze slightly off camera, mug prominent and sharply focused, realistic 11 oz scale. Late autumn daylight through tall window, soft warm practical light, deep charcoal and warm wood, subtle cool blue shadows, analog editorial grain, high-end independent fashion magazine. No Halloween or holiday decorations; evergreen store imagery. Natural skin and hands, anatomically correct fingers. No captions, no added logos, no extra mug, no watermark. Product fidelity takes priority over styling. Supplied product artwork is fixed, do not redesign emblem."
+  },
+  "verification": {
+    "delivery": "HEAD verified all 19 originals and all 19 WebP twins via getAbsoluteAssetUrl",
+    "typecheck": "passed",
+    "targetedMerchTests": "12 passed",
+    "scriptTests": "333 passed; clean-jwks test failed because sandbox cannot reach Neon; separate existing test invoked build with missing index.html",
+    "skillValidation": "Frontmatter parsed with js-yaml and linked reference exists; bundled Python validator unavailable because PyYAML is absent"
+  }
+}

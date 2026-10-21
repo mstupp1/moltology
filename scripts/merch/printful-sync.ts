@@ -183,13 +183,15 @@ export interface SyncProductDetail {
   sync_variants: Array<{ id: number; external_id: string; variant_id: number }>
 }
 export interface PrintfileInfo {
+  option_groups?: string[]
+  options?: string[]
   printfiles: Array<{ printfile_id: number; width: number; height: number; dpi: number }>
   variant_printfiles: Array<{ variant_id: number; placements: Record<string, number> }>
 }
 export interface MockupTask {
   task_key: string
   status: 'pending' | 'completed' | 'failed'
-  mockups?: Array<{ variant_ids: number[]; mockup_url: string; extra?: Array<{ url: string; title?: string }> }>
+  mockups?: Array<{ variant_ids: number[]; mockup_url: string; extra?: Array<{ url: string; title?: string; option?: string; option_group?: string }> }>
 }
 
 /** Recover remote creation before writing the ledger; never recreate with --force. */
