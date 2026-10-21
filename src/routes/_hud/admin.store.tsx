@@ -5,7 +5,7 @@ import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 export const Route = createFileRoute('/_hud/admin/store')({
   headers: () => xRobotsNoindexHeaders(),
-  head: () => ({ meta: privatePageSeo({ title: 'Store operations | Moltology', description: 'Staff store operations.' }) }),
+  head: () => ({ meta: privatePageSeo({ title: 'Store settings | Moltology', description: 'Staff store settings.' }) }),
   pendingComponent: HudWorkspaceGhost,
   component: () => <AdminAccessGuard skeleton={<HudWorkspaceGhost />}><AdminStore /></AdminAccessGuard>,
 })

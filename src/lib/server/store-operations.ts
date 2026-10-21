@@ -1,8 +1,9 @@
-import { and, asc, desc, eq, exists, ilike, inArray, isNull, lt, or, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, exists, gt, ilike, inArray, isNotNull, isNull, lt, ne, notInArray, or, sql } from 'drizzle-orm'
 import { getDb } from '../../db'
-import { storeQuotes, merchOrders, merchProducts, merchVariants, storeAudit, storeOutbox, storeOverrides, storeRateLimits, storeSettings } from '../../db/schema'
+import { profiles, storeQuotes, merchOrders, merchProducts, merchVariants, storeAudit, storeOutbox, storeOverrides, storeRateLimits, storeSettings } from '../../db/schema'
 import { storeSettingsSchema, safeTrackingUrl, type StoreShipment } from '../store'
 import { formatMerchPrice, printfulOrderExternalId, isOrderablePrintfulId } from '../merch'
+import { FAILED_PROVIDER_STATUSES, PAID_PAYMENT_STATUSES, STUCK_FULFILLMENT_STATUSES, type ShopOrderFilter } from '../shop-orders'
 import { requireStaff } from './admin-oversight'
 import { hashStoreValue, readStoreSettings, storeStatusToken, storeStripe, type StoreArgs } from './store'
 import { sendTransactionalEmail } from './mail'
@@ -14,7 +15,7 @@ export async function queueStoreMail(key: string, orderId: string | null, to: st
 export async function alertStoreOperator(orderId: string, problem: string) {
   const to = process.env.STORE_SUPPORT_INBOX
   if (!to) return
-  await queueStoreMail(`alert:${orderId}:${hashStoreValue(problem).slice(0,16)}`, null, to, 'Store order needs review', `Order: ${orderId}\n${problem}\nReview /admin/store. Refunds do not cancel Printful production.`)
+  await queueStoreMail(`alert:${orderId}:${hashStoreValue(problem).slice(0,16)}`, null, to, 'Store order needs review', `Order: ${orderId}\n${problem}\nReview the Shop tab at /admin?tab=shop. Refunds do not cancel Printful production.`)
 }
 export async function enqueueOrderConfirmation(id: string) {
   const [order] = await getDb().select().from(merchOrders).where(eq(merchOrders.id, id)).limit(1)
@@ -169,22 +170,60 @@ export async function recoverStore() {
   } finally { await releaseJob(key, lease) }
 }
 
-export async function getAdminStore(args: StoreArgs & { data?: { token?: string; userId?: string; query?: string; reviewOnly?: boolean; mode?: 'test' | 'live' } }) {
+export async function getAdminStore(args: StoreArgs & { data?: { token?: string; userId?: string } }) {
   await requireStaff(args)
-  const db = getDb(), query = args.data?.query?.trim().slice(0,100)
-  const orders = await db.select().from(merchOrders).where(and(
-    query ? or(ilike(sql`${merchOrders.id}::text`, `%${query}%`), ilike(merchOrders.customerEmail, `%${query}%`), ilike(merchOrders.printfulOrderId, `%${query}%`)) : undefined,
-    args.data?.mode ? eq(merchOrders.livemode, args.data.mode === 'live') : undefined,
-    args.data?.reviewOnly ? and(eq(merchOrders.paymentStatus, 'paid'), inArray(merchOrders.fulfillmentStatus, ['paid', 'processing', 'printful_draft', 'fulfillment_failed'])) : undefined,
-  )).orderBy(desc(merchOrders.createdAt)).limit(50)
+  const db = getDb()
   const [products, variants, overrides, audit, mail] = await Promise.all([
     db.select().from(merchProducts).orderBy(asc(merchProducts.sortOrder)), db.select().from(merchVariants), db.select().from(storeOverrides),
     db.select().from(storeAudit).orderBy(desc(storeAudit.createdAt)).limit(30),
     db.select({ key: storeOutbox.key, orderId: storeOutbox.orderId, attempts: storeOutbox.attempts, sentAt: storeOutbox.sentAt, lastError: storeOutbox.lastError }).from(storeOutbox).where(isNull(storeOutbox.sentAt)).limit(30),
   ])
-  return { orders, products, variants, overrides, audit: audit.map(({ detail, ...row }) => ({ ...row, detail: JSON.stringify(detail) })), mail, settings: await readStoreSettings(),
+  return { products, variants, overrides, audit: audit.map(({ detail, ...row }) => ({ ...row, detail: JSON.stringify(detail) })), mail, settings: await readStoreSettings(),
     health: { liveAuthorized: process.env.STORE_LIVE_PAYMENTS_AUTHORIZED === 'true', publicAuthorized: process.env.STORE_PUBLIC_LAUNCH_AUTHORIZED === 'true', emailConfigured: Boolean(process.env.RESEND_API_KEY), supportConfigured: Boolean(process.env.STORE_SUPPORT_INBOX), recoveryConfigured: Boolean(process.env.STORE_RECOVERY_SECRET), printfulCallbackConfigured: Boolean(process.env.PRINTFUL_WEBHOOK_SECRET), statusConfigured: Boolean(process.env.STORE_STATUS_SECRET), autoProductionConfigured: process.env.PRINTFUL_DRAFT === 'false' } }
 }
+// Same rule as shopOrderNeedsAttention in src/lib/shop-orders.ts.
+const needsAttention = or(
+  eq(merchOrders.fulfillmentStatus, 'fulfillment_failed'),
+  and(inArray(merchOrders.providerStatus, [...FAILED_PROVIDER_STATUSES]), ne(merchOrders.paymentStatus, 'refunded')),
+  and(gt(merchOrders.refundCents, 0), isNotNull(merchOrders.printfulOrderId),
+    or(isNull(merchOrders.providerStatus), notInArray(merchOrders.providerStatus, ['fulfilled', 'canceled']))),
+  and(eq(merchOrders.paymentStatus, 'paid'), inArray(merchOrders.fulfillmentStatus, [...STUCK_FULFILLMENT_STATUSES])),
+)!
+const isPaid = inArray(merchOrders.paymentStatus, [...PAID_PAYMENT_STATUSES])
+
+export type AdminShopOrder = Awaited<ReturnType<typeof listAdminShopOrders>>['orders'][number]
+
+/** Real shop orders for the admin Shop tab. Test-mode orders are opt-in. */
+export async function listAdminShopOrders(args: StoreArgs & { data?: { token?: string; userId?: string; query?: string; filter?: ShopOrderFilter; includeTest?: boolean } }) {
+  await requireStaff(args)
+  const db = getDb(), query = args.data?.query?.trim().slice(0, 100), filter = args.data?.filter ?? 'attention'
+  const mode = args.data?.includeTest ? undefined : eq(merchOrders.livemode, true)
+  const rows = await db.select({ order: merchOrders, handle: profiles.handle }).from(merchOrders)
+    .leftJoin(profiles, eq(profiles.id, merchOrders.userId))
+    .where(and(mode,
+      query ? or(ilike(sql`${merchOrders.id}::text`, `%${query}%`), ilike(merchOrders.customerEmail, `%${query}%`), ilike(merchOrders.printfulOrderId, `%${query}%`)) : undefined,
+      filter === 'attention' ? needsAttention : filter === 'paid' ? isPaid : undefined,
+    )).orderBy(desc(merchOrders.createdAt)).limit(50)
+  const [summary] = await db.select({
+    paidOrders: sql<number>`count(*) filter (where ${isPaid})`.mapWith(Number),
+    revenueCents: sql<number>`coalesce(sum(${merchOrders.totalCents} - ${merchOrders.refundCents}) filter (where ${isPaid}), 0)`.mapWith(Number),
+    attention: sql<number>`count(*) filter (where ${needsAttention})`.mapWith(Number),
+  }).from(merchOrders).where(mode)
+  return {
+    summary: summary ?? { paidOrders: 0, revenueCents: 0, attention: 0 },
+    orders: rows.map(({ order, handle }) => ({
+      id: order.id, memberHandle: handle, customerEmail: order.customerEmail, shippingAddress: order.shippingAddress,
+      livemode: order.livemode, paymentStatus: order.paymentStatus, fulfillmentStatus: order.fulfillmentStatus,
+      fulfillmentMode: order.fulfillmentMode, providerStatus: order.providerStatus, fulfillmentError: order.fulfillmentError,
+      printfulOrderId: order.printfulOrderId, stripeCheckoutSessionId: order.stripeCheckoutSessionId, stripePaymentIntentId: order.stripePaymentIntentId,
+      lineItems: order.lineItems.map(l => ({ productTitle: l.productTitle, variantTitle: l.variantTitle, quantity: l.quantity, unitPriceCents: l.unitPriceCents })),
+      shipments: order.shipments, subtotalCents: order.subtotalCents, shippingCents: order.shippingCents, taxCents: order.taxCents,
+      totalCents: order.totalCents, refundCents: order.refundCents, currency: order.currency,
+      createdAt: order.createdAt.toISOString(), updatedAt: order.updatedAt.toISOString(), reconciledAt: order.reconciledAt?.toISOString() ?? null,
+    })),
+  }
+}
+
 export async function mutateAdminStore(args: StoreArgs & { data: { token?: string; userId?: string; action: string; target?: string; value?: unknown } }) {
   const actor = await requireStaff(args), db = getDb(), { action, target = 'main', value } = args.data
   const auditId = crypto.randomUUID()
