@@ -133,8 +133,8 @@ describe('countUnreadForumTopics', () => {
 })
 
 describe('unread chrome copy', () => {
-  it('keeps the diegetic label and a short count', () => {
-    expect(FORUM_UNREAD_LABEL).toBe('New transmission')
+  it('keeps a plain label and a short count', () => {
+    expect(FORUM_UNREAD_LABEL).toBe('New')
     expect(formatForumUnreadCount(0)).toBe('')
     expect(formatForumUnreadCount(1)).toBe('1 new')
     expect(formatForumUnreadCount(3)).toBe('3 new')

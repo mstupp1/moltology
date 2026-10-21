@@ -3,8 +3,8 @@
  * Visit rows live per member; these functions only compare timestamps.
  */
 
-export const FORUM_UNREAD_LABEL = 'New transmission'
-export const FORUM_UNREAD_BOARD_LABEL = 'New transmissions'
+export const FORUM_UNREAD_LABEL = 'New'
+export const FORUM_UNREAD_BOARD_LABEL = 'New posts'
 
 export interface ForumVisitMaps {
   topicVisitedAtById: ReadonlyMap<string, string>
