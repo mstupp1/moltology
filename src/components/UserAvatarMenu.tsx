@@ -274,22 +274,19 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   // Floating Popover Layout (Desktop Navigation / HUDSidebar)
   return (
     <div className={`relative inline-block text-left ${className}`} ref={menuRef}>
-      {/* Interactive Avatar Button Badge */}
+      {/* Avatar button: the photo is the whole control, edged by an inset hairline */}
       <button
         type="button"
         onClick={handleToggle}
         aria-expanded={isOpen}
         aria-haspopup="true"
         aria-label="User account menu"
-        className="flex items-center justify-center p-1 rounded-full backdrop-blur-md transition-all group cursor-pointer active:scale-95 bg-surface-1 border border-line hover:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+        className="relative flex rounded-full transition-transform group cursor-pointer active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
       >
-        <UserAvatar
-          user={user}
-          name={displayName}
-          size="sm"
-          className={
-            'border border-line group-hover:border-line-strong transition-all'
-          }
+        <UserAvatar user={user} name={displayName} size="nav" borderless />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/15 transition-shadow group-hover:ring-white/40 group-aria-expanded:ring-white/40"
         />
       </button>
 

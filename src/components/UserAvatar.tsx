@@ -14,8 +14,10 @@ export interface UserAvatarProps {
   email?: string | null
   fallbackSrc?: string | null
   fallbackLetter?: string
-  size?: 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  size?: 'xxs' | 'xs' | 'sm' | 'nav' | 'md' | 'lg' | 'xl'
   className?: string
+  /** Drop the letter fallback's own border when the parent draws the edge. */
+  borderless?: boolean
   alt?: string
 }
 
@@ -34,6 +36,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(({
   size = 'md',
   className = '',
   alt,
+  borderless = false,
 }) => {
   const [imageError, setImageError] = useState(false)
 
@@ -50,6 +53,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(({
     xxs: 'w-4 h-4 text-[8px]',
     xs: 'w-5 h-5 text-[10px]',
     sm: 'w-6 h-6 text-xs',
+    nav: 'w-9 h-9 text-sm',
     md: 'w-8 h-8 sm:w-10 sm:h-10 text-xs sm:text-sm',
     lg: 'w-12 h-12 text-base',
     xl: 'w-16 h-16 text-lg',
@@ -101,7 +105,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(({
 
   return (
     <div
-      className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center font-sans font-bold bg-gradient-to-br from-[#0f1d22] via-[#091316] to-[#030606] border border-[#00c3ff]/60 text-[#00c3ff] ${sizeClasses} ${className}`}
+      className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center font-sans font-bold bg-gradient-to-br from-[#0f1d22] via-[#091316] to-[#030606] ${borderless ? '' : 'border border-[#00c3ff]/60'} text-[#00c3ff] ${sizeClasses} ${className}`}
       aria-label={displayAlt}
       title={displayName || 'User Avatar'}
     >
