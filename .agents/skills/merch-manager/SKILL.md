@@ -43,6 +43,9 @@ provider mappings in `content/merch/printful-sync.json`. See [launch state and o
    or expired URLs. Inspect every final photo against the actual print and garment color.
 6. `npm run merch -- upload --only <slug> --kind mockups`. Website images stay under `images/merch/`
    with compressed twins; code references original keys through the asset resolver.
+   Also create a separate transparent dashboard cutout for every new item, following
+   [dashboard cutouts](references/product-photography.md#dashboard-cutouts). Upload and register
+   it before completing the item; keep official product-page photos unchanged.
 7. `npm run merch -- sync --only <slug> --dry-run`, then the same command without `--dry-run`.
    This recovers existing products by stable external IDs instead of duplicating them. Confirm
    placement in Printful. Commit the sync ledger with other intentional changes.
