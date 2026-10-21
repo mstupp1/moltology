@@ -10,7 +10,7 @@ const remote: SyncProductDetail = { sync_product: { id: 1, external_id: 'p' }, s
 describe('private merch workflow', () => {
   it('selects only the pilot and refuses unknown or conflicting selections', () => {
     const products = selectMerchProducts(undefined, true)
-    expect(products.map(product => product.slug)).toEqual(['moltology-mug-v2', 'moltology-tee-v2'])
+    expect(products.map(product => product.slug)).toEqual(['moltology-mug', 'moltology-tee'])
     expect(products.flatMap(product => product.variants)).toHaveLength(7)
     expect(selectMerchProducts('synaptic-mark-tee')).toHaveLength(1)
     expect(() => selectMerchProducts('typo')).toThrow('Unknown product')

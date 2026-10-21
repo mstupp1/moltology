@@ -30,7 +30,12 @@ provider mappings in `content/merch/printful-sync.json`. See [launch state and o
 
 ## Create and publish a private listing
 
-1. Add a new stable catalog `n` (never renumber/reuse IDs) and versioned design keys. Match the
+1. Add a new stable catalog `n` (never renumber/reuse IDs) and versioned design keys. The slug is the
+   product's permanent public URL (`/store/<slug>`): the plain product name in kebab case, such as
+   `moltology-mug`, never a revision or status suffix (`-v2`, `-new`, `-final`, `-draft`, a date). A
+   test fails on those. Revisions go in design keys (`mug-moltology-v2`) and, when photos need a new
+   name, in `imageName`. A redesign of an existing product keeps its slug; a new slug is only for a
+   genuinely different product. Once published, never change a slug without the owner's go-ahead. Match the
    existing category prices/options unless the user requests another price. Add a per-size design
    when Printful templates differ; the pilot mug has distinct files for its two sizes.
 2. `npm run merch -- check --only <slug>`, then `templates --only <slug>`. Live template validation
@@ -52,11 +57,12 @@ provider mappings in `content/merch/printful-sync.json`. See [launch state and o
 9. Use the existing private store/admin experiment (or the public store with ordering closed: admins
    can still check out). Promo codes and the ordering switch are described in docs/merch-launch.md.
 
-The current approved pair is selected with `--pilot` instead of `--only`: `moltology-mug-v2` and
-`moltology-tee-v2`. The original `synaptic-mark-*` pair is retired from dev; preserve its provider
+The current approved pair is selected with `--pilot` instead of `--only`: `moltology-mug` and
+`moltology-tee` (renamed from `-v2` on 2026-10-21; their photos keep the `moltology-*-v2` names
+through `imageName`). The original `synaptic-mark-*` pair is retired from dev; preserve its provider
 IDs and historical draft. The approved SVG wordmarks live in `content/brand/synaptic-path/parts/merch-v2/`: keep the 54-source-pixel clearance below the title descenders. Mug faces separate emblem/text; the tee stacks the emblem above the text.
 For this revision, seed the current and retired pairs explicitly with
-`seed --only moltology-mug-v2,moltology-tee-v2,synaptic-mark-mug,synaptic-mark-tee` to persist their
+`seed --only moltology-mug,moltology-tee,synaptic-mark-mug,synaptic-mark-tee` to persist their
 publication states without touching the placeholder catalog. `upload` uses `--kind print|mockups|all`; never upload arbitrary folder contents.
 `print --only <design-key>` remains supported. Unknown product selectors fail explicitly.
 

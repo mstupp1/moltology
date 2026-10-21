@@ -88,6 +88,11 @@ const image = (name: string) => `${MERCH_IMAGE_PREFIX}/${name}.jpg`
 function mug(input: {
   n: number
   slug: string
+  /**
+   * Base name of the product photos in the bucket. Defaults to the slug. Set it when the slug changes
+   * so existing photos keep working; photo names can carry revisions, slugs never do.
+   */
+  imageName?: string
   title: string
   description: string
   design: string
@@ -96,7 +101,8 @@ function mug(input: {
   /** Wrap color shown as the swatch. */
   wrap: { name: string; hex: string }
 }): MerchSeedProduct {
-  const featured = image(`${input.slug}-1`)
+  const photo = input.imageName ?? input.slug
+  const featured = image(`${photo}-1`)
   return {
     id: uuid(input.n, 0),
     title: input.title,
@@ -104,7 +110,7 @@ function mug(input: {
     description: input.description,
     category: 'Mugs',
     featuredImageUrl: featured,
-    galleryImageUrls: [featured, image(`${input.slug}-2`)],
+    galleryImageUrls: [featured, image(`${photo}-2`)],
     basePriceCents: MUG_SIZES[0].priceCents,
     isPublished: true,
     sortOrder: input.n,
@@ -126,13 +132,18 @@ function mug(input: {
 function tee(input: {
   n: number
   slug: string
+  /**
+   * Base name of the product photos in the bucket. Defaults to the slug. Set it when the slug changes
+   * so existing photos keep working; photo names can carry revisions, slugs never do.
+   */
+  imageName?: string
   title: string
   description: string
   /** Design per shirt color. */
   designs: Partial<Record<TeeColor, string>>
 }): MerchSeedProduct {
   const colors = Object.keys(input.designs) as TeeColor[]
-  const colorImage = (color: TeeColor) => image(`${input.slug}-${color.toLowerCase()}`)
+  const colorImage = (color: TeeColor) => image(`${input.imageName ?? input.slug}-${color.toLowerCase()}`)
   const variants: MerchSeedVariant[] = []
   colors.forEach((color, colorIndex) => {
     TEE_SIZES.forEach((option, sizeIndex) => {
@@ -166,12 +177,13 @@ function tee(input: {
   }
 }
 
-export const MERCH_PILOT_SLUGS = ['moltology-mug-v2', 'moltology-tee-v2'] as const
+export const MERCH_PILOT_SLUGS = ['moltology-mug', 'moltology-tee'] as const
 
 const BASE_CATALOG: MerchSeedProduct[] = [
   mug({
     n: 10,
-    slug: 'moltology-mug-v2',
+    slug: 'moltology-mug',
+    imageName: 'moltology-mug-v2',
     title: 'Moltology Mug',
     description: 'White ceramic with the red emblem on one face and Moltology above The Synaptic Path on the other.',
     design: 'mug-moltology-v2',
@@ -180,7 +192,8 @@ const BASE_CATALOG: MerchSeedProduct[] = [
   }),
   tee({
     n: 11,
-    slug: 'moltology-tee-v2',
+    slug: 'moltology-tee',
+    imageName: 'moltology-tee-v2',
     title: 'Moltology Tee',
     description: 'A black cotton tee with a large red emblem above Moltology and The Synaptic Path.',
     designs: { Black: 'tee-moltology-v2' },
