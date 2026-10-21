@@ -1,6 +1,6 @@
 import { INITIAL_MERCH_PRODUCTS } from '../../src/lib/merch-seed-data'
 import { isOrderablePrintfulId } from '../../src/lib/merch'
-export const APPROVED_STORE_SLUGS = ['moltology-mug-v2', 'moltology-tee-v2'] as const
+export const APPROVED_STORE_SLUGS = ['moltology-mug', 'moltology-tee'] as const
 export function requireProductionCatalogTarget(env: Record<string, string | undefined>, endpoint: string, authorization: string) {
   if (authorization !== 'approved-production-catalog') throw new Error('Explicit production catalog authorization is required.')
   if (!env.PROD_DATABASE_URL || !env.DATABASE_URL || env.DATABASE_URL !== env.PROD_DATABASE_URL) throw new Error('DATABASE_URL must equal the explicitly configured PROD_DATABASE_URL.')
