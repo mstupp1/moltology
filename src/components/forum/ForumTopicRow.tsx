@@ -1,4 +1,5 @@
 import React from 'react'
+import { LocalTime } from '@/components/ui/LocalTime'
 import { Link } from '@tanstack/react-router'
 import { MessageSquare, Eye, Clock } from 'lucide-react'
 import type { ForumTopicEntry } from '@/lib/server/api'
@@ -112,7 +113,7 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
           <span className="text-ink-muted/50">·</span>
           <span className="flex items-center gap-1">
             <Clock className="w-3 h-3 text-ink-muted/60 group-hover:text-ink-muted transition-colors" />
-            <span>{relativeTime(topic.createdAt)}</span>
+            <LocalTime value={topic.createdAt} format={relativeTime} />
           </span>
           <span className="text-ink-muted/50">·</span>
           <span className="flex items-center gap-1">

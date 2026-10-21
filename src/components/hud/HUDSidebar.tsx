@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate, useLocation, useRouter } from '@tanstack/react-router'
 import {
@@ -93,19 +93,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const [isMobileClosing, setIsMobileClosing] = useState(false)
   const [isMobileVisible, setIsMobileVisible] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  const [isCollapsed, setIsCollapsed] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const savedCollapsed = localStorage.getItem('moltology_hud_sidebar_collapsed')
-        if (savedCollapsed !== null) {
-          return savedCollapsed === 'true'
-        }
-      } catch {
-        // Fallback for localStorage access restrictions
-      }
-    }
-    return false
-  })
+  // Starts expanded to match the server render; the saved choice is applied
+  // before first paint in the layout effect below.
+  const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const dragStartRef = React.useRef<{ startX: number; hasMoved: boolean }>({
@@ -113,19 +103,21 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     hasMoved: false,
   })
 
-  // Track mount state for SSR safe portal rendering & client-side localStorage
+  // Apply the saved collapsed state before paint so there is no visible jump.
+  useLayoutEffect(() => {
+    try {
+      const savedCollapsed = localStorage.getItem('moltology_hud_sidebar_collapsed')
+      if (savedCollapsed !== null) {
+        setIsCollapsed(savedCollapsed === 'true')
+      }
+    } catch {
+      // Fallback for localStorage access restrictions
+    }
+  }, [])
+
+  // Track mount state for SSR safe portal rendering
   useEffect(() => {
     setIsMounted(true)
-    if (typeof window !== 'undefined') {
-      try {
-        const savedCollapsed = localStorage.getItem('moltology_hud_sidebar_collapsed')
-        if (savedCollapsed !== null) {
-          setIsCollapsed(savedCollapsed === 'true')
-        }
-      } catch {
-        // Fallback for localStorage access restrictions
-      }
-    }
   }, [])
 
   const openMobileMenu = () => {

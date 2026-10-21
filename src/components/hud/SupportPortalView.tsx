@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { LocalTime } from '@/components/ui/LocalTime'
 import { Link } from '@tanstack/react-router'
 import { HudGhostCard } from '@/components/ui/HudGhostLoader'
 import {
@@ -347,11 +348,7 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
                           ))}
                           <span className="text-[10px] text-[#839493] flex items-center gap-1 border border-[#3a4a49] px-2 py-0.5 bg-[#030606]">
                             <Clock className="w-3 h-3 text-[#00ffff]" />
-                            {new Date(entry.releasedAt).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                            })}
+                            <LocalTime value={entry.releasedAt} />
                           </span>
                         </div>
                       </div>

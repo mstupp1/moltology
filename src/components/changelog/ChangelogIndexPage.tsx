@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react'
+import { LocalTime } from '@/components/ui/LocalTime'
 import { useNavigate, Link, useLoaderData } from '@tanstack/react-router'
 import {
   Clock,
@@ -253,14 +254,6 @@ export function ChangelogIndexPage() {
             </div>
 
             {paginatedLogs.map((log) => {
-              const formattedDate = log.releasedAt
-                ? new Date(log.releasedAt).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })
-                : 'AUG 2026'
-
               const extraTags = Array.isArray(log.tags)
                 ? log.tags.filter((t) => t.toLowerCase() !== log.category?.toLowerCase())
                 : []
@@ -304,7 +297,7 @@ export function ChangelogIndexPage() {
 
                       <div className="flex items-center gap-1.5 text-xs text-gray-400 font-sans">
                         <Clock className="w-3.5 h-3.5 text-cyan-400" />
-                        <span>{formattedDate}</span>
+                        {log.releasedAt ? <LocalTime value={log.releasedAt} /> : <span>AUG 2026</span>}
                       </div>
                     </div>
 

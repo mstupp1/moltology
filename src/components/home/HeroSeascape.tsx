@@ -17,6 +17,10 @@ export function HeroSky() {
 // Ripple lines from the horizon toward the viewer: spacing and weight grow with nearness.
 const RIPPLES = [0, 4, 10, 19, 32, 50, 74, 105, 145, 196, 260]
 
+// Math.pow/Math.sin can differ in the last digit between Node and the browser,
+// so round to keep the SSR attributes identical to the hydrated ones.
+const round = (n: number) => Math.round(n * 100) / 100
+
 // A column of glints under the shell, narrow at the horizon and spreading toward the viewer.
 const GLINTS = Array.from({ length: 34 }, (_, i) => {
   const t = i / 33
@@ -26,7 +30,7 @@ const GLINTS = Array.from({ length: 34 }, (_, i) => {
   const jitter = Math.sin(i * 12.9898) * 0.5 + Math.sin(i * 4.1) * 0.5
   const x = 720 + jitter * spread
   const w = 6 + t * 34 + Math.abs(Math.sin(i * 7.3)) * 14
-  return { x, y, w, h: 0.8 + t * 1.6, group: i % 2 }
+  return { x: round(x), y: round(y), w: round(w), h: round(0.8 + t * 1.6), group: i % 2 }
 })
 
 export function HeroSea() {
@@ -50,7 +54,7 @@ export function HeroSea() {
           {[0, 1].map((group) => (
             <g key={group} className={`home-hero-glint-set home-hero-glint-set--${group}`}>
               {GLINTS.filter((g) => g.group === group).map((g) => (
-                <rect key={g.y} x={g.x - g.w / 2} y={g.y} width={g.w} height={g.h} rx={g.h / 2} />
+                <rect key={g.y} x={round(g.x - g.w / 2)} y={g.y} width={g.w} height={g.h} rx={round(g.h / 2)} />
               ))}
             </g>
           ))}

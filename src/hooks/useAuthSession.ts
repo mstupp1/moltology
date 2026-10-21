@@ -1,21 +1,12 @@
-import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useEffect, useState } from 'react'
 import { authClient } from '@/lib/auth-client'
+import { useHydrated } from '@/hooks/useHydrated'
 import {
   isOAuthPending,
   resolveAuthSession,
   settleOAuthSessionIfPending,
   type AuthSessionState,
 } from '@/lib/auth-session'
-
-const subscribeNoop = () => () => {}
-
-/**
- * Server snapshot is false so SSR and the hydration frame hold chrome.
- * After hydration, the client snapshot is true and the session hook may settle.
- */
-function useIsClient(): boolean {
-  return useSyncExternalStore(subscribeNoop, () => true, () => false)
-}
 
 function readAuthClientSession(): Promise<unknown> {
   const client = authClient as { getSession?: () => Promise<unknown> }
@@ -27,7 +18,8 @@ function readAuthClientSession(): Promise<unknown> {
 
 export function useAuthSession(): AuthSessionState {
   const sessionRes = authClient.useSession()
-  const clientReady = useIsClient()
+  // Server snapshot is false so SSR and the hydration frame hold chrome.
+  const clientReady = useHydrated()
   const [, setOauthEpoch] = useState(0)
 
   useEffect(() => {

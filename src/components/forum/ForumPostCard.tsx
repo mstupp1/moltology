@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { LocalTime } from '@/components/ui/LocalTime'
+import { formatDayTime } from '@/lib/dates'
 import { forumVisibleLength } from '@/lib/forum-markdown'
 import { Link } from '@tanstack/react-router'
 import { AlertTriangle, ChevronDown, ChevronRight, Clock, MessageSquare, Link2, Check, Quote, MoreHorizontal, Pencil, Undo2, Flag } from 'lucide-react'
@@ -258,9 +260,7 @@ export function ForumPostCard({
               {/* Timestamp & Collapse Info */}
               <div className="flex items-center gap-1.5 text-[11px] text-ink-muted mt-0.5">
                 <Clock className="w-3 h-3 text-ink-muted/60" />
-                <span title={new Date(post.createdAt).toLocaleString()}>
-                  {relativeTime(post.createdAt)}
-                </span>
+                <LocalTime value={post.createdAt} format={relativeTime} titleFormat={formatDayTime} />
                 <ForumRevisedMark
                   createdAt={post.createdAt}
                   updatedAt={post.updatedAt}
