@@ -73,7 +73,7 @@ describe('Oracle Route Component', () => {
 
     await waitFor(() => {
       expect(screen.getAllByText('CHATS').length).toBeGreaterThan(0)
-      expect(screen.getAllByText(/New Chat/i).length).toBeGreaterThan(0)
+      expect(screen.getAllByRole('button', { name: /^New Chat$/i }).length).toBeGreaterThan(0)
       expect(screen.getAllByText(/Carcinization Inquiries/i).length).toBeGreaterThan(0)
     })
   })

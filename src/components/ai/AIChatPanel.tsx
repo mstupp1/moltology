@@ -1,14 +1,10 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
 import {
   X,
-  Pencil,
+  SquarePen,
   AlertCircle,
-  Minimize2,
-  Maximize2,
-  PanelRight,
   Shield,
   UserPlus,
-  MessageSquare,
   ArrowDown,
 } from 'lucide-react'
 import { Conversation, ConversationContent } from '../ai-elements/conversation'
@@ -25,6 +21,7 @@ import { useIsPhone, useKeyboardInset } from '../../hooks/useChatViewport'
 import { PromptInput } from '../ai-elements/prompt-input'
 import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS } from './NewChatScreen'
 import { OracleChatsPanel, type OracleChatsLayout } from './OracleChatsPanel'
+import { ChatListIcon, OracleModeMenu, headerIconButtonClasses } from './OracleHeaderControls'
 import { useThreadActions, type ThreadPatch } from './useThreadActions'
 import { getAIMessagesFn, getAIThreadsFn, getUserProfileFn } from '../../lib/server/api'
 import { streamOracleChat } from '../../lib/ai/stream-oracle-chat-client'
@@ -54,7 +51,6 @@ export interface AIChatPanelProps {
   } | null
   userId?: string | null
   threadId?: string | null
-  personaName?: string
   onClose?: () => void
   onThreadCreated?: (newThreadId: string) => void
   isCompact?: boolean
@@ -88,7 +84,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   user: propUser,
   userId: propUserId,
   threadId: propThreadId,
-  personaName = 'SYNAPTIC ORACLE',
   placeholder = DEFAULT_ORACLE_PLACEHOLDER,
   onClose,
   onThreadCreated,
@@ -694,8 +689,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       onSelectModel={canPickModel ? (id) => setSelectedModelId(id) : undefined}
     />
   )
-  const chatsToggleSize = isCompact ? 'p-2 min-w-10 min-h-10' : 'p-1'
-  const chatsIconSize = isCompact ? 'w-4 h-4' : 'w-3.5 h-3.5'
+  const headerButton = headerIconButtonClasses(isPhone)
 
   return (
     <div
@@ -704,106 +698,70 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       style={keyboardInset ? { paddingBottom: keyboardInset } : undefined}
       className={`flex flex-col bg-surface-1/60 backdrop-blur-md border border-line-subtle shadow-menu font-sans overflow-hidden h-full w-full relative ${className}`}
     >
-      {/* Shared Simplified Header */}
-      <div className="bg-surface-2/75 backdrop-blur-md border-b border-line-subtle px-3 py-2 flex items-center justify-between gap-2 shrink-0 select-none relative z-10">
-        {/* Left Section: Icon, Title & Chats Button */}
-        <div className="flex items-center space-x-2 min-w-0 flex-1 truncate">
+      {/* Header: conversation controls on the left, window controls on the right */}
+      <div className="h-12 px-2 border-b border-line-subtle flex items-center justify-between gap-2 shrink-0 select-none relative z-10">
+        <div className="flex items-center gap-0.5 min-w-0 flex-1">
           {onToggleConversations ? (
             <button
               type="button"
               onClick={onToggleConversations}
-              className={`text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control ${chatsToggleSize} md:hidden transition-colors cursor-pointer shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow`}
+              className={`${headerButton} md:hidden`}
               title="Chats"
               aria-label="Toggle Chats"
             >
-              <MessageSquare className={chatsIconSize} />
+              <ChatListIcon className="w-4 h-4" />
             </button>
           ) : (
             <button
               ref={chatsButtonRef}
               type="button"
               onClick={handleToggleChats}
-              className={`${chatsToggleSize} rounded-control transition-colors cursor-pointer shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                isChatsOpen
-                  ? 'text-cyan-glow bg-surface-2'
-                  : 'text-ink-muted hover:text-ink hover:bg-surface-2'
-              }`}
+              className={`${headerButton} ${isChatsOpen ? '!text-cyan-glow bg-surface-2' : ''}`}
               title="Chats"
               aria-label="Toggle Chats"
               aria-expanded={isChatsOpen}
             >
-              <MessageSquare className={chatsIconSize} />
+              <ChatListIcon className="w-4 h-4" />
             </button>
           )}
 
-          {activeThreadTitle ? (
+          <button
+            type="button"
+            onClick={handleNewChat}
+            disabled={isAtChatLimit}
+            className={headerButton}
+            title={isAtChatLimit ? getChatLimitError().message : 'New chat (Ctrl+Shift+O)'}
+            aria-label="New Chat"
+          >
+            <SquarePen className="w-4 h-4" />
+          </button>
+
+          {activeThreadTitle && (
             <span
-              className="text-sm font-medium text-ink truncate pointer-events-none"
+              className="ml-1.5 text-sm font-medium text-ink truncate pointer-events-none"
               title={activeThreadTitle}
             >
               {activeThreadTitle}
             </span>
-          ) : (
-            <span className="text-xs font-bold text-ink tracking-[0.08em] truncate pointer-events-none">
-              {personaName}
-            </span>
           )}
         </div>
 
-        {/* Mode Switcher & Panel Controls */}
         <div
-          className="flex items-center space-x-1 shrink-0 pointer-events-auto"
+          className="flex items-center gap-0.5 shrink-0 pointer-events-auto"
           onPointerDown={(e) => e.stopPropagation()}
         >
-          {showModeControls && oracle && (
-            <>
-              <button
-                onClick={() => handleModeSwitch(oracle.mode === 'sidebar' ? 'popout' : 'sidebar')}
-                className={`hidden md:inline-flex p-1 rounded-control transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                  oracle.mode === 'sidebar'
-                    ? 'text-cyan-glow bg-surface-2'
-                    : 'text-ink-muted hover:text-ink hover:bg-surface-2'
-                }`}
-                title="Sidebar"
-                aria-label="Sidebar"
-              >
-                <PanelRight className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => handleModeSwitch(oracle.mode === 'page' ? 'popout' : 'page')}
-                className={`p-1 rounded-control transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                  oracle.mode === 'page'
-                    ? 'text-cyan-glow bg-surface-2'
-                    : 'text-ink-muted hover:text-ink hover:bg-surface-2'
-                }`}
-                title={oracle.mode === 'page' ? 'Popout' : 'Expand'}
-                aria-label={oracle.mode === 'page' ? 'Popout' : 'Expand'}
-              >
-                {oracle.mode === 'page' ? (
-                  <Minimize2 className="w-3.5 h-3.5" />
-                ) : (
-                  <Maximize2 className="w-3.5 h-3.5" />
-                )}
-              </button>
-            </>
+          {showModeControls && oracle && oracle.mode !== 'closed' && (
+            <OracleModeMenu mode={oracle.mode} onSelect={handleModeSwitch} touch={isPhone} />
           )}
 
           <button
-            onClick={handleNewChat}
-            disabled={isAtChatLimit}
-            className="text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control p-1 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-ink-muted"
-            title={isAtChatLimit ? getChatLimitError().message : 'New chat (Ctrl+Shift+O)'}
-            aria-label="New Chat"
-          >
-            <Pencil className="w-3.5 h-3.5" />
-          </button>
-
-          <button
+            type="button"
             onClick={handleClose}
-            className="text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control p-1 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            className={headerButton}
             title="Close Panel"
+            aria-label="Close"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -832,8 +790,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             layout={chatsLayout}
             onSelectThread={handleSelectThread}
             onClose={() => setIsChatsOpen(false)}
-            onNewChat={handleNewChat}
-            canStartNewChat={!isAtChatLimit}
             onPin={pinThread}
             onArchive={archiveThread}
             onRename={renameThread}

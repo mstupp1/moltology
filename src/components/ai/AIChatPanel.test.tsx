@@ -51,7 +51,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
   })
 
   it('renders guest mode new chat screen on initial load with no canned messages', () => {
-    render(<AIChatPanel userId={null} personaName="SYNAPTIC ORACLE" />)
+    render(<AIChatPanel userId={null} />)
 
     expect(screen.queryByText(/Welcome! I am the/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/Welcome back!/i)).not.toBeInTheDocument()
@@ -61,7 +61,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
   })
 
   it('renders authenticated new chat screen without guest CTA or canned message when userId is provided', async () => {
-    render(<AIChatPanel userId="usr_valid_user" personaName="SYNAPTIC ORACLE" />)
+    render(<AIChatPanel userId="usr_valid_user" />)
 
     expect(screen.queryByText(/Welcome! I am the/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/Welcome back!/i)).not.toBeInTheDocument()
@@ -154,12 +154,12 @@ describe('AIChatPanel Guest Mode Gating', () => {
   })
 
   it('does not render the extra moltology logo emblem in the top left header', () => {
-    const { container } = render(<AIChatPanel userId="usr_valid_user" personaName="SYNAPTIC ORACLE" />)
+    const { container } = render(<AIChatPanel userId="usr_valid_user" />)
     const header = container.querySelector('.border-b')
     expect(header).toBeInTheDocument()
     const headerLogo = header?.querySelector('svg path[fill-rule="evenodd"]')
     expect(headerLogo).toBeNull()
-    expect(screen.getByText('SYNAPTIC ORACLE')).toBeInTheDocument()
+    expect(screen.queryByText('SYNAPTIC ORACLE')).toBeNull()
   })
 })
 
@@ -231,7 +231,8 @@ describe('AIChatPanel Chats List Panel', () => {
     expect(screen.getByText('Deep Trench Strategy')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Back to conversation/i })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^Close Chats$/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Start a new chat' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Start a new chat' })).toBeNull()
+    expect(screen.getByRole('button', { name: /^New Chat$/i })).toBeInTheDocument()
   })
 
   it('keeps the chats menu free of retention text and blocks starting chat 51', async () => {
@@ -259,7 +260,7 @@ describe('AIChatPanel Chats List Panel', () => {
     expect(await screen.findByText('Delete a chat to start another.')).toBeInTheDocument()
     expect(screen.queryByText(/chats used/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/Archived conversations become eligible/i)).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Start a new chat' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /^New Chat$/i })).toBeDisabled()
   })
 
   it('returns to the conversation after selecting a thread from the list', async () => {

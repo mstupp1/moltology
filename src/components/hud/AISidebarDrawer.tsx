@@ -144,7 +144,6 @@ export const AISidebarDrawer: React.FC<AISidebarDrawerProps> = ({
           userId={userId}
           isCompact={false}
           onClose={handleClose}
-          personaName="SYNAPTIC ORACLE"
           className="h-full border-none shadow-none"
         />
       </div>
