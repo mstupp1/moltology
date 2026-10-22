@@ -52,10 +52,30 @@ interface OracleModeMenuProps {
   touch?: boolean
 }
 
-/** Display-mode switcher: the trigger shows the current mode's icon, the menu lists the others. */
+/**
+ * Display-mode switcher: the trigger shows the current mode's icon, the menu lists the others.
+ * Phones only have Floating and Fullscreen, so they get a single toggle button instead.
+ */
 export const OracleModeMenu: React.FC<OracleModeMenuProps> = ({ mode, onSelect, touch = false }) => {
   const current = ORACLE_DISPLAY_MODES.find((option) => option.mode === mode) ?? ORACLE_DISPLAY_MODES[1]
   const CurrentIcon = current.icon
+
+  if (touch) {
+    // The icon shows where the toggle goes, like a maximize/restore button.
+    const target = ORACLE_DISPLAY_MODES.find((option) => option.mode === (mode === 'page' ? 'popout' : 'page'))!
+    const TargetIcon = target.icon
+    return (
+      <button
+        type="button"
+        onClick={() => onSelect(target.mode)}
+        className={headerIconButtonClasses(true)}
+        aria-label={`Switch to ${target.label.toLowerCase()}`}
+        title={target.label}
+      >
+        <TargetIcon className="w-4 h-4" />
+      </button>
+    )
+  }
 
   return (
     <HudDropdownMenu modal={false}>
