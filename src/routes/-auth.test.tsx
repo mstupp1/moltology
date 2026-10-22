@@ -106,7 +106,7 @@ describe('Auth Split Landing Page Component (/auth)', () => {
 
     expect(screen.getByRole('heading', { name: /Create Account/i })).toBeInTheDocument()
     expect(screen.getByText('Sign up to persist your session')).toBeInTheDocument()
-    expect(screen.queryByPlaceholderText('your_designation')).not.toBeInTheDocument()
+    expect(screen.queryByPlaceholderText('your_username')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^Create Account$/i })).toBeInTheDocument()
 
     // Click Sign In tab
@@ -114,7 +114,7 @@ describe('Auth Split Landing Page Component (/auth)', () => {
     fireEvent.click(signInTab)
 
     expect(screen.getByRole('heading', { name: /Welcome Back/i })).toBeInTheDocument()
-    expect(screen.queryByPlaceholderText('your_designation')).not.toBeInTheDocument()
+    expect(screen.queryByPlaceholderText('your_username')).not.toBeInTheDocument()
   })
 
   it('triggers Google OAuth flow with callback destination', async () => {

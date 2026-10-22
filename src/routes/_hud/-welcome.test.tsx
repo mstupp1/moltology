@@ -24,6 +24,7 @@ vi.mock('@/lib/auth-client', () => ({
 
 vi.mock('@/lib/server/api', () => ({
   getUserProfileFn: vi.fn().mockResolvedValue({ handle: null, larvaId: 'LARVA UNIT #2468' }),
+  getUserStatsFn: vi.fn().mockResolvedValue(null),
   claimMemberHandleFn: vi.fn(),
 }))
 
@@ -49,14 +50,14 @@ describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
   it('triggers welcome popup for guest demo mode on first visit', () => {
     renderHud()
 
-    expect(screen.getByText('WELCOME, GUEST')).toBeInTheDocument()
-    expect(screen.getByText('⬡ MOLTOLOGY SIGNAL RECEIVED ⬡')).toBeInTheDocument()
+    expect(screen.getByText('Welcome to Moltology')).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Welcome to Moltology' })).toBeInTheDocument()
   })
 
   it('dismisses welcome popup for guest demo mode and sets localStorage key', () => {
     renderHud()
 
-    expect(screen.getByText('WELCOME, GUEST')).toBeInTheDocument()
+    expect(screen.getByText('Welcome to Moltology')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: /close/i }))
 
@@ -72,13 +73,13 @@ describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
 
     renderHud()
 
-    expect(screen.queryByText('WELCOME, GUEST')).not.toBeInTheDocument()
+    expect(screen.queryByText('Welcome to Moltology')).not.toBeInTheDocument()
   })
 
-  it('does not flash WELCOME, GUEST while the session is unresolved', () => {
+  it('does not flash the guest welcome while the session is unresolved', () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
     renderHud()
-    expect(screen.queryByText('WELCOME, GUEST')).not.toBeInTheDocument()
+    expect(screen.queryByText('Welcome to Moltology')).not.toBeInTheDocument()
   })
 
   it('does not show the guest welcome popup on a shared forum link', () => {
@@ -86,31 +87,31 @@ describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
 
     renderHud()
 
-    expect(screen.queryByText('WELCOME, GUEST')).not.toBeInTheDocument()
+    expect(screen.queryByText('Welcome to Moltology')).not.toBeInTheDocument()
     expect(localStorage.getItem('moltology:welcomed:guest')).toBeNull()
   })
 
   it('still shows the guest welcome popup after a forum visit once they open the dashboard', () => {
     mockPathname = '/forum'
     const forumVisit = renderHud()
-    expect(screen.queryByText('WELCOME, GUEST')).not.toBeInTheDocument()
+    expect(screen.queryByText('Welcome to Moltology')).not.toBeInTheDocument()
     forumVisit.unmount()
 
     mockPathname = '/dashboard'
     renderHud()
-    expect(screen.getByText('WELCOME, GUEST')).toBeInTheDocument()
+    expect(screen.getByText('Welcome to Moltology')).toBeInTheDocument()
   })
 
   it('still opens the guest welcome from the manual relaunch on a forum page', () => {
     mockPathname = '/forum/general-discussion/some-topic'
     renderHud()
-    expect(screen.queryByText('WELCOME, GUEST')).not.toBeInTheDocument()
+    expect(screen.queryByText('Welcome to Moltology')).not.toBeInTheDocument()
 
     act(() => {
       window.dispatchEvent(new CustomEvent('launch-welcome-splash'))
     })
 
-    expect(screen.getByText('WELCOME, GUEST')).toBeInTheDocument()
+    expect(screen.getByText('Welcome to Moltology')).toBeInTheDocument()
   })
 
   it('triggers welcome popup with user name for logged-in user on first visit', () => {
@@ -120,7 +121,7 @@ describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
 
     renderHud()
 
-    expect(screen.getByText('WELCOME, COMMANDER')).toBeInTheDocument()
+    expect(screen.getByText('Welcome to Moltology, Commander')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: /close/i }))
 
@@ -139,6 +140,6 @@ describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
 
     renderHud()
 
-    expect(screen.getByText('WELCOME, COMMANDER')).toBeInTheDocument()
+    expect(screen.getByText('Welcome to Moltology, Commander')).toBeInTheDocument()
   })
 })
