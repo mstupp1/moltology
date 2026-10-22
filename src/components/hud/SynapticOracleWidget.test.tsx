@@ -75,7 +75,7 @@ describe('SynapticOracleWidget', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /Open Oracle AI Popout/i }))
 
-    expect(screen.getAllByText('SYNAPTIC ORACLE').length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('button', { name: /^New Chat$/i }).length).toBeGreaterThan(0)
     expect(screen.queryByTitle(/Drag header to move chat window/i)).not.toBeInTheDocument()
 
     const popout = container.querySelector('.fixed.rounded-card')
@@ -97,7 +97,7 @@ describe('SynapticOracleWidget', () => {
     fireEvent.pointerMove(btn, { clientX: 550, clientY: 550, pointerId: 1 })
     fireEvent.click(btn)
 
-    expect(screen.getAllByText('SYNAPTIC ORACLE').length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('button', { name: /^New Chat$/i }).length).toBeGreaterThan(0)
     expect(localStorage.getItem('moltology:oracle_button_pos')).toBeNull()
     expect(localStorage.getItem('moltology:oracle_popout_pos')).toBeNull()
   })

@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArrowLeft, Lock, Pencil, UserPlus } from 'lucide-react'
+import { ArrowLeft, Lock, UserPlus } from 'lucide-react'
 import { ThreadList, ThreadListSkeleton } from './ThreadList'
 import type { ManagedThread } from './useThreadActions'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
@@ -17,9 +17,6 @@ export interface OracleChatsPanelProps {
   layout: OracleChatsLayout
   onSelectThread: (id: string) => void
   onClose: () => void
-  /** Starts a fresh chat and closes the list. */
-  onNewChat?: () => void
-  canStartNewChat?: boolean
   onPin: (threadId: string, pinned: boolean) => void
   onArchive: (threadId: string, archived: boolean) => void
   onRename: (threadId: string, title: string) => void
@@ -36,8 +33,6 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
   layout,
   onSelectThread,
   onClose,
-  onNewChat,
-  canStartNewChat = true,
   onPin,
   onArchive,
   onRename,
@@ -69,19 +64,6 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
           </button>
           <span className="text-sm font-semibold text-ink">Chats</span>
         </div>
-
-        {userId && onNewChat && (
-          <button
-            type="button"
-            onClick={onNewChat}
-            disabled={!canStartNewChat}
-            className="inline-flex items-center gap-1.5 min-h-11 px-3 text-xs font-medium text-ink-body hover:text-ink hover:bg-surface-3 transition-colors cursor-pointer rounded-control disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-            aria-label="Start a new chat"
-          >
-            <Pencil className="w-4 h-4 text-cyan-glow" />
-            <span>New chat</span>
-          </button>
-        )}
       </div>
 
       <div className="flex-1 overflow-y-auto px-2 py-2 min-h-0">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
-import { Lock, UserPlus, Shield, X, Pencil } from 'lucide-react'
+import { Lock, UserPlus, Shield, X } from 'lucide-react'
 import { ThreadList, ThreadListSkeleton } from '@/components/ai/ThreadList'
 import { useThreadActions, type ThreadPatch } from '@/components/ai/useThreadActions'
 import { useSafeOracle } from '@/components/hud/OracleContext'
@@ -14,6 +14,13 @@ import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { parseOracleThreadSearch, validateOracleSearch } from '@/lib/ai/last-oracle-thread'
 
+const STORAGE_KEY_CHATS_COLUMN = 'moltology:oracle_page_chats'
+
+const isDesktopViewport = () =>
+  typeof window !== 'undefined' &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(min-width: 768px)').matches
+
 const LazyAIChatPanel = React.lazy(() =>
   import('@/components/ai/AIChatPanel').then((m) => ({ default: m.AIChatPanel }))
 )
@@ -25,7 +32,6 @@ interface OracleSidebarContentProps {
   activeThreadId: string | null
   isLoadingThreads: boolean
   onSelectThread: (id: string | null) => void
-  onNewChat?: () => void
   onOpenAuthModal: () => void
   onPin: (threadId: string, pinned: boolean) => void
   onArchive: (threadId: string, archived: boolean) => void
@@ -41,7 +47,6 @@ function OracleSidebarContent({
   activeThreadId,
   isLoadingThreads,
   onSelectThread,
-  onNewChat,
   onOpenAuthModal,
   onPin,
   onArchive,
@@ -51,11 +56,10 @@ function OracleSidebarContent({
 }: OracleSidebarContentProps) {
   if (isAuthPending && !userId) {
     return (
-      <div className="flex flex-col h-full space-y-3 font-sans" data-testid="oracle-auth-skeleton">
+      <div className="flex flex-col h-full gap-3 font-sans" data-testid="oracle-auth-skeleton">
         {!hideHeader && (
-          <div className="flex items-center justify-between border-b border-line-subtle pb-1.5 shrink-0">
+          <div className="h-12 -mx-3 -mt-3 px-3 flex items-center justify-between border-b border-line-subtle shrink-0">
             <HudGhostSkeleton variant="cyan" preset="badge" width={64} height={12} />
-            <HudGhostSkeleton variant="neutral" preset="button" width={72} height={20} />
           </div>
         )}
         <div className="flex-1">
@@ -67,26 +71,12 @@ function OracleSidebarContent({
 
   if (userId) {
     return (
-      <div className="flex flex-col h-full space-y-3 font-sans">
+      <div className="flex flex-col h-full gap-3 font-sans">
         {!hideHeader && (
-          <div className="flex items-center justify-between border-b border-line-subtle pb-1.5 shrink-0">
+          <div className="h-12 -mx-3 -mt-3 px-3 flex items-center justify-between border-b border-line-subtle shrink-0">
             <span className="text-[11px] font-bold text-ink-muted tracking-[0.08em] uppercase">
               CHATS
             </span>
-            {onNewChat && (
-              <button
-                type="button"
-                onClick={onNewChat}
-                className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-ink transition-colors p-1 group cursor-pointer rounded-control hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-                title="New Chat"
-                aria-label="New Chat"
-              >
-                <span className="text-[11px] tracking-[0.08em] uppercase font-medium text-ink-muted group-hover:text-ink">
-                  New Chat
-                </span>
-                <Pencil className="w-3.5 h-3.5 text-cyan-glow" />
-              </button>
-            )}
           </div>
         )}
 
@@ -166,6 +156,7 @@ function OracleRouteComponent() {
   const [localIsLoading, setLocalIsLoading] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false)
+  const [isChatsColumnOpen, setIsChatsColumnOpen] = useState(true)
   const appliedSearchThreadRef = useRef<string | undefined>(undefined)
 
   const threads = oracle ? oracle.threads : localThreads
@@ -271,8 +262,25 @@ function OracleRouteComponent() {
     }
   }, [requestedThreadId, isLoadingThreads, threads])
 
-  const handleCreateNewThread = () => {
-    setActiveThreadId(null)
+  // Restore the collapsed chats column after mount so the server render matches.
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(STORAGE_KEY_CHATS_COLUMN) === 'closed') setIsChatsColumnOpen(false)
+    } catch {}
+  }, [])
+
+  // Desktop collapses the chats column in place; phones slide the drawer over.
+  const handleToggleChats = () => {
+    if (!isDesktopViewport()) {
+      setIsMobileDrawerOpen(true)
+      return
+    }
+    setIsChatsColumnOpen((open) => {
+      try {
+        localStorage.setItem(STORAGE_KEY_CHATS_COLUMN, open ? 'closed' : 'open')
+      } catch {}
+      return !open
+    })
   }
 
   const handleThreadCreated = (newThreadId: string) => {
@@ -297,7 +305,10 @@ function OracleRouteComponent() {
       <div className="flex-1 h-full bg-abyss/40 backdrop-blur-md flex overflow-hidden relative">
         
         {/* Desktop Sidebar with Translucent Glass Styling */}
-        <aside className="hidden md:flex w-64 lg:w-72 bg-surface-1/75 backdrop-blur-md border-r border-line-subtle p-3 flex-col shrink-0 overflow-y-auto z-10">
+        <aside
+          data-testid="oracle-chats-column"
+          className={`${isChatsColumnOpen ? 'hidden md:flex' : 'hidden'} w-64 lg:w-72 bg-surface-1/75 backdrop-blur-md border-r border-line-subtle p-3 flex-col shrink-0 overflow-y-auto z-10`}
+        >
           <OracleSidebarContent
             userId={userId}
             isAuthPending={isAuthPending}
@@ -305,7 +316,6 @@ function OracleRouteComponent() {
             activeThreadId={activeThreadId}
             isLoadingThreads={isLoadingThreads}
             onSelectThread={(id) => setActiveThreadId(id)}
-            onNewChat={handleCreateNewThread}
             onOpenAuthModal={() => setIsAuthModalOpen(true)}
             onPin={pinThread}
             onArchive={archiveThread}
@@ -321,9 +331,9 @@ function OracleRouteComponent() {
               userId={userId}
               threadId={activeThreadId}
               onThreadCreated={handleThreadCreated}
-              personaName="SYNAPTIC ORACLE"
               className="h-full border-none shadow-none bg-transparent"
-              onToggleConversations={() => setIsMobileDrawerOpen(true)}
+              onToggleConversations={handleToggleChats}
+              conversationsOpen={isChatsColumnOpen}
             />
           </React.Suspense>
         </div>
@@ -352,23 +362,6 @@ function OracleRouteComponent() {
           <div className="flex items-center justify-between p-3 border-b border-line-subtle bg-surface-2/90 shrink-0">
             <span className="text-sm font-semibold text-ink font-sans">Chats</span>
             <div className="flex items-center gap-2">
-              {userId && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleCreateNewThread()
-                    setIsMobileDrawerOpen(false)
-                  }}
-                  className="flex items-center gap-1 text-xs text-ink-muted hover:text-ink transition-colors p-1 group cursor-pointer rounded-control hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-                  title="New Chat"
-                  aria-label="New Chat"
-                >
-                  <span className="text-[11px] tracking-[0.08em] uppercase font-medium text-ink-muted group-hover:text-ink">
-                    New Chat
-                  </span>
-                  <Pencil className="w-3.5 h-3.5 text-cyan-glow" />
-                </button>
-              )}
               <button
                 onClick={() => setIsMobileDrawerOpen(false)}
                 className="p-1 text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
@@ -389,10 +382,6 @@ function OracleRouteComponent() {
               isLoadingThreads={isLoadingThreads}
               onSelectThread={(id) => {
                 setActiveThreadId(id)
-                setIsMobileDrawerOpen(false)
-              }}
-              onNewChat={() => {
-                handleCreateNewThread()
                 setIsMobileDrawerOpen(false)
               }}
               onOpenAuthModal={() => {

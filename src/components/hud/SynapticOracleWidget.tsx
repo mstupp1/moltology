@@ -359,7 +359,6 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
             userId={userId}
             isCompact={true}
             onClose={handleMobileClose}
-            personaName="SYNAPTIC ORACLE"
             className="h-full w-full border-none shadow-none"
           />
         </HudBottomSheet>
@@ -424,7 +423,6 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
             isCompact={true}
             onClose={handleClose}
             closeOnEscape
-            personaName="SYNAPTIC ORACLE"
             className="h-full w-full border-none shadow-none"
           />
         </div>
