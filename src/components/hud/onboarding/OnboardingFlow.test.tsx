@@ -73,7 +73,7 @@ describe('OnboardingFlow', () => {
     expect(greetingName('someone@example.com')).toBeNull()
   })
 
-  it('walks welcome, tour, character and username in order with no audio', () => {
+  it('walks members through welcome, tour, username and character, in that order, with no audio', async () => {
     renderFlow()
     expect(screen.getByRole('dialog', { name: 'Welcome to Moltology, Myles' })).toBeInTheDocument()
     expect(document.querySelector('audio')).toBeNull()
@@ -82,55 +82,60 @@ describe('OnboardingFlow', () => {
     next()
     expect(screen.getByRole('heading', { name: "What's here" })).toBeInTheDocument()
     next()
-    expect(screen.getByRole('heading', { name: 'Make your character' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Surprise me/i })).toBeInTheDocument()
-    expect(screen.queryByText(/Roll Base Stats/i)).not.toBeInTheDocument()
-    next()
     expect(screen.getByRole('heading', { name: 'Pick a username' })).toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Back' }))
-    expect(screen.getByRole('heading', { name: 'Make your character' })).toBeInTheDocument()
-  })
-
-  it('needs a valid username before Finish, then saves it with the character and a quiet stats roll', async () => {
-    const { onDismiss } = renderFlow({ initialStepId: 'name' })
-    await waitFor(() => expect(mockGetStats).toHaveBeenCalled())
-
-    const finish = screen.getByRole('button', { name: 'Finish' })
-    expect(finish).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled()
 
     fireEvent.change(screen.getByLabelText(/Username/), { target: { value: 'claw_lord' } })
-    expect(screen.getAllByText('claw_lord').length).toBeGreaterThan(0)
-    fireEvent.click(finish)
+    next()
+    expect(await screen.findByRole('heading', { name: 'Make your character' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Surprise me/i })).toBeInTheDocument()
+    expect(screen.queryByText(/Roll Base Stats/i)).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Finish' })).toBeInTheDocument()
 
-    await waitFor(() => expect(onDismiss).toHaveBeenCalled())
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }))
+    expect(screen.getByRole('heading', { name: 'Pick a username' })).toBeInTheDocument()
+  })
+
+  it('claims the username on Next, then saves the character and a quiet stats roll on Finish', async () => {
+    const { onDismiss } = renderFlow({ initialStepId: 'username' })
+    await waitFor(() => expect(mockGetStats).toHaveBeenCalled())
+
+    fireEvent.change(screen.getByLabelText(/Username/), { target: { value: 'claw_lord' } })
+    next()
+
+    await screen.findByRole('heading', { name: 'Make your character' })
     expect(mockClaimHandle).toHaveBeenCalledWith({
       data: expect.objectContaining({ handle: 'claw_lord', userId: 'user-1' }),
     })
+    expect(mockSaveAvatar).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Finish' }))
+    await waitFor(() => expect(onDismiss).toHaveBeenCalled())
     expect(mockSaveAvatar).toHaveBeenCalled()
     expect(mockUpdateStats).toHaveBeenCalledTimes(1)
     const scores = mockUpdateStats.mock.calls[0][0].data.moltmaxDimensionScores
     expect(Object.values(scores).reduce((a: number, b) => a + (b as number), 0)).toBe(300)
   })
 
-  it('keeps the member on the step and shows the error when the username is taken', async () => {
+  it('keeps the member on the username step and shows the error when the name is taken', async () => {
     mockClaimHandle.mockRejectedValue(new Error('That username is taken.'))
-    const { onDismiss } = renderFlow({ initialStepId: 'name' })
+    renderFlow({ initialStepId: 'username' })
 
     fireEvent.change(screen.getByLabelText(/Username/), { target: { value: 'claw_lord' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Finish' }))
+    next()
 
     expect(await screen.findByRole('alert')).toHaveTextContent('That username is taken.')
-    expect(onDismiss).not.toHaveBeenCalled()
-    expect(mockSaveAvatar).not.toHaveBeenCalled()
+    expect(screen.getByRole('heading', { name: 'Pick a username' })).toBeInTheDocument()
   })
 
   it('on a replay, prefills the saved username and leaves existing stats alone', async () => {
     mockGetProfile.mockResolvedValue({ handle: 'old_shell', avatarConfig: null })
     mockGetStats.mockResolvedValue({ moltmaxDimensionScores: { defense: 60 } })
-    const { onDismiss } = renderFlow({ initialStepId: 'name' })
+    const { onDismiss } = renderFlow({ initialStepId: 'username' })
 
     await waitFor(() => expect(screen.getByLabelText(/Username/)).toHaveValue('old_shell'))
+    next()
+    await screen.findByRole('heading', { name: 'Make your character' })
     fireEvent.click(screen.getByRole('button', { name: 'Finish' }))
 
     await waitFor(() => expect(onDismiss).toHaveBeenCalled())
@@ -139,10 +144,14 @@ describe('OnboardingFlow', () => {
     expect(mockSaveAvatar).toHaveBeenCalled()
   })
 
-  it('offers guests a free account on the last step and keeps their character on this device', async () => {
+  it('skips the username step for guests and ends on a free account offer', async () => {
     guest()
-    const { onDismiss } = renderFlow({ userName: 'Guest', initialStepId: 'name' })
+    const { onDismiss } = renderFlow({ userName: 'Guest' })
 
+    next()
+    next()
+    expect(screen.getByRole('heading', { name: 'Make your character' })).toBeInTheDocument()
+    next()
     expect(screen.getByRole('heading', { name: 'Keep your character' })).toBeInTheDocument()
     expect(screen.queryByLabelText(/Username/)).not.toBeInTheDocument()
 
@@ -154,6 +163,24 @@ describe('OnboardingFlow', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Not now' }))
     await waitFor(() => expect(onDismiss).toHaveBeenCalled())
     expect(mockSaveAvatar).not.toHaveBeenCalled()
+  })
+
+  it('moves a guest who signs up on the last step on to the username step', () => {
+    guest()
+    const view = render(
+      <ToastProvider>
+        <OnboardingFlow userName="Guest" onDismiss={vi.fn()} initialStepId="keep" />
+      </ToastProvider>,
+    )
+    expect(screen.getByRole('heading', { name: 'Keep your character' })).toBeInTheDocument()
+
+    signedIn('user-2', 'Initiate')
+    view.rerender(
+      <ToastProvider>
+        <OnboardingFlow userName="Initiate" onDismiss={vi.fn()} initialStepId="keep" />
+      </ToastProvider>,
+    )
+    expect(screen.getByRole('heading', { name: 'Pick a username' })).toBeInTheDocument()
   })
 
   it('closes on Escape', async () => {

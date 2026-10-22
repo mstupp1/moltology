@@ -32,9 +32,11 @@ export interface OnboardingStep {
   /** Short name for the progress bar. */
   label: string
   Component: React.FC<OnboardingStepProps>
+  /** Show only to members or only to guests. Defaults to everyone. */
+  audience?: 'member' | 'guest'
   /** Whether Next is enabled. Defaults to always. */
   canContinue?: (props: OnboardingStepProps) => boolean
-  /** Label for the Next button. Defaults to "Next". */
+  /** Label for the Next button. Defaults to "Next", or "Finish" on the last step. */
   nextLabel?: (props: OnboardingStepProps) => string
 }
 
@@ -59,7 +61,7 @@ function WelcomeStep({ firstName, headingId }: OnboardingStepProps) {
         Moltology helps you shed the noise of always-online life, one small habit at a time.
       </StepHeading>
       <p className="font-sans text-sm text-ink-muted leading-relaxed">
-        This takes about a minute. We will show you around, then you will make your character and pick a username.
+        This takes about a minute. We will show you around, then you will pick a username and make your character.
       </p>
     </div>
   )
@@ -127,47 +129,12 @@ function CharacterStep({ draft, update, busy, headingId }: OnboardingStepProps) 
   )
 }
 
-function NameStep({ draft, update, isGuest, error, busy, headingId }: OnboardingStepProps) {
-  const portrait = (
-    <LobsterAvatarPortrait
-      config={draft.config}
-      live
-      size={128}
-      alt="Your character"
-      className="w-16 h-16 shrink-0"
-    />
-  )
-
-  if (isGuest) {
-    return (
-      <div className="max-w-md mx-auto w-full space-y-6 py-2">
-        <StepHeading id={headingId} title="Keep your character">
-          You are looking around as a guest. Make a free account to keep this character, pick a username, and save your
-          progress.
-        </StepHeading>
-        <div className="rounded-card border border-line-subtle bg-surface-2 hud-sheen p-4 flex items-center gap-4">
-          {portrait}
-          <p className="font-sans text-sm text-ink-body">Your character is saved on this device until you sign up.</p>
-        </div>
-      </div>
-    )
-  }
-
-  const parsed = draft.handle ? parseMemberHandle(draft.handle) : null
-  const shownName = parsed?.ok ? parsed.handle : draft.handle.trim() || 'your_username'
-
+function UsernameStep({ draft, update, error, busy, headingId }: OnboardingStepProps) {
   return (
     <div className="max-w-md mx-auto w-full space-y-6 py-2">
       <StepHeading id={headingId} title="Pick a username">
         This is how other members see you in the forum and member lists. You can change it later in Settings.
       </StepHeading>
-      <div className="rounded-card border border-line-subtle bg-surface-2 hud-sheen p-4 flex items-center gap-4">
-        {portrait}
-        <div className="min-w-0">
-          <div className="font-sans text-[11px] tracking-[0.08em] uppercase text-ink-muted">Preview</div>
-          <div className="font-sans text-base font-semibold text-ink truncate">{shownName}</div>
-        </div>
-      </div>
       <div className="space-y-2">
         <DesignationField id="onboarding-username" value={draft.handle} onChange={(handle) => update({ handle })} disabled={busy} />
         {error ? (
@@ -180,19 +147,41 @@ function NameStep({ draft, update, isGuest, error, busy, headingId }: Onboarding
   )
 }
 
+function KeepStep({ draft, headingId }: OnboardingStepProps) {
+  return (
+    <div className="max-w-md mx-auto w-full space-y-6 py-2">
+      <StepHeading id={headingId} title="Keep your character">
+        You are looking around as a guest. Make a free account to keep this character, pick a username, and save your
+        progress.
+      </StepHeading>
+      <div className="rounded-card border border-line-subtle bg-surface-2 hud-sheen p-4 flex items-center gap-4">
+        <LobsterAvatarPortrait config={draft.config} live size={128} alt="Your character" className="w-16 h-16 shrink-0" />
+        <p className="font-sans text-sm text-ink-body">Your character is saved on this device until you sign up.</p>
+      </div>
+    </div>
+  )
+}
+
 /**
- * The new-member flow, in order. To add a step, write a component that takes
- * OnboardingStepProps and add an entry here; the flow handles progress, Back/Next and focus.
+ * The flow, in order. To add a step, write a component that takes OnboardingStepProps and
+ * add an entry here; the flow handles progress, Back/Next and focus. `audience` limits a
+ * step to members or guests. The last step a viewer sees finishes the flow.
  */
 export const ONBOARDING_STEPS: readonly OnboardingStep[] = [
   { id: 'welcome', label: 'Welcome', Component: WelcomeStep, nextLabel: () => 'Get started' },
   { id: 'tour', label: "What's here", Component: TourStep },
-  { id: 'character', label: 'Character', Component: CharacterStep },
   {
-    id: 'name',
-    label: 'Name',
-    Component: NameStep,
-    canContinue: ({ isGuest, draft }) => isGuest || parseMemberHandle(draft.handle).ok,
-    nextLabel: ({ isGuest }) => (isGuest ? 'Sign up free' : 'Finish'),
+    id: 'username',
+    label: 'Username',
+    audience: 'member',
+    Component: UsernameStep,
+    canContinue: ({ draft }) => parseMemberHandle(draft.handle).ok,
   },
+  { id: 'character', label: 'Character', Component: CharacterStep },
+  { id: 'keep', label: 'Sign up', audience: 'guest', Component: KeepStep, nextLabel: () => 'Sign up free' },
 ]
+
+export function stepsFor(isGuest: boolean): readonly OnboardingStep[] {
+  const audience = isGuest ? 'guest' : 'member'
+  return ONBOARDING_STEPS.filter((s) => !s.audience || s.audience === audience)
+}

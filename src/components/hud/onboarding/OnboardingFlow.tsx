@@ -21,7 +21,7 @@ import {
 } from '@/lib/lobster-avatar'
 import { parseMemberHandle } from '@/lib/member-handle'
 import { rollBaseStats, type BaseStats } from '@/lib/stats-roller'
-import { ONBOARDING_STEPS, type OnboardingDraft, type OnboardingStepProps } from './steps'
+import { stepsFor, type OnboardingDraft, type OnboardingStepProps } from './steps'
 
 export interface OnboardingFlowProps {
   userName?: string | null
@@ -80,10 +80,8 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
   const isGuest = !userId
   const { toast } = useToast()
 
-  const [index, setIndex] = useState(() => {
-    const found = ONBOARDING_STEPS.findIndex((s) => s.id === initialStepId)
-    return found >= 0 ? found : 0
-  })
+  const steps = stepsFor(isGuest)
+  const [stepId, setStepId] = useState(() => initialStepId ?? steps[0].id)
   const [draft, setDraft] = useState<OnboardingDraft>(() => ({
     config: readStoredConfig(userId || 'guest') ?? { style: LOBSTER_AVATAR_STYLE, seed: randomLobsterSeed() },
     handle: '',
@@ -143,8 +141,13 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
     setDraft((d) => ({ ...d, ...patch }))
   }, [])
 
-  const step = ONBOARDING_STEPS[index]
-  const isLast = index === ONBOARDING_STEPS.length - 1
+  // A guest who signs up on the last step stays in the flow: their "Sign up" step is gone
+  // from the member list, so carry on at the username step with the character they made.
+  let index = steps.findIndex((s) => s.id === stepId)
+  if (index < 0) index = Math.max(0, steps.findIndex((s) => s.id === 'username'))
+  const step = steps[index]
+  const isLast = index === steps.length - 1
+  const goTo = (i: number) => setStepId(steps[i].id)
   const stepProps: OnboardingStepProps = {
     draft,
     update,
@@ -161,7 +164,7 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
     const heading = document.getElementById(headingId)
     heading?.focus({ preventScroll: true })
     panelRef.current?.querySelector('[data-onboarding-body]')?.scrollTo?.({ top: 0 })
-  }, [index, visible, authOpen, headingId])
+  }, [step.id, visible, authOpen, headingId])
 
   const close = useCallback(() => {
     setVisible(false)
@@ -172,27 +175,43 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
     writeLocal(avatarKey('guest'), JSON.stringify(lockAvatarConfig(draft.config)))
   }
 
-  const finishAsMember = async () => {
-    if (!userId) return
+  /** Claims the username before the member moves on, so a taken name is caught on its own step. */
+  const claimUsername = async () => {
+    if (!userId) return false
     const parsed = parseMemberHandle(draft.handle)
     if (!parsed.ok) {
       setError(parsed.message)
-      return
+      return false
     }
+    if (parsed.handle === savedHandle) return true
     setBusy(true)
     setError(null)
     try {
       const token = (await getAuthJWTToken().catch(() => null)) ?? undefined
-      if (parsed.handle !== savedHandle) {
-        try {
-          await claimMemberHandleFn({ data: { handle: parsed.handle, userId, token } })
-        } catch (err) {
-          setError(err instanceof Error ? err.message : 'Could not save that username. Try another one.')
-          return
-        }
-        window.dispatchEvent(new CustomEvent('member-handle-changed'))
-      }
+      await claimMemberHandleFn({ data: { handle: parsed.handle, userId, token } })
+      setSavedHandle(parsed.handle)
+      window.dispatchEvent(new CustomEvent('member-handle-changed'))
+      return true
+    } catch (err) {
+      const message = err instanceof Error ? err.message : ''
+      setError(
+        !message
+          ? 'Could not save that username. Try another one.'
+          : message.startsWith('Unauthenticated')
+            ? 'Your session expired. Sign in again to save your username.'
+            : message,
+      )
+      return false
+    } finally {
+      setBusy(false)
+    }
+  }
 
+  const finishAsMember = async () => {
+    if (!userId) return
+    setBusy(true)
+    try {
+      const token = (await getAuthJWTToken().catch(() => null)) ?? undefined
       const config = lockAvatarConfig(draft.config)
       writeLocal(avatarKey(userId), JSON.stringify(config))
       const [avatar] = await Promise.allSettled([
@@ -204,7 +223,7 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
       window.dispatchEvent(new CustomEvent('user-stats-changed'))
 
       if (avatar.status === 'rejected') {
-        toast.error('Your username is saved, but your character did not save. Try again in Settings.')
+        toast.error('Your character did not save. Try again in Settings.')
       } else {
         toast.success("You're all set.")
       }
@@ -214,9 +233,10 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
     }
   }
 
-  const next = () => {
+  const next = async () => {
+    if (step.id === 'username' && !(await claimUsername())) return
     if (!isLast) {
-      setIndex((i) => i + 1)
+      goTo(index + 1)
       return
     }
     if (isGuest) {
@@ -267,7 +287,7 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
   }
 
   const canContinue = step.canContinue ? step.canContinue(stepProps) : true
-  const nextLabel = step.nextLabel ? step.nextLabel(stepProps) : 'Next'
+  const nextLabel = step.nextLabel ? step.nextLabel(stepProps) : isLast ? 'Finish' : 'Next'
   const { Component } = step
 
   return (
@@ -289,7 +309,7 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
         <header className="shrink-0 px-4 sm:px-6 pt-4 pb-3 border-b border-line-subtle">
           <div className="flex items-center justify-between gap-3">
             <span className="font-sans text-[11px] tracking-[0.08em] uppercase text-ink-muted">
-              Step {index + 1} of {ONBOARDING_STEPS.length} · {step.label}
+              Step {index + 1} of {steps.length} · {step.label}
             </span>
             <button
               type="button"
@@ -301,8 +321,8 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
               <X className="w-4 h-4" />
             </button>
           </div>
-          <ol className="mt-3 grid gap-1.5" style={{ gridTemplateColumns: `repeat(${ONBOARDING_STEPS.length}, minmax(0, 1fr))` }}>
-            {ONBOARDING_STEPS.map((s, i) => (
+          <ol className="mt-3 grid gap-1.5" style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}>
+            {steps.map((s, i) => (
               <li key={s.id} className="h-1 rounded-chip bg-surface-3 overflow-hidden">
                 <span className="sr-only">
                   {s.label}
@@ -333,7 +353,7 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
               type="button"
               variant="ghost"
               size="md"
-              onClick={() => setIndex((i) => i - 1)}
+              onClick={() => goTo(index - 1)}
               disabled={busy}
               icon={<ChevronLeft className="w-4 h-4" />}
             >
@@ -350,7 +370,7 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
               type="button"
               variant="primary"
               size="md"
-              onClick={next}
+              onClick={() => void next()}
               disabled={!canContinue || busy}
               iconPosition="right"
               icon={isLast ? undefined : <ChevronRight className="w-4 h-4" />}
