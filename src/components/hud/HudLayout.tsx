@@ -16,6 +16,7 @@ import { PwaInstallBanner } from '@/components/hud/PwaInstallBanner'
 import { PwaNotificationBridge } from '@/components/hud/PwaNotificationBridge'
 import '@/styles/crt.css'
 import '@/styles/hud-chrome.css'
+import { useBackdropCovered } from '@/hooks/useBackdropCovered'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
 import { usePwaInstall } from '@/hooks/usePwaInstall'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -33,6 +34,8 @@ function HudContent() {
   const user = session.user
   const userId = session.userId
   const { heavyVfxDisabled } = useHeavyVfx()
+  // The Oracle page and full-screen overlays are opaque, so the bubbles can rest.
+  const backdropCovered = useBackdropCovered()
   // Register service worker + track install prompt for the whole hub (guest + member).
   usePwaInstall()
 
@@ -142,12 +145,13 @@ function HudContent() {
           customBubbleSrcs={BUBBLE_VARIANT_SRCS}
           chromaKeyMode="black"
           disabled={heavyVfxDisabled}
+          paused={isFullscreenRoute || backdropCovered}
           className="absolute inset-0 pointer-events-none z-[1] opacity-85"
         />
 
         {/* Phosphor Ambient Radial Glow (Electric Cyan) */}
         <div
-          className="absolute inset-0 z-[2] transition-opacity duration-150 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.35)_0%,rgba(0,195,255,0.16)_55%,transparent_85%)]"
+          className="absolute inset-0 z-[2] transition-opacity duration-150 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.21)_0%,rgba(0,195,255,0.1)_55%,transparent_85%)]"
         />
 
         {/* High-Tech CRT Scanlines Overlay on Background Image */}
@@ -184,7 +188,7 @@ function HudContent() {
                 isFullscreenRoute
                   ? 'p-0 overflow-hidden'
                   : 'p-2.5 pb-16 sm:p-4 sm:pb-4 md:p-6 md:pb-6 overflow-y-auto overscroll-y-contain'
-              } bg-surface-1/50 ${
+              } bg-surface-1/[0.62] ${
                 isMainOnly
                   ? 'border-0 shadow-none'
                   : 'border-t md:border-t-0 md:border-l border-line-subtle shadow-2xl'

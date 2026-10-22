@@ -281,7 +281,7 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
               aria-pressed={selected}
               onClick={() => handleVolumeChange(tab.value)}
               className={`shrink-0 whitespace-nowrap min-h-10 px-3 rounded-control font-grotesk text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                selected ? 'text-ink bg-surface-3 shadow-nav-current' : 'text-ink-muted hover:text-ink hover:bg-surface-2'
+                selected ? 'text-ink bg-surface-3 shadow-nav-current' : 'text-ink-body hover:text-ink hover:bg-surface-2'
               }`}
             >
               {tab.label}
@@ -311,7 +311,7 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
               >
                 Contents
               </HudButton>
-              <span className="text-xs text-ink-muted tabular-nums whitespace-nowrap">
+              <span className="text-xs text-ink-body tabular-nums whitespace-nowrap">
                 <span className="hidden sm:inline">Stage {activeScripture.stageClearance} · </span>
                 {pageIndex + 1} of {filteredScriptures.length}
               </span>
