@@ -24,7 +24,7 @@ export const DASHBOARD_PROMOS: DashboardPromo[] = [
     description: 'See where you are on the descent and what opens next.',
     ctaText: 'See the stages',
     to: '/pipeline',
-    image: getAssetUrl('images/marketing/promo_early_access.webp'),
+    image: getAssetUrl('images/dashboard/carousel/start-here-2026-10-22.png'),
   },
   {
     id: 'academy',
@@ -33,7 +33,7 @@ export const DASHBOARD_PROMOS: DashboardPromo[] = [
     description: 'Courses, lectures and certifications, at your own depth.',
     ctaText: 'Browse courses',
     to: '/lectures',
-    image: getAssetUrl('images/bento_lectures.jpg'),
+    image: getAssetUrl('images/dashboard/carousel/academy-2026-10-22.png'),
   },
   {
     id: 'chassis',
@@ -42,7 +42,7 @@ export const DASHBOARD_PROMOS: DashboardPromo[] = [
     description: 'Seat gear from your vault and read the loadout.',
     ctaText: 'Open chassis',
     to: '/chassis',
-    image: getAssetUrl('images/marketing/promo_cyber_chassis.webp'),
+    image: getAssetUrl('images/dashboard/carousel/chassis-2026-10-22.png'),
   },
 ]
 

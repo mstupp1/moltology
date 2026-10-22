@@ -1,0 +1,26 @@
+{
+  "created": "2026-10-22",
+  "tool": "built-in image_gen",
+  "uploadStatus": "All three originals and compressed WebP twins uploaded successfully to moltology-public-assets.",
+  "treatment": "Evergreen product navigation artwork; no seasonal props.",
+  "assets": [
+    {
+      "id": "start-here",
+      "local": "tmp/dashboard-carousel/start-here.png",
+      "key": "images/dashboard/carousel/start-here-2026-10-22.png",
+      "prompt": "Use case: stylized-concept. Create one finished square 1024x1024 cinematic 3D environment illustration for the Moltology dashboard Start Here tile. Deep ocean science-fantasy, calm and welcoming, extremely polished tactile charcoal chitin and brushed metal with bioluminescent cyan and restrained warm amber. Subject: an elegant illuminated descent beacon on a small round seafloor platform, four broad stepped concentric shells receding toward a quiet luminous cyan depth aperture, visually suggesting gradual progression into the ocean. Subtle suspended particles, dark ocean background. One bold readable central silhouette, generous dark margins. Put all essential subject detail within central 65% width and middle 45% height so it survives a shallow horizontal center crop. Low oblique camera. Consistent art direction for a series of small dashboard illustrations. No people, no humanoids, no characters, no text, no numbers, no typography, no logos, no UI, no watermark. Strong contrast and beautiful material rendering, avoid busy microdetail."
+    },
+    {
+      "id": "academy",
+      "local": "tmp/dashboard-carousel/academy.png",
+      "key": "images/dashboard/carousel/academy-2026-10-22.png",
+      "prompt": "Use case: stylized-concept. One finished square cinematic 3D environment illustration for the Moltology dashboard Molt Academy tile. Deep ocean science-fantasy study sanctuary; tactile charcoal chitin, brushed dark metal, luminous cyan and restrained warm amber edge lights. Main subject: a single open thick physical field manual on a low sculpted shell-shaped study console, luminous cyan translucent schematic of a small crab carapace hovering above the open pages. Pages contain only elegant abstract cyan line diagrams, absolutely no letters or numbers. Background softly blurred underwater archive alcoves and suspended particles, peaceful inviting light from above. Premium game environment material rendering, coherent believable objects. Compact composition with open book and hologram centered within the middle half of image height, generous dark framing on all sides, readable at tiny dashboard tile sizes and horizontal center crop. Low three quarter camera. One clear focal point. No people, no humanoids, no characters, no typography, no words, no logos, no UI, no watermark. Same family as a dark underwater descent beacon with cyan light and amber-edged chitin shells."
+    },
+    {
+      "id": "chassis",
+      "local": "tmp/dashboard-carousel/chassis.png",
+      "key": "images/dashboard/carousel/chassis-2026-10-22.png",
+      "prompt": "Use case: stylized-concept. Create one finished square cinematic 3D environment illustration for the Moltology dashboard Chassis tile. Deep ocean science-fantasy workshop, polished tactile charcoal chitin armor, brushed dark metal, luminous cyan and restrained warm amber edge lights. Subject: a beautiful crab-shaped exoshell equipment assembly suspended above a low round calibration pedestal, broad domed protective carapace with two compact symmetrical pincer modules floating beside it, separated slightly to suggest fitting gear. Armor object only, no living crab, no humanoid suit, no human torso. Broad horizontal silhouette centered in the middle 45% of frame height, generous dark ocean workshop background and negative margins. Cyan light shines through the fine gaps between shell plates. Subtle restrained workshop braces in background, suspended particles, welcoming calm mood. Low three quarter camera. Strong readable central subject at small dashboard tile sizes, middle horizontal crop must retain shell and pincers. Cohesive with an underwater archive open field manual and a descent beacon, luxurious detailed materials, premium game key art. No writing, no words, no numbers, no logos, no characters, no watermark, no UI, no weapons, no busy microdetails."
+    }
+  ]
+}
