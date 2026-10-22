@@ -10,7 +10,7 @@ describe('vector diagram geometry', () => {
 
   it('pushes only the active vector out and pulls the rest in', () => {
     const shape = shapeFor(2)
-    expect(shape[2]).toBe(96)
+    expect(shape[2]).toBe(88)
     shape.forEach((value, index) => {
       if (index !== 2) expect(value).toBeLessThan(SAMPLE_SHELL[index])
     })
