@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { Clock, Calendar, RefreshCw, Sparkles, CheckCircle2, ChevronDown, ChevronUp, CheckSquare, Square, Award, Bell, BellOff, Zap, Radio, X, Trash2, ListTodo } from 'lucide-react'
+import { Clock, Calendar, RefreshCw, Sparkles, CheckCircle2, ChevronDown, ChevronUp, CheckSquare, Square, Award, Bell, Check, X, ListTodo } from 'lucide-react'
+import { AlignmentRemindersSwitch } from '@/components/hud/AlignmentRemindersSwitch'
 import { HudCard, HudBadge, HudBottomSheet } from '@/components/ui'
 import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
@@ -10,7 +11,7 @@ import { Link } from '@tanstack/react-router'
 import { OPEN_ALIGNMENT_PANEL_EVENT, isAlignmentPanelHostVisible } from '@/lib/alignment-panel'
 import { CANONICAL_ALIGNMENT_TASKS, type AlignmentTaskItem } from '@/lib/alignment-tasks'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
-import { ACTIVITY_INBOX_LABEL, isForumInboxKind } from '@/lib/notifications'
+import { isForumInboxKind } from '@/lib/notifications'
 import { forumPostAnchorId } from '@/lib/forum-mentions'
 
 export interface AlignmentTask {
@@ -61,7 +62,6 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
 
   // ToastProvider context for notification telemetry (optional-safe)
   const toastCtx = useOptionalToast()
-  const toastsList: any[] = toastCtx?.toasts || []
   const toastHistoryList: any[] = toastCtx?.toastHistory || toastCtx?.toasts || []
   const clearToastsFn = toastCtx?.clearToasts ?? (() => {})
 
@@ -256,258 +256,211 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   const allTasksCompleted = localTasks.length > 0 && localTasks.every(t => t.completed)
   const completedCount = localTasks.filter(t => t.completed).length
   const liturgyCountText = `${completedCount}/${localTasks.length}`
+  const progressPct = Math.round((completedCount / Math.max(localTasks.length, 1)) * 100)
+  const nextTaskId = allTasksCompleted ? undefined : nextTask?.id
+  const alertsCount = notificationUnread + toastHistoryList.length
+  const hasAnyAlerts = dbNotifications.length > 0 || toastHistoryList.length > 0
+  const todayLabel = mounted
+    ? time.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+    : ''
 
-  const renderLiturgyCount = (className: string) =>
-    countReady ? (
-      <span className={className}>{liturgyCountText}</span>
-    ) : (
-      <span
-        className={`${className} inline-flex items-center justify-center min-w-[2.25rem]`}
-        aria-hidden
+  const focusRing =
+    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
+  const sectionLabel = 'text-[11px] font-bold tracking-[0.08em] uppercase text-ink-muted'
+  const listFrame = 'rounded-control border border-line-subtle divide-y divide-line-subtle overflow-hidden'
+
+  const renderTab = (id: 'liturgies' | 'transmissions', label: string, meta: React.ReactNode, Icon: typeof ListTodo) => {
+    const selected = activeTab === id
+    return (
+      <button
+        type="button"
+        role="tab"
+        aria-selected={selected}
+        onClick={() => setActiveTab(id)}
+        className={`min-h-10 sm:min-h-8 px-2 rounded-control text-xs font-bold flex items-center justify-center gap-2 transition-colors touch-manipulation ${focusRing} ${
+          selected ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-2'
+        }`}
       >
-        <span className="inline-block h-2 w-4 rounded-chip bg-cyan-glow/40 animate-pulse" />
-      </span>
+        <Icon className={`w-3.5 h-3.5 ${selected ? 'text-cyan-glow' : ''}`} aria-hidden="true" />
+        <span>{label}</span>
+        {meta}
+      </button>
     )
+  }
 
-  // Sub-renderer for Activity Center content (shared across desktop dropdown & mobile bottom sheet)
+  const renderAlertRow = (key: string, title: React.ReactNode, detail: React.ReactNode, unread: boolean) => (
+    <div key={key} className="flex items-start gap-2.5 min-w-0">
+      <span
+        aria-hidden="true"
+        className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${unread ? 'bg-cyan-glow' : 'bg-surface-3'}`}
+      />
+      <span className="min-w-0 flex-1 space-y-0.5">
+        {title && <span className="block text-xs font-bold text-ink">{title}</span>}
+        {detail && <span className="block text-xs text-ink-body leading-snug">{detail}</span>}
+      </span>
+    </div>
+  )
+
+  // Shared body for the desktop dropdown and the phone bottom sheet
   const renderActivityContent = () => (
     <>
-      {/* Header: Title & Close Button */}
-      <div className="flex items-center justify-between border-b border-line-subtle pb-2.5">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-cyan-glow animate-pulse" />
-          <span className="font-grotesk text-xs font-bold text-ink tracking-[0.08em] uppercase">
-            DAILY ALIGNMENT SCHEDULE
-          </span>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-baseline gap-2 min-w-0">
+          <span className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">Today</span>
+          {todayLabel && <span className="text-xs text-ink-muted truncate">{todayLabel}</span>}
         </div>
         <button
+          type="button"
           onClick={(e) => { e.stopPropagation(); setIsScheduleOpen(false); }}
           aria-label="Close activity center"
-          className="text-ink-muted hover:text-ink p-1 rounded-control hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+          className={`-mr-1 p-1.5 rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors ${focusRing}`}
         >
           <X className="w-4 h-4" />
         </button>
       </div>
 
-      {/* Segmented Control Tabs (iOS / Dynamic Island Style) */}
-      <div className="grid grid-cols-2 gap-1 p-1 bg-abyss border border-line-subtle rounded-card">
-        <button
-          onClick={() => setActiveTab('liturgies')}
-          className={`py-1.5 sm:py-1 px-2 rounded-control font-sans text-[11px] font-bold tracking-[0.08em] transition-colors flex items-center justify-center gap-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-            activeTab === 'liturgies'
-              ? 'bg-surface-2 text-ink shadow-[inset_0_-2px_0_theme(colors.cyan.glow)]'
-              : 'text-ink-muted hover:text-ink hover:bg-surface-2'
-          }`}
-        >
-          <Zap className="w-3 h-3 text-cyan-glow" />
-          <span>
-            {countReady ? `LITURGIES (${liturgyCountText})` : 'LITURGIES'}
-          </span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('transmissions')}
-          className={`py-1.5 sm:py-1 px-2 rounded-control font-sans text-[11px] font-bold tracking-[0.08em] transition-colors flex items-center justify-center gap-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow relative ${
-            activeTab === 'transmissions'
-              ? 'bg-surface-2 text-ink shadow-[inset_0_-2px_0_theme(colors.cyan.glow)]'
-              : 'text-ink-muted hover:text-ink hover:bg-surface-2'
-          }`}
-        >
-          <Radio className="w-3 h-3 text-crimson-text" />
-          <span>ALERTS ({alertsBadgeCount})</span>
-          {(toastsList.length > 0 || notificationUnread > 0) && (
-            <span className="w-2 h-2 rounded-full bg-crimson-aggro animate-pulse" />
-          )}
-        </button>
+      <div role="tablist" aria-label="Today" className="grid grid-cols-2 gap-1 p-1 bg-abyss border border-line-subtle rounded-card">
+        {renderTab(
+          'liturgies',
+          'Tasks',
+          countReady ? (
+            <span className={`tabular-nums ${allTasksCompleted ? 'text-emerald-500' : 'text-ink-muted'}`}>{liturgyCountText}</span>
+          ) : null,
+          ListTodo,
+        )}
+        {renderTab(
+          'transmissions',
+          'Alerts',
+          alertsCount > 0 ? (
+            <span className="min-w-5 px-1 rounded-chip bg-crimson-soft text-crimson-text text-[11px] tabular-nums">
+              {alertsCount}
+            </span>
+          ) : null,
+          Bell,
+        )}
       </div>
 
-      {/* ── TAB 1: LITURGIES & UPCOMING SCHEDULE ── */}
       {activeTab === 'liturgies' && (
-        <div className="space-y-3 animate-in fade-in duration-150">
-          {/* Spotlight "Next Up" Live Activity Card */}
-          {nextTask && !allTasksCompleted ? (
-            <div className="p-3 rounded-card border border-cyan-glow/40 bg-surface-2 hud-sheen space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-sans font-bold text-cyan-glow tracking-[0.08em] flex items-center gap-1.5">
-                  <Sparkles className="w-3 h-3 text-crimson-text animate-pulse" />
-                  NEXT IMPENDING LITURGY
-                </span>
-                <span className="text-[11px] font-bold text-cyan-glow bg-cyan-soft border border-line-subtle px-1.5 py-0.2 rounded-chip font-sans">
-                  {nextTask.time}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between gap-2">
-                <div className="min-w-0">
-                  <span className="text-[11px] font-sans font-bold text-crimson-text mr-1.5">
-                    [{nextTask.time}]
-                  </span>
-                  <span className="text-xs font-bold text-ink truncate">
-                    {nextTask.title}
-                  </span>
-                </div>
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleToggleTask(nextTask.id)
-                  }}
-                  className="shrink-0 px-2.5 py-1.5 sm:py-1 bg-cyan-glow hover:bg-cyan-hover text-abyss font-bold text-[11px] uppercase tracking-[0.08em] rounded-control transition-colors active:scale-95 flex items-center gap-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-                >
-                  <CheckCircle2 className="w-3 h-3" />
-                  <span>COMPLETE</span>
-                </button>
-              </div>
-            </div>
-          ) : allTasksCompleted ? (
-            <div className="p-3 bg-emerald-500/10 border border-emerald-500/40 rounded-card flex items-center gap-2 text-xs font-bold text-emerald-400">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>ALL DAILY LITURGIES VERIFIED FOR TODAY</span>
-            </div>
-          ) : null}
-
-          {/* Progress bar */}
-          <div className="space-y-1">
-            <div className="flex justify-between text-[11px] text-ink-muted">
-              {countReady ? (
-                <>
-                  <span>PROGRESS: {liturgyCountText} COMPLETED</span>
-                  <span className="text-cyan-glow font-bold">
-                    {Math.round((completedCount / Math.max(localTasks.length, 1)) * 100)}%
-                  </span>
-                </>
-              ) : (
-                <span
-                  className="inline-block h-2 w-28 rounded-chip bg-cyan-glow/25 animate-pulse"
-                  aria-hidden
-                />
-              )}
-            </div>
-            <div className="w-full h-1.5 bg-surface-3 rounded-chip overflow-hidden">
-              <div
-                className={`h-full rounded-chip ${allTasksCompleted ? 'bg-emerald-500' : 'bg-cyan-glow'} ${
-                  countReady ? 'transition-all duration-300' : 'animate-pulse opacity-40'
-                }`}
-                style={{
-                  width: countReady
-                    ? `${Math.round((completedCount / Math.max(localTasks.length, 1)) * 100)}%`
-                    : '35%',
-                }}
-              />
-            </div>
+        <div role="tabpanel" aria-label="Tasks" className="space-y-2.5">
+          <div className="flex items-center justify-between gap-2">
+            {countReady ? (
+              <span className={`text-xs ${allTasksCompleted ? 'text-emerald-500 font-bold' : 'text-ink-muted'}`}>
+                {allTasksCompleted ? 'All eight done for today' : `${completedCount} of ${localTasks.length} done`}
+              </span>
+            ) : (
+              <span className="inline-block h-2 w-24 rounded-chip bg-surface-3 animate-pulse" aria-hidden />
+            )}
+            <AlignmentRemindersSwitch enabled={remindersEnabled} onToggle={toggleReminders} />
+          </div>
+          <div className="w-full h-1 bg-surface-3 rounded-chip overflow-hidden" aria-hidden="true">
+            <div
+              className={`h-full rounded-chip transition-[width] duration-300 ${allTasksCompleted ? 'bg-emerald-500' : 'bg-cyan-glow'} ${
+                countReady ? '' : 'opacity-0'
+              }`}
+              style={{ width: `${countReady ? progressPct : 0}%` }}
+            />
           </div>
 
-          {/* Scrollable list of 8 liturgies */}
-          <div className="space-y-1 max-h-48 overflow-y-auto pr-1">
+          <ul className={listFrame}>
             {localTasks.map((t) => {
-              const isNext = t.id === nextTask.id && !allTasksCompleted
-              const reminderTime = getTaskReminderTime(t.time)
+              const isNext = t.id === nextTaskId
+              const reminderTime = remindersEnabled && !t.completed ? getTaskReminderTime(t.time) : null
               return (
-                <div
-                  key={t.id}
-                  onClick={() => handleToggleTask(t.id)}
-                  className={`flex items-center justify-between p-2 rounded-card border transition-colors cursor-pointer ${
-                    isNext
-                      ? 'bg-cyan-soft border-cyan-glow/40'
-                      : t.completed
-                      ? 'bg-surface-1 border-line-subtle opacity-70'
-                      : 'bg-surface-1 border-line-subtle hover:bg-surface-2 hover:border-line-strong'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleToggleTask(t.id)
-                      }}
-                      className="rounded-chip text-cyan-glow hover:scale-110 transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                <li key={t.id}>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleToggleTask(t.id)
+                    }}
+                    aria-pressed={t.completed}
+                    className={`w-full min-h-[44px] sm:min-h-10 px-3 py-2 flex items-center gap-3 text-left text-xs transition-colors touch-manipulation group focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
+                      isNext ? 'bg-surface-3 shadow-nav-current' : t.completed ? 'bg-abyss/30 hover:bg-surface-2' : 'hover:bg-surface-2'
+                    }`}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`w-4 h-4 shrink-0 rounded-chip border flex items-center justify-center transition-colors ${
+                        t.completed ? 'bg-emerald-500 border-emerald-500 text-abyss' : 'border-line-strong group-hover:border-cyan-glow'
+                      }`}
                     >
-                      {t.completed ? (
-                        <CheckSquare className="w-3.5 h-3.5 text-cyan-glow" />
-                      ) : (
-                        <Square className="w-3.5 h-3.5 text-ink-muted" />
-                      )}
-                    </button>
-
-                    <div className="flex items-center gap-1.5">
-                      <span className={`text-[11px] font-sans font-bold ${isNext ? 'text-crimson-text' : 'text-ink-muted'}`}>
-                        [{t.time}]
-                      </span>
-                      {reminderTime && (
-                        <span className="text-[11px] text-amber-400 bg-amber-500/15 px-1 rounded-chip border border-amber-500/30 hidden xs:inline-flex items-center gap-0.5">
-                          <Bell className="w-2.5 h-2.5" /> {reminderTime}
-                        </span>
-                      )}
-                    </div>
-
-                    <span className={`text-[11px] font-sans font-bold truncate ${
-                      t.completed ? 'line-through text-ink-muted' : 'text-ink'
-                    }`}>
+                      {t.completed && <Check className="w-3 h-3" strokeWidth={3} />}
+                    </span>
+                    <span className={`w-[5.5rem] shrink-0 text-[11px] tabular-nums ${isNext ? 'text-cyan-glow font-bold' : 'text-ink-muted'}`}>
+                      {t.time}
+                    </span>
+                    <span
+                      className={`min-w-0 flex-1 truncate ${
+                        t.completed ? 'line-through decoration-ink-muted/60 text-ink-muted' : 'text-ink font-bold'
+                      }`}
+                    >
                       {t.title}
                     </span>
-                  </div>
-
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-[11px] font-sans text-cyan-glow bg-surface-2 px-1.5 py-0.2 border border-line-subtle rounded-chip">
-                      {t.completed ? 'COMPLETE' : 'PENDING'}
-                    </span>
-                  </div>
-                </div>
+                    {isNext ? (
+                      <span className="shrink-0 text-[11px] font-bold uppercase tracking-[0.08em] text-cyan-glow">Next</span>
+                    ) : reminderTime ? (
+                      <span className="shrink-0 hidden sm:inline-flex items-center gap-1 text-[11px] text-ink-muted tabular-nums" title="Reminder time">
+                        <Bell className="w-3 h-3" aria-hidden="true" />
+                        {reminderTime}
+                      </span>
+                    ) : null}
+                  </button>
+                </li>
               )
             })}
-          </div>
+          </ul>
         </div>
       )}
 
-      {/* ── TAB 2: TRANSMISSIONS & TOAST ALERTS ── */}
       {activeTab === 'transmissions' && (
-        <div className="space-y-2.5 animate-in fade-in duration-150">
-          <div className="flex items-center justify-between text-[11px] text-ink-muted">
-            <span>{ACTIVITY_INBOX_LABEL}</span>
-            <div className="flex items-center gap-2">
+        <div role="tabpanel" aria-label="Alerts" className="space-y-3">
+          {(notificationUnread > 0 || toastHistoryList.length > 0) && (
+            <div className="flex items-center justify-end gap-3 text-[11px]">
               {notificationUnread > 0 && (
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation()
                     void markAllRead()
                   }}
-                  className="rounded-control text-cyan-glow hover:text-ink font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                  className={`min-h-8 px-1 rounded-control font-bold text-ink-muted hover:text-ink transition-colors ${focusRing}`}
                 >
-                  MARK ALL READ
+                  Mark all read
                 </button>
               )}
               {toastHistoryList.length > 0 && (
                 <button
+                  type="button"
                   onClick={(e) => { e.stopPropagation(); clearToastsFn(); }}
-                  className="rounded-control text-crimson-text hover:text-crimson-hover flex items-center gap-1 font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                  className={`min-h-8 px-1 rounded-control font-bold text-ink-muted hover:text-ink transition-colors ${focusRing}`}
                 >
-                  <Trash2 className="w-2.5 h-2.5" /> CLEAR
+                  Clear
                 </button>
               )}
             </div>
-          </div>
+          )}
+
+          {!hasAnyAlerts && (
+            <div className="py-6 text-center space-y-1">
+              <Bell className="w-5 h-5 text-ink-muted mx-auto" aria-hidden="true" />
+              <div className="text-sm font-bold text-ink">Nothing new</div>
+              <div className="text-xs text-ink-muted">Alerts from this visit show up here.</div>
+            </div>
+          )}
 
           {actionableNotifications.length > 0 && (
-            <div className="space-y-1.5">
-              <div className="text-[11px] font-bold tracking-[0.08em] text-cyan-glow uppercase">
-                Action Required
-              </div>
-              <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+            <section className="space-y-1.5">
+              <h3 className={sectionLabel}>Needs you</h3>
+              <ul className={`${listFrame} max-h-60 overflow-y-auto`}>
                 {actionableNotifications.map((n) => (
-                  <div
-                    key={n.id}
-                    className="p-2 rounded-card bg-surface-1 hud-sheen border border-line space-y-2"
-                  >
-                    <div className="text-[11px] font-bold text-cyan-glow font-grotesk tracking-[0.08em]">
-                      {n.title}
-                    </div>
-                    <div className="text-ink-body text-[11px] leading-tight">{n.detail}</div>
-                    <div className="flex flex-wrap gap-1.5">
+                  <li key={n.id} className="p-3 space-y-2">
+                    {renderAlertRow(n.id, n.title, n.detail, !n.readAt)}
+                    <div className="flex flex-wrap gap-1.5 pl-4">
                       {n.payload.requestId && (
                         <>
                           <button
                             type="button"
-                            className="px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] border border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/15 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                            className={`min-h-8 px-2.5 text-[11px] font-bold rounded-control bg-cyan-glow hover:bg-cyan-hover text-abyss transition-colors ${focusRing}`}
                             onClick={(e) => {
                               e.stopPropagation()
                               void acceptFriendRequest(n.payload.requestId!, n.id)
@@ -517,7 +470,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                           </button>
                           <button
                             type="button"
-                            className="px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] border border-line text-ink-muted hover:border-crimson-aggro hover:text-crimson-text rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                            className={`min-h-8 px-2.5 text-[11px] font-bold rounded-control border border-line text-ink-muted hover:text-ink hover:border-line-strong transition-colors ${focusRing}`}
                             onClick={(e) => {
                               e.stopPropagation()
                               void declineFriendRequest(n.payload.requestId!, n.id)
@@ -536,44 +489,28 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                               handle: n.actorHandle,
                             }),
                           }}
-                          className="px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] border border-line text-cyan-glow hover:border-line-strong hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                          className={`min-h-8 inline-flex items-center px-2.5 text-[11px] font-bold rounded-control border border-line text-ink-muted hover:text-ink hover:border-line-strong transition-colors ${focusRing}`}
                           onClick={() => setIsScheduleOpen(false)}
                         >
-                          View Profile
+                          View profile
                         </Link>
                       )}
                     </div>
-                  </div>
+                  </li>
                 ))}
-              </div>
-            </div>
+              </ul>
+            </section>
           )}
 
           {recentNotifications.length > 0 && (
-            <div className="space-y-1.5">
-              <div className="text-[11px] font-bold tracking-[0.08em] text-ink-muted uppercase">
-                Recent Transmissions
-              </div>
-              <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+            <section className="space-y-1.5">
+              <h3 className={sectionLabel}>Recent</h3>
+              <ul className={`${listFrame} max-h-60 overflow-y-auto`}>
                 {recentNotifications.map((n) => {
-                  const rowClass = `w-full text-left p-2 rounded-card bg-surface-1 hover:bg-surface-2 border flex items-start gap-2 text-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                    n.readAt ? 'border-line-subtle opacity-80' : 'border-line'
+                  const rowClass = `block w-full text-left px-3 py-2.5 hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
+                    n.readAt ? 'opacity-75' : ''
                   }`
-                  const body = (
-                    <>
-                      <div
-                        className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${
-                          n.readAt ? 'bg-ink-muted/40' : 'bg-cyan-glow'
-                        }`}
-                      />
-                      <div className="min-w-0 flex-1 space-y-0.5">
-                        <div className="text-[11px] font-bold text-cyan-glow font-grotesk tracking-[0.08em]">
-                          {n.title}
-                        </div>
-                        <div className="text-ink-body text-[11px] leading-tight">{n.detail}</div>
-                      </div>
-                    </>
-                  )
+                  const body = renderAlertRow(n.id, n.title, n.detail, !n.readAt)
                   const markAndClose = () => {
                     if (!n.readAt) void markRead(n.id)
                     setIsScheduleOpen(false)
@@ -582,188 +519,153 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                     const categorySlug = n.payload.categorySlug?.trim()
                     const topicSlug = n.payload.topicSlug?.trim()
                     const postId = n.payload.postId?.trim()
-                    if (categorySlug && topicSlug) {
-                      return (
-                        <Link
-                          key={n.id}
-                          to="/forum/$categorySlug/$topicSlug"
-                          params={{ categorySlug, topicSlug }}
-                          hash={postId ? forumPostAnchorId(postId) : undefined}
-                          className={rowClass}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            markAndClose()
-                          }}
-                        >
-                          {body}
-                        </Link>
-                      )
-                    }
                     return (
-                      <Link
-                        key={n.id}
-                        to="/forum"
-                        className={rowClass}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          markAndClose()
-                        }}
-                      >
-                        {body}
-                      </Link>
+                      <li key={n.id}>
+                        {categorySlug && topicSlug ? (
+                          <Link
+                            to="/forum/$categorySlug/$topicSlug"
+                            params={{ categorySlug, topicSlug }}
+                            hash={postId ? forumPostAnchorId(postId) : undefined}
+                            className={rowClass}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              markAndClose()
+                            }}
+                          >
+                            {body}
+                          </Link>
+                        ) : (
+                          <Link
+                            to="/forum"
+                            className={rowClass}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              markAndClose()
+                            }}
+                          >
+                            {body}
+                          </Link>
+                        )}
+                      </li>
                     )
                   }
                   return (
-                    <button
-                      key={n.id}
-                      type="button"
-                      className={rowClass}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        if (!n.readAt) void markRead(n.id)
-                      }}
-                    >
-                      {body}
-                    </button>
+                    <li key={n.id}>
+                      <button
+                        type="button"
+                        className={rowClass}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (!n.readAt) void markRead(n.id)
+                        }}
+                      >
+                        {body}
+                      </button>
+                    </li>
                   )
                 })}
-              </div>
-            </div>
+              </ul>
+            </section>
           )}
 
-          <div className="space-y-1.5">
-            <div className="text-[11px] font-bold tracking-[0.08em] text-ink-muted uppercase">
-              Ephemeral Toasts
-            </div>
-            {toastHistoryList.length === 0 ? (
-              <div className="p-4 text-center text-xs text-ink-muted space-y-1">
-                {dbNotifications.length === 0 && (
-                  <>
-                    <Radio className="w-6 h-6 text-ink-muted/40 mx-auto animate-pulse" />
-                    <div>ALL FREQUENCIES QUIET</div>
-                    <div className="text-[11px] text-ink-muted">
-                      No hails, replies, or friend alerts in the log.
-                    </div>
-                  </>
-                )}
-                {dbNotifications.length > 0 && (
-                  <div className="text-[11px] text-ink-muted">No recent toast alerts.</div>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+          {toastHistoryList.length > 0 && (
+            <section className="space-y-1.5">
+              <h3 className={sectionLabel}>This session</h3>
+              <ul className={`${listFrame} max-h-60 overflow-y-auto`}>
                 {toastHistoryList.map((t) => (
-                  <div
-                    key={t.id}
-                    className="p-2 rounded-card bg-surface-1 border border-line-subtle flex items-start gap-2 text-xs"
-                  >
-                    <div className="w-1.5 h-1.5 rounded-full bg-cyan-glow mt-1.5 shrink-0" />
-                    <div className="min-w-0 flex-1 space-y-0.5">
-                      {t.title && (
-                        <div className="text-[11px] font-bold text-cyan-glow font-grotesk tracking-[0.08em]">
-                          {t.title}
-                        </div>
-                      )}
-                      <div className="text-ink-body text-[11px] leading-tight">
-                        {t.message}
-                      </div>
-                    </div>
-                  </div>
+                  <li key={t.id} className="px-3 py-2.5">
+                    {renderAlertRow(t.id, t.title, t.message, false)}
+                  </li>
                 ))}
-              </div>
-            )}
-          </div>
+              </ul>
+            </section>
+          )}
         </div>
       )}
-
-      {/* Footer Status Controls */}
-      <div className="pt-2 border-t border-line-subtle flex items-center justify-between text-[11px]">
-        <button
-          onClick={toggleReminders}
-          className="flex items-center gap-1 px-2 py-0.5 border border-line hover:border-line-strong bg-surface-1 hover:bg-surface-2 text-cyan-glow transition-colors rounded-control text-[11px] font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-          title="Toggle automated 10-minute prior toast reminders"
-        >
-          {remindersEnabled ? <Bell className="w-2.5 h-2.5 text-cyan-glow" /> : <BellOff className="w-2.5 h-2.5 text-crimson-text" />}
-          <span>{remindersEnabled ? '10M REMINDERS: ON' : 'REMINDERS: OFF'}</span>
-        </button>
-      </div>
     </>
   )
 
   // ══════════════════════════════════════════════════════════════════════════════
-  // HEADER PILL VARIANT (Minimalist, for HUDHeader bar)
+  // HEADER TILE VARIANT (HUDHeader bar and phone top bar)
   // ══════════════════════════════════════════════════════════════════════════════
   if (variant === 'header') {
     return (
       <div className={`relative ${className}`} ref={headerIslandRef}>
-        {/* Dynamic Island style header pill button */}
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation()
             setIsScheduleOpen((prev) => !prev)
           }}
-          className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded-control bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink transition-colors select-none group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-          title="Open Activity Center & Liturgy Schedule"
+          className={`relative flex items-center gap-2 min-h-10 sm:min-h-8 px-2.5 rounded-control border text-xs transition-colors select-none touch-manipulation ${focusRing} ${
+            isScheduleOpen
+              ? 'bg-surface-3 shadow-nav-current border-transparent text-ink'
+              : 'bg-surface-1 border-line hover:bg-surface-2 hover:border-line-strong text-ink'
+          }`}
+          title="Today's tasks and alerts"
           aria-label="Daily alignment tasks schedule"
           aria-expanded={isScheduleOpen}
+          aria-haspopup="dialog"
           aria-busy={!countReady}
         >
-          {/* Alignment status: next liturgy, or complete once 8/8 is sealed */}
-          <span className="text-[11px] text-ink-muted hidden md:inline truncate max-w-[130px] font-sans">
-            {countReady ? (
-              allTasksCompleted ? (
-                <span className="text-emerald-400 font-semibold">COMPLETE</span>
-              ) : (
-                <>
-                  NEXT: <span className="text-ink font-semibold">{nextTask?.title || 'None'}</span>
-                </>
-              )
-            ) : (
-              <span
-                className="inline-block h-2 w-20 rounded-chip bg-ink-muted/30 animate-pulse align-middle"
-                aria-hidden
-              />
-            )}
-          </span>
+          {allTasksCompleted && countReady ? (
+            <Check className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
+          ) : (
+            <ListTodo className={`w-3.5 h-3.5 ${isScheduleOpen ? 'text-cyan-glow' : 'text-ink-muted'}`} aria-hidden="true" />
+          )}
 
-          {/* Liturgy Count Badge */}
-          {renderLiturgyCount(
-            'text-[11px] font-sans font-bold px-1.5 py-0.2 rounded-chip bg-cyan-soft text-cyan-glow border border-line-subtle',
+          {countReady ? (
+            allTasksCompleted ? (
+              <span className="hidden md:inline text-emerald-500 font-bold">All done</span>
+            ) : (
+              <span data-testid="header-next" className="hidden md:inline truncate max-w-[180px] text-ink-muted">
+                Next <span className="text-ink font-bold">{nextTask?.title || 'None'}</span>
+              </span>
+            )
+          ) : (
+            <span className="hidden md:inline-block h-2 w-20 rounded-chip bg-surface-3 animate-pulse" aria-hidden />
+          )}
+
+          {countReady ? (
+            <span className={`font-bold tabular-nums md:pl-2 md:border-l md:border-line-subtle ${allTasksCompleted ? 'text-emerald-500' : 'text-ink'}`}>
+              {liturgyCountText}
+            </span>
+          ) : (
+            <span className="inline-block h-2 w-6 rounded-chip bg-surface-3 animate-pulse" aria-hidden />
           )}
 
           {notificationUnread > 0 && (
-            <span className="text-[11px] font-sans font-bold px-1.5 py-0.2 rounded-chip bg-crimson-soft text-crimson-text border border-crimson-aggro/40 animate-pulse">
+            <span
+              className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-chip bg-crimson-aggro text-abyss text-[11px] font-bold leading-[18px] text-center tabular-nums"
+              aria-label={`${notificationUnread} new alerts`}
+            >
               {notificationUnread}
             </span>
           )}
-
-          {/* Chevron Indicator */}
-          {isScheduleOpen ? (
-            <ChevronUp className="w-3 h-3 text-cyan-glow" />
-          ) : (
-            <ChevronDown className="w-3 h-3 text-ink-muted group-hover:text-cyan-glow" />
-          )}
         </button>
 
-        {/* ═══ DESKTOP FLOATING FLYOUT DROPDOWN (>= 640px) ═══ */}
+        {/* Desktop dropdown (>= 640px) */}
         {isScheduleOpen && !isMobileScreen && (
           <div
             ref={dropdownRef}
-            className="absolute top-full right-0 mt-2 w-80 sm:w-96 rounded-card border border-line bg-surface-1 shadow-menu p-3.5 z-50 font-sans space-y-3 animate-in fade-in slide-in-from-top-2 duration-150"
+            data-testid="alignment-panel"
+            className="absolute top-full right-0 mt-2 w-96 rounded-card border border-line bg-surface-1 shadow-menu p-4 z-50 font-sans space-y-3 animate-in fade-in slide-in-from-top-2 duration-150"
           >
             {renderActivityContent()}
           </div>
         )}
 
-        {/* ═══ MOBILE BOTTOM-ANCHORED MODAL SHEET (< 640px) ═══ */}
+        {/* Phone bottom sheet (< 640px) */}
         {mounted && (
           <HudBottomSheet
             isOpen={isScheduleOpen && isMobileScreen}
             onClose={() => setIsScheduleOpen(false)}
-            title="Activity Center"
+            title="Today's tasks and alerts"
             className="p-4 space-y-3"
           >
-            {renderActivityContent()}
+            <div data-testid="alignment-panel" className="space-y-3">
+              {renderActivityContent()}
+            </div>
           </HudBottomSheet>
         )}
       </div>

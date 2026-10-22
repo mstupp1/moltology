@@ -231,12 +231,12 @@ describe('DailyRoutineWidget Component', () => {
       </ToastProvider>
     )
 
-    expect(screen.queryByText('DAILY ALIGNMENT SCHEDULE')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('alignment-panel')).not.toBeInTheDocument()
 
     fireEvent.click(screen.getByTestId('daily-alignment-card-open'))
 
-    expect(screen.getByText('DAILY ALIGNMENT SCHEDULE')).toBeInTheDocument()
-    expect(screen.getByText('NEXT IMPENDING LITURGY')).toBeInTheDocument()
+    expect(screen.getByTestId('alignment-panel')).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /Tasks/ })).toHaveAttribute('aria-selected', 'true')
   })
 
   it('does not open the liturgies panel when a liturgy row is toggled', () => {
@@ -249,7 +249,7 @@ describe('DailyRoutineWidget Component', () => {
 
     expect(screen.getByText('1/8 done')).toBeInTheDocument()
     expect(listener).not.toHaveBeenCalled()
-    expect(screen.queryByText('DAILY ALIGNMENT SCHEDULE')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('alignment-panel')).not.toBeInTheDocument()
 
     window.removeEventListener(OPEN_ALIGNMENT_PANEL_EVENT, listener)
   })

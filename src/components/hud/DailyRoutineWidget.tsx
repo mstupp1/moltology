@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
-import { Bell, BellOff, Calendar, Check } from 'lucide-react'
-import { DashboardPanel, DASHBOARD_FOCUS } from '@/components/hud/dashboard/DashboardPanel'
+import { Calendar, Check } from 'lucide-react'
+import { AlignmentRemindersSwitch } from '@/components/hud/AlignmentRemindersSwitch'
+import { DashboardPanel } from '@/components/hud/dashboard/DashboardPanel'
 import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { DailyRoutineGhost } from '@/components/hud/HudGhostSkeletons'
@@ -462,40 +463,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
           <div className="lg:col-span-7 min-w-0 space-y-2">
             <div className="flex items-center justify-between gap-2">
               <span className="text-[11px] font-bold tracking-[0.08em] uppercase text-ink-muted">Today’s schedule</span>
-              <button
-                type="button"
-                role="switch"
-                onClick={toggleReminders}
-                aria-checked={remindersEnabled}
-                aria-label="Reminders 10 minutes before each liturgy"
-                title="Reminders 10 minutes before each liturgy"
-                data-testid="alignment-reminders"
-                className={cn(
-                  'inline-flex items-center gap-2 min-h-[44px] -my-2 -mr-1 px-1 rounded-control text-[11px] font-bold text-ink-muted hover:text-ink transition-colors touch-manipulation',
-                  DASHBOARD_FOCUS,
-                )}
-              >
-                {remindersEnabled ? (
-                  <Bell className="w-3.5 h-3.5 text-cyan-glow" aria-hidden="true" />
-                ) : (
-                  <BellOff className="w-3.5 h-3.5" aria-hidden="true" />
-                )}
-                Reminders
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    'relative inline-flex h-4 w-7 rounded-full border transition-colors',
-                    remindersEnabled ? 'bg-cyan-glow/30 border-cyan-glow/60' : 'bg-surface-3 border-line',
-                  )}
-                >
-                  <span
-                    className={cn(
-                      'absolute top-0.5 h-2.5 w-2.5 rounded-full transition-[left,background-color]',
-                      remindersEnabled ? 'left-3.5 bg-cyan-glow' : 'left-0.5 bg-ink-muted',
-                    )}
-                  />
-                </span>
-              </button>
+              <AlignmentRemindersSwitch enabled={remindersEnabled} onToggle={toggleReminders} testId="alignment-reminders" />
             </div>
 
             <ul className="rounded-control border border-line-subtle divide-y divide-line-subtle overflow-hidden">
