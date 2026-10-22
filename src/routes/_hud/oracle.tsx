@@ -14,6 +14,13 @@ import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { parseOracleThreadSearch, validateOracleSearch } from '@/lib/ai/last-oracle-thread'
 
+const STORAGE_KEY_CHATS_COLUMN = 'moltology:oracle_page_chats'
+
+const isDesktopViewport = () =>
+  typeof window !== 'undefined' &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(min-width: 768px)').matches
+
 const LazyAIChatPanel = React.lazy(() =>
   import('@/components/ai/AIChatPanel').then((m) => ({ default: m.AIChatPanel }))
 )
@@ -149,6 +156,7 @@ function OracleRouteComponent() {
   const [localIsLoading, setLocalIsLoading] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false)
+  const [isChatsColumnOpen, setIsChatsColumnOpen] = useState(true)
   const appliedSearchThreadRef = useRef<string | undefined>(undefined)
 
   const threads = oracle ? oracle.threads : localThreads
@@ -254,6 +262,27 @@ function OracleRouteComponent() {
     }
   }, [requestedThreadId, isLoadingThreads, threads])
 
+  // Restore the collapsed chats column after mount so the server render matches.
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(STORAGE_KEY_CHATS_COLUMN) === 'closed') setIsChatsColumnOpen(false)
+    } catch {}
+  }, [])
+
+  // Desktop collapses the chats column in place; phones slide the drawer over.
+  const handleToggleChats = () => {
+    if (!isDesktopViewport()) {
+      setIsMobileDrawerOpen(true)
+      return
+    }
+    setIsChatsColumnOpen((open) => {
+      try {
+        localStorage.setItem(STORAGE_KEY_CHATS_COLUMN, open ? 'closed' : 'open')
+      } catch {}
+      return !open
+    })
+  }
+
   const handleThreadCreated = (newThreadId: string) => {
     setActiveThreadId(newThreadId)
     if (oracle) {
@@ -276,7 +305,10 @@ function OracleRouteComponent() {
       <div className="flex-1 h-full bg-abyss/40 backdrop-blur-md flex overflow-hidden relative">
         
         {/* Desktop Sidebar with Translucent Glass Styling */}
-        <aside className="hidden md:flex w-64 lg:w-72 bg-surface-1/75 backdrop-blur-md border-r border-line-subtle p-3 flex-col shrink-0 overflow-y-auto z-10">
+        <aside
+          data-testid="oracle-chats-column"
+          className={`${isChatsColumnOpen ? 'hidden md:flex' : 'hidden'} w-64 lg:w-72 bg-surface-1/75 backdrop-blur-md border-r border-line-subtle p-3 flex-col shrink-0 overflow-y-auto z-10`}
+        >
           <OracleSidebarContent
             userId={userId}
             isAuthPending={isAuthPending}
@@ -300,7 +332,8 @@ function OracleRouteComponent() {
               threadId={activeThreadId}
               onThreadCreated={handleThreadCreated}
               className="h-full border-none shadow-none bg-transparent"
-              onToggleConversations={() => setIsMobileDrawerOpen(true)}
+              onToggleConversations={handleToggleChats}
+              conversationsOpen={isChatsColumnOpen}
             />
           </React.Suspense>
         </div>

@@ -103,6 +103,36 @@ describe('Oracle Route Component', () => {
     expect(drawer).toHaveClass('-translate-x-full')
   })
 
+  it('collapses and expands the chats column on desktop', async () => {
+    const matchMedia = vi.fn().mockReturnValue({ matches: true })
+    vi.stubGlobal('matchMedia', matchMedia)
+    try {
+      mockUser = { id: 'usr_oracle_initiate', name: 'Lobster initiate' }
+      const Component = (Route as any).component
+      render(<Component />)
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /Toggle Chats/i })).toBeInTheDocument()
+      })
+
+      const column = screen.getByTestId('oracle-chats-column')
+      const drawer = screen.getByRole('dialog', { name: /Chats/i })
+      expect(column).toHaveClass('md:flex')
+
+      fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+      expect(column).not.toHaveClass('md:flex')
+      expect(drawer).toHaveClass('-translate-x-full')
+      expect(localStorage.getItem('moltology:oracle_page_chats')).toBe('closed')
+
+      fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+      expect(column).toHaveClass('md:flex')
+      expect(localStorage.getItem('moltology:oracle_page_chats')).toBe('open')
+    } finally {
+      vi.unstubAllGlobals()
+      localStorage.removeItem('moltology:oracle_page_chats')
+    }
+  })
+
   it('selects thread from mobile drawer and closes drawer', async () => {
     mockUser = { id: 'usr_oracle_initiate', name: 'Lobster initiate' }
     const Component = (Route as any).component

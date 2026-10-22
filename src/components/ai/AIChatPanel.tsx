@@ -57,6 +57,8 @@ export interface AIChatPanelProps {
   className?: string
   showModeControls?: boolean
   onToggleConversations?: () => void
+  /** Whether the host's chats column is showing (desktop fullscreen). */
+  conversationsOpen?: boolean
   placeholder?: string
   /** Close the panel when Escape is pressed inside it (popout). */
   closeOnEscape?: boolean
@@ -91,6 +93,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   className = '',
   showModeControls = true,
   onToggleConversations,
+  conversationsOpen = false,
   closeOnEscape = false,
 }) => {
   const oracle = useSafeOracle()
@@ -705,7 +708,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             <button
               type="button"
               onClick={onToggleConversations}
-              className={`${headerButton} md:hidden`}
+              className={`${headerButton} ${conversationsOpen ? 'md:!text-cyan-glow md:bg-surface-2' : ''}`}
               title="Chats"
               aria-label="Toggle Chats"
             >
