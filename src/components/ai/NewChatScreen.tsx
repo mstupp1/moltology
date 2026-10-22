@@ -57,9 +57,6 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
       <h2 className="font-grotesk text-lg sm:text-xl font-semibold text-ink tracking-tight">
         Ask the Oracle
       </h2>
-      <p className="text-sm text-ink-muted max-w-md">
-        Doctrine, moltmaxxing, or the thing you keep putting off.
-      </p>
     </div>
   )
 
@@ -117,8 +114,8 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
     return (
       <div className={`flex flex-col w-full px-3 pt-3 pb-6 gap-5 font-sans ${className}`}>
         {composer}
-        <div className="flex flex-col gap-2 px-1">
-          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">Try asking</p>
+        <div className="flex flex-col gap-5 px-1">
+          {greeting}
           {suggestions}
         </div>
         {guestBanner}

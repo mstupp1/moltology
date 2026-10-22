@@ -42,4 +42,17 @@ describe('OracleModeMenu', () => {
     fireEvent.click(await screen.findByRole('menuitemradio', { name: 'Floating' }))
     expect(onSelect).not.toHaveBeenCalled()
   })
+
+  it('is a single toggle between floating and fullscreen on phones', () => {
+    const onSelect = vi.fn()
+    const { rerender } = render(<OracleModeMenu mode="popout" onSelect={onSelect} touch />)
+
+    expect(screen.queryByRole('button', { name: /Display mode/i })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Switch to fullscreen' }))
+    expect(onSelect).toHaveBeenLastCalledWith('page')
+
+    rerender(<OracleModeMenu mode="page" onSelect={onSelect} touch />)
+    fireEvent.click(screen.getByRole('button', { name: 'Switch to floating' }))
+    expect(onSelect).toHaveBeenLastCalledWith('popout')
+  })
 })

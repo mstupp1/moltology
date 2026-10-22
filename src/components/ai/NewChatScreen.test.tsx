@@ -51,7 +51,7 @@ describe('NewChatScreen', () => {
     )
     const root = container.firstElementChild as HTMLElement
     expect(root.firstElementChild?.tagName).toBe('TEXTAREA')
-    expect(screen.getByText('Try asking')).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Ask the Oracle' })).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Ask the Oracle' })).toBeInTheDocument()
+    expect(screen.queryByText('Try asking')).not.toBeInTheDocument()
   })
 })
