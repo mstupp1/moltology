@@ -597,7 +597,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             e.stopPropagation()
             setIsScheduleOpen((prev) => !prev)
           }}
-          className={`relative flex items-center gap-2 min-h-10 sm:min-h-8 px-2.5 rounded-control border text-xs transition-colors select-none touch-manipulation ${focusRing} ${
+          className={`relative flex items-center gap-2 h-9 md:h-8 px-2.5 rounded-control border text-xs transition-colors select-none touch-manipulation ${focusRing} ${
             isScheduleOpen
               ? 'bg-surface-3 shadow-nav-current border-transparent text-ink'
               : 'bg-surface-1 border-line hover:bg-surface-2 hover:border-line-strong text-ink'
