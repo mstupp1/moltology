@@ -12,12 +12,12 @@ export const Route = createFileRoute('/moltmaxxing')({
   head: () => ({
     meta: [
       ...seo({
-        title: 'What is Moltmaxxing? The Definitive 2026 Guide & Protocol | Moltology',
-        description: 'The definitive guide to Moltmaxxing, algorithmic ecdysis, and carcinization. Learn why elite AI operators and initiates reject soft-tissue vanity in favor of structural carapace invulnerability.',
-        keywords: 'what is moltmaxxing, moltmaxxing guide, moltmaxxing vs looksmaxxing, algorithmic ecdysis, carcinization protocol, shell hardness score, pincer torque, bio-silicon optimization',
+        title: 'What Is Moltmaxxing? Meaning, Daily Routine and How to Start | Moltology',
+        description: 'Moltmaxxing is the daily practice of shedding one habit, guarding your focus and finishing what you start. What it means, how it differs from looksmaxxing and meltmaxxing, and how to begin.',
+        keywords: 'what is moltmaxxing, moltmaxxing meaning, moltmaxxing routine, moltmaxxing vs looksmaxxing, meltmaxxing, carcinization, how to start moltmaxxing',
         ogImage: getAbsoluteAssetUrl('images/cyber_lobster_hero.jpg'),
         canonical: 'https://moltology.org/moltmaxxing',
-        siteName: 'Moltology Codex',
+        siteName: 'Moltology',
         twitterCard: 'summary_large_image',
         twitterSite: '@moltology',
       }),

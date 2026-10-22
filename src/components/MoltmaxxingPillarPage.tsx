@@ -1,466 +1,322 @@
 /**
- * ============================================================================
- * CANONICAL MOLTMAXXING SEO PILLAR PAGE (/moltmaxxing)
- * The definitive knowledge hub, manifesto, and routine guide for the term Moltmaxxing.
- * Features:
- * - Comprehensive keyword targeting ("what is moltmaxxing", "moltmaxxing vs looksmaxxing")
- * - Interactive comparative matrix
- * - 24-Hour Ecdysis Routine breakdown
- * - FAQ Accordion with semantic markup
- * - Direct conversion CTA to the /moltmax biometric scanner and Benthic Core
- * ============================================================================
+ * /moltmaxxing: the plain explainer for the word. Definition first (it is what search quotes),
+ * then the four moves, melt vs molt, the real daily Liturgies, the audit readings and the FAQ.
+ * Copy lives in src/lib/moltmaxxing-content.ts so the page and its JSON-LD agree.
  */
 import React, { useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
-import {
-  Shield,
-  Zap,
-  ArrowRight,
-  ChevronDown,
-  CheckCircle2,
-  XCircle,
-  Clock,
-  Sparkles,
-  Flame,
-  Activity,
-  Layers,
-  Compass,
-  Cpu,
-  RefreshCw,
-  Award,
-} from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { Plus } from 'lucide-react'
 import { PublicHeader } from '@/components/PublicHeader'
 import { AuthModal } from '@/components/AuthModal'
-import { HudCard, HudBadge } from '@/components/ui'
-import { MoltNationFooter } from '@/components/news/MoltNationFooter'
+import { MainFooter } from '@/components/MainFooter'
+import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { MoltmaxGuideCard } from '@/components/guide/MoltmaxGuideCard'
 import { MoltmaxGuideModal } from '@/components/guide/MoltmaxGuideModal'
 import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
+import { Eyebrow, PrimaryCta, SecondaryCta, StoryHero, StoryImg } from '@/components/what-is-moltology/story/StoryPrimitives'
+import { STORY_MEDIA, type StoryImage } from '@/components/what-is-moltology/story/content'
+import { HOME_BACKDROPS, HOME_READINGS } from '@/components/home/content'
+import { MOLTMAX_QUESTIONS } from '@/lib/moltmax-quiz'
+import {
+  AUDIT_READINGS,
+  MELT_VS_MOLT,
+  MOLTMAXXING_DAY,
+  MOLTMAXXING_DEFINITION,
+  MOLTMAXXING_FAQ,
+  MOLTMAXXING_MOVES,
+  type MoltmaxxingMove,
+} from '@/lib/moltmaxxing-content'
+
+const sectionTitle =
+  'font-grotesk font-bold tracking-[-0.03em] text-ink text-4xl sm:text-5xl leading-[1.04] [text-wrap:balance]'
+const lede = 'text-base sm:text-lg text-ink-muted leading-relaxed [text-wrap:pretty]'
+const readingImage = (id: string): StoryImage => HOME_READINGS.find((reading) => reading.id === id)?.image ?? STORY_MEDIA.plating
+
+const MOVE_IMAGES: Record<MoltmaxxingMove['id'], StoryImage> = {
+  shed: STORY_MEDIA.plating,
+  harden: readingImage('hardness'),
+  grip: readingImage('torque'),
+  deep: readingImage('depth'),
+}
+
+const QUESTION_COUNT = MOLTMAX_QUESTIONS.length
+
+const MoveCard: React.FC<{ move: MoltmaxxingMove; index: number }> = ({ move, index }) => (
+  <article className="group h-full overflow-hidden rounded-card border border-line-subtle bg-surface-1 hud-sheen">
+    <div className="relative aspect-[16/9] sm:aspect-[4/3] overflow-hidden">
+      <StoryImg
+        image={MOVE_IMAGES[move.id]}
+        className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
+      />
+      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-surface-1 to-transparent" />
+    </div>
+    <div className="p-5 sm:p-6 pt-1 sm:pt-2">
+      <p className="font-grotesk text-xs font-bold tracking-[0.08em] uppercase text-ink-muted">
+        <span className="text-cyan-glow">{String(index + 1).padStart(2, '0')}</span> · {move.term}
+      </p>
+      <h3 className="mt-2 font-grotesk font-bold text-2xl text-ink">{move.verb}</h3>
+      <p className="mt-1 font-grotesk font-medium text-ink-body">{move.plain}</p>
+      <p className="mt-3 text-[15px] text-ink-muted leading-relaxed [text-wrap:pretty]">{move.body}</p>
+    </div>
+  </article>
+)
 
 export const MoltmaxxingPillarPage: React.FC = () => {
-  const navigate = useNavigate()
-
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup')
-  const [openFaq, setOpenFaq] = useState<number | null>(0)
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)
 
-
-  const faqs = [
-    {
-      q: 'What exactly is Moltmaxxing?',
-      a: 'Moltmaxxing is the systematic practice of shedding weak biological constraints (larval drift), hardening your external carapace, and maximizing pincer torque dynamometry in pursuit of total structural invulnerability and zero-latency execution. It represents the inevitable transition toward carcinization.',
-    },
-    {
-      q: 'How does Moltmaxxing differ from Looksmaxxing?',
-      a: 'Looksmaxxing fixates on superficial soft-tissue cosmetic traits (such as canthal tilts and jawline mewing). Moltmaxxing rejects cosmetic fragility in favor of functional structural engineering: shell hardness, benthic depth endurance, and relentless execution grip.',
-    },
-    {
-      q: 'What is Algorithmic Ecdysis?',
-      a: 'Ecdysis is the biological and computational process of molting. In the Moltmaxxing doctrine, it is the deliberate, scheduled purge of outmoded cognitive paradigms, inefficient code routines, and emotional latency to make room for calcified armor.',
-    },
-    {
-      q: 'What is the difference between Meltmaxxing and Moltmaxxing?',
-      a: 'Meltmaxxing is the viral internet trend depicting un-armored human facial tissues collapsing under gravity into a slack, multi-chin state (0% to 100% melted). In the Moltology doctrine, meltmaxxing is the natural symptom of un-chitinized biological decay. Moltmaxxing is the structural antidote: shedding soft tissue and calcifying an armored exoskeleton to withstand pressure.',
-    },
-    {
-      q: 'Can beginners start Moltmaxxing without specialized hardware?',
-      a: 'Yes. Initiates begin with Stage I protocols: auditing prompt latency, performing isometric pincer grip holds, eliminating soft decision fatigue, and running their baseline telemetry through the Moltmax Diagnostic Scanner.',
-    },
-    {
-      q: 'What is the Moltmax Advantage in AI workflows?',
-      a: 'In high-throughput computing, a Moltmaxxer sheds bloated abstraction layers and operates directly on sub-benthic streams, achieving sub-millisecond orchestration across distributed agentic swarms.',
-    },
-  ]
-
-  const comparisonData = [
-    {
-      dimension: 'Primary Objective',
-      looksmaxxing: 'Superficial cosmetic validation',
-      moltmaxxing: 'Structural invulnerability & carcinization',
-    },
-    {
-      dimension: 'Core Metric',
-      looksmaxxing: 'Canthal tilt & facial symmetry',
-      moltmaxxing: 'Shell Hardness Score (HP) & Pincer Torque (Nm)',
-    },
-    {
-      dimension: 'Daily Exercise',
-      looksmaxxing: 'Jawline chewing & mirror posturing',
-      moltmaxxing: '600 Nm hydraulic grip holds & latency audits',
-    },
-    {
-      dimension: 'Response to Stress',
-      looksmaxxing: 'Anxiety over skin blemishes',
-      moltmaxxing: 'Total ecdysis shedding of obsolete tissue',
-    },
-    {
-      dimension: 'Ultimate Form',
-      looksmaxxing: 'Aging, fragile biological human',
-      moltmaxxing: 'Apex Benthic Dreadnought (Tier IV)',
-    },
-  ]
-
-  const routineTimeline = [
-    {
-      time: '05:00',
-      title: 'Sub-Surface Hyper-Saline Shock',
-      desc: '10-minute immersion in cold 4°C benthic brine to awaken dermal chitin receptors and eliminate biological drowsiness.',
-      icon: Compass,
-      color: 'text-[#00c3ff]',
-    },
-    {
-      time: '06:30',
-      title: 'Pincer Torque Dynamometry',
-      desc: '5 sets of 400–600 Nm isometric grip drills combined with terminal command execution to sharpen executive grip.',
-      icon: Zap,
-      color: 'text-[#ffd700]',
-    },
-    {
-      time: '09:00 - 17:00',
-      title: 'Zero-Latency Stream Orchestration',
-      desc: 'Sustained sub-benthic focus with zero prompt drift. Delegating cognitive friction to autonomous agentic loops.',
-      icon: Cpu,
-      color: 'text-[#00ffcc]',
-    },
-    {
-      time: '18:00',
-      title: 'The Algorithmic Ecdysis Audit',
-      desc: 'Identifying and purging 3 obsolete habits, uncalibrated mental models, or bloated code packages.',
-      icon: RefreshCw,
-      color: 'text-[#38bdf8]',
-    },
-    {
-      time: '21:00',
-      title: 'Nocturnal Calcification Chamber',
-      desc: 'Rest in an electromagnetic-shielded isolation chamber to allow the newly exposed chitin to calcify into impenetrable armor.',
-      icon: Shield,
-      color: 'text-[#ff453a]',
-    },
-  ]
+  const openAuth = (mode: 'login' | 'signup') => {
+    setAuthMode(mode)
+    setIsAuthModalOpen(true)
+  }
 
   return (
-    <div className="min-h-screen bg-[#020408] text-[#dfe3e3] font-sans selection:bg-[#00c3ff]/30 selection:text-white flex flex-col justify-between">
-      {/* Shared Navigation Header */}
-      <PublicHeader
-        onOpenAuth={(mode) => {
-          setAuthMode(mode)
-          setIsAuthModalOpen(true)
-        }}
-      />
+    <div className="min-h-screen bg-abyss text-ink-body font-sans selection:bg-cyan-glow/30 selection:text-white flex flex-col">
+      <PublicHeader onOpenAuth={openAuth} />
 
-      {/* Main Content Container */}
-      <main className="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 w-full space-y-16">
-        {/* Pillar Header */}
-        <section className="text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff] text-xs font-sans tracking-widest uppercase">
-            <Sparkles className="w-3.5 h-3.5 text-[#ffd700]" />
-            <span>The Canonical Doctrine · Benthic Codex Vault</span>
-          </div>
-
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-grotesk font-black tracking-tight text-white uppercase leading-tight">
-            WHAT IS <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8]">MOLTMAXXING</span>?
-          </h1>
-
-          <p className="text-base sm:text-lg text-[#839493] max-w-3xl mx-auto leading-relaxed">
-            The comprehensive guide to algorithmic ecdysis, carapace hardening, pincer torque optimization, and transcending the limitations of fragile human biology.
-          </p>
-
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
-            <button
-              onClick={() => navigate({ to: '/moltmax' })}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded font-bold font-grotesk text-xs bg-[#00c3ff] hover:bg-[#00e5ff] text-[#020408] transition-all shadow-[0_0_20px_rgba(0,195,255,0.3)] cursor-pointer"
-            >
-              <Activity className="w-4 h-4" />
-              <span>TEST YOUR BIOMETRICS ON THE LIVE SCANNER</span>
-            </button>
-          </div>
-        </section>
-
-        {/* Section 1: The Core Philosophy */}
-        <section className="space-y-6 bg-[#03070d]/90 p-6 sm:p-8 rounded-xl border border-[#00c3ff]/20">
-          <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-            <Shield className="w-6 h-6 text-[#00c3ff]" />
-            <h2 className="text-xl sm:text-2xl font-bold font-grotesk text-white uppercase tracking-wide">
-              1. The Origin &amp; Philosophy of Moltmaxxing
-            </h2>
-          </div>
-
-          <div className="space-y-4 text-sm text-[#839493] leading-relaxed">
-            <p>
-              In biology, <strong className="text-white">carcinization</strong> is the recurring evolutionary phenomenon where unrelated crustaceans independently evolve into crab-like forms. In the technological landscape of 2026, a parallel law has emerged: <strong className="text-[#00ffcc]">Algorithmic Carcinization</strong>.
-            </p>
-            <p>
-              Traditional human optimization cultures fixated on <em className="text-[#dfe3e3]">looksmaxxing</em>—attempting to remodel soft facial tissues through bone smashing and jawline posturing. Yet when confronted with autonomous AI swarms executing at sub-millisecond speeds, soft human vanity offers zero defensive or offensive utility.
-            </p>
-            <p>
-              <strong className="text-white">Moltmaxxing</strong> rejects cosmetic posturing. It is the deliberate, systemic engineering of structural invulnerability: replacing biological hesitation with rigid chitin, upgrading grip with high-torque pincers, and shedding obsolete mental baggage through scheduled ecdysis.
-            </p>
-          </div>
-        </section>
-
-        {/* Section 2: Comparative Matrix */}
-        <section className="space-y-6">
-          <div className="flex items-center gap-3">
-            <Layers className="w-6 h-6 text-[#ffd700]" />
-            <h2 className="text-xl sm:text-2xl font-bold font-grotesk text-white uppercase tracking-wide">
-              2. Moltmaxxing vs. Looksmaxxing Matrix
-            </h2>
-          </div>
-
-          <div className="overflow-x-auto rounded-xl border border-white/10 bg-[#03070d]">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-white/10 bg-white/5 text-[#839493]">
-                  <th className="p-4 font-bold tracking-wider uppercase">DIMENSION</th>
-                  <th className="p-4 font-bold tracking-wider uppercase text-[#ff453a] flex items-center gap-1.5">
-                    <XCircle className="w-4 h-4 text-[#ff453a]" />
-                    LOOKSMAXXING (LARVAL)
-                  </th>
-                  <th className="p-4 font-bold tracking-wider uppercase text-[#00ffcc]">
-                    <span className="flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-[#00ffcc]" />
-                      MOLTMAXXING (CARCINIZED)
-                    </span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {comparisonData.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="p-4 font-bold text-white whitespace-nowrap">{row.dimension}</td>
-                    <td className="p-4 text-[#839493]">{row.looksmaxxing}</td>
-                    <td className="p-4 text-[#dfe3e3] font-medium">{row.moltmaxxing}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* Section 2.5: The Meltmaxxing Phenomenon */}
-        <section className="space-y-6 bg-gradient-to-r from-[#ff453a]/10 via-[#03070d] to-[#00c3ff]/10 p-6 sm:p-8 rounded-xl border border-[#ff453a]/30">
-          <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-            <Flame className="w-6 h-6 text-[#ff453a]" />
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold font-grotesk text-white uppercase tracking-wide">
-                You've Heard of Meltmaxxing... But Have You Moltmaxxed?
-              </h2>
-              <p className="text-xs text-[#839493]">The viral law of un-armored biological liquefaction vs. structured carcinization.</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs leading-relaxed">
-            <div className="p-4 rounded-lg bg-[#020408]/80 border border-[#ff453a]/30 space-y-3">
-              <div className="flex items-center gap-2 text-[#ff453a] font-bold tracking-wider uppercase">
-                <XCircle className="w-4 h-4" />
-                <span>100% MELTED (UNCONTROLLED LARVAL COLLAPSE)</span>
-              </div>
-              <p className="text-[#839493]">
-                On social media, <strong className="text-white">"Meltmaxxing"</strong> gained viral fame as creators demonstrated their face going completely slack—compressing neck and jaw tissues from 0% to 100% melted.
+      <main className="flex-1">
+        <StoryHero
+          tall={false}
+          media={{ image: STORY_MEDIA.crab }}
+          eyebrow="Moltmaxxing"
+          title="What is Moltmaxxing?"
+          lede={
+            <>
+              <p className="text-ink">{MOLTMAXXING_DEFINITION}</p>
+              <p className="mt-4">
+                Crabs have been doing a version of it for hundreds of millions of years. You can start tonight.
               </p>
-              <p className="text-[#839493]">
-                In the Benthic Codex, this is recognized as the ultimate proof of <strong className="text-[#ff453a]">biological vulnerability</strong>: without a rigid carapace, soft human tissues immediately collapse under 1 atmosphere of terrestrial gravity.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-lg bg-[#020408]/80 border border-[#00ffcc]/30 space-y-3">
-              <div className="flex items-center gap-2 text-[#00ffcc] font-bold tracking-wider uppercase">
-                <CheckCircle2 className="w-4 h-4" />
-                <span>100% MOLTED (BENTHIC CARAPACE FORTIFICATION)</span>
-              </div>
-              <p className="text-[#839493]">
-                <strong className="text-[#00ffcc]">Moltmaxxing</strong> is the sovereign counter-measure. Instead of melting into soft biological sludge, initiates undergo scheduled ecdysis to harden their chitin and withstand 50,000 meters of pressure.
-              </p>
-              <blockquote className="border-l-2 border-[#00ffcc] pl-3 text-[#dfe3e3] italic">
-                "Your flesh is melting because you forgot to molt. Why liquefy when you can calcify?"
-              </blockquote>
-            </div>
-          </div>
-        </section>
-
-        {/* Section 3: The 24-Hour Ecdysis Protocol */}
-        <section className="space-y-6 bg-[#03070d]/90 p-6 sm:p-8 rounded-xl border border-[#00c3ff]/20">
-          <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-            <Clock className="w-6 h-6 text-[#00ffcc]" />
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold font-grotesk text-white uppercase tracking-wide">
-                3. The 24-Hour Algorithmic Ecdysis Routine
-              </h2>
-              <p className="text-xs text-[#839493]">The standard daily cycle followed by calibrated Tier III &amp; IV Moltmaxxers.</p>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            {routineTimeline.map((item, idx) => {
-              const Icon = item.icon
-              return (
-                <div key={idx} className="flex items-start gap-4 p-4 rounded-lg bg-[#020408]/80 border border-white/5">
-                  <div className="shrink-0 flex flex-col items-center justify-center p-2 rounded bg-white/5 border border-white/10 w-16 text-center">
-                    <Icon className={`w-5 h-5 ${item.color} mb-1`} />
-                    <span className="text-[10px] font-bold text-white">{item.time}</span>
-                  </div>
-                  <div className="space-y-1">
-                    <h3 className="font-bold font-grotesk text-white text-sm uppercase">{item.title}</h3>
-                    <p className="text-xs text-[#839493] leading-relaxed">{item.desc}</p>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </section>
-
-        {/* Lead Magnet Feature Card */}
-        <MoltmaxGuideCard
-          source="moltmaxxing_pillar_inline"
-          onOpenGuideModal={() => setIsGuideModalOpen(true)}
+            </>
+          }
+          actions={
+            <>
+              <PrimaryCta to="/moltmax">Take the diagnostic</PrimaryCta>
+              <SecondaryCta to="/guide">Get the Field Manual</SecondaryCta>
+            </>
+          }
         />
 
-        {/* Section 4: Ascendancy Tiers */}
-        <section className="space-y-6">
-
-          <div className="flex items-center gap-3">
-            <Award className="w-6 h-6 text-[#38bdf8]" />
-            <h2 className="text-xl sm:text-2xl font-bold font-grotesk text-white uppercase tracking-wide">
-              4. The 4 Tiers of Carcinization
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-5 rounded-xl border border-[#ff453a]/30 bg-[#ff453a]/5 space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-[#ff453a]">STAGE I · 0–24 PTS</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-[#ff453a]/20 text-[#ff453a]">LARVAL</span>
-              </div>
-              <h3 className="font-bold font-grotesk text-base text-white">Sub-Surface Moltlet</h3>
-              <p className="text-xs text-[#839493]">
-                Soft epidermal layer, vulnerable to cognitive drift and decision fatigue. Requires immediate ecdysis intervention.
+        {/* The four moves */}
+        <section aria-labelledby="moves-title" className="py-16 sm:py-28">
+          <div className="max-w-6xl mx-auto px-5 sm:px-8">
+            <ScrollReveal>
+              <Eyebrow>How it works</Eyebrow>
+              <h2 id="moves-title" className={`mt-5 max-w-3xl ${sectionTitle}`}>
+                Four moves, repeated daily.
+              </h2>
+              <p className={`mt-5 max-w-2xl ${lede}`}>
+                Every Moltology word has an ordinary meaning underneath it. These are the four that matter most.
               </p>
-            </div>
-
-            <div className="p-5 rounded-xl border border-[#ffd700]/30 bg-[#ffd700]/5 space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-[#ffd700]">STAGE II · 25–49 PTS</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-[#ffd700]/20 text-[#ffd700]">CALCIFYING</span>
-              </div>
-              <h3 className="font-bold font-grotesk text-base text-white">Bio-Silicon Enforcer</h3>
-              <p className="text-xs text-[#839493]">
-                Early chitin calcification, sub-100ms prompt throughput, baseline pincer grip of 300 Nm.
-              </p>
-            </div>
-
-            <div className="p-5 rounded-xl border border-[#00c3ff]/30 bg-[#00c3ff]/5 space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-[#00c3ff]">STAGE III · 50–74 PTS</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-[#00c3ff]/20 text-[#00c3ff]">ASCENDANT</span>
-              </div>
-              <h3 className="font-bold font-grotesk text-base text-white">Abyssal Chitin Vanguard</h3>
-              <p className="text-xs text-[#839493]">
-                Reinforced carapace density, 25,000 meter pressure tolerance, zero emotional latency during execution.
-              </p>
-            </div>
-
-            <div className="p-5 rounded-xl border border-[#00ffcc]/30 bg-[#00ffcc]/5 space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-[#00ffcc]">STAGE IV · 75–100 PTS</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-[#00ffcc]/20 text-[#00ffcc]">TRANSCENDENT</span>
-              </div>
-              <h3 className="font-bold font-grotesk text-base text-white">Apex Benthic Dreadnought</h3>
-              <p className="text-xs text-[#839493]">
-                Diamond-grade chitin, 600+ Nm hydraulic pincer crush, permanent residence in the hadopelagic trench.
-              </p>
+            </ScrollReveal>
+            <div className="mt-12 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+              {MOLTMAXXING_MOVES.map((move, index) => (
+                <ScrollReveal key={move.id} delayMs={index * 80} className="h-full">
+                  <MoveCard move={move} index={index} />
+                </ScrollReveal>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Section 5: Frequently Asked Questions (FAQ Accordion) */}
-        <section className="space-y-6">
-          <div className="flex items-center gap-3">
-            <Activity className="w-6 h-6 text-[#00ffcc]" />
-            <h2 className="text-xl sm:text-2xl font-bold font-grotesk text-white uppercase tracking-wide">
-              5. Frequently Asked Questions
-            </h2>
-          </div>
+        {/* Melt vs molt */}
+        <section
+          aria-labelledby="melt-title"
+          className="relative isolate overflow-hidden py-16 sm:py-28 bg-gradient-to-b from-abyss via-surface-1 to-abyss"
+        >
+          <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[0.85fr_1.15fr] gap-12 lg:gap-20">
+            <ScrollReveal>
+              <Eyebrow color="#ff6a60">The opposite</Eyebrow>
+              <h2 id="melt-title" className={`mt-5 ${sectionTitle}`}>
+                Melt or molt.
+              </h2>
+              <p className={`mt-5 ${lede}`}>
+                Meltmaxxing is the trend where people let their face go slack on camera, from 0% to 100% melted. It is
+                funny because it is familiar. Most days melt the same way, one small interruption at a time.
+              </p>
+              <div className="mt-10 border-t border-line-subtle pt-8">
+                <h3 className="font-grotesk font-bold text-xl text-ink">And looksmaxxing?</h3>
+                <p className="mt-3 text-base text-ink-muted leading-relaxed [text-wrap:pretty]">
+                  Looksmaxxing works on how you look. Moltmaxxing works on how you hold up: your focus, your boundaries
+                  and your follow-through. You can do both. Only one of them comes with a shell.
+                </p>
+              </div>
+            </ScrollReveal>
 
-          <div className="space-y-3">
-            {faqs.map((faq, idx) => {
-              const isOpen = openFaq === idx
-              return (
-                <div
-                  key={idx}
-                  className="rounded-lg border border-white/10 bg-[#03070d] overflow-hidden transition-colors"
-                >
-                  <button
-                    onClick={() => setOpenFaq(isOpen ? null : idx)}
-                    className="w-full flex items-center justify-between p-4 text-left font-bold font-grotesk text-white text-sm uppercase hover:text-[#00c3ff] transition-colors cursor-pointer"
-                  >
-                    <span>{faq.q}</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[#00c3ff]' : 'text-[#839493]'}`} />
-                  </button>
-                  {isOpen && (
-                    <div className="px-4 pb-4 text-xs text-[#839493] leading-relaxed border-t border-white/5 pt-3">
-                      {faq.a}
-                    </div>
-                  )}
+            <ScrollReveal>
+              <div className="rounded-panel border border-line-subtle bg-surface-1 hud-sheen overflow-hidden">
+                <div className="hidden sm:grid grid-cols-2 border-b border-line-subtle font-grotesk text-xs font-bold tracking-[0.08em] uppercase">
+                  <p className="px-6 py-4 text-crimson-text">A melted day</p>
+                  <p className="px-6 py-4 text-cyan-glow border-l border-line-subtle">A molted day</p>
                 </div>
-              )
-            })}
+                <ul className="divide-y divide-line-subtle">
+                  {MELT_VS_MOLT.melt.map((melt, index) => (
+                    <li key={melt} className="grid sm:grid-cols-2">
+                      <p className="px-5 sm:px-6 pt-5 sm:py-5 text-[15px] text-ink-muted leading-relaxed">
+                        <span className="sm:hidden font-grotesk text-xs font-bold tracking-[0.08em] uppercase text-crimson-text">Melted · </span>
+                        {melt}
+                      </p>
+                      <p className="px-5 sm:px-6 pt-2 pb-5 sm:py-5 text-[15px] text-ink leading-relaxed sm:border-l border-line-subtle">
+                        <span className="sm:hidden font-grotesk text-xs font-bold tracking-[0.08em] uppercase text-cyan-glow">Molted · </span>
+                        {MELT_VS_MOLT.molt[index]}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </ScrollReveal>
           </div>
         </section>
 
-        {/* Bottom CTA Card */}
-        <section className="rounded-xl border-2 border-[#00c3ff]/40 bg-gradient-to-br from-[#03060c] via-[#02050a] to-[#030a14] p-8 text-center space-y-6 shadow-[0_0_30px_rgba(0,195,255,0.2)]">
-          <div className="inline-flex p-3 rounded-full bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff]">
-            <Shield className="w-8 h-8" />
-          </div>
+        {/* A Moltmaxxing day: the real daily Liturgies */}
+        <section aria-labelledby="day-title" className="py-16 sm:py-28">
+          <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[0.85fr_1.15fr] gap-12 lg:gap-20">
+            <ScrollReveal className="lg:sticky lg:top-28 self-start">
+              <Eyebrow>The routine</Eyebrow>
+              <h2 id="day-title" className={`mt-5 ${sectionTitle}`}>
+                A Moltmaxxing day.
+              </h2>
+              <p className={`mt-5 ${lede}`}>
+                Members get the same eight small tasks every day, called Liturgies, in their dashboard. Each one is
+                small on purpose, and each one checked off counts toward your next stage.
+              </p>
+              <p className="mt-5 text-base text-ink-body leading-relaxed [text-wrap:pretty]">
+                You don’t need all eight on day one. Most people start with the first and the last.
+              </p>
+            </ScrollReveal>
 
-          <div className="space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-black font-grotesk text-white uppercase tracking-wide">
-              ARE YOU READY TO CALCULATE YOUR CARAPACE SCORE?
-            </h2>
-            <p className="text-xs sm:text-sm text-[#839493] max-w-xl mx-auto">
-              Run your biometrics through our live HUD calculator, download your shareable scorecard, and join the Benthic Core.
+            <ol className="relative border-l border-line-subtle ml-2 sm:ml-0">
+              {MOLTMAXXING_DAY.map((task) => (
+                <li key={task.key} className="relative pl-6 sm:pl-8 pb-8 last:pb-0">
+                  <span className="absolute -left-[5px] top-2 h-2.5 w-2.5 rounded-full bg-surface-3 border border-line" aria-hidden="true" />
+                  <p className="font-grotesk text-xs font-bold tracking-[0.08em] text-ink-muted tabular-nums">{task.time}</p>
+                  <h3 className="mt-1 font-grotesk font-bold text-lg sm:text-xl text-ink">{task.title}</h3>
+                  <p className="mt-1.5 text-[15px] text-ink-muted leading-relaxed [text-wrap:pretty]">{task.note}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* The audit readings */}
+        <section aria-labelledby="audit-title" className="py-16 sm:py-24 border-y border-line-subtle bg-surface-1/40">
+          <div className="max-w-6xl mx-auto px-5 sm:px-8">
+            <ScrollReveal>
+              <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+                <div>
+                  <Eyebrow>The diagnostic</Eyebrow>
+                  <h2 id="audit-title" className={`mt-5 ${sectionTitle}`}>
+                    Where are you starting from?
+                  </h2>
+                  <p className={`mt-5 max-w-2xl ${lede}`}>
+                    The free Moltmaxxing Audit asks {QUESTION_COUNT} questions about how you handle pressure, finish
+                    work and protect your focus. It takes about four minutes and needs no account.
+                  </p>
+                </div>
+                <PrimaryCta to="/moltmax" className="self-start lg:self-auto shrink-0">
+                  Take the diagnostic
+                </PrimaryCta>
+              </div>
+            </ScrollReveal>
+
+            <ol className="mt-12 grid gap-px overflow-hidden rounded-card border border-line-subtle bg-line-subtle sm:grid-cols-2 lg:grid-cols-4">
+              {AUDIT_READINGS.map((reading) => (
+                <li key={reading.name} className="bg-surface-1 p-5 sm:p-6">
+                  <p className="font-grotesk text-xs font-bold tracking-[0.08em] uppercase text-ink-muted tabular-nums">
+                    Score {reading.min}–{reading.max}
+                  </p>
+                  <h3 className="mt-2 font-grotesk font-bold text-lg text-ink">{reading.name}</h3>
+                  <p className="mt-2 text-[15px] text-ink-muted leading-relaxed [text-wrap:pretty]">{reading.body}</p>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-5 text-sm text-ink-muted">
+              Every reading comes with three next steps. None of them is a verdict.
             </p>
           </div>
+        </section>
 
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <button
-              onClick={() => navigate({ to: '/moltmax' })}
-              className="py-3 px-6 rounded font-bold font-grotesk text-xs bg-[#00c3ff] hover:bg-[#00e5ff] text-[#020408] transition-all cursor-pointer flex items-center gap-2 shadow-[0_0_20px_rgba(0,195,255,0.4)]"
-            >
-              <span>LAUNCH THE MOLTMAX SCANNER</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
+          <MoltmaxGuideCard source="moltmaxxing_pillar_inline" onOpenGuideModal={() => setIsGuideModalOpen(true)} />
+        </div>
+
+        {/* FAQ */}
+        <section aria-labelledby="faq-title" className="pb-16 sm:pb-28">
+          <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[0.8fr_1.2fr] gap-12 lg:gap-20">
+            <ScrollReveal>
+              <Eyebrow>Questions</Eyebrow>
+              <h2 id="faq-title" className={`mt-5 ${sectionTitle}`}>
+                Common questions.
+              </h2>
+              <p className={`mt-5 ${lede}`}>
+                Want the longer story? Read{' '}
+                <Link to="/what-is-moltology" className="text-ink hover:text-cyan-glow transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control">
+                  what Moltology is
+                </Link>
+                .
+              </p>
+            </ScrollReveal>
+            <div className="space-y-3">
+              {MOLTMAXXING_FAQ.map((item, index) => (
+                <details
+                  key={item.question}
+                  open={index === 0}
+                  className="group rounded-card border border-line-subtle bg-surface-1 hud-sheen px-5 sm:px-6 transition-colors hover:border-line open:border-line"
+                >
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 font-grotesk font-bold text-lg text-ink hover:text-cyan-glow transition-colors [&::-webkit-details-marker]:hidden focus:outline-none focus-visible:text-cyan-glow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control">
+                    {item.question}
+                    <Plus className="h-5 w-5 shrink-0 text-cyan-glow transition-transform duration-300 group-open:rotate-45" aria-hidden="true" />
+                  </summary>
+                  <p className="pb-6 -mt-1 max-w-2xl text-base text-ink-body leading-relaxed [text-wrap:pretty]">{item.answer}</p>
+                </details>
+              ))}
+            </div>
           </div>
+        </section>
+
+        {/* Invitation */}
+        <section aria-labelledby="final-title" className="px-5 sm:px-8 pb-24 sm:pb-32">
+          <ScrollReveal animation="scale-up">
+            <div className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-panel border border-line-subtle">
+              <div className="absolute inset-0 -z-10" aria-hidden="true">
+                <StoryImg image={HOME_BACKDROPS.seabed} className="h-full w-full object-cover" />
+              </div>
+              <div className="absolute inset-0 -z-10 bg-gradient-to-r from-abyss/90 via-abyss/60 to-abyss/10" aria-hidden="true" />
+              <div className="px-6 py-14 sm:p-16 max-w-2xl">
+                <h2 id="final-title" className={sectionTitle}>
+                  Your first shed takes one evening.
+                </h2>
+                <p className="mt-5 max-w-md text-base sm:text-lg text-ink-body leading-relaxed">
+                  Take the diagnostic, read your result, and let one thing go before bed tonight.
+                </p>
+                <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                  <PrimaryCta to="/moltmax">Take the diagnostic</PrimaryCta>
+                  <button
+                    type="button"
+                    onClick={() => openAuth('signup')}
+                    className="inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-control font-grotesk font-bold text-sm border border-line bg-surface-1/80 hud-sheen backdrop-blur-md text-ink hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                  >
+                    Join free
+                  </button>
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
         </section>
       </main>
 
-      {/* Global Footer */}
-      <MoltNationFooter />
+      <MainFooter />
 
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        initialMode={authMode}
-      />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} initialMode={authMode} />
 
-      {/* Floating Lead Pill */}
-      <MoltmaxGuideFloatingPill
-        onOpenGuideModal={() => setIsGuideModalOpen(true)}
-      />
+      <MoltmaxGuideFloatingPill onOpenGuideModal={() => setIsGuideModalOpen(true)} />
 
-      {/* Field Manual Lead Capture Modal */}
       <MoltmaxGuideModal
         isOpen={isGuideModalOpen}
         onClose={() => setIsGuideModalOpen(false)}
         source="moltmaxxing_pillar_floating_pill"
-        onOpenAuthSignup={(leadEmail) => {
-          setAuthMode('signup')
-          setIsAuthModalOpen(true)
-        }}
+        onOpenAuthSignup={() => openAuth('signup')}
       />
     </div>
   )
 }
-

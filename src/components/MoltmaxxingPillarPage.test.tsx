@@ -4,6 +4,8 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { MoltmaxxingPillarPage } from './MoltmaxxingPillarPage'
 import { authClient } from '@/lib/auth-client'
 import { ToastProvider } from '@/components/ui/ToastProvider'
+import { CANONICAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
+import { AUDIT_READINGS, MOLTMAXXING_DEFINITION, MOLTMAXXING_FAQ } from '@/lib/moltmaxxing-content'
 
 const mockNavigate = vi.fn()
 
@@ -20,58 +22,57 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
+const renderPage = () =>
+  render(
+    <ToastProvider>
+      <MoltmaxxingPillarPage />
+    </ToastProvider>
+  )
+
 describe('MoltmaxxingPillarPage Component', () => {
   beforeEach(() => {
     mockNavigate.mockClear()
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
   })
 
-  it('renders manifesto headline and core sections', () => {
-    render(
-      <ToastProvider>
-        <MoltmaxxingPillarPage />
-      </ToastProvider>
-    )
+  it('leads with the plain definition and the main sections', () => {
+    renderPage()
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/WHAT IS MOLTMAXXING/i)
-    expect(screen.getByText(/The Origin & Philosophy of Moltmaxxing/i)).toBeInTheDocument()
-    expect(screen.getByText(/Moltmaxxing vs. Looksmaxxing Matrix/i)).toBeInTheDocument()
-    expect(screen.getByText(/You've Heard of Meltmaxxing/i)).toBeInTheDocument()
-    expect(screen.getByText(/The 24-Hour Algorithmic Ecdysis Routine/i)).toBeInTheDocument()
-    expect(screen.getByText(/The 4 Tiers of Carcinization/i)).toBeInTheDocument()
-    expect(screen.getByText(/Frequently Asked Questions/i)).toBeInTheDocument()
-    expect(screen.getByText(/25,000 meter pressure tolerance/i)).toBeInTheDocument()
-    expect(screen.getByText(/50,000 meters of pressure/i)).toBeInTheDocument()
-    expect(screen.queryByText(/fathom/i)).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('What is Moltmaxxing?')
+    expect(screen.getAllByText(MOLTMAXXING_DEFINITION).length).toBeGreaterThan(0)
+    for (const title of ['Four moves, repeated daily.', 'Melt or molt.', 'A Moltmaxxing day.', 'Where are you starting from?', 'Common questions.']) {
+      expect(screen.getByRole('heading', { level: 2, name: title })).toBeInTheDocument()
+    }
   })
 
-  it('toggles FAQ accordion answers', () => {
-    render(
-      <ToastProvider>
-        <MoltmaxxingPillarPage />
-      </ToastProvider>
-    )
+  it('shows the real daily Liturgies and audit readings', () => {
+    renderPage()
 
-    // First FAQ is open by default
-    expect(screen.getByText(/Moltmaxxing is the systematic practice/i)).toBeInTheDocument()
-
-    // Click second FAQ
-    const secondFaqQuestion = screen.getByText(/How does Moltmaxxing differ from Looksmaxxing\?/i)
-    fireEvent.click(secondFaqQuestion)
-
-    expect(screen.getByText(/Looksmaxxing fixates on superficial soft-tissue cosmetic traits/i)).toBeInTheDocument()
+    for (const task of CANONICAL_ALIGNMENT_TASKS) {
+      expect(screen.getByRole('heading', { level: 3, name: task.title })).toBeInTheDocument()
+    }
+    for (const reading of AUDIT_READINGS) {
+      expect(screen.getByRole('heading', { level: 3, name: reading.name })).toBeInTheDocument()
+    }
   })
 
-  it('navigates to /moltmax when clicking CTA button', () => {
-    render(
-      <ToastProvider>
-        <MoltmaxxingPillarPage />
-      </ToastProvider>
-    )
+  it('renders every FAQ with the first one open', () => {
+    const { container } = renderPage()
+    const details = container.querySelectorAll('details')
+    expect(details).toHaveLength(MOLTMAXXING_FAQ.length)
+    expect(details[0]).toHaveAttribute('open')
+    expect(details[1]).not.toHaveAttribute('open')
+  })
 
-    const ctaBtns = screen.getAllByText(/LAUNCH THE MOLTMAX SCANNER|TEST YOUR BIOMETRICS ON THE LIVE SCANNER/i)
-    expect(ctaBtns.length).toBeGreaterThan(0)
-    fireEvent.click(ctaBtns[0])
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/moltmax' })
+  it('links the diagnostic CTAs to /moltmax', () => {
+    renderPage()
+    const ctas = screen.getAllByRole('link', { name: /Take the diagnostic/i })
+    expect(ctas.length).toBeGreaterThan(0)
+    for (const cta of ctas) expect(cta).toHaveAttribute('href', '/moltmax')
+  })
+
+  it('keeps the old invented stats off the page', () => {
+    const { container } = renderPage()
+    expect(container.textContent).not.toMatch(/\bNm\b|50,000|sub-millisecond|brine/i)
   })
 })

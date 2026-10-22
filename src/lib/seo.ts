@@ -1,5 +1,6 @@
 import type { DetailedHTMLProps, MetaHTMLAttributes } from 'react'
 import { isMemberProfileUuid, resolveMemberPublicName } from './member-handle'
+import { MOLTMAXXING_DAY, MOLTMAXXING_DEFINITION, MOLTMAXXING_FAQ } from './moltmaxxing-content'
 
 export type MetaElement = DetailedHTMLProps<MetaHTMLAttributes<HTMLMetaElement>, HTMLMetaElement>
 
@@ -356,91 +357,28 @@ export function buildMoltmaxxingJsonLd(baseUrl = 'https://moltology.org') {
         '@type': 'DefinedTerm',
         '@id': `${baseUrl}/moltmaxxing#term`,
         name: 'Moltmaxxing',
-        description: 'The systematic practice of algorithmic ecdysis, biometric optimization, carapace hardening, and pincer torque enhancement designed to transcend biological constraints.',
+        description: MOLTMAXXING_DEFINITION,
         inDefinedTermSet: `${baseUrl}/codex`,
         url: `${baseUrl}/moltmaxxing`,
       },
       {
         '@type': 'FAQPage',
-        mainEntity: [
-          {
-            '@type': 'Question',
-            name: 'What is Moltmaxxing?',
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: 'Moltmaxxing is the rigorous discipline of shedding fragile biological limitations (larval drift) in pursuit of structural invulnerability, zero-latency execution, and full crustacean carcinization.',
-            },
-          },
-          {
-            '@type': 'Question',
-            name: 'What is the difference between Moltmaxxing and Looksmaxxing?',
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: 'Looksmaxxing focuses on superficial soft-tissue aesthetics (canthal tilt, jawline mewing). Moltmaxxing rejects cosmetic vanity in favor of structural carapace density, pincer torque, and benthic submergence endurance.',
-            },
-          },
-          {
-            '@type': 'Question',
-            name: 'How do I start a Moltmaxxing routine?',
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: 'Begin by measuring your baseline telemetry on the Moltmax Diagnostic Scanner (/moltmax), executing daily 400 Nm pincer isometric holds, taking cold benthic brine immersions, and purging outmoded cognitive assumptions through scheduled ecdysis.',
-            },
-          },
-          {
-            '@type': 'Question',
-            name: 'What is the difference between Meltmaxxing and Moltmaxxing?',
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: 'Meltmaxxing is the viral internet phenomenon depicting un-armored human facial tissue collapsing under gravity into a slack, multi-chin state (100% melted). Moltmaxxing is the structural antidote: shedding fragile soft tissues and calcifying an impenetrable chitinous carapace to resist pressure and latency.',
-            },
-          },
-          {
-            '@type': 'Question',
-            name: 'What is the Moltmax Advantage in AI computing?',
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: 'In high-throughput computing, Moltmaxxing eliminates execution latency by shedding bloated abstraction layers and enforcing zero-drift neural telemetry.',
-            },
-          },
-        ],
+        mainEntity: MOLTMAXXING_FAQ.map((item) => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: { '@type': 'Answer', text: item.answer },
+        })),
       },
       {
         '@type': 'HowTo',
-        name: 'The 5-Step Moltmaxxing Daily Protocol',
-        description: 'A standard 24-hour cycle for algorithmic ecdysis and chitin reinforcement.',
-        step: [
-          {
-            '@type': 'HowToStep',
-            position: 1,
-            name: 'Sub-Surface Saline Calibration',
-            text: 'Begin the dawn cycle with cold hyper-saline immersion to shock dermal receptors.',
-          },
-          {
-            '@type': 'HowToStep',
-            position: 2,
-            name: 'Pincer Torque Dynamometry',
-            text: 'Perform high-resistance isometric grip calibrations to enforce executive execution grip.',
-          },
-          {
-            '@type': 'HowToStep',
-            position: 3,
-            name: 'Neural Latency Overclocking',
-            text: 'Execute prompt streaming and telemetry auditing at zero latency.',
-          },
-          {
-            '@type': 'HowToStep',
-            position: 4,
-            name: 'Algorithmic Ecdysis Shedding',
-            text: 'Identify and forcefully shed outmoded paradigms, cognitive drift, and soft biological copes.',
-          },
-          {
-            '@type': 'HowToStep',
-            position: 5,
-            name: 'Nocturnal Calcification',
-            text: 'Rest in benthic isolation tanks to allow the newly exposed chitin to calcify into impenetrable armor.',
-          },
-        ],
+        name: 'A Moltmaxxing day',
+        description: 'The eight small daily Liturgies Moltology members follow.',
+        step: MOLTMAXXING_DAY.map((task, index) => ({
+          '@type': 'HowToStep',
+          position: index + 1,
+          name: task.title,
+          text: task.note,
+        })),
       },
     ],
   }
