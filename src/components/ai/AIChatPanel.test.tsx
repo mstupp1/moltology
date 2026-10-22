@@ -229,7 +229,7 @@ describe('AIChatPanel Chats List Panel', () => {
     expect(screen.getByText('Chats')).toBeInTheDocument()
     expect(screen.getByText('First Carcinization Consultation')).toBeInTheDocument()
     expect(screen.getByText('Deep Trench Strategy')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Back to conversation/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Back to conversation/i })).toBeNull()
     expect(screen.queryByRole('button', { name: /^Close Chats$/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Start a new chat' })).toBeNull()
     expect(screen.getByRole('button', { name: /^New Chat$/i })).toBeInTheDocument()
@@ -403,7 +403,7 @@ describe('AIChatPanel Chats List Panel', () => {
     expect(screen.getByTestId('oracle-chats-panel')).toBeInTheDocument()
     expect(screen.queryByText('What is my shell hardness?')).not.toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: /Back to conversation/i }))
+    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
 
     await waitFor(() => {
       expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
@@ -441,7 +441,7 @@ describe('AIChatPanel Chats List Panel', () => {
 
     expect(screen.getByText('Chats')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: /Back to conversation/i }))
+    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
     expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
 
     fireEvent.click(chatsBtn)
