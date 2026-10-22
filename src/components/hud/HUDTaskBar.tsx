@@ -107,9 +107,10 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
     return () => clearInterval(timer)
   }, [mounted])
 
-  // Click outside and escape key listener to close dropdown
+  // Click outside and escape key listener to close the desktop dropdown.
+  // The phone sheet is portalled outside these refs and closes from its own backdrop and Escape.
   useEffect(() => {
-    if (!isScheduleOpen) return
+    if (!isScheduleOpen || isMobileScreen) return
 
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node
@@ -132,7 +133,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
       document.removeEventListener('mousedown', handleClickOutside)
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isScheduleOpen])
+  }, [isScheduleOpen, isMobileScreen])
 
   // Dashboard Daily Alignment card (and leftover /alignment hops) open this same panel.
   useEffect(() => {
