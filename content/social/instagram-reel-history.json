@@ -1969,6 +1969,44 @@
       "youtubeContainsSyntheticMedia": true,
       "productionExperiment": "Action-first plus save CTA baseline reset; historical control confounded",
       "verifiedAt": "2026-10-15T13:14:42.965Z"
+    },
+    {
+      "id": "reel-1792674369617",
+      "topic": "The phone beside the unfinished line",
+      "hookHeadline": "Your phone keeps taking the page.",
+      "holidayOrEvent": "Halloween restrained, nine days before: phone shadow as grasping interruption",
+      "relatedBlogSlug": null,
+      "characterArc": "Lobster Engineer: gives a phone interruption a closed drawer",
+      "narrationScript": "Your phone lights up, and your hand leaves the page. You answer one message, then return to the same unfinished line. Even face down, it waits beside your elbow. Below, a lobster gives that interruption a closed drawer. Put the phone out of reach for one task. Let your shell hold the boundary. Try the audit at moltology.org.",
+      "archivePath": "Social Archive/2026/10/reel-b365d437303fcfa296a6a23a",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1792674370772_9cpknicq_01.mp4"
+      ],
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 26.1,
+      "status": "queued",
+      "scheduledFor": "2026-10-22T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6ada0a44f934eaad403fcfcd",
+      "zernioYouTubePostId": "6ada0a44f934eaad403fcfcd",
+      "zernioPostId": "6ada0a44f934eaad403fcfcd",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "firstComment": "Try the audit at moltology.org: https://moltology.org/quiz",
+      "caption": "Your phone keeps taking the page.\n\nGive the interruption a closed drawer. Put the phone out of reach for one task, then return to the line you were writing.\n\nTry the audit at moltology.org: https://moltology.org/quiz",
+      "hashtags": [
+        "#Moltology",
+        "#Focus",
+        "#DeepWork"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-10-22T13:06:14.816Z"
     }
   ]
 }
