@@ -4,7 +4,6 @@ import { render, screen, fireEvent, act } from '@testing-library/react'
 import { HUDTaskBar } from './HUDTaskBar'
 import { CANONICAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
 import { OPEN_ALIGNMENT_PANEL_EVENT } from '@/lib/alignment-panel'
-import { ACTIVITY_INBOX_LABEL } from '@/lib/notifications'
 import type { NotificationView } from '@/lib/notifications'
 
 const markRead = vi.fn()
@@ -70,15 +69,15 @@ describe('HUDTaskBar', () => {
     render(<HUDTaskBar variant="header" />)
     
     expect(screen.queryByText('BENTHIC CHRONOMETER')).not.toBeInTheDocument()
-    expect(screen.getByText(/NEXT:/i)).toBeInTheDocument()
+    expect(screen.getByTestId('header-next')).toHaveTextContent(/^Next /)
   })
 
   it('does not label the header chip NEXT when all eight liturgies are complete', () => {
     render(<HUDTaskBar variant="header" tasks={tasksWithCompletedCount(8)} />)
 
     expect(screen.getByText('8/8')).toBeInTheDocument()
-    expect(screen.getByText('COMPLETE')).toBeInTheDocument()
-    expect(screen.queryByText(/NEXT:/i)).not.toBeInTheDocument()
+    expect(screen.getByText('All done')).toBeInTheDocument()
+    expect(screen.queryByTestId('header-next')).not.toBeInTheDocument()
     expect(screen.queryByText('Alignment Review')).not.toBeInTheDocument()
   })
 
@@ -86,9 +85,9 @@ describe('HUDTaskBar', () => {
     render(<HUDTaskBar variant="header" tasks={tasksWithCompletedCount(3)} />)
 
     expect(screen.getByText('3/8')).toBeInTheDocument()
-    expect(screen.getByText(/NEXT:/i)).toBeInTheDocument()
+    expect(screen.getByTestId('header-next')).toHaveTextContent(/^Next /)
     expect(screen.getByText('Nutritional Efficiency Break')).toBeInTheDocument()
-    expect(screen.queryByText('COMPLETE')).not.toBeInTheDocument()
+    expect(screen.queryByText('All done')).not.toBeInTheDocument()
   })
 
   it('allows switching timezone modes between LOCAL, UTC, BENTHIC, and STARDATE', () => {
@@ -124,39 +123,50 @@ describe('HUDTaskBar', () => {
     expect(onComplete).toHaveBeenCalledWith('silent-synchronization')
   })
 
-  it('toggles the floating schedule dropdown and allows tab switching and spotlight task completion', () => {
+  it('toggles the dropdown, switches tabs and toggles liturgies from the list', () => {
     const onComplete = vi.fn()
     render(<HUDTaskBar variant="header" onCompleteTask={onComplete} />)
-    
-    expect(screen.queryByText('DAILY ALIGNMENT SCHEDULE')).not.toBeInTheDocument()
 
-    const headerClockPill = screen.getByRole('button')
-    fireEvent.click(headerClockPill)
+    expect(screen.queryByTestId('alignment-panel')).not.toBeInTheDocument()
 
-    expect(screen.getByText('DAILY ALIGNMENT SCHEDULE')).toBeInTheDocument()
-    expect(screen.getAllByText('Silent Synchronization').length).toBeGreaterThan(0)
-    expect(screen.getByText('NEXT IMPENDING LITURGY')).toBeInTheDocument()
+    const headerTile = screen.getByRole('button', { name: 'Daily alignment tasks schedule' })
+    fireEvent.click(headerTile)
 
-    // Test Spotlight Complete Button
-    const completeBtns = screen.getAllByRole('button', { name: /COMPLETE/i })
-    fireEvent.click(completeBtns[0])
+    expect(screen.getByTestId('alignment-panel')).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /Tasks/ })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByText('0 of 8 done')).toBeInTheDocument()
+    expect(screen.getByTestId('alignment-panel')).toHaveTextContent('Next')
+
+    fireEvent.click(screen.getByRole('button', { name: /Silent Synchronization/ }))
     expect(onComplete).toHaveBeenCalledWith('silent-synchronization')
 
-    // Test Tab Switching to ALERTS / TRANSMISSIONS
-    const alertsTab = screen.getByText(/ALERTS/i)
-    fireEvent.click(alertsTab)
-    expect(screen.getByText(ACTIVITY_INBOX_LABEL)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('tab', { name: /Alerts/ }))
+    expect(screen.getByText('Nothing new')).toBeInTheDocument()
 
-    // Switch back to LITURGIES
-    const liturgiesTab = screen.getByText(/LITURGIES/i)
-    fireEvent.click(liturgiesTab)
-    expect(screen.getByText('NEXT IMPENDING LITURGY')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('tab', { name: /Tasks/ }))
+    expect(screen.getByText('0 of 8 done')).toBeInTheDocument()
 
-    // Close via close activity center button
-    const closeBtn = screen.getByRole('button', { name: 'Close activity center' })
-    fireEvent.click(closeBtn)
+    fireEvent.click(screen.getByRole('button', { name: 'Close activity center' }))
+    expect(screen.queryByTestId('alignment-panel')).not.toBeInTheDocument()
+  })
 
-    expect(screen.queryByText('DAILY ALIGNMENT SCHEDULE')).not.toBeInTheDocument()
+  it('shows every liturgy without the old spotlight card, chips or bracketed times', () => {
+    render(<HUDTaskBar variant="header" tasks={tasksWithCompletedCount(3)} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
+
+    const panel = screen.getByTestId('alignment-panel')
+    expect(panel.querySelectorAll('li')).toHaveLength(8)
+    expect(screen.queryByText('NEXT IMPENDING LITURGY')).not.toBeInTheDocument()
+    expect(screen.queryByText('PENDING')).not.toBeInTheDocument()
+    expect(panel.textContent).not.toContain('[')
+    expect(screen.getByRole('switch', { name: /Reminders/ })).toBeInTheDocument()
+  })
+
+  it('marks the header tile with the unread count', () => {
+    mockUnreadCount = 2
+    render(<HUDTaskBar variant="header" />)
+
+    expect(screen.getByLabelText('2 new alerts')).toHaveTextContent('2')
   })
 
   it('renders bottom-anchored modal sheet on mobile viewport (< 640px)', () => {
@@ -168,15 +178,14 @@ describe('HUDTaskBar', () => {
 
     render(<HUDTaskBar variant="header" />)
 
-    const headerClockPill = screen.getByRole('button')
-    fireEvent.click(headerClockPill)
+    fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
 
     // Modal dialog rendered with bottom-anchored modal sheet
-    const dialog = screen.getByRole('dialog', { name: 'Activity Center' })
+    const dialog = screen.getByRole('dialog', { name: "Today's tasks and alerts" })
     expect(dialog).toBeInTheDocument()
     expect(dialog.className).toContain('rounded-t-3xl')
     expect(screen.getByLabelText('Drag handle to close')).toBeInTheDocument()
-    expect(screen.getByText('DAILY ALIGNMENT SCHEDULE')).toBeInTheDocument()
+    expect(screen.getByTestId('alignment-panel')).toBeInTheDocument()
 
     // Clean up viewport
     act(() => {
@@ -188,14 +197,14 @@ describe('HUDTaskBar', () => {
   it('opens the liturgies panel when the dashboard alignment card event fires', () => {
     render(<HUDTaskBar variant="header" />)
 
-    expect(screen.queryByText('DAILY ALIGNMENT SCHEDULE')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('alignment-panel')).not.toBeInTheDocument()
 
     act(() => {
       window.dispatchEvent(new CustomEvent(OPEN_ALIGNMENT_PANEL_EVENT))
     })
 
-    expect(screen.getByText('DAILY ALIGNMENT SCHEDULE')).toBeInTheDocument()
-    expect(screen.getByText('NEXT IMPENDING LITURGY')).toBeInTheDocument()
+    expect(screen.getByTestId('alignment-panel')).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /Tasks/ })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByRole('button', { name: 'Daily alignment tasks schedule' })).toHaveAttribute(
       'aria-expanded',
       'true',
@@ -244,9 +253,9 @@ describe('HUDTaskBar', () => {
 
     render(<HUDTaskBar variant="header" />)
     fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
-    fireEvent.click(screen.getByText(/ALERTS/i))
+    fireEvent.click(screen.getByRole('tab', { name: /Alerts/ }))
 
-    expect(screen.getByText(ACTIVITY_INBOX_LABEL)).toBeInTheDocument()
+    expect(screen.getByText('Recent')).toBeInTheDocument()
     expect(screen.getByText('You were hailed')).toBeInTheDocument()
     expect(screen.getByText('A reply reached your thread')).toBeInTheDocument()
 
