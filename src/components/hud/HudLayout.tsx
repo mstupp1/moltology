@@ -11,7 +11,7 @@ import { AlignmentProvider } from '@/hooks/useDailyAlignment'
 import { HudPersistProvider } from '@/hooks/useHudPersist'
 import { NotificationsProvider } from '@/hooks/useNotifications'
 import { HudPersistIndicator } from '@/components/hud/HudPersistIndicator'
-import { WelcomeSplash } from '@/components/hud/WelcomeSplash'
+import { OnboardingFlow } from '@/components/hud/onboarding/OnboardingFlow'
 import { PwaInstallBanner } from '@/components/hud/PwaInstallBanner'
 import { PwaNotificationBridge } from '@/components/hud/PwaNotificationBridge'
 import '@/styles/crt.css'
@@ -102,7 +102,7 @@ function HudContent() {
     return () => window.removeEventListener('toggle-ai-drawer', handleToggle)
   }, [oracle])
 
-  // Replay Initiation Broadcast (lobster click) — relaunch welcome splash
+  // "Replay the welcome tour" in Settings reopens the flow from the start
   useEffect(() => {
     const handleRelaunch = () => setShowWelcome(true)
     window.addEventListener('launch-welcome-splash', handleRelaunch)
@@ -121,9 +121,9 @@ function HudContent() {
     <div
       className="fixed inset-0 w-full h-full text-ink flex flex-col font-sans overflow-hidden bg-abyss overscroll-none select-none"
     >
-      {/* First-time welcome splash */}
+      {/* First-visit onboarding */}
       {showWelcome && (
-        <WelcomeSplash
+        <OnboardingFlow
           userName={user?.name || user?.email || 'Guest'}
           onDismiss={handleDismissWelcome}
         />

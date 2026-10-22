@@ -43,6 +43,7 @@ import {
 } from '@/lib/lobster-avatar'
 import { EYE_COLOR_SWATCH } from '@/lib/avatar/parts'
 import { headShapeOutline } from '@/lib/avatar/races'
+import { HudButton } from '@/components/ui/HudButton'
 
 export interface AvatarCreatorPanelProps {
   value: LobsterAvatarConfig
@@ -62,7 +63,7 @@ type TabId = (typeof TABS)[number]['id']
 function OptionGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <fieldset className="space-y-1.5 min-w-0">
-      <legend className="text-[10px] font-grotesk font-bold tracking-wider uppercase text-[#7ea6a6] mb-1.5">{label}</legend>
+      <legend className="text-[11px] font-sans font-semibold tracking-[0.08em] uppercase text-ink-muted mb-1.5">{label}</legend>
       <div className="flex flex-wrap gap-1.5">{children}</div>
     </fieldset>
   )
@@ -85,10 +86,10 @@ function Chip({
       aria-pressed={selected}
       disabled={disabled}
       onClick={onClick}
-      className={`px-2.5 py-1 rounded-md border text-[11px] font-sans transition-colors disabled:opacity-50 ${
+      className={`min-h-8 px-2.5 rounded-control border text-xs font-sans transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
         selected
-          ? 'border-[#00ffff]/70 bg-[#00ffff]/15 text-[#e6ffff] shadow-[0_0_10px_rgba(0,255,255,0.15)]'
-          : 'border-white/10 bg-[#04111a]/70 text-[#9bbbbb] hover:border-[#00ffff]/40 hover:text-[#dfe3e3]'
+          ? 'border-cyan-glow bg-cyan-soft text-ink'
+          : 'border-line bg-surface-2 text-ink-body hover:border-line-hover hover:text-ink'
       }`}
     >
       {children}
@@ -117,10 +118,8 @@ function Swatch({
       title={label}
       disabled={disabled}
       onClick={onClick}
-      className={`w-8 h-8 rounded-full border-2 transition-transform disabled:opacity-50 ${
-        selected
-          ? 'border-[#00ffff] scale-110 shadow-[0_0_12px_rgba(0,255,255,0.45)]'
-          : 'border-white/15 hover:scale-105 hover:border-white/40'
+      className={`w-8 h-8 rounded-full border-2 transition-transform disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+        selected ? 'border-cyan-glow scale-110' : 'border-line hover:scale-105 hover:border-line-hover'
       }`}
       style={{ background }}
     />
@@ -160,16 +159,16 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({ value, o
               aria-pressed={selected}
               disabled={disabled}
               onClick={() => set('race', race)}
-              className={`flex items-center gap-2 p-1.5 pr-3 rounded-xl border transition-colors disabled:opacity-50 ${
+              className={`flex items-center gap-2 p-1.5 pr-3 rounded-card border transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                 selected
-                  ? 'border-[#00ffff]/70 bg-[#00ffff]/10 shadow-[0_0_14px_rgba(0,255,255,0.18)]'
-                  : 'border-white/10 bg-[#04111a]/70 hover:border-[#00ffff]/40'
+                  ? 'border-cyan-glow bg-cyan-soft'
+                  : 'border-line bg-surface-2 hover:border-line-hover'
               }`}
             >
               {racePreviews[race] ? (
-                <img src={racePreviews[race] ?? undefined} alt="" width={40} height={40} className="w-10 h-10 rounded-full bg-[#020810]" />
+                <img src={racePreviews[race] ?? undefined} alt="" width={40} height={40} className="w-10 h-10 rounded-full bg-abyss" />
               ) : null}
-              <span className={`font-grotesk text-sm font-bold ${selected ? 'text-[#00ffff]' : 'text-[#dfe3e3]'}`}>
+              <span className={`font-sans text-sm font-semibold ${selected ? 'text-cyan-glow' : 'text-ink'}`}>
                 {AVATAR_RACE_LABELS[race]}
               </span>
             </button>
@@ -178,7 +177,7 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({ value, o
       </div>
 
       <div className="flex items-center gap-2">
-        <div role="tablist" aria-label="Customize" className="flex flex-1 rounded-lg border border-white/10 bg-[#020a10]/80 p-0.5">
+        <div role="tablist" aria-label="Customize" className="flex flex-1 gap-0.5 rounded-card border border-line-subtle bg-surface-1 p-0.5">
           {TABS.map((t) => (
             <button
               key={t.id}
@@ -186,26 +185,28 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({ value, o
               role="tab"
               aria-selected={tab === t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 py-1.5 rounded-md text-[11px] font-grotesk font-bold tracking-wider uppercase transition-colors ${
-                tab === t.id ? 'bg-[#00ffff]/15 text-[#00ffff]' : 'text-[#7ea6a6] hover:text-[#dfe3e3]'
+              className={`flex-1 min-h-8 rounded-control text-[11px] font-sans font-semibold tracking-[0.08em] uppercase transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                tab === t.id ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-2'
               }`}
             >
               {t.label}
             </button>
           ))}
         </div>
-        <button
+        <HudButton
           type="button"
+          variant="secondary"
+          size="sm"
+          className="shrink-0"
           disabled={disabled}
           onClick={() => onChange(rerollAvatarConfig(value))}
-          className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#00ffff]/40 bg-[#00ffff]/10 hover:bg-[#00ffff]/20 text-[#00ffff] text-[11px] font-semibold tracking-wider uppercase transition-colors active:scale-95 disabled:opacity-50"
+          icon={<Dices className="w-3.5 h-3.5 text-cyan-glow" />}
         >
-          <Dices className="w-3.5 h-3.5" />
           Surprise me
-        </button>
+        </HudButton>
       </div>
 
-      <div role="tabpanel" className="space-y-3 rounded-xl border border-white/10 bg-[#030d14]/70 p-3">
+      <div role="tabpanel" className="space-y-3 rounded-card border border-line-subtle bg-surface-1 p-3">
         {tab === 'body' && (
           <>
             <OptionGroup label={traits.race === 'crab' ? 'Shell shape' : 'Head shape'}>

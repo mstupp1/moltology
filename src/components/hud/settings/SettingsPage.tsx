@@ -214,9 +214,9 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
             <div className="space-y-3">
               <div className="rounded-card border border-line-subtle bg-abyss/50 p-3 sm:p-4 space-y-3">
                 <div>
-                  <h3 className="text-sm font-grotesk font-bold text-ink">Designation</h3>
+                  <h3 className="text-sm font-grotesk font-bold text-ink">Username</h3>
                   <p className="text-xs text-ink-muted font-sans mt-0.5">
-                    Your public name on the hub and forum. Your larva unit stays on file.
+                    Your public name in the forum and member lists.
                   </p>
                 </div>
                 <DesignationField value={designation} onChange={setDesignation} />
@@ -227,7 +227,7 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
                   onClick={handleSaveDesignation}
                   disabled={!parseMemberHandle(designation).ok || designation === savedDesignation}
                 >
-                  Seal designation
+                  Save username
                 </HudButton>
               </div>
 
@@ -307,7 +307,7 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
                 <Radio className="w-5 h-5 shrink-0 text-cyan-glow group-hover:text-cyan-hover transition-colors" />
                 <div className="min-w-0 flex-1">
                   <span className="text-sm font-grotesk font-bold text-ink block">
-                    Replay Initiation Broadcast
+                    Replay the welcome tour
                   </span>
                   <span className="text-xs text-ink-muted font-sans">
                     Restart the welcome guide from the beginning

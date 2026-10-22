@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Radio } from 'lucide-react'
+import { AtSign } from 'lucide-react'
 import { HudInput } from '@/components/ui'
 import { parseMemberHandle } from '@/lib/member-handle'
 
@@ -30,17 +30,17 @@ export function DesignationField({
     <div className="space-y-1.5">
       <HudInput
         id={id}
-        label="Designation"
+        label="Username"
         type="text"
         autoComplete="username"
         required
         disabled={disabled}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="your_designation"
+        placeholder="your_username"
         aria-invalid={Boolean(value && parsed && !parsed.ok)}
         aria-describedby={`${id}-hint`}
-        startIcon={<Radio className="w-4 h-4 text-cyan-glow" />}
+        startIcon={<AtSign className="w-4 h-4 text-cyan-glow" />}
       />
       <p
         id={`${id}-hint`}
