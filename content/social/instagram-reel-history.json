@@ -2006,7 +2006,17 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-10-22T13:06:14.816Z"
+      "createdAt": "2026-10-22T13:06:14.816Z",
+      "productionCostEstimateUsd": 2.6694,
+      "videoOutputCostUsd": 2.63536,
+      "videoOutputTokens": 150592,
+      "sourceFootageSeconds": 26.109332999999996,
+      "videoModel": "gemini-omni-1.1-flash",
+      "mascot": "lobster_engineer",
+      "youtubeContainsSyntheticMedia": true,
+      "productionExperiment": "Website CTA and subtitle baseline reset; no isolated causal comparison",
+      "verifiedAt": "2026-10-22T13:06:33.080Z",
+      "productionCaveat": "Narration subtitle remains on frame zero; headline is clear. Queued media preserved under no-replacement instruction."
     }
   ]
 }
