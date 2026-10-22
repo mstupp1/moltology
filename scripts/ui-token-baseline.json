@@ -14,11 +14,6 @@
     "tiny-text": 2,
     "off-scale-radius": 10
   },
-  "src/components/MoltmaxxingPillarPage.tsx": {
-    "hex-color": 101,
-    "tiny-text": 5,
-    "off-scale-radius": 13
-  },
   "src/components/PrivacyPolicyPage.tsx": {
     "hex-color": 2,
     "tiny-text": 3
