@@ -92,6 +92,25 @@ describe('HUDErrorBoundary & HUDErrorFallback', () => {
     expect(onResetMock).toHaveBeenCalledTimes(1)
     consoleError.mockRestore()
   })
+
+  it('shows a calm reload note instead of the crash card for a missing deploy chunk', async () => {
+    const reload = vi.fn()
+    const original = window.location
+    Object.defineProperty(window, 'location', { configurable: true, value: { ...original, reload } })
+    window.sessionStorage.clear()
+
+    render(
+      <HUDErrorFallback
+        error={new TypeError('Failed to fetch dynamically imported module: https://moltology.org/assets/index-old.js')}
+      />
+    )
+
+    expect(screen.getByText('Loading the latest version')).toBeInTheDocument()
+    expect(screen.queryByText('Application Error')).not.toBeInTheDocument()
+    await waitFor(() => expect(reload).toHaveBeenCalledTimes(1))
+
+    Object.defineProperty(window, 'location', { configurable: true, value: original })
+  })
 })
 
 
