@@ -792,7 +792,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             isLoadingThreads={isLoadingThreads}
             layout={chatsLayout}
             onSelectThread={handleSelectThread}
-            onClose={() => setIsChatsOpen(false)}
             onPin={pinThread}
             onArchive={archiveThread}
             onRename={renameThread}

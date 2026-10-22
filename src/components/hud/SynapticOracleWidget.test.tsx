@@ -246,7 +246,7 @@ describe('SynapticOracleWidget', () => {
     expect(panel).toHaveAttribute('data-chats-layout', 'takeover')
     expect(screen.getByText('Chats')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: /Back to conversation/i }))
+    fireEvent.click(chatsBtn)
     expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
     expect(screen.queryByText('Chats')).not.toBeInTheDocument()
   })

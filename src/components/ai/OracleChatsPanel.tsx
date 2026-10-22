@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArrowLeft, Lock, UserPlus } from 'lucide-react'
+import { Lock, UserPlus } from 'lucide-react'
 import { ThreadList, ThreadListSkeleton } from './ThreadList'
 import type { ManagedThread } from './useThreadActions'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
@@ -16,7 +16,6 @@ export interface OracleChatsPanelProps {
   isLoadingThreads: boolean
   layout: OracleChatsLayout
   onSelectThread: (id: string) => void
-  onClose: () => void
   onPin: (threadId: string, pinned: boolean) => void
   onArchive: (threadId: string, archived: boolean) => void
   onRename: (threadId: string, title: string) => void
@@ -32,7 +31,6 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
   isLoadingThreads,
   layout,
   onSelectThread,
-  onClose,
   onPin,
   onArchive,
   onRename,
@@ -51,22 +49,9 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
           : 'flex-1 w-full'
       }`}
     >
-      <div className="flex items-center justify-between gap-2 px-1.5 py-1 border-b border-line-subtle bg-surface-2 shrink-0 select-none">
-        <div className="flex items-center gap-1 min-w-0">
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex items-center justify-center min-w-11 min-h-11 p-2.5 text-ink-muted hover:text-ink hover:bg-surface-3 transition-colors cursor-pointer rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-            title="Back to conversation"
-            aria-label="Back to conversation"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </button>
-          <span className="text-sm font-semibold text-ink">Chats</span>
-        </div>
-      </div>
+      <h2 className="px-4 pt-3 pb-1 text-xs font-medium text-ink-muted shrink-0 select-none">Chats</h2>
 
-      <div className="flex-1 overflow-y-auto px-2 py-2 min-h-0">
+      <div className="flex-1 overflow-y-auto px-2 pb-2 min-h-0">
         {userId && !isAuthPending && !isLoadingThreads && threads.length >= CHAT_LIMIT && (
           <p className="px-2 pb-2 text-[11px] text-ink" data-testid="chat-limit-note">
             Delete a chat to start another.

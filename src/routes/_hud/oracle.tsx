@@ -351,7 +351,7 @@ function OracleRouteComponent() {
 
         {/* Mobile Slide-Over Chats Drawer */}
         <div
-          className={`fixed md:hidden top-0 bottom-0 left-0 w-72 sm:w-80 max-w-[85vw] bg-surface-1/95 backdrop-blur-md border-r border-line shadow-menu z-50 flex flex-col h-full transform transition-transform duration-300 ease-in-out ${
+          className={`fixed md:hidden top-0 bottom-0 left-0 w-72 sm:w-80 max-w-[85vw] bg-surface-1 border-r border-line shadow-menu z-50 flex flex-col h-full transform transition-transform duration-300 ease-in-out ${
             isMobileDrawerOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
           role="dialog"
@@ -359,12 +359,12 @@ function OracleRouteComponent() {
           aria-label="Chats"
         >
           {/* Mobile Drawer Header */}
-          <div className="flex items-center justify-between p-3 border-b border-line-subtle bg-surface-2/90 shrink-0">
-            <span className="text-sm font-semibold text-ink font-sans">Chats</span>
-            <div className="flex items-center gap-2">
+          <div className="h-12 flex items-center justify-between pl-4 pr-1 border-b border-line-subtle shrink-0">
+            <span className="text-sm font-medium text-ink font-sans">Chats</span>
+            <div className="flex items-center">
               <button
                 onClick={() => setIsMobileDrawerOpen(false)}
-                className="p-1 text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                className="inline-flex items-center justify-center min-w-11 min-h-11 text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 aria-label="Close Chats"
               >
                 <X className="w-4 h-4" />
