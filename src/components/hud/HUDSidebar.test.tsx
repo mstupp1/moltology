@@ -26,6 +26,12 @@ vi.mock('../../lib/server/api', () => ({
   getUserProfileFn: (...args: unknown[]) => mockGetUserProfileFn(...args),
 }))
 
+const mockGetPremiumMembershipFn = vi.fn()
+
+vi.mock('@/lib/server/premium-api', () => ({
+  getPremiumMembershipFn: (...args: unknown[]) => mockGetPremiumMembershipFn(...args),
+}))
+
 vi.mock('../../lib/jwt', () => ({
   getAuthJWTToken: vi.fn().mockResolvedValue('test-token'),
 }))
@@ -34,6 +40,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockGetUserProfileFn.mockResolvedValue(null)
+    mockGetPremiumMembershipFn.mockResolvedValue({ hasPurchasedPremium: false, isPremium: false })
     localStorage.clear()
     document.body.style.overflow = ''
   })
@@ -91,7 +98,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     // Press Cmd+B to collapse
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
-    expect(aside).toHaveClass('md:w-[72px]')
+    expect(aside).toHaveClass('md:w-20')
 
     // Press Cmd+B to un-collapse
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
@@ -111,7 +118,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     fireEvent.mouseDown(rail, { button: 0, clientX: 288 })
     fireEvent.mouseUp(window)
 
-    expect(aside).toHaveClass('md:w-[72px]')
+    expect(aside).toHaveClass('md:w-20')
 
     // Click rail again to expand
     fireEvent.mouseDown(rail, { button: 0, clientX: 72 })
@@ -133,7 +140,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     fireEvent.mouseMove(window, { clientX: 100 })
     fireEvent.mouseUp(window)
 
-    expect(aside).toHaveClass('md:w-[72px]')
+    expect(aside).toHaveClass('md:w-20')
 
     // Drag right past threshold
     fireEvent.mouseDown(rail, { button: 0, clientX: 72 })
@@ -149,7 +156,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     // Collapse the sidebar via Cmd+B
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
     const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('md:w-[72px]')
+    expect(aside).toHaveClass('md:w-20')
 
     // Check for short labels
     expect(screen.getAllByText('CODEX').length).toBeGreaterThan(0)
@@ -337,7 +344,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     const { container } = render(<HUDSidebar />)
 
     const aside = container.querySelector('aside')
-    expect(aside?.className).toContain('md:w-[72px]')
+    expect(aside?.className).toContain('md:w-20')
     expect(aside?.className).not.toContain('md:w-72')
   })
 
@@ -361,7 +368,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /User account menu/i }))
     await waitFor(() => {
-      expect(screen.getByText('claw_lord')).toBeInTheDocument()
+      expect(screen.getAllByText('claw_lord').length).toBeGreaterThan(0)
     })
     expect(screen.queryByText(/LARVA UNIT/)).not.toBeInTheDocument()
   })
@@ -438,7 +445,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(await screen.findByRole('button', { name: /Go Premium/i })).toBeInTheDocument()
   })
 
-  it('stacks admin above support and hides Go Premium badge when sidebar is collapsed', async () => {
+  it('stacks admin above support and hides Go Premium when sidebar is collapsed', async () => {
     mockGetUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['premium'] })
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
@@ -454,13 +461,13 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     render(<HUDSidebar />)
 
-    // Initially expanded: badge visible
+    // Initially expanded: Go Premium row visible
     expect(await screen.findByRole('button', { name: /Go Premium/i })).toBeInTheDocument()
 
     // Collapse via Cmd+B
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
 
-    // Badge is hidden when collapsed
+    // Go Premium is hidden when collapsed
     expect(screen.queryByRole('button', { name: /Go Premium/i })).not.toBeInTheDocument()
 
     // Admin button is stacked above support
@@ -469,6 +476,42 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(collapsedAdmin).toBeInTheDocument()
     expect(collapsedSupport).toBeInTheDocument()
     expect(collapsedAdmin.compareDocumentPosition(collapsedSupport)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+  })
+
+  it('shows the account row with the plan and Go Premium below support for free members', async () => {
+    mockGetUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['premium'] })
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'admin-1', name: 'Admin', email: 'ops@example.com', role: 'admin' } } as any,
+      isPending: false,
+    } as any)
+
+    render(<HUDSidebar />)
+
+    const goPremium = await screen.findByRole('button', { name: /Go Premium/i })
+    const supportItem = screen.getByRole('button', { name: /HELP & SUPPORT/i })
+    const accountRow = screen.getByRole('button', { name: /User account menu/i })
+    expect(supportItem.compareDocumentPosition(goPremium)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    expect(goPremium.compareDocumentPosition(accountRow)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    expect(accountRow).toHaveTextContent('Free plan')
+
+    fireEvent.click(goPremium)
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/premium' })
+  })
+
+  it('hides Go Premium and labels the account row for current Premium members', async () => {
+    mockGetUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['premium'] })
+    mockGetPremiumMembershipFn.mockResolvedValue({ hasPurchasedPremium: true, isPremium: true })
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'admin-1', name: 'Admin', email: 'ops@example.com', role: 'admin' } } as any,
+      isPending: false,
+    } as any)
+
+    render(<HUDSidebar />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /User account menu/i })).toHaveTextContent('Premium member')
+    })
+    expect(screen.queryByRole('button', { name: /Go Premium/i })).not.toBeInTheDocument()
   })
 
   it('shows the larva unit in the account menu when no designation is claimed', async () => {
@@ -491,7 +534,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /User account menu/i }))
     await waitFor(() => {
-      expect(screen.getByText('LARVA UNIT #2468')).toBeInTheDocument()
+      expect(screen.getAllByText('LARVA UNIT #2468').length).toBeGreaterThan(0)
     })
     expect(screen.queryByText('claw_lord')).not.toBeInTheDocument()
   })

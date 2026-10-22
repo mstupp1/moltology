@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Sparkles } from 'lucide-react'
-import { useAuthSession } from '@/hooks/useAuthSession'
-import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
-import { getAuthJWTToken } from '@/lib/jwt'
+import { usePremiumMembership } from '@/hooks/usePremiumMembership'
 import { premiumBannerCopy, shouldShowPremiumDashboardBanner } from '@/lib/premium-membership'
-import { getPremiumMembershipFn } from '@/lib/server/premium-api'
 
 export function PremiumBanner({ hasPurchasedPremium }: { hasPurchasedPremium: boolean }) {
   const copy = premiumBannerCopy(hasPurchasedPremium)
@@ -35,34 +32,9 @@ export function PremiumBanner({ hasPurchasedPremium }: { hasPurchasedPremium: bo
  * and hidden from members who cannot open the soft-launch page.
  */
 export function PremiumDashboardBanner() {
-  const access = useHiddenPageAccess('premium')
-  const session = useAuthSession()
-  const [membership, setMembership] = useState<{ hasPurchasedPremium: boolean; isPremium: boolean } | null>(null)
+  const { membership, canViewPremium } = usePremiumMembership()
 
-  useEffect(() => {
-    if (access.pending || !access.canView || !session.userId) {
-      setMembership(null)
-      return
-    }
-    let cancelled = false
-    const userId = session.userId
-    void (async () => {
-      try {
-        const token = await getAuthJWTToken().catch(() => null)
-        const result = await getPremiumMembershipFn({
-          data: { token: token ?? undefined, userId },
-        })
-        if (!cancelled) setMembership(result)
-      } catch {
-        if (!cancelled) setMembership(null)
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [access.pending, access.canView, session.userId])
-
-  if (!membership || !shouldShowPremiumDashboardBanner({ ...membership, canViewHiddenPages: access.canView })) {
+  if (!membership || !shouldShowPremiumDashboardBanner({ ...membership, canViewHiddenPages: canViewPremium })) {
     return null
   }
   return <PremiumBanner hasPurchasedPremium={membership.hasPurchasedPremium} />
