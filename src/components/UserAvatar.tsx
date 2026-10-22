@@ -14,7 +14,7 @@ export interface UserAvatarProps {
   email?: string | null
   fallbackSrc?: string | null
   fallbackLetter?: string
-  size?: 'xxs' | 'xs' | 'sm' | 'nav' | 'md' | 'lg' | 'xl'
+  size?: 'xxs' | 'xs' | 'sm' | 'row' | 'nav' | 'md' | 'lg' | 'xl'
   className?: string
   /** Drop the letter fallback's own border when the parent draws the edge. */
   borderless?: boolean
@@ -53,6 +53,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(({
     xxs: 'w-4 h-4 text-[8px]',
     xs: 'w-5 h-5 text-[10px]',
     sm: 'w-6 h-6 text-xs',
+    row: 'w-8 h-8 text-xs',
     nav: 'w-9 h-9 text-sm',
     md: 'w-8 h-8 sm:w-10 sm:h-10 text-xs sm:text-sm',
     lg: 'w-12 h-12 text-base',

@@ -34,7 +34,7 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
 import { ChromaElement, HeaderBrand, AnimatedHamburger } from '../ui'
-import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
+import { usePremiumMembership } from '@/hooks/usePremiumMembership'
 import { getEffectiveRole, isAdmin } from '../../lib/permissions'
 import { isHiddenPagePath } from '../../lib/hidden-pages'
 import {
@@ -430,8 +430,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   const canViewHiddenPages = isAdmin(user, userRole)
   const canViewAdmin = canViewHiddenPages
-  const premiumAccess = useHiddenPageAccess('premium')
-  const showPremiumBadge = !premiumAccess.pending && premiumAccess.canView
+  const { membership: premiumMembership, canViewPremium } = usePremiumMembership()
+  const showGoPremium = canViewPremium && premiumMembership !== null && !premiumMembership.isPremium
+  const accountSubtitle = premiumMembership
+    ? premiumMembership.isPremium
+      ? 'Premium member'
+      : 'Free plan'
+    : 'Account and settings'
   const isAdminActive =
     effectiveRoute === '/admin' ||
     (effectiveRoute !== '/' && effectiveRoute.startsWith('/admin'))
@@ -544,7 +549,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   />
 
                   <span
-                    className={`inline-flex items-center justify-center gap-0.5 text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center max-w-[64px] transition-colors duration-150 ${
+                    className={`inline-flex items-center justify-center gap-0.5 text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center max-w-full transition-colors duration-150 ${
                       isActive
                         ? 'text-ink'
                         : 'text-ink-muted group-hover/navitem:text-ink'
@@ -707,7 +712,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       <aside
         suppressHydrationWarning
         className={`w-full ${
-          isCollapsed ? 'md:w-[72px]' : 'md:w-72'
+          isCollapsed ? 'md:w-20' : 'md:w-72'
         } h-auto md:h-full md:min-h-0 md:max-h-full bg-surface-1 border-b md:border-b-0 md:border-r border-line-subtle flex flex-col select-none relative z-40 md:z-50 shrink-0 shadow-2xl ${
           isMounted ? 'transition-all duration-300 ease-in-out' : ''
         } group/sidebar overflow-visible`}
@@ -786,28 +791,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           <HeaderBrand
             isCollapsed={isCollapsed}
             onClick={() => handleNavClick('/dashboard')}
-            badge={
-              !isCollapsed && showPremiumBadge ? (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleNavClick('/premium')
-                  }}
-                  onMouseEnter={() => handlePrefetch('/premium')}
-                  onFocus={() => handlePrefetch('/premium')}
-                  className={`inline-flex items-center gap-1 font-sans text-[11px] font-bold tracking-[0.06em] uppercase px-1.5 py-0.5 rounded-chip border transition-all cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow shrink-0 ${
-                    effectiveRoute === '/premium'
-                      ? 'border-cyan-glow bg-cyan-soft text-cyan-glow shadow-[0_0_8px_rgba(0,195,255,0.35)]'
-                      : 'border-cyan-glow/40 hover:border-cyan-glow bg-cyan-soft/50 hover:bg-cyan-soft text-cyan-glow'
-                  }`}
-                  title="Go Premium"
-                >
-                  <Sparkles className="w-3 h-3 shrink-0" />
-                  <span>Go Premium</span>
-                </button>
-              ) : undefined
-            }
           />
 
           {/* Brand Tooltip when collapsed */}
@@ -908,7 +891,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       />
 
                       <span
-                        className={`text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center truncate max-w-[64px] transition-colors duration-150 ${
+                        className={`text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center truncate max-w-full transition-colors duration-150 ${
                           isAdminActive
                             ? 'text-cyan-glow'
                             : 'text-ink-muted group-hover/admin:text-ink'
@@ -955,7 +938,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     />
 
                     <span
-                      className={`text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center truncate max-w-[64px] transition-colors duration-150 ${
+                      className={`text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center truncate max-w-full transition-colors duration-150 ${
                         currentRoute === '/support'
                           ? 'text-cyan-glow'
                           : 'text-ink-muted group-hover/help:text-ink'
@@ -1061,20 +1044,19 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   </div>
                 )}
 
-                {/* Combined Row: Help & Support + User Avatar / Auth (Expanded) */}
+                {/* Help & Support Nav Item (Expanded) */}
                 <div
-                  className={`flex items-center justify-between relative transition-colors duration-150 overflow-visible min-h-[44px] ${
+                  className={`relative transition-colors duration-150 overflow-visible min-h-[44px] ${
                     currentRoute === '/support'
                       ? 'bg-surface-2'
                       : 'bg-surface-1 hover:bg-surface-2'
                   }`}
                 >
-                  {/* Help & Support Nav Item */}
                   <button
                     onClick={() => handleNavClick('/support')}
                     onMouseEnter={() => handlePrefetch('/support')}
                     onFocus={() => handlePrefetch('/support')}
-                    className="flex-1 text-left relative flex items-center min-h-[44px] px-4 py-2.5 pl-5 gap-3 transition-colors duration-150 group/help cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
+                    className="w-full text-left relative flex items-center min-h-[44px] px-4 py-2.5 pl-5 gap-3 transition-colors duration-150 group/help cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
                     title={SUPPORT_PAGE_COPY.pageTitle}
                   >
                     {currentRoute === '/support' && (
@@ -1101,38 +1083,68 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       </span>
                     </div>
                   </button>
+                </div>
 
-                  {/* User Avatar Menu / Auth Button */}
-                  <div className="shrink-0 flex items-center pr-3">
-                    {isSessionPending ? (
-                      <div className="flex items-center justify-center p-1" data-testid="sidebar-auth-skeleton">
-                        <HudGhostSkeleton variant="neutral" preset="avatar" width={28} height={28} />
-                      </div>
-                    ) : !user ? (
+                {/* Go Premium (free members only, Expanded) */}
+                {showGoPremium && (
+                  <div
+                    className={`relative transition-colors duration-150 min-h-[44px] ${
+                      effectiveRoute === '/premium'
+                        ? 'bg-surface-2'
+                        : 'bg-surface-1 hover:bg-surface-2'
+                    }`}
+                  >
+                    <button
+                      onClick={() => handleNavClick('/premium')}
+                      onMouseEnter={() => handlePrefetch('/premium')}
+                      onFocus={() => handlePrefetch('/premium')}
+                      className="w-full text-left relative flex items-center min-h-[44px] px-4 py-2.5 pl-5 gap-3 transition-colors duration-150 group/premium cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
+                    >
+                      {effectiveRoute === '/premium' && (
+                        <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-glow" />
+                      )}
+                      <Sparkles className="w-4 h-4 shrink-0 text-cyan-glow" />
+                      <span className="flex-1 min-w-0 truncate text-xs md:text-[12.5px] font-sans font-semibold tracking-wide uppercase leading-tight text-cyan-glow">
+                        Go Premium
+                      </span>
+                    </button>
+                  </div>
+                )}
+
+                {/* Account Row: avatar, name and plan / Auth (Expanded) */}
+                <div className="relative bg-surface-1 overflow-visible">
+                  {isSessionPending ? (
+                    <div className="flex items-center gap-3 min-h-[56px] px-4" data-testid="sidebar-auth-skeleton">
+                      <HudGhostSkeleton variant="neutral" preset="avatar" width={32} height={32} />
+                    </div>
+                  ) : !user ? (
+                    <div className="p-3">
                       <BenthicCTAButton
                         variant="cyan"
                         size="sm"
+                        fullWidth
                         onClick={() => setIsAuthModalOpen(true)}
-                        className="!px-2.5 !py-1"
                       >
-                        <span className="flex items-center gap-1.5 text-[11px]">
+                        <span className="flex items-center justify-center gap-1.5 text-[11px]">
                           <UserPlus className="w-3.5 h-3.5" />
                           <span>SIGN UP</span>
                         </span>
                       </BenthicCTAButton>
-                    ) : (
-                      <div className="relative z-50 flex items-center overflow-visible">
-                        <UserAvatarMenu
-                          user={user}
-                          userRole={effectiveUserRole}
-                          displayName={displayName}
-                          onNavigate={(path) => navigate({ to: path })}
-                          align="right"
-                          openDirection="up"
-                        />
-                      </div>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className="relative z-50 overflow-visible">
+                      <UserAvatarMenu
+                        user={user}
+                        userRole={effectiveUserRole}
+                        displayName={displayName}
+                        onNavigate={(path) => navigate({ to: path })}
+                        align="left"
+                        openDirection="up"
+                        trigger="row"
+                        subtitle={accountSubtitle}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             )}

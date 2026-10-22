@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { LogOut, ChevronDown, Settings, User, Globe } from 'lucide-react'
+import { LogOut, ChevronDown, ChevronsUpDown, Settings, User, Globe } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { beginSignOut, endSignOut } from '@/lib/auth-session'
 import { UserAvatar } from './UserAvatar'
@@ -21,6 +21,10 @@ export interface UserAvatarMenuProps {
   align?: 'left' | 'right' | 'center'
   openDirection?: 'up' | 'down'
   inline?: boolean
+  /** `row` makes the trigger a full-width account row (desktop sidebar footer). */
+  trigger?: 'avatar' | 'row'
+  /** Second line under the name on a `row` trigger. */
+  subtitle?: string | null
   className?: string
   displayName?: string | null
 }
@@ -38,6 +42,8 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   align = 'right',
   openDirection = 'down',
   inline = false,
+  trigger = 'avatar',
+  subtitle,
   className = '',
   displayName: displayNameProp,
 }) => {
@@ -273,8 +279,43 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
 
   // Floating Popover Layout (Desktop Navigation / HUDSidebar)
   return (
-    <div className={`relative inline-block text-left ${className}`} ref={menuRef}>
-      {/* Avatar button: the photo is the whole control, edged by an inset hairline */}
+    <div
+      className={`relative text-left ${trigger === 'row' ? 'block w-full' : 'inline-block'} ${className}`}
+      ref={menuRef}
+    >
+      {trigger === 'row' ? (
+        /* Account row: photo, name and plan, opening the same menu */
+        <button
+          type="button"
+          onClick={handleToggle}
+          aria-expanded={isOpen}
+          aria-haspopup="true"
+          aria-label="User account menu"
+          className="w-full flex items-center gap-3 min-h-[56px] pl-4 pr-4 py-2.5 text-left transition-colors duration-150 group cursor-pointer hover:bg-surface-2 aria-expanded:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
+        >
+          <span className="relative flex shrink-0 rounded-full">
+            <UserAvatar user={user} name={displayName} size="row" borderless />
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/15 transition-shadow group-hover:ring-white/40 group-aria-expanded:ring-white/40"
+            />
+          </span>
+          <span className="flex flex-col min-w-0 flex-1">
+            <span className="text-[13px] font-sans font-semibold text-ink truncate leading-tight">
+              {displayName}
+            </span>
+            {subtitle && (
+              <span className="text-[11px] font-sans text-ink-muted truncate leading-tight mt-0.5">
+                {subtitle}
+              </span>
+            )}
+          </span>
+          <ChevronsUpDown
+            aria-hidden="true"
+            className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-ink transition-colors duration-150"
+          />
+        </button>
+      ) : (
       <button
         type="button"
         onClick={handleToggle}
@@ -289,6 +330,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/15 transition-shadow group-hover:ring-white/40 group-aria-expanded:ring-white/40"
         />
       </button>
+      )}
 
       {/* Floating Glassmorphic Dropdown Menu with smooth animated open and close */}
       {shouldRender && (
@@ -299,7 +341,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               : align === 'center'
               ? 'left-1/2 -translate-x-1/2'
               : 'left-0'
-          } ${
+          } ${trigger === 'row' ? 'ml-2' : ''} ${
             openDirection === 'up'
               ? 'bottom-full mb-2 origin-bottom'
               : 'top-full mt-2 origin-top'
