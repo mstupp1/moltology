@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Activity, ArrowDown, ArrowRight, BookOpen, CheckCircle2, Clock, ListChecks, Lock, Sparkles, Terminal } from 'lucide-react'
+import { ArrowDown, ArrowRight, BookOpen, CheckCircle2, Clock, ListChecks, Lock, Sparkles, Terminal } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { PublicHeader } from '@/components/PublicHeader'
 import { AuthModal } from '@/components/AuthModal'
@@ -594,41 +594,25 @@ export const MoltMaxPage: React.FC = () => {
         </section>
 
         {/* The five traits */}
-        <section className="relative w-full overflow-hidden border-y border-cyan-900/60 bg-[#030608] py-12 sm:py-16">
-          <div className="pbr-underlay pbr-underlay-carbon opacity-40 pointer-events-none" />
-          <img
-            src={getAssetUrl('/images/benthic_abyss_hero.jpg')}
-            alt=""
-            loading="lazy"
-            className="pointer-events-none absolute inset-0 h-full w-full scale-105 object-cover opacity-25 mix-blend-luminosity blur-[6px]"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#030608] via-[#030608]/75 to-[#030608] pointer-events-none" />
-          <div className="absolute inset-0 bg-sacred-grid opacity-25 pointer-events-none" />
-
-          <div className="relative z-10 mx-auto max-w-3xl px-4 text-center sm:px-8">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-500/40 bg-cyan-950/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-300 sm:text-xs">
-              <Activity className="h-3.5 w-3.5 text-[#00ffcc]" /> What gets measured
+        <section className="relative border-y border-line-subtle bg-abyss py-14 sm:py-20">
+          <div className="mx-auto max-w-[1200px] px-4 sm:px-8 lg:px-12">
+            <div className="max-w-2xl">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-glow sm:text-xs">What gets measured</div>
+              <h2 className="mt-3 font-grotesk text-3xl font-black uppercase tracking-tight text-ink sm:text-4xl lg:text-5xl">
+                The five vectors of carcinization
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-ink-body sm:text-base">
+                Each trait gets three questions. Your results show all five side by side, so you can see where the shell is already hard and where it is still soft.
+              </p>
             </div>
-            <h2 className="font-grotesk text-3xl font-black uppercase tracking-tight text-white sm:text-4xl lg:text-5xl">
-              The five vectors of <span className="bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] bg-clip-text text-transparent">carcinization</span>
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-gray-300 sm:text-base">
-              Each trait gets three questions. Your results show all five side by side, so you can see where the shell is already hard and where it is still soft.
-            </p>
-          </div>
-        </section>
-
-        <section className="relative mx-auto max-w-[1440px] px-4 py-12 sm:px-8 sm:py-16 lg:px-12">
-          <div className="pointer-events-none absolute left-1/3 top-1/3 h-[450px] w-[450px] -translate-y-1/2 rounded-full bg-cyan-500/10 blur-[150px]" />
-          <div className="pointer-events-none absolute bottom-1/3 right-1/4 h-[400px] w-[400px] rounded-full bg-amber-500/10 blur-[140px]" />
-
-          <div className="relative">
-            <VectorCarapaceDiagram />
+            <div className="mt-10 sm:mt-14">
+              <VectorCarapaceDiagram />
+            </div>
           </div>
         </section>
 
         {/* Closing call to action */}
-        <section className="relative mx-auto max-w-[1440px] px-4 pb-16 sm:px-8 lg:px-12">
+        <section className="relative mx-auto max-w-[1440px] px-4 pb-16 pt-14 sm:px-8 sm:pt-20 lg:px-12">
           <div className="relative overflow-hidden rounded-2xl border border-[#00c3ff]/35 bg-gradient-to-br from-[#06131a] via-[#050c10] to-[#04110f] px-6 py-10 text-center shadow-[0_0_60px_rgba(0,195,255,0.12)] sm:px-12 sm:py-14">
             <div className="absolute inset-0 bg-sacred-grid opacity-20 pointer-events-none" />
             <div className="relative z-10">
