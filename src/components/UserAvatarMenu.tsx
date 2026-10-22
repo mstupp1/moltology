@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { LogOut, ChevronDown, ChevronUp, Settings, User, Globe } from 'lucide-react'
+import { LogOut, ChevronDown, ChevronsUpDown, Settings, User, Globe } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { beginSignOut, endSignOut } from '@/lib/auth-session'
 import { UserAvatar } from './UserAvatar'
@@ -310,11 +310,9 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               </span>
             )}
           </span>
-          <ChevronUp
+          <ChevronsUpDown
             aria-hidden="true"
-            className={`w-4 h-4 shrink-0 text-ink-muted group-hover:text-ink transition-transform duration-200 ${
-              isOpen ? 'rotate-180' : ''
-            }`}
+            className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-ink transition-colors duration-150"
           />
         </button>
       ) : (
