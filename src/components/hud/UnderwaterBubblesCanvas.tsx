@@ -37,6 +37,11 @@ export interface UnderwaterBubblesCanvasProps {
    * Disables canvas particle physics & animation frame loop when true.
    */
   disabled?: boolean
+  /**
+   * Holds the last drawn frame and stops the loop while the canvas is hidden
+   * behind an opaque page or a full-screen overlay. Resumes where it left off.
+   */
+  paused?: boolean
 }
 
 /**
@@ -49,6 +54,56 @@ export const BUBBLE_VARIANT_SRCS: string[] = [
   '/images/bubble_variant_2.jpg',
   '/images/bubble_variant_3.jpg',
 ]
+
+// ---------------------------------------------------------------------------
+// BUBBLE BUDGET
+// ---------------------------------------------------------------------------
+// Phones get fewer bubbles than desktop, and low-power or data-saver phones
+// get fewer again at a lower frame rate. Desktop keeps the full scene.
+
+export interface BubbleDeviceHints {
+  viewportWidth: number
+  saveData?: boolean
+  hardwareConcurrency?: number
+  deviceMemory?: number
+}
+
+export interface BubbleBudget {
+  count: number
+  fpsTiers: number[]
+}
+
+const PHONE_MAX_WIDTH = 768
+const PHONE_BUBBLES = 40
+const LOW_POWER_PHONE_BUBBLES = 24
+
+export function isLowPowerDevice(hints: BubbleDeviceHints): boolean {
+  return (
+    hints.saveData === true ||
+    (hints.hardwareConcurrency ?? 8) <= 4 ||
+    (hints.deviceMemory ?? 8) <= 4
+  )
+}
+
+export function pickBubbleBudget(bubbleCount: number, hints: BubbleDeviceHints): BubbleBudget {
+  if (hints.viewportWidth >= PHONE_MAX_WIDTH) {
+    return { count: bubbleCount, fpsTiers: [36, 24, 18] }
+  }
+  if (isLowPowerDevice(hints)) {
+    return { count: Math.min(bubbleCount, LOW_POWER_PHONE_BUBBLES), fpsTiers: [24, 18] }
+  }
+  return { count: Math.min(bubbleCount, PHONE_BUBBLES), fpsTiers: [30, 24, 18] }
+}
+
+function readDeviceHints(): BubbleDeviceHints {
+  const nav = navigator as Navigator & { connection?: { saveData?: boolean }; deviceMemory?: number }
+  return {
+    viewportWidth: window.innerWidth,
+    saveData: nav.connection?.saveData,
+    hardwareConcurrency: nav.hardwareConcurrency,
+    deviceMemory: nav.deviceMemory,
+  }
+}
 
 // ---------------------------------------------------------------------------
 // ADAPTIVE FPS GOVERNOR
@@ -385,8 +440,16 @@ export function UnderwaterBubblesCanvas({
   customBubbleSrcs,
   chromaKeyMode = 'black',
   disabled = false,
+  paused = false,
 }: UnderwaterBubblesCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const pausedRef = useRef(paused)
+  const resumeRef = useRef<(() => void) | null>(null)
+
+  useEffect(() => {
+    pausedRef.current = paused
+    if (!paused) resumeRef.current?.()
+  }, [paused])
 
   useEffect(() => {
     if (disabled) return
@@ -399,6 +462,7 @@ export function UnderwaterBubblesCanvas({
 
     let animationFrameId: number
     let isPaused = false
+    let running = false
 
     const parent = canvas.parentElement
     let width = (canvas.width = parent?.clientWidth || window.innerWidth || 800)
@@ -581,9 +645,8 @@ export function UnderwaterBubblesCanvas({
       }
     }
 
-    // Dynamic particle count scaling for mobile devices
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
-    const activeParticleCount = isMobile ? Math.min(bubbleCount, 40) : bubbleCount
+    const budget = pickBubbleBudget(bubbleCount, readDeviceHints())
+    const activeParticleCount = budget.count
 
     // Reuse persistent global particle positions across page changes & re-renders
     let particles: Particle[]
@@ -627,19 +690,27 @@ export function UnderwaterBubblesCanvas({
       }
     }
 
+    // Restart the loop after a hidden tab or an external pause, without
+    // letting the time gap turn into one big jump.
+    const resume = () => {
+      if (running || isPaused || pausedRef.current || prefersReducedMotion) return
+      const now = performance.now()
+      lastTime = now
+      lastFrameTime = now
+      lastRafTimestamp = now
+      running = true
+      animationFrameId = requestAnimationFrame(render)
+    }
+    resumeRef.current = resume
+
     const handleVisibilityChange = () => {
       if (document.hidden) {
         isPaused = true
+        running = false
         if (animationFrameId) cancelAnimationFrame(animationFrameId)
       } else {
         isPaused = false
-        const now = performance.now()
-        lastTime = now
-        lastFrameTime = now
-        lastRafTimestamp = now
-        if (!prefersReducedMotion) {
-          animationFrameId = requestAnimationFrame(render)
-        }
+        resume()
       }
     }
 
@@ -649,11 +720,16 @@ export function UnderwaterBubblesCanvas({
     let lastTime = startTime
     let lastFrameTime = startTime
     let lastRafTimestamp = startTime
-    const governor = createFpsGovernor(isMobile ? [30, 24, 18] : [36, 24, 18])
+    const governor = createFpsGovernor(budget.fpsTiers)
     let frameInterval = governor.intervalMs
+    // Let the very first callback draw instead of waiting out a frame interval.
+    lastFrameTime = startTime - frameInterval
 
     const render = (now: number = performance.now()) => {
-      if (isPaused) return
+      if (isPaused || pausedRef.current) {
+        running = false
+        return
+      }
 
       const rafDelta = now - lastRafTimestamp
       lastRafTimestamp = now
@@ -736,12 +812,27 @@ export function UnderwaterBubblesCanvas({
 
       if (!prefersReducedMotion && !isPaused) {
         animationFrameId = requestAnimationFrame(render)
+      } else {
+        running = false
       }
     }
 
-    animationFrameId = requestAnimationFrame(render)
+    // Always paint one frame, even when mounting paused or with reduced motion,
+    // so the scene is in place the moment the page underneath is shown.
+    running = true
+    animationFrameId = requestAnimationFrame((now) => {
+      const wasPaused = pausedRef.current
+      pausedRef.current = false
+      render(now)
+      pausedRef.current = wasPaused
+      if (pausedRef.current) {
+        cancelAnimationFrame(animationFrameId)
+        running = false
+      }
+    })
 
     return () => {
+      resumeRef.current = null
       clearTimeout(resizeTimeout)
       cancelAnimationFrame(animationFrameId)
       window.removeEventListener('resize', handleResize)

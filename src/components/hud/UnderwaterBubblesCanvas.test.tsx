@@ -6,6 +6,7 @@ import {
   UnderwaterBubblesCanvas,
   createChromaKeyedSprite,
   createFpsGovernor,
+  pickBubbleBudget,
 } from './UnderwaterBubblesCanvas'
 
 describe('UnderwaterBubblesCanvas Component', () => {
@@ -262,3 +263,118 @@ describe('createFpsGovernor', () => {
   })
 })
 
+
+describe('pickBubbleBudget', () => {
+  it('keeps the full scene on desktop, even on low-power hardware', () => {
+    expect(pickBubbleBudget(90, { viewportWidth: 1440, hardwareConcurrency: 2, saveData: true })).toEqual({
+      count: 90,
+      fpsTiers: [36, 24, 18],
+    })
+  })
+
+  it('caps phones at 40 bubbles and 30fps', () => {
+    expect(pickBubbleBudget(90, { viewportWidth: 390, hardwareConcurrency: 8, deviceMemory: 8 })).toEqual({
+      count: 40,
+      fpsTiers: [30, 24, 18],
+    })
+  })
+
+  it('drops low-power and data-saver phones to 24 bubbles at 24fps', () => {
+    const lowPower = { count: 24, fpsTiers: [24, 18] }
+    expect(pickBubbleBudget(90, { viewportWidth: 390, hardwareConcurrency: 4 })).toEqual(lowPower)
+    expect(pickBubbleBudget(90, { viewportWidth: 390, deviceMemory: 2 })).toEqual(lowPower)
+    expect(pickBubbleBudget(90, { viewportWidth: 390, saveData: true })).toEqual(lowPower)
+  })
+})
+
+describe('UnderwaterBubblesCanvas animation loop', () => {
+  let drawImage: ReturnType<typeof vi.fn>
+  let rafCalls: number
+
+  const stubContext = () => {
+    drawImage = vi.fn()
+    HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue({
+      clearRect: vi.fn(),
+      beginPath: vi.fn(),
+      arc: vi.fn(),
+      fill: vi.fn(),
+      stroke: vi.fn(),
+      drawImage,
+      getImageData: vi.fn().mockReturnValue({ data: new Uint8ClampedArray(4) }),
+      putImageData: vi.fn(),
+      createRadialGradient: vi.fn().mockReturnValue({ addColorStop: vi.fn() }),
+    }) as unknown as typeof HTMLCanvasElement.prototype.getContext
+  }
+
+  const stubReducedMotion = (reduce: boolean) => {
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn().mockImplementation((query: string) => ({
+        matches: reduce && query.includes('prefers-reduced-motion'),
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }))
+    )
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'performance'] })
+    rafCalls = 0
+    vi.stubGlobal(
+      'requestAnimationFrame',
+      vi.fn((cb: FrameRequestCallback) => {
+        rafCalls++
+        return setTimeout(() => cb(performance.now()), 16) as unknown as number
+      })
+    )
+    vi.stubGlobal('cancelAnimationFrame', vi.fn((id) => clearTimeout(id)))
+    stubContext()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
+  })
+
+  it('animates continuously by default', () => {
+    stubReducedMotion(false)
+    render(<UnderwaterBubblesCanvas bubbleCount={10} />)
+    vi.advanceTimersByTime(1000)
+    expect(rafCalls).toBeGreaterThan(30)
+  })
+
+  it('paints one still frame and stops under reduced motion', () => {
+    stubReducedMotion(true)
+    render(<UnderwaterBubblesCanvas bubbleCount={10} />)
+    vi.advanceTimersByTime(1000)
+    expect(rafCalls).toBe(1)
+    expect(drawImage).toHaveBeenCalled()
+  })
+
+  it('paints one frame then holds while paused, and resumes when unpaused', () => {
+    stubReducedMotion(false)
+    const { rerender } = render(<UnderwaterBubblesCanvas bubbleCount={10} paused />)
+    vi.advanceTimersByTime(1000)
+    expect(drawImage).toHaveBeenCalled()
+    const pausedCalls = rafCalls
+    vi.advanceTimersByTime(1000)
+    expect(rafCalls).toBe(pausedCalls)
+
+    rerender(<UnderwaterBubblesCanvas bubbleCount={10} paused={false} />)
+    vi.advanceTimersByTime(1000)
+    expect(rafCalls).toBeGreaterThan(pausedCalls + 30)
+  })
+
+  it('stops when paused mid-animation', () => {
+    stubReducedMotion(false)
+    const { rerender } = render(<UnderwaterBubblesCanvas bubbleCount={10} />)
+    vi.advanceTimersByTime(500)
+    rerender(<UnderwaterBubblesCanvas bubbleCount={10} paused />)
+    vi.advanceTimersByTime(100)
+    const settled = rafCalls
+    vi.advanceTimersByTime(1000)
+    expect(rafCalls).toBe(settled)
+  })
+})
