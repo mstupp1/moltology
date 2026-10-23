@@ -33,7 +33,6 @@ export function DashboardNewsPanel() {
     <DashboardPanel
       icon={<Newspaper />}
       title="MoltNation News"
-      subtitle="Dispatches from the deep."
       action={{ label: 'All news', onClick: () => navigate({ to: '/news' }) }}
       data-testid="dashboard-news"
     >

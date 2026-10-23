@@ -28,7 +28,6 @@ import { relativeTime } from '@/lib/forum-utils'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 
 export const CONNECTIONS_HUB_TITLE = 'CONNECTIONS'
-export const CONNECTIONS_HUB_SUBTITLE = 'Find members and keep your circle close.'
 export const CONNECTIONS_HUB_EMPTY_COPY = {
   title: 'The circle is quiet',
   body: 'Search a designation to send a request.',
@@ -184,7 +183,6 @@ export function ConnectionsHubCard() {
     <DashboardPanel
       icon={<Users />}
       title={CONNECTIONS_HUB_TITLE}
-      subtitle={CONNECTIONS_HUB_SUBTITLE}
       action={{ label: incomingCount > 0 ? 'Open incoming' : 'Open connections', onClick: () => openConnections() }}
       className="h-full"
       data-testid="connections-hub-card"

@@ -438,7 +438,6 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
         id={DAILY_ALIGNMENT_HUB_ID}
         icon={<Calendar />}
         title="Daily alignment"
-        subtitle="Eight liturgies a day keep the shell hard and the streak alive."
         className="lg:p-5 gap-4 font-sans overflow-hidden scroll-mt-24"
         meta={
           <span

@@ -37,7 +37,6 @@ export function DashboardChangelogPanel() {
     <DashboardPanel
       icon={<GitCommit />}
       title="What’s new"
-      subtitle="Recent changes to Moltology."
       action={{ label: `All ${entries.length} releases`, onClick: () => navigate({ to: '/changelog' }) }}
       data-testid="dashboard-changelog"
     >
