@@ -1,4 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
+// Unit tests exercise the Canvas fallback; browser capture belongs to explicit visual runs.
+vi.mock('./composite-renderer', () => ({
+  captureComposite: vi.fn().mockRejectedValue(new Error('Browser capture disabled in unit tests')),
+}))
+
 import fs from 'node:fs'
 import path from 'node:path'
 import {
@@ -49,7 +54,7 @@ describe('Reel Compositor Rendering', () => {
     expect(stats.size).toBeGreaterThan(10000)
   })
 
-  it('renders the clean, homepage-aligned CTA outro card video', async () => {
+  it('renders the CTA outro card video through the Canvas fallback', async () => {
     const outPath = path.resolve(process.cwd(), 'tmp/test_cta_outro.mp4')
     const result = await renderCtaOutroVideo(
       outPath,

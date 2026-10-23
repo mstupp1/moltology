@@ -24,7 +24,7 @@ prove branch identity when the production URL is absent: verify the dev branch
 before supplying its URL. Ordinary test commands exclude integration tests. Existing merch integration suites
 also retain their separate `RUN_MERCH_INTEGRATION=1` opt-in and dev-target checks.
 
-## Remaining audit findings
+## Stage 1 audit baseline
 
 `npm audit --json` on 2026-10-23 reports 11 affected package entries: 5 high and
 6 moderate. These counts include parent packages affected by their dependencies;
@@ -44,8 +44,7 @@ transitive versions just to clear the audit.
 
 ## Deferred migrations
 
-Remaining work is grouped into a toolchain bundle (Vite, React plugin, Vitest,
-and TypeScript), a Tailwind migration with compatible Drizzle tooling fixes if
+Remaining work is a Tailwind migration with compatible Drizzle tooling fixes if
 available, and a separate Stripe API/webhook review. Tailwind needs browser-support
 and HUD styling checks. Do not downgrade Drizzle Kit or force incompatible
 transitive overrides. Use current registry metadata and version-specific docs at
@@ -118,3 +117,44 @@ per-test timeout is now 30 seconds; ordinary tests retain their existing timeout
 The other 15 integration tests remain separately opt-in. Audit remains at 11
 Tailwind/Drizzle tooling findings (5 high, 6 moderate). No full production build
 was verified.
+
+## Stage 4: toolchain bundle (2026-10-23)
+
+After merged PR #297, upgraded Vite 7.3.7 → 8.3.5, its React plugin 5.2.0 → 6.1.2,
+Vitest 4.1.12 → 5.0.5 and the project TypeScript compiler 5.9.3 → 7.0.2. The
+existing Node 24 CI runtime satisfies these releases' requirements.
+
+[Vite 8 migration](https://vite.dev/guide/migration) replaces the old Rollup build
+options with Rolldown. The `auth-vendor` group retains its existing package
+selection through `rolldownOptions.output.codeSplitting.groups`. Vite config uses
+`import.meta.dirname` and an explicit `.ts` config-helper import. TypeScript's
+removed `baseUrl` option is dropped; `@/*` still maps directly to `./src/*`.
+
+TypeScript 7's root package no longer exposes the classic compiler AST API.
+The Logic Atlas anchor resolver alone imports the exact-pinned
+`typescript-parser` alias (`npm:typescript@6.0.3`); project typechecking uses
+TypeScript 7. Its ten anchor tests pass. A future migration can remove the alias
+once a suitable stable parser interface is available.
+
+Vitest setup now imports `@testing-library/jest-dom/vitest` for the correct
+matcher typing and runtime integration. Updated stale homepage/news tests to
+match the already-shipped canvas hero, byline placement and accessible labels.
+The reel compositor unit test mocks browser capture failure and verifies its
+Canvas/FFmpeg fallback instead of starting a browser/build during a unit run.
+These test corrections do not change page behavior or production media rendering.
+
+Verification passed:
+
+- Typecheck and the full ordinary suite: 352 files, 2,513 tests.
+- Live Neon dev auth: signup, signin, session retrieval and signout; zero temporary
+  users remained afterward. The 15 merch integration tests remain opt-in.
+- Standard `npm run build` and `NITRO_PRESET=vercel npm run build`, including the
+  post-build pruning step. Generated Vercel functions use Node 24; store recovery
+  retains `maxDuration: 240`; static images are not duplicated in the server function.
+- Asset budget, brand asset and UI-token hygiene checks.
+- Audit: seven moderate findings, zero high or critical, through Drizzle Kit's
+  legacy esbuild chain and Tailwind's PostCSS selector parser chain. This is down
+  from the prior 11 findings; no forced audit fixes were applied.
+
+Builds retain non-fatal third-party module-directive, external `/media/*` URL and
+large-chunk warnings. No deployment or browser visual verification was performed.
