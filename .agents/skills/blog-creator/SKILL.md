@@ -302,8 +302,7 @@ npm run carousel:create -- --article <slug>
 Follow the `instagram-carousel-creator` skill for reviewed copy, five to eight final slides, shared seasonal treatment and built-in ImageGen artwork. Its three scaffold seeds are not the finished deck; Google Flow is a user-selected alternative.
 
 #### 2. Short-Form Vertical Video (Reels & Shorts)
-* For single-topic 6-clip video broadcasts: use `reels-and-shorts-creator` (`npm run reel:create`).
-* For episodic cinematic narrative shorts: use `viral-reel-series-creator` (`npm run series:create`).
+* Use `reels-and-shorts-creator` (`npm run reel:create`) with a reviewed script built from one of its video formats. Recurring segments are formats in that skill's library.
 
 #### 3. Lead Magnet Post
 * Use `instagram-post-creator` (`npm run post:create`) to generate a single diagnostic audit or lead magnet card.

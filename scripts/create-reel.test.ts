@@ -3,12 +3,8 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import {
-  generateDailyReelScript,
   CTA_GOAL_CONFIGS,
   withReelWebsiteCta,
-  buildDynamicScenePrompts,
-  synthesizeBlogReelScript,
-  getThematicVariations,
   getLocalClipPool,
   selectRecycledClipSequence,
   resolveColorGradingPresets,
@@ -47,121 +43,7 @@ describe('Reviewed reel production inputs', () => {
   })
 })
 
-describe('Reels & Shorts Dynamic Script Formulation & Clip Recycling', () => {
-  it('generates a complete 6-scene narrative script with custom topic', () => {
-    const script = generateDailyReelScript({
-      topic: 'Oceanic Subsea GPU Cooling',
-    })
-
-    expect(script.title).toContain('Oceanic Subsea GPU Cooling')
-    expect(script.topic).toBe('Oceanic Subsea GPU Cooling')
-    expect(script.hookHeadline).toBeDefined()
-    expect(script.narrationScript.split(/\s+/).length).toBeGreaterThanOrEqual(95)
-    // 6-scene storytelling format
-    expect(script.scenePrompts.length).toBe(6)
-    expect(script.caption).toContain('moltology.org')
-    expect(script.hashtags.length).toBeGreaterThan(0)
-    expect(script.characterArc).toContain('Silas Trench')
-  })
-
-  it('generates complete dynamic variations for multiple themes with 6 scenes', () => {
-    const themes = ['moltmaxxing', 'ecdysis', 'pincer-torque', 'benthic-depth', 'quiz']
-
-    for (const theme of themes) {
-      const variations = getThematicVariations(theme, {})
-      expect(variations.length).toBeGreaterThanOrEqual(1)
-
-      const script = generateDailyReelScript({ theme })
-      expect(script.hookHeadline).toBeDefined()
-      expect(script.narrationScript).toBeDefined()
-      // A shorter website invitation still leaves a complete six-beat script.
-      const wordCount = script.narrationScript.split(/\s+/).length
-      expect(wordCount).toBeGreaterThanOrEqual(50)
-      // Exactly 6 scenes per video
-      expect(script.scenePrompts.length).toBe(6)
-      expect(script.caption).toContain('moltology.org')
-      expect(script.youtubeTitle).toBeDefined()
-    }
-  })
-
-  it('synthesizes dynamic bespoke 6-scene reel scripts from arbitrary blog posts', () => {
-    const mockBlog = {
-      slug: 'neuromorphic-spiking-chitin-arrays',
-      title: 'Neuromorphic Spiking Silicon & Chitin Arrays: 100x Energy Efficiency',
-      summary: 'Spiking neural networks meet sub-benthic hydrostatic computing for ultra-low power reasoning.',
-      content: 'Traditional synchronous clocks waste massive energy. Spiking neuromorphic silicon computes on event pulses...',
-    }
-
-    const script = synthesizeBlogReelScript(mockBlog, {})
-    expect(script.title).toContain(mockBlog.title)
-    expect(script.topic).toBe(mockBlog.title)
-    expect(script.relatedBlogSlug).toBe('neuromorphic-spiking-chitin-arrays')
-    expect(script.scenePrompts.length).toBe(6)
-    expect(script.caption).toContain('moltology.org')
-  })
-
-  it('synthesizes World Foundation Models & JEPA scripts with pixel ecdysis hooks and 6 scenes', () => {
-    const worldModelBlog = {
-      slug: 'world-foundation-models-pixel-ecdysis-latent-jepa',
-      title: 'World Foundation Models & The Great Pixel Ecdysis',
-      summary: 'Why sub-benthic swarms are shedding generative video for joint-embedding world latents.',
-      content: 'Terrestrial AI labs burn gigawatts rendering pixels. B-JEPA predicts abstract invariant latents...',
-    }
-
-    const script = synthesizeBlogReelScript(worldModelBlog, {})
-    expect(['WHY AI IS SHEDDING PIXELS', 'THE PIXEL-DIFFUSION MELT']).toContain(script.hookHeadline)
-    expect(script.narrationScript).toMatch(/(Joint-Embedding|B-JEPA)/)
-    expect(script.scenePrompts.length).toBe(6)
-    expect(script.scenePrompts.some((p) => p.includes('diffusion'))).toBe(true)
-    expect(script.scenePrompts.some((p) => p.includes('latent'))).toBe(true)
-  })
-
-  it('synthesizes The Napkin You Didn\'t Watch scripts with worn gripper hooks and 6 scenes', () => {
-    const napkinBlog = {
-      slug: 'the-napkin-you-didnt-watch',
-      title: 'The Napkin You Didn\'t Watch: A Worn Gripper, Not a Model',
-      summary: 'The dining room never sees the robot. It sees the napkin. Throughput fell for two weeks until someone watched the grab.',
-      content: 'Throughput fell for two weeks. The labeling system traced it to missed grabs. A worn gripper, not a model regression...',
-    }
-
-    const script = synthesizeBlogReelScript(napkinBlog, {})
-    expect(['WATCH THE GRAB', 'THE NAPKIN YOU DIDN\'T WATCH']).toContain(script.hookHeadline)
-    expect(script.narrationScript).toMatch(/(gripper|grab|robot)/)
-    expect(script.scenePrompts.length).toBe(6)
-    expect(script.scenePrompts.some((p) => p.includes('gripper'))).toBe(true)
-    expect(script.scenePrompts.some((p) => p.includes('pincer'))).toBe(true)
-  })
-
-  it('synthesizes The Parts Bin Still Teaching scripts with chassis CTA and cubbies hook', () => {
-    const partsBinBlog = {
-      slug: 'the-parts-bin-still-teaching',
-      title: 'The Parts Bin Still Teaching: Atlas Shadows the Line',
-      summary: 'Boston Dynamics opened a training cell inside Hyundai\'s Metaplant so Atlas can learn real auto-parts logistics before the line. The cubbies teach first.',
-      content: 'A humanoid walking through an empty hall is just a brochure demo. Real manufacturing happens in the high-density cubbies where parts cannot be scratched...',
-    }
-
-    const script = synthesizeBlogReelScript(partsBinBlog, {})
-    expect(['THE BIN WAS THE SKILL', 'SHADOW, NOT STAGE']).toContain(script.hookHeadline)
-    expect(script.narrationScript).toMatch(/(cubbies|parts bin|manufacturing|apprentice)/)
-    expect(script.ctaGoal).toBe('chassis')
-    expect(script.commentTriggerKeyword).toBe('CHASSIS')
-    expect(script.scenePrompts.length).toBe(6)
-    expect(script.scenePrompts.some((p) => p.includes('parts cubbies') || p.includes('parts bins'))).toBe(true)
-    expect(script.scenePrompts.some((p) => p.includes('chassis'))).toBe(true)
-  })
-
-  it('builds dynamic combinatorial 6-scene prompts with corporate and benthic juxtaposition', () => {
-    const prompts1 = buildDynamicScenePrompts('moltmaxxing', 'Topic A')
-    const prompts2 = buildDynamicScenePrompts('moltmaxxing', 'Topic B')
-
-    expect(prompts1.length).toBe(6)
-    expect(prompts2.length).toBe(6)
-    for (let i = 0; i < 6; i++) {
-      expect(prompts1[i]).toContain('cinematic 9:16 vertical 8k')
-      expect(prompts2[i]).toContain('cinematic 9:16 vertical 8k')
-    }
-  })
-
+describe('Reels & Shorts clip recycling and grading', () => {
   it('indexes local clips and selects a non-empty sequence of 6 recycled clips', () => {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'reel-clip-pool-'))
     const cwd = vi.spyOn(process, 'cwd').mockReturnValue(directory)
@@ -179,69 +61,6 @@ describe('Reels & Shorts Dynamic Script Formulation & Clip Recycling', () => {
       cwd.mockRestore()
       fs.rmSync(directory, { recursive: true, force: true })
     }
-  })
-
-  it('supports all CTA goals with legacy metadata and direct destination copy', () => {
-    const goals: Array<{ goal: any; keyword: string; urlFragment: string }> = [
-      { goal: 'quiz', keyword: 'QUIZ', urlFragment: 'moltology.org/quiz' },
-      { goal: 'guide', keyword: 'GUIDE', urlFragment: 'moltology.org/news/the-2026-moltmaxxing-protocol-guide' },
-      { goal: 'oracle', keyword: 'ORACLE', urlFragment: 'moltology.org/oracle' },
-      { goal: 'chassis', keyword: 'CHASSIS', urlFragment: 'moltology.org/chassis' },
-      { goal: 'routine', keyword: 'ROUTINE', urlFragment: 'moltology.org/news/the-2026-moltmaxxing-protocol-guide' },
-      { goal: 'codex', keyword: 'CODEX', urlFragment: 'moltology.org/codex' },
-      { goal: 'forum', keyword: 'FORUM', urlFragment: 'moltology.org/forum' },
-      { goal: 'demo', keyword: 'DEMO', urlFragment: 'moltology.org' },
-      { goal: 'homepage', keyword: 'INITIATE', urlFragment: 'moltology.org' },
-    ]
-
-    for (const { goal, keyword, urlFragment } of goals) {
-      const script = generateDailyReelScript({
-        topic: `Focusing on ${goal}`,
-        ctaGoal: goal,
-      })
-
-      expect(script.ctaGoal).toBe(goal)
-      expect(script.commentTriggerKeyword).toBe(keyword)
-      expect(script.caption).toContain(CTA_GOAL_CONFIGS[goal as keyof typeof CTA_GOAL_CONFIGS].captionCta)
-      expect(script.caption).toContain(urlFragment)
-      expect(script.firstComment).toContain(urlFragment)
-      expect(script.trialParams).toEqual({ graduationStrategy: 'SS_PERFORMANCE' })
-    }
-  })
-
-  it('synthesizes diverse Lead Magnet endings without hardcoding Calculate your molt clearance', () => {
-    const blogA = {
-      slug: 'neuromorphic-spiking-chitin-arrays',
-      title: 'Neuromorphic Spiking Silicon & Chitin Arrays: 100x Energy Efficiency',
-      summary: 'Spiking neural networks meet sub-benthic hydrostatic computing for ultra-low power reasoning.',
-      content: 'Traditional synchronous clocks waste massive energy...',
-    }
-    const scriptA = synthesizeBlogReelScript(blogA, {})
-    expect(scriptA.ctaGoal).toBe('chassis')
-    expect(scriptA.narrationScript).toMatch(/(equipment|chassis|hardware|telemetry)/)
-    expect(scriptA.commentTriggerKeyword).toBe('CHASSIS')
-
-    const blogB = {
-      slug: 'sparse-autoencoders-monosemantic-features',
-      title: 'Sparse Autoencoders: Disentangling 16.7M Monosemantic Features',
-      summary: 'Why black-box AI is cracking under mechanistic interpretability.',
-      content: 'Sparse autoencoders map latent superposition into discrete circuits...',
-    }
-    const scriptB = synthesizeBlogReelScript(blogB, {})
-    expect(scriptB.ctaGoal).toBe('oracle')
-    expect(scriptB.narrationScript).toMatch(/(oracle|prompt|vault)/i)
-    expect(scriptB.commentTriggerKeyword).toBe('ORACLE')
-
-    const blogC = {
-      slug: 'the-tabs-you-kept',
-      title: 'The Tabs You Kept: A Browser Is a Boundary, Not Clutter',
-      summary: 'The coworker arrived with a second pair of hands in a side panel.',
-      content: 'A coworker got a second pair of hands in a side panel you didn\'t ask for...',
-    }
-    const scriptC = synthesizeBlogReelScript(blogC, {})
-    expect(scriptC.ctaGoal).toBe('routine')
-    expect(scriptC.narrationScript).toMatch(/(blueprint|protocol|routine)/)
-    expect(scriptC.commentTriggerKeyword).toBe('ROUTINE')
   })
 
   it('resolves cohesive contextual color grading presets across 6 scenes', () => {
@@ -337,22 +156,5 @@ describe('Website invitations', () => {
       .toBe(`${body} ${CTA_GOAL_CONFIGS.guide.endingScriptPhrases[0]}`)
     const rewritten = withReelWebsiteCta(`${body} Save this for Monday.`, CTA_GOAL_CONFIGS.quiz)
     expect(withReelWebsiteCta(rewritten, CTA_GOAL_CONFIGS.quiz)).toBe(rewritten)
-  })
-
-  it('keeps each generated daily destination consistent across public copy', () => {
-    for (const config of Object.values(CTA_GOAL_CONFIGS)) {
-      for (const script of [
-        generateDailyReelScript({ topic: 'A crowded Monday', ctaGoal: config.goal }),
-        ...getThematicVariations('moltmaxxing', { ctaGoal: config.goal }),
-        synthesizeBlogReelScript({ slug: 'a-quiet-hour', title: 'A quiet hour', summary: 'Close one tab.', content: 'Pick one task.' }, { ctaGoal: config.goal }),
-      ]) {
-        expect(script.narrationScript).toContain(config.endingScriptPhrases[0])
-        for (const surface of [script.caption, script.firstComment, script.youtubeDescription]) {
-          expect(surface).toContain(config.url.replace('https://', ''))
-        }
-        const copy = [script.narrationScript, script.caption, script.firstComment, script.youtubeDescription, config.actionText].join('\n')
-        expect(copy).not.toMatch(/comment\s+(?:QUIZ|GUIDE|ORACLE|CHASSIS|ROUTINE|CODEX|FORUM|DEMO|INITIATE)|\bDMs?\b|(?:save|share|send) this/i)
-      }
-    }
   })
 })
