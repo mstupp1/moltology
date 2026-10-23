@@ -44,12 +44,12 @@ transitive versions just to clear the audit.
 
 ## Deferred migrations
 
-Review dotenv, Lucide, and Three.js with matching types in independent
-changes. Review Vite / React plugin / Vitest together for TanStack Start and Nitro
-compatibility; review TypeScript separately. Tailwind needs browser-support and
-HUD styling checks. Stripe needs an explicit API and webhook compatibility review.
-Use current registry metadata and version-specific documentation at each stage,
-rather than treating previously quoted latest versions as fixed targets.
+Remaining work is grouped into a toolchain bundle (Vite, React plugin, Vitest,
+and TypeScript), a Tailwind migration with compatible Drizzle tooling fixes if
+available, and a separate Stripe API/webhook review. Tailwind needs browser-support
+and HUD styling checks. Do not downgrade Drizzle Kit or force incompatible
+transitive overrides. Use current registry metadata and version-specific docs at
+each stage rather than treating earlier latest-version quotes as fixed targets.
 
 ## Stage 1 verification (2026-10-23)
 
@@ -83,3 +83,38 @@ tests remain behind their separate opt-in. No production migration or social
 archive operation was executed, and no full production build was verified.
 
 Stage 1 merged in PR #295. Review this Neon-only migration against `main`.
+
+## Stage 3: bundled supporting dependencies (2026-10-23)
+
+Combined the following upgrades after merging the Neon PR #296:
+
+| Dependency | Before | After |
+| --- | --- | --- |
+| dotenv | 17.4.2 | 18.0.9 |
+| lucide-react | 0.474.0 | 1.61.0 |
+| three | 0.185.1 | 0.186.1 |
+| @types/three | 0.185.4 | 0.186.0 |
+
+The installed dotenv 18.0.9 package still exports `dotenv/config`; its side-effect
+import defaults to quiet. Tests cover working-directory `.env` loading, shell
+variable precedence, blank/quoted/multiline values and optional missing files.
+No loading paths or override behavior are changed by this migration. See the
+[dotenv release notes](https://github.com/motdotla/dotenv/blob/master/CHANGELOG.md#1800-2026-09-17).
+
+Lucide no longer exports Instagram and Youtube. Both footers now use shared
+`SocialIcons` components with the exact prior paths, Lucide rendering defaults
+and the original ISC license notice. All 169 runtime Lucide exports used by tracked
+source were checked against the installed package; none remain missing.
+
+The book-cover component uses WebGLRenderer and does not use the APIs changed in
+the [Three.js r185→r186 migration guide](https://github.com/mrdoob/three.js/wiki/Migration-Guide#185--186).
+Headless construction of its geometry, extrusion, material, light and scene APIs
+passed. Actual WebGL rendering and visual output were not verified.
+
+Typecheck, 1,238 core tests, 330 script tests and 13 focused tests (environment
+loading and both footers) passed. The live Neon dev auth test passed on an isolated
+rerun after exceeding the default five-second limit under parallel load. Its
+per-test timeout is now 30 seconds; ordinary tests retain their existing timeout.
+The other 15 integration tests remain separately opt-in. Audit remains at 11
+Tailwind/Drizzle tooling findings (5 high, 6 moderate). No full production build
+was verified.

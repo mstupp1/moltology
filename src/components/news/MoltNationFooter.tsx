@@ -7,14 +7,13 @@ import {
   Newspaper,
   Compass,
   Building2,
-  Instagram,
-  Youtube,
   Flame,
   BookOpen,
   Activity,
   Scroll,
   MessageSquare,
 } from 'lucide-react'
+import { Instagram, Youtube } from '@/components/ui/SocialIcons'
 import { MoltNationLogo } from '@/components/news/MoltNationLogo'
 import { useStoreDestination } from '@/components/store/useStoreDestination'
 

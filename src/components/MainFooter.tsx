@@ -8,12 +8,11 @@ import {
   Scroll,
   Building2,
   ShoppingBag,
-  Instagram,
-  Youtube,
   Rss,
   ExternalLink,
   Info,
 } from 'lucide-react'
+import { Instagram, Youtube } from '@/components/ui/SocialIcons'
 import { useStoreDestination } from '@/components/store/useStoreDestination'
 import { HeaderBrand } from '@/components/ui/HeaderBrand'
 
