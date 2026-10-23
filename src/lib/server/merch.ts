@@ -1,4 +1,5 @@
 import Stripe from 'stripe'
+import { STRIPE_API_VERSION } from '../stripe-config'
 import { and, asc, eq, inArray, isNull } from 'drizzle-orm'
 import { getDb } from '../../db'
 import { merchOrders, merchProducts, merchVariants, profiles } from '../../db/schema'
@@ -195,7 +196,7 @@ export async function retryMerchOrder(orderId: string): Promise<void> {
   }
   const key = process.env.STRIPE_SECRET_KEY
   if (!key) throw new Error('STRIPE_SECRET_KEY is missing.')
-  const stripe = new Stripe(key, { apiVersion: '2026-07-29.dahlia', timeout: 10_000, maxNetworkRetries: 0 })
+  const stripe = new Stripe(key, { apiVersion: STRIPE_API_VERSION, timeout: 10_000, maxNetworkRetries: 0 })
   const session = await stripe.checkout.sessions.retrieve(order.stripeCheckoutSessionId)
   if (session.metadata?.orderId !== order.id || session.metadata?.orderType !== 'merch' || session.payment_status !== 'paid') {
     throw new Error('Stripe has not confirmed payment for this merch order.')

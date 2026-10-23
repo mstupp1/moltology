@@ -1,4 +1,5 @@
 import Stripe from 'stripe'
+import { STRIPE_API_VERSION } from '../../src/lib/stripe-config'
 import { neon } from '@neondatabase/serverless'
 import type { MerchSeedProduct } from '../../src/lib/merch-seed-data'
 import { isOrderablePrintfulId, MERCH_CHECKOUT_EVENT_TYPES } from '../../src/lib/merch'
@@ -26,7 +27,7 @@ export async function merchDoctor(products: MerchSeedProduct[], mode: 'test' | '
   await check('Stripe', async () => {
     const key = process.env.STRIPE_SECRET_KEY
     if (!key || !(mode === 'live' ? /^(sk|rk)_live_/ : /^(sk|rk)_test_/).test(key)) throw new DoctorIssue(`expected a Stripe ${mode} secret/restricted key`)
-    const stripe = new Stripe(key)
+    const stripe = new Stripe(key, { apiVersion: STRIPE_API_VERSION })
     const endpoints = await stripe.webhookEndpoints.list({ limit: 100 })
     const valid = endpoints.data.some(endpoint => endpoint.status === 'enabled' &&
       new URL(endpoint.url).origin === new URL(process.env.BETTER_AUTH_URL || 'http://localhost:3000').origin && new URL(endpoint.url).pathname === '/api/stripe/webhook' &&
