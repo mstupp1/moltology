@@ -194,6 +194,43 @@ describe('HUDTaskBar', () => {
     })
   })
 
+  it('keeps the phone sheet open while switching between Tasks and Alerts', () => {
+    act(() => {
+      window.innerWidth = 390
+      window.dispatchEvent(new Event('resize'))
+    })
+
+    render(<HUDTaskBar variant="header" />)
+    fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
+
+    const alertsTab = screen.getByRole('tab', { name: /Alerts/ })
+    fireEvent.mouseDown(alertsTab)
+    fireEvent.click(alertsTab)
+    expect(screen.getByText('Nothing new')).toBeInTheDocument()
+
+    const tasksTab = screen.getByRole('tab', { name: /Tasks/ })
+    fireEvent.mouseDown(tasksTab)
+    fireEvent.click(tasksTab)
+    expect(screen.getByTestId('alignment-panel')).toBeInTheDocument()
+    expect(tasksTab).toHaveAttribute('aria-selected', 'true')
+
+    act(() => {
+      window.innerWidth = 1024
+      window.dispatchEvent(new Event('resize'))
+    })
+  })
+
+  it('closes the desktop dropdown on a click outside it', () => {
+    render(<HUDTaskBar variant="header" />)
+    fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
+
+    fireEvent.mouseDown(screen.getByRole('tab', { name: /Alerts/ }))
+    expect(screen.getByTestId('alignment-panel')).toBeInTheDocument()
+
+    fireEvent.mouseDown(document.body)
+    expect(screen.queryByTestId('alignment-panel')).not.toBeInTheDocument()
+  })
+
   it('opens the liturgies panel when the dashboard alignment card event fires', () => {
     render(<HUDTaskBar variant="header" />)
 
