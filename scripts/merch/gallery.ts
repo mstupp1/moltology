@@ -22,7 +22,7 @@ export async function generateOfficialGallery(client: PrintfulClient, products: 
   for (const product of products) {
     const info = await client.printfiles(product.printful.catalogProductId)
     const blanks = await client.catalogProduct(product.printful.catalogProductId)
-    const selectedGroups = groups ?? (product.category === 'Mugs' ? ['Default'] : ['Flat 2', 'Ghost'])
+    const selectedGroups = groups ?? (product.category === 'Mugs' ? ['Default'] : product.category === 'Tees' ? ['Flat 2', 'Ghost'] : ['Flat'])
     for (const group of selectedGroups) if (!info.option_groups?.includes(group)) throw new Error(`${product.slug}: unavailable mockup group ${group}. Available: ${info.option_groups?.join(' | ')}`)
     const folder = path.join(root, product.slug)
     fs.mkdirSync(folder, { recursive: true })
@@ -40,6 +40,7 @@ export async function generateOfficialGallery(client: PrintfulClient, products: 
         else {
           const created = await client.createMockupTask(product.printful.catalogProductId, {
             variant_ids: [template.blank.id], format: 'jpg', width: 1600, option_groups: [group],
+            ...(product.printful.options ? { product_options: Object.fromEntries(product.printful.options.map(option => [option.id, option.value])) } : {}),
             files: [{ placement: product.printful.placement, image_url: getAbsoluteAssetUrl(`${MERCH_PRINT_PREFIX}/${design}.png`),
               position: { area_width: template.template.width, area_height: template.template.height, width: template.template.width, height: template.template.height, top: 0, left: 0 } }],
           })

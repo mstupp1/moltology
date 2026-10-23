@@ -22,7 +22,7 @@ describe('Printful sync payloads', () => {
     for (const product of INITIAL_MERCH_PRODUCTS) {
       const { payload, missing } = buildSyncProductPayload({
         product,
-        catalogVariants: product.category === 'Mugs' ? mugBlanks : teeBlanks,
+        catalogVariants: product.category === 'Mugs' ? mugBlanks : product.category === 'Tees' ? teeBlanks : product.category === 'Hats' ? [{ id: 7854, size: 'One size', color: 'Black' }] : [{ id: 22327, size: '16″×32″', color: 'Black' }],
         printFileUrl: (design) => `https://example.test/${design}.png`,
         thumbnailUrl: 'https://example.test/thumb.jpg',
       })
@@ -31,6 +31,19 @@ describe('Printful sync payloads', () => {
       expect(payload.sync_variants[0].files[0].type).toBe(product.printful.placement)
       expect(payload.sync_product.external_id).toBe(product.id)
     }
+  })
+
+  it('preserves the hat embroidery placement and red thread options', () => {
+    const product = INITIAL_MERCH_PRODUCTS.find(item => item.slug === 'moltology-hat')!
+    const { payload, missing } = buildSyncProductPayload({ product,
+      catalogVariants: [{ id: 7854, size: 'One size', color: 'Black' }],
+      printFileUrl: design => `https://example.test/${design}.png`, thumbnailUrl: 'https://example.test/hat.jpg' })
+    expect(missing).toEqual([])
+    expect(payload.sync_variants[0]).toMatchObject({ variant_id: 7854,
+      files: [{ type: 'embroidery_front_large' }], options: [
+        { id: 'embroidery_type', value: 'flat' },
+        { id: 'thread_colors_front_large', value: ['#CC3333'] },
+      ] })
   })
 
   it('formats retail prices and every variant has a design', () => {

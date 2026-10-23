@@ -28,6 +28,8 @@ const teeModel = (scene: string): ImageDescription => ({ caption: 'Black tee', a
 
 /** Explicit source sizes: never infer the pictured mug from the customer's size selection. */
 export const MERCH_IMAGE_DESCRIPTIONS: Record<string, ImageDescription> = {
+  'images/merch/moltology-hat-v1-black.jpg': { caption: 'Black hat · front', alt: 'Black Moltology dad hat with a red embroidered emblem on the front' },
+  'images/merch/moltology-desk-mat-v1.jpg': { caption: '16″ × 32″ desk mat', alt: 'Dark Moltology desk mat with depth contours and a small red emblem and white wordmark in one corner' },
   'images/merch/moltology-mug-v2-1.jpg': mug('11', 'red emblem facing forward'),
   'images/merch/moltology-mug-v2-2.jpg': mug('15', 'wordmark facing forward'),
   'images/merch/moltology-tee-v2-black.jpg': tee('front'),
