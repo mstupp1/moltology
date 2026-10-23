@@ -113,5 +113,5 @@ describe('Better Auth email/password against Neon dev', () => {
     })
     const afterBody = await afterOut.json()
     expect(afterBody).toBeNull()
-  })
+  }, 30_000)
 })
