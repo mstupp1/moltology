@@ -95,10 +95,14 @@ export default defineConfig(({ mode }) => {
       proxy: mediaProxy,
     },
     test: {
+      ...(mode === 'integration' ? { include: ['src/**/*.integration.test.ts'] } : {}),
       globals: true,
       environment: 'jsdom',
       setupFiles: ['./src/test/setup.ts'],
-      exclude: ['**/node_modules/**', '**/dist/**', '**/.claude/**', '**/.git/**'],
+      exclude: [
+        '**/node_modules/**', '**/dist/**', '**/.claude/**', '**/.git/**',
+        ...(mode === 'integration' ? [] : ['**/*.integration.test.ts']),
+      ],
     },
     plugins: [
       ...(isTest

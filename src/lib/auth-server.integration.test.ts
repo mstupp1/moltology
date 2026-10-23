@@ -1,12 +1,18 @@
-import { afterAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { and, eq } from 'drizzle-orm'
-import { getDb } from '../db'
-import { authAccount, authSession, authUser, profiles, userStats } from '../db/schema'
-import { auth } from './auth-server'
+import { resolveIntegrationDatabaseUrl } from '../../scripts/lib/integration-database'
 
-const dummyUrl =
-  typeof process !== 'undefined' &&
-  (process.env.DATABASE_URL || '').includes('ep-dummy')
+let getDb: typeof import('../db').getDb
+let auth: typeof import('./auth-server').auth
+let tables: typeof import('../db/schema')
+
+// Validate the explicit dev target before importing modules that create DB clients.
+beforeAll(async () => {
+  process.env.DATABASE_URL = resolveIntegrationDatabaseUrl(process.env)
+  getDb = (await import('../db')).getDb
+  auth = (await import('./auth-server')).auth
+  tables = await import('../db/schema')
+})
 
 function readSetCookieLines(response: Response): string[] {
   const headers = response.headers as Headers & { getSetCookie?: () => string[] }
@@ -43,7 +49,7 @@ async function callAuth(path: string, init: RequestInit = {}): Promise<Response>
   return auth.handler(new Request(url, init))
 }
 
-describe.skipIf(dummyUrl)('Better Auth email/password against Neon dev', () => {
+describe('Better Auth email/password against Neon dev', () => {
   const email = `probe-auth-${Date.now()}@moltology.org`
   const password = 'probe-password-126'
   const name = 'probe_auth_126'
@@ -51,6 +57,7 @@ describe.skipIf(dummyUrl)('Better Auth email/password against Neon dev', () => {
 
   afterAll(async () => {
     if (!userId) return
+    const { authAccount, authSession, authUser, profiles, userStats } = tables
     const db = getDb()
     await db.delete(authSession).where(eq(authSession.userId, userId)).catch(() => {})
     await db.delete(authAccount).where(eq(authAccount.userId, userId)).catch(() => {})
