@@ -1,9 +1,10 @@
 # Instagram Reels strategy
 
-Updated October 22, 2026. Applies to daily Reels and episodic series, including their
-YouTube Shorts copies. Read with [STYLE_GUIDE.md](../../STYLE_GUIDE.md),
-[the daily skill](../../.agents/skills/reels-and-shorts-creator/SKILL.md) and
-[the series skill](../../.agents/skills/viral-reel-series-creator/SKILL.md).
+Updated October 23, 2026. Applies to Reels and their YouTube Shorts copies. Read with
+[STYLE_GUIDE.md](../../STYLE_GUIDE.md), [the reels skill](../../.agents/skills/reels-and-shorts-creator/SKILL.md)
+and the [writing playbook](../writing-playbook.md). The episodic series skill was retired
+on October 23; recurring segments are now formats in the
+[reel format library](../../.agents/skills/reels-and-shorts-creator/references/reel-formats.md).
 
 Read the [shared annual content calendar](../annual-content-calendar.md) for the intended
 publication date and queue timezone. Seasonal scenes, props and examples build toward
@@ -17,7 +18,7 @@ The advice supplied by the user reports zero viewer comments in 90 days, comment
 only from the account itself, and a 48% decline while repeating the same formula.
 These are supplied observations, not analytics independently verified here. The
 declining metric and comparison period were not specified. Treat the opening frame
-as the first hypothesis to investigate; keep the two-act structure.
+as the first hypothesis to investigate.
 
 The October 15 baseline combines cinematic ImageGen openings, clean white-and-amber
 subtitles and one relevant website invitation. Compare overall performance with
@@ -52,11 +53,15 @@ the first body phrase before queueing. Follow the measured timing and editing
 checks in the [daily reel skill](../../.agents/skills/reels-and-shorts-creator/SKILL.md). A `hookHeadline` field or a text instruction to a video model does not prove
 the claim appears on screen.
 
-Act 1 shows surface friction: hook, consequence, frustration. Act 2 shows the useful
-molt: a change in approach, one demonstrated action, one invitation. Keep those
-functions while changing the wording, imagery and selected experiment variable.
-An aphorism earns its place by explaining the demonstrated action; it cannot replace
-the opening scene or practical payoff.
+## Write it in a known format
+
+The October reels followed one shape (problem, consequence, "Below, a lobster…", tip,
+link) and read like announcements. Each reel now picks a format viewers already know,
+such as a nature documentary, POV, roast list or work forecast, from the
+[reel format library](../../.agents/skills/reels-and-shorts-creator/references/reel-formats.md).
+Pitch three scripts in different formats, score them and build the winner, then pass the
+playbook's boredom check before any paid generation. The format sets the shape; the useful
+action is still demonstrated and arrives as the payoff, followed by one invitation.
 
 ## Write the seasonal connection into the script
 
@@ -97,23 +102,26 @@ phone-size samples on bright and dark footage before queueing.
 
 ## Change one variable per reel
 
-Before production, name a published control and state a hypothesis. Hold the topic
-family, two acts, useful action, mascot, voice identity, approximate duration,
-caption treatment, publishing slot and all non-tested settings as steady as
-practical. Record unavoidable differences as confounders. Avoid the last three
-exact topics/hooks; use a comparable new situation in the same topic family.
+The script format, jokes and wording change every reel; that variety is the point and
+is not the variable under test. Record `format` and `loudness` for every reel so
+formats can be compared once enough have run (look for a family that repeatedly beats
+the others on opening retention and shares/reach).
+
+For a production test, name a published control and state a hypothesis. Change one
+production setting and hold the mascot, voice identity, approximate duration, caption
+treatment, publishing slot and CTA as steady as practical. Compare within the same
+format family where possible, and record the format difference as a confounder when
+not. Avoid the last three exact topics and hooks.
 
 | Variable | Example comparison | Keep fixed |
 | --- | --- | --- |
-| Hook style | Close-up of an interruption versus a wider view of its consequence; both begin with motion and a claim. | Claim length, pacing, CTA, payoff. |
-| Aphorism length | One short line versus one longer line explaining the same action. Record word counts. | Hook, voice rate, CTA; keep total duration close. |
+| Opening framing | Close-up of the hook action versus a wider view of its consequence; both begin with motion and a claim. | Script, pacing, CTA. |
 | Voiceover pacing | Measured baseline rate versus a modestly faster rate. Record actual words/second. | Script, speaker, hook, CTA, visual sequence; record duration change. |
+| Cut rhythm | Cuts on sentence ends versus cuts on punchlines. | Script, voice, CTA. |
 
-Start with hook style because the supplied diagnosis points to the first frame.
-Then test aphorism length and voiceover pacing against the best confirmed control.
-Keep the website invitation and subtitle treatment fixed during these tests. Do not
-rotate franchises simply to create variation. Repeat a promising variant on a
-comparable reel before making it the default; a single spike is a candidate.
+Keep the website invitation and subtitle treatment fixed during these tests. Repeat a
+promising variant on a comparable reel before making it the default; a single spike
+is a candidate.
 
 ## Measure and decide
 
@@ -152,7 +160,7 @@ Single variable and control → variant values:
 Fixed settings / unavoidable confounders:
 Planned publication date/timezone / seasonal anchor and intensity:
 Opening physical action and exact on-screen claim:
-Aphorism word count / voice identity / measured words per second:
+Format / loudness / narration word count / voice identity / measured words per second:
 CTA action and exact wording:
 Actual duration:
 24h: reach, plays, shares, saves, share rate, save rate, retention, watch time,
@@ -165,11 +173,9 @@ Next test / confirmation reel:
 
 ## Production checks
 
-Use reviewed `--content-json` and a reviewed `--custom-outro` for daily reels. Current
-`--cta-goal` values select resource destinations; there are no share/save goal flags.
-Both generators now use direct resource invitations. The series CLI has no reviewed
-content JSON input: inspect its generated draft and public surfaces before production;
-do not invent an input flag or assume its unrelated template copy has been reviewed.
+Use reviewed `--content-json` and a reviewed `--custom-outro` for every reel; the CLI
+stops without a reviewed script and has no built-in templates. Current `--cta-goal`
+values select resource destinations; there are no share/save goal flags.
 
 Before queueing, verify physical motion and exact readable text in the first second,
 the demonstrated payoff, one relevant website invitation, no keyword prompts or DM promises, and
