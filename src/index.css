@@ -493,12 +493,13 @@
   transition: opacity 1200ms ease-out;
 }
 .home-hero-water[data-ready='true'] { opacity: 1; }
-/* Once the WebGL water is up, the CSS ripples and glints under it step aside. */
+/* First paint is calm water that matches the WebGL water, so its fade-in reads as the sea coming
+   alive. The ripples and glints only fade in once the field reports the WebGL water isn't coming. */
 .home-hero-sea-ripples,
 .home-hero-sea-glints,
 .home-hero-sea-line { transition: opacity 1200ms ease-out; }
-.home-hero[data-water='webgl'] .home-hero-sea-ripples,
-.home-hero[data-water='webgl'] .home-hero-sea-glints,
+.home-hero:not([data-water='css']) .home-hero-sea-ripples,
+.home-hero:not([data-water='css']) .home-hero-sea-glints,
 .home-hero[data-water='webgl'] .home-hero-sea-line { opacity: 0; }
 @media (prefers-reduced-motion: no-preference) {
   /* Two sets of glints trade places: opacity only, so the compositor handles it. */

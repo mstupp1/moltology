@@ -232,7 +232,7 @@ export function startHeroWater(opts: HeroWaterOptions): HeroWaterHandle | null {
     event.preventDefault()
     lost = true
     canvas.removeAttribute('data-ready')
-    host.removeAttribute('data-water')
+    host.setAttribute('data-water', 'css')
   }
   canvas.addEventListener('webglcontextlost', onLost)
 
@@ -271,7 +271,7 @@ export function startHeroWater(opts: HeroWaterOptions): HeroWaterHandle | null {
       resizeObserver?.disconnect()
       canvas.removeEventListener('webglcontextlost', onLost)
       canvas.removeAttribute('data-ready')
-      host.removeAttribute('data-water')
+      host.setAttribute('data-water', 'css')
       gl!.getExtension('WEBGL_lose_context')?.loseContext()
     },
   }
