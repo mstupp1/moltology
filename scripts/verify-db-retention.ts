@@ -33,19 +33,19 @@ async function main() {
     const statement = strings.reduce((sql, part, index) => sql + (index ? `$${index}` : '') + part, '')
     assert(!/\bpublic\s*\./i.test(statement), 'Fixture queries must not access public tables')
     const rewritten = statement.replace(tablePattern, (_, table: string) => `"${namespace}"."${table}"`)
-    return query(rewritten, values) as Promise<Array<Record<string, unknown>>>
+    return query.query(rewritten, values) as Promise<Array<Record<string, unknown>>>
   }
   const count = async (table: string) => {
     assert(tables.includes(table))
-    const [row] = await query(`SELECT count(*)::int AS count FROM "${namespace}"."${table}"`)
+    const [row] = await query.query(`SELECT count(*)::int AS count FROM "${namespace}"."${table}"`)
     return row.count as number
   }
   const asOf = new Date('2026-10-15T12:00:00.000Z')
   console.log(`[retention-verify] isolated fixtures on dev endpoint=${endpoint(url)} schema=${namespace}`)
-  await query(`CREATE SCHEMA "${namespace}"`)
+  await query.query(`CREATE SCHEMA "${namespace}"`)
   try {
     for (const table of tables) {
-      await query(`CREATE TABLE "${namespace}"."${table}" (LIKE public."${table}" INCLUDING ALL)`)
+      await query.query(`CREATE TABLE "${namespace}"."${table}" (LIKE public."${table}" INCLUDING ALL)`)
     }
     // LIKE copies indexes/defaults but not foreign keys; test the real cascade
     // explicitly against the isolated parent, never against public data.
@@ -259,7 +259,7 @@ async function main() {
     assert(policies.every((row) => row.relrowsecurity), 'Summary-table RLS must be enabled')
     console.log('[retention-verify] PASS: request dependencies, 90-day history/timezone/streak carries, usage rollups, concurrent chat cap/replay, archive expiry/cascade, usage-limit preservation, and migrated RLS')
   } finally {
-    await query(`DROP SCHEMA "${namespace}" CASCADE`)
+    await query.query(`DROP SCHEMA "${namespace}" CASCADE`)
     console.log('[retention-verify] isolated fixture schema removed')
   }
 }

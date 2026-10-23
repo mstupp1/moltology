@@ -44,7 +44,7 @@ transitive versions just to clear the audit.
 
 ## Deferred migrations
 
-Review Neon, dotenv, Lucide, and Three.js with matching types in independent
+Review dotenv, Lucide, and Three.js with matching types in independent
 changes. Review Vite / React plugin / Vitest together for TanStack Start and Nitro
 compatibility; review TypeScript separately. Tailwind needs browser-support and
 HUD styling checks. Stripe needs an explicit API and webhook compatibility review.
@@ -58,3 +58,28 @@ by the expanded integration-target guard tests (10). The live auth integration
 test passed against the CLI-verified `dev` branch (`br-mute-violet-ayw0bf9s`):
 signup, signin, session retrieval and signout. The 15 merch integration tests
 remain behind their separate opt-in. No full production build was verified.
+
+## Stage 2: Neon driver 1.2.0 (2026-10-23)
+
+Upgraded `@neondatabase/serverless` from 0.10.4 to 1.2.0. Its Node >=19
+requirement is satisfied by the current Node 24 CI runtime. The installed
+Drizzle ORM 0.45.4 supports this driver version and already uses its `.query()`
+API. No Drizzle tooling, schema, RLS or Stripe changes are included.
+
+[Neon's v1 migration notes](https://github.com/neondatabase/serverless/blob/main/CHANGELOG.md#100-2025-03-25)
+remove conventional `sql(text, values)` calls. Converted 11 such calls across
+the legacy blog migration, social archive dependency scan and dev retention
+verifier to `.query(text, values)`. Preserved SQL text, identifier escaping and
+parameter binding; existing tagged templates and serializable transactions stay
+as they were. A TypeScript AST inspection of driver clients found no remaining
+conventional calls in tracked source.
+
+Verification: typecheck, 1,238 core tests and 327 script tests passed. The live
+auth test passed against the verified Neon dev endpoint. The dev retention
+verifier passed using an isolated fixture schema and removed that schema after
+checking cleanup, history/timezones/streak carries, usage rollups, concurrent
+chat caps/replay, archive cascades and migrated RLS. The 15 merch integration
+tests remain behind their separate opt-in. No production migration or social
+archive operation was executed, and no full production build was verified.
+
+Stage 1 merged in PR #295. Review this Neon-only migration against `main`.

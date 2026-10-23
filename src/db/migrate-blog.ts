@@ -8,7 +8,7 @@ async function runMigration() {
 
   try {
     // 1. Create blog_posts table if it doesn't exist
-    await sql(`
+    await sql.query(`
       CREATE TABLE IF NOT EXISTS "blog_posts" (
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
         "slug" text NOT NULL UNIQUE,
@@ -35,7 +35,7 @@ async function runMigration() {
     console.log('✓ "blog_posts" table created/verified')
 
     // 2. Create blog_comments table if it doesn't exist
-    await sql(`
+    await sql.query(`
       CREATE TABLE IF NOT EXISTS "blog_comments" (
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
         "postId" uuid NOT NULL REFERENCES "blog_posts"("id") ON DELETE CASCADE,
@@ -49,10 +49,10 @@ async function runMigration() {
     console.log('✓ "blog_comments" table created/verified')
 
     // 3. Enable RLS and create policies
-    await sql(`ALTER TABLE "blog_posts" ENABLE ROW LEVEL SECURITY;`)
-    await sql(`ALTER TABLE "blog_comments" ENABLE ROW LEVEL SECURITY;`)
+    await sql.query(`ALTER TABLE "blog_posts" ENABLE ROW LEVEL SECURITY;`)
+    await sql.query(`ALTER TABLE "blog_comments" ENABLE ROW LEVEL SECURITY;`)
 
-    await sql(`
+    await sql.query(`
       DO $$
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'blog_posts_public_read_policy') THEN
