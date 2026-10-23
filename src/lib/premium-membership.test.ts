@@ -375,6 +375,17 @@ describe('premium checkout configuration', () => {
     )
   })
 
+  it('documents billing variables with blank, account-independent placeholders', () => {
+    const example = readFileSync(resolve(process.cwd(), '.env.example'), 'utf8')
+    for (const key of ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_PREMIUM_PRICE_ID']) {
+      expect(example).toContain(`${key}=""`)
+    }
+    expect(example).toContain('# STRIPE_PREMIUM_PRODUCT_ID=""')
+    expect(example).not.toContain(STRIPE_SANDBOX_PREMIUM.accountId)
+    expect(example).not.toContain(STRIPE_SANDBOX_PREMIUM.priceId)
+    expect(example).not.toContain(STRIPE_SANDBOX_PREMIUM.productId)
+  })
+
   it('reads the sandbox price and product ids from env and never invents an amount', () => {
     expect(STRIPE_SANDBOX_PREMIUM).toEqual({
       accountId: 'acct_1Se62XQ7tNSavLB7',
@@ -382,13 +393,6 @@ describe('premium checkout configuration', () => {
       priceId: 'price_1UIfEjQ7tNSavLB7C4N9velE',
       productId: 'prod_VJHoQFNhsIRtt0',
     })
-    const example = readFileSync(resolve(process.cwd(), '.env.example'), 'utf8')
-    expect(example).toContain(`STRIPE_PREMIUM_PRICE_ID="${STRIPE_SANDBOX_PREMIUM.priceId}"`)
-    expect(example).toContain(`STRIPE_PREMIUM_PRODUCT_ID="${STRIPE_SANDBOX_PREMIUM.productId}"`)
-    expect(example).toContain('acct_1Se62XQ7tNSavLB7')
-    expect(example).toContain('livemode=false')
-    expect(example).toContain('STRIPE_SECRET_KEY=""')
-    expect(example).toContain('STRIPE_WEBHOOK_SECRET=""')
     const config = readStripePremiumConfig(secretEnv, { secret: true, price: true, webhook: true }, 'test')
     expect(config.priceId).toBe('price_1UIfEjQ7tNSavLB7C4N9velE')
     expect(config.productId).toBe('prod_VJHoQFNhsIRtt0')

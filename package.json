@@ -17,6 +17,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:core": "vitest run src/lib src/db src/emails",
+    "test:integration": "vitest run --mode integration",
     "test:ui": "vitest run src/components src/routes src/hooks",
     "test:scripts": "vitest run scripts/",
     "test:changed": "vitest run --changed",
