@@ -169,7 +169,7 @@ export function ForumFlagControl({
                   maxLength={FORUM_REPORT_NOTE_MAX}
                   rows={3}
                   placeholder={FORUM_REPORT_COPY.notePlaceholder}
-                  className="w-full bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus p-2.5 text-xs text-ink outline-none resize-y rounded-control transition-[border-color,box-shadow] placeholder:text-ink-muted"
+                  className="w-full bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus p-2.5 text-xs text-ink outline-hidden resize-y rounded-control transition-[border-color,box-shadow] placeholder:text-ink-muted"
                   data-testid="forum-flag-note"
                 />
               </label>

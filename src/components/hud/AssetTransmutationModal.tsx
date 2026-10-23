@@ -98,7 +98,7 @@ export const AssetTransmutationModal: React.FC<AssetTransmutationModalProps> = (
               placeholder="e.g. 3-bedroom suburban residence, 2022 EV sedan"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-[#0f1414] border border-[#3a4a49] p-2.5 text-[#dfe3e3] focus:border-[#00ffff] focus:outline-none focus:ring-1 focus:ring-[#00ffff] chamfer-corner"
+              className="w-full bg-[#0f1414] border border-[#3a4a49] p-2.5 text-[#dfe3e3] focus:border-[#00ffff] focus:outline-hidden focus:ring-1 focus:ring-[#00ffff] chamfer-corner"
             />
           </div>
 

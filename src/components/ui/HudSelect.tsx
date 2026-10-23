@@ -48,7 +48,7 @@ export const HudSelect = React.forwardRef<HTMLSelectElement, HudSelectProps>(
             disabled={disabled}
             className={cn(
               'w-full min-h-10 bg-surface-2 text-ink text-sm font-sans rounded-control appearance-none cursor-pointer',
-              'border border-line py-2 pl-3 pr-9 transition-[border-color,box-shadow] duration-200 outline-none hover:border-line-hover',
+              'border border-line py-2 pl-3 pr-9 transition-[border-color,box-shadow] duration-200 outline-hidden hover:border-line-hover',
               'focus:border-cyan-glow focus:shadow-field-focus',
               'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-surface-1',
               error && 'border-crimson-aggro hover:border-crimson-aggro focus:border-crimson-aggro focus:shadow-field-error',

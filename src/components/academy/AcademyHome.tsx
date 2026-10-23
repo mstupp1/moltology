@@ -337,7 +337,7 @@ export function AcademyHome({ data }: { data: AcademyHomePayload }) {
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
                     placeholder="Search by title, code, or instructor"
-                    className="w-full bg-transparent text-sm text-ink placeholder:text-ink-muted outline-none"
+                    className="w-full bg-transparent text-sm text-ink placeholder:text-ink-muted outline-hidden"
                   />
                   {query ? (
                     <button

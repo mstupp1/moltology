@@ -109,7 +109,7 @@ export function NewTopicDialog({
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-none rounded-control transition-colors p-2.5"
+              className="w-full bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-hidden rounded-control transition-colors p-2.5"
             >
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id} className="bg-surface-2 text-ink">
@@ -131,7 +131,7 @@ export function NewTopicDialog({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="What would you like to discuss?"
-              className="w-full bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-none rounded-control transition-colors p-2.5 placeholder:text-ink-muted"
+              className="w-full bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-hidden rounded-control transition-colors p-2.5 placeholder:text-ink-muted"
             />
           </div>
 

@@ -270,7 +270,7 @@ function MemberDirectory({
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            className="w-full min-h-[40px] rounded-control border border-line bg-surface-2 px-3 text-sm text-ink outline-none transition-colors hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus"
+            className="w-full min-h-[40px] rounded-control border border-line bg-surface-2 px-3 text-sm text-ink outline-hidden transition-colors hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus"
             data-testid="admin-member-search"
           />
         </label>
@@ -317,7 +317,7 @@ function MemberDirectory({
                   <label className="text-[11px] text-ink-muted">
                     Clearance
                     <select
-                      className="ml-2 min-h-[36px] rounded-control border border-line bg-surface-2 px-2 text-xs text-ink outline-none transition-colors hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus"
+                      className="ml-2 min-h-[36px] rounded-control border border-line bg-surface-2 px-2 text-xs text-ink outline-hidden transition-colors hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus"
                       value={drafts[member.id] ?? member.role}
                       aria-label={`Clearance for ${memberName(member.handle, member.larvaId)}`}
                       onChange={(event) =>

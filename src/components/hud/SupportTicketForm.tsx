@@ -23,7 +23,7 @@ import {
 } from '@/lib/support-tickets'
 
 const fieldClass =
-  'w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-xs text-[#dfe3e3] p-2.5 outline-none chamfer-corner'
+  'w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-xs text-[#dfe3e3] p-2.5 outline-hidden chamfer-corner'
 
 export default function SupportTicketForm() {
   const session = useAuthSession()

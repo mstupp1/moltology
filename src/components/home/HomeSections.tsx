@@ -198,7 +198,7 @@ const ScreenFrame: React.FC<{ step: HomeStep; onExpand: () => void; children: Re
       type="button"
       onClick={onExpand}
       aria-label={`Expand screenshot: ${step.title}`}
-      className="home-tilt group relative block w-full text-left cursor-zoom-in rounded-panel focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+      className="home-tilt group relative block w-full text-left cursor-zoom-in rounded-panel focus:outline-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
     >
       <div className="relative overflow-hidden rounded-panel border border-line-subtle bg-surface-1 shadow-[0_20px_60px_rgba(0,0,0,0.5)] transition-colors duration-500 group-hover:border-line-strong">
         <div className="flex items-center gap-3 px-3 sm:px-4 h-8 sm:h-9 border-b border-line-subtle bg-surface-2" aria-hidden="true">
@@ -231,7 +231,7 @@ const StepAction: React.FC<{ step: HomeStep; onNavigate: (path: string) => void 
   <button
     type="button"
     onClick={() => onNavigate(step.actionRoute)}
-    className="group/cta mt-5 inline-flex items-center gap-2 font-grotesk font-bold text-sm text-cyan-glow hover:text-ink transition-colors focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control"
+    className="group/cta mt-5 inline-flex items-center gap-2 font-grotesk font-bold text-sm text-cyan-glow hover:text-ink transition-colors focus:outline-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control"
   >
     {step.actionText}
     <ArrowRight className="w-4 h-4 transition-transform group-hover/cta:translate-x-0.5" aria-hidden="true" />
@@ -526,7 +526,7 @@ export const HomeFaq: React.FC = () => (
             key={item.question}
             className="group rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset px-5 sm:px-6 transition-colors hover:border-line open:border-line"
           >
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 sm:py-6 font-grotesk font-bold text-lg sm:text-xl text-ink hover:text-cyan-glow transition-colors [&::-webkit-details-marker]:hidden focus:outline-none focus-visible:text-cyan-glow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 sm:py-6 font-grotesk font-bold text-lg sm:text-xl text-ink hover:text-cyan-glow transition-colors [&::-webkit-details-marker]:hidden focus:outline-hidden focus-visible:text-cyan-glow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control">
               {item.question}
               <Plus
                 className="h-5 w-5 shrink-0 text-cyan-glow transition-transform duration-300 group-open:rotate-45"

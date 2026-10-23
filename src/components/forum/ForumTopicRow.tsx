@@ -76,7 +76,7 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
           <Link
             to="/forum/$categorySlug/$topicSlug"
             params={{ categorySlug, topicSlug: topic.slug }}
-            className="outline-none after:absolute after:inset-0 after:rounded-card focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-cyan-glow"
+            className="outline-hidden after:absolute after:inset-0 after:rounded-card focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-cyan-glow"
           >
             {topic.title}
           </Link>

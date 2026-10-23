@@ -430,7 +430,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
                   }}
                   onBlur={() => void saveNote()}
                   rows={4}
-                  className="w-full rounded-control bg-surface-2 border border-line text-sm text-ink p-3 outline-none placeholder:text-ink-muted hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus"
+                  className="w-full rounded-control bg-surface-2 border border-line text-sm text-ink p-3 outline-hidden placeholder:text-ink-muted hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus"
                   placeholder="Only you can see these. They save when you click away."
                 />
               </section>

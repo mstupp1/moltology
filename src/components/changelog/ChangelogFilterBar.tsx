@@ -124,7 +124,7 @@ export function ChangelogFilterBar({
               placeholder="Search updates or tags..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full pl-8 pr-14 py-1.5 bg-[#030607] border border-cyan-900/60 focus:border-cyan-400 text-gray-100 font-sans text-xs chamfer-corner outline-none placeholder-gray-500 transition-colors"
+              className="w-full pl-8 pr-14 py-1.5 bg-[#030607] border border-cyan-900/60 focus:border-cyan-400 text-gray-100 font-sans text-xs chamfer-corner outline-hidden placeholder-gray-500 transition-colors"
               aria-label="Search changelogs"
             />
             {searchQuery ? (

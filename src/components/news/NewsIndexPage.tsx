@@ -137,7 +137,7 @@ export function NewsIndexPage() {
               placeholder="Search stories"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus rounded-control text-ink text-sm outline-none placeholder:text-ink-muted transition-colors"
+              className="w-full pl-9 pr-3 py-2 bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus rounded-control text-ink text-sm outline-hidden placeholder:text-ink-muted transition-colors"
             />
           </div>
         </div>

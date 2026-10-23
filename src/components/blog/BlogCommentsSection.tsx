@@ -219,7 +219,7 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
                 onChange={(e) => setCommentInput(e.target.value)}
                 placeholder="Log your thoughts or synaptic telemetry..."
                 rows={3}
-                className="w-full bg-surface-2 border border-line hover:border-line-hover rounded-control p-3 font-sans text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:border-cyan-glow focus:shadow-field-focus transition-all resize-y"
+                className="w-full bg-surface-2 border border-line hover:border-line-hover rounded-control p-3 font-sans text-sm text-ink placeholder:text-ink-muted focus:outline-hidden focus:border-cyan-glow focus:shadow-field-focus transition-all resize-y"
               />
             </div>
 

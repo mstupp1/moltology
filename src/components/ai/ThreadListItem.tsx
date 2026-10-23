@@ -110,7 +110,7 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
           }}
           onBlur={commitRename}
           aria-label="Rename chat"
-          className="flex-1 min-w-0 mx-2 my-1 px-2 py-1 rounded-control bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus text-ink text-xs outline-none"
+          className="flex-1 min-w-0 mx-2 my-1 px-2 py-1 rounded-control bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus text-ink text-xs outline-hidden"
         />
       ) : (
         <>
@@ -119,7 +119,7 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
             onClick={onSelect}
             title={thread.title}
             aria-current={isActive ? 'true' : undefined}
-            className={`flex-1 min-w-0 text-left bg-transparent border-none outline-none cursor-pointer select-none focus:outline-none focus:ring-0 active:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
+            className={`flex-1 min-w-0 text-left bg-transparent border-none outline-hidden cursor-pointer select-none focus:outline-hidden focus:ring-0 active:outline-hidden focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
               isComfortable ? 'px-3 py-3' : 'px-2 py-1.5'
             }`}
             style={{ WebkitTapHighlightColor: 'transparent' }}

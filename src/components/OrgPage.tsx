@@ -169,7 +169,7 @@ const tileOn = 'bg-surface-3 shadow-nav-current text-ink'
 const tileOff = 'text-ink-muted hover:text-ink hover:bg-surface-2'
 const fieldLabel = 'block text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted mb-1.5'
 const fieldClass =
-  'w-full min-h-10 bg-surface-2 text-ink placeholder:text-ink-muted/70 text-sm rounded-control border border-line py-2 px-3 transition-[border-color,box-shadow] duration-200 outline-none hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus'
+  'w-full min-h-10 bg-surface-2 text-ink placeholder:text-ink-muted/70 text-sm rounded-control border border-line py-2 px-3 transition-[border-color,box-shadow] duration-200 outline-hidden hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus'
 
 export const OrgPage: React.FC = () => {
   const navigate = useNavigate()

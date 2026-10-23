@@ -198,7 +198,7 @@ export function ConnectionsHubCard() {
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={CONNECTIONS_HUB_SEARCH_PLACEHOLDER}
                 aria-label="Search members"
-                className="w-full pl-8 pr-8 py-2 bg-surface-2 border border-line text-xs text-ink placeholder:text-ink-muted/70 hover:border-line-hover focus:outline-none focus:border-cyan-glow focus:shadow-field-focus transition-[border-color,box-shadow] rounded-control"
+                className="w-full pl-8 pr-8 py-2 bg-surface-2 border border-line text-xs text-ink placeholder:text-ink-muted/70 hover:border-line-hover focus:outline-hidden focus:border-cyan-glow focus:shadow-field-focus transition-[border-color,box-shadow] rounded-control"
               />
               {searching && (
                 <Loader2 className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-cyan-glow animate-spin" />

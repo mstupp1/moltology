@@ -43,7 +43,7 @@ export const HudDropdownMenuItem = React.forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      'flex items-center gap-2 min-h-[34px] px-2.5 text-sm cursor-pointer select-none outline-none',
+      'flex items-center gap-2 min-h-[34px] px-2.5 text-sm cursor-pointer select-none outline-hidden',
       'transition-colors rounded-control border-none',
       'data-[disabled]:pointer-events-none data-[disabled]:opacity-40',
       destructive

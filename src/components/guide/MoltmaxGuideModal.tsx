@@ -185,7 +185,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className={`relative flex flex-col w-full max-h-[92dvh] sm:max-h-[calc(100dvh-3rem)] bg-[#040a15] border border-[#00c3ff]/30 border-b-0 sm:border-b rounded-t-2xl sm:rounded-2xl shadow-[0_0_60px_rgba(0,195,255,0.18)] text-[#dfe3e3] overflow-hidden outline-none guide-panel ${
+        className={`relative flex flex-col w-full max-h-[92dvh] sm:max-h-[calc(100dvh-3rem)] bg-[#040a15] border border-[#00c3ff]/30 border-b-0 sm:border-b rounded-t-2xl sm:rounded-2xl shadow-[0_0_60px_rgba(0,195,255,0.18)] text-[#dfe3e3] overflow-hidden outline-hidden guide-panel ${
           step === 'claim' ? 'sm:max-w-[840px]' : 'sm:max-w-lg'
         }`}
         onClick={(e) => e.stopPropagation()}
@@ -289,7 +289,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                         placeholder="you@example.com"
                         aria-invalid={error ? true : undefined}
                         aria-describedby={error ? 'lead-email-error' : undefined}
-                        className="w-full pl-10 pr-4 py-3 bg-[#020408] border border-white/20 rounded-lg text-white font-sans text-base sm:text-sm placeholder:text-[#839493]/60 focus:outline-none focus:border-[#00c3ff] focus:ring-1 focus:ring-[#00c3ff] transition-all"
+                        className="w-full pl-10 pr-4 py-3 bg-[#020408] border border-white/20 rounded-lg text-white font-sans text-base sm:text-sm placeholder:text-[#839493]/60 focus:outline-hidden focus:border-[#00c3ff] focus:ring-1 focus:ring-[#00c3ff] transition-all"
                       />
                     </div>
                     <button

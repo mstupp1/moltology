@@ -93,7 +93,7 @@ export const RitualGateModal: React.FC<RitualGateModalProps> = ({ isOpen, onClos
                 value={passphrase}
                 onChange={(e) => setPassphrase(e.target.value)}
                 placeholder="FLESH DIES. THE SHELL ENDURES."
-                className="w-full bg-[#0a0f0f] border border-[#3a4a49] focus:border-[#ff0000] text-[#dfe3e3] p-3 font-sans text-xs chamfer-corner outline-none"
+                className="w-full bg-[#0a0f0f] border border-[#3a4a49] focus:border-[#ff0000] text-[#dfe3e3] p-3 font-sans text-xs chamfer-corner outline-hidden"
               />
               {error && (
                 <div className="text-[10px] text-[#ff5540] flex items-center gap-1 mt-1 font-bold">

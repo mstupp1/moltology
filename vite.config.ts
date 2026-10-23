@@ -3,6 +3,7 @@ import { defineConfig, loadEnv, searchForWorkspaceRoot } from 'vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import { nitro } from 'nitro/vite'
 import viteReact from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 import { realpathSync } from 'node:fs'
 import { resolveViteEmailVerificationEnabled, resolveViteGoogleAuthEnabled } from './src/lib/auth-config.ts'
@@ -105,6 +106,7 @@ export default defineConfig(({ mode }) => {
       ],
     },
     plugins: [
+      tailwindcss(),
       ...(isTest
         ? []
         : [

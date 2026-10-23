@@ -47,7 +47,7 @@ export const HudInput = React.forwardRef<HTMLInputElement, HudInputProps>(
             disabled={disabled}
             className={cn(
               'w-full min-h-10 bg-surface-2 text-ink placeholder:text-ink-muted/70 text-sm font-sans rounded-control',
-              'border border-line py-2 px-3 transition-[border-color,box-shadow] duration-200 outline-none hover:border-line-hover',
+              'border border-line py-2 px-3 transition-[border-color,box-shadow] duration-200 outline-hidden hover:border-line-hover',
               'focus:border-cyan-glow focus:shadow-field-focus',
               'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-surface-1',
               startIcon && 'pl-9',

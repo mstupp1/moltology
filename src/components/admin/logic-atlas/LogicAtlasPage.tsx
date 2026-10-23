@@ -289,7 +289,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
               value={search.q ?? ''}
               onChange={(event) => update({ q: event.target.value.slice(0, 80) })}
               placeholder="Search rules, code symbols, and decisions"
-              className="h-10 w-full rounded-control border border-line bg-surface-2 pl-9 pr-9 text-sm text-ink placeholder:text-ink-muted transition-colors hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus focus:outline-none"
+              className="h-10 w-full rounded-control border border-line bg-surface-2 pl-9 pr-9 text-sm text-ink placeholder:text-ink-muted transition-colors hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus focus:outline-hidden"
               data-testid="atlas-search"
             />
             {search.q ? (

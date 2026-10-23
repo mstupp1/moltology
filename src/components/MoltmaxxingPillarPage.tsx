@@ -263,7 +263,7 @@ export const MoltmaxxingPillarPage: React.FC = () => {
                   open={index === 0}
                   className="group rounded-card border border-line-subtle bg-surface-1 hud-sheen px-5 sm:px-6 transition-colors hover:border-line open:border-line"
                 >
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 font-grotesk font-bold text-lg text-ink hover:text-cyan-glow transition-colors [&::-webkit-details-marker]:hidden focus:outline-none focus-visible:text-cyan-glow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 font-grotesk font-bold text-lg text-ink hover:text-cyan-glow transition-colors [&::-webkit-details-marker]:hidden focus:outline-hidden focus-visible:text-cyan-glow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control">
                     {item.question}
                     <Plus className="h-5 w-5 shrink-0 text-cyan-glow transition-transform duration-300 group-open:rotate-45" aria-hidden="true" />
                   </summary>

@@ -164,7 +164,7 @@ export const MoltmaxGuidePage: React.FC = () => {
                       id="guide-email"
                       autoComplete="email"
                       placeholder="you@example.com"
-                      className="w-full px-4 py-3.5 bg-[#020408] border border-white/20 rounded-lg text-white font-sans text-sm placeholder:text-[#839493]/50 focus:outline-none focus:border-[#00c3ff] focus:ring-1 focus:ring-[#00c3ff] transition-all"
+                      className="w-full px-4 py-3.5 bg-[#020408] border border-white/20 rounded-lg text-white font-sans text-sm placeholder:text-[#839493]/50 focus:outline-hidden focus:border-[#00c3ff] focus:ring-1 focus:ring-[#00c3ff] transition-all"
                     />
                     <Lock className="absolute right-3.5 top-4 w-4 h-4 text-[#839493]" />
                   </div>

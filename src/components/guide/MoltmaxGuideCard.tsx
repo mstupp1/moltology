@@ -177,7 +177,7 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter email to claim free copy..."
-                    className="w-full px-4 py-3 bg-surface-2 border border-line rounded-control text-ink font-sans text-sm placeholder:text-ink-muted/70 hover:border-line-hover focus:outline-none focus:border-cyan-glow focus:shadow-field-focus transition-all"
+                    className="w-full px-4 py-3 bg-surface-2 border border-line rounded-control text-ink font-sans text-sm placeholder:text-ink-muted/70 hover:border-line-hover focus:outline-hidden focus:border-cyan-glow focus:shadow-field-focus transition-all"
                   />
                   <Lock className="absolute right-3.5 top-3.5 w-4 h-4 text-ink-muted" />
                 </div>
