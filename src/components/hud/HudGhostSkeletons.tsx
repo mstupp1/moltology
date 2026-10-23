@@ -14,10 +14,7 @@ export function DailyRoutineGhost() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line-subtle pb-3">
         <div className="flex items-center gap-3 min-w-0">
           <HudGhostSkeleton variant="teal" preset="avatar" width={28} height={28} />
-          <div className="space-y-1 min-w-0">
-            <HudGhostSkeleton variant="teal" preset="heading" width={150} height={16} />
-            <HudGhostSkeleton variant="neutral" preset="text" width={180} height={11} />
-          </div>
+          <HudGhostSkeleton variant="teal" preset="heading" width={150} height={16} />
         </div>
         <HudGhostSkeleton variant="teal" preset="badge" width={76} height={20} />
       </div>

@@ -16,8 +16,9 @@ export interface DashboardPanelProps extends Omit<React.HTMLAttributes<HTMLEleme
 }
 
 /**
- * The one card shell every dashboard panel uses: icon, short caps label, a sentence of context,
- * and a single link to the full page in the header. Grows with its content; no fixed heights.
+ * The one card shell every dashboard panel uses: icon, short caps label and a single link to the
+ * full page, on one centered header row. `subtitle` is only for panels outside the dashboard
+ * (the forum rail). Grows with its content; no fixed heights.
  */
 export function DashboardPanel({
   icon,
@@ -37,13 +38,13 @@ export function DashboardPanel({
       )}
       {...props}
     >
-      <header className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-2.5 min-w-0">
-          <span className="mt-0.5 shrink-0 text-cyan-glow [&>svg]:w-4 [&>svg]:h-4" aria-hidden="true">
+      <header className={cn('flex justify-between gap-3', subtitle ? 'items-start' : 'items-center min-h-8')}>
+        <div className={cn('flex gap-2.5 min-w-0', subtitle ? 'items-start' : 'items-center')}>
+          <span className={cn('shrink-0 text-cyan-glow [&>svg]:w-4 [&>svg]:h-4', subtitle && 'mt-0.5')} aria-hidden="true">
             {icon}
           </span>
           <div className="min-w-0">
-            <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase leading-tight">{title}</h2>
+            <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase leading-tight truncate">{title}</h2>
             {subtitle && <p className="text-xs text-ink-muted mt-0.5 leading-relaxed">{subtitle}</p>}
           </div>
         </div>

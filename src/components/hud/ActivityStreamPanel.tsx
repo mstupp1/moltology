@@ -13,7 +13,6 @@ import { DashboardEmptyRow, DashboardPanel } from '@/components/hud/dashboard/Da
 const HUB_STREAM_LIMIT = 5
 
 /** Shorter than the stream page copy, and distinct from the Connections empty state beside it. */
-export const ACTIVITY_HUB_SUBTITLE = 'Pulses from the members you keep close.'
 export const ACTIVITY_HUB_EMPTY_COPY = {
   title: 'No pulses yet',
   body: 'Liturgies, streaks and posts from your circle show up here.',
@@ -72,7 +71,6 @@ export function ActivityStreamPanel() {
     <DashboardPanel
       icon={<Activity />}
       title="Activity stream"
-      subtitle={ACTIVITY_HUB_SUBTITLE}
       action={{ label: 'Open stream', onClick: () => navigate({ to: '/stream' }) }}
       className="h-full"
       data-testid="activity-stream-panel"

@@ -19,7 +19,6 @@ import { DASHBOARD_FOCUS, DashboardEmptyRow, DashboardPanel } from '@/components
 import { cn } from '@/lib/utils'
 
 export const FORUM_HUB_TITLE = 'COMMUNITY'
-export const FORUM_HUB_SUBTITLE = 'Live boards and the latest transmissions.'
 export const FORUM_HUB_CTA = 'Open boards'
 export const FORUM_HUB_EMPTY_COPY = {
   title: 'The boards are quiet',
@@ -181,7 +180,6 @@ export function ForumHubCard() {
     <DashboardPanel
       icon={<MessageSquare />}
       title={FORUM_HUB_TITLE}
-      subtitle={FORUM_HUB_SUBTITLE}
       meta={pulse.unreadCount > 0 ? <ForumUnreadMark label={formatForumUnreadCount(pulse.unreadCount)} /> : null}
       action={{ label: FORUM_HUB_CTA, onClick: () => navigate({ to: '/forum' }) }}
       className="h-full"

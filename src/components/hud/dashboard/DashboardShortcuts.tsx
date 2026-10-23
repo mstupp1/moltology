@@ -27,7 +27,6 @@ export function DashboardShortcuts() {
     <DashboardPanel
       icon={<LayoutGrid />}
       title="Explore"
-      subtitle="The rest of the facility, one step away."
       data-testid="dashboard-shortcuts"
     >
       <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-6 gap-2">
