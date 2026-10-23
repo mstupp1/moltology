@@ -1,6 +1,6 @@
 {
   "note": "Written by `npm run merch -- sync`. Maps merch variant ids to Printful sync variant ids.",
-  "syncedAt": "2026-10-20T00:48:38.453Z",
+  "syncedAt": "2026-10-23T01:08:23.040Z",
   "products": {
     "synaptic-mark-mug": {
       "syncProductId": 483237197,
@@ -17,6 +17,14 @@
     "moltology-tee": {
       "syncProductId": 483250892,
       "syncedAt": "2026-10-20T00:48:38.453Z"
+    },
+    "moltology-hat": {
+      "syncProductId": 484236285,
+      "syncedAt": "2026-10-23T01:08:21.733Z"
+    },
+    "moltology-desk-mat": {
+      "syncProductId": 484236287,
+      "syncedAt": "2026-10-23T01:08:23.040Z"
     }
   },
   "variants": {
@@ -75,6 +83,14 @@
     "22222222-2222-4222-8222-001100000005": {
       "syncVariantId": 5583914516,
       "catalogVariantId": 4020
+    },
+    "22222222-2222-4222-8222-001200000001": {
+      "syncVariantId": 5589970362,
+      "catalogVariantId": 7854
+    },
+    "22222222-2222-4222-8222-001300000001": {
+      "syncVariantId": 5589970370,
+      "catalogVariantId": 22327
     }
   },
   "storeId": 18931450

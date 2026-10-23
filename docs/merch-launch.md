@@ -1,5 +1,23 @@
 # Store launch preparation
 
+## Hat and desk mat private additions — October 22, 2026
+
+Added `moltology-hat` (black adjustable Yupoong 6245CM, $30 draft retail) and
+`moltology-desk-mat` (16″ × 32″ Printful Desk Mat, $36 draft retail). Both are
+synced to the existing Manual/API store and seeded only into verified dev.
+Production catalog and launch settings were not changed.
+
+The hat uses the original red emblem as flat embroidery with red thread on the
+live `embroidery_front_large` template. The desk mat combines a dark contour SVG
+with the original emblem and outlined wordmark. Exact print templates, official
+Printful photos, separate transparent dashboard cutouts, processed provider files,
+dev read-back and a live US shipping quote were verified. Physical samples remain
+unreviewed. See [the run ledger](../content/merch/hat-desk-mat-2026-10-22.json).
+
+Select this pair with `--only moltology-hat,moltology-desk-mat`; `--pilot` continues
+to select the original approved mug and tee. Production publication is a separate
+authorized release; the current `promote` command is limited to the mug and tee.
+
 The native store (`/store`) is private behind the admin-only `new-store` experiment until **Public
 browsing** is on in Store settings and `STORE_PUBLIC_LAUNCH_AUTHORIZED=true` is set. Ordering,
 indexing, live charges and automatic production are each gated separately. While the store is

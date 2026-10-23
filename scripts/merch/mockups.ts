@@ -34,6 +34,7 @@ export async function generatePrintfulMockups(client: PrintfulClient, products: 
           variant_ids: variants.map(variant => variantTemplate(product, variant, blanks.variants, info).blank.id),
           format: 'jpg', width: 1600,
           option_groups: [product.category === 'Mugs' ? 'Default' : 'Flat'],
+          ...(product.printful.options ? { product_options: Object.fromEntries(product.printful.options.map(option => [option.id, option.value])) } : {}),
           files: [{ placement: product.printful.placement, image_url: getAbsoluteAssetUrl(`${MERCH_PRINT_PREFIX}/${designKey}.png`),
             position: { area_width: template.template.width, area_height: template.template.height,
               width: template.template.width, height: template.template.height, top: 0, left: 0 } }],

@@ -10,7 +10,7 @@
 import printfulSync from '../../content/merch/printful-sync.json'
 import { MERCH_PRODUCT_GALLERIES } from './merch-gallery'
 
-export type MerchPrintPlacement = 'default' | 'front'
+export type MerchPrintPlacement = 'default' | 'front' | 'embroidery_front_large'
 
 export interface MerchSeedVariant {
   id: string
@@ -40,6 +40,7 @@ export interface MerchSeedProduct {
     /** Printful catalog product id (blank product). */
     catalogProductId: number
     placement: MerchPrintPlacement
+    options?: Array<{ id: string; value: string | string[] }>
   }
   variants: MerchSeedVariant[]
 }
@@ -52,6 +53,10 @@ export const MERCH_PRINT_PREFIX = 'merch/print'
 
 /** Printful catalog ids for the blanks. Verify with `npm run merch -- blanks`. */
 export const PRINTFUL_BLANKS = {
+  /** Classic cotton dad hat, adjustable. */
+  hat: 206,
+  /** Polyester desk mat with natural rubber backing. */
+  deskMat: 853,
   /** White glossy mug, 11 oz and 15 oz. */
   mug: 19,
   /** Bella + Canvas 3001 unisex tee. */
@@ -267,6 +272,29 @@ const BASE_CATALOG: MerchSeedProduct[] = [
     description: 'The circuit claw printed large on black. For days when you intend to finish the thing.',
     designs: { Black: 'tee-circuit-claw' },
   }),
+  {
+    id: uuid(12, 0), title: 'Moltology Hat', slug: 'moltology-hat',
+    description: 'A black cotton dad hat with the red emblem embroidered on the front. Curved visor and an adjustable buckle strap.',
+    category: 'Hats', featuredImageUrl: image('moltology-hat-v1-black'),
+    galleryImageUrls: [image('moltology-hat-v1-black')],
+    basePriceCents: 3000, isPublished: true, sortOrder: 12,
+    printful: { catalogProductId: PRINTFUL_BLANKS.hat, placement: 'embroidery_front_large', options: [
+      { id: 'embroidery_type', value: 'flat' },
+      { id: 'thread_colors_front_large', value: ['#CC3333'] },
+    ] },
+    variants: [{ id: uuid(12, 1), title: 'Black / One size', size: 'One size', color: 'Black', colorHex: '#0c0c0e',
+      priceCents: 3000, imageUrl: image('moltology-hat-v1-black'), printfulSyncVariantId: placeholderSyncId(12, 1), design: 'hat-moltology-v1' }],
+  },
+  {
+    id: uuid(13, 0), title: 'Moltology Desk Mat', slug: 'moltology-desk-mat',
+    description: 'A dark desk mat with quiet depth contours and the Moltology mark in one corner. Room for your keyboard, mouse, and the work ahead.',
+    category: 'Desk mats', featuredImageUrl: image('moltology-desk-mat-v1'),
+    galleryImageUrls: [image('moltology-desk-mat-v1')],
+    basePriceCents: 3600, isPublished: true, sortOrder: 13,
+    printful: { catalogProductId: PRINTFUL_BLANKS.deskMat, placement: 'default' },
+    variants: [{ id: uuid(13, 1), title: 'Black / 16″×32″', size: '16″×32″', color: 'Black', colorHex: '#0b1114',
+      priceCents: 3600, imageUrl: image('moltology-desk-mat-v1'), printfulSyncVariantId: placeholderSyncId(13, 1), design: 'desk-mat-moltology-v1' }],
+  },
 ]
 
 interface PrintfulSyncRecord {
