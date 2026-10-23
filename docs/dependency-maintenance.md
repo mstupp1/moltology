@@ -3,7 +3,8 @@
 Stage 1 was rebased on main at `2ada726` (2026-10-23). That merge already
 included Vite 7.3.7, follow-redirects 1.16.1, Better Auth 1.7.12,
 the TanStack Start `~1.168.61` range, and Node 22 in CI. Keep those fixes.
-Stripe remains locked at 22.4.0 with API version `2026-07-29.dahlia`.
+Stripe was held at 22.4.0 with API version `2026-07-29.dahlia` at that baseline;
+Stage 6 upgrades it to 23.0.1 and `2026-09-30.endive`.
 
 ## Test commands
 
@@ -44,7 +45,7 @@ transitive versions just to clear the audit.
 
 ## Deferred migrations
 
-Remaining work is the separate Stripe API/webhook review. Four moderate Drizzle
+The planned dependency migrations are complete. Four moderate Drizzle
 Kit tooling findings remain without a compatible stable upstream fix. Do not
 downgrade Drizzle Kit or force incompatible transitive overrides. Use current
 registry metadata and version-specific docs at each stage.
@@ -197,3 +198,48 @@ desktop has small text/CTA spacing differences, with the overall design intact.
 Dashboard preview widgets remained in loading states in both versions, so those
 captures are not treated as visual verification. No deployment was performed.
 The legacy default styling is deliberately not reproduced pixel for pixel.
+
+## Stage 6: Stripe 23 (2026-10-23)
+
+Upgraded Stripe 22.4.0 → 23.0.1 and outgoing API requests from
+`2026-07-29.dahlia` to `2026-09-30.endive`, matching the SDK's generated types.
+The SDK is pinned exactly so dependency resolution cannot silently change the
+typed API contract. `src/lib/stripe-config.ts` centralizes the explicit version
+for Premium, store checkout, merch recovery, webhook verification and the merch
+doctor. Existing timeouts and retry limits are retained. No type suppression or
+historical-version cast is used.
+
+Reviewed the [Stripe 23 changelog](https://github.com/stripe/stripe-node/blob/v23.0.1/CHANGELOG.md).
+Node >=20 is satisfied by the project's Node 24 runtime. The removed V2 list
+fields, top-level unverified-event helper, error-type export, address types and
+Checkout `payment_method_types` request field are not used here. Existing invoice
+parent/subscription metadata, subscription-item period ends, collected shipping,
+discount totals and refund handlers remain compatible with the consumed fields.
+Checkout still uses account payment-method settings; physical goods continue to
+explicitly disable Managed Payments. No account defaults or hosted webhook
+endpoint versions were changed. Endpoint payload versions are independent of
+the outgoing request version; signed Dahlia and Endive fixtures both verify.
+
+Verification passed:
+
+- Typecheck; 153 core test files / 1,241 tests; 44 script test files / 330 tests.
+- Real SDK HTTP serialization tests cover the explicit API header and Premium
+  metadata, merch amounts, shipping and Managed Payments parameters. Webhook tests
+  cover both API versions and reject stale, tampered and incorrectly signed data.
+- Stripe sandbox API: created an isolated recurring price, created/retrieved
+  Premium checkout, and created physical-goods checkout with a verified total and
+  shipping. Expired both unpaid sessions and confirmed fixture products/prices
+  inactive. The inline fixtures rejected archive updates; follow-up reads confirmed
+  they were already inactive after session expiration.
+- Audit remains four moderate Drizzle-tooling findings, zero high or critical.
+
+The local configured Premium price ID is absent under the available test key, so
+sandbox verification used isolated fixtures instead of changing `.env`. That
+sandbox account requires an eligible product tax code for its default Managed
+Payments setting; the temporary digital fixture used documented SaaS tax code
+`txcd_10103000`. No real product tax classification was changed. There is no local
+webhook secret or hosted webhook endpoint in this sandbox, so hosted delivery and
+end-to-end membership synchronization were not verified. No checkout was completed,
+payment collected, application database written, Printful fulfillment triggered,
+production configuration changed, or deployment performed. No full suite or build
+was run for this scoped SDK/API change (Tier 2 verification).

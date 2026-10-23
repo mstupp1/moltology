@@ -1,4 +1,5 @@
 import Stripe from 'stripe'
+import { STRIPE_API_VERSION } from './stripe-config'
 
 export interface StripeWebhookVerifier {
   webhooks: {
@@ -28,6 +29,6 @@ export function verifyStripeWebhookSignature(
 /** Instance used only to verify signatures. The key is never sent to Stripe. */
 export function createStripeWebhookVerifier(): StripeWebhookVerifier {
   return new Stripe('webhook_verifier_not_a_key', {
-    apiVersion: '2026-07-29.dahlia',
+    apiVersion: STRIPE_API_VERSION,
   })
 }

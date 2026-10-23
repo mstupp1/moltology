@@ -1,5 +1,6 @@
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto'
 import Stripe from 'stripe'
+import { STRIPE_API_VERSION } from '../stripe-config'
 import { and, eq, inArray, isNull, lt, or, sql } from 'drizzle-orm'
 import { getDb } from '../../db'
 import { merchOrders, merchProducts, merchVariants, storeSettings, storeOverrides, storeQuotes, storeRateLimits } from '../../db/schema'
@@ -14,7 +15,7 @@ import sync from '../../../content/merch/printful-sync.json'
 export type StoreArgs = { data?: { token?: string; userId?: string }; context?: WriteAuthContext & { clientIp?: string | null } | null }
 export function storeStripe() {
   if (!process.env.STRIPE_SECRET_KEY) throw new Error('Store payment is not configured.')
-  return new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2026-07-29.dahlia', timeout: 10_000, maxNetworkRetries: 0 })
+  return new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: STRIPE_API_VERSION, timeout: 10_000, maxNetworkRetries: 0 })
 }
 export async function readStoreSettings(): Promise<StoreSettings> {
   const [row] = await getDb().select().from(storeSettings).where(eq(storeSettings.id, 'main')).limit(1)

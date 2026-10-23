@@ -19,15 +19,28 @@ describe('stripe webhook signature', () => {
     data: { object: { id: 'cs_test' } },
   })
 
-  it('accepts a payload signed with the webhook secret', () => {
-    const event = verifyStripeWebhookSignature(
-      createStripeWebhookVerifier(),
-      payload,
-      signedPayload(payload),
-      SECRET,
-    )
-    expect(event.id).toBe('evt_premium_test')
-    expect(event.type).toBe('checkout.session.completed')
+  it.each(['2026-07-29.dahlia', '2026-09-30.endive'])(
+    'accepts a signed payload from an endpoint using %s',
+    (apiVersion) => {
+      const versionedPayload = JSON.stringify({ ...JSON.parse(payload), api_version: apiVersion })
+      const event = verifyStripeWebhookSignature(
+        createStripeWebhookVerifier(),
+        versionedPayload,
+        signedPayload(versionedPayload),
+        SECRET,
+      )
+      expect(event.id).toBe('evt_premium_test')
+      expect(event.type).toBe('checkout.session.completed')
+      expect(event.api_version).toBe(apiVersion)
+    },
+  )
+
+  it('rejects a valid signature older than the default replay tolerance', () => {
+    const header = Stripe.webhooks.generateTestHeaderString({
+      payload, secret: SECRET, timestamp: Math.floor(Date.now() / 1000) - 600,
+    })
+    expect(() => verifyStripeWebhookSignature(createStripeWebhookVerifier(), payload, header, SECRET))
+      .toThrow(/Timestamp outside the tolerance zone/)
   })
 
   it('rejects a missing signature, a wrong secret, and a tampered payload', () => {

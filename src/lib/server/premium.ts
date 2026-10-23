@@ -1,4 +1,5 @@
 import Stripe from 'stripe'
+import { STRIPE_API_VERSION } from '../stripe-config'
 import { eq } from 'drizzle-orm'
 import { getDb } from '../../db'
 import { authUser, profiles } from '../../db/schema'
@@ -43,7 +44,7 @@ class PremiumEventUnmatchedError extends Error {
 
 function createStripeClient(secretKey: string) {
   return new Stripe(secretKey, {
-    apiVersion: '2026-07-29.dahlia',
+    apiVersion: STRIPE_API_VERSION,
   })
 }
 
@@ -176,7 +177,7 @@ export async function createPremiumCheckoutHandler(args: HandlerArgs): Promise<{
     const origin = resolvePremiumReturnOrigin(process.env.BETTER_AUTH_URL)
     const session = await stripe.checkout.sessions.create(
       buildPremiumCheckoutSessionParams({
-        priceId: config.priceId!, // STRIPE_PREMIUM_PRICE_ID (sandbox: price_1UIfEjQ7tNSavLB7C4N9velE)
+        priceId: config.priceId!,
         userId: auth.userId,
         customerId: profile.stripeCustomerId,
         customerEmail: profile.stripeCustomerId ? null : await memberEmail(auth.dbClient, auth.userId),
