@@ -11,7 +11,7 @@ description: >-
 
 Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
 
-Read `BRAND_BIBLE.md`, `STYLE_GUIDE.md`, [the Instagram content strategy](../../../content/social/instagram-content-strategy.md), and `content/social/instagram-post-history.json` before drafting. The October 9, 2026 opening, CTA, experiment and built-in ImageGen defaults supersede older Google Flow and Antigravity image instructions. Resume pending drafts rather than duplicating them.
+Read `BRAND_BIBLE.md`, `STYLE_GUIDE.md`, [the Instagram content strategy](../../../content/social/instagram-content-strategy.md), and `content/social/instagram-post-history.json` before drafting. The October 9, 2026 opening, CTA, experiment and built-in ImageGen defaults supersede older Google Flow and Antigravity image instructions. Resume pending drafts rather than duplicating them. Write with the [writing playbook](../../../content/writing-playbook.md): set a loudness (usually 2–3), pitch three concepts, and run its boredom check before any artwork. Meme-style or loud decks belong in [Benthic Swipe Lab](../benthic-swipe-lab/SKILL.md) and its format library.
 
 ## Channel and production setup
 

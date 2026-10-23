@@ -11,7 +11,7 @@ description: >-
 
 Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
 
-Create a finished single-image Moltology post, with reviewed copy, full-frame artwork, and a verified queue or publication result. Read `BRAND_BIBLE.md`, `STYLE_GUIDE.md`, [the Instagram content strategy](../../../content/social/instagram-content-strategy.md), and the continuity ledger at `content/social/instagram-post-history.json` before choosing a campaign. Resume a pending draft rather than duplicating it. The October 9, 2026 strategy and built-in ImageGen defaults supersede legacy campaign and Antigravity image instructions.
+Create a finished single-image Moltology post, with reviewed copy, full-frame artwork, and a verified queue or publication result. Read `BRAND_BIBLE.md`, `STYLE_GUIDE.md`, [the Instagram content strategy](../../../content/social/instagram-content-strategy.md), and the continuity ledger at `content/social/instagram-post-history.json` before choosing a campaign. Resume a pending draft rather than duplicating it. Write with the [writing playbook](../../../content/writing-playbook.md): set a loudness (usually 2–3), pitch three lines or concepts, and run its boredom check before any artwork. The October 9, 2026 strategy and built-in ImageGen defaults supersede legacy campaign and Antigravity image instructions.
 
 ## Campaign and publishing setup
 

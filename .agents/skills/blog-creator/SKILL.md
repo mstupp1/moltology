@@ -197,6 +197,7 @@ The sections follow the argument, not a fixed template. Most dispatches land in 
 Re-read the full draft and fix every failure. Record in the brief that the pass ran.
 
 - [ ] The title follows §2, and neither the title nor its opening matches the last 10 titles.
+- [ ] The title and first paragraph pass the [writing playbook](../../../content/writing-playbook.md) boredom check at loudness 2: a concrete opening and at least one line worth quoting.
 - [ ] A reader can state the thesis after the first three paragraphs.
 - [ ] The proving detail is explained well enough that a non-specialist could retell it.
 - [ ] Every paragraph passes the swap test.

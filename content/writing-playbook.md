@@ -129,7 +129,7 @@ Add a line here when a phrase starts repeating across pieces.
 | [Benthic Swipe Lab](../.agents/skills/benthic-swipe-lab/SKILL.md) | [Format library](../.agents/skills/benthic-swipe-lab/references/format-library.md) | 3–4 | One save, share or comment-question ask |
 | [Carousels](../.agents/skills/instagram-carousel-creator/SKILL.md) and [posts](../.agents/skills/instagram-post-creator/SKILL.md) | Swipe Lab library where it fits | 2–3 | Per STYLE_GUIDE §4.3 |
 | [Blog](../.agents/skills/blog-creator/SKILL.md) | Thesis-first dispatch | 2 | Optional, specific invitation |
-| [YouTube long-form](../.agents/skills/youtube-research/youtube-channel-plan.md) | Cited explainer | 2 | Per the channel plan |
+| [YouTube long-form](../.agents/skills/youtube-research/SKILL.md) | Validated outlier format | 2 | Per the channel plan |
 
 Where a skill and this playbook differ on length, format or CTA, the skill wins. On voice,
 bans and formatting, STYLE_GUIDE wins.
