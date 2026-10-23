@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { INITIAL_BLOG_POSTS } from '../../lib/blog-data'
 
 // Mock TanStack Router
@@ -55,13 +55,12 @@ describe('NewsPostDetail ($slug.tsx) Route Component', () => {
     mockUseLoaderData.mockReturnValue(post)
     render(<NewsPostDetail />)
 
-    expect(
-      await screen.findByRole('heading', { level: 1, name: 'The 2026 Moltmaxxing Protocol' }, { timeout: 5000 })
-    ).toBeInTheDocument()
+    const headline = await screen.findByRole('heading', { level: 1, name: 'The 2026 Moltmaxxing Protocol' }, { timeout: 5000 })
+    expect(headline).toBeInTheDocument()
     expect(screen.getByText('Why Elite AI Operators Are Shedding Biological Constraints')).toBeInTheDocument()
-    expect(screen.getByText(post.authorName)).toBeInTheDocument()
-    expect(screen.getByText('SHARE')).toBeInTheDocument()
-    expect(screen.getByText('BEGIN YOUR BIO-SILICON TRANSMUTATION')).toBeInTheDocument()
-    expect(screen.getByText('RELATED BENTHIC INTELLIGENCE')).toBeInTheDocument()
+    expect(within(headline.closest('header')!).getByText(post.authorName)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^share$/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /begin your bio-silicon transmutation/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /related benthic intelligence/i })).toBeInTheDocument()
   })
 })

@@ -5,7 +5,7 @@ import { nitro } from 'nitro/vite'
 import viteReact from '@vitejs/plugin-react'
 import path from 'path'
 import { realpathSync } from 'node:fs'
-import { resolveViteEmailVerificationEnabled, resolveViteGoogleAuthEnabled } from './src/lib/auth-config'
+import { resolveViteEmailVerificationEnabled, resolveViteGoogleAuthEnabled } from './src/lib/auth-config.ts'
 
 const isTest = Boolean(process.env.VITEST)
 
@@ -56,22 +56,22 @@ export default defineConfig(({ mode }) => {
         }),
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, './src'),
+        '@': path.resolve(import.meta.dirname, './src'),
       },
     },
     build: {
       sourcemap: true,
-      rollupOptions: {
+      rolldownOptions: {
         output: {
-          manualChunks(id) {
-            if (
-              id.includes('node_modules/@neondatabase/') ||
-              id.includes('node_modules/better-auth') ||
-              id.includes('node_modules/@better-auth/') ||
-              id.includes('node_modules/@supabase/auth-js')
-            ) {
-              return 'auth-vendor'
-            }
+          codeSplitting: {
+            groups: [{
+              name: 'auth-vendor',
+              test: (id: string) =>
+                id.includes('node_modules/@neondatabase/') ||
+                id.includes('node_modules/better-auth') ||
+                id.includes('node_modules/@better-auth/') ||
+                id.includes('node_modules/@supabase/auth-js'),
+            }],
           },
         },
       },

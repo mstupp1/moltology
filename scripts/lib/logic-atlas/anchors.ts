@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
-import ts from 'typescript'
+// TypeScript 7 no longer exports the classic AST API used by this resolver.
+import ts from 'typescript-parser'
 
 export interface ResolvedAnchor {
   line: number
