@@ -1,0 +1,29 @@
+{
+  "title": "It survived three Mondays",
+  "topic": "A vague task that never gets started",
+  "format": "roast-list",
+  "loudness": 3,
+  "pitchScores": [
+    { "format": "roast-list", "hook": "\"Work on report\" has been on your list since September.", "stop": 4, "laugh": 4, "pull": 4, "keep": 4, "fresh": 4, "winner": true },
+    { "format": "nature-documentary", "hook": "Here we observe the human, moving one task to tomorrow.", "stop": 4, "laugh": 4, "pull": 3, "keep": 4, "fresh": 3 },
+    { "format": "rating-your-excuses", "hook": "Rating your excuses for not starting.", "stop": 3, "laugh": 3, "pull": 4, "keep": 3, "fresh": 4 }
+  ],
+  "hookHeadline": "\"Work on report\" has been on your list since September.",
+  "narrationScript": "\"Work on report\" has been on your list since September. It survived three Mondays. It survived a new notebook. It survived you colour-coding the list instead of doing the list. It will outlive us all, unless it gets a first step. \"Open the draft. Type one heading.\" That one's gone by lunch. Try the audit at moltology.org.",
+  "scenePrompts": [
+    "Close-up of a hand dragging a sticky note reading only a scribble from one calendar week to the next, the note already curling with age, warm amber desk lamp, deep teal shadows, the motion already underway in the first frame",
+    "The same sticky note on a wall calendar as three Monday squares flip past behind it, the note unmoved and faintly smug, slow push-in",
+    "A brand-new notebook is opened with ceremony; the old sticky note is transferred onto its first page, unchanged",
+    "Overhead shot of a to-do list being colour-coded with four highlighters while the curled note sits untouched in the middle",
+    "The friendly cartoon lobster engineer peels the note off the page, crosses out the scribble and writes two short lines in its place",
+    "The lobster opens a laptop, types a single heading into a blank document and leans back as the old note drops into a bin, cool ocean light rising"
+  ],
+  "caption": "\"Work on report\" has been on your list since September.\n\nIt has survived three Mondays and a new notebook. Give it a first step you can actually do: open the draft and type one heading.\n\nTry the audit at moltology.org.",
+  "hashtags": ["#Moltology", "#Focus", "#DeepWork"],
+  "firstComment": "Try the audit: https://moltology.org/quiz",
+  "youtubeTitle": "It survived three Mondays",
+  "youtubeDescription": "A vague task survives forever. A first step doesn't. Try the audit: https://moltology.org/quiz",
+  "youtubeTags": ["focus", "procrastination", "to-do list"],
+  "characterArc": "Lobster Engineer rewrites a vague task as one visible first step",
+  "ctaGoal": "quiz"
+}
