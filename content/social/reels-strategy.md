@@ -1,6 +1,6 @@
 # Instagram Reels strategy
 
-Updated October 15, 2026. Applies to daily Reels and episodic series, including their
+Updated October 22, 2026. Applies to daily Reels and episodic series, including their
 YouTube Shorts copies. Read with [STYLE_GUIDE.md](../../STYLE_GUIDE.md),
 [the daily skill](../../.agents/skills/reels-and-shorts-creator/SKILL.md) and
 [the series skill](../../.agents/skills/viral-reel-series-creator/SKILL.md).
@@ -28,7 +28,8 @@ at a time after establishing this baseline.
 
 At 0:00–0:01, something physical is already happening and one blunt claim is visible.
 No thesis, logo intro, slow establishing shot or lore explanation before the action.
-The visual and claim must tell the same story, even with sound off.
+The visual and claim must tell the same story, even with sound off. Speak the exact
+on-screen claim as the first sentence of the narration, with no preamble.
 
 | Opening action | On-screen claim |
 | --- | --- |
@@ -36,10 +37,19 @@ The visual and claim must tell the same story, even with sound off.
 | A hand turns over a buzzing phone beside an unfinished page. | Every ping takes a bite. |
 | A lobster closes a hatch on a pile of meeting invites. | One task needs a closed door. |
 
-Use sentence case and fewer than 14 words. The claim is one readable overlay;
-2–3-word kinetic subtitles still handle narration. Add exact typography in the edit,
-keep it clear of subtitles and platform controls, and inspect the exported first
-second. A `hookHeadline` field or a text instruction to a video model does not prove
+Use sentence case and fewer than 14 words. During the spoken hook, the large
+animated headline is the only caption. Use voice-synced phrase emphasis, quick eased
+movement or a small scale settle while keeping it readable from frame zero. At the
+first body word, clear the headline and resume regular 2–3-word subtitles on their
+original timestamps; no duplicate hook subtitles or missing body words.
+
+Design the entire animated headline inside the house starting safe box x=120–900,
+y=460–900 on a 1080×1920 frame, including animated extremes and outlines. Reframe
+the artwork to make room there. Check phone-size full-frame, centered 4:5 and square
+crops, plus another platform preview crop when available; the house box is not a
+guarantee of platform UI behavior. Inspect frame zero, mid-hook, last hook word and
+the first body phrase before queueing. Follow the measured timing and editing
+checks in the [daily reel skill](../../.agents/skills/reels-and-shorts-creator/SKILL.md). A `hookHeadline` field or a text instruction to a video model does not prove
 the claim appears on screen.
 
 Act 1 shows surface friction: hook, consequence, frustration. Act 2 shows the useful
@@ -47,6 +57,17 @@ molt: a change in approach, one demonstrated action, one invitation. Keep those
 functions while changing the wording, imagery and selected experiment variable.
 An aphorism earns its place by explaining the demonstrated action; it cannot replace
 the opening scene or practical payoff.
+
+## Write the seasonal connection into the script
+
+Choose the calendar anchor and intensity for the intended slot before drafting.
+For a seasonal reel, make the situation, a spoken line and the useful example/payoff
+carry the same idea as the artwork. The voiceover alone should make the seasonal
+treatment understandable. Spooky shadows over a generic phone-interruption script
+do not establish that connection. If the connection feels forced, choose evergreen
+copy and imagery. Keep the calendar’s proximity bands; stronger holiday imagery
+needs a correspondingly clear story. Record the script connection in the brief
+and recheck it if the slot changes.
 
 ## Invite viewers to continue on Moltology
 
@@ -68,8 +89,9 @@ text, amber (#f59e0b) spoken-word highlight, dark outline and soft shadow. No ne
 glow, active-word box or bouncing text. Keep identical font weight and positions
 as the highlight moves. Preserve narration words, punctuation, timing, 2–3-word
 phrases and outro cutoff. At 1080×1920, start at 64px, fit within 820px and center
-around y=1180. Hide narration subtitles on the very first rendered frame only;
-keep word timestamps and audio unchanged. The opening headline remains visible.
+around y=1180. Hide regular subtitles throughout the spoken hook, then resume at
+the first body word after clearing the large headline. Split phrases at that
+boundary and keep all word timestamps and audio unchanged.
 Keep the opening headline and platform controls clear. Inspect
 phone-size samples on bright and dark footage before queueing.
 
