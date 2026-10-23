@@ -35,7 +35,7 @@ Needs `YOUTUBE_API_KEY`, or `GEMINI_API_KEY` with the YouTube Data API v3 enable
 
 ## Turning results into ideas
 
-For each idea, record the outlier(s) it maps to, the validated format, the outcome and the molting mechanism it pairs, and the title in our words. Present the top 10 to Myles and let him pick. Adapt formats to our audience's psychographics; don't copy entertainment-creator titles.
+For each idea, record the outlier(s) it maps to, the validated format, the outcome and the molting mechanism it pairs, and the title in our words. Present the top 10 to Myles and let him pick. Adapt formats to our audience's psychographics; don't copy entertainment-creator titles. When an idea moves to scripting, the title and first 30 seconds follow the [writing playbook](../../../content/writing-playbook.md) hooks at loudness 2, and the script passes its boredom check.
 
 ## Links in video copy
 

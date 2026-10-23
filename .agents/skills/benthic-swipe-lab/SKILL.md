@@ -16,7 +16,7 @@ Before starting, read and follow [content worktree hygiene](../../../docs/conten
 
 Swipe Lab exists to make posts people swipe through, send to a friend, and save. Take a format the reader already knows from their feed, fill it with a specific, slightly ridiculous observation about modern work and attention, and leave them one thing worth keeping. Loud on the image, clean in the caption, kind underneath.
 
-A polite, pretty, forgettable deck is a failed run, even if every rule below is followed. When in doubt, pick the funnier concept and make the cover louder.
+A polite, pretty, forgettable deck is a failed run, even if every rule below is followed. Sections 1–3 and 6 are the carousel versions of the shared [writing playbook](../../../content/writing-playbook.md); where they differ, this skill wins for carousels, and new cut-list phrases go in the playbook. When in doubt, pick the funnier concept and make the cover louder.
 
 Complete the workflow through ingestion and Zernio queueing after inspecting the finished artwork. A request to run this skill includes queueing by default; stop at a draft only when the user requests draft-only, preview-only, or no queueing. Immediate publication still requires an explicit request.
 

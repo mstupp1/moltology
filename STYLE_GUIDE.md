@@ -3,7 +3,7 @@
 How to write every human-facing string: product UI, HUD readouts, news, changelogs, social,
 forum, and onboarding. Terms, voices, and the economy live in
 [BRAND_BIBLE.md](BRAND_BIBLE.md). This guide wins on voice, bans, and formatting.
-_Last Revised: 2026-10-09_
+_Last Revised: 2026-10-23_
 
 ---
 
@@ -22,6 +22,11 @@ Three registers, most to least common:
 - **Dry understatement.** The rare laugh. One quiet aside that lands because everything
   around it was serious.
 
+Social content (reels, carousels, posts) runs louder: a clear comic premise, absurd
+specifics and a light roast of the habit, still deadpan and in the world. The
+[writing playbook](content/writing-playbook.md) sets the loudness per channel and holds
+the hooks, the pitch-three step, the boredom check and the cut list.
+
 ### 1.1 Rules of the voice
 
 1. **The joke is the premise, not the punchline.** Commit fully. Never step outside the
@@ -35,8 +40,9 @@ Three registers, most to least common:
    a toast, a hook), and let the sentence explain each one. Long pieces still introduce
    terms one at a time. One crustacean metaphor per sentence.
 6. **Kindness is the constraint.** The target is always the melt (the exhaustion, the
-   clutter, the hesitation), never a person. If a line could sting a struggling member even
-   once, soften it. Invite; never lecture or shame.
+   clutter, the hesitation), never a person. Light roasting of a habit is fine ("your 47
+   tabs are a cry for help"); bodies, health, money and jobs are off limits. If a line
+   could sting a struggling member even once, soften it. Invite; never lecture or shame.
 7. **Not everything needs to be funny.** Encouragement and diagnostics can be plain and
    warm.
 8. **Narrative stays in the world; utility copy is plain English.** Errors, form
@@ -257,21 +263,23 @@ zooming out.
 
 ### 4.7 Reels and Shorts (9:16)
 
-- About 50 to 65 words across six concrete beats, 25 to 30 seconds with the outro.
-- Keep two acts: recognizable surface friction, then a useful molt. The six beats are
-  functions, not a script to repeat word for word.
+- About 50 to 65 words across six scenes, 25 to 30 seconds with the outro.
+- Each reel uses a known video format (nature documentary, POV, roast list and others in
+  the [reel format library](.agents/skills/reels-and-shorts-creator/references/reel-formats.md)).
+  The format sets the shape; the useful action is held back as the payoff.
 - First second: a physical action already happening plus one blunt on-screen claim in
-  sentence case, under 14 words. Open on the scene; let the explanation follow.
+  sentence case, under 14 words, spoken as the first sentence. Open on the scene.
 - Voiceover stays in the world all the way through, including the last three seconds.
 - Kinetic captions are two or three words and break at sentence boundaries.
-- End with one specific share or save ask after delivering the useful action. No keyword
-  comment requests or DM promises in narration, caption, first comment or outro.
-- Outro card: one clearly lit mascot and the same share/save ask. A URL can be secondary;
-  resource links belong in the first comment. This overrides the general caption CTA
+- End with one website invitation that matches its destination ("Try the audit at
+  moltology.org"). No save or share ask, keyword comment request or DM promise in
+  narration, caption, first comment or outro.
+- Outro card: one clearly lit mascot, the same website invitation and the short domain;
+  the full resource URL goes in the first comment. This overrides the general caption CTA
   pattern in §4.3 for Reels and Shorts.
 - Thumbnail: one headline, one pill, one mascot.
-- Change one planned variable per reel against a named control: hook style, aphorism
-  length, voiceover pacing or CTA. Follow [the Reels strategy](content/social/reels-strategy.md)
+- The format and jokes change every reel. Production tests change one setting at a time
+  against a named control; follow [the Reels strategy](content/social/reels-strategy.md)
   for experiment records and performance review.
 
 ### 4.8 Stories
@@ -284,6 +292,7 @@ Loose but still in the world. One human truth and one invitation.
 
 - [ ] No ban fires (BAN 1 to 8).
 - [ ] The humor comes from a human observation, not decoration.
+- [ ] Social and blog pieces pass the [writing playbook](content/writing-playbook.md) boredom check, with nothing from its cut list.
 - [ ] No more than two Moltology terms in a short piece, each explained in context.
 - [ ] Warm and inviting; nothing shames the reader.
 - [ ] Utility copy says plainly what happened.

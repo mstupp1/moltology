@@ -1,112 +1,82 @@
 ---
 name: reels-and-shorts-creator
 description: >-
-  Create and queue Moltology Instagram Reels and YouTube Shorts with six concrete story
-  beats, built-in ImageGen artwork, canonical mascot image references, Gemini Omni video,
-  voiceover, kinetic captions and deterministic publishing scripts. Use for reel and
-  short creation or the weekly production automation.
+  Write and produce Moltology Instagram Reels and YouTube Shorts: pick a known video
+  format (nature documentary, POV, roast list, fake infomercial, work forecast and more),
+  pitch three scripts and score them, pass a boredom check, then produce with ImageGen
+  artwork, canonical mascot references, Gemini Omni video, voiceover, kinetic captions
+  and deterministic publishing scripts. Use for reel and short creation or the weekly
+  production automation.
 ---
 
 # Reels and shorts creator
 
 Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
 
-Read BRAND_BIBLE.md, STYLE_GUIDE.md and [the Reels strategy](../../../content/social/reels-strategy.md) before writing. These defaults include the user's October 8 production feedback, October 9 strategy advice and October 15 visual-opening, subtitle and website-CTA feedback, and October 22 Instagram crop, spoken-hook and seasonal-story feedback. The opening, CTA and experiment rules below supersede older campaign templates.
+A reel works when people watch it to the end, and that is decided by the script. Production (Omni video, subtitles, voice) is already solid and lives in [references/production.md](references/production.md). It must not change what the script says. A clean, compliant reel that nobody finishes is a failed run.
 
-## Opening, CTA and experiment rules
+Read before writing:
 
-Read the [shared annual content calendar](../../../content/annual-content-calendar.md) using the intended publication date and queue timezone. Let the season influence the physical opening, concrete situation, artwork and examples with growing intensity near holidays, then reset afterward. Record the anchor/intensity in the brief and recheck when the slot changes. Choose the seasonal story before writing narration or generating artwork: let it change the recognizable situation, a spoken line and the practical example/payoff. For a seasonal reel, the audio alone should explain why that treatment belongs. Halloween shadows over an otherwise generic phone script are insufficient; a coherent Halloween angle could start with “Your phone is haunting the work,” then describe recurring pings as an unwanted returning visitor and putting it away as closing the door on that interruption. This is an example, not a recurring script. Use the calendar’s proximity band; do not force explicit holiday language outside its window. If no useful seasonal connection fits, mark the brief evergreen and remove unrelated holiday effects. Preserve first-second action plus claim and the useful payoff. Hold seasonal treatment fixed during experiments or record it as the chosen variable.
+- `STYLE_GUIDE.md` (voice and bans) and `BRAND_BIBLE.md` (terms and characters).
+- The [writing playbook](../../../content/writing-playbook.md): loudness dial, hooks, pitch three, boredom check and the cut list.
+- [references/reel-formats.md](references/reel-formats.md): the video formats with skeletons, traps and sample scripts.
+- [The Reels strategy](../../../content/social/reels-strategy.md) and the [annual content calendar](../../../content/annual-content-calendar.md) for the intended slot.
+- `content/social/instagram-reel-history.json`. Avoid the last three topics and hooks, and the formats used in the last three reels.
 
-- Keep the two-act structure: surface friction, then a useful molt. The six beats below support those acts; they are story functions, not six sentences to repeat verbatim.
-- At 0:00–0:01, show a physical action already happening and one blunt claim as readable on-screen text. A hand silences a buzzing phone; a chair rolls into another meeting; a claw closes a distracting tab. Begin on the action, without a logo intro, thesis, establishing pause or lore explanation.
-- Art-direct the opening through ImageGen before video generation. Default to cinematic exaggeration: a recognizable human problem made visually striking through scale, silhouette, framing and warm amber against deep teal light. Use one clear subject and action; avoid generic desk footage whose meaning depends on the headline. For example, a hand already pulling one card from a towering, leaning stack of unfinished tasks. Vary the visual with the topic rather than repeating this example.
-- Use `hookHeadline` for the claim, in sentence case and under 14 words. Make it the exact first sentence of `narrationScript`, spoken immediately before the supporting situation. During that spoken hook, the large animated headline is its caption; do not also show those words in the regular subtitle track. Follow the timing, animation and crop checks below. `hookHeadline` is metadata, not proof of an edited overlay. Video prompts describe motion; do not rely on the video model to spell the claim.
-- Let the artwork dominate. Place compact, phone-readable headline type in planned negative space, with minimal backing only where contrast requires it. Avoid a large opaque rounded text panel covering the focal action. Review the opening image with the headline hidden: the situation and visual tension should still be clear. Animate this image as scene one, not as a static title card before the reel; select a cover from the opening where suitable.
-- Retire keyword CTAs everywhere: narration, caption, first comment, outro and YouTube copy. Do not ask viewers to comment QUIZ, GUIDE or another keyword, and do not promise a DM. Give the useful action, then one relevant website invitation: “Try the audit at moltology.org” or “Learn how at moltology.org.” Do not ask viewers to save or share. Match the invitation to what the destination actually offers; do not promise a tool or download on a reading page.
-- Keep the same destination and invitation across narration, caption, outro, first comment and YouTube copy. Show moltology.org in the video and the full resource URL in accompanying copy. `ctaGoal` / `--cta-goal quiz` selects the resource destination; share/save are not supported CLI goal values. Use reviewed `--content-json` and `--custom-outro` for topic-specific public copy; generated defaults use the selected resource destination. Inspect all public surfaces before queueing; a legacy `commentTriggerKeyword` ledger field is not engagement evidence.
-- Change exactly one planned variable per reel relative to a named recent control: hook style, aphorism length, voiceover pacing, or opening framing. Record the hypothesis and fixed settings before production, then record 24-hour and 7-day results in the strategy's experiment log. For pacing tests, hold voice identity fixed. Every hook variant must still meet the physical-action plus claim opening rule.
-- Apply cinematic openings, clean subtitles and website invitations as the new baseline together. Do not claim that this combined reset isolates any one effect. Run one-variable tests against that baseline, holding subtitle styling and website CTA fixed; repeat a promising spike before adopting it.
+## 1. Find the situation
 
-## Spoken hook, dynamic headline and subtitle handoff
+Start from one recognisable everyday moment, as specific as possible: a time, an object, a sentence someone actually says. "Your calendar" is a topic; "an invite called 'sync' with no agenda" is a situation. An uncovered blog dispatch can supply it. Research real-world claims with primary sources; never invent news, studies or outcomes.
 
-- Start the voiceover with the exact headline, with no preamble or second competing opening line. Include it within the 50–65-word narration budget. Aim for a short, punchy delivery of roughly 1.5–3 seconds; use measured TTS word boundaries to determine the actual hook end and first body-word start, rather than a fixed 3.2-second overlay.
-- Make the large headline feel energetic: show a readable claim from frame zero over physical motion, then accent its spoken phrases with quick eased movement, a small scale settle and/or an amber emphasis sweep in sync with the voice. Let one decisive word land with the action. Keep the line breaks and final resting position stable, with no flashing, continuous bouncing, giant opaque panel or motion that carries letters outside the safe area. The regular body subtitles keep their restrained styling.
-- Design for Instagram’s cropped surfaces, not just the full 9:16 export. At 1080×1920, use an internal starting safe box for the **entire headline**, including outline and animated extremes: x=120–900, y=460–900. This keeps it below top chrome and inside a centered square crop (y=420–1500), with right-side control clearance. These are house layout defaults, not a guarantee about every Instagram surface. Reframe the artwork to leave useful space there; wrap or shorten the headline before making it tiny. Never place it against the top edge to preserve a composition.
-- Hide the regular narration subtitles from frame zero through the spoken hook, including pauses before the first body word. Animate the hook words only in the large headline. At the first body word, clear the headline and resume the usual 2–3-word subtitle phrases on their original timestamps. Split any phrase that straddles that boundary so no hook words reappear and no body words disappear. Preserve all narration audio, words and timing; do not shift or restart the body track.
-- Record the exact hook sentence, measured hook-word times, body-subtitle start, safe box and chosen animation in the reviewed production brief. These are editing instructions, not supported CLI flags. The current CLI alone does not prove this handoff is implemented; render the required edit before queueing and pass that inspected result through `--custom-video`.
-- Gate queueing on fresh extracts of the exact final file: frame zero, mid-hook, last hook word, first body phrase and one later phrase. Review at phone size with sound on for speech/highlight alignment and sound off for motion and legibility. Check the full 9:16 image plus centered 4:5 and 1:1 crops; use an available platform preview if it shows another crop. Require no clipped headline letters at any animation position, no duplicate small hook subtitles, and a clean handoff with every body word intact. A successful render or a changed filter expression is not evidence; inspect the newly rendered frames before invoking the queue command.
+Choose the seasonal treatment now, before writing (rules in references/production.md). For a seasonal reel, the situation, one spoken line and the payoff all carry the season, so the audio alone explains it. If nothing fits, mark it evergreen.
 
-## Length, writing and budget
+## 2. Pitch three, build one
 
-Read [comment-to-DM delivery guidance](../instagram-post-creator/references/comment-to-dm.md) before writing a CTA. Delivery is disabled / unverified by default. Check narration, captions, first comments, subtitles and outro artwork; use direct resource links and do not provision rules during content creation.
+Follow the playbook's pitch step with three **different** formats from the reel format library, each with its spoken hook, a one-line summary of the beats, and the payoff. Save them to `tmp/reel-next/pitches.md` with Stop, Laugh, Pull, Keep and Fresh scores, and build the winner. A pitch under 3 on Stop or Laugh is rewritten before it can win. When nothing in the library fits, a new format is fine; describe its skeleton in the pitch.
 
-- Six scenes and a 2.5-second outro. Aim around 25–30 seconds total, modestly longer than the 17.6-second calendar reel.
-- Begin around 50–65 narration words, then measure the voiceover and adjust pacing. The old 26–34-word limit and 110-word minimum no longer apply.
-- External production budget: $2.50–$3.50. Aim around $3.00 for video and reserve room for voice and direction. This is wiggle room, not a requirement to spend the full amount. Built-in Codex/ImageGen usage is separate; its exact cost is not available to the script.
-- Keep beat-matched cuts, warm office to cool ocean grading, 2–3-word subtitles in bold sentence-case white text with amber (#f59e0b) spoken-word highlighting, dark outline and soft shadow, a restrained emblem, Fish narration with Edge fallback and the ambient soundtrack.
-- Subtitle layout: 64px starting size, maximum 820px width, center y=1180 on a 1080×1920 frame. Suppress regular subtitles for the entire spoken hook, then resume at the first body word as described above; preserve word timestamps and audio. Keep word positions and font weight stable across highlights; preserve accurate words, punctuation, phrase grouping and timestamps. No glowing boxes or bounce. Keep the opening headline clear of subtitles and inspect on bright/dark frames at phone size.
-- Use Gemini Omni 1.1 Flash at 720p, composited to 1080×1920 at 30 fps. PR #182 supplies the Interactions API implementation. Do not force obsolete Veo preview IDs in wrappers.
+## 3. Write the script
 
-Check content/social/instagram-reel-history.json and automation memory. Avoid the last three exact topics and hooks; for an experiment, choose a comparable new situation in the control's topic family. Choose an uncovered article or a recognizable everyday situation. Research real-world claims with primary sources; do not invent news claims or outcomes.
+The format decides the shape. These house constraints hold for every format:
 
-Write for someone who has never heard of Moltology. Act 1 has three concrete beats: physical hook, everyday consequence, frustration. Act 2 has three: change in approach, one useful action, one relevant website invitation. Let the lobster demonstrate the action. Use one or two familiar lore terms tied directly to what the viewer can do. Avoid chains of imaginary scientific language. Stay committed to the world and warm toward the viewer. Vary the chosen test variable rather than recycling the same script with a new topic.
+- **Spoken hook.** The first sentence is the `hookHeadline`: sentence case, under 14 words, concrete, and something the opening image can show happening in the first second. No preamble before it.
+- **Length.** About 50 to 65 words. Read it aloud at about 2.6 words per second; it should land near 23 seconds before the 2.5-second outro.
+- **Payoff late.** The useful action arrives near the end and the lobster demonstrates it. It is small, specific and doable today ("open the draft, type one heading"), not a philosophy.
+- **Loudness.** Default 3, up to 4 for bold formats. Light roasting of habits is fine; never of people.
+- **Lore.** At most two Moltology terms, each doing real work. Zero is often better.
+- **Ending.** One website invitation that matches its destination, worded to fit the script ("More field notes at moltology.org", "Try the audit at moltology.org"). No save or share ask, keyword comment request or DM promise.
+- **Cut list.** Nothing from the playbook's cut list, especially "Below, a lobster…" bridges and melt/molt couplets.
 
-Example direction, not a recurring script:
+Then write six `scenePrompts`, one per beat of the finished script, each describing a concrete visible action. Scene 1 is the hook action already in motion. The visuals follow the script, never the other way round.
 
-> Opening visual: a chair rolls into a meeting while an untouched notebook slides out of reach. On-screen claim: “Your calendar ate the work.”
->
-> Your calendar ate the work. Another invite lands while your notebook stays blank. Your coffee goes cold. Every meeting looks urgent, and the task keeps waiting. Below, a lobster closes the hatch and picks one task. That's the molt: shed one meeting that no longer needs you, then finish what does. Learn how to build your routine at moltology.org.
+## 4. Boredom check before spending money
 
-Save reviewed JSON containing title, topic, hookHeadline, narrationScript, six scenePrompts, caption, hashtags, firstComment, youtubeTitle, youtubeDescription, youtubeTags, characterArc and ctaGoal. Use --content-json to preserve this copy instead of legacy canned templates. Keep the opening action, exact spoken/visible hook, measured subtitle handoff, crop-safe animation, seasonal script connection and experiment settings alongside the draft and in the strategy log; they are production instructions, not new supported CLI flags. Never copy the whole pipeline into tmp to inject a script. Sentence case, at most three hashtags, a direct URL in the first comment, one relevant website CTA.
+Run the playbook's boredom check on the script before any ImageGen or Omni spend. Also ask:
 
-## Artwork and actual character references
+- Read aloud with a timer: is it under about 24 seconds, and does every sentence give the edit something to show?
+- Is the hook claim visual enough to work with the sound off?
+- Would someone who has never heard of Moltology get the joke and the tip?
 
-Use the built-in ImageGen tool for the opening image, outro and character scene frames. Read the imagegen skill. No initial Gemini image generation, Antigravity elevation or obligatory user Flow handoff.
+Fix any "no" in the script, then check again. Only then move to artwork.
 
-1. Choose the canonical mascot in scripts/lib/character-overlay.ts. Download its publicUrl into the run directory if no local asset exists. Inspect the actual asset with view_image.
-2. Generate each character scene with ImageGen, supplying that asset as the identity reference. Preserve its face, eyes, shell shape, proportions, attire and friendly cartoon style. Cinematic environments are fine; do not redesign it into a realistic lobster or add robot anatomy.
-3. Generate a dedicated full 9:16 opening image as scene-1.png in the same frames directory as scene-4.png, scene-5.png and scene-6.png. Compose the opening for the cinematic exaggeration direction above, with no generated headline text and room for the exact overlay inside the crop-safe headline box. Make its seasonal imagery demonstrate the reviewed script’s situation rather than adding unrelated atmosphere. Inspect it at phone size before paid video generation; revise weak composition at the image stage. Optional scene-2.png and scene-3.png can preserve the human protagonist. Do not use a storyboard grid as a video input.
-4. Inspect the images before video generation. Require scene-1.png as an authoring check, then pass --scene-frames <directory>. The reel loop passes referenceImagePath as a real Omni image input. Direct scene one's motion to begin immediately from the supplied composition, with one simple physical action and no establishing pause or fade-in. The CLI stops for missing character frames; it does not enforce the opening-image requirement. Cache fingerprints include the model and reference image hash.
-5. Generate the outro directly through ImageGen with the same mascot and public/images/order_emblem.png. Require exact mixed-case copy and the same single website invitation chosen for the reel. Show the short domain moltology.org clearly; keep the destination consistent with the narration and accompanying copy. Do not add a competing ask. Inspect and pass it with --custom-outro. Do not use the uppercase composite template as final artwork.
+## 5. Save the reviewed draft
 
-The previous run supplied only descriptions like cybernetic lobster engineer, which encouraged invented anatomy. Repeating a description is not visual continuity. Omni can take images, but the request must actually contain them. Individual clips support --image through scripts/generate-video.ts. Character identity still needs inspection; no model guarantees perfect preservation.
+Save `tmp/reel-next/draft.json` with `title`, `topic`, `format`, `loudness`, `pitchScores`, `hookHeadline`, `narrationScript`, six `scenePrompts`, `caption`, `hashtags` (at most three), `firstComment` (a direct destination URL), `youtubeTitle`, `youtubeDescription`, `youtubeTags`, `characterArc` and `ctaGoal`. [references/example-draft.json](references/example-draft.json) is a complete example and also works for `--recycle-clips --dry-run` pipeline checks.
 
-## Production and cost checks
+The caption follows STYLE_GUIDE §4.3: the hook line, two or three tight lines with the payoff, the same website invitation, up to three hashtags. `npm run reel:create` stops without `--content-json`; there are no built-in scripts.
 
-At the October 8 verified rate, Omni 720p output is approximately $0.10 per second. Requested 30 seconds estimates to $3.00. Verify current official prices before paid production. Default --video-budget 3.30 reserves $0.20 of the ceiling for other external services. The CLI checks the plan before generating clips.
+## 6. Produce, inspect and queue
 
-Omni duration is a prompt hint, not a fixed output length. Check actual output lengths and usage after each request. Reduce later requests or stop with saved assets if longer output threatens the budget. Do not repeat successful generations after polling/download failures. Estimates are not exact billing guarantees. Recycle clips only deliberately, never as a silent failure fallback.
+Follow [references/production.md](references/production.md) for the opening image, spoken-hook headline and subtitle handoff, crop checks, character references, Omni budget, render, queueing, archive and clean-tree rules. The usual sequence:
 
 ```bash
 npm run reel:create -- --content-json tmp/reel-next/draft.json \
   --scene-frames tmp/reel-next/frames --custom-outro tmp/reel-next/outro.png \
   --mascot lobster_engineer --cta-goal quiz --video-budget 3.30 --render-only
-```
 
---recycle-clips --dry-run skips video generation, upload and publishing, but still calls voice and direction services. For a request-only check, run targeted unit tests instead.
-
-After --render-only and the spoken-hook edit complete, pass the full hook-to-body handoff and crop checks above on the exact final file before queueing. Inspect the opening frame at phone size and the first second with sound off: require striking composition, immediate physical motion, the exact readable claim and an unobscured focal action. Compare against the text-free opening image to confirm the visual carries the situation independently. Inspect representative frames and the finished outro, verify audio/video duration and readability, and check narration, caption, first comment and YouTube copy for a single website invitation without save/share asks, keyword prompts or DM promises. Queue only after those inspections pass; if the hook clips, duplicates subtitles or lacks the seasonal script connection, revise the draft/edit first. Then queue the inspected file without generating again:
-
-```bash
 npm run reel:create -- --content-json tmp/reel-next/draft.json \
   --custom-video tmp/reel-daily-<id>/master-reel-<id>.mp4 \
   --mascot lobster_engineer --cta-goal quiz --commit
 ```
 
-The existing CLI handles narration, direction, Omni video, compositing, Google Drive archiving, direct Zernio upload, dual-platform queueing and ledger commits. Queue ID: 6a84b7702421e968ac81f5bd. Instagram account ID: 6a7f7f0777555aae01d99b54 (currently moltology_org). YouTube account ID: 6a7fd9bd77555aae01ebea63. Resolve actual account names and schedule from the API.
+Before queueing, watch the final file once with sound on at phone size and run the boredom check again. If the jokes don't land in the edit (a punchline buried under a cut, a pause that kills the rhythm), fix the edit or the script first.
 
-Use the next queue slot. Never --publish-now without an explicit immediate-publication request. Use scripts/lib/zernio-client.ts through the CLI, not Zernio MCP tools. Verify stored schedule, video URL, both platform targets, Instagram isAiGenerated: true and native firstComment settings. A scheduled first comment is not posted yet. Before retrying an error, check the API and ledger to avoid duplicates.
-
-Commit only production files and preserve unrelated changes. Report the preview, actual schedule and cost estimate with billing uncertainty. Record topic, mascot, paths, post ID, duration, costs, failures, test variable and control in automation memory and the strategy experiment log. Fill performance snapshots only after publication using actual analytics; queued reels have no outcome yet. These defaults apply to future work; do not replace an existing queued reel unless asked.
-
-## Finish with a clean working tree
-
-Record git status at the start of the run. Final queueing uses --commit for the tracked reel ledger only when the staged index and selected files contain solely run-owned changes; otherwise omit it and make the scoped manual commit required by the shared worktree hygiene rules. Commit any other intentional run-owned changes with explicit file paths; never blindly stage the entire working tree or include another task's changes. If a run updates the skill or other tracked production metadata, commit those too. A render-only run normally produces only ignored files.
-
-Keep generated images, video, audio, frame previews, draft JSON, logs and temporary runners under tmp/, which is already ignored. Final videos and metadata are archived by the CLI in Google Drive before direct Zernio upload. Website assets and reusable templates remain on S3. Add narrow .gitignore entries only when a new kind of disposable output genuinely falls outside the existing rules. Do not ignore tracked content/social ledgers or source files to hide changes.
-
-Before returning, inspect git status --porcelain. The run must leave no new uncommitted or untracked files. Preserve pre-existing or concurrent work; if it remains, report it rather than discarding it or claiming the whole tree is clean. When the user explicitly requests a completely clean current tree, inspect and commit legitimate pre-existing changes within that authorization. Do not use reset --hard, clean -fd or a hidden stash to manufacture cleanliness. Push/sync when the user authorizes it; otherwise the automatic cleanup is a local commit.
-
-## Social archive and retries
-
-See `docs/social-archive.md`. `SOCIAL_ARCHIVE_ROOT` overrides the existing Moltology folder, which must be available before queueing. The CLI preserves final files after publishing failures and saves confirmed Zernio media URLs, IDs, status and schedule in archive metadata and Git ledgers. A confirmed archived result is reused on retry. Dry-run/render-only modes do not write to Drive or publish. Do not reupload finished social archives to Neon.
+Report the chosen format, the three pitches with scores, the final script and word count, the preview, the actual schedule and the cost estimate. Record `format` and `loudness` in the strategy's experiment log with the other production settings.
