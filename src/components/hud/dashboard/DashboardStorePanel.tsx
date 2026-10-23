@@ -5,10 +5,10 @@ import { MerchImage } from '@/components/store/MerchImage'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { merchPriceLabel, type MerchProductView } from '@/lib/merch'
+import { MERCH_CUTOUTS } from '@/lib/merch-cutouts'
 import { getMerchCatalogFn, getStoreAccessFn } from '@/lib/server/merch-api'
 import { cn } from '@/lib/utils'
 import { DASHBOARD_FOCUS, DashboardPanel } from './DashboardPanel'
-import { DASHBOARD_STORE_IMAGES } from './store-images'
 
 export const DASHBOARD_STORE_LIMIT = 4
 
@@ -55,7 +55,7 @@ export function DashboardStorePanel() {
     >
       <ul className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {products.map((product) => {
-          const image = DASHBOARD_STORE_IMAGES[product.slug]
+          const image = MERCH_CUTOUTS[product.slug]
           return (
             <li key={product.id} className="min-w-0">
               <Link

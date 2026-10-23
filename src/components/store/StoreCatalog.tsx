@@ -4,6 +4,7 @@ import { Plus, ShoppingBag } from 'lucide-react'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { merchPriceLabel, uniqueVariantLabels, type MerchProductView } from '@/lib/merch'
+import { MERCH_CUTOUTS } from '@/lib/merch-cutouts'
 import { getMerchCatalogFn } from '@/lib/server/merch-api'
 import { StorePolicies } from './StorePolicies'
 import { MerchImage } from './MerchImage'
@@ -183,8 +184,7 @@ function ProductCard({ product, eager }: { product: MerchProductView; eager: boo
   const colors = product.variants.filter(
     (variant, index, all) => variant.color && all.findIndex((item) => item.color === variant.color) === index,
   )
-  // A second angle on hover. Multi-color products keep their first color so quick add matches the photo.
-  const hoverImage = colors.length > 1 ? undefined : product.galleryImageUrls.find((url) => url !== product.featuredImageUrl)
+  const cutout = MERCH_CUTOUTS[product.slug]
   const firstColor = product.variants[0]?.color ?? null
   const quickSizes = uniqueVariantLabels(
     product.variants.filter((variant) => variant.color === firstColor),
@@ -210,20 +210,14 @@ function ProductCard({ product, eager }: { product: MerchProductView; eager: boo
 
   return (
     <article className="group relative">
-      <div className="relative aspect-square overflow-hidden rounded-card bg-surface-1">
+      <div className={`relative aspect-square overflow-hidden rounded-card ${cutout?.background ?? 'bg-surface-1'}`}>
         <Link to="/store/$slug" params={{ slug: product.slug }} className={`block h-full w-full rounded-card ${FOCUS}`}>
           <span className="sr-only">{product.title}</span>
           <MerchImage
-            src={product.featuredImageUrl}
+            src={cutout?.src ?? product.featuredImageUrl}
             loading={eager ? 'eager' : 'lazy'}
-            className="h-full w-full object-cover transition duration-500 ease-out group-hover:scale-[1.03]"
+            className={`h-full w-full transition duration-500 ease-out group-hover:scale-[1.03] ${cutout ? 'object-contain p-5 sm:p-10' : 'object-cover'}`}
           />
-          {hoverImage ? (
-            <MerchImage
-              src={hoverImage}
-              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-            />
-          ) : null}
         </Link>
         {quickSizes.length > 0 && cart.canOrder ? (
           <div className="pointer-events-none absolute inset-x-3 bottom-3 hidden translate-y-2 opacity-0 transition duration-300 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 md:block">

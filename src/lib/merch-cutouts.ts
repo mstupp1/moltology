@@ -1,5 +1,8 @@
-/** Dashboard-only cutouts. Keep official catalog, cart and product-page photos unchanged. */
-export const DASHBOARD_STORE_IMAGES: Record<string, { src: string; alt: string; background: string }> = {
+/**
+ * Transparent product cutouts for product cards (store grid and dashboard Store panel), shown on a
+ * tinted square. The product page and cart keep the catalog photos.
+ */
+export const MERCH_CUTOUTS: Record<string, { src: string; alt: string; background: string }> = {
   'moltology-hat': {
     src: 'images/merch/dashboard/2026-10-22/moltology-hat-v1.png',
     alt: 'Black Moltology dad hat with red embroidered emblem',
@@ -23,5 +26,5 @@ export const DASHBOARD_STORE_IMAGES: Record<string, { src: string; alt: string; 
 }
 
 // Existing DB rows may retain their earlier URLs until the catalog slug update runs.
-DASHBOARD_STORE_IMAGES['moltology-mug-v2'] = DASHBOARD_STORE_IMAGES['moltology-mug']
-DASHBOARD_STORE_IMAGES['moltology-tee-v2'] = DASHBOARD_STORE_IMAGES['moltology-tee']
+MERCH_CUTOUTS['moltology-mug-v2'] = MERCH_CUTOUTS['moltology-mug']
+MERCH_CUTOUTS['moltology-tee-v2'] = MERCH_CUTOUTS['moltology-tee']
