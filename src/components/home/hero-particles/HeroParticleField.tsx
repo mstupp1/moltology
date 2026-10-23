@@ -34,6 +34,15 @@ export const HeroParticleField: React.FC<HeroParticleFieldProps> = ({ anchorRef,
     const reducedMotion =
       (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false) || nav.connection?.saveData === true
     const lowEnd = (nav.hardwareConcurrency ?? 8) <= 4 || (nav.deviceMemory ?? 8) <= 4
+    // The CSS ripples wait for this, so first paint matches the WebGL water and they only fade in
+    // when that water isn't coming.
+    const showCssSea = () => {
+      const host = hostRef?.current
+      if (host && host.getAttribute('data-water') !== 'webgl') host.setAttribute('data-water', 'css')
+    }
+    if (reducedMotion) showCssSea()
+    // Nothing after a few seconds (slow network, background tab): give the CSS sea its ripples.
+    const fallbackId = setTimeout(showCssSea, 4000)
 
     const boot = () => {
       if (cancelled) return
@@ -57,6 +66,7 @@ export const HeroParticleField: React.FC<HeroParticleFieldProps> = ({ anchorRef,
             onSlow: () => {
               water?.destroy()
               water = null
+              showCssSea()
             },
           })
           if (waterModule && waterCanvas && host && sea) {
@@ -69,9 +79,11 @@ export const HeroParticleField: React.FC<HeroParticleFieldProps> = ({ anchorRef,
               moon: host.querySelector<HTMLElement>('.home-hero-moon'),
             })
           }
+          if (!water) showCssSea()
         })
         .catch(() => {
-          // Decorative only: without the engine the hero keeps its static glow.
+          // Decorative only: without the engine the hero keeps its static glow and CSS sea.
+          showCssSea()
         })
     }
     // Wait for the page to finish loading and go idle, so the field never competes with first
@@ -85,6 +97,7 @@ export const HeroParticleField: React.FC<HeroParticleFieldProps> = ({ anchorRef,
 
     return () => {
       cancelled = true
+      clearTimeout(fallbackId)
       window.removeEventListener('load', schedule)
       if (idleId !== undefined) window.cancelIdleCallback?.(idleId)
       if (timeoutId !== undefined) clearTimeout(timeoutId)

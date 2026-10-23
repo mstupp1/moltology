@@ -335,7 +335,7 @@
 }
 /* Night sky → horizon → sea. Static CSS/SVG paints with the headline, without media or JS.
    The sky fills the hero stage; the sea hangs from the shell's box (--sea-top) so the horizon
-   always sits just under the shell and the glints fall straight below it. */
+   always sits just under the shell and its light falls straight below it. */
 .home-hero-sky {
   position: absolute;
   inset: 0;
@@ -477,38 +477,17 @@
   color: rgba(130, 196, 214, 0.26);
   mask-image: radial-gradient(ellipse 24% 100% at 50% 0%, #000, transparent 92%);
 }
-.home-hero-sea-glints {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: 1440px;
-  height: 320px;
-  transform: translateX(-50%);
-  fill: rgba(170, 236, 255, 0.85);
-  mask-image: linear-gradient(#000 20%, transparent 95%);
-}
-.home-hero-glint-set--1 { opacity: 0.35; }
 .home-hero-water {
   opacity: 0;
   transition: opacity 1200ms ease-out;
 }
 .home-hero-water[data-ready='true'] { opacity: 1; }
-/* Once the WebGL water is up, the CSS ripples and glints under it step aside. */
+/* First paint is calm water that matches the WebGL water, so its fade-in reads as the sea coming
+   alive. The ripples only fade in once the field reports the WebGL water isn't coming. */
 .home-hero-sea-ripples,
-.home-hero-sea-glints,
 .home-hero-sea-line { transition: opacity 1200ms ease-out; }
-.home-hero[data-water='webgl'] .home-hero-sea-ripples,
-.home-hero[data-water='webgl'] .home-hero-sea-glints,
+.home-hero:not([data-water='css']) .home-hero-sea-ripples,
 .home-hero[data-water='webgl'] .home-hero-sea-line { opacity: 0; }
-@media (prefers-reduced-motion: no-preference) {
-  /* Two sets of glints trade places: opacity only, so the compositor handles it. */
-  .home-hero-glint-set { animation: homeGlint 2.8s ease-in-out infinite alternate; }
-  .home-hero-glint-set--1 { animation-delay: -1.4s; }
-}
-@keyframes homeGlint {
-  from { opacity: 0.25; }
-  to { opacity: 0.95; }
-}
 .home-hero-sea-line {
   position: absolute;
   left: 0;
