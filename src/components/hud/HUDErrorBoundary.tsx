@@ -1,5 +1,6 @@
-import React, { Component, ErrorInfo, ReactNode, useState } from 'react'
+import React, { Component, ErrorInfo, ReactNode, useEffect, useState } from 'react'
 import { AlertCircle, ChevronDown, ChevronRight, RefreshCw, Home, Copy, Check } from 'lucide-react'
+import { isStaleChunkError, reloadForStaleChunk } from '@/lib/stale-chunk'
 
 interface Props {
   children: ReactNode
@@ -46,6 +47,70 @@ export class HUDErrorBoundary extends Component<Props, State> {
 }
 
 export function HUDErrorFallback({
+  error,
+  reset,
+}: {
+  error?: Error | unknown
+  reset?: () => void
+}) {
+  // A chunk from the previous deploy is gone: reload into the new build instead of showing a crash.
+  if (isStaleChunkError(error)) return <StaleVersionNotice />
+  return <RuntimeErrorCard error={error} reset={reset} />
+}
+
+function StaleVersionNotice() {
+  const [reloading, setReloading] = useState(true)
+
+  useEffect(() => {
+    setReloading(reloadForStaleChunk())
+  }, [])
+
+  return (
+    <div className="min-h-[400px] w-full flex items-center justify-center p-4 sm:p-6 bg-abyss text-ink font-sans">
+      <div
+        role="status"
+        className="w-full max-w-md rounded-card border border-line-subtle bg-surface-1 hud-sheen p-6 shadow-menu"
+      >
+        <div className="flex items-start gap-3.5">
+          <div className="p-2.5 rounded-control bg-surface-2 border border-line-subtle shrink-0 mt-0.5">
+            <RefreshCw className={`w-5 h-5 text-cyan-glow ${reloading ? 'motion-safe:animate-spin' : ''}`} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg font-semibold text-ink mb-1">
+              {reloading ? 'Loading the latest version' : 'Moltology was just updated'}
+            </h2>
+            <p className="text-xs text-ink-body leading-relaxed">
+              {reloading
+                ? 'The site changed since this page opened. Reloading now.'
+                : 'This page is from an older version of the site. Reload to pick up the new one.'}
+            </p>
+          </div>
+        </div>
+
+        {!reloading && (
+          <div className="flex flex-wrap items-center gap-2.5 pt-5">
+            <button
+              onClick={() => window.location.reload()}
+              className="flex items-center justify-center gap-2 px-4 py-2 rounded-control border border-line bg-surface-1 hud-sheen text-cyan-glow hover:bg-surface-2 hover:border-line-strong transition-colors text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Reload Page
+            </button>
+            <a
+              href="/"
+              className="flex items-center justify-center gap-2 px-4 py-2 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong transition-colors text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            >
+              <Home className="w-4 h-4" />
+              Go to Home
+            </a>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function RuntimeErrorCard({
   error,
   reset,
 }: {
