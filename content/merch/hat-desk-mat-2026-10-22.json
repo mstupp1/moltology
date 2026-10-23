@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-22",
+  "timezone": "America/New_York",
+  "brief": {
+    "treatment": "Evergreen",
+    "seasonalIntensity": "none",
+    "reason": "Durable core catalog additions; no holiday treatment",
+    "userSelection": "Black embroidered dad hat and a dark contour desk mat"
+  },
+  "status": "Synced to Printful Manual/API store and published only in verified dev database; production catalog unchanged",
+  "storeId": 18931450,
+  "products": [
+    {
+      "slug": "moltology-hat",
+      "catalogNumber": 12,
+      "blank": {
+        "id": 206,
+        "name": "Classic Dad Hat | Yupoong 6245CM",
+        "variantId": 7854,
+        "color": "Black",
+        "size": "One size",
+        "baseCostUsd": "14.94",
+        "largeEmbroideryPlacementAdditionalUsd": "2.95"
+      },
+      "retailPriceCents": 3000,
+      "priceStatus": "Draft price selected for review",
+      "syncProductId": 484236285,
+      "syncVariantId": 5589970362,
+      "design": "hat-moltology-v1",
+      "printDimensions": [
+        1650,
+        600
+      ],
+      "placement": "embroidery_front_large",
+      "thread": "#CC3333",
+      "officialPhotoKey": "images/merch/moltology-hat-v1-black.jpg",
+      "cutoutKey": "images/merch/dashboard/2026-10-22/moltology-hat-v1.png",
+      "cutoutPrompt": "Edit this official product photo into a dashboard product cutout. Remove ONLY the white studio background and floor shadow; make them genuinely transparent. Preserve the exact black cotton dad hat, silhouette, perspective, fabric, curved visor, and red embroidered emblem geometry, placement and scale. Keep all black fabric opaque. Do not redraw, restyle, recolor, add text or add anything. Center the entire hat with a little transparent padding. Output one square transparent PNG.",
+      "inspection": "Official front photo: black adjustable dad hat, centered red flat embroidered canonical emblem. Cutout preserves silhouette, embroidered emblem and black material; background removed. ImageGen cutout is dashboard-only."
+    },
+    {
+      "slug": "moltology-desk-mat",
+      "catalogNumber": 13,
+      "blank": {
+        "id": 853,
+        "name": "Desk Mat",
+        "variantId": 22327,
+        "color": "Black",
+        "size": "16″×32″",
+        "baseCostUsd": "16.75"
+      },
+      "retailPriceCents": 3600,
+      "priceStatus": "Draft price selected for review",
+      "syncProductId": 484236287,
+      "syncVariantId": 5589970370,
+      "design": "desk-mat-moltology-v1",
+      "printDimensions": [
+        9921,
+        5197
+      ],
+      "placement": "default",
+      "officialPhotoKey": "images/merch/moltology-desk-mat-v1.jpg",
+      "cutoutKey": "images/merch/dashboard/2026-10-22/moltology-desk-mat-v1.png",
+      "cutoutPrompt": "Edit this official product photo into a dashboard product cutout. Remove ONLY the white studio background and any floor shadow to true transparency. Preserve exactly the full dark rectangular desk mat, its aspect ratio, rounded hemmed edges, perspective, quiet dark cyan contour lines on the left, red emblem, and white Moltology and THE SYNAPTIC PATH wordmark at the lower right. Keep the entire mat surface opaque, including dark areas. Do not redraw the artwork, change text, recolor, crop the product or add anything. Center the complete mat with transparent padding. Output one square transparent PNG.",
+      "inspection": "Official photo: complete hemmed dark mat, quiet cyan contours on left, original red emblem and outlined white wordmark in lower-right safe area. Cutout preserves complete mat and readable branding; dashboard-only."
+    }
+  ],
+  "assets": {
+    "prints": "Both exact 300 dpi PNGs uploaded under merch/print/",
+    "website": "Both official JPGs and separate dashboard PNGs uploaded under images/merch/ with compressed WebP twins; all four resolved website URLs returned HTTP 200",
+    "provenance": "Official primary photos: Printful. Dashboard background removal: built-in ImageGen. Print compositions: canonical SVG layers; new contour background is a deterministic SVG.",
+    "localFiles": "tmp/merch/print/, tmp/merch/mockups/, tmp/merch/dashboard/2026-10-22/"
+  },
+  "verification": {
+    "templates": "Both canvases match live provider templates exactly",
+    "provider": "Both print files processed ok; hat thread and embroidery options read back correctly",
+    "dev": "Both publication states, prices and sync variant IDs read back successfully",
+    "shipping": "Live STANDARD/USD US quote passed; no order created",
+    "typecheck": "passed",
+    "targetedTests": "31 passed",
+    "scripts": "334 passed; one database connectivity failure passed with network on retry",
+    "core": "1236 passed, 15 skipped; auth database connectivity failure passed with network on retry; pre-existing Premium .env.example sandbox price expectation still fails",
+    "assetBudget": "passed",
+    "physicalSamples": "Not ordered; mockups do not verify physical stitch quality"
+  },
+  "remaining": [
+    "Separate production publication authorization and release",
+    "Physical sample review, including hat embroidery digitization",
+    "Existing launch setup: support/status configuration, deployed callbacks/recovery, approved business policies and local Stripe webhook secret"
+  ]
+}

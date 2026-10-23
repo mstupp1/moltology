@@ -59,6 +59,7 @@ export function buildSyncProductPayload(input: {
         external_id: variant.id,
         variant_id: blank.id,
         retail_price: formatRetailPrice(variant.priceCents),
+        ...(input.product.printful.options ? { options: input.product.printful.options } : {}),
         files: [{ type: input.product.printful.placement, url: input.printFileUrl(variant.design) }],
       },
     ]

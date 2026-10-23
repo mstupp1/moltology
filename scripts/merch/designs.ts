@@ -22,7 +22,7 @@ export interface MerchLayer {
 export interface MerchDesign {
   key: string
   /** What the mockup generator should call the blank. */
-  blank: 'mug' | 'tee'
+  blank: 'mug' | 'tee' | 'hat' | 'deskMat'
   width: number
   height: number
   /** Solid wrap color, or null for a transparent print file. */
@@ -46,6 +46,18 @@ const face = (side: 'left' | 'right', source: MerchLayerSource, scale = 0.72): M
 })
 
 export const MERCH_DESIGNS: MerchDesign[] = [
+  {
+    key: 'hat-moltology-v1', blank: 'hat', width: 1650, height: 600, background: null,
+    layers: [{ source: { repo: `${KIT}/parts/icon.svg` }, cx: 0.5, cy: 0.5, maxWidth: 0.31, maxHeight: 0.85 }],
+  },
+  {
+    key: 'desk-mat-moltology-v1', blank: 'deskMat', width: 9921, height: 5197, background: '#0b1114',
+    layers: [
+      { source: { repo: 'content/merch/art/desk-mat-contours-v1.svg' }, cx: 0.5, cy: 0.5, maxWidth: 1, maxHeight: 1 },
+      { source: { repo: `${KIT}/parts/icon.svg` }, cx: 0.785, cy: 0.80, maxWidth: 0.045, maxHeight: 0.09 },
+      { source: { repo: `${KIT}/parts/merch-v2/moltology-stacked-dark.svg` }, cx: 0.88, cy: 0.80, maxWidth: 0.115, maxHeight: 0.12 },
+    ],
+  },
   // Approved site wordmark: 54 source pixels of clear space below the g/y descenders.
   ...[{ key: 'mug-moltology-v2', height: 1050 }, { key: 'mug-moltology-v2-15oz', height: 1140 }].map(({ key, height }): MerchDesign => ({
     key, blank: 'mug', width: 2700, height, background: '#ffffff',

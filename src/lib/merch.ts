@@ -580,6 +580,14 @@ export interface MerchCategoryInfo {
 
 /** Product facts by category. Shown on product pages; the blanks are fixed per category. */
 export const MERCH_CATEGORY_INFO: Record<string, MerchCategoryInfo> = {
+  Hats: {
+    details: ['100% chino cotton twill', 'Unstructured, six-panel, low-profile fit with a curved visor', 'Adjustable strap with an antique buckle', 'Red flat embroidery on the front'],
+    care: ['Spot clean gently with mild soap and cool water', 'Air dry; do not machine wash or tumble dry'],
+  },
+  'Desk mats': {
+    details: ['16″ × 32″', '100% polyester top with an anti-slip natural rubber base', '3 mm thick with hemmed edges'],
+    care: ['Wipe gently with a damp cloth', 'Allow to air dry before use'],
+  },
   Mugs: {
     details: ['Glossy white ceramic, printed edge to edge', '11 oz or 15 oz', 'Lead and BPA free'],
     care: ['Dishwasher and microwave safe', 'Not for the oven or stovetop'],
