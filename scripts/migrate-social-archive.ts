@@ -49,7 +49,7 @@ export async function checkDatabaseDependencies(): Promise<DependencyCheck> {
     for (const table of tables) {
       const identifier = String(table.tablename).replace(/"/g, '""')
       // Return only asset references, not row contents or personal information.
-      const rows = await sql(`SELECT regexp_matches(to_jsonb(t)::text, '(?:images|videos)/social/[^"[:space:]<>\\\\]+', 'g') AS matches FROM public."${identifier}" AS t WHERE to_jsonb(t)::text LIKE '%/social/%'`)
+      const rows = await sql.query(`SELECT regexp_matches(to_jsonb(t)::text, '(?:images|videos)/social/[^"[:space:]<>\\\\]+', 'g') AS matches FROM public."${identifier}" AS t WHERE to_jsonb(t)::text LIKE '%/social/%'`)
       for (const row of rows) references.push(...row.matches)
     }
     return { complete: true, references }
