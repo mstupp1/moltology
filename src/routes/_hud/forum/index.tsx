@@ -50,7 +50,7 @@ export const Route = createFileRoute('/_hud/forum/')({
 })
 
 const FIELD =
-  'w-full min-h-8 bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-none rounded-control transition-colors'
+  'w-full min-h-8 bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-hidden rounded-control transition-colors'
 
 function sentenceCase(text: string) {
   const lower = text.toLowerCase()

@@ -308,7 +308,7 @@ export const ZoomableImage: React.FC<ZoomableImageProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="relative group/zoom block w-full h-full text-left cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-white/40 rounded overflow-hidden"
+        className="relative group/zoom block w-full h-full text-left cursor-zoom-in focus:outline-hidden focus:ring-2 focus:ring-white/40 rounded overflow-hidden"
         aria-label={`Enlarge ${zoomTitle || alt || 'image'}`}
       >
         <img src={src} alt={alt} className={className} {...rest} />

@@ -44,11 +44,10 @@ transitive versions just to clear the audit.
 
 ## Deferred migrations
 
-Remaining work is a Tailwind migration with compatible Drizzle tooling fixes if
-available, and a separate Stripe API/webhook review. Tailwind needs browser-support
-and HUD styling checks. Do not downgrade Drizzle Kit or force incompatible
-transitive overrides. Use current registry metadata and version-specific docs at
-each stage rather than treating earlier latest-version quotes as fixed targets.
+Remaining work is the separate Stripe API/webhook review. Four moderate Drizzle
+Kit tooling findings remain without a compatible stable upstream fix. Do not
+downgrade Drizzle Kit or force incompatible transitive overrides. Use current
+registry metadata and version-specific docs at each stage.
 
 ## Stage 1 verification (2026-10-23)
 
@@ -158,3 +157,43 @@ Verification passed:
 
 Builds retain non-fatal third-party module-directive, external `/media/*` URL and
 large-chunk warnings. No deployment or browser visual verification was performed.
+
+## Stage 5: Tailwind 4 (2026-10-23)
+
+Upgraded Tailwind 3.4.19 → 4.3.3 with the first-party `@tailwindcss/vite` plugin.
+Removed the old PostCSS config and direct PostCSS/Autoprefixer dependencies.
+`src/index.css` imports Tailwind, explicitly loads the existing JavaScript theme
+and scans `src/`; project colors, typography, radii, shadows, animations and class
+based dark mode remain in `tailwind.config.js`.
+
+Use native Tailwind 4 defaults, as requested. No frozen v3 palette, default-value
+snapshot or compatibility overrides are included. Small changes to standard
+colors, shadows, blur, gradients and form defaults are accepted. Tailwind 4 uses
+its [modern browser baseline](https://tailwindcss.com/docs/upgrade-guide#browser-requirements).
+Mechanical component updates replace `outline-none` with `outline-hidden` for
+forced-colors support and the removed `blur-0` with `blur-none` for the quiz image
+loading transition. The token guide now reflects opacity modifiers applying to
+RGBA tokens.
+
+Verification passed:
+
+- Full ordinary suite: 352 files, 2,513 tests; typecheck passed.
+- Standard production build and Vercel-preset production build. The recovery
+  function retains its Node 24 runtime and 240-second limit.
+- Compiled CSS includes the custom HUD palette, fonts, focus styles, corners and
+  shadows. Compared 3,074 baseline emitted class names: expected utilities are
+  present after outline/blur renames (three unused v3 scanner artifacts excluded),
+  with no unprocessed Tailwind directives.
+- Asset budget, brand assets and UI-token checks.
+- Audit: four moderate findings, zero high or critical, all in Drizzle Kit's
+  legacy `@esbuild-kit/esm-loader` → `@esbuild-kit/core-utils` → esbuild chain.
+  Latest stable Drizzle Kit 0.31.11 still depends on that loader; no downgrade or
+  forced override was applied.
+
+Compared homepage screenshots from production builds of the pre-migration commit
+and this branch at matching desktop (1760×1100) and mobile (540×1170) viewports,
+with the same assets and reduced motion. Mobile appears virtually unchanged;
+desktop has small text/CTA spacing differences, with the overall design intact.
+Dashboard preview widgets remained in loading states in both versions, so those
+captures are not treated as visual verification. No deployment was performed.
+The legacy default styling is deliberately not reproduced pixel for pixel.

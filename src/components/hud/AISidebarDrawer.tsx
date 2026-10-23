@@ -130,7 +130,7 @@ export const AISidebarDrawer: React.FC<AISidebarDrawerProps> = ({
         onPointerCancel={handlePointerUp}
         onDoubleClick={handleReset}
         onKeyDown={handleKeyDown}
-        className={`group absolute inset-y-0 -left-1 w-2 z-40 cursor-col-resize focus-visible:outline-none`}
+        className={`group absolute inset-y-0 -left-1 w-2 z-40 cursor-col-resize focus-visible:outline-hidden`}
       >
         <span
           aria-hidden="true"

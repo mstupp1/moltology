@@ -202,7 +202,7 @@ export const CommandPalette: React.FC = () => {
                   aria-label="Search"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  className="bg-transparent text-ink placeholder:text-ink-muted focus:outline-none w-full text-xs sm:text-sm font-sans"
+                  className="bg-transparent text-ink placeholder:text-ink-muted focus:outline-hidden w-full text-xs sm:text-sm font-sans"
                 />
               </div>
               <button

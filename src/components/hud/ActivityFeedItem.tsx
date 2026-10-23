@@ -271,7 +271,7 @@ function ActivityFeedRow({ event }: { event: ActivityEventView }) {
         <div className="flex items-baseline gap-2 min-w-0">
           <EventTitleLink
             event={event}
-            className="min-w-0 flex-1 rounded-chip after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-cyan-glow"
+            className="min-w-0 flex-1 rounded-chip after:absolute after:inset-0 focus-visible:outline-hidden focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-cyan-glow"
           >
             <h3 className="text-sm font-bold text-ink group-hover:text-cyan-glow transition-colors truncate leading-snug">
               {event.title}

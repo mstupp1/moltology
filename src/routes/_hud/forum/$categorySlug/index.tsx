@@ -257,7 +257,7 @@ function ForumBoardPage() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search this board..."
-                      className="w-full pl-8 pr-2.5 py-1 bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-none rounded-control transition-colors placeholder:text-ink-muted"
+                      className="w-full pl-8 pr-2.5 py-1 bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-hidden rounded-control transition-colors placeholder:text-ink-muted"
                     />
                   </div>
                 </div>

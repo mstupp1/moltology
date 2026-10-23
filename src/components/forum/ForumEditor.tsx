@@ -165,7 +165,7 @@ export const ForumEditor = forwardRef<ForumEditorHandle, ForumEditorProps>(funct
     content: forumMarkdownToDoc(value) as JSONContent,
     editorProps: {
       attributes: {
-        class: `forum-editor-content ${SIZE_CLASS[size]} max-h-[420px] overflow-y-auto px-3 py-2.5 text-[16px] sm:text-sm text-ink leading-relaxed outline-none break-words`,
+        class: `forum-editor-content ${SIZE_CLASS[size]} max-h-[420px] overflow-y-auto px-3 py-2.5 text-[16px] sm:text-sm text-ink leading-relaxed outline-hidden break-words`,
         role: 'textbox',
         'aria-multiline': 'true',
         ...(ariaLabel ? { 'aria-label': ariaLabel } : {}),
@@ -419,7 +419,7 @@ export const ForumEditor = forwardRef<ForumEditorHandle, ForumEditorProps>(funct
                   closeLink()
                 }
               }}
-              className={`flex-1 min-w-[160px] min-h-8 bg-surface-1 border px-2 text-xs text-ink rounded-control outline-none placeholder:text-ink-muted transition-[border-color,box-shadow] ${
+              className={`flex-1 min-w-[160px] min-h-8 bg-surface-1 border px-2 text-xs text-ink rounded-control outline-hidden placeholder:text-ink-muted transition-[border-color,box-shadow] ${
                 linkError ? 'border-crimson-aggro shadow-field-error' : 'border-line focus:border-cyan-glow focus:shadow-field-focus'
               }`}
               data-testid="forum-link-input"

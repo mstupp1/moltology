@@ -116,7 +116,7 @@ export const MoltmaxGuideFloatingPill: React.FC<MoltmaxGuideFloatingPillProps> =
         <button
           type="button"
           onClick={onOpenGuideModal}
-          className="relative flex items-center gap-3 pl-[72px] pr-10 py-3 sm:py-3.5 text-left rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.55)] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00c3ff]"
+          className="relative flex items-center gap-3 pl-[72px] pr-10 py-3 sm:py-3.5 text-left rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.55)] cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00c3ff]"
           aria-label="Get the free Moltmaxxing Field Manual"
         >
           <span className="block min-w-0 space-y-0.5">

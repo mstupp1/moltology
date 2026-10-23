@@ -133,7 +133,7 @@ export const QuizQuestionCard: React.FC<QuizQuestionCardProps> = ({
                 onLoad={() => setImageLoaded(true)}
                 className={cn(
                   'h-full w-full object-cover object-center transition-all duration-700 ease-out group-hover:scale-[1.03]',
-                  imageLoaded ? 'opacity-100 blur-0' : 'opacity-0 blur-sm'
+                  imageLoaded ? 'opacity-100 blur-none' : 'opacity-0 blur-sm'
                 )}
               />
               {!imageLoaded && (

@@ -259,7 +259,7 @@ function HubThreadRow({ thread }: { thread: ForumHubThreadView }) {
         <Link
           to="/forum/$categorySlug/$topicSlug"
           params={{ categorySlug: thread.categorySlug, topicSlug: thread.slug }}
-          className="flex items-center gap-1.5 min-w-0 rounded-chip after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-cyan-glow"
+          className="flex items-center gap-1.5 min-w-0 rounded-chip after:absolute after:inset-0 focus-visible:outline-hidden focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-cyan-glow"
         >
           {thread.unread && (
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow shrink-0">

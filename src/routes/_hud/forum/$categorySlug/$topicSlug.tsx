@@ -396,7 +396,7 @@ function ForumThreadPage() {
                           handle: topic.authorHandle,
                         }),
                       }}
-                      className="shrink-0 group/topic-avatar focus:outline-none"
+                      className="shrink-0 group/topic-avatar focus:outline-hidden"
                       tabIndex={-1}
                       aria-hidden="true"
                     >
@@ -492,7 +492,7 @@ function ForumThreadPage() {
                     value={topicTitleDraft}
                     onChange={(e) => setTopicTitleDraft(e.target.value)}
                     aria-label="Revise topic title"
-                    className="w-full bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus p-3 text-sm text-ink outline-none rounded-control transition-[border-color,box-shadow]"
+                    className="w-full bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus p-3 text-sm text-ink outline-hidden rounded-control transition-[border-color,box-shadow]"
                   />
                   <ForumEditor
                     value={topicBodyDraft}

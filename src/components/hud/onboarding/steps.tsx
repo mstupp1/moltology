@@ -43,7 +43,7 @@ export interface OnboardingStep {
 function StepHeading({ id, title, children }: { id: string; title: string; children?: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <h2 id={id} tabIndex={-1} className="font-sans text-xl sm:text-2xl font-bold text-ink tracking-tight outline-none">
+      <h2 id={id} tabIndex={-1} className="font-sans text-xl sm:text-2xl font-bold text-ink tracking-tight outline-hidden">
         {title}
       </h2>
       {children ? <p className="font-sans text-sm text-ink-body leading-relaxed">{children}</p> : null}

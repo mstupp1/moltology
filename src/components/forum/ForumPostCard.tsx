@@ -188,7 +188,7 @@ export function ForumPostCard({
                     handle: post.authorHandle,
                   }),
                 }}
-                className="shrink-0 group/avatar focus:outline-none"
+                className="shrink-0 group/avatar focus:outline-hidden"
                 tabIndex={-1}
                 aria-hidden="true"
               >

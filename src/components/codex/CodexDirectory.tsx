@@ -46,7 +46,7 @@ export function CodexDirectory({
             placeholder="Search scriptures and verses"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full min-h-10 bg-surface-2 text-ink placeholder:text-ink-muted/70 text-sm rounded-control border border-line pl-9 pr-9 py-2 outline-none transition-[border-color,box-shadow] duration-200 hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus [&::-webkit-search-cancel-button]:hidden"
+            className="w-full min-h-10 bg-surface-2 text-ink placeholder:text-ink-muted/70 text-sm rounded-control border border-line pl-9 pr-9 py-2 outline-hidden transition-[border-color,box-shadow] duration-200 hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus [&::-webkit-search-cancel-button]:hidden"
           />
           {searchQuery && (
             <button

@@ -84,7 +84,7 @@ export function SearchPage({
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
             placeholder="Search members or pages"
-            className="w-full pl-10 pr-3 py-2.5 bg-[#050808] border border-[#3a4a49] text-sm text-[#dfe3e3] placeholder:text-[#4a5a59] focus:outline-none focus:border-[#00c3ff] chamfer-corner"
+            className="w-full pl-10 pr-3 py-2.5 bg-[#050808] border border-[#3a4a49] text-sm text-[#dfe3e3] placeholder:text-[#4a5a59] focus:outline-hidden focus:border-[#00c3ff] chamfer-corner"
             aria-label="Search query"
           />
           {searching && type === 'people' && (

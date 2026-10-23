@@ -139,7 +139,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
             }}
             placeholder="Search chats"
             aria-label="Search chats"
-            className="w-full h-9 pl-8 pr-8 rounded-control bg-surface-1 border border-line-subtle hover:border-line focus:border-line text-base sm:text-xs text-ink placeholder-ink-muted outline-none transition-colors [&::-webkit-search-cancel-button]:hidden"
+            className="w-full h-9 pl-8 pr-8 rounded-control bg-surface-1 border border-line-subtle hover:border-line focus:border-line text-base sm:text-xs text-ink placeholder-ink-muted outline-hidden transition-colors [&::-webkit-search-cancel-button]:hidden"
           />
           {query && (
             <button

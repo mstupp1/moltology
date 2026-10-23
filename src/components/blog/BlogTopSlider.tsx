@@ -102,7 +102,7 @@ export function BlogTopSlider({
       onKeyDown={handleKeyDown}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative w-full overflow-hidden chitin-card border border-line-subtle bg-surface-1 hud-sheen rounded-panel shadow-sheen-inset group focus:outline-none focus-visible:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow transition-all duration-300"
+      className="relative w-full overflow-hidden chitin-card border border-line-subtle bg-surface-1 hud-sheen rounded-panel shadow-sheen-inset group focus:outline-hidden focus-visible:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow transition-all duration-300"
     >
       {/* Top Animated Progress Bar */}
       <div className="w-full h-1 bg-surface-3 relative overflow-hidden">

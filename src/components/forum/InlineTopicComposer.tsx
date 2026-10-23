@@ -304,7 +304,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
                 value={activeCategoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
                 disabled={fixedCategory}
-                className="w-full min-h-[44px] sm:min-h-[38px] bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus px-3 py-2 text-[16px] sm:text-xs text-ink outline-none rounded-control transition-[border-color,box-shadow] disabled:opacity-75"
+                className="w-full min-h-[44px] sm:min-h-[38px] bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus px-3 py-2 text-[16px] sm:text-xs text-ink outline-hidden rounded-control transition-[border-color,box-shadow] disabled:opacity-75"
               >
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id} className="bg-surface-2 text-ink">
@@ -333,7 +333,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
               onChange={(e) => setTitle(e.target.value)}
               placeholder="What would you like to discuss?"
               maxLength={150}
-              className="w-full min-h-[44px] sm:min-h-[38px] bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus px-3 py-2 text-[16px] sm:text-xs text-ink outline-none rounded-control transition-[border-color,box-shadow] placeholder:text-ink-muted"
+              className="w-full min-h-[44px] sm:min-h-[38px] bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus px-3 py-2 text-[16px] sm:text-xs text-ink outline-hidden rounded-control transition-[border-color,box-shadow] placeholder:text-ink-muted"
             />
           </div>
 

@@ -79,7 +79,7 @@ export function HubSurfaceControls({ dense = false }: HubSurfaceControlsProps) {
           onClick={() => {
             void handleToggleAlerts()
           }}
-          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#00c3ff] disabled:opacity-40 disabled:cursor-not-allowed ${
+          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-1 focus:ring-[#00c3ff] disabled:opacity-40 disabled:cursor-not-allowed ${
             enabled ? 'bg-[#00c3ff]' : 'bg-cyan-950 border-cyan-800'
           }`}
         >

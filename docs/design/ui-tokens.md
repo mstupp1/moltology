@@ -17,7 +17,8 @@ says when to use each. New UI uses these and the primitives in `src/components/u
 | `crimson-aggro`, `crimson-hover`, `crimson-text`, `crimson-soft` | Sacred and destructive: fill / hover fill / red text on dark grounds / tinted ground. |
 | `emerald-500`, `amber-500` | Done and warning, always with a word or ▲ ▼. |
 
-The `line-*` and `*-soft` tokens are rgba, so Tailwind's `/50` opacity modifier does not apply to them.
+The `line-*` and `*-soft` tokens already include alpha. Tailwind 4 opacity modifiers
+apply to those colors too, so `/50` makes them more transparent.
 
 ### Brand artwork
 

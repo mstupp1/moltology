@@ -251,7 +251,7 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
                   aria-checked={emailOptIn}
                   aria-label="Toggle email updates"
                   onClick={toggleEmailOptIn}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                     emailOptIn ? 'bg-cyan-glow border-transparent' : 'bg-surface-3 border-line'
                   }`}
                 >
@@ -287,7 +287,7 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
                   aria-checked={!heavyVfxDisabled}
                   aria-label="Toggle underwater bubbles"
                   onClick={toggleHeavyVfx}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                     !heavyVfxDisabled ? 'bg-cyan-glow border-transparent' : 'bg-surface-3 border-line'
                   }`}
                 >

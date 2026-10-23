@@ -458,7 +458,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
             <select
               value={mascot}
               onChange={(e) => setMascot(e.target.value as MascotKey)}
-              className="w-full p-2.5 rounded-lg bg-[#081016] border border-slate-800 text-xs font-mono text-slate-200 focus:border-cyan-400 focus:outline-none"
+              className="w-full p-2.5 rounded-lg bg-[#081016] border border-slate-800 text-xs font-mono text-slate-200 focus:border-cyan-400 focus:outline-hidden"
             >
               <option value="random">🎲 Random Mascot (Surprise)</option>
               {Object.values(MASCOT_REGISTRY).map((m) => (
@@ -478,7 +478,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
             <select
               value={ctaTexture}
               onChange={(e) => setCtaTexture(e.target.value as CtaTextureKey)}
-              className="w-full p-2.5 rounded-lg bg-[#081016] border border-slate-800 text-xs font-mono text-slate-200 focus:border-cyan-400 focus:outline-none"
+              className="w-full p-2.5 rounded-lg bg-[#081016] border border-slate-800 text-xs font-mono text-slate-200 focus:border-cyan-400 focus:outline-hidden"
             >
               <option value="chitin">Chitin Plates (Classic Molt)</option>
               <option value="hex">Hex Lattice (Cellular Chitin)</option>
