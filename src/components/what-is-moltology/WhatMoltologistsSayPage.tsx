@@ -2,13 +2,13 @@ import React, { useMemo, useState } from 'react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import {
   MEMBER_VOICES,
-  STORY_MEDIA,
   VOICE_STAGE_ACCENTS,
   VOICE_STAGE_LABELS,
   type MemberVoice,
   type VoiceStage,
 } from './story/content'
 import { Eyebrow, PrimaryCta, SecondaryCta, StoryHero, StoryImg } from './story/StoryPrimitives'
+import { PAGE_ART } from './story/page-art'
 
 type Filter = 'all' | VoiceStage
 
@@ -35,7 +35,7 @@ export const WhatMoltologistsSayPage: React.FC = () => {
     <main className="flex-1 w-full overflow-x-clip">
       <StoryHero
         tall={false}
-        media={{ image: STORY_MEDIA.archive }}
+        media={{ image: PAGE_ART.voicesHero }}
         eyebrow="What Moltologists say"
         title="Voices from the trench."
         lede={
@@ -67,7 +67,7 @@ export const WhatMoltologistsSayPage: React.FC = () => {
                 </figcaption>
               </div>
               <div className="relative min-h-[16rem]">
-                <StoryImg image={STORY_MEDIA.shrine} className="absolute inset-0 h-full w-full object-cover" />
+                <StoryImg image={PAGE_ART.featuredVoice} className="absolute inset-0 h-full w-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#05090c] to-transparent" />
               </div>
             </figure>
@@ -129,8 +129,8 @@ export const WhatMoltologistsSayPage: React.FC = () => {
       <section className="pb-24 sm:pb-32">
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
           <div className="relative isolate overflow-hidden rounded-panel border border-line-subtle px-6 py-14 sm:px-14 sm:py-20 text-center">
-            <StoryImg image={STORY_MEDIA.lookingUp} className="absolute inset-0 -z-10 h-full w-full object-cover opacity-50" />
-            <div className="absolute inset-0 -z-10 bg-abyss/70" />
+            <StoryImg image={PAGE_ART.firstRite} className="absolute inset-0 -z-10 h-full w-full object-cover object-right md:object-center opacity-80" />
+            <div className="absolute inset-0 -z-10 bg-abyss/50" />
             <h2 className="font-grotesk font-bold tracking-tight text-ink text-3xl sm:text-5xl leading-[1.05]">
               Your first shed can be small.
             </h2>

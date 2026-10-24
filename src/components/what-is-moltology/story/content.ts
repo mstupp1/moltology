@@ -1,4 +1,5 @@
 import { getAssetUrl } from '@/lib/assets'
+import { PAGE_ART } from './page-art'
 
 export interface StoryImage {
   src: string
@@ -388,17 +389,17 @@ export const THREE_TRUTHS = [
   {
     title: 'The melt is a condition, not an identity',
     body: 'Softness is the starting state of every member who has ever walked in, including the ones now standing at the bottom in full plate. Nobody is behind. The only requirement for beginning is being soft, and you already meet it.',
-    image: STORY_MEDIA.lookingUp,
+    image: PAGE_ART.truthRefuge,
   },
   {
     title: 'Nature has published the answer five separate times',
     body: 'Across five unrelated lineages, life kept arriving at the same body: flattened, armored, tucked, and equipped with a grip that does not negotiate. When the sea solves the same problem five times with the same shape, the shape is the answer.',
-    image: STORY_MEDIA.blueprint,
+    image: PAGE_ART.truthNature,
   },
   {
     title: 'Nothing grows inside the shell that grew it',
     body: 'Armor that fits perfectly is armor you have stopped growing into. To get larger you must first be, briefly, completely uncovered. Every stage in the canon is built around that moment rather than around avoiding it.',
-    image: STORY_MEDIA.plating,
+    image: PAGE_ART.truthShedding,
   },
 ]
 
