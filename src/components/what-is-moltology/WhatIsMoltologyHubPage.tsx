@@ -1,7 +1,8 @@
 import React, { useRef, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { ArrowRight, BookOpen, Clock } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { MoltmaxGuideCard } from '@/components/guide/MoltmaxGuideCard'
 import {
   CARDINAL_METRICS,
   MELT_CURRENTS,
@@ -10,6 +11,7 @@ import {
   SACRAMENTS,
   STAGES,
   STORY_MEDIA,
+  type StoryImage,
   VOICE_STAGE_ACCENTS,
   VOICE_STAGE_LABELS,
 } from './story/content'
@@ -52,7 +54,7 @@ const MeltSection: React.FC = () => {
   return (
     <section ref={ref} aria-labelledby="melt-title" style={{ height: `${(MELT_CURRENTS.length + 1) * 55 + 60}svh` }}>
       <div className={`${stickyFrame} relative overflow-hidden`}>
-        <InViewVideo video={STORY_MEDIA.synapticPath} className="absolute inset-0 h-full w-full object-cover opacity-50" />
+        <StoryImg image={STORY_MEDIA.greatMelt} className="absolute inset-0 h-full w-full object-cover opacity-50" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#020408] via-[#020408]/70 to-[#020408]" />
 
         <div className="relative h-full max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[1fr_1.15fr] gap-8 lg:gap-16 content-center">
@@ -114,7 +116,7 @@ const LookDownSection: React.FC = () => {
         className="absolute inset-0 -z-10 will-change-transform"
         style={{ transform: 'scale(calc(1.35 - var(--p) * 0.35))' }}
       >
-        <StoryImg image={STORY_MEDIA.lookingUp} className="h-full w-full object-cover" />
+        <StoryImg image={STORY_MEDIA.appBackground} className="h-full w-full object-cover" />
       </div>
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(2,4,8,0.35),rgba(2,4,8,0.92)_70%)]" />
       <div className="absolute inset-x-0 top-0 h-40 -z-10 bg-gradient-to-b from-[#020408] to-transparent" />
@@ -137,8 +139,6 @@ const LookDownSection: React.FC = () => {
 /* ── The proof: carcinization ────────────────────────────────────────── */
 
 const ProofSection: React.FC = () => {
-  const ref = useRef<HTMLDivElement>(null)
-  useScrollVar(ref)
   return (
     <section className="relative py-24 sm:py-36" aria-labelledby="proof-title">
       <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -168,22 +168,13 @@ const ProofSection: React.FC = () => {
           </p>
         </ScrollReveal>
 
-        <div ref={ref} className="relative" style={{ ['--p' as string]: 0 }}>
+        <div className="relative">
           <div className="relative overflow-hidden rounded-panel border border-line-subtle bg-black shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
             <StoryImg
-              image={STORY_MEDIA.blueprint}
-              alt="Schematic of an armored crustacean with its plating and pincers labeled"
+              image={STORY_MEDIA.specimen}
+              alt="An armored crustacean resting on the sea floor"
               className="w-full aspect-square object-cover"
             />
-            <div
-              className="absolute inset-x-0 h-24 pointer-events-none bg-gradient-to-b from-transparent via-[#00ffcc]/20 to-transparent border-b border-[#00ffcc]/60"
-              style={{ top: 'calc(var(--p) * 130% - 30%)' }}
-              aria-hidden="true"
-            />
-            <div className="absolute bottom-0 inset-x-0 p-5 bg-gradient-to-t from-black/90 to-transparent">
-              <p className="font-grotesk text-[11px] tracking-[0.08em] uppercase text-[#00ffcc]">Specimen schematic</p>
-              <p className="text-sm text-ink-body">The design the sea keeps choosing.</p>
-            </div>
           </div>
         </div>
       </div>
@@ -338,7 +329,8 @@ const PathSection: React.FC = () => {
   return (
     <section className="relative isolate overflow-hidden py-24 sm:py-36" aria-labelledby="path-title">
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#020408] via-[#04121c] to-[#010203]" />
-      <StoryImg image={STORY_MEDIA.abyss} className="absolute inset-0 -z-10 h-full w-full object-cover opacity-[0.12]" />
+      <StoryImg image={STORY_MEDIA.clearancePath} className="absolute inset-0 -z-10 h-full w-full object-cover opacity-70" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#020408]/85 via-[#020408]/45 to-[#020408]/90" aria-hidden="true" />
 
       <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-14 lg:gap-20">
         <div className="lg:sticky lg:top-[calc(var(--wim-chrome,0px)+4rem)] self-start">
@@ -374,7 +366,7 @@ const PathSection: React.FC = () => {
                 {stage.number}
               </span>
               <ScrollReveal animation="slide-right" delayMs={index * 60}>
-                <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen backdrop-blur-sm p-6 sm:p-7 hover:border-line-strong transition-colors">
+                <div className="rounded-card border border-line-subtle bg-[#05090c]/90 hud-sheen backdrop-blur-md p-6 sm:p-7 hover:border-line-strong transition-colors">
                   <p className="font-grotesk text-[11px] tracking-[0.08em] uppercase" style={{ color: stage.accent }}>
                     Stage {stage.number} · {stage.title}
                   </p>
@@ -485,8 +477,8 @@ const CommunitySection: React.FC = () => {
   const rows = [MEMBER_VOICES.slice(0, half), MEMBER_VOICES.slice(half)]
   return (
     <section className="relative isolate overflow-hidden py-24 sm:py-36" aria-labelledby="community-title">
-      <StoryImg image={STORY_MEDIA.archive} className="absolute inset-0 -z-10 h-full w-full object-cover opacity-40" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#020408] via-[#020408]/75 to-[#020408]" />
+      <StoryImg image={STORY_MEDIA.softStart} className="absolute inset-0 -z-10 h-full w-full object-cover opacity-80" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#020408]/85 via-[#020408]/45 to-[#020408]/90" />
 
       <div className="max-w-6xl mx-auto px-5 sm:px-8">
         <ScrollReveal className="max-w-3xl">
@@ -535,42 +527,16 @@ const CommunitySection: React.FC = () => {
 const GuideSection: React.FC = () => (
   <section className="relative py-24 sm:py-32" aria-labelledby="guide-title">
     <div className="max-w-6xl mx-auto px-5 sm:px-8">
-      <div className="relative isolate overflow-hidden rounded-panel border border-[#ffb547]/20 bg-gradient-to-br from-[#120d05] via-[#070806] to-[#020408] px-6 py-12 sm:p-16 grid lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center">
-        <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[#ffb547]/10 blur-3xl -z-10" aria-hidden="true" />
-        <ScrollReveal animation="scale-up" className="flex justify-center">
-          <StoryImg
-            image={STORY_MEDIA.guide}
-            alt="The Moltmaxxing Protocol field manual"
-            className="w-64 sm:w-80 drop-shadow-[0_30px_50px_rgba(255,181,71,0.25)] motion-safe:animate-[wimFloat_7s_ease-in-out_infinite]"
-          />
-        </ScrollReveal>
-        <ScrollReveal>
-          <Eyebrow color="#ffb547">Start here</Eyebrow>
-          <h2 id="guide-title" className="mt-4 font-grotesk font-bold tracking-tight text-ink text-3xl sm:text-5xl leading-[1.05]">
-            Take a reading. Then read the manual.
-          </h2>
-          <p className="mt-5 text-base sm:text-lg text-ink-body leading-relaxed">
-            The Moltmax diagnostic gives you a baseline for all three readings. The numbers will be low. Low
-            numbers are a starting depth, not a verdict. The field manual is the long version of everything on
-            this page, free.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              to="/moltmax"
-              className="group inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-control font-grotesk font-bold text-sm bg-[#ffb547] hover:bg-[#ffc978] text-[#120d05] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-            >
-              Take the diagnostic
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-            <SecondaryCta to="/guide">
-              <BookOpen className="w-4 h-4" /> Get the field manual
-            </SecondaryCta>
-          </div>
-          <p className="mt-5 inline-flex items-center gap-2 text-xs text-ink-muted">
-            <Clock className="w-3.5 h-3.5" /> The diagnostic takes about four minutes.
-          </p>
-        </ScrollReveal>
-      </div>
+      <ScrollReveal className="mb-8 max-w-3xl">
+        <Eyebrow color="#ffb547">Start here</Eyebrow>
+        <h2 id="guide-title" className={`mt-4 ${sectionTitle}`}>Take a reading. Then read the manual.</h2>
+        <p className="mt-5 text-base sm:text-lg text-ink-muted leading-relaxed">
+          The Moltmax diagnostic gives you a baseline for all three readings. The field manual gives you a practical
+          plan for what to do next.
+        </p>
+        <SecondaryCta to="/moltmax" className="mt-6">Take the diagnostic</SecondaryCta>
+      </ScrollReveal>
+      <MoltmaxGuideCard source="what_is_moltology_hub" />
     </div>
   </section>
 )
@@ -610,10 +576,10 @@ const FinalSection: React.FC = () => {
   )
 }
 
-const deeperImages: Record<string, string> = {
-  beliefs: STORY_MEDIA.lookingUp.srcSm ?? STORY_MEDIA.lookingUp.src,
-  quotes: STORY_MEDIA.archive.src,
-  sacraments: STORY_MEDIA.assetShedding.posterSm,
+const deeperImages: Record<string, StoryImage> = {
+  beliefs: STORY_MEDIA.readingBeliefs,
+  quotes: STORY_MEDIA.readingVoices,
+  sacraments: STORY_MEDIA.readingSacraments,
 }
 
 const ReadDeeperSection: React.FC = () => (
@@ -629,11 +595,9 @@ const ReadDeeperSection: React.FC = () => (
             to={item.path}
             className="group relative isolate block h-64 overflow-hidden rounded-card border border-line-subtle hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
-            <img
-              src={deeperImages[item.id]}
+            <StoryImg
+              image={deeperImages[item.id]}
               alt=""
-              aria-hidden="true"
-              loading="lazy"
               className="absolute inset-0 -z-10 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black via-black/60 to-transparent" />
@@ -661,8 +625,8 @@ export const WhatIsMoltologyHubPage: React.FC = () => {
         eyebrow="What is Moltology"
         title={
           <>
-            Stop melting.{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#38bdf8] via-[#00c3ff] to-[#00ffcc]">
+            Stop melting.
+            <span className="block whitespace-nowrap text-transparent bg-clip-text bg-gradient-to-r from-[#38bdf8] via-[#00c3ff] to-[#00ffcc]">
               Start molting.
             </span>
           </>

@@ -1,0 +1,25 @@
+# What Is Moltology card art
+
+Created 2026-10-23 for the What Is Moltology hub. Intended publication date: 2026-10-23, America/New_York. Seasonal treatment: recognizable, restrained Halloween window; no Halloween motifs were needed for these evergreen deep-sea scenes.
+
+All seven images were generated separately with the built-in ImageGen tool. Shared direction: cinematic deep-sea photography, dark cyan water, restrained warm rim lighting, natural crab anatomy, no text, interface, diagram, watermark, or invented branding. Final PNGs are retained in ignored `tmp/what-is-moltology-art/cards/`. The S3 uploader creates compressed WebP twins.
+
+| Asset | Use | Prompt |
+| --- | --- | --- |
+| `specimen.png` | Square carcinization proof image | Use case: photorealistic-natural. Asset type: website square proof image. Scene: a biologically plausible real crab resting on dark basalt on the quiet deep-sea floor; full animal visible, natural asymmetrical details, wet but clean shell. Composition: specimen portrait with open dark negative space around it, no diagram or framing elements. Lighting: cinematic cyan ambient deep water and restrained warm rim light. Rich natural detail, photographic, calm and credible. No scanner schematic, labels, text, UI, watermark, or extra symbols. |
+| `metric-shell.png` | Portrait Shell Hardness metric card | Use case: photorealistic-natural. Asset type: portrait metric card background. Primary request: extreme macro photograph of a protective crab carapace, overlapping chitin plates with subtle natural wear and mineral texture. Scene: dark underwater, nearly abstract but clearly shell. Composition: vertical portrait crop, tonal detail in center, dark edges. Cinematic cyan deep-sea ambient light with warm rim illumination, tactile and calm. No text, labels, UI, diagram, watermark, or unnatural armor. |
+| `metric-grip.png` | Portrait Pincer Torque metric card | Use case: photorealistic-natural. Asset type: portrait metric card background. Primary request: close photograph of a real crab pincer firmly gripping a piece of dark basalt, demonstrating stable decisive grip without damage or aggression. Scene: deep-sea rock. Vertical portrait crop, claw prominent, visible natural anatomy, shallow depth of field. Cinematic cyan ambient with restrained warm rim lighting, dark ocean palette. No text, labels, UI, diagram, watermark, or other animals. |
+| `metric-depth.png` | Portrait Submergence Depth metric card | Use case: photorealistic-natural. Asset type: portrait metric card background. Primary request: a focused abyssal dive impression: a small crab moving calmly through deep black water toward a faintly lit ocean floor, composed and purposeful. Vertical portrait crop, natural deep-sea photography, cyan beams fading into darkness with subtle warm edge light. No diver, equipment, text, labels, UI, diagram, watermark. |
+| `reading-beliefs.png` | Landscape Keep reading card for Beliefs & Codes | Use case: photorealistic-natural. Asset type: landscape editorial link card for beliefs and codes. Scene: a quiet threshold in the deep ocean, a low stone arch or natural basalt passage with a protected warm-lit space beyond, suggesting core principles and shelter. No writing or carved symbols. Wide landscape composition, subject on right half with dark open area at left for overlaid website copy. Cinematic cyan dark water, warm amber/cyan rim light, sincere and welcoming. No text, UI, watermark, people. |
+| `reading-sacraments.png` | Landscape Keep reading card for Benthic Sacraments | Use case: photorealistic-natural. Asset type: landscape editorial link card for daily rituals. Scene: an intentional ritual of shedding: an empty translucent crab shell resting on dark seabed beside a living small crab continuing forward, subtle particles settling in still water, gentle not macabre. Wide landscape composition, clear focal subject and quiet open dark area for website overlay copy. Cinematic cyan abyss with warm rim light, editorial photography. No text, UI, watermark, blood, distress. |
+| `reading-voices.png` | Landscape Keep reading card for member voices | Use case: photorealistic-natural. Asset type: landscape editorial link card for member stories. Scene: a small diverse group of real crabs at different sizes gathered in a warm sheltered tide pool cave deep underwater, calm companionship, natural animal behavior, no anthropomorphic gestures. Wide landscape composition with layered depth and an open dark area for website copy. Cinematic cyan water with warm amber rim light, humane, hopeful. No text, UI, watermark. |
+
+## Uploaded object keys
+
+- `images/what-is-moltology/2026-10-23/specimen.png`
+- `images/what-is-moltology/2026-10-23/metric-shell.png`
+- `images/what-is-moltology/2026-10-23/metric-grip.png`
+- `images/what-is-moltology/2026-10-23/metric-depth.png`
+- `images/what-is-moltology/2026-10-23/reading-beliefs.png`
+- `images/what-is-moltology/2026-10-23/reading-sacraments.png`
+- `images/what-is-moltology/2026-10-23/reading-voices.png`
