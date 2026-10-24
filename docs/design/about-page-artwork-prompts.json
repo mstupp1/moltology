@@ -1,0 +1,199 @@
+{
+  "generatedOn": "2026-10-23",
+  "tool": "built-in image_gen",
+  "agents": "three gpt-6-luna sub-agents",
+  "treatment": "evergreen",
+  "bucketPrefix": "images/about/20261023/",
+  "assets": [
+    {
+      "file": "beliefs-hero-desktop.png",
+      "prompt": "Use case: stylized-concept\nAsset type: evergreen website hero artwork for Moltology Beliefs & Codes\nPrimary request: Create cinematic environmental concept art of an abyssal monumental open stone sanctuary. Three luminous chitin-like arches and a broad ascending stair rise from a calm ocean floor. Main architecture occupies the right side; preserve uncluttered darker negative space in the lower left for a page title.\nScene/backdrop: vast deep-ocean sanctuary, open and quiet, no enclosing walls\nStyle/medium: premium cinematic 3D environment concept art, tactile basalt and chitin materials, refined and believable\nComposition/framing: wide 16:9 landscape, architecture weighted right, lower-left quiet negative space\nLighting/mood: calm cyan illumination with a distant restrained warm amber glow; contemplative, welcoming, monumental\nColor palette: abyssal navy, basalt charcoal, luminous cyan, small warm amber accents\nMaterials/textures: weathered stone, subtly translucent chitin-like arches, fine mineral detail\nConstraints: no text, logos, UI, people, creatures or mascots; evergreen reusable website art; no holiday imagery."
+    },
+    {
+      "file": "beliefs-hero-mobile.png",
+      "prompt": "Use case: stylized-concept\nAsset type: evergreen website hero artwork for Moltology Beliefs & Codes\nPrimary request: Create a freshly composed portrait version of a monumental open stone sanctuary beneath the ocean. Three luminous chitin-like arches frame a calm stair descending through the sanctuary. Place architecture in the upper center and leave the lower half quiet and dark for page text.\nScene/backdrop: vast deep-ocean sanctuary, open and quiet, no enclosing walls\nStyle/medium: premium cinematic 3D environment concept art, tactile basalt and chitin materials, refined and believable\nComposition/framing: portrait 3:4, architecture in upper center, lower half uncluttered dark negative space\nLighting/mood: calm cyan illumination with a distant restrained warm amber glow; contemplative, welcoming\nColor palette: abyssal navy, basalt charcoal, luminous cyan, small warm amber accents\nMaterials/textures: weathered stone, subtly translucent chitin-like arches, fine mineral detail\nConstraints: no text, logos, UI, people, creatures or mascots; evergreen reusable website art; no holiday imagery."
+    },
+    {
+      "file": "truth-depth.png",
+      "prompt": "Use case: stylized-concept\nAsset type: evergreen website supporting artwork for Moltology Beliefs & Codes, truth about the Melt as a condition rather than an identity\nPrimary request: A calm, empty deep-ocean refuge, expressed as a monumental descent of broad basalt steps into still dark water, where the noisy upper surface fades above. One small distant cyan focal light rests at the end of the descent, suggesting quiet focus and shelter without implying a person or creature.\nScene/backdrop: open abyssal seafloor and descending stone stair, tranquil deep ocean\nStyle/medium: premium cinematic 3D environment concept art, tactile basalt and water, refined and believable\nComposition/framing: landscape 4:3, strong descending perspective, single focal point in the distance, substantial calm dark water around it\nLighting/mood: hushed cyan focal glow in deep navy shadow, safe, spacious and steady\nColor palette: abyssal navy, basalt charcoal, quiet cyan\nMaterials/textures: worn basalt steps, faint particulate in water, soft volumetric light\nConstraints: no text, logos, UI, people, creatures or mascots; no dramatic danger; evergreen, no holiday imagery."
+    },
+    {
+      "file": "truth-harden.png",
+      "prompt": "Use case: stylized-concept\nAsset type: evergreen website supporting artwork for Moltology Beliefs & Codes, truth that nature arrived at crab forms repeatedly\nPrimary request: Premium still-life concept art showing five distinct natural crab shell forms arranged like a quiet scientific museum study on dark seafloor stone. Each form should be an unmistakably different crab carapace silhouette and proportion, with subtle variation in natural color and shape, suggesting convergent evolution without becoming a literal diagram.\nScene/backdrop: deep-ocean stone plinths and soft distant water, orderly but organic display\nStyle/medium: premium cinematic 3D environmental still life, elegant scientific-natural history mood, highly tactile\nComposition/framing: landscape 4:3, five separate forms all legible in a balanced group, varied scale and spacing, no overlap hiding their silhouettes\nLighting/mood: restrained cyan edge light with gentle warm gold accents, thoughtful and quietly wondrous\nColor palette: abyssal navy, charcoal basalt, cyan highlights, restrained amber-gold and muted natural shell tones\nMaterials/textures: mineralized chitin, fine ridges, matte and satin surfaces\nConstraints: exactly five distinct crab shell forms; shells only, no living creatures, text, labels, logos, UI, people or mascots; no holiday imagery."
+    },
+    {
+      "file": "truth-shed.png",
+      "prompt": "Use case: stylized-concept\nAsset type: evergreen website supporting artwork for Moltology Beliefs & Codes, truth that nothing grows inside the old shell\nPrimary request: On a quiet ocean floor, show an empty, delicate, translucent shed crab carapace beside a new intact shell. The shed shell is clearly hollow and fragile, naturally parted and left behind; the newer shell is whole and quietly luminous. No crab is present. The image should make release and renewal feel calm, gentle, and natural.\nScene/backdrop: serene benthic seafloor with fine sediment and sparse stone, softly fading into dark water\nStyle/medium: premium cinematic 3D environment concept art, tactile natural history realism with restrained poetic glow\nComposition/framing: landscape 4:3, both shells clearly visible and distinct, gentle diagonal relationship, negative space around them\nLighting/mood: luminous cyan and gentle coral warmth, quiet, tender and hopeful\nColor palette: abyssal navy and muted stone, translucent cyan, small soft coral accents\nMaterials/textures: delicate translucent shed chitin, subtle ridges and fine mineral grains, new intact shell with satin finish\nConstraints: no creature needed; no text, logos, UI, people or mascots; no threatening mood; evergreen reusable website art; no holiday imagery."
+    },
+    {
+      "file": "voices-hero-desktop.png",
+      "prompt": "Use case: stylized-concept. Asset type: website hero artwork for the What Moltologists Say page, desktop crop. A premium cinematic environment painting of an inhabited undersea community meeting hall where visitors gather in quiet discussion. Deep-sea stone chamber with circular stone discussion alcoves, arched windows showing open cyan water, warm amber lantern-like corals. Composition: wide 16:9 landscape; discussion alcoves and glowing amber corals primarily on the RIGHT; lower LEFT dark, calm, uncluttered, generous negative space for website title overlay; layered depth through arches to cyan sea. Quiet, warm, inhabited, contemplative; warm coral light against cool cyan and deep navy. Refined cinematic environment art, painterly realism, tactile carved stone and shell. No humans, cartoon mascots, text, lettering, logos, UI, watermark, Halloween or holiday cues."
+    },
+    {
+      "file": "voices-hero-mobile.png",
+      "prompt": "Use case: stylized-concept. Asset type: mobile website hero artwork, 3:4 portrait crop. A premium cinematic environment painting of a welcoming, inhabited undersea community meeting hall. Deep-sea stone chamber with a warm community gathering around a circular stone discussion alcove, arched windows onto cyan water, and amber lantern-like corals. Portrait 3:4, composed specifically for a mobile website hero; warm community circle in the UPPER CENTER; entire LOWER HALF dark, quiet, and mostly uncluttered for page title and description overlay; cyan water visible beyond an arch. Quiet, warm, inhabited and contemplative, amber coral glow balanced with deep ocean blue and cyan. Refined cinematic environment art, painterly realism, tactile worn stone and shell. No humans, cartoon mascots, text, lettering, logos, UI, watermark, Halloween or holiday imagery."
+    },
+    {
+      "file": "voices-feature.png",
+      "prompt": "Use case: stylized-concept. Asset type: website feature image, landscape 4:3. An intimate empty seat at a low circular stone table in a deep-sea community chamber, prepared for a thoughtful conversation. Quiet inhabited undersea meeting chamber, with an open blank notebook resting on the table and a softly luminous coral lamp nearby. Landscape 4:3, intimate eye-level view; table and empty seat are the focus, notebook open and completely blank, coral lamp softly glowing; surrounding chamber falls into deep blue shadow with hints of cyan beyond. Quiet, warm, contemplative, welcoming; amber coral light balanced by cool cyan and deep ocean blue. Premium cinematic environment art, painterly realism, tactile stone and shell. No people, foreground animals, cartoon mascots, text or markings in notebook, logos, UI, watermark, or holiday cues."
+    },
+    {
+      "file": "practices-bg.png",
+      "prompt": "Use case: stylized-concept. Asset type: website section background, wide 16:9. Scene: a premium cinematic undersea meditation garden on a dark seafloor, quiet basalt paths and a thin cyan bioluminescent current flowing along the bottom. Composition: large uncluttered deep navy center with generous negative space for overlay text; landscape environment, subdued low-contrast lighting intended to sit at low opacity behind web content. Materials: tactile basalt, subtle sediment, restrained luminous details. Palette: deep navy, cyan #00c3ff, very subtle warm coral accents. No text, UI, logos, people, creatures, mascots, holiday imagery, or focal object in center."
+    },
+    {
+      "file": "community-codes.png",
+      "prompt": "Use case: stylized-concept. Asset type: website background illustration, 4:3. Intimate premium cinematic undersea environment. A large, clearly EMPTY crab exoskeleton shell, detached and hollow, arches like a protective shelter over a smaller translucent shed exoskeleton shell (both are empty molted shells, no animals inside). Make the large shell visibly a hollow carapace with empty eye sockets and no eyes, no head/body attached; smaller form is also an empty transparent shell, not a living crab. Luminous coral surrounds them; warm gentle undersea light conveys protection, renewal, and care. Tactile shell and reef material, deep navy water, cyan #00c3ff bioluminescence with restrained amber/coral highlights. Balanced readable composition with scene filling frame. No living creatures, no eyes, no legs attached to bodies, no humanoid mascot, no combat, no text, UI, logos, people, or holiday imagery."
+    },
+    {
+      "file": "first-rite-bg.png",
+      "prompt": "Use case: stylized-concept. Asset type: website section background, wide 16:9. Scene: an open stone doorway on the far right of a cyan-lit deep sea basalt landscape, inviting warm amber light spilling from within the doorway. Composition: left two thirds calm dark navy negative space for website CTA overlay; doorway and brighter detail confined to far right. Premium cinematic environment concept art with tactile basalt and gentle underwater haze, cyan #00c3ff accents and subtle warm coral/amber light. No text, UI, logos, people, creatures, mascots, or holiday imagery."
+    }
+  ],
+  "verifiedUploads": [
+    {
+      "name": "beliefs-hero-desktop",
+      "key": "images/about/20261023/beliefs-hero-desktop.png",
+      "webp": "images/about/20261023/beliefs-hero-desktop.webp",
+      "width": 1672,
+      "height": 941,
+      "bytes": 142740
+    },
+    {
+      "name": "beliefs-hero-mobile",
+      "key": "images/about/20261023/beliefs-hero-mobile.png",
+      "webp": "images/about/20261023/beliefs-hero-mobile.webp",
+      "width": 1086,
+      "height": 1448,
+      "bytes": 90172
+    },
+    {
+      "name": "truth-depth",
+      "key": "images/about/20261023/truth-depth.png",
+      "webp": "images/about/20261023/truth-depth.webp",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 153678
+    },
+    {
+      "name": "truth-depth-sm",
+      "key": "images/about/20261023/truth-depth-sm.png",
+      "webp": "images/about/20261023/truth-depth-sm.webp",
+      "width": 900,
+      "height": 675,
+      "bytes": 70168
+    },
+    {
+      "name": "truth-harden",
+      "key": "images/about/20261023/truth-harden.png",
+      "webp": "images/about/20261023/truth-harden.webp",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 342800
+    },
+    {
+      "name": "truth-harden-sm",
+      "key": "images/about/20261023/truth-harden-sm.png",
+      "webp": "images/about/20261023/truth-harden-sm.webp",
+      "width": 900,
+      "height": 675,
+      "bytes": 162316
+    },
+    {
+      "name": "truth-shed",
+      "key": "images/about/20261023/truth-shed.png",
+      "webp": "images/about/20261023/truth-shed.webp",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 205664
+    },
+    {
+      "name": "truth-shed-sm",
+      "key": "images/about/20261023/truth-shed-sm.png",
+      "webp": "images/about/20261023/truth-shed-sm.webp",
+      "width": 900,
+      "height": 675,
+      "bytes": 109750
+    },
+    {
+      "name": "practices-bg",
+      "key": "images/about/20261023/practices-bg.png",
+      "webp": "images/about/20261023/practices-bg.webp",
+      "width": 1672,
+      "height": 941,
+      "bytes": 148420
+    },
+    {
+      "name": "practices-bg-sm",
+      "key": "images/about/20261023/practices-bg-sm.png",
+      "webp": "images/about/20261023/practices-bg-sm.webp",
+      "width": 900,
+      "height": 507,
+      "bytes": 50864
+    },
+    {
+      "name": "community-codes",
+      "key": "images/about/20261023/community-codes.png",
+      "webp": "images/about/20261023/community-codes.webp",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 220640
+    },
+    {
+      "name": "community-codes-sm",
+      "key": "images/about/20261023/community-codes-sm.png",
+      "webp": "images/about/20261023/community-codes-sm.webp",
+      "width": 900,
+      "height": 675,
+      "bytes": 117096
+    },
+    {
+      "name": "first-rite-bg",
+      "key": "images/about/20261023/first-rite-bg.png",
+      "webp": "images/about/20261023/first-rite-bg.webp",
+      "width": 1672,
+      "height": 941,
+      "bytes": 151382
+    },
+    {
+      "name": "first-rite-bg-sm",
+      "key": "images/about/20261023/first-rite-bg-sm.png",
+      "webp": "images/about/20261023/first-rite-bg-sm.webp",
+      "width": 900,
+      "height": 507,
+      "bytes": 58260
+    },
+    {
+      "name": "voices-hero-desktop",
+      "key": "images/about/20261023/voices-hero-desktop.png",
+      "webp": "images/about/20261023/voices-hero-desktop.webp",
+      "width": 1672,
+      "height": 941,
+      "bytes": 219462
+    },
+    {
+      "name": "voices-hero-mobile",
+      "key": "images/about/20261023/voices-hero-mobile.png",
+      "webp": "images/about/20261023/voices-hero-mobile.webp",
+      "width": 1086,
+      "height": 1448,
+      "bytes": 159632
+    },
+    {
+      "name": "voices-feature",
+      "key": "images/about/20261023/voices-feature.png",
+      "webp": "images/about/20261023/voices-feature.webp",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 200370
+    },
+    {
+      "name": "voices-feature-sm",
+      "key": "images/about/20261023/voices-feature-sm.png",
+      "webp": "images/about/20261023/voices-feature-sm.webp",
+      "width": 900,
+      "height": 675,
+      "bytes": 108012
+    }
+  ]
+}

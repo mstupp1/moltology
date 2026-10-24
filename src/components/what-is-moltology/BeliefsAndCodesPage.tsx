@@ -2,7 +2,8 @@ import React, { useRef } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
-import { COMMUNITY_CODES, DAILY_PRACTICES, STORY_MEDIA, THREE_TRUTHS } from './story/content'
+import { COMMUNITY_CODES, DAILY_PRACTICES, THREE_TRUTHS } from './story/content'
+import { PAGE_ART } from './story/page-art'
 import { useScrollVar } from './story/motion'
 import { Eyebrow, PrimaryCta, SecondaryCta, StoryHero, StoryImg } from './story/StoryPrimitives'
 
@@ -47,7 +48,7 @@ export const BeliefsAndCodesPage: React.FC = () => {
     <main className="flex-1 w-full overflow-x-clip">
       <StoryHero
         tall={false}
-        media={{ image: STORY_MEDIA.abyss }}
+        media={{ image: PAGE_ART.beliefsHero }}
         eyebrow="Beliefs & codes"
         title="What the Order holds true."
         lede={
@@ -75,7 +76,8 @@ export const BeliefsAndCodesPage: React.FC = () => {
       </section>
 
       <section className="relative isolate overflow-hidden py-20 sm:py-32" aria-labelledby="practices-title">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#020408] via-[#04121c] to-[#020408]" />
+        <StoryImg image={PAGE_ART.practices} className="absolute inset-0 -z-10 h-full w-full object-cover opacity-70" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-abyss via-abyss/40 to-abyss" />
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
           <ScrollReveal className="max-w-2xl">
             <Eyebrow color="#00ffcc">Living practices</Eyebrow>
@@ -128,7 +130,7 @@ export const BeliefsAndCodesPage: React.FC = () => {
               The Benthic Community runs on four codes. They are the reason people who arrive soft tend to stay.
             </p>
             <div className="mt-8 relative overflow-hidden rounded-panel border border-line-subtle aspect-[16/10]">
-              <StoryImg image={STORY_MEDIA.archive} className="h-full w-full object-cover opacity-80" />
+              <StoryImg image={PAGE_ART.codes} className="h-full w-full object-cover opacity-80" />
             </div>
           </ScrollReveal>
           <div className="grid gap-5 sm:grid-cols-2">
@@ -154,7 +156,7 @@ export const BeliefsAndCodesPage: React.FC = () => {
       <section className="pb-24 sm:pb-32">
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
           <div className="relative isolate overflow-hidden rounded-panel border border-line-subtle px-6 py-14 sm:px-14 sm:py-20">
-            <StoryImg image={STORY_MEDIA.expanse} className="absolute inset-0 -z-10 h-full w-full object-cover opacity-50" />
+            <StoryImg image={PAGE_ART.firstRite} className="absolute inset-0 -z-10 h-full w-full object-cover object-right md:object-center opacity-70" />
             <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#020408] via-[#020408]/80 to-transparent" />
             <h2 className="max-w-xl font-grotesk font-bold tracking-tight text-ink text-3xl sm:text-5xl leading-[1.05]">
               Belief is easier with a first rite.
