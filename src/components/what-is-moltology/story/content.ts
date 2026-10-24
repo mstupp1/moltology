@@ -19,7 +19,23 @@ const heroVideo = (name: string): StoryVideo => ({
   posterSm: getAssetUrl(`/images/hero_card_${name}_sm.webp`),
 })
 
+const aboutImage = (name: string, mobile = false): StoryImage => ({
+  src: getAssetUrl(`/images/what-is-moltology/2026-10-23/${name}.png`),
+  ...(mobile ? { srcSm: getAssetUrl(`/images/what-is-moltology/2026-10-23/${name}-mobile.png`) } : {}),
+})
+
 export const STORY_MEDIA = {
+  greatMelt: aboutImage('great-melt', true),
+  clearancePath: aboutImage('clearance-path', true),
+  softStart: aboutImage('soft-start', true),
+  appBackground: { src: getAssetUrl('/images/hud/underwater-looking-up-hq-v2.webp') },
+  specimen: aboutImage('specimen'),
+  metricShell: aboutImage('metric-shell'),
+  metricGrip: aboutImage('metric-grip'),
+  metricDepth: aboutImage('metric-depth'),
+  readingBeliefs: aboutImage('reading-beliefs'),
+  readingSacraments: aboutImage('reading-sacraments'),
+  readingVoices: aboutImage('reading-voices'),
   benthicCore: heroVideo('benthic_core'),
   synapticPath: heroVideo('synaptic_path'),
   assetShedding: heroVideo('asset_shedding'),
@@ -107,7 +123,7 @@ export const CARDINAL_METRICS: CardinalMetric[] = [
     unit: 'Boundaries',
     question: 'Does the surface dent you?',
     body: 'A boundary with a shape. The group chat can be on fire and your afternoon stays yours. Not a wall against people, just a shell around the work.',
-    image: STORY_MEDIA.plating,
+    image: STORY_MEDIA.metricShell,
     accent: '#00c3ff',
   },
   {
@@ -116,7 +132,7 @@ export const CARDINAL_METRICS: CardinalMetric[] = [
     unit: 'Follow-through',
     question: 'Do you finish what you grip?',
     body: 'Grip is the whole idea. Zero torque means twelve tabs open. Full torque means the thing is done and the tab is closed.',
-    image: STORY_MEDIA.crab,
+    image: STORY_MEDIA.metricGrip,
     accent: '#ff453a',
   },
   {
@@ -125,7 +141,7 @@ export const CARDINAL_METRICS: CardinalMetric[] = [
     unit: 'Deep focus',
     question: 'How long can you stay below the noise?',
     body: 'Depth is the quiet you can hold. Ten minutes becomes forty, forty becomes a morning. The deep was always there. Most people just never stayed long enough to see it.',
-    image: STORY_MEDIA.shrine,
+    image: STORY_MEDIA.metricDepth,
     accent: '#00ffcc',
   },
 ]
