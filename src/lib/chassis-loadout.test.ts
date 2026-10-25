@@ -1,8 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  applyLookUpdates,
   applyMoveUpdates,
-  buildKitLoadout,
   chassisTypeImageUrl,
   computeLoadoutTotals,
   clearChassisLoadoutCache,
@@ -12,8 +10,6 @@ import {
   formatAffixLine,
   getCachedChassisLoadout,
   planGearMove,
-  planLookChange,
-  planStarterCosmetics,
   planStarterGrants,
   primaryStatLine,
   setCachedChassisLoadout,
@@ -281,30 +277,12 @@ describe('cosmetics (looks)', () => {
     { id: 'i-halo', catalogItemId: 'c-halo', equippedSlot: null, vaultIndex: null, lookSlot: null },
   ]
 
-  it('wears a look by sending the current one in that slot back to the wardrobe', () => {
-    const plan = planLookChange(items, catalog, 'i-halo', true)
-    expect(plan).toEqual({ ok: true, updates: [{ id: 'i-crown', lookSlot: null }, { id: 'i-halo', lookSlot: 'look-head' }] })
-    if (!plan.ok) throw new Error(plan.error)
-    const next = applyLookUpdates(items, plan.updates)
-    expect(next.find((i) => i.id === 'i-halo')?.lookSlot).toBe('look-head')
-    expect(next.find((i) => i.id === 'i-crown')?.lookSlot).toBeNull()
-  })
-
-  it('refuses to wear gear as a look, and to put a cosmetic in a hardpoint or vault cell', () => {
-    expect(planLookChange(items, catalog, 'i-gear', true).ok).toBe(false)
+  it('refuses to move retired cosmetics into a hardpoint or vault cell', () => {
     expect(planGearMove(items, catalog, 'i-halo', { type: 'equip', slot: 'head' }).ok).toBe(false)
     expect(planGearMove(items, catalog, 'i-halo', { type: 'vault', index: 3 }).ok).toBe(false)
   })
 
-  it('never adds cosmetic stats and draws both gear and looks', () => {
+  it('keeps retired cosmetics out of equipment stats', () => {
     expect(computeLoadoutTotals(items, catalog).intelligence).toBe(10)
-    expect(buildKitLoadout(items, catalog)).toEqual({
-      gear: { head: { visual: 'helm', rarity: 'rare' } },
-      look: { head: 'reef-crown' },
-    })
-  })
-
-  it('grants missing starter cosmetics without vault cells', () => {
-    expect(planStarterCosmetics(items, ['c-crown', 'c-new'], ['c-crown', 'c-new', 'c-absent'])).toEqual(['c-new'])
   })
 })

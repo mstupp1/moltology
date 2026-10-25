@@ -155,7 +155,7 @@ function KeepStep({ draft, headingId }: OnboardingStepProps) {
         progress.
       </StepHeading>
       <div className="rounded-card border border-line-subtle bg-surface-2 hud-sheen p-4 flex items-center gap-4">
-        <LobsterAvatarPortrait config={draft.config} live size={128} alt="Your character" className="w-16 h-16 shrink-0" />
+        <LobsterAvatarPortrait config={draft.config} size={128} alt="Your character" className="w-16 h-16 shrink-0" />
         <p className="font-sans text-sm text-ink-body">Your character is saved on this device until you sign up.</p>
       </div>
     </div>

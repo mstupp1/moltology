@@ -83,7 +83,7 @@ rules:
   - id: economy.cosmetics-no-stats
     title: Cosmetics carry no stats
     kind: invariant
-    statement: Cosmetic items change only how the avatar looks. They add nothing to loadout stats, so no look can be bought or worn for an advantage.
+    statement: Legacy cosmetic inventory rows add nothing to loadout stats and cannot enter gear hardpoints or vault cells. The experimental wardrobe is retired.
     dependsOn: [economy.red-line]
     anchors:
       - file: src/lib/chassis-loadout.ts
@@ -92,27 +92,30 @@ rules:
         symbol: isCosmetic
     tests: [src/lib/chassis-loadout.test.ts]
   - id: economy.look-slots
-    title: Looks have their own slots
+    title: Experimental look slots retired
     kind: invariant
-    statement: Cosmetics are worn in six look slots (head, carapace, claws, belt, legs, antennae), one per category, and wearing one takes off the previous look in that slot. Cosmetics are refused from gear hardpoints and vault cells, and gear is refused from look slots.
+    status: deprecated
+    statement: The wardrobe and its wear/remove endpoint are removed. Existing look-slot rows are still recognized for compatibility and remain separate from usable equipment.
     dependsOn: [economy.cosmetics-no-stats]
     anchors:
       - file: src/lib/chassis-loadout.ts
-        symbol: planLookChange
+        symbol: isLookSlot
       - file: src/lib/chassis-loadout.ts
         symbol: planGearMove
     tests: [src/lib/chassis-loadout.test.ts]
   - id: economy.starter-looks
-    title: Four starter looks
+    title: Starter looks retired
     kind: flow
-    statement: Every member is granted four starter cosmetics (Reef Crown, Kelp Sash, Lantern Feelers, Tide Runners) the next time their chassis loads. Grants are skipped for looks they already own.
+    status: deprecated
+    statement: Chassis loads and catalog seeds no longer grant or create experimental starter cosmetics. Original equipment grants continue.
     dependsOn: [economy.cosmetics-no-stats]
     anchors:
       - file: src/lib/equipment-seed-data.ts
-        symbol: STARTER_COSMETIC_CATALOG_IDS
+        symbol: ALL_EQUIPMENT_CATALOG
       - file: src/lib/chassis-loadout.ts
-        symbol: planStarterCosmetics
+        symbol: planStarterGrants
     tests: [src/lib/equipment-seed-data.test.ts]
+
 ---
 
 The economy is a locked design decision in `BRAND_BIBLE.md` §4 and hard rule 2 in `AGENTS.md`. Every paid feature must be checked against the red line before it ships.

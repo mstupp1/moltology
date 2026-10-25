@@ -4,7 +4,6 @@ import {
   getCachedPixelatedImage,
   type PixelateOptions,
 } from '@/lib/pixelate-avatar'
-import { isKitSvgDataUri } from '@/lib/lobster-avatar'
 import {
   decodeSvgDataUri,
   resolveIdleAnimationPhase,
@@ -81,8 +80,7 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
 
   const useAnimatedSvg =
     animated && !reducedMotion && !documentHidden && src.startsWith('data:image/svg+xml')
-  // Kit SVGs reference bucket images, which an <img> will not load, so they always render inline.
-  const useInlineSvg = useAnimatedSvg || isKitSvgDataUri(src)
+  const useInlineSvg = useAnimatedSvg
 
   const animatedSvgMarkup = useMemo(() => {
     if (!useInlineSvg) return null

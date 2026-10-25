@@ -43,15 +43,5 @@ export async function setExperimentHandler(
   const next = toggleExperiment(profile?.experiments, id, args.data.on)
   await auth.dbClient.update(profiles).set({ experiments: next, updatedAt: new Date() }).where(eq(profiles.id, auth.userId))
 
-  // Apply the switch to the avatar right away (adds or clears the painted look and portrait).
-  if (id === 'avatar-kit') {
-    const { syncAvatarLook } = await import('./db-services')
-    try {
-      await syncAvatarLook(auth.dbClient, auth.userId)
-    } catch (e) {
-      console.warn('[setExperiment] Avatar sync failed:', e)
-    }
-  }
-
   return toRows(activeExperiments(profile?.role, next))
 }

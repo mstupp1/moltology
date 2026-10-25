@@ -7,15 +7,15 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-10-20",
+  "syncedAt": "2026-10-25",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
     "rules": 113,
-    "decisions": 39,
-    "anchors": 205,
-    "drifted": 26,
-    "flagged": 11
+    "decisions": 40,
+    "anchors": 204,
+    "drifted": 28,
+    "flagged": 10
   },
   "canvas": {
     "width": 5737,
@@ -626,23 +626,23 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Cosmetics carry no stats",
       "kind": "invariant",
       "status": "active",
-      "statement": "Cosmetic items change only how the avatar looks. They add nothing to loadout stats, so no look can be bought or worn for an advantage.",
+      "statement": "Legacy cosmetic inventory rows add nothing to loadout stats and cannot enter gear hardpoints or vault cells. The experimental wardrobe is retired.",
       "anchors": [
         {
           "file": "src/lib/chassis-loadout.ts",
           "symbol": "computeLoadoutTotals",
-          "line": 275,
+          "line": 266,
           "value": "computeLoadoutTotals(items, catalogById)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L275"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L266"
         },
         {
           "file": "src/lib/chassis-loadout.ts",
           "symbol": "isCosmetic",
-          "line": 247,
+          "line": 238,
           "value": "isCosmetic(catalog)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L247"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L238"
         }
       ],
       "tests": [
@@ -659,7 +659,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "economy.starter-looks"
       ],
       "decisions": [
-        "equippable-cosmetics"
+        "equippable-cosmetics",
+        "retire-painted-avatar-builder"
       ],
       "flag": null,
       "flow": null,
@@ -672,26 +673,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "economy.look-slots",
       "domain": "economy",
-      "title": "Looks have their own slots",
+      "title": "Experimental look slots retired",
       "kind": "invariant",
-      "status": "active",
-      "statement": "Cosmetics are worn in six look slots (head, carapace, claws, belt, legs, antennae), one per category, and wearing one takes off the previous look in that slot. Cosmetics are refused from gear hardpoints and vault cells, and gear is refused from look slots.",
+      "status": "deprecated",
+      "statement": "The wardrobe and its wear/remove endpoint are removed. Existing look-slot rows are still recognized for compatibility and remain separate from usable equipment.",
       "anchors": [
         {
           "file": "src/lib/chassis-loadout.ts",
-          "symbol": "planLookChange",
-          "line": 563,
-          "value": "planLookChange(items, catalogById, itemId, wear)",
+          "symbol": "isLookSlot",
+          "line": 78,
+          "value": "isLookSlot(value)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L563"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L78"
         },
         {
           "file": "src/lib/chassis-loadout.ts",
           "symbol": "planGearMove",
-          "line": 387,
+          "line": 378,
           "value": "planGearMove(items, catalogById, itemId, target, vaultSize)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L387"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L378"
         }
       ],
       "tests": [
@@ -703,11 +704,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "dependsOn": [
         "economy.cosmetics-no-stats"
       ],
-      "usedBy": [
-        "data.avatar-look-server"
-      ],
+      "usedBy": [],
       "decisions": [
-        "equippable-cosmetics"
+        "equippable-cosmetics",
+        "retire-painted-avatar-builder"
       ],
       "flag": null,
       "flow": null,
@@ -720,26 +720,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "economy.starter-looks",
       "domain": "economy",
-      "title": "Four starter looks",
+      "title": "Starter looks retired",
       "kind": "flow",
-      "status": "active",
-      "statement": "Every member is granted four starter cosmetics (Reef Crown, Kelp Sash, Lantern Feelers, Tide Runners) the next time their chassis loads. Grants are skipped for looks they already own.",
+      "status": "deprecated",
+      "statement": "Chassis loads and catalog seeds no longer grant or create experimental starter cosmetics. Original equipment grants continue.",
       "anchors": [
         {
           "file": "src/lib/equipment-seed-data.ts",
-          "symbol": "STARTER_COSMETIC_CATALOG_IDS",
-          "line": 499,
-          "value": "[ 'b2000000-0000-4000-8000-000000000001', // reef crown 'b2000000-0000-4000-8000-000000000008', // kelp sash 'b2000000-0000-4000-8000-00000000000a', // lantern…",
+          "symbol": "ALL_EQUIPMENT_CATALOG",
+          "line": 361,
+          "value": "INITIAL_EQUIPMENT_CATALOG",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/equipment-seed-data.ts#L499"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/equipment-seed-data.ts#L361"
         },
         {
           "file": "src/lib/chassis-loadout.ts",
-          "symbol": "planStarterCosmetics",
-          "line": 621,
-          "value": "planStarterCosmetics(existing, catalogIdsPresent, starterIds)",
+          "symbol": "planStarterGrants",
+          "line": 551,
+          "value": "planStarterGrants(existing, catalogIdsPresent, starterIds, vaultSize)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L621"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L551"
         }
       ],
       "tests": [
@@ -753,7 +753,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [],
       "decisions": [
-        "equippable-cosmetics"
+        "equippable-cosmetics",
+        "retire-painted-avatar-builder"
       ],
       "flag": null,
       "flow": null,
@@ -858,10 +859,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3552,
+          "line": 3545,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3552"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3545"
         }
       ],
       "tests": [
@@ -908,10 +909,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3552,
+          "line": 3545,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3552"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3545"
         }
       ],
       "tests": [
@@ -946,10 +947,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3332,
+          "line": 3325,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3332"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3325"
         },
         {
           "file": "src/lib/progression.ts",
@@ -1084,10 +1085,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3332,
+          "line": 3325,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3332"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3325"
         }
       ],
       "tests": [],
@@ -1474,7 +1475,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "setAdminMemberRoleHandler",
           "line": 171,
           "value": "setAdminMemberRoleHandler(args)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/admin-oversight.ts#L171"
         }
       ],
@@ -1498,7 +1499,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 568,
         "y": 544
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "access.admin-list-limits",
@@ -2567,18 +2568,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "submitLeadHandler",
-          "line": 3096,
+          "line": 3091,
           "value": "submitLeadHandler(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3096"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3091"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createBlogCommentHandler",
-          "line": 748,
+          "line": 743,
           "value": "createBlogCommentHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L748"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L743"
         }
       ],
       "tests": [
@@ -2617,10 +2618,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/premium.ts",
           "symbol": "requirePremiumOperator",
-          "line": 87,
+          "line": 88,
           "value": "requirePremiumOperator(args)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L87"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L88"
         },
         {
           "file": "src/lib/premium-membership.ts",
@@ -2780,10 +2781,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/premium.ts",
           "symbol": "createPremiumCheckoutHandler",
-          "line": 165,
+          "line": 166,
           "value": "createPremiumCheckoutHandler(args)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L165"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L166"
         }
       ],
       "tests": [
@@ -2805,7 +2806,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 364
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "premium.webhook-signature",
@@ -2818,26 +2819,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/stripe-webhook.ts",
           "symbol": "verifyStripeWebhookSignature",
-          "line": 13,
+          "line": 14,
           "value": "verifyStripeWebhookSignature(stripe, payload, signature, secret)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/stripe-webhook.ts#L13"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/stripe-webhook.ts#L14"
         },
         {
           "file": "src/lib/server/premium.ts",
           "symbol": "handleStripeWebhookRequest",
-          "line": 427,
+          "line": 428,
           "value": "handleStripeWebhookRequest(request)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L427"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L428"
         },
         {
           "file": "src/lib/server/merch.ts",
           "symbol": "fulfillMerchCheckoutEvent",
-          "line": 142,
+          "line": 137,
           "value": "fulfillMerchCheckoutEvent(event, retry)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L142"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L137"
         }
       ],
       "tests": [
@@ -2865,7 +2866,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 948,
         "y": 208
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "premium.event-sync",
@@ -2894,10 +2895,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/premium.ts",
           "symbol": "applyPremiumStripeEvent",
-          "line": 354,
+          "line": 355,
           "value": "applyPremiumStripeEvent(event, secretKey)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L354"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L355"
         }
       ],
       "tests": [
@@ -3195,10 +3196,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/premium.ts",
           "symbol": "setPremiumAccessHandler",
-          "line": 211,
+          "line": 212,
           "value": "setPremiumAccessHandler(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L211"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L212"
         }
       ],
       "tests": [
@@ -3236,18 +3237,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumTopicHandler",
-          "line": 1588,
+          "line": 1583,
           "value": "createForumTopicHandler({ data, context })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1588"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1583"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "requirePublishableForumPost",
-          "line": 922,
+          "line": 917,
           "value": "requirePublishableForumPost(input)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L922"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L917"
         }
       ],
       "tests": [
@@ -3609,10 +3610,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createBlogCommentHandler",
-          "line": 748,
+          "line": 743,
           "value": "createBlogCommentHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L748"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L743"
         },
         {
           "file": "src/lib/server/forum-write-limit.ts",
@@ -3959,10 +3960,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertForumAuthor",
-          "line": 930,
+          "line": 925,
           "value": "assertForumAuthor(rowUserId, actorId, action)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L930"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L925"
         }
       ],
       "tests": [
@@ -4005,10 +4006,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumPostHandler",
-          "line": 1734,
+          "line": 1729,
           "value": "createForumPostHandler({ data, context })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1734"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1729"
         }
       ],
       "tests": [
@@ -4095,26 +4096,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertCovenantSteward",
-          "line": 2379,
+          "line": 2374,
           "value": "assertCovenantSteward(dbClient, userId, payload)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2379"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2374"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "reviewForumReportHandler",
-          "line": 2682,
+          "line": 2677,
           "value": "reviewForumReportHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2682"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2677"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "removeForumReportTargetHandler",
-          "line": 2752,
+          "line": 2747,
           "value": "removeForumReportTargetHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2752"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2747"
         }
       ],
       "tests": [
@@ -5499,10 +5500,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "AGENTS.md",
           "symbol": "Assets and media",
-          "line": 54,
+          "line": 58,
           "value": "Finished social posts, carousel slides, reels and shorts are archived in Google Drive under `My Drive/Projects/Moltology/Social Archive/`, with direct local me…",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md#L54"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md#L58"
         }
       ],
       "tests": [],
@@ -5517,23 +5518,23 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 76
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "data.avatar-look-server",
       "domain": "data",
-      "title": "Server writes the worn look",
+      "title": "Painted avatar state retired",
       "kind": "invariant",
-      "status": "active",
-      "statement": "What a member's avatar wears, and its cached portrait, are written by the server from their equipped gear and worn looks after each gear move, look change, or avatar save. Avatar saves from the app cannot set either field.",
+      "status": "deprecated",
+      "statement": "Painted loadouts and cached portrait keys are ignored when reading saved avatar configs. Saving an avatar stores only the original drawn character traits. Gear moves no longer rewrite avatars.",
       "anchors": [
         {
-          "file": "src/lib/server/db-services.ts",
-          "symbol": "syncAvatarLook",
-          "line": 3832,
-          "value": "syncAvatarLook(dbClient, userId)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3832"
+          "file": "src/lib/lobster-avatar.ts",
+          "symbol": "parseLobsterAvatarConfig",
+          "line": 244,
+          "value": "parseLobsterAvatarConfig(raw)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar.ts#L244"
         },
         {
           "file": "src/lib/avatar/config-schema.ts",
@@ -5544,15 +5545,19 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/config-schema.ts#L19"
         }
       ],
-      "tests": [],
-      "dependsOn": [
-        "economy.look-slots"
+      "tests": [
+        {
+          "file": "src/lib/lobster-avatar.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar.test.ts"
+        }
       ],
+      "dependsOn": [],
       "usedBy": [
         "data.avatar-portraits"
       ],
       "decisions": [
-        "equippable-cosmetics"
+        "equippable-cosmetics",
+        "retire-painted-avatar-builder"
       ],
       "flag": null,
       "flow": null,
@@ -5560,51 +5565,46 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 208
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "data.avatar-portraits",
       "domain": "data",
-      "title": "Portraits are rendered once",
+      "title": "Painted portraits retired",
       "kind": "invariant",
-      "status": "active",
-      "statement": "Avatars drawn with painted art get a 256px WebP portrait rendered on the server when their look changes, stored under a content hash with a one-year immutable cache, and served through the cached media route. Pages show that image instead of drawing the avatar. A failed render keeps the save and falls back to the drawn portrait.",
+      "status": "deprecated",
+      "statement": "Portraits and full-body avatars use the original drawn character. Saved painted portrait keys cannot select the retired renderer, and no painted portraits are generated or uploaded.",
       "anchors": [
-        {
-          "file": "src/lib/server/avatar-portrait.ts",
-          "symbol": "renderAvatarPortrait",
-          "line": 77,
-          "value": "renderAvatarPortrait(config)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/avatar-portrait.ts#L77"
-        },
         {
           "file": "src/lib/lobster-avatar-slots.ts",
           "symbol": "resolveLobsterAvatarAssets",
-          "line": 81,
+          "line": 71,
           "value": "resolveLobsterAvatarAssets(config, options)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar-slots.ts#L81"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar-slots.ts#L71"
         }
       ],
-      "tests": [],
+      "tests": [
+        {
+          "file": "src/lib/lobster-avatar-slots.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar-slots.test.ts"
+        }
+      ],
       "dependsOn": [
         "data.avatar-look-server"
       ],
       "usedBy": [],
       "decisions": [
-        "equippable-cosmetics"
+        "equippable-cosmetics",
+        "retire-painted-avatar-builder"
       ],
-      "flag": {
-        "level": "watch",
-        "note": "Members who saved an avatar before painted art existed get their first portrait on their next chassis load or avatar save, or when staff run npm run avatar:kit -- sync-all."
-      },
+      "flag": null,
       "flow": null,
       "position": {
         "x": 28,
         "y": 364
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "merch.private-pilot",
@@ -5617,10 +5617,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/store.ts",
           "symbol": "requireStoreAccess",
-          "line": 26,
+          "line": 27,
           "value": "requireStoreAccess(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L26"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L27"
         }
       ],
       "tests": [
@@ -5710,10 +5710,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/store.ts",
           "symbol": "createQuotedCheckout",
-          "line": 100,
+          "line": 110,
           "value": "createQuotedCheckout(args)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L100"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L110"
         }
       ],
       "tests": [
@@ -5736,7 +5736,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 388
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "merch.draft-guard",
@@ -5876,10 +5876,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/merch.ts",
           "symbol": "retryMerchOrder",
-          "line": 195,
+          "line": 190,
           "value": "retryMerchOrder(orderId)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L195"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L190"
         }
       ],
       "tests": [
@@ -5906,7 +5906,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 72,
         "y": 700
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "merch.shipping-quote",
@@ -5919,10 +5919,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/store.ts",
           "symbol": "createStoreQuote",
-          "line": 69,
+          "line": 80,
           "value": "createStoreQuote(args)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L69"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L80"
         },
         {
           "file": "src/lib/store.ts",
@@ -5958,7 +5958,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 388
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "merch.operational-overrides",
@@ -5971,10 +5971,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/store-operations.ts",
           "symbol": "mutateAdminStore",
-          "line": 188,
+          "line": 230,
           "value": "mutateAdminStore(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L188"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L230"
         }
       ],
       "tests": [
@@ -6009,18 +6009,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/store.ts",
           "symbol": "getStoreStatus",
-          "line": 160,
+          "line": 177,
           "value": "getStoreStatus(orderId, token)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L160"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L177"
         },
         {
           "file": "src/lib/server/store.ts",
           "symbol": "limitStoreRequest",
-          "line": 47,
+          "line": 58,
           "value": "limitStoreRequest(key, maximum, windowMs)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L47"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L58"
         }
       ],
       "tests": [
@@ -6048,7 +6048,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 544
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "merch.provider-status",
@@ -6061,18 +6061,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/store-operations.ts",
           "symbol": "reconcileStoreOrder",
-          "line": 64,
+          "line": 67,
           "value": "reconcileStoreOrder(id)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L64"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L67"
         },
         {
           "file": "src/lib/server/store-operations.ts",
           "symbol": "syncStoreRefund",
-          "line": 107,
+          "line": 110,
           "value": "syncStoreRefund(paymentIntentId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L107"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L110"
         }
       ],
       "tests": [
@@ -6113,18 +6113,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/store-operations.ts",
           "symbol": "recoverStore",
-          "line": 137,
+          "line": 140,
           "value": "recoverStore()",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L137"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L140"
         },
         {
           "file": "src/lib/server/store-operations.ts",
           "symbol": "drainStoreOutbox",
-          "line": 31,
+          "line": 34,
           "value": "drainStoreOutbox(maximum)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L31"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L34"
         }
       ],
       "tests": [
@@ -8129,8 +8129,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "data.avatar-look-server",
         "data.avatar-portraits"
       ],
-      "status": "accepted",
-      "supersededBy": null,
+      "status": "superseded",
+      "supersededBy": "retire-painted-avatar-builder",
       "sources": [
         {
           "kind": "pr",
@@ -8295,6 +8295,50 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "heading": "Consequences",
           "html": "<p>Physical samples, live onboarding, business policy/tax approval, sending-domain verification,\ndeployed acceptance and explicit launch authorization remain separate requirements. Printful v1\ncallbacks use a private bearer URL and authoritative API reads; redact that URL from logs.\nResend idempotency has a finite retention period, so old uncertain sends require operator review.</p>"
+        }
+      ]
+    },
+    {
+      "id": "retire-painted-avatar-builder",
+      "date": "2026-10-25",
+      "title": "Retain the original drawn avatar builder",
+      "summary": "Retire the painted avatar experiment, wardrobe, generated portraits, and art tooling while preserving original drawn characters and equipment.",
+      "domains": [
+        "economy",
+        "data"
+      ],
+      "rules": [
+        "economy.cosmetics-no-stats",
+        "economy.look-slots",
+        "economy.starter-looks",
+        "data.avatar-look-server",
+        "data.avatar-portraits"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "doc",
+          "label": "experiments.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/experiments.ts"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>The painted character builder remained an admin opt-in experiment. The product owner chose to abandon it and continue with the original drawn character creator.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Remove the experiment switch, painted layers, WebGL stage, wardrobe, look mutation, portrait generation, cosmetic grants, and avatar-kit art pipeline. Preserve the drawn lobster and crab creator, its traits and animations, and the original chassis equipment display.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<p>Leaving the experiment disabled would retain unused rendering and maintenance paths. Keeping the wardrobe would expose looks that no longer affect the character.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Previously saved experimental avatars render through the original drawn system using their saved traits. Experimental config fields are ignored on read and disappear on the next avatar save. Historical database columns, inventory rows, and migrations remain intact. At the product owner&#39;s request, the retired artwork was also deleted from the public asset bucket: 38 painted layer files under <code>images/avatar-kit/</code>, 81 source and delivery files under <code>avatar-kit/</code>, and seven generated portraits under <code>images/avatar-portraits/</code> (30,010,564 bytes total). All three prefixes were verified empty after deletion. Original drawn character code and chassis artwork remain. Retired experiment IDs are ignored by the existing experiment registry.</p>"
         }
       ]
     }
@@ -8857,12 +8901,6 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "source": "data.retention-windows",
       "target": "data.canonical-content",
       "crossDomain": false
-    },
-    {
-      "id": "economy.look-slots->data.avatar-look-server",
-      "source": "economy.look-slots",
-      "target": "data.avatar-look-server",
-      "crossDomain": true
     },
     {
       "id": "data.avatar-look-server->data.avatar-portraits",
