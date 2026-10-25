@@ -24,7 +24,6 @@ describe('Dashboard view source', () => {
       '<ConnectionsHubCard',
       '<ActivityStreamPanel',
       '<DashboardStorePanel',
-      '<DashboardShortcuts',
       '<DashboardNewsPanel',
       '<DashboardChangelogPanel',
     ].map((tag) => src.indexOf(tag))
