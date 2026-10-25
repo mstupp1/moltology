@@ -13,7 +13,7 @@ import {
 } from './alignment-tasks'
 
 describe('alignment-tasks catalog and helpers', () => {
-  it('contains exactly 8 canonical daily alignment tasks with valid keys and times', () => {
+  it('contains exactly 8 canonical daily alignment tasks with stable keys and relative time frames', () => {
     expect(CANONICAL_ALIGNMENT_TASKS).toHaveLength(8)
     expect(TOTAL_ALIGNMENT_TASKS).toBe(8)
     expect(DAILY_ALIGNMENT_HUB_ID).toBe('daily-routine-hub')
@@ -29,10 +29,15 @@ describe('alignment-tasks catalog and helpers', () => {
       'alignment-review',
     ]
 
+    const expectedTimes = [
+      'Early morning', 'Morning', 'Late morning', 'Noon',
+      'Afternoon', 'Late afternoon', 'Early evening', 'Evening',
+    ]
+
     CANONICAL_ALIGNMENT_TASKS.forEach((task, idx) => {
       expect(task.key).toBe(expectedKeys[idx])
       expect(task.title).toBeTruthy()
-      expect(task.time).toBeTruthy()
+      expect(task.time).toBe(expectedTimes[idx])
     })
   })
 
