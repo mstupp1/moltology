@@ -1,7 +1,139 @@
 {
   "version": 1,
-  "races": {},
+  "races": {
+    "crab": {
+      "pivots": {
+        "antenna": [
+          452,
+          245
+        ],
+        "shoulder": [
+          300,
+          450
+        ]
+      }
+    }
+  },
   "assets": {
+    "crab/antenna/whip": {
+      "src": "images/avatar-kit/crab/antenna/whip.c57b21d20b.webp",
+      "x": 238.4433811802233,
+      "y": 17.148325358851675,
+      "w": 245.792663476874,
+      "h": 248.24242424242425
+    },
+    "crab/arm/default": {
+      "src": "images/avatar-kit/crab/arm/default.c6c2dbdec1.webp",
+      "x": 146.98564593301435,
+      "y": 307.03668261563,
+      "w": 176.38277511961724,
+      "h": 194.347687400319
+    },
+    "crab/body/bean": {
+      "src": "images/avatar-kit/crab/body/bean.ab28e4a71b.webp",
+      "x": 249.8755980861244,
+      "y": 245.792663476874,
+      "w": 524.2488038277512,
+      "h": 458.10526315789474
+    },
+    "crab/brows/round": {
+      "src": "images/avatar-kit/crab/brows/round.49c467233b.svg",
+      "x": 384,
+      "y": 220,
+      "w": 282,
+      "h": 52
+    },
+    "crab/claw/classic": {
+      "src": "images/avatar-kit/crab/claw/classic.c9daead21d.webp",
+      "x": 65.32695374800637,
+      "y": 80.84210526315789,
+      "w": 214.76236044657097,
+      "h": 293.1547049441786
+    },
+    "crab/eyes/round": {
+      "src": "images/avatar-kit/crab/eyes/round.c7647a6850.svg",
+      "x": 382,
+      "y": 260,
+      "w": 246,
+      "h": 116
+    },
+    "crab/gear/antennae": {
+      "src": "images/avatar-kit/crab/gear/antennae.b46ae649c6.webp",
+      "x": 150.25199362041468,
+      "y": 8.165869218500797,
+      "w": 716.1467304625199,
+      "h": 220.47846889952154
+    },
+    "crab/gear/belt": {
+      "src": "images/avatar-kit/crab/gear/belt.b3b272031e.webp",
+      "x": 66.14354066985646,
+      "y": 138.00318979266348,
+      "w": 765.1419457735248,
+      "h": 573.244019138756
+    },
+    "crab/gear/carapace": {
+      "src": "images/avatar-kit/crab/gear/carapace.07939a9ac9.webp",
+      "x": 332.35087719298247,
+      "y": 534.0478468899522,
+      "w": 358.481658692185,
+      "h": 182.91547049441786
+    },
+    "crab/gear/greaves": {
+      "src": "images/avatar-kit/crab/gear/greaves.c84416b931.webp",
+      "x": 115.95534290271132,
+      "y": 510.36682615629985,
+      "w": 792.0893141945774,
+      "h": 485.86921850079744
+    },
+    "crab/gear/hammer": {
+      "src": "images/avatar-kit/crab/gear/hammer.20b8a0deb0.webp",
+      "x": 22.864433811802233,
+      "y": 92.274322169059,
+      "w": 293.9712918660287,
+      "h": 272.74003189792666
+    },
+    "crab/gear/helm": {
+      "src": "images/avatar-kit/crab/gear/helm.b5d3c0d536.webp",
+      "x": 253.14194577352472,
+      "y": 138.81977671451355,
+      "w": 516.8995215311005,
+      "h": 315.20255183413076
+    },
+    "crab/gear/pincer": {
+      "src": "images/avatar-kit/crab/gear/pincer.b7bd9a0b59.webp",
+      "x": 51.44497607655502,
+      "y": 89.00797448165869,
+      "w": 236.81020733652312,
+      "h": 287.43859649122805
+    },
+    "crab/iris/round": {
+      "src": "images/avatar-kit/crab/iris/round.548474c4af.svg",
+      "x": 396,
+      "y": 273,
+      "w": 214,
+      "h": 88
+    },
+    "crab/legs/default": {
+      "src": "images/avatar-kit/crab/legs/default.6f3364793b.webp",
+      "x": 75.94258373205741,
+      "y": 529.9649122807018,
+      "w": 868.0318979266348,
+      "h": 469.53748006379584
+    },
+    "crab/lids/round": {
+      "src": "images/avatar-kit/crab/lids/round.0a3730c05d.svg",
+      "x": 381,
+      "y": 259,
+      "w": 248,
+      "h": 118
+    },
+    "crab/mouth/grin": {
+      "src": "images/avatar-kit/crab/mouth/grin.ef37892f1f.svg",
+      "x": 404,
+      "y": 383,
+      "w": 216,
+      "h": 119
+    },
     "lobster/antenna/whip": {
       "src": "images/avatar-kit/lobster/antenna/whip.4c3927f9a8.webp",
       "x": 278.4561403508772,
@@ -51,6 +183,13 @@
       "w": 207.41307814992027,
       "h": 98.80701754385964
     },
+    "lobster/gear/antennae": {
+      "src": "images/avatar-kit/lobster/gear/antennae.02627a6955.webp",
+      "x": 275,
+      "y": 5,
+      "w": 218,
+      "h": 203
+    },
     "lobster/gear/belt": {
       "src": "images/avatar-kit/lobster/gear/belt.429f46a33e.webp",
       "x": 454.02232854864434,
@@ -64,6 +203,20 @@
       "y": 449.12280701754383,
       "w": 289.8883572567783,
       "h": 359.29824561403507
+    },
+    "lobster/gear/greaves": {
+      "src": "images/avatar-kit/lobster/gear/greaves.f01d7f08e4.webp",
+      "x": 268,
+      "y": 618,
+      "w": 490,
+      "h": 382
+    },
+    "lobster/gear/hammer": {
+      "src": "images/avatar-kit/lobster/gear/hammer.74e5ebf75f.webp",
+      "x": 120,
+      "y": 224,
+      "w": 258,
+      "h": 296
     },
     "lobster/gear/helm": {
       "src": "images/avatar-kit/lobster/gear/helm.0f7ea49ec2.webp",

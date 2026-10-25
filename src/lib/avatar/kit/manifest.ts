@@ -28,4 +28,5 @@ export interface KitManifest {
   assets: Record<string, KitAsset>
 }
 
-export const KIT_MANIFEST: KitManifest = rawManifest as KitManifest
+// JSON imports infer numeric arrays, while ingest validates pivots as coordinate pairs.
+export const KIT_MANIFEST: KitManifest = rawManifest as unknown as KitManifest
