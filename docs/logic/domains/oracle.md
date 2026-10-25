@@ -89,13 +89,13 @@ rules:
         symbol: checkRateLimit
     tests: [src/lib/ai/guardrails.test.ts]
   - id: oracle.usage-allowance
-    title: Daily allowance, Premium gets 10x
+    title: Rolling allowances, Premium gets 10x
     kind: limit
-    statement: Free members can send 5 Oracle messages a minute and 30 in any rolling 24 hours. Premium members get 10 times that, 50 a minute and 300 a day. Usage is stored per member, shared across server instances, and deleting a thread does not reset it.
+    statement: Free members can send 5 Oracle messages a minute, 15 in any rolling 5 hours, and 100 in any rolling 7 days. Premium gets 10 times each allowance. Both rolling windows must have capacity; availability is calculated from recorded timestamps. Usage survives thread deletion and is shared across server instances. Chat shows five-hour usage, with both windows in expanded details and Settings.
     dependsOn: [oracle.request-pipeline, premium.no-standing, economy.red-line]
     flag:
       level: watch
-      note: If the usage table cannot be read, the request continues with only the per-instance flood guard.
+      note: Usage checks fail closed when storage is unavailable. Checking capacity and recording a request remain separate operations, so concurrent requests can overshoot a cap.
     anchors:
       - file: src/lib/ai/usage-limits.ts
         symbol: ORACLE_FREE_LIMITS
@@ -105,7 +105,11 @@ rules:
         symbol: decideOracleUsage
       - file: src/lib/ai/service.ts
         symbol: getOracleUsageSnapshot
-    tests: [src/lib/ai/usage-limits.test.ts, src/lib/ai/handle-oracle-chat-request.test.ts]
+      - file: src/lib/ai/usage-limits.ts
+        symbol: buildOracleUsageSnapshot
+      - file: src/lib/server/oracle-usage.ts
+        symbol: getOracleUsageHandler
+    tests: [src/lib/ai/usage-limits.test.ts, src/lib/ai/handle-oracle-chat-request.test.ts, src/lib/server/oracle-usage.test.ts, src/hooks/useOracleUsage.test.tsx, src/components/ai/OracleUsage.test.tsx]
   - id: oracle.request-caps
     title: History and reply size caps
     kind: limit

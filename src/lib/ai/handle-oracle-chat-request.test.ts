@@ -5,7 +5,7 @@ import { ORACLE_MODELS } from './oracle-models'
 import { buildSystemPrompt } from './codex-prompt'
 import { ORACLE_JAILBREAK_ERROR, screenOraclePrompt } from '../quality/oracle-preflight'
 import { getOracleUsageSnapshot, getRecentAIThreadTurns, recordOracleUsage } from './service'
-import { ORACLE_FREE_LIMITS, ORACLE_MAX_OUTPUT_TOKENS, ORACLE_PREMIUM_LIMITS } from './usage-limits'
+import { buildOracleUsageSnapshot, ORACLE_FREE_LIMITS, ORACLE_MAX_OUTPUT_TOKENS, ORACLE_PREMIUM_LIMITS } from './usage-limits'
 import { validateInputGuardrails } from './guardrails'
 import { getChatLimitError } from './chat-retention'
 
@@ -31,7 +31,7 @@ vi.mock('./service', () => ({
   updateAIThreadTitle: vi.fn().mockResolvedValue({ id: 'thread-1' }),
   getOwnedAIThread: vi.fn().mockResolvedValue({ id: '11111111-1111-4111-8111-111111111111', userId: 'usr_from_jwt' }),
   getRecentAIThreadTurns: vi.fn().mockResolvedValue([]),
-  getOracleUsageSnapshot: vi.fn().mockResolvedValue({ lastMinute: 0, lastDay: 0, isPremium: false }),
+  getOracleUsageSnapshot: vi.fn().mockResolvedValue({ lastMinute: 0, lastFiveHours: 0, lastWeek: 0, isPremium: false }),
   recordOracleUsage: vi.fn().mockResolvedValue('usage-1'),
   finalizeOracleUsage: vi.fn().mockResolvedValue(undefined),
 }))
@@ -481,20 +481,16 @@ describe('handleOracleChatRequest', () => {
     expect(streamTextMock).not.toHaveBeenCalled()
   })
 
-  it('returns 429 when a free member hits the daily limit', async () => {
-    vi.mocked(getOracleUsageSnapshot).mockResolvedValueOnce({
-      lastMinute: 0,
-      lastDay: ORACLE_FREE_LIMITS.perDay,
-      isPremium: false,
-    })
+  it('returns 429 when a free member hits the five-hour limit', async () => {
+    vi.mocked(getOracleUsageSnapshot).mockResolvedValueOnce(buildOracleUsageSnapshot(Array.from({ length: ORACLE_FREE_LIMITS.perFiveHours }, () => new Date(Date.now() - 120_000)), false))
     const res = await handleOracleChatRequest(
       await authedRequest({ messages: [{ role: 'user', content: 'Teach me ecdysis' }] })
     )
     expect(res.status).toBe(429)
     expect(res.headers.get('Retry-After')).toBeTruthy()
     const data = await res.json()
-    expect(data.limit).toBe('day')
-    expect(data.error).toContain('Premium')
+    expect(data.limit).toBe('fiveHours')
+    expect(data.error).toContain('5-hour')
     expect(screenOraclePrompt).not.toHaveBeenCalled()
     expect(streamTextMock).not.toHaveBeenCalled()
   })
@@ -509,13 +505,9 @@ describe('handleOracleChatRequest', () => {
     expect(streamTextMock).not.toHaveBeenCalled()
   })
 
-  it('lets a Premium member past the free daily limit', async () => {
+  it('lets a Premium member past the free five-hour limit', async () => {
     streamTextMock.mockReturnValueOnce({ stream: textStream('Premium answer') })
-    vi.mocked(getOracleUsageSnapshot).mockResolvedValueOnce({
-      lastMinute: 0,
-      lastDay: ORACLE_PREMIUM_LIMITS.perDay - 1,
-      isPremium: true,
-    })
+    vi.mocked(getOracleUsageSnapshot).mockResolvedValueOnce(buildOracleUsageSnapshot(Array.from({ length: ORACLE_PREMIUM_LIMITS.perFiveHours - 1 }, () => new Date(Date.now() - 120_000)), true))
     const res = await handleOracleChatRequest(
       await authedRequest({ messages: [{ role: 'user', content: 'Teach me ecdysis' }] })
     )

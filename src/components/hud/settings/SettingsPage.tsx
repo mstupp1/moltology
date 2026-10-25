@@ -27,6 +27,7 @@ import {
 import { AvatarCreatorPanel } from '../avatar/AvatarCreatorPanel'
 import { AvatarCreatorPreview } from '../avatar/AvatarCreatorPreview'
 import { ConnectedAccounts } from './ConnectedAccounts'
+import { PlanUsageSection } from '@/components/ai/OracleUsage'
 import { PremiumSettingsSection } from './PremiumSettingsSection'
 
 export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) => {
@@ -165,6 +166,7 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
         description="Choose your avatar, email preferences, sign-in methods, display ambience, and command surface options."
       />
 
+      <PlanUsageSection userId={userId} />
       <PremiumSettingsSection />
 
       <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5">

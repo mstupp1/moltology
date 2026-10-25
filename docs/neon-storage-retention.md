@@ -62,7 +62,7 @@ Safety details:
 - The visible product history horizon is 90 days. An extra internal date protects members whose local calendar is one day behind UTC: retention holds 91 dates, while the API/UI display only the requested 90.
 - A compact per-member streak carry preserves the current long streak and existing XP milestones when older daily records expire. It does not preserve older daily task details.
 - Summaries retain simulated and real completion history for the same horizon and timezone boundary buffer. No shorter simulated TTL truncates the visible heatmap.
-- Usage events older than the raw window move atomically into per-user UTC-day/kind/model totals. Request counts, known token sums, and missing-token counts survive; rolling 24-hour limits continue to use recent raw events.
+- Usage events older than the raw window move atomically into per-user UTC-day/kind/model totals. Request counts, known token sums, and missing-token counts survive; rolling 7-day Oracle and 24-hour forum limits continue to use recent raw events.
 - XP, screening history, community content, active chats, pending requests, friendships, and member bonds are not log-cleanup targets.
 - The user explicitly selected deletion 30 days after archiving rather than transcript summarization/private archival. No private transcript service is required for this policy.
 
