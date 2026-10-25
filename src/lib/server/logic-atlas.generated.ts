@@ -847,10 +847,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/avatar/races.ts",
           "symbol": "renderCharacter",
-          "line": 162,
+          "line": 784,
           "value": "renderCharacter(spec, ctx)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/races.ts#L162"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/races.ts#L784"
         }
       ],
       "tests": [
@@ -8603,11 +8603,11 @@ export const LOGIC_ATLAS: LogicAtlas = {
         },
         {
           "heading": "Decision",
-          "html": "<p>Keep deterministic SVG rendering and redraw both species using the adult Composite Studio cast as anatomical references. Use one equipment item per hardpoint, with separate right and left pincers. Every active catalog entry has shared worn geometry and thumbnail art; higher tiers add construction details.</p>\n<p>The character studio owns a complete draft with Save and Discard. Temporary unowned try-ons are separate from saved placements. Stats and powers remain descriptive flavor. Acquisition mechanics are deferred.</p>\n<p>Initialize equipment version one once per member, replacing previous ownership with nineteen common items and seven initial equipped placements. Preserve body and face choices; remove embedded headwear and claw selections. Initialization and commits lock the member row. Commits validate the complete placement list and expected revision before any writes. Public projections include compact visual snapshots without exposing the vault.</p>"
+          "html": "<p>Keep deterministic SVG rendering and the original SVG art direction: lobster silhouette, expressive eyes, shell gradients, and outlines. Give the crab an upright lower body with knees and broad feet while retaining its original shell and face. Use one equipment item per hardpoint, with separate right and left pincers. Every active catalog entry has shared worn geometry and thumbnail art; higher tiers add construction details.</p>\n<p>The character studio owns a complete draft with Save and Discard. Temporary unowned try-ons are separate from saved placements. Stats and powers remain descriptive flavor. Acquisition mechanics are deferred.</p>\n<p>Initialize equipment version one once per member, replacing previous ownership with nineteen common items and seven initial equipped placements. Preserve body and face choices; remove embedded headwear and claw selections. Initialization and commits lock the member row. Commits validate the complete placement list and expected revision before any writes. Public projections include compact visual snapshots without exposing the vault.</p>"
         },
         {
           "heading": "Alternatives",
-          "html": "<p>Interactive 3D and layered bitmap characters were declined in favor of redesigned SVGs. Separate cosmetic overrides, legendary starter grants, functional combat stats, and new acquisition mechanics were excluded.</p>"
+          "html": "<p>Interactive 3D, layered bitmap characters, and a replacement SVG silhouette and paint treatment were declined in favor of retaining the original SVG style. Separate cosmetic overrides, legendary starter grants, functional combat stats, and new acquisition mechanics were excluded.</p>"
         },
         {
           "heading": "Consequences",

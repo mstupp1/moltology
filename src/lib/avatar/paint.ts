@@ -19,7 +19,7 @@ export interface PaintContext {
 
 export type PieceSide = 'left' | 'right' | 'center'
 
-export const OUTLINE_WIDTH = 1.15
+export const OUTLINE_WIDTH = 2.3
 
 export const ids = (ctx: PaintContext) => ({
   shell: `${ctx.uid}-shell`,
@@ -47,14 +47,12 @@ function shellGradient(id: string, p: ShellPalette, finish: ShellFinish): string
       <stop offset="1" stop-color="${p.deep}"/>
     </linearGradient>`
   }
-  const mid = finish === 'satin' ? 0.48 : 0.38
-  return `<radialGradient id="${id}" cx=".32" cy=".23" r=".86">
+  const mid = finish === 'satin' ? 0.5 : 0.42
+  return `<linearGradient id="${id}" x1="0.2" y1="0" x2="0.75" y2="1">
       <stop offset="0" stop-color="${p.highlight}"/>
       <stop offset="${mid}" stop-color="${p.base}"/>
-      <stop offset=".86" stop-color="${p.shade}"/>
-      <stop offset="1" stop-color="${p.deep}"/>
-    </radialGradient>`
-
+      <stop offset="1" stop-color="${p.shade}"/>
+    </linearGradient>`
 }
 
 function markingColor(ctx: PaintContext): string {
@@ -126,7 +124,7 @@ export function paintDefs(ctx: PaintContext): string {
   const p = ctx.palette
   const specOpacity = { glossy: 0.85, satin: 0.38, pearl: 0.7, chrome: 0.95, glow: 0.5 }[ctx.finish]
   const aoOpacity = ctx.finish === 'satin' ? 0.42 : 0.55
-  const rimOpacity = ctx.finish === 'glow' ? 1 : 0.36
+  const rimOpacity = ctx.finish === 'glow' ? 1 : 0.85
   const partner = ctx.partner
   return `
     ${shellGradient(i.shell, p, ctx.finish)}
@@ -215,7 +213,7 @@ export function piece(d: string, ctx: PaintContext, opts: PieceOptions = {}): st
   layers.push(`<path d="${d}" fill="url(#${i.spec})"/>`)
   if (!opts.noRim) {
     const glowAttr = ctx.finish === 'glow' ? ` filter="url(#${i.glow})"` : ''
-    layers.push(`<path d="${d}" fill="none" stroke="url(#${i.rim})" stroke-width="1.3" stroke-linejoin="round"${glowAttr}/>`)
+    layers.push(`<path d="${d}" fill="none" stroke="url(#${i.rim})" stroke-width="2.2" stroke-linejoin="round"${glowAttr}/>`)
   }
   return `<g${opts.attrs ? ` ${opts.attrs}` : ''}>${layers.join('')}</g>`
 }

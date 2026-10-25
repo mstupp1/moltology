@@ -45,7 +45,7 @@
   "data.storage-headroom::src/lib/data-retention.ts#STORAGE_CRITICAL_RATIO": "3a81b010d8b1",
   "data.storage-headroom::src/lib/data-retention.ts#STORAGE_WARN_RATIO": "584637bce994",
   "economy.character-equipment-visuals::src/lib/avatar/equipment.ts#EQUIPMENT_VISUALS": "9efd9a7a58da",
-  "economy.character-equipment-visuals::src/lib/avatar/races.ts#renderCharacter": "0d70ebba949f",
+  "economy.character-equipment-visuals::src/lib/avatar/races.ts#renderCharacter": "e4514ce67483",
   "economy.character-starter-equipment::src/lib/avatar/starter-equipment.ts#STARTER_CHARACTER_EQUIPMENT": "9ae92dc47d11",
   "economy.character-starter-equipment::src/lib/character-appearance.ts#EQUIPMENT_VERSION": "802df8a256ca",
   "economy.character-starter-equipment::src/lib/equipment-seed-data.ts#STARTER_EQUIPMENT_CATALOG_IDS": "0aca90570ed6",

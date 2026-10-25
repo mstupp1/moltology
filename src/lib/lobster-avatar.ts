@@ -467,12 +467,12 @@ export function resolveAvatarTraits(config: LobsterAvatarConfig): ResolvedAvatar
 /** Full-body square frame. The character stands on y=185 around the x=50 centre line. */
 export const LOBSTER_FULL_BODY_VIEWBOX = '-80 -65 260 260' as const
 /** Head-and-shoulders close-up used by every static portrait. */
-export const LOBSTER_PORTRAIT_VIEWBOX = '-9 6 118 118' as const
+export const LOBSTER_PORTRAIT_VIEWBOX = '-9 -11 118 118' as const
 
 /** Portrait framing per race, so every face sits in the same spot of the porthole. */
 export const AVATAR_PORTRAIT_VIEWBOXES: Readonly<Record<AvatarRace, string>> = {
   lobster: LOBSTER_PORTRAIT_VIEWBOX,
-  crab: '-9 12 118 118',
+  crab: '-9 -11 118 118',
 }
 
 export type LobsterAvatarFrame = 'portrait' | 'fullBody'

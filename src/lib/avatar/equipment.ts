@@ -69,7 +69,11 @@ export const EQUIPMENT_VISUALS: Readonly<Record<string, EquipmentVisual>> = Obje
 export const getEquipmentVisual = (key: string) => EQUIPMENT_VISUALS[key]
 
 /** Local coordinates: torso 0..60, head centred at y=0, weapon cuff at y=0. */
-export function renderEquipment(key: string, ctx: PaintContext): string {
+export function renderEquipment(
+  key: string,
+  ctx: PaintContext,
+  fit?: { eyeY: number; mouthY: number },
+): string {
   const v = getEquipmentVisual(key)
   if (!v) return ''
   const uid = `${ctx.uid}-eq-${v.key}`,
@@ -90,7 +94,7 @@ export function renderEquipment(key: string, ctx: PaintContext): string {
     body = renderAccessory(
       v.accessory,
       { ...ctx, uid, rim: v.accent },
-      { x: 0, top: 0, eyeY: 26, mouth: [0, 40] },
+      { x: 0, top: 0, eyeY: fit?.eyeY ?? 26, mouth: [0, fit?.mouthY ?? 40] },
     )
   } else if (v.category === 'carapace') {
     body =

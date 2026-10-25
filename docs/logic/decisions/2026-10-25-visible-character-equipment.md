@@ -17,7 +17,7 @@ Equipment previously appeared as inventory tiles around a mannequin. Creator hat
 
 ## Decision
 
-Keep deterministic SVG rendering and redraw both species using the adult Composite Studio cast as anatomical references. Use one equipment item per hardpoint, with separate right and left pincers. Every active catalog entry has shared worn geometry and thumbnail art; higher tiers add construction details.
+Keep deterministic SVG rendering and the original SVG art direction: lobster silhouette, expressive eyes, shell gradients, and outlines. Give the crab an upright lower body with knees and broad feet while retaining its original shell and face. Use one equipment item per hardpoint, with separate right and left pincers. Every active catalog entry has shared worn geometry and thumbnail art; higher tiers add construction details.
 
 The character studio owns a complete draft with Save and Discard. Temporary unowned try-ons are separate from saved placements. Stats and powers remain descriptive flavor. Acquisition mechanics are deferred.
 
@@ -25,7 +25,7 @@ Initialize equipment version one once per member, replacing previous ownership w
 
 ## Alternatives
 
-Interactive 3D and layered bitmap characters were declined in favor of redesigned SVGs. Separate cosmetic overrides, legendary starter grants, functional combat stats, and new acquisition mechanics were excluded.
+Interactive 3D, layered bitmap characters, and a replacement SVG silhouette and paint treatment were declined in favor of retaining the original SVG style. Separate cosmetic overrides, legendary starter grants, functional combat stats, and new acquisition mechanics were excluded.
 
 ## Consequences
 

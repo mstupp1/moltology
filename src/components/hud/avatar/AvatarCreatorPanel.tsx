@@ -248,7 +248,7 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
                   onClick={() => set('headShape', h)}
                 >
                   <span className="inline-flex items-center gap-1.5">
-                    <svg viewBox="-40 -8 80 90" className="w-4 h-4 shrink-0" aria-hidden="true">
+                    <svg viewBox={traits.race === 'crab' ? '-12 28 124 104' : '6 0 88 118'} className="w-4 h-4 shrink-0" aria-hidden="true">
                       <path
                         d={headShapeOutline(traits.race, h)}
                         fill="currentColor"

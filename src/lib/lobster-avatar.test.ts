@@ -376,7 +376,8 @@ describe('lobster-avatar', () => {
       expect(portrait).toContain('data-avatar-slot="portrait"')
     }
     expect(AVATAR_PORTRAIT_VIEWBOXES.lobster).toBe(LOBSTER_PORTRAIT_VIEWBOX)
-    expect(AVATAR_PORTRAIT_VIEWBOXES.crab).not.toBe(LOBSTER_PORTRAIT_VIEWBOX)
+    // The raised crab now aligns with the lobster at regular height.
+    expect(AVATAR_PORTRAIT_VIEWBOXES.crab).toBe(LOBSTER_PORTRAIT_VIEWBOX)
   })
 
   it('keeps the portrait framed on the face for every height and head shape', () => {
