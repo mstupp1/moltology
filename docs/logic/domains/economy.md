@@ -107,14 +107,38 @@ rules:
     title: Starter looks retired
     kind: flow
     status: deprecated
-    statement: Chassis loads and catalog seeds no longer grant or create experimental starter cosmetics. Original equipment grants continue.
+    statement: Chassis loads and catalog seeds no longer grant or create experimental starter cosmetics. The replacement starter collection is initialized once per equipment version.
     dependsOn: [economy.cosmetics-no-stats]
     anchors:
       - file: src/lib/equipment-seed-data.ts
         symbol: ALL_EQUIPMENT_CATALOG
-      - file: src/lib/chassis-loadout.ts
-        symbol: planStarterGrants
+      - file: src/lib/equipment-seed-data.ts
+        symbol: STARTER_EQUIPMENT_CATALOG_IDS
     tests: [src/lib/equipment-seed-data.test.ts]
+  - id: economy.character-starter-equipment
+    title: Nineteen common starter items
+    kind: flow
+    statement: Equipment version one replaces legacy inventories once with nineteen common items, including two instances of every creator claw style. Seven pieces start equipped. Rarer catalog items can be previewed but cannot be equipped without ownership.
+    dependsOn: [economy.red-line]
+    anchors:
+      - file: src/lib/equipment-seed-data.ts
+        symbol: STARTER_EQUIPMENT_CATALOG_IDS
+      - file: src/lib/avatar/starter-equipment.ts
+        symbol: STARTER_CHARACTER_EQUIPMENT
+      - file: src/lib/character-appearance.ts
+        symbol: EQUIPMENT_VERSION
+    tests: [src/lib/character-appearance.test.ts, src/lib/server/character.integration.test.ts]
+  - id: economy.character-equipment-visuals
+    title: Equipment changes appearance without progression
+    kind: invariant
+    statement: Each equipped slot displays its actual item. Rarity describes visible construction and materials; stats and unique powers are character flavor and do not affect activities, progression, rank, or authority. There is no separate cosmetic override layer.
+    dependsOn: [economy.red-line]
+    anchors:
+      - file: src/lib/avatar/equipment.ts
+        symbol: EQUIPMENT_VISUALS
+      - file: src/lib/avatar/races.ts
+        symbol: renderCharacter
+    tests: [src/lib/character-appearance.test.ts, src/components/hud/chassis/ChassisStatusPage.test.tsx]
 
 ---
 

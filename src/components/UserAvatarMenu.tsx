@@ -1,3 +1,6 @@
+import { getUserProfileFn } from '@/lib/server/api'
+import { getAuthJWTToken } from '@/lib/jwt'
+import { parseLobsterAvatarConfig } from '@/lib/lobster-avatar'
 import React, { useState, useRef, useEffect } from 'react'
 import { LogOut, ChevronDown, ChevronsUpDown, Settings, User, Globe } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
@@ -8,6 +11,7 @@ import { useOptionalToast } from '@/components/ui/ToastProvider'
 
 export interface UserAvatarMenuProps {
   user: {
+    avatarConfig?: import('@/lib/lobster-avatar').LobsterAvatarConfig | null
     id?: string
     name?: string | null
     email?: string | null
@@ -47,6 +51,37 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   className = '',
   displayName: displayNameProp,
 }) => {
+  const [character, setCharacter] = useState({ userId: user.id, config: user.avatarConfig })
+  useEffect(() => {
+    let cancelled = false
+    setCharacter({ userId: user.id, config: user.avatarConfig })
+    if (user.avatarConfig !== undefined || !user.id) return
+    const load = async () => {
+      try {
+        const token = await getAuthJWTToken()
+        const profile = await getUserProfileFn({
+          data: { userId: user.id, token: token ?? undefined },
+        })
+        if (!cancelled)
+          setCharacter({ userId: user.id, config: parseLobsterAvatarConfig(profile?.avatarConfig) })
+      } catch {}
+    }
+    void load()
+    window.addEventListener('profile-avatar-changed', load)
+    return () => {
+      cancelled = true
+      window.removeEventListener('profile-avatar-changed', load)
+    }
+  }, [user.id, user.avatarConfig])
+  const avatarUser = {
+    ...user,
+    avatarConfig:
+      user.avatarConfig !== undefined
+        ? user.avatarConfig
+        : character.userId === user.id
+          ? character.config
+          : null,
+  }
   const [isOpen, setIsOpen] = useState(false)
   const [shouldRender, setShouldRender] = useState(isOpen)
   const [isExpanded, setIsExpanded] = useState(isOpen)
@@ -157,9 +192,12 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
       }
     } else {
       setIsExpanded(false)
-      const timer = setTimeout(() => {
-        setShouldRender(false)
-      }, inline ? 250 : 200)
+      const timer = setTimeout(
+        () => {
+          setShouldRender(false)
+        },
+        inline ? 250 : 200,
+      )
       return () => clearTimeout(timer)
     }
   }, [isOpen, inline])
@@ -179,7 +217,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
         >
           <div className="flex items-center gap-3 min-w-0">
             <UserAvatar
-              user={user}
+              user={avatarUser}
               name={displayName}
               size="sm"
               className={
@@ -188,23 +226,17 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             />
             <div className="flex flex-col min-w-0 text-left">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span
-                  className="text-xs font-bold truncate font-grotesk flex items-center gap-1.5 text-ink group-hover:text-cyan-glow"
-                >
+                <span className="text-xs font-bold truncate font-grotesk flex items-center gap-1.5 text-ink group-hover:text-cyan-glow">
                   {displayName}
                 </span>
                 {effectiveRole === 'admin' && (
-                  <span
-                    className="text-[11px] font-sans font-extrabold tracking-[0.08em] uppercase px-1.5 py-0.5 rounded-chip shrink-0 bg-cyan-soft border border-cyan-glow/40 text-cyan-glow"
-                  >
+                  <span className="text-[11px] font-sans font-extrabold tracking-[0.08em] uppercase px-1.5 py-0.5 rounded-chip shrink-0 bg-cyan-soft border border-cyan-glow/40 text-cyan-glow">
                     ADMIN
                   </span>
                 )}
               </div>
               {user.email && (
-                <span
-                  className="text-[11px] truncate mt-0.5 font-sans text-ink-muted"
-                >
+                <span className="text-[11px] truncate mt-0.5 font-sans text-ink-muted">
                   {user.email}
                 </span>
               )}
@@ -212,9 +244,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           </div>
           <ChevronDown
             className={`w-4 h-4 transition-transform duration-300 ease-in-out shrink-0 ml-2 ${
-              isOpen
-                ? 'rotate-180 text-cyan-glow'
-                : 'rotate-0 text-ink-muted group-hover:text-ink'
+              isOpen ? 'rotate-180 text-cyan-glow' : 'rotate-0 text-ink-muted group-hover:text-ink'
             }`}
           />
         </button>
@@ -294,7 +324,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           className="w-full flex items-center gap-3 min-h-[56px] pl-4 pr-4 py-2.5 text-left transition-colors duration-150 group cursor-pointer hover:bg-surface-2 aria-expanded:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
         >
           <span className="relative flex shrink-0 rounded-full">
-            <UserAvatar user={user} name={displayName} size="row" borderless />
+            <UserAvatar user={avatarUser} name={displayName} size="row" borderless />
             <span
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/15 transition-shadow group-hover:ring-white/40 group-aria-expanded:ring-white/40"
@@ -316,20 +346,20 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           />
         </button>
       ) : (
-      <button
-        type="button"
-        onClick={handleToggle}
-        aria-expanded={isOpen}
-        aria-haspopup="true"
-        aria-label="User account menu"
-        className="relative flex rounded-full transition-transform group cursor-pointer active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-      >
-        <UserAvatar user={user} name={displayName} size="nav" borderless />
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/15 transition-shadow group-hover:ring-white/40 group-aria-expanded:ring-white/40"
-        />
-      </button>
+        <button
+          type="button"
+          onClick={handleToggle}
+          aria-expanded={isOpen}
+          aria-haspopup="true"
+          aria-label="User account menu"
+          className="relative flex rounded-full transition-transform group cursor-pointer active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+        >
+          <UserAvatar user={avatarUser} name={displayName} size="nav" borderless />
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/15 transition-shadow group-hover:ring-white/40 group-aria-expanded:ring-white/40"
+          />
+        </button>
       )}
 
       {/* Floating Glassmorphic Dropdown Menu with smooth animated open and close */}
@@ -339,51 +369,39 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             align === 'right'
               ? 'right-0'
               : align === 'center'
-              ? 'left-1/2 -translate-x-1/2'
-              : 'left-0'
+                ? 'left-1/2 -translate-x-1/2'
+                : 'left-0'
           } ${trigger === 'row' ? 'ml-2' : ''} ${
-            openDirection === 'up'
-              ? 'bottom-full mb-2 origin-bottom'
-              : 'top-full mt-2 origin-top'
+            openDirection === 'up' ? 'bottom-full mb-2 origin-bottom' : 'top-full mt-2 origin-top'
           } w-64 max-w-[calc(100vw-2rem)] rounded-card p-3.5 z-[200] backdrop-blur-2xl transition-all duration-200 ease-out bg-surface-2 border border-line-subtle shadow-menu font-sans ${
             isExpanded
               ? 'opacity-100 scale-100 translate-y-0'
               : openDirection === 'up'
-              ? `opacity-0 scale-95 translate-y-2${isOpen ? '' : ' pointer-events-none'}`
-              : `opacity-0 scale-95 -translate-y-2${isOpen ? '' : ' pointer-events-none'}`
+                ? `opacity-0 scale-95 translate-y-2${isOpen ? '' : ' pointer-events-none'}`
+                : `opacity-0 scale-95 -translate-y-2${isOpen ? '' : ' pointer-events-none'}`
           }`}
         >
           {/* Top User Header Info Section */}
-          <div
-            className="flex items-center gap-3 pb-3 border-b border-line-subtle"
-          >
+          <div className="flex items-center gap-3 pb-3 border-b border-line-subtle">
             <UserAvatar
-              user={user}
+              user={avatarUser}
               name={displayName}
               size="md"
-              className={
-                'border-2 border-cyan-glow/40'
-              }
+              className={'border-2 border-cyan-glow/40'}
             />
             <div className="flex flex-col min-w-0 flex-1">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span
-                  className="text-xs font-bold truncate font-grotesk flex items-center gap-1.5 text-ink"
-                >
+                <span className="text-xs font-bold truncate font-grotesk flex items-center gap-1.5 text-ink">
                   {displayName}
                 </span>
                 {effectiveRole === 'admin' && (
-                  <span
-                    className="text-[11px] font-sans font-extrabold tracking-[0.08em] uppercase px-1.5 py-0.5 rounded-chip shrink-0 bg-cyan-soft border border-cyan-glow/40 text-cyan-glow"
-                  >
+                  <span className="text-[11px] font-sans font-extrabold tracking-[0.08em] uppercase px-1.5 py-0.5 rounded-chip shrink-0 bg-cyan-soft border border-cyan-glow/40 text-cyan-glow">
                     ADMIN
                   </span>
                 )}
               </div>
               {user.email && (
-                <span
-                  className="text-[11px] truncate mt-0.5 font-sans text-ink-muted"
-                >
+                <span className="text-[11px] truncate mt-0.5 font-sans text-ink-muted">
                   {user.email}
                 </span>
               )}
@@ -398,9 +416,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                 onClick={handleOpenProfile}
                 className="w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
-                <User
-                  className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow"
-                />
+                <User className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow" />
                 <span>YOUR PROFILE</span>
               </button>
             )}
@@ -409,9 +425,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               onClick={handleOpenSettings}
               className="w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
-              <Settings
-                className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow"
-              />
+              <Settings className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow" />
               <span>SETTINGS</span>
             </button>
 
@@ -420,9 +434,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               onClick={handleOpenHome}
               className="w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
-              <Globe
-                className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow"
-              />
+              <Globe className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow" />
               <span>MOLTOLOGY HOME</span>
             </button>
 
@@ -431,9 +443,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               {...signOutButtonProps}
               className="w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer text-crimson-text border border-crimson-aggro/55 hover:bg-crimson-soft hover:border-crimson-aggro focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
-              <LogOut
-                className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5 text-crimson-text"
-              />
+              <LogOut className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5 text-crimson-text" />
               <span>SIGN OUT</span>
             </button>
           </div>

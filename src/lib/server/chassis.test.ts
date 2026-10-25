@@ -8,7 +8,7 @@ vi.mock('../../db', () => ({
   getDb: vi.fn(() => ({ mocked: true })),
 }))
 
-import { getChassisLoadoutHandler, moveGearItemHandler } from './db-services'
+import { getChassisLoadoutHandler, moveGearItemHandler, saveCharacterHandler } from './db-services'
 
 describe('Chassis loadout handlers', () => {
   beforeEach(() => {
@@ -20,7 +20,7 @@ describe('Chassis loadout handlers', () => {
       getChassisLoadoutHandler({
         data: {},
         context: {},
-      })
+      }),
     ).rejects.toThrow('Unauthenticated')
   })
 
@@ -32,7 +32,32 @@ describe('Chassis loadout handlers', () => {
           target: { type: 'equip', slot: 'claws-1' },
         },
         context: {},
-      })
+      }),
     ).rejects.toThrow('Unauthenticated')
+  })
+  it('rejects an unauthenticated complete character save', async () => {
+    await expect(
+      saveCharacterHandler({
+        data: {
+          config: { style: 'critters', seed: 'forged' },
+          expectedRevision: 0,
+          placements: [],
+        },
+        context: {},
+      }),
+    ).rejects.toThrow('Unauthenticated')
+  })
+  it('rejects a client userId that differs from the authenticated member', async () => {
+    await expect(
+      saveCharacterHandler({
+        data: {
+          userId: 'victim',
+          config: { style: 'critters', seed: 'forged' },
+          expectedRevision: 0,
+          placements: [],
+        },
+        context: { user: { sub: 'attacker' } },
+      }),
+    ).rejects.toThrow('does not match')
   })
 })

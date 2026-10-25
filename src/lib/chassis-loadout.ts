@@ -217,6 +217,7 @@ export const RARITY_STYLES: Record<
 }
 
 export interface CatalogRef {
+  appearanceKey?: string | null
   id: string
   slug: string
   name: string
@@ -578,6 +579,8 @@ export interface ChassisLoadoutPayload {
   items: GearItemState[]
   totals: LoadoutTotals
   vaultSize: number
+  config?: import('./lobster-avatar').LobsterAvatarConfig | null
+  appearanceRevision?: number
 }
 
 let chassisLoadoutCache: { userId: string; payload: ChassisLoadoutPayload } | null = null

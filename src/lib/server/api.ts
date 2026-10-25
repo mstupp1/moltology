@@ -1076,3 +1076,30 @@ export const setExperimentFn = createServerFn({ method: 'POST' })
     const { setExperimentHandler } = await import('./experiments')
     return setExperimentHandler(args)
   })
+
+/** One explicit save for the complete character draft. Render snapshots are server-owned. */
+export const saveCharacterFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: import('./db-services').SaveCharacterInput) =>
+    z
+      .object({
+        token: z.string().optional(),
+        userId: z.string().optional(),
+        expectedRevision: z.number().int().nonnegative(),
+        config: z.object(avatarConfigShape),
+        placements: z
+          .array(
+            z.object({
+              id: z.string().uuid(),
+              equippedSlot: z.enum(EQUIP_SLOT_IDS as [EquipSlotId, ...EquipSlotId[]]).nullable(),
+              vaultIndex: z.number().int().min(0).max(VAULT_SIZE - 1).nullable(),
+            }),
+          )
+          .max(VAULT_SIZE + EQUIP_SLOT_IDS.length),
+      })
+      .parse(data),
+  )
+  .handler(async (args) => {
+    const { saveCharacterHandler } = await import('./db-services')
+    return saveCharacterHandler(args as Parameters<typeof saveCharacterHandler>[0])
+  })

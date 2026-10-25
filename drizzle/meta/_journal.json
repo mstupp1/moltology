@@ -386,6 +386,13 @@
       "when": 1792614582664,
       "tag": "0054_merch_order_discounts",
       "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1792964043060,
+      "tag": "0055_high_starbolt",
+      "breakpoints": true
     }
   ]
 }

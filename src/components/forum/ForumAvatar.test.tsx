@@ -9,26 +9,20 @@ describe('ForumAvatar', () => {
       <ForumAvatar
         src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"
         authorName="Larva Unit #8971"
-      />
+      />,
     )
 
     const customImg = screen.getByTestId('forum-avatar-custom-image')
     expect(customImg).toBeInTheDocument()
     expect(customImg).toHaveAttribute(
       'src',
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
     )
     expect(customImg).toHaveAttribute('alt', 'Larva Unit #8971')
   })
 
   it('falls back to lobster SVG still when src is empty or null', () => {
-    render(
-      <ForumAvatar
-        src=""
-        authorName="CLAW_LORD_99"
-        authorHandle="claw_lord_99"
-      />
-    )
+    render(<ForumAvatar src="" authorName="CLAW_LORD_99" authorHandle="claw_lord_99" />)
 
     expect(screen.queryByTestId('forum-avatar-custom-image')).toBeNull()
     const lobsterImg = screen.getByTestId('forum-avatar-lobster-still')
@@ -37,18 +31,15 @@ describe('ForumAvatar', () => {
     expect(lobsterImg).toHaveAttribute('data-slot', 'portrait')
     expect(lobsterImg.className).not.toContain('scale-[')
     expect(lobsterImg.className).not.toContain('origin-[')
-    expect(decodeURIComponent(lobsterImg.getAttribute('src') ?? '')).toContain('data-avatar-slot="portrait"')
+    expect(decodeURIComponent(lobsterImg.getAttribute('src') ?? '')).toContain(
+      'data-avatar-slot="portrait"',
+    )
     expect(screen.queryByTestId('lobster-avatar-inline-svg')).toBeNull()
     expect(screen.queryByTestId('lobster-avatar-full-body')).toBeNull()
   })
 
   it('falls back to lobster SVG still when src is /images/stage1_larva.png', () => {
-    render(
-      <ForumAvatar
-        src="/images/stage1_larva.png"
-        authorName="ABYSSAL_ARCHITECT"
-      />
-    )
+    render(<ForumAvatar src="/images/stage1_larva.png" authorName="ABYSSAL_ARCHITECT" />)
 
     expect(screen.queryByTestId('forum-avatar-custom-image')).toBeNull()
     const lobsterImg = screen.getByTestId('forum-avatar-lobster-still')
@@ -58,10 +49,7 @@ describe('ForumAvatar', () => {
 
   it('falls back to lobster SVG still when custom image errors', () => {
     render(
-      <ForumAvatar
-        src="https://broken-avatar-url.example.com/photo.jpg"
-        authorName="Vaelen"
-      />
+      <ForumAvatar src="https://broken-avatar-url.example.com/photo.jpg" authorName="Vaelen" />,
     )
 
     const customImg = screen.getByTestId('forum-avatar-custom-image')
@@ -86,7 +74,7 @@ describe('ForumAvatar', () => {
           seed: 'kaelith-custom-seed',
           backgroundTheme: 'abyssal_indigo',
         }}
-      />
+      />,
     )
 
     const lobsterImg = screen.getByTestId('forum-avatar-lobster-still')
@@ -96,13 +84,7 @@ describe('ForumAvatar', () => {
   })
 
   it('applies custom className to the container', () => {
-    render(
-      <ForumAvatar
-        src=""
-        authorName="Unit"
-        className="w-5 h-5 shadow-sm"
-      />
-    )
+    render(<ForumAvatar src="" authorName="Unit" className="w-5 h-5 shadow-sm" />)
 
     const container = screen.getByTestId('forum-avatar-container')
     expect(container).toHaveClass('w-5')
@@ -123,4 +105,24 @@ describe('ForumAvatar', () => {
     expect(container).toHaveClass('w-11')
     expect(container).toHaveClass('h-11')
   })
+})
+
+it('preserves species and equipped items when a character overrides an account photo', () => {
+  const { container } = render(
+    <ForumAvatar
+      src="https://example.com/photo.jpg"
+      avatarConfig={{
+        style: 'critters',
+        seed: 'member',
+        race: 'crab',
+        build: 'chunky',
+        shellColor: 'jade',
+        equipment: { head: { visualKey: 'creator-crown', rarity: 'common' } },
+      }}
+    />,
+  )
+  const svg = decodeURIComponent(container.querySelector('img')!.src.split(',')[1])
+  expect(svg).toContain('data-race="crab"')
+  expect(svg).toContain('data-build="chunky"')
+  expect(svg).toContain('data-equipment="creator-crown"')
 })

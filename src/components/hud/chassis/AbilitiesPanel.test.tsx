@@ -30,13 +30,13 @@ describe('AbilitiesPanel', () => {
     render(<AbilitiesPanel abilities={abilities} />)
     expect(screen.getByText('Zero-Latency Clamp')).toBeInTheDocument()
     expect(screen.getByText('Quiet Arrival')).toBeInTheDocument()
-    expect(screen.getByText('Ready')).toBeInTheDocument()
-    expect(screen.getByText('Locked')).toBeInTheDocument()
+    expect(screen.queryByText('Ready')).not.toBeInTheDocument()
+    expect(screen.queryByText('Locked')).not.toBeInTheDocument()
     expect(screen.queryByText(/stub readout/i)).not.toBeInTheDocument()
   })
 
   it('invites seating legendary plating when no powers are owned', () => {
     render(<AbilitiesPanel abilities={[]} />)
-    expect(screen.getByText(/No legendary power is seated/i)).toBeInTheDocument()
+    expect(screen.getByText(/No item lore in this collection/i)).toBeInTheDocument()
   })
 })

@@ -1,3 +1,6 @@
+import { validateCharacterPlacements, type CharacterPlacement } from '../character-appearance'
+import { getEquipmentVisual } from '../avatar/equipment'
+import { parseLobsterAvatarConfig, type LobsterAvatarConfig } from '../lobster-avatar'
 import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import {
@@ -87,16 +90,10 @@ import {
   type ProgressionState,
 } from '../progression'
 import {
-  ALL_EQUIPMENT_CATALOG,
-  STARTER_EQUIPMENT_CATALOG_IDS,
-  catalogSeedInsertValues,
-} from '../equipment-seed-data'
-import {
   VAULT_SIZE,
   chassisTypeImageUrl,
   computeLoadoutTotals,
   planGearMove,
-  planStarterGrants,
   isLookSlot,
   resolveVisualType,
   normalizeEquipSlot,
@@ -166,6 +163,29 @@ import {
   presentForumReplyNotification,
   type ForumReplyTarget,
 } from '../forum-replies'
+
+/** Public render data contains visuals only, never inventory instances or vault contents. */
+const publicAvatarConfig = sql<LobsterAvatarConfig | null>`CASE WHEN ${profiles.avatarConfig} IS NULL THEN NULL ELSE (${profiles.avatarConfig} - 'accessory' - 'claws' - 'equipment') || jsonb_build_object('equipment', CASE WHEN ${profiles.equipmentVersion} = 1 THEN ${profiles.equippedAppearance} ELSE '{}'::jsonb END) END`
+function withCharacterAppearance<
+  T extends { avatarConfig?: unknown; equipmentVersion?: number; equippedAppearance?: unknown },
+>(profile: T) {
+  const config = parseLobsterAvatarConfig(profile.avatarConfig)
+  return {
+    ...profile,
+    avatarConfig: config
+      ? {
+          ...config,
+          accessory: undefined,
+          claws: undefined,
+          equipment:
+            profile.equipmentVersion === 1
+              ? ((profile.equippedAppearance ??
+                  {}) as import('../character-appearance').EquippedAppearance)
+              : {},
+        }
+      : null,
+  }
+}
 
 type Db = ReturnType<typeof getDb>
 
@@ -265,7 +285,7 @@ export async function getUserProfileHandler({ data, context }: ServerFnArgs<{ to
   if (!auth) return null
 
   const healed = await ensureUserProfile(auth.userId)
-  if (healed) return healed
+  if (healed) return withCharacterAppearance(healed)
 
   const [profileRecord] = await auth.dbClient
     .select()
@@ -273,7 +293,7 @@ export async function getUserProfileHandler({ data, context }: ServerFnArgs<{ to
     .where(eq(profiles.id, auth.userId))
     .limit(1)
 
-  return profileRecord || null
+  return profileRecord ? withCharacterAppearance(profileRecord) : null
 }
 
 
@@ -1260,7 +1280,7 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
         deletedAt: forumTopics.deletedAt,
         profileHandle: profiles.handle,
         profileLarvaId: profiles.larvaId,
-        profileAvatarConfig: profiles.avatarConfig,
+        profileAvatarConfig: publicAvatarConfig,
       })
       .from(forumTopics)
       .leftJoin(forumCategories, eq(forumTopics.categoryId, forumCategories.id))
@@ -1436,7 +1456,7 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
         profileHandle: profiles.handle,
         profileLarvaId: profiles.larvaId,
         profileStage: profiles.stage,
-        profileAvatarConfig: profiles.avatarConfig,
+        profileAvatarConfig: publicAvatarConfig,
       })
       .from(forumTopics)
       .leftJoin(forumCategories, eq(forumTopics.categoryId, forumCategories.id))
@@ -1480,7 +1500,7 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
           profileHandle: profiles.handle,
           profileLarvaId: profiles.larvaId,
           profileStage: profiles.stage,
-          profileAvatarConfig: profiles.avatarConfig,
+          profileAvatarConfig: publicAvatarConfig,
         })
         .from(forumPosts)
         .leftJoin(profiles, eq(forumPosts.userId, profiles.id))
@@ -1697,7 +1717,7 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
     authorName: inserted.authorName,
     authorHandle: userProfile?.handle?.trim() || null,
     authorAvatar: inserted.authorAvatar,
-    authorAvatarConfig: userProfile?.avatarConfig ?? null,
+    authorAvatarConfig: userProfile ? withCharacterAppearance(userProfile).avatarConfig : null,
     authorStage: inserted.authorStage,
     title: inserted.title,
     slug: inserted.slug,
@@ -1934,7 +1954,7 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     authorName: inserted.authorName,
     authorHandle: userProfile?.handle?.trim() || null,
     authorAvatar: inserted.authorAvatar,
-    authorAvatarConfig: userProfile?.avatarConfig ?? null,
+    authorAvatarConfig: userProfile ? withCharacterAppearance(userProfile).avatarConfig : null,
     authorStage: inserted.authorStage,
     content: inserted.content,
     upvotes: inserted.upvotes,
@@ -3207,7 +3227,7 @@ export async function updateEmailPreferencesHandler({ data, context }: ServerFnA
 }
 
 
-// Lobster avatar (DiceBear) preferences
+// Legacy avatar preferences adapter; shares the unified character persistence contract.
 const lobsterAvatarConfigSchema = z.object({
   ...avatarConfigShape,
   token: z.string().optional(),
@@ -3216,7 +3236,10 @@ const lobsterAvatarConfigSchema = z.object({
 
 export type SaveLobsterAvatarInput = z.input<typeof lobsterAvatarConfigSchema>
 
-export async function saveLobsterAvatarHandler({ data, context }: ServerFnArgs<SaveLobsterAvatarInput>) {
+export async function saveLobsterAvatarHandler({
+  data,
+  context,
+}: ServerFnArgs<SaveLobsterAvatarInput>) {
   const auth = await resolveWriteAuth({ data, context })
   if (!auth) {
     throw new Error('Authentication required to save avatar.')
@@ -3243,18 +3266,21 @@ export async function saveLobsterAvatarHandler({ data, context }: ServerFnArgs<S
     seed: validated.seed.trim(),
   }
 
-  const [updated] = await dbClient
-    .update(profiles)
-    .set({ avatarConfig, updatedAt: new Date() })
-    .where(eq(profiles.id, userId))
-    .returning()
-
-  return {
-    success: true,
-    avatarConfig: updated?.avatarConfig ?? avatarConfig,
-  }
+  const payload = await loadChassisPayload(dbClient, userId)
+  await commitCharacter(
+    dbClient,
+    userId,
+    payload.appearanceRevision ?? 0,
+    avatarConfig as LobsterAvatarConfig,
+    payload.items.map((i) => ({
+      id: i.id,
+      equippedSlot: i.equippedSlot,
+      vaultIndex: i.vaultIndex,
+    })),
+  )
+  const saved = await loadChassisPayload(dbClient, userId)
+  return { success: true, avatarConfig: saved.config }
 }
-
 
 const clearLobsterAvatarSchema = z.object({
   token: z.string().optional(),
@@ -3263,7 +3289,10 @@ const clearLobsterAvatarSchema = z.object({
 
 export type ClearLobsterAvatarInput = z.input<typeof clearLobsterAvatarSchema>
 
-export async function clearLobsterAvatarHandler({ data, context }: ServerFnArgs<ClearLobsterAvatarInput>) {
+export async function clearLobsterAvatarHandler({
+  data,
+  context,
+}: ServerFnArgs<ClearLobsterAvatarInput>) {
   const auth = await resolveWriteAuth({ data, context })
   if (!auth) {
     throw new Error('Authentication required to clear avatar.')
@@ -3271,14 +3300,21 @@ export async function clearLobsterAvatarHandler({ data, context }: ServerFnArgs<
 
   const { userId, dbClient } = auth
 
-  await dbClient
-    .update(profiles)
-    .set({ avatarConfig: null, updatedAt: new Date() })
-    .where(eq(profiles.id, userId))
+  const payload = await loadChassisPayload(dbClient, userId)
+  await commitCharacter(
+    dbClient,
+    userId,
+    payload.appearanceRevision ?? 0,
+    null,
+    payload.items.map((i) => ({
+      id: i.id,
+      equippedSlot: i.equippedSlot,
+      vaultIndex: i.vaultIndex,
+    })),
+  )
 
   return { success: true }
 }
-
 
 export interface GetDailyAlignmentInput {
   date?: string
@@ -3801,6 +3837,7 @@ function toCatalogRef(row: typeof equipmentCatalog.$inferSelect): CatalogRef {
     sortOrder: row.sortOrder,
     kind: row.kind ?? 'gear',
     artKey: row.artKey ?? null,
+    appearanceKey: row.appearanceKey ?? row.slug,
   }
 }
 
@@ -3816,98 +3853,81 @@ function toGearState(row: typeof userGearItems.$inferSelect): GearItemState {
 }
 
 async function loadChassisPayload(dbClient: Db, userId: string): Promise<ChassisLoadoutPayload> {
-  let catalogRows = await dbClient
-    .select()
-    .from(equipmentCatalog)
-    .orderBy(asc(equipmentCatalog.sortOrder))
-
-  // Auto-sync any seed catalog entries missing from the database
-  const existingIds = new Set(catalogRows.map((r) => r.id))
-  const missingSeeds = ALL_EQUIPMENT_CATALOG.filter((item) => !existingIds.has(item.id))
-
-  if (missingSeeds.length > 0) {
-    try {
-      for (const item of missingSeeds) {
-        const values = catalogSeedInsertValues(item)
-        await dbClient
-          .insert(equipmentCatalog)
-          .values(values)
-          .onConflictDoUpdate({
-            target: equipmentCatalog.id,
-            set: {
-              slug: values.slug,
-              name: values.name,
-              flavorText: values.flavorText,
-              category: values.category,
-              rarity: values.rarity,
-              visualType: values.visualType,
-              primaryStat: values.primaryStat,
-              affixes: values.affixes,
-              uniquePower: values.uniquePower,
-              imageUrl: values.imageUrl,
-              sortOrder: values.sortOrder,
-              kind: values.kind,
-              artKey: values.artKey,
-            },
-          })
-      }
-      catalogRows = await dbClient
-        .select()
-        .from(equipmentCatalog)
-        .orderBy(asc(equipmentCatalog.sortOrder))
-    } catch (e) {
-      console.warn('[loadChassisPayload] Auto-sync catalog warning:', e)
-    }
-  }
-
-  let gearRows = await dbClient
-    .select()
-    .from(userGearItems)
-    .where(eq(userGearItems.userId, userId))
-
-  const legacyClaws = gearRows.filter((row) => row.equippedSlot === 'claws')
-  if (legacyClaws.length > 0) {
-    for (const row of legacyClaws) {
-      await dbClient
-        .update(userGearItems)
-        .set({ equippedSlot: 'claws-1', updatedAt: new Date() })
-        .where(and(eq(userGearItems.id, row.id), eq(userGearItems.userId, userId)))
-    }
-    gearRows = await dbClient
-      .select()
-      .from(userGearItems)
-      .where(eq(userGearItems.userId, userId))
-  }
-
-  if (catalogRows.length > 0) {
-    const grants = planStarterGrants(
-      gearRows.map(toGearState),
-      catalogRows.map((c) => c.id),
-      STARTER_EQUIPMENT_CATALOG_IDS,
-      VAULT_SIZE
-    )
-    if (grants.length > 0) {
-      await dbClient.insert(userGearItems).values(
-        grants.map((grant) => ({
-          userId,
-          catalogItemId: grant.catalogItemId,
-          equippedSlot: null,
-          vaultIndex: grant.vaultIndex,
-        }))
-      )
-      gearRows = await dbClient
-        .select()
-        .from(userGearItems)
-        .where(eq(userGearItems.userId, userId))
-    }
-  }
-
-  const catalog = catalogRows.map(toCatalogRef)
+  await dbClient.execute(sql`SELECT public.initialize_character(${userId})`)
+  // One statement gives config, revision, and owned placements the same MVCC snapshot.
+  // Separate concurrent SELECTs could pair a newer revision with older equipment.
+  const result = await dbClient.execute<{
+    catalog: (typeof equipmentCatalog.$inferSelect)[]
+    items: (typeof userGearItems.$inferSelect)[]
+    profile: typeof profiles.$inferSelect
+  }>(sql`SELECT
+    (SELECT COALESCE(jsonb_agg(c ORDER BY c."sortOrder"), '[]'::jsonb) FROM public.equipment_catalog c) AS catalog,
+    (SELECT COALESCE(jsonb_agg(g ORDER BY g.id), '[]'::jsonb) FROM public.user_gear_items g WHERE g."userId"=${userId}) AS items,
+    (SELECT to_jsonb(p) FROM public.profiles p WHERE p.id=${userId}) AS profile`)
+  const { catalog: catalogRows, items: gearRows, profile } = result.rows[0]
+  const catalog = catalogRows
+    .filter((c) => c.kind !== 'cosmetic' && getEquipmentVisual(c.appearanceKey || c.slug))
+    .map(toCatalogRef)
   const items = gearRows.map(toGearState)
-  const catalogById = new Map(catalog.map((c) => [c.id, c]))
-  const totals = computeLoadoutTotals(items, catalogById)
+  return {
+    catalog,
+    items,
+    totals: computeLoadoutTotals(items, new Map(catalog.map((c) => [c.id, c]))),
+    vaultSize: VAULT_SIZE,
+    config: profile ? withCharacterAppearance(profile).avatarConfig : null,
+    appearanceRevision: profile?.appearanceRevision ?? 0,
+  }
+}
 
-  return { catalog, items, totals, vaultSize: VAULT_SIZE }
+async function commitCharacter(
+  dbClient: Db,
+  userId: string,
+  revision: number,
+  config: LobsterAvatarConfig | null,
+  placements: CharacterPlacement[],
+) {
+  try {
+    await dbClient.execute(
+      sql`SELECT public.commit_character(${userId},${revision},${config ? JSON.stringify(config) : null}::jsonb,${JSON.stringify(placements)}::jsonb)`,
+    )
+  } catch (error) {
+    const cause =
+      (error as { cause?: { message?: string } }).cause?.message ??
+      (error instanceof Error ? error.message : '')
+    if (
+      /Your character changed|Invalid or unowned|Duplicate equipment|Include every owned/.test(
+        cause,
+      )
+    )
+      throw new Error(cause.split('\n')[0])
+    throw new Error('Could not save your character. Please try again.')
+  }
+}
+
+export interface SaveCharacterInput {
+  token?: string
+  userId?: string
+  expectedRevision: number
+  config: LobsterAvatarConfig
+  placements: CharacterPlacement[]
+}
+export async function saveCharacterHandler({ data, context }: ServerFnArgs<SaveCharacterInput>) {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to save your character.')
+  if (!data) throw new Error('Missing character payload.')
+  const config = z.object(avatarConfigShape).parse(data.config)
+  if (config.style !== 'critters') throw new Error('Invalid character style.')
+  const payload = await loadChassisPayload(auth.dbClient, auth.userId)
+  const error = validateCharacterPlacements(payload.items, payload.catalog, data.placements)
+  if (error) throw new Error(error)
+  await commitCharacter(
+    auth.dbClient,
+    auth.userId,
+    data.expectedRevision,
+    config as LobsterAvatarConfig,
+    data.placements,
+  )
+  return loadChassisPayload(auth.dbClient, auth.userId)
 }
 
 export const getChassisLoadoutHandler = async ({
@@ -3944,43 +3964,29 @@ export const moveGearItemHandler = async ({ data, context }: ServerFnArgs<MoveGe
   if (!data?.itemId || !data?.target) throw new Error('Missing gear move payload.')
   const { userId, dbClient } = auth
 
-  const catalogRows = await dbClient.select().from(equipmentCatalog)
-  const gearRows = await dbClient
-    .select()
-    .from(userGearItems)
-    .where(eq(userGearItems.userId, userId))
-
-  const catalog = catalogRows.map(toCatalogRef)
-  const items = gearRows.map(toGearState)
-  const catalogById = new Map(catalog.map((c) => [c.id, c]))
-
-  const plan = planGearMove(items, catalogById, data.itemId, data.target, VAULT_SIZE)
-  if (!plan.ok) throw new Error(plan.error)
-
-  if (plan.updates.length > 0) {
-    // Clear positions first to avoid unique-index collisions during swaps
-    const ids = plan.updates.map((u) => u.id)
-    for (const id of ids) {
-      await dbClient
-        .update(userGearItems)
-        .set({
-          equippedSlot: null,
-          vaultIndex: null,
-          updatedAt: new Date(),
-        })
-        .where(and(eq(userGearItems.id, id), eq(userGearItems.userId, userId)))
-    }
-    for (const update of plan.updates) {
-      await dbClient
-        .update(userGearItems)
-        .set({
-          equippedSlot: update.equippedSlot,
-          vaultIndex: update.vaultIndex,
-          updatedAt: new Date(),
-        })
-        .where(and(eq(userGearItems.id, update.id), eq(userGearItems.userId, userId)))
-    }
-  }
+  const payload = await loadChassisPayload(dbClient, userId)
+  const currentPlan = planGearMove(
+    payload.items,
+    new Map(payload.catalog.map((c) => [c.id, c])),
+    data.itemId,
+    data.target,
+    VAULT_SIZE,
+  )
+  if (!currentPlan.ok) throw new Error(currentPlan.error)
+  const updates = new Map(currentPlan.updates.map((u) => [u.id, u]))
+  const placements = payload.items.map((item) => ({
+    id: item.id,
+    equippedSlot: item.equippedSlot,
+    vaultIndex: item.vaultIndex,
+    ...updates.get(item.id),
+  }))
+  await commitCharacter(
+    dbClient,
+    userId,
+    payload.appearanceRevision ?? 0,
+    payload.config ?? null,
+    placements,
+  )
 
   return loadChassisPayload(dbClient, userId)
 }
@@ -3988,6 +3994,13 @@ export const moveGearItemHandler = async ({ data, context }: ServerFnArgs<MoveGe
 // ─── Public profiles & connections ───────────────────────────────────────────
 
 async function loadMemberEquippedLoadout(dbClient: Db, targetUserId: string) {
+  const [owner] = await dbClient
+    .select({ version: profiles.equipmentVersion })
+    .from(profiles)
+    .where(eq(profiles.id, targetUserId))
+    .limit(1)
+  if (owner?.version !== 1)
+    return { catalog: [], items: [], totals: computeLoadoutTotals([], new Map()) }
   const catalogRows = await dbClient
     .select()
     .from(equipmentCatalog)
@@ -3999,9 +4012,7 @@ async function loadMemberEquippedLoadout(dbClient: Db, targetUserId: string) {
     .where(eq(userGearItems.userId, targetUserId))
 
   const catalog = catalogRows.map(toCatalogRef)
-  const items = gearRows
-    .map(toGearState)
-    .filter((item) => item.equippedSlot != null)
+  const items = gearRows.map(toGearState).filter((item) => item.equippedSlot != null)
   const catalogById = new Map(catalog.map((c) => [c.id, c]))
   const totals = computeLoadoutTotals(items, catalogById)
 
@@ -4209,7 +4220,7 @@ async function findMemberProfileByRouteKey(dbClient: Db, routeKey: string) {
       larvaId: profiles.larvaId,
       handle: profiles.handle,
       stage: profiles.stage,
-      avatarConfig: profiles.avatarConfig,
+      avatarConfig: publicAvatarConfig,
       createdAt: profiles.createdAt,
       joinSource: profiles.joinSource,
       referredByUserId: profiles.referredByUserId,
@@ -4410,7 +4421,7 @@ export const searchMembersHandler = async ({
       larvaId: profiles.larvaId,
       handle: profiles.handle,
       stage: profiles.stage,
-      avatarConfig: profiles.avatarConfig,
+      avatarConfig: publicAvatarConfig,
     })
     .from(profiles)
     .where(
@@ -4673,7 +4684,7 @@ async function selectSynapticNearby(
       larvaId: profiles.larvaId,
       handle: profiles.handle,
       stage: profiles.stage,
-      avatarConfig: profiles.avatarConfig,
+      avatarConfig: publicAvatarConfig,
     })
     .from(profiles)
     .where(
@@ -4701,7 +4712,7 @@ async function selectSynapticNearby(
   return rows.map((row) =>
     toMemberSummary({
       ...row,
-      avatarConfig: (row.avatarConfig as { style: string; seed: string } | null) ?? null,
+      avatarConfig: (row.avatarConfig as LobsterAvatarConfig | null) ?? null,
     }),
   )
 }
@@ -4735,7 +4746,7 @@ export const listConnectionsHandler = async ({
             larvaId: profiles.larvaId,
             handle: profiles.handle,
             stage: profiles.stage,
-            avatarConfig: profiles.avatarConfig,
+            avatarConfig: publicAvatarConfig,
           })
           .from(profiles)
           .where(inArray(profiles.id, friendIds))
@@ -4771,7 +4782,7 @@ export const listConnectionsHandler = async ({
             larvaId: profiles.larvaId,
             handle: profiles.handle,
             stage: profiles.stage,
-            avatarConfig: profiles.avatarConfig,
+            avatarConfig: publicAvatarConfig,
           })
           .from(profiles)
           .where(inArray(profiles.id, relatedIds))
@@ -4785,7 +4796,7 @@ export const listConnectionsHandler = async ({
       if (!other) return null
       return toMemberSummary({
         ...other,
-        avatarConfig: (other.avatarConfig as { style: string; seed: string } | null) ?? null,
+        avatarConfig: (other.avatarConfig as LobsterAvatarConfig | null) ?? null,
         requestId: row.id,
         since: row.createdAt,
       })
@@ -4799,7 +4810,7 @@ export const listConnectionsHandler = async ({
       if (!other) return null
       return toMemberSummary({
         ...other,
-        avatarConfig: (other.avatarConfig as { style: string; seed: string } | null) ?? null,
+        avatarConfig: (other.avatarConfig as LobsterAvatarConfig | null) ?? null,
         requestId: row.id,
         since: row.createdAt,
       })
@@ -4809,7 +4820,7 @@ export const listConnectionsHandler = async ({
   const friends = friendProfiles.map((p) =>
     toMemberSummary({
       ...p,
-      avatarConfig: (p.avatarConfig as { style: string; seed: string } | null) ?? null,
+      avatarConfig: (p.avatarConfig as LobsterAvatarConfig | null) ?? null,
       since: friendSinceById.get(p.id) ?? null,
     }),
   )
