@@ -70,21 +70,31 @@ describe('AIChatPanel Guest Mode Gating', () => {
     expect(message).toHaveValue('Keep my draft')
     expect(message).toBeEnabled()
     expect(streamOracleChat).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Settings' }), { key: 'Enter' })
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Usage' }))
     expect(screen.getByText('0 of 15 remaining · Past 5 hours')).toBeInTheDocument()
   })
 
   it.each([
     { phone: false, threadId: null }, { phone: true, threadId: null },
     { phone: false, threadId: 'existing' }, { phone: true, threadId: 'existing' },
-  ])('shows one usage indicator beside the composer: %j', async ({ phone, threadId }) => {
+  ])('shows usage through Chats settings: %j', async ({ phone, threadId }) => {
     const phoneSpy = vi.spyOn(viewport, 'useIsPhone').mockReturnValue(phone)
     const snapshot = buildOracleUsageSnapshot([], false)
     vi.mocked(useOracleUsage).mockReturnValue({ snapshot, unavailable: false, blocked: false, refresh: vi.fn() })
     try {
       render(<AIChatPanel userId="member" threadId={threadId} />)
       expect(await screen.findByRole('textbox', { name: 'Message' })).toBeInTheDocument()
-      expect(screen.getAllByRole('meter')).toHaveLength(1)
+      expect(screen.queryByRole('meter')).not.toBeInTheDocument()
+      fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+      fireEvent.keyDown(screen.getByRole('button', { name: 'Settings' }), { key: 'Enter' })
+      fireEvent.click(await screen.findByRole('menuitem', { name: 'Usage' }))
+      expect(screen.getAllByRole('meter')).toHaveLength(2)
       expect(screen.getByText('15 of 15 remaining · Past 5 hours')).toBeInTheDocument()
+      fireEvent.click(screen.getByRole('button', { name: 'Close usage' }))
+      expect(screen.queryByRole('meter')).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument()
     } finally { phoneSpy.mockRestore() }
   })
 
@@ -102,6 +112,8 @@ describe('AIChatPanel Guest Mode Gating', () => {
   it('does not show usage to guests', () => {
     render(<AIChatPanel userId={null} />)
     expect(screen.queryByRole('button', { name: 'View usage' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+    expect(screen.queryByRole('button', { name: 'Settings' })).not.toBeInTheDocument()
   })
 
   it('renders guest mode new chat screen on initial load with no canned messages', () => {
