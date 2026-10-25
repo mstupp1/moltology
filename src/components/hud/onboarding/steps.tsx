@@ -1,3 +1,4 @@
+import { STARTER_CHARACTER_EQUIPMENT } from '@/lib/avatar/starter-equipment'
 import React from 'react'
 import { Atom, BookOpen, LayoutDashboard, Users } from 'lucide-react'
 import { BrandIcon } from '@/components/ui/BrandMark'
@@ -119,10 +120,10 @@ function CharacterStep({ draft, update, busy, headingId }: OnboardingStepProps) 
   return (
     <div className="w-full space-y-4">
       <StepHeading id={headingId} title="Make your character">
-        Pick a lobster or a crab and dress it up. You can change it any time in Settings.
+        Pick a lobster or a crab. Your basic equipment is included. Change your look any time in the character studio.
       </StepHeading>
       <div className="grid grid-cols-1 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-4 md:gap-6 items-start">
-        <AvatarCreatorPreview config={draft.config} className="max-w-[180px] md:max-w-none mx-auto md:sticky md:top-0" />
+        <AvatarCreatorPreview config={{...draft.config,equipment:STARTER_CHARACTER_EQUIPMENT}} className="max-w-[180px] md:max-w-none mx-auto md:sticky md:top-0" />
         <AvatarCreatorPanel value={draft.config} onChange={(config) => update({ config })} disabled={busy} />
       </div>
     </div>
@@ -155,7 +156,7 @@ function KeepStep({ draft, headingId }: OnboardingStepProps) {
         progress.
       </StepHeading>
       <div className="rounded-card border border-line-subtle bg-surface-2 hud-sheen p-4 flex items-center gap-4">
-        <LobsterAvatarPortrait config={draft.config} size={128} alt="Your character" className="w-16 h-16 shrink-0" />
+        <LobsterAvatarPortrait config={{...draft.config,equipment:STARTER_CHARACTER_EQUIPMENT}} size={128} alt="Your character" className="w-16 h-16 shrink-0" />
         <p className="font-sans text-sm text-ink-body">Your character is saved on this device until you sign up.</p>
       </div>
     </div>

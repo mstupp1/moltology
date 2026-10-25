@@ -223,10 +223,10 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
       window.dispatchEvent(new CustomEvent('user-stats-changed'))
 
       if (avatar.status === 'rejected') {
-        toast.error('Your character did not save. Try again in Settings.')
-      } else {
-        toast.success("You're all set.")
+        toast.error('Your character did not save. Please try again.')
+        return
       }
+      toast.success("You're all set.")
       close()
     } finally {
       setBusy(false)

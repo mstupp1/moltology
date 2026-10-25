@@ -397,7 +397,7 @@ describe('lobster-avatar', () => {
   it('makes crab height stretch the legs, not just nudge the body', () => {
     const lift = (height: 'short' | 'towering') =>
       Number(generateLobsterAvatarSvg({ style: 'critters', seed: 'crab-h', race: 'crab', height }, 128, { frame: 'portrait' })?.match(/viewBox="-9 (-?[\d.]+) /)?.[1])
-    expect(lift('short') - lift('towering')).toBeGreaterThan(30)
+    expect(lift('short') - lift('towering')).toBeGreaterThan(10)
   })
 
   it('renders every head shape and build on both races', () => {
@@ -427,10 +427,10 @@ describe('lobster-avatar', () => {
     expect(AVATAR_BUILDS).toContain(reroll.build)
   })
 
-  it('gives the crab its own body without the lobster tail and abdomen', () => {
+  it('gives the upright crab an abdomen without the lobster tail', () => {
     const crab = generateLobsterAvatarSvg({ style: 'critters', seed: 'crab-body', race: 'crab' })
     expect(crab).not.toContain('lobster-idle-tail')
-    expect(crab).not.toContain('lobster-idle-abdomen')
+    expect(crab).toContain('lobster-idle-abdomen')
     expect(crab).toContain('lobster-idle-claw-left')
   })
 

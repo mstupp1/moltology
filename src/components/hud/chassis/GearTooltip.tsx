@@ -51,22 +51,16 @@ export const GearTooltip: React.FC<GearTooltipProps> = ({ catalog, className = '
         </p>
       </div>
 
-      <div className="px-3 py-2 space-y-1">
-        {isCosmetic(catalog) ? (
-          <p className="text-xs sm:text-sm text-ink">Changes how your avatar looks. No stats.</p>
-        ) : (
-          <p className="text-lg sm:text-xl font-bold text-[#dfe3e3]">{primaryStatLine(catalog)}</p>
-        )}
-        {(catalog.affixes ?? []).map((affix, index) => (
-          <p key={`${affix.stat}-${index}`} className="text-xs sm:text-sm text-[#9ae6b4]">
-            {formatAffixLine(affix)}
-          </p>
-        ))}
-      </div>
+      <details className="px-3 py-2 text-xs text-ink-muted">
+        <summary className="cursor-pointer">Stats · character flavor</summary>
+        <p className="mt-2">{primaryStatLine(catalog)}</p>
+        {(catalog.affixes ?? []).map((affix,index)=><p key={index}>{formatAffixLine(affix)}</p>)}
+        <p className="mt-2">These values do not affect activities or progression.</p>
+      </details>
 
       {power && (
         <div className={`mx-3 mb-2 px-2 py-2 border ${rarity.border} ${rarity.bar} chamfer-corner`}>
-          <p className={`text-xs sm:text-sm font-bold tracking-wide ${rarity.text}`}>{power.name}</p>
+          <p className={`text-xs sm:text-sm font-bold tracking-wide ${rarity.text}`}>Item lore · {power.name}</p>
           <p className="text-[11px] sm:text-xs text-[#dfe3e3] leading-relaxed mt-1">{power.description}</p>
         </div>
       )}

@@ -1,167 +1,151 @@
 import React from 'react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { ChassisStatusPage } from './ChassisStatusPage'
 import { ToastProvider } from '@/components/ui/ToastProvider'
-import { authClient } from '@/lib/auth-client'
-import { getChassisLoadoutFn, moveGearItemFn } from '@/lib/server/api'
-import { clearChassisLoadoutCache } from '@/lib/chassis-loadout'
-import type { CatalogRef, ChassisLoadoutPayload, GearItemState } from '@/lib/chassis-loadout'
-
-vi.mock('@/lib/auth-client', () => ({
-  authClient: {
-    useSession: vi.fn(),
-  },
-}))
-
-vi.mock('@/lib/server/api', () => ({
-  getChassisLoadoutFn: vi.fn(),
-  moveGearItemFn: vi.fn(),
-  getUserProfileFn: vi.fn().mockResolvedValue({ avatarConfig: null }),
-}))
-
-vi.mock('@/lib/jwt', () => ({
-  getAuthJWTToken: vi.fn().mockResolvedValue('a.b.c'),
-}))
-
+import { getChassisLoadoutFn, saveCharacterFn } from '@/lib/server/api'
+import {
+  clearChassisLoadoutCache,
+  setCachedChassisLoadout,
+  type ChassisLoadoutPayload,
+} from '@/lib/chassis-loadout'
+import {
+  ALL_EQUIPMENT_CATALOG,
+  STARTER_EQUIPMENT_CATALOG_IDS,
+  STARTER_EQUIPPED_SLOTS,
+} from '@/lib/equipment-seed-data'
+vi.mock('@/hooks/useAuthSession', () => ({ useAuthSession: () => ({ userId: 'user-1' }) }))
+vi.mock('@/lib/jwt', () => ({ getAuthJWTToken: vi.fn().mockResolvedValue('token') }))
+vi.mock('@/lib/server/api', () => ({ getChassisLoadoutFn: vi.fn(), saveCharacterFn: vi.fn() }))
 vi.mock('@/hooks/useHudPersist', () => ({
-  useHudPersist: () => ({
-    begin: vi.fn(),
-    end: vi.fn(),
-    run: vi.fn(async (fn: () => Promise<unknown>) => fn()),
-    isPersisting: false,
-  }),
+  useHudPersist: () => ({ begin: vi.fn(), end: vi.fn() }),
 }))
-
-const catalog: CatalogRef[] = [
-  {
-    id: 'a1000000-0000-4000-8000-000000000001',
-    slug: 'larval-plate-vest',
-    name: 'Larval Plate Vest',
-    flavorText: 'Thin chitin, still soft from the last shed.',
-    category: 'carapace',
-    rarity: 'common',
-    visualType: 'carapace',
-    primaryStat: 12,
-    affixes: [],
-    uniquePower: null,
-    imageUrl: '/images/chassis/carapace.webp',
-    sortOrder: 1,
-  },
-  {
-    id: 'a1000000-0000-4000-8000-000000000006',
-    slug: 'synapse-shear-claws',
-    name: 'Synapse-Shear Claws',
-    flavorText: 'Legendary torque.',
-    category: 'claws',
-    rarity: 'legendary',
-    visualType: 'pincer',
-    primaryStat: 96,
-    affixes: [{ stat: 'speed', value: 8 }],
-    uniquePower: {
-      name: 'Zero-Latency Clamp',
-      description: 'The first grip of a session closes without hesitation.',
-    },
-    imageUrl: '/images/chassis/pincer.webp',
-    sortOrder: 7,
-  },
-]
-
-const items: GearItemState[] = [
-  {
-    id: '11111111-1111-4111-8111-111111111111',
-    catalogItemId: catalog[0].id,
-    equippedSlot: null,
-    vaultIndex: 0,
-  },
-  {
-    id: '22222222-2222-4222-8222-222222222222',
-    catalogItemId: catalog[1].id,
-    equippedSlot: null,
-    vaultIndex: 1,
-  },
-]
-
-const emptyPayload: ChassisLoadoutPayload = {
-  catalog,
-  items,
-  totals: { defense: 0, attack: 0, intelligence: 0, speed: 0, perception: 0 },
+vi.mock('../avatar/AvatarCreatorPreview', () => ({
+  AvatarCreatorPreview: ({ config }: any) => (
+    <div data-testid="preview" data-config={JSON.stringify(config)} />
+  ),
+}))
+vi.mock('../avatar/AvatarCreatorPanel', () => ({
+  AvatarCreatorPanel: ({ value, onChange }: any) => (
+    <button onClick={() => onChange({ ...value, race: 'crab' })}>Become crab</button>
+  ),
+}))
+const payload: ChassisLoadoutPayload = {
+  catalog: ALL_EQUIPMENT_CATALOG,
+  items: STARTER_EQUIPMENT_CATALOG_IDS.map((id, i) => ({
+    id: `b1000000-0000-4000-8000-${String(i + 1).padStart(12, '0')}`,
+    catalogItemId: id,
+    equippedSlot: i < 7 ? STARTER_EQUIPPED_SLOTS[i] : null,
+    vaultIndex: i < 7 ? null : i - 7,
+  })),
   vaultSize: 20,
+  totals: { attack: 0, defense: 0, intelligence: 0, perception: 0, speed: 0 },
+  config: { style: 'critters', seed: 'saved', race: 'lobster' },
+  appearanceRevision: 4,
 }
-
-describe('ChassisStatusPage', () => {
+const preview = () => JSON.parse(screen.getByTestId('preview').getAttribute('data-config')!)
+async function mount() {
+  render(
+    <ToastProvider>
+      <ChassisStatusPage />
+    </ToastProvider>,
+  )
+  await screen.findByTestId('preview')
+}
+function choose(name: string) {
+  fireEvent.click(screen.getByRole('button', { name: `${name}, Head` }))
+}
+describe('unified character workspace', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     clearChassisLoadoutCache()
-    vi.mocked(authClient.useSession).mockReturnValue({
-      data: { user: { id: 'user-1', name: 'Commander Craw' } },
-    } as any)
-    vi.mocked(getChassisLoadoutFn).mockResolvedValue(emptyPayload)
-    vi.mocked(moveGearItemFn).mockImplementation(async ({ data }: any) => {
-      const nextItems = items.map((item) =>
-        item.id === data.itemId
-          ? { ...item, equippedSlot: data.target.slot, vaultIndex: null }
-          : item
-      )
-      const totals = {
-        defense: data.target.slot === 'carapace' ? 12 : 0,
-        attack: data.target.slot === 'claws-1' || data.target.slot === 'claws-2' ? 96 : 0,
-        intelligence: 0,
-        speed: data.target.slot === 'claws-1' || data.target.slot === 'claws-2' ? 8 : 0,
-        perception: 0,
-      }
-      return { catalog, items: nextItems, totals, vaultSize: 20 }
-    })
+    vi.mocked(getChassisLoadoutFn).mockResolvedValue(structuredClone(payload))
+    vi.mocked(saveCharacterFn).mockImplementation(async ({ data }: any) => ({
+      ...structuredClone(payload),
+      config: data.config,
+      appearanceRevision: 5,
+      items: data.placements.map((p: any) => ({
+        ...payload.items.find((i) => i.id === p.id),
+        ...p,
+      })),
+    }))
   })
-
-  it('shows vaulted gear, zeroed stats, and locked legendary powers', async () => {
-    render(<ToastProvider><ChassisStatusPage /></ToastProvider>)
-    expect(await screen.findByText('Larval Plate Vest')).toBeInTheDocument()
-    expect(screen.getByText('Synapse-Shear Claws')).toBeInTheDocument()
-    expect(screen.getAllByText('Zero-Latency Clamp').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('Locked').length).toBeGreaterThan(0)
-    expect(screen.queryByText(/stub readout/i)).not.toBeInTheDocument()
+  it('shows a live loadout, owned and preview pieces, with no usable powers', async () => {
+    await mount()
+    expect(preview().equipment.head.visualKey).toBe('soft-shell-visor')
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled()
+    expect(screen.getAllByText('Preview only').length).toBeGreaterThan(0)
+    expect(screen.queryByText('Ready')).not.toBeInTheDocument()
+    expect(
+      screen.getByText('Loadout stats · character flavor').closest('details'),
+    ).not.toHaveAttribute('open')
   })
-
-  it('equips a selected vault piece onto a matching hardpoint on desktop without opening bottom modal', async () => {
-    render(<ToastProvider><ChassisStatusPage /></ToastProvider>)
-    const claw = await screen.findByRole('button', { name: /Synapse-Shear Claws/i })
-    fireEvent.click(claw)
-
-    // Verify no bottom sheet modal dialog is opened on desktop
-    expect(screen.queryByRole('dialog', { name: /Gear/i })).not.toBeInTheDocument()
-
-    fireEvent.click(screen.getAllByRole('button', { name: 'Claws slot' })[0])
-
-    await waitFor(() => {
-      expect(moveGearItemFn).toHaveBeenCalled()
-    })
-    const call = vi.mocked(moveGearItemFn).mock.calls[0][0] as { data: { itemId: string; target: { type: string; slot: string } } }
-    expect(call.data.itemId).toBe('22222222-2222-4222-8222-222222222222')
-    expect(call.data.target).toEqual({ type: 'equip', slot: 'claws-1' })
-    expect((await screen.findAllByText('96')).length).toBeGreaterThan(0)
-    expect(screen.getAllByText('Ready').length).toBeGreaterThan(0)
+  it('keeps owned equipment local until save, and discards it completely', async () => {
+    await mount()
+    choose('Bow')
+    fireEvent.click(screen.getByRole('button', { name: 'Equip on head' }))
+    expect(preview().equipment.head.visualKey).toBe('creator-bow')
+    expect(saveCharacterFn).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled()
+    fireEvent.click(screen.getByRole('button', { name: 'Discard' }))
+    expect(preview().equipment.head.visualKey).toBe('soft-shell-visor')
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled()
   })
-
-  it('opens bottom sheet modal when tapping an item on mobile viewports', async () => {
-    vi.stubGlobal('matchMedia', vi.fn().mockImplementation((query: string) => ({
-      matches: query.includes('max-width'),
-      media: query,
-      onchange: null,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })))
-
-    render(<ToastProvider><ChassisStatusPage /></ToastProvider>)
-    const claw = await screen.findByRole('button', { name: /Synapse-Shear Claws/i })
-    fireEvent.click(claw)
-
-    expect(await screen.findByRole('dialog', { name: /Synapse-Shear Claws/i })).toBeInTheDocument()
-    expect((await screen.findAllByText('+96 Attack')).length).toBeGreaterThan(0)
-
-    vi.unstubAllGlobals()
+  it('never includes an unowned try-on in saved configuration or placements', async () => {
+    await mount()
+    choose('Oracle Dome Lattice')
+    fireEvent.click(screen.getByRole('button', { name: 'Try on' }))
+    expect(preview().equipment.head.visualKey).toBe('oracle-dome-lattice')
+    expect(screen.getByRole('status')).toHaveTextContent('Preview only')
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('tab', { name: 'body' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Become crab' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+    await waitFor(() => expect(saveCharacterFn).toHaveBeenCalledTimes(1))
+    const data = vi.mocked(saveCharacterFn).mock.calls[0][0].data
+    expect(data.config.race).toBe('crab')
+    expect(data.config).not.toHaveProperty('equipment')
+    expect(data.expectedRevision).toBe(4)
+    expect(data.placements).toHaveLength(19)
+    expect(data.placements.find((i) => i.equippedSlot === 'head')?.id).toBe(payload.items[3].id)
+  })
+  it('retains draft edits after a rejected save and allows retry', async () => {
+    vi.mocked(saveCharacterFn).mockRejectedValueOnce(
+      new Error('Your character changed in another session. Reload before saving.'),
+    )
+    await mount()
+    choose('Bow')
+    fireEvent.click(screen.getByRole('button', { name: 'Equip on head' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+    await screen.findByText(/Your character changed in another session/)
+    expect(preview().equipment.head.visualKey).toBe('creator-bow')
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled()
+  })
+  it('lets both pincer slots use independently owned instances', async () => {
+    await mount()
+    fireEvent.click(screen.getByRole('button', { name: /^Right pincer/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Mitten gauntlet, Claws' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Equip on right pincer' }))
+    fireEvent.click(screen.getByRole('button', { name: /^Left pincer/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Slender gauntlet, Claws' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Equip on left pincer' }))
+    expect(preview().equipment['claws-1'].visualKey).toBe('creator-mitten')
+    expect(preview().equipment['claws-2'].visualKey).toBe('creator-slim')
+  })
+  it('does not overwrite local edits with a delayed background refresh', async () => {
+    setCachedChassisLoadout('user-1', structuredClone(payload))
+    let finish!: (value: ChassisLoadoutPayload) => void
+    vi.mocked(getChassisLoadoutFn).mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve
+        }),
+    )
+    await mount()
+    await waitFor(() => expect(getChassisLoadoutFn).toHaveBeenCalledTimes(1))
+    choose('Bow')
+    fireEvent.click(screen.getByRole('button', { name: 'Equip on head' }))
+    await act(async () => finish(structuredClone(payload)))
+    expect(preview().equipment.head.visualKey).toBe('creator-bow')
   })
 })

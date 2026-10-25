@@ -231,6 +231,7 @@ export interface ClawPlacement {
   rot: number
   scale: number
   side: 'left' | 'right'
+  gripping?: boolean
 }
 
 export function renderClaw(p: ClawPlacement, style: AvatarClaws, ctx: PaintContext): string {
@@ -246,7 +247,7 @@ export function renderClaw(p: ClawPlacement, style: AvatarClaws, ctx: PaintConte
     .join('')
   return `<g class="lobster-idle-layer lobster-idle-claw-${p.side}" data-claw="${heavy ? 'crusher' : style}">
     <g transform="${transform}">
-      ${piece(shape.finger, ctx, { side: p.side })}
+      <g${p.gripping ? ' transform="rotate(-16 10 -29)"' : ''}>${piece(shape.finger, ctx, { side: p.side })}</g>
       ${teeth}
       ${piece(shape.palm, ctx, { side: p.side })}
       ${glint(shape.glint, ctx, 0.55)}

@@ -1,14 +1,10 @@
 import React, { useMemo, useState } from 'react'
 import { Dices } from 'lucide-react'
 import {
-  AVATAR_ACCESSORIES,
-  AVATAR_ACCESSORY_LABELS,
   AVATAR_ANTENNAE,
   AVATAR_ANTENNAE_LABELS,
   AVATAR_BUILDS,
   AVATAR_BUILD_LABELS,
-  AVATAR_CLAWS,
-  AVATAR_CLAW_LABELS,
   AVATAR_EXPRESSION_LABELS,
   AVATAR_HEAD_SHAPES,
   AVATAR_HEAD_SHAPE_LABELS,
@@ -50,12 +46,12 @@ export interface AvatarCreatorPanelProps {
   onChange: (next: LobsterAvatarConfig) => void
   disabled?: boolean
   className?: string
+  section?: 'body' | 'face' | 'scene'
 }
 
 const TABS = [
   { id: 'body', label: 'Body' },
   { id: 'face', label: 'Face' },
-  { id: 'gear', label: 'Gear' },
   { id: 'scene', label: 'Scene' },
 ] as const
 type TabId = (typeof TABS)[number]['id']
@@ -63,7 +59,9 @@ type TabId = (typeof TABS)[number]['id']
 function OptionGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <fieldset className="space-y-1.5 min-w-0">
-      <legend className="text-[11px] font-sans font-semibold tracking-[0.08em] uppercase text-ink-muted mb-1.5">{label}</legend>
+      <legend className="text-[11px] font-sans font-semibold tracking-[0.08em] uppercase text-ink-muted mb-1.5">
+        {label}
+      </legend>
       <div className="flex flex-wrap gap-1.5">{children}</div>
     </fieldset>
   )
@@ -119,7 +117,9 @@ function Swatch({
       disabled={disabled}
       onClick={onClick}
       className={`w-8 h-8 rounded-full border-2 transition-transform disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-        selected ? 'border-cyan-glow scale-110' : 'border-line hover:scale-105 hover:border-line-hover'
+        selected
+          ? 'border-cyan-glow scale-110'
+          : 'border-line hover:scale-105 hover:border-line-hover'
       }`}
       style={{ background }}
     />
@@ -130,8 +130,15 @@ function Swatch({
  * Character creator controls. Every choice is written straight into the config,
  * so the preview next to it updates as the member taps.
  */
-export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({ value, onChange, disabled = false, className = '' }) => {
-  const [tab, setTab] = useState<TabId>('body')
+export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
+  value,
+  onChange,
+  disabled = false,
+  className = '',
+  section,
+}) => {
+  const [localTab, setTab] = useState<TabId>('body')
+  const tab = section ?? localTab
   const traits = useMemo(() => resolveAvatarTraits(value), [value])
 
   const set = <K extends keyof ResolvedAvatarTraits>(key: K, next: ResolvedAvatarTraits[K]) => {
@@ -142,7 +149,11 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({ value, o
   const racePreviews = useMemo(() => {
     const out: Partial<Record<AvatarRace, string | null>> = {}
     for (const race of AVATAR_RACES) {
-      out[race] = generateLobsterAvatarDataUri({ ...value, ...traits, race, accessory: 'none' }, 128, { frame: 'portrait' })
+      out[race] = generateLobsterAvatarDataUri(
+        { ...value, ...traits, race, accessory: 'none' },
+        128,
+        { frame: 'portrait' },
+      )
     }
     return out
   }, [value, traits])
@@ -166,9 +177,17 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({ value, o
               }`}
             >
               {racePreviews[race] ? (
-                <img src={racePreviews[race] ?? undefined} alt="" width={40} height={40} className="w-10 h-10 rounded-full bg-abyss" />
+                <img
+                  src={racePreviews[race] ?? undefined}
+                  alt=""
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 rounded-full bg-abyss"
+                />
               ) : null}
-              <span className={`font-sans text-sm font-semibold ${selected ? 'text-cyan-glow' : 'text-ink'}`}>
+              <span
+                className={`font-sans text-sm font-semibold ${selected ? 'text-cyan-glow' : 'text-ink'}`}
+              >
                 {AVATAR_RACE_LABELS[race]}
               </span>
             </button>
@@ -177,22 +196,30 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({ value, o
       </div>
 
       <div className="flex items-center gap-2">
-        <div role="tablist" aria-label="Customize" className="flex flex-1 gap-0.5 rounded-card border border-line-subtle bg-surface-1 p-0.5">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              role="tab"
-              aria-selected={tab === t.id}
-              onClick={() => setTab(t.id)}
-              className={`flex-1 min-h-8 rounded-control text-[11px] font-sans font-semibold tracking-[0.08em] uppercase transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                tab === t.id ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-2'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
+        {!section && (
+          <div
+            role="tablist"
+            aria-label="Customize"
+            className="flex flex-1 gap-0.5 rounded-card border border-line-subtle bg-surface-1 p-0.5"
+          >
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                role="tab"
+                aria-selected={tab === t.id}
+                onClick={() => setTab(t.id)}
+                className={`flex-1 min-h-8 rounded-control text-[11px] font-sans font-semibold tracking-[0.08em] uppercase transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                  tab === t.id
+                    ? 'bg-surface-3 shadow-nav-current text-ink'
+                    : 'text-ink-muted hover:text-ink hover:bg-surface-2'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        )}
         <HudButton
           type="button"
           variant="secondary"
@@ -206,15 +233,27 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({ value, o
         </HudButton>
       </div>
 
-      <div role="tabpanel" className="space-y-3 rounded-card border border-line-subtle bg-surface-1 p-3">
+      <div
+        role="tabpanel"
+        className="space-y-3 rounded-card border border-line-subtle bg-surface-1 p-3"
+      >
         {tab === 'body' && (
           <>
             <OptionGroup label={traits.race === 'crab' ? 'Shell shape' : 'Head shape'}>
               {AVATAR_HEAD_SHAPES.map((h) => (
-                <Chip key={h} selected={traits.headShape === h} disabled={disabled} onClick={() => set('headShape', h)}>
+                <Chip
+                  key={h}
+                  selected={traits.headShape === h}
+                  disabled={disabled}
+                  onClick={() => set('headShape', h)}
+                >
                   <span className="inline-flex items-center gap-1.5">
-                    <svg viewBox={traits.race === 'crab' ? '-12 28 124 104' : '6 0 88 118'} className="w-4 h-4 shrink-0" aria-hidden="true">
-                      <path d={headShapeOutline(traits.race, h)} fill="currentColor" opacity="0.85" />
+                    <svg viewBox="-40 -8 80 90" className="w-4 h-4 shrink-0" aria-hidden="true">
+                      <path
+                        d={headShapeOutline(traits.race, h)}
+                        fill="currentColor"
+                        opacity="0.85"
+                      />
                     </svg>
                     {AVATAR_HEAD_SHAPE_LABELS[traits.race][h]}
                   </span>
@@ -223,14 +262,24 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({ value, o
             </OptionGroup>
             <OptionGroup label="Build">
               {AVATAR_BUILDS.map((b) => (
-                <Chip key={b} selected={traits.build === b} disabled={disabled} onClick={() => set('build', b)}>
+                <Chip
+                  key={b}
+                  selected={traits.build === b}
+                  disabled={disabled}
+                  onClick={() => set('build', b)}
+                >
                   {AVATAR_BUILD_LABELS[traits.race][b]}
                 </Chip>
               ))}
             </OptionGroup>
             <OptionGroup label="Height">
               {LOBSTER_HEIGHTS.map((h) => (
-                <Chip key={h} selected={traits.height === h} disabled={disabled} onClick={() => set('height', h)}>
+                <Chip
+                  key={h}
+                  selected={traits.height === h}
+                  disabled={disabled}
+                  onClick={() => set('height', h)}
+                >
                   {LOBSTER_HEIGHT_LABELS[h]}
                 </Chip>
               ))}
@@ -249,15 +298,54 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({ value, o
             </OptionGroup>
             <OptionGroup label="Finish">
               {SHELL_FINISHES.map((f) => (
-                <Chip key={f} selected={traits.shellFinish === f} disabled={disabled} onClick={() => set('shellFinish', f)}>
+                <Chip
+                  key={f}
+                  selected={traits.shellFinish === f}
+                  disabled={disabled}
+                  onClick={() => set('shellFinish', f)}
+                >
                   {SHELL_FINISH_LABELS[f]}
                 </Chip>
               ))}
             </OptionGroup>
             <OptionGroup label="Pattern">
               {SHELL_MARKINGS.map((m) => (
-                <Chip key={m} selected={traits.marking === m} disabled={disabled} onClick={() => set('marking', m)}>
+                <Chip
+                  key={m}
+                  selected={traits.marking === m}
+                  disabled={disabled}
+                  onClick={() => set('marking', m)}
+                >
                   {SHELL_MARKING_LABELS[m]}
+                </Chip>
+              ))}
+            </OptionGroup>
+          </>
+        )}
+
+        {tab === 'body' && (
+          <>
+            <OptionGroup label="Antennae">
+              {AVATAR_ANTENNAE.map((a) => (
+                <Chip
+                  key={a}
+                  selected={traits.antennae === a}
+                  disabled={disabled}
+                  onClick={() => set('antennae', a)}
+                >
+                  {AVATAR_ANTENNAE_LABELS[a]}
+                </Chip>
+              ))}
+            </OptionGroup>
+            <OptionGroup label="Pose">
+              {AVATAR_POSES.map((p) => (
+                <Chip
+                  key={p}
+                  selected={traits.pose === p}
+                  disabled={disabled}
+                  onClick={() => set('pose', p)}
+                >
+                  {AVATAR_POSE_LABELS[p]}
                 </Chip>
               ))}
             </OptionGroup>
@@ -283,62 +371,49 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({ value, o
             </OptionGroup>
             <OptionGroup label="Expression">
               {LOBSTER_EYELID_STYLES.map((e) => (
-                <Chip key={e} selected={traits.eyelidStyle === e} disabled={disabled} onClick={() => set('eyelidStyle', e)}>
+                <Chip
+                  key={e}
+                  selected={traits.eyelidStyle === e}
+                  disabled={disabled}
+                  onClick={() => set('eyelidStyle', e)}
+                >
                   {AVATAR_EXPRESSION_LABELS[e]}
                 </Chip>
               ))}
             </OptionGroup>
             <OptionGroup label="Mouth">
               {AVATAR_MOUTHS.map((m) => (
-                <Chip key={m} selected={traits.mouth === m} disabled={disabled} onClick={() => set('mouth', m)}>
+                <Chip
+                  key={m}
+                  selected={traits.mouth === m}
+                  disabled={disabled}
+                  onClick={() => set('mouth', m)}
+                >
                   {AVATAR_MOUTH_LABELS[m]}
                 </Chip>
               ))}
             </OptionGroup>
             <OptionGroup label="Eye shape">
               {LOBSTER_EYE_VARIANTS.map((v) => (
-                <Chip key={v} selected={traits.eyeVariant === v} disabled={disabled} onClick={() => set('eyeVariant', v)}>
+                <Chip
+                  key={v}
+                  selected={traits.eyeVariant === v}
+                  disabled={disabled}
+                  onClick={() => set('eyeVariant', v)}
+                >
                   {LOBSTER_EYE_VARIANT_LABELS[v]}
                 </Chip>
               ))}
             </OptionGroup>
             <OptionGroup label="Pupils">
               {LOBSTER_PUPIL_VARIANTS.map((v) => (
-                <Chip key={v} selected={traits.pupilVariant === v} disabled={disabled} onClick={() => set('pupilVariant', v)}>
+                <Chip
+                  key={v}
+                  selected={traits.pupilVariant === v}
+                  disabled={disabled}
+                  onClick={() => set('pupilVariant', v)}
+                >
                   {LOBSTER_PUPIL_VARIANT_LABELS[v]}
-                </Chip>
-              ))}
-            </OptionGroup>
-          </>
-        )}
-
-        {tab === 'gear' && (
-          <>
-            <OptionGroup label="Headwear">
-              {AVATAR_ACCESSORIES.map((a) => (
-                <Chip key={a} selected={traits.accessory === a} disabled={disabled} onClick={() => set('accessory', a)}>
-                  {AVATAR_ACCESSORY_LABELS[a]}
-                </Chip>
-              ))}
-            </OptionGroup>
-            <OptionGroup label="Antennae">
-              {AVATAR_ANTENNAE.map((a) => (
-                <Chip key={a} selected={traits.antennae === a} disabled={disabled} onClick={() => set('antennae', a)}>
-                  {AVATAR_ANTENNAE_LABELS[a]}
-                </Chip>
-              ))}
-            </OptionGroup>
-            <OptionGroup label="Claws">
-              {AVATAR_CLAWS.map((c) => (
-                <Chip key={c} selected={traits.claws === c} disabled={disabled} onClick={() => set('claws', c)}>
-                  {AVATAR_CLAW_LABELS[c]}
-                </Chip>
-              ))}
-            </OptionGroup>
-            <OptionGroup label="Pose">
-              {AVATAR_POSES.map((p) => (
-                <Chip key={p} selected={traits.pose === p} disabled={disabled} onClick={() => set('pose', p)}>
-                  {AVATAR_POSE_LABELS[p]}
                 </Chip>
               ))}
             </OptionGroup>
@@ -361,7 +436,12 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({ value, o
             </OptionGroup>
             <OptionGroup label="Backdrop pattern">
               {LOBSTER_BACKGROUND_PATTERNS.map((p) => (
-                <Chip key={p.id} selected={traits.backgroundPattern === p.id} disabled={disabled} onClick={() => set('backgroundPattern', p.id)}>
+                <Chip
+                  key={p.id}
+                  selected={traits.backgroundPattern === p.id}
+                  disabled={disabled}
+                  onClick={() => set('backgroundPattern', p.id)}
+                >
                   {p.label}
                 </Chip>
               ))}

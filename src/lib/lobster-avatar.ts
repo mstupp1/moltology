@@ -36,6 +36,9 @@ import {
   type PatternPulse,
   type PatternSparkles,
 } from './avatar/backdrop'
+import type { EquippedAppearance } from './character-appearance'
+import { getEquipmentVisual } from './avatar/equipment'
+import { EQUIP_SLOT_IDS, EQUIPMENT_RARITIES, equipSlotCategory } from './chassis-loadout'
 import { paintDefs, type PaintContext } from './avatar/paint'
 import { AVATAR_EYE_COLORS, eyeDefs } from './avatar/parts'
 import { portraitViewBox, renderCharacter, type CharacterSpec } from './avatar/races'
@@ -160,6 +163,8 @@ export function resolveHeightScale(height?: LobsterHeight | string | number): nu
 
 export interface LobsterAvatarConfig {
   style: typeof LOBSTER_AVATAR_STYLE
+  /** Read-only snapshot derived from owned equipment by the server. */
+  equipment?: EquippedAppearance
   seed: string
   race?: AvatarRace
   shellColor?: string
@@ -295,6 +300,16 @@ export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | nu
     config.backgroundMotion = obj.backgroundMotion.trim() as BackgroundMotionMode
   }
   if (typeof obj.transparentBackground === 'boolean') config.transparentBackground = obj.transparentBackground
+  if (obj.equipment && typeof obj.equipment === 'object') {
+    config.equipment = {}
+    for (const slot of EQUIP_SLOT_IDS) {
+      const value = (obj.equipment as Record<string, unknown>)[slot] as { visualKey?: unknown; rarity?: unknown } | undefined
+      const visual = typeof value?.visualKey === 'string' ? getEquipmentVisual(value.visualKey) : null
+      if (visual && visual.category === equipSlotCategory(slot) && isOneOf(EQUIPMENT_RARITIES, value?.rarity)) {
+        config.equipment[slot] = { visualKey: visual.key, rarity: value.rarity }
+      }
+    }
+  }
   return config
 }
 
@@ -450,14 +465,14 @@ export function resolveAvatarTraits(config: LobsterAvatarConfig): ResolvedAvatar
 }
 
 /** Full-body square frame. The character stands on y=185 around the x=50 centre line. */
-export const LOBSTER_FULL_BODY_VIEWBOX = '-65 -35 230 230' as const
+export const LOBSTER_FULL_BODY_VIEWBOX = '-80 -65 260 260' as const
 /** Head-and-shoulders close-up used by every static portrait. */
-export const LOBSTER_PORTRAIT_VIEWBOX = '-9 -11 118 118' as const
+export const LOBSTER_PORTRAIT_VIEWBOX = '-9 6 118 118' as const
 
 /** Portrait framing per race, so every face sits in the same spot of the porthole. */
 export const AVATAR_PORTRAIT_VIEWBOXES: Readonly<Record<AvatarRace, string>> = {
   lobster: LOBSTER_PORTRAIT_VIEWBOX,
-  crab: '-9 19 118 118',
+  crab: '-9 12 118 118',
 }
 
 export type LobsterAvatarFrame = 'portrait' | 'fullBody'
@@ -538,15 +553,15 @@ function renderBackdrop(
   const textureLayer =
     texture.id !== 'none' && texture.publicUrl
       ? `<g id="lobster-texture-layer" data-texture="${texture.id}">
-        <image href="${texture.publicUrl}" xlink:href="${texture.publicUrl}" x="-80" y="-50" width="260" height="260" preserveAspectRatio="xMidYMid slice" opacity="${texture.opacity ?? 0.38}" style="mix-blend-mode: overlay; pointer-events: none;" />
+        <image href="${texture.publicUrl}" xlink:href="${texture.publicUrl}" x="-90" y="-80" width="280" height="300" preserveAspectRatio="xMidYMid slice" opacity="${texture.opacity ?? 0.38}" style="mix-blend-mode: overlay; pointer-events: none;" />
       </g>`
       : ''
 
   const layer = `
     <g id="lobster-background-layer" data-theme="${theme.id}" data-pattern="${pattern.id}" data-density="${density}" data-glow="${glow}" data-pulse="${pulse}" data-sparkles="${sparkles}" data-texture="${texture.id}" data-motion="${escapeSvgAttr(motion.mode)}">
-      <rect x="-80" y="-50" width="260" height="260" fill="url(#${bgGradId})" />
-      <rect x="-80" y="-50" width="260" height="260" fill="url(#${bgGlowId})" />
-      <rect x="-80" y="-50" width="260" height="260" fill="url(#${bgFloorGlowId})" />
+      <rect x="-90" y="-80" width="280" height="300" fill="url(#${bgGradId})" />
+      <rect x="-90" y="-80" width="280" height="300" fill="url(#${bgGlowId})" />
+      <rect x="-90" y="-80" width="280" height="300" fill="url(#${bgFloorGlowId})" />
       ${textureLayer}
       ${pattern.render(theme, pattern.id, motion, density, glow, pulse)}
       <ellipse cx="50" cy="96" rx="78" ry="96" fill="url(#lobster-bg-hush-${theme.id})" />
@@ -585,9 +600,10 @@ export function buildAvatarSvg(
       expression: traits.eyelidStyle,
       mouth: traits.mouth,
       antennae: traits.antennae,
-      claws: traits.claws,
+      claws: 'classic',
       pose: traits.pose,
-      accessory: traits.accessory,
+      accessory: 'none',
+      equipment: config.equipment,
       headShape: traits.headShape,
       build: traits.build,
       heightScale: resolveHeightScale(traits.height),
@@ -624,7 +640,7 @@ export function buildAvatarSvg(
 function getAvatarCacheKey(config: LobsterAvatarConfig, size: number, frame: LobsterAvatarFrame, staticMotion: boolean): string {
   const ordered = Object.keys(config)
     .sort()
-    .map((k) => `${k}=${String((config as unknown as Record<string, unknown>)[k])}`)
+    .map((k) => `${k}=${JSON.stringify(k === 'equipment' ? EQUIP_SLOT_IDS.map(slot => [slot, config.equipment?.[slot]]) : (config as unknown as Record<string, unknown>)[k])}`)
     .join('|')
   return `${ordered}|${size}|${frame}|${staticMotion ? 'static' : 'live'}`
 }

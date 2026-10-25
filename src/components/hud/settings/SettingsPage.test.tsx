@@ -4,6 +4,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 import { SettingsPage } from './SettingsPage'
 
+vi.mock('@tanstack/react-router', () => ({ Link: ({to,children,...props}:any) => <a href={to} {...props}>{children}</a> }))
+
 vi.mock('@/hooks/useAuthSession', () => ({
   useAuthSession: () => ({
     user: { id: 'user-1', email: 'operative@moltology.org', name: 'Operative' },
@@ -93,19 +95,9 @@ describe('SettingsPage', () => {
     expect(localStorage.getItem('moltology_heavy_vfx_disabled')).toBe('true')
   })
 
-  it('renders the avatar creator with preview and controls', async () => {
-    render(
-      <ToastProvider>
-        <SettingsPage />
-      </ToastProvider>,
-    )
-
-    await waitFor(() => {
-      expect(screen.getByTestId('avatar-creator-panel')).toBeInTheDocument()
-    })
-
-    expect(screen.getByTestId('avatar-creator-preview')).toBeInTheDocument()
-    expect(screen.queryByText('Seed Number')).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Surprise me/i })).toBeInTheDocument()
+  it('links to the unified character studio instead of a second editor', async () => {
+    render(<ToastProvider><SettingsPage /></ToastProvider>)
+    expect(await screen.findByRole('link', {name:'Open character studio'})).toHaveAttribute('href','/chassis')
+    expect(screen.queryByTestId('avatar-creator-panel')).not.toBeInTheDocument()
   })
 })

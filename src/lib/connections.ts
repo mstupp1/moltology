@@ -40,7 +40,7 @@ export type PublicProfileView = {
   displayName: string
   stage: number
   stageLabel: string
-  avatarConfig: { style: string; seed: string } | null
+  avatarConfig: (Omit<import('./lobster-avatar').LobsterAvatarConfig, 'style'> & { style: string }) | null
   memberSince: string
   stats: PublicProfileStats | null
   moltmax: PublicMoltmaxSummary
@@ -61,7 +61,7 @@ export type ConnectionMemberSummary = {
   displayName: string
   stage: number
   stageLabel: string
-  avatarConfig: { style: string; seed: string } | null
+  avatarConfig: (Omit<import('./lobster-avatar').LobsterAvatarConfig, 'style'> & { style: string }) | null
   requestId?: string
   since?: string
 }
@@ -162,7 +162,7 @@ export type MemberSearchResult = {
   displayName: string
   stage: number
   stageLabel: string
-  avatarConfig: { style: string; seed: string } | null
+  avatarConfig: (Omit<import('./lobster-avatar').LobsterAvatarConfig, 'style'> & { style: string }) | null
 }
 
 export function relationshipForMember(
@@ -388,7 +388,7 @@ export function toMemberSummary(row: {
   larvaId: string
   handle?: string | null
   stage: number
-  avatarConfig: { style: string; seed: string } | null
+  avatarConfig: (Omit<import('./lobster-avatar').LobsterAvatarConfig, 'style'> & { style: string }) | null
   requestId?: string
   since?: string | Date | null
 }): ConnectionMemberSummary {

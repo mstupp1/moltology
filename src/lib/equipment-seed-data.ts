@@ -22,6 +22,7 @@ export interface EquipmentCatalogSeed {
   sortOrder: number
   kind?: EquipmentKind
   artKey?: string | null
+  appearanceKey?: string
 }
 
 const VISUAL_TYPE_SLOT: Record<ChassisVisualType, EquipmentCategory> = {
@@ -41,7 +42,7 @@ function typeImage(visualType: ChassisVisualType): string {
 function piece(
   partial: Omit<EquipmentCatalogSeed, 'imageUrl' | 'category'> & {
     category?: EquipmentCategory
-  }
+  },
 ): EquipmentCatalogSeed {
   const category = partial.category ?? VISUAL_TYPE_SLOT[partial.visualType]
   return {
@@ -103,7 +104,8 @@ export const INITIAL_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
     affixes: [{ stat: 'intelligence', value: 10 }],
     uniquePower: {
       name: 'Pressure Calcifies',
-      description: 'The harder the current, the tighter this plate sets. Surface weather cannot pry it open.',
+      description:
+        'The harder the current, the tighter this plate sets. Surface weather cannot pry it open.',
     },
     sortOrder: 4,
   }),
@@ -142,7 +144,8 @@ export const INITIAL_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
     affixes: [{ stat: 'speed', value: 8 }],
     uniquePower: {
       name: 'Zero-Latency Clamp',
-      description: 'The first grip of a session closes without hesitation. There is no gap between seeing the work and taking it.',
+      description:
+        'The first grip of a session closes without hesitation. There is no gap between seeing the work and taking it.',
     },
     sortOrder: 7,
   }),
@@ -205,7 +208,8 @@ export const INITIAL_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
     affixes: [{ stat: 'perception', value: 10 }],
     uniquePower: {
       name: 'Quiet Arrival',
-      description: 'Thought reaches the dome already complete. Surface chatter never crosses the lattice.',
+      description:
+        'Thought reaches the dome already complete. Surface chatter never crosses the lattice.',
     },
     sortOrder: 12,
   }),
@@ -309,7 +313,8 @@ export const INITIAL_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
     id: 'a1000000-0000-4000-8000-000000000016',
     slug: 'silt-tension-vent-sash',
     name: 'Silt-Tension Vent Sash',
-    flavorText: 'Woven from flexible hydrothermal cords. Keeps the abdominal plates stable during rapid descent.',
+    flavorText:
+      'Woven from flexible hydrothermal cords. Keeps the abdominal plates stable during rapid descent.',
     visualType: 'belt',
     rarity: 'uncommon',
     primaryStat: 27,
@@ -333,7 +338,8 @@ export const INITIAL_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
     id: 'a1000000-0000-4000-8000-000000000017',
     slug: 'hydrostatic-girdle-lattice',
     name: 'Hydrostatic Girdle Lattice',
-    flavorText: 'Pressure-sealed titanium ribs distribute benthic torque evenly across the chassis core.',
+    flavorText:
+      'Pressure-sealed titanium ribs distribute benthic torque evenly across the chassis core.',
     visualType: 'belt',
     rarity: 'epic',
     primaryStat: 70,
@@ -352,32 +358,63 @@ export const INITIAL_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
     affixes: [{ stat: 'defense', value: 10 }],
     uniquePower: {
       name: 'Zero-Strain Bulkhead',
-      description: 'When abdominal torque peaks, internal pressure vents automatically. Your core never fractures under sudden load.',
+      description:
+        'When abdominal torque peaks, internal pressure vents automatically. Your core never fractures under sudden load.',
     },
     sortOrder: 24,
   }),
 ]
 
-export const ALL_EQUIPMENT_CATALOG = INITIAL_EQUIPMENT_CATALOG
+export const CREATOR_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
+  ['hard-hat', 'Hard hat', 'head', 'helm'],
+  ['crown', 'Crown', 'head', 'helm'],
+  ['headset', 'Headset', 'head', 'helm'],
+  ['halo', 'Halo', 'head', 'helm'],
+  ['bow', 'Bow', 'head', 'helm'],
+  ['beanie', 'Beanie', 'head', 'helm'],
+  ['crusher', 'Crusher gauntlet', 'claws', 'pincer'],
+  ['slim', 'Slender gauntlet', 'claws', 'pincer'],
+  ['mitten', 'Mitten gauntlet', 'claws', 'pincer'],
+].map(([slug, name, category, visualType], i) => ({
+  id: `a2000000-0000-4000-8000-${String(i + 1).padStart(12, '0')}`,
+  slug: `creator-${slug}`,
+  name,
+  flavorText: 'A familiar fit, made for your shell.',
+  category: category as EquipmentCategory,
+  visualType: visualType as ChassisVisualType,
+  rarity: 'common',
+  primaryStat: 0,
+  affixes: [],
+  uniquePower: null,
+  imageUrl: '',
+  appearanceKey: `creator-${slug}`,
+  sortOrder: 25 + i,
+  kind: 'gear',
+}))
+export const ALL_EQUIPMENT_CATALOG = [...INITIAL_EQUIPMENT_CATALOG, ...CREATOR_EQUIPMENT_CATALOG]
 
+/** Two copies of every claw style; 19 instances total, all fitting in an empty vault. */
 export const STARTER_EQUIPMENT_CATALOG_IDS: string[] = [
-  'a1000000-0000-4000-8000-000000000001', // larval plate
-  'a1000000-0000-4000-8000-000000000004', // training pincers
-  'a1000000-0000-4000-8000-000000000007', // soft-shell visor
-  'a1000000-0000-4000-8000-00000000000a', // silt-walker greaves
-  'a1000000-0000-4000-8000-00000000000d', // larval feelers
-  'a1000000-0000-4000-8000-000000000014', // larval chitin cincture
-  'a1000000-0000-4000-8000-000000000002', // tide-braced carapace
-  'a1000000-0000-4000-8000-000000000012', // silt maul
-  'a1000000-0000-4000-8000-00000000000e', // depth-sense antennae
-  'a1000000-0000-4000-8000-000000000005', // hydraulic crush claws
-  'a1000000-0000-4000-8000-000000000008', // architect crown plate
-  'a1000000-0000-4000-8000-00000000000f', // benthic radar
-  'a1000000-0000-4000-8000-000000000006', // synapse-shear claws (legendary)
-  'a1000000-0000-4000-8000-000000000009', // oracle dome lattice (legendary)
-  'a1000000-0000-4000-8000-000000000011', // hydrostatic seal plate (legendary)
-  'a1000000-0000-4000-8000-000000000018', // core-lock vent harness (legendary)
+  'a1000000-0000-4000-8000-000000000001',
+  'a1000000-0000-4000-8000-000000000004',
+  'a1000000-0000-4000-8000-000000000004',
+  'a1000000-0000-4000-8000-000000000007',
+  'a1000000-0000-4000-8000-00000000000a',
+  'a1000000-0000-4000-8000-00000000000d',
+  'a1000000-0000-4000-8000-000000000014',
+  ...CREATOR_EQUIPMENT_CATALOG.flatMap((item) =>
+    item.category === 'claws' ? [item.id, item.id] : [item.id],
+  ),
 ]
+export const STARTER_EQUIPPED_SLOTS = [
+  'carapace',
+  'claws-1',
+  'claws-2',
+  'head',
+  'legs',
+  'antennae',
+  'belt',
+] as const
 
 export function catalogSeedInsertValues(item: EquipmentCatalogSeed) {
   return {
@@ -395,5 +432,6 @@ export function catalogSeedInsertValues(item: EquipmentCatalogSeed) {
     sortOrder: item.sortOrder,
     kind: item.kind ?? 'gear',
     artKey: item.artKey ?? null,
+    appearanceKey: item.appearanceKey ?? item.slug,
   }
 }

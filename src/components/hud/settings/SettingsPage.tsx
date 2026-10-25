@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import React, { useCallback, useEffect, useState } from 'react'
 import { EyeOff, Mail, Radio, Settings, Sparkles } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastProvider'
@@ -7,25 +8,10 @@ import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { HudButton } from '@/components/ui/HudButton'
 import { HubSurfaceControls } from '@/components/hud/HubSurfaceControls'
 import { getAuthJWTToken } from '@/lib/jwt'
-import {
-  claimMemberHandleFn,
-  getUserProfileFn,
-  saveLobsterAvatarFn,
-  updateEmailPreferencesFn,
-} from '@/lib/server/api'
+import { claimMemberHandleFn, getUserProfileFn, updateEmailPreferencesFn } from '@/lib/server/api'
 import { parseMemberHandle } from '@/lib/member-handle'
 import { DesignationField } from '../DesignationField'
 import { useHudPersist } from '@/hooks/useHudPersist'
-import {
-  LOBSTER_AVATAR_STYLE,
-  clearCachedProfileAvatarUrl,
-  lockAvatarConfig,
-  parseLobsterAvatarConfig,
-  randomLobsterSeed,
-  type LobsterAvatarConfig,
-} from '@/lib/lobster-avatar'
-import { AvatarCreatorPanel } from '../avatar/AvatarCreatorPanel'
-import { AvatarCreatorPreview } from '../avatar/AvatarCreatorPreview'
 import { ConnectedAccounts } from './ConnectedAccounts'
 import { PremiumSettingsSection } from './PremiumSettingsSection'
 
@@ -37,7 +23,6 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
   const { heavyVfxDisabled, toggleHeavyVfx } = useHeavyVfx()
 
   const [emailOptIn, setEmailOptIn] = useState(false)
-  const [draftConfig, setDraftConfig] = useState<LobsterAvatarConfig | null>(null)
   const [designation, setDesignation] = useState('')
   const [savedDesignation, setSavedDesignation] = useState('')
   const [loading, setLoading] = useState(true)
@@ -56,8 +41,6 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
       const nextHandle = profile?.handle?.trim() || ''
       setDesignation(nextHandle)
       setSavedDesignation(nextHandle)
-      const parsed = parseLobsterAvatarConfig(profile?.avatarConfig)
-      setDraftConfig(parsed ?? { style: LOBSTER_AVATAR_STYLE, seed: randomLobsterSeed() })
     } catch {
       toast.error('Could not load settings.')
     } finally {
@@ -88,26 +71,6 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
     } catch {
       setEmailOptIn(!nextState)
       toast.error('Could not update email preferences.')
-    }
-  }
-
-  const handleSaveAvatar = async () => {
-    if (!userId || !draftConfig?.seed.trim()) return
-    const config = lockAvatarConfig(draftConfig)
-    try {
-      await persist.run('settings-avatar', async () => {
-        const token = await getAuthJWTToken()
-        await saveLobsterAvatarFn({
-          data: { ...config, userId, token: token ?? undefined },
-        })
-        clearCachedProfileAvatarUrl(userId)
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('profile-avatar-changed'))
-        }
-      })
-      toast.success('Avatar saved.')
-    } catch {
-      toast.error('Could not save avatar.')
     }
   }
 
@@ -162,7 +125,7 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
           </>
         }
         title="Settings"
-        description="Choose your avatar, email preferences, sign-in methods, display ambience, and command surface options."
+        description="Manage your account, email preferences, sign-in methods, and display options."
       />
 
       <PremiumSettingsSection />
@@ -176,28 +139,16 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
                 Avatar
               </h2>
               <p className="text-xs text-ink-muted font-sans mt-0.5">
-                Build your character. It shows on your chassis page, in the forum, and across the HUD once saved.
+                Edit your body, face, equipment, and scene in the character studio.
               </p>
             </div>
 
-            <div className="flex flex-col items-center gap-4">
-              {draftConfig ? (
-                <>
-                  <AvatarCreatorPreview config={draftConfig} className="max-w-[280px]" />
-                  <AvatarCreatorPanel value={draftConfig} onChange={setDraftConfig} disabled={loading} />
-                </>
-              ) : null}
-
-              <HudButton
-                type="button"
-                variant="secondary"
-                size="md"
-                onClick={handleSaveAvatar}
-                disabled={!draftConfig?.seed.trim()}
-              >
-                Save Avatar
-              </HudButton>
-            </div>
+            <Link
+              to="/chassis"
+              className="inline-flex items-center justify-center min-h-11 px-4 rounded-control border border-cyan-glow/50 bg-cyan-soft text-ink text-sm font-semibold"
+            >
+              Open character studio
+            </Link>
           </div>
 
           {/* Right: Preferences */}
@@ -288,7 +239,9 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
                   aria-label="Toggle underwater bubbles"
                   onClick={toggleHeavyVfx}
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                    !heavyVfxDisabled ? 'bg-cyan-glow border-transparent' : 'bg-surface-3 border-line'
+                    !heavyVfxDisabled
+                      ? 'bg-cyan-glow border-transparent'
+                      : 'bg-surface-3 border-line'
                   }`}
                 >
                   <span

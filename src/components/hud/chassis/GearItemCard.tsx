@@ -1,3 +1,4 @@
+import { equipmentThumbnail } from '@/lib/avatar/equipment'
 import React from 'react'
 import type { CatalogRef } from '@/lib/chassis-loadout'
 import {
@@ -39,7 +40,7 @@ export const GearItemCard: React.FC<GearItemCardProps> = ({
     catalog.imageUrl && !catalog.imageUrl.endsWith('.svg')
       ? catalog.imageUrl
       : chassisTypeImageUrl(catalog.visualType)
-  const imageSrc = getAssetUrl(rawSrc)
+  const imageSrc = equipmentThumbnail(catalog.appearanceKey || catalog.slug) ?? getAssetUrl(rawSrc)
 
   return (
     <button
@@ -72,7 +73,7 @@ export const GearItemCard: React.FC<GearItemCardProps> = ({
         <img
           src={imageSrc}
           alt=""
-          className={`absolute inset-0 w-full h-full object-cover pointer-events-none ${flipped ? 'scale-x-[-1]' : ''}`}
+          className={`absolute inset-0 w-full h-full object-contain p-1 pointer-events-none ${flipped ? 'scale-x-[-1]' : ''}`}
           draggable={false}
         />
       </div>
@@ -81,7 +82,7 @@ export const GearItemCard: React.FC<GearItemCardProps> = ({
           {catalog.name}
         </span>
         <span className={`text-[9px] sm:text-[10px] font-bold ${rarity.text}`}>
-          +{catalog.primaryStat}
+          {catalog.rarity}
         </span>
       </div>
     </button>

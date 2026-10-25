@@ -139,6 +139,9 @@ export const profiles = pgTable('profiles', {
     seed: string
     [trait: string]: string | number | boolean
   }>(),
+  equippedAppearance: jsonb('equippedAppearance').$type<import('../lib/character-appearance').EquippedAppearance>().default({}).notNull(),
+  equipmentVersion: integer('equipmentVersion').default(0).notNull(),
+  appearanceRevision: integer('appearanceRevision').default(0).notNull(),
   emailOptIn: boolean('emailOptIn').default(false).notNull(),
   emailOptInAt: timestamp('emailOptInAt'),
   emailOptInSource: text('emailOptInSource'),
@@ -863,6 +866,7 @@ export const equipmentCatalog = pgTable('equipment_catalog', {
   kind: text('kind').$type<EquipmentKind>().default('gear').notNull(),
   /** Cosmetics only: avatar kit art key (`images/avatar-kit/<race>/look/<artKey>`). */
   artKey: text('artKey'),
+  appearanceKey: text('appearanceKey'),
   primaryStat: integer('primaryStat').notNull(),
   affixes: jsonb('affixes').$type<EquipmentAffix[]>().default([]).notNull(),
   uniquePower: jsonb('uniquePower').$type<EquipmentUniquePower | null>(),

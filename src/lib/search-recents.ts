@@ -58,7 +58,7 @@ export type SearchRecentPerson = {
   larvaId: string
   stage: number
   stageLabel: string
-  avatarConfig: { style: string; seed: string } | null
+  avatarConfig: MemberSearchResult['avatarConfig']
   openedAt: number
 }
 
