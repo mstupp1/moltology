@@ -13,6 +13,7 @@ import { parseMemberHandle } from '@/lib/member-handle'
 import { DesignationField } from '../DesignationField'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { ConnectedAccounts } from './ConnectedAccounts'
+import { PlanUsageSection } from '@/components/ai/OracleUsage'
 import { PremiumSettingsSection } from './PremiumSettingsSection'
 
 export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) => {
@@ -128,6 +129,7 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
         description="Manage your account, email preferences, sign-in methods, and display options."
       />
 
+      <PlanUsageSection userId={userId} />
       <PremiumSettingsSection />
 
       <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5">

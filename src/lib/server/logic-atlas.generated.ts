@@ -12,9 +12,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
   "stats": {
     "domains": 12,
     "rules": 117,
-    "decisions": 41,
-    "anchors": 214,
-    "drifted": 26,
+    "decisions": 42,
+    "anchors": 216,
+    "drifted": 27,
     "flagged": 10
   },
   "canvas": {
@@ -2811,7 +2811,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "decisions": [
         "premium-soft-launch",
-        "oracle-usage-and-moderation"
+        "oracle-usage-and-moderation",
+        "oracle-rolling-allowances"
       ],
       "flag": null,
       "flow": null,
@@ -4303,7 +4304,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "handleOracleChatRequest",
           "line": 71,
           "value": "handleOracleChatRequest(request)",
-          "drift": "ok",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L71"
         }
       ],
@@ -4583,7 +4584,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1117,
         "y": 76
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "oracle.rate-limit",
@@ -4629,34 +4630,34 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "oracle.usage-allowance",
       "domain": "oracle",
-      "title": "Daily allowance, Premium gets 10x",
+      "title": "Rolling allowances, Premium gets 10x",
       "kind": "limit",
       "status": "active",
-      "statement": "Free members can send 5 Oracle messages a minute and 30 in any rolling 24 hours. Premium members get 10 times that, 50 a minute and 300 a day. Usage is stored per member, shared across server instances, and deleting a thread does not reset it.",
+      "statement": "Free members can send 5 Oracle messages a minute, 15 in any rolling 5 hours, and 100 in any rolling 7 days. Premium gets 10 times each allowance. Both rolling windows must have capacity; availability is calculated from recorded timestamps. Usage survives thread deletion and is shared across server instances. Chat shows five-hour usage, with both windows in expanded details and Settings.",
       "anchors": [
         {
           "file": "src/lib/ai/usage-limits.ts",
           "symbol": "ORACLE_FREE_LIMITS",
-          "line": 16,
-          "value": "{ perMinute: 5, perDay: 30 }",
+          "line": 8,
+          "value": "{ perMinute: 5, perFiveHours: 15, perWeek: 100 }",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L16"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L8"
         },
         {
           "file": "src/lib/ai/usage-limits.ts",
           "symbol": "ORACLE_PREMIUM_LIMITS",
-          "line": 20,
-          "value": "{ perMinute: ORACLE_FREE_LIMITS.perMinute * PREMIUM_LIMIT_MULTIPLIER, perDay: ORACLE_FREE_LIMITS.perDay * PREMIUM_LIMIT_MULTIPLIER, }",
+          "line": 10,
+          "value": "{ perMinute: ORACLE_FREE_LIMITS.perMinute * PREMIUM_LIMIT_MULTIPLIER, perFiveHours: ORACLE_FREE_LIMITS.perFiveHours * PREMIUM_LIMIT_MULTIPLIER, perWeek: ORACLE…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L20"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L10"
         },
         {
           "file": "src/lib/ai/usage-limits.ts",
           "symbol": "decideOracleUsage",
-          "line": 52,
+          "line": 92,
           "value": "decideOracleUsage(counts, isPremium)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L52"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L92"
         },
         {
           "file": "src/lib/ai/service.ts",
@@ -4665,6 +4666,22 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "value": "getOracleUsageSnapshot(userId, now)",
           "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L308"
+        },
+        {
+          "file": "src/lib/ai/usage-limits.ts",
+          "symbol": "buildOracleUsageSnapshot",
+          "line": 51,
+          "value": "buildOracleUsageSnapshot(events, isPremium, now)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L51"
+        },
+        {
+          "file": "src/lib/server/oracle-usage.ts",
+          "symbol": "getOracleUsageHandler",
+          "line": 4,
+          "value": "getOracleUsageHandler(args)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/oracle-usage.ts#L4"
         }
       ],
       "tests": [
@@ -4675,6 +4692,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/handle-oracle-chat-request.test.ts",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.test.ts"
+        },
+        {
+          "file": "src/lib/server/oracle-usage.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/oracle-usage.test.ts"
+        },
+        {
+          "file": "src/hooks/useOracleUsage.test.tsx",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useOracleUsage.test.tsx"
+        },
+        {
+          "file": "src/components/ai/OracleUsage.test.tsx",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/ai/OracleUsage.test.tsx"
         }
       ],
       "dependsOn": [
@@ -4684,11 +4713,12 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [],
       "decisions": [
-        "oracle-usage-and-moderation"
+        "oracle-usage-and-moderation",
+        "oracle-rolling-allowances"
       ],
       "flag": {
         "level": "watch",
-        "note": "If the usage table cannot be read, the request continues with only the per-instance flood guard."
+        "note": "Usage checks fail closed when storage is unavailable. Checking capacity and recording a request remain separate operations, so concurrent requests can overshoot a cap."
       },
       "flow": null,
       "position": {
@@ -4708,18 +4738,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/usage-limits.ts",
           "symbol": "ORACLE_MAX_HISTORY_MESSAGES",
-          "line": 26,
+          "line": 17,
           "value": "20",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L26"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L17"
         },
         {
           "file": "src/lib/ai/usage-limits.ts",
           "symbol": "ORACLE_MAX_OUTPUT_TOKENS",
-          "line": 28,
+          "line": 19,
           "value": "1_024",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L28"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L19"
         },
         {
           "file": "src/lib/ai/oracle-chat.ts",
@@ -8520,6 +8550,37 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "heading": "Consequences",
           "html": "<p>Physical samples, live onboarding, business policy/tax approval, sending-domain verification,\ndeployed acceptance and explicit launch authorization remain separate requirements. Printful v1\ncallbacks use a private bearer URL and authoritative API reads; redact that URL from logs.\nResend idempotency has a finite retention period, so old uncertain sends require operator review.</p>"
+        }
+      ]
+    },
+    {
+      "id": "oracle-rolling-allowances",
+      "date": "2026-10-25",
+      "title": "Show Oracle usage and enforce two rolling allowances",
+      "summary": "Replace the daily allowance with 15 messages per rolling 5 hours and 100 per rolling 7 days, with Premium at 10x and a quiet usage display.",
+      "domains": [
+        "oracle",
+        "premium"
+      ],
+      "rules": [
+        "oracle.usage-allowance",
+        "premium.no-standing"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>A daily allowance gave members no visible indication of remaining usage. Short sessions need a clear allowance, while sustained use needs an additional weekly cost ceiling.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Free members receive 15 messages per rolling 5 hours and 100 per rolling 7 days. Premium receives 150 and 1,000 respectively. Keep the existing minute safeguards. Both allowance windows must have room; when both are exhausted, use the later availability time. Historical events continue counting immediately, including usage above a new cap. Thread deletion cannot restore capacity.</p>\n<p>Show the five-hour allowance as a small bar below the composer. Put weekly usage in expandable details and both windows in Settings. Surface an exhausted weekly allowance even when details are closed. Keep the draft editable while sending is blocked. Use verified account reads and a shared session cache; mark failed reads without inventing usage.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>There are no midnight or calendar-week resets and no data migration. Existing raw-event retention covers both windows. The original decision&#39;s moderation, model, and Standing policies remain unchanged; this decision replaces only its daily allowance. Admission and usage recording remain separate operations, retaining the existing concurrency caveat.</p>"
         }
       ]
     },

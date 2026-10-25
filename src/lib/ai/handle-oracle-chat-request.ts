@@ -137,7 +137,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
       )
     }
   } catch (err) {
-    // Without the usage table the daily and per-minute limits cannot be enforced,
+    // Without the usage table the rolling and per-minute limits cannot be enforced,
     // so the paid model call does not run.
     console.warn('[handleOracleChatRequest] Usage check unavailable:', err)
     return Response.json(

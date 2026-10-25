@@ -130,7 +130,7 @@ describe('premium without checkout', () => {
 
 describe('premium entitlements', () => {
   it('lists the higher Oracle limit as the only unlock', () => {
-    expect(listPremiumEntitlements(false)).toEqual(['300 Oracle messages a day instead of 30'])
+    expect(listPremiumEntitlements(false)).toEqual(['150 Oracle messages per 5 hours instead of 15, and 1,000 per 7 days instead of 100'])
     expect(listPremiumEntitlements(true)).toEqual(listPremiumEntitlements(false))
   })
 })

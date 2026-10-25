@@ -4,7 +4,7 @@ import { aiThreads, aiMessages, aiUsageEvents, profiles } from '../../db/schema'
 import { ensureUserProfile } from '../user-sync'
 
 import { ORACLE_TITLE_MODEL_ID } from './oracle-models'
-import type { OracleUsageCounts } from './usage-limits'
+import { buildOracleUsageSnapshot, ORACLE_WEEK_MS, type OracleUsageSnapshot } from './usage-limits'
 import { createChatThreadWithinLimit, getChatLimitError } from './chat-retention'
 
 export interface CreateThreadInput {
@@ -304,33 +304,17 @@ export async function finalizeOracleUsage(
   }
 }
 
-/** Chat calls in the last minute and last 24 hours, plus the member's Premium flag. */
+/** Existing raw events preserve allowance across thread deletion and deployments. */
 export async function getOracleUsageSnapshot(
   userId: string,
   now: Date = new Date(),
-): Promise<OracleUsageCounts & { isPremium: boolean }> {
+): Promise<OracleUsageSnapshot> {
   const db = getDb()
-  const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
-  const minuteAgo = new Date(now.getTime() - 60 * 1000)
-  const [[counts], [profile]] = await Promise.all([
-    db
-      .select({
-        lastDay: sql<number>`count(*)::int`,
-        lastMinute: sql<number>`count(*) filter (where ${aiUsageEvents.createdAt} >= ${minuteAgo.toISOString()}::timestamp)::int`,
-      })
-      .from(aiUsageEvents)
-      .where(
-        and(
-          eq(aiUsageEvents.userId, userId),
-          eq(aiUsageEvents.kind, 'chat'),
-          gte(aiUsageEvents.createdAt, dayAgo),
-        ),
-      ),
+  const weekAgo = new Date(now.getTime() - ORACLE_WEEK_MS)
+  const [events, [profile]] = await Promise.all([
+    db.select({ createdAt: aiUsageEvents.createdAt }).from(aiUsageEvents)
+      .where(and(eq(aiUsageEvents.userId, userId), eq(aiUsageEvents.kind, 'chat'), gte(aiUsageEvents.createdAt, weekAgo))),
     db.select({ isPremium: profiles.isPremium }).from(profiles).where(eq(profiles.id, userId)).limit(1),
   ])
-  return {
-    lastDay: Number(counts?.lastDay ?? 0),
-    lastMinute: Number(counts?.lastMinute ?? 0),
-    isPremium: profile?.isPremium === true,
-  }
+  return buildOracleUsageSnapshot(events.map((event) => event.createdAt), profile?.isPremium === true, now)
 }

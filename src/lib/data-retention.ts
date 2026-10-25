@@ -252,7 +252,7 @@ export function buildTablePolicies(windows: RetentionWindows): TableRetentionPol
       retentionClass: 'hot-summarize-delete',
       hotDays: windows.aiUsageEventsHotDays,
       summarizeAfterDays: windows.aiUsageEventsHotDays,
-      notes: 'Keep recent raw events for rolling 24-hour Oracle/forum limits; atomically roll older events into daily request/token totals before deletion.',
+      notes: 'Keep recent raw events for rolling 7-day Oracle and 24-hour forum limits; atomically roll older events into daily request/token totals before deletion.',
     },
     {
       table: 'ai_usage_daily_summaries',
