@@ -198,9 +198,7 @@ describe('DailyRoutineWidget Component', () => {
     expect(heatmap.className).toMatch(/overflow-x-auto/)
     expect(heatmap.className).toMatch(/min-w-0/)
 
-    const reminderToggle = screen.getByRole('switch', { name: /reminders/i })
-    expect(reminderToggle.className).toMatch(/min-h-\[44px\]/)
-    expect(['true', 'false']).toContain(reminderToggle.getAttribute('aria-checked'))
+    expect(screen.queryByRole('switch', { name: /reminders/i })).not.toBeInTheDocument()
   })
 
   it('shows the 90-day range and disables blank calendar padding', () => {

@@ -67,7 +67,7 @@ const LITURGY_NOTES: Record<string, string> = {
   'silent-synchronization': 'Before the phone, sit still for a few minutes and name the one thing today is for.',
   'prompt-construction': 'Write the day’s plan in plain words, so the first hour isn’t spent deciding.',
   'skill-development': 'Learn one thing on purpose: a lecture, a chapter, a new tool.',
-  'nutritional-efficiency-break': 'Eat away from the screen. The shell is built from what you feed it.',
+  'nutritional-efficiency-break': 'Close the stray tabs, clear one distraction, and choose what gets your attention next.',
   'iterative-refinement': 'The long work block. One task at a time, notifications off.',
   'community-outreach': 'Check in with someone. Answer a friend, post in the forum, return the call.',
   'reflection-log': 'Write three lines: what went well, what didn’t, what you learned.',

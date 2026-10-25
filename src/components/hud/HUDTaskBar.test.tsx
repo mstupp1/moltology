@@ -86,7 +86,7 @@ describe('HUDTaskBar', () => {
 
     expect(screen.getByText('3/8')).toBeInTheDocument()
     expect(screen.getByTestId('header-next')).toHaveTextContent(/^Next /)
-    expect(screen.getByText('Nutritional Efficiency Break')).toBeInTheDocument()
+    expect(screen.getByText('Focus Reset')).toBeInTheDocument()
     expect(screen.queryByText('All done')).not.toBeInTheDocument()
   })
 
@@ -159,7 +159,7 @@ describe('HUDTaskBar', () => {
     expect(screen.queryByText('NEXT IMPENDING LITURGY')).not.toBeInTheDocument()
     expect(screen.queryByText('PENDING')).not.toBeInTheDocument()
     expect(panel.textContent).not.toContain('[')
-    expect(screen.getByRole('switch', { name: /Reminders/ })).toBeInTheDocument()
+    expect(screen.queryByRole('switch', { name: /Reminders/ })).not.toBeInTheDocument()
   })
 
   it('marks the header tile with the unread count', () => {

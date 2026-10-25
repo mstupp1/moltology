@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { Clock, Calendar, RefreshCw, Sparkles, CheckCircle2, ChevronDown, ChevronUp, CheckSquare, Square, Award, Bell, Check, X, ListTodo } from 'lucide-react'
-import { AlignmentRemindersSwitch } from '@/components/hud/AlignmentRemindersSwitch'
 import { HudCard, HudBadge, HudBottomSheet } from '@/components/ui'
-import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useNotifications } from '@/hooks/useNotifications'
@@ -89,9 +87,6 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
 
   const localTasks: AlignmentTask[] = localPropTasks || alignment.tasks
   const countReady = Boolean(localPropTasks) || !alignment.isLoading
-
-  const { remindersEnabled, toggleReminders, getTaskReminderTime } =
-    useAlignmentReminders(localTasks)
 
   // SSR hydration safety
   useEffect(() => {
@@ -351,7 +346,6 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             ) : (
               <span className="inline-block h-2 w-24 rounded-chip bg-surface-3 animate-pulse" aria-hidden />
             )}
-            <AlignmentRemindersSwitch enabled={remindersEnabled} onToggle={toggleReminders} />
           </div>
           <div className="w-full h-1 bg-surface-3 rounded-chip overflow-hidden" aria-hidden="true">
             <div
@@ -365,7 +359,6 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           <ul className={listFrame}>
             {localTasks.map((t) => {
               const isNext = t.id === nextTaskId
-              const reminderTime = remindersEnabled && !t.completed ? getTaskReminderTime(t.time) : null
               return (
                 <li key={t.id}>
                   <button
@@ -387,7 +380,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                     >
                       {t.completed && <Check className="w-3 h-3" strokeWidth={3} />}
                     </span>
-                    <span className={`w-[5.5rem] shrink-0 text-[11px] tabular-nums ${isNext ? 'text-cyan-glow font-bold' : 'text-ink-muted'}`}>
+                    <span className={`w-24 shrink-0 text-[11px] ${isNext ? 'text-cyan-glow font-bold' : 'text-ink-muted'}`}>
                       {t.time}
                     </span>
                     <span
@@ -397,14 +390,9 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                     >
                       {t.title}
                     </span>
-                    {isNext ? (
+                    {isNext && (
                       <span className="shrink-0 text-[11px] font-bold uppercase tracking-[0.08em] text-cyan-glow">Next</span>
-                    ) : reminderTime ? (
-                      <span className="shrink-0 hidden sm:inline-flex items-center gap-1 text-[11px] text-ink-muted tabular-nums" title="Reminder time">
-                        <Bell className="w-3 h-3" aria-hidden="true" />
-                        {reminderTime}
-                      </span>
-                    ) : null}
+                    )}
                   </button>
                 </li>
               )
