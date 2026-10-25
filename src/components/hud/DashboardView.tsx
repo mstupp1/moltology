@@ -6,7 +6,6 @@ import { ActivityStreamPanel } from '@/components/hud/ActivityStreamPanel'
 import { PremiumDashboardBanner } from '@/components/hud/PremiumDashboardBanner'
 import { DashboardTodayStrip } from '@/components/hud/dashboard/DashboardTodayStrip'
 import { DashboardPromoBanner } from '@/components/hud/dashboard/DashboardPromoBanner'
-import { DashboardShortcuts } from '@/components/hud/dashboard/DashboardShortcuts'
 import { DashboardStorePanel } from '@/components/hud/dashboard/DashboardStorePanel'
 import { DashboardNewsPanel } from '@/components/hud/dashboard/DashboardNewsPanel'
 import { DashboardChangelogPanel } from '@/components/hud/dashboard/DashboardChangelogPanel'
@@ -35,8 +34,6 @@ export default function DashboardView() {
       <DashboardPromoBanner />
 
       <DashboardStorePanel />
-
-      <DashboardShortcuts />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-5 items-start">
         <DashboardNewsPanel />
