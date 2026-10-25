@@ -110,6 +110,8 @@ export interface PromptInputProps {
   status?: 'ready' | 'submitted' | 'streaming' | 'error' | string
   placeholder?: string
   disabled?: boolean
+  /** Block sending while keeping the draft editable. */
+  sendDisabled?: boolean
   className?: string
   selectedModel?: OracleModel
   onSelectModel?: (modelId: string) => void
@@ -132,6 +134,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   status = 'ready',
   placeholder = DEFAULT_ORACLE_PLACEHOLDER,
   disabled = false,
+  sendDisabled = false,
   className = '',
   selectedModel,
   onSelectModel,
@@ -182,7 +185,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault()
-    if (!text.trim() || disabled || isStreaming) return
+    if (!text.trim() || disabled || sendDisabled || isStreaming) return
     if (dictation.isListening) dictation.stop()
     onSubmit({ text: text.trim() })
     setText('')
@@ -246,7 +249,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
       ) : (
         <button
           type="submit"
-          disabled={disabled || isStreaming || !text.trim()}
+          disabled={disabled || sendDisabled || isStreaming || !text.trim()}
           className={`w-8 h-8 rounded-full bg-cyan-glow hover:bg-cyan-hover active:bg-cyan-dim disabled:opacity-40 disabled:hover:bg-cyan-glow text-abyss flex items-center justify-center transition-colors cursor-pointer disabled:cursor-not-allowed ${FOCUS_RING}`}
           title="Send"
           aria-label="Send message"

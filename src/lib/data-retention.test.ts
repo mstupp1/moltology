@@ -76,8 +76,8 @@ describe('table policies', () => {
     // Both member types need the same 90-day UI horizon; a telemetry TTL would truncate it.
     expect(byTable.routine_completions.simulatedDays).toBeUndefined()
     expect(byTable.routine_day_summaries.hotDays).toBe(91)
-    // Usage retention must not remove any event inside the rolling 24-hour limit.
-    expect(byTable.ai_usage_events.hotDays).toBeGreaterThan(1)
+    // Usage retention must not remove any event inside the rolling 7-day limit.
+    expect(byTable.ai_usage_events.hotDays).toBeGreaterThanOrEqual(7)
     expect(byTable.ai_usage_daily_summaries.hotDays).toBe(400)
   })
 

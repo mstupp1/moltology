@@ -102,7 +102,7 @@ export function shouldShowPremiumDashboardBanner(input: {
  */
 export function listPremiumEntitlements(_isPremium: boolean): readonly string[] {
   return [
-    `${ORACLE_PREMIUM_LIMITS.perDay} Oracle messages a day instead of ${ORACLE_FREE_LIMITS.perDay}`,
+    `${ORACLE_PREMIUM_LIMITS.perFiveHours} Oracle messages per 5 hours instead of ${ORACLE_FREE_LIMITS.perFiveHours}, and ${ORACLE_PREMIUM_LIMITS.perWeek.toLocaleString('en-US')} per 7 days instead of ${ORACLE_FREE_LIMITS.perWeek}`,
   ]
 }
 

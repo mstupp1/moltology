@@ -2,7 +2,14 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { AIChatPanel } from './AIChatPanel'
+import * as viewport from '@/hooks/useChatViewport'
+import { useOracleUsage } from '@/hooks/useOracleUsage'
+import { buildOracleUsageSnapshot } from '@/lib/ai/usage-limits'
 import { authClient } from '@/lib/auth-client'
+
+vi.mock('@/hooks/useOracleUsage', () => ({
+  useOracleUsage: vi.fn(() => ({ snapshot: null, unavailable: false, blocked: false, refresh: vi.fn() })),
+}))
 
 // Mock scrollIntoView for test environment
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
@@ -48,6 +55,53 @@ vi.mock('@/lib/server/api', async (importOriginal) => {
 describe('AIChatPanel Guest Mode Gating', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(useOracleUsage).mockReturnValue({ snapshot: null, unavailable: false, blocked: false, refresh: vi.fn() })
+  })
+
+  it('keeps the draft editable and prevents sending when usage is blocked', async () => {
+    const now = new Date()
+    const snapshot = buildOracleUsageSnapshot(Array.from({ length: 15 }, () => now), false, now)
+    vi.mocked(useOracleUsage).mockReturnValue({ snapshot, unavailable: false, blocked: true, refresh: vi.fn() })
+    const { streamOracleChat } = await import('@/lib/ai/stream-oracle-chat-client')
+    render(<AIChatPanel userId="member" />)
+    const message = screen.getByRole('textbox', { name: 'Message' })
+    fireEvent.change(message, { target: { value: 'Keep my draft' } })
+    fireEvent.keyDown(message, { key: 'Enter' })
+    expect(message).toHaveValue('Keep my draft')
+    expect(message).toBeEnabled()
+    expect(streamOracleChat).not.toHaveBeenCalled()
+    expect(screen.getByText('0 of 15 remaining · Past 5 hours')).toBeInTheDocument()
+  })
+
+  it.each([
+    { phone: false, threadId: null }, { phone: true, threadId: null },
+    { phone: false, threadId: 'existing' }, { phone: true, threadId: 'existing' },
+  ])('shows one usage indicator beside the composer: %j', async ({ phone, threadId }) => {
+    const phoneSpy = vi.spyOn(viewport, 'useIsPhone').mockReturnValue(phone)
+    const snapshot = buildOracleUsageSnapshot([], false)
+    vi.mocked(useOracleUsage).mockReturnValue({ snapshot, unavailable: false, blocked: false, refresh: vi.fn() })
+    try {
+      render(<AIChatPanel userId="member" threadId={threadId} />)
+      expect(await screen.findByRole('textbox', { name: 'Message' })).toBeInTheDocument()
+      expect(screen.getAllByRole('meter')).toHaveLength(1)
+      expect(screen.getByText('15 of 15 remaining · Past 5 hours')).toBeInTheDocument()
+    } finally { phoneSpy.mockRestore() }
+  })
+
+  it('restores the draft when the server rejects a stale allowance', async () => {
+    const { streamOracleChat } = await import('@/lib/ai/stream-oracle-chat-client')
+    vi.mocked(streamOracleChat).mockRejectedValueOnce(Object.assign(new Error('5-hour limit reached.'), { status: 429 }))
+    render(<AIChatPanel userId="member" />)
+    const message = screen.getByRole('textbox', { name: 'Message' })
+    fireEvent.change(message, { target: { value: 'Save this question' } })
+    fireEvent.keyDown(message, { key: 'Enter' })
+    await waitFor(() => expect(message).toHaveValue('Save this question'))
+    expect(vi.mocked(useOracleUsage).mock.results[0].value.refresh).toHaveBeenCalled()
+  })
+
+  it('does not show usage to guests', () => {
+    render(<AIChatPanel userId={null} />)
+    expect(screen.queryByRole('button', { name: 'View usage' })).not.toBeInTheDocument()
   })
 
   it('renders guest mode new chat screen on initial load with no canned messages', () => {
@@ -166,6 +220,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
 describe('AIChatPanel designation refresh', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(useOracleUsage).mockReturnValue({ snapshot: null, unavailable: false, blocked: false, refresh: vi.fn() })
   })
 
   it('refetches the member profile when member-handle-changed fires', async () => {
@@ -191,6 +246,7 @@ describe('AIChatPanel designation refresh', () => {
 describe('AIChatPanel Chats List Panel', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(useOracleUsage).mockReturnValue({ snapshot: null, unavailable: false, blocked: false, refresh: vi.fn() })
     Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 390 })
     vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(390)
   })
@@ -517,6 +573,7 @@ describe('AIChatPanel Chats List Panel', () => {
 describe('AIChatPanel Thinking State & Error Handling', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(useOracleUsage).mockReturnValue({ snapshot: null, unavailable: false, blocked: false, refresh: vi.fn() })
   })
 
   it('renders thinking dots while awaiting assistant response', async () => {

@@ -34,6 +34,8 @@ import { isAdmin } from '../../lib/permissions'
 import { resolveMemberPublicName } from '../../lib/member-handle'
 import { getAuthJWTToken } from '../../lib/jwt'
 import { oracleAuthData } from '../../lib/ai/oracle-auth-client'
+import { OracleUsage } from './OracleUsage'
+import { useOracleUsage } from '@/hooks/useOracleUsage'
 import { CHAT_LIMIT, getChatLimitError } from '@/lib/ai/chat-retention'
 
 export const CHATS_COLUMN_MIN_WIDTH = 640
@@ -102,6 +104,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const user = propUser?.id || propUser?.sub ? propUser : sessionUser
 
   const userId = propUserId ?? user?.id ?? user?.sub ?? oracle?.userId ?? session.userId ?? null
+  const usage = useOracleUsage(userId)
   const isAuthPending = !userId && session.isPending
   const isGuest = !userId && !isAuthPending
 
@@ -425,6 +428,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   const sendMessage = async (text: string, baseMessages: ChatMessage[] = messages) => {
     setErrorMessage(null)
+    if (usage.blocked) {
+      setDraft((previous) => previous || text)
+      return
+    }
     if (userId && !activeThreadId && isAtChatLimit) {
       setErrorMessage(getChatLimitError().message)
       setDraft((prev) => prev || text)
@@ -541,6 +548,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         )
         setErrorMessage(err?.message || 'The reply was cut off. Please try again.')
       } else {
+        if (err?.status === 429) setDraft((previous) => previous || text)
         const failedError = err?.message || 'Something went wrong sending your message. Please try again.'
         setMessages((prev) =>
           prev
@@ -554,6 +562,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       }
       if (abortRef.current === controller) abortRef.current = null
       setIsSending(false)
+      void usage.refresh()
     }
   }
 
@@ -677,20 +686,28 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   }
 
   const composer = (variant: 'docked' | 'inline') => (
-    <PromptInput
-      variant={variant}
-      compact={isPhone}
-      footnote={isPhone ? undefined : 'The Oracle can be wrong. Check anything important.'}
-      value={draft}
-      onValueChange={setDraft}
-      onSubmit={handlePromptSubmit}
-      onStop={handleStop}
-      status={isSending ? 'streaming' : 'ready'}
-      placeholder={placeholder}
-      autoFocus
-      selectedModel={canPickModel ? selectedModel : undefined}
-      onSelectModel={canPickModel ? (id) => setSelectedModelId(id) : undefined}
-    />
+    <div>
+      <PromptInput
+        sendDisabled={usage.blocked}
+        variant={variant}
+        compact={isPhone}
+        footnote={isPhone ? undefined : 'The Oracle can be wrong. Check anything important.'}
+        value={draft}
+        onValueChange={setDraft}
+        onSubmit={handlePromptSubmit}
+        onStop={handleStop}
+        status={isSending ? 'streaming' : 'ready'}
+        placeholder={placeholder}
+        autoFocus
+        selectedModel={canPickModel ? selectedModel : undefined}
+        onSelectModel={canPickModel ? (id) => setSelectedModelId(id) : undefined}
+      />
+      {userId && (
+        <div className="px-3 pb-2">
+          <OracleUsage snapshot={usage.snapshot} unavailable={usage.unavailable} />
+        </div>
+      )}
+    </div>
   )
   const headerButton = headerIconButtonClasses(isPhone)
 
@@ -810,7 +827,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                 <NewChatScreen
                   isGuest={isGuest}
                   onSubmit={handlePromptSubmit}
-                  disabled={isSending}
+                  disabled={isSending || usage.blocked}
                   onOpenAuthModal={() => setIsAuthModalOpen(true)}
                   shortcuts={DEFAULT_PROMPT_SHORTCUTS}
                   composer={isPhone || !isNarrow ? composer('inline') : undefined}
