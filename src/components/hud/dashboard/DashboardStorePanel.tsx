@@ -63,7 +63,7 @@ export function DashboardStorePanel() {
                 params={{ slug: product.slug }}
                 className={cn('group block rounded-control -m-1 p-1 hover:bg-surface-2 transition-colors', DASHBOARD_FOCUS)}
               >
-                <span className={cn('block aspect-square overflow-hidden rounded-control border border-line-subtle', image?.background ?? 'bg-surface-2')}>
+                <span className="block aspect-[4/3] overflow-hidden rounded-control border border-line-subtle bg-benthic-border">
                   <MerchImage
                     src={image?.src ?? product.featuredImageUrl}
                     alt={image?.alt ?? product.title}
