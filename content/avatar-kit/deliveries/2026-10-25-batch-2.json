@@ -1,0 +1,125 @@
+{
+  "batch": "batch-2",
+  "date": "2026-10-25",
+  "timezone": "America/New_York",
+  "bucket": "moltology-public-assets",
+  "prefix": "avatar-kit/inbox/batch-2/",
+  "imageCount": 21,
+  "objectCount": 22,
+  "verification": "Every remote object downloaded and SHA-256 matched to the final local delivery.",
+  "selectedMaster": "crab/master.png",
+  "generator": "built-in ImageGen",
+  "productionAgents": "Three gpt-6-luna subagents; primary assembly and QA",
+  "objects": [
+    {
+      "file": "crab/antenna/whip.png",
+      "bytes": 97124,
+      "sha256": "c931cb617c1beb17b3e4a6f6750a5b7ce6a20555a4b6b81ed700c47ddb8dbac0"
+    },
+    {
+      "file": "crab/arm/default.png",
+      "bytes": 119697,
+      "sha256": "002d109fbaf142e1dbbf2c544bb76d0801b1c8ad5c464abbd52e3465f7d14e2c"
+    },
+    {
+      "file": "crab/body/bean.png",
+      "bytes": 537692,
+      "sha256": "c4694d36228951de0a3efd47da613b8c31c772da3136559fe2173c436fe662f6"
+    },
+    {
+      "file": "crab/brows/round.svg",
+      "bytes": 635,
+      "sha256": "449a8e3387ca80c29cbc969270b82e08648c825af312f9888cb3e9b0f9683882"
+    },
+    {
+      "file": "crab/claw/classic.png",
+      "bytes": 202680,
+      "sha256": "48ecf6c6065cbaa05df16e9e3b689da137f93b0bbc22c92905d065ccc98d479a"
+    },
+    {
+      "file": "crab/eyes/round.svg",
+      "bytes": 1209,
+      "sha256": "7073f858d85233be72a15d0fb9d03abaa7584dccdad87dfcec5f56d05948c70b"
+    },
+    {
+      "file": "crab/gear/antennae.png",
+      "bytes": 1321299,
+      "sha256": "01908d0083526c28d2c52a0cd0d821284850ebd4d7e1597ba144f26de5d60496"
+    },
+    {
+      "file": "crab/gear/belt.png",
+      "bytes": 1265452,
+      "sha256": "315afbaccab3a408842b5e64f7edee6d40ce50a6aa04d5176192b5744b049eb5"
+    },
+    {
+      "file": "crab/gear/carapace.png",
+      "bytes": 1302116,
+      "sha256": "e3012f8452c179c05c5bb4bf181c1429a1ebc832bc0f96de339cb1da35494b5e"
+    },
+    {
+      "file": "crab/gear/greaves.png",
+      "bytes": 920834,
+      "sha256": "d96656e8c0c011ade39de6fd3d4a413c78eb3b714bb00ddca91a65f532764262"
+    },
+    {
+      "file": "crab/gear/hammer.png",
+      "bytes": 262968,
+      "sha256": "c365be510e79d49db121c81ae552d66079e654e14fe0754651d7fae7c976e07f"
+    },
+    {
+      "file": "crab/gear/helm.png",
+      "bytes": 223459,
+      "sha256": "bbb233be43b05b63a060a83c0a7a4a2009f68af07b5b09ed23cb338c0bb9b9a0"
+    },
+    {
+      "file": "crab/gear/pincer.png",
+      "bytes": 240441,
+      "sha256": "8304c1ea4c154a1a4ac17dcfa6866269828029c7295da301df60b89a4cf0edd2"
+    },
+    {
+      "file": "crab/iris/round.svg",
+      "bytes": 670,
+      "sha256": "8f42af130baed2bcae2a457a5a0f4353f17a3970140cfaeecba558b7ee359372"
+    },
+    {
+      "file": "crab/legs/default.png",
+      "bytes": 804884,
+      "sha256": "c396fd8725f50e99c043b64b65331242177db9cff2f71931ff3ab7482c4e7839"
+    },
+    {
+      "file": "crab/lids/round.svg",
+      "bytes": 878,
+      "sha256": "2dce17e1feffdcdf1045fd552aaca6493596c02254efa7bfc812d637b71d9306"
+    },
+    {
+      "file": "crab/master.png",
+      "bytes": 1288384,
+      "sha256": "12c4903a7bb4866ce46ee8fe80f9e6e964df02a6bac41723f0cdb1f1b1ad4fc6"
+    },
+    {
+      "file": "crab/mouth/grin.svg",
+      "bytes": 557,
+      "sha256": "90d98ca890407361a5504774ebd8f90d9b466afd6bfc9734123ad39633dd57f1"
+    },
+    {
+      "file": "crab/pivots.json",
+      "bytes": 78,
+      "sha256": "b45a1a8042d558b91ad1f7221b0cc1c3980827d641ee94d2de1857ac66ffbcbe"
+    },
+    {
+      "file": "lobster/gear/antennae.png",
+      "bytes": 32745,
+      "sha256": "5f9e3ab6d80db651924c24fecf4b555bfc8de06d4aa7e13bf2fd8e5bfc50508b"
+    },
+    {
+      "file": "lobster/gear/greaves.png",
+      "bytes": 310659,
+      "sha256": "b1c25f65ce496a68a65cbe83c956e208c87cb17c151aa15ee74f33fb40bae5f5"
+    },
+    {
+      "file": "lobster/gear/hammer.png",
+      "bytes": 173150,
+      "sha256": "a27fe4bd9703460ec12801036ef93e8b1555f208e8c31ea86c5faf331c24de65"
+    }
+  ]
+}
