@@ -774,6 +774,32 @@
       "zernioCommentId": null,
       "isAiGenerated": true,
       "createdAt": "2026-10-19T01:50:11.537Z"
+    },
+    {
+      "id": "post-1792962592812",
+      "topic": "Off-duty work alerts interrupting dinner",
+      "hookHeadline": "Your inbox has invited itself to dinner.",
+      "theme": "off-duty-dinner",
+      "mascot": "lobster_peaceful",
+      "archivePath": "Social Archive/2026/10/post-b23f6f8aeef5ccbf527bd23c",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1792962593874_lx38hg87_01.png"
+      ],
+      "aspectRatio": "3:4",
+      "caption": "Your inbox has invited itself to dinner.\n\nOne red dot, and the meal has a meeting agenda.\nIf you’re off duty, mute work alerts until your next shift. Leave the phone away from the table.\nYour shell deserves a seat too.\n\nSend this to the dinner group chat.",
+      "hashtags": [
+        "#Moltology",
+        "#Boundaries",
+        "#DigitalWellbeing"
+      ],
+      "firstComment": "https://moltology.org\n\n#Moltology\n#Boundaries\n#DigitalWellbeing",
+      "status": "scheduled",
+      "scheduledFor": "2026-10-26T17:00:00.000Z",
+      "queueId": "6a84b76d2421e968ac81f5bc",
+      "zernioPostId": "6ade702312f3502df3e27761",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "createdAt": "2026-10-25T21:09:57.457Z"
     }
   ]
 }
