@@ -604,3 +604,13 @@ describe('lobster-avatar', () => {
     })
   })
 })
+
+
+describe('retired painted avatar configs', () => {
+  it('preserves drawn traits while dropping experimental state', () => {
+    expect(parseLobsterAvatarConfig({
+      style: 'critters', seed: 'saved-member', race: 'crab', shellColor: 'coral',
+      kit: true, loadout: 'head=helm:rare', portraitKey: 'images/avatar-portraits/abcdef0123456789.webp',
+    })).toEqual({ style: 'critters', seed: 'saved-member', race: 'crab', shellColor: 'coral' })
+  })
+})

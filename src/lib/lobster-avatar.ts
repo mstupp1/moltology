@@ -67,11 +67,6 @@ import {
   type ShellMarking,
 } from './avatar/traits'
 
-import { getAssetUrl } from './assets'
-import { renderKitCharacter, type KitCharacterInput } from './avatar/kit/compose'
-import { parseKitLoadout } from './avatar/kit/loadout'
-import type { KitAsset, KitManifest } from './avatar/kit/manifest'
-
 export * from './avatar/backdrop'
 export * from './avatar/traits'
 
@@ -192,15 +187,6 @@ export interface LobsterAvatarConfig {
   pupilVariant?: LobsterPupilVariant
   backgroundMotion?: BackgroundMotionMode
   transparentBackground?: boolean
-  /** Worn gear and looks, written by the server (see avatar/kit/loadout.ts). */
-  loadout?: string
-  /** Pre-rendered static portrait in the bucket, written by the server on save. */
-  portraitKey?: string
-  /**
-   * Draw with painted kit art. Written by the server only for members in the `avatar-kit`
-   * experiment; without it the avatar stays on the vector rig and loadout/portrait are ignored.
-   */
-  kit?: boolean
 }
 
 /** Every look trait, fully resolved from a config plus its seed. */
@@ -309,9 +295,6 @@ export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | nu
     config.backgroundMotion = obj.backgroundMotion.trim() as BackgroundMotionMode
   }
   if (typeof obj.transparentBackground === 'boolean') config.transparentBackground = obj.transparentBackground
-  if (typeof obj.loadout === 'string' && obj.loadout.length <= 600) config.loadout = obj.loadout
-  if (typeof obj.portraitKey === 'string' && isAvatarPortraitKey(obj.portraitKey)) config.portraitKey = obj.portraitKey
-  if (obj.kit === true) config.kit = true
   return config
 }
 
@@ -483,56 +466,6 @@ export interface GenerateLobsterAvatarOptions {
   frame?: LobsterAvatarFrame
   /** Strip SMIL motion tags. Implied for the portrait frame. */
   staticMotion?: boolean
-  /**
-   * Draw the painted kit when this race has art. Kit SVGs reference bucket images, so they
-   * only render inline (never as an `<img>` src); `LobsterAvatarDisplay` handles that.
-   */
-  kit?: boolean
-}
-
-/** Bucket keys of server-rendered static portraits. */
-const PORTRAIT_KEY_PATTERN = /^images\/avatar-portraits\/[a-f0-9]{16,64}\.webp$/
-
-export function isAvatarPortraitKey(value: string): boolean {
-  return PORTRAIT_KEY_PATTERN.test(value)
-}
-
-/** Kit SVGs open with this attribute so the display can spot them without decoding. */
-export const KIT_SVG_DATA_URI_PREFIX = `data:image/svg+xml;charset=utf-8,${encodeURIComponent('<svg data-kit="1"')}`
-
-export function isKitSvgDataUri(src: string): boolean {
-  return src.startsWith(KIT_SVG_DATA_URI_PREFIX)
-}
-
-/** Kit inputs (variants, colours, loadout) for a config, already resolved from its seed. */
-export function resolveKitCharacterInput(config: LobsterAvatarConfig): KitCharacterInput {
-  const traits = resolveAvatarTraits(config)
-  return {
-    race: traits.race,
-    palette: SHELL_PALETTE_MAP[traits.shellColor] ?? SHELL_PALETTES[0],
-    finish: traits.shellFinish,
-    eyeColor: traits.eyeColor,
-    heightScale: resolveHeightScale(traits.height),
-    variants: {
-      antennae: traits.antennae,
-      claws: traits.claws,
-      build: traits.build,
-      headShape: traits.headShape,
-      eyeVariant: traits.eyeVariant,
-      mouth: traits.mouth,
-      accessory: traits.accessory,
-    },
-    loadout: parseKitLoadout(config.loadout),
-  }
-}
-
-export interface BuildAvatarSvgOptions {
-  /** Use kit art when the race has it. */
-  kit?: boolean
-  /** Override how kit images are referenced (the server embeds them as data URIs). */
-  kitHref?: (asset: KitAsset) => string
-  /** Kit art to draw from (defaults to the committed manifest; the art scripts pass local files). */
-  kitManifest?: KitManifest
 }
 
 /** Remove SMIL animate nodes so a portrait data URI stays still even as an <img>. */
@@ -627,8 +560,7 @@ export function buildAvatarSvg(
   config: LobsterAvatarConfig,
   size: number,
   frame: LobsterAvatarFrame,
-  cacheKey: string,
-  options: BuildAvatarSvgOptions = {}
+  cacheKey: string
 ): string {
   const traits = resolveAvatarTraits(config)
   const seeded = getLobsterAvatarSeededOptions(config.seed)
@@ -661,18 +593,10 @@ export function buildAvatarSvg(
       heightScale: resolveHeightScale(traits.height),
       armScale: typeof config.armScale === 'number' ? Math.min(1.3, Math.max(0.8, config.armScale)) : 1,
   }
-  const kit = options.kit
-    ? renderKitCharacter(resolveKitCharacterInput(config), {
-        uid: ctx.uid,
-        href: options.kitHref ?? ((asset) => getAssetUrl(asset.src)),
-        manifest: options.kitManifest,
-      })
-    : null
-  const character = kit ? kit.markup : renderCharacter(spec, ctx)
+  const character = renderCharacter(spec, ctx)
 
-  const viewBox = frame === 'portrait' ? (kit ? kit.portraitViewBox : portraitViewBox(spec)) : LOBSTER_FULL_BODY_VIEWBOX
+  const viewBox = frame === 'portrait' ? portraitViewBox(spec) : LOBSTER_FULL_BODY_VIEWBOX
   const dataAttrs = [
-    ...(kit ? ['data-kit="1"'] : []),
     `data-avatar-slot="${frame}"`,
     `data-race="${traits.race}"`,
     `data-shell="${escapeSvgAttr(palette.id)}"`,
@@ -691,18 +615,18 @@ export function buildAvatarSvg(
   ].join(' ')
 
   return `<svg ${dataAttrs} xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="${viewBox}" width="${size}" height="${size}" role="img" aria-label="Member avatar">
-  <defs>${backdrop?.defs ?? ''}${kit ? kit.defs : `${paintDefs(ctx)}${eyeDefs(ctx, traits.eyeColor)}`}</defs>
+  <defs>${backdrop?.defs ?? ''}${paintDefs(ctx)}${eyeDefs(ctx, traits.eyeColor)}</defs>
   ${backdrop?.layer ?? ''}
   ${character}
 </svg>`
 }
 
-function getAvatarCacheKey(config: LobsterAvatarConfig, size: number, frame: LobsterAvatarFrame, staticMotion: boolean, kit = false): string {
+function getAvatarCacheKey(config: LobsterAvatarConfig, size: number, frame: LobsterAvatarFrame, staticMotion: boolean): string {
   const ordered = Object.keys(config)
     .sort()
     .map((k) => `${k}=${String((config as unknown as Record<string, unknown>)[k])}`)
     .join('|')
-  return `${ordered}|${size}|${frame}|${staticMotion ? 'static' : 'live'}${kit ? '|kit' : ''}`
+  return `${ordered}|${size}|${frame}|${staticMotion ? 'static' : 'live'}`
 }
 
 const MAX_GENERATED_AVATAR_CACHE = 128
@@ -739,12 +663,11 @@ export function generateLobsterAvatarSvg(
   if (!config?.seed) return null
   const frame = options?.frame ?? 'fullBody'
   const staticMotion = options?.staticMotion ?? frame === 'portrait'
-  const kit = Boolean(options?.kit)
-  const key = getAvatarCacheKey(config, size, frame, staticMotion, kit)
+  const key = getAvatarCacheKey(config, size, frame, staticMotion)
   const cached = readLru(generatedSvgCache, key)
   if (cached !== undefined) return cached
 
-  let svg = buildAvatarSvg(config, size, frame, key, { kit })
+  let svg = buildAvatarSvg(config, size, frame, key)
   if (staticMotion) svg = stripSvgSmilAnimation(svg)
   rememberLru(generatedSvgCache, key, svg)
   return svg
@@ -758,12 +681,11 @@ export function generateLobsterAvatarDataUri(
   if (!config?.seed) return null
   const frame = options?.frame ?? 'fullBody'
   const staticMotion = options?.staticMotion ?? frame === 'portrait'
-  const kit = Boolean(options?.kit)
-  const key = getAvatarCacheKey(config, size, frame, staticMotion, kit)
+  const key = getAvatarCacheKey(config, size, frame, staticMotion)
   const cached = readLru(generatedDataUriCache, key)
   if (cached !== undefined) return cached
 
-  const svg = generateLobsterAvatarSvg(config, size, { frame, staticMotion, kit })
+  const svg = generateLobsterAvatarSvg(config, size, { frame, staticMotion })
   if (!svg) return null
   const dataUri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
   rememberLru(generatedDataUriCache, key, dataUri)

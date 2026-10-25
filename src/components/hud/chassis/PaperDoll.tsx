@@ -6,8 +6,6 @@ import {
   equipSlotCategory,
 } from '@/lib/chassis-loadout'
 import { getAssetUrl } from '@/lib/assets'
-import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
-import { LobsterAvatarFullBody } from '../LobsterAvatarFullBody'
 import { DraggableGear } from './DraggableGear'
 import { GearItemCard } from './GearItemCard'
 import type { GearHoverTarget, TooltipAnchor } from './gear-tooltip-position'
@@ -20,7 +18,6 @@ export interface PaperDollProps {
   onSlotActivate: (slot: EquipSlotId) => void
   onHoverItem?: (target: GearHoverTarget | null) => void
   /** The member wearing this loadout. With it, hardpoints flank the live avatar. */
-  avatarConfig?: LobsterAvatarConfig | null
 }
 
 const SLOT_LABELS: Record<EquipSlotId, string> = {
@@ -116,7 +113,6 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
   onSelectItem,
   onSlotActivate,
   onHoverItem,
-  avatarConfig,
 }) => {
   const equipped = new Map(
     items
@@ -145,32 +141,6 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
           )
         }
       />
-    )
-  }
-
-  if (avatarConfig?.seed) {
-    return (
-      <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 sm:gap-3 w-full min-w-0 flex-1 min-h-0 overflow-y-auto overflow-x-hidden select-none py-1">
-        <div className="flex flex-col items-center gap-1.5 sm:gap-2">
-          {renderSlot('antennae', { small: true })}
-          {renderSlot('head', { small: true })}
-          {renderSlot('claws-1', { small: true })}
-        </div>
-        <div className="flex items-center justify-center min-w-0 h-full">
-          <LobsterAvatarFullBody
-            config={avatarConfig}
-            size={360}
-            alt="Your avatar wearing this loadout"
-            className="w-full max-w-[320px] aspect-[4/5]"
-          />
-        </div>
-        <div className="flex flex-col items-center gap-1.5 sm:gap-2">
-          {renderSlot('carapace', { small: true })}
-          {renderSlot('claws-2', { flipped: true, small: true })}
-          {renderSlot('belt', { small: true })}
-          {renderSlot('legs', { small: true })}
-        </div>
-      </div>
     )
   }
 

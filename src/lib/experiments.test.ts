@@ -3,9 +3,9 @@ import { activeExperiments, hasExperiment, isExperimentId, toggleExperiment } fr
 
 describe('experiments', () => {
   it('only apply to admins', () => {
-    expect(hasExperiment('admin', ['avatar-kit'], 'avatar-kit')).toBe(true)
-    expect(hasExperiment('user', ['avatar-kit'], 'avatar-kit')).toBe(false)
-    expect(hasExperiment(null, ['avatar-kit'], 'avatar-kit')).toBe(false)
+    expect(hasExperiment('admin', ['new-store'], 'new-store')).toBe(true)
+    expect(hasExperiment('user', ['new-store'], 'new-store')).toBe(false)
+    expect(hasExperiment(null, ['new-store'], 'new-store')).toBe(false)
   })
 
   it('keeps Premium and the store off until independently enabled by an admin', () => {
@@ -21,15 +21,16 @@ describe('experiments', () => {
   })
 
   it('ignore retired or malformed stored values', () => {
-    expect(activeExperiments('admin', ['old-thing', 'avatar-kit'])).toEqual(['avatar-kit'])
-    expect(activeExperiments('admin', 'avatar-kit')).toEqual([])
+    expect(activeExperiments('admin', ['old-thing', 'avatar-kit'])).toEqual([])
+    expect(activeExperiments('admin', 'new-store')).toEqual([])
     expect(activeExperiments('admin', null)).toEqual([])
+    expect(isExperimentId('avatar-kit')).toBe(false)
     expect(isExperimentId('toString')).toBe(false)
   })
 
   it('toggle one id and drop retired ones', () => {
-    expect(toggleExperiment(['old-thing'], 'avatar-kit', true)).toEqual(['avatar-kit'])
-    expect(toggleExperiment(['avatar-kit'], 'avatar-kit', false)).toEqual([])
-    expect(toggleExperiment(undefined, 'avatar-kit', true)).toEqual(['avatar-kit'])
+    expect(toggleExperiment(['old-thing'], 'new-store', true)).toEqual(['new-store'])
+    expect(toggleExperiment(['new-store'], 'new-store', false)).toEqual([])
+    expect(toggleExperiment(undefined, 'new-store', true)).toEqual(['new-store'])
   })
 })

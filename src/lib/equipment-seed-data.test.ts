@@ -1,9 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   ALL_EQUIPMENT_CATALOG,
-  COSMETIC_CATALOG,
   INITIAL_EQUIPMENT_CATALOG,
-  STARTER_COSMETIC_CATALOG_IDS,
   STARTER_EQUIPMENT_CATALOG_IDS,
 } from './equipment-seed-data'
 import {
@@ -63,23 +61,7 @@ describe('equipment catalog seed', () => {
   })
 })
 
-describe('cosmetic catalog', () => {
-  it('carries no stats and names its kit art after the slug', () => {
-    for (const item of COSMETIC_CATALOG) {
-      expect(item.kind).toBe('cosmetic')
-      expect(item.primaryStat).toBe(0)
-      expect(item.affixes).toEqual([])
-      expect(item.uniquePower).toBeNull()
-      expect(item.artKey).toBe(item.slug)
-      expect(item.artKey).toMatch(/^[a-z0-9-]+$/)
-    }
-  })
-
-  it('has unique ids across gear and cosmetics, and real starter ids', () => {
-    const ids = ALL_EQUIPMENT_CATALOG.map((item) => item.id)
-    expect(new Set(ids).size).toBe(ids.length)
-    for (const id of STARTER_COSMETIC_CATALOG_IDS) {
-      expect(COSMETIC_CATALOG.some((item) => item.id === id)).toBe(true)
-    }
-  })
+it('seeds only the original equipment catalog', () => {
+  expect(ALL_EQUIPMENT_CATALOG).toEqual(INITIAL_EQUIPMENT_CATALOG)
+  expect(ALL_EQUIPMENT_CATALOG.every((item) => !item.kind || item.kind === 'gear')).toBe(true)
 })

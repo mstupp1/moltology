@@ -7,7 +7,6 @@ import type {
   EquipmentUniquePower,
   LookSlotId,
 } from '../db/schema'
-import type { KitLoadout, KitLookCategory } from './avatar/kit/loadout'
 
 export type {
   ChassisVisualType,
@@ -66,7 +65,7 @@ export function isClawEquipSlot(slot: EquipSlotId): slot is ClawEquipSlot {
   return slot === 'claws-1' || slot === 'claws-2'
 }
 
-/** Look slots, one per category. A claws look is drawn on both claws. */
+/** Legacy slots retained to recognize retired cosmetic inventory rows. */
 export const LOOK_SLOT_IDS: LookSlotId[] = [
   'look-head',
   'look-carapace',
@@ -75,14 +74,6 @@ export const LOOK_SLOT_IDS: LookSlotId[] = [
   'look-legs',
   'look-antennae',
 ]
-
-export function lookSlotForCategory(category: EquipmentCategory): LookSlotId {
-  return `look-${category}` as LookSlotId
-}
-
-export function lookSlotCategory(slot: LookSlotId): KitLookCategory {
-  return slot.slice('look-'.length) as KitLookCategory
-}
 
 export function isLookSlot(value: unknown): value is LookSlotId {
   return typeof value === 'string' && (LOOK_SLOT_IDS as string[]).includes(value)
@@ -240,7 +231,7 @@ export interface CatalogRef {
   sortOrder: number
   /** Defaults to gear for rows written before cosmetics existed. */
   kind?: EquipmentKind
-  /** Cosmetics: avatar kit art key. */
+  /** Legacy cosmetic art key, retained for existing catalog rows. */
   artKey?: string | null
 }
 
@@ -250,7 +241,7 @@ export function isCosmetic(catalog: Pick<CatalogRef, 'kind'> | null | undefined)
 
 /**
  * One owned item. Gear sits in a hardpoint (`equippedSlot`) or a vault cell (`vaultIndex`).
- * Cosmetics never take a vault cell: they are worn (`lookSlot`) or kept in the wardrobe (both null).
+ * Legacy cosmetics never take a vault cell; their old look slot is decoded separately.
  */
 export interface GearItemState {
   id: string
@@ -402,7 +393,7 @@ export function planGearMove(
   const movingCatalog = lookup(moving.catalogItemId)
   if (!movingCatalog) return { ok: false, error: 'Catalog entry missing for gear.' }
   if (isCosmetic(movingCatalog)) {
-    return { ok: false, error: 'Cosmetics go in look slots, not hardpoints or the vault.' }
+    return { ok: false, error: 'This retired cosmetic cannot be equipped or moved to the vault.' }
   }
 
   if (target.type === 'equip') {
@@ -551,83 +542,6 @@ export function applyMoveUpdates(
   })
 }
 
-export interface LookPlanUpdate {
-  id: string
-  lookSlot: LookSlotId | null
-}
-
-/**
- * Wear or remove a cosmetic. Wearing replaces whatever look sits in that category's slot,
- * which goes back to the wardrobe. Pure; does not mutate inputs.
- */
-export function planLookChange(
-  items: GearItemState[],
-  catalogById: Map<string, CatalogRef> | Record<string, CatalogRef>,
-  itemId: string,
-  wear: boolean
-): { ok: true; updates: LookPlanUpdate[] } | MovePlanError {
-  const lookup =
-    catalogById instanceof Map
-      ? (id: string) => catalogById.get(id)
-      : (id: string) => catalogById[id]
-  const item = items.find((i) => i.id === itemId)
-  if (!item) return { ok: false, error: 'Cosmetic not found in your wardrobe.' }
-  const catalog = lookup(item.catalogItemId)
-  if (!catalog || !isCosmetic(catalog)) return { ok: false, error: 'Only cosmetics can be worn as a look.' }
-
-  const slot = lookSlotForCategory(catalog.category)
-  if (!wear) return { ok: true, updates: item.lookSlot ? [{ id: item.id, lookSlot: null }] : [] }
-  if (item.lookSlot === slot) return { ok: true, updates: [] }
-
-  const updates: LookPlanUpdate[] = []
-  const occupant = items.find((i) => i.id !== item.id && i.lookSlot === slot)
-  if (occupant) updates.push({ id: occupant.id, lookSlot: null })
-  updates.push({ id: item.id, lookSlot: slot })
-  return { ok: true, updates }
-}
-
-export function applyLookUpdates(items: GearItemState[], updates: LookPlanUpdate[]): GearItemState[] {
-  if (updates.length === 0) return items
-  const byId = new Map(updates.map((u) => [u.id, u]))
-  return items.map((item) => {
-    const u = byId.get(item.id)
-    return u ? { ...item, lookSlot: u.lookSlot } : item
-  })
-}
-
-/** What the avatar wears: equipped gear visuals and worn looks. */
-export function buildKitLoadout(
-  items: GearItemState[],
-  catalogById: Map<string, CatalogRef> | Record<string, CatalogRef>
-): KitLoadout {
-  const lookup =
-    catalogById instanceof Map
-      ? (id: string) => catalogById.get(id)
-      : (id: string) => catalogById[id]
-  const loadout: KitLoadout = { gear: {}, look: {} }
-  for (const item of items) {
-    const cat = lookup(item.catalogItemId)
-    if (!cat) continue
-    if (isCosmetic(cat)) {
-      if (item.lookSlot && cat.artKey) loadout.look[lookSlotCategory(item.lookSlot)] = cat.artKey
-    } else if (item.equippedSlot) {
-      loadout.gear[item.equippedSlot] = { visual: cat.visualType, rarity: cat.rarity }
-    }
-  }
-  return loadout
-}
-
-/** Cosmetics a member should own but does not. They go straight to the wardrobe. */
-export function planStarterCosmetics(
-  existing: GearItemState[],
-  catalogIdsPresent: Iterable<string>,
-  starterIds: string[]
-): string[] {
-  const present = new Set(catalogIdsPresent)
-  const owned = new Set(existing.map((item) => item.catalogItemId))
-  return starterIds.filter((id) => present.has(id) && !owned.has(id))
-}
-
 export interface StarterGrant {
   catalogItemId: string
   vaultIndex: number
@@ -664,10 +578,6 @@ export interface ChassisLoadoutPayload {
   items: GearItemState[]
   totals: LoadoutTotals
   vaultSize: number
-  /** The member's saved avatar config, so the paper doll can draw them wearing the loadout. */
-  avatarConfig?: { style: string; seed: string; [trait: string]: string | number | boolean } | null
-  /** The avatar-kit experiment is on: show the avatar paper doll and the wardrobe. */
-  avatarKit?: boolean
 }
 
 let chassisLoadoutCache: { userId: string; payload: ChassisLoadoutPayload } | null = null

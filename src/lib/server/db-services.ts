@@ -62,7 +62,6 @@ import {
 } from '../forum-visits'
 import { FORUM_REPORT_COPY, forumReportReasonLabel, validateForumReportInput } from '../forum-reports'
 import { isAdmin } from '../permissions'
-import { hasExperiment } from '../experiments'
 import { assertCanReply, assertCanStartTopic, loadForumStanding } from './forum-standing'
 import { shouldSinkReply, type ForumStandingDecision } from '../forum-standing'
 import { getAbsoluteAssetUrl, getMediaPath } from '../assets'
@@ -89,7 +88,6 @@ import {
 } from '../progression'
 import {
   ALL_EQUIPMENT_CATALOG,
-  STARTER_COSMETIC_CATALOG_IDS,
   STARTER_EQUIPMENT_CATALOG_IDS,
   catalogSeedInsertValues,
 } from '../equipment-seed-data'
@@ -98,10 +96,7 @@ import {
   chassisTypeImageUrl,
   computeLoadoutTotals,
   planGearMove,
-  planLookChange,
-  planStarterCosmetics,
   planStarterGrants,
-  buildKitLoadout,
   isLookSlot,
   resolveVisualType,
   normalizeEquipSlot,
@@ -3254,11 +3249,9 @@ export async function saveLobsterAvatarHandler({ data, context }: ServerFnArgs<S
     .where(eq(profiles.id, userId))
     .returning()
 
-  const synced = await syncAvatarLook(dbClient, userId)
-
   return {
     success: true,
-    avatarConfig: synced ?? updated?.avatarConfig ?? avatarConfig,
+    avatarConfig: updated?.avatarConfig ?? avatarConfig,
   }
 }
 
@@ -3822,69 +3815,6 @@ function toGearState(row: typeof userGearItems.$inferSelect): GearItemState {
   }
 }
 
-/**
- * Write what the member wears onto their avatar config (`loadout`) and refresh the static
- * portrait. Runs after gear moves, look changes, and avatar saves. A portrait failure never
- * blocks the save; the member keeps their vector portrait until the next successful render.
- */
-type StoredAvatarConfig = NonNullable<typeof profiles.$inferSelect['avatarConfig']>
-
-export async function syncAvatarLook(dbClient: Db, userId: string): Promise<StoredAvatarConfig | null> {
-  const [profile] = await dbClient
-    .select({ avatarConfig: profiles.avatarConfig, role: profiles.role, experiments: profiles.experiments })
-    .from(profiles)
-    .where(eq(profiles.id, userId))
-    .limit(1)
-  const current = profile?.avatarConfig
-  if (!current?.seed) return current ?? null
-
-  // Outside the avatar-kit experiment the avatar stays on the vector rig: no kit flag,
-  // loadout, or rendered portrait (this also clears them when the experiment is switched off).
-  if (!hasExperiment(profile.role, profile.experiments, 'avatar-kit')) {
-    const legacy: Record<string, string | number | boolean> = { ...current }
-    delete legacy.kit
-    delete legacy.loadout
-    delete legacy.portraitKey
-    if (Object.keys(legacy).length === Object.keys(current).length) return current
-    const legacyConfig = legacy as StoredAvatarConfig
-    await dbClient.update(profiles).set({ avatarConfig: legacyConfig, updatedAt: new Date() }).where(eq(profiles.id, userId))
-    return legacyConfig
-  }
-
-  const catalogRows = await dbClient.select().from(equipmentCatalog)
-  const gearRows = await dbClient.select().from(userGearItems).where(eq(userGearItems.userId, userId))
-  const catalogById = new Map(catalogRows.map((row) => [row.id, toCatalogRef(row)]))
-  const { serializeKitLoadout } = await import('../avatar/kit/loadout')
-  const loadout = serializeKitLoadout(buildKitLoadout(gearRows.map(toGearState), catalogById))
-
-  const { parseLobsterAvatarConfig } = await import('../lobster-avatar')
-  const next: Record<string, string | number | boolean> = { ...current, kit: true }
-  if (loadout) next.loadout = loadout
-  else delete next.loadout
-
-  let portraitKey: string | null = null
-  try {
-    const parsed = parseLobsterAvatarConfig(next)
-    if (parsed) {
-      const { renderAvatarPortrait } = await import('./avatar-portrait')
-      portraitKey = await renderAvatarPortrait(parsed)
-    }
-  } catch (e) {
-    console.warn('[syncAvatarLook] Portrait render failed:', e)
-  }
-  if (portraitKey) next.portraitKey = portraitKey
-  else delete next.portraitKey
-
-  const unchanged = current.kit === true && next.loadout === current.loadout && next.portraitKey === current.portraitKey
-  if (unchanged) return current
-  const nextConfig = next as StoredAvatarConfig
-  await dbClient
-    .update(profiles)
-    .set({ avatarConfig: nextConfig, updatedAt: new Date() })
-    .where(eq(profiles.id, userId))
-  return nextConfig
-}
-
 async function loadChassisPayload(dbClient: Db, userId: string): Promise<ChassisLoadoutPayload> {
   let catalogRows = await dbClient
     .select()
@@ -3949,29 +3879,7 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<Chassis
       .where(eq(userGearItems.userId, userId))
   }
 
-  const [profile] = await dbClient
-    .select({ avatarConfig: profiles.avatarConfig, role: profiles.role, experiments: profiles.experiments })
-    .from(profiles)
-    .where(eq(profiles.id, userId))
-    .limit(1)
-  const avatarKit = hasExperiment(profile?.role, profile?.experiments, 'avatar-kit')
-
   if (catalogRows.length > 0) {
-    const cosmeticGrants = !avatarKit ? [] : planStarterCosmetics(
-      gearRows.map(toGearState),
-      catalogRows.map((c) => c.id),
-      STARTER_COSMETIC_CATALOG_IDS
-    )
-    if (cosmeticGrants.length > 0) {
-      await dbClient.insert(userGearItems).values(
-        cosmeticGrants.map((catalogItemId) => ({ userId, catalogItemId, equippedSlot: null, vaultIndex: null }))
-      )
-      gearRows = await dbClient
-        .select()
-        .from(userGearItems)
-        .where(eq(userGearItems.userId, userId))
-    }
-
     const grants = planStarterGrants(
       gearRows.map(toGearState),
       catalogRows.map((c) => c.id),
@@ -3999,7 +3907,7 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<Chassis
   const catalogById = new Map(catalog.map((c) => [c.id, c]))
   const totals = computeLoadoutTotals(items, catalogById)
 
-  return { catalog, items, totals, vaultSize: VAULT_SIZE, avatarConfig: profile?.avatarConfig ?? null, avatarKit }
+  return { catalog, items, totals, vaultSize: VAULT_SIZE }
 }
 
 export const getChassisLoadoutHandler = async ({
@@ -4072,54 +3980,10 @@ export const moveGearItemHandler = async ({ data, context }: ServerFnArgs<MoveGe
         })
         .where(and(eq(userGearItems.id, update.id), eq(userGearItems.userId, userId)))
     }
-    await syncAvatarLook(dbClient, userId)
   }
 
   return loadChassisPayload(dbClient, userId)
 }
-
-interface SetLookInput {
-  itemId: string
-  wear: boolean
-  token?: string
-  userId?: string
-}
-
-/** Wear or remove a cosmetic. Looks change the drawing only, so totals never move. */
-export const setLookHandler = async ({ data, context }: ServerFnArgs<SetLookInput>) => {
-  const auth = await resolveWriteAuth({ data, context })
-  if (!auth) throw new Error('Unauthenticated: Authentication required to update your look.')
-  if (!data?.itemId) throw new Error('Missing cosmetic.')
-  const { userId, dbClient } = auth
-
-  const catalogRows = await dbClient.select().from(equipmentCatalog)
-  const gearRows = await dbClient.select().from(userGearItems).where(eq(userGearItems.userId, userId))
-  const catalogById = new Map(catalogRows.map((row) => [row.id, toCatalogRef(row)]))
-
-  const plan = planLookChange(gearRows.map(toGearState), catalogById, data.itemId, Boolean(data.wear))
-  if (!plan.ok) throw new Error(plan.error)
-
-  if (plan.updates.length > 0) {
-    // Clear first so the per-slot unique index never sees two looks in one slot.
-    for (const update of plan.updates) {
-      await dbClient
-        .update(userGearItems)
-        .set({ equippedSlot: null, updatedAt: new Date() })
-        .where(and(eq(userGearItems.id, update.id), eq(userGearItems.userId, userId)))
-    }
-    for (const update of plan.updates) {
-      if (!update.lookSlot) continue
-      await dbClient
-        .update(userGearItems)
-        .set({ equippedSlot: update.lookSlot, vaultIndex: null, updatedAt: new Date() })
-        .where(and(eq(userGearItems.id, update.id), eq(userGearItems.userId, userId)))
-    }
-    await syncAvatarLook(dbClient, userId)
-  }
-
-  return loadChassisPayload(dbClient, userId)
-}
-
 
 // ─── Public profiles & connections ───────────────────────────────────────────
 

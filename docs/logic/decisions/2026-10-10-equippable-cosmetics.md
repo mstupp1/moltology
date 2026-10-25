@@ -5,7 +5,8 @@ title: "Cosmetics are equipment with no stats, worn in look slots"
 summary: "Cosmetic looks live in the equipment catalog, sit in their own six slots, add no stats, and are drawn on the avatar with gear; the server writes the worn look and a cached portrait."
 domains: [economy, data]
 rules: [economy.cosmetics-no-stats, economy.look-slots, economy.starter-looks, data.avatar-look-server, data.avatar-portraits]
-status: accepted
+status: superseded
+supersededBy: retire-painted-avatar-builder
 sources:
   - pr: 217
 ---

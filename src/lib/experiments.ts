@@ -16,11 +16,6 @@ export const EXPERIMENTS = {
     title: 'New store',
     description: 'Open the on-site store and checkout. Store links use Etsy while this is off.',
   },
-  'avatar-kit': {
-    title: 'Painted avatars and cosmetics',
-    description:
-      'Your avatar uses the painted art with your gear and looks, gets a rendered portrait, and your chassis shows the avatar and wardrobe. Other members see your avatar painted too.',
-  },
 } as const satisfies Record<string, { title: string; description: string }>
 
 export type ExperimentId = keyof typeof EXPERIMENTS
