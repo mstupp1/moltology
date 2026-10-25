@@ -34,7 +34,6 @@ import { isAdmin } from '../../lib/permissions'
 import { resolveMemberPublicName } from '../../lib/member-handle'
 import { getAuthJWTToken } from '../../lib/jwt'
 import { oracleAuthData } from '../../lib/ai/oracle-auth-client'
-import { OracleUsage } from './OracleUsage'
 import { useOracleUsage } from '@/hooks/useOracleUsage'
 import { CHAT_LIMIT, getChatLimitError } from '@/lib/ai/chat-retention'
 
@@ -702,11 +701,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         selectedModel={canPickModel ? selectedModel : undefined}
         onSelectModel={canPickModel ? (id) => setSelectedModelId(id) : undefined}
       />
-      {userId && (
-        <div className="px-3 pb-2">
-          <OracleUsage snapshot={usage.snapshot} unavailable={usage.unavailable} />
-        </div>
-      )}
     </div>
   )
   const headerButton = headerIconButtonClasses(isPhone)
@@ -808,6 +802,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             activeThreadId={activeThreadId}
             isLoadingThreads={isLoadingThreads}
             layout={chatsLayout}
+            usageSnapshot={usage.snapshot}
+            usageUnavailable={usage.unavailable}
             onSelectThread={handleSelectThread}
             onPin={pinThread}
             onArchive={archiveThread}
