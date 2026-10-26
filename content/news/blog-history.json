@@ -503,6 +503,17 @@
       "coreHook": "Laboratory automation meets the stubborn facts of liquid and glass. Google's new research shows why checking the bench matters as much as planning.",
       "keyMetrics": [],
       "relatedReelIds": []
+    },
+    {
+      "slug": "robot-autonomy-stanford",
+      "title": "Stanford Opens the Toolbox: Learn Robot Autonomy Beyond AI Demos",
+      "format": "autonomous-dispatch",
+      "category": "TELEMETRY",
+      "author": "Silas Trench",
+      "publishedAt": "2026-10-26T12:35:50.000Z",
+      "coreHook": "Stanford's free robot autonomy materials put runnable exercises beside the theory, giving learners a way to question what makes a robot work.",
+      "keyMetrics": [],
+      "relatedReelIds": []
     }
   ]
 }
