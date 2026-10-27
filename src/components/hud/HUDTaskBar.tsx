@@ -586,7 +586,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             e.stopPropagation()
             setIsScheduleOpen((prev) => !prev)
           }}
-          className={`relative flex items-center gap-2 h-9 md:h-8 px-2.5 rounded-control border text-xs transition-colors select-none touch-manipulation ${focusRing} ${
+          className={`relative flex items-center gap-2 h-9 md:h-8 md:w-[260px] md:min-w-[260px] px-2.5 rounded-control border text-xs transition-colors select-none touch-manipulation ${focusRing} ${
             isScheduleOpen
               ? 'bg-surface-3 shadow-nav-current border-transparent text-ink'
               : 'bg-surface-1 border-line hover:bg-surface-2 hover:border-line-strong text-ink'
@@ -598,16 +598,16 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           aria-busy={!countReady}
         >
           {allTasksCompleted && countReady ? (
-            <Check className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
+            <Check className="w-3.5 h-3.5 shrink-0 text-emerald-500" aria-hidden="true" />
           ) : (
-            <ListTodo className={`w-3.5 h-3.5 ${isScheduleOpen ? 'text-cyan-glow' : 'text-ink-muted'}`} aria-hidden="true" />
+            <ListTodo className={`w-3.5 h-3.5 shrink-0 ${isScheduleOpen ? 'text-cyan-glow' : 'text-ink-muted'}`} aria-hidden="true" />
           )}
 
           {countReady ? (
             allTasksCompleted ? (
               <span className="hidden md:inline text-emerald-500 font-bold">All done</span>
             ) : (
-              <span data-testid="header-next" className="hidden md:inline truncate max-w-[180px] text-ink-muted">
+              <span data-testid="header-next" className="hidden md:inline min-w-0 truncate text-ink-muted">
                 Next <span className="text-ink font-bold">{nextTask?.title || 'None'}</span>
               </span>
             )
@@ -616,11 +616,11 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           )}
 
           {countReady ? (
-            <span className={`font-bold tabular-nums md:pl-2 md:border-l md:border-line-subtle ${allTasksCompleted ? 'text-emerald-500' : 'text-ink'}`}>
+            <span className={`shrink-0 font-bold tabular-nums md:ml-auto md:pl-2 md:border-l md:border-line-subtle ${allTasksCompleted ? 'text-emerald-500' : 'text-ink'}`}>
               {liturgyCountText}
             </span>
           ) : (
-            <span className="inline-block h-2 w-6 rounded-chip bg-surface-3 animate-pulse" aria-hidden />
+            <span className="inline-block shrink-0 md:ml-auto h-2 w-6 rounded-chip bg-surface-3 animate-pulse" aria-hidden />
           )}
 
           {notificationUnread > 0 && (

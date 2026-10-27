@@ -97,9 +97,9 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
       data-chats-layout={layout}
       aria-hidden={!isOpen}
       inert={!isOpen}
-      className={`flex flex-col min-h-0 h-full bg-surface-1/95 backdrop-blur-xl font-sans overflow-hidden transition-[opacity,transform,width,flex-basis] duration-200 ease-out motion-reduce:transition-none ${isOpen ? 'animate-[oracle-chats-enter_200ms_ease-out] motion-reduce:animate-none' : ''} ${layout === 'column'
-        ? `shrink-0 border-r border-line-subtle ${isOpen ? 'w-64 lg:w-72 opacity-100 translate-x-0' : 'w-0 opacity-0 -translate-x-2 border-r-0'}`
-        : `w-full ${isOpen ? 'flex-1 opacity-100 translate-x-0' : 'absolute inset-0 z-20 pointer-events-none opacity-0 translate-x-2'}`}`}
+      className={`flex flex-col min-h-0 h-full bg-surface-1/95 backdrop-blur-xl font-sans overflow-hidden transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${isOpen ? 'animate-[oracle-chats-enter_200ms_ease-out] motion-reduce:animate-none' : ''} ${layout === 'column'
+        ? 'absolute inset-y-0 left-0 z-20 w-72 shrink-0 border-r border-line-subtle'
+        : isOpen ? 'w-full flex-1' : 'absolute inset-0 z-20 w-full'} ${isOpen ? 'opacity-100 translate-x-0' : 'pointer-events-none opacity-0 -translate-x-2'}`}
     >
       <div className="flex shrink-0 items-center gap-1 px-3 pt-3 pb-2">
         <h2 className="min-w-0 flex-1 text-base font-semibold text-ink select-none">Synaptic Oracle</h2>

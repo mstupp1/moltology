@@ -2,6 +2,7 @@ import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useId
 import {
   X,
   PanelLeftOpen,
+  SquarePen,
   AlertCircle,
   Shield,
   UserPlus,
@@ -119,9 +120,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const [panelWidth, setPanelWidth] = useState(0)
   const [desktopChatsOpen, setDesktopChatsOpen] = useState(true)
   const [desktopViewport, setDesktopViewport] = useState(false)
-  const isDesktopPage = desktopChatsSidebar && desktopViewport
+  const isDesktopPage = desktopChatsSidebar && desktopViewport && panelWidth >= 768
   const chatsOpen = isDesktopPage ? desktopChatsOpen : isChatsOpen
-  const chatsLayout = (desktopChatsSidebar ? isDesktopPage : panelWidth >= 640) ? 'column' : 'takeover'
+  const chatsLayout = panelWidth >= 768 ? 'column' : 'takeover'
   const chatsPanelId = useId()
   const restoreChatsFocusRef = useRef(false)
   useEffect(() => {
@@ -130,7 +131,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       return
     }
     if (!isChatsMounted) return
-    const timer = setTimeout(() => setIsChatsMounted(false), 220)
+    const timer = setTimeout(() => setIsChatsMounted(false), window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : 200)
     return () => clearTimeout(timer)
   }, [chatsOpen, isChatsMounted])
   const setChatsOpen = useCallback((open: boolean) => {
@@ -280,13 +281,18 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
     syncWidth(el.clientWidth)
 
-    if (typeof ResizeObserver === 'undefined') return
+    const onResize = () => syncWidth(el.clientWidth)
+    window.addEventListener('resize', onResize)
+    if (typeof ResizeObserver === 'undefined') return () => window.removeEventListener('resize', onResize)
     const observer = new ResizeObserver((entries) => {
       const width = entries[0]?.contentRect.width ?? el.clientWidth
       syncWidth(width)
     })
     observer.observe(el)
-    return () => observer.disconnect()
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', onResize)
+    }
   }, [])
 
   useEffect(() => {
@@ -781,6 +787,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       className={`flex flex-col bg-surface-1/60 backdrop-blur-md border border-line-subtle shadow-menu font-sans overflow-hidden h-full w-full relative ${className}`}
     >
       <div className="flex flex-1 min-h-0 overflow-hidden relative z-10">
+        {/* Reserve the final width once; only the history surface animates. */}
+        {chatsOpen && chatsLayout === 'column' && <div aria-hidden="true" className="w-72 shrink-0" />}
         {isChatsMounted && (
           <OracleChatsPanel
             id={chatsPanelId}
@@ -816,18 +824,30 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             <div className="h-12 px-2 border-b border-line-subtle flex items-center justify-between gap-2 shrink-0 select-none relative z-10">
               <div className="flex items-center gap-0.5 min-w-0 flex-1">
                 {!chatsOpen && (
-                  <button
-                    ref={chatsButtonRef}
-                    type="button"
-                    onClick={handleToggleChats}
-                    className={headerButton}
-                    title="Open chats"
-                    aria-label="Open chats"
-                    aria-expanded={false}
-                    aria-controls={chatsPanelId}
-                  >
-                    <PanelLeftOpen className="w-4 h-4" aria-hidden="true" />
-                  </button>
+                  <>
+                    <button
+                      ref={chatsButtonRef}
+                      type="button"
+                      onClick={handleToggleChats}
+                      className={headerButton}
+                      title="Open chats"
+                      aria-label="Open chats"
+                      aria-expanded={false}
+                      aria-controls={chatsPanelId}
+                    >
+                      <PanelLeftOpen className="w-4 h-4" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleNewChat}
+                      disabled={isAtChatLimit}
+                      className={headerButton}
+                      title={isAtChatLimit ? getChatLimitError().message : 'New chat (Ctrl+Shift+O)'}
+                      aria-label="New chat"
+                    >
+                      <SquarePen className="w-4 h-4" aria-hidden="true" />
+                    </button>
+                  </>
                 )}
 
                 {activeThreadTitle && (

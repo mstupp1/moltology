@@ -52,6 +52,37 @@ describe('SynapticOracleWidget', () => {
     window.innerHeight = 800
   })
 
+  it('uses the larger default size, preserves custom sizes, and clamps on short screens', () => {
+    const { container, unmount } = render(<SynapticOracleWidget />)
+    fireEvent.click(screen.getByRole('button', { name: /Open Oracle AI Popout/i }))
+    expect(container.querySelector('.fixed.rounded-card')).toHaveStyle({ width: '480px', height: '680px' })
+    unmount()
+
+    localStorage.setItem('moltology:oracle_popout_size', JSON.stringify({ width: 560, height: 720 }))
+    const custom = render(<SynapticOracleWidget />)
+    fireEvent.click(screen.getByRole('button', { name: /Open Oracle AI Popout/i }))
+    expect(custom.container.querySelector('.fixed.rounded-card')).toHaveStyle({ width: '560px', height: '720px' })
+    window.innerHeight = 450
+    window.innerWidth = 640
+    fireEvent.resize(window)
+    expect(custom.container.querySelector('.fixed.rounded-card')).toHaveStyle({ width: '560px', height: '418px' })
+    fireEvent.doubleClick(custom.container.querySelector('.cursor-n-resize')!)
+    expect(custom.container.querySelector('.fixed.rounded-card')).toHaveStyle({ width: '480px', height: '418px' })
+  })
+
+  it('closes immediately in state while retaining an inert popup for its exit', () => {
+    vi.useFakeTimers()
+    const { container } = render(<SynapticOracleWidget />)
+    fireEvent.click(screen.getByRole('button', { name: /Open Oracle AI Popout/i }))
+    act(() => vi.advanceTimersByTime(20))
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    expect(container.querySelector('.fixed.rounded-card')).toHaveAttribute('inert')
+    act(() => vi.advanceTimersByTime(200))
+    expect(container.querySelector('.fixed.rounded-card')).toBeNull()
+    expect(screen.getByRole('button', { name: /Open Oracle AI Popout/i })).toHaveFocus()
+    vi.useRealTimers()
+  })
+
   it('renders the floating launcher button initially', () => {
     render(
       <OracleProvider>
@@ -191,6 +222,7 @@ describe('SynapticOracleWidget', () => {
 
     expect(localStorage.getItem('moltology:oracle_popout_size')).toBeNull()
     expect(localStorage.getItem('moltology:oracle_popout_pos')).toBeNull()
+    expect(container.querySelector('.fixed.rounded-card')).toHaveStyle({ width: '480px', height: '680px' })
   })
 
   it('docks to bottom as interactive prompt pill tray with no resize handles on mobile viewport', () => {

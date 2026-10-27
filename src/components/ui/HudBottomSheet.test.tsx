@@ -4,6 +4,30 @@ import { render, screen, fireEvent, act } from '@testing-library/react'
 import { HudBottomSheet } from './HudBottomSheet'
 
 describe('HudBottomSheet Component', () => {
+  it('contains keyboard focus, becomes inert on close, and restores focus to its opener', () => {
+    vi.useFakeTimers()
+    const opener = document.createElement('button')
+    document.body.append(opener)
+    opener.focus()
+    const { rerender } = render(
+      <HudBottomSheet isOpen onClose={vi.fn()} title="Focus test">
+        <button>First control</button><button>Last control</button>
+      </HudBottomSheet>,
+    )
+    expect(screen.getByRole('button', { name: 'First control' })).toHaveFocus()
+    screen.getByRole('button', { name: 'Last control' }).focus()
+    fireEvent.keyDown(document.activeElement!, { key: 'Tab' })
+    expect(screen.getByRole('button', { name: 'First control' })).toHaveFocus()
+    const dialog = screen.getByRole('dialog')
+    rerender(<HudBottomSheet isOpen={false} onClose={vi.fn()} title="Focus test"><button>First control</button></HudBottomSheet>)
+    expect(dialog).toHaveAttribute('inert')
+    expect(opener).toHaveFocus()
+    act(() => vi.advanceTimersByTime(250))
+    expect(dialog).not.toBeInTheDocument()
+    opener.remove()
+    vi.useRealTimers()
+  })
+
   it('renders bottom sheet content when open with top drag handle', () => {
     render(
       <HudBottomSheet isOpen={true} onClose={vi.fn()} title="Test Activity Modal">

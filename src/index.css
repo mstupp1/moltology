@@ -943,10 +943,20 @@
 @keyframes oracle-chats-enter {
   from {
     opacity: 0;
-    transform: translateX(0.5rem);
+    transform: translateX(-0.5rem);
   }
   to {
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+@keyframes sidebar-content-expanded {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sidebar-content-compact {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

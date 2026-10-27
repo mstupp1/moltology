@@ -196,7 +196,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
     })
   })
 
-  it('resets conversation to new chat screen when clicking New Chat button', async () => {
+  it('resets conversation directly from the header New chat button', async () => {
     render(<AIChatPanel userId="usr_valid_user" />)
 
     const shortcutBtn = screen.getByRole('button', { name: /what is moltology/i })
@@ -210,7 +210,6 @@ describe('AIChatPanel Guest Mode Gating', () => {
     expect(screen.getByText('What is Moltology and why should I molt?')).toBeInTheDocument()
     expect(screen.queryByText(/Welcome! I am the/i)).not.toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Open chats' }))
     const newChatBtn = screen.getByRole('button', { name: /^New Chat$/i })
     expect(newChatBtn).toBeInTheDocument()
     fireEvent.click(newChatBtn)
@@ -276,12 +275,20 @@ describe('AIChatPanel Chats List Panel', () => {
     vi.restoreAllMocks()
   })
 
-  it('renders Chats button in header for desktop / compact panel', () => {
+  it('shows an icon-only New chat beside Open chats and hides it while chats are expanded', () => {
     render(<AIChatPanel userId="usr_valid_user" />)
     const chatsBtn = screen.getByRole('button', { name: /(Open|Collapse) chats/i })
     expect(chatsBtn).toBeInTheDocument()
     expect(chatsBtn).toHaveAttribute('title', 'Open chats')
-    expect(screen.queryByRole('button', { name: 'New Chat' })).not.toBeInTheDocument()
+    const newChatBtn = screen.getByRole('button', { name: 'New chat' })
+    expect(chatsBtn.nextElementSibling).toBe(newChatBtn)
+    expect(newChatBtn).toHaveTextContent('')
+    expect(newChatBtn).toHaveAttribute('title', 'New chat (Ctrl+Shift+O)')
+    fireEvent.click(chatsBtn)
+    expect(screen.queryByRole('button', { name: 'New chat' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'New Chat' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse chats' }))
+    expect(screen.getByRole('button', { name: 'New chat' })).toBeInTheDocument()
   })
 
   it('reveals focused search, filters chats, and handles Escape before collapsing', async () => {
@@ -392,6 +399,10 @@ describe('AIChatPanel Chats List Panel', () => {
       'You have 50 conversations. Delete one to start another.'
     )
     fireEvent.click(screen.getByRole('button', { name: 'Collapse chats' }))
+    expect(screen.getByRole('button', { name: 'New chat' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'New chat' })).toHaveAttribute(
+      'title', 'You have 50 conversations. Delete one to start another.'
+    )
     fireEvent.click(screen.getByRole('button', { name: /what is moltology/i }))
     expect(await screen.findByText('You have 50 conversations. Delete one to start another.')).toBeInTheDocument()
 
@@ -585,6 +596,8 @@ describe('AIChatPanel Chats List Panel', () => {
     expect(panel).toHaveAttribute('aria-hidden', 'true')
     expect(panel).toHaveAttribute('inert')
     expect(panel.className).toContain('opacity-0')
+    expect(panel).toHaveClass('-translate-x-2')
+    expect(panel.className).not.toMatch(/transition-\[[^\]]*width/)
     await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
 
     fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
@@ -593,7 +606,19 @@ describe('AIChatPanel Chats List Panel', () => {
     await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
   })
 
-  it('opens a chats column when the Oracle window is wide', async () => {
+  it.each([480, 640, 767])('uses a takeover at %ipx of available space even on desktop', async (width) => {
+    const measurement = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(width)
+    try {
+      render(<AIChatPanel />)
+      fireEvent.click(screen.getByRole('button', { name: 'Open chats' }))
+      expect(screen.getByTestId('oracle-chats-panel')).toHaveAttribute('data-chats-layout', 'takeover')
+      expect(screen.queryByRole('textbox', { name: 'Message' })).not.toBeInTheDocument()
+    } finally {
+      measurement.mockRestore()
+    }
+  })
+
+  it.each([768, 900])('opens a fixed-width chats column at %ipx', async (width) => {
     const { getAIThreadsFn } = await import('@/lib/server/api')
     ;(getAIThreadsFn as any).mockResolvedValue([
       { id: 'thread-1', title: 'First Carcinization Consultation' },
@@ -605,7 +630,7 @@ describe('AIChatPanel Chats List Panel', () => {
         resizeListeners.push(cb)
       }
       observe() {
-        resizeListeners.forEach((cb) => cb([{ contentRect: { width: 720 } }]))
+        resizeListeners.forEach((cb) => cb([{ contentRect: { width } }]))
       }
       disconnect() {}
       unobserve() {}
@@ -619,7 +644,8 @@ describe('AIChatPanel Chats List Panel', () => {
     await waitFor(() => {
       expect(panel).toHaveAttribute('data-chats-layout', 'column')
     })
-    expect(panel).toHaveClass('w-64', 'shrink-0')
+    expect(panel).toHaveClass('w-72', 'shrink-0', 'absolute')
+    expect(panel.previousElementSibling).toHaveClass('w-72', 'shrink-0')
     expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
     expect(screen.getByText('First Carcinization Consultation')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /First Carcinization Consultation/i }))

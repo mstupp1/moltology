@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
+import { useModalPanelFocus } from '@/hooks/useModalPanelFocus'
 import { useNavigate, useLocation, useRouter } from '@tanstack/react-router'
 import {
 
@@ -89,6 +90,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     setPendingRoute(null)
   }, [currentRoute])
 
+  const mobileCloseTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const mobileFrames = React.useRef<number[]>([])
+  const mobileTriggerRef = React.useRef<HTMLButtonElement>(null)
+  const mobileDialogRef = React.useRef<HTMLDivElement>(null)
+  const [isNavAnimating, setIsNavAnimating] = useState(false)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [isMobileClosing, setIsMobileClosing] = useState(false)
   const [isMobileVisible, setIsMobileVisible] = useState(false)
@@ -120,29 +126,51 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     setIsMounted(true)
   }, [])
 
+  const cancelMobileTransition = () => {
+    if (mobileCloseTimer.current) clearTimeout(mobileCloseTimer.current)
+    mobileFrames.current.forEach(cancelAnimationFrame)
+    mobileFrames.current = []
+  }
+  useEffect(() => () => cancelMobileTransition(), [])
+
+  useEffect(() => {
+    setIsNavAnimating(true)
+    const timer = setTimeout(() => setIsNavAnimating(false), window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : 200)
+    return () => clearTimeout(timer)
+  }, [isCollapsed])
+
   const openMobileMenu = () => {
+    cancelMobileTransition()
     setIsMobileOpen(true)
     setIsMobileClosing(false)
-    if (typeof window !== 'undefined') {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setIsMobileVisible(true)
-        })
-      })
-    } else {
-      setIsMobileVisible(true)
-    }
+    mobileFrames.current.push(requestAnimationFrame(() => {
+      mobileFrames.current.push(requestAnimationFrame(() => setIsMobileVisible(true)))
+    }))
   }
 
   const closeMobileMenu = (callback?: () => void) => {
+    cancelMobileTransition()
     setIsMobileVisible(false)
     setIsMobileClosing(true)
-    setTimeout(() => {
+    mobileTriggerRef.current?.focus()
+    mobileCloseTimer.current = setTimeout(() => {
       setIsMobileOpen(false)
       setIsMobileClosing(false)
-      if (callback) callback()
-    }, 200)
+      callback?.()
+    }, window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : 200)
   }
+
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth < 768) return
+      cancelMobileTransition()
+      setIsMobileOpen(false)
+      setIsMobileClosing(false)
+      setIsMobileVisible(false)
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
   const toggleMobileMenu = () => {
     if (isMobileOpen && !isMobileClosing) {
@@ -703,6 +731,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     })
   }
 
+  useModalPanelFocus(isMobileOpen && !isMobileClosing && isMounted, mobileDialogRef, mobileTriggerRef)
+
+  const desktopContentAnimation = isMounted
+    ? `${isCollapsed ? 'animate-[sidebar-content-compact_200ms_ease-out]' : 'animate-[sidebar-content-expanded_200ms_ease-out]'} motion-reduce:animate-none`
+    : ''
   const isMobileHeaderOpen = isMobileOpen && !isMobileClosing
 
   return (
@@ -719,8 +752,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         className={`w-full ${
           isCollapsed ? 'md:w-20' : 'md:w-72'
         } h-auto md:h-full md:min-h-0 md:max-h-full bg-surface-1 border-b-0 md:border-r border-line-subtle flex flex-col select-none relative z-40 md:z-50 shrink-0 shadow-2xl ${
-          isMounted ? 'transition-all duration-300 ease-in-out' : ''
-        } group/sidebar overflow-visible`}
+          isMounted ? 'transition-[width] duration-200 ease-out motion-reduce:transition-none' : ''
+        } group/sidebar ${isNavAnimating ? 'md:overflow-hidden' : 'overflow-visible'}`}
       >
         {/* Mobile Top Bar (Transitions between HeaderBrand and Progress Bar when hamburger menu is toggled) */}
         <div className="flex md:hidden items-center justify-between gap-2 px-2.5 py-2 h-14 bg-surface-1 border-b border-line-subtle relative z-50 shrink-0 overflow-hidden">
@@ -736,7 +769,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
           {/* Left Brand Area (Visible when menu is closed, slides smoothly back into view when closing) */}
           <div
-            className={`flex items-center min-w-0 z-10 transition-all duration-200 ease-out ${
+            className={`flex items-center min-w-0 z-10 transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${
               isMobileHeaderOpen
                 ? 'opacity-0 -translate-x-4 pointer-events-none absolute left-2.5'
                 : 'opacity-100 translate-x-0 relative flex-1'
@@ -770,6 +803,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
             {/* Hamburger / Close Menu Toggle Button */}
             <button
+              ref={mobileTriggerRef}
               onClick={toggleMobileMenu}
               aria-label={isMobileHeaderOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isMobileHeaderOpen}
@@ -788,9 +822,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         {/* Desktop Header Logo */}
         <div
           className={`hidden md:flex items-center shrink-0 relative group/brand border-b border-line-subtle h-16 overflow-visible ${
-            isMounted ? 'transition-all duration-300' : ''
+            desktopContentAnimation
           } ${
-            isCollapsed ? 'justify-center px-2' : 'justify-start px-3'
+            isCollapsed ? 'w-20 justify-center px-2' : 'w-72 justify-start px-3'
           }`}
         >
           <HeaderBrand
@@ -836,7 +870,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         </div>
 
         {/* Desktop Sidebar Navigation Container */}
-        <div className="hidden md:flex flex-1 flex-col justify-between space-y-0 overflow-visible min-h-0">
+        <div className={`hidden md:flex flex-1 flex-col justify-between space-y-0 overflow-visible min-h-0 shrink-0 ${desktopContentAnimation} ${isCollapsed ? 'w-20' : 'w-72'}`}>
           {/* Search Bar — full width, above nav */}
           <div className="shrink-0 border-b border-line-subtle">
             <button
@@ -1163,10 +1197,14 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         typeof document !== 'undefined' &&
         createPortal(
           <div
+            ref={mobileDialogRef}
+            tabIndex={-1}
+            inert={isMobileClosing}
+            aria-hidden={isMobileClosing}
             role="dialog"
             aria-modal="true"
             aria-label="Navigation Menu"
-            className={`md:hidden fixed inset-x-0 bottom-0 top-14 z-[99990] w-screen h-[calc(100dvh-3.5rem)] bg-abyss flex flex-col font-sans text-ink select-none overflow-hidden transition-all duration-250 ease-out ${
+            className={`md:hidden fixed inset-x-0 bottom-0 top-14 z-[99990] w-screen h-[calc(100dvh-3.5rem)] bg-abyss flex flex-col font-sans text-ink select-none overflow-hidden transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${
               isMobileVisible && !isMobileClosing
                 ? 'opacity-100 translate-y-0'
                 : 'opacity-0 -translate-y-2 pointer-events-none'
