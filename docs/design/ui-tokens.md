@@ -20,6 +20,9 @@ says when to use each. New UI uses these and the primitives in `src/components/u
 The `line-*` and `*-soft` tokens already include alpha. Tailwind 4 opacity modifiers
 apply to those colors too, so `/50` makes them more transparent.
 
+Text selection defaults to `selection:bg-cyan-glow/30 selection:text-ink`: a muted
+cyan wash with light text, so selected passages stay readable without a solid signal fill.
+
 ### Brand artwork
 
 The Synaptic Path emblem uses `crimson-aggro` (`#ff453a`) in production. The
