@@ -991,11 +991,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                 {isAwayFromBottom && (
                   <button
                     type="button"
+                    aria-label="Jump to latest"
                     onClick={handleJumpToLatest}
-                    className="absolute bottom-14 left-1/2 -translate-x-1/2 z-20 inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-surface-2 border border-line shadow-menu text-xs text-ink-body hover:text-ink hover:border-line-hover transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow animate-in fade-in slide-in-from-bottom-1 duration-150"
+                    className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 inline-flex size-8 items-center justify-center rounded-full bg-surface-2 border border-line shadow-menu text-ink-body hover:text-ink hover:border-line-hover transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow animate-in fade-in slide-in-from-bottom-1 duration-150"
                   >
                     <ArrowDown className="w-3.5 h-3.5" />
-                    <span>Jump to latest</span>
                   </button>
                 )}
               </div>
