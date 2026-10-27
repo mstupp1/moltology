@@ -75,7 +75,7 @@ export async function readEmailSignupGate(
   const body = await readSignupBody(request)
   const elapsedMs = parseSignupElapsedMs(body[SIGNUP_ELAPSED_FIELD])
   if (!honeypotTripped(body[SIGNUP_HONEYPOT_FIELD])) {
-    return { kind: 'pass', telemetry: { elapsedMs, fast: isFastSignup(elapsedMs) } }
+    return { kind: 'pass', telemetry: { elapsedMs, fast: isFastSignup(elapsedMs), emailOptIn: body.emailOptIn === true } }
   }
 
   const record = deps?.record ?? recordSignupRiskEvent

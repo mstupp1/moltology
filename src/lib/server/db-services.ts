@@ -3116,116 +3116,46 @@ export async function submitLeadHandler(args: ServerFnArgs<SubmitLeadInput>) {
   const referrer = validated.referrer || null
   const emailOptIn = validated.emailOptIn ?? false
 
-  // Every lead form sends a Turnstile token, so a missing one is treated as a bot.
-  const verification = await verifyTurnstileToken({
-    token: validated.turnstileToken,
-    expectedAction: LEAD_CAPTURE_TURNSTILE_ACTION,
-  })
-  if (!verification.success) {
-    throw new Error(verification.errorMessage || 'Bot protection check failed. Please try again.')
-  }
-
+  const verification = await verifyTurnstileToken({ token: validated.turnstileToken, expectedAction: LEAD_CAPTURE_TURNSTILE_ACTION })
+  if (!verification.success) throw new Error(verification.errorMessage || 'Bot protection check failed. Please try again.')
   const downloadUrl = getAbsoluteAssetUrl(GUIDE_PDF_KEY)
-
+  let isExisting = false
+  let marketingStatus: 'pending' | 'subscribed' | 'error' | undefined
   try {
     const db = getDb()
-    if (db) {
-      const existing = await db
-        .select()
-        .from(leads)
-        .where(eq(leads.email, normalizedEmail))
-        .limit(1)
-
-      if (existing.length > 0) {
-        if (emailOptIn && !existing[0].emailOptIn) {
-          await db
-            .update(leads)
-            .set({
-              emailOptIn: true,
-              emailOptInAt: new Date(),
-              updatedAt: new Date(),
-            })
-            .where(eq(leads.id, existing[0].id))
-        }
-
-        return {
-          success: true,
-          isExisting: true,
-          email: normalizedEmail,
-          downloadUrl,
-          message: 'Biometric telemetry confirmed. Dossier transmission unlocked.',
-        }
-      }
-
-      await db.insert(leads).values({
-        email: normalizedEmail,
-        source,
-        referrer,
-        claimedPdf: true,
-        convertedToUser: false,
-        emailOptIn,
-        emailOptInAt: emailOptIn ? new Date() : null,
-      })
-
-      return {
-        success: true,
-        isExisting: false,
-        email: normalizedEmail,
-        downloadUrl,
-        message: 'New initiate registered. Transmission unlocked.',
-      }
+    const [existing] = await db.select().from(leads).where(eq(leads.email, normalizedEmail)).limit(1)
+    isExisting = Boolean(existing)
+    if (!existing) await db.insert(leads).values({ email: normalizedEmail, source, referrer, claimedPdf: true, emailOptIn: false })
+    if (emailOptIn) {
+      const { requestEmailOptIn } = await import('./email-opt-in')
+      marketingStatus = (await requestEmailOptIn(normalizedEmail, source)).status
     }
-  } catch (error) {
-    console.warn('[ServerFn submitLeadFn] DB insertion fallback:', error)
+  } catch {
+    if (emailOptIn) marketingStatus = 'error'
+    console.warn('[submitLead] Could not save lead preferences.')
   }
-
-  // Graceful fallback if database is in mock or offline mode
-  return {
-    success: true,
-    isExisting: false,
-    email: normalizedEmail,
-    downloadUrl,
-    message: 'Telemetry acknowledged. Offline decryption enabled.',
-  }
+  return { success: true, isExisting, email: normalizedEmail, downloadUrl, marketingStatus,
+    message: 'Your guide is ready.' }
 }
-
 
 // User Email Communication Preferences API
 const updateEmailPreferencesSchema = z.object({
-  emailOptIn: z.boolean(),
-  source: z.string().optional(),
-  token: z.string().optional(),
-  userId: z.string().optional(),
+  emailOptIn: z.boolean(), source: z.string().optional(), token: z.string().optional(), userId: z.string().optional(),
 })
-
 export type UpdateEmailPreferencesInput = z.input<typeof updateEmailPreferencesSchema>
 
 export async function updateEmailPreferencesHandler({ data, context }: ServerFnArgs<UpdateEmailPreferencesInput>) {
   const auth = await resolveWriteAuth({ data, context })
-  if (!auth) {
-    throw new Error('Authentication required to update email preferences.')
-  }
-
+  if (!auth) throw new Error('Authentication required to update email preferences.')
   const validated = updateEmailPreferencesSchema.parse(data || {})
-  const { userId, dbClient } = auth
-
-  const [updated] = await dbClient
-    .update(profiles)
-    .set({
-      emailOptIn: validated.emailOptIn,
-      emailOptInAt: validated.emailOptIn ? new Date() : null,
-      emailOptInSource: validated.source || 'profile_settings',
-      updatedAt: new Date(),
-    })
-    .where(eq(profiles.id, userId))
-    .returning()
-
-  return {
-    success: true,
-    emailOptIn: updated?.emailOptIn ?? validated.emailOptIn,
-  }
+  const { authUser } = await import('../../db/schema')
+  const [user] = await auth.dbClient.select({ email: authUser.email }).from(authUser).where(eq(authUser.id, auth.userId)).limit(1)
+  if (!user) throw new Error('Could not find your account.')
+  const { setEmailPreference } = await import('./email-opt-in')
+  const result = await setEmailPreference(user.email, validated.emailOptIn, 'settings_page')
+  if (result.status === 'error') throw new Error('Could not send your subscription confirmation. Please try again.')
+  return { success: true, emailOptIn: result.status === 'subscribed', confirmationPending: validated.emailOptIn && result.status === 'pending' }
 }
-
 
 // Legacy avatar preferences adapter; shares the unified character persistence contract.
 const lobsterAvatarConfigSchema = z.object({

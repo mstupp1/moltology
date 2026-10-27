@@ -76,6 +76,7 @@ import { Route as HudLecturesIndexRouteImport } from './routes/_hud/lectures/ind
 import { Route as HudMemberProfileIdRouteImport } from './routes/_hud/member/$profileId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiEmailConfirmRouteImport } from './routes/api/email/confirm'
+import { Route as ApiEmailWebhookRouteImport } from './routes/api/email/webhook'
 import { Route as ApiPrintfulWebhookRouteImport } from './routes/api/printful/webhook'
 import { Route as ApiStoreRecoveryRouteImport } from './routes/api/store/recovery'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
@@ -425,6 +426,11 @@ const ApiEmailConfirmRoute = ApiEmailConfirmRouteImport.update({
   path: '/api/email/confirm',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiEmailWebhookRoute = ApiEmailWebhookRouteImport.update({
+  id: '/api/email/webhook',
+  path: '/api/email/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPrintfulWebhookRoute = ApiPrintfulWebhookRouteImport.update({
   id: '/api/printful/webhook',
   path: '/api/printful/webhook',
@@ -550,6 +556,7 @@ export interface FileRoutesByFullPath {
   '/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/email/confirm': typeof ApiEmailConfirmRoute
+  '/api/email/webhook': typeof ApiEmailWebhookRoute
   '/api/printful/webhook': typeof ApiPrintfulWebhookRoute
   '/api/store/recovery': typeof ApiStoreRecoveryRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
@@ -626,6 +633,7 @@ export interface FileRoutesByTo {
   '/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/email/confirm': typeof ApiEmailConfirmRoute
+  '/api/email/webhook': typeof ApiEmailWebhookRoute
   '/api/printful/webhook': typeof ApiPrintfulWebhookRoute
   '/api/store/recovery': typeof ApiStoreRecoveryRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
@@ -706,6 +714,7 @@ export interface FileRoutesById {
   '/_hud/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/email/confirm': typeof ApiEmailConfirmRoute
+  '/api/email/webhook': typeof ApiEmailWebhookRoute
   '/api/printful/webhook': typeof ApiPrintfulWebhookRoute
   '/api/store/recovery': typeof ApiStoreRecoveryRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
@@ -787,6 +796,7 @@ export interface FileRouteTypes {
     | '/member/$profileId'
     | '/api/auth/$'
     | '/api/email/confirm'
+    | '/api/email/webhook'
     | '/api/printful/webhook'
     | '/api/store/recovery'
     | '/api/stripe/webhook'
@@ -863,6 +873,7 @@ export interface FileRouteTypes {
     | '/member/$profileId'
     | '/api/auth/$'
     | '/api/email/confirm'
+    | '/api/email/webhook'
     | '/api/printful/webhook'
     | '/api/store/recovery'
     | '/api/stripe/webhook'
@@ -942,6 +953,7 @@ export interface FileRouteTypes {
     | '/_hud/member/$profileId'
     | '/api/auth/$'
     | '/api/email/confirm'
+    | '/api/email/webhook'
     | '/api/printful/webhook'
     | '/api/store/recovery'
     | '/api/stripe/webhook'
@@ -996,6 +1008,7 @@ export interface RootRouteChildren {
   NewsIndexRoute: typeof NewsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiEmailConfirmRoute: typeof ApiEmailConfirmRoute
+  ApiEmailWebhookRoute: typeof ApiEmailWebhookRoute
   ApiPrintfulWebhookRoute: typeof ApiPrintfulWebhookRoute
   ApiStoreRecoveryRoute: typeof ApiStoreRecoveryRoute
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
@@ -1472,6 +1485,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiEmailConfirmRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/email/webhook': {
+      id: '/api/email/webhook'
+      path: '/api/email/webhook'
+      fullPath: '/api/email/webhook'
+      preLoaderRoute: typeof ApiEmailWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/printful/webhook': {
       id: '/api/printful/webhook'
       path: '/api/printful/webhook'
@@ -1718,6 +1738,7 @@ const rootRouteChildren: RootRouteChildren = {
   NewsIndexRoute: NewsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiEmailConfirmRoute: ApiEmailConfirmRoute,
+  ApiEmailWebhookRoute: ApiEmailWebhookRoute,
   ApiPrintfulWebhookRoute: ApiPrintfulWebhookRoute,
   ApiStoreRecoveryRoute: ApiStoreRecoveryRoute,
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,

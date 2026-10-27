@@ -126,7 +126,7 @@ describe('submitContactFormHandler', () => {
     })
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     await expect(submitContactFormHandler({ data: { ...validData, emailOptIn: true } })).resolves.toEqual({
-      success: true,
+      success: true, marketingStatus: 'error',
     })
     warn.mockRestore()
   })

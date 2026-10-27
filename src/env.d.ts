@@ -22,6 +22,10 @@ declare global {
       readonly GOOGLE_CLIENT_SECRET?: string
       readonly RESEND_API_KEY?: string
       readonly RESEND_FROM_EMAIL?: string
+      readonly RESEND_LEADS_SEGMENT_ID?: string
+      readonly RESEND_USERS_SEGMENT_ID?: string
+      readonly RESEND_ALL_SUBSCRIBERS_SEGMENT_ID?: string
+      readonly RESEND_WEBHOOK_SECRET?: string
       readonly EMAIL_VERIFICATION_ENABLED?: string
       readonly NODE_ENV?: 'development' | 'production' | 'test'
     }

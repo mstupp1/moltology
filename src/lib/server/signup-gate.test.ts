@@ -21,7 +21,14 @@ describe('email signup gate', () => {
 
   it('passes a blank honeypot and keeps a fast completion as telemetry', async () => {
     const gate = await readEmailSignupGate(signupRequest({ email: 'ada@example.com', confirm_website: '', signupElapsedMs: 400 }))
-    expect(gate).toEqual({ kind: 'pass', telemetry: { elapsedMs: 400, fast: true } })
+    expect(gate).toEqual({ kind: 'pass', telemetry: { elapsedMs: 400, fast: true, emailOptIn: false } })
+  })
+
+  it('only accepts an explicit boolean marketing choice', async () => {
+    for (const [value, expected] of [[true, true], [false, false], ['true', false]]) {
+      const gate = await readEmailSignupGate(signupRequest({ emailOptIn: value }))
+      expect(gate.kind === 'pass' && gate.telemetry?.emailOptIn).toBe(expected)
+    }
   })
 
   it('rejects a filled honeypot without calling the model and records the event', async () => {

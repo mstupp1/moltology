@@ -24,6 +24,7 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
   const { heavyVfxDisabled, toggleHeavyVfx } = useHeavyVfx()
 
   const [emailOptIn, setEmailOptIn] = useState(false)
+  const [emailSaving, setEmailSaving] = useState(false)
   const [designation, setDesignation] = useState('')
   const [savedDesignation, setSavedDesignation] = useState('')
   const [loading, setLoading] = useState(true)
@@ -54,13 +55,14 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
   }, [loadProfile])
 
   const toggleEmailOptIn = async () => {
-    if (!userId) return
+    if (!userId || emailSaving) return
+    setEmailSaving(true)
     const nextState = !emailOptIn
     setEmailOptIn(nextState)
     try {
       await persist.run('settings-email', async () => {
         const token = await getAuthJWTToken()
-        await updateEmailPreferencesFn({
+        const result = await updateEmailPreferencesFn({
           data: {
             emailOptIn: nextState,
             source: 'settings_page',
@@ -68,10 +70,14 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
             token: token ?? undefined,
           },
         })
+        setEmailOptIn(result.emailOptIn)
+        if (result.confirmationPending) toast.info('Check your email to confirm your subscription.')
       })
     } catch {
       setEmailOptIn(!nextState)
-      toast.error('Could not update email preferences.')
+      toast.error('Could not update email preferences. Please try again.')
+    } finally {
+      setEmailSaving(false)
     }
   }
 
@@ -202,6 +208,7 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
                   type="button"
                   role="switch"
                   aria-checked={emailOptIn}
+                  disabled={emailSaving}
                   aria-label="Toggle email updates"
                   onClick={toggleEmailOptIn}
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${

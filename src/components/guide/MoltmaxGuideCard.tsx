@@ -1,3 +1,4 @@
+import { useOptionalToast } from '@/components/ui/ToastProvider'
 /**
  * ============================================================================
  * MOLTMAXXING GUIDE EMBEDDED SHOWCASE CARD
@@ -32,6 +33,7 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
   variant = 'full',
 }) => {
   const [email, setEmail] = useState('')
+  const toast = useOptionalToast()?.toast
   const [emailOptIn, setEmailOptIn] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
@@ -65,6 +67,8 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
       })
 
       if (res?.success) {
+        if (res.marketingStatus === 'pending') toast?.info('Check your email to confirm your subscription.')
+        if (res.marketingStatus === 'error') toast?.warning('Your guide is ready, but we could not send your subscription confirmation. Please try subscribing again.')
         setIsSubmitted(true)
         const url = guidePdfUrl(res.downloadUrl)
         if (typeof window !== 'undefined') {

@@ -1,3 +1,4 @@
+import { useOptionalToast } from '@/components/ui/ToastProvider'
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Lock, Mail, AlertCircle, Loader2 } from 'lucide-react'
@@ -13,7 +14,7 @@ import {
 import { useAuthSession } from '../hooks/useAuthSession'
 import { rememberSessionUser, startGoogleSignIn } from '../lib/auth-session'
 import { getAuthJWTToken } from '../lib/jwt'
-import { getUserProfileFn, updateEmailPreferencesFn } from '../lib/server/api'
+import { getUserProfileFn } from '../lib/server/api'
 import { HudCard, HudInput, HudButton } from '@/components/ui'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 import { SignupHoneypot, useSignupSignals } from '@/components/auth/SignupSignals'
@@ -31,6 +32,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onSuccess,
   initialMode = 'signup',
 }) => {
+  const toast = useOptionalToast()?.toast
   const session = useAuthSession()
   const user = session.user
 
@@ -88,16 +90,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     source: string
   }) => {
     const token = await getAuthJWTToken()
-    if (opts.emailOptIn) {
-      await updateEmailPreferencesFn({
-        data: {
-          emailOptIn: true,
-          source: opts.source,
-          userId: opts.userId,
-          token: token ?? undefined,
-        },
-      }).catch(() => {})
-    }
     await getUserProfileFn({ data: { token: token ?? undefined, userId: opts.userId } }).catch(() => {})
   }
 
@@ -160,7 +152,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           name: 'Initiate',
           callbackURL,
           ...signupSignals.fields(),
+          ...{ emailOptIn },
         })
+        if ((res?.data as { emailPreferenceError?: boolean } | undefined)?.emailPreferenceError) {
+          toast?.warning('Your account was created, but your email subscription could not be saved. Try again in settings.')
+        }
         if (res?.error) {
           setError(res.error.message || 'Could not create account. Please check your details and try again.')
         } else if (shouldHoldSignupForVerification(res, isEmailVerificationEnabled())) {

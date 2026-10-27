@@ -17,6 +17,11 @@ function getRawEnv(): Record<string, unknown> {
     TURNSTILE_SECRET_KEY: processEnv.TURNSTILE_SECRET_KEY || importMetaEnv.TURNSTILE_SECRET_KEY,
     RESEND_API_KEY: processEnv.RESEND_API_KEY || importMetaEnv.RESEND_API_KEY,
     RESEND_FROM_EMAIL: processEnv.RESEND_FROM_EMAIL || importMetaEnv.RESEND_FROM_EMAIL,
+    RESEND_LEADS_SEGMENT_ID: processEnv.RESEND_LEADS_SEGMENT_ID || importMetaEnv.RESEND_LEADS_SEGMENT_ID,
+    RESEND_USERS_SEGMENT_ID: processEnv.RESEND_USERS_SEGMENT_ID || importMetaEnv.RESEND_USERS_SEGMENT_ID,
+    RESEND_ALL_SUBSCRIBERS_SEGMENT_ID: processEnv.RESEND_ALL_SUBSCRIBERS_SEGMENT_ID || importMetaEnv.RESEND_ALL_SUBSCRIBERS_SEGMENT_ID,
+    RESEND_WEBHOOK_SECRET: processEnv.RESEND_WEBHOOK_SECRET || importMetaEnv.RESEND_WEBHOOK_SECRET,
+
     NODE_ENV: processEnv.NODE_ENV || importMetaEnv.MODE,
   }
 }
@@ -37,6 +42,11 @@ export const envSchema = z.object({
   TURNSTILE_SECRET_KEY: z.string().default('1x0000000000000000000000000000000AA'),
   RESEND_API_KEY: z.string().optional(),
   RESEND_FROM_EMAIL: z.string().optional(),
+  RESEND_LEADS_SEGMENT_ID: z.string().optional(),
+  RESEND_USERS_SEGMENT_ID: z.string().optional(),
+  RESEND_ALL_SUBSCRIBERS_SEGMENT_ID: z.string().optional(),
+  RESEND_WEBHOOK_SECRET: z.string().optional(),
+
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 })
 

@@ -264,7 +264,7 @@ export const OrgPage: React.FC = () => {
     setContactError(null)
     setIsContactSubmitting(true)
     try {
-      await submitContactFormFn({
+      const result = await submitContactFormFn({
         data: {
           name: validated.name,
           email: validated.email,
@@ -275,6 +275,8 @@ export const OrgPage: React.FC = () => {
           [CONTACT_HONEYPOT_FIELD]: contactHoneypot,
         },
       })
+      setContactOptInPending(result.marketingStatus === 'pending')
+      if (result.marketingStatus === 'error') toast.warning('Your message was sent, but we could not send your subscription confirmation. Please try subscribing again.')
     } catch (error) {
       setIsContactSubmitting(false)
       setContactTurnstileToken(null)
@@ -286,7 +288,6 @@ export const OrgPage: React.FC = () => {
     setIsContactSubmitting(false)
     setContactTurnstileToken(null)
     setContactSentTo(validated.email)
-    setContactOptInPending(contactForm.emailOptIn)
     setContactForm(EMPTY_CONTACT_FORM)
     toast.success(CONTACT_COPY.toastSent, { id: 'org-contact' })
   }

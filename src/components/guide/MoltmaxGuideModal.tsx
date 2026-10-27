@@ -1,3 +1,4 @@
+import { useOptionalToast } from '@/components/ui/ToastProvider'
 /**
  * ============================================================================
  * MOLTMAXXING GUIDE LEAD CAPTURE MODAL
@@ -73,6 +74,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
   source = 'moltmax_guide_modal',
 }) => {
   const [email, setEmail] = useState('')
+  const toast = useOptionalToast()?.toast
   const [emailOptIn, setEmailOptIn] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const turnstileRef = useRef<TurnstileWidgetRef>(null)
@@ -136,6 +138,8 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
       })
 
       if (res?.success) {
+        if (res.marketingStatus === 'pending') toast?.info('Check your email to confirm your subscription.')
+        if (res.marketingStatus === 'error') toast?.warning('Your guide is ready, but we could not send your subscription confirmation. Please try subscribing again.')
         const url = guidePdfUrl(res.downloadUrl)
         setDownloadUrl(url)
         setStep('success')

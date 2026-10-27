@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 import { SettingsPage } from './SettingsPage'
+import { updateEmailPreferencesFn } from '@/lib/server/api'
 
 vi.mock('@tanstack/react-router', () => ({ Link: ({to,children,...props}:any) => <a href={to} {...props}>{children}</a> }))
 
@@ -93,6 +94,24 @@ describe('SettingsPage', () => {
     expect(toggle).toHaveAttribute('aria-checked', 'false')
     expect(screen.getByText(/Hidden — reduces motion and battery use/i)).toBeInTheDocument()
     expect(localStorage.getItem('moltology_heavy_vfx_disabled')).toBe('true')
+  })
+
+  it('keeps an unconfirmed subscription off and asks the member to check email', async () => {
+    vi.mocked(updateEmailPreferencesFn).mockResolvedValueOnce({ success: true, emailOptIn: false, confirmationPending: true })
+    render(<ToastProvider><SettingsPage /></ToastProvider>)
+    const toggle = await screen.findByRole('switch', { name: /toggle email updates/i })
+    fireEvent.click(toggle)
+    expect(await screen.findByText('Check your email to confirm your subscription.')).toBeInTheDocument()
+    expect(toggle).toHaveAttribute('aria-checked', 'false')
+  })
+
+  it('restores the previous preference and reports a failed update', async () => {
+    vi.mocked(updateEmailPreferencesFn).mockRejectedValueOnce(new Error('offline'))
+    render(<ToastProvider><SettingsPage /></ToastProvider>)
+    const toggle = await screen.findByRole('switch', { name: /toggle email updates/i })
+    fireEvent.click(toggle)
+    expect(await screen.findByText('Could not update email preferences. Please try again.')).toBeInTheDocument()
+    expect(toggle).toHaveAttribute('aria-checked', 'false')
   })
 
   it('links to the unified character studio instead of a second editor', async () => {

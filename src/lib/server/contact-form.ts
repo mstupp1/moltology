@@ -39,7 +39,7 @@ interface ServerFnArgs {
  * to support@moltology.org with reply-to set to the sender. Nothing is stored,
  * so a failed send is reported to the visitor instead of silently dropped.
  */
-export async function submitContactFormHandler(args: ServerFnArgs): Promise<{ success: true }> {
+export async function submitContactFormHandler(args: ServerFnArgs): Promise<{ success: true; marketingStatus?: 'pending' | 'subscribed' | 'error' }> {
   const raw = (args.data ?? {}) as Partial<SubmitContactFormInput>
   if (isContactHoneypotTriggered(raw[CONTACT_HONEYPOT_FIELD])) {
     return { success: true }
@@ -83,7 +83,8 @@ export async function submitContactFormHandler(args: ServerFnArgs): Promise<{ su
   }
 
   if (data.emailOptIn) {
-    await requestEmailOptIn(validated.email, 'org_contact')
+    const result = await requestEmailOptIn(validated.email, 'org_contact')
+    return { success: true, marketingStatus: result.status }
   }
 
   return { success: true }

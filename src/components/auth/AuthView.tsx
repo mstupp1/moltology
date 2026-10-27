@@ -1,3 +1,4 @@
+import { useOptionalToast } from '@/components/ui/ToastProvider'
 import React, { useState, useEffect } from 'react'
 import { BrandIcon } from '@/components/ui/BrandMark'
 import { useNavigate, Link } from '@tanstack/react-router'
@@ -27,7 +28,7 @@ import {
 import type { AuthSearch } from '@/lib/auth-search'
 import '@/styles/crt.css'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { getUserProfileFn, updateEmailPreferencesFn } from '@/lib/server/api'
+import { getUserProfileFn } from '@/lib/server/api'
 import { getAssetUrl } from '@/lib/assets'
 import { MainFooter } from '@/components/MainFooter'
 import { HudCard, HudInput, HudButton, HeaderBrand } from '@/components/ui'
@@ -36,6 +37,7 @@ import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/Turnstile
 import { SignupHoneypot, useSignupSignals } from '@/components/auth/SignupSignals'
 
 export default function AuthView({ search }: { search: AuthSearch }) {
+  const toast = useOptionalToast()?.toast
   abandonOAuthPendingIfCallbackError(search.error)
   const navigate = useNavigate()
   const session = useAuthSession()
@@ -73,16 +75,6 @@ export default function AuthView({ search }: { search: AuthSearch }) {
     source: string
   }) => {
     const token = await getAuthJWTToken()
-    if (opts.emailOptIn) {
-      await updateEmailPreferencesFn({
-        data: {
-          emailOptIn: true,
-          source: opts.source,
-          userId: opts.userId,
-          token: token ?? undefined,
-        },
-      }).catch(() => {})
-    }
     await getUserProfileFn({ data: { token: token ?? undefined, userId: opts.userId } }).catch(() => {})
   }
 
@@ -178,7 +170,11 @@ export default function AuthView({ search }: { search: AuthSearch }) {
           name: 'Initiate',
           callbackURL,
           ...signupSignals.fields(),
+          ...{ emailOptIn },
         })
+        if ((res?.data as { emailPreferenceError?: boolean } | undefined)?.emailPreferenceError) {
+          toast?.warning('Your account was created, but your email subscription could not be saved. Try again in settings.')
+        }
         if (res?.error) {
           setError(res.error.message || 'Sign up failed. Please check your credentials.')
         } else if (shouldHoldSignupForVerification(res, isEmailVerificationEnabled())) {

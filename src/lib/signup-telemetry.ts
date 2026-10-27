@@ -12,6 +12,8 @@ export const SIGNUP_FAST_MS = 1_500
 export const SIGNUP_HONEYPOT_MESSAGE = 'Could not create that account.'
 
 export interface SignupTelemetry {
+  emailOptIn?: boolean
+  marketingError?: boolean
   elapsedMs: number | null
   fast: boolean
 }

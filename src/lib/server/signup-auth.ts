@@ -156,6 +156,10 @@ export const signupAuthAfterHook = createAuthMiddleware(async (ctx) => {
         if (withheld) return withheld
       }
     }
+    if (path.endsWith('/sign-up/email') && readSignupTelemetry()?.marketingError) {
+      const returned = hookCtx.context.returned
+      if (returned && typeof returned === 'object') return { ...returned, emailPreferenceError: true }
+    }
     if (path.endsWith('/sign-in/email')) {
       await rejectChallengedSignIn(hookCtx)
     }

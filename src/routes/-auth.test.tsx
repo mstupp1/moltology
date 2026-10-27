@@ -259,13 +259,8 @@ describe('Auth Split Landing Page Component (/auth)', () => {
 
     await waitFor(() => {
       expect(authClient.signUp.email).toHaveBeenCalled()
-      expect(updateEmailPreferencesFn).toHaveBeenCalledWith({
-        data: {
-          emailOptIn: true,
-          source: 'auth_page',
-          userId: 'user-789',
-        },
-      })
+      expect(authClient.signUp.email).toHaveBeenCalledWith(expect.objectContaining({ emailOptIn: true }))
+      expect(updateEmailPreferencesFn).not.toHaveBeenCalled()
     })
   })
 

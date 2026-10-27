@@ -21,6 +21,8 @@ import {
 } from './auth-config'
 import { EMAIL_VERIFICATION_COPY } from './auth-email-verification'
 import { sendEmailVerificationEmail } from './server/mail'
+import { readSignupTelemetry } from './server/signup-request-state'
+import { confirmSignupMarketing, handleMarketingSignup } from './server/email-opt-in'
 import { persistAdmittedSignup, signupAuthAfterHook, validateSignupUser } from './server/signup-auth'
 
 /**
@@ -128,6 +130,10 @@ export const auth = betterAuth({
     autoSignInAfterVerification: true,
     expiresIn: 3600,
     sendVerificationEmail,
+    afterEmailVerification: async (user) => {
+      try { await confirmSignupMarketing(user) }
+      catch { console.warn('[marketing] Could not activate signup subscription; retry in account settings.') }
+    },
   },
   account: {
     accountLinking: {
@@ -169,6 +175,13 @@ export const auth = betterAuth({
           const { ensureUserProfile } = await import('./user-sync')
           await ensureUserProfile(user.id)
           await persistAdmittedSignup(user)
+          const telemetry = readSignupTelemetry()
+          try {
+            await handleMarketingSignup(user, telemetry?.emailOptIn === true, emailVerificationEnabled)
+          } catch {
+            if (telemetry) telemetry.marketingError = true
+            console.warn('[marketing] Could not update signup subscription; retry in account settings.')
+          }
         },
       },
     },

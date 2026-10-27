@@ -1,9 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const dbMock = { update: vi.fn() }
+const dbMock = { update: vi.fn(), select: vi.fn() }
+vi.mock('./resend-contacts', () => ({ subscribeResendContact: vi.fn(), getResendContact: vi.fn(), moveResendContactToUsers: vi.fn(), unsubscribeResendContact: vi.fn(), MARKETING_UPDATE_ERROR: 'Could not update your email subscription.' }))
 vi.mock('../../db', () => ({ getDb: vi.fn(() => dbMock) }))
 vi.mock('./mail', () => ({ sendTransactionalEmail: vi.fn() }))
 
+import { subscribeResendContact } from './resend-contacts'
 import {
   createEmailOptInToken,
   EMAIL_OPT_IN_TTL_MS,
@@ -39,11 +41,24 @@ describe('handleEmailOptInConfirm', () => {
   })
 
   it('opts in a confirmed address and redirects to /org', async () => {
-    const token = createEmailOptInToken('crab@example.com')
+    const now = Date.now()
+    const token = createEmailOptInToken('crab@example.com', now)
+    const limit = vi.fn().mockResolvedValueOnce([{ emailOptInAt: new Date(now), emailOptIn: false }]).mockResolvedValue([])
+    const query: any = { where: vi.fn(() => query), limit, innerJoin: vi.fn(() => query) }
+    dbMock.select.mockReturnValue({ from: vi.fn(() => query) })
     const res = await handleEmailOptInConfirm(new Request(`https://moltology.org/api/email/confirm?token=${token}`))
     expect(res.status).toBe(303)
     expect(res.headers.get('Location')).toBe('/org?email=confirmed')
+    expect(subscribeResendContact).toHaveBeenCalledWith('crab@example.com', 'leads')
     expect(dbMock.update).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not activate a revoked or superseded request', async () => {
+    const token = createEmailOptInToken('crab@example.com')
+    dbMock.select.mockReturnValue({ from: vi.fn(() => ({ where: vi.fn(() => ({ limit: vi.fn().mockResolvedValue([{ emailOptInAt: null }]) })) })) })
+    const res = await handleEmailOptInConfirm(new Request(`https://moltology.org/api/email/confirm?token=${token}`))
+    expect(res.headers.get('Location')).toBe('/org?email=expired')
+    expect(subscribeResendContact).not.toHaveBeenCalled()
   })
 
   it('does nothing for a bad link', async () => {
