@@ -20,8 +20,8 @@ describe('oracle-chat helpers', () => {
       shortLabel: 'GLM',
       provider: 'zai',
       badge: 'Chat',
-      pricing: { input: '$0.15', output: '$0.50' },
-      latency: '0.4s',
+      pricing: { input: '$0.04', output: '$0.08' },
+      latency: '0.2s',
     })
     expect(DEFAULT_ORACLE_MODEL_ID).toBe('zai/glm-5.3-flash')
     expect(getOracleModel().id).toBe('zai/glm-5.3-flash')
