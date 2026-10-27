@@ -134,7 +134,7 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
           onClick={onNewChat}
           disabled={newChatDisabled}
           title={newChatTitle}
-          className="flex min-h-12 w-full items-center gap-3 rounded-control px-3 text-base text-ink-body hover:bg-surface-2 hover:text-ink disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+          className="flex min-h-11 w-full items-center gap-3 rounded-control px-3 text-base text-ink-body hover:bg-surface-2 hover:text-ink disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
           <SquarePen className="w-5 h-5 shrink-0" aria-hidden="true" />
           New Chat

@@ -26,14 +26,6 @@ export interface ThreadListItemProps {
   onDelete: () => void
 }
 
-const formatDate = (value?: string | Date) =>
-  new Date(value as string).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-
 export const ThreadListItem: React.FC<ThreadListItemProps> = ({
   thread,
   isActive,
@@ -63,7 +55,6 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
   const committedRef = useRef(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isPinned = !!thread.pinnedAt
-  const dateSource = thread.updatedAt || thread.createdAt
 
   useEffect(() => {
     if (isRenaming) {
@@ -168,7 +159,7 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
               title={thread.title}
               aria-current={isActive ? 'true' : undefined}
               className={`flex-1 min-w-0 text-left bg-transparent border-none outline-hidden cursor-pointer select-none focus:outline-hidden focus:ring-0 active:outline-hidden focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
-                isComfortable ? 'px-3 py-3' : 'px-2 py-1.5'
+                isComfortable ? 'min-h-11 px-3 py-3' : 'px-2 py-1.5'
               }`}
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
@@ -178,11 +169,6 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
                 )}
                 <span className="block truncate">{thread.title || 'Untitled Consultation'}</span>
               </span>
-              {dateSource && (
-                <span className="block text-[11px] text-ink-muted font-mono mt-0.5 select-none">
-                  {formatDate(dateSource)}
-                </span>
-              )}
             </button>
 
             <div className="flex items-center shrink-0 pr-1">
