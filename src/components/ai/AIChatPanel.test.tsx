@@ -70,7 +70,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
     expect(message).toHaveValue('Keep my draft')
     expect(message).toBeEnabled()
     expect(streamOracleChat).not.toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
     fireEvent.click(screen.getByRole('button', { name: 'Usage' }))
     expect(screen.getByText('0 of 15 remaining · Past 5 hours')).toBeInTheDocument()
   })
@@ -86,7 +86,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
       render(<AIChatPanel userId="member" threadId={threadId} />)
       expect(await screen.findByRole('textbox', { name: 'Message' })).toBeInTheDocument()
       expect(screen.queryByRole('meter')).not.toBeInTheDocument()
-      fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+      fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
       const usageButton = screen.getByRole('button', { name: 'Usage' })
       expect(usageButton).toHaveAttribute('aria-expanded', 'false')
       const settingsLink = screen.getByRole('link', { name: 'Settings' })
@@ -118,7 +118,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
   it('does not show usage to guests', () => {
     render(<AIChatPanel userId={null} />)
     expect(screen.queryByRole('button', { name: 'Usage' })).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
     expect(screen.queryByRole('link', { name: 'Settings' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Usage' })).not.toBeInTheDocument()
   })
@@ -210,6 +210,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
     expect(screen.getByText('What is Moltology and why should I molt?')).toBeInTheDocument()
     expect(screen.queryByText(/Welcome! I am the/i)).not.toBeInTheDocument()
 
+    fireEvent.click(screen.getByRole('button', { name: 'Open chats' }))
     const newChatBtn = screen.getByRole('button', { name: /^New Chat$/i })
     expect(newChatBtn).toBeInTheDocument()
     fireEvent.click(newChatBtn)
@@ -277,9 +278,68 @@ describe('AIChatPanel Chats List Panel', () => {
 
   it('renders Chats button in header for desktop / compact panel', () => {
     render(<AIChatPanel userId="usr_valid_user" />)
-    const chatsBtn = screen.getByRole('button', { name: /Toggle Chats/i })
+    const chatsBtn = screen.getByRole('button', { name: /(Open|Collapse) chats/i })
     expect(chatsBtn).toBeInTheDocument()
-    expect(chatsBtn).toHaveAttribute('title', 'Chats')
+    expect(chatsBtn).toHaveAttribute('title', 'Open chats')
+    expect(screen.queryByRole('button', { name: 'New Chat' })).not.toBeInTheDocument()
+  })
+
+  it('reveals focused search, filters chats, and handles Escape before collapsing', async () => {
+    const { getAIThreadsFn } = await import('@/lib/server/api')
+    vi.mocked(getAIThreadsFn).mockResolvedValue([
+      { id: 'alpha', title: 'Alpha briefing' },
+      { id: 'bravo', title: 'Bravo notes' },
+    ] as any)
+    const onClose = vi.fn()
+    render(<AIChatPanel userId="member" closeOnEscape onClose={onClose} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Open chats' }))
+    const collapse = screen.getByRole('button', { name: 'Collapse chats' })
+    expect(collapse).toHaveFocus()
+    expect(collapse).toHaveAttribute('aria-controls', screen.getByTestId('oracle-chats-panel').id)
+    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument()
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+
+    const searchButton = screen.getByRole('button', { name: 'Search chats' })
+    fireEvent.click(searchButton)
+    const search = screen.getByRole('searchbox', { name: 'Search chats' })
+    expect(search).toHaveFocus()
+    expect(searchButton).toHaveAttribute('aria-expanded', 'true')
+    await screen.findByText('Bravo notes')
+    fireEvent.change(search, { target: { value: 'Alpha' } })
+    expect(screen.getByText('Alpha briefing')).toBeInTheDocument()
+    expect(screen.queryByText('Bravo notes')).not.toBeInTheDocument()
+
+    fireEvent.keyDown(search, { key: 'Escape' })
+    expect(search).toHaveValue('')
+    expect(search).toHaveFocus()
+    expect(screen.getByText('Bravo notes')).toBeInTheDocument()
+    fireEvent.keyDown(search, { key: 'Escape' })
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+    expect(searchButton).toHaveFocus()
+    expect(screen.getByTestId('oracle-chats-panel')).toBeInTheDocument()
+    fireEvent.keyDown(searchButton, { key: 'Escape' })
+    expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Open chats' })).toHaveFocus()
+    expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
+    expect(onClose).not.toHaveBeenCalled()
+  })
+
+  it('clears the filter when search is toggled off and restores focus after collapse', async () => {
+    const { getAIThreadsFn } = await import('@/lib/server/api')
+    vi.mocked(getAIThreadsFn).mockResolvedValue([{ id: 'alpha', title: 'Alpha briefing' }] as any)
+    render(<AIChatPanel userId="member" />)
+    fireEvent.click(screen.getByRole('button', { name: 'Open chats' }))
+    await screen.findByText('Alpha briefing')
+    const searchButton = screen.getByRole('button', { name: 'Search chats' })
+    fireEvent.click(searchButton)
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'missing' } })
+    expect(screen.getByText('No chats match "missing".')).toBeInTheDocument()
+    fireEvent.click(searchButton)
+    expect(screen.getByText('Alpha briefing')).toBeInTheDocument()
+    fireEvent.click(searchButton)
+    expect(screen.getByRole('searchbox')).toHaveValue('')
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse chats' }))
+    expect(screen.getByRole('button', { name: 'Open chats' })).toHaveFocus()
   })
 
   it('opens a full-width list panel on a narrow viewport, not a small anchored menu', async () => {
@@ -290,8 +350,7 @@ describe('AIChatPanel Chats List Panel', () => {
     ])
 
     render(<AIChatPanel userId="usr_valid_user" isCompact />)
-    const chatsBtn = screen.getByRole('button', { name: /Toggle Chats/i })
-    fireEvent.click(chatsBtn)
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
 
     const panel = await screen.findByTestId('oracle-chats-panel')
     expect(panel).toHaveAttribute('data-chats-layout', 'takeover')
@@ -301,7 +360,7 @@ describe('AIChatPanel Chats List Panel', () => {
     expect(panel.className).not.toMatch(/absolute/)
     expect(panel.className).not.toMatch(/w-56/)
     expect(panel.className).not.toMatch(/max-h-\[48%\]/)
-    expect(screen.getByText('Chats')).toBeInTheDocument()
+    expect(screen.getByText('Synaptic Oracle')).toBeInTheDocument()
     expect(screen.getByText('First Carcinization Consultation')).toBeInTheDocument()
     expect(screen.getByText('Deep Trench Strategy')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Back to conversation/i })).toBeNull()
@@ -321,6 +380,7 @@ describe('AIChatPanel Chats List Panel', () => {
 
     render(<AIChatPanel userId="usr_valid_user" isCompact />)
 
+    fireEvent.click(screen.getByRole('button', { name: 'Open chats' }))
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /^New Chat$/i })).toBeDisabled()
     })
@@ -328,10 +388,11 @@ describe('AIChatPanel Chats List Panel', () => {
       'title',
       'You have 50 conversations. Delete one to start another.'
     )
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse chats' }))
     fireEvent.click(screen.getByRole('button', { name: /what is moltology/i }))
     expect(await screen.findByText('You have 50 conversations. Delete one to start another.')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
     expect(await screen.findByText('Delete a chat to start another.')).toBeInTheDocument()
     expect(screen.queryByText(/chats used/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/Archived conversations become eligible/i)).not.toBeInTheDocument()
@@ -349,8 +410,7 @@ describe('AIChatPanel Chats List Panel', () => {
     ])
 
     render(<AIChatPanel userId="usr_valid_user" isCompact />)
-    const chatsBtn = screen.getByRole('button', { name: /Toggle Chats/i })
-    fireEvent.click(chatsBtn)
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
 
     await waitFor(() => {
       expect(screen.getByText('Chitin Density Analysis')).toBeInTheDocument()
@@ -361,7 +421,7 @@ describe('AIChatPanel Chats List Panel', () => {
 
     await waitFor(() => {
       expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
-      expect(screen.queryByText('Chats')).not.toBeInTheDocument()
+      expect(screen.queryByText('Synaptic Oracle')).not.toBeInTheDocument()
       expect(screen.getByText('What is my shell hardness?')).toBeInTheDocument()
       expect(screen.getByText('Your shell hardness index is 94%.')).toBeInTheDocument()
     })
@@ -395,7 +455,7 @@ describe('AIChatPanel Chats List Panel', () => {
     render(<AIChatPanel userId="usr_valid_user" isCompact />)
 
     const openChatsAndSelect = async (title: RegExp) => {
-      fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+      fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
       const threadButton = await screen.findByRole('button', { name: title })
       fireEvent.click(threadButton)
     }
@@ -462,7 +522,7 @@ describe('AIChatPanel Chats List Panel', () => {
     ])
 
     render(<AIChatPanel userId="usr_valid_user" isCompact />)
-    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
 
     await waitFor(() => {
       expect(screen.getByText('Chitin Density Analysis')).toBeInTheDocument()
@@ -474,11 +534,11 @@ describe('AIChatPanel Chats List Panel', () => {
       expect(screen.getByText('What is my shell hardness?')).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
     expect(screen.getByTestId('oracle-chats-panel')).toBeInTheDocument()
     expect(screen.queryByText('What is my shell hardness?')).not.toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
 
     await waitFor(() => {
       expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
@@ -486,18 +546,17 @@ describe('AIChatPanel Chats List Panel', () => {
     })
   })
 
-  it('resets chat and closes the list panel when clicking main New Chat header button', async () => {
+  it('resets chat and closes the list panel when clicking sidebar New Chat button', async () => {
     const { getAIThreadsFn } = await import('@/lib/server/api')
     ;(getAIThreadsFn as any).mockResolvedValue([
       { id: 'thread-alpha', title: 'Chitin Density Analysis' },
     ])
 
     render(<AIChatPanel userId="usr_valid_user" />)
-    const chatsBtn = screen.getByRole('button', { name: /Toggle Chats/i })
-    fireEvent.click(chatsBtn)
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
 
     await waitFor(() => {
-      expect(screen.getByText('Chats')).toBeInTheDocument()
+      expect(screen.getByText('Synaptic Oracle')).toBeInTheDocument()
     })
 
     const newChatBtn = screen.getByRole('button', { name: /^New Chat$/i })
@@ -505,22 +564,21 @@ describe('AIChatPanel Chats List Panel', () => {
 
     await waitFor(() => {
       expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
-      expect(screen.queryByText('Chats')).not.toBeInTheDocument()
+      expect(screen.queryByText('Synaptic Oracle')).not.toBeInTheDocument()
     })
   })
 
   it('closes the chats panel when clicking back or pressing Escape', async () => {
     render(<AIChatPanel userId="usr_valid_user" />)
-    const chatsBtn = screen.getByRole('button', { name: /Toggle Chats/i })
-    fireEvent.click(chatsBtn)
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
 
-    expect(screen.getByText('Chats')).toBeInTheDocument()
+    expect(screen.getByText('Synaptic Oracle')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
     expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
 
-    fireEvent.click(chatsBtn)
-    expect(screen.getByText('Chats')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
+    expect(screen.getByText('Synaptic Oracle')).toBeInTheDocument()
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
   })
@@ -545,7 +603,7 @@ describe('AIChatPanel Chats List Panel', () => {
     vi.stubGlobal('ResizeObserver', MockResizeObserver)
 
     render(<AIChatPanel userId="usr_valid_user" />)
-    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
 
     const panel = await screen.findByTestId('oracle-chats-panel')
     await waitFor(() => {
@@ -554,14 +612,19 @@ describe('AIChatPanel Chats List Panel', () => {
     expect(panel).toHaveClass('w-64', 'shrink-0')
     expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
     expect(screen.getByText('First Carcinization Consultation')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /First Carcinization Consultation/i }))
+    expect(screen.getByTestId('oracle-chats-panel')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'New Chat' }))
+    expect(screen.getByTestId('oracle-chats-panel')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
   })
 
   it('displays guest mode notice with Sign Up CTA when unauthenticated', async () => {
     render(<AIChatPanel userId={null} />)
-    const chatsBtn = screen.getByRole('button', { name: /Toggle Chats/i })
-    fireEvent.click(chatsBtn)
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
 
-    expect(screen.getByText('Chats')).toBeInTheDocument()
+    expect(screen.getByText('Synaptic Oracle')).toBeInTheDocument()
     expect(screen.getAllByText(/GUEST MODE/i).length).toBeGreaterThan(0)
     expect(screen.getByText(/Guest chats aren't saved/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /SIGN UP FREE/i })).toBeInTheDocument()

@@ -30,6 +30,8 @@ export interface ThreadListProps {
   loadingNode?: React.ReactNode
   /** Show the title search box once the list is longer than this. */
   searchThreshold?: number
+  /** External search field; omit to retain the built-in search UI. */
+  searchQuery?: string
 }
 
 /** Placeholder rows shown while chats load. */
@@ -55,8 +57,10 @@ export const ThreadList: React.FC<ThreadListProps> = ({
   emptyMessage = 'No chats yet. Your conversations will show up here.',
   loadingNode,
   searchThreshold = 5,
+  searchQuery,
 }) => {
-  const [query, setQuery] = useState('')
+  const [localQuery, setQuery] = useState('')
+  const query = searchQuery ?? localQuery
   // Date sections need the clock, so they appear after mount (never during SSR).
   const [nowMs, setNowMs] = useState<number | null>(null)
   useEffect(() => {
@@ -77,7 +81,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
   const archivedThreads = visibleThreads.filter((t) => t.archivedAt)
   const unpinnedGroups =
     nowMs != null && !isSearching ? groupThreadsByDate(unpinnedThreads, nowMs) : null
-  const showSearch = threads.length > searchThreshold || isSearching
+  const showSearch = searchQuery === undefined && (threads.length > searchThreshold || isSearching)
 
   const deleteCandidate = threads.find((t) => t.id === deleteCandidateId) || null
 
