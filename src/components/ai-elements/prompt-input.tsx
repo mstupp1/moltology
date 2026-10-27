@@ -280,7 +280,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
           disabled={disabled}
           rows={1}
           aria-label="Message"
-          className={`${oneRow ? 'flex-1 min-w-0' : 'w-full'} bg-transparent text-ink placeholder-ink-muted text-base sm:text-sm focus:outline-hidden resize-none min-h-[40px] max-h-[200px] leading-relaxed font-sans px-1.5 py-[0.4rem]`}
+          className={`${oneRow ? 'flex-1 min-w-0' : 'w-full'} bg-transparent text-ink placeholder-ink-muted text-base sm:text-sm focus:outline-hidden resize-none select-text min-h-[40px] max-h-[200px] leading-relaxed font-sans px-1.5 py-[0.4rem]`}
         />
 
         {oneRow ? (

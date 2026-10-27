@@ -130,7 +130,7 @@ function RootDocument() {
           dangerouslySetInnerHTML={{ __html: buildJsonLd(jsonLd) }}
         />
       </head>
-      <body className="bg-[#030708] text-[#dfe3e3] font-sans antialiased selection:bg-[#00ffff] selection:text-[#000a0a]">
+      <body className="bg-[#030708] text-[#dfe3e3] font-sans antialiased selection:bg-cyan-glow/30 selection:text-ink">
         <HUDErrorBoundary>
           <ToastProvider>
             <Outlet />
