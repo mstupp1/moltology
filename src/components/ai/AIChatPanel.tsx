@@ -742,7 +742,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         sendDisabled={usage.blocked}
         variant={variant}
         compact={isPhone}
-        footnote={isPhone ? undefined : 'The Oracle can be wrong. Check anything important.'}
         value={draft}
         onValueChange={setDraft}
         onSubmit={handlePromptSubmit}
@@ -879,7 +878,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                 <Conversation
                   ref={conversationRef}
                   onScroll={handleConversationScroll}
-                  className="flex-1 min-h-0"
+                  className="flex-1 min-h-0 pb-16"
                   aria-live="polite"
                   aria-busy={isSending}
                 >
@@ -973,7 +972,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                   <button
                     type="button"
                     onClick={handleJumpToLatest}
-                    className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-surface-2 border border-line shadow-menu text-xs text-ink-body hover:text-ink hover:border-line-hover transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow animate-in fade-in slide-in-from-bottom-1 duration-150"
+                    className="absolute bottom-14 left-1/2 -translate-x-1/2 z-20 inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-surface-2 border border-line shadow-menu text-xs text-ink-body hover:text-ink hover:border-line-hover transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow animate-in fade-in slide-in-from-bottom-1 duration-150"
                   >
                     <ArrowDown className="w-3.5 h-3.5" />
                     <span>Jump to latest</span>
@@ -982,7 +981,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               </div>
             )}
 
-            {(!isNewChat || (isNarrow && !isPhone)) && <div className="shrink-0">{composer('docked')}</div>}
+            {(!isNewChat || (isNarrow && !isPhone)) && (
+              // Overlap only the fade; the input stays in flow as its draft grows.
+              // Pointer events pass through the fade to the conversation beneath it.
+              <div className="relative z-10 shrink-0 -mt-12 pointer-events-none">{composer('docked')}</div>
+            )}
           </div>
         )}
       </div>

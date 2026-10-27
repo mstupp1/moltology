@@ -266,7 +266,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
 
   const card = (
     <div
-      className={`bg-surface-2 border rounded-card transition-colors focus-within:border-line ${
+      className={`pointer-events-auto bg-surface-2 border ${variant === 'docked' ? 'rounded-panel shadow-sm' : 'rounded-card'} transition-colors focus-within:border-line ${
         oneRow ? 'p-1.5' : 'p-2 sm:p-2.5'
       } ${dictation.isListening ? 'border-line' : 'border-line-subtle'}`}
     >
@@ -319,7 +319,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
 
   return (
     <div
-      className={`px-2.5 pt-2 pb-[max(0.625rem,env(safe-area-inset-bottom))] sm:px-3 sm:pb-3 bg-surface-1/85 backdrop-blur-md border-t border-line-subtle ${className}`}
+      className={`px-2.5 pt-14 pb-[max(0.625rem,env(safe-area-inset-bottom))] sm:px-3 sm:pb-3 bg-linear-to-b from-transparent via-surface-1/95 via-12 to-surface-1 ${className}`}
     >
       <div className="mx-auto w-full max-w-3xl">{withFootnote(card)}</div>
     </div>
