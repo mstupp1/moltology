@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Gauge, Lock, Settings, UserPlus, X } from 'lucide-react'
+import React, { useId, useState } from 'react'
+import { ChevronRight, ChevronUp, Gauge, Lock, Settings, UserPlus } from 'lucide-react'
 import { ThreadList, ThreadListSkeleton } from './ThreadList'
 import type { ManagedThread } from './useThreadActions'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
@@ -7,12 +7,7 @@ import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { CHAT_LIMIT } from '@/lib/ai/chat-retention'
 import { OracleUsage } from './OracleUsage'
 import type { OracleUsageSnapshot } from '@/lib/ai/usage-limits'
-import {
-  HudDropdownMenu,
-  HudDropdownMenuTrigger,
-  HudDropdownMenuContent,
-  HudDropdownMenuItem,
-} from '@/components/ui/HudDropdownMenu'
+
 
 export interface OracleChatsPanelProps {
   userId: string | null
@@ -48,6 +43,7 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
   onOpenAuthModal,
 }) => {
   const [showUsage, setShowUsage] = useState(false)
+  const usageId = useId()
   return (
     <section
       role="region"
@@ -116,33 +112,33 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
       </div>
       {userId && !isAuthPending && (
         <div className="shrink-0 border-t border-line-subtle p-2">
-          {showUsage && (
-            <section aria-label="Usage" className="max-h-64 overflow-y-auto p-2 pb-4 space-y-3">
-              <div className="flex items-center justify-between gap-2">
-                <h3 className="flex items-center gap-2 text-xs font-medium text-ink">
-                  <Gauge className="w-4 h-4" aria-hidden="true" />Usage
-                </h3>
-                <button type="button" aria-label="Close usage" onClick={() => setShowUsage(false)}
-                  className="flex min-h-8 min-w-8 items-center justify-center rounded-control text-ink-muted hover:bg-surface-2 hover:text-ink focus-visible:outline-cyan-glow">
-                  <X className="w-4 h-4" aria-hidden="true" />
-                </button>
-              </div>
-              {!usageSnapshot && !usageUnavailable && <p role="status" className="text-[11px] text-ink-muted">Loading usage…</p>}
-              <OracleUsage snapshot={usageSnapshot} unavailable={usageUnavailable} expanded />
-            </section>
-          )}
-          <HudDropdownMenu modal={false}>
-            <HudDropdownMenuTrigger asChild>
-              <button type="button" className="flex min-h-10 w-full items-center gap-2 rounded-control px-2 text-xs text-ink-muted hover:bg-surface-2 hover:text-ink focus-visible:outline-cyan-glow">
-                <Settings className="w-4 h-4" aria-hidden="true" />Settings
-              </button>
-            </HudDropdownMenuTrigger>
-            <HudDropdownMenuContent side="top" align="start">
-              <HudDropdownMenuItem onSelect={() => setShowUsage(true)}>
-                <Gauge className="w-4 h-4" aria-hidden="true" />Usage
-              </HudDropdownMenuItem>
-            </HudDropdownMenuContent>
-          </HudDropdownMenu>
+          <div
+            id={usageId}
+            aria-hidden={!showUsage}
+            inert={!showUsage}
+            className={`grid transition-[grid-template-rows,opacity] duration-250 ease-in-out motion-reduce:transition-none ${showUsage ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+          >
+            <div className="min-h-0 overflow-hidden">
+              <section aria-label="Usage" className="max-h-64 overflow-y-auto p-2 pb-4 space-y-3">
+                {!usageSnapshot && !usageUnavailable && <p role="status" className="text-[11px] text-ink-muted">Loading usage…</p>}
+                <OracleUsage snapshot={usageSnapshot} unavailable={usageUnavailable} expanded />
+              </section>
+            </div>
+          </div>
+          <button
+            type="button"
+            aria-expanded={showUsage}
+            aria-controls={usageId}
+            onClick={() => setShowUsage(open => !open)}
+            className="flex min-h-10 w-full items-center gap-2 rounded-control px-2 text-xs text-ink-muted hover:bg-surface-2 hover:text-ink focus-visible:outline-cyan-glow"
+          >
+            <Gauge className="w-4 h-4" aria-hidden="true" />Usage
+            <ChevronUp className={`ml-auto w-4 h-4 transition-transform duration-250 motion-reduce:transition-none ${showUsage ? 'rotate-180' : ''}`} aria-hidden="true" />
+          </button>
+          <a href="/settings" className="flex min-h-10 w-full items-center gap-2 rounded-control px-2 text-xs text-ink-muted hover:bg-surface-2 hover:text-ink focus-visible:outline-cyan-glow">
+            <Settings className="w-4 h-4" aria-hidden="true" />Settings
+            <ChevronRight className="ml-auto w-4 h-4" aria-hidden="true" />
+          </a>
         </div>
       )}
     </section>
