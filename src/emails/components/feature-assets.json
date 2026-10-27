@@ -1,0 +1,20 @@
+{
+  "dashboard": {
+    "key": "images/email/welcome-dashboard-0edf811e24f5.jpg",
+    "revision": "0edf811e24f5",
+    "width": 860,
+    "height": 430
+  },
+  "oracle": {
+    "key": "images/email/welcome-oracle-ebe3e890c364.jpg",
+    "revision": "ebe3e890c364",
+    "width": 860,
+    "height": 430
+  },
+  "forum": {
+    "key": "images/email/welcome-forum-716a1a097c39.jpg",
+    "revision": "716a1a097c39",
+    "width": 860,
+    "height": 430
+  }
+}

@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { SUPPORT_INBOX } from '../support-tickets'
 import * as emailVerification from '../../emails/email-verification'
+import { TRANSACTIONAL_EMAIL_BRAND_URL } from '../../emails/components/transactional'
 import {
-  EMAIL_VERIFICATION_EMBLEM_URL,
   EMAIL_VERIFICATION_MAIL,
 } from '../../emails/email-verification'
 import {
@@ -172,9 +172,9 @@ describe('email verification mail', () => {
     })
     expect(html).toContain(EMAIL_VERIFICATION_MAIL.heading)
     expect(html).toContain(EMAIL_VERIFICATION_MAIL.button)
-    expect(html).toContain(EMAIL_VERIFICATION_EMBLEM_URL)
+    expect(html).toContain(TRANSACTIONAL_EMAIL_BRAND_URL)
     expect(html).toContain('href="https://moltology.org/api/auth/verify-email?token=abc&amp;next=/home"')
-    expect(html).toContain('background-color:rgb(0,195,255)')
+    expect(html).toContain('background-color:#00c3ff')
     expect(html).not.toMatch(/Resend|React Email|Better Auth|\bJWT\b/)
   })
 
@@ -195,10 +195,12 @@ describe('email verification mail', () => {
     const payload = JSON.parse((init as { body: string }).body)
     expect(payload.to).toEqual(['member@example.com'])
     expect(payload.subject).toBe(EMAIL_VERIFICATION_MAIL.subject)
+    expect(payload.from).toBe(DEFAULT_SUPPORT_FROM)
+    expect(payload.reply_to).toBe(SUPPORT_INBOX)
     expect(payload.text).toContain('token=abc')
     expect(payload.html).toContain('token=abc')
     expect(payload.html).toContain(EMAIL_VERIFICATION_MAIL.button)
-    expect(payload.html).toContain(EMAIL_VERIFICATION_EMBLEM_URL)
+    expect(payload.html).toContain(TRANSACTIONAL_EMAIL_BRAND_URL)
   })
 
   it('skips verification mail when Resend key is missing', async () => {
@@ -233,6 +235,9 @@ describe('email verification mail', () => {
     expect(payload.text).toContain(EMAIL_VERIFICATION_MAIL.heading)
     expect(payload.text).toContain('token=abc')
     expect(payload.html).toBeUndefined()
+    expect(payload.text).toContain(EMAIL_VERIFICATION_MAIL.expiration)
+    expect(payload.text).toContain('https://moltology.org/privacy')
+    expect(payload.reply_to).toBe(SUPPORT_INBOX)
   })
 
   it('logs only whether a Resend key is present', async () => {

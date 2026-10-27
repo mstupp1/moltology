@@ -14,6 +14,7 @@ import {
   AUTH_SESSION_COOKIE_CACHE,
   DEFAULT_AUTH_URL,
   DEV_AUTH_SECRET,
+  EMAIL_VERIFICATION_EXPIRES_IN_SECONDS,
   getAuthBaseUrl,
   getGoogleClientCredentials,
   isEmailVerificationEnabled,
@@ -24,6 +25,7 @@ import { sendEmailVerificationEmail } from './server/mail'
 import { readSignupTelemetry } from './server/signup-request-state'
 import { confirmSignupMarketing, handleMarketingSignup } from './server/email-opt-in'
 import { persistAdmittedSignup, signupAuthAfterHook, validateSignupUser } from './server/signup-auth'
+import { isVerifiedGoogleSignup, sendWelcomeForVerifiedUser } from './server/welcome-email'
 
 /**
  * Better Auth `sendVerificationEmail` hook. Throws when Resend did not send
@@ -128,11 +130,12 @@ export const auth = betterAuth({
     sendOnSignUp: emailVerificationEnabled,
     sendOnSignIn: emailVerificationEnabled,
     autoSignInAfterVerification: true,
-    expiresIn: 3600,
+    expiresIn: EMAIL_VERIFICATION_EXPIRES_IN_SECONDS,
     sendVerificationEmail,
     afterEmailVerification: async (user) => {
       try { await confirmSignupMarketing(user) }
       catch { console.warn('[marketing] Could not activate signup subscription; retry in account settings.') }
+      await sendWelcomeForVerifiedUser(user)
     },
   },
   account: {
@@ -171,7 +174,7 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        after: async (user) => {
+        after: async (user, context) => {
           const { ensureUserProfile } = await import('./user-sync')
           await ensureUserProfile(user.id)
           await persistAdmittedSignup(user)
@@ -182,6 +185,7 @@ export const auth = betterAuth({
             if (telemetry) telemetry.marketingError = true
             console.warn('[marketing] Could not update signup subscription; retry in account settings.')
           }
+          if (isVerifiedGoogleSignup(user, context)) await sendWelcomeForVerifiedUser(user)
         },
       },
     },

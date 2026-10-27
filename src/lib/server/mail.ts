@@ -1,8 +1,10 @@
 import {
   EMAIL_VERIFICATION_MAIL,
   renderEmailVerificationEmailHtml,
+  renderEmailVerificationEmailText,
 } from '../../emails/email-verification'
 import { env } from '../../env'
+import { WELCOME_MAIL, renderWelcomeEmailHtml, renderWelcomeEmailText } from '../../emails/welcome'
 import {
   SUPPORT_INBOX,
   supportTicketCategoryLabel,
@@ -70,14 +72,7 @@ export function renderSupportTicketEmailText(input: SupportTicketMailInput): str
 }
 
 export function renderEmailVerificationText(input: EmailVerificationMailInput): string {
-  return [
-    EMAIL_VERIFICATION_MAIL.heading,
-    '',
-    EMAIL_VERIFICATION_MAIL.body,
-    input.url,
-    '',
-    EMAIL_VERIFICATION_MAIL.ignore,
-  ].join('\n')
+  return renderEmailVerificationEmailText(input.url)
 }
 
 export async function renderEmailVerificationHtml(
@@ -226,5 +221,29 @@ export async function sendEmailVerificationEmail(
     subject: EMAIL_VERIFICATION_MAIL.subject,
     text: renderEmailVerificationText(input),
     html,
+    replyTo: SUPPORT_INBOX,
+  })
+}
+
+export interface WelcomeMailInput {
+  userId: string
+  to: string
+}
+
+/** One attempt; Resend deduplicates the same per-user request for 24 hours. */
+export async function sendWelcomeEmail(input: WelcomeMailInput): Promise<TransactionalMailResult> {
+  let html: string | undefined
+  try {
+    html = await renderWelcomeEmailHtml()
+  } catch {
+    console.warn('[mail] Failed to render welcome email HTML; sending text only.')
+  }
+  return sendTransactionalEmail({
+    to: input.to,
+    subject: WELCOME_MAIL.subject,
+    text: renderWelcomeEmailText(),
+    html,
+    replyTo: SUPPORT_INBOX,
+    idempotencyKey: `welcome-user/${input.userId}`,
   })
 }

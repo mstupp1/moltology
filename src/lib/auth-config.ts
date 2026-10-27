@@ -5,6 +5,7 @@
 
 export const DEFAULT_AUTH_URL = 'http://localhost:3000'
 export const DEV_AUTH_SECRET = 'dev-only-better-auth-secret-min-32-chars!!'
+export const EMAIL_VERIFICATION_EXPIRES_IN_SECONDS = 3600
 
 function readProcessEnv(key: string): string | undefined {
   if (typeof process === 'undefined' || !process.env) return undefined

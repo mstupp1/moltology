@@ -2,7 +2,7 @@
 name: mockup-capture
 description: >-
   Capture or refresh platform UI screenshots, marketing mockups, device frames,
-  and preview screenshots with matched desktop/mobile assets.
+  and preview screenshots with matched desktop/mobile assets and matching welcome-email images.
 ---
 
 # Platform UI screenshot library
@@ -75,6 +75,17 @@ macOS/Linux through the existing composite renderer resolver; override with
   `getAssetUrl()` adds the marketing cache token.
 - Default execution also runs the existing `s3:sync` parity pipeline. `--skip-s3`
   keeps the refresh local. Uploads are not required for homepage images served locally.
+
+## Keep welcome-email screenshots in sync
+
+The welcome email also uses the website's `dashboard_feature_preview.webp`, `oracle_feature_preview.webp`, and `forum_feature_preview.webp`. Whenever a successful selected capture batch replaces any of these three sources (including a full refresh or `--target=feature`), refresh the email derivatives in the same run. Device-only, mobile-only, Moltmax-only, and unrelated custom captures do not need this step unless they also replaced those feature sources.
+
+1. After the source captures pass visual checks, run `npm run email:images`. It exports 860×430 top crops from the three existing site screenshots as email-compatible JPEGs under ignored `tmp/email-features/`, and updates `src/emails/components/feature-assets.json` with content-hashed keys. Do not regenerate or retouch the product UI separately for email.
+2. Publish each changed JPEG with `npm run s3:upload -- tmp/email-features/<filename>.jpg --key images/email/<filename>.jpg`. The existing uploader also writes the required WebP twin. The email resolves the original JPEG with `getAbsoluteAssetUrl`; do not use the WebP or a direct bucket URL in email markup. The normal `s3:sync` step does not replace these uploads, because the JPEG exports live under ignored `tmp/`.
+3. Verify every new `https://moltology.org/media/images/email/<filename>.jpg?v=<revision>` URL used by the template returns the expected JPEG before releasing the manifest. The stable content revision query avoids an earlier cached missing-image response. Upload before opening previews that fetch the public images. Regenerate `npm run email:preview` and review the three welcome cards for framing, readable copy and short nonbreaking word groups; follow [the email-builder skill](../resend-email-builder/SKILL.md) for email-specific treatment. Sending a test email is a separate action.
+4. Run `npx vitest run scripts/build-email-feature-images.test.ts src/emails/welcome.test.ts` along with the applicable screenshot checks. Commit the updated email manifest with the source screenshots and cache-version changes. Keep generated JPEGs/previews ignored and preserve them for retry after an upload failure.
+
+Respect `--skip-s3` / `--no-s3`: generate changed email derivatives locally, but do not upload them or claim the public email images are ready. Record the outstanding image keys; publish and verify them before releasing the changed email manifest. If capture fails, preserve the previous website and email assets/manifest.
 
 ## Homepage behavior and checks
 

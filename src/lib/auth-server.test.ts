@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { EMAIL_VERIFICATION_COPY } from './auth-email-verification'
-import { AUTH_SESSION_COOKIE_CACHE } from './auth-config'
+import { AUTH_SESSION_COOKIE_CACHE, EMAIL_VERIFICATION_EXPIRES_IN_SECONDS } from './auth-config'
 import {
   ACCOUNT_LINKING_OPTIONS,
   auth,
@@ -11,6 +11,9 @@ import {
 } from './auth-server'
 
 describe('auth-server', () => {
+  it('uses the same verification lifetime as the email copy', () => {
+    expect(auth.options.emailVerification?.expiresIn).toBe(EMAIL_VERIFICATION_EXPIRES_IN_SECONDS)
+  })
   it('exposes a Better Auth handler and email/password API', () => {
     expect(typeof auth.handler).toBe('function')
     expect(auth.api.signUpEmail).toBeDefined()

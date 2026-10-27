@@ -1,0 +1,4 @@
+interface:
+  display_name: "Resend Email Builder"
+  short_description: "Build branded Moltology transactional emails"
+  default_prompt: "Use $resend-email-builder to create or update a Moltology transactional email using the shared dark React Email template."
