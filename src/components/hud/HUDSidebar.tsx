@@ -718,7 +718,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         suppressHydrationWarning
         className={`w-full ${
           isCollapsed ? 'md:w-20' : 'md:w-72'
-        } h-auto md:h-full md:min-h-0 md:max-h-full bg-surface-1 border-b md:border-b-0 md:border-r border-line-subtle flex flex-col select-none relative z-40 md:z-50 shrink-0 shadow-2xl ${
+        } h-auto md:h-full md:min-h-0 md:max-h-full bg-surface-1 border-b-0 md:border-r border-line-subtle flex flex-col select-none relative z-40 md:z-50 shrink-0 shadow-2xl ${
           isMounted ? 'transition-all duration-300 ease-in-out' : ''
         } group/sidebar overflow-visible`}
       >

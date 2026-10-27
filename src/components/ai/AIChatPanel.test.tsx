@@ -296,7 +296,7 @@ describe('AIChatPanel Chats List Panel', () => {
     const collapse = screen.getByRole('button', { name: 'Collapse chats' })
     expect(collapse).toHaveFocus()
     expect(collapse).toHaveAttribute('aria-controls', screen.getByTestId('oracle-chats-panel').id)
-    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument()
     expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
 
     const searchButton = screen.getByRole('button', { name: 'Search chats' })
@@ -318,7 +318,10 @@ describe('AIChatPanel Chats List Panel', () => {
     expect(searchButton).toHaveFocus()
     expect(screen.getByTestId('oracle-chats-panel')).toBeInTheDocument()
     fireEvent.keyDown(searchButton, { key: 'Escape' })
-    expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+    const exitingPanel = screen.getByTestId('oracle-chats-panel')
+    expect(exitingPanel).toHaveAttribute('aria-hidden', 'true')
+    expect(exitingPanel).toHaveAttribute('inert')
+    await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
     expect(screen.getByRole('button', { name: 'Open chats' })).toHaveFocus()
     expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
     expect(onClose).not.toHaveBeenCalled()
@@ -568,19 +571,26 @@ describe('AIChatPanel Chats List Panel', () => {
     })
   })
 
-  it('closes the chats panel when clicking back or pressing Escape', async () => {
+  it('animates chats open and closed while keeping the exiting panel inert', async () => {
     render(<AIChatPanel userId="usr_valid_user" />)
     fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
 
     expect(screen.getByText('Synaptic Oracle')).toBeInTheDocument()
+    const panel = screen.getByTestId('oracle-chats-panel')
+    expect(panel.className).toContain('animate-[oracle-chats-enter_200ms_ease-out]')
+    expect(panel.className).toContain('motion-reduce:transition-none')
+    expect(panel.className).toContain('motion-reduce:animate-none')
 
     fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
-    expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+    expect(panel).toHaveAttribute('aria-hidden', 'true')
+    expect(panel).toHaveAttribute('inert')
+    expect(panel.className).toContain('opacity-0')
+    await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
 
     fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
     expect(screen.getByText('Synaptic Oracle')).toBeInTheDocument()
     fireEvent.keyDown(document, { key: 'Escape' })
-    expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+    await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
   })
 
   it('opens a chats column when the Oracle window is wide', async () => {

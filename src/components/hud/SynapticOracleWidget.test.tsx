@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
-import { render, screen, fireEvent, act } from '@testing-library/react'
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { SynapticOracleWidget } from './SynapticOracleWidget'
 import { OracleProvider, useSafeOracle } from './OracleContext'
 import { DEFAULT_ORACLE_PLACEHOLDER } from '@/lib/ai/oracle-models'
@@ -228,7 +228,7 @@ describe('SynapticOracleWidget', () => {
     vi.useRealTimers()
   })
 
-  it('renders Chats button in popout and toggles the chats list panel', () => {
+  it('renders Chats button in popout and toggles the chats list panel', async () => {
     render(
       <OracleProvider>
         <SynapticOracleWidget />
@@ -247,7 +247,7 @@ describe('SynapticOracleWidget', () => {
     expect(screen.getByText('Synaptic Oracle')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
-    expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+    await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
     expect(screen.queryByText('Synaptic Oracle')).not.toBeInTheDocument()
   })
 
