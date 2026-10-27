@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
+import { usePanelPresence } from '@/hooks/usePanelPresence'
+import { useModalPanelFocus } from '@/hooks/useModalPanelFocus'
 
 export interface HudBottomSheetProps {
   isOpen: boolean
@@ -33,8 +35,7 @@ export const HudBottomSheet: React.FC<HudBottomSheetProps> = ({
   contentLayout = 'default',
 }) => {
   const [mounted, setMounted] = useState(false)
-  const [isRendered, setIsRendered] = useState(false)
-  const [isVisible, setIsVisible] = useState(false)
+  const { mounted: isRendered, visible: isVisible } = usePanelPresence(isOpen, 250)
   const [dragOffset, setDragOffset] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
 
@@ -47,28 +48,14 @@ export const HudBottomSheet: React.FC<HudBottomSheetProps> = ({
     setMounted(true)
   }, [])
 
-  // Smooth IN and OUT Transition State Machine
+  useModalPanelFocus(isOpen && isRendered && mounted, sheetRef)
+
   useEffect(() => {
-    let timer: NodeJS.Timeout
-
     if (isOpen) {
-      setIsRendered(true)
       setDragOffset(0)
-      // Small frame delay to ensure DOM render before activating CSS transition
-      timer = setTimeout(() => {
-        setIsVisible(true)
-      }, 20)
-    } else if (isRendered) {
-      setIsVisible(false)
-      // Wait for exit transition duration before removing from DOM
-      timer = setTimeout(() => {
-        setIsRendered(false)
-        setDragOffset(0)
-      }, 250)
+      setIsDragging(false)
     }
-
-    return () => clearTimeout(timer)
-  }, [isOpen, isRendered])
+  }, [isOpen])
 
   // Body scroll lock
   useEffect(() => {
@@ -81,24 +68,23 @@ export const HudBottomSheet: React.FC<HudBottomSheetProps> = ({
     }
   }, [isRendered])
 
-  // Handle escape key
+  const handleClose = useCallback(() => {
+    if (isOpen) onClose()
+  }, [isOpen, onClose])
+
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isRendered) {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null
+      const layer = target?.closest?.('[role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"]')
+      if (layer && layer !== sheetRef.current) return
+      if (event.key === 'Escape' && !event.defaultPrevented && isOpen) {
+        event.preventDefault()
         handleClose()
       }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isRendered])
-
-  // Trigger smooth exit animation
-  const handleClose = useCallback(() => {
-    setIsVisible(false)
-    setTimeout(() => {
-      onClose()
-    }, 250)
-  }, [onClose])
+  }, [isOpen, handleClose])
 
   // ── Drag Gestures (Touch & Pointer) ──
   const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
@@ -151,7 +137,7 @@ export const HudBottomSheet: React.FC<HudBottomSheetProps> = ({
       <div
         onClick={handleClose}
         aria-hidden="true"
-        className={`fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-250 ease-out ${
+        className={`fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-250 ease-out motion-reduce:transition-none ${
           isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
         } ${overlayClassName}`}
       />
@@ -159,6 +145,9 @@ export const HudBottomSheet: React.FC<HudBottomSheetProps> = ({
       {/* Bottom Anchored Modal Sheet */}
       <div
         ref={sheetRef}
+        tabIndex={-1}
+        inert={!isOpen}
+        aria-hidden={!isOpen}
         role="dialog"
         aria-modal="true"
         aria-label={title || ariaLabel}
@@ -166,9 +155,9 @@ export const HudBottomSheet: React.FC<HudBottomSheetProps> = ({
           height,
           maxHeight,
           transform: isVisible ? `translateY(${Math.max(0, dragOffset)}px)` : 'translateY(100%)',
-          transition: isDragging ? 'none' : 'transform 250ms cubic-bezier(0.16, 1, 0.3, 1), opacity 250ms ease-out',
+          transitionDuration: isDragging ? '0ms' : undefined,
         }}
-        className={`relative z-[99991] w-full rounded-t-3xl bg-[#03090cfb] border-t-2 border-t-[#00c3ff]/70 border-x-0 border-b-0 shadow-[0_-20px_50px_rgba(0,0,0,0.95),0_0_30px_rgba(0,195,255,0.25)] backdrop-blur-2xl text-xs text-[#dfe3e3] ${
+        className={`relative transition-[transform,opacity] duration-250 ease-out motion-reduce:transition-none z-[99991] w-full rounded-t-3xl bg-[#03090cfb] border-t-2 border-t-[#00c3ff]/70 border-x-0 border-b-0 shadow-[0_-20px_50px_rgba(0,0,0,0.95),0_0_30px_rgba(0,195,255,0.25)] backdrop-blur-2xl text-xs text-[#dfe3e3] ${
           contentLayout === 'fill'
             ? 'flex flex-col p-0 overflow-hidden'
             : 'p-4 pb-8 space-y-3 overflow-y-auto'
