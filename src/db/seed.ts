@@ -482,6 +482,7 @@ export async function seedDatabase(databaseUrl?: string) {
             sortOrder: values.sortOrder,
             kind: values.kind,
             artKey: values.artKey,
+            appearanceKey: values.appearanceKey,
           },
         })
     }

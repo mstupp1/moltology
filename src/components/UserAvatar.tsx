@@ -1,14 +1,21 @@
+import {
+  generateLobsterAvatarDataUri,
+  parseLobsterAvatarConfig,
+  type LobsterAvatarConfig,
+} from '@/lib/lobster-avatar'
 import React, { useState, useEffect } from 'react'
 import { BrandAwareImage } from '@/components/ui/BrandMark'
 
 export interface UserAvatarProps {
   user?: {
+    avatarConfig?: LobsterAvatarConfig | null
     name?: string | null
     email?: string | null
     image?: string | null
     avatar?: string | null
     picture?: string | null
   } | null
+  config?: LobsterAvatarConfig | null
   src?: string | null
   name?: string | null
   email?: string | null
@@ -26,93 +33,100 @@ export interface UserAvatarProps {
  * Supports SSO profile images (Google avatar) with automatic onError fallback
  * to a high-tech HUD styled letter avatar.
  */
-export const UserAvatar: React.FC<UserAvatarProps> = React.memo(({
-  user,
-  src,
-  name,
-  email,
-  fallbackSrc,
-  fallbackLetter,
-  size = 'md',
-  className = '',
-  alt,
-  borderless = false,
-}) => {
-  const [imageError, setImageError] = useState(false)
+export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
+  ({
+    user,
+    config,
+    src,
+    name,
+    email,
+    fallbackSrc,
+    fallbackLetter,
+    size = 'md',
+    className = '',
+    alt,
+    borderless = false,
+  }) => {
+    const [imageError, setImageError] = useState(false)
 
-  const imageUrl = src ?? user?.image ?? user?.avatar ?? user?.picture ?? null
-  const displayName = name ?? user?.name ?? email ?? user?.email ?? ''
-  const displayAlt = alt ?? displayName ?? 'User avatar'
+    const character = parseLobsterAvatarConfig(config ?? user?.avatarConfig)
+    const portrait = character
+      ? generateLobsterAvatarDataUri(character, 128, { frame: 'portrait', staticMotion: true })
+      : null
+    const imageUrl = portrait ?? src ?? user?.image ?? user?.avatar ?? user?.picture ?? null
+    const displayName = name ?? user?.name ?? email ?? user?.email ?? ''
+    const displayAlt = alt ?? displayName ?? 'User avatar'
 
-  useEffect(() => {
-    setImageError(false)
-  }, [imageUrl])
+    useEffect(() => {
+      setImageError(false)
+    }, [imageUrl])
 
-  // Size preset mapping
-  const sizeClasses = {
-    xxs: 'w-4 h-4 text-[8px]',
-    xs: 'w-5 h-5 text-[10px]',
-    sm: 'w-6 h-6 text-xs',
-    row: 'w-8 h-8 text-xs',
-    nav: 'w-9 h-9 text-sm',
-    md: 'w-8 h-8 sm:w-10 sm:h-10 text-xs sm:text-sm',
-    lg: 'w-12 h-12 text-base',
-    xl: 'w-16 h-16 text-lg',
-  }[size]
+    // Size preset mapping
+    const sizeClasses = {
+      xxs: 'w-4 h-4 text-[8px]',
+      xs: 'w-5 h-5 text-[10px]',
+      sm: 'w-6 h-6 text-xs',
+      row: 'w-8 h-8 text-xs',
+      nav: 'w-9 h-9 text-sm',
+      md: 'w-8 h-8 sm:w-10 sm:h-10 text-xs sm:text-sm',
+      lg: 'w-12 h-12 text-base',
+      xl: 'w-16 h-16 text-lg',
+    }[size]
 
-  // Compute initial letter fallback from name or email
-  const getInitial = () => {
-    if (fallbackLetter) return fallbackLetter[0].toUpperCase()
-    if (displayName && displayName.trim().length > 0) {
-      const clean = displayName.trim()
-      return clean[0].toUpperCase()
+    // Compute initial letter fallback from name or email
+    const getInitial = () => {
+      if (fallbackLetter) return fallbackLetter[0].toUpperCase()
+      if (displayName && displayName.trim().length > 0) {
+        const clean = displayName.trim()
+        return clean[0].toUpperCase()
+      }
+      return '?'
     }
-    return '?'
-  }
 
-  // 1. Primary Avatar Image (e.g. Google SSO profile picture)
-  if (imageUrl && !imageError) {
+    // 1. Primary Avatar Image (e.g. Google SSO profile picture)
+    if (imageUrl && !imageError) {
+      return (
+        <div
+          className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-[#030606] ${sizeClasses} ${className}`}
+        >
+          <BrandAwareImage
+            src={imageUrl}
+            alt={displayAlt}
+            className="w-full h-full object-cover rounded-full"
+            onError={() => setImageError(true)}
+          />
+        </div>
+      )
+    }
+
+    // 2. Custom Fallback Image (e.g. default Larva Unit graphic when logged out)
+    if (fallbackSrc && !user) {
+      return (
+        <div
+          className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-[#030606] ${sizeClasses} ${className}`}
+        >
+          <BrandAwareImage
+            src={fallbackSrc}
+            alt={displayAlt}
+            className="w-full h-full object-cover rounded-full"
+          />
+        </div>
+      )
+    }
+
+    // 3. Fallback Letter Avatar
+    const initial = getInitial()
+
     return (
       <div
-        className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-[#030606] ${sizeClasses} ${className}`}
+        className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center font-sans font-bold bg-gradient-to-br from-[#0f1d22] via-[#091316] to-[#030606] ${borderless ? '' : 'border border-[#00c3ff]/60'} text-[#00c3ff] ${sizeClasses} ${className}`}
+        aria-label={displayAlt}
+        title={displayName || 'User Avatar'}
       >
-        <BrandAwareImage
-          src={imageUrl}
-          alt={displayAlt}
-          className="w-full h-full object-cover rounded-full"
-          onError={() => setImageError(true)}
-        />
+        <span className="select-none leading-none">{initial}</span>
       </div>
     )
-  }
-
-  // 2. Custom Fallback Image (e.g. default Larva Unit graphic when logged out)
-  if (fallbackSrc && !user) {
-    return (
-      <div
-        className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-[#030606] ${sizeClasses} ${className}`}
-      >
-        <BrandAwareImage
-          src={fallbackSrc}
-          alt={displayAlt}
-          className="w-full h-full object-cover rounded-full"
-        />
-      </div>
-    )
-  }
-
-  // 3. Fallback Letter Avatar
-  const initial = getInitial()
-
-  return (
-    <div
-      className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center font-sans font-bold bg-gradient-to-br from-[#0f1d22] via-[#091316] to-[#030606] ${borderless ? '' : 'border border-[#00c3ff]/60'} text-[#00c3ff] ${sizeClasses} ${className}`}
-      aria-label={displayAlt}
-      title={displayName || 'User Avatar'}
-    >
-      <span className="select-none leading-none">{initial}</span>
-    </div>
-  )
-})
+  },
+)
 
 UserAvatar.displayName = 'UserAvatar'

@@ -111,7 +111,7 @@ export function StoreCatalog({
         <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-3">
           {[0, 1, 2, 3, 4, 5].map((key) => (
             <div key={key} className="space-y-3">
-              <div className="aspect-square animate-pulse rounded-card bg-surface-1" />
+              <div className="aspect-[4/3] animate-pulse rounded-card bg-benthic-border" />
               <div className="h-4 w-1/2 animate-pulse rounded-chip bg-surface-1" />
             </div>
           ))}
@@ -210,7 +210,7 @@ function ProductCard({ product, eager }: { product: MerchProductView; eager: boo
 
   return (
     <article className="group relative">
-      <div className={`relative aspect-square overflow-hidden rounded-card ${cutout?.background ?? 'bg-surface-1'}`}>
+      <div className="relative aspect-[4/3] overflow-hidden rounded-card bg-benthic-border">
         <Link to="/store/$slug" params={{ slug: product.slug }} className={`block h-full w-full rounded-card ${FOCUS}`}>
           <span className="sr-only">{product.title}</span>
           <MerchImage

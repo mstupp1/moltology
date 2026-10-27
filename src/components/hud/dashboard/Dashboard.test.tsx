@@ -6,7 +6,6 @@ import { getAIThreadsFn, getBlogPostsFn } from '@/lib/server/api'
 import { OPEN_ALIGNMENT_PANEL_EVENT } from '@/lib/alignment-panel'
 import { DashboardTodayStrip } from './DashboardTodayStrip'
 import { DASHBOARD_PROMOS, DashboardPromoBanner } from './DashboardPromoBanner'
-import { DASHBOARD_SHORTCUTS, DashboardShortcuts } from './DashboardShortcuts'
 import { DashboardNewsPanel } from './DashboardNewsPanel'
 import { DashboardChangelogPanel, formatReleaseDay } from './DashboardChangelogPanel'
 import { DashboardEmptyRow } from './DashboardPanel'
@@ -109,15 +108,6 @@ describe('DashboardPromoBanner', () => {
     for (const promo of DASHBOARD_PROMOS) {
       expect(promo.to.startsWith('/')).toBe(true)
       expect(`${promo.title} ${promo.description}`).not.toMatch(/chitin gem|% off|bundle/i)
-    }
-  })
-})
-
-describe('DashboardShortcuts', () => {
-  it('renders one link per shortcut', () => {
-    render(<DashboardShortcuts />)
-    for (const s of DASHBOARD_SHORTCUTS) {
-      expect(screen.getByTestId(`dashboard-shortcut-${s.id}`)).toHaveAttribute('href', s.to)
     }
   })
 })

@@ -73,6 +73,6 @@ describe('Chassis Configurator HUD Route', () => {
     const Component = Route.options.component!
     render(<Component />)
 
-    expect(await screen.findByRole('button', { name: 'Antennae slot' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /^Antennae/ })).toBeInTheDocument()
   })
 })

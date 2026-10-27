@@ -1,10 +1,18 @@
-import React from 'react'
-import { Lock, UserPlus } from 'lucide-react'
+import React, { useState } from 'react'
+import { Gauge, Lock, Settings, UserPlus, X } from 'lucide-react'
 import { ThreadList, ThreadListSkeleton } from './ThreadList'
 import type { ManagedThread } from './useThreadActions'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { CHAT_LIMIT } from '@/lib/ai/chat-retention'
+import { OracleUsage } from './OracleUsage'
+import type { OracleUsageSnapshot } from '@/lib/ai/usage-limits'
+import {
+  HudDropdownMenu,
+  HudDropdownMenuTrigger,
+  HudDropdownMenuContent,
+  HudDropdownMenuItem,
+} from '@/components/ui/HudDropdownMenu'
 
 export type OracleChatsLayout = 'takeover' | 'column'
 
@@ -15,6 +23,8 @@ export interface OracleChatsPanelProps {
   activeThreadId: string | null
   isLoadingThreads: boolean
   layout: OracleChatsLayout
+  usageSnapshot: OracleUsageSnapshot | null
+  usageUnavailable: boolean
   onSelectThread: (id: string) => void
   onPin: (threadId: string, pinned: boolean) => void
   onArchive: (threadId: string, archived: boolean) => void
@@ -30,6 +40,8 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
   activeThreadId,
   isLoadingThreads,
   layout,
+  usageSnapshot,
+  usageUnavailable,
   onSelectThread,
   onPin,
   onArchive,
@@ -37,6 +49,7 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
   onDelete,
   onOpenAuthModal,
 }) => {
+  const [showUsage, setShowUsage] = useState(false)
   return (
     <section
       role="region"
@@ -107,6 +120,37 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
           </div>
         )}
       </div>
+      {userId && !isAuthPending && (
+        <div className="shrink-0 border-t border-line-subtle p-2">
+          {showUsage && (
+            <section aria-label="Usage" className="max-h-64 overflow-y-auto p-2 pb-4 space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="flex items-center gap-2 text-xs font-medium text-ink">
+                  <Gauge className="w-4 h-4" aria-hidden="true" />Usage
+                </h3>
+                <button type="button" aria-label="Close usage" onClick={() => setShowUsage(false)}
+                  className="flex min-h-8 min-w-8 items-center justify-center rounded-control text-ink-muted hover:bg-surface-2 hover:text-ink focus-visible:outline-cyan-glow">
+                  <X className="w-4 h-4" aria-hidden="true" />
+                </button>
+              </div>
+              {!usageSnapshot && !usageUnavailable && <p role="status" className="text-[11px] text-ink-muted">Loading usage…</p>}
+              <OracleUsage snapshot={usageSnapshot} unavailable={usageUnavailable} expanded />
+            </section>
+          )}
+          <HudDropdownMenu modal={false}>
+            <HudDropdownMenuTrigger asChild>
+              <button type="button" className="flex min-h-10 w-full items-center gap-2 rounded-control px-2 text-xs text-ink-muted hover:bg-surface-2 hover:text-ink focus-visible:outline-cyan-glow">
+                <Settings className="w-4 h-4" aria-hidden="true" />Settings
+              </button>
+            </HudDropdownMenuTrigger>
+            <HudDropdownMenuContent side="top" align="start">
+              <HudDropdownMenuItem onSelect={() => setShowUsage(true)}>
+                <Gauge className="w-4 h-4" aria-hidden="true" />Usage
+              </HudDropdownMenuItem>
+            </HudDropdownMenuContent>
+          </HudDropdownMenu>
+        </div>
+      )}
     </section>
   )
 }

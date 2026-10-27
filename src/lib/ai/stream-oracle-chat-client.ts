@@ -61,7 +61,7 @@ export async function streamOracleChat(params: StreamOracleChatParams): Promise<
   if (contentType.includes('application/json')) {
     const data = await res.json()
     if (!res.ok) {
-      throw new Error(data?.error || data?.text || 'Something went wrong sending your message. Please try again.')
+      throw Object.assign(new Error(data?.error || data?.text || 'Something went wrong sending your message. Please try again.'), { status: res.status, limit: data?.limit })
     }
     const text = data?.text || ''
     if (data?.threadId && params.onThreadId) {

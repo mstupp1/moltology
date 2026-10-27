@@ -72,7 +72,7 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
 }) => {
   const [imageError, setImageError] = useState(false)
 
-  const hasCustomImage = isValidCustomImageUrl(src)
+  const hasCustomImage = !avatarConfig?.seed && isValidCustomImageUrl(src)
 
   useEffect(() => {
     setImageError(false)
@@ -93,22 +93,8 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
     const assets = resolveLobsterAvatarAssets(
       {
         style: avatarConfig?.style || LOBSTER_AVATAR_STYLE,
+        ...avatarConfig,
         seed: effectiveSeed,
-        ...(avatarConfig?.height ? { height: avatarConfig.height } : {}),
-        ...(avatarConfig?.armScale ? { armScale: avatarConfig.armScale } : {}),
-        ...(avatarConfig?.backgroundTheme ? { backgroundTheme: avatarConfig.backgroundTheme } : {}),
-        ...(avatarConfig?.backgroundPattern ? { backgroundPattern: avatarConfig.backgroundPattern } : {}),
-        ...(avatarConfig?.backgroundTexture ? { backgroundTexture: avatarConfig.backgroundTexture } : {}),
-        ...(avatarConfig?.patternDensity ? { patternDensity: avatarConfig.patternDensity } : {}),
-        ...(avatarConfig?.patternGlow ? { patternGlow: avatarConfig.patternGlow } : {}),
-        ...(avatarConfig?.patternPulse ? { patternPulse: avatarConfig.patternPulse } : {}),
-        ...(avatarConfig?.patternSparkles ? { patternSparkles: avatarConfig.patternSparkles } : {}),
-        ...(avatarConfig?.eyelidStyle ? { eyelidStyle: avatarConfig.eyelidStyle } : {}),
-        ...(avatarConfig?.eyeColor ? { eyeColor: avatarConfig.eyeColor } : {}),
-        ...(avatarConfig?.eyeVariant ? { eyeVariant: avatarConfig.eyeVariant } : {}),
-        ...(avatarConfig?.pupilVariant ? { pupilVariant: avatarConfig.pupilVariant } : {}),
-        ...(avatarConfig?.backgroundMotion ? { backgroundMotion: avatarConfig.backgroundMotion } : {}),
-        ...(avatarConfig?.transparentBackground ? { transparentBackground: avatarConfig.transparentBackground } : {}),
       },
       { portraitSize: portraitSourcePxForCssPx(64) }
     )

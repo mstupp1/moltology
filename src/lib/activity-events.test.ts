@@ -51,8 +51,8 @@ describe('activity event copy and mapping', () => {
     const copy = buildRoutineCompletedCopy(task!)
     expect(copy.kind).toBe(ACTIVITY_EVENT_KIND_ROUTINE_COMPLETED)
     expect(copy.title).toBe('Silent Synchronization sealed')
-    expect(copy.detail).toBe('The 05:30 liturgy is complete.')
-    expect(copy.valueBadge).toBe('05:30')
+    expect(copy.detail).toBe('The Early morning liturgy is complete.')
+    expect(copy.valueBadge).toBe('Early morning')
     const blob = `${copy.title} ${copy.detail} ${copy.valueBadge}`
     expect(blob).not.toMatch(/luxury sedan/i)
     expect(blob).not.toMatch(/\+450/)

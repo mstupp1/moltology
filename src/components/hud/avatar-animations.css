@@ -136,3 +136,9 @@
     animation: none !important;
   }
 }
+
+@keyframes equipment-breathe { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+.lobster-avatar-animated .equipment-signature { animation: equipment-breathe 4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .equipment-signature { animation: none !important; }
+}

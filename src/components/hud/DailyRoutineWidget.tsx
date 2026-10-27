@@ -1,8 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { Calendar, Check } from 'lucide-react'
-import { AlignmentRemindersSwitch } from '@/components/hud/AlignmentRemindersSwitch'
 import { DashboardPanel } from '@/components/hud/dashboard/DashboardPanel'
-import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { DailyRoutineGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
@@ -421,7 +419,6 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
     toggleTask,
   } = useDailyAlignment()
 
-  const { remindersEnabled, toggleReminders } = useAlignmentReminders(tasks)
   const allDone = completedCount >= totalCount
   const nextTaskId = tasks.find((task) => !task.completed)?.id
 
@@ -462,7 +459,6 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
           <div className="lg:col-span-7 min-w-0 space-y-2">
             <div className="flex items-center justify-between gap-2">
               <span className="text-[11px] font-bold tracking-[0.08em] uppercase text-ink-muted">Today’s schedule</span>
-              <AlignmentRemindersSwitch enabled={remindersEnabled} onToggle={toggleReminders} testId="alignment-reminders" />
             </div>
 
             <ul className="rounded-control border border-line-subtle divide-y divide-line-subtle overflow-hidden">
@@ -492,7 +488,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                       </span>
                       <span
                         className={cn(
-                          'w-[5.5rem] shrink-0 text-[11px] tabular-nums',
+                          'w-24 shrink-0 text-[11px]',
                           isNext ? 'text-cyan-glow font-bold' : 'text-ink-muted',
                         )}
                       >

@@ -262,6 +262,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const session = useAuthSession()
   const user = session.user
   const isSessionPending = session.isPending
+  const [memberAvatar, setMemberAvatar] = useState<import('@/lib/lobster-avatar').LobsterAvatarConfig | null>(null)
   const [userRole, setUserRole] = useState<string | null>(null)
   const [memberHandle, setMemberHandle] = useState<string | null>(null)
   const [memberLarvaId, setMemberLarvaId] = useState(larvaId)
@@ -278,6 +279,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   useEffect(() => {
     if (!user?.id) {
+      setMemberAvatar(null)
       setUserRole(null)
       setMemberHandle(null)
       setMemberLarvaId(larvaId)
@@ -286,9 +288,10 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     const profileUserId = user.id
     if (!profileUserId) return
     let isSubscribed = true
-    const applyProfile = (profile: { role?: string | null; handle?: string | null; larvaId?: string | null } | null) => {
+    const applyProfile = (profile: { avatarConfig?: import('@/lib/lobster-avatar').LobsterAvatarConfig | null; role?: string | null; handle?: string | null; larvaId?: string | null } | null) => {
       if (!isSubscribed) return
       const role = getEffectiveRole(user, profile?.role)
+      setMemberAvatar(profile?.avatarConfig ?? null)
       setUserRole(role)
       setMemberHandle(profile?.handle ?? null)
       setMemberLarvaId(profile?.larvaId ?? larvaId)
@@ -299,9 +302,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     const onHandleChanged = () => {
       loadUserProfile(profileUserId).then(applyProfile).catch(() => applyProfile(null))
     }
+    window.addEventListener('profile-avatar-changed', onHandleChanged)
     window.addEventListener('member-handle-changed', onHandleChanged)
     return () => {
       isSubscribed = false
+      window.removeEventListener('profile-avatar-changed', onHandleChanged)
       window.removeEventListener('member-handle-changed', onHandleChanged)
     }
   }, [user?.id, user?.email, user?.role, loadUserProfile, larvaId])
@@ -989,7 +994,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   ) : (
                     <div className="relative z-50 flex items-center justify-center overflow-visible">
                       <UserAvatarMenu
-                        user={user}
+                        user={{...user, avatarConfig:memberAvatar}}
                         userRole={effectiveUserRole}
                         displayName={displayName}
                         onNavigate={(path) => navigate({ to: path })}
@@ -1134,7 +1139,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   ) : (
                     <div className="relative z-50 overflow-visible">
                       <UserAvatarMenu
-                        user={user}
+                        user={{...user, avatarConfig:memberAvatar}}
                         userRole={effectiveUserRole}
                         displayName={displayName}
                         onNavigate={(path) => navigate({ to: path })}
@@ -1281,7 +1286,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   </div>
                 ) : user ? (
                   <UserAvatarMenu
-                    user={user}
+                    user={{...user, avatarConfig:memberAvatar}}
                     userRole={effectiveUserRole}
                     displayName={displayName}
                     onNavigate={(path) => handleNavClick(path)}

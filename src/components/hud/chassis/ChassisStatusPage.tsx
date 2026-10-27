@@ -1,346 +1,406 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import {
-  DndContext,
-  DragOverlay,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-  type DragStartEvent,
-} from '@dnd-kit/core'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { HudTitlePanel } from '../HudTitlePanel'
+import { HudWorkspaceGhost } from '../HudGhostSkeletons'
+import { HudButton } from '@/components/ui/HudButton'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
-import { getAuthJWTToken } from '@/lib/jwt'
-import { getChassisLoadoutFn, moveGearItemFn } from '@/lib/server/api'
 import { useHudPersist } from '@/hooks/useHudPersist'
+import { getAuthJWTToken } from '@/lib/jwt'
+import { getChassisLoadoutFn, saveCharacterFn } from '@/lib/server/api'
+import {
+  LOBSTER_AVATAR_STYLE,
+  clearCachedProfileAvatarUrl,
+  type LobsterAvatarConfig,
+} from '@/lib/lobster-avatar'
 import {
   applyMoveUpdates,
-  computeLoadoutTotals,
-  deriveSynapticAbilities,
-  emptyTotals,
-  getCachedChassisLoadout,
   planGearMove,
+  findFirstFreeVaultIndex,
+  computeLoadoutTotals,
+  EQUIP_SLOT_IDS,
+  equipSlotCategory,
+  CATEGORY_LABELS,
+  getCachedChassisLoadout,
   setCachedChassisLoadout,
-  type CatalogRef,
   type ChassisLoadoutPayload,
+  type EquipSlotId,
   type GearItemState,
-  type LoadoutTotals,
-  type MoveTarget,
-  VAULT_SIZE,
 } from '@/lib/chassis-loadout'
-import type { EquipSlotId } from '@/lib/chassis-loadout'
-import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
-import { GearDetail } from './GearDetail'
+import { equipmentAppearance } from '@/lib/character-appearance'
+import { AvatarCreatorPanel } from '../avatar/AvatarCreatorPanel'
+import { AvatarCreatorPreview } from '../avatar/AvatarCreatorPreview'
 import { GearItemCard } from './GearItemCard'
-import { GearTooltipFloating } from './GearTooltip'
-import type { GearHoverTarget } from './gear-tooltip-position'
-import { LoadoutStatsPanel } from './LoadoutStatsPanel'
-import { AbilitiesPanel } from './AbilitiesPanel'
-import { PaperDoll } from './PaperDoll'
-import { VaultGrid } from './VaultGrid'
+import { GearDetail } from './GearDetail'
 
-function parseDropTarget(overId: string | number): MoveTarget | null {
-  const id = String(overId)
-  if (id.startsWith('equip:')) {
-    const slot = id.slice('equip:'.length) as EquipSlotId
-    return { type: 'equip', slot }
-  }
-  if (id.startsWith('vault:')) {
-    const index = Number(id.slice('vault:'.length))
-    if (Number.isFinite(index)) return { type: 'vault', index }
-  }
-  return null
+const TABS = ['body', 'face', 'equipment', 'scene'] as const
+export const SLOT_NAMES: Record<EquipSlotId, string> = {
+  head: 'Head',
+  carapace: 'Carapace',
+  belt: 'Belt',
+  legs: 'Legs',
+  antennae: 'Antennae',
+  'claws-1': 'Right pincer',
+  'claws-2': 'Left pincer',
 }
 
+/** One local draft. A catalog try-on is deliberately separate from owned placements. */
 export const ChassisStatusPage: React.FC = () => {
-  const session = useAuthSession()
-  const user = session.user
-  const userId = session.userId
+  const { userId } = useAuthSession()
+  const toast = useOptionalToast()?.toast
   const persist = useHudPersist()
-  const optionalToast = useOptionalToast()
-  const toast = optionalToast?.toast
-
-  const cached = userId ? getCachedChassisLoadout(userId) : null
-
-  const [catalog, setCatalog] = useState<CatalogRef[]>(() => cached?.catalog ?? [])
-  const [items, setItems] = useState<GearItemState[]>(() => cached?.items ?? [])
-  const [totals, setTotals] = useState<LoadoutTotals>(() => cached?.totals ?? emptyTotals())
-  const [vaultSize, setVaultSize] = useState(() => cached?.vaultSize ?? VAULT_SIZE)
+  const [saved, setSaved] = useState<ChassisLoadoutPayload | null>(() =>
+    userId ? getCachedChassisLoadout(userId) : null,
+  )
+  const [config, setConfig] = useState<LobsterAvatarConfig | null>(null)
+  const [items, setItems] = useState<GearItemState[]>([])
+  const [tab, setTab] = useState<(typeof TABS)[number]>('equipment')
+  const [slot, setSlot] = useState<EquipSlotId>('head')
+  const [selected, setSelected] = useState<string | null>(null)
+  const [tryOn, setTryOn] = useState<{ catalogId: string; slot: EquipSlotId } | null>(null)
+  const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
-  const [detailItemId, setDetailItemId] = useState<string | null>(null)
-  const [hoverTarget, setHoverTarget] = useState<GearHoverTarget | null>(null)
-  const [activeDragId, setActiveDragId] = useState<string | null>(null)
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
-    const media = window.matchMedia('(max-width: 767px)')
-    const updateMobile = () => setIsMobile(media.matches)
-    updateMobile()
-    if (media.addEventListener) {
-      media.addEventListener('change', updateMobile)
-      return () => media.removeEventListener('change', updateMobile)
-    } else if ((media as any).addListener) {
-      ;(media as any).addListener(updateMobile)
-      return () => (media as any).removeListener(updateMobile)
+  const [onlyOwned, setOnlyOwned] = useState(false)
+  const draftTouched = useRef(false)
+  const canonicalRevision = useRef(0)
+  const [reload, setReload] = useState(0)
+  const baseConfig = (payload: ChassisLoadoutPayload): LobsterAvatarConfig =>
+    payload.config ?? {
+      style: LOBSTER_AVATAR_STYLE,
+      seed: `member-${userId}`,
+      shellFinish: 'satin',
+      pose: 'rest',
     }
-  }, [])
-
-  const catalogById = useMemo(() => new Map(catalog.map((c) => [c.id, c])), [catalog])
-  const abilities = useMemo(
-    () => deriveSynapticAbilities(items, catalogById),
-    [items, catalogById]
-  )
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
-  )
-
-  const applyPayload = useCallback(
-    (payload: ChassisLoadoutPayload) => {
-      setCatalog(payload.catalog)
-      setItems(payload.items)
-      setTotals(payload.totals)
-      setVaultSize(payload.vaultSize)
-      if (userId) setCachedChassisLoadout(userId, payload)
-    },
-    [userId]
-  )
-
+  const accept = (payload: ChassisLoadoutPayload) => {
+    draftTouched.current = false
+    canonicalRevision.current = payload.appearanceRevision ?? 0
+    setSaved(payload)
+    setConfig(baseConfig(payload))
+    setItems(payload.items)
+    setTryOn(null)
+    if (userId) setCachedChassisLoadout(userId, payload)
+  }
   useEffect(() => {
     let cancelled = false
-    ;(async () => {
-      if (!userId) return
-
-      const sessionCache = getCachedChassisLoadout(userId)
-      if (sessionCache && !cancelled) {
-        applyPayload(sessionCache)
-      }
-
+    setError(null)
+    setSelected(null)
+    setTryOn(null)
+    const cache = userId ? getCachedChassisLoadout(userId) : null
+    if (cache) accept(cache)
+    else {
+      canonicalRevision.current = 0
+      setSaved(null)
+      setConfig(null)
+      setItems([])
+    }
+    if (!userId) return
+    void (async () => {
       try {
         const token = await getAuthJWTToken()
-        const payload = await getChassisLoadoutFn({
-          data: { token: token ?? undefined, userId },
-        })
-        if (!cancelled) {
-          applyPayload(payload)
-          setError(null)
-        }
+        const payload = await getChassisLoadoutFn({ data: { userId, token: token ?? undefined } })
+        if (
+          !cancelled &&
+          !draftTouched.current &&
+          (payload.appearanceRevision ?? 0) >= canonicalRevision.current
+        )
+          accept(payload)
       } catch (e) {
-        if (!cancelled && !getCachedChassisLoadout(userId)) {
-          setError(e instanceof Error ? e.message : 'Could not load equipment.')
-        }
+        if (!cancelled) setError(e instanceof Error ? e.message : 'Could not load your character.')
       }
     })()
     return () => {
       cancelled = true
     }
-  }, [userId, applyPayload])
-
-  const persistMove = useCallback(
-    async (itemId: string, target: MoveTarget) => {
-      const plan = planGearMove(items, catalogById, itemId, target, vaultSize)
-      if (!plan.ok) {
-        toast?.warning(plan.error, { title: 'Vault Limits' })
-        return
-      }
-      if (plan.updates.length === 0) return
-
-      const prevItems = items
-      const nextItems = applyMoveUpdates(items, plan.updates)
-      setItems(nextItems)
-      setTotals(computeLoadoutTotals(nextItems, catalogById))
-
-      persist.begin('chassis-gear')
-      try {
-        const token = await getAuthJWTToken()
-        const payload = await moveGearItemFn({
-          data: {
-            itemId,
-            target,
-            token: token ?? undefined,
-            userId: userId ?? undefined,
-          },
-        })
-        applyPayload(payload)
-      } catch (e) {
-        setItems(prevItems)
-        setTotals(computeLoadoutTotals(prevItems, catalogById))
-        toast?.warning(
-          e instanceof Error ? e.message : 'Could not update equipment. Please try again.',
-          { title: 'Equipment Sync' }
-        )
-      } finally {
-        persist.end('chassis-gear')
-      }
-    },
-    [items, catalogById, vaultSize, persist, userId, applyPayload]
+  }, [userId, reload])
+  const catalog = saved?.catalog ?? []
+  const catalogById = useMemo(() => new Map(catalog.map((c) => [c.id, c])), [catalog])
+  const equipped = useMemo(() => equipmentAppearance(items, catalog), [items, catalog])
+  const preview = useMemo(() => {
+    if (!config) return null
+    const equipment = { ...equipped }
+    const c = tryOn ? catalogById.get(tryOn.catalogId) : null
+    if (tryOn && c)
+      equipment[tryOn.slot] = { visualKey: c.appearanceKey || c.slug, rarity: c.rarity }
+    return { ...config, equipment }
+  }, [config, equipped, tryOn, catalogById])
+  const dirty = Boolean(
+    saved &&
+    config &&
+    (JSON.stringify({ ...config, equipment: undefined }) !==
+      JSON.stringify({ ...baseConfig(saved), equipment: undefined }) ||
+      JSON.stringify(items) !== JSON.stringify(saved.items)),
   )
-
-  const handleSelectItem = useCallback(
-    (id: string | null) => {
-      setSelectedItemId(id)
-      if (isMobile && id) {
-        setDetailItemId(id)
-      } else {
-        setDetailItemId(null)
-      }
-    },
-    [isMobile]
+  const selectedCatalog = selected ? catalogById.get(selected) : null
+  const matching = catalog.filter(
+    (c) =>
+      c.category === equipSlotCategory(slot) &&
+      (!onlyOwned || items.some((i) => i.catalogItemId === c.id)),
   )
-
-  const handleSlotActivate = useCallback(
-    (slot: EquipSlotId) => {
-      if (!selectedItemId) return
-      void persistMove(selectedItemId, { type: 'equip', slot })
-      setSelectedItemId(null)
-    },
-    [selectedItemId, persistMove]
-  )
-
-  const handleCellActivate = useCallback(
-    (index: number) => {
-      if (!selectedItemId) return
-      void persistMove(selectedItemId, { type: 'vault', index })
-      setSelectedItemId(null)
-    },
-    [selectedItemId, persistMove]
-  )
-
-  const onDragStart = (event: DragStartEvent) => {
-    const id = String(event.active.id)
-    if (id.startsWith('item:')) {
-      setActiveDragId(id.slice('item:'.length))
-      setSelectedItemId(id.slice('item:'.length))
+  const equip = (catalogId: string) => {
+    const instance =
+      items.find((i) => i.catalogItemId === catalogId && !i.equippedSlot) ??
+      items.find((i) => i.catalogItemId === catalogId && i.equippedSlot !== slot) ??
+      items.find((i) => i.catalogItemId === catalogId)
+    if (!instance) {
+      setTryOn({ catalogId, slot })
+      return
+    }
+    const plan = planGearMove(
+      items,
+      catalogById,
+      instance.id,
+      { type: 'equip', slot },
+      saved?.vaultSize,
+    )
+    if (!plan.ok) {
+      toast?.warning(plan.error)
+      return
+    }
+    draftTouched.current = true
+    setItems(applyMoveUpdates(items, plan.updates))
+    setTryOn(null)
+  }
+  const unequip = () => {
+    const item = items.find((i) => i.equippedSlot === slot)
+    if (!item) return
+    const index = findFirstFreeVaultIndex(items, saved?.vaultSize)
+    if (index === null) {
+      toast?.warning('Your vault is full.')
+      return
+    }
+    const plan = planGearMove(
+      items,
+      catalogById,
+      item.id,
+      { type: 'vault', index },
+      saved?.vaultSize,
+    )
+    if (plan.ok) {
+      draftTouched.current = true
+      setItems(applyMoveUpdates(items, plan.updates))
+    }
+    setTryOn(null)
+  }
+  const save = async () => {
+    if (!config || !saved || !userId || saving) return
+    setSaving(true)
+    persist.begin('character')
+    try {
+      const token = await getAuthJWTToken()
+      const { equipment: _, accessory: __, claws: ___, ...body } = config
+      const payload = await saveCharacterFn({
+        data: {
+          userId,
+          token: token ?? undefined,
+          config: body,
+          expectedRevision: saved.appearanceRevision ?? 0,
+          placements: items.map((i) => ({
+            id: i.id,
+            equippedSlot: i.equippedSlot,
+            vaultIndex: i.vaultIndex,
+          })),
+        },
+      })
+      accept(payload)
+      setError(null)
+      clearCachedProfileAvatarUrl(userId)
+      window.dispatchEvent(new CustomEvent('profile-avatar-changed'))
+      toast?.success('Character saved.')
+    } catch (e) {
+      if (e instanceof Error && e.message.includes('another session'))
+        setError('A newer character is available. Reload to replace this draft.')
+      toast?.error(
+        e instanceof Error ? e.message : 'Could not save your character. Please try again.',
+      )
+    } finally {
+      setSaving(false)
+      persist.end('character')
     }
   }
-
-  const onDragEnd = (event: DragEndEvent) => {
-    setActiveDragId(null)
-    const { active, over } = event
-    if (!over) return
-    const itemId = String(active.id).startsWith('item:')
-      ? String(active.id).slice('item:'.length)
-      : null
-    if (!itemId) return
-    const target = parseDropTarget(over.id)
-    if (!target) return
-    void persistMove(itemId, target)
-  }
-
-  const onDragCancel = () => setActiveDragId(null)
-
-  const detailCatalog = useMemo(() => {
-    const item = items.find((i) => i.id === detailItemId)
-    if (!item) return null
-    return catalogById.get(item.catalogItemId) ?? null
-  }, [items, detailItemId, catalogById])
-
-  const hoverCatalog = useMemo(() => {
-    const item = items.find((i) => i.id === hoverTarget?.itemId)
-    if (!item) return null
-    return catalogById.get(item.catalogItemId) ?? null
-  }, [items, hoverTarget, catalogById])
-
-  const dragCatalog = useMemo(() => {
-    const item = items.find((i) => i.id === activeDragId)
-    if (!item) return null
-    return catalogById.get(item.catalogItemId) ?? null
-  }, [items, activeDragId, catalogById])
-
-  if (error && catalog.length === 0 && items.length === 0) {
-    return (
-      <div className="flex flex-col flex-1 min-h-0 h-full font-sans relative">
-        <div className="chitin-card p-4 chamfer-corner border border-[#ff5540]/40 bg-[#1a0808] text-[#ff5540] text-sm">
-          {error}
-        </div>
+  if (!saved || !config || !preview)
+    return error ? (
+      <div role="alert" className="p-5 space-y-3">
+        <p>{error}</p>
+        <HudButton onClick={() => setReload((n) => n + 1)}>Try again</HudButton>
       </div>
+    ) : (
+      <HudWorkspaceGhost />
     )
-  }
-
+  const wearing = items.find((i) => i.equippedSlot === slot)
   return (
-    <div className="flex flex-col flex-1 min-h-0 h-full w-full">
-      <DndContext
-        sensors={sensors}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-        onDragCancel={onDragCancel}
-      >
-        <div className="flex flex-col flex-1 min-h-0 h-full font-sans relative min-w-0 w-full">
-          <div className="flex flex-col md:grid md:grid-cols-[minmax(0,14rem)_minmax(0,1fr)_minmax(0,14rem)] flex-1 min-h-0 gap-3.5 sm:gap-5 min-w-0">
-            <div className="order-2 md:order-1 hidden md:flex md:flex-col md:min-h-0">
-              <LoadoutStatsPanel totals={totals} variant="panel" />
+    <div className="space-y-3.5 sm:space-y-5 font-sans relative" data-testid="character-workspace">
+      <HudTitlePanel
+        title="Your character"
+        eyebrow="Character studio"
+        description="Shape your shell. Find your fit."
+        actions={
+          <div className="flex gap-2">
+            <HudButton
+              variant="secondary"
+              disabled={saving || (!dirty && !tryOn)}
+              onClick={() => accept(saved)}
+            >
+              Discard
+            </HudButton>
+            <HudButton disabled={saving || !dirty} onClick={() => void save()}>
+              {saving ? 'Saving…' : 'Save changes'}
+            </HudButton>
+          </div>
+        }
+      />
+      {error && (
+        <div role="alert" className="text-crimson-text">
+          {error}{' '}
+          <button type="button" className="underline" onClick={() => setReload((n) => n + 1)}>
+            Reload character
+          </button>
+        </div>
+      )}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,1fr)] gap-4 lg:gap-6 items-start">
+        <div className="lg:sticky lg:top-4 space-y-3">
+          <AvatarCreatorPreview config={preview} className="max-w-[640px] mx-auto" />
+          {tryOn && (
+            <div
+              role="status"
+              className="flex items-center justify-between gap-3 px-3 py-2 border border-cyan-glow/30 bg-cyan-soft rounded-control text-sm"
+            >
+              <span>Preview only · {catalogById.get(tryOn.catalogId)?.name}</span>
+              <button type="button" className="underline shrink-0" onClick={() => setTryOn(null)}>
+                End preview
+              </button>
             </div>
-
-            <div className="order-1 md:order-2 flex flex-col flex-1 min-h-0 gap-3.5 sm:gap-5 min-w-0">
-              <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl flex flex-col flex-1 min-h-[12rem] md:min-h-0 overflow-hidden">
-                <PaperDoll
-                  items={items}
-                  catalogById={catalogById}
-                  selectedItemId={selectedItemId}
-                  onSelectItem={handleSelectItem}
-                  onSlotActivate={handleSlotActivate}
-                  onHoverItem={setHoverTarget}
-                />
-              </div>
-
-              <div className="md:hidden space-y-3.5 shrink-0">
-                <LoadoutStatsPanel totals={totals} variant="strip" />
-                <AbilitiesPanel abilities={abilities} variant="strip" />
-              </div>
-
-              <div className="chitin-card p-3 sm:p-4 md:p-5 rounded-card shadow-2xl shrink-0 overflow-hidden min-w-0">
-                <VaultGrid
-                  items={items}
-                  catalogById={catalogById}
-                  vaultSize={vaultSize}
-                  selectedItemId={selectedItemId}
-                  onSelectItem={handleSelectItem}
-                  onCellActivate={handleCellActivate}
-                  onHoverItem={setHoverTarget}
-                />
-              </div>
-
-            </div>
-
-            <div className="order-3 hidden md:flex md:flex-col md:min-h-0">
-              <AbilitiesPanel abilities={abilities} variant="panel" />
-            </div>
+          )}
+          <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5" aria-label="Equipment slots">
+            {EQUIP_SLOT_IDS.map((id) => (
+              <button
+                type="button"
+                key={id}
+                disabled={saving}
+                aria-label={`${SLOT_NAMES[id]} slot`}
+                aria-pressed={slot === id}
+                onClick={() => {
+                  setSlot(id)
+                  setTab('equipment')
+                  setSelected(null)
+                  setTryOn(null)
+                }}
+                className={`rounded-control border px-1.5 py-2 text-[11px] min-h-12 ${slot === id ? 'border-cyan-glow bg-cyan-soft text-ink' : 'border-line text-ink-muted bg-surface-1'}`}
+              >
+                <span className="block font-semibold">{SLOT_NAMES[id]}</span>
+                <span className="block truncate mt-1 opacity-70">
+                  {equipped[id]
+                    ? catalogById.get(items.find((i) => i.equippedSlot === id)?.catalogItemId ?? '')
+                        ?.name
+                    : 'Empty'}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
-
-        {hoverCatalog && hoverTarget && (
-          <GearTooltipFloating catalog={hoverCatalog} anchor={hoverTarget.anchor} />
-        )}
-
-        <DragOverlay dropAnimation={null}>
-          {dragCatalog ? (
-            <div className="w-16 sm:w-20 pointer-events-none">
-              <GearItemCard catalog={dragCatalog} />
-            </div>
-          ) : null}
-        </DragOverlay>
-
-        <div className="md:hidden">
-          <HudBottomSheet
-            isOpen={isMobile && Boolean(detailCatalog)}
-            onClose={() => setDetailItemId(null)}
-            title={detailCatalog?.name ?? 'Gear'}
-            ariaLabel="Gear detail"
-            containerClassName="md:hidden"
-          >
-            {detailCatalog && <GearDetail catalog={detailCatalog} />}
-            {detailCatalog && (
-              <p className="px-3 pb-4 text-[10px] text-[#839493] uppercase tracking-widest">
-                Close, then drag or tap a hardpoint to equip
-              </p>
+        <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-4">
+          <div role="tablist" aria-label="Character editor" className="flex border-b border-line">
+            {TABS.map((id) => (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={tab === id}
+                aria-controls="character-controls"
+                onClick={() => {
+                  setTab(id)
+                  setTryOn(null)
+                }}
+                className={`flex-1 py-3 text-sm capitalize border-b-2 ${tab === id ? 'border-cyan-glow text-ink' : 'border-transparent text-ink-muted'}`}
+              >
+                {id}
+              </button>
+            ))}
+          </div>
+          <div id="character-controls" role="tabpanel">
+            {tab !== 'equipment' ? (
+              <AvatarCreatorPanel
+                value={config}
+                section={tab}
+                onChange={(next) => {
+                  draftTouched.current = true
+                  setConfig(next)
+                }}
+                disabled={saving}
+              />
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <h2 className="font-grotesk font-bold text-ink">{SLOT_NAMES[slot]}</h2>
+                    <p className="text-xs text-ink-muted mt-1">
+                      {wearing
+                        ? catalogById.get(wearing.catalogItemId)?.name
+                        : 'Natural shell · nothing equipped'}
+                    </p>
+                  </div>
+                  <HudButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={unequip}
+                    disabled={saving || !wearing}
+                  >
+                    Unequip
+                  </HudButton>
+                </div>
+                <label className="flex gap-2 items-center text-xs text-ink-muted">
+                  <input
+                    type="checkbox"
+                    checked={onlyOwned}
+                    onChange={(e) => setOnlyOwned(e.target.checked)}
+                  />
+                  Owned items only
+                </label>
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                  {matching.map((c) => {
+                    const owned = items.filter((i) => i.catalogItemId === c.id).length
+                    return (
+                      <div key={c.id} className="space-y-1">
+                        <GearItemCard
+                          catalog={c}
+                          selected={selected === c.id}
+                          onClick={() => setSelected(c.id)}
+                        />
+                        <p className="text-[11px] text-ink-muted text-center">
+                          {owned ? `Owned${owned > 1 ? ` ×${owned}` : ''}` : 'Preview only'}
+                        </p>
+                      </div>
+                    )
+                  })}
+                </div>
+                {selectedCatalog && selectedCatalog.category === equipSlotCategory(slot) && (
+                  <div className="space-y-3">
+                    <GearDetail catalog={selectedCatalog} />
+                    <HudButton onClick={() => equip(selectedCatalog.id)} disabled={saving}>
+                      {items.some((i) => i.catalogItemId === selectedCatalog.id)
+                        ? `Equip on ${SLOT_NAMES[slot].toLowerCase()}`
+                        : 'Try on'}
+                    </HudButton>
+                  </div>
+                )}
+                <p className="text-xs text-ink-muted">
+                  {items.length} owned items · {items.filter((i) => !i.equippedSlot).length}/
+                  {saved.vaultSize} vault spaces used. Other designs are available to preview.
+                </p>
+              </div>
             )}
-          </HudBottomSheet>
+          </div>
+          <details className="border-t border-line pt-3 text-xs text-ink-muted">
+            <summary className="cursor-pointer">Loadout stats · character flavor</summary>
+            <div className="grid grid-cols-2 gap-2 pt-3">
+              {Object.entries(computeLoadoutTotals(items, catalogById)).map(([key, value]) => (
+                <p key={key} className="capitalize">
+                  {key}: {value}
+                </p>
+              ))}
+            </div>
+            <p className="pt-2">Equipment values do not affect activities or progression.</p>
+          </details>
         </div>
-      </DndContext>
+      </div>
     </div>
   )
 }

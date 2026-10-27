@@ -62,7 +62,7 @@ describe('UserAvatar Component', () => {
         user={null}
         fallbackSrc="/images/extracted/larva_unit_3d.jpg"
         alt="Larva Unit 3D"
-      />
+      />,
     )
 
     const img = screen.getByRole('img', { name: 'Larva Unit 3D' })
@@ -83,3 +83,22 @@ describe('UserAvatar Component', () => {
   })
 })
 
+it('prefers a saved equipped character over an account photo', () => {
+  const { container } = render(
+    <UserAvatar
+      user={{
+        name: 'Crab',
+        image: 'https://example.com/photo.jpg',
+        avatarConfig: {
+          style: 'critters',
+          seed: 'member',
+          race: 'crab',
+          equipment: { head: { visualKey: 'creator-bow', rarity: 'common' } },
+        },
+      }}
+    />,
+  )
+  const svg = decodeURIComponent(container.querySelector('img')!.src.split(',')[1])
+  expect(svg).toContain('data-race="crab"')
+  expect(svg).toContain('data-equipment="creator-bow"')
+})

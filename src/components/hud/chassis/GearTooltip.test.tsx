@@ -29,7 +29,7 @@ describe('GearTooltip', () => {
     expect(screen.getByText(/Legendary · Claws/i)).toBeInTheDocument()
     expect(screen.getByText('+96 Attack')).toBeInTheDocument()
     expect(screen.getByText('+8 Speed')).toBeInTheDocument()
-    expect(screen.getByText('Zero-Latency Clamp')).toBeInTheDocument()
+    expect(screen.getByText('Item lore · Zero-Latency Clamp')).toBeInTheDocument()
     expect(
       screen.getByText(/The first grip of a session closes without hesitation/i)
     ).toBeInTheDocument()

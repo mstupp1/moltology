@@ -11,14 +11,14 @@ export const LOGIC_ATLAS: LogicAtlas = {
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
-    "rules": 113,
-    "decisions": 40,
-    "anchors": 204,
-    "drifted": 28,
+    "rules": 117,
+    "decisions": 42,
+    "anchors": 216,
+    "drifted": 27,
     "flagged": 10
   },
   "canvas": {
-    "width": 5737,
+    "width": 5803,
     "height": 2976
   },
   "domains": [
@@ -31,7 +31,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "box": {
         "x": 0,
         "y": 0,
-        "width": 1532,
+        "width": 1598,
         "height": 676
       },
       "ruleIds": [
@@ -44,7 +44,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "economy.simulated-gem-grants",
         "economy.cosmetics-no-stats",
         "economy.look-slots",
-        "economy.starter-looks"
+        "economy.starter-looks",
+        "economy.character-starter-equipment",
+        "economy.character-equipment-visuals"
       ]
     },
     {
@@ -54,7 +56,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Daily liturgies earn XP into an append-only ledger. Stage and clearance are derived from lifetime XP, never set directly.",
       "overviewHtml": "<p>Progression is the earned half of the economy. The XP ledger is the source of truth, and <code>profiles.xp</code> and <code>profiles.stage</code> are caches rebuilt from it after every change.</p>",
       "box": {
-        "x": 1628,
+        "x": 1694,
         "y": 0,
         "width": 948,
         "height": 988
@@ -78,7 +80,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Two roles, user and admin. Server functions verify the caller's JWT, then check the role before any staff action.",
       "overviewHtml": "<p>Access has two layers. The UI hides staff tools from everyone else, and each server function checks the role again, because the client can be skipped.</p>",
       "box": {
-        "x": 2672,
+        "x": 2738,
         "y": 0,
         "width": 1196,
         "height": 676
@@ -102,7 +104,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Self-hosted Better Auth with email and password plus Google. Sessions are cookie-cached, and writes use short-lived JWTs.",
       "overviewHtml": "<p>Auth moved off Managed Neon Auth because its background polling kept Neon compute awake and blew the compute budget. Identity for writes is always a verified JWT, never a client-supplied id.</p>",
       "box": {
-        "x": 3964,
+        "x": 4030,
         "y": 0,
         "width": 1773,
         "height": 538
@@ -253,7 +255,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 2336,
         "y": 1988,
         "width": 904,
-        "height": 652
+        "height": 940
       },
       "ruleIds": [
         "data.neon-compute-budget",
@@ -264,7 +266,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "data.migrations-via-ci",
         "data.asset-budget",
         "data.avatar-look-server",
-        "data.avatar-portraits"
+        "data.avatar-portraits",
+        "data.character-atomic-save",
+        "data.character-public-appearance"
       ]
     },
     {
@@ -358,7 +362,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 160,
+        "x": 226,
         "y": 76
       },
       "drift": "ok"
@@ -386,6 +390,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [
         "economy.cosmetics-no-stats",
+        "economy.character-starter-equipment",
+        "economy.character-equipment-visuals",
         "progression.stage-from-xp",
         "premium.no-standing",
         "oracle.usage-allowance",
@@ -399,7 +405,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 72,
+        "x": 138,
         "y": 232
       },
       "drift": "ok"
@@ -432,7 +438,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 364,
+        "x": 430,
         "y": 232
       },
       "drift": "ok"
@@ -476,7 +482,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 656,
+        "x": 722,
         "y": 232
       },
       "drift": "ok"
@@ -532,7 +538,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 948,
+        "x": 1014,
         "y": 232
       },
       "drift": "ok"
@@ -581,7 +587,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       },
       "flow": null,
       "position": {
-        "x": 948,
+        "x": 1014,
         "y": 388
       },
       "drift": "changed"
@@ -615,7 +621,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       },
       "flow": null,
       "position": {
-        "x": 1240,
+        "x": 1306,
         "y": 232
       },
       "drift": "changed"
@@ -631,18 +637,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/chassis-loadout.ts",
           "symbol": "computeLoadoutTotals",
-          "line": 266,
+          "line": 267,
           "value": "computeLoadoutTotals(items, catalogById)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L266"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L267"
         },
         {
           "file": "src/lib/chassis-loadout.ts",
           "symbol": "isCosmetic",
-          "line": 238,
+          "line": 239,
           "value": "isCosmetic(catalog)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L238"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L239"
         }
       ],
       "tests": [
@@ -689,10 +695,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/chassis-loadout.ts",
           "symbol": "planGearMove",
-          "line": 378,
+          "line": 379,
           "value": "planGearMove(items, catalogById, itemId, target, vaultSize)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L378"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L379"
         }
       ],
       "tests": [
@@ -723,23 +729,23 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Starter looks retired",
       "kind": "flow",
       "status": "deprecated",
-      "statement": "Chassis loads and catalog seeds no longer grant or create experimental starter cosmetics. Original equipment grants continue.",
+      "statement": "Chassis loads and catalog seeds no longer grant or create experimental starter cosmetics. The replacement starter collection is initialized once per equipment version.",
       "anchors": [
         {
           "file": "src/lib/equipment-seed-data.ts",
           "symbol": "ALL_EQUIPMENT_CATALOG",
-          "line": 361,
-          "value": "INITIAL_EQUIPMENT_CATALOG",
+          "line": 394,
+          "value": "[...INITIAL_EQUIPMENT_CATALOG, ...CREATOR_EQUIPMENT_CATALOG]",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/equipment-seed-data.ts#L361"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/equipment-seed-data.ts#L394"
         },
         {
-          "file": "src/lib/chassis-loadout.ts",
-          "symbol": "planStarterGrants",
-          "line": 551,
-          "value": "planStarterGrants(existing, catalogIdsPresent, starterIds, vaultSize)",
+          "file": "src/lib/equipment-seed-data.ts",
+          "symbol": "STARTER_EQUIPMENT_CATALOG_IDS",
+          "line": 397,
+          "value": "[ 'a1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000004', 'a1000000-0000-4000-8000-000000000004', 'a1000000-0000-4000-8000-000000000007…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L551"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/equipment-seed-data.ts#L397"
         }
       ],
       "tests": [
@@ -765,6 +771,114 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "drift": "ok"
     },
     {
+      "id": "economy.character-starter-equipment",
+      "domain": "economy",
+      "title": "Nineteen common starter items",
+      "kind": "flow",
+      "status": "active",
+      "statement": "Equipment version one replaces legacy inventories once with nineteen common items, including two instances of every creator claw style. Seven pieces start equipped. Rarer catalog items can be previewed but cannot be equipped without ownership.",
+      "anchors": [
+        {
+          "file": "src/lib/equipment-seed-data.ts",
+          "symbol": "STARTER_EQUIPMENT_CATALOG_IDS",
+          "line": 397,
+          "value": "[ 'a1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000004', 'a1000000-0000-4000-8000-000000000004', 'a1000000-0000-4000-8000-000000000007…",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/equipment-seed-data.ts#L397"
+        },
+        {
+          "file": "src/lib/avatar/starter-equipment.ts",
+          "symbol": "STARTER_CHARACTER_EQUIPMENT",
+          "line": 8,
+          "value": "Object.fromEntries( STARTER_EQUIPPED_SLOTS.map((slot, i) => { const c = ALL_EQUIPMENT_CATALOG.find((c) => c.id === STARTER_EQUIPMENT_CATALOG_IDS[i])! return [s…",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/starter-equipment.ts#L8"
+        },
+        {
+          "file": "src/lib/character-appearance.ts",
+          "symbol": "EQUIPMENT_VERSION",
+          "line": 6,
+          "value": "1",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/character-appearance.ts#L6"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/character-appearance.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/character-appearance.test.ts"
+        },
+        {
+          "file": "src/lib/server/character.integration.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/character.integration.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "economy.red-line"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "visible-character-equipment"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 364,
+        "y": 388
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "economy.character-equipment-visuals",
+      "domain": "economy",
+      "title": "Equipment changes appearance without progression",
+      "kind": "invariant",
+      "status": "active",
+      "statement": "Each equipped slot displays its actual item. Rarity describes visible construction and materials; stats and unique powers are character flavor and do not affect activities, progression, rank, or authority. There is no separate cosmetic override layer.",
+      "anchors": [
+        {
+          "file": "src/lib/avatar/equipment.ts",
+          "symbol": "EQUIPMENT_VISUALS",
+          "line": 63,
+          "value": "Object.fromEntries( rows.map(([key, category, material, trim, accent, construction, motif, accessory]) => [ key, { key, category, material, trim, accent, const…",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/equipment.ts#L63"
+        },
+        {
+          "file": "src/lib/avatar/races.ts",
+          "symbol": "renderCharacter",
+          "line": 784,
+          "value": "renderCharacter(spec, ctx)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/races.ts#L784"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/character-appearance.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/character-appearance.test.ts"
+        },
+        {
+          "file": "src/components/hud/chassis/ChassisStatusPage.test.tsx",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/chassis/ChassisStatusPage.test.tsx"
+        }
+      ],
+      "dependsOn": [
+        "economy.red-line"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "visible-character-equipment"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 656,
+        "y": 388
+      },
+      "drift": "ok"
+    },
+    {
       "id": "progression.daily-liturgies",
       "domain": "progression",
       "title": "Eight daily liturgies",
@@ -776,8 +890,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "file": "src/lib/alignment-tasks.ts",
           "symbol": "CANONICAL_ALIGNMENT_TASKS",
           "line": 33,
-          "value": "[ { key: 'silent-synchronization', time: '05:30', title: 'Silent Synchronization', description: 'Align neural baseline and initiate telemetry.', }, { key: 'pro…",
-          "drift": "ok",
+          "value": "[ { key: 'silent-synchronization', time: 'Early morning', title: 'Silent Synchronization', description: 'Align neural baseline and initiate telemetry.', }, { k…",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/alignment-tasks.ts#L33"
         }
       ],
@@ -798,7 +912,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 568,
         "y": 76
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "progression.xp-rewards",
@@ -851,18 +965,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/db/schema.ts",
           "symbol": "xpTransactions",
-          "line": 362,
+          "line": 365,
           "value": "pgTable('xp_transactions', { id: uuid('id').defaultRandom().primaryKey(), userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' …",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L362"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L365"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3545,
+          "line": 3581,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3545"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3581"
         }
       ],
       "tests": [
@@ -901,18 +1015,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/alignment-tasks.ts",
           "symbol": "isAlignmentDateWritable",
-          "line": 123,
+          "line": 124,
           "value": "isAlignmentDateWritable(date, now)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/alignment-tasks.ts#L123"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/alignment-tasks.ts#L124"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3545,
+          "line": 3581,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3545"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3581"
         }
       ],
       "tests": [
@@ -947,10 +1061,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3325,
+          "line": 3361,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3325"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3361"
         },
         {
           "file": "src/lib/progression.ts",
@@ -1085,10 +1199,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3325,
+          "line": 3361,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3325"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3361"
         }
       ],
       "tests": [],
@@ -1276,7 +1390,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "forum.write-pipeline",
         "forum.author-only-edits",
         "forum.peer-flags",
-        "oracle.thread-ownership"
+        "oracle.thread-ownership",
+        "data.character-atomic-save"
       ],
       "decisions": [
         "jwt-write-auth",
@@ -1303,7 +1418,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "profiles",
           "line": 123,
           "value": "pgTable('profiles', { id: text('id').primaryKey(), role: text('role').default('user').notNull(), // 'user' | 'admin' larvaId: text('larvaId').default('LARVA UN…",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L123"
         }
       ],
@@ -1324,7 +1439,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 904,
         "y": 388
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "access.hidden-pages",
@@ -2568,18 +2683,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "submitLeadHandler",
-          "line": 3091,
+          "line": 3111,
           "value": "submitLeadHandler(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3091"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3111"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createBlogCommentHandler",
-          "line": 743,
+          "line": 763,
           "value": "createBlogCommentHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L743"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L763"
         }
       ],
       "tests": [
@@ -2696,7 +2811,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "decisions": [
         "premium-soft-launch",
-        "oracle-usage-and-moderation"
+        "oracle-usage-and-moderation",
+        "oracle-rolling-allowances"
       ],
       "flag": null,
       "flow": null,
@@ -2733,10 +2849,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/db/schema.ts",
           "symbol": "profiles.hasPurchasedPremium",
-          "line": 156,
+          "line": 159,
           "value": "boolean('hasPurchasedPremium').default(false).notNull()",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L156"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L159"
         }
       ],
       "tests": [
@@ -3237,18 +3353,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumTopicHandler",
-          "line": 1583,
+          "line": 1603,
           "value": "createForumTopicHandler({ data, context })",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1583"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1603"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "requirePublishableForumPost",
-          "line": 917,
+          "line": 937,
           "value": "requirePublishableForumPost(input)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L917"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L937"
         }
       ],
       "tests": [
@@ -3538,7 +3654,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 116,
         "y": 364
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "forum.rate-limit",
@@ -3610,10 +3726,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createBlogCommentHandler",
-          "line": 743,
+          "line": 763,
           "value": "createBlogCommentHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L743"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L763"
         },
         {
           "file": "src/lib/server/forum-write-limit.ts",
@@ -3960,10 +4076,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertForumAuthor",
-          "line": 925,
+          "line": 945,
           "value": "assertForumAuthor(rowUserId, actorId, action)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L925"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L945"
         }
       ],
       "tests": [
@@ -4006,10 +4122,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumPostHandler",
-          "line": 1729,
+          "line": 1749,
           "value": "createForumPostHandler({ data, context })",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1729"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1749"
         }
       ],
       "tests": [
@@ -4031,7 +4147,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 520
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "forum.peer-flags",
@@ -4096,26 +4212,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertCovenantSteward",
-          "line": 2374,
+          "line": 2394,
           "value": "assertCovenantSteward(dbClient, userId, payload)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2374"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2394"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "reviewForumReportHandler",
-          "line": 2677,
+          "line": 2697,
           "value": "reviewForumReportHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2677"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2697"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "removeForumReportTargetHandler",
-          "line": 2747,
+          "line": 2767,
           "value": "removeForumReportTargetHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2747"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2767"
         }
       ],
       "tests": [
@@ -4188,7 +4304,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "handleOracleChatRequest",
           "line": 71,
           "value": "handleOracleChatRequest(request)",
-          "drift": "ok",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L71"
         }
       ],
@@ -4468,7 +4584,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1117,
         "y": 76
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "oracle.rate-limit",
@@ -4514,34 +4630,34 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "oracle.usage-allowance",
       "domain": "oracle",
-      "title": "Daily allowance, Premium gets 10x",
+      "title": "Rolling allowances, Premium gets 10x",
       "kind": "limit",
       "status": "active",
-      "statement": "Free members can send 5 Oracle messages a minute and 30 in any rolling 24 hours. Premium members get 10 times that, 50 a minute and 300 a day. Usage is stored per member, shared across server instances, and deleting a thread does not reset it.",
+      "statement": "Free members can send 5 Oracle messages a minute, 15 in any rolling 5 hours, and 100 in any rolling 7 days. Premium gets 10 times each allowance. Both rolling windows must have capacity; availability is calculated from recorded timestamps. Usage survives thread deletion and is shared across server instances. Chat shows five-hour usage, with both windows in expanded details and Settings.",
       "anchors": [
         {
           "file": "src/lib/ai/usage-limits.ts",
           "symbol": "ORACLE_FREE_LIMITS",
-          "line": 16,
-          "value": "{ perMinute: 5, perDay: 30 }",
+          "line": 8,
+          "value": "{ perMinute: 5, perFiveHours: 15, perWeek: 100 }",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L16"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L8"
         },
         {
           "file": "src/lib/ai/usage-limits.ts",
           "symbol": "ORACLE_PREMIUM_LIMITS",
-          "line": 20,
-          "value": "{ perMinute: ORACLE_FREE_LIMITS.perMinute * PREMIUM_LIMIT_MULTIPLIER, perDay: ORACLE_FREE_LIMITS.perDay * PREMIUM_LIMIT_MULTIPLIER, }",
+          "line": 10,
+          "value": "{ perMinute: ORACLE_FREE_LIMITS.perMinute * PREMIUM_LIMIT_MULTIPLIER, perFiveHours: ORACLE_FREE_LIMITS.perFiveHours * PREMIUM_LIMIT_MULTIPLIER, perWeek: ORACLE…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L20"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L10"
         },
         {
           "file": "src/lib/ai/usage-limits.ts",
           "symbol": "decideOracleUsage",
-          "line": 52,
+          "line": 92,
           "value": "decideOracleUsage(counts, isPremium)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L52"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L92"
         },
         {
           "file": "src/lib/ai/service.ts",
@@ -4550,6 +4666,22 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "value": "getOracleUsageSnapshot(userId, now)",
           "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L308"
+        },
+        {
+          "file": "src/lib/ai/usage-limits.ts",
+          "symbol": "buildOracleUsageSnapshot",
+          "line": 51,
+          "value": "buildOracleUsageSnapshot(events, isPremium, now)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L51"
+        },
+        {
+          "file": "src/lib/server/oracle-usage.ts",
+          "symbol": "getOracleUsageHandler",
+          "line": 4,
+          "value": "getOracleUsageHandler(args)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/oracle-usage.ts#L4"
         }
       ],
       "tests": [
@@ -4560,6 +4692,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/handle-oracle-chat-request.test.ts",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.test.ts"
+        },
+        {
+          "file": "src/lib/server/oracle-usage.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/oracle-usage.test.ts"
+        },
+        {
+          "file": "src/hooks/useOracleUsage.test.tsx",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useOracleUsage.test.tsx"
+        },
+        {
+          "file": "src/components/ai/OracleUsage.test.tsx",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/ai/OracleUsage.test.tsx"
         }
       ],
       "dependsOn": [
@@ -4569,11 +4713,12 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [],
       "decisions": [
-        "oracle-usage-and-moderation"
+        "oracle-usage-and-moderation",
+        "oracle-rolling-allowances"
       ],
       "flag": {
         "level": "watch",
-        "note": "If the usage table cannot be read, the request continues with only the per-instance flood guard."
+        "note": "Usage checks fail closed when storage is unavailable. Checking capacity and recording a request remain separate operations, so concurrent requests can overshoot a cap."
       },
       "flow": null,
       "position": {
@@ -4593,18 +4738,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/usage-limits.ts",
           "symbol": "ORACLE_MAX_HISTORY_MESSAGES",
-          "line": 26,
+          "line": 17,
           "value": "20",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L26"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L17"
         },
         {
           "file": "src/lib/ai/usage-limits.ts",
           "symbol": "ORACLE_MAX_OUTPUT_TOKENS",
-          "line": 28,
+          "line": 19,
           "value": "1_024",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L28"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L19"
         },
         {
           "file": "src/lib/ai/oracle-chat.ts",
@@ -5321,8 +5466,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 364,
-        "y": 208
+        "x": 72,
+        "y": 496
       },
       "drift": "ok"
     },
@@ -5370,8 +5515,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 364,
-        "y": 364
+        "x": 72,
+        "y": 652
       },
       "drift": "changed"
     },
@@ -5414,8 +5559,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       },
       "flow": null,
       "position": {
-        "x": 320,
-        "y": 520
+        "x": 28,
+        "y": 808
       },
       "drift": "changed"
     },
@@ -5447,8 +5592,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 612,
-        "y": 520
+        "x": 320,
+        "y": 808
       },
       "drift": "changed"
     },
@@ -5526,15 +5671,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Painted avatar state retired",
       "kind": "invariant",
       "status": "deprecated",
-      "statement": "Painted loadouts and cached portrait keys are ignored when reading saved avatar configs. Saving an avatar stores only the original drawn character traits. Gear moves no longer rewrite avatars.",
+      "statement": "Painted loadouts and cached portrait keys are ignored when reading saved avatar configs. Saving an avatar stores body, face, and scene traits. Equipment appearance is maintained in a separate server-owned snapshot.",
       "anchors": [
         {
           "file": "src/lib/lobster-avatar.ts",
           "symbol": "parseLobsterAvatarConfig",
-          "line": 244,
+          "line": 249,
           "value": "parseLobsterAvatarConfig(raw)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar.ts#L244"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar.ts#L249"
         },
         {
           "file": "src/lib/avatar/config-schema.ts",
@@ -5573,7 +5718,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Painted portraits retired",
       "kind": "invariant",
       "status": "deprecated",
-      "statement": "Portraits and full-body avatars use the original drawn character. Saved painted portrait keys cannot select the retired renderer, and no painted portraits are generated or uploaded.",
+      "statement": "Portraits and full-body avatars compose the same drawn character and equipped visual snapshot. Saved painted portrait keys cannot select the retired renderer, and no painted portraits are generated or uploaded.",
       "anchors": [
         {
           "file": "src/lib/lobster-avatar-slots.ts",
@@ -5602,6 +5747,116 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flow": null,
       "position": {
         "x": 28,
+        "y": 364
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "data.character-atomic-save",
+      "domain": "data",
+      "title": "Character saves are atomic and versioned",
+      "kind": "invariant",
+      "status": "active",
+      "statement": "Character saves validate the verified member, every owned placement, slot compatibility, and vault capacity. A locked database function commits body configuration, equipment, appearance snapshot, and revision together; stale revisions fail without partial changes.",
+      "anchors": [
+        {
+          "file": "src/lib/server/db-services.ts",
+          "symbol": "saveCharacterHandler",
+          "line": 3914,
+          "value": "saveCharacterHandler({ data, context })",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3914"
+        },
+        {
+          "file": "src/lib/character-appearance.ts",
+          "symbol": "validateCharacterPlacements",
+          "line": 36,
+          "value": "validateCharacterPlacements(owned, catalog, placements)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/character-appearance.ts#L36"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/character-appearance.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/character-appearance.test.ts"
+        },
+        {
+          "file": "src/lib/server/character.integration.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/character.integration.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "access.write-auth"
+      ],
+      "usedBy": [
+        "data.character-public-appearance"
+      ],
+      "decisions": [
+        "visible-character-equipment"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 320,
+        "y": 208
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "data.character-public-appearance",
+      "domain": "data",
+      "title": "Public portraits share equipped visuals",
+      "kind": "invariant",
+      "status": "active",
+      "statement": "Public member and author payloads include complete body traits and compact equipped visual keys. They do not expose inventory instances or vault contents. Saved characters take precedence over account photos.",
+      "anchors": [
+        {
+          "file": "src/lib/server/db-services.ts",
+          "symbol": "publicAvatarConfig",
+          "line": 168,
+          "value": "sql<LobsterAvatarConfig | null>`CASE WHEN ${profiles.avatarConfig} IS NULL THEN NULL ELSE (${profiles.avatarConfig} - 'accessory' - 'claws' - 'equipment') || j…",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L168"
+        },
+        {
+          "file": "src/components/UserAvatar.tsx",
+          "symbol": "UserAvatar",
+          "line": 36,
+          "value": "React.memo( ({ user, config, src, name, email, fallbackSrc, fallbackLetter, size = 'md', className = '', alt, borderless = false, }) => { const [imageError, se…",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/UserAvatar.tsx#L36"
+        },
+        {
+          "file": "src/components/forum/ForumAvatar.tsx",
+          "symbol": "ForumAvatar",
+          "line": 62,
+          "value": "React.memo(({ src, authorName, authorHandle, userId, avatarConfig, size = 'md', className, alt, loading = 'lazy', }) => { const [imageError, setImageError] = u…",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/forum/ForumAvatar.tsx#L62"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/components/UserAvatar.test.tsx",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/UserAvatar.test.tsx"
+        },
+        {
+          "file": "src/components/forum/ForumAvatar.test.tsx",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/forum/ForumAvatar.test.tsx"
+        }
+      ],
+      "dependsOn": [
+        "data.character-atomic-save"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "visible-character-equipment"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 320,
         "y": 364
       },
       "drift": "ok"
@@ -8299,6 +8554,37 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ]
     },
     {
+      "id": "oracle-rolling-allowances",
+      "date": "2026-10-25",
+      "title": "Show Oracle usage and enforce two rolling allowances",
+      "summary": "Replace the daily allowance with 15 messages per rolling 5 hours and 100 per rolling 7 days, with Premium at 10x and a quiet usage display.",
+      "domains": [
+        "oracle",
+        "premium"
+      ],
+      "rules": [
+        "oracle.usage-allowance",
+        "premium.no-standing"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>A daily allowance gave members no visible indication of remaining usage. Short sessions need a clear allowance, while sustained use needs an additional weekly cost ceiling.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Free members receive 15 messages per rolling 5 hours and 100 per rolling 7 days. Premium receives 150 and 1,000 respectively. Keep the existing minute safeguards. Both allowance windows must have room; when both are exhausted, use the later availability time. Historical events continue counting immediately, including usage above a new cap. Thread deletion cannot restore capacity.</p>\n<p>Show the five-hour allowance as a small bar below the composer. Put weekly usage in expandable details and both windows in Settings. Surface an exhausted weekly allowance even when details are closed. Keep the draft editable while sending is blocked. Use verified account reads and a shared session cache; mark failed reads without inventing usage.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>There are no midnight or calendar-week resets and no data migration. Existing raw-event retention covers both windows. The original decision&#39;s moderation, model, and Standing policies remain unchanged; this decision replaces only its daily allowance. Admission and usage recording remain separate operations, retaining the existing concurrency caveat.</p>"
+        }
+      ]
+    },
+    {
       "id": "retire-painted-avatar-builder",
       "date": "2026-10-25",
       "title": "Retain the original drawn avatar builder",
@@ -8339,6 +8625,54 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "heading": "Consequences",
           "html": "<p>Previously saved experimental avatars render through the original drawn system using their saved traits. Experimental config fields are ignored on read and disappear on the next avatar save. Historical database columns, inventory rows, and migrations remain intact. At the product owner&#39;s request, the retired artwork was also deleted from the public asset bucket: 38 painted layer files under <code>images/avatar-kit/</code>, 81 source and delivery files under <code>avatar-kit/</code>, and seven generated portraits under <code>images/avatar-portraits/</code> (30,010,564 bytes total). All three prefixes were verified empty after deletion. Original drawn character code and chassis artwork remain. Retired experiment IDs are ignored by the existing experiment registry.</p>"
+        }
+      ]
+    },
+    {
+      "id": "visible-character-equipment",
+      "date": "2026-10-25",
+      "title": "Unify character creation and visible equipment",
+      "summary": "Draw upright lobster and crab characters with actual worn items, one draft editor, atomic persistence, and a common starter collection.",
+      "domains": [
+        "economy",
+        "data"
+      ],
+      "rules": [
+        "economy.character-starter-equipment",
+        "economy.character-equipment-visuals",
+        "data.character-atomic-save",
+        "data.character-public-appearance"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "doc",
+          "label": "character-appearance.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/character-appearance.ts"
+        },
+        {
+          "kind": "doc",
+          "label": "0055_high_starbolt.sql",
+          "url": "https://github.com/mstupp1/moltology/blob/main/drizzle/0055_high_starbolt.sql"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Equipment previously appeared as inventory tiles around a mannequin. Creator hats and claw shapes were unrelated to ownership, while rarity chiefly changed colors and fictional values. The retired painted experiment remains retired.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Keep deterministic SVG rendering and the original SVG art direction: lobster silhouette, expressive eyes, shell gradients, and outlines. Give the crab an upright lower body with knees and broad feet while retaining its original shell and face. Use one equipment item per hardpoint, with separate right and left pincers. Every active catalog entry has shared worn geometry and thumbnail art; higher tiers add construction details.</p>\n<p>The character studio owns a complete draft with Save and Discard. Temporary unowned try-ons are separate from saved placements. Stats and powers remain descriptive flavor. Acquisition mechanics are deferred.</p>\n<p>Initialize equipment version one once per member, replacing previous ownership with nineteen common items and seven initial equipped placements. Preserve body and face choices; remove embedded headwear and claw selections. Initialization and commits lock the member row. Commits validate the complete placement list and expected revision before any writes. Public projections include compact visual snapshots without exposing the vault.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<p>Interactive 3D, layered bitmap characters, and a replacement SVG silhouette and paint treatment were declined in favor of retaining the original SVG style. Separate cosmetic overrides, legendary starter grants, functional combat stats, and new acquisition mechanics were excluded.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Existing inventories reset when their owner first opens the character studio or saves through onboarding. Before that initialization, public characters render without legacy equipment. The configured development database has the migration and integration coverage; production receives it through the standard migration workflow.</p>"
         }
       ]
     }
@@ -8396,6 +8730,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "economy.cosmetics-no-stats->economy.starter-looks",
       "source": "economy.cosmetics-no-stats",
       "target": "economy.starter-looks",
+      "crossDomain": false
+    },
+    {
+      "id": "economy.red-line->economy.character-starter-equipment",
+      "source": "economy.red-line",
+      "target": "economy.character-starter-equipment",
+      "crossDomain": false
+    },
+    {
+      "id": "economy.red-line->economy.character-equipment-visuals",
+      "source": "economy.red-line",
+      "target": "economy.character-equipment-visuals",
       "crossDomain": false
     },
     {
@@ -8906,6 +9252,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "data.avatar-look-server->data.avatar-portraits",
       "source": "data.avatar-look-server",
       "target": "data.avatar-portraits",
+      "crossDomain": false
+    },
+    {
+      "id": "access.write-auth->data.character-atomic-save",
+      "source": "access.write-auth",
+      "target": "data.character-atomic-save",
+      "crossDomain": true
+    },
+    {
+      "id": "data.character-atomic-save->data.character-public-appearance",
+      "source": "data.character-atomic-save",
+      "target": "data.character-public-appearance",
       "crossDomain": false
     },
     {

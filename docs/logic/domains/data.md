@@ -79,7 +79,7 @@ rules:
     title: Painted avatar state retired
     kind: invariant
     status: deprecated
-    statement: Painted loadouts and cached portrait keys are ignored when reading saved avatar configs. Saving an avatar stores only the original drawn character traits. Gear moves no longer rewrite avatars.
+    statement: Painted loadouts and cached portrait keys are ignored when reading saved avatar configs. Saving an avatar stores body, face, and scene traits. Equipment appearance is maintained in a separate server-owned snapshot.
     anchors:
       - file: src/lib/lobster-avatar.ts
         symbol: parseLobsterAvatarConfig
@@ -90,12 +90,36 @@ rules:
     title: Painted portraits retired
     kind: invariant
     status: deprecated
-    statement: Portraits and full-body avatars use the original drawn character. Saved painted portrait keys cannot select the retired renderer, and no painted portraits are generated or uploaded.
+    statement: Portraits and full-body avatars compose the same drawn character and equipped visual snapshot. Saved painted portrait keys cannot select the retired renderer, and no painted portraits are generated or uploaded.
     dependsOn: [data.avatar-look-server]
     anchors:
       - file: src/lib/lobster-avatar-slots.ts
         symbol: resolveLobsterAvatarAssets
     tests: [src/lib/lobster-avatar-slots.test.ts]
+  - id: data.character-atomic-save
+    title: Character saves are atomic and versioned
+    kind: invariant
+    statement: Character saves validate the verified member, every owned placement, slot compatibility, and vault capacity. A locked database function commits body configuration, equipment, appearance snapshot, and revision together; stale revisions fail without partial changes.
+    dependsOn: [access.write-auth]
+    anchors:
+      - file: src/lib/server/db-services.ts
+        symbol: saveCharacterHandler
+      - file: src/lib/character-appearance.ts
+        symbol: validateCharacterPlacements
+    tests: [src/lib/character-appearance.test.ts, src/lib/server/character.integration.test.ts]
+  - id: data.character-public-appearance
+    title: Public portraits share equipped visuals
+    kind: invariant
+    statement: Public member and author payloads include complete body traits and compact equipped visual keys. They do not expose inventory instances or vault contents. Saved characters take precedence over account photos.
+    dependsOn: [data.character-atomic-save]
+    anchors:
+      - file: src/lib/server/db-services.ts
+        symbol: publicAvatarConfig
+      - file: src/components/UserAvatar.tsx
+        symbol: UserAvatar
+      - file: src/components/forum/ForumAvatar.tsx
+        symbol: ForumAvatar
+    tests: [src/components/UserAvatar.test.tsx, src/components/forum/ForumAvatar.test.tsx]
 
 ---
 

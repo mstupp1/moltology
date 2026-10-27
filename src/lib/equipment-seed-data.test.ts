@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   ALL_EQUIPMENT_CATALOG,
   INITIAL_EQUIPMENT_CATALOG,
+  CREATOR_EQUIPMENT_CATALOG,
   STARTER_EQUIPMENT_CATALOG_IDS,
 } from './equipment-seed-data'
 import {
@@ -44,15 +45,9 @@ describe('equipment catalog seed', () => {
     }
   })
 
-  it('grants a starter stash that includes every legendary', () => {
-    const legendaryIds = INITIAL_EQUIPMENT_CATALOG.filter((item) => item.rarity === 'legendary').map(
-      (item) => item.id
-    )
-    for (const id of legendaryIds) {
-      expect(STARTER_EQUIPMENT_CATALOG_IDS).toContain(id)
-    }
-    expect(STARTER_EQUIPMENT_CATALOG_IDS.length).toBeGreaterThanOrEqual(8)
-    expect(STARTER_EQUIPMENT_CATALOG_IDS.length).toBeLessThanOrEqual(20)
+  it('grants common gear and creator pieces without legendary starter grants', () => {
+    expect(STARTER_EQUIPMENT_CATALOG_IDS).toHaveLength(19)
+    for (const id of STARTER_EQUIPMENT_CATALOG_IDS) expect(ALL_EQUIPMENT_CATALOG.find(c=>c.id===id)?.rarity).toBe('common')
   })
 
   it('does not ship Diablo names in the catalog', () => {
@@ -61,7 +56,7 @@ describe('equipment catalog seed', () => {
   })
 })
 
-it('seeds only the original equipment catalog', () => {
-  expect(ALL_EQUIPMENT_CATALOG).toEqual(INITIAL_EQUIPMENT_CATALOG)
+it('seeds original equipment and converted creator items', () => {
+  expect(ALL_EQUIPMENT_CATALOG).toEqual([...INITIAL_EQUIPMENT_CATALOG,...CREATOR_EQUIPMENT_CATALOG])
   expect(ALL_EQUIPMENT_CATALOG.every((item) => !item.kind || item.kind === 'gear')).toBe(true)
 })

@@ -92,18 +92,6 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
     const parsed = parseLobsterAvatarConfig(profile.avatarConfig)
     if (parsed?.seed) return parsed
 
-    if (typeof window !== 'undefined') {
-      try {
-        const stored =
-          localStorage.getItem(`moltology:avatar_config:${profile.id}`) ||
-          localStorage.getItem(`moltology:avatar_config:${profile.larvaId}`)
-        if (stored) {
-          const storedParsed = parseLobsterAvatarConfig(stored)
-          if (storedParsed?.seed) return storedParsed
-        }
-      } catch {}
-    }
-
     return undefined
   }, [profile])
 
@@ -280,8 +268,8 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
           </div>
           {loadout && loadout.items.length > 0 ? (
             <>
-              <ReadOnlyPaperDoll items={loadout.items} catalogById={catalogById} />
-              <LoadoutStatsPanel totals={loadout.totals} variant="strip" />
+              <ReadOnlyPaperDoll config={effectiveAvatarConfig} items={loadout.items} catalogById={catalogById} />
+              <details className="text-xs text-ink-muted"><summary>Loadout stats · character flavor</summary><LoadoutStatsPanel totals={loadout.totals} variant="strip" /></details>
             </>
           ) : (
             <p className="text-xs text-ink-muted py-6 text-center">No gear equipped yet.</p>
