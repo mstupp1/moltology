@@ -57,103 +57,59 @@ describe('Oracle Route Component', () => {
     }) as any)
   })
 
-  it('renders guest mode benefits box and create account CTA when unauthenticated', () => {
+  it('opens the shared guest chats menu from the header', async () => {
     const Component = (Route as any).component
     render(<Component />)
 
-    expect(screen.getAllByText(/GUEST MODE/i).length).toBeGreaterThan(0)
-    expect(screen.getAllByText(/MEMBER BENEFITS:/i).length).toBeGreaterThan(0)
-    expect(screen.getAllByRole('button', { name: /SIGN UP/i }).length).toBeGreaterThan(0)
+    const toggle = await screen.findByRole('button', { name: 'Toggle Chats' }, { timeout: 5000 })
+    expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+    fireEvent.click(toggle)
+
+    expect(screen.getByTestId('oracle-chats-panel')).toHaveClass('w-full', 'flex-1')
+    expect(screen.getByText(/Guest chats aren't saved/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'SIGN UP FREE' })).toBeInTheDocument()
   })
 
-  it('renders historical chats sidebar when user is authenticated', async () => {
-    mockUser = { id: 'usr_oracle_initiate', name: 'Lobster initiate' }
-    const Component = (Route as any).component
-    render(<Component />)
-
-    await waitFor(() => {
-      expect(screen.getAllByText('CHATS').length).toBeGreaterThan(0)
-      expect(screen.getAllByRole('button', { name: /^New Chat$/i }).length).toBeGreaterThan(0)
-      expect(screen.getAllByText(/Carcinization Inquiries/i).length).toBeGreaterThan(0)
-    })
-  })
-
-  it('toggles mobile chats overlay drawer open and close', async () => {
-    mockUser = { id: 'usr_oracle_initiate', name: 'Lobster initiate' }
-    const Component = (Route as any).component
-    render(<Component />)
-
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /Toggle Chats/i })).toBeInTheDocument()
-    })
-
-    const toggleBtn = screen.getByRole('button', { name: /Toggle Chats/i })
-    const drawer = screen.getByRole('dialog', { name: /Chats/i })
-
-    // Initially drawer should be hidden via transform
-    expect(drawer).toHaveClass('-translate-x-full')
-
-    // Click toggle button to open drawer
-    fireEvent.click(toggleBtn)
-    expect(drawer).toHaveClass('translate-x-0')
-
-    // Close drawer via close button
-    const closeBtn = screen.getByRole('button', { name: /Close Chats/i })
-    fireEvent.click(closeBtn)
-    expect(drawer).toHaveClass('-translate-x-full')
-  })
-
-  it('collapses and expands the chats column on desktop', async () => {
-    const matchMedia = vi.fn().mockReturnValue({ matches: true })
-    vi.stubGlobal('matchMedia', matchMedia)
+  it.each([390, 1280])('uses the shared full-width menu at %ipx', async (width) => {
+    const resizeSpy = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(width)
     try {
       mockUser = { id: 'usr_oracle_initiate', name: 'Lobster initiate' }
       const Component = (Route as any).component
       render(<Component />)
 
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: /Toggle Chats/i })).toBeInTheDocument()
-      })
+      const toggle = await screen.findByRole('button', { name: 'Toggle Chats' }, { timeout: 5000 })
+      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('oracle-chats-column')).not.toBeInTheDocument()
+      fireEvent.click(toggle)
 
-      const column = screen.getByTestId('oracle-chats-column')
-      const drawer = screen.getByRole('dialog', { name: /Chats/i })
-      expect(column).toHaveClass('md:flex')
+      const menu = screen.getByTestId('oracle-chats-panel')
+      expect(menu).toHaveAttribute('data-chats-layout', 'takeover')
+      expect(menu).toHaveClass('w-full', 'flex-1')
+      expect(toggle).toHaveAttribute('aria-expanded', 'true')
+      expect(screen.queryByRole('dialog', { name: 'Chats' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('textbox', { name: 'Message' })).not.toBeInTheDocument()
+      expect(await screen.findByText('Carcinization Inquiries')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument()
 
-      fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
-      expect(column).not.toHaveClass('md:flex')
-      expect(drawer).toHaveClass('-translate-x-full')
-      expect(localStorage.getItem('moltology:oracle_page_chats')).toBe('closed')
+      fireEvent.click(toggle)
+      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+      fireEvent.click(toggle)
+      fireEvent.keyDown(document, { key: 'Escape' })
+      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
 
-      fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
-      expect(column).toHaveClass('md:flex')
-      expect(localStorage.getItem('moltology:oracle_page_chats')).toBe('open')
+      fireEvent.click(toggle)
+      fireEvent.click(await screen.findByRole('button', { name: /Carcinization Inquiries/i }))
+      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+      const { getAIMessagesFn } = await import('@/lib/server/api')
+      await waitFor(() => expect(getAIMessagesFn).toHaveBeenCalledWith({
+        data: expect.objectContaining({ threadId: 'thread-1', userId: 'usr_oracle_initiate' }),
+      }))
+      fireEvent.click(screen.getByRole('button', { name: 'New Chat' }))
+      expect(screen.queryByText('Carcinization Inquiries')).not.toBeInTheDocument()
+      expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
     } finally {
-      vi.unstubAllGlobals()
-      localStorage.removeItem('moltology:oracle_page_chats')
+      resizeSpy.mockRestore()
     }
-  })
-
-  it('selects thread from mobile drawer and closes drawer', async () => {
-    mockUser = { id: 'usr_oracle_initiate', name: 'Lobster initiate' }
-    const Component = (Route as any).component
-    render(<Component />)
-
-    await waitFor(() => {
-      expect(screen.getAllByText('Carcinization Inquiries').length).toBeGreaterThan(0)
-    })
-
-    const toggleBtn = screen.getByRole('button', { name: /Toggle Chats/i })
-    fireEvent.click(toggleBtn)
-
-    const drawer = screen.getByRole('dialog', { name: /Chats/i })
-    expect(drawer).toHaveClass('translate-x-0')
-
-    // Find thread button inside mobile drawer and click it
-    const drawerThreadButtons = screen.getAllByRole('button', { name: /Carcinization Inquiries/i })
-    fireEvent.click(drawerThreadButtons[drawerThreadButtons.length - 1])
-
-    // Drawer should close
-    expect(drawer).toHaveClass('-translate-x-full')
   })
 
   it('opens the requested thread from hub search instead of a blank consultation', async () => {
@@ -187,7 +143,7 @@ describe('Oracle Route Component', () => {
     render(<Component />)
 
     await waitFor(() => {
-      expect(screen.getAllByText(/Carcinization Inquiries/i).length).toBeGreaterThan(0)
+      expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
     })
     expect(getAIMessagesFn).not.toHaveBeenCalled()
     expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
@@ -200,7 +156,7 @@ describe('Oracle Route Component', () => {
 
     await waitFor(() => {
       expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
-      expect(screen.getAllByText('Carcinization Inquiries').length).toBeGreaterThan(0)
+      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
     })
   })
 
@@ -214,17 +170,18 @@ describe('Oracle Route Component', () => {
     )
   })
 
-  it('holds chrome instead of GUEST MODE while the session is unresolved', () => {
+  it('holds chrome instead of GUEST MODE while the session is unresolved', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
     const Component = (Route as any).component
     render(<Component />)
 
-    expect(screen.getAllByTestId('oracle-auth-skeleton').length).toBeGreaterThan(0)
+    fireEvent.click(await screen.findByRole('button', { name: 'Toggle Chats' }))
+    expect(screen.getByTestId('oracle-chats-auth-skeleton')).toBeInTheDocument()
     expect(screen.queryByText(/GUEST MODE/i)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /SIGN UP/i })).not.toBeInTheDocument()
   })
 
-  it('does not flash guest chrome when a pending session hydrates to a member', () => {
+  it('does not flash guest chrome when a pending session hydrates to a member', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: true } as any)
     const Component = (Route as any).component
     const { rerender } = render(<Component />)
@@ -240,7 +197,9 @@ describe('Oracle Route Component', () => {
 
     expect(screen.queryByText(/GUEST MODE/i)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /SIGN UP/i })).not.toBeInTheDocument()
-    expect(screen.getAllByText('CHATS').length).toBeGreaterThan(0)
+    fireEvent.click(await screen.findByRole('button', { name: 'Toggle Chats' }))
+    expect(screen.getByTestId('oracle-chats-panel')).toBeInTheDocument()
+    expect(await screen.findByText('Carcinization Inquiries')).toBeInTheDocument()
   })
 })
 
