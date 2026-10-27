@@ -23,8 +23,8 @@ export const ORACLE_MODELS: OracleModel[] = [
     shortLabel: 'GLM',
     provider: 'zai',
     badge: 'Chat',
-    pricing: { input: '$0.15', output: '$0.50' },
-    latency: '0.4s',
+    pricing: { input: '$0.04', output: '$0.08' },
+    latency: '0.2s',
   },
 ]
 

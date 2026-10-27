@@ -34,8 +34,8 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={`flex items-center gap-1 text-[11px] sm:text-xs text-ink-body hover:text-ink bg-surface-1 border border-line hover:bg-surface-3 hover:border-line-strong px-2 py-1 rounded-control transition-colors cursor-pointer ${FOCUS_RING}`}
-        title="Select Cognition Model"
-        aria-label="Select Cognition Model"
+        title="Select model"
+        aria-label="Select model"
         aria-expanded={open}
       >
         <span className="truncate max-w-[140px] sm:max-w-none font-medium">
@@ -47,11 +47,11 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 bottom-full mb-2 z-50 bg-surface-2 border border-line shadow-menu rounded-card py-1 w-[380px] sm:w-[410px] max-w-[calc(100vw-2rem)] text-xs">
-            <div className="px-3 py-1.5 grid grid-cols-[1fr_56px_52px_48px_16px] items-center gap-2 text-[11px] font-mono font-bold text-ink-muted uppercase tracking-[0.08em] border-b border-line-subtle select-none">
+          <div className="absolute left-0 bottom-full mb-2 z-50 w-[400px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-card border border-line bg-surface-2 shadow-menu text-xs" onKeyDown={(event) => { if (event.key === 'Escape') setOpen(false) }}>
+            <div className="grid grid-cols-[minmax(0,1fr)_52px_52px_48px_14px] items-center gap-2 border-b border-line-subtle px-3 py-2 font-mono text-[11px] font-bold uppercase tracking-wide text-ink-muted">
               <span>Model</span>
-              <span className="text-right">In / 1M</span>
-              <span className="text-right">Out / 1M</span>
+              <span className="text-right whitespace-nowrap">In / 1M</span>
+              <span className="text-right whitespace-nowrap">Out / 1M</span>
               <span className="text-right">Latency</span>
               <span />
             </div>
@@ -63,37 +63,18 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
                   onSelectModel(m.id)
                   setOpen(false)
                 }}
-                className={`w-full text-left px-3 py-2 grid grid-cols-[1fr_56px_52px_48px_16px] items-center gap-2 text-xs transition-colors cursor-pointer group ${
-                  m.id === selectedModel.id
-                    ? 'bg-surface-3 text-ink font-medium'
-                    : 'text-ink-body hover:bg-surface-3 hover:text-ink'
+                className={`grid w-full grid-cols-[minmax(0,1fr)_52px_52px_48px_14px] items-center gap-2 px-3 py-3 text-left transition-colors cursor-pointer ${FOCUS_RING} ${
+                  m.id === selectedModel.id ? 'bg-surface-3 text-ink' : 'text-ink-body hover:bg-surface-3 hover:text-ink'
                 }`}
               >
-                <div className="flex items-center gap-1.5 min-w-0 pr-1">
-                  <span className="truncate">{m.label}</span>
-                  {m.badge === 'Chat' && (
-                    <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-chip bg-cyan-soft text-cyan-glow shrink-0">
-                      Chat
-                    </span>
-                  )}
-                  {m.badge === 'Titles' && (
-                    <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-chip bg-amber-500/15 text-amber-300 shrink-0">
-                      Titles
-                    </span>
-                  )}
-                </div>
-                <span className="text-right font-mono text-[11px] text-ink-muted group-hover:text-ink-body">
-                  {m.pricing?.input ?? '—'}
+                <span className="flex min-w-0 items-center gap-1.5">
+                  <span className="truncate font-semibold">{m.label}</span>
+                  {m.badge && <span className="shrink-0 rounded-chip bg-cyan-soft px-1.5 py-0.5 text-[11px] font-semibold text-cyan-glow">{m.badge}</span>}
                 </span>
-                <span className="text-right font-mono text-[11px] text-ink-muted group-hover:text-ink-body">
-                  {m.pricing?.output ?? '—'}
-                </span>
-                <span className="text-right font-mono text-[11px] text-emerald-400/90 font-medium">
-                  {m.latency ?? '—'}
-                </span>
-                <div className="flex items-center justify-end">
-                  {m.id === selectedModel.id && <Check className="w-3.5 h-3.5 text-cyan-glow shrink-0" />}
-                </div>
+                <span className="text-right font-mono text-[11px] text-ink-body">{m.pricing?.input ?? '—'}</span>
+                <span className="text-right font-mono text-[11px] text-ink-body">{m.pricing?.output ?? '—'}</span>
+                <span className="text-right font-mono text-[11px] text-ink-body">{m.latency ?? '—'}</span>
+                <span>{m.id === selectedModel.id && <Check aria-label="Selected" className="h-3.5 w-3.5 text-cyan-glow" />}</span>
               </button>
             ))}
           </div>

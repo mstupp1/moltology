@@ -66,9 +66,9 @@ describe('PromptInput', () => {
   it('shows the model picker only when a model and handler are passed', () => {
     const onSelectModel = vi.fn()
     render(<PromptInput onSubmit={vi.fn()} selectedModel={getOracleModel()} onSelectModel={onSelectModel} />)
-    fireEvent.click(screen.getByRole('button', { name: /Select Cognition Model/i }))
+    fireEvent.click(screen.getByRole('button', { name: /Select model/i }))
     expect(screen.getByText('In / 1M')).toBeInTheDocument()
-    expect(screen.getByText('$0.15')).toBeInTheDocument()
+    expect(screen.getByText('$0.04')).toBeInTheDocument()
     fireEvent.click(screen.getAllByRole('button', { name: /GLM 5.3 Flash/i }).at(-1)!)
     expect(onSelectModel).toHaveBeenCalledWith('zai/glm-5.3-flash')
   })
