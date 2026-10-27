@@ -518,7 +518,7 @@ describe('AIChatPanel Chats List Panel', () => {
     expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
   })
 
-  it('renders the list as a left column when the Oracle window is wide', async () => {
+  it('opens the full-width chats menu when the Oracle window is wide', async () => {
     const { getAIThreadsFn } = await import('@/lib/server/api')
     ;(getAIThreadsFn as any).mockResolvedValue([
       { id: 'thread-1', title: 'First Carcinization Consultation' },
@@ -542,11 +542,10 @@ describe('AIChatPanel Chats List Panel', () => {
 
     const panel = await screen.findByTestId('oracle-chats-panel')
     await waitFor(() => {
-      expect(panel).toHaveAttribute('data-chats-layout', 'column')
+      expect(panel).toHaveAttribute('data-chats-layout', 'takeover')
     })
-    expect(panel.className).toMatch(/w-64/)
-    expect(panel.className).toMatch(/border-r/)
-    expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
+    expect(panel).toHaveClass('w-full', 'flex-1')
+    expect(screen.queryByRole('textbox', { name: 'Message' })).not.toBeInTheDocument()
     expect(screen.getByText('First Carcinization Consultation')).toBeInTheDocument()
   })
 

@@ -20,7 +20,7 @@ import {
 import { useIsPhone, useKeyboardInset } from '../../hooks/useChatViewport'
 import { PromptInput } from '../ai-elements/prompt-input'
 import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS } from './NewChatScreen'
-import { OracleChatsPanel, type OracleChatsLayout } from './OracleChatsPanel'
+import { OracleChatsPanel } from './OracleChatsPanel'
 import { ChatListIcon, OracleModeMenu, headerIconButtonClasses } from './OracleHeaderControls'
 import { useThreadActions, type ThreadPatch } from './useThreadActions'
 import { getAIMessagesFn, getAIThreadsFn, getUserProfileFn } from '../../lib/server/api'
@@ -37,7 +37,7 @@ import { oracleAuthData } from '../../lib/ai/oracle-auth-client'
 import { useOracleUsage } from '@/hooks/useOracleUsage'
 import { CHAT_LIMIT, getChatLimitError } from '@/lib/ai/chat-retention'
 
-export const CHATS_COLUMN_MIN_WIDTH = 640
+const INLINE_COMPOSER_MIN_WIDTH = 640
 
 export interface AIChatPanelProps {
   user?: {
@@ -54,12 +54,10 @@ export interface AIChatPanelProps {
   threadId?: string | null
   onClose?: () => void
   onThreadCreated?: (newThreadId: string) => void
+  onThreadChange?: (threadId: string | null) => void
   isCompact?: boolean
   className?: string
   showModeControls?: boolean
-  onToggleConversations?: () => void
-  /** Whether the host's chats column is showing (desktop fullscreen). */
-  conversationsOpen?: boolean
   placeholder?: string
   /** Close the panel when Escape is pressed inside it (popout). */
   closeOnEscape?: boolean
@@ -90,11 +88,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   placeholder = DEFAULT_ORACLE_PLACEHOLDER,
   onClose,
   onThreadCreated,
+  onThreadChange,
   isCompact = false,
   className = '',
   showModeControls = true,
-  onToggleConversations,
-  conversationsOpen = false,
   closeOnEscape = false,
 }) => {
   const oracle = useSafeOracle()
@@ -218,9 +215,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
   }, [oracle, userId])
 
-  const chatsLayout: OracleChatsLayout =
-    isChatsOpen && panelWidth >= CHATS_COLUMN_MIN_WIDTH ? 'column' : 'takeover'
-
   useLayoutEffect(() => {
     const el = rootRef.current
     if (!el) return
@@ -313,17 +307,17 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   const handleActiveThreadRemoved = useCallback(
     (removedThreadId: string) => {
-      const current = oracle ? oracle.activeThreadId : localActiveThreadId
-      if (current === removedThreadId) {
+      if (activeThreadId === removedThreadId) {
         if (oracle) {
           oracle.setActiveThreadId(null)
         } else {
           setLocalActiveThreadId(null)
+          onThreadChange?.(null)
         }
         setMessages([])
       }
     },
-    [oracle, localActiveThreadId]
+    [oracle, activeThreadId, onThreadChange]
   )
 
   const { pinThread, archiveThread, renameThread, deleteThread } = useThreadActions({
@@ -616,6 +610,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       oracle.setActiveThreadId(selectedId)
     } else {
       setLocalActiveThreadId(selectedId)
+      onThreadChange?.(selectedId)
     }
     setIsChatsOpen(false)
   }
@@ -626,6 +621,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       oracle.setActiveThreadId(null)
     } else {
       setLocalActiveThreadId(null)
+      onThreadChange?.(null)
     }
     setMessages([])
     setErrorMessage(null)
@@ -641,11 +637,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
   }
 
-  const showConversation = !isChatsOpen || chatsLayout === 'column'
+  const showConversation = !isChatsOpen
   const isNewChat = !hasUserMessages && !activeThreadId
   // Narrow panels (phone sheet, popout, sidebar) keep the prompt box docked at the bottom
   // from the first message, so it sits above the keyboard and never jumps after sending.
-  const isNarrow = panelWidth < CHATS_COLUMN_MIN_WIDTH
+  const isNarrow = panelWidth < INLINE_COMPOSER_MIN_WIDTH
   // Phones: a new chat puts the box at the top (the keyboard opens below it); an ongoing
   // chat docks it at the bottom and lifts it by the keyboard inset instead of panning the page.
   const isPhone = useIsPhone()
@@ -715,29 +711,17 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       {/* Header: conversation controls on the left, window controls on the right */}
       <div className="h-12 px-2 border-b border-line-subtle flex items-center justify-between gap-2 shrink-0 select-none relative z-10">
         <div className="flex items-center gap-0.5 min-w-0 flex-1">
-          {onToggleConversations ? (
-            <button
-              type="button"
-              onClick={onToggleConversations}
-              className={`${headerButton} ${conversationsOpen ? 'md:!text-cyan-glow md:bg-surface-2' : ''}`}
-              title="Chats"
-              aria-label="Toggle Chats"
-            >
-              <ChatListIcon className="w-4 h-4" />
-            </button>
-          ) : (
-            <button
-              ref={chatsButtonRef}
-              type="button"
-              onClick={handleToggleChats}
-              className={`${headerButton} ${isChatsOpen ? '!text-cyan-glow bg-surface-2' : ''}`}
-              title="Chats"
-              aria-label="Toggle Chats"
-              aria-expanded={isChatsOpen}
-            >
-              <ChatListIcon className="w-4 h-4" />
-            </button>
-          )}
+          <button
+            ref={chatsButtonRef}
+            type="button"
+            onClick={handleToggleChats}
+            className={`${headerButton} ${isChatsOpen ? '!text-cyan-glow bg-surface-2' : ''}`}
+            title="Chats"
+            aria-label="Toggle Chats"
+            aria-expanded={isChatsOpen}
+          >
+            <ChatListIcon className="w-4 h-4" />
+          </button>
 
           <button
             type="button"
@@ -801,7 +785,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             threads={threads}
             activeThreadId={activeThreadId}
             isLoadingThreads={isLoadingThreads}
-            layout={chatsLayout}
             usageSnapshot={usage.snapshot}
             usageUnavailable={usage.unavailable}
             onSelectThread={handleSelectThread}

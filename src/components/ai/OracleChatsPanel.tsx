@@ -14,15 +14,12 @@ import {
   HudDropdownMenuItem,
 } from '@/components/ui/HudDropdownMenu'
 
-export type OracleChatsLayout = 'takeover' | 'column'
-
 export interface OracleChatsPanelProps {
   userId: string | null
   isAuthPending: boolean
   threads: ManagedThread[]
   activeThreadId: string | null
   isLoadingThreads: boolean
-  layout: OracleChatsLayout
   usageSnapshot: OracleUsageSnapshot | null
   usageUnavailable: boolean
   onSelectThread: (id: string) => void
@@ -39,7 +36,6 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
   threads,
   activeThreadId,
   isLoadingThreads,
-  layout,
   usageSnapshot,
   usageUnavailable,
   onSelectThread,
@@ -55,12 +51,8 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
       role="region"
       aria-label="Chats"
       data-testid="oracle-chats-panel"
-      data-chats-layout={layout}
-      className={`flex flex-col min-h-0 h-full bg-surface-1/95 backdrop-blur-xl font-sans ${
-        layout === 'column'
-          ? 'w-64 lg:w-72 shrink-0 border-r border-line-subtle'
-          : 'flex-1 w-full'
-      }`}
+      data-chats-layout="takeover"
+      className="flex flex-col min-h-0 h-full bg-surface-1/95 backdrop-blur-xl font-sans flex-1 w-full"
     >
       <h2 className="px-4 pt-3 pb-1 text-xs font-medium text-ink-muted shrink-0 select-none">Chats</h2>
 
@@ -89,7 +81,7 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
               activeThreadId={activeThreadId}
               isLoadingThreads={false}
               density="comfortable"
-              searchThreshold={layout === 'takeover' ? 0 : undefined}
+              searchThreshold={0}
               onSelectThread={onSelectThread}
               onPin={onPin}
               onArchive={onArchive}
