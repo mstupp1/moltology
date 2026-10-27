@@ -3,7 +3,6 @@ import { ChevronDown, ChevronRight, Search, X } from 'lucide-react'
 import { filterThreadsByQuery, groupThreadsByDate } from '@/lib/ai/thread-groups'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { ThreadListItem, type ThreadListDensity } from './ThreadListItem'
-import { ThreadActionSheet } from './ThreadActionSheet'
 import { DeleteThreadDialog, isDeleteConfirmSkipped } from './DeleteThreadDialog'
 import type { ManagedThread } from './useThreadActions'
 
@@ -63,7 +62,6 @@ export const ThreadList: React.FC<ThreadListProps> = ({
   useEffect(() => {
     setNowMs(Date.now())
   }, [threads])
-  const [actionThreadId, setActionThreadId] = useState<string | null>(null)
   const [deleteCandidateId, setDeleteCandidateId] = useState<string | null>(null)
   const [renamingThreadId, setRenamingThreadId] = useState<string | null>(null)
   const [isArchivedOpen, setIsArchivedOpen] = useState(false)
@@ -81,7 +79,6 @@ export const ThreadList: React.FC<ThreadListProps> = ({
     nowMs != null && !isSearching ? groupThreadsByDate(unpinnedThreads, nowMs) : null
   const showSearch = threads.length > searchThreshold || isSearching
 
-  const actionThread = threads.find((t) => t.id === actionThreadId) || null
   const deleteCandidate = threads.find((t) => t.id === deleteCandidateId) || null
 
   const handleDeleteRequest = (threadId: string) => {
@@ -101,7 +98,6 @@ export const ThreadList: React.FC<ThreadListProps> = ({
       density={density}
       isRenaming={renamingThreadId === t.id}
       onSelect={() => onSelectThread(t.id)}
-      onMobileMenu={() => setActionThreadId(t.id)}
       onRenameStart={() => setRenamingThreadId(t.id)}
       onRenameCommit={(title) => {
         setRenamingThreadId(null)
@@ -205,22 +201,6 @@ export const ThreadList: React.FC<ThreadListProps> = ({
           {(isArchivedOpen || isSearching) && <div className="space-y-1 mt-1">{archivedThreads.map((t) => renderItem(t, true))}</div>}
         </div>
       )}
-
-      <ThreadActionSheet
-        thread={actionThread}
-        archived={!!actionThread?.archivedAt}
-        onClose={() => setActionThreadId(null)}
-        onPin={(id) => {
-          const t = threads.find((x) => x.id === id)
-          if (t) onPin(id, !t.pinnedAt)
-        }}
-        onArchive={(id) => {
-          const t = threads.find((x) => x.id === id)
-          if (t) onArchive(id, !t.archivedAt)
-        }}
-        onRename={(id) => setRenamingThreadId(id)}
-        onDelete={(id) => handleDeleteRequest(id)}
-      />
 
       <DeleteThreadDialog
         thread={deleteCandidate}

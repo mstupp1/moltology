@@ -1,5 +1,5 @@
 import React from 'react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { Route } from './oracle'
 
@@ -47,8 +47,11 @@ vi.mock('@/lib/ai/stream-oracle-chat-client', () => ({
 }))
 
 describe('Oracle Route Component', () => {
+  afterEach(() => { vi.unstubAllGlobals() })
   beforeEach(() => {
     vi.clearAllMocks()
+    localStorage.clear()
+    vi.stubGlobal('innerWidth', 390)
     mockUser = null
     mockOracleSearch = {}
     vi.mocked(authClient.useSession).mockImplementation(() => ({
@@ -70,7 +73,7 @@ describe('Oracle Route Component', () => {
     expect(screen.getByRole('button', { name: 'SIGN UP FREE' })).toBeInTheDocument()
   })
 
-  it.each([390, 1280])('uses the shared full-width menu at %ipx', async (width) => {
+  it.each([390])('uses the shared full-width menu at %ipx', async (width) => {
     const resizeSpy = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(width)
     try {
       mockUser = { id: 'usr_oracle_initiate', name: 'Lobster initiate' }
@@ -106,6 +109,40 @@ describe('Oracle Route Component', () => {
       }))
       fireEvent.click(screen.getByRole('button', { name: 'New Chat' }))
       expect(screen.queryByText('Carcinization Inquiries')).not.toBeInTheDocument()
+      expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
+    } finally {
+      resizeSpy.mockRestore()
+    }
+  })
+
+  it('keeps the desktop chats column beside the conversation, including after selecting a chat', async () => {
+    vi.stubGlobal('innerWidth', 1280)
+    const resizeSpy = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(900)
+    try {
+      mockUser = { id: 'usr_oracle_initiate', name: 'Lobster initiate' }
+      const Component = (Route as any).component
+      render(<Component />)
+      const panel = await screen.findByTestId('oracle-chats-panel')
+      expect(panel).toHaveAttribute('data-chats-layout', 'column')
+      expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
+      fireEvent.click(await screen.findByRole('button', { name: /Carcinization Inquiries/i }))
+      expect(screen.getByTestId('oracle-chats-panel')).toBeInTheDocument()
+      expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
+      const toggle = screen.getByRole('button', { name: 'Toggle Chats' })
+      fireEvent.click(toggle)
+      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+      expect(localStorage.getItem('moltology:oracle_page_chats')).toBe('closed')
+      fireEvent.click(toggle)
+      expect(screen.getByTestId('oracle-chats-panel')).toHaveAttribute('data-chats-layout', 'column')
+      vi.stubGlobal('innerWidth', 390)
+      fireEvent.resize(window)
+      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+      fireEvent.click(toggle)
+      expect(screen.getByTestId('oracle-chats-panel')).toHaveAttribute('data-chats-layout', 'takeover')
+      expect(screen.queryByRole('textbox', { name: 'Message' })).not.toBeInTheDocument()
+      vi.stubGlobal('innerWidth', 1280)
+      fireEvent.resize(window)
+      expect(screen.getByTestId('oracle-chats-panel')).toHaveAttribute('data-chats-layout', 'column')
       expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
     } finally {
       resizeSpy.mockRestore()
