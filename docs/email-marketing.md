@@ -53,26 +53,22 @@ The three segments and a **disabled** webhook have been created in Resend. The w
 is `74ae33ae-1925-4c8a-bdb0-3390d565d552`, targeting
 `https://moltology.org/api/email/webhook`, subscribed only to `contact.updated`.
 
-The segment IDs and signing secret are configured in this checkout's ignored `.env`.
-A read-only API check confirmed the existing application key is valid but **sending-only**
-(`restricted_api_key`). Vercel production already has `RESEND_API_KEY`; it was not changed.
-Change that key from **Sending access** to **Full access** in the Resend Dashboard
-so the same `RESEND_API_KEY` can also manage Contacts and Segments. The API/MCP
-can only rename keys; permission changes must be made in the dashboard.
-See https://resend.com/changelog/update-api-key-name. If the dashboard retains the
-existing token, no API-key environment update is needed. If it issues a replacement,
-update `RESEND_API_KEY` in both the local environment and Vercel production.
+The segment IDs and signing secret are configured in the surviving checkout's ignored
+`.env` and in the Moltology Vercel project's production environment.
+The existing application key initially had Sending access and returned
+`restricted_api_key` for Contacts/Segments. Its permissions have now been changed in the
+Resend Dashboard, and a read-only check returned HTTP 200 with all three configured
+segments accessible. The key was renamed to `moltology`; its token was not changed.
+Vercel production already has `RESEND_API_KEY`. No second API key is required.
 Do not copy that file into Git or print the secret in logs.
 
 Before activating production:
 
-1. Edit the existing Resend API key in the dashboard and change **Sending access**
-   to **Full access**. This grants the Contacts and Segments access required by this
-   integration. Keep using `RESEND_API_KEY`; no second key or variable is required.
-2. Set `RESEND_LEADS_SEGMENT_ID`, `RESEND_USERS_SEGMENT_ID`,
-   `RESEND_ALL_SUBSCRIBERS_SEGMENT_ID`, and `RESEND_WEBHOOK_SECRET` in the production
-   server environment. Retrieve the webhook signing secret
-   from Resend or the local ignored environment file through a secure secret workflow.
+1. API-key access is already verified. Keep using `RESEND_API_KEY`; no second key or
+   variable is required. The dashboard rename does not require an environment update.
+2. Production already has `RESEND_LEADS_SEGMENT_ID`, `RESEND_USERS_SEGMENT_ID`,
+   `RESEND_ALL_SUBSCRIBERS_SEGMENT_ID`, and `RESEND_WEBHOOK_SECRET`. The webhook
+   secret is marked sensitive. No environment changes or key replacement remain.
 3. Deploy this branch through the normal release process. No migration is required.
 4. Enable the prepared webhook in Resend once the route is deployed and test a signed
    contact.updated delivery. Use the owner's address for an explicit opt-in, account

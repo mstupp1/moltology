@@ -7,18 +7,18 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-10-25",
+  "syncedAt": "2026-10-26",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
-    "rules": 117,
-    "decisions": 42,
-    "anchors": 216,
-    "drifted": 27,
+    "rules": 120,
+    "decisions": 43,
+    "anchors": 226,
+    "drifted": 26,
     "flagged": 10
   },
   "canvas": {
-    "width": 5803,
+    "width": 6157,
     "height": 2976
   },
   "domains": [
@@ -106,8 +106,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "box": {
         "x": 4030,
         "y": 0,
-        "width": 1773,
-        "height": 538
+        "width": 2127,
+        "height": 548
       },
       "ruleIds": [
         "auth.better-auth",
@@ -117,7 +117,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "auth.session-cookie-cache",
         "auth.google-linking",
         "auth.email-verification-flag",
-        "auth.oauth-errors"
+        "auth.oauth-errors",
+        "auth.marketing-consent",
+        "auth.marketing-targets",
+        "auth.marketing-unsubscribe"
       ]
     },
     {
@@ -973,10 +976,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3581,
+          "line": 3511,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3581"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3511"
         }
       ],
       "tests": [
@@ -1023,10 +1026,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3581,
+          "line": 3511,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3581"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3511"
         }
       ],
       "tests": [
@@ -1061,10 +1064,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3361,
+          "line": 3291,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3361"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3291"
         },
         {
           "file": "src/lib/progression.ts",
@@ -1199,10 +1202,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3361,
+          "line": 3291,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3361"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3291"
         }
       ],
       "tests": [],
@@ -1668,10 +1671,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-server.ts",
           "symbol": "auth",
-          "line": 101,
+          "line": 103,
           "value": "betterAuth({ baseURL, secret: getAuthSecret(), database: drizzleAdapter(getDb(), { provider: 'pg', camelCase: true, transaction: false, schema: { user: authUse…",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L101"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L103"
         }
       ],
       "tests": [
@@ -1689,6 +1692,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "auth.google-linking",
         "auth.email-verification-flag",
         "auth.oauth-errors",
+        "auth.marketing-consent",
         "signup.pipeline"
       ],
       "decisions": [
@@ -1697,10 +1701,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 127,
+        "x": 1688,
         "y": 76
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "auth.production-secret",
@@ -1713,10 +1717,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-server.ts",
           "symbol": "getAuthSecret",
-          "line": 43,
+          "line": 45,
           "value": "getAuthSecret()",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L43"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L45"
         }
       ],
       "tests": [],
@@ -1730,8 +1734,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 28,
-        "y": 250
+        "x": 39,
+        "y": 260
       },
       "drift": "ok"
     },
@@ -1746,10 +1750,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-server.ts",
           "symbol": "auth.minPasswordLength",
-          "line": 118,
+          "line": 120,
           "value": "MIN_PASSWORD_LENGTH",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L118"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L120"
         },
         {
           "file": "src/lib/auth-config.ts",
@@ -1776,8 +1780,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
-        "y": 250
+        "x": 915,
+        "y": 260
       },
       "drift": "ok"
     },
@@ -1816,15 +1820,17 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "auth.better-auth",
         "access.write-auth"
       ],
-      "usedBy": [],
+      "usedBy": [
+        "auth.marketing-unsubscribe"
+      ],
       "decisions": [
         "jwt-write-auth"
       ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 612,
-        "y": 250
+        "x": 1207,
+        "y": 260
       },
       "drift": "ok"
     },
@@ -1873,8 +1879,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       },
       "flow": null,
       "position": {
-        "x": 904,
-        "y": 250
+        "x": 623,
+        "y": 260
       },
       "drift": "ok"
     },
@@ -1889,10 +1895,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-server.ts",
           "symbol": "ACCOUNT_LINKING_OPTIONS",
-          "line": 91,
+          "line": 93,
           "value": "{ enabled: true, trustedProviders: ['google'] as const, requireLocalEmailVerified: true, }",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L91"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L93"
         }
       ],
       "tests": [
@@ -1917,8 +1923,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1090,
-        "y": 406
+        "x": 287,
+        "y": 416
       },
       "drift": "ok"
     },
@@ -1958,8 +1964,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1189,
-        "y": 250
+        "x": 331,
+        "y": 260
       },
       "drift": "ok"
     },
@@ -1974,10 +1980,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-server.ts",
           "symbol": "getAuthApiErrorUrl",
-          "line": 97,
+          "line": 99,
           "value": "getAuthApiErrorUrl(origin)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L97"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L99"
         }
       ],
       "tests": [
@@ -1996,8 +2002,194 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1481,
-        "y": 250
+        "x": 1499,
+        "y": 260
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "auth.marketing-consent",
+      "domain": "auth",
+      "title": "Marketing requires explicit confirmed consent",
+      "kind": "permission",
+      "status": "active",
+      "statement": "Public lead requests and unverified members must confirm email ownership before joining marketing Contacts. Verified members can opt in directly. Signup consent is stored on the server and account verification activates a checked opt-in. Unchecked public forms leave existing subscriptions unchanged; simulated members cannot subscribe.",
+      "anchors": [
+        {
+          "file": "src/lib/server/email-opt-in.ts",
+          "symbol": "requestEmailOptIn",
+          "line": 75,
+          "value": "requestEmailOptIn(email, source, deferConfirmation)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/email-opt-in.ts#L75"
+        },
+        {
+          "file": "src/lib/server/email-opt-in.ts",
+          "symbol": "setEmailPreference",
+          "line": 113,
+          "value": "setEmailPreference(email, optedIn, source)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/email-opt-in.ts#L113"
+        },
+        {
+          "file": "src/lib/server/email-opt-in.ts",
+          "symbol": "confirmSignupMarketing",
+          "line": 158,
+          "value": "confirmSignupMarketing(user)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/email-opt-in.ts#L158"
+        },
+        {
+          "file": "src/lib/server/email-opt-in.ts",
+          "symbol": "handleEmailOptInConfirm",
+          "line": 165,
+          "value": "handleEmailOptInConfirm(request)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/email-opt-in.ts#L165"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/server/email-preferences.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/email-preferences.test.ts"
+        },
+        {
+          "file": "src/lib/server/email-opt-in.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/email-opt-in.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "auth.better-auth"
+      ],
+      "usedBy": [
+        "auth.marketing-targets",
+        "auth.marketing-unsubscribe"
+      ],
+      "decisions": [
+        "event-driven-marketing-consent"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 1791,
+        "y": 260
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "auth.marketing-targets",
+      "domain": "auth",
+      "title": "One contact with lifecycle targeting",
+      "kind": "flow",
+      "status": "active",
+      "statement": "Confirmed subscribers belong to All Subscribers and either Leads or Users. Registration moves an existing subscribed lead to Users while preserving its provider unsubscribe state. Account creation and opt-out alone never create a marketing Contact.",
+      "anchors": [
+        {
+          "file": "src/lib/server/email-opt-in.ts",
+          "symbol": "handleMarketingSignup",
+          "line": 136,
+          "value": "handleMarketingSignup(user, optedIn, defer)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/email-opt-in.ts#L136"
+        },
+        {
+          "file": "src/lib/server/resend-contacts.ts",
+          "symbol": "subscribeResendContact",
+          "line": 36,
+          "value": "subscribeResendContact(email, group)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/resend-contacts.ts#L36"
+        },
+        {
+          "file": "src/lib/server/resend-contacts.ts",
+          "symbol": "moveResendContactToUsers",
+          "line": 57,
+          "value": "moveResendContactToUsers(email)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/resend-contacts.ts#L57"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/server/email-preferences.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/email-preferences.test.ts"
+        },
+        {
+          "file": "src/lib/server/resend-contacts.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/resend-contacts.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "auth.marketing-consent"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "event-driven-marketing-consent"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 1835,
+        "y": 416
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "auth.marketing-unsubscribe",
+      "domain": "auth",
+      "title": "Opt-outs update existing contacts and local preferences",
+      "kind": "flow",
+      "status": "active",
+      "statement": "Settings opt-out marks an existing Contact unsubscribed and clears matching lead/profile preferences. Signed contact.updated webhooks apply provider opt-outs only after checking current provider status. Repeated deliveries are safe, failures trigger provider retries, and routine events never re-subscribe a Contact. There is no scheduled reconciliation worker.",
+      "anchors": [
+        {
+          "file": "src/lib/server/resend-contacts.ts",
+          "symbol": "unsubscribeResendContact",
+          "line": 62,
+          "value": "unsubscribeResendContact(email)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/resend-contacts.ts#L62"
+        },
+        {
+          "file": "src/lib/server/resend-webhook.ts",
+          "symbol": "verifyResendWebhook",
+          "line": 7,
+          "value": "verifyResendWebhook(body, headers, secret, now)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/resend-webhook.ts#L7"
+        },
+        {
+          "file": "src/lib/server/resend-webhook.ts",
+          "symbol": "handleResendWebhook",
+          "line": 23,
+          "value": "handleResendWebhook(request)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/resend-webhook.ts#L23"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/server/resend-webhook.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/resend-webhook.test.ts"
+        },
+        {
+          "file": "src/lib/server/email-preferences.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/email-preferences.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "auth.marketing-consent",
+        "auth.jwt-for-writes"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "event-driven-marketing-consent"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 1251,
+        "y": 416
       },
       "drift": "ok"
     },
@@ -5762,10 +5954,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "saveCharacterHandler",
-          "line": 3914,
+          "line": 3844,
           "value": "saveCharacterHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3914"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3844"
         },
         {
           "file": "src/lib/character-appearance.ts",
@@ -8675,6 +8867,53 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "html": "<p>Existing inventories reset when their owner first opens the character studio or saves through onboarding. Before that initialization, public characters render without legacy equipment. The configured development database has the migration and integration coverage; production receives it through the standard migration workflow.</p>"
         }
       ]
+    },
+    {
+      "id": "event-driven-marketing-consent",
+      "date": "2026-10-26",
+      "title": "Use event-driven Resend marketing consent",
+      "summary": "Sync explicit subscription events and email opt-outs without a scheduler, import, or new consent table.",
+      "domains": [
+        "auth",
+        "signup"
+      ],
+      "rules": [
+        "auth.marketing-consent",
+        "auth.marketing-targets",
+        "auth.marketing-unsubscribe"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "commit",
+          "label": "dfe2470",
+          "url": "https://github.com/mstupp1/moltology/commit/dfe2470ce31289f78e4ec22f02e8b09cb4153cf4"
+        },
+        {
+          "kind": "doc",
+          "label": "email-marketing.md",
+          "url": "https://github.com/mstupp1/moltology/blob/main/docs/email-marketing.md"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Leads and registered members need one marketing preference and separate campaign targets.\nExisting lead/profile flags and transactional Resend sending already exist. There are no\nreal historical subscribers to import.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Use explicit application events to manage one Contact per normalized email and three\nsegments. Confirm public requests, reuse account verification for checked signup consent,\nand allow verified members to subscribe directly. Receive signed unsubscribe webhooks and\ncheck current provider state before applying delayed deliveries. Store pending request\nidentity in existing timestamps; do not add a schema migration or background worker.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<p>A durable outbox with scheduled reconciliation was rejected as disproportionate to this\ninitial setup. Separate category preferences and Topics are deferred. Unchecked public\nforms do not revoke earlier consent, and registration never manufactures consent.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Provider errors are visible and the user can retry; optional marketing failures do not\nblock signup, guide download, or contact-message delivery. Provider webhook retries cover\nfailed inbound opt-outs. A partial provider/local write can still need a repeated action.\nThe existing API key needs Full access for Contacts and Segments; changing permissions in\nthe dashboard avoids adding a second API key. Deployment requires the prepared segment\nIDs and signing secret, followed by enabling the webhook after the endpoint is live.</p>"
+        }
+      ]
     }
   ],
   "edges": [
@@ -8898,6 +9137,30 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "auth.better-auth->auth.oauth-errors",
       "source": "auth.better-auth",
       "target": "auth.oauth-errors",
+      "crossDomain": false
+    },
+    {
+      "id": "auth.better-auth->auth.marketing-consent",
+      "source": "auth.better-auth",
+      "target": "auth.marketing-consent",
+      "crossDomain": false
+    },
+    {
+      "id": "auth.marketing-consent->auth.marketing-targets",
+      "source": "auth.marketing-consent",
+      "target": "auth.marketing-targets",
+      "crossDomain": false
+    },
+    {
+      "id": "auth.marketing-consent->auth.marketing-unsubscribe",
+      "source": "auth.marketing-consent",
+      "target": "auth.marketing-unsubscribe",
+      "crossDomain": false
+    },
+    {
+      "id": "auth.jwt-for-writes->auth.marketing-unsubscribe",
+      "source": "auth.jwt-for-writes",
+      "target": "auth.marketing-unsubscribe",
       "crossDomain": false
     },
     {

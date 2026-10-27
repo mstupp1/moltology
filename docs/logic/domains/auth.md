@@ -85,6 +85,48 @@ rules:
       - file: src/lib/auth-server.ts
         symbol: getAuthApiErrorUrl
     tests: [src/lib/auth-oauth-errors.test.ts]
+  - id: auth.marketing-consent
+    title: Marketing requires explicit confirmed consent
+    kind: permission
+    statement: Public lead requests and unverified members must confirm email ownership before joining marketing Contacts. Verified members can opt in directly. Signup consent is stored on the server and account verification activates a checked opt-in. Unchecked public forms leave existing subscriptions unchanged; simulated members cannot subscribe.
+    dependsOn: [auth.better-auth]
+    anchors:
+      - file: src/lib/server/email-opt-in.ts
+        symbol: requestEmailOptIn
+      - file: src/lib/server/email-opt-in.ts
+        symbol: setEmailPreference
+      - file: src/lib/server/email-opt-in.ts
+        symbol: confirmSignupMarketing
+      - file: src/lib/server/email-opt-in.ts
+        symbol: handleEmailOptInConfirm
+    tests: [src/lib/server/email-preferences.test.ts, src/lib/server/email-opt-in.test.ts]
+  - id: auth.marketing-targets
+    title: One contact with lifecycle targeting
+    kind: flow
+    statement: Confirmed subscribers belong to All Subscribers and either Leads or Users. Registration moves an existing subscribed lead to Users while preserving its provider unsubscribe state. Account creation and opt-out alone never create a marketing Contact.
+    dependsOn: [auth.marketing-consent]
+    anchors:
+      - file: src/lib/server/email-opt-in.ts
+        symbol: handleMarketingSignup
+      - file: src/lib/server/resend-contacts.ts
+        symbol: subscribeResendContact
+      - file: src/lib/server/resend-contacts.ts
+        symbol: moveResendContactToUsers
+    tests: [src/lib/server/email-preferences.test.ts, src/lib/server/resend-contacts.test.ts]
+  - id: auth.marketing-unsubscribe
+    title: Opt-outs update existing contacts and local preferences
+    kind: flow
+    statement: Settings opt-out marks an existing Contact unsubscribed and clears matching lead/profile preferences. Signed contact.updated webhooks apply provider opt-outs only after checking current provider status. Repeated deliveries are safe, failures trigger provider retries, and routine events never re-subscribe a Contact. There is no scheduled reconciliation worker.
+    dependsOn: [auth.marketing-consent, auth.jwt-for-writes]
+    anchors:
+      - file: src/lib/server/resend-contacts.ts
+        symbol: unsubscribeResendContact
+      - file: src/lib/server/resend-webhook.ts
+        symbol: verifyResendWebhook
+      - file: src/lib/server/resend-webhook.ts
+        symbol: handleResendWebhook
+    tests: [src/lib/server/resend-webhook.test.ts, src/lib/server/email-preferences.test.ts]
+
 ---
 
 Auth moved off Managed Neon Auth because its background polling kept Neon compute awake and blew the compute budget. Identity for writes is always a verified JWT, never a client-supplied id.
