@@ -115,6 +115,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const [localIsLoadingThreads, setLocalIsLoadingThreads] = useState(false)
   const localThreadsCountRef = useRef(0)
   const [isChatsOpen, setIsChatsOpen] = useState(false)
+  const [isChatsMounted, setIsChatsMounted] = useState(false)
   const [panelWidth, setPanelWidth] = useState(0)
   const [desktopChatsOpen, setDesktopChatsOpen] = useState(true)
   const [desktopViewport, setDesktopViewport] = useState(false)
@@ -123,6 +124,15 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const chatsLayout = (desktopChatsSidebar ? isDesktopPage : panelWidth >= 640) ? 'column' : 'takeover'
   const chatsPanelId = useId()
   const restoreChatsFocusRef = useRef(false)
+  useEffect(() => {
+    if (chatsOpen) {
+      setIsChatsMounted(true)
+      return
+    }
+    if (!isChatsMounted) return
+    const timer = setTimeout(() => setIsChatsMounted(false), 220)
+    return () => clearTimeout(timer)
+  }, [chatsOpen, isChatsMounted])
   const setChatsOpen = useCallback((open: boolean) => {
     if (isDesktopPage) {
       setDesktopChatsOpen(open)
@@ -772,7 +782,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       className={`flex flex-col bg-surface-1/60 backdrop-blur-md border border-line-subtle shadow-menu font-sans overflow-hidden h-full w-full relative ${className}`}
     >
       <div className="flex flex-1 min-h-0 overflow-hidden relative z-10">
-        {chatsOpen && (
+        {isChatsMounted && (
           <OracleChatsPanel
             id={chatsPanelId}
             touch={isPhone}
@@ -780,13 +790,13 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             onNewChat={handleNewChat}
             newChatDisabled={isAtChatLimit}
             newChatTitle={isAtChatLimit ? getChatLimitError().message : 'New chat (Ctrl+Shift+O)'}
-            windowControls={chatsLayout === 'takeover' ? windowControls : undefined}
             userId={userId}
             isAuthPending={isAuthPending}
             threads={threads}
             activeThreadId={activeThreadId}
             isLoadingThreads={isLoadingThreads}
             layout={chatsLayout}
+            isOpen={chatsOpen}
             usageSnapshot={usage.snapshot}
             usageUnavailable={usage.unavailable}
             onSelectThread={handleSelectThread}

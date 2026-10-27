@@ -191,7 +191,9 @@ function HudContent() {
               } bg-surface-1/[0.62] ${
                 isMainOnly
                   ? 'border-0 shadow-none'
-                  : 'border-t md:border-t-0 md:border-l border-line-subtle shadow-2xl'
+                  : isFullscreenRoute
+                    ? 'border-t-0 md:border-l border-line-subtle shadow-2xl'
+                    : 'border-t md:border-t-0 md:border-l border-line-subtle shadow-2xl'
               } flex flex-col`}
             >
               <Outlet />

@@ -16,13 +16,13 @@ export interface OracleChatsPanelProps {
   onNewChat: () => void
   newChatDisabled: boolean
   newChatTitle: string
-  windowControls?: React.ReactNode
   userId: string | null
   isAuthPending: boolean
   threads: ManagedThread[]
   activeThreadId: string | null
   isLoadingThreads: boolean
   layout?: 'column' | 'takeover'
+  isOpen?: boolean
   usageSnapshot: OracleUsageSnapshot | null
   usageUnavailable: boolean
   onSelectThread: (id: string) => void
@@ -40,13 +40,13 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
   onNewChat,
   newChatDisabled,
   newChatTitle,
-  windowControls,
   userId,
   isAuthPending,
   threads,
   activeThreadId,
   isLoadingThreads,
   layout = 'takeover',
+  isOpen = true,
   usageSnapshot,
   usageUnavailable,
   onSelectThread,
@@ -67,8 +67,8 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
   const headerButton = headerIconButtonClasses(touch)
 
   useEffect(() => {
-    collapseButtonRef.current?.focus()
-  }, [])
+    if (isOpen) collapseButtonRef.current?.focus()
+  }, [isOpen])
 
   useEffect(() => {
     if (showSearch) searchInputRef.current?.focus()
@@ -95,13 +95,12 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
       aria-label="Chats"
       data-testid="oracle-chats-panel"
       data-chats-layout={layout}
-      className={`flex flex-col min-h-0 h-full bg-surface-1/95 backdrop-blur-xl font-sans ${layout === 'column' ? 'w-64 lg:w-72 shrink-0 border-r border-line-subtle' : 'flex-1 w-full'}`}
+      aria-hidden={!isOpen}
+      inert={!isOpen}
+      className={`flex flex-col min-h-0 h-full bg-surface-1/95 backdrop-blur-xl font-sans overflow-hidden transition-[opacity,transform,width,flex-basis] duration-200 ease-out motion-reduce:transition-none ${isOpen ? 'animate-[oracle-chats-enter_200ms_ease-out] motion-reduce:animate-none' : ''} ${layout === 'column'
+        ? `shrink-0 border-r border-line-subtle ${isOpen ? 'w-64 lg:w-72 opacity-100 translate-x-0' : 'w-0 opacity-0 -translate-x-2 border-r-0'}`
+        : `w-full ${isOpen ? 'flex-1 opacity-100 translate-x-0' : 'absolute inset-0 z-20 pointer-events-none opacity-0 translate-x-2'}`}`}
     >
-      {windowControls && (
-        <div className="flex shrink-0 items-center justify-end gap-0.5 px-2 pt-1" onPointerDown={(event) => event.stopPropagation()}>
-          {windowControls}
-        </div>
-      )}
       <div className="flex shrink-0 items-center gap-1 px-3 pt-3 pb-2">
         <h2 className="min-w-0 flex-1 text-base font-semibold text-ink select-none">Synaptic Oracle</h2>
         <button

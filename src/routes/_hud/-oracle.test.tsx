@@ -95,25 +95,48 @@ describe('Oracle Route Component', () => {
       expect(screen.getByRole('link', { name: 'Settings' })).toBeInTheDocument()
 
       fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
-      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+      expect(screen.getByTestId('oracle-chats-panel')).toHaveAttribute('aria-hidden', 'true')
+      await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
       fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
       fireEvent.keyDown(document, { key: 'Escape' })
-      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+      expect(screen.getByTestId('oracle-chats-panel')).toHaveAttribute('aria-hidden', 'true')
+      await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
 
       fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
       fireEvent.click(await screen.findByRole('button', { name: /Carcinization Inquiries/i }))
-      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+      await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
       const { getAIMessagesFn } = await import('@/lib/server/api')
       await waitFor(() => expect(getAIMessagesFn).toHaveBeenCalledWith({
         data: expect.objectContaining({ threadId: 'thread-1', userId: 'usr_oracle_initiate' }),
       }))
       fireEvent.click(screen.getByRole('button', { name: 'Open chats' }))
       fireEvent.click(screen.getByRole('button', { name: 'New Chat' }))
+      await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
       expect(screen.queryByText('Carcinization Inquiries')).not.toBeInTheDocument()
       expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
     } finally {
       resizeSpy.mockRestore()
     }
+  })
+
+  it('keeps the chats panel open when reopened before its exit timer completes', async () => {
+    const Component = (Route as any).component
+    render(<Component />)
+
+    fireEvent.click(await screen.findByRole('button', { name: /Open chats/i }, { timeout: 5000 }))
+    const panel = await screen.findByTestId('oracle-chats-panel')
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse chats' }))
+
+    expect(panel).toHaveAttribute('aria-hidden', 'true')
+    expect(panel).toHaveAttribute('inert')
+    fireEvent.click(screen.getByRole('button', { name: 'Open chats' }))
+    expect(screen.getByTestId('oracle-chats-panel')).toBe(panel)
+    expect(panel).toHaveAttribute('aria-hidden', 'false')
+    expect(panel).not.toHaveAttribute('inert')
+
+    await new Promise((resolve) => setTimeout(resolve, 250))
+    expect(screen.getByTestId('oracle-chats-panel')).toBe(panel)
+    expect(panel).toHaveAttribute('aria-hidden', 'false')
   })
 
   it('keeps the desktop chats column beside the conversation, including after selecting a chat', async () => {
@@ -134,18 +157,20 @@ describe('Oracle Route Component', () => {
       fireEvent.click(screen.getByRole('button', { name: 'New Chat' }))
       expect(screen.getByTestId('oracle-chats-panel')).toBeInTheDocument()
       fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
-      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+      expect(screen.getByTestId('oracle-chats-panel')).toHaveAttribute('aria-hidden', 'true')
+      await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
       expect(localStorage.getItem('moltology:oracle_page_chats')).toBe('closed')
       fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
       expect(screen.getByTestId('oracle-chats-panel')).toHaveAttribute('data-chats-layout', 'column')
       fireEvent.keyDown(document, { key: 'Escape' })
-      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+      expect(screen.getByTestId('oracle-chats-panel')).toHaveAttribute('aria-hidden', 'true')
+      await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
       expect(localStorage.getItem('moltology:oracle_page_chats')).toBe('closed')
       expect(screen.getByRole('button', { name: 'Open chats' })).toHaveFocus()
       fireEvent.click(screen.getByRole('button', { name: 'Open chats' }))
       vi.stubGlobal('innerWidth', 390)
       fireEvent.resize(window)
-      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+      await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
       fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
       expect(screen.getByTestId('oracle-chats-panel')).toHaveAttribute('data-chats-layout', 'takeover')
       expect(screen.queryByRole('textbox', { name: 'Message' })).not.toBeInTheDocument()
