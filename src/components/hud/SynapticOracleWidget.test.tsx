@@ -75,7 +75,7 @@ describe('SynapticOracleWidget', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /Open Oracle AI Popout/i }))
 
-    expect(screen.getAllByRole('button', { name: /^New Chat$/i }).length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: 'Open chats' })).toBeInTheDocument()
     expect(screen.queryByTitle(/Drag header to move chat window/i)).not.toBeInTheDocument()
 
     const popout = container.querySelector('.fixed.rounded-card')
@@ -97,7 +97,7 @@ describe('SynapticOracleWidget', () => {
     fireEvent.pointerMove(btn, { clientX: 550, clientY: 550, pointerId: 1 })
     fireEvent.click(btn)
 
-    expect(screen.getAllByRole('button', { name: /^New Chat$/i }).length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: 'Open chats' })).toBeInTheDocument()
     expect(localStorage.getItem('moltology:oracle_button_pos')).toBeNull()
     expect(localStorage.getItem('moltology:oracle_popout_pos')).toBeNull()
   })
@@ -237,18 +237,18 @@ describe('SynapticOracleWidget', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /Open Oracle AI Popout/i }))
 
-    const chatsBtn = screen.getByRole('button', { name: /Toggle Chats/i })
+    const chatsBtn = screen.getByRole('button', { name: /(Open|Collapse) chats/i })
     expect(chatsBtn).toBeInTheDocument()
-    fireEvent.click(chatsBtn)
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
 
     const panel = screen.getByTestId('oracle-chats-panel')
     expect(panel).toBeInTheDocument()
     expect(panel).toHaveAttribute('data-chats-layout', 'takeover')
-    expect(screen.getByText('Chats')).toBeInTheDocument()
+    expect(screen.getByText('Synaptic Oracle')).toBeInTheDocument()
 
-    fireEvent.click(chatsBtn)
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
     expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
-    expect(screen.queryByText('Chats')).not.toBeInTheDocument()
+    expect(screen.queryByText('Synaptic Oracle')).not.toBeInTheDocument()
   })
 
   it('resets popout size when switching from sidebar mode to small window (popout) mode', () => {

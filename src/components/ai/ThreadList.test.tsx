@@ -46,6 +46,13 @@ function touchPointer(target: HTMLElement, type: string, x = 20, y = 20) {
 }
 
 describe('ThreadList', () => {
+  it('filters from an external query without rendering the built-in search field', () => {
+    renderList({ searchThreshold: 0, searchQuery: 'Pinned' })
+    expect(screen.getByText('Pinned Chat')).toBeInTheDocument()
+    expect(screen.queryByText('Active Chat')).not.toBeInTheDocument()
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+  })
+
   afterEach(() => { vi.useRealTimers() })
 
   beforeEach(() => {

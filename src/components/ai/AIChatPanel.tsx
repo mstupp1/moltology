@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useId } from 'react'
 import {
   X,
-  SquarePen,
+  PanelLeftOpen,
   AlertCircle,
   Shield,
   UserPlus,
@@ -21,7 +21,7 @@ import { useIsPhone, useKeyboardInset } from '../../hooks/useChatViewport'
 import { PromptInput } from '../ai-elements/prompt-input'
 import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS } from './NewChatScreen'
 import { OracleChatsPanel } from './OracleChatsPanel'
-import { ChatListIcon, OracleModeMenu, headerIconButtonClasses } from './OracleHeaderControls'
+import { OracleModeMenu, headerIconButtonClasses } from './OracleHeaderControls'
 import { useThreadActions, type ThreadPatch } from './useThreadActions'
 import { getAIMessagesFn, getAIThreadsFn, getUserProfileFn } from '../../lib/server/api'
 import { streamOracleChat } from '../../lib/ai/stream-oracle-chat-client'
@@ -121,10 +121,22 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const isDesktopPage = desktopChatsSidebar && desktopViewport
   const chatsOpen = isDesktopPage ? desktopChatsOpen : isChatsOpen
   const chatsLayout = (desktopChatsSidebar ? isDesktopPage : panelWidth >= 640) ? 'column' : 'takeover'
-  const closeChats = () => {
-    if (isDesktopPage) setDesktopChatsOpen(false)
-    else setIsChatsOpen(false)
-  }
+  const chatsPanelId = useId()
+  const restoreChatsFocusRef = useRef(false)
+  const setChatsOpen = useCallback((open: boolean) => {
+    if (isDesktopPage) {
+      setDesktopChatsOpen(open)
+      try {
+        localStorage.setItem('moltology:oracle_page_chats', open ? 'open' : 'closed')
+      } catch {}
+    } else {
+      setIsChatsOpen(open)
+    }
+  }, [isDesktopPage])
+  const closeChats = useCallback((restoreFocus = true) => {
+    restoreChatsFocusRef.current = restoreFocus
+    setChatsOpen(false)
+  }, [setChatsOpen])
 
   useEffect(() => {
     if (!desktopChatsSidebar) return
@@ -143,6 +155,12 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   const rootRef = useRef<HTMLDivElement>(null)
   const chatsButtonRef = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (!chatsOpen && restoreChatsFocusRef.current) {
+      chatsButtonRef.current?.focus()
+      restoreChatsFocusRef.current = false
+    }
+  }, [chatsOpen])
 
   const threads = oracle ? oracle.threads : localThreads
   const isLoadingThreads = oracle ? oracle.isLoadingThreads : localIsLoadingThreads
@@ -275,7 +293,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [chatsOpen, isDesktopPage])
+  }, [chatsOpen, closeChats])
 
   const getTimeString = (d: Date = new Date()) => {
     if (!isMounted) return ''
@@ -624,15 +642,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         refreshLocalThreads()
       }
     }
-    if (isDesktopPage) {
-      const next = !desktopChatsOpen
-      setDesktopChatsOpen(next)
-      try {
-        localStorage.setItem('moltology:oracle_page_chats', next ? 'open' : 'closed')
-      } catch {}
-    } else {
-      setIsChatsOpen((prev) => !prev)
-    }
+    if (chatsOpen) closeChats()
+    else setChatsOpen(true)
   }
 
   const handleSelectThread = (selectedId: string) => {
@@ -647,7 +658,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       setLocalActiveThreadId(selectedId)
       onThreadChange?.(selectedId)
     }
-    setIsChatsOpen(false)
+    if (chatsLayout === 'takeover') closeChats(false)
   }
 
   const handleNewChat = () => {
@@ -660,7 +671,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
     setMessages([])
     setErrorMessage(null)
-    setIsChatsOpen(false)
+    if (chatsLayout === 'takeover') closeChats(false)
   }
 
   const handleClose = () => {
@@ -708,7 +719,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   }
 
   const handleRootKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key !== 'Escape' || !closeOnEscape || isChatsOpen || isAuthModalOpen) return
+    if (e.key !== 'Escape' || !closeOnEscape || chatsOpen || isAuthModalOpen) return
     const target = e.target as HTMLElement | null
     if (target?.closest?.('[role="menu"], [role="dialog"], [role="alertdialog"], [role="listbox"]')) return
     e.preventDefault()
@@ -735,6 +746,23 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     </div>
   )
   const headerButton = headerIconButtonClasses(isPhone)
+  const windowControls = (
+    <>
+      {showModeControls && oracle && oracle.mode !== 'closed' && (
+        <OracleModeMenu mode={oracle.mode} onSelect={handleModeSwitch} touch={isPhone} />
+      )}
+
+      <button
+        type="button"
+        onClick={handleClose}
+        className={headerButton}
+        title="Close Panel"
+        aria-label="Close"
+      >
+        <X className="w-4 h-4" />
+      </button>
+    </>
+  )
 
   return (
     <div
@@ -743,78 +771,16 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       style={keyboardInset ? { paddingBottom: keyboardInset } : undefined}
       className={`flex flex-col bg-surface-1/60 backdrop-blur-md border border-line-subtle shadow-menu font-sans overflow-hidden h-full w-full relative ${className}`}
     >
-      {/* Header: conversation controls on the left, window controls on the right */}
-      <div className="h-12 px-2 border-b border-line-subtle flex items-center justify-between gap-2 shrink-0 select-none relative z-10">
-        <div className="flex items-center gap-0.5 min-w-0 flex-1">
-          <button
-            ref={chatsButtonRef}
-            type="button"
-            onClick={handleToggleChats}
-            className={`${headerButton} ${chatsOpen ? '!text-cyan-glow bg-surface-2' : ''}`}
-            title="Chats"
-            aria-label="Toggle Chats"
-            aria-expanded={chatsOpen}
-          >
-            <ChatListIcon className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={handleNewChat}
-            disabled={isAtChatLimit}
-            className={headerButton}
-            title={isAtChatLimit ? getChatLimitError().message : 'New chat (Ctrl+Shift+O)'}
-            aria-label="New Chat"
-          >
-            <SquarePen className="w-4 h-4" />
-          </button>
-
-          {activeThreadTitle && (
-            <span
-              className="ml-1.5 text-sm font-medium text-ink truncate pointer-events-none"
-              title={activeThreadTitle}
-            >
-              {activeThreadTitle}
-            </span>
-          )}
-        </div>
-
-        <div
-          className="flex items-center gap-0.5 shrink-0 pointer-events-auto"
-          onPointerDown={(e) => e.stopPropagation()}
-        >
-          {showModeControls && oracle && oracle.mode !== 'closed' && (
-            <OracleModeMenu mode={oracle.mode} onSelect={handleModeSwitch} touch={isPhone} />
-          )}
-
-          <button
-            type="button"
-            onClick={handleClose}
-            className={headerButton}
-            title="Close Panel"
-            aria-label="Close"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-
-      {/* Error Alert */}
-      {errorMessage && (
-        <div className="bg-crimson-soft border-b border-crimson-aggro/40 px-3 py-1.5 text-[11px] text-crimson-text flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-1.5">
-            <AlertCircle className="w-3.5 h-3.5 text-crimson-text shrink-0" />
-            <span>{errorMessage}</span>
-          </div>
-          <button onClick={() => setErrorMessage(null)} className="text-crimson-text hover:text-ink rounded-control px-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
-            ×
-          </button>
-        </div>
-      )}
-
       <div className="flex flex-1 min-h-0 overflow-hidden relative z-10">
         {chatsOpen && (
           <OracleChatsPanel
+            id={chatsPanelId}
+            touch={isPhone}
+            onCollapse={() => closeChats()}
+            onNewChat={handleNewChat}
+            newChatDisabled={isAtChatLimit}
+            newChatTitle={isAtChatLimit ? getChatLimitError().message : 'New chat (Ctrl+Shift+O)'}
+            windowControls={chatsLayout === 'takeover' ? windowControls : undefined}
             userId={userId}
             isAuthPending={isAuthPending}
             threads={threads}
@@ -830,13 +796,62 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             onDelete={deleteThread}
             onOpenAuthModal={() => {
               setIsAuthModalOpen(true)
-              setIsChatsOpen(false)
+              closeChats(false)
             }}
           />
         )}
 
         {showConversation && (
           <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden relative">
+            {/* Header: conversation controls on the left, window controls on the right */}
+            <div className="h-12 px-2 border-b border-line-subtle flex items-center justify-between gap-2 shrink-0 select-none relative z-10">
+              <div className="flex items-center gap-0.5 min-w-0 flex-1">
+                {!chatsOpen && (
+                  <button
+                    ref={chatsButtonRef}
+                    type="button"
+                    onClick={handleToggleChats}
+                    className={headerButton}
+                    title="Open chats"
+                    aria-label="Open chats"
+                    aria-expanded={false}
+                    aria-controls={chatsPanelId}
+                  >
+                    <PanelLeftOpen className="w-4 h-4" aria-hidden="true" />
+                  </button>
+                )}
+
+                {activeThreadTitle && (
+                  <span
+                    className="ml-1.5 text-sm font-medium text-ink truncate pointer-events-none"
+                    title={activeThreadTitle}
+                  >
+                    {activeThreadTitle}
+                  </span>
+                )}
+              </div>
+
+              <div
+                className="flex items-center gap-0.5 shrink-0 pointer-events-auto"
+                onPointerDown={(e) => e.stopPropagation()}
+              >
+                {windowControls}
+              </div>
+            </div>
+
+            {/* Error Alert */}
+            {errorMessage && (
+              <div className="bg-crimson-soft border-b border-crimson-aggro/40 px-3 py-1.5 text-[11px] text-crimson-text flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 text-crimson-text shrink-0" />
+                  <span>{errorMessage}</span>
+                </div>
+                <button onClick={() => setErrorMessage(null)} className="text-crimson-text hover:text-ink rounded-control px-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
+                  ×
+                </button>
+              </div>
+            )}
+
             {isNewChat ? (
               <div className="flex-1 overflow-y-auto min-h-0 relative">
                 <NewChatScreen
