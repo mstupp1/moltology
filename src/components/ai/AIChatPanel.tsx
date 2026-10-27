@@ -2,6 +2,7 @@ import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useId
 import {
   X,
   PanelLeftOpen,
+  SquarePen,
   AlertCircle,
   Shield,
   UserPlus,
@@ -823,18 +824,30 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             <div className="h-12 px-2 border-b border-line-subtle flex items-center justify-between gap-2 shrink-0 select-none relative z-10">
               <div className="flex items-center gap-0.5 min-w-0 flex-1">
                 {!chatsOpen && (
-                  <button
-                    ref={chatsButtonRef}
-                    type="button"
-                    onClick={handleToggleChats}
-                    className={headerButton}
-                    title="Open chats"
-                    aria-label="Open chats"
-                    aria-expanded={false}
-                    aria-controls={chatsPanelId}
-                  >
-                    <PanelLeftOpen className="w-4 h-4" aria-hidden="true" />
-                  </button>
+                  <>
+                    <button
+                      ref={chatsButtonRef}
+                      type="button"
+                      onClick={handleToggleChats}
+                      className={headerButton}
+                      title="Open chats"
+                      aria-label="Open chats"
+                      aria-expanded={false}
+                      aria-controls={chatsPanelId}
+                    >
+                      <PanelLeftOpen className="w-4 h-4" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleNewChat}
+                      disabled={isAtChatLimit}
+                      className={headerButton}
+                      title={isAtChatLimit ? getChatLimitError().message : 'New chat (Ctrl+Shift+O)'}
+                      aria-label="New chat"
+                    >
+                      <SquarePen className="w-4 h-4" aria-hidden="true" />
+                    </button>
+                  </>
                 )}
 
                 {activeThreadTitle && (
