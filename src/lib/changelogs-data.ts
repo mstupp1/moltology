@@ -14,6 +14,66 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    "slug": "2026-10-25-character-equipment-and-oracle-usage",
+    "version": "2026.10.25",
+    "title": "Visible Equipment and Clearer Oracle Usage",
+    "category": "Feature",
+    "tags": [
+      "Feature",
+      "UI/UX",
+      "Tools"
+    ],
+    "summary": "Your character now shows equipped items, and chat settings make Oracle usage and reset windows easier to understand.",
+    "content": "### Dress Your Character\n- Character creation and equipment now share one experience.\n- Equipped items appear on your character while preserving the original illustrated style.\n\n### Plan Your Conversations\n- See Oracle usage in Chats settings.\n- Rolling five-hour and weekly usage windows show how much conversation allowance remains.\n- Usage limits are checked against both windows before a new reply starts.",
+    "isPublished": true,
+    "releasedAt": "2026-10-25T23:59:00Z"
+  },
+  {
+    "slug": "2026-10-24-clearer-moltology-introduction",
+    "version": "2026.10.24",
+    "title": "A Clearer Introduction to Moltology",
+    "category": "Design",
+    "tags": [
+      "Design",
+      "Guides",
+      "UI/UX"
+    ],
+    "summary": "Explore a refreshed introduction to Moltology, with new illustrations of its beliefs and community.",
+    "content": "### Understand the Practice\n- The introductory pages explain Moltology and Moltmaxxing through clearer stories and practical context.\n- Refreshed imagery connects the daily practice to the world around it.\n\n### Meet the Community\n- Dedicated illustrations bring the beliefs and community sections into view.\n- Updated Field Manual presentation keeps the free guide close to the introduction.",
+    "isPublished": true,
+    "releasedAt": "2026-10-24T23:59:00Z"
+  },
+  {
+    "slug": "2026-10-22-guided-welcome-and-daily-tasks",
+    "version": "2026.10.22",
+    "title": "A Guided Welcome and Easier Daily Tasks",
+    "category": "Improvement",
+    "tags": [
+      "Improvement",
+      "Navigation",
+      "Mobile"
+    ],
+    "summary": "New members get a guided introduction, while daily tasks and phone chat controls are easier to reach.",
+    "content": "### Settle In\n- A step-by-step welcome introduces the platform and helps you choose a username and character.\n- Taken usernames show a clear error before you finish setup.\n\n### Keep Your Place\n- Refreshed daily tasks and alerts make your next action easier to find.\n- On phones, switching task tabs keeps the task sheet open.\n- Switch Oracle chats between floating and full-screen views with one tap.",
+    "isPublished": true,
+    "releasedAt": "2026-10-22T23:59:00Z"
+  },
+  {
+    "slug": "2026-10-21-store-preview-and-easier-phone-chats",
+    "version": "2026.10.21",
+    "title": "Browse the Store and Chat More Easily",
+    "category": "Feature",
+    "tags": [
+      "Feature",
+      "UI/UX",
+      "Mobile"
+    ],
+    "summary": "Browse the public store with fuller product galleries, and keep Oracle conversations easier to follow on your phone.",
+    "content": "### Explore the Store\n- Browse products and their image galleries without signing in.\n- Find a store preview on your dashboard; products show when ordering is unavailable.\n\n### Keep the Conversation Moving\n- Search saved chats and start a new conversation from the chats menu.\n- The message box stays within reach when your phone keyboard opens.\n- Stop a reply with Escape or start a new chat with the keyboard shortcut.",
+    "isPublished": true,
+    "releasedAt": "2026-10-21T23:59:00Z"
+  },
+  {
     "slug": "2026-10-18-clearer-navigation-and-codex-reader",
     "version": "2026.10.18",
     "title": "Clearer Navigation and a Better Codex Reader",
