@@ -85,11 +85,12 @@ describe('ThreadList', () => {
     expect(text.indexOf('Newer Pin')).toBeLessThan(text.indexOf('Older Pin'))
   })
 
-  it('uses comfortable row padding when density is comfortable', () => {
+  it('uses tighter single-line rows and matching options controls when density is comfortable', () => {
     renderList({ density: 'comfortable' })
     const title = screen.getByText('Active Chat')
     expect(title.closest('[data-density="comfortable"]')).toBeTruthy()
-    expect(title.closest('button')?.className).toContain('py-3')
+    expect(title.closest('button')).toHaveClass('min-h-8', 'py-1.5', 'text-sm')
+    expect(screen.getAllByRole('button', { name: 'Chat options' })[0]).toHaveClass('h-8', 'w-8')
   })
 
   it('selects a thread when the row title is clicked', () => {

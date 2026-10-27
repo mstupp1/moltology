@@ -80,7 +80,7 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
 
   const isComfortable = density === 'comfortable'
   const kebabClasses = `items-center justify-center shrink-0 transition-all cursor-pointer text-current rounded-control hover:text-ink hover:bg-surface-3 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
-    isComfortable ? 'min-w-11 min-h-11 p-2.5' : 'p-1'
+    isComfortable ? 'h-8 w-8 p-2' : 'p-1'
   }`
 
   return (
@@ -159,7 +159,7 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
               title={thread.title}
               aria-current={isActive ? 'true' : undefined}
               className={`flex-1 min-w-0 text-left bg-transparent border-none outline-hidden cursor-pointer select-none focus:outline-hidden focus:ring-0 active:outline-hidden focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
-                isComfortable ? 'min-h-11 px-3 py-3' : 'px-2 py-1.5'
+                isComfortable ? 'min-h-8 px-3 py-1.5 text-sm' : 'px-2 py-1.5'
               }`}
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >

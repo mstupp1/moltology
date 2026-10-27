@@ -164,7 +164,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
             <span>Pinned</span>
             <span className="text-ink-muted font-mono">({pinnedThreads.length})</span>
           </div>
-          <div className="space-y-1 mt-1">{pinnedThreads.map((t) => renderItem(t, false))}</div>
+          <div className="space-y-0.5 mt-1">{pinnedThreads.map((t) => renderItem(t, false))}</div>
         </div>
       )}
 
@@ -175,12 +175,12 @@ export const ThreadList: React.FC<ThreadListProps> = ({
               {unpinnedGroups.map((group) => (
                 <div key={group.id} data-testid={`thread-group-${group.id}`}>
                   <div className={SECTION_LABEL}>{group.label}</div>
-                  <div className="space-y-1 mt-1">{group.threads.map((t) => renderItem(t, false))}</div>
+                  <div className="space-y-0.5 mt-1">{group.threads.map((t) => renderItem(t, false))}</div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="space-y-1">{unpinnedThreads.map((t) => renderItem(t, false))}</div>
+            <div className="space-y-0.5">{unpinnedThreads.map((t) => renderItem(t, false))}</div>
           )}
         </div>
       )}
@@ -202,7 +202,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
             <span>Archived</span>
             <span className="text-ink-muted font-mono">({archivedThreads.length})</span>
           </button>
-          {(isArchivedOpen || isSearching) && <div className="space-y-1 mt-1">{archivedThreads.map((t) => renderItem(t, true))}</div>}
+          {(isArchivedOpen || isSearching) && <div className="space-y-0.5 mt-1">{archivedThreads.map((t) => renderItem(t, true))}</div>}
         </div>
       )}
 
