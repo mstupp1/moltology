@@ -58,6 +58,8 @@ export interface AIChatPanelProps {
   isCompact?: boolean
   className?: string
   showModeControls?: boolean
+  /** Full-page desktop keeps a persistent chats column; mobile uses the list takeover. */
+  desktopChatsSidebar?: boolean
   placeholder?: string
   /** Close the panel when Escape is pressed inside it (popout). */
   closeOnEscape?: boolean
@@ -92,6 +94,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   isCompact = false,
   className = '',
   showModeControls = true,
+  desktopChatsSidebar = false,
   closeOnEscape = false,
 }) => {
   const oracle = useSafeOracle()
@@ -113,6 +116,30 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const localThreadsCountRef = useRef(0)
   const [isChatsOpen, setIsChatsOpen] = useState(false)
   const [panelWidth, setPanelWidth] = useState(0)
+  const [desktopChatsOpen, setDesktopChatsOpen] = useState(true)
+  const [desktopViewport, setDesktopViewport] = useState(false)
+  const isDesktopPage = desktopChatsSidebar && desktopViewport
+  const chatsOpen = isDesktopPage ? desktopChatsOpen : isChatsOpen
+  const chatsLayout = (desktopChatsSidebar ? isDesktopPage : panelWidth >= 640) ? 'column' : 'takeover'
+  const closeChats = () => {
+    if (isDesktopPage) setDesktopChatsOpen(false)
+    else setIsChatsOpen(false)
+  }
+
+  useEffect(() => {
+    if (!desktopChatsSidebar) return
+    try {
+      setDesktopChatsOpen(localStorage.getItem('moltology:oracle_page_chats') !== 'closed')
+    } catch {}
+  }, [desktopChatsSidebar])
+
+  useEffect(() => {
+    if (!desktopChatsSidebar) return
+    const sync = () => setDesktopViewport(window.innerWidth >= 768)
+    sync()
+    window.addEventListener('resize', sync)
+    return () => window.removeEventListener('resize', sync)
+  }, [desktopChatsSidebar])
 
   const rootRef = useRef<HTMLDivElement>(null)
   const chatsButtonRef = useRef<HTMLButtonElement>(null)
@@ -235,20 +262,20 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   }, [])
 
   useEffect(() => {
-    if (!isChatsOpen) return
+    if (!chatsOpen) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return
+      if (e.defaultPrevented || e.key !== 'Escape') return
       e.preventDefault()
       e.stopPropagation()
-      setIsChatsOpen(false)
+      closeChats()
     }
 
     document.addEventListener('keydown', handleKeyDown)
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isChatsOpen])
+  }, [chatsOpen, isDesktopPage])
 
   const getTimeString = (d: Date = new Date()) => {
     if (!isMounted) return ''
@@ -590,14 +617,22 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   }
 
   const handleToggleChats = () => {
-    if (!isChatsOpen) {
+    if (!chatsOpen) {
       if (oracle) {
         oracle.refreshThreads()
       } else if (userId) {
         refreshLocalThreads()
       }
     }
-    setIsChatsOpen((prev) => !prev)
+    if (isDesktopPage) {
+      const next = !desktopChatsOpen
+      setDesktopChatsOpen(next)
+      try {
+        localStorage.setItem('moltology:oracle_page_chats', next ? 'open' : 'closed')
+      } catch {}
+    } else {
+      setIsChatsOpen((prev) => !prev)
+    }
   }
 
   const handleSelectThread = (selectedId: string) => {
@@ -637,11 +672,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
   }
 
-  const showConversation = !isChatsOpen
+  const showConversation = !chatsOpen || chatsLayout === 'column'
   const isNewChat = !hasUserMessages && !activeThreadId
   // Narrow panels (phone sheet, popout, sidebar) keep the prompt box docked at the bottom
   // from the first message, so it sits above the keyboard and never jumps after sending.
-  const isNarrow = panelWidth < INLINE_COMPOSER_MIN_WIDTH
+  const isNarrow = panelWidth - (chatsOpen && chatsLayout === 'column' ? 288 : 0) < INLINE_COMPOSER_MIN_WIDTH
   // Phones: a new chat puts the box at the top (the keyboard opens below it); an ongoing
   // chat docks it at the bottom and lifts it by the keyboard inset instead of panning the page.
   const isPhone = useIsPhone()
@@ -715,10 +750,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             ref={chatsButtonRef}
             type="button"
             onClick={handleToggleChats}
-            className={`${headerButton} ${isChatsOpen ? '!text-cyan-glow bg-surface-2' : ''}`}
+            className={`${headerButton} ${chatsOpen ? '!text-cyan-glow bg-surface-2' : ''}`}
             title="Chats"
             aria-label="Toggle Chats"
-            aria-expanded={isChatsOpen}
+            aria-expanded={chatsOpen}
           >
             <ChatListIcon className="w-4 h-4" />
           </button>
@@ -778,13 +813,14 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       )}
 
       <div className="flex flex-1 min-h-0 overflow-hidden relative z-10">
-        {isChatsOpen && (
+        {chatsOpen && (
           <OracleChatsPanel
             userId={userId}
             isAuthPending={isAuthPending}
             threads={threads}
             activeThreadId={activeThreadId}
             isLoadingThreads={isLoadingThreads}
+            layout={chatsLayout}
             usageSnapshot={usage.snapshot}
             usageUnavailable={usage.unavailable}
             onSelectThread={handleSelectThread}
@@ -800,7 +836,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         )}
 
         {showConversation && (
-          <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
+          <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden relative">
             {isNewChat ? (
               <div className="flex-1 overflow-y-auto min-h-0 relative">
                 <NewChatScreen
