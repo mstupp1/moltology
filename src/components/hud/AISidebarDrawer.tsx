@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { usePanelPresence } from '@/hooks/usePanelPresence'
 import { AIChatPanel } from '../ai/AIChatPanel'
 import { useSafeOracle } from './OracleContext'
 
@@ -31,6 +32,17 @@ export const AISidebarDrawer: React.FC<AISidebarDrawerProps> = ({
   const asideRef = useRef<HTMLElement>(null)
 
   const isVisible = oracle ? oracle.mode === 'sidebar' : Boolean(propIsOpen)
+  const presence = usePanelPresence(isVisible)
+  const openerRef = useRef<HTMLElement | null>(null)
+  useLayoutEffect(() => {
+    if (!isVisible) return
+    openerRef.current = document.activeElement as HTMLElement | null
+    return () => {
+      if (asideRef.current?.contains(document.activeElement) && openerRef.current?.isConnected) {
+        openerRef.current.focus()
+      }
+    }
+  }, [isVisible])
 
   useEffect(() => {
     if (!isVisible) return
@@ -53,7 +65,7 @@ export const AISidebarDrawer: React.FC<AISidebarDrawerProps> = ({
     } catch {}
   }, [])
 
-  if (!isVisible) return null
+  if (!presence.mounted) return null
 
   const handleClose = () => {
     if (oracle) {
@@ -108,45 +120,50 @@ export const AISidebarDrawer: React.FC<AISidebarDrawerProps> = ({
   }
 
   return (
-    <aside
-      ref={asideRef}
-      style={width != null ? { width: `${width}px` } : undefined}
-      className={`relative hidden md:flex ${width == null ? 'w-80 lg:w-96' : ''} bg-surface-1 border-l border-line-subtle flex-col h-full z-30 shrink-0 animate-in slide-in-from-right duration-200 shadow-2xl font-sans ${
-        isResizing ? 'select-none' : ''
-      }`}
+    <div
+      className={`relative hidden md:block h-full shrink-0 ${isVisible && width == null ? 'w-80 lg:w-96' : ''}`}
+      style={{ width: isVisible ? width ?? undefined : 0 }}
     >
-      <div
-        role="separator"
-        aria-orientation="vertical"
-        aria-label="Resize Oracle sidebar"
-        aria-valuemin={SIDEBAR_MIN_WIDTH}
-        aria-valuemax={SIDEBAR_MAX_WIDTH}
-        aria-valuenow={width ?? undefined}
-        tabIndex={0}
-        title="Drag to resize. Double-click to reset."
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
-        onDoubleClick={handleReset}
-        onKeyDown={handleKeyDown}
-        className={`group absolute inset-y-0 -left-1 w-2 z-40 cursor-col-resize focus-visible:outline-hidden`}
+      <aside
+        ref={asideRef}
+        aria-hidden={!isVisible}
+        inert={!isVisible}
+        style={width != null ? { width: `${width}px` } : undefined}
+        className={`absolute inset-y-0 right-0 flex ${width == null ? 'w-80 lg:w-96' : ''} bg-surface-1 border-l border-line-subtle flex-col h-full z-30 shrink-0 transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none shadow-2xl font-sans ${isResizing ? 'select-none' : ''} ${presence.visible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}
       >
-        <span
-          aria-hidden="true"
-          className={`absolute inset-y-0 left-[3px] w-px transition-colors ${
-            isResizing ? 'bg-line-hover' : 'bg-transparent group-hover:bg-line group-focus-visible:bg-cyan-glow'
-          }`}
-        />
-      </div>
-      <div className="flex-1 overflow-hidden">
-        <AIChatPanel
-          userId={userId}
-          isCompact={false}
-          onClose={handleClose}
-          className="h-full border-none shadow-none"
-        />
-      </div>
-    </aside>
+        <div
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize Oracle sidebar"
+          aria-valuemin={SIDEBAR_MIN_WIDTH}
+          aria-valuemax={SIDEBAR_MAX_WIDTH}
+          aria-valuenow={width ?? undefined}
+          tabIndex={0}
+          title="Drag to resize. Double-click to reset."
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          onDoubleClick={handleReset}
+          onKeyDown={handleKeyDown}
+          className={`group absolute inset-y-0 -left-1 w-2 z-40 cursor-col-resize focus-visible:outline-hidden`}
+        >
+          <span
+            aria-hidden="true"
+            className={`absolute inset-y-0 left-[3px] w-px transition-colors ${
+              isResizing ? 'bg-line-hover' : 'bg-transparent group-hover:bg-line group-focus-visible:bg-cyan-glow'
+            }`}
+          />
+        </div>
+        <div className="flex-1 overflow-hidden">
+          <AIChatPanel
+            userId={userId}
+            isCompact={false}
+            onClose={handleClose}
+            className="h-full border-none shadow-none"
+          />
+        </div>
+      </aside>
+    </div>
   )
 }

@@ -169,6 +169,16 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }
 
+  // A docked panel must remain reachable when the viewport becomes narrow.
+  useEffect(() => {
+    if (mode !== 'sidebar') return
+    const onResize = () => {
+      if (window.innerWidth < 768) setMode('page')
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [mode])
+
   const toggleMode = (targetMode?: 'popout' | 'sidebar' | 'page') => {
     const effectiveTarget = targetMode || lastActiveMode || 'popout'
     const resolvedMode =

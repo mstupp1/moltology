@@ -585,6 +585,8 @@ describe('AIChatPanel Chats List Panel', () => {
     expect(panel).toHaveAttribute('aria-hidden', 'true')
     expect(panel).toHaveAttribute('inert')
     expect(panel.className).toContain('opacity-0')
+    expect(panel).toHaveClass('-translate-x-2')
+    expect(panel.className).not.toMatch(/transition-\[[^\]]*width/)
     await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
 
     fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
@@ -593,7 +595,19 @@ describe('AIChatPanel Chats List Panel', () => {
     await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
   })
 
-  it('opens a chats column when the Oracle window is wide', async () => {
+  it.each([480, 640, 767])('uses a takeover at %ipx of available space even on desktop', async (width) => {
+    const measurement = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(width)
+    try {
+      render(<AIChatPanel />)
+      fireEvent.click(screen.getByRole('button', { name: 'Open chats' }))
+      expect(screen.getByTestId('oracle-chats-panel')).toHaveAttribute('data-chats-layout', 'takeover')
+      expect(screen.queryByRole('textbox', { name: 'Message' })).not.toBeInTheDocument()
+    } finally {
+      measurement.mockRestore()
+    }
+  })
+
+  it.each([768, 900])('opens a fixed-width chats column at %ipx', async (width) => {
     const { getAIThreadsFn } = await import('@/lib/server/api')
     ;(getAIThreadsFn as any).mockResolvedValue([
       { id: 'thread-1', title: 'First Carcinization Consultation' },
@@ -605,7 +619,7 @@ describe('AIChatPanel Chats List Panel', () => {
         resizeListeners.push(cb)
       }
       observe() {
-        resizeListeners.forEach((cb) => cb([{ contentRect: { width: 720 } }]))
+        resizeListeners.forEach((cb) => cb([{ contentRect: { width } }]))
       }
       disconnect() {}
       unobserve() {}
@@ -619,7 +633,8 @@ describe('AIChatPanel Chats List Panel', () => {
     await waitFor(() => {
       expect(panel).toHaveAttribute('data-chats-layout', 'column')
     })
-    expect(panel).toHaveClass('w-64', 'shrink-0')
+    expect(panel).toHaveClass('w-72', 'shrink-0', 'absolute')
+    expect(panel.previousElementSibling).toHaveClass('w-72', 'shrink-0')
     expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
     expect(screen.getByText('First Carcinization Consultation')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /First Carcinization Consultation/i }))

@@ -99,6 +99,20 @@ describe('OracleContext & Mode Management', () => {
     window.innerWidth = originalWidth
   })
 
+  it('keeps a docked chat reachable when resizing to a mobile viewport', () => {
+    const originalWidth = window.innerWidth
+    window.innerWidth = 1200
+    const wrapper = ({ children }: { children: React.ReactNode }) => <OracleProvider>{children}</OracleProvider>
+    const { result } = renderHook(() => useOracle(), { wrapper })
+    act(() => result.current.setMode('sidebar'))
+    act(() => {
+      window.innerWidth = 390
+      window.dispatchEvent(new Event('resize'))
+    })
+    expect(result.current.mode).toBe('page')
+    window.innerWidth = originalWidth
+  })
+
   it('preserves sidebar mode when closing and reopening without arguments', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <OracleProvider>{children}</OracleProvider>
