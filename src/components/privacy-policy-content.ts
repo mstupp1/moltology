@@ -1,6 +1,6 @@
 // Shared by the public HTML page and its Markdown representation.
 export const PRIVACY_UPDATED = 'October 19, 2026'
-export const PRIVACY_CONTACT = 'privacy@moltology.org'
+export const PRIVACY_CONTACT = 'support@moltology.org'
 export const PRIVACY_INTRO = 'This Privacy Policy explains how Moltology ("we," "us," or "our") collects, uses, stores, and shares personal information when you use moltology.org, including Google sign-in, member accounts, community features, the Oracle chat, and purchases.'
 
 export const PRIVACY_SECTIONS = [
@@ -58,7 +58,7 @@ export const PRIVACY_SECTIONS = [
     title: 'Retention and deletion',
     paragraphs: [
       'We retain account information, including Google account identifiers, profile details, and stored sign-in credentials, while needed to maintain your account and connected sign-in method. We retain content, purchase records, support records, and security logs for the purposes described in this policy and for applicable legal, fraud-prevention, and dispute-resolution requirements.',
-      'To request deletion of your Moltology account and associated personal information, including Google user data and stored OAuth credentials, email privacy@moltology.org from the address associated with your account. You may also request deletion of Google connection data without requesting deletion of the whole account. We may verify ownership before acting on a request.',
+      'To request deletion of your Moltology account and associated personal information, including Google user data and stored OAuth credentials, email support@moltology.org from the address associated with your account. You may also request deletion of Google connection data without requesting deletion of the whole account. We may verify ownership before acting on a request.',
       'Following a verified request, we delete information that is no longer needed for those purposes. Information retained for legal or security reasons is limited to that purpose. Backup copies may remain until replaced through the backup lifecycle. Revoking Google access alone does not delete information already stored by Moltology.',
     ],
   },
@@ -68,7 +68,7 @@ export const PRIVACY_SECTIONS = [
     paragraphs: [
       'You can edit available profile and communication settings in your account. In Settings, the Sign-in methods section lets you disconnect Google when another sign-in method is available. Keep a working sign-in method before disconnecting Google.',
       'You can also revoke Moltology\'s authorization through your Google Account third-party connections page. This prevents continued use of that Google authorization. It does not automatically close your Moltology account, end every existing Moltology session, or erase stored data; use the deletion request process above for that.',
-      'Depending on where you live, you may have rights to access, correct, delete, or receive a copy of your personal information, restrict or object to processing, withdraw consent, or complain to a data protection authority. Send requests to privacy@moltology.org. We respond in accordance with applicable law.',
+      'Depending on where you live, you may have rights to access, correct, delete, or receive a copy of your personal information, restrict or object to processing, withdraw consent, or complain to a data protection authority. Send requests to support@moltology.org. We respond in accordance with applicable law.',
     ],
     links: [
       { label: 'Manage Google Account third-party connections', href: 'https://myaccount.google.com/connections' },
@@ -106,7 +106,7 @@ export const PRIVACY_SECTIONS = [
     id: 'contact',
     title: 'Contact Moltology',
     paragraphs: [
-      'For privacy questions, account and Google data deletion requests, or other data rights requests, contact Moltology at privacy@moltology.org. Include the email address associated with your account and describe your request. Do not send passwords or OAuth tokens.',
+      'For privacy questions, account and Google data deletion requests, or other data rights requests, contact Moltology at support@moltology.org. Include the email address associated with your account and describe your request. Do not send passwords or OAuth tokens.',
     ],
     links: [{ label: PRIVACY_CONTACT, href: `mailto:${PRIVACY_CONTACT}` }],
   },

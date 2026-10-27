@@ -14,7 +14,7 @@ describe('PrivacyPolicyPage', () => {
     expect(html).toContain('Google sign-in and Google user data')
     expect(html).toContain('openid, email, and profile')
     expect(html).toContain('Retention and deletion')
-    expect(html).toContain('mailto:privacy@moltology.org')
+    expect(html).toContain('mailto:support@moltology.org')
     expect(html).toContain('https://myaccount.google.com/connections')
     expect(html).toContain('https://developers.google.com/terms/api-services-user-data-policy')
   })
