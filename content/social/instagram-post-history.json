@@ -800,6 +800,50 @@
       "zernioCommentId": null,
       "isAiGenerated": true,
       "createdAt": "2026-10-25T21:09:57.457Z"
+    },
+    {
+      "id": "carousel-1793192830208",
+      "type": "carousel",
+      "topic": "Turn vague revision feedback into a specific change",
+      "theme": "swipe-lab",
+      "mascot": "none",
+      "articleSlug": null,
+      "archivePath": "Social Archive/2026/10/carousel-e55393cda45088d452f13b1d",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/media/1793192831467_3af4e54e836f9a1e_01.png",
+        "https://media.zernio.com/media/1793192832239_459fe998edc667b5_02.png",
+        "https://media.zernio.com/media/1793192832937_7264777cbe1b4df0_03.png",
+        "https://media.zernio.com/media/1793192833722_80513fd055acc725_04.png",
+        "https://media.zernio.com/media/1793192834484_2306a1eab3c7af86_05.png"
+      ],
+      "slideUrls": [
+        "https://media.zernio.com/media/1793192831467_3af4e54e836f9a1e_01.png",
+        "https://media.zernio.com/media/1793192832239_459fe998edc667b5_02.png",
+        "https://media.zernio.com/media/1793192832937_7264777cbe1b4df0_03.png",
+        "https://media.zernio.com/media/1793192833722_80513fd055acc725_04.png",
+        "https://media.zernio.com/media/1793192834484_2306a1eab3c7af86_05.png"
+      ],
+      "slideCount": 5,
+      "aspectRatio": "3:4",
+      "caption": "This brief keeps summoning final drafts.\n\n“Make it pop” has acquired a fog machine.\nAsk which part should change and what the reader should notice or do afterward.\nThe next draft gets a specific job.\n\nSave this reply before the next revision ritual.",
+      "hashtags": [
+        "#Moltology",
+        "#CreativeWork",
+        "#Communication"
+      ],
+      "firstComment": "https://moltology.org",
+      "status": "scheduled",
+      "scheduledFor": "2026-10-28T17:00:00.000Z",
+      "queueId": "6a84b76d2421e968ac81f5bc",
+      "zernioPostId": "6ae1f3834d6762f740fc672a",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "createdAt": "2026-10-28T13:07:20.155Z",
+      "verifiedDimensions": {
+        "width": 2160,
+        "height": 2880
+      },
+      "verifiedAt": "2026-10-28T13:07:31.664Z"
     }
   ]
 }
