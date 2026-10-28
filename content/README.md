@@ -1,55 +1,38 @@
-# Content Ingestion System
+# Content workflows and ingestion
 
-This directory houses structured Markdown and JSON content source files for Moltology. Files in these directories can be programmatically published and updated in Neon PostgreSQL using the `scripts/ingest.ts` CLI tool.
+Read the shared prerequisites and matching skill before any content pipeline, including supporting artwork, reference ingestion, research, drafts, and chained skills.
 
----
+## Shared prerequisites
+
+- Read [BRAND_BIBLE.md](../BRAND_BIBLE.md) and [STYLE_GUIDE.md](../STYLE_GUIDE.md) before user-facing copy. Every writing skill uses the [writing playbook](writing-playbook.md) for voice, loudness, hooks, and the boredom check.
+- Follow [content worktree hygiene](../docs/content-worktree-hygiene.md): record starting Git state, commit all intentional run-owned changes (including ledgers and skill updates), and verify final status. A clean start must finish clean. Preserve and report unrelated or concurrent work. This applies to drafts, chained skills, and partial failures too.
+- Read the [annual content calendar](annual-content-calendar.md) before choosing topics, copy, or artwork. Use the intended publication date and channel timezone; follow seasonal lead-in and expiry. News and release claims still require actual sources and shipped work. Supporting asset skills inherit the campaign brief without changing canonical identities or factual screenshots.
+- Follow [asset workflows](../docs/assets-and-media.md) and the [social archive procedure](../docs/social-archive.md). Archive finished social files in Google Drive before queueing; website/blog media, character sources, and reusable templates stay on Neon S3. Preserve final files after failures.
+- Queue and publish through repo CLI scripts only, never Zernio MCP tools. [Publishing storage](../docs/social-publishing-storage.md) explains Zernio uploads and retries.
+
+## Choose the matching skill
+
+| Task | Required skill / source |
+| --- | --- |
+| Codex scriptures | [codex-sync](../.agents/skills/codex-sync/SKILL.md); sources in [codex/](../codex/README.md) |
+| Academy courses and tracks | [academy-course-creator](../.agents/skills/academy-course-creator/SKILL.md); Markdown in [academy/](academy/README.md), ingested with `npm run academy:ingest` |
+| Single Instagram posts | [instagram-post-creator](../.agents/skills/instagram-post-creator/SKILL.md) |
+| Instagram carousels | [instagram-carousel-creator](../.agents/skills/instagram-carousel-creator/SKILL.md) |
+| Loud, format-led carousels | [benthic-swipe-lab](../.agents/skills/benthic-swipe-lab/SKILL.md) |
+| Reels and Shorts | [reels-and-shorts-creator](../.agents/skills/reels-and-shorts-creator/SKILL.md) |
+| Blog dispatches | [blog-creator](../.agents/skills/blog-creator/SKILL.md) |
+| Long-form YouTube topic validation | [youtube-research](../.agents/skills/youtube-research/SKILL.md) |
+| Composite layouts from references | [composite-reference-library](../.agents/skills/composite-reference-library/SKILL.md), `npm run refs`; JSON specs in [composite-layouts/](composite-layouts/README.md) |
+
+Composites render through `scripts/lib/composite-renderer.ts` using `npm run composite:render`.
 
 ## Automated Blog Creation Process (Agent SOP)
 
-Follow [`.agents/skills/blog-creator/SKILL.md`](../.agents/skills/blog-creator/SKILL.md). **Do not ideate a topic from scratch.**
+Use [blog-creator](../.agents/skills/blog-creator/SKILL.md) for research, drafting, illustration, ingestion, and companion social handoffs. It owns the current workflow, including autonomous topic scouting by default and Google Drive input when explicitly requested. Do not maintain a second production SOP here.
 
-When an agent is asked to **"run blog creation process"**, it follows this loop:
+## Ingestion reference
 
-1. **Pull from Google Drive** (`Projects/Moltology/news/ready/`):
-   - Sibling folders: `drafts/` (do not publish) and `shipped/` (already ingested).
-   - If one or more ingest-ready markdown files exist (frontmatter matching `content/news`), pick the **oldest** and use that body as the article.
-   - If `ready/` is empty, **STOP**. Skip the day. Do not write a fallback article. End the run.
-2. **Generate Cover & Inline Images** (only after a ready file is selected):
-   - Call `generate_image` with cinematic 16:9 prompts drawn from the selected article.
-   - Generate a main cover image AND 1-3 inline supporting diagrams/figures.
-3. **Stage the Ready Article with Inline Figures**:
-   - Copy the ready markdown to `content/news/<slug>.md`. Keep that prose. Point frontmatter and figure slots at the generated images:
-     ```markdown
-     ---
-     title: "Article Title: The Supporting Subtitle"
-     category: "SWARM ARCHITECTURE" # or SACRED DOCTRINE, DEEP RESEARCH, TELEMETRY
-     tags: ["Sub-Benthic", "Agentic Systems", "AI Hardware"]
-     authorName: "High Ascendant Carcinus"
-     authorRole: "Stage 4 Ascendant"
-     coverImageUrl: "path/to/generated_cover.png"
-     ---
-
-     ### Executive Summary
-     Article body...
-
-     ![Sub-Benthic Compute Pod Telemetry Frame](path/to/generated_inline_figure_1.png)
-
-     ### Deep Abyssal Analysis
-     Article body...
-
-     ![Hydrothermal Power Coupling Matrix](path/to/generated_inline_figure_2.png)
-     ```
-4. **Ingest to Live Database**:
-   - Execute: `npx tsx scripts/ingest.ts content/news/<slug>.md`
-   - *(The CLI automatically uploads the cover image AND all inline body images to Neon S3 `moltology-public-assets`, replaces local paths with public HTTPS URLs in the Markdown body, and upserts the post into production PostgreSQL).*
-   - After a successful ingest, move the Drive file to `Projects/Moltology/news/shipped/`. Do not leave it in `ready/`.
-5. **Verify Live Output**:
-   - Confirm article and rendered HUD figures are live on `https://moltology.org/news/<slug>`.
-6. **Companion Social Distribution (Optional & Decoupled)**:
-   - To create an accompanying 3-slide Instagram carousel, use [`.agents/skills/instagram-carousel-creator/SKILL.md`](../.agents/skills/instagram-carousel-creator/SKILL.md) (`npm run carousel:create -- --article <slug>`).
-   - To create companion reels/shorts or lead magnets, see [`.agents/skills/reels-and-shorts-creator/SKILL.md`](../.agents/skills/reels-and-shorts-creator/SKILL.md) and [`.agents/skills/instagram-post-creator/SKILL.md`](../.agents/skills/instagram-post-creator/SKILL.md).
-
----
+Structured Markdown and JSON sources are published to Neon PostgreSQL with `scripts/ingest.ts`. The commands and frontmatter below document ingestion; follow the matching skill for production.
 
 ## Directory Structure
 
