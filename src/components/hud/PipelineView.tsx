@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FlaskConical } from 'lucide-react'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
@@ -6,16 +6,19 @@ import { STAGE_PIPELINE_DATA } from '@/lib/codexData'
 import { PIPELINE_CLEARANCES, clearanceIndexForXp } from '@/lib/pipeline-explorer'
 import { StageStrata } from './pipeline/StageStrata'
 import { StageSection } from './pipeline/StageSection'
-import { READINGS, clearanceRowId, formatXp } from './pipeline/shared'
+import { READINGS, formatXp } from './pipeline/shared'
 
 /**
- * Moltology science: the four stages and twelve clearances as one page you read top to bottom,
- * with the member's own clearance lit.
+ * Browse one stage at a time, starting with the member's own stage.
  */
 export default function PipelineView() {
   const alignment = useDailyAlignment()
   const xp = alignment.progression.xp
   const current = PIPELINE_CLEARANCES[clearanceIndexForXp(xp)]
+  // Follow progression until the member explicitly chooses a stage to browse.
+  const [chosenStage, setChosenStage] = useState<number | null>(null)
+  const selectedStage = chosenStage ?? current.stageNum
+  const stage = STAGE_PIPELINE_DATA.find((item) => item.stageNum === selectedStage)!
 
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans">
@@ -28,7 +31,6 @@ export default function PipelineView() {
           </>
         }
         title="The descent"
-        description="Four stages, twelve clearances. Each clearance has one rite. XP from your daily liturgies opens the next one, and you can read ahead to see what is coming."
         actions={
           <div className="flex items-center gap-4">
             <div>
@@ -39,21 +41,19 @@ export default function PipelineView() {
               <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">Clearance</div>
               <div className="font-grotesk text-lg font-bold text-cyan-glow">{current.code}</div>
             </div>
-            <a
-              href={`#${clearanceRowId(current.code)}`}
-              className="inline-flex min-h-10 items-center rounded-control border border-line bg-surface-1 px-3 text-xs font-bold uppercase tracking-[0.08em] text-ink transition-colors hover:border-line-strong hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-            >
-              Go to mine
-            </a>
           </div>
         }
       />
 
-      <StageStrata currentIndex={current.index} />
+      <StageStrata
+        currentIndex={current.index}
+        selectedStage={selectedStage}
+        onSelectStage={setChosenStage}
+      />
 
-      {STAGE_PIPELINE_DATA.map((stage) => (
+      <div id="pipeline-stage-details">
         <StageSection key={stage.stageNum} stage={stage} xp={xp} />
-      ))}
+      </div>
 
       <aside aria-labelledby="pipeline-readings-title" className="rounded-card border border-line-subtle bg-surface-1 p-4 sm:p-5">
         <h2 id="pipeline-readings-title" className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
