@@ -49,6 +49,7 @@ One toast system, one persistent notification system, one OS bridge. Never `aler
 
 - **Tests**: Write Vitest unit tests (`*.test.ts`) for logic/helpers.
 - **SSR Safe**: NO browser globals (`window`/`document`/`Date`) in render. Use effects/handlers.
+- **Visual verification**: When validating changes with a visible result, capture and inspect relevant screenshots and include them in the final response so the user can review the outcome. For responsive UI changes, include desktop and mobile views where applicable. If screenshots cannot be captured, state the limitation.
 - **Fast-Feedback Verification Policy (Avoid Full-Suite Fatigue)**:
   - **Tier 1 (Scoped / Component / Feature Changes)**: Run targeted tests for the specific file(s) touched (e.g., `npx vitest run path/to/file.test.ts` or `npm run test:changed`) and use `npm run typecheck` (`tsc --noEmit`) for fast type validation. **Do NOT run the entire 100+ test suite or full `npm run build` for localized edits.**
   - **Tier 2 (Core Logic / Backend / Schema / Ingest / Tooling)**: When changing shared libraries (`src/lib/`), database schemas (`src/db/`), auth, security, or ingestion, run `npm run test:core` (`src/lib` + `src/db`) or `npm run test:scripts`.
