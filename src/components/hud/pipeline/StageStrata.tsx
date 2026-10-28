@@ -1,32 +1,54 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { STAGE_PIPELINE_DATA } from '@/lib/codexData'
 import { PIPELINE_CLEARANCES } from '@/lib/pipeline-explorer'
-import { stageAccent, stageArtUrl, stageName, stageSectionId, xpRangeLabel } from './shared'
+import { stageAccent, stageArtUrl, stageName, xpRangeLabel } from './shared'
 
 interface StageStrataProps {
   currentIndex: number
+  selectedStage: number
+  onSelectStage: (stageNum: number) => void
 }
 
-/** The four stages as a contents row, shallowest first. Each card jumps to its section. */
-export function StageStrata({ currentIndex }: StageStrataProps) {
+/** One row of stages with an expanded selection and shared details below. */
+export function StageStrata({ currentIndex, selectedStage, onSelectStage }: StageStrataProps) {
   const currentStage = PIPELINE_CLEARANCES[currentIndex].stageNum
+  const rowRef = useRef<HTMLElement>(null)
+  const selectedRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    const row = rowRef.current
+    const card = selectedRef.current
+    if (!row || !card) return
+    const rowBounds = row.getBoundingClientRect()
+    const cardBounds = card.getBoundingClientRect()
+    if (cardBounds.left < rowBounds.left || cardBounds.right > rowBounds.right) {
+      // Scroll only the card row; keep the page and details in place.
+      row.scrollTo({ left: row.scrollLeft + cardBounds.left - rowBounds.left - (row.clientWidth - cardBounds.width) / 2 })
+    }
+  }, [selectedStage])
 
   return (
-    <nav aria-label="Stages" className="grid grid-cols-2 gap-2 lg:grid-cols-4 sm:gap-3">
+    <nav ref={rowRef} aria-label="Stages" className="flex gap-2 overflow-x-auto p-1 sm:gap-3">
       {STAGE_PIPELINE_DATA.map((stage) => {
         const accent = stageAccent(stage.stageNum)
         const current = stage.stageNum === currentStage
+        const selected = stage.stageNum === selectedStage
         const clearances = PIPELINE_CLEARANCES.filter((c) => c.stageNum === stage.stageNum)
         return (
-          <a
+          <button
             key={stage.stageNum}
-            href={`#${stageSectionId(stage.stageNum)}`}
+            ref={selected ? selectedRef : undefined}
+            type="button"
+            onClick={() => onSelectStage(stage.stageNum)}
+            aria-expanded={selected}
+            aria-controls="pipeline-stage-details"
             aria-current={current ? 'step' : undefined}
             className={cn(
-              'flex items-center gap-3 rounded-card border p-2.5 transition-colors sm:p-3',
+              'flex min-w-44 basis-0 shrink-0 items-center gap-3 rounded-card border p-2.5 text-left transition-colors sm:p-3',
               'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
-              current
+              selected ? 'min-w-72 grow-[1.8]' : 'grow',
+              selected
                 ? 'border-transparent bg-surface-3 shadow-nav-current'
                 : 'border-line-subtle bg-surface-1 hover:border-line hover:bg-surface-2'
             )}
@@ -38,7 +60,7 @@ export function StageStrata({ currentIndex }: StageStrataProps) {
               height={56}
               loading="lazy"
               decoding="async"
-              className="hidden h-12 w-12 shrink-0 object-contain sm:block lg:h-14 lg:w-14"
+              className={cn('shrink-0 object-contain', selected ? 'h-16 w-16' : 'h-9 w-9')}
             />
             <span className="min-w-0">
               <span className={cn('block text-[11px] font-bold uppercase tracking-[0.08em]', accent.text)}>
@@ -61,7 +83,7 @@ export function StageStrata({ currentIndex }: StageStrataProps) {
                 ))}
               </span>
             </span>
-          </a>
+          </button>
         )
       })}
     </nav>
