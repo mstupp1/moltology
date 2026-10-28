@@ -32,9 +32,9 @@ export const Route = createFileRoute('/changelog/')({
   head: () => ({
     meta: [
       ...seo({
-        title: 'System Changelog · Transmutation Telemetry | Moltology',
-        description: 'Official system updates, chassis upgrades, security isolations, and bio-silicon transmutations powering Moltology.',
-        keywords: 'Moltology changelog, system updates, ecdysis telemetry, chassis upgrades, bio-silicon transmutations',
+        title: 'Change log | Moltology',
+        description: 'New features, improvements, and fixes to make your day in Moltology easier.',
+        keywords: 'Moltology change log, new features, improvements, fixes',
         ogImage: getAssetUrl('/images/ai_learning_ascension_cover.jpg'),
         canonical: 'https://moltology.org/changelog',
         siteName: 'Moltology Changelog',

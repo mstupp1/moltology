@@ -33,8 +33,8 @@ export const Route = createFileRoute('/changelog/$slug')({
     const entry = loaderData as ChangelogEntry | null
     const title = entry?.title
       ? `${entry.title} (${entry.version || 'Update'}) | Moltology Changelog`
-      : 'System Transmutation | Moltology Changelog'
-    const description = entry?.summary || 'Official system update telemetry and bio-silicon transmutations.'
+      : 'Update | Moltology Change log'
+    const description = entry?.summary || 'The latest features, improvements, and fixes in Moltology.'
     const url = entry?.slug ? `https://moltology.org/changelog/${entry.slug}` : 'https://moltology.org/changelog'
     const ogImage = getAssetUrl('/images/ai_learning_ascension_cover.jpg')
     const publishedTime = entry?.releasedAt ? new Date(entry.releasedAt).toISOString() : new Date().toISOString()
@@ -44,13 +44,13 @@ export const Route = createFileRoute('/changelog/$slug')({
         ...seo({
           title,
           description,
-          keywords: `Moltology, changelog, ${entry?.category || 'transmutation'}, system update, ecdysis`,
+          keywords: `Moltology, changelog, ${entry?.category || 'update'}, product update`,
           ogImage,
           ogType: 'article',
           canonical: url,
           siteName: 'Moltology Changelog',
           publishedTime,
-          section: entry?.category || 'System Transmutations',
+          section: entry?.category || 'Product updates',
           twitterCard: 'summary_large_image',
           twitterSite: '@moltology',
         }),
