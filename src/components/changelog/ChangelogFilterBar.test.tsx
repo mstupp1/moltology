@@ -29,17 +29,16 @@ describe('ChangelogFilterBar Component', () => {
 
   it('renders all categories with counts', () => {
     render(<ChangelogFilterBar {...defaultProps} />)
-    expect(screen.getByText('ALL UPDATES')).toBeDefined()
+    expect(screen.getByText('All updates')).toBeDefined()
     expect(screen.getByText('Feature')).toBeDefined()
     expect(screen.getByText('Improvement')).toBeDefined()
     expect(screen.getByText('Security')).toBeDefined()
   })
 
-  it('renders tags with hashtag prefixes and counts', () => {
+  it('renders readable topics in a select', () => {
     render(<ChangelogFilterBar {...defaultProps} />)
-    expect(screen.getByText('#UI/UX')).toBeDefined()
-    expect(screen.getByText('#Navigation')).toBeDefined()
-    expect(screen.getByText('#AI')).toBeDefined()
+    expect(screen.getByRole('option', { name: 'Interface (10)' })).toBeDefined()
+    expect(screen.getByRole('option', { name: 'Navigation (4)' })).toBeDefined()
   })
 
   it('triggers onSearchChange when typing into the input', () => {
@@ -58,11 +57,10 @@ describe('ChangelogFilterBar Component', () => {
     expect(onCategoryChange).toHaveBeenCalledWith('Feature')
   })
 
-  it('triggers onTagChange when clicking a tag button', () => {
+  it('triggers onTagChange when choosing a topic', () => {
     const onTagChange = vi.fn()
     render(<ChangelogFilterBar {...defaultProps} onTagChange={onTagChange} />)
-    const tagButton = screen.getByText('#UI/UX')
-    fireEvent.click(tagButton)
+    fireEvent.change(screen.getByLabelText('Filter by topic'), { target: { value: 'UI/UX' } })
     expect(onTagChange).toHaveBeenCalledWith('UI/UX')
   })
 
