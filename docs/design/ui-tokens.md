@@ -61,6 +61,10 @@ icons or geometry and verifies the original-icon backups.
 
 - Controls are `min-h-8`, `min-h-10` or `min-h-12` (32, 40, 48px at the base font size).
 - Cards pad 16px (`p-4`); large panels 24px. No text under 11px.
+- Standard app pages share a centered, fluid content area capped at 1,280px on desktop
+  in `HudLayout`. The cap excludes sidebar navigation and page padding. Use pixels here
+  because the root font size scales on desktop. Fullscreen Oracle pages use the full workspace.
+  The desktop header's XP bar shares the same centered cap and horizontal page padding.
 - Focus: `outline-2 outline-offset-2 outline-cyan-glow` on buttons and tabs; fields switch to a
   `cyan-glow` border with `shadow-field-focus` (`shadow-field-error` when invalid).
 - Glow is for the main action on hover and for live states only. Resting cards and buttons do not glow.

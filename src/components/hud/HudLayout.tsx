@@ -196,7 +196,13 @@ function HudContent() {
                     : 'border-t md:border-t-0 md:border-l border-line-subtle shadow-2xl'
               } flex flex-col`}
             >
-              <Outlet />
+              {isFullscreenRoute ? (
+                <Outlet />
+              ) : (
+                <div className="mx-auto flex w-full min-w-0 min-h-0 flex-1 flex-col md:max-w-[1280px]">
+                  <Outlet />
+                </div>
+              )}
             </main>
 
             {!isMainOnly && <HudPersistIndicator />}
