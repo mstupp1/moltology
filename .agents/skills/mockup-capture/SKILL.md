@@ -102,6 +102,7 @@ npm run typecheck
 npm run assets:check
 ```
 
-The user requesting capture authorizes this headless browser pipeline under the
-project's fast-verification rules. Do not use a full build solely to verify a
-localized UI edit; reuse a local server with `--base-url` for capture when appropriate.
+Follow [AGENTS.md verification guidance](../../../AGENTS.md#tests-and-verification).
+For localized UI verification, prefer reusing a local server with `--base-url`;
+run a production build when SSR, bundling, or other evidence makes it necessary.
+Routine UI completion screenshots do not require refreshing the marketing library.
