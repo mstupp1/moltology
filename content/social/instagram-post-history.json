@@ -832,7 +832,7 @@
         "#Communication"
       ],
       "firstComment": "https://moltology.org",
-      "status": "scheduled",
+      "status": "published",
       "scheduledFor": "2026-10-28T17:00:00.000Z",
       "queueId": "6a84b76d2421e968ac81f5bc",
       "zernioPostId": "6ae1f3834d6762f740fc672a",
@@ -843,7 +843,54 @@
         "width": 2160,
         "height": 2880
       },
-      "verifiedAt": "2026-10-28T13:07:31.664Z"
+      "verifiedAt": "2026-10-28T13:07:31.664Z",
+      "publishedAt": "2026-10-28T17:04:49.537Z",
+      "platformPostUrl": "https://www.instagram.com/p/DfC7S8siGT7/",
+      "creativeFeedback": "User rejected plain type-led treatment as boring; ImageGen remake requested October 29. Original live post preserved."
+    },
+    {
+      "id": "carousel-1793298456371",
+      "type": "carousel",
+      "topic": "Turn vague revision feedback into a specific change",
+      "theme": "swipe-lab",
+      "mascot": "lobster_engineer",
+      "articleSlug": null,
+      "archivePath": "Social Archive/2026/10/carousel-ef2ef595589ab7e6d4dfc973",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/media/1793298457522_861b0ad8ef972a08_01.png",
+        "https://media.zernio.com/media/1793298458927_64983b7bae2d4f41_02.png",
+        "https://media.zernio.com/media/1793298459847_37adef7610e459b3_03.png",
+        "https://media.zernio.com/media/1793298461182_98b7411e3e9f36b7_04.png",
+        "https://media.zernio.com/media/1793298462171_411e02ed57585312_05.png"
+      ],
+      "slideUrls": [
+        "https://media.zernio.com/media/1793298457522_861b0ad8ef972a08_01.png",
+        "https://media.zernio.com/media/1793298458927_64983b7bae2d4f41_02.png",
+        "https://media.zernio.com/media/1793298459847_37adef7610e459b3_03.png",
+        "https://media.zernio.com/media/1793298461182_98b7411e3e9f36b7_04.png",
+        "https://media.zernio.com/media/1793298462171_411e02ed57585312_05.png"
+      ],
+      "slideCount": 5,
+      "aspectRatio": "3:4",
+      "caption": "This brief keeps summoning final drafts.\n\n“Make it pop” has acquired a fog machine.\nAsk which part should change and what the reader should notice or do afterward.\n“Make the date larger” gives the next draft a job.\n\nSave this reply before the next revision ritual.",
+      "hashtags": [
+        "#Moltology",
+        "#CreativeWork",
+        "#Communication"
+      ],
+      "firstComment": "https://moltology.org",
+      "status": "scheduled",
+      "scheduledFor": "2026-10-30T17:00:00.000Z",
+      "queueId": "6a84b76d2421e968ac81f5bc",
+      "zernioPostId": "6ae3901f040392ab85596f44",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "createdAt": "2026-10-29T18:27:50.076Z",
+      "verifiedDimensions": {
+        "width": 2160,
+        "height": 2880
+      },
+      "verifiedAt": "2026-10-29T18:28:06.025Z"
     }
   ]
 }

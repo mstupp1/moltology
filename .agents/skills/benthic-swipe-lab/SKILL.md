@@ -4,8 +4,8 @@ description: >-
   Make loud, funny, swipeable Moltology Instagram posts by riffing on proven formats:
   memes (POV, starter pack, tier list, red flags, fake group chats), hot takes (unpopular
   opinion, myth vs fact, stop doing X), interactive decks (this or that, which one are you)
-  and the saved inspiration formats, with boredom scoring, ImageGen or type-led art and
-  deterministic Zernio queueing. Use for Benthic Swipe Lab or requests for engaging,
+  and the saved inspiration formats, with boredom scoring, ImageGen artwork, exact
+  composite type and deterministic Zernio queueing. Use for Benthic Swipe Lab or requests for engaging,
   meme-style or save-worthy carousels. Ordinary blog companion carousels, daily lead
   magnets and standard reels stay with their existing creator skills.
 ---
@@ -100,9 +100,11 @@ npm run composite:render -- --spec tmp/swipe-lab/<slug>/slide-01.json --out tmp/
 
 Use 3:4 portrait, 1080×1440, with 2x scaffolds by default; preserve the finished full frame. Use the Tailwind/HUD tokens, Space Grotesk hierarchy, abyss/navy fields, cyan and crimson, and the Order emblem. One category pill at most. Each frame has one focal point.
 
+Use built-in ImageGen on every finished frame by default, either for its scene artwork or for a polish pass over a reviewed scaffold. The renderer adds exact copy and the official emblem afterward. A type-led format does not waive image production. Only skip ImageGen when the user explicitly requests a purely typographic or code-rendered treatment.
+
 Pick the treatment from the format:
 
-- **Type-led** (most meme, hot take and interactive formats: tier lists, red flags, myth vs fact, stop doing X, alignment charts, fake chats, fake notifications, this or that, rate it). The composite renderer carries the frame: big text, panels, flags, scores, lists and mascot cutouts. ImageGen is optional, for a background plate, a prop or a reaction pose when it makes the joke land. Original in-world chat and notification skins only; never a real app's UI or marks.
+- **Type-led** (most meme, hot take and interactive formats: tier lists, red flags, myth vs fact, stop doing X, alignment charts, fake chats, fake notifications, this or that, rate it). Keep exact text and structured information in the composite renderer, but use ImageGen to supply a distinctive scene, comic prop, purposeful reaction or finished scaffold polish. Flat navy backgrounds with repeated text panels are unfinished scaffolds, not final artwork. Original in-world chat and notification skins only; never a real app's UI or marks.
 - **Scene-led** (POV, expectation vs reality, starter pack, spot the difference, day in the life, cinematic field kits, depth maps, story). ImageGen makes the finished frames or their key artwork, and the renderer adds exact text.
 - **Mixed.** A scene-led cover with type-led interior frames is often the strongest combination.
 
@@ -127,6 +129,8 @@ Lay the finished frames out in order (a contact sheet is enough) and answer hone
 - Does every frame make the next feel necessary, with the punchline or best item late?
 - Is the save or share frame genuinely useful or precisely relatable?
 - Is it loud, a bit silly and engaging, or merely tidy?
+- With the text hidden, does each frame still show a specific situation, visual joke, purposeful reaction or distinctive composition? Generic glow, texture behind text and repeated panels do not pass this check.
+- Is the artwork carrying the premise at phone size, with enough space to see it? Do not bury a generated scene under the same scaffold panels.
 
 Fix any "no" with a targeted change (rewrite the line, enlarge the type, cut a frame, swap the reaction) before queueing. Then check spelling, margins, order, legibility, claims, character identity and logo integrity. Save each final ImageGen prompt and its input roles beside the draft. Copy selected built-in outputs from their returned save paths into `tmp/swipe-lab/<slug>/` and record the final artifact paths; don't leave deliverables only in the tool's default output directory. Generated media stays in workspace `tmp/` until publication; finished social media and reviewed metadata go to the Google Drive social archive through the social CLI, with publishing media uploaded directly to Zernio, never tracked `public/`. Website and character source assets remain on S3.
 
