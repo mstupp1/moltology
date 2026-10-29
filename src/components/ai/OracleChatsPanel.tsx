@@ -1,5 +1,5 @@
 import React, { useEffect, useId, useRef, useState } from 'react'
-import { ChevronRight, ChevronUp, Gauge, Lock, PanelLeftClose, Search, Settings, SquarePen, UserPlus, X } from 'lucide-react'
+import { ChartNoAxesColumn, Lock, PanelLeftClose, Search, Settings, SquarePen, UserPlus, X } from 'lucide-react'
 import { ThreadList, ThreadListSkeleton } from './ThreadList'
 import type { ManagedThread } from './useThreadActions'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
@@ -241,20 +241,27 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
               </section>
             </div>
           </div>
-          <button
-            type="button"
-            aria-expanded={showUsage}
-            aria-controls={usageId}
-            onClick={() => setShowUsage(open => !open)}
-            className="flex min-h-10 w-full items-center gap-2 rounded-control px-2 text-xs text-ink-muted hover:bg-surface-2 hover:text-ink focus-visible:outline-cyan-glow"
-          >
-            <Gauge className="w-4 h-4" aria-hidden="true" />Usage
-            <ChevronUp className={`ml-auto w-4 h-4 transition-transform duration-250 motion-reduce:transition-none ${showUsage ? 'rotate-180' : ''}`} aria-hidden="true" />
-          </button>
-          <a href="/settings" className="flex min-h-10 w-full items-center gap-2 rounded-control px-2 text-xs text-ink-muted hover:bg-surface-2 hover:text-ink focus-visible:outline-cyan-glow">
-            <Settings className="w-4 h-4" aria-hidden="true" />Settings
-            <ChevronRight className="ml-auto w-4 h-4" aria-hidden="true" />
-          </a>
+          <div className="flex items-center gap-1">
+            <a
+              href="/settings"
+              title="Settings"
+              aria-label="Settings"
+              className={headerButton}
+            >
+              <Settings className="w-4 h-4" aria-hidden="true" />
+            </a>
+            <button
+              type="button"
+              title="Usage"
+              aria-label="Usage"
+              aria-expanded={showUsage}
+              aria-controls={usageId}
+              onClick={() => setShowUsage(open => !open)}
+              className={`${headerButton} ${showUsage ? 'bg-surface-2 text-ink' : ''}`}
+            >
+              <ChartNoAxesColumn className="w-4 h-4" aria-hidden="true" />
+            </button>
+          </div>
         </div>
       )}
     </section>

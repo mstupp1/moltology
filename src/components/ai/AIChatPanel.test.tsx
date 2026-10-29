@@ -78,7 +78,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
   it.each([
     { phone: false, threadId: null }, { phone: true, threadId: null },
     { phone: false, threadId: 'existing' }, { phone: true, threadId: 'existing' },
-  ])('toggles usage directly above Settings in Chats: %j', async ({ phone, threadId }) => {
+  ])('toggles usage beside Settings in Chats: %j', async ({ phone, threadId }) => {
     const phoneSpy = vi.spyOn(viewport, 'useIsPhone').mockReturnValue(phone)
     const snapshot = buildOracleUsageSnapshot([], false)
     vi.mocked(useOracleUsage).mockReturnValue({ snapshot, unavailable: false, blocked: false, refresh: vi.fn() })
@@ -91,7 +91,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
       expect(usageButton).toHaveAttribute('aria-expanded', 'false')
       const settingsLink = screen.getByRole('link', { name: 'Settings' })
       expect(settingsLink).toHaveAttribute('href', '/settings')
-      expect(usageButton.compareDocumentPosition(settingsLink) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+      expect(settingsLink.compareDocumentPosition(usageButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
       fireEvent.click(usageButton)
       expect(usageButton).toHaveAttribute('aria-expanded', 'true')
       expect(screen.getByRole('region', { name: 'Usage' })).toHaveAttribute('aria-label', 'Usage')
