@@ -2017,6 +2017,44 @@
       "productionExperiment": "Website CTA and subtitle baseline reset; no isolated causal comparison",
       "verifiedAt": "2026-10-22T13:06:33.080Z",
       "productionCaveat": "Narration subtitle remains on frame zero; headline is clear. Queued media preserved under no-replacement instruction."
+    },
+    {
+      "id": "reel-1793279466313",
+      "topic": "Halloween costume research that becomes the costume",
+      "hookHeadline": "Your costume research has become the costume.",
+      "holidayOrEvent": "Halloween",
+      "relatedBlogSlug": null,
+      "characterArc": "The Engineer chooses a witch hat already on the desk and ends the costume comparison.",
+      "narrationScript": "Your costume research has become the costume. First, open twelve ideas. Then compare capes until Thursday becomes Friday. By Halloween, you're dressed as someone still choosing. The lobster picks the witch hat already on the desk and closes the other options. Choose from what you have before browsing again. Try the audit at moltology dot org.",
+      "archivePath": "Social Archive/2026/10/reel-cdc5fa42d448c287b07f51d6",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1793279467525_77b4aadd927fa045_01.mp4"
+      ],
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 27.3,
+      "status": "queued",
+      "scheduledFor": "2026-10-29T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6ae345edba733ef093c26f0c",
+      "zernioYouTubePostId": "6ae345edba733ef093c26f0c",
+      "zernioPostId": "6ae345edba733ef093c26f0c",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "firstComment": "Try the audit at moltology.org: https://moltology.org/quiz",
+      "caption": "Your costume research has become the costume.\nTwelve ideas. Another cape comparison. Halloween arrives while the hat waits on the desk.\nChoose from what you have before browsing again.\nTry the audit at moltology.org.\n\n#Halloween #Focus #Moltology",
+      "hashtags": [
+        "#Halloween",
+        "#Focus",
+        "#Moltology"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-10-29T13:11:12.425Z"
     }
   ]
 }
