@@ -3,12 +3,10 @@ import { LocalTime } from '@/components/ui/LocalTime'
 import { useNavigate, Link, useLoaderData } from '@tanstack/react-router'
 import {
   ArrowLeft,
-  Clock,
   Calendar,
   Share2,
   Terminal,
   ArrowRight,
-  Sparkles,
   Activity,
   CheckCircle2,
 } from 'lucide-react'
@@ -35,27 +33,27 @@ export function ChangelogDetailPage() {
 
   if (!entry) {
     return (
-      <div className="min-h-screen bg-[#05080a] text-gray-200 font-sans flex flex-col justify-between items-center py-20 px-4">
+      <div className="min-h-screen bg-abyss text-ink font-sans flex flex-col justify-between items-center py-20 px-4">
         <PublicHeader
           onOpenAuth={(mode) => {
             setAuthMode(mode)
             setIsAuthModalOpen(true)
           }}
         />
-        <div className="text-center chitin-card border border-red-900/60 p-8 sm:p-12 chamfer-corner max-w-lg w-full my-auto">
+        <div className="text-center rounded-card hud-sheen shadow-sheen-inset border border-line-subtle p-8 sm:p-12 rounded-control max-w-lg w-full my-auto">
           <Terminal className="w-12 h-12 text-red-500 mx-auto mb-4 animate-pulse" />
-          <h2 className="font-grotesk text-xl sm:text-2xl font-bold text-gray-100 uppercase">
-            TRANSMUTATION LOG NOT FOUND
+          <h2 className="font-grotesk text-xl sm:text-2xl font-bold text-ink">
+            Update not found
           </h2>
-          <p className="text-xs text-gray-400 mt-2 mb-6 font-sans">
-            The requested changelog slug does not exist or has been archived.
+          <p className="text-xs text-ink-muted mt-2 mb-6 font-sans">
+            This update is unavailable. Browse the change log for other updates.
           </p>
           <Link
             to="/changelog"
-            className="px-6 py-2.5 bg-cyan-950 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-xs uppercase chamfer-corner inline-flex items-center justify-center gap-2 hover:bg-cyan-900 transition-colors"
+            className="px-6 py-2.5 bg-surface-2 border border-line text-cyan-glow font-grotesk font-bold text-xs rounded-control inline-flex items-center justify-center gap-2 hover:bg-surface-3 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>RETURN TO SYSTEM CHANGELOG</span>
+            <span>Back to change log</span>
           </Link>
         </div>
         <MoltNationFooter />
@@ -67,7 +65,7 @@ export function ChangelogDetailPage() {
     if (typeof window !== 'undefined') {
       const shareData = {
         title: entry.title,
-        text: entry.summary || 'System update from Moltology Changelog',
+        text: entry.summary || 'An update from Moltology',
         url: window.location.href,
       }
       if (typeof navigator.share === 'function' && navigator.canShare && navigator.canShare(shareData)) {
@@ -88,67 +86,8 @@ export function ChangelogDetailPage() {
     }
   }
 
-  const getCategoryBadgeClass = (category: string) => {
-    switch (category?.toLowerCase()) {
-      case 'feature':
-      case 'features':
-        return 'text-cyan-300 border-cyan-500/50 bg-cyan-950/60'
-      case 'improvement':
-      case 'improvements':
-        return 'text-purple-300 border-purple-500/50 bg-purple-950/60'
-      case 'security':
-        return 'text-emerald-400 border-emerald-500/50 bg-emerald-950/60'
-      case 'performance':
-        return 'text-amber-300 border-amber-500/50 bg-amber-950/60'
-      case 'fix':
-      case 'fixes':
-      case 'bug_purge':
-        return 'text-rose-400 border-rose-500/50 bg-rose-950/60'
-      case 'design':
-      case 'ui/ux':
-        return 'text-pink-300 border-pink-500/50 bg-pink-950/60'
-      default:
-        return 'text-cyan-400 border-cyan-600/40 bg-cyan-950/40'
-    }
-  }
-
-  const getTagBadgeClass = (tag: string) => {
-    switch (tag.toLowerCase()) {
-      case 'performance':
-        return 'text-amber-300/90 border-amber-500/30 bg-amber-950/40'
-      case 'ui/ux':
-      case 'design':
-        return 'text-pink-300/90 border-pink-500/30 bg-pink-950/40'
-      case 'security':
-      case 'auth':
-      case 'protection':
-        return 'text-emerald-300/90 border-emerald-500/30 bg-emerald-950/40'
-      case 'ai':
-        return 'text-indigo-300/90 border-indigo-500/30 bg-indigo-950/40'
-      case 'media':
-      case 'video':
-      case 'audio':
-        return 'text-sky-300/90 border-sky-500/30 bg-sky-950/40'
-      case 'navigation':
-      case 'tools':
-        return 'text-cyan-300/90 border-cyan-500/30 bg-cyan-950/40'
-      default:
-        return 'text-gray-300 border-cyan-900/40 bg-[#0a1013]'
-    }
-  }
-
-  const extraTags = Array.isArray(entry.tags)
-    ? entry.tags.filter((t) => t.toLowerCase() !== entry.category?.toLowerCase())
-    : []
-
   return (
-    <div className="min-h-screen bg-[#05080a] text-gray-200 font-sans relative flex flex-col justify-between">
-      {/* Background Overlays */}
-      <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-80" />
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.08)_0%,transparent_70%)] pointer-events-none z-0" />
-      <div className="fixed inset-0 bg-sacred-grid pointer-events-none z-0 opacity-20" />
-      <div className="fixed inset-0 crt-scanlines pointer-events-none z-0 opacity-25" />
-
+    <div className="min-h-screen bg-abyss text-ink font-sans relative flex flex-col justify-between">
       <AuthModal
         isOpen={isAuthModalOpen}
         initialMode={authMode}
@@ -167,60 +106,52 @@ export function ChangelogDetailPage() {
       {/* Main Article Content */}
       <article className="flex-1 w-full relative z-10">
         {/* Header Hero Section */}
-        <header className="w-full relative pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-8 border-b border-cyan-900/40 bg-[#030608]/90 overflow-hidden">
+        <header className="w-full relative pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-8 border-b border-line-subtle bg-surface-1 overflow-hidden">
           <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 relative z-10">
             <Link
               to="/changelog"
-              className="inline-flex items-center gap-2 py-1 text-xs font-sans font-bold text-cyan-400 hover:text-cyan-300 transition-colors uppercase active:scale-95"
+              className="inline-flex items-center gap-2 py-1 text-xs font-sans font-bold text-cyan-glow hover:text-cyan-glow transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>BACK TO SYSTEM CHANGELOG</span>
+              <span>Back to change log</span>
             </Link>
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-sans">
               {entry.version && (
-                <span className="font-grotesk font-extrabold text-xs text-cyan-300 bg-cyan-950/90 border border-cyan-500/60 px-3 py-1 chamfer-corner shadow-hud-cyan">
+                <span className="font-grotesk font-extrabold text-xs text-cyan-glow bg-surface-2 border border-line px-3 py-1 rounded-control ">
                   {entry.version}
                 </span>
               )}
-              <span className={`text-[11px] font-bold px-2.5 py-1 border ${getCategoryBadgeClass(entry.category)} chamfer-corner uppercase`}>
+              <span className={`text-[11px] font-bold px-2.5 py-1 border text-cyan-glow bg-cyan-soft border-line-subtle rounded-control`}>
                 {entry.category}
               </span>
-              {extraTags.map((tag) => (
-                <span
-                  key={tag}
-                  className={`text-[10px] font-bold px-2 py-0.5 border ${getTagBadgeClass(tag)} chamfer-corner uppercase`}
-                >
-                  {tag}
-                </span>
-              ))}
-              <span className="flex items-center gap-1.5 text-gray-400 text-xs">
-                <Calendar className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <span className="flex items-center gap-1.5 text-ink-muted text-xs">
+                <Calendar className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
                 {entry.releasedAt ? <LocalTime value={entry.releasedAt} /> : 'AUG 2026'}
               </span>
             </div>
 
-            <h1 className="font-grotesk font-black text-2xl sm:text-4xl md:text-5xl text-gray-100 uppercase tracking-tight leading-tight break-words">
+            <h1 className="font-grotesk font-black text-2xl sm:text-4xl md:text-5xl text-ink tracking-tight leading-tight break-words">
               {entry.title}
             </h1>
 
-            <p className="font-sans text-sm sm:text-base text-gray-300 leading-relaxed max-w-3xl">
+            <p className="font-sans text-sm sm:text-base text-ink-body leading-relaxed max-w-3xl">
               {entry.summary}
             </p>
 
             {/* Actions Bar */}
-            <div className="flex items-center justify-between gap-4 pt-4 border-t border-cyan-900/40">
-              <div className="flex items-center gap-2 text-xs text-cyan-400 font-sans">
-                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
-                <span>VERIFIED SYSTEM TRANSMUTATION</span>
+            <div className="flex items-center justify-between gap-4 pt-4 border-t border-line-subtle">
+              <div className="flex items-center gap-2 text-xs text-cyan-glow font-sans">
+                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-glow" />
+                <span>Published update</span>
               </div>
 
               <button
                 onClick={handleShare}
-                className="px-3.5 py-1.5 bg-[#090f11] hover:bg-cyan-950 border border-cyan-900/60 text-xs font-sans text-gray-300 hover:text-cyan-300 chamfer-corner flex items-center gap-1.5 transition-colors active:scale-95 shrink-0"
+                className="px-3.5 py-1.5 bg-surface-2 hover:bg-surface-3 border border-line-subtle text-xs font-sans text-ink-body hover:text-cyan-glow rounded-control flex items-center gap-1.5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow shrink-0"
               >
-                <Share2 className="w-3.5 h-3.5 text-cyan-400" />
-                <span>{copied ? 'LINK COPIED!' : 'SHARE'}</span>
+                <Share2 className="w-3.5 h-3.5 text-cyan-glow" />
+                <span>{copied ? 'Link copied' : 'Share update'}</span>
               </button>
             </div>
           </div>
@@ -228,23 +159,23 @@ export function ChangelogDetailPage() {
 
         {/* Release Notes Body */}
         <div className="max-w-4xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
-          <div className="chitin-card p-6 sm:p-8 border border-cyan-900/50 chamfer-corner bg-[#080d0f]/90 shadow-2xl">
-            <NewsArticleBody content={entry.content} />
+          <div className="rounded-card hud-sheen shadow-sheen-inset p-6 sm:p-8 border border-line-subtle bg-surface-1 ">
+            <NewsArticleBody content={entry.content} className="[&>:first-child]:mt-0" />
           </div>
 
           {/* Related / Recent Transmutations */}
           {relatedEntries.length > 0 && (
-            <div className="mt-12 pt-8 border-t border-cyan-900/40 space-y-4">
+            <div className="mt-12 pt-8 border-t border-line-subtle space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-grotesk font-bold text-sm text-gray-200 uppercase tracking-wider flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-cyan-400" />
-                  <span>OTHER RECENT TRANSMUTATIONS</span>
+                <h3 className="font-grotesk font-bold text-sm text-ink tracking-wider flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-cyan-glow" />
+                  <span>More updates</span>
                 </h3>
                 <Link
                   to="/changelog"
-                  className="text-xs font-sans text-cyan-400 hover:text-cyan-300 transition-colors uppercase flex items-center gap-1"
+                  className="text-xs font-sans text-cyan-glow hover:text-cyan-glow transition-colors flex items-center gap-1"
                 >
-                  <span>ALL CHANGELOGS</span>
+                  <span>All updates</span>
                   <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
@@ -255,22 +186,22 @@ export function ChangelogDetailPage() {
                     key={rel.slug}
                     to="/changelog/$slug"
                     params={{ slug: rel.slug }}
-                    className="chitin-card p-4 border border-cyan-900/60 hover:border-cyan-500/70 chamfer-corner bg-[#070b0d] transition-all flex flex-col justify-between group space-y-2"
+                    className="rounded-card hud-sheen shadow-sheen-inset p-4 border border-line-subtle hover:border-line-strong bg-surface-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow transition-all flex flex-col justify-between group space-y-2"
                   >
                     <div className="space-y-1">
-                      <div className="flex items-center justify-between text-[10px] font-sans">
-                        <span className="text-cyan-400 font-bold uppercase">{rel.version}</span>
-                        <span className="text-gray-500">{rel.category}</span>
+                      <div className="flex items-center justify-between text-[11px] font-sans">
+                        <span className="text-cyan-glow font-bold">{rel.version}</span>
+                        <span className="text-ink-muted">{rel.category}</span>
                       </div>
-                      <h4 className="font-grotesk font-bold text-xs sm:text-sm text-gray-200 group-hover:text-cyan-300 transition-colors line-clamp-2 uppercase">
+                      <h4 className="font-grotesk font-bold text-xs sm:text-sm text-ink group-hover:text-cyan-glow transition-colors line-clamp-2">
                         {rel.title}
                       </h4>
-                      <p className="text-[11px] text-gray-400 font-sans line-clamp-2">
+                      <p className="text-[11px] text-ink-muted font-sans line-clamp-2">
                         {rel.summary}
                       </p>
                     </div>
-                    <div className="text-[10px] text-cyan-400 group-hover:text-cyan-300 flex items-center gap-1 font-bold pt-1">
-                      <span>VIEW LOG</span>
+                    <div className="text-[11px] text-cyan-glow group-hover:text-cyan-glow flex items-center gap-1 font-bold pt-1">
+                      <span>Read update</span>
                       <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </Link>

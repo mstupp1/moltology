@@ -17,6 +17,7 @@ import { PwaNotificationBridge } from '@/components/hud/PwaNotificationBridge'
 import '@/styles/crt.css'
 import '@/styles/hud-chrome.css'
 import { useBackdropCovered } from '@/hooks/useBackdropCovered'
+import { useDesktopViewport } from '@/hooks/useDesktopViewport'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
 import { usePwaInstall } from '@/hooks/usePwaInstall'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -30,11 +31,12 @@ function HudContent() {
   const oracle = useSafeOracle()
   const location = useLocation()
   const isFullscreenRoute = location.pathname.startsWith('/oracle')
+  const isDesktop = useDesktopViewport()
   const session = useAuthSession()
   const user = session.user
   const userId = session.userId
   const { heavyVfxDisabled } = useHeavyVfx()
-  // The Oracle page and full-screen overlays are opaque, so the bubbles can rest.
+  // Full-screen overlays and the phone Oracle cover the backdrop.
   const backdropCovered = useBackdropCovered()
   // Register service worker + track install prompt for the whole hub (guest + member).
   usePwaInstall()
@@ -145,7 +147,7 @@ function HudContent() {
           customBubbleSrcs={BUBBLE_VARIANT_SRCS}
           chromaKeyMode="black"
           disabled={heavyVfxDisabled}
-          paused={isFullscreenRoute || backdropCovered}
+          paused={(isFullscreenRoute && !isDesktop) || backdropCovered}
           className="absolute inset-0 pointer-events-none z-[1] opacity-85"
         />
 
@@ -191,10 +193,18 @@ function HudContent() {
               } bg-surface-1/[0.62] ${
                 isMainOnly
                   ? 'border-0 shadow-none'
-                  : 'border-t md:border-t-0 md:border-l border-line-subtle shadow-2xl'
+                  : isFullscreenRoute
+                    ? 'border-t-0 md:border-l border-line-subtle shadow-2xl'
+                    : 'border-t md:border-t-0 md:border-l border-line-subtle shadow-2xl'
               } flex flex-col`}
             >
-              <Outlet />
+              {isFullscreenRoute ? (
+                <Outlet />
+              ) : (
+                <div className="mx-auto flex w-full min-w-0 min-h-0 flex-1 flex-col md:max-w-[1280px]">
+                  <Outlet />
+                </div>
+              )}
             </main>
 
             {!isMainOnly && <HudPersistIndicator />}

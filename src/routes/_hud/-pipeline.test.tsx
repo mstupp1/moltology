@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import PipelineView from '@/components/hud/PipelineView'
 import { getAssetUrl } from '@/lib/assets'
 import { calculateProgression } from '@/lib/progression'
@@ -29,7 +29,8 @@ describe('Moltology science pipeline', () => {
 
     expect(screen.getByRole('heading', { name: 'The descent' })).toBeInTheDocument()
     expect(screen.getByText('600 XP')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Go to mine' })).toHaveAttribute('href', '#clearance-L-2')
+    expect(screen.queryByRole('link', { name: 'Go to mine' })).not.toBeInTheDocument()
+    expect(screen.queryByText(/Four stages, twelve clearances/)).not.toBeInTheDocument()
 
     const current = document.getElementById('clearance-L-2')!
     expect(current).toHaveAttribute('aria-current', 'step')
@@ -39,17 +40,18 @@ describe('Moltology science pipeline', () => {
     expect(within(document.getElementById('clearance-L-1')!).getByText('Cleared')).toBeInTheDocument()
   })
 
-  it('lists every stage and clearance with its rite and readings', () => {
+  it('shows only the selected stage with its three clearances, rite and readings', () => {
     render(<PipelineView />)
 
     expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual([
       'THE LARVAL INITIATE',
-      'THE SOFT-SHED',
-      'THE EXOSHELL BORN',
-      'FULL CARCINIZATION',
       'About the readings',
     ])
-    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(12)
+    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(3)
+
+    fireEvent.click(screen.getByRole('button', { name: /Stage 3/ }))
+    expect(document.getElementById('stage-1')).not.toBeInTheDocument()
+    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(3)
 
     const row = document.getElementById('clearance-E-2')!
     expect(within(row).getByText('The Working Standard')).toBeInTheDocument()
@@ -60,15 +62,51 @@ describe('Moltology science pipeline', () => {
     expect(within(stage3).getByRole('link', { name: /Read the scripture/ })).toHaveAttribute('href', expect.stringMatching(/^\/codex\/scr-\d+$/))
   })
 
-  it('jumps to each stage from the contents row', () => {
+  it('exclusively expands each selected stage and keeps the member’s stage marked', () => {
     render(<PipelineView />)
 
     const nav = screen.getByRole('navigation', { name: 'Stages' })
-    const links = within(nav).getAllByRole('link')
-    expect(links.map((l) => l.getAttribute('href'))).toEqual(['#stage-1', '#stage-2', '#stage-3', '#stage-4'])
-    expect(links[0]).toHaveAttribute('aria-current', 'step')
+    const cards = within(nav).getAllByRole('button')
+    expect(cards).toHaveLength(4)
+    expect(cards[0]).toHaveAttribute('aria-current', 'step')
+    expect(cards[0]).toHaveAttribute('aria-expanded', 'true')
     const img = nav.querySelector('img')!
     expect(img.getAttribute('src')).toBe(getAssetUrl('/images/stage1_larval.webp'))
+
+    for (const index of [1, 3, 2, 0]) {
+      fireEvent.click(cards[index])
+      expect(within(nav).getAllByRole('button', { expanded: true })).toEqual([cards[index]])
+      expect(document.querySelectorAll('#pipeline-stage-details > section')).toHaveLength(1)
+      expect(document.getElementById(`stage-${index + 1}`)).toBeInTheDocument()
+      expect(cards[index]).toHaveAttribute('aria-controls', 'pipeline-stage-details')
+      expect(cards[0]).toHaveAttribute('aria-current', 'step')
+      expect(within(nav).getByText(/Yours/)).toBeInTheDocument()
+      fireEvent.click(cards[index])
+      expect(cards[index]).toHaveAttribute('aria-expanded', 'true')
+    }
+  })
+
+  it('follows loaded progression until the member chooses a stage', () => {
+    alignment.progression = calculateProgression(0)
+    const { rerender } = render(<PipelineView />)
+    alignment.progression = calculateProgression(18000)
+    rerender(<PipelineView />)
+    expect(screen.getByRole('button', { name: /Stage 3/ })).toHaveAttribute('aria-expanded', 'true')
+
+    fireEvent.click(screen.getByRole('button', { name: /Stage 2/ }))
+    alignment.progression = calculateProgression(120000)
+    rerender(<PipelineView />)
+    expect(screen.getByRole('button', { name: /Stage 2/ })).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByRole('button', { name: /Stage 4/ })).toHaveAttribute('aria-current', 'step')
+    expect(document.getElementById('stage-4')).not.toBeInTheDocument()
+  })
+
+  it('opens the current stage again when the page is reopened', () => {
+    const { unmount } = render(<PipelineView />)
+    fireEvent.click(screen.getByRole('button', { name: /Stage 3/ }))
+    unmount()
+    render(<PipelineView />)
+    expect(screen.getByRole('button', { name: /Stage 1/ })).toHaveAttribute('aria-expanded', 'true')
   })
 
   it('says so at the last clearance', () => {
@@ -77,5 +115,6 @@ describe('Moltology science pipeline', () => {
 
     expect(screen.getByText('This is the last clearance.')).toBeInTheDocument()
     expect(document.getElementById('clearance-C-3')).toHaveAttribute('aria-current', 'step')
+    expect(screen.getByRole('button', { name: /Stage 4/ })).toHaveAttribute('aria-expanded', 'true')
   })
 })

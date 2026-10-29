@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useId } from 'react'
 import {
   X,
+  PanelLeftOpen,
   SquarePen,
   AlertCircle,
   Shield,
@@ -20,8 +21,8 @@ import {
 import { useIsPhone, useKeyboardInset } from '../../hooks/useChatViewport'
 import { PromptInput } from '../ai-elements/prompt-input'
 import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS } from './NewChatScreen'
-import { OracleChatsPanel, type OracleChatsLayout } from './OracleChatsPanel'
-import { ChatListIcon, OracleModeMenu, headerIconButtonClasses } from './OracleHeaderControls'
+import { OracleChatsPanel } from './OracleChatsPanel'
+import { OracleModeMenu, headerIconButtonClasses } from './OracleHeaderControls'
 import { useThreadActions, type ThreadPatch } from './useThreadActions'
 import { getAIMessagesFn, getAIThreadsFn, getUserProfileFn } from '../../lib/server/api'
 import { streamOracleChat } from '../../lib/ai/stream-oracle-chat-client'
@@ -37,7 +38,7 @@ import { oracleAuthData } from '../../lib/ai/oracle-auth-client'
 import { useOracleUsage } from '@/hooks/useOracleUsage'
 import { CHAT_LIMIT, getChatLimitError } from '@/lib/ai/chat-retention'
 
-export const CHATS_COLUMN_MIN_WIDTH = 640
+const INLINE_COMPOSER_MIN_WIDTH = 640
 
 export interface AIChatPanelProps {
   user?: {
@@ -54,12 +55,12 @@ export interface AIChatPanelProps {
   threadId?: string | null
   onClose?: () => void
   onThreadCreated?: (newThreadId: string) => void
+  onThreadChange?: (threadId: string | null) => void
   isCompact?: boolean
   className?: string
   showModeControls?: boolean
-  onToggleConversations?: () => void
-  /** Whether the host's chats column is showing (desktop fullscreen). */
-  conversationsOpen?: boolean
+  /** Full-page desktop keeps a persistent chats column; mobile uses the list takeover. */
+  desktopChatsSidebar?: boolean
   placeholder?: string
   /** Close the panel when Escape is pressed inside it (popout). */
   closeOnEscape?: boolean
@@ -90,11 +91,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   placeholder = DEFAULT_ORACLE_PLACEHOLDER,
   onClose,
   onThreadCreated,
+  onThreadChange,
   isCompact = false,
   className = '',
   showModeControls = true,
-  onToggleConversations,
-  conversationsOpen = false,
+  desktopChatsSidebar = false,
   closeOnEscape = false,
 }) => {
   const oracle = useSafeOracle()
@@ -115,10 +116,62 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const [localIsLoadingThreads, setLocalIsLoadingThreads] = useState(false)
   const localThreadsCountRef = useRef(0)
   const [isChatsOpen, setIsChatsOpen] = useState(false)
+  const [isChatsMounted, setIsChatsMounted] = useState(false)
   const [panelWidth, setPanelWidth] = useState(0)
+  const [desktopChatsOpen, setDesktopChatsOpen] = useState(true)
+  const [desktopViewport, setDesktopViewport] = useState(false)
+  const isDesktopPage = desktopChatsSidebar && desktopViewport && panelWidth >= 768
+  const chatsOpen = isDesktopPage ? desktopChatsOpen : isChatsOpen
+  const chatsLayout = panelWidth >= 768 ? 'column' : 'takeover'
+  const chatsPanelId = useId()
+  const restoreChatsFocusRef = useRef(false)
+  useEffect(() => {
+    if (chatsOpen) {
+      setIsChatsMounted(true)
+      return
+    }
+    if (!isChatsMounted) return
+    const timer = setTimeout(() => setIsChatsMounted(false), window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : 200)
+    return () => clearTimeout(timer)
+  }, [chatsOpen, isChatsMounted])
+  const setChatsOpen = useCallback((open: boolean) => {
+    if (isDesktopPage) {
+      setDesktopChatsOpen(open)
+      try {
+        localStorage.setItem('moltology:oracle_page_chats', open ? 'open' : 'closed')
+      } catch {}
+    } else {
+      setIsChatsOpen(open)
+    }
+  }, [isDesktopPage])
+  const closeChats = useCallback((restoreFocus = true) => {
+    restoreChatsFocusRef.current = restoreFocus
+    setChatsOpen(false)
+  }, [setChatsOpen])
+
+  useEffect(() => {
+    if (!desktopChatsSidebar) return
+    try {
+      setDesktopChatsOpen(localStorage.getItem('moltology:oracle_page_chats') !== 'closed')
+    } catch {}
+  }, [desktopChatsSidebar])
+
+  useEffect(() => {
+    if (!desktopChatsSidebar) return
+    const sync = () => setDesktopViewport(window.innerWidth >= 768)
+    sync()
+    window.addEventListener('resize', sync)
+    return () => window.removeEventListener('resize', sync)
+  }, [desktopChatsSidebar])
 
   const rootRef = useRef<HTMLDivElement>(null)
   const chatsButtonRef = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (!chatsOpen && restoreChatsFocusRef.current) {
+      chatsButtonRef.current?.focus()
+      restoreChatsFocusRef.current = false
+    }
+  }, [chatsOpen])
 
   const threads = oracle ? oracle.threads : localThreads
   const isLoadingThreads = oracle ? oracle.isLoadingThreads : localIsLoadingThreads
@@ -218,9 +271,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
   }, [oracle, userId])
 
-  const chatsLayout: OracleChatsLayout =
-    isChatsOpen && panelWidth >= CHATS_COLUMN_MIN_WIDTH ? 'column' : 'takeover'
-
   useLayoutEffect(() => {
     const el = rootRef.current
     if (!el) return
@@ -231,30 +281,35 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
     syncWidth(el.clientWidth)
 
-    if (typeof ResizeObserver === 'undefined') return
+    const onResize = () => syncWidth(el.clientWidth)
+    window.addEventListener('resize', onResize)
+    if (typeof ResizeObserver === 'undefined') return () => window.removeEventListener('resize', onResize)
     const observer = new ResizeObserver((entries) => {
       const width = entries[0]?.contentRect.width ?? el.clientWidth
       syncWidth(width)
     })
     observer.observe(el)
-    return () => observer.disconnect()
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', onResize)
+    }
   }, [])
 
   useEffect(() => {
-    if (!isChatsOpen) return
+    if (!chatsOpen) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return
+      if (e.defaultPrevented || e.key !== 'Escape') return
       e.preventDefault()
       e.stopPropagation()
-      setIsChatsOpen(false)
+      closeChats()
     }
 
     document.addEventListener('keydown', handleKeyDown)
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isChatsOpen])
+  }, [chatsOpen, closeChats])
 
   const getTimeString = (d: Date = new Date()) => {
     if (!isMounted) return ''
@@ -313,17 +368,17 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   const handleActiveThreadRemoved = useCallback(
     (removedThreadId: string) => {
-      const current = oracle ? oracle.activeThreadId : localActiveThreadId
-      if (current === removedThreadId) {
+      if (activeThreadId === removedThreadId) {
         if (oracle) {
           oracle.setActiveThreadId(null)
         } else {
           setLocalActiveThreadId(null)
+          onThreadChange?.(null)
         }
         setMessages([])
       }
     },
-    [oracle, localActiveThreadId]
+    [oracle, activeThreadId, onThreadChange]
   )
 
   const { pinThread, archiveThread, renameThread, deleteThread } = useThreadActions({
@@ -596,14 +651,15 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   }
 
   const handleToggleChats = () => {
-    if (!isChatsOpen) {
+    if (!chatsOpen) {
       if (oracle) {
         oracle.refreshThreads()
       } else if (userId) {
         refreshLocalThreads()
       }
     }
-    setIsChatsOpen((prev) => !prev)
+    if (chatsOpen) closeChats()
+    else setChatsOpen(true)
   }
 
   const handleSelectThread = (selectedId: string) => {
@@ -616,8 +672,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       oracle.setActiveThreadId(selectedId)
     } else {
       setLocalActiveThreadId(selectedId)
+      onThreadChange?.(selectedId)
     }
-    setIsChatsOpen(false)
+    if (chatsLayout === 'takeover') closeChats(false)
   }
 
   const handleNewChat = () => {
@@ -626,10 +683,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       oracle.setActiveThreadId(null)
     } else {
       setLocalActiveThreadId(null)
+      onThreadChange?.(null)
     }
     setMessages([])
     setErrorMessage(null)
-    setIsChatsOpen(false)
+    if (chatsLayout === 'takeover') closeChats(false)
   }
 
   const handleClose = () => {
@@ -641,11 +699,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
   }
 
-  const showConversation = !isChatsOpen || chatsLayout === 'column'
+  const showConversation = !chatsOpen || chatsLayout === 'column'
   const isNewChat = !hasUserMessages && !activeThreadId
   // Narrow panels (phone sheet, popout, sidebar) keep the prompt box docked at the bottom
   // from the first message, so it sits above the keyboard and never jumps after sending.
-  const isNarrow = panelWidth < CHATS_COLUMN_MIN_WIDTH
+  const isNarrow = panelWidth - (chatsOpen && chatsLayout === 'column' ? 288 : 0) < INLINE_COMPOSER_MIN_WIDTH
   // Phones: a new chat puts the box at the top (the keyboard opens below it); an ongoing
   // chat docks it at the bottom and lifts it by the keyboard inset instead of panning the page.
   const isPhone = useIsPhone()
@@ -677,7 +735,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   }
 
   const handleRootKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key !== 'Escape' || !closeOnEscape || isChatsOpen || isAuthModalOpen) return
+    if (e.key !== 'Escape' || !closeOnEscape || chatsOpen || isAuthModalOpen) return
     const target = e.target as HTMLElement | null
     if (target?.closest?.('[role="menu"], [role="dialog"], [role="alertdialog"], [role="listbox"]')) return
     e.preventDefault()
@@ -690,7 +748,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         sendDisabled={usage.blocked}
         variant={variant}
         compact={isPhone}
-        footnote={isPhone ? undefined : 'The Oracle can be wrong. Check anything important.'}
         value={draft}
         onValueChange={setDraft}
         onSubmit={handlePromptSubmit}
@@ -704,6 +761,23 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     </div>
   )
   const headerButton = headerIconButtonClasses(isPhone)
+  const windowControls = (
+    <>
+      {showModeControls && oracle && oracle.mode !== 'closed' && (
+        <OracleModeMenu mode={oracle.mode} onSelect={handleModeSwitch} touch={isPhone} />
+      )}
+
+      <button
+        type="button"
+        onClick={handleClose}
+        className={headerButton}
+        title="Close Panel"
+        aria-label="Close"
+      >
+        <X className="w-4 h-4" />
+      </button>
+    </>
+  )
 
   return (
     <div
@@ -712,96 +786,24 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       style={keyboardInset ? { paddingBottom: keyboardInset } : undefined}
       className={`flex flex-col bg-surface-1/60 backdrop-blur-md border border-line-subtle shadow-menu font-sans overflow-hidden h-full w-full relative ${className}`}
     >
-      {/* Header: conversation controls on the left, window controls on the right */}
-      <div className="h-12 px-2 border-b border-line-subtle flex items-center justify-between gap-2 shrink-0 select-none relative z-10">
-        <div className="flex items-center gap-0.5 min-w-0 flex-1">
-          {onToggleConversations ? (
-            <button
-              type="button"
-              onClick={onToggleConversations}
-              className={`${headerButton} ${conversationsOpen ? 'md:!text-cyan-glow md:bg-surface-2' : ''}`}
-              title="Chats"
-              aria-label="Toggle Chats"
-            >
-              <ChatListIcon className="w-4 h-4" />
-            </button>
-          ) : (
-            <button
-              ref={chatsButtonRef}
-              type="button"
-              onClick={handleToggleChats}
-              className={`${headerButton} ${isChatsOpen ? '!text-cyan-glow bg-surface-2' : ''}`}
-              title="Chats"
-              aria-label="Toggle Chats"
-              aria-expanded={isChatsOpen}
-            >
-              <ChatListIcon className="w-4 h-4" />
-            </button>
-          )}
-
-          <button
-            type="button"
-            onClick={handleNewChat}
-            disabled={isAtChatLimit}
-            className={headerButton}
-            title={isAtChatLimit ? getChatLimitError().message : 'New chat (Ctrl+Shift+O)'}
-            aria-label="New Chat"
-          >
-            <SquarePen className="w-4 h-4" />
-          </button>
-
-          {activeThreadTitle && (
-            <span
-              className="ml-1.5 text-sm font-medium text-ink truncate pointer-events-none"
-              title={activeThreadTitle}
-            >
-              {activeThreadTitle}
-            </span>
-          )}
-        </div>
-
-        <div
-          className="flex items-center gap-0.5 shrink-0 pointer-events-auto"
-          onPointerDown={(e) => e.stopPropagation()}
-        >
-          {showModeControls && oracle && oracle.mode !== 'closed' && (
-            <OracleModeMenu mode={oracle.mode} onSelect={handleModeSwitch} touch={isPhone} />
-          )}
-
-          <button
-            type="button"
-            onClick={handleClose}
-            className={headerButton}
-            title="Close Panel"
-            aria-label="Close"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-
-      {/* Error Alert */}
-      {errorMessage && (
-        <div className="bg-crimson-soft border-b border-crimson-aggro/40 px-3 py-1.5 text-[11px] text-crimson-text flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-1.5">
-            <AlertCircle className="w-3.5 h-3.5 text-crimson-text shrink-0" />
-            <span>{errorMessage}</span>
-          </div>
-          <button onClick={() => setErrorMessage(null)} className="text-crimson-text hover:text-ink rounded-control px-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
-            ×
-          </button>
-        </div>
-      )}
-
       <div className="flex flex-1 min-h-0 overflow-hidden relative z-10">
-        {isChatsOpen && (
+        {/* Reserve the final width once; only the history surface animates. */}
+        {chatsOpen && chatsLayout === 'column' && <div aria-hidden="true" className="w-72 shrink-0" />}
+        {isChatsMounted && (
           <OracleChatsPanel
+            id={chatsPanelId}
+            touch={isPhone}
+            onCollapse={() => closeChats()}
+            onNewChat={handleNewChat}
+            newChatDisabled={isAtChatLimit}
+            newChatTitle={isAtChatLimit ? getChatLimitError().message : 'New chat (Ctrl+Shift+O)'}
             userId={userId}
             isAuthPending={isAuthPending}
             threads={threads}
             activeThreadId={activeThreadId}
             isLoadingThreads={isLoadingThreads}
             layout={chatsLayout}
+            isOpen={chatsOpen}
             usageSnapshot={usage.snapshot}
             usageUnavailable={usage.unavailable}
             onSelectThread={handleSelectThread}
@@ -811,13 +813,74 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             onDelete={deleteThread}
             onOpenAuthModal={() => {
               setIsAuthModalOpen(true)
-              setIsChatsOpen(false)
+              closeChats(false)
             }}
           />
         )}
 
         {showConversation && (
-          <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
+          <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden relative">
+            {/* Header: conversation controls on the left, window controls on the right */}
+            <div className="h-12 px-2 border-b border-line-subtle flex items-center justify-between gap-2 shrink-0 select-none relative z-10">
+              <div className="flex items-center gap-0.5 min-w-0 flex-1">
+                {!chatsOpen && (
+                  <>
+                    <button
+                      ref={chatsButtonRef}
+                      type="button"
+                      onClick={handleToggleChats}
+                      className={headerButton}
+                      title="Open chats"
+                      aria-label="Open chats"
+                      aria-expanded={false}
+                      aria-controls={chatsPanelId}
+                    >
+                      <PanelLeftOpen className="w-4 h-4" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleNewChat}
+                      disabled={isAtChatLimit}
+                      className={headerButton}
+                      title={isAtChatLimit ? getChatLimitError().message : 'New chat (Ctrl+Shift+O)'}
+                      aria-label="New chat"
+                    >
+                      <SquarePen className="w-4 h-4" aria-hidden="true" />
+                    </button>
+                  </>
+                )}
+
+                {activeThreadTitle && (
+                  <span
+                    className="ml-1.5 text-sm font-medium text-ink truncate pointer-events-none"
+                    title={activeThreadTitle}
+                  >
+                    {activeThreadTitle}
+                  </span>
+                )}
+              </div>
+
+              <div
+                className="flex items-center gap-0.5 shrink-0 pointer-events-auto"
+                onPointerDown={(e) => e.stopPropagation()}
+              >
+                {windowControls}
+              </div>
+            </div>
+
+            {/* Error Alert */}
+            {errorMessage && (
+              <div className="bg-crimson-soft border-b border-crimson-aggro/40 px-3 py-1.5 text-[11px] text-crimson-text flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 text-crimson-text shrink-0" />
+                  <span>{errorMessage}</span>
+                </div>
+                <button onClick={() => setErrorMessage(null)} className="text-crimson-text hover:text-ink rounded-control px-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
+                  ×
+                </button>
+              </div>
+            )}
+
             {isNewChat ? (
               <div className="flex-1 overflow-y-auto min-h-0 relative">
                 <NewChatScreen
@@ -835,7 +898,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                 <Conversation
                   ref={conversationRef}
                   onScroll={handleConversationScroll}
-                  className="flex-1 min-h-0"
+                  className="flex-1 min-h-0 pb-16"
                   aria-live="polite"
                   aria-busy={isSending}
                 >
@@ -928,17 +991,21 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                 {isAwayFromBottom && (
                   <button
                     type="button"
+                    aria-label="Jump to latest"
                     onClick={handleJumpToLatest}
-                    className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-surface-2 border border-line shadow-menu text-xs text-ink-body hover:text-ink hover:border-line-hover transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow animate-in fade-in slide-in-from-bottom-1 duration-150"
+                    className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 inline-flex size-8 items-center justify-center rounded-full bg-surface-2 border border-line shadow-menu text-ink-body hover:text-ink hover:border-line-hover transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow animate-in fade-in slide-in-from-bottom-1 duration-150"
                   >
                     <ArrowDown className="w-3.5 h-3.5" />
-                    <span>Jump to latest</span>
                   </button>
                 )}
               </div>
             )}
 
-            {(!isNewChat || (isNarrow && !isPhone)) && <div className="shrink-0">{composer('docked')}</div>}
+            {(!isNewChat || (isNarrow && !isPhone)) && (
+              // Overlap only the fade; the input stays in flow as its draft grows.
+              // Pointer events pass through the fade to the conversation beneath it.
+              <div className="relative z-10 shrink-0 -mt-12 pointer-events-none">{composer('docked')}</div>
+            )}
           </div>
         )}
       </div>

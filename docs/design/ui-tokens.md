@@ -20,6 +20,9 @@ says when to use each. New UI uses these and the primitives in `src/components/u
 The `line-*` and `*-soft` tokens already include alpha. Tailwind 4 opacity modifiers
 apply to those colors too, so `/50` makes them more transparent.
 
+Text selection defaults to `selection:bg-cyan-glow/30 selection:text-ink`: a muted
+cyan wash with light text, so selected passages stay readable without a solid signal fill.
+
 ### Brand artwork
 
 The Synaptic Path emblem uses `crimson-aggro` (`#ff453a`) in production. The
@@ -58,6 +61,10 @@ icons or geometry and verifies the original-icon backups.
 
 - Controls are `min-h-8`, `min-h-10` or `min-h-12` (32, 40, 48px at the base font size).
 - Cards pad 16px (`p-4`); large panels 24px. No text under 11px.
+- Standard app pages share a centered, fluid content area capped at 1,280px on desktop
+  in `HudLayout`. The cap excludes sidebar navigation and page padding. Use pixels here
+  because the root font size scales on desktop. Fullscreen Oracle pages use the full workspace.
+  The desktop header's XP bar shares the same centered cap and horizontal page padding.
 - Focus: `outline-2 outline-offset-2 outline-cyan-glow` on buttons and tabs; fields switch to a
   `cyan-glow` border with `shadow-field-focus` (`shadow-field-error` when invalid).
 - Glow is for the main action on hover and for live states only. Resting cards and buttons do not glow.

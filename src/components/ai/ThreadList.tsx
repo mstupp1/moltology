@@ -3,7 +3,6 @@ import { ChevronDown, ChevronRight, Search, X } from 'lucide-react'
 import { filterThreadsByQuery, groupThreadsByDate } from '@/lib/ai/thread-groups'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { ThreadListItem, type ThreadListDensity } from './ThreadListItem'
-import { ThreadActionSheet } from './ThreadActionSheet'
 import { DeleteThreadDialog, isDeleteConfirmSkipped } from './DeleteThreadDialog'
 import type { ManagedThread } from './useThreadActions'
 
@@ -31,6 +30,8 @@ export interface ThreadListProps {
   loadingNode?: React.ReactNode
   /** Show the title search box once the list is longer than this. */
   searchThreshold?: number
+  /** External search field; omit to retain the built-in search UI. */
+  searchQuery?: string
 }
 
 /** Placeholder rows shown while chats load. */
@@ -56,14 +57,15 @@ export const ThreadList: React.FC<ThreadListProps> = ({
   emptyMessage = 'No chats yet. Your conversations will show up here.',
   loadingNode,
   searchThreshold = 5,
+  searchQuery,
 }) => {
-  const [query, setQuery] = useState('')
+  const [localQuery, setQuery] = useState('')
+  const query = searchQuery ?? localQuery
   // Date sections need the clock, so they appear after mount (never during SSR).
   const [nowMs, setNowMs] = useState<number | null>(null)
   useEffect(() => {
     setNowMs(Date.now())
   }, [threads])
-  const [actionThreadId, setActionThreadId] = useState<string | null>(null)
   const [deleteCandidateId, setDeleteCandidateId] = useState<string | null>(null)
   const [renamingThreadId, setRenamingThreadId] = useState<string | null>(null)
   const [isArchivedOpen, setIsArchivedOpen] = useState(false)
@@ -79,9 +81,8 @@ export const ThreadList: React.FC<ThreadListProps> = ({
   const archivedThreads = visibleThreads.filter((t) => t.archivedAt)
   const unpinnedGroups =
     nowMs != null && !isSearching ? groupThreadsByDate(unpinnedThreads, nowMs) : null
-  const showSearch = threads.length > searchThreshold || isSearching
+  const showSearch = searchQuery === undefined && (threads.length > searchThreshold || isSearching)
 
-  const actionThread = threads.find((t) => t.id === actionThreadId) || null
   const deleteCandidate = threads.find((t) => t.id === deleteCandidateId) || null
 
   const handleDeleteRequest = (threadId: string) => {
@@ -101,7 +102,6 @@ export const ThreadList: React.FC<ThreadListProps> = ({
       density={density}
       isRenaming={renamingThreadId === t.id}
       onSelect={() => onSelectThread(t.id)}
-      onMobileMenu={() => setActionThreadId(t.id)}
       onRenameStart={() => setRenamingThreadId(t.id)}
       onRenameCommit={(title) => {
         setRenamingThreadId(null)
@@ -164,7 +164,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
             <span>Pinned</span>
             <span className="text-ink-muted font-mono">({pinnedThreads.length})</span>
           </div>
-          <div className="space-y-1 mt-1">{pinnedThreads.map((t) => renderItem(t, false))}</div>
+          <div className="space-y-0.5 mt-1">{pinnedThreads.map((t) => renderItem(t, false))}</div>
         </div>
       )}
 
@@ -175,12 +175,12 @@ export const ThreadList: React.FC<ThreadListProps> = ({
               {unpinnedGroups.map((group) => (
                 <div key={group.id} data-testid={`thread-group-${group.id}`}>
                   <div className={SECTION_LABEL}>{group.label}</div>
-                  <div className="space-y-1 mt-1">{group.threads.map((t) => renderItem(t, false))}</div>
+                  <div className="space-y-0.5 mt-1">{group.threads.map((t) => renderItem(t, false))}</div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="space-y-1">{unpinnedThreads.map((t) => renderItem(t, false))}</div>
+            <div className="space-y-0.5">{unpinnedThreads.map((t) => renderItem(t, false))}</div>
           )}
         </div>
       )}
@@ -202,25 +202,9 @@ export const ThreadList: React.FC<ThreadListProps> = ({
             <span>Archived</span>
             <span className="text-ink-muted font-mono">({archivedThreads.length})</span>
           </button>
-          {(isArchivedOpen || isSearching) && <div className="space-y-1 mt-1">{archivedThreads.map((t) => renderItem(t, true))}</div>}
+          {(isArchivedOpen || isSearching) && <div className="space-y-0.5 mt-1">{archivedThreads.map((t) => renderItem(t, true))}</div>}
         </div>
       )}
-
-      <ThreadActionSheet
-        thread={actionThread}
-        archived={!!actionThread?.archivedAt}
-        onClose={() => setActionThreadId(null)}
-        onPin={(id) => {
-          const t = threads.find((x) => x.id === id)
-          if (t) onPin(id, !t.pinnedAt)
-        }}
-        onArchive={(id) => {
-          const t = threads.find((x) => x.id === id)
-          if (t) onArchive(id, !t.archivedAt)
-        }}
-        onRename={(id) => setRenamingThreadId(id)}
-        onDelete={(id) => handleDeleteRequest(id)}
-      />
 
       <DeleteThreadDialog
         thread={deleteCandidate}

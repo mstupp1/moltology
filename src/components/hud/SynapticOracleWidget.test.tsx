@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
-import { render, screen, fireEvent, act } from '@testing-library/react'
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { SynapticOracleWidget } from './SynapticOracleWidget'
 import { OracleProvider, useSafeOracle } from './OracleContext'
 import { DEFAULT_ORACLE_PLACEHOLDER } from '@/lib/ai/oracle-models'
@@ -52,6 +52,37 @@ describe('SynapticOracleWidget', () => {
     window.innerHeight = 800
   })
 
+  it('uses the larger default size, preserves custom sizes, and clamps on short screens', () => {
+    const { container, unmount } = render(<SynapticOracleWidget />)
+    fireEvent.click(screen.getByRole('button', { name: /Open Oracle AI Popout/i }))
+    expect(container.querySelector('.fixed.rounded-card')).toHaveStyle({ width: '480px', height: '680px' })
+    unmount()
+
+    localStorage.setItem('moltology:oracle_popout_size', JSON.stringify({ width: 560, height: 720 }))
+    const custom = render(<SynapticOracleWidget />)
+    fireEvent.click(screen.getByRole('button', { name: /Open Oracle AI Popout/i }))
+    expect(custom.container.querySelector('.fixed.rounded-card')).toHaveStyle({ width: '560px', height: '720px' })
+    window.innerHeight = 450
+    window.innerWidth = 640
+    fireEvent.resize(window)
+    expect(custom.container.querySelector('.fixed.rounded-card')).toHaveStyle({ width: '560px', height: '418px' })
+    fireEvent.doubleClick(custom.container.querySelector('.cursor-n-resize')!)
+    expect(custom.container.querySelector('.fixed.rounded-card')).toHaveStyle({ width: '480px', height: '418px' })
+  })
+
+  it('closes immediately in state while retaining an inert popup for its exit', () => {
+    vi.useFakeTimers()
+    const { container } = render(<SynapticOracleWidget />)
+    fireEvent.click(screen.getByRole('button', { name: /Open Oracle AI Popout/i }))
+    act(() => vi.advanceTimersByTime(20))
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    expect(container.querySelector('.fixed.rounded-card')).toHaveAttribute('inert')
+    act(() => vi.advanceTimersByTime(200))
+    expect(container.querySelector('.fixed.rounded-card')).toBeNull()
+    expect(screen.getByRole('button', { name: /Open Oracle AI Popout/i })).toHaveFocus()
+    vi.useRealTimers()
+  })
+
   it('renders the floating launcher button initially', () => {
     render(
       <OracleProvider>
@@ -75,7 +106,7 @@ describe('SynapticOracleWidget', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /Open Oracle AI Popout/i }))
 
-    expect(screen.getAllByRole('button', { name: /^New Chat$/i }).length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: 'Open chats' })).toBeInTheDocument()
     expect(screen.queryByTitle(/Drag header to move chat window/i)).not.toBeInTheDocument()
 
     const popout = container.querySelector('.fixed.rounded-card')
@@ -97,7 +128,7 @@ describe('SynapticOracleWidget', () => {
     fireEvent.pointerMove(btn, { clientX: 550, clientY: 550, pointerId: 1 })
     fireEvent.click(btn)
 
-    expect(screen.getAllByRole('button', { name: /^New Chat$/i }).length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: 'Open chats' })).toBeInTheDocument()
     expect(localStorage.getItem('moltology:oracle_button_pos')).toBeNull()
     expect(localStorage.getItem('moltology:oracle_popout_pos')).toBeNull()
   })
@@ -191,6 +222,7 @@ describe('SynapticOracleWidget', () => {
 
     expect(localStorage.getItem('moltology:oracle_popout_size')).toBeNull()
     expect(localStorage.getItem('moltology:oracle_popout_pos')).toBeNull()
+    expect(container.querySelector('.fixed.rounded-card')).toHaveStyle({ width: '480px', height: '680px' })
   })
 
   it('docks to bottom as interactive prompt pill tray with no resize handles on mobile viewport', () => {
@@ -228,7 +260,7 @@ describe('SynapticOracleWidget', () => {
     vi.useRealTimers()
   })
 
-  it('renders Chats button in popout and toggles the chats list panel', () => {
+  it('renders Chats button in popout and toggles the chats list panel', async () => {
     render(
       <OracleProvider>
         <SynapticOracleWidget />
@@ -237,18 +269,18 @@ describe('SynapticOracleWidget', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /Open Oracle AI Popout/i }))
 
-    const chatsBtn = screen.getByRole('button', { name: /Toggle Chats/i })
+    const chatsBtn = screen.getByRole('button', { name: /(Open|Collapse) chats/i })
     expect(chatsBtn).toBeInTheDocument()
-    fireEvent.click(chatsBtn)
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
 
     const panel = screen.getByTestId('oracle-chats-panel')
     expect(panel).toBeInTheDocument()
     expect(panel).toHaveAttribute('data-chats-layout', 'takeover')
-    expect(screen.getByText('Chats')).toBeInTheDocument()
+    expect(screen.getByText('Synaptic Oracle')).toBeInTheDocument()
 
-    fireEvent.click(chatsBtn)
-    expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
-    expect(screen.queryByText('Chats')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
+    await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
+    expect(screen.queryByText('Synaptic Oracle')).not.toBeInTheDocument()
   })
 
   it('resets popout size when switching from sidebar mode to small window (popout) mode', () => {

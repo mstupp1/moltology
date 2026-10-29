@@ -1,20 +1,13 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within, act } from '@testing-library/react'
 import { ThreadList } from './ThreadList'
-
-vi.mock('@/components/ui/HudBottomSheet', () => ({
-  HudBottomSheet: ({ children, isOpen }: { children: React.ReactNode; isOpen: boolean }) =>
-    isOpen ? <div data-testid="action-sheet">{children}</div> : null,
-}))
 
 const THREADS = [
   { id: 't1', title: 'Active Chat', pinnedAt: null, archivedAt: null },
   { id: 't2', title: 'Pinned Chat', pinnedAt: '2026-01-01T00:00:00Z', archivedAt: null },
   { id: 't3', title: 'Archived Chat', pinnedAt: null, archivedAt: '2026-01-01T00:00:00Z' },
 ]
-
-const noop = () => {}
 
 function renderList(overrides: Partial<Parameters<typeof ThreadList>[0]> = {}) {
   const onPin = vi.fn()
@@ -43,10 +36,25 @@ function renderList(overrides: Partial<Parameters<typeof ThreadList>[0]> = {}) {
 function kebabFor(title: string) {
   const titleEl = screen.getByText(title)
   const row = titleEl.closest('[data-density]')
-  return row?.querySelector('[data-testid="thread-kebab-mobile"]') as HTMLElement
+  return row?.querySelector('button') as HTMLElement
+}
+
+function touchPointer(target: HTMLElement, type: string, x = 20, y = 20) {
+  const event = new Event(type === 'pointerleave' ? 'pointerout' : type, { bubbles: true, cancelable: true })
+  Object.assign(event, { pointerType: 'touch', pointerId: 1, isPrimary: true, clientX: x, clientY: y })
+  fireEvent(target, event)
 }
 
 describe('ThreadList', () => {
+  it('filters from an external query without rendering the built-in search field', () => {
+    renderList({ searchThreshold: 0, searchQuery: 'Pinned' })
+    expect(screen.getByText('Pinned Chat')).toBeInTheDocument()
+    expect(screen.queryByText('Active Chat')).not.toBeInTheDocument()
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+  })
+
+  afterEach(() => { vi.useRealTimers() })
+
   beforeEach(() => {
     localStorage.clear()
   })
@@ -77,11 +85,12 @@ describe('ThreadList', () => {
     expect(text.indexOf('Newer Pin')).toBeLessThan(text.indexOf('Older Pin'))
   })
 
-  it('uses comfortable row padding when density is comfortable', () => {
+  it('uses tighter single-line rows and matching options controls when density is comfortable', () => {
     renderList({ density: 'comfortable' })
     const title = screen.getByText('Active Chat')
     expect(title.closest('[data-density="comfortable"]')).toBeTruthy()
-    expect(title.closest('button')?.className).toContain('py-3')
+    expect(title.closest('button')).toHaveClass('min-h-8', 'py-1.5', 'text-sm')
+    expect(screen.getAllByRole('button', { name: 'Chat options' })[0]).toHaveClass('h-8', 'w-8')
   })
 
   it('selects a thread when the row title is clicked', () => {
@@ -100,26 +109,68 @@ describe('ThreadList', () => {
     expect(screen.getByText('Archived Chat')).toBeInTheDocument()
   })
 
-  it('opens the mobile action sheet from the kebab and pins from it', async () => {
+  it('opens the anchored dropdown after holding for 500ms and suppresses the selection click', () => {
+    vi.useFakeTimers()
+    const { onSelectThread } = renderList()
+    const row = kebabFor('Active Chat')
+    touchPointer(row, 'pointerdown')
+    act(() => { vi.advanceTimersByTime(499) })
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    act(() => { vi.advanceTimersByTime(1) })
+    expect(screen.getByRole('menu')).toBeInTheDocument()
+    expect(screen.queryByTestId('thread-kebab-mobile')).not.toBeInTheDocument()
+    touchPointer(row, 'pointerup')
+    fireEvent.click(row)
+    expect(onSelectThread).not.toHaveBeenCalled()
+  })
+
+  it.each(['pointerup', 'pointercancel', 'pointermove', 'pointerleave'])(
+    'cancels a pending hold on %s so scrolling and normal taps do not open a menu', (event) => {
+      vi.useFakeTimers()
+      const { onSelectThread } = renderList()
+      const row = kebabFor('Active Chat')
+      touchPointer(row, 'pointerdown')
+      act(() => { vi.advanceTimersByTime(200) })
+      touchPointer(row, event, 40, 40)
+      act(() => { vi.advanceTimersByTime(500) })
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+      if (event === 'pointerup') {
+        fireEvent.click(row)
+        expect(onSelectThread).toHaveBeenCalledWith('t1')
+      }
+    },
+  )
+
+  it('keeps desktop options and keyboard context menus available', () => {
+    renderList()
+    const row = kebabFor('Active Chat')
+    const trigger = row.closest('[data-density]')!.querySelector('[data-testid="thread-kebab-desktop"]')!
+    fireEvent.pointerDown(trigger, { button: 0, ctrlKey: false, pointerType: 'mouse' })
+    expect(screen.getByRole('menu')).toBeInTheDocument()
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' })
+    fireEvent.keyDown(row, { key: 'F10', shiftKey: true })
+    expect(screen.getByRole('menu')).toBeInTheDocument()
+  })
+
+  it('opens the row dropdown from the context menu and pins from it', async () => {
     const { onPin } = renderList()
-    fireEvent.click(kebabFor('Active Chat'))
+    fireEvent.contextMenu(kebabFor('Active Chat'))
 
     await waitFor(() => {
-      expect(screen.getByTestId('action-sheet')).toBeInTheDocument()
+      expect(screen.getByRole('menu')).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByText('Pin to top'))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Pin' }))
     expect(onPin).toHaveBeenCalledWith('t1', true)
   })
 
-  it('unarchives from the action sheet for archived rows', async () => {
+  it('unarchives from the dropdown for archived rows', async () => {
     const { onArchive } = renderList()
     fireEvent.click(screen.getByRole('button', { name: /archived/i }))
-    const kebabs = screen.getAllByTestId('thread-kebab-mobile')
-    fireEvent.click(kebabs[kebabs.length - 1])
+    fireEvent.contextMenu(kebabFor('Archived Chat'))
 
     await waitFor(() => {
-      expect(screen.getByTestId('action-sheet')).toBeInTheDocument()
+      expect(screen.getByRole('menu')).toBeInTheDocument()
     })
 
     fireEvent.click(screen.getByText('Unarchive'))
@@ -128,12 +179,12 @@ describe('ThreadList', () => {
 
   it('asks for confirmation before delete and deletes on confirm', async () => {
     const { onDelete } = renderList()
-    fireEvent.click(kebabFor('Active Chat'))
+    fireEvent.contextMenu(kebabFor('Active Chat'))
 
     await waitFor(() => {
-      expect(screen.getByTestId('action-sheet')).toBeInTheDocument()
+      expect(screen.getByRole('menu')).toBeInTheDocument()
     })
-    fireEvent.click(screen.getByText('Delete chat'))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Delete' }))
 
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: 'Delete chat confirmation' })).toBeInTheDocument()
@@ -147,23 +198,23 @@ describe('ThreadList', () => {
   it('skips confirmation when the dont-ask-again preference is stored', async () => {
     localStorage.setItem('moltology:oracle_skip_delete_confirm', 'true')
     const { onDelete } = renderList()
-    fireEvent.click(kebabFor('Active Chat'))
+    fireEvent.contextMenu(kebabFor('Active Chat'))
 
     await waitFor(() => {
-      expect(screen.getByTestId('action-sheet')).toBeInTheDocument()
+      expect(screen.getByRole('menu')).toBeInTheDocument()
     })
-    fireEvent.click(screen.getByText('Delete chat'))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Delete' }))
 
     expect(onDelete).toHaveBeenCalledWith('t1')
     expect(screen.queryByRole('dialog', { name: 'Delete chat confirmation' })).not.toBeInTheDocument()
   })
 
-  it('starts inline rename from the action sheet and commits on Enter', async () => {
+  it('starts inline rename from the dropdown and commits on Enter', async () => {
     const { onRename } = renderList()
-    fireEvent.click(kebabFor('Active Chat'))
+    fireEvent.contextMenu(kebabFor('Active Chat'))
 
     await waitFor(() => {
-      expect(screen.getByTestId('action-sheet')).toBeInTheDocument()
+      expect(screen.getByRole('menu')).toBeInTheDocument()
     })
     fireEvent.click(screen.getByText('Rename'))
 
@@ -178,16 +229,15 @@ describe('ThreadList', () => {
     expect(onRename).toHaveBeenCalledWith('t1', 'Fresh Title')
   })
 
-  it('hides pin and rename actions for archived threads in the sheet', async () => {
+  it('hides pin and rename actions for archived threads in the dropdown', async () => {
     renderList()
     fireEvent.click(screen.getByRole('button', { name: /archived/i }))
-    const kebabs = screen.getAllByTestId('thread-kebab-mobile')
-    fireEvent.click(kebabs[kebabs.length - 1])
+    fireEvent.contextMenu(kebabFor('Archived Chat'))
 
     await waitFor(() => {
-      expect(screen.getByTestId('action-sheet')).toBeInTheDocument()
+      expect(screen.getByRole('menu')).toBeInTheDocument()
     })
-    expect(screen.queryByText('Pin to top')).not.toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: 'Pin' })).not.toBeInTheDocument()
     expect(screen.queryByText('Rename')).not.toBeInTheDocument()
     expect(screen.getByText('Unarchive')).toBeInTheDocument()
   })

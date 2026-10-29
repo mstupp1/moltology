@@ -3,6 +3,7 @@ import { BrandIcon } from '@/components/ui/BrandMark'
 import { ChevronUp } from 'lucide-react'
 import { DEFAULT_ORACLE_PLACEHOLDER } from '@/lib/ai/oracle-models'
 import { AIChatPanel } from '../ai/AIChatPanel'
+import { usePanelPresence } from '@/hooks/usePanelPresence'
 import { HudBottomSheet } from '../ui/HudBottomSheet'
 import { useSafeOracle } from './OracleContext'
 
@@ -16,8 +17,8 @@ const STORAGE_KEY_POPOUT_SIZE = 'moltology:oracle_popout_size'
 
 const MIN_WIDTH = 320
 const MIN_HEIGHT = 500
-const DEFAULT_WIDTH = 384
-const DEFAULT_HEIGHT = 640
+const DEFAULT_WIDTH = 480
+const DEFAULT_HEIGHT = 680
 
 type ResizeDirection = 'nw' | 'n' | 'ne' | 'sw' | 'w'
 
@@ -89,8 +90,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
   const [activeResizeDir, setActiveResizeDir] = useState<ResizeDirection | null>(null)
 
   // Popout open/close animation state — mirrors HudBottomSheet pattern
-  const [isRendered, setIsRendered] = useState(false)
-  const [isVisible, setIsVisible] = useState(false)
+  const { mounted: isRendered, visible: isVisible } = usePanelPresence(isPopoutActive && !isMobile)
 
   const resizeRef = useRef<{
     direction: ResizeDirection
@@ -102,14 +102,14 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
   } | null>(null)
 
   const getSafePopoutDims = useCallback((size: { width: number; height: number } | null) => {
-    if (typeof window === 'undefined') return { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
-    const maxW = Math.max(MIN_WIDTH, window.innerWidth - 16)
-    const maxH = Math.max(MIN_HEIGHT, window.innerHeight - 16)
+    if (typeof window === 'undefined' || window.innerWidth < 640) return size ?? { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
+    const maxW = Math.max(1, window.innerWidth - 24 - 16)
+    const maxH = Math.max(1, window.innerHeight - 16 - 16)
     const targetW = size ? size.width : DEFAULT_WIDTH
     const targetH = size ? size.height : DEFAULT_HEIGHT
     return {
-      width: clamp(targetW, MIN_WIDTH, maxW),
-      height: clamp(targetH, MIN_HEIGHT, maxH),
+      width: clamp(targetW, Math.min(MIN_WIDTH, maxW), maxW),
+      height: clamp(targetH, Math.min(MIN_HEIGHT, maxH), maxH),
     }
   }, [])
 
@@ -137,14 +137,14 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
       let initialSize = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
       if (savedSize) {
         const parsed = JSON.parse(savedSize)
-        if (typeof parsed?.width === 'number' && typeof parsed?.height === 'number') {
+        if (Number.isFinite(parsed?.width) && parsed.width > 0 && Number.isFinite(parsed?.height) && parsed.height > 0) {
           initialSize = getSafePopoutDims(parsed)
         }
       }
-      updatePopoutSize(initialSize)
+      updatePopoutSize(getSafePopoutDims(initialSize))
     } catch (err) {
       console.warn('Failed to load Oracle widget size from storage:', err)
-      updatePopoutSize({ width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT })
+      updatePopoutSize(getSafePopoutDims(null))
     }
   }, [getSafePopoutDims, updatePopoutSize])
 
@@ -181,7 +181,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
         localStorage.removeItem(STORAGE_KEY_POPOUT_SIZE)
       } catch {}
       clearStalePositionKeys()
-      updatePopoutSize({ width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT })
+      updatePopoutSize(getSafePopoutDims(null))
     }
   }, [oracle?.mode, updatePopoutSize])
 
@@ -193,29 +193,9 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     }
   }
 
-  // Animate the popout panel in/out — isRendered keeps it in the DOM during exit transition
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>
-    if (isPopoutActive) {
-      setIsRendered(true)
-      timer = setTimeout(() => setIsVisible(true), 20)
-    } else if (isRendered) {
-      setIsVisible(false)
-      timer = setTimeout(() => setIsRendered(false), 280)
-    }
-    return () => clearTimeout(timer)
-  }, [isPopoutActive])
-
   const handleClose = () => {
-    // Kick off exit animation then actually close
-    setIsVisible(false)
-    setTimeout(() => {
-      if (oracle) {
-        oracle.setMode('closed')
-      } else {
-        setLocalIsOpen(false)
-      }
-    }, 280)
+    if (oracle) oracle.setMode('closed')
+    else setLocalIsOpen(false)
   }
 
   const handleMobileClose = useCallback(() => {
@@ -225,6 +205,15 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
       setLocalIsOpen(false)
     }
   }, [oracle])
+
+  const wasPopoutOpenRef = useRef(false)
+  useEffect(() => {
+    if (isPopoutActive) wasPopoutOpenRef.current = true
+    if (wasPopoutOpenRef.current && !isPopoutActive && !isRendered) {
+      wasPopoutOpenRef.current = false
+      document.querySelector<HTMLButtonElement>(isMobile ? '[aria-label="Open Oracle AI Tray"]' : '[aria-label="Open Oracle AI Popout"]')?.focus()
+    }
+  }, [isPopoutActive, isRendered, isMobile])
 
   const mobilePillTouchStartYRef = useRef<number | null>(null)
 
@@ -248,7 +237,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
       localStorage.removeItem(STORAGE_KEY_POPOUT_SIZE)
     } catch {}
     clearStalePositionKeys()
-    updatePopoutSize({ width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT })
+    updatePopoutSize(getSafePopoutDims(null))
   }
 
   const handleResizePointerDown = (
@@ -379,20 +368,21 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
         </div>
       )}
 
-      {/* ── Desktop: Bottom-right popout with fade + scale-in ── */}
+      {/* ── Desktop: Bottom-right popout with fade and vertical motion ── */}
       {!isMobile && isRendered && (
         <div
-          className={`fixed z-40 right-6 bottom-4 font-sans overflow-hidden shadow-menu bg-surface-1 rounded-card border border-line hidden sm:block ${
+          className={`fixed z-40 right-6 bottom-4 font-sans overflow-hidden transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none shadow-menu bg-surface-1 rounded-card border border-line hidden sm:block ${
             activeResizeDir ? 'select-none' : ''
           }`}
+          aria-hidden={!isPopoutActive}
+          inert={!isPopoutActive}
           style={{
             width: `${popoutSize.width}px`,
             height: `${popoutSize.height}px`,
-            minWidth: `${MIN_WIDTH}px`,
-            minHeight: `${MIN_HEIGHT}px`,
+            minWidth: `min(${MIN_WIDTH}px, calc(100vw - 40px))`,
+            minHeight: `min(${MIN_HEIGHT}px, calc(100dvh - 32px))`,
             opacity: isVisible ? 1 : 0,
-            transform: isVisible ? 'scale(1) translateY(0)' : 'scale(0.96) translateY(8px)',
-            transition: 'opacity 220ms ease-out, transform 220ms cubic-bezier(0.16, 1, 0.3, 1)',
+            transform: isVisible ? 'translateY(0)' : 'translateY(8px)',
             transformOrigin: 'bottom right',
           }}
         >

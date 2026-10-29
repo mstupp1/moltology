@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { HUDSidebar, computeNavItemHidden } from './HUDSidebar'
 import { authClient } from '@/lib/auth-client'
 
@@ -43,6 +43,40 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     mockGetPremiumMembershipFn.mockResolvedValue({ hasPurchasedPremium: false, isPremium: false })
     localStorage.clear()
     document.body.style.overflow = ''
+  })
+
+  it('keeps desktop contents at their target width while the outer rail changes width', () => {
+    const { container } = render(<HUDSidebar />)
+    const aside = screen.getByRole('complementary')
+    expect(aside).toHaveClass('transition-[width]', 'motion-reduce:transition-none')
+    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-72')
+    fireEvent.keyDown(window, { key: 'b', metaKey: true })
+    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-20')
+    fireEvent.keyDown(window, { key: 'b', metaKey: true })
+    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-72')
+  })
+
+  it('cancels mobile close callbacks on reopen and releases scroll lock at the desktop breakpoint', () => {
+    vi.useFakeTimers()
+    render(<HUDSidebar />)
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }))
+    act(() => vi.advanceTimersByTime(50))
+    const dialog = screen.getByRole('dialog', { name: 'Navigation Menu' })
+    fireEvent.click(screen.getByRole('button', { name: 'Close menu' }))
+    expect(dialog).toHaveAttribute('inert')
+    expect(dialog).toHaveClass('-translate-y-2')
+    act(() => vi.advanceTimersByTime(100))
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }))
+    act(() => vi.advanceTimersByTime(250))
+    expect(screen.getByRole('dialog', { name: 'Navigation Menu' })).toBe(dialog)
+    expect(dialog).not.toHaveAttribute('inert')
+    const previousWidth = window.innerWidth
+    window.innerWidth = 1024
+    fireEvent.resize(window)
+    expect(dialog).not.toBeInTheDocument()
+    expect(document.body.style.overflow).toBe('')
+    window.innerWidth = previousWidth
+    vi.useRealTimers()
   })
 
   it('renders core navigation groups and items correctly', () => {

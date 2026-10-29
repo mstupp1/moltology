@@ -9,7 +9,7 @@ export const Conversation = React.forwardRef<HTMLDivElement, ConversationProps>(
     return (
       <div
         ref={ref}
-        className={`flex flex-col flex-1 overflow-y-auto px-4 py-5 sm:px-6 font-sans text-sm bg-transparent ${className}`}
+        className={`flex flex-col flex-1 overflow-y-auto px-4 py-5 sm:px-6 font-sans text-sm bg-transparent select-text ${className}`}
         {...props}
       >
         {children}

@@ -7,14 +7,14 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-10-26",
+  "syncedAt": "2026-10-28",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
     "rules": 120,
     "decisions": 43,
     "anchors": 226,
-    "drifted": 26,
+    "drifted": 27,
     "flagged": 10
   },
   "canvas": {
@@ -344,7 +344,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "file": "AGENTS.md",
           "symbol": "Hard list",
           "line": 3,
-          "value": "1. Copy. Read [BRAND_BIBLE.md](BRAND_BIBLE.md) (world, terms, economy) and [STYLE_GUIDE.md](STYLE_GUIDE.md) (voice, bans) before writing user-facing copy. Narr…",
+          "value": "1. Copy. Read [BRAND_BIBLE.md](BRAND_BIBLE.md) and [STYLE_GUIDE.md](STYLE_GUIDE.md) before user-facing writing. Narrative stays in-world; functional UI uses pl…",
           "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md#L3"
         }
@@ -425,7 +425,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "file": "AGENTS.md",
           "symbol": "Hard list",
           "line": 3,
-          "value": "1. Copy. Read [BRAND_BIBLE.md](BRAND_BIBLE.md) (world, terms, economy) and [STYLE_GUIDE.md](STYLE_GUIDE.md) (voice, bans) before writing user-facing copy. Narr…",
+          "value": "1. Copy. Read [BRAND_BIBLE.md](BRAND_BIBLE.md) and [STYLE_GUIDE.md](STYLE_GUIDE.md) before user-facing writing. Narrative stays in-world; functional UI uses pl…",
           "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md#L3"
         }
@@ -1671,10 +1671,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-server.ts",
           "symbol": "auth",
-          "line": 103,
+          "line": 105,
           "value": "betterAuth({ baseURL, secret: getAuthSecret(), database: drizzleAdapter(getDb(), { provider: 'pg', camelCase: true, transaction: false, schema: { user: authUse…",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L103"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L105"
         }
       ],
       "tests": [
@@ -1704,7 +1704,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1688,
         "y": 76
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "auth.production-secret",
@@ -1717,10 +1717,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-server.ts",
           "symbol": "getAuthSecret",
-          "line": 45,
+          "line": 47,
           "value": "getAuthSecret()",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L45"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L47"
         }
       ],
       "tests": [],
@@ -1750,18 +1750,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-server.ts",
           "symbol": "auth.minPasswordLength",
-          "line": 120,
+          "line": 122,
           "value": "MIN_PASSWORD_LENGTH",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L120"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L122"
         },
         {
           "file": "src/lib/auth-config.ts",
           "symbol": "MIN_PASSWORD_LENGTH",
-          "line": 60,
+          "line": 61,
           "value": "8",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-config.ts#L60"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-config.ts#L61"
         }
       ],
       "tests": [
@@ -1845,18 +1845,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-config.ts",
           "symbol": "AUTH_SESSION_COOKIE_CACHE",
-          "line": 62,
+          "line": 63,
           "value": "{ enabled: true, maxAge: 5 * 60, } as const",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-config.ts#L62"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-config.ts#L63"
         },
         {
           "file": "src/lib/auth-config.ts",
           "symbol": "AUTH_SESSION_CLIENT_OPTIONS",
-          "line": 48,
+          "line": 49,
           "value": "{ refetchInterval: 0, refetchOnWindowFocus: false, refetchWhenOffline: false, } as const",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-config.ts#L48"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-config.ts#L49"
         }
       ],
       "tests": [
@@ -1895,10 +1895,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-server.ts",
           "symbol": "ACCOUNT_LINKING_OPTIONS",
-          "line": 93,
+          "line": 95,
           "value": "{ enabled: true, trustedProviders: ['google'] as const, requireLocalEmailVerified: true, }",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L93"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L95"
         }
       ],
       "tests": [
@@ -1939,10 +1939,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-config.ts",
           "symbol": "isEmailVerificationEnabled",
-          "line": 133,
+          "line": 134,
           "value": "isEmailVerificationEnabled()",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-config.ts#L133"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-config.ts#L134"
         }
       ],
       "tests": [
@@ -1980,10 +1980,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-server.ts",
           "symbol": "getAuthApiErrorUrl",
-          "line": 99,
+          "line": 101,
           "value": "getAuthApiErrorUrl(origin)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L99"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L101"
         }
       ],
       "tests": [
@@ -5194,7 +5194,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "file": "src/lib/ai/oracle-models.ts",
           "symbol": "ORACLE_MODELS",
           "line": 19,
-          "value": "[ { id: 'zai/glm-5.3-flash', label: 'GLM 5.3 Flash', shortLabel: 'GLM', provider: 'zai', badge: 'Chat', pricing: { input: '$0.15', output: '$0.50' }, latency: …",
+          "value": "[ { id: 'zai/glm-5.3-flash', label: 'GLM 5.3 Flash', shortLabel: 'GLM', provider: 'zai', badge: 'Chat', pricing: { input: '$0.04', output: '$0.08' }, latency: …",
           "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts#L19"
         }
@@ -5837,10 +5837,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "AGENTS.md",
           "symbol": "Assets and media",
-          "line": 58,
-          "value": "Finished social posts, carousel slides, reels and shorts are archived in Google Drive under `My Drive/Projects/Moltology/Social Archive/`, with direct local me…",
+          "line": 25,
+          "value": "Heavy website/blog media, character source assets, and reusable templates belong in Neon S3 (`moltology-public-assets`), never `public/`. Use `getAssetUrl` for…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md#L58"
+          "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md#L25"
         }
       ],
       "tests": [],

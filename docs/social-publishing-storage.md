@@ -1,6 +1,8 @@
 # Social publishing media storage
 
-Social production keeps its archive in Neon S3 and publishes from Zernio-hosted media.
+Social production keeps its archive in Google Drive (see [social archive](social-archive.md))
+and publishes from Zernio-hosted media. Archive writes must succeed before queueing;
+website/blog media and reusable source assets remain on Neon S3.
 The post, carousel, reel/short, and series CLIs pass local production files to
 `scripts/lib/zernio-client.ts`. The shared client obtains a presigned upload URL,
 uploads each file to Zernio without forwarding the API authorization header to

@@ -112,9 +112,9 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
 
   if (isTop) {
     return (
-      <div className={`flex flex-col w-full px-3 pt-3 pb-6 gap-5 font-sans ${className}`}>
+      <div className={`flex flex-col min-h-full w-full px-3 pt-3 pb-6 gap-5 font-sans ${className}`}>
         {composer}
-        <div className="flex flex-col gap-5 px-1">
+        <div className="flex flex-col gap-5 px-1 mt-auto">
           {greeting}
           {suggestions}
         </div>
