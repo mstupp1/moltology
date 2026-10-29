@@ -2054,7 +2054,122 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-10-29T13:11:12.425Z"
+      "createdAt": "2026-10-29T13:11:12.425Z",
+      "format": "Reverse tutorial",
+      "loudness": 3,
+      "productionCostEstimateUsd": 2.465,
+      "videoOutputCostUsd": 2.43264,
+      "videoOutputTokens": 139008,
+      "sourceFootageSeconds": 24.192,
+      "videoModel": "gemini-omni-1.1-flash",
+      "mascot": "lobster_engineer",
+      "youtubeContainsSyntheticMedia": true,
+      "verifiedAt": "2026-10-29T13:11:26.141Z",
+      "productionExperiment": "Opening framing: wider visible consequence. Topic, format and stronger seasonal story are confounders; no isolated causal claim. Subtitle handoff correction is baseline compliance.",
+      "productionReview": {
+        "rawDirectory": "/Users/mylesstupp/Development/moltology/tmp/reel-daily-1793279157182",
+        "finalVideo": "/Users/mylesstupp/Development/moltology/tmp/reels-2026-10-29/choose-the-hat.mp4",
+        "durationSeconds": 27.3,
+        "hookWordStartsSeconds": [
+          0.0,
+          0.21,
+          0.71,
+          1.57,
+          1.71,
+          2.14,
+          2.21
+        ],
+        "bodySubtitleStartSeconds": 3.42,
+        "subtitleHandoff": "Full clean timeline overlay through measured first body word; original body subtitles and narration preserved; sentence boundary prevents straddling.",
+        "headlineSafeBox": [
+          120,
+          460,
+          900,
+          900
+        ],
+        "animation": "18px exponential horizontal settle; amber final phrase; stable line breaks",
+        "costs": {
+          "plannedVideoEstimateUsd": 2.43264,
+          "videoBudgetUsd": 3.3,
+          "externalCeilingUsd": 3.5,
+          "videoOutputTokens": 139008,
+          "videoOutputUsd": 2.43264,
+          "inputTokens": 5450,
+          "inputUsd": 0.008175,
+          "conservativeNonvideoAndThoughtTokens": 2112,
+          "nonvideoAndThoughtUsd": 0.019008,
+          "voiceUtf8Bytes": 344,
+          "voiceEstimateUsd": 0.00516,
+          "directionUsd": 0,
+          "builtInImageGenCost": "Separate, unavailable",
+          "billingCaveat": "Token based estimate; thoughts conservatively charged as text; exact invoice unavailable",
+          "sources": [
+            "https://ai.google.dev/gemini-api/docs/pricing",
+            "https://fish.audio/developers/"
+          ],
+          "externalEstimateUsd": 2.465,
+          "sourceClipSeconds": [
+            4.032,
+            4.032,
+            4.032,
+            4.032,
+            4.032,
+            4.032
+          ]
+        },
+        "voiceoverSeconds": 24.01,
+        "artwork": {
+          "tool": "Built-in ImageGen",
+          "canonicalReference": "/Users/mylesstupp/Development/moltology/tmp/reels-2026-10-29/mascot.webp",
+          "sourceKey": "images/characters/char_lobster_engineer_adult_v2.webp",
+          "sceneFrameInputs": [
+            "scene-1.png",
+            "scene-4.png",
+            "scene-5.png",
+            "scene-6.png"
+          ],
+          "prompts": "Authored visible actions in scenePrompts, canonical identity preserved for character frames; outro Choose the hat. / Try the audit at moltology.org, mascot plus official emblem reference."
+        },
+        "verification": "Inspected exact final export: frame zero has only large headline, mid/last hook and first/later body phrases pass; square and 4:5 crops retain every letter; opening motion, mascot identity, useful choice and outro inspected. Audio stream and volume checked; no full audiovisual playback performed in this environment.",
+        "hookTimestampCorrection": "Clean timeline first video PTS 0.033008 versus master 0; setpts=PTS-STARTPTS removes initial-frame leak.",
+        "finalSha256": "b236542d5b60100882f43b9499206cf7efcc8ce5a84add7984ef71ef3f51a38a",
+        "boredomCheck": "Pass on visual sequence and script: costume-as-research joke, escalation and useful choice; no jargon or stale bridge."
+      },
+      "pitchScores": [
+        {
+          "format": "Reverse tutorial",
+          "hook": "Your costume research has become the costume.",
+          "beats": "Twelve ideas, endless cape comparisons, still choosing at Halloween; Engineer chooses the hat already on the desk.",
+          "payoff": "Choose from what you have before browsing again.",
+          "Stop": 5,
+          "Laugh": 4,
+          "Pull": 4,
+          "Keep": 4,
+          "Fresh": 5
+        },
+        {
+          "format": "Fake infomercial",
+          "hook": "Your costume needs another research department.",
+          "beats": "Overbuilt costume laboratory offers endless comparisons; a plain hat ends the committee.",
+          "payoff": "Choose the existing hat.",
+          "Stop": 4,
+          "Laugh": 4,
+          "Pull": 3,
+          "Keep": 3,
+          "Fresh": 4
+        },
+        {
+          "format": "Work forecast",
+          "hook": "A cape comparison is swallowing Halloween.",
+          "beats": "Forecast of costume research fog; visibility drops to one hat; clear it by choosing.",
+          "payoff": "Use what is on the desk.",
+          "Stop": 4,
+          "Laugh": 3,
+          "Pull": 3,
+          "Keep": 3,
+          "Fresh": 4
+        }
+      ]
     }
   ]
 }
