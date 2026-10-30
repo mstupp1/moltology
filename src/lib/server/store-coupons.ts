@@ -21,6 +21,7 @@ export interface StorePromotion extends StoreCouponTerms {
   code: string
   label: string
   discountCents: number
+  oncePerEmail: boolean
 }
 
 function couponOf(promotion: Stripe.PromotionCode): Stripe.Coupon | null {
@@ -57,7 +58,7 @@ export async function resolveStorePromotion(input: { code: string; email: string
     if (used) throw new Error('That promo code was already used with this email.')
   }
   const terms = termsOf(coupon)
-  return { id: promotion.id, code: promotion.code, ...terms, label: storeCouponLabel(terms), discountCents: estimateCouponDiscountCents(terms, input.subtotalCents) }
+  return { id: promotion.id, code: promotion.code, ...terms, label: storeCouponLabel(terms), discountCents: estimateCouponDiscountCents(terms, input.subtotalCents), oncePerEmail: promotion.metadata?.oncePerEmail === 'true' }
 }
 
 function toView(promotion: Stripe.PromotionCode): StoreCouponView | null {
