@@ -4,7 +4,7 @@ import { ORACLE_THREAD_ID_HEADER, ORACLE_UNAVAILABLE_MESSAGE } from './oracle-ch
 import { ORACLE_MODELS } from './oracle-models'
 import { buildSystemPrompt } from './codex-prompt'
 import { ORACLE_JAILBREAK_ERROR, screenOraclePrompt } from '../quality/oracle-preflight'
-import { getOracleUsageSnapshot, getRecentAIThreadTurns, recordOracleUsage } from './service'
+import { getOracleUsageSnapshot, getRecentAIThreadTurns, releaseOracleChatUsage, reserveOracleChatUsage } from './service'
 import { buildOracleUsageSnapshot, ORACLE_FREE_LIMITS, ORACLE_MAX_OUTPUT_TOKENS, ORACLE_PREMIUM_LIMITS } from './usage-limits'
 import { validateInputGuardrails } from './guardrails'
 import { getChatLimitError } from './chat-retention'
@@ -32,7 +32,8 @@ vi.mock('./service', () => ({
   getOwnedAIThread: vi.fn().mockResolvedValue({ id: '11111111-1111-4111-8111-111111111111', userId: 'usr_from_jwt' }),
   getRecentAIThreadTurns: vi.fn().mockResolvedValue([]),
   getOracleUsageSnapshot: vi.fn().mockResolvedValue({ lastMinute: 0, lastFiveHours: 0, lastWeek: 0, isPremium: false }),
-  recordOracleUsage: vi.fn().mockResolvedValue('usage-1'),
+  reserveOracleChatUsage: vi.fn().mockResolvedValue({ allowed: true, id: 'usage-1' }),
+  releaseOracleChatUsage: vi.fn().mockResolvedValue(undefined),
   finalizeOracleUsage: vi.fn().mockResolvedValue(undefined),
 }))
 
@@ -279,6 +280,7 @@ describe('handleOracleChatRequest', () => {
       error: 'You have 50 conversations. Delete one to start another.',
     })
     expect(streamTextMock).not.toHaveBeenCalled()
+    expect(releaseOracleChatUsage).toHaveBeenCalledWith('usage-1')
   })
 
   it('returns 400 when messages are missing', async () => {
@@ -512,8 +514,37 @@ describe('handleOracleChatRequest', () => {
       await authedRequest({ messages: [{ role: 'user', content: 'Teach me ecdysis' }] })
     )
     expect(res.status).toBe(200)
-    expect(recordOracleUsage).toHaveBeenCalledWith({ userId: 'usr_from_jwt', kind: 'chat' })
+    expect(reserveOracleChatUsage).toHaveBeenCalledWith('usr_from_jwt')
     expect(streamTextMock.mock.calls[0]?.[0]?.maxOutputTokens).toBe(ORACLE_MAX_OUTPUT_TOKENS)
+  })
+
+  it('returns the current quota decision when the atomic reservation loses a concurrent race', async () => {
+    const { createAIThread } = await import('./service')
+    vi.mocked(reserveOracleChatUsage).mockResolvedValueOnce({
+      allowed: false,
+      decision: { allowed: false, scope: 'minute', message: 'Wait a minute.', retryAfterSeconds: 42 },
+    })
+    const res = await handleOracleChatRequest(
+      await authedRequest({ messages: [{ role: 'user', content: 'Teach me ecdysis' }] })
+    )
+
+    expect(res.status).toBe(429)
+    expect(res.headers.get('Retry-After')).toBe('42')
+    expect(await res.json()).toEqual({ error: 'Wait a minute.', limit: 'minute' })
+    expect(createAIThread).not.toHaveBeenCalled()
+    expect(streamTextMock).not.toHaveBeenCalled()
+  })
+
+  it('fails closed when the atomic reservation cannot be written', async () => {
+    vi.mocked(reserveOracleChatUsage).mockRejectedValueOnce(new Error('db down'))
+    const res = await handleOracleChatRequest(
+      await authedRequest({ messages: [{ role: 'user', content: 'Teach me ecdysis' }] })
+    )
+
+    expect(res.status).toBe(503)
+    expect(res.headers.get('Retry-After')).toBe('30')
+    expect((await res.json()).error).toBe(ORACLE_USAGE_UNAVAILABLE_MESSAGE)
+    expect(streamTextMock).not.toHaveBeenCalled()
   })
 
   it('uses GLM Flash model and passes context to buildSystemPrompt', async () => {

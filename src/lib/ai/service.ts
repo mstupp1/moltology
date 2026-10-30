@@ -4,7 +4,7 @@ import { aiThreads, aiMessages, aiUsageEvents, profiles } from '../../db/schema'
 import { ensureUserProfile } from '../user-sync'
 
 import { ORACLE_TITLE_MODEL_ID } from './oracle-models'
-import { buildOracleUsageSnapshot, ORACLE_WEEK_MS, type OracleUsageSnapshot } from './usage-limits'
+import { buildOracleUsageSnapshot, decideOracleUsage, oracleLimitsFor, ORACLE_WEEK_MS, type OracleUsageSnapshot } from './usage-limits'
 import { createChatThreadWithinLimit, getChatLimitError } from './chat-retention'
 
 export interface CreateThreadInput {
@@ -282,6 +282,98 @@ export async function recordOracleUsage(input: OracleUsageRecord): Promise<strin
   } catch (err) {
     console.warn('[recordOracleUsage] Usage write warning:', err)
     return null
+  }
+}
+
+const MAX_ORACLE_USAGE_RESERVATION_ATTEMPTS = 3
+
+/**
+ * Atomically checks the current rolling allowance and reserves one chat call.
+ * The serializable transaction makes concurrent requests re-evaluate after a
+ * conflicting reservation instead of all consuming the same final slot.
+ */
+export async function reserveOracleChatUsage(
+  userId: string,
+): Promise<{ allowed: true; id: string } | { allowed: false; decision: Exclude<ReturnType<typeof decideOracleUsage>, { allowed: true }> }> {
+  // createAIThread previously materialized a missing profile before the usage
+  // insert. Keep that first-chat path valid now that reservation runs first.
+  await ensureUserProfile(userId)
+  const client = getDb().$client
+  const freeLimits = oracleLimitsFor(false)
+  const premiumLimits = oracleLimitsFor(true)
+
+  for (let attempt = 1; attempt <= MAX_ORACLE_USAGE_RESERVATION_ATTEMPTS; attempt += 1) {
+    try {
+      const query = client`
+        WITH clock AS MATERIALIZED (
+          SELECT now()::timestamp AS db_now
+        ), events AS MATERIALIZED (
+          SELECT "createdAt"
+          FROM ai_usage_events
+          CROSS JOIN clock
+          WHERE "userId" = ${userId}
+            AND kind = 'chat'
+            AND "createdAt" > clock.db_now - interval '7 days'
+            AND "createdAt" <= clock.db_now
+        ), usage AS MATERIALIZED (
+          SELECT
+            COALESCE(json_agg(to_char("createdAt", 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')), '[]'::json) AS timestamps,
+            count(*) FILTER (WHERE "createdAt" > clock.db_now - interval '1 minute')::integer AS last_minute,
+            count(*) FILTER (WHERE "createdAt" > clock.db_now - interval '5 hours')::integer AS last_five_hours,
+            count(*)::integer AS last_week
+          FROM events CROSS JOIN clock
+        ), account AS MATERIALIZED (
+          SELECT COALESCE((SELECT "isPremium" FROM profiles WHERE id = ${userId} LIMIT 1), false) AS is_premium
+        ), decision AS MATERIALIZED (
+          SELECT usage.*, account.is_premium,
+            usage.last_minute < CASE WHEN account.is_premium THEN ${premiumLimits.perMinute}::integer ELSE ${freeLimits.perMinute}::integer END
+            AND usage.last_five_hours < CASE WHEN account.is_premium THEN ${premiumLimits.perFiveHours}::integer ELSE ${freeLimits.perFiveHours}::integer END
+            AND usage.last_week < CASE WHEN account.is_premium THEN ${premiumLimits.perWeek}::integer ELSE ${freeLimits.perWeek}::integer END AS allowed
+          FROM usage CROSS JOIN account CROSS JOIN clock
+        ), inserted AS (
+          INSERT INTO ai_usage_events ("userId", kind)
+          SELECT ${userId}, 'chat' FROM decision WHERE allowed
+          RETURNING id
+        )
+        SELECT decision.timestamps, decision.is_premium, decision.allowed, inserted.id,
+          to_char(clock.db_now, 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS server_time
+        FROM decision LEFT JOIN inserted ON true CROSS JOIN clock
+      `
+      const [result] = await client.transaction([query], { isolationLevel: 'Serializable' })
+      const row = result[0] as {
+        timestamps: Array<Date | string>
+        is_premium: boolean
+        allowed: boolean
+        id: string | null
+        server_time: string
+      } | undefined
+      if (!row) throw new Error('Oracle usage reservation returned no decision.')
+      // transaction_timestamp() is refreshed when a serialization conflict is retried.
+      // It also matches the database default used for the inserted reservation row.
+      const serverTime = new Date(row.server_time)
+      const snapshot = buildOracleUsageSnapshot(row.timestamps ?? [], row.is_premium, serverTime)
+      const decision = decideOracleUsage(snapshot, row.is_premium)
+      if (!row.allowed || !row.id) {
+        if (decision.allowed) throw new Error('Oracle usage reservation was denied without a full quota window.')
+        return { allowed: false, decision }
+      }
+      return { allowed: true, id: row.id }
+    } catch (error) {
+      const code = typeof error === 'object' && error !== null && 'code' in error
+        ? (error as { code?: unknown }).code
+        : undefined
+      if (code !== '40001' || attempt === MAX_ORACLE_USAGE_RESERVATION_ATTEMPTS) throw error
+    }
+  }
+  throw new Error('Serializable Oracle usage reservation retry exhausted.')
+}
+
+/** Releases a quota reservation when the request cannot start its conversation. */
+export async function releaseOracleChatUsage(id: string): Promise<void> {
+  try {
+    await getDb().delete(aiUsageEvents).where(eq(aiUsageEvents.id, id))
+  } catch (error) {
+    console.warn('[releaseOracleChatUsage] Usage release warning:', error)
   }
 }
 

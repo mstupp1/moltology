@@ -1,6 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { summarizeThreadTitle } from './service'
+import { reserveOracleChatUsage, summarizeThreadTitle } from './service'
 import { ORACLE_TITLE_MODEL_ID } from './oracle-models'
+
+const { neonClient } = vi.hoisted(() => {
+  const client: any = (strings: TemplateStringsArray, ...values: unknown[]) => ({
+    text: strings.join('?'),
+    values,
+  })
+  client.transaction = vi.fn()
+  return { neonClient: client }
+})
 
 vi.mock('ai', () => ({
   generateText: vi.fn(),
@@ -8,6 +17,7 @@ vi.mock('ai', () => ({
 
 vi.mock('../../db', () => ({
   getDb: vi.fn(() => ({
+    $client: neonClient,
     insert: vi.fn().mockReturnThis(),
     values: vi.fn().mockReturnThis(),
     returning: vi.fn().mockResolvedValue([{ id: 'thread-1', title: 'Test Title' }]),
@@ -27,6 +37,7 @@ vi.mock('../user-sync', () => ({
 describe('summarizeThreadTitle', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    neonClient.transaction.mockReset()
   })
 
   it('uses ORACLE_TITLE_MODEL_ID (zai/glm-5.3-flash) and returns cleaned AI-generated title', async () => {
@@ -66,6 +77,69 @@ describe('summarizeThreadTitle', () => {
   it('handles empty or blank prompt gracefully with default fallback', async () => {
     const title = await summarizeThreadTitle('   ')
     expect(title).toBe('Ascendance Consultation')
+  })
+})
+
+describe('reserveOracleChatUsage', () => {
+  const serverTime = '2026-10-30T12:00:00.000Z'
+
+  it('checks current rolling windows and inserts only inside a serializable transaction', async () => {
+    neonClient.transaction.mockResolvedValueOnce([[
+      { timestamps: [], is_premium: false, allowed: true, id: 'reserved-1', server_time: serverTime },
+    ]])
+
+    await expect(reserveOracleChatUsage('member-1')).resolves.toEqual({ allowed: true, id: 'reserved-1' })
+    const { ensureUserProfile } = await import('../user-sync')
+    expect(ensureUserProfile).toHaveBeenCalledWith('member-1')
+    expect(neonClient.transaction).toHaveBeenCalledWith(
+      [expect.objectContaining({ text: expect.stringContaining('INSERT INTO ai_usage_events') })],
+      { isolationLevel: 'Serializable' },
+    )
+    const query = neonClient.transaction.mock.calls[0][0][0]
+    expect(query.text).toContain("kind = 'chat'")
+    expect(query.text).toContain('profiles')
+    expect(query.text).toContain('last_minute')
+    expect(query.text).toContain('now()::timestamp')
+    expect(query.text).toContain('"createdAt" > clock.db_now - interval \'7 days\'')
+    expect(query.text).toContain("'1 minute'")
+    expect(query.values).toContain('member-1')
+  })
+
+  it('returns a current 429 decision without an id when the atomic check denies the reservation', async () => {
+    neonClient.transaction.mockResolvedValueOnce([[
+      {
+        timestamps: Array.from({ length: 5 }, () => new Date(new Date(serverTime).getTime() - 10_000)),
+        is_premium: false,
+        allowed: false,
+        id: null,
+        server_time: serverTime,
+      },
+    ]])
+
+    await expect(reserveOracleChatUsage('member-1')).resolves.toMatchObject({
+      allowed: false,
+      decision: { allowed: false, scope: 'minute', retryAfterSeconds: 50 },
+    })
+  })
+
+  it('rechecks against the retry transaction clock and sees a newer committed reservation', async () => {
+    neonClient.transaction
+      .mockRejectedValueOnce({ code: '40001' })
+      .mockResolvedValueOnce([[
+        {
+          timestamps: Array.from({ length: 5 }, () => new Date(new Date(serverTime).getTime() - 10_000)),
+          is_premium: false,
+          allowed: false,
+          id: null,
+          server_time: serverTime,
+        },
+      ]])
+
+    await expect(reserveOracleChatUsage('member-1')).resolves.toMatchObject({
+      allowed: false,
+      decision: { allowed: false, scope: 'minute', retryAfterSeconds: 50 },
+    })
+    expect(neonClient.transaction).toHaveBeenCalledTimes(2)
   })
 })
 
