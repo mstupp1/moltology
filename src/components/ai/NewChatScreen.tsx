@@ -1,6 +1,6 @@
 import React from 'react'
 import { ArrowUpRight, Shield, UserPlus } from 'lucide-react'
-import { BrandIcon } from '@/components/ui/BrandMark'
+import { BrandIcon3D } from '@/components/ui/BrandIcon3D'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
 
 export interface PromptShortcut {
@@ -53,7 +53,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
 
   const greeting = (
     <div className={`flex flex-col gap-2 ${isCentered ? 'items-center text-center' : 'items-start'}`}>
-      <BrandIcon aria-hidden="true" className="w-8 h-8 object-contain" />
+      <BrandIcon3D size={64} aria-hidden="true" />
       <h2 className="font-grotesk text-lg sm:text-xl font-semibold text-ink tracking-tight">
         Ask the Oracle
       </h2>
