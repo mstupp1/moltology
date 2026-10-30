@@ -22,10 +22,18 @@ import { useIsPhone, useKeyboardInset } from '../../hooks/useChatViewport'
 import { PromptInput } from '../ai-elements/prompt-input'
 import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS } from './NewChatScreen'
 import { OracleChatsPanel } from './OracleChatsPanel'
-import { OracleModeMenu, headerIconButtonClasses } from './OracleHeaderControls'
+import {
+  OracleEntityModeToggle,
+  OracleModeMenu,
+  STORAGE_KEY_ORACLE_VIEW_MODE,
+  headerIconButtonClasses,
+  type OracleViewMode,
+} from './OracleHeaderControls'
+import { SynapticEntityHud } from './SynapticEntityHud'
 import { useThreadActions, type ThreadPatch } from './useThreadActions'
 import { getAIMessagesFn, getAIThreadsFn, getUserProfileFn } from '../../lib/server/api'
 import { streamOracleChat } from '../../lib/ai/stream-oracle-chat-client'
+import { createOracleEntityBridge, type OracleEntityBridge } from '@/lib/ai/oracle-entity-bridge'
 import { useSafeOracle, OracleMode } from '../hud/OracleContext'
 import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel, DEFAULT_ORACLE_PLACEHOLDER } from '../../lib/ai/oracle-models'
 import { AuthModal } from '../AuthModal'
@@ -64,6 +72,8 @@ export interface AIChatPanelProps {
   placeholder?: string
   /** Close the panel when Escape is pressed inside it (popout). */
   closeOnEscape?: boolean
+  /** Initial view mode ('standard' chat vs 'entity' 3D core). */
+  initialViewMode?: OracleViewMode
 }
 
 interface ChatMessage {
@@ -97,6 +107,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   showModeControls = true,
   desktopChatsSidebar = false,
   closeOnEscape = false,
+  initialViewMode,
 }) => {
   const oracle = useSafeOracle()
   const session = useAuthSession()
@@ -186,6 +197,40 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const [memberHandle, setMemberHandle] = useState<string | null>(null)
   const [memberLarvaId, setMemberLarvaId] = useState<string | null>(null)
   const [draft, setDraft] = useState('')
+  const [viewMode, setViewMode] = useState<OracleViewMode>(() => {
+    if (initialViewMode) return initialViewMode
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY_ORACLE_VIEW_MODE)
+        if (saved === 'entity' || saved === 'standard') return saved
+      } catch {}
+    }
+    return 'standard'
+  })
+  const entityBridgeRef = useRef<OracleEntityBridge | null>(null)
+  if (!entityBridgeRef.current) {
+    entityBridgeRef.current = createOracleEntityBridge()
+  }
+  const entityBridge = entityBridgeRef.current
+
+  const handleToggleViewMode = useCallback(() => {
+    setViewMode((prev) => {
+      const next: OracleViewMode = prev === 'entity' ? 'standard' : 'entity'
+      try {
+        localStorage.setItem(STORAGE_KEY_ORACLE_VIEW_MODE, next)
+      } catch {}
+      return next
+    })
+  }, [])
+
+  const handleDraftChange = useCallback(
+    (nextDraft: string) => {
+      setDraft(nextDraft)
+      entityBridge.notifyUserTyping(nextDraft.length)
+    },
+    [entityBridge]
+  )
+
   const [isAwayFromBottom, setIsAwayFromBottom] = useState(false)
   const conversationRef = useRef<HTMLDivElement>(null)
   const hadUserMessagesRef = useRef(false)
@@ -512,6 +557,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       },
     ])
     setIsSending(true)
+    entityBridge.notifyStreamStart()
     const controller = new AbortController()
     abortRef.current = controller
 
@@ -526,6 +572,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
     const queueStreamText = (fullText: string) => {
       pendingStreamText = fullText
+      entityBridge.ingestStreamText(fullText)
       if (streamFrameId == null) {
         streamFrameId = requestAnimationFrame(flushStreamText)
       }
@@ -574,6 +621,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         }
       }
 
+      entityBridge.ingestStreamText(res.text)
+      entityBridge.notifyStreamEnd(false)
       setMessages((prev) =>
         prev.map((m) =>
           m.id === assistantId
@@ -592,16 +641,19 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       }
       const partial = pendingStreamText
       if (isAbortError(err) || controller.signal.aborted) {
+        entityBridge.notifyStreamEnd(false)
         // Keep whatever arrived and mark it, so a stopped reply never looks finished.
         setMessages((prev) =>
           prev.map((m) => (m.id === assistantId ? { ...m, content: partial, stopped: true } : m))
         )
       } else if (partial.trim()) {
+        entityBridge.notifyStreamEnd(true)
         setMessages((prev) =>
           prev.map((m) => (m.id === assistantId ? { ...m, content: partial } : m))
         )
         setErrorMessage(err?.message || 'The reply was cut off. Please try again.')
       } else {
+        entityBridge.notifyStreamEnd(true)
         if (err?.status === 429) setDraft((previous) => previous || text)
         const failedError = err?.message || 'Something went wrong sending your message. Please try again.'
         setMessages((prev) =>
@@ -641,7 +693,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     const failed = messages.find((m) => m.id === failedId)
     if (!failed) return
     setMessages((prev) => prev.filter((m) => m.id !== failedId))
-    setDraft(failed.content)
+    handleDraftChange(failed.content)
   }
 
   const handleModeSwitch = (targetMode: OracleMode) => {
@@ -665,6 +717,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const handleSelectThread = (selectedId: string) => {
     if (selectedId !== activeThreadId) {
       abortRef.current?.abort()
+      entityBridge.reset()
       loadedThreadIdRef.current = null
       setMessages([])
     }
@@ -679,6 +732,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   const handleNewChat = () => {
     abortRef.current?.abort()
+    entityBridge.reset()
     if (oracle) {
       oracle.setActiveThreadId(null)
     } else {
@@ -707,7 +761,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   // Phones: a new chat puts the box at the top (the keyboard opens below it); an ongoing
   // chat docks it at the bottom and lifts it by the keyboard inset instead of panning the page.
   const isPhone = useIsPhone()
-  const keyboardInset = useKeyboardInset(isPhone && !isNewChat)
+  const keyboardInset = useKeyboardInset(isPhone && (!isNewChat || viewMode === 'entity'))
 
   // The keyboard shrinks the message pane, so keep the latest turn in view as it opens.
   useLayoutEffect(() => {
@@ -749,7 +803,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         variant={variant}
         compact={isPhone}
         value={draft}
-        onValueChange={setDraft}
+        onValueChange={handleDraftChange}
         onSubmit={handlePromptSubmit}
         onStop={handleStop}
         status={isSending ? 'streaming' : 'ready'}
@@ -763,6 +817,12 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const headerButton = headerIconButtonClasses(isPhone)
   const windowControls = (
     <>
+      <OracleEntityModeToggle
+        viewMode={viewMode}
+        onToggle={handleToggleViewMode}
+        touch={isPhone}
+      />
+
       {showModeControls && oracle && oracle.mode !== 'closed' && (
         <OracleModeMenu mode={oracle.mode} onSelect={handleModeSwitch} touch={isPhone} />
       )}
@@ -881,130 +941,149 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               </div>
             )}
 
-            {isNewChat ? (
-              <div className="flex-1 overflow-y-auto min-h-0 relative">
-                <NewChatScreen
-                  isGuest={isGuest}
-                  onSubmit={handlePromptSubmit}
-                  disabled={isSending || usage.blocked}
-                  onOpenAuthModal={() => setIsAuthModalOpen(true)}
-                  shortcuts={DEFAULT_PROMPT_SHORTCUTS}
-                  composer={isPhone || !isNarrow ? composer('inline') : undefined}
-                  composerPosition={isPhone ? 'top' : 'center'}
-                />
-              </div>
+            {viewMode === 'entity' ? (
+              <SynapticEntityHud
+                bridge={entityBridge}
+                messages={messages}
+                isSending={isSending}
+                isGuest={isGuest}
+                isPhone={isPhone}
+                isCompact={isCompact}
+                shortcuts={DEFAULT_PROMPT_SHORTCUTS}
+                onSubmitShortcut={handlePromptSubmit}
+                onRetryFailed={handleRetryFailed}
+                onEditFailed={handleEditFailed}
+                onOpenAuthModal={() => setIsAuthModalOpen(true)}
+                composer={composer('docked')}
+              />
             ) : (
-              <div className="flex-1 min-h-0 relative flex flex-col">
-                <Conversation
-                  ref={conversationRef}
-                  onScroll={handleConversationScroll}
-                  className="flex-1 min-h-0 pb-16"
-                  aria-live="polite"
-                  aria-busy={isSending}
-                >
-                  <ConversationContent>
-                    {messages.map((msg) => {
-                      const isAssistant = msg.role === 'assistant'
-                      const isStreamingThis = isSending && msg.id === lastAssistantId
-                      const showGuestNudge =
-                        isAssistant && (msg.isGuest || isGuest) && Boolean(msg.content) && msg.id === lastAssistantId
-                      const actions = msg.failedError ? (
-                        <>
-                          <MessageRetryButton onRetry={() => handleRetryFailed(msg.id)} />
-                          <button
-                            type="button"
-                            onClick={() => handleEditFailed(msg.id)}
-                            className="inline-flex items-center h-7 px-1.5 rounded-control text-[11px] text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-                          >
-                            Edit
-                          </button>
-                        </>
-                      ) : isAssistant && msg.content && !isStreamingThis ? (
-                        <MessageCopyButton text={msg.content} />
-                      ) : undefined
+              <>
+                {isNewChat ? (
+                  <div className="flex-1 overflow-y-auto min-h-0 relative">
+                    <NewChatScreen
+                      isGuest={isGuest}
+                      onSubmit={handlePromptSubmit}
+                      disabled={isSending || usage.blocked}
+                      onOpenAuthModal={() => setIsAuthModalOpen(true)}
+                      shortcuts={DEFAULT_PROMPT_SHORTCUTS}
+                      composer={isPhone || !isNarrow ? composer('inline') : undefined}
+                      composerPosition={isPhone ? 'top' : 'center'}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex-1 min-h-0 relative flex flex-col">
+                    <Conversation
+                      ref={conversationRef}
+                      onScroll={handleConversationScroll}
+                      className="flex-1 min-h-0 pb-16"
+                      aria-live="polite"
+                      aria-busy={isSending}
+                    >
+                      <ConversationContent>
+                        {messages.map((msg) => {
+                          const isAssistant = msg.role === 'assistant'
+                          const isStreamingThis = isSending && msg.id === lastAssistantId
+                          const showGuestNudge =
+                            isAssistant && (msg.isGuest || isGuest) && Boolean(msg.content) && msg.id === lastAssistantId
+                          const actions = msg.failedError ? (
+                            <>
+                              <MessageRetryButton onRetry={() => handleRetryFailed(msg.id)} />
+                              <button
+                                type="button"
+                                onClick={() => handleEditFailed(msg.id)}
+                                className="inline-flex items-center h-7 px-1.5 rounded-control text-[11px] text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                              >
+                                Edit
+                              </button>
+                            </>
+                          ) : isAssistant && msg.content && !isStreamingThis ? (
+                            <MessageCopyButton text={msg.content} />
+                          ) : undefined
 
-                      return (
-                        <Message
-                          key={msg.id}
-                          from={msg.role === 'user' ? 'user' : 'assistant'}
-                          timestamp={msg.timestamp}
-                          senderLabel={
-                            msg.role === 'user'
-                              ? resolveMemberPublicName({
-                                  userId,
-                                  handle: memberHandle,
-                                  larvaId: memberLarvaId,
-                                })
-                              : undefined
-                          }
-                          user={msg.role === 'user' ? user : undefined}
-                          actions={actions}
-                          actionsAlwaysVisible={Boolean(msg.failedError)}
-                        >
-                          <MessageContent>
-                            {msg.role === 'user' ? (
-                              msg.content
-                            ) : msg.content ? (
-                              <MessageResponse>
-                                {isStreamingThis ? withStreamingCursor(msg.content) : msg.content}
-                              </MessageResponse>
-                            ) : msg.stopped ? null : (
-                              <MessageThinkingDots />
-                            )}
-                            {msg.stopped && (
-                              <p className="text-[11px] text-ink-muted">
-                                {msg.content ? 'Stopped.' : 'Stopped before a reply came through.'}
-                              </p>
-                            )}
-                            {showGuestNudge && (
-                              <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-surface-2 px-3 py-2 rounded-control border border-line-subtle">
-                                <div className="text-[11px] text-ink-body font-sans flex items-center gap-1.5 min-w-0">
-                                  <Shield className="w-3 h-3 text-cyan-glow shrink-0" />
-                                  <span>Sign up free for full answers and saved chats.</span>
-                                </div>
-                                <BenthicCTAButton
-                                  variant="cyan"
-                                  size="sm"
-                                  onClick={() => setIsAuthModalOpen(true)}
-                                  className="w-full sm:w-auto shrink-0 !min-h-0 !py-0.5 !px-2.5"
-                                >
-                                  <span className="flex items-center justify-center gap-1 text-[11px] font-bold font-grotesk tracking-[0.08em] uppercase">
-                                    <UserPlus className="w-3 h-3" />
-                                    <span>Sign Up</span>
-                                  </span>
-                                </BenthicCTAButton>
-                              </div>
-                            )}
-                          </MessageContent>
-                          {msg.failedError && (
-                            <p role="alert" className="mt-1.5 flex items-center gap-1.5 text-[11px] text-crimson-text">
-                              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                              <span>{msg.failedError}</span>
-                            </p>
-                          )}
-                        </Message>
-                      )
-                    })}
-                  </ConversationContent>
-                </Conversation>
+                          return (
+                            <Message
+                              key={msg.id}
+                              from={msg.role === 'user' ? 'user' : 'assistant'}
+                              timestamp={msg.timestamp}
+                              senderLabel={
+                                msg.role === 'user'
+                                  ? resolveMemberPublicName({
+                                      userId,
+                                      handle: memberHandle,
+                                      larvaId: memberLarvaId,
+                                    })
+                                  : undefined
+                              }
+                              user={msg.role === 'user' ? user : undefined}
+                              actions={actions}
+                              actionsAlwaysVisible={Boolean(msg.failedError)}
+                            >
+                              <MessageContent>
+                                {msg.role === 'user' ? (
+                                  msg.content
+                                ) : msg.content ? (
+                                  <MessageResponse>
+                                    {isStreamingThis ? withStreamingCursor(msg.content) : msg.content}
+                                  </MessageResponse>
+                                ) : msg.stopped ? null : (
+                                  <MessageThinkingDots />
+                                )}
+                                {msg.stopped && (
+                                  <p className="text-[11px] text-ink-muted">
+                                    {msg.content ? 'Stopped.' : 'Stopped before a reply came through.'}
+                                  </p>
+                                )}
+                                {showGuestNudge && (
+                                  <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-surface-2 px-3 py-2 rounded-control border border-line-subtle">
+                                    <div className="text-[11px] text-ink-body font-sans flex items-center gap-1.5 min-w-0">
+                                      <Shield className="w-3 h-3 text-cyan-glow shrink-0" />
+                                      <span>Sign up free for full answers and saved chats.</span>
+                                    </div>
+                                    <BenthicCTAButton
+                                      variant="cyan"
+                                      size="sm"
+                                      onClick={() => setIsAuthModalOpen(true)}
+                                      className="w-full sm:w-auto shrink-0 !min-h-0 !py-0.5 !px-2.5"
+                                    >
+                                      <span className="flex items-center justify-center gap-1 text-[11px] font-bold font-grotesk tracking-[0.08em] uppercase">
+                                        <UserPlus className="w-3 h-3" />
+                                        <span>Sign Up</span>
+                                      </span>
+                                    </BenthicCTAButton>
+                                  </div>
+                                )}
+                              </MessageContent>
+                              {msg.failedError && (
+                                <p role="alert" className="mt-1.5 flex items-center gap-1.5 text-[11px] text-crimson-text">
+                                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                  <span>{msg.failedError}</span>
+                                </p>
+                              )}
+                            </Message>
+                          )
+                        })}
+                      </ConversationContent>
+                    </Conversation>
 
-                {isAwayFromBottom && (
-                  <button
-                    type="button"
-                    aria-label="Jump to latest"
-                    onClick={handleJumpToLatest}
-                    className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 inline-flex size-8 items-center justify-center rounded-full bg-surface-2 border border-line shadow-menu text-ink-body hover:text-ink hover:border-line-hover transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow animate-in fade-in slide-in-from-bottom-1 duration-150"
-                  >
-                    <ArrowDown className="w-3.5 h-3.5" />
-                  </button>
+                    {isAwayFromBottom && (
+                      <button
+                        type="button"
+                        aria-label="Jump to latest"
+                        onClick={handleJumpToLatest}
+                        className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 inline-flex size-8 items-center justify-center rounded-full bg-surface-2 border border-line shadow-menu text-ink-body hover:text-ink hover:border-line-hover transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow animate-in fade-in slide-in-from-bottom-1 duration-150"
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
                 )}
-              </div>
-            )}
 
-            {(!isNewChat || (isNarrow && !isPhone)) && (
-              // Overlap only the fade; the input stays in flow as its draft grows.
-              // Pointer events pass through the fade to the conversation beneath it.
-              <div className="relative z-10 shrink-0 -mt-12 pointer-events-none">{composer('docked')}</div>
+                {(!isNewChat || (isNarrow && !isPhone)) && (
+                  // Overlap only the fade; the input stays in flow as its draft grows.
+                  // Pointer events pass through the fade to the conversation beneath it.
+                  <div className="relative z-10 shrink-0 -mt-12 pointer-events-none">{composer('docked')}</div>
+                )}
+              </>
             )}
           </div>
         )}

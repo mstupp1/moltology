@@ -1,5 +1,14 @@
 import React from 'react'
-import { Check, ChevronsUpDown, Fullscreen, PanelRight, PictureInPicture2, type LucideIcon } from 'lucide-react'
+import {
+  Brain,
+  Check,
+  ChevronsUpDown,
+  Fullscreen,
+  MessageSquareText,
+  PanelRight,
+  PictureInPicture2,
+  type LucideIcon,
+} from 'lucide-react'
 import {
   HudDropdownMenu,
   HudDropdownMenuTrigger,
@@ -9,6 +18,9 @@ import {
 import type { OracleMode } from '../hud/OracleContext'
 
 export type OracleDisplayMode = Exclude<OracleMode, 'closed'>
+export type OracleViewMode = 'standard' | 'entity'
+
+export const STORAGE_KEY_ORACLE_VIEW_MODE = 'moltology:oracle_view_mode'
 
 interface DisplayModeOption {
   mode: OracleDisplayMode
@@ -29,6 +41,49 @@ export const headerIconButtonClasses = (touch: boolean) =>
   `inline-flex items-center justify-center shrink-0 rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-ink-muted ${
     touch ? 'min-w-11 min-h-11' : 'w-8 h-8'
   }`
+
+interface OracleEntityModeToggleProps {
+  viewMode: OracleViewMode
+  onToggle: () => void
+  touch?: boolean
+}
+
+/**
+ * Seamless toggle between standard text chat and 3D Token-Reactive Entity Mode.
+ */
+export const OracleEntityModeToggle: React.FC<OracleEntityModeToggleProps> = ({
+  viewMode,
+  onToggle,
+  touch = false,
+}) => {
+  const isEntity = viewMode === 'entity'
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-pressed={isEntity}
+      aria-label={isEntity ? 'Switch to standard chat' : 'Switch to 3D Entity Mode'}
+      title={isEntity ? 'Switch to standard chat' : 'Switch to 3D Entity Mode'}
+      className={`${headerIconButtonClasses(touch)} !w-auto px-2 gap-1.5 text-xs font-medium ${
+        isEntity
+          ? 'bg-cyan-soft text-cyan-glow border border-line-strong hover:bg-cyan-soft hover:text-cyan-bright'
+          : 'border border-transparent'
+      }`}
+    >
+      {isEntity ? (
+        <>
+          <MessageSquareText className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+          <span className="hidden sm:inline">Chat View</span>
+        </>
+      ) : (
+        <>
+          <Brain className="w-3.5 h-3.5 shrink-0 text-cyan-glow" aria-hidden="true" />
+          <span className="hidden sm:inline">Entity Mode</span>
+        </>
+      )}
+    </button>
+  )
+}
 
 /** Two stacked lines, the long one on top: the chat list toggle. */
 export const ChatListIcon: React.FC<{ className?: string }> = ({ className }) => (

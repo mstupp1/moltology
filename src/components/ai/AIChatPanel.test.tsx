@@ -798,3 +798,77 @@ describe('AIChatPanel Thinking State & Error Handling', () => {
     expect(await screen.findByRole('button', { name: 'Copy message' })).toBeInTheDocument()
   })
 })
+
+describe('AIChatPanel 3D Synaptic Entity Mode', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    localStorage.removeItem('moltology:oracle_view_mode')
+    vi.mocked(useOracleUsage).mockReturnValue({ snapshot: null, unavailable: false, blocked: false, refresh: vi.fn() })
+  })
+
+  afterEach(() => {
+    localStorage.removeItem('moltology:oracle_view_mode')
+  })
+
+  it('toggles seamlessly between Standard Chat and 3D Entity Mode while preserving draft and conversation state', async () => {
+    render(<AIChatPanel userId="usr_valid_user" />)
+
+    // Type a draft in standard mode
+    const input = screen.getByRole('textbox', { name: 'Message' })
+    fireEvent.change(input, { target: { value: 'Protocol status check' } })
+    expect(input).toHaveValue('Protocol status check')
+
+    // Switch to 3D Entity Mode
+    const toggleToEntity = screen.getByRole('button', { name: /Switch to 3D Entity Mode/i })
+    fireEvent.click(toggleToEntity)
+
+    expect(screen.getByTestId('synaptic-entity-hud')).toBeInTheDocument()
+    expect(screen.getByTestId('synaptic-entity-canvas')).toBeInTheDocument()
+    expect(screen.getByTestId('entity-status-pill')).toHaveTextContent(/SYNAPTIC CORE/i)
+
+    // Draft is preserved in Entity Mode composer
+    const entityInput = screen.getByRole('textbox', { name: 'Message' })
+    expect(entityInput).toHaveValue('Protocol status check')
+
+    // Send a prompt via shortcut inside Entity Mode
+    fireEvent.click(screen.getByRole('button', { name: /what is moltology/i }))
+    await waitFor(() => {
+      expect(screen.getByTestId('entity-live-turn-card')).toBeInTheDocument()
+      expect(screen.getByText(/Stage 3 Exoshell requires complete chitin hardening/i)).toBeInTheDocument()
+    })
+
+    // Switch back to Standard Chat and verify the conversation is intact
+    const toggleToChat = screen.getByRole('button', { name: /Switch to standard chat/i })
+    fireEvent.click(toggleToChat)
+
+    expect(screen.queryByTestId('synaptic-entity-hud')).not.toBeInTheDocument()
+    expect(screen.getByText('What is Moltology and why should I molt?')).toBeInTheDocument()
+    expect(screen.getByText(/Stage 3 Exoshell requires complete chitin hardening/i)).toBeInTheDocument()
+  })
+
+  it('supports switching to Entity Mode mid-stream and accessing prior context turns', async () => {
+    const { getAIMessagesFn } = await import('@/lib/server/api')
+    ;(getAIMessagesFn as any).mockResolvedValueOnce([
+      { id: 'm1', role: 'user', content: 'First benthic query' },
+      { id: 'm2', role: 'assistant', content: 'First benthic response' },
+      { id: 'm3', role: 'user', content: 'Latest benthic query' },
+      { id: 'm4', role: 'assistant', content: 'Latest benthic response' },
+    ])
+
+    render(<AIChatPanel userId="usr_valid_user" threadId="thread-multi" initialViewMode="entity" />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('entity-live-turn-card')).toBeInTheDocument()
+      expect(screen.getByText('Latest benthic query')).toBeInTheDocument()
+      expect(screen.getByText('Latest benthic response')).toBeInTheDocument()
+    })
+
+    // Open prior context drawer
+    const contextBtn = screen.getByRole('button', { name: /Context \(2\)/i })
+    fireEvent.click(contextBtn)
+    expect(screen.getByTestId('entity-context-drawer')).toBeInTheDocument()
+    expect(screen.getByText('First benthic query')).toBeInTheDocument()
+    expect(screen.getByText('First benthic response')).toBeInTheDocument()
+  })
+})
+
