@@ -27,7 +27,7 @@ export const Route = createFileRoute('/news/$slug')({
     } catch (e) {
       console.warn('Loader error fetching post:', e)
     }
-    return INITIAL_BLOG_POSTS.find((p) => p.slug === params.slug) ?? null
+    return INITIAL_BLOG_POSTS.find((p) => p.slug === params.slug && p.isPublished === true) ?? null
   },
   head: ({ loaderData }) => {
     const post = loaderData as BlogPostData | null
