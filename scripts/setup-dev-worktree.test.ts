@@ -30,6 +30,13 @@ describe('worktree dev setup', () => {
     expect(fs.realpathSync(path.join(worktree, 'node_modules'))).toBe(fs.realpathSync(path.join(main, 'node_modules')))
     expect(fs.realpathSync(path.join(worktree, '.env'))).toBe(fs.realpathSync(path.join(main, '.env')))
   })
+  it('prepares dependencies before tests without inheriting environment files', async () => {
+    fs.writeFileSync(path.join(main, '.env'), 'DATABASE_URL=unsafe')
+    await setupDevWorktree(worktree, { dependenciesOnly: true })
+    await setupDevWorktree(worktree, { dependenciesOnly: true })
+    expect(fs.realpathSync(path.join(worktree, 'node_modules'))).toBe(fs.realpathSync(path.join(main, 'node_modules')))
+    expect(fs.existsSync(path.join(worktree, '.env'))).toBe(false)
+  })
   it('preserves explicitly configured dependencies and worktree env overrides', async () => {
     fs.mkdirSync(path.join(worktree, 'node_modules'))
     fs.writeFileSync(path.join(worktree, '.env.local'), 'CUSTOM=value')

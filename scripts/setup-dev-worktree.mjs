@@ -3,9 +3,9 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-// npm runs this before `dev`. Reuse the main checkout's local setup, while
+// npm runs this before local development commands. Reuse the main checkout's setup, while
 // leaving explicit worktree installations and environment files untouched.
-export async function setupDevWorktree(cwd = process.cwd()) {
+export async function setupDevWorktree(cwd = process.cwd(), { dependenciesOnly = false } = {}) {
   const commonDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
     cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
   }).trim()
@@ -24,6 +24,8 @@ export async function setupDevWorktree(cwd = process.cwd()) {
     fs.symlinkSync(sharedModules, localModules, 'dir')
     console.log('[dev] Reusing the main checkout’s dependencies.')
   }
+  // Tests and build/type checks only need dependencies; leave environment setup to dev.
+  if (dependenciesOnly) return
   if (['.env', '.env.local', '.env.development', '.env.development.local'].some((name) => exists(path.join(cwd, name)))) return
   const sharedEnv = path.join(mainRoot, '.env')
   if (!fs.existsSync(sharedEnv)) {
@@ -48,5 +50,5 @@ export async function setupDevWorktree(cwd = process.cwd()) {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  await setupDevWorktree()
+  await setupDevWorktree(process.cwd(), { dependenciesOnly: process.argv.includes('--dependencies-only') })
 }
