@@ -16,7 +16,8 @@ import {
   getOwnedAIThread,
   getRecentAIThreadTurns,
   getOracleUsageSnapshot,
-  recordOracleUsage,
+  reserveOracleChatUsage,
+  releaseOracleChatUsage,
   finalizeOracleUsage,
 } from './service'
 import { getChatLimitMessage, isChatLimitError } from './chat-retention'
@@ -175,6 +176,24 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   const initialThreadTitle =
     userText.trim().split('\n')[0].slice(0, 60) || 'Ascendance Consultation'
 
+  let usageReservation: Awaited<ReturnType<typeof reserveOracleChatUsage>>
+  try {
+    usageReservation = await reserveOracleChatUsage(userId)
+  } catch (err) {
+    console.warn('[handleOracleChatRequest] Usage reservation unavailable:', err)
+    return Response.json(
+      { error: ORACLE_USAGE_UNAVAILABLE_MESSAGE },
+      { status: 503, headers: { 'Retry-After': '30' } }
+    )
+  }
+  if (!usageReservation.allowed) {
+    return Response.json(
+      { error: usageReservation.decision.message, limit: usageReservation.decision.scope },
+      { status: 429, headers: { 'Retry-After': String(usageReservation.decision.retryAfterSeconds) } }
+    )
+  }
+  const usageEventId = usageReservation.id
+
   if (isNewThread) {
     try {
       await createAIThread({
@@ -184,6 +203,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
         persona: 'oracle',
       })
     } catch (error) {
+      await releaseOracleChatUsage(usageEventId)
       if (isChatLimitError(error)) {
         return Response.json({ error: getChatLimitMessage() }, { status: 409 })
       }
@@ -194,8 +214,6 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
       )
     }
   }
-
-  queueOracleUserMessagePersistence({ userId, threadId: activeThreadId, userText })
 
   const systemPrompt = buildSystemPrompt(DEFAULT_ORACLE_PERSONA, preflight.context)
   // History comes from saved messages, never the client, so a caller cannot forge
@@ -210,7 +228,8 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   ])
   const candidateModels = orderOracleModels(body.model, preflight.preferredModelId)
   let lastError: Error | null = null
-  const usageEventId = await recordOracleUsage({ userId, kind: 'chat' })
+
+  queueOracleUserMessagePersistence({ userId, threadId: activeThreadId, userText })
 
   for (const modelCandidate of candidateModels) {
     const abortController = new AbortController()
