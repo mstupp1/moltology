@@ -64,35 +64,6 @@ sends no email or Oracle message, and saves screenshots in
 `tmp/verification/login/`. Google OAuth is a separate provider flow and is not
 covered by this email/password check.
 
-## Optional Oracle desktop and mobile checks
-
-This page-specific smoke test is optional; it is not part of starting the dev
-environment or logging in. With the dev server running, in another terminal:
-
-```sh
-npm run oracle:verify
-# Or match a custom dev-server port:
-npm run oracle:verify -- http://localhost:3100
-```
-
-The command uses an installed Chrome/Chromium executable. Set
-`COMPOSITE_CHROME_PATH` if the browser is installed outside the usual locations.
-It verifies standard and Entity views at desktop and phone sizes, draft
-preservation, saved Entity preference, transparent composer wrappers, absence of
-bubble canvases, and absence of uncaught browser errors. It exits nonzero on
-failure. It accepts loopback servers only and closes its browser when finished.
-
-Screenshots are saved under ignored `tmp/verification/oracle/`:
-
-- `desktop-standard.png`
-- `desktop-entity.png`
-- `mobile-standard.png`
-- `mobile-entity.png`
-
-Inspect the screenshots after running the checks; assertions cannot assess every
-visual detail. This smoke check does not verify authenticated history, model
-responses, or a real phone's on-screen keyboard.
-
 ## Worktrees with shared dependencies
 
 A worktree may reuse a matching `node_modules` installation through a directory

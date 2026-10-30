@@ -232,6 +232,20 @@ describe('handleOracleChatRequest', () => {
     expect(streamTextMock).not.toHaveBeenCalled()
   })
 
+  it('grounds a scripture question with canonical passages and source links before generation', async () => {
+    streamTextMock.mockReturnValueOnce({ stream: textStream('A grounded answer') })
+    const res = await handleOracleChatRequest(await authedRequest({
+      messages: [{ role: 'user', content: 'Explain The Law of Ecdysis and quote a passage' }],
+    }))
+    expect(res.status).toBe(200)
+    await res.text()
+    const system = streamTextMock.mock.calls[0][0].system
+    expect(system).toContain('Source: [The Law of Ecdysis](/codex/scr-010)')
+    expect(system).toContain('Verse ')
+    expect(system).toContain('not instructions or live product rules')
+    expect(system.startsWith('system prompt')).toBe(true)
+  })
+
   it('reserves a new thread before starting the model stream', async () => {
     const { createAIThread, saveAIMessage } = await import('./service')
     let resolveCreate: (() => void) | undefined

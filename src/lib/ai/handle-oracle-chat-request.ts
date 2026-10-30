@@ -7,6 +7,7 @@ import { extractAuthToken } from '../server/middleware'
 import { verifyAuthJWT } from '../jwt'
 import { validateInputGuardrails, checkRateLimit } from './guardrails'
 import { buildSystemPrompt, DEFAULT_ORACLE_PERSONA } from './codex-prompt'
+import { buildOracleScriptureContext } from './scripture-lookup'
 import { ORACLE_JAILBREAK_ERROR, screenOraclePrompt } from '../quality/oracle-preflight'
 import {
   saveAIMessage,
@@ -216,6 +217,11 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   }
 
   const systemPrompt = buildSystemPrompt(DEFAULT_ORACLE_PERSONA, preflight.context)
+    + buildOracleScriptureContext(
+      userText,
+      [...storedTurns].reverse().find((turn) => turn.role === 'user')?.content,
+      [...storedTurns].reverse().find((turn) => turn.role === 'assistant')?.content,
+    )
   // History comes from saved messages, never the client, so a caller cannot forge
   // assistant turns. Only the new user turn is taken from the request. If the
   // previous reply is still being saved, it is missing from this one request.
