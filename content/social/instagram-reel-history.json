@@ -2170,6 +2170,141 @@
           "Fresh": 4
         }
       ]
+    },
+    {
+      "id": "reel-1793366344487",
+      "topic": "Meeting invites landing on lunch without a decision",
+      "hookHeadline": "Another meeting invite lands on your lunch.",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": null,
+      "characterArc": "Engineer asks for the decision before accepting an invite and protects lunch.",
+      "narrationScript": "Another meeting invite lands on your lunch. Introducing the agenda: a remarkable invention that explains why everyone is here. Features include a purpose, an ending, and fewer sandwiches eaten beside a loading screen. The lobster asks which decision needs the meeting before accepting. Try that question on your next invite. Try the audit at moltology dot org.",
+      "archivePath": "Social Archive/2026/10/reel-39f379d2b92d35791f7efca3",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1793366345506_214d1b071cd26c88_01.mp4"
+      ],
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 28,
+      "status": "queued",
+      "scheduledFor": "2026-11-05T23:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6ae4994b4ce432e556de836f",
+      "zernioYouTubePostId": "6ae4994b4ce432e556de836f",
+      "zernioPostId": "6ae4994b4ce432e556de836f",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "firstComment": "Try the audit at moltology.org: https://moltology.org/quiz",
+      "caption": "Another meeting invite lands on your lunch.\nThe agenda has a purpose. An ending. Room for a sandwich.\nAsk which decision needs the meeting before accepting.\nTry the audit at moltology.org.\n\n#Moltology #Focus #Meetings",
+      "hashtags": [
+        "#Moltology",
+        "#Focus",
+        "#Meetings"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-10-30T13:19:10.337Z",
+      "format": "Fake infomercial",
+      "loudness": 3,
+      "pitchScores": [
+        {
+          "format": "Fake infomercial",
+          "hook": "Another meeting invite lands on your lunch.",
+          "beats": "Invites bury lunch; reveal the agenda as a miraculous invention; Engineer asks for one decision before accepting.",
+          "payoff": "Ask what decision the meeting needs before accepting.",
+          "Stop": 5,
+          "Laugh": 4,
+          "Pull": 4,
+          "Keep": 5,
+          "Fresh": 5
+        },
+        {
+          "format": "Nature documentary",
+          "hook": "The meeting invite has found your sandwich.",
+          "beats": "An invite hunts an unguarded lunch; more descend; Engineer asks for the purpose.",
+          "payoff": "Ask for the decision before accepting.",
+          "Stop": 4,
+          "Laugh": 4,
+          "Pull": 4,
+          "Keep": 4,
+          "Fresh": 4
+        },
+        {
+          "format": "Countdown",
+          "hook": "Three meeting invites are circling your sandwich.",
+          "beats": "Three vague invites arrive, each less specific; one clear question stops the pile.",
+          "payoff": "Ask which decision needs the meeting.",
+          "Stop": 4,
+          "Laugh": 3,
+          "Pull": 4,
+          "Keep": 4,
+          "Fresh": 4
+        }
+      ],
+      "productionCostEstimateUsd": 3.1266,
+      "videoOutputCostUsd": 3.0408,
+      "videoOutputTokens": 173760,
+      "videoModel": "gemini-omni-1.1-flash",
+      "mascot": "lobster_engineer",
+      "youtubeContainsSyntheticMedia": true,
+      "verifiedAt": "2026-10-30T13:19:17.879Z",
+      "productionReview": {
+        "rawDirectory": "/Users/mylesstupp/Development/moltology/tmp/reel-daily-1793365572768",
+        "finalVideo": "/Users/mylesstupp/Development/moltology/tmp/reels-2026-10-30/introducing-the-agenda.mp4",
+        "durationSeconds": 28.0,
+        "hookWordStartsSeconds": [
+          0.0,
+          0.28,
+          0.71,
+          1.35,
+          1.78,
+          1.92,
+          2.07
+        ],
+        "bodySubtitleStartSeconds": 3.0,
+        "subtitleHandoff": "Full clean timeline overlay through measured first body word; original body subtitles and narration preserved; sentence boundary prevents straddling.",
+        "headlineSafeBox": [
+          120,
+          460,
+          900,
+          900
+        ],
+        "animation": "18px exponential horizontal settle; amber final phrase; stable line breaks",
+        "costs": {
+          "videoOutputTokens": 173760,
+          "videoUsd": 3.0408,
+          "inputUsd": 0.0099825,
+          "conservativeOtherUsd": 0.035064,
+          "voiceUsd": 0.0108,
+          "directorReserveUsd": 0.03,
+          "unusedDirectedOpeningIncluded": true,
+          "builtInImageGenCost": "Separate, unavailable",
+          "sources": [
+            "https://ai.google.dev/gemini-api/docs/pricing",
+            "https://fish.audio/developers/"
+          ],
+          "billingCaveat": "Token based estimate plus conservative director reserve; exact invoice unavailable.",
+          "externalEstimateUsd": 3.1266,
+          "sourceClipSeconds": [
+            4.032,
+            4.032,
+            6.037333,
+            4.032,
+            4.032,
+            4.032
+          ]
+        },
+        "voiceoverSeconds": 24.68,
+        "finalSha256": "5ea07808a221d2399546cf13ba68077e60ffddab2b1f2fd757a600b94c0aad06",
+        "verification": "Exact final frame zero, last-hook word, first body phrase, later phrase, mascot/payoff and outro inspected; centered square and 4:5 headline crops pass. Initial source motion inspected at 0.8s. Audio stream/levels checked. Full sound-on playback unavailable; queue gate incomplete.",
+        "queueStatus": "scheduled; verified both targets",
+        "archiveStatus": "archived before queue",
+        "soundReview": "User confirmed sound review passed and instructed queueing."
+      }
     }
   ]
 }
