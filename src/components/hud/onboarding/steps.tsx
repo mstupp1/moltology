@@ -1,7 +1,7 @@
 import { STARTER_CHARACTER_EQUIPMENT } from '@/lib/avatar/starter-equipment'
 import React from 'react'
 import { Atom, BookOpen, LayoutDashboard, Users } from 'lucide-react'
-import { BrandIcon } from '@/components/ui/BrandMark'
+import { BrandIcon3D } from '@/components/ui/BrandIcon3D'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import { parseMemberHandle } from '@/lib/member-handle'
 import { AvatarCreatorPanel } from '../avatar/AvatarCreatorPanel'
@@ -55,8 +55,8 @@ function StepHeading({ id, title, children }: { id: string; title: string; child
 function WelcomeStep({ firstName, headingId }: OnboardingStepProps) {
   return (
     <div className="max-w-md mx-auto w-full flex flex-col items-center text-center gap-6 py-4">
-      <div className="w-20 h-20 rounded-full flex items-center justify-center border border-line bg-surface-2 hud-sheen">
-        <BrandIcon aria-hidden="true" width={44} height={44} className="w-11 h-11" />
+      <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full flex items-center justify-center border border-line bg-surface-2 hud-sheen shadow-menu">
+        <BrandIcon3D size={96} aria-hidden="true" />
       </div>
       <StepHeading id={headingId} title={firstName ? `Welcome to Moltology, ${firstName}` : 'Welcome to Moltology'}>
         Moltology helps you shed the noise of always-online life, one small habit at a time.
