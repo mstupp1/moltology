@@ -8,7 +8,7 @@ rules:
   - id: oracle.request-pipeline
     title: Oracle request pipeline
     kind: flow
-    statement: Every Oracle message passes the flood guard, a last-turn check, and local input guardrails. Guests then get a canned reply with no model call. Members are checked against their usage allowance and the jailbreak preflight before a routed, streamed answer. If the allowance cannot be read, the request is refused with a 503 instead of calling the model.
+    statement: Every message passes flood and local input checks. Guests get a canned reply. Members pass usage and prompt screening, then atomically reserve one allowance slot before a new thread or model call. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.
     anchors:
       - file: src/lib/ai/handle-oracle-chat-request.ts
         symbol: handleOracleChatRequest
@@ -69,7 +69,7 @@ rules:
         kind: outcome
         tone: block
       - id: route
-        label: Record usage, pick context and model
+        label: Reserve usage and create a thread if needed
         kind: action
         next: [stream]
       - id: stream
@@ -91,12 +91,13 @@ rules:
   - id: oracle.usage-allowance
     title: Rolling allowances, Premium gets 10x
     kind: limit
-    statement: Free members can send 5 Oracle messages a minute, 15 in any rolling 5 hours, and 100 in any rolling 7 days. Premium gets 10 times each allowance. Both rolling windows must have capacity; availability is calculated from recorded timestamps. Usage survives thread deletion and is shared across server instances. Chat shows five-hour usage, with both windows in expanded details and Settings.
+    statement: Free members can send 5 Oracle messages a minute, 15 per rolling 5 hours, and 100 per rolling 7 days. Premium receives 10x. Both windows must have capacity; usage is checked and reserved atomically across instances before model calls and survives thread deletion. New-thread failure releases the reservation. Chat shows five-hour usage and both windows in details and Settings.
     dependsOn: [oracle.request-pipeline, premium.no-standing, economy.red-line]
-    flag:
-      level: watch
-      note: Usage checks fail closed when storage is unavailable. Checking capacity and recording a request remain separate operations, so concurrent requests can overshoot a cap.
     anchors:
+      - file: src/lib/ai/service.ts
+        symbol: reserveOracleChatUsage
+      - file: src/lib/ai/service.ts
+        symbol: releaseOracleChatUsage
       - file: src/lib/ai/usage-limits.ts
         symbol: ORACLE_FREE_LIMITS
       - file: src/lib/ai/usage-limits.ts
