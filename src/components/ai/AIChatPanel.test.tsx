@@ -842,7 +842,8 @@ describe('AIChatPanel 3D Synaptic Entity Mode', () => {
 
     expect(screen.getByTestId('synaptic-entity-hud')).toBeInTheDocument()
     expect(screen.getByTestId('synaptic-entity-canvas')).toBeInTheDocument()
-    expect(screen.getByTestId('entity-status-pill')).toHaveTextContent(/SYNAPTIC CORE/i)
+    expect(screen.queryByTestId('entity-status-pill')).not.toBeInTheDocument()
+    expect(screen.getByText('Interface with the Synaptic Core')).toBeInTheDocument()
 
     // Draft is preserved in Entity Mode composer
     const entityInput = screen.getByRole('textbox', { name: 'Message' })

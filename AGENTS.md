@@ -17,7 +17,7 @@
 
 ## Tests and verification
 
-- **Scoped changes:** Targeted Vitest tests (`npx vitest run path/to/file.test.ts` or `npm run test:changed`) plus `npm run typecheck`.
+- **Scoped changes:** Targeted Vitest tests (`npm run test:file -- path/to/file.test.ts` or `npm run test:changed`) plus `npm run typecheck`.
 - **Shared logic/backend:** `npm run test:core`; scripts/ingest/tooling: `npm run test:scripts`.
 - **Broader verification:** `npm run test` and `npm run build` when warranted by the change or failures.
 

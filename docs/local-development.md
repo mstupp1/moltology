@@ -6,7 +6,10 @@ Run the usual command from any checkout:
 npm run dev
 ```
 
-Before Vite starts, `predev` prepares linked worktrees automatically. If the
+Before Vite starts, `predev` prepares linked worktrees automatically.
+The `npm run test*`, `npm run typecheck`, and `npm run build` commands also
+prepare the dependency link, so they work before the first dev-server launch.
+These commands leave environment files untouched; `predev` handles environment setup. If the
 worktree has no dependencies, it links the main checkout's `node_modules`. If it
 has no local environment files, it links the main checkout's `.env`, after
 checking that `DATABASE_URL` matches `DEV_DATABASE_URL` and differs from the
@@ -105,11 +108,11 @@ through the ES module runner breaks CommonJS packages such as `@vercel/oidc`.
 
 `npm run dev` uses Vite's runner config loader automatically. This avoids writing
 temporary config files under a shared `node_modules/.vite-temp/`, so new chats
-and linked worktrees use the same startup command. Tests can opt into it too:
+and linked worktrees use the same startup command. The npm test scripts use the runner config loader too:
 
 ```sh
-npm run test:scripts -- --configLoader runner
-npx vitest run src/components/ai/AIChatPanel.test.tsx --configLoader runner
+npm run test:scripts
+npm run test:file -- src/components/ai/AIChatPanel.test.tsx
 ```
 
 The server and headless browser also need permission to listen/connect on

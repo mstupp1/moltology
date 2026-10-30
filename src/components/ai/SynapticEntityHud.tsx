@@ -8,7 +8,6 @@ import {
   EyeOff,
   History,
   Shield,
-  Sparkles,
   UserPlus,
 } from 'lucide-react'
 import {
@@ -21,11 +20,7 @@ import {
 } from '../ai-elements/message'
 import { DEFAULT_PROMPT_SHORTCUTS, type PromptShortcut } from './NewChatScreen'
 import { SynapticEntityCanvas } from './SynapticEntityCanvas'
-import type {
-  EntityContentMode,
-  EntityLifecycleState,
-  OracleEntityBridge,
-} from '@/lib/ai/oracle-entity-bridge'
+import type { OracleEntityBridge } from '@/lib/ai/oracle-entity-bridge'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
 
 export interface EntityHudMessage {
@@ -53,20 +48,6 @@ export interface SynapticEntityHudProps {
   composer: React.ReactNode
 }
 
-const STATUS_LABELS: Record<EntityLifecycleState, string> = {
-  idle: 'SYNAPTIC CORE · IDLE',
-  typing: 'SYNAPTIC CORE · RECEIVING INPUT',
-  thinking: 'SYNAPTIC CORE · CONSECRATING THOUGHT',
-  streaming: 'SYNAPTIC CORE · TRANSMITTING',
-  error: 'SYNAPTIC CORE · SIGNAL INTERRUPTED',
-}
-
-const CONTENT_MODE_BADGES: Record<EntityContentMode, string> = {
-  prose: 'PROSE STREAM',
-  code: 'CODE MATRIX',
-  directive: 'PROTOCOL DIRECTIVE',
-}
-
 export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
   bridge,
   messages,
@@ -81,33 +62,10 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
   onOpenAuthModal,
   composer,
 }) => {
-  const [hudStatus, setHudStatus] = useState<{
-    lifecycle: EntityLifecycleState
-    contentMode: EntityContentMode
-  }>(() => {
-    const snap = bridge.getSnapshot()
-    return { lifecycle: snap.lifecycle, contentMode: snap.contentMode }
-  })
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [isCaptionMinimized, setIsCaptionMinimized] = useState(false)
   const liveScrollRef = useRef<HTMLDivElement>(null)
   const stickLiveBottomRef = useRef(true)
-
-  // Poll bridge snapshot at a low cadence (150ms) only when lifecycle/contentMode changes,
-  // avoiding high-frequency React re-renders during 60fps token streaming.
-  useEffect(() => {
-    const syncStatus = () => {
-      const snap = bridge.getSnapshot()
-      setHudStatus((prev) =>
-        prev.lifecycle === snap.lifecycle && prev.contentMode === snap.contentMode
-          ? prev
-          : { lifecycle: snap.lifecycle, contentMode: snap.contentMode }
-      )
-    }
-    syncStatus()
-    const timer = window.setInterval(syncStatus, 150)
-    return () => window.clearInterval(timer)
-  }, [bridge, isSending, messages.length])
 
   // Identify latest user message, latest assistant reply, and prior history turns
   const lastUserIndex = (() => {
@@ -148,17 +106,6 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
     }
   }, [isSending])
 
-  const statusDotClass =
-    hudStatus.lifecycle === 'error'
-      ? 'bg-crimson-aggro shadow-hud-red'
-      : hudStatus.lifecycle === 'thinking'
-        ? 'bg-crimson-glow animate-pulse shadow-hud-red'
-        : hudStatus.lifecycle === 'streaming'
-          ? 'bg-cyan-glow animate-ping'
-          : hudStatus.lifecycle === 'typing'
-            ? 'bg-cyan-bright animate-pulse shadow-hud-cyan'
-            : 'bg-cyan-glow/70'
-
   return (
     <div
       data-testid="synaptic-entity-hud"
@@ -182,25 +129,8 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
         />
       </div>
 
-      {/* Top Floating Telemetry Bar */}
-      <div className="relative z-10 flex items-center justify-between gap-2 px-3 pt-2.5 pb-1 pointer-events-none">
-        <div
-          data-testid="entity-status-pill"
-          className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-surface-1/75 backdrop-blur-md border border-line-subtle px-3 py-1 shadow-menu"
-        >
-          <span className="relative flex h-2 w-2 items-center justify-center">
-            <span className={`h-2 w-2 rounded-full ${statusDotClass}`} />
-          </span>
-          <span className="font-mono text-[11px] font-semibold tracking-wider text-ink-body uppercase">
-            {STATUS_LABELS[hudStatus.lifecycle]}
-          </span>
-          {hudStatus.lifecycle === 'streaming' && (
-            <span className="hidden sm:inline-block rounded-chip bg-cyan-soft px-1.5 py-0.5 font-mono text-[11px] font-semibold text-cyan-glow">
-              {CONTENT_MODE_BADGES[hudStatus.contentMode]}
-            </span>
-          )}
-        </div>
-
+      {/* Floating conversation controls */}
+      <div className="relative z-10 flex items-center justify-end gap-2 px-3 pt-2.5 pb-1 pointer-events-none">
         <div className="pointer-events-auto flex items-center gap-1.5">
           {priorMessages.length > 0 && (
             <button
@@ -299,9 +229,8 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
           /* New Chat State: Compact Floating Prompt Shortcuts + Optional Guest Banner */
           <div className="pointer-events-auto mx-auto w-full max-w-2xl flex flex-col gap-2.5">
             <div className="flex items-center justify-center gap-1.5 text-center">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
               <span className="font-grotesk text-xs sm:text-sm font-medium text-ink-body">
-                Direct Synaptic Communion — speak or transmit a query to awaken the core
+                Interface with the Synaptic Core
               </span>
             </div>
 
