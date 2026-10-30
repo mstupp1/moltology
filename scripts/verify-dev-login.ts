@@ -22,6 +22,9 @@ try {
       isMobile: viewport.name === 'mobile', hasTouch: viewport.name === 'mobile',
     })
     try {
+      if (process.env.DEV_TEST_USER_ID) {
+        await context.addInitScript((id) => localStorage.setItem(`moltology:welcomed:${id}`, '1'), process.env.DEV_TEST_USER_ID)
+      }
       const page = await context.newPage()
       const errors: string[] = []
       page.on('pageerror', (error) => errors.push(error.message))
@@ -29,9 +32,6 @@ try {
       await page.getByLabel('Email Address', { exact: true }).waitFor()
       // Auth pages load a third-party challenge; networkidle is unreliable here.
       await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => {})
-      if (process.env.DEV_TEST_USER_ID) {
-        await page.evaluate((id) => localStorage.setItem(`moltology:welcomed:${id}`, '1'), process.env.DEV_TEST_USER_ID)
-      }
       await page.getByLabel('Email Address', { exact: true }).fill(email)
       await page.getByLabel('Password', { exact: true }).fill(password)
       const signIn = page.waitForResponse((response) => response.url().includes('/api/auth/sign-in/email'))

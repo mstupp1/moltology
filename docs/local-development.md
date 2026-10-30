@@ -19,16 +19,18 @@ For a fresh main checkout, install dependencies with `npm ci` and configure
 login and database-backed actions need a development database. Worktrees reuse
 the development accounts; production-only accounts may not exist there.
 
-Vite defaults to http://localhost:3000. Run simultaneous worktrees on distinct
-ports:
+The launcher defaults to http://localhost:3000 and selects the next free port
+through 3099 when another checkout is running. It prints the URL before starting
+Vite and sets the auth origin to that port before the server worker starts.
+To choose a fixed port, use `PORT` or:
 
 ```sh
 npm run dev -- --port 3100
 ```
 
 The dev server sets its server-side auth origin and trusted loopback origins to
-that port. An occupied port causes a clear startup error instead of silently
-changing the auth callback origin. Email/password login works on custom ports.
+that port. An occupied explicitly chosen port causes a clear startup error.
+Email/password login works on custom ports.
 Google sign-in additionally requires the chosen
 `http://localhost:PORT/api/auth/callback/google` URL to be registered with Google;
 use port 3000 for the documented local OAuth setup, or register another callback.
@@ -101,12 +103,11 @@ symlink. Keep generated output local to each checkout:
 Server dependencies use Vite's default externalization. Forcing all dependencies
 through the ES module runner breaks CommonJS packages such as `@vercel/oidc`.
 
-Vite's default config bundler still writes temporary config files under
-`node_modules/.vite-temp/`. If a restricted agent cannot write to a shared
-installation, use the runner config loader:
+`npm run dev` uses Vite's runner config loader automatically. This avoids writing
+temporary config files under a shared `node_modules/.vite-temp/`, so new chats
+and linked worktrees use the same startup command. Tests can opt into it too:
 
 ```sh
-npm run dev -- --configLoader runner
 npm run test:scripts -- --configLoader runner
 npx vitest run src/components/ai/AIChatPanel.test.tsx --configLoader runner
 ```
