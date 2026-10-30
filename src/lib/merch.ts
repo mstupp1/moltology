@@ -446,6 +446,7 @@ interface LooseShippingDetails {
 export interface LooseCheckoutSession {
   id?: string | null
   livemode?: boolean
+  status?: string | null
   mode?: string | null
   metadata?: Record<string, string> | null
   payment_status?: string | null
@@ -486,6 +487,7 @@ export const MERCH_CHECKOUT_EVENT_TYPES = [
   'checkout.session.completed',
   'checkout.session.async_payment_succeeded',
   'checkout.session.async_payment_failed',
+  'checkout.session.expired',
 ] as const
 
 export function isMerchCheckoutEvent(event: { type: string; data?: { object?: unknown } | null }): boolean {

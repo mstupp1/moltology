@@ -1,6 +1,6 @@
 import Stripe from 'stripe'
 import { STRIPE_API_VERSION } from '../stripe-config'
-import { and, asc, eq, inArray, isNull } from 'drizzle-orm'
+import { and, asc, eq, inArray, isNull, or } from 'drizzle-orm'
 import { getDb } from '../../db'
 import { merchOrders, merchProducts, merchVariants, profiles } from '../../db/schema'
 import {
@@ -156,6 +156,20 @@ export async function fulfillMerchCheckoutEvent(event: {
       throw new Error('Stripe totals do not match the approved order snapshot.')
     completion.shipping = order.shippingAddress
     completion.email = order.customerEmail
+  }
+  if (event.type === 'checkout.session.expired') {
+    if (session.status !== 'expired') {
+      throw new Error('Stripe has not confirmed that checkout expired.')
+    }
+    if (order.paymentStatus === 'unpaid' || order.paymentStatus === 'failed') {
+      await db.update(merchOrders).set({ stripeCheckoutSessionId: completion.sessionId, paymentStatus: 'failed',
+        fulfillmentStatus: 'payment_failed', updatedAt: new Date() }).where(and(
+          eq(merchOrders.id, order.id),
+          or(isNull(merchOrders.stripeCheckoutSessionId), eq(merchOrders.stripeCheckoutSessionId, completion.sessionId)),
+          inArray(merchOrders.paymentStatus, ['unpaid', 'failed']),
+        ))
+    }
+    return
   }
   if (completion.paid) {
     await db.update(merchOrders).set({ paymentStatus: 'paid', livemode: session.livemode === true,

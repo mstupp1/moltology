@@ -11,6 +11,7 @@ import { hasExperiment } from '../experiments'
 import { isAdmin } from '../permissions'
 import { profiles } from '../../db/schema'
 import sync from '../../../content/merch/printful-sync.json'
+import { createStoreCouponOrderClaim } from './store-coupon-claims'
 
 export type StoreArgs = { data?: { token?: string; userId?: string }; context?: WriteAuthContext & { clientIp?: string | null } | null }
 export function storeStripe() {
@@ -132,12 +133,25 @@ export async function createQuotedCheckout(args: Omit<StoreArgs, 'data'> & { dat
   // Live operation remains separately authorized, even for an admin private pilot.
   if (livemode && process.env.STORE_LIVE_PAYMENTS_AUTHORIZED !== 'true') throw new Error('Live store payments are not enabled.')
   if (auth) await (await import('../user-sync')).ensureUserProfile(auth.userId)
-  await db.insert(merchOrders).values({ id: orderId, userId: auth?.userId ?? null, customerEmail: input.email,
-    shippingAddress: quote.snapshot.address, subtotalCents, shippingCents: quote.snapshot.amountCents,
-    totalCents: subtotalCents + quote.snapshot.amountCents, lineItems: lines, quoteSnapshot: quote.snapshot,
-    promotionCode: promotion?.code ?? null, promotionCodeId: promotion?.id ?? null,
-    statusTokenHash: hashStoreValue(statusToken), fulfillmentMode: settings.fulfillmentMode === 'automatic' && !shouldDraftPrintfulOrder(process.env, livemode) ? 'automatic' : 'manual', livemode,
-  }).onConflictDoNothing()
+  const fulfillmentMode = settings.fulfillmentMode === 'automatic' && !shouldDraftPrintfulOrder(process.env, livemode) ? 'automatic' : 'manual'
+  if (promotion?.oncePerEmail) {
+    const claim = await createStoreCouponOrderClaim(db.$client, {
+      orderId, userId: auth?.userId ?? null, email: input.email,
+      shippingAddress: quote.snapshot.address, subtotalCents, shippingCents: quote.snapshot.amountCents,
+      totalCents: subtotalCents + quote.snapshot.amountCents, lineItems: lines, quoteSnapshot: quote.snapshot,
+      promotionCode: promotion.code, promotionCodeId: promotion.id, statusTokenHash: hashStoreValue(statusToken),
+      fulfillmentMode, livemode,
+    })
+    if (claim === 'conflict') throw new Error('That promo code was already used with this email.')
+    if (claim === 'mismatch') throw new Error('The promo code changed. Quote shipping again.')
+  } else {
+    await db.insert(merchOrders).values({ id: orderId, userId: auth?.userId ?? null, customerEmail: input.email,
+      shippingAddress: quote.snapshot.address, subtotalCents, shippingCents: quote.snapshot.amountCents,
+      totalCents: subtotalCents + quote.snapshot.amountCents, lineItems: lines, quoteSnapshot: quote.snapshot,
+      promotionCode: promotion?.code ?? null, promotionCodeId: promotion?.id ?? null,
+      statusTokenHash: hashStoreValue(statusToken), fulfillmentMode, livemode,
+    }).onConflictDoNothing()
+  }
   const [existing] = await db.select().from(merchOrders).where(eq(merchOrders.id, orderId)).limit(1)
   if ((existing.promotionCodeId ?? null) !== (promotion?.id ?? null)) throw new Error('The promo code changed. Quote shipping again.')
   if (existing.stripeCheckoutSessionId) {

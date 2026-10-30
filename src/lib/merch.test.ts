@@ -148,7 +148,7 @@ describe('merch store helpers', () => {
     expect(readMerchCheckoutCompletion({ ...session, payment_status: 'no_payment_required' })?.paid).toBe(true)
     expect(isMerchCheckoutEvent({ type: 'checkout.session.async_payment_succeeded', data: { object: session } })).toBe(true)
     expect(isMerchCheckoutEvent({ type: 'checkout.session.async_payment_failed', data: { object: session } })).toBe(true)
-    expect(isMerchCheckoutEvent({ type: 'checkout.session.expired', data: { object: session } })).toBe(false)
+    expect(isMerchCheckoutEvent({ type: 'checkout.session.expired', data: { object: session } })).toBe(true)
   })
 
   it('builds a Printful draft payload outside production', () => {

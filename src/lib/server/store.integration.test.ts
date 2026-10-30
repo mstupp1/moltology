@@ -4,8 +4,8 @@ import { and, eq, inArray, like } from 'drizzle-orm'
 import { STORE_DEFAULTS } from '../store'
 import { requireMerchDevDatabase } from '../../../scripts/merch/database'
 import { merchOrders, storeAudit, storeOutbox, storeOverrides, storeQuotes, storeRateLimits, storeSettings, profiles } from '../../db/schema'
-const mocks = vi.hoisted(() => ({ rateKeys: [] as string[], settings: {} as any, customer: vi.fn(), create: vi.fn(), retrieve: vi.fn(), intent: vi.fn(), provider: vi.fn(), mail: vi.fn() }))
-vi.mock('stripe', () => ({ default: class { customers = { create: mocks.customer }; checkout = { sessions: { create: mocks.create, retrieve: mocks.retrieve } }; paymentIntents = { retrieve: mocks.intent } } }))
+const mocks = vi.hoisted(() => ({ rateKeys: [] as string[], settings: {} as any, customer: vi.fn(), create: vi.fn(), retrieve: vi.fn(), intent: vi.fn(), provider: vi.fn(), mail: vi.fn(), promotionList: vi.fn() }))
+vi.mock('stripe', () => ({ default: class { customers = { create: mocks.customer }; checkout = { sessions: { create: mocks.create, retrieve: mocks.retrieve } }; paymentIntents = { retrieve: mocks.intent }; promotionCodes = { list: mocks.promotionList } } }))
 vi.mock('./printful', () => ({ ensurePrintfulOrder: mocks.provider }))
 vi.mock('./mail', () => ({ sendTransactionalEmail: mocks.mail }))
 // Only settings reads are replaced with an in-process fixture. The deployed/dev public gate is never opened.
@@ -14,6 +14,7 @@ vi.mock('../../db', async importOriginal => {
   return { ...actual, getDb: () => {
     const real = actual.getDb()
     return new Proxy(real, { get(target, property) {
+      if (property === '$client') return Reflect.get(target, property)
       if (property === 'insert') return (table: unknown) => {
         const builder = real.insert(table as any)
         return { values(value: any) { if (table === storeRateLimits) mocks.rateKeys.push(value.key); return builder.values(value) } }
@@ -50,6 +51,7 @@ suite('store checkout and operations on Neon dev', () => {
     mocks.settings = { ...STORE_DEFAULTS, publicEnabled: true, orderingOpen: true }
     vi.stubEnv('STORE_PUBLIC_LAUNCH_AUTHORIZED','true')
     vi.stubEnv('STORE_STATUS_SECRET','integration-status-secret-with-32-characters')
+    vi.stubEnv('BETTER_AUTH_URL','https://moltology.org')
     vi.stubEnv('STRIPE_SECRET_KEY','sk_test_fixture')
     vi.stubEnv('PRINTFUL_API_TOKEN','fixture')
     vi.stubEnv('PRINTFUL_STORE_ID','18931450')
@@ -69,6 +71,8 @@ suite('store checkout and operations on Neon dev', () => {
     mocks.provider.mockResolvedValue({ id:`fixture-${randomUUID()}`,status:'draft' })
     mocks.mail.mockResolvedValue({ sent:true })
     mocks.intent.mockResolvedValue({ livemode:false, status:'succeeded', latest_charge:{ amount_refunded:0 } })
+    mocks.promotionList.mockResolvedValue({ data: [{ id:'promo_fixture', code:'LAUNCH15', active:true, metadata:{ scope:'merch', oncePerEmail:'true' }, expires_at:null, max_redemptions:null, times_redeemed:0, restrictions:null,
+      promotion:{ type:'coupon', coupon:{ id:'coupon_fixture', valid:true, percent_off:15, amount_off:null, currency:null } } }] })
   })
   afterEach(async () => {
     vi.unstubAllGlobals()
@@ -90,9 +94,18 @@ suite('store checkout and operations on Neon dev', () => {
     quotes.push(result.id)
     return result
   }
+  async function quotedCheckout(input: ReturnType<typeof delivery> & { promoCode?: string }, quoteId: string) {
+    try {
+      return await createQuotedCheckout({ data:{ ...input, quoteId },context:{ clientIp:randomUUID() } })
+    } catch (error) {
+      const [claimed] = await getDb().select({ orderId:storeQuotes.orderId }).from(storeQuotes).where(eq(storeQuotes.id,quoteId))
+      if (claimed?.orderId) owned.push(claimed.orderId)
+      throw error
+    }
+  }
   async function checkout() {
     const input = delivery(), q = await quote(input)
-    const result = await createQuotedCheckout({ data:{ ...input,quoteId:q.id },context:{ clientIp:randomUUID() } })
+    const result = await quotedCheckout(input,q.id)
     owned.push(result.orderId)
     const [order] = await getDb().select().from(merchOrders).where(eq(merchOrders.id,result.orderId))
     return { input,q,result,order }
@@ -136,6 +149,45 @@ suite('store checkout and operations on Neon dev', () => {
     expect(params.customer_update).toBeUndefined()
     expect(params.customer).toMatch(/^cus_/)
     expect(mocks.customer.mock.calls[0][0].shipping.address.line1).toBe(address.line1)
+  })
+  it('reserves a once-per-email promotion across distinct pending quotes and normalizes email case', async () => {
+    const email = `Coupon-Fixture-${randomUUID()}@example.com`
+    const firstInput = { ...delivery(), email }
+    const secondInput = { ...delivery(), email: email.toUpperCase() }
+    const firstQuote = await quote(firstInput), secondQuote = await quote(secondInput)
+    const first = await quotedCheckout({ ...firstInput, promoCode:'LAUNCH15' },firstQuote.id)
+    owned.push(first.orderId)
+    const checkoutCalls = mocks.create.mock.calls.length
+    const replay = await quotedCheckout({ ...firstInput, promoCode:'LAUNCH15' },firstQuote.id)
+    expect(replay.orderId).toBe(first.orderId)
+    expect(mocks.create).toHaveBeenCalledTimes(checkoutCalls)
+    await expect(quotedCheckout({ ...secondInput, promoCode:'LAUNCH15' },secondQuote.id))
+      .rejects.toThrow('already used with this email')
+    expect(mocks.create).toHaveBeenCalledTimes(checkoutCalls)
+    const [order] = await getDb().select().from(merchOrders).where(eq(merchOrders.id, first.orderId))
+    expect(order.paymentStatus).toBe('unpaid')
+    expect(order.customerEmail).toBe(email.toLowerCase())
+  })
+  it('serializes concurrent distinct quotes so only one same-email checkout reserves the promotion', async () => {
+    const email = `Concurrent-Fixture-${randomUUID()}@example.com`
+    const firstInput = { ...delivery(), email }
+    const secondInput = { ...delivery(), email: email.toUpperCase() }
+    const firstQuote = await quote(firstInput), secondQuote = await quote(secondInput)
+    const results = await Promise.allSettled([
+      quotedCheckout({ ...firstInput, promoCode:'LAUNCH15' },firstQuote.id),
+      quotedCheckout({ ...secondInput, promoCode:'LAUNCH15' },secondQuote.id),
+    ])
+    const succeeded = results.filter((result): result is PromiseFulfilledResult<{ url: string; orderId: string }> => result.status === 'fulfilled')
+    const failed = results.filter((result): result is PromiseRejectedResult => result.status === 'rejected')
+    expect(succeeded).toHaveLength(1)
+    expect(failed).toHaveLength(1)
+    expect(failed[0].reason).toBeInstanceOf(Error)
+    expect(failed[0].reason.message).toContain('already used with this email')
+    owned.push(succeeded[0].value.orderId)
+    expect(mocks.create).toHaveBeenCalledTimes(1)
+    const orders = await getDb().select().from(merchOrders).where(and(eq(merchOrders.customerEmail,email.toLowerCase()),eq(merchOrders.promotionCodeId,'promo_fixture')))
+    expect(orders).toHaveLength(1)
+    expect(orders[0].paymentStatus).toBe('unpaid')
   })
   it('rejects cross-order status tokens, unpaid manufacturing, and mismatched totals; concurrent paid events create one draft', async () => {
     const { order } = await checkout()

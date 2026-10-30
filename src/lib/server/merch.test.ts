@@ -40,8 +40,8 @@ describe('new store experiment server gate', () => {
 })
 
 describe('merch fulfilment waits for payment', () => {
-  function orderDb() {
-    const order = { id: 'order-1', userId: 'u1', fulfillmentStatus: 'pending', subtotalCents: 2800, shippingCents: 695, taxCents: 0, lineItems: [] }
+  function orderDb(overrides: Record<string, unknown> = {}) {
+    const order = { id: 'order-1', userId: 'u1', paymentStatus: 'unpaid', stripeCheckoutSessionId: 'cs_1', fulfillmentStatus: 'pending', subtotalCents: 2800, shippingCents: 695, taxCents: 0, lineItems: [], ...overrides }
     const sets: Array<Record<string, unknown>> = []
     const query = { from: () => query, where: () => query, limit: vi.fn().mockResolvedValue([order]) }
     const update = { set: (values: Record<string, unknown>) => { sets.push(values); return update }, where: vi.fn().mockResolvedValue([]) }
@@ -71,6 +71,33 @@ describe('merch fulfilment waits for payment', () => {
     await fulfillMerchCheckoutEvent({ type: 'checkout.session.async_payment_failed', data: { object: session('unpaid') } })
     expect(sets.map((s) => s.fulfillmentStatus)).toEqual(['payment_failed'])
     expect(fulfillPaidMerchOrder).not.toHaveBeenCalled()
+  })
+
+  it('releases a pending coupon claim only after Stripe confirms session expiry', async () => {
+    const sets = orderDb()
+    const expired = { ...session('unpaid'), status: 'expired' }
+    await fulfillMerchCheckoutEvent({ type: 'checkout.session.expired', data: { object: expired } })
+    expect(sets).toEqual([expect.objectContaining({ paymentStatus: 'failed', fulfillmentStatus: 'payment_failed' })])
+  })
+
+  it('does not release a pending coupon claim from an unconfirmed expiry event', async () => {
+    const sets = orderDb()
+    await expect(fulfillMerchCheckoutEvent({ type: 'checkout.session.expired', data: { object: session('unpaid') } }))
+      .rejects.toThrow('Stripe has not confirmed')
+    expect(sets).toEqual([])
+  })
+
+  it.each(['paid', 'partially_refunded', 'refunded'])('preserves a %s coupon claim after a late expiry event', async (paymentStatus) => {
+    const sets = orderDb({ paymentStatus })
+    await fulfillMerchCheckoutEvent({ type: 'checkout.session.expired', data: { object: { ...session('paid'), status: 'expired' } } })
+    expect(sets).toEqual([])
+  })
+
+  it('does not release a claim when the expired session id does not match the order', async () => {
+    const sets = orderDb()
+    await expect(fulfillMerchCheckoutEvent({ type: 'checkout.session.expired', data: { object: { ...session('unpaid'), id: 'cs_other', status: 'expired' } } }))
+      .rejects.toThrow('does not match')
+    expect(sets).toEqual([])
   })
 
   it('fulfils once Stripe reports the session paid', async () => {
