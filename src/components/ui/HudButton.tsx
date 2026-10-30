@@ -80,6 +80,7 @@ export const HudButton = React.forwardRef<HTMLButtonElement, HudButtonProps>(
       iconPosition = 'left',
       className = '',
       disabled,
+      onClick,
       ...props
     },
     ref
@@ -91,6 +92,7 @@ export const HudButton = React.forwardRef<HTMLButtonElement, HudButtonProps>(
       <button
         ref={ref}
         disabled={disabled}
+        onClick={disabled ? undefined : onClick}
         data-variant={resolved}
         className={cn(
           'group/hudbtn relative isolate inline-flex items-center justify-center font-grotesk font-bold uppercase tracking-[0.08em] leading-none',

@@ -3,12 +3,14 @@ import { defineConfig, loadEnv, searchForWorkspaceRoot } from 'vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import { nitro } from 'nitro/vite'
 import viteReact from '@vitejs/plugin-react'
+import { redact } from '@tanstack/redact/vite'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 import { realpathSync } from 'node:fs'
 import { resolveViteEmailVerificationEnabled, resolveViteGoogleAuthEnabled } from './src/lib/auth-config.ts'
 
 const isTest = Boolean(process.env.VITEST)
+const shouldUseRedact = process.env.DISABLE_REDACT !== 'true'
 
 // Bucket media is served at /media/* by a cached Vercel rewrite (vercel.json). Locally we proxy
 // to the live site so dev servers and screenshot runs hit the CDN cache, not the Neon bucket.
@@ -55,7 +57,12 @@ export default defineConfig(({ mode }) => {
             ),
           },
         }),
+    ssr: {
+      noExternal: true,
+    },
     resolve: {
+      noExternal: true,
+      mainFields: ['module', 'jsnext:main', 'jsnext', 'main'],
       alias: {
         '@': path.resolve(import.meta.dirname, './src'),
       },
@@ -100,6 +107,11 @@ export default defineConfig(({ mode }) => {
       globals: true,
       environment: 'jsdom',
       setupFiles: ['./src/test/setup.ts'],
+      server: {
+        deps: {
+          inline: true,
+        },
+      },
       exclude: [
         '**/node_modules/**', '**/dist/**', '**/.claude/**', '**/.git/**',
         ...(mode === 'integration' ? [] : ['**/*.integration.test.ts']),
@@ -119,6 +131,7 @@ export default defineConfig(({ mode }) => {
             nitro({ vercel: { functionRules: { '/api/store/recovery': { maxDuration: 240 } } } }),
           ]),
       viteReact(),
+      ...(shouldUseRedact ? [redact()] : []),
     ],
   }
 })
