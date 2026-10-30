@@ -72,6 +72,8 @@ export interface AIChatPanelProps {
   placeholder?: string
   /** Close the panel when Escape is pressed inside it (popout). */
   closeOnEscape?: boolean
+  /** Enabled only by the full-page /oracle workspace. */
+  allowEntityMode?: boolean
   /** Initial view mode ('standard' chat vs 'entity' 3D core). */
   initialViewMode?: OracleViewMode
 }
@@ -108,6 +110,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   desktopChatsSidebar = false,
   closeOnEscape = false,
   initialViewMode,
+  allowEntityMode = false,
 }) => {
   const oracle = useSafeOracle()
   const session = useAuthSession()
@@ -197,16 +200,16 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const [memberHandle, setMemberHandle] = useState<string | null>(null)
   const [memberLarvaId, setMemberLarvaId] = useState<string | null>(null)
   const [draft, setDraft] = useState('')
-  const [viewMode, setViewMode] = useState<OracleViewMode>(() => {
-    if (initialViewMode) return initialViewMode
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY_ORACLE_VIEW_MODE)
-        if (saved === 'entity' || saved === 'standard') return saved
-      } catch {}
-    }
-    return 'standard'
-  })
+  const [preferredViewMode, setViewMode] = useState<OracleViewMode>(initialViewMode ?? 'standard')
+  const viewMode = allowEntityMode ? preferredViewMode : 'standard'
+
+  useEffect(() => {
+    if (!allowEntityMode || initialViewMode) return
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_ORACLE_VIEW_MODE)
+      if (saved === 'entity' || saved === 'standard') setViewMode(saved)
+    } catch {}
+  }, [allowEntityMode, initialViewMode])
   const entityBridgeRef = useRef<OracleEntityBridge | null>(null)
   if (!entityBridgeRef.current) {
     entityBridgeRef.current = createOracleEntityBridge()
@@ -796,7 +799,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     handleClose()
   }
 
-  const composer = (variant: 'docked' | 'inline') => (
+  const composer = (variant: 'docked' | 'inline' | 'floating') => (
     <div>
       <PromptInput
         sendDisabled={usage.blocked}
@@ -817,11 +820,13 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const headerButton = headerIconButtonClasses(isPhone)
   const windowControls = (
     <>
-      <OracleEntityModeToggle
-        viewMode={viewMode}
-        onToggle={handleToggleViewMode}
-        touch={isPhone}
-      />
+      {allowEntityMode && (
+        <OracleEntityModeToggle
+          viewMode={viewMode}
+          onToggle={handleToggleViewMode}
+          touch={isPhone}
+        />
+      )}
 
       {showModeControls && oracle && oracle.mode !== 'closed' && (
         <OracleModeMenu mode={oracle.mode} onSelect={handleModeSwitch} touch={isPhone} />
@@ -954,7 +959,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                 onRetryFailed={handleRetryFailed}
                 onEditFailed={handleEditFailed}
                 onOpenAuthModal={() => setIsAuthModalOpen(true)}
-                composer={composer('docked')}
+                composer={composer('floating')}
               />
             ) : (
               <>

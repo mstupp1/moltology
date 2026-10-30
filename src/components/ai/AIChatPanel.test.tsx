@@ -141,7 +141,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
     expect(screen.queryByText(/Sign up free for full answers/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/You're exploring as a guest/i)).not.toBeInTheDocument()
     expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Select Cognition Model/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Select model/i })).not.toBeInTheDocument()
   })
 
   it('shows model picker for admin users', async () => {
@@ -156,7 +156,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /Select Cognition Model/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Select model/i })).toBeInTheDocument()
     })
   })
 
@@ -810,8 +810,26 @@ describe('AIChatPanel 3D Synaptic Entity Mode', () => {
     localStorage.removeItem('moltology:oracle_view_mode')
   })
 
+  it('keeps embedded panels in standard chat despite saved or requested Entity mode', () => {
+    localStorage.setItem('moltology:oracle_view_mode', 'entity')
+    render(<AIChatPanel userId="usr_valid_user" initialViewMode="entity" />)
+    expect(screen.queryByRole('button', { name: /Switch to 3D Entity Mode/i })).not.toBeInTheDocument()
+    expect(screen.queryByTestId('synaptic-entity-hud')).not.toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
+  })
+
+  it('restores the full-page preference and exits Entity mode when embedded', () => {
+    localStorage.setItem('moltology:oracle_view_mode', 'entity')
+    const { rerender } = render(<AIChatPanel allowEntityMode userId="usr_valid_user" />)
+    expect(screen.getByTestId('synaptic-entity-hud')).toBeInTheDocument()
+    rerender(<AIChatPanel userId="usr_valid_user" />)
+    expect(screen.queryByTestId('synaptic-entity-hud')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Switch to 3D Entity Mode/i })).not.toBeInTheDocument()
+    expect(localStorage.getItem('moltology:oracle_view_mode')).toBe('entity')
+  })
+
   it('toggles seamlessly between Standard Chat and 3D Entity Mode while preserving draft and conversation state', async () => {
-    render(<AIChatPanel userId="usr_valid_user" />)
+    render(<AIChatPanel allowEntityMode userId="usr_valid_user" />)
 
     // Type a draft in standard mode
     const input = screen.getByRole('textbox', { name: 'Message' })
@@ -855,7 +873,7 @@ describe('AIChatPanel 3D Synaptic Entity Mode', () => {
       { id: 'm4', role: 'assistant', content: 'Latest benthic response' },
     ])
 
-    render(<AIChatPanel userId="usr_valid_user" threadId="thread-multi" initialViewMode="entity" />)
+    render(<AIChatPanel allowEntityMode userId="usr_valid_user" threadId="thread-multi" initialViewMode="entity" />)
 
     await waitFor(() => {
       expect(screen.getByTestId('entity-live-turn-card')).toBeInTheDocument()

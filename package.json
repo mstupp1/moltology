@@ -9,6 +9,7 @@
     "msedge-tts": false
   },
   "scripts": {
+    "predev": "node scripts/setup-dev-worktree.mjs",
     "dev": "vite dev",
     "build": "vite build && tsc --noEmit && node scripts/prune-vercel-function.mjs",
     "start": "node .output/server/index.mjs",
@@ -21,6 +22,8 @@
     "test": "vitest run",
     "test:core": "vitest run src/lib src/db src/emails",
     "test:integration": "vitest run --mode integration",
+    "dev:verify-login": "tsx scripts/verify-dev-login.ts",
+    "oracle:verify": "tsx scripts/verify-oracle-ui.ts",
     "test:ui": "vitest run src/components src/routes src/hooks",
     "test:scripts": "vitest run scripts/",
     "test:changed": "vitest run --changed",

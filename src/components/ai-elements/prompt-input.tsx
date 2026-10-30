@@ -99,8 +99,8 @@ export interface PromptInputProps {
   /** Controlled draft, so the owner can keep it across views or restore it after a failed send. */
   value?: string
   onValueChange?: (text: string) => void
-  /** `docked` sits on the bottom edge of a panel; `inline` is the bare card used on the new chat screen. */
-  variant?: 'docked' | 'inline'
+  /** `docked` sits on the bottom edge of a panel; `inline` is the bare card used on the new chat screen; `floating` keeps the docked card without a backdrop. */
+  variant?: 'docked' | 'inline' | 'floating'
   /** Focus the box on mount (skipped on touch screens so the keyboard doesn't jump up). */
   autoFocus?: boolean
   /** One row: the text grows on the left with mic and send on the right (phones). */
@@ -247,7 +247,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
 
   const card = (
     <div
-      className={`pointer-events-auto bg-surface-2 border ${variant === 'docked' ? 'rounded-panel shadow-sm' : 'rounded-card'} transition-colors focus-within:border-line ${
+      className={`pointer-events-auto bg-surface-2 border ${variant !== 'inline' ? 'rounded-panel shadow-sm' : 'rounded-card'} transition-colors focus-within:border-line ${
         oneRow ? 'p-1.5' : 'p-2 sm:p-2.5'
       } ${dictation.isListening ? 'border-line' : 'border-line-subtle'}`}
     >
@@ -273,7 +273,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
               <OracleModelPicker
                 selectedModel={selectedModel}
                 onSelectModel={onSelectModel}
-                compactLabel={variant === 'docked'}
+                compactLabel={variant !== 'inline'}
               />
             )}
             </div>
@@ -294,7 +294,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
       node
     )
 
-  if (variant === 'inline') {
+  if (variant === 'inline' || variant === 'floating') {
     return <div className={className}>{withFootnote(card)}</div>
   }
 

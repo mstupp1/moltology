@@ -9,6 +9,7 @@
 ## Engineering
 
 - **Stack:** TanStack Start (SSR), React, Vite, Nitro, Tailwind, shadcn/ui (Radix); Neon PostgreSQL, Drizzle (`src/db/schema.ts`), JWT-based RLS; self-hosted Better Auth (`src/lib/auth-server.ts`, `src/lib/auth.ts`).
+- **Local development:** [Local development](docs/local-development.md) covers automatic worktree setup, custom ports, and the saved development account for browser verification.
 - **Database and writes:** Read [neon-data-platform](.agents/skills/neon-data-platform/SKILL.md) before schema, migration, seed, or authenticated mutation work. It owns branch, migration, seeding, and server/JWT write procedures.
 - **Design:** [Tailwind](tailwind.config.js) and [HUD CSS](src/index.css) define visual truth. Follow [UI tokens](docs/design/ui-tokens.md); use primitives in `src/components/ui/`.
 - **Notifications:** Use `ToastProvider`, `NotificationsProvider`, and the existing OS bridge. No `alert()`/`confirm()`, custom toast markup/state, or additional toast libraries. Read [notification rules](docs/design/notifications.md) before changing feedback or notifications.
