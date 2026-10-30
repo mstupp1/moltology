@@ -92,6 +92,7 @@ function OracleRouteComponent() {
       <div className="flex-1 min-h-0 bg-surface-1 sm:bg-abyss/40 backdrop-blur-md overflow-hidden relative">
         <React.Suspense fallback={<HudWorkspaceGhost />}>
           <LazyAIChatPanel
+            allowEntityMode
             desktopChatsSidebar
             userId={userId}
             threadId={activeThreadId}

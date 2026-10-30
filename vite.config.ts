@@ -41,7 +41,14 @@ function syncPublicEmailVerificationFlag(mode: string) {
   })
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
+  if (command === 'serve' && !isTest) {
+    // Server-only credentials stay in process.env; Vite exposes only VITE_* to clients.
+    const localEnv = loadEnv(mode, process.cwd(), '')
+    for (const [key, value] of Object.entries(localEnv)) {
+      if (process.env[key] === undefined) process.env[key] = value
+    }
+  }
   syncPublicGoogleAuthFlag(mode)
   syncPublicEmailVerificationFlag(mode)
   return {
@@ -57,11 +64,9 @@ export default defineConfig(({ mode }) => {
             ),
           },
         }),
-    ssr: {
-      noExternal: true,
-    },
+    // Keep generated caches in this checkout when node_modules is shared by worktrees.
+    cacheDir: 'tmp/vite',
     resolve: {
-      noExternal: true,
       mainFields: ['module', 'jsnext:main', 'jsnext', 'main'],
       alias: {
         '@': path.resolve(import.meta.dirname, './src'),
@@ -87,6 +92,8 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
       host: true,
+      // Auth uses the configured port. Fail clearly instead of silently changing origins.
+      strictPort: true,
       // Worktrees can share node_modules through a symlink outside the workspace.
       fs: {
         allow: [searchForWorkspaceRoot(process.cwd()), realpathSync(path.resolve(process.cwd(), 'node_modules'))],
@@ -118,6 +125,20 @@ export default defineConfig(({ mode }) => {
       ],
     },
     plugins: [
+      ...(!isTest && command === 'serve' ? [{
+        name: 'local-worktree-auth-origin',
+        enforce: 'pre',
+        config(config) {
+          // Nitro starts its worker before configResolved; set its inherited env now.
+          const port = Number.parseInt(process.env.PORT || '') || config.server?.port || 3000
+          process.env.BETTER_AUTH_URL = `http://localhost:${port}`
+          process.env.BETTER_AUTH_TRUSTED_ORIGINS = [
+            process.env.BETTER_AUTH_TRUSTED_ORIGINS,
+            `http://localhost:${port}`,
+            `http://127.0.0.1:${port}`,
+          ].filter(Boolean).join(',')
+        },
+      } satisfies import('vite').Plugin] : []),
       tailwindcss(),
       ...(isTest
         ? []
@@ -128,7 +149,7 @@ export default defineConfig(({ mode }) => {
                 autoCodeSplitting: true,
               },
             }),
-            nitro({ vercel: { functionRules: { '/api/store/recovery': { maxDuration: 240 } } } }),
+            nitro({ buildDir: '.nitro', vercel: { functionRules: { '/api/store/recovery': { maxDuration: 240 } } } }),
           ]),
       viteReact(),
       ...(shouldUseRedact ? [redact()] : []),
