@@ -28,7 +28,6 @@
     "pretest:integration": "node scripts/setup-dev-worktree.mjs --dependencies-only",
     "test:integration": "vitest run --configLoader runner --mode integration",
     "dev:verify-login": "tsx scripts/verify-dev-login.ts",
-    "oracle:verify": "tsx scripts/verify-oracle-ui.ts",
     "pretest:ui": "node scripts/setup-dev-worktree.mjs --dependencies-only",
     "test:ui": "vitest run --configLoader runner src/components src/routes src/hooks",
     "pretest:scripts": "node scripts/setup-dev-worktree.mjs --dependencies-only",
