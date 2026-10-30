@@ -35,6 +35,19 @@ rules:
       - file: src/lib/server/store.ts
         symbol: createQuotedCheckout
     tests: [src/lib/merch.test.ts]
+  - id: merch.once-per-email-claim
+    title: Once-per-email promotions reserve before checkout
+    kind: invariant
+    statement: Promotions marked once per email reserve the normalized email and promotion atomically with order creation. Pending and paid or refunded orders keep the claim; retries of the same order are allowed. A claim is released only after a provider-final payment failure or a matching Stripe-confirmed session expiration.
+    dependsOn: [merch.physical-checkout, merch.shipping-quote]
+    anchors:
+      - file: src/lib/server/store-coupon-claims.ts
+        symbol: createStoreCouponOrderClaim
+      - file: src/lib/server/merch.ts
+        symbol: fulfillMerchCheckoutEvent
+      - file: src/lib/merch.ts
+        symbol: MERCH_CHECKOUT_EVENT_TYPES
+    tests: [src/lib/server/store-coupon-claims.test.ts, src/lib/server/merch.test.ts, src/lib/server/store.integration.test.ts]
   - id: merch.draft-guard
     title: Test payments always create drafts
     kind: gate

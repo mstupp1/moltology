@@ -54,7 +54,7 @@ rules:
   - id: premium.webhook-signature
     title: Webhooks must be signed
     kind: gate
-    statement: The Stripe webhook verifies the signature before any membership or merch write. A missing secret returns 500, and a bad signature returns 400. Merch checkout events (completed, async payment succeeded or failed) go to merch fulfillment, which only sends an order to Printful once Stripe reports it paid. Everything else goes to membership sync.
+    statement: Stripe signatures are verified before membership or merch writes. A missing secret returns 500; a bad signature returns 400. Completed, async success/failure, and expired checkout events go to merch handling. Orders reach Printful only after payment; pending coupon claims release only on final failure or matching confirmed expiration. Other events go to membership sync.
     anchors:
       - file: src/lib/stripe-webhook.ts
         symbol: verifyStripeWebhookSignature

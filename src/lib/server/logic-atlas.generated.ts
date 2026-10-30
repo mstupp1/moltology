@@ -7,15 +7,15 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-10-28",
+  "syncedAt": "2026-10-30",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
-    "rules": 120,
-    "decisions": 43,
-    "anchors": 226,
-    "drifted": 27,
-    "flagged": 10
+    "rules": 122,
+    "decisions": 46,
+    "anchors": 234,
+    "drifted": 24,
+    "flagged": 9
   },
   "canvas": {
     "width": 6157,
@@ -266,6 +266,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "data.retention-windows",
         "data.retention-dry-run",
         "data.canonical-content",
+        "data.public-article-privacy",
         "data.migrations-via-ci",
         "data.asset-budget",
         "data.avatar-look-server",
@@ -283,13 +284,14 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "box": {
         "x": 3336,
         "y": 1988,
-        "width": 904,
+        "width": 992,
         "height": 988
       },
       "ruleIds": [
         "merch.private-pilot",
         "merch.catalog-price",
         "merch.physical-checkout",
+        "merch.once-per-email-claim",
         "merch.draft-guard",
         "merch.fulfillment-claim",
         "merch.dev-recovery",
@@ -307,7 +309,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Standing is a member's forum reputation, from upvotes plus review adjustments. It decides who can start threads, which replies sink, and who is limited.",
       "overviewHtml": "<p>Standing is the forum&#39;s reputation score. It comes from other members&#39; upvotes and gates the actions that cost the community the most: new threads and high reply volume.</p>",
       "box": {
-        "x": 4336,
+        "x": 4424,
         "y": 1988,
         "width": 1196,
         "height": 520
@@ -3122,7 +3124,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Webhooks must be signed",
       "kind": "gate",
       "status": "active",
-      "statement": "The Stripe webhook verifies the signature before any membership or merch write. A missing secret returns 500, and a bad signature returns 400. Merch checkout events (completed, async payment succeeded or failed) go to merch fulfillment, which only sends an order to Printful once Stripe reports it paid. Everything else goes to membership sync.",
+      "statement": "Stripe signatures are verified before membership or merch writes. A missing secret returns 500; a bad signature returns 400. Completed, async success/failure, and expired checkout events go to merch handling. Orders reach Printful only after payment; pending coupon claims release only on final failure or matching confirmed expiration. Other events go to membership sync.",
       "anchors": [
         {
           "file": "src/lib/stripe-webhook.ts",
@@ -3145,7 +3147,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "fulfillMerchCheckoutEvent",
           "line": 137,
           "value": "fulfillMerchCheckoutEvent(event, retry)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L137"
         }
       ],
@@ -3174,7 +3176,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 948,
         "y": 208
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "premium.event-sync",
@@ -4489,15 +4491,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Oracle request pipeline",
       "kind": "flow",
       "status": "active",
-      "statement": "Every Oracle message passes the flood guard, a last-turn check, and local input guardrails. Guests then get a canned reply with no model call. Members are checked against their usage allowance and the jailbreak preflight before a routed, streamed answer. If the allowance cannot be read, the request is refused with a 503 instead of calling the model.",
+      "statement": "Every message passes flood and local input checks. Guests get a canned reply. Members pass usage and prompt screening, then atomically reserve one allowance slot before a new thread or model call. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.",
       "anchors": [
         {
           "file": "src/lib/ai/handle-oracle-chat-request.ts",
           "symbol": "handleOracleChatRequest",
-          "line": 71,
+          "line": 72,
           "value": "handleOracleChatRequest(request)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L71"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L72"
         }
       ],
       "tests": [
@@ -4515,7 +4517,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "decisions": [
         "oracle-usage-and-moderation",
-        "security-scan-2026-10"
+        "security-scan-2026-10",
+        "atomic-oracle-allowance"
       ],
       "flag": null,
       "flow": {
@@ -4666,7 +4669,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           },
           {
             "id": "route",
-            "label": "Record usage, pick context and model",
+            "label": "Reserve usage and create a thread if needed",
             "kind": "action",
             "tone": "neutral",
             "position": {
@@ -4776,7 +4779,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1117,
         "y": 76
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "oracle.rate-limit",
@@ -4825,8 +4828,24 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Rolling allowances, Premium gets 10x",
       "kind": "limit",
       "status": "active",
-      "statement": "Free members can send 5 Oracle messages a minute, 15 in any rolling 5 hours, and 100 in any rolling 7 days. Premium gets 10 times each allowance. Both rolling windows must have capacity; availability is calculated from recorded timestamps. Usage survives thread deletion and is shared across server instances. Chat shows five-hour usage, with both windows in expanded details and Settings.",
+      "statement": "Free members can send 5 Oracle messages a minute, 15 per rolling 5 hours, and 100 per rolling 7 days. Premium receives 10x. Both windows must have capacity; usage is checked and reserved atomically across instances before model calls and survives thread deletion. New-thread failure releases the reservation. Chat shows five-hour usage and both windows in details and Settings.",
       "anchors": [
+        {
+          "file": "src/lib/ai/service.ts",
+          "symbol": "reserveOracleChatUsage",
+          "line": 295,
+          "value": "reserveOracleChatUsage(userId)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L295"
+        },
+        {
+          "file": "src/lib/ai/service.ts",
+          "symbol": "releaseOracleChatUsage",
+          "line": 372,
+          "value": "releaseOracleChatUsage(id)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L372"
+        },
         {
           "file": "src/lib/ai/usage-limits.ts",
           "symbol": "ORACLE_FREE_LIMITS",
@@ -4854,10 +4873,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "getOracleUsageSnapshot",
-          "line": 308,
+          "line": 400,
           "value": "getOracleUsageSnapshot(userId, now)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L308"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L400"
         },
         {
           "file": "src/lib/ai/usage-limits.ts",
@@ -4906,12 +4925,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "usedBy": [],
       "decisions": [
         "oracle-usage-and-moderation",
-        "oracle-rolling-allowances"
+        "oracle-rolling-allowances",
+        "atomic-oracle-allowance"
       ],
-      "flag": {
-        "level": "watch",
-        "note": "Usage checks fail closed when storage is unavailable. Checking capacity and recording a request remain separate operations, so concurrent requests can overshoot a cap."
-      },
+      "flag": null,
       "flow": null,
       "position": {
         "x": 612,
@@ -5790,6 +5807,62 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "drift": "changed"
     },
     {
+      "id": "data.public-article-privacy",
+      "domain": "data",
+      "title": "Only published articles are public",
+      "kind": "permission",
+      "status": "active",
+      "statement": "Public article and Markdown lookups return database or static fallback content only when the article is explicitly published. Missing and unpublished articles return no content.",
+      "anchors": [
+        {
+          "file": "src/lib/server/db-services.ts",
+          "symbol": "getBlogPostBySlugHandler",
+          "line": 633,
+          "value": "getBlogPostBySlugHandler({ data: slug, context })",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L633"
+        },
+        {
+          "file": "src/routes/news/$slug.tsx",
+          "symbol": "Route",
+          "line": 22,
+          "value": "createFileRoute('/news/$slug')({ loader: async ({ params }) => { try { const res = await getBlogPostBySlugFn({ data: params.slug }) if (res) return res } catch…",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/routes/news/$slug.tsx#L22"
+        },
+        {
+          "file": "src/routes/news/{$slug}[.]md.ts",
+          "symbol": "Route",
+          "line": 7,
+          "value": "createFileRoute('/news/{$slug}.md')({ server: { handlers: { GET: async ({ request, params }) => { const pathname = new URL(request.url).pathname const slugFrom…",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/routes/news/{$slug}[.]md.ts#L7"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/server/blog-post-privacy.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/blog-post-privacy.test.ts"
+        },
+        {
+          "file": "src/routes/news/-article-privacy.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/routes/news/-article-privacy.test.ts"
+        }
+      ],
+      "dependsOn": [],
+      "usedBy": [],
+      "decisions": [
+        "public-article-privacy"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 320,
+        "y": 76
+      },
+      "drift": "ok"
+    },
+    {
       "id": "data.migrations-via-ci",
       "domain": "data",
       "title": "Production migrations run in CI",
@@ -5813,7 +5886,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 612,
         "y": 76
       },
       "drift": "changed"
@@ -5852,8 +5925,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 612,
-        "y": 76
+        "x": 28,
+        "y": 208
       },
       "drift": "ok"
     },
@@ -5899,7 +5972,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 28,
+        "x": 320,
         "y": 208
       },
       "drift": "ok"
@@ -5938,7 +6011,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 28,
+        "x": 320,
         "y": 364
       },
       "drift": "ok"
@@ -5990,7 +6063,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 612,
         "y": 208
       },
       "drift": "ok"
@@ -6048,7 +6121,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 612,
         "y": 364
       },
       "drift": "ok"
@@ -6064,10 +6137,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/store.ts",
           "symbol": "requireStoreAccess",
-          "line": 27,
+          "line": 28,
           "value": "requireStoreAccess(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L27"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L28"
         }
       ],
       "tests": [
@@ -6090,7 +6163,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 568,
+        "x": 182,
         "y": 76
       },
       "drift": "ok"
@@ -6141,7 +6214,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 138,
         "y": 232
       },
       "drift": "ok"
@@ -6157,10 +6230,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/store.ts",
           "symbol": "createQuotedCheckout",
-          "line": 110,
+          "line": 111,
           "value": "createQuotedCheckout(args)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L110"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L111"
         }
       ],
       "tests": [
@@ -6172,7 +6245,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "dependsOn": [
         "merch.catalog-price"
       ],
-      "usedBy": [],
+      "usedBy": [
+        "merch.once-per-email-claim"
+      ],
       "decisions": [
         "private-merch-drafts",
         "store-launch-controls"
@@ -6180,10 +6255,73 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 28,
+        "x": 364,
         "y": 388
       },
-      "drift": "changed"
+      "drift": "ok"
+    },
+    {
+      "id": "merch.once-per-email-claim",
+      "domain": "merch",
+      "title": "Once-per-email promotions reserve before checkout",
+      "kind": "invariant",
+      "status": "active",
+      "statement": "Promotions marked once per email reserve the normalized email and promotion atomically with order creation. Pending and paid or refunded orders keep the claim; retries of the same order are allowed. A claim is released only after a provider-final payment failure or a matching Stripe-confirmed session expiration.",
+      "anchors": [
+        {
+          "file": "src/lib/server/store-coupon-claims.ts",
+          "symbol": "createStoreCouponOrderClaim",
+          "line": 27,
+          "value": "createStoreCouponOrderClaim(client, input)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-coupon-claims.ts#L27"
+        },
+        {
+          "file": "src/lib/server/merch.ts",
+          "symbol": "fulfillMerchCheckoutEvent",
+          "line": 137,
+          "value": "fulfillMerchCheckoutEvent(event, retry)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L137"
+        },
+        {
+          "file": "src/lib/merch.ts",
+          "symbol": "MERCH_CHECKOUT_EVENT_TYPES",
+          "line": 486,
+          "value": "[ 'checkout.session.completed', 'checkout.session.async_payment_succeeded', 'checkout.session.async_payment_failed', 'checkout.session.expired', ] as const",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/merch.ts#L486"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/server/store-coupon-claims.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-coupon-claims.test.ts"
+        },
+        {
+          "file": "src/lib/server/merch.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.test.ts"
+        },
+        {
+          "file": "src/lib/server/store.integration.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.integration.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "merch.physical-checkout",
+        "merch.shipping-quote"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "once-per-email-coupon-claims"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 408,
+        "y": 544
+      },
+      "drift": "ok"
     },
     {
       "id": "merch.draft-guard",
@@ -6233,7 +6371,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 72,
         "y": 388
       },
       "drift": "ok"
@@ -6299,7 +6437,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 72,
         "y": 544
       },
       "drift": "ok"
@@ -6323,10 +6461,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/merch.ts",
           "symbol": "retryMerchOrder",
-          "line": 190,
+          "line": 204,
           "value": "retryMerchOrder(orderId)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L190"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L204"
         }
       ],
       "tests": [
@@ -6350,7 +6488,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 72,
+        "x": 28,
         "y": 700
       },
       "drift": "changed"
@@ -6366,10 +6504,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/store.ts",
           "symbol": "createStoreQuote",
-          "line": 80,
+          "line": 81,
           "value": "createStoreQuote(args)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L80"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L81"
         },
         {
           "file": "src/lib/store.ts",
@@ -6394,6 +6532,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "merch.catalog-price"
       ],
       "usedBy": [
+        "merch.once-per-email-claim",
         "merch.customer-status"
       ],
       "decisions": [
@@ -6402,7 +6541,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 612,
+        "x": 656,
         "y": 388
       },
       "drift": "changed"
@@ -6440,7 +6579,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 612,
+        "x": 430,
         "y": 232
       },
       "drift": "ok"
@@ -6456,18 +6595,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/store.ts",
           "symbol": "getStoreStatus",
-          "line": 177,
+          "line": 191,
           "value": "getStoreStatus(orderId, token)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L177"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L191"
         },
         {
           "file": "src/lib/server/store.ts",
           "symbol": "limitStoreRequest",
-          "line": 58,
+          "line": 59,
           "value": "limitStoreRequest(key, maximum, windowMs)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L58"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L59"
         }
       ],
       "tests": [
@@ -6492,8 +6631,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 612,
-        "y": 544
+        "x": 700,
+        "y": 700
       },
       "drift": "changed"
     },
@@ -6544,7 +6683,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 364,
+        "x": 320,
         "y": 700
       },
       "drift": "ok"
@@ -6591,7 +6730,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 568,
+        "x": 364,
         "y": 856
       },
       "drift": "ok"
@@ -8914,6 +9053,139 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "html": "<p>Provider errors are visible and the user can retry; optional marketing failures do not\nblock signup, guide download, or contact-message delivery. Provider webhook retries cover\nfailed inbound opt-outs. A partial provider/local write can still need a repeated action.\nThe existing API key needs Full access for Contacts and Segments; changing permissions in\nthe dashboard avoids adding a second API key. Deployment requires the prepared segment\nIDs and signing secret, followed by enabling the webhook after the endpoint is live.</p>"
         }
       ]
+    },
+    {
+      "id": "atomic-oracle-allowance",
+      "date": "2026-10-30",
+      "title": "Reserve Oracle allowance atomically",
+      "summary": "Check and reserve Oracle usage in one serializable operation before a model call.",
+      "domains": [
+        "oracle"
+      ],
+      "rules": [
+        "oracle.request-pipeline",
+        "oracle.usage-allowance"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "pr",
+          "label": "PR #341",
+          "url": "https://github.com/mstupp1/moltology/pull/341"
+        },
+        {
+          "kind": "commit",
+          "label": "006f7e6",
+          "url": "https://github.com/mstupp1/moltology/commit/006f7e66a6c3a2013befd80818cc0b0cc3d581e3"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Concurrent Oracle requests could each pass the same allowance check and then start separate paid model calls. A failed usage write also allowed a request to continue without a recorded reservation.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Check the current rolling limits and insert the usage reservation in a serializable transaction before a model call. Retry serialization conflicts against a fresh transaction timestamp. Fail closed when reservation storage is unavailable, and release the reservation when creating a new conversation fails.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<p>Keeping capacity checks and usage writes separate leaves a concurrency window. Recording usage after a model call allows a request through when usage persistence fails.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>The free and Premium allowance values and usage display remain unchanged. Concurrent requests now compete for the same final slot, and failed new-thread creation does not consume allowance.</p>"
+        }
+      ]
+    },
+    {
+      "id": "once-per-email-coupon-claims",
+      "date": "2026-10-30",
+      "title": "Reserve once-per-email promotions before checkout",
+      "summary": "A normalized email and promotion are reserved atomically when an order is created, including while payment is pending.",
+      "domains": [
+        "merch"
+      ],
+      "rules": [
+        "merch.once-per-email-claim"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "pr",
+          "label": "PR #340",
+          "url": "https://github.com/mstupp1/moltology/pull/340"
+        },
+        {
+          "kind": "commit",
+          "label": "5085c4e",
+          "url": "https://github.com/mstupp1/moltology/commit/5085c4e661acc90d0bee28558af2c6654fcac59a"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Each checkout creates a separate Stripe customer. A shopper could open multiple unpaid orders with a once-per-email promotion before paying any of them, bypassing a check that counted only paid orders.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Reserve the normalized email and promotion in the same serializable database operation that creates the order. Keep the reservation for pending, paid, and refunded orders. Permit retries of the same order. Release a pending claim only after a final payment failure or a matching Stripe-confirmed session expiration.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<p>Relying on Stripe&#39;s per-customer restriction does not enforce an email-wide rule when each order has a separate customer. Releasing on the shopper&#39;s cancel redirect is not proof that the Stripe session can no longer complete.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Only one distinct pending or consumed order can hold a once-per-email promotion for an email address. A definitive provider failure or expiration allows a new order to claim it.</p>"
+        }
+      ]
+    },
+    {
+      "id": "public-article-privacy",
+      "date": "2026-10-30",
+      "title": "Keep unpublished articles private",
+      "summary": "Public article and Markdown lookups return content only for explicitly published database or static articles.",
+      "domains": [
+        "data"
+      ],
+      "rules": [
+        "data.public-article-privacy"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "pr",
+          "label": "PR #339",
+          "url": "https://github.com/mstupp1/moltology/pull/339"
+        },
+        {
+          "kind": "commit",
+          "label": "ac9ec2b",
+          "url": "https://github.com/mstupp1/moltology/commit/ac9ec2bf6b6c8c35e137e2c67f1bd63bd32c29f4"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Public slug lookups could return unpublished database posts, and both public route fallbacks could return unpublished static posts. The Markdown endpoint exposed the same article body as the page.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Require explicit publication for database lookups and every static fallback. Preserve published article behavior and return no article for unpublished or unknown slugs.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<p>Allowing public slug lookup to act as a draft preview would keep private content reachable without a staff gate. Draft previews need a separate authenticated path.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Article pages and Markdown responses share the same publication boundary. Static seeds are public only when their publication flag is true.</p>"
+        }
+      ]
     }
   ],
   "edges": [
@@ -9551,6 +9823,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "merch.catalog-price->merch.physical-checkout",
       "source": "merch.catalog-price",
       "target": "merch.physical-checkout",
+      "crossDomain": false
+    },
+    {
+      "id": "merch.physical-checkout->merch.once-per-email-claim",
+      "source": "merch.physical-checkout",
+      "target": "merch.once-per-email-claim",
+      "crossDomain": false
+    },
+    {
+      "id": "merch.shipping-quote->merch.once-per-email-claim",
+      "source": "merch.shipping-quote",
+      "target": "merch.once-per-email-claim",
       "crossDomain": false
     },
     {

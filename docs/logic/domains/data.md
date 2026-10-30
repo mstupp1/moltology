@@ -59,6 +59,18 @@ rules:
     anchors:
       - file: src/lib/data-retention.ts
         symbol: buildTablePolicies
+  - id: data.public-article-privacy
+    title: Only published articles are public
+    kind: permission
+    statement: Public article and Markdown lookups return database or static fallback content only when the article is explicitly published. Missing and unpublished articles return no content.
+    anchors:
+      - file: src/lib/server/db-services.ts
+        symbol: getBlogPostBySlugHandler
+      - file: src/routes/news/$slug.tsx
+        symbol: Route
+      - file: src/routes/news/{$slug}[.]md.ts
+        symbol: Route
+    tests: [src/lib/server/blog-post-privacy.test.ts, src/routes/news/-article-privacy.test.ts]
   - id: data.migrations-via-ci
     title: Production migrations run in CI
     kind: flow
