@@ -10,7 +10,7 @@
   },
   "scripts": {
     "predev": "node scripts/setup-dev-worktree.mjs",
-    "dev": "vite dev",
+    "dev": "node scripts/dev.mjs",
     "build": "vite build && tsc --noEmit && node scripts/prune-vercel-function.mjs",
     "start": "node .output/server/index.mjs",
     "preview": "vite preview",
