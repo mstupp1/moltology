@@ -32,7 +32,7 @@ export const Route = createFileRoute('/news/{$slug}.md')({
         }
 
         if (!post) {
-          post = INITIAL_BLOG_POSTS.find((candidate) => candidate.slug === slug) ?? null
+          post = INITIAL_BLOG_POSTS.find((candidate) => candidate.slug === slug && candidate.isPublished === true) ?? null
         }
 
         if (!post) {

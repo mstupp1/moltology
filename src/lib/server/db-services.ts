@@ -637,7 +637,7 @@ export const getBlogPostBySlugHandler = async ({ data: slug, context }: ServerFn
     const records = await dbClient
       .select()
       .from(blogPosts)
-      .where(eq(blogPosts.slug, slug))
+      .where(and(eq(blogPosts.slug, slug), eq(blogPosts.isPublished, true)))
       .limit(1)
 
     if (records.length > 0) {
@@ -666,7 +666,7 @@ export const getBlogPostBySlugHandler = async ({ data: slug, context }: ServerFn
     console.warn(`[getBlogPostBySlugFn] Error loading post ${slug} from DB, fallback checking:`, err)
   }
 
-  const fallback = INITIAL_BLOG_POSTS.find((p) => p.slug === slug)
+  const fallback = INITIAL_BLOG_POSTS.find((p) => p.slug === slug && p.isPublished === true)
   return fallback ?? null
 }
 
