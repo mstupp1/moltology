@@ -40,7 +40,7 @@ function kebabFor(title: string) {
 }
 
 function touchPointer(target: HTMLElement, type: string, x = 20, y = 20) {
-  const event = new Event(type === 'pointerleave' ? 'pointerout' : type, { bubbles: true, cancelable: true })
+  const event = new Event(type, { bubbles: type !== 'pointerleave', cancelable: true })
   Object.assign(event, { pointerType: 'touch', pointerId: 1, isPrimary: true, clientX: x, clientY: y })
   fireEvent(target, event)
 }
