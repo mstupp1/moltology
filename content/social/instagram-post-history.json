@@ -891,6 +891,50 @@
         "height": 2880
       },
       "verifiedAt": "2026-10-29T18:28:06.025Z"
+    },
+    {
+      "id": "carousel-1793365572602",
+      "type": "carousel",
+      "topic": "Rewrite a sprawling project as one visible next action",
+      "theme": "ecdysis",
+      "mascot": "lobster_engineer",
+      "articleSlug": null,
+      "archivePath": "Social Archive/2026/10/carousel-0eefcc7097361db68148a6ba",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/media/1793365574246_2538e570fac1fcb4_01.png",
+        "https://media.zernio.com/media/1793365575681_470263b6161a5cc9_02.png",
+        "https://media.zernio.com/media/1793365576749_c16d864cc09ca994_03.png",
+        "https://media.zernio.com/media/1793365577782_1ba215007c3c7a73_04.png",
+        "https://media.zernio.com/media/1793365578845_44a4c0855be986aa_05.png"
+      ],
+      "slideUrls": [
+        "https://media.zernio.com/media/1793365574246_2538e570fac1fcb4_01.png",
+        "https://media.zernio.com/media/1793365575681_470263b6161a5cc9_02.png",
+        "https://media.zernio.com/media/1793365576749_c16d864cc09ca994_03.png",
+        "https://media.zernio.com/media/1793365577782_1ba215007c3c7a73_04.png",
+        "https://media.zernio.com/media/1793365578845_44a4c0855be986aa_05.png"
+      ],
+      "slideCount": 5,
+      "aspectRatio": "3:4",
+      "caption": "“Website” is not a task. It is a continent.\n\nGive the expedition one small destination: draft three homepage headlines. Three rough options is a finish line.\nBefore you stop, leave the first move in writing: open one blank note. Your Monday shell can take it from there.\n\nSave this task rewrite for Monday planning.",
+      "hashtags": [
+        "#Moltology",
+        "#DeepWork",
+        "#TaskPlanning"
+      ],
+      "firstComment": "https://moltology.org",
+      "status": "scheduled",
+      "scheduledFor": "2026-11-02T18:00:00.000Z",
+      "queueId": "6a84b76d2421e968ac81f5bc",
+      "zernioPostId": "6ae4964b8c0315a22ec178aa",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "createdAt": "2026-10-30T13:06:25.687Z",
+      "verifiedDimensions": {
+        "width": 2160,
+        "height": 2880
+      },
+      "verifiedAt": "2026-10-30T13:06:52.506Z"
     }
   ]
 }
