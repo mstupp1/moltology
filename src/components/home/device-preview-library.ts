@@ -9,6 +9,7 @@ export const DEVICE_PREVIEW_LIBRARY = [
   { id: 'oracle', label: 'Oracle', route: '/oracle', alt: 'A new conversation with the Oracle', caption: 'Ask the Oracle for a plan, a nudge or a straight answer.', focus: { x: 0.29, y: 0.04, w: 0.7 } },
   { id: 'moltmax', label: 'Moltmax', route: '/moltmax', alt: 'A Moltmax diagnostic question with answers to choose from', caption: 'The Moltmax diagnostic shows how your focus holds up under noise.', focus: { x: 0.12, y: 0.13, w: 0.76 } },
   { id: 'market', label: 'Market', route: '/market', alt: 'The Benthic Market catalog', caption: 'The Benthic Market, for cosmetics and extras.', focus: { x: 0.185, y: 0.04, w: 0.8 } },
+  { id: 'chassis', label: 'Character', route: '/chassis', alt: 'The character studio and equipment catalog', caption: 'Customize your character and preview equipment in the studio.', focus: { x: 0.185, y: 0.04, w: 0.8 } },
   { id: 'codex', label: 'Codex', route: '/codex', alt: 'The Benthic Codex scripture library', caption: 'The Codex, the library of Moltology scripture.', focus: { x: 0.185, y: 0.04, w: 0.8 } },
 ] as const
 
