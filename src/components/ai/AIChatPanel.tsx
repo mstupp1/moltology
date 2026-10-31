@@ -39,7 +39,6 @@ import { getOracleDefaultModelId, canUseOracleChatModel, getOracleModel, DEFAULT
 import { AuthModal } from '../AuthModal'
 import { useAuthSession } from '../../hooks/useAuthSession'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
-import { isAdmin } from '../../lib/permissions'
 import { resolveMemberPublicName } from '../../lib/member-handle'
 import { getAuthJWTToken } from '../../lib/jwt'
 import { oracleAuthData } from '../../lib/ai/oracle-auth-client'
@@ -194,9 +193,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSending, setIsSending] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
-  const [selectedModelId, setSelectedModelId] = useState<string | null>(null)
+  const [modelChoice, setModelChoice] = useState<{ userId: string | null; id: string } | null>(null)
+  const selectedModelId = modelChoice?.userId === userId ? modelChoice.id : null
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  const [profileRole, setProfileRole] = useState<string | null>(null)
   const [memberHandle, setMemberHandle] = useState<string | null>(null)
   const [memberLarvaId, setMemberLarvaId] = useState<string | null>(null)
   const [draft, setDraft] = useState('')
@@ -240,11 +239,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const stickToBottomRef = useRef(true)
   const abortRef = useRef<AbortController | null>(null)
 
-  const canPickModel = isAdmin(user, profileRole)
 
   useEffect(() => {
     if (!userId) {
-      setProfileRole(null)
       setMemberHandle(null)
       setMemberLarvaId(null)
       return
@@ -256,13 +253,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         const token = await getAuthJWTToken().catch(() => null)
         const profile = await getUserProfileFn({ data: { token: token ?? undefined, userId } })
         if (isSubscribed) {
-          setProfileRole(profile?.role ?? null)
           setMemberHandle(profile?.handle ?? null)
           setMemberLarvaId(profile?.larvaId ?? null)
         }
       } catch {
         if (isSubscribed) {
-          setProfileRole(null)
           setMemberHandle(null)
           setMemberLarvaId(null)
         }
@@ -807,8 +802,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         placeholder={placeholder}
         autoFocus
         accessTier={accessTier}
-        selectedModel={canPickModel ? selectedModel : undefined}
-        onSelectModel={canPickModel ? (id) => setSelectedModelId(id) : undefined}
+        selectedModel={selectedModel}
+        onSelectModel={(id) => {
+          if (canUseOracleChatModel(getOracleModel(id), accessTier)) setModelChoice({ userId, id })
+        }}
       />
     </div>
   )

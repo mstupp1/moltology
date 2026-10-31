@@ -15,8 +15,8 @@ export const FEATURE_FLAGS = {
   premium: {
     id: 'premium',
     experiment: 'premium',
-    label: 'Go Premium',
-    description: 'Monthly premium subscription badge and access',
+    label: 'Go Oracle MAX',
+    description: 'Monthly Oracle MAX subscription badge and access',
     audience: 'admin-only',
   },
 } as const satisfies Record<string, FeatureFlagDefinition>

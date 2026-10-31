@@ -10,7 +10,7 @@ import {
   pickGuestOracleResponse,
   toModelMessages,
 } from './oracle-chat'
-import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel, ORACLE_TITLE_MODEL_ID, PREMIUM_ORACLE_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID, getOracleTitleModelId, getOracleGenerationOptions } from './oracle-models'
+import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel, ORACLE_TITLE_MODEL_ID, PREMIUM_ORACLE_MODEL_ID, PREMIUM_DEEPSEEK_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID, getOracleTitleModelId, getOracleGenerationOptions } from './oracle-models'
 
 describe('oracle-chat helpers', () => {
   it('keeps chat and title defaults explicit for each membership tier', () => {
@@ -22,7 +22,7 @@ describe('oracle-chat helpers', () => {
   })
 
   it('lists preview, free chat/titles, premium chat, and premium titles', () => {
-    expect(ORACLE_MODELS.map((m) => m.access)).toEqual(['guest', 'free', 'premium', 'premium'])
+    expect(ORACLE_MODELS.map((m) => m.access)).toEqual(['guest', 'free', 'premium', 'premium', 'premium'])
     expect(getOracleModel(PREMIUM_ORACLE_TITLE_MODEL_ID).roles).toEqual(['titles'])
   })
 
@@ -46,7 +46,7 @@ describe('oracle-chat helpers', () => {
   })
 
   it('never routes free accounts to premium, titles-only, or preview entries', () => {
-    for (const requested of [undefined, 'unknown-model', PREMIUM_ORACLE_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID, 'guest-preview']) {
+    for (const requested of [undefined, 'unknown-model', PREMIUM_ORACLE_MODEL_ID, PREMIUM_DEEPSEEK_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID, 'guest-preview']) {
       expect(getOracleCandidateModelIds(requested)).toEqual([DEFAULT_ORACLE_MODEL_ID])
     }
     expect(getOracleCandidateModelIds(undefined, 'guest')).toEqual([])
@@ -56,11 +56,19 @@ describe('oracle-chat helpers', () => {
     for (const requested of [undefined, DEFAULT_ORACLE_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID]) {
       expect(orderOracleModels(requested, DEFAULT_ORACLE_MODEL_ID, 'premium')).toEqual([PREMIUM_ORACLE_MODEL_ID])
     }
-    for (const model of [PREMIUM_ORACLE_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID]) {
+    for (const model of [PREMIUM_DEEPSEEK_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID]) {
       expect(getOracleGenerationOptions(model)).toMatchObject({
         providerOptions: { gateway: { only: ['deepinfra'], disallowPromptTraining: true } },
       })
     }
+  })
+
+  it('preserves the selected MAX model and its no-training route without fallback', () => {
+    expect(orderOracleModels(PREMIUM_DEEPSEEK_MODEL_ID, undefined, 'premium')).toEqual([PREMIUM_DEEPSEEK_MODEL_ID])
+    expect(orderOracleModels(PREMIUM_ORACLE_MODEL_ID, undefined, 'premium')).toEqual([PREMIUM_ORACLE_MODEL_ID])
+    expect(getOracleGenerationOptions(PREMIUM_ORACLE_MODEL_ID)).toMatchObject({
+      providerOptions: { gateway: { only: ['anthropic'], disallowPromptTraining: true } },
+    })
   })
 
   it('never shows provider error text to the member', () => {

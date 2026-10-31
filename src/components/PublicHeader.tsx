@@ -41,8 +41,6 @@ type NavTabId = 'home' | 'news' | 'forum' | 'moltmax' | 'about' | 'org' | 'store
 interface NavTab {
   id: NavTabId
   label: string
-  /** One line shown under the label in the phone menu. */
-  hint: string
   path?: string
   href?: string
   Icon?: React.ComponentType<{ className?: string }>
@@ -51,13 +49,13 @@ interface NavTab {
 
 const NAV_TABS: NavTab[] = [
   // The brand beside the nav reads "Moltology", so the tab stays short.
-  { id: 'home', label: 'Home', hint: 'Start here', path: '/' },
-  { id: 'news', label: 'News', hint: 'Updates, releases and the blog', path: '/news', Icon: Newspaper },
-  { id: 'forum', label: 'Forum', hint: 'Talk with other members', path: '/forum', Icon: MessageSquare },
-  { id: 'moltmax', label: 'Moltmax', hint: 'Take the clearance audit', path: '/moltmax', Icon: Activity },
-  { id: 'about', label: 'About', hint: 'What Moltology believes', path: '/what-is-moltology', Icon: Info },
-  { id: 'org', label: 'Organization', hint: 'Who runs it and how to reach us', path: '/org', Icon: Building2 },
-  { id: 'store', label: 'Store', hint: 'Merch and gear', href: 'https://www.etsy.com/shop/SaasTrash', Icon: ShoppingBag, external: true },
+  { id: 'home', label: 'Home', path: '/' },
+  { id: 'news', label: 'News', path: '/news', Icon: Newspaper },
+  { id: 'forum', label: 'Forum', path: '/forum', Icon: MessageSquare },
+  { id: 'moltmax', label: 'Moltmax', path: '/moltmax', Icon: Activity },
+  { id: 'about', label: 'About', path: '/what-is-moltology', Icon: Info },
+  { id: 'org', label: 'Organization', path: '/org', Icon: Building2 },
+  { id: 'store', label: 'Store', href: 'https://www.etsy.com/shop/SaasTrash', Icon: ShoppingBag, external: true },
 ]
 
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect
@@ -477,12 +475,11 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         ? 'bg-surface-3 shadow-nav-current'
         : 'hover:bg-surface-2 active:bg-surface-2'
     }`
-    const labelCls = `block font-grotesk font-semibold text-base leading-tight ${
+    const labelCls = `font-grotesk font-semibold text-base leading-tight ${
       isStore
         ? 'text-amber-300'
         : 'text-ink'
     }`
-    const hintCls = 'block text-xs leading-snug mt-0.5 text-ink-muted'
     const icon =
       tab.id === 'home' ? (
         <BrandIcon aria-hidden="true" width={20} height={20} className="w-5 h-5 object-contain shrink-0" />
@@ -503,10 +500,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     const content = (
       <>
         {icon}
-        <span className="min-w-0 flex-1">
-          <span className={labelCls}>{tab.label}</span>
-          <span className={hintCls}>{tab.hint}</span>
-        </span>
+        <span className={`min-w-0 flex-1 ${labelCls}`}>{tab.label}</span>
         {tab.external && (
           <ExternalLink
             aria-hidden="true"

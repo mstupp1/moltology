@@ -141,10 +141,10 @@ describe('AIChatPanel Guest Mode Gating', () => {
     expect(screen.queryByText(/Sign up free for full answers/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/You're exploring as a guest/i)).not.toBeInTheDocument()
     expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Select model/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Select model/i })).toBeInTheDocument()
   })
 
-  it('shows model picker for admin users', async () => {
+  it('shows model choices for admin users', async () => {
     const { getUserProfileFn } = await import('@/lib/server/api')
     ;(getUserProfileFn as any).mockResolvedValueOnce({ role: 'admin' })
 
@@ -158,6 +158,21 @@ describe('AIChatPanel Guest Mode Gating', () => {
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /Select model/i })).toBeInTheDocument()
     })
+  })
+
+  it('defaults MAX members to Abyss and resets the choice after sign-out', async () => {
+    const snapshot = buildOracleUsageSnapshot([], true)
+    vi.mocked(useOracleUsage).mockReturnValue({ snapshot, unavailable: false, blocked: false, refresh: vi.fn() })
+    const { rerender } = render(<AIChatPanel userId="usr_max" />)
+    expect(screen.getByRole('button', { name: /Select model/i })).toHaveTextContent('Abyss')
+    fireEvent.keyDown(screen.getByRole('button', { name: /Select model/i }), { key: 'Enter' })
+    fireEvent.click(await screen.findByRole('menuitemradio', { name: /DeepSeek V4.1 Flash/i }))
+    expect(screen.getByRole('button', { name: /Select model/i })).toHaveTextContent('DeepSeek')
+    vi.mocked(useOracleUsage).mockReturnValue({ snapshot: null, unavailable: false, blocked: false, refresh: vi.fn() })
+    rerender(<AIChatPanel userId={null} />)
+    expect(screen.getByRole('button', { name: /Select model/i })).toHaveTextContent('Preview')
+    fireEvent.keyDown(screen.getByRole('button', { name: /Select model/i }), { key: 'Enter' })
+    expect(await screen.findByRole('menuitemradio', { name: /Oracle Abyss/i })).toHaveAttribute('aria-disabled', 'true')
   })
 
   it('submits a shortcut in guest mode and ensures conversation starts with user message and no canned message before it', async () => {

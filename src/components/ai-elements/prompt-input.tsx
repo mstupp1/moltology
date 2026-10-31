@@ -38,7 +38,7 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
   const [open, setOpen] = useState(false)
 
   return (
-    <HudDropdownMenu open={open} onOpenChange={setOpen}>
+    <HudDropdownMenu modal={false} open={open} onOpenChange={setOpen}>
       <HudDropdownMenuTrigger asChild>
         <button
           type="button"
@@ -74,13 +74,15 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
             const canSelect = canUseOracleChatModel(model, accessTier)
             const isSelected = canSelect && model.id === selectedModel.id
             const purpose = isPreview ? 'Preview' : model.roles.includes('titles') ? (isChat ? 'Chat + Titles' : 'Titles') : 'Chat'
-            const access = model.access === 'guest' ? 'Guest' : model.access === 'premium' ? 'Premium' : 'Free'
-            const note = !isChat ? (isPreview ? 'Automatic preview replies' : 'Automatic titles only') : !hasAccess ? (accessTier === 'guest' ? 'Sign in to use chat' : 'Requires Premium') : accessTier === 'premium' && !model.noPromptTraining ? 'Free members only; Premium uses providers that do not train on your data.' : undefined
+            const access = model.access === 'guest' ? 'Guest' : model.access === 'premium' ? 'Oracle MAX' : 'Free'
+            const note = !isChat ? (isPreview ? 'Automatic preview replies' : 'Automatic titles only') : !hasAccess ? (accessTier === 'guest' ? 'Sign in to use chat' : 'Requires Oracle MAX') : accessTier === 'premium' && !model.noPromptTraining ? 'Free members only; Oracle MAX uses providers that do not train on your data.' : undefined
 
             return (
               <HudDropdownMenuItem
                 key={model.id}
                 disabled={!canSelect}
+                role="menuitemradio"
+                aria-checked={isSelected}
                 onSelect={() => onSelectModel(model.id)}
                 className={`grid grid-cols-1 gap-2 rounded-none border-b border-line-subtle px-4 py-3 last:border-0 sm:grid-cols-[minmax(0,1fr)_190px] sm:gap-4 data-[disabled]:opacity-100 ${isSelected ? 'bg-surface-3' : ''}`}
               >
@@ -114,6 +116,7 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
             )
           })}
         </div>
+        {accessTier !== 'premium' && <a href="/premium" className="block border-t border-line-subtle px-4 py-3 text-xs text-cyan-glow hover:underline">Explore Oracle MAX</a>}
         <p className="border-t border-line-subtle px-4 py-3 text-[11px] leading-relaxed text-ink-muted">Prices per million tokens. Listed prices and latency may change.</p>
       </HudDropdownMenuContent>
     </HudDropdownMenu>

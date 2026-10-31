@@ -71,7 +71,7 @@ describe('PromptInput', () => {
       expect(within(menu).getByText(model.label)).toBeInTheDocument()
     }
     expect(within(menu).getAllByText('In / 1M')).toHaveLength(ORACLE_MODELS.length)
-    expect(within(menu).getAllByText('Premium').length).toBeGreaterThan(0)
+    expect(within(menu).getAllByText('Oracle MAX').length).toBeGreaterThan(0)
     expect(within(menu).getAllByText('Free').length).toBeGreaterThan(0)
     expect(within(menu).getByText('Guest')).toBeInTheDocument()
     expect(within(menu).getByText('Titles')).toBeInTheDocument()
@@ -84,7 +84,7 @@ describe('PromptInput', () => {
     render(<OracleModelPicker selectedModel={freeChat} onSelectModel={onSelectModel} accessTier="free" />)
     fireEvent.keyDown(screen.getByRole('button', { name: 'Select model' }), { key: 'Enter' })
     for (const model of ORACLE_MODELS.filter((model) => model.access !== 'free' || !model.roles.includes('chat'))) {
-      const row = screen.getByRole('menuitem', { name: new RegExp(model.label) })
+      const row = screen.getByRole('menuitemradio', { name: new RegExp(model.label) })
       expect(row).toHaveAttribute('aria-disabled', 'true')
       fireEvent.click(row)
     }
@@ -97,7 +97,7 @@ describe('PromptInput', () => {
     const premiumChat = ORACLE_MODELS.find((model) => model.access === 'premium' && model.roles.includes('chat'))!
     render(<OracleModelPicker selectedModel={getOracleModel()} onSelectModel={onSelectModel} accessTier="premium" />)
     fireEvent.keyDown(screen.getByRole('button', { name: 'Select model' }), { key: 'Enter' })
-    fireEvent.click(screen.getByRole('menuitem', { name: new RegExp(premiumChat.label) }))
+    fireEvent.click(screen.getByRole('menuitemradio', { name: new RegExp(premiumChat.label) }))
     expect(onSelectModel).toHaveBeenCalledWith(premiumChat.id)
     await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument())
   })
@@ -138,7 +138,7 @@ describe('PromptInput', () => {
     const free = ORACLE_MODELS.find((model) => model.access === 'free')!
     render(<OracleModelPicker selectedModel={premium} onSelectModel={onSelectModel} accessTier="premium" />)
     fireEvent.keyDown(screen.getByRole('button', { name: 'Select model' }), { key: 'Enter' })
-    const row = screen.getByRole('menuitem', { name: new RegExp(free.label) })
+    const row = screen.getByRole('menuitemradio', { name: new RegExp(free.label) })
     expect(row).toHaveAttribute('aria-disabled', 'true')
     fireEvent.click(row)
     expect(onSelectModel).not.toHaveBeenCalled()

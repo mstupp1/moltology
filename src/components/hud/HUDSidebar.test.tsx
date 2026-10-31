@@ -407,7 +407,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.queryByText(/LARVA UNIT/)).not.toBeInTheDocument()
   })
 
-  it('hides admin tools and Go Premium badge from members', async () => {
+  it('hides admin tools and Go Oracle MAX badge from members', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -426,11 +426,11 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     await waitFor(() => {
       expect(mockGetUserProfileFn).toHaveBeenCalled()
     })
-    expect(screen.queryByRole('button', { name: /Go Premium/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Go Oracle MAX/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^ADMIN$/i })).not.toBeInTheDocument()
   })
 
-  it('shows admin nav and Go Premium for opted-in admins', async () => {
+  it('shows admin nav and Go Oracle MAX for opted-in admins', async () => {
     mockGetUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['premium'] })
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
@@ -450,7 +450,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(adminItem).toBeInTheDocument()
     expect(adminItem).not.toHaveAttribute('data-hidden', 'true')
 
-    const premiumBadge = await screen.findByRole('button', { name: /Go Premium/i })
+    const premiumBadge = await screen.findByRole('button', { name: /Go Oracle MAX/i })
     expect(premiumBadge).toBeInTheDocument()
     expect(premiumBadge).not.toHaveAttribute('data-hidden', 'true')
 
@@ -459,7 +459,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(adminItem.compareDocumentPosition(supportItem)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
   })
 
-  it('shows admin nav item and Go Premium badge when admin clearance lives only on the profile', async () => {
+  it('shows admin nav item and Go Oracle MAX badge when admin clearance lives only on the profile', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -476,10 +476,10 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     render(<HUDSidebar />)
 
     expect(await screen.findByRole('button', { name: /^ADMIN$/i })).toBeInTheDocument()
-    expect(await screen.findByRole('button', { name: /Go Premium/i })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /Go Oracle MAX/i })).toBeInTheDocument()
   })
 
-  it('stacks admin above support and hides Go Premium when sidebar is collapsed', async () => {
+  it('stacks admin above support and hides Go Oracle MAX when sidebar is collapsed', async () => {
     mockGetUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['premium'] })
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
@@ -495,14 +495,14 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     render(<HUDSidebar />)
 
-    // Initially expanded: Go Premium row visible
-    expect(await screen.findByRole('button', { name: /Go Premium/i })).toBeInTheDocument()
+    // Initially expanded: Go Oracle MAX row visible
+    expect(await screen.findByRole('button', { name: /Go Oracle MAX/i })).toBeInTheDocument()
 
     // Collapse via Cmd+B
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
 
-    // Go Premium is hidden when collapsed
-    expect(screen.queryByRole('button', { name: /Go Premium/i })).not.toBeInTheDocument()
+    // Go Oracle MAX is hidden when collapsed
+    expect(screen.queryByRole('button', { name: /Go Oracle MAX/i })).not.toBeInTheDocument()
 
     // Admin button is stacked above support
     const collapsedAdmin = screen.getByRole('button', { name: /^ADMIN$/i })
@@ -512,7 +512,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(collapsedAdmin.compareDocumentPosition(collapsedSupport)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
   })
 
-  it('shows the account row with the plan and Go Premium below support for free members', async () => {
+  it('shows the account row with the plan and Go Oracle MAX below support for free members', async () => {
     mockGetUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['premium'] })
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'admin-1', name: 'Admin', email: 'ops@example.com', role: 'admin' } } as any,
@@ -521,7 +521,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     render(<HUDSidebar />)
 
-    const goPremium = await screen.findByRole('button', { name: /Go Premium/i })
+    const goPremium = await screen.findByRole('button', { name: /Go Oracle MAX/i })
     const supportItem = screen.getByRole('button', { name: /HELP & SUPPORT/i })
     const accountRow = screen.getByRole('button', { name: /User account menu/i })
     expect(supportItem.compareDocumentPosition(goPremium)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
@@ -532,7 +532,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/premium' })
   })
 
-  it('hides Go Premium and labels the account row for current Premium members', async () => {
+  it('hides Go Oracle MAX and labels the account row for current Oracle MAX members', async () => {
     mockGetUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['premium'] })
     mockGetPremiumMembershipFn.mockResolvedValue({ hasPurchasedPremium: true, isPremium: true })
     vi.mocked(authClient.useSession).mockReturnValue({
@@ -543,9 +543,9 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     render(<HUDSidebar />)
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /User account menu/i })).toHaveTextContent('Premium member')
+      expect(screen.getByRole('button', { name: /User account menu/i })).toHaveTextContent('Oracle MAX member')
     })
-    expect(screen.queryByRole('button', { name: /Go Premium/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Go Oracle MAX/i })).not.toBeInTheDocument()
   })
 
   it('shows the larva unit in the account menu when no designation is claimed', async () => {

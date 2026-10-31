@@ -62,8 +62,8 @@ export function PlanUsageSection({ userId }: { userId: string | null }) {
   if (!userId) return null
   return <HudCard className="p-3 sm:p-4 md:p-5 space-y-3">
     <h2 className="font-grotesk text-sm font-bold text-ink">Plan &amp; usage</h2>
-    {usage.snapshot && <p className="text-xs text-ink-muted">{usage.snapshot.isPremium ? 'Premium' : 'Free'} plan · Oracle messages</p>}
+    {usage.snapshot && <p className="text-xs text-ink-muted">{usage.snapshot.isPremium ? 'Oracle MAX' : 'Free'} plan · Oracle messages</p>}
     <OracleUsage snapshot={usage.snapshot} unavailable={usage.unavailable} expanded />
-    {access.canView && <Link to="/premium" className="inline-block text-xs text-ink-muted underline underline-offset-2 hover:text-ink">View Premium</Link>}
+    {access.canView && <Link to="/premium" className="inline-block text-xs text-ink-muted underline underline-offset-2 hover:text-ink">View Oracle MAX</Link>}
   </HudCard>
 }

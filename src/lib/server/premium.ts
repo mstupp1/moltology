@@ -49,7 +49,7 @@ function createStripeClient(secretKey: string) {
 }
 
 function configErrorMessage(error: unknown): string | null {
-  if (error instanceof Error && error.message.startsWith('Premium billing is not configured')) {
+  if (error instanceof Error && error.message.startsWith('Oracle MAX billing is not configured')) {
     return error.message
   }
   return null
@@ -69,13 +69,13 @@ function toPublicBillingError(error: unknown, fallback: string): Error {
     if (
       configErrorMessage(error) ||
       error.message === 'This page is not available.' ||
-      error.message === 'Subscribe to Premium before managing a membership.' ||
+      error.message === 'Subscribe to Oracle MAX before managing a membership.' ||
       error.message.startsWith('Unauthenticated') ||
       error.message.startsWith('Unauthorized') ||
       error.message === 'Could not load your membership. Try again.' ||
-      error.message === 'Could not update Premium. Try again.' ||
-      error.message === 'Could not activate Premium. Try again.' ||
-      error.message === 'Could not cancel Premium. Try again.' ||
+      error.message === 'Could not update Oracle MAX. Try again.' ||
+      error.message === 'Could not activate Oracle MAX. Try again.' ||
+      error.message === 'Could not cancel Oracle MAX. Try again.' ||
       error.message === 'Could not cancel the paid membership. Try again later.'
     ) {
       return error
@@ -138,7 +138,7 @@ export async function getPremiumOfferHandler(args: HandlerArgs): Promise<Premium
     const price = await stripe.prices.retrieve(config.priceId!)
     if (!premiumPriceMatchesProduct(price.product, config.productId)) {
       throw new Error(
-        'Premium billing is not configured. STRIPE_PREMIUM_PRICE_ID does not match STRIPE_PREMIUM_PRODUCT_ID.',
+        'Oracle MAX billing is not configured. STRIPE_PREMIUM_PRICE_ID does not match STRIPE_PREMIUM_PRODUCT_ID.',
       )
     }
     return {
@@ -158,7 +158,7 @@ export async function getPremiumOfferHandler(args: HandlerArgs): Promise<Premium
       ...base,
       priceLabel: null,
       configured: false,
-      configMessage: configMessage ?? 'Could not load Premium pricing. Try again.',
+      configMessage: configMessage ?? 'Could not load Oracle MAX pricing. Try again.',
     }
   }
 }
@@ -171,7 +171,7 @@ export async function createPremiumCheckoutHandler(args: HandlerArgs): Promise<{
     const price = await stripe.prices.retrieve(config.priceId!)
     if (!premiumPriceMatchesProduct(price.product, config.productId)) {
       throw new Error(
-        'Premium billing is not configured. STRIPE_PREMIUM_PRICE_ID does not match STRIPE_PREMIUM_PRODUCT_ID.',
+        'Oracle MAX billing is not configured. STRIPE_PREMIUM_PRICE_ID does not match STRIPE_PREMIUM_PRODUCT_ID.',
       )
     }
     const origin = resolvePremiumReturnOrigin(process.env.BETTER_AUTH_URL)
@@ -213,10 +213,10 @@ export async function setPremiumAccessHandler(
   args: HandlerArgs,
 ): Promise<{ hasPurchasedPremium: boolean; isPremium: boolean }> {
   const action = args.data?.action
-  const fallback = action === 'cancel' ? 'Could not cancel Premium. Try again.' : 'Could not activate Premium. Try again.'
+  const fallback = action === 'cancel' ? 'Could not cancel Oracle MAX. Try again.' : 'Could not activate Oracle MAX. Try again.'
   try {
     if (action !== 'grant' && action !== 'cancel') {
-      throw new Error('Could not update Premium. Try again.')
+      throw new Error('Could not update Oracle MAX. Try again.')
     }
     const { auth } = await requirePremiumOperator(args)
     const dbClient = getDb()
@@ -271,7 +271,7 @@ export async function createPremiumPortalHandler(args: HandlerArgs): Promise<{ u
   try {
     const { profile } = await requirePremiumOperator(args)
     if (!profile.stripeCustomerId) {
-      throw new Error('Subscribe to Premium before managing a membership.')
+      throw new Error('Subscribe to Oracle MAX before managing a membership.')
     }
     const config = readStripePremiumConfig(process.env, { secret: true }, process.env.NODE_ENV)
     const stripe = createStripeClient(config.secretKey)
@@ -433,7 +433,7 @@ export async function handleStripeWebhookRequest(request: Request): Promise<Resp
     secretKey = config.secretKey
     webhookSecret = config.webhookSecret || ''
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Premium billing is not configured.'
+    const message = error instanceof Error ? error.message : 'Oracle MAX billing is not configured.'
     return json({ error: message }, 500)
   }
 

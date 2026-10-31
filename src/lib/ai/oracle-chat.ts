@@ -31,7 +31,8 @@ export function getOracleCandidateModelIds(selectedModelId?: string, tier: Oracl
   const allowed = ORACLE_MODELS.filter((model) => canUseOracleChatModel(model, tier))
   const selected = allowed.find((model) => model.id === selectedModelId)
     ?? allowed.find((model) => model.id === getOracleDefaultModelId(tier))
-  return selected ? [selected.id, ...allowed.filter((model) => model.id !== selected.id).map((model) => model.id)] : []
+  // Preserve the selected model: never silently downgrade or increase cost.
+  return selected ? [selected.id] : []
 }
 
 export function orderOracleModels(requestedModelId?: string, _preferredModelId?: string, tier: OracleAccessTier = 'free'): string[] {

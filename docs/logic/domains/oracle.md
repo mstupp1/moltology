@@ -89,9 +89,9 @@ rules:
         symbol: checkRateLimit
     tests: [src/lib/ai/guardrails.test.ts]
   - id: oracle.usage-allowance
-    title: Rolling allowances, Premium gets 10x
+    title: Rolling allowances, Oracle MAX gets 10x
     kind: limit
-    statement: Free members can send 5 Oracle messages a minute, 15 per rolling 5 hours, and 100 per rolling 7 days. Premium receives 10x. Both windows must have capacity; usage is checked and reserved atomically across instances before model calls and survives thread deletion. New-thread failure releases the reservation. Chat shows five-hour usage and both windows in details and Settings.
+    statement: Free members can send 5 Oracle messages a minute, 15 per rolling 5 hours, and 100 per rolling 7 days. Oracle MAX receives 10x. Both windows must have capacity; usage is checked and reserved atomically across instances before model calls and survives thread deletion. New-thread failure releases the reservation. Chat shows five-hour usage and both windows in details and Settings.
     dependsOn: [oracle.request-pipeline, premium.no-standing, economy.red-line]
     anchors:
       - file: src/lib/ai/service.ts
@@ -141,7 +141,7 @@ rules:
   - id: oracle.jailbreak-gate
     title: Paraphrased jailbreaks are refused
     kind: gate
-    statement: The moderation model refuses a message above 80% jailbreak confidence. Premium screening uses Jev with prompt training disallowed; free members retain Laya for short inputs and Jev for longer ones. Screening runs after the authoritative tier reservation, and refusal releases that reservation.
+    statement: The moderation model refuses a message above 80% jailbreak confidence. Oracle MAX screening uses Jev with prompt training disallowed; free members retain Laya for short inputs and Jev for longer ones. Screening runs after the authoritative tier reservation, and refusal releases that reservation.
     dependsOn: [oracle.input-guardrails, forum.jev-shared]
     anchors:
       - file: src/lib/quality/oracle-preflight.ts
@@ -167,7 +167,7 @@ rules:
   - id: oracle.model-routing
     title: Membership determines model access
     kind: permission
-    statement: Guests receive preset preview replies. Free members use Ling 3.1 Flash 1019 for chat and titles. Premium uses DeepSeek chat and Nemo titles through DeepInfra, with training disallowed. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.
+    statement: Guests receive preset preview replies. Free members use Oracle Current (Ling) for chat and titles. MAX defaults to Oracle Abyss (Sonnet) and may select DeepSeek. MAX titles use Nemo; all MAX providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.
     dependsOn: [oracle.jailbreak-gate, economy.red-line]
     anchors:
       - file: src/lib/ai/oracle-chat.ts
@@ -178,7 +178,7 @@ rules:
   - id: oracle.model-fallback
     title: Ordered model fallback
     kind: flow
-    statement: Free chat uses Ling through Novita. Premium chat uses only DeepSeek through DeepInfra, with Gateway prompt training disallowed; it cannot select or fall back to Ling. Empty streams, errors, and a 12-second first-token timeout return unavailable. SDK retries and reasoning are disabled.
+    statement: Free chat uses Ling through Novita. MAX uses the selected Sonnet (Anthropic) or DeepSeek (DeepInfra), with prompt training disallowed. It cannot select Ling. Empty streams, errors, and a 12-second first-token timeout return unavailable without changing models. SDK retries and reasoning are disabled.
     dependsOn: [oracle.model-routing]
     anchors:
       - file: src/lib/ai/oracle-models.ts

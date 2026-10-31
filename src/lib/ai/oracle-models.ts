@@ -1,4 +1,4 @@
-export type OracleProvider = 'deepseek' | 'inclusionai' | 'mistral' | 'local'
+export type OracleProvider = 'deepseek' | 'inclusionai' | 'mistral' | 'anthropic' | 'local'
 export type OracleModelBadge = 'Chat' | 'Titles' | 'Preview'
 export type OracleAccessTier = 'guest' | 'free' | 'premium'
 export type OracleModelRole = 'chat' | 'titles' | 'preview'
@@ -25,7 +25,8 @@ export interface OracleModel {
 }
 
 export const DEFAULT_ORACLE_MODEL_ID = 'inclusionai/ling-3.1-flash-1019'
-export const PREMIUM_ORACLE_MODEL_ID = 'deepseek/deepseek-v4.1-flash'
+export const PREMIUM_ORACLE_MODEL_ID = 'anthropic/claude-sonnet-4.6'
+export const PREMIUM_DEEPSEEK_MODEL_ID = 'deepseek/deepseek-v4.1-flash'
 export const ORACLE_TITLE_MODEL_ID = DEFAULT_ORACLE_MODEL_ID
 export const PREMIUM_ORACLE_TITLE_MODEL_ID = 'mistral/mistral-nemo'
 export const GUEST_ORACLE_MODEL_ID = 'guest-preview'
@@ -48,18 +49,18 @@ export const ORACLE_MODELS: OracleModel[] = [
   },
   {
     id: DEFAULT_ORACLE_MODEL_ID,
-    label: 'Ling 3.1 Flash 1019',
-    shortLabel: 'Ling Flash',
+    label: 'Oracle Current',
+    shortLabel: 'Current',
     provider: 'inclusionai',
     badge: 'Chat',
     roles: ['chat', 'titles'],
     access: 'free',
-    description: 'Free member chat and automatic titles. Currently free through Novita.',
+    description: 'Ling 3.1 Flash 1019 for free chat and automatic titles. Currently free through Novita.',
     pricing: { input: 'Free', output: 'Free' },
     latency: '~4 s',
   },
   {
-    id: PREMIUM_ORACLE_MODEL_ID,
+    id: PREMIUM_DEEPSEEK_MODEL_ID,
     label: 'DeepSeek V4.1 Flash',
     shortLabel: 'DeepSeek',
     provider: 'deepseek',
@@ -67,9 +68,22 @@ export const ORACLE_MODELS: OracleModel[] = [
     roles: ['chat'],
     access: 'premium',
     noPromptTraining: true,
-    description: 'Premium chat through DeepInfra. Provider does not train on prompts or replies.',
+    description: 'Oracle MAX chat through DeepInfra. Provider does not train on prompts or replies.',
     pricing: { input: '$0.14', output: '$0.42' },
     latency: '~1 s',
+  },
+  {
+    id: PREMIUM_ORACLE_MODEL_ID,
+    label: 'Oracle Abyss',
+    shortLabel: 'Abyss',
+    provider: 'anthropic',
+    badge: 'Chat',
+    roles: ['chat'],
+    access: 'premium',
+    noPromptTraining: true,
+    description: 'Claude Sonnet 4.6 for deeper reasoning. Oracle MAX default; provider training is disabled.',
+    pricing: { input: '$3', output: '$15' },
+    latency: '~1.6 s',
   },
   {
     id: PREMIUM_ORACLE_TITLE_MODEL_ID,
@@ -80,7 +94,7 @@ export const ORACLE_MODELS: OracleModel[] = [
     roles: ['titles'],
     access: 'premium',
     noPromptTraining: true,
-    description: 'Automatic Premium titles through DeepInfra. Provider does not train on prompts or replies.',
+    description: 'Automatic Oracle MAX titles through DeepInfra. Provider does not train on prompts or replies.',
     pricing: { input: '$0.029', output: '$0.03' },
     latency: '~0.3 s',
   },
@@ -113,8 +127,9 @@ export function getOracleThreadFallbackTitle(message: string): string {
 export function getOracleGenerationOptions(modelId: string) {
   return {
     reasoning: 'none' as const,
-    ...(modelId === PREMIUM_ORACLE_MODEL_ID || modelId === PREMIUM_ORACLE_TITLE_MODEL_ID
+    ...(modelId === PREMIUM_DEEPSEEK_MODEL_ID || modelId === PREMIUM_ORACLE_TITLE_MODEL_ID
       ? { providerOptions: { gateway: { only: ['deepinfra'], disallowPromptTraining: true } } }
+      : modelId === PREMIUM_ORACLE_MODEL_ID ? { providerOptions: { gateway: { only: ['anthropic'], disallowPromptTraining: true } } }
       : modelId.startsWith('inclusionai/') ? { providerOptions: { gateway: { only: ['novita'] } } } : {}),
   }
 }

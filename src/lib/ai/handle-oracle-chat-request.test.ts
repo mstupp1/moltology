@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { handleOracleChatRequest, ORACLE_USAGE_UNAVAILABLE_MESSAGE } from './handle-oracle-chat-request'
 import { ORACLE_THREAD_ID_HEADER, ORACLE_UNAVAILABLE_MESSAGE } from './oracle-chat'
-import { DEFAULT_ORACLE_MODEL_ID, PREMIUM_ORACLE_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID, ORACLE_TITLE_MODEL_ID } from './oracle-models'
+import { DEFAULT_ORACLE_MODEL_ID, PREMIUM_ORACLE_MODEL_ID, PREMIUM_DEEPSEEK_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID, ORACLE_TITLE_MODEL_ID } from './oracle-models'
 import { buildSystemPrompt } from './codex-prompt'
 import { ORACLE_JAILBREAK_ERROR, screenOraclePrompt } from '../quality/oracle-preflight'
 import { getOracleUsageSnapshot, getRecentAIThreadTurns, releaseOracleChatUsage, reserveOracleChatUsage, saveAIMessage, summarizeThreadTitle, updateAIThreadTitle } from './service'
@@ -215,7 +215,7 @@ describe('handleOracleChatRequest', () => {
     streamTextMock.mockReset()
   })
 
-  it.each([PREMIUM_ORACLE_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID])(
+  it.each([PREMIUM_ORACLE_MODEL_ID, PREMIUM_DEEPSEEK_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID])(
     'does not let a free member select %s or spend on a paid title model',
     async (requestedModel) => {
       streamTextMock.mockReturnValueOnce({ stream: textStream('Free reply') })
@@ -255,10 +255,22 @@ describe('handleOracleChatRequest', () => {
     }))
     expect(response.status).toBe(502)
     expect(streamTextMock.mock.calls.map(([options]) => options.model)).toEqual([PREMIUM_ORACLE_MODEL_ID])
-    expect(streamTextMock.mock.calls[0][0].providerOptions.gateway).toEqual({ only: ['deepinfra'], disallowPromptTraining: true })
+    expect(streamTextMock.mock.calls[0][0].providerOptions.gateway).toEqual({ only: ['anthropic'], disallowPromptTraining: true })
     expect(screenOraclePrompt).toHaveBeenCalledWith('Help me focus today', { isPremium: true })
     expect(summarizeThreadTitle).toHaveBeenCalledTimes(1)
     expect(updateAIThreadTitle).not.toHaveBeenCalled()
+  })
+
+  it('honors a MAX member selecting the private DeepSeek option', async () => {
+    vi.mocked(reserveOracleChatUsage).mockResolvedValueOnce({ allowed: true, id: 'max-usage', isPremium: true })
+    streamTextMock.mockReturnValueOnce({ stream: textStream('MAX reply') })
+    const response = await handleOracleChatRequest(await authedRequest({
+      model: PREMIUM_DEEPSEEK_MODEL_ID,
+      messages: [{ role: 'user', content: 'Help me focus today' }],
+    }))
+    await response.text()
+    expect(streamTextMock.mock.calls[0][0].model).toBe(PREMIUM_DEEPSEEK_MODEL_ID)
+    expect(streamTextMock.mock.calls[0][0].providerOptions.gateway).toEqual({ only: ['deepinfra'], disallowPromptTraining: true })
   })
 
   it('returns guest JSON when unauthenticated', async () => {

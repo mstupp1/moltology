@@ -9,8 +9,8 @@ import { isAdmin } from './permissions'
 
 export const EXPERIMENTS = {
   premium: {
-    title: 'Premium',
-    description: 'Show Premium membership, settings, and dashboard offers for your account.',
+    title: 'Oracle MAX',
+    description: 'Show Oracle MAX membership, settings, and dashboard offers for your account.',
   },
   'new-store': {
     title: 'New store',

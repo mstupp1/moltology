@@ -18,7 +18,7 @@ export function verifyStripeWebhookSignature(
   secret: string,
 ): Stripe.Event {
   if (!secret.trim()) {
-    throw new Error('Premium billing is not configured. Missing: STRIPE_WEBHOOK_SECRET.')
+    throw new Error('Oracle MAX billing is not configured. Missing: STRIPE_WEBHOOK_SECRET.')
   }
   if (!signature?.trim()) {
     throw new Error('Missing Stripe signature.')

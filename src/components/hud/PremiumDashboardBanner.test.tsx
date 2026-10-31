@@ -22,7 +22,7 @@ vi.mock('@/lib/server/premium-api', () => ({
   getPremiumMembershipFn: vi.fn(),
 }))
 
-describe('Premium dashboard banner', () => {
+describe('Oracle MAX dashboard banner', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(useAuthSession).mockReturnValue({
@@ -37,7 +37,7 @@ describe('Premium dashboard banner', () => {
     expect(screen.getByTestId('premium-dashboard-banner')).toHaveTextContent(/monthly membership/i)
     rerender(<PremiumBanner hasPurchasedPremium={true} />)
     expect(screen.getByTestId('premium-dashboard-banner')).toHaveTextContent(/not active/i)
-    expect(screen.getByRole('link', { name: 'View Premium' })).toHaveAttribute('href', '/premium')
+    expect(screen.getByRole('link', { name: 'View Oracle MAX' })).toHaveAttribute('href', '/premium')
   })
 
   it('shows the banner for free and lapsed admins and hides it for current premium', async () => {
