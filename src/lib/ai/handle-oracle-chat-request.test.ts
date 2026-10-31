@@ -32,7 +32,7 @@ vi.mock('./service', () => ({
   getOwnedAIThread: vi.fn().mockResolvedValue({ id: '11111111-1111-4111-8111-111111111111', userId: 'usr_from_jwt' }),
   getRecentAIThreadTurns: vi.fn().mockResolvedValue([]),
   getOracleUsageSnapshot: vi.fn().mockResolvedValue({ lastMinute: 0, lastFiveHours: 0, lastWeek: 0, isPremium: false }),
-  reserveOracleChatUsage: vi.fn().mockResolvedValue({ allowed: true, id: 'usage-1' }),
+  reserveOracleChatUsage: vi.fn().mockResolvedValue({ allowed: true, id: 'usage-1', isPremium: false }),
   releaseOracleChatUsage: vi.fn().mockResolvedValue(undefined),
   finalizeOracleUsage: vi.fn().mockResolvedValue(undefined),
 }))
@@ -112,6 +112,37 @@ describe('handleOracleChatRequest', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.spyOn(crypto, 'randomUUID').mockReturnValue(TEST_THREAD_ID)
+  })
+
+  it('prevents a free member from requesting the paid backend', async () => {
+    streamTextMock.mockReturnValueOnce({ stream: textStream('answer') })
+    const request = await authedRequest({ messages: [{ role: 'user', content: 'Help me focus' }], model: ORACLE_MODELS[1].id })
+    const response = await handleOracleChatRequest(request)
+    expect(response.status).toBe(200)
+    expect(streamTextMock.mock.calls[0][0].model).toBe(ORACLE_MODELS[0].id)
+  })
+
+  it('uses the reservation entitlement when MAX access ends after the initial usage read', async () => {
+    vi.mocked(getOracleUsageSnapshot).mockResolvedValueOnce(buildOracleUsageSnapshot([], true))
+    vi.mocked(reserveOracleChatUsage).mockResolvedValueOnce({ allowed: true, id: 'downgraded-usage', isPremium: false })
+    streamTextMock.mockReturnValueOnce({ stream: textStream('current answer') })
+    const request = await authedRequest({
+      messages: [{ role: 'user', content: 'Help me plan' }],
+      model: ORACLE_MODELS[1].id,
+    })
+    const response = await handleOracleChatRequest(request)
+    expect(response.status).toBe(200)
+    expect(streamTextMock).toHaveBeenCalledTimes(1)
+    expect(streamTextMock.mock.calls[0][0].model).toBe(ORACLE_MODELS[0].id)
+  })
+
+  it('routes MAX to Abyss using the atomic reservation entitlement', async () => {
+    vi.mocked(reserveOracleChatUsage).mockResolvedValueOnce({ allowed: true, id: 'paid-usage', isPremium: true })
+    streamTextMock.mockReturnValueOnce({ stream: textStream('deeper answer') })
+    const request = await authedRequest({ messages: [{ role: 'user', content: 'Help me plan' }] })
+    const response = await handleOracleChatRequest(request)
+    expect(response.status).toBe(200)
+    expect(streamTextMock.mock.calls[0][0].model).toBe(ORACLE_MODELS[1].id)
   })
 
   it('returns guest JSON when unauthenticated', async () => {

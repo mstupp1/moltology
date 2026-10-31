@@ -232,7 +232,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     ),
     { role: 'user', content: userText },
   ])
-  const candidateModels = orderOracleModels(body.model, preflight.preferredModelId)
+  const candidateModels = orderOracleModels(body.model, preflight.preferredModelId, usageReservation.isPremium)
   let lastError: Error | null = null
 
   queueOracleUserMessagePersistence({ userId, threadId: activeThreadId, userText })

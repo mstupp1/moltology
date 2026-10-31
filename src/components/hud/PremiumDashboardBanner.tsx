@@ -28,7 +28,7 @@ export function PremiumBanner({ hasPurchasedPremium }: { hasPurchasedPremium: bo
 }
 
 /**
- * Dashboard upsell for free and lapsed members. Hidden for current Premium,
+ * Dashboard upsell for free and lapsed members. Hidden for current Oracle MAX,
  * and hidden from members who cannot open the soft-launch page.
  */
 export function PremiumDashboardBanner() {

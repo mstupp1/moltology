@@ -148,7 +148,7 @@ describe('CommandPalette Component', () => {
 
     fireEvent.change(input, { target: { value: 'Codex' } })
     expect(screen.getByText('Codex')).toBeInTheDocument()
-    expect(screen.queryByText('Premium')).not.toBeInTheDocument()
+    expect(screen.queryByText('Oracle MAX')).not.toBeInTheDocument()
   })
 
   it('lists hidden pages for admins and hides them from everyone else', () => {
@@ -156,14 +156,14 @@ describe('CommandPalette Component', () => {
     fireEvent(window, new CustomEvent('open-command-palette'))
     const input = screen.getByPlaceholderText(/Search pages and members/i)
     fireEvent.change(input, { target: { value: 'premium' } })
-    expect(screen.queryByText('Premium')).not.toBeInTheDocument()
+    expect(screen.queryByText('Oracle MAX')).not.toBeInTheDocument()
 
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'admin-1', email: 'ops@example.com', role: 'admin' } },
       isPending: false,
     } as any)
     view.rerender(<ToastProvider><CommandPalette /></ToastProvider>)
-    expect(screen.getByText('Premium')).toBeInTheDocument()
+    expect(screen.getByText('Oracle MAX')).toBeInTheDocument()
   })
 
   it('surfaces the shared chamber index for oracle, connections, and news', () => {

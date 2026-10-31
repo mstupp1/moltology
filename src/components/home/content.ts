@@ -146,7 +146,7 @@ export const HOME_FAQ: HomeQuestion[] = [
   {
     question: 'Is it really free?',
     answer:
-      'Yes. Joining, the daily routine, the diagnostic, the community, and the Oracle are all free. Premium and Molt Credits are optional extras, such as more time with the Oracle, cosmetics, and premium guides. Progress and rank cannot be bought.',
+      'Yes. Joining, the daily routine, the diagnostic, the community, and the Oracle are all free. Oracle MAX and Molt Credits are optional extras, such as more time with the Oracle, cosmetics, and premium guides. Progress and rank cannot be bought.',
   },
   {
     question: 'How much time does it take?',

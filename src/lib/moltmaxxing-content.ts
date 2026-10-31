@@ -124,6 +124,6 @@ export const MOLTMAXXING_FAQ = [
   {
     question: 'Does it cost anything?',
     answer:
-      'No. The diagnostic, the Field Manual and a member account are free. Premium is an optional subscription, and your stage still comes only from the Liturgies you complete.',
+      'No. The diagnostic, the Field Manual and a member account are free. Oracle MAX is an optional subscription, and your stage still comes only from the Liturgies you complete.',
   },
 ]

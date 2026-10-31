@@ -1,15 +1,15 @@
 ---
 id: premium
-title: Premium & billing
+title: Oracle MAX & billing
 order: 6
 color: '#d27bff'
-summary: A Stripe monthly membership in soft launch behind the staff gate. Its only benefit so far is a 10x Oracle allowance.
+summary: Oracle MAX adds Oracle Abyss and a 10x Oracle allowance. The plan preview is public; billing and no-charge activation remain staff-only.
 rules:
   - id: premium.soft-launch
-    title: Premium is staff-only for now
+    title: Oracle MAX billing stays staff-only
     kind: gate
     status: soft-launch
-    statement: The /premium page, checkout, price lookup, and the billing portal all require a staff role during the soft launch. The dashboard banner is also shown only to staff.
+    statement: The /premium marketing preview is public. Checkout, price lookup, the billing portal, and no-charge activation require staff with the premium experiment enabled. The dashboard banner remains limited to that audience.
     dependsOn: [access.hidden-pages]
     anchors:
       - file: src/lib/server/premium.ts
@@ -20,7 +20,7 @@ rules:
   - id: premium.no-standing
     title: Premium grants no standing
     kind: invariant
-    statement: Premium must never grant rank, clearance, stage, forum authority, Standing, or Chitin Gems. Its only listed benefit is 10 times the free Oracle allowance.
+    statement: Premium must never grant rank, clearance, stage, forum authority, Standing, or Chitin Gems. Oracle MAX includes Oracle Abyss plus Current and 10 times the free Oracle allowance.
     dependsOn: [economy.red-line]
     anchors:
       - file: src/lib/premium-membership.ts

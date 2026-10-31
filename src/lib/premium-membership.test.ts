@@ -52,7 +52,7 @@ describe('premium banner visibility', () => {
     expect(shouldShowPremiumBanner({ isPremium: false })).toBe(true)
     expect(premiumBannerCopy(false).body).toMatch(/monthly membership/i)
     expect(premiumBannerCopy(true).body).toMatch(/not active/i)
-    expect(premiumBannerCopy(false).action).toBe('View Premium')
+    expect(premiumBannerCopy(false).action).toBe('View Oracle MAX')
   })
 
   it('keeps the soft-launch banner off the public dashboard', () => {
@@ -92,7 +92,7 @@ describe('premium banner visibility', () => {
 describe('premium without checkout', () => {
   const syncedAt = new Date('2026-09-23T00:00:00.000Z')
 
-  it('activates Premium and keeps any existing billing ids', () => {
+  it('activates Oracle MAX and keeps any existing billing ids', () => {
     const next = grantPremiumWithoutCheckout(
       {
         ...emptyPremiumMembership(),
@@ -130,7 +130,10 @@ describe('premium without checkout', () => {
 
 describe('premium entitlements', () => {
   it('lists the higher Oracle limit as the only unlock', () => {
-    expect(listPremiumEntitlements(false)).toEqual(['150 Oracle messages per 5 hours instead of 15, and 1,000 per 7 days instead of 100'])
+    expect(listPremiumEntitlements(false)).toEqual([
+      'Oracle Abyss, our advanced model, alongside Oracle Current',
+      '150 Oracle messages per 5 hours instead of 15, and 1,000 per 7 days instead of 100',
+    ])
     expect(listPremiumEntitlements(true)).toEqual(listPremiumEntitlements(false))
   })
 })
@@ -371,7 +374,7 @@ describe('premium checkout configuration', () => {
       /not configured in this environment.*STRIPE_SECRET_KEY.*STRIPE_PREMIUM_PRICE_ID/,
     )
     expect(stripePremiumConfigError(['STRIPE_WEBHOOK_SECRET'], 'production').message).toBe(
-      'Premium billing is not configured. Missing: STRIPE_WEBHOOK_SECRET.',
+      'Oracle MAX billing is not configured. Missing: STRIPE_WEBHOOK_SECRET.',
     )
   })
 
@@ -441,7 +444,7 @@ describe('premium checkout configuration', () => {
     expect(createPremiumIntegrationIdentifier((index) => index + 1)).toBe('moltology_premium_bcdefghi')
   })
 
-  it('sends the member back to the Premium page from the customer portal', () => {
+  it('sends the member back to the Oracle MAX page from the customer portal', () => {
     expect(buildPremiumPortalParams({ customerId: 'cus_1', origin: 'http://localhost:3000' })).toEqual({
       customer: 'cus_1',
       return_url: 'http://localhost:3000/premium',

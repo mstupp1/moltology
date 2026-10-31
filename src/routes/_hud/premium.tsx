@@ -1,31 +1,29 @@
-import React, { Suspense, lazy } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
-import { HiddenPageGuard } from '@/components/hud/HiddenPageGuard'
-import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
-import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
+import React, { Suspense, lazy } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { HudWorkspaceGhost } from "@/components/hud/HudGhostSkeletons";
+import { privatePageSeo, xRobotsNoindexHeaders } from "@/lib/seo";
 
-const LazyPremiumView = lazy(() => import('@/components/hud/PremiumView'))
+const LazyPremiumView = lazy(() => import("@/components/hud/PremiumView"));
 
 function PremiumPage() {
   return (
-    <HiddenPageGuard experiment="premium" skeleton={<HudWorkspaceGhost />}>
-      <Suspense fallback={<HudWorkspaceGhost />}>
-        <LazyPremiumView />
-      </Suspense>
-    </HiddenPageGuard>
-  )
+    <Suspense fallback={<HudWorkspaceGhost />}>
+      <LazyPremiumView />
+    </Suspense>
+  );
 }
 
-export const Route = createFileRoute('/_hud/premium')({
+export const Route = createFileRoute("/_hud/premium")({
   headers: () => xRobotsNoindexHeaders(),
   head: () => ({
     meta: [
       ...privatePageSeo({
-        title: 'Premium membership | Moltology',
-        description: 'Monthly Premium membership. It does not change rank, clearance, or forum authority.',
+        title: "Oracle MAX | Moltology",
+        description:
+          "Explore Oracle MAX: Oracle Abyss, our advanced model, and 10× the free message allowance.",
       }),
     ],
   }),
   component: PremiumPage,
   pendingComponent: HudWorkspaceGhost,
-})
+});
