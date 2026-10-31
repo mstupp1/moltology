@@ -103,9 +103,11 @@ Plain names for real features. Use them as written; don't invent in-world substi
 | **Standing** | A member's forum reputation, from upvotes and review. |
 | **Chitin Gems** | The earned currency. |
 | **Molt Credits** | The paid currency. |
-| **Premium** | The paid subscription. |
+| **Oracle MAX** | The paid subscription. |
 | **Benthic Market** | The in-app shop where currencies are spent. |
 | **Oracle** | The chat companion, voiced by the Synaptic Oracle. |
+| **Oracle Current** | The standard Oracle model for guests and free members. |
+| **Oracle Abyss** | The more capable Oracle model included with Oracle MAX. |
 | **Nightly Molt Audit** | The end-of-day ritual: name and release one bad thought, wasted hour, or distraction. |
 | **Field Manual** | The free downloadable guide. |
 
@@ -181,7 +183,7 @@ errors, settings, and permission prompts stay plain English.
 ## 4. The Economy
 
 Signup is free. **Chitin Gems** are earned by doing the work: shedding, routines, and being
-useful to other members. They cannot be bought. **Molt Credits** and **Premium** are the
+useful to other members. They cannot be bought. **Molt Credits** and **Oracle MAX** are the
 paid layer. They buy speed, style, and extra catalog (accelerators, cosmetics, premium
 guides, a larger Oracle allowance).
 

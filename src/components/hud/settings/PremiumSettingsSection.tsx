@@ -28,7 +28,7 @@ export function PremiumSettingsSection() {
       const next = await getPremiumMembershipFn({ data: { token: token ?? undefined } })
       setMembership(next ?? { hasPurchasedPremium: false, isPremium: false })
     } catch {
-      toastRef.current?.toast.error('Could not load Premium. Try again.')
+      toastRef.current?.toast.error('Could not load Oracle MAX. Try again.')
     }
   }, [])
 
@@ -58,8 +58,8 @@ export function PremiumSettingsSection() {
         error instanceof Error
           ? error.message
           : action === 'grant'
-            ? 'Could not activate Premium. Try again.'
-            : 'Could not cancel Premium. Try again.',
+            ? 'Could not activate Oracle MAX. Try again.'
+            : 'Could not cancel Oracle MAX. Try again.',
       )
     } finally {
       setBusy(null)

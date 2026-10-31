@@ -69,13 +69,13 @@ describe('MemberProfilePage', () => {
     expect(screen.queryByTestId('premium-badge')).not.toBeInTheDocument()
   })
 
-  it('shows a Premium badge only while the membership is active', async () => {
+  it('shows a Oracle MAX badge only while the membership is active', async () => {
     mockGetPublicProfile.mockResolvedValue({ ...claimedProfile, isPremium: true })
 
     const { rerender } = render(<MemberProfilePage profileId="member-a" />)
 
     await waitFor(() => {
-      expect(screen.getByTestId('premium-badge')).toHaveTextContent('Premium')
+      expect(screen.getByTestId('premium-badge')).toHaveTextContent('Oracle MAX')
     })
 
     mockGetPublicProfile.mockResolvedValue({ ...claimedProfile, isPremium: false })

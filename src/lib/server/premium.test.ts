@@ -68,7 +68,7 @@ describe('setPremiumAccessHandler staff gate', () => {
     expect(db.update).not.toHaveBeenCalled()
   })
 
-  it('refuses an admin who has not enabled the Premium experiment', async () => {
+  it('refuses an admin who has not enabled the Oracle MAX experiment', async () => {
     const db = membershipDb([[{ ...freeMembership, role: 'admin', experiments: ['new-store'] }]])
     vi.mocked(getDb).mockReturnValue(db as never)
     await expect(setPremiumAccessHandler({
@@ -78,7 +78,7 @@ describe('setPremiumAccessHandler staff gate', () => {
     expect(db.update).not.toHaveBeenCalled()
   })
 
-  it('lets staff activate Premium without a charge', async () => {
+  it('lets staff activate Oracle MAX without a charge', async () => {
     const db = membershipDb([
       [{ ...freeMembership, id: 'staff-1', role: 'admin', experiments: ['premium'] }],
       [{ ...freeMembership, id: 'staff-1', role: 'admin', experiments: ['premium'] }],

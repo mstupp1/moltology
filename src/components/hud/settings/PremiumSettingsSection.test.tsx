@@ -19,7 +19,7 @@ vi.mock('@/lib/server/premium-api', () => ({
   setPremiumAccessFn: vi.fn(),
 }))
 
-describe('Premium settings section', () => {
+describe('Oracle MAX settings section', () => {
   beforeEach(() => {
     vi.mocked(getPremiumMembershipFn).mockReset()
     vi.mocked(setPremiumAccessFn).mockReset()
@@ -36,23 +36,23 @@ describe('Premium settings section', () => {
     )
     expect(screen.queryByTestId('premium-settings')).not.toBeInTheDocument()
     expect(getPremiumMembershipFn).not.toHaveBeenCalled()
-    expect(screen.queryByRole('button', { name: /Purchase Premium/i })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Cancel Premium/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Purchase Oracle MAX/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Cancel Oracle MAX/i })).not.toBeInTheDocument()
     expect(screen.queryByText(/No payment is taken/i)).not.toBeInTheDocument()
   })
 
-  it('offers Purchase Premium to a free member and skips the badge', async () => {
+  it('offers Purchase Oracle MAX to a free member and skips the badge', async () => {
     vi.mocked(getPremiumMembershipFn).mockResolvedValue({ hasPurchasedPremium: false, isPremium: false })
     render(
       <ToastProvider>
         <PremiumSettingsSection />
       </ToastProvider>,
     )
-    expect(await screen.findByRole('button', { name: /Purchase Premium/i })).toBeEnabled()
-    expect(screen.getByText(/do not have an active Premium membership/i)).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /Purchase Oracle MAX/i })).toBeEnabled()
+    expect(screen.getByText(/do not have an active Oracle MAX membership/i)).toBeInTheDocument()
     expect(screen.getByText(/No payment is taken/i)).toBeInTheDocument()
     expect(screen.queryByTestId('premium-badge')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Cancel Premium/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Cancel Oracle MAX/i })).not.toBeInTheDocument()
   })
 
   it('shows the badge and cancel for a current member, then returns to purchase', async () => {
@@ -64,18 +64,18 @@ describe('Premium settings section', () => {
       </ToastProvider>,
     )
     expect(await screen.findByTestId('premium-badge')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: /Cancel Premium/i }))
+    fireEvent.click(screen.getByRole('button', { name: /Cancel Oracle MAX/i }))
     await waitFor(() => {
       expect(setPremiumAccessFn).toHaveBeenCalledWith({
         data: { token: 'mock-jwt', action: 'cancel' },
       })
     })
-    expect(await screen.findByRole('button', { name: /Purchase Premium/i })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /Purchase Oracle MAX/i })).toBeInTheDocument()
     expect(screen.queryByTestId('premium-badge')).not.toBeInTheDocument()
-    expect(screen.getByText('Premium is canceled.')).toBeInTheDocument()
+    expect(screen.getByText('Oracle MAX is canceled.')).toBeInTheDocument()
   })
 
-  it('activates Premium for a free member without asking for payment', async () => {
+  it('activates Oracle MAX for a free member without asking for payment', async () => {
     vi.mocked(getPremiumMembershipFn).mockResolvedValue({ hasPurchasedPremium: false, isPremium: false })
     vi.mocked(setPremiumAccessFn).mockResolvedValue({ hasPurchasedPremium: true, isPremium: true })
     render(
@@ -83,14 +83,14 @@ describe('Premium settings section', () => {
         <PremiumSettingsSection />
       </ToastProvider>,
     )
-    fireEvent.click(await screen.findByRole('button', { name: /Purchase Premium/i }))
+    fireEvent.click(await screen.findByRole('button', { name: /Purchase Oracle MAX/i }))
     await waitFor(() => {
       expect(setPremiumAccessFn).toHaveBeenCalledWith({
         data: { token: 'mock-jwt', action: 'grant' },
       })
     })
     expect(await screen.findByTestId('premium-badge')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Cancel Premium/i })).toBeInTheDocument()
-    expect(screen.getByText('Premium is active.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Cancel Oracle MAX/i })).toBeInTheDocument()
+    expect(screen.getByText('Oracle MAX is active.')).toBeInTheDocument()
   })
 })

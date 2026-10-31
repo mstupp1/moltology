@@ -1,4 +1,4 @@
-export type OracleProvider = 'deepseek'
+export type OracleProvider = 'deepseek' | 'anthropic'
 export type OracleModelBadge = 'Chat' | 'Titles'
 
 export interface OracleModelPricing {
@@ -14,6 +14,8 @@ export interface OracleModel {
   badge?: OracleModelBadge
   pricing?: OracleModelPricing
   latency?: string
+  description: string
+  premium?: boolean
 }
 
 // Gateway prices from, per 1M tokens; provider routing can change the billed rate.
@@ -21,13 +23,26 @@ export interface OracleModel {
 export const ORACLE_MODELS: OracleModel[] = [
   {
     id: 'deepseek/deepseek-v4.1-flash',
-    label: 'DeepSeek V4.1 Flash',
-    shortLabel: 'DeepSeek',
+    label: 'Oracle Current',
+    shortLabel: 'Current',
+    description: 'Quick guidance for everyday questions.',
     provider: 'deepseek',
     badge: 'Chat',
     pricing: { input: '$0.02', output: '$0.19' },
   },
+  {
+    id: 'anthropic/claude-sonnet-4.6',
+    label: 'Oracle Abyss',
+    shortLabel: 'Abyss',
+    description: 'Deeper reasoning for complex questions.',
+    provider: 'anthropic',
+    premium: true,
+  },
 ]
+
+// Oracle Abyss uses a separate reasoning model, never a renamed copy of Current.
+// Gateway model verified: https://vercel.com/changelog/claude-sonnet-4-6-is-live-on-ai-gateway
+export const PREMIUM_ORACLE_MODEL_ID = ORACLE_MODELS[1].id
 
 export const DEFAULT_ORACLE_MODEL_ID = ORACLE_MODELS[0].id
 

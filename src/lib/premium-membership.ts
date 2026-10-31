@@ -1,8 +1,8 @@
 /**
- * Premium membership rules.
+ * Oracle MAX membership rules.
  *
  * Paid user (`hasPurchasedPremium`) means the member has paid at least once.
- * Premium member (`isPremium`) means a Premium subscription is currently active.
+ * Oracle MAX member (`isPremium`) means an Oracle MAX subscription is currently active.
  * Those flags stay distinct. This module does not grant rank, clearance, stage,
  * forum authority, or Chitin Gems.
  */
@@ -38,24 +38,24 @@ const CURRENT_PREMIUM_STATUSES = new Set(['active'])
 const PURCHASE_STATUSES = new Set(['active', 'past_due', 'unpaid', 'paused'])
 
 export const PREMIUM_PAGE_COPY = {
-  title: 'Premium membership',
+  title: 'Oracle MAX membership',
   eyebrow: 'Monthly membership',
   description:
-    'Premium does not change your rank, clearance, stage, or forum authority. Chitin Gems stay earned. Signup stays free.',
-  benefitsTitle: 'What Premium unlocks',
-  benefitsBody: 'Premium raises your Oracle chat limits.',
-  active: 'Your Premium membership is active.',
-  lapsed: 'You have purchased Premium before. It is not active right now.',
-  free: 'You do not have an active Premium membership.',
-  subscribe: 'Subscribe to Premium',
+    'Oracle MAX does not change your rank, clearance, stage, or forum authority. Chitin Gems stay earned. Signup stays free.',
+  benefitsTitle: 'What Oracle MAX unlocks',
+  benefitsBody: 'Oracle MAX includes Oracle Abyss, our advanced model, and 10× the free message allowance.',
+  active: 'Your Oracle MAX membership is active.',
+  lapsed: 'You have purchased Oracle MAX before. It is not active right now.',
+  free: 'You do not have an active Oracle MAX membership.',
+  subscribe: 'Subscribe to Oracle MAX',
   manage: 'Manage membership',
-  activate: 'Activate Premium',
-  activateHint: 'Activates Premium on this account. No payment is taken.',
-  purchase: 'Purchase Premium',
-  cancel: 'Cancel Premium',
-  activated: 'Premium is active.',
-  canceled: 'Premium is canceled.',
-  settingsTitle: 'Premium',
+  activate: 'Activate Oracle MAX',
+  activateHint: 'Activates Oracle MAX on this account. No payment is taken.',
+  purchase: 'Purchase Oracle MAX',
+  cancel: 'Cancel Oracle MAX',
+  activated: 'Oracle MAX is active.',
+  canceled: 'Oracle MAX is canceled.',
+  settingsTitle: 'Oracle MAX',
   checkoutSuccess: 'Checkout completed. Your membership status will update shortly.',
   checkoutCancel: 'Checkout was canceled. No charge was made.',
   pricePending: 'Monthly price will appear when billing is configured.',
@@ -68,26 +68,26 @@ export function premiumBannerCopy(hasPurchasedPremium: boolean): {
 } {
   if (hasPurchasedPremium) {
     return {
-      title: 'Premium',
-      body: 'Your Premium membership is not active.',
-      action: 'View Premium',
+      title: 'Oracle MAX',
+      body: 'Your Oracle MAX membership is not active.',
+      action: 'View Oracle MAX',
     }
   }
   return {
-    title: 'Premium',
+    title: 'Oracle MAX',
     body: 'A monthly membership.',
-    action: 'View Premium',
+    action: 'View Oracle MAX',
   }
 }
 
-/** Free and paid-but-not-current see the banner. Current Premium does not. */
+/** Free and paid-but-not-current see the banner. Current Oracle MAX does not. */
 export function shouldShowPremiumBanner(state: { isPremium: boolean }): boolean {
   return !state.isPremium
 }
 
 /**
  * Soft launch: the dashboard banner follows the membership matrix and stays
- * with the same admin audience that can open the hidden Premium page.
+ * with the same admin audience that can open the hidden Oracle MAX page.
  */
 export function shouldShowPremiumDashboardBanner(input: {
   isPremium: boolean
@@ -97,11 +97,12 @@ export function shouldShowPremiumDashboardBanner(input: {
 }
 
 /**
- * What Premium unlocks. Lists the same benefits for every viewer.
+ * What Oracle MAX unlocks. Lists the same benefits for every viewer.
  * Do not grant rank, clearance, stage, forum authority, or Chitin Gems.
  */
 export function listPremiumEntitlements(_isPremium: boolean): readonly string[] {
   return [
+    'Oracle Abyss, our advanced model, alongside Oracle Current',
     `${ORACLE_PREMIUM_LIMITS.perFiveHours} Oracle messages per 5 hours instead of ${ORACLE_FREE_LIMITS.perFiveHours}, and ${ORACLE_PREMIUM_LIMITS.perWeek.toLocaleString('en-US')} per 7 days instead of ${ORACLE_FREE_LIMITS.perWeek}`,
   ]
 }
@@ -356,7 +357,7 @@ export function mergeRetrievedSubscription(
 }
 
 /**
- * Sandbox catalog for Premium (livemode false).
+ * Sandbox catalog for Oracle MAX (livemode false).
  * Checkout does not charge these constants. It charges `STRIPE_PREMIUM_PRICE_ID`.
  * `STRIPE_PREMIUM_PRODUCT_ID` is optional; when set, the Price must belong to that Product.
  */
@@ -394,8 +395,8 @@ export function missingStripePremiumKeys(
 export function stripePremiumConfigError(missing: string[], nodeEnv: string | undefined): Error {
   const lead =
     nodeEnv === 'production'
-      ? 'Premium billing is not configured.'
-      : 'Premium billing is not configured in this environment.'
+      ? 'Oracle MAX billing is not configured.'
+      : 'Oracle MAX billing is not configured in this environment.'
   return new Error(`${lead} Missing: ${missing.join(', ')}.`)
 }
 
@@ -417,13 +418,13 @@ export function readStripePremiumConfig(
 export function resolvePremiumReturnOrigin(betterAuthUrl: string | undefined): string {
   const raw = betterAuthUrl?.trim()
   if (!raw) {
-    throw new Error('Premium billing is not configured. Missing: BETTER_AUTH_URL.')
+    throw new Error('Oracle MAX billing is not configured. Missing: BETTER_AUTH_URL.')
   }
   let url: URL
   try {
     url = new URL(raw)
   } catch {
-    throw new Error('Premium billing is not configured. BETTER_AUTH_URL must be an absolute URL.')
+    throw new Error('Oracle MAX billing is not configured. BETTER_AUTH_URL must be an absolute URL.')
   }
   return url.origin
 }
