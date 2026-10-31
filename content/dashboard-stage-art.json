@@ -1,0 +1,33 @@
+{
+  "createdAt": "2026-10-30",
+  "generator": "Built-in ImageGen",
+  "purpose": "Dashboard stage identity artwork",
+  "seasonalTreatment": "Evergreen progression artwork",
+  "composition": "Right-aligned crustacean portrait with quiet left space for live UI text.",
+  "assets": [
+    {
+      "stage": 1,
+      "key": "images/dashboard/stages/larval-v1.png",
+      "localSource": "tmp/imagegen/dashboard/larval-v1.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium Moltology member dashboard stage artwork, one of a coherent set of four. A cinematic, tactile 3D deep-sea crustacean portrait, mature art direction with warmth, intricate natural chitin, believable ocean water, restrained cyan bioluminescent rim light against near-black teal ocean. Landscape 3:2 composition. Subject occupies right half of image, looking gently toward the left, dark calm empty water in left half for live HTML text, background fades almost to black at left and bottom. Detailed, expressive, composed and inviting rather than threatening. No humans, no humanoid bodies, no text, letters, numbers, UI, borders, logos, watermarks or frames. No weapons, neon cyberpunk, machinery or busy scenery.\nStage 1, Larval: a small delicate translucent crustacean larva floating just above a dark smooth stone, oversized curious dark eyes, fine antennae, tiny emerging pincers, translucent pearl and pale coral shell with warm internal light, fragile and full of potential. Macro portrait, intimate low camera."
+    },
+    {
+      "stage": 2,
+      "key": "images/dashboard/stages/soft-shed-v1.png",
+      "localSource": "tmp/imagegen/dashboard/soft-shed-v1.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium Moltology member dashboard stage artwork, one of a coherent set of four. A cinematic, tactile 3D deep-sea crustacean portrait, mature art direction with warmth, intricate natural chitin, believable ocean water, restrained cyan bioluminescent rim light against near-black teal ocean. Landscape 3:2 composition. Subject occupies right half of image, looking gently toward the left, dark calm empty water in left half for live HTML text, background fades almost to black at left and bottom. Detailed, expressive, composed and inviting rather than threatening. No humans, no humanoid bodies, no text, letters, numbers, UI, borders, logos, watermarks or frames. No weapons, neon cyberpunk, machinery or busy scenery.\nStage 2, Soft-Shed: a young crab emerging gently from an old empty shed shell on a dark sea floor. Its new shell is soft luminous pearl with a restrained coral tint, expressive attentive eyes, modest pincers. The old shell is subtle behind it. Gentle protective mood. Three-quarter low camera portrait."
+    },
+    {
+      "stage": 3,
+      "key": "images/dashboard/stages/exoshell-v1.png",
+      "localSource": "tmp/imagegen/dashboard/exoshell-v1.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium Moltology member dashboard stage artwork, one of a coherent set of four. A cinematic, tactile 3D deep-sea crustacean portrait, mature art direction with warmth, intricate natural chitin, believable ocean water, restrained cyan bioluminescent rim light against near-black teal ocean. Landscape 3:2 composition. Subject occupies right half of image, looking gently toward the left, dark calm empty water in left half for live HTML text, background fades almost to black at left and bottom. Detailed, expressive, composed and inviting rather than threatening. No humans, no humanoid bodies, no text, letters, numbers, UI, borders, logos, watermarks or frames. No weapons, neon cyberpunk, machinery or busy scenery.\nStage 3, Exoshell Born: a substantial elegant crab with fully formed layered graphite and deep petrol-blue chitin armor, fine natural ridges and minute signs of wear. Strong front pincers resting calmly on dark rock, attentive warm eyes, poised and grounded. Low camera three-quarter portrait."
+    },
+    {
+      "stage": 4,
+      "key": "images/dashboard/stages/ascendant-v1.png",
+      "localSource": "tmp/imagegen/dashboard/ascendant-v1.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium Moltology member dashboard stage artwork, one of a coherent set of four. A cinematic, tactile 3D deep-sea crustacean portrait, mature art direction with warmth, intricate natural chitin, believable ocean water, restrained cyan bioluminescent rim light against near-black teal ocean. Landscape 3:2 composition. Subject occupies right half of image, looking gently toward the left, dark calm empty water in left half for live HTML text, background fades almost to black at left and bottom. Detailed, expressive, composed and inviting rather than threatening. No humans, no humanoid bodies, no text, letters, numbers, UI, borders, logos, watermarks or frames. No weapons, neon cyberpunk, machinery or busy scenery.\nStage 4, Full Carcinization: a majestic mature crab at the quiet deepest ocean, beautifully sculptural obsidian and pearl chitin, powerful broad carapace, perfectly composed posture, pincers resting gently, subtle pale cyan bioluminescent seams and sparse drifting particles. Calm wisdom and protection, never menace. Low camera three-quarter portrait."
+    }
+  ]
+}
