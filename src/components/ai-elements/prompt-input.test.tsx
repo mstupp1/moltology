@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
-import { PromptInput } from './prompt-input'
-import { getOracleModel } from '@/lib/ai/oracle-models'
+import { render, screen, fireEvent, within, waitFor } from '@testing-library/react'
+import { PromptInput, OracleModelPicker } from './prompt-input'
+import { getOracleModel, ORACLE_MODELS } from '@/lib/ai/oracle-models'
 
 describe('PromptInput', () => {
   beforeEach(() => {
@@ -63,27 +63,52 @@ describe('PromptInput', () => {
     expect(screen.getByRole('button', { name: 'Start dictation' })).toBeInTheDocument()
   })
 
-  it('shows two branded choices and locks Abyss for free members', async () => {
-    const onSelectModel = vi.fn()
-    render(<PromptInput onSubmit={vi.fn()} selectedModel={getOracleModel()} onSelectModel={onSelectModel} />)
-    fireEvent.keyDown(screen.getByRole('button', { name: /Select model/i }), { key: 'Enter' })
-    const locked = await screen.findByRole('menuitemradio', { name: /Oracle Abyss/i })
-    expect(locked).toHaveAttribute('aria-disabled', 'true')
-    fireEvent.click(locked)
-    expect(onSelectModel).not.toHaveBeenCalled()
-    expect(screen.getByRole('menuitem', { name: 'Explore Oracle MAX' })).toHaveAttribute('href', '/premium')
-    expect(screen.queryByText(/DeepSeek|Claude|In \/ 1M/)).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('menuitemradio', { name: /Oracle Current/i }))
-    expect(onSelectModel).toHaveBeenCalledWith('deepseek/deepseek-v4.1-flash')
+  it('shows every model with access, purpose, and pricing details', () => {
+    render(<PromptInput onSubmit={vi.fn()} selectedModel={getOracleModel()} onSelectModel={vi.fn()} />)
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Select model' }), { key: 'Enter' })
+    const menu = screen.getByRole('menu', { name: 'Oracle models' })
+    for (const model of ORACLE_MODELS) {
+      expect(within(menu).getByText(model.label)).toBeInTheDocument()
+    }
+    expect(within(menu).getAllByText('In / 1M')).toHaveLength(ORACLE_MODELS.length)
+    expect(within(menu).getAllByText('Oracle MAX').length).toBeGreaterThan(0)
+    expect(within(menu).getAllByText('Free').length).toBeGreaterThan(0)
+    expect(within(menu).getByText('Guest')).toBeInTheDocument()
+    expect(within(menu).getByText('Titles')).toBeInTheDocument()
+    expect(menu.closest('[data-radix-popper-content-wrapper]')).toBeInTheDocument()
   })
 
-  it('lets MAX members select Abyss without an upgrade CTA', async () => {
+  it('keeps Premium, title-only and guest preview rows informational for a free member', () => {
     const onSelectModel = vi.fn()
-    render(<PromptInput onSubmit={vi.fn()} selectedModel={getOracleModel()} onSelectModel={onSelectModel} hasPremiumAccess />)
-    fireEvent.keyDown(screen.getByRole('button', { name: /Select model/i }), { key: 'Enter' })
-    fireEvent.click(await screen.findByRole('menuitemradio', { name: /Oracle Abyss/i }))
-    expect(onSelectModel).toHaveBeenCalledWith('anthropic/claude-sonnet-4.6')
-    expect(screen.queryByText('Explore Oracle MAX')).not.toBeInTheDocument()
+    const freeChat = ORACLE_MODELS.find((model) => model.access === 'free' && model.roles.includes('chat'))!
+    render(<OracleModelPicker selectedModel={freeChat} onSelectModel={onSelectModel} accessTier="free" />)
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Select model' }), { key: 'Enter' })
+    for (const model of ORACLE_MODELS.filter((model) => model.access !== 'free' || !model.roles.includes('chat'))) {
+      const row = screen.getByRole('menuitemradio', { name: new RegExp(model.label) })
+      expect(row).toHaveAttribute('aria-disabled', 'true')
+      fireEvent.click(row)
+    }
+    expect(onSelectModel).not.toHaveBeenCalled()
+    expect(screen.getByRole('menu', { name: 'Oracle models' })).toBeInTheDocument()
+  })
+
+  it('lets Premium members select a chat model and closes the menu', async () => {
+    const onSelectModel = vi.fn()
+    const premiumChat = ORACLE_MODELS.find((model) => model.access === 'premium' && model.roles.includes('chat'))!
+    render(<OracleModelPicker selectedModel={getOracleModel()} onSelectModel={onSelectModel} accessTier="premium" />)
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Select model' }), { key: 'Enter' })
+    fireEvent.click(screen.getByRole('menuitemradio', { name: new RegExp(premiumChat.label) }))
+    expect(onSelectModel).toHaveBeenCalledWith(premiumChat.id)
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument())
+  })
+
+  it('dismisses the model menu with Escape and restores trigger focus', async () => {
+    render(<OracleModelPicker selectedModel={getOracleModel()} onSelectModel={vi.fn()} />)
+    const trigger = screen.getByRole('button', { name: 'Select model' })
+    fireEvent.keyDown(trigger, { key: 'Enter' })
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' })
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument())
+    await waitFor(() => expect(trigger).toHaveFocus())
   })
 
   it('stops a streaming reply with Escape', () => {
@@ -91,6 +116,32 @@ describe('PromptInput', () => {
     render(<PromptInput onSubmit={vi.fn()} onStop={onStop} status="streaming" />)
     fireEvent.keyDown(screen.getByRole('textbox', { name: 'Message' }), { key: 'Escape' })
     expect(onStop).toHaveBeenCalled()
+  })
+
+  it('keeps the model picker above the compact compose row', () => {
+    const { container } = render(
+      <PromptInput compact onSubmit={vi.fn()} selectedModel={getOracleModel()} onSelectModel={vi.fn()} />,
+    )
+    const trigger = screen.getByRole('button', { name: 'Select model' })
+    expect(trigger.closest('form')).toBeNull()
+    const form = container.querySelector('form')!
+    expect(form.className).toContain('items-end')
+    expect(within(form).getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
+    expect(within(form).getByRole('button', { name: 'Send message' })).toBeInTheDocument()
+    fireEvent.keyDown(trigger, { key: 'Enter' })
+    expect(screen.getByRole('menu', { name: 'Oracle models' })).toBeInTheDocument()
+  })
+
+  it('does not let Premium select the free model without no-training protection', () => {
+    const onSelectModel = vi.fn()
+    const premium = ORACLE_MODELS.find((model) => model.access === 'premium' && model.roles.includes('chat'))!
+    const free = ORACLE_MODELS.find((model) => model.access === 'free')!
+    render(<OracleModelPicker selectedModel={premium} onSelectModel={onSelectModel} accessTier="premium" />)
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Select model' }), { key: 'Enter' })
+    const row = screen.getByRole('menuitemradio', { name: new RegExp(free.label) })
+    expect(row).toHaveAttribute('aria-disabled', 'true')
+    fireEvent.click(row)
+    expect(onSelectModel).not.toHaveBeenCalled()
   })
 
   it('lays out on one row in compact mode and shows a footnote when given', () => {

@@ -144,7 +144,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
     expect(screen.getByRole('button', { name: /Select model/i })).toBeInTheDocument()
   })
 
-  it('shows the same two model choices for admin users', async () => {
+  it('shows model choices for admin users', async () => {
     const { getUserProfileFn } = await import('@/lib/server/api')
     ;(getUserProfileFn as any).mockResolvedValueOnce({ role: 'admin' })
 
@@ -166,11 +166,11 @@ describe('AIChatPanel Guest Mode Gating', () => {
     const { rerender } = render(<AIChatPanel userId="usr_max" />)
     expect(screen.getByRole('button', { name: /Select model/i })).toHaveTextContent('Abyss')
     fireEvent.keyDown(screen.getByRole('button', { name: /Select model/i }), { key: 'Enter' })
-    fireEvent.click(await screen.findByRole('menuitemradio', { name: /Oracle Current/i }))
-    expect(screen.getByRole('button', { name: /Select model/i })).toHaveTextContent('Current')
+    fireEvent.click(await screen.findByRole('menuitemradio', { name: /DeepSeek V4.1 Flash/i }))
+    expect(screen.getByRole('button', { name: /Select model/i })).toHaveTextContent('DeepSeek')
     vi.mocked(useOracleUsage).mockReturnValue({ snapshot: null, unavailable: false, blocked: false, refresh: vi.fn() })
     rerender(<AIChatPanel userId={null} />)
-    expect(screen.getByRole('button', { name: /Select model/i })).toHaveTextContent('Current')
+    expect(screen.getByRole('button', { name: /Select model/i })).toHaveTextContent('Preview')
     fireEvent.keyDown(screen.getByRole('button', { name: /Select model/i }), { key: 'Enter' })
     expect(await screen.findByRole('menuitemradio', { name: /Oracle Abyss/i })).toHaveAttribute('aria-disabled', 'true')
   })

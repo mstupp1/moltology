@@ -11,9 +11,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
-    "rules": 122,
-    "decisions": 47,
-    "anchors": 234,
+    "rules": 123,
+    "decisions": 48,
+    "anchors": 237,
     "drifted": 20,
     "flagged": 9
   },
@@ -205,12 +205,12 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "oracle",
       "title": "Oracle AI",
       "color": "#ff5fa2",
-      "summary": "The Oracle checks input and rolling usage, screens prompts, and routes to Oracle Current or MAX-only Oracle Abyss using the entitlement returned by its atomic usage reservation.",
-      "overviewHtml": "<p>The Oracle is the most expensive surface, because every message is a billed model call. The pipeline refuses abuse cheaply first, caps each member&#39;s allowance, then screens the prompt before calling the model allowed by the member&#39;s plan and choice.</p>",
+      "summary": "The Oracle checks rate, input, and each member's usage allowance, screens the prompt with the moderation model, routes it to a model allowed by the membership tier, and names new conversations within the streamed request.",
+      "overviewHtml": "<p>The Oracle is the most expensive surface, because every message is a billed model call. The pipeline refuses abuse cheaply first, caps each member&#39;s allowance, then spends a free moderation call to route the question to the cheapest model that can answer it.</p>",
       "box": {
         "x": 0,
         "y": 1988,
-        "width": 1532,
+        "width": 1576,
         "height": 832
       },
       "ruleIds": [
@@ -223,6 +223,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "oracle.intent-context",
         "oracle.model-routing",
         "oracle.model-fallback",
+        "oracle.thread-titles",
         "oracle.thread-ownership"
       ]
     },
@@ -233,7 +234,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Members claim one unique handle, and feeds only show real activity from the member and their friends. Empty stays honest.",
       "overviewHtml": "<p>Social surfaces follow one rule. Show real people and real activity, or show nothing. A quiet new account sees an honest, empty stream instead of fake veterans.</p>",
       "box": {
-        "x": 1628,
+        "x": 1672,
         "y": 1988,
         "width": 612,
         "height": 784
@@ -255,7 +256,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "The app runs inside Neon Free and Vercel Hobby limits. Retention windows, polling rules, and the asset budget keep it there.",
       "overviewHtml": "<p>Most cost decisions trace back to two limits: Neon Free compute hours and Vercel Hobby Active CPU. Anything that polls, keeps compute awake, or grows storage without bound has to justify itself here.</p>",
       "box": {
-        "x": 2336,
+        "x": 2380,
         "y": 1988,
         "width": 904,
         "height": 940
@@ -282,7 +283,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Private-by-default guest checkout preparation with live quotes, audited operations, and recoverable draft fulfillment.",
       "overviewHtml": "<h1>Store launch preparation</h1>\n<p>The store stays private, test-only and manual until separately authorized. Authored product data,\noperational controls and order snapshots have separate lifecycles. See <code>docs/merch-launch.md</code>.</p>",
       "box": {
-        "x": 3336,
+        "x": 3380,
         "y": 1988,
         "width": 992,
         "height": 988
@@ -309,7 +310,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Standing is a member's forum reputation, from upvotes plus review adjustments. It decides who can start threads, which replies sink, and who is limited.",
       "overviewHtml": "<p>Standing is the forum&#39;s reputation score. It comes from other members&#39; upvotes and gates the actions that cost the community the most: new threads and high reply volume.</p>",
       "box": {
-        "x": 4424,
+        "x": 4468,
         "y": 1988,
         "width": 1196,
         "height": 520
@@ -400,7 +401,6 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "progression.stage-from-xp",
         "premium.no-standing",
         "oracle.usage-allowance",
-        "oracle.intent-context",
         "oracle.model-routing",
         "merch.private-pilot",
         "merch.catalog-price",
@@ -4495,15 +4495,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Oracle request pipeline",
       "kind": "flow",
       "status": "active",
-      "statement": "Every message passes flood and local input checks. Guests get a canned reply. Members pass usage and prompt screening, then atomically reserve one allowance slot before a new thread or model call. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.",
+      "statement": "Every message passes flood and local input checks. Guests get a canned reply. Members pass usage checks and atomically reserve an allowance slot before prompt screening or model calls. Refused prompts release the slot. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.",
       "anchors": [
         {
           "file": "src/lib/ai/handle-oracle-chat-request.ts",
           "symbol": "handleOracleChatRequest",
-          "line": 73,
+          "line": 74,
           "value": "handleOracleChatRequest(request)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L73"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L74"
         }
       ],
       "tests": [
@@ -4522,7 +4522,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "decisions": [
         "oracle-usage-and-moderation",
         "security-scan-2026-10",
-        "atomic-oracle-allowance"
+        "atomic-oracle-allowance",
+        "oracle-tier-models-and-titles"
       ],
       "flag": null,
       "flow": {
@@ -4685,7 +4686,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           },
           {
             "id": "stream",
-            "label": "Stream entitled model",
+            "label": "Stream with fallback chain",
             "kind": "outcome",
             "tone": "allow",
             "position": {
@@ -4829,7 +4830,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "oracle.usage-allowance",
       "domain": "oracle",
-      "title": "Rolling allowances, Premium gets 10x",
+      "title": "Rolling allowances, Oracle MAX gets 10x",
       "kind": "limit",
       "status": "active",
       "statement": "Free members can send 5 Oracle messages a minute, 15 per rolling 5 hours, and 100 per rolling 7 days. Oracle MAX receives 10x. Both windows must have capacity; usage is checked and reserved atomically across instances before model calls and survives thread deletion. New-thread failure releases the reservation. Chat shows five-hour usage and both windows in details and Settings.",
@@ -4837,18 +4838,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "reserveOracleChatUsage",
-          "line": 295,
+          "line": 304,
           "value": "reserveOracleChatUsage(userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L295"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L304"
         },
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "releaseOracleChatUsage",
-          "line": 372,
+          "line": 381,
           "value": "releaseOracleChatUsage(id)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L372"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L381"
         },
         {
           "file": "src/lib/ai/usage-limits.ts",
@@ -4877,10 +4878,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "getOracleUsageSnapshot",
-          "line": 400,
+          "line": 409,
           "value": "getOracleUsageSnapshot(userId, now)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L400"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L409"
         },
         {
           "file": "src/lib/ai/usage-limits.ts",
@@ -4967,10 +4968,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/oracle-chat.ts",
           "symbol": "toModelMessages",
-          "line": 62,
+          "line": 66,
           "value": "toModelMessages(messages)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-chat.ts#L62"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-chat.ts#L66"
         }
       ],
       "tests": [
@@ -5056,7 +5057,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Paraphrased jailbreaks are refused",
       "kind": "gate",
       "status": "active",
-      "statement": "The moderation model refuses a message when it is more than 80% sure it is a jailbreak, which catches paraphrases the local patterns miss.",
+      "statement": "The moderation model refuses a message above 80% jailbreak confidence. Oracle MAX screening uses Jev with prompt training disallowed; free members retain Laya for short inputs and Jev for longer ones. Screening runs after the authoritative tier reservation, and refusal releases that reservation.",
       "anchors": [
         {
           "file": "src/lib/quality/oracle-preflight.ts",
@@ -5073,6 +5074,14 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "value": "\"This message can't be sent. Ask your question directly instead of trying to override the assistant.\"",
           "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L32"
+        },
+        {
+          "file": "src/lib/quality/oracle-preflight.ts",
+          "symbol": "defaultOracleEvaluator",
+          "line": 134,
+          "value": "defaultOracleEvaluator(message, isPremium)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L134"
         }
       ],
       "tests": [
@@ -5140,8 +5149,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         }
       ],
       "dependsOn": [
-        "oracle.jailbreak-gate",
-        "economy.red-line"
+        "oracle.jailbreak-gate"
       ],
       "usedBy": [],
       "decisions": [
@@ -5158,26 +5166,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "oracle.model-routing",
       "domain": "oracle",
-      "title": "Membership gates model selection",
+      "title": "Membership determines model access",
       "kind": "permission",
       "status": "active",
-      "statement": "Free members use Oracle Current (DeepSeek V4.1 Flash). Oracle MAX defaults to Oracle Abyss (Claude Sonnet 4.6) and may select Current. The atomic usage reservation supplies the authoritative entitlement; a free member requesting Abyss is routed to Current. Moderation preferences cannot override this gate.",
+      "statement": "Guests receive preset preview replies. Free members use Oracle Current (Ling) for chat and titles. MAX defaults to Oracle Abyss (Sonnet) and may select DeepSeek. MAX titles use Nemo; all MAX providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.",
       "anchors": [
-        {
-          "file": "src/lib/ai/oracle-chat.ts",
-          "symbol": "orderOracleModels",
-          "line": 35,
-          "value": "orderOracleModels(requestedModelId, _preferredModelId, isPremium)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-chat.ts#L35"
-        },
         {
           "file": "src/lib/ai/oracle-chat.ts",
           "symbol": "getOracleCandidateModelIds",
           "line": 30,
-          "value": "getOracleCandidateModelIds(selectedModelId, isPremium)",
+          "value": "getOracleCandidateModelIds(selectedModelId, tier)",
           "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-chat.ts#L30"
+        },
+        {
+          "file": "src/lib/ai/oracle-models.ts",
+          "symbol": "getOracleTitleModelId",
+          "line": 113,
+          "value": "getOracleTitleModelId(isPremium)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts#L113"
         }
       ],
       "tests": [
@@ -5195,12 +5203,14 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "economy.red-line"
       ],
       "usedBy": [
-        "oracle.model-fallback"
+        "oracle.model-fallback",
+        "oracle.thread-titles"
       ],
       "decisions": [
         "jev-quality-gates",
         "oracle-usage-and-moderation",
-        "oracle-max-model-access"
+        "oracle-max-model-access",
+        "oracle-tier-models-and-titles"
       ],
       "flag": null,
       "flow": null,
@@ -5213,18 +5223,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "oracle.model-fallback",
       "domain": "oracle",
-      "title": "Model failure preserves the selected tier",
+      "title": "Ordered model fallback",
       "kind": "flow",
       "status": "active",
-      "statement": "The Oracle waits for a real first token from the single entitled model. Empty streams, errors, and timeouts return the unavailable message without falling into a more expensive model or silently downgrading Abyss. Thread titles continue to use DeepSeek V4.1 Flash.",
+      "statement": "Free chat uses Ling through Novita. MAX uses the selected Sonnet (Anthropic) or DeepSeek (DeepInfra), with prompt training disallowed. It cannot select Ling. Empty streams, errors, and a 12-second first-token timeout return unavailable without changing models. SDK retries and reasoning are disabled.",
       "anchors": [
         {
           "file": "src/lib/ai/oracle-models.ts",
           "symbol": "ORACLE_MODELS",
-          "line": 23,
-          "value": "[ { id: 'deepseek/deepseek-v4.1-flash', label: 'Oracle Current', shortLabel: 'Current', description: 'Quick guidance for everyday questions.', provider: 'deeps…",
+          "line": 37,
+          "value": "[ { id: GUEST_ORACLE_MODEL_ID, label: 'Guest preview', shortLabel: 'Preview', provider: 'local', badge: 'Preview', roles: ['preview'], access: 'guest', descrip…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts#L23"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts#L37"
         }
       ],
       "tests": [
@@ -5240,12 +5250,63 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "decisions": [
         "oracle-model-fallback",
         "oracle-usage-and-moderation",
-        "oracle-max-model-access"
+        "oracle-max-model-access",
+        "oracle-tier-models-and-titles"
       ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1240,
+        "x": 992,
+        "y": 700
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "oracle.thread-titles",
+      "domain": "oracle",
+      "title": "One bounded title attempt per new conversation",
+      "kind": "flow",
+      "status": "active",
+      "statement": "New conversations receive a 60-character excerpt. One title attempt overlaps chat, capped at 500 input characters, 32 output tokens, eight seconds, and no retries. Successful streams wait for title persistence, then the client refreshes once. Failures or cancellation keep the excerpt. Updates require an unchanged placeholder, preserving manual renames.",
+      "anchors": [
+        {
+          "file": "src/lib/ai/service.ts",
+          "symbol": "summarizeThreadTitle",
+          "line": 30,
+          "value": "summarizeThreadTitle(firstMessageText, modelId, userId, signal)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L30"
+        },
+        {
+          "file": "src/lib/ai/service.ts",
+          "symbol": "updateAIThreadTitle",
+          "line": 195,
+          "value": "updateAIThreadTitle(threadId, title, userId, expectedTitle)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L195"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/ai/service.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.test.ts"
+        },
+        {
+          "file": "src/lib/ai/handle-oracle-chat-request.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "oracle.model-routing"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "oracle-tier-models-and-titles"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 1284,
         "y": 700
       },
       "drift": "ok"
@@ -5261,10 +5322,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "getOwnedAIThread",
-          "line": 119,
+          "line": 127,
           "value": "getOwnedAIThread(userId, threadId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L119"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L127"
         }
       ],
       "tests": [
@@ -9241,6 +9302,49 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "html": "<p>Paid chat requests use the more expensive advanced model. Existing history and output caps remain in force. No rank, clearance, stage or forum authority is sold. The external Stripe product display name is not changed by this code PR.</p>"
         }
       ]
+    },
+    {
+      "id": "oracle-tier-models-and-titles",
+      "date": "2026-10-31",
+      "title": "Separate free and Oracle MAX Oracle models and finish titles within the request",
+      "summary": "Free members use free Ling for chat and titles. Oracle MAX offers private chat and Nemo titles without provider training. Naming finishes within the stream lifecycle and preserves manual renames.",
+      "domains": [
+        "oracle",
+        "premium"
+      ],
+      "rules": [
+        "oracle.request-pipeline",
+        "oracle.model-routing",
+        "oracle.model-fallback",
+        "oracle.thread-titles"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "doc",
+          "label": "oracle-models.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>All members previously used the same paid model. Automatic naming ran as detached work after the reply and the client checked for the title on a short timer. A slow title could remain invisible, and a late automatic update could overwrite a manual rename.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Use the verified free Ling 3.1 Flash 1019 endpoint for free-member chat and titles. Preserve Oracle MAX&#39;s Oracle Abyss default (Claude Sonnet 4.6 via Anthropic), with DeepSeek V4.1 Flash via DeepInfra as another MAX choice. MAX titles use Mistral Nemo 12B via DeepInfra. All MAX routes disallow prompt training. Preserve Oracle Current as the free option, backed by free Ling. Enforce model access using membership from the usage reservation, restrict free Ling to Novita, disable reasoning, and exclude preview/title-only rows from chat routing. Oracle MAX cannot select or fall back to free Ling. Oracle MAX prompt screening uses Jev with the same no-training filter, based on the authoritative reservation tier. Refused prompts release their reservation. Preserve guest preview replies and existing usage allowances.</p>\n<p>Start a single bounded title attempt alongside a new chat. Await its conditional persistence before successful stream completion, then refresh the thread list once. Retain the immediate excerpt on failure or cancellation. The public picker shows access, purpose, current pricing, and indicative latency for every configured entry, including informational title models.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<p>Laya can select supplied text but cannot generate a short title. A durable naming queue adds infrastructure for a low-impact feature. Repeated generation, paid fallback for free members, and polling add cost or request traffic without a sufficient benefit here.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Free endpoint availability and promotional prices may change. Provider routing, rather than model name alone, enforces Oracle MAX privacy. No-training filtering does not assert zero retention. Preserve the single selected-model failure behavior from the Oracle MAX redesign; never silently switch to another model. DeepInfra policy: <a href=\"https://docs.deepinfra.com/account/data-privacy\">https://docs.deepinfra.com/account/data-privacy</a>. Existing threads are not renamed or backfilled. Disconnects may retain excerpt titles. First reply tokens remain immediate; final stream completion can wait for the remaining title budget. Title-model display is informational and never substitutes for server enforcement.</p>"
+        }
+      ]
     }
   ],
   "edges": [
@@ -9779,12 +9883,6 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "crossDomain": false
     },
     {
-      "id": "economy.red-line->oracle.intent-context",
-      "source": "economy.red-line",
-      "target": "oracle.intent-context",
-      "crossDomain": true
-    },
-    {
       "id": "oracle.jailbreak-gate->oracle.model-routing",
       "source": "oracle.jailbreak-gate",
       "target": "oracle.model-routing",
@@ -9800,6 +9898,12 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "oracle.model-routing->oracle.model-fallback",
       "source": "oracle.model-routing",
       "target": "oracle.model-fallback",
+      "crossDomain": false
+    },
+    {
+      "id": "oracle.model-routing->oracle.thread-titles",
+      "source": "oracle.model-routing",
+      "target": "oracle.thread-titles",
       "crossDomain": false
     },
     {

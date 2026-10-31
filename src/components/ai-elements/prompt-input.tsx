@@ -1,9 +1,15 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
-import { ArrowUp, Mic, Loader2, ChevronDown, Check, LockKeyhole, Square } from 'lucide-react'
-import { OracleModel, ORACLE_MODELS, DEFAULT_ORACLE_PLACEHOLDER } from '@/lib/ai/oracle-models'
-import { HudDropdownMenu, HudDropdownMenuTrigger, HudDropdownMenuContent, HudDropdownMenuItem, HudDropdownMenuSeparator } from '@/components/ui/HudDropdownMenu'
+import { ArrowUp, Mic, Loader2, ChevronDown, Check, Square } from 'lucide-react'
+import { OracleModel, ORACLE_MODELS, DEFAULT_ORACLE_PLACEHOLDER, canUseOracleChatModel } from '@/lib/ai/oracle-models'
 import { useSpeechDictation, type DictationError } from '@/hooks/useSpeechDictation'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
+import { HudBadge } from '@/components/ui/HudBadge'
+import {
+  HudDropdownMenu,
+  HudDropdownMenuTrigger,
+  HudDropdownMenuContent,
+  HudDropdownMenuItem,
+} from '@/components/ui/HudDropdownMenu'
 
 const FOCUS_RING =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
@@ -17,62 +23,105 @@ const DICTATION_ERROR_COPY: Record<DictationError, string> = {
 export interface OracleModelPickerProps {
   selectedModel: OracleModel
   onSelectModel: (modelId: string) => void
+  accessTier?: 'guest' | 'free' | 'premium'
   /** Show the short label on the trigger (docked composer). */
   compactLabel?: boolean
-  hasPremiumAccess?: boolean
 }
 
-/** Branded model choices shared by every Oracle composer. */
+/** Admin model directory: chat options and the automatic title models. */
 export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
   selectedModel,
   onSelectModel,
+  accessTier = 'free',
   compactLabel = false,
-  hasPremiumAccess = false,
-}) => (
-  <HudDropdownMenu modal={false}>
-    <HudDropdownMenuTrigger asChild>
-      <button
-        type="button"
-        className={`flex items-center gap-1 text-[11px] sm:text-xs text-ink-body hover:text-ink px-2 py-1 rounded-control transition-colors cursor-pointer ${FOCUS_RING}`}
-        title="Select model"
-        aria-label="Select model"
+}) => {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <HudDropdownMenu modal={false} open={open} onOpenChange={setOpen}>
+      <HudDropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className={`flex min-h-8 items-center gap-1 text-[11px] sm:text-xs text-ink-body hover:text-ink bg-surface-1 border border-line hover:bg-surface-3 hover:border-line-strong px-2 py-1 rounded-control transition-colors cursor-pointer ${FOCUS_RING}`}
+          title="Select model"
+          aria-label="Select model"
+        >
+          <span className="truncate max-w-[140px] sm:max-w-none font-medium">
+            {compactLabel ? selectedModel.shortLabel || selectedModel.label : selectedModel.label}
+          </span>
+          <ChevronDown className="w-3 h-3 text-ink-muted shrink-0" />
+        </button>
+      </HudDropdownMenuTrigger>
+      <HudDropdownMenuContent
+        side="top"
+        align="start"
+        sideOffset={8}
+        collisionPadding={12}
+        aria-label="Oracle models"
+        aria-labelledby={undefined}
+        className="w-[620px] max-w-[calc(100vw-24px)] p-0 overflow-y-auto overscroll-contain"
+        style={{ maxHeight: 'min(720px, var(--radix-dropdown-menu-content-available-height))' }}
       >
-        <span className="truncate max-w-[140px] font-medium">
-          {compactLabel ? selectedModel.shortLabel : selectedModel.label}
-        </span>
-        <ChevronDown className="w-3 h-3 text-ink-muted shrink-0" />
-      </button>
-    </HudDropdownMenuTrigger>
-    <HudDropdownMenuContent side="top" align="start" sideOffset={10} className="w-72 max-w-[calc(100vw-2rem)] p-1.5">
-      {ORACLE_MODELS.map((model) => {
-        const locked = Boolean(model.premium && !hasPremiumAccess)
-        return (
-          <HudDropdownMenuItem
-            key={model.id}
-            disabled={locked}
-            role="menuitemradio"
-            aria-checked={model.id === selectedModel.id}
-            onSelect={() => onSelectModel(model.id)}
-            className="gap-3 py-3 data-[disabled]:opacity-60"
-          >
-            <span className="flex-1">
-              <span className="block font-semibold">{model.label}</span>
-              <span className="mt-1 block text-[11px] font-normal text-ink-muted">{model.description}</span>
-              {locked && <span className="mt-1 block text-[11px] text-ink-muted">Included with Oracle MAX</span>}
-            </span>
-            {locked ? <LockKeyhole className="h-3.5 w-3.5 text-ink-muted" aria-label="Locked" /> : model.id === selectedModel.id ? <Check className="h-3.5 w-3.5 text-cyan-glow" aria-label="Selected" /> : null}
-          </HudDropdownMenuItem>
-        )
-      })}
-      {!hasPremiumAccess && <>
-        <HudDropdownMenuSeparator />
-        <HudDropdownMenuItem asChild>
-          <a href="/premium" className="text-xs text-ink-muted">Explore Oracle MAX</a>
-        </HudDropdownMenuItem>
-      </>}
-    </HudDropdownMenuContent>
-  </HudDropdownMenu>
-)
+        <div className="border-b border-line-subtle px-4 py-3">
+          <p className="font-semibold text-sm text-ink">Models</p>
+          <p className="mt-1 text-xs leading-relaxed text-ink-muted">Select a chat model. Chat titles are generated automatically.</p>
+        </div>
+        <div className="py-1">
+          {ORACLE_MODELS.map((model) => {
+            const isChat = model.roles.includes('chat')
+            const isPreview = model.roles.includes('preview')
+            const hasAccess = accessTier !== 'guest' && (model.access !== 'premium' || accessTier === 'premium')
+            const canSelect = canUseOracleChatModel(model, accessTier)
+            const isSelected = canSelect && model.id === selectedModel.id
+            const purpose = isPreview ? 'Preview' : model.roles.includes('titles') ? (isChat ? 'Chat + Titles' : 'Titles') : 'Chat'
+            const access = model.access === 'guest' ? 'Guest' : model.access === 'premium' ? 'Oracle MAX' : 'Free'
+            const note = !isChat ? (isPreview ? 'Automatic preview replies' : 'Automatic titles only') : !hasAccess ? (accessTier === 'guest' ? 'Sign in to use chat' : 'Requires Oracle MAX') : accessTier === 'premium' && !model.noPromptTraining ? 'Free members only; Oracle MAX uses providers that do not train on your data.' : undefined
+
+            return (
+              <HudDropdownMenuItem
+                key={model.id}
+                disabled={!canSelect}
+                role="menuitemradio"
+                aria-checked={isSelected}
+                onSelect={() => onSelectModel(model.id)}
+                className={`grid grid-cols-1 gap-2 rounded-none border-b border-line-subtle px-4 py-3 last:border-0 sm:grid-cols-[minmax(0,1fr)_190px] sm:gap-4 data-[disabled]:opacity-100 ${isSelected ? 'bg-surface-3' : ''}`}
+              >
+                <div className="min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="min-w-0 break-words text-sm font-semibold leading-snug">{model.label}</span>
+                    {isSelected && <Check aria-label="Selected" className="mt-0.5 h-4 w-4 shrink-0 text-cyan-glow" />}
+                  </div>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    <HudBadge variant={model.access === 'premium' ? 'warning' : model.access === 'guest' ? 'neutral' : 'cyan'}>{access}</HudBadge>
+                    <HudBadge variant="neutral">{purpose}</HudBadge>
+                  </div>
+                  {model.description && <p className="mt-1.5 text-xs leading-relaxed text-ink-muted">{model.description}</p>}
+                  {note && <p className="mt-1 text-xs leading-relaxed text-ink-muted">{note}</p>}
+                </div>
+                <dl className="grid grid-cols-3 gap-3 text-[11px] sm:self-center">
+                  <div>
+                    <dt className="text-ink-muted">In / 1M</dt>
+                    <dd className="mt-1 font-mono text-ink-body">{model.pricing?.input ?? '—'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-ink-muted">Out / 1M</dt>
+                    <dd className="mt-1 font-mono text-ink-body">{model.pricing?.output ?? '—'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-ink-muted">First token</dt>
+                    <dd className="mt-1 font-mono text-ink-body">{model.latency ?? '—'}</dd>
+                  </div>
+                </dl>
+              </HudDropdownMenuItem>
+            )
+          })}
+        </div>
+        {accessTier !== 'premium' && <a href="/premium" className="block border-t border-line-subtle px-4 py-3 text-xs text-cyan-glow hover:underline">Explore Oracle MAX</a>}
+        <p className="border-t border-line-subtle px-4 py-3 text-[11px] leading-relaxed text-ink-muted">Prices per million tokens. Listed prices and latency may change.</p>
+      </HudDropdownMenuContent>
+    </HudDropdownMenu>
+  )
+}
 
 export interface PromptInputProps {
   onSubmit: (message: { text: string }) => void
@@ -86,7 +135,7 @@ export interface PromptInputProps {
   className?: string
   selectedModel?: OracleModel
   onSelectModel?: (modelId: string) => void
-  hasPremiumAccess?: boolean
+  accessTier?: 'guest' | 'free' | 'premium'
   /** Controlled draft, so the owner can keep it across views or restore it after a failed send. */
   value?: string
   onValueChange?: (text: string) => void
@@ -110,7 +159,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   className = '',
   selectedModel,
   onSelectModel,
-  hasPremiumAccess = false,
+  accessTier = 'free',
   value,
   onValueChange,
   variant = 'docked',
@@ -179,8 +228,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   }
 
   const showStop = isStreaming && Boolean(onStop)
-  const hasModelPicker = Boolean(selectedModel && onSelectModel)
-  const oneRow = compact && !hasModelPicker
+  const oneRow = compact
 
   const actionButtons = (
     <div className="flex items-center gap-1.5 shrink-0">
@@ -237,12 +285,24 @@ export const PromptInput: React.FC<PromptInputProps> = ({
     </div>
   )
 
+  const modelPicker = selectedModel && onSelectModel ? (
+    <OracleModelPicker
+      selectedModel={selectedModel}
+      onSelectModel={onSelectModel}
+      accessTier={accessTier}
+      compactLabel={oneRow || variant !== 'inline'}
+    />
+  ) : null
+
   const card = (
     <div
       className={`pointer-events-auto bg-surface-2 border ${variant !== 'inline' ? 'rounded-panel shadow-sm' : 'rounded-card'} transition-colors focus-within:border-line ${
         oneRow ? 'p-1.5' : 'p-2 sm:p-2.5'
       } ${dictation.isListening ? 'border-line' : 'border-line-subtle'}`}
     >
+      {oneRow && modelPicker && (
+        <div className="flex min-w-0 items-center px-1.5 pb-1.5">{modelPicker}</div>
+      )}
       <form onSubmit={handleSubmit} className={oneRow ? 'flex items-end gap-1.5' : 'flex flex-col'}>
         <textarea
           ref={textareaRef}
@@ -261,14 +321,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
         ) : (
           <div className="flex items-center justify-between gap-2 pt-1.5 select-none">
             <div className="flex items-center gap-1.5 min-w-0">
-            {selectedModel && onSelectModel && (
-              <OracleModelPicker
-                selectedModel={selectedModel}
-                hasPremiumAccess={hasPremiumAccess}
-                onSelectModel={onSelectModel}
-                compactLabel={variant !== 'inline'}
-              />
-            )}
+              {modelPicker}
             </div>
             {actionButtons}
           </div>

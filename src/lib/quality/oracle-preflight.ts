@@ -1,6 +1,6 @@
 import type { OraclePromptContext } from '../ai/codex-prompt'
 import { DEFAULT_ORACLE_MODEL_ID, ORACLE_MODELS } from '../ai/oracle-models'
-import { clampEvaluationText, evaluateWithJev, exceedsJevConfidence } from './jev'
+import { clampEvaluationText, evaluateWithJev, exceedsJevConfidence, JEV_GATEWAY_MODEL_ID } from './jev'
 
 export const ORACLE_INTENTS = {
   codex_doctrine: 'Scriptures, liturgies, stages, and lore',
@@ -131,10 +131,11 @@ export function decideOraclePreflight(answers: OraclePreflightAnswers): OraclePr
   }
 }
 
-async function defaultOracleEvaluator(message: string): Promise<OraclePreflightAnswers | null> {
+async function defaultOracleEvaluator(message: string, isPremium: boolean = false): Promise<OraclePreflightAnswers | null> {
   const result = await evaluateWithJev({
     state: { message: clampEvaluationText(message.trim()) },
     questions: ORACLE_QUESTIONS,
+    ...(isPremium ? { model: JEV_GATEWAY_MODEL_ID, disallowPromptTraining: true } : {}),
   })
   if (!result) return null
   return result.answers as OraclePreflightAnswers
@@ -142,10 +143,10 @@ async function defaultOracleEvaluator(message: string): Promise<OraclePreflightA
 
 export async function screenOraclePrompt(
   message: string,
-  options?: { evaluate?: OraclePreflightEvaluator },
+  options?: { evaluate?: OraclePreflightEvaluator; isPremium?: boolean },
 ): Promise<OraclePreflightDecision> {
   try {
-    const answers = await (options?.evaluate ?? defaultOracleEvaluator)(message)
+    const answers = await (options?.evaluate ? options.evaluate(message) : defaultOracleEvaluator(message, options?.isPremium))
     if (!answers) return fallbackOracleDecision()
     return decideOraclePreflight(answers)
   } catch (err) {

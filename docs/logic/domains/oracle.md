@@ -3,12 +3,12 @@ id: oracle
 title: Oracle AI
 order: 8
 color: '#ff5fa2'
-summary: The Oracle checks input and rolling usage, screens prompts, and routes to Oracle Current or MAX-only Oracle Abyss using the entitlement returned by its atomic usage reservation.
+summary: The Oracle checks rate, input, and each member's usage allowance, screens the prompt with the moderation model, routes it to a model allowed by the membership tier, and names new conversations within the streamed request.
 rules:
   - id: oracle.request-pipeline
     title: Oracle request pipeline
     kind: flow
-    statement: Every message passes flood and local input checks. Guests get a canned reply. Members pass usage and prompt screening, then atomically reserve one allowance slot before a new thread or model call. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.
+    statement: Every message passes flood and local input checks. Guests get a canned reply. Members pass usage checks and atomically reserve an allowance slot before prompt screening or model calls. Refused prompts release the slot. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.
     anchors:
       - file: src/lib/ai/handle-oracle-chat-request.ts
         symbol: handleOracleChatRequest
@@ -73,7 +73,7 @@ rules:
         kind: action
         next: [stream]
       - id: stream
-        label: Stream entitled model
+        label: Stream with fallback chain
         kind: outcome
         tone: allow
   - id: oracle.rate-limit
@@ -89,7 +89,7 @@ rules:
         symbol: checkRateLimit
     tests: [src/lib/ai/guardrails.test.ts]
   - id: oracle.usage-allowance
-    title: Rolling allowances, Premium gets 10x
+    title: Rolling allowances, Oracle MAX gets 10x
     kind: limit
     statement: Free members can send 5 Oracle messages a minute, 15 per rolling 5 hours, and 100 per rolling 7 days. Oracle MAX receives 10x. Both windows must have capacity; usage is checked and reserved atomically across instances before model calls and survives thread deletion. New-thread failure releases the reservation. Chat shows five-hour usage and both windows in details and Settings.
     dependsOn: [oracle.request-pipeline, premium.no-standing, economy.red-line]
@@ -141,19 +141,21 @@ rules:
   - id: oracle.jailbreak-gate
     title: Paraphrased jailbreaks are refused
     kind: gate
-    statement: The moderation model refuses a message when it is more than 80% sure it is a jailbreak, which catches paraphrases the local patterns miss.
+    statement: The moderation model refuses a message above 80% jailbreak confidence. Oracle MAX screening uses Jev with prompt training disallowed; free members retain Laya for short inputs and Jev for longer ones. Screening runs after the authoritative tier reservation, and refusal releases that reservation.
     dependsOn: [oracle.input-guardrails, forum.jev-shared]
     anchors:
       - file: src/lib/quality/oracle-preflight.ts
         symbol: decideOraclePreflight
       - file: src/lib/quality/oracle-preflight.ts
         symbol: ORACLE_JAILBREAK_ERROR
+      - file: src/lib/quality/oracle-preflight.ts
+        symbol: defaultOracleEvaluator
     tests: [src/lib/quality/oracle-preflight.test.ts]
   - id: oracle.intent-context
     title: Intent picks the prompt context
     kind: flow
     statement: Doctrine questions load the scripture block, chassis and progression questions load a short block, and casual or unrelated questions use the base prompt. When the moderation model is down, the full doctrine context is used.
-    dependsOn: [oracle.jailbreak-gate, economy.red-line]
+    dependsOn: [oracle.jailbreak-gate]
     anchors:
       - file: src/lib/quality/oracle-preflight.ts
         symbol: ORACLE_INTENTS
@@ -163,25 +165,36 @@ rules:
         symbol: fallbackOracleDecision
     tests: [src/lib/quality/oracle-preflight.test.ts]
   - id: oracle.model-routing
-    title: Membership gates model selection
+    title: Membership determines model access
     kind: permission
-    statement: Free members use Oracle Current (DeepSeek V4.1 Flash). Oracle MAX defaults to Oracle Abyss (Claude Sonnet 4.6) and may select Current. The atomic usage reservation supplies the authoritative entitlement; a free member requesting Abyss is routed to Current. Moderation preferences cannot override this gate.
+    statement: Guests receive preset preview replies. Free members use Oracle Current (Ling) for chat and titles. MAX defaults to Oracle Abyss (Sonnet) and may select DeepSeek. MAX titles use Nemo; all MAX providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.
     dependsOn: [oracle.jailbreak-gate, economy.red-line]
     anchors:
       - file: src/lib/ai/oracle-chat.ts
-        symbol: orderOracleModels
-      - file: src/lib/ai/oracle-chat.ts
         symbol: getOracleCandidateModelIds
+      - file: src/lib/ai/oracle-models.ts
+        symbol: getOracleTitleModelId
     tests: [src/lib/ai/oracle-chat.test.ts, src/lib/ai/handle-oracle-chat-request.test.ts]
   - id: oracle.model-fallback
-    title: Model failure preserves the selected tier
+    title: Ordered model fallback
     kind: flow
-    statement: The Oracle waits for a real first token from the single entitled model. Empty streams, errors, and timeouts return the unavailable message without falling into a more expensive model or silently downgrading Abyss. Thread titles continue to use DeepSeek V4.1 Flash.
+    statement: Free chat uses Ling through Novita. MAX uses the selected Sonnet (Anthropic) or DeepSeek (DeepInfra), with prompt training disallowed. It cannot select Ling. Empty streams, errors, and a 12-second first-token timeout return unavailable without changing models. SDK retries and reasoning are disabled.
     dependsOn: [oracle.model-routing]
     anchors:
       - file: src/lib/ai/oracle-models.ts
         symbol: ORACLE_MODELS
     tests: [src/lib/ai/oracle-chat.test.ts]
+  - id: oracle.thread-titles
+    title: One bounded title attempt per new conversation
+    kind: flow
+    statement: New conversations receive a 60-character excerpt. One title attempt overlaps chat, capped at 500 input characters, 32 output tokens, eight seconds, and no retries. Successful streams wait for title persistence, then the client refreshes once. Failures or cancellation keep the excerpt. Updates require an unchanged placeholder, preserving manual renames.
+    dependsOn: [oracle.model-routing]
+    anchors:
+      - file: src/lib/ai/service.ts
+        symbol: summarizeThreadTitle
+      - file: src/lib/ai/service.ts
+        symbol: updateAIThreadTitle
+    tests: [src/lib/ai/service.test.ts, src/lib/ai/handle-oracle-chat-request.test.ts]
   - id: oracle.thread-ownership
     title: Threads are owner-scoped
     kind: permission
@@ -193,4 +206,4 @@ rules:
     tests: [src/lib/server/oracle-threads.test.ts]
 ---
 
-The Oracle is the most expensive surface, because every message is a billed model call. The pipeline refuses abuse cheaply first, caps each member's allowance, then screens the prompt before calling the model allowed by the member's plan and choice.
+The Oracle is the most expensive surface, because every message is a billed model call. The pipeline refuses abuse cheaply first, caps each member's allowance, then spends a free moderation call to route the question to the cheapest model that can answer it.

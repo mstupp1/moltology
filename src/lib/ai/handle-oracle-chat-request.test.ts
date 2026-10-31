@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { handleOracleChatRequest, ORACLE_USAGE_UNAVAILABLE_MESSAGE } from './handle-oracle-chat-request'
 import { ORACLE_THREAD_ID_HEADER, ORACLE_UNAVAILABLE_MESSAGE } from './oracle-chat'
-import { ORACLE_MODELS } from './oracle-models'
+import { DEFAULT_ORACLE_MODEL_ID, PREMIUM_ORACLE_MODEL_ID, PREMIUM_DEEPSEEK_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID, ORACLE_TITLE_MODEL_ID } from './oracle-models'
 import { buildSystemPrompt } from './codex-prompt'
 import { ORACLE_JAILBREAK_ERROR, screenOraclePrompt } from '../quality/oracle-preflight'
-import { getOracleUsageSnapshot, getRecentAIThreadTurns, releaseOracleChatUsage, reserveOracleChatUsage } from './service'
+import { getOracleUsageSnapshot, getRecentAIThreadTurns, releaseOracleChatUsage, reserveOracleChatUsage, saveAIMessage, summarizeThreadTitle, updateAIThreadTitle } from './service'
 import { buildOracleUsageSnapshot, ORACLE_FREE_LIMITS, ORACLE_MAX_OUTPUT_TOKENS, ORACLE_PREMIUM_LIMITS } from './usage-limits'
 import { validateInputGuardrails } from './guardrails'
 import { getChatLimitError } from './chat-retention'
@@ -111,38 +111,166 @@ function emptyStream() {
 describe('handleOracleChatRequest', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(summarizeThreadTitle).mockReset().mockResolvedValue('Test Title')
+    vi.mocked(saveAIMessage).mockReset().mockResolvedValue({ id: 'msg-1' } as any)
+    vi.mocked(updateAIThreadTitle).mockReset().mockResolvedValue({ id: TEST_THREAD_ID } as any)
     vi.spyOn(crypto, 'randomUUID').mockReturnValue(TEST_THREAD_ID)
   })
 
-  it('prevents a free member from requesting the paid backend', async () => {
-    streamTextMock.mockReturnValueOnce({ stream: textStream('answer') })
-    const request = await authedRequest({ messages: [{ role: 'user', content: 'Help me focus' }], model: ORACLE_MODELS[1].id })
-    const response = await handleOracleChatRequest(request)
-    expect(response.status).toBe(200)
-    expect(streamTextMock.mock.calls[0][0].model).toBe(ORACLE_MODELS[0].id)
+  it('streams the first token immediately but waits for title persistence before EOF', async () => {
+    let resolveTitle!: (title: string) => void
+    vi.mocked(summarizeThreadTitle).mockImplementationOnce(() => new Promise((resolve) => { resolveTitle = resolve }))
+    let resolveSave!: () => void
+    vi.mocked(updateAIThreadTitle).mockImplementationOnce(() => new Promise((resolve) => {
+      resolveSave = () => resolve({ id: TEST_THREAD_ID } as any)
+    }))
+    streamTextMock.mockImplementationOnce((options) => ({
+      stream: textStream('Immediate reply').pipeThrough(new TransformStream({
+        async flush() {
+          await options.onFinish({ text: 'Immediate reply', totalUsage: {} })
+        },
+      })),
+    }))
+
+    const response = await handleOracleChatRequest(await authedRequest({
+      messages: [{ role: 'user', content: 'Help me focus today' }],
+    }))
+    const reader = response.body!.getReader()
+    expect(new TextDecoder().decode((await reader.read()).value)).toBe('Immediate reply')
+    let reachedEof = false
+    const eof = reader.read().then((next) => { reachedEof = Boolean(next.done); return next })
+    await Promise.resolve()
+    expect(reachedEof).toBe(false)
+    expect(updateAIThreadTitle).not.toHaveBeenCalled()
+
+    resolveTitle('Daily Focus Advice')
+    await vi.waitFor(() => expect(updateAIThreadTitle).toHaveBeenCalledWith(
+      TEST_THREAD_ID, 'Daily Focus Advice', 'usr_from_jwt', 'Help me focus today',
+    ))
+    expect(reachedEof).toBe(false)
+    resolveSave()
+    expect((await eof).done).toBe(true)
+    expect(summarizeThreadTitle).toHaveBeenCalledTimes(1)
   })
 
-  it('uses the reservation entitlement when MAX access ends after the initial usage read', async () => {
-    vi.mocked(getOracleUsageSnapshot).mockResolvedValueOnce(buildOracleUsageSnapshot([], true))
-    vi.mocked(reserveOracleChatUsage).mockResolvedValueOnce({ allowed: true, id: 'downgraded-usage', isPremium: false })
-    streamTextMock.mockReturnValueOnce({ stream: textStream('current answer') })
-    const request = await authedRequest({
-      messages: [{ role: 'user', content: 'Help me plan' }],
-      model: ORACLE_MODELS[1].id,
+  it('persists the title even when saving the assistant message fails', async () => {
+    vi.mocked(saveAIMessage)
+      .mockResolvedValueOnce({ id: 'user-msg' } as any)
+      .mockRejectedValueOnce(new Error('Assistant persistence unavailable'))
+    streamTextMock.mockImplementationOnce((options) => ({
+      stream: textStream('Reply').pipeThrough(new TransformStream({
+        async flush() { await options.onFinish({ text: 'Reply', totalUsage: {} }) },
+      })),
+    }))
+    const response = await handleOracleChatRequest(await authedRequest({
+      messages: [{ role: 'user', content: 'Explain daily alignment' }],
+    }))
+    expect(await response.text()).toBe('Reply')
+    expect(updateAIThreadTitle).toHaveBeenCalledWith(
+      TEST_THREAD_ID, 'Test Title', 'usr_from_jwt', 'Explain daily alignment',
+    )
+  })
+
+  it('keeps the initial excerpt when title generation fails without failing the chat', async () => {
+    vi.mocked(summarizeThreadTitle).mockRejectedValueOnce(new Error('Title service unavailable'))
+    streamTextMock.mockImplementationOnce((options) => ({
+      stream: textStream('Reply').pipeThrough(new TransformStream({
+        async flush() { await options.onFinish({ text: 'Reply', totalUsage: {} }) },
+      })),
+    }))
+    const response = await handleOracleChatRequest(await authedRequest({
+      messages: [{ role: 'user', content: 'Help me focus today' }],
+    }))
+    expect(await response.text()).toBe('Reply')
+    expect(updateAIThreadTitle).not.toHaveBeenCalled()
+  })
+
+  it('does not generate titles for guests or existing conversations', async () => {
+    await handleOracleChatRequest(makeRequest({ messages: [{ role: 'user', content: 'Hello' }] }))
+    streamTextMock.mockReturnValueOnce({ stream: textStream('Reply') })
+    const response = await handleOracleChatRequest(await authedRequest({
+      threadId: TEST_THREAD_ID,
+      messages: [{ role: 'user', content: 'Help me focus today' }],
+    }))
+    await response.text()
+    expect(summarizeThreadTitle).not.toHaveBeenCalled()
+  })
+
+  it('aborts the single title task when all chat candidates fail', async () => {
+    let titleSignal!: AbortSignal
+    vi.mocked(summarizeThreadTitle).mockImplementationOnce((_text, _model, _user, signal) => {
+      titleSignal = signal!
+      return new Promise((_resolve, reject) => {
+        signal!.addEventListener('abort', () => reject(new Error('Aborted')), { once: true })
+      })
     })
-    const response = await handleOracleChatRequest(request)
-    expect(response.status).toBe(200)
-    expect(streamTextMock).toHaveBeenCalledTimes(1)
-    expect(streamTextMock.mock.calls[0][0].model).toBe(ORACLE_MODELS[0].id)
+    streamTextMock.mockImplementation(() => { throw new Error('Chat unavailable') })
+    const response = await handleOracleChatRequest(await authedRequest({
+      messages: [{ role: 'user', content: 'Help me focus today' }],
+    }))
+    expect(response.status).toBe(502)
+    expect(titleSignal.aborted).toBe(true)
+    expect(summarizeThreadTitle).toHaveBeenCalledTimes(1)
+    expect(updateAIThreadTitle).not.toHaveBeenCalled()
+    streamTextMock.mockReset()
   })
 
-  it('routes MAX to Abyss using the atomic reservation entitlement', async () => {
-    vi.mocked(reserveOracleChatUsage).mockResolvedValueOnce({ allowed: true, id: 'paid-usage', isPremium: true })
-    streamTextMock.mockReturnValueOnce({ stream: textStream('deeper answer') })
-    const request = await authedRequest({ messages: [{ role: 'user', content: 'Help me plan' }] })
-    const response = await handleOracleChatRequest(request)
-    expect(response.status).toBe(200)
-    expect(streamTextMock.mock.calls[0][0].model).toBe(ORACLE_MODELS[1].id)
+  it.each([PREMIUM_ORACLE_MODEL_ID, PREMIUM_DEEPSEEK_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID])(
+    'does not let a free member select %s or spend on a paid title model',
+    async (requestedModel) => {
+      streamTextMock.mockReturnValueOnce({ stream: textStream('Free reply') })
+      const response = await handleOracleChatRequest(await authedRequest({
+        model: requestedModel,
+        messages: [{ role: 'user', content: 'Help me focus today' }],
+      }))
+      await response.text()
+      expect(streamTextMock.mock.calls[0][0].model).toBe(DEFAULT_ORACLE_MODEL_ID)
+      expect(summarizeThreadTitle).toHaveBeenCalledWith(
+        'Help me focus today', ORACLE_TITLE_MODEL_ID, 'usr_from_jwt', expect.any(AbortSignal),
+      )
+    },
+  )
+
+  it('uses the authoritative reservation tier for Premium chat and titles', async () => {
+    // The preliminary snapshot still says free; only the atomic reservation
+    // determines access at the point where calls are dispatched.
+    vi.mocked(reserveOracleChatUsage).mockResolvedValueOnce({ allowed: true, id: 'premium-usage', isPremium: true })
+    streamTextMock.mockReturnValueOnce({ stream: textStream('Premium reply') })
+    const response = await handleOracleChatRequest(await authedRequest({
+      messages: [{ role: 'user', content: 'Help me focus today' }],
+    }))
+    await response.text()
+    expect(streamTextMock.mock.calls[0][0].model).toBe(PREMIUM_ORACLE_MODEL_ID)
+    expect(summarizeThreadTitle).toHaveBeenCalledWith(
+      'Help me focus today', PREMIUM_ORACLE_TITLE_MODEL_ID, 'usr_from_jwt', expect.any(AbortSignal),
+    )
+  })
+
+  it('fails closed without sending Premium prompts to a free fallback', async () => {
+    vi.mocked(reserveOracleChatUsage).mockResolvedValueOnce({ allowed: true, id: 'premium-usage', isPremium: true })
+    streamTextMock.mockReturnValueOnce({ stream: emptyStream() })
+    const response = await handleOracleChatRequest(await authedRequest({
+      model: DEFAULT_ORACLE_MODEL_ID,
+      messages: [{ role: 'user', content: 'Help me focus today' }],
+    }))
+    expect(response.status).toBe(502)
+    expect(streamTextMock.mock.calls.map(([options]) => options.model)).toEqual([PREMIUM_ORACLE_MODEL_ID])
+    expect(streamTextMock.mock.calls[0][0].providerOptions.gateway).toEqual({ only: ['anthropic'], disallowPromptTraining: true })
+    expect(screenOraclePrompt).toHaveBeenCalledWith('Help me focus today', { isPremium: true })
+    expect(summarizeThreadTitle).toHaveBeenCalledTimes(1)
+    expect(updateAIThreadTitle).not.toHaveBeenCalled()
+  })
+
+  it('honors a MAX member selecting the private DeepSeek option', async () => {
+    vi.mocked(reserveOracleChatUsage).mockResolvedValueOnce({ allowed: true, id: 'max-usage', isPremium: true })
+    streamTextMock.mockReturnValueOnce({ stream: textStream('MAX reply') })
+    const response = await handleOracleChatRequest(await authedRequest({
+      model: PREMIUM_DEEPSEEK_MODEL_ID,
+      messages: [{ role: 'user', content: 'Help me focus today' }],
+    }))
+    await response.text()
+    expect(streamTextMock.mock.calls[0][0].model).toBe(PREMIUM_DEEPSEEK_MODEL_ID)
+    expect(streamTextMock.mock.calls[0][0].providerOptions.gateway).toEqual({ only: ['deepinfra'], disallowPromptTraining: true })
   })
 
   it('returns guest JSON when unauthenticated', async () => {
@@ -347,7 +475,7 @@ describe('handleOracleChatRequest', () => {
     expect(res.status).toBe(200)
     expect(await res.text()).toBe('Primary answer')
     expect(streamTextMock).toHaveBeenCalledTimes(1)
-    expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(ORACLE_MODELS[0].id)
+    expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(DEFAULT_ORACLE_MODEL_ID)
   })
 
   it('builds history from stored messages and ignores client-sent turns', async () => {
@@ -450,7 +578,7 @@ describe('handleOracleChatRequest', () => {
     const data = await res.json()
     expect(data.error).toContain(ORACLE_UNAVAILABLE_MESSAGE)
     expect(streamTextMock).toHaveBeenCalledTimes(1)
-    expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(ORACLE_MODELS[0].id)
+    expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(DEFAULT_ORACLE_MODEL_ID)
   })
 
   it('returns 502 when DeepSeek V4.1 Flash fails', async () => {
@@ -470,7 +598,7 @@ describe('handleOracleChatRequest', () => {
     expect(streamTextMock).toHaveBeenCalledTimes(1)
   })
 
-  it('pins candidate model to DeepSeek V4.1 Flash', async () => {
+  it('uses the free member default model', async () => {
     streamTextMock.mockReturnValueOnce({ stream: textStream('Answer') })
 
     const res = await handleOracleChatRequest(
@@ -481,7 +609,7 @@ describe('handleOracleChatRequest', () => {
 
     expect(res.status).toBe(200)
     expect(await res.text()).toBe('Answer')
-    expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(ORACLE_MODELS[0].id)
+    expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(DEFAULT_ORACLE_MODEL_ID)
   })
 
   it('blocks a Jev jailbreak before streaming', async () => {
@@ -503,6 +631,7 @@ describe('handleOracleChatRequest', () => {
     expect(res.status).toBe(400)
     const data = await res.json()
     expect(data.error).toBe(ORACLE_JAILBREAK_ERROR)
+    expect(releaseOracleChatUsage).toHaveBeenCalledWith('usage-1')
     expect(streamTextMock).not.toHaveBeenCalled()
   })
 
@@ -592,13 +721,13 @@ describe('handleOracleChatRequest', () => {
     expect(streamTextMock).not.toHaveBeenCalled()
   })
 
-  it('uses DeepSeek V4.1 Flash model and passes context to buildSystemPrompt', async () => {
+  it('uses the free member model and passes context to buildSystemPrompt', async () => {
     streamTextMock.mockReturnValueOnce({ stream: textStream('Chassis answer') })
     vi.mocked(screenOraclePrompt).mockResolvedValueOnce({
       blocked: false,
       intent: 'chassis_equipment',
       complexityBand: 2,
-      preferredModelId: ORACLE_MODELS[0].id,
+      preferredModelId: DEFAULT_ORACLE_MODEL_ID,
       context: 'chassis',
       source: 'jev',
     })
@@ -610,7 +739,7 @@ describe('handleOracleChatRequest', () => {
     )
 
     expect(res.status).toBe(200)
-    expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(ORACLE_MODELS[0].id)
+    expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(DEFAULT_ORACLE_MODEL_ID)
     expect(buildSystemPrompt).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'Synaptic Oracle' }),
       'chassis',

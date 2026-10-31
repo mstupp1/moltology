@@ -1,4 +1,4 @@
-import { ORACLE_MODELS, getOracleModel } from './oracle-models'
+import { ORACLE_MODELS, getOracleDefaultModelId, canUseOracleChatModel, type OracleAccessTier } from './oracle-models'
 import { capOracleHistory } from './usage-limits'
 
 export const GUEST_ORACLE_RESPONSES = [
@@ -26,14 +26,18 @@ export function pickGuestOracleResponse(userText: string, messageCount: number):
   return GUEST_ORACLE_RESPONSES[index]
 }
 
-/** Resolve a single entitled model; never fall forward into a paid model on failure. */
-export function getOracleCandidateModelIds(selectedModelId?: string, isPremium = false): string[] {
-  const selectedModel = getOracleModel(selectedModelId)
-  return [selectedModel.premium && !isPremium ? ORACLE_MODELS[0].id : selectedModel.id]
+/** Title/preview rows never enter chat routing; membership is supplied by the server. */
+export function getOracleCandidateModelIds(selectedModelId?: string, tier: OracleAccessTier = 'free'): string[] {
+  const allowed = ORACLE_MODELS.filter((model) => canUseOracleChatModel(model, tier))
+  const selected = allowed.find((model) => model.id === selectedModelId)
+    ?? allowed.find((model) => model.id === getOracleDefaultModelId(tier))
+  // Preserve the selected model: never silently downgrade or increase cost.
+  return selected ? [selected.id] : []
 }
 
-export function orderOracleModels(requestedModelId?: string, _preferredModelId?: string, isPremium = false): string[] {
-  return getOracleCandidateModelIds(requestedModelId || (isPremium ? ORACLE_MODELS[1].id : undefined), isPremium)
+export function orderOracleModels(requestedModelId?: string, _preferredModelId?: string, tier: OracleAccessTier = 'free'): string[] {
+  // Moderation's model preference cannot override the member's entitlement/default.
+  return getOracleCandidateModelIds(requestedModelId, tier)
 }
 
 /** The member sees a fixed message; provider error text stays in the server log. */
