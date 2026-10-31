@@ -3,7 +3,7 @@ id: oracle
 title: Oracle AI
 order: 8
 color: '#ff5fa2'
-summary: The Oracle checks rate, input, and each member's usage allowance, screens the prompt with the moderation model, routes it to a fast or deep model, and falls back through a model chain.
+summary: The Oracle checks input and rolling usage, screens prompts, and routes to Oracle Current or MAX-only Oracle Abyss using the entitlement returned by its atomic usage reservation.
 rules:
   - id: oracle.request-pipeline
     title: Oracle request pipeline
@@ -73,7 +73,7 @@ rules:
         kind: action
         next: [stream]
       - id: stream
-        label: Stream with fallback chain
+        label: Stream entitled model
         kind: outcome
         tone: allow
   - id: oracle.rate-limit
@@ -91,7 +91,7 @@ rules:
   - id: oracle.usage-allowance
     title: Rolling allowances, Premium gets 10x
     kind: limit
-    statement: Free members can send 5 Oracle messages a minute, 15 per rolling 5 hours, and 100 per rolling 7 days. Premium receives 10x. Both windows must have capacity; usage is checked and reserved atomically across instances before model calls and survives thread deletion. New-thread failure releases the reservation. Chat shows five-hour usage and both windows in details and Settings.
+    statement: Free members can send 5 Oracle messages a minute, 15 per rolling 5 hours, and 100 per rolling 7 days. Oracle MAX receives 10x. Both windows must have capacity; usage is checked and reserved atomically across instances before model calls and survives thread deletion. New-thread failure releases the reservation. Chat shows five-hour usage and both windows in details and Settings.
     dependsOn: [oracle.request-pipeline, premium.no-standing, economy.red-line]
     anchors:
       - file: src/lib/ai/service.ts
@@ -153,7 +153,7 @@ rules:
     title: Intent picks the prompt context
     kind: flow
     statement: Doctrine questions load the scripture block, chassis and progression questions load a short block, and casual or unrelated questions use the base prompt. When the moderation model is down, the full doctrine context is used.
-    dependsOn: [oracle.jailbreak-gate]
+    dependsOn: [oracle.jailbreak-gate, economy.red-line]
     anchors:
       - file: src/lib/quality/oracle-preflight.ts
         symbol: ORACLE_INTENTS
@@ -163,20 +163,20 @@ rules:
         symbol: fallbackOracleDecision
     tests: [src/lib/quality/oracle-preflight.test.ts]
   - id: oracle.model-routing
-    title: Complexity band picks the model
-    kind: threshold
-    statement: Questions rated band 4 or 5 of 5 go to DeepSeek 4.1 Flash and simpler ones to the default, GLM 5.3 Flash. A model the member picked always wins.
-    dependsOn: [oracle.jailbreak-gate]
+    title: Membership gates model selection
+    kind: permission
+    statement: Free members use Oracle Current (DeepSeek V4.1 Flash). Oracle MAX defaults to Oracle Abyss (Claude Sonnet 4.6) and may select Current. The atomic usage reservation supplies the authoritative entitlement; a free member requesting Abyss is routed to Current. Moderation preferences cannot override this gate.
+    dependsOn: [oracle.jailbreak-gate, economy.red-line]
     anchors:
-      - file: src/lib/quality/oracle-preflight.ts
-        symbol: ORACLE_COMPLEX_BAND
-      - file: src/lib/quality/oracle-preflight.ts
-        symbol: preferredOracleModelId
-    tests: [src/lib/quality/oracle-preflight.test.ts]
+      - file: src/lib/ai/oracle-chat.ts
+        symbol: orderOracleModels
+      - file: src/lib/ai/oracle-chat.ts
+        symbol: getOracleCandidateModelIds
+    tests: [src/lib/ai/oracle-chat.test.ts, src/lib/ai/handle-oracle-chat-request.test.ts]
   - id: oracle.model-fallback
-    title: Ordered model fallback
+    title: Model failure preserves the selected tier
     kind: flow
-    statement: The models are GLM 5.3 Flash (default, also writes thread titles), DeepSeek 4.1 Flash, and Qwen 3.7 Flash. The Oracle tries the preferred model first and waits for the first real token before committing. On an empty stream, error, or timeout it moves to the next model, and it only shows the unavailable message when every model fails.
+    statement: The Oracle waits for a real first token from the single entitled model. Empty streams, errors, and timeouts return the unavailable message without falling into a more expensive model or silently downgrading Abyss. Thread titles continue to use DeepSeek V4.1 Flash.
     dependsOn: [oracle.model-routing]
     anchors:
       - file: src/lib/ai/oracle-models.ts
@@ -193,4 +193,4 @@ rules:
     tests: [src/lib/server/oracle-threads.test.ts]
 ---
 
-The Oracle is the most expensive surface, because every message is a billed model call. The pipeline refuses abuse cheaply first, caps each member's allowance, then spends a free moderation call to route the question to the cheapest model that can answer it.
+The Oracle is the most expensive surface, because every message is a billed model call. The pipeline refuses abuse cheaply first, caps each member's allowance, then screens the prompt before calling the model allowed by the member's plan and choice.

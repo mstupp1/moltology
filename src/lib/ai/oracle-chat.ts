@@ -26,20 +26,14 @@ export function pickGuestOracleResponse(userText: string, messageCount: number):
   return GUEST_ORACLE_RESPONSES[index]
 }
 
-export function getOracleCandidateModelIds(selectedModelId?: string): string[] {
+/** Resolve a single entitled model; never fall forward into a paid model on failure. */
+export function getOracleCandidateModelIds(selectedModelId?: string, isPremium = false): string[] {
   const selectedModel = getOracleModel(selectedModelId)
-  return [
-    selectedModel.id,
-    ...ORACLE_MODELS.filter((m) => m.id !== selectedModel.id).map((m) => m.id),
-  ]
+  return [selectedModel.premium && !isPremium ? ORACLE_MODELS[0].id : selectedModel.id]
 }
 
-/**
- * Returns candidate model list pinned to DeepSeek V4.1 Flash for maximum KV cache hits
- * and predictable execution without multi-model fallback hops.
- */
-export function orderOracleModels(requestedModelId?: string, preferredModelId?: string): string[] {
-  return getOracleCandidateModelIds(requestedModelId || preferredModelId)
+export function orderOracleModels(requestedModelId?: string, _preferredModelId?: string, isPremium = false): string[] {
+  return getOracleCandidateModelIds(requestedModelId || (isPremium ? ORACLE_MODELS[1].id : undefined), isPremium)
 }
 
 /** The member sees a fixed message; provider error text stays in the server log. */

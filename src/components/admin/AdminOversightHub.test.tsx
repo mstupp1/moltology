@@ -108,11 +108,11 @@ describe('Admin access and oversight hub', () => {
     })
   })
 
-  it('opens the Shop tab with orders above Premium members', async () => {
+  it('opens the Shop tab with orders above Oracle MAX members', async () => {
     access.canView = true
     render(<AdminOversightHub initialTab="shop" />)
     expect(screen.getByTestId('admin-tab-shop')).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByTestId('admin-shop')).toBeInTheDocument()
-    expect(await screen.findByTestId('admin-purchases-empty')).toHaveTextContent('No Premium purchases')
+    expect(await screen.findByTestId('admin-purchases-empty')).toHaveTextContent('No Oracle MAX purchases')
   })
 })

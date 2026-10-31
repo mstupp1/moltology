@@ -171,7 +171,7 @@ const SECTORS = [
   { title: 'Store settings', detail: 'Checkout, policies, catalog', to: '/admin/store' as const },
   { title: 'Storefront', detail: 'The shop as members see it', to: '/store' as const },
   { title: 'Logic Atlas', detail: 'Business rules and where they live', to: '/admin/logic' as const },
-  { title: 'Premium', detail: 'Membership tools for this account', to: '/premium' as const },
+  { title: 'Oracle MAX', detail: 'Membership tools for this account', to: '/premium' as const },
   { title: 'Composite Studio', detail: 'Preview render layouts', to: '/render/composite' as const },
 ]
 
@@ -381,15 +381,15 @@ function PurchaseLedger({ userId }: { userId: string | null }) {
     <section className="hud-sheen rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 md:p-5 space-y-3" data-testid="admin-purchases">
       <div className="flex items-center gap-2">
         <ShieldCheck className="w-4 h-4 text-amber-400" />
-        <h2 className="font-grotesk text-sm font-bold uppercase tracking-[0.08em] text-ink">Premium members</h2>
+        <h2 className="font-grotesk text-sm font-bold uppercase tracking-[0.08em] text-ink">Oracle MAX members</h2>
       </div>
       <p className="text-xs text-ink-muted">
-        Premium status and currency balances. This view does not change billing.
+        Oracle MAX status and currency balances. This view does not change billing.
       </p>
       {error ? <p className="text-xs text-crimson-text">{error}</p> : null}
       {rows && rows.length === 0 && !error ? (
         <p className="text-xs text-ink-muted" data-testid="admin-purchases-empty">
-          No Premium purchases are on file.
+          No Oracle MAX purchases are on file.
         </p>
       ) : null}
       {rows && rows.length > 0 ? (
@@ -399,7 +399,7 @@ function PurchaseLedger({ userId }: { userId: string | null }) {
               <p className="text-sm font-bold text-ink">{memberName(row.handle, row.larvaId)}</p>
               <p className="text-[11px] text-ink-muted">{row.email ?? 'No email'}</p>
               <p className="text-[11px] text-ink-body">
-                {row.isPremium ? 'Premium active' : 'Premium inactive'}
+                {row.isPremium ? 'Oracle MAX active' : 'Oracle MAX inactive'}
                 {row.hasPurchasedPremium ? ' · purchased before' : ''}
                 {row.premiumStatus ? ` · ${row.premiumStatus}` : ''}
                 {row.premiumPeriodEnd ? ` · through ${utcDate(row.premiumPeriodEnd)}` : ''}

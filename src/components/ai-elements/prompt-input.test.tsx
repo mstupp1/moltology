@@ -63,16 +63,27 @@ describe('PromptInput', () => {
     expect(screen.getByRole('button', { name: 'Start dictation' })).toBeInTheDocument()
   })
 
-  it('shows the model picker only when a model and handler are passed', () => {
+  it('shows two branded choices and locks Abyss for free members', async () => {
     const onSelectModel = vi.fn()
     render(<PromptInput onSubmit={vi.fn()} selectedModel={getOracleModel()} onSelectModel={onSelectModel} />)
-    fireEvent.click(screen.getByRole('button', { name: /Select model/i }))
-    expect(screen.getByText('In / 1M')).toBeInTheDocument()
-    expect(screen.getByText('$0.02')).toBeInTheDocument()
-    expect(screen.getByText('$0.19')).toBeInTheDocument()
-    expect(screen.queryByText(/GLM/i)).not.toBeInTheDocument()
-    fireEvent.click(screen.getAllByRole('button', { name: /DeepSeek V4.1 Flash/i }).at(-1)!)
+    fireEvent.keyDown(screen.getByRole('button', { name: /Select model/i }), { key: 'Enter' })
+    const locked = await screen.findByRole('menuitemradio', { name: /Oracle Abyss/i })
+    expect(locked).toHaveAttribute('aria-disabled', 'true')
+    fireEvent.click(locked)
+    expect(onSelectModel).not.toHaveBeenCalled()
+    expect(screen.getByRole('menuitem', { name: 'Explore Oracle MAX' })).toHaveAttribute('href', '/premium')
+    expect(screen.queryByText(/DeepSeek|Claude|In \/ 1M/)).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('menuitemradio', { name: /Oracle Current/i }))
     expect(onSelectModel).toHaveBeenCalledWith('deepseek/deepseek-v4.1-flash')
+  })
+
+  it('lets MAX members select Abyss without an upgrade CTA', async () => {
+    const onSelectModel = vi.fn()
+    render(<PromptInput onSubmit={vi.fn()} selectedModel={getOracleModel()} onSelectModel={onSelectModel} hasPremiumAccess />)
+    fireEvent.keyDown(screen.getByRole('button', { name: /Select model/i }), { key: 'Enter' })
+    fireEvent.click(await screen.findByRole('menuitemradio', { name: /Oracle Abyss/i }))
+    expect(onSelectModel).toHaveBeenCalledWith('anthropic/claude-sonnet-4.6')
+    expect(screen.queryByText('Explore Oracle MAX')).not.toBeInTheDocument()
   })
 
   it('stops a streaming reply with Escape', () => {

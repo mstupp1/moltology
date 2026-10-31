@@ -13,24 +13,11 @@ import {
 import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel, ORACLE_TITLE_MODEL_ID } from './oracle-models'
 
 describe('oracle-chat helpers', () => {
-  it('configures DeepSeek V4.1 Flash as the default chat and title model', () => {
-    expect(ORACLE_MODELS[0]).toEqual({
-      id: 'deepseek/deepseek-v4.1-flash',
-      label: 'DeepSeek V4.1 Flash',
-      shortLabel: 'DeepSeek',
-      provider: 'deepseek',
-      badge: 'Chat',
-      pricing: { input: '$0.02', output: '$0.19' },
-    })
+  it('brands two distinct backends without exposing vendor labels', () => {
+    expect(ORACLE_MODELS.map((m) => m.label)).toEqual(['Oracle Current', 'Oracle Abyss'])
+    expect(new Set(ORACLE_MODELS.map((m) => m.id)).size).toBe(2)
     expect(DEFAULT_ORACLE_MODEL_ID).toBe('deepseek/deepseek-v4.1-flash')
-    expect(getOracleModel().id).toBe('deepseek/deepseek-v4.1-flash')
-    expect(ORACLE_TITLE_MODEL_ID).toBe('deepseek/deepseek-v4.1-flash')
-  })
-
-  it('pins ORACLE_MODELS to DeepSeek V4.1 Flash', () => {
-    expect(ORACLE_MODELS.map((m) => m.id)).toEqual([
-      'deepseek/deepseek-v4.1-flash',
-    ])
+    expect(ORACLE_TITLE_MODEL_ID).toBe(DEFAULT_ORACLE_MODEL_ID)
   })
 
   it('drops system turns and caps history before it reaches the model', () => {
@@ -53,7 +40,7 @@ describe('oracle-chat helpers', () => {
   })
 
   it('returns the default model in the candidate list', () => {
-    const expected = ORACLE_MODELS.map((m) => m.id)
+    const expected = [DEFAULT_ORACLE_MODEL_ID]
     expect(getOracleCandidateModelIds()).toEqual(expected)
     expect(getOracleCandidateModelIds('unknown-model')).toEqual(expected)
     expect(getOracleModel('zai/glm-5.3-flash').id).toBe(DEFAULT_ORACLE_MODEL_ID)
@@ -61,9 +48,13 @@ describe('oracle-chat helpers', () => {
     expect(getOracleCandidateModelIds('deepseek/deepseek-v4.1-flash')[0]).toBe('deepseek/deepseek-v4.1-flash')
   })
 
-  it('always resolves candidate models to DeepSeek V4.1 Flash', () => {
-    expect(orderOracleModels()[0]).toBe(DEFAULT_ORACLE_MODEL_ID)
-    expect(orderOracleModels('deepseek/deepseek-v4.1-flash')[0]).toBe(DEFAULT_ORACLE_MODEL_ID)
+  it('enforces model entitlement and gives MAX the deeper model by default', () => {
+    const premiumId = ORACLE_MODELS[1].id
+    expect(orderOracleModels(premiumId)).toEqual([DEFAULT_ORACLE_MODEL_ID])
+    expect(orderOracleModels(undefined, premiumId)).toEqual([DEFAULT_ORACLE_MODEL_ID])
+    expect(orderOracleModels(undefined, undefined, true)).toEqual([premiumId])
+    expect(orderOracleModels(premiumId, undefined, true)).toEqual([premiumId])
+    expect(orderOracleModels(DEFAULT_ORACLE_MODEL_ID, undefined, true)).toEqual([DEFAULT_ORACLE_MODEL_ID])
   })
 
   it('never shows provider error text to the member', () => {

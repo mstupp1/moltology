@@ -88,7 +88,7 @@ describe('reserveOracleChatUsage', () => {
       { timestamps: [], is_premium: false, allowed: true, id: 'reserved-1', server_time: serverTime },
     ]])
 
-    await expect(reserveOracleChatUsage('member-1')).resolves.toEqual({ allowed: true, id: 'reserved-1' })
+    await expect(reserveOracleChatUsage('member-1')).resolves.toEqual({ allowed: true, id: 'reserved-1', isPremium: false })
     const { ensureUserProfile } = await import('../user-sync')
     expect(ensureUserProfile).toHaveBeenCalledWith('member-1')
     expect(neonClient.transaction).toHaveBeenCalledWith(

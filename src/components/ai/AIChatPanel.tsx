@@ -35,11 +35,10 @@ import { getAIMessagesFn, getAIThreadsFn, getUserProfileFn } from '../../lib/ser
 import { streamOracleChat } from '../../lib/ai/stream-oracle-chat-client'
 import { createOracleEntityBridge, type OracleEntityBridge } from '@/lib/ai/oracle-entity-bridge'
 import { useSafeOracle, OracleMode } from '../hud/OracleContext'
-import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel, DEFAULT_ORACLE_PLACEHOLDER } from '../../lib/ai/oracle-models'
+import { PREMIUM_ORACLE_MODEL_ID, DEFAULT_ORACLE_MODEL_ID, getOracleModel, DEFAULT_ORACLE_PLACEHOLDER } from '../../lib/ai/oracle-models'
 import { AuthModal } from '../AuthModal'
 import { useAuthSession } from '../../hooks/useAuthSession'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
-import { isAdmin } from '../../lib/permissions'
 import { resolveMemberPublicName } from '../../lib/member-handle'
 import { getAuthJWTToken } from '../../lib/jwt'
 import { oracleAuthData } from '../../lib/ai/oracle-auth-client'
@@ -194,9 +193,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSending, setIsSending] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
-  const [selectedModelId, setSelectedModelId] = useState<string>(DEFAULT_ORACLE_MODEL_ID)
+  const [modelChoice, setModelChoice] = useState<{ userId: string | null; id: string } | null>(null)
+  const selectedModelId = modelChoice?.userId === userId && (!getOracleModel(modelChoice.id).premium || usage.snapshot?.isPremium)
+    ? modelChoice.id
+    : usage.snapshot?.isPremium ? PREMIUM_ORACLE_MODEL_ID : DEFAULT_ORACLE_MODEL_ID
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  const [profileRole, setProfileRole] = useState<string | null>(null)
   const [memberHandle, setMemberHandle] = useState<string | null>(null)
   const [memberLarvaId, setMemberLarvaId] = useState<string | null>(null)
   const [draft, setDraft] = useState('')
@@ -240,11 +241,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const stickToBottomRef = useRef(true)
   const abortRef = useRef<AbortController | null>(null)
 
-  const canPickModel = isAdmin(user, profileRole)
+  const hasPremiumAccess = Boolean(userId && usage.snapshot?.isPremium)
 
   useEffect(() => {
     if (!userId) {
-      setProfileRole(null)
       setMemberHandle(null)
       setMemberLarvaId(null)
       return
@@ -256,13 +256,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         const token = await getAuthJWTToken().catch(() => null)
         const profile = await getUserProfileFn({ data: { token: token ?? undefined, userId } })
         if (isSubscribed) {
-          setProfileRole(profile?.role ?? null)
           setMemberHandle(profile?.handle ?? null)
           setMemberLarvaId(profile?.larvaId ?? null)
         }
       } catch {
         if (isSubscribed) {
-          setProfileRole(null)
           setMemberHandle(null)
           setMemberLarvaId(null)
         }
@@ -812,8 +810,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         status={isSending ? 'streaming' : 'ready'}
         placeholder={placeholder}
         autoFocus
-        selectedModel={canPickModel ? selectedModel : undefined}
-        onSelectModel={canPickModel ? (id) => setSelectedModelId(id) : undefined}
+        selectedModel={selectedModel}
+        hasPremiumAccess={hasPremiumAccess}
+        onSelectModel={(id) => { if (!getOracleModel(id).premium || hasPremiumAccess) setModelChoice({ userId, id }) }}
       />
     </div>
   )

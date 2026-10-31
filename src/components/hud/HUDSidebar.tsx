@@ -467,7 +467,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const showGoPremium = canViewPremium && premiumMembership !== null && !premiumMembership.isPremium
   const accountSubtitle = premiumMembership
     ? premiumMembership.isPremium
-      ? 'Premium member'
+      ? 'Oracle MAX member'
       : 'Free plan'
     : 'Account and settings'
   const isAdminActive =
@@ -1124,7 +1124,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   </button>
                 </div>
 
-                {/* Go Premium (free members only, Expanded) */}
+                {/* Go Oracle MAX (free members only, Expanded) */}
                 {showGoPremium && (
                   <div
                     className={`relative transition-colors duration-150 min-h-[44px] ${
@@ -1144,7 +1144,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       )}
                       <Sparkles className="w-4 h-4 shrink-0 text-cyan-glow" />
                       <span className="flex-1 min-w-0 truncate text-xs md:text-[12.5px] font-sans font-semibold tracking-wide uppercase leading-tight text-cyan-glow">
-                        Go Premium
+                        Go Oracle MAX
                       </span>
                     </button>
                   </div>

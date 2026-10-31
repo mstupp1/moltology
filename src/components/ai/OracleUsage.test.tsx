@@ -42,12 +42,12 @@ describe('quiet Oracle usage', () => {
     view.rerender(<OracleUsage snapshot={buildOracleUsageSnapshot([], false, now)} unavailable />)
     expect(screen.getByText('Usage unavailable. Showing the last reading.')).toBeInTheDocument()
   })
-  it('shows both windows and plan in Settings without a hidden Premium link', () => {
+  it('shows both windows and plan in Settings without a hidden Oracle MAX link', () => {
     vi.mocked(useOracleUsage).mockReturnValue({ snapshot: buildOracleUsageSnapshot([], true, now), unavailable: false, blocked: false, refresh: vi.fn() })
     const view = render(<PlanUsageSection userId="member" />)
-    expect(screen.getByText('Premium plan · Oracle messages')).toBeInTheDocument()
+    expect(screen.getByText('Oracle MAX plan · Oracle messages')).toBeInTheDocument()
     expect(screen.getAllByRole('meter')).toHaveLength(2)
-    expect(screen.queryByRole('link', { name: 'View Premium' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'View Oracle MAX' })).not.toBeInTheDocument()
     view.rerender(<PlanUsageSection userId={null} />)
     expect(screen.queryByText('Plan & usage')).not.toBeInTheDocument()
   })

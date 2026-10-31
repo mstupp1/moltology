@@ -294,7 +294,7 @@ const MAX_ORACLE_USAGE_RESERVATION_ATTEMPTS = 3
  */
 export async function reserveOracleChatUsage(
   userId: string,
-): Promise<{ allowed: true; id: string } | { allowed: false; decision: Exclude<ReturnType<typeof decideOracleUsage>, { allowed: true }> }> {
+): Promise<{ allowed: true; id: string; isPremium: boolean } | { allowed: false; decision: Exclude<ReturnType<typeof decideOracleUsage>, { allowed: true }> }> {
   // createAIThread previously materialized a missing profile before the usage
   // insert. Keep that first-chat path valid now that reservation runs first.
   await ensureUserProfile(userId)
@@ -357,7 +357,7 @@ export async function reserveOracleChatUsage(
         if (decision.allowed) throw new Error('Oracle usage reservation was denied without a full quota window.')
         return { allowed: false, decision }
       }
-      return { allowed: true, id: row.id }
+      return { allowed: true, id: row.id, isPremium: row.is_premium }
     } catch (error) {
       const code = typeof error === 'object' && error !== null && 'code' in error
         ? (error as { code?: unknown }).code

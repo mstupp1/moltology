@@ -7,14 +7,14 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-10-30",
+  "syncedAt": "2026-10-31",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
     "rules": 122,
-    "decisions": 46,
+    "decisions": 47,
     "anchors": 234,
-    "drifted": 24,
+    "drifted": 20,
     "flagged": 9
   },
   "canvas": {
@@ -151,9 +151,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
     },
     {
       "id": "premium",
-      "title": "Premium & billing",
+      "title": "Oracle MAX & billing",
       "color": "#d27bff",
-      "summary": "A Stripe monthly membership in soft launch behind the staff gate. Its only benefit so far is a 10x Oracle allowance.",
+      "summary": "Oracle MAX adds Oracle Abyss and a 10x Oracle allowance. The plan preview is public; billing and no-charge activation remain staff-only.",
       "overviewHtml": "<p>Premium is a subscription, not a currency. It sits beside the economy and must stay on the right side of the red line. During the soft launch, only staff can see, buy, or turn Premium on without a charge.</p>",
       "box": {
         "x": 2460,
@@ -205,8 +205,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "oracle",
       "title": "Oracle AI",
       "color": "#ff5fa2",
-      "summary": "The Oracle checks rate, input, and each member's usage allowance, screens the prompt with the moderation model, routes it to a fast or deep model, and falls back through a model chain.",
-      "overviewHtml": "<p>The Oracle is the most expensive surface, because every message is a billed model call. The pipeline refuses abuse cheaply first, caps each member&#39;s allowance, then spends a free moderation call to route the question to the cheapest model that can answer it.</p>",
+      "summary": "The Oracle checks input and rolling usage, screens prompts, and routes to Oracle Current or MAX-only Oracle Abyss using the entitlement returned by its atomic usage reservation.",
+      "overviewHtml": "<p>The Oracle is the most expensive surface, because every message is a billed model call. The pipeline refuses abuse cheaply first, caps each member&#39;s allowance, then screens the prompt before calling the model allowed by the member&#39;s plan and choice.</p>",
       "box": {
         "x": 0,
         "y": 1988,
@@ -337,10 +337,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "BRAND_BIBLE.md",
           "symbol": "4. The Economy",
-          "line": 181,
+          "line": 183,
           "value": "Signup is free. Chitin Gems are earned by doing the work: shedding, routines, and being",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L181"
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L183"
         },
         {
           "file": "AGENTS.md",
@@ -383,10 +383,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "BRAND_BIBLE.md",
           "symbol": "4. The Economy",
-          "line": 181,
+          "line": 183,
           "value": "Signup is free. Chitin Gems are earned by doing the work: shedding, routines, and being",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L181"
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L183"
         }
       ],
       "tests": [],
@@ -400,6 +400,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "progression.stage-from-xp",
         "premium.no-standing",
         "oracle.usage-allowance",
+        "oracle.intent-context",
+        "oracle.model-routing",
         "merch.private-pilot",
         "merch.catalog-price",
         "standing.score"
@@ -1165,10 +1167,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "BRAND_BIBLE.md",
           "symbol": "3.3 Stages and clearances",
-          "line": 147,
+          "line": 149,
           "value": "Scriptures describe what the metrics typically read at each stage. What actually moves a",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L147"
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L149"
         }
       ],
       "tests": [
@@ -2919,17 +2921,17 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "premium.soft-launch",
       "domain": "premium",
-      "title": "Premium is staff-only for now",
+      "title": "Oracle MAX billing stays staff-only",
       "kind": "gate",
       "status": "soft-launch",
-      "statement": "The /premium page, checkout, price lookup, and the billing portal all require a staff role during the soft launch. The dashboard banner is also shown only to staff.",
+      "statement": "The /premium marketing preview is public. Checkout, price lookup, the billing portal, and no-charge activation require staff with the premium experiment enabled. The dashboard banner remains limited to that audience.",
       "anchors": [
         {
           "file": "src/lib/server/premium.ts",
           "symbol": "requirePremiumOperator",
           "line": 88,
           "value": "requirePremiumOperator(args)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L88"
         },
         {
@@ -2956,7 +2958,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "decisions": [
         "premium-soft-launch",
-        "premium-no-charge-staff-gate"
+        "premium-no-charge-staff-gate",
+        "oracle-max-model-access"
       ],
       "flag": null,
       "flow": null,
@@ -2964,7 +2967,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 72,
         "y": 208
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "premium.no-standing",
@@ -2972,7 +2975,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Premium grants no standing",
       "kind": "invariant",
       "status": "active",
-      "statement": "Premium must never grant rank, clearance, stage, forum authority, Standing, or Chitin Gems. Its only listed benefit is 10 times the free Oracle allowance.",
+      "statement": "Premium must never grant rank, clearance, stage, forum authority, Standing, or Chitin Gems. Oracle MAX includes Oracle Abyss plus Current and 10 times the free Oracle allowance.",
       "anchors": [
         {
           "file": "src/lib/premium-membership.ts",
@@ -2986,7 +2989,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "file": "src/lib/premium-membership.ts",
           "symbol": "PREMIUM_PAGE_COPY",
           "line": 40,
-          "value": "{ title: 'Premium membership', eyebrow: 'Monthly membership', description: 'Premium does not change your rank, clearance, stage, or forum authority. Chitin Gem…",
+          "value": "{ title: 'Oracle MAX membership', eyebrow: 'Monthly membership', description: 'Oracle MAX does not change your rank, clearance, stage, or forum authority. Chit…",
           "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L40"
         }
@@ -3006,7 +3009,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "decisions": [
         "premium-soft-launch",
         "oracle-usage-and-moderation",
-        "oracle-rolling-allowances"
+        "oracle-rolling-allowances",
+        "oracle-max-model-access"
       ],
       "flag": null,
       "flow": null,
@@ -3027,18 +3031,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/premium-membership.ts",
           "symbol": "isCurrentPremiumStatus",
-          "line": 109,
+          "line": 110,
           "value": "isCurrentPremiumStatus(status)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L109"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L110"
         },
         {
           "file": "src/lib/premium-membership.ts",
           "symbol": "subscriptionStatusImpliesPurchase",
-          "line": 113,
+          "line": 114,
           "value": "subscriptionStatusImpliesPurchase(status)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L113"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L114"
         },
         {
           "file": "src/db/schema.ts",
@@ -3083,17 +3087,17 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/premium-membership.ts",
           "symbol": "premiumPriceMatchesProduct",
-          "line": 498,
+          "line": 499,
           "value": "premiumPriceMatchesProduct(priceProduct, expectedProductId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L498"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L499"
         },
         {
           "file": "src/lib/server/premium.ts",
           "symbol": "createPremiumCheckoutHandler",
           "line": 166,
           "value": "createPremiumCheckoutHandler(args)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L166"
         }
       ],
@@ -3116,7 +3120,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 364
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "premium.webhook-signature",
@@ -3189,18 +3193,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/premium-membership.ts",
           "symbol": "interpretPremiumStripeEvent",
-          "line": 265,
+          "line": 266,
           "value": "interpretPremiumStripeEvent(event)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L265"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L266"
         },
         {
           "file": "src/lib/premium-membership.ts",
           "symbol": "reducePremiumMembership",
-          "line": 181,
+          "line": 182,
           "value": "reducePremiumMembership(previous, input)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L181"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L182"
         },
         {
           "file": "src/lib/server/premium.ts",
@@ -4496,10 +4500,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/handle-oracle-chat-request.ts",
           "symbol": "handleOracleChatRequest",
-          "line": 72,
+          "line": 73,
           "value": "handleOracleChatRequest(request)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L72"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L73"
         }
       ],
       "tests": [
@@ -4681,7 +4685,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           },
           {
             "id": "stream",
-            "label": "Stream with fallback chain",
+            "label": "Stream entitled model",
             "kind": "outcome",
             "tone": "allow",
             "position": {
@@ -4828,7 +4832,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Rolling allowances, Premium gets 10x",
       "kind": "limit",
       "status": "active",
-      "statement": "Free members can send 5 Oracle messages a minute, 15 per rolling 5 hours, and 100 per rolling 7 days. Premium receives 10x. Both windows must have capacity; usage is checked and reserved atomically across instances before model calls and survives thread deletion. New-thread failure releases the reservation. Chat shows five-hour usage and both windows in details and Settings.",
+      "statement": "Free members can send 5 Oracle messages a minute, 15 per rolling 5 hours, and 100 per rolling 7 days. Oracle MAX receives 10x. Both windows must have capacity; usage is checked and reserved atomically across instances before model calls and survives thread deletion. New-thread failure releases the reservation. Chat shows five-hour usage and both windows in details and Settings.",
       "anchors": [
         {
           "file": "src/lib/ai/service.ts",
@@ -4963,10 +4967,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/oracle-chat.ts",
           "symbol": "toModelMessages",
-          "line": 68,
+          "line": 62,
           "value": "toModelMessages(messages)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-chat.ts#L68"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-chat.ts#L62"
         }
       ],
       "tests": [
@@ -5136,7 +5140,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         }
       ],
       "dependsOn": [
-        "oracle.jailbreak-gate"
+        "oracle.jailbreak-gate",
+        "economy.red-line"
       ],
       "usedBy": [],
       "decisions": [
@@ -5153,43 +5158,49 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "oracle.model-routing",
       "domain": "oracle",
-      "title": "Complexity band picks the model",
-      "kind": "threshold",
+      "title": "Membership gates model selection",
+      "kind": "permission",
       "status": "active",
-      "statement": "Questions rated band 4 or 5 of 5 go to DeepSeek 4.1 Flash and simpler ones to the default, GLM 5.3 Flash. A model the member picked always wins.",
+      "statement": "Free members use Oracle Current (DeepSeek V4.1 Flash). Oracle MAX defaults to Oracle Abyss (Claude Sonnet 4.6) and may select Current. The atomic usage reservation supplies the authoritative entitlement; a free member requesting Abyss is routed to Current. Moderation preferences cannot override this gate.",
       "anchors": [
         {
-          "file": "src/lib/quality/oracle-preflight.ts",
-          "symbol": "ORACLE_COMPLEX_BAND",
-          "line": 27,
-          "value": "4",
+          "file": "src/lib/ai/oracle-chat.ts",
+          "symbol": "orderOracleModels",
+          "line": 35,
+          "value": "orderOracleModels(requestedModelId, _preferredModelId, isPremium)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L27"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-chat.ts#L35"
         },
         {
-          "file": "src/lib/quality/oracle-preflight.ts",
-          "symbol": "preferredOracleModelId",
-          "line": 75,
-          "value": "preferredOracleModelId(_band)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L75"
+          "file": "src/lib/ai/oracle-chat.ts",
+          "symbol": "getOracleCandidateModelIds",
+          "line": 30,
+          "value": "getOracleCandidateModelIds(selectedModelId, isPremium)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-chat.ts#L30"
         }
       ],
       "tests": [
         {
-          "file": "src/lib/quality/oracle-preflight.test.ts",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.test.ts"
+          "file": "src/lib/ai/oracle-chat.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-chat.test.ts"
+        },
+        {
+          "file": "src/lib/ai/handle-oracle-chat-request.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.test.ts"
         }
       ],
       "dependsOn": [
-        "oracle.jailbreak-gate"
+        "oracle.jailbreak-gate",
+        "economy.red-line"
       ],
       "usedBy": [
         "oracle.model-fallback"
       ],
       "decisions": [
         "jev-quality-gates",
-        "oracle-usage-and-moderation"
+        "oracle-usage-and-moderation",
+        "oracle-max-model-access"
       ],
       "flag": null,
       "flow": null,
@@ -5197,23 +5208,23 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1240,
         "y": 544
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "oracle.model-fallback",
       "domain": "oracle",
-      "title": "Ordered model fallback",
+      "title": "Model failure preserves the selected tier",
       "kind": "flow",
       "status": "active",
-      "statement": "The models are GLM 5.3 Flash (default, also writes thread titles), DeepSeek 4.1 Flash, and Qwen 3.7 Flash. The Oracle tries the preferred model first and waits for the first real token before committing. On an empty stream, error, or timeout it moves to the next model, and it only shows the unavailable message when every model fails.",
+      "statement": "The Oracle waits for a real first token from the single entitled model. Empty streams, errors, and timeouts return the unavailable message without falling into a more expensive model or silently downgrading Abyss. Thread titles continue to use DeepSeek V4.1 Flash.",
       "anchors": [
         {
           "file": "src/lib/ai/oracle-models.ts",
           "symbol": "ORACLE_MODELS",
-          "line": 19,
-          "value": "[ { id: 'zai/glm-5.3-flash', label: 'GLM 5.3 Flash', shortLabel: 'GLM', provider: 'zai', badge: 'Chat', pricing: { input: '$0.04', output: '$0.08' }, latency: …",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts#L19"
+          "line": 23,
+          "value": "[ { id: 'deepseek/deepseek-v4.1-flash', label: 'Oracle Current', shortLabel: 'Current', description: 'Quick guidance for everyday questions.', provider: 'deeps…",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts#L23"
         }
       ],
       "tests": [
@@ -5228,7 +5239,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "usedBy": [],
       "decisions": [
         "oracle-model-fallback",
-        "oracle-usage-and-moderation"
+        "oracle-usage-and-moderation",
+        "oracle-max-model-access"
       ],
       "flag": null,
       "flow": null,
@@ -5236,7 +5248,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1240,
         "y": 700
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "oracle.thread-ownership",
@@ -5910,10 +5922,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "AGENTS.md",
           "symbol": "Assets and media",
-          "line": 25,
+          "line": 26,
           "value": "Heavy website/blog media, character source assets, and reusable templates belong in Neon S3 (`moltology-public-assets`), never `public/`. Use `getAssetUrl` for…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md#L25"
+          "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md#L26"
         }
       ],
       "tests": [],
@@ -9186,6 +9198,49 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "html": "<p>Article pages and Markdown responses share the same publication boundary. Static seeds are public only when their publication flag is true.</p>"
         }
       ]
+    },
+    {
+      "id": "oracle-max-model-access",
+      "date": "2026-10-31",
+      "title": "Oracle MAX adds an entitled advanced model",
+      "summary": "Expose the Oracle MAX plan preview and two model choices while retaining staff-only billing and enforcing paid model access on the server.",
+      "domains": [
+        "oracle",
+        "premium"
+      ],
+      "rules": [
+        "oracle.model-routing",
+        "oracle.model-fallback",
+        "premium.soft-launch",
+        "premium.no-standing"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "doc",
+          "label": "BRAND_BIBLE.md",
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Premium had a larger Oracle allowance but a single shared chat model. Its sales page and billing operations were hidden behind the staff experiment. Guests need a useful destination from the locked model option without opening subscription operations to a wider audience.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Rename the subscription Oracle MAX. Offer Oracle Current (DeepSeek V4.1 Flash) and MAX-only Oracle Abyss (Claude Sonnet 4.6). Both names describe product options; vendor identifiers remain internal. The entitlement returned with the atomic usage reservation controls server routing, including when membership changes after the initial usage read. MAX defaults to Abyss and may select Current. Failures never fall into another model tier.</p>\n<p>The /premium marketing preview is public, with real rolling allowances and an early-access notice. Existing price lookup, checkout, portal and no-charge controls retain their staff experiment gate. Guests retain demo replies; free signed-in accounts receive 15 messages per rolling five hours and 100 per rolling seven days. MAX receives 150 and 1,000 respectively.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<p>Renaming one backend twice would not provide a model upgrade. Trusting the selected client model or an earlier membership snapshot would allow stale entitlement decisions. Opening billing with the marketing page would expand the existing soft launch beyond this rebrand.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Paid chat requests use the more expensive advanced model. Existing history and output caps remain in force. No rank, clearance, stage or forum authority is sold. The external Stripe product display name is not changed by this code PR.</p>"
+        }
+      ]
     }
   ],
   "edges": [
@@ -9724,10 +9779,22 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "crossDomain": false
     },
     {
+      "id": "economy.red-line->oracle.intent-context",
+      "source": "economy.red-line",
+      "target": "oracle.intent-context",
+      "crossDomain": true
+    },
+    {
       "id": "oracle.jailbreak-gate->oracle.model-routing",
       "source": "oracle.jailbreak-gate",
       "target": "oracle.model-routing",
       "crossDomain": false
+    },
+    {
+      "id": "economy.red-line->oracle.model-routing",
+      "source": "economy.red-line",
+      "target": "oracle.model-routing",
+      "crossDomain": true
     },
     {
       "id": "oracle.model-routing->oracle.model-fallback",
