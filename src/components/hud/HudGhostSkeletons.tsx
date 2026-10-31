@@ -119,18 +119,23 @@ export function HudWorkspaceGhost() {
 export function DashboardGhost() {
   return (
     <div className="space-y-4 lg:space-y-5 font-sans select-none animate-in fade-in duration-150" data-testid="dashboard-ghost">
-      <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-4 lg:p-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)_auto] lg:items-center">
-        <div className="space-y-2">
-          <HudGhostSkeleton variant="cyan" preset="text" width={140} height={11} />
-          <HudGhostSkeleton variant="neutral" preset="heading" width={220} height={20} />
-          <HudGhostSkeleton variant="neutral" preset="text" width={180} height={12} />
+      <div className="rounded-card border border-line-subtle bg-surface-1 overflow-hidden">
+        <div className="relative p-5 sm:p-6 lg:p-8 min-h-[330px] sm:min-h-[300px] space-y-5">
+          <div className="absolute right-0 top-0 w-2/5 h-full bg-surface-2/40" />
+          <HudGhostSkeleton variant="neutral" preset="text" width={140} height={11} />
+          <HudGhostSkeleton variant="neutral" preset="text" width={180} height={18} />
+          <div className="space-y-3 pt-6">
+            <HudGhostSkeleton variant="cyan" preset="text" width={70} height={11} />
+            <HudGhostSkeleton variant="neutral" preset="heading" width={240} height={36} />
+            <HudGhostSkeleton variant="neutral" preset="text" width={180} height={14} />
+          </div>
+          <HudGhostSkeleton variant="cyan" preset="button" width={200} height={40} />
         </div>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-2 p-3 border-t border-line-subtle">
           {Array.from({ length: 3 }).map((_, i) => (
             <HudGhostStatBox key={i} variant="neutral" className={GHOST_CARD} />
           ))}
         </div>
-        <HudGhostSkeleton variant="cyan" preset="button" width={200} height={40} />
       </div>
       <DailyRoutineGhost />
       <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-5">
