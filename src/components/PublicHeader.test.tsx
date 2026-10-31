@@ -196,7 +196,8 @@ describe('PublicHeader Navigation Component', () => {
 
     const mobileNav = screen.getByRole('navigation', { name: /mobile navigation/i })
     const moltmaxRow = within(mobileNav).getByRole('link', { name: /^Moltmax/i })
-    expect(moltmaxRow).toHaveTextContent('Take the clearance audit')
+    expect(moltmaxRow).toHaveTextContent('Moltmax')
+    expect(moltmaxRow).not.toHaveTextContent('Take the clearance audit')
     expect(within(mobileNav).getByRole('link', { name: /^Home/i })).toHaveAttribute('aria-current', 'page')
 
     const mobileLogin = (await screen.findAllByRole('button', { name: /LOG IN/i })).at(-1)!
