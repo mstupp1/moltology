@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import { Instagram, Youtube } from '@/components/ui/SocialIcons'
 import { useStoreDestination } from '@/components/store/useStoreDestination'
-import { HeaderBrand } from '@/components/ui/HeaderBrand'
+import { FooterBrand } from '@/components/ui/FooterBrand'
 
 export interface MainFooterProps {
   className?: string
@@ -47,12 +47,7 @@ export const MainFooter: React.FC<MainFooterProps> = ({
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8 text-center md:text-left">
           {/* Brand & Tagline with Header-Identical Subtext */}
           <div className="space-y-2 flex flex-col items-center md:items-start max-w-md">
-            <Link
-              to="/"
-              className="inline-flex items-center gap-3 cursor-pointer group select-none max-w-fit"
-            >
-              <HeaderBrand />
-            </Link>
+            <FooterBrand />
 
             {brandTagline && (
               <p

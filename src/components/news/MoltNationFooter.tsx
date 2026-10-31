@@ -14,7 +14,7 @@ import {
   MessageSquare,
 } from 'lucide-react'
 import { Instagram, Youtube } from '@/components/ui/SocialIcons'
-import { MoltNationLogo } from '@/components/news/MoltNationLogo'
+import { FooterBrand } from '@/components/ui/FooterBrand'
 import { useStoreDestination } from '@/components/store/useStoreDestination'
 
 export interface MoltNationFooterProps {
@@ -41,7 +41,7 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8 text-center md:text-left">
           {/* Brand & Tagline */}
           <div className="space-y-2 flex flex-col items-center md:items-start max-w-md">
-            <MoltNationLogo size="sm" theme="dark" align="center" />
+            <FooterBrand />
             <p className="text-[11px] sm:text-xs text-ink-muted font-sans text-center md:text-left leading-relaxed">
               Stories about AI, work, and the long road to becoming a crab.
             </p>
