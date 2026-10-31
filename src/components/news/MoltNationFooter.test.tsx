@@ -22,11 +22,13 @@ describe('MoltNationFooter Component', () => {
     storeAccess = { canView: false, pending: false }
   })
 
-  it('renders MoltNation logo and clean tagline', () => {
+  it('renders the main Moltology logo linked home and the news tagline', () => {
     render(<MoltNationFooter />)
 
-    expect(screen.getByText('MOLT')).toBeInTheDocument()
-    expect(screen.getByText('NATION')).toBeInTheDocument()
+    expect(screen.getByText('Moltology').closest('a')).toHaveAttribute('href', '/')
+    expect(screen.getByText('The Synaptic Path')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Order Emblem' })).toBeInTheDocument()
+    expect(screen.queryByText('NATION')).not.toBeInTheDocument()
     expect(screen.getByText(/the long road to becoming a crab/i)).toBeInTheDocument()
   })
 
