@@ -10,7 +10,7 @@ export interface CaptureTarget {
 }
 
 export const REGISTERED_TARGETS: Record<string, CaptureTarget> = Object.fromEntries(
-  [...DEVICE_PREVIEW_LIBRARY, { id: 'chassis', route: '/chassis' }].flatMap((sector) => [
+  DEVICE_PREVIEW_LIBRARY.flatMap((sector) => [
     ...(['desktop', 'mobile'] as const).map((device) => ({
       name: `${sector.id}_${device}`,
       route: sector.route,
@@ -28,7 +28,7 @@ export const REGISTERED_TARGETS: Record<string, CaptureTarget> = Object.fromEntr
 )
 
 
-/** Chassis remains explicitly capturable; defaults refresh the usable homepage library. */
+/** Default captures cover the complete homepage library. */
 export const DEFAULT_CAPTURE_TARGETS = Object.values(REGISTERED_TARGETS).filter((target) =>
   DEVICE_PREVIEW_LIBRARY.some((sector) => target.name.startsWith(`${sector.id}_`)),
 )

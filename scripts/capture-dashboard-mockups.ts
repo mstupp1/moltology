@@ -9,6 +9,7 @@ import { chromium, type Page } from 'playwright-core'
 import { resolveChromeExecutable } from './lib/composite-renderer'
 import { REGISTERED_TARGETS, DEFAULT_CAPTURE_TARGETS, type CaptureTarget } from './lib/mockup-targets'
 import { advanceServiceWorkerVersion } from './lib/mockup-cache-version'
+import { validateDevCapture } from './lib/mockup-dev-auth'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
 
 const PORT = 3019
@@ -113,6 +114,9 @@ async function main() {
   const customOutput = args.find((a) => a.startsWith('--output='))?.slice('--output='.length)
 
   const baseUrl = args.find((arg) => arg.startsWith('--base-url='))?.slice('--base-url='.length) || BASE_URL
+  const authDev = args.includes('--auth-dev')
+  if (authDev && !args.some((arg) => arg.startsWith('--base-url='))) throw new Error('--auth-dev requires an explicit --base-url for a running development server.')
+  const credentials = authDev ? validateDevCapture(baseUrl, process.env) : null
   const mediaOrigin = args.find((arg) => arg.startsWith('--media-origin='))?.slice('--media-origin='.length)
   const mediaCache = new Map<string, { body: Buffer; contentType: string }>()
   const executablePath = process.env.MOCKUP_CHROME_PATH || resolveChromeExecutable()
@@ -148,6 +152,10 @@ async function main() {
     activeTargets = DEFAULT_CAPTURE_TARGETS
   }
 
+  if (!credentials && activeTargets.some((target) => target.name.startsWith('chassis_'))) {
+    throw new Error('Chassis capture requires --auth-dev and an explicit local development --base-url.')
+  }
+
   // --base-url reuses a running local server; default remains an isolated production build.
   let serverProcess: ReturnType<typeof spawn> | undefined
   if (baseUrl === BASE_URL && !args.some((arg) => arg.startsWith('--base-url='))) {
@@ -181,6 +189,16 @@ async function main() {
           localStorage.setItem('moltology:alignment:snapshot:00000000-0000-0000-0000-000000000001', JSON.stringify({ date, completedKeys: [] }))
         })
         const page = await context.newPage()
+        if (credentials) {
+          await context.addInitScript((id) => localStorage.setItem(`moltology:welcomed:${id}`, '1'), credentials.userId)
+          await page.goto(new URL('/login', baseUrl).href, { waitUntil: 'domcontentloaded' })
+          await page.getByLabel('Email Address', { exact: true }).fill(credentials.email)
+          await page.getByLabel('Password', { exact: true }).fill(credentials.password)
+          const signIn = page.waitForResponse((response) => response.url().includes('/api/auth/sign-in/email'))
+          await page.locator('form button[type="submit"]').click()
+          const response = await signIn
+          if (!response.ok() || (await response.json()).user?.id !== credentials.userId) throw new Error('Development sign-in failed or returned the wrong account.')
+        }
         // Capture-only source override for environments without access to the production CDN.
         if (mediaOrigin) await page.route('**/media/**', async (route) => {
           const key = new URL(route.request().url()).pathname.slice('/media/'.length)
@@ -210,6 +228,13 @@ async function main() {
             .map((image) => Promise.race([image.decode().catch(() => undefined), new Promise((resolve) => setTimeout(resolve, 10000))])))
         })
         await page.waitForTimeout(1500)
+        if (credentials) {
+          // Do not publish the development account's display name in marketing images.
+          const session = await context.request.get(new URL('/api/auth/get-session', baseUrl).href)
+          const user = (await session.json())?.user
+          if (user?.id !== credentials.userId) throw new Error('Development session did not persist.')
+          await page.getByRole('button', { name: 'User account menu' }).evaluateAll((nodes) => nodes.forEach((node) => { (node as HTMLElement).style.visibility = 'hidden' }))
+        }
         const brokenImages = await page.locator('img').evaluateAll((images) => images
           .filter((image) => {
             const rect = image.getBoundingClientRect()
@@ -228,6 +253,7 @@ async function main() {
         await encodeMarketingWebp(pngPath, path.join(stage, `${target.outputBase}.webp`), 90)
         await encodeMarketingWebp(pngPath, path.join(stage, `${target.outputBase}_sm.webp`), 86, target.isMobile ? 540 : 1280)
       } finally {
+        if (credentials) await context.request.post(new URL('/api/auth/sign-out', baseUrl).href, { data: {}, headers: { origin: new URL(baseUrl).origin } }).catch(() => undefined)
         await context.close()
       }
     }

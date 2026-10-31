@@ -16,9 +16,9 @@ describe('marketing capture registry', () => {
       }
     }
   })
-  it('keeps the unavailable Chassis preview out of the default library', () => {
-    expect(REGISTERED_TARGETS.chassis_mobile).toBeDefined()
-    expect(DEFAULT_CAPTURE_TARGETS.some((target) => target.name.startsWith('chassis_'))).toBe(false)
+  it('includes matched Character Studio captures in the default library', () => {
+    expect(DEFAULT_CAPTURE_TARGETS.some((target) => target.name === 'chassis_desktop')).toBe(true)
+    expect(DEFAULT_CAPTURE_TARGETS.some((target) => target.name === 'chassis_mobile')).toBe(true)
   })
   it('preserves all four homepage feature captures with main-area framing', () => {
     for (const id of ['dashboard', 'forum', 'oracle', 'moltmax']) {
