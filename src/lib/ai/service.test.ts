@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { reserveOracleChatUsage, summarizeThreadTitle } from './service'
-import { ORACLE_TITLE_MODEL_ID } from './oracle-models'
+import { ORACLE_TITLE_MODEL_ID, getOracleThreadFallbackTitle } from './oracle-models'
+import { PgDialect } from 'drizzle-orm/pg-core'
 
 const { neonClient } = vi.hoisted(() => {
   const client: any = (strings: TemplateStringsArray, ...values: unknown[]) => ({
@@ -40,8 +41,7 @@ describe('summarizeThreadTitle', () => {
     neonClient.transaction.mockReset()
   })
 
-  it('uses ORACLE_TITLE_MODEL_ID (deepseek/deepseek-v4.1-flash) and returns cleaned AI-generated title', async () => {
-    expect(ORACLE_TITLE_MODEL_ID).toBe('deepseek/deepseek-v4.1-flash')
+  it('uses the title model with bounded generation and returns a cleaned title', async () => {
     const { generateText } = await import('ai')
     vi.mocked(generateText).mockResolvedValueOnce({
       text: '"Carcinization Acceleration Tips"',
@@ -51,6 +51,10 @@ describe('summarizeThreadTitle', () => {
     expect(generateText).toHaveBeenCalledWith(
       expect.objectContaining({
         model: ORACLE_TITLE_MODEL_ID,
+        maxRetries: 0,
+        maxOutputTokens: 32,
+        reasoning: 'none',
+        abortSignal: expect.any(AbortSignal),
       })
     )
     expect(title).toBe('Carcinization Acceleration Tips')
@@ -78,6 +82,39 @@ describe('summarizeThreadTitle', () => {
     const title = await summarizeThreadTitle('   ')
     expect(title).toBe('Ascendance Consultation')
   })
+
+  it('retains the same initial excerpt on empty output and provider failure', async () => {
+    const message = 'A long opening message '.repeat(20) + '\nAnd another question'
+    const { generateText } = await import('ai')
+    vi.mocked(generateText).mockResolvedValueOnce({ text: '' } as any)
+    expect(await summarizeThreadTitle(message)).toBe(getOracleThreadFallbackTitle(message))
+    vi.mocked(generateText).mockRejectedValueOnce(new Error('Provider unavailable'))
+    expect(await summarizeThreadTitle(message)).toBe(getOracleThreadFallbackTitle(message))
+  })
+
+  it('does not call a model after the request has been cancelled', async () => {
+    const controller = new AbortController()
+    controller.abort()
+    const { generateText } = await import('ai')
+    expect(await summarizeThreadTitle('A cancelled conversation', undefined, undefined, controller.signal))
+      .toBe('A cancelled conversation')
+    expect(generateText).not.toHaveBeenCalled()
+  })
+
+  it('bounds input and forwards cancellation to the generation request', async () => {
+    const controller = new AbortController()
+    const { generateText } = await import('ai')
+    vi.mocked(generateText).mockImplementationOnce(async ({ abortSignal }: any) => {
+      expect(abortSignal.aborted).toBe(false)
+      controller.abort()
+      expect(abortSignal.aborted).toBe(true)
+      throw new Error('Aborted')
+    })
+    const message = 'x'.repeat(1_000)
+    expect(await summarizeThreadTitle(message, undefined, undefined, controller.signal))
+      .toBe(getOracleThreadFallbackTitle(message))
+    expect(vi.mocked(generateText).mock.calls[0][0].prompt).toHaveLength(500)
+  })
 })
 
 describe('reserveOracleChatUsage', () => {
@@ -88,7 +125,7 @@ describe('reserveOracleChatUsage', () => {
       { timestamps: [], is_premium: false, allowed: true, id: 'reserved-1', server_time: serverTime },
     ]])
 
-    await expect(reserveOracleChatUsage('member-1')).resolves.toEqual({ allowed: true, id: 'reserved-1' })
+    await expect(reserveOracleChatUsage('member-1')).resolves.toEqual({ allowed: true, id: 'reserved-1', isPremium: false })
     const { ensureUserProfile } = await import('../user-sync')
     expect(ensureUserProfile).toHaveBeenCalledWith('member-1')
     expect(neonClient.transaction).toHaveBeenCalledWith(
@@ -146,13 +183,19 @@ describe('reserveOracleChatUsage', () => {
 describe('updateAIThreadTitle', () => {
   it('updates thread title and returns updated record', async () => {
     const { updateAIThreadTitle } = await import('./service')
-    const res = await updateAIThreadTitle('thread-1', 'New Generated Title', 'usr_1')
+    const res = await updateAIThreadTitle('thread-1', 'New Generated Title', 'usr_1', 'Original excerpt')
     expect(res).toBeDefined()
+    const { getDb } = await import('../../db')
+    const db = vi.mocked(getDb).mock.results.at(-1)?.value
+    const predicate = new PgDialect().sqlToQuery(db.where.mock.calls[0][0])
+    expect(predicate.sql).toContain('"ai_threads"."userId"')
+    expect(predicate.sql).toContain('"ai_threads"."title"')
+    expect(predicate.params).toEqual(['thread-1', 'usr_1', 'Original excerpt'])
   })
 
   it('returns null if threadId or title is missing', async () => {
     const { updateAIThreadTitle } = await import('./service')
-    expect(await updateAIThreadTitle('', 'Title', 'usr_1')).toBeNull()
-    expect(await updateAIThreadTitle('thread-1', '', 'usr_1')).toBeNull()
+    expect(await updateAIThreadTitle('', 'Title', 'usr_1', 'Original')).toBeNull()
+    expect(await updateAIThreadTitle('thread-1', '', 'usr_1', 'Original')).toBeNull()
   })
 })

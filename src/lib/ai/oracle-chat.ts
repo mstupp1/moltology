@@ -1,4 +1,4 @@
-import { ORACLE_MODELS, getOracleModel } from './oracle-models'
+import { ORACLE_MODELS, getOracleDefaultModelId, canUseOracleChatModel, type OracleAccessTier } from './oracle-models'
 import { capOracleHistory } from './usage-limits'
 
 export const GUEST_ORACLE_RESPONSES = [
@@ -26,20 +26,17 @@ export function pickGuestOracleResponse(userText: string, messageCount: number):
   return GUEST_ORACLE_RESPONSES[index]
 }
 
-export function getOracleCandidateModelIds(selectedModelId?: string): string[] {
-  const selectedModel = getOracleModel(selectedModelId)
-  return [
-    selectedModel.id,
-    ...ORACLE_MODELS.filter((m) => m.id !== selectedModel.id).map((m) => m.id),
-  ]
+/** Title/preview rows never enter chat routing; membership is supplied by the server. */
+export function getOracleCandidateModelIds(selectedModelId?: string, tier: OracleAccessTier = 'free'): string[] {
+  const allowed = ORACLE_MODELS.filter((model) => canUseOracleChatModel(model, tier))
+  const selected = allowed.find((model) => model.id === selectedModelId)
+    ?? allowed.find((model) => model.id === getOracleDefaultModelId(tier))
+  return selected ? [selected.id, ...allowed.filter((model) => model.id !== selected.id).map((model) => model.id)] : []
 }
 
-/**
- * Returns candidate model list pinned to DeepSeek V4.1 Flash for maximum KV cache hits
- * and predictable execution without multi-model fallback hops.
- */
-export function orderOracleModels(requestedModelId?: string, preferredModelId?: string): string[] {
-  return getOracleCandidateModelIds(requestedModelId || preferredModelId)
+export function orderOracleModels(requestedModelId?: string, _preferredModelId?: string, tier: OracleAccessTier = 'free'): string[] {
+  // Moderation's model preference cannot override the member's entitlement/default.
+  return getOracleCandidateModelIds(requestedModelId, tier)
 }
 
 /** The member sees a fixed message; provider error text stays in the server log. */

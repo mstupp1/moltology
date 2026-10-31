@@ -3,12 +3,12 @@ id: oracle
 title: Oracle AI
 order: 8
 color: '#ff5fa2'
-summary: The Oracle checks rate, input, and each member's usage allowance, screens the prompt with the moderation model, routes it to a fast or deep model, and falls back through a model chain.
+summary: The Oracle checks rate, input, and each member's usage allowance, screens the prompt with the moderation model, routes it to a model allowed by the membership tier, and names new conversations within the streamed request.
 rules:
   - id: oracle.request-pipeline
     title: Oracle request pipeline
     kind: flow
-    statement: Every message passes flood and local input checks. Guests get a canned reply. Members pass usage and prompt screening, then atomically reserve one allowance slot before a new thread or model call. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.
+    statement: Every message passes flood and local input checks. Guests get a canned reply. Members pass usage checks and atomically reserve an allowance slot before prompt screening or model calls. Refused prompts release the slot. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.
     anchors:
       - file: src/lib/ai/handle-oracle-chat-request.ts
         symbol: handleOracleChatRequest
@@ -141,13 +141,15 @@ rules:
   - id: oracle.jailbreak-gate
     title: Paraphrased jailbreaks are refused
     kind: gate
-    statement: The moderation model refuses a message when it is more than 80% sure it is a jailbreak, which catches paraphrases the local patterns miss.
+    statement: The moderation model refuses a message above 80% jailbreak confidence. Premium screening uses Jev with prompt training disallowed; free members retain Laya for short inputs and Jev for longer ones. Screening runs after the authoritative tier reservation, and refusal releases that reservation.
     dependsOn: [oracle.input-guardrails, forum.jev-shared]
     anchors:
       - file: src/lib/quality/oracle-preflight.ts
         symbol: decideOraclePreflight
       - file: src/lib/quality/oracle-preflight.ts
         symbol: ORACLE_JAILBREAK_ERROR
+      - file: src/lib/quality/oracle-preflight.ts
+        symbol: defaultOracleEvaluator
     tests: [src/lib/quality/oracle-preflight.test.ts]
   - id: oracle.intent-context
     title: Intent picks the prompt context
@@ -163,25 +165,36 @@ rules:
         symbol: fallbackOracleDecision
     tests: [src/lib/quality/oracle-preflight.test.ts]
   - id: oracle.model-routing
-    title: Complexity band picks the model
-    kind: threshold
-    statement: Questions rated band 4 or 5 of 5 go to DeepSeek 4.1 Flash and simpler ones to the default, GLM 5.3 Flash. A model the member picked always wins.
-    dependsOn: [oracle.jailbreak-gate]
+    title: Membership determines model access
+    kind: permission
+    statement: Guests receive preset preview replies. Free members use Ling 3.1 Flash 1019 for chat and titles. Premium uses DeepSeek chat and Nemo titles through DeepInfra, with training disallowed. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.
+    dependsOn: [oracle.jailbreak-gate, economy.red-line]
     anchors:
-      - file: src/lib/quality/oracle-preflight.ts
-        symbol: ORACLE_COMPLEX_BAND
-      - file: src/lib/quality/oracle-preflight.ts
-        symbol: preferredOracleModelId
-    tests: [src/lib/quality/oracle-preflight.test.ts]
+      - file: src/lib/ai/oracle-chat.ts
+        symbol: getOracleCandidateModelIds
+      - file: src/lib/ai/oracle-models.ts
+        symbol: getOracleTitleModelId
+    tests: [src/lib/ai/oracle-chat.test.ts, src/lib/ai/handle-oracle-chat-request.test.ts]
   - id: oracle.model-fallback
     title: Ordered model fallback
     kind: flow
-    statement: The models are GLM 5.3 Flash (default, also writes thread titles), DeepSeek 4.1 Flash, and Qwen 3.7 Flash. The Oracle tries the preferred model first and waits for the first real token before committing. On an empty stream, error, or timeout it moves to the next model, and it only shows the unavailable message when every model fails.
+    statement: Free chat uses Ling through Novita. Premium chat uses only DeepSeek through DeepInfra, with Gateway prompt training disallowed; it cannot select or fall back to Ling. Empty streams, errors, and a 12-second first-token timeout return unavailable. SDK retries and reasoning are disabled.
     dependsOn: [oracle.model-routing]
     anchors:
       - file: src/lib/ai/oracle-models.ts
         symbol: ORACLE_MODELS
     tests: [src/lib/ai/oracle-chat.test.ts]
+  - id: oracle.thread-titles
+    title: One bounded title attempt per new conversation
+    kind: flow
+    statement: New conversations receive a 60-character excerpt. One title attempt overlaps chat, capped at 500 input characters, 32 output tokens, eight seconds, and no retries. Successful streams wait for title persistence, then the client refreshes once. Failures or cancellation keep the excerpt. Updates require an unchanged placeholder, preserving manual renames.
+    dependsOn: [oracle.model-routing]
+    anchors:
+      - file: src/lib/ai/service.ts
+        symbol: summarizeThreadTitle
+      - file: src/lib/ai/service.ts
+        symbol: updateAIThreadTitle
+    tests: [src/lib/ai/service.test.ts, src/lib/ai/handle-oracle-chat-request.test.ts]
   - id: oracle.thread-ownership
     title: Threads are owner-scoped
     kind: permission

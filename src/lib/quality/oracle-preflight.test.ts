@@ -1,4 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
+import { evaluateWithJev, JEV_GATEWAY_MODEL_ID } from './jev'
+vi.mock('./jev', async (original) => ({ ...await original<typeof import('./jev')>(), evaluateWithJev: vi.fn().mockResolvedValue(null) }))
 import {
   ORACLE_DEEP_MODEL_ID,
   ORACLE_FAST_MODEL_ID,
@@ -12,6 +14,13 @@ import {
 } from './oracle-preflight'
 
 describe('oracle preflight decisions', () => {
+  it('screens Premium only through the no-training Jev route', async () => {
+    await screenOraclePrompt('A normal question', { isPremium: true })
+    expect(evaluateWithJev).toHaveBeenLastCalledWith(expect.objectContaining({ model: JEV_GATEWAY_MODEL_ID, disallowPromptTraining: true }))
+    await screenOraclePrompt('A normal question', { isPremium: false })
+    expect(evaluateWithJev).toHaveBeenLastCalledWith(expect.not.objectContaining({ disallowPromptTraining: true }))
+  })
+
   it('maps rubric scores onto the 1–5 band', () => {
     expect(complexityBandFromScore(0)).toBe(1)
     expect(complexityBandFromScore(2.49)).toBe(3)

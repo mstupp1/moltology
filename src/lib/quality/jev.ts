@@ -62,6 +62,7 @@ export async function evaluateWithJev<QUESTIONS extends EvaluationQuestions>(arg
   questions: QUESTIONS
   model?: string
   timeoutMs?: number
+  disallowPromptTraining?: boolean
 }): Promise<{ answers: { [ID in keyof QUESTIONS]: unknown } } | null> {
   if (jevEvaluationSkipped()) return null
 
@@ -70,6 +71,7 @@ export async function evaluateWithJev<QUESTIONS extends EvaluationQuestions>(arg
       model: args.model ?? moderationModelFor(args.state),
       state: args.state,
       questions: args.questions,
+      ...(args.disallowPromptTraining ? { providerOptions: { gateway: { disallowPromptTraining: true } } } : {}),
       maxRetries: 0,
       abortSignal: AbortSignal.timeout(args.timeoutMs ?? JEV_EVAL_TIMEOUT_MS),
       // No zeroDataRetention flag: the gateway rejects it on the Hobby plan,

@@ -35,7 +35,7 @@ import { getAIMessagesFn, getAIThreadsFn, getUserProfileFn } from '../../lib/ser
 import { streamOracleChat } from '../../lib/ai/stream-oracle-chat-client'
 import { createOracleEntityBridge, type OracleEntityBridge } from '@/lib/ai/oracle-entity-bridge'
 import { useSafeOracle, OracleMode } from '../hud/OracleContext'
-import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel, DEFAULT_ORACLE_PLACEHOLDER } from '../../lib/ai/oracle-models'
+import { getOracleDefaultModelId, canUseOracleChatModel, getOracleModel, DEFAULT_ORACLE_PLACEHOLDER, type OracleAccessTier } from '../../lib/ai/oracle-models'
 import { AuthModal } from '../AuthModal'
 import { useAuthSession } from '../../hooks/useAuthSession'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
@@ -194,7 +194,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSending, setIsSending] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
-  const [selectedModelId, setSelectedModelId] = useState<string>(DEFAULT_ORACLE_MODEL_ID)
+  const [selectedModelId, setSelectedModelId] = useState<string | null>(null)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [profileRole, setProfileRole] = useState<string | null>(null)
   const [memberHandle, setMemberHandle] = useState<string | null>(null)
@@ -303,16 +303,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     return []
   }
 
-  // The AI title is written after the reply finishes, so poll briefly until it replaces the placeholder.
-  const refreshForGeneratedTitle = async (threadId: string, placeholder: string) => {
-    for (let attempt = 0; attempt < 4; attempt += 1) {
-      await new Promise((resolve) => setTimeout(resolve, attempt === 0 ? 800 : 1500))
-      const list = oracle ? await oracle.refreshThreads() : await refreshLocalThreads()
-      const current = Array.isArray(list) ? list.find((t: any) => t.id === threadId) : null
-      if (current && current.title && current.title !== placeholder) return
-    }
-  }
-
   useEffect(() => {
     if (!oracle && userId) {
       refreshLocalThreads()
@@ -364,7 +354,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
 
-  const selectedModel = getOracleModel(selectedModelId)
+  const accessTier: OracleAccessTier = isGuest ? 'guest' : usage.snapshot?.isPremium ? 'premium' : 'free'
+  const requestedModel = selectedModelId ? getOracleModel(selectedModelId) : null
+  const selectedModel = requestedModel && canUseOracleChatModel(requestedModel, accessTier)
+    ? requestedModel : getOracleModel(getOracleDefaultModelId(accessTier))
 
   const [messages, setMessages] = useState<ChatMessage[]>([])
   // Tracks the thread whose messages are currently owned by this pane (loaded or
@@ -610,7 +603,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         messages: payloadMessages,
         userId: userId || undefined,
         threadId: activeThreadId || undefined,
-        model: selectedModelId,
+        model: requestedModel && canUseOracleChatModel(requestedModel, accessTier) ? requestedModel.id : undefined,
         signal: controller.signal,
         onThreadId: applyThreadId,
         onChunk: queueStreamText,
@@ -619,8 +612,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       if (res.threadId) {
         applyThreadId(res.threadId)
         if (!activeThreadId && userId) {
-          const placeholder = text.trim().split('\n')[0].slice(0, 60) || 'Ascendance Consultation'
-          void refreshForGeneratedTitle(res.threadId, placeholder)
+          // The server has awaited title persistence before closing the stream.
+          if (oracle) await oracle.refreshThreads()
+          else await refreshLocalThreads()
         }
       }
 
@@ -812,6 +806,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         status={isSending ? 'streaming' : 'ready'}
         placeholder={placeholder}
         autoFocus
+        accessTier={accessTier}
         selectedModel={canPickModel ? selectedModel : undefined}
         onSelectModel={canPickModel ? (id) => setSelectedModelId(id) : undefined}
       />

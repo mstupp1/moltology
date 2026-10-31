@@ -22,6 +22,7 @@ import {
   finalizeOracleUsage,
 } from './service'
 import { getChatLimitMessage, isChatLimitError } from './chat-retention'
+import { getOracleGenerationOptions, getOracleTitleModelId, getOracleThreadFallbackTitle } from './oracle-models'
 import {
   decideOracleUsage,
   ORACLE_MAX_HISTORY_MESSAGES,
@@ -148,14 +149,6 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     )
   }
 
-  const preflight = await screenOraclePrompt(guardrail.sanitizedText || userText)
-  if (preflight.blocked) {
-    return Response.json(
-      { error: preflight.reason || ORACLE_JAILBREAK_ERROR },
-      { status: 400 }
-    )
-  }
-
   let activeThreadId = body.threadId
   let isNewThread = !activeThreadId
   let storedTurns: OracleChatMessageInput[] = []
@@ -174,8 +167,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     activeThreadId = crypto.randomUUID()
     isNewThread = true
   }
-  const initialThreadTitle =
-    userText.trim().split('\n')[0].slice(0, 60) || 'Ascendance Consultation'
+  const initialThreadTitle = getOracleThreadFallbackTitle(userText)
 
   let usageReservation: Awaited<ReturnType<typeof reserveOracleChatUsage>>
   try {
@@ -194,6 +186,17 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     )
   }
   const usageEventId = usageReservation.id
+
+  // The reservation's authoritative tier governs every remote prompt processor,
+  // including screening. Premium never sends prompts to the free Laya endpoint.
+  const preflight = await screenOraclePrompt(guardrail.sanitizedText || userText, { isPremium: usageReservation.isPremium })
+  if (preflight.blocked) {
+    await releaseOracleChatUsage(usageEventId)
+    return Response.json(
+      { error: preflight.reason || ORACLE_JAILBREAK_ERROR },
+      { status: 400 },
+    )
+  }
 
   if (isNewThread) {
     try {
@@ -232,18 +235,40 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     ),
     { role: 'user', content: userText },
   ])
-  const candidateModels = orderOracleModels(body.model, preflight.preferredModelId)
+  const accessTier = usageReservation.isPremium ? 'premium' : 'free'
+  const titleModelId = getOracleTitleModelId(usageReservation.isPremium)
+  const candidateModels = orderOracleModels(body.model, preflight.preferredModelId, accessTier)
   let lastError: Error | null = null
 
   queueOracleUserMessagePersistence({ userId, threadId: activeThreadId, userText })
+
+  // Start once per new conversation, not once per attempted chat model. The
+  // awaited completion callback keeps title persistence inside the response's
+  // lifetime while generation overlaps the streamed reply.
+  const titleAbortController = new AbortController()
+  const abortTitle = () => titleAbortController.abort()
+  request.signal.addEventListener('abort', abortTitle, { once: true })
+  if (request.signal.aborted) abortTitle()
+  const titleTask = isNewThread
+    ? summarizeThreadTitle(userText, titleModelId, userId, titleAbortController.signal)
+        .catch((error) => {
+          console.warn('[handleOracleChatRequest] Title generation warning:', error)
+          return initialThreadTitle
+        })
+    : null
+  const cleanUpTitle = () => {
+    abortTitle()
+    request.signal.removeEventListener('abort', abortTitle)
+  }
 
   for (const modelCandidate of candidateModels) {
     const abortController = new AbortController()
     try {
       const threadIdForSave = activeThreadId
-      const shouldSummarizeTitle = isNewThread
       const result = streamText({
         model: modelCandidate as any,
+        ...getOracleGenerationOptions(modelCandidate),
+        maxRetries: 0,
         system: systemPrompt,
         messages: payloadMessages,
         maxOutputTokens: ORACLE_MAX_OUTPUT_TOKENS,
@@ -266,21 +291,18 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
                 content: text,
               })
             }
-
-            if (shouldSummarizeTitle) {
-              // Asynchronously summarize thread title in the background without blocking TTFT
-              summarizeThreadTitle(userText, undefined, userId)
-                .then(async (aiTitle) => {
-                  if (aiTitle && aiTitle !== initialThreadTitle) {
-                    await updateAIThreadTitle(threadIdForSave, aiTitle, userId)
-                  }
-                })
-                .catch((err) => {
-                  console.warn('[handleOracleChatRequest] Async title summarization warning:', err)
-                })
-            }
           } catch (dbErr) {
             console.warn('[handleOracleChatRequest] DB assistant response logging warning:', dbErr)
+          }
+          // Saving the assistant response and naming the thread are independent:
+          // a transient message-save failure must not suppress the title.
+          try {
+            const aiTitle = await titleTask
+            if (!titleAbortController.signal.aborted && aiTitle && aiTitle !== initialThreadTitle) {
+              await updateAIThreadTitle(threadIdForSave, aiTitle, userId, initialThreadTitle)
+            }
+          } catch (error) {
+            console.warn('[handleOracleChatRequest] Title persistence warning:', error)
           }
         },
         onError: ({ error }) => {
@@ -292,7 +314,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
       })
 
       // Do not commit until the first token arrives. streamText() returns immediately,
-      // so an empty or hung MiniMax stream must fall through to the next candidate.
+      // so an empty or hung model stream can fall through to the next allowed candidate.
       const committedStream = await commitOracleTextStream(
         toTextStream({ stream: result.stream }),
       )
@@ -302,9 +324,39 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
         headers[ORACLE_THREAD_ID_HEADER] = activeThreadId
       }
 
+      const reader = committedStream.getReader()
+      const responseStream = new ReadableStream({
+        async pull(controller) {
+          try {
+            const next = await reader.read()
+            if (next.done) {
+              cleanUpTitle()
+              reader.releaseLock()
+              controller.close()
+            } else {
+              controller.enqueue(next.value)
+            }
+          } catch (error) {
+            cleanUpTitle()
+            abortController.abort()
+            reader.releaseLock()
+            await titleTask
+            controller.error(error)
+          }
+        },
+        async cancel(reason) {
+          cleanUpTitle()
+          abortController.abort()
+          try {
+            await reader.cancel(reason)
+          } finally {
+            await titleTask
+          }
+        },
+      })
       return createTextStreamResponse({
         headers,
-        stream: committedStream,
+        stream: responseStream,
       })
     } catch (err: any) {
       abortController.abort()
@@ -313,6 +365,8 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     }
   }
 
+  cleanUpTitle()
+  await titleTask
   return Response.json(
     {
       error: formatOracleUnavailableMessage(lastError),

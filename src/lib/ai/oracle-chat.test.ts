@@ -10,27 +10,20 @@ import {
   pickGuestOracleResponse,
   toModelMessages,
 } from './oracle-chat'
-import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel, ORACLE_TITLE_MODEL_ID } from './oracle-models'
+import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel, ORACLE_TITLE_MODEL_ID, PREMIUM_ORACLE_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID, getOracleTitleModelId, getOracleGenerationOptions } from './oracle-models'
 
 describe('oracle-chat helpers', () => {
-  it('configures DeepSeek V4.1 Flash as the default chat and title model', () => {
-    expect(ORACLE_MODELS[0]).toEqual({
-      id: 'deepseek/deepseek-v4.1-flash',
-      label: 'DeepSeek V4.1 Flash',
-      shortLabel: 'DeepSeek',
-      provider: 'deepseek',
-      badge: 'Chat',
-      pricing: { input: '$0.02', output: '$0.19' },
-    })
-    expect(DEFAULT_ORACLE_MODEL_ID).toBe('deepseek/deepseek-v4.1-flash')
-    expect(getOracleModel().id).toBe('deepseek/deepseek-v4.1-flash')
-    expect(ORACLE_TITLE_MODEL_ID).toBe('deepseek/deepseek-v4.1-flash')
+  it('keeps chat and title defaults explicit for each membership tier', () => {
+    expect(DEFAULT_ORACLE_MODEL_ID).toBe('inclusionai/ling-3.1-flash-1019')
+    expect(getOracleModel().roles).toEqual(['chat', 'titles'])
+    expect(getOracleTitleModelId(false)).toBe(ORACLE_TITLE_MODEL_ID)
+    expect(getOracleTitleModelId(true)).toBe(PREMIUM_ORACLE_TITLE_MODEL_ID)
+    expect(getOracleGenerationOptions(ORACLE_TITLE_MODEL_ID)).toMatchObject({ reasoning: 'none', providerOptions: { gateway: { only: ['novita'] } } })
   })
 
-  it('pins ORACLE_MODELS to DeepSeek V4.1 Flash', () => {
-    expect(ORACLE_MODELS.map((m) => m.id)).toEqual([
-      'deepseek/deepseek-v4.1-flash',
-    ])
+  it('lists preview, free chat/titles, premium chat, and premium titles', () => {
+    expect(ORACLE_MODELS.map((m) => m.access)).toEqual(['guest', 'free', 'premium', 'premium'])
+    expect(getOracleModel(PREMIUM_ORACLE_TITLE_MODEL_ID).roles).toEqual(['titles'])
   })
 
   it('drops system turns and caps history before it reaches the model', () => {
@@ -52,18 +45,22 @@ describe('oracle-chat helpers', () => {
     expect(a).toMatch(/Guest|account|Sign up/i)
   })
 
-  it('returns the default model in the candidate list', () => {
-    const expected = ORACLE_MODELS.map((m) => m.id)
-    expect(getOracleCandidateModelIds()).toEqual(expected)
-    expect(getOracleCandidateModelIds('unknown-model')).toEqual(expected)
-    expect(getOracleModel('zai/glm-5.3-flash').id).toBe(DEFAULT_ORACLE_MODEL_ID)
-    expect(getOracleCandidateModelIds('zai/glm-5.3-flash')).toEqual(expected)
-    expect(getOracleCandidateModelIds('deepseek/deepseek-v4.1-flash')[0]).toBe('deepseek/deepseek-v4.1-flash')
+  it('never routes free accounts to premium, titles-only, or preview entries', () => {
+    for (const requested of [undefined, 'unknown-model', PREMIUM_ORACLE_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID, 'guest-preview']) {
+      expect(getOracleCandidateModelIds(requested)).toEqual([DEFAULT_ORACLE_MODEL_ID])
+    }
+    expect(getOracleCandidateModelIds(undefined, 'guest')).toEqual([])
   })
 
-  it('always resolves candidate models to DeepSeek V4.1 Flash', () => {
-    expect(orderOracleModels()[0]).toBe(DEFAULT_ORACLE_MODEL_ID)
-    expect(orderOracleModels('deepseek/deepseek-v4.1-flash')[0]).toBe(DEFAULT_ORACLE_MODEL_ID)
+  it('never routes Premium prompts to free models, even when requested', () => {
+    for (const requested of [undefined, DEFAULT_ORACLE_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID]) {
+      expect(orderOracleModels(requested, DEFAULT_ORACLE_MODEL_ID, 'premium')).toEqual([PREMIUM_ORACLE_MODEL_ID])
+    }
+    for (const model of [PREMIUM_ORACLE_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID]) {
+      expect(getOracleGenerationOptions(model)).toMatchObject({
+        providerOptions: { gateway: { only: ['deepinfra'], disallowPromptTraining: true } },
+      })
+    }
   })
 
   it('never shows provider error text to the member', () => {

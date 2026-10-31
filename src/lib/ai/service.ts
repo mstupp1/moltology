@@ -3,7 +3,7 @@ import { getDb } from '../../db'
 import { aiThreads, aiMessages, aiUsageEvents, profiles } from '../../db/schema'
 import { ensureUserProfile } from '../user-sync'
 
-import { ORACLE_TITLE_MODEL_ID } from './oracle-models'
+import { ORACLE_TITLE_MODEL_ID, getOracleGenerationOptions, getOracleThreadFallbackTitle } from './oracle-models'
 import { buildOracleUsageSnapshot, decideOracleUsage, oracleLimitsFor, ORACLE_WEEK_MS, type OracleUsageSnapshot } from './usage-limits'
 import { createChatThreadWithinLimit, getChatLimitError } from './chat-retention'
 
@@ -31,9 +31,10 @@ export async function summarizeThreadTitle(
   firstMessageText: string,
   modelId: string = ORACLE_TITLE_MODEL_ID,
   userId?: string,
+  signal?: AbortSignal,
 ): Promise<string> {
-  const fallback = firstMessageText.trim().split('\n')[0].slice(0, 100) || 'Ascendance Consultation'
-  if (!firstMessageText || !firstMessageText.trim()) {
+  const fallback = getOracleThreadFallbackTitle(firstMessageText)
+  if (!firstMessageText.trim() || signal?.aborted) {
     return fallback
   }
 
@@ -41,13 +42,19 @@ export async function summarizeThreadTitle(
     const { generateText } = await import('ai')
     const result = await generateText({
       model: modelId as any,
+      ...getOracleGenerationOptions(modelId),
       system:
-        'You are a conversation title generator. Create a brief, concise, and clear 3 to 6 word title summarizing the user inquiry. Output ONLY the title with no quotation marks, no markdown, no punctuation at the end, and no "Title:" prefix.',
-      prompt: `User message: "${firstMessageText.slice(0, 500)}"`,
+        'Summarize the user message as a 3 to 6 word conversation title. Output only the title, without quotes, markdown, or a prefix.',
+      prompt: firstMessageText.slice(0, 500),
       maxOutputTokens: 32,
+      temperature: 0,
+      maxRetries: 0,
+      abortSignal: signal
+        ? AbortSignal.any([signal, AbortSignal.timeout(8_000)])
+        : AbortSignal.timeout(8_000),
     })
     if (userId) {
-      void recordOracleUsage({
+      await recordOracleUsage({
         userId,
         kind: 'title',
         model: modelId,
@@ -60,9 +67,10 @@ export async function summarizeThreadTitle(
     if (!raw) return fallback
 
     const cleanTitle = raw
-      .replace(/^["'`]|["'`]$/g, '')
       .replace(/^Title:\s*/i, '')
+      .replace(/^["'`]+|["'`]+$/g, '')
       .replace(/\.+$/, '')
+      .replace(/\s+/g, ' ')
       .trim()
 
     return cleanTitle.slice(0, 120) || fallback
@@ -184,13 +192,14 @@ export async function saveAIMessage(input: SaveMessageInput) {
 /**
  * Updates the title of an existing AI conversation thread the caller owns.
  */
-export async function updateAIThreadTitle(threadId: string, title: string, userId: string) {
+export async function updateAIThreadTitle(threadId: string, title: string, userId: string, expectedTitle: string) {
   if (!threadId || !title || !title.trim() || !userId) return null
   const dbClient = getDb()
   const [updated] = await dbClient
     .update(aiThreads)
     .set({ title: title.trim().slice(0, 120), updatedAt: new Date() })
-    .where(and(eq(aiThreads.id, threadId), eq(aiThreads.userId, userId)))
+    // A member's manual rename wins over a title that finishes later.
+    .where(and(eq(aiThreads.id, threadId), eq(aiThreads.userId, userId), eq(aiThreads.title, expectedTitle)))
     .returning()
 
   return updated
@@ -294,7 +303,7 @@ const MAX_ORACLE_USAGE_RESERVATION_ATTEMPTS = 3
  */
 export async function reserveOracleChatUsage(
   userId: string,
-): Promise<{ allowed: true; id: string } | { allowed: false; decision: Exclude<ReturnType<typeof decideOracleUsage>, { allowed: true }> }> {
+): Promise<{ allowed: true; id: string; isPremium: boolean } | { allowed: false; decision: Exclude<ReturnType<typeof decideOracleUsage>, { allowed: true }> }> {
   // createAIThread previously materialized a missing profile before the usage
   // insert. Keep that first-chat path valid now that reservation runs first.
   await ensureUserProfile(userId)
@@ -357,7 +366,7 @@ export async function reserveOracleChatUsage(
         if (decision.allowed) throw new Error('Oracle usage reservation was denied without a full quota window.')
         return { allowed: false, decision }
       }
-      return { allowed: true, id: row.id }
+      return { allowed: true, id: row.id, isPremium: row.is_premium }
     } catch (error) {
       const code = typeof error === 'object' && error !== null && 'code' in error
         ? (error as { code?: unknown }).code
