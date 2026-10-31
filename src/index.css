@@ -961,14 +961,35 @@
   to { opacity: 1; }
 }
 
-/* Oracle MAX: the attendant settles in as the model comparison comes into view. */
-.oracle-max-art { animation: homeHeroRise 1s ease-out both; }
-.oracle-max-hero { min-height: 390px; }
-@supports (animation-timeline: view()) {
-  .oracle-max-art { animation: homeHeroSettle linear both; animation-timeline: view(); animation-range: entry 0% cover 40%; }
+/* Oracle MAX keeps its content on quiet surfaces and gives the core one clear stage. */
+.oracle-max-page { container: oracle-max / inline-size; }
+.oracle-max-hero { min-height: 420px; }
+.oracle-max-shade { @apply bg-gradient-to-r from-abyss via-abyss/60 to-transparent; }
+.oracle-max-title { min-height: 420px; border-left: 0; }
+.oracle-max-title > div:first-child { max-width: 48%; }
+.oracle-max-title h1 { margin-top: 22px; font-size: clamp(42px, 5vw, 76px); line-height: 1; letter-spacing: -0.045em; text-transform: none; }
+.oracle-max-title h1 + p { margin-top: 24px; font-size: 20px; line-height: 1.4; @apply text-ink; }
+.oracle-max-title .oracle-max-intro { margin-top: 14px; max-width: 350px; }
+.oracle-max-title .oracle-max-compare-link { margin-top: 24px; }
+.oracle-max-title > div:first-child { animation: homeHeroRise 650ms ease-out both; }
+.oracle-max-art { animation: homeHeroRise 1s ease-out both; object-position: 60% center; }
+.oracle-max-compare-link svg { transition: transform 180ms ease; }
+.oracle-max-compare-link:hover svg { transform: translateY(3px); }
+@container oracle-max (max-width: 700px) {
+  .oracle-max-comparison { padding: 24px; }
+  .oracle-max-comparison-header { flex-direction: column; align-items: flex-start; }
+  .oracle-max-models { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .oracle-max-hero { min-height: 570px; }
+  .oracle-max-art { height: 310px; top: auto; bottom: 0; object-position: right center; }
+  .oracle-max-shade { @apply bg-gradient-to-b from-abyss from-35% via-abyss/95 via-50% to-transparent to-80%; }
+  .oracle-max-title { min-height: 0; }
+  .oracle-max-title > div:first-child { max-width: 100%; }
+  .oracle-max-title h1 { margin-top: 20px; font-size: 48px; }
+  .oracle-max-title h1 + p { margin-top: 18px; font-size: 20px; }
+  .oracle-max-title .oracle-max-intro { max-width: 350px; }
+  .oracle-max-title .oracle-max-compare-link { margin-top: 16px; }
 }
-@media (prefers-reduced-motion: reduce) { .oracle-max-art { animation: none; } }
-@media (max-width: 639px) {
-  .oracle-max-art { height: 170px; width: 150px; right: 12px; bottom: 8px; opacity: 1; }
-  .oracle-max-hero .home-hero-rise { padding-bottom: 145px; }
+@media (prefers-reduced-motion: reduce) {
+  .oracle-max-art, .oracle-max-title > div:first-child { animation: none; }
+  .oracle-max-compare-link:hover svg { transform: none; }
 }

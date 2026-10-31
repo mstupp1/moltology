@@ -45,7 +45,6 @@ export function PremiumOfferPanel({
   onCancel: () => void;
 }) {
   const rows = [
-    ["Model", "Oracle Current", "Oracle Abyss + Current"],
     [
       "Messages per 5 hours",
       String(ORACLE_FREE_LIMITS.perFiveHours),
@@ -60,54 +59,51 @@ export function PremiumOfferPanel({
   return (
     <div
       data-testid="premium-page"
-      className="oracle-max-page space-y-5 font-sans relative"
+      className="oracle-max-page space-y-3.5 sm:space-y-5 font-sans relative"
     >
-      <HudTitlePanel
-        title="Oracle MAX"
-        eyebrow="Oracle membership"
-        description="A deeper conversation. More room to think."
-      />
-      <section className="oracle-max-hero relative isolate overflow-hidden rounded-panel bg-surface-1 border border-line-subtle">
+      <section className="oracle-max-hero relative isolate overflow-hidden rounded-card border border-line-subtle bg-abyss">
         <img
-          className="oracle-max-art absolute right-0 bottom-0 h-full w-full object-contain object-right opacity-50 sm:w-3/5 sm:opacity-90"
-          src={getAssetUrl(
-            "images/characters/char_lobster_oracle_attendant_adult_v2.webp",
-          )}
-          alt="The Oracle attendant holding a glowing sea-glass orb"
+          className="oracle-max-art absolute inset-0 h-full w-full object-cover"
+          src={getAssetUrl("images/oracle/oracle-max-synaptic-core-v1.png")}
+          alt="The Synaptic Core: precision titanium rings surrounding a luminous cyan nucleus in the deep ocean"
+          fetchPriority="high"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-surface-0 via-surface-0/90 to-transparent" />
-        <div className="home-hero-rise relative z-10 p-6 sm:p-10 lg:p-14 max-w-xl">
-          <p className="text-xs font-mono tracking-widest text-cyan-glow mb-5">
-            Meet your deeper-thinking Oracle
-          </p>
-          <h2 className="font-grotesk text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-ink leading-none">
-            Oracle <span className="text-cyan-glow">MAX</span>
-          </h2>
-          <p className="text-xl sm:text-2xl text-ink mt-6 font-grotesk">
-            For the thought that needs another turn.
-          </p>
-          <p className="text-sm text-ink-body leading-relaxed mt-3 max-w-sm">
-            Work through complex questions with Oracle Abyss, our advanced
-            model, and 10× the message allowance.
+        <div className="oracle-max-shade absolute inset-0" aria-hidden="true" />
+        <HudTitlePanel
+          className="oracle-max-title relative z-10 rounded-none border-0 bg-transparent p-6 sm:p-10 lg:p-12"
+          title={
+            <>
+              Oracle <span className="text-cyan-glow">MAX</span>
+            </>
+          }
+          eyebrow="Oracle membership"
+          description="Deeper reasoning. More room to think."
+        >
+          <p className="oracle-max-intro text-sm text-ink-body leading-relaxed">
+            Meet Oracle Abyss, our advanced model for complex questions. Get 10×
+            the free message allowance to keep the conversation going.
           </p>
           <a
             href="#oracle-max-compare"
-            className="inline-flex min-h-11 items-center gap-2 mt-7 text-sm text-cyan-glow hover:text-cyan-bright transition-colors"
+            className="oracle-max-compare-link inline-flex min-h-11 items-center gap-3 rounded-control text-sm font-medium text-cyan-glow hover:text-cyan-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow transition-colors"
           >
             Compare the models{" "}
             <ArrowDown className="w-4 h-4" aria-hidden="true" />
           </a>
-        </div>
+        </HudTitlePanel>
       </section>
 
-      <section id="oracle-max-compare" className="scroll-mt-6 py-5 sm:py-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
+      <section
+        id="oracle-max-compare"
+        className="oracle-max-comparison scroll-mt-6 rounded-card border border-line-subtle bg-surface-1 p-5 sm:p-8 lg:p-10"
+      >
+        <div className="oracle-max-comparison-header flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
           <div>
             <p className="text-xs text-cyan-glow mb-2">
-              Two models. One Oracle.
+              Model access and usage
             </p>
-            <h2 className="text-2xl font-grotesk font-bold text-ink">
-              Choose how deep to go.
+            <h2 className="text-xl sm:text-2xl font-grotesk font-bold text-ink">
+              Compare your options.
             </h2>
           </div>
           <p className="text-xs text-ink-muted max-w-xs">
@@ -115,8 +111,8 @@ export function PremiumOfferPanel({
             demo.
           </p>
         </div>
-        <div className="grid sm:grid-cols-2 gap-6 sm:gap-10 mb-8">
-          <div className="border-t border-line-subtle pt-5">
+        <div className="oracle-max-models grid sm:grid-cols-2 gap-6 sm:gap-10 mb-7">
+          <div className="border-t border-line-subtle pt-5 pb-1">
             <p className="text-xs text-ink-muted mb-2">
               Included with your free account
             </p>
@@ -128,7 +124,7 @@ export function PremiumOfferPanel({
               step.
             </p>
           </div>
-          <div className="border-t border-cyan-glow pt-5">
+          <div className="border-t border-cyan-glow pt-5 pb-1">
             <p className="text-xs text-cyan-glow mb-2">
               Included with Oracle MAX
             </p>
@@ -148,15 +144,21 @@ export function PremiumOfferPanel({
             </caption>
             <thead>
               <tr className="border-b border-line-subtle">
-                <th scope="col" className="py-3 font-medium text-ink-muted">
+                <th
+                  scope="col"
+                  className="w-2/5 py-3 font-medium text-ink-muted"
+                >
                   Included
                 </th>
-                <th scope="col" className="py-3 px-3 font-medium text-ink">
+                <th
+                  scope="col"
+                  className="w-[30%] py-3 px-3 text-right font-medium text-ink"
+                >
                   Free
                 </th>
                 <th
                   scope="col"
-                  className="py-3 pl-3 font-medium text-cyan-glow"
+                  className="w-[30%] py-3 pl-3 text-right font-medium text-cyan-glow"
                 >
                   Oracle MAX
                 </th>
@@ -168,8 +170,12 @@ export function PremiumOfferPanel({
                   <th scope="row" className="py-4 font-normal text-ink-body">
                     {label}
                   </th>
-                  <td className="py-4 px-3 text-ink-muted">{free}</td>
-                  <td className="py-4 pl-3 text-ink font-medium">{max}</td>
+                  <td className="py-4 px-3 text-right tabular-nums text-ink-body">
+                    {free}
+                  </td>
+                  <td className="py-4 pl-3 text-right tabular-nums text-ink font-semibold">
+                    {max}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -182,7 +188,7 @@ export function PremiumOfferPanel({
         </p>
       </section>
 
-      <section className="rounded-card border border-line-subtle bg-surface-1 p-5 sm:p-7 space-y-4">
+      <section className="rounded-card border border-line-subtle bg-surface-1 p-5 sm:p-8 lg:p-10 space-y-4">
         <div className="flex items-start gap-3">
           <span className="text-cyan-glow pt-1">
             {preview ? (
