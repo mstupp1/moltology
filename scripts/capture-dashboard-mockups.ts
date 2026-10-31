@@ -173,6 +173,13 @@ async function main() {
         reducedMotion: 'reduce', serviceWorkers: 'block',
       })
       try {
+        // Give the synthetic preview session a date-scoped, empty routine snapshot.
+        // Its fictitious user has no JWT, so the normal authenticated fetch cannot fill it.
+        await context.addInitScript(() => {
+          const now = new Date()
+          const date = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-')
+          localStorage.setItem('moltology:alignment:snapshot:00000000-0000-0000-0000-000000000001', JSON.stringify({ date, completedKeys: [] }))
+        })
         const page = await context.newPage()
         // Capture-only source override for environments without access to the production CDN.
         if (mediaOrigin) await page.route('**/media/**', async (route) => {
@@ -203,8 +210,15 @@ async function main() {
             .map((image) => Promise.race([image.decode().catch(() => undefined), new Promise((resolve) => setTimeout(resolve, 10000))])))
         })
         await page.waitForTimeout(1500)
+        const brokenImages = await page.locator('img').evaluateAll((images) => images
+          .filter((image) => {
+            const rect = image.getBoundingClientRect()
+            return rect.width > 0 && rect.height > 0 && rect.top < innerHeight && rect.bottom > 0 && (!image.complete || image.naturalWidth === 0)
+          })
+          .map((image) => image.currentSrc || image.src))
+        if (brokenImages.length) throw new Error(`Unloaded visible images for ${target.name}: ${brokenImages.join(', ')}`)
         const text = await page.locator('body').innerText()
-        if (text.trim().length < 30 || /Something went wrong|Internal Server Error|Cannot read properties|Cannot destructure|Could not load equipment/.test(text)) {
+        if (text.trim().length < 30 || /Something went wrong|Internal Server Error|Cannot read properties|Cannot destructure|Could not load equipment|Could not load your character|Unauthenticated: Authentication required|Reading today’s liturgies…/.test(text)) {
           throw new Error(`Invalid or empty UI for ${target.name}; existing library preserved.`)
         }
         await page.mouse.move(0, 0)
