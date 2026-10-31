@@ -13,24 +13,23 @@ import {
 import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel, ORACLE_TITLE_MODEL_ID } from './oracle-models'
 
 describe('oracle-chat helpers', () => {
-  it('configures GLM 5.3 Flash as the default chat and title model', () => {
+  it('configures DeepSeek V4.1 Flash as the default chat and title model', () => {
     expect(ORACLE_MODELS[0]).toEqual({
-      id: 'zai/glm-5.3-flash',
-      label: 'GLM 5.3 Flash',
-      shortLabel: 'GLM',
-      provider: 'zai',
+      id: 'deepseek/deepseek-v4.1-flash',
+      label: 'DeepSeek V4.1 Flash',
+      shortLabel: 'DeepSeek',
+      provider: 'deepseek',
       badge: 'Chat',
-      pricing: { input: '$0.04', output: '$0.08' },
-      latency: '0.2s',
+      pricing: { input: '$0.02', output: '$0.19' },
     })
-    expect(DEFAULT_ORACLE_MODEL_ID).toBe('zai/glm-5.3-flash')
-    expect(getOracleModel().id).toBe('zai/glm-5.3-flash')
-    expect(ORACLE_TITLE_MODEL_ID).toBe('zai/glm-5.3-flash')
+    expect(DEFAULT_ORACLE_MODEL_ID).toBe('deepseek/deepseek-v4.1-flash')
+    expect(getOracleModel().id).toBe('deepseek/deepseek-v4.1-flash')
+    expect(ORACLE_TITLE_MODEL_ID).toBe('deepseek/deepseek-v4.1-flash')
   })
 
-  it('pins ORACLE_MODELS to GLM 5.3 Flash', () => {
+  it('pins ORACLE_MODELS to DeepSeek V4.1 Flash', () => {
     expect(ORACLE_MODELS.map((m) => m.id)).toEqual([
-      'zai/glm-5.3-flash',
+      'deepseek/deepseek-v4.1-flash',
     ])
   })
 
@@ -57,12 +56,14 @@ describe('oracle-chat helpers', () => {
     const expected = ORACLE_MODELS.map((m) => m.id)
     expect(getOracleCandidateModelIds()).toEqual(expected)
     expect(getOracleCandidateModelIds('unknown-model')).toEqual(expected)
-    expect(getOracleCandidateModelIds('zai/glm-5.3-flash')[0]).toBe('zai/glm-5.3-flash')
+    expect(getOracleModel('zai/glm-5.3-flash').id).toBe(DEFAULT_ORACLE_MODEL_ID)
+    expect(getOracleCandidateModelIds('zai/glm-5.3-flash')).toEqual(expected)
+    expect(getOracleCandidateModelIds('deepseek/deepseek-v4.1-flash')[0]).toBe('deepseek/deepseek-v4.1-flash')
   })
 
-  it('always resolves candidate models to GLM Flash', () => {
+  it('always resolves candidate models to DeepSeek V4.1 Flash', () => {
     expect(orderOracleModels()[0]).toBe(DEFAULT_ORACLE_MODEL_ID)
-    expect(orderOracleModels('zai/glm-5.3-flash')[0]).toBe(DEFAULT_ORACLE_MODEL_ID)
+    expect(orderOracleModels('deepseek/deepseek-v4.1-flash')[0]).toBe(DEFAULT_ORACLE_MODEL_ID)
   })
 
   it('never shows provider error text to the member', () => {
