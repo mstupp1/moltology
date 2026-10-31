@@ -205,7 +205,7 @@ describe('handleOracleChatRequest', () => {
     const res = await handleOracleChatRequest(
       await authedRequest({
         messages: [{ role: 'user', content: 'Teach me ecdysis' }],
-        model: 'zai/glm-5.3-flash',
+        model: 'deepseek/deepseek-v4.1-flash',
       })
     )
 
@@ -422,7 +422,7 @@ describe('handleOracleChatRequest', () => {
     expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(ORACLE_MODELS[0].id)
   })
 
-  it('returns 502 when GLM Flash fails', async () => {
+  it('returns 502 when DeepSeek V4.1 Flash fails', async () => {
     streamTextMock.mockReturnValueOnce({ stream: emptyStream() })
 
     const res = await handleOracleChatRequest(
@@ -439,7 +439,7 @@ describe('handleOracleChatRequest', () => {
     expect(streamTextMock).toHaveBeenCalledTimes(1)
   })
 
-  it('pins candidate model to GLM Flash', async () => {
+  it('pins candidate model to DeepSeek V4.1 Flash', async () => {
     streamTextMock.mockReturnValueOnce({ stream: textStream('Answer') })
 
     const res = await handleOracleChatRequest(
@@ -561,7 +561,7 @@ describe('handleOracleChatRequest', () => {
     expect(streamTextMock).not.toHaveBeenCalled()
   })
 
-  it('uses GLM Flash model and passes context to buildSystemPrompt', async () => {
+  it('uses DeepSeek V4.1 Flash model and passes context to buildSystemPrompt', async () => {
     streamTextMock.mockReturnValueOnce({ stream: textStream('Chassis answer') })
     vi.mocked(screenOraclePrompt).mockResolvedValueOnce({
       blocked: false,

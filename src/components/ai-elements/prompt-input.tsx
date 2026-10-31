@@ -47,7 +47,7 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 bottom-full mb-2 z-50 w-[400px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-card border border-line bg-surface-2 shadow-menu text-xs" onKeyDown={(event) => { if (event.key === 'Escape') setOpen(false) }}>
+          <div className="absolute left-0 bottom-full mb-2 z-50 w-[460px] max-w-[calc(100vw-4rem)] overflow-hidden rounded-card border border-line bg-surface-2 shadow-menu text-xs" onKeyDown={(event) => { if (event.key === 'Escape') setOpen(false) }}>
             <div className="grid grid-cols-[minmax(0,1fr)_52px_52px_48px_14px] items-center gap-2 border-b border-line-subtle px-3 py-2 font-mono text-[11px] font-bold uppercase tracking-wide text-ink-muted">
               <span>Model</span>
               <span className="text-right whitespace-nowrap">In / 1M</span>
@@ -68,7 +68,7 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
                 }`}
               >
                 <span className="flex min-w-0 items-center gap-1.5">
-                  <span className="truncate font-semibold">{m.label}</span>
+                  <span className="min-w-0 whitespace-normal font-semibold">{m.label}</span>
                   {m.badge && <span className="shrink-0 rounded-chip bg-cyan-soft px-1.5 py-0.5 text-[11px] font-semibold text-cyan-glow">{m.badge}</span>}
                 </span>
                 <span className="text-right font-mono text-[11px] text-ink-body">{m.pricing?.input ?? '—'}</span>

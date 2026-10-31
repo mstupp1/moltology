@@ -68,9 +68,11 @@ describe('PromptInput', () => {
     render(<PromptInput onSubmit={vi.fn()} selectedModel={getOracleModel()} onSelectModel={onSelectModel} />)
     fireEvent.click(screen.getByRole('button', { name: /Select model/i }))
     expect(screen.getByText('In / 1M')).toBeInTheDocument()
-    expect(screen.getByText('$0.04')).toBeInTheDocument()
-    fireEvent.click(screen.getAllByRole('button', { name: /GLM 5.3 Flash/i }).at(-1)!)
-    expect(onSelectModel).toHaveBeenCalledWith('zai/glm-5.3-flash')
+    expect(screen.getByText('$0.02')).toBeInTheDocument()
+    expect(screen.getByText('$0.19')).toBeInTheDocument()
+    expect(screen.queryByText(/GLM/i)).not.toBeInTheDocument()
+    fireEvent.click(screen.getAllByRole('button', { name: /DeepSeek V4.1 Flash/i }).at(-1)!)
+    expect(onSelectModel).toHaveBeenCalledWith('deepseek/deepseek-v4.1-flash')
   })
 
   it('stops a streaming reply with Escape', () => {

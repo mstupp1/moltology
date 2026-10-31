@@ -1,4 +1,4 @@
-export type OracleProvider = 'zai' | 'deepseek' | 'alibaba'
+export type OracleProvider = 'deepseek'
 export type OracleModelBadge = 'Chat' | 'Titles'
 
 export interface OracleModelPricing {
@@ -16,15 +16,16 @@ export interface OracleModel {
   latency?: string
 }
 
+// Gateway prices from, per 1M tokens; provider routing can change the billed rate.
+// Verified 2026-10-31: https://vercel.com/ai-gateway/models/deepseek-v4.1-flash
 export const ORACLE_MODELS: OracleModel[] = [
   {
-    id: 'zai/glm-5.3-flash',
-    label: 'GLM 5.3 Flash',
-    shortLabel: 'GLM',
-    provider: 'zai',
+    id: 'deepseek/deepseek-v4.1-flash',
+    label: 'DeepSeek V4.1 Flash',
+    shortLabel: 'DeepSeek',
+    provider: 'deepseek',
     badge: 'Chat',
-    pricing: { input: '$0.04', output: '$0.08' },
-    latency: '0.2s',
+    pricing: { input: '$0.02', output: '$0.19' },
   },
 ]
 
@@ -40,7 +41,7 @@ export const DEFAULT_ORACLE_PLACEHOLDER = 'Ask Synaptic Oracle...'
  * Dedicated model used for summarizing conversation titles on first message dispatch.
  * Configured separately from interactive chat models.
  */
-export const ORACLE_TITLE_MODEL_ID = 'zai/glm-5.3-flash'
+export const ORACLE_TITLE_MODEL_ID = 'deepseek/deepseek-v4.1-flash'
 
 export function getOracleModel(id?: string): OracleModel {
   return ORACLE_MODELS.find((m) => m.id === id) || ORACLE_MODELS[0]

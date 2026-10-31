@@ -40,8 +40,8 @@ describe('summarizeThreadTitle', () => {
     neonClient.transaction.mockReset()
   })
 
-  it('uses ORACLE_TITLE_MODEL_ID (zai/glm-5.3-flash) and returns cleaned AI-generated title', async () => {
-    expect(ORACLE_TITLE_MODEL_ID).toBe('zai/glm-5.3-flash')
+  it('uses ORACLE_TITLE_MODEL_ID (deepseek/deepseek-v4.1-flash) and returns cleaned AI-generated title', async () => {
+    expect(ORACLE_TITLE_MODEL_ID).toBe('deepseek/deepseek-v4.1-flash')
     const { generateText } = await import('ai')
     vi.mocked(generateText).mockResolvedValueOnce({
       text: '"Carcinization Acceleration Tips"',

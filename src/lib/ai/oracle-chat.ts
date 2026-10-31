@@ -35,7 +35,7 @@ export function getOracleCandidateModelIds(selectedModelId?: string): string[] {
 }
 
 /**
- * Returns candidate model list pinned to GLM 5.3 Flash for maximum KV cache hits
+ * Returns candidate model list pinned to DeepSeek V4.1 Flash for maximum KV cache hits
  * and predictable execution without multi-model fallback hops.
  */
 export function orderOracleModels(requestedModelId?: string, preferredModelId?: string): string[] {
