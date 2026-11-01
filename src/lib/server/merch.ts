@@ -1,4 +1,5 @@
 import Stripe from 'stripe'
+import { MERCH_PRODUCT_GALLERIES } from '../merch-gallery'
 import { STRIPE_API_VERSION } from '../stripe-config'
 import { and, asc, eq, inArray, isNull, or } from 'drizzle-orm'
 import { getDb } from '../../db'
@@ -97,7 +98,7 @@ export async function getMerchCatalogHandler(args: HandlerArgs): Promise<MerchPr
       description: product.description,
       category: product.category,
       featuredImageUrl: product.featuredImageUrl,
-      galleryImageUrls: product.galleryImageUrls ?? [],
+      galleryImageUrls: MERCH_PRODUCT_GALLERIES[product.slug] ?? product.galleryImageUrls ?? [],
       basePriceCents: product.basePriceCents,
       sortOrder: product.sortOrder,
       variants: variants.filter((variant) => variant.productId === product.id && (enabled.get(variant.id) ?? variant.isAvailable)).map(toVariantView),

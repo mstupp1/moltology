@@ -1,0 +1,285 @@
+{
+  "date": "2026-11-01",
+  "timezone": "America/New_York",
+  "brief": {
+    "treatment": "Evergreen",
+    "seasonalIntensity": "none",
+    "reason": "Durable core store galleries; no holiday props"
+  },
+  "standard": {
+    "totalImages": 6,
+    "officialPrintfulImages": 3,
+    "aiLifestyleImages": 3,
+    "order": "Existing primary, two alternate/detail views, three square lifestyle scenes"
+  },
+  "galleries": {
+    "moltology-mug": [
+      "images/merch/moltology-mug-v2-1.jpg",
+      "images/merch/library/2026-10-21/moltology-mug-v2/mug-moltology-v2-default-1.jpg",
+      "images/merch/moltology-mug-v2-2.jpg",
+      "images/merch/library/2026-10-21/square-v2/moltology-mug-v2/mug-studio.jpg",
+      "images/merch/library/2026-10-21/square-v2/moltology-mug-v2/mug-reading.jpg",
+      "images/merch/library/2026-10-21/square-v2/moltology-mug-v2/mug-gallery.jpg"
+    ],
+    "moltology-tee": [
+      "images/merch/moltology-tee-v2-black.jpg",
+      "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-flat-2-2.jpg",
+      "images/merch/library/2026-10-21/moltology-tee-v2/tee-moltology-v2-ghost-3.jpg",
+      "images/merch/library/2026-10-21/square-v2/moltology-tee-v2/tee-studio.jpg",
+      "images/merch/library/2026-10-21/square-v2/moltology-tee-v2/tee-terrace.jpg",
+      "images/merch/library/2026-10-21/square-v2/moltology-tee-v2/tee-gallery.jpg"
+    ],
+    "moltology-hat": [
+      "images/merch/moltology-hat-v1-black.jpg",
+      "images/merch/library/2026-11-01/moltology-hat/hat-moltology-v1-flat-3.jpg",
+      "images/merch/library/2026-11-01/moltology-hat/hat-moltology-v1-flat-6.jpg",
+      "images/merch/library/2026-11-01/moltology-hat/hat-studio.jpg",
+      "images/merch/library/2026-11-01/moltology-hat/hat-terrace.jpg",
+      "images/merch/library/2026-11-01/moltology-hat/hat-gallery.jpg"
+    ],
+    "moltology-desk-mat": [
+      "images/merch/moltology-desk-mat-v1.jpg",
+      "images/merch/library/2026-11-01/moltology-desk-mat/desk-mat-moltology-v1-product-details-1.jpg",
+      "images/merch/library/2026-11-01/moltology-desk-mat/desk-mat-moltology-v1-product-details-2.jpg",
+      "images/merch/library/2026-11-01/moltology-desk-mat/mat-studio.jpg",
+      "images/merch/library/2026-11-01/moltology-desk-mat/mat-reading-square.jpg",
+      "images/merch/library/2026-11-01/moltology-desk-mat/mat-workspace-square.jpg"
+    ]
+  },
+  "assets": [
+    {
+      "slug": "moltology-hat",
+      "name": "hat-moltology-v1-flat-3",
+      "provider": "Printful",
+      "key": "images/merch/library/2026-11-01/moltology-hat/hat-moltology-v1-flat-3.jpg",
+      "webpKey": "images/merch/library/2026-11-01/moltology-hat/hat-moltology-v1-flat-3.webp",
+      "localFile": "tmp/merch/official-gallery/18931450/moltology-hat/hat-moltology-v1-flat-3.jpg",
+      "dimensions": [
+        1600,
+        1600
+      ],
+      "uploaded": true,
+      "httpVerified": "Original and WebP return HTTP 200 through local /media proxy",
+      "design": "hat-moltology-v1",
+      "catalogVariantId": 7854,
+      "style": "Flat",
+      "inspection": "Official angled front / adjustable-strap back; black fabric and red embroidery checked. Original provider framing preserved."
+    },
+    {
+      "slug": "moltology-hat",
+      "name": "hat-moltology-v1-flat-6",
+      "provider": "Printful",
+      "key": "images/merch/library/2026-11-01/moltology-hat/hat-moltology-v1-flat-6.jpg",
+      "webpKey": "images/merch/library/2026-11-01/moltology-hat/hat-moltology-v1-flat-6.webp",
+      "localFile": "tmp/merch/official-gallery/18931450/moltology-hat/hat-moltology-v1-flat-6.jpg",
+      "dimensions": [
+        1600,
+        1600
+      ],
+      "uploaded": true,
+      "httpVerified": "Original and WebP return HTTP 200 through local /media proxy",
+      "design": "hat-moltology-v1",
+      "catalogVariantId": 7854,
+      "style": "Flat",
+      "inspection": "Official angled front / adjustable-strap back; black fabric and red embroidery checked. Original provider framing preserved."
+    },
+    {
+      "slug": "moltology-desk-mat",
+      "name": "desk-mat-moltology-v1-product-details-1",
+      "provider": "Printful",
+      "key": "images/merch/library/2026-11-01/moltology-desk-mat/desk-mat-moltology-v1-product-details-1.jpg",
+      "webpKey": "images/merch/library/2026-11-01/moltology-desk-mat/desk-mat-moltology-v1-product-details-1.webp",
+      "localFile": "tmp/merch/official-gallery/18931450/moltology-desk-mat/desk-mat-moltology-v1-product-details-1.jpg",
+      "dimensions": [
+        1600,
+        1600
+      ],
+      "uploaded": true,
+      "httpVerified": "Original and WebP return HTTP 200 through local /media proxy",
+      "design": "desk-mat-moltology-v1",
+      "catalogVariantId": 22327,
+      "style": "Product details",
+      "inspection": "Official surface/stitched-edge close-up and rolled backing/wordmark detail checked. Original portrait provider framing preserved."
+    },
+    {
+      "slug": "moltology-desk-mat",
+      "name": "desk-mat-moltology-v1-product-details-2",
+      "provider": "Printful",
+      "key": "images/merch/library/2026-11-01/moltology-desk-mat/desk-mat-moltology-v1-product-details-2.jpg",
+      "webpKey": "images/merch/library/2026-11-01/moltology-desk-mat/desk-mat-moltology-v1-product-details-2.webp",
+      "localFile": "tmp/merch/official-gallery/18931450/moltology-desk-mat/desk-mat-moltology-v1-product-details-2.jpg",
+      "dimensions": [
+        1600,
+        1600
+      ],
+      "uploaded": true,
+      "httpVerified": "Original and WebP return HTTP 200 through local /media proxy",
+      "design": "desk-mat-moltology-v1",
+      "catalogVariantId": 22327,
+      "style": "Product details",
+      "inspection": "Official surface/stitched-edge close-up and rolled backing/wordmark detail checked. Original portrait provider framing preserved."
+    },
+    {
+      "slug": "moltology-hat",
+      "name": "hat-studio",
+      "provider": "built-in ImageGen",
+      "key": "images/merch/library/2026-11-01/moltology-hat/hat-studio.jpg",
+      "webpKey": "images/merch/library/2026-11-01/moltology-hat/hat-studio.webp",
+      "localFile": "tmp/merch/lifestyle/2026-11-01/hat-studio.jpg",
+      "dimensions": [
+        1600,
+        1600
+      ],
+      "uploaded": true,
+      "httpVerified": "Original and WebP return HTTP 200 through local /media proxy",
+      "officialReferenceKey": "images/merch/moltology-hat-v1-black.jpg",
+      "prompt": "Use case: photorealistic-natural. Asset: supplementary ecommerce lifestyle photograph, one full-bleed square 1:1 image, no collage. Input image 1 is the exact official product reference, not an edit target. Reproduce that product's material, color, shape, proportions, branding geometry, scale and placement faithfully. An adult Black woman wearing the hat and a simple charcoal overshirt, seated in a sunlit concrete design studio. Front three-quarter upper-body portrait, entire hat and visor in frame, emblem facing camera. Exact black cotton six-panel dad hat, curved visor, small centered red embroidered reference emblem, no added lettering or other marks. Do not substitute a crab icon or redraw the emblem. Premium natural editorial photography, believable product scale, realistic materials and anatomy, restrained warm light and deep teal accents. Evergreen durable store imagery; no holiday props, other logos, captions or watermark. Keep the product and branding visible, no occlusion, no cropped heads or hands.",
+      "generatedSource": "/Users/mylesstupp/.codex/generated_images/01a19877-de4b-71e1-b91b-257a45a01bed/exec-7eeffa0f-9728-485a-90be-9faac9e24e0c.png",
+      "inspection": "Inspected beside official reference: black cotton dad hat, curved visor, centered red embroidered emblem; unobscured hat, plausible model and square full-bleed composition. Supplementary AI illustration, not physical embroidery proof."
+    },
+    {
+      "slug": "moltology-hat",
+      "name": "hat-terrace",
+      "provider": "built-in ImageGen",
+      "key": "images/merch/library/2026-11-01/moltology-hat/hat-terrace.jpg",
+      "webpKey": "images/merch/library/2026-11-01/moltology-hat/hat-terrace.webp",
+      "localFile": "tmp/merch/lifestyle/2026-11-01/hat-terrace.jpg",
+      "dimensions": [
+        1600,
+        1600
+      ],
+      "uploaded": true,
+      "httpVerified": "Original and WebP return HTTP 200 through local /media proxy",
+      "officialReferenceKey": "images/merch/moltology-hat-v1-black.jpg",
+      "prompt": "Use case: photorealistic-natural. Asset: supplementary ecommerce lifestyle photograph, one full-bleed square 1:1 image, no collage. Input image 1 is the exact official product reference, not an edit target. Reproduce that product's material, color, shape, proportions, branding geometry, scale and placement faithfully. An adult East Asian man wearing the hat and a muted stone jacket, standing on a quiet architectural terrace. Front three-quarter upper-body portrait, entire hat and visor in frame, emblem facing camera. Exact black cotton six-panel dad hat, curved visor, small centered red embroidered reference emblem, no added lettering or other marks. Do not substitute a crab icon or redraw the emblem. Premium natural editorial photography, believable product scale, realistic materials and anatomy, restrained warm light and deep teal accents. Evergreen durable store imagery; no holiday props, other logos, captions or watermark. Keep the product and branding visible, no occlusion, no cropped heads or hands.",
+      "generatedSource": "/Users/mylesstupp/.codex/generated_images/01a19877-de4b-71e1-b91b-257a45a01bed/exec-bfeaab21-fae8-466b-916a-3062ac3489af.png",
+      "inspection": "Inspected beside official reference: black cotton dad hat, curved visor, centered red embroidered emblem; unobscured hat, plausible model and square full-bleed composition. Supplementary AI illustration, not physical embroidery proof."
+    },
+    {
+      "slug": "moltology-hat",
+      "name": "hat-gallery",
+      "provider": "built-in ImageGen",
+      "key": "images/merch/library/2026-11-01/moltology-hat/hat-gallery.jpg",
+      "webpKey": "images/merch/library/2026-11-01/moltology-hat/hat-gallery.webp",
+      "localFile": "tmp/merch/lifestyle/2026-11-01/hat-gallery.jpg",
+      "dimensions": [
+        1600,
+        1600
+      ],
+      "uploaded": true,
+      "httpVerified": "Original and WebP return HTTP 200 through local /media proxy",
+      "officialReferenceKey": "images/merch/moltology-hat-v1-black.jpg",
+      "prompt": "Use case: photorealistic-natural. Asset: supplementary ecommerce lifestyle photograph, one full-bleed square 1:1 image, no collage. Input image 1 is the exact official product reference, not an edit target. Reproduce that product's material, color, shape, proportions, branding geometry, scale and placement faithfully. An adult woman with olive skin wearing the hat and a navy chore jacket in a warm minimal gallery cafe. Front three-quarter upper-body portrait, entire hat and visor in frame, emblem facing camera. Exact black cotton six-panel dad hat, curved visor, small centered red embroidered reference emblem, no added lettering or other marks. Do not substitute a crab icon or redraw the emblem. Premium natural editorial photography, believable product scale, realistic materials and anatomy, restrained warm light and deep teal accents. Evergreen durable store imagery; no holiday props, other logos, captions or watermark. Keep the product and branding visible, no occlusion, no cropped heads or hands.",
+      "generatedSource": "/Users/mylesstupp/.codex/generated_images/01a19877-de4b-71e1-b91b-257a45a01bed/exec-940ba478-a7b0-4559-a390-9cd73213cfc8.png",
+      "inspection": "Inspected beside official reference: black cotton dad hat, curved visor, centered red embroidered emblem; unobscured hat, plausible model and square full-bleed composition. Supplementary AI illustration, not physical embroidery proof."
+    },
+    {
+      "slug": "moltology-desk-mat",
+      "name": "mat-studio",
+      "provider": "built-in ImageGen",
+      "key": "images/merch/library/2026-11-01/moltology-desk-mat/mat-studio.jpg",
+      "webpKey": "images/merch/library/2026-11-01/moltology-desk-mat/mat-studio.webp",
+      "localFile": "tmp/merch/lifestyle/2026-11-01/mat-studio.jpg",
+      "dimensions": [
+        1600,
+        1600
+      ],
+      "uploaded": true,
+      "httpVerified": "Original and WebP return HTTP 200 through local /media proxy",
+      "officialReferenceKey": "images/merch/moltology-desk-mat-v1.jpg",
+      "prompt": "Use case: photorealistic-natural. Asset: supplementary ecommerce lifestyle photograph, one full-bleed square 1:1 image, no collage. Input image 1 is the exact official product reference, not an edit target. Reproduce that product's material, color, shape, proportions, branding geometry, scale and placement faithfully. The full desk mat on a pale oak desk in a bright design studio, compact unbranded keyboard at upper center and a mouse on the right, leaving the complete lower-right branding uncovered. An adult working at the desk appears only as naturally posed forearms. Elevated three-quarter view with the complete mat and all its edges in frame. Exact 16 by 32 inch dark rectangular stitched desk mat, subtle cyan contour lines on the LEFT, small original red emblem and white Moltology / THE SYNAPTIC PATH wordmark at LOWER RIGHT. Preserve wide 2:1 proportions, thin profile, rounded stitched edges and artwork placement. Exact lettering: Moltology and THE SYNAPTIC PATH. Do not enlarge the mark or add printing elsewhere. Premium natural editorial photography, believable product scale, realistic materials and anatomy, restrained warm light and deep teal accents. Evergreen durable store imagery; no holiday props, other logos, captions or watermark. Keep the product and branding visible, no occlusion, no cropped heads or hands.",
+      "generatedSource": "/Users/mylesstupp/.codex/generated_images/01a19877-de4b-71e1-b91b-257a45a01bed/exec-ee327451-eb7e-497e-bd4b-9f90beaddf8f.png",
+      "inspection": "Inspected beside official reference: complete dark wide mat, stitched edge, cyan contours on left, red emblem and legible white wordmark at lower right. Full mat visible in square workspace composition. Supplementary AI illustration, not print proof."
+    },
+    {
+      "slug": "moltology-desk-mat",
+      "name": "mat-reading-square",
+      "provider": "built-in ImageGen",
+      "key": "images/merch/library/2026-11-01/moltology-desk-mat/mat-reading-square.jpg",
+      "webpKey": "images/merch/library/2026-11-01/moltology-desk-mat/mat-reading-square.webp",
+      "localFile": "tmp/merch/lifestyle/2026-11-01/mat-reading-square.jpg",
+      "dimensions": [
+        1600,
+        1600
+      ],
+      "uploaded": true,
+      "httpVerified": "Original and WebP return HTTP 200 through local /media proxy",
+      "officialReferenceKey": "images/merch/moltology-desk-mat-v1.jpg",
+      "prompt": "Use case: photorealistic-natural. Asset: supplementary ecommerce lifestyle photograph, one full-bleed square 1:1 image, no collage. Input image 1 is the exact official product reference, not an edit target. Reproduce that product's material, color, shape, proportions, branding geometry, scale and placement faithfully. The full desk mat on a walnut writing desk beside a large window, a closed plain notebook and pen at upper center, one adult seated behind the desk with hands away from the branding. Elevated three-quarter view with the complete mat and all its edges in frame. Exact 16 by 32 inch dark rectangular stitched desk mat, subtle cyan contour lines on the LEFT, small original red emblem and white Moltology / THE SYNAPTIC PATH wordmark at LOWER RIGHT. Preserve wide 2:1 proportions, thin profile, rounded stitched edges and artwork placement. Exact lettering: Moltology and THE SYNAPTIC PATH. Do not enlarge the mark or add printing elsewhere. Premium natural editorial photography, believable product scale, realistic materials and anatomy, restrained warm light and deep teal accents. Evergreen durable store imagery; no holiday props, other logos, captions or watermark. Keep the product and branding visible, no occlusion, no cropped heads or hands.",
+      "generatedSource": "/Users/mylesstupp/.codex/generated_images/01a19877-de4b-71e1-b91b-257a45a01bed/exec-7d4405b4-b3a9-4c6b-80b4-156f78dabd1a.png",
+      "revisionPrompt": "Recompose this ecommerce lifestyle photograph into a FULL-BLEED SQUARE 1:1 composition. Output width MUST EQUAL output height. Keep the exact wide 16 by 32 inch black desk mat and its printed artwork as reference: subtle cyan contours on left, small red canonical emblem and white Moltology / THE SYNAPTIC PATH at lower right, original scale and placement. Show a complete walnut desk and window scene with the entire mat visible, all four edges and corners inside the square, closed dark notebook and pen at upper center. Remove the person and laptop so the focus is the mat and notebook. Add natural scene above and below to create the square; do not crop product or add bars. Realistic premium daylight photograph, exact same product materials, shape and branding. No holiday props, captions, watermark, extra branding.",
+      "rejectedInitialReason": "Landscape output; recomposed with ImageGen to square rather than cropped or stretched",
+      "inspection": "Inspected beside official reference: complete dark wide mat, stitched edge, cyan contours on left, red emblem and legible white wordmark at lower right. Full mat visible in square workspace composition. Supplementary AI illustration, not print proof."
+    },
+    {
+      "slug": "moltology-desk-mat",
+      "name": "mat-workspace-square",
+      "provider": "built-in ImageGen",
+      "key": "images/merch/library/2026-11-01/moltology-desk-mat/mat-workspace-square.jpg",
+      "webpKey": "images/merch/library/2026-11-01/moltology-desk-mat/mat-workspace-square.webp",
+      "localFile": "tmp/merch/lifestyle/2026-11-01/mat-workspace-square.jpg",
+      "dimensions": [
+        1600,
+        1600
+      ],
+      "uploaded": true,
+      "httpVerified": "Original and WebP return HTTP 200 through local /media proxy",
+      "officialReferenceKey": "images/merch/moltology-desk-mat-v1.jpg",
+      "prompt": "Use case: photorealistic-natural. Asset: supplementary ecommerce lifestyle photograph, one full-bleed square 1:1 image, no collage. Input image 1 is the exact official product reference, not an edit target. Reproduce that product's material, color, shape, proportions, branding geometry, scale and placement faithfully. The full desk mat on a pale minimal home-office desk with a laptop on a separate stand behind it, compact keyboard centered high on the mat and mouse on right. Quiet plaster walls and soft daylight. Elevated three-quarter view with the complete mat and all its edges in frame. Exact 16 by 32 inch dark rectangular stitched desk mat, subtle cyan contour lines on the LEFT, small original red emblem and white Moltology / THE SYNAPTIC PATH wordmark at LOWER RIGHT. Preserve wide 2:1 proportions, thin profile, rounded stitched edges and artwork placement. Exact lettering: Moltology and THE SYNAPTIC PATH. Do not enlarge the mark or add printing elsewhere. Premium natural editorial photography, believable product scale, realistic materials and anatomy, restrained warm light and deep teal accents. Evergreen durable store imagery; no holiday props, other logos, captions or watermark. Keep the product and branding visible, no occlusion, no cropped heads or hands.",
+      "generatedSource": "/Users/mylesstupp/.codex/generated_images/01a19877-de4b-71e1-b91b-257a45a01bed/exec-d764f222-5c70-4a16-bc46-e22d12dcad1a.png",
+      "revisionPrompt": "Edit input image 1 into a FULL-BLEED SQUARE 1:1 ecommerce lifestyle photograph. Output WIDTH MUST EQUAL HEIGHT. Add real room/desk scene ABOVE AND BELOW the current image; keep entire mat in frame, no cropping, bars, stretching or blank padding. Image 2 is official exact product reference. Preserve the exact 16 by 32 inch dark rectangular thin desk mat with stitched rounded edges, subtle cyan contours on LEFT, small original red emblem and white Moltology / THE SYNAPTIC PATH at LOWER RIGHT, original print scale and placement. A minimal pale home-office desk, laptop on stand behind the mat, compact keyboard high on mat and mouse right, naturally lit plaster wall. Maintain faithful material, proportions and branding. Show all four corners with breathing room. Square composition, photorealistic editorial quality, no holidays, other logos, watermark or captions.",
+      "rejectedInitialReason": "Landscape output; recomposed with ImageGen to square rather than cropped or stretched",
+      "inspection": "Inspected beside official reference: complete dark wide mat, stitched edge, cyan contours on left, red emblem and legible white wordmark at lower right. Full mat visible in square workspace composition. Supplementary AI illustration, not print proof."
+    }
+  ],
+  "background": {
+    "token": "bg-benthic-border",
+    "hex": "#3a4a49",
+    "decision": "Retain existing approved brand color and contrast. Both store grid and dashboard now consume the shared cutout background registry.",
+    "inspection": "Desktop store screenshot inspected: white ceramic and all three dark products have clear silhouette separation."
+  },
+  "release": {
+    "status": "Prepared for PR; no production database or Printful product changes",
+    "behavior": "Reviewed complete gallery selections take precedence for existing database rows when the PR deploys. Seed catalog shares the selections. Unknown products retain their saved galleries; missing rows remain absent."
+  },
+  "verification": {
+    "typecheck": "passed",
+    "core": "1368 passed; final targeted gallery/server/dashboard run: 23 passed",
+    "scripts": "342 passed",
+    "uiTokens": "passed",
+    "assetBudget": "passed",
+    "browser": "Passed at 1440\u00d71000 and 390\u00d7844: all six photos of all four products loaded and clicked; captions/counters, no overflow and no runtime errors checked. Catalog responses use browser-local fixtures; media uses actual uploaded assets. Dashboard panel checked with saved development login. Screenshots inspected.",
+    "screenshots": "tmp/verification/merch/{desktop,mobile}-{catalog,moltology-hat,moltology-desk-mat,moltology-tee,moltology-mug,dashboard-store}.png"
+  },
+  "localFiles": "tmp/merch/lifestyle/2026-11-01",
+  "supersededUploads": [
+    {
+      "slug": "moltology-desk-mat",
+      "name": "mat-reading",
+      "provider": "built-in ImageGen",
+      "key": "images/merch/library/2026-11-01/moltology-desk-mat/mat-reading.jpg",
+      "webpKey": "images/merch/library/2026-11-01/moltology-desk-mat/mat-reading.webp",
+      "localFile": "tmp/merch/lifestyle/2026-11-01/mat-reading.jpg",
+      "dimensions": [
+        1600,
+        1600
+      ],
+      "uploaded": true,
+      "reason": "Earlier pre-upload browser probe cached a 404 at this URL. Final selection uses the fresh -square.jpg / .webp keys."
+    },
+    {
+      "slug": "moltology-desk-mat",
+      "name": "mat-workspace",
+      "provider": "built-in ImageGen",
+      "key": "images/merch/library/2026-11-01/moltology-desk-mat/mat-workspace.jpg",
+      "webpKey": "images/merch/library/2026-11-01/moltology-desk-mat/mat-workspace.webp",
+      "localFile": "tmp/merch/lifestyle/2026-11-01/mat-workspace.jpg",
+      "dimensions": [
+        1600,
+        1600
+      ],
+      "uploaded": true,
+      "reason": "Earlier pre-upload browser probe cached a 404 at this URL. Final selection uses the fresh -square.jpg / .webp keys."
+    }
+  ]
+}

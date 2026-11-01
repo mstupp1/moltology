@@ -1,22 +1,23 @@
 /**
  * Transparent product cutouts for product cards (store grid and dashboard Store panel), shown on a
- * tinted square. The product page and cart keep the catalog photos.
+ * brand benthic-border surface (#3a4a49), keeping dark silhouettes visible.
+ * The product page and cart keep the catalog photos.
  */
 export const MERCH_CUTOUTS: Record<string, { src: string; alt: string; background: string }> = {
   'moltology-hat': {
     src: 'images/merch/dashboard/2026-10-22/moltology-hat-v1.png',
     alt: 'Black Moltology dad hat with red embroidered emblem',
-    background: 'bg-surface-3',
+    background: 'bg-benthic-border',
   },
   'moltology-desk-mat': {
     src: 'images/merch/dashboard/2026-10-22/moltology-desk-mat-v1.png',
     alt: 'Dark Moltology desk mat with depth contours',
-    background: 'bg-surface-3',
+    background: 'bg-benthic-border',
   },
   'moltology-mug': {
     src: 'images/merch/dashboard/2026-10-21/moltology-mug-v2.png',
     alt: 'White Moltology mug with red emblem',
-    background: 'bg-surface-3',
+    background: 'bg-benthic-border',
   },
   'moltology-tee': {
     src: 'images/merch/dashboard/2026-10-21/moltology-tee-v2.png',

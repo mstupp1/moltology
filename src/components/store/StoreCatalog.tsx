@@ -210,7 +210,7 @@ function ProductCard({ product, eager }: { product: MerchProductView; eager: boo
 
   return (
     <article className="group relative">
-      <div className="relative aspect-[4/3] overflow-hidden rounded-card bg-benthic-border">
+      <div className={`relative aspect-[4/3] overflow-hidden rounded-card ${cutout?.background ?? 'bg-benthic-border'}`}>
         <Link to="/store/$slug" params={{ slug: product.slug }} className={`block h-full w-full rounded-card ${FOCUS}`}>
           <span className="sr-only">{product.title}</span>
           <MerchImage

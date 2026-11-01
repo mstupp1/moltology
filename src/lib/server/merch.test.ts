@@ -3,6 +3,7 @@ import { beforeEach } from 'vitest'
 import { getDb } from '../../db'
 import { getMerchCatalogHandler, createMerchCheckoutSessionHandler, fulfillMerchCheckoutEvent } from './merch'
 import { fulfillPaidMerchOrder } from './merch-fulfillment'
+import { MERCH_PRODUCT_GALLERIES } from '../merch-gallery'
 
 vi.mock('../../db', () => ({ getDb: vi.fn(() => ({})) }))
 
@@ -29,6 +30,25 @@ describe('new store experiment server gate', () => {
     await expect(getMerchCatalogHandler(args)).rejects.toThrow('This page is not available.')
     await expect(createMerchCheckoutSessionHandler({ ...args, data: { items: [] } })).rejects.toThrow('This page is not available.')
     expect(db.select).toHaveBeenCalled()
+  })
+
+  it('uses reviewed galleries for existing rows and preserves other database galleries', async () => {
+    const rows = [
+      { id: 'hat', slug: 'moltology-hat', isPublished: true, galleryImageUrls: ['old-hat.jpg'] },
+      { id: 'other', slug: 'another-product', isPublished: true, galleryImageUrls: ['custom.jpg'] },
+    ]
+    const orderBy = vi.fn().mockResolvedValueOnce(rows).mockResolvedValueOnce([])
+    const query = {
+      from: () => query, where: () => query, orderBy,
+      limit: vi.fn().mockResolvedValue([{ role: 'admin', experiments: ['new-store'] }]),
+      then: (resolve: (value: unknown[]) => void) => resolve([]),
+    }
+    const db = { select: () => query }
+    vi.mocked(getDb).mockReturnValue(db as never)
+    const result = await getMerchCatalogHandler({ context: { user: { sub: 'admin-1' }, db: db as never } })
+    expect(result[0].galleryImageUrls).toEqual(MERCH_PRODUCT_GALLERIES['moltology-hat'])
+    expect(result[1].galleryImageUrls).toEqual(['custom.jpg'])
+    expect(result).toHaveLength(2)
   })
 
   it('loads the catalog for an opted-in admin', async () => {
