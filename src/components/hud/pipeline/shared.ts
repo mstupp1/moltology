@@ -1,4 +1,3 @@
-import { getAssetUrl } from '@/lib/assets'
 import { stageXpRange, type Clearance } from '@/lib/pipeline-explorer'
 
 /** Per-stage accent. Classes are spelled out so Tailwind keeps them; hex is for SVG and gradients. */
@@ -11,11 +10,6 @@ export const STAGE_ACCENT: Record<number, { hex: string; rgb: string; text: stri
 
 export function stageAccent(stageNum: number) {
   return STAGE_ACCENT[stageNum] ?? STAGE_ACCENT[2]
-}
-
-/** The stage art as the lighter webp encode that sits next to each png in the asset bucket. */
-export function stageArtUrl(img: string): string {
-  return getAssetUrl(img.replace(/\.png$/, '.webp'))
 }
 
 /** "STAGE 1: THE LARVAL INITIATE" -> "THE LARVAL INITIATE". */

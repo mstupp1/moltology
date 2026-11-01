@@ -2,7 +2,9 @@ import React, { useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { STAGE_PIPELINE_DATA } from '@/lib/codexData'
 import { PIPELINE_CLEARANCES } from '@/lib/pipeline-explorer'
-import { stageAccent, stageArtUrl, stageName, xpRangeLabel } from './shared'
+import { getAssetUrl } from '@/lib/assets'
+import { STAGE_ART } from '@/lib/stage-art'
+import { stageAccent, stageName, xpRangeLabel } from './shared'
 
 interface StageStrataProps {
   currentIndex: number
@@ -54,13 +56,13 @@ export function StageStrata({ currentIndex, selectedStage, onSelectStage }: Stag
             )}
           >
             <img
-              src={stageArtUrl(stage.img)}
+              src={getAssetUrl(STAGE_ART[stage.stageNum])}
               alt=""
               width={56}
               height={56}
               loading="lazy"
               decoding="async"
-              className={cn('shrink-0 object-contain', selected ? 'h-16 w-16' : 'h-9 w-9')}
+              className={cn('shrink-0 rounded-control object-cover object-right', selected ? 'h-16 w-16' : 'h-9 w-9')}
             />
             <span className="min-w-0">
               <span className={cn('block text-[11px] font-bold uppercase tracking-[0.08em]', accent.text)}>

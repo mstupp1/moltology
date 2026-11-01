@@ -70,8 +70,9 @@ describe('Moltology science pipeline', () => {
     expect(cards).toHaveLength(4)
     expect(cards[0]).toHaveAttribute('aria-current', 'step')
     expect(cards[0]).toHaveAttribute('aria-expanded', 'true')
-    const img = nav.querySelector('img')!
-    expect(img.getAttribute('src')).toBe(getAssetUrl('/images/stage1_larval.webp'))
+    expect(Array.from(nav.querySelectorAll('img'), (img) => img.getAttribute('src'))).toEqual([
+      'larval', 'soft-shed', 'exoshell', 'ascendant',
+    ].map((name) => getAssetUrl(`images/dashboard/stages/${name}-v1.png`)))
 
     for (const index of [1, 3, 2, 0]) {
       fireEvent.click(cards[index])
