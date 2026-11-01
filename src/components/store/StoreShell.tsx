@@ -9,9 +9,10 @@ import { CartDrawer } from './CartDrawer'
 import { MerchCartProvider } from './MerchCartProvider'
 
 function StoreBody() {
+  const isCatalog = useLocation({ select: location => location.pathname.replace(/\/$/, '') === '/store' })
   return (
     <MerchCartProvider>
-      <main className="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+      <main className={isCatalog ? 'pb-16' : 'mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8'}>
         <Outlet />
       </main>
       <CartDrawer />

@@ -25,5 +25,14 @@
       "tmp/verification/store-hero/desktop.png",
       "tmp/verification/store-hero/mobile.png"
     ]
+  },
+  "layoutUpdate": {
+    "layout": "Full viewport width with constrained inner copy and catalog; larger headline, collection anchor, reduced-motion-aware entrance and hover transitions",
+    "copy": "Merch carrying the Synaptic Path. Printed when you order it.",
+    "verification": "Typecheck, 7 existing store tests, UI tokens passed. Desktop 1440x1000 and mobile 390x844: full viewport hero width asserted, collection anchor clicked, no overflow or runtime errors, screenshots inspected. Browser-local access fixture; catalog remains gated.",
+    "screenshots": [
+      "tmp/verification/store-hero-full-width/desktop.png",
+      "tmp/verification/store-hero-full-width/mobile.png"
+    ]
   }
 }
