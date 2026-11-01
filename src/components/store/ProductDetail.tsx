@@ -19,6 +19,7 @@ import { StorePolicies } from './StorePolicies'
 import { MerchImage } from './MerchImage'
 import { useMerchCart, type StoreOrderingState } from './MerchCartProvider'
 import { merchGalleryAlt, merchGalleryCaption } from '@/lib/merch-gallery'
+import { MERCH_CUTOUTS } from '@/lib/merch-cutouts'
 
 const FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 
@@ -353,17 +354,23 @@ export function ProductDetail({ slug }: { slug: string }) {
             More from the store
           </h2>
           <ul className="mt-6 grid grid-cols-2 gap-5 lg:grid-cols-3">
-            {related.map((item) => (
-              <li key={item.id}>
-                <Link to="/store/$slug" params={{ slug: item.slug }} className={`group block rounded-card ${FOCUS}`}>
-                  <div className="aspect-square overflow-hidden rounded-card bg-surface-1">
-                    <MerchImage src={item.featuredImageUrl} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
-                  </div>
-                  <p className="mt-3 font-grotesk text-sm font-medium text-ink group-hover:text-cyan-glow">{item.title}</p>
-                  <p className="text-sm text-ink-body">{merchPriceLabel(item)}</p>
-                </Link>
-              </li>
-            ))}
+            {related.map((item) => {
+              const cutout = MERCH_CUTOUTS[item.slug]
+              return (
+                <li key={item.id}>
+                  <Link to="/store/$slug" params={{ slug: item.slug }} className={`group block rounded-card ${FOCUS}`}>
+                    <div className={`aspect-square overflow-hidden rounded-card ${cutout?.background ?? 'bg-surface-1'}`}>
+                      <MerchImage
+                        src={cutout?.src ?? item.featuredImageUrl}
+                        className={`h-full w-full transition duration-500 group-hover:scale-[1.03] ${cutout ? 'object-contain p-5 sm:p-10' : 'object-cover'}`}
+                      />
+                    </div>
+                    <p className="mt-3 font-grotesk text-sm font-medium text-ink group-hover:text-cyan-glow">{item.title}</p>
+                    <p className="text-sm text-ink-body">{merchPriceLabel(item)}</p>
+                  </Link>
+                </li>
+              )
+            })}
           </ul>
         </section>
       ) : null}

@@ -1,7 +1,7 @@
 /**
- * Transparent product cutouts for product cards (store grid and dashboard Store panel), shown on a
+ * Transparent product cutouts for product cards (store grid, related items and dashboard Store panel), shown on a
  * brand benthic-border surface (#3a4a49), keeping dark silhouettes visible.
- * The product page and cart keep the catalog photos.
+ * The main product gallery and cart keep the catalog photos.
  */
 export const MERCH_CUTOUTS: Record<string, { src: string; alt: string; background: string }> = {
   'moltology-hat': {
