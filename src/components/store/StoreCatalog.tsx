@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { Plus, ShoppingBag } from 'lucide-react'
+import { ArrowDownRight, Plus, ShoppingBag } from 'lucide-react'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { merchPriceLabel, uniqueVariantLabels, type MerchProductView } from '@/lib/merch'
 import { MERCH_CUTOUTS } from '@/lib/merch-cutouts'
+import { getAssetUrl } from '@/lib/assets'
 import { getMerchCatalogFn } from '@/lib/server/merch-api'
 import { StorePolicies } from './StorePolicies'
 import { MerchImage } from './MerchImage'
@@ -63,81 +64,106 @@ export function StoreCatalog({
   }, [category, products])
 
   return (
-    <div className="space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-6 border-b border-line-subtle pb-6">
-        <div className="max-w-2xl">
-          <p className="font-grotesk text-xs font-bold tracking-[0.12em] text-cyan-glow">STORE</p>
-          <h1 className="mt-2 font-grotesk text-4xl font-semibold tracking-tight text-ink sm:text-5xl">Field Issue</h1>
-          <p className="mt-3 text-base leading-relaxed text-ink-body">
-            Mugs and tees carrying the Synaptic Path. Each one is printed when you order it.
-          </p>
+    <div>
+      <header className="relative isolate flex min-h-[620px] items-end overflow-hidden bg-surface-1 sm:min-h-[500px] sm:items-center lg:min-h-[560px]">
+        <picture className="absolute inset-0 -z-20">
+          <source media="(max-width: 639px)" srcSet={getAssetUrl('images/merch/hero/field-issue-mobile-v1.png')} width={1024} height={1536} />
+          <img
+            src={getAssetUrl('images/merch/hero/field-issue-everyday-v1.png')}
+            alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            width={1774}
+            height={887}
+            className="store-hero-image h-full w-full object-cover object-top"
+          />
+        </picture>
+        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-abyss via-abyss/70 via-35% to-transparent to-65% sm:bg-gradient-to-r sm:from-abyss/95 sm:via-abyss/40 sm:via-50% sm:to-transparent sm:to-100%" />
+        <div className="relative mx-auto w-full max-w-7xl px-5 pb-7 pt-80 sm:px-6 sm:py-16 lg:px-8">
+          <div className="store-hero-copy max-w-md space-y-6">
+            <div>
+              <p className="flex items-center gap-3 font-grotesk text-xs font-bold tracking-[0.18em] text-cyan-glow"><span aria-hidden="true" className="h-px w-8 bg-cyan-glow" />MOLTOLOGY STORE</p>
+              <h1 className="mt-4 font-grotesk text-5xl font-semibold leading-none tracking-tight text-ink sm:text-6xl lg:text-7xl">Field Issue</h1>
+              <p className="mt-5 max-w-xs text-base leading-relaxed text-ink-body sm:text-lg">
+                Merch carrying the Synaptic Path. Printed when you order it.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-4">
+              <a href="#store-collection" className={`group inline-flex min-h-12 items-center gap-4 rounded-control bg-cyan-glow px-5 font-grotesk text-sm font-semibold text-abyss transition-colors hover:bg-cyan-hover ${FOCUS}`}>
+                Explore the merch
+                <ArrowDownRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:translate-y-0.5 motion-reduce:transform-none" aria-hidden="true" />
+              </a>
+              {cart.canOrder ? (
+                <button
+                  type="button"
+                  onClick={() => cart.setOpen(true)}
+                  className={`inline-flex min-h-10 items-center gap-2 rounded-control border border-line bg-surface-1 px-4 text-sm text-ink hover:border-line-strong hover:bg-surface-2 ${FOCUS}`}
+                >
+                  <ShoppingBag className="h-4 w-4" aria-hidden="true" />
+                  Cart
+                  {cart.count > 0 ? (
+                    <span className="rounded-chip bg-cyan-glow px-1.5 text-xs font-semibold text-abyss">{cart.count}</span>
+                  ) : null}
+                </button>
+              ) : cart.ordering === 'closed' ? (
+                <p className="text-sm text-ink-muted" data-testid="store-ordering-closed">
+                  Ordering opens soon. Have a look around.
+                </p>
+              ) : null}
+            </div>
+          </div>
         </div>
-        {cart.canOrder ? (
-          <button
-            type="button"
-            onClick={() => cart.setOpen(true)}
-            className={`inline-flex min-h-10 items-center gap-2 rounded-control border border-line bg-surface-1 px-4 text-sm text-ink hover:border-line-strong hover:bg-surface-2 ${FOCUS}`}
-          >
-            <ShoppingBag className="h-4 w-4" aria-hidden="true" />
-            Cart
-            {cart.count > 0 ? (
-              <span className="rounded-chip bg-cyan-glow px-1.5 text-xs font-semibold text-abyss">{cart.count}</span>
-            ) : null}
-          </button>
-        ) : cart.ordering === 'closed' ? (
-          <p className="rounded-control border border-line-subtle bg-surface-1 px-4 py-2 text-sm text-ink-body" data-testid="store-ordering-closed">
-            Ordering opens soon. Have a look around.
-          </p>
-        ) : null}
       </header>
 
-      <nav className="flex flex-wrap items-baseline justify-between gap-3" aria-label="Categories">
-        <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
-          <CategoryLink label="All" count={products?.length} to="/store" active={!category} />
-          {categories.map(([name, count]) => (
-            <CategoryLink key={name} label={name} count={count} to="/store" search={{ category: name }} active={category === name} />
-          ))}
-        </div>
-        {products ? (
-          <p className="text-sm text-ink-muted">
-            {visible.length} {visible.length === 1 ? 'item' : 'items'}
-          </p>
+      <div id="store-collection" className="mx-auto max-w-7xl scroll-mt-28 space-y-8 px-4 pt-8 sm:px-6 sm:pt-10 lg:px-8">
+        <nav className="flex flex-wrap items-baseline justify-between gap-3" aria-label="Categories">
+          <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
+            <CategoryLink label="All" count={products?.length} to="/store" active={!category} />
+            {categories.map(([name, count]) => (
+              <CategoryLink key={name} label={name} count={count} to="/store" search={{ category: name }} active={category === name} />
+            ))}
+          </div>
+          {products ? (
+            <p className="text-sm text-ink-muted">
+              {visible.length} {visible.length === 1 ? 'item' : 'items'}
+            </p>
+          ) : null}
+        </nav>
+
+        {error ? <p className="text-sm text-crimson-text">{error}</p> : null}
+
+        {products === null && !error ? (
+          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-3">
+            {[0, 1, 2, 3, 4, 5].map((key) => (
+              <div key={key} className="space-y-3">
+                <div className="aspect-[4/3] animate-pulse rounded-card bg-benthic-border" />
+                <div className="h-4 w-1/2 animate-pulse rounded-chip bg-surface-1" />
+              </div>
+            ))}
+          </div>
         ) : null}
-      </nav>
 
-      {error ? <p className="text-sm text-crimson-text">{error}</p> : null}
+        {products && visible.length === 0 ? (
+          <p className="text-sm text-ink-muted">{category ? 'Nothing is listed in this category.' : 'Nothing is listed yet.'}</p>
+        ) : null}
 
-      {products === null && !error ? (
-        <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-3">
-          {[0, 1, 2, 3, 4, 5].map((key) => (
-            <div key={key} className="space-y-3">
-              <div className="aspect-[4/3] animate-pulse rounded-card bg-benthic-border" />
-              <div className="h-4 w-1/2 animate-pulse rounded-chip bg-surface-1" />
-            </div>
-          ))}
-        </div>
-      ) : null}
+        {visible.length > 0 ? (
+          <ul className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-3">
+            {visible.map((product, index) => (
+              <li key={product.id}>
+                <ProductCard product={product} eager={index < 3} />
+              </li>
+            ))}
+          </ul>
+        ) : null}
 
-      {products && visible.length === 0 ? (
-        <p className="text-sm text-ink-muted">{category ? 'Nothing is listed in this category.' : 'Nothing is listed yet.'}</p>
-      ) : null}
-
-      {visible.length > 0 ? (
-        <ul className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-3">
-          {visible.map((product, index) => (
-            <li key={product.id}>
-              <ProductCard product={product} eager={index < 3} />
-            </li>
-          ))}
-        </ul>
-      ) : null}
-
-      <section aria-label="How orders work" className="grid gap-px overflow-hidden rounded-card border border-line-subtle bg-line-subtle sm:grid-cols-3">
-        <StorePromise title="Printed to order" body="Nothing sits in a warehouse. Your piece is printed after you check out." />
-        <StorePromise title="Shipping quoted before payment" body="Enter your delivery address for current shipping options and cost." />
-        <StorePromise title="Checkout on Stripe" body="Payment happens on Stripe's secure page. We never see your card number." />
-      </section>
-      <StorePolicies />
+        <section aria-label="How orders work" className="grid gap-px overflow-hidden rounded-card border border-line-subtle bg-line-subtle sm:grid-cols-3">
+          <StorePromise title="Printed to order" body="Nothing sits in a warehouse. Your piece is printed after you check out." />
+          <StorePromise title="Shipping quoted before payment" body="Enter your delivery address for current shipping options and cost." />
+          <StorePromise title="Checkout on Stripe" body="Payment happens on Stripe's secure page. We never see your card number." />
+        </section>
+        <StorePolicies />
+      </div>
     </div>
   )
 }

@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-01",
+  "provider": "built-in ImageGen",
+  "brief": "Evergreen portrait companion to the approved desktop hero; mobile composition with photo and copy in one full-width panel.",
+  "prompt": "Use case: photorealistic-natural. Asset type: mobile-only Field Issue store hero background, portrait 2:3. Create a unique portrait companion photograph to input image 1, which provides the exact two people, kitchen, wardrobe and product identities. Inputs 2 and 3 are exact tee and mug product references. Preserve people and exact branding. Same relaxed Black woman with curly hair wearing the black Moltology tee and East Asian male friend in olive overshirt, sharing a happy ordinary coffee moment in that cozy kitchen. Recompose for a narrow mobile screen: the two people close together, visible from head to waist in the TOP 55% of the portrait, heads fully inside frame with modest breathing room. Woman on left holds the white red-emblem mug at chest level, man on right beside his mug on the table. Tee print and mugs visible. Bottom 45% is mostly empty dark wooden tabletop falling into natural soft shadow, usable negative space for a webpage heading and button; no plants or bright objects in this bottom area. Human faces remain clearly visible above the halfway line. Warm morning window light, realistic skin and fabric, candid everyday feeling. One continuous photographic scene, no collage. No headline, overlay text, watermark, graphic effects, new branding, holiday props or invented products. Portrait composition intentionally made for mobile, not a crop of the landscape.",
+  "key": "images/merch/hero/field-issue-mobile-v1.png",
+  "webpKey": "images/merch/hero/field-issue-mobile-v1.webp",
+  "localFile": "tmp/store-hero/field-issue-mobile-v1.png",
+  "uploaded": true,
+  "webpBytes": 95932,
+  "dimensions": [
+    1024,
+    1536
+  ],
+  "delivery": "picture source selected below 640px; desktop retains original landscape source",
+  "verification": {
+    "typecheck": "passed",
+    "storeTests": "7 passed",
+    "uiTokens": "passed",
+    "assetBudget": "passed",
+    "browser": "Inspected 1440x1000 desktop and 360x780, 390x844, 430x932 mobile screenshots. Correct responsive source, full width, collection link, image decode, no horizontal overflow or runtime errors. Development access uses browser-only fixture; no store settings or catalog data changed.",
+    "screenshots": [
+      "tmp/verification/store-hero-mobile/desktop.png",
+      "tmp/verification/store-hero-mobile/mobile.png",
+      "tmp/verification/store-hero-mobile/mobile-small.png",
+      "tmp/verification/store-hero-mobile/mobile-wide.png"
+    ]
+  }
+}

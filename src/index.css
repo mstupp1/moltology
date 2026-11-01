@@ -993,3 +993,16 @@
   .oracle-max-art, .oracle-max-title > div:first-child { animation: none; }
   .oracle-max-compare-link:hover svg { transform: none; }
 }
+.store-hero-image { animation: store-hero-settle 1.1s ease-out both; }
+.store-hero-copy { animation: store-hero-enter 600ms ease-out both; }
+@keyframes store-hero-settle {
+  from { transform: scale(1.025); }
+  to { transform: scale(1); }
+}
+@keyframes store-hero-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .store-hero-image, .store-hero-copy { animation: none; }
+}
