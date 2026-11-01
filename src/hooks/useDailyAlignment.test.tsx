@@ -1,5 +1,5 @@
 import React from 'react'
-import { renderHook, act, waitFor } from '@testing-library/react'
+import { renderHook, act, waitFor, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { AlignmentProvider, useDailyAlignment } from './useDailyAlignment'
 import { ToastProvider } from '@/components/ui/ToastProvider'
@@ -37,6 +37,30 @@ describe('useDailyAlignment Hook Optimistic State & Rapid Clicks', () => {
       data: { user: { id: 'test-user-123' } },
       isPending: false,
     })
+  })
+
+
+  it('keeps repeated silent sessions complete without duplicate XP or writes', async () => {
+    mockAuthClient.useSession.mockReturnValue({ data: null, isPending: false })
+    const write = vi.spyOn(serverApi, 'toggleDailyAlignmentTaskFn')
+    const { result } = renderHook(() => useDailyAlignment(), { wrapper })
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+    act(() => result.current.openSilentSynchronization())
+    fireEvent.click(await screen.findByRole('button', { name: 'Close dialog' }))
+    expect(result.current.tasks[0].completed).toBe(false)
+    act(() => result.current.openSilentSynchronization())
+    fireEvent.click(await screen.findByRole('button', { name: 'Start timer' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }))
+    expect(result.current.tasks[0].completed).toBe(true)
+    expect(screen.getByRole('dialog', { name: 'Silent synchronization' })).toBeInTheDocument()
+    const xp = result.current.xp
+    fireEvent.click(screen.getByRole('button', { name: 'Close dialog' }))
+    act(() => result.current.openSilentSynchronization())
+    fireEvent.click(await screen.findByRole('button', { name: 'Start timer' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close dialog' }))
+    expect(result.current.completedCount).toBe(1)
+    expect(result.current.xp).toBe(xp)
+    expect(write).not.toHaveBeenCalled()
   })
 
   it('handles rapid clicking across multiple tasks without state rollback or flicker', async () => {

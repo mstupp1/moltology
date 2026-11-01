@@ -17,6 +17,8 @@ const mockAlignment: AlignmentContextValue = {
   isLoading: true,
   isSyncing: false,
   toggleTask: vi.fn(),
+  setTaskCompleted: vi.fn(),
+  openSilentSynchronization: vi.fn(),
   refetch: vi.fn(),
   currentDate: '2026-08-31',
   isGuest: false,

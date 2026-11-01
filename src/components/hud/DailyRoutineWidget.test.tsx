@@ -39,6 +39,13 @@ function renderWidget() {
   )
 }
 
+function completeSilentSync() {
+  fireEvent.click(screen.getByRole('button', { name: /Silent Synchronization/i }))
+  expect(screen.getByRole('dialog', { name: /Silent synchronization/i })).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Start timer' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Stop' }))
+}
+
 describe('computeHeatmapLayout', () => {
   const { maxWeeks, minCell, maxCell, gap, dowGutter } = ALIGNMENT_HEATMAP
 
@@ -134,26 +141,26 @@ describe('DailyRoutineWidget Component', () => {
     expect(screen.queryByText(/CARAPACE ALIGNMENT STATUS/i)).not.toBeInTheDocument()
   })
 
-  it('toggles a task on click and updates completion count', () => {
+  it('opens the silent synchronization dialog and records completion after the session', () => {
     renderWidget()
 
     expect(screen.getByText('0/8 done')).toBeInTheDocument()
 
-    const firstTask = screen.getByText('Silent Synchronization')
-    fireEvent.click(firstTask)
+    completeSilentSync()
 
     expect(screen.getByText('1/8 done')).toBeInTheDocument()
-    expect(firstTask).toHaveClass('line-through')
-    expect(screen.queryByText('SYNCING')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Silent Synchronization/i })).toHaveAttribute('aria-pressed', 'true')
   })
 
   it('displays the neutral-positive completion toast when all 8 tasks are completed', async () => {
     renderWidget()
 
     for (const task of CANONICAL_ALIGNMENT_TASKS) {
+      if (task.key === 'silent-synchronization') continue
       const taskEl = screen.getByText(task.title)
       fireEvent.click(taskEl)
     }
+    completeSilentSync()
 
     expect(screen.getByText('8/8 done')).toBeInTheDocument()
 
@@ -172,7 +179,7 @@ describe('DailyRoutineWidget Component', () => {
     const task2 = screen.getByText('Prompt Construction')
     const task3 = screen.getByText('Skill Development')
 
-    fireEvent.click(task1)
+    completeSilentSync()
     fireEvent.click(task2)
     fireEvent.click(task3)
 
@@ -237,7 +244,7 @@ describe('DailyRoutineWidget Component', () => {
     expect(screen.getByRole('tab', { name: /Tasks/ })).toHaveAttribute('aria-selected', 'true')
   })
 
-  it('does not open the liturgies panel when a liturgy row is toggled', () => {
+  it('launches silent synchronization without opening the liturgies panel', () => {
     const listener = vi.fn()
     window.addEventListener(OPEN_ALIGNMENT_PANEL_EVENT, listener)
 
@@ -245,11 +252,22 @@ describe('DailyRoutineWidget Component', () => {
 
     fireEvent.click(screen.getByText('Silent Synchronization'))
 
-    expect(screen.getByText('1/8 done')).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: /Silent synchronization/i })).toBeInTheDocument()
+    expect(screen.getByText('0/8 done')).toBeInTheDocument()
     expect(listener).not.toHaveBeenCalled()
     expect(screen.queryByTestId('alignment-panel')).not.toBeInTheDocument()
 
     window.removeEventListener(OPEN_ALIGNMENT_PANEL_EVENT, listener)
+  })
+
+  it('does not uncomplete silent synchronization when the dialog is reopened', () => {
+    renderWidget()
+    completeSilentSync()
+    expect(screen.getByText('1/8 done')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Silent Synchronization/i }))
+    expect(screen.getByText('1/8 done')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Close dialog' }))
+    expect(screen.getByText('1/8 done')).toBeInTheDocument()
   })
 })
 
@@ -264,7 +282,7 @@ describe('DailyRoutineWidget next liturgy', () => {
     expect(screen.getAllByText('Next')).toHaveLength(1)
     expect(screen.getByRole('button', { name: /Silent Synchronization/i }).textContent).toMatch(/Next$/)
 
-    fireEvent.click(screen.getByText('Silent Synchronization'))
+    completeSilentSync()
     expect(screen.getAllByText('Next')).toHaveLength(1)
     expect(screen.getByRole('button', { name: /Prompt Construction/i }).textContent).toMatch(/Next$/)
   })

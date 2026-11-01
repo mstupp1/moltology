@@ -27,6 +27,7 @@ import {
 } from '@/lib/alignment-snapshot'
 import {
   getDailyAlignmentFn,
+  getUserProfileFn,
   toggleDailyAlignmentTaskFn,
 } from '@/lib/server/api'
 import { useHudPersist } from '@/hooks/useHudPersist'
@@ -35,6 +36,9 @@ import {
   calculateXpFromHistory,
   type ProgressionState,
 } from '@/lib/progression'
+import { SilentSynchronizationDialog } from '@/components/hud/SilentSynchronizationDialog'
+import { generateLobsterAvatarDataUri, parseLobsterAvatarConfig } from '@/lib/lobster-avatar'
+import { resolveMemberPublicName } from '@/lib/member-handle'
 
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
@@ -50,6 +54,8 @@ export interface AlignmentContextValue {
   isLoading: boolean
   isSyncing: boolean
   toggleTask: (taskKey: string) => Promise<void>
+  setTaskCompleted: (taskKey: string, completed: boolean) => Promise<void>
+  openSilentSynchronization: () => void
   refetch: () => Promise<void>
   currentDate: string
   isGuest: boolean
@@ -87,6 +93,35 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
   const [optimisticXpDelta, setOptimisticXpDelta] = useState<number>(0)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isSyncing, setIsSyncing] = useState<boolean>(false)
+  const [silentDialogOpen, setSilentDialogOpen] = useState(false)
+  const [silentDialogDate, setSilentDialogDate] = useState<string | null>(null)
+  const silentDialogUserRef = useRef<string | null>(null)
+  const [silentAvatarUrl, setSilentAvatarUrl] = useState<string | null>(null)
+  const [silentAvatarName, setSilentAvatarName] = useState<string | undefined>()
+
+  const sessionImage = session.user?.image ?? session.user?.avatar ?? session.user?.picture ?? null
+  const loadSilentAvatar = useCallback(async () => {
+    if (!userId) { setSilentAvatarUrl(null); setSilentAvatarName(undefined); return }
+    const activeUserId = userId
+    try {
+      const token = await getAuthJWTToken().catch(() => null)
+      const profile = await getUserProfileFn({ data: { token: token ?? undefined, userId: activeUserId } })
+      if (userIdRef.current !== activeUserId) return
+      const config = parseLobsterAvatarConfig(profile?.avatarConfig)
+      setSilentAvatarUrl(config ? generateLobsterAvatarDataUri(config, 128, { frame: 'portrait', staticMotion: true }) : sessionImage)
+      setSilentAvatarName(resolveMemberPublicName({ userId: activeUserId, handle: profile?.handle, larvaId: profile?.larvaId }))
+    } catch { setSilentAvatarUrl(null); setSilentAvatarName(undefined) }
+  }, [userId, sessionImage])
+
+  /* Profile data is fetched only when the member opens this practice. */
+  const profileAvatarRef = useRef(loadSilentAvatar)
+  profileAvatarRef.current = loadSilentAvatar
+  useEffect(() => {
+    if (!userId) { setSilentAvatarUrl(null); setSilentAvatarName(undefined); return }
+    const onAvatarChanged = () => { void profileAvatarRef.current() }
+    window.addEventListener('profile-avatar-changed', onAvatarChanged)
+    return () => window.removeEventListener('profile-avatar-changed', onAvatarChanged)
+  }, [userId])
 
   // Synchronous references to eliminate stale closures and race conditions on rapid clicks
   const tasksRef = useRef<AlignmentTaskItem[]>(tasks)
@@ -388,8 +423,8 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     return buildStreakHistory(history, currentDate, 14)
   }, [history, currentDate])
 
-  const toggleTask = useCallback(
-    async (taskKeyOrId: string) => {
+  const setTaskCompleted = useCallback(
+    async (taskKeyOrId: string, nextCompleted: boolean) => {
       const targetKey = taskKeyOrId.toLowerCase().trim()
       const currentTasks = tasksRef.current
       const currentTask = currentTasks.find((t) => t.key === targetKey || t.id === targetKey)
@@ -398,7 +433,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
       const canonicalKey = currentTask.key
 
       // Determine next completion state based on current optimistic state
-      const nextCompleted = !currentTask.completed
+      if (currentTask.completed === nextCompleted) return
 
       // Record pending override
       pendingOverridesRef.current.set(canonicalKey, nextCompleted)
@@ -451,6 +486,21 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     [triggerQueueProcessing, persistSnapshot]
   )
 
+  const toggleTask = useCallback(async (taskKey: string) => {
+    const key = taskKey.toLowerCase().trim()
+    const current = tasksRef.current.find((task) => task.key === key || task.id === key)
+    if (current) await setTaskCompleted(taskKey, !current.completed)
+  }, [setTaskCompleted])
+  const openSilentSynchronization = useCallback(() => {
+    silentDialogUserRef.current = userIdRef.current
+    setSilentDialogDate(currentDateRef.current)
+    setSilentDialogOpen(true)
+    void profileAvatarRef.current()
+  }, [])
+  const completeSilentSynchronization = useCallback(() => {
+    if (silentDialogDate === currentDateRef.current && silentDialogUserRef.current === userIdRef.current) void setTaskCompleted('silent-synchronization', true)
+  }, [silentDialogDate, setTaskCompleted])
+
   const refetch = useCallback(async () => {
     await fetchAlignment(currentDateRef.current)
   }, [fetchAlignment])
@@ -478,6 +528,8 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     isLoading,
     isSyncing,
     toggleTask,
+    setTaskCompleted,
+    openSilentSynchronization,
     refetch,
     currentDate,
     isGuest,
@@ -494,6 +546,8 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     isLoading,
     isSyncing,
     toggleTask,
+    setTaskCompleted,
+    openSilentSynchronization,
     refetch,
     currentDate,
     isGuest,
@@ -505,6 +559,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
   return (
     <AlignmentContext.Provider value={value}>
       {children}
+      <SilentSynchronizationDialog open={silentDialogOpen} onClose={() => setSilentDialogOpen(false)} onComplete={completeSilentSynchronization} avatarUrl={silentAvatarUrl} avatarName={silentAvatarName} />
     </AlignmentContext.Provider>
   )
 }
@@ -530,6 +585,15 @@ function useStandaloneDailyAlignment(): AlignmentContextValue {
       return next
     })
   }, [])
+  const setTaskCompleted = useCallback(async (taskKeyOrId: string, completed: boolean) => {
+    const key = taskKeyOrId.toLowerCase().trim()
+    setTasks((prev) => {
+      const next = prev.map((t) => t.key === key || t.id === key ? { ...t, completed } : t)
+      tasksRef.current = next
+      return next
+    })
+  }, [])
+  const openSilentSynchronization = useCallback(() => {}, [])
 
   const refetch = useCallback(async () => {}, [])
 
@@ -549,6 +613,8 @@ function useStandaloneDailyAlignment(): AlignmentContextValue {
     isLoading: false,
     isSyncing: false,
     toggleTask,
+    setTaskCompleted,
+    openSilentSynchronization,
     refetch,
     currentDate,
     isGuest: true,

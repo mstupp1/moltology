@@ -156,6 +156,12 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   }
 
   const handleToggleTask = (taskId: string) => {
+    const task = localTasks.find((item) => item.id === taskId || item.key === taskId)
+    if ((task?.key === 'silent-synchronization' || taskId === 'silent-synchronization') && !onCompleteTask && !localPropTasks) {
+      setIsScheduleOpen(false)
+      alignment.openSilentSynchronization()
+      return
+    }
     if (onCompleteTask) {
       onCompleteTask(taskId)
     } else if (localPropTasks) {
