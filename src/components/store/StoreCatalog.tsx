@@ -5,6 +5,7 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { merchPriceLabel, uniqueVariantLabels, type MerchProductView } from '@/lib/merch'
 import { MERCH_CUTOUTS } from '@/lib/merch-cutouts'
+import { getAssetUrl } from '@/lib/assets'
 import { getMerchCatalogFn } from '@/lib/server/merch-api'
 import { StorePolicies } from './StorePolicies'
 import { MerchImage } from './MerchImage'
@@ -64,31 +65,43 @@ export function StoreCatalog({
 
   return (
     <div className="space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-6 border-b border-line-subtle pb-6">
-        <div className="max-w-2xl">
-          <p className="font-grotesk text-xs font-bold tracking-[0.12em] text-cyan-glow">STORE</p>
-          <h1 className="mt-2 font-grotesk text-4xl font-semibold tracking-tight text-ink sm:text-5xl">Field Issue</h1>
-          <p className="mt-3 text-base leading-relaxed text-ink-body">
-            Mugs and tees carrying the Synaptic Path. Each one is printed when you order it.
-          </p>
+      <header className="relative isolate overflow-hidden rounded-panel border border-line-subtle bg-surface-1 sm:flex sm:min-h-[420px] sm:items-end lg:min-h-[480px]">
+        <img
+          src={getAssetUrl('images/merch/hero/field-issue-everyday-v1.png')}
+          alt=""
+          aria-hidden="true"
+          fetchPriority="high"
+          width={1774}
+          height={887}
+          className="absolute inset-x-0 top-0 -z-20 h-64 w-full object-cover object-[80%_center] sm:h-full sm:object-top"
+        />
+        <div aria-hidden="true" className="absolute inset-0 -z-10 hidden bg-gradient-to-r from-abyss/95 via-abyss/40 to-transparent sm:block" />
+        <div className="relative space-y-6 px-6 pb-6 pt-72 sm:max-w-sm sm:p-8 lg:p-10">
+          <div>
+            <p className="font-grotesk text-xs font-bold tracking-[0.12em] text-cyan-glow">STORE</p>
+            <h1 className="mt-2 font-grotesk text-4xl font-semibold tracking-tight text-ink sm:text-5xl">Field Issue</h1>
+            <p className="mt-3 text-base leading-relaxed text-ink-body">
+              Mugs and tees carrying the Synaptic Path. Each one is printed when you order it.
+            </p>
+          </div>
+          {cart.canOrder ? (
+            <button
+              type="button"
+              onClick={() => cart.setOpen(true)}
+              className={`inline-flex min-h-10 items-center gap-2 rounded-control border border-line bg-surface-1 px-4 text-sm text-ink hover:border-line-strong hover:bg-surface-2 ${FOCUS}`}
+            >
+              <ShoppingBag className="h-4 w-4" aria-hidden="true" />
+              Cart
+              {cart.count > 0 ? (
+                <span className="rounded-chip bg-cyan-glow px-1.5 text-xs font-semibold text-abyss">{cart.count}</span>
+              ) : null}
+            </button>
+          ) : cart.ordering === 'closed' ? (
+            <p className="rounded-control border border-line-subtle bg-surface-1 px-4 py-2 text-sm text-ink-body" data-testid="store-ordering-closed">
+              Ordering opens soon. Have a look around.
+            </p>
+          ) : null}
         </div>
-        {cart.canOrder ? (
-          <button
-            type="button"
-            onClick={() => cart.setOpen(true)}
-            className={`inline-flex min-h-10 items-center gap-2 rounded-control border border-line bg-surface-1 px-4 text-sm text-ink hover:border-line-strong hover:bg-surface-2 ${FOCUS}`}
-          >
-            <ShoppingBag className="h-4 w-4" aria-hidden="true" />
-            Cart
-            {cart.count > 0 ? (
-              <span className="rounded-chip bg-cyan-glow px-1.5 text-xs font-semibold text-abyss">{cart.count}</span>
-            ) : null}
-          </button>
-        ) : cart.ordering === 'closed' ? (
-          <p className="rounded-control border border-line-subtle bg-surface-1 px-4 py-2 text-sm text-ink-body" data-testid="store-ordering-closed">
-            Ordering opens soon. Have a look around.
-          </p>
-        ) : null}
       </header>
 
       <nav className="flex flex-wrap items-baseline justify-between gap-3" aria-label="Categories">

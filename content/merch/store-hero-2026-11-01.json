@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-01",
+  "brief": {
+    "treatment": "Evergreen",
+    "reason": "Durable store hero showing everyday use of existing products"
+  },
+  "provider": "built-in ImageGen",
+  "prompt": "Use case: photorealistic-natural. Asset type: unique Field Issue store website hero background, landscape 2:1. Input image 1 and 2 are exact product references: black Moltology tee and white ceramic mug. Primary request: regular people enjoying these products in everyday life, simple warm candid lifestyle photography. Scene: two adult friends, a Black woman with natural curly hair wearing the reference black tee and an East Asian man in a casual olive overshirt, enjoying coffee and conversation at a wooden table in an ordinary cozy apartment kitchen with a leafy window. Both relaxed and smiling naturally at each other, not at camera. Woman holds the reference white mug with red emblem visible; another same mug sits near the man. Faithfully preserve actual tee print and mug emblem from references, no invented branding. Composition: wide environmental photograph, people and products concentrated in right two-thirds, left third a softly out-of-focus darker kitchen wall with usable negative space for white webpage title. Faces and mugs comfortably inside frame. Medium-wide waist-up view, eye-level 35mm lens. Soft natural window light, realistic skin and cotton, warm wood, subdued deep green. Everyday people, believable lived-in space. One continuous photograph, no collage, no graphic overlays, no headline or watermark, no fantasy, no luxury-model posing. Evergreen image without holiday props.",
+  "references": [
+    "images/merch/moltology-tee-v2-black.jpg",
+    "images/merch/moltology-mug-v2-1.jpg"
+  ],
+  "key": "images/merch/hero/field-issue-everyday-v1.png",
+  "webpKey": "images/merch/hero/field-issue-everyday-v1.webp",
+  "localFile": "tmp/store-hero/field-issue-everyday-v1.png",
+  "uploaded": true,
+  "webpBytes": 96190,
+  "verification": {
+    "typecheck": "passed",
+    "storeTests": "7 passed",
+    "uiTokens": "passed",
+    "assetBudget": "passed",
+    "browser": "Desktop 1440x1000 and mobile 390x844: real uploaded hero decoded; heading visible; no horizontal overflow or browser runtime errors. Browser-only publicEnabled fixture used because development store is gated. Catalog remains gated; no store settings or catalog data changed.",
+    "screenshots": [
+      "tmp/verification/store-hero/desktop.png",
+      "tmp/verification/store-hero/mobile.png"
+    ]
+  }
+}
