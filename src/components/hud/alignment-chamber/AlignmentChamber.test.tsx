@@ -49,6 +49,18 @@ describe('Image-based alignment chamber', () => {
     expect(container.querySelector('[data-socket="silent-synchronization"] .alignment-chamber-flame')).toBeNull()
   })
 
+  it('keeps every socket on its own animation phase when tasks are toggled', () => {
+    const allTasks = mergeCompletions().map((task) => ({ ...task, completed: true }))
+    const { container, rerender } = render(<AlignmentChamber tasks={allTasks} />)
+    const delays = () => Array.from(container.querySelectorAll<HTMLElement>('.alignment-chamber-flame'),
+      (flame) => flame.style.getPropertyValue('--flame-delay'))
+    const initialDelays = delays()
+    expect(new Set(initialDelays).size).toBe(TOTAL_ALIGNMENT_TASKS)
+    expect(initialDelays.every((delay) => Number.parseFloat(delay) <= 0 && Number.parseFloat(delay) > -3.6)).toBe(true)
+    rerender(<AlignmentChamber tasks={allTasks.map((task, index) => ({ ...task, completed: index !== 0 }))} />)
+    expect(delays()).toEqual(initialDelays.slice(1))
+  })
+
   it('retains static flame images when the existing heavy effects preference is disabled', () => {
     setHeavyVfxDisabled(true)
     const { container } = render(<AlignmentChamber tasks={mergeCompletions(['skill-development'])} />)

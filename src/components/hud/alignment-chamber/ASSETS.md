@@ -1,8 +1,12 @@
 # Daily alignment artwork
 
-The chamber uses a static illustration and a transparent 4-column × 2-row flame sprite sheet.
+The chamber uses a static illustration and the first cell of a transparent 4-column × 2-row flame sprite sheet.
 There is no Three.js import, canvas, or WebGL context. Each completed task displays one
-registered flame loop; the existing heavy VFX setting and reduced motion select frame one.
+registered flame with a 3.6-second eased sway (±0.6° skew and 2.5% height change),
+anchored at its base. The sprite cell and brightness stay fixed to avoid flicker.
+Each socket has a different negative delay, spread across the loop in a nonsequential
+order so the flames neither move in sync nor form a left-to-right wave.
+The existing heavy VFX setting and reduced motion disable the transform animation.
 Loops also stop offscreen and in hidden tabs.
 
 Artwork is evergreen product UI, generated with the built-in ImageGen tool on October 31,

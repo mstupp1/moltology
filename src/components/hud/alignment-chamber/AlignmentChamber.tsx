@@ -7,8 +7,10 @@ import './chamber.css'
 
 const CHAMBER_IMAGE = getAssetUrl('images/hud/alignment/chamber-v1.png')
 const FLAME_SHEET = getAssetUrl('images/hud/alignment/water-flame-sheet-v1.png')
+// Spread the eight phases across the loop without a left-to-right wave.
+const FLAME_DELAYS = [0, -2.25, -0.9, -3.15, -1.8, -0.45, -2.7, -1.35]
 
-/** Detailed chamber artwork with transparent, eight-frame flame loops. No canvas or GPU scene. */
+/** Detailed chamber artwork with a steady flame shape and subtle CSS motion. */
 export function AlignmentChamber({ tasks }: { tasks: AlignmentTaskItem[] }) {
   const { heavyVfxDisabled } = useHeavyVfx()
   const hostRef = useRef<HTMLDivElement>(null)
@@ -45,7 +47,7 @@ export function AlignmentChamber({ tasks }: { tasks: AlignmentTaskItem[] }) {
             return (
               <span key={task?.key ?? index} data-socket={task?.key ?? index} data-completed={task?.completed ?? false}
                 className="alignment-chamber-socket" style={{ left: `${socket.x}%`, top: `${socket.y}%` }} aria-hidden="true">
-                {task?.completed && <span className="alignment-chamber-flame" style={{ backgroundImage: `url("${FLAME_SHEET}")`, '--flame-delay': `${index * -0.137}s` } as CSSProperties} />}
+                {task?.completed && <span className="alignment-chamber-flame" style={{ backgroundImage: `url("${FLAME_SHEET}")`, '--flame-delay': `${FLAME_DELAYS[index]}s` } as CSSProperties} />}
               </span>
             )
           })}
