@@ -1,8 +1,8 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 import { AlignmentChamber } from './AlignmentChamber'
-import { CHAMBER_SOCKETS } from './layout'
-import { mergeCompletions, TOTAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
+import { CHAMBER_SOCKETS, FLAME_LOOP_SECONDS } from './layout'
+import { CANONICAL_ALIGNMENT_TASKS, mergeCompletions, TOTAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
 import { setHeavyVfxDisabled } from '@/lib/vfx-settings'
 
 let reduced = false
@@ -58,6 +58,27 @@ describe('Image-based alignment chamber', () => {
     expect(container.firstChild).toHaveAttribute('data-motion', 'animated')
     act(() => setHeavyVfxDisabled(true))
     expect(container.firstChild).toHaveAttribute('data-motion', 'static')
+  })
+
+  it('assigns every socket a distinct nonsequential phase that survives completion and undo', () => {
+    const keys = CANONICAL_ALIGNMENT_TASKS.map(({ key }) => key)
+    const { container, rerender } = render(<AlignmentChamber tasks={mergeCompletions(keys)} />)
+    const delays = () => Array.from(container.querySelectorAll<HTMLElement>('.alignment-chamber-flame'))
+      .map((flame) => parseFloat(flame.style.getPropertyValue('--flame-delay')))
+    const original = delays()
+    expect(new Set(original).size).toBe(TOTAL_ALIGNMENT_TASKS)
+    original.forEach((delay) => {
+      expect(delay).toBeLessThan(0)
+      expect(delay).toBeGreaterThan(-FLAME_LOOP_SECONDS)
+    })
+    expect(original).not.toEqual([...original].sort((a, b) => a - b))
+    expect(original).not.toEqual([...original].sort((a, b) => b - a))
+    expect(container.querySelector<HTMLElement>('.alignment-chamber-flame')?.style.backgroundImage)
+      .toContain('/media/images/hud/alignment/synaptic-flame-loop-v2.webp')
+    rerender(<AlignmentChamber tasks={mergeCompletions(keys.slice(1))} />)
+    expect(delays()).toEqual(original.slice(1))
+    rerender(<AlignmentChamber tasks={mergeCompletions(keys)} />)
+    expect(delays()).toEqual(original)
   })
 
   it('honors reduced motion on initial load and live changes', () => {

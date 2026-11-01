@@ -1,23 +1,67 @@
 # Daily alignment artwork
 
-The chamber uses a static illustration and a transparent 4-column × 2-row flame sprite sheet.
+The chamber uses a static illustration and a transparent 8-column × 4-row flame sprite sheet.
 There is no Three.js import, canvas, or WebGL context. Each completed task displays one
 registered flame loop; the existing heavy VFX setting and reduced motion select frame one.
 Loops also stop offscreen and in hidden tabs.
 
-Artwork is evergreen product UI, generated with the built-in ImageGen tool on October 31,
-2026. It is not seasonal campaign content. Source PNGs and optimized WebP twins live in
+Artwork is evergreen product UI. The chamber was generated with the built-in ImageGen
+tool on October 31, 2026; the flames were remade on November 1. Source PNGs and optimized WebP twins live in
 `moltology-public-assets`; pages resolve their original keys through `getAssetUrl`:
 
 - `images/hud/alignment/chamber-v1.png` (2172 × 724; WebP 140,212 bytes)
-- `images/hud/alignment/water-flame-sheet-v1.png` (1774 × 887 RGBA; WebP 409,134 bytes)
+- `images/hud/alignment/synaptic-flame-loop-v2.png` (1536 × 768 RGBA; PNG 561,911 bytes; WebP 113,740 bytes)
+- `images/hud/alignment/synaptic-flame-a-v2.png` (ImageGen source keyframe)
+- `images/hud/alignment/synaptic-flame-b-v2.png` (ImageGen interior-current edit)
 
 Local source copies are preserved in ignored `tmp/alignment-assets/`. Do not put heavy
 artwork in `public/`. Upload revised artwork with a new versioned key, inspect the eight
-socket positions, and update `layout.ts` to match it. The sheet contains eight equal cells,
-read left to right then top to bottom; the flame base is at 92% of each cell height.
+socket positions, and update `layout.ts` if the chamber changes. The sheet contains 32 equal
+192px cells, read left to right then top to bottom; the fixed flame base is at 176/192
+(91.67%) of each cell height. Socket anchors stay unchanged.
 
-## Generation prompts
+## Synaptic flame remake (November 1, 2026)
+
+Evergreen product artwork, created with the built-in ImageGen tool. References inspected:
+`SynapticEntityCanvas.tsx` (organic nucleus, cyan/aqua veins, chitin lattice, orbital data
+rings), `PremiumView.tsx`, and `images/oracle/oracle-max-synaptic-core-v1.png` (luminous
+nucleus inside dark titanium orbital rings). The new contained teardrop carries a small
+nucleus and fine synaptic filaments rather than splashing water and detached droplets.
+
+Two newly generated raster keyframes supply a four-second loop of 32 baked in-between
+frames. There is no CSS sway, scaling, opacity pulse or movement of the whole sprite.
+The packer retains keyframe A's alpha in every frame, uses the same crop for both inputs,
+feathers changes away from the outline, normalizes B's light energy and caps interior
+channel changes at 32/255. Periodic cosine interpolation returns smoothly to A. The
+runtime WebP also retains identical alpha in all cells; measured total luminance varies
+by 0.88% across the loop. Its wrap delta is smaller than its largest internal transition.
+
+Rebuild from the original PNG source keys (not their lossy WebP twins):
+
+```sh
+node --import tsx scripts/build-alignment-flame-sheet.ts \
+  tmp/alignment-assets/synaptic-flame-a-v2.png \
+  tmp/alignment-assets/synaptic-flame-b-v2.png \
+  tmp/alignment-assets/synaptic-flame-sheet-v2.png
+npm run s3:upload -- tmp/alignment-assets/synaptic-flame-sheet-v2.png \
+  --key images/hud/alignment/synaptic-flame-loop-v2.png
+```
+
+The final versioned sheet and both source PNGs are archived in S3, with local copies in
+ignored `tmp/alignment-assets/`. Future revisions must use a new key. Each socket uses a
+fixed shuffled phase `[1, 20, 8, 28, 13, 4, 24, 17]`, independent of completion count.
+Reduced motion and disabled heavy VFX show frame one; offscreen and hidden-tab gating
+continues to stop playback. Completion and undo still add/remove the corresponding flame.
+
+ImageGen prompt A (official Core image supplied as a style reference; transparency enabled):
+
+> Use case: stylized-concept. Production isolated raster sprite for Moltology daily alignment. Create ONE small calm synaptic flame, upright and tightly contained, a simple tapered teardrop of bioluminescent energy rising from a compact glowing base. Echo the reference's luminous cyan/aqua nucleus, a few fine branching synaptic veins inside a dark translucent chitin-like outer envelope, with two very subtle thin curved orbital filaments contained within its silhouette. Sculptural realistic dimensional material, spare detail readable at 40px. Mostly muted teal/cyan with tiny soft white center, no huge bloom or overexposed white mass. Flame height about 65% canvas, width 36%, centered x=50%, base at y=82%. Generous truly transparent margins. Calm vertical tip, fixed compact base; no splash, droplets, sparks, detached particles, rings outside flame, pedestal, bowl, machinery, orange, text, logo or background. Single flame only, not a sprite sheet. Evergreen product UI artwork.
+
+ImageGen prompt B (A supplied as edit target; transparency enabled):
+
+> Use case: precise-object-edit. Edit the single transparent flame sprite into its next very near animation keyframe. Keep the EXACT same canvas size, flame outline, tip, base position, scale, camera, dark translucent envelope and brightness. Keep the central nucleus and all outer edges fixed. Change ONLY the fine interior synaptic veins: shift their curved paths very slightly, as a quiet current flowing upward inside a contained flame. Preserve total cyan/aqua light energy, do not brighten or dim. No new particles, splashes, tongues, rings or other objects. Single isolated flame on genuine transparency. This will be blended with the previous keyframe to create a very restrained seamless raster animation.
+
+## Original chamber and retired v1 flame prompts
 
 Chamber (reference: the approved image mockup with eight sockets):
 

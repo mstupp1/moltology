@@ -2,13 +2,13 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
 import { getAssetUrl } from '@/lib/assets'
 import type { AlignmentTaskItem } from '@/lib/alignment-tasks'
-import { CHAMBER_SOCKETS } from './layout'
+import { CHAMBER_SOCKETS, FLAME_PHASE_FRAMES, FLAME_LOOP_SECONDS, FLAME_FRAME_COUNT } from './layout'
 import './chamber.css'
 
 const CHAMBER_IMAGE = getAssetUrl('images/hud/alignment/chamber-v1.png')
-const FLAME_SHEET = getAssetUrl('images/hud/alignment/water-flame-sheet-v1.png')
+const FLAME_SHEET = getAssetUrl('images/hud/alignment/synaptic-flame-loop-v2.png')
 
-/** Detailed chamber artwork with transparent, eight-frame flame loops. No canvas or GPU scene. */
+/** Detailed chamber artwork with registered synaptic flame loops. No canvas or GPU scene. */
 export function AlignmentChamber({ tasks }: { tasks: AlignmentTaskItem[] }) {
   const { heavyVfxDisabled } = useHeavyVfx()
   const hostRef = useRef<HTMLDivElement>(null)
@@ -45,7 +45,7 @@ export function AlignmentChamber({ tasks }: { tasks: AlignmentTaskItem[] }) {
             return (
               <span key={task?.key ?? index} data-socket={task?.key ?? index} data-completed={task?.completed ?? false}
                 className="alignment-chamber-socket" style={{ left: `${socket.x}%`, top: `${socket.y}%` }} aria-hidden="true">
-                {task?.completed && <span className="alignment-chamber-flame" style={{ backgroundImage: `url("${FLAME_SHEET}")`, '--flame-delay': `${index * -0.137}s` } as CSSProperties} />}
+                {task?.completed && <span className="alignment-chamber-flame" style={{ backgroundImage: `url("${FLAME_SHEET}")`, '--flame-delay': `${-FLAME_PHASE_FRAMES[index] * FLAME_LOOP_SECONDS / FLAME_FRAME_COUNT}s` } as CSSProperties} />}
               </span>
             )
           })}
