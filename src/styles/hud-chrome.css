@@ -6,8 +6,13 @@
 
 @media (width < 640px) {
   .hud-mobile-oracle-clearance {
-    /* Reserve viewport space so nested scroll panels also end above the dock. */
-    margin-bottom: calc(var(--oracle-mobile-launcher-height) + var(--oracle-mobile-bottom-offset) + 0.5rem);
+    /* Scroll content behind the floating launcher, with room to reach its end. */
+    padding-bottom: calc(var(--oracle-mobile-launcher-height) + var(--oracle-mobile-bottom-offset) + 0.5rem);
+  }
+
+  .hud-mobile-oracle-clearance > div {
+    /* Let long pages grow so their final content clears the launcher on scroll. */
+    min-height: auto;
   }
 }
 
