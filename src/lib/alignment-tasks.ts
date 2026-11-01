@@ -27,7 +27,7 @@ export interface DailyStreakDay {
   isToday?: boolean
 }
 
-/** Dashboard Daily Alignment panel target for leftover `/alignment` redirects. */
+/** Anchor for the Daily alignment schedule. */
 export const DAILY_ALIGNMENT_HUB_ID = 'daily-routine-hub'
 
 export const CANONICAL_ALIGNMENT_TASKS: CanonicalAlignmentTask[] = [

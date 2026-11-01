@@ -71,7 +71,7 @@ describe('activity event log helpers', () => {
         valueBadge: 'Early morning',
         sourceKey: 'routine:silent-synchronization:2026-08-27',
         visibility: 'friends',
-        href: '/dashboard#daily-routine-hub',
+        href: '/alignment',
       })
     )
     expect(mock.onConflictDoNothing).toHaveBeenCalled()

@@ -114,7 +114,7 @@ export function HudWorkspaceGhost() {
 
 
 /**
- * Dashboard first paint: the Today strip, the alignment card, then the three people panels.
+ * Dashboard first paint: the Today strip, then the three people panels.
  */
 export function DashboardGhost() {
   return (
@@ -137,7 +137,6 @@ export function DashboardGhost() {
           ))}
         </div>
       </div>
-      <DailyRoutineGhost />
       <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-5">
         {Array.from({ length: 3 }).map((_, i) => (
           <HudGhostCard key={i} variant="neutral" lines={3} className={GHOST_CARD} />

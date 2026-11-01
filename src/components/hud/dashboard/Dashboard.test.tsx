@@ -3,7 +3,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { authClient } from '@/lib/auth-client'
 import { getAIThreadsFn, getBlogPostsFn } from '@/lib/server/api'
-import { OPEN_ALIGNMENT_PANEL_EVENT } from '@/lib/alignment-panel'
 import { DashboardTodayStrip } from './DashboardTodayStrip'
 import { DASHBOARD_PROMOS, DashboardPromoBanner } from './DashboardPromoBanner'
 import { DashboardNewsPanel } from './DashboardNewsPanel'
@@ -64,13 +63,11 @@ describe('DashboardTodayStrip', () => {
     expect(screen.getByTestId('auth-modal')).toBeInTheDocument()
   })
 
-  it('greets a member by first name and opens the alignment panel as the next step', async () => {
+  it('greets a member by first name and navigates to the alignment page as the next step', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'u1', name: 'Myles Example' } },
       isPending: false,
     } as any)
-    const onOpen = vi.fn()
-    window.addEventListener(OPEN_ALIGNMENT_PANEL_EVENT, onOpen)
 
     render(<DashboardTodayStrip />)
     expect(screen.getByRole('heading', { name: 'Welcome back, Myles' })).toBeInTheDocument()
@@ -79,8 +76,7 @@ describe('DashboardTodayStrip', () => {
     expect(screen.getByText('0/8')).toBeInTheDocument()
 
     fireEvent.click(screen.getByTestId('dashboard-next-step'))
-    expect(onOpen).toHaveBeenCalledTimes(1)
-    window.removeEventListener(OPEN_ALIGNMENT_PANEL_EVENT, onOpen)
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/alignment' })
     await waitFor(() => expect(getAIThreadsFn).toHaveBeenCalled())
   })
 })

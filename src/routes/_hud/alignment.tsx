@@ -1,12 +1,24 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
-import { DAILY_ALIGNMENT_HUB_ID } from '@/lib/alignment-tasks'
+import { createFileRoute } from '@tanstack/react-router'
+import { DailyRoutineWidget } from '@/components/hud/DailyRoutineWidget'
+import { DailyRoutineGhost } from '@/components/hud/HudGhostSkeletons'
+import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
+
+function AlignmentPage() {
+  return (
+    <div className="shrink-0">
+      <DailyRoutineWidget />
+    </div>
+  )
+}
 
 export const Route = createFileRoute('/_hud/alignment')({
-  beforeLoad: () => {
-    throw redirect({
-      to: '/dashboard',
-      hash: DAILY_ALIGNMENT_HUB_ID,
-      replace: true,
-    })
-  },
+  headers: () => xRobotsNoindexHeaders(),
+  head: () => ({
+    meta: privatePageSeo({
+      title: 'Daily alignment | Moltology',
+      description: 'Your daily alignment: today’s liturgies, progress and recent history.',
+    }),
+  }),
+  component: AlignmentPage,
+  pendingComponent: DailyRoutineGhost,
 })
