@@ -100,7 +100,8 @@ For existing products, read [product photography](references/product-photography
 Use `npm run merch -- gallery --pilot` (or `--only <slug>`) for a separate resumable
 library of official Printful shots, including alternate views. Use inspected official
 photos as product references for the built-in ImageGen tool when stylish models or
-lifestyle scenes are requested. Keep the official primary image and distinguish AI
+lifestyle scenes are requested. Standardize core product galleries at six images: the official primary, two official
+alternate/detail views, and three square AI lifestyle scenes. Keep the official primary image and distinguish AI
 lifestyle images from provider mockups in the image ledger. Image creation or upload
 does not authorize changing live production listings.
 

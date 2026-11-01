@@ -42,6 +42,8 @@ describe('DashboardStorePanel', () => {
     await screen.findByTestId('dashboard-store')
     expect(screen.getByAltText('White Moltology mug with red emblem')).toHaveAttribute('src', '/media/images/merch/dashboard/2026-10-21/moltology-mug-v2.webp')
     expect(screen.getByAltText('Black Moltology tee, front')).toHaveAttribute('src', '/media/images/merch/dashboard/2026-10-21/moltology-tee-v2.webp')
+    expect(screen.getByAltText('White Moltology mug with red emblem').parentElement).toHaveClass('bg-benthic-border')
+    expect(screen.getByAltText('Black Moltology tee, front').parentElement).toHaveClass('bg-benthic-border')
     expect(catalog.find(product => product.slug === 'moltology-mug')?.featuredImageUrl).toBe('images/merch/moltology-mug-v2-1.jpg')
   })
 

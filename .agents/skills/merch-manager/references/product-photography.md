@@ -47,9 +47,12 @@ request transparency from it. Reject dirty extractions instead of uploading them
 Save PNGs under ignored `tmp/merch/dashboard/` and upload an explicit selected list through
 `npm run s3:upload -- <file.png> --key images/merch/dashboard/<date>/<slug>.png`.
 The uploader creates WebP twins; preserve alpha in both. Reference original PNG keys in
-`src/components/hud/dashboard/store-images.ts`, with descriptive alt text and a background
-class using existing brand tokens. Prefer `bg-surface-3` for light products and
-`bg-benthic-border` for black garments so their outlines remain visible. Use contain sizing
+`src/lib/merch-cutouts.ts`, with descriptive alt text and a background
+class using existing brand tokens. Use the registered `background` class in both
+the store grid and dashboard. The
+core catalog uses `bg-benthic-border` (`#3a4a49`), an existing brand token with enough
+separation for black garments, the hat and the dark desk mat as well as white ceramic.
+Do not hardcode a second background in either consumer. Use contain sizing
 and padding. Do not substitute cutouts into product-page galleries, variants or cart photos.
 Products without a registered cutout keep their normal primary image as a fallback.
 
@@ -110,6 +113,14 @@ Reference original keys through `getAssetUrl`/`getAbsoluteAssetUrl`, never expos
 bucket URLs on pages. The normal `merch upload --kind mockups` handles only the
 catalog allowlist, not this separate library.
 
+Core catalog standard: **six unique images per product**, comprising the existing
+official primary, two useful official alternate/detail views and three square AI
+lifestyle images. Apply it to the mug, tee, hat and desk mat. Keep size/face coverage
+when curating mugs; remove redundant official views rather than adding near-duplicates.
+`MERCH_PRODUCT_GALLERIES` holds each complete ordered selection, including its primary.
+The store catalog reader uses these selections for existing database rows; seed data
+uses the same registry. No production seed is needed to release a reviewed gallery PR.
+
 Default gallery order: official primary, useful official alternate views, then
 lifestyle images. Choose one clear front tee view, a back and a useful side view;
 omit hanger photos and redundant front views from the storefront. Curate mug
@@ -127,16 +138,19 @@ Update catalog/gallery data only within the user's authorized scope; production
 listing changes remain separate from image production. Preserve existing product,
 variant, design, payment and fulfillment identities.
 
-Published supplementary selections live in `src/lib/merch-gallery.ts` and are merged
-into the canonical seed catalog. Keep this registry aligned with production gallery
-data. Normal `mockups`, placeholder rendering and catalog uploads exclude these
+Reviewed complete gallery selections live in `src/lib/merch-gallery.ts` and are used
+by both the store catalog reader and canonical seed catalog. The reviewed registry
+takes precedence over saved gallery fields for these existing products; products
+without a selection retain their database galleries. Normal `mockups`, placeholder
+rendering and catalog uploads exclude these
 curated assets so regenerating primary photos cannot overwrite lifestyle shots.
 The product detail view captions every image using `MERCH_IMAGE_DESCRIPTIONS`,
 including the original catalog keys. Verify caption/alt coverage across gallery
 and variant images whenever selections change.
-After an authorized release, update only the selected products' gallery fields,
-save the prior values, and read back the new galleries; do not run a broad seed
-that would overwrite unrelated authored catalog fields.
+A gallery PR releases its reviewed selection on deployment without a database write.
+If a separate production catalog update is explicitly authorized, change only the
+selected gallery fields, save the prior values and read them back. Never run a broad
+seed that would overwrite unrelated authored catalog fields.
 
 Commit scripts, skill updates and the completed ledger, verify final Git status,
 and report saved previews, asset keys and whether listings were actually changed.
