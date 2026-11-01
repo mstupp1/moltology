@@ -9,3 +9,8 @@ export const CHAMBER_SOCKETS = [
   { x: 67.7, y: 66.5 },
   { x: 73.1, y: 62.5 },
 ] as const
+
+/** Fixed, shuffled phases in the 32-frame / four-second loop, indexed by socket. */
+export const FLAME_PHASE_FRAMES = [1, 20, 8, 28, 13, 4, 24, 17] as const
+export const FLAME_LOOP_SECONDS = 4
+export const FLAME_FRAME_COUNT = 32
