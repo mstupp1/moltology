@@ -12,7 +12,7 @@ interface StageStrataProps {
   onSelectStage: (stageNum: number) => void
 }
 
-/** One row of stages with an expanded selection and shared details below. */
+/** Full-bleed stage portraits with a shared detail section below. */
 export function StageStrata({ currentIndex, selectedStage, onSelectStage }: StageStrataProps) {
   const currentStage = PIPELINE_CLEARANCES[currentIndex].stageNum
   const rowRef = useRef<HTMLElement>(null)
@@ -47,44 +47,48 @@ export function StageStrata({ currentIndex, selectedStage, onSelectStage }: Stag
             aria-controls="pipeline-stage-details"
             aria-current={current ? 'step' : undefined}
             className={cn(
-              'flex min-w-44 basis-0 shrink-0 items-center gap-3 rounded-card border p-2.5 text-left transition-colors sm:p-3',
+              'group relative isolate flex h-64 min-w-60 basis-0 shrink-0 grow flex-col justify-end overflow-hidden rounded-card border bg-surface-1 text-left transition-colors sm:h-72 lg:min-w-0',
               'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
-              selected ? 'min-w-72 grow-[1.8]' : 'grow',
               selected
-                ? 'border-transparent bg-surface-3 shadow-nav-current'
-                : 'border-line-subtle bg-surface-1 hover:border-line hover:bg-surface-2'
+                ? 'border-cyan-glow'
+                : 'border-line-subtle hover:border-line'
             )}
           >
             <img
               src={getAssetUrl(STAGE_ART[stage.stageNum])}
               alt=""
-              width={56}
-              height={56}
+              width={1536}
+              height={1024}
               loading="lazy"
               decoding="async"
-              className={cn('shrink-0 rounded-control object-cover object-right', selected ? 'h-16 w-16' : 'h-9 w-9')}
+              className="absolute inset-0 -z-20 h-full w-full object-cover object-right motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-105 motion-safe:group-focus-visible:scale-105"
             />
-            <span className="min-w-0">
-              <span className={cn('block text-[11px] font-bold uppercase tracking-[0.08em]', accent.text)}>
-                Stage {stage.stageNum}
-                {current ? <span className="text-ink-muted"> · Yours</span> : null}
-              </span>
-              <span className="block font-grotesk text-xs font-bold uppercase tracking-[0.04em] text-ink sm:text-sm">
+            <span aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-abyss via-abyss/60 to-transparent" />
+            <span className="absolute inset-x-0 top-0 h-20 -z-10 bg-gradient-to-b from-abyss/70 to-transparent" aria-hidden="true" />
+            <span className={cn('absolute left-4 right-4 top-4 text-[11px] font-bold uppercase tracking-[0.08em]', accent.text)}>
+              Stage {stage.stageNum}
+              {current ? <span className="text-ink-muted"> · Yours</span> : null}
+            </span>
+            <span className="block w-full p-4">
+              <span className="block max-w-48 font-grotesk text-lg font-bold uppercase leading-tight tracking-[0.04em] text-ink">
                 {stageName(stage.stageTitle)}
               </span>
-              <span className="mt-0.5 block text-[11px] text-ink-muted">{xpRangeLabel(stage.stageNum)}</span>
-              <span aria-hidden="true" className="mt-1 flex gap-0.5">
-                {clearances.map((c) => (
-                  <span
-                    key={c.code}
-                    className={cn(
-                      'h-1.5 w-3 rounded-chip',
-                      c.index < currentIndex ? 'bg-emerald-400' : c.index === currentIndex ? 'bg-cyan-glow' : 'bg-surface-3'
-                    )}
-                  />
-                ))}
+              <span className="mt-3 flex items-center justify-between gap-2">
+                <span className="text-[11px] text-ink-body">{xpRangeLabel(stage.stageNum)}</span>
+                <span aria-hidden="true" className="flex gap-1">
+                  {clearances.map((c) => (
+                    <span
+                      key={c.code}
+                      className={cn(
+                        'h-1.5 w-3 rounded-chip',
+                        c.index < currentIndex ? 'bg-emerald-400' : c.index === currentIndex ? 'bg-cyan-glow' : 'bg-ink/25'
+                      )}
+                    />
+                  ))}
+                </span>
               </span>
             </span>
+            {selected ? <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-0.5 bg-cyan-glow" /> : null}
           </button>
         )
       })}
