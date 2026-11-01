@@ -11,7 +11,6 @@ import {
 import { AlignmentProvider } from '@/hooks/useDailyAlignment'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 import { CANONICAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
-import { HUDTaskBar } from './HUDTaskBar'
 import { OPEN_ALIGNMENT_PANEL_EVENT } from '@/lib/alignment-panel'
 
 // Mock authClient to return guest or user
@@ -226,22 +225,11 @@ describe('DailyRoutineWidget Component', () => {
     expect(Array.from(blankCells).every((cell) => cell.getAttribute('aria-label')?.includes('outside 90-day history'))).toBe(true)
   })
 
-  it('opens the header liturgies panel when the Daily Alignment card is activated', () => {
-    render(
-      <ToastProvider>
-        <AlignmentProvider>
-          <HUDTaskBar variant="header" />
-          <DailyRoutineWidget />
-        </AlignmentProvider>
-      </ToastProvider>
-    )
-
-    expect(screen.queryByTestId('alignment-panel')).not.toBeInTheDocument()
-
-    fireEvent.click(screen.getByTestId('daily-alignment-card-open'))
-
-    expect(screen.getByTestId('alignment-panel')).toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: /Tasks/ })).toHaveAttribute('aria-selected', 'true')
+  it('renders the schedule without an Open action', () => {
+    renderWidget()
+    expect(screen.getByText('Today’s schedule')).toBeInTheDocument()
+    expect(screen.queryByTestId('daily-alignment-card-open')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Open daily alignment/i })).not.toBeInTheDocument()
   })
 
   it('launches silent synchronization without opening the liturgies panel', () => {

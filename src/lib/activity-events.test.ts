@@ -144,7 +144,7 @@ describe('activity event copy and mapping', () => {
     expect(forumTopicHref('general-discussion', 'hold-the-quiet', 'post-1')).toBe(
       '/forum/general-discussion/hold-the-quiet#post-post-1'
     )
-    expect(alignmentActivityHref()).toBe('/dashboard#daily-routine-hub')
+    expect(alignmentActivityHref()).toBe('/alignment')
 
     const first = buildOracleMilestoneCopy(1)
     expect(first.title).toBe('First consultation')
@@ -161,10 +161,8 @@ describe('activity event copy and mapping', () => {
 
   it('parses stream hrefs for dashboard, forum, oracle, and member dossiers', () => {
     expect(parseActivityEventHref('/dashboard')).toEqual({ kind: 'dashboard' })
-    expect(parseActivityEventHref('/dashboard#daily-routine-hub')).toEqual({
-      kind: 'dashboard',
-      hash: 'daily-routine-hub',
-    })
+    expect(parseActivityEventHref('/alignment')).toEqual({ kind: 'alignment' })
+    expect(parseActivityEventHref('/dashboard#daily-routine-hub')).toEqual({ kind: 'alignment' })
     expect(parseActivityEventHref('/oracle')).toEqual({ kind: 'oracle' })
     expect(parseActivityEventHref('/forum/general-discussion/hold-the-quiet')).toEqual({
       kind: 'forum-topic',

@@ -299,7 +299,7 @@ export function forumTopicHref(categorySlug: string, topicSlug: string, postId?:
 }
 
 export function alignmentActivityHref(): string {
-  return `/dashboard#${DAILY_ALIGNMENT_HUB_ID}`
+  return '/alignment'
 }
 
 export function memberActivityHref(input: { id: string; handle?: string | null }): string {
@@ -308,6 +308,7 @@ export function memberActivityHref(input: { id: string; handle?: string | null }
 
 export type ParsedActivityHref =
   | { kind: 'dashboard'; hash?: string }
+  | { kind: 'alignment' }
   | { kind: 'pipeline' }
   | { kind: 'connections' }
   | { kind: 'oracle' }
@@ -325,6 +326,7 @@ export function parseActivityEventHref(href?: string | null): ParsedActivityHref
   const end = [hashIndex, queryIndex].filter((index) => index >= 0).sort((a, b) => a - b)[0]
   const path = (end === undefined ? raw : raw.slice(0, end)).replace(/\/+$/, '') || '/'
   const hash = hashIndex >= 0 ? raw.slice(hashIndex + 1).split('?')[0] || undefined : undefined
+  if (path === '/alignment' || (path === '/dashboard' && hash === DAILY_ALIGNMENT_HUB_ID)) return { kind: 'alignment' }
   if (path === '/dashboard') return hash ? { kind: 'dashboard', hash } : { kind: 'dashboard' }
   if (path === '/pipeline') return { kind: 'pipeline' }
   if (path === '/connections') return { kind: 'connections' }

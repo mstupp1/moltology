@@ -4,7 +4,6 @@ import { DashboardPanel } from '@/components/hud/dashboard/DashboardPanel'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { DailyRoutineGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
-import { openAlignmentPanel } from '@/lib/alignment-panel'
 import { ALIGNMENT_HISTORY_DAYS, DAILY_ALIGNMENT_HUB_ID, localDateString, parseLocalDate, TOTAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
 import type { DailyStreakDay } from '@/lib/alignment-tasks'
 import { cn } from '@/lib/utils'
@@ -450,12 +449,6 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
             {completedCount}/{totalCount} done
           </span>
         }
-        action={{
-          label: 'Open',
-          onClick: openAlignmentPanel,
-          ariaLabel: 'Open daily alignment liturgies',
-          testId: 'daily-alignment-card-open',
-        }}
       >
         <AlignmentChamber tasks={tasks} />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 min-w-0">

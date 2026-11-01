@@ -77,7 +77,7 @@ describe('ActivityFeedItem', () => {
           categoryLabel: 'Liturgy',
           title: 'Silent Synchronization sealed',
           detail: 'The 05:30 liturgy is complete.',
-          href: '/dashboard#daily-routine-hub',
+          href: '/alignment',
           metadata: { time: '05:30' },
         })}
       />
@@ -85,7 +85,7 @@ describe('ActivityFeedItem', () => {
 
     expect(screen.getByRole('heading', { name: 'Silent Synchronization sealed' }).closest('a')).toHaveAttribute(
       'href',
-      '/dashboard#daily-routine-hub'
+      '/alignment'
     )
   })
 

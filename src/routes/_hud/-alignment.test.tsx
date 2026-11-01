@@ -1,29 +1,22 @@
+import React from 'react'
+import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 
 vi.mock('@tanstack/react-router', () => ({
-  createFileRoute: () => (config: any) => ({
-    ...config,
-    options: config,
-  }),
-  redirect: vi.fn((args) => args),
+  createFileRoute: () => (config: any) => ({ options: config }),
 }))
+vi.mock('@/components/hud/DailyRoutineWidget', () => ({ DailyRoutineWidget: () => <div data-testid="daily-alignment-page" /> }))
+vi.mock('@/components/hud/HudGhostSkeletons', () => ({ DailyRoutineGhost: () => null }))
 
 import { Route } from './alignment'
-import { redirect } from '@tanstack/react-router'
-import { DAILY_ALIGNMENT_HUB_ID } from '@/lib/alignment-tasks'
+import { DailyRoutineGhost } from '@/components/hud/HudGhostSkeletons'
 
-describe('/alignment Route redirect', () => {
-  it('redirects to the dashboard Daily Alignment surface with replace=true', () => {
-    const beforeLoad = Route.options.beforeLoad as any
-
-    expect(() => {
-      beforeLoad()
-    }).toThrow()
-
-    expect(redirect).toHaveBeenCalledWith({
-      to: '/dashboard',
-      hash: DAILY_ALIGNMENT_HUB_ID,
-      replace: true,
-    })
+describe('/alignment route', () => {
+  it('renders daily alignment as a dedicated page instead of redirecting', () => {
+    const Component = Route.options.component!
+    render(<Component />)
+    expect(screen.getByTestId('daily-alignment-page')).toBeInTheDocument()
+    expect(Route.options.pendingComponent).toBe(DailyRoutineGhost)
+    expect(Route.options).not.toHaveProperty('beforeLoad')
   })
 })

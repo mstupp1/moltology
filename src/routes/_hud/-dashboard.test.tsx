@@ -17,9 +17,9 @@ describe('Dashboard view source', () => {
 
   it('puts the member’s day first, then people, then places, then what is new', () => {
     const src = viewSrc()
+    expect(src).not.toMatch(/DailyRoutineWidget/)
     const order = [
       '<DashboardTodayStrip',
-      '<DailyRoutineWidget',
       '<ForumHubCard',
       '<ConnectionsHubCard',
       '<ActivityStreamPanel',

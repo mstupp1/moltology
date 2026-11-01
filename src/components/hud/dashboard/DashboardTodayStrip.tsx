@@ -6,7 +6,6 @@ import { HudButton } from '@/components/ui'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { useLastOracleThread } from '@/hooks/useLastOracleThread'
-import { openAlignmentPanel } from '@/lib/alignment-panel'
 import { oracleRouteSearch } from '@/lib/ai/last-oracle-thread'
 import { describeAlignmentToday, pickDashboardNextStep } from '@/lib/dashboard-next-step'
 import { cn } from '@/lib/utils'
@@ -101,7 +100,7 @@ export function DashboardTodayStrip() {
         setIsAuthOpen(true)
         return
       case 'alignment':
-        openAlignmentPanel()
+        navigate({ to: '/alignment' })
         return
       case 'resume-oracle':
         navigate({ to: '/oracle', search: oracleRouteSearch(step.threadId) })

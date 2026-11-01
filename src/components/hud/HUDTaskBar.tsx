@@ -130,7 +130,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
     }
   }, [isScheduleOpen, isMobileScreen])
 
-  // Dashboard Daily Alignment card (and leftover /alignment hops) open this same panel.
+  // Other HUD controls can request the same quick liturgies panel.
   useEffect(() => {
     const handleOpenAlignmentPanel = () => {
       if (variant === 'header' && !isAlignmentPanelHostVisible(headerIslandRef.current)) {

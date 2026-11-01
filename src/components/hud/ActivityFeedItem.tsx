@@ -56,6 +56,13 @@ function EventTitleLink({
       </Link>
     )
   }
+  if (parsed.kind === 'alignment') {
+    return (
+      <Link to="/alignment" className={className}>
+        {children}
+      </Link>
+    )
+  }
   if (parsed.kind === 'dashboard') {
     return (
       <Link to="/dashboard" hash={parsed.hash} className={className}>
