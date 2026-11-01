@@ -10,13 +10,7 @@ import { oracleRouteSearch } from '@/lib/ai/last-oracle-thread'
 import { describeAlignmentToday, pickDashboardNextStep } from '@/lib/dashboard-next-step'
 import { cn } from '@/lib/utils'
 import { getAssetUrl } from '@/lib/assets'
-
-const STAGE_ART: Record<number, string> = {
-  1: 'images/dashboard/stages/larval-v1.png',
-  2: 'images/dashboard/stages/soft-shed-v1.png',
-  3: 'images/dashboard/stages/exoshell-v1.png',
-  4: 'images/dashboard/stages/ascendant-v1.png',
-}
+import { STAGE_ART } from '@/lib/stage-art'
 
 function firstName(name?: string | null): string | null {
   const first = (name || '').trim().split(/\s+/)[0]
