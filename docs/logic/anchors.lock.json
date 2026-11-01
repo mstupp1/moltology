@@ -182,6 +182,8 @@
   "progression.client-date::src/lib/server/db-services.ts#toggleDailyAlignmentTaskHandler": "327724564766",
   "progression.daily-liturgies::src/lib/alignment-tasks.ts#CANONICAL_ALIGNMENT_TASKS": "cd6e1824083b",
   "progression.legacy-stage::src/lib/server/db-services.ts#syncUserProgression": "a236994d9379",
+  "progression.silent-synchronization::src/components/hud/SilentSynchronizationDialog.tsx#SilentSynchronizationDialog": "65e064b4070b",
+  "progression.silent-synchronization::src/hooks/useDailyAlignment.tsx#AlignmentProvider": "615961859d0d",
   "progression.stage-from-xp::src/lib/progression.ts#calculateStage": "7da571170408",
   "progression.stage-from-xp::src/lib/server/db-services.ts#syncUserProgression": "a236994d9379",
   "progression.stage-thresholds::src/lib/progression.ts#STAGE_THRESHOLDS": "32f7fe82d715",

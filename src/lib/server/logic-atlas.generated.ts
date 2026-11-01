@@ -11,14 +11,14 @@ export const LOGIC_ATLAS: LogicAtlas = {
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
-    "rules": 123,
-    "decisions": 48,
-    "anchors": 237,
+    "rules": 124,
+    "decisions": 49,
+    "anchors": 239,
     "drifted": 20,
     "flagged": 9
   },
   "canvas": {
-    "width": 6157,
+    "width": 6449,
     "height": 2976
   },
   "domains": [
@@ -58,11 +58,12 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "box": {
         "x": 1694,
         "y": 0,
-        "width": 948,
+        "width": 1240,
         "height": 988
       },
       "ruleIds": [
         "progression.daily-liturgies",
+        "progression.silent-synchronization",
         "progression.xp-rewards",
         "progression.xp-ledger",
         "progression.client-date",
@@ -80,7 +81,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Two roles, user and admin. Server functions verify the caller's JWT, then check the role before any staff action.",
       "overviewHtml": "<p>Access has two layers. The UI hides staff tools from everyone else, and each server function checks the role again, because the client can be skipped.</p>",
       "box": {
-        "x": 2738,
+        "x": 3030,
         "y": 0,
         "width": 1196,
         "height": 676
@@ -104,7 +105,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Self-hosted Better Auth with email and password plus Google. Sessions are cookie-cached, and writes use short-lived JWTs.",
       "overviewHtml": "<p>Auth moved off Managed Neon Auth because its background polling kept Neon compute awake and blew the compute budget. Identity for writes is always a verified JWT, never a client-supplied id.</p>",
       "box": {
-        "x": 4030,
+        "x": 4322,
         "y": 0,
         "width": 2127,
         "height": 548
@@ -398,6 +399,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "economy.cosmetics-no-stats",
         "economy.character-starter-equipment",
         "economy.character-equipment-visuals",
+        "progression.silent-synchronization",
         "progression.stage-from-xp",
         "premium.no-standing",
         "oracle.usage-allowance",
@@ -910,16 +912,69 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "dependsOn": [],
       "usedBy": [
+        "progression.silent-synchronization",
         "progression.xp-rewards"
       ],
       "decisions": [],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 568,
+        "x": 794,
         "y": 76
       },
       "drift": "changed"
+    },
+    {
+      "id": "progression.silent-synchronization",
+      "domain": "progression",
+      "title": "Silent synchronization completion",
+      "kind": "flow",
+      "status": "active",
+      "statement": "Opening the timer does not complete the task. After starting, stopping, dismissing, or reaching the deadline marks it complete. Repeat sessions do not undo completion or award more XP. A session is credited only while its original local date and account still match.",
+      "anchors": [
+        {
+          "file": "src/components/hud/SilentSynchronizationDialog.tsx",
+          "symbol": "SilentSynchronizationDialog",
+          "line": 38,
+          "value": "SilentSynchronizationDialog({ open, onClose, onComplete, avatarUrl, avatarName = 'Your profile', })",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/SilentSynchronizationDialog.tsx#L38"
+        },
+        {
+          "file": "src/hooks/useDailyAlignment.tsx",
+          "symbol": "AlignmentProvider",
+          "line": 69,
+          "value": "AlignmentProvider({ children })",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useDailyAlignment.tsx#L69"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/components/hud/SilentSynchronizationDialog.test.tsx",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/SilentSynchronizationDialog.test.tsx"
+        },
+        {
+          "file": "src/hooks/useDailyAlignment.test.tsx",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useDailyAlignment.test.tsx"
+        }
+      ],
+      "dependsOn": [
+        "progression.daily-liturgies",
+        "progression.xp-ledger",
+        "economy.red-line"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "silent-synchronization-participation"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 320,
+        "y": 544
+      },
+      "drift": "ok"
     },
     {
       "id": "progression.xp-rewards",
@@ -956,7 +1011,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 568,
+        "x": 838,
         "y": 232
       },
       "drift": "ok"
@@ -996,6 +1051,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "progression.xp-rewards"
       ],
       "usedBy": [
+        "progression.silent-synchronization",
         "progression.client-date",
         "progression.stage-from-xp"
       ],
@@ -1006,7 +1062,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 568,
+        "x": 838,
         "y": 388
       },
       "drift": "ok"
@@ -1052,7 +1108,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 612,
         "y": 544
       },
       "drift": "ok"
@@ -1102,7 +1158,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 612,
+        "x": 904,
         "y": 544
       },
       "drift": "ok"
@@ -1143,7 +1199,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 364,
+        "x": 656,
         "y": 700
       },
       "drift": "ok"
@@ -1190,7 +1246,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 364,
+        "x": 656,
         "y": 856
       },
       "drift": "ok"
@@ -1223,7 +1279,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 656,
+        "x": 948,
         "y": 700
       },
       "drift": "ok"
@@ -9345,6 +9401,45 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "html": "<p>Free endpoint availability and promotional prices may change. Provider routing, rather than model name alone, enforces Oracle MAX privacy. No-training filtering does not assert zero retention. Preserve the single selected-model failure behavior from the Oracle MAX redesign; never silently switch to another model. DeepInfra policy: <a href=\"https://docs.deepinfra.com/account/data-privacy\">https://docs.deepinfra.com/account/data-privacy</a>. Existing threads are not renamed or backfilled. Disconnects may retain excerpt titles. First reply tokens remain immediate; final stream completion can wait for the remaining title budget. Title-model display is informational and never substitutes for server enforcement.</p>"
         }
       ]
+    },
+    {
+      "id": "silent-synchronization-participation",
+      "date": "2026-10-31",
+      "title": "Count participation in silent synchronization",
+      "summary": "Starting a session is sufficient participation; stopping or dismissing records the daily task without a minimum duration.",
+      "domains": [
+        "progression"
+      ],
+      "rules": [
+        "progression.silent-synchronization"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "pr",
+          "label": "PR #359",
+          "url": "https://github.com/mstupp1/moltology/pull/359"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Silent Synchronization is the first daily alignment task with a dedicated guided experience. Members can select a duration and optionally watch the Oracle Core connect to their profile avatar.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Opening the dialog alone does not count. Once started, stopping, dismissing, or reaching the deadline records completion through the existing daily alignment write queue. Repeated sessions set completion to true, rather than toggling it. The original local date and account must still match when recording completion.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<p>Requiring the full duration would make the timer a gate rather than an optional guide. Toggling completion on every session would undo earlier participation.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>There is no minimum duration requirement. Existing server validation, daily XP awards, and source-key deduplication remain authoritative. Timer state and the 3D preference are local; this visual does not transfer member files or start an Oracle conversation.</p>"
+        }
+      ]
     }
   ],
   "edges": [
@@ -9413,6 +9508,24 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "source": "economy.red-line",
       "target": "economy.character-equipment-visuals",
       "crossDomain": false
+    },
+    {
+      "id": "progression.daily-liturgies->progression.silent-synchronization",
+      "source": "progression.daily-liturgies",
+      "target": "progression.silent-synchronization",
+      "crossDomain": false
+    },
+    {
+      "id": "progression.xp-ledger->progression.silent-synchronization",
+      "source": "progression.xp-ledger",
+      "target": "progression.silent-synchronization",
+      "crossDomain": false
+    },
+    {
+      "id": "economy.red-line->progression.silent-synchronization",
+      "source": "economy.red-line",
+      "target": "progression.silent-synchronization",
+      "crossDomain": true
     },
     {
       "id": "progression.daily-liturgies->progression.xp-rewards",

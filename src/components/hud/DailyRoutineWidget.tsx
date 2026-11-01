@@ -417,6 +417,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
     currentDate,
     isLoading: isAlignmentLoading,
     toggleTask,
+    openSilentSynchronization,
   } = useDailyAlignment()
 
   const allDone = completedCount >= totalCount
@@ -468,7 +469,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                   <li key={task.id}>
                     <button
                       type="button"
-                      onClick={() => toggleTask(task.key || task.id)}
+                      onClick={() => task.key === 'silent-synchronization' ? openSilentSynchronization() : toggleTask(task.key || task.id)}
                       aria-pressed={task.completed}
                       className={cn(
                         'w-full min-h-[44px] px-3 py-2 flex items-center gap-3 text-left text-xs transition-colors touch-manipulation group focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow',
