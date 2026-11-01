@@ -1,6 +1,6 @@
 # Daily alignment artwork
 
-The chamber uses a static illustration and a transparent 8-column × 4-row flame sprite sheet.
+The chamber uses a static illustration and a transparent 8-column × 6-row flame sprite sheet.
 There is no Three.js import, canvas, or WebGL context. Each completed task displays one
 registered flame loop; the existing heavy VFX setting and reduced motion select frame one.
 Loops also stop offscreen and in hidden tabs.
@@ -10,17 +10,62 @@ tool on October 31, 2026; the flames were remade on November 1. Source PNGs and 
 `moltology-public-assets`; pages resolve their original keys through `getAssetUrl`:
 
 - `images/hud/alignment/chamber-v1.png` (2172 × 724; WebP 140,212 bytes)
-- `images/hud/alignment/synaptic-flame-loop-v2.png` (1536 × 768 RGBA; PNG 561,911 bytes; WebP 113,740 bytes)
+- `images/hud/alignment/synaptic-flame-loop-v3.png` (1536 × 1152 RGBA; PNG 933,417 bytes; WebP 167,496 bytes)
 - `images/hud/alignment/synaptic-flame-a-v2.png` (ImageGen source keyframe)
-- `images/hud/alignment/synaptic-flame-b-v2.png` (ImageGen interior-current edit)
+- `images/hud/alignment/synaptic-flame-b-v3.png` (ImageGen broad S-current pose)
+- `images/hud/alignment/synaptic-flame-c-v3.png` (ImageGen left-current pose)
 
 Local source copies are preserved in ignored `tmp/alignment-assets/`. Do not put heavy
 artwork in `public/`. Upload revised artwork with a new versioned key, inspect the eight
-socket positions, and update `layout.ts` if the chamber changes. The sheet contains 32 equal
+socket positions, and update `layout.ts` if the chamber changes. The sheet contains 48 equal
 192px cells, read left to right then top to bottom; the fixed flame base is at 176/192
 (91.67%) of each cell height. Socket anchors stay unchanged.
 
-## Synaptic flame remake (November 1, 2026)
+## Visible internal flow (v3, November 1, 2026)
+
+The deployed v2 sheet advanced frames but read as static at actual socket sizes: its
+near-identical source poses and 32/255 channel-delta cap suppressed meaningful motion.
+V3 preserves the approved silhouette but uses three distinct raster poses: the original
+A plus two newly edited ImageGen poses with broad luminous ribbons in different places.
+
+The packer blends A → B → C → A with 16 eased in-between frames per segment: 48 frames
+over four seconds. It retains A's alpha and fixed crop/base, feathers interior changes
+away from the outline, and normalizes light energy per frame instead of clipping local
+movement to 32/255. The delivered WebP has identical alpha across all 48 cells and 0.47%
+total luminance variation. No whole-sprite sway, scaling or opacity animation is used.
+
+A build gate renders each pose into a 42px phone socket and requires at least 5% of opaque
+pixels to change by 20/255 or more between poses. This checks visibility at delivery size,
+rather than merely confirming CSS background-position changes. A regression test checks
+that identical poses are rejected before writing a sheet and distinct poses retain alpha.
+
+Runtime phases are `[1, 29, 11, 41, 19, 5, 35, 24]`. Reduced motion, heavy-VFX, offscreen,
+hidden-tab gating and completion/undo remain unchanged. Local desktop (1440 × 1000) and
+mobile (390 × 844) browser checks passed, with final screenshots and captured loop phases
+in ignored `tmp/verification/visible-flow-*` and `tmp/verification/flow-*`.
+
+Rebuild from archived original PNGs, then upload under a new versioned key for any revision:
+
+```sh
+node --import tsx scripts/build-alignment-flame-sheet.ts \
+  tmp/alignment-assets/synaptic-flame-a-v2.png \
+  tmp/alignment-assets/synaptic-flame-b-v3.png \
+  tmp/alignment-assets/synaptic-flame-c-v3.png \
+  tmp/alignment-assets/synaptic-flame-loop-v3.png
+npm run s3:upload -- tmp/alignment-assets/synaptic-flame-loop-v3.png \
+  --key images/hud/alignment/synaptic-flame-loop-v3.png
+```
+
+Both edits used the built-in ImageGen tool with original A as the edit target and
+transparency enabled. Prompt B:
+
+> Use case: precise-object-edit. This is a production animation keyframe edit of the supplied transparent synaptic flame. Keep EXACT same canvas dimensions, position, compact base, outline, tip, scale, translucent dark teal envelope, and cyan/aqua color palette. Change ONLY the INTERIOR luminous flow substantially: reroute the broad bright filament into a clearly different S curve through the interior, curling from lower RIGHT to upper LEFT instead of its current path. The bright internal ribbon should be broad enough to read as an actual moving current in a 40px-tall sprite, about one sixth of flame width. Redistribute the fine synaptic veins around that path. Keep the small spherical nucleus fixed at the same bottom-center position and retain comparable total brightness. This is a new animation pose, with visibly different internal ribbon position, not merely subtle surface retouching. No change to flame silhouette, tip or base; no detached particles, sparks, splashes, additional flames, bowls, text or background. True transparent background. Match the supplied artwork's dimensional material and contained, calm Synaptic Core identity.
+
+Prompt C:
+
+> Use case: precise-object-edit. Produce a different animation pose of the supplied isolated transparent synaptic flame. Preserve EXACT original canvas, position, base, tip, outline, scale, dark translucent teal envelope and fixed small bottom-center nucleus. REPLACE the interior S-shaped bright current with a clearly different LEFT-SIDE luminous flow: broad cyan/aqua ribbon sweeps from the bottom nucleus toward the LEFT interior wall at the lower third, then bends gently toward the center at the upper third and tapers into the tip. The RIGHT half of the flame interior is mostly dark teal with only fine branching synaptic threads. Do NOT retain the original bright ribbon running along the RIGHT lower-middle half. This must look distinct when reduced to 40 pixels tall: one broad left-side light current about one fifth flame width. Retain comparable integrated brightness and the source's realistic 3D synaptic/chitin material. Only interior texture changes; no outline or whole-object movement, no splash, sparks, particles, bowl or background. Genuine transparent background. Single flame.
+
+## Retired v2 remake (November 1, 2026)
 
 Evergreen product artwork, created with the built-in ImageGen tool. References inspected:
 `SynapticEntityCanvas.tsx` (organic nucleus, cyan/aqua veins, chitin lattice, orbital data
@@ -36,7 +81,8 @@ channel changes at 32/255. Periodic cosine interpolation returns smoothly to A. 
 runtime WebP also retains identical alpha in all cells; measured total luminance varies
 by 0.88% across the loop. Its wrap delta is smaller than its largest internal transition.
 
-Rebuild from the original PNG source keys (not their lossy WebP twins):
+Historical v2 rebuild used the packer at commit `c78ac93` (the current packer deliberately
+rejects this unreadable motion). Its source keys and command were:
 
 ```sh
 node --import tsx scripts/build-alignment-flame-sheet.ts \
@@ -47,7 +93,7 @@ npm run s3:upload -- tmp/alignment-assets/synaptic-flame-sheet-v2.png \
   --key images/hud/alignment/synaptic-flame-loop-v2.png
 ```
 
-The final versioned sheet and both source PNGs are archived in S3, with local copies in
+The retired v2 sheet and both source PNGs are archived in S3, with local copies in
 ignored `tmp/alignment-assets/`. Future revisions must use a new key. Each socket uses a
 fixed shuffled phase `[1, 20, 8, 28, 13, 4, 24, 17]`, independent of completion count.
 Reduced motion and disabled heavy VFX show frame one; offscreen and hidden-tab gating
