@@ -74,7 +74,7 @@ describe('Image-based alignment chamber', () => {
     expect(original).not.toEqual([...original].sort((a, b) => a - b))
     expect(original).not.toEqual([...original].sort((a, b) => b - a))
     expect(container.querySelector<HTMLElement>('.alignment-chamber-flame')?.style.backgroundImage)
-      .toContain('/media/images/hud/alignment/synaptic-flame-loop-v2.webp')
+      .toContain('/media/images/hud/alignment/synaptic-flame-loop-v3.webp')
     rerender(<AlignmentChamber tasks={mergeCompletions(keys.slice(1))} />)
     expect(delays()).toEqual(original.slice(1))
     rerender(<AlignmentChamber tasks={mergeCompletions(keys)} />)

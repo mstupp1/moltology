@@ -6,7 +6,7 @@ import { CHAMBER_SOCKETS, FLAME_PHASE_FRAMES, FLAME_LOOP_SECONDS, FLAME_FRAME_CO
 import './chamber.css'
 
 const CHAMBER_IMAGE = getAssetUrl('images/hud/alignment/chamber-v1.png')
-const FLAME_SHEET = getAssetUrl('images/hud/alignment/synaptic-flame-loop-v2.png')
+const FLAME_SHEET = getAssetUrl('images/hud/alignment/synaptic-flame-loop-v3.png')
 
 /** Detailed chamber artwork with registered synaptic flame loops. No canvas or GPU scene. */
 export function AlignmentChamber({ tasks }: { tasks: AlignmentTaskItem[] }) {

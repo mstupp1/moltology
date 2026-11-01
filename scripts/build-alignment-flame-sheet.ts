@@ -2,10 +2,12 @@
 import sharp from 'sharp'
 import fs from 'node:fs/promises'
 
-const [sourceA, sourceB, output] = process.argv.slice(2)
-if (!sourceA || !sourceB || !output) throw new Error('Usage: tsx scripts/build-alignment-flame-sheet.ts <a.png> <b.png> <sheet.png>')
+const args = process.argv.slice(2)
+const output = args.pop()
+const [sourceA] = args
+if (args.length < 2 || !output) throw new Error('Usage: tsx scripts/build-alignment-flame-sheet.ts <a.png> <b.png> [c.png ...] <sheet.png>')
 const size = 192
-const count = 32
+const count = args.length * 16
 const original = await sharp(sourceA).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
 let left = original.info.width, top = original.info.height, right = 0, bottom = 0
 for (let y = 0; y < original.info.height; y++) {
@@ -21,7 +23,8 @@ const height = 144
 const width = Math.round(crop.width * height / crop.height)
 const load = async (file: string) => sharp(file).ensureAlpha().extract(crop)
   .resize(width, height).raw().toBuffer()
-const a = await load(sourceA), b = await load(sourceB)
+const sources = await Promise.all(args.map(load))
+const a = sources[0]
 const energy = (pixels: Buffer) => {
   let total = 0
   for (let i = 0; i < pixels.length; i += 4) {
@@ -29,23 +32,49 @@ const energy = (pixels: Buffer) => {
   }
   return total
 }
-const gain = energy(a) / energy(b)
+const targetEnergy = energy(a)
+const gains = sources.map((pixels) => targetEnergy / energy(pixels))
 const frames: Buffer[] = []
 for (let frame = 0; frame < count; frame++) {
-  // Periodic interpolation gives the wrap the same small delta as every other step.
-  const mix = .5 * (1 - Math.cos(frame / count * Math.PI * 2))
+  // Three distinct poses carry a readable current around the loop, including C → A.
+  const pose = Math.floor(frame / 16)
+  const next = (pose + 1) % sources.length
+  const mix = .5 * (1 - Math.cos(frame % 16 / 16 * Math.PI))
   const pixels = Buffer.from(a)
   for (let i = 0; i < pixels.length; i += 4) {
     // Keep A's alpha exactly; feather interior changes away from the silhouette.
     const interior = Math.max(0, (a[i + 3] - 180) / 75)
     for (let c = 0; c < 3; c++) {
-      const delta = Math.max(-32, Math.min(32, b[i + c] * gain - a[i + c]))
-      pixels[i + c] = Math.max(0, Math.min(255, Math.round(a[i + c] + delta * mix * interior)))
+      const current = sources[pose][i + c] * gains[pose]
+      const following = sources[next][i + c] * gains[next]
+      const value = a[i + c] * (1 - interior) + (current * (1 - mix) + following * mix) * interior
+      pixels[i + c] = Math.max(0, Math.min(255, Math.round(value)))
+    }
+  }
+  // Keep light energy steady without suppressing visible local ribbon movement.
+  for (let pass = 0; pass < 3; pass++) {
+    const gain = targetEnergy / energy(pixels)
+    for (let i = 0; i < pixels.length; i += 4) {
+      for (let c = 0; c < 3; c++) pixels[i + c] = Math.max(0, Math.min(255, Math.round(pixels[i + c] * gain)))
     }
   }
   frames.push(await sharp({ create: { width: size, height: size, channels: 4, background: '#00000000' } })
     .composite([{ input: pixels, raw: { width, height, channels: 4 }, left: Math.floor((size - width) / 2), top: 176 - height }]).png().toBuffer())
 }
-await fs.writeFile(output, await sharp({ create: { width: size * 8, height: size * 4, channels: 4, background: '#00000000' } })
+// Do not ship another loop whose frames differ only when enlarged. At phone socket
+// size, at least 5% of opaque pixels must visibly change between each generated pose.
+const previews = await Promise.all(frames.filter((_, index) => index % 16 === 0)
+  .map((frame) => sharp(frame).resize(42, 42).raw().toBuffer()))
+previews.forEach((current, index) => {
+  const next = previews[(index + 1) % previews.length]
+  let visible = 0, changed = 0
+  for (let i = 0; i < current.length; i += 4) {
+    if (current[i + 3] <= 180) continue
+    visible++
+    if ([0, 1, 2].some((c) => Math.abs(current[i + c] - next[i + c]) >= 20)) changed++
+  }
+  if (!visible || changed / visible < .05) throw new Error(`Pose ${index}: motion is unreadable at 42px socket size`)
+})
+await fs.writeFile(output, await sharp({ create: { width: size * 8, height: size * Math.ceil(count / 8), channels: 4, background: '#00000000' } })
   .composite(frames.map((input, index) => ({ input, left: index % 8 * size, top: Math.floor(index / 8) * size }))).png().toBuffer())
-console.log(`Packed ${count} frames, ${size * 8} × ${size * 4}; identical alpha and anchors in every cell.`)
+console.log(`Packed ${count} frames, ${size * 8} × ${size * Math.ceil(count / 8)}; identical alpha and anchors in every cell.`)
