@@ -60,6 +60,7 @@ function HudContent() {
               (location.search as string).includes('main_only=true')))
     )
 
+  const reserveMobileOracleSpace = !isMainOnly && !isFullscreenRoute && oracle?.mode !== 'sidebar'
   const isPending = session.isPending
   const targetId = isPending ? null : userId || 'guest'
   const isDashboardRoute =
@@ -122,7 +123,7 @@ function HudContent() {
 
   return (
     <div
-      className="fixed inset-0 w-full h-full text-ink flex flex-col font-sans overflow-hidden bg-abyss overscroll-none select-none"
+      className="hud-layout fixed inset-0 w-full h-full text-ink flex flex-col font-sans overflow-hidden bg-abyss overscroll-none select-none"
     >
       {/* First-visit onboarding */}
       {showWelcome && (
@@ -186,10 +187,10 @@ function HudContent() {
 
             {/* Main Panel Content Workspace with Ultra-Translucent Glass Backdrop */}
             <main
-              className={`flex-1 min-h-0 ${
+              className={`flex-1 min-h-0 ${reserveMobileOracleSpace ? 'hud-mobile-oracle-clearance' : ''} ${
                 isFullscreenRoute
                   ? 'p-0 overflow-hidden'
-                  : 'p-2.5 pb-16 sm:p-4 sm:pb-4 md:p-6 md:pb-6 overflow-y-auto overscroll-y-contain'
+                  : 'p-2.5 sm:p-4 md:p-6 overflow-y-auto overscroll-y-contain'
               } bg-surface-1/[0.62] ${
                 isMainOnly
                   ? 'border-0 shadow-none'
