@@ -5,6 +5,7 @@ import { useNavigate, useLocation, useRouter } from '@tanstack/react-router'
 import {
 
   LayoutDashboard,
+  Calendar,
   BookOpen,
   Scroll,
   FlaskConical,
@@ -375,6 +376,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           shortLabel: 'DASHBOARD',
           icon: LayoutDashboard,
           path: '/dashboard',
+        },
+        {
+          id: 'alignment',
+          label: 'DAILY ALIGNMENT',
+          shortLabel: 'ALIGNMENT',
+          icon: Calendar,
+          path: '/alignment',
         },
         {
           id: 'oracle',

@@ -89,15 +89,14 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     expect(screen.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
     expect(screen.getByText('ORACLE')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^DAILY ALIGNMENT$/i })).toBeInTheDocument()
   })
 
-  it('navigates to route on nav item click', () => {
+  it.each([['CODEX', '/codex'], ['DAILY ALIGNMENT', '/alignment']])('navigates to %s on nav item click', (label, route) => {
     render(<HUDSidebar />)
 
-    const codexBtn = screen.getByRole('button', { name: /^CODEX$/i })
-    fireEvent.click(codexBtn)
-
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/codex' })
+    fireEvent.click(screen.getByRole('button', { name: label }))
+    expect(mockNavigate).toHaveBeenCalledWith({ to: route })
   })
 
   it('navigates to /dashboard when brand emblem logo is clicked', () => {
