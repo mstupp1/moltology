@@ -101,7 +101,11 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
 
   const sessionImage = session.user?.image ?? session.user?.avatar ?? session.user?.picture ?? null
   const loadSilentAvatar = useCallback(async () => {
-    if (!userId) { setSilentAvatarUrl(null); setSilentAvatarName(undefined); return }
+    if (!userId) {
+      setSilentAvatarUrl(null)
+      setSilentAvatarName(undefined)
+      return
+    }
     const activeUserId = userId
     try {
       const token = await getAuthJWTToken().catch(() => null)
@@ -110,14 +114,22 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
       const config = parseLobsterAvatarConfig(profile?.avatarConfig)
       setSilentAvatarUrl(config ? generateLobsterAvatarDataUri(config, 128, { frame: 'portrait', staticMotion: true }) : sessionImage)
       setSilentAvatarName(resolveMemberPublicName({ userId: activeUserId, handle: profile?.handle, larvaId: profile?.larvaId }))
-    } catch { setSilentAvatarUrl(null); setSilentAvatarName(undefined) }
+    } catch {
+      if (userIdRef.current !== activeUserId) return
+      setSilentAvatarUrl(sessionImage)
+      setSilentAvatarName(undefined)
+    }
   }, [userId, sessionImage])
 
   /* Profile data is fetched only when the member opens this practice. */
   const profileAvatarRef = useRef(loadSilentAvatar)
   profileAvatarRef.current = loadSilentAvatar
   useEffect(() => {
-    if (!userId) { setSilentAvatarUrl(null); setSilentAvatarName(undefined); return }
+    if (!userId) {
+      setSilentAvatarUrl(null)
+      setSilentAvatarName(undefined)
+      return
+    }
     const onAvatarChanged = () => { void profileAvatarRef.current() }
     window.addEventListener('profile-avatar-changed', onAvatarChanged)
     return () => window.removeEventListener('profile-avatar-changed', onAvatarChanged)
@@ -498,7 +510,11 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     void profileAvatarRef.current()
   }, [])
   const completeSilentSynchronization = useCallback(() => {
-    if (silentDialogDate === currentDateRef.current && silentDialogUserRef.current === userIdRef.current) void setTaskCompleted('silent-synchronization', true)
+    const sameDate = silentDialogDate === currentDateRef.current
+    const sameUser = silentDialogUserRef.current === userIdRef.current
+    if (sameDate && sameUser) {
+      void setTaskCompleted('silent-synchronization', true)
+    }
   }, [silentDialogDate, setTaskCompleted])
 
   const refetch = useCallback(async () => {
@@ -559,7 +575,13 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
   return (
     <AlignmentContext.Provider value={value}>
       {children}
-      <SilentSynchronizationDialog open={silentDialogOpen} onClose={() => setSilentDialogOpen(false)} onComplete={completeSilentSynchronization} avatarUrl={silentAvatarUrl} avatarName={silentAvatarName} />
+      <SilentSynchronizationDialog
+        open={silentDialogOpen}
+        onClose={() => setSilentDialogOpen(false)}
+        onComplete={completeSilentSynchronization}
+        avatarUrl={silentAvatarUrl}
+        avatarName={silentAvatarName}
+      />
     </AlignmentContext.Provider>
   )
 }

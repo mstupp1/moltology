@@ -3,6 +3,7 @@ import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
 import { UserAvatar } from '@/components/UserAvatar'
 import { HudButton } from '@/components/ui/HudButton'
 import { createSilentSynchronizationBridge } from './silentSynchronizationBridge'
+import './silent-synchronization.css'
 import {
   getSilentSyncProgress,
   SILENT_SYNC_PRESETS,
@@ -123,12 +124,18 @@ export function SilentSynchronizationDialog({
   const toggleVisual = () => {
     setVisualEnabled((current) => {
       const next = !current
-      try { window.localStorage.setItem(VISUAL_PREF_KEY, String(next)) } catch { /* preference is optional */ }
+      try {
+        window.localStorage.setItem(VISUAL_PREF_KEY, String(next))
+      } catch {
+        // The timer still works when browser storage is unavailable.
+      }
       return next
     })
   }
 
-  useEffect(() => { bridge.setRunning(open && session === 'running') }, [bridge, open, session])
+  useEffect(() => {
+    bridge.setRunning(open && session === 'running')
+  }, [bridge, open, session])
 
   const running = session === 'running'
   const showCanvas = visualEnabled && !reducedMotion
@@ -151,7 +158,9 @@ export function SilentSynchronizationDialog({
             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-cyan-glow">Quiet practice</p>
             <h2 className="mt-1 font-grotesk text-xl font-bold text-ink sm:text-2xl">Silent synchronization</h2>
           </div>
-          <button type="button" onClick={handleClose} aria-label="Close dialog" className="rounded-control px-3 py-2 text-sm text-ink-muted hover:bg-surface-2 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow">Close</button>
+          <HudButton variant="ghost" size="sm" onClick={handleClose} aria-label="Close dialog">
+            Close
+          </HudButton>
         </header>
 
         <div className="px-5 pb-6 pt-4 sm:px-7">
@@ -161,12 +170,20 @@ export function SilentSynchronizationDialog({
 
           <div className="relative my-5 flex min-h-44 items-center justify-center overflow-hidden rounded-card border border-line-subtle bg-abyss px-4 py-5 sm:min-h-52">
             <div className="relative z-10 flex w-full max-w-sm items-center justify-between gap-4">
-              <div className={`relative grid size-20 shrink-0 place-items-center rounded-full border border-cyan-glow/40 bg-surface-1 shadow-[0_0_24px_rgba(0,195,255,0.15)] sm:size-24 ${running ? 'silent-sync-pulse' : ''}`}>
-                {showCanvas ? <Suspense fallback={<span className="size-9 rounded-full bg-cyan-glow/15" />}><div className="pointer-events-none absolute -inset-3"><SynapticEntityCanvas bridge={bridge} isCompact className="h-full w-full !min-h-0" /></div></Suspense> : <span aria-hidden="true" className="size-9 rounded-full border border-cyan-glow/60 bg-cyan-glow/15 shadow-[0_0_18px_rgba(0,195,255,0.35)]" />}
+              <div className={`relative grid size-20 shrink-0 place-items-center rounded-full border border-cyan-glow/40 bg-surface-1 sm:size-24 ${running ? 'silent-sync-pulse shadow-md shadow-cyan-glow/20' : ''}`}>
+                {showCanvas ? (
+                  <Suspense fallback={<span className="size-9 rounded-full bg-cyan-glow/15" />}>
+                    <div className="pointer-events-none absolute -inset-3">
+                      <SynapticEntityCanvas bridge={bridge} isCompact className="h-full w-full !min-h-0" />
+                    </div>
+                  </Suspense>
+                ) : (
+                  <span aria-hidden="true" className="size-9 rounded-full border border-cyan-glow/60 bg-cyan-glow/15" />
+                )}
                 <span className="absolute -bottom-5 text-[11px] font-bold uppercase tracking-widest text-ink-muted">Core</span>
               </div>
               <div aria-hidden="true" className={`h-px min-w-6 flex-1 bg-gradient-to-r from-cyan-glow/20 via-cyan-glow to-cyan-glow/20 ${running && !reducedMotion ? 'silent-sync-flow' : ''}`} />
-              <div className={`relative grid size-20 shrink-0 place-items-center overflow-hidden rounded-full border border-cyan-glow/40 bg-surface-2 shadow-[0_0_24px_rgba(0,195,255,0.12)] sm:size-24 ${running ? 'silent-sync-pulse' : ''}`}>
+              <div className={`relative grid size-20 shrink-0 place-items-center overflow-hidden rounded-full border border-cyan-glow/40 bg-surface-2 sm:size-24 ${running ? 'silent-sync-pulse shadow-md shadow-cyan-glow/20' : ''}`}>
                 <UserAvatar src={avatarUrl} name={avatarName} alt={avatarName} size="xl" borderless className="!h-full !w-full" />
                 <span className="sr-only">{avatarName}</span>
               </div>
@@ -176,15 +193,32 @@ export function SilentSynchronizationDialog({
 
           <div className="flex items-center justify-between gap-3">
             <span className="text-xs font-medium text-ink-muted">3D experience</span>
-            <button type="button" role="switch" aria-label="3D experience" aria-checked={visualEnabled} onClick={toggleVisual} className="rounded-control border border-line px-3 py-1.5 text-xs text-ink-body hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow">{visualEnabled ? 'On' : 'Off'}</button>
+            <HudButton
+              variant="secondary"
+              size="sm"
+              role="switch"
+              aria-label="3D experience"
+              aria-checked={visualEnabled}
+              onClick={toggleVisual}
+            >
+              {visualEnabled ? 'On' : 'Off'}
+            </HudButton>
           </div>
 
           {session === 'ready' ? (
-            <fieldset className="mt-5" disabled={running}>
+            <fieldset className="mt-5">
               <legend className="mb-2 text-xs font-medium text-ink-muted">Duration</legend>
               <div className="grid grid-cols-4 gap-2" role="group" aria-label="Timer duration">
                 {SILENT_SYNC_PRESETS.map((preset) => (
-                  <button key={preset} type="button" aria-pressed={minutes === preset} onClick={() => setMinutes(preset)} className={`min-h-10 rounded-control border text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow ${minutes === preset ? 'border-cyan-glow bg-cyan-soft text-ink' : 'border-line bg-surface-1 text-ink-body hover:bg-surface-2'}`}>{preset} min</button>
+                  <HudButton
+                    key={preset}
+                    variant="secondary"
+                    aria-pressed={minutes === preset}
+                    onClick={() => setMinutes(preset)}
+                    className={minutes === preset ? 'border-cyan-glow bg-cyan-soft' : ''}
+                  >
+                    {preset} min
+                  </HudButton>
                 ))}
               </div>
             </fieldset>
@@ -194,17 +228,22 @@ export function SilentSynchronizationDialog({
                 <span className="text-xs text-ink-muted">{running ? 'Sync cycles remaining' : 'Sync cycles completed'}</span>
                 <span className="font-mono text-2xl tabular-nums text-ink" data-testid="silent-sync-readout">{running ? Math.ceil(progress.remainingMs / 1000) : progress.cycles}</span>
               </div>
-              <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-3" role="progressbar" aria-label="Timer progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress.progress * 100)}>
-                <div className="h-full rounded-full bg-cyan-glow transition-[width] duration-200 motion-reduce:transition-none" style={{ width: `${Math.round(progress.progress * 100)}%` }} />
+              <div className="mt-2 h-2 overflow-hidden rounded-chip bg-surface-3" role="progressbar" aria-label="Timer progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress.progress * 100)}>
+                <div className="h-full rounded-chip bg-cyan-glow transition-[width] duration-200 motion-reduce:transition-none" style={{ width: `${Math.round(progress.progress * 100)}%` }} />
               </div>
               <p className="mt-2 text-xs text-ink-muted">{progress.cycles} sync {progress.cycles === 1 ? 'cycle' : 'cycles'} completed</p>
             </div>
           )}
 
           <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            {session === 'ready' ? <HudButton variant="primary" onClick={start}>Start timer</HudButton> : running ? <HudButton variant="secondary" onClick={stop}>Stop</HudButton> : <HudButton variant="secondary" onClick={handleClose}>Close</HudButton>}
+            {session === 'ready' ? (
+              <HudButton variant="primary" onClick={start}>Start timer</HudButton>
+            ) : running ? (
+              <HudButton variant="secondary" onClick={stop}>Stop</HudButton>
+            ) : (
+              <HudButton variant="secondary" onClick={handleClose}>Close</HudButton>
+            )}
           </div>
-          <style>{`@keyframes silent-sync-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.045); } } @keyframes silent-sync-flow { 0%,100% { opacity:.45; } 50% { opacity:1; } } .silent-sync-pulse { animation: silent-sync-pulse 3.2s ease-in-out infinite; } .silent-sync-flow { animation: silent-sync-flow 2.4s ease-in-out infinite; } @media (prefers-reduced-motion: reduce) { .silent-sync-pulse,.silent-sync-flow { animation:none; } }`}</style>
         </div>
       </section>
     </HudBottomSheet>

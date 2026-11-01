@@ -13,6 +13,17 @@ rules:
       - file: src/lib/alignment-tasks.ts
         symbol: CANONICAL_ALIGNMENT_TASKS
     tests: [src/lib/alignment-tasks.test.ts]
+  - id: progression.silent-synchronization
+    title: Silent synchronization completion
+    kind: flow
+    statement: Opening the timer does not complete the task. After starting, stopping, dismissing, or reaching the deadline marks it complete. Repeat sessions do not undo completion or award more XP. A session is credited only while its original local date and account still match.
+    dependsOn: [progression.daily-liturgies, progression.xp-ledger, economy.red-line]
+    anchors:
+      - file: src/components/hud/SilentSynchronizationDialog.tsx
+        symbol: SilentSynchronizationDialog
+      - file: src/hooks/useDailyAlignment.tsx
+        symbol: AlignmentProvider
+    tests: [src/components/hud/SilentSynchronizationDialog.test.tsx, src/hooks/useDailyAlignment.test.tsx]
   - id: progression.xp-rewards
     title: XP per liturgy and bonuses
     kind: threshold

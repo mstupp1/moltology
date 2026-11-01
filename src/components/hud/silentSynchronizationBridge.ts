@@ -18,7 +18,9 @@ export function createSilentSynchronizationBridge(): EntityBridgeReader & { setR
   let running = false
   let elapsed = 0
   return {
-    setRunning(value) { running = value },
+    setRunning(value) {
+      running = value
+    },
     getSnapshot: () => snapshot,
     stepFrame(dtSeconds) {
       elapsed += dtSeconds

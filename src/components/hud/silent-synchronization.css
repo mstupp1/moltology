@@ -1,0 +1,16 @@
+@keyframes silent-sync-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+
+@keyframes silent-sync-flow {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
+.silent-sync-pulse { animation: silent-sync-pulse 3.2s ease-in-out infinite; }
+.silent-sync-flow { animation: silent-sync-flow 2.4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .silent-sync-pulse, .silent-sync-flow { animation: none; }
+}
