@@ -67,7 +67,7 @@ describe('SettingsPage', () => {
     localStorage.clear()
   })
 
-  it('renders Underwater Bubbles toggle under Preferences and toggles VFX state', async () => {
+  it('renders the shared heavy effects toggle and persists the VFX preference', async () => {
     render(
       <ToastProvider>
         <SettingsPage />
@@ -75,24 +75,24 @@ describe('SettingsPage', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Underwater Bubbles')).toBeInTheDocument()
+      expect(screen.getByText('Heavy visual effects')).toBeInTheDocument()
     })
 
     expect(screen.queryByTestId('premium-settings')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Purchase Premium/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Cancel Premium/i })).not.toBeInTheDocument()
-    expect(screen.getByText('Visible across the hub')).toBeInTheDocument()
+    expect(screen.getByText('Underwater bubbles and animated ritual flames enabled.')).toBeInTheDocument()
     expect(screen.getByText('Email Updates')).toBeInTheDocument()
     expect(screen.getByText('Sign-in methods')).toBeInTheDocument()
     expect(screen.getByTestId('hub-surface-controls')).toBeInTheDocument()
 
-    const toggle = screen.getByRole('switch', { name: /toggle underwater bubbles/i })
+    const toggle = screen.getByRole('switch', { name: /toggle heavy visual effects/i })
     expect(toggle).toHaveAttribute('aria-checked', 'true')
 
     fireEvent.click(toggle)
 
     expect(toggle).toHaveAttribute('aria-checked', 'false')
-    expect(screen.getByText(/Hidden — reduces motion and battery use/i)).toBeInTheDocument()
+    expect(screen.getByText(/Bubbles and animated ritual flames off/i)).toBeInTheDocument()
     expect(localStorage.getItem('moltology_heavy_vfx_disabled')).toBe('true')
   })
 

@@ -232,12 +232,12 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
                   )}
                   <div className="min-w-0">
                     <span className="text-sm font-grotesk font-bold text-ink block">
-                      Underwater Bubbles
+                      Heavy visual effects
                     </span>
                     <span className="text-xs text-ink-muted font-sans">
                       {heavyVfxDisabled
-                        ? 'Hidden — reduces motion and battery use'
-                        : 'Visible across the hub'}
+                        ? 'Bubbles and animated ritual flames off. Reduces motion and battery use.'
+                        : 'Underwater bubbles and animated ritual flames enabled.'}
                     </span>
                   </div>
                 </div>
@@ -245,7 +245,7 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
                   type="button"
                   role="switch"
                   aria-checked={!heavyVfxDisabled}
-                  aria-label="Toggle underwater bubbles"
+                  aria-label="Toggle heavy visual effects"
                   onClick={toggleHeavyVfx}
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                     !heavyVfxDisabled

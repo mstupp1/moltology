@@ -8,6 +8,7 @@ import { openAlignmentPanel } from '@/lib/alignment-panel'
 import { ALIGNMENT_HISTORY_DAYS, DAILY_ALIGNMENT_HUB_ID, localDateString, parseLocalDate, TOTAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
 import type { DailyStreakDay } from '@/lib/alignment-tasks'
 import { cn } from '@/lib/utils'
+import { AlignmentChamber } from './alignment-chamber/AlignmentChamber'
 
 // ---------------------------------------------------------------------------
 // ActivityHeatmap — width-aware GitHub-style grid (Sun–Sat rows, weeks as cols)
@@ -455,6 +456,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
           testId: 'daily-alignment-card-open',
         }}
       >
+        <AlignmentChamber tasks={tasks} />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 min-w-0">
           <div className="lg:col-span-7 min-w-0 space-y-2">
             <div className="flex items-center justify-between gap-2">
