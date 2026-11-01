@@ -1,3 +1,16 @@
+/* Keep the fixed phone dock and workspace on the same safe-area geometry. */
+.hud-layout {
+  --oracle-mobile-launcher-height: 2.75rem;
+  --oracle-mobile-bottom-offset: max(0.75rem, env(safe-area-inset-bottom, 0px));
+}
+
+@media (width < 640px) {
+  .hud-mobile-oracle-clearance {
+    /* Reserve viewport space so nested scroll panels also end above the dock. */
+    margin-bottom: calc(var(--oracle-mobile-launcher-height) + var(--oracle-mobile-bottom-offset) + 0.5rem);
+  }
+}
+
 /* Horizontal Stock Ticker Marquee Animation */
 @keyframes hud-marquee {
   0% { transform: translateX(0%); }

@@ -317,13 +317,13 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     <>
       {/* ── Mobile: Bottom Pull-Up Prompt Pill Dock ── */}
       {!isPopoutActive && (
-        <div className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 max-w-md mx-auto sm:hidden font-sans select-none pointer-events-auto">
+        <div className="fixed inset-x-3 bottom-[var(--oracle-mobile-bottom-offset)] z-40 max-w-md mx-auto sm:hidden font-sans select-none pointer-events-auto">
           <button
             type="button"
             onClick={handleToggle}
             onTouchStart={handleMobilePillTouchStart}
             onTouchEnd={handleMobilePillTouchEnd}
-            className={`${ORACLE_PILL_BASE_CLASSES} w-full cursor-pointer transition-all duration-200 active:scale-[0.98]`}
+            className={`${ORACLE_PILL_BASE_CLASSES} min-h-[var(--oracle-mobile-launcher-height)] w-full cursor-pointer transition-all duration-200 active:scale-[0.98]`}
             aria-label="Open Oracle AI Tray"
             title="Tap or swipe up to consult Oracle AI"
           >
