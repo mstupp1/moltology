@@ -8,7 +8,6 @@ import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
 import { ForumBoardNav, ForumSortTabs, type ForumSortKey } from '@/components/forum/ForumBoardNav'
 import { InlineTopicComposer, InlineTopicComposerHandle } from '@/components/forum/InlineTopicComposer'
 import { ForumRulesDialog } from '@/components/forum/ForumRulesDialog'
-import { DashboardPanel } from '@/components/hud/dashboard/DashboardPanel'
 import { getForumCategoriesFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
@@ -180,9 +179,7 @@ function ForumIndexPage() {
           }
         />
 
-        <DashboardPanel icon={<LayoutGrid />} title="Boards" className="lg:hidden">
-          <ForumBoardNav boards={categoriesState} variant="strip" />
-        </DashboardPanel>
+        <ForumBoardNav boards={categoriesState} variant="strip" className="lg:hidden" />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
           <div className="lg:col-span-8 space-y-4 min-w-0">
@@ -202,46 +199,48 @@ function ForumIndexPage() {
               }}
             />
 
-            <section aria-labelledby="forum-posts-heading" className="min-w-0 space-y-3 rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3.5 sm:p-5">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <h2 id="forum-posts-heading" className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-cyan-glow" aria-hidden="true" />
-                  Posts
-                </h2>
-                <ForumSortTabs value={sortBy} onChange={setSortBy} />
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-2">
-                <div className="relative flex-1 min-w-0">
-                  <Search className="w-3.5 h-3.5 text-ink-muted absolute left-2.5 top-1/2 -translate-y-1/2" aria-hidden="true" />
-                  <input
-                    type="search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search posts"
-                    aria-label="Search posts"
-                    className={`${FIELD} pl-8 pr-2.5 py-1.5 placeholder:text-ink-muted`}
-                  />
+            <section aria-labelledby="forum-posts-heading" className="min-w-0 space-y-3">
+              <header className="space-y-3 rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3.5 sm:p-5">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <h2 id="forum-posts-heading" className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-cyan-glow" aria-hidden="true" />
+                    Posts
+                  </h2>
+                  <ForumSortTabs value={sortBy} onChange={setSortBy} />
                 </div>
-                <label className="relative sm:w-56 shrink-0">
-                  <span className="sr-only">Filter by board</span>
-                  <LayoutGrid className="w-3.5 h-3.5 text-ink-muted absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
-                  <select
-                    value={boardFilter}
-                    onChange={(e) => setBoardFilter(e.target.value)}
-                    className={`${FIELD} pl-8 pr-2.5 py-1.5`}
-                  >
-                    <option value="ALL" className="bg-surface-2 text-ink">
-                      All boards
-                    </option>
-                    {categoriesState.map((cat) => (
-                      <option key={cat.id} value={cat.slug} className="bg-surface-2 text-ink">
-                        {cat.name}
+
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="relative flex-1 min-w-0">
+                    <Search className="w-3.5 h-3.5 text-ink-muted absolute left-2.5 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                    <input
+                      type="search"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search posts"
+                      aria-label="Search posts"
+                      className={`${FIELD} pl-8 pr-2.5 py-1.5 placeholder:text-ink-muted`}
+                    />
+                  </div>
+                  <label className="relative sm:w-56 shrink-0">
+                    <span className="sr-only">Filter by board</span>
+                    <LayoutGrid className="w-3.5 h-3.5 text-ink-muted absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+                    <select
+                      value={boardFilter}
+                      onChange={(e) => setBoardFilter(e.target.value)}
+                      className={`${FIELD} pl-8 pr-2.5 py-1.5`}
+                    >
+                      <option value="ALL" className="bg-surface-2 text-ink">
+                        All boards
                       </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
+                      {categoriesState.map((cat) => (
+                        <option key={cat.id} value={cat.slug} className="bg-surface-2 text-ink">
+                          {cat.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              </header>
 
               {loading && visibleTopics.length === 0 ? (
                 <div className="space-y-2" aria-busy="true">
@@ -278,13 +277,7 @@ function ForumIndexPage() {
           </div>
 
           <aside className="hidden min-w-0 lg:block lg:col-span-4 lg:sticky lg:top-4">
-            <DashboardPanel
-              icon={<LayoutGrid />}
-              title="Boards"
-              subtitle="Pick a board to see everything posted there."
-            >
-              <ForumBoardNav boards={categoriesState} variant="list" />
-            </DashboardPanel>
+            <ForumBoardNav boards={categoriesState} variant="list" />
           </aside>
         </div>
       </div>

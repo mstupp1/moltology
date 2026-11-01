@@ -106,13 +106,13 @@ export function ForumBoardNav({
 
   return (
     <nav aria-label="Boards" className={className} data-testid="forum-board-list">
-      <ul className="rounded-control border border-line-subtle divide-y divide-line-subtle overflow-hidden">
+      <ul className="space-y-2">
         {boards.map((board) => (
           <li key={board.id}>
             <Link
               to="/forum/$categorySlug"
               params={{ categorySlug: board.slug }}
-              className={cn('group flex items-start gap-3 px-3 py-2.5 hover:bg-surface-2 transition-colors', FOCUS, 'focus-visible:outline-offset-[-2px]')}
+              className={cn('group flex items-start gap-3 px-3 py-2.5 rounded-card border border-line-subtle bg-surface-1 hud-sheen hover:bg-surface-2 transition-colors', FOCUS, 'focus-visible:outline-offset-[-2px]')}
             >
               <span className="mt-1.5 w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: board.color }} aria-hidden="true" />
               <span className="min-w-0 flex-1">
