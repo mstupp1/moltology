@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Users, Plus, MessageSquare, ShieldCheck, Search, LayoutGrid, SearchX } from 'lucide-react'
+import { Plus, MessageSquare, ShieldCheck, Search, LayoutGrid, SearchX } from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { HudButton } from '@/components/ui/HudButton'
@@ -10,7 +10,6 @@ import { InlineTopicComposer, InlineTopicComposerHandle } from '@/components/for
 import { ForumRulesDialog } from '@/components/forum/ForumRulesDialog'
 import { DashboardPanel } from '@/components/hud/dashboard/DashboardPanel'
 import { getForumCategoriesFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
-import { COMMUNITY_RULES } from '@/lib/community-rules'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
@@ -51,11 +50,6 @@ export const Route = createFileRoute('/_hud/forum/')({
 
 const FIELD =
   'w-full min-h-8 bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-hidden rounded-control transition-colors'
-
-function sentenceCase(text: string) {
-  const lower = text.toLowerCase()
-  return lower.charAt(0).toUpperCase() + lower.slice(1)
-}
 
 function ForumIndexPage() {
   const { categories, topics } = Route.useLoaderData()
@@ -167,14 +161,7 @@ function ForumIndexPage() {
     <ForumShell>
       <div className="space-y-4 sm:space-y-5 font-sans relative pb-8">
         <HudTitlePanel
-          eyebrow={
-            <>
-              <Users className="w-3.5 h-3.5" />
-              <span>Moltology community</span>
-            </>
-          }
-          title="Forum"
-          description="Ask questions, share progress and talk with other members."
+          title="Moltology Community"
           actions={
             <>
               <HudButton
@@ -193,13 +180,15 @@ function ForumIndexPage() {
           }
         />
 
-        {/* Phones get the boards as one swipeable row above the feed; desktop keeps them in the rail. */}
-        <ForumBoardNav boards={categoriesState} variant="strip" className="lg:hidden" />
+        <DashboardPanel icon={<LayoutGrid />} title="Boards" className="lg:hidden">
+          <ForumBoardNav boards={categoriesState} variant="strip" />
+        </DashboardPanel>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
           <div className="lg:col-span-8 space-y-4 min-w-0">
             <InlineTopicComposer
               ref={composerRef}
+              showPrompt={false}
               categories={categoriesState}
               onCreated={(topic) => {
                 setTopicsState((prev) => [topic, ...prev])
@@ -213,8 +202,8 @@ function ForumIndexPage() {
               }}
             />
 
-            <section aria-labelledby="forum-posts-heading" className="space-y-3">
-              <div className="flex items-center justify-between gap-3">
+            <section aria-labelledby="forum-posts-heading" className="min-w-0 space-y-3 rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3.5 sm:p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 id="forum-posts-heading" className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-cyan-glow" aria-hidden="true" />
                   Posts
@@ -275,9 +264,6 @@ function ForumIndexPage() {
                       <MessageSquare className="w-6 h-6 text-ink-muted mx-auto" aria-hidden="true" />
                       <p className="text-sm font-bold text-ink">No posts yet</p>
                       <p className="text-xs text-ink-muted">Start the first conversation.</p>
-                      <HudButton type="button" variant="secondary" size="sm" onClick={startPost}>
-                        Start a post
-                      </HudButton>
                     </>
                   )}
                 </div>
@@ -291,30 +277,13 @@ function ForumIndexPage() {
             </section>
           </div>
 
-          <aside className="lg:col-span-4 space-y-4 lg:sticky lg:top-4">
+          <aside className="hidden min-w-0 lg:block lg:col-span-4 lg:sticky lg:top-4">
             <DashboardPanel
               icon={<LayoutGrid />}
               title="Boards"
               subtitle="Pick a board to see everything posted there."
-              className="hidden lg:flex"
             >
               <ForumBoardNav boards={categoriesState} variant="list" />
-            </DashboardPanel>
-
-            <DashboardPanel
-              icon={<ShieldCheck />}
-              title="Rules"
-              subtitle="How we keep the boards useful."
-              action={{ label: 'Read all', onClick: () => setShowRules(true) }}
-            >
-              <ol className="space-y-1.5 text-xs text-ink-body">
-                {COMMUNITY_RULES.map((rule) => (
-                  <li key={rule.id} className="flex gap-2">
-                    <span className="text-ink-muted tabular-nums">{rule.id}.</span>
-                    <span>{sentenceCase(rule.title)}</span>
-                  </li>
-                ))}
-              </ol>
             </DashboardPanel>
           </aside>
         </div>
