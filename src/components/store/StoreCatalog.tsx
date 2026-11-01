@@ -65,18 +65,21 @@ export function StoreCatalog({
 
   return (
     <div>
-      <header className="relative isolate overflow-hidden bg-surface-1 sm:flex sm:min-h-[500px] sm:items-center lg:min-h-[560px]">
-        <img
-          src={getAssetUrl('images/merch/hero/field-issue-everyday-v1.png')}
-          alt=""
-          aria-hidden="true"
-          fetchPriority="high"
-          width={1774}
-          height={887}
-          className="absolute inset-x-0 top-0 -z-20 store-hero-image h-72 w-full object-cover object-[80%_center] sm:h-full sm:object-top"
-        />
-        <div aria-hidden="true" className="absolute inset-0 -z-10 hidden bg-gradient-to-r from-abyss/95 via-abyss/40 to-transparent sm:block" />
-        <div className="relative mx-auto w-full max-w-7xl px-4 pb-8 pt-80 sm:px-6 sm:py-16 lg:px-8">
+      <header className="relative isolate flex min-h-[620px] items-end overflow-hidden bg-surface-1 sm:min-h-[500px] sm:items-center lg:min-h-[560px]">
+        <picture className="absolute inset-0 -z-20">
+          <source media="(max-width: 639px)" srcSet={getAssetUrl('images/merch/hero/field-issue-mobile-v1.png')} width={1024} height={1536} />
+          <img
+            src={getAssetUrl('images/merch/hero/field-issue-everyday-v1.png')}
+            alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            width={1774}
+            height={887}
+            className="store-hero-image h-full w-full object-cover object-top"
+          />
+        </picture>
+        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-abyss via-abyss/70 via-35% to-transparent to-65% sm:bg-gradient-to-r sm:from-abyss/95 sm:via-abyss/40 sm:via-50% sm:to-transparent sm:to-100%" />
+        <div className="relative mx-auto w-full max-w-7xl px-5 pb-7 pt-80 sm:px-6 sm:py-16 lg:px-8">
           <div className="store-hero-copy max-w-md space-y-6">
             <div>
               <p className="flex items-center gap-3 font-grotesk text-xs font-bold tracking-[0.18em] text-cyan-glow"><span aria-hidden="true" className="h-px w-8 bg-cyan-glow" />MOLTOLOGY STORE</p>
