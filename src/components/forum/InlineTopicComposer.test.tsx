@@ -64,6 +64,23 @@ describe('InlineTopicComposer', () => {
     } as any)
   })
 
+  it('opens from an external button without a redundant prompt and disappears on close', () => {
+    const ref = createRef<InlineTopicComposerHandle>()
+    render(
+      <ForumShell>
+        <button onClick={() => ref.current?.expandAndFocus()}>New post</button>
+        <InlineTopicComposer ref={ref} showPrompt={false} categories={mockCategories} onCreated={onCreated} />
+      </ForumShell>
+    )
+
+    expect(screen.queryByTestId('inline-composer-collapsed')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'New post' }))
+    expect(screen.getByLabelText(/title/i)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Close composer' }))
+    expect(screen.queryByTestId('inline-composer-expanded')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('inline-composer-collapsed')).not.toBeInTheDocument()
+  })
+
   it('renders collapsed state when authenticated', () => {
     render(
       <ForumShell>

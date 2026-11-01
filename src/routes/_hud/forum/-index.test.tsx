@@ -60,12 +60,14 @@ describe('ForumIndexPage (/_hud/forum/)', () => {
 
     render(<ForumIndexPage />)
 
-    expect(screen.getByRole('heading', { level: 1, name: /forum/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Moltology Community/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2, name: /posts/i })).toBeInTheDocument()
     const boardList = screen.getByTestId('forum-board-list')
     expect(boardList).toHaveTextContent('Rules & Directives')
     expect(boardList).toHaveTextContent('General Discussion')
     expect(screen.getByRole('button', { name: /new post/i })).toBeInTheDocument()
+    expect(screen.queryByTestId('inline-composer-guest')).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Rules' })).not.toBeInTheDocument()
     expect(screen.queryByTestId('forum-unread-mark')).not.toBeInTheDocument()
     expect(boardList.textContent?.match(/1 post(?!s)/g)).toHaveLength(3)
     expect(boardList.textContent?.match(/0 posts/g)).toHaveLength(3)

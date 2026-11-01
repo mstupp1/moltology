@@ -22,6 +22,8 @@ export interface InlineTopicComposerProps {
   initialCategoryId?: string
   fixedCategory?: boolean
   onCreated: (topic: ForumTopicEntry) => void
+  /** Hide the idle prompt when an external New post button opens the composer. */
+  showPrompt?: boolean
   placeholder?: string
   className?: string
 }
@@ -35,6 +37,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
       onCreated,
       placeholder,
       className = '',
+      showPrompt = true,
     },
     ref
   ) {
@@ -139,6 +142,8 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
         setCreating(false)
       }
     }
+
+    if (!showPrompt && !isExpanded) return null
 
     if (isPending) {
       return (
