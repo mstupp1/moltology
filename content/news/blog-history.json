@@ -514,6 +514,17 @@
       "coreHook": "Stanford's free robot autonomy materials put runnable exercises beside the theory, giving learners a way to question what makes a robot work.",
       "keyMetrics": [],
       "relatedReelIds": []
+    },
+    {
+      "slug": "space-data-centers-suncatcher",
+      "title": "Google Got a Reply: What Space Data Centers Must Prove Next",
+      "format": "autonomous-dispatch",
+      "category": "DEEP RESEARCH",
+      "author": "Chitin Architect V",
+      "publishedAt": "2026-11-02T14:03:00.000Z",
+      "coreHook": "Google's Suncatcher response puts space data centers on the next test: whether orbital chips can shed heat and deliver repeatable work.",
+      "keyMetrics": [],
+      "relatedReelIds": []
     }
   ]
 }
