@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
 import { render, screen, fireEvent, act } from '@testing-library/react'
+import { ToastProvider, useToast } from '@/components/ui/ToastProvider'
 import { HUDTaskBar } from './HUDTaskBar'
 import { CANONICAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
 import { OPEN_ALIGNMENT_PANEL_EVENT } from '@/lib/alignment-panel'
@@ -140,7 +141,7 @@ describe('HUDTaskBar', () => {
     fireEvent.click(screen.getByRole('button', { name: /Silent Synchronization/ }))
     expect(onComplete).toHaveBeenCalledWith('silent-synchronization')
 
-    fireEvent.click(screen.getByRole('tab', { name: /Alerts/ }))
+    fireEvent.click(screen.getByRole('tab', { name: /Notifications/ }))
     expect(screen.getByText('Nothing new')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('tab', { name: /Tasks/ }))
@@ -162,11 +163,27 @@ describe('HUDTaskBar', () => {
     expect(screen.queryByRole('switch', { name: /Reminders/ })).not.toBeInTheDocument()
   })
 
+  it('keeps action feedback in the floating toast without adding inbox entries or badges', () => {
+    function ToastTrigger() {
+      const { toast } = useToast()
+      return <button onClick={() => toast.success('Profile saved.')}>Save profile</button>
+    }
+    render(<ToastProvider><ToastTrigger /><HUDTaskBar variant="header" /></ToastProvider>)
+    fireEvent.click(screen.getByRole('button', { name: 'Save profile' }))
+    expect(screen.getByText('Profile saved.')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Notifications' }))
+    expect(screen.getByText('Nothing new')).toBeInTheDocument()
+    expect(screen.getByRole('tabpanel', { name: 'Notifications' })).not.toHaveTextContent('Profile saved.')
+    expect(screen.queryByText('This session')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument()
+  })
+
   it('marks the header tile with the unread count', () => {
     mockUnreadCount = 2
     render(<HUDTaskBar variant="header" />)
 
-    expect(screen.getByLabelText('2 new alerts')).toHaveTextContent('2')
+    expect(screen.getByLabelText('2 new notifications')).toHaveTextContent('2')
   })
 
   it('renders bottom-anchored modal sheet on mobile viewport (< 640px)', () => {
@@ -181,7 +198,7 @@ describe('HUDTaskBar', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
 
     // Modal dialog rendered with bottom-anchored modal sheet
-    const dialog = screen.getByRole('dialog', { name: "Today's tasks and alerts" })
+    const dialog = screen.getByRole('dialog', { name: "Today's tasks and notifications" })
     expect(dialog).toBeInTheDocument()
     expect(dialog.className).toContain('rounded-t-3xl')
     expect(screen.getByLabelText('Drag handle to close')).toBeInTheDocument()
@@ -194,7 +211,7 @@ describe('HUDTaskBar', () => {
     })
   })
 
-  it('keeps the phone sheet open while switching between Tasks and Alerts', () => {
+  it('keeps the phone sheet open while switching between Tasks and Notifications', () => {
     act(() => {
       window.innerWidth = 390
       window.dispatchEvent(new Event('resize'))
@@ -203,9 +220,9 @@ describe('HUDTaskBar', () => {
     render(<HUDTaskBar variant="header" />)
     fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
 
-    const alertsTab = screen.getByRole('tab', { name: /Alerts/ })
-    fireEvent.mouseDown(alertsTab)
-    fireEvent.click(alertsTab)
+    const notificationsTab = screen.getByRole('tab', { name: /Notifications/ })
+    fireEvent.mouseDown(notificationsTab)
+    fireEvent.click(notificationsTab)
     expect(screen.getByText('Nothing new')).toBeInTheDocument()
 
     const tasksTab = screen.getByRole('tab', { name: /Tasks/ })
@@ -224,7 +241,7 @@ describe('HUDTaskBar', () => {
     render(<HUDTaskBar variant="header" />)
     fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
 
-    fireEvent.mouseDown(screen.getByRole('tab', { name: /Alerts/ }))
+    fireEvent.mouseDown(screen.getByRole('tab', { name: /Notifications/ }))
     expect(screen.getByTestId('alignment-panel')).toBeInTheDocument()
 
     fireEvent.mouseDown(document.body)
@@ -290,7 +307,7 @@ describe('HUDTaskBar', () => {
 
     render(<HUDTaskBar variant="header" />)
     fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
-    fireEvent.click(screen.getByRole('tab', { name: /Alerts/ }))
+    fireEvent.click(screen.getByRole('tab', { name: /Notifications/ }))
 
     expect(screen.getByText('Recent')).toBeInTheDocument()
     expect(screen.getByText('You were hailed')).toBeInTheDocument()

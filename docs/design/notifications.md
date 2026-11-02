@@ -10,5 +10,5 @@ One toast system, one persistent notification system, one OS bridge. Never `aler
 - **Defaults**: 5s duration, no title unless it adds meaning. Pass `id:` for dedupe on repeatable actions. Extend duration only for scheduled reminders (8s max).
 - **Persistent notifications**: `NotificationsProvider` ([`src/hooks/useNotifications.tsx`](../../src/hooks/useNotifications.tsx)) + the `notifications` table — never for ephemeral feedback.
 - **OS notifications**: only via [`src/lib/system-notifications.ts`](../../src/lib/system-notifications.ts).
-- **HUD telemetry**: read toast history from provider context (`HUDTaskBar` pattern); do not keep parallel toast logs.
+- **Notification inbox**: Show persistent notifications only. Toasts are temporary feedback; do not copy them into the inbox, keep a toast history, or count them toward notification badges.
 - **Copy**: plain English that says what happened. Follow [STYLE_GUIDE §3.4](../../STYLE_GUIDE.md#34-utility-copy-buttons-toasts-errors-forms-empty-states).
