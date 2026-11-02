@@ -89,3 +89,13 @@ hex colour class (`bg-[#…]`, `text-[#…]`, `border-[#…]` …), a `chamfer-c
 off the scale above (`rounded-lg`, `rounded-[28px]` …). Older hits are recorded per file in
 `scripts/ui-token-baseline.json` and may only go down. After cleaning a file up, run
 `npm run ui:check -- --update` to lock in the lower count.
+
+## Horizontal scrolling
+
+Use `HorizontalScroll` from `src/components/ui/HorizontalScroll.tsx` for sideways card,
+filter and tab rows, keeping the layout's `overflow-x-auto` and responsive wrap/grid
+classes. It preserves native touch and keyboard scrolling, hides the scrollbar, and
+fades only edges with more content beyond them. Fades update on scroll, resize and
+content changes, and disappear when the row fits. Use `as="nav"` or `as="ul"` to keep
+the row's semantics; existing refs and scroll-to-selection behavior are supported.
+Horizontal overflow utilities also hide scrollbars for tables and code blocks.

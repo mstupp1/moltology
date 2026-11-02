@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { useMemo, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, Award, BookOpen, Check, Clock, GraduationCap, Layers, Route as RouteIcon, Search, X } from 'lucide-react'
@@ -348,23 +349,23 @@ export function AcademyHome({ data }: { data: AcademyHomePayload }) {
                     </button>
                   ) : null}
                 </label>
-                <div className="flex gap-1 overflow-x-auto -mx-1 px-1 pb-0.5" role="group" aria-label="Level">
+                <HorizontalScroll className="flex gap-1 overflow-x-auto -mx-1 px-1 pb-0.5" role="group" aria-label="Level">
                   <FilterChip active={level === 'all'} onClick={() => setLevel('all')}>All levels</FilterChip>
                   {ACADEMY_LEVELS.map((item) => (
                     <FilterChip key={item} active={level === item} onClick={() => setLevel(item)}>
                       {levelLabel(item)}
                     </FilterChip>
                   ))}
-                </div>
+                </HorizontalScroll>
                 {data.categories.length > 1 ? (
-                  <div className="flex gap-1 overflow-x-auto -mx-1 px-1 pb-0.5" role="group" aria-label="Subject">
+                  <HorizontalScroll className="flex gap-1 overflow-x-auto -mx-1 px-1 pb-0.5" role="group" aria-label="Subject">
                     <FilterChip active={category === 'all'} onClick={() => setCategory('all')}>All subjects</FilterChip>
                     {data.categories.map((item) => (
                       <FilterChip key={item} active={category === item} onClick={() => setCategory(item)}>
                         {item}
                       </FilterChip>
                     ))}
-                  </div>
+                  </HorizontalScroll>
                 ) : null}
               </div>
             ) : null}

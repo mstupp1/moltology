@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 /**
  * ============================================================================
  * MOLTOLOGY.ORG - OFFICIAL ORGANIZATION PAGE
@@ -423,7 +424,7 @@ export const OrgPage: React.FC = () => {
                 <p className={sectionLede}>Our building sits on the floor of the Mariana Trench. Here is a look around.</p>
               </ScrollReveal>
 
-              <div className="mt-8 flex gap-1 overflow-x-auto touch-pan-scroll no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0" aria-label="Rooms">
+              <HorizontalScroll className="mt-8 flex gap-1 overflow-x-auto touch-pan-scroll no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0" aria-label="Rooms">
                 {places.map((item, index) => (
                   <button
                     key={item.id}
@@ -435,7 +436,7 @@ export const OrgPage: React.FC = () => {
                     {item.title}
                   </button>
                 ))}
-              </div>
+              </HorizontalScroll>
 
               <div className={`${card} mt-4 overflow-hidden grid lg:grid-cols-12`}>
                 <div className="lg:col-span-7 relative aspect-[16/10] lg:aspect-auto lg:min-h-[380px] bg-surface-2 overflow-hidden">

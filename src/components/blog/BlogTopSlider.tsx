@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { getAssetUrl } from '@/lib/assets'
 import { BrandAwareImage } from '@/components/ui/BrandMark'
@@ -234,7 +235,7 @@ export function BlogTopSlider({
         {/* Footer Navigation & Controls */}
         <div className="relative z-10 pt-4 border-t border-line-subtle flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Interactive Slide Thumbnail Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto max-w-full pb-1 sm:pb-0 scrollbar-none">
+          <HorizontalScroll className="flex items-center gap-2 overflow-x-auto max-w-full pb-1 sm:pb-0 scrollbar-none">
             {featuredPosts.map((post, idx) => (
               <button
                 key={post.slug}
@@ -249,7 +250,7 @@ export function BlogTopSlider({
                 <span className="truncate max-w-[120px] sm:max-w-[160px]">{formatNewsTitle(post.title).headline}</span>
               </button>
             ))}
-          </div>
+          </HorizontalScroll>
 
           {/* Navigation Arrows & Dot Indicators */}
           <div className="flex items-center gap-4 shrink-0">

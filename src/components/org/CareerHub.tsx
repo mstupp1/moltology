@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 /**
  * ============================================================================
  * MOLTOLOGY CAREERS
@@ -273,7 +274,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onApply }) => {
         <h3 id="careers-roles-title" className="font-grotesk font-bold text-xl text-ink">
           Open roles <span className="text-ink-muted font-medium">({jobs.length})</span>
         </h3>
-        <div className="mt-4 flex gap-1 overflow-x-auto touch-pan-scroll no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0" aria-label="Filter by team">
+        <HorizontalScroll className="mt-4 flex gap-1 overflow-x-auto touch-pan-scroll no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0" aria-label="Filter by team">
           {filters.map((filter) => (
             <button
               key={filter.id}
@@ -289,7 +290,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onApply }) => {
               {filter.label}
             </button>
           ))}
-        </div>
+        </HorizontalScroll>
         <div className="mt-5 space-y-3">
           {jobs.map((job) => (
             <JobCard key={job.id} job={job} onApply={onApply} />

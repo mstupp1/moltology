@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { MessageSquare, Pin } from 'lucide-react'
@@ -188,7 +189,7 @@ export function ForumHubCard() {
       <HudGhostWidget isLoading={isLoading} skeleton={<ForumHubListGhost />}>
         <div className="space-y-3">
           {boards.length > 0 && (
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5" data-testid="forum-hub-boards">
+            <HorizontalScroll className="flex items-center gap-1.5 overflow-x-auto pb-0.5" data-testid="forum-hub-boards">
               {boards.map((board) => (
                 <Link
                   key={board.id}
@@ -207,7 +208,7 @@ export function ForumHubCard() {
                   )}
                 </Link>
               ))}
-            </div>
+            </HorizontalScroll>
           )}
 
           {threads.length === 0 ? (

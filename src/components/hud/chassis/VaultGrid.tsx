@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import type { CatalogRef, GearItemState } from '@/lib/chassis-loadout'
@@ -98,7 +99,7 @@ export const VaultGrid: React.FC<VaultGridProps> = ({
   )
 
   return (
-    <div className="w-full min-w-0 overflow-x-auto overflow-y-hidden">
+    <HorizontalScroll className="w-full min-w-0 overflow-x-auto overflow-y-hidden">
       <div className="flex gap-1.5 sm:gap-2 w-max min-w-full py-0.5">
         {Array.from({ length: vaultSize }, (_, index) => {
           const item = byIndex.get(index)
@@ -122,6 +123,6 @@ export const VaultGrid: React.FC<VaultGridProps> = ({
           )
         })}
       </div>
-    </div>
+    </HorizontalScroll>
   )
 }

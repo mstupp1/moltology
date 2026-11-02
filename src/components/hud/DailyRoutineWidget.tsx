@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { Calendar, Check } from 'lucide-react'
 import { DashboardPanel } from '@/components/hud/dashboard/DashboardPanel'
@@ -259,7 +260,7 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
       metaTestId="alignment-heatmap-weeks"
       className="text-xs overflow-hidden"
     >
-      <div
+      <HorizontalScroll
         ref={scrollRef}
         className="overflow-x-auto overscroll-x-contain relative min-w-0 max-w-full"
         style={{ WebkitOverflowScrolling: 'touch' }}
@@ -338,7 +339,7 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
             </div>
           )}
         </div>
-      </div>
+      </HorizontalScroll>
 
       <div className="flex items-center justify-end gap-1.5">
         <span className="text-[11px] text-ink-muted mr-0.5">Less</span>

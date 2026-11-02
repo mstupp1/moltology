@@ -58,12 +58,38 @@
   -webkit-overflow-scrolling: touch;
 }
 
-.no-scrollbar::-webkit-scrollbar {
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar,
+*::-webkit-scrollbar:horizontal,
+.horizontal-scroll::-webkit-scrollbar {
   display: none;
 }
-.no-scrollbar {
+.no-scrollbar,
+.scrollbar-none,
+.overflow-x-auto,
+.overflow-x-scroll,
+.horizontal-scroll,
+.wim-marquee-mask > div,
+.forum-editor-codeblock {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Mask the content itself so fades blend with every surface and never intercept input. */
+.horizontal-scroll {
+  --scroll-fade-left: 0px;
+  --scroll-fade-right: 0px;
+}
+.horizontal-scroll[data-fade-left="true"],
+.horizontal-scroll[data-fade-right="true"] {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--scroll-fade-left), #000 calc(100% - var(--scroll-fade-right)), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 var(--scroll-fade-left), #000 calc(100% - var(--scroll-fade-right)), transparent);
+}
+.horizontal-scroll[data-fade-left="true"] { --scroll-fade-left: 24px; }
+.horizontal-scroll[data-fade-right="true"] { --scroll-fade-right: 24px; }
+@media (forced-colors: active) {
+  .horizontal-scroll[data-fade-left="true"],
+  .horizontal-scroll[data-fade-right="true"] { -webkit-mask-image: none; mask-image: none; }
 }
 
 .pb-safe {
@@ -415,15 +441,6 @@
     .home-hero .home-hero-title { font-size: min(clamp(4rem, 5.6vw, 6rem), 100cqi / 7.2); }
   }
 }
-/* The phone tab row scrolls sideways without a scrollbar and fades at its edges. */
-.home-preview-tabs {
-  scrollbar-width: none;
-  mask-image: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent);
-}
-.home-preview-tabs::-webkit-scrollbar { display: none; }
-@media (min-width: 640px) {
-  .home-preview-tabs { mask-image: none; }
-}
 .home-hero-sea {
   --sea-top: 84%;
   position: absolute;
@@ -629,8 +646,6 @@
   border: 1px solid rgba(160, 225, 245, 0.5);
   background: radial-gradient(circle at 35% 30%, rgba(220, 245, 255, 0.35), transparent 60%);
 }
-.home-voices-row { scrollbar-width: none; }
-.home-voices-row::-webkit-scrollbar { display: none; }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .home-voices-bubble {

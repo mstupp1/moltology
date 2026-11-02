@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
 import { usePublicHeaderChrome } from '@/components/public-header-chrome'
@@ -62,7 +63,7 @@ export const WhatIsMoltologySubnav: React.FC = () => {
         style={{ transform: `translateY(${offset}px)` }}
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ul ref={listRef} className="flex gap-1.5 overflow-x-auto py-2 px-1 -mx-1 scrollbar-none">
+          <HorizontalScroll as="ul" ref={listRef} className="flex gap-1.5 overflow-x-auto py-2 px-1 -mx-1 scrollbar-none">
             {WHAT_IS_MOLTOLOGY_NAV.map((item) => {
               const active = item.id === activeId
               return (
@@ -81,7 +82,7 @@ export const WhatIsMoltologySubnav: React.FC = () => {
                 </li>
               )
             })}
-          </ul>
+          </HorizontalScroll>
         </div>
       </nav>
     </>

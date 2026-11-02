@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { STAGE_PIPELINE_DATA } from '@/lib/codexData'
@@ -31,7 +32,7 @@ export function StageStrata({ currentIndex, selectedStage, onSelectStage }: Stag
   }, [selectedStage])
 
   return (
-    <nav ref={rowRef} aria-label="Stages" className="flex gap-2 overflow-x-auto p-1 sm:gap-3">
+    <HorizontalScroll as="nav" ref={rowRef} aria-label="Stages" className="flex gap-2 overflow-x-auto p-1 sm:gap-3">
       {STAGE_PIPELINE_DATA.map((stage) => {
         const accent = stageAccent(stage.stageNum)
         const current = stage.stageNum === currentStage
@@ -92,6 +93,6 @@ export function StageStrata({ currentIndex, selectedStage, onSelectStage }: Stag
           </button>
         )
       })}
-    </nav>
+    </HorizontalScroll>
   )
 }
