@@ -105,7 +105,7 @@ describe('HUDErrorBoundary & HUDErrorFallback', () => {
       />
     )
 
-    expect(screen.getByText('Loading the latest version')).toBeInTheDocument()
+    expect(screen.getByText('Loading the latest version…')).toBeInTheDocument()
     expect(screen.queryByText('Application Error')).not.toBeInTheDocument()
     await waitFor(() => expect(reload).toHaveBeenCalledTimes(1))
 
