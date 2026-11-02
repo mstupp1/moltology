@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom'
 import { Clock, Calendar, RefreshCw, Sparkles, CheckCircle2, ChevronDown, ChevronUp, CheckSquare, Square, Award, Bell, Check, X, ListTodo } from 'lucide-react'
 import { HudCard, HudBadge, HudBottomSheet } from '@/components/ui'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
-import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useNotifications } from '@/hooks/useNotifications'
 import { Link } from '@tanstack/react-router'
 import { OPEN_ALIGNMENT_PANEL_EVENT, isAlignmentPanelHostVisible } from '@/lib/alignment-panel'
@@ -58,11 +57,6 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null)
   const headerIslandRef = useRef<HTMLDivElement>(null)
 
-  // ToastProvider context for notification telemetry (optional-safe)
-  const toastCtx = useOptionalToast()
-  const toastHistoryList: any[] = toastCtx?.toastHistory || toastCtx?.toasts || []
-  const clearToastsFn = toastCtx?.clearToasts ?? (() => {})
-
   const {
     notifications: dbNotifications,
     unreadCount: notificationUnread,
@@ -74,7 +68,6 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
 
   const actionableNotifications = dbNotifications.filter((n) => n.actionable)
   const recentNotifications = dbNotifications.filter((n) => !n.actionable)
-  const alertsBadgeCount = notificationUnread + toastHistoryList.length
 
   // Use propTasks if passed (e.g. in tests/custom usage), otherwise use global alignment tasks
   const [localPropTasks, setLocalPropTasks] = useState<AlignmentTask[] | null>(propTasks || null)
@@ -260,8 +253,8 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   const liturgyCountText = `${completedCount}/${localTasks.length}`
   const progressPct = Math.round((completedCount / Math.max(localTasks.length, 1)) * 100)
   const nextTaskId = allTasksCompleted ? undefined : nextTask?.id
-  const alertsCount = notificationUnread + toastHistoryList.length
-  const hasAnyAlerts = dbNotifications.length > 0 || toastHistoryList.length > 0
+  const notificationsCount = notificationUnread
+  const hasAnyNotifications = dbNotifications.length > 0
   const todayLabel = mounted
     ? time.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
     : ''
@@ -332,10 +325,10 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
         )}
         {renderTab(
           'transmissions',
-          'Alerts',
-          alertsCount > 0 ? (
+          'Notifications',
+          notificationsCount > 0 ? (
             <span className="min-w-5 px-1 rounded-chip bg-crimson-soft text-crimson-text text-[11px] tabular-nums">
-              {alertsCount}
+              {notificationsCount}
             </span>
           ) : null,
           Bell,
@@ -408,8 +401,8 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
       )}
 
       {activeTab === 'transmissions' && (
-        <div role="tabpanel" aria-label="Alerts" className="space-y-3">
-          {(notificationUnread > 0 || toastHistoryList.length > 0) && (
+        <div role="tabpanel" aria-label="Notifications" className="space-y-3">
+          {notificationUnread > 0 && (
             <div className="flex items-center justify-end gap-3 text-[11px]">
               {notificationUnread > 0 && (
                 <button
@@ -423,23 +416,14 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                   Mark all read
                 </button>
               )}
-              {toastHistoryList.length > 0 && (
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); clearToastsFn(); }}
-                  className={`min-h-8 px-1 rounded-control font-bold text-ink-muted hover:text-ink transition-colors ${focusRing}`}
-                >
-                  Clear
-                </button>
-              )}
             </div>
           )}
 
-          {!hasAnyAlerts && (
+          {!hasAnyNotifications && (
             <div className="py-6 text-center space-y-1">
               <Bell className="w-5 h-5 text-ink-muted mx-auto" aria-hidden="true" />
               <div className="text-sm font-bold text-ink">Nothing new</div>
-              <div className="text-xs text-ink-muted">Alerts from this visit show up here.</div>
+              <div className="text-xs text-ink-muted">Friend requests, replies, and mentions show up here.</div>
             </div>
           )}
 
@@ -563,18 +547,6 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             </section>
           )}
 
-          {toastHistoryList.length > 0 && (
-            <section className="space-y-1.5">
-              <h3 className={sectionLabel}>This session</h3>
-              <ul className={`${listFrame} max-h-60 overflow-y-auto`}>
-                {toastHistoryList.map((t) => (
-                  <li key={t.id} className="px-3 py-2.5">
-                    {renderAlertRow(t.id, t.title, t.message, false)}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
         </div>
       )}
     </>
@@ -597,7 +569,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
               ? 'bg-surface-3 shadow-nav-current border-transparent text-ink'
               : 'bg-surface-1 border-line hover:bg-surface-2 hover:border-line-strong text-ink'
           }`}
-          title="Today's tasks and alerts"
+          title="Today's tasks and notifications"
           aria-label="Daily alignment tasks schedule"
           aria-expanded={isScheduleOpen}
           aria-haspopup="dialog"
@@ -632,7 +604,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           {notificationUnread > 0 && (
             <span
               className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-chip bg-crimson-aggro text-abyss text-[11px] font-bold leading-[18px] text-center tabular-nums"
-              aria-label={`${notificationUnread} new alerts`}
+              aria-label={`${notificationUnread} new notifications`}
             >
               {notificationUnread}
             </span>
@@ -655,7 +627,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           <HudBottomSheet
             isOpen={isScheduleOpen && isMobileScreen}
             onClose={() => setIsScheduleOpen(false)}
-            title="Today's tasks and alerts"
+            title="Today's tasks and notifications"
             className="p-4 space-y-3"
           >
             <div data-testid="alignment-panel" className="space-y-3">

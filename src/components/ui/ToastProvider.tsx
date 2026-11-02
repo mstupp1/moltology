@@ -21,7 +21,6 @@ export interface ToastOptions {
 
 export interface ToastContextType {
   toasts: ToastItem[]
-  toastHistory: ToastItem[]
   addToast: (message: string, options?: ToastOptions) => string
   removeToast: (id: string) => void
   clearToasts: () => void
@@ -52,7 +51,6 @@ const DEFAULT_DURATION = 5000
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([])
-  const [toastHistory, setToastHistory] = useState<ToastItem[]>([])
   const recentToastsRef = React.useRef<Map<string, number>>(new Map())
 
   const removeToast = useCallback((id: string) => {
@@ -61,7 +59,6 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const clearToasts = useCallback(() => {
     setToasts([])
-    setToastHistory([])
     recentToastsRef.current.clear()
   }, [])
 
@@ -109,8 +106,6 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         return [newToast, ...prev].slice(0, 5) // Max 5 active floating toasts
       })
 
-      setToastHistory((prev) => [newToast, ...prev.filter((t) => t.id !== id)].slice(0, 15)) // Max 15 in history
-
       if (duration > 0) {
         setTimeout(() => {
           removeToast(id)
@@ -154,7 +149,6 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     <ToastContext.Provider
       value={{
         toasts,
-        toastHistory,
         addToast,
         removeToast,
         clearToasts,
