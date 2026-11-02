@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowLeft, History, Map as MapIcon, RefreshCw, Search, TriangleAlert, Workflow, X } from 'lucide-react'
@@ -306,7 +307,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
         </div>
 
         {atlas ? (
-          <div className="no-scrollbar flex gap-1.5 overflow-x-auto sm:flex-wrap sm:overflow-visible" aria-label="Filter by domain">
+          <HorizontalScroll className="no-scrollbar flex gap-1.5 overflow-x-auto sm:flex-wrap sm:overflow-visible" aria-label="Filter by domain">
             {atlas.domains.map((domain) => (
               <DomainChip
                 key={domain.id}
@@ -319,7 +320,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
                 }
               />
             ))}
-          </div>
+          </HorizontalScroll>
         ) : null}
 
         {atlas && tab === 'map' ? (

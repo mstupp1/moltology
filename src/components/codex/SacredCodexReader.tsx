@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { useEffect, useRef, useState } from 'react'
 import { List, Maximize2, Printer, RefreshCw, Scroll } from 'lucide-react'
 import { CANONICAL_SCRIPTURES, CODEX_VOLUMES } from '@/lib/codexData'
@@ -261,7 +262,7 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
 
       {titlePanel}
 
-      <div
+      <HorizontalScroll
         role="group"
         aria-label="Volumes"
         className="no-print -mt-1 flex gap-1 overflow-x-auto no-scrollbar border-b border-line-subtle pb-2"
@@ -282,7 +283,7 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
             </button>
           )
         })}
-      </div>
+      </HorizontalScroll>
 
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
         <aside

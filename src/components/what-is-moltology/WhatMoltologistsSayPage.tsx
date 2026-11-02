@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { useMemo, useState } from 'react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import {
@@ -85,7 +86,7 @@ export const WhatMoltologistsSayPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="mt-6 -mx-5 px-5 sm:mx-0 sm:px-0 flex gap-2 overflow-x-auto no-scrollbar" role="group" aria-label="Filter voices by stage">
+          <HorizontalScroll className="mt-6 -mx-5 px-5 sm:mx-0 sm:px-0 flex gap-2 overflow-x-auto no-scrollbar" role="group" aria-label="Filter voices by stage">
             {FILTERS.map((option) => {
               const active = filter === option.id
               const accent = option.id === 'all' ? '#dfe3e3' : VOICE_STAGE_ACCENTS[option.id]
@@ -104,7 +105,7 @@ export const WhatMoltologistsSayPage: React.FC = () => {
                 </button>
               )
             })}
-          </div>
+          </HorizontalScroll>
 
           <div className="mt-10 columns-1 md:columns-2 lg:columns-3 gap-5 [column-fill:_balance]">
             {visible.map((voice) => (

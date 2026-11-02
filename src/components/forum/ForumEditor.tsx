@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { EditorContent, useEditor, useEditorState, type Editor, type JSONContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
@@ -358,7 +359,7 @@ export const ForumEditor = forwardRef<ForumEditorHandle, ForumEditorProps>(funct
       } ${disabled ? 'opacity-60' : ''} ${className}`}
       data-testid={testId}
     >
-      <div
+      <HorizontalScroll
         role="toolbar"
         aria-label="Formatting"
         className="flex items-center gap-0.5 px-1.5 py-1 border-b border-line-subtle overflow-x-auto no-scrollbar"
@@ -387,7 +388,7 @@ export const ForumEditor = forwardRef<ForumEditorHandle, ForumEditorProps>(funct
             </React.Fragment>
           )
         })}
-      </div>
+      </HorizontalScroll>
 
       {linkOpen && (
         <div className="px-2 py-2 border-b border-line-subtle space-y-1.5" data-testid="forum-link-panel">

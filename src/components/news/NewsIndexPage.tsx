@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useLoaderData } from '@tanstack/react-router'
 import { Search, Rss, ArrowRight } from 'lucide-react'
@@ -103,9 +104,9 @@ export function NewsIndexPage() {
       {/* Section bar */}
       <div className="w-full border-y border-line-subtle bg-[#05080a]/95 backdrop-blur relative z-20">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-8 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 py-2">
-          <nav
+          <HorizontalScroll as="nav"
             aria-label="News sections"
-            className="flex items-center gap-5 overflow-x-auto touch-pan-scroll no-scrollbar flex-1 min-w-0 -mb-px pr-6 [mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)]"
+            className="flex items-center gap-5 overflow-x-auto touch-pan-scroll no-scrollbar flex-1 min-w-0 -mb-px pr-6"
           >
             {[ALL, ...categories].map((cat) => {
               const active = selectedCategory === cat
@@ -125,7 +126,7 @@ export function NewsIndexPage() {
                 </button>
               )
             })}
-          </nav>
+          </HorizontalScroll>
           <div className="relative w-full md:w-64 shrink-0">
             <Search className="w-4 h-4 text-ink-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <label htmlFor="news-search" className="sr-only">

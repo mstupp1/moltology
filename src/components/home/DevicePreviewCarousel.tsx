@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { Maximize2, Pause, Play } from 'lucide-react'
 import { getAssetUrl } from '@/lib/assets'
@@ -125,7 +126,7 @@ export function DevicePreviewCarousel() {
       onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false) }}>
       {/* On phones the tabs are one row that scrolls sideways, with the pause control pinned beside it. */}
       <div className="relative z-20 mb-4 -mx-4 sm:mx-0 flex items-center justify-center gap-1">
-        <div ref={tabRowRef} className="home-preview-tabs relative flex min-w-0 items-center gap-1 overflow-x-auto px-4 sm:px-0 sm:overflow-visible sm:flex-wrap sm:justify-center">
+        <HorizontalScroll ref={tabRowRef} className="home-preview-tabs relative flex min-w-0 items-center gap-1 overflow-x-auto px-4 sm:px-0 sm:overflow-visible sm:flex-wrap sm:justify-center">
         {DEVICE_PREVIEW_LIBRARY.map((shot, index) => (
           <button key={shot.id} type="button" aria-label={`Show ${shot.label} screenshot`} aria-pressed={active === index}
             disabled={failed.has(index)}
@@ -134,7 +135,7 @@ export function DevicePreviewCarousel() {
             {shot.label}
           </button>
         ))}
-        </div>
+        </HorizontalScroll>
         {!reducedMotion && <button type="button" onClick={() => setPaused(!paused)}
           aria-label={paused ? 'Play screenshot rotation' : 'Pause screenshot rotation'}
           className="shrink-0 mr-4 sm:mr-0 rounded-control p-2 text-ink-muted hover:text-ink-heading focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow">

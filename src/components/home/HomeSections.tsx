@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { Suspense, useRef, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, BookOpen, Maximize2, Pin, Plus } from 'lucide-react'
@@ -470,7 +471,7 @@ export const HomeVoices: React.FC = () => (
         </h2>
       </ScrollReveal>
 
-      <ul
+      <HorizontalScroll as="ul"
         className="home-voices-row mt-6 sm:mt-10 -mx-5 px-5 pt-4 pb-2 scroll-px-5 flex gap-4 overflow-x-auto snap-x snap-mandatory md:mx-0 md:px-0 md:pb-0 md:grid md:grid-cols-12 md:gap-6 md:overflow-visible"
         aria-label="Member posts"
       >
@@ -486,7 +487,7 @@ export const HomeVoices: React.FC = () => (
             </div>
           </li>
         ))}
-      </ul>
+      </HorizontalScroll>
 
       <ScrollReveal>
         <Link to="/what-is-moltology/what-moltologists-say" className={`mt-10 sm:mt-12 text-[#00ffcc] ${textLink}`}>

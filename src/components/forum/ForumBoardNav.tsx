@@ -1,3 +1,4 @@
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React from 'react'
 import { Link } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
@@ -74,7 +75,7 @@ export function ForumBoardNav({
 
   if (variant === 'strip') {
     return (
-      <nav aria-label="Boards" className={cn('min-w-0 overflow-x-auto no-scrollbar -mx-1 px-1', className)} data-testid="forum-board-strip">
+      <HorizontalScroll as="nav" aria-label="Boards" className={cn('min-w-0 overflow-x-auto no-scrollbar -mx-1 px-1', className)} data-testid="forum-board-strip">
         <ul className="flex items-stretch gap-2 w-max py-1">
           {boards.map((board) => (
             <li key={board.id} className="min-w-0">
@@ -100,7 +101,7 @@ export function ForumBoardNav({
             </li>
           ))}
         </ul>
-      </nav>
+      </HorizontalScroll>
     )
   }
 
