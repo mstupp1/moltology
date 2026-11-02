@@ -125,3 +125,45 @@ describe('equipped character contract', () => {
     ).toEqual({})
   })
 })
+
+describe('species fitting and claw integration', () => {
+  const render = (race: 'lobster' | 'crab', mouth: 'smile' | 'beam' = 'smile') => {
+    const svg = generateLobsterAvatarSvg({
+      style: 'critters', seed: 'fitted', race, mouth, headShape: 'bean', pose: 'rest',
+      equipment: {
+        carapace: { visualKey: 'hydrostatic-seal-plate', rarity: 'common' },
+        antennae: { visualKey: 'benthic-radar-array', rarity: 'common' },
+        'claws-1': { visualKey: 'silt-maul', rarity: 'common' },
+        'claws-2': { visualKey: 'creator-slim', rarity: 'common' },
+      },
+    }, 512)!
+    return new DOMParser().parseFromString(svg, 'image/svg+xml')
+  }
+  it('fits broad crab armor independently of mouth expression', () => {
+    const smile = render('crab'), beam = render('crab', 'beam')
+    const selector = '[data-equipment="hydrostatic-seal-plate"]'
+    const geometry = (doc: Document) => [...doc.querySelectorAll(`${selector} path`)].map(p => p.getAttribute('d'))
+    expect(geometry(smile)).toEqual(geometry(beam))
+    expect(smile.querySelector(selector)?.parentElement?.getAttribute('transform')).toBe(beam.querySelector(selector)?.parentElement?.getAttribute('transform'))
+    expect(smile.querySelector('[data-armor-fit="crab"]')).not.toBeNull()
+    expect(render('lobster').querySelector('[data-armor-fit="crab"]')).toBeNull()
+    for (const eye of smile.querySelectorAll('[data-eye-orbit]')) {
+      expect(Number(eye.getAttribute('cy'))).toBeGreaterThan(60)
+    }
+  })
+  it('replaces native gauntlets and paints a gripping dactyl in front of weapons', () => {
+    for (const race of ['lobster', 'crab'] as const) {
+      const doc = render(race)
+      const hammer = doc.querySelector('[data-equipment="silt-maul"]')!
+      const grip = doc.querySelector('[data-weapon-grip]')!
+      expect(hammer.parentElement).toBe(grip.parentElement)
+      expect(hammer.nextElementSibling).toBe(grip)
+      const gauntlet = doc.querySelector('[data-equipment="creator-slim"]')!
+      // A replacement contains only the wrist ball and equipment, no organic fingers.
+      expect(gauntlet.parentElement?.children).toHaveLength(2)
+      expect(doc.querySelectorAll('g[data-antennae]')).toHaveLength(0)
+      expect(doc.querySelectorAll('.lobster-idle-antenna-left')).toHaveLength(1)
+      expect(doc.querySelectorAll('[data-arm-anatomy="merus-carpus"]')).toHaveLength(2)
+    }
+  })
+})

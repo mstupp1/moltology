@@ -92,11 +92,6 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
     [src, animationSeed]
   )
 
-  const resolvedTexture = useMemo(() => {
-    if (texture) return texture
-    const match = src.match(/data-texture="([^"]+)"/) || (animatedSvgMarkup ? animatedSvgMarkup.match(/data-texture="([^"]+)"/) : null)
-    return match?.[1] ?? null
-  }, [texture, src, animatedSvgMarkup])
 
   const idleStyle = useMemo(
     () => (useAnimatedSvg ? ({ '--lobster-idle-phase': idlePhase } as React.CSSProperties) : undefined),
@@ -161,16 +156,6 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
     }
   }, [glowColor])
 
-  const characterMaskStyle = useMemo((): React.CSSProperties => ({
-    WebkitMaskImage: `url("${src}")`,
-    maskImage: `url("${src}")`,
-    WebkitMaskSize: 'cover',
-    maskSize: 'cover',
-    WebkitMaskPosition: 'center',
-    maskPosition: 'center',
-    WebkitMaskRepeat: 'no-repeat',
-    maskRepeat: 'no-repeat',
-  }), [src])
 
   const radialMaskStyle = useMemo((): React.CSSProperties => (
     maskRadial
@@ -228,15 +213,7 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
         />
       )}
 
-      {/* 4.5. PBR Surface Texture Underlay (from Homepage) */}
-      {resolvedTexture && resolvedTexture !== 'none' && (
-        <div
-          data-testid="avatar-pbr-texture"
-          className={`pbr-underlay pbr-underlay-${resolvedTexture} opacity-40 pointer-events-none z-0`}
-        />
-      )}
-
-      {/* 5. Synchronized Character Layer (Wraps sprite + all silhouette-masked overlays together so all transforms/scales stay 1:1) */}
+      {/* 5. Synchronized Character Layer */}
       <div className={`relative z-10 w-full h-full flex items-center justify-center ${className}`}>
         {useInlineSvg && animatedSvgMarkup ? (
           <div
@@ -255,25 +232,6 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
             className={`${spriteClasses} object-cover ${pixelated ? '[image-rendering:pixelated] [image-rendering:crisp-edges]' : ''}`}
           />
         )}
-
-        {/* Directional Top Illumination Gradient masked to character */}
-        {lightingSource === 'overhead' && (
-          <div
-            data-testid="avatar-character-light"
-            className="absolute inset-0 bg-gradient-to-b from-cyan-300/35 via-transparent to-black/40 pointer-events-none z-20 mix-blend-overlay"
-            style={characterMaskStyle}
-          />
-        )}
-
-        {/* CRT Scanline Layer masked strictly to the character silhouette */}
-        {crt && (
-          <div
-            data-testid="crt-avatar-scanlines"
-            className="absolute inset-0 crt-avatar-scanlines opacity-50 pointer-events-none z-20"
-            style={characterMaskStyle}
-          />
-        )}
-
       </div>
     </div>
   )

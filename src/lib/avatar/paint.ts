@@ -195,9 +195,9 @@ export function piece(d: string, ctx: PaintContext, opts: PieceOptions = {}): st
   const i = ids(ctx)
   const side = opts.side ?? 'center'
   const fill = opts.belly ? `url(#${i.belly})` : shellFill(ctx, side)
-  const outline = outlineColor(ctx, side)
+  const outline = opts.belly ? ctx.palette.bellyShade : outlineColor(ctx, side)
   const layers: string[] = []
-  layers.push(`<path d="${d}" fill="${fill}" stroke="${outline}" stroke-width="${OUTLINE_WIDTH}" stroke-linejoin="round"/>`)
+  layers.push(`<path d="${d}" fill="${fill}" stroke="${outline}" stroke-width="${opts.belly ? 1 : OUTLINE_WIDTH}" stroke-linejoin="round"/>`)
   if (!opts.belly && !opts.plain) {
     if (ctx.marking === 'split' && ctx.partner && side === 'center') {
       layers.push(`<path d="${d}" fill="url(#${i.split})"/>`)

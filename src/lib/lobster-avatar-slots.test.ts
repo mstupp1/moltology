@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   LOBSTER_FULL_BODY_VIEWBOX,
-  LOBSTER_PORTRAIT_VIEWBOX,
   generateLobsterAvatarSvg,
   stripSvgSmilAnimation,
 } from './lobster-avatar'
@@ -79,11 +78,13 @@ describe('lobster-avatar-slots', () => {
   it('generates a dedicated portrait viewBox instead of cropping the full-body frame', () => {
     const portrait = generateLobsterAvatarSvg(config, 128, { frame: 'portrait' })
     const fullBody = generateLobsterAvatarSvg(config, 256, { frame: 'fullBody' })
-    // The portrait crop follows the face, so it only matches the base crop at regular height.
+    // The portrait crop follows the seated face at every height.
     expect(portrait).toMatch(/viewBox="-9 -?[\d.]+ 118 118"/)
-    expect(generateLobsterAvatarSvg({ ...config, height: 'regular' }, 128, { frame: 'portrait' })).toContain(
-      `viewBox="${LOBSTER_PORTRAIT_VIEWBOX}"`
-    )
+    const regular = generateLobsterAvatarSvg({ ...config, height: 'regular' }, 128, { frame: 'portrait' })!
+    const doc = new DOMParser().parseFromString(regular, 'image/svg+xml')
+    const cropY = Number(doc.documentElement.getAttribute('viewBox')!.split(' ')[1])
+    const eyeY = Number(doc.querySelector('[data-eye-orbit]')!.getAttribute('cy')) - 1.8
+    expect(eyeY - cropY).toBeCloseTo(35)
     expect(portrait).toContain('data-avatar-slot="portrait"')
     expect(portrait).not.toContain(`viewBox="${LOBSTER_FULL_BODY_VIEWBOX}"`)
     expect(fullBody).toContain(`viewBox="${LOBSTER_FULL_BODY_VIEWBOX}"`)

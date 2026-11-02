@@ -172,7 +172,7 @@ describe('lobster-avatar', () => {
     expect(svg).toContain('stop-color="#061828"')
     expect(svg).toContain('stop-color="#020b14"')
     expect(svg).toContain('stop-color="#01060c"')
-    expect(svg).toContain('id="pattern-circuit"')
+    expect(svg).toContain('<ellipse cx="50" cy="185" rx="33" ry="6.5" fill="rgba(1, 5, 9, 0.58)"')
   })
 
   it('computes deterministic seeded background theme, pattern, texture, density, glow, pulse, sparkles, and motion', () => {
@@ -284,13 +284,10 @@ describe('lobster-avatar', () => {
     expect(svgAnimated).toContain('data-glow="chromatic"')
     expect(svgAnimated).toContain('data-pulse="pulse"')
     expect(svgAnimated).toContain('data-sparkles="radiant"')
-    expect(svgAnimated).toContain('id="lobster-sparkles-layer"')
-    expect(svgAnimated).toContain('id="lobster-texture-layer"')
-    expect(svgAnimated).toContain('pbr_carbon_weave.webp')
-    expect(svgAnimated).toContain('feDropShadow')
+    expect(svgAnimated).not.toContain('id="lobster-sparkles-layer"')
+    expect(svgAnimated).not.toContain('id="lobster-texture-layer"')
+    expect(svgAnimated).not.toContain('pbr_carbon_weave.webp')
     expect(svgAnimated).toContain('data-motion="drift_diagonal"')
-    expect(svgAnimated).toContain('<animate')
-    expect(svgAnimated).toContain('repeatCount="indefinite"')
 
     const svgStatic = generateLobsterAvatarSvg({
       style: 'critters',
@@ -312,7 +309,6 @@ describe('lobster-avatar', () => {
     expect(svgStatic).toContain('data-sparkles="none"')
     expect(svgStatic).not.toContain('id="lobster-sparkles-layer"')
     expect(svgStatic).not.toContain('id="lobster-texture-layer"')
-    expect(svgStatic).not.toContain('<animateTransform')
 
     const svgConstellationsSpin = generateLobsterAvatarSvg({
       style: 'critters',
@@ -322,8 +318,6 @@ describe('lobster-avatar', () => {
     })
     expect(svgConstellationsSpin).toContain('data-pattern="triangle_constellations"')
     expect(svgConstellationsSpin).toContain('data-motion="radar_sweep"')
-    expect(svgConstellationsSpin).toMatch(/type="rotate" from="0 50 50" to="-?360 50 50"/)
-    expect(svgConstellationsSpin).toContain('id="pat-triangle_constellations-')
   })
 
   it('produces random larva seeds', () => {
@@ -372,7 +366,11 @@ describe('lobster-avatar', () => {
       const portrait = generateLobsterAvatarSvg(config, 128, { frame: 'portrait' })
       expect(attr(full, 'data-race')).toBe(race)
       expect(full).toContain(`viewBox="${LOBSTER_FULL_BODY_VIEWBOX}"`)
-      expect(portrait).toContain(`viewBox="${AVATAR_PORTRAIT_VIEWBOXES[race]}"`)
+      // Seated eyes move the face crop; legacy exported crop constants remain compatible.
+      const doc = new DOMParser().parseFromString(portrait!, 'image/svg+xml')
+      const cropY = Number(doc.documentElement.getAttribute('viewBox')!.split(' ')[1])
+      const eyeY = Number(doc.querySelector('[data-eye-orbit]')!.getAttribute('cy')) - 1.8
+      expect(eyeY - cropY).toBeCloseTo(race === 'crab' ? 36 : 35)
       expect(portrait).toContain('data-avatar-slot="portrait"')
     }
     expect(AVATAR_PORTRAIT_VIEWBOXES.lobster).toBe(LOBSTER_PORTRAIT_VIEWBOX)
@@ -557,9 +555,8 @@ describe('lobster-avatar', () => {
   })
 
   it('strips SMIL animation for static renders', () => {
-    const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'larva-test', backgroundMotion: 'drift_diagonal' })!
-    expect(svg).toContain('<animate')
-    expect(stripSvgSmilAnimation(svg)).not.toMatch(/<animate/)
+    const raw = '<svg><animate attributeName="opacity" values="0;1;0" dur="2s"/><animateTransform type="rotate" values="0;360"/></svg>'
+    expect(stripSvgSmilAnimation(raw)).not.toMatch(/<animate/)
   })
 
   it('caches generated SVG and data URIs', () => {

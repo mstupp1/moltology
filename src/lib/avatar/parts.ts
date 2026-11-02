@@ -127,9 +127,10 @@ export function renderEye(e: EyeSpec, ctx: PaintContext, shellSide: PieceSide): 
   const browDir = e.side === 'left' ? 1 : -1
   const bw = e.rx * 0.62
   const by = e.cy - e.ry * 0.86 - lid.brow.lift
-  const brow = `<path d="M${r2(e.cx - bw)},${r2(by + 1.6)} Q${r2(e.cx)},${r2(by - 2.4)} ${r2(e.cx + bw)},${r2(by + 1.6)}" fill="none" stroke="${deep}" stroke-width="3.2" stroke-linecap="round" transform="rotate(${lid.brow.tilt * browDir} ${r2(e.cx)} ${r2(by)})"/>`
+  const brow = `<path d="M${r2(e.cx - e.rx)},${r2(e.cy - e.ry * .65)} Q${r2(e.cx)},${r2(e.cy - e.ry - 5)} ${r2(e.cx + e.rx)},${r2(e.cy - e.ry * .65)}" fill="none" stroke="${ctx.palette.shade}" stroke-width="4.4" stroke-linecap="round"/><path d="M${r2(e.cx - bw)},${r2(by + 1.6)} Q${r2(e.cx)},${r2(by - 2.4)} ${r2(e.cx + bw)},${r2(by + 1.6)}" fill="none" stroke="${deep}" stroke-width="3.2" stroke-linecap="round" transform="rotate(${lid.brow.tilt * browDir} ${r2(e.cx)} ${r2(by)})"/>`
 
   return `<g class="avatar-eye" data-eye-side="${e.side}">
+    <ellipse data-eye-orbit="${e.side}" cx="${r2(e.cx)}" cy="${r2(e.cy + 1.8)}" rx="${r2(e.rx + 2)}" ry="${r2(e.ry + 2.5)}" fill="${deep}" opacity=".24"/>
     <clipPath id="${clipId}">${eyeShape}</clipPath>
     <ellipse cx="${r2(e.cx)}" cy="${r2(e.cy)}" rx="${r2(e.rx)}" ry="${r2(e.ry)}" fill="url(#${ctx.uid}-sclera)" stroke="${deep}" stroke-width="2.3"/>
     <g clip-path="url(#${clipId})">
@@ -139,7 +140,7 @@ export function renderEye(e: EyeSpec, ctx: PaintContext, shellSide: PieceSide): 
       ${catch1}
       <g class="lobster-idle-layer lobster-idle-eyelid-${e.side}">${upperLid}<path d="${lidEdge(e, lid)}" fill="none" stroke="${deep}" stroke-width="1.8" stroke-linecap="round"/></g>
       ${lowerLid}
-      <g class="lobster-idle-layer lobster-idle-blink" opacity="0"><rect x="${r2(e.cx - e.rx - 2)}" y="${r2(e.cy - e.ry - 2)}" width="${r2(e.rx * 2 + 4)}" height="${r2(e.ry * 2 + 4)}" fill="${fill}"/></g>
+      <g transform="translate(${r2(e.cx)} ${r2(e.cy - e.ry)})"><g class="lobster-idle-layer lobster-idle-blink" transform="scale(1 0)"><path d="M${r2(-e.rx - 2)},-2 H${r2(e.rx + 2)} V${r2(e.ry * 2 + 2)} Q0,${r2(e.ry * 2 + 5)} ${r2(-e.rx - 2)},${r2(e.ry * 2 + 2)} Z" fill="${fill}"/><path d="M${r2(-e.rx)},${r2(e.ry * 2)} Q0,${r2(e.ry * 2 + 3)} ${r2(e.rx)},${r2(e.ry * 2)}" fill="none" stroke="${deep}" stroke-width="1.4"/></g></g>
     </g>
     <ellipse cx="${r2(e.cx)}" cy="${r2(e.cy)}" rx="${r2(e.rx)}" ry="${r2(e.ry)}" fill="none" stroke="${deep}" stroke-width="2.3"/>
     <g class="lobster-idle-layer lobster-idle-brow-${e.side}">${brow}</g>
@@ -232,6 +233,9 @@ export interface ClawPlacement {
   scale: number
   side: 'left' | 'right'
   gripping?: boolean
+  /** Mechanical gauntlets replace the entire organic claw. */
+  replacement?: boolean
+  equipment?: string
 }
 
 export function renderClaw(p: ClawPlacement, style: AvatarClaws, ctx: PaintContext): string {
@@ -245,13 +249,18 @@ export function renderClaw(p: ClawPlacement, style: AvatarClaws, ctx: PaintConte
   const teeth = shape.teeth
     .map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${ctx.palette.belly}" stroke="${outlineColor(ctx, p.side)}" stroke-width="0.6"/>`)
     .join('')
-  return `<g class="lobster-idle-layer lobster-idle-claw-${p.side}" data-claw="${heavy ? 'crusher' : style}">
-    <g transform="${transform}">
-      <g${p.gripping ? ' transform="rotate(-16 10 -29)"' : ''}>${piece(shape.finger, ctx, { side: p.side })}</g>
+  const socket = `<ellipse cx="0" cy="2" rx="7.8" ry="7" fill="${shellFill(ctx, p.side)}" stroke="${outlineColor(ctx, p.side)}" stroke-width="1.4"/>`
+  const organic = p.replacement ? '' : `
+      ${p.gripping ? '' : piece(shape.finger, ctx, { side: p.side })}
       ${teeth}
       ${piece(shape.palm, ctx, { side: p.side })}
-      ${glint(shape.glint, ctx, 0.55)}
-      ${piece('M-8.5,4 C-8.5,0 8.5,0 8.5,4 C8.5,8.6 -8.5,8.6 -8.5,4 Z', ctx, { side: p.side, plain: true, noRim: true })}
+      ${glint(shape.glint, ctx, 0.55)}`
+  // Placement is static. Animation rotates local geometry around the wrist ball,
+  // independent of the bounds of a hammer, gauntlet, or alternate claw silhouette.
+  return `<g transform="${transform}" data-claw="${heavy ? 'crusher' : style}">
+    <g class="lobster-idle-layer lobster-idle-claw-${p.side}">
+      ${socket}${organic}${p.equipment ?? ''}
+      ${p.gripping ? `<g data-weapon-grip="dactyl">${piece('M11,-29 C9,-34 3,-36 -3,-32 C-7,-29 -7,-24 -3,-23 C1,-23 3,-29 7,-25 L10,-20 Q15,-23 11,-29 Z', ctx, { side: p.side, plain: true })}</g>` : ''}
     </g>
   </g>`
 }
@@ -264,8 +273,19 @@ export interface ArmCurve {
 }
 
 export function renderArm(a: ArmCurve, side: 'left' | 'right', ctx: PaintContext, width = 10): string {
-  const d = taperedCurve(a.p0, a.p1, a.p2, a.p3, width, width * 0.78)
-  return `<g class="lobster-idle-layer lobster-idle-arm-${side}">${piece(d, ctx, { side, plain: true })}</g>`
+  // Split the cubic at t=.5: each shell segment retains the authored pose.
+  const mid = (p: Pt, q: Pt): Pt => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2]
+  const ab = mid(a.p0, a.p1), bc = mid(a.p1, a.p2), cd = mid(a.p2, a.p3)
+  const abc = mid(ab, bc), bcd = mid(bc, cd), elbow = mid(abc, bcd)
+  const merus = taperedCurve(a.p0, ab, abc, elbow, width * 1.3, width * .95)
+  const carpus = taperedCurve(elbow, bcd, cd, a.p3, width * 1.06, width * .92)
+  const joint = (p: Pt, r: number) => `<ellipse cx="${r2(p[0])}" cy="${r2(p[1] + 1)}" rx="${r2(r)}" ry="${r2(r * .75)}" fill="${ctx.palette.deep}" opacity=".24"/>`
+  return `<g class="lobster-idle-layer lobster-idle-arm-${side}" data-arm-anatomy="merus-carpus">
+    ${piece(merus, ctx, { side, plain: true })}${joint(elbow, width * .58)}
+    ${piece(carpus, ctx, { side, plain: true })}
+    <circle cx="${r2(a.p3[0])}" cy="${r2(a.p3[1])}" r="${r2(width * .56)}" fill="${shellFill(ctx, side)}" stroke="${ctx.palette.shade}" stroke-width="1.3"/>
+    ${joint(a.p0, width * .7)}
+  </g>`
 }
 
 // ---------------------------------------------------------------------------
@@ -331,7 +351,7 @@ export function renderAntennae(
   const one = (side: 'left' | 'right') => {
     const [x, y] = roots[side]
     const flip = side === 'right' ? ' scale(-1 1)' : ''
-    return `<g class="lobster-idle-layer lobster-idle-antenna-${side}"><g transform="translate(${x} ${y}) scale(${scale})${flip}">${antennaShapes(style, ctx, side)}</g></g>`
+    return `<g transform="translate(${x} ${y}) scale(${scale})${flip}"><g class="lobster-idle-layer lobster-idle-antenna-${side}">${antennaShapes(style, ctx, side)}</g></g>`
   }
   return `<g class="lobster-idle-layer lobster-idle-antennae" data-antennae="${style}">${one('left')}${one('right')}</g>`
 }

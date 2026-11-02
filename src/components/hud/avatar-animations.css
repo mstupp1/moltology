@@ -1,6 +1,6 @@
 /*
  * Layered avatar idle: one shared breath cycle, limbs follow, feet stay planted.
- * Origins use fill-box percentages so they hold for every race, pose, and height.
+ * Articulated parts rotate at local joint origins, independent of equipment bounds.
  */
 .lobster-avatar-animated {
   --lobster-breath-duration: 4.4s;
@@ -51,15 +51,10 @@
   50% { transform: scaleX(1.03); }
 }
 
-@keyframes lobsterIdleBrow {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, -0.9px, 0); }
-}
-
-/* Lids stay open most of the cycle, then close for a quick blink. */
+/* An upper lid sweeps down from the orbital rim, then opens quickly. */
 @keyframes lobsterIdleBlink {
-  0%, 92%, 100% { opacity: 0; }
-  93.5%, 96% { opacity: 1; }
+  0%, 91%, 98%, 100% { transform: scaleY(0); }
+  94%, 95% { transform: scaleY(1); }
 }
 
 .lobster-avatar-animated .lobster-idle-carapace {
@@ -77,38 +72,38 @@
 }
 
 .lobster-avatar-animated .lobster-idle-antenna-left {
-  transform-box: fill-box;
-  transform-origin: 100% 100%;
+  transform-box: view-box;
+  transform-origin: 0px 0px;
   animation: lobsterIdleAntennaLeft var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: var(--lobster-idle-delay);
+  animation-delay: calc(var(--lobster-idle-delay) - .18s);
 }
 
 .lobster-avatar-animated .lobster-idle-antenna-right {
-  transform-box: fill-box;
-  transform-origin: 0% 100%;
+  transform-box: view-box;
+  transform-origin: 0px 0px;
   animation: lobsterIdleAntennaRight var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: var(--lobster-idle-delay);
+  animation-delay: calc(var(--lobster-idle-delay) - .32s);
 }
 
 .lobster-avatar-animated .lobster-idle-claw-left {
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
+  transform-box: view-box;
+  transform-origin: 0px 0px;
   animation: lobsterIdleClawLeft var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: var(--lobster-idle-delay);
+  animation-delay: calc(var(--lobster-idle-delay) - .18s);
 }
 
 .lobster-avatar-animated .lobster-idle-claw-right {
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
+  transform-box: view-box;
+  transform-origin: 0px 0px;
   animation: lobsterIdleClawRight var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: var(--lobster-idle-delay);
+  animation-delay: calc(var(--lobster-idle-delay) - .32s);
 }
 
 .lobster-avatar-animated .lobster-idle-tail {
-  transform-box: fill-box;
-  transform-origin: 50% 0%;
+  transform-box: view-box;
+  transform-origin: 0px 0px;
   animation: lobsterIdleTail var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: var(--lobster-idle-delay);
+  animation-delay: calc(var(--lobster-idle-delay) - .32s);
 }
 
 .lobster-avatar-animated .lobster-idle-flank-limbs {
@@ -118,16 +113,10 @@
   animation-delay: var(--lobster-idle-delay);
 }
 
-.lobster-avatar-animated .lobster-idle-brow-left,
-.lobster-avatar-animated .lobster-idle-brow-right {
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
-  animation: lobsterIdleBrow var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: var(--lobster-idle-delay);
-}
-
 .lobster-avatar-animated .lobster-idle-blink {
-  animation: lobsterIdleBlink var(--lobster-blink-duration) linear infinite;
+  transform-box: view-box;
+  transform-origin: 0px 0px;
+  animation: lobsterIdleBlink var(--lobster-blink-duration) ease-in-out infinite;
   animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-blink-duration));
 }
 
