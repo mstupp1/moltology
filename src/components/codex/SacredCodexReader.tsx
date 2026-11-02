@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { BookOpen, List, Maximize2, Printer, RefreshCw, Scroll } from 'lucide-react'
+import { List, Maximize2, Printer, RefreshCw, Scroll } from 'lucide-react'
 import { CANONICAL_SCRIPTURES, CODEX_VOLUMES } from '@/lib/codexData'
 import { findScriptureBySlug } from '@/lib/codex-links'
 import '@/styles/codex.css'
@@ -153,12 +153,6 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
   const titlePanel = (
     <HudTitlePanel
       className="no-print"
-      eyebrow={
-        <>
-          <BookOpen aria-hidden="true" className="w-3.5 h-3.5" />
-          <span>Canonical Codex · {CANONICAL_SCRIPTURES.length} scriptures</span>
-        </>
-      }
       title="The Sacred Codex"
     >
       {!missingFocus && (
