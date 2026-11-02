@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { FlaskConical } from 'lucide-react'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { STAGE_PIPELINE_DATA } from '@/lib/codexData'
@@ -24,13 +23,8 @@ export default function PipelineView() {
     <div className="space-y-3.5 sm:space-y-5 font-sans">
       <HudTitlePanel
         accent="cyan"
-        eyebrow={
-          <>
-            <FlaskConical className="h-3.5 w-3.5" aria-hidden="true" />
-            Moltology science
-          </>
-        }
         title="The descent"
+        description="Moltology science"
         actions={
           <div className="flex items-center gap-4">
             <div>

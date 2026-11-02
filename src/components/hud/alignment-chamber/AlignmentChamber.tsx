@@ -51,10 +51,6 @@ export function AlignmentChamber({ tasks }: { tasks: AlignmentTaskItem[] }) {
           })}
         </div>
       </div>
-      <div className="alignment-chamber-caption border-t border-line-subtle px-3 py-2 flex items-center justify-between gap-3 text-[11px] text-ink-muted">
-        <span>Today’s ritual</span>
-        <span className="tabular-nums">{completed} of {tasks.length} completed</span>
-      </div>
     </div>
   )
 }

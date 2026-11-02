@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Activity } from 'lucide-react'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { ActivityFeedItem } from '@/components/hud/ActivityFeedItem'
 import { HudButton } from '@/components/ui/HudButton'
@@ -9,7 +8,6 @@ import { getActivityFeedFn } from '@/lib/server/api'
 import {
   ACTIVITY_FEED_FILTERS,
   ACTIVITY_FEED_SCOPES,
-  ACTIVITY_STREAM_PAGE_DESCRIPTION,
   emptyCopyForFeed,
   type ActivityEventView,
   type ActivityFeedFilter,
@@ -154,14 +152,7 @@ export function ActivityStreamPage() {
     <div className="space-y-3.5 sm:space-y-5 font-sans relative">
       <HudTitlePanel
         accent="cyan"
-        eyebrow={
-          <span className="flex items-center gap-2">
-            <Activity className="w-3.5 h-3.5" />
-            Community
-          </span>
-        }
         title="Activity Stream"
-        description={ACTIVITY_STREAM_PAGE_DESCRIPTION}
       />
 
       <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3.5">

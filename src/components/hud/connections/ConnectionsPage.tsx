@@ -111,7 +111,6 @@ export const ConnectionsPage: React.FC<{
       <HudTitlePanel
         accent="teal"
         title="Connections"
-        description="Find members, send friend requests, and keep your circle close."
       />
 
       <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">

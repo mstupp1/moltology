@@ -277,9 +277,7 @@ export function AcademyHome({ data }: { data: AcademyHomePayload }) {
   return (
     <div className="space-y-5 sm:space-y-6">
       <HudTitlePanel
-        eyebrow="Molt Academy"
-        title="Learn the molt in order"
-        description="Tracks group courses. Courses are video lectures, readings, and quizzes. Finish the work and a certification is issued in your name."
+        title="Molt Academy"
         actions={<AcademyNav current="catalog" />}
       />
 
