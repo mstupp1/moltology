@@ -75,28 +75,22 @@ describe('LobsterAvatarDisplay Component', () => {
     })
   })
 
-  it('renders masked crt-avatar-scanlines overlay by default', () => {
+  it('does not render drifting silhouette-masked crt-avatar-scanlines or character-light overlays', () => {
     render(<LobsterAvatarDisplay src={testSrc} />)
 
-    const scanlines = screen.getByTestId('crt-avatar-scanlines')
-    expect(scanlines).toBeInTheDocument()
-    expect(scanlines).toHaveClass('crt-avatar-scanlines')
-  })
-
-  it('suppresses crt-avatar-scanlines when crt is false', () => {
-    render(<LobsterAvatarDisplay src={testSrc} crt={false} />)
-
     expect(screen.queryByTestId('crt-avatar-scanlines')).toBeNull()
+    expect(screen.queryByTestId('avatar-character-light')).toBeNull()
   })
 
-  it('renders ambient glow aura, scanline overlay, light source, and vignette by default', () => {
+  it('renders ambient glow aura, background scanline overlay, spotlight source, and vignette by default', () => {
     render(<LobsterAvatarDisplay src={testSrc} glowColor="cyan" terminalEffects={true} />)
 
     expect(screen.getByTestId('avatar-glow-aura')).toBeInTheDocument()
     expect(screen.getByTestId('crt-bg-scanlines')).toBeInTheDocument()
     expect(screen.getByTestId('avatar-light-source')).toBeInTheDocument()
-    expect(screen.getByTestId('avatar-character-light')).toBeInTheDocument()
     expect(screen.getByTestId('avatar-vignette')).toBeInTheDocument()
+    expect(screen.queryByTestId('avatar-character-light')).toBeNull()
+    expect(screen.queryByTestId('crt-avatar-scanlines')).toBeNull()
   })
 
   it('suppresses vignette when vignette is false', () => {
@@ -112,21 +106,17 @@ describe('LobsterAvatarDisplay Component', () => {
     expect(screen.queryByTestId('avatar-character-light')).toBeNull()
   })
 
-  it('renders PBR surface texture underlay when texture prop is provided', () => {
+  it('does not render redundant PBR surface texture underlay even when texture prop is provided', () => {
     render(<LobsterAvatarDisplay src={testSrc} texture="carbon" />)
 
-    const textureEl = screen.getByTestId('avatar-pbr-texture')
-    expect(textureEl).toBeInTheDocument()
-    expect(textureEl).toHaveClass('pbr-underlay-carbon')
+    expect(screen.queryByTestId('avatar-pbr-texture')).toBeNull()
   })
 
-  it('extracts and renders PBR surface texture underlay from SVG data-texture', () => {
+  it('does not render redundant PBR surface texture underlay from SVG data-texture', () => {
     const avatarSrc = generateLobsterAvatarDataUri({ style: 'critters', seed: 'test-seed', backgroundTexture: 'hex' }, 256)
     render(<LobsterAvatarDisplay src={avatarSrc!} />)
 
-    const textureEl = screen.getByTestId('avatar-pbr-texture')
-    expect(textureEl).toBeInTheDocument()
-    expect(textureEl).toHaveClass('pbr-underlay-hex')
+    expect(screen.queryByTestId('avatar-pbr-texture')).toBeNull()
   })
 
   it('does not keep the animated svg mounted when the document is hidden', async () => {

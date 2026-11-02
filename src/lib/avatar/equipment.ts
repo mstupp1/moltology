@@ -68,18 +68,27 @@ export const EQUIPMENT_VISUALS: Readonly<Record<string, EquipmentVisual>> = Obje
 )
 export const getEquipmentVisual = (key: string) => EQUIPMENT_VISUALS[key]
 
+export interface EquipmentFit {
+  race?: 'lobster' | 'crab'
+  torsoW?: number
+  torsoH?: number
+  eyeY?: number
+  mouthY?: number
+  antennaRoots?: [[number, number], [number, number]]
+}
+
 /** Local coordinates: torso 0..60, head centred at y=0, weapon cuff at y=0. */
 export function renderEquipment(
   key: string,
   ctx: PaintContext,
-  fit?: { eyeY: number; mouthY: number },
+  fit?: EquipmentFit,
 ): string {
   const v = getEquipmentVisual(key)
   if (!v) return ''
   const uid = `${ctx.uid}-eq-${v.key}`,
     n = v.construction
   const plate = (d: string, fill = `url(#${uid})`) =>
-    `<path d="${d}" fill="${fill}" stroke="#14252b" stroke-width="1.1" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${v.trim}" stroke-width="0.55" opacity=".65" transform="translate(0 -.5)"/>`
+    `<path d="${d}" fill="${fill}" stroke="#14252b" stroke-width="1.1" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${ctx.rim}" stroke-width="0.65" opacity=".48" transform="translate(0 -.5)"/>`
   const bolts = (xs: number[], y: number) =>
     xs
       .map(
@@ -96,8 +105,17 @@ export function renderEquipment(
       { ...ctx, uid, rim: v.accent },
       { x: 0, top: 0, eyeY: fit?.eyeY ?? 26, mouth: [0, fit?.mouthY ?? 40] },
     )
+  } else if (v.category === 'carapace' && fit?.race === 'crab') {
+    const w = (fit.torsoW ?? 101) / 2
+    const h = fit.torsoH ?? 69
+    // Dorsal wings follow the shell edge. The fixed ventral plate clears even
+    // an open grin; expression never stretches, shifts, or resizes the armor.
+    const vent = (fit.mouthY ?? 38) + 22
+    body = `<g data-armor-fit="crab"><path d="M${-w + 3},16 Q0,-8 ${w - 3},16 L${w - 7},${h - 4} Q0,${h + 7} ${-w + 7},${h - 4} Z" fill="#07171d" opacity=".25"/>`
+    for (const side of [-1, 1]) body += `<g transform="scale(${side} 1)">${plate(`M22,5 Q${w - 12},0 ${w - 3},20 L${w + 1},35 L${w - 8},${h - 9} L${w - 20},${h - 13} L${w - 15},29 L25,17 Z`)}${seam(`M30,12 Q${w - 10},13 ${w - 9},31 L${w - 15},${h - 18}`)}${bolts([w - 10], 25)}</g>`
+    body += plate(`M-20,${vent} Q0,${vent + 5} 20,${vent} L17,${vent + 15} Q0,${vent + 24} -17,${vent + 15} Z`) + seam(`M-12,${vent + 9} Q0,${vent + 13} 12,${vent + 9}`) + '</g>'
   } else if (v.category === 'carapace') {
-    body =
+    body = `<path d="M-30,3 Q0,-4 30,3 L20,49 Q0,64 -20,49 Z" fill="#07171d" opacity=".25" transform="translate(0 2)"/>` +
       plate('M-29,1 Q-15,-5 0,4 Q15,-5 29,1 L23,25 L18,47 Q0,60 -18,47 L-23,25 Z') +
       plate('M-25,6 L-9,12 L-5,34 L-17,29 Z', v.material) +
       plate('M25,6 L9,12 L5,34 L17,29 Z', v.material) +
@@ -125,9 +143,12 @@ export function renderEquipment(
       plate('M-9,41 L8,41 L14,48 L-13,48 L-14,46 Z', v.material) +
       seam('M-5,8 L0,13 L5,8 M-4,32 H4')
   } else if (v.category === 'antennae') {
-    body = plate('M-18,0 Q0,-6 18,0 L15,7 Q0,3 -15,7 Z')
-    for (const side of [-1, 1]) {
-      body += `<g transform="scale(${side} 1)"><path d="M12,2 Q${18 + n * 3},${-22 - n * 4} ${30 + n * 3},${-25 - n * 5}" fill="none" stroke="#152930" stroke-width="5"/><path d="M12,2 Q${18 + n * 3},${-22 - n * 4} ${30 + n * 3},${-25 - n * 5}" fill="none" stroke="${v.trim}" stroke-width="2.6"/><circle cx="${30 + n * 3}" cy="${-25 - n * 5}" r="${2 + n}" fill="${v.accent}"/>${n > 1 ? seam('M20,-9 l9,-4 m-5,-2 l9,-4') : ''}</g>`
+    body = ''
+    for (const [i, side] of [-1, 1].entries()) {
+      const root = fit?.antennaRoots?.[i] ?? [side * 5, 0]
+      const name = i === 0 ? 'left' : 'right'
+      const tip = 25 + n * 3
+      body += `<g transform="translate(${root[0]} ${root[1]}) scale(${side} 1)"><circle r="3.2" fill="${v.material}" stroke="${v.trim}" stroke-width="1"/><g class="lobster-idle-layer lobster-idle-antenna-${name}"><path d="M0,0 Q${8 + n * 3},${-22 - n * 4} ${tip},${-25 - n * 5}" fill="none" stroke="#152930" stroke-width="4.5" stroke-linecap="round"/><path d="M0,0 Q${8 + n * 3},${-22 - n * 4} ${tip},${-25 - n * 5}" fill="none" stroke="${v.trim}" stroke-width="2.5" stroke-linecap="round"/><circle cx="${tip}" cy="${-25 - n * 5}" r="${2 + n}" fill="${v.accent}"/></g></g>`
     }
   } else if (v.category === 'head') {
     body =
@@ -162,7 +183,7 @@ export function renderEquipment(
       )
   }
   // Construction changes shape and assembly, rather than only tinting a shared silhouette.
-  if (!v.accessory && v.category === 'carapace' && n >= 2) {
+  if (!v.accessory && v.category === 'carapace' && fit?.race !== 'crab' && n >= 2) {
     body += [-1, 1]
       .map(
         (side) =>

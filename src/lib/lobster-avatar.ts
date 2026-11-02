@@ -24,8 +24,6 @@ import {
   LOBSTER_PATTERN_PULSES,
   LOBSTER_PATTERN_SPARKLES,
   escapeSvgAttr,
-  getPatternGlowFilterDef,
-  renderLobsterSparkles,
   type BackgroundMotionConfig,
   type BackgroundMotionMode,
   type BackgroundPattern,
@@ -459,8 +457,14 @@ export function resolveAvatarTraits(config: LobsterAvatarConfig): ResolvedAvatar
     eyeVariant: isOneOf(LOBSTER_EYE_VARIANTS, lower(config.eyeVariant)) ? (lower(config.eyeVariant) as LobsterEyeVariant) : seeded.eyeVariant,
     pupilVariant: isOneOf(LOBSTER_PUPIL_VARIANTS, lower(config.pupilVariant)) ? (lower(config.pupilVariant) as LobsterPupilVariant) : seeded.pupilVariant,
     backgroundTheme: (config.backgroundTheme && LOBSTER_BACKGROUND_THEME_MAP[config.backgroundTheme]?.id) || seeded.theme.id,
-    backgroundPattern: (config.backgroundPattern && LOBSTER_BACKGROUND_PATTERN_MAP[config.backgroundPattern]?.id) || seeded.pattern.id,
-    backgroundTexture: (config.backgroundTexture && LOBSTER_BACKGROUND_TEXTURE_MAP[config.backgroundTexture]?.id) || seeded.texture.id,
+    backgroundPattern:
+      config.backgroundPattern === 'none'
+        ? 'none'
+        : (config.backgroundPattern && LOBSTER_BACKGROUND_PATTERN_MAP[config.backgroundPattern]?.id) || seeded.pattern.id,
+    backgroundTexture:
+      config.backgroundTexture === 'none'
+        ? 'none'
+        : (config.backgroundTexture && LOBSTER_BACKGROUND_TEXTURE_MAP[config.backgroundTexture]?.id) || seeded.texture.id,
   }
 }
 
@@ -507,8 +511,6 @@ function renderBackdrop(
   seeded: SeededAvatarOptions
 ): { defs: string; layer: string; theme: BackgroundTheme } {
   const theme = LOBSTER_BACKGROUND_THEME_MAP[traits.backgroundTheme] ?? seeded.theme
-  const pattern = LOBSTER_BACKGROUND_PATTERN_MAP[traits.backgroundPattern] ?? seeded.pattern
-  const texture = LOBSTER_BACKGROUND_TEXTURE_MAP[traits.backgroundTexture] ?? seeded.texture
   // Configs can arrive unparsed, so every value is checked against its catalog before it reaches markup.
   const density = isOneOf(LOBSTER_PATTERN_DENSITIES, config.patternDensity) ? config.patternDensity : seeded.density
   const glow = isOneOf(LOBSTER_PATTERN_GLOWS, config.patternGlow) ? config.patternGlow : seeded.glow
@@ -530,42 +532,24 @@ function renderBackdrop(
   const defs = `
       <linearGradient id="${bgGradId}" x1="${x1}%" y1="${y1}%" x2="${x2}%" y2="${y2}%">
         <stop offset="0%" stop-color="${theme.topColor}" />
-        <stop offset="45%" stop-color="${theme.primaryColor}" />
+        <stop offset="50%" stop-color="${theme.primaryColor}" />
         <stop offset="100%" stop-color="${theme.bottomColor}" />
       </linearGradient>
-      <radialGradient id="${bgGlowId}" cx="50%" cy="40%" r="62%">
-        <stop offset="0%" stop-color="${theme.glowColor}" />
-        <stop offset="55%" stop-color="${theme.glowColor}" stop-opacity="0.18" />
+      <radialGradient id="${bgGlowId}" cx="50%" cy="34%" r="60%">
+        <stop offset="0%" stop-color="${theme.glowColor}" stop-opacity="0.22" />
         <stop offset="100%" stop-color="${theme.glowColor}" stop-opacity="0" />
       </radialGradient>
       <radialGradient id="${bgFloorGlowId}" cx="50%" cy="92%" r="55%">
-        <stop offset="0%" stop-color="${theme.glowSecondaryColor ?? theme.glowColor}" />
-        <stop offset="60%" stop-color="${theme.glowSecondaryColor ?? theme.glowColor}" stop-opacity="0.12" />
+        <stop offset="0%" stop-color="${theme.glowSecondaryColor ?? theme.glowColor}" stop-opacity="0.18" />
         <stop offset="100%" stop-color="${theme.glowSecondaryColor ?? theme.glowColor}" stop-opacity="0" />
-      </radialGradient>
-      <radialGradient id="lobster-bg-hush-${theme.id}" cx="50%" cy="52%" r="50%">
-        <stop offset="0%" stop-color="${theme.bottomColor}" stop-opacity="0.82" />
-        <stop offset="70%" stop-color="${theme.bottomColor}" stop-opacity="0.35" />
-        <stop offset="100%" stop-color="${theme.bottomColor}" stop-opacity="0" />
-      </radialGradient>
-      ${getPatternGlowFilterDef(glow, theme)}`
-
-  const textureLayer =
-    texture.id !== 'none' && texture.publicUrl
-      ? `<g id="lobster-texture-layer" data-texture="${texture.id}">
-        <image href="${texture.publicUrl}" xlink:href="${texture.publicUrl}" x="-90" y="-80" width="280" height="300" preserveAspectRatio="xMidYMid slice" opacity="${texture.opacity ?? 0.38}" style="mix-blend-mode: overlay; pointer-events: none;" />
-      </g>`
-      : ''
+      </radialGradient>`
 
   const layer = `
-    <g id="lobster-background-layer" data-theme="${theme.id}" data-pattern="${pattern.id}" data-density="${density}" data-glow="${glow}" data-pulse="${pulse}" data-sparkles="${sparkles}" data-texture="${texture.id}" data-motion="${escapeSvgAttr(motion.mode)}">
+    <g id="lobster-background-layer" data-theme="${theme.id}" data-pattern="${traits.backgroundPattern}" data-density="${density}" data-glow="${glow}" data-pulse="${pulse}" data-sparkles="${sparkles}" data-texture="${traits.backgroundTexture}" data-motion="${escapeSvgAttr(motion.mode)}">
       <rect x="-90" y="-80" width="280" height="300" fill="url(#${bgGradId})" />
       <rect x="-90" y="-80" width="280" height="300" fill="url(#${bgGlowId})" />
       <rect x="-90" y="-80" width="280" height="300" fill="url(#${bgFloorGlowId})" />
-      ${textureLayer}
-      ${pattern.render(theme, pattern.id, motion, density, glow, pulse)}
-      <ellipse cx="50" cy="96" rx="78" ry="96" fill="url(#lobster-bg-hush-${theme.id})" />
-      <g transform="translate(0 ${traits.race === 'crab' ? 26 : 0})">${renderLobsterSparkles(theme, sparkles, config.seed)}</g>
+      <ellipse cx="50" cy="185" rx="33" ry="6.5" fill="rgba(1, 5, 9, 0.58)" />
     </g>`
 
   return { defs, layer, theme }

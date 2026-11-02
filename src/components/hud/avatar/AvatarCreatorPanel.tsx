@@ -14,7 +14,6 @@ import {
   AVATAR_POSE_LABELS,
   AVATAR_RACES,
   AVATAR_RACE_LABELS,
-  LOBSTER_BACKGROUND_PATTERNS,
   LOBSTER_BACKGROUND_THEMES,
   LOBSTER_EYELID_STYLES,
   LOBSTER_EYE_COLORS,
@@ -421,32 +420,18 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
         )}
 
         {tab === 'scene' && (
-          <>
-            <OptionGroup label="Backdrop">
-              {LOBSTER_BACKGROUND_THEMES.map((t) => (
-                <Swatch
-                  key={t.id}
-                  label={t.label}
-                  selected={traits.backgroundTheme === t.id}
-                  disabled={disabled}
-                  onClick={() => set('backgroundTheme', t.id)}
-                  background={`radial-gradient(circle at 50% 35%, ${t.secondaryColor} 0%, ${t.topColor} 55%, ${t.bottomColor} 100%)`}
-                />
-              ))}
-            </OptionGroup>
-            <OptionGroup label="Backdrop pattern">
-              {LOBSTER_BACKGROUND_PATTERNS.map((p) => (
-                <Chip
-                  key={p.id}
-                  selected={traits.backgroundPattern === p.id}
-                  disabled={disabled}
-                  onClick={() => set('backgroundPattern', p.id)}
-                >
-                  {p.label}
-                </Chip>
-              ))}
-            </OptionGroup>
-          </>
+          <OptionGroup label="Backdrop">
+            {LOBSTER_BACKGROUND_THEMES.map((t) => (
+              <Swatch
+                key={t.id}
+                label={t.label}
+                selected={traits.backgroundTheme === t.id}
+                disabled={disabled}
+                onClick={() => set('backgroundTheme', t.id)}
+                background={`radial-gradient(circle at 50% 35%, ${t.secondaryColor} 0%, ${t.topColor} 55%, ${t.bottomColor} 100%)`}
+              />
+            ))}
+          </OptionGroup>
         )}
       </div>
     </div>

@@ -56,3 +56,22 @@ describe('lobster-avatar-idle', () => {
     expect(res1).toBe(res2) // Identical cached reference
   })
 })
+
+describe('local joint rig', () => {
+  it('places animated claws and antennae inside static placement groups', () => {
+    for (const race of ['lobster', 'crab'] as const) {
+      for (const pose of ['rest', 'wave', 'flex', 'cheer'] as const) {
+        const svg = generateLobsterAvatarSvg({style: 'critters', seed: 'pivot', race, pose})!
+        const doc = new DOMParser().parseFromString(svg, 'image/svg+xml')
+        for (const part of ['claw-left', 'claw-right', 'antenna-left', 'antenna-right']) {
+          const joint = doc.querySelector(`.lobster-idle-${part}`)!
+          expect(joint.hasAttribute('transform')).toBe(false)
+          expect(joint.parentElement?.getAttribute('transform')).toMatch(/^translate\(/)
+          expect(joint.closest('.lobster-idle-carapace')).not.toBeNull()
+        }
+        expect(doc.querySelector('.lobster-idle-blink rect')).toBeNull()
+        expect(doc.querySelector('.lobster-idle-blink path')).not.toBeNull()
+      }
+    }
+  })
+})
