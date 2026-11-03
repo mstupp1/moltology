@@ -1,4 +1,4 @@
-import { getOraclePromptMaxChars, getOraclePromptLengthError } from '@/lib/ai/prompt-limits'
+import { getOraclePromptLengthError } from '@/lib/ai/prompt-limits'
 import React, { useState, useRef, useEffect, useLayoutEffect, useId } from 'react'
 import { ArrowUp, Mic, Loader2, ChevronDown, Check, Square } from 'lucide-react'
 import { OracleModel, ORACLE_MODELS, DEFAULT_ORACLE_PLACEHOLDER, canUseOracleChatModel } from '@/lib/ai/oracle-models'
@@ -152,8 +152,6 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   const [localText, setLocalText] = useState('')
   const isControlled = value !== undefined
   const text = isControlled ? value : localText
-  const maxChars = getOraclePromptMaxChars(accessTier === 'premium')
-  const characterCount = text.trim().length
   const lengthError = getOraclePromptLengthError(text, accessTier === 'premium')
   const textRef = useRef(text)
   textRef.current = text
@@ -299,7 +297,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
           rows={1}
           aria-label="Message"
           aria-invalid={Boolean(lengthError)}
-          aria-describedby={lengthFeedbackId}
+          aria-describedby={lengthError ? lengthFeedbackId : undefined}
           className={`${inlineActions ? 'flex-1 min-w-0' : 'w-full'} bg-transparent text-ink placeholder-ink-muted text-base sm:text-sm focus:outline-hidden resize-none select-text min-h-[40px] max-h-[200px] leading-relaxed font-sans px-1.5 py-[0.4rem]`}
         />
 
@@ -314,9 +312,11 @@ export const PromptInput: React.FC<PromptInputProps> = ({
           </div>
         )}
       </form>
-      <p id={lengthFeedbackId} aria-live="polite" className={`mt-1 px-1.5 text-[11px] ${lengthError ? 'text-crimson-text' : 'text-ink-muted'}`}>
-        {lengthError || `${characterCount.toLocaleString('en-US')} / ${maxChars.toLocaleString('en-US')} characters`}
-      </p>
+      {lengthError && (
+        <p id={lengthFeedbackId} aria-live="polite" className="mt-1 px-1.5 text-[11px] text-crimson-text">
+          {lengthError}
+        </p>
+      )}
     </div>
   )
 
