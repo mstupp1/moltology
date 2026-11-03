@@ -160,19 +160,21 @@ describe('AIChatPanel Guest Mode Gating', () => {
     })
   })
 
-  it('defaults MAX members to Abyss and resets the choice after sign-out', async () => {
+  it('defaults MAX members to DeepSeek and resets the choice after sign-out', async () => {
     const snapshot = buildOracleUsageSnapshot([], true)
     vi.mocked(useOracleUsage).mockReturnValue({ snapshot, unavailable: false, blocked: false, refresh: vi.fn() })
     const { rerender } = render(<AIChatPanel userId="usr_max" />)
-    expect(screen.getByRole('button', { name: /Select model/i })).toHaveTextContent('Abyss')
+    expect(screen.getByRole('button', { name: /Select model/i })).toHaveTextContent('Oracle MAX')
     fireEvent.keyDown(screen.getByRole('button', { name: /Select model/i }), { key: 'Enter' })
-    fireEvent.click(await screen.findByRole('menuitemradio', { name: /DeepSeek V4.1 Flash/i }))
-    expect(screen.getByRole('button', { name: /Select model/i })).toHaveTextContent('DeepSeek')
+    fireEvent.click(await screen.findByRole('menuitemradio', { name: 'Oracle MAX' }))
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument())
+    expect(screen.getByRole('button', { name: /Select model/i })).toHaveTextContent('Oracle MAX')
     vi.mocked(useOracleUsage).mockReturnValue({ snapshot: null, unavailable: false, blocked: false, refresh: vi.fn() })
     rerender(<AIChatPanel userId={null} />)
-    expect(screen.getByRole('button', { name: /Select model/i })).toHaveTextContent('Preview')
+    expect(screen.getByRole('button', { name: /Select model/i })).toHaveTextContent('Oracle Lite')
     fireEvent.keyDown(screen.getByRole('button', { name: /Select model/i }), { key: 'Enter' })
-    expect(await screen.findByRole('menuitemradio', { name: /Oracle Abyss/i })).toHaveAttribute('aria-disabled', 'true')
+    expect(await screen.findByRole('menuitemradio', { name: /Oracle MAX/i })).toHaveAttribute('aria-disabled', 'true')
+    expect(await screen.findByRole('menuitemradio', { name: 'Oracle Lite' })).toHaveAttribute('aria-checked', 'true')
   })
 
   it('submits a shortcut in guest mode and ensures conversation starts with user message and no canned message before it', async () => {

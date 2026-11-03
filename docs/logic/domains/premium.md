@@ -3,7 +3,7 @@ id: premium
 title: Oracle MAX & billing
 order: 6
 color: '#d27bff'
-summary: Oracle MAX adds Oracle Abyss and a 10x Oracle allowance. The plan preview is public; billing and no-charge activation remain staff-only.
+summary: Oracle MAX adds the DeepSeek chat model and a 10x Oracle allowance. The plan preview is public; billing and no-charge activation remain staff-only.
 rules:
   - id: premium.soft-launch
     title: Oracle MAX billing stays staff-only
@@ -20,7 +20,7 @@ rules:
   - id: premium.no-standing
     title: Premium grants no standing
     kind: invariant
-    statement: Premium must never grant rank, clearance, stage, forum authority, Standing, or Chitin Gems. Oracle MAX includes Oracle Abyss plus Current and 10 times the free Oracle allowance.
+    statement: Premium must never grant rank, clearance, stage, forum authority, Standing, or Chitin Gems. Oracle MAX includes its advanced chat model and 10 times the free Oracle allowance.
     dependsOn: [economy.red-line]
     anchors:
       - file: src/lib/premium-membership.ts

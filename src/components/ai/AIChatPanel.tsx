@@ -349,7 +349,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
 
-  const accessTier: OracleAccessTier = isGuest ? 'guest' : usage.snapshot?.isPremium ? 'premium' : 'free'
+  const accessTier: OracleAccessTier = !userId ? 'guest' : usage.snapshot?.isPremium ? 'premium' : 'free'
   const requestedModel = selectedModelId ? getOracleModel(selectedModelId) : null
   const selectedModel = requestedModel && canUseOracleChatModel(requestedModel, accessTier)
     ? requestedModel : getOracleModel(getOracleDefaultModelId(accessTier))

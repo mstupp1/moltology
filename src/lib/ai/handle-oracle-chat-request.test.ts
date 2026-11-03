@@ -255,7 +255,7 @@ describe('handleOracleChatRequest', () => {
     }))
     expect(response.status).toBe(502)
     expect(streamTextMock.mock.calls.map(([options]) => options.model)).toEqual([PREMIUM_ORACLE_MODEL_ID])
-    expect(streamTextMock.mock.calls[0][0].providerOptions.gateway).toEqual({ only: ['anthropic'], disallowPromptTraining: true })
+    expect(streamTextMock.mock.calls[0][0].providerOptions.gateway).toEqual({ only: ['deepinfra'], disallowPromptTraining: true })
     expect(screenOraclePrompt).toHaveBeenCalledWith('Help me focus today', { isPremium: true })
     expect(summarizeThreadTitle).toHaveBeenCalledTimes(1)
     expect(updateAIThreadTitle).not.toHaveBeenCalled()

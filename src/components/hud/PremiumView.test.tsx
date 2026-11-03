@@ -44,7 +44,7 @@ describe("Oracle MAX offer panel", () => {
       screen.queryByRole("button", { name: /Subscribe|Activate/ }),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Try Oracle Current" }),
+      screen.getByRole("link", { name: "Try Oracle Lite" }),
     ).toHaveAttribute("href", "/oracle");
     expect(screen.getByText("150")).toBeInTheDocument();
     expect(screen.getByText("1,000")).toBeInTheDocument();
@@ -62,7 +62,7 @@ describe("Oracle MAX offer panel", () => {
       screen.queryByRole("button", { name: /Manage membership/i }),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Oracle Abyss" }),
+      screen.getByRole("heading", { name: "Oracle MAX", level: 3 }),
     ).toBeInTheDocument();
     expect(
       screen.getByText(

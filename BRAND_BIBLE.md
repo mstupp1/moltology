@@ -103,11 +103,10 @@ Plain names for real features. Use them as written; don't invent in-world substi
 | **Standing** | A member's forum reputation, from upvotes and review. |
 | **Chitin Gems** | The earned currency. |
 | **Molt Credits** | The paid currency. |
-| **Oracle MAX** | The paid subscription. |
+| **Oracle MAX** | The paid subscription and its advanced Oracle model. |
 | **Benthic Market** | The in-app shop where currencies are spent. |
 | **Oracle** | The chat companion, voiced by the Synaptic Oracle. |
-| **Oracle Current** | The standard Oracle model for guests and free members. |
-| **Oracle Abyss** | The more capable Oracle model included with Oracle MAX. |
+| **Oracle Lite** | The standard Oracle chat model for free members. Guests see it selected while using preview replies. |
 | **Nightly Molt Audit** | The end-of-day ritual: name and release one bad thought, wasted hour, or distraction. |
 | **Field Manual** | The free downloadable guide. |
 

@@ -43,7 +43,7 @@ export const PREMIUM_PAGE_COPY = {
   description:
     'Oracle MAX does not change your rank, clearance, stage, or forum authority. Chitin Gems stay earned. Signup stays free.',
   benefitsTitle: 'What Oracle MAX unlocks',
-  benefitsBody: 'Oracle MAX includes Oracle Abyss, our advanced model, and 10× the free message allowance.',
+  benefitsBody: 'Oracle MAX includes our advanced model and 10× the free message allowance.',
   active: 'Your Oracle MAX membership is active.',
   lapsed: 'You have purchased Oracle MAX before. It is not active right now.',
   free: 'You do not have an active Oracle MAX membership.',
@@ -102,7 +102,7 @@ export function shouldShowPremiumDashboardBanner(input: {
  */
 export function listPremiumEntitlements(_isPremium: boolean): readonly string[] {
   return [
-    'Oracle Abyss, our advanced model, alongside Oracle Current',
+    'Oracle MAX, our advanced model',
     `${ORACLE_PREMIUM_LIMITS.perFiveHours} Oracle messages per 5 hours instead of ${ORACLE_FREE_LIMITS.perFiveHours}, and ${ORACLE_PREMIUM_LIMITS.perWeek.toLocaleString('en-US')} per 7 days instead of ${ORACLE_FREE_LIMITS.perWeek}`,
   ]
 }

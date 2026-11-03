@@ -80,7 +80,7 @@ export function PremiumOfferPanel({
           description="Deeper reasoning. More room to think."
         >
           <p className="oracle-max-intro text-sm text-ink-body leading-relaxed">
-            Meet Oracle Abyss, our advanced model for complex questions. Get 10×
+            Meet Oracle MAX, our advanced model for complex questions. Get 10×
             the free message allowance to keep the conversation going.
           </p>
           <a
@@ -117,7 +117,7 @@ export function PremiumOfferPanel({
               Included with your free account
             </p>
             <h3 className="text-xl font-grotesk font-bold text-ink">
-              Oracle Current
+              Oracle Lite
             </h3>
             <p className="mt-2 text-sm text-ink-body">
               Everyday guidance for a routine, a distraction, or your next small
@@ -129,7 +129,7 @@ export function PremiumOfferPanel({
               Included with Oracle MAX
             </p>
             <h3 className="text-xl font-grotesk font-bold text-ink">
-              Oracle Abyss
+              Oracle MAX
             </h3>
             <p className="mt-2 text-sm text-ink-body">
               Our advanced model for complex questions, careful reasoning, and
@@ -215,7 +215,7 @@ export function PremiumOfferPanel({
             to="/oracle"
             className="inline-flex items-center gap-2 min-h-11 text-sm text-cyan-glow hover:text-cyan-bright transition-colors"
           >
-            Try Oracle Current{" "}
+            Try Oracle Lite{" "}
             <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
           </Link>
         ) : (
