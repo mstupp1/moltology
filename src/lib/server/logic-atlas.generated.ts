@@ -7,12 +7,12 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-10-31",
+  "syncedAt": "2026-11-02",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
     "rules": 124,
-    "decisions": 49,
+    "decisions": 50,
     "anchors": 239,
     "drifted": 20,
     "flagged": 9
@@ -154,7 +154,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "premium",
       "title": "Oracle MAX & billing",
       "color": "#d27bff",
-      "summary": "Oracle MAX adds Oracle Abyss and a 10x Oracle allowance. The plan preview is public; billing and no-charge activation remain staff-only.",
+      "summary": "Oracle MAX adds the DeepSeek chat model and a 10x Oracle allowance. The plan preview is public; billing and no-charge activation remain staff-only.",
       "overviewHtml": "<p>Premium is a subscription, not a currency. It sits beside the economy and must stay on the right side of the red line. During the soft launch, only staff can see, buy, or turn Premium on without a charge.</p>",
       "box": {
         "x": 2460,
@@ -339,10 +339,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "BRAND_BIBLE.md",
           "symbol": "4. The Economy",
-          "line": 183,
+          "line": 181,
           "value": "Signup is free. Chitin Gems are earned by doing the work: shedding, routines, and being",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L183"
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L181"
         },
         {
           "file": "AGENTS.md",
@@ -385,10 +385,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "BRAND_BIBLE.md",
           "symbol": "4. The Economy",
-          "line": 183,
+          "line": 181,
           "value": "Signup is free. Chitin Gems are earned by doing the work: shedding, routines, and being",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L183"
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L181"
         }
       ],
       "tests": [],
@@ -856,10 +856,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/avatar/races.ts",
           "symbol": "renderCharacter",
-          "line": 784,
+          "line": 770,
           "value": "renderCharacter(spec, ctx)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/races.ts#L784"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/races.ts#L770"
         }
       ],
       "tests": [
@@ -1223,10 +1223,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "BRAND_BIBLE.md",
           "symbol": "3.3 Stages and clearances",
-          "line": 149,
+          "line": 147,
           "value": "Scriptures describe what the metrics typically read at each stage. What actually moves a",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L149"
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L147"
         }
       ],
       "tests": [
@@ -3031,7 +3031,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Premium grants no standing",
       "kind": "invariant",
       "status": "active",
-      "statement": "Premium must never grant rank, clearance, stage, forum authority, Standing, or Chitin Gems. Oracle MAX includes Oracle Abyss plus Current and 10 times the free Oracle allowance.",
+      "statement": "Premium must never grant rank, clearance, stage, forum authority, Standing, or Chitin Gems. Oracle MAX includes its advanced chat model and 10 times the free Oracle allowance.",
       "anchors": [
         {
           "file": "src/lib/premium-membership.ts",
@@ -3066,7 +3066,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "premium-soft-launch",
         "oracle-usage-and-moderation",
         "oracle-rolling-allowances",
-        "oracle-max-model-access"
+        "oracle-max-model-access",
+        "simplify-oracle-models"
       ],
       "flag": null,
       "flow": null,
@@ -3205,10 +3206,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/merch.ts",
           "symbol": "fulfillMerchCheckoutEvent",
-          "line": 137,
+          "line": 138,
           "value": "fulfillMerchCheckoutEvent(event, retry)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L137"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L138"
         }
       ],
       "tests": [
@@ -5225,7 +5226,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Membership determines model access",
       "kind": "permission",
       "status": "active",
-      "statement": "Guests receive preset preview replies. Free members use Oracle Current (Ling) for chat and titles. MAX defaults to Oracle Abyss (Sonnet) and may select DeepSeek. MAX titles use Nemo; all MAX providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.",
+      "statement": "Guests receive preset preview replies. Free members use Oracle (Ling) for chat and titles. Oracle MAX uses DeepSeek V4.1 Flash as its only chat model. MAX titles use Nemo; all MAX providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.",
       "anchors": [
         {
           "file": "src/lib/ai/oracle-chat.ts",
@@ -5238,10 +5239,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/oracle-models.ts",
           "symbol": "getOracleTitleModelId",
-          "line": 113,
+          "line": 104,
           "value": "getOracleTitleModelId(isPremium)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts#L113"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts#L104"
         }
       ],
       "tests": [
@@ -5266,7 +5267,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "jev-quality-gates",
         "oracle-usage-and-moderation",
         "oracle-max-model-access",
-        "oracle-tier-models-and-titles"
+        "oracle-tier-models-and-titles",
+        "simplify-oracle-models"
       ],
       "flag": null,
       "flow": null,
@@ -5282,15 +5284,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Ordered model fallback",
       "kind": "flow",
       "status": "active",
-      "statement": "Free chat uses Ling through Novita. MAX uses the selected Sonnet (Anthropic) or DeepSeek (DeepInfra), with prompt training disallowed. It cannot select Ling. Empty streams, errors, and a 12-second first-token timeout return unavailable without changing models. SDK retries and reasoning are disabled.",
+      "statement": "Free chat uses Ling through Novita. MAX uses DeepSeek through DeepInfra, with prompt training disallowed. It cannot select Ling. Empty streams, errors, and a 12-second first-token timeout return unavailable without changing models. SDK retries and reasoning are disabled.",
       "anchors": [
         {
           "file": "src/lib/ai/oracle-models.ts",
           "symbol": "ORACLE_MODELS",
-          "line": 37,
-          "value": "[ { id: GUEST_ORACLE_MODEL_ID, label: 'Guest preview', shortLabel: 'Preview', provider: 'local', badge: 'Preview', roles: ['preview'], access: 'guest', descrip…",
+          "line": 38,
+          "value": "[ { id: GUEST_ORACLE_MODEL_ID, label: 'Oracle', shortLabel: 'Oracle', provider: 'local', badge: 'Preview', roles: ['preview'], access: 'guest', description: 'P…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts#L37"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts#L38"
         }
       ],
       "tests": [
@@ -5307,7 +5309,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "oracle-model-fallback",
         "oracle-usage-and-moderation",
         "oracle-max-model-access",
-        "oracle-tier-models-and-titles"
+        "oracle-tier-models-and-titles",
+        "simplify-oracle-models"
       ],
       "flag": null,
       "flow": null,
@@ -6070,10 +6073,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/lobster-avatar.ts",
           "symbol": "parseLobsterAvatarConfig",
-          "line": 249,
+          "line": 247,
           "value": "parseLobsterAvatarConfig(raw)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar.ts#L249"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar.ts#L247"
         },
         {
           "file": "src/lib/avatar/config-schema.ts",
@@ -6408,10 +6411,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/merch.ts",
           "symbol": "fulfillMerchCheckoutEvent",
-          "line": 137,
+          "line": 138,
           "value": "fulfillMerchCheckoutEvent(event, retry)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L137"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L138"
         },
         {
           "file": "src/lib/merch.ts",
@@ -6590,10 +6593,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/merch.ts",
           "symbol": "retryMerchOrder",
-          "line": 204,
+          "line": 205,
           "value": "retryMerchOrder(orderId)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L204"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L205"
         }
       ],
       "tests": [
@@ -9438,6 +9441,44 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "heading": "Consequences",
           "html": "<p>There is no minimum duration requirement. Existing server validation, daily XP awards, and source-key deduplication remain authoritative. Timer state and the 3D preference are local; this visual does not transfer member files or start an Oracle conversation.</p>"
+        }
+      ]
+    },
+    {
+      "id": "simplify-oracle-models",
+      "date": "2026-11-02",
+      "title": "Simplify Oracle models to Oracle and Oracle MAX",
+      "summary": "Oracle uses Ling, Oracle MAX uses DeepSeek, and Sonnet is removed from chat routing.",
+      "domains": [
+        "oracle",
+        "premium"
+      ],
+      "rules": [
+        "oracle.model-routing",
+        "oracle.model-fallback",
+        "premium.no-standing"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "doc",
+          "label": "oracle-models.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>The model directory mixed product names, provider names, guest previews, and automatic title models. The extra chat choice made Oracle MAX harder to understand.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Use Oracle for free Ling chat and Oracle MAX for DeepSeek V4.1 Flash chat through DeepInfra. Remove Sonnet from the configured models. Existing Sonnet selections resolve to the current default for the authoritative membership tier. Keep MAX prompt-training restrictions and separate Nemo title generation.</p>\n<p>Remove the directory header and guest preview row. Show the underlying model name beneath each product label instead of provider descriptions. Guest demo replies continue to work.</p>\n<p>This replaces the chat naming and Sonnet choice in the October 31 model decisions; their usage, screening, and title-generation rules remain in effect.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>MAX has one chat model. Provider failure returns unavailable without switching tiers. Message allowances and membership authority stay unchanged.</p>"
         }
       ]
     }

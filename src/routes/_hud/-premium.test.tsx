@@ -158,7 +158,7 @@ describe("Premium HUD route", () => {
       ),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Oracle Abyss" }),
+      screen.getByRole("heading", { name: "Oracle MAX", level: 3 }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /Subscribe to Oracle MAX/i }),

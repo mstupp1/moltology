@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_hud/premium")({
       ...privatePageSeo({
         title: "Oracle MAX | Moltology",
         description:
-          "Explore Oracle MAX: Oracle Abyss, our advanced model, and 10× the free message allowance.",
+          "Explore Oracle MAX: our advanced model and 10× the free message allowance.",
       }),
     ],
   }),

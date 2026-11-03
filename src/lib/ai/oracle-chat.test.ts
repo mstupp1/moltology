@@ -22,7 +22,7 @@ describe('oracle-chat helpers', () => {
   })
 
   it('lists preview, free chat/titles, premium chat, and premium titles', () => {
-    expect(ORACLE_MODELS.map((m) => m.access)).toEqual(['guest', 'free', 'premium', 'premium', 'premium'])
+    expect(ORACLE_MODELS.map((m) => m.access)).toEqual(['guest', 'free', 'premium', 'premium'])
     expect(getOracleModel(PREMIUM_ORACLE_TITLE_MODEL_ID).roles).toEqual(['titles'])
   })
 
@@ -53,7 +53,7 @@ describe('oracle-chat helpers', () => {
   })
 
   it('never routes Premium prompts to free models, even when requested', () => {
-    for (const requested of [undefined, DEFAULT_ORACLE_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID]) {
+    for (const requested of [undefined, DEFAULT_ORACLE_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID, 'anthropic/claude-sonnet-4.6']) {
       expect(orderOracleModels(requested, DEFAULT_ORACLE_MODEL_ID, 'premium')).toEqual([PREMIUM_ORACLE_MODEL_ID])
     }
     for (const model of [PREMIUM_DEEPSEEK_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID]) {
@@ -67,7 +67,7 @@ describe('oracle-chat helpers', () => {
     expect(orderOracleModels(PREMIUM_DEEPSEEK_MODEL_ID, undefined, 'premium')).toEqual([PREMIUM_DEEPSEEK_MODEL_ID])
     expect(orderOracleModels(PREMIUM_ORACLE_MODEL_ID, undefined, 'premium')).toEqual([PREMIUM_ORACLE_MODEL_ID])
     expect(getOracleGenerationOptions(PREMIUM_ORACLE_MODEL_ID)).toMatchObject({
-      providerOptions: { gateway: { only: ['anthropic'], disallowPromptTraining: true } },
+      providerOptions: { gateway: { only: ['deepinfra'], disallowPromptTraining: true } },
     })
   })
 

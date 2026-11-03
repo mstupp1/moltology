@@ -18,6 +18,7 @@ export interface OracleModel {
   access: OracleAccessTier
   /** Provider routing must exclude training on prompts for this entry. */
   noPromptTraining?: boolean
+  modelName?: string
   description?: string
   pricing?: OracleModelPricing
   /** Indicative provider time to first token, not a response-time guarantee. */
@@ -25,8 +26,8 @@ export interface OracleModel {
 }
 
 export const DEFAULT_ORACLE_MODEL_ID = 'inclusionai/ling-3.1-flash-1019'
-export const PREMIUM_ORACLE_MODEL_ID = 'anthropic/claude-sonnet-4.6'
-export const PREMIUM_DEEPSEEK_MODEL_ID = 'deepseek/deepseek-v4.1-flash'
+export const PREMIUM_ORACLE_MODEL_ID = 'deepseek/deepseek-v4.1-flash'
+export const PREMIUM_DEEPSEEK_MODEL_ID = PREMIUM_ORACLE_MODEL_ID
 export const ORACLE_TITLE_MODEL_ID = DEFAULT_ORACLE_MODEL_ID
 export const PREMIUM_ORACLE_TITLE_MODEL_ID = 'mistral/mistral-nemo'
 export const GUEST_ORACLE_MODEL_ID = 'guest-preview'
@@ -37,8 +38,8 @@ export const GUEST_ORACLE_MODEL_ID = 'guest-preview'
 export const ORACLE_MODELS: OracleModel[] = [
   {
     id: GUEST_ORACLE_MODEL_ID,
-    label: 'Guest preview',
-    shortLabel: 'Preview',
+    label: 'Oracle Lite',
+    shortLabel: 'Oracle Lite',
     provider: 'local',
     badge: 'Preview',
     roles: ['preview'],
@@ -49,8 +50,9 @@ export const ORACLE_MODELS: OracleModel[] = [
   },
   {
     id: DEFAULT_ORACLE_MODEL_ID,
-    label: 'Oracle Current',
-    shortLabel: 'Current',
+    label: 'Oracle Lite',
+    shortLabel: 'Oracle Lite',
+    modelName: 'Ling 3.1 Flash 1019',
     provider: 'inclusionai',
     badge: 'Chat',
     roles: ['chat', 'titles'],
@@ -61,8 +63,9 @@ export const ORACLE_MODELS: OracleModel[] = [
   },
   {
     id: PREMIUM_DEEPSEEK_MODEL_ID,
-    label: 'DeepSeek V4.1 Flash',
-    shortLabel: 'DeepSeek',
+    label: 'Oracle MAX',
+    shortLabel: 'Oracle MAX',
+    modelName: 'DeepSeek V4.1 Flash',
     provider: 'deepseek',
     badge: 'Chat',
     roles: ['chat'],
@@ -73,22 +76,10 @@ export const ORACLE_MODELS: OracleModel[] = [
     latency: '~1 s',
   },
   {
-    id: PREMIUM_ORACLE_MODEL_ID,
-    label: 'Oracle Abyss',
-    shortLabel: 'Abyss',
-    provider: 'anthropic',
-    badge: 'Chat',
-    roles: ['chat'],
-    access: 'premium',
-    noPromptTraining: true,
-    description: 'Claude Sonnet 4.6 for deeper reasoning. Oracle MAX default; provider training is disabled.',
-    pricing: { input: '$3', output: '$15' },
-    latency: '~1.6 s',
-  },
-  {
     id: PREMIUM_ORACLE_TITLE_MODEL_ID,
     label: 'Mistral Nemo 12B',
     shortLabel: 'Nemo Titles',
+    modelName: 'Mistral Nemo 12B',
     provider: 'mistral',
     badge: 'Titles',
     roles: ['titles'],
@@ -107,7 +98,7 @@ export function getOracleModel(id: string = DEFAULT_ORACLE_MODEL_ID): OracleMode
 }
 
 export function getOracleDefaultModelId(tier: OracleAccessTier): string {
-  return tier === 'guest' ? GUEST_ORACLE_MODEL_ID : tier === 'premium' ? PREMIUM_ORACLE_MODEL_ID : DEFAULT_ORACLE_MODEL_ID
+  return tier === 'premium' ? PREMIUM_ORACLE_MODEL_ID : DEFAULT_ORACLE_MODEL_ID
 }
 
 export function getOracleTitleModelId(isPremium: boolean): string {
@@ -129,7 +120,6 @@ export function getOracleGenerationOptions(modelId: string) {
     reasoning: 'none' as const,
     ...(modelId === PREMIUM_DEEPSEEK_MODEL_ID || modelId === PREMIUM_ORACLE_TITLE_MODEL_ID
       ? { providerOptions: { gateway: { only: ['deepinfra'], disallowPromptTraining: true } } }
-      : modelId === PREMIUM_ORACLE_MODEL_ID ? { providerOptions: { gateway: { only: ['anthropic'], disallowPromptTraining: true } } }
       : modelId.startsWith('inclusionai/') ? { providerOptions: { gateway: { only: ['novita'] } } } : {}),
   }
 }
