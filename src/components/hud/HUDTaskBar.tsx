@@ -5,7 +5,7 @@ import { HudCard, HudBadge, HudBottomSheet } from '@/components/ui'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { useNotifications } from '@/hooks/useNotifications'
 import { Link } from '@tanstack/react-router'
-import { OPEN_ALIGNMENT_PANEL_EVENT, OPEN_NOTIFICATIONS_PANEL_EVENT, isAlignmentPanelHostVisible } from '@/lib/alignment-panel'
+import { OPEN_ALIGNMENT_PANEL_EVENT, isAlignmentPanelHostVisible } from '@/lib/alignment-panel'
 import { CANONICAL_ALIGNMENT_TASKS, type AlignmentTaskItem } from '@/lib/alignment-tasks'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { isForumInboxKind } from '@/lib/notifications'
@@ -23,7 +23,7 @@ export interface AlignmentTask {
 export type TimezoneMode = 'LOCAL' | 'UTC' | 'BENTHIC' | 'STARDATE'
 
 export interface HUDTaskBarProps {
-  variant?: 'hero' | 'header' | 'compact' | 'mobile'
+  variant?: 'hero' | 'header' | 'compact'
   tasks?: AlignmentTask[]
   onCompleteTask?: (taskId: string) => void
   className?: string
@@ -48,7 +48,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const checkMobile = () => setIsMobileScreen(window.innerWidth < 768)
+      const checkMobile = () => setIsMobileScreen(window.innerWidth < 640)
       checkMobile()
       window.addEventListener('resize', checkMobile)
       return () => window.removeEventListener('resize', checkMobile)
@@ -125,19 +125,17 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
 
   // Other HUD controls can request the same quick liturgies panel.
   useEffect(() => {
-    const handleOpenAlignmentPanel = (event: Event) => {
-      if ((variant === 'header' || variant === 'mobile') && !isAlignmentPanelHostVisible(headerIslandRef.current)) {
+    const handleOpenAlignmentPanel = () => {
+      if (variant === 'header' && !isAlignmentPanelHostVisible(headerIslandRef.current)) {
         return
       }
-      setActiveTab(event.type === OPEN_NOTIFICATIONS_PANEL_EVENT ? 'transmissions' : 'liturgies')
+      setActiveTab('liturgies')
       setIsScheduleOpen(true)
     }
 
     window.addEventListener(OPEN_ALIGNMENT_PANEL_EVENT, handleOpenAlignmentPanel)
-    window.addEventListener(OPEN_NOTIFICATIONS_PANEL_EVENT, handleOpenAlignmentPanel)
     return () => {
       window.removeEventListener(OPEN_ALIGNMENT_PANEL_EVENT, handleOpenAlignmentPanel)
-      window.removeEventListener(OPEN_NOTIFICATIONS_PANEL_EVENT, handleOpenAlignmentPanel)
     }
   }, [variant])
 
@@ -239,7 +237,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   useEffect(() => {
     if (isScheduleOpen && typeof document !== 'undefined') {
       const originalOverflow = document.body.style.overflow
-      if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      if (typeof window !== 'undefined' && window.innerWidth < 640) {
         document.body.style.overflow = 'hidden'
       }
       return () => {
@@ -557,16 +555,16 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   // ══════════════════════════════════════════════════════════════════════════════
   // HEADER TILE VARIANT (HUDHeader bar and phone top bar)
   // ══════════════════════════════════════════════════════════════════════════════
-  if (variant === 'header' || variant === 'mobile') {
+  if (variant === 'header') {
     return (
       <div className={`relative ${className}`} ref={headerIslandRef}>
-        {variant !== 'mobile' && <button
+        <button
           type="button"
           onClick={(e) => {
             e.stopPropagation()
             setIsScheduleOpen((prev) => !prev)
           }}
-          className={`relative flex items-center gap-2 h-12 md:h-8 md:w-[260px] md:min-w-[260px] px-2.5 rounded-control border text-xs transition-colors select-none touch-manipulation ${focusRing} ${
+          className={`relative flex items-center gap-2 h-9 md:h-8 md:w-[260px] md:min-w-[260px] px-2.5 rounded-control border text-xs transition-colors select-none touch-manipulation ${focusRing} ${
             isScheduleOpen
               ? 'bg-surface-3 shadow-nav-current border-transparent text-ink'
               : 'bg-surface-1 border-line hover:bg-surface-2 hover:border-line-strong text-ink'
@@ -595,7 +593,6 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             <span className="hidden md:inline-block h-2 w-20 rounded-chip bg-surface-3 animate-pulse" aria-hidden />
           )}
 
-          <span className="md:hidden">Today</span>
           {countReady ? (
             <span className={`shrink-0 font-bold tabular-nums md:ml-auto md:pl-2 md:border-l md:border-line-subtle ${allTasksCompleted ? 'text-emerald-500' : 'text-ink'}`}>
               {liturgyCountText}
@@ -612,9 +609,9 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
               {notificationUnread}
             </span>
           )}
-        </button>}
+        </button>
 
-        {/* Desktop dropdown (>= 768px) */}
+        {/* Desktop dropdown (>= 640px) */}
         {isScheduleOpen && !isMobileScreen && (
           <div
             ref={dropdownRef}
@@ -625,7 +622,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           </div>
         )}
 
-        {/* Phone bottom sheet (< 768px) */}
+        {/* Phone bottom sheet (< 640px) */}
         {mounted && (
           <HudBottomSheet
             isOpen={isScheduleOpen && isMobileScreen}
