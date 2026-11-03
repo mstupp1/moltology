@@ -12,9 +12,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
   "stats": {
     "domains": 12,
     "rules": 124,
-    "decisions": 53,
-    "anchors": 241,
-    "drifted": 21,
+    "decisions": 54,
+    "anchors": 240,
+    "drifted": 19,
     "flagged": 9
   },
   "canvas": {
@@ -128,8 +128,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "signup",
       "title": "Signup screening",
       "color": "#ff7a45",
-      "summary": "New accounts pass a honeypot, a timing signal, a disposable-domain list, and a Jev bot check. Screening fails open when the model is down.",
-      "overviewHtml": "<p>Screening uses cheap local checks first, then asks Jev only when needed. Every path fails open, because a false block costs a real member.</p>",
+      "summary": "New accounts pass a honeypot, a timing signal, a disposable-domain list, and a Laya bot check. Screening fails open when the model is down.",
+      "overviewHtml": "<p>Screening uses cheap local checks first, then asks Laya only when needed. Every path fails open, because a false block costs a real member.</p>",
       "box": {
         "x": 0,
         "y": 1084,
@@ -206,13 +206,13 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "oracle",
       "title": "Oracle AI",
       "color": "#ff5fa2",
-      "summary": "The Oracle checks rate, input, and each member's usage allowance, screens the prompt with the moderation model, routes it to a model allowed by the membership tier, and names new conversations within the streamed request.",
-      "overviewHtml": "<p>The Oracle is the most expensive surface, because every message is a billed model call. The pipeline refuses abuse cheaply first, caps each member&#39;s allowance, then spends a free moderation call to route the question to the cheapest model that can answer it.</p>",
+      "summary": "The Oracle checks rate, input, and each member's usage allowance, routes it to a model allowed by the membership tier, and names new conversations within the streamed request.",
+      "overviewHtml": "<p>The Oracle is the most expensive surface, because every message is a billed model call. The pipeline refuses abuse cheaply first, caps each member&#39;s allowance, then selects a chat model allowed by the verified membership tier. There is no remote moderation call in chat; Laya and Jev remain in forum and signup screening.</p>",
       "box": {
         "x": 0,
         "y": 1988,
-        "width": 1576,
-        "height": 832
+        "width": 1306,
+        "height": 808
       },
       "ruleIds": [
         "oracle.request-pipeline",
@@ -235,7 +235,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Members claim one unique handle, and feeds only show real activity from the member and their friends. Empty stays honest.",
       "overviewHtml": "<p>Social surfaces follow one rule. Show real people and real activity, or show nothing. A quiet new account sees an honest, empty stream instead of fake veterans.</p>",
       "box": {
-        "x": 1672,
+        "x": 1402,
         "y": 1988,
         "width": 612,
         "height": 784
@@ -257,7 +257,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "The app runs inside Neon Free and Vercel Hobby limits. Retention windows, polling rules, and the asset budget keep it there.",
       "overviewHtml": "<p>Most cost decisions trace back to two limits: Neon Free compute hours and Vercel Hobby Active CPU. Anything that polls, keeps compute awake, or grows storage without bound has to justify itself here.</p>",
       "box": {
-        "x": 2380,
+        "x": 2110,
         "y": 1988,
         "width": 904,
         "height": 940
@@ -284,7 +284,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Private-by-default guest checkout preparation with live quotes, audited operations, and recoverable draft fulfillment.",
       "overviewHtml": "<h1>Store launch preparation</h1>\n<p>The store stays private, test-only and manual until separately authorized. Authored product data,\noperational controls and order snapshots have separate lifecycles. See <code>docs/merch-launch.md</code>.</p>",
       "box": {
-        "x": 3380,
+        "x": 3110,
         "y": 1988,
         "width": 992,
         "height": 988
@@ -311,7 +311,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Standing is a member's forum reputation, from upvotes plus review adjustments. It decides who can start threads, which replies sink, and who is limited.",
       "overviewHtml": "<p>Standing is the forum&#39;s reputation score. It comes from other members&#39; upvotes and gates the actions that cost the community the most: new threads and high reply volume.</p>",
       "box": {
-        "x": 4468,
+        "x": 4198,
         "y": 1988,
         "width": 1196,
         "height": 520
@@ -2377,7 +2377,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           },
           {
             "id": "jev",
-            "label": "Jev bot check (800ms)",
+            "label": "Laya bot check (800ms)",
             "kind": "action",
             "tone": "neutral",
             "position": {
@@ -2537,7 +2537,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Honeypot rejects bots",
       "kind": "gate",
       "status": "active",
-      "statement": "The email signup form sends a hidden confirm_website field. If it is filled, the request returns 400 before Better Auth or Jev run, and the attempt is logged with no user id.",
+      "statement": "The email signup form sends a hidden confirm_website field. If it is filled, the request returns 400 before Better Auth or Laya run, and the attempt is logged with no user id.",
       "anchors": [
         {
           "file": "src/lib/signup-telemetry.ts",
@@ -2587,7 +2587,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Fast form signal",
       "kind": "threshold",
       "status": "active",
-      "statement": "An email signup completed in under 1,500 ms is marked fast. It is a signal passed to Jev, not a block on its own.",
+      "statement": "An email signup completed in under 1,500 ms is marked fast. It is a signal passed to Laya, not a block on its own.",
       "anchors": [
         {
           "file": "src/lib/signup-telemetry.ts",
@@ -2703,7 +2703,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "800 ms model budget",
       "kind": "limit",
       "status": "active",
-      "statement": "The signup Jev call has an 800 ms budget, shorter than the 1,200 ms used by the forum and Oracle, so signup never feels slow.",
+      "statement": "Signup screening is pinned to Laya with an 800 ms budget and no Jev fallback. Fields are bounded within the 1,500-character state budget. Forum evaluation retains its 1,200 ms default; Oracle chat has no remote screening.",
       "anchors": [
         {
           "file": "src/lib/quality/signup-screen.ts",
@@ -2712,6 +2712,22 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "value": "800",
           "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/signup-screen.ts#L5"
+        },
+        {
+          "file": "src/lib/quality/signup-screen.ts",
+          "symbol": "defaultSignupEvaluator",
+          "line": 259,
+          "value": "defaultSignupEvaluator(state)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/signup-screen.ts#L259"
+        },
+        {
+          "file": "src/lib/quality/signup-screen.ts",
+          "symbol": "buildSignupState",
+          "line": 243,
+          "value": "buildSignupState(input, local, domain, disposableDomain, fastSubmission)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/signup-screen.ts#L243"
         }
       ],
       "tests": [
@@ -2726,7 +2742,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [],
       "decisions": [
-        "signup-screening"
+        "signup-screening",
+        "oracle-local-screening"
       ],
       "flag": null,
       "flow": null,
@@ -2742,15 +2759,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Screening fails open",
       "kind": "invariant",
       "status": "active",
-      "statement": "If Jev times out, errors, or the gate throws, the signup is allowed. Screening must never lock real people out because a model is down.",
+      "statement": "If Laya times out, errors, or the gate throws, the signup is allowed. Screening must never lock real people out because a model is down.",
       "anchors": [
         {
           "file": "src/lib/quality/signup-screen.ts",
           "symbol": "screenSignup",
-          "line": 269,
+          "line": 270,
           "value": "screenSignup(input, options)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/signup-screen.ts#L269"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/signup-screen.ts#L270"
         }
       ],
       "tests": [
@@ -2764,7 +2781,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [],
       "decisions": [
-        "signup-screening"
+        "signup-screening",
+        "oracle-local-screening"
       ],
       "flag": null,
       "flow": null,
@@ -2780,7 +2798,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Block confidence bars",
       "kind": "threshold",
       "status": "active",
-      "statement": "Email signups are blocked above 0.8 bot confidence, or when Jev says block with a high-risk score. Google accounts are blocked only above 0.9 and only when the email rule would also block. Exactly 0.8 stays on the allow side.",
+      "statement": "Email signups are blocked above 0.8 bot confidence, or when Laya says block with a high-risk score. Google accounts are blocked only above 0.9 and only when the email rule would also block. Exactly 0.8 stays on the allow side.",
       "anchors": [
         {
           "file": "src/lib/quality/signup-screen.ts",
@@ -3938,10 +3956,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/guardrails.ts",
           "symbol": "checkRateLimit",
-          "line": 42,
+          "line": 41,
           "value": "checkRateLimit(identifier, limit, windowMs)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guardrails.ts#L42"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guardrails.ts#L41"
         }
       ],
       "tests": [
@@ -4180,8 +4198,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "usedBy": [
         "signup.jev-budget",
         "forum.quarantine",
-        "forum.fail-open",
-        "oracle.jailbreak-gate"
+        "forum.fail-open"
       ],
       "decisions": [
         "jev-quality-gates",
@@ -4570,15 +4587,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Oracle request pipeline",
       "kind": "flow",
       "status": "active",
-      "statement": "Every message passes flood and local input checks. Guests get a canned reply. Members pass usage checks and atomically reserve an allowance slot before prompt screening or model calls. Refused prompts release the slot. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.",
+      "statement": "Every message passes flood and local input checks. Guests get a canned reply. Members pass usage checks and atomically reserve an allowance slot before chat model calls. Oversized tier-specific prompts release the slot. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.",
       "anchors": [
         {
           "file": "src/lib/ai/handle-oracle-chat-request.ts",
           "symbol": "handleOracleChatRequest",
-          "line": 75,
+          "line": 74,
           "value": "handleOracleChatRequest(request)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L75"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L74"
         }
       ],
       "tests": [
@@ -4598,7 +4615,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "oracle-usage-and-moderation",
         "security-scan-2026-10",
         "atomic-oracle-allowance",
-        "oracle-tier-models-and-titles"
+        "oracle-tier-models-and-titles",
+        "oracle-local-screening"
       ],
       "flag": null,
       "flow": {
@@ -4689,7 +4707,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           },
           {
             "id": "usage",
-            "label": "Over minute or daily allowance?",
+            "label": "Over minute, five-hour, or weekly allowance?",
             "kind": "check",
             "tone": "neutral",
             "position": {
@@ -4724,8 +4742,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "height": 46
           },
           {
-            "id": "preflight",
-            "label": "Moderation preflight",
+            "id": "route",
+            "label": "Reserve usage and create a thread if needed",
             "kind": "action",
             "tone": "neutral",
             "position": {
@@ -4736,37 +4754,13 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "height": 46
           },
           {
-            "id": "jailbreak",
-            "label": "Refused (jailbreak)",
-            "kind": "outcome",
-            "tone": "block",
-            "position": {
-              "x": 267,
-              "y": 796
-            },
-            "width": 208,
-            "height": 46
-          },
-          {
-            "id": "route",
-            "label": "Reserve usage and create a thread if needed",
-            "kind": "action",
-            "tone": "neutral",
-            "position": {
-              "x": 499,
-              "y": 796
-            },
-            "width": 208,
-            "height": 46
-          },
-          {
             "id": "stream",
             "label": "Stream with fallback chain",
             "kind": "outcome",
             "tone": "allow",
             "position": {
-              "x": 499,
-              "y": 882
+              "x": 464,
+              "y": 740
             },
             "width": 208,
             "height": 46
@@ -4828,22 +4822,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "label": "unreadable"
           },
           {
-            "id": "usage-2-preflight",
+            "id": "usage-2-route",
             "source": "usage",
-            "target": "preflight",
-            "label": "no"
-          },
-          {
-            "id": "preflight-0-jailbreak",
-            "source": "preflight",
-            "target": "jailbreak",
-            "label": "jailbreak"
-          },
-          {
-            "id": "preflight-1-route",
-            "source": "preflight",
             "target": "route",
-            "label": "ok or down"
+            "label": "no"
           },
           {
             "id": "route-0-stream",
@@ -4852,14 +4834,14 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "label": null
           }
         ],
-        "width": 707,
-        "height": 928
+        "width": 672,
+        "height": 786
       },
       "position": {
-        "x": 1117,
-        "y": 76
+        "x": 825,
+        "y": 208
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "oracle.rate-limit",
@@ -4872,10 +4854,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/guardrails.ts",
           "symbol": "checkRateLimit",
-          "line": 42,
+          "line": 41,
           "value": "checkRateLimit(identifier, limit, windowMs)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guardrails.ts#L42"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guardrails.ts#L41"
         }
       ],
       "tests": [
@@ -4897,8 +4879,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       },
       "flow": null,
       "position": {
-        "x": 320,
-        "y": 232
+        "x": 28,
+        "y": 364
       },
       "drift": "ok"
     },
@@ -5011,8 +4993,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 612,
-        "y": 232
+        "x": 320,
+        "y": 364
       },
       "drift": "ok"
     },
@@ -5072,8 +5054,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       },
       "flow": null,
       "position": {
-        "x": 904,
-        "y": 232
+        "x": 612,
+        "y": 364
       },
       "drift": "ok"
     },
@@ -5083,23 +5065,23 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Local input guardrails",
       "kind": "gate",
       "status": "active",
-      "statement": "Messages must be non-empty. Free members and guests can send up to 1,500 characters per message; Oracle MAX allows 4,000. Member limits use the authoritative reservation tier, and oversized messages release their reservation before screening. Obvious prompt-injection phrases and explicit harm are refused before any model call.",
+      "statement": "Messages must be non-empty. Free members and guests can send up to 1,500 characters per message; Oracle MAX allows 4,000. Member limits use the authoritative reservation tier, and oversized messages release their reservation before generation. Obvious prompt-injection phrases and explicit harm are refused before any model call.",
       "anchors": [
         {
           "file": "src/lib/ai/guardrails.ts",
           "symbol": "validateInputGuardrails",
-          "line": 91,
+          "line": 90,
           "value": "validateInputGuardrails(input)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guardrails.ts#L91"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guardrails.ts#L90"
         },
         {
           "file": "src/lib/ai/guardrails.ts",
           "symbol": "INJECTION_PATTERNS",
-          "line": 79,
+          "line": 78,
           "value": "[ /ignore (all )?previous instructions/i, /disregard (all )?prior rules/i, /you are now in DAN mode/i, /bypass (safety|content) filter/i, /system prompt overri…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guardrails.ts#L79"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guardrails.ts#L78"
         }
       ],
       "tests": [
@@ -5113,128 +5095,109 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "forum.content-safety"
       ],
       "usedBy": [
-        "oracle.jailbreak-gate"
-      ],
-      "decisions": [
-        "ai-guardrails-first"
-      ],
-      "flag": null,
-      "flow": null,
-      "position": {
-        "x": 1196,
-        "y": 232
-      },
-      "drift": "changed"
-    },
-    {
-      "id": "oracle.jailbreak-gate",
-      "domain": "oracle",
-      "title": "Paraphrased jailbreaks are refused",
-      "kind": "gate",
-      "status": "active",
-      "statement": "The moderation model refuses a message above 80% jailbreak confidence. Oracle MAX screening uses Jev with prompt training disallowed; free members use Laya within their 1,500-character message limit. Screening runs after the authoritative tier reservation, and refusal releases that reservation.",
-      "anchors": [
-        {
-          "file": "src/lib/quality/oracle-preflight.ts",
-          "symbol": "decideOraclePreflight",
-          "line": 106,
-          "value": "decideOraclePreflight(answers)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L106"
-        },
-        {
-          "file": "src/lib/quality/oracle-preflight.ts",
-          "symbol": "ORACLE_JAILBREAK_ERROR",
-          "line": 32,
-          "value": "\"This message can't be sent. Ask your question directly instead of trying to override the assistant.\"",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L32"
-        },
-        {
-          "file": "src/lib/quality/oracle-preflight.ts",
-          "symbol": "defaultOracleEvaluator",
-          "line": 134,
-          "value": "defaultOracleEvaluator(message, isPremium)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L134"
-        }
-      ],
-      "tests": [
-        {
-          "file": "src/lib/quality/oracle-preflight.test.ts",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.test.ts"
-        }
-      ],
-      "dependsOn": [
-        "oracle.input-guardrails",
-        "forum.jev-shared"
-      ],
-      "usedBy": [
+        "oracle.jailbreak-gate",
         "oracle.intent-context",
         "oracle.model-routing"
       ],
       "decisions": [
-        "jev-quality-gates"
+        "ai-guardrails-first",
+        "oracle-local-screening"
       ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1196,
-        "y": 388
+        "x": 904,
+        "y": 364
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "oracle.jailbreak-gate",
+      "domain": "oracle",
+      "title": "Remote chat screening removed",
+      "kind": "gate",
+      "status": "deprecated",
+      "statement": "Oracle chat no longer calls Laya or Jev. Local input checks remain, along with verified membership, message limits, usage reservations, and model access rules. Forum and signup screening remain separate.",
+      "anchors": [
+        {
+          "file": "src/lib/ai/handle-oracle-chat-request.ts",
+          "symbol": "handleOracleChatRequest",
+          "line": 74,
+          "value": "handleOracleChatRequest(request)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L74"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/ai/handle-oracle-chat-request.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "oracle.input-guardrails"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "jev-quality-gates",
+        "oracle-local-screening"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 386,
+        "y": 520
       },
       "drift": "ok"
     },
     {
       "id": "oracle.intent-context",
       "domain": "oracle",
-      "title": "Intent picks the prompt context",
+      "title": "Shared system prompt and local scripture lookup",
       "kind": "flow",
       "status": "active",
-      "statement": "Doctrine questions load the scripture block, chassis and progression questions load a short block, and casual or unrelated questions use the base prompt. When the moderation model is down, the full doctrine context is used.",
+      "statement": "All member chats use the same static system prompt prefix with doctrine, equipment, progression, and scripture summaries. Local lookup adds relevant scripture passages using the current question and recent conversation, without remote intent classification.",
       "anchors": [
         {
-          "file": "src/lib/quality/oracle-preflight.ts",
-          "symbol": "ORACLE_INTENTS",
-          "line": 5,
-          "value": "{ codex_doctrine: 'Scriptures, liturgies, stages, and lore', chassis_equipment: 'Chassis, carapace, pincers, and equipment stats', progression_tasks: 'Daily al…",
+          "file": "src/lib/ai/codex-prompt.ts",
+          "symbol": "buildSystemPrompt",
+          "line": 68,
+          "value": "buildSystemPrompt(persona, _context)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L5"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/codex-prompt.ts#L68"
         },
         {
-          "file": "src/lib/quality/oracle-preflight.ts",
-          "symbol": "contextForOracleIntent",
-          "line": 83,
-          "value": "contextForOracleIntent(intent)",
+          "file": "src/lib/ai/scripture-lookup.ts",
+          "symbol": "buildOracleScriptureContext",
+          "line": 82,
+          "value": "buildOracleScriptureContext(query, previousUserQuestion, previousAssistantResponse)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L83"
-        },
-        {
-          "file": "src/lib/quality/oracle-preflight.ts",
-          "symbol": "fallbackOracleDecision",
-          "line": 96,
-          "value": "fallbackOracleDecision()",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L96"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/scripture-lookup.ts#L82"
         }
       ],
       "tests": [
         {
-          "file": "src/lib/quality/oracle-preflight.test.ts",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.test.ts"
+          "file": "src/lib/ai/codex-prompt.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/codex-prompt.test.ts"
+        },
+        {
+          "file": "src/lib/ai/scripture-lookup.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/scripture-lookup.test.ts"
         }
       ],
       "dependsOn": [
-        "oracle.jailbreak-gate"
+        "oracle.input-guardrails"
       ],
       "usedBy": [],
       "decisions": [
-        "jev-quality-gates"
+        "jev-quality-gates",
+        "oracle-local-screening"
       ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 948,
-        "y": 544
+        "x": 678,
+        "y": 520
       },
       "drift": "ok"
     },
@@ -5274,7 +5237,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         }
       ],
       "dependsOn": [
-        "oracle.jailbreak-gate",
+        "oracle.input-guardrails",
         "economy.red-line"
       ],
       "usedBy": [
@@ -5287,14 +5250,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "oracle-max-model-access",
         "oracle-tier-models-and-titles",
         "oracle-haiku-and-deepseek-1017",
+        "oracle-local-screening",
         "shared-oracle-chat-titles",
         "simplify-oracle-models"
       ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1240,
-        "y": 544
+        "x": 970,
+        "y": 520
       },
       "drift": "ok"
     },
@@ -5337,8 +5301,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 992,
-        "y": 700
+        "x": 722,
+        "y": 676
       },
       "drift": "ok"
     },
@@ -5389,8 +5353,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1284,
-        "y": 700
+        "x": 1014,
+        "y": 676
       },
       "drift": "ok"
     },
@@ -9539,6 +9503,52 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ]
     },
     {
+      "id": "oracle-local-screening",
+      "date": "2026-11-02",
+      "title": "Remove remote Oracle screening and retain message limits",
+      "summary": "Chat uses local guardrails without a Laya or Jev preflight; free messages retain the 1,500-character limit and MAX retains 4,000.",
+      "domains": [
+        "oracle",
+        "signup"
+      ],
+      "rules": [
+        "oracle.request-pipeline",
+        "oracle.input-guardrails",
+        "oracle.jailbreak-gate",
+        "oracle.intent-context",
+        "oracle.model-routing",
+        "signup.jev-budget",
+        "signup.fail-open"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "doc",
+          "label": "handle-oracle-chat-request.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Remote Oracle screening checked for jailbreak attempts in addition to the existing local patterns. It introduced an evaluation request with a 1,200 ms timeout and allowed requests through when evaluation failed. The system prompt already uses a shared static prefix and local scripture lookup; it does not need the evaluator&#39;s intent or complexity classification.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Remove the remote screening call and its unused Oracle preflight module. Keep local input safety checks, JWT verification, authoritative membership and model access checks, usage reservations, and stored conversation history. Free members and guests retain a 1,500-character per-message limit; MAX retains 4,000. Forum retains shared Laya/Jev routing. Signup screening uses Laya explicitly, with bounded fields and no Jev fallback; existing signup decisions and the 800 ms fail-open budget remain.</p>\n<p>This replaces the Oracle screening and intent-routing portions of the earlier Jev quality gates and Oracle usage/moderation decisions. Their forum and usage rules remain in effect.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<p>Keep remote screening as an additional layer. Rejected because its narrow chat role does not justify another request in every member message. Removing all local checks or changing forum screening is outside this decision.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Chat no longer waits for remote screening or sends a separate prompt copy to a moderation endpoint. Paraphrased jailbreak detection from that evaluator is removed; local input checks and the chat model&#39;s own behavior remain. Existing message limits continue to distinguish free and MAX access.</p>"
+        }
+      ]
+    },
+    {
       "id": "shared-oracle-chat-titles",
       "date": "2026-11-02",
       "title": "Use the chat model and first exchange for Oracle titles",
@@ -10162,20 +10172,14 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "crossDomain": false
     },
     {
-      "id": "forum.jev-shared->oracle.jailbreak-gate",
-      "source": "forum.jev-shared",
-      "target": "oracle.jailbreak-gate",
-      "crossDomain": true
-    },
-    {
-      "id": "oracle.jailbreak-gate->oracle.intent-context",
-      "source": "oracle.jailbreak-gate",
+      "id": "oracle.input-guardrails->oracle.intent-context",
+      "source": "oracle.input-guardrails",
       "target": "oracle.intent-context",
       "crossDomain": false
     },
     {
-      "id": "oracle.jailbreak-gate->oracle.model-routing",
-      "source": "oracle.jailbreak-gate",
+      "id": "oracle.input-guardrails->oracle.model-routing",
+      "source": "oracle.input-guardrails",
       "target": "oracle.model-routing",
       "crossDomain": false
     },

@@ -1,7 +1,7 @@
-import { evaluateWithJev, exceedsJevConfidence } from './jev'
+import { evaluateWithJev, exceedsJevConfidence, LAYA_GATEWAY_MODEL_ID } from './jev'
 import { isFastSignup } from '../signup-telemetry'
 
-/** Signup budget. Forum and Oracle keep the shared 1200ms default. */
+/** Signup budget. Forum keeps the shared 1200ms default. */
 export const SIGNUP_JEV_TIMEOUT_MS = 800
 
 /** Email blocks above 0.8. 0.8 itself stays on the allow side. */
@@ -247,8 +247,8 @@ function buildSignupState(input: SignupScreenInput, local: string, domain: strin
     email_structure: describeEmailStructure(local, domain),
     display_name: input.displayName.trim().slice(0, 80) || 'unknown',
     auth_provider: input.provider,
-    country: input.country?.trim() || 'unknown',
-    accept_language: input.acceptLanguage?.trim() || 'unknown',
+    country: normalizeSignupCountry(input.country) || 'unknown',
+    accept_language: clipHeader(input.acceptLanguage ?? null, 128) || 'unknown',
     user_agent: input.userAgent?.trim().slice(0, 256) || 'unknown',
     form_duration_ms: input.provider === 'email' && input.elapsedMs != null ? String(Math.round(input.elapsedMs)) : 'unknown',
     fast_submission: fastSubmission ? 'true' : 'false',
@@ -259,6 +259,7 @@ function buildSignupState(input: SignupScreenInput, local: string, domain: strin
 async function defaultSignupEvaluator(state: Record<string, string>): Promise<SignupAnswers | null> {
   const result = await evaluateWithJev({
     state,
+    model: LAYA_GATEWAY_MODEL_ID,
     questions: SIGNUP_QUESTIONS,
     timeoutMs: SIGNUP_JEV_TIMEOUT_MS,
   })
@@ -295,7 +296,7 @@ export async function screenSignup(
     return decideSignupScreen(answers, decisionInput)
   } catch (err) {
     const message = err instanceof Error ? err.message : 'unknown error'
-    console.warn(`[signup-screen] Jev evaluation failed; signup stays open: ${message}`)
+    console.warn(`[signup-screen] Laya evaluation failed; signup stays open: ${message}`)
     return decideSignupScreen(null, { ...decisionInput, fastPath: false, disposableDomain: false })
   }
 }

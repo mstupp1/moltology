@@ -9,7 +9,6 @@ import { verifyAuthJWT } from '../jwt'
 import { validateInputGuardrails, checkRateLimit } from './guardrails'
 import { buildSystemPrompt, DEFAULT_ORACLE_PERSONA } from './codex-prompt'
 import { buildOracleScriptureContext } from './scripture-lookup'
-import { ORACLE_JAILBREAK_ERROR, screenOraclePrompt } from '../quality/oracle-preflight'
 import {
   saveAIMessage,
   createAIThread,
@@ -122,7 +121,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     )
   }
 
-  // Guests get a canned reply, so they never reach the moderation or chat models.
+  // Guests get a canned reply, so they never reach the chat models.
   if (!userId) {
     const lengthError = getOraclePromptLengthError(userText, false)
     if (lengthError) return Response.json({ error: lengthError }, { status: 400 })
@@ -195,17 +194,6 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     return Response.json({ error: lengthError }, { status: 400 })
   }
 
-  // The reservation's authoritative tier governs every remote prompt processor,
-  // including screening. Premium never sends prompts to the free Laya endpoint.
-  const preflight = await screenOraclePrompt(guardrail.sanitizedText || userText, { isPremium: usageReservation.isPremium })
-  if (preflight.blocked) {
-    await releaseOracleChatUsage(usageEventId)
-    return Response.json(
-      { error: preflight.reason || ORACLE_JAILBREAK_ERROR },
-      { status: 400 },
-    )
-  }
-
   if (isNewThread) {
     try {
       await createAIThread({
@@ -227,7 +215,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     }
   }
 
-  const systemPrompt = buildSystemPrompt(DEFAULT_ORACLE_PERSONA, preflight.context)
+  const systemPrompt = buildSystemPrompt(DEFAULT_ORACLE_PERSONA)
     + buildOracleScriptureContext(
       userText,
       [...storedTurns].reverse().find((turn) => turn.role === 'user')?.content,
@@ -244,7 +232,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     { role: 'user', content: userText },
   ])
   const accessTier = usageReservation.isPremium ? 'premium' : 'free'
-  const candidateModels = orderOracleModels(body.model, preflight.preferredModelId, accessTier)
+  const candidateModels = orderOracleModels(body.model, undefined, accessTier)
   let lastError: Error | null = null
 
   queueOracleUserMessagePersistence({ userId, threadId: activeThreadId, userText })

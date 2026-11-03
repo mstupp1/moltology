@@ -4,8 +4,7 @@ import { ORACLE_MAX_PROMPT_MAX_CHARS } from './prompt-limits'
  * Enforces rate limiting, prompt sanitization, safety policies, and input token boundaries.
  *
  * Obvious injection phrases are rejected here so they never reach a model.
- * Paraphrased jailbreaks are classified by the Jev preflight in
- * `src/lib/quality/oracle-preflight.ts` before a stream starts.
+ * Chat uses these local checks without a remote moderation preflight.
  */
 
 import { containsHarmfulContent, stripControlChars } from '../content-safety'
