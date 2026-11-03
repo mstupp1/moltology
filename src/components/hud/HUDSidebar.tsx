@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useModalPanelFocus } from '@/hooks/useModalPanelFocus'
-import { useNavigate, useLocation, useRouter } from '@tanstack/react-router'
+import { Link, useNavigate, useLocation, useRouter } from '@tanstack/react-router'
 import {
 
   LayoutDashboard,
@@ -50,7 +50,9 @@ import { UserAvatar } from '../UserAvatar'
 import { UserAvatarMenu } from '../UserAvatarMenu'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { getAssetUrl } from '@/lib/assets'
-import { HUDProgressBar } from './HUDProgressBar'
+import { useDailyAlignment } from '@/hooks/useDailyAlignment'
+import { useNotifications } from '@/hooks/useNotifications'
+import { openNotificationsPanel } from '@/lib/alignment-panel'
 import { HUDTaskBar } from './HUDTaskBar'
 import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 
@@ -75,13 +77,13 @@ interface HUDSidebarProps {
 
 export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   larvaId = 'LARVA UNIT #8971',
-  stage,
-  xp,
 }) => {
   const router = typeof useRouter === 'function' ? useRouter() : null
   const navigate = useNavigate()
   const location = useLocation()
 
+  const alignment = useDailyAlignment()
+  const { unreadCount } = useNotifications()
   const currentRoute = location.pathname
 
   const [pendingRoute, setPendingRoute] = useState<string | null>(null)
@@ -100,9 +102,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const [isMobileClosing, setIsMobileClosing] = useState(false)
   const [isMobileVisible, setIsMobileVisible] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  // Starts expanded to match the server render; the saved choice is applied
-  // before first paint in the layout effect below.
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  // Use the compact rail for SSR and new visitors; restore an explicit saved choice before paint.
+  const [isCollapsed, setIsCollapsed] = useState(true)
   const [isMounted, setIsMounted] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const dragStartRef = React.useRef<{ startX: number; hasMoved: boolean }>({
@@ -758,81 +759,61 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       <aside
         suppressHydrationWarning
         className={`w-full ${
-          isCollapsed ? 'md:w-20' : 'md:w-72'
+          isCollapsed ? 'md:w-20' : 'md:w-60'
         } h-auto md:h-full md:min-h-0 md:max-h-full bg-surface-1 border-b-0 md:border-r border-line-subtle flex flex-col select-none relative z-40 md:z-50 shrink-0 shadow-2xl ${
           isMounted ? 'transition-[width] duration-200 ease-out motion-reduce:transition-none' : ''
         } group/sidebar ${isNavAnimating ? 'md:overflow-hidden' : 'overflow-visible'}`}
       >
-        {/* Mobile Top Bar (Transitions between HeaderBrand and Progress Bar when hamburger menu is toggled) */}
-        <div className="flex md:hidden items-center justify-between gap-2 px-2.5 py-2 h-14 bg-surface-1 border-b border-line-subtle relative z-50 shrink-0 overflow-hidden">
-          {/* HUD scanline overlay in mobile header */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
-            <div
-              className="absolute inset-0 opacity-[0.02]"
-              style={{
-                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,255,0.5) 2px, rgba(0,255,255,0.5) 3px)',
-              }}
-            />
-          </div>
-
-          {/* Left Brand Area (Visible when menu is closed, slides smoothly back into view when closing) */}
-          <div
-            className={`flex items-center min-w-0 z-10 transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${
-              isMobileHeaderOpen
-                ? 'opacity-0 -translate-x-4 pointer-events-none absolute left-2.5'
-                : 'opacity-100 translate-x-0 relative flex-1'
-            }`}
-          >
-            <HeaderBrand
-              logoSize="sm"
-              onClick={() => handleNavClick('/dashboard')}
-            />
-          </div>
-
-          {/* Progress Bar Row Area (Fades in in-place when open without horizontal slide) */}
-          <div
-            className={`flex items-center min-w-0 z-10 transition-opacity duration-150 ${
-              isMobileHeaderOpen
-                ? 'opacity-100 relative flex-1 mr-1'
-                : 'opacity-0 pointer-events-none absolute inset-y-0 left-2.5 right-12'
-            }`}
-          >
-            <HUDProgressBar stage={stage} xp={xp} showTaskBar={false} className="w-full" />
-          </div>
-
-          {/* Right Action Controls */}
-          <div className="flex items-center gap-1.5 shrink-0 z-10">
-            {/* Task list button next to hamburger (visible when menu is closed) */}
-            {!isMobileHeaderOpen && (
-              <div className="flex items-center animate-in fade-in duration-200">
-                <HUDTaskBar variant="header" />
-              </div>
-            )}
-
-            {/* Hamburger / Close Menu Toggle Button */}
+        {/* Mobile navigation is fixed to the bottom, leaving the content area clear. */}
+        <nav aria-label="Mobile navigation" className="md:hidden fixed inset-x-0 bottom-0 z-50 bg-surface-1 border-t border-line-subtle pb-[env(safe-area-inset-bottom)]">
+          <div className="grid grid-cols-5">
+            {[
+              { label: 'Home', path: '/dashboard', icon: LayoutDashboard },
+              { label: 'Liturgies', path: '/alignment', icon: Calendar },
+              { label: 'Community', path: '/forum', icon: Users },
+              { label: 'Oracle', path: '/oracle', icon: Atom },
+            ].map(({ label, path, icon: Icon }) => (
+              <Link key={path} to={path} onClick={() => { if (isMobileOpen) closeMobileMenu() }} aria-current={(effectiveRoute === path || effectiveRoute.startsWith(`${path}/`)) ? 'page' : undefined} className={`h-14 flex flex-col items-center justify-center gap-1 text-[11px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow ${(effectiveRoute === path || effectiveRoute.startsWith(`${path}/`)) ? 'text-cyan-glow' : 'text-ink'}`}>
+                <span className="flex items-center justify-center gap-1">
+                  <Icon className="w-5 h-5" aria-hidden="true" />
+                  {path === '/alignment' && !alignment.isLoading && (
+                    <span className="text-[11px] tabular-nums text-ink-muted" aria-label={`${alignment.completedCount} of ${alignment.totalCount} liturgies complete`}>
+                      {alignment.completedCount}/{alignment.totalCount}
+                    </span>
+                  )}
+                </span>
+                {label}
+              </Link>
+            ))}
             <button
               ref={mobileTriggerRef}
+              type="button"
               onClick={toggleMobileMenu}
-              aria-label={isMobileHeaderOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isMobileHeaderOpen}
-              title={isMobileHeaderOpen ? 'Close menu' : 'Open menu'}
-              className={`w-9 h-9 flex items-center justify-center rounded-control border transition-all duration-300 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow shrink-0 cursor-pointer ${
-                isMobileHeaderOpen
-                  ? 'bg-surface-2 border-line-strong text-ink hover:bg-surface-3'
-                  : 'bg-surface-1 border-line text-cyan-glow hover:bg-surface-2 hover:border-line-strong'
+              aria-label="More navigation"
+              className={`h-14 flex flex-col items-center justify-center gap-1 text-[11px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow ${
+                isMobileHeaderOpen || !['/dashboard', '/alignment', '/forum', '/oracle'].some(
+                  path => effectiveRoute === path || effectiveRoute.startsWith(`${path}/`)
+                ) ? 'text-cyan-glow' : 'text-ink'
               }`}
             >
-              <AnimatedHamburger isOpen={isMobileHeaderOpen} />
+              <span className="relative">
+                <AnimatedHamburger isOpen={isMobileHeaderOpen} />
+                {unreadCount > 0 && <span aria-label={`${unreadCount} unread notifications`} className="absolute -right-2 -top-1 min-w-4 px-0.5 rounded-chip bg-crimson-aggro text-abyss text-[11px] tabular-nums">{unreadCount}</span>}
+              </span>
+              More
             </button>
           </div>
-        </div>
+        </nav>
+
+        <HUDTaskBar variant="mobile" className="md:hidden" />
 
         {/* Desktop Header Logo */}
         <div
           className={`hidden md:flex items-center shrink-0 relative group/brand border-b border-line-subtle h-16 overflow-visible ${
             desktopContentAnimation
           } ${
-            isCollapsed ? 'w-20 justify-center px-2' : 'w-72 justify-start px-3'
+            isCollapsed ? 'w-20 justify-center px-2' : 'w-60 justify-start px-3'
           }`}
         >
           <HeaderBrand
@@ -878,7 +859,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         </div>
 
         {/* Desktop Sidebar Navigation Container */}
-        <div className={`hidden md:flex flex-1 flex-col justify-between space-y-0 overflow-visible min-h-0 shrink-0 ${desktopContentAnimation} ${isCollapsed ? 'w-20' : 'w-72'}`}>
+        <div className={`hidden md:flex flex-1 flex-col justify-between space-y-0 overflow-visible min-h-0 shrink-0 ${desktopContentAnimation} ${isCollapsed ? 'w-20' : 'w-60'}`}>
           {/* Search Bar — full width, above nav */}
           <div className="shrink-0 border-b border-line-subtle">
             <button
@@ -1212,12 +1193,19 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             role="dialog"
             aria-modal="true"
             aria-label="Navigation Menu"
-            className={`md:hidden fixed inset-x-0 bottom-0 top-14 z-[99990] w-screen h-[calc(100dvh-3.5rem)] bg-abyss flex flex-col font-sans text-ink select-none overflow-hidden transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${
+            className={`md:hidden fixed inset-x-0 bottom-0 top-0 z-[99990] w-screen h-[100dvh] pt-[env(safe-area-inset-top)] bg-abyss flex flex-col font-sans text-ink select-none overflow-hidden transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${
               isMobileVisible && !isMobileClosing
                 ? 'opacity-100 translate-y-0'
                 : 'opacity-0 -translate-y-2 pointer-events-none'
             }`}
           >
+            <div className="flex items-center justify-between px-4 py-2 border-b border-line-subtle"><HeaderBrand logoSize="sm" onClick={() => handleNavClick('/dashboard')} /><button type="button" aria-label="Close more navigation" onClick={() => closeMobileMenu()} className="min-h-12 px-3 text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow">Close</button></div>
+            <Link to="/market" onClick={() => closeMobileMenu()} className="flex items-center justify-between min-h-12 px-4 border-b border-line-subtle text-sm text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow">
+              <span>Balances and market</span><ChevronRight className="w-4 h-4 text-ink-muted" aria-hidden="true" />
+            </Link>
+            <button type="button" onClick={() => closeMobileMenu(openNotificationsPanel)} className="flex items-center justify-between min-h-12 px-4 border-b border-line-subtle text-sm text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow">
+              <span>Notifications</span><span className="text-ink-muted tabular-nums">{unreadCount > 0 ? unreadCount : 'Up to date'}</span>
+            </button>
             {/* Search Bar (Click opens Command Palette & closes mobile menu) */}
             <div className="shrink-0 border-b border-line-subtle bg-surface-1">
               <button

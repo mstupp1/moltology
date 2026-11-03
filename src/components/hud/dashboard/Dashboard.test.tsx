@@ -63,6 +63,19 @@ describe('DashboardTodayStrip', () => {
     expect(screen.getByTestId('auth-modal')).toBeInTheDocument()
   })
 
+  it('opens live stage progress and returns to Home when dismissed', async () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
+    render(<DashboardTodayStrip />)
+    const trigger = screen.getByRole('button', { name: 'View stage progress' })
+    await waitFor(() => expect(trigger).toBeEnabled())
+    fireEvent.click(trigger)
+    expect(screen.getByRole('dialog', { name: 'Stage progress' })).toBeInTheDocument()
+    expect(screen.getByText(/lifetime XP/)).toBeInTheDocument()
+    expect(screen.getByText('Stage 4 · Full Carcinization')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Stage progress' })).not.toBeInTheDocument())
+  })
+
   it('greets a member by first name and navigates to the alignment page as the next step', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'u1', name: 'Myles Example' } },
@@ -71,7 +84,7 @@ describe('DashboardTodayStrip', () => {
 
     render(<DashboardTodayStrip />)
     expect(screen.getByRole('heading', { name: 'Welcome back, Myles' })).toBeInTheDocument()
-    expect(screen.getByText('Stage 1')).toBeInTheDocument()
+    expect(screen.getAllByText('Stage 1').length).toBeGreaterThan(0)
     expect(screen.getByText('Streak')).toBeInTheDocument()
     expect(screen.getByText('0/8')).toBeInTheDocument()
 

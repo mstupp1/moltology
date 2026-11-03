@@ -1,12 +1,13 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act, within } from '@testing-library/react'
 import { HUDSidebar, computeNavItemHidden } from './HUDSidebar'
 import { authClient } from '@/lib/auth-client'
 
 const mockNavigate = vi.fn()
 
 vi.mock('@tanstack/react-router', () => ({
+  Link: ({ children, to, ...props }: any) => <a href={to} {...props}>{children}</a>,
   useNavigate: () => mockNavigate,
   useLocation: () => ({ pathname: '/dashboard' }),
   useRouter: () => ({ preloadRoute: vi.fn() }),
@@ -42,31 +43,41 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     mockGetUserProfileFn.mockResolvedValue(null)
     mockGetPremiumMembershipFn.mockResolvedValue({ hasPurchasedPremium: false, isPremium: false })
     localStorage.clear()
+    localStorage.setItem('moltology_hud_sidebar_collapsed', 'false')
     document.body.style.overflow = ''
+  })
+
+  it('defaults to the compact rail without a saved preference', () => {
+    localStorage.removeItem('moltology_hud_sidebar_collapsed')
+    render(<HUDSidebar />)
+    expect(screen.getByRole('complementary')).toHaveClass('md:w-20')
+    fireEvent.keyDown(window, { key: 'b', metaKey: true })
+    expect(screen.getByRole('complementary')).toHaveClass('md:w-60')
+    expect(localStorage.getItem('moltology_hud_sidebar_collapsed')).toBe('false')
   })
 
   it('keeps desktop contents at their target width while the outer rail changes width', () => {
     const { container } = render(<HUDSidebar />)
     const aside = screen.getByRole('complementary')
     expect(aside).toHaveClass('transition-[width]', 'motion-reduce:transition-none')
-    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-72')
+    expect(container.querySelector('nav[aria-label="Mobile navigation"]')?.closest('aside')).toHaveClass('md:w-60')
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
-    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-20')
+    expect(container.querySelector('nav[aria-label="Mobile navigation"]')?.closest('aside')).toHaveClass('md:w-20')
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
-    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-72')
+    expect(container.querySelector('nav[aria-label="Mobile navigation"]')?.closest('aside')).toHaveClass('md:w-60')
   })
 
   it('cancels mobile close callbacks on reopen and releases scroll lock at the desktop breakpoint', () => {
     vi.useFakeTimers()
     render(<HUDSidebar />)
-    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }))
+    fireEvent.click(screen.getByRole('button', { name: 'More navigation' }))
     act(() => vi.advanceTimersByTime(50))
     const dialog = screen.getByRole('dialog', { name: 'Navigation Menu' })
-    fireEvent.click(screen.getByRole('button', { name: 'Close menu' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close more navigation' }))
     expect(dialog).toHaveAttribute('inert')
     expect(dialog).toHaveClass('-translate-y-2')
     act(() => vi.advanceTimersByTime(100))
-    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }))
+    fireEvent.click(screen.getByRole('button', { name: 'More navigation' }))
     act(() => vi.advanceTimersByTime(250))
     expect(screen.getByRole('dialog', { name: 'Navigation Menu' })).toBe(dialog)
     expect(dialog).not.toHaveAttribute('inert')
@@ -127,7 +138,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     render(<HUDSidebar />)
 
     const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-60')
 
     // Press Cmd+B to collapse
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
@@ -135,14 +146,14 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     // Press Cmd+B to un-collapse
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-60')
   })
 
   it('toggles sidebar collapse with interactive edge rail click', () => {
     render(<HUDSidebar />)
 
     const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-60')
 
     const rail = screen.getByRole('separator', { name: /Collapse sidebar/i })
     expect(rail).toBeInTheDocument()
@@ -157,14 +168,14 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     fireEvent.mouseDown(rail, { button: 0, clientX: 72 })
     fireEvent.mouseUp(window)
 
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-60')
   })
 
   it('collapses and expands sidebar by dragging the edge rail', () => {
     render(<HUDSidebar />)
 
     const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-60')
 
     const rail = screen.getByRole('separator')
 
@@ -180,7 +191,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     fireEvent.mouseMove(window, { clientX: 300 })
     fireEvent.mouseUp(window)
 
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-60')
   })
 
   it('renders short centered text names underneath items in collapsed mode', () => {
@@ -206,40 +217,32 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getAllByText('SUPPORT').length).toBeGreaterThan(0)
   })
 
-  it('toggles mobile HUD menu state on mobile button click and renders icon-only with no text', () => {
+  it('offers labeled primary route links and opens secondary navigation from More', () => {
     render(<HUDSidebar />)
-
-    // When mobile menu is closed, task list button is present in header next to hamburger
-    expect(screen.getByLabelText('Daily alignment tasks schedule')).toBeInTheDocument()
-
-    const mobileMenuBtn = screen.getByRole('button', { name: /Open menu/i })
-    expect(mobileMenuBtn).toBeInTheDocument()
-    expect(mobileMenuBtn.textContent).toBe('')
-
-    fireEvent.click(mobileMenuBtn)
-
-    const closeMenuBtn = screen.getByRole('button', { name: /Close menu/i })
-    expect(closeMenuBtn).toBeInTheDocument()
-    expect(closeMenuBtn.textContent).toBe('')
-
-    // When mobile menu is open, the progress bar row is rendered in the top header
-    expect(screen.getByLabelText('Stage 1 Badge')).toBeInTheDocument()
-    expect(screen.getByLabelText('Next Stage 2 Badge')).toBeInTheDocument()
+    const nav = screen.getByRole('navigation', { name: 'Mobile navigation' })
+    expect(within(nav).getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/dashboard')
+    expect(within(nav).getByRole('link', { name: 'Home' })).toHaveAttribute('aria-current', 'page')
+    expect(within(nav).getByRole('link', { name: 'Oracle' })).toHaveAttribute('href', '/oracle')
+    expect(within(nav).getByLabelText('0 of 8 liturgies complete')).toHaveTextContent('0/8')
+    expect(within(nav).queryByRole('button', { name: 'Daily alignment tasks schedule' })).not.toBeInTheDocument()
+    fireEvent.click(within(nav).getByRole('button', { name: 'More navigation' }))
+    const dialog = screen.getByRole('dialog', { name: 'Navigation Menu' })
+    expect(within(dialog).getByRole('button', { name: 'Close more navigation' })).toHaveTextContent('Close')
   })
 
   it('renders mobile menu as full-screen portal modal with body scroll locked', async () => {
     render(<HUDSidebar />)
 
-    const mobileMenuBtn = screen.getByRole('button', { name: /Open menu/i })
+    const mobileMenuBtn = screen.getByRole('button', { name: 'More navigation' })
     fireEvent.click(mobileMenuBtn)
 
     const dialog = screen.getByRole('dialog', { name: /Navigation Menu/i })
     expect(dialog).toBeInTheDocument()
-    expect(dialog).toHaveClass('fixed', 'inset-x-0', 'bottom-0', 'top-14', 'w-screen')
+    expect(dialog).toHaveClass('fixed', 'inset-x-0', 'bottom-0', 'top-0', 'w-screen')
     expect(document.body.style.overflow).toBe('hidden')
 
     // Close via close button
-    const closeBtn = screen.getByRole('button', { name: /Close menu/i })
+    const closeBtn = screen.getByRole('button', { name: 'Close more navigation' })
     fireEvent.click(closeBtn)
 
     await waitFor(() => {
@@ -251,7 +254,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
   it('closes mobile full-screen menu when Escape key is pressed', async () => {
     render(<HUDSidebar />)
 
-    const mobileMenuBtn = screen.getByRole('button', { name: /Open menu/i })
+    const mobileMenuBtn = screen.getByRole('button', { name: 'More navigation' })
     fireEvent.click(mobileMenuBtn)
 
     expect(screen.getByRole('dialog', { name: /Navigation Menu/i })).toBeInTheDocument()
@@ -266,7 +269,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
   it('navigates and closes mobile menu when nav item inside modal is clicked', async () => {
     render(<HUDSidebar />)
 
-    const mobileMenuBtn = screen.getByRole('button', { name: /Open menu/i })
+    const mobileMenuBtn = screen.getByRole('button', { name: 'More navigation' })
     fireEvent.click(mobileMenuBtn)
 
     const dialog = screen.getByRole('dialog', { name: /Navigation Menu/i })
@@ -378,7 +381,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     const aside = container.querySelector('aside')
     expect(aside?.className).toContain('md:w-20')
-    expect(aside?.className).not.toContain('md:w-72')
+    expect(aside?.className).not.toContain('md:w-60')
   })
 
   it('shows a claimed designation in the account menu instead of the larva unit', async () => {
