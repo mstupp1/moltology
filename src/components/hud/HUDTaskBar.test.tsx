@@ -4,7 +4,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react'
 import { ToastProvider, useToast } from '@/components/ui/ToastProvider'
 import { HUDTaskBar } from './HUDTaskBar'
 import { CANONICAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
-import { OPEN_ALIGNMENT_PANEL_EVENT, OPEN_NOTIFICATIONS_PANEL_EVENT } from '@/lib/alignment-panel'
+import { OPEN_ALIGNMENT_PANEL_EVENT } from '@/lib/alignment-panel'
 import type { NotificationView } from '@/lib/notifications'
 
 const markRead = vi.fn()
@@ -55,19 +55,6 @@ describe('HUDTaskBar', () => {
     mockUnreadCount = 0
     markRead.mockReset()
     markAllRead.mockReset()
-  })
-
-  it('opens the mobile task and notification sheets without rendering a standalone trigger', () => {
-    const previous = window.innerWidth
-    window.innerWidth = 390
-    render(<HUDTaskBar variant="mobile" />)
-    expect(screen.queryByRole('button', { name: 'Daily alignment tasks schedule' })).not.toBeInTheDocument()
-    act(() => window.dispatchEvent(new Event(OPEN_ALIGNMENT_PANEL_EVENT)))
-    expect(screen.getByRole('dialog', { name: "Today's tasks and notifications" })).toBeInTheDocument()
-    expect(screen.getByRole('tabpanel', { name: 'Tasks' })).toBeInTheDocument()
-    act(() => window.dispatchEvent(new Event(OPEN_NOTIFICATIONS_PANEL_EVENT)))
-    expect(screen.getByRole('tabpanel', { name: 'Notifications' })).toBeInTheDocument()
-    window.innerWidth = previous
   })
 
   it('renders hero task bar chronometer with title, digits, and next alignment task', () => {
@@ -199,10 +186,10 @@ describe('HUDTaskBar', () => {
     expect(screen.getByLabelText('2 new notifications')).toHaveTextContent('2')
   })
 
-  it.each([390, 700])('renders the task sheet at mobile navigation width %ipx', (width) => {
+  it('renders bottom-anchored modal sheet on mobile viewport (< 640px)', () => {
     // Set viewport width to mobile
     act(() => {
-      window.innerWidth = width
+      window.innerWidth = 390
       window.dispatchEvent(new Event('resize'))
     })
 

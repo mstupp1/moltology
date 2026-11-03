@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowRight, Flame } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
-import { HudButton, HudBottomSheet, HeaderBrand } from '@/components/ui'
+import { HudButton } from '@/components/ui'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { useLastOracleThread } from '@/hooks/useLastOracleThread'
@@ -10,8 +10,6 @@ import { oracleRouteSearch } from '@/lib/ai/last-oracle-thread'
 import { describeAlignmentToday, pickDashboardNextStep } from '@/lib/dashboard-next-step'
 import { cn } from '@/lib/utils'
 import { getAssetUrl } from '@/lib/assets'
-import { openAlignmentPanel } from '@/lib/alignment-panel'
-import { STAGE_THRESHOLDS } from '@/lib/progression'
 import { STAGE_ART } from '@/lib/stage-art'
 
 function firstName(name?: string | null): string | null {
@@ -76,7 +74,6 @@ export function DashboardTodayStrip() {
   const lastThread = useLastOracleThread()
   const [dateLabel, setDateLabel] = useState('')
   const [isAuthOpen, setIsAuthOpen] = useState(false)
-  const [isProgressOpen, setIsProgressOpen] = useState(false)
 
   useEffect(() => {
     setDateLabel(new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }))
@@ -113,7 +110,6 @@ export function DashboardTodayStrip() {
       data-testid="dashboard-today"
       className="relative isolate overflow-hidden rounded-card border border-line-subtle bg-surface-1 shadow-sheen-inset"
     >
-      <div className="md:hidden px-5 pt-4"><HeaderBrand logoSize="sm" /></div>
       <div className="relative">
         <div aria-hidden="true" className="pointer-events-none absolute top-0 right-0 h-[210px] sm:h-full w-full sm:w-3/5 overflow-hidden">
           <img
@@ -185,17 +181,8 @@ export function DashboardTodayStrip() {
       </div>
 
       <div className="relative grid grid-cols-3 min-w-0 border-t border-line-subtle bg-abyss/40 divide-x divide-line-subtle px-2 py-2 sm:px-3">
-        <button
-          type="button"
-          onClick={() => setIsProgressOpen(true)}
-          disabled={!ready}
-          aria-label="View stage progress"
-          aria-haspopup="dialog"
-          aria-expanded={isProgressOpen}
-          className="text-left rounded-control hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow"
-        >
         <Readout
-          label={`Stage ${progression.stage}`}
+          label="Progress"
           footer={
             <>
               <Meter ratio={progression.progressRatio} label="Progress to the next stage" />
@@ -215,7 +202,6 @@ export function DashboardTodayStrip() {
         >
           {ready ? `${Math.round(progression.progressRatio * 100)}%` : '–'}
         </Readout>
-        </button>
         <Readout
           label="Streak"
           footer={
@@ -230,7 +216,6 @@ export function DashboardTodayStrip() {
             {ready ? streakDays : '–'}
           </span>
         </Readout>
-        <button type="button" onClick={openAlignmentPanel} aria-label="View today's tasks" aria-haspopup="dialog" className="text-left rounded-control hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow">
         <Readout
           label="Alignment"
           footer={
@@ -244,26 +229,8 @@ export function DashboardTodayStrip() {
         >
           {ready ? `${completedCount}/${totalCount}` : '–'}
         </Readout>
-        </button>
       </div>
 
-      <HudBottomSheet isOpen={isProgressOpen} onClose={() => setIsProgressOpen(false)} title="Stage progress">
-        <div className="flex items-center justify-between gap-4">
-          <h2 className="text-lg font-bold text-ink">Stage progress</h2>
-          <button type="button" onClick={() => setIsProgressOpen(false)} className="min-h-12 px-3 text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow">Close</button>
-        </div>
-        <p className="text-sm text-ink-body">{progression.xp.toLocaleString('en-US')} lifetime XP · {progression.subStage.code} {progression.subStage.shortTitle}</p>
-        <Meter ratio={progression.progressRatio} label="Stage progression" />
-        <p className="text-sm text-ink-body">{progression.isMaxStage ? 'Final stage reached' : `${xpToNext.toLocaleString('en-US')} XP to Stage ${progression.stage + 1}`}</p>
-        <ol className="divide-y divide-line-subtle">
-          {STAGE_THRESHOLDS.map((stage) => (
-            <li key={stage.stage} aria-current={stage.stage === progression.stage ? 'step' : undefined} className="flex justify-between gap-4 py-3 text-sm">
-              <span className={stage.stage === progression.stage ? 'text-cyan-glow font-semibold' : 'text-ink-body'}>Stage {stage.stage} · {stage.title.toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase())}</span>
-              <span className="shrink-0 text-ink-muted tabular-nums">{stage.minXp.toLocaleString('en-US')} XP</span>
-            </li>
-          ))}
-        </ol>
-      </HudBottomSheet>
       {isGuest && <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} initialMode="signup" />}
     </section>
   )

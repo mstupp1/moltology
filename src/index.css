@@ -1021,7 +1021,3 @@
 @media (prefers-reduced-motion: reduce) {
   .store-hero-image, .store-hero-copy { animation: none; }
 }
-
-@media (max-width: 767px) {
-  .mobile-nav-clearance { padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px)); }
-}

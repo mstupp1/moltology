@@ -60,6 +60,7 @@ function HudContent() {
               (location.search as string).includes('main_only=true')))
     )
 
+  const reserveMobileOracleSpace = !isMainOnly && !isFullscreenRoute && oracle?.mode !== 'sidebar'
   const isPending = session.isPending
   const targetId = isPending ? null : userId || 'guest'
   const isDashboardRoute =
@@ -186,7 +187,7 @@ function HudContent() {
 
             {/* Main Panel Content Workspace with Ultra-Translucent Glass Backdrop */}
             <main
-              className={`flex-1 min-h-0 ${!isMainOnly ? 'mobile-nav-clearance' : ''} ${
+              className={`flex-1 min-h-0 ${reserveMobileOracleSpace ? 'hud-mobile-oracle-clearance' : ''} ${
                 isFullscreenRoute
                   ? 'p-0 overflow-hidden'
                   : 'p-2.5 sm:p-4 md:p-6 overflow-y-auto overscroll-y-contain'
@@ -223,7 +224,7 @@ function HudContent() {
       {!isMainOnly && <SynapticOracleWidget userId={userId} />}
 
       {!isMainOnly && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-[calc(56px+env(safe-area-inset-bottom))] md:bottom-0 z-[45] pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[45] pb-[max(0.5rem,env(safe-area-inset-bottom))]">
           <PwaInstallBanner />
         </div>
       )}

@@ -1,11 +1,5 @@
 /** Custom event that opens the in-HUD Daily Alignment liturgies panel (NEXT chip). */
 export const OPEN_ALIGNMENT_PANEL_EVENT = 'open-alignment-panel'
-export const OPEN_NOTIFICATIONS_PANEL_EVENT = 'open-notifications-panel'
-
-export function openNotificationsPanel(): void {
-  if (typeof window === 'undefined') return
-  window.dispatchEvent(new CustomEvent(OPEN_NOTIFICATIONS_PANEL_EVENT))
-}
 
 /** Fire from dashboard chrome so HUDTaskBar opens the same liturgies panel as NEXT. */
 export function openAlignmentPanel(): void {
