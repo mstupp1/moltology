@@ -159,7 +159,7 @@ describe('MemberProfilePage', () => {
     expect(screen.getByText('Learning from Architect Vaelen')).toBeInTheDocument()
   })
 
-  it('renders circular animated portrait on profile page and avoids square full-body', async () => {
+  it('renders the standard circular mascot portrait on profile page', async () => {
     mockGetPublicProfile.mockResolvedValue({
       ...claimedProfile,
       avatarConfig: JSON.stringify({ style: 'critters', seed: 'claw-lord-avatar' }),
@@ -172,8 +172,10 @@ describe('MemberProfilePage', () => {
     })
     expect(screen.queryByTestId('lobster-avatar-full-body')).toBeNull()
     await waitFor(() => {
-      expect(screen.getByTestId('lobster-avatar-inline-svg')).toBeInTheDocument()
+      expect(screen.getByTestId('lobster-avatar-portrait-image')).toBeInTheDocument()
     })
+    expect(screen.getByTestId('lobster-avatar-portrait')).toHaveAttribute('data-animated', 'false')
+    expect(screen.queryByTestId('lobster-avatar-inline-svg')).toBeNull()
   })
 
   it('renders uncalibrated carapace silhouette in circular portrait when avatarConfig is null', async () => {

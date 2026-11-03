@@ -114,9 +114,14 @@ describe('SettingsPage', () => {
     expect(toggle).toHaveAttribute('aria-checked', 'false')
   })
 
-  it('links to the unified character studio instead of a second editor', async () => {
+  it('shows the simplified settings title without the avatar section', async () => {
     render(<ToastProvider><SettingsPage /></ToastProvider>)
-    expect(await screen.findByRole('link', {name:'Open character studio'})).toHaveAttribute('href','/chassis')
+    expect(await screen.findByRole('heading', { name: 'Settings', level: 1 })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Plan & usage' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Avatar' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Open character studio' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Account', { exact: true })).not.toBeInTheDocument()
+    expect(screen.queryByText('Manage your account, email preferences, sign-in methods, and display options.')).not.toBeInTheDocument()
     expect(screen.queryByTestId('avatar-creator-panel')).not.toBeInTheDocument()
   })
 })
