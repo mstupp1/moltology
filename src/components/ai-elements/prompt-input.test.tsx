@@ -86,6 +86,9 @@ describe('PromptInput', () => {
     expect(within(menu).queryByText(/Sonnet/)).not.toBeInTheDocument()
     expect(within(menu).queryByText('Mistral Nemo 12B')).not.toBeInTheDocument()
     expect(within(menu).getAllByRole('menuitemradio')).toHaveLength(2)
+    expect(menu.querySelectorAll('[data-oracle-provider]')).toHaveLength(0)
+    expect(menu.querySelector('[data-oracle-tier=lite]')).toBeInTheDocument()
+    expect(menu.querySelector('[data-oracle-tier=max]')).toBeInTheDocument()
     expect(menu.closest('[data-radix-popper-content-wrapper]')).toBeInTheDocument()
   })
 
@@ -166,6 +169,9 @@ describe('PromptInput', () => {
     fireEvent.keyDown(screen.getByRole('button', { name: 'Select model' }), { key: 'Enter' })
     expect(screen.getByText('DeepSeek V4.1 Flash 1017')).toBeInTheDocument()
     expect(screen.getByText('Claude Haiku 5.5')).toBeInTheDocument()
+    const menu = screen.getByRole('menu', { name: 'Oracle models' })
+    expect(menu.querySelector('[data-oracle-provider=deepseek]')).toBeInTheDocument()
+    expect(menu.querySelector('[data-oracle-provider=anthropic]')).toBeInTheDocument()
   })
 
   it('lets MAX members select Lite with no-training routing', () => {

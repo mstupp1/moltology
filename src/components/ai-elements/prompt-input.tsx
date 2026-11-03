@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { ArrowUp, Mic, Loader2, ChevronDown, Check, Square } from 'lucide-react'
 import { OracleModel, ORACLE_MODELS, DEFAULT_ORACLE_PLACEHOLDER, canUseOracleChatModel } from '@/lib/ai/oracle-models'
+import { OracleTierIcon } from '@/components/ai/OracleTierIcon'
 import { OracleModelLogo } from '@/components/ai/OracleModelLogo'
 import { useSpeechDictation, type DictationError } from '@/hooks/useSpeechDictation'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
@@ -48,7 +49,7 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
           title="Select model"
           aria-label="Select model"
         >
-          <OracleModelLogo provider={selectedModel.provider} />
+          <OracleTierIcon tier={selectedModel.access === 'premium' ? 'max' : 'lite'} />
           <span className="truncate max-w-[140px] sm:max-w-none font-medium">
             {compactLabel ? selectedModel.shortLabel || selectedModel.label : selectedModel.label}
           </span>
@@ -70,7 +71,7 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
             const hasAccess = accessTier !== 'guest' && (model.access !== 'premium' || accessTier === 'premium')
             const canSelect = canUseOracleChatModel(model, accessTier)
             const isSelected = model.id === selectedModel.id
-            const note = !hasAccess ? (accessTier === 'guest' ? 'Sign in to use chat' : 'Requires Oracle MAX') : accessTier === 'premium' && !model.noPromptTraining ? 'Free members only' : undefined
+            const note = !hasAccess ? (accessTier === 'guest' ? 'Sign in to use chat' : 'Requires Oracle MAX subscription') : accessTier === 'premium' && !model.noPromptTraining ? 'Free members only' : undefined
 
             return (
               <HudDropdownMenuItem
@@ -84,10 +85,10 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
               >
                 <div className="min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <span className="flex min-w-0 items-center gap-2 text-sm font-semibold leading-snug"><OracleModelLogo provider={model.provider} /><span className="break-words">{model.label}</span></span>
+                    <span className="flex min-w-0 items-center gap-2 text-sm font-semibold leading-snug"><OracleTierIcon tier={model.access === 'premium' ? 'max' : 'lite'} /><span className="break-words">{model.label}</span></span>
                     {isSelected && <Check aria-label="Selected" className="mt-0.5 h-4 w-4 shrink-0 text-cyan-glow" />}
                   </div>
-                  {showModelNames && model.modelName && <p className="mt-1 text-xs leading-relaxed text-ink-muted">{model.modelName}</p>}
+                  {showModelNames && model.modelName && <p className="mt-1 flex items-center gap-1.5 text-xs leading-relaxed text-ink-muted"><OracleModelLogo provider={model.provider} className="h-3.5 w-3.5" /><span>{model.modelName}</span></p>}
                   {note && <p className="mt-1 text-xs leading-relaxed text-ink-muted">{note}</p>}
                 </div>
               </HudDropdownMenuItem>

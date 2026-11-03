@@ -8,7 +8,7 @@ export function OracleModelLogo({ provider, className = 'h-4 w-4' }: { provider:
   const path = provider === 'anthropic' ? CLAUDE_PATH : provider === 'deepseek' || provider === 'local' ? DEEPSEEK_PATH : null
   if (!path) return null
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" fillRule="evenodd" aria-hidden="true" focusable="false" className={`shrink-0 ${className}`}>
+    <svg viewBox="0 0 24 24" fill="currentColor" fillRule="evenodd" aria-hidden="true" focusable="false" data-oracle-provider={provider} className={`shrink-0 ${className}`}>
       <path d={path} />
     </svg>
   )
