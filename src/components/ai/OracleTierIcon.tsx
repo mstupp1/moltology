@@ -1,9 +1,7 @@
-/** Matching product marks: one chevron for Lite, a double chevron for MAX. */
+import { getAssetUrl } from '@/lib/assets'
+
+/** Original shell/core marks generated with ImageGen; source prompts live in docs/design/oracle-tier-icons.md. */
 export function OracleTierIcon({ tier, className = 'h-4 w-4' }: { tier: 'lite' | 'max'; className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false" data-oracle-tier={tier} className={`shrink-0 ${className}`}>
-      <path d="M8 3H6L3 6v12l3 3h2M16 3h2l3 3v12l-3 3h-2" />
-      {tier === 'max' ? <path d="m8 10 4-4 4 4m-8 7 4-4 4 4" /> : <path d="m8 14 4-4 4 4" />}
-    </svg>
-  )
+  const asset = tier === 'max' ? 'images/ui/oracle/oracle-max-core-v1.png' : 'images/ui/oracle/oracle-lite-shell-v1.png'
+  return <img src={getAssetUrl(asset)} alt="" aria-hidden="true" data-oracle-tier={tier} className={`shrink-0 object-contain ${className}`} />
 }

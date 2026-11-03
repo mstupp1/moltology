@@ -71,7 +71,7 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
             const hasAccess = accessTier !== 'guest' && (model.access !== 'premium' || accessTier === 'premium')
             const canSelect = canUseOracleChatModel(model, accessTier)
             const isSelected = model.id === selectedModel.id
-            const note = !hasAccess ? (accessTier === 'guest' ? 'Sign in to use chat' : 'Requires Oracle MAX') : accessTier === 'premium' && !model.noPromptTraining ? 'Free members only' : undefined
+            const note = !hasAccess ? (accessTier === 'guest' ? 'Sign in to use chat' : 'Requires Oracle MAX subscription') : accessTier === 'premium' && !model.noPromptTraining ? 'Free members only' : undefined
 
             return (
               <HudDropdownMenuItem
