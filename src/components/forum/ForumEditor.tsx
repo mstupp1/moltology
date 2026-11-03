@@ -1,3 +1,4 @@
+import { FORUM_BODY_MAX_CHARS } from '@/lib/community-rules'
 import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { EditorContent, useEditor, useEditorState, type Editor, type JSONContent } from '@tiptap/react'
@@ -467,6 +468,13 @@ export const ForumEditor = forwardRef<ForumEditorHandle, ForumEditorProps>(funct
           {value ? '' : placeholder}
         </div>
       )}
+
+      <p
+        className={`border-t border-line-subtle px-3 py-2 text-[11px] ${value.trim().length > FORUM_BODY_MAX_CHARS ? 'text-crimson-text' : 'text-ink-muted'}`}
+        role={value.trim().length > FORUM_BODY_MAX_CHARS ? 'alert' : undefined}
+      >
+        {value.trim().length} / {FORUM_BODY_MAX_CHARS.toLocaleString('en-US')} characters · Includes formatting and links
+      </p>
 
       {showMenu && (
         <div

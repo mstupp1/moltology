@@ -12,9 +12,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
   "stats": {
     "domains": 12,
     "rules": 124,
-    "decisions": 52,
-    "anchors": 239,
-    "drifted": 22,
+    "decisions": 53,
+    "anchors": 241,
+    "drifted": 21,
     "flagged": 9
   },
   "canvas": {
@@ -4024,15 +4024,31 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Length limits",
       "kind": "limit",
       "status": "active",
-      "statement": "Topic titles must be 5 to 150 characters. Topic and reply bodies must be 10 to 10,000 characters.",
+      "statement": "Topic titles must be 5 to 150 characters. Topic and reply bodies need at least 10 visible characters and at most 1,350 characters of trimmed Markdown, including formatting and links. New topics fit the 1,500-character short-input screening budget. Existing posts are preserved; edits must meet the new limit.",
       "anchors": [
         {
           "file": "src/lib/community-rules.ts",
           "symbol": "validateForumContent",
-          "line": 125,
+          "line": 129,
           "value": "validateForumContent(title, content)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L125"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L129"
+        },
+        {
+          "file": "src/lib/community-rules.ts",
+          "symbol": "FORUM_TITLE_MAX_CHARS",
+          "line": 123,
+          "value": "150",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L123"
+        },
+        {
+          "file": "src/lib/community-rules.ts",
+          "symbol": "FORUM_BODY_MAX_CHARS",
+          "line": 124,
+          "value": "1_350",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L124"
         }
       ],
       "tests": [
@@ -4046,7 +4062,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [],
       "decisions": [
-        "forum-write-hardening"
+        "forum-write-hardening",
+        "forum-short-post-limits"
       ],
       "flag": null,
       "flow": null,
@@ -4054,7 +4071,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 520
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "forum.content-safety",
@@ -4168,7 +4185,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "decisions": [
         "jev-quality-gates",
-        "oracle-usage-and-moderation"
+        "oracle-usage-and-moderation",
+        "forum-short-post-limits"
       ],
       "flag": {
         "level": "watch",
@@ -9447,6 +9465,46 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "heading": "Consequences",
           "html": "<p>There is no minimum duration requirement. Existing server validation, daily XP awards, and source-key deduplication remain authoritative. Timer state and the 3D preference are local; this visual does not transfer member files or start an Oracle conversation.</p>"
+        }
+      ]
+    },
+    {
+      "id": "forum-short-post-limits",
+      "date": "2026-11-02",
+      "title": "Keep forum submissions within the short-input screening budget",
+      "summary": "Limit bodies to 1,350 characters and titles to 150 so new forum submissions fit Laya without chunking.",
+      "domains": [
+        "forum"
+      ],
+      "rules": [
+        "forum.content-limits",
+        "forum.jev-shared"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "doc",
+          "label": "community-rules.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Forum bodies previously allowed 10,000 characters. Screening routes inputs above 1,500 characters to Jev. Splitting long submissions would complicate whole-post quality scoring.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Keep the 150-character title maximum and reduce topic and reply bodies to 1,350 trimmed Markdown characters, including formatting and links. Preserve the 10-visible-character body minimum. Show the serialized character count in every body editor and prevent oversized drafts from being submitted. Apply validation on create and edit without truncating saved posts or drafts.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<p>Keep long posts with Jev, or split posts into overlapping Laya chunks. Concise conversation is preferred over either approach.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>New topics fit the 1,500-character screening budget. Existing long posts remain readable but must be shortened when edited. The long-input screening route remains available for legacy content and other callers. A reply to a legacy title over 150 characters may still use that route.</p>"
         }
       ]
     },

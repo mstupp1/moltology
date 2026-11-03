@@ -83,3 +83,20 @@ describe('Community Rules & Guardrails', () => {
     expect(() => assertForumWriteRateLimit(userId)).toThrow(FORUM_WRITE_RATE_ERROR)
   })
 })
+
+
+describe('forum screening length budget', () => {
+  it('accepts the maximum topic and reply and rejects one extra character', () => {
+    expect(validateForumContent('t'.repeat(150), 'b'.repeat(1350)).valid).toBe(true)
+    expect(validateForumContent('t'.repeat(151), 'b'.repeat(1350)).valid).toBe(false)
+    expect(validateForumContent('Valid title', 'b'.repeat(1351)).valid).toBe(false)
+    expect(validateForumContent(undefined, 'b'.repeat(1350)).valid).toBe(true)
+    expect(validateForumContent(undefined, 'b'.repeat(1351)).valid).toBe(false)
+  })
+
+  it('counts serialized formatting and links toward the maximum', () => {
+    const body = '**' + 'b'.repeat(1347) + '**'
+    expect(validateForumContent(undefined, body).valid).toBe(false)
+    expect(validateForumContent(undefined, '  ' + 'b'.repeat(1350) + '  ').valid).toBe(true)
+  })
+})

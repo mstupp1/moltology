@@ -111,11 +111,15 @@ rules:
   - id: forum.content-limits
     title: Length limits
     kind: limit
-    statement: Topic titles must be 5 to 150 characters. Topic and reply bodies must be 10 to 10,000 characters.
+    statement: Topic titles must be 5 to 150 characters. Topic and reply bodies need at least 10 visible characters and at most 1,350 characters of trimmed Markdown, including formatting and links. New topics fit the 1,500-character short-input screening budget. Existing posts are preserved; edits must meet the new limit.
     dependsOn: [forum.write-pipeline]
     anchors:
       - file: src/lib/community-rules.ts
         symbol: validateForumContent
+      - file: src/lib/community-rules.ts
+        symbol: FORUM_TITLE_MAX_CHARS
+      - file: src/lib/community-rules.ts
+        symbol: FORUM_BODY_MAX_CHARS
     tests: [src/lib/community-rules.test.ts]
   - id: forum.content-safety
     title: Secret and harm detectors

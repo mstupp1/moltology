@@ -42,7 +42,7 @@ import { seo } from '@/lib/seo'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { ForumPostBody } from '@/components/forum/ForumPostBody'
 import { buildForumQuoteMarkup, isForumQuoteSourceWithdrawn } from '@/lib/forum-quotes'
-import { FORUM_LOCKED_ERROR, validateForumContent } from '@/lib/community-rules'
+import { FORUM_BODY_MAX_CHARS, FORUM_TITLE_MAX_CHARS, FORUM_LOCKED_ERROR, validateForumContent } from '@/lib/community-rules'
 
 function TopicShareButton() {
   const [copied, setCopied] = useState(false)
@@ -487,7 +487,9 @@ function ForumThreadPage() {
                       <span>{topicError}</span>
                     </div>
                   )}
+                  <p className="text-[11px] text-ink-muted">{topicTitleDraft.trim().length} / {FORUM_TITLE_MAX_CHARS} title characters</p>
                   <input
+                    maxLength={FORUM_TITLE_MAX_CHARS}
                     type="text"
                     value={topicTitleDraft}
                     onChange={(e) => setTopicTitleDraft(e.target.value)}
@@ -517,7 +519,7 @@ function ForumThreadPage() {
                     </button>
                     <button
                       type="submit"
-                      disabled={topicBusy || topicTitleDraft.trim().length < 5 || forumVisibleLength(topicBodyDraft) < 10}
+                      disabled={topicBusy || topicTitleDraft.trim().length < 5 || forumVisibleLength(topicBodyDraft) < 10 || topicBodyDraft.trim().length > FORUM_BODY_MAX_CHARS}
                       className="px-4 py-1.5 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     >
                       {topicBusy ? 'Sealing...' : 'Seal revision'}

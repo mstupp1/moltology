@@ -20,7 +20,7 @@ import { isForumQuoteSourceWithdrawn } from '@/lib/forum-quotes'
 import { useForumAuth } from '@/components/forum/ForumShell'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
-import { validateForumContent } from '@/lib/community-rules'
+import { FORUM_BODY_MAX_CHARS, validateForumContent } from '@/lib/community-rules'
 import {
   HudDropdownMenu,
   HudDropdownMenuTrigger,
@@ -344,7 +344,7 @@ export function ForumPostCard({
                   </button>
                   <button
                     type="submit"
-                    disabled={busy || forumVisibleLength(draft) < 10}
+                    disabled={busy || forumVisibleLength(draft) < 10 || draft.trim().length > FORUM_BODY_MAX_CHARS}
                     className="px-4 py-1.5 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                   >
                     {busy ? 'Sealing...' : 'Seal revision'}
