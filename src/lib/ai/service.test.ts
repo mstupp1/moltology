@@ -75,6 +75,15 @@ describe('summarizeThreadTitle', () => {
     expect(options.prompt).toBeUndefined()
   })
 
+  it('omits sampling controls and enables gateway caching for Haiku titles', async () => {
+    const { generateText } = await import('ai')
+    vi.mocked(generateText).mockResolvedValueOnce({ text: 'Daily Focus Plan' } as any)
+    await summarizeThreadTitle('Help me focus', 'anthropic/claude-haiku-5.5')
+    const options = vi.mocked(generateText).mock.calls[0][0]
+    expect(options.temperature).toBeUndefined()
+    expect(options.providerOptions?.gateway).toMatchObject({ only: ['anthropic'], disallowPromptTraining: true, caching: 'auto' })
+  })
+
   it('strips "Title:" prefixes, extra quotes, and trailing ellipses from model output', async () => {
     const { generateText } = await import('ai')
     vi.mocked(generateText).mockResolvedValueOnce({

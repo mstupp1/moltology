@@ -14,7 +14,7 @@ import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel, ORACLE_TITLE_MO
 
 describe('oracle-chat helpers', () => {
   it('keeps chat and title defaults explicit for each membership tier', () => {
-    expect(DEFAULT_ORACLE_MODEL_ID).toBe('deepseek/deepseek-v4.1-flash')
+    expect(DEFAULT_ORACLE_MODEL_ID).toBe('deepseek/deepseek-v4.1-flash-1017')
     expect(getOracleModel().roles).toEqual(['chat', 'titles'])
     expect(getOracleTitleModelId(false)).toBe(ORACLE_TITLE_MODEL_ID)
     expect(getOracleTitleModelId(true)).toBe(PREMIUM_ORACLE_TITLE_MODEL_ID)
@@ -46,7 +46,7 @@ describe('oracle-chat helpers', () => {
   })
 
   it('keeps guests offline and prevents free accounts from selecting MAX or retired models', () => {
-    for (const requested of [undefined, 'unknown-model', PREMIUM_ORACLE_MODEL_ID, 'mistral/mistral-nemo', 'guest-preview']) {
+    for (const requested of [undefined, 'unknown-model', 'deepseek/deepseek-v4.1-flash', PREMIUM_ORACLE_MODEL_ID, 'mistral/mistral-nemo', 'guest-preview']) {
       expect(getOracleCandidateModelIds(requested)).toEqual([DEFAULT_ORACLE_MODEL_ID])
     }
     expect(getOracleCandidateModelIds(undefined, 'guest')).toEqual([])
@@ -61,7 +61,7 @@ describe('oracle-chat helpers', () => {
       providerOptions: { gateway: { only: ['deepinfra'], disallowPromptTraining: true } },
     })
     expect(getOracleGenerationOptions(PREMIUM_ORACLE_MODEL_ID)).toMatchObject({
-      providerOptions: { gateway: { only: ['openai'], disallowPromptTraining: true } },
+      providerOptions: { gateway: { only: ['anthropic'], disallowPromptTraining: true } },
     })
   })
 

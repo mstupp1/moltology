@@ -12,7 +12,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
   "stats": {
     "domains": 12,
     "rules": 124,
-    "decisions": 51,
+    "decisions": 52,
     "anchors": 239,
     "drifted": 20,
     "flagged": 9
@@ -154,7 +154,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "premium",
       "title": "Oracle MAX & billing",
       "color": "#d27bff",
-      "summary": "Oracle MAX adds the GPT-6 Luna chat model and a 10x Oracle allowance. The plan preview is public; billing and no-charge activation remain staff-only.",
+      "summary": "Oracle MAX adds the Claude Haiku 5.5 chat model and a 10x Oracle allowance. The plan preview is public; billing and no-charge activation remain staff-only.",
       "overviewHtml": "<p>Premium is a subscription, not a currency. It sits beside the economy and must stay on the right side of the red line. During the soft launch, only staff can see, buy, or turn Premium on without a charge.</p>",
       "box": {
         "x": 2460,
@@ -4895,18 +4895,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "reserveOracleChatUsage",
-          "line": 312,
+          "line": 311,
           "value": "reserveOracleChatUsage(userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L312"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L311"
         },
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "releaseOracleChatUsage",
-          "line": 389,
+          "line": 388,
           "value": "releaseOracleChatUsage(id)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L389"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L388"
         },
         {
           "file": "src/lib/ai/usage-limits.ts",
@@ -4935,10 +4935,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "getOracleUsageSnapshot",
-          "line": 417,
+          "line": 416,
           "value": "getOracleUsageSnapshot(userId, now)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L417"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L416"
         },
         {
           "file": "src/lib/ai/usage-limits.ts",
@@ -5226,7 +5226,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Membership determines model access",
       "kind": "permission",
       "status": "active",
-      "statement": "Guests receive preset preview replies. Free members use Oracle Lite (DeepSeek V4.1 Flash). MAX defaults to GPT-6 Luna and can select Lite. Titles use the selected chat model. Both providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.",
+      "statement": "Guests receive preset preview replies. Free members use Oracle Lite (DeepSeek V4.1 Flash 1017). MAX defaults to Claude Haiku 5.5 and can select Lite. Titles use the selected chat model. Both providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.",
       "anchors": [
         {
           "file": "src/lib/ai/oracle-chat.ts",
@@ -5268,6 +5268,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "oracle-usage-and-moderation",
         "oracle-max-model-access",
         "oracle-tier-models-and-titles",
+        "oracle-haiku-and-deepseek-1017",
         "shared-oracle-chat-titles",
         "simplify-oracle-models"
       ],
@@ -5285,7 +5286,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Ordered model fallback",
       "kind": "flow",
       "status": "active",
-      "statement": "Lite uses DeepSeek through DeepInfra. MAX defaults to GPT-6 Luna through OpenAI and may choose Lite. Both routes disallow prompt training. Empty streams, errors, and a 12-second first-token timeout return unavailable without changing models. SDK retries and reasoning are disabled.",
+      "statement": "Lite pins DeepSeek V4.1 Flash 1017 through DeepInfra. MAX defaults to Claude Haiku 5.5 through Anthropic and may choose Lite. Both routes disallow prompt training. Empty streams, errors, and a 12-second first-token timeout return unavailable without changing models. SDK retries and reasoning are disabled.",
       "anchors": [
         {
           "file": "src/lib/ai/oracle-models.ts",
@@ -5311,6 +5312,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "oracle-usage-and-moderation",
         "oracle-max-model-access",
         "oracle-tier-models-and-titles",
+        "oracle-haiku-and-deepseek-1017",
         "shared-oracle-chat-titles",
         "simplify-oracle-models"
       ],
@@ -5341,10 +5343,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "updateAIThreadTitle",
-          "line": 203,
+          "line": 202,
           "value": "updateAIThreadTitle(threadId, title, userId, expectedTitle)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L203"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L202"
         }
       ],
       "tests": [
@@ -5363,6 +5365,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "usedBy": [],
       "decisions": [
         "oracle-tier-models-and-titles",
+        "oracle-haiku-and-deepseek-1017",
         "shared-oracle-chat-titles"
       ],
       "flag": null,
@@ -5384,10 +5387,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "getOwnedAIThread",
-          "line": 135,
+          "line": 134,
           "value": "getOwnedAIThread(userId, threadId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L135"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L134"
         }
       ],
       "tests": [
@@ -9444,6 +9447,36 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "heading": "Consequences",
           "html": "<p>There is no minimum duration requirement. Existing server validation, daily XP awards, and source-key deduplication remain authoritative. Timer state and the 3D preference are local; this visual does not transfer member files or start an Oracle conversation.</p>"
+        }
+      ]
+    },
+    {
+      "id": "oracle-haiku-and-deepseek-1017",
+      "date": "2026-11-02",
+      "title": "Pin Lite to DeepSeek 1017 and use Haiku for MAX",
+      "summary": "Oracle Lite uses the explicit DeepSeek V4.1 Flash 1017 snapshot; MAX uses Claude Haiku 5.5 with automatic gateway caching.",
+      "domains": [
+        "oracle",
+        "premium"
+      ],
+      "rules": [
+        "oracle.model-routing",
+        "oracle.model-fallback",
+        "oracle.thread-titles"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "doc",
+          "label": "oracle-models.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Decision",
+          "html": "<p>Pin Oracle Lite to deepseek/deepseek-v4.1-flash-1017 through DeepInfra. Route Oracle MAX to anthropic/claude-haiku-5.5 through Anthropic, replacing Luna. Preserve no-training filtering, disabled reasoning, and the same selected model for chat and title follow-ups. Enable gateway automatic caching for Anthropic&#39;s cache markers. Omit temperature from title requests because Haiku 5.5 does not support sampling controls.</p>\n<p>The picker retains its two product labels and admin-only underlying model names, with LobeHub&#39;s MIT-licensed DeepSeek and Claude vector logos. Guests retain the selected Lite preview; no guest model calls or allowance changes are introduced.</p>"
         }
       ]
     },

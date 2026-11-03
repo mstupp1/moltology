@@ -55,7 +55,6 @@ export async function summarizeThreadTitle(
         prompt: firstMessageText.slice(0, 500),
       }),
       maxOutputTokens: 32,
-      temperature: 0,
       maxRetries: 0,
       abortSignal: signal
         ? AbortSignal.any([signal, AbortSignal.timeout(8_000)])
