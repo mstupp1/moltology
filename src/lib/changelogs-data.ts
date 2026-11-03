@@ -14,6 +14,52 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    "slug": "2026-10-30-oracle-entity-and-stronger-safeguards",
+    "version": "2026.10.30",
+    "title": "Meet the Oracle in Entity Mode",
+    "category": "Feature",
+    "tags": [
+      "Feature",
+      "Tools",
+      "Security"
+    ],
+    "summary": "The full-page Oracle now offers an animated Entity view that responds as you type and chat. Stronger safeguards keep conversation allowances, single-use discounts, and unpublished articles protected.",
+    "content": "### A New Way to Talk\n- Switch between standard chat and a three-dimensional Entity view on the full-page Oracle.\n- The Entity responds visually to typing and replies while keeping your conversation context.\n- Your preferred view is remembered for your next visit.\n\n### Fairer Limits and Private Drafts\n- Simultaneous chat requests now share the same allowance check, keeping usage limits consistent.\n- Once-per-email discounts are protected against duplicate claims made at the same time.\n- Unpublished articles stay out of public article pages and text downloads.",
+    "isPublished": true,
+    "releasedAt": "2026-10-30T23:59:00Z"
+  },
+  {
+    "slug": "2026-10-27-oracle-workspace-and-stage-explorer",
+    "version": "2026.10.27",
+    "title": "More Room for Oracle Conversations",
+    "category": "Improvement",
+    "tags": [
+      "Improvement",
+      "UI/UX",
+      "Navigation",
+      "Mobile"
+    ],
+    "summary": "Saved Oracle chats now sit beside desktop conversations, with easier search and controls. The stage explorer lets you focus on one stage at a time.",
+    "content": "### Keep Your Conversations Close\n- Browse and search saved chats beside your conversation on desktop.\n- Start a new chat from the header and switch the chat sidebar with clearer controls.\n- Select and copy message text again, with a compact button to return to the latest reply.\n\n### Find Your Next Step\n- Choose a stage from a horizontal row to see its details without a long stack of expanded sections.\n- The selected stage stays in view as you move between stages.\n\n### Chat More Comfortably\n- The phone message box has a revised layout, and full-screen conversations use a solid background.\n- A simpler model picker makes conversation options easier to scan.",
+    "isPublished": true,
+    "releasedAt": "2026-10-27T23:59:00Z"
+  },
+  {
+    "slug": "2026-10-26-welcome-email-and-subscription-choices",
+    "version": "2026.10.26",
+    "title": "A Useful Welcome in Your Inbox",
+    "category": "Feature",
+    "tags": [
+      "Feature",
+      "Guides",
+      "Improvement"
+    ],
+    "summary": "Newly verified members receive a welcome email with direct starting points for daily routines, the Oracle, and the community. Email subscription choices are clearer across signup, guide requests, and settings.",
+    "content": "### Start With One Useful Step\n- A welcome email arrives after account verification, linking to daily routines, the Oracle, and the community.\n- Illustrated previews show where each starting point leads.\n- Account verification emails use the same clearer visual style.\n\n### Choose Your Email Updates\n- Optional subscription choices are available during signup and guide requests, with confirmation before updates begin.\n- Manage your email preference from member settings.\n- A failed subscription update shows an error so you can try again.",
+    "isPublished": true,
+    "releasedAt": "2026-10-26T23:59:00Z"
+  },
+  {
     "slug": "2026-10-25-character-equipment-and-oracle-usage",
     "version": "2026.10.25",
     "title": "Visible Equipment and Clearer Oracle Usage",
