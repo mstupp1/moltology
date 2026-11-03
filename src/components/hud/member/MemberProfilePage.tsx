@@ -13,7 +13,6 @@ import { getPublicProfileFn, getMemberLoadoutFn } from '@/lib/server/api'
 import type { PublicProfileView } from '@/lib/connections'
 import type { CatalogRef, GearItemState, LoadoutTotals } from '@/lib/chassis-loadout'
 import {
-  LOBSTER_AVATAR_STYLE,
   parseLobsterAvatarConfig,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
@@ -121,14 +120,13 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
 
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans relative">
-      <div className="relative overflow-hidden rounded-card border border-line-subtle border-l-2 border-l-cyan-glow bg-gradient-to-br from-[#0a1214] via-[#071012] to-[#050808] hud-sheen p-4 sm:p-5 shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
+      <div className="relative overflow-hidden rounded-card border border-line-subtle border-l-2 border-l-cyan-glow bg-surface-1 hud-sheen p-4 sm:p-5 shadow-sheen-inset">
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center">
           <LobsterAvatarPortrait
             config={effectiveAvatarConfig}
             className="w-28 h-28 sm:w-36 sm:h-36 shrink-0"
             size={256}
             interactive
-            animated
             loading="eager"
           />
           <div className="min-w-0 flex-1 space-y-2">

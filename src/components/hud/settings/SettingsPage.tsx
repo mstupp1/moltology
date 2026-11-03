@@ -1,6 +1,5 @@
-import { Link } from '@tanstack/react-router'
 import React, { useCallback, useEffect, useState } from 'react'
-import { EyeOff, Mail, Radio, Settings, Sparkles } from 'lucide-react'
+import { EyeOff, Mail, Radio, Sparkles } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
@@ -123,40 +122,13 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
 
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans relative">
-      <HudTitlePanel
-        accent="teal"
-        eyebrow={
-          <>
-            <Settings className="w-3.5 h-3.5" />
-            Account
-          </>
-        }
-        title="Settings"
-        description="Manage your account, email preferences, sign-in methods, and display options."
-      />
-
-      <PlanUsageSection userId={userId} />
-      <PremiumSettingsSection />
+      <HudTitlePanel accent="teal" title="Settings" />
 
       <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          {/* Left: Avatar */}
           <div className="space-y-4">
-            <div>
-              <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">
-                Avatar
-              </h2>
-              <p className="text-xs text-ink-muted font-sans mt-0.5">
-                Edit your body, face, equipment, and scene in the character studio.
-              </p>
-            </div>
-
-            <Link
-              to="/chassis"
-              className="inline-flex items-center justify-center min-h-11 px-4 rounded-control border border-cyan-glow/50 bg-cyan-soft text-ink text-sm font-semibold"
-            >
-              Open character studio
-            </Link>
+            <PlanUsageSection userId={userId} />
+            <PremiumSettingsSection />
           </div>
 
           {/* Right: Preferences */}
