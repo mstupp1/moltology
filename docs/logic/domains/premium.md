@@ -3,7 +3,7 @@ id: premium
 title: Oracle MAX & billing
 order: 6
 color: '#d27bff'
-summary: Oracle MAX adds the DeepSeek chat model and a 10x Oracle allowance. The plan preview is public; billing and no-charge activation remain staff-only.
+summary: Oracle MAX adds the GPT-6 Luna chat model and a 10x Oracle allowance. The plan preview is public; billing and no-charge activation remain staff-only.
 rules:
   - id: premium.soft-launch
     title: Oracle MAX billing stays staff-only

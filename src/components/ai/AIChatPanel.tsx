@@ -43,6 +43,7 @@ import { resolveMemberPublicName } from '../../lib/member-handle'
 import { getAuthJWTToken } from '../../lib/jwt'
 import { oracleAuthData } from '../../lib/ai/oracle-auth-client'
 import { useOracleUsage } from '@/hooks/useOracleUsage'
+import { isAdmin } from '@/lib/permissions'
 import { CHAT_LIMIT, getChatLimitError } from '@/lib/ai/chat-retention'
 
 const INLINE_COMPOSER_MIN_WIDTH = 640
@@ -118,6 +119,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   const userId = propUserId ?? user?.id ?? user?.sub ?? oracle?.userId ?? session.userId ?? null
   const usage = useOracleUsage(userId)
+  const [profileRole, setProfileRole] = useState<{ userId: string; role: string | null } | null>(null)
   const isAuthPending = !userId && session.isPending
   const isGuest = !userId && !isAuthPending
 
@@ -253,6 +255,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         const token = await getAuthJWTToken().catch(() => null)
         const profile = await getUserProfileFn({ data: { token: token ?? undefined, userId } })
         if (isSubscribed) {
+          setProfileRole({ userId, role: profile?.role ?? null })
           setMemberHandle(profile?.handle ?? null)
           setMemberLarvaId(profile?.larvaId ?? null)
         }
@@ -802,6 +805,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         placeholder={placeholder}
         autoFocus
         accessTier={accessTier}
+        showModelNames={Boolean(userId) && isAdmin(user, profileRole?.userId === userId ? profileRole.role : null)}
         selectedModel={selectedModel}
         onSelectModel={(id) => {
           if (canUseOracleChatModel(getOracleModel(id), accessTier)) setModelChoice({ userId, id })

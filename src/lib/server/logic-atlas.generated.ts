@@ -12,7 +12,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
   "stats": {
     "domains": 12,
     "rules": 124,
-    "decisions": 50,
+    "decisions": 51,
     "anchors": 239,
     "drifted": 20,
     "flagged": 9
@@ -154,7 +154,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "premium",
       "title": "Oracle MAX & billing",
       "color": "#d27bff",
-      "summary": "Oracle MAX adds the DeepSeek chat model and a 10x Oracle allowance. The plan preview is public; billing and no-charge activation remain staff-only.",
+      "summary": "Oracle MAX adds the GPT-6 Luna chat model and a 10x Oracle allowance. The plan preview is public; billing and no-charge activation remain staff-only.",
       "overviewHtml": "<p>Premium is a subscription, not a currency. It sits beside the economy and must stay on the right side of the red line. During the soft launch, only staff can see, buy, or turn Premium on without a charge.</p>",
       "box": {
         "x": 2460,
@@ -339,10 +339,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "BRAND_BIBLE.md",
           "symbol": "4. The Economy",
-          "line": 181,
+          "line": 182,
           "value": "Signup is free. Chitin Gems are earned by doing the work: shedding, routines, and being",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L181"
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L182"
         },
         {
           "file": "AGENTS.md",
@@ -385,10 +385,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "BRAND_BIBLE.md",
           "symbol": "4. The Economy",
-          "line": 181,
+          "line": 182,
           "value": "Signup is free. Chitin Gems are earned by doing the work: shedding, routines, and being",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L181"
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L182"
         }
       ],
       "tests": [],
@@ -1223,10 +1223,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "BRAND_BIBLE.md",
           "symbol": "3.3 Stages and clearances",
-          "line": 147,
+          "line": 148,
           "value": "Scriptures describe what the metrics typically read at each stage. What actually moves a",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L147"
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L148"
         }
       ],
       "tests": [
@@ -4895,18 +4895,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "reserveOracleChatUsage",
-          "line": 304,
+          "line": 312,
           "value": "reserveOracleChatUsage(userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L304"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L312"
         },
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "releaseOracleChatUsage",
-          "line": 381,
+          "line": 389,
           "value": "releaseOracleChatUsage(id)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L381"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L389"
         },
         {
           "file": "src/lib/ai/usage-limits.ts",
@@ -4935,10 +4935,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "getOracleUsageSnapshot",
-          "line": 409,
+          "line": 417,
           "value": "getOracleUsageSnapshot(userId, now)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L409"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L417"
         },
         {
           "file": "src/lib/ai/usage-limits.ts",
@@ -5226,7 +5226,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Membership determines model access",
       "kind": "permission",
       "status": "active",
-      "statement": "Guests receive preset preview replies. Free members use Oracle (Ling) for chat and titles. Oracle MAX uses DeepSeek V4.1 Flash as its only chat model. MAX titles use Nemo; all MAX providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.",
+      "statement": "Guests receive preset preview replies. Free members use Oracle Lite (DeepSeek V4.1 Flash). MAX defaults to GPT-6 Luna and can select Lite. Titles use the selected chat model. Both providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.",
       "anchors": [
         {
           "file": "src/lib/ai/oracle-chat.ts",
@@ -5239,10 +5239,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/oracle-models.ts",
           "symbol": "getOracleTitleModelId",
-          "line": 104,
+          "line": 76,
           "value": "getOracleTitleModelId(isPremium)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts#L104"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts#L76"
         }
       ],
       "tests": [
@@ -5268,6 +5268,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "oracle-usage-and-moderation",
         "oracle-max-model-access",
         "oracle-tier-models-and-titles",
+        "shared-oracle-chat-titles",
         "simplify-oracle-models"
       ],
       "flag": null,
@@ -5284,15 +5285,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Ordered model fallback",
       "kind": "flow",
       "status": "active",
-      "statement": "Free chat uses Ling through Novita. MAX uses DeepSeek through DeepInfra, with prompt training disallowed. It cannot select Ling. Empty streams, errors, and a 12-second first-token timeout return unavailable without changing models. SDK retries and reasoning are disabled.",
+      "statement": "Lite uses DeepSeek through DeepInfra. MAX defaults to GPT-6 Luna through OpenAI and may choose Lite. Both routes disallow prompt training. Empty streams, errors, and a 12-second first-token timeout return unavailable without changing models. SDK retries and reasoning are disabled.",
       "anchors": [
         {
           "file": "src/lib/ai/oracle-models.ts",
           "symbol": "ORACLE_MODELS",
-          "line": 38,
-          "value": "[ { id: GUEST_ORACLE_MODEL_ID, label: 'Oracle', shortLabel: 'Oracle', provider: 'local', badge: 'Preview', roles: ['preview'], access: 'guest', description: 'P…",
+          "line": 35,
+          "value": "[ { id: GUEST_ORACLE_MODEL_ID, label: 'Oracle Lite', shortLabel: 'Oracle Lite', provider: 'local', roles: ['preview'], access: 'guest', }, { id: DEFAULT_ORACLE…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts#L38"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts#L35"
         }
       ],
       "tests": [
@@ -5310,6 +5311,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "oracle-usage-and-moderation",
         "oracle-max-model-access",
         "oracle-tier-models-and-titles",
+        "shared-oracle-chat-titles",
         "simplify-oracle-models"
       ],
       "flag": null,
@@ -5326,23 +5328,23 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "One bounded title attempt per new conversation",
       "kind": "flow",
       "status": "active",
-      "statement": "New conversations receive a 60-character excerpt. One title attempt overlaps chat, capped at 500 input characters, 32 output tokens, eight seconds, and no retries. Successful streams wait for title persistence, then the client refreshes once. Failures or cancellation keep the excerpt. Updates require an unchanged placeholder, preserving manual renames.",
+      "statement": "New threads start with a 60-character excerpt. After the first reply, one title call reuses its model, provider, system prompt, and exchange for cache eligibility. It has 32 output tokens, an eight-second timeout, and no retries. Stream completion awaits title persistence. Failures retain the excerpt; conditional updates preserve manual renames.",
       "anchors": [
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "summarizeThreadTitle",
           "line": 30,
-          "value": "summarizeThreadTitle(firstMessageText, modelId, userId, signal)",
+          "value": "summarizeThreadTitle(firstMessageText, modelId, userId, signal, context)",
           "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L30"
         },
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "updateAIThreadTitle",
-          "line": 195,
+          "line": 203,
           "value": "updateAIThreadTitle(threadId, title, userId, expectedTitle)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L195"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L203"
         }
       ],
       "tests": [
@@ -5360,7 +5362,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [],
       "decisions": [
-        "oracle-tier-models-and-titles"
+        "oracle-tier-models-and-titles",
+        "shared-oracle-chat-titles"
       ],
       "flag": null,
       "flow": null,
@@ -5381,10 +5384,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "getOwnedAIThread",
-          "line": 127,
+          "line": 135,
           "value": "getOwnedAIThread(userId, threadId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L127"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L135"
         }
       ],
       "tests": [
@@ -9441,6 +9444,49 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "heading": "Consequences",
           "html": "<p>There is no minimum duration requirement. Existing server validation, daily XP awards, and source-key deduplication remain authoritative. Timer state and the 3D preference are local; this visual does not transfer member files or start an Oracle conversation.</p>"
+        }
+      ]
+    },
+    {
+      "id": "shared-oracle-chat-titles",
+      "date": "2026-11-02",
+      "title": "Use the chat model and first exchange for Oracle titles",
+      "summary": "Lite uses DeepSeek, MAX defaults to GPT-6 Luna, and titles reuse the first chat prefix after the reply.",
+      "domains": [
+        "oracle",
+        "premium"
+      ],
+      "rules": [
+        "oracle.model-routing",
+        "oracle.model-fallback",
+        "oracle.thread-titles"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "doc",
+          "label": "oracle-models.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts"
+        },
+        {
+          "kind": "doc",
+          "label": "handle-oracle-chat-request.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Separate title prompts and title-only models cannot reuse the chat request&#39;s provider cache. The picker should expose two product choices, with underlying model names visible only to admins.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Oracle Lite uses DeepSeek V4.1 Flash through DeepInfra. Oracle MAX defaults to GPT-6 Luna through OpenAI; MAX members may select Lite because both routes disallow prompt training. Guests remain on preset replies, with Lite displayed as selected.</p>\n<p>After the first successful reply, request a short title from that same model and pinned provider. Preserve the original system prompt and user message, append the first assistant reply, then append the title instruction. This preserves the prompt prefix for provider cache lookup; actual hits depend on provider eligibility, minimum length, and cache state. No title is generated for a failed or cancelled chat. Keep the excerpt fallback, eight-second timeout, 32-token cap, no retries, request-scoped persistence, and conditional update that protects manual renames.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Title generation remains a separate small inference after the streamed answer. It does not delay the first reply token, but stream completion waits for the bounded title attempt. No title markers appear in the user-facing reply. The title-only Nemo route is removed. This supersedes the model assignments in simplify-oracle-models; usage allowances stay unchanged.</p>"
         }
       ]
     },

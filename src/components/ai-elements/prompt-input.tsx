@@ -25,12 +25,14 @@ export interface OracleModelPickerProps {
   accessTier?: 'guest' | 'free' | 'premium'
   /** Show the short label on the trigger (docked composer). */
   compactLabel?: boolean
+  showModelNames?: boolean
 }
 
 /** Public chat choices; automatic title and preview models stay internal. */
 export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
   selectedModel,
   onSelectModel,
+  showModelNames = false,
   accessTier = 'free',
   compactLabel = false,
 }) => {
@@ -63,11 +65,10 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
       >
         <div className="py-1">
           {ORACLE_MODELS.filter((model) => model.roles.includes('chat')).map((model) => {
-            const isChat = model.roles.includes('chat')
             const hasAccess = accessTier !== 'guest' && (model.access !== 'premium' || accessTier === 'premium')
             const canSelect = canUseOracleChatModel(model, accessTier)
             const isSelected = model.id === selectedModel.id
-            const note = !isChat ? 'Automatic titles only' : !hasAccess ? (accessTier === 'guest' ? 'Sign in to use chat' : 'Requires Oracle MAX') : accessTier === 'premium' && !model.noPromptTraining ? 'Free members only' : undefined
+            const note = !hasAccess ? (accessTier === 'guest' ? 'Sign in to use chat' : 'Requires Oracle MAX') : accessTier === 'premium' && !model.noPromptTraining ? 'Free members only' : undefined
 
             return (
               <HudDropdownMenuItem
@@ -84,7 +85,7 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
                     <span className="min-w-0 break-words text-sm font-semibold leading-snug">{model.label}</span>
                     {isSelected && <Check aria-label="Selected" className="mt-0.5 h-4 w-4 shrink-0 text-cyan-glow" />}
                   </div>
-                  {model.modelName && <p className="mt-1 text-xs leading-relaxed text-ink-muted">{model.modelName}</p>}
+                  {showModelNames && model.modelName && <p className="mt-1 text-xs leading-relaxed text-ink-muted">{model.modelName}</p>}
                   {note && <p className="mt-1 text-xs leading-relaxed text-ink-muted">{note}</p>}
                 </div>
               </HudDropdownMenuItem>
@@ -109,6 +110,7 @@ export interface PromptInputProps {
   className?: string
   selectedModel?: OracleModel
   onSelectModel?: (modelId: string) => void
+  showModelNames?: boolean
   accessTier?: 'guest' | 'free' | 'premium'
   /** Controlled draft, so the owner can keep it across views or restore it after a failed send. */
   value?: string
@@ -133,6 +135,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   className = '',
   selectedModel,
   onSelectModel,
+  showModelNames = false,
   accessTier = 'free',
   value,
   onValueChange,
@@ -264,6 +267,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
       selectedModel={selectedModel}
       onSelectModel={onSelectModel}
       accessTier={accessTier}
+      showModelNames={showModelNames}
       compactLabel={oneRow || variant !== 'inline'}
     />
   ) : null
