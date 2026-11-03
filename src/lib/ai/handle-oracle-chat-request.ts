@@ -1,3 +1,4 @@
+import { getOraclePromptLengthError } from './prompt-limits'
 import {
   createTextStreamResponse,
   streamText,
@@ -123,6 +124,8 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
 
   // Guests get a canned reply, so they never reach the moderation or chat models.
   if (!userId) {
+    const lengthError = getOraclePromptLengthError(userText, false)
+    if (lengthError) return Response.json({ error: lengthError }, { status: 400 })
     return Response.json({
       text: pickGuestOracleResponse(userText, messages.length),
       threadId: null,
@@ -186,6 +189,11 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     )
   }
   const usageEventId = usageReservation.id
+  const lengthError = getOraclePromptLengthError(userText, usageReservation.isPremium)
+  if (lengthError) {
+    await releaseOracleChatUsage(usageEventId)
+    return Response.json({ error: lengthError }, { status: 400 })
+  }
 
   // The reservation's authoritative tier governs every remote prompt processor,
   // including screening. Premium never sends prompts to the free Laya endpoint.

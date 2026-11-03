@@ -130,7 +130,7 @@ rules:
   - id: oracle.input-guardrails
     title: Local input guardrails
     kind: gate
-    statement: Messages must be non-empty and at most 4,000 characters. Obvious prompt-injection phrases and explicit harm are refused before any model call.
+    statement: Messages must be non-empty. Free members and guests can send up to 1,500 characters per message; Oracle MAX allows 4,000. Member limits use the authoritative reservation tier, and oversized messages release their reservation before screening. Obvious prompt-injection phrases and explicit harm are refused before any model call.
     dependsOn: [oracle.request-pipeline, forum.content-safety]
     anchors:
       - file: src/lib/ai/guardrails.ts
@@ -141,7 +141,7 @@ rules:
   - id: oracle.jailbreak-gate
     title: Paraphrased jailbreaks are refused
     kind: gate
-    statement: The moderation model refuses a message above 80% jailbreak confidence. Oracle MAX screening uses Jev with prompt training disallowed; free members retain Laya for short inputs and Jev for longer ones. Screening runs after the authoritative tier reservation, and refusal releases that reservation.
+    statement: The moderation model refuses a message above 80% jailbreak confidence. Oracle MAX screening uses Jev with prompt training disallowed; free members use Laya within their 1,500-character message limit. Screening runs after the authoritative tier reservation, and refusal releases that reservation.
     dependsOn: [oracle.input-guardrails, forum.jev-shared]
     anchors:
       - file: src/lib/quality/oracle-preflight.ts

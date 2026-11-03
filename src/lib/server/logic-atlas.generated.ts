@@ -14,7 +14,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
     "rules": 124,
     "decisions": 52,
     "anchors": 239,
-    "drifted": 20,
+    "drifted": 22,
     "flagged": 9
   },
   "canvas": {
@@ -3938,10 +3938,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/guardrails.ts",
           "symbol": "checkRateLimit",
-          "line": 41,
+          "line": 42,
           "value": "checkRateLimit(identifier, limit, windowMs)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guardrails.ts#L41"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guardrails.ts#L42"
         }
       ],
       "tests": [
@@ -4557,10 +4557,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/handle-oracle-chat-request.ts",
           "symbol": "handleOracleChatRequest",
-          "line": 74,
+          "line": 75,
           "value": "handleOracleChatRequest(request)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L74"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L75"
         }
       ],
       "tests": [
@@ -4841,7 +4841,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1117,
         "y": 76
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "oracle.rate-limit",
@@ -4854,10 +4854,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/guardrails.ts",
           "symbol": "checkRateLimit",
-          "line": 41,
+          "line": 42,
           "value": "checkRateLimit(identifier, limit, windowMs)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guardrails.ts#L41"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guardrails.ts#L42"
         }
       ],
       "tests": [
@@ -5065,23 +5065,23 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Local input guardrails",
       "kind": "gate",
       "status": "active",
-      "statement": "Messages must be non-empty and at most 4,000 characters. Obvious prompt-injection phrases and explicit harm are refused before any model call.",
+      "statement": "Messages must be non-empty. Free members and guests can send up to 1,500 characters per message; Oracle MAX allows 4,000. Member limits use the authoritative reservation tier, and oversized messages release their reservation before screening. Obvious prompt-injection phrases and explicit harm are refused before any model call.",
       "anchors": [
         {
           "file": "src/lib/ai/guardrails.ts",
           "symbol": "validateInputGuardrails",
-          "line": 90,
+          "line": 91,
           "value": "validateInputGuardrails(input)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guardrails.ts#L90"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guardrails.ts#L91"
         },
         {
           "file": "src/lib/ai/guardrails.ts",
           "symbol": "INJECTION_PATTERNS",
-          "line": 78,
+          "line": 79,
           "value": "[ /ignore (all )?previous instructions/i, /disregard (all )?prior rules/i, /you are now in DAN mode/i, /bypass (safety|content) filter/i, /system prompt overri…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guardrails.ts#L78"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guardrails.ts#L79"
         }
       ],
       "tests": [
@@ -5106,7 +5106,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1196,
         "y": 232
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "oracle.jailbreak-gate",
@@ -5114,7 +5114,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Paraphrased jailbreaks are refused",
       "kind": "gate",
       "status": "active",
-      "statement": "The moderation model refuses a message above 80% jailbreak confidence. Oracle MAX screening uses Jev with prompt training disallowed; free members retain Laya for short inputs and Jev for longer ones. Screening runs after the authoritative tier reservation, and refusal releases that reservation.",
+      "statement": "The moderation model refuses a message above 80% jailbreak confidence. Oracle MAX screening uses Jev with prompt training disallowed; free members use Laya within their 1,500-character message limit. Screening runs after the authoritative tier reservation, and refusal releases that reservation.",
       "anchors": [
         {
           "file": "src/lib/quality/oracle-preflight.ts",

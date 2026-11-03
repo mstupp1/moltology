@@ -27,6 +27,27 @@ describe('PromptInput', () => {
     expect(box.value).toBe('')
   })
 
+  it('keeps oversized drafts and blocks both Enter and click until they fit the tier', () => {
+    const onSubmit = vi.fn()
+    const { rerender } = render(<PromptInput onSubmit={onSubmit} accessTier="free" />)
+    const box = screen.getByRole('textbox', { name: 'Message' }) as HTMLTextAreaElement
+    fireEvent.change(box, { target: { value: 'a'.repeat(1501) } })
+    expect(box.value).toHaveLength(1501)
+    expect(box).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getByRole('button', { name: 'Send message' })).toBeDisabled()
+    fireEvent.keyDown(box, { key: 'Enter' })
+    expect(onSubmit).not.toHaveBeenCalled()
+    rerender(<PromptInput onSubmit={onSubmit} accessTier="premium" />)
+    expect(screen.getByText('1,501 / 4,000 characters')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Send message' })).toBeEnabled()
+    fireEvent.change(box, { target: { value: 'a'.repeat(4001) } })
+    expect(screen.getByRole('button', { name: 'Send message' })).toBeDisabled()
+    rerender(<PromptInput onSubmit={onSubmit} accessTier="free" />)
+    fireEvent.change(box, { target: { value: 'a'.repeat(1500) } })
+    fireEvent.click(screen.getByRole('button', { name: 'Send message' }))
+    expect(onSubmit).toHaveBeenCalledWith({ text: 'a'.repeat(1500) })
+  })
+
   it('has no fake attachment menu', () => {
     render(<PromptInput onSubmit={vi.fn()} />)
     expect(screen.queryByRole('button', { name: /Add Context/i })).not.toBeInTheDocument()
