@@ -3,7 +3,7 @@ import { forumVisibleLength } from '@/lib/forum-markdown'
 import { X, AlertTriangle, MessageSquare } from 'lucide-react'
 import { createForumTopicFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { validateForumContent } from '@/lib/community-rules'
+import { FORUM_BODY_MAX_CHARS, FORUM_TITLE_MAX_CHARS, validateForumContent } from '@/lib/community-rules'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { useForumStanding } from '@/hooks/useForumStanding'
 import { useForumAuth } from './ForumShell'
@@ -124,10 +124,11 @@ export function NewTopicDialog({
               <label className="text-ink-muted font-bold uppercase tracking-[0.08em]">
                 Title
               </label>
-              <span className="text-[11px] text-ink-muted">{title.trim().length} / 150</span>
+              <span className="text-[11px] text-ink-muted">{title.trim().length} / {FORUM_TITLE_MAX_CHARS}</span>
             </div>
             <input
               type="text"
+              maxLength={FORUM_TITLE_MAX_CHARS}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="What would you like to discuss?"
@@ -139,9 +140,6 @@ export function NewTopicDialog({
             <div className="flex items-center justify-between text-xs">
               <span id={contentLabelId} className="text-ink-muted font-bold uppercase tracking-[0.08em]">
                 Content
-              </span>
-              <span className="text-[11px] text-ink-muted">
-                {forumVisibleLength(content)} characters (min 10)
               </span>
             </div>
             <ForumEditor
@@ -168,7 +166,7 @@ export function NewTopicDialog({
               type="submit"
               variant="primary"
               size="sm"
-              disabled={creating || locked || title.trim().length < 5 || forumVisibleLength(content) < 10}
+              disabled={creating || locked || title.trim().length < 5 || forumVisibleLength(content) < 10 || content.trim().length > FORUM_BODY_MAX_CHARS}
             >
               {creating ? 'Posting...' : 'Post'}
             </HudButton>

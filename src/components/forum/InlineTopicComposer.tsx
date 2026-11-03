@@ -3,7 +3,7 @@ import { forumVisibleLength } from '@/lib/forum-markdown'
 import { X, AlertTriangle, Send, Plus, Terminal } from 'lucide-react'
 import { createForumTopicFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { validateForumContent } from '@/lib/community-rules'
+import { FORUM_BODY_MAX_CHARS, FORUM_TITLE_MAX_CHARS, validateForumContent } from '@/lib/community-rules'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { useForumStanding } from '@/hooks/useForumStanding'
 import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
@@ -328,7 +328,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
               >
                 Title
               </label>
-              <span className="text-[11px] text-ink-muted">{title.trim().length} / 150</span>
+              <span className="text-[11px] text-ink-muted">{title.trim().length} / {FORUM_TITLE_MAX_CHARS}</span>
             </div>
             <input
               id="composer-title-input"
@@ -337,7 +337,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="What would you like to discuss?"
-              maxLength={150}
+              maxLength={FORUM_TITLE_MAX_CHARS}
               className="w-full min-h-[44px] sm:min-h-[38px] bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus px-3 py-2 text-[16px] sm:text-xs text-ink outline-hidden rounded-control transition-[border-color,box-shadow] placeholder:text-ink-muted"
             />
           </div>
@@ -349,9 +349,6 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
                 className="text-[11px] sm:text-xs text-ink-muted font-bold uppercase tracking-[0.08em]"
               >
                 Content
-              </span>
-              <span className="text-[11px] text-ink-muted">
-                {forumVisibleLength(content)} characters (min 10)
               </span>
             </div>
             <ForumEditor
@@ -379,7 +376,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
             </button>
             <button
               type="submit"
-              disabled={creating || title.trim().length < 5 || forumVisibleLength(content) < 10}
+              disabled={creating || title.trim().length < 5 || forumVisibleLength(content) < 10 || content.trim().length > FORUM_BODY_MAX_CHARS}
               className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] px-5 py-2 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center justify-center gap-2 touch-manipulation"
             >
               <Send className="w-3.5 h-3.5" />

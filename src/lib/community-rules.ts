@@ -119,6 +119,10 @@ function scanForumSafety(text: string): GuardrailValidationResult | null {
   return null
 }
 
+// Reserve 150 title characters within the 1,500-character screening budget.
+export const FORUM_TITLE_MAX_CHARS = 150
+export const FORUM_BODY_MAX_CHARS = 1_350
+
 /**
  * Validates forum topic or reply content against community guardrails.
  */
@@ -136,7 +140,7 @@ export function validateForumContent(
         error: 'Topic title must be at least 5 characters long.',
       }
     }
-    if (trimmedTitle.length > 150) {
+    if (trimmedTitle.length > FORUM_TITLE_MAX_CHARS) {
       return {
         valid: false,
         error: 'Topic title cannot exceed 150 characters.',
@@ -152,10 +156,10 @@ export function validateForumContent(
     }
   }
 
-  if (trimmedContent.length > 10000) {
+  if (trimmedContent.length > FORUM_BODY_MAX_CHARS) {
     return {
       valid: false,
-      error: 'Content cannot exceed 10,000 characters.',
+      error: 'Content cannot exceed 1,350 characters, including formatting and links.',
     }
   }
 

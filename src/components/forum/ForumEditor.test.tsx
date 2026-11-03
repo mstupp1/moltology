@@ -51,6 +51,16 @@ async function getEditor(): Promise<Editor> {
 }
 
 describe('ForumEditor', () => {
+  it('counts serialized characters and flags oversized drafts without truncating them', async () => {
+    render(<Harness initial={'**' + 'b'.repeat(1347) + '**'} />)
+    await getEditor()
+    expect(screen.getByRole('alert')).toHaveTextContent('1351 / 1,350 characters')
+    expect(screen.getByTestId('markdown').textContent).toHaveLength(1351)
+    fireEvent.click(screen.getByRole('button', { name: 'clear' }))
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.getByText(/0 \/ 1,350 characters/)).toBeInTheDocument()
+  })
+
   it('shows stored markdown as formatted text, not syntax', async () => {
     render(<Harness initial={'**bold** and [site](https://moltology.com)\n\n- one\n- two'} />)
     const input = await screen.findByTestId('forum-editor-input')

@@ -5,7 +5,7 @@ import { useForumAuth } from '@/components/forum/ForumShell'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { createForumPostFn, ForumPostEntry } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { validateForumContent } from '@/lib/community-rules'
+import { FORUM_BODY_MAX_CHARS, validateForumContent } from '@/lib/community-rules'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { ForumEditor, type ForumEditorHandle } from '@/components/forum/ForumEditor'
@@ -164,7 +164,6 @@ export const ReplyComposer = forwardRef<
             </div>
           )}
         </div>
-        <span className="text-[11px] text-ink-muted shrink-0">{content.trim().length} / 10,000</span>
       </div>
 
       {error && (
@@ -203,7 +202,7 @@ export const ReplyComposer = forwardRef<
           )}
           <button
             type="submit"
-            disabled={posting || forumVisibleLength(content) < 10}
+            disabled={posting || forumVisibleLength(content) < 10 || content.trim().length > FORUM_BODY_MAX_CHARS}
             className="px-4 py-1.5 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             {posting ? 'Posting...' : 'Reply'}
