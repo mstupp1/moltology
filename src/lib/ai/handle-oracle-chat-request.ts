@@ -22,7 +22,7 @@ import {
   finalizeOracleUsage,
 } from './service'
 import { getChatLimitMessage, isChatLimitError } from './chat-retention'
-import { getOracleGenerationOptions, getOracleTitleModelId, getOracleThreadFallbackTitle } from './oracle-models'
+import { getOracleGenerationOptions, getOracleThreadFallbackTitle } from './oracle-models'
 import {
   decideOracleUsage,
   ORACLE_MAX_HISTORY_MESSAGES,
@@ -236,26 +236,18 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     { role: 'user', content: userText },
   ])
   const accessTier = usageReservation.isPremium ? 'premium' : 'free'
-  const titleModelId = getOracleTitleModelId(usageReservation.isPremium)
   const candidateModels = orderOracleModels(body.model, preflight.preferredModelId, accessTier)
   let lastError: Error | null = null
 
   queueOracleUserMessagePersistence({ userId, threadId: activeThreadId, userText })
 
-  // Start once per new conversation, not once per attempted chat model. The
-  // awaited completion callback keeps title persistence inside the response's
-  // lifetime while generation overlaps the streamed reply.
+  // Name successful new conversations after the first reply, using the same
+  // model and exact prompt prefix so provider prompt caching can reuse it.
   const titleAbortController = new AbortController()
   const abortTitle = () => titleAbortController.abort()
   request.signal.addEventListener('abort', abortTitle, { once: true })
   if (request.signal.aborted) abortTitle()
-  const titleTask = isNewThread
-    ? summarizeThreadTitle(userText, titleModelId, userId, titleAbortController.signal)
-        .catch((error) => {
-          console.warn('[handleOracleChatRequest] Title generation warning:', error)
-          return initialThreadTitle
-        })
-    : null
+  let titleTask: Promise<string> | null = null
   const cleanUpTitle = () => {
     abortTitle()
     request.signal.removeEventListener('abort', abortTitle)
@@ -297,6 +289,12 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
           // Saving the assistant response and naming the thread are independent:
           // a transient message-save failure must not suppress the title.
           try {
+            if (isNewThread && text && !titleAbortController.signal.aborted && !titleTask) {
+              titleTask = summarizeThreadTitle(userText, modelCandidate, userId, titleAbortController.signal, {
+                system: systemPrompt,
+                messages: [...payloadMessages, { role: 'assistant', content: text }],
+              })
+            }
             const aiTitle = await titleTask
             if (!titleAbortController.signal.aborted && aiTitle && aiTitle !== initialThreadTitle) {
               await updateAIThreadTitle(threadIdForSave, aiTitle, userId, initialThreadTitle)

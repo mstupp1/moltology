@@ -167,7 +167,7 @@ rules:
   - id: oracle.model-routing
     title: Membership determines model access
     kind: permission
-    statement: Guests receive preset preview replies. Free members use Oracle (Ling) for chat and titles. Oracle MAX uses DeepSeek V4.1 Flash as its only chat model. MAX titles use Nemo; all MAX providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.
+    statement: Guests receive preset preview replies. Free members use Oracle Lite (DeepSeek V4.1 Flash). MAX defaults to GPT-6 Luna and can select Lite. Titles use the selected chat model. Both providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.
     dependsOn: [oracle.jailbreak-gate, economy.red-line]
     anchors:
       - file: src/lib/ai/oracle-chat.ts
@@ -178,7 +178,7 @@ rules:
   - id: oracle.model-fallback
     title: Ordered model fallback
     kind: flow
-    statement: Free chat uses Ling through Novita. MAX uses DeepSeek through DeepInfra, with prompt training disallowed. It cannot select Ling. Empty streams, errors, and a 12-second first-token timeout return unavailable without changing models. SDK retries and reasoning are disabled.
+    statement: Lite uses DeepSeek through DeepInfra. MAX defaults to GPT-6 Luna through OpenAI and may choose Lite. Both routes disallow prompt training. Empty streams, errors, and a 12-second first-token timeout return unavailable without changing models. SDK retries and reasoning are disabled.
     dependsOn: [oracle.model-routing]
     anchors:
       - file: src/lib/ai/oracle-models.ts
@@ -187,7 +187,7 @@ rules:
   - id: oracle.thread-titles
     title: One bounded title attempt per new conversation
     kind: flow
-    statement: New conversations receive a 60-character excerpt. One title attempt overlaps chat, capped at 500 input characters, 32 output tokens, eight seconds, and no retries. Successful streams wait for title persistence, then the client refreshes once. Failures or cancellation keep the excerpt. Updates require an unchanged placeholder, preserving manual renames.
+    statement: New threads start with a 60-character excerpt. After the first reply, one title call reuses its model, provider, system prompt, and exchange for cache eligibility. It has 32 output tokens, an eight-second timeout, and no retries. Stream completion awaits title persistence. Failures retain the excerpt; conditional updates preserve manual renames.
     dependsOn: [oracle.model-routing]
     anchors:
       - file: src/lib/ai/service.ts

@@ -160,6 +160,17 @@ describe('AIChatPanel Guest Mode Gating', () => {
     })
   })
 
+  it('reveals model names for profile admins and hides them after sign-out', async () => {
+    const { getUserProfileFn } = await import('@/lib/server/api')
+    vi.mocked(getUserProfileFn).mockResolvedValueOnce({ role: 'admin' } as any)
+    const { rerender } = render(<AIChatPanel userId="admin" />)
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Select model' }), { key: 'Enter' })
+    expect(await screen.findByText('DeepSeek V4.1 Flash')).toBeInTheDocument()
+    expect(screen.getByText('GPT-6 Luna')).toBeInTheDocument()
+    rerender(<AIChatPanel userId={null} />)
+    await waitFor(() => expect(screen.queryByText('GPT-6 Luna')).not.toBeInTheDocument())
+  })
+
   it('defaults MAX members to DeepSeek and resets the choice after sign-out', async () => {
     const snapshot = buildOracleUsageSnapshot([], true)
     vi.mocked(useOracleUsage).mockReturnValue({ snapshot, unavailable: false, blocked: false, refresh: vi.fn() })

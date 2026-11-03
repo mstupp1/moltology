@@ -688,8 +688,7 @@ varying vec3 vNormal;
 varying vec3 vPosition;
 varying vec3 vViewPosition;
 
-// Surprise Layer: Holographic Gyro-Chitin Caustic & Chromatic Interference Aegis Field
-// Replaces the old flat icosahedron wireframe grid with a volumetric curved interference lens
+// Volumetric curved interference lens replacing the flat icosahedron wireframe grid
 float causticInterference(vec3 p, float t) {
   // Warped spherical coordinates for curved cyber-chitin contours
   vec3 q = normalize(p);

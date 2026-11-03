@@ -10,20 +10,20 @@ import {
   pickGuestOracleResponse,
   toModelMessages,
 } from './oracle-chat'
-import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel, ORACLE_TITLE_MODEL_ID, PREMIUM_ORACLE_MODEL_ID, PREMIUM_DEEPSEEK_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID, getOracleTitleModelId, getOracleGenerationOptions } from './oracle-models'
+import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel, ORACLE_TITLE_MODEL_ID, PREMIUM_ORACLE_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID, getOracleTitleModelId, getOracleGenerationOptions } from './oracle-models'
 
 describe('oracle-chat helpers', () => {
   it('keeps chat and title defaults explicit for each membership tier', () => {
-    expect(DEFAULT_ORACLE_MODEL_ID).toBe('inclusionai/ling-3.1-flash-1019')
+    expect(DEFAULT_ORACLE_MODEL_ID).toBe('deepseek/deepseek-v4.1-flash')
     expect(getOracleModel().roles).toEqual(['chat', 'titles'])
     expect(getOracleTitleModelId(false)).toBe(ORACLE_TITLE_MODEL_ID)
     expect(getOracleTitleModelId(true)).toBe(PREMIUM_ORACLE_TITLE_MODEL_ID)
-    expect(getOracleGenerationOptions(ORACLE_TITLE_MODEL_ID)).toMatchObject({ reasoning: 'none', providerOptions: { gateway: { only: ['novita'] } } })
+    expect(getOracleGenerationOptions(ORACLE_TITLE_MODEL_ID)).toMatchObject({ reasoning: 'none', providerOptions: { gateway: { only: ['deepinfra'], disallowPromptTraining: true } } })
   })
 
   it('lists preview, free chat/titles, premium chat, and premium titles', () => {
-    expect(ORACLE_MODELS.map((m) => m.access)).toEqual(['guest', 'free', 'premium', 'premium'])
-    expect(getOracleModel(PREMIUM_ORACLE_TITLE_MODEL_ID).roles).toEqual(['titles'])
+    expect(ORACLE_MODELS.map((m) => m.access)).toEqual(['guest', 'free', 'premium'])
+    expect(getOracleModel(PREMIUM_ORACLE_TITLE_MODEL_ID).roles).toEqual(['chat', 'titles'])
   })
 
   it('drops system turns and caps history before it reaches the model', () => {
@@ -45,29 +45,23 @@ describe('oracle-chat helpers', () => {
     expect(a).toMatch(/Guest|account|Sign up/i)
   })
 
-  it('never routes free accounts to premium, titles-only, or preview entries', () => {
-    for (const requested of [undefined, 'unknown-model', PREMIUM_ORACLE_MODEL_ID, PREMIUM_DEEPSEEK_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID, 'guest-preview']) {
+  it('keeps guests offline and prevents free accounts from selecting MAX or retired models', () => {
+    for (const requested of [undefined, 'unknown-model', PREMIUM_ORACLE_MODEL_ID, 'mistral/mistral-nemo', 'guest-preview']) {
       expect(getOracleCandidateModelIds(requested)).toEqual([DEFAULT_ORACLE_MODEL_ID])
     }
     expect(getOracleCandidateModelIds(undefined, 'guest')).toEqual([])
   })
 
-  it('never routes Premium prompts to free models, even when requested', () => {
-    for (const requested of [undefined, DEFAULT_ORACLE_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID, 'anthropic/claude-sonnet-4.6']) {
-      expect(orderOracleModels(requested, DEFAULT_ORACLE_MODEL_ID, 'premium')).toEqual([PREMIUM_ORACLE_MODEL_ID])
+  it('defaults MAX to Luna and preserves an explicit Lite selection', () => {
+    for (const requested of [undefined, 'mistral/mistral-nemo', 'anthropic/claude-sonnet-4.6']) {
+      expect(orderOracleModels(requested, undefined, 'premium')).toEqual([PREMIUM_ORACLE_MODEL_ID])
     }
-    for (const model of [PREMIUM_DEEPSEEK_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID]) {
-      expect(getOracleGenerationOptions(model)).toMatchObject({
-        providerOptions: { gateway: { only: ['deepinfra'], disallowPromptTraining: true } },
-      })
-    }
-  })
-
-  it('preserves the selected MAX model and its no-training route without fallback', () => {
-    expect(orderOracleModels(PREMIUM_DEEPSEEK_MODEL_ID, undefined, 'premium')).toEqual([PREMIUM_DEEPSEEK_MODEL_ID])
-    expect(orderOracleModels(PREMIUM_ORACLE_MODEL_ID, undefined, 'premium')).toEqual([PREMIUM_ORACLE_MODEL_ID])
-    expect(getOracleGenerationOptions(PREMIUM_ORACLE_MODEL_ID)).toMatchObject({
+    expect(orderOracleModels(DEFAULT_ORACLE_MODEL_ID, undefined, 'premium')).toEqual([DEFAULT_ORACLE_MODEL_ID])
+    expect(getOracleGenerationOptions(DEFAULT_ORACLE_MODEL_ID)).toMatchObject({
       providerOptions: { gateway: { only: ['deepinfra'], disallowPromptTraining: true } },
+    })
+    expect(getOracleGenerationOptions(PREMIUM_ORACLE_MODEL_ID)).toMatchObject({
+      providerOptions: { gateway: { only: ['openai'], disallowPromptTraining: true } },
     })
   })
 

@@ -60,6 +60,21 @@ describe('summarizeThreadTitle', () => {
     expect(title).toBe('Carcinization Acceleration Tips')
   })
 
+  it('keeps the chat prefix identical and appends the title instruction', async () => {
+    const { generateText } = await import('ai')
+    vi.mocked(generateText).mockResolvedValueOnce({ text: 'Daily Focus Plan' } as any)
+    const context = { system: 'Original system prompt', messages: [
+      { role: 'user' as const, content: 'Help me focus' },
+      { role: 'assistant' as const, content: 'Try one task at a time.' },
+    ] }
+    await summarizeThreadTitle('Help me focus', ORACLE_TITLE_MODEL_ID, undefined, undefined, context)
+    const options = vi.mocked(generateText).mock.calls[0][0]
+    expect(options.system).toBe(context.system)
+    expect(options.messages?.slice(0, 2)).toEqual(context.messages)
+    expect(options.messages?.[2]).toMatchObject({ role: 'user', content: expect.stringContaining('3 to 6 word title') })
+    expect(options.prompt).toBeUndefined()
+  })
+
   it('strips "Title:" prefixes, extra quotes, and trailing ellipses from model output', async () => {
     const { generateText } = await import('ai')
     vi.mocked(generateText).mockResolvedValueOnce({

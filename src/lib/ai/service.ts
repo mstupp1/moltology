@@ -24,7 +24,7 @@ export interface SaveMessageInput {
 }
 
 /**
- * Summarizes the user's initial inquiry into a concise 3-6 word conversation title using the title model (ORACLE_TITLE_MODEL_ID).
+ * Summarizes the user's initial inquiry into a concise 3-6 word conversation title using the chat model.
  * Falls back to a sliced excerpt of the user's message if AI generation is unavailable.
  */
 export async function summarizeThreadTitle(
@@ -32,6 +32,7 @@ export async function summarizeThreadTitle(
   modelId: string = ORACLE_TITLE_MODEL_ID,
   userId?: string,
   signal?: AbortSignal,
+  context?: { system: string; messages: { role: 'user' | 'assistant'; content: string }[] },
 ): Promise<string> {
   const fallback = getOracleThreadFallbackTitle(firstMessageText)
   if (!firstMessageText.trim() || signal?.aborted) {
@@ -43,9 +44,16 @@ export async function summarizeThreadTitle(
     const result = await generateText({
       model: modelId as any,
       ...getOracleGenerationOptions(modelId),
-      system:
-        'Summarize the user message as a 3 to 6 word conversation title. Output only the title, without quotes, markdown, or a prefix.',
-      prompt: firstMessageText.slice(0, 500),
+      ...(context ? {
+        system: context.system,
+        messages: [
+          ...context.messages,
+          { role: 'user' as const, content: 'Name this conversation with a 3 to 6 word title. Output only the title, without quotes, markdown, or a prefix.' },
+        ],
+      } : {
+        system: 'Summarize the user message as a 3 to 6 word conversation title. Output only the title, without quotes, markdown, or a prefix.',
+        prompt: firstMessageText.slice(0, 500),
+      }),
       maxOutputTokens: 32,
       temperature: 0,
       maxRetries: 0,

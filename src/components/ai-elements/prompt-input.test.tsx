@@ -81,8 +81,8 @@ describe('PromptInput', () => {
     expect(within(menu).queryByText('Chat')).not.toBeInTheDocument()
     expect(within(menu).queryByText('Guest preview')).not.toBeInTheDocument()
     expect(within(menu).queryByText('Models')).not.toBeInTheDocument()
-    expect(within(menu).getByText('Ling 3.1 Flash 1019')).toBeInTheDocument()
-    expect(within(menu).getByText('DeepSeek V4.1 Flash')).toBeInTheDocument()
+    expect(within(menu).queryByText('DeepSeek V4.1 Flash')).not.toBeInTheDocument()
+    expect(within(menu).queryByText('GPT-6 Luna')).not.toBeInTheDocument()
     expect(within(menu).queryByText(/Sonnet/)).not.toBeInTheDocument()
     expect(within(menu).queryByText('Mistral Nemo 12B')).not.toBeInTheDocument()
     expect(within(menu).getAllByRole('menuitemradio')).toHaveLength(2)
@@ -161,16 +161,20 @@ describe('PromptInput', () => {
     expect(screen.getByRole('menu', { name: 'Oracle models' })).toBeInTheDocument()
   })
 
-  it('does not let Premium select the free model without no-training protection', () => {
+  it('shows underlying model names only when enabled for admins', () => {
+    render(<OracleModelPicker selectedModel={getOracleModel()} onSelectModel={vi.fn()} showModelNames />)
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Select model' }), { key: 'Enter' })
+    expect(screen.getByText('DeepSeek V4.1 Flash')).toBeInTheDocument()
+    expect(screen.getByText('GPT-6 Luna')).toBeInTheDocument()
+  })
+
+  it('lets MAX members select Lite with no-training routing', () => {
     const onSelectModel = vi.fn()
-    const premium = ORACLE_MODELS.find((model) => model.access === 'premium' && model.roles.includes('chat'))!
-    const free = ORACLE_MODELS.find((model) => model.access === 'free')!
+    const premium = ORACLE_MODELS.find((model) => model.access === 'premium')!
     render(<OracleModelPicker selectedModel={premium} onSelectModel={onSelectModel} accessTier="premium" />)
     fireEvent.keyDown(screen.getByRole('button', { name: 'Select model' }), { key: 'Enter' })
-    const row = screen.getByRole('menuitemradio', { name: free.label })
-    expect(row).toHaveAttribute('aria-disabled', 'true')
-    fireEvent.click(row)
-    expect(onSelectModel).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('menuitemradio', { name: 'Oracle Lite' }))
+    expect(onSelectModel).toHaveBeenCalledWith(getOracleModel().id)
   })
 
   it('lays out on one row in compact mode and shows a footnote when given', () => {

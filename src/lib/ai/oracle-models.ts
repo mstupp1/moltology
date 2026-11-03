@@ -1,4 +1,4 @@
-export type OracleProvider = 'deepseek' | 'inclusionai' | 'mistral' | 'anthropic' | 'local'
+export type OracleProvider = 'deepseek' | 'inclusionai' | 'mistral' | 'anthropic' | 'openai' | 'local'
 export type OracleModelBadge = 'Chat' | 'Titles' | 'Preview'
 export type OracleAccessTier = 'guest' | 'free' | 'premium'
 export type OracleModelRole = 'chat' | 'titles' | 'preview'
@@ -25,69 +25,41 @@ export interface OracleModel {
   latency?: string
 }
 
-export const DEFAULT_ORACLE_MODEL_ID = 'inclusionai/ling-3.1-flash-1019'
-export const PREMIUM_ORACLE_MODEL_ID = 'deepseek/deepseek-v4.1-flash'
-export const PREMIUM_DEEPSEEK_MODEL_ID = PREMIUM_ORACLE_MODEL_ID
+export const DEFAULT_ORACLE_MODEL_ID = 'deepseek/deepseek-v4.1-flash'
+export const PREMIUM_ORACLE_MODEL_ID = 'openai/gpt-6-luna'
 export const ORACLE_TITLE_MODEL_ID = DEFAULT_ORACLE_MODEL_ID
-export const PREMIUM_ORACLE_TITLE_MODEL_ID = 'mistral/mistral-nemo'
+export const PREMIUM_ORACLE_TITLE_MODEL_ID = PREMIUM_ORACLE_MODEL_ID
 export const GUEST_ORACLE_MODEL_ID = 'guest-preview'
 
-// Verified 2026-10-31 against vercel.com/ai-gateway/models and its public catalog.
-// Free offers/discounts can change. Prices are USD per 1M tokens for the pinned provider.
-// Premium policy: https://docs.deepinfra.com/account/data-privacy
+// Chat and title generation share a model and a pinned provider per tier.
 export const ORACLE_MODELS: OracleModel[] = [
   {
     id: GUEST_ORACLE_MODEL_ID,
     label: 'Oracle Lite',
     shortLabel: 'Oracle Lite',
     provider: 'local',
-    badge: 'Preview',
     roles: ['preview'],
     access: 'guest',
-    description: 'Preset replies for signed-out visitors. Sign in to start a saved chat.',
-    pricing: { input: 'Free', output: 'Free' },
-    latency: 'Instant',
   },
   {
     id: DEFAULT_ORACLE_MODEL_ID,
     label: 'Oracle Lite',
     shortLabel: 'Oracle Lite',
-    modelName: 'Ling 3.1 Flash 1019',
-    provider: 'inclusionai',
-    badge: 'Chat',
-    roles: ['chat', 'titles'],
-    access: 'free',
-    description: 'Ling 3.1 Flash 1019 for free chat and automatic titles. Currently free through Novita.',
-    pricing: { input: 'Free', output: 'Free' },
-    latency: '~4 s',
-  },
-  {
-    id: PREMIUM_DEEPSEEK_MODEL_ID,
-    label: 'Oracle MAX',
-    shortLabel: 'Oracle MAX',
     modelName: 'DeepSeek V4.1 Flash',
     provider: 'deepseek',
-    badge: 'Chat',
-    roles: ['chat'],
-    access: 'premium',
+    roles: ['chat', 'titles'],
+    access: 'free',
     noPromptTraining: true,
-    description: 'Oracle MAX chat through DeepInfra. Provider does not train on prompts or replies.',
-    pricing: { input: '$0.14', output: '$0.42' },
-    latency: '~1 s',
   },
   {
-    id: PREMIUM_ORACLE_TITLE_MODEL_ID,
-    label: 'Mistral Nemo 12B',
-    shortLabel: 'Nemo Titles',
-    modelName: 'Mistral Nemo 12B',
-    provider: 'mistral',
-    badge: 'Titles',
-    roles: ['titles'],
+    id: PREMIUM_ORACLE_MODEL_ID,
+    label: 'Oracle MAX',
+    shortLabel: 'Oracle MAX',
+    modelName: 'GPT-6 Luna',
+    provider: 'openai',
+    roles: ['chat', 'titles'],
     access: 'premium',
     noPromptTraining: true,
-    description: 'Automatic Oracle MAX titles through DeepInfra. Provider does not train on prompts or replies.',
-    pricing: { input: '$0.029', output: '$0.03' },
-    latency: '~0.3 s',
   },
 ]
 
@@ -118,8 +90,10 @@ export function getOracleThreadFallbackTitle(message: string): string {
 export function getOracleGenerationOptions(modelId: string) {
   return {
     reasoning: 'none' as const,
-    ...(modelId === PREMIUM_DEEPSEEK_MODEL_ID || modelId === PREMIUM_ORACLE_TITLE_MODEL_ID
+    ...(modelId === DEFAULT_ORACLE_MODEL_ID
       ? { providerOptions: { gateway: { only: ['deepinfra'], disallowPromptTraining: true } } }
-      : modelId.startsWith('inclusionai/') ? { providerOptions: { gateway: { only: ['novita'] } } } : {}),
+      : modelId === PREMIUM_ORACLE_MODEL_ID
+        ? { providerOptions: { gateway: { only: ['openai'], disallowPromptTraining: true } } }
+        : {}),
   }
 }
