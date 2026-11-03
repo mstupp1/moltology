@@ -43,6 +43,11 @@ vi.mock('@/lib/ai/stream-oracle-chat-client', () => ({
   }),
 }))
 
+function MobileTrayController() {
+  const oracle = useSafeOracle()
+  return <><button onClick={() => oracle?.setMode('popout')}>Open test tray</button><SynapticOracleWidget /></>
+}
+
 describe('SynapticOracleWidget', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -63,7 +68,7 @@ describe('SynapticOracleWidget', () => {
     fireEvent.click(screen.getByRole('button', { name: /Open Oracle AI Popout/i }))
     expect(custom.container.querySelector('.fixed.rounded-card')).toHaveStyle({ width: '560px', height: '720px' })
     window.innerHeight = 450
-    window.innerWidth = 640
+    window.innerWidth = 800
     fireEvent.resize(window)
     expect(custom.container.querySelector('.fixed.rounded-card')).toHaveStyle({ width: '560px', height: '418px' })
     fireEvent.doubleClick(custom.container.querySelector('.cursor-n-resize')!)
@@ -225,25 +230,21 @@ describe('SynapticOracleWidget', () => {
     expect(container.querySelector('.fixed.rounded-card')).toHaveStyle({ width: '480px', height: '680px' })
   })
 
-  it('docks to bottom as interactive prompt pill tray with no resize handles on mobile viewport', () => {
-    window.innerWidth = 375
+  it.each([375, 700])('keeps the floating launcher absent at %ipx and supports an explicitly opened tray', (width) => {
+    window.innerWidth = width
     window.innerHeight = 667
 
     vi.useFakeTimers()
 
     render(
       <OracleProvider>
-        <SynapticOracleWidget />
+        <MobileTrayController />
       </OracleProvider>
     )
 
-    // Mobile prompt pill dock should be rendered with prompt text
-    const btn = screen.getByRole('button', { name: /Open Oracle AI Tray/i })
-    expect(btn).toBeInTheDocument()
-    expect(screen.getByText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
-
-    // Tap to open tray
-    fireEvent.click(btn)
+    expect(screen.queryByRole('button', { name: /Open Oracle AI Tray/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Open Oracle AI Popout/i })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Open test tray' }))
     act(() => { vi.advanceTimersByTime(50) })
 
     // Mobile sheet is rendered via HudBottomSheet into document.body
@@ -322,7 +323,7 @@ describe('SynapticOracleWidget', () => {
     expect(localStorage.getItem('moltology:oracle_button_pos')).toBeNull()
   })
 
-  it('supports mobile swipe-up to open and swipe-down handle gesture to dismiss tray', () => {
+  it('dismisses an explicitly opened mobile tray with the swipe-down handle', () => {
     window.innerWidth = 375
     window.innerHeight = 667
 
@@ -330,20 +331,11 @@ describe('SynapticOracleWidget', () => {
 
     render(
       <OracleProvider>
-        <SynapticOracleWidget />
+        <MobileTrayController />
       </OracleProvider>
     )
 
-    const pillBtn = screen.getByRole('button', { name: /Open Oracle AI Tray/i })
-    expect(pillBtn).toBeInTheDocument()
-
-    // Simulate swipe up by 30px (touchStartY: 600, changedTouches clientY: 570)
-    fireEvent.touchStart(pillBtn, {
-      touches: [{ clientY: 600 }],
-    })
-    fireEvent.touchEnd(pillBtn, {
-      changedTouches: [{ clientY: 570 }],
-    })
+    fireEvent.click(screen.getByRole('button', { name: 'Open test tray' }))
 
     act(() => { vi.advanceTimersByTime(50) })
 
@@ -363,8 +355,9 @@ describe('SynapticOracleWidget', () => {
     // Advance past exit animation
     act(() => { vi.advanceTimersByTime(350) })
 
-    // Mobile prompt pill dock should re-appear
-    expect(screen.getByRole('button', { name: /Open Oracle AI Tray/i })).toBeInTheDocument()
+    // Closing returns to the app without restoring a floating mobile launcher
+    expect(screen.queryByRole('button', { name: /Open Oracle AI Tray/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 
     vi.useRealTimers()
   })

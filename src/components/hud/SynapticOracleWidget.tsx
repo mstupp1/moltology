@@ -102,7 +102,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
   } | null>(null)
 
   const getSafePopoutDims = useCallback((size: { width: number; height: number } | null) => {
-    if (typeof window === 'undefined' || window.innerWidth < 640) return size ?? { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
+    if (typeof window === 'undefined' || window.innerWidth < 768) return size ?? { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
     const maxW = Math.max(1, window.innerWidth - 24 - 16)
     const maxH = Math.max(1, window.innerHeight - 16 - 16)
     const targetW = size ? size.width : DEFAULT_WIDTH
@@ -127,7 +127,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
   useEffect(() => {
     setIsMounted(true)
     if (typeof window !== 'undefined') {
-      setIsMobile(window.innerWidth < 640)
+      setIsMobile(window.innerWidth < 768)
     }
 
     clearStalePositionKeys()
@@ -153,7 +153,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     if (!isMounted) return
     const handleResize = () => {
       if (typeof window !== 'undefined') {
-        setIsMobile(window.innerWidth < 640)
+        setIsMobile(window.innerWidth < 768)
       }
       const clampedSize = getSafePopoutDims(popoutSizeRef.current)
       if (
@@ -211,26 +211,9 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     if (isPopoutActive) wasPopoutOpenRef.current = true
     if (wasPopoutOpenRef.current && !isPopoutActive && !isRendered) {
       wasPopoutOpenRef.current = false
-      document.querySelector<HTMLButtonElement>(isMobile ? '[aria-label="Open Oracle AI Tray"]' : '[aria-label="Open Oracle AI Popout"]')?.focus()
+      document.querySelector<HTMLButtonElement>(isMobile ? '[aria-label="Mobile navigation"] a[href="/oracle"]' : '[aria-label="Open Oracle AI Popout"]')?.focus()
     }
   }, [isPopoutActive, isRendered, isMobile])
-
-  const mobilePillTouchStartYRef = useRef<number | null>(null)
-
-  const handleMobilePillTouchStart = (e: React.TouchEvent) => {
-    mobilePillTouchStartYRef.current = e.touches[0]?.clientY ?? null
-  }
-
-  const handleMobilePillTouchEnd = (e: React.TouchEvent) => {
-    if (mobilePillTouchStartYRef.current !== null && e.changedTouches[0]) {
-      const deltaY = mobilePillTouchStartYRef.current - e.changedTouches[0].clientY
-      mobilePillTouchStartYRef.current = null
-      // If swiped up by > 15px, open the tray
-      if (deltaY > 15) {
-        handleToggle()
-      }
-    }
-  }
 
   const handleResetSize = () => {
     try {
@@ -315,23 +298,6 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
 
   return (
     <>
-      {/* ── Mobile: Bottom Pull-Up Prompt Pill Dock ── */}
-      {!isPopoutActive && (
-        <div className="fixed inset-x-3 bottom-[var(--oracle-mobile-bottom-offset)] z-40 max-w-md mx-auto sm:hidden font-sans select-none pointer-events-auto">
-          <button
-            type="button"
-            onClick={handleToggle}
-            onTouchStart={handleMobilePillTouchStart}
-            onTouchEnd={handleMobilePillTouchEnd}
-            className={`${ORACLE_PILL_BASE_CLASSES} min-h-[var(--oracle-mobile-launcher-height)] w-full cursor-pointer transition-all duration-200 active:scale-[0.98]`}
-            aria-label="Open Oracle AI Tray"
-            title="Tap or swipe up to consult Oracle AI"
-          >
-            <OracleLauncherPillContent />
-          </button>
-        </div>
-      )}
-
       {/* ── Mobile: Gesture-driven Pull-Up Bottom Sheet Tray ── */}
       {isMobile && (
         <HudBottomSheet
@@ -341,7 +307,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
           height="80dvh"
           maxHeight="85dvh"
           ariaLabel="Synaptic Oracle AI Assistant"
-          containerClassName="sm:hidden font-sans"
+          containerClassName="md:hidden font-sans"
           className="bg-surface-1 border-t border-line rounded-t-card shadow-menu"
         >
           <AIChatPanel
@@ -355,7 +321,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
 
       {/* ── Desktop: Fixed Floating Launcher Button ── */}
       {!isMobile && !isPopoutActive && !isRendered && (
-        <div className="hidden sm:block fixed z-40 right-6 bottom-4 font-sans select-none">
+        <div className="hidden md:block fixed z-40 right-6 bottom-4 font-sans select-none">
           <button
             type="button"
             onClick={handleToggle}
@@ -371,7 +337,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
       {/* ── Desktop: Bottom-right popout with fade and vertical motion ── */}
       {!isMobile && isRendered && (
         <div
-          className={`fixed z-40 right-6 bottom-4 font-sans overflow-hidden transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none shadow-menu bg-surface-1 rounded-card border border-line hidden sm:block ${
+          className={`fixed z-40 right-6 bottom-4 font-sans overflow-hidden transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none shadow-menu bg-surface-1 rounded-card border border-line hidden md:block ${
             activeResizeDir ? 'select-none' : ''
           }`}
           aria-hidden={!isPopoutActive}
