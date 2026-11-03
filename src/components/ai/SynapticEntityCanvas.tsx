@@ -40,6 +40,7 @@ interface SharedUniforms {
   uReducedMotion: { value: number }
   uPixelRatio: { value: number }
   uColor: { value: THREE.Color }
+  uCompColor: { value: THREE.Color }
 }
 
 function canUseWebGL(): boolean {
@@ -77,13 +78,13 @@ function createRadialGlowTexture(type: 'corona' | 'wide'): THREE.Texture | null 
   const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32)
   if (type === 'corona') {
     gradient.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)')
-    gradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.85)')
-    gradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.3)')
+    gradient.addColorStop(0.28, 'rgba(255, 255, 255, 0.82)')
+    gradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.28)')
     gradient.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)')
   } else {
-    gradient.addColorStop(0.0, 'rgba(255, 255, 255, 0.7)')
-    gradient.addColorStop(0.35, 'rgba(255, 255, 255, 0.35)')
-    gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.1)')
+    gradient.addColorStop(0.0, 'rgba(255, 255, 255, 0.68)')
+    gradient.addColorStop(0.35, 'rgba(255, 255, 255, 0.34)')
+    gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.09)')
     gradient.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)')
   }
   ctx.fillStyle = gradient
@@ -186,31 +187,37 @@ ${ASHIMA_SIMPLEX_NOISE_3D}
 
 void main() {
   vNormal = normalize(normalMatrix * normal);
-  
+
   float motionScale = mix(1.0, 0.15, uReducedMotion);
-  
-  float baseWave = simplex2(position * 1.15, uTime * 0.85 * motionScale);
-  
+
+  // Flowing domain-warped organic waves
+  vec3 warp = vec3(
+    sin(position.y * 2.4 + uTime * 0.65 * motionScale),
+    cos(position.z * 2.4 - uTime * 0.55 * motionScale),
+    sin(position.x * 2.4 + uTime * 0.7 * motionScale)
+  ) * 0.22;
+  float baseWave = simplex2(position * 1.18 + warp, uTime * 0.85 * motionScale);
+
   // High-frequency radial contraction & tremor during thinking
   float thinkingTremor = sin(uTime * 32.0 * motionScale + position.x * 14.0 + position.y * 16.0) * uThinkingTension * 0.045;
-  float thinkingContract = -uThinkingTension * 0.12;
-  
+  float thinkingContract = -uThinkingTension * 0.11;
+
   // Streaming outward ripple with token energy
-  float streamWave = sin(length(position) * 6.5 - uTime * 6.5 * motionScale);
-  float streamRipple = streamWave * (uStreamVelocity * 0.08 + uPulseEnergy * 0.14);
-  
+  float streamWave = sin(length(position + warp * 0.5) * 6.5 - uTime * 6.5 * motionScale);
+  float streamRipple = streamWave * (uStreamVelocity * 0.085 + uPulseEnergy * 0.14);
+
   // Typing gentle hum
-  float typingHum = sin(position.y * 5.5 + uTime * 3.2 * motionScale) * uTypingIntensity * 0.035;
-  
-  float disp = (baseWave * 0.08 + streamRipple + thinkingTremor + thinkingContract + typingHum) * motionScale;
+  float typingHum = sin(position.y * 5.2 + uTime * 3.2 * motionScale) * uTypingIntensity * 0.038;
+
+  float disp = (baseWave * 0.095 + streamRipple + thinkingTremor + thinkingContract + typingHum) * motionScale;
   vDisplacement = disp;
-  
+
   vec3 displacedPosition = position + normal * disp;
   vPosition = displacedPosition;
-  
+
   vec4 mvPosition = modelViewMatrix * vec4(displacedPosition, 1.0);
   vViewPosition = -mvPosition.xyz;
-  
+
   gl_Position = projectionMatrix * mvPosition;
 }
 `
@@ -220,92 +227,135 @@ uniform float uTime;
 uniform float uColorShift;
 uniform float uPulseEnergy;
 uniform float uStreamVelocity;
+uniform float uThinkingTension;
+uniform float uTypingIntensity;
 uniform float uSynapseFlash;
 uniform vec3 uColor;
+uniform vec3 uCompColor;
 
 varying vec3 vNormal;
 varying vec3 vPosition;
 varying vec3 vViewPosition;
 varying float vDisplacement;
 
-float synapticVeins(vec3 p, float t) {
-  vec3 q = p * 4.0 + vec3(sin(t * 0.5), cos(t * 0.6), sin(t * 0.4));
-  float v1 = sin(q.x + sin(q.y * 1.5)) * cos(q.y + sin(q.z * 1.4));
-  float v2 = sin(q.z * 2.0 + cos(q.x * 1.8)) * cos(q.x * 2.2 + sin(q.y * 2.0));
-  float raw = abs(v1 * 0.6 + v2 * 0.4);
-  return smoothstep(0.42, 0.04, raw);
+float wispyCurrents(vec3 p, float t) {
+  vec3 w1 = p * 2.6 + vec3(sin(t * 0.45 + p.y * 1.8), cos(t * 0.5 + p.z * 1.8), sin(t * 0.38 + p.x * 1.8)) * 0.65;
+  vec3 w2 = w1 * 1.75 + vec3(cos(w1.y * 1.6 - t * 0.7), sin(w1.z * 1.6 + t * 0.6), cos(w1.x * 1.6 - t * 0.5)) * 0.55;
+  float ribbon1 = abs(sin(w1.x + cos(w1.y * 1.3) + sin(w1.z * 1.1)));
+  float ribbon2 = abs(cos(w2.y - sin(w2.z * 1.4) + cos(w2.x * 1.2)));
+  float mainStream = smoothstep(0.38, 0.02, ribbon1 * 0.58 + ribbon2 * 0.42);
+  float fineFilament = smoothstep(0.16, 0.0, abs(ribbon1 - ribbon2));
+  return clamp(mainStream * 0.78 + fineFilament * 0.55, 0.0, 1.0);
+}
+
+float surfaceLightning(vec3 p, float t) {
+  vec3 lp = p * 5.2 + vec3(
+    sin(p.y * 7.5 + t * 9.0) * 0.35 + cos(p.z * 13.0 - t * 14.0) * 0.14,
+    cos(p.z * 7.5 - t * 8.5) * 0.35 + sin(p.x * 13.0 + t * 15.0) * 0.14,
+    sin(p.x * 7.5 + t * 10.0) * 0.35 + cos(p.y * 13.0 - t * 13.0) * 0.14
+  );
+  float bolt = abs(sin(lp.x + lp.y * 0.8 - lp.z * 0.6));
+  float gate = smoothstep(0.55, 0.96, sin(t * 4.7 + p.x * 2.5 - p.y * 2.1) * 0.5 + 0.5);
+  return smoothstep(0.065, 0.004, bolt) * gate;
 }
 
 void main() {
   vec3 viewDir = normalize(vViewPosition);
   vec3 norm = normalize(vNormal);
-  
+
   float NdotV = max(0.0, dot(norm, viewDir));
-  float fresnel = pow(1.0 - NdotV, 2.8);
-  
-  vec3 abyssalDeep = vec3(0.012, 0.027, 0.031);
-  vec3 abyssalTrench = vec3(0.027, 0.141, 0.259);
-  
-  vec3 cyan = vec3(0.0, 0.765, 1.0);
-  vec3 bioAqua = vec3(0.0, 0.961, 0.831);
-  vec3 sacredCrimson = vec3(1.0, 0.271, 0.227);
-  vec3 sacredCoral = vec3(1.0, 0.416, 0.376);
-  
-  vec3 activeHue;
-  if (uColorShift < 0.45) {
-    float f = clamp(uColorShift / 0.45, 0.0, 1.0);
-    activeHue = mix(cyan, bioAqua, f);
-  } else {
-    float f = clamp((uColorShift - 0.45) / 0.45, 0.0, 1.0);
-    vec3 crimsonShift = mix(sacredCrimson, sacredCoral, clamp((uColorShift - 0.88) * 8.0, 0.0, 1.0));
-    activeHue = mix(bioAqua, crimsonShift, f);
-  }
-  
-  // (b) Iridescent thin-film rim: fresnel-driven hue shift towards complementary tint
-  vec3 iridTint = vec3(activeHue.b * 0.85 + 0.15, activeHue.r * 0.4 + 0.1, activeHue.g * 0.8 + 0.2);
-  vec3 rimColor = mix(activeHue, iridTint, fresnel * 0.75);
-  
-  float creviceDepth = smoothstep(0.06, -0.06, vDisplacement);
-  vec3 creviceColor = mix(abyssalTrench, abyssalDeep, creviceDepth);
-  
-  // (a) Veins that carry traveling energy pulses (speed rises with streamVelocity)
-  float veins = synapticVeins(vPosition, uTime * 0.5);
-  float pulseTravel = fract(dot(vPosition, vec3(1.3, 1.7, 1.1)) * 2.0 - uTime * (1.5 + uStreamVelocity * 5.0));
-  float travelingPulse = smoothstep(0.7, 1.0, pulseTravel) * veins * (0.6 + uStreamVelocity * 0.9 + uPulseEnergy * 0.5);
-  
-  // (c) Fake subsurface inner glow
-  float innerGlow = pow(NdotV, 2.2) * (0.35 + uPulseEnergy * 0.35);
-  
-  // (d) SynapseFlash makes veins flare white-hot
-  vec3 hotWhite = vec3(0.96, 0.98, 1.0);
-  float hotSpot = veins * (uSynapseFlash * 2.2 + uPulseEnergy * 0.4) + travelingPulse * 0.85;
-  
-  vec3 bodyColor = mix(creviceColor, activeHue, 0.28 + veins * 0.42 + fresnel * 0.55);
-  bodyColor += activeHue * (innerGlow * 0.7 + travelingPulse * 0.6);
-  bodyColor += rimColor * (fresnel * (0.75 + uSynapseFlash * 0.6));
-  bodyColor += hotWhite * hotSpot;
-  
-  float alpha = clamp(0.92 + fresnel * 0.08, 0.0, 1.0);
+  float fresnel = pow(1.0 - NdotV, 2.6);
+
+  // Dark metallic liquid-chrome base
+  vec3 abyssalChrome = vec3(0.014, 0.032, 0.042);
+  vec3 brushedTitanium = vec3(0.055, 0.115, 0.155);
+
+  vec3 activeHue = uColor;
+  vec3 compHue = uCompColor;
+
+  // Dual-light studio metallic specular highlights
+  vec3 lightDir1 = normalize(vec3(0.65, 0.75, 0.85));
+  vec3 lightDir2 = normalize(vec3(-0.75, -0.45, 0.55));
+  vec3 halfVec1 = normalize(lightDir1 + viewDir);
+  vec3 halfVec2 = normalize(lightDir2 + viewDir);
+
+  float specChrome = pow(max(0.0, dot(norm, halfVec1)), 42.0);
+  float specSheen = pow(max(0.0, dot(norm, halfVec1)), 9.0);
+  float specComp = pow(max(0.0, dot(norm, halfVec2)), 20.0);
+
+  // Anisotropic metallic contour bands across displaced shell
+  float metalContour = 0.5 + 0.5 * sin((norm.y * 5.0 + norm.x * 3.0 + vDisplacement * 14.0) * 3.14159);
+  vec3 metalBase = mix(abyssalChrome, brushedTitanium, metalContour * 0.55 + specSheen * 0.45);
+
+  // Wispy bioluminescent internal currents + complementary secondary currents
+  float veins = wispyCurrents(vPosition, uTime * 0.55);
+  float compVeins = wispyCurrents(vPosition.yzx * 1.12 + vec3(1.7, -0.9, 2.3), -uTime * 0.42);
+
+  float pulseTravel = fract(dot(vPosition, vec3(1.1, 1.5, 0.9)) * 1.6 - uTime * (1.2 + uStreamVelocity * 4.5));
+  float travelingPulse = smoothstep(0.62, 1.0, pulseTravel) * veins * (0.65 + uStreamVelocity * 0.95 + uPulseEnergy * 0.55);
+
+  // Surface arc lightning tendrils
+  float arcIntensity = 0.28 + uPulseEnergy * 0.65 + uThinkingTension * 0.8 + uStreamVelocity * 0.55 + uSynapseFlash * 1.3;
+  float arc = surfaceLightning(vPosition, uTime) * arcIntensity;
+
+  float innerGlow = pow(NdotV, 2.0) * (0.38 + uPulseEnergy * 0.38 + uTypingIntensity * 0.2);
+  vec3 hotWhite = vec3(0.95, 0.98, 1.0);
+
+  // Combine metallic base + primary state hue + complementary state harmonic
+  vec3 bodyColor = mix(metalBase, activeHue * 0.85, 0.24 + veins * 0.44);
+  bodyColor = mix(bodyColor, compHue * 0.9, compVeins * 0.28 + fresnel * 0.36);
+
+  // Add subsurface glow, traveling synaptic streams, and metallic specular reflections
+  bodyColor += activeHue * (innerGlow * 0.68 + travelingPulse * 0.65 + specSheen * 0.35);
+  bodyColor += compHue * (specComp * 0.58 + compVeins * (0.22 + uThinkingTension * 0.25 + uTypingIntensity * 0.2));
+  bodyColor += mix(activeHue, compHue, 0.48) * (fresnel * (0.85 + uSynapseFlash * 0.6));
+  bodyColor += mix(hotWhite, activeHue, 0.25) * (specChrome * 0.95);
+  bodyColor += hotWhite * (veins * (uSynapseFlash * 1.8 + uPulseEnergy * 0.35) + travelingPulse * 0.75 + arc * 1.15);
+
+  float alpha = clamp(0.94 + fresnel * 0.06, 0.0, 1.0);
   gl_FragColor = vec4(bodyColor, alpha);
 }
 `
 
-const SYNAPSE_LINE_VERTEX_SHADER = `
+const TENDRIL_VERTEX_SHADER = `
+uniform float uTime;
+uniform float uStreamVelocity;
+uniform float uPulseEnergy;
+uniform float uThinkingTension;
+uniform float uReducedMotion;
+
 attribute float aT;
 attribute float aPhase;
+attribute float aColorMix;
 
 varying float vT;
 varying float vPhase;
+varying float vColorMix;
 
 void main() {
   vT = aT;
   vPhase = aPhase;
-  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+  vColorMix = aColorMix;
+
+  float motionScale = mix(1.0, 0.2, uReducedMotion);
+  float envelope = sin(aT * 3.14159265);
+
+  // Organic wispy undulation along each curved filament
+  float swayFreq = 6.2831853 * 1.5;
+  float waveSpeed = (1.6 + uStreamVelocity * 2.8 + uThinkingTension * 2.2) * motionScale;
+  vec3 sway = vec3(
+    sin(aT * swayFreq - uTime * waveSpeed + aPhase),
+    cos(aT * swayFreq * 1.2 + uTime * waveSpeed * 0.85 + aPhase * 1.3),
+    sin(aT * swayFreq * 0.9 - uTime * waveSpeed * 1.1 + aPhase * 0.7)
+  ) * envelope * (0.045 + uPulseEnergy * 0.035 + uThinkingTension * 0.03);
+
+  vec3 pos = position + sway;
+  vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
   gl_Position = projectionMatrix * mvPosition;
 }
 `
 
-const SYNAPSE_LINE_FRAGMENT_SHADER = `
+const TENDRIL_FRAGMENT_SHADER = `
 uniform float uTime;
 uniform float uStreamVelocity;
 uniform float uPulseEnergy;
@@ -313,66 +363,102 @@ uniform float uThinkingTension;
 uniform float uSynapseFlash;
 uniform float uReducedMotion;
 uniform vec3 uColor;
+uniform vec3 uCompColor;
 
 varying float vT;
 varying float vPhase;
+varying float vColorMix;
 
 void main() {
   float motionScale = mix(1.0, 0.2, uReducedMotion);
-  float speed = 1.0 + uStreamVelocity * 3.5 + uPulseEnergy * 1.5;
-  float pulseHead = fract(uTime * speed * 0.35 * motionScale + vPhase);
-  
-  float dist = abs(vT - pulseHead);
-  float pulse = smoothstep(0.18, 0.0, dist);
-  
-  float flicker = 1.0 - uThinkingTension * 0.45 * sin(uTime * 32.0 * motionScale + vPhase * 8.0);
-  
-  float baseAlpha = 0.12;
-  float pulseBrightness = (0.55 + uPulseEnergy * 0.45 + uStreamVelocity * 0.35 + uSynapseFlash * 0.8) * flicker;
-  
-  vec3 col = mix(uColor * 0.8, vec3(1.0), pulse * 0.65 + uSynapseFlash * 0.5);
-  float alpha = baseAlpha + pulse * pulseBrightness;
-  
+  float speed = 0.85 + uStreamVelocity * 2.8 + uPulseEnergy * 1.4;
+  float flow = fract(vT - uTime * speed * 0.42 * motionScale + vPhase);
+
+  // Smooth wispy comet-stream along the curve (no dots or dashes)
+  float streamGlow = smoothstep(0.0, 0.35, flow) * smoothstep(1.0, 0.35, flow);
+  float headHighlight = pow(smoothstep(0.55, 0.98, flow), 3.0);
+
+  // Smooth tapered ends so curves melt into space organically
+  float endTaper = sin(vT * 3.14159265);
+
+  vec3 baseHue = mix(uColor, uCompColor, vColorMix);
+  vec3 col = mix(baseHue, vec3(0.96, 0.99, 1.0), headHighlight * 0.65 + uSynapseFlash * 0.45);
+
+  float alpha = endTaper * (0.14 + streamGlow * (0.42 + uPulseEnergy * 0.35 + uStreamVelocity * 0.3) + headHighlight * (0.45 + uSynapseFlash * 0.5));
   gl_FragColor = vec4(col, clamp(alpha, 0.0, 1.0));
 }
 `
 
-const SYNAPSE_POINT_VERTEX_SHADER = `
-uniform float uPixelRatio;
+const LIGHTNING_VERTEX_SHADER = `
 uniform float uTime;
-uniform float uReducedMotion;
+uniform float uStreamVelocity;
 uniform float uPulseEnergy;
+uniform float uThinkingTension;
 uniform float uSynapseFlash;
+uniform float uReducedMotion;
 
-attribute float aPhase;
-varying float vTwinkle;
+attribute float aT;
+attribute float aSeed;
+attribute vec3 aOrtho1;
+attribute vec3 aOrtho2;
+
+varying float vT;
+varying float vBoltIntensity;
+varying float vSeed;
 
 void main() {
+  vT = aT;
+  vSeed = aSeed;
+
   float motionScale = mix(1.0, 0.2, uReducedMotion);
-  float tw = 0.65 + 0.35 * sin(uTime * 3.0 * motionScale + aPhase);
-  vTwinkle = tw;
-  
-  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-  float pSize = (11.0 + uPulseEnergy * 6.0 + uSynapseFlash * 10.0) * tw;
-  gl_PointSize = (pSize * uPixelRatio) / -mvPosition.z;
+  float envelope = sin(aT * 3.14159265);
+
+  // Quantized time steps so electric arcs snap & crackle like real high-voltage plasma
+  float snapRate = (11.0 + uStreamVelocity * 10.0 + uThinkingTension * 12.0) * motionScale;
+  float snapTime = floor(uTime * snapRate + aSeed * 19.0);
+
+  // High-frequency jagged displacement + secondary micro-forking jitter
+  float jag1 = sin(aT * 26.0 + snapTime * 4.7 + aSeed * 31.0)
+             + 0.55 * cos(aT * 59.0 - snapTime * 7.3 + aSeed * 17.0);
+  float jag2 = cos(aT * 31.0 - snapTime * 5.9 + aSeed * 43.0)
+             + 0.55 * sin(aT * 67.0 + snapTime * 8.1 + aSeed * 23.0);
+
+  float amp = envelope * (0.095 + uPulseEnergy * 0.06 + uThinkingTension * 0.055 + uSynapseFlash * 0.07);
+  vec3 displaced = position + (aOrtho1 * jag1 + aOrtho2 * jag2) * amp;
+
+  // Intermittent firing gate per bolt
+  float cycle = sin(uTime * (2.8 + fract(aSeed * 7.3) * 3.2) * motionScale + aSeed * 40.0);
+  float threshold = 0.42 - uPulseEnergy * 0.28 - uThinkingTension * 0.25 - uStreamVelocity * 0.22 - uSynapseFlash * 0.5;
+  float activeGate = smoothstep(threshold, threshold + 0.22, cycle);
+
+  vBoltIntensity = clamp(activeGate + uSynapseFlash * 0.85, 0.0, 1.0);
+
+  vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);
   gl_Position = projectionMatrix * mvPosition;
 }
 `
 
-const SYNAPSE_POINT_FRAGMENT_SHADER = `
-uniform vec3 uColor;
+const LIGHTNING_FRAGMENT_SHADER = `
+uniform float uTime;
 uniform float uSynapseFlash;
-varying float vTwinkle;
+uniform vec3 uColor;
+uniform vec3 uCompColor;
+
+varying float vT;
+varying float vBoltIntensity;
+varying float vSeed;
 
 void main() {
-  vec2 coord = gl_PointCoord - vec2(0.5);
-  float d = length(coord);
-  if (d > 0.5) discard;
-  
-  float falloff = smoothstep(0.5, 0.0, d);
-  vec3 col = mix(uColor, vec3(1.0), falloff * (0.6 + uSynapseFlash * 0.4));
-  float alpha = falloff * vTwinkle * (0.75 + uSynapseFlash * 0.25);
-  gl_FragColor = vec4(col, alpha);
+  if (vBoltIntensity < 0.01) discard;
+
+  float endPinch = sin(vT * 3.14159265);
+  float surge = 0.65 + 0.35 * sin(vT * 18.0 - uTime * 28.0 + vSeed * 20.0);
+
+  vec3 arcTint = mix(uColor, uCompColor, fract(vSeed * 3.7));
+  vec3 hotCore = mix(arcTint, vec3(0.96, 0.99, 1.0), 0.72 + uSynapseFlash * 0.25);
+
+  float alpha = vBoltIntensity * surge * (0.35 + 0.65 * endPinch);
+  gl_FragColor = vec4(hotCore, clamp(alpha, 0.0, 1.0));
 }
 `
 
@@ -390,149 +476,270 @@ attribute float aSize;
 
 varying float vAlpha;
 varying float vSeed;
+varying float vAngle;
 
 void main() {
   float motionScale = mix(1.0, 0.15, uReducedMotion);
-  
-  // Spiral inward with streamVelocity for an 'ingesting tokens' feel:
-  // radius contracts over each cycle and the particle twists as it falls.
-  float spiralCycle = fract(uTime * 0.35 * motionScale + aSeed);
+
+  // Curl-like 3D helical flow + inward token-stream vortex
+  float spiralCycle = fract(uTime * 0.24 * motionScale + aSeed);
   float ingest = uStreamVelocity * spiralCycle;
 
-  float angle = uTime * (0.1 + aSeed * 0.3) * motionScale + ingest * 2.4;
-  float cosA = cos(angle);
-  float sinA = sin(angle);
-  
+  float orbitAngle = uTime * (0.14 + fract(aSeed * 3.1) * 0.28) * motionScale + ingest * 2.2;
+  float cosA = cos(orbitAngle);
+  float sinA = sin(orbitAngle);
+
   vec3 p = position;
   vec3 orbitedPos = vec3(
     p.x * cosA - p.z * sinA,
     p.y,
     p.x * sinA + p.z * cosA
   );
-  
-  float spiralFactor = 1.0 - 0.5 * ingest;
+
+  // Fluid wavy drift (wispy underwater / cyber currents)
+  float driftPhase = uTime * 0.75 * motionScale + aSeed * 18.0;
+  vec3 fluidCurl = vec3(
+    sin(orbitedPos.y * 2.2 + driftPhase) * 0.16,
+    cos(orbitedPos.x * 1.9 - driftPhase * 0.85) * 0.18,
+    sin(orbitedPos.z * 2.2 + driftPhase * 1.1) * 0.16
+  );
+  orbitedPos += fluidCurl;
+
+  float spiralFactor = 1.0 - 0.45 * ingest;
   orbitedPos *= spiralFactor;
-  // Fade out near the end of each cycle so the reset to the outer shell is invisible
-  float wrapFade = mix(1.0, smoothstep(1.0, 0.8, spiralCycle) * smoothstep(0.0, 0.08, spiralCycle), uStreamVelocity);
-  
-  // Thinking adds jitter
-  float jitter = sin(uTime * 28.0 * motionScale + aSeed * 50.0) * uThinkingTension * 0.08;
-  orbitedPos += vec3(jitter, -jitter * 0.5, jitter * 0.7);
-  
+
+  float wrapFade = mix(1.0, smoothstep(1.0, 0.82, spiralCycle) * smoothstep(0.0, 0.08, spiralCycle), uStreamVelocity);
+
   vec4 mvPosition = modelViewMatrix * vec4(orbitedPos, 1.0);
-  float scaleFactor = 1.0 + uPulseEnergy * 0.45 + uSynapseFlash * 0.6;
+  float scaleFactor = 1.0 + uPulseEnergy * 0.45 + uSynapseFlash * 0.55 + uThinkingTension * 0.2;
   gl_PointSize = (aSize * scaleFactor * uPixelRatio) / -mvPosition.z;
   gl_Position = projectionMatrix * mvPosition;
-  
-  float twinkle = 0.5 + 0.5 * sin(uTime * 2.5 * motionScale + aSeed * 25.0);
-  vAlpha = (0.35 + 0.45 * twinkle + uStreamVelocity * 0.25 + uSynapseFlash * 0.35) * wrapFade;
+
+  float breathe = 0.55 + 0.45 * sin(uTime * 2.1 * motionScale + aSeed * 25.0);
+  vAlpha = (0.38 + 0.45 * breathe + uStreamVelocity * 0.25 + uSynapseFlash * 0.35) * wrapFade;
   vSeed = aSeed;
+  vAngle = orbitAngle + aSeed * 6.2831853;
 }
 `
 
 const HALO_FRAGMENT_SHADER = `
-uniform vec3 uColor;
+uniform float uTime;
 uniform float uSynapseFlash;
+uniform vec3 uColor;
+uniform vec3 uCompColor;
 
 varying float vAlpha;
 varying float vSeed;
+varying float vAngle;
 
 void main() {
-  vec2 coord = gl_PointCoord - vec2(0.5);
-  float dist = length(coord);
-  if (dist > 0.5) discard;
-  
-  float falloff = smoothstep(0.5, 0.04, dist);
-  vec3 col = mix(uColor, vec3(1.0), falloff * (0.35 + uSynapseFlash * 0.65));
-  gl_FragColor = vec4(col, falloff * vAlpha);
+  vec2 centered = gl_PointCoord - vec2(0.5);
+  float r = length(centered);
+  if (r > 0.5) discard;
+
+  // Rotate local coordinates into a curvy S-shaped wispy wisp instead of a flat round dot
+  float c = cos(vAngle);
+  float s = sin(vAngle);
+  vec2 rot = vec2(centered.x * c - centered.y * s, centered.x * s + centered.y * c);
+
+  // S-curve spine distortion
+  float sCurve = rot.y - 0.24 * sin(rot.x * 6.5 + vSeed * 12.0);
+  float wispDist = length(vec2(rot.x * 0.68, sCurve * 1.85));
+
+  float wispCore = smoothstep(0.36, 0.01, wispDist);
+  float softHalo = smoothstep(0.5, 0.08, r) * 0.35;
+  float shape = clamp(wispCore + softHalo, 0.0, 1.0);
+
+  vec3 particleHue = mix(uColor, uCompColor, fract(vSeed * 2.7));
+  vec3 col = mix(particleHue, vec3(0.98, 0.99, 1.0), wispCore * (0.48 + uSynapseFlash * 0.45));
+
+  gl_FragColor = vec4(col, shape * vAlpha);
 }
 `
 
-const RING_VERTEX_SHADER = `
-varying vec2 vLocalPos;
-
-void main() {
-  vLocalPos = position.xy;
-  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-  gl_Position = projectionMatrix * mvPosition;
-}
-`
-
-const RING_FRAGMENT_SHADER = `
+const RIBBON_RING_VERTEX_SHADER = `
 uniform float uTime;
 uniform float uStreamVelocity;
 uniform float uPulseEnergy;
-uniform float uSynapseFlash;
+uniform float uThinkingTension;
 uniform float uReducedMotion;
-uniform vec3 uColor;
-uniform float uDashCount;
 uniform float uRingSpeed;
-uniform float uScanDir;
 
-varying vec2 vLocalPos;
-
-void main() {
-  float angle = atan(vLocalPos.y, vLocalPos.x);
-  float normAngle = (angle + 3.14159265) / 6.2831853;
-  
-  float motionScale = mix(1.0, 0.2, uReducedMotion);
-  float scroll = uTime * (0.1 + uStreamVelocity * 0.4) * motionScale * uRingSpeed;
-  
-  float dash = step(0.4, fract(normAngle * uDashCount + scroll));
-  
-  float scanHead = fract(normAngle * uScanDir - uTime * (0.25 + uStreamVelocity * 0.7) * motionScale);
-  float scanGlow = pow(max(0.0, 1.0 - scanHead), 5.0);
-  
-  float pattern = dash * 0.45 + scanGlow * 1.6;
-  float baseAlpha = 0.25 + uPulseEnergy * 0.35 + uSynapseFlash * 0.4;
-  
-  vec3 col = mix(uColor, vec3(1.0), scanGlow * 0.7 + uSynapseFlash * 0.4);
-  gl_FragColor = vec4(col, clamp(pattern * baseAlpha, 0.0, 1.0));
-}
-`
-
-const EXOSKELETON_VERTEX_SHADER = `
+varying vec2 vUv;
 varying vec3 vNormal;
-varying vec3 vPosition;
 varying vec3 vViewPosition;
+varying float vWave;
 
 void main() {
+  vUv = uv;
+  float motionScale = mix(1.0, 0.2, uReducedMotion);
+  float angle = uv.x * 6.2831853;
+
+  // Subtle organic undulation along the metallic cyber ribbon
+  float wave = sin(angle * 3.0 + uTime * uRingSpeed * 1.4 * motionScale) * 0.045
+             + cos(angle * 5.0 - uTime * uRingSpeed * 0.9 * motionScale) * 0.025;
+  vWave = wave;
+
+  vec3 displaced = position;
+  displaced.z += wave * (1.0 + uPulseEnergy * 0.5 + uThinkingTension * 0.4);
+
   vNormal = normalize(normalMatrix * normal);
-  vPosition = position;
-  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+  vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);
   vViewPosition = -mvPosition.xyz;
   gl_Position = projectionMatrix * mvPosition;
 }
 `
 
-const EXOSKELETON_FRAGMENT_SHADER = `
+const RIBBON_RING_FRAGMENT_SHADER = `
 uniform float uTime;
-uniform float uPulseEnergy;
 uniform float uStreamVelocity;
+uniform float uPulseEnergy;
 uniform float uSynapseFlash;
 uniform float uReducedMotion;
 uniform vec3 uColor;
+uniform vec3 uCompColor;
+uniform float uRingSpeed;
+uniform float uScanDir;
+uniform float uColorMix;
+
+varying vec2 vUv;
+varying vec3 vNormal;
+varying vec3 vViewPosition;
+varying float vWave;
+
+void main() {
+  float motionScale = mix(1.0, 0.2, uReducedMotion);
+  float normAngle = vUv.x;
+
+  // Smooth continuous liquid-metal + plasma stream along the ring (zero dashes/dots)
+  float speed = (0.18 + uStreamVelocity * 0.55) * motionScale * uRingSpeed;
+  float phase1 = fract(normAngle * uScanDir - uTime * speed);
+  float phase2 = fract(normAngle * uScanDir - uTime * speed + 0.5);
+
+  float comet1 = pow(smoothstep(0.0, 0.95, 1.0 - phase1), 3.5);
+  float comet2 = pow(smoothstep(0.0, 0.95, 1.0 - phase2), 4.5) * 0.65;
+
+  // Metallic specular sheen along the ribbon
+  vec3 viewDir = normalize(vViewPosition);
+  vec3 norm = normalize(vNormal);
+  float spec = pow(max(0.0, abs(dot(norm, viewDir))), 6.0);
+
+  // Soft cross-sectional filament profile with bright center spine
+  float crossCenter = 1.0 - abs(vUv.y * 2.0 - 1.0);
+  float crossProfile = smoothstep(0.0, 0.6, crossCenter);
+  float coreSpine = pow(crossCenter, 3.0);
+
+  vec3 ringHue = mix(uColor, uCompColor, uColorMix + 0.25 * sin(normAngle * 6.2831853 + uTime * 0.5));
+  vec3 metallicSheen = mix(vec3(0.18, 0.26, 0.32), ringHue, 0.65);
+
+  float energyFlow = 0.22 + comet1 * 1.15 + comet2 * 0.8;
+  float alpha = crossProfile * energyFlow * (0.34 + uPulseEnergy * 0.32 + uSynapseFlash * 0.4 + spec * 0.25);
+
+  vec3 col = mix(metallicSheen, ringHue, 0.6 + comet1 * 0.4);
+  col = mix(col, vec3(0.96, 0.99, 1.0), coreSpine * (comet1 * 0.65 + spec * 0.35 + uSynapseFlash * 0.45));
+
+  gl_FragColor = vec4(col, clamp(alpha, 0.0, 1.0));
+}
+`
+
+const AEGIS_SHELL_VERTEX_SHADER = `
+uniform float uTime;
+uniform float uStreamVelocity;
+uniform float uPulseEnergy;
+uniform float uThinkingTension;
+uniform float uReducedMotion;
 
 varying vec3 vNormal;
 varying vec3 vPosition;
 varying vec3 vViewPosition;
 
 void main() {
+  float motionScale = mix(1.0, 0.2, uReducedMotion);
+
+  // Subtle organic breathing & helical twist on the outer containment shell
+  float twistAngle = position.y * 0.35 * sin(uTime * 0.5 * motionScale);
+  float c = cos(twistAngle);
+  float s = sin(twistAngle);
+  vec3 twisted = vec3(
+    position.x * c - position.z * s,
+    position.y,
+    position.x * s + position.z * c
+  );
+
+  vNormal = normalize(normalMatrix * normal);
+  vPosition = twisted;
+  vec4 mvPosition = modelViewMatrix * vec4(twisted, 1.0);
+  vViewPosition = -mvPosition.xyz;
+  gl_Position = projectionMatrix * mvPosition;
+}
+`
+
+const AEGIS_SHELL_FRAGMENT_SHADER = `
+uniform float uTime;
+uniform float uPulseEnergy;
+uniform float uStreamVelocity;
+uniform float uThinkingTension;
+uniform float uSynapseFlash;
+uniform float uReducedMotion;
+uniform vec3 uColor;
+uniform vec3 uCompColor;
+
+varying vec3 vNormal;
+varying vec3 vPosition;
+varying vec3 vViewPosition;
+
+// Surprise Layer: Holographic Gyro-Chitin Caustic & Chromatic Interference Aegis Field
+// Replaces the old flat icosahedron wireframe grid with a volumetric curved interference lens
+float causticInterference(vec3 p, float t) {
+  // Warped spherical coordinates for curved cyber-chitin contours
+  vec3 q = normalize(p);
+  float phi = atan(q.z, q.x);
+  float theta = acos(clamp(q.y, -1.0, 1.0));
+
+  float warp = sin(phi * 3.0 + theta * 4.0 - t * 0.9) * 0.38
+             + cos(phi * 5.0 - theta * 3.0 + t * 0.7) * 0.24;
+
+  // Intersecting helical wave ribbons
+  float waveA = abs(sin((theta * 5.0 + phi * 2.0 + warp) - t * 0.8));
+  float waveB = abs(sin((theta * 4.0 - phi * 3.0 - warp * 0.8) + t * 0.65));
+
+  float caustic = smoothstep(0.14, 0.008, waveA * waveB);
+  float secondary = smoothstep(0.045, 0.0, abs(waveA - 0.45)) * 0.45;
+  return clamp(caustic + secondary, 0.0, 1.0);
+}
+
+void main() {
   vec3 viewDir = normalize(vViewPosition);
   vec3 norm = normalize(vNormal);
-  float NdotV = max(0.0, dot(norm, viewDir));
-  float fresnel = pow(1.0 - NdotV, 2.5);
-  
+  float NdotV = max(0.0, abs(dot(norm, viewDir)));
+  float fresnel = pow(1.0 - NdotV, 2.2);
+
   float motionScale = mix(1.0, 0.2, uReducedMotion);
-  float scanY = sin(uTime * (1.2 + uStreamVelocity * 2.0) * motionScale) * 1.4;
-  float scanDist = abs(vPosition.y - scanY);
-  float scanBand = smoothstep(0.35, 0.0, scanDist);
-  
-  float baseAlpha = 0.18 + fresnel * 0.45 + scanBand * 0.4;
-  float alpha = baseAlpha * (0.5 + uPulseEnergy * 0.35 + uSynapseFlash * 0.4);
-  
-  vec3 col = mix(uColor, vec3(1.0), scanBand * 0.5 + uSynapseFlash * 0.5);
-  gl_FragColor = vec4(col, clamp(alpha, 0.0, 1.0));
+  float speed = (0.75 + uStreamVelocity * 1.4 + uThinkingTension * 0.9) * motionScale;
+
+  float field = causticInterference(vPosition, uTime * speed);
+
+  // Travelling cyber-pulse wave sweeping across the curved lens
+  float sweep = sin(vPosition.y * 2.4 - uTime * (1.3 + uStreamVelocity * 2.0) * motionScale) * 0.5 + 0.5;
+  float sweepBand = pow(sweep, 4.0);
+
+  // Chromatic iridescence between primary state color and complementary state shade
+  float iridFactor = clamp(fresnel * 0.75 + sweepBand * 0.35, 0.0, 1.0);
+  vec3 shellColor = mix(uColor, uCompColor, iridFactor);
+
+  // Metallic rim reflection
+  vec3 lightDir = normalize(vec3(-0.5, 0.8, 0.6));
+  vec3 halfV = normalize(lightDir + viewDir);
+  float rimSpec = pow(max(0.0, abs(dot(norm, halfV))), 18.0);
+
+  vec3 col = mix(shellColor, vec3(0.95, 0.99, 1.0), field * 0.42 + rimSpec * 0.5 + uSynapseFlash * 0.45);
+
+  // Center stays ultra-clear so the core shines unobstructed; edges and caustic filaments glow
+  float edgeMask = 0.22 + fresnel * 0.78;
+  float baseAlpha = (field * 0.36 + fresnel * 0.24 + rimSpec * 0.2 + sweepBand * field * 0.25) * edgeMask;
+  float alpha = baseAlpha * (0.55 + uPulseEnergy * 0.38 + uStreamVelocity * 0.25 + uSynapseFlash * 0.45);
+
+  gl_FragColor = vec4(col, clamp(alpha, 0.0, 0.78));
 }
 `
 
@@ -545,8 +752,7 @@ function buildCore(
   sharedUniforms: SharedUniforms,
   disposables: Disposable[]
 ): THREE.Mesh {
-  // PolyhedronGeometry detail N => 20 * (N + 1)^2 faces (14 => ~4.5k tris, 8 => ~1.6k tris)
-  const coreDetail = isCompact ? 8 : 14
+  const coreDetail = isCompact ? 10 : 16
   const coreGeo = new THREE.IcosahedronGeometry(1.15, coreDetail)
   const coreMaterial = new THREE.ShaderMaterial({
     vertexShader: CORE_VERTEX_SHADER,
@@ -588,21 +794,21 @@ function buildGlowSprites(
   })
   const coronaSprite = new THREE.Sprite(coronaMaterial)
   coronaSprite.renderOrder = -1
-  const coronaScale = isCompact ? 2.6 : 3.0
+  const coronaScale = isCompact ? 2.75 : 3.2
   coronaSprite.scale.set(coronaScale, coronaScale, 1.0)
   group.add(coronaSprite)
   disposables.push(coronaMaterial)
 
   const wideMaterial = new THREE.SpriteMaterial({
     map: wideTex ?? undefined,
-    color: 0x00c3ff,
+    color: 0x6366f1,
     transparent: true,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
   })
   const wideSprite = new THREE.Sprite(wideMaterial)
   wideSprite.renderOrder = -2
-  const wideScale = isCompact ? 5.2 : 6.4
+  const wideScale = isCompact ? 5.4 : 6.6
   wideSprite.scale.set(wideScale, wideScale, 1.0)
   group.add(wideSprite)
   disposables.push(wideMaterial)
@@ -610,89 +816,111 @@ function buildGlowSprites(
   return { group, coronaSprite, wideSprite, coronaMaterial, wideMaterial }
 }
 
-function buildSynapseNetwork(
+function sampleSphericalPoint(rng: () => number, radius: number): THREE.Vector3 {
+  const u = rng()
+  const v = rng()
+  const theta = u * 2.0 * Math.PI
+  const phi = Math.acos(2.0 * v - 1.0)
+  const sinPhi = Math.sin(phi)
+  return new THREE.Vector3(
+    radius * sinPhi * Math.cos(theta),
+    radius * sinPhi * Math.sin(theta),
+    radius * Math.cos(phi)
+  )
+}
+
+function buildWispySynapseAndLightning(
   isCompact: boolean,
   rng: () => number,
   sharedUniforms: SharedUniforms,
   disposables: Disposable[]
 ): THREE.Group {
   const group = new THREE.Group()
-  const nodeCount = isCompact ? 45 : 90
-  const nodePositions: THREE.Vector3[] = []
 
-  for (let i = 0; i < nodeCount; i++) {
-    const u = rng()
-    const v = rng()
-    const theta = u * 2.0 * Math.PI
-    const phi = Math.acos(2.0 * v - 1.0)
-    const r = 1.28 + rng() * 0.28
-    const sinPhi = Math.sin(phi)
-    nodePositions.push(
-      new THREE.Vector3(
-        r * sinPhi * Math.cos(theta),
-        r * sinPhi * Math.sin(theta),
-        r * Math.cos(phi)
-      )
-    )
-  }
+  // 1. Curved Wispy Synaptic Tendrils (smooth cubic/Catmull-Rom splines, zero straight segments or dots)
+  const tendrilCount = isCompact ? 26 : 48
+  const subdivisions = isCompact ? 20 : 28
+  const totalTendrilSegments = tendrilCount * subdivisions
 
-  // Connect each node to 2-3 nearest neighbors, dedupe edges
-  const edgeSet = new Set<string>()
-  const edges: { from: number; to: number; phase: number }[] = []
+  const tendrilPos = new Float32Array(totalTendrilSegments * 2 * 3)
+  const tendrilT = new Float32Array(totalTendrilSegments * 2)
+  const tendrilPhase = new Float32Array(totalTendrilSegments * 2)
+  const tendrilColorMix = new Float32Array(totalTendrilSegments * 2)
 
-  for (let i = 0; i < nodeCount; i++) {
-    const dists: { index: number; distSq: number }[] = []
-    for (let j = 0; j < nodeCount; j++) {
-      if (i === j) continue
-      dists.push({ index: j, distSq: nodePositions[i].distanceToSquared(nodePositions[j]) })
+  let segIdx = 0
+  for (let i = 0; i < tendrilCount; i++) {
+    const startR = 1.16 + rng() * 0.14
+    const p0 = sampleSphericalPoint(rng, startR)
+
+    // Create a sweeping tangential arc around the core
+    const randomAxis = sampleSphericalPoint(rng, 1.0).normalize()
+    const tangent1 = new THREE.Vector3().crossVectors(p0, randomAxis).normalize()
+    const tangent2 = new THREE.Vector3().crossVectors(p0, tangent1).normalize()
+
+    const arcScale = 0.65 + rng() * 0.75
+    const mid1R = 1.38 + rng() * 0.42
+    const mid2R = 1.42 + rng() * 0.48
+    const endR = 1.18 + rng() * 0.25
+
+    const p1 = p0
+      .clone()
+      .addScaledVector(tangent1, arcScale * 0.6)
+      .addScaledVector(tangent2, (rng() - 0.5) * 0.5)
+      .normalize()
+      .multiplyScalar(mid1R)
+
+    const p2 = p1
+      .clone()
+      .addScaledVector(tangent1, arcScale * 0.65)
+      .addScaledVector(tangent2, (rng() - 0.5) * 0.65)
+      .normalize()
+      .multiplyScalar(mid2R)
+
+    const p3 = p2
+      .clone()
+      .addScaledVector(tangent1, arcScale * 0.5)
+      .addScaledVector(tangent2, (rng() - 0.5) * 0.4)
+      .normalize()
+      .multiplyScalar(endR)
+
+    const curve = new THREE.CatmullRomCurve3([p0, p1, p2, p3])
+    const pts = curve.getPoints(subdivisions)
+    const phase = rng() * 10.0
+    const colorMix = rng()
+
+    for (let s = 0; s < subdivisions; s++) {
+      const a = pts[s]
+      const b = pts[s + 1]
+      const t0 = s / subdivisions
+      const t1 = (s + 1) / subdivisions
+
+      tendrilPos[segIdx * 6 + 0] = a.x
+      tendrilPos[segIdx * 6 + 1] = a.y
+      tendrilPos[segIdx * 6 + 2] = a.z
+      tendrilT[segIdx * 2 + 0] = t0
+      tendrilPhase[segIdx * 2 + 0] = phase
+      tendrilColorMix[segIdx * 2 + 0] = colorMix
+
+      tendrilPos[segIdx * 6 + 3] = b.x
+      tendrilPos[segIdx * 6 + 4] = b.y
+      tendrilPos[segIdx * 6 + 5] = b.z
+      tendrilT[segIdx * 2 + 1] = t1
+      tendrilPhase[segIdx * 2 + 1] = phase
+      tendrilColorMix[segIdx * 2 + 1] = colorMix
+
+      segIdx++
     }
-    dists.sort((a, b) => a.distSq - b.distSq)
-
-    const kNeighbors = rng() > 0.4 ? 3 : 2
-    for (let k = 0; k < Math.min(kNeighbors, dists.length); k++) {
-      const target = dists[k].index
-      const minIdx = Math.min(i, target)
-      const maxIdx = Math.max(i, target)
-      const key = `${minIdx}_${maxIdx}`
-      if (!edgeSet.has(key)) {
-        edgeSet.add(key)
-        edges.push({ from: minIdx, to: maxIdx, phase: rng() * 100.0 })
-      }
-    }
   }
 
-  // Build LineSegments
-  const segmentCount = edges.length
-  const linePos = new Float32Array(segmentCount * 2 * 3)
-  const lineT = new Float32Array(segmentCount * 2)
-  const linePhase = new Float32Array(segmentCount * 2)
+  const tendrilGeo = new THREE.BufferGeometry()
+  tendrilGeo.setAttribute('position', new THREE.BufferAttribute(tendrilPos, 3))
+  tendrilGeo.setAttribute('aT', new THREE.BufferAttribute(tendrilT, 1))
+  tendrilGeo.setAttribute('aPhase', new THREE.BufferAttribute(tendrilPhase, 1))
+  tendrilGeo.setAttribute('aColorMix', new THREE.BufferAttribute(tendrilColorMix, 1))
 
-  for (let e = 0; e < segmentCount; e++) {
-    const edge = edges[e]
-    const p1 = nodePositions[edge.from]
-    const p2 = nodePositions[edge.to]
-
-    linePos[e * 6 + 0] = p1.x
-    linePos[e * 6 + 1] = p1.y
-    linePos[e * 6 + 2] = p1.z
-    lineT[e * 2 + 0] = 0.0
-    linePhase[e * 2 + 0] = edge.phase
-
-    linePos[e * 6 + 3] = p2.x
-    linePos[e * 6 + 4] = p2.y
-    linePos[e * 6 + 5] = p2.z
-    lineT[e * 2 + 1] = 1.0
-    linePhase[e * 2 + 1] = edge.phase
-  }
-
-  const lineGeo = new THREE.BufferGeometry()
-  lineGeo.setAttribute('position', new THREE.BufferAttribute(linePos, 3))
-  lineGeo.setAttribute('aT', new THREE.BufferAttribute(lineT, 1))
-  lineGeo.setAttribute('aPhase', new THREE.BufferAttribute(linePhase, 1))
-
-  const lineMaterial = new THREE.ShaderMaterial({
-    vertexShader: SYNAPSE_LINE_VERTEX_SHADER,
-    fragmentShader: SYNAPSE_LINE_FRAGMENT_SHADER,
+  const tendrilMat = new THREE.ShaderMaterial({
+    vertexShader: TENDRIL_VERTEX_SHADER,
+    fragmentShader: TENDRIL_FRAGMENT_SHADER,
     uniforms: {
       ...sharedUniforms,
     },
@@ -700,26 +928,95 @@ function buildSynapseNetwork(
     blending: THREE.AdditiveBlending,
     depthWrite: false,
   })
-  const linesMesh = new THREE.LineSegments(lineGeo, lineMaterial)
-  group.add(linesMesh)
-  disposables.push(lineGeo, lineMaterial)
+  const tendrilMesh = new THREE.LineSegments(tendrilGeo, tendrilMat)
+  group.add(tendrilMesh)
+  disposables.push(tendrilGeo, tendrilMat)
 
-  // Build Node Points
-  const pointPos = new Float32Array(nodeCount * 3)
-  const pointPhase = new Float32Array(nodeCount)
-  for (let i = 0; i < nodeCount; i++) {
-    pointPos[i * 3 + 0] = nodePositions[i].x
-    pointPos[i * 3 + 1] = nodePositions[i].y
-    pointPos[i * 3 + 2] = nodePositions[i].z
-    pointPhase[i] = rng() * 6.2831853
+  // 2. High-Voltage Synaptic Lightning Arcs (branching/snapping electrical bolts between core and outer field)
+  const boltCount = isCompact ? 12 : 22
+  const boltSteps = isCompact ? 16 : 22
+  const totalBoltSegments = boltCount * boltSteps
+
+  const boltPos = new Float32Array(totalBoltSegments * 2 * 3)
+  const boltT = new Float32Array(totalBoltSegments * 2)
+  const boltSeed = new Float32Array(totalBoltSegments * 2)
+  const boltOrtho1 = new Float32Array(totalBoltSegments * 2 * 3)
+  const boltOrtho2 = new Float32Array(totalBoltSegments * 2 * 3)
+
+  let bIdx = 0
+  for (let b = 0; b < boltCount; b++) {
+    const start = sampleSphericalPoint(rng, 1.12)
+    const dir = start.clone().normalize()
+    // Arc either outward to outer shell or across to an adjacent quadrant
+    const isBridgeBolt = rng() > 0.45
+    const end = isBridgeBolt
+      ? sampleSphericalPoint(rng, 1.68 + rng() * 0.35)
+      : dir
+          .clone()
+          .add(sampleSphericalPoint(rng, 0.75))
+          .normalize()
+          .multiplyScalar(1.15)
+
+    const mid = start
+      .clone()
+      .add(end)
+      .multiplyScalar(0.5)
+      .normalize()
+      .multiplyScalar(1.45 + rng() * 0.35)
+
+    const baseCurve = new THREE.QuadraticBezierCurve3(start, mid, end)
+    const pts = baseCurve.getPoints(boltSteps)
+
+    const chord = end.clone().sub(start).normalize()
+    const up = Math.abs(chord.y) < 0.9 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0)
+    const ortho1 = new THREE.Vector3().crossVectors(chord, up).normalize()
+    const ortho2 = new THREE.Vector3().crossVectors(chord, ortho1).normalize()
+    const seed = rng()
+
+    for (let s = 0; s < boltSteps; s++) {
+      const pA = pts[s]
+      const pB = pts[s + 1]
+      const t0 = s / boltSteps
+      const t1 = (s + 1) / boltSteps
+
+      boltPos[bIdx * 6 + 0] = pA.x
+      boltPos[bIdx * 6 + 1] = pA.y
+      boltPos[bIdx * 6 + 2] = pA.z
+      boltT[bIdx * 2 + 0] = t0
+      boltSeed[bIdx * 2 + 0] = seed
+      boltOrtho1[bIdx * 6 + 0] = ortho1.x
+      boltOrtho1[bIdx * 6 + 1] = ortho1.y
+      boltOrtho1[bIdx * 6 + 2] = ortho1.z
+      boltOrtho2[bIdx * 6 + 0] = ortho2.x
+      boltOrtho2[bIdx * 6 + 1] = ortho2.y
+      boltOrtho2[bIdx * 6 + 2] = ortho2.z
+
+      boltPos[bIdx * 6 + 3] = pB.x
+      boltPos[bIdx * 6 + 4] = pB.y
+      boltPos[bIdx * 6 + 5] = pB.z
+      boltT[bIdx * 2 + 1] = t1
+      boltSeed[bIdx * 2 + 1] = seed
+      boltOrtho1[bIdx * 6 + 3] = ortho1.x
+      boltOrtho1[bIdx * 6 + 4] = ortho1.y
+      boltOrtho1[bIdx * 6 + 5] = ortho1.z
+      boltOrtho2[bIdx * 6 + 3] = ortho2.x
+      boltOrtho2[bIdx * 6 + 4] = ortho2.y
+      boltOrtho2[bIdx * 6 + 5] = ortho2.z
+
+      bIdx++
+    }
   }
-  const pointGeo = new THREE.BufferGeometry()
-  pointGeo.setAttribute('position', new THREE.BufferAttribute(pointPos, 3))
-  pointGeo.setAttribute('aPhase', new THREE.BufferAttribute(pointPhase, 1))
 
-  const pointMaterial = new THREE.ShaderMaterial({
-    vertexShader: SYNAPSE_POINT_VERTEX_SHADER,
-    fragmentShader: SYNAPSE_POINT_FRAGMENT_SHADER,
+  const boltGeo = new THREE.BufferGeometry()
+  boltGeo.setAttribute('position', new THREE.BufferAttribute(boltPos, 3))
+  boltGeo.setAttribute('aT', new THREE.BufferAttribute(boltT, 1))
+  boltGeo.setAttribute('aSeed', new THREE.BufferAttribute(boltSeed, 1))
+  boltGeo.setAttribute('aOrtho1', new THREE.BufferAttribute(boltOrtho1, 3))
+  boltGeo.setAttribute('aOrtho2', new THREE.BufferAttribute(boltOrtho2, 3))
+
+  const boltMat = new THREE.ShaderMaterial({
+    vertexShader: LIGHTNING_VERTEX_SHADER,
+    fragmentShader: LIGHTNING_FRAGMENT_SHADER,
     uniforms: {
       ...sharedUniforms,
     },
@@ -727,9 +1024,9 @@ function buildSynapseNetwork(
     blending: THREE.AdditiveBlending,
     depthWrite: false,
   })
-  const pointsMesh = new THREE.Points(pointGeo, pointMaterial)
-  group.add(pointsMesh)
-  disposables.push(pointGeo, pointMaterial)
+  const boltMesh = new THREE.LineSegments(boltGeo, boltMat)
+  group.add(boltMesh)
+  disposables.push(boltGeo, boltMat)
 
   return group
 }
@@ -740,18 +1037,18 @@ function buildParticleHalo(
   sharedUniforms: SharedUniforms,
   disposables: Disposable[]
 ): THREE.Points {
-  const particleCount = isCompact ? 300 : 700
+  const particleCount = isCompact ? 260 : 580
   const positions = new Float32Array(particleCount * 3)
   const seeds = new Float32Array(particleCount)
   const sizes = new Float32Array(particleCount)
 
-  const baseSize = isCompact ? 10.0 : 13.5
+  const baseSize = isCompact ? 15.0 : 20.0
   for (let i = 0; i < particleCount; i++) {
     const u = rng()
     const v = rng()
     const theta = u * 2.0 * Math.PI
     const phi = Math.acos(2.0 * v - 1.0)
-    const r = 1.6 + rng() * 1.3
+    const r = 1.48 + rng() * 1.42
     const sinPhi = Math.sin(phi)
 
     positions[i * 3 + 0] = r * sinPhi * Math.cos(theta)
@@ -759,7 +1056,7 @@ function buildParticleHalo(
     positions[i * 3 + 2] = r * Math.cos(phi)
 
     seeds[i] = rng()
-    sizes[i] = baseSize * (0.65 + rng() * 0.7)
+    sizes[i] = baseSize * (0.65 + rng() * 0.85)
   }
 
   const haloGeo = new THREE.BufferGeometry()
@@ -783,7 +1080,8 @@ function buildParticleHalo(
   return haloPoints
 }
 
-function buildDataRings(
+function buildCyberRibbonRings(
+  isCompact: boolean,
   sharedUniforms: SharedUniforms,
   disposables: Disposable[]
 ): {
@@ -793,16 +1091,17 @@ function buildDataRings(
   ring3: THREE.Mesh
 } {
   const group = new THREE.Group()
+  const tubularSegments = isCompact ? 96 : 144
 
-  const createRingMaterial = (dashCount: number, ringSpeed: number, scanDir: number) => {
+  const createRibbonMaterial = (ringSpeed: number, scanDir: number, colorMix: number) => {
     const mat = new THREE.ShaderMaterial({
-      vertexShader: RING_VERTEX_SHADER,
-      fragmentShader: RING_FRAGMENT_SHADER,
+      vertexShader: RIBBON_RING_VERTEX_SHADER,
+      fragmentShader: RIBBON_RING_FRAGMENT_SHADER,
       uniforms: {
         ...sharedUniforms,
-        uDashCount: { value: dashCount },
         uRingSpeed: { value: ringSpeed },
         uScanDir: { value: scanDir },
+        uColorMix: { value: colorMix },
       },
       side: THREE.DoubleSide,
       transparent: true,
@@ -813,24 +1112,24 @@ function buildDataRings(
     return mat
   }
 
-  const ring1Geo = new THREE.RingGeometry(1.68, 1.72, 128)
-  const ring1Mat = createRingMaterial(36.0, 1.0, 1.0)
+  const ring1Geo = new THREE.TorusGeometry(1.7, 0.022, 8, tubularSegments)
+  const ring1Mat = createRibbonMaterial(1.0, 1.0, 0.15)
   const ring1 = new THREE.Mesh(ring1Geo, ring1Mat)
   ring1.rotation.x = Math.PI * 0.35
   ring1.rotation.y = Math.PI * 0.15
   group.add(ring1)
   disposables.push(ring1Geo)
 
-  const ring2Geo = new THREE.RingGeometry(1.88, 1.92, 128)
-  const ring2Mat = createRingMaterial(48.0, -1.2, -1.0)
+  const ring2Geo = new THREE.TorusGeometry(1.9, 0.018, 8, tubularSegments)
+  const ring2Mat = createRibbonMaterial(-1.25, -1.0, 0.55)
   const ring2 = new THREE.Mesh(ring2Geo, ring2Mat)
   ring2.rotation.x = -Math.PI * 0.4
   ring2.rotation.y = -Math.PI * 0.25
   group.add(ring2)
   disposables.push(ring2Geo)
 
-  const ring3Geo = new THREE.RingGeometry(2.08, 2.12, 128)
-  const ring3Mat = createRingMaterial(60.0, 1.5, 1.0)
+  const ring3Geo = new THREE.TorusGeometry(2.1, 0.016, 8, tubularSegments)
+  const ring3Mat = createRibbonMaterial(1.45, 1.0, 0.85)
   const ring3 = new THREE.Mesh(ring3Geo, ring3Mat)
   ring3.rotation.x = Math.PI * 0.6
   ring3.rotation.z = Math.PI * 0.3
@@ -840,25 +1139,27 @@ function buildDataRings(
   return { group, ring1, ring2, ring3 }
 }
 
-function buildExoskeleton(
+function buildAegisContainmentShell(
+  isCompact: boolean,
   sharedUniforms: SharedUniforms,
   disposables: Disposable[]
 ): THREE.Mesh {
-  const exoGeo = new THREE.IcosahedronGeometry(1.38, 2)
-  const exoMaterial = new THREE.ShaderMaterial({
-    vertexShader: EXOSKELETON_VERTEX_SHADER,
-    fragmentShader: EXOSKELETON_FRAGMENT_SHADER,
+  const detail = isCompact ? 6 : 10
+  const shellGeo = new THREE.IcosahedronGeometry(1.42, detail)
+  const shellMaterial = new THREE.ShaderMaterial({
+    vertexShader: AEGIS_SHELL_VERTEX_SHADER,
+    fragmentShader: AEGIS_SHELL_FRAGMENT_SHADER,
     uniforms: {
       ...sharedUniforms,
     },
-    wireframe: true,
+    side: THREE.DoubleSide,
     transparent: true,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
   })
-  const exoMesh = new THREE.Mesh(exoGeo, exoMaterial)
-  disposables.push(exoGeo, exoMaterial)
-  return exoMesh
+  const shellMesh = new THREE.Mesh(shellGeo, shellMaterial)
+  disposables.push(shellGeo, shellMaterial)
+  return shellMesh
 }
 
 // ---------------------------------------------------------------------------
@@ -872,7 +1173,6 @@ export function SynapticEntityCanvas({
 }: SynapticEntityCanvasProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const pointerTargetRef = useRef({ x: 0, y: 0 })
   const [webglUnavailable, setWebglUnavailable] = useState<boolean>(() => !canUseWebGL())
 
   useEffect(() => {
@@ -912,7 +1212,7 @@ export function SynapticEntityCanvas({
       })
       renderer.setPixelRatio(currentPr)
       renderer.toneMapping = THREE.ACESFilmicToneMapping
-      renderer.toneMappingExposure = 1.1
+      renderer.toneMappingExposure = 1.15
 
       const scene = new THREE.Scene()
       const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 50)
@@ -922,12 +1222,22 @@ export function SynapticEntityCanvas({
       const rootGroup = new THREE.Group()
       scene.add(rootGroup)
 
+      // Primary state palette
       const cyanColor = new THREE.Color(0x00c3ff)
       const emeraldColor = new THREE.Color(0x00f5d4)
       const crimsonColor = new THREE.Color(0xff453a)
       const coralColor = new THREE.Color(0xff6a60)
+
+      // Complementary / harmonic state shades from our abyssal cyber palette
+      const indigoCompColor = new THREE.Color(0x6366f1) // Electric Cyber Indigo-Violet (pairs with Cyan)
+      const magentaCompColor = new THREE.Color(0xc026d3) // Bioluminescent Orchid-Magenta (pairs with Bio-Aqua)
+      const goldCompColor = new THREE.Color(0xffb703) // Molten Amber-Gold (pairs with Sacred Crimson)
+      const cyanShockCompColor = new THREE.Color(0x38bdf8) // High-voltage Electric Ice-Cyan (accent during error/max)
+
       const activeColor = new THREE.Color(0x00c3ff)
+      const compColor = new THREE.Color(0x6366f1)
       const crimsonShiftColor = new THREE.Color()
+      const compShiftColor = new THREE.Color()
 
       const sharedUniforms: SharedUniforms = {
         uTime: { value: 0 },
@@ -940,6 +1250,7 @@ export function SynapticEntityCanvas({
         uReducedMotion: { value: 0 },
         uPixelRatio: { value: currentPr },
         uColor: { value: activeColor },
+        uCompColor: { value: compColor },
       }
 
       const rng = createMulberry32(0x594e)
@@ -948,24 +1259,24 @@ export function SynapticEntityCanvas({
       const glow = buildGlowSprites(isCompact, disposables)
       rootGroup.add(glow.group)
 
-      // Layer 1: Organic Bioluminescent Core
+      // Layer 1: Metallic & Bioluminescent Liquid-Chitin Core
       const coreMesh = buildCore(isCompact, sharedUniforms, disposables)
       rootGroup.add(coreMesh)
 
-      // Layer 6: Chitin Exoskeleton Lattice
-      const exoskeletonMesh = buildExoskeleton(sharedUniforms, disposables)
-      rootGroup.add(exoskeletonMesh)
+      // Layer 6: Holographic Caustic & Chromatic Interference Aegis Field (replaces wireframe grid)
+      const aegisShellMesh = buildAegisContainmentShell(isCompact, sharedUniforms, disposables)
+      rootGroup.add(aegisShellMesh)
 
-      // Layer 3: Synapse Network (lines + glowing points)
-      const synapseGroup = buildSynapseNetwork(isCompact, rng, sharedUniforms, disposables)
+      // Layer 3: Curved Wispy Synaptic Tendrils & High-Voltage Lightning Arcs
+      const synapseGroup = buildWispySynapseAndLightning(isCompact, rng, sharedUniforms, disposables)
       rootGroup.add(synapseGroup)
 
-      // Layer 4: Particle Halo
+      // Layer 4: Curvy S-Wisp Particle Halo
       const haloPoints = buildParticleHalo(isCompact, rng, sharedUniforms, disposables)
       rootGroup.add(haloPoints)
 
-      // Layer 5: Data Rings
-      const rings = buildDataRings(sharedUniforms, disposables)
+      // Layer 5: Continuous Metallic & Plasma Cyber Ribbon Rings
+      const rings = buildCyberRibbonRings(isCompact, sharedUniforms, disposables)
       rootGroup.add(rings.group)
 
       const updateDimensions = () => {
@@ -1008,8 +1319,6 @@ export function SynapticEntityCanvas({
         }
       }
 
-      let currentPointerX = 0
-      let currentPointerY = 0
       let lastTimeMs = performance.now()
       let elapsedTotal = 0
       let rollingFrameTimeMs = 16.6
@@ -1024,8 +1333,7 @@ export function SynapticEntityCanvas({
         const dtSeconds = Math.min(0.1, Math.max(0.001, rawDtMs * 0.001))
         lastTimeMs = nowMs
 
-        // Adaptive resolution step down (sustained >20ms for ~1.5s).
-        // Samples are clamped so one long frame (GC, tab switch) can't trigger a downgrade.
+        // Adaptive resolution step down (sustained >20ms for ~1.5s)
         rollingFrameTimeMs = rollingFrameTimeMs * 0.9 + Math.min(rawDtMs, 50) * 0.1
         if (rollingFrameTimeMs > 20.0 && currentPr > 1.0) {
           slowAccumulatorSeconds += dtSeconds
@@ -1053,21 +1361,22 @@ export function SynapticEntityCanvas({
         sharedUniforms.uColorShift.value = snapshot.colorShift
         sharedUniforms.uReducedMotion.value = prefersReducedMotion ? 1.0 : 0.0
 
-        // Palette blending
+        // Primary + Complementary Palette Blending across Entity Lifecycle States
         if (snapshot.colorShift < 0.45) {
-          activeColor.lerpColors(cyanColor, emeraldColor, snapshot.colorShift / 0.45)
+          const t = snapshot.colorShift / 0.45
+          activeColor.lerpColors(cyanColor, emeraldColor, t)
+          compColor.lerpColors(indigoCompColor, magentaCompColor, t)
         } else {
           const f = Math.min(1.0, (snapshot.colorShift - 0.45) / 0.45)
-          crimsonShiftColor.lerpColors(
-            crimsonColor,
-            coralColor,
-            Math.max(0.0, Math.min(1.0, (snapshot.colorShift - 0.88) * 8.0))
-          )
+          const highEnd = Math.max(0.0, Math.min(1.0, (snapshot.colorShift - 0.88) * 8.0))
+          crimsonShiftColor.lerpColors(crimsonColor, coralColor, highEnd)
+          compShiftColor.lerpColors(goldCompColor, cyanShockCompColor, highEnd * 0.65)
           activeColor.lerpColors(emeraldColor, crimsonShiftColor, f)
+          compColor.lerpColors(magentaCompColor, compShiftColor, f)
         }
 
-        // Bloom billboards breathing
-        const coronaBaseScale = isCompact ? 2.6 : 3.0
+        // Bloom billboards breathing (corona carries primary hue, wide halo carries complementary blend)
+        const coronaBaseScale = isCompact ? 2.75 : 3.2
         const coronaScale =
           coronaBaseScale *
           (1.0 +
@@ -1078,47 +1387,47 @@ export function SynapticEntityCanvas({
         glow.coronaMaterial.color.copy(activeColor)
         glow.coronaMaterial.opacity = Math.min(
           1.0,
-          0.6 +
+          0.62 +
             snapshot.pulseEnergy * 0.25 +
-            snapshot.synapseFlash * 0.4 +
+            snapshot.synapseFlash * 0.38 +
             snapshot.streamVelocity * 0.15
         )
 
-        const wideBaseScale = isCompact ? 5.2 : 6.4
+        const wideBaseScale = isCompact ? 5.4 : 6.6
         const wideScale =
           wideBaseScale *
           (1.0 + snapshot.pulseEnergy * 0.22 + snapshot.synapseFlash * 0.3)
         glow.wideSprite.scale.set(wideScale, wideScale, 1.0)
-        glow.wideMaterial.color.copy(activeColor)
+        glow.wideMaterial.color.copy(compColor).lerp(activeColor, 0.45)
         glow.wideMaterial.opacity = Math.min(
-          0.8,
-          0.25 + snapshot.pulseEnergy * 0.2 + snapshot.synapseFlash * 0.35
+          0.85,
+          0.28 + snapshot.pulseEnergy * 0.22 + snapshot.synapseFlash * 0.35
         )
 
         // Core mesh orbital breathing rotation
         const coreSpeed =
-          (0.28 + snapshot.streamVelocity * 0.65 + snapshot.thinkingTension * 0.35) * motionScale
+          (0.26 + snapshot.streamVelocity * 0.62 + snapshot.thinkingTension * 0.35) * motionScale
         coreMesh.rotation.y += dtSeconds * coreSpeed
-        coreMesh.rotation.x += dtSeconds * coreSpeed * 0.4
+        coreMesh.rotation.x += dtSeconds * coreSpeed * 0.38
 
-        // Exoskeleton lattice dynamics
-        const exoScale = 1.0 - snapshot.thinkingTension * 0.12 + snapshot.pulseEnergy * 0.16
-        exoskeletonMesh.scale.setScalar(exoScale)
-        const exoSpeed =
-          (0.32 + snapshot.streamVelocity * 0.8 + snapshot.thinkingTension * 0.55) * motionScale
-        exoskeletonMesh.rotation.y -= dtSeconds * exoSpeed * 1.15
-        exoskeletonMesh.rotation.x -= dtSeconds * exoSpeed * 0.8
-        exoskeletonMesh.rotation.z += dtSeconds * exoSpeed * 0.35
+        // Holographic Aegis containment shell dynamics
+        const shellScale = 1.0 - snapshot.thinkingTension * 0.08 + snapshot.pulseEnergy * 0.12
+        aegisShellMesh.scale.setScalar(shellScale)
+        const shellSpeed =
+          (0.22 + snapshot.streamVelocity * 0.65 + snapshot.thinkingTension * 0.45) * motionScale
+        aegisShellMesh.rotation.y -= dtSeconds * shellSpeed
+        aegisShellMesh.rotation.x += dtSeconds * shellSpeed * 0.52
+        aegisShellMesh.rotation.z += dtSeconds * shellSpeed * 0.28
 
-        // Synapse network rotation
+        // Wispy tendrils & lightning network rotation
         const synapseSpeed =
-          (0.18 + snapshot.streamVelocity * 0.45 + snapshot.pulseEnergy * 0.2) * motionScale
+          (0.18 + snapshot.streamVelocity * 0.48 + snapshot.pulseEnergy * 0.22) * motionScale
         synapseGroup.rotation.y += dtSeconds * synapseSpeed
-        synapseGroup.rotation.x += dtSeconds * synapseSpeed * 0.3
+        synapseGroup.rotation.x += dtSeconds * synapseSpeed * 0.32
 
-        // Orbital rings gyroscopic precession
+        // Continuous cyber ribbon rings gyroscopic precession
         const ringPrecessionSpeed =
-          (0.45 + snapshot.streamVelocity * 1.5 + snapshot.thinkingTension * 0.8) * motionScale
+          (0.42 + snapshot.streamVelocity * 1.4 + snapshot.thinkingTension * 0.75) * motionScale
         rings.ring1.rotation.z += dtSeconds * ringPrecessionSpeed
         rings.ring1.rotation.y += dtSeconds * ringPrecessionSpeed * 0.55
         rings.ring2.rotation.z -= dtSeconds * ringPrecessionSpeed * 0.82
@@ -1126,15 +1435,11 @@ export function SynapticEntityCanvas({
         rings.ring3.rotation.y += dtSeconds * ringPrecessionSpeed * 0.7
         rings.ring3.rotation.z += dtSeconds * ringPrecessionSpeed * 0.35
 
-        // Pointer parallax + subtle sinusoidal idle drift
-        const idleSwayX = Math.sin(elapsedTotal * 0.6) * 0.04 * motionScale
-        const idleSwayY = Math.cos(elapsedTotal * 0.45) * 0.03 * motionScale
-
-        currentPointerX += (pointerTargetRef.current.x - currentPointerX) * 0.07
-        currentPointerY += (pointerTargetRef.current.y - currentPointerY) * 0.07
-
-        rootGroup.rotation.y = (currentPointerX + idleSwayX) * 0.32
-        rootGroup.rotation.x = (-currentPointerY + idleSwayY) * 0.22
+        // Autonomous subtle sinusoidal idle drift (no mouse/pointer movement)
+        const idleSwayX = Math.sin(elapsedTotal * 0.55) * 0.045 * motionScale
+        const idleSwayY = Math.cos(elapsedTotal * 0.42) * 0.035 * motionScale
+        rootGroup.rotation.y = idleSwayX
+        rootGroup.rotation.x = idleSwayY
 
         renderer?.render(scene, camera)
         frameId = window.requestAnimationFrame(tick)
@@ -1225,28 +1530,11 @@ export function SynapticEntityCanvas({
     }
   }, [bridge, isCompact])
 
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const rect = containerRef.current?.getBoundingClientRect()
-    if (!rect || rect.width === 0 || rect.height === 0) return
-    const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2
-    const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2
-    pointerTargetRef.current = {
-      x: Math.max(-1, Math.min(1, nx)),
-      y: Math.max(-1, Math.min(1, ny)),
-    }
-  }
-
-  const handlePointerLeave = () => {
-    pointerTargetRef.current = { x: 0, y: 0 }
-  }
-
   return (
     <div
       ref={containerRef}
       data-testid="synaptic-entity-canvas"
       className={`relative w-full h-full min-h-[140px] flex items-center justify-center overflow-hidden select-none ${className}`}
-      onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerLeave}
     >
       {webglUnavailable ? (
         <div
@@ -1257,8 +1545,8 @@ export function SynapticEntityCanvas({
             className="w-28 h-28 rounded-full animate-pulse"
             style={{
               background:
-                'radial-gradient(circle at 40% 40%, rgba(0, 245, 212, 0.85) 0%, rgba(0, 195, 255, 0.7) 35%, rgba(7, 36, 66, 0.5) 70%, rgba(3, 7, 8, 0) 100%)',
-              boxShadow: '0 0 45px rgba(0, 195, 255, 0.45)',
+                'radial-gradient(circle at 38% 36%, rgba(0, 245, 212, 0.9) 0%, rgba(0, 195, 255, 0.75) 32%, rgba(99, 102, 241, 0.55) 64%, rgba(3, 7, 8, 0) 100%)',
+              boxShadow: '0 0 48px rgba(0, 195, 255, 0.5), inset 0 0 24px rgba(192, 38, 211, 0.35)',
             }}
           />
         </div>
