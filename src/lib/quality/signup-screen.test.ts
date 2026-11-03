@@ -1,3 +1,4 @@
+import * as moderation from './jev'
 import { describe, expect, it, vi } from 'vitest'
 import {
   GOOGLE_BLOCK_CONFIDENCE,
@@ -20,7 +21,7 @@ const emailBase = {
 }
 
 describe('signup screen decisions', () => {
-  it('pins the Jev question schema and the 800ms signup budget', () => {
+  it('pins the screening question schema and the 800ms signup budget', () => {
     expect(SIGNUP_JEV_TIMEOUT_MS).toBe(800)
     expect(SIGNUP_QUESTIONS.is_bot_or_burner.type).toBe('boolean')
     expect(SIGNUP_QUESTIONS.risk_level.type).toBe('score')
@@ -113,7 +114,7 @@ describe('signup screen decisions', () => {
     expect(decision.action).toBe('require_email_verification')
   })
 
-  it('fails open when Jev returns nothing', () => {
+  it('fails open when the evaluator returns nothing', () => {
     const decision = decideSignupScreen(null, emailBase)
     expect(decision.action).toBe('allow')
     expect(decision.reason).toBe('fail_open')
@@ -162,6 +163,30 @@ describe('signup screen decisions', () => {
     expect(decision.action).toBe('allow')
     expect(decision.reason).toBe('fail_open')
     expect(decision.fastSubmission).toBe(true)
+  })
+
+  it('pins signup to Laya and bounds even oversized fields within its state budget', async () => {
+    const evaluate = vi.spyOn(moderation, 'evaluateWithJev').mockResolvedValueOnce(null)
+    try {
+      await screenSignup({
+        provider: 'email',
+        email: `${'a'.repeat(4000)}@${'b'.repeat(4000)}.com`,
+        displayName: 'n'.repeat(4000),
+        country: 'c'.repeat(4000),
+        acceptLanguage: 'l'.repeat(4000),
+        userAgent: 'u'.repeat(4000),
+        elapsedMs: 2000,
+      })
+      expect(evaluate).toHaveBeenCalledWith(expect.objectContaining({
+        model: moderation.LAYA_GATEWAY_MODEL_ID,
+        timeoutMs: 800,
+      }))
+      const state = evaluate.mock.calls[0][0].state
+      expect(moderation.stateLength(state)).toBeLessThanOrEqual(moderation.LAYA_STATE_MAX_CHARS)
+      expect(state).toEqual(expect.objectContaining({ country: 'unknown', accept_language: 'l'.repeat(128) }))
+    } finally {
+      evaluate.mockRestore()
+    }
   })
 
   it('screens new email and Google accounts and skips later sign-ins', () => {

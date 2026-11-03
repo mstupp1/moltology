@@ -3,12 +3,12 @@ id: oracle
 title: Oracle AI
 order: 8
 color: '#ff5fa2'
-summary: The Oracle checks rate, input, and each member's usage allowance, screens the prompt with the moderation model, routes it to a model allowed by the membership tier, and names new conversations within the streamed request.
+summary: The Oracle checks rate, input, and each member's usage allowance, routes it to a model allowed by the membership tier, and names new conversations within the streamed request.
 rules:
   - id: oracle.request-pipeline
     title: Oracle request pipeline
     kind: flow
-    statement: Every message passes flood and local input checks. Guests get a canned reply. Members pass usage checks and atomically reserve an allowance slot before prompt screening or model calls. Refused prompts release the slot. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.
+    statement: Every message passes flood and local input checks. Guests get a canned reply. Members pass usage checks and atomically reserve an allowance slot before chat model calls. Oversized tier-specific prompts release the slot. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.
     anchors:
       - file: src/lib/ai/handle-oracle-chat-request.ts
         symbol: handleOracleChatRequest
@@ -45,11 +45,11 @@ rules:
         label: Canned guest reply
         kind: outcome
       - id: usage
-        label: Over minute or daily allowance?
+        label: Over minute, five-hour, or weekly allowance?
         next:
           - { to: over, label: 'yes' }
           - { to: unavailable, label: 'unreadable' }
-          - { to: preflight, label: 'no' }
+          - { to: route, label: 'no' }
       - id: unavailable
         label: 503, no model call
         kind: outcome
@@ -58,16 +58,6 @@ rules:
         label: 429 with Retry-After
         kind: outcome
         tone: warn
-      - id: preflight
-        label: Moderation preflight
-        kind: action
-        next:
-          - { to: jailbreak, label: 'jailbreak' }
-          - { to: route, label: 'ok or down' }
-      - id: jailbreak
-        label: Refused (jailbreak)
-        kind: outcome
-        tone: block
       - id: route
         label: Reserve usage and create a thread if needed
         kind: action
@@ -130,7 +120,7 @@ rules:
   - id: oracle.input-guardrails
     title: Local input guardrails
     kind: gate
-    statement: Messages must be non-empty. Free members and guests can send up to 1,500 characters per message; Oracle MAX allows 4,000. Member limits use the authoritative reservation tier, and oversized messages release their reservation before screening. Obvious prompt-injection phrases and explicit harm are refused before any model call.
+    statement: Messages must be non-empty. Free members and guests can send up to 1,500 characters per message; Oracle MAX allows 4,000. Member limits use the authoritative reservation tier, and oversized messages release their reservation before generation. Obvious prompt-injection phrases and explicit harm are refused before any model call.
     dependsOn: [oracle.request-pipeline, forum.content-safety]
     anchors:
       - file: src/lib/ai/guardrails.ts
@@ -139,36 +129,31 @@ rules:
         symbol: INJECTION_PATTERNS
     tests: [src/lib/ai/guardrails.test.ts]
   - id: oracle.jailbreak-gate
-    title: Paraphrased jailbreaks are refused
+    title: Remote chat screening removed
     kind: gate
-    statement: The moderation model refuses a message above 80% jailbreak confidence. Oracle MAX screening uses Jev with prompt training disallowed; free members use Laya within their 1,500-character message limit. Screening runs after the authoritative tier reservation, and refusal releases that reservation.
-    dependsOn: [oracle.input-guardrails, forum.jev-shared]
+    status: deprecated
+    statement: Oracle chat no longer calls Laya or Jev. Local input checks remain, along with verified membership, message limits, usage reservations, and model access rules. Forum and signup screening remain separate.
+    dependsOn: [oracle.input-guardrails]
     anchors:
-      - file: src/lib/quality/oracle-preflight.ts
-        symbol: decideOraclePreflight
-      - file: src/lib/quality/oracle-preflight.ts
-        symbol: ORACLE_JAILBREAK_ERROR
-      - file: src/lib/quality/oracle-preflight.ts
-        symbol: defaultOracleEvaluator
-    tests: [src/lib/quality/oracle-preflight.test.ts]
+      - file: src/lib/ai/handle-oracle-chat-request.ts
+        symbol: handleOracleChatRequest
+    tests: [src/lib/ai/handle-oracle-chat-request.test.ts]
   - id: oracle.intent-context
-    title: Intent picks the prompt context
+    title: Shared system prompt and local scripture lookup
     kind: flow
-    statement: Doctrine questions load the scripture block, chassis and progression questions load a short block, and casual or unrelated questions use the base prompt. When the moderation model is down, the full doctrine context is used.
-    dependsOn: [oracle.jailbreak-gate]
+    statement: All member chats use the same static system prompt prefix with doctrine, equipment, progression, and scripture summaries. Local lookup adds relevant scripture passages using the current question and recent conversation, without remote intent classification.
+    dependsOn: [oracle.input-guardrails]
     anchors:
-      - file: src/lib/quality/oracle-preflight.ts
-        symbol: ORACLE_INTENTS
-      - file: src/lib/quality/oracle-preflight.ts
-        symbol: contextForOracleIntent
-      - file: src/lib/quality/oracle-preflight.ts
-        symbol: fallbackOracleDecision
-    tests: [src/lib/quality/oracle-preflight.test.ts]
+      - file: src/lib/ai/codex-prompt.ts
+        symbol: buildSystemPrompt
+      - file: src/lib/ai/scripture-lookup.ts
+        symbol: buildOracleScriptureContext
+    tests: [src/lib/ai/codex-prompt.test.ts, src/lib/ai/scripture-lookup.test.ts]
   - id: oracle.model-routing
     title: Membership determines model access
     kind: permission
     statement: Guests receive preset preview replies. Free members use Oracle Lite (DeepSeek V4.1 Flash 1017). MAX defaults to Claude Haiku 5.5 and can select Lite. Titles use the selected chat model. Both providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.
-    dependsOn: [oracle.jailbreak-gate, economy.red-line]
+    dependsOn: [oracle.input-guardrails, economy.red-line]
     anchors:
       - file: src/lib/ai/oracle-chat.ts
         symbol: getOracleCandidateModelIds
@@ -206,4 +191,4 @@ rules:
     tests: [src/lib/server/oracle-threads.test.ts]
 ---
 
-The Oracle is the most expensive surface, because every message is a billed model call. The pipeline refuses abuse cheaply first, caps each member's allowance, then spends a free moderation call to route the question to the cheapest model that can answer it.
+The Oracle is the most expensive surface, because every message is a billed model call. The pipeline refuses abuse cheaply first, caps each member's allowance, then selects a chat model allowed by the verified membership tier. There is no remote moderation call in chat; Laya and Jev remain in forum and signup screening.

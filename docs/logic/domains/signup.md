@@ -3,7 +3,7 @@ id: signup
 title: Signup screening
 order: 5
 color: '#ff7a45'
-summary: New accounts pass a honeypot, a timing signal, a disposable-domain list, and a Jev bot check. Screening fails open when the model is down.
+summary: New accounts pass a honeypot, a timing signal, a disposable-domain list, and a Laya bot check. Screening fails open when the model is down.
 rules:
   - id: signup.pipeline
     title: Signup screening pipeline
@@ -45,7 +45,7 @@ rules:
           - { to: challenge, label: 'yes' }
           - { to: jev, label: 'no' }
       - id: jev
-        label: Jev bot check (800ms)
+        label: Laya bot check (800ms)
         kind: action
         next:
           - { to: allow-open, label: 'timeout' }
@@ -75,7 +75,7 @@ rules:
   - id: signup.honeypot
     title: Honeypot rejects bots
     kind: gate
-    statement: The email signup form sends a hidden confirm_website field. If it is filled, the request returns 400 before Better Auth or Jev run, and the attempt is logged with no user id.
+    statement: The email signup form sends a hidden confirm_website field. If it is filled, the request returns 400 before Better Auth or Laya run, and the attempt is logged with no user id.
     dependsOn: [signup.pipeline]
     anchors:
       - file: src/lib/signup-telemetry.ts
@@ -86,7 +86,7 @@ rules:
   - id: signup.fast-form
     title: Fast form signal
     kind: threshold
-    statement: An email signup completed in under 1,500 ms is marked fast. It is a signal passed to Jev, not a block on its own.
+    statement: An email signup completed in under 1,500 ms is marked fast. It is a signal passed to Laya, not a block on its own.
     dependsOn: [signup.pipeline]
     anchors:
       - file: src/lib/signup-telemetry.ts
@@ -113,16 +113,20 @@ rules:
   - id: signup.jev-budget
     title: 800 ms model budget
     kind: limit
-    statement: The signup Jev call has an 800 ms budget, shorter than the 1,200 ms used by the forum and Oracle, so signup never feels slow.
+    statement: Signup screening is pinned to Laya with an 800 ms budget and no Jev fallback. Fields are bounded within the 1,500-character state budget. Forum evaluation retains its 1,200 ms default; Oracle chat has no remote screening.
     dependsOn: [signup.pipeline, forum.jev-shared]
     anchors:
       - file: src/lib/quality/signup-screen.ts
         symbol: SIGNUP_JEV_TIMEOUT_MS
+      - file: src/lib/quality/signup-screen.ts
+        symbol: defaultSignupEvaluator
+      - file: src/lib/quality/signup-screen.ts
+        symbol: buildSignupState
     tests: [src/lib/quality/signup-screen.test.ts]
   - id: signup.fail-open
     title: Screening fails open
     kind: invariant
-    statement: If Jev times out, errors, or the gate throws, the signup is allowed. Screening must never lock real people out because a model is down.
+    statement: If Laya times out, errors, or the gate throws, the signup is allowed. Screening must never lock real people out because a model is down.
     dependsOn: [signup.pipeline]
     anchors:
       - file: src/lib/quality/signup-screen.ts
@@ -131,7 +135,7 @@ rules:
   - id: signup.block-thresholds
     title: Block confidence bars
     kind: threshold
-    statement: Email signups are blocked above 0.8 bot confidence, or when Jev says block with a high-risk score. Google accounts are blocked only above 0.9 and only when the email rule would also block. Exactly 0.8 stays on the allow side.
+    statement: Email signups are blocked above 0.8 bot confidence, or when Laya says block with a high-risk score. Google accounts are blocked only above 0.9 and only when the email rule would also block. Exactly 0.8 stays on the allow side.
     dependsOn: [signup.pipeline]
     anchors:
       - file: src/lib/quality/signup-screen.ts
@@ -175,4 +179,4 @@ rules:
     tests: [src/lib/server/turnstile.test.ts, src/lib/server/blog-comment-guards.test.ts]
 ---
 
-Screening uses cheap local checks first, then asks Jev only when needed. Every path fails open, because a false block costs a real member.
+Screening uses cheap local checks first, then asks Laya only when needed. Every path fails open, because a false block costs a real member.
