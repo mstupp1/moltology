@@ -167,7 +167,7 @@ rules:
   - id: oracle.model-routing
     title: Membership determines model access
     kind: permission
-    statement: Guests receive preset preview replies. Free members use Oracle Lite (DeepSeek V4.1 Flash). MAX defaults to GPT-6 Luna and can select Lite. Titles use the selected chat model. Both providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.
+    statement: Guests receive preset preview replies. Free members use Oracle Lite (DeepSeek V4.1 Flash 1017). MAX defaults to Claude Haiku 5.5 and can select Lite. Titles use the selected chat model. Both providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.
     dependsOn: [oracle.jailbreak-gate, economy.red-line]
     anchors:
       - file: src/lib/ai/oracle-chat.ts
@@ -178,7 +178,7 @@ rules:
   - id: oracle.model-fallback
     title: Ordered model fallback
     kind: flow
-    statement: Lite uses DeepSeek through DeepInfra. MAX defaults to GPT-6 Luna through OpenAI and may choose Lite. Both routes disallow prompt training. Empty streams, errors, and a 12-second first-token timeout return unavailable without changing models. SDK retries and reasoning are disabled.
+    statement: Lite pins DeepSeek V4.1 Flash 1017 through DeepInfra. MAX defaults to Claude Haiku 5.5 through Anthropic and may choose Lite. Both routes disallow prompt training. Empty streams, errors, and a 12-second first-token timeout return unavailable without changing models. SDK retries and reasoning are disabled.
     dependsOn: [oracle.model-routing]
     anchors:
       - file: src/lib/ai/oracle-models.ts

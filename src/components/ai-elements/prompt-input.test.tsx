@@ -81,8 +81,8 @@ describe('PromptInput', () => {
     expect(within(menu).queryByText('Chat')).not.toBeInTheDocument()
     expect(within(menu).queryByText('Guest preview')).not.toBeInTheDocument()
     expect(within(menu).queryByText('Models')).not.toBeInTheDocument()
-    expect(within(menu).queryByText('DeepSeek V4.1 Flash')).not.toBeInTheDocument()
-    expect(within(menu).queryByText('GPT-6 Luna')).not.toBeInTheDocument()
+    expect(within(menu).queryByText('DeepSeek V4.1 Flash 1017')).not.toBeInTheDocument()
+    expect(within(menu).queryByText('Claude Haiku 5.5')).not.toBeInTheDocument()
     expect(within(menu).queryByText(/Sonnet/)).not.toBeInTheDocument()
     expect(within(menu).queryByText('Mistral Nemo 12B')).not.toBeInTheDocument()
     expect(within(menu).getAllByRole('menuitemradio')).toHaveLength(2)
@@ -164,8 +164,8 @@ describe('PromptInput', () => {
   it('shows underlying model names only when enabled for admins', () => {
     render(<OracleModelPicker selectedModel={getOracleModel()} onSelectModel={vi.fn()} showModelNames />)
     fireEvent.keyDown(screen.getByRole('button', { name: 'Select model' }), { key: 'Enter' })
-    expect(screen.getByText('DeepSeek V4.1 Flash')).toBeInTheDocument()
-    expect(screen.getByText('GPT-6 Luna')).toBeInTheDocument()
+    expect(screen.getByText('DeepSeek V4.1 Flash 1017')).toBeInTheDocument()
+    expect(screen.getByText('Claude Haiku 5.5')).toBeInTheDocument()
   })
 
   it('lets MAX members select Lite with no-training routing', () => {

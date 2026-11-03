@@ -165,10 +165,10 @@ describe('AIChatPanel Guest Mode Gating', () => {
     vi.mocked(getUserProfileFn).mockResolvedValueOnce({ role: 'admin' } as any)
     const { rerender } = render(<AIChatPanel userId="admin" />)
     fireEvent.keyDown(screen.getByRole('button', { name: 'Select model' }), { key: 'Enter' })
-    expect(await screen.findByText('DeepSeek V4.1 Flash')).toBeInTheDocument()
-    expect(screen.getByText('GPT-6 Luna')).toBeInTheDocument()
+    expect(await screen.findByText('DeepSeek V4.1 Flash 1017')).toBeInTheDocument()
+    expect(screen.getByText('Claude Haiku 5.5')).toBeInTheDocument()
     rerender(<AIChatPanel userId={null} />)
-    await waitFor(() => expect(screen.queryByText('GPT-6 Luna')).not.toBeInTheDocument())
+    await waitFor(() => expect(screen.queryByText('Claude Haiku 5.5')).not.toBeInTheDocument())
   })
 
   it('defaults MAX members to DeepSeek and resets the choice after sign-out', async () => {

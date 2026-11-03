@@ -25,8 +25,8 @@ export interface OracleModel {
   latency?: string
 }
 
-export const DEFAULT_ORACLE_MODEL_ID = 'deepseek/deepseek-v4.1-flash'
-export const PREMIUM_ORACLE_MODEL_ID = 'openai/gpt-6-luna'
+export const DEFAULT_ORACLE_MODEL_ID = 'deepseek/deepseek-v4.1-flash-1017'
+export const PREMIUM_ORACLE_MODEL_ID = 'anthropic/claude-haiku-5.5'
 export const ORACLE_TITLE_MODEL_ID = DEFAULT_ORACLE_MODEL_ID
 export const PREMIUM_ORACLE_TITLE_MODEL_ID = PREMIUM_ORACLE_MODEL_ID
 export const GUEST_ORACLE_MODEL_ID = 'guest-preview'
@@ -45,7 +45,7 @@ export const ORACLE_MODELS: OracleModel[] = [
     id: DEFAULT_ORACLE_MODEL_ID,
     label: 'Oracle Lite',
     shortLabel: 'Oracle Lite',
-    modelName: 'DeepSeek V4.1 Flash',
+    modelName: 'DeepSeek V4.1 Flash 1017',
     provider: 'deepseek',
     roles: ['chat', 'titles'],
     access: 'free',
@@ -55,8 +55,8 @@ export const ORACLE_MODELS: OracleModel[] = [
     id: PREMIUM_ORACLE_MODEL_ID,
     label: 'Oracle MAX',
     shortLabel: 'Oracle MAX',
-    modelName: 'GPT-6 Luna',
-    provider: 'openai',
+    modelName: 'Claude Haiku 5.5',
+    provider: 'anthropic',
     roles: ['chat', 'titles'],
     access: 'premium',
     noPromptTraining: true,
@@ -93,7 +93,7 @@ export function getOracleGenerationOptions(modelId: string) {
     ...(modelId === DEFAULT_ORACLE_MODEL_ID
       ? { providerOptions: { gateway: { only: ['deepinfra'], disallowPromptTraining: true } } }
       : modelId === PREMIUM_ORACLE_MODEL_ID
-        ? { providerOptions: { gateway: { only: ['openai'], disallowPromptTraining: true } } }
+        ? { providerOptions: { gateway: { only: ['anthropic'], disallowPromptTraining: true, caching: 'auto' as const } } }
         : {}),
   }
 }

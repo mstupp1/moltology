@@ -248,7 +248,7 @@ describe('handleOracleChatRequest', () => {
     }))
     expect(response.status).toBe(502)
     expect(streamTextMock.mock.calls.map(([options]) => options.model)).toEqual([PREMIUM_ORACLE_MODEL_ID])
-    expect(streamTextMock.mock.calls[0][0].providerOptions.gateway).toEqual({ only: ['openai'], disallowPromptTraining: true })
+    expect(streamTextMock.mock.calls[0][0].providerOptions.gateway).toEqual({ only: ['anthropic'], disallowPromptTraining: true, caching: 'auto' })
     expect(screenOraclePrompt).toHaveBeenCalledWith('Help me focus today', { isPremium: true })
     expect(summarizeThreadTitle).not.toHaveBeenCalled()
     expect(updateAIThreadTitle).not.toHaveBeenCalled()
