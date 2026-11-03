@@ -1,3 +1,4 @@
+import { ORACLE_MAX_PROMPT_MAX_CHARS } from './prompt-limits'
 /**
  * Guardrails module for AI interaction.
  * Enforces rate limiting, prompt sanitization, safety policies, and input token boundaries.
@@ -97,7 +98,7 @@ export function validateInputGuardrails(input: string): GuardrailResult {
     return { allowed: false, reason: 'Input cannot be empty' }
   }
 
-  if (trimmed.length > 4000) {
+  if (trimmed.length > ORACLE_MAX_PROMPT_MAX_CHARS) {
     return {
       allowed: false,
       reason: 'Input exceeds maximum allowed length of 4000 characters',

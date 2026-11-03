@@ -224,6 +224,30 @@ describe('handleOracleChatRequest', () => {
     },
   )
 
+  it('rejects oversized free prompts before screening and releases usage', async () => {
+    const response = await handleOracleChatRequest(await authedRequest({
+      model: PREMIUM_ORACLE_MODEL_ID,
+      messages: [{ role: 'user', content: 'a'.repeat(1501) }],
+    }))
+    expect(response.status).toBe(400)
+    expect((await response.json()).error).toContain('1,500')
+    expect(releaseOracleChatUsage).toHaveBeenCalledWith('usage-1')
+    expect(screenOraclePrompt).not.toHaveBeenCalled()
+    expect(streamTextMock).not.toHaveBeenCalled()
+  })
+
+  it('accepts a longer MAX prompt using the authoritative reservation tier', async () => {
+    vi.mocked(reserveOracleChatUsage).mockResolvedValueOnce({ allowed: true, id: 'premium-usage', isPremium: true })
+    streamTextMock.mockReturnValueOnce({ stream: textStream('MAX reply') })
+    const prompt = 'a'.repeat(4000)
+    const response = await handleOracleChatRequest(await authedRequest({
+      messages: [{ role: 'user', content: prompt }],
+    }))
+    expect(response.status).toBe(200)
+    await response.text()
+    expect(screenOraclePrompt).toHaveBeenCalledWith(prompt, { isPremium: true })
+  })
+
   it('uses the authoritative reservation tier for Premium chat and titles', async () => {
     // The preliminary snapshot still says free; only the atomic reservation
     // determines access at the point where calls are dispatched.
