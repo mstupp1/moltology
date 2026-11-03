@@ -966,6 +966,50 @@
         "height": 1448
       },
       "verifiedAt": "2026-11-01T22:02:46.483Z"
+    },
+    {
+      "id": "carousel-1793714956021",
+      "type": "carousel",
+      "topic": "Turn meeting notes into an agreed action handoff",
+      "theme": "ecdysis",
+      "mascot": "lobster_engineer",
+      "articleSlug": null,
+      "archivePath": "Social Archive/2026/11/carousel-ddb05d0560325dab93d3a70f",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/media/1793714957357_d35a3caaf01fa13c_01.png",
+        "https://media.zernio.com/media/1793714958418_c16568496baf0d46_02.png",
+        "https://media.zernio.com/media/1793714959482_b2df3d6ac65de10c_03.png",
+        "https://media.zernio.com/media/1793714960399_e6df57e3b2312cdb_04.png",
+        "https://media.zernio.com/media/1793714961278_fba1c661d9f86d5a_05.png"
+      ],
+      "slideUrls": [
+        "https://media.zernio.com/media/1793714957357_d35a3caaf01fa13c_01.png",
+        "https://media.zernio.com/media/1793714958418_c16568496baf0d46_02.png",
+        "https://media.zernio.com/media/1793714959482_b2df3d6ac65de10c_03.png",
+        "https://media.zernio.com/media/1793714960399_e6df57e3b2312cdb_04.png",
+        "https://media.zernio.com/media/1793714961278_fba1c661d9f86d5a_05.png"
+      ],
+      "slideCount": 5,
+      "aspectRatio": "3:4",
+      "caption": "Your meeting notes never left the meeting.\n\n“We’ll sort it” is still circling the unclaimed cargo bay.\nBefore closing, agree who owns the next step, what they’ll send and when you’ll check back.\n“Sam will send the draft agenda by Thursday. We’ll review it Friday.” The parcel has a destination.\n\nSave this handoff for meeting close.",
+      "hashtags": [
+        "#Moltology",
+        "#Communication",
+        "#Meetings"
+      ],
+      "firstComment": "https://moltology.org",
+      "status": "scheduled",
+      "scheduledFor": "2026-11-06T18:00:00.000Z",
+      "queueId": "6a84b76d2421e968ac81f5bc",
+      "zernioPostId": "6ae9eb12984d2cc9c898f341",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "createdAt": "2026-11-03T14:09:27.507Z",
+      "verifiedDimensions": {
+        "width": 2160,
+        "height": 2880
+      },
+      "verifiedAt": "2026-11-03T14:09:33.394Z"
     }
   ]
 }
