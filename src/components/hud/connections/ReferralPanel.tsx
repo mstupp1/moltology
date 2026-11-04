@@ -32,7 +32,7 @@ export function ReferralPanel() {
     try {
       const url = new URL(invitePath(summary.userId), window.location.origin).href
       if (native) {
-        await navigator.share({ title: 'Join me on Moltology', text: 'Join me on Moltology. You can send me a friend request after signing up.', url })
+        await navigator.share({ title: 'Join me on Moltology', text: 'Add me as a friend after signing up.', url })
       } else {
         await navigator.clipboard.writeText(url)
         toast.success('Invite link copied.')

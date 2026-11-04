@@ -193,7 +193,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
               </ul>
             )}
             <div className="pt-1 flex flex-wrap items-center gap-2">
-              {profile.relationship === 'self' && <ProfileLinkButton userId={profile.id} />}
+              {profile.relationship === 'self' && <ProfileLinkButton userId={profile.id} handle={profile.handle} />}
               <FriendRequestButton
                 profileId={profile.id}
                 relationship={profile.relationship}

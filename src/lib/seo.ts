@@ -1,10 +1,13 @@
 import type { DetailedHTMLProps, MetaHTMLAttributes } from 'react'
 import { isMemberProfileUuid, resolveMemberPublicName } from './member-handle'
 import { MOLTMAXXING_DAY, MOLTMAXXING_DEFINITION, MOLTMAXXING_FAQ } from './moltmaxxing-content'
+import { getAbsoluteAssetUrl } from './assets'
+import { SITE_ORIGIN } from './site-origin'
+import { profileSharePath } from './referrals'
 
 export type MetaElement = DetailedHTMLProps<MetaHTMLAttributes<HTMLMetaElement>, HTMLMetaElement>
 
-export const SITE_ORIGIN = 'https://moltology.org'
+export { SITE_ORIGIN } from './site-origin'
 export const NOINDEX_ROBOTS = 'noindex, nofollow'
 
 export interface SEOOptions {
@@ -41,8 +44,10 @@ export function canonicalLink(href: string) {
 export const MEMBER_PROFILE_SEO = {
   title: 'Member Dossier | Moltology',
   description:
-    'Public member dossier, chassis readings, and equipped loadout for authenticated units.',
+    'Connect on Moltology. Open this profile to send a friend request.',
 } as const
+
+export const MEMBER_SHARE_IMAGE = 'images/sharing/member-invite-v1.png'
 
 export const SEARCH_PAGE_SEO = {
   title: 'Search | Moltology',
@@ -71,17 +76,24 @@ export function memberIdentityFromRouteKey(profileId?: string | null): MemberPro
   if (isMemberProfileUuid(trimmed)) {
     return { userId: trimmed }
   }
-  return { handle: trimmed }
+  return /^[A-Za-z0-9_]{3,20}$/.test(trimmed) ? { handle: trimmed } : undefined
 }
 
 export function memberProfileSeo(member?: MemberProfileSeoInput | null) {
   const handle = member?.handle?.trim()
   const hasIdentity = Boolean(handle || member?.userId || member?.larvaId?.trim())
   const publicName = hasIdentity && member ? resolveMemberPublicName(member) : ''
-  return privatePageSeo({
-    title: publicName ? `${publicName} | Moltology` : MEMBER_PROFILE_SEO.title,
+  return [...privatePageSeo({
+    title: publicName ? `Add ${publicName} on Moltology` : MEMBER_PROFILE_SEO.title,
     description: MEMBER_PROFILE_SEO.description,
-  })
+    ogImage: getAbsoluteAssetUrl(MEMBER_SHARE_IMAGE),
+  }),
+    { property: 'og:image:width', content: '1200' },
+    { property: 'og:image:height', content: '630' },
+    { property: 'og:image:type', content: 'image/png' },
+    { property: 'og:image:alt', content: 'Add me on Moltology. A friend beneath the surface.' },
+    ...(member?.userId || handle ? [{ property: 'og:url', content: `${SITE_ORIGIN}${profileSharePath(member?.userId || handle || '', handle)}` }] : []),
+  ]
 }
 
 export function privatePageSeo(

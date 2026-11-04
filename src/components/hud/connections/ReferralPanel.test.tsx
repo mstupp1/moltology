@@ -36,7 +36,9 @@ describe('referral sharing', () => {
     render(<ReferralPanel />)
     await screen.findByText('1 of 5 rewards this month · 100 referral XP earned')
     fireEvent.click(screen.getByRole('button', { name: 'Share' }))
-    await waitFor(() => expect(nativeShare).toHaveBeenCalledWith(expect.objectContaining({ url: `${window.location.origin}/i/inviter` })))
+    await waitFor(() => expect(nativeShare).toHaveBeenCalledWith({
+      title: 'Join me on Moltology', text: 'Add me as a friend after signing up.', url: `${window.location.origin}/i/inviter`,
+    }))
     await waitFor(() => expect(screen.getByRole('button', { name: 'Share' })).not.toBeDisabled())
     expect(toast.error).not.toHaveBeenCalled()
   })
