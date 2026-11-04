@@ -39,10 +39,11 @@ export const avatarConfigShape = {
   patternGlow: z.enum(['subtle', 'chromatic', 'none']).optional(),
   patternPulse: z.enum(['pulse', 'steady']).optional(),
   patternSparkles: z.enum(['subtle', 'radiant', 'none']).optional(),
-  eyelidStyle: z.enum(['open', 'relaxed', 'cheerful_squint', 'focused', 'chill', 'angry', 'worried', 'sad', 'smug', 'shocked']).optional(),
+  eyelidStyle: z.enum(['open', 'relaxed', 'cheerful_squint', 'focused', 'chill', 'angry', 'worried', 'sad', 'smug', 'shocked', 'wink']).optional(),
   eyeColor: z.enum(['amber', 'sapphire', 'emerald', 'amethyst', 'ruby', 'topaz']).optional(),
   eyeVariant: z.enum(['round', 'wide', 'tall']).optional(),
   pupilVariant: z.enum(['standard', 'big', 'sparkle', 'keen']).optional(),
+  gaze: z.enum(['ahead', 'left', 'right', 'up', 'down']).optional(),
   backgroundMotion: z.enum(['drift_diagonal', 'drift_horizontal', 'radar_sweep', 'wave_undulate', 'pulse_breathe', 'static']).optional(),
   transparentBackground: z.boolean().optional(),
 }

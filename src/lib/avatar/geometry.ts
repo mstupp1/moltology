@@ -4,7 +4,7 @@ export type Pt = readonly [number, number]
 
 const r2 = (n: number) => Math.round(n * 100) / 100
 
-function cubicAt(p0: Pt, p1: Pt, p2: Pt, p3: Pt, t: number): [number, number] {
+export function cubicAt(p0: Pt, p1: Pt, p2: Pt, p3: Pt, t: number): [number, number] {
   const u = 1 - t
   const a = u * u * u
   const b = 3 * u * u * t

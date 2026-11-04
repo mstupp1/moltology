@@ -24,7 +24,8 @@ export const EYE_COLOR_SWATCH: Readonly<Record<AvatarEyeColor, { inner: string; 
 
 export type EyeShape = 'round' | 'wide' | 'tall'
 export type PupilStyle = 'standard' | 'big' | 'sparkle' | 'keen'
-export type Expression = 'open' | 'relaxed' | 'cheerful_squint' | 'focused' | 'chill' | 'angry' | 'worried' | 'sad' | 'smug' | 'shocked'
+export type Expression = 'open' | 'relaxed' | 'cheerful_squint' | 'focused' | 'chill' | 'angry' | 'worried' | 'sad' | 'smug' | 'shocked' | 'wink'
+export type Gaze = 'ahead' | 'left' | 'right' | 'up' | 'down'
 
 interface LidLine {
   outer: number
@@ -32,6 +33,8 @@ interface LidLine {
   ctrl: number
   lower?: { outer: number; inner: number; ctrl: number }
   brow: { tilt: number; lift: number }
+  /** Overrides for the character's right eye (screen right), for one-sided looks. */
+  right?: Partial<Omit<LidLine, 'right'>>
 }
 
 /** Lid heights as a fraction of the eye radius, from the outer to the inner corner. */
@@ -46,7 +49,12 @@ const LIDS: Readonly<Record<Expression, LidLine>> = {
   // Outer corners droop under the lid; brows knit upward in the middle.
   sad: { outer: -0.16, inner: -0.52, ctrl: -0.4, brow: { tilt: -24, lift: 0.5 } },
   // Heavy upper lid and a lifted lower lid: pleased with itself.
-  smug: { outer: -0.14, inner: -0.1, ctrl: -0.22, lower: { outer: 0.55, inner: 0.5, ctrl: 0.3 }, brow: { tilt: 7, lift: 0.5 } },
+  smug: { outer: -0.14, inner: -0.1, ctrl: -0.22, lower: { outer: 0.55, inner: 0.5, ctrl: 0.3 }, brow: { tilt: 7, lift: 0.5 }, right: { brow: { tilt: -18, lift: 6.5 } } },
+  // Left eye bright and open, right eye shut in a soft curve.
+  wink: {
+    outer: -0.6, inner: -0.6, ctrl: -0.86, brow: { tilt: -4, lift: 1.5 },
+    right: { outer: 0.18, inner: 0.18, ctrl: 0.5, lower: { outer: 0.2, inner: 0.2, ctrl: 0.42 }, brow: { tilt: 6, lift: -0.5 } },
+  },
   // Lids pulled clear of the eye, brows shot up, pupils shrink to pinpricks.
   shocked: { outer: -1.25, inner: -1.25, ctrl: -1.5, brow: { tilt: -6, lift: 5.5 } },
 }
@@ -61,6 +69,7 @@ export interface EyeSpec {
   color: AvatarEyeColor
   pupil: PupilStyle
   expression: Expression
+  gaze?: Gaze
 }
 
 export function eyeDefs(ctx: PaintContext, color: AvatarEyeColor): string {
@@ -105,10 +114,13 @@ function lidEdge(e: EyeSpec, l: { outer: number; inner: number; ctrl: number }):
 
 export function renderEye(e: EyeSpec, ctx: PaintContext, shellSide: PieceSide): string {
   const clipId = `${ctx.uid}-eye-${e.side}`
-  const lid = LIDS[e.expression] ?? LIDS.relaxed
-  const look = e.side === 'left' ? 0.5 : -0.5
+  const base = LIDS[e.expression] ?? LIDS.relaxed
+  const lid: LidLine = e.side === 'right' && base.right ? { ...base, ...base.right } : base
+  const gaze = e.gaze ?? 'ahead'
+  const look = gaze === 'left' ? -e.rx * 0.3 : gaze === 'right' ? e.rx * 0.3 : e.side === 'left' ? 0.5 : -0.5
+  const lookY = gaze === 'up' ? -e.ry * 0.28 : gaze === 'down' ? e.ry * 0.28 : 0
   const ix = r2(e.cx + look)
-  const iy = r2(e.cy + (e.expression === 'sad' ? 3 : 1.4))
+  const iy = r2(e.cy + lookY + (e.expression === 'sad' ? 3 : 1.4))
   const irisR = Math.min(e.rx, e.ry) * (e.pupil === 'big' ? 0.7 : 0.64) * (e.expression === 'shocked' ? 0.82 : 1)
   const pupilR = irisR * (e.pupil === 'big' ? 0.62 : e.pupil === 'keen' ? 0.36 : 0.5) * (e.expression === 'shocked' ? 0.55 : 1)
   const c = EYE_COLOR_SWATCH[e.color] ?? EYE_COLOR_SWATCH.amber
@@ -240,6 +252,11 @@ const CLAW_SHAPES = {
   },
 } as const
 
+/** The claw outline a given style and side draws, so gauntlets can be built over it. */
+export function clawShape(style: AvatarClaws, side: 'left' | 'right'): { palm: string; finger: string } {
+  return style === 'crusher' && side === 'right' ? CLAW_SHAPES.crusher : CLAW_SHAPES.classic
+}
+
 export interface ClawPlacement {
   x: number
   y: number
@@ -250,6 +267,8 @@ export interface ClawPlacement {
   /** Mechanical gauntlets replace the entire organic claw. */
   replacement?: boolean
   equipment?: string
+  /** Drawn behind the claw: a held weapon's shaft runs through the pinch. */
+  equipmentUnder?: string
 }
 
 export function renderClaw(p: ClawPlacement, style: AvatarClaws, ctx: PaintContext): string {
@@ -265,7 +284,7 @@ export function renderClaw(p: ClawPlacement, style: AvatarClaws, ctx: PaintConte
     .join('')
   const socket = `<ellipse cx="0" cy="2" rx="7.8" ry="7" fill="${shellFill(ctx, p.side)}" stroke="${outlineColor(ctx, p.side)}" stroke-width="1.4"/>`
   const organic = p.replacement ? '' : `
-      ${p.gripping ? '' : piece(shape.finger, ctx, { side: p.side })}
+      ${piece(shape.finger, ctx, { side: p.side })}
       ${teeth}
       ${piece(shape.palm, ctx, { side: p.side })}
       ${glint(shape.glint, ctx, 0.55)}`
@@ -273,8 +292,7 @@ export function renderClaw(p: ClawPlacement, style: AvatarClaws, ctx: PaintConte
   // independent of the bounds of a hammer, gauntlet, or alternate claw silhouette.
   return `<g transform="${transform}" data-claw="${heavy ? 'crusher' : style}">
     <g class="lobster-idle-layer lobster-idle-claw-${p.side}">
-      ${socket}${organic}${p.equipment ?? ''}
-      ${p.gripping ? `<g data-weapon-grip="dactyl">${piece('M11,-29 C9,-34 3,-36 -3,-32 C-7,-29 -7,-24 -3,-23 C1,-23 3,-29 7,-25 L10,-20 Q15,-23 11,-29 Z', ctx, { side: p.side, plain: true })}</g>` : ''}
+      ${p.equipmentUnder ?? ''}${socket}${organic}${p.equipment ?? ''}
     </g>
   </g>`
 }
@@ -356,16 +374,27 @@ function antennaShapes(style: AvatarAntennae, ctx: PaintContext, side: PieceSide
   }
 }
 
+/** Each antenna style's main stalk (left side, root at 0,0) and where its tip ornament sits, so gear can ride it. */
+export const ANTENNA_RIG: Readonly<Record<AvatarAntennae, { stalk: [Pt, Pt, Pt, Pt]; tip: Pt }>> = {
+  whip: { stalk: [[0, 0], [-2, -24], [-18, -46], [-44, -52]], tip: [-44, -52] },
+  curl: { stalk: [[0, 0], [-2, -22], [-14, -40], [-32, -46]], tip: [-41, -41] },
+  plume: { stalk: [[0, 0], [-2, -22], [-16, -44], [-46, -50]], tip: [-46, -50] },
+  bolt: { stalk: [[0, 0], [-6, -16], [-10, -30], [-28, -50]], tip: [-28, -50] },
+  beacon: { stalk: [[0, 0], [0, -18], [-6, -30], [-16, -38]], tip: [-18, -40] },
+}
+
 export function renderAntennae(
   style: AvatarAntennae,
   ctx: PaintContext,
   roots: { left: Pt; right: Pt },
-  scale = 1
+  scale = 1,
+  /** Gear fitted to this antenna, drawn inside its sway layer so it moves with it. */
+  gear?: (side: 'left' | 'right') => string,
 ): string {
   const one = (side: 'left' | 'right') => {
     const [x, y] = roots[side]
     const flip = side === 'right' ? ' scale(-1 1)' : ''
-    return `<g transform="translate(${x} ${y}) scale(${scale})${flip}"><g class="lobster-idle-layer lobster-idle-antenna-${side}">${antennaShapes(style, ctx, side)}</g></g>`
+    return `<g transform="translate(${x} ${y}) scale(${scale})${flip}"><g class="lobster-idle-layer lobster-idle-antenna-${side}">${antennaShapes(style, ctx, side)}${gear?.(side) ?? ''}</g></g>`
   }
   return `<g class="lobster-idle-layer lobster-idle-antennae" data-antennae="${style}">${one('left')}${one('right')}</g>`
 }
