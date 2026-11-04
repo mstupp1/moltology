@@ -738,18 +738,32 @@ export interface GenerateLobsterAvatarSilhouetteOptions {
   size?: number
 }
 
-/** Empty-state outline: the lobster rig's head, eyes, and antennae in one benthic tone. */
+/**
+ * Empty-state outline: the default lobster as its portrait frames it (head, eyes, antennae and
+ * shoulders) in one benthic tone. Coordinates match LOBSTER_PORTRAIT_VIEWBOX, so nothing is
+ * clipped and the face sits where a real portrait's would.
+ */
 export const SILHOUETTE_PATHS = {
-  head: 'M50,21 C71,21 85,36 86.5,60 C88,85 82,110 50,113 C18,110 12,85 13.5,60 C15,36 29,21 50,21 Z',
-  antennaLeft: 'M45,24 C43,0 27,-22 1,-28',
-  antennaRight: 'M55,24 C57,0 73,-22 99,-28',
-  eyeLeft: { cx: 36.5, cy: 25, r: 14.5 },
-  eyeRight: { cx: 63.5, cy: 25, r: 14.5 },
+  shoulders: 'M6,122 C8,98 25,87 50,87 C75,87 92,98 94,122 Z',
+  head: 'M50,6 C73,6 85,30 86.5,54 C88,79 82,104 50,107 C18,104 12,79 13.5,54 C15,30 27,6 50,6 Z',
+  glint: 'M24,42 C24,30 31,22 39,19 C34,26 30,34 29,44 Z',
+  antennaLeft: 'M45,19 C43,5 35,-3 24,-6',
+  antennaRight: 'M55,19 C57,5 65,-3 76,-6',
+  tipLeft: { cx: 24, cy: -6, r: 3 },
+  tipRight: { cx: 76, cy: -6, r: 3 },
+  eyeLeft: { cx: 36.5, cy: 24, r: 13 },
+  eyeRight: { cx: 63.5, cy: 24, r: 13 },
+  pupilLeft: { cx: 38, cy: 25.5, r: 4.2 },
+  pupilRight: { cx: 62, cy: 25.5, r: 4.2 },
 } as const
+
+/** Shrinks the figure inside the porthole so the antenna tips and shoulders stay clear of the ring. */
+export const SILHOUETTE_FIT = 'translate(50 51) scale(0.84) translate(-50 -47)'
 
 export function generateLobsterAvatarSilhouetteSvg(options?: GenerateLobsterAvatarSilhouetteOptions): string {
   const sizeAttr = options?.size ? ` width="${options.size}" height="${options.size}"` : ''
   const s = SILHOUETTE_PATHS
+  const c = (o: { cx: number; cy: number; r: number }, attrs = '') => `<circle cx="${o.cx}" cy="${o.cy}" r="${o.r}"${attrs} />`
   return `<svg data-avatar-slot="portrait" data-avatar-silhouette="true" xmlns="http://www.w3.org/2000/svg" viewBox="${LOBSTER_PORTRAIT_VIEWBOX}" fill="none"${sizeAttr} role="img" aria-label="Avatar not set yet">
     <defs>
       <linearGradient id="sil-benthic-grad" x1="25%" y1="0%" x2="75%" y2="100%">
@@ -758,13 +772,18 @@ export function generateLobsterAvatarSilhouetteSvg(options?: GenerateLobsterAvat
         <stop offset="100%" stop-color="#030e14" />
       </linearGradient>
     </defs>
-    <g stroke="#00c3ff" stroke-linecap="round" stroke-opacity="0.75" stroke-width="2.6" fill="none">
+    <g transform="${SILHOUETTE_FIT}">
+    <g stroke="#00c3ff" stroke-linecap="round" stroke-opacity="0.7" stroke-width="2.6" fill="none">
       <path d="${s.antennaLeft}" /><path d="${s.antennaRight}" />
     </g>
-    <g fill="url(#sil-benthic-grad)" stroke="#00c3ff" stroke-width="1.4" stroke-opacity="0.5">
+    <g fill="#00c3ff" fill-opacity="0.7">${c(s.tipLeft)}${c(s.tipRight)}</g>
+    <g fill="url(#sil-benthic-grad)" stroke="#00c3ff" stroke-width="1.4" stroke-opacity="0.5" stroke-linejoin="round">
+      <path d="${s.shoulders}" />
       <path d="${s.head}" />
-      <circle cx="${s.eyeLeft.cx}" cy="${s.eyeLeft.cy}" r="${s.eyeLeft.r}" />
-      <circle cx="${s.eyeRight.cx}" cy="${s.eyeRight.cy}" r="${s.eyeRight.r}" />
+      ${c(s.eyeLeft)}${c(s.eyeRight)}
+    </g>
+    <path d="${s.glint}" fill="#ffffff" fill-opacity="0.06" />
+    <g fill="#00c3ff" fill-opacity="0.35">${c(s.pupilLeft)}${c(s.pupilRight)}</g>
     </g>
   </svg>`
 }
