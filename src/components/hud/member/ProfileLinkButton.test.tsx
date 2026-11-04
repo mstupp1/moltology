@@ -11,6 +11,12 @@ beforeEach(() => {
   Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } })
 })
 describe('profile link sharing', () => {
+  it('prefers a readable username link when a username is claimed', async () => {
+    writeText.mockResolvedValue(undefined)
+    render(<ProfileLinkButton userId="opaque-account-id" handle="mstupp" />)
+    fireEvent.click(screen.getByRole('button', { name: 'Copy profile link' }))
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith(`${window.location.origin}/member/mstupp`))
+  })
   it('copies a stable profile link and explains the friend request', async () => {
     writeText.mockResolvedValue(undefined)
     render(<ProfileLinkButton userId="member-1" />)

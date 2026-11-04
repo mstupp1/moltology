@@ -72,17 +72,26 @@ describe('SEO Meta Tag Generator', () => {
     expect(handleMeta).toEqual(
       expect.arrayContaining([
         { name: 'robots', content: 'noindex, nofollow' },
-        { title: 'mstupp | Moltology' },
+        { title: 'Add mstupp on Moltology' },
       ]),
     )
     expect(larvaMeta).toEqual(
-      expect.arrayContaining([{ title: `${larvaName} | Moltology` }]),
+      expect.arrayContaining([{ title: `Add ${larvaName} on Moltology` }]),
     )
     expect(memberProfileSeo()).toEqual(
       expect.arrayContaining([{ title: MEMBER_PROFILE_SEO.title }]),
     )
     expect(memberIdentityFromRouteKey('mstupp')).toEqual({ handle: 'mstupp' })
     expect(memberIdentityFromRouteKey(larvaId)).toEqual({ userId: larvaId })
+    expect(memberIdentityFromRouteKey('NUBirqu1KNSnM41jXnQt3SMGobGHuoCJ')).toBeUndefined()
+    expect(memberProfileSeo({ userId: 'NUBirqu1KNSnM41jXnQt3SMGobGHuoCJ', handle: 'mstupp' })).toEqual(
+      expect.arrayContaining([
+        { property: 'og:title', content: 'Add mstupp on Moltology' },
+        { property: 'og:image', content: 'https://moltology.org/media/images/sharing/member-invite-v1.png' },
+        { property: 'og:image:width', content: '1200' },
+        { property: 'og:image:height', content: '630' },
+      ]),
+    )
   })
 
   it('emits a real search title that is never blank, including an empty query', () => {

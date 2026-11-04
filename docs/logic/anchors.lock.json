@@ -44,6 +44,7 @@
   "data.character-public-appearance::src/components/forum/ForumAvatar.tsx#ForumAvatar": "4caf953dd447",
   "data.character-public-appearance::src/components/UserAvatar.tsx#UserAvatar": "7f834179b0d2",
   "data.character-public-appearance::src/lib/server/db-services.ts#publicAvatarConfig": "87d64ff671ad",
+  "data.member-share-previews::src/lib/server/member-share-data.ts#getMemberShareIdentity": "0360f1f05222",
   "data.migrations-via-ci::.github/workflows/migrate.yml#npm run db:migrate": "96ac22906be5",
   "data.neon-compute-budget::docs/neon-storage-retention.md#Current constraints": "f9de002e2d17",
   "data.neon-compute-budget::src/lib/notifications-refresh.ts#NOTIFICATIONS_MIN_INTERVAL_MS": "55bf7676cdd3",

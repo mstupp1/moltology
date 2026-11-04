@@ -7,9 +7,9 @@ export function invitePath(userId: string): string {
   return `/i/${encodeURIComponent(userId)}`
 }
 
-/** Use the stable id; the profile route redirects to the current handle. */
-export function profileSharePath(userId: string): string {
-  return `/member/${encodeURIComponent(userId)}`
+/** Prefer readable usernames; existing id links still resolve. */
+export function profileSharePath(userId: string, handle?: string | null): string {
+  return `/member/${encodeURIComponent(handle?.trim() || userId)}`
 }
 
 export function readReferralCookie(cookieHeader?: string | null): string | null {
