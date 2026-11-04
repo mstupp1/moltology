@@ -5,6 +5,7 @@ import path from 'node:path'
 import { overlayCharacterOnImage, CharacterKey, getRandomCharacterKey, getCharacterInfo } from './lib/character-overlay'
 import { captureComposite } from './lib/composite-renderer'
 import { publishArchivedSocial } from './lib/social-archive'
+import { continuityFields } from './lib/social-continuity'
 import { assertNoKeywordCta } from './lib/instagram-copy-policy'
 import {
   queueInstagramPost,
@@ -376,6 +377,7 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
         zernioPostId: queueResult?.postId || null,
         zernioCommentId: queueResult?.commentId || null,
         isAiGenerated: true,
+        ...continuityFields(options.contentJson ? JSON.parse(fs.readFileSync(options.contentJson, 'utf8')) : { mascot: postData.mascot }),
       })
     } else {
       console.log(`\n1️⃣ [Dry Run] Skipped Drive archive and uploads. Polished image saved at: ${finalImagePath}`)

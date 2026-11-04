@@ -13,7 +13,7 @@
       "id": "eyebrow",
       "type": "pill",
       "text": "Three steps",
-      "size": 26,
+      "size": 30,
       "box": {
         "x": 7,
         "y": 6,
@@ -33,7 +33,8 @@
         "y": 12,
         "w": 86,
         "h": 18
-      }
+      },
+      "minSize": 64
     },
     {
       "id": "p1",
@@ -117,7 +118,7 @@
       "type": "text",
       "font": "body",
       "text": "Close every tab that is not the task.",
-      "size": 38,
+      "size": 40,
       "weight": 600,
       "valign": "center",
       "box": {
@@ -125,14 +126,15 @@
         "y": 34,
         "w": 66,
         "h": 14
-      }
+      },
+      "minSize": 36
     },
     {
       "id": "s2",
       "type": "text",
       "font": "body",
       "text": "Set one timer. Ignore the shallows until it rings.",
-      "size": 38,
+      "size": 40,
       "weight": 600,
       "valign": "center",
       "box": {
@@ -140,14 +142,15 @@
         "y": 50,
         "w": 66,
         "h": 14
-      }
+      },
+      "minSize": 36
     },
     {
       "id": "s3",
       "type": "text",
       "font": "body",
       "text": "Ship the rough version. Polish is a second dive.",
-      "size": 38,
+      "size": 40,
       "weight": 600,
       "valign": "center",
       "box": {
@@ -155,7 +158,8 @@
         "y": 66,
         "w": 66,
         "h": 14
-      }
+      },
+      "minSize": 36
     },
     {
       "id": "brand",
@@ -174,7 +178,7 @@
       "type": "text",
       "font": "body",
       "text": "Save this for tomorrow.",
-      "size": 30,
+      "size": 36,
       "weight": 500,
       "color": "muted",
       "align": "right",
@@ -184,7 +188,8 @@
         "y": 86,
         "w": 38,
         "h": 7
-      }
+      },
+      "minSize": 36
     }
   ]
 }

@@ -47,7 +47,7 @@ The schema and lint rules live in [`src/components/composite/layout-spec.ts`](..
 
 ## Lint
 
-Every render prints warnings for text inside the edge margin (`safeArea`, default 4%), text boxes without a height (they cannot auto-fit), type under 22px, and frames over 60 words. Treat them as review notes, not blockers.
+Every render prints warnings for text inside the edge margin (`safeArea`, default 4%), text boxes without a height (they cannot auto-fit), type under 36px (labels, pills and buttons under 30px), text that auto-fit could shrink under 36px, and frames over 40 words. These floors come from the type scale in [creative direction](../creative-direction.md). Auto-fit never shrinks below `minSize`, or 60 percent of `size` (at least 30px) when `minSize` is missing, so set `minSize` on every text layer that has a box height. Social runs treat these warnings as fixes; cut words before shrinking type.
 
 ## Copy
 

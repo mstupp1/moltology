@@ -26,7 +26,7 @@
       "id": "eyebrow",
       "type": "pill",
       "text": "MoltNation News",
-      "size": 24,
+      "size": 30,
       "box": {
         "x": 6,
         "y": 12,
@@ -46,14 +46,15 @@
         "y": 24,
         "w": 56,
         "h": 36
-      }
+      },
+      "minSize": 64
     },
     {
       "id": "dek",
       "type": "text",
       "font": "body",
       "text": "Focus is a depth, not a setting.",
-      "size": 34,
+      "size": 40,
       "weight": 500,
       "color": "bone",
       "box": {
@@ -61,7 +62,8 @@
         "y": 62,
         "w": 52,
         "h": 8
-      }
+      },
+      "minSize": 36
     },
     {
       "id": "brand",

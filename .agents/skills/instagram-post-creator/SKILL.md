@@ -11,7 +11,7 @@ description: >-
 
 Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
 
-Create a finished single-image Moltology post, with reviewed copy, full-frame artwork, and a verified queue or publication result. Read `BRAND_BIBLE.md`, `STYLE_GUIDE.md`, [the Instagram content strategy](../../../content/social/instagram-content-strategy.md), and the continuity ledger at `content/social/instagram-post-history.json` before choosing a campaign. Resume a pending draft rather than duplicating it. Write with the [writing playbook](../../../content/writing-playbook.md): set a loudness (usually 2–3), pitch three lines or concepts, and run its boredom check before any artwork. The October 9, 2026 strategy and built-in ImageGen defaults supersede legacy campaign and Antigravity image instructions.
+Create a finished single-image Moltology post, with reviewed copy, full-frame artwork, and a verified queue or publication result. Read `BRAND_BIBLE.md`, `STYLE_GUIDE.md`, [the Instagram content strategy](../../../content/social/instagram-content-strategy.md) and the [creative direction](../../../content/creative-direction.md) playbook, and run `npm run social:continuity` before choosing a campaign. Pick the series (lead magnets usually sit in Ask the Oracle) and fill the playbook's creative brief: with one frame, the stopper, focal point and headline carry everything. Resume a pending draft rather than duplicating it. Write with the [writing playbook](../../../content/writing-playbook.md): set a loudness (usually 2–3), pitch three lines or concepts, and run its boredom check before any artwork. The October 9, 2026 strategy and built-in ImageGen defaults supersede legacy campaign and Antigravity image instructions.
 
 For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
 
@@ -53,7 +53,7 @@ Read [comment-to-DM delivery guidance](references/comment-to-dm.md) before writi
 
 Write a relatable sentence-case hook, a short grounded value body, and one clear invitation. Follow the brand/style guide, including a maximum of three hashtags and no decorative diamonds or shouting headers.
 
-Save reviewed content JSON with these fields: `title`, `topic`, `hookHeadline`, `imagePrompt`, `caption`, `hashtags` (at most three strings), `firstComment`, and optional `mascot`. Omit the legacy `commentKeyword` field. This file is the publishing source of truth; pass it with `--content-json` so campaign defaults cannot replace approved copy.
+Save reviewed content JSON with these fields: `title`, `topic`, `hookHeadline`, `imagePrompt`, `caption`, `hashtags` (at most three strings), `firstComment`, `series`, `episode`, `creativeBrief`, and optional `mascot`. The CLI copies the series fields into the continuity ledger. Omit the legacy `commentKeyword` field. This file is the publishing source of truth; pass it with `--content-json` so campaign defaults cannot replace approved copy.
 
 Render a 2x Retina structural blueprint:
 
@@ -65,7 +65,7 @@ For custom layout copy or native 3:4 scaffolds, use `scripts/render-composite.ts
 
 For a look the built-in templates don't cover, render a layout spec instead: `npm run composite:render -- --spec content/composite-layouts/<name>.json --aspect 3:4`. Layouts recreated from references live there; see the `composite-reference-library` skill. When a layout came from a reference, attach the reference preview to the polish pass as a style reference.
 
-Select from the full mascot registry in `src/components/composite/MascotOverlay.tsx`; specify `--mascot` during experiments. Outside comparisons, apply the shared recent-usage rotation and pass the selected canonical key explicitly. Character cutouts live in S3 under `images/characters/`. Inspect the actual character reference and attach it when editing to preserve face, shell, proportions and attire. Keep one clearly visible character with natural ambient lighting and soft contact shadows, without harsh backlights or artificial halos.
+Select from the full mascot registry in `src/components/composite/MascotOverlay.tsx`; specify `--mascot` during experiments. Outside comparisons, start from the series cast in creative direction, apply the shared recent-usage rotation among equally strong matches, and pass the selected canonical key explicitly. Character cutouts live in S3 under `images/characters/`. Inspect the actual character reference and attach it when editing to preserve face, shell, proportions and attire. Keep one clearly visible character with natural ambient lighting and soft contact shadows, without harsh backlights or artificial halos.
 
 ## Visual polish: built-in ImageGen by default
 
@@ -74,7 +74,7 @@ Use the built-in **`image_gen.imagegen`** tool by default (`tools.image_gen__ima
 1. Inspect the local scaffold with `view_image` before editing.
 2. Supply the scaffold and inspected character references as local `referenced_image_paths`. Use `num_last_images_to_include` only when a target lacks a local path; never supply both. Specify exact approved text, sentence case, one category pill, and the single CTA selected for the goal. Keep the recognizable situation and useful step prominent. Use restrained glassmorphic HUD panels, rounded bevels, cyan `#00c3ff`, crimson `#ff453a`, dark navy abyss `#01060e` and subsea caustics with breathing room around text. Set `transparent_background: false` for the complete post; preserve transparency when editing character cutouts separately.
 3. Explicitly remove template artifacts that violate the style guide: certification seals, fake review stars, excess badges, decorative glyphs, dead widgets, emoji garnish, unsupported stats and unverified DM promises.
-4. Inspect the finished image at mobile reading size: recognizable situation, exact readable claim, useful payoff, spelling, margins, one appropriate CTA and mascot identity. The caption must not be needed to explain the image. Iterate if necessary.
+4. Run the creative-direction phone proof (the image at 390px wide) and inspect it at that size against the type scale: recognizable situation, exact readable claim, useful payoff, spelling, margins, one appropriate CTA and mascot identity. The caption must not be needed to explain the image. Iterate if necessary.
 5. Copy the selected image from the tool's returned generated-image location into workspace `tmp/` before ingestion. Save the final prompt beside the draft. Do not assume a destination-path argument or switch silently to an API/CLI fallback.
 
 ### Google Flow alternative

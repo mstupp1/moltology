@@ -50,7 +50,8 @@
         "y": 22,
         "w": 84,
         "h": 22
-      }
+      },
+      "minSize": 64
     },
     {
       "id": "body",
@@ -66,7 +67,8 @@
         "y": 45,
         "w": 76,
         "h": 9
-      }
+      },
+      "minSize": 36
     },
     {
       "id": "cta",
@@ -85,7 +87,7 @@
       "id": "link",
       "type": "text",
       "text": "Link in bio",
-      "size": 30,
+      "size": 36,
       "weight": 600,
       "tracking": 0.2,
       "uppercase": true,
@@ -96,7 +98,8 @@
         "y": 63.5,
         "w": 50,
         "h": 3
-      }
+      },
+      "minSize": 36
     },
     {
       "id": "mascot",

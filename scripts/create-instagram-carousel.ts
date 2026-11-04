@@ -5,6 +5,7 @@ import path from 'node:path'
 import matter from 'gray-matter'
 import { openCompositeSession } from './lib/composite-renderer'
 import { publishArchivedSocial } from './lib/social-archive'
+import { continuityFields } from './lib/social-continuity'
 import { CharacterKey, getRandomCharacterRotation, getCharacterInfo } from './lib/character-overlay'
 import { assertNoKeywordCta } from './lib/instagram-copy-policy'
 import {
@@ -838,6 +839,7 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
         zernioPostId: queueResult?.postId || null,
         zernioCommentId: queueResult?.commentId || null,
         isAiGenerated: true,
+        ...continuityFields(options.contentJson ? JSON.parse(fs.readFileSync(options.contentJson, 'utf8')) : { mascot }),
       })
     } else {
       console.log(`\n1️⃣ [Dry Run] Skipped Drive archive and uploads for ${slidePaths.length} slides.`)

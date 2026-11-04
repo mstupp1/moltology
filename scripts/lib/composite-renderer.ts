@@ -286,6 +286,12 @@ async function captureWithBrowser(
     })
     missingImages = missingImages.map((src) => (src.startsWith('data:') ? `${src.slice(0, 40)}…` : src))
     if (missingImages.length > 0) warnings.push(`${missingImages.length} image(s) failed to load: ${missingImages.join(', ')}`)
+    const overflowing = await page.evaluate(() =>
+      Array.from(document.querySelectorAll<HTMLElement>('[data-overflow]')).map((el) => el.dataset.overflow || 'text')
+    )
+    for (const layer of overflowing) {
+      warnings.push(`Text layer "${layer}" does not fit its box even at its minimum size and is clipped; cut words or enlarge the box`)
+    }
 
     await page.waitForTimeout(options.waitDelayMs ?? 250)
     await page.screenshot({

@@ -276,6 +276,25 @@ export function splitHighlights(text: string, highlight?: string | string[]): { 
     .map((part) => ({ text: part, hit: terms.some((t) => t.toLowerCase() === part.toLowerCase()) }))
 }
 
+/**
+ * Phone-readability floors in 1x canvas pixels (1080 wide). A feed shows that canvas at about
+ * 390pt, so 36px reads near 13pt. Roles and fuller sizes live in content/creative-direction.md.
+ */
+export const MIN_TEXT_PX = 36
+export const MIN_LABEL_PX = 30
+export const MAX_FRAME_WORDS = 40
+
+/** Smallest size a text layer can end up at once auto-fit has run (mirrors LayoutSlide). */
+export function textFitFloor(layer: { size: number; minSize?: number; fit?: boolean; box: { h?: number } }): number {
+  const fits = layer.box.h !== undefined && layer.fit !== false
+  if (!fits) return layer.size
+  return Math.min(layer.minSize ?? defaultFitMin(layer.size), layer.size)
+}
+
+export function defaultFitMin(size: number): number {
+  return Math.max(MIN_LABEL_PX, Math.round(size * 0.6))
+}
+
 export interface LayoutLintIssue {
   level: 'warn' | 'error'
   layer?: string
@@ -307,15 +326,32 @@ export function lintLayoutSpec(spec: LayoutSpec): LayoutLintIssue[] {
       if (h === undefined) {
         issues.push({ level: 'warn', layer: label, message: 'has no box height, so it cannot auto-fit and may overflow' })
       }
-      if (layer.size < 22) {
-        issues.push({ level: 'warn', layer: label, message: `font size ${layer.size}px is hard to read on a phone feed` })
+      if (layer.size < MIN_TEXT_PX) {
+        issues.push({ level: 'warn', layer: label, message: `font size ${layer.size}px is hard to read on a phone feed (min ${MIN_TEXT_PX}px)` })
+      } else {
+        const floor = textFitFloor(layer)
+        if (floor < MIN_TEXT_PX) {
+          issues.push({
+            level: 'warn',
+            layer: label,
+            message: `can auto-fit down to ${floor}px, too small for a phone feed; set minSize to ${MIN_TEXT_PX} or more and cut words`,
+          })
+        }
       }
     }
-    if (layer.type === 'list') words += layer.items.join(' ').split(/\s+/).filter(Boolean).length
+    if ((layer.type === 'pill' || layer.type === 'button') && layer.size !== undefined && layer.size < MIN_LABEL_PX) {
+      issues.push({ level: 'warn', layer: label, message: `label size ${layer.size}px is hard to read on a phone feed (min ${MIN_LABEL_PX}px)` })
+    }
+    if (layer.type === 'list') {
+      words += layer.items.join(' ').split(/\s+/).filter(Boolean).length
+      if (layer.size !== undefined && layer.size < MIN_TEXT_PX) {
+        issues.push({ level: 'warn', layer: label, message: `list size ${layer.size}px is hard to read on a phone feed (min ${MIN_TEXT_PX}px)` })
+      }
+    }
   })
 
-  if (words > 60) {
-    issues.push({ level: 'warn', message: `${words} words on one frame; strong ads usually carry under 40` })
+  if (words > MAX_FRAME_WORDS) {
+    issues.push({ level: 'warn', message: `${words} words on one frame; keep it to ${MAX_FRAME_WORDS} or fewer and cut, don't shrink` })
   }
 
   return issues

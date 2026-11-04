@@ -26,7 +26,7 @@
       "id": "eyebrow",
       "type": "pill",
       "text": "A question for the shallows",
-      "size": 28,
+      "size": 30,
       "align": "center",
       "box": {
         "x": 10,
@@ -52,14 +52,15 @@
         "y": 15,
         "w": 86,
         "h": 36
-      }
+      },
+      "minSize": 64
     },
     {
       "id": "answer-tease",
       "type": "text",
       "font": "body",
       "text": "Nature solved this 500 million years ago. Swipe for the memo.",
-      "size": 38,
+      "size": 40,
       "weight": 500,
       "align": "center",
       "color": "bone",
@@ -68,7 +69,8 @@
         "y": 53,
         "w": 76,
         "h": 10
-      }
+      },
+      "minSize": 36
     },
     {
       "id": "mascot",

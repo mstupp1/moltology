@@ -7,6 +7,7 @@ import {
   BRAND_COLORS,
   FONT_STACKS,
   boxToStyle,
+  defaultFitMin,
   resolveColor,
   splitHighlights,
   type LayoutLayer,
@@ -51,7 +52,7 @@ function FitText({ layer }: { layer: LayoutTextLayer }) {
     const fit = () => {
       if (cancelled) return
       const max = layer.size
-      const min = Math.min(layer.minSize ?? Math.max(12, Math.round(layer.size * 0.45)), max)
+      const min = Math.min(layer.minSize ?? defaultFitMin(layer.size), max)
       const fits = (px: number) => {
         el.style.fontSize = `${px}px`
         return el.scrollHeight <= el.clientHeight + 1 && el.scrollWidth <= el.clientWidth + 1
@@ -64,7 +65,8 @@ function FitText({ layer }: { layer: LayoutTextLayer }) {
           if (fits(mid)) lo = mid
           else hi = mid
         }
-        fits(Math.floor(lo * 2) / 2)
+        // At the floor and still too long: flag it so the capture warns instead of clipping silently.
+        if (!fits(Math.floor(lo * 2) / 2)) el.dataset.overflow = layer.id || 'text'
       }
       el.dataset.fit = 'done'
     }
