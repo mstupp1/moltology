@@ -1010,6 +1010,50 @@
         "height": 2880
       },
       "verifiedAt": "2026-11-03T14:09:33.394Z"
+    },
+    {
+      "id": "carousel-1793801288957",
+      "type": "carousel",
+      "topic": "Replace ambiguous final filenames with project, date, version and status",
+      "theme": "swipe-lab",
+      "mascot": "lobster_engineer",
+      "articleSlug": null,
+      "archivePath": "Social Archive/2026/11/carousel-caf679aa5c45e16e39e8717d",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/media/1793801290172_06a04be7fb164cca_01.png",
+        "https://media.zernio.com/media/1793801291471_c145de70e9f49f5e_02.png",
+        "https://media.zernio.com/media/1793801292569_b9737ed048b49b58_03.png",
+        "https://media.zernio.com/media/1793801293492_c87aca2d60569a31_04.png",
+        "https://media.zernio.com/media/1793801294561_6de197b6865f828b_05.png"
+      ],
+      "slideUrls": [
+        "https://media.zernio.com/media/1793801290172_06a04be7fb164cca_01.png",
+        "https://media.zernio.com/media/1793801291471_c145de70e9f49f5e_02.png",
+        "https://media.zernio.com/media/1793801292569_b9737ed048b49b58_03.png",
+        "https://media.zernio.com/media/1793801293492_c87aca2d60569a31_04.png",
+        "https://media.zernio.com/media/1793801294561_6de197b6865f828b_05.png"
+      ],
+      "slideCount": 5,
+      "aspectRatio": "3:4",
+      "caption": "Your final file has three aliases.\n\n“Final_final_REAL” has requested a disguise.\nUse project, date, version and status so the next person can tell what they have.\nKeep the approved copy in one agreed place.\n\nSave this naming rule before the next handoff.",
+      "hashtags": [
+        "#Moltology",
+        "#DigitalClutter",
+        "#CreativeWork"
+      ],
+      "firstComment": "https://moltology.org",
+      "status": "scheduled",
+      "scheduledFor": "2026-11-09T18:00:00.000Z",
+      "queueId": "6a84b76d2421e968ac81f5bc",
+      "zernioPostId": "6aeb3c4fd3d9f49b616eba85",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "createdAt": "2026-11-04T14:08:22.159Z",
+      "verifiedDimensions": {
+        "width": 2160,
+        "height": 2880
+      },
+      "verifiedAt": "2026-11-04T14:08:30.963Z"
     }
   ]
 }
