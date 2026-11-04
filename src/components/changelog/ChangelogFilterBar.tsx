@@ -54,24 +54,32 @@ export function ChangelogFilterBar({
   const control = 'min-h-10 rounded-control border border-line bg-surface-2 text-ink text-sm px-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 
   return (
-    <section aria-label="Filter updates" className={`rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-4 space-y-4 ${className}`}>
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
+    <section aria-label="Filter updates" className={`rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 space-y-3 ${className}`}>
+      <div className="grid grid-cols-1 gap-3 sm:flex sm:items-end">
+        <div className="relative min-w-0 sm:flex-1">
           <Search className="w-4 h-4 absolute left-3 top-3 text-ink-muted" aria-hidden="true" />
           <input ref={searchInputRef} type="search" aria-label="Search changelogs" placeholder="Search updates…"
             value={searchQuery} onChange={(e) => onSearchChange(e.target.value)} className={`${control} w-full pl-9`} />
         </div>
-        {tags.length > 0 && (
-          <label className="flex items-center gap-2 text-xs text-ink-muted">
-            Topic
-            <select aria-label="Filter by topic" value={selectedTag || ''} onChange={(e) => onTagChange?.(e.target.value || null)} className={`${control} flex-1 sm:w-44`}>
-              <option value="">All topics</option>
-              {tags.map((tag) => <option key={tag.label} value={tag.label}>{tag.label === 'UI/UX' ? 'Interface' : tag.label === 'Auth' ? 'Sign-in' : tag.label} {typeof tag.count === 'number' ? `(${tag.count})` : ''}</option>)}
+        <div className="grid min-w-0 grid-cols-1 gap-3 sm:block">
+          <label className="flex min-w-0 flex-col gap-1.5 text-xs text-ink-muted sm:hidden">
+            Category
+            <select aria-label="Filter by category" value={selectedCategory} onChange={(e) => onCategoryChange(e.target.value)} className={`${control} w-full min-w-0`}>
+              {categories.map((cat) => <option key={cat.label} value={cat.label}>{cat.label === 'ALL' ? 'All updates' : cat.label}{typeof cat.count === 'number' ? ` (${cat.count})` : ''}</option>)}
             </select>
           </label>
-        )}
+          {tags.length > 0 && (
+            <label className="flex min-w-0 flex-col gap-1.5 text-xs text-ink-muted sm:w-44">
+              Topic
+              <select aria-label="Filter by topic" value={selectedTag || ''} onChange={(e) => onTagChange?.(e.target.value || null)} className={`${control} w-full min-w-0`}>
+                <option value="">All topics</option>
+                {tags.map((tag) => <option key={tag.label} value={tag.label}>{tag.label === 'UI/UX' ? 'Interface' : tag.label === 'Auth' ? 'Sign-in' : tag.label} {typeof tag.count === 'number' ? `(${tag.count})` : ''}</option>)}
+              </select>
+            </label>
+          )}
+        </div>
       </div>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="hidden sm:flex flex-wrap items-center gap-2">
         <div className="flex flex-wrap gap-1.5 flex-1" role="group" aria-label="Filter by category">
           {categories.map((cat) => (
             <button key={cat.label} type="button" aria-pressed={selectedCategory === cat.label} onClick={() => onCategoryChange(cat.label)}
@@ -82,6 +90,7 @@ export function ChangelogFilterBar({
         </div>
         {hasActiveFilters && <button type="button" title="Reset all filters" onClick={onReset} className={`${control} text-xs`}>Clear filters</button>}
       </div>
+      {hasActiveFilters && <button type="button" title="Reset all filters" onClick={onReset} className={`${control} w-full text-xs sm:hidden`}>Clear filters</button>}
       {hasActiveFilters && <p role="status" className="text-xs text-ink-muted">Showing {filteredCount} of {totalCount} updates</p>}
     </section>
   )

@@ -2,19 +2,17 @@ import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import React, { useState } from 'react'
 import { HudTabs } from '@/components/ui/HudTabs'
 import { HudButton } from '@/components/ui/HudButton'
-import { LocalTime } from '@/components/ui/LocalTime'
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
+import { DashboardPanel, DASHBOARD_FOCUS } from '@/components/hud/dashboard/DashboardPanel'
+import { formatReleaseDay } from '@/components/hud/dashboard/DashboardChangelogPanel'
 import { Link } from '@tanstack/react-router'
 import { HudGhostCard } from '@/components/ui/HudGhostLoader'
 import {
+  GitCommit,
   HelpCircle,
-  Activity,
   ChevronDown,
   ChevronUp,
-  Clock,
   AlertTriangle,
-  Database,
-  ShieldCheck,
-  Zap,
   ExternalLink,
   RotateCcw,
 } from 'lucide-react'
@@ -23,11 +21,11 @@ import { ChangelogFilterBar } from '@/components/changelog/ChangelogFilterBar'
 import { HudPagination } from '@/components/ui/HudPagination'
 import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 import SupportTicketForm from '@/components/hud/SupportTicketForm'
-import { SUPPORT_PAGE_COPY, SUPPORT_TICKET_COPY } from '@/lib/support-tickets'
+import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 
 export default function SupportPortalView({ loaderData }: { loaderData: any }) {
   // loaderData passed as prop
-  const [activeTab, setActiveTab] = useState<'changelog' | 'kb' | 'ticket' | 'diagnostics'>('ticket')
+  const [activeTab, setActiveTab] = useState<'changelog' | 'kb' | 'ticket'>('ticket')
   const changelogs: ChangelogEntry[] = loaderData?.changelogs || []
   const loading = !loaderData?.changelogs
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
@@ -35,7 +33,7 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 20
-  const [expandedEntries, setExpandedEntries] = useState<Record<string, boolean>>({ v1_0_0: true, v1_4_2: true })
+  const [expandedEntries, setExpandedEntries] = useState<Record<string, boolean>>({})
 
   const toggleExpand = (version: string) => {
     setExpandedEntries((prev) => ({
@@ -134,19 +132,20 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
   return (
     <div className="chitin-card rounded-card p-4 sm:p-6 space-y-5 font-sans text-ink">
       <HudTitlePanel treatment="integrated" title={SUPPORT_PAGE_COPY.pageTitle} />
-      <HudTabs
-        label="Support sections"
-        className="grid grid-cols-2 gap-x-4 gap-y-0 sm:flex sm:gap-5"
-        idPrefix="support-tab"
-        value={activeTab}
-        onValueChange={setActiveTab}
-        items={[
-          { value: 'changelog', label: SUPPORT_PAGE_COPY.tabChangelog },
-          { value: 'kb', label: SUPPORT_PAGE_COPY.tabFaq },
-          { value: 'ticket', label: SUPPORT_TICKET_COPY.formTitle },
-          { value: 'diagnostics', label: SUPPORT_PAGE_COPY.tabDiagnostics },
-        ]}
-      />
+      <HorizontalScroll className="overflow-x-auto p-1">
+        <HudTabs
+          label="Support sections"
+          className="w-max min-w-full flex-nowrap [&_button]:shrink-0"
+          idPrefix="support-tab"
+          value={activeTab}
+          onValueChange={setActiveTab}
+          items={[
+            { value: 'changelog', label: SUPPORT_PAGE_COPY.tabChangelog },
+            { value: 'kb', label: SUPPORT_PAGE_COPY.tabFaq },
+            { value: 'ticket', label: SUPPORT_PAGE_COPY.tabContact },
+          ]}
+        />
+      </HorizontalScroll>
       <div role="tabpanel" aria-labelledby={`support-tab-${activeTab}`}>
         {/* Changelog */}
         {activeTab === 'changelog' && (
@@ -167,7 +166,7 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
               className="border-line-subtle"
             />
 
-            {/* Changelog Entries Timeline */}
+            {/* Release rows match the dashboard. */}
             {loading ? (
               <div className="space-y-4">
                 <HudGhostCard lines={3} />
@@ -188,99 +187,45 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
                 </HudButton>
               </div>
             ) : (
-              <div className="space-y-4 relative">
-                <div aria-hidden="true" className="absolute left-2 md:left-3 top-4 bottom-4 w-px bg-line" />
-
-                {paginatedChangelogs.map((entry) => {
-                  const key = entry.version.replace(/\./g, '_')
-                  const isExpanded = expandedEntries[entry.version] || expandedEntries[key]
-
-                  return (
-                    <div key={entry.version} className="group relative z-10 pl-6 md:pl-8">
-                      <div aria-hidden="true" className="absolute left-2 md:left-3 top-5 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-cyan-glow border-2 border-surface-1" />
-
-                      {/* Entry Card */}
-                      <div className="rounded-card border border-line-subtle bg-surface-2 p-4 md:p-5 space-y-3">
-                        {/* Top Bar: Version & Metadata */}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-line/60 pb-3">
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            <span className="font-grotesk font-extrabold text-sm md:text-base text-ink">
-                              {entry.version}
-                            </span>
-                            <span className="text-[11px] font-bold px-2 py-0.5 text-cyan-glow bg-cyan-soft rounded-chip uppercase">
-                              {entry.category}
-                            </span>
-                            {(Array.isArray(entry.tags) ? entry.tags.filter((t) => t.toLowerCase() !== entry.category?.toLowerCase()) : []).map((tag) => (
-                              <span
-                                key={tag}
-                                className="text-[11px] text-ink-muted"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                            <span className="text-[11px] text-ink-muted flex items-center gap-1">
-                              <Clock className="w-3 h-3 text-cyan-glow" />
-                              <LocalTime value={entry.releasedAt} />
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Title & Summary */}
-                        <div className="space-y-1">
-                          <h2 className="font-grotesk text-sm md:text-base font-bold text-ink">
-                            {entry.title}
-                          </h2>
-                          <p className="text-xs text-ink-muted leading-relaxed">
-                            {entry.summary}
-                          </p>
-                        </div>
-
-                        {/* Expandable Markdown Release Notes */}
+              <DashboardPanel icon={<GitCommit />} title="What’s new">
+                <ol className="divide-y divide-line-subtle -my-1">
+                  {paginatedChangelogs.map((entry) => {
+                    const key = entry.version.replace(/\./g, '_')
+                    const isExpanded = Boolean(expandedEntries[key])
+                    return (
+                      <li key={entry.version} className="py-1">
+                        <button
+                          type="button"
+                          onClick={() => toggleExpand(key)}
+                          aria-expanded={isExpanded}
+                          aria-label={`${isExpanded ? SUPPORT_PAGE_COPY.changelogCollapse : SUPPORT_PAGE_COPY.changelogExpand}: ${entry.title}`}
+                          className={`group grid w-full grid-cols-[3.25rem_minmax(0,1fr)_auto] gap-3 py-2.5 rounded-control hover:bg-surface-2 text-left transition-colors ${DASHBOARD_FOCUS}`}
+                        >
+                          <time dateTime={formatReleaseDay(entry.releasedAt) ? new Date(entry.releasedAt).toISOString() : undefined} className="text-[11px] font-bold text-ink-muted tabular-nums pt-0.5">
+                            {formatReleaseDay(entry.releasedAt)}
+                          </time>
+                          <span className="min-w-0 flex flex-col gap-0.5">
+                            <span className="text-sm font-bold text-ink group-hover:text-cyan-glow transition-colors leading-snug line-clamp-2 sm:line-clamp-1">{entry.title}</span>
+                            <span className="text-xs text-ink-muted leading-relaxed line-clamp-2 sm:line-clamp-1">{entry.summary}</span>
+                          </span>
+                          {isExpanded ? <ChevronUp className="w-4 h-4 text-cyan-glow mt-0.5" /> : <ChevronDown className="w-4 h-4 text-ink-muted mt-0.5" />}
+                        </button>
                         {isExpanded && (
-                          <div className="pt-3 border-t border-line/50 bg-surface-2 p-4 rounded-card">
+                          <div className="space-y-3 border-t border-line-subtle py-4 sm:ml-[4rem]">
+                            <div className="flex flex-wrap gap-2 text-[11px] text-ink-muted">
+                              <span>{entry.version}</span>
+                              <span>{entry.category}</span>
+                              {entry.slug && <Link to="/changelog/$slug" params={{ slug: entry.slug }} className={`inline-flex items-center gap-1 text-cyan-glow rounded-control ${DASHBOARD_FOCUS}`}>
+                                {SUPPORT_PAGE_COPY.changelogPermalink}<ExternalLink className="w-3 h-3" />
+                              </Link>}
+                            </div>
                             <NewsArticleBody content={entry.content} />
                           </div>
                         )}
-
-                        {/* Card Footer Toggle Button */}
-                        <div className="flex justify-between items-center pt-1">
-                          <div className="flex items-center gap-3">
-                            <button
-                              onClick={() => toggleExpand(key)}
-                              aria-expanded={Boolean(isExpanded)}
-                              className="min-h-10 rounded-control text-xs text-cyan-glow hover:text-ink font-bold flex items-center gap-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-                            >
-                              {isExpanded ? (
-                                <>
-                                  <span>{SUPPORT_PAGE_COPY.changelogCollapse}</span>
-                                  <ChevronUp className="w-3.5 h-3.5" />
-                                </>
-                              ) : (
-                                <>
-                                  <span>{SUPPORT_PAGE_COPY.changelogExpand}</span>
-                                  <ChevronDown className="w-3.5 h-3.5" />
-                                </>
-                              )}
-                            </button>
-
-                            {entry.slug && (
-                              <Link
-                                to="/changelog/$slug"
-                                params={{ slug: entry.slug }}
-                                className="min-h-8 rounded-control text-[11px] text-ink-muted hover:text-cyan-glow font-bold flex items-center gap-1 transition-colors border border-line px-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-                                title="View public permalink page"
-                              >
-                                <span>{SUPPORT_PAGE_COPY.changelogPermalink}</span>
-                                <ExternalLink className="w-2.5 h-2.5" />
-                              </Link>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-
+                      </li>
+                    )
+                  })}
+                </ol>
                 {/* Pagination Controls */}
                 <HudPagination
                   currentPage={currentPage}
@@ -294,7 +239,7 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
                   }}
                   itemName="releases"
                 />
-              </div>
+              </DashboardPanel>
             )}
           </div>
         )}
@@ -348,43 +293,6 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
         {activeTab === 'ticket' && (
           <div className="space-y-4">
             <SupportTicketForm />
-          </div>
-        )}
-
-        {activeTab === 'diagnostics' && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 border-b border-line pb-3">
-              <Activity className="w-5 h-5 text-cyan-glow" />
-              <h2 className="font-grotesk text-sm font-bold text-ink uppercase tracking-wider">
-                {SUPPORT_PAGE_COPY.diagnosticsTitle}
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              <div className="rounded-card border border-line-subtle bg-surface-2 p-4 space-y-2">
-                <span className="text-[11px] text-ink-muted uppercase font-bold">{SUPPORT_PAGE_COPY.diagnosticsDatabase}</span>
-                <div className="text-sm font-bold text-cyan-glow flex items-center gap-1.5">
-                  <Database className="w-4 h-4 text-cyan-glow" />
-                  <span>{SUPPORT_PAGE_COPY.diagnosticsOk}</span>
-                </div>
-              </div>
-
-              <div className="rounded-card border border-line-subtle bg-surface-2 p-4 space-y-2">
-                <span className="text-[11px] text-ink-muted uppercase font-bold">{SUPPORT_PAGE_COPY.diagnosticsAuth}</span>
-                <div className="text-sm font-bold text-cyan-glow flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-cyan-glow" />
-                  <span>{SUPPORT_PAGE_COPY.diagnosticsHealthy}</span>
-                </div>
-              </div>
-
-              <div className="rounded-card border border-line-subtle bg-surface-2 p-4 space-y-2">
-                <span className="text-[11px] text-ink-muted uppercase font-bold">{SUPPORT_PAGE_COPY.diagnosticsApp}</span>
-                <div className="text-sm font-bold text-cyan-glow flex items-center gap-1.5">
-                  <Zap className="w-4 h-4 text-cyan-glow" />
-                  <span>{SUPPORT_PAGE_COPY.diagnosticsOk}</span>
-                </div>
-              </div>
-            </div>
           </div>
         )}
       </div>

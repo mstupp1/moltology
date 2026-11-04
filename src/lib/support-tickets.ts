@@ -57,10 +57,10 @@ export const SUPPORT_TICKET_COPY = {
 
 export const SUPPORT_PAGE_COPY = {
   eyebrow: 'Support',
-  pageTitle: 'Contact support',
+  pageTitle: 'Support',
   tabChangelog: 'Changelog',
   tabFaq: 'FAQ',
-  tabDiagnostics: 'Diagnostics',
+  tabContact: 'Contact',
   changelogLive: 'Live',
   changelogEmpty: 'No matching releases',
   changelogEmptyHint: (query: string) => `Nothing matches "${query}".`,
@@ -76,12 +76,6 @@ export const SUPPORT_PAGE_COPY = {
   faqBillingBody: 'Questions about purchases and the Market.',
   faqPrivacyTitle: 'Privacy',
   faqPrivacyBody: 'How to manage privacy and notification settings.',
-  diagnosticsTitle: 'Diagnostics',
-  diagnosticsDatabase: 'Database',
-  diagnosticsAuth: 'Sign-in',
-  diagnosticsApp: 'App',
-  diagnosticsOk: 'Operational',
-  diagnosticsHealthy: 'Healthy',
 } as const
 
 export const SUPPORT_TICKET_CATEGORY_LABELS: Record<SupportTicketCategoryId, string> = {
