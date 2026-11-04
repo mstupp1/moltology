@@ -23,6 +23,7 @@ import { useToast } from '@/components/ui/ToastProvider'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { useMemberSearch } from '@/hooks/useMemberSearch'
 import { MEMBER_SEARCH_MIN_CHARS } from '@/lib/member-search'
+import { ReferralPanel } from './ReferralPanel'
 
 export {
   CONNECTIONS_FRIENDS_EMPTY,
@@ -149,6 +150,8 @@ export const ConnectionsPage: React.FC<{
           </p>
         )}
       </div>
+
+      <ReferralPanel />
 
       <SynapticNearbyStrip
         members={suggested}

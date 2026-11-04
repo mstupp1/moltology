@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { welcome, ensureProfile, persistSignup, signupMarketing, confirmMarketing } = vi.hoisted(() => ({
-  welcome: vi.fn(), ensureProfile: vi.fn(), persistSignup: vi.fn(), signupMarketing: vi.fn(), confirmMarketing: vi.fn(),
+const { welcome, ensureProfile, persistSignup, signupMarketing, confirmMarketing, captureReferral } = vi.hoisted(() => ({
+  welcome: vi.fn(), ensureProfile: vi.fn(), persistSignup: vi.fn(), signupMarketing: vi.fn(), confirmMarketing: vi.fn(), captureReferral: vi.fn(),
 }))
+vi.mock('./server/referrals', () => ({ captureSignupReferral: captureReferral }))
 vi.mock('./server/welcome-email', async (importOriginal) => ({
   ...await importOriginal<typeof import('./server/welcome-email')>(),
   sendWelcomeForVerifiedUser: welcome,
@@ -26,6 +27,13 @@ describe('automatic welcome auth hooks', () => {
   beforeEach(() => {
     vi.resetAllMocks()
     welcome.mockResolvedValue(undefined)
+  })
+
+  it.each(['/sign-up/email', '/callback/:id'])('captures the invitation only on account creation through %s', async (path) => {
+    const request = new Request('https://moltology.org/api/auth/signup', { headers: { cookie: 'moltology_inviter=sponsor' } })
+    await afterCreation(user, { path, request } as unknown as CreationContext)
+    expect(captureReferral).toHaveBeenCalledExactlyOnceWith(user.id, request)
+    expect(ensureProfile.mock.invocationCallOrder[0]).toBeLessThan(captureReferral.mock.invocationCallOrder[0])
   })
 
   it('welcomes a newly verified email account without changing the existing consent callback', async () => {

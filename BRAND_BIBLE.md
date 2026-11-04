@@ -99,7 +99,7 @@ Plain names for real features. Use them as written; don't invent in-world substi
 |---|---|
 | **Moltmaxxing** | The brand's verb for doing the work of the molt. The **Moltmaxxing Audit** is the free diagnostic quiz. **Meltmaxxing** is its opposite, used for contrast. |
 | **Liturgies** | The eight daily tasks in the HUD. |
-| **XP** | Experience earned by completing liturgies and streaks. Stage and clearance follow lifetime XP. |
+| **XP** | Experience earned by completing liturgies, streaks, and qualifying referrals. Stage and clearance follow lifetime XP. |
 | **Standing** | A member's forum reputation, from upvotes and review. |
 | **Chitin Gems** | The earned currency. |
 | **Molt Credits** | The paid currency. |

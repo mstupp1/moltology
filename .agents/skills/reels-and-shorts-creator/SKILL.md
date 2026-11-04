@@ -23,6 +23,8 @@ Read before writing:
 - [The Reels strategy](../../../content/social/reels-strategy.md) and the [annual content calendar](../../../content/annual-content-calendar.md) for the intended slot.
 - `content/social/instagram-reel-history.json`. Avoid the last three topics and hooks, and the formats used in the last three reels.
 
+For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+
 ## 1. Find the situation
 
 Start from one recognisable everyday moment, as specific as possible: a time, an object, a sentence someone actually says. "Your calendar" is a topic; "an invite called 'sync' with no agenda" is a situation. An uncovered blog dispatch can supply it. Research real-world claims with primary sources; never invent news, studies or outcomes.
@@ -70,11 +72,11 @@ Follow [references/production.md](references/production.md) for the opening imag
 ```bash
 npm run reel:create -- --content-json tmp/reel-next/draft.json \
   --scene-frames tmp/reel-next/frames --custom-outro tmp/reel-next/outro.png \
-  --mascot lobster_engineer --cta-goal quiz --video-budget 3.30 --render-only
+  --mascot "$MASCOT" --cta-goal quiz --video-budget 3.30 --render-only
 
 npm run reel:create -- --content-json tmp/reel-next/draft.json \
   --custom-video tmp/reel-daily-<id>/master-reel-<id>.mp4 \
-  --mascot lobster_engineer --cta-goal quiz --commit
+  --mascot "$MASCOT" --cta-goal quiz --commit
 ```
 
 Before queueing, watch the final file once with sound on at phone size and run the boredom check again. If the jokes don't land in the edit (a punchline buried under a cut, a pause that kills the rhythm), fix the edit or the script first.

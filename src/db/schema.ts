@@ -184,6 +184,38 @@ export const profiles = pgTable('profiles', {
 // Alias users export to profiles for backward compatibility if needed
 export const users = profiles
 
+/** Signup attribution is fixed at account creation; friendship is independent. */
+export const memberReferrals = pgTable('member_referrals', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  referrerId: text('referrerId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  referredUserId: text('referredUserId').unique().references(() => profiles.id, { onDelete: 'set null' }),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  qualifiedAt: timestamp('qualifiedAt'),
+}, (table) => [
+  index('member_referrals_referrer_idx').on(table.referrerId),
+  pgPolicy('member_referrals_server_only', {
+    for: 'all',
+    using: sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`,
+    withCheck: sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`,
+  }),
+])
+
+/** Unique monthly slots enforce the cap even across concurrent activations. */
+export const referralRewards = pgTable('referral_rewards', {
+  referralId: uuid('referralId').primaryKey().references(() => memberReferrals.id, { onDelete: 'cascade' }),
+  referrerId: text('referrerId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  month: text('month').notNull(), // UTC calendar month, YYYY-MM
+  slot: integer('slot').notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('referral_rewards_month_slot_uidx').on(table.referrerId, table.month, table.slot),
+  pgPolicy('referral_rewards_server_only', {
+    for: 'all',
+    using: sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`,
+    withCheck: sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`,
+  }),
+])
+
 // User Biometric Stats Table (Moltmaxxing Dashboard)
 export const userStats = pgTable('user_stats', {
   id: uuid('id').defaultRandom().primaryKey(),

@@ -109,7 +109,7 @@ page's structure; a title alone does not need its own card.
   sections. Use for Community, Academy, admin pages, and editor toolbars.
 - `treatment="integrated"`: heading inside an existing workspace surface, separated
   from its controls/content by a divider. Use for Search, Connections, Activity Stream,
-  Settings, and Covenant Watch. The parent supplies padding and section spacing.
+  Settings, Daily Alignment, and Covenant Watch. The parent supplies padding and section spacing.
 - `treatment="hero"`: substantial introduction with useful imagery, identity, or
   overview content. Premium uses this explicitly. Dashboard and member profiles
   retain their purpose-built identity compositions.
@@ -122,7 +122,9 @@ instead of letting artwork compete with heading text. Integrated headings inheri
 `actions` holds page-level commands or a short status summary. `toolbar` spans the
 full width below the heading and actions, for navigation or filters. Both wrap on
 small screens; do not force fixed header heights. Keep collection filters near
-their results and editor save actions accessible while scrolling.
+their results and editor save actions accessible while scrolling. Admin overview
+metrics, tool links, and section tabs share one solid workspace; keep Atlas
+filters and Store settings navigation on solid surfaces too.
 
 Use one page heading. Keep descriptions brief, omit redundant eyebrows, and avoid
 repeating the page title as the first section heading. Oracle, lesson readers,

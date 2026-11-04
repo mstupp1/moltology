@@ -7,6 +7,7 @@ import { LoadoutStatsPanel } from '@/components/hud/chassis/LoadoutStatsPanel'
 import { ReadOnlyPaperDoll } from './ReadOnlyPaperDoll'
 import { PremiumBadge } from '@/components/hud/PremiumBadge'
 import { FriendRequestButton } from './FriendRequestButton'
+import { ProfileLinkButton } from './ProfileLinkButton'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { getPublicProfileFn, getMemberLoadoutFn } from '@/lib/server/api'
@@ -191,7 +192,8 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
                 ))}
               </ul>
             )}
-            <div className="pt-1">
+            <div className="pt-1 flex flex-wrap items-center gap-2">
+              {profile.relationship === 'self' && <ProfileLinkButton userId={profile.id} handle={profile.handle} />}
               <FriendRequestButton
                 profileId={profile.id}
                 relationship={profile.relationship}

@@ -104,6 +104,19 @@ rules:
       - file: src/lib/stats-roller.ts
         symbol: rollBaseStats
     tests: [src/lib/stats-roller.test.ts]
+  - id: progression.referral-rewards
+    title: Qualified referral XP
+    kind: threshold
+    statement: A new member qualifies after a character, username, and first liturgy. The referrer earns 100 XP once, capped at five per UTC month of qualification. Clicks, existing accounts, self-referrals, and simulated members earn none. Unchecking a liturgy does not undo qualification. Deleting a referred account keeps its reward slot occupied.
+    dependsOn: [social.referrals, progression.xp-ledger, economy.red-line]
+    anchors:
+      - file: src/lib/referrals.ts
+        symbol: REFERRAL_XP
+      - file: src/lib/referrals.ts
+        symbol: REFERRAL_MONTHLY_CAP
+      - file: src/lib/server/referrals.ts
+        symbol: qualifyReferral
+    tests: [src/lib/server/referrals.integration.test.ts]
 ---
 
 Progression is the earned half of the economy. The XP ledger is the source of truth, and `profiles.xp` and `profiles.stage` are caches rebuilt from it after every change.

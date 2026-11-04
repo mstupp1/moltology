@@ -10,7 +10,7 @@
  */
 
 import { MARKETING_ASSET_VERSION } from './marketing-assets-version'
-import { SITE_ORIGIN } from './seo'
+import { SITE_ORIGIN } from './site-origin'
 import { webpTwinKey } from './asset-formats'
 
 export { MARKETING_ASSET_VERSION }

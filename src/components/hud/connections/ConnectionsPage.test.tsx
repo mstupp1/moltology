@@ -28,6 +28,7 @@ vi.mock('@/lib/jwt', () => ({
 }))
 
 vi.mock('@/lib/server/api', () => ({
+  getReferralSummaryFn: vi.fn().mockResolvedValue({ userId: 'self', rewardedThisMonth: 0, totalXp: 0, referrals: [] }),
   listConnectionsFn: vi.fn(),
   searchMembersFn: vi.fn(),
   sendFriendRequestFn: vi.fn(),

@@ -1,7 +1,7 @@
 import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { useState, useMemo, useRef, useEffect } from 'react'
-import { Calendar, Check } from 'lucide-react'
-import { DashboardPanel } from '@/components/hud/dashboard/DashboardPanel'
+import { Check } from 'lucide-react'
+import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { DailyRoutineGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
@@ -433,24 +433,26 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
 
   return (
     <HudGhostWidget isLoading={isLoading || isAlignmentLoading} skeleton={<DailyRoutineGhost />}>
-      <DashboardPanel
+      <section
         id={DAILY_ALIGNMENT_HUB_ID}
-        icon={<Calendar />}
-        title="Daily alignment"
-        className="lg:p-5 gap-4 font-sans overflow-hidden scroll-mt-24"
-        meta={
-          <span
-            data-testid="alignment-count"
-            className={cn(
-              'inline-flex items-center gap-1 rounded-chip px-2 py-1 text-[11px] font-bold tabular-nums',
-              allDone ? 'bg-emerald-500/15 text-emerald-500' : 'bg-surface-3 text-ink',
-            )}
-          >
-            {allDone && <Check className="w-3 h-3" aria-hidden="true" />}
-            {completedCount}/{totalCount} done
-          </span>
-        }
+        className="min-w-0 rounded-card bg-surface-1 p-4 sm:p-5 space-y-4 font-sans overflow-hidden scroll-mt-24"
       >
+        <HudTitlePanel
+          treatment="integrated"
+          title="Daily alignment"
+          actions={
+            <span
+              data-testid="alignment-count"
+              className={cn(
+                'inline-flex items-center gap-1 rounded-chip px-2 py-1 text-[11px] font-bold tabular-nums',
+                allDone ? 'bg-emerald-500/15 text-emerald-500' : 'bg-surface-3 text-ink',
+              )}
+            >
+              {allDone && <Check className="w-3 h-3" aria-hidden="true" />}
+              {completedCount}/{totalCount} done
+            </span>
+          }
+        />
         <AlignmentChamber tasks={tasks} />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 min-w-0">
           <div className="lg:col-span-7 min-w-0 space-y-2">
@@ -514,7 +516,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
             <ActivityHeatmap history={history} currentDate={currentDate} />
           </div>
         </div>
-      </DashboardPanel>
+      </section>
     </HudGhostWidget>
   )
 }

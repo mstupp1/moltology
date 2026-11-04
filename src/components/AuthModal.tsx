@@ -26,6 +26,12 @@ interface AuthModalProps {
   initialMode?: 'login' | 'signup'
 }
 
+function authModalDestination(): string {
+  return typeof window !== 'undefined' && window.location.pathname.startsWith('/member/')
+    ? window.location.pathname
+    : '/dashboard'
+}
+
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
@@ -101,8 +107,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     try {
       const callbackURL =
         typeof window !== 'undefined'
-          ? `${window.location.origin}/dashboard`
-          : '/dashboard'
+          ? `${window.location.origin}${authModalDestination()}`
+          : authModalDestination()
       const res = await authClient.sendVerificationEmail({
         email: pendingVerificationEmail,
         callbackURL,
@@ -124,8 +130,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     try {
       const user = await startGoogleSignIn({
         signInSocial: (args) => authClient.signIn.social(args),
-        callbackURL: `${window.location.origin}/dashboard`,
-        destination: '/dashboard',
+        callbackURL: `${window.location.origin}${authModalDestination()}`,
+        destination: authModalDestination(),
       })
       if (user) {
         if (onSuccess) onSuccess()
@@ -145,7 +151,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     try {
       if (mode === 'signup') {
         const callbackURL =
-          typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : '/dashboard'
+          typeof window !== 'undefined' ? `${window.location.origin}${authModalDestination()}` : authModalDestination()
         const res = await authClient.signUp.email({
           email,
           password,
@@ -163,7 +169,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           stashPendingSignup({
             emailOptIn,
             email,
-            callbackURL: '/dashboard',
+            callbackURL: authModalDestination(),
           })
           setPendingVerificationEmail(email)
           setResendMessage(null)
