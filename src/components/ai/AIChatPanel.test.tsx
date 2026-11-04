@@ -869,7 +869,7 @@ describe('AIChatPanel 3D Synaptic Entity Mode', () => {
     fireEvent.click(toggleToEntity)
 
     expect(screen.getByTestId('synaptic-entity-hud')).toBeInTheDocument()
-    expect(screen.getByTestId('synaptic-entity-canvas')).toBeInTheDocument()
+    expect(await screen.findByTestId('synaptic-entity-canvas')).toBeInTheDocument()
     expect(screen.queryByTestId('entity-status-pill')).not.toBeInTheDocument()
     expect(screen.getByText('Interface with the Synaptic Core')).toBeInTheDocument()
 

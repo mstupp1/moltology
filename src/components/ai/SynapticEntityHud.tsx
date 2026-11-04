@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, { Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import {
   AlertCircle,
   ArrowUpRight,
@@ -19,9 +19,12 @@ import {
   withStreamingCursor,
 } from '../ai-elements/message'
 import { DEFAULT_PROMPT_SHORTCUTS, type PromptShortcut } from './NewChatScreen'
-import { SynapticEntityCanvas } from './SynapticEntityCanvas'
+import { SynapticCoreFallback } from './SynapticCoreFallback'
 import type { OracleEntityBridge } from '@/lib/ai/oracle-entity-bridge'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
+
+// three.js loads only when the core view opens.
+const SynapticEntityCanvas = lazy(() => import('./SynapticEntityCanvas'))
 
 export interface EntityHudMessage {
   id: string
@@ -113,11 +116,13 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
     >
       {/* 3D Procedural Synaptic Brain Backdrop */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <SynapticEntityCanvas
-          bridge={bridge}
-          isCompact={isCompact || isPhone}
-          className="w-full h-full"
-        />
+        <Suspense fallback={<SynapticCoreFallback />}>
+          <SynapticEntityCanvas
+            bridge={bridge}
+            isCompact={isCompact || isPhone}
+            className="w-full h-full"
+          />
+        </Suspense>
         {/* Subtle top/bottom vignette for HUD legibility */}
         <div
           aria-hidden="true"

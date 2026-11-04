@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { SynapticCoreFallback } from './SynapticCoreFallback'
 
 export interface EntityBridgeFrameSnapshot {
   lifecycle: 'idle' | 'typing' | 'thinking' | 'streaming' | 'error'
@@ -25,23 +26,29 @@ export interface SynapticEntityCanvasProps {
   className?: string
 }
 
+/*
+ * The synaptic core: one calm, glassy deep-sea body with a handful of fine
+ * filaments. Light travels out along the filaments as reply text arrives,
+ * gathers toward the centre while the Oracle is thinking, and the rim cools to
+ * crimson on an error. The body leans gently toward the pointer. Nothing spins
+ * on its own.
+ *
+ * Cost: four draw calls (halo, body, filaments, marine snow), ~30fps while
+ * idle, a near-still frame for reduced motion, and paused when hidden.
+ */
+
 interface Disposable {
   dispose: () => void
 }
 
-interface SharedUniforms {
-  uTime: { value: number }
-  uStreamVelocity: { value: number }
-  uPulseEnergy: { value: number }
-  uThinkingTension: { value: number }
-  uTypingIntensity: { value: number }
-  uSynapseFlash: { value: number }
-  uColorShift: { value: number }
-  uReducedMotion: { value: number }
-  uPixelRatio: { value: number }
-  uColor: { value: THREE.Color }
-  uCompColor: { value: THREE.Color }
-}
+const PULSE_SLOTS = 4
+
+const CYAN = new THREE.Color('#00c3ff')
+const CYAN_PALE = new THREE.Color('#9be7ff')
+const CYAN_DEEP = new THREE.Color('#0a6f93')
+const TEAL = new THREE.Color('#3fd8f2')
+const CRIMSON = new THREE.Color('#ff453a')
+const BODY_DEEP = new THREE.Color('#03121a')
 
 function canUseWebGL(): boolean {
   if (typeof window === 'undefined' || typeof document === 'undefined') return false
@@ -67,1098 +74,386 @@ function createMulberry32(seed = 0x594e) {
   }
 }
 
-function createRadialGlowTexture(type: 'corona' | 'wide'): THREE.Texture | null {
-  if (typeof document === 'undefined') return null
-  const canvas = document.createElement('canvas')
-  canvas.width = 64
-  canvas.height = 64
-  const ctx = canvas.getContext('2d')
-  if (!ctx) return null
-
-  const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32)
-  if (type === 'corona') {
-    gradient.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)')
-    gradient.addColorStop(0.28, 'rgba(255, 255, 255, 0.82)')
-    gradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.28)')
-    gradient.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)')
-  } else {
-    gradient.addColorStop(0.0, 'rgba(255, 255, 255, 0.68)')
-    gradient.addColorStop(0.35, 'rgba(255, 255, 255, 0.34)')
-    gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.09)')
-    gradient.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)')
-  }
-  ctx.fillStyle = gradient
-  ctx.fillRect(0, 0, 64, 64)
-
-  const texture = new THREE.CanvasTexture(canvas)
-  texture.needsUpdate = true
-  return texture
-}
+const damp = (current: number, target: number, rate: number, dt: number) =>
+  current + (target - current) * (1 - Math.exp(-rate * dt))
 
 // ---------------------------------------------------------------------------
 // SHADERS
 // ---------------------------------------------------------------------------
 
-const ASHIMA_SIMPLEX_NOISE_3D = `
+const SIMPLEX_NOISE_3D = `
 vec4 permute(vec4 x) { return mod(((x * 34.0) + 1.0) * x, 289.0); }
 vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
 
 float snoise(vec3 v) {
   const vec2 C = vec2(1.0 / 6.0, 1.0 / 3.0);
   const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
-
   vec3 i  = floor(v + dot(v, C.yyy));
   vec3 x0 = v - i + dot(i, C.xxx);
-
   vec3 g = step(x0.yzx, x0.xyz);
   vec3 l = 1.0 - g;
   vec3 i1 = min(g.xyz, l.zxy);
   vec3 i2 = max(g.xyz, l.zxy);
-
   vec3 x1 = x0 - i1 + C.xxx;
   vec3 x2 = x0 - i2 + C.yyy;
   vec3 x3 = x0 - D.yyy;
-
   i = mod(i, 289.0);
   vec4 p = permute(permute(permute(
              i.z + vec4(0.0, i1.z, i2.z, 1.0))
            + i.y + vec4(0.0, i1.y, i2.y, 1.0))
            + i.x + vec4(0.0, i1.x, i2.x, 1.0));
-
   float n_ = 0.142857142857;
   vec3 ns = n_ * D.wyz - D.xzx;
-
   vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
-
   vec4 x_ = floor(j * ns.z);
   vec4 y_ = floor(j - 7.0 * x_);
-
   vec4 x = x_ * ns.x + ns.yyyy;
   vec4 y = y_ * ns.x + ns.yyyy;
   vec4 h = 1.0 - abs(x) - abs(y);
-
   vec4 b0 = vec4(x.xy, y.xy);
   vec4 b1 = vec4(x.zw, y.zw);
-
   vec4 s0 = floor(b0) * 2.0 + 1.0;
   vec4 s1 = floor(b1) * 2.0 + 1.0;
   vec4 sh = -step(h, vec4(0.0));
-
   vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
   vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
-
   vec3 p0 = vec3(a0.xy, h.x);
   vec3 p1 = vec3(a0.zw, h.y);
   vec3 p2 = vec3(a1.xy, h.z);
   vec3 p3 = vec3(a1.zw, h.w);
-
   vec4 norm = taylorInvSqrt(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
   p0 *= norm.x;
   p1 *= norm.y;
   p2 *= norm.z;
   p3 *= norm.w;
-
   vec4 m = max(0.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), vec4(0.0));
   m = m * m;
   return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
 }
-
-float simplex2(vec3 p, float t) {
-  float n = snoise(p + vec3(0.0, 0.0, t * 0.35));
-  n += 0.5 * snoise(p * 2.08 - vec3(0.0, t * 0.55, 0.0));
-  return n;
-}
 `
 
-const CORE_VERTEX_SHADER = `
+const BODY_VERTEX_SHADER = `
 uniform float uTime;
-uniform float uStreamVelocity;
-uniform float uPulseEnergy;
-uniform float uThinkingTension;
-uniform float uTypingIntensity;
-uniform float uReducedMotion;
+uniform float uBreath;
+uniform float uThink;
 
 varying vec3 vNormal;
-varying vec3 vPosition;
-varying vec3 vViewPosition;
-varying float vDisplacement;
+varying vec3 vView;
+varying vec3 vObject;
 
-${ASHIMA_SIMPLEX_NOISE_3D}
+${SIMPLEX_NOISE_3D}
 
 void main() {
+  // A very slight, slow surface swell. Calmer still while thinking.
+  float swell = snoise(position * 1.3 + vec3(0.0, 0.0, uTime * 0.07)) * 0.016 * (1.0 - uThink * 0.6);
+  vec3 displaced = position * uBreath + normal * swell;
+
+  vObject = position;
   vNormal = normalize(normalMatrix * normal);
-
-  float motionScale = mix(1.0, 0.15, uReducedMotion);
-
-  // Flowing domain-warped organic waves
-  vec3 warp = vec3(
-    sin(position.y * 2.4 + uTime * 0.65 * motionScale),
-    cos(position.z * 2.4 - uTime * 0.55 * motionScale),
-    sin(position.x * 2.4 + uTime * 0.7 * motionScale)
-  ) * 0.22;
-  float baseWave = simplex2(position * 1.18 + warp, uTime * 0.85 * motionScale);
-
-  // High-frequency radial contraction & tremor during thinking
-  float thinkingTremor = sin(uTime * 32.0 * motionScale + position.x * 14.0 + position.y * 16.0) * uThinkingTension * 0.045;
-  float thinkingContract = -uThinkingTension * 0.11;
-
-  // Streaming outward ripple with token energy
-  float streamWave = sin(length(position + warp * 0.5) * 6.5 - uTime * 6.5 * motionScale);
-  float streamRipple = streamWave * (uStreamVelocity * 0.085 + uPulseEnergy * 0.14);
-
-  // Typing gentle hum
-  float typingHum = sin(position.y * 5.2 + uTime * 3.2 * motionScale) * uTypingIntensity * 0.038;
-
-  float disp = (baseWave * 0.095 + streamRipple + thinkingTremor + thinkingContract + typingHum) * motionScale;
-  vDisplacement = disp;
-
-  vec3 displacedPosition = position + normal * disp;
-  vPosition = displacedPosition;
-
-  vec4 mvPosition = modelViewMatrix * vec4(displacedPosition, 1.0);
-  vViewPosition = -mvPosition.xyz;
-
+  vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);
+  vView = -mvPosition.xyz;
   gl_Position = projectionMatrix * mvPosition;
 }
 `
 
-const CORE_FRAGMENT_SHADER = `
+const BODY_FRAGMENT_SHADER = `
 uniform float uTime;
-uniform float uColorShift;
-uniform float uPulseEnergy;
-uniform float uStreamVelocity;
-uniform float uThinkingTension;
-uniform float uTypingIntensity;
-uniform float uSynapseFlash;
+uniform float uEnergy;
+uniform float uThink;
+uniform float uFlash;
+uniform float uError;
 uniform vec3 uColor;
-uniform vec3 uCompColor;
+uniform vec3 uRimColor;
+uniform vec3 uDeep;
+uniform vec3 uLight;
 
 varying vec3 vNormal;
-varying vec3 vPosition;
-varying vec3 vViewPosition;
-varying float vDisplacement;
+varying vec3 vView;
+varying vec3 vObject;
 
-float wispyCurrents(vec3 p, float t) {
-  vec3 w1 = p * 2.6 + vec3(sin(t * 0.45 + p.y * 1.8), cos(t * 0.5 + p.z * 1.8), sin(t * 0.38 + p.x * 1.8)) * 0.65;
-  vec3 w2 = w1 * 1.75 + vec3(cos(w1.y * 1.6 - t * 0.7), sin(w1.z * 1.6 + t * 0.6), cos(w1.x * 1.6 - t * 0.5)) * 0.55;
-  float ribbon1 = abs(sin(w1.x + cos(w1.y * 1.3) + sin(w1.z * 1.1)));
-  float ribbon2 = abs(cos(w2.y - sin(w2.z * 1.4) + cos(w2.x * 1.2)));
-  float mainStream = smoothstep(0.38, 0.02, ribbon1 * 0.58 + ribbon2 * 0.42);
-  float fineFilament = smoothstep(0.16, 0.0, abs(ribbon1 - ribbon2));
-  return clamp(mainStream * 0.78 + fineFilament * 0.55, 0.0, 1.0);
-}
-
-float surfaceLightning(vec3 p, float t) {
-  vec3 lp = p * 5.2 + vec3(
-    sin(p.y * 7.5 + t * 9.0) * 0.35 + cos(p.z * 13.0 - t * 14.0) * 0.14,
-    cos(p.z * 7.5 - t * 8.5) * 0.35 + sin(p.x * 13.0 + t * 15.0) * 0.14,
-    sin(p.x * 7.5 + t * 10.0) * 0.35 + cos(p.y * 13.0 - t * 13.0) * 0.14
-  );
-  float bolt = abs(sin(lp.x + lp.y * 0.8 - lp.z * 0.6));
-  float gate = smoothstep(0.55, 0.96, sin(t * 4.7 + p.x * 2.5 - p.y * 2.1) * 0.5 + 0.5);
-  return smoothstep(0.065, 0.004, bolt) * gate;
-}
+${SIMPLEX_NOISE_3D}
 
 void main() {
-  vec3 viewDir = normalize(vViewPosition);
-  vec3 norm = normalize(vNormal);
+  vec3 V = normalize(vView);
+  vec3 N = normalize(vNormal);
+  float facing = clamp(dot(N, V), 0.0, 1.0);
+  float fresnel = pow(1.0 - facing, 3.0);
 
-  float NdotV = max(0.0, dot(norm, viewDir));
-  float fresnel = pow(1.0 - NdotV, 2.6);
+  // A soft nucleus of light held inside the body. It gathers while thinking.
+  float nucleusNoise = snoise(vObject * 0.9 + vec3(0.0, uTime * 0.05, 0.0)) * 0.5 + 0.5;
+  float nucleus = pow(facing, 5.0) * (0.22 + nucleusNoise * 0.12 + uThink * 0.45 + uEnergy * 0.22);
+  float depth = pow(facing, 1.6) * 0.1;
 
-  // Dark metallic liquid-chrome base
-  vec3 abyssalChrome = vec3(0.014, 0.032, 0.042);
-  vec3 brushedTitanium = vec3(0.055, 0.115, 0.155);
+  // Fine internal currents, drifting slowly.
+  // Sampled a little inside the surface, so the currents sit behind the glass.
+  vec3 inside = vObject * 0.86 ;
+  float n = snoise(inside * 2.1 + vec3(uTime * 0.05, -uTime * 0.04, uTime * 0.03));
+  float current = pow(clamp(1.0 - abs(n), 0.0, 1.0), 22.0) * (0.09 + uEnergy * 0.14) * (0.3 + 0.7 * facing);
 
-  vec3 activeHue = uColor;
-  vec3 compHue = uCompColor;
+  // Broad, soft sheen from the pointer-led light (no hard plastic hotspot).
+  vec3 H = normalize(normalize(uLight) + V);
+  float NdotH = max(dot(N, H), 0.0);
+  float spec = pow(NdotH, 36.0) * 0.16;
+  float sheen = pow(NdotH, 6.0) * 0.06;
 
-  // Dual-light studio metallic specular highlights
-  vec3 lightDir1 = normalize(vec3(0.65, 0.75, 0.85));
-  vec3 lightDir2 = normalize(vec3(-0.75, -0.45, 0.55));
-  vec3 halfVec1 = normalize(lightDir1 + viewDir);
-  vec3 halfVec2 = normalize(lightDir2 + viewDir);
+  // Thin bright edge plus a wider glassy falloff.
+  float edge = 1.0 - facing;
+  float rim = pow(edge, 7.0) * (0.95 + uEnergy * 0.35 + uFlash * 0.2 - uThink * 0.25)
+            + pow(edge, 2.2) * (0.16 + uEnergy * 0.08);
 
-  float specChrome = pow(max(0.0, dot(norm, halfVec1)), 42.0);
-  float specSheen = pow(max(0.0, dot(norm, halfVec1)), 9.0);
-  float specComp = pow(max(0.0, dot(norm, halfVec2)), 20.0);
+  // Light from above, so it sits in water rather than floating flat.
+  float above = N.y * 0.5 + 0.5;
 
-  // Anisotropic metallic contour bands across displaced shell
-  float metalContour = 0.5 + 0.5 * sin((norm.y * 5.0 + norm.x * 3.0 + vDisplacement * 14.0) * 3.14159);
-  vec3 metalBase = mix(abyssalChrome, brushedTitanium, metalContour * 0.55 + specSheen * 0.45);
+  vec3 col = uDeep * (0.75 + above * 0.5);
+  col += uColor * (depth + current + sheen + above * 0.04);
+  col += mix(uColor, vec3(0.75, 0.95, 1.0), 0.45 * (1.0 - uError)) * nucleus * (1.0 - uError * 0.55);
+  col += uRimColor * rim;
+  col += vec3(0.85, 0.96, 1.0) * spec;
 
-  // Wispy bioluminescent internal currents + complementary secondary currents
-  float veins = wispyCurrents(vPosition, uTime * 0.55);
-  float compVeins = wispyCurrents(vPosition.yzx * 1.12 + vec3(1.7, -0.9, 2.3), -uTime * 0.42);
-
-  float pulseTravel = fract(dot(vPosition, vec3(1.1, 1.5, 0.9)) * 1.6 - uTime * (1.2 + uStreamVelocity * 4.5));
-  float travelingPulse = smoothstep(0.62, 1.0, pulseTravel) * veins * (0.65 + uStreamVelocity * 0.95 + uPulseEnergy * 0.55);
-
-  // Surface arc lightning tendrils
-  float arcIntensity = 0.28 + uPulseEnergy * 0.65 + uThinkingTension * 0.8 + uStreamVelocity * 0.55 + uSynapseFlash * 1.3;
-  float arc = surfaceLightning(vPosition, uTime) * arcIntensity;
-
-  float innerGlow = pow(NdotV, 2.0) * (0.38 + uPulseEnergy * 0.38 + uTypingIntensity * 0.2);
-  vec3 hotWhite = vec3(0.95, 0.98, 1.0);
-
-  // Combine metallic base + primary state hue + complementary state harmonic
-  vec3 bodyColor = mix(metalBase, activeHue * 0.85, 0.24 + veins * 0.44);
-  bodyColor = mix(bodyColor, compHue * 0.9, compVeins * 0.28 + fresnel * 0.36);
-
-  // Add subsurface glow, traveling synaptic streams, and metallic specular reflections
-  bodyColor += activeHue * (innerGlow * 0.68 + travelingPulse * 0.65 + specSheen * 0.35);
-  bodyColor += compHue * (specComp * 0.58 + compVeins * (0.22 + uThinkingTension * 0.25 + uTypingIntensity * 0.2));
-  bodyColor += mix(activeHue, compHue, 0.48) * (fresnel * (0.85 + uSynapseFlash * 0.6));
-  bodyColor += mix(hotWhite, activeHue, 0.25) * (specChrome * 0.95);
-  bodyColor += hotWhite * (veins * (uSynapseFlash * 1.8 + uPulseEnergy * 0.35) + travelingPulse * 0.75 + arc * 1.15);
-
-  float alpha = clamp(0.94 + fresnel * 0.06, 0.0, 1.0);
-  gl_FragColor = vec4(bodyColor, alpha);
+  gl_FragColor = vec4(col, 1.0);
 }
 `
 
-const TENDRIL_VERTEX_SHADER = `
+const FILAMENT_VERTEX_SHADER = `
 uniform float uTime;
-uniform float uStreamVelocity;
-uniform float uPulseEnergy;
-uniform float uThinkingTension;
-uniform float uReducedMotion;
+uniform float uBreath;
+uniform float uThink;
 
 attribute float aT;
-attribute float aPhase;
-attribute float aColorMix;
+attribute float aSeed;
 
 varying float vT;
-varying float vPhase;
-varying float vColorMix;
+varying float vSeed;
 
 void main() {
   vT = aT;
-  vPhase = aPhase;
-  vColorMix = aColorMix;
+  vSeed = aSeed;
 
-  float motionScale = mix(1.0, 0.2, uReducedMotion);
-  float envelope = sin(aT * 3.14159265);
+  // Tips drift like something resting in a slow current; the root stays put.
+  float reach = aT * aT;
+  vec3 drift = vec3(
+    sin(uTime * 0.32 + aSeed * 6.2831 + aT * 1.8),
+    cos(uTime * 0.27 + aSeed * 4.1 + aT * 1.5),
+    sin(uTime * 0.23 + aSeed * 2.3)
+  ) * 0.07 * reach;
 
-  // Organic wispy undulation along each curved filament
-  float swayFreq = 6.2831853 * 1.5;
-  float waveSpeed = (1.6 + uStreamVelocity * 2.8 + uThinkingTension * 2.2) * motionScale;
-  vec3 sway = vec3(
-    sin(aT * swayFreq - uTime * waveSpeed + aPhase),
-    cos(aT * swayFreq * 1.2 + uTime * waveSpeed * 0.85 + aPhase * 1.3),
-    sin(aT * swayFreq * 0.9 - uTime * waveSpeed * 1.1 + aPhase * 0.7)
-  ) * envelope * (0.045 + uPulseEnergy * 0.035 + uThinkingTension * 0.03);
+  // Draw in slightly while thinking.
+  vec3 pos = position * uBreath * (1.0 - uThink * 0.07 * aT) + drift;
 
-  vec3 pos = position + sway;
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
   gl_Position = projectionMatrix * mvPosition;
 }
 `
 
-const TENDRIL_FRAGMENT_SHADER = `
+const FILAMENT_FRAGMENT_SHADER = `
 uniform float uTime;
-uniform float uStreamVelocity;
-uniform float uPulseEnergy;
-uniform float uThinkingTension;
-uniform float uSynapseFlash;
-uniform float uReducedMotion;
+uniform float uEnergy;
 uniform vec3 uColor;
-uniform vec3 uCompColor;
+uniform vec4 uPulseBirth;
+uniform vec4 uPulseSeed;
+uniform vec4 uPulseGain;
 
 varying float vT;
-varying float vPhase;
-varying float vColorMix;
+varying float vSeed;
+
+float pulse(float birth, float seed, float gain) {
+  float age = uTime - birth;
+  if (age < 0.0 || age > 2.2) return 0.0;
+  // Each pulse lights roughly a third of the filaments.
+  float chosen = step(0.64, fract(vSeed * 13.71 + seed));
+  float head = age * 0.85;
+  float d = vT - head;
+  return exp(-d * d * 70.0) * chosen * gain * (1.0 - smoothstep(0.75, 1.05, head));
+}
 
 void main() {
-  float motionScale = mix(1.0, 0.2, uReducedMotion);
-  float speed = 0.85 + uStreamVelocity * 2.8 + uPulseEnergy * 1.4;
-  float flow = fract(vT - uTime * speed * 0.42 * motionScale + vPhase);
+  float lit = pulse(uPulseBirth.x, uPulseSeed.x, uPulseGain.x)
+            + pulse(uPulseBirth.y, uPulseSeed.y, uPulseGain.y)
+            + pulse(uPulseBirth.z, uPulseSeed.z, uPulseGain.z)
+            + pulse(uPulseBirth.w, uPulseSeed.w, uPulseGain.w);
+  lit = min(lit, 1.0);
 
-  // Smooth wispy comet-stream along the curve (no dots or dashes)
-  float streamGlow = smoothstep(0.0, 0.35, flow) * smoothstep(1.0, 0.35, flow);
-  float headHighlight = pow(smoothstep(0.55, 0.98, flow), 3.0);
+  float fade = 1.0 - smoothstep(0.15, 1.0, vT);
+  float alpha = (0.17 + uEnergy * 0.12) * fade + lit * (0.95 - vT * 0.35);
+  vec3 col = mix(uColor, vec3(0.9, 0.98, 1.0), lit * 0.45);
 
-  // Smooth tapered ends so curves melt into space organically
-  float endTaper = sin(vT * 3.14159265);
-
-  vec3 baseHue = mix(uColor, uCompColor, vColorMix);
-  vec3 col = mix(baseHue, vec3(0.96, 0.99, 1.0), headHighlight * 0.65 + uSynapseFlash * 0.45);
-
-  float alpha = endTaper * (0.14 + streamGlow * (0.42 + uPulseEnergy * 0.35 + uStreamVelocity * 0.3) + headHighlight * (0.45 + uSynapseFlash * 0.5));
   gl_FragColor = vec4(col, clamp(alpha, 0.0, 1.0));
 }
 `
 
-const LIGHTNING_VERTEX_SHADER = `
+const SNOW_VERTEX_SHADER = `
 uniform float uTime;
-uniform float uStreamVelocity;
-uniform float uPulseEnergy;
-uniform float uThinkingTension;
-uniform float uSynapseFlash;
-uniform float uReducedMotion;
+uniform float uPixelRatio;
+uniform float uSizeScale;
 
-attribute float aT;
 attribute float aSeed;
-attribute vec3 aOrtho1;
-attribute vec3 aOrtho2;
 
-varying float vT;
-varying float vBoltIntensity;
-varying float vSeed;
+varying float vAlpha;
 
 void main() {
-  vT = aT;
-  vSeed = aSeed;
+  vec3 p = position;
+  // Marine snow sinks slowly and wraps around.
+  float fall = uTime * (0.018 + aSeed * 0.02);
+  p.y = mod(p.y - fall + 3.0, 6.0) - 3.0;
+  p.x += sin(uTime * 0.09 + aSeed * 40.0) * 0.06;
 
-  float motionScale = mix(1.0, 0.2, uReducedMotion);
-  float envelope = sin(aT * 3.14159265);
-
-  // Quantized time steps so electric arcs snap & crackle like real high-voltage plasma
-  float snapRate = (11.0 + uStreamVelocity * 10.0 + uThinkingTension * 12.0) * motionScale;
-  float snapTime = floor(uTime * snapRate + aSeed * 19.0);
-
-  // High-frequency jagged displacement + secondary micro-forking jitter
-  float jag1 = sin(aT * 26.0 + snapTime * 4.7 + aSeed * 31.0)
-             + 0.55 * cos(aT * 59.0 - snapTime * 7.3 + aSeed * 17.0);
-  float jag2 = cos(aT * 31.0 - snapTime * 5.9 + aSeed * 43.0)
-             + 0.55 * sin(aT * 67.0 + snapTime * 8.1 + aSeed * 23.0);
-
-  float amp = envelope * (0.095 + uPulseEnergy * 0.06 + uThinkingTension * 0.055 + uSynapseFlash * 0.07);
-  vec3 displaced = position + (aOrtho1 * jag1 + aOrtho2 * jag2) * amp;
-
-  // Intermittent firing gate per bolt
-  float cycle = sin(uTime * (2.8 + fract(aSeed * 7.3) * 3.2) * motionScale + aSeed * 40.0);
-  float threshold = 0.42 - uPulseEnergy * 0.28 - uThinkingTension * 0.25 - uStreamVelocity * 0.22 - uSynapseFlash * 0.5;
-  float activeGate = smoothstep(threshold, threshold + 0.22, cycle);
-
-  vBoltIntensity = clamp(activeGate + uSynapseFlash * 0.85, 0.0, 1.0);
-
-  vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);
+  vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
   gl_Position = projectionMatrix * mvPosition;
+  gl_PointSize = (1.4 + aSeed * 1.8) * uPixelRatio * uSizeScale * (4.6 / -mvPosition.z);
+
+  float edge = smoothstep(3.0, 2.3, abs(p.y));
+  vAlpha = (0.12 + aSeed * 0.22) * edge;
 }
 `
 
-const LIGHTNING_FRAGMENT_SHADER = `
-uniform float uTime;
-uniform float uSynapseFlash;
+const SNOW_FRAGMENT_SHADER = `
 uniform vec3 uColor;
-uniform vec3 uCompColor;
-
-varying float vT;
-varying float vBoltIntensity;
-varying float vSeed;
+varying float vAlpha;
 
 void main() {
-  if (vBoltIntensity < 0.01) discard;
-
-  float endPinch = sin(vT * 3.14159265);
-  float surge = 0.65 + 0.35 * sin(vT * 18.0 - uTime * 28.0 + vSeed * 20.0);
-
-  vec3 arcTint = mix(uColor, uCompColor, fract(vSeed * 3.7));
-  vec3 hotCore = mix(arcTint, vec3(0.96, 0.99, 1.0), 0.72 + uSynapseFlash * 0.25);
-
-  float alpha = vBoltIntensity * surge * (0.35 + 0.65 * endPinch);
-  gl_FragColor = vec4(hotCore, clamp(alpha, 0.0, 1.0));
+  float d = length(gl_PointCoord - vec2(0.5));
+  float a = smoothstep(0.5, 0.1, d) * vAlpha;
+  if (a < 0.004) discard;
+  gl_FragColor = vec4(uColor, a);
 }
 `
 
 const HALO_VERTEX_SHADER = `
-uniform float uTime;
-uniform float uStreamVelocity;
-uniform float uPulseEnergy;
-uniform float uThinkingTension;
-uniform float uSynapseFlash;
-uniform float uReducedMotion;
-uniform float uPixelRatio;
-
-attribute float aSeed;
-attribute float aSize;
-
-varying float vAlpha;
-varying float vSeed;
-varying float vAngle;
-
+varying vec2 vUv;
 void main() {
-  float motionScale = mix(1.0, 0.15, uReducedMotion);
-
-  // Curl-like 3D helical flow + inward token-stream vortex
-  float spiralCycle = fract(uTime * 0.24 * motionScale + aSeed);
-  float ingest = uStreamVelocity * spiralCycle;
-
-  float orbitAngle = uTime * (0.14 + fract(aSeed * 3.1) * 0.28) * motionScale + ingest * 2.2;
-  float cosA = cos(orbitAngle);
-  float sinA = sin(orbitAngle);
-
-  vec3 p = position;
-  vec3 orbitedPos = vec3(
-    p.x * cosA - p.z * sinA,
-    p.y,
-    p.x * sinA + p.z * cosA
-  );
-
-  // Fluid wavy drift (wispy underwater / cyber currents)
-  float driftPhase = uTime * 0.75 * motionScale + aSeed * 18.0;
-  vec3 fluidCurl = vec3(
-    sin(orbitedPos.y * 2.2 + driftPhase) * 0.16,
-    cos(orbitedPos.x * 1.9 - driftPhase * 0.85) * 0.18,
-    sin(orbitedPos.z * 2.2 + driftPhase * 1.1) * 0.16
-  );
-  orbitedPos += fluidCurl;
-
-  float spiralFactor = 1.0 - 0.45 * ingest;
-  orbitedPos *= spiralFactor;
-
-  float wrapFade = mix(1.0, smoothstep(1.0, 0.82, spiralCycle) * smoothstep(0.0, 0.08, spiralCycle), uStreamVelocity);
-
-  vec4 mvPosition = modelViewMatrix * vec4(orbitedPos, 1.0);
-  float scaleFactor = 1.0 + uPulseEnergy * 0.45 + uSynapseFlash * 0.55 + uThinkingTension * 0.2;
-  gl_PointSize = (aSize * scaleFactor * uPixelRatio) / -mvPosition.z;
-  gl_Position = projectionMatrix * mvPosition;
-
-  float breathe = 0.55 + 0.45 * sin(uTime * 2.1 * motionScale + aSeed * 25.0);
-  vAlpha = (0.38 + 0.45 * breathe + uStreamVelocity * 0.25 + uSynapseFlash * 0.35) * wrapFade;
-  vSeed = aSeed;
-  vAngle = orbitAngle + aSeed * 6.2831853;
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `
 
 const HALO_FRAGMENT_SHADER = `
-uniform float uTime;
-uniform float uSynapseFlash;
 uniform vec3 uColor;
-uniform vec3 uCompColor;
-
-varying float vAlpha;
-varying float vSeed;
-varying float vAngle;
-
-void main() {
-  vec2 centered = gl_PointCoord - vec2(0.5);
-  float r = length(centered);
-  if (r > 0.5) discard;
-
-  // Rotate local coordinates into a curvy S-shaped wispy wisp instead of a flat round dot
-  float c = cos(vAngle);
-  float s = sin(vAngle);
-  vec2 rot = vec2(centered.x * c - centered.y * s, centered.x * s + centered.y * c);
-
-  // S-curve spine distortion
-  float sCurve = rot.y - 0.24 * sin(rot.x * 6.5 + vSeed * 12.0);
-  float wispDist = length(vec2(rot.x * 0.68, sCurve * 1.85));
-
-  float wispCore = smoothstep(0.36, 0.01, wispDist);
-  float softHalo = smoothstep(0.5, 0.08, r) * 0.35;
-  float shape = clamp(wispCore + softHalo, 0.0, 1.0);
-
-  vec3 particleHue = mix(uColor, uCompColor, fract(vSeed * 2.7));
-  vec3 col = mix(particleHue, vec3(0.98, 0.99, 1.0), wispCore * (0.48 + uSynapseFlash * 0.45));
-
-  gl_FragColor = vec4(col, shape * vAlpha);
-}
-`
-
-const RIBBON_RING_VERTEX_SHADER = `
-uniform float uTime;
-uniform float uStreamVelocity;
-uniform float uPulseEnergy;
-uniform float uThinkingTension;
-uniform float uReducedMotion;
-uniform float uRingSpeed;
-
+uniform float uIntensity;
 varying vec2 vUv;
-varying vec3 vNormal;
-varying vec3 vViewPosition;
-varying float vWave;
 
 void main() {
-  vUv = uv;
-  float motionScale = mix(1.0, 0.2, uReducedMotion);
-  float angle = uv.x * 6.2831853;
-
-  // Subtle organic undulation along the metallic cyber ribbon
-  float wave = sin(angle * 3.0 + uTime * uRingSpeed * 1.4 * motionScale) * 0.045
-             + cos(angle * 5.0 - uTime * uRingSpeed * 0.9 * motionScale) * 0.025;
-  vWave = wave;
-
-  vec3 displaced = position;
-  displaced.z += wave * (1.0 + uPulseEnergy * 0.5 + uThinkingTension * 0.4);
-
-  vNormal = normalize(normalMatrix * normal);
-  vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);
-  vViewPosition = -mvPosition.xyz;
-  gl_Position = projectionMatrix * mvPosition;
-}
-`
-
-const RIBBON_RING_FRAGMENT_SHADER = `
-uniform float uTime;
-uniform float uStreamVelocity;
-uniform float uPulseEnergy;
-uniform float uSynapseFlash;
-uniform float uReducedMotion;
-uniform vec3 uColor;
-uniform vec3 uCompColor;
-uniform float uRingSpeed;
-uniform float uScanDir;
-uniform float uColorMix;
-
-varying vec2 vUv;
-varying vec3 vNormal;
-varying vec3 vViewPosition;
-varying float vWave;
-
-void main() {
-  float motionScale = mix(1.0, 0.2, uReducedMotion);
-  float normAngle = vUv.x;
-
-  // Smooth continuous liquid-metal + plasma stream along the ring (zero dashes/dots)
-  float speed = (0.18 + uStreamVelocity * 0.55) * motionScale * uRingSpeed;
-  float phase1 = fract(normAngle * uScanDir - uTime * speed);
-  float phase2 = fract(normAngle * uScanDir - uTime * speed + 0.5);
-
-  float comet1 = pow(smoothstep(0.0, 0.95, 1.0 - phase1), 3.5);
-  float comet2 = pow(smoothstep(0.0, 0.95, 1.0 - phase2), 4.5) * 0.65;
-
-  // Metallic specular sheen along the ribbon
-  vec3 viewDir = normalize(vViewPosition);
-  vec3 norm = normalize(vNormal);
-  float spec = pow(max(0.0, abs(dot(norm, viewDir))), 6.0);
-
-  // Soft cross-sectional filament profile with bright center spine
-  float crossCenter = 1.0 - abs(vUv.y * 2.0 - 1.0);
-  float crossProfile = smoothstep(0.0, 0.6, crossCenter);
-  float coreSpine = pow(crossCenter, 3.0);
-
-  vec3 ringHue = mix(uColor, uCompColor, uColorMix + 0.25 * sin(normAngle * 6.2831853 + uTime * 0.5));
-  vec3 metallicSheen = mix(vec3(0.18, 0.26, 0.32), ringHue, 0.65);
-
-  float energyFlow = 0.22 + comet1 * 1.15 + comet2 * 0.8;
-  float alpha = crossProfile * energyFlow * (0.34 + uPulseEnergy * 0.32 + uSynapseFlash * 0.4 + spec * 0.25);
-
-  vec3 col = mix(metallicSheen, ringHue, 0.6 + comet1 * 0.4);
-  col = mix(col, vec3(0.96, 0.99, 1.0), coreSpine * (comet1 * 0.65 + spec * 0.35 + uSynapseFlash * 0.45));
-
-  gl_FragColor = vec4(col, clamp(alpha, 0.0, 1.0));
-}
-`
-
-const AEGIS_SHELL_VERTEX_SHADER = `
-uniform float uTime;
-uniform float uStreamVelocity;
-uniform float uPulseEnergy;
-uniform float uThinkingTension;
-uniform float uReducedMotion;
-
-varying vec3 vNormal;
-varying vec3 vPosition;
-varying vec3 vViewPosition;
-
-void main() {
-  float motionScale = mix(1.0, 0.2, uReducedMotion);
-
-  // Subtle organic breathing & helical twist on the outer containment shell
-  float twistAngle = position.y * 0.35 * sin(uTime * 0.5 * motionScale);
-  float c = cos(twistAngle);
-  float s = sin(twistAngle);
-  vec3 twisted = vec3(
-    position.x * c - position.z * s,
-    position.y,
-    position.x * s + position.z * c
-  );
-
-  vNormal = normalize(normalMatrix * normal);
-  vPosition = twisted;
-  vec4 mvPosition = modelViewMatrix * vec4(twisted, 1.0);
-  vViewPosition = -mvPosition.xyz;
-  gl_Position = projectionMatrix * mvPosition;
-}
-`
-
-const AEGIS_SHELL_FRAGMENT_SHADER = `
-uniform float uTime;
-uniform float uPulseEnergy;
-uniform float uStreamVelocity;
-uniform float uThinkingTension;
-uniform float uSynapseFlash;
-uniform float uReducedMotion;
-uniform vec3 uColor;
-uniform vec3 uCompColor;
-
-varying vec3 vNormal;
-varying vec3 vPosition;
-varying vec3 vViewPosition;
-
-// Volumetric curved interference lens replacing the flat icosahedron wireframe grid
-float causticInterference(vec3 p, float t) {
-  // Warped spherical coordinates for curved cyber-chitin contours
-  vec3 q = normalize(p);
-  float phi = atan(q.z, q.x);
-  float theta = acos(clamp(q.y, -1.0, 1.0));
-
-  float warp = sin(phi * 3.0 + theta * 4.0 - t * 0.9) * 0.38
-             + cos(phi * 5.0 - theta * 3.0 + t * 0.7) * 0.24;
-
-  // Intersecting helical wave ribbons
-  float waveA = abs(sin((theta * 5.0 + phi * 2.0 + warp) - t * 0.8));
-  float waveB = abs(sin((theta * 4.0 - phi * 3.0 - warp * 0.8) + t * 0.65));
-
-  float caustic = smoothstep(0.14, 0.008, waveA * waveB);
-  float secondary = smoothstep(0.045, 0.0, abs(waveA - 0.45)) * 0.45;
-  return clamp(caustic + secondary, 0.0, 1.0);
-}
-
-void main() {
-  vec3 viewDir = normalize(vViewPosition);
-  vec3 norm = normalize(vNormal);
-  float NdotV = max(0.0, abs(dot(norm, viewDir)));
-  float fresnel = pow(1.0 - NdotV, 2.2);
-
-  float motionScale = mix(1.0, 0.2, uReducedMotion);
-  float speed = (0.75 + uStreamVelocity * 1.4 + uThinkingTension * 0.9) * motionScale;
-
-  float field = causticInterference(vPosition, uTime * speed);
-
-  // Travelling cyber-pulse wave sweeping across the curved lens
-  float sweep = sin(vPosition.y * 2.4 - uTime * (1.3 + uStreamVelocity * 2.0) * motionScale) * 0.5 + 0.5;
-  float sweepBand = pow(sweep, 4.0);
-
-  // Chromatic iridescence between primary state color and complementary state shade
-  float iridFactor = clamp(fresnel * 0.75 + sweepBand * 0.35, 0.0, 1.0);
-  vec3 shellColor = mix(uColor, uCompColor, iridFactor);
-
-  // Metallic rim reflection
-  vec3 lightDir = normalize(vec3(-0.5, 0.8, 0.6));
-  vec3 halfV = normalize(lightDir + viewDir);
-  float rimSpec = pow(max(0.0, abs(dot(norm, halfV))), 18.0);
-
-  vec3 col = mix(shellColor, vec3(0.95, 0.99, 1.0), field * 0.42 + rimSpec * 0.5 + uSynapseFlash * 0.45);
-
-  // Center stays ultra-clear so the core shines unobstructed; edges and caustic filaments glow
-  float edgeMask = 0.22 + fresnel * 0.78;
-  float baseAlpha = (field * 0.36 + fresnel * 0.24 + rimSpec * 0.2 + sweepBand * field * 0.25) * edgeMask;
-  float alpha = baseAlpha * (0.55 + uPulseEnergy * 0.38 + uStreamVelocity * 0.25 + uSynapseFlash * 0.45);
-
-  gl_FragColor = vec4(col, clamp(alpha, 0.0, 0.78));
+  float d = length(vUv - vec2(0.5)) * 2.0;
+  float a = pow(clamp(1.0 - d, 0.0, 1.0), 2.4) * uIntensity;
+  // Dither so the faint gradient doesn't band on 8-bit displays.
+  a += (fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) / 255.0;
+  gl_FragColor = vec4(uColor, a);
 }
 `
 
 // ---------------------------------------------------------------------------
-// BUILDER HELPERS
+// BUILDERS
 // ---------------------------------------------------------------------------
 
-function buildCore(
-  isCompact: boolean,
-  sharedUniforms: SharedUniforms,
-  disposables: Disposable[]
-): THREE.Mesh {
-  const coreDetail = isCompact ? 10 : 16
-  const coreGeo = new THREE.IcosahedronGeometry(1.15, coreDetail)
-  const coreMaterial = new THREE.ShaderMaterial({
-    vertexShader: CORE_VERTEX_SHADER,
-    fragmentShader: CORE_FRAGMENT_SHADER,
-    uniforms: {
-      ...sharedUniforms,
-    },
-    transparent: true,
-    depthWrite: true,
-  })
-  const coreMesh = new THREE.Mesh(coreGeo, coreMaterial)
-  disposables.push(coreGeo, coreMaterial)
-  return coreMesh
-}
-
-function buildGlowSprites(
-  isCompact: boolean,
-  disposables: Disposable[]
-): {
-  group: THREE.Group
-  coronaSprite: THREE.Sprite
-  wideSprite: THREE.Sprite
-  coronaMaterial: THREE.SpriteMaterial
-  wideMaterial: THREE.SpriteMaterial
-} {
-  const group = new THREE.Group()
-
-  const coronaTex = createRadialGlowTexture('corona')
-  const wideTex = createRadialGlowTexture('wide')
-  if (coronaTex) disposables.push(coronaTex)
-  if (wideTex) disposables.push(wideTex)
-
-  const coronaMaterial = new THREE.SpriteMaterial({
-    map: coronaTex ?? undefined,
-    color: 0x00c3ff,
-    transparent: true,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-  })
-  const coronaSprite = new THREE.Sprite(coronaMaterial)
-  coronaSprite.renderOrder = -1
-  const coronaScale = isCompact ? 2.75 : 3.2
-  coronaSprite.scale.set(coronaScale, coronaScale, 1.0)
-  group.add(coronaSprite)
-  disposables.push(coronaMaterial)
-
-  const wideMaterial = new THREE.SpriteMaterial({
-    map: wideTex ?? undefined,
-    color: 0x6366f1,
-    transparent: true,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-  })
-  const wideSprite = new THREE.Sprite(wideMaterial)
-  wideSprite.renderOrder = -2
-  const wideScale = isCompact ? 5.4 : 6.6
-  wideSprite.scale.set(wideScale, wideScale, 1.0)
-  group.add(wideSprite)
-  disposables.push(wideMaterial)
-
-  return { group, coronaSprite, wideSprite, coronaMaterial, wideMaterial }
-}
-
-function sampleSphericalPoint(rng: () => number, radius: number): THREE.Vector3 {
-  const u = rng()
-  const v = rng()
-  const theta = u * 2.0 * Math.PI
-  const phi = Math.acos(2.0 * v - 1.0)
-  const sinPhi = Math.sin(phi)
-  return new THREE.Vector3(
-    radius * sinPhi * Math.cos(theta),
-    radius * sinPhi * Math.sin(theta),
-    radius * Math.cos(phi)
-  )
-}
-
-function buildWispySynapseAndLightning(
-  isCompact: boolean,
-  rng: () => number,
-  sharedUniforms: SharedUniforms,
-  disposables: Disposable[]
-): THREE.Group {
-  const group = new THREE.Group()
-
-  // 1. Curved Wispy Synaptic Tendrils (smooth cubic/Catmull-Rom splines, zero straight segments or dots)
-  const tendrilCount = isCompact ? 26 : 48
-  const subdivisions = isCompact ? 20 : 28
-  const totalTendrilSegments = tendrilCount * subdivisions
-
-  const tendrilPos = new Float32Array(totalTendrilSegments * 2 * 3)
-  const tendrilT = new Float32Array(totalTendrilSegments * 2)
-  const tendrilPhase = new Float32Array(totalTendrilSegments * 2)
-  const tendrilColorMix = new Float32Array(totalTendrilSegments * 2)
-
-  let segIdx = 0
-  for (let i = 0; i < tendrilCount; i++) {
-    const startR = 1.16 + rng() * 0.14
-    const p0 = sampleSphericalPoint(rng, startR)
-
-    // Create a sweeping tangential arc around the core
-    const randomAxis = sampleSphericalPoint(rng, 1.0).normalize()
-    const tangent1 = new THREE.Vector3().crossVectors(p0, randomAxis).normalize()
-    const tangent2 = new THREE.Vector3().crossVectors(p0, tangent1).normalize()
-
-    const arcScale = 0.65 + rng() * 0.75
-    const mid1R = 1.38 + rng() * 0.42
-    const mid2R = 1.42 + rng() * 0.48
-    const endR = 1.18 + rng() * 0.25
-
-    const p1 = p0
-      .clone()
-      .addScaledVector(tangent1, arcScale * 0.6)
-      .addScaledVector(tangent2, (rng() - 0.5) * 0.5)
-      .normalize()
-      .multiplyScalar(mid1R)
-
-    const p2 = p1
-      .clone()
-      .addScaledVector(tangent1, arcScale * 0.65)
-      .addScaledVector(tangent2, (rng() - 0.5) * 0.65)
-      .normalize()
-      .multiplyScalar(mid2R)
-
-    const p3 = p2
-      .clone()
-      .addScaledVector(tangent1, arcScale * 0.5)
-      .addScaledVector(tangent2, (rng() - 0.5) * 0.4)
-      .normalize()
-      .multiplyScalar(endR)
-
-    const curve = new THREE.CatmullRomCurve3([p0, p1, p2, p3])
-    const pts = curve.getPoints(subdivisions)
-    const phase = rng() * 10.0
-    const colorMix = rng()
-
-    for (let s = 0; s < subdivisions; s++) {
-      const a = pts[s]
-      const b = pts[s + 1]
-      const t0 = s / subdivisions
-      const t1 = (s + 1) / subdivisions
-
-      tendrilPos[segIdx * 6 + 0] = a.x
-      tendrilPos[segIdx * 6 + 1] = a.y
-      tendrilPos[segIdx * 6 + 2] = a.z
-      tendrilT[segIdx * 2 + 0] = t0
-      tendrilPhase[segIdx * 2 + 0] = phase
-      tendrilColorMix[segIdx * 2 + 0] = colorMix
-
-      tendrilPos[segIdx * 6 + 3] = b.x
-      tendrilPos[segIdx * 6 + 4] = b.y
-      tendrilPos[segIdx * 6 + 5] = b.z
-      tendrilT[segIdx * 2 + 1] = t1
-      tendrilPhase[segIdx * 2 + 1] = phase
-      tendrilColorMix[segIdx * 2 + 1] = colorMix
-
-      segIdx++
-    }
+/** Evenly spread directions on a sphere (no clumping). */
+function fibonacciDirections(count: number, rng: () => number): THREE.Vector3[] {
+  const dirs: THREE.Vector3[] = []
+  const golden = Math.PI * (3 - Math.sqrt(5))
+  const offset = rng() * Math.PI * 2
+  for (let i = 0; i < count; i++) {
+    const y = 1 - ((i + 0.5) / count) * 2
+    const r = Math.sqrt(1 - y * y)
+    const theta = golden * i + offset
+    // Flatten toward the screen plane so filaments read in silhouette, not as dots.
+    dirs.push(new THREE.Vector3(Math.cos(theta) * r, y, Math.sin(theta) * r * 0.45).normalize())
   }
+  return dirs
+}
 
-  const tendrilGeo = new THREE.BufferGeometry()
-  tendrilGeo.setAttribute('position', new THREE.BufferAttribute(tendrilPos, 3))
-  tendrilGeo.setAttribute('aT', new THREE.BufferAttribute(tendrilT, 1))
-  tendrilGeo.setAttribute('aPhase', new THREE.BufferAttribute(tendrilPhase, 1))
-  tendrilGeo.setAttribute('aColorMix', new THREE.BufferAttribute(tendrilColorMix, 1))
+/** All filaments as one tapered tube mesh, so they draw in a single call. */
+function buildFilamentGeometry(count: number, rng: () => number): THREE.BufferGeometry {
+  const lengthSegments = 36
+  const radialSegments = 4
+  const ringVerts = radialSegments + 1
+  const vertsPerFilament = (lengthSegments + 1) * ringVerts
 
-  const tendrilMat = new THREE.ShaderMaterial({
-    vertexShader: TENDRIL_VERTEX_SHADER,
-    fragmentShader: TENDRIL_FRAGMENT_SHADER,
-    uniforms: {
-      ...sharedUniforms,
-    },
-    transparent: true,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-  })
-  const tendrilMesh = new THREE.LineSegments(tendrilGeo, tendrilMat)
-  group.add(tendrilMesh)
-  disposables.push(tendrilGeo, tendrilMat)
+  const positions = new Float32Array(count * vertsPerFilament * 3)
+  const tValues = new Float32Array(count * vertsPerFilament)
+  const seeds = new Float32Array(count * vertsPerFilament)
+  const indices: number[] = []
 
-  // 2. High-Voltage Synaptic Lightning Arcs (branching/snapping electrical bolts between core and outer field)
-  const boltCount = isCompact ? 12 : 22
-  const boltSteps = isCompact ? 16 : 22
-  const totalBoltSegments = boltCount * boltSteps
+  const dirs = fibonacciDirections(count, rng)
+  const up = new THREE.Vector3(0, 1, 0)
+  const side = new THREE.Vector3()
+  const tangent = new THREE.Vector3()
+  const normal = new THREE.Vector3()
+  const binormal = new THREE.Vector3()
+  const point = new THREE.Vector3()
 
-  const boltPos = new Float32Array(totalBoltSegments * 2 * 3)
-  const boltT = new Float32Array(totalBoltSegments * 2)
-  const boltSeed = new Float32Array(totalBoltSegments * 2)
-  const boltOrtho1 = new Float32Array(totalBoltSegments * 2 * 3)
-  const boltOrtho2 = new Float32Array(totalBoltSegments * 2 * 3)
-
-  let bIdx = 0
-  for (let b = 0; b < boltCount; b++) {
-    const start = sampleSphericalPoint(rng, 1.12)
-    const dir = start.clone().normalize()
-    // Arc either outward to outer shell or across to an adjacent quadrant
-    const isBridgeBolt = rng() > 0.45
-    const end = isBridgeBolt
-      ? sampleSphericalPoint(rng, 1.68 + rng() * 0.35)
-      : dir
-          .clone()
-          .add(sampleSphericalPoint(rng, 0.75))
-          .normalize()
-          .multiplyScalar(1.15)
-
-    const mid = start
-      .clone()
-      .add(end)
-      .multiplyScalar(0.5)
-      .normalize()
-      .multiplyScalar(1.45 + rng() * 0.35)
-
-    const baseCurve = new THREE.QuadraticBezierCurve3(start, mid, end)
-    const pts = baseCurve.getPoints(boltSteps)
-
-    const chord = end.clone().sub(start).normalize()
-    const up = Math.abs(chord.y) < 0.9 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0)
-    const ortho1 = new THREE.Vector3().crossVectors(chord, up).normalize()
-    const ortho2 = new THREE.Vector3().crossVectors(chord, ortho1).normalize()
+  let v = 0
+  dirs.forEach((dir, f) => {
     const seed = rng()
+    side.crossVectors(dir, Math.abs(dir.y) > 0.9 ? new THREE.Vector3(1, 0, 0) : up).normalize()
+    const sweep = side.clone().applyAxisAngle(dir, rng() * Math.PI * 2)
+    const reach = 0.75 + rng() * 0.35
+    const curl = 0.25 + rng() * 0.35
 
-    for (let s = 0; s < boltSteps; s++) {
-      const pA = pts[s]
-      const pB = pts[s + 1]
-      const t0 = s / boltSteps
-      const t1 = (s + 1) / boltSteps
+    const curve = new THREE.CatmullRomCurve3([
+      dir.clone().multiplyScalar(0.97),
+      dir.clone().multiplyScalar(1.0 + 0.32 * reach).addScaledVector(sweep, curl * 0.35),
+      dir.clone().multiplyScalar(1.0 + 0.7 * reach).addScaledVector(sweep, curl * 0.85),
+      dir.clone().multiplyScalar(1.0 + 1.0 * reach).addScaledVector(sweep, curl * 1.3),
+    ])
+    const frames = curve.computeFrenetFrames(lengthSegments, false)
 
-      boltPos[bIdx * 6 + 0] = pA.x
-      boltPos[bIdx * 6 + 1] = pA.y
-      boltPos[bIdx * 6 + 2] = pA.z
-      boltT[bIdx * 2 + 0] = t0
-      boltSeed[bIdx * 2 + 0] = seed
-      boltOrtho1[bIdx * 6 + 0] = ortho1.x
-      boltOrtho1[bIdx * 6 + 1] = ortho1.y
-      boltOrtho1[bIdx * 6 + 2] = ortho1.z
-      boltOrtho2[bIdx * 6 + 0] = ortho2.x
-      boltOrtho2[bIdx * 6 + 1] = ortho2.y
-      boltOrtho2[bIdx * 6 + 2] = ortho2.z
+    for (let s = 0; s <= lengthSegments; s++) {
+      const t = s / lengthSegments
+      curve.getPointAt(t, point)
+      tangent.copy(frames.tangents[s])
+      normal.copy(frames.normals[s])
+      binormal.copy(frames.binormals[s])
+      const radius = 0.0125 * (1 - t * 0.8)
 
-      boltPos[bIdx * 6 + 3] = pB.x
-      boltPos[bIdx * 6 + 4] = pB.y
-      boltPos[bIdx * 6 + 5] = pB.z
-      boltT[bIdx * 2 + 1] = t1
-      boltSeed[bIdx * 2 + 1] = seed
-      boltOrtho1[bIdx * 6 + 3] = ortho1.x
-      boltOrtho1[bIdx * 6 + 4] = ortho1.y
-      boltOrtho1[bIdx * 6 + 5] = ortho1.z
-      boltOrtho2[bIdx * 6 + 3] = ortho2.x
-      boltOrtho2[bIdx * 6 + 4] = ortho2.y
-      boltOrtho2[bIdx * 6 + 5] = ortho2.z
-
-      bIdx++
+      for (let r = 0; r <= radialSegments; r++) {
+        const a = (r / radialSegments) * Math.PI * 2
+        const cx = Math.cos(a) * radius
+        const cy = Math.sin(a) * radius
+        positions[v * 3 + 0] = point.x + normal.x * cx + binormal.x * cy
+        positions[v * 3 + 1] = point.y + normal.y * cx + binormal.y * cy
+        positions[v * 3 + 2] = point.z + normal.z * cx + binormal.z * cy
+        tValues[v] = t
+        seeds[v] = seed
+        v++
+      }
     }
-  }
 
-  const boltGeo = new THREE.BufferGeometry()
-  boltGeo.setAttribute('position', new THREE.BufferAttribute(boltPos, 3))
-  boltGeo.setAttribute('aT', new THREE.BufferAttribute(boltT, 1))
-  boltGeo.setAttribute('aSeed', new THREE.BufferAttribute(boltSeed, 1))
-  boltGeo.setAttribute('aOrtho1', new THREE.BufferAttribute(boltOrtho1, 3))
-  boltGeo.setAttribute('aOrtho2', new THREE.BufferAttribute(boltOrtho2, 3))
-
-  const boltMat = new THREE.ShaderMaterial({
-    vertexShader: LIGHTNING_VERTEX_SHADER,
-    fragmentShader: LIGHTNING_FRAGMENT_SHADER,
-    uniforms: {
-      ...sharedUniforms,
-    },
-    transparent: true,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
+    const base = f * vertsPerFilament
+    for (let s = 0; s < lengthSegments; s++) {
+      for (let r = 0; r < radialSegments; r++) {
+        const a = base + s * ringVerts + r
+        const b = base + (s + 1) * ringVerts + r
+        indices.push(a, b, a + 1, b, b + 1, a + 1)
+      }
+    }
   })
-  const boltMesh = new THREE.LineSegments(boltGeo, boltMat)
-  group.add(boltMesh)
-  disposables.push(boltGeo, boltMat)
 
-  return group
+  const geometry = new THREE.BufferGeometry()
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  geometry.setAttribute('aT', new THREE.BufferAttribute(tValues, 1))
+  geometry.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1))
+  geometry.setIndex(indices)
+  return geometry
 }
 
-function buildParticleHalo(
-  isCompact: boolean,
-  rng: () => number,
-  sharedUniforms: SharedUniforms,
-  disposables: Disposable[]
-): THREE.Points {
-  const particleCount = isCompact ? 260 : 580
-  const positions = new Float32Array(particleCount * 3)
-  const seeds = new Float32Array(particleCount)
-  const sizes = new Float32Array(particleCount)
-
-  const baseSize = isCompact ? 15.0 : 20.0
-  for (let i = 0; i < particleCount; i++) {
-    const u = rng()
-    const v = rng()
-    const theta = u * 2.0 * Math.PI
-    const phi = Math.acos(2.0 * v - 1.0)
-    const r = 1.48 + rng() * 1.42
-    const sinPhi = Math.sin(phi)
-
-    positions[i * 3 + 0] = r * sinPhi * Math.cos(theta)
-    positions[i * 3 + 1] = r * sinPhi * Math.sin(theta)
-    positions[i * 3 + 2] = r * Math.cos(phi)
-
+function buildSnowGeometry(count: number, rng: () => number): THREE.BufferGeometry {
+  const positions = new Float32Array(count * 3)
+  const seeds = new Float32Array(count)
+  for (let i = 0; i < count; i++) {
+    positions[i * 3 + 0] = (rng() - 0.5) * 8
+    positions[i * 3 + 1] = (rng() - 0.5) * 6
+    positions[i * 3 + 2] = -3.2 + rng() * 4.4
     seeds[i] = rng()
-    sizes[i] = baseSize * (0.65 + rng() * 0.85)
   }
-
-  const haloGeo = new THREE.BufferGeometry()
-  haloGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-  haloGeo.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1))
-  haloGeo.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1))
-
-  const haloMaterial = new THREE.ShaderMaterial({
-    vertexShader: HALO_VERTEX_SHADER,
-    fragmentShader: HALO_FRAGMENT_SHADER,
-    uniforms: {
-      ...sharedUniforms,
-    },
-    transparent: true,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-  })
-
-  const haloPoints = new THREE.Points(haloGeo, haloMaterial)
-  disposables.push(haloGeo, haloMaterial)
-  return haloPoints
+  const geometry = new THREE.BufferGeometry()
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  geometry.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1))
+  return geometry
 }
 
-function buildCyberRibbonRings(
-  isCompact: boolean,
-  sharedUniforms: SharedUniforms,
-  disposables: Disposable[]
-): {
-  group: THREE.Group
-  ring1: THREE.Mesh
-  ring2: THREE.Mesh
-  ring3: THREE.Mesh
-} {
-  const group = new THREE.Group()
-  const tubularSegments = isCompact ? 96 : 144
-
-  const createRibbonMaterial = (ringSpeed: number, scanDir: number, colorMix: number) => {
-    const mat = new THREE.ShaderMaterial({
-      vertexShader: RIBBON_RING_VERTEX_SHADER,
-      fragmentShader: RIBBON_RING_FRAGMENT_SHADER,
-      uniforms: {
-        ...sharedUniforms,
-        uRingSpeed: { value: ringSpeed },
-        uScanDir: { value: scanDir },
-        uColorMix: { value: colorMix },
-      },
-      side: THREE.DoubleSide,
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    })
-    disposables.push(mat)
-    return mat
-  }
-
-  const ring1Geo = new THREE.TorusGeometry(1.7, 0.022, 8, tubularSegments)
-  const ring1Mat = createRibbonMaterial(1.0, 1.0, 0.15)
-  const ring1 = new THREE.Mesh(ring1Geo, ring1Mat)
-  ring1.rotation.x = Math.PI * 0.35
-  ring1.rotation.y = Math.PI * 0.15
-  group.add(ring1)
-  disposables.push(ring1Geo)
-
-  const ring2Geo = new THREE.TorusGeometry(1.9, 0.018, 8, tubularSegments)
-  const ring2Mat = createRibbonMaterial(-1.25, -1.0, 0.55)
-  const ring2 = new THREE.Mesh(ring2Geo, ring2Mat)
-  ring2.rotation.x = -Math.PI * 0.4
-  ring2.rotation.y = -Math.PI * 0.25
-  group.add(ring2)
-  disposables.push(ring2Geo)
-
-  const ring3Geo = new THREE.TorusGeometry(2.1, 0.016, 8, tubularSegments)
-  const ring3Mat = createRibbonMaterial(1.45, 1.0, 0.85)
-  const ring3 = new THREE.Mesh(ring3Geo, ring3Mat)
-  ring3.rotation.x = Math.PI * 0.6
-  ring3.rotation.z = Math.PI * 0.3
-  group.add(ring3)
-  disposables.push(ring3Geo)
-
-  return { group, ring1, ring2, ring3 }
-}
-
-function buildAegisContainmentShell(
-  isCompact: boolean,
-  sharedUniforms: SharedUniforms,
-  disposables: Disposable[]
-): THREE.Mesh {
-  const detail = isCompact ? 6 : 10
-  const shellGeo = new THREE.IcosahedronGeometry(1.42, detail)
-  const shellMaterial = new THREE.ShaderMaterial({
-    vertexShader: AEGIS_SHELL_VERTEX_SHADER,
-    fragmentShader: AEGIS_SHELL_FRAGMENT_SHADER,
-    uniforms: {
-      ...sharedUniforms,
-    },
-    side: THREE.DoubleSide,
-    transparent: true,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-  })
-  const shellMesh = new THREE.Mesh(shellGeo, shellMaterial)
-  disposables.push(shellGeo, shellMaterial)
-  return shellMesh
+/** Camera distance that keeps a sphere of `radius` inside both view axes. */
+function fitDistance(radius: number, fovDeg: number, aspect: number): number {
+  const halfV = THREE.MathUtils.degToRad(fovDeg) / 2
+  const halfH = Math.atan(Math.tan(halfV) * aspect)
+  return radius / Math.sin(Math.min(halfV, halfH))
 }
 
 // ---------------------------------------------------------------------------
@@ -1186,338 +481,350 @@ export function SynapticEntityCanvas({
 
     let renderer: THREE.WebGLRenderer | null = null
     let frameId = 0
-    let resizeObserver: ResizeObserver | null = null
-    let handleWindowResize: (() => void) | null = null
-    let intersectionObserver: IntersectionObserver | null = null
-    let mql: MediaQueryList | null = null
-    let handleMqlChange: ((e: MediaQueryListEvent) => void) | null = null
-    let handleVisibilityChange: (() => void) | null = null
-
+    const cleanups: Array<() => void> = []
     const disposables: Disposable[] = []
 
     try {
-      const initialCap = isCompact ? 1.5 : 1.75
-      const initialPr = Math.min(
-        typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1,
-        initialCap
-      )
-      let currentPr = initialPr
+      const prCap = isCompact ? 1.25 : 1.5
+      let currentPr = Math.min(window.devicePixelRatio || 1, prCap)
 
       renderer = new THREE.WebGLRenderer({
         canvas,
         alpha: true,
-        antialias: initialPr < 1.5,
-        powerPreference: 'high-performance',
+        antialias: currentPr < 1.5,
+        powerPreference: 'default',
       })
       renderer.setPixelRatio(currentPr)
-      renderer.toneMapping = THREE.ACESFilmicToneMapping
-      renderer.toneMappingExposure = 1.15
+      renderer.setClearColor(0x000000, 0)
 
       const scene = new THREE.Scene()
-      const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 50)
-      camera.position.set(0, 0, isCompact ? 5.1 : 4.65)
-      camera.lookAt(0, 0, 0)
-
+      const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 40)
       const rootGroup = new THREE.Group()
       scene.add(rootGroup)
 
-      // Primary state palette
-      const cyanColor = new THREE.Color(0x00c3ff)
-      const emeraldColor = new THREE.Color(0x00f5d4)
-      const crimsonColor = new THREE.Color(0xff453a)
-      const coralColor = new THREE.Color(0xff6a60)
-
-      // Complementary / harmonic state shades from our abyssal cyber palette
-      const indigoCompColor = new THREE.Color(0x6366f1) // Electric Cyber Indigo-Violet (pairs with Cyan)
-      const magentaCompColor = new THREE.Color(0xc026d3) // Bioluminescent Orchid-Magenta (pairs with Bio-Aqua)
-      const goldCompColor = new THREE.Color(0xffb703) // Molten Amber-Gold (pairs with Sacred Crimson)
-      const cyanShockCompColor = new THREE.Color(0x38bdf8) // High-voltage Electric Ice-Cyan (accent during error/max)
-
-      const activeColor = new THREE.Color(0x00c3ff)
-      const compColor = new THREE.Color(0x6366f1)
-      const crimsonShiftColor = new THREE.Color()
-      const compShiftColor = new THREE.Color()
-
-      const sharedUniforms: SharedUniforms = {
-        uTime: { value: 0 },
-        uStreamVelocity: { value: 0 },
-        uPulseEnergy: { value: 0 },
-        uThinkingTension: { value: 0 },
-        uTypingIntensity: { value: 0 },
-        uSynapseFlash: { value: 0 },
-        uColorShift: { value: 0 },
-        uReducedMotion: { value: 0 },
-        uPixelRatio: { value: currentPr },
-        uColor: { value: activeColor },
-        uCompColor: { value: compColor },
-      }
-
       const rng = createMulberry32(0x594e)
 
-      // Layer 2 Bloom sprites (renderOrder -1, -2 behind core)
-      const glow = buildGlowSprites(isCompact, disposables)
-      rootGroup.add(glow.group)
+      // Live colours, mutated in place each frame.
+      const coreColor = CYAN.clone()
+      const rimColor = CYAN.clone()
+      const lightDir = new THREE.Vector3(0.5, 0.65, 1)
 
-      // Layer 1: Metallic & Bioluminescent Liquid-Chitin Core
-      const coreMesh = buildCore(isCompact, sharedUniforms, disposables)
-      rootGroup.add(coreMesh)
+      const time = { value: 0 }
+      const breath = { value: 1 }
+      const energy = { value: 0 }
+      const think = { value: 0 }
+      const flash = { value: 0 }
+      const pixelRatio = { value: currentPr }
+      const errorUniform = { value: 0 }
 
-      // Layer 6: Holographic Caustic & Chromatic Interference Aegis Field (replaces wireframe grid)
-      const aegisShellMesh = buildAegisContainmentShell(isCompact, sharedUniforms, disposables)
-      rootGroup.add(aegisShellMesh)
+      // Halo: a soft light behind the body, sized to it (not the whole canvas).
+      const haloMaterial = new THREE.ShaderMaterial({
+        vertexShader: HALO_VERTEX_SHADER,
+        fragmentShader: HALO_FRAGMENT_SHADER,
+        uniforms: { uColor: { value: coreColor }, uIntensity: { value: 0.18 } },
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        depthTest: false,
+      })
+      const haloGeometry = new THREE.PlaneGeometry(5.2, 5.2)
+      const halo = new THREE.Mesh(haloGeometry, haloMaterial)
+      halo.position.z = -1.4
+      halo.renderOrder = -1
+      scene.add(halo)
+      disposables.push(haloMaterial, haloGeometry)
 
-      // Layer 3: Curved Wispy Synaptic Tendrils & High-Voltage Lightning Arcs
-      const synapseGroup = buildWispySynapseAndLightning(isCompact, rng, sharedUniforms, disposables)
-      rootGroup.add(synapseGroup)
+      // Body
+      const bodyGeometry = new THREE.IcosahedronGeometry(1, isCompact ? 8 : 12)
+      const bodyMaterial = new THREE.ShaderMaterial({
+        vertexShader: BODY_VERTEX_SHADER,
+        fragmentShader: BODY_FRAGMENT_SHADER,
+        uniforms: {
+          uTime: time,
+          uBreath: breath,
+          uEnergy: energy,
+          uThink: think,
+          uFlash: flash,
+          uError: errorUniform,
+          uColor: { value: coreColor },
+          uRimColor: { value: rimColor },
+          uDeep: { value: BODY_DEEP.clone() },
+          uLight: { value: lightDir },
+        },
+      })
+      const body = new THREE.Mesh(bodyGeometry, bodyMaterial)
+      rootGroup.add(body)
+      disposables.push(bodyGeometry, bodyMaterial)
 
-      // Layer 4: Curvy S-Wisp Particle Halo
-      const haloPoints = buildParticleHalo(isCompact, rng, sharedUniforms, disposables)
-      rootGroup.add(haloPoints)
+      // Filaments
+      const pulseBirth = new THREE.Vector4(-99, -99, -99, -99)
+      const pulseSeed = new THREE.Vector4(0, 0.25, 0.5, 0.75)
+      const pulseGain = new THREE.Vector4(0, 0, 0, 0)
+      const filamentGeometry = buildFilamentGeometry(isCompact ? 9 : 12, rng)
+      const filamentMaterial = new THREE.ShaderMaterial({
+        vertexShader: FILAMENT_VERTEX_SHADER,
+        fragmentShader: FILAMENT_FRAGMENT_SHADER,
+        uniforms: {
+          uTime: time,
+          uBreath: breath,
+          uThink: think,
+          uEnergy: energy,
+          uColor: { value: rimColor },
+          uPulseBirth: { value: pulseBirth },
+          uPulseSeed: { value: pulseSeed },
+          uPulseGain: { value: pulseGain },
+        },
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      })
+      const filaments = new THREE.Mesh(filamentGeometry, filamentMaterial)
+      rootGroup.add(filaments)
+      disposables.push(filamentGeometry, filamentMaterial)
 
-      // Layer 5: Continuous Metallic & Plasma Cyber Ribbon Rings
-      const rings = buildCyberRibbonRings(isCompact, sharedUniforms, disposables)
-      rootGroup.add(rings.group)
+      // Marine snow (outside the tilting group, so it reads as depth)
+      const snowGeometry = buildSnowGeometry(isCompact ? 50 : 110, rng)
+      const snowMaterial = new THREE.ShaderMaterial({
+        vertexShader: SNOW_VERTEX_SHADER,
+        fragmentShader: SNOW_FRAGMENT_SHADER,
+        uniforms: {
+          uTime: time,
+          uPixelRatio: pixelRatio,
+          uSizeScale: { value: 1 },
+          uColor: { value: CYAN_PALE.clone() },
+        },
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      })
+      const snow = new THREE.Points(snowGeometry, snowMaterial)
+      scene.add(snow)
+      disposables.push(snowGeometry, snowMaterial)
 
+      // Sizing: keep the body and filament tips in view on any aspect ratio.
+      const fitRadius = 1.8
       const updateDimensions = () => {
-        if (!container || !renderer || !camera) return
+        if (!renderer) return
         const width = container.clientWidth || 300
         const height = container.clientHeight || 300
         camera.aspect = width / height
+        camera.position.set(0, 0, fitDistance(fitRadius, camera.fov, camera.aspect))
+        camera.lookAt(0, 0, 0)
         camera.updateProjectionMatrix()
         renderer.setSize(width, height, false)
-      }
-      updateDimensions()
-
-      if (typeof ResizeObserver !== 'undefined') {
-        resizeObserver = new ResizeObserver(() => {
-          updateDimensions()
-        })
-        resizeObserver.observe(container)
-      } else if (typeof window !== 'undefined') {
-        handleWindowResize = updateDimensions
-        window.addEventListener('resize', handleWindowResize)
+        // Snow stays a fixed on-screen size relative to the canvas height.
+        snowMaterial.uniforms.uSizeScale.value = Math.min(1.4, Math.max(0.6, height / 700))
+        if (!isRunning) renderFrame(0)
       }
 
-      // Prefers-reduced-motion caching
-      let prefersReducedMotion = false
-      if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
-        mql = window.matchMedia('(prefers-reduced-motion: reduce)')
-        prefersReducedMotion = mql.matches
-        handleMqlChange = (e: MediaQueryListEvent) => {
-          prefersReducedMotion = e.matches
+      // Pointer tilt: the body leans toward the pointer and its light follows.
+      const pointer = { x: 0, y: 0, active: false }
+      const tilt = { x: 0, y: 0 }
+      const handlePointerMove = (event: PointerEvent) => {
+        if (event.pointerType === 'touch') return
+        const rect = container.getBoundingClientRect()
+        if (rect.width === 0 || rect.height === 0) return
+        const nx = ((event.clientX - rect.left) / rect.width) * 2 - 1
+        const ny = ((event.clientY - rect.top) / rect.height) * 2 - 1
+        pointer.x = Math.max(-1, Math.min(1, nx))
+        pointer.y = Math.max(-1, Math.min(1, ny))
+        pointer.active = true
+      }
+      const handlePointerLeave = () => {
+        pointer.active = false
+      }
+      window.addEventListener('pointermove', handlePointerMove, { passive: true })
+      document.documentElement.addEventListener('pointerleave', handlePointerLeave)
+      cleanups.push(() => {
+        window.removeEventListener('pointermove', handlePointerMove)
+        document.documentElement.removeEventListener('pointerleave', handlePointerLeave)
+      })
+
+      // Reduced motion
+      let reducedMotion = false
+      const mql = typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-reduced-motion: reduce)')
+        : null
+      if (mql) {
+        reducedMotion = mql.matches
+        const onChange = (e: MediaQueryListEvent) => {
+          reducedMotion = e.matches
         }
-        if (typeof mql.addEventListener === 'function') {
-          mql.addEventListener('change', handleMqlChange)
-        } else if (
-          typeof (mql as unknown as { addListener: (cb: (e: MediaQueryListEvent) => void) => void })
-            .addListener === 'function'
-        ) {
-          ;(
-            mql as unknown as { addListener: (cb: (e: MediaQueryListEvent) => void) => void }
-          ).addListener(handleMqlChange)
-        }
+        mql.addEventListener?.('change', onChange)
+        cleanups.push(() => mql.removeEventListener?.('change', onChange))
       }
 
-      let lastTimeMs = performance.now()
-      let elapsedTotal = 0
-      let rollingFrameTimeMs = 16.6
-      let slowAccumulatorSeconds = 0
+      // State smoothing
+      let elapsed = 0
+      let errorMix = 0
+      let pulseSlot = 0
+      let lastPulseAt = -99
+      let lastChars = 0
+      let wasStreaming = false
 
-      let isIntersecting = true
-      let isVisible = typeof document !== 'undefined' ? !document.hidden : true
-      let isRunning = false
+      const launchPulse = (gain: number) => {
+        const slot = pulseSlot % PULSE_SLOTS
+        pulseSlot++
+        const seed = rng()
+        if (slot === 0) { pulseBirth.x = elapsed; pulseSeed.x = seed; pulseGain.x = gain }
+        if (slot === 1) { pulseBirth.y = elapsed; pulseSeed.y = seed; pulseGain.y = gain }
+        if (slot === 2) { pulseBirth.z = elapsed; pulseSeed.z = seed; pulseGain.z = gain }
+        if (slot === 3) { pulseBirth.w = elapsed; pulseSeed.w = seed; pulseGain.w = gain }
+        lastPulseAt = elapsed
+      }
 
-      const tick = (nowMs: number) => {
-        const rawDtMs = nowMs - lastTimeMs
-        const dtSeconds = Math.min(0.1, Math.max(0.001, rawDtMs * 0.001))
-        lastTimeMs = nowMs
+      const renderFrame = (dt: number) => {
+        const snapshot = bridge.stepFrame(dt)
+        const motion = reducedMotion ? 0 : 1
+        elapsed += dt * motion
+        time.value = elapsed
 
-        // Adaptive resolution step down (sustained >20ms for ~1.5s)
-        rollingFrameTimeMs = rollingFrameTimeMs * 0.9 + Math.min(rawDtMs, 50) * 0.1
-        if (rollingFrameTimeMs > 20.0 && currentPr > 1.0) {
-          slowAccumulatorSeconds += dtSeconds
-          if (slowAccumulatorSeconds >= 1.5) {
-            currentPr = Math.max(1.0, currentPr - 0.25)
-            renderer?.setPixelRatio(currentPr)
-            sharedUniforms.uPixelRatio.value = currentPr
-            slowAccumulatorSeconds = 0
+        const streaming = snapshot.lifecycle === 'streaming'
+        const activity = Math.min(1, snapshot.streamVelocity * 0.7 + snapshot.pulseEnergy * 0.5)
+        energy.value = damp(energy.value, activity, 4, dt)
+        think.value = damp(think.value, snapshot.thinkingTension, 3, dt)
+        flash.value = damp(flash.value, snapshot.synapseFlash, 10, dt)
+        errorMix = damp(errorMix, snapshot.lifecycle === 'error' ? 1 : 0, 2.5, dt)
+        errorUniform.value = errorMix
+
+        // One colour family. Brighter while replying, deeper while thinking,
+        // crimson only for errors.
+        coreColor.copy(CYAN).lerp(CYAN_DEEP, think.value * 0.35).lerp(CYAN_PALE, energy.value * 0.25)
+        rimColor.copy(CYAN).lerp(TEAL, 0.4).lerp(CYAN_PALE, energy.value * 0.3 + snapshot.typingIntensity * 0.1)
+        coreColor.lerp(CRIMSON, errorMix * 0.85)
+        rimColor.lerp(CRIMSON, errorMix * 0.8)
+
+        // Breath: slow at rest, held smaller while thinking.
+        const breathe = Math.sin(elapsed * (Math.PI * 2) / 5.5) * 0.012
+        breath.value = 1 + breathe * (1 - think.value * 0.6) - think.value * 0.03 + energy.value * 0.012
+
+        // Light travels out along the filaments as text arrives.
+        if (motion > 0) {
+          const chars = snapshot.totalCharsStreamed
+          if (streaming && (!wasStreaming || chars < lastChars)) lastChars = 0
+          if (streaming && chars > lastChars && elapsed - lastPulseAt > 0.32) {
+            launchPulse(0.7 + Math.min(0.3, snapshot.pulseEnergy * 0.5))
+            lastChars = chars
+          } else if (!streaming && snapshot.lifecycle !== 'error' && elapsed - lastPulseAt > 7) {
+            launchPulse(0.4)
           }
-        } else {
-          slowAccumulatorSeconds = Math.max(0, slowAccumulatorSeconds - dtSeconds * 0.5)
         }
+        wasStreaming = streaming
 
-        const snapshot = bridge.stepFrame(dtSeconds, nowMs)
-        const motionScale = prefersReducedMotion ? 0.15 : 1.0
-        elapsedTotal += dtSeconds * motionScale
+        haloMaterial.uniforms.uIntensity.value =
+          0.2 + energy.value * 0.12 + think.value * 0.06 + flash.value * 0.04
 
-        // Shared uniform updates
-        sharedUniforms.uTime.value = elapsedTotal
-        sharedUniforms.uStreamVelocity.value = snapshot.streamVelocity
-        sharedUniforms.uPulseEnergy.value = snapshot.pulseEnergy
-        sharedUniforms.uThinkingTension.value = snapshot.thinkingTension
-        sharedUniforms.uTypingIntensity.value = snapshot.typingIntensity
-        sharedUniforms.uSynapseFlash.value = snapshot.synapseFlash
-        sharedUniforms.uColorShift.value = snapshot.colorShift
-        sharedUniforms.uReducedMotion.value = prefersReducedMotion ? 1.0 : 0.0
-
-        // Primary + Complementary Palette Blending across Entity Lifecycle States
-        if (snapshot.colorShift < 0.45) {
-          const t = snapshot.colorShift / 0.45
-          activeColor.lerpColors(cyanColor, emeraldColor, t)
-          compColor.lerpColors(indigoCompColor, magentaCompColor, t)
-        } else {
-          const f = Math.min(1.0, (snapshot.colorShift - 0.45) / 0.45)
-          const highEnd = Math.max(0.0, Math.min(1.0, (snapshot.colorShift - 0.88) * 8.0))
-          crimsonShiftColor.lerpColors(crimsonColor, coralColor, highEnd)
-          compShiftColor.lerpColors(goldCompColor, cyanShockCompColor, highEnd * 0.65)
-          activeColor.lerpColors(emeraldColor, crimsonShiftColor, f)
-          compColor.lerpColors(magentaCompColor, compShiftColor, f)
-        }
-
-        // Bloom billboards breathing (corona carries primary hue, wide halo carries complementary blend)
-        const coronaBaseScale = isCompact ? 2.75 : 3.2
-        const coronaScale =
-          coronaBaseScale *
-          (1.0 +
-            snapshot.pulseEnergy * 0.18 +
-            snapshot.synapseFlash * 0.35 +
-            snapshot.streamVelocity * 0.12)
-        glow.coronaSprite.scale.set(coronaScale, coronaScale, 1.0)
-        glow.coronaMaterial.color.copy(activeColor)
-        glow.coronaMaterial.opacity = Math.min(
-          1.0,
-          0.62 +
-            snapshot.pulseEnergy * 0.25 +
-            snapshot.synapseFlash * 0.38 +
-            snapshot.streamVelocity * 0.15
-        )
-
-        const wideBaseScale = isCompact ? 5.4 : 6.6
-        const wideScale =
-          wideBaseScale *
-          (1.0 + snapshot.pulseEnergy * 0.22 + snapshot.synapseFlash * 0.3)
-        glow.wideSprite.scale.set(wideScale, wideScale, 1.0)
-        glow.wideMaterial.color.copy(compColor).lerp(activeColor, 0.45)
-        glow.wideMaterial.opacity = Math.min(
-          0.85,
-          0.28 + snapshot.pulseEnergy * 0.22 + snapshot.synapseFlash * 0.35
-        )
-
-        // Core mesh orbital breathing rotation
-        const coreSpeed =
-          (0.26 + snapshot.streamVelocity * 0.62 + snapshot.thinkingTension * 0.35) * motionScale
-        coreMesh.rotation.y += dtSeconds * coreSpeed
-        coreMesh.rotation.x += dtSeconds * coreSpeed * 0.38
-
-        // Holographic Aegis containment shell dynamics
-        const shellScale = 1.0 - snapshot.thinkingTension * 0.08 + snapshot.pulseEnergy * 0.12
-        aegisShellMesh.scale.setScalar(shellScale)
-        const shellSpeed =
-          (0.22 + snapshot.streamVelocity * 0.65 + snapshot.thinkingTension * 0.45) * motionScale
-        aegisShellMesh.rotation.y -= dtSeconds * shellSpeed
-        aegisShellMesh.rotation.x += dtSeconds * shellSpeed * 0.52
-        aegisShellMesh.rotation.z += dtSeconds * shellSpeed * 0.28
-
-        // Wispy tendrils & lightning network rotation
-        const synapseSpeed =
-          (0.18 + snapshot.streamVelocity * 0.48 + snapshot.pulseEnergy * 0.22) * motionScale
-        synapseGroup.rotation.y += dtSeconds * synapseSpeed
-        synapseGroup.rotation.x += dtSeconds * synapseSpeed * 0.32
-
-        // Continuous cyber ribbon rings gyroscopic precession
-        const ringPrecessionSpeed =
-          (0.42 + snapshot.streamVelocity * 1.4 + snapshot.thinkingTension * 0.75) * motionScale
-        rings.ring1.rotation.z += dtSeconds * ringPrecessionSpeed
-        rings.ring1.rotation.y += dtSeconds * ringPrecessionSpeed * 0.55
-        rings.ring2.rotation.z -= dtSeconds * ringPrecessionSpeed * 0.82
-        rings.ring2.rotation.x += dtSeconds * ringPrecessionSpeed * 0.48
-        rings.ring3.rotation.y += dtSeconds * ringPrecessionSpeed * 0.7
-        rings.ring3.rotation.z += dtSeconds * ringPrecessionSpeed * 0.35
-
-        // Autonomous subtle sinusoidal idle drift (no mouse/pointer movement)
-        const idleSwayX = Math.sin(elapsedTotal * 0.55) * 0.045 * motionScale
-        const idleSwayY = Math.cos(elapsedTotal * 0.42) * 0.035 * motionScale
-        rootGroup.rotation.y = idleSwayX
-        rootGroup.rotation.x = idleSwayY
+        // Pointer tilt and light (eased; returns to centre when the pointer leaves).
+        const tx = pointer.active ? pointer.x : 0
+        const ty = pointer.active ? pointer.y : 0
+        const ease = reducedMotion ? 1 : 1 - Math.exp(-3 * dt)
+        tilt.x += (tx - tilt.x) * ease
+        tilt.y += (ty - tilt.y) * ease
+        const lean = reducedMotion ? 0.08 : 0.22
+        rootGroup.rotation.y = tilt.x * lean
+        rootGroup.rotation.x = tilt.y * lean * 0.75
+        lightDir.set(0.45 + tilt.x * 0.9, 0.6 - tilt.y * 0.9, 1)
 
         renderer?.render(scene, camera)
+      }
+
+      // Frame pacing: full rate while the Oracle is active, ~30fps at rest,
+      // ~6fps for reduced motion (colour changes only).
+      let isIntersecting = true
+      let isVisible = !document.hidden
+      let isRunning = false
+      let lastMs = performance.now()
+      let pendingDt = 0
+      let slowSeconds = 0
+      let rollingMs = 16.6
+
+      const tick = (nowMs: number) => {
         frameId = window.requestAnimationFrame(tick)
+        const rawMs = nowMs - lastMs
+        lastMs = nowMs
+        pendingDt += Math.min(0.1, Math.max(0, rawMs * 0.001))
+
+        const snapshot = bridge.getSnapshot()
+        const busy =
+          snapshot.lifecycle === 'streaming' ||
+          snapshot.lifecycle === 'thinking' ||
+          energy.value > 0.02 ||
+          think.value > 0.02
+        const minStep = reducedMotion ? 1 / 6 : busy ? 0 : 1 / 31
+        if (pendingDt < minStep) return
+
+        const dt = Math.min(0.1, Math.max(0.001, pendingDt))
+        pendingDt = 0
+
+        // Step resolution down if frames stay slow.
+        rollingMs = rollingMs * 0.9 + Math.min(rawMs, 50) * 0.1
+        if (busy && rollingMs > 22 && currentPr > 1) {
+          slowSeconds += dt
+          if (slowSeconds > 1.5) {
+            currentPr = Math.max(1, currentPr - 0.25)
+            renderer?.setPixelRatio(currentPr)
+            pixelRatio.value = currentPr
+            slowSeconds = 0
+          }
+        } else {
+          slowSeconds = Math.max(0, slowSeconds - dt * 0.5)
+        }
+
+        renderFrame(dt)
       }
 
       const checkLoop = () => {
-        if (isIntersecting && isVisible) {
-          if (!isRunning) {
-            isRunning = true
-            lastTimeMs = performance.now()
-            frameId = window.requestAnimationFrame(tick)
-          }
-        } else {
-          if (isRunning) {
-            isRunning = false
-            if (frameId && typeof window !== 'undefined') {
-              window.cancelAnimationFrame(frameId)
-              frameId = 0
-            }
-          }
+        const shouldRun = isIntersecting && isVisible
+        if (shouldRun && !isRunning) {
+          isRunning = true
+          lastMs = performance.now()
+          pendingDt = 1
+          frameId = window.requestAnimationFrame(tick)
+        } else if (!shouldRun && isRunning) {
+          isRunning = false
+          window.cancelAnimationFrame(frameId)
+          frameId = 0
         }
       }
 
-      if (typeof IntersectionObserver !== 'undefined' && container) {
-        intersectionObserver = new IntersectionObserver(
+      updateDimensions()
+      if (typeof ResizeObserver !== 'undefined') {
+        const resizeObserver = new ResizeObserver(updateDimensions)
+        resizeObserver.observe(container)
+        cleanups.push(() => resizeObserver.disconnect())
+      } else {
+        window.addEventListener('resize', updateDimensions)
+        cleanups.push(() => window.removeEventListener('resize', updateDimensions))
+      }
+
+      if (typeof IntersectionObserver !== 'undefined') {
+        const intersectionObserver = new IntersectionObserver(
           (entries) => {
-            const entry = entries[0]
-            isIntersecting = entry ? entry.isIntersecting : true
+            isIntersecting = entries[0]?.isIntersecting ?? true
             checkLoop()
           },
           { threshold: 0.05 }
         )
         intersectionObserver.observe(container)
+        cleanups.push(() => intersectionObserver.disconnect())
       }
 
-      handleVisibilityChange = () => {
-        isVisible = typeof document !== 'undefined' ? !document.hidden : true
+      const handleVisibilityChange = () => {
+        isVisible = !document.hidden
         checkLoop()
       }
-      if (typeof document !== 'undefined') {
-        document.addEventListener('visibilitychange', handleVisibilityChange)
-      }
+      document.addEventListener('visibilitychange', handleVisibilityChange)
+      cleanups.push(() => document.removeEventListener('visibilitychange', handleVisibilityChange))
 
-      isRunning = true
-      lastTimeMs = performance.now()
-      frameId = window.requestAnimationFrame(tick)
+      checkLoop()
       setWebglUnavailable(false)
     } catch {
       setWebglUnavailable(true)
     }
 
     return () => {
-      if (frameId && typeof window !== 'undefined') {
-        window.cancelAnimationFrame(frameId)
-      }
-      if (intersectionObserver) {
-        intersectionObserver.disconnect()
-      }
-      if (handleVisibilityChange && typeof document !== 'undefined') {
-        document.removeEventListener('visibilitychange', handleVisibilityChange)
-      }
-      if (resizeObserver) {
-        resizeObserver.disconnect()
-      } else if (handleWindowResize && typeof window !== 'undefined') {
-        window.removeEventListener('resize', handleWindowResize)
-      }
-      if (mql && handleMqlChange) {
-        if (typeof mql.removeEventListener === 'function') {
-          mql.removeEventListener('change', handleMqlChange)
-        } else if (
-          typeof (mql as unknown as { removeListener: (cb: (e: MediaQueryListEvent) => void) => void })
-            .removeListener === 'function'
-        ) {
-          ;(
-            mql as unknown as { removeListener: (cb: (e: MediaQueryListEvent) => void) => void }
-          ).removeListener(handleMqlChange)
-        }
-      }
-
+      if (frameId) window.cancelAnimationFrame(frameId)
+      cleanups.forEach((fn) => fn())
       disposables.forEach((item) => {
         try {
           item.dispose()
@@ -1535,23 +842,10 @@ export function SynapticEntityCanvas({
       data-testid="synaptic-entity-canvas"
       className={`relative w-full h-full min-h-[140px] flex items-center justify-center overflow-hidden select-none ${className}`}
     >
-      {webglUnavailable ? (
-        <div
-          data-testid="synaptic-entity-fallback"
-          className="w-full h-full min-h-[140px] flex items-center justify-center relative overflow-hidden select-none"
-        >
-          <div
-            className="w-28 h-28 rounded-full animate-pulse"
-            style={{
-              background:
-                'radial-gradient(circle at 38% 36%, rgba(0, 245, 212, 0.9) 0%, rgba(0, 195, 255, 0.75) 32%, rgba(99, 102, 241, 0.55) 64%, rgba(3, 7, 8, 0) 100%)',
-              boxShadow: '0 0 48px rgba(0, 195, 255, 0.5), inset 0 0 24px rgba(192, 38, 211, 0.35)',
-            }}
-          />
-        </div>
-      ) : (
+      {webglUnavailable ? <SynapticCoreFallback /> : (
         <canvas
           ref={canvasRef}
+          aria-hidden="true"
           className="block w-full h-full"
           style={{ display: 'block', width: '100%', height: '100%' }}
         />
