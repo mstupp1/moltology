@@ -32,6 +32,24 @@ export const getGemWalletFn = createServerFn({ method: 'POST' })
     const { getGemWalletHandler } = await import('./gems')
     return getGemWalletHandler(args)
   })
+
+export const getMarketFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { token?: string }) => z.object({ token: z.string().optional() }).parse(data))
+  .handler(async (args) => {
+    const { getMarketHandler } = await import('./market')
+    return getMarketHandler(args)
+  })
+
+export const buyGearFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { token?: string; catalogItemId: string }) =>
+    z.object({ token: z.string().optional(), catalogItemId: z.string().uuid() }).parse(data),
+  )
+  .handler(async (args) => {
+    const { buyGearHandler } = await import('./market')
+    return buyGearHandler(args)
+  })
 export type {
   AdminMemberDirectory,
   AdminMemberRole,

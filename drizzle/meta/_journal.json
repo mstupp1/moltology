@@ -407,6 +407,13 @@
       "when": 1793819574973,
       "tag": "0057_gem_ledger",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1793820380738,
+      "tag": "0058_gear_unlocks_and_variants",
+      "breakpoints": true
     }
   ]
 }

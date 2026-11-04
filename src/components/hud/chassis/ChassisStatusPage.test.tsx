@@ -25,6 +25,9 @@ vi.mock('../avatar/AvatarCreatorPreview', () => ({
     <div data-testid="preview" data-config={JSON.stringify(config)} />
   ),
 }))
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
+}))
 vi.mock('../avatar/AvatarCreatorPanel', () => ({
   AvatarCreatorPanel: ({ value, onChange }: any) => (
     <button onClick={() => onChange({ ...value, race: 'crab' })}>Become crab</button>
@@ -113,9 +116,10 @@ describe('unified character workspace', () => {
     vi.mocked(getChassisLoadoutFn).mockResolvedValue({
       ...structuredClone(payload),
       allUnlocked: true,
+      everyItem: true,
     })
     await mount()
-    expect(screen.getByText('Admin · every item is unlocked.')).toBeInTheDocument()
+    expect(screen.getByText(/Admin · every item is unlocked/)).toBeInTheDocument()
     choose('Oracle Dome Lattice')
     fireEvent.click(screen.getByRole('button', { name: 'Equip on head' }))
     expect(screen.queryByRole('status')).toBeNull()

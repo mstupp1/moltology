@@ -21,7 +21,7 @@ type Db = ReturnType<typeof getDb>
  * sum runs on a fresh snapshot after any concurrent award or purchase has committed
  * (each statement in a batch takes its own snapshot).
  */
-function balanceRefresh(db: Db, userId: string) {
+export function balanceRefresh(db: Db, userId: string) {
   return [
     db.select({ id: profiles.id }).from(profiles).where(eq(profiles.id, userId)).for('update'),
     db

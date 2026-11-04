@@ -581,8 +581,13 @@ export interface ChassisLoadoutPayload {
   vaultSize: number
   config?: import('./lobster-avatar').LobsterAvatarConfig | null
   appearanceRevision?: number
-  /** Admins have every catalog item unlocked; equipping one creates its instance on save. */
+  /**
+   * Collection mode: every catalog entry listed here is owned and can be worn; equipping one
+   * creates its instance on save. The catalog holds only what this member owns.
+   */
   allUnlocked?: boolean
+  /** Admins: the catalog is every piece, owned or not. */
+  everyItem?: boolean
 }
 
 let chassisLoadoutCache: { userId: string; payload: ChassisLoadoutPayload } | null = null
