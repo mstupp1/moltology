@@ -5,6 +5,17 @@ import {
   toggleDailyAlignmentTaskHandler,
 } from './db-services'
 
+vi.mock('./gems', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./gems')>()
+  return {
+    ...actual,
+    awardGems: vi.fn().mockResolvedValue(undefined),
+    revokeDailyGems: vi.fn().mockResolvedValue(undefined),
+    checkGemMilestones: vi.fn().mockResolvedValue(undefined),
+    tryCheckGemMilestones: vi.fn().mockResolvedValue(undefined),
+  }
+})
+
 const writableDate = localDateString()
 
 describe('Daily Alignment Server Handlers', () => {
@@ -166,6 +177,9 @@ describe('Daily Alignment Server Handlers', () => {
 
     // routineCompletions + activityEvents + xpTransactions = 3 deletes
     expect(deleteMock).toHaveBeenCalledTimes(3)
+    // Unchecking takes back that date's daily gems
+    const gems = await import('./gems')
+    expect(vi.mocked(gems.revokeDailyGems)).toHaveBeenCalledWith(mockDb, 'test-user-id', writableDate)
   })
 
   it('accepts liturgy dates within one day of the server today and rejects the rest', async () => {

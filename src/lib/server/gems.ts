@@ -16,18 +16,25 @@ import { resolveWriteAuth, type WriteAuthContext } from './write-auth'
 
 type Db = ReturnType<typeof getDb>
 
-/** Statement that refreshes the cached balance from the ledger. */
-function syncBalanceStatement(db: Db, userId: string) {
-  return db
-    .update(profiles)
-    .set({
-      chitinGems: sql`(SELECT COALESCE(SUM(amount), 0)::int FROM gem_transactions WHERE "userId" = ${userId})`,
-    })
-    .where(eq(profiles.id, userId))
+/**
+ * Statements that refresh the cached balance from the ledger. The row lock comes first so the
+ * sum runs on a fresh snapshot after any concurrent award or purchase has committed
+ * (each statement in a batch takes its own snapshot).
+ */
+function balanceRefresh(db: Db, userId: string) {
+  return [
+    db.select({ id: profiles.id }).from(profiles).where(eq(profiles.id, userId)).for('update'),
+    db
+      .update(profiles)
+      .set({
+        chitinGems: sql`(SELECT COALESCE(SUM(amount), 0)::int FROM gem_transactions WHERE "userId" = ${userId})`,
+      })
+      .where(eq(profiles.id, userId)),
+  ] as const
 }
 
 export async function syncGemBalance(db: Db, userId: string): Promise<void> {
-  await syncBalanceStatement(db, userId)
+  await db.batch(balanceRefresh(db, userId))
 }
 
 export interface GemAward {
@@ -45,7 +52,7 @@ export async function awardGems(db: Db, userId: string, awards: GemAward[]): Pro
       .insert(gemTransactions)
       .values(awards.map((a) => ({ userId, ...a })))
       .onConflictDoNothing(),
-    syncBalanceStatement(db, userId),
+    ...balanceRefresh(db, userId),
   ])
 }
 
@@ -86,7 +93,7 @@ export async function revokeDailyGems(db: Db, userId: string, date: string): Pro
           ),
         ),
       ),
-    syncBalanceStatement(db, userId),
+    ...balanceRefresh(db, userId),
   ])
 }
 
@@ -133,7 +140,7 @@ export async function checkGemMilestones(db: Db, userId: string): Promise<void> 
       SELECT ${userId}, ${GEM_PER_REFERRAL}, 'referral', 'referral:' || "referralId", 'A member you invited got started'
       FROM referral_rewards WHERE "referrerId" = ${userId}
       ON CONFLICT DO NOTHING`),
-    syncBalanceStatement(db, userId),
+    ...balanceRefresh(db, userId),
   ])
 }
 

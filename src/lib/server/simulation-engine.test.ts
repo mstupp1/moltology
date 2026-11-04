@@ -37,6 +37,8 @@ vi.mock('./activity-log', () => ({
   recordConnectionAcceptedEvents: vi.fn().mockResolvedValue(undefined),
 }))
 
+vi.mock('./gems', () => ({ awardGems: vi.fn().mockResolvedValue(undefined) }))
+
 vi.mock('./db-services', () => ({
   recordForumMentions: vi.fn().mockResolvedValue(['mock-user-id']),
   recordForumReplyNotifications: vi.fn().mockResolvedValue(1),
@@ -307,7 +309,6 @@ describe('Simulation Engine', () => {
             where: mockUpdateWhere,
           }),
         })),
-        batch: vi.fn().mockResolvedValue([]),
       }
 
       const res = await simulateDailyRoutines(mockDb, DEFAULT_GROWTH_CONFIG, {
@@ -319,8 +320,13 @@ describe('Simulation Engine', () => {
       expect(res.completed).toBeGreaterThan(0)
       expect(mockDb.insert).toHaveBeenCalled()
       expect(mockDb.update).toHaveBeenCalled()
-      // Gems go through the ledger in one batch: insert rows, then refresh the cached balance.
-      expect(mockDb.batch).toHaveBeenCalledTimes(1)
+      // Gems go through the ledger, one row per simulated liturgy.
+      const { awardGems } = await import('./gems')
+      expect(vi.mocked(awardGems)).toHaveBeenCalledWith(
+        mockDb,
+        'sim-user-1',
+        expect.arrayContaining([expect.objectContaining({ source: 'simulation', amount: 15 })]),
+      )
     })
   })
 
