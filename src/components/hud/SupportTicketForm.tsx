@@ -3,6 +3,7 @@ import { CheckCircle2, Lock, LogIn, Send, UserPlus } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
+import { HudButton } from '@/components/ui/HudButton'
 import { HudGhostCard } from '@/components/ui/HudGhostLoader'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
@@ -23,7 +24,7 @@ import {
 } from '@/lib/support-tickets'
 
 const fieldClass =
-  'w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-xs text-[#dfe3e3] p-2.5 outline-hidden chamfer-corner'
+  'w-full min-h-10 rounded-control bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-sm text-ink placeholder:text-ink-muted p-2.5 outline-hidden transition-colors'
 
 export default function SupportTicketForm() {
   const session = useAuthSession()
@@ -55,34 +56,22 @@ export default function SupportTicketForm() {
   if (session.isGuest || !session.userId) {
     return (
       <div className="space-y-4" data-testid="support-ticket-guest">
-        <div className="bg-[#091113]/80 border border-[#3a4a49] p-6 chamfer-corner text-center space-y-3">
-          <Lock className="w-8 h-8 text-[#ff5540] mx-auto" />
-          <h3 className="font-grotesk text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
+        <div className="bg-surface-2 border border-line-subtle p-6 rounded-card text-center space-y-3">
+          <Lock className="w-8 h-8 text-crimson-text mx-auto" />
+          <h3 className="font-grotesk text-sm font-bold text-ink uppercase tracking-wider">
             {SUPPORT_TICKET_COPY.guestTitle}
           </h3>
-          <p className="text-xs text-[#839493] max-w-md mx-auto leading-relaxed">
+          <p className="text-xs text-ink-muted max-w-md mx-auto leading-relaxed">
             {SUPPORT_TICKET_COPY.guestBody}
           </p>
           <div className="pt-2 space-y-2">
-            <button
-              type="button"
-              onClick={() => openAuth('signup')}
-              className="px-5 py-2.5 bg-[#ff453a] hover:bg-[#ff5540] text-white font-bold text-xs chamfer-corner inline-flex items-center gap-2"
-            >
-              <UserPlus className="w-4 h-4" />
-              <span>{SUPPORT_TICKET_COPY.guestSignUp}</span>
-            </button>
+            <HudButton type="button" onClick={() => openAuth('signup')} icon={<UserPlus className="w-4 h-4" />}>
+              {SUPPORT_TICKET_COPY.guestSignUp}
+            </HudButton>
             <div>
-              <button
-                type="button"
-                onClick={() => openAuth('login')}
-                className="text-xs text-[#00c3ff] hover:text-white underline underline-offset-4"
-              >
-                <span className="inline-flex items-center gap-1.5">
-                  <LogIn className="w-3.5 h-3.5" />
-                  {SUPPORT_TICKET_COPY.guestSignIn}
-                </span>
-              </button>
+              <HudButton type="button" variant="ghost" onClick={() => openAuth('login')} icon={<LogIn className="w-3.5 h-3.5" />}>
+                {SUPPORT_TICKET_COPY.guestSignIn}
+              </HudButton>
             </div>
           </div>
         </div>
@@ -147,20 +136,20 @@ export default function SupportTicketForm() {
   if (received) {
     return (
       <div
-        className="bg-[#00ffff]/10 border border-[#00ffff] p-6 chamfer-corner text-center space-y-2"
+        className="bg-cyan-soft border border-cyan-glow/40 p-6 rounded-card text-center space-y-2"
         data-testid="support-ticket-success"
       >
-        <CheckCircle2 className="w-10 h-10 text-[#00ffff] mx-auto" />
-        <h3 className="font-grotesk text-sm font-bold text-[#dfe3e3] uppercase">
+        <CheckCircle2 className="w-10 h-10 text-cyan-glow mx-auto" />
+        <h3 className="font-grotesk text-sm font-bold text-ink uppercase">
           {SUPPORT_TICKET_COPY.successTitle}
         </h3>
-        <p className="text-xs text-[#839493] leading-relaxed max-w-md mx-auto">
+        <p className="text-xs text-ink-muted leading-relaxed max-w-md mx-auto">
           {ticketReference
             ? SUPPORT_TICKET_COPY.successBody(ticketReference)
             : SUPPORT_TICKET_COPY.successTitle}
         </p>
         {ticketReference ? (
-          <p className="font-grotesk text-xs font-bold text-[#00ffff] tracking-wider" data-testid="support-ticket-reference">
+          <p className="font-grotesk text-xs font-bold text-cyan-glow tracking-wider" data-testid="support-ticket-reference">
             {ticketReference}
           </p>
         ) : null}
@@ -170,10 +159,10 @@ export default function SupportTicketForm() {
 
   return (
     <form onSubmit={handleSubmit} className="relative space-y-4 max-w-2xl" data-testid="support-ticket-form">
-      <p className="text-xs text-[#839493] leading-relaxed">{SUPPORT_TICKET_COPY.formHint}</p>
+      <p className="text-xs text-ink-muted leading-relaxed">{SUPPORT_TICKET_COPY.formHint}</p>
 
-      <div className="space-y-1">
-        <label className="text-xs text-[#839493] font-bold block uppercase" htmlFor="support-ticket-subject">
+      <div className="space-y-2">
+        <label className="text-xs text-ink-muted font-bold block" htmlFor="support-ticket-subject">
           {SUPPORT_TICKET_COPY.subjectLabel}
         </label>
         <input
@@ -189,8 +178,8 @@ export default function SupportTicketForm() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div className="space-y-1">
-          <label className="text-xs text-[#839493] font-bold block uppercase" htmlFor="support-ticket-category">
+        <div className="space-y-2">
+          <label className="text-xs text-ink-muted font-bold block" htmlFor="support-ticket-category">
             {SUPPORT_TICKET_COPY.categoryLabel}
           </label>
           <select
@@ -206,8 +195,8 @@ export default function SupportTicketForm() {
             ))}
           </select>
         </div>
-        <div className="space-y-1">
-          <label className="text-xs text-[#839493] font-bold block uppercase" htmlFor="support-ticket-urgency">
+        <div className="space-y-2">
+          <label className="text-xs text-ink-muted font-bold block" htmlFor="support-ticket-urgency">
             {SUPPORT_TICKET_COPY.urgencyLabel}
           </label>
           <select
@@ -225,8 +214,8 @@ export default function SupportTicketForm() {
         </div>
       </div>
 
-      <div className="space-y-1">
-        <label className="text-xs text-[#839493] font-bold block uppercase" htmlFor="support-ticket-body">
+      <div className="space-y-2">
+        <label className="text-xs text-ink-muted font-bold block" htmlFor="support-ticket-body">
           {SUPPORT_TICKET_COPY.bodyLabel}
         </label>
         <textarea
@@ -237,7 +226,7 @@ export default function SupportTicketForm() {
           placeholder={SUPPORT_TICKET_COPY.bodyPlaceholder}
           value={body}
           onChange={(event) => setBody(event.target.value)}
-          className={`${fieldClass} resize-none`}
+          className={`${fieldClass} resize-y`}
         />
       </div>
 
@@ -255,19 +244,14 @@ export default function SupportTicketForm() {
       </div>
 
       {errorMessage ? (
-        <p className="text-xs text-[#ff5540]" role="alert">
+        <p className="text-xs text-crimson-text" role="alert">
           {errorMessage}
         </p>
       ) : null}
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="px-5 py-2.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 border border-[#00ffff] text-[#00ffff] font-bold text-xs flex items-center gap-2 chamfer-corner transition-all shadow-[0_0_15px_rgba(0,255,255,0.3)] active:scale-95 disabled:opacity-60"
-      >
-        <Send className="w-4 h-4" />
-        <span>{isSubmitting ? SUPPORT_TICKET_COPY.submitting : SUPPORT_TICKET_COPY.submit}</span>
-      </button>
+      <HudButton type="submit" disabled={isSubmitting} icon={<Send className="w-4 h-4" />}>
+        {isSubmitting ? SUPPORT_TICKET_COPY.submitting : SUPPORT_TICKET_COPY.submit}
+      </HudButton>
 
       <TurnstileWidget
         ref={turnstileRef}
