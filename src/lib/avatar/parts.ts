@@ -24,7 +24,7 @@ export const EYE_COLOR_SWATCH: Readonly<Record<AvatarEyeColor, { inner: string; 
 
 export type EyeShape = 'round' | 'wide' | 'tall'
 export type PupilStyle = 'standard' | 'big' | 'sparkle' | 'keen'
-export type Expression = 'open' | 'relaxed' | 'cheerful_squint' | 'focused' | 'chill' | 'angry' | 'worried'
+export type Expression = 'open' | 'relaxed' | 'cheerful_squint' | 'focused' | 'chill' | 'angry' | 'worried' | 'sad' | 'smug' | 'shocked'
 
 interface LidLine {
   outer: number
@@ -43,6 +43,12 @@ const LIDS: Readonly<Record<Expression, LidLine>> = {
   chill: { outer: 0.06, inner: 0.06, ctrl: -0.06, brow: { tilt: 0, lift: -1 } },
   angry: { outer: -0.72, inner: 0.02, ctrl: -0.42, brow: { tilt: 20, lift: -1 } },
   worried: { outer: -0.08, inner: -0.8, ctrl: -0.52, brow: { tilt: -18, lift: 1.5 } },
+  // Outer corners droop under the lid; brows knit upward in the middle.
+  sad: { outer: -0.16, inner: -0.52, ctrl: -0.4, brow: { tilt: -24, lift: 0.5 } },
+  // Heavy upper lid and a lifted lower lid: pleased with itself.
+  smug: { outer: -0.14, inner: -0.1, ctrl: -0.22, lower: { outer: 0.55, inner: 0.5, ctrl: 0.3 }, brow: { tilt: 7, lift: 0.5 } },
+  // Lids pulled clear of the eye, brows shot up, pupils shrink to pinpricks.
+  shocked: { outer: -1.25, inner: -1.25, ctrl: -1.5, brow: { tilt: -6, lift: 5.5 } },
 }
 
 export interface EyeSpec {
@@ -102,9 +108,9 @@ export function renderEye(e: EyeSpec, ctx: PaintContext, shellSide: PieceSide): 
   const lid = LIDS[e.expression] ?? LIDS.relaxed
   const look = e.side === 'left' ? 0.5 : -0.5
   const ix = r2(e.cx + look)
-  const iy = r2(e.cy + 1.4)
-  const irisR = Math.min(e.rx, e.ry) * (e.pupil === 'big' ? 0.7 : 0.64)
-  const pupilR = irisR * (e.pupil === 'big' ? 0.62 : e.pupil === 'keen' ? 0.36 : 0.5)
+  const iy = r2(e.cy + (e.expression === 'sad' ? 3 : 1.4))
+  const irisR = Math.min(e.rx, e.ry) * (e.pupil === 'big' ? 0.7 : 0.64) * (e.expression === 'shocked' ? 0.82 : 1)
+  const pupilR = irisR * (e.pupil === 'big' ? 0.62 : e.pupil === 'keen' ? 0.36 : 0.5) * (e.expression === 'shocked' ? 0.55 : 1)
   const c = EYE_COLOR_SWATCH[e.color] ?? EYE_COLOR_SWATCH.amber
   const fill = shellFill(ctx, shellSide)
   const deep = outlineColor(ctx, shellSide)
@@ -124,10 +130,12 @@ export function renderEye(e: EyeSpec, ctx: PaintContext, shellSide: PieceSide): 
     ? `<path d="${lidPath(e, lid.lower, false)}" fill="${fill}"/><path d="${lidEdge(e, lid.lower)}" fill="none" stroke="${deep}" stroke-width="1.6" stroke-linecap="round"/>`
     : ''
 
+  // Brows sit just clear of the eye and carry the mood: tilt for anger or worry,
+  // lift for surprise. A thick-middle taper reads at small sizes.
   const browDir = e.side === 'left' ? 1 : -1
-  const bw = e.rx * 0.62
-  const by = e.cy - e.ry * 0.86 - lid.brow.lift
-  const brow = `<path d="M${r2(e.cx - e.rx)},${r2(e.cy - e.ry * .65)} Q${r2(e.cx)},${r2(e.cy - e.ry - 5)} ${r2(e.cx + e.rx)},${r2(e.cy - e.ry * .65)}" fill="none" stroke="${ctx.palette.shade}" stroke-width="4.4" stroke-linecap="round"/><path d="M${r2(e.cx - bw)},${r2(by + 1.6)} Q${r2(e.cx)},${r2(by - 2.4)} ${r2(e.cx + bw)},${r2(by + 1.6)}" fill="none" stroke="${deep}" stroke-width="3.2" stroke-linecap="round" transform="rotate(${lid.brow.tilt * browDir} ${r2(e.cx)} ${r2(by)})"/>`
+  const bw = e.rx * 0.74
+  const by = e.cy - e.ry - 2.8 - lid.brow.lift
+  const brow = `<path d="M${r2(e.cx - bw)},${r2(by + 1.2)} Q${r2(e.cx)},${r2(by - 3.6)} ${r2(e.cx + bw)},${r2(by + 1.2)} Q${r2(e.cx)},${r2(by - 0.6)} ${r2(e.cx - bw)},${r2(by + 1.2)} Z" fill="${deep}" stroke="${deep}" stroke-width="1.6" stroke-linejoin="round" transform="rotate(${lid.brow.tilt * browDir} ${r2(e.cx)} ${r2(by)})"/>`
 
   return `<g class="avatar-eye" data-eye-side="${e.side}">
     <ellipse data-eye-orbit="${e.side}" cx="${r2(e.cx)}" cy="${r2(e.cy + 1.8)}" rx="${r2(e.rx + 2)}" ry="${r2(e.ry + 2.5)}" fill="${deep}" opacity=".24"/>
@@ -184,6 +192,12 @@ export function renderMouth(type: AvatarMouth, cx: number, cy: number, ctx: Pain
     case 'fang':
       body = `<path d="M-5.5,2.2 L-3.4,6.6 L-1.6,2.8 Z" fill="${TEETH}" stroke="${deep}" stroke-width="1.1" stroke-linejoin="round"/>
         <path d="M-12.5,-2.5 Q0,8.5 12.5,-2.5" fill="none" stroke="${deep}" stroke-width="2.6" stroke-linecap="round"/>${dimples}`
+      break
+    case 'frown':
+      body = `<path d="M-11,4.5 Q0,-5 11,4.5" fill="none" stroke="${deep}" stroke-width="2.6" stroke-linecap="round"/>`
+      break
+    case 'wobble':
+      body = `<path d="M-12,1.5 Q-8,-2.5 -4,1 Q0,4.5 4,1 Q8,-2.5 12,1.5" fill="none" stroke="${deep}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`
       break
     case 'oh':
       body = `<clipPath id="${clipId}"><ellipse cx="0" cy="2.5" rx="5.2" ry="6.4"/></clipPath>

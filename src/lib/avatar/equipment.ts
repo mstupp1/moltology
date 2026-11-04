@@ -1,5 +1,6 @@
 /** Worn geometry and inventory art share this registry. Never use inventory photographs as overlays. */
 import type { EquipmentCategory } from '../../db/schema'
+import type { Pt } from './geometry'
 import { renderAccessory } from './parts'
 import { ids, paintDefs, type PaintContext } from './paint'
 import { SHELL_PALETTES, type AvatarAccessory } from './traits'
@@ -84,6 +85,37 @@ export interface EquipmentFit {
   eyeY?: number
   mouthY?: number
   antennaRoots?: [[number, number], [number, number]]
+  /** Leg gear is built over the wearer's own leg outline instead of a stock shape. */
+  leg?: LegFrame
+}
+
+/**
+ * One leg as the race draws it. Armour is the limb's own outline, puffed out a
+ * little, so it always matches the leg's width, bend and foot.
+ */
+export interface LegFrame {
+  thigh: string
+  shin: string
+  foot: string
+  /** Point the thigh and shin plates swell from. */
+  thighAt: Pt
+  shinAt: Pt
+  /** Bottom centre of the foot; the boot grows from here so it stays on the ground. */
+  sole: Pt
+  knee: Pt
+  kneeR: number
+  ankle: Pt
+  /** +1 when the outside of the leg is toward +x. */
+  outward: 1 | -1
+}
+
+/** Where each hat's band sits against the brim line (local y = 0). */
+const ACCESSORY_TOP: Partial<Record<AvatarAccessory, number>> = {
+  hard_hat: -8,
+  beanie: -7,
+  crown: -2,
+  halo: -3,
+  bow: -1,
 }
 
 /** Local coordinates: torso 0..60, head centred at y=0, weapon cuff at y=0. */
@@ -113,7 +145,7 @@ export function renderEquipment(
     body = renderAccessory(
       v.accessory,
       { ...ctx, uid, rim: v.accent },
-      { x: 0, top: 0, eyeY: fit?.eyeY ?? 26, mouth: [0, fit?.mouthY ?? 40] },
+      { x: 0, top: ACCESSORY_TOP[v.accessory] ?? 0, eyeY: fit?.eyeY ?? 15, mouth: [0, fit?.mouthY ?? 40] },
     )
   } else if (v.category === 'carapace' && fit?.race === 'crab') {
     const w = (fit.torsoW ?? 101) / 2
@@ -121,8 +153,10 @@ export function renderEquipment(
     // Dorsal wings follow the shell edge. The fixed ventral plate clears even
     // an open grin; expression never stretches, shifts, or resizes the armor.
     const vent = (fit.mouthY ?? 38) + 22
-    body = `<g data-armor-fit="crab"><path d="M${-w + 3},16 Q0,-8 ${w - 3},16 L${w - 7},${h - 4} Q0,${h + 7} ${-w + 7},${h - 4} Z" fill="#07171d" opacity=".25"/>`
-    for (const side of [-1, 1]) body += `<g transform="scale(${side} 1)">${plate(`M22,5 Q${w - 12},0 ${w - 3},20 L${w + 1},35 L${w - 8},${h - 9} L${w - 20},${h - 13} L${w - 15},29 L25,17 Z`)}${seam(`M30,12 Q${w - 10},13 ${w - 9},31 L${w - 15},${h - 18}`)}${bolts([w - 10], 25)}</g>`
+    // Edge guards ride the shell's outer rim, clear of the eyes, so the face stays open.
+    const x0 = Math.max(w - 20, 29)
+    body = `<g data-armor-fit="crab">`
+    for (const side of [-1, 1]) body += `<g transform="scale(${side} 1)">${plate(`M${x0},14 Q${w - 6},10 ${w - 1},22 L${w + 2},36 L${w - 5},${h - 9} L${w - 15},${h - 13} L${x0 + 4},31 Z`)}${seam(`M${x0 + 4},17 Q${w - 6},16 ${w - 4},30 L${w - 10},${h - 16}`)}${bolts([w - 8], 26)}</g>`
     body += plate(`M-20,${vent} Q0,${vent + 5} 20,${vent} L17,${vent + 15} Q0,${vent + 24} -17,${vent + 15} Z`) + seam(`M-12,${vent + 9} Q0,${vent + 13} 12,${vent + 9}`) + '</g>'
   } else if (v.category === 'carapace') {
     body = `<path d="M-30,3 Q0,-4 30,3 L20,49 Q0,64 -20,49 Z" fill="#07171d" opacity=".25" transform="translate(0 2)"/>` +
@@ -146,6 +180,8 @@ export function renderEquipment(
       plate(`M-${6 + n},-4 L${6 + n},-4 L${8 + n},8 L0,${13 + n} L-${8 + n},8 Z`, v.trim) +
       bolts([-21, 21], 2)
     if (v.motif === 'vent') body += [-17, -12, 12, 17].map((x) => seam(`M${x},0 v5`)).join('')
+  } else if (v.category === 'legs' && fit?.leg) {
+    body = legArmour(v, uid, fit.leg, plate, seam)
   } else if (v.category === 'legs') {
     body =
       plate(`M-8,-2 L8,-2 L${10 + n},17 L6,29 L-6,29 L-${10 + n},17 Z`) +
@@ -217,7 +253,7 @@ export function renderEquipment(
       .join('')
     if (n === 4) body += plate('M-8,-20 L0,-32 L8,-20 L5,-8 L-5,-8 Z', v.trim) + seam('M0,-26 V-13')
   }
-  if (v.category === 'legs' && n > 0) {
+  if (v.category === 'legs' && n > 0 && !fit?.leg) {
     body += plate(n > 2 ? 'M7,5 L15,-5 L16,16 L9,26 L5,21 Z' : 'M7,7 L12,2 L12,17 L7,22 Z')
     body += (n > 2 ? [0, 1, 2] : [0, 1])
       .map((i) => seam(`M-5,${15 + i * 4} L0,${18 + i * 4} L5,${15 + i * 4}`))
@@ -243,10 +279,12 @@ export function renderEquipment(
       v.material +
       '" stroke-width="3"/>'
   }
-  if (n > 1)
+  if (n > 1 && !fit?.leg)
     body += `<g fill="${v.accent}">${[0, 1, 2].map((i) => `<circle cx="${(i - 1) * 4}" cy="${v.category === 'claws' ? -8 : 3}" r=".8"/>`).join('')}</g>`
-  if (n === 4)
+  if (n === 4 && !fit?.leg)
     body += `<g class="equipment-signature" fill="none" stroke="${v.accent}" stroke-width=".65" opacity=".7">${v.category === 'claws' ? '<path d="M-14,-20 l3,-8 M10,-25 l3,-8"/>' : '<path d="M-12,10 L0,16 L12,10 M-9,14 L0,20 L9,14"/>'}</g>`
+  // Helmets are drawn with their band at y=3; lift it just clear of the brows on the brim line.
+  if (v.category === 'head' && !v.accessory) body = `<g transform="translate(0 -5)">${body}</g>`
   return `<g data-equipment="${v.key}" data-construction="${n}"><defs><linearGradient id="${uid}" x1="0" y1="0" x2=".85" y2="1"><stop stop-color="${v.trim}"/><stop offset=".2" stop-color="${v.material}"/><stop offset=".32" stop-color="${v.trim}" stop-opacity=".65"/><stop offset=".65" stop-color="${v.material}"/><stop offset="1" stop-color="${tone(v.material, -0.5)}"/></linearGradient></defs><g filter="url(#${ids(ctx).gearForm})">${body}</g></g>`
 }
 
@@ -270,4 +308,45 @@ export function equipmentThumbnail(key: string): string | null {
     belt: '-36 -26 72 72',
   }
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${boxes[v.category]}"><defs>${paintDefs(ctx)}</defs>${renderEquipment(key, ctx)}</svg>`)}`
+}
+
+type PlateFn = (d: string, fill?: string) => string
+
+/** Greaves, knee cop, thigh guard and boot, each the wearer's own leg part puffed out a little. */
+function legArmour(v: EquipmentVisual, uid: string, leg: LegFrame, plate: PlateFn, seam: (d: string) => string): string {
+  const n = v.construction
+  const p = (q: Pt) => `${q[0].toFixed(2)} ${q[1].toFixed(2)}`
+  const swell = (d: string, at: Pt, k: number, fill?: string) =>
+    `<g transform="translate(${p(at)}) scale(${k}) translate(${p([-at[0], -at[1]])})">${plate(d, fill)}</g>`
+  // Lines across a plate, clipped to it, so the detail follows any leg shape.
+  const bands = (id: string, d: string, at: Pt, k: number, ys: number[], stroke: string, w: number) =>
+    `<clipPath id="${uid}-${id}"><path d="${d}" transform="translate(${p(at)}) scale(${k}) translate(${p([-at[0], -at[1]])})"/></clipPath>` +
+    `<g clip-path="url(#${uid}-${id})" fill="none" stroke="${stroke}" stroke-width="${w}" stroke-linecap="round">${ys
+      .map((y) => `<path d="M${(at[0] - 30).toFixed(2)},${y.toFixed(2)} H${(at[0] + 30).toFixed(2)}"/>`)
+      .join('')}</g>`
+  const [kx, ky] = leg.knee
+  const [ax, ay] = leg.ankle
+  const shinLen = ay - ky
+  let out = ''
+  // Thigh guard from the first upgrade on.
+  if (n >= 1) {
+    out += swell(leg.thigh, leg.thighAt, 1.1)
+    if (v.motif === 'rib') out += bands('thigh', leg.thigh, leg.thighAt, 1.1, [0.3, 0.55, 0.8].map((f) => leg.thighAt[1] + (ky - leg.thighAt[1]) * (f * 2 - 1) * 0.9), tone(v.material, -0.55), 1.1)
+  }
+  out += swell(leg.shin, leg.shinAt, 1.14)
+  if (v.motif === 'vent') out += bands('shin', leg.shin, leg.shinAt, 1.14, [0.3, 0.45, 0.6].map((f) => ky + shinLen * f), v.accent, 1.2)
+  else if (v.motif === 'rib') out += bands('shin', leg.shin, leg.shinAt, 1.14, [0.3, 0.55, 0.8].map((f) => ky + shinLen * f), tone(v.material, -0.55), 1.1)
+  else out += seam(`M${kx.toFixed(2)},${(ky + 4).toFixed(2)} L${ax.toFixed(2)},${(ay - 3).toFixed(2)}`)
+  // Boot: the foot itself, grown from the sole so it never lifts off the ground.
+  out += swell(leg.foot, leg.sole, 1.08, v.material)
+  // Knee cop: a domed plate with a trim ridge, rather than a flat disc.
+  const r = leg.kneeR * 0.88
+  out += plate(`M${(kx - r).toFixed(2)},${(ky + 1).toFixed(2)} Q${(kx - r).toFixed(2)},${(ky - r * 0.9).toFixed(2)} ${kx.toFixed(2)},${(ky - r * 0.9).toFixed(2)} Q${(kx + r).toFixed(2)},${(ky - r * 0.9).toFixed(2)} ${(kx + r).toFixed(2)},${(ky + 1).toFixed(2)} Q${kx.toFixed(2)},${(ky + r * 0.75).toFixed(2)} ${(kx - r).toFixed(2)},${(ky + 1).toFixed(2)} Z`)
+  out += `<path d="M${(kx - r * 0.6).toFixed(2)},${(ky - 0.5).toFixed(2)} Q${kx.toFixed(2)},${(ky - r * 0.55).toFixed(2)} ${(kx + r * 0.6).toFixed(2)},${(ky - 0.5).toFixed(2)}" fill="none" stroke="${v.trim}" stroke-width="1" stroke-linecap="round"/>`
+  if (n > 2) {
+    const o = leg.outward
+    const fx = kx + o * leg.kneeR * 0.7
+    out += plate(`M${fx.toFixed(2)},${(ky - 3).toFixed(2)} L${(fx + o * 6).toFixed(2)},${(ky - 7).toFixed(2)} L${(fx + o * 3).toFixed(2)},${(ky + 4).toFixed(2)} Z`, v.trim)
+  }
+  return `<g data-leg-armour="fit">${out}</g>`
 }

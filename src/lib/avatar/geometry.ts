@@ -77,3 +77,61 @@ export function mirroredBlob(rightHalf: readonly Pt[], tension = 1): string {
   }
   return d + ' Z'
 }
+
+const halfWidthCache = new Map<string, Map<number, number>>()
+
+/**
+ * Half-width of a closed outline (absolute M/C/L commands, centred on x=50) at height y.
+ * Gear uses it to size itself to the real head, so new shapes fit without hand-tuned numbers.
+ */
+export function outlineHalfAt(d: string, y: number): number {
+  const key = Math.round(y * 4) / 4
+  let cache = halfWidthCache.get(d)
+  if (!cache) halfWidthCache.set(d, (cache = new Map()))
+  const hit = cache.get(key)
+  if (hit !== undefined) return hit
+  const tokens = d.match(/[MLCZ]|-?\d*\.?\d+/g) ?? []
+  const pts: [number, number][] = []
+  let cmd = ''
+  let cur: [number, number] = [50, 0]
+  const nums: number[] = []
+  const flush = () => {
+    if (cmd === 'M' || cmd === 'L') {
+      for (let i = 0; i + 1 < nums.length; i += 2) pts.push((cur = [nums[i], nums[i + 1]]))
+    } else if (cmd === 'C') {
+      for (let i = 0; i + 5 < nums.length; i += 6) {
+        const p0 = cur
+        const p1: Pt = [nums[i], nums[i + 1]]
+        const p2: Pt = [nums[i + 2], nums[i + 3]]
+        const p3: Pt = [nums[i + 4], nums[i + 5]]
+        for (let s = 1; s <= 16; s++) pts.push(cubicAt(p0, p1, p2, p3, s / 16))
+        cur = [p3[0], p3[1]]
+      }
+    }
+    nums.length = 0
+  }
+  for (const t of tokens) {
+    if (/[MLCZ]/.test(t)) {
+      flush()
+      cmd = t
+    } else nums.push(Number(t))
+  }
+  flush()
+  let half = 0
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i]
+    const b = pts[(i + 1) % pts.length]
+    if ((a[1] - y) * (b[1] - y) > 0 || a[1] === b[1]) continue
+    const x = a[0] + ((y - a[1]) / (b[1] - a[1])) * (b[0] - a[0])
+    half = Math.max(half, Math.abs(x - 50))
+  }
+  cache.set(key, half)
+  return half
+}
+
+/** Highest point (smallest y) of an outline: the top of a head or shell. */
+export function outlineTop(d: string): number {
+  let top = Infinity
+  for (let y = -40; y < 200; y += 0.5) if (outlineHalfAt(d, y) > 0) return Math.min(top, y)
+  return top
+}

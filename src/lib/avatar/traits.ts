@@ -69,7 +69,9 @@ export const SHELL_MARKING_LABELS: Readonly<Record<ShellMarking, string>> = {
   circuit: 'Circuit',
 }
 
-export const AVATAR_MOUTHS = ['grin', 'smile', 'beam', 'smirk', 'tongue', 'fang', 'oh'] as const
+export const AVATAR_MOUTHS = ['grin', 'smile', 'beam', 'smirk', 'tongue', 'fang', 'oh', 'frown', 'wobble'] as const
+/** Seeded (never customised) characters roll from the original set, so adding mouths never changes an existing member's look. */
+export const SEEDED_MOUTHS = AVATAR_MOUTHS.slice(0, 7)
 export type AvatarMouth = (typeof AVATAR_MOUTHS)[number]
 export const AVATAR_MOUTH_LABELS: Readonly<Record<AvatarMouth, string>> = {
   grin: 'Grin',
@@ -79,6 +81,8 @@ export const AVATAR_MOUTH_LABELS: Readonly<Record<AvatarMouth, string>> = {
   tongue: 'Cheeky',
   fang: 'Snaggletooth',
   oh: 'Surprised',
+  frown: 'Frown',
+  wobble: 'Wobbly',
 }
 
 export const AVATAR_ANTENNAE = ['whip', 'curl', 'plume', 'bolt', 'beacon'] as const
@@ -146,6 +150,9 @@ export const AVATAR_EXPRESSION_LABELS: Readonly<Record<string, string>> = {
   chill: 'Sleepy',
   angry: 'Fierce',
   worried: 'Nervous',
+  sad: 'Sad',
+  smug: 'Smug',
+  shocked: 'Shocked',
 }
 
 /** Small deterministic PRNG so seeds always roll the same character. */
