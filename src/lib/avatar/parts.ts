@@ -70,6 +70,11 @@ export interface EyeSpec {
   pupil: PupilStyle
   expression: Expression
   gaze?: Gaze
+  /**
+   * Highest the brow may sit (smallest y) for a given x, so brows stay on the head
+   * instead of floating off its top as dark bars. Omitted when a hat gives them a backdrop.
+   */
+  browCeil?: (x: number) => number
 }
 
 export function eyeDefs(ctx: PaintContext, color: AvatarEyeColor): string {
@@ -146,7 +151,12 @@ export function renderEye(e: EyeSpec, ctx: PaintContext, shellSide: PieceSide): 
   // lift for surprise. A thick-middle taper reads at small sizes.
   const browDir = e.side === 'left' ? 1 : -1
   const bw = e.rx * 0.74
-  const by = e.cy - e.ry - 2.8 - lid.brow.lift
+  let by = e.cy - e.ry - 2.8 - lid.brow.lift
+  if (e.browCeil) {
+    // Keep the brow's top edge on the head; on heads with no room it rests on the lid line.
+    const ceil = Math.max(e.browCeil(e.cx - bw), e.browCeil(e.cx), e.browCeil(e.cx + bw)) + 3.8
+    by = Math.min(Math.max(by, ceil), Math.max(by, e.cy - e.ry - 0.6))
+  }
   const brow = `<path d="M${r2(e.cx - bw)},${r2(by + 1.2)} Q${r2(e.cx)},${r2(by - 3.6)} ${r2(e.cx + bw)},${r2(by + 1.2)} Q${r2(e.cx)},${r2(by - 0.6)} ${r2(e.cx - bw)},${r2(by + 1.2)} Z" fill="${deep}" stroke="${deep}" stroke-width="1.6" stroke-linejoin="round" transform="rotate(${lid.brow.tilt * browDir} ${r2(e.cx)} ${r2(by)})"/>`
 
   return `<g class="avatar-eye" data-eye-side="${e.side}">
@@ -406,7 +416,7 @@ export function renderAntennae(
 export function renderAccessory(
   acc: AvatarAccessory,
   ctx: PaintContext,
-  anchor: { x: number; top: number; eyeY: number; mouth: Pt }
+  anchor: { x: number; top: number; eyeY: number; mouth: Pt; crownY?: number }
 ): string {
   if (acc === 'none') return ''
   const { x, top } = anchor
@@ -416,7 +426,7 @@ export function renderAccessory(
   switch (acc) {
     case 'hard_hat':
       body = `<defs><linearGradient id="${uid}-hat" x1="0.2" y1="0" x2="0.7" y2="1"><stop offset="0" stop-color="#fff2a1"/><stop offset="0.45" stop-color="#ffc928"/><stop offset="1" stop-color="#d48e00"/></linearGradient></defs>
-        <g transform="${at(0, 2)} rotate(-6)">
+        <g transform="${at(0, 2)}">
           <path d="M-31,2 C-31,-2 31,-2 31,2 C31,6.5 -31,6.5 -31,2 Z" fill="url(#${uid}-hat)" stroke="#5c3d00" stroke-width="2"/>
           <path d="M-22,0 C-22,-20 -10,-27 0,-27 C10,-27 22,-20 22,0 Z" fill="url(#${uid}-hat)" stroke="#5c3d00" stroke-width="2" stroke-linejoin="round"/>
           <path d="M-4,-26.5 C-4,-14 -4,-6 -4,0 L4,0 C4,-6 4,-14 4,-26.5 Z" fill="#ffd84a" stroke="#5c3d00" stroke-width="1.2"/>
@@ -426,7 +436,7 @@ export function renderAccessory(
       break
     case 'crown':
       body = `<defs><linearGradient id="${uid}-crown" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="#fff6c2"/><stop offset="0.5" stop-color="#ffcf3a"/><stop offset="1" stop-color="#c98a0a"/></linearGradient></defs>
-        <g transform="${at(3, 0)} rotate(10)">
+        <g transform="${at(0, 0)}">
           <path d="M-14,2 L-16,-15 L-7,-6 L0,-19 L7,-6 L16,-15 L14,2 Z" fill="url(#${uid}-crown)" stroke="#6b4300" stroke-width="1.8" stroke-linejoin="round"/>
           <rect x="-14.5" y="-2" width="29" height="5" rx="1.5" fill="#f3b622" stroke="#6b4300" stroke-width="1.5"/>
           <circle cx="0" cy="0.5" r="1.9" fill="#ff3f6c"/><circle cx="-8" cy="0.5" r="1.4" fill="${ctx.rim}"/><circle cx="8" cy="0.5" r="1.4" fill="${ctx.rim}"/>
@@ -434,14 +444,14 @@ export function renderAccessory(
         </g>`
       break
     case 'halo':
-      body = `<g transform="${at(0, -10)}" filter="url(#${ids(ctx).glow})">
+      body = `<g transform="${at(0, 0)}" filter="url(#${ids(ctx).glow})">
           <ellipse cx="0" cy="0" rx="20" ry="5.5" fill="none" stroke="#fff3b0" stroke-width="3.6" opacity="0.95"/>
           <ellipse cx="0" cy="0" rx="20" ry="5.5" fill="none" stroke="${ctx.rim}" stroke-width="1.2"/>
         </g>`
       break
     case 'visor': {
-      // Worn pushed up on the brow so the eyes stay visible.
-      const y = anchor.eyeY - top - 19
+      // A band across the brow line; the eyes are drawn over it, so they stay visible.
+      const y = 0
       body = `<defs><linearGradient id="${uid}-visor" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${ctx.rim}" stop-opacity="0.75"/><stop offset="1" stop-color="#0a1c2e" stop-opacity="0.8"/></linearGradient></defs>
         <g transform="${at(0, y)}">
           <path d="M-32,-7 C-32,-12 32,-12 32,-7 L30,7 C29,11 -29,11 -30,7 Z" fill="url(#${uid}-visor)" stroke="#0b1520" stroke-width="2.2" stroke-linejoin="round"/>
@@ -456,7 +466,10 @@ export function renderAccessory(
       const [mx, my] = anchor.mouth
       const ex = x + 31
       const ey = anchor.eyeY + 6
-      body = `<path d="M${r2(x - 30)},${r2(ey)} C${r2(x - 30)},${r2(top - 14)} ${r2(x + 30)},${r2(top - 14)} ${r2(x + 30)},${r2(ey)}" fill="none" stroke="#18212c" stroke-width="4" stroke-linecap="round"/>
+      // The band's apex rests on the head top (a cubic reaches 3/4 of the way to its controls).
+      const apex = (anchor.crownY ?? top - 10) - 1.5
+      const cy = (apex - 0.25 * ey) / 0.75
+      body = `<path d="M${r2(x - 30)},${r2(ey)} C${r2(x - 30)},${r2(cy)} ${r2(x + 30)},${r2(cy)} ${r2(x + 30)},${r2(ey)}" fill="none" stroke="#18212c" stroke-width="4" stroke-linecap="round"/>
         <path d="M${r2(ex)},${r2(ey + 4)} C${r2(ex + 2)},${r2(my)} ${r2(mx + 18)},${r2(my + 2)} ${r2(mx + 11)},${r2(my + 1)}" fill="none" stroke="#18212c" stroke-width="2.2" stroke-linecap="round"/>
         <rect x="${r2(mx + 6)}" y="${r2(my - 2)}" width="7" height="5" rx="2.5" fill="#18212c"/>
         <circle cx="${r2(ex)}" cy="${r2(ey)}" r="7.5" fill="#1d2a38" stroke="#0b1520" stroke-width="1.8"/>
@@ -464,7 +477,7 @@ export function renderAccessory(
       break
     }
     case 'bow':
-      body = `<g transform="${at(20, 0)} rotate(18)">
+      body = `<g transform="${at(0, 0)} rotate(18)">
           <path d="M0,0 C-6,-9 -15,-8 -14,0 C-15,8 -6,9 0,0 Z" fill="#ff4f8f" stroke="#7a1040" stroke-width="1.6" stroke-linejoin="round"/>
           <path d="M0,0 C6,-9 15,-8 14,0 C15,8 6,9 0,0 Z" fill="#ff4f8f" stroke="#7a1040" stroke-width="1.6" stroke-linejoin="round"/>
           <path d="M-11,-2.5 C-9,-5 -6,-5 -4,-3" fill="none" stroke="#ffd0e4" stroke-width="1.4" stroke-linecap="round"/>
