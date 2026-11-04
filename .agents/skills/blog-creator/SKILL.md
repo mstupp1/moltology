@@ -21,6 +21,8 @@ Dispatches are written by one of the Order's correspondents about a real develop
 
 ---
 
+For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+
 ## Core Brand & Style Rules for Blog Dispatches
 
 Read the [shared annual content calendar](../../../content/annual-content-calendar.md) before scouting or drafting and record the seasonal anchor/intensity in the brief. In a dispatch, a season shows up only where it already belongs in the scene (an October deadline, a holiday shipping rush the story is about). Never add props such as a paper ghost on the window or a pumpkin on the desk to signal the date. Verified news and search intent choose the subject; a holiday does not create a technical claim. Companion social pieces share the calendar and adapt to their own publication dates.
