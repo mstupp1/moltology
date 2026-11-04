@@ -432,6 +432,12 @@ export default function AuthView({ search }: { search: AuthSearch }) {
               ) : (
               <>
 
+              {search.invitedBy && (
+                <p className="mb-4 rounded-control border border-cyan-glow/30 bg-cyan-soft p-3 text-sm text-ink-body">
+                  Invited by <strong>{search.invitedBy}</strong>. After signing in or creating your account, you can send them a friend request.
+                </p>
+              )}
+
               <div className="flex border-b border-line-subtle mb-5 sm:mb-6" role="tablist">
                 <button
                   type="button"

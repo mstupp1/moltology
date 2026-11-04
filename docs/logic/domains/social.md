@@ -75,6 +75,16 @@ rules:
       - file: src/lib/notifications-refresh.ts
         symbol: NOTIFICATIONS_MIN_INTERVAL_MS
     tests: [src/lib/notifications-refresh.test.ts]
+  - id: social.referrals
+    title: Signup referral attribution
+    kind: flow
+    statement: An invitation link remembers its inviter for 30 days in a private same-site cookie. Only new account creation can assign a referrer; attribution cannot be replaced. Existing members return to the inviter's profile. Friendship always requires a separate request and acceptance.
+    anchors:
+      - file: src/lib/server/referrals.ts
+        symbol: captureSignupReferral
+      - file: src/lib/server/referrals.ts
+        symbol: handleInvitation
+    tests: [src/lib/server/referrals.integration.test.ts, src/lib/auth-welcome.test.ts]
 ---
 
 Social surfaces follow one rule. Show real people and real activity, or show nothing. A quiet new account sees an honest, empty stream instead of fake veterans.

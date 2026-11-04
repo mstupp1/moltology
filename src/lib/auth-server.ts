@@ -177,6 +177,9 @@ export const auth = betterAuth({
         after: async (user, context) => {
           const { ensureUserProfile } = await import('./user-sync')
           await ensureUserProfile(user.id)
+          const { captureSignupReferral } = await import('./server/referrals')
+          try { await captureSignupReferral(user.id, context?.request) }
+          catch { console.warn('[referrals] Could not record signup attribution.') }
           await persistAdmittedSignup(user)
           const telemetry = readSignupTelemetry()
           try {

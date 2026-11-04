@@ -55,6 +55,7 @@ import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as ChangelogIndexRouteImport } from './routes/changelog/index'
 import { Route as ChangelogSlugRouteImport } from './routes/changelog/$slug'
+import { Route as IReferrerIdRouteImport } from './routes/i/$referrerId'
 import { Route as NewsIndexRouteImport } from './routes/news/index'
 import { Route as NewsSlugRouteImport } from './routes/news/$slug'
 import { Route as NewsChar123slugChar125DotmdRouteImport } from './routes/news/{$slug}[.]md'
@@ -318,6 +319,11 @@ const ChangelogSlugRoute = ChangelogSlugRouteImport.update({
   path: '/changelog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IReferrerIdRoute = IReferrerIdRouteImport.update({
+  id: '/i/$referrerId',
+  path: '/i/$referrerId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NewsIndexRoute = NewsIndexRouteImport.update({
   id: '/news/',
   path: '/news/',
@@ -537,6 +543,7 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
+  '/i/$referrerId': typeof IReferrerIdRoute
   '/news/$slug': typeof NewsSlugRoute
   '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
@@ -614,6 +621,7 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
+  '/i/$referrerId': typeof IReferrerIdRoute
   '/news/$slug': typeof NewsSlugRoute
   '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
@@ -695,6 +703,7 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
+  '/i/$referrerId': typeof IReferrerIdRoute
   '/news/$slug': typeof NewsSlugRoute
   '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
@@ -777,6 +786,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/blog/$slug'
     | '/changelog/$slug'
+    | '/i/$referrerId'
     | '/news/$slug'
     | '/news/{$slug}.md'
     | '/render/composite'
@@ -854,6 +864,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/blog/$slug'
     | '/changelog/$slug'
+    | '/i/$referrerId'
     | '/news/$slug'
     | '/news/{$slug}.md'
     | '/render/composite'
@@ -934,6 +945,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/blog/$slug'
     | '/changelog/$slug'
+    | '/i/$referrerId'
     | '/news/$slug'
     | '/news/{$slug}.md'
     | '/render/composite'
@@ -1000,6 +1012,7 @@ export interface RootRouteChildren {
   ApiChatRoute: typeof ApiChatRoute
   BlogSlugRoute: typeof BlogSlugRoute
   ChangelogSlugRoute: typeof ChangelogSlugRoute
+  IReferrerIdRoute: typeof IReferrerIdRoute
   NewsSlugRoute: typeof NewsSlugRoute
   NewsChar123slugChar125DotmdRoute: typeof NewsChar123slugChar125DotmdRoute
   RenderCompositeRoute: typeof RenderCompositeRoute
@@ -1336,6 +1349,13 @@ declare module '@tanstack/react-router' {
       path: '/changelog/$slug'
       fullPath: '/changelog/$slug'
       preLoaderRoute: typeof ChangelogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/i/$referrerId': {
+      id: '/i/$referrerId'
+      path: '/i/$referrerId'
+      fullPath: '/i/$referrerId'
+      preLoaderRoute: typeof IReferrerIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/news/': {
@@ -1730,6 +1750,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiChatRoute: ApiChatRoute,
   BlogSlugRoute: BlogSlugRoute,
   ChangelogSlugRoute: ChangelogSlugRoute,
+  IReferrerIdRoute: IReferrerIdRoute,
   NewsSlugRoute: NewsSlugRoute,
   NewsChar123slugChar125DotmdRoute: NewsChar123slugChar125DotmdRoute,
   RenderCompositeRoute: RenderCompositeRoute,
