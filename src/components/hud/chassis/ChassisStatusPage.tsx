@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { HudTitlePanel } from '../HudTitlePanel'
+import React, { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import { Dices } from 'lucide-react'
 import { HudWorkspaceGhost } from '../HudGhostSkeletons'
 import { HudButton } from '@/components/ui/HudButton'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
@@ -11,6 +11,7 @@ import {
   LOBSTER_AVATAR_STYLE,
   clearCachedProfileAvatarUrl,
   equipmentIcon,
+  rerollAvatarConfig,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
 import {
@@ -56,11 +57,28 @@ export const SLOT_NAMES: Record<EquipSlotId, string> = {
   'claws-2': 'Left pincer',
 }
 
+const WIDE_QUERY = '(min-width: 1024px)'
+const subscribeWide = (onChange: () => void) => {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return () => {}
+  const media = window.matchMedia(WIDE_QUERY)
+  media.addEventListener?.('change', onChange)
+  return () => media.removeEventListener?.('change', onChange)
+}
+/** Matches Tailwind `lg`: the two-column layout. */
+function useWideLayout() {
+  return useSyncExternalStore(
+    subscribeWide,
+    () => typeof window.matchMedia === 'function' && window.matchMedia(WIDE_QUERY).matches,
+    () => false,
+  )
+}
+
 /** One local draft. A catalog try-on is deliberately separate from owned placements. */
 export const ChassisStatusPage: React.FC = () => {
   const { userId } = useAuthSession()
   const toast = useOptionalToast()?.toast
   const persist = useHudPersist()
+  const wide = useWideLayout()
   const [saved, setSaved] = useState<ChassisLoadoutPayload | null>(() =>
     userId ? getCachedChassisLoadout(userId) : null,
   )
@@ -69,7 +87,10 @@ export const ChassisStatusPage: React.FC = () => {
   const [tab, setTab] = useState<(typeof TABS)[number]>('equipment')
   const [slot, setSlot] = useState<EquipSlotId>('head')
   const [selected, setSelected] = useState<string | null>(null)
-  const [tryOn, setTryOn] = useState<{ catalogId: string; slot: EquipSlotId } | null>(null)
+  const [tryOn, setTryOn] = useState<{
+    catalogId: string
+    slot: EquipSlotId
+  } | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [onlyOwned, setOnlyOwned] = useState(false)
@@ -109,7 +130,9 @@ export const ChassisStatusPage: React.FC = () => {
     void (async () => {
       try {
         const token = await getAuthJWTToken()
-        const payload = await getChassisLoadoutFn({ data: { userId, token: token ?? undefined } })
+        const payload = await getChassisLoadoutFn({
+          data: { userId, token: token ?? undefined },
+        })
         if (
           !cancelled &&
           !draftTouched.current &&
@@ -132,7 +155,10 @@ export const ChassisStatusPage: React.FC = () => {
     const equipment = { ...equipped }
     const c = tryOn ? catalogById.get(tryOn.catalogId) : null
     if (tryOn && c)
-      equipment[tryOn.slot] = { visualKey: c.appearanceKey || c.slug, rarity: c.rarity }
+      equipment[tryOn.slot] = {
+        visualKey: c.appearanceKey || c.slug,
+        rarity: c.rarity,
+      }
     return { ...config, equipment }
   }, [config, equipped, tryOn, catalogById])
   const dirty = Boolean(
@@ -244,7 +270,7 @@ export const ChassisStatusPage: React.FC = () => {
     disabled: saving,
     itemFor: (id) => {
       const worn = items.find((i) => i.equippedSlot === id)
-      return worn ? catalogById.get(worn.catalogItemId) ?? null : null
+      return worn ? (catalogById.get(worn.catalogItemId) ?? null) : null
     },
     onPick: (id) => {
       setSlot(id)
@@ -255,181 +281,223 @@ export const ChassisStatusPage: React.FC = () => {
   }
   // A new key replays the small settle animation whenever the look changes.
   const popKey = JSON.stringify(preview).length + ':' + JSON.stringify(preview.equipment ?? {})
+  const tabBar = (
+    <div
+      role="tablist"
+      aria-label="Character editor"
+      className="flex gap-0.5 rounded-card border border-line-subtle bg-surface-1 p-0.5"
+    >
+      {TABS.map((id) => (
+        <button
+          key={id}
+          type="button"
+          role="tab"
+          aria-selected={tab === id}
+          aria-controls="character-controls"
+          onClick={() => {
+            setTab(id)
+            setTryOn(null)
+          }}
+          className={`flex-1 min-h-9 rounded-control text-[11px] font-sans font-semibold tracking-[0.08em] uppercase transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+            tab === id
+              ? 'bg-surface-3 shadow-nav-current text-ink'
+              : 'text-ink-muted hover:text-ink hover:bg-surface-2'
+          }`}
+        >
+          {TAB_LABELS[id]}
+        </button>
+      ))}
+    </div>
+  )
   return (
-    <div className="space-y-3.5 sm:space-y-5 font-sans relative" data-testid="character-workspace">
-      <HudTitlePanel
-        surface="solid"
-        className="sticky top-0 z-20"
-        title="Your character"
-        actions={
-          <div className="flex w-full gap-2 sm:w-auto">
+    // Phones: header, character and tabs stay pinned as one compact stage while
+    // only the options scroll. Wide screens: character on the left, editor on the right.
+    <div
+      className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.35fr)_minmax(340px,1fr)] gap-x-6 gap-y-3 lg:gap-y-5 items-start font-sans relative max-lg:pb-16"
+      data-testid="character-workspace"
+    >
+      <div className="max-lg:sticky max-lg:z-20 max-sm:-top-2.5 max-sm:-mx-2.5 max-sm:-mt-2.5 max-sm:px-2.5 max-sm:pt-2.5 sm:max-md:-top-4 sm:max-md:-mx-4 sm:max-md:-mt-4 sm:max-md:px-4 sm:max-md:pt-4 md:max-lg:-top-6 md:max-lg:-mx-6 md:max-lg:-mt-6 md:max-lg:px-6 md:max-lg:pt-6 max-lg:pb-2 max-lg:space-y-2 max-lg:bg-abyss/95 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-line-subtle lg:contents">
+        <div className="lg:col-span-2 flex items-center justify-between gap-3 rounded-card bg-surface-1 px-3 py-2 sm:px-5 sm:py-4">
+          <h1 className="font-grotesk font-extrabold text-lg sm:text-2xl text-ink tracking-tight truncate">
+            Your character
+          </h1>
+          <div className="flex shrink-0 gap-2">
             <HudButton
-              className="flex-1 sm:flex-none"
+              size="sm"
               variant="secondary"
               disabled={saving || (!dirty && !tryOn)}
               onClick={() => accept(saved)}
             >
               Discard
             </HudButton>
-            <HudButton className="flex-1 sm:flex-none" disabled={saving || !dirty} onClick={() => void save()}>
+            <HudButton size="sm" disabled={saving || !dirty} onClick={() => void save()}>
               {saving ? 'Saving…' : 'Save changes'}
             </HudButton>
           </div>
-        }
-      />
-      {error && (
-        <div role="alert" className="text-crimson-text">
-          {error}{' '}
-          <button type="button" className="underline" onClick={() => setReload((n) => n + 1)}>
-            Reload character
-          </button>
         </div>
-      )}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.35fr)_minmax(340px,1fr)] gap-4 lg:gap-6 items-start">
-        <div className="lg:sticky lg:top-24 space-y-3">
+        <div className="lg:row-start-2 lg:sticky lg:top-6 lg:self-start space-y-3">
           <div className="grid grid-cols-1 lg:grid-cols-[84px_minmax(0,1fr)_84px] gap-2 items-center">
-            <SlotColumn
-              ids={LEFT_SLOTS}
-              className="hidden lg:flex"
-              {...slotProps}
-            />
+            <SlotColumn ids={LEFT_SLOTS} className="hidden lg:flex" {...slotProps} />
             <div className="relative">
               <div key={popKey} className="avatar-creator-pop">
-                <AvatarCreatorPreview config={preview} className="max-w-[260px] sm:max-w-[560px] mx-auto" />
+                <AvatarCreatorPreview
+                  config={preview}
+                  className="max-w-[min(212px,28svh)] lg:max-w-[560px] mx-auto"
+                />
               </div>
+              <HudButton
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="absolute top-1 left-0 lg:top-2 lg:left-2"
+                disabled={saving}
+                onClick={() => {
+                  draftTouched.current = true
+                  setConfig(rerollAvatarConfig(config))
+                }}
+                icon={<Dices className="w-3.5 h-3.5 text-cyan-glow" />}
+              >
+                Surprise me
+              </HudButton>
             </div>
-            <SlotColumn
-              ids={RIGHT_SLOTS}
-              className="hidden lg:flex"
-              {...slotProps}
-            />
+            <SlotColumn ids={RIGHT_SLOTS} className="hidden lg:flex" {...slotProps} />
           </div>
           {tryOn && (
             <div
               role="status"
               className="flex items-center justify-between gap-3 px-3 py-2 border border-cyan-glow/30 bg-cyan-soft rounded-control text-sm"
             >
-              <span>Preview only · {catalogById.get(tryOn.catalogId)?.name}</span>
+              <span className="truncate">
+                Preview only · {catalogById.get(tryOn.catalogId)?.name}
+              </span>
               <button type="button" className="underline shrink-0" onClick={() => setTryOn(null)}>
                 End preview
               </button>
             </div>
           )}
-          <div
-            className="flex lg:hidden gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 snap-x"
-            aria-label="Equipment slots"
-          >
-            {EQUIP_SLOT_IDS.map((id) => (
-              <SlotButton key={id} id={id} className="w-[76px] shrink-0 snap-start" {...slotProps} />
-            ))}
-          </div>
         </div>
-        <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-4 min-w-0">
-          <div role="tablist" aria-label="Character editor" className="flex gap-0.5 rounded-card border border-line-subtle bg-surface-1 p-0.5">
-            {TABS.map((id) => (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                aria-selected={tab === id}
-                aria-controls="character-controls"
-                onClick={() => {
-                  setTab(id)
-                  setTryOn(null)
-                }}
-                className={`flex-1 min-h-9 rounded-control text-[11px] font-sans font-semibold tracking-[0.08em] uppercase transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                  tab === id
-                    ? 'bg-surface-3 shadow-nav-current text-ink'
-                    : 'text-ink-muted hover:text-ink hover:bg-surface-2'
-                }`}
-              >
-                {TAB_LABELS[id]}
-              </button>
-            ))}
+        {!wide && tabBar}
+      </div>
+      <div className="lg:col-start-2 lg:row-start-2 chitin-card p-2.5 sm:p-4 lg:p-5 chamfer-corner shadow-2xl space-y-4 min-w-0">
+        {wide && (
+          <div className="sticky -top-6 z-10 -mx-5 -mt-5 px-5 pt-5 pb-2 rounded-t-card bg-abyss/95 backdrop-blur-md">
+            {tabBar}
           </div>
-          <div id="character-controls" role="tabpanel">
-            {tab !== 'equipment' ? (
-              <AvatarCreatorPanel
-                value={config}
-                section={tab}
-                onChange={(next) => {
-                  draftTouched.current = true
-                  setConfig(next)
-                }}
-                disabled={saving}
-              />
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h2 className="font-grotesk font-bold text-ink">{SLOT_NAMES[slot]}</h2>
-                    <p className="text-xs text-ink-muted mt-1">
-                      {wearing
-                        ? catalogById.get(wearing.catalogItemId)?.name
-                        : 'Natural shell · nothing equipped'}
-                    </p>
-                  </div>
-                  <HudButton
-                    variant="secondary"
-                    size="sm"
-                    onClick={unequip}
-                    disabled={saving || !wearing}
-                  >
-                    Unequip
-                  </HudButton>
-                </div>
-                <label className="flex gap-2 items-center text-xs text-ink-muted">
-                  <input
-                    type="checkbox"
-                    checked={onlyOwned}
-                    onChange={(e) => setOnlyOwned(e.target.checked)}
+        )}
+        {error && (
+          <div role="alert" className="text-crimson-text">
+            {error}{' '}
+            <button type="button" className="underline" onClick={() => setReload((n) => n + 1)}>
+              Reload character
+            </button>
+          </div>
+        )}
+        <div id="character-controls" role="tabpanel">
+          {tab !== 'equipment' ? (
+            <AvatarCreatorPanel
+              value={config}
+              section={tab}
+              onChange={(next) => {
+                draftTouched.current = true
+                setConfig(next)
+              }}
+              disabled={saving}
+            />
+          ) : (
+            <div className="space-y-3 lg:space-y-4">
+              <div
+                className="flex lg:hidden gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 snap-x"
+                aria-label="Equipment slots"
+              >
+                {EQUIP_SLOT_IDS.map((id) => (
+                  <SlotButton
+                    key={id}
+                    id={id}
+                    className="w-[68px] shrink-0 snap-start"
+                    {...slotProps}
                   />
-                  Owned items only
-                </label>
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-2">
-                  {matching.map((c) => {
-                    const owned = items.filter((i) => i.catalogItemId === c.id).length
-                    return (
-                      <GearPick
-                        key={c.id}
-                        catalog={c}
-                        owned={owned}
-                        worn={wearing?.catalogItemId === c.id}
-                        selected={selected === c.id}
-                        onClick={() => setSelected(c.id)}
-                      />
-                    )
-                  })}
+                ))}
+              </div>
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <h2 className="font-grotesk font-bold text-ink">{SLOT_NAMES[slot]}</h2>
+                  <p className="text-xs text-ink-muted mt-1">
+                    {wearing
+                      ? catalogById.get(wearing.catalogItemId)?.name
+                      : 'Natural shell · nothing equipped'}
+                  </p>
                 </div>
-                {selectedCatalog && selectedCatalog.category === equipSlotCategory(slot) && (
-                  <div className="space-y-3">
-                    <GearDetail catalog={selectedCatalog} />
-                    <HudButton onClick={() => equip(selectedCatalog.id)} disabled={saving}>
+                <HudButton
+                  variant="secondary"
+                  size="sm"
+                  onClick={unequip}
+                  disabled={saving || !wearing}
+                >
+                  Unequip
+                </HudButton>
+              </div>
+              <label className="flex gap-2 items-center text-xs text-ink-muted">
+                <input
+                  type="checkbox"
+                  checked={onlyOwned}
+                  onChange={(e) => setOnlyOwned(e.target.checked)}
+                />
+                Owned items only
+              </label>
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(84px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-2">
+                {matching.map((c) => {
+                  const owned = items.filter((i) => i.catalogItemId === c.id).length
+                  return (
+                    <GearPick
+                      key={c.id}
+                      catalog={c}
+                      owned={owned}
+                      worn={wearing?.catalogItemId === c.id}
+                      selected={selected === c.id}
+                      onClick={() => setSelected(c.id)}
+                    />
+                  )
+                })}
+              </div>
+              {selectedCatalog && selectedCatalog.category === equipSlotCategory(slot) && (
+                <>
+                  {/* Floats above the Oracle bar on phones so the pick is one tap from the grid. */}
+                  <div className="max-lg:sticky max-lg:bottom-3 max-lg:z-10 flex items-center justify-between gap-3 rounded-card max-lg:border max-lg:border-line max-lg:bg-surface-1/95 max-lg:backdrop-blur-md max-lg:p-2 max-lg:pl-3 max-lg:shadow-2xl">
+                    <span className="lg:hidden text-sm font-semibold text-ink truncate">
+                      {selectedCatalog.name}
+                    </span>
+                    <HudButton
+                      size="sm"
+                      className="shrink-0 lg:order-2"
+                      onClick={() => equip(selectedCatalog.id)}
+                      disabled={saving}
+                    >
                       {items.some((i) => i.catalogItemId === selectedCatalog.id)
                         ? `Equip on ${SLOT_NAMES[slot].toLowerCase()}`
                         : 'Try on'}
                     </HudButton>
                   </div>
-                )}
-                <p className="text-xs text-ink-muted">
-                  {items.length} owned items · {items.filter((i) => !i.equippedSlot).length}/
-                  {saved.vaultSize} vault spaces used. Other designs are available to preview.
-                </p>
-              </div>
-            )}
-          </div>
-          <details className="border-t border-line pt-3 text-xs text-ink-muted">
-            <summary className="cursor-pointer">Loadout stats · character flavor</summary>
-            <div className="grid grid-cols-2 gap-2 pt-3">
-              {Object.entries(computeLoadoutTotals(items, catalogById)).map(([key, value]) => (
-                <p key={key} className="capitalize">
-                  {key}: {value}
-                </p>
-              ))}
+                  <GearDetail catalog={selectedCatalog} />
+                </>
+              )}
+              <p className="text-xs text-ink-muted">
+                {items.length} owned items · {items.filter((i) => !i.equippedSlot).length}/
+                {saved.vaultSize} vault spaces used. Other designs are available to preview.
+              </p>
             </div>
-            <p className="pt-2">Equipment values do not affect activities or progression.</p>
-          </details>
+          )}
         </div>
+        <details className="border-t border-line pt-3 text-xs text-ink-muted">
+          <summary className="cursor-pointer">Loadout stats · character flavor</summary>
+          <div className="grid grid-cols-2 gap-2 pt-3">
+            {Object.entries(computeLoadoutTotals(items, catalogById)).map(([key, value]) => (
+              <p key={key} className="capitalize">
+                {key}: {value}
+              </p>
+            ))}
+          </div>
+          <p className="pt-2">Equipment values do not affect activities or progression.</p>
+        </details>
       </div>
     </div>
   )
@@ -442,7 +510,14 @@ interface SlotSharedProps {
   onPick: (id: EquipSlotId) => void
 }
 
-function SlotButton({ id, className = '', active, disabled, itemFor, onPick }: SlotSharedProps & { id: EquipSlotId; className?: string }) {
+function SlotButton({
+  id,
+  className = '',
+  active,
+  disabled,
+  itemFor,
+  onPick,
+}: SlotSharedProps & { id: EquipSlotId; className?: string }) {
   const item = itemFor(id)
   const thumb = item ? equipmentIcon(item.appearanceKey || item.slug) : null
   const selected = active === id
@@ -454,24 +529,35 @@ function SlotButton({ id, className = '', active, disabled, itemFor, onPick }: S
       aria-pressed={selected}
       onClick={() => onPick(id)}
       className={`flex flex-col items-center gap-1 rounded-control border p-1.5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-        selected ? 'border-cyan-glow bg-cyan-soft' : 'border-line-subtle bg-surface-1 hover:border-line-hover'
+        selected
+          ? 'border-cyan-glow bg-cyan-soft'
+          : 'border-line-subtle bg-surface-1 hover:border-line-hover'
       } ${className}`}
     >
       <span className="grid place-items-center w-11 h-11 rounded-chip bg-abyss/70">
         {thumb ? (
           <img src={thumb} alt="" className="w-9 h-9 object-contain" />
         ) : (
-          <span className="w-5 h-5 rounded-full border border-dashed border-line" aria-hidden="true" />
+          <span
+            className="w-5 h-5 rounded-full border border-dashed border-line"
+            aria-hidden="true"
+          />
         )}
       </span>
-      <span className={`text-[10.5px] leading-tight text-center ${selected ? 'text-ink font-semibold' : 'text-ink-muted'}`}>
+      <span
+        className={`text-[10.5px] leading-tight text-center ${selected ? 'text-ink font-semibold' : 'text-ink-muted'}`}
+      >
         {SLOT_NAMES[id]}
       </span>
     </button>
   )
 }
 
-function SlotColumn({ ids, className = '', ...shared }: SlotSharedProps & { ids: EquipSlotId[]; className?: string }) {
+function SlotColumn({
+  ids,
+  className = '',
+  ...shared
+}: SlotSharedProps & { ids: EquipSlotId[]; className?: string }) {
   return (
     <div className={`flex-col gap-2 ${className}`} aria-label="Equipment slots">
       {ids.map((id) => (
@@ -480,7 +566,6 @@ function SlotColumn({ ids, className = '', ...shared }: SlotSharedProps & { ids:
     </div>
   )
 }
-
 
 /** Calm item card: the item on a quiet tile, its name, and a small rarity mark. */
 function GearPick({
@@ -505,13 +590,17 @@ function GearPick({
       aria-pressed={selected}
       aria-label={`${catalog.name}, ${CATEGORY_LABELS[catalog.category]}`}
       className={`relative flex flex-col gap-1.5 rounded-control border p-1.5 text-left transition-[border-color,background-color,transform] duration-150 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow motion-reduce:transition-none ${
-        selected ? 'border-cyan-glow bg-cyan-soft' : 'border-line-subtle bg-surface-2 hover:border-line-hover'
+        selected
+          ? 'border-cyan-glow bg-cyan-soft'
+          : 'border-line-subtle bg-surface-2 hover:border-line-hover'
       }`}
     >
       <span className="grid place-items-center w-full aspect-square rounded-chip bg-abyss/70">
         {thumb ? <img src={thumb} alt="" className="w-3/4 h-3/4 object-contain" /> : null}
       </span>
-      <span className="text-[12px] leading-tight text-ink font-semibold line-clamp-2 min-h-[2lh]">{catalog.name}</span>
+      <span className="text-[12px] leading-tight text-ink font-semibold line-clamp-2 min-h-[2lh]">
+        {catalog.name}
+      </span>
       <span className={`inline-flex items-center gap-1 capitalize text-[11px] ${rarity.text}`}>
         <span className="w-1.5 h-1.5 rounded-full bg-current" aria-hidden="true" />
         {catalog.rarity}
