@@ -1,12 +1,12 @@
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import React, { useState } from 'react'
+import { HudTabs } from '@/components/ui/HudTabs'
+import { HudButton } from '@/components/ui/HudButton'
 import { LocalTime } from '@/components/ui/LocalTime'
 import { Link } from '@tanstack/react-router'
 import { HudGhostCard } from '@/components/ui/HudGhostLoader'
 import {
-  FileText,
   HelpCircle,
-  Send,
   Activity,
   ChevronDown,
   ChevronUp,
@@ -131,376 +131,263 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
     setCurrentPage(1)
   }
 
-  const getCategoryColor = (cat: string) => {
-    switch (cat?.toLowerCase()) {
-      case 'feature':
-      case 'features':
-        return 'text-[#00ffff] border-[#00ffff]/40 bg-[#00ffff]/10'
-      case 'improvement':
-      case 'improvements':
-        return 'text-[#c084fc] border-[#c084fc]/40 bg-[#c084fc]/10'
-      case 'security':
-        return 'text-[#34d399] border-[#34d399]/40 bg-[#34d399]/10'
-      case 'performance':
-        return 'text-[#fbbf24] border-[#fbbf24]/40 bg-[#fbbf24]/10'
-      case 'fix':
-      case 'fixes':
-      case 'bug_purge':
-        return 'text-[#f43f5e] border-[#f43f5e]/40 bg-[#f43f5e]/10'
-      case 'design':
-      case 'ui/ux':
-        return 'text-[#f472b6] border-[#f472b6]/40 bg-[#f472b6]/10'
-      default:
-        return 'text-[#00c3ff] border-[#00c3ff]/40 bg-[#00c3ff]/10'
-    }
-  }
-
-  const getTagColor = (tag: string) => {
-    switch (tag.toLowerCase()) {
-      case 'performance':
-        return 'text-amber-300/90 border-amber-500/30 bg-amber-950/40'
-      case 'ui/ux':
-      case 'design':
-        return 'text-pink-300/90 border-pink-500/30 bg-pink-950/40'
-      case 'security':
-      case 'auth':
-      case 'protection':
-        return 'text-emerald-300/90 border-emerald-500/30 bg-emerald-950/40'
-      case 'ai':
-        return 'text-indigo-300/90 border-indigo-500/30 bg-indigo-950/40'
-      case 'media':
-      case 'video':
-      case 'audio':
-        return 'text-sky-300/90 border-sky-500/30 bg-sky-950/40'
-      case 'navigation':
-      case 'tools':
-        return 'text-cyan-300/90 border-cyan-500/30 bg-cyan-950/40'
-      default:
-        return 'text-[#839493] border-[#3a4a49] bg-[#070b0b]'
-    }
-  }
-
   return (
-    <div className="space-y-3.5 sm:space-y-5 md:space-y-6 font-sans text-[#dfe3e3] pb-10">
-      <div className="chitin-card p-3.5 sm:p-5 chamfer-corner shadow-2xl relative overflow-hidden space-y-2.5 sm:space-y-3">
-        <HudTitlePanel treatment="integrated" title={SUPPORT_PAGE_COPY.pageTitle} />
+    <div className="chitin-card rounded-card p-4 sm:p-6 space-y-5 font-sans text-ink">
+      <HudTitlePanel treatment="integrated" title={SUPPORT_PAGE_COPY.pageTitle} />
+      <HudTabs
+        label="Support sections"
+        className="grid grid-cols-2 gap-x-4 gap-y-0 sm:flex sm:gap-5"
+        idPrefix="support-tab"
+        value={activeTab}
+        onValueChange={setActiveTab}
+        items={[
+          { value: 'changelog', label: SUPPORT_PAGE_COPY.tabChangelog },
+          { value: 'kb', label: SUPPORT_PAGE_COPY.tabFaq },
+          { value: 'ticket', label: SUPPORT_TICKET_COPY.formTitle },
+          { value: 'diagnostics', label: SUPPORT_PAGE_COPY.tabDiagnostics },
+        ]}
+      />
+      <div role="tabpanel" aria-labelledby={`support-tab-${activeTab}`}>
+        {/* Changelog */}
+        {activeTab === 'changelog' && (
+          <div className="space-y-4">
+            {/* Standard Responsive Search & Filter Controls Bar */}
+            <ChangelogFilterBar
+              searchQuery={searchQuery}
+              onSearchChange={handleSearchChange}
+              selectedCategory={selectedCategory}
+              onCategoryChange={handleCategoryChange}
+              selectedTag={selectedTag}
+              onTagChange={handleTagChange}
+              categories={categoryOptions}
+              tags={tagOptions}
+              totalCount={changelogs.length}
+              filteredCount={filteredChangelogs.length}
+              onReset={handleResetFilters}
+              className="border-line-subtle"
+            />
 
-        {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-2 pt-1">
-          <button
-            onClick={() => setActiveTab('changelog')}
-            className={`px-4 py-2 text-xs font-bold uppercase transition-all duration-200 flex items-center gap-2 chamfer-corner ${
-              activeTab === 'changelog'
-                ? 'bg-[#00ffff]/15 text-[#00ffff] border border-[#00ffff] shadow-[0_0_12px_rgba(0,255,255,0.3)]'
-                : 'bg-[#091113]/60 text-[#839493] border border-[#3a4a49] hover:border-[#00ffff]/50 hover:text-white'
-            }`}
-          >
-            <FileText className="w-3.5 h-3.5" />
-            <span>{SUPPORT_PAGE_COPY.tabChangelog}</span>
-            <span className="bg-[#00ffff]/20 text-[#00ffff] text-[10px] px-1.5 py-0.2 rounded-full ml-1">
-              {SUPPORT_PAGE_COPY.changelogLive}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('kb')}
-            className={`px-4 py-2 text-xs font-bold uppercase transition-all duration-200 flex items-center gap-2 chamfer-corner ${
-              activeTab === 'kb'
-                ? 'bg-[#00ffff]/15 text-[#00ffff] border border-[#00ffff] shadow-[0_0_12px_rgba(0,255,255,0.3)]'
-                : 'bg-[#091113]/60 text-[#839493] border border-[#3a4a49] hover:border-[#00ffff]/50 hover:text-white'
-            }`}
-          >
-            <HelpCircle className="w-3.5 h-3.5" />
-            <span>{SUPPORT_PAGE_COPY.tabFaq}</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('ticket')}
-            className={`px-4 py-2 text-xs font-bold uppercase transition-all duration-200 flex items-center gap-2 chamfer-corner ${
-              activeTab === 'ticket'
-                ? 'bg-[#00ffff]/15 text-[#00ffff] border border-[#00ffff] shadow-[0_0_12px_rgba(0,255,255,0.3)]'
-                : 'bg-[#091113]/60 text-[#839493] border border-[#3a4a49] hover:border-[#00ffff]/50 hover:text-white'
-            }`}
-          >
-            <Send className="w-3.5 h-3.5" />
-            <span>{SUPPORT_TICKET_COPY.formTitle}</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('diagnostics')}
-            className={`px-4 py-2 text-xs font-bold uppercase transition-all duration-200 flex items-center gap-2 chamfer-corner ${
-              activeTab === 'diagnostics'
-                ? 'bg-[#00ffff]/15 text-[#00ffff] border border-[#00ffff] shadow-[0_0_12px_rgba(0,255,255,0.3)]'
-                : 'bg-[#091113]/60 text-[#839493] border border-[#3a4a49] hover:border-[#00ffff]/50 hover:text-white'
-            }`}
-          >
-            <Activity className="w-3.5 h-3.5" />
-            <span>{SUPPORT_PAGE_COPY.tabDiagnostics}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Changelog */}
-      {activeTab === 'changelog' && (
-        <div className="space-y-4">
-          {/* Standard Responsive Search & Filter Controls Bar */}
-          <ChangelogFilterBar
-            searchQuery={searchQuery}
-            onSearchChange={handleSearchChange}
-            selectedCategory={selectedCategory}
-            onCategoryChange={handleCategoryChange}
-            selectedTag={selectedTag}
-            onTagChange={handleTagChange}
-            categories={categoryOptions}
-            tags={tagOptions}
-            totalCount={changelogs.length}
-            filteredCount={filteredChangelogs.length}
-            onReset={handleResetFilters}
-            className="rounded-sm border border-[#3a4a49]/60"
-          />
-
-          {/* Changelog Entries Timeline */}
-          {loading ? (
-            <div className="space-y-4">
-              <HudGhostCard lines={3} />
-              <HudGhostCard lines={3} />
-              <HudGhostCard lines={3} />
-            </div>
-          ) : filteredChangelogs.length === 0 ? (
-            <div className="chitin-card p-8 text-center space-y-3 chamfer-corner">
-              <AlertTriangle className="w-8 h-8 text-[#ff5540] mx-auto" />
-              <div className="space-y-1">
-                <p className="text-sm font-bold text-[#dfe3e3]">{SUPPORT_PAGE_COPY.changelogEmpty}</p>
-                <p className="text-xs text-[#839493] max-w-md mx-auto">
-                  {SUPPORT_PAGE_COPY.changelogEmptyHint(searchQuery || selectedCategory)}
-                </p>
+            {/* Changelog Entries Timeline */}
+            {loading ? (
+              <div className="space-y-4">
+                <HudGhostCard lines={3} />
+                <HudGhostCard lines={3} />
+                <HudGhostCard lines={3} />
               </div>
-              <button
-                onClick={handleResetFilters}
-                className="px-4 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 border border-[#00ffff] text-[#00ffff] text-xs font-bold chamfer-corner inline-flex items-center gap-1.5 transition-all"
-              >
-                <RotateCcw className="w-3 h-3" />
-                <span>{SUPPORT_PAGE_COPY.changelogReset}</span>
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4 relative">
-              {/* Vertical Timeline Bar */}
-              <div className="absolute left-4 md:left-6 top-4 bottom-4 w-[3px] -translate-x-1/2 pointer-events-none z-0">
-                <div className="absolute inset-0 bg-gradient-to-b from-[#00ffff] via-[#3a4a49]/60 to-transparent opacity-60 rounded-full" />
-                <div className="absolute inset-0 bg-[#00ffff]/10 blur-md rounded-full" />
-                <div className="absolute inset-0 bg-[repeating-linear-gradient(to_bottom,transparent,transparent_6px,rgba(0,255,255,0.35)_6px,rgba(0,255,255,0.35)_7px)]" />
+            ) : filteredChangelogs.length === 0 ? (
+              <div className="p-6 text-center space-y-3">
+                <AlertTriangle className="w-8 h-8 text-crimson-text mx-auto" />
+                <div className="space-y-1">
+                  <p className="text-sm font-bold text-ink">{SUPPORT_PAGE_COPY.changelogEmpty}</p>
+                  <p className="text-xs text-ink-muted max-w-md mx-auto">
+                    {SUPPORT_PAGE_COPY.changelogEmptyHint(searchQuery || selectedCategory)}
+                  </p>
+                </div>
+                <HudButton variant="secondary" onClick={handleResetFilters} icon={<RotateCcw className="w-3.5 h-3.5" />}>
+                  {SUPPORT_PAGE_COPY.changelogReset}
+                </HudButton>
               </div>
+            ) : (
+              <div className="space-y-4 relative">
+                <div aria-hidden="true" className="absolute left-2 md:left-3 top-4 bottom-4 w-px bg-line" />
 
-              {paginatedChangelogs.map((entry) => {
-                const isExpanded = expandedEntries[entry.version] || expandedEntries[entry.version.replace('.', '_')]
-                const key = entry.version.replace(/\./g, '_')
+                {paginatedChangelogs.map((entry) => {
+                  const key = entry.version.replace(/\./g, '_')
+                  const isExpanded = expandedEntries[entry.version] || expandedEntries[key]
 
-                return (
-                  <div key={entry.version} className="group relative z-10 pl-10 md:pl-14">
-                    {/* Timeline Node Ring */}
-                    <div className="absolute left-4 md:left-6 top-4 -translate-x-1/2 group-hover:scale-125 transition-transform duration-300">
-                      <div className="w-4 h-4 rounded-full bg-[#070b0b] border-2 border-[#00ffff] shadow-[0_0_10px_rgba(0,255,255,0.6)] relative flex items-center justify-center">
-                        <div className="w-1.5 h-1.5 bg-[#00ffff] rounded-full" />
-                      </div>
-                      <div className="absolute inset-0 rounded-full bg-[#00ffff]/40 blur-[6px] -z-10" />
-                      <div className="absolute left-1/2 top-1/2 w-6 h-6 rounded-full border border-[#00ffff]/30 animate-ping-slow -z-10" />
-                    </div>
+                  return (
+                    <div key={entry.version} className="group relative z-10 pl-6 md:pl-8">
+                      <div aria-hidden="true" className="absolute left-2 md:left-3 top-5 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-cyan-glow border-2 border-surface-1" />
 
-                    {/* Entry Card */}
-                    <div className="chitin-card p-4 md:p-5 chamfer-corner space-y-3 hover:border-[#00ffff]/60 transition-all shadow-xl">
-                      {/* Top Bar: Version & Metadata */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#3a4a49]/60 pb-3">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="font-grotesk font-extrabold text-sm md:text-base text-[#00ffff] bg-[#00ffff]/10 border border-[#00ffff]/40 px-2.5 py-0.5 chamfer-corner">
-                            {entry.version}
-                          </span>
-                          <span className={`text-[10px] font-bold px-2 py-0.5 border ${getCategoryColor(entry.category)} chamfer-corner uppercase`}>
-                            {entry.category}
-                          </span>
-                          {(Array.isArray(entry.tags) ? entry.tags.filter((t) => t.toLowerCase() !== entry.category?.toLowerCase()) : []).map((tag) => (
-                            <span
-                              key={tag}
-                              className={`text-[9px] font-bold px-1.5 py-0.5 border ${getTagColor(tag)} chamfer-corner uppercase`}
-                            >
-                              {tag}
+                      {/* Entry Card */}
+                      <div className="rounded-card border border-line-subtle bg-surface-2 p-4 md:p-5 space-y-3">
+                        {/* Top Bar: Version & Metadata */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-line/60 pb-3">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="font-grotesk font-extrabold text-sm md:text-base text-ink">
+                              {entry.version}
                             </span>
-                          ))}
-                          <span className="text-[10px] text-[#839493] flex items-center gap-1 border border-[#3a4a49] px-2 py-0.5 bg-[#030606]">
-                            <Clock className="w-3 h-3 text-[#00ffff]" />
-                            <LocalTime value={entry.releasedAt} />
-                          </span>
+                            <span className="text-[11px] font-bold px-2 py-0.5 text-cyan-glow bg-cyan-soft rounded-chip uppercase">
+                              {entry.category}
+                            </span>
+                            {(Array.isArray(entry.tags) ? entry.tags.filter((t) => t.toLowerCase() !== entry.category?.toLowerCase()) : []).map((tag) => (
+                              <span
+                                key={tag}
+                                className="text-[11px] text-ink-muted"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                            <span className="text-[11px] text-ink-muted flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-cyan-glow" />
+                              <LocalTime value={entry.releasedAt} />
+                            </span>
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Title & Summary */}
-                      <div className="space-y-1">
-                        <h2 className="font-grotesk text-sm md:text-base font-bold text-[#dfe3e3] hover:text-[#00ffff] transition-colors">
-                          {entry.title}
-                        </h2>
-                        <p className="text-xs text-[#839493] leading-relaxed">
-                          {entry.summary}
-                        </p>
-                      </div>
-
-                      {/* Expandable Markdown Release Notes */}
-                      {isExpanded && (
-                        <div className="pt-3 border-t border-[#3a4a49]/50 bg-[#030606]/80 p-4 chamfer-corner">
-                          <NewsArticleBody content={entry.content} />
+                        {/* Title & Summary */}
+                        <div className="space-y-1">
+                          <h2 className="font-grotesk text-sm md:text-base font-bold text-ink">
+                            {entry.title}
+                          </h2>
+                          <p className="text-xs text-ink-muted leading-relaxed">
+                            {entry.summary}
+                          </p>
                         </div>
-                      )}
 
-                      {/* Card Footer Toggle Button */}
-                      <div className="flex justify-between items-center pt-1">
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={() => toggleExpand(key)}
-                            className="text-[11px] text-[#00ffff] hover:text-white font-bold flex items-center gap-1 transition-colors"
-                          >
-                            {isExpanded ? (
-                              <>
-                                <span>{SUPPORT_PAGE_COPY.changelogCollapse}</span>
-                                <ChevronUp className="w-3.5 h-3.5" />
-                              </>
-                            ) : (
-                              <>
-                                <span>{SUPPORT_PAGE_COPY.changelogExpand}</span>
-                                <ChevronDown className="w-3.5 h-3.5" />
-                              </>
-                            )}
-                          </button>
+                        {/* Expandable Markdown Release Notes */}
+                        {isExpanded && (
+                          <div className="pt-3 border-t border-line/50 bg-surface-2 p-4 rounded-card">
+                            <NewsArticleBody content={entry.content} />
+                          </div>
+                        )}
 
-                          {entry.slug && (
-                            <Link
-                              to="/changelog/$slug"
-                              params={{ slug: entry.slug }}
-                              className="text-[10px] text-[#839493] hover:text-[#00ffff] font-sans font-bold flex items-center gap-1 transition-colors border border-[#3a4a49] px-2 py-0.5 chamfer-corner bg-[#030606]"
-                              title="View public permalink page"
+                        {/* Card Footer Toggle Button */}
+                        <div className="flex justify-between items-center pt-1">
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => toggleExpand(key)}
+                              aria-expanded={Boolean(isExpanded)}
+                              className="min-h-10 rounded-control text-xs text-cyan-glow hover:text-ink font-bold flex items-center gap-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                             >
-                              <span>{SUPPORT_PAGE_COPY.changelogPermalink}</span>
-                              <ExternalLink className="w-2.5 h-2.5" />
-                            </Link>
-                          )}
+                              {isExpanded ? (
+                                <>
+                                  <span>{SUPPORT_PAGE_COPY.changelogCollapse}</span>
+                                  <ChevronUp className="w-3.5 h-3.5" />
+                                </>
+                              ) : (
+                                <>
+                                  <span>{SUPPORT_PAGE_COPY.changelogExpand}</span>
+                                  <ChevronDown className="w-3.5 h-3.5" />
+                                </>
+                              )}
+                            </button>
+
+                            {entry.slug && (
+                              <Link
+                                to="/changelog/$slug"
+                                params={{ slug: entry.slug }}
+                                className="min-h-8 rounded-control text-[11px] text-ink-muted hover:text-cyan-glow font-bold flex items-center gap-1 transition-colors border border-line px-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                                title="View public permalink page"
+                              >
+                                <span>{SUPPORT_PAGE_COPY.changelogPermalink}</span>
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </Link>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )
-              })}
+                  )
+                })}
 
-              {/* Pagination Controls */}
-              <HudPagination
-                currentPage={currentPage}
-                totalItems={filteredChangelogs.length}
-                pageSize={pageSize}
-                onPageChange={(page) => {
-                  setCurrentPage(page)
-                  if (typeof window !== 'undefined') {
-                    window.scrollTo({ top: 120, behavior: 'smooth' })
-                  }
-                }}
-                itemName="releases"
-              />
+                {/* Pagination Controls */}
+                <HudPagination
+                  currentPage={currentPage}
+                  totalItems={filteredChangelogs.length}
+                  pageSize={pageSize}
+                  onPageChange={(page) => {
+                    setCurrentPage(page)
+                    if (typeof window !== 'undefined') {
+                      window.scrollTo({ top: 120, behavior: 'smooth' })
+                    }
+                  }}
+                  itemName="releases"
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'kb' && (
+          <div className="space-y-4">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 border-b border-line pb-3">
+                <HelpCircle className="w-5 h-5 text-cyan-glow" />
+                <h2 className="font-grotesk text-sm font-bold text-ink uppercase tracking-wider">
+                  {SUPPORT_PAGE_COPY.faqTitle}
+                </h2>
+              </div>
+              <p className="text-xs text-ink-muted leading-relaxed">
+                {SUPPORT_PAGE_COPY.faqHint}
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+                <div className="space-y-2 border-t border-line-subtle pt-4">
+                  <h3 className="font-grotesk text-xs font-bold text-ink">
+                    {SUPPORT_PAGE_COPY.faqStartTitle}
+                  </h3>
+                  <p className="text-xs text-ink-muted leading-relaxed">
+                    {SUPPORT_PAGE_COPY.faqStartBody}
+                  </p>
+                </div>
+
+                <div className="space-y-2 border-t border-line-subtle pt-4">
+                  <h3 className="font-grotesk text-xs font-bold text-ink">
+                    {SUPPORT_PAGE_COPY.faqBillingTitle}
+                  </h3>
+                  <p className="text-xs text-ink-muted leading-relaxed">
+                    {SUPPORT_PAGE_COPY.faqBillingBody}
+                  </p>
+                </div>
+
+                <div className="space-y-2 border-t border-line-subtle pt-4">
+                  <h3 className="font-grotesk text-xs font-bold text-ink">
+                    {SUPPORT_PAGE_COPY.faqPrivacyTitle}
+                  </h3>
+                  <p className="text-xs text-ink-muted leading-relaxed">
+                    {SUPPORT_PAGE_COPY.faqPrivacyBody}
+                  </p>
+                </div>
+              </div>
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
 
-      {activeTab === 'kb' && (
-        <div className="space-y-4">
-          <div className="chitin-card p-5 chamfer-corner space-y-4">
-            <div className="flex items-center gap-2 border-b border-[#3a4a49] pb-3">
-              <HelpCircle className="w-5 h-5 text-[#00ffff]" />
-              <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
-                {SUPPORT_PAGE_COPY.faqTitle}
+        {/* TAB 3: Contact support */}
+        {activeTab === 'ticket' && (
+          <div className="space-y-4">
+            <SupportTicketForm />
+          </div>
+        )}
+
+        {activeTab === 'diagnostics' && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 border-b border-line pb-3">
+              <Activity className="w-5 h-5 text-cyan-glow" />
+              <h2 className="font-grotesk text-sm font-bold text-ink uppercase tracking-wider">
+                {SUPPORT_PAGE_COPY.diagnosticsTitle}
               </h2>
             </div>
-            <p className="text-xs text-[#839493] leading-relaxed">
-              {SUPPORT_PAGE_COPY.faqHint}
-            </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-              <div className="chitin-card-inset p-4 chamfer-corner space-y-2 border border-[#3a4a49] hover:border-[#00ffff]/50 transition-all group">
-                <h3 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff]">
-                  {SUPPORT_PAGE_COPY.faqStartTitle}
-                </h3>
-                <p className="text-[11px] text-[#839493]">
-                  {SUPPORT_PAGE_COPY.faqStartBody}
-                </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="rounded-card border border-line-subtle bg-surface-2 p-4 space-y-2">
+                <span className="text-[11px] text-ink-muted uppercase font-bold">{SUPPORT_PAGE_COPY.diagnosticsDatabase}</span>
+                <div className="text-sm font-bold text-cyan-glow flex items-center gap-1.5">
+                  <Database className="w-4 h-4 text-cyan-glow" />
+                  <span>{SUPPORT_PAGE_COPY.diagnosticsOk}</span>
+                </div>
               </div>
 
-              <div className="chitin-card-inset p-4 chamfer-corner space-y-2 border border-[#3a4a49] hover:border-[#00ffff]/50 transition-all group">
-                <h3 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff]">
-                  {SUPPORT_PAGE_COPY.faqBillingTitle}
-                </h3>
-                <p className="text-[11px] text-[#839493]">
-                  {SUPPORT_PAGE_COPY.faqBillingBody}
-                </p>
+              <div className="rounded-card border border-line-subtle bg-surface-2 p-4 space-y-2">
+                <span className="text-[11px] text-ink-muted uppercase font-bold">{SUPPORT_PAGE_COPY.diagnosticsAuth}</span>
+                <div className="text-sm font-bold text-cyan-glow flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-cyan-glow" />
+                  <span>{SUPPORT_PAGE_COPY.diagnosticsHealthy}</span>
+                </div>
               </div>
 
-              <div className="chitin-card-inset p-4 chamfer-corner space-y-2 border border-[#3a4a49] hover:border-[#00ffff]/50 transition-all group">
-                <h3 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff]">
-                  {SUPPORT_PAGE_COPY.faqPrivacyTitle}
-                </h3>
-                <p className="text-[11px] text-[#839493]">
-                  {SUPPORT_PAGE_COPY.faqPrivacyBody}
-                </p>
+              <div className="rounded-card border border-line-subtle bg-surface-2 p-4 space-y-2">
+                <span className="text-[11px] text-ink-muted uppercase font-bold">{SUPPORT_PAGE_COPY.diagnosticsApp}</span>
+                <div className="text-sm font-bold text-cyan-glow flex items-center gap-1.5">
+                  <Zap className="w-4 h-4 text-cyan-glow" />
+                  <span>{SUPPORT_PAGE_COPY.diagnosticsOk}</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* TAB 3: Contact support */}
-      {activeTab === 'ticket' && (
-        <div className="chitin-card p-5 chamfer-corner space-y-4">
-          <div className="flex items-center gap-2 border-b border-[#3a4a49] pb-3">
-            <Send className="w-5 h-5 text-[#00ffff]" />
-            <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
-              {SUPPORT_TICKET_COPY.formTitle}
-            </h2>
-          </div>
-
-          <SupportTicketForm />
-        </div>
-      )}
-
-      {activeTab === 'diagnostics' && (
-        <div className="chitin-card p-5 chamfer-corner space-y-4">
-          <div className="flex items-center gap-2 border-b border-[#3a4a49] pb-3">
-            <Activity className="w-5 h-5 text-[#00ffff]" />
-            <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
-              {SUPPORT_PAGE_COPY.diagnosticsTitle}
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="chitin-card-inset p-3 chamfer-corner space-y-1">
-              <span className="text-[10px] text-[#839493] uppercase font-bold">{SUPPORT_PAGE_COPY.diagnosticsDatabase}</span>
-              <div className="text-sm font-bold text-[#00ffff] flex items-center gap-1.5">
-                <Database className="w-4 h-4 text-[#00ffff]" />
-                <span>{SUPPORT_PAGE_COPY.diagnosticsOk}</span>
-              </div>
-            </div>
-
-            <div className="chitin-card-inset p-3 chamfer-corner space-y-1">
-              <span className="text-[10px] text-[#839493] uppercase font-bold">{SUPPORT_PAGE_COPY.diagnosticsAuth}</span>
-              <div className="text-sm font-bold text-[#00ffff] flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-[#00ffff]" />
-                <span>{SUPPORT_PAGE_COPY.diagnosticsHealthy}</span>
-              </div>
-            </div>
-
-            <div className="chitin-card-inset p-3 chamfer-corner space-y-1">
-              <span className="text-[10px] text-[#839493] uppercase font-bold">{SUPPORT_PAGE_COPY.diagnosticsApp}</span>
-              <div className="text-sm font-bold text-[#00ffff] flex items-center gap-1.5">
-                <Zap className="w-4 h-4 text-[#00ffff]" />
-                <span>{SUPPORT_PAGE_COPY.diagnosticsOk}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
