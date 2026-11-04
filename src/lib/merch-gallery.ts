@@ -2,9 +2,26 @@
 const root = 'images/merch/library/2026-10-21'
 const square = `${root}/square-v2`
 const expanded = 'images/merch/library/2026-11-01'
+const additions = 'images/merch/library/2026-11-04'
 
 /** Complete six-image galleries: three official views followed by three lifestyle scenes. */
 export const MERCH_PRODUCT_GALLERIES: Record<string, string[]> = {
+  'moltology-hoodie': [
+    'images/merch/moltology-hoodie-v1-black.jpg',
+    'images/merch/moltology-hoodie-v1-black-back.jpg',
+    `${additions}/hoodie-side.jpg`,
+    `${additions}/hoodie-studio.jpg`,
+    `${additions}/hoodie-terrace.jpg`,
+    `${additions}/hoodie-reading.jpg`,
+  ],
+  'moltology-tote': [
+    'images/merch/moltology-tote-v1-black.jpg',
+    `${additions}/tote-hanger.jpg`,
+    `${additions}/tote-detail.jpg`,
+    `${additions}/tote-studio.jpg`,
+    `${additions}/tote-terrace.jpg`,
+    `${additions}/tote-reading.jpg`,
+  ],
   'moltology-mug': [
     'images/merch/moltology-mug-v2-1.jpg',
     `${root}/moltology-mug-v2/mug-moltology-v2-default-1.jpg`,
@@ -49,6 +66,18 @@ const teeModel = (scene: string): ImageDescription => ({ caption: 'Black tee', a
 
 /** Explicit source sizes: never infer the pictured mug from the customer's size selection. */
 export const MERCH_IMAGE_DESCRIPTIONS: Record<string, ImageDescription> = {
+  'images/merch/moltology-hoodie-v1-black.jpg': { caption: 'Black hoodie · front', alt: 'Black Moltology pullover hoodie with a small red emblem on the left chest' },
+  'images/merch/moltology-hoodie-v1-black-back.jpg': { caption: 'Black hoodie · back', alt: 'Black Moltology hoodie with the white wordmark below the hood on the back' },
+  [`${additions}/hoodie-side.jpg`]: { caption: 'Black hoodie · side', alt: 'Black Moltology hoodie, side view showing the hood, sleeve, and pouch pocket' },
+  [`${additions}/hoodie-studio.jpg`]: { caption: 'Black hoodie', alt: 'Model wearing the black Moltology hoodie in a sunlit studio' },
+  [`${additions}/hoodie-terrace.jpg`]: { caption: 'Black hoodie · back', alt: 'Model wearing the black Moltology hoodie on a terrace, with the back wordmark visible' },
+  [`${additions}/hoodie-reading.jpg`]: { caption: 'Black hoodie', alt: 'Model wearing the black Moltology hoodie seated beside a cafe window' },
+  'images/merch/moltology-tote-v1-black.jpg': { caption: 'Black tote · front', alt: 'Black Moltology tote with a red emblem and white wordmark printed on the front' },
+  [`${additions}/tote-hanger.jpg`]: { caption: 'Black tote · hanging', alt: 'Black Moltology tote hanging by its straps, printed front facing forward' },
+  [`${additions}/tote-detail.jpg`]: { caption: 'Black tote · fabric detail', alt: 'Close view of the black cotton twill tote, side label, and printed wordmark' },
+  [`${additions}/tote-studio.jpg`]: { caption: 'Black tote', alt: 'Model carrying the black Moltology tote in a sunlit studio' },
+  [`${additions}/tote-terrace.jpg`]: { caption: 'Black tote', alt: 'Model carrying the black Moltology tote beside a concrete terrace' },
+  [`${additions}/tote-reading.jpg`]: { caption: 'Black tote', alt: 'Black Moltology tote standing on a walnut reading table beside a book' },
   [`${expanded}/moltology-hat/hat-moltology-v1-flat-3.jpg`]: { caption: 'Black hat · angled front', alt: 'Black Moltology dad hat, angled front view with red embroidered emblem' },
   [`${expanded}/moltology-hat/hat-moltology-v1-flat-6.jpg`]: { caption: 'Black hat · back', alt: 'Black Moltology dad hat, back view with adjustable buckle strap' },
   [`${expanded}/moltology-hat/hat-studio.jpg`]: { caption: 'Black hat', alt: 'Model wearing the black Moltology hat in a sunlit studio' },

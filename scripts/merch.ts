@@ -16,12 +16,12 @@ import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
 import sharp from 'sharp'
-import { MERCH_PRINT_PREFIX, PRINTFUL_BLANKS, type MerchSeedProduct } from '../src/lib/merch-seed-data'
+import { MERCH_PRINT_PREFIX, PRINTFUL_BLANKS, variantPrintFiles, type MerchSeedProduct } from '../src/lib/merch-seed-data'
 import { getAbsoluteAssetUrl } from '../src/lib/assets'
 import { MERCH_DESIGNS, getMerchDesign } from './merch/designs'
 import { renderPrintFile, renderReference } from './merch/render'
 import { selectMerchProducts, productAssetKeys } from './merch/selection'
-import { variantTemplate } from './merch/templates'
+import { variantTemplates } from './merch/templates'
 import { requireMerchDevDatabase } from './merch/database'
 import { merchDoctor } from './merch/doctor'
 import { generatePrintfulMockups } from './merch/mockups'
@@ -69,7 +69,9 @@ function check() {
     for (const variant of product.variants) {
       if (syncIds.has(variant.printfulSyncVariantId)) problems.push(`Duplicate Printful id on ${variant.id}`)
       syncIds.add(variant.printfulSyncVariantId)
-      if (!getMerchDesign(variant.design)) problems.push(`${product.slug} ${variant.title}: unknown design ${variant.design}`)
+      for (const file of variantPrintFiles(product, variant)) {
+        if (!getMerchDesign(file.design)) problems.push(`${product.slug} ${variant.title}: unknown design ${file.design}`)
+      }
       if (variant.priceCents < 500) problems.push(`${product.slug} ${variant.title}: price looks wrong`)
     }
   }
@@ -91,7 +93,7 @@ function check() {
 
 async function print() {
   const only = flag('only')
-  const designKeys = new Set(only && getMerchDesign(only) && !flag('pilot') ? [only] : selected().flatMap(product => product.variants.map(variant => variant.design)))
+  const designKeys = new Set(only && getMerchDesign(only) && !flag('pilot') ? [only] : selected().flatMap(product => product.variants.flatMap(variant => variantPrintFiles(product, variant).map(file => file.design))))
   const designs = MERCH_DESIGNS.filter(design => designKeys.has(design.key))
   for (const design of designs) {
     const out = path.join(PRINT_DIR, `${design.key}.png`)
@@ -187,8 +189,7 @@ async function templates() {
     const blanks = await client.catalogProduct(product.printful.catalogProductId)
     const info = await client.printfiles(product.printful.catalogProductId)
     for (const variant of product.variants) {
-      const { template, design } = variantTemplate(product, variant, blanks.variants, info)
-      console.log(`✓ ${product.slug} ${variant.title}: ${design.width}x${design.height}, template ${template.width}x${template.height} at ${template.dpi} dpi`)
+      for (const { template, design } of variantTemplates(product, variant, blanks.variants, info)) console.log(`✓ ${product.slug} ${variant.title}: ${design.width}x${design.height}, template ${template.width}x${template.height} at ${template.dpi} dpi`)
     }
   }
 }
@@ -231,7 +232,7 @@ async function sync() {
     const blankId = product.printful.catalogProductId
     if (!catalogCache.has(blankId)) catalogCache.set(blankId, await client.catalogProduct(blankId))
     const info = await client.printfiles(blankId)
-    for (const variant of product.variants) variantTemplate(product, variant, catalogCache.get(blankId)!.variants, info)
+    for (const variant of product.variants) variantTemplates(product, variant, catalogCache.get(blankId)!.variants, info)
     const { payload, missing } = buildSyncProductPayload({
       product,
       catalogVariants: catalogCache.get(blankId)!.variants,

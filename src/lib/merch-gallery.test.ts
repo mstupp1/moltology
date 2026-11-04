@@ -6,7 +6,7 @@ import { productAssetKeys } from '../../scripts/merch/selection'
 describe('reviewed product galleries', () => {
   const products = INITIAL_MERCH_PRODUCTS.filter(product => product.slug in MERCH_PRODUCT_GALLERIES)
   it('keeps the primary first and protects curated media from regeneration and uploads', () => {
-    expect(products).toHaveLength(4)
+    expect(products).toHaveLength(6)
     for (const product of products) {
       expect(product.galleryImageUrls[0]).toBe(product.featuredImageUrl)
       expect(product.galleryImageUrls).toEqual(expect.arrayContaining(MERCH_PRODUCT_GALLERIES[product.slug]))
@@ -31,7 +31,7 @@ describe('reviewed product galleries', () => {
   it('keeps six images with three lifestyle scenes for each core product', () => {
     for (const product of products) {
       expect(product.galleryImageUrls).toHaveLength(6)
-      expect(product.galleryImageUrls.filter(key => /square-v2|(?:hat|mat)-(?:studio|terrace|gallery|reading|workspace)(?:-square)?\.jpg/.test(key))).toHaveLength(3)
+      expect(product.galleryImageUrls.filter(key => /square-v2|(?:hat|mat|hoodie|tote)-(?:studio|terrace|gallery|reading|workspace)(?:-square)?\.jpg/.test(key))).toHaveLength(3)
     }
     const tee = products.find(product => product.slug === 'moltology-tee')!
     expect(tee.galleryImageUrls.some(key => /on-hanger|ghost-1/.test(key))).toBe(false)

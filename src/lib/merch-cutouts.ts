@@ -4,6 +4,16 @@
  * The main product gallery and cart keep the catalog photos.
  */
 export const MERCH_CUTOUTS: Record<string, { src: string; alt: string; background: string }> = {
+  'moltology-hoodie': {
+    src: 'images/merch/dashboard/2026-11-04/moltology-hoodie-v1.png',
+    alt: 'Black Moltology pullover hoodie with a small red left chest emblem',
+    background: 'bg-benthic-border',
+  },
+  'moltology-tote': {
+    src: 'images/merch/dashboard/2026-11-04/moltology-tote-v1.png',
+    alt: 'Black Moltology tote with a red emblem and white wordmark',
+    background: 'bg-benthic-border',
+  },
   'moltology-hat': {
     src: 'images/merch/dashboard/2026-10-22/moltology-hat-v1.png',
     alt: 'Black Moltology dad hat with red embroidered emblem',

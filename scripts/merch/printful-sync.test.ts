@@ -22,7 +22,7 @@ describe('Printful sync payloads', () => {
     for (const product of INITIAL_MERCH_PRODUCTS) {
       const { payload, missing } = buildSyncProductPayload({
         product,
-        catalogVariants: product.category === 'Mugs' ? mugBlanks : product.category === 'Tees' ? teeBlanks : product.category === 'Hats' ? [{ id: 7854, size: 'One size', color: 'Black' }] : [{ id: 22327, size: '16″×32″', color: 'Black' }],
+        catalogVariants: product.category === 'Mugs' ? mugBlanks : product.category === 'Tees' || product.category === 'Hoodies' ? teeBlanks : product.category === 'Hats' || product.category === 'Totes' ? [{ id: 7854, size: 'One size', color: 'Black' }] : [{ id: 22327, size: '16″×32″', color: 'Black' }],
         printFileUrl: (design) => `https://example.test/${design}.png`,
         thumbnailUrl: 'https://example.test/thumb.jpg',
       })

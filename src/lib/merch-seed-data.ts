@@ -10,7 +10,14 @@
 import printfulSync from '../../content/merch/printful-sync.json'
 import { MERCH_PRODUCT_GALLERIES } from './merch-gallery'
 
-export type MerchPrintPlacement = 'default' | 'front' | 'embroidery_front_large'
+export type MerchPrintPlacement = 'default' | 'front' | 'back' | 'embroidery_front_large'
+
+export interface MerchPrintFile { placement: MerchPrintPlacement; design: string }
+
+/** Every placement shares the same variant identity and fulfillment payload. */
+export function variantPrintFiles(product: MerchSeedProduct, variant: MerchSeedVariant): MerchPrintFile[] {
+  return [{ placement: product.printful.placement, design: variant.design }, ...(variant.additionalPrints ?? [])]
+}
 
 export interface MerchSeedVariant {
   id: string
@@ -23,6 +30,7 @@ export interface MerchSeedVariant {
   printfulSyncVariantId: number
   /** Print file design key, see scripts/merch/designs.ts. */
   design: string
+  additionalPrints?: MerchPrintFile[]
 }
 
 export interface MerchSeedProduct {
@@ -61,6 +69,10 @@ export const PRINTFUL_BLANKS = {
   mug: 19,
   /** Bella + Canvas 3001 unisex tee. */
   tee: 71,
+  /** Cotton Heritage M2580 premium pullover. */
+  hoodie: 380,
+  /** Econscious EC8000 organic cotton twill tote. */
+  tote: 367,
 } as const
 
 const MUG_SIZES = [
@@ -294,6 +306,30 @@ const BASE_CATALOG: MerchSeedProduct[] = [
     printful: { catalogProductId: PRINTFUL_BLANKS.deskMat, placement: 'default' },
     variants: [{ id: uuid(13, 1), title: 'Black / 16″×32″', size: '16″×32″', color: 'Black', colorHex: '#0b1114',
       priceCents: 3600, imageUrl: image('moltology-desk-mat-v1'), printfulSyncVariantId: placeholderSyncId(13, 1), design: 'desk-mat-moltology-v1' }],
+  },
+  {
+    id: uuid(14, 0), title: 'Moltology Hoodie', slug: 'moltology-hoodie',
+    description: 'A black pullover with a small red chest emblem and the Moltology wordmark across the back. Front pouch pocket and matching drawstrings.',
+    category: 'Hoodies', featuredImageUrl: image('moltology-hoodie-v1-black'),
+    galleryImageUrls: [image('moltology-hoodie-v1-black'), image('moltology-hoodie-v1-black-back')],
+    basePriceCents: 6000, isPublished: true, sortOrder: 14,
+    printful: { catalogProductId: PRINTFUL_BLANKS.hoodie, placement: 'front' },
+    variants: ['S', 'M', 'L', 'XL', '2XL'].map((size, index) => ({
+      id: uuid(14, index + 1), title: `Black / ${size}`, size, color: 'Black', colorHex: '#080808',
+      priceCents: size === '2XL' ? 6300 : 6000, imageUrl: image('moltology-hoodie-v1-black'),
+      printfulSyncVariantId: placeholderSyncId(14, index + 1), design: 'hoodie-moltology-front-v1',
+      additionalPrints: [{ placement: 'back', design: 'hoodie-moltology-back-v1' }],
+    })),
+  },
+  {
+    id: uuid(15, 0), title: 'Moltology Tote', slug: 'moltology-tote',
+    description: 'A black cotton twill tote with a bold red emblem and white Moltology wordmark on the front. An open compartment for books, groceries, and everyday carry.',
+    category: 'Totes', featuredImageUrl: image('moltology-tote-v1-black'),
+    galleryImageUrls: [image('moltology-tote-v1-black')],
+    basePriceCents: 3000, isPublished: true, sortOrder: 15,
+    printful: { catalogProductId: PRINTFUL_BLANKS.tote, placement: 'front' },
+    variants: [{ id: uuid(15, 1), title: 'Black / One size', size: 'One size', color: 'Black', colorHex: '#0c0c0c',
+      priceCents: 3000, imageUrl: image('moltology-tote-v1-black'), printfulSyncVariantId: placeholderSyncId(15, 1), design: 'tote-moltology-v1' }],
   },
 ]
 

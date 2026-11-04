@@ -15,6 +15,8 @@ import {
   setCartLineQuantity,
   shouldDraftPrintfulOrder,
   upsertCartLine,
+  uniqueVariantLabels,
+  type MerchVariantView,
   type MerchCartLine,
   type PricedVariant,
 } from './merch'
@@ -34,6 +36,12 @@ const tee: PricedVariant = {
 }
 
 describe('merch store helpers', () => {
+  it('orders garment sizes naturally without reordering other option labels', () => {
+    const variants = ['2XL', 'L', 'M', 'S', 'XL'].map(size => ({ size, color: 'Black' } as MerchVariantView))
+    expect(uniqueVariantLabels(variants, 'size')).toEqual(['S', 'M', 'L', 'XL', '2XL'])
+    expect(uniqueVariantLabels(variants, 'color')).toEqual(['Black'])
+    expect(uniqueVariantLabels([{ size: '15 oz' }, { size: '11 oz' }] as MerchVariantView[], 'size')).toEqual(['15 oz', '11 oz'])
+  })
   it('encodes UUID order identifiers within Printful’s external-ID limit', () => {
     expect(printfulOrderExternalId('c0aa7474-fd40-430f-8b9a-acb83712a95e')).toBe('c0aa7474fd40430f8b9aacb83712a95e')
     expect(printfulOrderExternalId('order-1')).toBe('order-1')

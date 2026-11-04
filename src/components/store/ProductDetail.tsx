@@ -223,7 +223,8 @@ export function ProductDetail({ slug }: { slug: string }) {
                 <div className="mt-3 grid grid-cols-5 gap-2">
                   {sizes.map((name) => {
                     const variant = pool.find((item) => item.size === name)
-                    const extra = variant && pool[0] && variant.priceCents > pool[0].priceCents
+                    const lowestPrice = Math.min(...pool.map(item => item.priceCents))
+                    const extra = variant && variant.priceCents > lowestPrice
                     return (
                       <button
                         key={name}
@@ -237,7 +238,7 @@ export function ProductDetail({ slug }: { slug: string }) {
                         }`}
                       >
                         {name}
-                        {extra ? <span className="text-[11px] text-ink-muted">+{formatMerchPrice(variant.priceCents - pool[0].priceCents)}</span> : null}
+                        {extra ? <span className="text-[11px] text-ink-muted">+{formatMerchPrice(variant.priceCents - lowestPrice)}</span> : null}
                       </button>
                     )
                   })}

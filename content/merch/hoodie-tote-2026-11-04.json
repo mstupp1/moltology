@@ -1,0 +1,404 @@
+{
+  "date": "2026-11-04",
+  "timezone": "America/New_York",
+  "brief": {
+    "treatment": "Evergreen",
+    "seasonalAnchor": null,
+    "intensity": "none",
+    "choice": "Black essentials, canonical red emblem and white wordmark, warm natural daylight, no holiday props."
+  },
+  "scope": {
+    "printfulStoreId": 18931450,
+    "platform": "Manual/API",
+    "database": "verified development endpoint",
+    "productionCatalogWritten": false,
+    "publicSettingsChanged": false,
+    "ordersCreated": false,
+    "manufacturingConfirmed": false
+  },
+  "products": [
+    {
+      "slug": "moltology-hoodie",
+      "blank": "Cotton Heritage M2580",
+      "catalogProductId": 380,
+      "printfulProductId": 489327787,
+      "color": "Black",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL",
+        "2XL"
+      ],
+      "retailUsd": {
+        "S": 60,
+        "M": 60,
+        "L": 60,
+        "XL": 60,
+        "2XL": 63
+      },
+      "providerBaseUsd": {
+        "S": 27.84,
+        "M": 27.84,
+        "L": 27.84,
+        "XL": 27.84,
+        "2XL": 29.84
+      },
+      "extraBackPrintUsd": 5.95,
+      "pricingNote": "Before shipping, tax and payment fees; base cost is a dated API quote, not a margin guarantee.",
+      "printFiles": [
+        {
+          "key": "merch/print/hoodie-moltology-front-v1.png",
+          "placement": "front",
+          "width": 3600,
+          "height": 3600
+        },
+        {
+          "key": "merch/print/hoodie-moltology-back-v1.png",
+          "placement": "back",
+          "width": 3600,
+          "height": 4800
+        }
+      ],
+      "officialKeys": [
+        "images/merch/moltology-hoodie-v1-black.jpg",
+        "images/merch/moltology-hoodie-v1-black-back.jpg",
+        "images/merch/library/2026-11-04/hoodie-side.jpg"
+      ]
+    },
+    {
+      "slug": "moltology-tote",
+      "blank": "Econscious EC8000",
+      "catalogProductId": 367,
+      "printfulProductId": 489327798,
+      "color": "Black",
+      "sizes": [
+        "One size"
+      ],
+      "retailUsd": 30,
+      "providerBaseUsd": 15.87,
+      "pricingNote": "Before shipping, tax and payment fees.",
+      "printFiles": [
+        {
+          "key": "merch/print/tote-moltology-v1.png",
+          "placement": "front",
+          "width": 3000,
+          "height": 3000
+        }
+      ],
+      "officialKeys": [
+        "images/merch/moltology-tote-v1-black.jpg",
+        "images/merch/library/2026-11-04/tote-hanger.jpg",
+        "images/merch/library/2026-11-04/tote-detail.jpg"
+      ]
+    }
+  ],
+  "providerVerification": [
+    {
+      "slug": "moltology-hoodie",
+      "productId": 489327787,
+      "variants": [
+        {
+          "id": 5619072375,
+          "catalogVariantId": 10779,
+          "retailPrice": "60.00",
+          "files": [
+            {
+              "type": "default",
+              "status": "ok",
+              "width": 3600,
+              "height": 3600
+            },
+            {
+              "type": "back",
+              "status": "ok",
+              "width": 3600,
+              "height": 4800
+            }
+          ]
+        },
+        {
+          "id": 5619072377,
+          "catalogVariantId": 10780,
+          "retailPrice": "60.00",
+          "files": [
+            {
+              "type": "default",
+              "status": "ok",
+              "width": 3600,
+              "height": 3600
+            },
+            {
+              "type": "back",
+              "status": "ok",
+              "width": 3600,
+              "height": 4800
+            }
+          ]
+        },
+        {
+          "id": 5619072378,
+          "catalogVariantId": 10781,
+          "retailPrice": "60.00",
+          "files": [
+            {
+              "type": "default",
+              "status": "ok",
+              "width": 3600,
+              "height": 3600
+            },
+            {
+              "type": "back",
+              "status": "ok",
+              "width": 3600,
+              "height": 4800
+            }
+          ]
+        },
+        {
+          "id": 5619072379,
+          "catalogVariantId": 10782,
+          "retailPrice": "60.00",
+          "files": [
+            {
+              "type": "default",
+              "status": "ok",
+              "width": 3600,
+              "height": 3600
+            },
+            {
+              "type": "back",
+              "status": "ok",
+              "width": 3600,
+              "height": 4800
+            }
+          ]
+        },
+        {
+          "id": 5619072380,
+          "catalogVariantId": 10783,
+          "retailPrice": "63.00",
+          "files": [
+            {
+              "type": "default",
+              "status": "ok",
+              "width": 3600,
+              "height": 3600
+            },
+            {
+              "type": "back",
+              "status": "ok",
+              "width": 3600,
+              "height": 4800
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "moltology-tote",
+      "productId": 489327798,
+      "variants": [
+        {
+          "id": 5619072386,
+          "catalogVariantId": 10457,
+          "retailPrice": "30.00",
+          "files": [
+            {
+              "type": "default",
+              "status": "ok",
+              "width": 3000,
+              "height": 3000
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "templateVerification": "All six variants and eleven placements validated against live Printful templates. Front/back hoodie templates differ. Print files render canonical vectors at 300 dpi and twice the provider minimum pixel dimensions.",
+  "artworkInspection": "Reviewed all three exact print PNGs and their dark-ground previews: transparent backgrounds, correct red emblem, canonical white wordmark and preserved descender clearance; left chest is viewer right.",
+  "officialSources": [
+    {
+      "key": "images/merch/library/2026-11-04/hoodie-side.jpg",
+      "provider": "printful",
+      "sourceFile": "hoodie-moltology-front-v1-ghost-3.jpg",
+      "group": "Ghost",
+      "size": "M"
+    },
+    {
+      "key": "images/merch/library/2026-11-04/tote-hanger.jpg",
+      "provider": "printful",
+      "sourceFile": "tote-moltology-v1-hanger-1.jpg",
+      "group": "Hanger",
+      "size": "One size"
+    },
+    {
+      "key": "images/merch/library/2026-11-04/tote-detail.jpg",
+      "provider": "printful",
+      "sourceFile": "tote-moltology-v1-product-details-1.jpg",
+      "group": "Product details",
+      "size": "One size"
+    }
+  ],
+  "generatedImages": [
+    {
+      "key": "images/merch/dashboard/2026-11-04/moltology-hoodie-v1.png",
+      "provider": "built-in ImageGen",
+      "kind": "edited promotional cutout",
+      "sourceKeys": [
+        "images/merch/moltology-hoodie-v1-black.jpg"
+      ],
+      "prompt": "Edit target: the official hoodie product photograph. Remove only the white studio background and any floor shadow, including enclosed background gaps. Preserve the exact black product silhouette, folds, perspective, red emblem geometry, print size, placement and lettering. Do not redraw branding. Center the complete product on a square transparent canvas with modest transparent margins. No props, no extra marks. Actual alpha transparency.",
+      "generatedFile": "exec-d8cf9054-7b70-42d3-947a-819c4a1b3ac1.png",
+      "savedLocal": "tmp/merch/dashboard/moltology-hoodie-v1.png",
+      "inspection": "Actual alpha verified; inspected against #3a4a49, no white rectangle, halo, or missing product area. Promotional edit retains recognizable branding.",
+      "uploaded": true,
+      "webpTwin": true
+    },
+    {
+      "key": "images/merch/dashboard/2026-11-04/moltology-tote-v1.png",
+      "provider": "built-in ImageGen",
+      "kind": "edited promotional cutout",
+      "sourceKeys": [
+        "images/merch/moltology-tote-v1-black.jpg"
+      ],
+      "prompt": "Edit target: the official tote product photograph. Remove only the white studio background and any floor shadow, including enclosed background gaps. Preserve the exact black product silhouette, folds, perspective, red emblem geometry, print size, placement and lettering. Do not redraw branding. Center the complete product on a square transparent canvas with modest transparent margins. No props, no extra marks. Actual alpha transparency.",
+      "generatedFile": "exec-491faddd-017c-4f93-be36-eaa8e1d21355.png",
+      "savedLocal": "tmp/merch/dashboard/moltology-tote-v1.png",
+      "inspection": "Actual alpha verified; inspected against #3a4a49, no white rectangle, halo, or missing product area. Promotional edit retains recognizable branding.",
+      "uploaded": true,
+      "webpTwin": true
+    },
+    {
+      "key": "images/merch/library/2026-11-04/hoodie-studio.jpg",
+      "provider": "built-in ImageGen",
+      "kind": "supplementary lifestyle illustration",
+      "sourceKeys": [
+        "images/merch/moltology-hoodie-v1-black.jpg",
+        "images/merch/moltology-hoodie-v1-black-back.jpg"
+      ],
+      "prompt": "Create one square 1:1 premium editorial lifestyle photograph. Reference image is the exact official product; preserve its black material, silhouette, construction, artwork geometry, print scale and placement. Cotton Heritage M2580 pullover hoodie: pouch pocket, matching flat drawstrings, three-panel hood. Small red emblem ONLY on wearer's left chest, white 'Moltology' and 'THE SYNAPTIC PATH' ONLY on the back, with exact lettering and spacing as official references. No extra logos. An adult Black woman with short natural hair stands in a sunlit concrete design studio. Frontal three-quarter pose, arms relaxed, pouch and left chest fully visible. Mid-thigh-up composition, complete head. Evergreen campaign, no seasonal decorations, no captions, no extra logos. Keep artwork unobstructed, realistic fabric and anatomy. Square full-bleed photo, no border.",
+      "generatedFile": "exec-1497e7d5-9495-4c99-8a78-f1b2e26f688b.png",
+      "savedLocal": "tmp/merch/library/2026-11-04/hoodie-studio.jpg",
+      "inspection": "Square full-bleed scene reviewed against official product: correct visible print face, spelling, colors, reasonable artwork scale and material, unobstructed branding, natural anatomy. AI imagery does not establish exact fit or print fidelity.",
+      "uploaded": true,
+      "webpTwin": true
+    },
+    {
+      "key": "images/merch/library/2026-11-04/hoodie-terrace.jpg",
+      "provider": "built-in ImageGen",
+      "kind": "supplementary lifestyle illustration",
+      "sourceKeys": [
+        "images/merch/moltology-hoodie-v1-black.jpg",
+        "images/merch/moltology-hoodie-v1-black-back.jpg"
+      ],
+      "prompt": "Create one square 1:1 premium editorial lifestyle photograph. Reference image is the exact official product; preserve its black material, silhouette, construction, artwork geometry, print scale and placement. Cotton Heritage M2580 pullover hoodie: pouch pocket, matching flat drawstrings, three-panel hood. Small red emblem ONLY on wearer's left chest, white 'Moltology' and 'THE SYNAPTIC PATH' ONLY on the back, with exact lettering and spacing as official references. No extra logos. An adult East Asian man on a quiet architectural terrace in soft autumn daylight, seen from the back with head turned slightly aside, hood DOWN. White back wordmark fully readable below the hood. Upper body and complete head in frame. Evergreen campaign, no seasonal decorations, no captions, no extra logos. Keep artwork unobstructed, realistic fabric and anatomy. Square full-bleed photo, no border.",
+      "generatedFile": "exec-1bc25cf8-0c71-4347-be87-66d7104732a6.png",
+      "savedLocal": "tmp/merch/library/2026-11-04/hoodie-terrace.jpg",
+      "inspection": "Square full-bleed scene reviewed against official product: correct visible print face, spelling, colors, reasonable artwork scale and material, unobstructed branding, natural anatomy. AI imagery does not establish exact fit or print fidelity.",
+      "uploaded": true,
+      "webpTwin": true
+    },
+    {
+      "key": "images/merch/library/2026-11-04/hoodie-reading.jpg",
+      "provider": "built-in ImageGen",
+      "kind": "supplementary lifestyle illustration",
+      "sourceKeys": [
+        "images/merch/moltology-hoodie-v1-black.jpg",
+        "images/merch/moltology-hoodie-v1-black-back.jpg"
+      ],
+      "prompt": "Create one square 1:1 premium editorial lifestyle photograph. Reference image is the exact official product; preserve its black material, silhouette, construction, artwork geometry, print scale and placement. Cotton Heritage M2580 pullover hoodie: pouch pocket, matching flat drawstrings, three-panel hood. Small red emblem ONLY on wearer's left chest, white 'Moltology' and 'THE SYNAPTIC PATH' ONLY on the back, with exact lettering and spacing as official references. No extra logos. An adult white man with wavy brown hair sits by a large cafe window holding a closed notebook low on his lap. Frontal chest visible, hands clear of the emblem. Full head and waist in frame, soft daylight, quiet editorial styling. Evergreen campaign, no seasonal decorations, no captions, no extra logos. Keep artwork unobstructed, realistic fabric and anatomy. Square full-bleed photo, no border.",
+      "generatedFile": "exec-fb6338e5-5cf0-49f1-ab86-9ea0f7921298.png",
+      "savedLocal": "tmp/merch/library/2026-11-04/hoodie-reading.jpg",
+      "inspection": "Square full-bleed scene reviewed against official product: correct visible print face, spelling, colors, reasonable artwork scale and material, unobstructed branding, natural anatomy. AI imagery does not establish exact fit or print fidelity.",
+      "uploaded": true,
+      "webpTwin": true
+    },
+    {
+      "key": "images/merch/library/2026-11-04/tote-studio.jpg",
+      "provider": "built-in ImageGen",
+      "kind": "supplementary lifestyle illustration",
+      "sourceKeys": [
+        "images/merch/moltology-tote-v1-black.jpg"
+      ],
+      "prompt": "Create one square 1:1 premium editorial lifestyle photograph. Reference image is the exact official product; preserve its black material, silhouette, construction, artwork geometry, print scale and placement. Econscious EC8000 black cotton twill tote: open main compartment, two long black fabric straps, exact large red emblem above white 'Moltology' and 'THE SYNAPTIC PATH' on front only. Preserve exact lettering and relative artwork scale. An adult South Asian woman in a plain cream knit top and dark trousers in a sunlit design studio, carrying the tote at hip height by both straps in one hand. Tote front turned directly to camera, complete bag and straps visible. Full head and knees included. Evergreen campaign, no seasonal decorations, no captions, no extra logos. Keep artwork unobstructed, realistic fabric and anatomy. Square full-bleed photo, no border.",
+      "generatedFile": "exec-660f0787-24d4-4c09-bd41-29727d1711fe.png",
+      "savedLocal": "tmp/merch/library/2026-11-04/tote-studio.jpg",
+      "inspection": "Square full-bleed scene reviewed against official product: correct visible print face, spelling, colors, reasonable artwork scale and material, unobstructed branding, natural anatomy. AI imagery does not establish exact fit or print fidelity.",
+      "uploaded": true,
+      "webpTwin": true
+    },
+    {
+      "key": "images/merch/library/2026-11-04/tote-terrace.jpg",
+      "provider": "built-in ImageGen",
+      "kind": "supplementary lifestyle illustration",
+      "sourceKeys": [
+        "images/merch/moltology-tote-v1-black.jpg"
+      ],
+      "prompt": "Create one square 1:1 premium editorial lifestyle photograph. Reference image is the exact official product; preserve its black material, silhouette, construction, artwork geometry, print scale and placement. Econscious EC8000 black cotton twill tote: open main compartment, two long black fabric straps, exact large red emblem above white 'Moltology' and 'THE SYNAPTIC PATH' on front only. Preserve exact lettering and relative artwork scale. An adult Black man wearing a plain warm-gray overshirt and dark trousers walks slowly along a concrete terrace, holding both tote straps in one hand beside his leg. Front of tote fully visible, bag believable 16 inch width at hip-to-knee scale. Full head and knees included. Evergreen campaign, no seasonal decorations, no captions, no extra logos. Keep artwork unobstructed, realistic fabric and anatomy. Square full-bleed photo, no border.",
+      "generatedFile": "exec-497d8598-6509-4067-9f7b-a481fe4c8aaf.png",
+      "savedLocal": "tmp/merch/library/2026-11-04/tote-terrace.jpg",
+      "inspection": "Square full-bleed scene reviewed against official product: correct visible print face, spelling, colors, reasonable artwork scale and material, unobstructed branding, natural anatomy. AI imagery does not establish exact fit or print fidelity.",
+      "uploaded": true,
+      "webpTwin": true
+    },
+    {
+      "key": "images/merch/library/2026-11-04/tote-reading.jpg",
+      "provider": "built-in ImageGen",
+      "kind": "supplementary lifestyle illustration",
+      "sourceKeys": [
+        "images/merch/moltology-tote-v1-black.jpg"
+      ],
+      "prompt": "Create one square 1:1 premium editorial lifestyle photograph. Reference image is the exact official product; preserve its black material, silhouette, construction, artwork geometry, print scale and placement. Econscious EC8000 black cotton twill tote: open main compartment, two long black fabric straps, exact large red emblem above white 'Moltology' and 'THE SYNAPTIC PATH' on front only. Preserve exact lettering and relative artwork scale. The exact tote rests upright on a walnut reading-room table next to a closed book, with a softly blurred adult East Asian woman seated beside it. Handles upright, printed front completely visible. Natural window light, tactile black twill, warm minimal interior. Evergreen campaign, no seasonal decorations, no captions, no extra logos. Keep artwork unobstructed, realistic fabric and anatomy. Square full-bleed photo, no border.",
+      "generatedFile": "exec-58af2d1f-0187-4136-b578-eec5f10d6674.png",
+      "savedLocal": "tmp/merch/library/2026-11-04/tote-reading.jpg",
+      "inspection": "Square full-bleed scene reviewed against official product: correct visible print face, spelling, colors, reasonable artwork scale and material, unobstructed branding, natural anatomy. AI imagery does not establish exact fit or print fidelity.",
+      "uploaded": true,
+      "webpTwin": true
+    }
+  ],
+  "uploads": {
+    "printFiles": 3,
+    "officialCatalogPhotos": 3,
+    "officialGalleryPhotos": 3,
+    "lifestylePhotos": 6,
+    "transparentCutouts": 2,
+    "galleryUploadedKeys": [
+      "images/merch/library/2026-11-04/hoodie-side.jpg",
+      "images/merch/library/2026-11-04/hoodie-studio.jpg",
+      "images/merch/library/2026-11-04/hoodie-terrace.jpg",
+      "images/merch/library/2026-11-04/hoodie-reading.jpg",
+      "images/merch/library/2026-11-04/tote-hanger.jpg",
+      "images/merch/library/2026-11-04/tote-detail.jpg",
+      "images/merch/library/2026-11-04/tote-studio.jpg",
+      "images/merch/library/2026-11-04/tote-terrace.jpg",
+      "images/merch/library/2026-11-04/tote-reading.jpg"
+    ],
+    "imagesHaveCompressedWebpTwins": true
+  },
+  "developmentSeed": {
+    "selector": "moltology-hoodie,moltology-tote",
+    "products": 2,
+    "variants": 6,
+    "confirmed": true
+  },
+  "verification": {
+    "scripts": "347 passed before the final mockup-placement regression test; final targeted tests also passed.",
+    "core": "1556 passed before the garment-size helper correction; final targeted merch tests passed after correction.",
+    "targeted": "28 tests passed across merch helpers, galleries, workflow and dashboard panel after final code changes; cart provider tests also passed.",
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "browser": "Passed desktop 1440×1000 and mobile 390×844: both six-image galleries and all photos decoded, hoodie M/2XL pricing, cart adds, catalog, category filtering, and no horizontal overflow or page errors. Saved dev account access restored after each run.",
+    "screenshots": "tmp/verification/merch-2026-11-04/",
+    "assetsCheck": "passed",
+    "visualInspection": "Desktop/mobile catalog and product screenshots inspected; S–2XL order and surcharge corrected. Full-page and viewport captures saved under tmp/verification/merch-2026-11-04/."
+  },
+  "remaining": "Development catalog only. Existing launch blockers remain: Stripe webhook signing secret, support inbox and status secret, deployed callbacks/recovery setup, approved policies, physical samples and production acceptance. No production seed or launch toggles changed.",
+  "references": [
+    "https://developers.printful.com/docs/",
+    "https://api.printful.com/products/380",
+    "https://api.printful.com/products/367",
+    "https://api.printful.com/mockup-generator/printfiles/380",
+    "https://api.printful.com/mockup-generator/printfiles/367"
+  ]
+}

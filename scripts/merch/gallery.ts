@@ -4,12 +4,12 @@ import sharp from 'sharp'
 import { getAbsoluteAssetUrl } from '../../src/lib/assets'
 import { MERCH_PRINT_PREFIX, type MerchSeedProduct } from '../../src/lib/merch-seed-data'
 import { PrintfulClient, type MockupTask } from './printful-sync'
-import { variantTemplate } from './templates'
+import { variantTemplate, variantTemplates } from './templates'
 import { requireCompletedMockups } from './mockups'
 
 export function galleryShots(task: MockupTask) {
   return requireCompletedMockups(task).flatMap(result => [
-    { url: result.mockup_url, title: 'Primary', variantIds: result.variant_ids },
+    { url: result.mockup_url, title: result.placement === 'back' ? 'Back' : 'Primary', variantIds: result.variant_ids },
     ...(result.extra ?? []).map(extra => ({ url: extra.url, title: extra.title ?? extra.option ?? 'Extra', variantIds: result.variant_ids })),
   ]).filter((shot, index, shots) => shots.findIndex(other => other.url === shot.url) === index)
 }
@@ -41,8 +41,10 @@ export async function generateOfficialGallery(client: PrintfulClient, products: 
           const created = await client.createMockupTask(product.printful.catalogProductId, {
             variant_ids: [template.blank.id], format: 'jpg', width: 1600, option_groups: [group],
             ...(product.printful.options ? { product_options: Object.fromEntries(product.printful.options.map(option => [option.id, option.value])) } : {}),
-            files: [{ placement: product.printful.placement, image_url: getAbsoluteAssetUrl(`${MERCH_PRINT_PREFIX}/${design}.png`),
-              position: { area_width: template.template.width, area_height: template.template.height, width: template.template.width, height: template.template.height, top: 0, left: 0 } }],
+            files: variantTemplates(product, variant, blanks.variants, info).map(file => ({
+              placement: file.placement, image_url: getAbsoluteAssetUrl(`${MERCH_PRINT_PREFIX}/${file.design.key}.png`),
+              position: { area_width: file.template.width, area_height: file.template.height, width: file.template.width, height: file.template.height, top: 0, left: 0 },
+            })),
           })
           task = { task_key: created.task_key, status: 'pending' }
           fs.writeFileSync(record, JSON.stringify(task, null, 2))
