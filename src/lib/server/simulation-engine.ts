@@ -1,3 +1,4 @@
+import { awardGems } from './gems'
 import fs from 'node:fs'
 import path from 'node:path'
 import { generateText } from 'ai'
@@ -594,6 +595,9 @@ export async function spawnSimulatedUser(
       },
     })
     .returning()
+  await awardGems(dbClient, userId, [
+    { amount: curr.gems, source: 'simulation', sourceKey: 'simulation:seed', description: 'Simulated starting balance' },
+  ])
 
   await dbClient
     .insert(userStats)
@@ -697,8 +701,17 @@ export async function simulateDailyRoutines(
         }
       }
 
-      // Increment earned Chitin Gems (+15 per liturgy)
-      const gemGain = tasksToComplete.length * 15
+      // Simulated members earn gems through the same ledger (+15 per liturgy)
+      await awardGems(
+        dbClient,
+        user.id,
+        tasksToComplete.map((task) => ({
+          amount: 15,
+          source: 'simulation' as const,
+          sourceKey: `simulation:${task.key}:${today}`,
+          description: 'Simulated liturgy',
+        })),
+      )
       const updatedPersona: SimulatedPersonaConfig = {
         ...(user.simulatedPersona || { archetype: 'Acolyte', tone: 'Steadfast' }),
         lastSimulatedAt: new Date().toISOString(),
@@ -707,7 +720,6 @@ export async function simulateDailyRoutines(
       await dbClient
         .update(profiles)
         .set({
-          chitinGems: sql`${profiles.chitinGems} + ${gemGain}`,
           simulatedPersona: updatedPersona,
         })
         .where(eq(profiles.id, user.id))
@@ -2675,6 +2687,9 @@ export async function applySimulationPlan(
           seed: crypto.randomUUID(),
         },
       })
+      await awardGems(dbClient, userId, [
+        { amount: curr.gems, source: 'simulation', sourceKey: 'simulation:seed', description: 'Simulated starting balance' },
+      ])
       await dbClient.insert(userStats).values({
         userId,
         pincerTorque: 50 + stage * 12,

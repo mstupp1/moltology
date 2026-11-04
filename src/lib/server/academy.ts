@@ -48,6 +48,7 @@ import type {
   AcademyVideoProvider,
 } from '../academy-types'
 import { ensureUserProfile } from '../user-sync'
+import { tryCheckGemMilestones } from './gems'
 import { resolveWriteAuth, type WriteAuthContext, type WriteAuthData } from './write-auth'
 
 type ReadContext = {
@@ -512,6 +513,7 @@ async function syncCredentials(db: ReturnType<typeof getDb>, userId: string, cou
       if (!isDuplicate(error)) throw error
     }
   }
+  if (awarded.length) await tryCheckGemMilestones(db, userId)
   return awarded
 }
 

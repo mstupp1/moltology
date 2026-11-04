@@ -371,6 +371,13 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
               setTasks(merged)
               persistSnapshot(currentDateRef.current, merged)
 
+              if ((response.gemsDelta ?? 0) > 0) {
+                toastRef.current.success(`+${response.gemsDelta} Chitin Gems. Spend them in the market.`, {
+                  id: 'daily-alignment-gems-toast',
+                  title: 'Gems earned',
+                })
+              }
+
               const remainingOverridesCount = pendingOverridesRef.current.size
               setServerXp(response.xp ?? 0)
               setServerStage(response.stage ?? 1)

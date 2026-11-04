@@ -139,6 +139,12 @@ export function buildTablePolicies(windows: RetentionWindows): TableRetentionPol
       notes: 'Progression is recalculated from the full ledger; never apply a log TTL.',
     },
     {
+      table: 'gem_transactions',
+      retentionClass: 'canonical',
+      hotDays: null,
+      notes: 'Gem balances are the sum of the full ledger; never apply a log TTL.',
+    },
+    {
       table: 'signup_risk_events',
       retentionClass: 'canonical',
       hotDays: null,

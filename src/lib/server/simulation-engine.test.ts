@@ -307,6 +307,7 @@ describe('Simulation Engine', () => {
             where: mockUpdateWhere,
           }),
         })),
+        batch: vi.fn().mockResolvedValue([]),
       }
 
       const res = await simulateDailyRoutines(mockDb, DEFAULT_GROWTH_CONFIG, {
@@ -318,6 +319,8 @@ describe('Simulation Engine', () => {
       expect(res.completed).toBeGreaterThan(0)
       expect(mockDb.insert).toHaveBeenCalled()
       expect(mockDb.update).toHaveBeenCalled()
+      // Gems go through the ledger in one batch: insert rows, then refresh the cached balance.
+      expect(mockDb.batch).toHaveBeenCalledTimes(1)
     })
   })
 

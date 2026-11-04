@@ -24,6 +24,14 @@ export const getReferralSummaryFn = createServerFn({ method: 'POST' })
     const { getReferralSummaryHandler } = await import('./referrals')
     return getReferralSummaryHandler(args)
   })
+
+export const getGemWalletFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { token?: string }) => z.object({ token: z.string().optional() }).parse(data))
+  .handler(async (args) => {
+    const { getGemWalletHandler } = await import('./gems')
+    return getGemWalletHandler(args)
+  })
 export type {
   AdminMemberDirectory,
   AdminMemberRole,

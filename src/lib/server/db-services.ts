@@ -12,6 +12,7 @@ import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, notInArray, isNull, getTableColumns } from 'drizzle-orm'
 import { union } from 'drizzle-orm/pg-core'
 import type { ChangelogEntry } from '../changelogs-data'
+import { tryCheckGemMilestones } from './gems'
 import { resolveWriteAuth } from './write-auth'
 import { ensureUserProfile } from '../user-sync'
 import {
@@ -349,6 +350,8 @@ export async function claimMemberHandleHandler({
     const { tryQualifyReferral } = await import('./referrals')
     await tryQualifyReferral(dbClient, userId)
 
+    await tryCheckGemMilestones(dbClient, userId)
+
     return {
       handle: updated.handle,
       displayName: resolveMemberPublicName({
@@ -426,6 +429,7 @@ export const updateUserStatsHandler = async ({ data, context }: ServerFnArgs<Use
     .where(eq(userStats.userId, userId))
     .returning()
 
+  if (labels) await tryCheckGemMilestones(dbClient, userId)
   return updated
 }
 
@@ -1672,6 +1676,7 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
       lastReplyAt: new Date(),
     })
     .returning()
+  await tryCheckGemMilestones(dbClient, userId)
 
   // Fetch category info
   const [cat] = await dbClient
@@ -1861,6 +1866,7 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
       sunk: shouldSinkReply({ qualityScore, authorStanding: standing.standing }),
     })
     .returning()
+  await tryCheckGemMilestones(dbClient, userId)
 
   // Update topic repliesCount and lastReplyAt
   try {
@@ -3275,6 +3281,8 @@ export interface DailyAlignmentResponse {
   xp?: number
   stage?: number
   progression?: ProgressionState
+  /** Gems this toggle added (positive) or took back (negative). Only set by the toggle. */
+  gemsDelta?: number
 }
 
 const getDailyAlignmentSchema = z.object({
@@ -3535,11 +3543,12 @@ export const toggleDailyAlignmentTaskHandler = async ({
   const taskTitle = targetTask.title || taskKey
 
   const [beforeProfile] = await dbClient
-    .select({ stage: profiles.stage })
+    .select({ stage: profiles.stage, chitinGems: profiles.chitinGems })
     .from(profiles)
     .where(eq(profiles.id, userId))
     .limit(1)
   const previousStage = beforeProfile?.stage ?? 1
+  const previousGems = beforeProfile?.chitinGems ?? 0
 
   if (completed) {
     await dbClient
@@ -3678,7 +3687,26 @@ export const toggleDailyAlignmentTaskHandler = async ({
     console.warn('[toggleDailyAlignmentTaskFn] highlight activity warning:', err)
   }
 
-  return result
+  let gemsDelta = 0
+  try {
+    const { awardGems, dailyGemAwards, revokeDailyGems, checkGemMilestones } = await import('./gems')
+    if (completed) {
+      await awardGems(dbClient, userId, dailyGemAwards(date, result.isAllCompleted, result.streakDays))
+    } else {
+      await revokeDailyGems(dbClient, userId, date)
+    }
+    await checkGemMilestones(dbClient, userId)
+    const [after] = await dbClient
+      .select({ chitinGems: profiles.chitinGems })
+      .from(profiles)
+      .where(eq(profiles.id, userId))
+      .limit(1)
+    gemsDelta = (after?.chitinGems ?? previousGems) - previousGems
+  } catch (err) {
+    console.warn('[toggleDailyAlignmentTaskFn] gem award warning:', err)
+  }
+
+  return { ...result, gemsDelta }
 }
 
 
@@ -4548,6 +4576,7 @@ export const respondFriendRequestHandler = async ({
       .insert(friendships)
       .values({ userAId, userBId })
       .onConflictDoNothing()
+    await Promise.all([userAId, userBId].map((id) => tryCheckGemMilestones(auth.dbClient, id)))
 
     const copy = presentFriendNotification('friend_accepted', {
       userId: auth.userId,
