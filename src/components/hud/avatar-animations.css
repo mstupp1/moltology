@@ -131,3 +131,14 @@
 @media (prefers-reduced-motion: reduce) {
   .equipment-signature { animation: none !important; }
 }
+
+/* Creator preview settles with a small pop when the look changes. */
+@keyframes avatar-creator-pop {
+  0% { transform: scale(0.965) translateY(4px); }
+  60% { transform: scale(1.012) translateY(-1px); }
+  100% { transform: none; }
+}
+.avatar-creator-pop { animation: avatar-creator-pop 260ms cubic-bezier(.2, .9, .3, 1.2) both; transform-origin: 50% 85%; }
+@media (prefers-reduced-motion: reduce) {
+  .avatar-creator-pop { animation: none; }
+}

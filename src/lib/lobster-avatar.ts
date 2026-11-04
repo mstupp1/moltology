@@ -630,7 +630,7 @@ function getAvatarCacheKey(config: LobsterAvatarConfig, size: number, frame: Lob
   return `${ordered}|${size}|${frame}|${staticMotion ? 'static' : 'live'}`
 }
 
-const MAX_GENERATED_AVATAR_CACHE = 128
+const MAX_GENERATED_AVATAR_CACHE = 256
 const generatedSvgCache = new Map<string, string>()
 const generatedDataUriCache = new Map<string, string>()
 

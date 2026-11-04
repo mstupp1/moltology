@@ -127,14 +127,8 @@
     "hex-color": 28,
     "chamfer": 5
   },
-  "src/components/hud/chassis/AbilitiesPanel.tsx": {
-    "hex-color": 16,
-    "chamfer": 3,
-    "tiny-text": 3
-  },
   "src/components/hud/chassis/ChassisStatusPage.tsx": {
-    "hex-color": 4,
-    "chamfer": 2,
+    "chamfer": 1,
     "tiny-text": 1
   },
   "src/components/hud/chassis/GearItemCard.tsx": {
@@ -143,7 +137,7 @@
     "off-scale-radius": 1
   },
   "src/components/hud/chassis/GearTooltip.tsx": {
-    "hex-color": 6,
+    "hex-color": 4,
     "chamfer": 2,
     "tiny-text": 1
   },
@@ -151,11 +145,6 @@
     "hex-color": 9,
     "chamfer": 3,
     "tiny-text": 1
-  },
-  "src/components/hud/chassis/PaperDoll.tsx": {
-    "hex-color": 5,
-    "tiny-text": 2,
-    "off-scale-radius": 1
   },
   "src/components/hud/chassis/VaultGrid.tsx": {
     "hex-color": 5,
@@ -182,9 +171,6 @@
   "src/components/hud/market/MoltCreditStorePanel.tsx": {
     "hex-color": 2
   },
-  "src/components/hud/member/MemberProfilePage.tsx": {
-    "hex-color": 3
-  },
   "src/components/hud/search/SearchPage.tsx": {
     "hex-color": 35,
     "chamfer": 8,
@@ -204,9 +190,6 @@
   },
   "src/components/news/MoltNationBannerBg.tsx": {
     "hex-color": 2
-  },
-  "src/components/news/MoltNationLogo.tsx": {
-    "tiny-text": 3
   },
   "src/components/news/NewsIndexPage.tsx": {
     "hex-color": 5
@@ -269,22 +252,19 @@
     "hex-color": 4
   },
   "src/components/what-is-moltology/BeliefsAndCodesPage.tsx": {
-    "hex-color": 11
+    "hex-color": 8
   },
   "src/components/what-is-moltology/BenthicSacramentsPage.tsx": {
     "hex-color": 5
   },
   "src/components/what-is-moltology/WhatIsMoltologyHubPage.tsx": {
-    "hex-color": 37
+    "hex-color": 30
   },
   "src/components/what-is-moltology/WhatMoltologistsSayPage.tsx": {
     "hex-color": 4
   },
   "src/components/what-is-moltology/story/StoryPrimitives.tsx": {
     "hex-color": 8
-  },
-  "src/emails/email-verification.tsx": {
-    "off-scale-radius": 2
   },
   "src/routes/__root.tsx": {
     "hex-color": 2

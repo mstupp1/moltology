@@ -37,7 +37,6 @@ import {
   type ResolvedAvatarTraits,
 } from '@/lib/lobster-avatar'
 import { EYE_COLOR_SWATCH } from '@/lib/avatar/parts'
-import { headShapeOutline } from '@/lib/avatar/races'
 import { HudButton } from '@/components/ui/HudButton'
 
 export interface AvatarCreatorPanelProps {
@@ -45,23 +44,27 @@ export interface AvatarCreatorPanelProps {
   onChange: (next: LobsterAvatarConfig) => void
   disabled?: boolean
   className?: string
-  section?: 'body' | 'face' | 'scene'
+  section?: CreatorSection
 }
 
-const TABS = [
+export type CreatorSection = 'body' | 'shell' | 'face' | 'scene'
+
+export const CREATOR_SECTIONS: readonly { id: CreatorSection; label: string }[] = [
   { id: 'body', label: 'Body' },
+  { id: 'shell', label: 'Shell' },
   { id: 'face', label: 'Face' },
   { id: 'scene', label: 'Scene' },
-] as const
-type TabId = (typeof TABS)[number]['id']
+]
 
-function OptionGroup({ label, children }: { label: string; children: React.ReactNode }) {
+function OptionGroup({ label, children, tiles = false }: { label: string; children: React.ReactNode; tiles?: boolean }) {
   return (
     <fieldset className="space-y-1.5 min-w-0">
       <legend className="text-[11px] font-sans font-semibold tracking-[0.08em] uppercase text-ink-muted mb-1.5">
         {label}
       </legend>
-      <div className="flex flex-wrap gap-1.5">{children}</div>
+      <div className={tiles ? 'grid grid-cols-[repeat(auto-fill,minmax(68px,1fr))] gap-1.5' : 'flex flex-wrap gap-1.5'}>
+        {children}
+      </div>
     </fieldset>
   )
 }
@@ -94,6 +97,47 @@ function Chip({
   )
 }
 
+/** A picture of the character with this option applied, so members choose by looking. */
+function Tile({
+  selected,
+  onClick,
+  disabled,
+  label,
+  src,
+  zoom = false,
+}: {
+  selected: boolean
+  onClick: () => void
+  disabled?: boolean
+  label: string
+  src: string | null
+  /** Face options zoom in on the eyes and mouth. */
+  zoom?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      disabled={disabled}
+      onClick={onClick}
+      className={`group flex flex-col items-center gap-1 rounded-control border p-1 pb-1.5 transition-[border-color,background-color,transform] duration-150 active:scale-[0.97] disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow motion-reduce:transition-none ${
+        selected
+          ? 'border-cyan-glow bg-cyan-soft'
+          : 'border-line-subtle bg-surface-2 hover:border-line-hover'
+      }`}
+    >
+      <span className="block w-full aspect-square rounded-chip bg-abyss/70 overflow-hidden">
+        {src ? (
+          <img src={src} alt="" width={96} height={96} loading="lazy" decoding="async" className={`w-full h-full object-contain transition-transform duration-150 motion-reduce:transition-none ${zoom ? 'scale-[1.45] translate-y-[6%] group-hover:scale-[1.5]' : 'group-hover:scale-105'}`} />
+        ) : null}
+      </span>
+      <span className={`text-[11px] leading-tight font-sans text-center ${selected ? 'text-ink font-semibold' : 'text-ink-body'}`}>
+        {label}
+      </span>
+    </button>
+  )
+}
+
 function Swatch({
   selected,
   onClick,
@@ -115,9 +159,9 @@ function Swatch({
       title={label}
       disabled={disabled}
       onClick={onClick}
-      className={`w-8 h-8 rounded-full border-2 transition-transform disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+      className={`w-9 h-9 rounded-full border-2 transition-transform disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow motion-reduce:transition-none ${
         selected
-          ? 'border-cyan-glow scale-110'
+          ? 'border-ink scale-110'
           : 'border-line hover:scale-105 hover:border-line-hover'
       }`}
       style={{ background }}
@@ -125,9 +169,12 @@ function Swatch({
   )
 }
 
+type TileFrame = 'portrait' | 'fullBody'
+
 /**
  * Character creator controls. Every choice is written straight into the config,
- * so the preview next to it updates as the member taps.
+ * so the preview next to it updates as the member taps. Shape, face, and pose
+ * options are shown as small renders of the member's own character.
  */
 export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
   value,
@@ -136,7 +183,7 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
   className = '',
   section,
 }) => {
-  const [localTab, setTab] = useState<TabId>('body')
+  const [localTab, setTab] = useState<CreatorSection>('body')
   const tab = section ?? localTab
   const traits = useMemo(() => resolveAvatarTraits(value), [value])
 
@@ -145,17 +192,20 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
     onChange({ ...value, ...traits, [key]: next })
   }
 
+  // One look shared by every tile: the member's current character, no backdrop, no gear.
+  const base = useMemo(
+    () => ({ ...value, ...traits, accessory: 'none' as const, equipment: undefined, transparentBackground: true }),
+    [value, traits],
+  )
+  const tile = (patch: Partial<LobsterAvatarConfig>, frame: TileFrame) =>
+    generateLobsterAvatarDataUri({ ...base, ...patch }, 96, { frame, staticMotion: true })
+
   const racePreviews = useMemo(() => {
     const out: Partial<Record<AvatarRace, string | null>> = {}
-    for (const race of AVATAR_RACES) {
-      out[race] = generateLobsterAvatarDataUri(
-        { ...value, ...traits, race, accessory: 'none' },
-        128,
-        { frame: 'portrait' },
-      )
-    }
+    for (const race of AVATAR_RACES) out[race] = tile({ race }, 'portrait')
     return out
-  }, [value, traits])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [base])
 
   return (
     <div className={`w-full space-y-3 ${className}`} data-testid="avatar-creator-panel">
@@ -169,7 +219,7 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
               aria-pressed={selected}
               disabled={disabled}
               onClick={() => set('race', race)}
-              className={`flex items-center gap-2 p-1.5 pr-3 rounded-card border transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+              className={`flex items-center gap-2.5 p-1.5 pr-3 rounded-card border transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                 selected
                   ? 'border-cyan-glow bg-cyan-soft'
                   : 'border-line bg-surface-2 hover:border-line-hover'
@@ -179,9 +229,9 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
                 <img
                   src={racePreviews[race] ?? undefined}
                   alt=""
-                  width={40}
-                  height={40}
-                  className="w-10 h-10 rounded-full bg-abyss"
+                  width={44}
+                  height={44}
+                  className="w-11 h-11 rounded-full bg-abyss"
                 />
               ) : null}
               <span
@@ -201,7 +251,7 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
             aria-label="Customize"
             className="flex flex-1 gap-0.5 rounded-card border border-line-subtle bg-surface-1 p-0.5"
           >
-            {TABS.map((t) => (
+            {CREATOR_SECTIONS.map((t) => (
               <button
                 key={t.id}
                 type="button"
@@ -223,7 +273,7 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
           type="button"
           variant="secondary"
           size="sm"
-          className="shrink-0"
+          className={section ? 'ml-auto shrink-0' : 'shrink-0'}
           disabled={disabled}
           onClick={() => onChange(rerollAvatarConfig(value))}
           icon={<Dices className="w-3.5 h-3.5 text-cyan-glow" />}
@@ -234,41 +284,32 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
 
       <div
         role="tabpanel"
-        className="space-y-3 rounded-card border border-line-subtle bg-surface-1 p-3"
+        className="space-y-4 rounded-card border border-line-subtle bg-surface-1 p-3"
       >
         {tab === 'body' && (
           <>
-            <OptionGroup label={traits.race === 'crab' ? 'Shell shape' : 'Head shape'}>
+            <OptionGroup label={traits.race === 'crab' ? 'Shell shape' : 'Head shape'} tiles>
               {AVATAR_HEAD_SHAPES.map((h) => (
-                <Chip
+                <Tile
                   key={h}
+                  label={AVATAR_HEAD_SHAPE_LABELS[traits.race][h]}
+                  src={tile({ headShape: h }, 'portrait')}
                   selected={traits.headShape === h}
                   disabled={disabled}
                   onClick={() => set('headShape', h)}
-                >
-                  <span className="inline-flex items-center gap-1.5">
-                    <svg viewBox={traits.race === 'crab' ? '-12 28 124 104' : '6 0 88 118'} className="w-4 h-4 shrink-0" aria-hidden="true">
-                      <path
-                        d={headShapeOutline(traits.race, h)}
-                        fill="currentColor"
-                        opacity="0.85"
-                      />
-                    </svg>
-                    {AVATAR_HEAD_SHAPE_LABELS[traits.race][h]}
-                  </span>
-                </Chip>
+                />
               ))}
             </OptionGroup>
-            <OptionGroup label="Build">
+            <OptionGroup label="Build" tiles>
               {AVATAR_BUILDS.map((b) => (
-                <Chip
+                <Tile
                   key={b}
+                  label={AVATAR_BUILD_LABELS[traits.race][b]}
+                  src={tile({ build: b, pose: 'rest' }, 'fullBody')}
                   selected={traits.build === b}
                   disabled={disabled}
                   onClick={() => set('build', b)}
-                >
-                  {AVATAR_BUILD_LABELS[traits.race][b]}
-                </Chip>
+                />
               ))}
             </OptionGroup>
             <OptionGroup label="Height">
@@ -283,6 +324,35 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
                 </Chip>
               ))}
             </OptionGroup>
+            <OptionGroup label="Pose" tiles>
+              {AVATAR_POSES.map((p) => (
+                <Tile
+                  key={p}
+                  label={AVATAR_POSE_LABELS[p]}
+                  src={tile({ pose: p }, 'fullBody')}
+                  selected={traits.pose === p}
+                  disabled={disabled}
+                  onClick={() => set('pose', p)}
+                />
+              ))}
+            </OptionGroup>
+            <OptionGroup label="Antennae" tiles>
+              {AVATAR_ANTENNAE.map((a) => (
+                <Tile
+                  key={a}
+                  label={AVATAR_ANTENNAE_LABELS[a]}
+                  src={tile({ antennae: a }, 'portrait')}
+                  selected={traits.antennae === a}
+                  disabled={disabled}
+                  onClick={() => set('antennae', a)}
+                />
+              ))}
+            </OptionGroup>
+          </>
+        )}
+
+        {tab === 'shell' && (
+          <>
             <OptionGroup label="Shell color">
               {SHELL_PALETTES.map((p) => (
                 <Swatch
@@ -295,57 +365,28 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
                 />
               ))}
             </OptionGroup>
-            <OptionGroup label="Finish">
+            <OptionGroup label="Finish" tiles>
               {SHELL_FINISHES.map((f) => (
-                <Chip
+                <Tile
                   key={f}
+                  label={SHELL_FINISH_LABELS[f]}
+                  src={tile({ shellFinish: f }, 'portrait')}
                   selected={traits.shellFinish === f}
                   disabled={disabled}
                   onClick={() => set('shellFinish', f)}
-                >
-                  {SHELL_FINISH_LABELS[f]}
-                </Chip>
+                />
               ))}
             </OptionGroup>
-            <OptionGroup label="Pattern">
+            <OptionGroup label="Pattern" tiles>
               {SHELL_MARKINGS.map((m) => (
-                <Chip
+                <Tile
                   key={m}
+                  label={SHELL_MARKING_LABELS[m]}
+                  src={tile({ marking: m }, 'portrait')}
                   selected={traits.marking === m}
                   disabled={disabled}
                   onClick={() => set('marking', m)}
-                >
-                  {SHELL_MARKING_LABELS[m]}
-                </Chip>
-              ))}
-            </OptionGroup>
-          </>
-        )}
-
-        {tab === 'body' && (
-          <>
-            <OptionGroup label="Antennae">
-              {AVATAR_ANTENNAE.map((a) => (
-                <Chip
-                  key={a}
-                  selected={traits.antennae === a}
-                  disabled={disabled}
-                  onClick={() => set('antennae', a)}
-                >
-                  {AVATAR_ANTENNAE_LABELS[a]}
-                </Chip>
-              ))}
-            </OptionGroup>
-            <OptionGroup label="Pose">
-              {AVATAR_POSES.map((p) => (
-                <Chip
-                  key={p}
-                  selected={traits.pose === p}
-                  disabled={disabled}
-                  onClick={() => set('pose', p)}
-                >
-                  {AVATAR_POSE_LABELS[p]}
-                </Chip>
+                />
               ))}
             </OptionGroup>
           </>
@@ -368,52 +409,56 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
                 )
               })}
             </OptionGroup>
-            <OptionGroup label="Expression">
+            <OptionGroup label="Expression" tiles>
               {LOBSTER_EYELID_STYLES.map((e) => (
-                <Chip
+                <Tile
                   key={e}
+                  label={AVATAR_EXPRESSION_LABELS[e]}
+                  src={tile({ eyelidStyle: e }, 'portrait')}
+                  zoom
                   selected={traits.eyelidStyle === e}
                   disabled={disabled}
                   onClick={() => set('eyelidStyle', e)}
-                >
-                  {AVATAR_EXPRESSION_LABELS[e]}
-                </Chip>
+                />
               ))}
             </OptionGroup>
-            <OptionGroup label="Mouth">
+            <OptionGroup label="Mouth" tiles>
               {AVATAR_MOUTHS.map((m) => (
-                <Chip
+                <Tile
                   key={m}
+                  label={AVATAR_MOUTH_LABELS[m]}
+                  src={tile({ mouth: m }, 'portrait')}
+                  zoom
                   selected={traits.mouth === m}
                   disabled={disabled}
                   onClick={() => set('mouth', m)}
-                >
-                  {AVATAR_MOUTH_LABELS[m]}
-                </Chip>
+                />
               ))}
             </OptionGroup>
-            <OptionGroup label="Eye shape">
+            <OptionGroup label="Eye shape" tiles>
               {LOBSTER_EYE_VARIANTS.map((v) => (
-                <Chip
+                <Tile
                   key={v}
+                  label={LOBSTER_EYE_VARIANT_LABELS[v]}
+                  src={tile({ eyeVariant: v }, 'portrait')}
+                  zoom
                   selected={traits.eyeVariant === v}
                   disabled={disabled}
                   onClick={() => set('eyeVariant', v)}
-                >
-                  {LOBSTER_EYE_VARIANT_LABELS[v]}
-                </Chip>
+                />
               ))}
             </OptionGroup>
-            <OptionGroup label="Pupils">
+            <OptionGroup label="Pupils" tiles>
               {LOBSTER_PUPIL_VARIANTS.map((v) => (
-                <Chip
+                <Tile
                   key={v}
+                  label={LOBSTER_PUPIL_VARIANT_LABELS[v]}
+                  src={tile({ pupilVariant: v }, 'portrait')}
+                  zoom
                   selected={traits.pupilVariant === v}
                   disabled={disabled}
                   onClick={() => set('pupilVariant', v)}
-                >
-                  {LOBSTER_PUPIL_VARIANT_LABELS[v]}
-                </Chip>
+                />
               ))}
             </OptionGroup>
           </>
