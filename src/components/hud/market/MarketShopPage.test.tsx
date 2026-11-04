@@ -1,6 +1,6 @@
 import React from 'react'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 import type { MarketPayload } from '@/lib/market'
 
@@ -75,6 +75,7 @@ import { MarketShopPage } from './MarketShopPage'
 
 describe('MarketShopPage', () => {
   beforeEach(() => {
+    window.history.replaceState(null, '', '/market')
     getMarketFn.mockReset()
     buyGearFn.mockReset()
   })
@@ -93,7 +94,11 @@ describe('MarketShopPage', () => {
     getMarketFn.mockResolvedValue({ ...payload(320), creditsLive: true, moltCredits: 550 })
     createCreditCheckoutFn.mockResolvedValue({ url: 'https://checkout.stripe.test/c' })
     const assign = vi.fn()
-    Object.defineProperty(window, 'location', { configurable: true, value: { ...window.location, assign, href: 'http://localhost/market' } })
+    const realLocation = window.location
+    Object.defineProperty(window, 'location', { configurable: true, value: { ...realLocation, assign, href: 'http://localhost/market' } })
+    onTestFinished(() => {
+      Object.defineProperty(window, 'location', { configurable: true, value: realLocation })
+    })
     renderMarket()
     await screen.findByTestId('gem-balance')
     fireEvent.click(screen.getByRole('tab', { name: 'Credits' }))
@@ -107,8 +112,67 @@ describe('MarketShopPage', () => {
     getMarketFn.mockResolvedValue(payload(320))
     renderMarket()
     await screen.findByText('Tide-Braced Carapace')
-    fireEvent.click(screen.getByRole('button', { name: 'Legendary' }))
+    fireEvent.change(screen.getByRole('combobox', { name: 'Rarity' }), { target: { value: 'legendary' } })
     expect(screen.getByRole('button', { name: /Tide-Braced Carapace, Legendary/ })).toBeInTheDocument()
+  })
+
+  it('pages through a long list and hides owned pieces', async () => {
+    const base = payload(320, true)
+    const one = base.pieces[0]!
+    const pieces = Array.from({ length: 30 }, (_, i) => ({
+      ...one,
+      baseKey: `${one.baseKey}-${i}`,
+      name: `Piece ${i + 1}`,
+      variants: one.variants.map((v) => ({ ...v, catalogItemId: `${v.catalogItemId}-${i}`, owned: v.rarity === 'uncommon' && i < 5 })),
+    }))
+    getMarketFn.mockResolvedValue({ ...base, pieces })
+    renderMarket()
+    await screen.findByRole('button', { name: /^Piece 1,/ })
+    expect(screen.queryByRole('button', { name: /^Piece 25,/ })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Page 2' }))
+    expect(screen.getByRole('button', { name: /^Piece 25,/ })).toBeInTheDocument()
+    expect(window.location.search).toContain('page=2')
+    fireEvent.click(screen.getByRole('button', { name: 'Hide owned' }))
+    // Back to page one; owned pieces show their cheapest version not yet owned.
+    expect(screen.getByRole('button', { name: /^Piece 1, Legendary/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Piece 6, Uncommon/ })).toBeInTheDocument()
+    expect(window.location.search).toContain('owned=hide')
+    expect(window.location.search).not.toContain('page=')
+  })
+
+  it('features promos and opens a bundle with its pieces', async () => {
+    const base = payload(320)
+    const v = base.pieces[0]!.variants[1]!
+    const make = (baseKey: string, name: string, category: 'carapace' | 'belt' | 'legs' | 'head') => ({
+      baseKey,
+      name,
+      flavorText: '',
+      category,
+      variants: [
+        { ...v, catalogItemId: `${baseKey}-e`, rarity: 'epic' as const, appearanceKey: `${baseKey}--epic`, price: 900 },
+        { ...v, catalogItemId: `${baseKey}-l`, rarity: 'legendary' as const, appearanceKey: `${baseKey}--legendary` },
+      ],
+    })
+    getMarketFn.mockResolvedValue({
+      ...base,
+      pieces: [
+        make('oracle-dome-lattice', 'Oracle Dome Lattice', 'head'),
+        make('abyssal-ward-shell', 'Abyssal Ward Shell', 'carapace'),
+        make('abyssal-clasp-girdle', 'Abyssal Clasp Girdle', 'belt'),
+        make('void-stride-articulation', 'Void-Stride Articulation', 'legs'),
+      ],
+    })
+    renderMarket()
+    const featured = await screen.findByRole('region', { name: 'Featured' })
+    expect(within(featured).getByText('Oracle Dome Lattice')).toBeInTheDocument()
+    fireEvent.click(within(featured).getAllByRole('button', { name: /Abyssal Set bundle/ })[0]!)
+    const detail = await screen.findByTestId('market-bundle-detail')
+    expect(within(detail).getByText('Abyssal Clasp Girdle')).toBeInTheDocument()
+    expect(within(detail).getByText('2,160')).toBeInTheDocument()
+    expect(within(detail).queryByRole('button', { name: /^Buy/ })).not.toBeInTheDocument()
+    // Filtering hides the promos.
+    fireEvent.click(screen.getByRole('button', { name: 'Belt' }))
+    expect(screen.queryByRole('region', { name: 'Featured' })).not.toBeInTheDocument()
   })
 
   it('buys a piece with gems and reloads the market', async () => {
