@@ -80,58 +80,61 @@ export function AdminOversightHub({ initialTab = 'watch' }: { initialTab?: Admin
 
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans" data-testid="admin-oversight-hub">
-      <HudTitlePanel
-        accent="cyan"
-        eyebrow="Steward oversight"
-        title="Admin"
-        description="Moderation, member clearance, shop orders, and system status for staff."
-      />
-
-      <section
-        className="grid grid-cols-1 sm:grid-cols-3 gap-2.5"
-        data-testid="admin-telemetry"
-        aria-label="System status"
-      >
-        <StatusCard label="Pending flags" value={telemetry ? String(telemetry.pendingFlags) : '—'} />
-        <StatusCard label="Active sessions" value={telemetry ? String(telemetry.activeSessions) : '—'} />
-        <StatusCard
-          label="Health"
-          value={telemetryError ? 'Unavailable' : telemetry?.healthy ? 'Healthy' : '—'}
-          tone={telemetryError ? 'amber' : 'cyan'}
+      <section className="rounded-card bg-surface-1 p-4 sm:p-5 space-y-4" aria-label="Admin overview">
+        <HudTitlePanel
+          treatment="integrated"
+          accent="cyan"
+          eyebrow="Steward oversight"
+          title="Admin"
+          description="Moderation, member clearance, shop orders, and system status for staff."
         />
+
+        <section
+          className="grid grid-cols-3 gap-2.5"
+          data-testid="admin-telemetry"
+          aria-label="System status"
+        >
+          <StatusCard label="Pending flags" value={telemetry ? String(telemetry.pendingFlags) : '—'} />
+          <StatusCard label="Active sessions" value={telemetry ? String(telemetry.activeSessions) : '—'} />
+          <StatusCard
+            label="Health"
+            value={telemetryError ? 'Unavailable' : telemetry?.healthy ? 'Healthy' : '—'}
+            tone={telemetryError ? 'amber' : 'cyan'}
+          />
+        </section>
+        {telemetryError ? (
+          <p className="text-xs text-amber-400" data-testid="admin-telemetry-error">
+            {telemetryError}
+          </p>
+        ) : null}
+
+        <SectorDirectory />
+
+        <div className="flex flex-wrap gap-2 border-t border-line-subtle pt-3" role="tablist" aria-label="Admin sections">
+          {TABS.map((item) => {
+            const Icon = item.icon
+            const selected = tab === item.id
+            return (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                data-testid={`admin-tab-${item.id}`}
+                onClick={() => setTab(item.id)}
+                className={`inline-flex min-h-[40px] items-center gap-2 rounded-t-control border-b-2 px-3 py-2 text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                  selected
+                    ? 'border-cyan-glow bg-surface-2 text-ink'
+                    : 'border-transparent text-ink-muted hover:bg-surface-2 hover:text-ink'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {item.label}
+              </button>
+            )
+          })}
+        </div>
       </section>
-      {telemetryError ? (
-        <p className="text-xs text-amber-400" data-testid="admin-telemetry-error">
-          {telemetryError}
-        </p>
-      ) : null}
-
-      <SectorDirectory />
-
-      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Admin sections">
-        {TABS.map((item) => {
-          const Icon = item.icon
-          const selected = tab === item.id
-          return (
-            <button
-              key={item.id}
-              type="button"
-              role="tab"
-              aria-selected={selected}
-              data-testid={`admin-tab-${item.id}`}
-              onClick={() => setTab(item.id)}
-              className={`inline-flex min-h-[40px] items-center gap-2 rounded-t-control border-b-2 px-3 py-2 text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                selected
-                  ? 'border-cyan-glow bg-surface-2 text-ink'
-                  : 'border-transparent text-ink-muted hover:bg-surface-2 hover:text-ink'
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5" />
-              {item.label}
-            </button>
-          )
-        })}
-      </div>
 
       {tab === 'watch' ? <CovenantWatchPage onChanged={() => void loadTelemetry()} /> : null}
       {tab === 'members' ? (
@@ -158,7 +161,7 @@ function StatusCard({
   tone?: 'cyan' | 'amber'
 }) {
   return (
-    <div className="hud-sheen rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4">
+    <div className="min-w-0 hud-sheen rounded-card border border-line-subtle bg-surface-1 p-2.5 sm:p-4">
       <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">{label}</p>
       <p className={`mt-1 font-grotesk text-xl font-bold ${tone === 'amber' ? 'text-amber-400' : 'text-cyan-glow'}`}>
         {value}
