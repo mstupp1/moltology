@@ -51,20 +51,38 @@ export interface AvatarCreatorPanelProps {
 
 export type CreatorSection = 'body' | 'shell' | 'face' | 'scene'
 
-export const CREATOR_SECTIONS: readonly { id: CreatorSection; label: string }[] = [
+export const CREATOR_SECTIONS: readonly {
+  id: CreatorSection
+  label: string
+}[] = [
   { id: 'body', label: 'Body' },
   { id: 'shell', label: 'Shell' },
   { id: 'face', label: 'Face' },
   { id: 'scene', label: 'Scene' },
 ]
 
-function OptionGroup({ label, children, tiles = false }: { label: string; children: React.ReactNode; tiles?: boolean }) {
+function OptionGroup({
+  label,
+  children,
+  tiles = false,
+}: {
+  label: string
+  children: React.ReactNode
+  tiles?: boolean
+}) {
   return (
     <fieldset className="space-y-1.5 min-w-0">
       <legend className="text-[11px] font-sans font-semibold tracking-[0.08em] uppercase text-ink-muted mb-1.5">
         {label}
       </legend>
-      <div className={tiles ? 'grid grid-cols-[repeat(auto-fill,minmax(68px,1fr))] gap-1.5' : 'flex flex-wrap gap-1.5'}>
+      {/* Phones get one swipeable row per group so a tab is a short list, not a wall of tiles. */}
+      <div
+        className={
+          tiles
+            ? 'flex gap-1.5 overflow-x-auto snap-x -mx-1 px-1 pb-1 [&>*]:w-[72px] [&>*]:shrink-0 [&>*]:snap-start lg:grid lg:grid-cols-[repeat(auto-fill,minmax(68px,1fr))] lg:overflow-visible lg:mx-0 lg:px-0 lg:pb-0 lg:[&>*]:w-auto'
+            : 'flex flex-wrap gap-1.5'
+        }
+      >
         {children}
       </div>
     </fieldset>
@@ -130,10 +148,20 @@ function Tile({
     >
       <span className="block w-full aspect-square rounded-chip bg-abyss/70 overflow-hidden">
         {src ? (
-          <img src={src} alt="" width={96} height={96} loading="lazy" decoding="async" className={`w-full h-full object-contain transition-transform duration-150 motion-reduce:transition-none ${zoom ? 'scale-[1.45] translate-y-[6%] group-hover:scale-[1.5]' : 'group-hover:scale-105'}`} />
+          <img
+            src={src}
+            alt=""
+            width={96}
+            height={96}
+            loading="lazy"
+            decoding="async"
+            className={`w-full h-full object-contain transition-transform duration-150 motion-reduce:transition-none ${zoom ? 'scale-[1.45] translate-y-[6%] group-hover:scale-[1.5]' : 'group-hover:scale-105'}`}
+          />
         ) : null}
       </span>
-      <span className={`text-[11px] leading-tight font-sans text-center ${selected ? 'text-ink font-semibold' : 'text-ink-body'}`}>
+      <span
+        className={`text-[11px] leading-tight font-sans text-center ${selected ? 'text-ink font-semibold' : 'text-ink-body'}`}
+      >
         {label}
       </span>
     </button>
@@ -162,9 +190,7 @@ function Swatch({
       disabled={disabled}
       onClick={onClick}
       className={`w-9 h-9 rounded-full border-2 transition-transform disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow motion-reduce:transition-none ${
-        selected
-          ? 'border-ink scale-110'
-          : 'border-line hover:scale-105 hover:border-line-hover'
+        selected ? 'border-ink scale-110' : 'border-line hover:scale-105 hover:border-line-hover'
       }`}
       style={{ background }}
     />
@@ -196,11 +222,20 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
 
   // One look shared by every tile: the member's current character, no backdrop, no gear.
   const base = useMemo(
-    () => ({ ...value, ...traits, accessory: 'none' as const, equipment: undefined, transparentBackground: true }),
+    () => ({
+      ...value,
+      ...traits,
+      accessory: 'none' as const,
+      equipment: undefined,
+      transparentBackground: true,
+    }),
     [value, traits],
   )
   const tile = (patch: Partial<LobsterAvatarConfig>, frame: TileFrame) =>
-    generateLobsterAvatarDataUri({ ...base, ...patch }, 96, { frame, staticMotion: true })
+    generateLobsterAvatarDataUri({ ...base, ...patch }, 96, {
+      frame,
+      staticMotion: true,
+    })
 
   const racePreviews = useMemo(() => {
     const out: Partial<Record<AvatarRace, string | null>> = {}
@@ -211,82 +246,90 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
 
   return (
     <div className={`w-full space-y-3 ${className}`} data-testid="avatar-creator-panel">
-      <div className="grid grid-cols-2 gap-2" role="group" aria-label="Race">
-        {AVATAR_RACES.map((race) => {
-          const selected = traits.race === race
-          return (
-            <button
-              key={race}
-              type="button"
-              aria-pressed={selected}
-              disabled={disabled}
-              onClick={() => set('race', race)}
-              className={`flex items-center gap-2.5 p-1.5 pr-3 rounded-card border transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                selected
-                  ? 'border-cyan-glow bg-cyan-soft'
-                  : 'border-line bg-surface-2 hover:border-line-hover'
-              }`}
-            >
-              {racePreviews[race] ? (
-                <img
-                  src={racePreviews[race] ?? undefined}
-                  alt=""
-                  width={44}
-                  height={44}
-                  className="w-11 h-11 rounded-full bg-abyss"
-                />
-              ) : null}
-              <span
-                className={`font-sans text-sm font-semibold ${selected ? 'text-cyan-glow' : 'text-ink'}`}
-              >
-                {AVATAR_RACE_LABELS[race]}
-              </span>
-            </button>
-          )
-        })}
-      </div>
-
-      <div className="flex items-center gap-2">
-        {!section && (
-          <div
-            role="tablist"
-            aria-label="Customize"
-            className="flex flex-1 gap-0.5 rounded-card border border-line-subtle bg-surface-1 p-0.5"
-          >
-            {CREATOR_SECTIONS.map((t) => (
+      {(!section || section === 'body') && (
+        <div className="grid grid-cols-2 gap-2" role="group" aria-label="Race">
+          {AVATAR_RACES.map((race) => {
+            const selected = traits.race === race
+            return (
               <button
-                key={t.id}
+                key={race}
                 type="button"
-                role="tab"
-                aria-selected={tab === t.id}
-                onClick={() => setTab(t.id)}
-                className={`flex-1 min-h-8 rounded-control text-[11px] font-sans font-semibold tracking-[0.08em] uppercase transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                  tab === t.id
-                    ? 'bg-surface-3 shadow-nav-current text-ink'
-                    : 'text-ink-muted hover:text-ink hover:bg-surface-2'
+                aria-pressed={selected}
+                disabled={disabled}
+                onClick={() => set('race', race)}
+                className={`flex items-center gap-2.5 p-1.5 pr-3 rounded-card border transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                  selected
+                    ? 'border-cyan-glow bg-cyan-soft'
+                    : 'border-line bg-surface-2 hover:border-line-hover'
                 }`}
               >
-                {t.label}
+                {racePreviews[race] ? (
+                  <img
+                    src={racePreviews[race] ?? undefined}
+                    alt=""
+                    width={44}
+                    height={44}
+                    className="w-11 h-11 rounded-full bg-abyss"
+                  />
+                ) : null}
+                <span
+                  className={`font-sans text-sm font-semibold ${selected ? 'text-cyan-glow' : 'text-ink'}`}
+                >
+                  {AVATAR_RACE_LABELS[race]}
+                </span>
               </button>
-            ))}
-          </div>
-        )}
-        <HudButton
-          type="button"
-          variant="secondary"
-          size="sm"
-          className={section ? 'ml-auto shrink-0' : 'shrink-0'}
-          disabled={disabled}
-          onClick={() => onChange(rerollAvatarConfig(value))}
-          icon={<Dices className="w-3.5 h-3.5 text-cyan-glow" />}
-        >
-          Surprise me
-        </HudButton>
-      </div>
+            )
+          })}
+        </div>
+      )}
+
+      {!section && (
+        <div className="flex items-center gap-2">
+          {
+            <div
+              role="tablist"
+              aria-label="Customize"
+              className="flex flex-1 gap-0.5 rounded-card border border-line-subtle bg-surface-1 p-0.5"
+            >
+              {CREATOR_SECTIONS.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === t.id}
+                  onClick={() => setTab(t.id)}
+                  className={`flex-1 min-h-8 rounded-control text-[11px] font-sans font-semibold tracking-[0.08em] uppercase transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                    tab === t.id
+                      ? 'bg-surface-3 shadow-nav-current text-ink'
+                      : 'text-ink-muted hover:text-ink hover:bg-surface-2'
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          }
+          <HudButton
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="shrink-0"
+            disabled={disabled}
+            onClick={() => onChange(rerollAvatarConfig(value))}
+            icon={<Dices className="w-3.5 h-3.5 text-cyan-glow" />}
+          >
+            Surprise me
+          </HudButton>
+        </div>
+      )}
 
       <div
         role="tabpanel"
-        className="space-y-4 rounded-card border border-line-subtle bg-surface-1 p-3"
+        className={
+          section
+            ? 'space-y-4'
+            : 'space-y-4 rounded-card border border-line-subtle bg-surface-1 p-3'
+        }
       >
         {tab === 'body' && (
           <>
