@@ -131,5 +131,6 @@ Add a line here when a phrase starts repeating across pieces.
 | [Blog](../.agents/skills/blog-creator/SKILL.md) | Thesis-first dispatch | 2 | Optional, specific invitation |
 | [YouTube long-form](../.agents/skills/youtube-research/SKILL.md) | Validated outlier format | 2 | Per the channel plan |
 
-Where a skill and this playbook differ on length, format or CTA, the skill wins. On voice,
+What a piece looks like, which series it belongs to and how big its type is live in the
+[creative direction](creative-direction.md) playbook. Where a skill and this playbook differ on length, format or CTA, the skill wins. On voice,
 bans and formatting, STYLE_GUIDE wins.

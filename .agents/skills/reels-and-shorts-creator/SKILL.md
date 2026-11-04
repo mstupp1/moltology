@@ -19,11 +19,15 @@ Read before writing:
 
 - `STYLE_GUIDE.md` (voice and bans) and `BRAND_BIBLE.md` (terms and characters).
 - The [writing playbook](../../../content/writing-playbook.md): loudness dial, hooks, pitch three, boredom check and the cut list.
+- The [creative direction](../../../content/creative-direction.md) playbook: series, cast, shot list, type scale, stoppers and the phone proof.
 - [references/reel-formats.md](references/reel-formats.md): the video formats with skeletons, traps and sample scripts.
 - [The Reels strategy](../../../content/social/reels-strategy.md) and the [annual content calendar](../../../content/annual-content-calendar.md) for the intended slot.
-- `content/social/instagram-reel-history.json`. Avoid the last three topics and hooks, and the formats used in the last three reels.
+- `npm run social:continuity`, which reads both history ledgers. Avoid the last three topics and hooks, the formats used in the last three reels, and any character it flags as overused.
 
-## 1. Find the situation
+## 1. Pick the series, then find the situation
+
+Choose the series that is due (usually Field Notes or The Molt Log) and fill the creative brief from the creative-direction playbook: series, next episode number, a callback to the last episode, cast, focal point, shots, stopper and easter egg. All three pitches below stay in that series unless you record why a one-off is better.
+
 
 Start from one recognisable everyday moment, as specific as possible: a time, an object, a sentence someone actually says. "Your calendar" is a topic; "an invite called 'sync' with no agenda" is a situation. An uncovered blog dispatch can supply it. Research real-world claims with primary sources; never invent news, studies or outcomes.
 
@@ -45,7 +49,7 @@ The format decides the shape. These house constraints hold for every format:
 - **Ending.** One website invitation that matches its destination, worded to fit the script ("More field notes at moltology.org", "Try the audit at moltology.org"). No save or share ask, keyword comment request or DM promise.
 - **Cut list.** Nothing from the playbook's cut list, especially "Below, a lobster…" bridges and melt/molt couplets.
 
-Then write six `scenePrompts`, one per beat of the finished script, each describing a concrete visible action. Scene 1 is the hook action already in motion. The visuals follow the script, never the other way round.
+Then write six `scenePrompts`, one per beat of the finished script, each describing a concrete visible action. Scene 1 is the hook action already in motion and carries the brief's stopper. Name the shot in each prompt from the playbook's shot list and use at least three kinds across the six. Keep the series light and grade in every prompt, and keep the cast doing their jobs. The visuals follow the script, never the other way round.
 
 ## 4. Boredom check before spending money
 
@@ -59,7 +63,7 @@ Fix any "no" in the script, then check again. Only then move to artwork.
 
 ## 5. Save the reviewed draft
 
-Save `tmp/reel-next/draft.json` with `title`, `topic`, `format`, `loudness`, `pitchScores`, `hookHeadline`, `narrationScript`, six `scenePrompts`, `caption`, `hashtags` (at most three), `firstComment` (a direct destination URL), `youtubeTitle`, `youtubeDescription`, `youtubeTags`, `characterArc` and `ctaGoal`. [references/example-draft.json](references/example-draft.json) is a complete example and also works for `--recycle-clips --dry-run` pipeline checks.
+Save `tmp/reel-next/draft.json` with `title`, `topic`, `series`, `episode`, `creativeBrief`, `format`, `loudness`, `pitchScores`, `hookHeadline`, `narrationScript`, six `scenePrompts`, `caption`, `hashtags` (at most three), `firstComment` (a direct destination URL), `youtubeTitle`, `youtubeDescription`, `youtubeTags`, `characterArc` and `ctaGoal`. [references/example-draft.json](references/example-draft.json) is a complete example and also works for `--recycle-clips --dry-run` pipeline checks.
 
 The caption follows STYLE_GUIDE §4.3: the hook line, two or three tight lines with the payoff, the same website invitation, up to three hashtags. `npm run reel:create` stops without `--content-json`; there are no built-in scripts.
 
@@ -77,6 +81,6 @@ npm run reel:create -- --content-json tmp/reel-next/draft.json \
   --mascot lobster_engineer --cta-goal quiz --commit
 ```
 
-Before queueing, watch the final file once with sound on at phone size and run the boredom check again. If the jokes don't land in the edit (a punchline buried under a cut, a pause that kills the rhythm), fix the edit or the script first.
+Before queueing, watch the final file once with sound on at phone size, run the boredom check again, and run the playbook's phone proof on stills of frame zero, the last hook word and the outro. The on-screen headline follows the playbook's type scale (80px minimum on 1080×1920) inside the safe box in production.md; shorten it before shrinking it. If the jokes don't land in the edit (a punchline buried under a cut, a pause that kills the rhythm), fix the edit or the script first.
 
 Report the chosen format, the three pitches with scores, the final script and word count, the preview, the actual schedule and the cost estimate. Record `format` and `loudness` in the strategy's experiment log with the other production settings.

@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { lintLayoutSpec, parseLayoutSpec, resolveColor, splitHighlights } from './layout-spec'
+import { lintLayoutSpec, parseLayoutSpec, resolveColor, splitHighlights, textFitFloor } from './layout-spec'
 
 const LAYOUT_DIR = path.resolve(__dirname, '../../../content/composite-layouts')
 
@@ -55,5 +55,31 @@ describe('layout specs', () => {
     expect(messages).toContain('text#0: has no box height')
     expect(messages).toContain('text#0: font size 18px')
     expect(messages).not.toContain('text#1')
+  })
+
+  it('warns when auto-fit, labels, lists or word count fall below phone readability', () => {
+    const issues = lintLayoutSpec({
+      layers: [
+        { id: 'shrinks', type: 'text', text: 'Body', size: 44, box: { x: 10, y: 10, w: 50, h: 10 } },
+        { id: 'held', type: 'text', text: 'Body', size: 44, minSize: 40, box: { x: 10, y: 30, w: 50, h: 10 } },
+        { id: 'pill', type: 'pill', text: 'Tag', size: 24, box: { x: 10, y: 50, w: 20 } },
+        { id: 'list', type: 'list', items: ['one', 'two'], size: 30, box: { x: 10, y: 60, w: 50, h: 20 } },
+        { id: 'long', type: 'text', text: Array(45).fill('word').join(' '), size: 40, fit: false, box: { x: 10, y: 80, w: 80, h: 10 } },
+      ],
+    })
+    const messages = issues.map((i) => `${i.layer ?? 'frame'}: ${i.message}`).join('\n')
+    expect(messages).toContain('shrinks: can auto-fit down to 30px')
+    expect(messages).not.toContain('held:')
+    expect(messages).toContain('pill: label size 24px')
+    expect(messages).toContain('list: list size 30px')
+    expect(messages).toContain('frame: 49 words on one frame')
+  })
+
+  it('computes the auto-fit floor the renderer uses', () => {
+    expect(textFitFloor({ size: 100, box: { h: 10 } })).toBe(60)
+    expect(textFitFloor({ size: 100, minSize: 72, box: { h: 10 } })).toBe(72)
+    expect(textFitFloor({ size: 100, box: {} })).toBe(100)
+    expect(textFitFloor({ size: 40, fit: false, box: { h: 10 } })).toBe(40)
+    expect(textFitFloor({ size: 20, box: { h: 10 } })).toBe(20)
   })
 })

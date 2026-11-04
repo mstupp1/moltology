@@ -21,6 +21,7 @@ import {
   SCENE_NEGATIVE_PROMPT,
 } from './lib/reel-director'
 import { publishArchivedSocial } from './lib/social-archive'
+import { continuityFields } from './lib/social-continuity'
 import { getRandomCharacterKey, CharacterKey } from './lib/character-overlay'
 import {
   queueDualReelAndShort,
@@ -1092,6 +1093,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       relatedBlogSlug: scriptData.relatedBlogSlug || null,
       characterArc: scriptData.characterArc,
       narrationScript: scriptData.narrationScript,
+      ...continuityFields(scriptData as unknown as Record<string, unknown>),
       archivePath,
       zernioMediaUrls: queueResult.mediaUrls || [],
       thumbnailUrl: null,

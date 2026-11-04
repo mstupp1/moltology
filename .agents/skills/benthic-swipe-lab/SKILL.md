@@ -20,13 +20,13 @@ A polite, pretty, forgettable deck is a failed run, even if every rule below is 
 
 Complete the workflow through ingestion and Zernio queueing after inspecting the finished artwork. A request to run this skill includes queueing by default; stop at a draft only when the user requests draft-only, preview-only, or no queueing. Immediate publication still requires an explicit request.
 
-Read `STYLE_GUIDE.md`, `BRAND_BIBLE.md`, and `content/social/instagram-post-history.json` before writing. Use the post history to avoid repeating a recent format, topic or hook shape. For video adaptations, also read the reel history.
+Read `STYLE_GUIDE.md`, `BRAND_BIBLE.md` and the [creative direction](../../../content/creative-direction.md) playbook before writing, then run `npm run social:continuity`. Use it to avoid repeating a recent format, topic, hook shape or overused character, and to find the next episode of the series you're making. Video adaptations read the same report.
 
 ## 1. Pitch three, build one
 
 Read [references/format-library.md](references/format-library.md). It holds the common Instagram formats (meme, hot take, interactive, story and series), each with a skeleton, the job it does best, a worked Moltology riff and its boring trap. [references/formats.md](references/formats.md) holds the saved creator inspiration formats; use them when a cinematic field kit, prompt vault, workflow breakdown or depth map fits better.
 
-Before drafting, write three concepts in `tmp/swipe-lab/<slug>/pitches.md`. Each uses a **different** format and has a cover line, the format, a one-line summary of the frames, and the save or share trigger. At least one must come from the meme or interactive families.
+First pick the series (usually Shell Check or The Molt Log) and fill the creative brief from the creative-direction playbook: series, next episode, callback, cast, focal point, shots, stopper and easter egg. Then write three concepts in `tmp/swipe-lab/<slug>/pitches.md`, in that series unless you record why a one-off is better. Each uses a **different** format and has a cover line, the format, a one-line summary of the frames, and the save or share trigger. At least one must come from the meme or interactive families.
 
 Score each concept from 1 to 5 on:
 
@@ -67,7 +67,7 @@ Prefer 5–8 frames for a deck. Some formats (starter pack, alignment chart, how
 
 Set the dial per post and write it in the draft as `loudness` (1 quiet, 3 loud, 5 unhinged-but-kind). Swipe Lab defaults to 3 or 4.
 
-- **On the image, go big.** Huge display type, caps where the layout calls for it (the style guide allows caps in on-image display type), hard contrast, one highlighted word in cyan or crimson, crossed-out text, stamps, flags, scores, timestamps. A frame should read in under two seconds at phone size.
+- **On the image, go big.** Huge display type at or above the creative-direction type scale (cover 96px or more, body 40px or more on the 1080-wide canvas), caps where the layout calls for it (the style guide allows caps in on-image display type), hard contrast, one highlighted word in cyan or crimson, crossed-out text, stamps, flags, scores, timestamps. A frame should read in under two seconds at phone size.
 - **Absurd specifics.** "Your to-do app has a to-do list." "A meeting that attached itself in 2023." Invent office-life terms freely. One clean in-world number per post is fine (STYLE_GUIDE BAN 7); never present it as a real result.
 - **Mascots react.** A lobster staring into the camera, a crab placing a tier tile with ceremony, the Oracle being calmly disappointed. A reaction is a narrative job.
 - **Roast the habit, not the person.** Light roasting is approved ("your 47 tabs are a cry for help"). The reader is in on the joke. Never roast bodies, health, money, jobs, or anything a struggling person can't change by Friday. If a line would sting someone on a bad day, move the target from the person to the object.
@@ -79,10 +79,10 @@ Set the dial per post and write it in the draft as `loudness` (1 quiet, 3 loud, 
 
 Save `tmp/swipe-lab/<slug>/draft.json` with:
 
-- `format`, `formatFamily`, `loudness`, `pitchScores` (all three concepts and the winner), `coverCandidates`, `title`, `topic`, `readerPayoff`, `saveOrShareTrigger`, `ctaGoal`.
+- `series`, `episode`, `creativeBrief` (from the creative-direction playbook), `format`, `formatFamily`, `loudness`, `pitchScores` (all three concepts and the winner), `coverCandidates`, `title`, `topic`, `readerPayoff`, `saveOrShareTrigger`, `ctaGoal`.
 - `referenceIds` and `borrowedDevices` when an inspiration archive post shaped the deck.
-- `artDirection`: `treatment` (`type-led`, `scene-led` or `mixed`), palette, lighting, materials and the visual motif shared by the whole piece.
-- `slides`: ordered objects with `number`, `role` (cover, rehook, beat, payoff, save, closer), `headline`, `body`, `visualDirection`, `characterRole` (or `none`), and `layoutPath` when rendered.
+- `artDirection`: `treatment` (`type-led`, `scene-led` or `mixed`), plus the series look (light, grade, accent), the cover system, and the visual motif shared by the whole piece.
+- `slides`: ordered objects with `number`, `role` (cover, rehook, beat, payoff, save, closer), `headline`, `body`, `visualDirection` (including the shot from the playbook's shot list), `characterRole` (character, job and expression, or `none`), and `layoutPath` when rendered.
 - `caption`, `hashtags` (at most three), `firstComment` (a direct destination link), and `sources` for real-world claims.
 - `mascot`, `aspectRatio`, and final artifact paths when available.
 
@@ -98,7 +98,7 @@ Read `content/composite-layouts/README.md` and the composite schema before writi
 npm run composite:render -- --spec tmp/swipe-lab/<slug>/slide-01.json --out tmp/swipe-lab/<slug>/slide-01-scaffold.png
 ```
 
-Use 3:4 portrait, 1080×1440, with 2x scaffolds by default; preserve the finished full frame. Use the Tailwind/HUD tokens, Space Grotesk hierarchy, abyss/navy fields, cyan and crimson, and the Order emblem. One category pill at most. Each frame has one focal point.
+Use 3:4 portrait, 1080×1440, with 2x scaffolds by default; preserve the finished full frame. Use the Space Grotesk hierarchy, the brand colours plus the series accent, the series cover system and the Order emblem. One category pill at most. Each frame has one focal point. Follow the creative-direction type scale and set `minSize` on every auto-fit text layer; treat renderer type-size warnings as fixes to make, not notes.
 
 Use built-in ImageGen on every finished frame by default, either for its scene artwork or for a polish pass over a reviewed scaffold. The renderer adds exact copy and the official emblem afterward. A type-led format does not waive image production. Only skip ImageGen when the user explicitly requests a purely typographic or code-rendered treatment.
 
@@ -118,7 +118,7 @@ Inspect local edit targets and identity references with `view_image` before usin
 
 Use the exact official logo assets, never an ImageGen approximation, invented wordmark, decorative shell substitute or altered emblem. Inspect `public/images/order_emblem.svg` (or its official raster twin) and the composite `brand` layer before production. Reserve clean branding space and composite the supplied asset afterward; scale and perspective may fit the surface, but preserve the geometry and approved colors. Check every final frame for invented or distorted marks.
 
-Use canonical mascots from `src/lib/mascots.ts` and `scripts/lib/character-overlay.ts`, and inspect their actual assets. Give each appearance a job (reacting, demonstrating, placing a tile, sending a message) and record it in `characterRole`. A recurring reaction mascot across a meme deck is fine when it reacts to each frame; a mascot pasted on as a badge is not. ImageGen may change pose, expression, angle and props, with actual identity references supplied and the recognizable anatomy, proportions, colors and signature features preserved. No robot anatomy, no creator faces.
+Use canonical mascots from `src/lib/mascots.ts` and `scripts/lib/character-overlay.ts`, and inspect their actual assets. Cast from the creative-direction cast table for the series; don't default to `lobster_engineer`. Give each appearance a job (reacting, demonstrating, placing a tile, sending a message) and record it in `characterRole`. A recurring reaction mascot across a meme deck is fine when it reacts to each frame; a mascot pasted on as a badge is not. ImageGen may change pose, expression, angle and props, with actual identity references supplied and the recognizable anatomy, proportions, colors and signature features preserved. No robot anatomy, no creator faces.
 
 ## 6. Boredom check before queueing
 
@@ -132,7 +132,7 @@ Lay the finished frames out in order (a contact sheet is enough) and answer hone
 - With the text hidden, does each frame still show a specific situation, visual joke, purposeful reaction or distinctive composition? Generic glow, texture behind text and repeated panels do not pass this check.
 - Is the artwork carrying the premise at phone size, with enough space to see it? Do not bury a generated scene under the same scaffold panels.
 
-Fix any "no" with a targeted change (rewrite the line, enlarge the type, cut a frame, swap the reaction) before queueing. Then check spelling, margins, order, legibility, claims, character identity and logo integrity. Save each final ImageGen prompt and its input roles beside the draft. Copy selected built-in outputs from their returned save paths into `tmp/swipe-lab/<slug>/` and record the final artifact paths; don't leave deliverables only in the tool's default output directory. Generated media stays in workspace `tmp/` until publication; finished social media and reviewed metadata go to the Google Drive social archive through the social CLI, with publishing media uploaded directly to Zernio, never tracked `public/`. Website and character source assets remain on S3.
+Then run the creative-direction phone proof: a contact sheet with every frame 390px wide, saved as `phone-proof.png`. Fix any "no" from either check with a targeted change (rewrite the line, cut words, enlarge the type, cut a frame, swap the reaction) before queueing. Then check spelling, margins, order, legibility, claims, character identity and logo integrity. Save each final ImageGen prompt and its input roles beside the draft. Copy selected built-in outputs from their returned save paths into `tmp/swipe-lab/<slug>/` and record the final artifact paths; don't leave deliverables only in the tool's default output directory. Generated media stays in workspace `tmp/` until publication; finished social media and reviewed metadata go to the Google Drive social archive through the social CLI, with publishing media uploaded directly to Zernio, never tracked `public/`. Website and character source assets remain on S3.
 
 ## 7. Ingest, queue and verify
 

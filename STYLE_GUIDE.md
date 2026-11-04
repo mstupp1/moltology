@@ -250,7 +250,8 @@ zooming out.
   line before one save ask. Measure saves with our audience before adopting a default.
 - HUD numbers are welcome when real or clearly in-world. Caption and CTA per §4.3.
 - Carousels default to full-frame 3:4; single posts may use 3:4, 4:5 or square. Preserve
-  the approved frame and mobile readability.
+  the approved frame and mobile readability. Series, cast, type sizes and the phone proof
+  follow [creative direction](content/creative-direction.md).
 - Change one planned variable against a named comparable control. Fix the mascot and
   other settings during comparisons. Follow [the Instagram content strategy](content/social/instagram-content-strategy.md)
   for post/carousel metrics and experiment records; video timing rules stay in §4.7.

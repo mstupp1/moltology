@@ -77,6 +77,7 @@
     "merch": "tsx scripts/merch.ts",
     "social:archive": "tsx scripts/migrate-social-archive.ts",
     "post:create": "tsx scripts/create-instagram-post.ts",
+    "social:continuity": "tsx scripts/social-continuity.ts",
     "carousel:create": "tsx scripts/create-instagram-carousel.ts",
     "guide:pdf": "tsx scripts/generate-guide-pdf.ts",
     "tts:voices": "tsx scripts/list-fish-voices.ts",
