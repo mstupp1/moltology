@@ -325,7 +325,7 @@ describe('lobster-avatar', () => {
   })
 
   it('renders deterministic SVG with the backdrop, ground shadow, and idle layers', () => {
-    const config = { style: 'critters' as const, seed: 'lobster-alpha' }
+    const config = { style: 'critters' as const, seed: 'lobster-alpha', height: 'regular' as const }
     const svg = generateLobsterAvatarSvg(config)
     expect(svg).toBe(generateLobsterAvatarSvg(config))
     expect(svg).toContain(`viewBox="${LOBSTER_FULL_BODY_VIEWBOX}"`)
@@ -357,6 +357,13 @@ describe('lobster-avatar', () => {
     for (let i = 0; i < 20; i++) {
       expect(['coral', 'crimson', 'tangerine']).toContain(resolveAvatarTraits({ style: 'critters', seed: `legacy-${i}` }).shellColor)
     }
+  })
+
+  it('gives tall characters extra headroom in the full-body frame', () => {
+    const regular = generateLobsterAvatarSvg({ style: 'critters', seed: 'tall', race: 'crab', height: 'regular' })!
+    const towering = generateLobsterAvatarSvg({ style: 'critters', seed: 'tall', race: 'crab', height: 'towering' })!
+    const top = (svg: string) => Number(attr(svg, 'viewBox')!.split(' ')[1])
+    expect(top(towering)).toBeLessThan(top(regular))
   })
 
   it('renders both races in both frames with a race-specific portrait crop', () => {

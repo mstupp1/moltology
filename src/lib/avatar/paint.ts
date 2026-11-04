@@ -19,7 +19,8 @@ export interface PaintContext {
 
 export type PieceSide = 'left' | 'right' | 'center'
 
-export const OUTLINE_WIDTH = 2.3
+/** Inner line weight. The outer silhouette gets its own heavier ink line (see `ink`). */
+export const OUTLINE_WIDTH = 1.5
 
 export const ids = (ctx: PaintContext) => ({
   shell: `${ctx.uid}-shell`,
@@ -34,6 +35,10 @@ export const ids = (ctx: PaintContext) => ({
   glow: `${ctx.uid}-glow`,
   softShadow: `${ctx.uid}-soft-shadow`,
   blush: `${ctx.uid}-blush`,
+  form: `${ctx.uid}-form`,
+  cast: `${ctx.uid}-cast`,
+  ink: `${ctx.uid}-ink`,
+  gearForm: `${ctx.uid}-gear-form`,
 })
 
 function shellGradient(id: string, p: ShellPalette, finish: ShellFinish): string {
@@ -118,13 +123,62 @@ function markingPattern(ctx: PaintContext): string {
   }
 }
 
+/**
+ * Lighting that scales with each part. `form` shades the edge turning away from the key
+ * light and lifts the edge facing it, sized from the part's own box so a claw and a head
+ * get the same roundness at any render size. `cast` drops a soft shadow onto whatever sits
+ * behind a layer. `ink` draws one heavier line around the whole silhouette.
+ */
+function formDefs(ctx: PaintContext): string {
+  const i = ids(ctx)
+  const p = ctx.palette
+  const shade = ctx.finish === 'chrome' ? 0.5 : ctx.finish === 'glow' ? 0.36 : 0.62
+  const lift = ctx.finish === 'satin' ? 0.18 : 0.3
+  return `<filter id="${i.form}" x="-0.04" y="-0.04" width="1.08" height="1.08" primitiveUnits="objectBoundingBox" color-interpolation-filters="sRGB">
+      <feComponentTransfer in="SourceAlpha" result="out"><feFuncA type="table" tableValues="1 0"/></feComponentTransfer>
+      <feGaussianBlur in="out" stdDeviation="0.09" result="edge"/>
+      <feOffset in="edge" dx="-0.08" dy="-0.11" result="far"/>
+      <feFlood flood-color="${p.deep}" flood-opacity="${shade}"/>
+      <feComposite in2="far" operator="in"/>
+      <feComposite in2="SourceAlpha" operator="in" result="shade"/>
+      <feOffset in="edge" dx="0.05" dy="0.06" result="near"/>
+      <feFlood flood-color="${p.highlight}" flood-opacity="${lift}"/>
+      <feComposite in2="near" operator="in"/>
+      <feComposite in2="SourceAlpha" operator="in" result="lift"/>
+      <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="shade"/><feMergeNode in="lift"/></feMerge>
+    </filter>
+    <filter id="${i.gearForm}" x="-0.04" y="-0.04" width="1.08" height="1.08" primitiveUnits="objectBoundingBox" color-interpolation-filters="sRGB">
+      <feComponentTransfer in="SourceAlpha" result="out"><feFuncA type="table" tableValues="1 0"/></feComponentTransfer>
+      <feGaussianBlur in="out" stdDeviation="0.07" result="edge"/>
+      <feOffset in="edge" dx="-0.07" dy="-0.09" result="far"/>
+      <feFlood flood-color="#03080c" flood-opacity="0.5"/>
+      <feComposite in2="far" operator="in"/>
+      <feComposite in2="SourceAlpha" operator="in" result="shade"/>
+      <feOffset in="edge" dx="0.05" dy="0.06" result="near"/>
+      <feFlood flood-color="#ffffff" flood-opacity="0.26"/>
+      <feComposite in2="near" operator="in"/>
+      <feComposite in2="SourceAlpha" operator="in" result="lift"/>
+      <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="shade"/><feMergeNode in="lift"/></feMerge>
+    </filter>
+    <filter id="${i.cast}" x="-20%" y="-20%" width="140%" height="150%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0.8" dy="2.8" stdDeviation="2" flood-color="${p.deep}" flood-opacity="0.5"/>
+    </filter>
+    <filter id="${i.ink}" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+      <feComponentTransfer in="SourceAlpha" result="solid"><feFuncA type="discrete" tableValues="0 0 0 1 1 1 1 1"/></feComponentTransfer>
+      <feMorphology in="solid" operator="dilate" radius="1.35" result="grown"/>
+      <feFlood flood-color="${p.deep}"/>
+      <feComposite in2="grown" operator="in" result="line"/>
+      <feMerge><feMergeNode in="line"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>`
+}
+
 /** All shared paint defs for one avatar. */
 export function paintDefs(ctx: PaintContext): string {
   const i = ids(ctx)
   const p = ctx.palette
   const specOpacity = { glossy: 0.85, satin: 0.38, pearl: 0.7, chrome: 0.95, glow: 0.5 }[ctx.finish]
   const aoOpacity = ctx.finish === 'satin' ? 0.42 : 0.55
-  const rimOpacity = ctx.finish === 'glow' ? 1 : 0.85
+  const rimOpacity = ctx.finish === 'glow' ? 0.9 : 0.45
   const partner = ctx.partner
   return `
     ${shellGradient(i.shell, p, ctx.finish)}
@@ -143,7 +197,7 @@ export function paintDefs(ctx: PaintContext): string {
       <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="${i.rim}" x1="0" y1="0.2" x2="1" y2="0.8">
-      <stop offset="0.55" stop-color="${ctx.rim}" stop-opacity="0"/>
+      <stop offset="0.68" stop-color="${ctx.rim}" stop-opacity="0"/>
       <stop offset="1" stop-color="${ctx.rim}" stop-opacity="${rimOpacity}"/>
     </linearGradient>
     ${ctx.finish === 'pearl' ? `<linearGradient id="${i.pearl}" x1="0" y1="0" x2="1" y2="1">
@@ -164,6 +218,7 @@ export function paintDefs(ctx: PaintContext): string {
       <stop offset="0" stop-color="#01050a" stop-opacity="0.65"/>
       <stop offset="1" stop-color="#01050a" stop-opacity="0"/>
     </radialGradient>
+    ${formDefs(ctx)}
     <radialGradient id="${i.blush}" cx="0.5" cy="0.5" r="0.5">
       <stop offset="0" stop-color="${p.blush}" stop-opacity="0.55"/>
       <stop offset="1" stop-color="${p.blush}" stop-opacity="0"/>
@@ -177,6 +232,8 @@ export interface PieceOptions {
   plain?: boolean
   /** Skip the rim light stroke. */
   noRim?: boolean
+  /** Skip the edge lighting filter (tiny parts). */
+  flat?: boolean
   attrs?: string
 }
 
@@ -190,12 +247,22 @@ export function outlineColor(ctx: PaintContext, side: PieceSide = 'center'): str
   return ctx.marking === 'split' && ctx.partner && side === 'right' ? ctx.partner.deep : ctx.palette.deep
 }
 
+/** Inner line between shell parts: a shade, not the near-black silhouette ink. */
+export function innerLineColor(ctx: PaintContext, side: PieceSide = 'center'): string {
+  return ctx.marking === 'split' && ctx.partner && side === 'right' ? ctx.partner.shade : ctx.palette.shade
+}
+
+/** Wrap a whole character in its silhouette ink line. */
+export function inked(ctx: PaintContext, inner: string): string {
+  return `<g filter="url(#${ids(ctx).ink})">${inner}</g>`
+}
+
 /** Paint one closed shell part with outline, marking, shading, sheen, and rim light. */
 export function piece(d: string, ctx: PaintContext, opts: PieceOptions = {}): string {
   const i = ids(ctx)
   const side = opts.side ?? 'center'
   const fill = opts.belly ? `url(#${i.belly})` : shellFill(ctx, side)
-  const outline = opts.belly ? ctx.palette.bellyShade : outlineColor(ctx, side)
+  const outline = opts.belly ? ctx.palette.bellyShade : innerLineColor(ctx, side)
   const layers: string[] = []
   layers.push(`<path d="${d}" fill="${fill}" stroke="${outline}" stroke-width="${opts.belly ? 1 : OUTLINE_WIDTH}" stroke-linejoin="round"/>`)
   if (!opts.belly && !opts.plain) {
@@ -215,7 +282,8 @@ export function piece(d: string, ctx: PaintContext, opts: PieceOptions = {}): st
     const glowAttr = ctx.finish === 'glow' ? ` filter="url(#${i.glow})"` : ''
     layers.push(`<path d="${d}" fill="none" stroke="url(#${i.rim})" stroke-width="2.2" stroke-linejoin="round"${glowAttr}/>`)
   }
-  return `<g${opts.attrs ? ` ${opts.attrs}` : ''}>${layers.join('')}</g>`
+  const form = opts.plain || opts.flat ? '' : ` filter="url(#${i.form})"`
+  return `<g${opts.attrs ? ` ${opts.attrs}` : ''}${form}>${layers.join('')}</g>`
 }
 
 /** A crisp specular streak for big glossy parts. */

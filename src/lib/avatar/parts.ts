@@ -397,7 +397,8 @@ export function renderAccessory(
         </g>`
       break
     case 'visor': {
-      const y = anchor.eyeY - top
+      // Worn pushed up on the brow so the eyes stay visible.
+      const y = anchor.eyeY - top - 19
       body = `<defs><linearGradient id="${uid}-visor" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${ctx.rim}" stop-opacity="0.75"/><stop offset="1" stop-color="#0a1c2e" stop-opacity="0.8"/></linearGradient></defs>
         <g transform="${at(0, y)}">
           <path d="M-32,-7 C-32,-12 32,-12 32,-7 L30,7 C29,11 -29,11 -30,7 Z" fill="url(#${uid}-visor)" stroke="#0b1520" stroke-width="2.2" stroke-linejoin="round"/>

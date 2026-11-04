@@ -1,7 +1,7 @@
 /** Worn geometry and inventory art share this registry. Never use inventory photographs as overlays. */
 import type { EquipmentCategory } from '../../db/schema'
 import { renderAccessory } from './parts'
-import { paintDefs, type PaintContext } from './paint'
+import { ids, paintDefs, type PaintContext } from './paint'
 import { SHELL_PALETTES, type AvatarAccessory } from './traits'
 
 export interface EquipmentVisual {
@@ -26,26 +26,26 @@ const rows: Array<
     AvatarAccessory?,
   ]
 > = [
-  ['larval-plate-vest', 'carapace', '#54706a', '#a9bbb0', '#c5d3ba', 0, 'plate'],
+  ['larval-plate-vest', 'carapace', '#2f6f73', '#c9b37a', '#8ff0e0', 0, 'plate'],
   ['tide-braced-carapace', 'carapace', '#345765', '#93b5b8', '#8bd7d2', 1, 'rib'],
   ['abyssal-ward-shell', 'carapace', '#34394f', '#a99bc9', '#c7a4ff', 3, 'plate'],
   ['hydrostatic-seal-plate', 'carapace', '#162c38', '#c99f54', '#85f0e0', 4, 'vent'],
-  ['training-pincers', 'claws', '#62726a', '#bdc9b0', '#dae6ca', 0, 'plate'],
+  ['training-pincers', 'claws', '#356f6c', '#c9b37a', '#8ff0e0', 0, 'plate'],
   ['hydraulic-crush-claws', 'claws', '#3d5961', '#a9bfc5', '#61dddf', 2, 'crusher'],
   ['synapse-shear-claws', 'claws', '#25354a', '#e3b765', '#87f5f3', 4, 'slim'],
   ['silt-maul', 'claws', '#66594d', '#b3a68a', '#dfc998', 1, 'hammer'],
   ['tideforge-hammer', 'claws', '#314958', '#a2c2c7', '#86e2ed', 2, 'hammer'],
-  ['soft-shell-visor', 'head', '#547e86', '#b4d4c8', '#91edf2', 0, 'plate', 'visor'],
+  ['soft-shell-visor', 'head', '#2b5f6b', '#c9b37a', '#8ff0e0', 0, 'plate', 'visor'],
   ['architect-crown-plate', 'head', '#3f5e68', '#c1b08b', '#9ce1e5', 2, 'crown'],
   ['oracle-dome-lattice', 'head', '#243448', '#d3b46b', '#b8a9ff', 4, 'crown'],
-  ['silt-walker-greaves', 'legs', '#5d716b', '#b4c4ae', '#d6dfc1', 0, 'plate'],
+  ['silt-walker-greaves', 'legs', '#2f6a66', '#c9b37a', '#8ff0e0', 0, 'plate'],
   ['current-cutter-legs', 'legs', '#355b64', '#9fc5bf', '#8ce0d4', 1, 'vent'],
   ['void-stride-articulation', 'legs', '#302d48', '#a8a1cd', '#c5aeff', 3, 'rib'],
-  ['larval-feelers', 'antennae', '#6b7b6c', '#bdc7ab', '#d4e4c0', 0, 'sensor'],
+  ['larval-feelers', 'antennae', '#3b706a', '#c9b37a', '#a5f2df', 0, 'sensor'],
   ['depth-sense-antennae', 'antennae', '#3e625f', '#a2bda3', '#a1e8d7', 1, 'sensor'],
   ['benthic-radar-array', 'antennae', '#344f62', '#9db9ce', '#85d9ff', 2, 'sensor'],
   ['ascendant-signal-crown', 'antennae', '#433b4f', '#c2a9cf', '#edb7ff', 3, 'crown'],
-  ['larval-chitin-cincture', 'belt', '#6c6253', '#bcba93', '#dfd7b1', 0, 'plate'],
+  ['larval-chitin-cincture', 'belt', '#7a5a3a', '#c9b37a', '#e9d9a6', 0, 'plate'],
   ['silt-tension-vent-sash', 'belt', '#485b5a', '#a1b7a2', '#b3dbcf', 1, 'vent'],
   ['abyssal-clasp-girdle', 'belt', '#2b4657', '#a3b8c3', '#93e0ef', 2, 'rib'],
   ['hydrostatic-girdle-lattice', 'belt', '#343c53', '#b3a7cc', '#b5c0ff', 3, 'rib'],
@@ -68,6 +68,15 @@ export const EQUIPMENT_VISUALS: Readonly<Record<string, EquipmentVisual>> = Obje
 )
 export const getEquipmentVisual = (key: string) => EQUIPMENT_VISUALS[key]
 
+/** Mix a hex colour toward black (f < 0) or white (f > 0). */
+export function tone(hex: string, f: number): string {
+  const n = parseInt(hex.slice(1), 16)
+  const ch = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((c) =>
+    Math.round(f < 0 ? c * (1 + f) : c + (255 - c) * f),
+  )
+  return `#${ch.map((c) => c.toString(16).padStart(2, '0')).join('')}`
+}
+
 export interface EquipmentFit {
   race?: 'lobster' | 'crab'
   torsoW?: number
@@ -87,8 +96,9 @@ export function renderEquipment(
   if (!v) return ''
   const uid = `${ctx.uid}-eq-${v.key}`,
     n = v.construction
+  const line = tone(v.material, -0.62)
   const plate = (d: string, fill = `url(#${uid})`) =>
-    `<path d="${d}" fill="${fill}" stroke="#14252b" stroke-width="1.1" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${ctx.rim}" stroke-width="0.65" opacity=".48" transform="translate(0 -.5)"/>`
+    `<path d="${d}" fill="${fill}" stroke="${line}" stroke-width="1.1" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${tone(v.trim, 0.45)}" stroke-width="0.65" opacity=".55" transform="translate(0 -.5)"/>`
   const bolts = (xs: number[], y: number) =>
     xs
       .map(
@@ -237,7 +247,7 @@ export function renderEquipment(
     body += `<g fill="${v.accent}">${[0, 1, 2].map((i) => `<circle cx="${(i - 1) * 4}" cy="${v.category === 'claws' ? -8 : 3}" r=".8"/>`).join('')}</g>`
   if (n === 4)
     body += `<g class="equipment-signature" fill="none" stroke="${v.accent}" stroke-width=".65" opacity=".7">${v.category === 'claws' ? '<path d="M-14,-20 l3,-8 M10,-25 l3,-8"/>' : '<path d="M-12,10 L0,16 L12,10 M-9,14 L0,20 L9,14"/>'}</g>`
-  return `<g data-equipment="${v.key}" data-construction="${n}"><defs><linearGradient id="${uid}" x1="0" y1="0" x2=".85" y2="1"><stop stop-color="${v.trim}"/><stop offset=".2" stop-color="${v.material}"/><stop offset=".32" stop-color="${v.trim}" stop-opacity=".65"/><stop offset=".65" stop-color="${v.material}"/><stop offset="1" stop-color="#101f29"/></linearGradient></defs>${body}</g>`
+  return `<g data-equipment="${v.key}" data-construction="${n}"><defs><linearGradient id="${uid}" x1="0" y1="0" x2=".85" y2="1"><stop stop-color="${v.trim}"/><stop offset=".2" stop-color="${v.material}"/><stop offset=".32" stop-color="${v.trim}" stop-opacity=".65"/><stop offset=".65" stop-color="${v.material}"/><stop offset="1" stop-color="${tone(v.material, -0.5)}"/></linearGradient></defs><g filter="url(#${ids(ctx).gearForm})">${body}</g></g>`
 }
 
 export function equipmentThumbnail(key: string): string | null {

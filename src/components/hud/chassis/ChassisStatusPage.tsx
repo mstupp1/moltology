@@ -20,6 +20,8 @@ import {
   EQUIP_SLOT_IDS,
   equipSlotCategory,
   CATEGORY_LABELS,
+  RARITY_STYLES,
+  type CatalogRef,
   getCachedChassisLoadout,
   setCachedChassisLoadout,
   type ChassisLoadoutPayload,
@@ -29,10 +31,21 @@ import {
 import { equipmentAppearance } from '@/lib/character-appearance'
 import { AvatarCreatorPanel } from '../avatar/AvatarCreatorPanel'
 import { AvatarCreatorPreview } from '../avatar/AvatarCreatorPreview'
-import { GearItemCard } from './GearItemCard'
+import { equipmentThumbnail } from '@/lib/avatar/equipment'
 import { GearDetail } from './GearDetail'
+import '../avatar-animations.css'
 
-const TABS = ['body', 'face', 'equipment', 'scene'] as const
+const TABS = ['equipment', 'body', 'shell', 'face', 'scene'] as const
+const TAB_LABELS: Record<(typeof TABS)[number], string> = {
+  equipment: 'Gear',
+  body: 'Body',
+  shell: 'Shell',
+  face: 'Face',
+  scene: 'Scene',
+}
+/** Slots shown down each side of the character on wide screens. */
+const LEFT_SLOTS: EquipSlotId[] = ['head', 'antennae', 'carapace', 'belt']
+const RIGHT_SLOTS: EquipSlotId[] = ['claws-1', 'claws-2', 'legs']
 export const SLOT_NAMES: Record<EquipSlotId, string> = {
   head: 'Head',
   carapace: 'Carapace',
@@ -226,6 +239,22 @@ export const ChassisStatusPage: React.FC = () => {
       <HudWorkspaceGhost />
     )
   const wearing = items.find((i) => i.equippedSlot === slot)
+  const slotProps: SlotSharedProps = {
+    active: slot,
+    disabled: saving,
+    itemFor: (id) => {
+      const worn = items.find((i) => i.equippedSlot === id)
+      return worn ? catalogById.get(worn.catalogItemId) ?? null : null
+    },
+    onPick: (id) => {
+      setSlot(id)
+      setTab('equipment')
+      setSelected(null)
+      setTryOn(null)
+    },
+  }
+  // A new key replays the small settle animation whenever the look changes.
+  const popKey = JSON.stringify(preview).length + ':' + JSON.stringify(preview.equipment ?? {})
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans relative" data-testid="character-workspace">
       <HudTitlePanel
@@ -256,9 +285,25 @@ export const ChassisStatusPage: React.FC = () => {
           </button>
         </div>
       )}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,1fr)] gap-4 lg:gap-6 items-start">
-        <div className="lg:sticky lg:top-4 space-y-3">
-          <AvatarCreatorPreview config={preview} className="max-w-[640px] mx-auto" />
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.35fr)_minmax(340px,1fr)] gap-4 lg:gap-6 items-start">
+        <div className="lg:sticky lg:top-24 space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-[84px_minmax(0,1fr)_84px] gap-2 items-center">
+            <SlotColumn
+              ids={LEFT_SLOTS}
+              className="hidden lg:flex"
+              {...slotProps}
+            />
+            <div className="relative">
+              <div key={popKey} className="avatar-creator-pop">
+                <AvatarCreatorPreview config={preview} className="max-w-[260px] sm:max-w-[560px] mx-auto" />
+              </div>
+            </div>
+            <SlotColumn
+              ids={RIGHT_SLOTS}
+              className="hidden lg:flex"
+              {...slotProps}
+            />
+          </div>
           {tryOn && (
             <div
               role="status"
@@ -270,35 +315,17 @@ export const ChassisStatusPage: React.FC = () => {
               </button>
             </div>
           )}
-          <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5" aria-label="Equipment slots">
+          <div
+            className="flex lg:hidden gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 snap-x"
+            aria-label="Equipment slots"
+          >
             {EQUIP_SLOT_IDS.map((id) => (
-              <button
-                type="button"
-                key={id}
-                disabled={saving}
-                aria-label={`${SLOT_NAMES[id]} slot`}
-                aria-pressed={slot === id}
-                onClick={() => {
-                  setSlot(id)
-                  setTab('equipment')
-                  setSelected(null)
-                  setTryOn(null)
-                }}
-                className={`rounded-control border px-1.5 py-2 text-[11px] min-h-12 ${slot === id ? 'border-cyan-glow bg-cyan-soft text-ink' : 'border-line text-ink-muted bg-surface-1'}`}
-              >
-                <span className="block font-semibold">{SLOT_NAMES[id]}</span>
-                <span className="block truncate mt-1 opacity-70">
-                  {equipped[id]
-                    ? catalogById.get(items.find((i) => i.equippedSlot === id)?.catalogItemId ?? '')
-                        ?.name
-                    : 'Empty'}
-                </span>
-              </button>
+              <SlotButton key={id} id={id} className="w-[76px] shrink-0 snap-start" {...slotProps} />
             ))}
           </div>
         </div>
-        <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-4">
-          <div role="tablist" aria-label="Character editor" className="flex border-b border-line">
+        <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-4 min-w-0">
+          <div role="tablist" aria-label="Character editor" className="flex gap-0.5 rounded-card border border-line-subtle bg-surface-1 p-0.5">
             {TABS.map((id) => (
               <button
                 key={id}
@@ -310,9 +337,13 @@ export const ChassisStatusPage: React.FC = () => {
                   setTab(id)
                   setTryOn(null)
                 }}
-                className={`flex-1 py-3 text-sm capitalize border-b-2 ${tab === id ? 'border-cyan-glow text-ink' : 'border-transparent text-ink-muted'}`}
+                className={`flex-1 min-h-9 rounded-control text-[11px] font-sans font-semibold tracking-[0.08em] uppercase transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                  tab === id
+                    ? 'bg-surface-3 shadow-nav-current text-ink'
+                    : 'text-ink-muted hover:text-ink hover:bg-surface-2'
+                }`}
               >
-                {id}
+                {TAB_LABELS[id]}
               </button>
             ))}
           </div>
@@ -355,20 +386,18 @@ export const ChassisStatusPage: React.FC = () => {
                   />
                   Owned items only
                 </label>
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-2">
                   {matching.map((c) => {
                     const owned = items.filter((i) => i.catalogItemId === c.id).length
                     return (
-                      <div key={c.id} className="space-y-1">
-                        <GearItemCard
-                          catalog={c}
-                          selected={selected === c.id}
-                          onClick={() => setSelected(c.id)}
-                        />
-                        <p className="text-[11px] text-ink-muted text-center">
-                          {owned ? `Owned${owned > 1 ? ` ×${owned}` : ''}` : 'Preview only'}
-                        </p>
-                      </div>
+                      <GearPick
+                        key={c.id}
+                        catalog={c}
+                        owned={owned}
+                        worn={wearing?.catalogItemId === c.id}
+                        selected={selected === c.id}
+                        onClick={() => setSelected(c.id)}
+                      />
                     )
                   })}
                 </div>
@@ -403,5 +432,93 @@ export const ChassisStatusPage: React.FC = () => {
         </div>
       </div>
     </div>
+  )
+}
+
+interface SlotSharedProps {
+  active: EquipSlotId
+  disabled?: boolean
+  itemFor: (id: EquipSlotId) => CatalogRef | null
+  onPick: (id: EquipSlotId) => void
+}
+
+function SlotButton({ id, className = '', active, disabled, itemFor, onPick }: SlotSharedProps & { id: EquipSlotId; className?: string }) {
+  const item = itemFor(id)
+  const thumb = item ? equipmentThumbnail(item.appearanceKey || item.slug) : null
+  const selected = active === id
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      aria-label={`${SLOT_NAMES[id]} slot`}
+      aria-pressed={selected}
+      onClick={() => onPick(id)}
+      className={`flex flex-col items-center gap-1 rounded-control border p-1.5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+        selected ? 'border-cyan-glow bg-cyan-soft' : 'border-line-subtle bg-surface-1 hover:border-line-hover'
+      } ${className}`}
+    >
+      <span className="grid place-items-center w-11 h-11 rounded-chip bg-abyss/70">
+        {thumb ? (
+          <img src={thumb} alt="" className="w-9 h-9 object-contain" />
+        ) : (
+          <span className="w-5 h-5 rounded-full border border-dashed border-line" aria-hidden="true" />
+        )}
+      </span>
+      <span className={`text-[10.5px] leading-tight text-center ${selected ? 'text-ink font-semibold' : 'text-ink-muted'}`}>
+        {SLOT_NAMES[id]}
+      </span>
+    </button>
+  )
+}
+
+function SlotColumn({ ids, className = '', ...shared }: SlotSharedProps & { ids: EquipSlotId[]; className?: string }) {
+  return (
+    <div className={`flex-col gap-2 ${className}`} aria-label="Equipment slots">
+      {ids.map((id) => (
+        <SlotButton key={id} id={id} {...shared} />
+      ))}
+    </div>
+  )
+}
+
+
+/** Calm item card: the item on a quiet tile, its name, and a small rarity mark. */
+function GearPick({
+  catalog,
+  owned,
+  worn,
+  selected,
+  onClick,
+}: {
+  catalog: CatalogRef
+  owned: number
+  worn: boolean
+  selected: boolean
+  onClick: () => void
+}) {
+  const thumb = equipmentThumbnail(catalog.appearanceKey || catalog.slug)
+  const rarity = RARITY_STYLES[catalog.rarity]
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      aria-label={`${catalog.name}, ${CATEGORY_LABELS[catalog.category]}`}
+      className={`relative flex flex-col gap-1.5 rounded-control border p-1.5 text-left transition-[border-color,background-color,transform] duration-150 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow motion-reduce:transition-none ${
+        selected ? 'border-cyan-glow bg-cyan-soft' : 'border-line-subtle bg-surface-2 hover:border-line-hover'
+      }`}
+    >
+      <span className="grid place-items-center w-full aspect-square rounded-chip bg-abyss/70">
+        {thumb ? <img src={thumb} alt="" className="w-3/4 h-3/4 object-contain" /> : null}
+      </span>
+      <span className="text-[12px] leading-tight text-ink font-semibold line-clamp-2 min-h-[2lh]">{catalog.name}</span>
+      <span className={`inline-flex items-center gap-1 capitalize text-[11px] ${rarity.text}`}>
+        <span className="w-1.5 h-1.5 rounded-full bg-current" aria-hidden="true" />
+        {catalog.rarity}
+      </span>
+      <span className={`text-[11px] ${worn ? 'text-cyan-glow' : 'text-ink-muted'}`}>
+        {worn ? 'Worn' : owned ? (owned > 1 ? `Owned ×${owned}` : 'Owned') : 'Preview only'}
+      </span>
+    </button>
   )
 }
