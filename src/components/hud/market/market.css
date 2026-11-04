@@ -1,0 +1,27 @@
+/* Epic: a faint inner edge so the frame reads as plated. */
+.market-frame-epic {
+  box-shadow: inset 0 0 0 1px rgb(167 139 250 / 0.22);
+}
+
+/* Legendary: a slow foil sweep across the frame. Off for reduced motion. */
+.market-frame-legendary {
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgb(252 211 77 / 0.25);
+}
+.market-frame-legendary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 35%, rgb(255 240 184 / 0.16) 50%, transparent 65%);
+  background-size: 250% 100%;
+  animation: market-foil 5s ease-in-out infinite;
+}
+@keyframes market-foil {
+  0%, 20% { background-position: 120% 0; }
+  80%, 100% { background-position: -20% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .market-frame-legendary::after { animation: none; background: none; }
+}

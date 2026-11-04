@@ -4,6 +4,7 @@ import {
   INITIAL_EQUIPMENT_CATALOG,
   CREATOR_EQUIPMENT_CATALOG,
   STARTER_EQUIPMENT_CATALOG_IDS,
+  VARIANT_EQUIPMENT_CATALOG,
 } from './equipment-seed-data'
 import {
   CHASSIS_VISUAL_TYPES,
@@ -56,7 +57,7 @@ describe('equipment catalog seed', () => {
   })
 })
 
-it('seeds original equipment and converted creator items', () => {
-  expect(ALL_EQUIPMENT_CATALOG).toEqual([...INITIAL_EQUIPMENT_CATALOG,...CREATOR_EQUIPMENT_CATALOG])
+it('seeds original equipment, converted creator items, then their rarer variants', () => {
+  expect(ALL_EQUIPMENT_CATALOG).toEqual([...INITIAL_EQUIPMENT_CATALOG,...CREATOR_EQUIPMENT_CATALOG,...VARIANT_EQUIPMENT_CATALOG])
   expect(ALL_EQUIPMENT_CATALOG.every((item) => !item.kind || item.kind === 'gear')).toBe(true)
 })

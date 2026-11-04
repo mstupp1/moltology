@@ -1,4 +1,4 @@
-import { pgTable, pgSchema, text, integer, bigint, timestamp, boolean, uuid, decimal, jsonb, pgPolicy, uniqueIndex, index, foreignKey, type AnyPgColumn } from 'drizzle-orm/pg-core'
+import { pgTable, pgSchema, text, integer, bigint, timestamp, boolean, uuid, decimal, jsonb, pgPolicy, uniqueIndex, index, foreignKey, primaryKey, type AnyPgColumn } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 import type {
   AcademyCertificateScope,
@@ -954,6 +954,24 @@ export const userGearItems = pgTable('user_gear_items', {
   uniqueIndex('user_gear_vault_index_uidx')
     .on(table.userId, table.vaultIndex)
     .where(sql`"vaultIndex" IS NOT NULL`),
+])
+
+export type GearUnlockSource = 'purchase' | 'grant' | 'legacy'
+
+// Pieces a member owns for good. Owning a piece lets them wear it in any slot that fits;
+// user_gear_items rows only exist while a piece is placed.
+export const gearUnlocks = pgTable('gear_unlocks', {
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  catalogItemId: uuid('catalogItemId').notNull().references(() => equipmentCatalog.id, { onDelete: 'cascade' }),
+  source: text('source').$type<GearUnlockSource>().notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+}, (table) => [
+  primaryKey({ columns: [table.userId, table.catalogItemId] }),
+  pgPolicy('gear_unlocks_server_only', {
+    for: 'all',
+    using: sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`,
+    withCheck: sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`,
+  }),
 ])
 
 /** Friend request lifecycle statuses. */

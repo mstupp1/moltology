@@ -6,6 +6,7 @@ import type {
   EquipmentRarity,
   EquipmentUniquePower,
 } from '../db/schema'
+import { higherTiers, tierAbility, variantId, variantKey, variantStats } from './gear-variants'
 
 export interface EquipmentCatalogSeed {
   id: string
@@ -363,7 +364,7 @@ export const INITIAL_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
     },
     sortOrder: 24,
   }),
-]
+].map((item) => ({ ...item, uniquePower: item.uniquePower ?? tierAbility(item.category, item.rarity) }))
 
 export const CREATOR_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
   ['hard-hat', 'Hard hat', 'head', 'helm'],
@@ -391,7 +392,24 @@ export const CREATOR_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
   sortOrder: 25 + i,
   kind: 'gear',
 }))
-export const ALL_EQUIPMENT_CATALOG = [...INITIAL_EQUIPMENT_CATALOG, ...CREATOR_EQUIPMENT_CATALOG]
+/** Every base piece, in catalog order. Variants are built from this list. */
+export const BASE_EQUIPMENT_CATALOG = [...INITIAL_EQUIPMENT_CATALOG, ...CREATOR_EQUIPMENT_CATALOG]
+
+/** Rarer versions of every base piece (see src/lib/gear-variants.ts). */
+export const VARIANT_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = BASE_EQUIPMENT_CATALOG.flatMap(
+  (base, baseIndex) =>
+    higherTiers(base.rarity).map((rarity, tierIndex) => ({
+      ...base,
+      ...variantStats(base, rarity),
+      id: variantId(baseIndex, rarity),
+      slug: variantKey(base.slug, rarity),
+      appearanceKey: variantKey(base.appearanceKey ?? base.slug, rarity),
+      rarity,
+      sortOrder: 1000 + base.sortOrder * 10 + tierIndex,
+    })),
+)
+
+export const ALL_EQUIPMENT_CATALOG = [...BASE_EQUIPMENT_CATALOG, ...VARIANT_EQUIPMENT_CATALOG]
 
 /** Two copies of every claw style; 19 instances total, all fitting in an empty vault. */
 export const STARTER_EQUIPMENT_CATALOG_IDS: string[] = [

@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import React, { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { Dices } from 'lucide-react'
 import { HudWorkspaceGhost } from '../HudGhostSkeletons'
@@ -31,6 +32,7 @@ import {
   type GearItemState,
 } from '@/lib/chassis-loadout'
 import { equipmentAppearance } from '@/lib/character-appearance'
+import { parseVariantKey } from '@/lib/gear-variants'
 import { AvatarCreatorPanel } from '../avatar/AvatarCreatorPanel'
 import { AvatarCreatorPreview } from '../avatar/AvatarCreatorPreview'
 import { GearDetail } from './GearDetail'
@@ -477,7 +479,12 @@ export const ChassisStatusPage: React.FC = () => {
                 </HudButton>
               </div>
               {unlocked ? (
-                <p className="text-xs text-ink-muted">Admin · every item is unlocked.</p>
+                <p className="text-xs text-ink-muted">
+                  {saved?.everyItem ? 'Admin · every item is unlocked. ' : 'Your collection. '}
+                  <Link to="/market" className="text-cyan-glow hover:text-ink">
+                    {saved?.everyItem ? 'Open the market' : 'Get more pieces in the market'}
+                  </Link>
+                </p>
               ) : (
                 <label className="flex gap-2 items-center text-xs text-ink-muted">
                   <input
@@ -635,7 +642,7 @@ function GearPick({
       type="button"
       onClick={onClick}
       aria-pressed={selected}
-      aria-label={`${catalog.name}, ${CATEGORY_LABELS[catalog.category]}`}
+      aria-label={`${catalog.name}${parseVariantKey(catalog.appearanceKey || catalog.slug).rarity ? ` (${catalog.rarity})` : ''}, ${CATEGORY_LABELS[catalog.category]}`}
       className={`relative flex flex-col gap-1.5 rounded-control border p-1.5 text-left transition-[border-color,background-color,transform] duration-150 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow motion-reduce:transition-none ${
         selected
           ? 'border-cyan-glow bg-cyan-soft'
@@ -660,7 +667,7 @@ function GearPick({
               ? `Owned ×${owned}`
               : 'Owned'
             : unlocked
-              ? 'Unlocked'
+              ? 'Owned'
               : 'Preview only'}
       </span>
     </button>

@@ -19,9 +19,9 @@ export const Route = createFileRoute('/_hud/market')({
   head: () => ({
     meta: [
       ...seo({
-        title: 'Ascension Market | Molt Credits & Chitin Gem Vault',
+        title: 'Market | Moltology',
         description:
-          'Buy Molt Credits, exchange shed material, and unlock prestige cosmetics with earned Chitin Gems in the Benthic Market.',
+          'Spend the Chitin Gems you earn on gear for your character, from common pieces to legendary versions.',
         canonical: 'https://moltology.org/market',
         siteName: 'Moltology Market',
         twitterSite: '@moltology',

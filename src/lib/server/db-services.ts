@@ -13,6 +13,7 @@ import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, notInArray, isNu
 import { union } from 'drizzle-orm/pg-core'
 import type { ChangelogEntry } from '../changelogs-data'
 import { tryCheckGemMilestones } from './gems'
+import { STARTER_EQUIPMENT_CATALOG_IDS } from '../equipment-seed-data'
 import { resolveWriteAuth } from './write-auth'
 import { ensureUserProfile } from '../user-sync'
 import {
@@ -3823,15 +3824,25 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<Chassis
     catalog: (typeof equipmentCatalog.$inferSelect)[]
     items: (typeof userGearItems.$inferSelect)[]
     profile: typeof profiles.$inferSelect
+    unlocks: string[]
   }>(sql`SELECT
     (SELECT COALESCE(jsonb_agg(c ORDER BY c."sortOrder"), '[]'::jsonb) FROM public.equipment_catalog c) AS catalog,
     (SELECT COALESCE(jsonb_agg(g ORDER BY g.id), '[]'::jsonb) FROM public.user_gear_items g WHERE g."userId"=${userId}) AS items,
-    (SELECT to_jsonb(p) FROM public.profiles p WHERE p.id=${userId}) AS profile`)
-  const { catalog: catalogRows, items: gearRows, profile } = result.rows[0]
+    (SELECT to_jsonb(p) FROM public.profiles p WHERE p.id=${userId}) AS profile,
+    (SELECT COALESCE(jsonb_agg(u."catalogItemId"), '[]'::jsonb) FROM public.gear_unlocks u WHERE u."userId"=${userId}) AS unlocks`)
+  const { catalog: catalogRows, items: gearRows, profile, unlocks } = result.rows[0]
+  const items = gearRows.map(toGearState)
+  const everyItem = isAdmin(null, profile?.role)
+  // Members wear what they own: the starter set, anything unlocked, and anything already placed.
+  const owned = new Set<string>([
+    ...STARTER_EQUIPMENT_CATALOG_IDS,
+    ...(unlocks ?? []),
+    ...items.map((i) => i.catalogItemId),
+  ])
   const catalog = catalogRows
     .filter((c) => c.kind !== 'cosmetic' && getEquipmentVisual(c.appearanceKey || c.slug))
+    .filter((c) => everyItem || owned.has(c.id))
     .map(toCatalogRef)
-  const items = gearRows.map(toGearState)
   return {
     catalog,
     items,
@@ -3839,12 +3850,13 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<Chassis
     vaultSize: VAULT_SIZE,
     config: profile ? withCharacterAppearance(profile).avatarConfig : null,
     appearanceRevision: profile?.appearanceRevision ?? 0,
-    ...(isAdmin(null, profile?.role) ? { allUnlocked: true } : {}),
+    allUnlocked: true,
+    ...(everyItem ? { everyItem: true } : {}),
   }
 }
 
 /**
- * Admins have all gear unlocked, so an admin's gear rows only exist while placed.
+ * Owned pieces live in the collection, so gear rows only exist while placed.
  * Unplaced gear rows (left behind by a save that failed after granting) are dropped.
  */
 async function dropUnplacedAdminGear(dbClient: Db, userId: string) {
@@ -3853,7 +3865,7 @@ async function dropUnplacedAdminGear(dbClient: Db, userId: string) {
       AND g."equippedSlot" IS NULL AND g."vaultIndex" IS NULL`)
 }
 
-/** Admin save step: create instances for newly equipped unlocked items and drop released ones. */
+/** Save step: create instances for newly equipped owned pieces and drop released ones. */
 async function applyAdminGearChanges(
   dbClient: Db,
   userId: string,
@@ -3911,9 +3923,9 @@ export interface SaveCharacterInput {
   expectedRevision: number
   config: LobsterAvatarConfig
   placements: CharacterPlacement[]
-  /** Admin only: new instances of unlocked items that the draft equips. */
+  /** New instances of owned pieces that the draft equips. */
   grants?: { id: string; catalogItemId: string }[]
-  /** Admin only: owned instances the draft let go of. */
+  /** Placed instances the draft let go of. */
   release?: string[]
 }
 export async function saveCharacterHandler({ data, context }: ServerFnArgs<SaveCharacterInput>) {

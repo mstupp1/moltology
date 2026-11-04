@@ -4,6 +4,7 @@ import { cubicAt, outlineHalfAt, type Pt } from './geometry'
 import { renderAccessory } from './parts'
 import { ids, paintDefs, type PaintContext } from './paint'
 import { SHELL_PALETTES, type AvatarAccessory } from './traits'
+import { TIER_FINISH, mixHex, parseVariantKey } from '../gear-variants'
 
 export interface EquipmentVisual {
   key: string
@@ -67,7 +68,30 @@ export const EQUIPMENT_VISUALS: Readonly<Record<string, EquipmentVisual>> = Obje
     { key, category, material, trim, accent, construction, motif, accessory },
   ]),
 )
-export const getEquipmentVisual = (key: string) => EQUIPMENT_VISUALS[key]
+const variantVisuals = new Map<string, EquipmentVisual | undefined>()
+
+/** Base pieces come from the table above; `<key>--<rarity>` variants are recoloured from their base. */
+export function getEquipmentVisual(key: string): EquipmentVisual | undefined {
+  const direct = EQUIPMENT_VISUALS[key]
+  if (direct) return direct
+  if (variantVisuals.has(key)) return variantVisuals.get(key)
+  const { baseKey, rarity } = parseVariantKey(key)
+  const base = rarity && rarity !== 'common' ? EQUIPMENT_VISUALS[baseKey] : undefined
+  const finish = rarity && rarity !== 'common' ? TIER_FINISH[rarity] : undefined
+  const visual =
+    base && finish
+      ? {
+          ...base,
+          key: key.replace(/[^a-z0-9-]/gi, '-'),
+          material: mixHex(base.material, finish.hue, finish.pull),
+          trim: finish.trim,
+          accent: finish.accent,
+          construction: Math.max(base.construction, finish.construction),
+        }
+      : undefined
+  variantVisuals.set(key, visual)
+  return visual
+}
 
 /** Mix a hex colour toward black (f < 0) or white (f > 0). */
 export function tone(hex: string, f: number): string {

@@ -5,7 +5,7 @@ import {
   STARTER_EQUIPPED_SLOTS,
 } from './equipment-seed-data'
 import { equipmentAppearance, validateCharacterPlacements } from './character-appearance'
-import { EQUIPMENT_VISUALS, equipmentThumbnail } from './avatar/equipment'
+import { getEquipmentVisual, equipmentThumbnail } from './avatar/equipment'
 import { generateLobsterAvatarSvg, parseLobsterAvatarConfig } from './lobster-avatar'
 import type { GearItemState } from './chassis-loadout'
 const catalog = ALL_EQUIPMENT_CATALOG
@@ -19,7 +19,7 @@ describe('equipped character contract', () => {
   it('registers compatible worn geometry and unique thumbnails for every catalog item', () => {
     const thumbnails = new Set<string>()
     for (const c of catalog) {
-      expect(EQUIPMENT_VISUALS[c.appearanceKey || c.slug]?.category).toBe(c.category)
+      expect(getEquipmentVisual(c.appearanceKey || c.slug)?.category).toBe(c.category)
       const thumb = equipmentThumbnail(c.appearanceKey || c.slug)!
       const svg = decodeURIComponent(thumb.split(',')[1])
       const doc = new DOMParser().parseFromString(svg, 'image/svg+xml')
