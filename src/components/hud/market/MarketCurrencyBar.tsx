@@ -23,21 +23,21 @@ export function MarketCurrencyBar({
   return (
     <div
       className={cn(
-        'flex flex-wrap items-stretch justify-end gap-2 sm:gap-2.5',
+        'grid w-full grid-cols-2 gap-2 sm:w-auto sm:gap-3',
         className
       )}
     >
-      <div className="flex items-center gap-2 min-w-[140px] px-3 py-2 rounded-card border border-line-subtle bg-surface-1/90 hud-sheen">
+      <div className="flex min-w-0 items-center gap-1.5 rounded-control bg-surface-2 px-2 py-2 sm:gap-2 sm:px-3">
         <img
           src={getAssetUrl('/images/molt_credit.png')}
           alt=""
-          className="w-7 h-7 object-contain shrink-0"
+          className="w-4 h-4 sm:w-6 sm:h-6 object-contain shrink-0"
         />
         <div className="flex flex-col leading-none min-w-0">
-          <span className="text-[11px] uppercase tracking-[0.08em] text-ink-muted font-bold">
+          <span className="whitespace-nowrap text-[11px] uppercase tracking-wide sm:tracking-[0.08em] text-ink-muted font-bold">
             Molt Credits
           </span>
-          <span className="font-grotesk text-base sm:text-lg font-extrabold text-cyan-glow tabular-nums">
+          <span className="font-grotesk text-base font-extrabold text-cyan-glow tabular-nums">
             {formatBalance(moltCredits)}
           </span>
         </div>
@@ -53,21 +53,21 @@ export function MarketCurrencyBar({
         ) : null}
       </div>
 
-      <div className="flex items-center gap-2 min-w-[140px] px-3 py-2 rounded-card border border-line-subtle bg-surface-1/90 hud-sheen">
+      <div className="flex min-w-0 items-center gap-1.5 rounded-control bg-surface-2 px-2 py-2 sm:gap-2 sm:px-3">
         <img
           src={getAssetUrl('/images/chitin_gem.png')}
           alt=""
-          className="w-7 h-7 object-contain shrink-0"
+          className="w-4 h-4 sm:w-6 sm:h-6 object-contain shrink-0"
         />
         <div className="flex flex-col leading-none min-w-0">
-          <span className="text-[11px] uppercase tracking-[0.08em] text-ink-muted font-bold">
+          <span className="whitespace-nowrap text-[11px] uppercase tracking-wide sm:tracking-[0.08em] text-ink-muted font-bold">
             Chitin Gems
           </span>
-          <span className="font-grotesk text-base sm:text-lg font-extrabold text-crimson-text tabular-nums">
+          <span className="font-grotesk text-base font-extrabold text-crimson-text tabular-nums">
             {formatBalance(chitinGems)}
           </span>
         </div>
-        <span className="ml-auto shrink-0 text-[11px] uppercase tracking-[0.08em] font-bold text-ink-muted px-1.5 py-0.5 border border-line-subtle rounded-chip">
+        <span className="ml-auto hidden shrink-0 text-[11px] uppercase tracking-[0.08em] font-bold text-ink-muted px-1.5 py-0.5 border border-line-subtle rounded-chip sm:inline">
           Earned
         </span>
       </div>

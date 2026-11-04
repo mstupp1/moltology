@@ -44,7 +44,7 @@ export function ReferralPanel() {
   }
 
   return (
-    <section aria-labelledby="referral-title" className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
+    <section aria-labelledby="referral-title" className="border-t border-line-subtle pt-4 space-y-3">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div className="space-y-1">
           <h2 id="referral-title" className="font-grotesk text-sm font-bold text-ink">Invite a friend</h2>

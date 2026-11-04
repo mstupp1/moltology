@@ -22,9 +22,9 @@ export default function PipelineView() {
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans">
       <HudTitlePanel
+        surface="solid"
         accent="cyan"
         title="The descent"
-        description="Moltology science"
         actions={
           <div className="flex items-center gap-4">
             <div>
@@ -37,12 +37,13 @@ export default function PipelineView() {
             </div>
           </div>
         }
-      />
-
-      <StageStrata
-        currentIndex={current.index}
-        selectedStage={selectedStage}
-        onSelectStage={setChosenStage}
+        toolbar={
+          <StageStrata
+            currentIndex={current.index}
+            selectedStage={selectedStage}
+            onSelectStage={setChosenStage}
+          />
+        }
       />
 
       <div id="pipeline-stage-details">

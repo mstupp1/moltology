@@ -150,12 +150,12 @@ export function ActivityStreamPage() {
 
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans relative">
-      <HudTitlePanel
-        accent="cyan"
-        title="Activity Stream"
-      />
-
       <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3.5">
+        <HudTitlePanel
+          treatment="integrated"
+          accent="cyan"
+          title="Activity Stream"
+        />
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <SegmentedControl
             items={ACTIVITY_FEED_SCOPES}

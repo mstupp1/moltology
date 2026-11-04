@@ -99,3 +99,32 @@ fades only edges with more content beyond them. Fades update on scroll, resize a
 content changes, and disappear when the row fits. Use `as="nav"` or `as="ul"` to keep
 the row's semantics; existing refs and scroll-to-selection behavior are supported.
 Horizontal overflow utilities also hide scrollbars for tables and code blocks.
+
+## Page headings
+
+Use `HudTitlePanel` for shared HUD page headings. The heading treatment follows the
+page's structure; a title alone does not need its own card.
+
+- `treatment="compact"` (default): unboxed heading and actions above independent
+  sections. Use for Community, Academy, admin pages, and editor toolbars.
+- `treatment="integrated"`: heading inside an existing workspace surface, separated
+  from its controls/content by a divider. Use for Search, Connections, Activity Stream,
+  Settings, and Covenant Watch. The parent supplies padding and section spacing.
+- `treatment="hero"`: substantial introduction with useful imagery, identity, or
+  overview content. Premium uses this explicitly. Dashboard and member profiles
+  retain their purpose-built identity compositions.
+
+`surface="solid"` gives a compact heading an opaque `surface-1` background and
+standard panel padding on pages with background artwork (Science, Academy,
+Certifications, Codex, Community, Market, and the character editor). Use this
+instead of letting artwork compete with heading text. Integrated headings inherit the surrounding workspace surface.
+
+`actions` holds page-level commands or a short status summary. `toolbar` spans the
+full width below the heading and actions, for navigation or filters. Both wrap on
+small screens; do not force fixed header heights. Keep collection filters near
+their results and editor save actions accessible while scrolling.
+
+Use one page heading. Keep descriptions brief, omit redundant eyebrows, and avoid
+repeating the page title as the first section heading. Oracle, lesson readers,
+profile details, and forum topics use their content's own heading rather than an
+additional generic title banner.

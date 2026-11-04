@@ -108,24 +108,13 @@ export const ConnectionsPage: React.FC<{
         : CONNECTIONS_SENT_EMPTY
 
   return (
-    <div className="space-y-3.5 sm:space-y-5 font-sans relative">
-      <HudTitlePanel
-        accent="teal"
-        title="Connections"
-      />
-
-      <ReferralPanel />
-
-      <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
-        <div className="border-b border-[#3a4a49] pb-3">
-          <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase flex items-center gap-2">
-            <Search className="w-4 h-4 text-[#00c3ff]" />
-            Search Members
-          </h2>
-          <p className="text-xs text-[#839493] mt-0.5">
-            Search by designation, larva unit, or name (at least {MEMBER_SEARCH_MIN_CHARS} characters).
-          </p>
-        </div>
+    <div className="rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 md:p-5 space-y-4 font-sans relative">
+      <div className="space-y-3">
+        <HudTitlePanel
+          treatment="integrated"
+          title="Connections"
+          description={`Find members by username, larva unit, or name (at least ${MEMBER_SEARCH_MIN_CHARS} characters).`}
+        />
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#839493]" />
           <input
@@ -162,6 +151,8 @@ export const ConnectionsPage: React.FC<{
         )}
       </div>
 
+      <ReferralPanel />
+
       <SynapticNearbyStrip
         members={suggested}
         onRequested={(memberId) => {
@@ -171,7 +162,7 @@ export const ConnectionsPage: React.FC<{
         onDismiss={(memberId) => void dismissSuggestion(memberId)}
       />
 
-      <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
+      <div className="space-y-3">
         <div className="flex flex-wrap gap-2 border-b border-[#3a4a49] pb-3">
           {tabs.map(({ id, label, count, icon: Icon }) => {
             const pendingIncoming = id === 'incoming' && count > 0

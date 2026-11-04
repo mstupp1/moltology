@@ -229,19 +229,20 @@ export const ChassisStatusPage: React.FC = () => {
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans relative" data-testid="character-workspace">
       <HudTitlePanel
+        surface="solid"
+        className="sticky top-0 z-20"
         title="Your character"
-        eyebrow="Character studio"
-        description="Shape your shell. Find your fit."
         actions={
-          <div className="flex gap-2">
+          <div className="flex w-full gap-2 sm:w-auto">
             <HudButton
+              className="flex-1 sm:flex-none"
               variant="secondary"
               disabled={saving || (!dirty && !tryOn)}
               onClick={() => accept(saved)}
             >
               Discard
             </HudButton>
-            <HudButton disabled={saving || !dirty} onClick={() => void save()}>
+            <HudButton className="flex-1 sm:flex-none" disabled={saving || !dirty} onClick={() => void save()}>
               {saving ? 'Saving…' : 'Save changes'}
             </HudButton>
           </div>

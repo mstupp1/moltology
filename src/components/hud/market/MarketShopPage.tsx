@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react'
-import { ShoppingBag } from 'lucide-react'
 import { AssetTransmutationModal } from '@/components/hud/AssetTransmutationModal'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { useToast } from '@/components/ui/ToastProvider'
@@ -98,15 +97,9 @@ export function MarketShopPage() {
       />
 
       <HudTitlePanel
+        surface="solid"
         accent="cyan"
-        eyebrow={
-          <>
-            <ShoppingBag className="w-3.5 h-3.5" />
-            <span>Benthic Market</span>
-          </>
-        }
-        title="Ascension Market"
-        description="Buy Molt Credits, shed material into the vault, and spend earned Chitin Gems on the apex cosmetic catalog."
+        title="Benthic Market"
         actions={
           <MarketCurrencyBar
             moltCredits={moltCredits}
@@ -114,11 +107,8 @@ export function MarketShopPage() {
             onAddCredits={() => setActiveTab('credits')}
           />
         }
+        toolbar={<MarketShopTabs activeTab={activeTab} onTabChange={setActiveTab} />}
       />
-
-      <div className="sticky top-0 z-20 -mx-0.5 px-0.5 pt-0.5 pb-1 bg-abyss">
-        <MarketShopTabs activeTab={activeTab} onTabChange={setActiveTab} />
-      </div>
 
       {activeTab === 'credits' ? <MoltCreditStorePanel onPurchase={handleBuyPack} /> : null}
       {activeTab === 'exchange' ? (

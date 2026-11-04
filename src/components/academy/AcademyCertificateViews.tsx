@@ -28,6 +28,7 @@ export function AcademyCertificateIndex({ data }: { data: AcademyHomePayload }) 
   return (
     <div className="space-y-5 sm:space-y-6">
       <HudTitlePanel
+        surface="solid"
         eyebrow="Molt Academy"
         title="Certifications"
         description="A course certificate is issued when every lesson is complete. A track certificate is issued when every required course on that path is complete."
