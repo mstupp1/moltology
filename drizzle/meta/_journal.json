@@ -393,6 +393,13 @@
       "when": 1792964043060,
       "tag": "0055_high_starbolt",
       "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1793758188276,
+      "tag": "0056_odd_blink",
+      "breakpoints": true
     }
   ]
 }

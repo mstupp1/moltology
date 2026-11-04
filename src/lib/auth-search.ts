@@ -4,6 +4,7 @@ export const authSearchSchema = z.object({
   mode: z.enum(['login', 'signup']).optional().catch('login'),
   redirect: z.string().optional(),
   error: z.string().optional(),
+  invitedBy: z.string().max(100).optional().catch(undefined),
 })
 
 export type AuthSearch = z.infer<typeof authSearchSchema>

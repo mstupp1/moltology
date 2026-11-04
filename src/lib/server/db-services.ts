@@ -346,6 +346,9 @@ export async function claimMemberHandleHandler({
       throw new Error('Could not save username. Try again.')
     }
 
+    const { tryQualifyReferral } = await import('./referrals')
+    await tryQualifyReferral(dbClient, userId)
+
     return {
       handle: updated.handle,
       displayName: resolveMemberPublicName({
@@ -3547,6 +3550,8 @@ export const toggleDailyAlignmentTaskHandler = async ({
         completedOn: date,
       })
       .onConflictDoNothing()
+    const { tryQualifyReferral } = await import('./referrals')
+    await tryQualifyReferral(dbClient, userId)
     try {
       await recordRoutineCompletedEvent(dbClient, userId, taskKey, date)
     } catch (err) {
@@ -3831,6 +3836,10 @@ async function commitCharacter(
     )
       throw new Error(cause.split('\n')[0])
     throw new Error('Could not save your character. Please try again.')
+  }
+  if (config) {
+    const { tryQualifyReferral } = await import('./referrals')
+    await tryQualifyReferral(dbClient, userId)
   }
 }
 

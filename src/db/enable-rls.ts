@@ -33,10 +33,18 @@ async function applyRLS() {
     await sql`ALTER TABLE IF EXISTS member_bonds ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS notifications ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS xp_transactions ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS member_referrals ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS referral_rewards ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS ai_usage_daily_summaries ENABLE ROW LEVEL SECURITY;`
     console.log('✓ RLS enabled on profiles, user_stats, routines, routine_completions, routine_day_summaries, routine_streak_carries, activity_events, user_avatars, equipment_catalog, user_gear_items, friend_requests, friendships, suggestion_dismissals, member_bonds, notifications, xp_transactions, ai_usage_daily_summaries')
 
     // 2. Drop existing policies if any to ensure clean idempotent script
+    for (const table of ['member_referrals', 'referral_rewards']) {
+      await sql.query(`DROP POLICY IF EXISTS ${table}_server_only ON ${table}`)
+      await sql.query(`CREATE POLICY ${table}_server_only ON ${table} FOR ALL
+        USING (NULLIF(current_setting('request.jwt.claims', true), '') IS NULL)
+        WITH CHECK (NULLIF(current_setting('request.jwt.claims', true), '') IS NULL)`)
+    }
     await sql`DROP POLICY IF EXISTS profiles_isolation_policy ON profiles;`
     await sql`DROP POLICY IF EXISTS users_isolation_policy ON users;`
     await sql`DROP POLICY IF EXISTS user_stats_isolation_policy ON user_stats;`

@@ -23,6 +23,7 @@ import { useToast } from '@/components/ui/ToastProvider'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { useMemberSearch } from '@/hooks/useMemberSearch'
 import { MEMBER_SEARCH_MIN_CHARS } from '@/lib/member-search'
+import { ReferralPanel } from './ReferralPanel'
 
 export {
   CONNECTIONS_FRIENDS_EMPTY,
@@ -112,6 +113,8 @@ export const ConnectionsPage: React.FC<{
         accent="teal"
         title="Connections"
       />
+
+      <ReferralPanel />
 
       <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
         <div className="border-b border-[#3a4a49] pb-3">
