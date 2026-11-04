@@ -113,10 +113,10 @@ describe('DailyRoutineWidget Component', () => {
     vi.unstubAllGlobals()
   })
 
-  it('renders compact chrome with title, 8 canonical tasks, and the week bars', () => {
+  it('renders a page heading, 8 canonical tasks, and the week bars', () => {
     renderWidget()
 
-    expect(screen.getByText('Daily alignment')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'Daily alignment' })).toBeInTheDocument()
     expect(screen.queryByText('MANDATORY LITURGY')).not.toBeInTheDocument()
     expect(screen.getByText('Last 7 days')).toBeInTheDocument()
     expect(screen.getByText('Activity')).toBeInTheDocument()

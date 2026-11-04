@@ -27,8 +27,9 @@ export function AdminStore() {
   }
   const enabled = (id: string, fallback: boolean) => payload?.overrides.find(o => o.id === id)?.enabled ?? fallback
   return <div className="space-y-3.5 sm:space-y-5 font-sans relative">
-    <HudTitlePanel title="Store settings" eyebrow="Administration" description="Checkout switches, policies, promo codes, catalog availability, and the email queue." />
+    <HudTitlePanel surface="solid" title="Store settings" eyebrow="Administration" description="Checkout switches, policies, promo codes, catalog availability, and the email queue.">
     <p className="text-sm text-ink-body">Looking for orders? They are in the <Link to="/admin" search={{ tab: 'shop' }} className="text-cyan-glow hover:underline">Shop tab on the admin page</Link>. <Link to="/store" className="text-cyan-glow hover:underline">Open storefront</Link></p>
+    </HudTitlePanel>
     {payload && settings && <>
       <section className="chitin-card p-3 sm:p-4 md:p-5 rounded-card shadow-2xl space-y-3"><h2 className="font-grotesk text-sm font-bold tracking-wider uppercase">Controls</h2>
         <p className="text-sm">Changes apply to new checkouts. Existing drafts require approval in Printful. Test and preview orders always stay drafts.</p>

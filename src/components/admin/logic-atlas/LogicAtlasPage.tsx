@@ -194,46 +194,49 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
 
   return (
     <div className="space-y-3.5 font-sans sm:space-y-4" data-testid="logic-atlas">
-      <HudTitlePanel
-        accent="cyan"
-        eyebrow="Steward oversight"
-        title="Logic Atlas"
-        description="How the app's rules fit together, where each one lives in code, and why it was decided."
-        actions={
-          <Link
-            to="/admin"
-            className="hud-sheen inline-flex min-h-[36px] items-center gap-1.5 rounded-control border border-line bg-surface-1 px-3 text-[11px] font-bold uppercase tracking-[0.08em] text-ink transition-colors hover:border-line-strong hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Admin
-          </Link>
-        }
-      />
+      <section className="rounded-card bg-surface-1 p-4 sm:p-5 space-y-4" aria-label="Atlas overview">
+        <HudTitlePanel
+          treatment="integrated"
+          accent="cyan"
+          eyebrow="Steward oversight"
+          title="Logic Atlas"
+          description="How the app's rules fit together, where each one lives in code, and why it was decided."
+          actions={
+            <Link
+              to="/admin"
+              className="hud-sheen inline-flex min-h-[36px] items-center gap-1.5 rounded-control border border-line bg-surface-1 px-3 text-[11px] font-bold uppercase tracking-[0.08em] text-ink transition-colors hover:border-line-strong hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Admin
+            </Link>
+          }
+        />
 
-      <section className="grid grid-cols-2 gap-2.5 lg:grid-cols-4" aria-label="Atlas summary">
-        <StatCard
-          label="Rules"
-          value={atlas ? String(atlas.stats.rules) : '—'}
-          detail={atlas ? `Across ${atlas.stats.domains} domains` : undefined}
-        />
-        <StatCard
-          label="Decisions"
-          value={atlas ? String(atlas.stats.decisions) : '—'}
-          detail={atlas ? 'Backed by PRs and commits' : undefined}
-        />
-        <StatCard
-          label="Needs attention"
-          value={atlas ? String(attentionCount) : '—'}
-          detail={atlas ? `${atlas.stats.flagged} flagged, ${driftedRules} with code changes` : undefined}
-          tone="amber"
-          onClick={atlas ? () => setOnlyAttention((value) => !value) : undefined}
-          pressed={onlyAttention}
-        />
-        <StatCard
-          label="Last synced"
-          value={atlas ? atlas.syncedAt : '—'}
-          detail="Run /logic-atlas to refresh"
-        />
+        <section className="grid grid-cols-2 gap-2.5 lg:grid-cols-4" aria-label="Atlas summary">
+          <StatCard
+            label="Rules"
+            value={atlas ? String(atlas.stats.rules) : '—'}
+            detail={atlas ? `Across ${atlas.stats.domains} domains` : undefined}
+          />
+          <StatCard
+            label="Decisions"
+            value={atlas ? String(atlas.stats.decisions) : '—'}
+            detail={atlas ? 'Backed by PRs and commits' : undefined}
+          />
+          <StatCard
+            label="Needs attention"
+            value={atlas ? String(attentionCount) : '—'}
+            detail={atlas ? `${atlas.stats.flagged} flagged, ${driftedRules} with code changes` : undefined}
+            tone="amber"
+            onClick={atlas ? () => setOnlyAttention((value) => !value) : undefined}
+            pressed={onlyAttention}
+          />
+          <StatCard
+            label="Last synced"
+            value={atlas ? atlas.syncedAt : '—'}
+            detail="Run /logic-atlas to refresh"
+          />
+        </section>
       </section>
 
       {error ? (
@@ -251,7 +254,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
         </div>
       ) : null}
 
-      <div className="space-y-2.5">
+      <div className="rounded-card bg-surface-1 p-4 space-y-2.5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <div className="flex gap-2" role="tablist" aria-label="Atlas views">
             {(
