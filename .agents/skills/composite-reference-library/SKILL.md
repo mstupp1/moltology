@@ -13,7 +13,7 @@ Before starting, read and follow [content worktree hygiene](../../../docs/conten
 
 References come in by the dozen. Each one goes through the same loop: ingest, analyze, recreate as a layout spec, compare, then promote the layouts worth reusing. The library is private working material; the layout specs are what join the system.
 
-For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Rotate using recent usage across formats, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
 
 ## Where things live
 

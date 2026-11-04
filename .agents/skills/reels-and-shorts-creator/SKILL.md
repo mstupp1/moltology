@@ -23,7 +23,7 @@ Read before writing:
 - [The Reels strategy](../../../content/social/reels-strategy.md) and the [annual content calendar](../../../content/annual-content-calendar.md) for the intended slot.
 - `content/social/instagram-reel-history.json`. Avoid the last three topics and hooks, and the formats used in the last three reels.
 
-For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Rotate using recent usage across formats, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
 
 ## 1. Find the situation
 

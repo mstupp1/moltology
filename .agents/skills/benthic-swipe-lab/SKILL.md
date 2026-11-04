@@ -22,7 +22,7 @@ Complete the workflow through ingestion and Zernio queueing after inspecting the
 
 Read `STYLE_GUIDE.md`, `BRAND_BIBLE.md`, and `content/social/instagram-post-history.json` before writing. Use the post history to avoid repeating a recent format, topic or hook shape. For video adaptations, also read the reel history.
 
-For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Rotate using recent usage across formats, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
 
 ## 1. Pitch three, build one
 

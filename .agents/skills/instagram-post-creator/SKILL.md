@@ -13,7 +13,7 @@ Before starting, read and follow [content worktree hygiene](../../../docs/conten
 
 Create a finished single-image Moltology post, with reviewed copy, full-frame artwork, and a verified queue or publication result. Read `BRAND_BIBLE.md`, `STYLE_GUIDE.md`, [the Instagram content strategy](../../../content/social/instagram-content-strategy.md), and the continuity ledger at `content/social/instagram-post-history.json` before choosing a campaign. Resume a pending draft rather than duplicating it. Write with the [writing playbook](../../../content/writing-playbook.md): set a loudness (usually 2–3), pitch three lines or concepts, and run its boredom check before any artwork. The October 9, 2026 strategy and built-in ImageGen defaults supersede legacy campaign and Antigravity image instructions.
 
-For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Rotate using recent usage across formats, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
 
 ## Campaign and publishing setup
 

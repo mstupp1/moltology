@@ -12,7 +12,7 @@ This skill automates the complete lifecycle of generating and extracting transpa
 
 ---
 
-For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Rotate using recent usage across formats, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
 
 ## The Chroma Key Strategy
 

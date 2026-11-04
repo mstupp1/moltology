@@ -12,7 +12,7 @@ Use the **imagegen** skill and built-in `image_gen` tool by default. Request nat
 
 Read repository `BRAND_BIBLE.md` and `STYLE_GUIDE.md` before public character copy. All paths below are relative to the current repository.
 
-For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Rotate using recent usage across formats, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
 
 ## Scope and reference inputs
 
