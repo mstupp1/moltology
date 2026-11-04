@@ -33,6 +33,8 @@ import type {
 } from './traits'
 
 export const GROUND_Y = 185
+/** Head gear sits this far above the eye line, so helmets rest on the brow and never cover the eyes. */
+const HEAD_GEAR_LIFT = 27
 
 export interface CharacterSpec {
   equipment?: EquippedAppearance
@@ -424,7 +426,7 @@ function lobster(spec: CharacterSpec, ctx: PaintContext): string {
     ${wear(spec, 'antennae', ctx, 50, head.eyeY - 5, 1, 1, { antennaRoots: [[-5, 0], [5, 0]] })}
     ${eyes(spec, ctx, head.eyeY, head.eyeSpread, spec.headShape === 'heart' ? 10.5 : spec.headShape === 'tall' ? 11.5 : 12.8)}
     <g filter="url(#${ids(ctx).cast})">${claws}</g>
-    ${wear(spec, 'head', ctx, 50, head.eyeY - 16, head.half / 36.5, 1, { eyeY: 16, mouthY: head.mouthY - head.eyeY + 16 })}
+    ${wear(spec, 'head', ctx, 50, head.eyeY - HEAD_GEAR_LIFT, head.half / 36.5, 1, { eyeY: HEAD_GEAR_LIFT, mouthY: head.mouthY - head.eyeY + HEAD_GEAR_LIFT })}
   </g></g>`
 
   return `<g class="avatar-character" data-race="lobster">${groundShadow(ctx, 46 + (build.half - 34) * 0.6)}${inked(ctx, `${tail}${sideLegs}${legs}${body}${upper}`)}</g>`
@@ -740,7 +742,7 @@ function crab(spec: CharacterSpec, ctx: PaintContext): string {
     <g filter="url(#${ids(ctx).cast})">${claws}</g>
     ${wear(spec, 'carapace', ctx, 50, shell.crown, 1, 1, { torsoW: shell.half * 2, torsoH: shell.bottom - shell.crown, eyeY: shell.eyeY - shell.crown, mouthY: mouthY - shell.crown })}
     ${wear(spec, 'belt', ctx, 50, hipY + dy - 1, hs * 0.86, 0.7)}
-    ${wear(spec, 'head', ctx, 50, shell.eyeY - 17, Math.min(1.35, hs), 1, { eyeY: 17, mouthY: mouthY - shell.eyeY + 17 })}
+    ${wear(spec, 'head', ctx, 50, shell.eyeY - HEAD_GEAR_LIFT - 1, Math.min(1.35, hs), 1, { eyeY: HEAD_GEAR_LIFT + 1, mouthY: mouthY - shell.eyeY + HEAD_GEAR_LIFT + 1 })}
   </g></g>`
 
   return `<g class="avatar-character" data-race="crab">${groundShadow(ctx, 56 + wx * 0.6)}${inked(ctx, `${sideLegs}${legs}${torso}${upper}`)}</g>`

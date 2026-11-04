@@ -38,6 +38,7 @@ export const ids = (ctx: PaintContext) => ({
   form: `${ctx.uid}-form`,
   cast: `${ctx.uid}-cast`,
   ink: `${ctx.uid}-ink`,
+  gearForm: `${ctx.uid}-gear-form`,
 })
 
 function shellGradient(id: string, p: ShellPalette, finish: ShellFinish): string {
@@ -142,6 +143,19 @@ function formDefs(ctx: PaintContext): string {
       <feComposite in2="SourceAlpha" operator="in" result="shade"/>
       <feOffset in="edge" dx="0.05" dy="0.06" result="near"/>
       <feFlood flood-color="${p.highlight}" flood-opacity="${lift}"/>
+      <feComposite in2="near" operator="in"/>
+      <feComposite in2="SourceAlpha" operator="in" result="lift"/>
+      <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="shade"/><feMergeNode in="lift"/></feMerge>
+    </filter>
+    <filter id="${i.gearForm}" x="-0.04" y="-0.04" width="1.08" height="1.08" primitiveUnits="objectBoundingBox" color-interpolation-filters="sRGB">
+      <feComponentTransfer in="SourceAlpha" result="out"><feFuncA type="table" tableValues="1 0"/></feComponentTransfer>
+      <feGaussianBlur in="out" stdDeviation="0.07" result="edge"/>
+      <feOffset in="edge" dx="-0.07" dy="-0.09" result="far"/>
+      <feFlood flood-color="#03080c" flood-opacity="0.5"/>
+      <feComposite in2="far" operator="in"/>
+      <feComposite in2="SourceAlpha" operator="in" result="shade"/>
+      <feOffset in="edge" dx="0.05" dy="0.06" result="near"/>
+      <feFlood flood-color="#ffffff" flood-opacity="0.26"/>
       <feComposite in2="near" operator="in"/>
       <feComposite in2="SourceAlpha" operator="in" result="lift"/>
       <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="shade"/><feMergeNode in="lift"/></feMerge>
