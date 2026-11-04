@@ -113,6 +113,8 @@ export interface EquipmentFit {
   leg?: LegFrame
   /** The wearer's claw outline (claw-local), so gauntlets wrap the real claw. */
   claw?: { palm: string; finger: string }
+  /** Head top relative to the hat's anchor, so bands can rest on it. */
+  crownY?: number
   /** Half-width of the wearer's waist at the belt line. */
   waistHalf?: number
   /** The wearer's own antenna (left-side local frame), so feeler gear rides it instead of replacing it. */
@@ -141,13 +143,10 @@ export interface LegFrame {
   outward: 1 | -1
 }
 
-/** Where each hat's band sits against the brim line (local y = 0). */
+/** Shifts each hat so its brim or band sits on the brim line (local y = 0). */
 const ACCESSORY_TOP: Partial<Record<AvatarAccessory, number>> = {
-  hard_hat: -8,
-  beanie: -7,
-  crown: -2,
-  halo: -3,
-  bow: -1,
+  hard_hat: -3,
+  beanie: -2.5,
 }
 
 /** Local coordinates: torso 0..60, head centred at y=0, weapon cuff at y=0. */
@@ -177,7 +176,7 @@ export function renderEquipment(
     body = renderAccessory(
       v.accessory,
       { ...ctx, uid, rim: v.accent },
-      { x: 0, top: ACCESSORY_TOP[v.accessory] ?? 0, eyeY: fit?.eyeY ?? 15, mouth: [0, fit?.mouthY ?? 40] },
+      { x: 0, top: ACCESSORY_TOP[v.accessory] ?? 0, eyeY: fit?.eyeY ?? 15, mouth: [0, fit?.mouthY ?? 40], crownY: fit?.crownY },
     )
   } else if (v.category === 'carapace' && fit?.race === 'crab') {
     const w = (fit.torsoW ?? 101) / 2
@@ -320,14 +319,15 @@ export function renderEquipment(
       v.material +
       '" stroke-width="3"/>'
   }
-  if (n > 1 && !fit?.leg && !fit?.torso && !fit?.antenna && !(fit?.claw && v.category === 'claws'))
+  // Tier marks sit on the face area for head gear, so helmets carry tier in their crest instead.
+  if (n > 1 && v.category !== 'head' && !fit?.leg && !fit?.torso && !fit?.antenna && !(fit?.claw && v.category === 'claws'))
     body += `<g fill="${v.accent}">${[0, 1, 2].map((i) => `<circle cx="${(i - 1) * 4}" cy="${v.category === 'claws' ? -8 : 3}" r=".8"/>`).join('')}</g>`
-  if (n === 4 && !fit?.leg && !fit?.torso && !fit?.antenna && !(fit?.claw && v.category === 'claws'))
+  if (n === 4 && v.category !== 'head' && !fit?.leg && !fit?.torso && !fit?.antenna && !(fit?.claw && v.category === 'claws'))
     body += `<g class="equipment-signature" fill="none" stroke="${v.accent}" stroke-width=".65" opacity=".7">${v.category === 'claws' ? '<path d="M-14,-20 l3,-8 M10,-25 l3,-8"/>' : '<path d="M-12,10 L0,16 L12,10 M-9,14 L0,20 L9,14"/>'}</g>`
   // Held weapons slide up so the shaft runs through the claw's pinch and the head clears the tip.
   if (v.motif === 'hammer' && fit?.claw) body = `<g data-weapon-grip="pinch" transform="translate(3 -16) scale(0.85)">${body}</g>`
-  // Helmets are drawn with their band at y=3; lift it just clear of the brows on the brim line.
-  if (v.category === 'head' && !v.accessory) body = `<g transform="translate(0 -5)">${body}</g>`
+  // Helmets are drawn with their opening at y=3; set it on the brim line. The eyes and brows draw over it.
+  if (v.category === 'head' && !v.accessory) body = `<g transform="translate(0 -2)">${body}</g>`
   return `<g data-equipment="${v.key}" data-construction="${n}"><defs><linearGradient id="${uid}" x1="0" y1="0" x2=".85" y2="1"><stop stop-color="${v.trim}"/><stop offset=".2" stop-color="${v.material}"/><stop offset=".32" stop-color="${v.trim}" stop-opacity=".65"/><stop offset=".65" stop-color="${v.material}"/><stop offset="1" stop-color="${tone(v.material, -0.5)}"/></linearGradient></defs><g filter="url(#${ids(ctx).gearForm})">${body}</g></g>`
 }
 

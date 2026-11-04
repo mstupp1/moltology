@@ -6,6 +6,8 @@
  *
  *   npm run avatar:fit                 -> tmp/avatar-fit/sheet.html (+ sheet.png when Playwright is available)
  *   npm run avatar:fit -- --only legs  -> one category (head, carapace, claws, legs, antennae, belt, face)
+ *   npm run avatar:fit -- --only hats  -> every hat on every head shape, both races (look for gaps under hats)
+ *   npm run avatar:fit -- --only bodies -> every build under every head (look for torso edges past the arms)
  */
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -39,6 +41,21 @@ for (const category of categories) {
       }
   }
   sections.push(`<h2>${category}</h2><div class="g">${cells.join('')}</div>`)
+}
+if (!only || only === 'hats') {
+  const cells: string[] = []
+  for (const race of races)
+    for (const v of Object.values(EQUIPMENT_VISUALS).filter((item) => item.category === 'head'))
+      for (const headShape of shapes) cells.push(cell({ seed: 'hats', race, headShape, build: 'classic', pose: 'rest', equipment: { head: { visualKey: v.key } } }, `${v.key} · ${race} ${headShape}`, 'portrait'))
+  sections.push(`<h2>hats on every head</h2><div class="g">${cells.join('')}</div>`)
+}
+if (!only || only === 'bodies') {
+  const cells: string[] = []
+  for (const race of races)
+    for (const build of builds)
+      for (const headShape of shapes)
+        for (const pose of ['rest', 'cheer'] as const) cells.push(cell({ seed: 'bodies', race, headShape, build, pose }, `${race} ${build}/${headShape} ${pose}`, 'fullBody'))
+  sections.push(`<h2>builds under every head</h2><div class="g">${cells.join('')}</div>`)
 }
 if (!only || only === 'face') {
   const cells: string[] = []

@@ -98,14 +98,14 @@ function resolvePose(
 }
 
 /** Move a pose table sideways (and down) so arms clear wider or narrower bodies. */
-function shiftPoses(table: Record<'up' | 'down' | 'flex' | 'wave', PoseSide>, dx: number, dy = 0) {
+function shiftPoses(table: Record<'up' | 'down' | 'flex' | 'wave', PoseSide>, dx: number, dy = 0, shoulderDx = dx * 0.4) {
   const mv = (p: Pt): Pt => [p[0] + dx, p[1] + dy]
   const out = {} as Record<'up' | 'down' | 'flex' | 'wave', PoseSide>
   for (const [k, v] of Object.entries(table) as [keyof typeof table, PoseSide][]) {
     out[k] = {
       // The shoulder stays put so the arm still meets the body.
       arm: {
-        p0: [v.arm.p0[0] + dx * 0.4, v.arm.p0[1] + dy],
+        p0: [v.arm.p0[0] + shoulderDx, v.arm.p0[1] + dy],
         p1: mv(v.arm.p1),
         p2: mv(v.arm.p2),
         p3: mv(v.arm.p3),
@@ -162,28 +162,137 @@ function wear(
     : ''
 }
 
-/**
- * Hats and helmets sit on a brim line just above the eyes, sized to the head's
- * real width there, so they rest on every head shape instead of hovering.
- */
-function headGear(
-  spec: CharacterSpec,
-  ctx: PaintContext,
-  eyeY: number,
-  mouthY: number,
-  eye: { rx: number; ry: number },
-  eyeSpread: number,
-  halfAt: (y: number) => number,
-  crown: number,
-): string {
-  if (!spec.equipment?.head) return ''
-  // Clear of the brows where the head allows it, but never above the crown, or the hat would hover.
-  const brim = Math.max(eyeY - eye.ry - 6, crown + 2)
-  const half = Math.max(halfAt(brim + 2), eyeSpread + eye.rx) + 2
-  const sx = Math.min(1.6, Math.max(0.8, half / 31))
-  const sy = Math.min(1.2, Math.max(0.9, Math.sqrt(sx)))
-  return wear(spec, 'head', ctx, 50, brim, sx, sy, { eyeY: (eyeY - brim) / sy, mouthY: (mouthY - brim) / sy })
+
+/** The head as hats and brows see it, in the head's own (unlifted) coordinates. */
+export interface HeadGeometry {
+  eyeY: number
+  mouthY: number
+  eye: { rx: number; ry: number }
+  eyeSpread: number
+  /** Half-width of the head outline at height y. */
+  halfAt: (y: number) => number
+  /** Head top. */
+  crown: number
 }
+
+export type HatKind = AvatarAccessory | 'helmet'
+
+export interface HatPlacement {
+  kind: HatKind
+  x: number
+  y: number
+  sx: number
+  sy: number
+}
+
+/** Which hat shape an item draws: its accessory, or a plated helmet. */
+export function hatKind(visualKey: string): HatKind {
+  return getEquipmentVisual(visualKey)?.accessory ?? 'helmet'
+}
+
+/**
+ * Hats sit down on the head, cartoon style: the brim lands across the top of the eyes at the
+ * head's real width there, the dome covers the head top, and the eyes and brows are drawn over
+ * the brim so the face is never hidden. Crowns perch on the head top, bows pin to its edge and
+ * halos float a fixed gap above it.
+ */
+export function hatPlacement(kind: HatKind, g: HeadGeometry): HatPlacement {
+  const { eyeY, eye, eyeSpread, halfAt, crown } = g
+  const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n))
+  if (kind === 'crown') {
+    const s = clamp(Math.max(halfAt(crown + 6) * 0.62, eyeSpread * 0.95) / 14.5, 0.85, 1.3)
+    return { kind, x: 50, y: crown + 3.5, sx: s, sy: s }
+  }
+  if (kind === 'bow') {
+    // Pinned to the head's upper edge, just outside the eye, where hair would part.
+    const y = crown + 5
+    const s = clamp(halfAt(eyeY) / 30, 0.85, 1.2)
+    return { kind, x: 50 + Math.max(halfAt(y) * 0.85, eyeSpread + eye.rx * 0.55), y, sx: s, sy: s }
+  }
+  if (kind === 'halo') {
+    const s = clamp((halfAt(eyeY - eye.ry * 0.5) * 0.72) / 20, 0.8, 1.4)
+    return { kind, x: 50, y: Math.min(crown, eyeY - eye.ry - 4) - 8, sx: s, sy: 1 }
+  }
+  if (kind === 'headset') {
+    const s = clamp((Math.max(halfAt(eyeY + 6), eyeSpread + eye.rx) + 1.5) / 30, 0.8, 1.6)
+    return { kind, x: 50, y: eyeY - eye.ry * 0.5, sx: s, sy: 1 }
+  }
+  const fit = HAT_FIT[kind] ?? HAT_FIT.helmet
+  // The brim crosses the upper half of the eyes; on heads that rise well above the eyes the
+  // hat sits higher, so its dome still reaches the top instead of perching on the forehead.
+  // A visor is a band with no dome, so it wraps the head top just above the brows.
+  let brim = kind === 'visor' ? Math.min(eyeY - eye.ry * 0.5, crown + 8) : eyeY - eye.ry * 0.5
+  let sx = 1
+  let sy = 1
+  for (let i = 0; i < 2; i++) {
+    sx = clamp((Math.max(halfAt(brim), eyeSpread + eye.rx * 0.75) + 1.5) / fit.half, 0.8, 1.7)
+    sy = clamp(sx * 0.85, 0.85, 1.35)
+    if (fit.dome > 0) brim = Math.min(eyeY - eye.ry * 0.5, crown + fit.dome * sy * 0.82)
+  }
+  return { kind, x: 50, y: brim, sx, sy }
+}
+
+/** How each wrapping hat meets the head: the half-width that hugs it, and its dome height above the brim. */
+export const HAT_FIT: Record<string, { half: number; dome: number }> = {
+  hard_hat: { half: 22, dome: 27 },
+  beanie: { half: 25, dome: 26 },
+  visor: { half: 31, dome: 0 },
+  helmet: { half: 24, dome: 21 },
+}
+
+/** Top of each hat in its own drawing (brim line at y = 0), stroke included. */
+const HAT_TOP: Record<string, number> = { hard_hat: -29, beanie: -36.5, visor: -11, crown: -21, halo: -8, bow: -10 }
+
+/** Highest point of the equipped hat, in head coordinates, or null with no hat. */
+export function hatTopY(spec: CharacterSpec): number | null {
+  const key = spec.equipment?.head?.visualKey
+  if (!key) return null
+  const kind = hatKind(key)
+  const g = headGeometry(spec)
+  if (kind === 'headset') return g.crown - 4
+  const p = hatPlacement(kind, g)
+  const n = getEquipmentVisual(key)?.construction ?? 0
+  const top = kind === 'helmet' ? (n >= 4 ? -34 : -(12 + n * 4)) : (HAT_TOP[kind] ?? -30)
+  return p.y + top * p.sy
+}
+
+function headGear(spec: CharacterSpec, ctx: PaintContext, g: HeadGeometry, layer: 'under' | 'over' = 'under'): string {
+  const key = spec.equipment?.head?.visualKey
+  if (!key) return ''
+  const kind = hatKind(key)
+  // Bows clip on over the eye line, so they draw in front of the eyes; everything else sits behind them.
+  if ((kind === 'bow') !== (layer === 'over')) return ''
+  const p = hatPlacement(kind, g)
+  return wear(spec, 'head', ctx, p.x, p.y, p.sx, p.sy, { eyeY: (g.eyeY - p.y) / p.sy, mouthY: (g.mouthY - p.y) / p.sy, crownY: (g.crown - p.y) / p.sy })
+}
+
+/** Head geometry for either race, so hats, brows and fit checks agree on one outline. */
+export function headGeometry(spec: CharacterSpec): HeadGeometry {
+  if (spec.race === 'crab') {
+    const base = CRAB_SHELLS[spec.headShape] ?? CRAB_SHELLS.bean
+    const build = CRAB_BUILDS[spec.build] ?? CRAB_BUILDS.classic
+    const shell = stretchShell(base, build)
+    return {
+      eyeY: shell.eyeY,
+      mouthY: r2((shell.crown + shell.bottom) / 2 + 3.5),
+      eye: eyeSize(spec.eyeShape, 11.6),
+      eyeSpread: 14,
+      halfAt: (y) => outlineHalfAt(base.path, base.widestY + (y - base.widestY) / build.sy) * build.sx,
+      crown: shell.crown,
+    }
+  }
+  const head = LOBSTER_HEADS[spec.headShape] ?? LOBSTER_HEADS.bean
+  return {
+    eyeY: head.eyeY,
+    mouthY: head.mouthY,
+    eye: eyeSize(spec.eyeShape, lobsterEyeBase(spec)),
+    eyeSpread: head.eyeSpread,
+    halfAt: (y) => outlineHalfAt(head.path, y),
+    crown: outlineTop(head.path),
+  }
+}
+
+const lobsterEyeBase = (spec: CharacterSpec) => (spec.headShape === 'heart' ? 10.5 : spec.headShape === 'tall' ? 11.5 : 12.8)
 
 /** Feeler gear rides the character's own antennae, whatever style they picked. */
 function antennaGearFor(spec: CharacterSpec, ctx: PaintContext, scale: number): ((side: 'left' | 'right') => string) | undefined {
@@ -197,15 +306,26 @@ function groundShadow(ctx: PaintContext, rx: number): string {
   return `<ellipse cx="50" cy="${GROUND_Y + 1}" rx="${rx}" ry="7" fill="url(#${ids(ctx).softShadow})"/>`
 }
 
+/** First y, from the top down, where an outline is at least `x` wide (half-width). */
+function topAt(halfAt: (y: number) => number, x: number): number {
+  for (let y = -40; y < 200; y += 0.5) if (halfAt(y) >= x) return y
+  return 200
+}
+
 function eyes(
   spec: CharacterSpec,
   ctx: PaintContext,
   y: number,
   spread: number,
   base: number,
+  halfAt?: (y: number) => number,
 ): string {
   const size = eyeSize(spec.eyeShape, base)
-  const common = { ...size, color: spec.eyeColor, pupil: spec.pupil, expression: spec.expression, gaze: spec.gaze }
+  // Brows stay on the head outline unless a hat's dome or band sits behind them as a backdrop.
+  const hat = spec.equipment?.head?.visualKey ? getEquipmentVisual(spec.equipment.head.visualKey) : undefined
+  const backdrop = hat && !['crown', 'halo', 'bow', 'headset'].includes(hat.accessory ?? '')
+  const browCeil = halfAt && !backdrop ? (x: number) => topAt(halfAt, Math.abs(x - 50)) : undefined
+  const common = { ...size, color: spec.eyeColor, pupil: spec.pupil, expression: spec.expression, gaze: spec.gaze, browCeil }
   return `<g class="lobster-idle-layer lobster-idle-eyes">${renderEye({ ...common, cx: 50 - spread, cy: y, side: 'left' }, ctx, 'left')}${renderEye({ ...common, cx: 50 + spread, cy: y, side: 'right' }, ctx, 'right')}</g>`
 }
 
@@ -360,6 +480,31 @@ const LOBSTER_BUILDS: Record<AvatarBuild, LobsterBuild> = {
 
 const lobsterLift = (spec: CharacterSpec) => Math.round((spec.heightScale - 1) * 40)
 
+const torsoOutline = (half: number, bulge: number, hips: number, y0: number, y1: number, curve: number) =>
+  `M${r2(50 - half)},${y0} C${r2(50 - bulge)},${y0 + curve} ${r2(50 - hips)},${y1} 50,${y1} C${r2(50 + hips)},${y1} ${r2(50 + bulge)},${y0 + curve} ${r2(50 + half)},${y0} Z`
+
+/** Where the lobster's arm roots on the body (upper-body coordinates, before lifting). */
+export const LOBSTER_SHOULDER: Pt = [22, 97]
+
+/**
+ * How the lobster's torso meets its head and arms, for any head on any build.
+ * The torso tucks under the head (its top corners never reach past the head's edge), and the
+ * shoulders ride whichever is wider at the arm root, the head or the torso, so an arm always
+ * covers the body's edge instead of the torso peeking out behind it.
+ */
+export function lobsterBodyFit(spec: CharacterSpec) {
+  const dy = lobsterLift(spec)
+  const top = 88 - dy
+  const head = LOBSTER_HEADS[spec.headShape] ?? LOBSTER_HEADS.bean
+  const build = LOBSTER_BUILDS[spec.build] ?? LOBSTER_BUILDS.classic
+  const neckHalf = Math.min(build.half, outlineHalfAt(head.path, top + dy + 4) - 2.5)
+  const torsoPath = torsoOutline(neckHalf, build.bulge + (neckHalf - build.half) * 0.35, build.hips, top, build.bottom, 40)
+  const headDx = (36.5 - head.half) * 0.9
+  const torsoEdge = 50 - outlineHalfAt(torsoPath, LOBSTER_SHOULDER[1] - dy) + 3.5
+  const shoulderDx = Math.min(headDx * 0.4, torsoEdge - LOBSTER_SHOULDER[0])
+  return { torsoPath, top, neckHalf, headHalfAtNeck: outlineHalfAt(head.path, top + dy + 4), shoulderDx, limbDx: Math.min(headDx, shoulderDx), torsoEdge }
+}
+
 function lobster(spec: CharacterSpec, ctx: PaintContext): string {
   const dy = lobsterLift(spec)
   const top = 88 - dy
@@ -419,16 +564,7 @@ function lobster(spec: CharacterSpec, ctx: PaintContext): string {
   }
   const legs = `<g class="lobster-idle-layer lobster-idle-legs">${leg('left')}${leg('right')}</g>`
 
-  const torso = (
-    half: number,
-    bulge: number,
-    hips: number,
-    y0: number,
-    y1: number,
-    curve: number,
-  ) =>
-    `M${r2(50 - half)},${y0} C${r2(50 - bulge)},${y0 + curve} ${r2(50 - hips)},${y1} 50,${y1} C${r2(50 + hips)},${y1} ${r2(50 + bulge)},${y0 + curve} ${r2(50 + half)},${y0} Z`
-  const torsoPath = torso(build.half, build.bulge, build.hips, top, bottom, 40)
+  const { torsoPath, shoulderDx, limbDx } = lobsterBodyFit(spec)
   const abdomen = piece(torsoPath, ctx, {
     attrs: 'class="avatar-abdomen-shell"',
   })
@@ -445,7 +581,7 @@ function lobster(spec: CharacterSpec, ctx: PaintContext): string {
         <path d="M${r2(52 - half)},${r2(y + 2.6)} Q50,${r2(y + 7.6)} ${r2(48 + half)},${r2(y + 2.6)}" fill="none" stroke="#ffffff" stroke-width=".8" stroke-linecap="round" opacity="0.35"/>`
     })
     .join('')
-  const bellyPath = torso(
+  const bellyPath = torsoOutline(
     build.half - 9,
     build.bulge - 9,
     Math.max(build.hips - 7, 4),
@@ -459,9 +595,10 @@ function lobster(spec: CharacterSpec, ctx: PaintContext): string {
     wear(spec, 'carapace', ctx, 0, 0, 1, 1, { torso: { path: torsoPath, top: top + 20, bottom: bottom - 12 } }) +
     wear(spec, 'belt', ctx, 50, bottom - 7, 1, 0.72, { waistHalf: outlineHalfAt(torsoPath, bottom - 7) + 1.5 })
   const body = `<g class="lobster-idle-layer lobster-idle-abdomen">${abdomen}${belly}${torsoGear}</g>`
-  const eyeBase = spec.headShape === 'heart' ? 10.5 : spec.headShape === 'tall' ? 11.5 : 12.8
+  const eyeBase = lobsterEyeBase(spec)
+  const geo = headGeometry(spec)
   const hx = 36.5 - head.half
-  const pose = resolvePose(spec.pose, shiftPoses(LOBSTER_POSES, hx * 0.9))
+  const pose = resolvePose(spec.pose, shiftPoses(LOBSTER_POSES, limbDx, 0, shoulderDx))
   const { arms, claws } = renderArmsAndClaws(pose, spec, ctx, 0.78)
   const glintMove = `translate(${r2(hx * 0.8)} ${head.eyeY - 24})`
 
@@ -473,9 +610,10 @@ function lobster(spec: CharacterSpec, ctx: PaintContext): string {
     ${renderCheeks(ctx, head.cheekX, 100 - head.cheekX, head.cheekY)}
     ${renderMouth(spec.mouth, 50, head.mouthY, ctx)}
     ${renderAntennae(spec.antennae, ctx, { left: [45, head.eyeY - 5], right: [55, head.eyeY - 5] }, 1, antennaGearFor(spec, ctx, 1))}
-    ${eyes(spec, ctx, head.eyeY, head.eyeSpread, eyeBase)}
+    ${headGear(spec, ctx, geo)}
+    ${eyes(spec, ctx, head.eyeY, head.eyeSpread, eyeBase, geo.halfAt)}
+    ${headGear(spec, ctx, geo, 'over')}
     <g filter="url(#${ids(ctx).cast})">${claws}</g>
-    ${headGear(spec, ctx, head.eyeY, head.mouthY, eyeSize(spec.eyeShape, eyeBase), head.eyeSpread, (y) => outlineHalfAt(head.path, y), outlineTop(head.path))}
   </g></g>`
 
   return `<g class="avatar-character" data-race="lobster">${groundShadow(ctx, 46 + (build.half - 34) * 0.6)}${inked(ctx, `${tail}${sideLegs}${legs}${body}${upper}`)}</g>`
@@ -783,6 +921,7 @@ function crab(spec: CharacterSpec, ctx: PaintContext): string {
   const pose = resolvePose(spec.pose, shiftPoses(CRAB_POSES, -wx, shell.widestY - 80))
   const { arms, claws } = renderArmsAndClaws(pose, spec, ctx, 0.9)
   const mouthY = r2((shell.crown + shell.bottom) / 2 + 3.5)
+  const geo = headGeometry(spec)
   const stretch =
     build.sx === 1 && build.sy === 1
       ? ''
@@ -800,11 +939,12 @@ function crab(spec: CharacterSpec, ctx: PaintContext): string {
     </g>
     ${renderCheeks(ctx, r2(50 - 26 * hs), r2(50 + 26 * hs), mouthY - 2)}
     ${renderMouth(spec.mouth, 50, mouthY, ctx, 1.05)}
-    ${eyes(spec, ctx, shell.eyeY, 14, 11.6)}
+    ${headGear(spec, ctx, geo)}
+    ${eyes(spec, ctx, shell.eyeY, 14, 11.6, geo.halfAt)}
+    ${headGear(spec, ctx, geo, 'over')}
     <g filter="url(#${ids(ctx).cast})">${claws}</g>
     ${wear(spec, 'carapace', ctx, 50, shell.crown, 1, 1, { torsoW: shell.half * 2, torsoH: shell.bottom - shell.crown, eyeY: shell.eyeY - shell.crown, mouthY: mouthY - shell.crown })}
     ${wear(spec, 'belt', ctx, 50, hipY + dy - 1, 1, 0.7, { waistHalf: 21 * hs + 2.5 })}
-    ${headGear(spec, ctx, shell.eyeY, mouthY, eyeSize(spec.eyeShape, 11.6), 14, (y) => outlineHalfAt(base.path, base.widestY + (y - base.widestY) / build.sy) * build.sx, shell.crown)}
   </g></g>`
 
   return `<g class="avatar-character" data-race="crab">${groundShadow(ctx, 56 + wx * 0.6)}${inked(ctx, `${sideLegs}${legs}${torso}${upper}`)}</g>`
@@ -820,8 +960,10 @@ export function headShapeOutline(race: AvatarRace, shape: AvatarHeadShape): stri
  * low crabs, and every height still frame the face the same way.
  */
 export function portraitViewBox(spec: CharacterSpec): string {
-  // Hats and helmets get headroom: the crop grows upward (bottom edge fixed) so the face stays centred.
-  const extra = spec.equipment?.head ? 18 : 0
+  // Hats get just the headroom they need: the crop grows upward (bottom edge fixed) so the
+  // face stays centred and the whole hat, pompom and crest included, stays in frame.
+  const hatTop = hatTopY(spec)
+  const extra = hatTop === null ? 0 : Math.min(26, Math.max(0, headGeometry(spec).eyeY - hatTop + 6 - 35))
   const frame = (eyeY: number) => `${r2(-9 - extra / 2)} ${r2(eyeY - 35 - extra)} ${118 + extra} ${118 + extra}`
   if (spec.race === 'crab') {
     const shell = stretchShell(
