@@ -1,6 +1,6 @@
 /** Worn geometry and inventory art share this registry. Never use inventory photographs as overlays. */
 import type { EquipmentCategory } from '../../db/schema'
-import type { Pt } from './geometry'
+import { cubicAt, outlineHalfAt, type Pt } from './geometry'
 import { renderAccessory } from './parts'
 import { ids, paintDefs, type PaintContext } from './paint'
 import { SHELL_PALETTES, type AvatarAccessory } from './traits'
@@ -87,6 +87,14 @@ export interface EquipmentFit {
   antennaRoots?: [[number, number], [number, number]]
   /** Leg gear is built over the wearer's own leg outline instead of a stock shape. */
   leg?: LegFrame
+  /** The wearer's claw outline (claw-local), so gauntlets wrap the real claw. */
+  claw?: { palm: string; finger: string }
+  /** Half-width of the wearer's waist at the belt line. */
+  waistHalf?: number
+  /** The wearer's own antenna (left-side local frame), so feeler gear rides it instead of replacing it. */
+  antenna?: { stalk: [Pt, Pt, Pt, Pt]; tip: Pt; scale: number }
+  /** The wearer's torso outline (absolute) and the band a chest plate covers. */
+  torso?: { path: string; top: number; bottom: number }
 }
 
 /**
@@ -158,7 +166,7 @@ export function renderEquipment(
     body = `<g data-armor-fit="crab">`
     for (const side of [-1, 1]) body += `<g transform="scale(${side} 1)">${plate(`M${x0},14 Q${w - 6},10 ${w - 1},22 L${w + 2},36 L${w - 5},${h - 9} L${w - 15},${h - 13} L${x0 + 4},31 Z`)}${seam(`M${x0 + 4},17 Q${w - 6},16 ${w - 4},30 L${w - 10},${h - 16}`)}${bolts([w - 8], 26)}</g>`
     body += plate(`M-20,${vent} Q0,${vent + 5} 20,${vent} L17,${vent + 15} Q0,${vent + 24} -17,${vent + 15} Z`) + seam(`M-12,${vent + 9} Q0,${vent + 13} 12,${vent + 9}`) + '</g>'
-  } else if (v.category === 'carapace') {
+  } else if (v.category === 'carapace' && !fit?.torso) {
     body = `<path d="M-30,3 Q0,-4 30,3 L20,49 Q0,64 -20,49 Z" fill="#07171d" opacity=".25" transform="translate(0 2)"/>` +
       plate('M-29,1 Q-15,-5 0,4 Q15,-5 29,1 L23,25 L18,47 Q0,60 -18,47 L-23,25 Z') +
       plate('M-25,6 L-9,12 L-5,34 L-17,29 Z', v.material) +
@@ -175,11 +183,16 @@ export function renderEquipment(
         plate(`M-28,0 L-36,${-n * 2} L-38,${9 + n * 2} L-25,17 Z`) +
         plate(`M28,0 L36,${-n * 2} L38,${9 + n * 2} L25,17 Z`)
   } else if (v.category === 'belt') {
+    // The band spans the wearer's real waist; buckle and fittings ride its ends.
+    const h = fit?.waistHalf ?? 27
+    const e = (x: number) => (x < 0 ? x - (h - 27) : x + (h - 27))
     body =
-      plate('M-27,-5 Q0,1 27,-5 L26,7 Q0,14 -26,7 Z') +
+      plate(`M${-h},-5 Q0,1 ${h},-5 L${h - 1},7 Q0,14 ${-(h - 1)},7 Z`) +
       plate(`M-${6 + n},-4 L${6 + n},-4 L${8 + n},8 L0,${13 + n} L-${8 + n},8 Z`, v.trim) +
-      bolts([-21, 21], 2)
-    if (v.motif === 'vent') body += [-17, -12, 12, 17].map((x) => seam(`M${x},0 v5`)).join('')
+      bolts([e(-21), e(21)], 2)
+    if (v.motif === 'vent') body += [-17, -12, 12, 17].map((x) => seam(`M${e(x)},0 v5`)).join('')
+  } else if (v.category === 'carapace' && fit?.torso) {
+    body = torsoArmour(v, uid, fit.torso, plate, seam, bolts)
   } else if (v.category === 'legs' && fit?.leg) {
     body = legArmour(v, uid, fit.leg, plate, seam)
   } else if (v.category === 'legs') {
@@ -188,6 +201,8 @@ export function renderEquipment(
       plate('M-6,27 L6,27 L9,45 L-9,45 Z') +
       plate('M-9,41 L8,41 L14,48 L-13,48 L-14,46 Z', v.material) +
       seam('M-5,8 L0,13 L5,8 M-4,32 H4')
+  } else if (v.category === 'antennae' && fit?.antenna) {
+    body = antennaGear(v, fit.antenna, plate)
   } else if (v.category === 'antennae') {
     body = ''
     for (const [i, side] of [-1, 1].entries()) {
@@ -204,6 +219,8 @@ export function renderEquipment(
       plate('M-18,3 L-14,-6 L0,-1 L14,-6 L18,3 Z', v.trim) +
       seam('M-12,-5 L0,-9 L12,-5') +
       bolts([-25, 25], 4)
+  } else if (v.category === 'claws' && v.motif !== 'hammer' && fit?.claw) {
+    body = clawArmour(v, uid, fit.claw, plate, seam, bolts)
   } else if (v.motif === 'hammer') {
     body =
       `<path d="M-3,5 L1,-67" stroke="#18272a" stroke-width="7"/><path d="M-3,5 L1,-67" stroke="${v.trim}" stroke-width="4"/>` +
@@ -229,7 +246,7 @@ export function renderEquipment(
       )
   }
   // Construction changes shape and assembly, rather than only tinting a shared silhouette.
-  if (!v.accessory && v.category === 'carapace' && fit?.race !== 'crab' && n >= 2) {
+  if (!v.accessory && v.category === 'carapace' && fit?.race !== 'crab' && !fit?.torso && n >= 2) {
     body += [-1, 1]
       .map(
         (side) =>
@@ -264,7 +281,7 @@ export function renderEquipment(
     body += [-1, 1]
       .map(
         (side) =>
-          `<g transform="scale(${side} 1)">${plate(n === 4 ? 'M12,-4 L23,-10 L28,-3 L25,14 L16,18 L15,7 Z' : 'M15,-3 L25,-1 L24,12 L16,15 Z')}${seam(n === 4 ? 'M19,-2 V10 M23,-2 V8' : 'M19,1 V8')}</g>`,
+          `<g transform="scale(${side} 1) translate(${(fit?.waistHalf ?? 27) - 27} 0)">${plate(n === 4 ? 'M12,-4 L23,-10 L28,-3 L25,14 L16,18 L15,7 Z' : 'M15,-3 L25,-1 L24,12 L16,15 Z')}${seam(n === 4 ? 'M19,-2 V10 M23,-2 V8' : 'M19,1 V8')}</g>`,
       )
       .join('')
     if (n === 3) body += seam('M-12,-3 L0,7 L12,-3 M-9,-3 L0,3 L9,-3')
@@ -279,10 +296,12 @@ export function renderEquipment(
       v.material +
       '" stroke-width="3"/>'
   }
-  if (n > 1 && !fit?.leg)
+  if (n > 1 && !fit?.leg && !fit?.torso && !fit?.antenna && !(fit?.claw && v.category === 'claws'))
     body += `<g fill="${v.accent}">${[0, 1, 2].map((i) => `<circle cx="${(i - 1) * 4}" cy="${v.category === 'claws' ? -8 : 3}" r=".8"/>`).join('')}</g>`
-  if (n === 4 && !fit?.leg)
+  if (n === 4 && !fit?.leg && !fit?.torso && !fit?.antenna && !(fit?.claw && v.category === 'claws'))
     body += `<g class="equipment-signature" fill="none" stroke="${v.accent}" stroke-width=".65" opacity=".7">${v.category === 'claws' ? '<path d="M-14,-20 l3,-8 M10,-25 l3,-8"/>' : '<path d="M-12,10 L0,16 L12,10 M-9,14 L0,20 L9,14"/>'}</g>`
+  // Held weapons slide up so the shaft runs through the claw's pinch and the head clears the tip.
+  if (v.motif === 'hammer' && fit?.claw) body = `<g data-weapon-grip="pinch" transform="translate(3 -16) scale(0.85)">${body}</g>`
   // Helmets are drawn with their band at y=3; lift it just clear of the brows on the brim line.
   if (v.category === 'head' && !v.accessory) body = `<g transform="translate(0 -5)">${body}</g>`
   return `<g data-equipment="${v.key}" data-construction="${n}"><defs><linearGradient id="${uid}" x1="0" y1="0" x2=".85" y2="1"><stop stop-color="${v.trim}"/><stop offset=".2" stop-color="${v.material}"/><stop offset=".32" stop-color="${v.trim}" stop-opacity=".65"/><stop offset=".65" stop-color="${v.material}"/><stop offset="1" stop-color="${tone(v.material, -0.5)}"/></linearGradient></defs><g filter="url(#${ids(ctx).gearForm})">${body}</g></g>`
@@ -349,4 +368,120 @@ function legArmour(v: EquipmentVisual, uid: string, leg: LegFrame, plate: PlateF
     out += plate(`M${fx.toFixed(2)},${(ky - 3).toFixed(2)} L${(fx + o * 6).toFixed(2)},${(ky - 7).toFixed(2)} L${(fx + o * 3).toFixed(2)},${(ky + 4).toFixed(2)} Z`, v.trim)
   }
   return `<g data-leg-armour="fit">${out}</g>`
+}
+
+/** Gauntlet plates over the claw's own palm and finger, so every claw style keeps its silhouette. */
+function clawArmour(
+  v: EquipmentVisual,
+  uid: string,
+  claw: { palm: string; finger: string },
+  plate: PlateFn,
+  seam: (d: string) => string,
+  bolts: (xs: number[], y: number) => string,
+): string {
+  const n = v.construction
+  const swell = (d: string, at: Pt, k: number, fill?: string) =>
+    `<g transform="translate(${at[0]} ${at[1]}) scale(${k}) translate(${-at[0]} ${-at[1]})">${plate(d, fill)}</g>`
+  const palmAt: Pt = [-5, -24]
+  const fingerAt: Pt = [7, -44]
+  const clip = `<clipPath id="${uid}-palm"><path d="${claw.palm}" transform="translate(-5 -24) scale(1.08) translate(5 24)"/></clipPath>`
+  const bands = (ys: number[], stroke: string) =>
+    `<g clip-path="url(#${uid}-palm)" fill="none" stroke="${stroke}" stroke-width="1.2">${ys.map((y) => `<path d="M-30,${y} Q-5,${y - 4} 20,${y}"/>`).join('')}</g>`
+  let out = clip
+  if (v.motif === 'crusher') {
+    out += swell(claw.finger, fingerAt, 1.12) + swell(claw.palm, palmAt, 1.1)
+    out += bolts([-14], -14) + bolts([-16], -26) + bolts([-14], -38)
+    out += bands([-8, -46], tone(v.material, -0.55))
+  } else if (v.motif === 'slim') {
+    out += swell(claw.finger, fingerAt, 1.06, v.trim) + swell(claw.palm, palmAt, 1.06)
+    // A blade along the finger's outer edge.
+    out += plate('M12,-30 C18,-40 16,-56 5,-68 L3,-61 C9,-52 10,-41 6,-33 Z', v.trim)
+    out += seam('M-14,-12 C-15,-24 -12,-38 -7,-46')
+  } else if (v.motif === 'mitten') {
+    // One padded cover over palm and finger: soft, no rivets.
+    out += swell(claw.finger, fingerAt, 1.16, v.material) + swell(claw.palm, palmAt, 1.14, v.material)
+    out += `<path d="M-15,-10 C-17,-24 -14,-40 -6,-50" fill="none" stroke="${v.trim}" stroke-width="1" stroke-dasharray="2 2" stroke-linecap="round"/>`
+  } else {
+    out += swell(claw.palm, palmAt, 1.08)
+    out += seam('M-13,-12 C-14,-24 -11,-36 -6,-44')
+  }
+  if (n >= 1 && v.motif !== 'mitten') out += bands(n >= 3 ? [-12, -22, -32] : [-14, -26], v.accent)
+  // Wrist cuff where the claw meets the arm.
+  out += plate('M-11,-1 Q0,-5 11,-1 L10,6 Q0,10 -10,6 Z', v.trim) + bolts([-5, 5], 3)
+  return `<g data-claw-armour="fit">${out}</g>`
+}
+
+/** A chest plate cut from the wearer's own torso outline, so it wraps every build. */
+function torsoArmour(
+  v: EquipmentVisual,
+  uid: string,
+  torso: { path: string; top: number; bottom: number },
+  plate: PlateFn,
+  seam: (d: string) => string,
+  bolts: (xs: number[], y: number) => string,
+): string {
+  const n = v.construction
+  const { top, bottom } = torso
+  const mid = (top + bottom) / 2
+  const halfAt = (y: number) => outlineHalfAt(torso.path, y) * 1.05
+  const grow = `translate(50 ${mid}) scale(1.05) translate(-50 ${-mid})`
+  const band = `M-10,${top} L110,${top} L110,${bottom - 6} Q50,${bottom + 8} -10,${bottom - 6} Z`
+  const clip = `<clipPath id="${uid}-band"><path d="${band}"/></clipPath><clipPath id="${uid}-torso"><path d="${torso.path}" transform="${grow}"/></clipPath>`
+  const inside = (inner: string) => `<g clip-path="url(#${uid}-torso)">${inner}</g>`
+  let out = clip + `<g clip-path="url(#${uid}-band)"><g transform="${grow}">${plate(torso.path)}</g></g>`
+  // Lower edge of the plate, drawn along the cut.
+  out += inside(`<path d="M-10,${bottom - 6} Q50,${bottom + 8} 110,${bottom - 6}" fill="none" stroke="${tone(v.material, -0.62)}" stroke-width="1.2"/><path d="M-10,${bottom - 7.5} Q50,${bottom + 6.5} 110,${bottom - 7.5}" fill="none" stroke="${tone(v.trim, 0.45)}" stroke-width=".7" opacity=".6"/>`)
+  // Centre keel in trim.
+  out += inside(plate(`M46,${top - 2} L54,${top - 2} L54.5,${bottom - 6} L50,${bottom + 1} L45.5,${bottom - 6} Z`, v.trim))
+  const span = bottom - top
+  if (v.motif === 'rib') {
+    out += inside([0.3, 0.5, 0.7].map((f) => `<path d="M0,${top + span * f} Q50,${top + span * f + 6} 100,${top + span * f}" fill="none" stroke="${tone(v.material, -0.55)}" stroke-width="1.2"/>`).join(''))
+  } else if (v.motif === 'vent') {
+    out += [-1, 1].map((sd) => [0.35, 0.5, 0.65].map((f) => { const y = top + span * f; const x = 50 + sd * halfAt(y) * 0.55; return seam(`M${(x - 4).toFixed(2)},${y.toFixed(2)} H${(x + 4).toFixed(2)}`) }).join('')).join('')
+  } else {
+    out += [-1, 1].map((sd) => { const y = top + span * 0.42; const x = 50 + sd * halfAt(y) * 0.5; return seam(`M${(50 + sd * 6).toFixed(2)},${(top + span * 0.2).toFixed(2)} Q${x.toFixed(2)},${y.toFixed(2)} ${(50 + sd * 8).toFixed(2)},${(top + span * 0.75).toFixed(2)}`) }).join('')
+  }
+  const by = top + span * 0.3
+  out += bolts([50 - halfAt(by) * 0.78, 50 + halfAt(by) * 0.78], by)
+  // Higher tiers add shoulder guards at the plate's top corners.
+  if (n >= 2) {
+    out += [-1, 1].map((sd) => {
+      const y = top + 4
+      const x = 50 + sd * halfAt(y)
+      const d = `M${(x - sd * 9).toFixed(2)},${(y - 4).toFixed(2)} Q${(x + sd * 3).toFixed(2)},${(y - 7).toFixed(2)} ${(x + sd * 4).toFixed(2)},${(y + 4).toFixed(2)} L${(x - sd * 2).toFixed(2)},${(y + 13).toFixed(2)} L${(x - sd * 8).toFixed(2)},${(y + 6).toFixed(2)} Z`
+      return plate(d, n === 4 ? v.trim : undefined)
+    }).join('')
+  }
+  return `<g data-armor-fit="torso">${out}</g>`
+}
+
+/** Collar, bands and a tip ornament fitted along the wearer's own antenna. */
+function antennaGear(v: EquipmentVisual, a: { stalk: [Pt, Pt, Pt, Pt]; tip: Pt; scale: number }, plate: PlateFn): string {
+  const n = v.construction
+  const k = 1 / a.scale // keep fittings a readable size on small crab antennae
+  const at = (t: number) => cubicAt(a.stalk[0], a.stalk[1], a.stalk[2], a.stalk[3], t)
+  const f = (q: readonly number[]) => `${q[0].toFixed(2)} ${q[1].toFixed(2)}`
+  const band = (t: number, r: number) => {
+    const p = at(t)
+    const q = at(Math.min(1, t + 0.04))
+    const ang = (Math.atan2(q[1] - p[1], q[0] - p[0]) * 180) / Math.PI
+    return `<g transform="translate(${f(p)}) rotate(${ang.toFixed(1)}) scale(${k.toFixed(2)})"><rect x="-1.6" y="${-r}" width="3.2" height="${2 * r}" rx="1.2" fill="${v.trim}" stroke="${tone(v.material, -0.62)}" stroke-width=".8"/></g>`
+  }
+  let out = `<g transform="scale(${k.toFixed(2)})"><circle r="3.6" fill="${v.material}" stroke="${v.trim}" stroke-width="1.1"/></g>`
+  out += band(0.32, 2.8)
+  if (n >= 1) out += band(0.58, 2.4)
+  if (n >= 3) out += band(0.8, 2)
+  const tip = `translate(${f(a.tip)}) scale(${k.toFixed(2)})`
+  if (v.motif === 'crown') {
+    out += `<g transform="${tip}">${plate('M-5,2 L-6,-5 L-2.5,-1.5 L0,-7 L2.5,-1.5 L6,-5 L5,2 Z', v.trim)}<circle cy="-1" r="1.3" fill="${v.accent}"/></g>`
+  } else {
+    // A sensor ring around the tip, with a glowing core that grows with each tier.
+    out += `<g transform="${tip}"><circle r="${(3.2 + n * 0.5).toFixed(1)}" fill="none" stroke="${v.trim}" stroke-width="1.4"/><circle r="${(1.4 + n * 0.35).toFixed(1)}" fill="${v.accent}"/></g>`
+  }
+  if (n >= 2 && v.motif !== 'crown') {
+    // A small dish part-way up for the radar tiers.
+    const p = at(0.45)
+    out += `<g transform="translate(${f(p)}) rotate(-35) scale(${k.toFixed(2)})">${plate('M-1,0 Q3,-7 8,-6 Q6,-1 -1,0 Z', v.material)}</g>`
+  }
+  return `<g data-antenna-gear="fit">${out}</g>`
 }

@@ -36,6 +36,7 @@ import {
 } from './avatar/backdrop'
 import type { EquippedAppearance } from './character-appearance'
 import { getEquipmentVisual } from './avatar/equipment'
+import type { EquipmentCategory } from '../db/schema'
 import { EQUIP_SLOT_IDS, EQUIPMENT_RARITIES, equipSlotCategory } from './chassis-loadout'
 import { paintDefs, type PaintContext } from './avatar/paint'
 import { AVATAR_EYE_COLORS, eyeDefs } from './avatar/parts'
@@ -75,7 +76,7 @@ export * from './avatar/traits'
 /** Stored style tag. Kept from the first avatar version so saved configs stay valid. */
 export const LOBSTER_AVATAR_STYLE = 'critters' as const
 
-export type EyelidStyle = 'open' | 'relaxed' | 'cheerful_squint' | 'focused' | 'chill' | 'angry' | 'worried' | 'sad' | 'smug' | 'shocked'
+export type EyelidStyle = 'open' | 'relaxed' | 'cheerful_squint' | 'focused' | 'chill' | 'angry' | 'worried' | 'sad' | 'smug' | 'shocked' | 'wink'
 export type LobsterEyeColor = (typeof AVATAR_EYE_COLORS)[number]
 
 export const LOBSTER_EYELID_STYLES: readonly EyelidStyle[] = [
@@ -89,6 +90,7 @@ export const LOBSTER_EYELID_STYLES: readonly EyelidStyle[] = [
   'sad',
   'smug',
   'shocked',
+  'wink',
 ] as const
 
 /** Seeded characters roll from the original seven, so new expressions never change an existing member's look. */
@@ -103,6 +105,17 @@ export const LOBSTER_EYE_COLOR_LABELS: Readonly<Record<LobsterEyeColor, string>>
   amethyst: 'Amethyst',
   ruby: 'Ruby',
   topaz: 'Topaz',
+}
+
+/** Where the pupils point. Unset keeps the original slight inward look. */
+export const LOBSTER_GAZES = ['ahead', 'left', 'right', 'up', 'down'] as const
+export type LobsterGaze = (typeof LOBSTER_GAZES)[number]
+export const LOBSTER_GAZE_LABELS: Readonly<Record<LobsterGaze, string>> = {
+  ahead: 'Ahead',
+  left: 'Left',
+  right: 'Right',
+  up: 'Up',
+  down: 'Down',
 }
 
 export const LOBSTER_EYE_VARIANTS = ['round', 'wide', 'tall'] as const
@@ -195,6 +208,7 @@ export interface LobsterAvatarConfig {
   eyeColor?: LobsterEyeColor
   eyeVariant?: LobsterEyeVariant
   pupilVariant?: LobsterPupilVariant
+  gaze?: LobsterGaze
   backgroundMotion?: BackgroundMotionMode
   transparentBackground?: boolean
 }
@@ -217,6 +231,7 @@ export interface ResolvedAvatarTraits {
   eyeColor: LobsterEyeColor
   eyeVariant: LobsterEyeVariant
   pupilVariant: LobsterPupilVariant
+  gaze: LobsterGaze
   backgroundTheme: string
   backgroundPattern: string
   backgroundTexture: string
@@ -240,6 +255,7 @@ export const AVATAR_TRAIT_KEYS = [
   'eyeColor',
   'eyeVariant',
   'pupilVariant',
+  'gaze',
   'backgroundTheme',
   'backgroundPattern',
   'backgroundTexture',
@@ -301,6 +317,7 @@ export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | nu
   if (isOneOf(LOBSTER_EYE_COLORS, lower(obj.eyeColor))) config.eyeColor = lower(obj.eyeColor) as LobsterEyeColor
   if (isOneOf(LOBSTER_EYE_VARIANTS, lower(obj.eyeVariant))) config.eyeVariant = lower(obj.eyeVariant) as LobsterEyeVariant
   if (isOneOf(LOBSTER_PUPIL_VARIANTS, lower(obj.pupilVariant))) config.pupilVariant = lower(obj.pupilVariant) as LobsterPupilVariant
+  if (isOneOf(LOBSTER_GAZES, lower(obj.gaze))) config.gaze = lower(obj.gaze) as LobsterGaze
   if (typeof obj.backgroundMotion === 'string' && isOneOf(LOBSTER_BACKGROUND_MOTION_MODES, obj.backgroundMotion.trim())) {
     config.backgroundMotion = obj.backgroundMotion.trim() as BackgroundMotionMode
   }
@@ -463,6 +480,7 @@ export function resolveAvatarTraits(config: LobsterAvatarConfig): ResolvedAvatar
     eyeColor: isOneOf(LOBSTER_EYE_COLORS, lower(config.eyeColor)) ? (lower(config.eyeColor) as LobsterEyeColor) : seeded.eyeColor,
     eyeVariant: isOneOf(LOBSTER_EYE_VARIANTS, lower(config.eyeVariant)) ? (lower(config.eyeVariant) as LobsterEyeVariant) : seeded.eyeVariant,
     pupilVariant: isOneOf(LOBSTER_PUPIL_VARIANTS, lower(config.pupilVariant)) ? (lower(config.pupilVariant) as LobsterPupilVariant) : seeded.pupilVariant,
+    gaze: isOneOf(LOBSTER_GAZES, lower(config.gaze)) ? (lower(config.gaze) as LobsterGaze) : 'ahead',
     backgroundTheme: (config.backgroundTheme && LOBSTER_BACKGROUND_THEME_MAP[config.backgroundTheme]?.id) || seeded.theme.id,
     backgroundPattern:
       config.backgroundPattern === 'none'
@@ -589,6 +607,7 @@ export function buildAvatarSvg(
       eyeColor: traits.eyeColor,
       eyeShape: traits.eyeVariant,
       pupil: traits.pupilVariant,
+      gaze: traits.gaze,
       expression: traits.eyelidStyle,
       mouth: traits.mouth,
       antennae: traits.antennae,
@@ -775,4 +794,56 @@ export function rerollAvatarConfig(config: Pick<LobsterAvatarConfig, 'race'>): L
     headShape: pickFrom(rng, AVATAR_HEAD_SHAPES),
     build: pickFrom(rng, AVATAR_BUILDS),
   }
+}
+
+/** Where each gear category sits on the stock mannequin (full-body coordinates). */
+const GEAR_ICON_CROP: Readonly<Record<EquipmentCategory, string>> = {
+  head: '2 -24 96 96',
+  antennae: '-8 -36 116 116',
+  carapace: '6 92 88 88',
+  belt: '16 124 68 68',
+  legs: '10 120 80 80',
+  claws: '-44 -26 108 108',
+}
+
+const gearIconCache = new Map<string, string | null>()
+
+/**
+ * Inventory icon: the item worn on a dark, plain mannequin, cropped to where it sits,
+ * so members can see at a glance what the piece is and where it goes.
+ */
+export function equipmentIcon(key: string): string | null {
+  const hit = gearIconCache.get(key)
+  if (hit !== undefined) return hit
+  const v = getEquipmentVisual(key)
+  if (!v) return null
+  const slot = v.category === 'claws' ? 'claws-1' : v.category
+  const svg = generateLobsterAvatarSvg(
+    {
+      style: LOBSTER_AVATAR_STYLE,
+      seed: 'gear-icon',
+      race: 'lobster',
+      shellColor: 'obsidian',
+      shellFinish: 'satin',
+      marking: 'none',
+      // Claws are shown raised so held weapons stay in frame.
+      pose: v.category === 'claws' ? 'cheer' : 'rest',
+      headShape: 'bean',
+      build: 'classic',
+      height: 'regular',
+      eyelidStyle: 'chill',
+      eyeColor: 'sapphire',
+      mouth: 'smile',
+      antennae: 'whip',
+      claws: 'classic',
+      accessory: 'none',
+      transparentBackground: true,
+      equipment: { [slot]: { visualKey: key } },
+    } as LobsterAvatarConfig,
+    96,
+    { frame: 'fullBody', staticMotion: true },
+  )
+  const out = svg ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(stripSvgSmilAnimation(svg).replace(/viewBox="[^"]*"/, `viewBox="${GEAR_ICON_CROP[v.category]}"`))}` : null
+  gearIconCache.set(key, out)
+  return out
 }

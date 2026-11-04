@@ -9,6 +9,8 @@ import { glint, ids, inked, piece, type PaintContext } from './paint'
 import {
   eyeSize,
   renderAccessory,
+  clawShape,
+  ANTENNA_RIG,
   renderAntennae,
   renderArm,
   renderCheeks,
@@ -18,6 +20,7 @@ import {
   type ArmCurve,
   type AvatarEyeColor,
   type Expression,
+  type Gaze,
   type EyeShape,
   type PupilStyle,
 } from './parts'
@@ -42,6 +45,7 @@ export interface CharacterSpec {
   eyeShape: EyeShape
   pupil: PupilStyle
   expression: Expression
+  gaze?: Gaze
   mouth: AvatarMouth
   antennae: AvatarAntennae
   claws: AvatarClaws
@@ -130,11 +134,12 @@ function renderArmsAndClaws(
         side,
         gripping: Boolean(hammer),
       }
-      if (hammer) p.rot = side === 'left' ? -8 : 8
+      // Gauntlets are built over the claw's own outline; weapons sit in the pinch and swing with the pose.
+      const gear = visual ? renderEquipment(visual, { ...ctx, uid: `${ctx.uid}-${side}` }, { race: spec.race, claw: clawShape(spec.claws, side) }) : ''
       return renderClaw({
         ...p,
-        replacement: Boolean(visual && !hammer),
-        equipment: visual ? renderEquipment(visual, { ...ctx, uid: `${ctx.uid}-${side}` }, { race: spec.race }) : '',
+        equipment: hammer ? '' : gear,
+        equipmentUnder: hammer ? gear : '',
       }, spec.claws, ctx)
     })
     .join('')
@@ -180,6 +185,14 @@ function headGear(
   return wear(spec, 'head', ctx, 50, brim, sx, sy, { eyeY: (eyeY - brim) / sy, mouthY: (mouthY - brim) / sy })
 }
 
+/** Feeler gear rides the character's own antennae, whatever style they picked. */
+function antennaGearFor(spec: CharacterSpec, ctx: PaintContext, scale: number): ((side: 'left' | 'right') => string) | undefined {
+  const key = spec.equipment?.antennae?.visualKey
+  if (!key) return undefined
+  const rig = ANTENNA_RIG[spec.antennae] ?? ANTENNA_RIG.whip
+  return (side) => renderEquipment(key, { ...ctx, uid: `${ctx.uid}-antennae-${side}` }, { race: spec.race, antenna: { ...rig, scale } })
+}
+
 function groundShadow(ctx: PaintContext, rx: number): string {
   return `<ellipse cx="50" cy="${GROUND_Y + 1}" rx="${rx}" ry="7" fill="url(#${ids(ctx).softShadow})"/>`
 }
@@ -192,7 +205,7 @@ function eyes(
   base: number,
 ): string {
   const size = eyeSize(spec.eyeShape, base)
-  const common = { ...size, color: spec.eyeColor, pupil: spec.pupil, expression: spec.expression }
+  const common = { ...size, color: spec.eyeColor, pupil: spec.pupil, expression: spec.expression, gaze: spec.gaze }
   return `<g class="lobster-idle-layer lobster-idle-eyes">${renderEye({ ...common, cx: 50 - spread, cy: y, side: 'left' }, ctx, 'left')}${renderEye({ ...common, cx: 50 + spread, cy: y, side: 'right' }, ctx, 'right')}</g>`
 }
 
@@ -415,7 +428,8 @@ function lobster(spec: CharacterSpec, ctx: PaintContext): string {
     curve: number,
   ) =>
     `M${r2(50 - half)},${y0} C${r2(50 - bulge)},${y0 + curve} ${r2(50 - hips)},${y1} 50,${y1} C${r2(50 + hips)},${y1} ${r2(50 + bulge)},${y0 + curve} ${r2(50 + half)},${y0} Z`
-  const abdomen = piece(torso(build.half, build.bulge, build.hips, top, bottom, 40), ctx, {
+  const torsoPath = torso(build.half, build.bulge, build.hips, top, bottom, 40)
+  const abdomen = piece(torsoPath, ctx, {
     attrs: 'class="avatar-abdomen-shell"',
   })
   const bellyTop = top + 10
@@ -442,8 +456,8 @@ function lobster(spec: CharacterSpec, ctx: PaintContext): string {
   const belly = `<g class="avatar-belly">${piece(bellyPath, ctx, { belly: true, noRim: true })}${ridges}</g>`
 
   const torsoGear =
-    wear(spec, 'carapace', ctx, 50, top + 23, (build.half / 34) * 0.87, (bottom - top - 23) / 56, { torsoW: build.half * 2, torsoH: bottom - top }) +
-    wear(spec, 'belt', ctx, 50, bottom - 7, (build.hips + 12) / 34, 0.72)
+    wear(spec, 'carapace', ctx, 0, 0, 1, 1, { torso: { path: torsoPath, top: top + 20, bottom: bottom - 12 } }) +
+    wear(spec, 'belt', ctx, 50, bottom - 7, 1, 0.72, { waistHalf: outlineHalfAt(torsoPath, bottom - 7) + 1.5 })
   const body = `<g class="lobster-idle-layer lobster-idle-abdomen">${abdomen}${belly}${torsoGear}</g>`
   const eyeBase = spec.headShape === 'heart' ? 10.5 : spec.headShape === 'tall' ? 11.5 : 12.8
   const hx = 36.5 - head.half
@@ -458,8 +472,7 @@ function lobster(spec: CharacterSpec, ctx: PaintContext): string {
     <g transform="${glintMove}">${glint('M24,48 C24,36 31,28 39,25 C34,32 30,40 29,50 Z', ctx, 0.5)}</g>
     ${renderCheeks(ctx, head.cheekX, 100 - head.cheekX, head.cheekY)}
     ${renderMouth(spec.mouth, 50, head.mouthY, ctx)}
-    ${spec.equipment?.antennae ? '' : renderAntennae(spec.antennae, ctx, { left: [45, head.eyeY - 5], right: [55, head.eyeY - 5] })}
-    ${wear(spec, 'antennae', ctx, 50, head.eyeY - 5, 1, 1, { antennaRoots: [[-5, 0], [5, 0]] })}
+    ${renderAntennae(spec.antennae, ctx, { left: [45, head.eyeY - 5], right: [55, head.eyeY - 5] }, 1, antennaGearFor(spec, ctx, 1))}
     ${eyes(spec, ctx, head.eyeY, head.eyeSpread, eyeBase)}
     <g filter="url(#${ids(ctx).cast})">${claws}</g>
     ${headGear(spec, ctx, head.eyeY, head.mouthY, eyeSize(spec.eyeShape, eyeBase), head.eyeSpread, (y) => outlineHalfAt(head.path, y), outlineTop(head.path))}
@@ -777,7 +790,7 @@ function crab(spec: CharacterSpec, ctx: PaintContext): string {
 
   const upper = `<g transform="translate(0 ${-dy})" filter="url(#${ids(ctx).cast})"><g class="lobster-idle-layer lobster-idle-carapace">
     ${arms}
-    ${spec.equipment?.antennae ? '' : renderAntennae(spec.antennae, ctx, { left: [45, shell.crown + 6], right: [55, shell.crown + 6] }, 0.55)}
+    ${renderAntennae(spec.antennae, ctx, { left: [45, shell.crown + 6], right: [55, shell.crown + 6] }, 0.55, antennaGearFor(spec, ctx, 0.55))}
     ${underside}
     <g${stretch}>
       ${spikes}
@@ -787,11 +800,10 @@ function crab(spec: CharacterSpec, ctx: PaintContext): string {
     </g>
     ${renderCheeks(ctx, r2(50 - 26 * hs), r2(50 + 26 * hs), mouthY - 2)}
     ${renderMouth(spec.mouth, 50, mouthY, ctx, 1.05)}
-    ${wear(spec, 'antennae', ctx, 50, shell.crown + 6, 1, 1, { antennaRoots: [[-5, 0], [5, 0]] })}
     ${eyes(spec, ctx, shell.eyeY, 14, 11.6)}
     <g filter="url(#${ids(ctx).cast})">${claws}</g>
     ${wear(spec, 'carapace', ctx, 50, shell.crown, 1, 1, { torsoW: shell.half * 2, torsoH: shell.bottom - shell.crown, eyeY: shell.eyeY - shell.crown, mouthY: mouthY - shell.crown })}
-    ${wear(spec, 'belt', ctx, 50, hipY + dy - 1, hs * 0.86, 0.7)}
+    ${wear(spec, 'belt', ctx, 50, hipY + dy - 1, 1, 0.7, { waistHalf: 21 * hs + 2.5 })}
     ${headGear(spec, ctx, shell.eyeY, mouthY, eyeSize(spec.eyeShape, 11.6), 14, (y) => outlineHalfAt(base.path, base.widestY + (y - base.widestY) / build.sy) * build.sx, shell.crown)}
   </g></g>`
 
@@ -808,15 +820,18 @@ export function headShapeOutline(race: AvatarRace, shape: AvatarHeadShape): stri
  * low crabs, and every height still frame the face the same way.
  */
 export function portraitViewBox(spec: CharacterSpec): string {
+  // Hats and helmets get headroom: the crop grows upward (bottom edge fixed) so the face stays centred.
+  const extra = spec.equipment?.head ? 18 : 0
+  const frame = (eyeY: number) => `${r2(-9 - extra / 2)} ${r2(eyeY - 35 - extra)} ${118 + extra} ${118 + extra}`
   if (spec.race === 'crab') {
     const shell = stretchShell(
       CRAB_SHELLS[spec.headShape] ?? CRAB_SHELLS.bean,
       CRAB_BUILDS[spec.build] ?? CRAB_BUILDS.classic,
     )
-    return `-9 ${r2(shell.eyeY - crabLift(spec) - 36)} 118 118`
+    return frame(shell.eyeY - crabLift(spec) - 1)
   }
   const head = LOBSTER_HEADS[spec.headShape] ?? LOBSTER_HEADS.bean
-  return `-9 ${r2(head.eyeY - lobsterLift(spec) - 35)} 118 118`
+  return frame(head.eyeY - lobsterLift(spec))
 }
 
 /** Full-body frame from just below the ground (y 198) up, with extra headroom for tall characters. */

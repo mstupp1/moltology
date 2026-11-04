@@ -23,6 +23,8 @@ import {
   LOBSTER_HEIGHTS,
   LOBSTER_HEIGHT_LABELS,
   LOBSTER_PUPIL_VARIANTS,
+  LOBSTER_GAZES,
+  LOBSTER_GAZE_LABELS,
   LOBSTER_PUPIL_VARIANT_LABELS,
   SHELL_FINISHES,
   SHELL_FINISH_LABELS,
@@ -458,6 +460,19 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
                   selected={traits.pupilVariant === v}
                   disabled={disabled}
                   onClick={() => set('pupilVariant', v)}
+                />
+              ))}
+            </OptionGroup>
+            <OptionGroup label="Looking" tiles>
+              {LOBSTER_GAZES.map((g) => (
+                <Tile
+                  key={g}
+                  label={LOBSTER_GAZE_LABELS[g]}
+                  src={tile({ gaze: g }, 'portrait')}
+                  zoom
+                  selected={traits.gaze === g}
+                  disabled={disabled}
+                  onClick={() => set('gaze', g)}
                 />
               ))}
             </OptionGroup>

@@ -151,17 +151,22 @@ describe('species fitting and claw integration', () => {
       expect(Number(eye.getAttribute('cy'))).toBeGreaterThan(60)
     }
   })
-  it('replaces native gauntlets and paints a gripping dactyl in front of weapons', () => {
+  it('builds gauntlets over the real claw, holds weapons in the pinch and keeps the chosen antennae', () => {
     for (const race of ['lobster', 'crab'] as const) {
       const doc = render(race)
       const hammer = doc.querySelector('[data-equipment="silt-maul"]')!
-      const grip = doc.querySelector('[data-weapon-grip]')!
-      expect(hammer.parentElement).toBe(grip.parentElement)
-      expect(hammer.nextElementSibling).toBe(grip)
+      const grip = hammer.querySelector('[data-weapon-grip="pinch"]')!
+      expect(grip).not.toBeNull()
+      // The weapon is drawn behind the claw, so the pincers close over the shaft.
+      const clawLayer = hammer.parentElement!
+      const palmAfter = [...clawLayer.children].slice([...clawLayer.children].indexOf(hammer) + 1)
+      expect(palmAfter.length).toBeGreaterThan(1)
       const gauntlet = doc.querySelector('[data-equipment="creator-slim"]')!
-      // A replacement contains only the wrist ball and equipment, no organic fingers.
-      expect(gauntlet.parentElement?.children).toHaveLength(2)
-      expect(doc.querySelectorAll('g[data-antennae]')).toHaveLength(0)
+      expect(gauntlet.querySelector('[data-claw-armour="fit"]')).not.toBeNull()
+      // The organic claw stays under the armour, so every claw style keeps its silhouette.
+      expect(gauntlet.parentElement!.children.length).toBeGreaterThan(2)
+      expect(doc.querySelectorAll('g[data-antennae]')).toHaveLength(1)
+      expect(doc.querySelectorAll('[data-antenna-gear="fit"]')).toHaveLength(2)
       expect(doc.querySelectorAll('.lobster-idle-antenna-left')).toHaveLength(1)
       expect(doc.querySelectorAll('[data-arm-anatomy="merus-carpus"]')).toHaveLength(2)
     }

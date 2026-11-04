@@ -1,4 +1,4 @@
-import { equipmentThumbnail } from '@/lib/avatar/equipment'
+import { equipmentIcon } from '@/lib/lobster-avatar'
 import React from 'react'
 import type { CatalogRef } from '@/lib/chassis-loadout'
 import {
@@ -40,7 +40,7 @@ export const GearItemCard: React.FC<GearItemCardProps> = ({
     catalog.imageUrl && !catalog.imageUrl.endsWith('.svg')
       ? catalog.imageUrl
       : chassisTypeImageUrl(catalog.visualType)
-  const imageSrc = equipmentThumbnail(catalog.appearanceKey || catalog.slug) ?? getAssetUrl(rawSrc)
+  const imageSrc = equipmentIcon(catalog.appearanceKey || catalog.slug) ?? getAssetUrl(rawSrc)
 
   return (
     <button

@@ -153,6 +153,7 @@ export const AVATAR_EXPRESSION_LABELS: Readonly<Record<string, string>> = {
   sad: 'Sad',
   smug: 'Smug',
   shocked: 'Shocked',
+  wink: 'Wink',
 }
 
 /** Small deterministic PRNG so seeds always roll the same character. */

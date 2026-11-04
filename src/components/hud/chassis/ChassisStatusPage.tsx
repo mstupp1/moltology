@@ -10,6 +10,7 @@ import { getChassisLoadoutFn, saveCharacterFn } from '@/lib/server/api'
 import {
   LOBSTER_AVATAR_STYLE,
   clearCachedProfileAvatarUrl,
+  equipmentIcon,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
 import {
@@ -31,7 +32,6 @@ import {
 import { equipmentAppearance } from '@/lib/character-appearance'
 import { AvatarCreatorPanel } from '../avatar/AvatarCreatorPanel'
 import { AvatarCreatorPreview } from '../avatar/AvatarCreatorPreview'
-import { equipmentThumbnail } from '@/lib/avatar/equipment'
 import { GearDetail } from './GearDetail'
 import '../avatar-animations.css'
 
@@ -444,7 +444,7 @@ interface SlotSharedProps {
 
 function SlotButton({ id, className = '', active, disabled, itemFor, onPick }: SlotSharedProps & { id: EquipSlotId; className?: string }) {
   const item = itemFor(id)
-  const thumb = item ? equipmentThumbnail(item.appearanceKey || item.slug) : null
+  const thumb = item ? equipmentIcon(item.appearanceKey || item.slug) : null
   const selected = active === id
   return (
     <button
@@ -496,7 +496,7 @@ function GearPick({
   selected: boolean
   onClick: () => void
 }) {
-  const thumb = equipmentThumbnail(catalog.appearanceKey || catalog.slug)
+  const thumb = equipmentIcon(catalog.appearanceKey || catalog.slug)
   const rarity = RARITY_STYLES[catalog.rarity]
   return (
     <button
