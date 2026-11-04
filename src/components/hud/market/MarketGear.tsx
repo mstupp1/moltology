@@ -107,6 +107,7 @@ export function MarketPieceDetail({
   onPickRarity,
   config,
   balance,
+  credits = 0,
   buying,
   everyItem,
   onBuy,
@@ -116,13 +117,17 @@ export function MarketPieceDetail({
   onPickRarity: (rarity: EquipmentRarity) => void
   config: LobsterAvatarConfig | null
   balance: number
+  /** Molt Credits cover what gems don't. */
+  credits?: number
   buying: boolean
   everyItem: boolean
   onBuy: (variant: MarketVariant) => void
 }) {
   const style = RARITY_FRAME[shown.rarity]
   const catalog = variantAsCatalog(piece, shown)
-  const short = shown.price - balance
+  const spendable = Math.max(0, credits)
+  const short = shown.price - balance - spendable
+  const creditPart = Math.max(0, shown.price - Math.max(0, balance))
   return (
     <div className="flex flex-col gap-3" data-testid="market-detail">
       <div className={cn('rounded-card border-2 bg-abyss/70 overflow-hidden w-full max-w-[260px] lg:max-w-none mx-auto', style.frame)}>
@@ -208,6 +213,11 @@ export function MarketPieceDetail({
           <HudButton size="lg" fullWidth disabled={buying || short > 0} onClick={() => onBuy(shown)}>
             {buying ? 'Buying…' : `Buy for ${shown.price.toLocaleString('en-US')} gems`}
           </HudButton>
+          {short <= 0 && creditPart > 0 ? (
+            <p className="text-xs text-ink-muted text-center">
+              Uses {Math.max(0, balance).toLocaleString('en-US')} gems and {creditPart.toLocaleString('en-US')} Molt Credits.
+            </p>
+          ) : null}
           {short > 0 ? (
             <p className="text-xs text-ink-muted text-center">
               You need {short.toLocaleString('en-US')} more gems. Daily liturgies, streaks and firsts all pay out.

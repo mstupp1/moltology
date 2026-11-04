@@ -20,6 +20,12 @@ describe('experiments', () => {
     expect(toggleExperiment(['premium', 'new-store'], 'premium', false)).toEqual(['new-store'])
   })
 
+  it('keeps Molt Credit purchases admin-only', () => {
+    expect(isExperimentId('molt-credits')).toBe(true)
+    expect(hasExperiment('admin', ['molt-credits'], 'molt-credits')).toBe(true)
+    expect(hasExperiment('user', ['molt-credits'], 'molt-credits')).toBe(false)
+  })
+
   it('ignore retired or malformed stored values', () => {
     expect(activeExperiments('admin', ['old-thing', 'avatar-kit'])).toEqual([])
     expect(activeExperiments('admin', 'new-store')).toEqual([])

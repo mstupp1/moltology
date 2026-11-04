@@ -5,7 +5,8 @@ import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { buyGearFn, getChassisLoadoutFn, getMarketFn } from '@/lib/server/api'
+import { buyGearFn, createCreditCheckoutFn, getChassisLoadoutFn, getMarketFn } from '@/lib/server/api'
+import type { MoltCreditPack } from '@/lib/molt-credits'
 import { clearChassisLoadoutCache, getCachedChassisLoadout, CATEGORY_LABELS } from '@/lib/chassis-loadout'
 import { equipmentAppearance } from '@/lib/character-appearance'
 import { RARITY_LABELS, RARITY_ORDER } from '@/lib/gear-variants'
@@ -88,6 +89,7 @@ export function MarketShopPage() {
   const [selected, setSelected] = useState<{ baseKey: string; rarity: EquipmentRarity } | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
   const [buying, setBuying] = useState(false)
+  const [buyingPack, setBuyingPack] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     if (!userId) return
@@ -104,6 +106,24 @@ export function MarketShopPage() {
   useEffect(() => {
     void load()
   }, [load])
+
+  // Back from Stripe: the webhook adds the credits, usually within a few seconds.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const url = new URL(window.location.href)
+    const status = url.searchParams.get('credits')
+    if (!status) return
+    setTab('credits')
+    if (status === 'success') {
+      toast?.success('Your Molt Credits will show up in a moment.', { title: 'Payment received' })
+      const timer = window.setTimeout(() => void load(), 4000)
+      url.searchParams.delete('credits')
+      window.history.replaceState(null, '', url.pathname + url.search)
+      return () => window.clearTimeout(timer)
+    }
+    url.searchParams.delete('credits')
+    window.history.replaceState(null, '', url.pathname + url.search)
+  }, [load, toast])
 
   // The member's own character, wearing what they have on, for try-ons.
   useEffect(() => {
@@ -191,6 +211,19 @@ export function MarketShopPage() {
     }
   }
 
+  const buyPack = async (pack: MoltCreditPack) => {
+    if (buyingPack) return
+    setBuyingPack(pack.id)
+    try {
+      const token = (await getAuthJWTToken()) ?? undefined
+      const { url } = await createCreditCheckoutFn({ data: { token, packId: pack.id } })
+      window.location.assign(url)
+    } catch (e) {
+      toast?.error(e instanceof Error ? e.message : 'Could not open checkout. Try again.')
+      setBuyingPack(null)
+    }
+  }
+
   if (!market) {
     if (error) return <p className="text-sm text-crimson-text p-4">{error}</p>
     return <HudWorkspaceGhost />
@@ -204,6 +237,7 @@ export function MarketShopPage() {
         onPickRarity={(r) => setSelected({ baseKey: selectedPiece.baseKey, rarity: r })}
         config={tryOnConfig}
         balance={market.wallet.balance}
+        credits={market.moltCredits}
         buying={buying}
         everyItem={market.everyItem}
         onBuy={buy}
@@ -218,7 +252,7 @@ export function MarketShopPage() {
         title="Market"
         description="Gear for your character. Rarer versions come with bigger stats and stranger abilities."
         actions={
-          <MarketCurrencyBar chitinGems={market.wallet.balance} moltCredits={market.moltCredits} creditsLive={false} />
+          <MarketCurrencyBar chitinGems={market.wallet.balance} moltCredits={market.moltCredits} creditsLive={market.creditsLive} />
         }
         toolbar={
           <div role="tablist" aria-label="Market sections" className="flex gap-1">
@@ -304,7 +338,9 @@ export function MarketShopPage() {
       ) : null}
 
       {tab === 'earn' ? <MarketEarnPanel wallet={market.wallet} /> : null}
-      {tab === 'credits' ? <MarketCreditsPanel live={false} /> : null}
+      {tab === 'credits' ? (
+        <MarketCreditsPanel live={market.creditsLive} buyingPackId={buyingPack} onBuy={buyPack} />
+      ) : null}
     </div>
   )
 }
