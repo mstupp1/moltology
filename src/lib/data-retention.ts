@@ -145,6 +145,12 @@ export function buildTablePolicies(windows: RetentionWindows): TableRetentionPol
       notes: 'Gem balances are the sum of the full ledger; never apply a log TTL.',
     },
     {
+      table: 'credit_transactions',
+      retentionClass: 'canonical',
+      hotDays: null,
+      notes: 'Paid Molt Credit balances and their Stripe payments; never apply a log TTL.',
+    },
+    {
       table: 'signup_risk_events',
       retentionClass: 'canonical',
       hotDays: null,

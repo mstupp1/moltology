@@ -431,6 +431,28 @@ export const gemTransactions = pgTable('gem_transactions', {
   }),
 ])
 
+export type CreditSource = 'stripe' | 'refund' | 'purchase' | 'admin'
+
+// Molt Credit ledger: bought packs, spends and refunds. profiles.moltCredits is the cached sum.
+export const creditTransactions = pgTable('credit_transactions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  amount: integer('amount').notNull(),
+  source: text('source').$type<CreditSource>().notNull(),
+  /** Unique per member: `stripe:<payment intent>`, `refund:<payment intent>`, `purchase:<catalog id>`. */
+  sourceKey: text('sourceKey').notNull(),
+  description: text('description').notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('credit_transactions_user_source_key_unique').on(table.userId, table.sourceKey),
+  index('credit_transactions_source_key_idx').on(table.sourceKey),
+  pgPolicy('credit_transactions_server_only', {
+    for: 'all',
+    using: sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`,
+    withCheck: sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`,
+  }),
+])
+
 // Public System Transmutation Changelogs Table
 export const changelogs = pgTable('changelogs', {
   id: uuid('id').defaultRandom().primaryKey(),

@@ -28,10 +28,13 @@ export interface MarketPayload {
   /** Admins own every piece, so there is nothing for them to buy. */
   everyItem: boolean
   moltCredits: number
+  /** Credit packs can be bought (admins with the Molt Credits experiment, for now). */
+  creditsLive: boolean
 }
 
 export interface BuyGearResult {
   ok: boolean
   balance: number
+  credits: number
   error?: string
 }

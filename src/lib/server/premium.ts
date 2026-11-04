@@ -26,6 +26,7 @@ import {
   type RetrievedSubscription,
 } from '../premium-membership'
 import { isMerchCheckoutEvent } from '../merch'
+import { isCreditCheckoutEvent } from './molt-credits'
 import { createStripeWebhookVerifier, verifyStripeWebhookSignature } from '../stripe-webhook'
 import { ensureUserProfile } from '../user-sync'
 import { resolveWriteAuth, type WriteAuthContext } from './write-auth'
@@ -455,10 +456,23 @@ export async function handleStripeWebhookRequest(request: Request): Promise<Resp
 
   if (['charge.refunded', 'refund.created', 'refund.updated', 'refund.failed'].includes(event.type)) {
     try {
+      const { handleCreditRefundEvent } = await import('./molt-credits')
+      await handleCreditRefundEvent(event)
       const { handleStoreRefundEvent } = await import('./store-operations')
       await handleStoreRefundEvent(event)
       return json({ received: true }, 200)
     } catch { return json({ error: 'Could not reconcile refund.' }, 500) }
+  }
+
+  if (isCreditCheckoutEvent(event)) {
+    try {
+      const { grantCreditsFromCheckout } = await import('./molt-credits')
+      await grantCreditsFromCheckout(event)
+      return json({ received: true, credits: true }, 200)
+    } catch (error) {
+      safeLog(`credits webhook ${event.type}`, error)
+      return json({ error: 'Could not apply Stripe event.' }, 500)
+    }
   }
 
   if (isMerchCheckoutEvent(event)) {

@@ -6,10 +6,12 @@ import type { MarketPayload } from '@/lib/market'
 
 const getMarketFn = vi.fn()
 const buyGearFn = vi.fn()
+const createCreditCheckoutFn = vi.fn()
 
 vi.mock('@/lib/server/api', () => ({
   getMarketFn: (...args: unknown[]) => getMarketFn(...args),
   buyGearFn: (...args: unknown[]) => buyGearFn(...args),
+  createCreditCheckoutFn: (...args: unknown[]) => createCreditCheckoutFn(...args),
   getChassisLoadoutFn: vi.fn().mockRejectedValue(new Error('no character')),
 }))
 vi.mock('@/lib/jwt', () => ({ getAuthJWTToken: vi.fn().mockResolvedValue('token') }))
@@ -22,6 +24,7 @@ function payload(balance: number, owned = false): MarketPayload {
   return {
     everyItem: false,
     moltCredits: 0,
+    creditsLive: false,
     wallet: {
       balance,
       history: [{ id: 'h1', amount: 100, source: 'welcome', description: 'Welcome to the market', createdAt: '2026-11-04T12:00:00Z' }],
@@ -84,6 +87,20 @@ describe('MarketShopPage', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Credits' }))
     expect(screen.getByText('Coming soon')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /\$1\.99/ })).not.toBeInTheDocument()
+  })
+
+  it('opens Stripe checkout for a pack once credits are live', async () => {
+    getMarketFn.mockResolvedValue({ ...payload(320), creditsLive: true, moltCredits: 550 })
+    createCreditCheckoutFn.mockResolvedValue({ url: 'https://checkout.stripe.test/c' })
+    const assign = vi.fn()
+    Object.defineProperty(window, 'location', { configurable: true, value: { ...window.location, assign, href: 'http://localhost/market' } })
+    renderMarket()
+    await screen.findByTestId('gem-balance')
+    fireEvent.click(screen.getByRole('tab', { name: 'Credits' }))
+    expect(screen.queryByText('Coming soon')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '$1.99' }))
+    await waitFor(() => expect(assign).toHaveBeenCalledWith('https://checkout.stripe.test/c'))
+    expect(createCreditCheckoutFn).toHaveBeenCalledWith({ data: { token: 'token', packId: 'pouch' } })
   })
 
   it('filters to a rarity and shows that version of each piece', async () => {

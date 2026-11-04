@@ -50,6 +50,16 @@ export const buyGearFn = createServerFn({ method: 'POST' })
     const { buyGearHandler } = await import('./market')
     return buyGearHandler(args)
   })
+export const createCreditCheckoutFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { token?: string; packId: string }) =>
+    z.object({ token: z.string().optional(), packId: z.string().min(1).max(40) }).parse(data),
+  )
+  .handler(async (args) => {
+    const { createCreditCheckoutHandler } = await import('./molt-credits')
+    return createCreditCheckoutHandler(args)
+  })
+
 export type {
   AdminMemberDirectory,
   AdminMemberRole,

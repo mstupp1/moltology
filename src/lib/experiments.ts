@@ -12,6 +12,10 @@ export const EXPERIMENTS = {
     title: 'Oracle MAX',
     description: 'Show Oracle MAX membership, settings, and dashboard offers for your account.',
   },
+  'molt-credits': {
+    title: 'Molt Credits',
+    description: 'Buy Molt Credit packs in the market with Stripe. Members see them as coming soon.',
+  },
   'new-store': {
     title: 'New store',
     description: 'Open the on-site store and checkout. Store links use Etsy while this is off.',
