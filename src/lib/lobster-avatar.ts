@@ -39,7 +39,7 @@ import { getEquipmentVisual } from './avatar/equipment'
 import { EQUIP_SLOT_IDS, EQUIPMENT_RARITIES, equipSlotCategory } from './chassis-loadout'
 import { paintDefs, type PaintContext } from './avatar/paint'
 import { AVATAR_EYE_COLORS, eyeDefs } from './avatar/parts'
-import { portraitViewBox, renderCharacter, type CharacterSpec } from './avatar/races'
+import { fullBodyViewBox, portraitViewBox, renderCharacter, type CharacterSpec } from './avatar/races'
 import {
   AVATAR_ACCESSORIES,
   AVATAR_ANTENNAE,
@@ -469,7 +469,8 @@ export function resolveAvatarTraits(config: LobsterAvatarConfig): ResolvedAvatar
 }
 
 /** Full-body square frame. The character stands on y=185 around the x=50 centre line. */
-export const LOBSTER_FULL_BODY_VIEWBOX = '-80 -65 260 260' as const
+/** Full-body frame at regular height; taller characters get extra headroom (see fullBodyViewBox). */
+export const LOBSTER_FULL_BODY_VIEWBOX = '-66 -34 232 232' as const
 /** Head-and-shoulders close-up used by every static portrait. */
 export const LOBSTER_PORTRAIT_VIEWBOX = '-9 -11 118 118' as const
 
@@ -595,7 +596,7 @@ export function buildAvatarSvg(
   }
   const character = renderCharacter(spec, ctx)
 
-  const viewBox = frame === 'portrait' ? portraitViewBox(spec) : LOBSTER_FULL_BODY_VIEWBOX
+  const viewBox = frame === 'portrait' ? portraitViewBox(spec) : fullBodyViewBox(spec)
   const dataAttrs = [
     `data-avatar-slot="${frame}"`,
     `data-race="${traits.race}"`,
