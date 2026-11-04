@@ -54,6 +54,7 @@
     "assets:check": "tsx scripts/check-asset-budget.ts",
     "vercel:clean": "node scripts/clean-vercel-deployments.mjs",
     "ui:check": "tsx scripts/check-ui-tokens.ts",
+    "avatar:fit": "tsx scripts/avatar-fit-sheet.ts",
     "brand:build": "node scripts/build-brand-assets.mjs",
     "brand:check": "node scripts/check-brand-assets.mjs",
     "image:generate": "tsx scripts/generate-image.ts",

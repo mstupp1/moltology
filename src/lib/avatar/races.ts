@@ -3,9 +3,9 @@
  * (centre line x=50, ground y=185) and hands painting to the shared parts.
  */
 import type { EquippedAppearance } from '../character-appearance'
-import { getEquipmentVisual, renderEquipment, type EquipmentFit } from './equipment'
-import { mirroredBlob, taperedCurve, r2, type Pt } from './geometry'
-import { glint, ids, piece, type PaintContext } from './paint'
+import { getEquipmentVisual, renderEquipment, type EquipmentFit, type LegFrame } from './equipment'
+import { mirroredBlob, outlineHalfAt, outlineTop, taperedCurve, r2, type Pt } from './geometry'
+import { glint, ids, inked, piece, type PaintContext } from './paint'
 import {
   eyeSize,
   renderAccessory,
@@ -33,6 +33,7 @@ import type {
 } from './traits'
 
 export const GROUND_Y = 185
+/** Head gear sits this far above the eye line, so helmets rest on the brow and never cover the eyes. */
 
 export interface CharacterSpec {
   equipment?: EquippedAppearance
@@ -154,6 +155,29 @@ function wear(
   return visual
     ? `<g transform="translate(${r2(x)} ${r2(y)}) scale(${r2(sx)} ${r2(sy)})">${renderEquipment(visual, { ...ctx, uid: `${ctx.uid}-${slot}-${x}` }, { race: spec.race, ...fit })}</g>`
     : ''
+}
+
+/**
+ * Hats and helmets sit on a brim line just above the eyes, sized to the head's
+ * real width there, so they rest on every head shape instead of hovering.
+ */
+function headGear(
+  spec: CharacterSpec,
+  ctx: PaintContext,
+  eyeY: number,
+  mouthY: number,
+  eye: { rx: number; ry: number },
+  eyeSpread: number,
+  halfAt: (y: number) => number,
+  crown: number,
+): string {
+  if (!spec.equipment?.head) return ''
+  // Clear of the brows where the head allows it, but never above the crown, or the hat would hover.
+  const brim = Math.max(eyeY - eye.ry - 6, crown + 2)
+  const half = Math.max(halfAt(brim + 2), eyeSpread + eye.rx) + 2
+  const sx = Math.min(1.6, Math.max(0.8, half / 31))
+  const sy = Math.min(1.2, Math.max(0.9, Math.sqrt(sx)))
+  return wear(spec, 'head', ctx, 50, brim, sx, sy, { eyeY: (eyeY - brim) / sy, mouthY: (mouthY - brim) / sy })
 }
 
 function groundShadow(ctx: PaintContext, rx: number): string {
@@ -344,7 +368,7 @@ function lobster(spec: CharacterSpec, ctx: PaintContext): string {
   const sx = 34 - build.half
   const walkLeg = (p0: Pt, p1: Pt, p2: Pt, p3: Pt, side: 'left' | 'right') => {
     const m = (p: Pt): Pt => (side === 'left' ? [p[0] + sx, p[1]] : [100 - p[0] - sx, p[1]])
-    return `<g data-walking-leg="side-${side}-${p0[1]}">${piece(taperedCurve(m(p0), m(p1), m(p2), m(p3), 4.6, 1.8), ctx, { side, plain: true, noRim: true })}</g>`
+    return `<g data-walking-leg="side-${side}-${p0[1]}">${piece(taperedCurve(m(p0), m(p1), m(p2), m(p3), 5.6, 2.3), ctx, { side, plain: true, noRim: true })}</g>`
   }
   const sideLegs = `<g class="lobster-idle-layer lobster-idle-flank-limbs">
     ${walkLeg([22, top + 30], [8, top + 30], [2, top + 44], [4, top + 62], 'left')}
@@ -365,7 +389,20 @@ function lobster(spec: CharacterSpec, ctx: PaintContext): string {
       build.legWidth * 0.73,
     )
     const foot = `M${m(39)},186 C${m(39)},179 ${m(33)},175.5 ${m(27)},176 C${m(20)},176.5 ${m(13)},181 ${m(10)},186 Z`
-    return `<g data-walking-leg="lower-${side}">${piece(limb, ctx, { side, plain: true })}${piece(foot, ctx, { side, plain: true })}${wear(spec, 'legs', ctx, m(38), 148, ((side === 'left' ? -1 : 1) * build.legWidth) / 11, 0.75)}</g>`
+    const w = build.legWidth
+    const frame: LegFrame = {
+      thigh: taperedCurve([m(38), 148], [m(37.3), 152.5], [m(36), 157.5], [m(35), 161], w, w * 0.88),
+      shin: taperedCurve([m(34.6), 163], [m(33.4), 168], [m(31.6), 173], [m(30.4), 177], w * 0.86, w * 0.76),
+      foot,
+      thighAt: [m(36.5), 154],
+      shinAt: [m(32.5), 170],
+      sole: [m(24.5), 186],
+      knee: [m(34.8), 162],
+      kneeR: w * 0.44 + 1.2,
+      ankle: [m(30.4), 177],
+      outward: side === 'left' ? -1 : 1,
+    }
+    return `<g data-walking-leg="lower-${side}">${piece(limb, ctx, { side, plain: true })}${piece(foot, ctx, { side, plain: true })}${wear(spec, 'legs', { ...ctx, uid: `${ctx.uid}-${side}` }, 0, 0, 1, 1, { leg: frame })}</g>`
   }
   const legs = `<g class="lobster-idle-layer lobster-idle-legs">${leg('left')}${leg('right')}</g>`
 
@@ -408,12 +445,13 @@ function lobster(spec: CharacterSpec, ctx: PaintContext): string {
     wear(spec, 'carapace', ctx, 50, top + 23, (build.half / 34) * 0.87, (bottom - top - 23) / 56, { torsoW: build.half * 2, torsoH: bottom - top }) +
     wear(spec, 'belt', ctx, 50, bottom - 7, (build.hips + 12) / 34, 0.72)
   const body = `<g class="lobster-idle-layer lobster-idle-abdomen">${abdomen}${belly}${torsoGear}</g>`
+  const eyeBase = spec.headShape === 'heart' ? 10.5 : spec.headShape === 'tall' ? 11.5 : 12.8
   const hx = 36.5 - head.half
   const pose = resolvePose(spec.pose, shiftPoses(LOBSTER_POSES, hx * 0.9))
   const { arms, claws } = renderArmsAndClaws(pose, spec, ctx, 0.78)
   const glintMove = `translate(${r2(hx * 0.8)} ${head.eyeY - 24})`
 
-  const upper = `<g transform="translate(0 ${-dy})"><g class="lobster-idle-layer lobster-idle-carapace">
+  const upper = `<g transform="translate(0 ${-dy})" filter="url(#${ids(ctx).cast})"><g class="lobster-idle-layer lobster-idle-carapace">
     ${arms}
     <ellipse cx="50" cy="108" rx="${head.half * .73}" ry="7" fill="${ctx.palette.deep}" opacity=".22"/>
     ${piece(head.path, ctx)}
@@ -422,12 +460,12 @@ function lobster(spec: CharacterSpec, ctx: PaintContext): string {
     ${renderMouth(spec.mouth, 50, head.mouthY, ctx)}
     ${spec.equipment?.antennae ? '' : renderAntennae(spec.antennae, ctx, { left: [45, head.eyeY - 5], right: [55, head.eyeY - 5] })}
     ${wear(spec, 'antennae', ctx, 50, head.eyeY - 5, 1, 1, { antennaRoots: [[-5, 0], [5, 0]] })}
-    ${eyes(spec, ctx, head.eyeY, head.eyeSpread, spec.headShape === 'heart' ? 10.5 : spec.headShape === 'tall' ? 11.5 : 12.8)}
-    ${claws}
-    ${wear(spec, 'head', ctx, 50, head.eyeY - 16, head.half / 36.5, 1, { eyeY: 16, mouthY: head.mouthY - head.eyeY + 16 })}
+    ${eyes(spec, ctx, head.eyeY, head.eyeSpread, eyeBase)}
+    <g filter="url(#${ids(ctx).cast})">${claws}</g>
+    ${headGear(spec, ctx, head.eyeY, head.mouthY, eyeSize(spec.eyeShape, eyeBase), head.eyeSpread, (y) => outlineHalfAt(head.path, y), outlineTop(head.path))}
   </g></g>`
 
-  return `<g class="avatar-character" data-race="lobster">${groundShadow(ctx, 46 + (build.half - 34) * 0.6)}${tail}${sideLegs}${legs}${body}${upper}</g>`
+  return `<g class="avatar-character" data-race="lobster">${groundShadow(ctx, 46 + (build.half - 34) * 0.6)}${inked(ctx, `${tail}${sideLegs}${legs}${body}${upper}`)}</g>`
 }
 
 // ---------------------------------------------------------------------------
@@ -435,6 +473,20 @@ function lobster(spec: CharacterSpec, ctx: PaintContext): string {
 // ---------------------------------------------------------------------------
 
 const CRAB_DROP = 0
+
+/** The crab's upright leg in its own local frame (toes toward +x, outward). */
+const CRAB_LEG_FRAME: LegFrame = {
+  thigh: 'M-6,-4 C-12,5 -10,15 -5,24 L5,24 C11,15 11,5 6,-4 Z',
+  shin: 'M-5,22 L-7,40 L-1,46 L7,41 L5,22 Z',
+  foot: 'M-7,39 Q0,35 7,40 L17,47 Q19,51 10,52 L-11,52 Q-16,48 -7,39 Z',
+  thighAt: [0, 10],
+  shinAt: [0, 33],
+  sole: [3, 52],
+  knee: [0.5, 24],
+  kneeR: 6.6,
+  ankle: [0, 41],
+  outward: 1,
+}
 
 interface CrabShell {
   path: string
@@ -642,7 +694,7 @@ function crab(spec: CharacterSpec, ctx: PaintContext): string {
       ${piece('M-6,-4 C-12,5 -10,15 -5,24 L-7,40 L-1,46 L7,41 L5,24 C11,15 11,5 6,-4 Z', ctx, { side, plain: true })}
       ${piece('M-7,39 Q0,35 7,40 L17,47 Q19,51 10,52 L-11,52 Q-16,48 -7,39 Z', ctx, { side, plain: true })}
       ${piece('M-5,21 Q0,17 6,21 Q8,26 1,29 Q-6,27 -5,21 Z', ctx, { side, plain: true })}
-      ${wear(spec, 'legs', { ...ctx, uid: `${ctx.uid}-${side}` }, 0, 0, Math.sqrt(build.legWidth), 1)}
+      ${wear(spec, 'legs', { ...ctx, uid: `${ctx.uid}-${side}` }, 0, 0, 1, 1, { leg: CRAB_LEG_FRAME })}
     </g>`
   }
   const legs = `<g class="lobster-idle-layer lobster-idle-legs">${lowerLeg('left')}${lowerLeg('right')}</g>`
@@ -723,7 +775,7 @@ function crab(spec: CharacterSpec, ctx: PaintContext): string {
       ? ''
       : ` transform="translate(50 ${base.widestY}) scale(${build.sx} ${build.sy}) translate(-50 ${-base.widestY})"`
 
-  const upper = `<g transform="translate(0 ${-dy})"><g class="lobster-idle-layer lobster-idle-carapace">
+  const upper = `<g transform="translate(0 ${-dy})" filter="url(#${ids(ctx).cast})"><g class="lobster-idle-layer lobster-idle-carapace">
     ${arms}
     ${spec.equipment?.antennae ? '' : renderAntennae(spec.antennae, ctx, { left: [45, shell.crown + 6], right: [55, shell.crown + 6] }, 0.55)}
     ${underside}
@@ -737,13 +789,13 @@ function crab(spec: CharacterSpec, ctx: PaintContext): string {
     ${renderMouth(spec.mouth, 50, mouthY, ctx, 1.05)}
     ${wear(spec, 'antennae', ctx, 50, shell.crown + 6, 1, 1, { antennaRoots: [[-5, 0], [5, 0]] })}
     ${eyes(spec, ctx, shell.eyeY, 14, 11.6)}
-    ${claws}
+    <g filter="url(#${ids(ctx).cast})">${claws}</g>
     ${wear(spec, 'carapace', ctx, 50, shell.crown, 1, 1, { torsoW: shell.half * 2, torsoH: shell.bottom - shell.crown, eyeY: shell.eyeY - shell.crown, mouthY: mouthY - shell.crown })}
     ${wear(spec, 'belt', ctx, 50, hipY + dy - 1, hs * 0.86, 0.7)}
-    ${wear(spec, 'head', ctx, 50, shell.eyeY - 17, Math.min(1.35, hs), 1, { eyeY: 17, mouthY: mouthY - shell.eyeY + 17 })}
+    ${headGear(spec, ctx, shell.eyeY, mouthY, eyeSize(spec.eyeShape, 11.6), 14, (y) => outlineHalfAt(base.path, base.widestY + (y - base.widestY) / build.sy) * build.sx, shell.crown)}
   </g></g>`
 
-  return `<g class="avatar-character" data-race="crab">${groundShadow(ctx, 56 + wx * 0.6)}${sideLegs}${legs}${torso}${upper}</g>`
+  return `<g class="avatar-character" data-race="crab">${groundShadow(ctx, 56 + wx * 0.6)}${inked(ctx, `${sideLegs}${legs}${torso}${upper}`)}</g>`
 }
 
 /** Head (lobster) and shell (crab) outlines, for shape pickers in the creator. */
@@ -765,6 +817,16 @@ export function portraitViewBox(spec: CharacterSpec): string {
   }
   const head = LOBSTER_HEADS[spec.headShape] ?? LOBSTER_HEADS.bean
   return `-9 ${r2(head.eyeY - lobsterLift(spec) - 35)} 118 118`
+}
+
+/** Full-body frame from just below the ground (y 198) up, with extra headroom for tall characters. */
+export const FULL_BODY_TOP = -34
+const FULL_BODY_BOTTOM = 198
+export function fullBodyViewBox(spec: CharacterSpec): string {
+  const lift = spec.race === 'crab' ? crabLift(spec) : lobsterLift(spec)
+  const top = FULL_BODY_TOP - Math.max(0, lift)
+  const size = FULL_BODY_BOTTOM - top
+  return `${r2(50 - size / 2)} ${r2(top)} ${r2(size)} ${r2(size)}`
 }
 
 export function renderCharacter(spec: CharacterSpec, ctx: PaintContext): string {

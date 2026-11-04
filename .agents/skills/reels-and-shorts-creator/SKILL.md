@@ -28,6 +28,7 @@ Read before writing:
 
 Choose the series that is due (usually Field Notes or The Molt Log) and fill the creative brief from the creative-direction playbook: series, next episode number, a callback to the last episode, cast, focal point, shots, stopper and easter egg. All three pitches below stay in that series unless you record why a one-off is better.
 
+For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Within a series, its creative-direction cast is the established story cast and the first shortlist. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
 
 Start from one recognisable everyday moment, as specific as possible: a time, an object, a sentence someone actually says. "Your calendar" is a topic; "an invite called 'sync' with no agenda" is a situation. An uncovered blog dispatch can supply it. Research real-world claims with primary sources; never invent news, studies or outcomes.
 
@@ -74,11 +75,11 @@ Follow [references/production.md](references/production.md) for the opening imag
 ```bash
 npm run reel:create -- --content-json tmp/reel-next/draft.json \
   --scene-frames tmp/reel-next/frames --custom-outro tmp/reel-next/outro.png \
-  --mascot lobster_engineer --cta-goal quiz --video-budget 3.30 --render-only
+  --mascot "$MASCOT" --cta-goal quiz --video-budget 3.30 --render-only
 
 npm run reel:create -- --content-json tmp/reel-next/draft.json \
   --custom-video tmp/reel-daily-<id>/master-reel-<id>.mp4 \
-  --mascot lobster_engineer --cta-goal quiz --commit
+  --mascot "$MASCOT" --cta-goal quiz --commit
 ```
 
 Before queueing, watch the final file once with sound on at phone size, run the boredom check again, and run the playbook's phone proof on stills of frame zero, the last hook word and the outro. The on-screen headline follows the playbook's type scale (80px minimum on 1080×1920) inside the safe box in production.md; shorten it before shrinking it. If the jokes don't land in the edit (a punchline buried under a cut, a pause that kills the rhythm), fix the edit or the script first.

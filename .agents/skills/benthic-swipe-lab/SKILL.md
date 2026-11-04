@@ -22,6 +22,8 @@ Complete the workflow through ingestion and Zernio queueing after inspecting the
 
 Read `STYLE_GUIDE.md`, `BRAND_BIBLE.md` and the [creative direction](../../../content/creative-direction.md) playbook before writing, then run `npm run social:continuity`. Use it to avoid repeating a recent format, topic, hook shape or overused character, and to find the next episode of the series you're making. Video adaptations read the same report.
 
+For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+
 ## 1. Pitch three, build one
 
 Read [references/format-library.md](references/format-library.md). It holds the common Instagram formats (meme, hot take, interactive, story and series), each with a skeleton, the job it does best, a worked Moltology riff and its boring trap. [references/formats.md](references/formats.md) holds the saved creator inspiration formats; use them when a cinematic field kit, prompt vault, workflow breakdown or depth map fits better.
@@ -118,7 +120,7 @@ Inspect local edit targets and identity references with `view_image` before usin
 
 Use the exact official logo assets, never an ImageGen approximation, invented wordmark, decorative shell substitute or altered emblem. Inspect `public/images/order_emblem.svg` (or its official raster twin) and the composite `brand` layer before production. Reserve clean branding space and composite the supplied asset afterward; scale and perspective may fit the surface, but preserve the geometry and approved colors. Check every final frame for invented or distorted marks.
 
-Use canonical mascots from `src/lib/mascots.ts` and `scripts/lib/character-overlay.ts`, and inspect their actual assets. Cast from the creative-direction cast table for the series; don't default to `lobster_engineer`. Give each appearance a job (reacting, demonstrating, placing a tile, sending a message) and record it in `characterRole`. A recurring reaction mascot across a meme deck is fine when it reacts to each frame; a mascot pasted on as a badge is not. ImageGen may change pose, expression, angle and props, with actual identity references supplied and the recognizable anatomy, proportions, colors and signature features preserved. No robot anatomy, no creator faces.
+Use canonical mascots from `src/lib/mascots.ts` and `scripts/lib/character-overlay.ts`, and inspect their actual assets. For a series, start from its creative-direction cast and choose with the character-casting rules; don't default to `lobster_engineer`. Give each appearance a job (reacting, demonstrating, placing a tile, sending a message) and record it in `characterRole`. A recurring reaction mascot across a meme deck is fine when it reacts to each frame; a mascot pasted on as a badge is not. ImageGen may change pose, expression, angle and props, with actual identity references supplied and the recognizable anatomy, proportions, colors and signature features preserved. No robot anatomy, no creator faces.
 
 ## 6. Boredom check before queueing
 

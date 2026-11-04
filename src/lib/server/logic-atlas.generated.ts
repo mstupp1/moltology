@@ -11,9 +11,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
-    "rules": 126,
+    "rules": 127,
     "decisions": 54,
-    "anchors": 245,
+    "anchors": 246,
     "drifted": 18,
     "flagged": 9
   },
@@ -265,6 +265,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "height": 940
       },
       "ruleIds": [
+        "data.member-share-previews",
         "data.neon-compute-budget",
         "data.storage-headroom",
         "data.retention-windows",
@@ -566,18 +567,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/components/hud/market/MarketShopPage.tsx",
           "symbol": "INITIAL_MOLT_CREDITS",
-          "line": 19,
+          "line": 18,
           "value": "1450",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx#L19"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx#L18"
         },
         {
           "file": "src/components/hud/market/MarketShopPage.tsx",
           "symbol": "MarketShopPage",
-          "line": 22,
+          "line": 21,
           "value": "MarketShopPage()",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx#L22"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx#L21"
         }
       ],
       "tests": [
@@ -5810,6 +5811,44 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "drift": "ok"
     },
     {
+      "id": "data.member-share-previews",
+      "domain": "data",
+      "title": "Public profile link previews",
+      "kind": "permission",
+      "status": "active",
+      "statement": "Link-preview crawlers can resolve a member's public handle or larva unit without signing in. Preview lookups exclude auth names, email, bio, stats, and inventory. The dossier and friend requests still require sign-in. Missing members or failed lookups use generic metadata rather than treating an account id as a public name.",
+      "anchors": [
+        {
+          "file": "src/lib/server/member-share-data.ts",
+          "symbol": "getMemberShareIdentity",
+          "line": 6,
+          "value": "getMemberShareIdentity(profileId)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/member-share-data.ts#L6"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/server/member-share-data.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/member-share-data.test.ts"
+        },
+        {
+          "file": "src/routes/_hud/member/-share.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/routes/_hud/member/-share.test.ts"
+        }
+      ],
+      "dependsOn": [],
+      "usedBy": [],
+      "decisions": [],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 28,
+        "y": 76
+      },
+      "drift": "ok"
+    },
+    {
       "id": "data.neon-compute-budget",
       "domain": "data",
       "title": "Let Neon compute sleep",
@@ -5847,7 +5886,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 28,
+        "x": 320,
         "y": 76
       },
       "drift": "changed"
@@ -5901,7 +5940,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 72,
+        "x": 364,
         "y": 496
       },
       "drift": "ok"
@@ -5950,7 +5989,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 72,
+        "x": 364,
         "y": 652
       },
       "drift": "changed"
@@ -5994,7 +6033,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       },
       "flow": null,
       "position": {
-        "x": 28,
+        "x": 320,
         "y": 808
       },
       "drift": "changed"
@@ -6027,7 +6066,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 612,
         "y": 808
       },
       "drift": "changed"
@@ -6083,7 +6122,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 612,
         "y": 76
       },
       "drift": "ok"
@@ -6112,8 +6151,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 612,
-        "y": 76
+        "x": 28,
+        "y": 208
       },
       "drift": "changed"
     },
@@ -6151,7 +6190,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 28,
+        "x": 320,
         "y": 208
       },
       "drift": "ok"
@@ -6198,7 +6237,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 612,
         "y": 208
       },
       "drift": "ok"
@@ -6237,7 +6276,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 612,
         "y": 364
       },
       "drift": "ok"
@@ -6289,8 +6328,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 612,
-        "y": 208
+        "x": 28,
+        "y": 496
       },
       "drift": "ok"
     },
@@ -6347,8 +6386,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 612,
-        "y": 364
+        "x": 28,
+        "y": 652
       },
       "drift": "ok"
     },

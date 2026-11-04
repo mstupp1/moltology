@@ -29,10 +29,10 @@ describe('ChangelogFilterBar Component', () => {
 
   it('renders all categories with counts', () => {
     render(<ChangelogFilterBar {...defaultProps} />)
-    expect(screen.getByText('All updates')).toBeDefined()
-    expect(screen.getByText('Feature')).toBeDefined()
-    expect(screen.getByText('Improvement')).toBeDefined()
-    expect(screen.getByText('Security')).toBeDefined()
+    expect(screen.getByRole('button', { name: 'All updates 14' })).toBeDefined()
+    expect(screen.getByRole('button', { name: 'Feature 8' })).toBeDefined()
+    expect(screen.getByRole('button', { name: 'Improvement 4' })).toBeDefined()
+    expect(screen.getByRole('button', { name: 'Security 2' })).toBeDefined()
   })
 
   it('renders readable topics in a select', () => {
@@ -52,7 +52,7 @@ describe('ChangelogFilterBar Component', () => {
   it('triggers onCategoryChange when clicking a category tab', () => {
     const onCategoryChange = vi.fn()
     render(<ChangelogFilterBar {...defaultProps} onCategoryChange={onCategoryChange} />)
-    const featureButton = screen.getByText('Feature')
+    const featureButton = screen.getByRole('button', { name: 'Feature 8' })
     fireEvent.click(featureButton)
     expect(onCategoryChange).toHaveBeenCalledWith('Feature')
   })
@@ -79,4 +79,12 @@ describe('ChangelogFilterBar Component', () => {
     fireEvent.click(resetButtons[0])
     expect(onReset).toHaveBeenCalled()
   })
+
+  it('changes category from the mobile select', () => {
+    const onCategoryChange = vi.fn()
+    render(<ChangelogFilterBar {...defaultProps} onCategoryChange={onCategoryChange} />)
+    fireEvent.change(screen.getByRole('combobox', { name: 'Filter by category' }), { target: { value: 'Security' } })
+    expect(onCategoryChange).toHaveBeenCalledWith('Security')
+  })
+
 })

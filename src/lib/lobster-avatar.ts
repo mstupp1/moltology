@@ -39,7 +39,7 @@ import { getEquipmentVisual } from './avatar/equipment'
 import { EQUIP_SLOT_IDS, EQUIPMENT_RARITIES, equipSlotCategory } from './chassis-loadout'
 import { paintDefs, type PaintContext } from './avatar/paint'
 import { AVATAR_EYE_COLORS, eyeDefs } from './avatar/parts'
-import { portraitViewBox, renderCharacter, type CharacterSpec } from './avatar/races'
+import { fullBodyViewBox, portraitViewBox, renderCharacter, type CharacterSpec } from './avatar/races'
 import {
   AVATAR_ACCESSORIES,
   AVATAR_ANTENNAE,
@@ -47,6 +47,7 @@ import {
   AVATAR_HEAD_SHAPES,
   AVATAR_CLAWS,
   AVATAR_MOUTHS,
+  SEEDED_MOUTHS,
   AVATAR_POSES,
   AVATAR_RACES,
   SHELL_FINISHES,
@@ -74,7 +75,7 @@ export * from './avatar/traits'
 /** Stored style tag. Kept from the first avatar version so saved configs stay valid. */
 export const LOBSTER_AVATAR_STYLE = 'critters' as const
 
-export type EyelidStyle = 'open' | 'relaxed' | 'cheerful_squint' | 'focused' | 'chill' | 'angry' | 'worried'
+export type EyelidStyle = 'open' | 'relaxed' | 'cheerful_squint' | 'focused' | 'chill' | 'angry' | 'worried' | 'sad' | 'smug' | 'shocked'
 export type LobsterEyeColor = (typeof AVATAR_EYE_COLORS)[number]
 
 export const LOBSTER_EYELID_STYLES: readonly EyelidStyle[] = [
@@ -85,7 +86,13 @@ export const LOBSTER_EYELID_STYLES: readonly EyelidStyle[] = [
   'chill',
   'angry',
   'worried',
+  'sad',
+  'smug',
+  'shocked',
 ] as const
+
+/** Seeded characters roll from the original seven, so new expressions never change an existing member's look. */
+const SEEDED_EYELID_STYLES = LOBSTER_EYELID_STYLES.slice(0, 7)
 
 export const LOBSTER_EYE_COLORS: readonly LobsterEyeColor[] = AVATAR_EYE_COLORS
 
@@ -407,7 +414,7 @@ export function getLobsterAvatarSeededOptions(seed: string): SeededAvatarOptions
     glow: LOBSTER_PATTERN_GLOWS[Math.abs(hash8) % LOBSTER_PATTERN_GLOWS.length],
     pulse: LOBSTER_PATTERN_PULSES[Math.abs(hash9) % LOBSTER_PATTERN_PULSES.length],
     sparkles: LOBSTER_PATTERN_SPARKLES[Math.abs(hash10) % LOBSTER_PATTERN_SPARKLES.length],
-    eyelidStyle: LOBSTER_EYELID_STYLES[Math.abs(hash7 ^ hash8) % LOBSTER_EYELID_STYLES.length],
+    eyelidStyle: SEEDED_EYELID_STYLES[Math.abs(hash7 ^ hash8) % SEEDED_EYELID_STYLES.length],
     eyeColor: LOBSTER_EYE_COLORS[Math.abs(hash12) % LOBSTER_EYE_COLORS.length],
     eyeVariant: LOBSTER_EYE_VARIANTS[Math.abs(hash3 ^ hash11) % LOBSTER_EYE_VARIANTS.length],
     pupilVariant: LOBSTER_PUPIL_VARIANTS[Math.abs(hash4 ^ hash12) % LOBSTER_PUPIL_VARIANTS.length],
@@ -423,7 +430,7 @@ export function getLobsterAvatarSeededOptions(seed: string): SeededAvatarOptions
     legacyShellColor: pickFrom(seededRandom(`${seed}:legacy-shell`), LEGACY_SHELL_COLORS),
     shellFinish: pickFrom(rng, SHELL_FINISHES),
     marking: rng() < 0.3 ? 'none' : pickFrom(rng, SHELL_MARKINGS),
-    mouth: pickFrom(rng, AVATAR_MOUTHS),
+    mouth: pickFrom(rng, SEEDED_MOUTHS),
     claws: pickFrom(rng, AVATAR_CLAWS),
     accessory: accessoryRoll < 0.45 ? 'none' : pickFrom(rng, AVATAR_ACCESSORIES),
   }
@@ -469,7 +476,8 @@ export function resolveAvatarTraits(config: LobsterAvatarConfig): ResolvedAvatar
 }
 
 /** Full-body square frame. The character stands on y=185 around the x=50 centre line. */
-export const LOBSTER_FULL_BODY_VIEWBOX = '-80 -65 260 260' as const
+/** Full-body frame at regular height; taller characters get extra headroom (see fullBodyViewBox). */
+export const LOBSTER_FULL_BODY_VIEWBOX = '-66 -34 232 232' as const
 /** Head-and-shoulders close-up used by every static portrait. */
 export const LOBSTER_PORTRAIT_VIEWBOX = '-9 -11 118 118' as const
 
@@ -595,7 +603,7 @@ export function buildAvatarSvg(
   }
   const character = renderCharacter(spec, ctx)
 
-  const viewBox = frame === 'portrait' ? portraitViewBox(spec) : LOBSTER_FULL_BODY_VIEWBOX
+  const viewBox = frame === 'portrait' ? portraitViewBox(spec) : fullBodyViewBox(spec)
   const dataAttrs = [
     `data-avatar-slot="${frame}"`,
     `data-race="${traits.race}"`,
@@ -629,7 +637,7 @@ function getAvatarCacheKey(config: LobsterAvatarConfig, size: number, frame: Lob
   return `${ordered}|${size}|${frame}|${staticMotion ? 'static' : 'live'}`
 }
 
-const MAX_GENERATED_AVATAR_CACHE = 128
+const MAX_GENERATED_AVATAR_CACHE = 256
 const generatedSvgCache = new Map<string, string>()
 const generatedDataUriCache = new Map<string, string>()
 

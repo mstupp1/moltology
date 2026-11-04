@@ -77,7 +77,7 @@ describe('lobster-avatar-slots', () => {
 
   it('generates a dedicated portrait viewBox instead of cropping the full-body frame', () => {
     const portrait = generateLobsterAvatarSvg(config, 128, { frame: 'portrait' })
-    const fullBody = generateLobsterAvatarSvg(config, 256, { frame: 'fullBody' })
+    const fullBody = generateLobsterAvatarSvg({ ...config, height: 'regular' }, 256, { frame: 'fullBody' })
     // The portrait crop follows the seated face at every height.
     expect(portrait).toMatch(/viewBox="-9 -?[\d.]+ 118 118"/)
     const regular = generateLobsterAvatarSvg({ ...config, height: 'regular' }, 128, { frame: 'portrait' })!

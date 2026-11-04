@@ -44,7 +44,7 @@ Rules:
 
 ## 2. Cast
 
-Characters are a cast with jobs, not stickers. A mascot appears because it does something
+Characters are a cast with jobs, not stickers. [Character casting](character-casting.md) is the procedure for choosing them (story fit first, then recent usage); for a series, the table below is its established story cast and the first shortlist. A mascot appears because it does something
 in the frame: reacts, judges, demonstrates, fails, wins.
 
 | Character | Job | Running bit | Use for |
@@ -67,8 +67,8 @@ the same set and roles every episode.
 Rules:
 
 - **No default mascot.** Pick the character whose job fits the beat. A hardhat engineer next
-  to an inbox joke is a badge, not a cast member. `lobster_engineer` should not appear in
-  more than one in four pieces outside The Molt Log.
+  to an inbox joke is a badge, not a cast member. Character casting's hard-hat cooldown
+  (`lobster_engineer` and `crab_builder` count as one look) applies outside The Molt Log.
 - **Same character, same look.** Supply the identity reference every time and keep
   proportions, colours and props. Expression, pose and angle change freely.
 - **Faces carry the joke.** Give each appearance an expression from the beat: deadpan stare,

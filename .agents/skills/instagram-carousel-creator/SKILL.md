@@ -13,6 +13,8 @@ Before starting, read and follow [content worktree hygiene](../../../docs/conten
 
 Read `BRAND_BIBLE.md`, `STYLE_GUIDE.md`, [the Instagram content strategy](../../../content/social/instagram-content-strategy.md) and the [creative direction](../../../content/creative-direction.md) playbook before drafting, and run `npm run social:continuity` for recent pieces, the next episode of each series and overused characters. Pick the series (usually Ask the Oracle or Field Notes) and fill the playbook's creative brief before pitching. The October 9, 2026 opening, CTA, experiment and built-in ImageGen defaults supersede older Google Flow and Antigravity image instructions. Resume pending drafts rather than duplicating them. Write with the [writing playbook](../../../content/writing-playbook.md): set a loudness (usually 2–3), pitch three concepts, and run its boredom check before any artwork. Meme-style or loud decks belong in [Benthic Swipe Lab](../benthic-swipe-lab/SKILL.md) and its format library.
 
+For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+
 ## Channel and production setup
 
 Read the [shared annual content calendar](../../../content/annual-content-calendar.md) for the intended publication date and queue timezone before choosing the story or quote-deck theme. Follow its gradual holiday lead-in and expiry, and carry one coherent seasonal treatment across the five-to-eight-slide deck. Record the anchor/intensity in the brief and recheck a changed slot. Hold seasonal treatment fixed during comparisons unless it is the declared test.
@@ -39,7 +41,7 @@ Keep a flexible problem → useful explanation → practical payoff arc. These a
 
 Choose the goal before writing. Editorial carousels end with one specific share/save ask, such as “Save this before planning Monday.” Lead magnets retain one direct resource invitation when downloads, audits or signups are the goal. Show useful value before the ask; avoid a closing slide that is only an advertisement. Keep the caption aligned with the same invitation and a relevant URL in the first comment. Retire keyword-comment requests and DM promises across every public surface.
 
-* **Cast from the series**: Choose characters from the creative-direction cast table for the series and pass them explicitly. The generator's random per-slide rotation (when `--mascot` is omitted or `random`) is only for scaffold seeds outside a series; a series deck keeps the same lead character doing a job on each slide.
+* **Character rotation**: Choose the cover and per-slide cast using the shared casting rules. In a series deck, the series cast from creative direction is the established story cast and the first shortlist; keep the same lead character doing a job on each slide. The generator can shuffle scaffold characters when `--mascot` is omitted or `random`, but this does not balance usage across posts or guarantee family variety. Pass the selected cover key and preserve the reviewed per-slide plan during ImageGen polish.
 * **Character Visibility & Natural Scene Blending**: Characters must be clearly visible with strong contrast against backgrounds, naturally blended with ambient scene shading rather than obvious lighting effects (avoid artificial backlight halos or stark rim lines). When layout space allows, characters **can be sized slightly larger than reference** to maximize personality, engagement, and readability.
 * **Custom Mascots**: To generate new character cutouts, use the `character-creator` skill.
 
@@ -59,7 +61,7 @@ Offer a quote deck when the idea works as five to eight concise lines worth retu
 
 Before production, name a published carousel control, hypothesis and primary metric in the strategy experiment log. Change one variable: cover style, slide count within 5–8, information density, deck type (story versus quote deck) or CTA. Keep topic family, goal, palette, posting slot, character plan and non-tested settings steady.
 
-Inspect actual character cutouts from `images/characters/` and use them as ImageGen identity references. Preserve face, eyes, shell, proportions and attire. The CLI's `--mascot` fixes the cover mascot; later scaffolds can still randomize characters. Specify and preserve the full per-slide character plan during ImageGen polish. Outside controlled comparisons, purposeful character rotation is allowed.
+Inspect actual character cutouts from `images/characters/` and use them as ImageGen identity references. Preserve face, eyes, shell, proportions and attire. The CLI's `--mascot` fixes the cover mascot; later scaffolds can still randomize characters. Specify and preserve the full per-slide character plan during ImageGen polish. Outside controlled comparisons, apply the shared recent-usage rotation before scaffolding and preserve it through final artwork.
 
 Review reach and shares/reach or saves/reach at 24 hours and 7 days after publication. For lead magnets, track attributable clicks, downloads or signups when available. Keep carousel results separate from single images and Reels. Mark unavailable swipe-depth/completion metrics unavailable; do not invent them or substitute video retention. Exclude account-authored comments from viewer engagement. Confirm a promising spike on another comparable carousel before changing defaults.
 
@@ -71,10 +73,10 @@ Save reviewed caption JSON containing `title`, `topic`, `caption`, `hashtags` (a
 
 ```bash
 # Blog companion scaffold with reviewed caption
-npm run carousel:create -- --article <slug> --content-json tmp/carousel-content.json --mascot lobster_pointing
+npm run carousel:create -- --article <slug> --content-json tmp/carousel-content.json --mascot "$MASCOT"
 
 # Standalone scaffold with reviewed caption
-npm run carousel:create -- --topic "Your calendar ate the work" --theme ecdysis --content-json tmp/carousel-content.json --mascot lobster_pointing
+npm run carousel:create -- --topic "Your calendar ate the work" --theme ecdysis --content-json tmp/carousel-content.json --mascot "$MASCOT"
 ```
 
 Use built-in templates or JSON layouts from `content/composite-layouts/` when they fit. Batch custom captures through `openCompositeSession()` so the renderer starts once. Legacy templates and printed Flow prompts are drafts: replace uppercase hooks, crowding, outdated claims and promotional defaults during the ImageGen pass. Layouts recreated from references use the `composite-reference-library` skill; attach the reference preview when relevant.

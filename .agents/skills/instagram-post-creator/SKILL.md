@@ -13,6 +13,8 @@ Before starting, read and follow [content worktree hygiene](../../../docs/conten
 
 Create a finished single-image Moltology post, with reviewed copy, full-frame artwork, and a verified queue or publication result. Read `BRAND_BIBLE.md`, `STYLE_GUIDE.md`, [the Instagram content strategy](../../../content/social/instagram-content-strategy.md) and the [creative direction](../../../content/creative-direction.md) playbook, and run `npm run social:continuity` before choosing a campaign. Pick the series (lead magnets usually sit in Ask the Oracle) and fill the playbook's creative brief: with one frame, the stopper, focal point and headline carry everything. Resume a pending draft rather than duplicating it. Write with the [writing playbook](../../../content/writing-playbook.md): set a loudness (usually 2–3), pitch three lines or concepts, and run its boredom check before any artwork. The October 9, 2026 strategy and built-in ImageGen defaults supersede legacy campaign and Antigravity image instructions.
 
+For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+
 ## Campaign and publishing setup
 
 Read the [shared annual content calendar](../../../content/annual-content-calendar.md) for the intended publication date and queue timezone before drafting. Use its lead-in/expiry rules for seasonal situations, props and examples, including a growing Halloween influence through October. Record the chosen anchor and intensity in the brief, and recheck if the slot changes. Keep seasonal treatment fixed during one-variable tests; retain evergreen framing where it fits better.
@@ -56,14 +58,14 @@ Save reviewed content JSON with these fields: `title`, `topic`, `hookHeadline`, 
 Render a 2x Retina structural blueprint:
 
 ```bash
-npm run post:create -- --theme sacred-codex --content-json tmp/post-content.json --mascot lobster_peaceful
+npm run post:create -- --theme sacred-codex --content-json tmp/post-content.json --mascot "$MASCOT"
 ```
 
 For custom layout copy or native 3:4 scaffolds, use `scripts/render-composite.ts --data <JSON>` or the existing `captureComposite` helper with `template: marketing-leadmagnet`, `aspectRatio: 3:4`, `scaleFactor: 2`, and `data` matching `SocialMarketingSlideProps`. Template defaults may still force uppercase or decorative CTAs: treat the render as a blueprint and explicitly replace them during polish.
 
 For a look the built-in templates don't cover, render a layout spec instead: `npm run composite:render -- --spec content/composite-layouts/<name>.json --aspect 3:4`. Layouts recreated from references live there; see the `composite-reference-library` skill. When a layout came from a reference, attach the reference preview to the polish pass as a style reference.
 
-Select from the full mascot registry in `src/components/composite/MascotOverlay.tsx`; specify `--mascot` during experiments. Outside comparisons, cast from the creative-direction cast table for the series rather than rotating at random. Character cutouts live in S3 under `images/characters/`. Inspect the actual character reference and attach it when editing to preserve face, shell, proportions and attire. Keep one clearly visible character with natural ambient lighting and soft contact shadows, without harsh backlights or artificial halos.
+Select from the full mascot registry in `src/components/composite/MascotOverlay.tsx`; specify `--mascot` during experiments. Outside comparisons, start from the series cast in creative direction, apply the shared recent-usage rotation among equally strong matches, and pass the selected canonical key explicitly. Character cutouts live in S3 under `images/characters/`. Inspect the actual character reference and attach it when editing to preserve face, shell, proportions and attire. Keep one clearly visible character with natural ambient lighting and soft contact shadows, without harsh backlights or artificial halos.
 
 ## Visual polish: built-in ImageGen by default
 
