@@ -43,7 +43,7 @@ The reviewed draft JSON (fields in SKILL.md) is required: `npm run reel:create` 
 
 Use the built-in ImageGen tool for the opening image, outro and character scene frames. Read the imagegen skill. No initial Gemini image generation, Antigravity elevation or obligatory user Flow handoff.
 
-1. Choose the canonical mascot in scripts/lib/character-overlay.ts. Download its publicUrl into the run directory if no local asset exists. Inspect the actual asset with view_image.
+1. Select and record the canonical mascot using [character casting](../../../../content/character-casting.md), then set `MASCOT` to that key for every command below. Pass it explicitly: omitted/`random` can use a CTA preset rather than rotate. Resolve its asset in scripts/lib/character-overlay.ts. Download its publicUrl into the run directory if no local asset exists. Inspect the actual asset with view_image.
 2. Generate each character scene with ImageGen, supplying that asset as the identity reference. Preserve its face, eyes, shell shape, proportions, attire and friendly cartoon style. Cinematic environments are fine; do not redesign it into a realistic lobster or add robot anatomy.
 3. Generate a dedicated full 9:16 opening image as scene-1.png in the same frames directory as scene-4.png, scene-5.png and scene-6.png. Compose the opening for the cinematic exaggeration direction above, with no generated headline text and room for the exact overlay inside the crop-safe headline box. Make its seasonal imagery demonstrate the reviewed script’s situation rather than adding unrelated atmosphere. Inspect it at phone size before paid video generation; revise weak composition at the image stage. Optional scene-2.png and scene-3.png can preserve the human protagonist. Do not use a storyboard grid as a video input.
 4. Inspect the images before video generation. Require scene-1.png as an authoring check, then pass --scene-frames <directory>. The reel loop passes referenceImagePath as a real Omni image input. Direct scene one's motion to begin immediately from the supplied composition, with one simple physical action and no establishing pause or fade-in. The CLI stops for missing character frames; it does not enforce the opening-image requirement. Cache fingerprints include the model and reference image hash.
@@ -60,7 +60,7 @@ Omni duration is a prompt hint, not a fixed output length. Check actual output l
 ```bash
 npm run reel:create -- --content-json tmp/reel-next/draft.json \
   --scene-frames tmp/reel-next/frames --custom-outro tmp/reel-next/outro.png \
-  --mascot lobster_engineer --cta-goal quiz --video-budget 3.30 --render-only
+  --mascot "$MASCOT" --cta-goal quiz --video-budget 3.30 --render-only
 ```
 
 --recycle-clips --dry-run skips video generation, upload and publishing, but still calls voice and direction services. For a request-only check, run targeted unit tests instead.
@@ -70,7 +70,7 @@ After --render-only and the spoken-hook edit complete, pass the full hook-to-bod
 ```bash
 npm run reel:create -- --content-json tmp/reel-next/draft.json \
   --custom-video tmp/reel-daily-<id>/master-reel-<id>.mp4 \
-  --mascot lobster_engineer --cta-goal quiz --commit
+  --mascot "$MASCOT" --cta-goal quiz --commit
 ```
 
 The existing CLI handles narration, direction, Omni video, compositing, Google Drive archiving, direct Zernio upload, dual-platform queueing and ledger commits. Queue ID: 6a84b7702421e968ac81f5bd. Instagram account ID: 6a7f7f0777555aae01d99b54 (currently moltology_org). YouTube account ID: 6a7fd9bd77555aae01ebea63. Resolve actual account names and schedule from the API.

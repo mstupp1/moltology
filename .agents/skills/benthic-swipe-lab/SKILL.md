@@ -22,6 +22,8 @@ Complete the workflow through ingestion and Zernio queueing after inspecting the
 
 Read `STYLE_GUIDE.md`, `BRAND_BIBLE.md`, and `content/social/instagram-post-history.json` before writing. Use the post history to avoid repeating a recent format, topic or hook shape. For video adaptations, also read the reel history.
 
+For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Rotate using recent usage across formats, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+
 ## 1. Pitch three, build one
 
 Read [references/format-library.md](references/format-library.md). It holds the common Instagram formats (meme, hot take, interactive, story and series), each with a skeleton, the job it does best, a worked Moltology riff and its boring trap. [references/formats.md](references/formats.md) holds the saved creator inspiration formats; use them when a cinematic field kit, prompt vault, workflow breakdown or depth map fits better.

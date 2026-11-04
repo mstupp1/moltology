@@ -1,0 +1,25 @@
+# Character casting for content
+
+Use this when choosing an existing mascot for posts, carousels, Reels, blog illustrations or campaign assets. Choose from the full `MASCOT_CAST` in `src/lib/mascots.ts`; the overlay registries derive from it. A user-requested character, a commissioned remake or an established story cast takes precedence.
+
+## Choose variety before writing the artwork prompt
+
+1. Check the latest 10 published or queued character-led pieces across `content/social/instagram-post-history.json` and `content/social/instagram-reel-history.json`, ordered by publication/scheduled date where available, otherwise creation date. Include known pending campaign briefs so a batch does not all choose the same lead. For blog artwork, also check recent article images/briefs. Use recorded mascot keys, character plans and inspected artwork; a correspondent name is not a mascot identity. Missing metadata is unknown, not evidence that a character was unused.
+2. Count each character family once per piece, regardless of how many frames it appears in. Resolve aliases; adult and `_junior` versions count as one family. Also count `lobster_engineer` and `crab_builder`, including juniors, together as the hard-hat visual group. A different species or age in the same hard hat does not reset that look's recent usage.
+3. Start with every canonical character that can plausibly perform the scene. Avoid the lead families and hard-hat look used in the last three pieces when suitable alternatives exist. Among the remaining candidates, randomly choose a family with the lowest recent usage, then choose a suitable registered variant. Do not give families with more variants extra chances. If constraints exhaust the pool, relax the cooldown and randomly choose among the least-used suitable families. If history is unavailable, randomize across the full suitable cast and note the gap in the brief.
+4. Let the selected character act out the idea. AI, tools, workflows and technical topics do not automatically require an engineer, builder, hard hat, blueprint or wrench. Those characters remain eligible under the same rotation. Preserve each selected character's signature attire and anatomy; do not dress another mascot as an engineer to work around rotation.
+
+## Keep the story coherent
+
+- One Reel keeps its selected protagonist across character scenes and outro. A recurring reaction mascot may carry an entire comic or meme deck. Rotate between pieces, not between shots of the same protagonist.
+- For a multi-character carousel, draw a shuffled cast without replacement where the story supports it. Avoid consecutive characters from the same family or hard-hat group. Do not introduce extra characters just to satisfy variety.
+- Preserve the cast during a controlled comparison unless character choice is the declared test variable. Record that exception, a user-requested identity or a necessary recurring role; resume rotation for unrelated pieces.
+- Mascots are optional where the format permits. Do not add one to technical blog imagery or an asset brief solely to meet a rotation quota.
+
+## Lock and record the choice
+
+Before generation, save the canonical lead key, per-slide/scene assignments, recent usage considered and any exception in the existing production brief. Record the final cast in the existing strategy/continuity record when the piece is queued or published; count failed or abandoned drafts only while they remain active plans. Do not claim a queue/publish outcome for a draft.
+
+On social CLIs that support `--mascot`, pass the chosen canonical key explicitly on scaffold, render and ingest/retry commands, and use the matching inspected identity reference in ImageGen. In command examples, `MASCOT` means the key already selected and recorded for this run; set that shell variable before using the example. Do not reroll on retry.
+
+CLI randomization is only a scaffold convenience: it has no cross-post cooldown, and Reel `random`/omitted mascot can resolve to a CTA preset. Carousel `--mascot` fixes the cover, not the entire deck. Review generated prompts for preset character descriptions (especially engineers/hard hats), replace them with the reviewed cast in the final artwork prompts, and preserve the full character plan during polish. No new CLI flags or draft-schema fields are implied by this procedure.

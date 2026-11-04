@@ -13,6 +13,8 @@ Before starting, read and follow [content worktree hygiene](../../../docs/conten
 
 References come in by the dozen. Each one goes through the same loop: ingest, analyze, recreate as a layout spec, compare, then promote the layouts worth reusing. The library is private working material; the layout specs are what join the system.
 
+For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Rotate using recent usage across formats, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+
 ## Where things live
 
 For content/campaign recreations, read the [shared annual content calendar](../../../content/annual-content-calendar.md) and adapt copy, props and accents to the intended publication date. Borrow the reference's structure while following the campaign's current seasonal treatment; do not carry an expired holiday over merely because it appears in a reference. Keep reusable base layouts distinct from seasonal variants.

@@ -12,6 +12,8 @@ Use the **imagegen** skill and built-in `image_gen` tool by default. Request nat
 
 Read repository `BRAND_BIBLE.md` and `STYLE_GUIDE.md` before public character copy. All paths below are relative to the current repository.
 
+For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Rotate using recent usage across formats, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+
 ## Scope and reference inputs
 
 For content/campaign artwork, read the [shared annual content calendar](../../../content/annual-content-calendar.md) and inherit the intended publication date, seasonal anchor and intensity from the brief. Seasonal lighting, poses and removable props may support the story; preserve canonical face, anatomy and signature attire, and save seasonal variants separately from reusable masters. Character design work follows the requested brief rather than automatically redesigning the cast for a holiday.
