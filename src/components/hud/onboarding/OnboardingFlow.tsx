@@ -8,9 +8,7 @@ import { getAuthJWTToken } from '@/lib/jwt'
 import {
   claimMemberHandleFn,
   getUserProfileFn,
-  getUserStatsFn,
   saveLobsterAvatarFn,
-  updateUserStatsFn,
 } from '@/lib/server/api'
 import {
   clearCachedProfileAvatarUrl,
@@ -20,7 +18,6 @@ import {
   randomLobsterSeed,
 } from '@/lib/lobster-avatar'
 import { parseMemberHandle } from '@/lib/member-handle'
-import { rollBaseStats, type BaseStats } from '@/lib/stats-roller'
 import { stepsFor, type OnboardingDraft, type OnboardingStepProps } from './steps'
 
 export interface OnboardingFlowProps {
@@ -58,18 +55,6 @@ function writeLocal(key: string, value: string) {
   }
 }
 
-function statsPayload(stats: BaseStats) {
-  return {
-    shellHardness: stats.defense,
-    clawStrength: stats.attack,
-    pincerTorque: stats.attack,
-    processingPower: stats.intelligence,
-    durability: stats.speed,
-    socialDetachmentIndex: stats.perception,
-    moltmaxDimensionScores: { ...stats },
-  }
-}
-
 /**
  * First-visit flow for new members and guests: welcome, a short tour, the character
  * creator and a username. The steps themselves live in ./steps.
@@ -87,8 +72,6 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
     handle: '',
   }))
   const [savedHandle, setSavedHandle] = useState<string | null>(null)
-  /** True only once we know the member has no base stats yet, so a replay never overwrites them. */
-  const [needsStats, setNeedsStats] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [authOpen, setAuthOpen] = useState(false)
@@ -109,10 +92,7 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
     let cancelled = false
     ;(async () => {
       const token = (await getAuthJWTToken().catch(() => null)) ?? undefined
-      const [profile, stats] = await Promise.allSettled([
-        getUserProfileFn({ data: { userId, token } }),
-        getUserStatsFn({ data: { userId, token } }),
-      ])
+      const [profile] = await Promise.allSettled([getUserProfileFn({ data: { userId, token } })])
       if (cancelled) return
       if (profile.status === 'fulfilled' && profile.value) {
         const handle = profile.value.handle?.trim() || ''
@@ -122,9 +102,6 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
           config: touched.current.config ? d.config : saved ?? readStoredConfig('guest') ?? d.config,
           handle: touched.current.handle ? d.handle : handle,
         }))
-      }
-      if (stats.status === 'fulfilled') {
-        setNeedsStats(!stats.value?.moltmaxDimensionScores)
       }
     })()
     return () => {
@@ -216,11 +193,9 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
       writeLocal(avatarKey(userId), JSON.stringify(config))
       const [avatar] = await Promise.allSettled([
         saveLobsterAvatarFn({ data: { ...config, userId, token } }),
-        needsStats ? updateUserStatsFn({ data: { ...statsPayload(rollBaseStats()), token } }) : Promise.resolve(),
       ])
       clearCachedProfileAvatarUrl(userId)
       window.dispatchEvent(new CustomEvent('profile-avatar-changed'))
-      window.dispatchEvent(new CustomEvent('user-stats-changed'))
 
       if (avatar.status === 'rejected') {
         toast.error('Your character did not save. Please try again.')

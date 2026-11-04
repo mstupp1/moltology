@@ -20,6 +20,9 @@ import {
   planGearMove,
   findFirstFreeVaultIndex,
   computeLoadoutTotals,
+  EQUIP_SLOT_LABELS,
+  previewLoadoutTotals,
+  primaryStatLine,
   EQUIP_SLOT_IDS,
   equipSlotCategory,
   CATEGORY_LABELS,
@@ -36,6 +39,8 @@ import { parseVariantKey } from '@/lib/gear-variants'
 import { AvatarCreatorPanel } from '../avatar/AvatarCreatorPanel'
 import { AvatarCreatorPreview } from '../avatar/AvatarCreatorPreview'
 import { GearDetail } from './GearDetail'
+import { BonusChange, VectorSheetPanel } from './VectorSheetPanel'
+import { buildVectorSheet, resolveVectorBase } from '@/lib/vectors'
 import '../avatar-animations.css'
 
 const TABS = ['equipment', 'body', 'shell', 'face', 'scene'] as const
@@ -49,15 +54,7 @@ const TAB_LABELS: Record<(typeof TABS)[number], string> = {
 /** Slots shown down each side of the character on wide screens. */
 const LEFT_SLOTS: EquipSlotId[] = ['head', 'antennae', 'carapace', 'belt']
 const RIGHT_SLOTS: EquipSlotId[] = ['claws-1', 'claws-2', 'legs']
-export const SLOT_NAMES: Record<EquipSlotId, string> = {
-  head: 'Head',
-  carapace: 'Carapace',
-  belt: 'Belt',
-  legs: 'Legs',
-  antennae: 'Antennae',
-  'claws-1': 'Right pincer',
-  'claws-2': 'Left pincer',
-}
+export const SLOT_NAMES: Record<EquipSlotId, string> = EQUIP_SLOT_LABELS
 
 const WIDE_QUERY = '(min-width: 1024px)'
 const subscribeWide = (onChange: () => void) => {
@@ -307,6 +304,16 @@ export const ChassisStatusPage: React.FC = () => {
       <HudWorkspaceGhost />
     )
   const wearing = items.find((i) => i.equippedSlot === slot)
+  const gearTotals = computeLoadoutTotals(items, catalogById)
+  const sheet = buildVectorSheet(saved.vectorBase ?? resolveVectorBase(null, userId ?? ''), gearTotals)
+  // While a piece for this slot is picked, the stats panel shows what wearing it would change.
+  const statPreview =
+    tab === 'equipment' &&
+    selectedCatalog &&
+    selectedCatalog.category === equipSlotCategory(slot) &&
+    wearing?.catalogItemId !== selectedCatalog.id
+      ? previewLoadoutTotals(items, catalogById, slot, selectedCatalog.id)
+      : null
   const slotProps: SlotSharedProps = {
     active: slot,
     disabled: saving,
@@ -417,6 +424,7 @@ export const ChassisStatusPage: React.FC = () => {
               </button>
             </div>
           )}
+          {wide && <VectorSheetPanel sheet={sheet} preview={statPreview} self />}
         </div>
         {!wide && tabBar}
       </div>
@@ -515,8 +523,17 @@ export const ChassisStatusPage: React.FC = () => {
                 <>
                   {/* Floats above the Oracle bar on phones so the pick is one tap from the grid. */}
                   <div className="max-lg:sticky max-lg:bottom-3 max-lg:z-10 flex items-center justify-between gap-3 rounded-card max-lg:border max-lg:border-line max-lg:bg-surface-1/95 max-lg:backdrop-blur-md max-lg:p-2 max-lg:pl-3 max-lg:shadow-2xl">
-                    <span className="lg:hidden text-sm font-semibold text-ink truncate">
-                      {selectedCatalog.name}
+                    <span className="min-w-0 lg:order-1">
+                      <span className="lg:hidden block text-sm font-semibold text-ink truncate">
+                        {selectedCatalog.name}
+                      </span>
+                      {statPreview && (
+                        <BonusChange
+                          from={gearTotals}
+                          to={statPreview}
+                          className="block text-[12px] text-ink-muted truncate"
+                        />
+                      )}
                     </span>
                     <HudButton
                       size="sm"
@@ -539,18 +556,8 @@ export const ChassisStatusPage: React.FC = () => {
             </div>
           )}
         </div>
-        <details className="border-t border-line pt-3 text-xs text-ink-muted">
-          <summary className="cursor-pointer">Loadout stats · character flavor</summary>
-          <div className="grid grid-cols-2 gap-2 pt-3">
-            {Object.entries(computeLoadoutTotals(items, catalogById)).map(([key, value]) => (
-              <p key={key} className="capitalize">
-                {key}: {value}
-              </p>
-            ))}
-          </div>
-          <p className="pt-2">Equipment values do not affect activities or progression.</p>
-        </details>
       </div>
+      {!wide && <VectorSheetPanel className="min-w-0" sheet={sheet} preview={statPreview} self />}
     </div>
   )
 }
@@ -659,6 +666,7 @@ function GearPick({
         <span className="w-1.5 h-1.5 rounded-full bg-current" aria-hidden="true" />
         {catalog.rarity}
       </span>
+      <span className="text-[11px] font-semibold text-cyan-glow tabular-nums">{primaryStatLine(catalog)}</span>
       <span className={`text-[11px] ${worn ? 'text-cyan-glow' : 'text-ink-muted'}`}>
         {worn
           ? 'Worn'

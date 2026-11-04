@@ -918,8 +918,9 @@ export type EquipmentRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legenda
 /** Shared 9:16 art key — one image per visual type, not per catalog row. */
 export type ChassisVisualType = 'helm' | 'carapace' | 'pincer' | 'hammer' | 'antennae' | 'greaves' | 'belt'
 
+/** Stat keys are the five Moltmax vectors (see src/lib/vectors.ts). */
 export type EquipmentAffix = {
-  stat: 'defense' | 'attack' | 'intelligence' | 'speed' | 'perception'
+  stat: 'shellHardness' | 'pincerTorque' | 'neuralLatency' | 'ecdysisDiscipline' | 'depthTolerance'
   value: number
 }
 

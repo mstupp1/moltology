@@ -42,7 +42,7 @@ const payload: ChassisLoadoutPayload = {
     vaultIndex: i < 7 ? null : i - 7,
   })),
   vaultSize: 20,
-  totals: { attack: 0, defense: 0, intelligence: 0, perception: 0, speed: 0 },
+  totals: { shellHardness: 0, pincerTorque: 0, neuralLatency: 0, ecdysisDiscipline: 0, depthTolerance: 0 },
   config: { style: 'critters', seed: 'saved', race: 'lobster' },
   appearanceRevision: 4,
 }
@@ -79,9 +79,13 @@ describe('unified character workspace', () => {
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled()
     expect(screen.getAllByText('Preview only').length).toBeGreaterThan(0)
     expect(screen.queryByText('Ready')).not.toBeInTheDocument()
-    expect(
-      screen.getByText('Loadout stats · character flavor').closest('details'),
-    ).not.toHaveAttribute('open')
+    expect(screen.getByTestId('vector-sheet')).toHaveTextContent('Moltmax rating')
+    expect(screen.queryByText(/do not affect/i)).not.toBeInTheDocument()
+  })
+  it('shows what a picked piece would change before it is equipped', async () => {
+    await mount()
+    choose('Bow')
+    expect(screen.getByTestId('bonus-change')).toBeInTheDocument()
   })
   it('keeps owned equipment local until save, and discards it completely', async () => {
     await mount()

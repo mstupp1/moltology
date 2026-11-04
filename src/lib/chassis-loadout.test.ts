@@ -3,6 +3,8 @@ import {
   applyMoveUpdates,
   chassisTypeImageUrl,
   computeLoadoutTotals,
+  gearBonuses,
+  previewLoadoutTotals,
   clearChassisLoadoutCache,
   deriveSynapticAbilities,
   emptyTotals,
@@ -66,7 +68,7 @@ const catalog: CatalogRef[] = [
     category: 'carapace',
     rarity: 'epic',
     primaryStat: 40,
-    affixes: [{ stat: 'perception', value: 6 }],
+    affixes: [{ stat: 'depthTolerance', value: 6 }],
     sortOrder: 3,
   }),
   ref({
@@ -94,11 +96,11 @@ describe('chassis-loadout', () => {
       { id: '3', catalogItemId: 'cat-carapace-2', equippedSlot: null, vaultIndex: 0 },
     ]
     expect(computeLoadoutTotals(items, byId)).toEqual({
-      defense: 10,
-      attack: 25,
-      intelligence: 0,
-      speed: 0,
-      perception: 0,
+      shellHardness: 10,
+      pincerTorque: 25,
+      neuralLatency: 0,
+      ecdysisDiscipline: 0,
+      depthTolerance: 0,
     })
   })
 
@@ -107,11 +109,11 @@ describe('chassis-loadout', () => {
       { id: '1', catalogItemId: 'cat-carapace-2', equippedSlot: 'carapace', vaultIndex: null },
     ]
     expect(computeLoadoutTotals(items, byId)).toEqual({
-      defense: 40,
-      attack: 0,
-      intelligence: 0,
-      speed: 0,
-      perception: 6,
+      shellHardness: 40,
+      pincerTorque: 0,
+      neuralLatency: 0,
+      ecdysisDiscipline: 0,
+      depthTolerance: 6,
     })
   })
 
@@ -143,7 +145,7 @@ describe('chassis-loadout', () => {
       { id: '2', equippedSlot: 'claws-2', vaultIndex: null },
     ])
     const totals = computeLoadoutTotals(applyMoveUpdates(items, plan.updates), byId)
-    expect(totals.attack).toBe(50)
+    expect(totals.pincerTorque).toBe(50)
   })
 
   it('swaps between dual claw hardpoints', () => {
@@ -213,8 +215,22 @@ describe('chassis-loadout', () => {
   })
 
   it('formats primary and affix lines for tooltips', () => {
-    expect(primaryStatLine(catalog[0])).toBe('+10 Defense')
-    expect(formatAffixLine({ stat: 'speed', value: 5 })).toBe('+5 Speed')
+    expect(primaryStatLine(catalog[0])).toBe('+10 Shell')
+    expect(formatAffixLine({ stat: 'ecdysisDiscipline', value: 5 })).toBe('+5 Ecdysis')
+  })
+
+  it('previews totals with a piece swapped into a slot', () => {
+    const items: GearItemState[] = [
+      { id: '1', catalogItemId: 'cat-carapace', equippedSlot: 'carapace', vaultIndex: null },
+    ]
+    const next = previewLoadoutTotals(items, byId, 'carapace', 'cat-carapace-2')
+    expect(next.shellHardness).toBe(40)
+    expect(next.depthTolerance).toBe(6)
+    expect(computeLoadoutTotals(items, byId).shellHardness).toBe(10)
+  })
+
+  it('lists every vector a piece raises', () => {
+    expect(gearBonuses(catalog[2])).toMatchObject({ shellHardness: 40, depthTolerance: 6 })
   })
 
   it('maps visual types onto type-level 9:16 image paths', () => {
@@ -283,6 +299,6 @@ describe('cosmetics (looks)', () => {
   })
 
   it('keeps retired cosmetics out of equipment stats', () => {
-    expect(computeLoadoutTotals(items, catalog).intelligence).toBe(10)
+    expect(computeLoadoutTotals(items, catalog).neuralLatency).toBe(10)
   })
 })

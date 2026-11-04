@@ -69,29 +69,30 @@ export function mixHex(a: string, b: string, f: number): string {
   return `#${ch.map((c) => c.toString(16).padStart(2, '0')).join('')}`
 }
 
+/** Primary bonus floor per tier. Sized to sit beside a 0 to 100 audit base. */
 const TIER_STAT: Record<EquipmentRarity, number> = {
-  common: 10,
-  uncommon: 22,
-  rare: 40,
-  epic: 65,
-  legendary: 95,
+  common: 2,
+  uncommon: 4,
+  rare: 7,
+  epic: 11,
+  legendary: 15,
 }
 
 const TIER_AFFIX: Record<EquipmentRarity, number> = {
   common: 0,
   uncommon: 0,
-  rare: 6,
-  epic: 10,
-  legendary: 15,
+  rare: 1,
+  epic: 2,
+  legendary: 3,
 }
 
 const SECONDARY_STAT: Record<EquipmentCategory, EquipmentAffix['stat']> = {
-  head: 'perception',
-  carapace: 'intelligence',
-  claws: 'speed',
-  legs: 'perception',
-  antennae: 'intelligence',
-  belt: 'attack',
+  head: 'depthTolerance',
+  carapace: 'neuralLatency',
+  claws: 'ecdysisDiscipline',
+  legs: 'depthTolerance',
+  antennae: 'neuralLatency',
+  belt: 'pincerTorque',
 }
 
 /** Made-up abilities for epic and legendary variants of pieces that don't have their own. */

@@ -421,6 +421,13 @@
       "when": 1793821737459,
       "tag": "0059_credit_ledger",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1793830954728,
+      "tag": "0060_vector_stats",
+      "breakpoints": true
     }
   ]
 }

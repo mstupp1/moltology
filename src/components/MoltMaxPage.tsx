@@ -236,9 +236,6 @@ export const MoltMaxPage: React.FC = () => {
       const token = await getAuthJWTToken()
       await updateUserStatsFn({
         data: {
-          pincerTorque: result.dimensionScores.pincerTorque,
-          shellHardness: result.dimensionScores.shellHardness,
-          clawStrength: result.score,
           moltmaxScore: result.score,
           moltmaxClearance: result.clearance,
           moltmaxStage: result.stage,
