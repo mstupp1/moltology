@@ -92,10 +92,10 @@ describe('support ticket intake helpers', () => {
       "We got your ticket. Reference abc-123. We'll email you when there's an update.",
     )
     expect(SUPPORT_TICKET_COPY.guestTitle).toBe('Sign in to contact support')
-    expect(SUPPORT_PAGE_COPY.pageTitle).toBe('Contact support')
+    expect(SUPPORT_PAGE_COPY.pageTitle).toBe('Support')
     expect(SUPPORT_PAGE_COPY.tabChangelog).toBe('Changelog')
     expect(SUPPORT_PAGE_COPY.tabFaq).toBe('FAQ')
-    expect(SUPPORT_PAGE_COPY.tabDiagnostics).toBe('Diagnostics')
+    expect(SUPPORT_PAGE_COPY.tabContact).toBe('Contact')
   })
 
   it('treats a filled honeypot as triggered and a blank one as clean', () => {

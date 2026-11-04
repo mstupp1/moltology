@@ -1,7 +1,7 @@
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import { SUPPORT_PAGE_COPY, SUPPORT_TICKET_COPY } from '@/lib/support-tickets'
+import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 import SupportPortalView from './SupportPortalView'
 
 vi.mock('./SupportTicketForm', () => ({
@@ -21,13 +21,13 @@ describe('SupportPortalView chrome', () => {
     expect(screen.getByRole('heading', { level: 1, name: SUPPORT_PAGE_COPY.pageTitle })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: new RegExp(SUPPORT_PAGE_COPY.tabChangelog, 'i') })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: new RegExp(`^${SUPPORT_PAGE_COPY.tabFaq}$`, 'i') })).toBeInTheDocument()
-    expect(screen.getAllByText(SUPPORT_TICKET_COPY.formTitle).length).toBeGreaterThan(0)
-    expect(screen.getByRole('tab', { name: new RegExp(SUPPORT_PAGE_COPY.tabDiagnostics, 'i') })).toBeInTheDocument()
+    expect(screen.getAllByText(SUPPORT_PAGE_COPY.tabContact).length).toBeGreaterThan(0)
+    expect(screen.queryByRole('tab', { name: 'Diagnostics' })).not.toBeInTheDocument()
     expect(screen.getByTestId('support-ticket-form-stub')).toBeInTheDocument()
     expect(screen.queryByText(LORE)).not.toBeInTheDocument()
   })
 
-  it('renames changelog, FAQ, and diagnostics panels without lore', () => {
+  it('renames changelog and FAQ panels without lore', () => {
     renderPortal()
 
     fireEvent.click(screen.getByRole('tab', { name: new RegExp(SUPPORT_PAGE_COPY.tabChangelog, 'i') }))
@@ -38,13 +38,7 @@ describe('SupportPortalView chrome', () => {
     expect(screen.getByText(SUPPORT_PAGE_COPY.faqHint)).toBeInTheDocument()
     expect(screen.getByText(SUPPORT_PAGE_COPY.faqStartTitle)).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('tab', { name: new RegExp(SUPPORT_PAGE_COPY.tabDiagnostics, 'i') }))
-    expect(screen.getByRole('heading', { name: SUPPORT_PAGE_COPY.diagnosticsTitle })).toBeInTheDocument()
-    expect(screen.getByText(SUPPORT_PAGE_COPY.diagnosticsDatabase)).toBeInTheDocument()
-    expect(screen.getByText(SUPPORT_PAGE_COPY.diagnosticsAuth)).toBeInTheDocument()
-    expect(screen.queryByText(/neon|tanstack|nitro|jwks/i)).not.toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('tab', { name: new RegExp(SUPPORT_TICKET_COPY.formTitle, 'i') }))
+    fireEvent.click(screen.getByRole('tab', { name: new RegExp(SUPPORT_PAGE_COPY.tabContact, 'i') }))
     expect(screen.getByTestId('support-ticket-form-stub')).toBeInTheDocument()
     expect(screen.queryByText(LORE)).not.toBeInTheDocument()
   })
@@ -52,13 +46,13 @@ describe('SupportPortalView chrome', () => {
   it('connects the active panel to tabs and supports keyboard navigation', () => {
     renderPortal()
 
-    const contactTab = screen.getByRole('tab', { name: SUPPORT_TICKET_COPY.formTitle })
+    const contactTab = screen.getByRole('tab', { name: SUPPORT_PAGE_COPY.tabContact })
     expect(contactTab).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByRole('tabpanel')).toHaveAccessibleName(SUPPORT_TICKET_COPY.formTitle)
+    expect(screen.getByRole('tabpanel')).toHaveAccessibleName(SUPPORT_PAGE_COPY.tabContact)
 
     fireEvent.keyDown(contactTab, { key: 'ArrowRight' })
-    expect(screen.getByRole('tab', { name: SUPPORT_PAGE_COPY.tabDiagnostics })).toHaveFocus()
-    expect(screen.getByRole('tabpanel')).toHaveAccessibleName(SUPPORT_PAGE_COPY.tabDiagnostics)
+    expect(screen.getByRole('tab', { name: SUPPORT_PAGE_COPY.tabChangelog })).toHaveFocus()
+    expect(screen.getByRole('tabpanel')).toHaveAccessibleName(SUPPORT_PAGE_COPY.tabChangelog)
 
     fireEvent.keyDown(document.activeElement!, { key: 'Home' })
     expect(screen.getByRole('tab', { name: SUPPORT_PAGE_COPY.tabChangelog })).toHaveFocus()
@@ -73,10 +67,10 @@ describe('SupportPortalView chrome', () => {
       releasedAt: '2026-11-03T12:00:00Z',
     }] }} />)
     fireEvent.click(screen.getByRole('tab', { name: SUPPORT_PAGE_COPY.tabChangelog }))
-    fireEvent.click(screen.getByRole('button', { name: SUPPORT_PAGE_COPY.changelogExpand }))
-    expect(screen.getByRole('button', { name: SUPPORT_PAGE_COPY.changelogCollapse })).toHaveAttribute('aria-expanded', 'true')
-    fireEvent.click(screen.getByRole('button', { name: SUPPORT_PAGE_COPY.changelogCollapse }))
-    expect(screen.getByRole('button', { name: SUPPORT_PAGE_COPY.changelogExpand })).toHaveAttribute('aria-expanded', 'false')
+    fireEvent.click(screen.getByRole('button', { name: `${SUPPORT_PAGE_COPY.changelogExpand}: Support update` }))
+    expect(screen.getByRole('button', { name: `${SUPPORT_PAGE_COPY.changelogCollapse}: Support update` })).toHaveAttribute('aria-expanded', 'true')
+    fireEvent.click(screen.getByRole('button', { name: `${SUPPORT_PAGE_COPY.changelogCollapse}: Support update` }))
+    expect(screen.getByRole('button', { name: `${SUPPORT_PAGE_COPY.changelogExpand}: Support update` })).toHaveAttribute('aria-expanded', 'false')
   })
 
 })
