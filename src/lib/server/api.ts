@@ -1104,6 +1104,11 @@ export const saveCharacterFn = createServerFn({ method: 'POST' })
             }),
           )
           .max(VAULT_SIZE + EQUIP_SLOT_IDS.length),
+        grants: z
+          .array(z.object({ id: z.string().uuid(), catalogItemId: z.string().uuid() }))
+          .max(EQUIP_SLOT_IDS.length)
+          .optional(),
+        release: z.array(z.string().uuid()).max(VAULT_SIZE + EQUIP_SLOT_IDS.length).optional(),
       })
       .parse(data),
   )

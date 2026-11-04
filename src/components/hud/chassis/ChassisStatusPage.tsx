@@ -169,18 +169,42 @@ export const ChassisStatusPage: React.FC = () => {
       JSON.stringify(items) !== JSON.stringify(saved.items)),
   )
   const selectedCatalog = selected ? catalogById.get(selected) : null
+  const unlocked = Boolean(saved?.allUnlocked)
   const matching = catalog.filter(
     (c) =>
       c.category === equipSlotCategory(slot) &&
-      (!onlyOwned || items.some((i) => i.catalogItemId === c.id)),
+      (unlocked || !onlyOwned || items.some((i) => i.catalogItemId === c.id)),
   )
+  /** Admins: wear any catalog item. A new instance is created when the draft is saved. */
+  const equipUnlocked = (catalogId: string) => {
+    const occupant = items.find((i) => i.equippedSlot === slot)
+    const isNew = (id: string) => !saved?.items.some((i) => i.id === id)
+    let next: GearItemState[] = items
+    if (occupant) {
+      const index = isNew(occupant.id) ? null : findFirstFreeVaultIndex(items, saved?.vaultSize)
+      // Unsaved or homeless pieces are simply let go: admins can pick them again any time.
+      next =
+        index === null
+          ? items.filter((i) => i.id !== occupant.id)
+          : items.map((i) =>
+              i.id === occupant.id ? { ...i, equippedSlot: null, vaultIndex: index } : i,
+            )
+    }
+    draftTouched.current = true
+    setItems([
+      ...next,
+      { id: crypto.randomUUID(), catalogItemId: catalogId, equippedSlot: slot, vaultIndex: null },
+    ])
+    setTryOn(null)
+  }
   const equip = (catalogId: string) => {
     const instance =
       items.find((i) => i.catalogItemId === catalogId && !i.equippedSlot) ??
       items.find((i) => i.catalogItemId === catalogId && i.equippedSlot !== slot) ??
       items.find((i) => i.catalogItemId === catalogId)
     if (!instance) {
-      setTryOn({ catalogId, slot })
+      if (unlocked) equipUnlocked(catalogId)
+      else setTryOn({ catalogId, slot })
       return
     }
     const plan = planGearMove(
@@ -202,6 +226,12 @@ export const ChassisStatusPage: React.FC = () => {
     const item = items.find((i) => i.equippedSlot === slot)
     if (!item) return
     const index = findFirstFreeVaultIndex(items, saved?.vaultSize)
+    if (unlocked && (index === null || !saved?.items.some((i) => i.id === item.id))) {
+      draftTouched.current = true
+      setItems(items.filter((i) => i.id !== item.id))
+      setTryOn(null)
+      return
+    }
     if (index === null) {
       toast?.warning('Your vault is full.')
       return
@@ -232,6 +262,16 @@ export const ChassisStatusPage: React.FC = () => {
           token: token ?? undefined,
           config: body,
           expectedRevision: saved.appearanceRevision ?? 0,
+          ...(unlocked
+            ? {
+                grants: items
+                  .filter((i) => !saved.items.some((s) => s.id === i.id))
+                  .map((i) => ({ id: i.id, catalogItemId: i.catalogItemId })),
+                release: saved.items
+                  .filter((s) => !items.some((i) => i.id === s.id))
+                  .map((s) => s.id),
+              }
+            : {}),
           placements: items.map((i) => ({
             id: i.id,
             equippedSlot: i.equippedSlot,
@@ -436,14 +476,18 @@ export const ChassisStatusPage: React.FC = () => {
                   Unequip
                 </HudButton>
               </div>
-              <label className="flex gap-2 items-center text-xs text-ink-muted">
-                <input
-                  type="checkbox"
-                  checked={onlyOwned}
-                  onChange={(e) => setOnlyOwned(e.target.checked)}
-                />
-                Owned items only
-              </label>
+              {unlocked ? (
+                <p className="text-xs text-ink-muted">Admin · every item is unlocked.</p>
+              ) : (
+                <label className="flex gap-2 items-center text-xs text-ink-muted">
+                  <input
+                    type="checkbox"
+                    checked={onlyOwned}
+                    onChange={(e) => setOnlyOwned(e.target.checked)}
+                  />
+                  Owned items only
+                </label>
+              )}
               <div className="grid grid-cols-[repeat(auto-fill,minmax(84px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-2">
                 {matching.map((c) => {
                   const owned = items.filter((i) => i.catalogItemId === c.id).length
@@ -452,6 +496,7 @@ export const ChassisStatusPage: React.FC = () => {
                       key={c.id}
                       catalog={c}
                       owned={owned}
+                      unlocked={unlocked}
                       worn={wearing?.catalogItemId === c.id}
                       selected={selected === c.id}
                       onClick={() => setSelected(c.id)}
@@ -472,7 +517,7 @@ export const ChassisStatusPage: React.FC = () => {
                       onClick={() => equip(selectedCatalog.id)}
                       disabled={saving}
                     >
-                      {items.some((i) => i.catalogItemId === selectedCatalog.id)
+                      {unlocked || items.some((i) => i.catalogItemId === selectedCatalog.id)
                         ? `Equip on ${SLOT_NAMES[slot].toLowerCase()}`
                         : 'Try on'}
                     </HudButton>
@@ -480,7 +525,7 @@ export const ChassisStatusPage: React.FC = () => {
                   <GearDetail catalog={selectedCatalog} />
                 </>
               )}
-              <p className="text-xs text-ink-muted">
+              <p className={`text-xs text-ink-muted ${unlocked ? 'hidden' : ''}`}>
                 {items.length} owned items · {items.filter((i) => !i.equippedSlot).length}/
                 {saved.vaultSize} vault spaces used. Other designs are available to preview.
               </p>
@@ -571,12 +616,14 @@ function SlotColumn({
 function GearPick({
   catalog,
   owned,
+  unlocked = false,
   worn,
   selected,
   onClick,
 }: {
   catalog: CatalogRef
   owned: number
+  unlocked?: boolean
   worn: boolean
   selected: boolean
   onClick: () => void
@@ -606,7 +653,15 @@ function GearPick({
         {catalog.rarity}
       </span>
       <span className={`text-[11px] ${worn ? 'text-cyan-glow' : 'text-ink-muted'}`}>
-        {worn ? 'Worn' : owned ? (owned > 1 ? `Owned ×${owned}` : 'Owned') : 'Preview only'}
+        {worn
+          ? 'Worn'
+          : owned
+            ? owned > 1
+              ? `Owned ×${owned}`
+              : 'Owned'
+            : unlocked
+              ? 'Unlocked'
+              : 'Preview only'}
       </span>
     </button>
   )
