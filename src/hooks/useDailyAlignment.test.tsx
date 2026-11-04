@@ -424,4 +424,43 @@ describe('useDailyAlignment Hook Optimistic State & Rapid Clicks', () => {
     expect(fetchSpy).not.toHaveBeenCalled()
     expect(result.current.completedCount).toBe(4)
   })
+
+  it('shows one completion toast carrying the gems the server awarded', async () => {
+    const keys = CANONICAL_ALIGNMENT_TASKS.map((task) => task.key)
+    const lastKey = keys[keys.length - 1]
+    const before = keys.slice(0, -1)
+    vi.spyOn(serverApi, 'getDailyAlignmentFn').mockResolvedValue({
+      date: localDateString(),
+      tasks: mergeCompletions(before),
+      completedKeys: before,
+      completedCount: before.length,
+      totalCount: 8,
+      isAllCompleted: false,
+      history: [{ date: localDateString(), completedCount: before.length }],
+      streakDays: 6,
+    } as any)
+    vi.spyOn(serverApi, 'toggleDailyAlignmentTaskFn').mockResolvedValue({
+      date: localDateString(),
+      tasks: mergeCompletions(keys),
+      completedKeys: keys,
+      completedCount: 8,
+      totalCount: 8,
+      isAllCompleted: true,
+      history: [{ date: localDateString(), completedCount: 8 }],
+      streakDays: 7,
+      gemsDelta: 70,
+    } as any)
+
+    const { result } = renderHook(() => useDailyAlignment(), { wrapper })
+    await waitFor(() => expect(result.current.completedCount).toBe(7))
+
+    act(() => {
+      void result.current.setTaskCompleted(lastKey, true)
+    })
+
+    expect(await screen.findByText('+70 Chitin Gems · 7-day streak')).toBeInTheDocument()
+    expect(screen.getAllByText('Daily alignment done')).toHaveLength(1)
+    expect(screen.queryByText('Gems earned')).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Market' })).toHaveAttribute('href', '/market')
+  })
 })

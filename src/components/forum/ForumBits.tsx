@@ -169,9 +169,8 @@ export function VoteButton({
       console.error('Vote failed:', err)
       setLocal(rollback)
       writeForumVote(userId, targetId, rollback.voted)
-      toastContext?.toast.warning('Upvote could not be recorded. Please try again.', {
+      toastContext?.toast.warning('Your upvote did not save. Please try again.', {
         id: 'forum-vote-sync-warning',
-        title: 'Upvote Failed',
         duration: 4000,
       })
     } finally {
