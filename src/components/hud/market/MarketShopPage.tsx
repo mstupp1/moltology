@@ -1,7 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import type { EquipmentCategory, EquipmentRarity } from '@/db/schema'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
+import { HudPagination } from '@/components/ui/HudPagination'
+import { HudSelect } from '@/components/ui/HudSelect'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
@@ -12,11 +14,13 @@ import { equipmentAppearance } from '@/lib/character-appearance'
 import { RARITY_LABELS, RARITY_ORDER } from '@/lib/gear-variants'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import type { MarketPayload, MarketPiece, MarketVariant } from '@/lib/market'
+import { MARKET_BUNDLES, type PieceRef } from '@/lib/market-featured'
 import { cn } from '@/lib/utils'
 import { HudWorkspaceGhost } from '../HudGhostSkeletons'
 import { MarketCreditsPanel } from './MarketCreditsPanel'
 import { MarketCurrencyBar } from './MarketCurrencyBar'
 import { MarketEarnPanel } from './MarketEarnPanel'
+import { MarketBundleDetail, MarketFeatured } from './MarketFeatured'
 import { MarketPieceCard, MarketPieceDetail } from './MarketGear'
 import './market.css'
 import '../avatar-animations.css'
@@ -28,6 +32,53 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'credits', label: 'Credits' },
 ]
 const SLOTS: EquipmentCategory[] = ['head', 'antennae', 'carapace', 'claws', 'belt', 'legs']
+export const PAGE_SIZE = 24
+
+type Sort = 'featured' | 'price-asc' | 'price-desc' | 'rarity'
+const SORTS: { value: Sort; label: string }[] = [
+  { value: 'featured', label: 'Featured' },
+  { value: 'price-asc', label: 'Price: low to high' },
+  { value: 'price-desc', label: 'Price: high to low' },
+  { value: 'rarity', label: 'Rarest first' },
+]
+
+interface GearFilters {
+  slot: EquipmentCategory | null
+  rarity: EquipmentRarity | null
+  sort: Sort
+  hideOwned: boolean
+  page: number
+}
+const DEFAULT_FILTERS: GearFilters = { slot: null, rarity: null, sort: 'featured', hideOwned: false, page: 1 }
+
+/** Filters live in the address so a refresh or a shared link keeps them. */
+function readFilters(search: string): GearFilters {
+  const q = new URLSearchParams(search)
+  const slot = q.get('slot') as EquipmentCategory | null
+  const rarity = q.get('rarity') as EquipmentRarity | null
+  const sort = q.get('sort') as Sort | null
+  const page = Number(q.get('page'))
+  return {
+    slot: slot && SLOTS.includes(slot) ? slot : null,
+    rarity: rarity && RARITY_ORDER.includes(rarity) ? rarity : null,
+    sort: sort && SORTS.some((s) => s.value === sort) ? sort : 'featured',
+    hideOwned: q.get('owned') === 'hide',
+    page: Number.isInteger(page) && page > 1 ? page : 1,
+  }
+}
+
+function writeFilters(f: GearFilters) {
+  if (typeof window === 'undefined') return
+  const url = new URL(window.location.href)
+  const set = (k: string, v: string | null) => (v ? url.searchParams.set(k, v) : url.searchParams.delete(k))
+  set('slot', f.slot)
+  set('rarity', f.rarity)
+  set('sort', f.sort === 'featured' ? null : f.sort)
+  set('owned', f.hideOwned ? 'hide' : null)
+  set('page', f.page > 1 ? String(f.page) : null)
+  const next = url.pathname + url.search
+  if (next !== window.location.pathname + window.location.search) window.history.replaceState(window.history.state, '', next)
+}
 
 const WIDE_QUERY = '(min-width: 1024px)'
 const subscribeWide = (onChange: () => void) => {
@@ -71,9 +122,25 @@ function LitTile({
   )
 }
 
-/** Variant a card shows: the rarity filter when set, otherwise the piece's own rarity. */
-function shownVariant(piece: MarketPiece, rarity: EquipmentRarity | null): MarketVariant | undefined {
-  return rarity ? piece.variants.find((v) => v.rarity === rarity) : piece.variants[0]
+/**
+ * Variant a card shows: the rarity filter when set, otherwise the piece's own rarity, or
+ * its cheapest unowned version when owned pieces are hidden.
+ */
+function shownVariant(piece: MarketPiece, rarity: EquipmentRarity | null, hideOwned = false): MarketVariant | undefined {
+  const v = rarity ? piece.variants.find((x) => x.rarity === rarity) : hideOwned ? piece.variants.find((x) => !x.owned) : piece.variants[0]
+  return v && hideOwned && v.owned ? undefined : v
+}
+
+function sortPieces(list: { piece: MarketPiece; shown: MarketVariant }[], sort: Sort) {
+  if (sort === 'featured') return list
+  const rank = (v: MarketVariant) => RARITY_ORDER.indexOf(v.rarity)
+  return [...list].sort((a, b) =>
+    sort === 'price-asc'
+      ? a.shown.price - b.shown.price
+      : sort === 'price-desc'
+        ? b.shown.price - a.shown.price
+        : rank(b.shown) - rank(a.shown) || b.shown.price - a.shown.price,
+  )
 }
 
 export function MarketShopPage() {
@@ -84,9 +151,11 @@ export function MarketShopPage() {
   const [error, setError] = useState<string | null>(null)
   const [config, setConfig] = useState<LobsterAvatarConfig | null>(null)
   const [tab, setTab] = useState<Tab>('gear')
-  const [slot, setSlot] = useState<EquipmentCategory | null>(null)
-  const [rarity, setRarity] = useState<EquipmentRarity | null>(null)
+  const [filters, setFilters] = useState<GearFilters>(DEFAULT_FILTERS)
+  const { slot, rarity, sort, hideOwned, page } = filters
   const [selected, setSelected] = useState<{ baseKey: string; rarity: EquipmentRarity } | null>(null)
+  const [openBundle, setOpenBundle] = useState<string | null>(null)
+  const gridTop = useRef<HTMLDivElement>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
   const [buying, setBuying] = useState(false)
   const [buyingPack, setBuyingPack] = useState<string | null>(null)
@@ -106,6 +175,18 @@ export function MarketShopPage() {
   useEffect(() => {
     void load()
   }, [load])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') setFilters(readFilters(window.location.search))
+  }, [])
+  useEffect(() => writeFilters(filters), [filters])
+
+  /** Changing a filter starts again from the first page. */
+  const updateFilters = (patch: Partial<GearFilters>) => setFilters((f) => ({ ...f, page: 1, ...patch }))
+  const goToPage = (next: number) => {
+    setFilters((f) => ({ ...f, page: next }))
+    gridTop.current?.scrollIntoView?.({ block: 'start', behavior: 'smooth' })
+  }
 
   // Back from Stripe: the webhook adds the credits, usually within a few seconds.
   useEffect(() => {
@@ -147,13 +228,22 @@ export function MarketShopPage() {
     }
   }, [userId])
 
-  const pieces = useMemo(
+  const matches = useMemo(
     () =>
-      (market?.pieces ?? []).filter(
-        (p) => (!slot || p.category === slot) && Boolean(shownVariant(p, rarity)),
+      sortPieces(
+        (market?.pieces ?? []).flatMap((piece) => {
+          const shown = !slot || piece.category === slot ? shownVariant(piece, rarity, hideOwned) : undefined
+          return shown ? [{ piece, shown }] : []
+        }),
+        sort,
       ),
-    [market, slot, rarity],
+    [market, slot, rarity, hideOwned, sort],
   )
+  const pageCount = Math.max(1, Math.ceil(matches.length / PAGE_SIZE))
+  const currentPage = Math.min(page, pageCount)
+  const pageItems = matches.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+  const unfiltered = !slot && !rarity && !hideOwned && currentPage === 1
+  const bundle = MARKET_BUNDLES.find((b) => b.id === openBundle) ?? null
 
   const selectedPiece = market?.pieces.find((p) => p.baseKey === selected?.baseKey) ?? null
   const selectedVariant =
@@ -161,15 +251,23 @@ export function MarketShopPage() {
 
   // Desktop keeps a piece open beside the grid.
   useEffect(() => {
-    if (wide && !selected && pieces[0]) {
-      const v = shownVariant(pieces[0], rarity)
-      if (v) setSelected({ baseKey: pieces[0].baseKey, rarity: v.rarity })
-    }
-  }, [wide, selected, pieces, rarity])
+    const first = pageItems[0]
+    if (wide && !selected && !openBundle && first) setSelected({ baseKey: first.piece.baseKey, rarity: first.shown.rarity })
+  }, [wide, selected, openBundle, pageItems])
+
+  const openPiece = (ref: PieceRef) => {
+    setOpenBundle(null)
+    setSelected(ref)
+    if (!wide) setSheetOpen(true)
+  }
+  const showBundle = (id: string) => {
+    setOpenBundle(id)
+    if (!wide) setSheetOpen(true)
+  }
 
   /** The open piece follows the rarity filter when it comes in that rarity. */
   const pickRarity = (r: EquipmentRarity | null) => {
-    setRarity(r)
+    updateFilters({ rarity: r })
     setSelected((cur) => {
       if (!cur || !r) return cur
       const piece = market?.pieces.find((p) => p.baseKey === cur.baseKey)
@@ -229,8 +327,9 @@ export function MarketShopPage() {
     return <HudWorkspaceGhost />
   }
 
-  const detail =
-    selectedPiece && selectedVariant ? (
+  const detail = bundle ? (
+    <MarketBundleDetail bundle={bundle} pieces={market.pieces} onOpenPiece={openPiece} />
+  ) : selectedPiece && selectedVariant ? (
       <MarketPieceDetail
         piece={selectedPiece}
         shown={selectedVariant}
@@ -278,49 +377,70 @@ export function MarketShopPage() {
       {tab === 'gear' ? (
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
           <div className="space-y-3 min-w-0">
-            <div className="flex flex-col gap-2 rounded-card border border-line-subtle bg-surface-1 p-2">
-              <div className="flex gap-1 overflow-x-auto" aria-label="Slot">
-                <LitTile active={slot === null} onClick={() => setSlot(null)}>
+            {unfiltered ? <MarketFeatured pieces={market.pieces} onOpenPiece={openPiece} onOpenBundle={showBundle} /> : null}
+            <div ref={gridTop} className="scroll-mt-4 flex flex-col gap-2 rounded-card border border-line-subtle bg-surface-1 p-2">
+              <div className="flex gap-1 overflow-x-auto" role="group" aria-label="Slot">
+                <LitTile active={slot === null} onClick={() => updateFilters({ slot: null })}>
                   All slots
                 </LitTile>
                 {SLOTS.map((s) => (
-                  <LitTile key={s} active={slot === s} onClick={() => setSlot(s)}>
+                  <LitTile key={s} active={slot === s} onClick={() => updateFilters({ slot: s })}>
                     {CATEGORY_LABELS[s]}
                   </LitTile>
                 ))}
               </div>
-              <div className="flex gap-1 overflow-x-auto" aria-label="Rarity">
-                <LitTile active={rarity === null} onClick={() => pickRarity(null)}>
-                  Any rarity
-                </LitTile>
-                {RARITY_ORDER.map((r) => (
-                  <LitTile key={r} active={rarity === r} onClick={() => pickRarity(r)}>
-                    {RARITY_LABELS[r]}
+              <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
+                <HudSelect
+                  aria-label="Rarity"
+                  className="min-h-9 text-[13px] sm:w-40"
+                  value={rarity ?? ''}
+                  onChange={(e) => pickRarity((e.target.value || null) as EquipmentRarity | null)}
+                  options={[{ value: '', label: 'Any rarity' }, ...RARITY_ORDER.map((r) => ({ value: r, label: RARITY_LABELS[r] }))]}
+                />
+                <HudSelect
+                  aria-label="Sort"
+                  className="min-h-9 text-[13px] sm:w-48"
+                  value={sort}
+                  onChange={(e) => updateFilters({ sort: e.target.value as Sort })}
+                  options={SORTS}
+                />
+                {market.everyItem ? null : (
+                  <LitTile active={hideOwned} onClick={() => updateFilters({ hideOwned: !hideOwned })} className="col-span-2 sm:col-span-1">
+                    Hide owned
                   </LitTile>
-                ))}
+                )}
+                <span className="hidden sm:block ml-auto pr-1 text-xs text-ink-muted tabular-nums" aria-live="polite">
+                  {matches.length} {matches.length === 1 ? 'piece' : 'pieces'}
+                </span>
               </div>
             </div>
-            {pieces.length === 0 ? (
-              <p className="text-sm text-ink-muted p-4">Nothing matches these filters.</p>
+            {matches.length === 0 ? (
+              <p className="text-sm text-ink-muted p-4">
+                {hideOwned && !slot && !rarity ? 'You own every piece. Nice.' : 'Nothing matches these filters.'}
+              </p>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3">
-                {pieces.map((p) => {
-                  const v = shownVariant(p, rarity)!
-                  return (
-                    <MarketPieceCard
-                      key={p.baseKey}
-                      piece={p}
-                      shown={v}
-                      selected={selected?.baseKey === p.baseKey}
-                      onSelect={() => {
-                        setSelected({ baseKey: p.baseKey, rarity: v.rarity })
-                        if (!wide) setSheetOpen(true)
-                      }}
-                    />
-                  )
-                })}
+              <div className="grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2">
+                {pageItems.map(({ piece: p, shown: v }) => (
+                  <MarketPieceCard
+                    key={p.baseKey}
+                    piece={p}
+                    shown={v}
+                    selected={!bundle && selected?.baseKey === p.baseKey}
+                    onSelect={() => openPiece({ baseKey: p.baseKey, rarity: v.rarity })}
+                  />
+                ))}
               </div>
             )}
+            {matches.length > PAGE_SIZE ? (
+              <HudPagination
+                currentPage={currentPage}
+                totalItems={matches.length}
+                pageSize={PAGE_SIZE}
+                onPageChange={goToPage}
+                itemName="pieces"
+                className="pt-3"
+              />
+            ) : null}
           </div>
           {wide ? (
             <aside className="sticky top-4 max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-card border border-line-subtle bg-surface-1 p-4">{detail}</aside>
@@ -328,7 +448,7 @@ export function MarketShopPage() {
             <HudBottomSheet
               isOpen={sheetOpen && Boolean(detail)}
               onClose={() => setSheetOpen(false)}
-              ariaLabel={selectedPiece ? selectedPiece.name : 'Piece'}
+              ariaLabel={bundle ? bundle.name : selectedPiece ? selectedPiece.name : 'Piece'}
               maxHeight="92dvh"
             >
               <div className="p-4 pt-1">{detail}</div>

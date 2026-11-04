@@ -65,14 +65,14 @@ export function MarketPieceCard({
           />
         ) : null}
         {shown.owned ? (
-          <span className="absolute top-1.5 right-1.5 inline-flex items-center gap-1 rounded-chip bg-surface-3 px-1.5 py-0.5 text-[11px] font-semibold text-ink">
+          <span className="absolute top-1.5 right-1.5 inline-flex items-center gap-1 rounded-chip bg-surface-3 px-1 sm:px-1.5 py-0.5 text-[11px] font-semibold text-ink">
             <Check className="w-3 h-3" aria-hidden="true" />
-            Owned
+            <span className="sr-only sm:not-sr-only">Owned</span>
           </span>
         ) : null}
       </span>
-      <span className="text-[13px] leading-tight text-ink font-semibold line-clamp-2 min-h-[2lh]">{piece.name}</span>
-      <span className="flex items-center justify-between gap-2">
+      <span className="text-[12px] sm:text-[13px] leading-tight text-ink font-semibold line-clamp-2 min-h-[2lh]">{piece.name}</span>
+      <span className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
         <span className={cn('text-[11px] font-semibold', style.text)}>{RARITY_LABELS[shown.rarity]}</span>
         {shown.owned ? null : <GemAmount value={shown.price} size="sm" />}
       </span>
