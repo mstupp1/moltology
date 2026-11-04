@@ -70,6 +70,7 @@ export function PremiumOfferPanel({
         />
         <div className="oracle-max-shade absolute inset-0" aria-hidden="true" />
         <HudTitlePanel
+          treatment="hero"
           className="oracle-max-title relative z-10 rounded-none border-0 bg-transparent p-6 sm:p-10 lg:p-12"
           title={
             <>

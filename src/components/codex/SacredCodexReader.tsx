@@ -153,28 +153,56 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
 
   const titlePanel = (
     <HudTitlePanel
+        surface="solid"
       className="no-print"
       title="The Sacred Codex"
+      toolbar={!missingFocus ? (
+        <HorizontalScroll
+          role="group"
+          aria-label="Volumes"
+          className="no-print flex gap-1 overflow-x-auto no-scrollbar"
+        >
+          {VOLUME_TABS.map((tab) => {
+            const selected = selectedVolume === tab.value
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => handleVolumeChange(tab.value)}
+                className={`shrink-0 whitespace-nowrap min-h-10 px-3 rounded-control font-grotesk text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                  selected ? 'text-ink bg-surface-3 shadow-nav-current' : 'text-ink-body hover:text-ink hover:bg-surface-2'
+                }`}
+              >
+                {tab.label}
+              </button>
+            )
+          })}
+        </HorizontalScroll>
+      ) : undefined}
     >
       {!missingFocus && (
-        <div className="flex items-start gap-2">
-          <p
-            className={`flex-1 font-garamond italic text-[15px] leading-snug text-ink-body transition-opacity duration-200 ${
-              isReflectionFading ? 'opacity-0' : 'opacity-100'
-            }`}
-          >
-            “{CANONICAL_REFLECTIONS[reflectionIndex]}”
-          </p>
-          <button
-            type="button"
-            onClick={handleNextReflection}
-            aria-label="Next reflection"
-            title="Next reflection"
-            className="-mt-1.5 flex items-center justify-center w-8 h-8 shrink-0 rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-          </button>
-        </div>
+        <details className="text-xs text-ink-muted">
+          <summary className="cursor-pointer min-h-8 py-1.5 w-fit rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow">Daily reflection</summary>
+          <div className="flex items-start gap-2 pt-1">
+            <p
+              className={`flex-1 font-garamond italic text-[15px] leading-snug text-ink-body transition-opacity duration-200 ${
+                isReflectionFading ? 'opacity-0' : 'opacity-100'
+              }`}
+            >
+              “{CANONICAL_REFLECTIONS[reflectionIndex]}”
+            </p>
+            <button
+              type="button"
+              onClick={handleNextReflection}
+              aria-label="Next reflection"
+              title="Next reflection"
+              className="-mt-1.5 flex items-center justify-center w-8 h-8 shrink-0 rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </details>
       )}
     </HudTitlePanel>
   )
@@ -262,28 +290,6 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
 
       {titlePanel}
 
-      <HorizontalScroll
-        role="group"
-        aria-label="Volumes"
-        className="no-print -mt-1 flex gap-1 overflow-x-auto no-scrollbar border-b border-line-subtle pb-2"
-      >
-        {VOLUME_TABS.map((tab) => {
-          const selected = selectedVolume === tab.value
-          return (
-            <button
-              key={tab.value}
-              type="button"
-              aria-pressed={selected}
-              onClick={() => handleVolumeChange(tab.value)}
-              className={`shrink-0 whitespace-nowrap min-h-10 px-3 rounded-control font-grotesk text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                selected ? 'text-ink bg-surface-3 shadow-nav-current' : 'text-ink-body hover:text-ink hover:bg-surface-2'
-              }`}
-            >
-              {tab.label}
-            </button>
-          )
-        })}
-      </HorizontalScroll>
 
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
         <aside

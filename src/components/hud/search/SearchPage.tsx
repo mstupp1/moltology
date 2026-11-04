@@ -70,13 +70,13 @@ export function SearchPage({
 
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans relative">
-      <HudTitlePanel
-        accent="teal"
-        title="Search"
-        description="Find members by name, handle or larva unit number, or jump to any page."
-      />
-
       <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
+        <HudTitlePanel
+          treatment="integrated"
+          accent="teal"
+          title="Search"
+          description="Find members by name, handle or larva unit number, or jump to any page."
+        />
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#839493]" />
           <input

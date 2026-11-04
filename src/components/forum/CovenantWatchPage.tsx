@@ -195,22 +195,14 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
 
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans relative" data-testid="covenant-watch">
-      <HudTitlePanel
-        accent="cyan"
-        eyebrow="Soft-Shell Covenant"
-        title="Covenant Watch"
-        description="Community flags from the benthic forum. Review quietly. Removing a post soft-deletes it from the board while preserving data in the ledger."
-      />
-
       <section className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 md:p-5 space-y-4">
+        <HudTitlePanel
+          treatment="integrated"
+          accent="cyan"
+          title="Covenant Watch"
+          description="Review community flags. Removed posts are hidden from the board and retained for staff review."
+        />
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line-subtle pb-3">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-cyan-glow" />
-            <h2 className="font-grotesk text-sm font-bold tracking-[0.08em] uppercase text-ink">
-              Flag Review Ledger
-            </h2>
-          </div>
-
           <div className="flex items-center gap-1.5" role="tablist" aria-label="Flag filter">
             <button
               type="button"

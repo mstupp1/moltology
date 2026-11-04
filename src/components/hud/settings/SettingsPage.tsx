@@ -122,9 +122,8 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
 
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans relative">
-      <HudTitlePanel accent="teal" title="Settings" />
-
-      <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5">
+      <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5 space-y-4">
+        <HudTitlePanel treatment="integrated" accent="teal" title="Settings" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           <div className="space-y-4">
             <PlanUsageSection userId={userId} />
