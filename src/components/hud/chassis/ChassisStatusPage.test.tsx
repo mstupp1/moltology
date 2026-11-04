@@ -109,6 +109,28 @@ describe('unified character workspace', () => {
     expect(data.placements).toHaveLength(19)
     expect(data.placements.find((i) => i.equippedSlot === 'head')?.id).toBe(payload.items[3].id)
   })
+  it('lets admins wear any item and creates its instance on save', async () => {
+    vi.mocked(getChassisLoadoutFn).mockResolvedValue({
+      ...structuredClone(payload),
+      allUnlocked: true,
+    })
+    await mount()
+    expect(screen.getByText('Admin · every item is unlocked.')).toBeInTheDocument()
+    choose('Oracle Dome Lattice')
+    fireEvent.click(screen.getByRole('button', { name: 'Equip on head' }))
+    expect(screen.queryByRole('status')).toBeNull()
+    expect(preview().equipment.head.visualKey).toBe('oracle-dome-lattice')
+    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+    await waitFor(() => expect(saveCharacterFn).toHaveBeenCalledTimes(1))
+    const data = vi.mocked(saveCharacterFn).mock.calls[0][0].data
+    const oracle = ALL_EQUIPMENT_CATALOG.find((c) => c.slug === 'oracle-dome-lattice')!
+    expect(data.grants).toEqual([{ id: expect.any(String), catalogItemId: oracle.id }])
+    expect(data.release).toEqual([])
+    expect(data.placements).toHaveLength(20)
+    expect(data.placements.find((p) => p.equippedSlot === 'head')?.id).toBe(data.grants?.[0].id)
+    const oldHead = payload.items.find((i) => i.equippedSlot === 'head')!
+    expect(data.placements.find((p) => p.id === oldHead.id)?.vaultIndex).not.toBeNull()
+  })
   it('retains draft edits after a rejected save and allows retry', async () => {
     vi.mocked(saveCharacterFn).mockRejectedValueOnce(
       new Error('Your character changed in another session. Reload before saving.'),

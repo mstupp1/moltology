@@ -3811,7 +3811,41 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<Chassis
     vaultSize: VAULT_SIZE,
     config: profile ? withCharacterAppearance(profile).avatarConfig : null,
     appearanceRevision: profile?.appearanceRevision ?? 0,
+    ...(isAdmin(null, profile?.role) ? { allUnlocked: true } : {}),
   }
+}
+
+/**
+ * Admins have all gear unlocked, so an admin's gear rows only exist while placed.
+ * Unplaced gear rows (left behind by a save that failed after granting) are dropped.
+ */
+async function dropUnplacedAdminGear(dbClient: Db, userId: string) {
+  await dbClient.execute(sql`DELETE FROM public.user_gear_items g USING public.equipment_catalog c
+    WHERE g."userId"=${userId} AND c.id=g."catalogItemId" AND c.kind='gear'
+      AND g."equippedSlot" IS NULL AND g."vaultIndex" IS NULL`)
+}
+
+/** Admin save step: create instances for newly equipped unlocked items and drop released ones. */
+async function applyAdminGearChanges(
+  dbClient: Db,
+  userId: string,
+  payload: ChassisLoadoutPayload,
+  grants: { id: string; catalogItemId: string }[],
+  release: string[],
+) {
+  const gear = new Set(payload.catalog.filter((c) => c.kind === 'gear').map((c) => c.id))
+  const owned = new Set(payload.items.map((i) => i.id))
+  if (grants.some((g) => owned.has(g.id) || !gear.has(g.catalogItemId)))
+    throw new Error('Invalid or unowned equipment placement.')
+  const released = release.filter((id) => owned.has(id))
+  if (released.length)
+    await dbClient
+      .delete(userGearItems)
+      .where(and(eq(userGearItems.userId, userId), inArray(userGearItems.id, released)))
+  if (grants.length)
+    await dbClient
+      .insert(userGearItems)
+      .values(grants.map((g) => ({ id: g.id, userId, catalogItemId: g.catalogItemId })))
 }
 
 async function commitCharacter(
@@ -3849,6 +3883,10 @@ export interface SaveCharacterInput {
   expectedRevision: number
   config: LobsterAvatarConfig
   placements: CharacterPlacement[]
+  /** Admin only: new instances of unlocked items that the draft equips. */
+  grants?: { id: string; catalogItemId: string }[]
+  /** Admin only: owned instances the draft let go of. */
+  release?: string[]
 }
 export async function saveCharacterHandler({ data, context }: ServerFnArgs<SaveCharacterInput>) {
   const auth = await resolveWriteAuth({ data, context })
@@ -3856,7 +3894,17 @@ export async function saveCharacterHandler({ data, context }: ServerFnArgs<SaveC
   if (!data) throw new Error('Missing character payload.')
   const config = z.object(avatarConfigShape).parse(data.config)
   if (config.style !== 'critters') throw new Error('Invalid character style.')
-  const payload = await loadChassisPayload(auth.dbClient, auth.userId)
+  let payload = await loadChassisPayload(auth.dbClient, auth.userId)
+  const grants = data.grants ?? []
+  const release = data.release ?? []
+  if (grants.length || release.length) {
+    if (!payload.allUnlocked) throw new Error('Invalid or unowned equipment placement.')
+    if ((payload.appearanceRevision ?? 0) !== data.expectedRevision)
+      throw new Error('Your character changed in another session. Reload before saving.')
+    await dropUnplacedAdminGear(auth.dbClient, auth.userId)
+    await applyAdminGearChanges(auth.dbClient, auth.userId, payload, grants, release)
+    payload = await loadChassisPayload(auth.dbClient, auth.userId)
+  }
   const error = validateCharacterPlacements(payload.items, payload.catalog, data.placements)
   if (error) throw new Error(error)
   await commitCharacter(
@@ -3875,6 +3923,10 @@ export const getChassisLoadoutHandler = async ({
 }: ServerFnArgs<{ token?: string; userId?: string }>) => {
   const auth = await resolveWriteAuth({ data, context })
   if (!auth) throw new Error('Unauthenticated: Authentication required to inspect equipment.')
+  const payload = await loadChassisPayload(auth.dbClient, auth.userId)
+  if (!payload.allUnlocked || payload.items.every((i) => i.equippedSlot || i.vaultIndex !== null))
+    return payload
+  await dropUnplacedAdminGear(auth.dbClient, auth.userId)
   return loadChassisPayload(auth.dbClient, auth.userId)
 }
 
