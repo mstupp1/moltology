@@ -8,6 +8,7 @@ import {
   REFERRAL_COOKIE, REFERRAL_COOKIE_MAX_AGE, REFERRAL_MONTHLY_CAP, REFERRAL_XP,
   profileSharePath, readReferralCookie, type ReferralSummary,
 } from '../referrals'
+import { tryCheckGemMilestones } from './gems'
 import { resolveWriteAuth, type WriteAuthContext } from './write-auth'
 
 type Db = ReturnType<typeof getDb>
@@ -117,6 +118,7 @@ export async function qualifyReferral(db: Db, userId: string): Promise<void> {
     `)
     if (award.rows.length) {
       await syncReferralProgression(db, referral.referrerId)
+      await tryCheckGemMilestones(db, referral.referrerId)
       return
     }
   }

@@ -128,8 +128,9 @@ export const profiles = pgTable('profiles', {
   handle: text('handle'),
   stage: integer('stage').default(1).notNull(), // 1: Larva, 2: Soft-Shed, 3: Architect, 4: Ascendant
   xp: integer('xp').default(0).notNull(),
-  moltCredits: decimal('moltCredits', { precision: 12, scale: 2 }).default('1450.00').notNull(),
-  chitinGems: integer('chitinGems').default(250).notNull(),
+  moltCredits: decimal('moltCredits', { precision: 12, scale: 2 }).default('0.00').notNull(),
+  /** Cached sum of `gem_transactions` for this member. Write through the ledger, never directly. */
+  chitinGems: integer('chitinGems').default(0).notNull(),
   synapseShards: integer('synapseShards').default(45).notNull(),
   depthPressureCoins: integer('depthPressureCoins').default(12).notNull(),
   activeAvatarId: text('activeAvatarId'),
@@ -409,6 +410,25 @@ export const xpTransactions = pgTable('xp_transactions', {
     for: 'all',
     using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
   })
+])
+
+// Chitin Gem ledger: every award and spend, one row each. Unique source keys stop double awards.
+export const gemTransactions = pgTable('gem_transactions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  amount: integer('amount').notNull(),
+  source: text('source').$type<import('../lib/gems').GemSource>().notNull(),
+  sourceKey: text('sourceKey').notNull(),
+  description: text('description').notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('gem_transactions_user_source_key_unique').on(table.userId, table.sourceKey),
+  index('gem_transactions_user_created_idx').on(table.userId, table.createdAt),
+  pgPolicy('gem_transactions_server_only', {
+    for: 'all',
+    using: sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`,
+    withCheck: sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`,
+  }),
 ])
 
 // Public System Transmutation Changelogs Table
