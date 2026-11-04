@@ -4,7 +4,7 @@ import sharp from 'sharp'
 import { getAbsoluteAssetUrl } from '../../src/lib/assets'
 import { MERCH_PRINT_PREFIX, type MerchSeedProduct } from '../../src/lib/merch-seed-data'
 import { PrintfulClient, type MockupTask } from './printful-sync'
-import { variantTemplate } from './templates'
+import { variantTemplate, variantTemplates } from './templates'
 import { productAssetKeys } from './selection'
 
 /** Only completed provider tasks may produce website photos. */
@@ -25,7 +25,6 @@ export async function generatePrintfulMockups(client: PrintfulClient, products: 
     const results: NonNullable<MockupTask['mockups']> = []
     for (const designKey of new Set(product.variants.map(variant => variant.design))) {
       const variants = product.variants.filter(variant => variant.design === designKey)
-      const template = variantTemplate(product, variants[0], blanks.variants, info)
       const record = path.join(taskDir, `${product.slug}-${designKey}.json`)
       let task: MockupTask
       if (fs.existsSync(record) && !refresh) task = JSON.parse(fs.readFileSync(record, 'utf8'))
@@ -35,9 +34,11 @@ export async function generatePrintfulMockups(client: PrintfulClient, products: 
           format: 'jpg', width: 1600,
           option_groups: [product.category === 'Mugs' ? 'Default' : 'Flat'],
           ...(product.printful.options ? { product_options: Object.fromEntries(product.printful.options.map(option => [option.id, option.value])) } : {}),
-          files: [{ placement: product.printful.placement, image_url: getAbsoluteAssetUrl(`${MERCH_PRINT_PREFIX}/${designKey}.png`),
-            position: { area_width: template.template.width, area_height: template.template.height,
-              width: template.template.width, height: template.template.height, top: 0, left: 0 } }],
+          files: variantTemplates(product, variants[0], blanks.variants, info).map(file => ({
+            placement: file.placement, image_url: getAbsoluteAssetUrl(`${MERCH_PRINT_PREFIX}/${file.design.key}.png`),
+            position: { area_width: file.template.width, area_height: file.template.height,
+              width: file.template.width, height: file.template.height, top: 0, left: 0 },
+          })),
         })
         task = { task_key: created.task_key, status: 'pending' }
         fs.writeFileSync(record, JSON.stringify(task, null, 2))
@@ -57,7 +58,8 @@ export async function generatePrintfulMockups(client: PrintfulClient, products: 
     for (const [index, key] of keys.entries()) {
       const variant = product.variants.find(item => item.imageUrl === key) ?? product.variants[Math.min(index, product.variants.length - 1)]
       const blank = variantTemplate(product, variant, blanks.variants, info).blank
-      const result = results.find(item => item.variant_ids.includes(blank.id))
+      const back = key.endsWith('-back.jpg')
+      const result = results.find(item => item.variant_ids.includes(blank.id) && (back ? item.placement === 'back' : item.placement !== 'back'))
       if (!result) throw new Error(`No Printful mockup for ${product.slug}: ${variant.title}.`)
       const url = product.category === 'Mugs' && index === 0
         ? result.extra?.find(extra => extra.title === 'Handle on Left')?.url ?? result.mockup_url

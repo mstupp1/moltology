@@ -22,7 +22,7 @@ export interface MerchLayer {
 export interface MerchDesign {
   key: string
   /** What the mockup generator should call the blank. */
-  blank: 'mug' | 'tee' | 'hat' | 'deskMat'
+  blank: 'mug' | 'tee' | 'hat' | 'deskMat' | 'hoodie' | 'tote'
   width: number
   height: number
   /** Solid wrap color, or null for a transparent print file. */
@@ -46,6 +46,23 @@ const face = (side: 'left' | 'right', source: MerchLayerSource, scale = 0.72): M
 })
 
 export const MERCH_DESIGNS: MerchDesign[] = [
+  {
+    key: 'hoodie-moltology-front-v1', blank: 'hoodie', width: 3600, height: 3600, background: null,
+    // Wearer's left chest, about three inches wide on a twelve-inch print area.
+    layers: [{ source: { repo: `${KIT}/parts/icon.svg` }, cx: 0.73, cy: 0.22, maxWidth: 0.25, maxHeight: 0.25 }],
+  },
+  {
+    key: 'hoodie-moltology-back-v1', blank: 'hoodie', width: 3600, height: 4800, background: null,
+    // Below the resting hood; original vector includes the canonical descender clearance.
+    layers: [{ source: { repo: `${KIT}/parts/merch-v2/moltology-stacked-dark.svg` }, cx: 0.5, cy: 0.38, maxWidth: 0.78, maxHeight: 0.25 }],
+  },
+  {
+    key: 'tote-moltology-v1', blank: 'tote', width: 3000, height: 3000, background: null,
+    layers: [
+      { source: { repo: `${KIT}/parts/icon.svg` }, cx: 0.5, cy: 0.32, maxWidth: 0.48, maxHeight: 0.42 },
+      { source: { repo: `${KIT}/parts/merch-v2/moltology-stacked-dark.svg` }, cx: 0.5, cy: 0.70, maxWidth: 0.78, maxHeight: 0.25 },
+    ],
+  },
   {
     key: 'hat-moltology-v1', blank: 'hat', width: 1650, height: 600, background: null,
     layers: [{ source: { repo: `${KIT}/parts/icon.svg` }, cx: 0.5, cy: 0.5, maxWidth: 0.31, maxHeight: 0.85 }],

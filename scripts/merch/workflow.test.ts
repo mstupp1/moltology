@@ -1,13 +1,30 @@
 import { describe, expect, it, vi } from 'vitest'
 import { selectMerchProducts, productAssetKeys } from './selection'
 import { requireMerchDevDatabase } from './database'
-import { ensureSyncProduct, validateSyncProduct, PrintfulClient, type SyncProductDetail } from './printful-sync'
+import { buildSyncProductPayload, ensureSyncProduct, validateSyncProduct, PrintfulClient, type SyncProductDetail } from './printful-sync'
 import { requireCompletedMockups } from './mockups'
-import { variantTemplate } from './templates'
+import { variantTemplate, variantTemplates } from './templates'
 
 const remote: SyncProductDetail = { sync_product: { id: 1, external_id: 'p' }, sync_variants: [] }
 
 describe('private merch workflow', () => {
+  it('carries both hoodie placements through template validation, upload selection, and sync', () => {
+    const product = selectMerchProducts('moltology-hoodie')[0]
+    const blanks = product.variants.map((v, index) => ({ id: 100 + index, size: v.size, color: 'Black' }))
+    const info = { printfiles: [
+      { printfile_id: 134, width: 1800, height: 1800, dpi: 150 },
+      { printfile_id: 1, width: 1800, height: 2400, dpi: 150 },
+    ], variant_printfiles: blanks.map(v => ({ variant_id: v.id, placements: { front: 134, back: 1 } })) }
+    expect(variantTemplates(product, product.variants[0], blanks, info).map(t => t.placement)).toEqual(['front', 'back'])
+    expect(productAssetKeys([product]).print).toEqual(['merch/print/hoodie-moltology-front-v1.png', 'merch/print/hoodie-moltology-back-v1.png'])
+    const { payload, missing } = buildSyncProductPayload({ product, catalogVariants: blanks, printFileUrl: key => `https://example.com/${key}.png`, thumbnailUrl: 'https://example.com/photo.jpg' })
+    expect(missing).toEqual([])
+    expect(payload.sync_variants[0].files.map(file => file.type)).toEqual(['front', 'back'])
+    expect(payload.sync_variants[0].files[1].url).toContain('hoodie-moltology-back-v1.png')
+    expect(() => variantTemplates(product, product.variants[0], blanks, { ...info, printfiles: info.printfiles.slice(0, 1) })).toThrow('Missing Printful template')
+    expect(() => variantTemplates(product, { ...product.variants[0], additionalPrints: [{ placement: 'back', design: 'hoodie-moltology-front-v1' }] }, blanks, info)).toThrow('dimensions')
+    expect(() => variantTemplates(product, { ...product.variants[0], additionalPrints: [{ placement: 'front', design: product.variants[0].design }] }, blanks, info)).toThrow('Duplicate')
+  })
   it('selects only the pilot and refuses unknown or conflicting selections', () => {
     const products = selectMerchProducts(undefined, true)
     expect(products.map(product => product.slug)).toEqual(['moltology-mug', 'moltology-tee'])
@@ -76,6 +93,38 @@ describe('Stripe local configuration', () => {
 })
 
 describe('mockup task recovery', () => {
+  it('requests both hoodie files and saves front/back responses by placement, regardless of response order', async () => {
+    const fs = await import('node:fs')
+    const os = await import('node:os')
+    const path = await import('node:path')
+    const sharp = (await import('sharp')).default
+    const { generatePrintfulMockups } = await import('./mockups')
+    const product = selectMerchProducts('moltology-hoodie')[0]
+    const out = fs.mkdtempSync(path.join(os.tmpdir(), 'merch-hoodie-'))
+    const variants = product.variants.map((v, index) => ({ id: 100 + index, size: v.size, color: 'Black' }))
+    const ids = variants.map(v => v.id)
+    const client = {
+      requireManualStore: vi.fn().mockResolvedValue(2),
+      catalogProduct: vi.fn().mockResolvedValue({ variants }),
+      printfiles: vi.fn().mockResolvedValue({ printfiles: [
+        { printfile_id: 134, width: 1800, height: 1800, dpi: 150 }, { printfile_id: 1, width: 1800, height: 2400, dpi: 150 },
+      ], variant_printfiles: variants.map(v => ({ variant_id: v.id, placements: { front: 134, back: 1 } })) }),
+      createMockupTask: vi.fn().mockResolvedValue({ task_key: 'hoodie' }),
+      mockupTask: vi.fn().mockResolvedValue({ task_key: 'hoodie', status: 'completed', mockups: [
+        { placement: 'back', variant_ids: ids, mockup_url: 'https://example.test/back.jpg' },
+        { placement: 'front', variant_ids: ids, mockup_url: 'https://example.test/front.jpg' },
+      ] }),
+    }
+    const photo = await sharp({ create: { width: 10, height: 10, channels: 3, background: '#000000' } }).jpeg().toBuffer()
+    const fetchMock = vi.fn().mockImplementation(async () => new Response(new Uint8Array(photo)))
+    vi.stubGlobal('fetch', fetchMock)
+    try {
+      await generatePrintfulMockups(client as unknown as PrintfulClient, [product], out)
+      expect(client.createMockupTask.mock.calls[0][1].files.map((f: { placement: string }) => f.placement)).toEqual(['front', 'back'])
+      expect(fetchMock.mock.calls.map(call => call[0])).toEqual(['https://example.test/front.jpg', 'https://example.test/back.jpg'])
+      expect(fs.existsSync(path.join(out, 'mockups/moltology-hoodie-v1-black-back.jpg'))).toBe(true)
+    } finally { vi.unstubAllGlobals(); fs.rmSync(out, { recursive: true, force: true }) }
+  })
   it('preserves failed task metadata and previous photos without creating another task on rerun', async () => {
     const fs = await import('node:fs')
     const os = await import('node:os')

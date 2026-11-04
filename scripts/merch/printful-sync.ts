@@ -1,4 +1,4 @@
-import { isPlaceholderSyncId, type MerchSeedProduct } from '../../src/lib/merch-seed-data'
+import { isPlaceholderSyncId, variantPrintFiles, type MerchSeedProduct } from '../../src/lib/merch-seed-data'
 
 export interface PrintfulCatalogVariant {
   id: number
@@ -60,7 +60,7 @@ export function buildSyncProductPayload(input: {
         variant_id: blank.id,
         retail_price: formatRetailPrice(variant.priceCents),
         ...(input.product.printful.options ? { options: input.product.printful.options } : {}),
-        files: [{ type: input.product.printful.placement, url: input.printFileUrl(variant.design) }],
+        files: variantPrintFiles(input.product, variant).map(file => ({ type: file.placement, url: input.printFileUrl(file.design) })),
       },
     ]
   })
@@ -192,7 +192,7 @@ export interface PrintfileInfo {
 export interface MockupTask {
   task_key: string
   status: 'pending' | 'completed' | 'failed'
-  mockups?: Array<{ variant_ids: number[]; mockup_url: string; extra?: Array<{ url: string; title?: string; option?: string; option_group?: string }> }>
+  mockups?: Array<{ placement?: string; variant_ids: number[]; mockup_url: string; extra?: Array<{ url: string; title?: string; option?: string; option_group?: string }> }>
 }
 
 /** Recover remote creation before writing the ledger; never recreate with --force. */

@@ -562,6 +562,10 @@ export function uniqueVariantLabels(variants: MerchVariantView[], key: 'size' | 
     seen.add(value)
     labels.push(value)
   }
+  const garmentSizes = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL']
+  if (key === 'size' && labels.every(label => garmentSizes.includes(label))) {
+    return labels.sort((a, b) => garmentSizes.indexOf(a) - garmentSizes.indexOf(b))
+  }
   return labels
 }
 
@@ -582,6 +586,14 @@ export interface MerchCategoryInfo {
 
 /** Product facts by category. Shown on product pages; the blanks are fixed per category. */
 export const MERCH_CATEGORY_INFO: Record<string, MerchCategoryInfo> = {
+  Hoodies: {
+    details: ['65% ring-spun cotton and 35% polyester, with a 100% cotton face', 'Front pouch pocket, matching flat drawstrings, and a three-panel hood', 'Red emblem on the left chest; white Moltology wordmark on the back', 'This style runs small; Printful recommends ordering one size larger than usual'],
+    care: ['Machine wash cold, inside out, with similar colors', 'Tumble dry low or hang dry', 'Do not iron the print'],
+  },
+  Totes: {
+    details: ['100% organic cotton 3/1 twill, 8 oz/yd²', '16″ × 14½″ × 5″ with an open main compartment', '24½″ dual carrying straps; weight limit 30 lb', 'Red emblem and white Moltology wordmark printed on the front'],
+    care: ['Spot clean with cold water', 'Air dry; do not iron the print'],
+  },
   Hats: {
     details: ['100% chino cotton twill', 'Unstructured, six-panel, low-profile fit with a curved visor', 'Adjustable strap with an antique buckle', 'Red flat embroidery on the front'],
     care: ['Spot clean gently with mild soap and cool water', 'Air dry; do not machine wash or tumble dry'],

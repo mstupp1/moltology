@@ -1,4 +1,4 @@
-import { INITIAL_MERCH_PRODUCTS, MERCH_PILOT_SLUGS, type MerchSeedProduct } from '../../src/lib/merch-seed-data'
+import { INITIAL_MERCH_PRODUCTS, MERCH_PILOT_SLUGS, variantPrintFiles, type MerchSeedProduct } from '../../src/lib/merch-seed-data'
 import { isCuratedMerchImage } from '../../src/lib/merch-gallery'
 
 export function selectMerchProducts(only?: string, pilot = false): MerchSeedProduct[] {
@@ -14,7 +14,7 @@ export function selectMerchProducts(only?: string, pilot = false): MerchSeedProd
 /** Build an exact upload allowlist; never enumerate stale output folders. */
 export function productAssetKeys(products: MerchSeedProduct[]) {
   return {
-    print: [...new Set(products.flatMap(product => product.variants.map(variant => `merch/print/${variant.design}.png`)))],
+    print: [...new Set(products.flatMap(product => product.variants.flatMap(variant => variantPrintFiles(product, variant).map(file => `merch/print/${file.design}.png`))))],
     mockups: [...new Set(products.flatMap(product => [product.featuredImageUrl, ...product.galleryImageUrls, ...product.variants.map(variant => variant.imageUrl).filter((key): key is string => Boolean(key))]))].filter(key => !isCuratedMerchImage(key)),
   }
 }
