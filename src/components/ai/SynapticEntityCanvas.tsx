@@ -48,7 +48,8 @@ const CYAN_PALE = new THREE.Color('#9be7ff')
 const CYAN_DEEP = new THREE.Color('#0a6f93')
 const TEAL = new THREE.Color('#3fd8f2')
 const CRIMSON = new THREE.Color('#ff453a')
-const BODY_DEEP = new THREE.Color('#03121a')
+const BODY_DEEP = new THREE.Color('#04202e')
+const AQUA = new THREE.Color('#2ee6d6')
 
 function canUseWebGL(): boolean {
   if (typeof window === 'undefined' || typeof document === 'undefined') return false
@@ -136,17 +137,32 @@ const BODY_VERTEX_SHADER = `
 uniform float uTime;
 uniform float uBreath;
 uniform float uThink;
+uniform float uEnergy;
+uniform float uRipple;
 
 varying vec3 vNormal;
 varying vec3 vView;
 varying vec3 vObject;
+varying float vSwell;
 
 ${SIMPLEX_NOISE_3D}
 
 void main() {
-  // A very slight, slow surface swell. Calmer still while thinking.
-  float swell = snoise(position * 1.3 + vec3(0.0, 0.0, uTime * 0.07)) * 0.016 * (1.0 - uThink * 0.6);
-  vec3 displaced = position * uBreath + normal * swell;
+  // Liquid surface: slow, smooth swells, held tighter while thinking.
+  vec3 warp = vec3(
+    sin(position.y * 2.2 + uTime * 0.55),
+    cos(position.z * 2.2 - uTime * 0.45),
+    sin(position.x * 2.2 + uTime * 0.6)
+  ) * 0.18;
+  float swell = snoise(position * 1.15 + warp + vec3(0.0, 0.0, uTime * 0.22));
+  float amp = 0.036 * (1.0 - uThink * 0.55) + uEnergy * 0.018;
+
+  // A ripple rolls across the surface each time a chunk of the reply lands.
+  float ripple = sin(dot(position, vec3(0.35, 0.8, 0.45)) * 7.0 - uTime * 7.5) * uRipple * 0.028;
+
+  float disp = swell * amp + ripple;
+  vSwell = swell * 0.5 + 0.5 + ripple * 10.0;
+  vec3 displaced = position * uBreath + normal * disp;
 
   vObject = position;
   vNormal = normalize(normalMatrix * normal);
@@ -163,6 +179,7 @@ uniform float uThink;
 uniform float uFlash;
 uniform float uError;
 uniform vec3 uColor;
+uniform vec3 uAccent;
 uniform vec3 uRimColor;
 uniform vec3 uDeep;
 uniform vec3 uLight;
@@ -170,45 +187,57 @@ uniform vec3 uLight;
 varying vec3 vNormal;
 varying vec3 vView;
 varying vec3 vObject;
+varying float vSwell;
 
-${SIMPLEX_NOISE_3D}
+// Flowing ribbons of light inside the body (cheap domain-warped sines).
+float currents(vec3 p, float t) {
+  vec3 w1 = p * 2.4 + vec3(sin(t * 0.45 + p.y * 1.8), cos(t * 0.5 + p.z * 1.8), sin(t * 0.38 + p.x * 1.8)) * 0.6;
+  vec3 w2 = w1 * 1.7 + vec3(cos(w1.y * 1.6 - t * 0.7), sin(w1.z * 1.6 + t * 0.6), cos(w1.x * 1.6 - t * 0.5)) * 0.5;
+  float r1 = abs(sin(w1.x + cos(w1.y * 1.3) + sin(w1.z * 1.1)));
+  float r2 = abs(cos(w2.y - sin(w2.z * 1.4) + cos(w2.x * 1.2)));
+  float stream = smoothstep(0.34, 0.02, r1 * 0.58 + r2 * 0.42);
+  float filament = smoothstep(0.12, 0.0, abs(r1 - r2));
+  return clamp(stream * 0.7 + filament * 0.5, 0.0, 1.0);
+}
 
 void main() {
   vec3 V = normalize(vView);
   vec3 N = normalize(vNormal);
   float facing = clamp(dot(N, V), 0.0, 1.0);
-  float fresnel = pow(1.0 - facing, 3.0);
+  float edge = 1.0 - facing;
 
-  // A soft nucleus of light held inside the body. It gathers while thinking.
-  float nucleusNoise = snoise(vObject * 0.9 + vec3(0.0, uTime * 0.05, 0.0)) * 0.5 + 0.5;
-  float nucleus = pow(facing, 5.0) * (0.22 + nucleusNoise * 0.12 + uThink * 0.45 + uEnergy * 0.22);
-  float depth = pow(facing, 1.6) * 0.1;
+  float flowSpeed = 0.5 + uEnergy * 0.6 + uThink * 0.5;
+  // Sampled a little inside the surface, so the light sits behind the glass.
+  vec3 inside = vObject * 0.9;
+  float veins = currents(inside, uTime * flowSpeed);
+  float deepVeins = currents(inside.yzx * 0.8 + vec3(1.7, -0.9, 2.3), -uTime * flowSpeed * 0.7);
 
-  // Fine internal currents, drifting slowly.
-  // Sampled a little inside the surface, so the currents sit behind the glass.
-  vec3 inside = vObject * 0.86 ;
-  float n = snoise(inside * 2.1 + vec3(uTime * 0.05, -uTime * 0.04, uTime * 0.03));
-  float current = pow(clamp(1.0 - abs(n), 0.0, 1.0), 22.0) * (0.09 + uEnergy * 0.14) * (0.3 + 0.7 * facing);
+  // Light runs along the currents, faster while replying.
+  float travel = fract(dot(vObject, vec3(1.1, 1.5, 0.9)) * 1.4 - uTime * (0.7 + uEnergy * 2.6));
+  float runner = smoothstep(0.7, 1.0, travel) * veins * (0.35 + uEnergy * 0.9);
 
-  // Broad, soft sheen from the pointer-led light (no hard plastic hotspot).
+  // A bright nucleus held inside the body; it gathers while thinking.
+  float nucleus = pow(facing, 3.2) * (0.42 + uThink * 0.55 + uEnergy * 0.35 + uFlash * 0.25);
+
   vec3 H = normalize(normalize(uLight) + V);
   float NdotH = max(dot(N, H), 0.0);
-  float spec = pow(NdotH, 36.0) * 0.16;
-  float sheen = pow(NdotH, 6.0) * 0.06;
+  float spec = pow(NdotH, 48.0) * 0.45;
+  float sheen = pow(NdotH, 8.0) * 0.12;
 
-  // Thin bright edge plus a wider glassy falloff.
-  float edge = 1.0 - facing;
-  float rim = pow(edge, 7.0) * (0.95 + uEnergy * 0.35 + uFlash * 0.2 - uThink * 0.25)
-            + pow(edge, 2.2) * (0.16 + uEnergy * 0.08);
+  float rim = pow(edge, 5.0) * (1.25 + uEnergy * 0.5 + uFlash * 0.3 - uThink * 0.3)
+            + pow(edge, 2.0) * (0.22 + uEnergy * 0.1);
 
-  // Light from above, so it sits in water rather than floating flat.
   float above = N.y * 0.5 + 0.5;
+  vec3 pale = vec3(0.78, 0.97, 1.0);
+  float calm = 1.0 - uError;
 
-  vec3 col = uDeep * (0.75 + above * 0.5);
-  col += uColor * (depth + current + sheen + above * 0.04);
-  col += mix(uColor, vec3(0.75, 0.95, 1.0), 0.45 * (1.0 - uError)) * nucleus * (1.0 - uError * 0.55);
+  vec3 col = uDeep * (0.7 + above * 0.6) * (0.8 + vSwell * 0.4);
+  col += mix(uColor, uAccent, 0.35 * calm) * deepVeins * (0.16 + uThink * 0.12) * (0.4 + 0.6 * facing);
+  col += uColor * veins * (0.42 + uEnergy * 0.35) * (0.35 + 0.65 * facing);
+  col += mix(uColor, pale, 0.55 * calm) * (nucleus + runner);
+  col += uColor * sheen;
   col += uRimColor * rim;
-  col += vec3(0.85, 0.96, 1.0) * spec;
+  col += pale * (spec + veins * uFlash * 0.5);
 
   gl_FragColor = vec4(col, 1.0);
 }
@@ -258,12 +287,12 @@ varying float vSeed;
 
 float pulse(float birth, float seed, float gain) {
   float age = uTime - birth;
-  if (age < 0.0 || age > 2.2) return 0.0;
-  // Each pulse lights roughly a third of the filaments.
-  float chosen = step(0.64, fract(vSeed * 13.71 + seed));
-  float head = age * 0.85;
+  if (age < 0.0 || age > 2.0) return 0.0;
+  // Each pulse lights about half of the filaments.
+  float chosen = step(0.5, fract(vSeed * 13.71 + seed));
+  float head = age * 1.05;
   float d = vT - head;
-  return exp(-d * d * 70.0) * chosen * gain * (1.0 - smoothstep(0.75, 1.05, head));
+  return exp(-d * d * 60.0) * chosen * gain * (1.0 - smoothstep(0.8, 1.1, head));
 }
 
 void main() {
@@ -273,9 +302,13 @@ void main() {
             + pulse(uPulseBirth.w, uPulseSeed.w, uPulseGain.w);
   lit = min(lit, 1.0);
 
-  float fade = 1.0 - smoothstep(0.15, 1.0, vT);
-  float alpha = (0.17 + uEnergy * 0.12) * fade + lit * (0.95 - vT * 0.35);
-  vec3 col = mix(uColor, vec3(0.9, 0.98, 1.0), lit * 0.45);
+  // A soft stream always flows outward along each filament.
+  float flow = fract(vT * 1.3 - uTime * (0.22 + uEnergy * 0.5) + vSeed * 7.0);
+  float stream = smoothstep(0.0, 0.5, flow) * smoothstep(1.0, 0.5, flow);
+
+  float fade = 1.0 - smoothstep(0.1, 1.0, vT);
+  float alpha = (0.2 + stream * (0.32 + uEnergy * 0.3)) * fade + lit * (1.0 - vT * 0.3);
+  vec3 col = mix(uColor, vec3(0.9, 0.99, 1.0), lit * 0.55 + stream * fade * 0.15);
 
   gl_FragColor = vec4(col, clamp(alpha, 0.0, 1.0));
 }
@@ -285,36 +318,51 @@ const SNOW_VERTEX_SHADER = `
 uniform float uTime;
 uniform float uPixelRatio;
 uniform float uSizeScale;
+uniform float uEnergy;
 
 attribute float aSeed;
 
 varying float vAlpha;
+varying float vNear;
 
 void main() {
   vec3 p = position;
-  // Marine snow sinks slowly and wraps around.
-  float fall = uTime * (0.018 + aSeed * 0.02);
-  p.y = mod(p.y - fall + 3.0, 6.0) - 3.0;
-  p.x += sin(uTime * 0.09 + aSeed * 40.0) * 0.06;
+
+  // Motes drift in a slow current around the core...
+  float drift = uTime * (0.05 + aSeed * 0.05);
+  float c = cos(drift), s = sin(drift);
+  p = vec3(p.x * c - p.z * s, p.y, p.x * s + p.z * c);
+  p += vec3(sin(uTime * 0.3 + aSeed * 30.0), cos(uTime * 0.26 + aSeed * 21.0), sin(uTime * 0.22 + aSeed * 13.0)) * 0.08;
+
+  // ...and are drawn in toward it while the Oracle replies.
+  float cycle = fract(uTime * 0.18 + aSeed);
+  float pull = uEnergy * cycle * 0.5;
+  p *= 1.0 - pull;
 
   vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
   gl_Position = projectionMatrix * mvPosition;
-  gl_PointSize = (1.4 + aSeed * 1.8) * uPixelRatio * uSizeScale * (4.6 / -mvPosition.z);
+  float r = length(p);
+  vNear = smoothstep(3.2, 1.3, r);
+  gl_PointSize = (1.6 + aSeed * 3.4) * (1.0 + vNear * 0.6) * uPixelRatio * uSizeScale * (4.6 / -mvPosition.z);
 
-  float edge = smoothstep(3.0, 2.3, abs(p.y));
-  vAlpha = (0.12 + aSeed * 0.22) * edge;
+  float twinkle = 0.65 + 0.35 * sin(uTime * 1.4 + aSeed * 40.0);
+  float wrap = mix(1.0, smoothstep(1.0, 0.85, cycle) * smoothstep(0.0, 0.1, cycle), uEnergy);
+  vAlpha = (0.14 + aSeed * 0.3 + vNear * 0.25) * twinkle * wrap;
 }
 `
 
 const SNOW_FRAGMENT_SHADER = `
 uniform vec3 uColor;
 varying float vAlpha;
+varying float vNear;
 
 void main() {
   float d = length(gl_PointCoord - vec2(0.5));
-  float a = smoothstep(0.5, 0.1, d) * vAlpha;
+  float core = smoothstep(0.22, 0.0, d);
+  float glow = smoothstep(0.5, 0.05, d) * 0.45;
+  float a = (core + glow) * vAlpha;
   if (a < 0.004) discard;
-  gl_FragColor = vec4(uColor, a);
+  gl_FragColor = vec4(mix(uColor, vec3(1.0), core * 0.4), a);
 }
 `
 
@@ -333,10 +381,52 @@ varying vec2 vUv;
 
 void main() {
   float d = length(vUv - vec2(0.5)) * 2.0;
-  float a = pow(clamp(1.0 - d, 0.0, 1.0), 2.4) * uIntensity;
+  float falloff = clamp(1.0 - d, 0.0, 1.0);
+  // Wide soft bloom plus a tighter corona just outside the body.
+  float a = (pow(falloff, 2.2) * 0.55 + pow(falloff, 7.0) * 0.9) * uIntensity;
   // Dither so the faint gradient doesn't band on 8-bit displays.
   a += (fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) / 255.0;
   gl_FragColor = vec4(uColor, a);
+}
+`
+
+const MEMBRANE_VERTEX_SHADER = `
+uniform float uBreath;
+varying vec3 vNormal;
+varying vec3 vView;
+varying vec3 vObject;
+
+void main() {
+  vObject = position;
+  vNormal = normalize(normalMatrix * normal);
+  vec4 mvPosition = modelViewMatrix * vec4(position * uBreath, 1.0);
+  vView = -mvPosition.xyz;
+  gl_Position = projectionMatrix * mvPosition;
+}
+`
+
+const MEMBRANE_FRAGMENT_SHADER = `
+uniform float uTime;
+uniform float uEnergy;
+uniform vec3 uColor;
+varying vec3 vNormal;
+varying vec3 vView;
+varying vec3 vObject;
+
+void main() {
+  vec3 N = normalize(vNormal);
+  vec3 V = normalize(vView);
+  float edge = 1.0 - abs(dot(N, V));
+  // Brightest just inside the silhouette, fading at the very edge so it never reads as a disc.
+  float fresnel = pow(edge, 2.6) * (1.0 - pow(edge, 14.0));
+
+  // Faint interference bands drifting over the outer membrane.
+  vec3 q = normalize(vObject);
+  float bands = sin(q.y * 9.0 + sin(q.x * 3.0 + uTime * 0.4) * 1.6 - uTime * 0.3) * 0.5 + 0.5;
+  float lines = smoothstep(0.92, 1.0, bands) * 0.5;
+
+  float alpha = fresnel * (0.07 + uEnergy * 0.06) + lines * fresnel * 0.3;
+  gl_FragColor = vec4(uColor, alpha);
 }
 `
 
@@ -384,14 +474,15 @@ function buildFilamentGeometry(count: number, rng: () => number): THREE.BufferGe
     const seed = rng()
     side.crossVectors(dir, Math.abs(dir.y) > 0.9 ? new THREE.Vector3(1, 0, 0) : up).normalize()
     const sweep = side.clone().applyAxisAngle(dir, rng() * Math.PI * 2)
-    const reach = 0.75 + rng() * 0.35
-    const curl = 0.25 + rng() * 0.35
+    const reach = 0.6 + rng() * 0.45
+    const curl = 0.35 + rng() * 0.35
 
     const curve = new THREE.CatmullRomCurve3([
       dir.clone().multiplyScalar(0.97),
-      dir.clone().multiplyScalar(1.0 + 0.32 * reach).addScaledVector(sweep, curl * 0.35),
-      dir.clone().multiplyScalar(1.0 + 0.7 * reach).addScaledVector(sweep, curl * 0.85),
-      dir.clone().multiplyScalar(1.0 + 1.0 * reach).addScaledVector(sweep, curl * 1.3),
+      dir.clone().multiplyScalar(1.0 + 0.3 * reach).addScaledVector(sweep, curl * 0.25),
+      dir.clone().multiplyScalar(1.0 + 0.62 * reach).addScaledVector(sweep, curl * 0.7),
+      dir.clone().multiplyScalar(1.0 + 0.85 * reach).addScaledVector(sweep, curl * 1.15).addScaledVector(side, curl * 0.15),
+      dir.clone().multiplyScalar(1.0 + 1.0 * reach).addScaledVector(sweep, curl * 1.6).addScaledVector(side, curl * 0.4),
     ])
     const frames = curve.computeFrenetFrames(lengthSegments, false)
 
@@ -401,7 +492,7 @@ function buildFilamentGeometry(count: number, rng: () => number): THREE.BufferGe
       tangent.copy(frames.tangents[s])
       normal.copy(frames.normals[s])
       binormal.copy(frames.binormals[s])
-      const radius = 0.0125 * (1 - t * 0.8)
+      const radius = 0.015 * Math.pow(1 - t, 1.4) + 0.0015
 
       for (let r = 0; r <= radialSegments; r++) {
         const a = (r / radialSegments) * Math.PI * 2
@@ -438,9 +529,12 @@ function buildSnowGeometry(count: number, rng: () => number): THREE.BufferGeomet
   const positions = new Float32Array(count * 3)
   const seeds = new Float32Array(count)
   for (let i = 0; i < count; i++) {
-    positions[i * 3 + 0] = (rng() - 0.5) * 8
-    positions[i * 3 + 1] = (rng() - 0.5) * 6
-    positions[i * 3 + 2] = -3.2 + rng() * 4.4
+    const theta = rng() * Math.PI * 2
+    const phi = Math.acos(2 * rng() - 1)
+    const r = 1.35 + Math.pow(rng(), 1.6) * 2.4
+    positions[i * 3 + 0] = r * Math.sin(phi) * Math.cos(theta)
+    positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * 0.8
+    positions[i * 3 + 2] = r * Math.cos(phi) * 0.7
     seeds[i] = rng()
   }
   const geometry = new THREE.BufferGeometry()
@@ -516,6 +610,7 @@ export function SynapticEntityCanvas({
       const flash = { value: 0 }
       const pixelRatio = { value: currentPr }
       const errorUniform = { value: 0 }
+      const ripple = { value: 0 }
 
       // Halo: a soft light behind the body, sized to it (not the whole canvas).
       const haloMaterial = new THREE.ShaderMaterial({
@@ -527,7 +622,7 @@ export function SynapticEntityCanvas({
         depthWrite: false,
         depthTest: false,
       })
-      const haloGeometry = new THREE.PlaneGeometry(5.2, 5.2)
+      const haloGeometry = new THREE.PlaneGeometry(6.4, 6.4)
       const halo = new THREE.Mesh(haloGeometry, haloMaterial)
       halo.position.z = -1.4
       halo.renderOrder = -1
@@ -546,7 +641,9 @@ export function SynapticEntityCanvas({
           uThink: think,
           uFlash: flash,
           uError: errorUniform,
+          uRipple: ripple,
           uColor: { value: coreColor },
+          uAccent: { value: AQUA.clone() },
           uRimColor: { value: rimColor },
           uDeep: { value: BODY_DEEP.clone() },
           uLight: { value: lightDir },
@@ -556,11 +653,25 @@ export function SynapticEntityCanvas({
       rootGroup.add(body)
       disposables.push(bodyGeometry, bodyMaterial)
 
+      // Outer membrane: a faint glassy skin that gives the body depth.
+      const membraneGeometry = new THREE.IcosahedronGeometry(1.28, isCompact ? 5 : 7)
+      const membraneMaterial = new THREE.ShaderMaterial({
+        vertexShader: MEMBRANE_VERTEX_SHADER,
+        fragmentShader: MEMBRANE_FRAGMENT_SHADER,
+        uniforms: { uTime: time, uBreath: breath, uEnergy: energy, uColor: { value: rimColor } },
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      })
+      const membrane = new THREE.Mesh(membraneGeometry, membraneMaterial)
+      rootGroup.add(membrane)
+      disposables.push(membraneGeometry, membraneMaterial)
+
       // Filaments
       const pulseBirth = new THREE.Vector4(-99, -99, -99, -99)
       const pulseSeed = new THREE.Vector4(0, 0.25, 0.5, 0.75)
       const pulseGain = new THREE.Vector4(0, 0, 0, 0)
-      const filamentGeometry = buildFilamentGeometry(isCompact ? 9 : 12, rng)
+      const filamentGeometry = buildFilamentGeometry(isCompact ? 14 : 22, rng)
       const filamentMaterial = new THREE.ShaderMaterial({
         vertexShader: FILAMENT_VERTEX_SHADER,
         fragmentShader: FILAMENT_FRAGMENT_SHADER,
@@ -582,14 +693,15 @@ export function SynapticEntityCanvas({
       rootGroup.add(filaments)
       disposables.push(filamentGeometry, filamentMaterial)
 
-      // Marine snow (outside the tilting group, so it reads as depth)
-      const snowGeometry = buildSnowGeometry(isCompact ? 50 : 110, rng)
+      // Drifting motes (outside the tilting group, so they read as depth)
+      const snowGeometry = buildSnowGeometry(isCompact ? 120 : 260, rng)
       const snowMaterial = new THREE.ShaderMaterial({
         vertexShader: SNOW_VERTEX_SHADER,
         fragmentShader: SNOW_FRAGMENT_SHADER,
         uniforms: {
           uTime: time,
           uPixelRatio: pixelRatio,
+          uEnergy: energy,
           uSizeScale: { value: 1 },
           uColor: { value: CYAN_PALE.clone() },
         },
@@ -671,6 +783,7 @@ export function SynapticEntityCanvas({
         if (slot === 2) { pulseBirth.z = elapsed; pulseSeed.z = seed; pulseGain.z = gain }
         if (slot === 3) { pulseBirth.w = elapsed; pulseSeed.w = seed; pulseGain.w = gain }
         lastPulseAt = elapsed
+        if (gain > 0.6) ripple.value = Math.min(1, ripple.value + 0.6)
       }
 
       const renderFrame = (dt: number) => {
@@ -686,6 +799,7 @@ export function SynapticEntityCanvas({
         flash.value = damp(flash.value, snapshot.synapseFlash, 10, dt)
         errorMix = damp(errorMix, snapshot.lifecycle === 'error' ? 1 : 0, 2.5, dt)
         errorUniform.value = errorMix
+        ripple.value *= Math.exp(-2.2 * dt)
 
         // One colour family. Brighter while replying, deeper while thinking,
         // crimson only for errors.
@@ -702,17 +816,17 @@ export function SynapticEntityCanvas({
         if (motion > 0) {
           const chars = snapshot.totalCharsStreamed
           if (streaming && (!wasStreaming || chars < lastChars)) lastChars = 0
-          if (streaming && chars > lastChars && elapsed - lastPulseAt > 0.32) {
+          if (streaming && chars > lastChars && elapsed - lastPulseAt > 0.22) {
             launchPulse(0.7 + Math.min(0.3, snapshot.pulseEnergy * 0.5))
             lastChars = chars
-          } else if (!streaming && snapshot.lifecycle !== 'error' && elapsed - lastPulseAt > 7) {
-            launchPulse(0.4)
+          } else if (!streaming && snapshot.lifecycle !== 'error' && elapsed - lastPulseAt > 4.5) {
+            launchPulse(0.5)
           }
         }
         wasStreaming = streaming
 
         haloMaterial.uniforms.uIntensity.value =
-          0.2 + energy.value * 0.12 + think.value * 0.06 + flash.value * 0.04
+          0.42 + energy.value * 0.3 + think.value * 0.12 + flash.value * 0.15
 
         // Pointer tilt and light (eased; returns to centre when the pointer leaves).
         const tx = pointer.active ? pointer.x : 0
@@ -720,6 +834,11 @@ export function SynapticEntityCanvas({
         const ease = reducedMotion ? 1 : 1 - Math.exp(-3 * dt)
         tilt.x += (tx - tilt.x) * ease
         tilt.y += (ty - tilt.y) * ease
+        // The body turns slowly so its currents roll past; faster while replying.
+        body.rotation.y += dt * motion * (0.07 + energy.value * 0.18)
+        body.rotation.x += dt * motion * 0.025
+        membrane.rotation.y -= dt * motion * 0.03
+
         const lean = reducedMotion ? 0.08 : 0.22
         rootGroup.rotation.y = tilt.x * lean
         rootGroup.rotation.x = tilt.y * lean * 0.75
