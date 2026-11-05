@@ -27,6 +27,14 @@ the avatar system's actual options. Preserve rendering quality and species gramm
 while choosing proportions that express the individual's personality. A single
 selected view establishes direction; consistent alternate views still need testing.
 
+The user also approved `crab-species-v2.png` on 2026-11-04 ("Looks good"). It is
+saved at `scratch/character_tests/crab-species-v2/crab-species-v2.png`, with its
+prompt, source and QA record in the experiment folders. Use it as the typical crab
+species reference alongside the lobster family-style anchor: moderately upright
+proportions, two short walking-leg pairs followed by the final long pair. The
+wider, shorter v1 remains a valid build variation rather than the baseline.
+This is design approval; production assets and registries remain unchanged.
+
 ## Implemented species grammar
 
 | Species | Visible design grammar to preserve | Stylized limb convention |
