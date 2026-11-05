@@ -56,8 +56,10 @@ third spike or reversing antennae. Show both long supporting legs with enough
 near/far separation to read as two limbs, and rotate pincer geometry with the
 body rather than pasting a frontal claw onto a profile. These are checks for the
 selected designs, not restrictions on other avatar antenna or shell options.
-The v2 sheets are still review candidates. Generative edits re-rendered some
-surface detail beyond the center figures; the v1 outer views remain available.
+The user accepted the v2 sheets as usable on 2026-11-04 ("These will do, continue").
+Generative edits re-rendered some surface detail beyond the center figures; the
+v1 outer views remain available. This acceptance does not claim strict geometric
+orthographic accuracy or production deployment.
 
 ## Implemented species grammar
 
