@@ -19,11 +19,11 @@ Resolve public URLs through `src/lib/assets.ts`; do not hardcode the bucket host
 
 ## Add
 
-Register the key and WebP filename in `MascotKey` / `MASCOT_REGISTRY` in `src/components/composite/MascotOverlay.tsx` and `CharacterKey` / `CHARACTER_REGISTRY` in `scripts/lib/character-overlay.ts`. Add the named option in `src/components/composite/CompositeStudioUI.tsx`. Keep the chosen reference and identity record available for subsequent poses.
+Register the species-prefixed named key and versioned WebP filename in `MASCOT_CAST` in `src/lib/mascots.ts`. Both component/script registries and the studio selector derive from this source. Keep the chosen reference and identity record available for subsequent poses. Update the video director's story role for the new individual; visual descriptions derive from the same cast metadata.
 
 ## Rename or replace
 
-Upload new keys first. Retain old objects for historical links. Map legacy keys to successors in `normalizeMascotKey()` and `getCharacterInfo()`; inspect existing aliases and update dropdown labels/values.
+Upload new keys first. Retain old objects for historical links. Map legacy keys to successors in `RETIRED_MASCOT_SUCCESSORS` in `src/lib/mascots.ts`; `resolveMascotAlias()` handles both consumers. Preserve exact retired filenames as aliases, including junior file stems. Normalize saved initial selections and template resets to active keys so the dropdown and rendered art agree.
 
 Upload to both new and legacy keys only when refreshing historical asset URLs is included in the request. Otherwise preserve historical art. Back up existing files before an authorized overwrite.
 

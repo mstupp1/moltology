@@ -1,6 +1,6 @@
 # Mira Kelp
 
-Draft individual concept. Not approved or registered as a production mascot.
+Adopted for the named replacement cast on 2026-11-04 under the user’s request.
 
 Mira wants to find a route everyone else has overlooked. She spots possibilities
 quickly and gets a hesitant group moving, but sometimes mistakes enthusiasm for
@@ -17,8 +17,8 @@ wears it when she wants to feel brave.
 - Flaw: commits before checking the route, then hesitates to ask for help.
 - Contradiction: effortlessly encourages others to learn, embarrassed by her own uncertainty.
 - Habit: straightens her neckerchief knot before making a promise.
-- Proposed relationship: urges Bram Silt to take the first step; he helps her pause
-  long enough to check where it leads. Both remain draft characters.
+- Relationship: encourages Pip Current to share early ideas; Pip notices the small
+  details she rushes past. Bram's concept has been retired.
 - Archetype: optimistic explorer learning to listen. Original appearance and story.
 
 ## Design brief
@@ -76,7 +76,8 @@ canvas edges. At alpha >16, margins are 2.67% left, 2.13% top, 6.67% right and
 4.27% bottom, below the requested 8%. Keep this candidate and address margins
 and faint stray alpha before production adoption. No cleanup was applied.
 
-Candidate remains unapproved. No upload, registry edit, publishing, push or PR.
+At this first-generation stage, the candidate remained unapproved and no upload
+or registry edit had occurred. The subsequent adoption is recorded below.
 No application code changed; code tests/typecheck were not needed for this
 image experiment. Verified file presence, alpha report, prompt and Git diff.
 
@@ -92,3 +93,19 @@ Image 1 supplies polished 3D animated feature-film sculpting, soft satin shell m
 Mira is an enthusiastic explorer learning to listen. Curious head tilt, attached brows, eager asymmetric smile; one classic pincer open invitingly and the other relaxed. Her one personal belonging is a small faded ochre fabric neckerchief with an off-center knot. Two curved antennae and two flank spikes per side. Crab body, without a lobster tail fan.
 Two pincer arms plus six connected walking legs: each side has two short legs followed by the final long supporting leg at the lowest socket. Keep all six legs traceable and the joints clear. Single shallow three-quarter view, complete appendages, 8% transparent margin, dimensional eyes and cheeks, soft key and fill light. No text, floor shadow or additional props.
 ```
+
+## Adoption (2026-11-04)
+
+The user authorized replacing the old active cast with these named individuals.
+The parent inspected the generated image and light/dark QA, retained the original
+experiment, and adopted this render under `crab_mira_kelp`. This is autonomous
+adoption under that request, not a claim of separate user review of each render.
+
+Masters and quality-90 WebPs are retained in `scratch/characters/` and
+`scratch/character_refs/` as `char_mira_kelp_v3.png` / `.webp`. Both
+new remote keys under `images/characters/` returned HTTP 200, expected dimensions
+and alpha through public media URLs before registration. No old object was
+overwritten. The generation-stage candidate status above is historical; this
+adoption section describes the current state. Existing anatomy/margin caveats
+remain recorded. See [cast v3](../../docs/character-cast-v3.md) for compatibility
+and browser verification details. No application push, merge or deployment.

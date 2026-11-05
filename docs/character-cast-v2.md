@@ -1,5 +1,9 @@
 # Character cast v2
 
+Historical record. The [named v3 cast](character-cast-v3.md) replaces these active
+options. Legacy role keys resolve to named successors; old asset objects remain
+available for historical links. Do not use this document to select current art.
+
 The October 2026 cast keeps the seven established roles and actions, adds crab
 explorers and builders, and introduces four visual classes: archivist, ritual
 keeper, sentinel and Oracle attendant. Existing role keys resolve to adult

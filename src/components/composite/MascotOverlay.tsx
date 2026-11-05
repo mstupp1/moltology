@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { S3_BASE_URL } from '@/lib/assets'
+import { getAssetUrl } from '@/lib/assets'
 import {
   DEFAULT_MASCOT_KEY,
   MASCOT_CAST,
@@ -19,7 +19,7 @@ export interface MascotInfo {
   description?: string
 }
 
-const mascotS3Url = (filename: string) => `${S3_BASE_URL}/${MASCOT_S3_PREFIX}/${filename}`
+const mascotS3Url = (filename: string) => getAssetUrl(`${MASCOT_S3_PREFIX}/${filename}`)
 
 export const MASCOT_REGISTRY: Record<string, MascotInfo> = Object.fromEntries(
   MASCOT_CAST.map((m) => [m.key, { ...m, s3Url: mascotS3Url(m.filename) }])
@@ -36,7 +36,8 @@ export function getAllMascotKeys(): string[] {
  * Pick a random registered mascot key, optionally excluding certain keys
  */
 export function getRandomMascotKey(excludeKeys: string[] = []): string {
-  const pool = getAllMascotKeys().filter((k) => !excludeKeys.includes(k))
+  const excluded = new Set(excludeKeys.map(resolveMascotAlias))
+  const pool = getAllMascotKeys().filter((k) => !excluded.has(k))
   const candidates = pool.length > 0 ? pool : getAllMascotKeys()
   return candidates[Math.floor(Math.random() * candidates.length)]
 }
@@ -123,7 +124,7 @@ export const MascotOverlay: React.FC<MascotOverlayProps> = ({
 
   const info = getMascotInfo(mascot)
 
-  // Direct S3 URL with resilient fallback to default mascot
+  // CDN media URL with resilient fallback to the current default mascot
   const [currentSrc, setCurrentSrc] = useState<string>(info.s3Url)
   const [isLoaded, setIsLoaded] = useState<boolean>(false)
   const [hasFailed, setHasFailed] = useState<boolean>(false)
@@ -166,7 +167,7 @@ export const MascotOverlay: React.FC<MascotOverlayProps> = ({
         />
       )}
 
-      {/* Mascot Cutout Image with Deep Shadow (pure S3 CDN) */}
+      {/* Mascot cutout served through the media CDN. */}
       <img
         src={currentSrc}
         alt={info.name || mascot}

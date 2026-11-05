@@ -1,6 +1,8 @@
 # Bram Silt
 
-Draft character concept. No generated candidate or canonical cast registration yet.
+Retired character concept (2026-11-04, at the user’s request). Do not generate or
+include in the active cast. No render or canonical registration was created.
+The brief and failed attempts remain here as a historical record.
 
 Bram packs for every possible mishap. By the end of a journey, he has usually given
 most of it away. He checks the clasp on his satchel twice before leaving, then

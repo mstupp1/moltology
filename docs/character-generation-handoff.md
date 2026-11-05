@@ -1,112 +1,131 @@
 # Character generation continuation
 
-Continue on branch `t3/restore-feature-film-character-style` in the existing
-worktree `/Users/mylesstupp/.t3/worktrees/moltology/t3-c324029b`. The user asked for
-a new thread on this same branch and Luna subagents where useful. Keep the parent
-model inherited; use Luna for focused brief/art-direction/QA tasks. The prior
-thread is handing off rather than continuing concurrent edits here.
+## Current state: six-character cast complete
 
-## Direction and selected references
+The user authorized replacing the old active cast, scrapping Bram and using Luna
+subagents for additional individuals, then clarified: “move forward so we can
+have a solid cast of 6.” The earlier design-only statement that no upload had
+been requested is superseded by this replacement request.
 
-The user wants polished 3D animated feature-film characters, with dimensional
-faces, satin organic chitin and cinematic lighting. Avoid sticker/cel/vector
-rendering. Avatar-system shapes and traits guide design relationships; its SVG
-finish does not. Each new cast member should be an individual with a name,
-motive, strength, flaw, habit, relationships and a personal visual detail.
-Broad familiar-story archetypes are useful inspiration for original personalities.
+Active cast: **Pip Current, Mira Kelp, Cal Brack, Clove Cinder, Tess Shoal and
+Faye Ripple**. Faye is the default. See [cast v3](character-cast-v3.md),
+`src/lib/mascots.ts` and each individual brief under `content/characters/`.
+Six renders exist, have been inspected and adopted, and no further generation
+is needed for this request. Bram, Oren, Ada, Nell and Gus are archived, not
+continuation tasks.
 
-Read the [character-creator skill](../.agents/skills/character-creator/SKILL.md),
-[species guide](../content/character-species.md), [AGENTS.md](../AGENTS.md) and
-[content prerequisites](../content/README.md). Approved files are local ignored experiments,
-so preserve this existing checkout: a fresh worktree would omit them.
+Remain on `t3/restore-feature-film-character-style` in the same worktree:
+`/Users/mylesstupp/.t3/worktrees/moltology/t3-c324029b`. Ignored experiments and
+approved references are local here; preserve them. The replacement run started
+with a clean tracked tree at `c1f0bd2`. No unrelated concurrent edits were present.
+All subagent work has settled. Parent model stayed inherited; focused generation
+and review agents used Luna.
 
-| Reference | Path relative to worktree | State |
+## Approved style and species inputs
+
+| Reference | Local path | User state |
 | --- | --- | --- |
-| Family film finish and typical lobster | `scratch/character_tests/lobster-species-v1/lobster-species-v1.png` | User: "Exactly what I wanted" |
-| Typical crab | `scratch/character_tests/crab-species-v2/crab-species-v2.png` | User: "Looks good" |
+| Family film finish and typical lobster | `scratch/character_tests/lobster-species-v1/lobster-species-v1.png` | “Exactly what I wanted” |
+| Typical crab | `scratch/character_tests/crab-species-v2/crab-species-v2.png` | “Looks good” |
 | Lobster turnaround | `scratch/character_tests/species-turnarounds-v2/lobster-turnaround-v2.png` | Accepted as usable |
 | Crab turnaround | `scratch/character_tests/species-turnarounds-v2/crab-turnaround-v2.png` | Accepted as usable |
 
-Head shape, body build, height, claw size, palette and face traits should vary
-across individuals. These are typical baselines, not mandatory silhouettes.
-Two main pincer arms are separate from six walking legs. Upright adult socket
-order per side is short, short, then the final long supporting leg at the
-lowest/rearmost socket; no short leg behind it. In the right-facing profile,
-lobster antennae curve forward/right, crab antennae backward/left. The selected
-crab has two visible flank spikes. Show both lower legs; orient pincers with the
-body. Other antenna/shell variants are still allowed for new individuals.
+Target polished 3D animated feature-film sculpting, dimensional seated eyes and
+attached brows, soft satin chitin and cinematic lighting. Avatar-system SVG/PNG
+studies supply actual head/build/height/palette relationships, not vector finish.
+Each individual's own image now controls identity for additional poses. Inspect
+actual images before prompting. Do not regenerate species baselines.
 
-## Resume with Bram Silt
+Two pincer arms are separate from six walking legs. Per-side socket order is
+short, short, then the final long supporting leg at the lowest/rearmost socket.
+No short leg follows it. Lobsters retain a segmented tail fan; crabs do not.
+The selected baseline crab has two flank spikes. Named builds and head shapes
+vary intentionally. A request for anatomy does not verify generated anatomy.
 
-The first named-character draft is [Bram Silt](../content/characters/bram-silt.md).
-He is short, chunky and boxy-headed, with crimson/cream shell, amber eyes and a
-repaired sea-green satchel. Cautious and overprepared, he wants everyone home
-safely; he plans his supplies meticulously, then gives them away. Luna reviewed
-the brief. It is not user-approved canon or a registered mascot.
+## Assets and migration
 
-His inspected avatar study is
-`scratch/character_tests/bram-silt-v1/inputs/avatar-lobster.png`; the config and
-source SVG sit beside it. This study supplies proportions/traits, while the
-approved lobster supplies render quality. The experiment folder also has
-`identity.md`, `prompt.txt`, `retry-prompt.txt` and `render-avatar.ts`.
+All six source-preserving PNGs and quality-90 WebPs are in both
+`scratch/characters/` and `scratch/character_refs/`, using
+`char_<first_last>_v3.png` / `.webp`. Individual experiment folders preserve
+inputs, avatar configs/renderers, exact prompts, returned sources, SHA-256 values,
+alpha reports and light/dark composites. The comparison boards are
+`scratch/character_tests/cast-v3/qa-cast-light.png` and `qa-cast-dark.png`.
 
-**There is no Bram character render.** Three built-in ImageGen attempts failed at
-output moderation with HTTP 400 `moderation_blocked`, category `other`. The exact
-request IDs are in the durable brief. Earlier turnaround edits also failed once
-and succeeded on simpler retries, but that does not establish the cause of any
-rejection. No API fallback/provider switch was authorized. Do not use a new
-thread as a reason for unchanged retry loops or claim a safety workaround.
+All twelve new objects under `images/characters/` were uploaded with the repo
+asset CLI and verified through public media URLs: HTTP 200, exact local-byte
+matches, expected formats, dimensions and alpha. Each WebP preserves its PNG's
+alpha exactly. No old object was overwritten or deleted. No image pixels were
+manually edited or chroma keyed.
 
-Continue the original benign design task with the built-in image tool and the
-saved references. If attempting again, use a deliberate, concise character
-prompt preserving Bram's requested identity and record the result. If the same
-failure recurs, preserve it and report it rather than silently switching tools
-or deleting distinctive design requirements. API/CLI fallback requires the
-user's explicit choice and configured credentials under the imagegen skill.
+`MASCOT_CAST` contains exactly six active names. All 22 old adult/junior options
+are retired from the selector and random pool. Historical role names, short
+aliases and exact v2 PNG/WebP stems resolve to named successors; species remain
+consistent. The complete successor table is in cast v3. Saved studio selections,
+theme resets and exclusion lists normalize aliases. Video identity prompts derive
+from the same named cast metadata, without resurrecting old uniforms or props.
+Pages use `getAssetUrl()` / `/media/`. Old remote files and historical published
+artwork remain available; existing merchandise artwork is historical material.
 
-For TypeScript avatar studies, `node --import tsx <script>` worked without the
-CLI IPC permission error from invoking `tsx` directly. Inspect actual local
-references with `view_image` before generation. One candidate at a time; inspect
-limb order, identity, alpha and light/dark composites. Whole-sheet edits can
-re-render other panels and surface texture, so compare all views. Requested 8%
-margins often were not honored; measure bounds and report production caveats.
+The studio's small-screen controls and preview now stack. Its conservative
+initial fit scale avoids starting with the canvas outside the viewport.
 
-## Completion state
+## Visual QA
 
-No production mascot registry replacement, upload, publication, push or PR has
-occurred. Images and prompts remain in ignored `scratch/`; briefs and guidance
-are committed. Prior script tests: 348 passed; typecheck passed for the earlier
-reel prompt change. Subsequent work is documentation and image experiments.
-Keep new media ignored, commit intentional durable briefs/skill/records, and
-finish with status checked. Do not generate another batch of species baselines;
-the next design is Bram, followed by other distinct individuals after review.
+All six show two distinct pincer arms and six walking-leg tips. Pip, Cal, Clove
+and Faye have readable short-short-long socket order on both sides. Mira's
+far-side final long-leg socket is partly hidden. Tess's upper short-leg socket
+bases are crowded by overlap. Those exact hidden connections remain unverified.
+Light/dark composites are clean at normal size. Clove's initial raw-preview amber
+background warning was corrected: sampled background pixels have alpha zero and
+the actual composites show no background glow.
 
-## Continuation attempt 3 (2026-11-04)
+Requested 8% margins were not fully honored, though visible appendages are
+complete. Individual briefs preserve measured bounds. Preserve full framing;
+new tight crops/poses need separate checks. Do not infer geometric turnarounds
+from these single-view renders.
 
-Resumed in this same worktree from `4d02197`, with a clean tracked starting state.
-Inspected all four approved reference images and Bram's avatar study. A focused
-Luna art-direction review informed a shorter prompt retaining his distinct
-design and satchel. Built-in ImageGen again returned HTTP 400
-`moderation_blocked`, output stage, category `other`, request
-`b2ea2e30-c852-47c1-8c81-fff99ce2d51d`. No image returned; no anatomy, alpha or
-light/dark QA was possible. Stopped without another retry or provider switch.
-See [the exact attempt record](character-generation-bram-attempt-03.md).
-Prompt and error also remain in `scratch/character_tests/bram-silt-v1/`.
+## Failed concepts and approval interruptions
 
-## Different-character test: Mira Kelp (2026-11-04)
+The built-in image tool returned HTTP 400 `moderation_blocked`, output stage,
+category `other`, without identifying a cause. No image exists for these concepts:
 
-The user then asked to try another character. Drafted [Mira Kelp](../content/characters/mira-kelp.md),
-a tall/lean jade-green adult crab with a softly heart-shaped shell, sapphire
-eyes and an ochre neckerchief. Built and inspected a separate avatar study.
-Luna reviewed the brief and performed independent visual QA. The first built-in
-ImageGen attempt succeeded; this does not identify the cause of Bram's failures.
+| Concept | Request IDs |
+| --- | --- |
+| Bram Silt | `df8c60d8-8446-477c-8fdb-be2e964bf7de`, `5e4b0538-8965-405a-bdac-54eaa451189a`, `b2ea2e30-c852-47c1-8c81-fff99ce2d51d` |
+| Oren Drift | `81471502-a1be-45d1-a416-1e2c9fc16604` |
+| Ada Flint | `b6ab9f86-6ffd-4643-9f34-dc34d0cfaf8f` |
+| Nell Brine | `a0bbcbe1-b53f-4700-a8a5-baae849596c6` |
+| Gus Pebble | `764e3326-e845-4f9e-b385-12986d325842` |
 
-Candidate: `scratch/character_tests/mira-kelp-v1/mira-kelp-v1.png`.
-Prompt, identity, avatar inputs, alpha metadata and light/dark composites remain
-in the same ignored experiment folder; exact prompt and observed QA are durable
-in Mira's brief. Native RGBA, 1199 × 1312. Six walking-leg tips are visible;
-far-side lowest socket partly hidden, so its exact attachment order is unverified.
-Light/dark previews look clean, but faint alpha reaches canvas edges and solid
-silhouette margins fall below 8%. Candidate awaits user review, with production
-cleanup still needed. No upload, registry replacement or publication. Preserve
-Bram and all approved species experiments. Review Mira before extending the cast.
+[Attempt 3](character-generation-bram-attempt-03.md) and the archived briefs
+preserve the prompts and actual error state. The user was not attached to failed
+concepts and authorized fresh individuals; Gus's lane moved to the distinct Clove,
+whose first render succeeded. No provider or API/CLI generation fallback occurred.
+A new thread was never treated as proof that a tool failure had cleared.
+
+The first Faye delegation launch was not executed because automatic approval
+review had a usage limit until 22:45. The user later requested continuation;
+current time was after that window, and the same Luna delegation then ran and
+Faye's first image succeeded. This was not an image-generation rejection.
+Tess's upload was initially rejected by approval review because it treated the
+old design-only scope as current. The later explicit cast-replacement request
+and repo deployment procedure were supplied as authorization evidence; the same
+versioned upload was approved, completed and verified. No review was bypassed.
+
+## Verification and handback
+
+Final core tests: **1557 passed**. Script tests: **348 passed**. Scoped mascot,
+character-overlay, composite-component and video-director tests: **42 passed**.
+Typecheck passed. Character skill frontmatter/structure validation passed.
+Markdown links, exact prompt records and source hashes were checked.
+
+Local Chrome verification exercises every named option at desktop and mobile
+sizes, legacy default normalization and exact loaded CDN image filenames, without
+accepting fallback art as success. Screenshots and reports are saved in
+`tmp/verification/character-cast-v3/`. Final Git status is checked after committing
+all intentional run-owned files. See the latest local commit for the migration.
+No application push, PR, merge or deployment was requested or performed.
+
+Earlier continuity commits: `4d02197` (original handoff), `07a8e44` (Bram third
+failure), `c1f0bd2` (Mira first render). No production registry update occurred in
+those earlier design-only phases; this replacement run is the later adoption.

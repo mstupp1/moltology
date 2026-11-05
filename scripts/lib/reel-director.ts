@@ -10,6 +10,7 @@
  */
 import type { WordBoundaryEvent } from './tts-engine'
 import { normalizeMascotKey } from './character-overlay'
+import { DEFAULT_MASCOT_KEY, MASCOT_CAST } from '../../src/lib/mascots'
 
 /** Clip lengths Veo 3.1 accepts. */
 export const VEO_CLIP_DURATIONS = [4, 6, 8] as const
@@ -41,61 +42,24 @@ export interface MascotVeoProfile {
   storyRole: string
 }
 
-/**
- * Canonical 3D Cinematic Veo Profiles for Moltology Composite Studio Mascots
- * Bridges 2D composite overlays and 3D photorealistic Veo video generation.
- */
-export const MASCOT_VEO_PROFILES: Record<string, MascotVeoProfile> = {
-  lobster_pointing: {
-    key: 'lobster_pointing',
-    name: 'Lobster Hero (Lead Initiator)',
-    heroDescription:
-      'a charismatic 3D animated-feature coral lobster with a rounded upright body, tan segmented belly, warm crescent smile, large expressive eyes and two big raised pincers',
-    storyRole: 'A bold, confident benthic leader guiding the viewer into the subsea future',
-  },
-  lobster_engineer: {
-    key: 'lobster_engineer',
-    name: 'Lobster Engineer (Hardware Specialist)',
-    heroDescription:
-      'a cheerful 3D animated-feature orange lobster engineer in a yellow hardhat and teal plated harness, wrench on the tool belt, holding a blueprint tablet',
-    storyRole: 'A cheerful technical specialist calibrating hydrothermal hardware and subsea compute clusters',
-  },
-  lobster_navigator: {
-    key: 'lobster_navigator',
-    name: 'Lobster Navigator (Benthic Explorer)',
-    heroDescription:
-      'an adventurous 3D animated-feature coral lobster explorer with brass diving goggles on its brow, a teal and canvas field harness with pouches, and big expressive pincers',
-    storyRole: 'A seasoned deep-trench explorer charting extreme depth pressure zones and abyssal data conduits',
-  },
-  crab_stats: {
-    key: 'crab_stats',
-    name: 'Crab Analyst (Decapod Engineer)',
-    heroDescription:
-      'an energetic 3D animated-feature coral crab with a wide satin shell, tan belly plates, green eyes and a confident smile, holding up a bar chart tablet in one pincer',
-    storyRole: 'A hyper-efficient decapod engineer demonstrating structural crab chassis optimality and metrics',
-  },
-  lobster_peaceful: {
-    key: 'lobster_peaceful',
-    name: 'Lobster Zen (Abyssal Mystic)',
-    heroDescription:
-      'a serene 3D animated-feature lavender lobster in a teal plated vest, half-closed calm eyes, open relaxed pincers and gently curving antennae',
-    storyRole: 'A tranquil subsea initiate embodying zero-friction thermal efficiency and calm hydrostatic clarity',
-  },
-  lobster_thumbs_up: {
-    key: 'lobster_thumbs_up',
-    name: 'Lobster Approver (Ascended Initiate)',
-    heroDescription:
-      'a confident, cheerful 3D animated-feature orange lobster with a tan segmented belly, bright friendly eyes and one big pincer raised high in approval',
-    storyRole: 'A triumphant initiate celebrating successful algorithmic ecdysis and calcified armor',
-  },
-  lobster_peek: {
-    key: 'lobster_peek',
-    name: 'Lobster Bashful (Curious Observer)',
-    heroDescription:
-      'a bashful 3D animated-feature pink lobster with blue eyes, both pincers clasped under its chin and a shy, curious smile',
-    storyRole: 'A playful scout discovering deep-sea secrets and peeking around sub-benthic server racks',
-  },
+/** The video director uses the same named identities as the active cutout registry. */
+const NAMED_STORY_ROLES: Record<string, string> = {
+  lobster_pip_current: 'A shy, observant experimenter learning to share an imperfect first attempt',
+  crab_mira_kelp: 'An encouraging explorer learning to check the route and listen before committing',
+  crab_cal_brack: 'A patient mediator learning to make room for his own opinions as well as everyone else’s',
+  lobster_clove_cinder: 'A perceptive listener learning to begin before the perfect moment arrives',
+  lobster_tess_shoal: 'An attentive listener whose practical questions help others choose while she learns to make her own decisions',
+  lobster_faye_ripple: 'An enthusiastic encourager learning to listen before offering a solution',
 }
+
+export const MASCOT_VEO_PROFILES: Record<string, MascotVeoProfile> = Object.fromEntries(
+  MASCOT_CAST.map((mascot) => [mascot.key, {
+    key: mascot.key,
+    name: mascot.name,
+    heroDescription: `a polished 3D animated feature-film character: ${mascot.description}; sculpted facial volume, seated expressive eyes, attached brows, satin organic chitin, two pincer arms and six walking legs, with two short legs before the final long supporting leg on each side`,
+    storyRole: NAMED_STORY_ROLES[mascot.key] ?? 'A thoughtful companion in the benthic community',
+  }])
+)
 
 export function resolveHeroForMascot(mascot?: string): MascotVeoProfile | null {
   if (!mascot || mascot === 'none' || mascot === 'random') return null
@@ -106,7 +70,7 @@ export function resolveHeroForMascot(mascot?: string): MascotVeoProfile | null {
 export const DEFAULT_CONTINUITY: ContinuityBible = {
   protagonist:
     'a tired office worker in their early thirties, short dark hair, rumpled navy hoodie over a white collared shirt, lanyard badge',
-  hero: MASCOT_VEO_PROFILES.lobster_pointing.heroDescription,
+  hero: MASCOT_VEO_PROFILES[DEFAULT_MASCOT_KEY].heroDescription,
 }
 
 const SHARED_LOOK =

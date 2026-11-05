@@ -8,23 +8,7 @@ import {
 
 describe('Character Overlay & Registry', () => {
   it('contains core registered cartoon characters with valid S3 URLs', () => {
-    const keys = [
-      'lobster_pointing',
-      'lobster_peek',
-      'lobster_thumbs_up',
-      'lobster_peaceful',
-      'lobster_navigator',
-      'crab_stats',
-      'lobster_engineer',
-      'lobster_archivist',
-      'lobster_oracle_attendant',
-      'crab_builder',
-      'crab_explorer',
-      'crab_sentinel',
-      'crab_ritual_keeper',
-      'lobster_pointing_junior',
-      'crab_explorer_junior',
-    ]
+    const keys = ['lobster_pip_current', 'crab_mira_kelp', 'crab_cal_brack', 'lobster_clove_cinder', 'lobster_tess_shoal', 'lobster_faye_ripple']
 
     for (const key of keys) {
       const char = CHARACTER_REGISTRY[key]
@@ -47,7 +31,7 @@ describe('Character Overlay & Registry', () => {
 
   it('provides random character selection across the entire registry', () => {
     const allKeys = getAllCharacterKeys()
-    expect(allKeys.length).toBeGreaterThanOrEqual(7)
+    expect(allKeys.length).toBe(6)
 
     const randomKey = getRandomCharacterKey()
     expect(allKeys).toContain(randomKey)
@@ -56,6 +40,8 @@ describe('Character Overlay & Registry', () => {
     const excludedKey = allKeys[0]
     const randomKeyWithExclude = getRandomCharacterKey([excludedKey])
     expect(randomKeyWithExclude).not.toBe(excludedKey)
+    const exclusions = allKeys.filter((key) => key !== 'lobster_pip_current').map((key) => key === 'lobster_faye_ripple' ? 'thumbs_up' : key)
+    expect(getRandomCharacterKey(exclusions)).toBe('lobster_pip_current')
 
     // Resolves 'random' keyword
     const randomInfo = getCharacterInfo('random')
@@ -64,15 +50,15 @@ describe('Character Overlay & Registry', () => {
   })
 
   it('maps retired art file names to the current renders', () => {
-    expect(getCharacterInfo('char_lobster_pointing_cta.png').filename).toBe('char_lobster_pointing_adult_v2.webp')
-    expect(getCharacterInfo('lobster_speed_action').key).toBe('lobster_navigator')
-    expect(getCharacterInfo('char_crab_pointing_stats.webp').filename).toBe('char_crab_stats_adult_v2.webp')
+    expect(getCharacterInfo('char_lobster_pointing_cta.png').filename).toBe('char_tess_shoal_v3.webp')
+    expect(getCharacterInfo('lobster_speed_action').key).toBe('lobster_tess_shoal')
+    expect(getCharacterInfo('char_crab_pointing_stats.webp').filename).toBe('char_cal_brack_v3.webp')
   })
 
   it('generates unique random rotations without duplicates', () => {
-    const rotation = getRandomCharacterRotation(3)
-    expect(rotation.length).toBe(3)
+    const rotation = getRandomCharacterRotation(6)
+    expect(rotation.length).toBe(6)
     const uniqueKeys = new Set(rotation)
-    expect(uniqueKeys.size).toBe(3)
+    expect(uniqueKeys.size).toBe(6)
   })
 })
