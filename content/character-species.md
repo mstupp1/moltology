@@ -35,6 +35,18 @@ proportions, two short walking-leg pairs followed by the final long pair. The
 wider, shorter v1 remains a valid build variation rather than the baseline.
 This is design approval; production assets and registries remain unchanged.
 
+### Turnaround tests
+
+Initial three-view tests are saved under
+`scratch/character_tests/species-turnarounds-v1/` as `lobster-turnaround-v1.png`
+and `crab-turnaround-v1.png`, with source references, prompts and QA records.
+Each shows front, profile and angled views generated from its approved baseline.
+These sheets are review candidates, not user-approved replacements for the
+selected images above. Profile views infer previously unseen surfaces and overlap
+far-side limbs; do not treat those hidden attachments as individually verified.
+The lobster's angled view is shallower than the requested 45 degrees. Outer
+safety margins also need attention before production use.
+
 ## Implemented species grammar
 
 | Species | Visible design grammar to preserve | Stylized limb convention |
