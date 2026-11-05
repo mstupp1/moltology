@@ -164,10 +164,8 @@ describe('DailyRoutineWidget Component', () => {
     expect(screen.getByText('8/8 done')).toBeInTheDocument()
 
     await waitFor(() => {
-      expect(screen.getByText('DAILY ALIGNMENT COMPLETE')).toBeInTheDocument()
-      expect(
-        screen.getByText('All eight daily alignment liturgies recorded. Protocol verified.')
-      ).toBeInTheDocument()
+      expect(screen.getByText('Daily alignment done')).toBeInTheDocument()
+      expect(screen.getByText('All 8 tasks done for today.')).toBeInTheDocument()
     })
   })
 

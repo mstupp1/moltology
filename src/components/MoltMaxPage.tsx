@@ -225,9 +225,9 @@ export const MoltMaxPage: React.FC = () => {
     if (typeof navigator === 'undefined' || !navigator.clipboard) return
     navigator.clipboard.writeText('https://moltology.org/moltmax').then(() => {
       setIsCopied(true)
-      toast.success('Link copied to clipboard.', { title: 'Copied' })
+      toast.success('Link copied.')
       window.setTimeout(() => setIsCopied(false), 2500)
-    }).catch(() => toast.error('Could not copy link to clipboard.', { title: 'Copy Failed' }))
+    }).catch(() => toast.error('Could not copy the link. Please try again.'))
   }
 
   const handleSave = async () => {
@@ -244,9 +244,9 @@ export const MoltMaxPage: React.FC = () => {
         },
       })
       setIsSaved(true)
-      toast.success('Results saved to your profile.', { title: 'Results Saved' })
+      toast.success('Results saved to your profile.')
     } catch {
-      toast.error('Could not save results. Please try again.', { title: 'Save Failed' })
+      toast.error('Could not save your results. Please try again.')
     }
   }
 
@@ -308,9 +308,9 @@ export const MoltMaxPage: React.FC = () => {
       link.download = `moltmax-clearance-${result.score}.png`
       link.href = canvas.toDataURL('image/png')
       link.click()
-      toast.success('Scorecard downloaded successfully.', { title: 'Scorecard Saved' })
+      toast.success('Scorecard downloaded.')
     } catch {
-      toast.error('Could not generate scorecard image. Please try again.', { title: 'Export Failed' })
+      toast.error('Could not make the scorecard image. Please try again.')
     } finally {
       setIsGeneratingImage(false)
     }

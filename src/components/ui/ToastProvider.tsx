@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
-import { AlertTriangle, CheckCircle2, Info, ShieldAlert, Terminal, X } from 'lucide-react'
+import { useRouter } from '@tanstack/react-router'
+import { AlertCircle, AlertTriangle, Bell, CheckCircle2, Info, X } from 'lucide-react'
 
 export type ToastType = 'info' | 'success' | 'warning' | 'error' | 'hud'
 
@@ -10,6 +11,15 @@ export interface ToastItem {
   type: ToastType
   duration?: number
   timestamp: number
+  /** Replaces the type's icon, e.g. the gem image on a reward toast. */
+  icon?: React.ReactNode
+  /** A small link button, e.g. "Market". */
+  action?: ToastAction
+}
+
+export interface ToastAction {
+  label: string
+  href: string
 }
 
 export interface ToastOptions {
@@ -17,6 +27,8 @@ export interface ToastOptions {
   title?: string
   duration?: number
   type?: ToastType
+  icon?: React.ReactNode
+  action?: ToastAction
 }
 
 export interface ToastContextType {
@@ -97,6 +109,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         type,
         duration,
         timestamp: now,
+        icon: options.icon,
+        action: options.action,
       }
 
       setToasts((prev) => {
@@ -199,36 +213,36 @@ function ToastItemCard({
   onDismiss: (id: string) => void
 }) {
   const styles = getToastStyles(toast.type)
+  const action = toast.action
 
   return (
     <div
-      className={`pointer-events-auto w-full flex items-start gap-2.5 px-3.5 py-2.5 rounded-lg border shadow-[0_10px_35px_rgba(0,0,0,0.85),0_0_20px_rgba(0,195,255,0.15)] backdrop-blur-xl transition-all duration-300 animate-in fade-in slide-in-from-top-3 ${styles.borderClass} ${styles.bgClass}`}
-      role="alert"
+      className="pointer-events-auto w-full flex items-start gap-3 px-3.5 py-3 rounded-card border border-line-subtle bg-surface-2/95 shadow-menu backdrop-blur-xl transition-all duration-300 animate-in fade-in slide-in-from-top-3"
+      role={toast.type === 'error' || toast.type === 'warning' ? 'alert' : 'status'}
+      data-toast-type={toast.type}
     >
-      <div className={`mt-0.5 shrink-0 ${styles.iconColor}`}>
-        {styles.icon}
+      <div className={`mt-px shrink-0 ${styles.iconColor}`}>
+        {toast.icon ?? styles.icon}
       </div>
 
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-          <span className={`text-[9px] font-sans font-bold tracking-widest uppercase px-1.5 py-0.5 rounded border ${styles.badgeClass}`}>
-            {styles.label}
-          </span>
-          {toast.title && (
-            <span className="text-xs font-bold text-[#dfe3e3] truncate">
-              {toast.title}
-            </span>
-          )}
-        </div>
-        <p className="text-xs text-[#b0c0c0] font-sans leading-snug break-words">
+        <span className="sr-only">{styles.label}: </span>
+        {toast.title && (
+          <p className="text-sm font-semibold text-ink leading-snug">
+            {toast.title}
+          </p>
+        )}
+        <p className={`text-[13px] leading-snug break-words ${toast.title ? 'text-ink-body mt-0.5' : 'text-ink'}`}>
           {toast.message}
         </p>
       </div>
 
+      {action && <ToastActionLink action={action} onDone={() => onDismiss(toast.id)} />}
+
       <button
         onClick={() => onDismiss(toast.id)}
         aria-label="Dismiss notification"
-        className="shrink-0 text-[#607070] hover:text-[#00c3ff] transition-colors p-1 rounded hover:bg-[#ffffff]/10"
+        className="shrink-0 -mr-1 -mt-0.5 p-1 rounded-control text-ink-muted hover:text-ink hover:bg-surface-3 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
       >
         <X className="w-3.5 h-3.5" />
       </button>
@@ -236,53 +250,38 @@ function ToastItemCard({
   )
 }
 
+/** Kept separate so toasts without an action never touch the router. */
+function ToastActionLink({ action, onDone }: { action: ToastAction; onDone: () => void }) {
+  const router = useRouter({ warn: false })
+  return (
+    <a
+      href={action.href}
+      onClick={(event) => {
+        onDone()
+        if (!router || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return
+        event.preventDefault()
+        void router.navigate({ to: action.href })
+      }}
+      className="self-center shrink-0 min-h-8 inline-flex items-center px-2.5 rounded-control border border-line text-[12px] font-semibold text-ink hover:border-line-hover hover:bg-surface-3 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+    >
+      {action.label}
+    </a>
+  )
+}
+
+/** One coloured icon per type; the card itself stays neutral. */
 function getToastStyles(type: ToastType) {
   switch (type) {
     case 'success':
-      return {
-        label: 'SUCCESS',
-        icon: <CheckCircle2 className="w-4 h-4 text-[#00ff88]" />,
-        borderClass: 'border-[#00ff88]/50 shadow-[0_0_20px_rgba(0,255,136,0.2)]',
-        bgClass: 'bg-[#020d08]/95',
-        badgeClass: 'bg-[#00ff88]/15 border-[#00ff88]/40 text-[#00ff88]',
-        iconColor: 'text-[#00ff88]',
-      }
+      return { label: 'Done', icon: <CheckCircle2 className="w-4 h-4" />, iconColor: 'text-emerald-500' }
     case 'warning':
-      return {
-        label: 'WARNING',
-        icon: <AlertTriangle className="w-4 h-4 text-[#ffb700]" />,
-        borderClass: 'border-[#ffb700]/50 shadow-[0_0_20px_rgba(255,183,0,0.2)]',
-        bgClass: 'bg-[#120d02]/95',
-        badgeClass: 'bg-[#ffb700]/15 border-[#ffb700]/40 text-[#ffb700]',
-        iconColor: 'text-[#ffb700]',
-      }
+      return { label: 'Warning', icon: <AlertTriangle className="w-4 h-4" />, iconColor: 'text-amber-500' }
     case 'error':
-      return {
-        label: 'ERROR',
-        icon: <ShieldAlert className="w-4 h-4 text-[#ff453a]" />,
-        borderClass: 'border-[#ff453a]/60 shadow-[0_0_20px_rgba(255,69,58,0.25)]',
-        bgClass: 'bg-[#150404]/95',
-        badgeClass: 'bg-[#ff453a]/15 border-[#ff453a]/50 text-[#ff453a]',
-        iconColor: 'text-[#ff453a]',
-      }
+      return { label: 'Error', icon: <AlertCircle className="w-4 h-4" />, iconColor: 'text-crimson-text' }
     case 'hud':
-      return {
-        label: 'NOTICE',
-        icon: <Terminal className="w-4 h-4 text-[#ff0055]" />,
-        borderClass: 'border-[#ff0055]/60 shadow-[0_0_20px_rgba(255,0,85,0.25)]',
-        bgClass: 'bg-[#12030a]/95',
-        badgeClass: 'bg-[#ff0055]/15 border-[#ff0055]/50 text-[#ff0055]',
-        iconColor: 'text-[#ff0055]',
-      }
+      return { label: 'Notice', icon: <Bell className="w-4 h-4" />, iconColor: 'text-cyan-glow' }
     case 'info':
     default:
-      return {
-        label: 'INFO',
-        icon: <Info className="w-4 h-4 text-[#00c3ff]" />,
-        borderClass: 'border-[#00c3ff]/50 shadow-[0_0_20px_rgba(0,195,255,0.2)]',
-        bgClass: 'bg-[#03090d]/95',
-        badgeClass: 'bg-[#00c3ff]/15 border-[#00c3ff]/40 text-[#00c3ff]',
-        iconColor: 'text-[#00c3ff]',
-      }
+      return { label: 'Info', icon: <Info className="w-4 h-4" />, iconColor: 'text-cyan-glow' }
   }
 }
