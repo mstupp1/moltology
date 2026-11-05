@@ -50,7 +50,7 @@ source SVG sit beside it. This study supplies proportions/traits, while the
 approved lobster supplies render quality. The experiment folder also has
 `identity.md`, `prompt.txt`, `retry-prompt.txt` and `render-avatar.ts`.
 
-**There is no Bram character render.** Two built-in ImageGen attempts failed at
+**There is no Bram character render.** Three built-in ImageGen attempts failed at
 output moderation with HTTP 400 `moderation_blocked`, category `other`. The exact
 request IDs are in the durable brief. Earlier turnaround edits also failed once
 and succeeded on simpler retries, but that does not establish the cause of any
@@ -80,3 +80,15 @@ reel prompt change. Subsequent work is documentation and image experiments.
 Keep new media ignored, commit intentional durable briefs/skill/records, and
 finish with status checked. Do not generate another batch of species baselines;
 the next design is Bram, followed by other distinct individuals after review.
+
+## Continuation attempt 3 (2026-11-04)
+
+Resumed in this same worktree from `4d02197`, with a clean tracked starting state.
+Inspected all four approved reference images and Bram's avatar study. A focused
+Luna art-direction review informed a shorter prompt retaining his distinct
+design and satchel. Built-in ImageGen again returned HTTP 400
+`moderation_blocked`, output stage, category `other`, request
+`b2ea2e30-c852-47c1-8c81-fff99ce2d51d`. No image returned; no anatomy, alpha or
+light/dark QA was possible. Stopped without another retry or provider switch.
+See [the exact attempt record](character-generation-bram-attempt-03.md).
+Prompt and error also remain in `scratch/character_tests/bram-silt-v1/`.

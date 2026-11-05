@@ -50,12 +50,20 @@ Bram's selected shape and color relationships.
 
 Experiment folder: `scratch/character_tests/bram-silt-v1/`. It contains the
 individual identity record, inspected avatar render and config, reference paths,
-initial prompt and simplified retry prompt. Two built-in ImageGen calls failed
-at output moderation with HTTP 400 `moderation_blocked`, category `other`.
+initial prompt, simplified retry prompt and concise continuation prompt. Three
+built-in ImageGen calls failed at output moderation with HTTP 400
+`moderation_blocked`, category `other`.
 No character image was returned. Request IDs:
 
 - `df8c60d8-8446-477c-8fdb-be2e964bf7de`
 - `5e4b0538-8965-405a-bdac-54eaa451189a`
+- `b2ea2e30-c852-47c1-8c81-fff99ce2d51d`
+
+The third attempt used a concise prompt after inspecting the approved species
+anchors, corrected turnarounds and Bram's avatar study, with a focused Luna
+art-direction review. It returned the same output-stage rejection and no image.
+Generation stopped without another retry. Exact prompt, reference checksums and
+QA status are in the [continuation record](../../docs/character-generation-bram-attempt-03.md).
 
 The brief and avatar study are preserved for a future attempt. No provider switch,
 upload, publication or production registry replacement occurred.
