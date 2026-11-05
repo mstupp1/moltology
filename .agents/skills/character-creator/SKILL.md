@@ -16,6 +16,8 @@ For content artwork that uses mascots, follow [character casting](../../../conte
 
 ## Scope and reference inputs
 
+Use the [species reference guide](../../../content/character-species.md) to separate shared film style, lobster/crab anatomy and individual identity. Species sheets establish body grammar, not generic age/job templates. Keep the individual's name, personality and personal details in their own identity record. A written species brief is not an approved visual reference; inspect the actual images used for generation.
+
 For content/campaign artwork, read the [shared annual content calendar](../../../content/annual-content-calendar.md) and inherit the intended publication date, seasonal anchor and intensity from the brief. Seasonal lighting, poses and removable props may support the story; preserve canonical face, anatomy and signature attire, and save seasonal variants separately from reusable masters. Character design work follows the requested brief rather than automatically redesigning the cast for a holiday.
 
 Design tests and explorations produce local experiments. Requests to add, replace, or publish a mascot may include [deployment](references/deployment.md). Follow existing session authorization; do not require another approval when deployment was already requested.

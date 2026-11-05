@@ -65,6 +65,9 @@ articulation and palette. Keep the selected original mascot image authoritative 
 that character's identity, proportions, costume and props. Do not imitate the avatar's
 vector finish or change the cast to match an avatar option.
 
+For the implemented lobster and crab visual grammar, reference roles and future sheet
+acceptance criteria, see the [species reference guide](../content/character-species.md).
+
 New additions should be named individuals with motives, contradictions, habits and
 relationships, following the [individual character brief](../.agents/skills/character-creator/SKILL.md#individual-character-brief).
 The role and age labels above describe the existing registry, rather than a template

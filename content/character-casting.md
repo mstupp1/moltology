@@ -26,6 +26,8 @@ On social CLIs that support `--mascot`, pass the chosen canonical key explicitly
 
 ## Reference roles and render finish
 
+Use the [species reference guide](character-species.md) to distinguish lobster and crab design grammar and to evaluate future species sheets.
+
 For remakes and recurring appearances, inspect the selected character's own registered image and use it as the identity authority. For new individuals, use the original family image for rendering quality and develop a distinct identity with the [individual character brief](../.agents/skills/character-creator/SKILL.md#individual-character-brief): name, motive, strength, flaw, habit and relationships. Familiar story archetypes can guide personality, while appearance and personal details remain original. Add an inspected avatar-system image as a distinct secondary reference for relevant build, face placement, shell segmentation, limb articulation and palette relationships. Preserve the chosen mascot's identity, costume and props. See [cast v2](../docs/character-cast-v2.md) for the current cast anchors.
 
 Target polished 3D animated feature-film rendering: sculpted volume, dimensional facial forms, soft contact occlusion, satin chitin, nuanced highlights and cinematic light falloff. Keep the established anatomy and identity. Explicitly exclude sticker-like cutout treatment, cel shading, heavy silhouette outlines, flat vector fills and graphic shadow bands. The avatar system is an implemented deterministic SVG rig; use its actual proportions and design grammar as reference, not as a demand to copy its vector rendering into generated artwork.
