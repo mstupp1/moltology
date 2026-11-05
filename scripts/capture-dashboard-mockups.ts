@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { spawn, execSync } from 'node:child_process'
+import { spawn, execSync, execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import http from 'node:http'
@@ -11,6 +11,7 @@ import { REGISTERED_TARGETS, DEFAULT_CAPTURE_TARGETS, type CaptureTarget } from 
 import { advanceServiceWorkerVersion } from './lib/mockup-cache-version'
 import { validateDevCapture } from './lib/mockup-dev-auth'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
+import { needsEmailRefresh } from './build-email-feature-images.mjs'
 
 const PORT = 3019
 const BASE_URL = `http://127.0.0.1:${PORT}`
@@ -273,6 +274,10 @@ async function main() {
 
   // 3. Automated End-to-End Neon S3 CDN Sync
   const skipS3 = args.includes('--skip-s3') || args.includes('--no-s3')
+  if (needsEmailRefresh(activeTargets)) {
+    // The publisher verifies the public JPEG bytes before replacing email references.
+    execFileSync(process.execPath, ['scripts/build-email-feature-images.mjs', ...(skipS3 ? [] : ['--publish'])], { stdio: 'inherit' })
+  }
   if (!skipS3) {
     console.log('\n☁️ Automatically syncing marketing mockups to Neon S3 CDN...')
     execSync('npm run s3:sync', { stdio: 'inherit' })
