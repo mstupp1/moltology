@@ -47,6 +47,18 @@ far-side limbs; do not treat those hidden attachments as individually verified.
 The lobster's angled view is shallower than the requested 45 degrees. Outer
 safety margins also need attention before production use.
 
+Side-view correction candidates are in `scratch/character_tests/species-turnarounds-v2/`
+as `lobster-turnaround-v2.png` and `crab-turnaround-v2.png`. For these selected
+baseline designs, the right-facing lobster's antennae curve forward/right; the
+right-facing crab's antennae sweep backward/left. The crab's visible shell flank
+has two spikes. Preserve those features across rotation rather than inventing a
+third spike or reversing antennae. Show both long supporting legs with enough
+near/far separation to read as two limbs, and rotate pincer geometry with the
+body rather than pasting a frontal claw onto a profile. These are checks for the
+selected designs, not restrictions on other avatar antenna or shell options.
+The v2 sheets are still review candidates. Generative edits re-rendered some
+surface detail beyond the center figures; the v1 outer views remain available.
+
 ## Implemented species grammar
 
 | Species | Visible design grammar to preserve | Stylized limb convention |
