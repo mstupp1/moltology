@@ -7,6 +7,16 @@ import type {
   EquipmentUniquePower,
   LookSlotId,
 } from '../db/schema'
+import {
+  SLOT_VECTOR,
+  VECTOR_KEYS,
+  VECTORS,
+  emptyVectors,
+  formatBonus,
+  type VectorBase,
+  type VectorKey,
+  type VectorSet,
+} from './vectors'
 
 export type {
   ChassisVisualType,
@@ -46,6 +56,16 @@ export const EQUIP_SLOT_IDS: EquipSlotId[] = [
   'legs',
   'antennae',
 ]
+
+export const EQUIP_SLOT_LABELS: Record<EquipSlotId, string> = {
+  head: 'Head',
+  carapace: 'Carapace',
+  belt: 'Belt',
+  legs: 'Legs',
+  antennae: 'Antennae',
+  'claws-1': 'Right pincer',
+  'claws-2': 'Left pincer',
+}
 
 export function equipSlotCategory(slot: EquipSlotId): EquipmentCategory {
   if (slot === 'claws-1' || slot === 'claws-2') return 'claws'
@@ -87,29 +107,14 @@ export const EQUIPMENT_RARITIES: EquipmentRarity[] = [
   'legendary',
 ]
 
-export type LoadoutStatKey =
-  | 'defense'
-  | 'attack'
-  | 'intelligence'
-  | 'speed'
-  | 'perception'
+export type LoadoutStatKey = VectorKey
 
-export const CATEGORY_TO_STAT: Record<EquipmentCategory, LoadoutStatKey> = {
-  carapace: 'defense',
-  claws: 'attack',
-  head: 'intelligence',
-  legs: 'speed',
-  antennae: 'perception',
-  belt: 'defense',
-}
+/** The vector each slot's primary stat raises. */
+export const CATEGORY_TO_STAT: Record<EquipmentCategory, LoadoutStatKey> = SLOT_VECTOR
 
-export const STAT_LABELS: Record<LoadoutStatKey, string> = {
-  defense: 'Defense',
-  attack: 'Attack',
-  intelligence: 'Intelligence',
-  speed: 'Speed',
-  perception: 'Perception',
-}
+export const STAT_LABELS: Record<LoadoutStatKey, string> = Object.fromEntries(
+  VECTOR_KEYS.map((k) => [k, VECTORS[k].label]),
+) as Record<LoadoutStatKey, string>
 
 export const CATEGORY_LABELS: Record<EquipmentCategory, string> = {
   carapace: 'Carapace',
@@ -252,16 +257,10 @@ export interface GearItemState {
   lookSlot?: LookSlotId | null
 }
 
-export type LoadoutTotals = Record<LoadoutStatKey, number>
+export type LoadoutTotals = VectorSet
 
 export function emptyTotals(): LoadoutTotals {
-  return {
-    defense: 0,
-    attack: 0,
-    intelligence: 0,
-    speed: 0,
-    perception: 0,
-  }
+  return emptyVectors()
 }
 
 export function computeLoadoutTotals(
@@ -287,14 +286,36 @@ export function computeLoadoutTotals(
   return totals
 }
 
-export function formatAffixLine(affix: EquipmentAffix): string {
-  const sign = affix.value >= 0 ? '+' : ''
-  return `${sign}${affix.value} ${STAT_LABELS[affix.stat]}`
+/** Totals if `catalogItemId` were worn in `slot` instead of whatever is there now. */
+export function previewLoadoutTotals(
+  items: GearItemState[],
+  catalogById: Map<string, CatalogRef> | Record<string, CatalogRef>,
+  slot: EquipSlotId,
+  catalogItemId: string,
+): LoadoutTotals {
+  const next: GearItemState[] = items.filter((i) => i.equippedSlot !== slot)
+  next.push({ id: '__preview__', catalogItemId, equippedSlot: slot, vaultIndex: null })
+  return computeLoadoutTotals(next, catalogById)
 }
 
-export function primaryStatLine(catalog: CatalogRef): string {
+export function formatAffixLine(affix: EquipmentAffix): string {
+  return `${formatBonus(affix.value)} ${STAT_LABELS[affix.stat] ?? affix.stat}`
+}
+
+export function primaryStatLine(catalog: Pick<CatalogRef, 'category' | 'primaryStat'>): string {
   const stat = CATEGORY_TO_STAT[catalog.category]
-  return `+${catalog.primaryStat} ${STAT_LABELS[stat]}`
+  return `${formatBonus(catalog.primaryStat)} ${STAT_LABELS[stat]}`
+}
+
+/** Every vector one piece raises, primary first. */
+export function gearBonuses(catalog: Pick<CatalogRef, 'category' | 'primaryStat' | 'affixes' | 'kind'>): LoadoutTotals {
+  const out = emptyVectors()
+  if (isCosmetic(catalog)) return out
+  out[CATEGORY_TO_STAT[catalog.category]] += catalog.primaryStat
+  for (const affix of catalog.affixes ?? []) {
+    if (affix.stat in out) out[affix.stat] += affix.value
+  }
+  return out
 }
 
 export type AbilityStatus = 'Ready' | 'Locked' | 'Cooling'
@@ -588,6 +609,8 @@ export interface ChassisLoadoutPayload {
   allUnlocked?: boolean
   /** Admins: the catalog is every piece, owned or not. */
   everyItem?: boolean
+  /** The member's base vectors (audit or provisional). Gear totals add on top. */
+  vectorBase?: VectorBase
 }
 
 let chassisLoadoutCache: { userId: string; payload: ChassisLoadoutPayload } | null = null

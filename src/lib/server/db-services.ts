@@ -91,6 +91,7 @@ import {
   getStreakMilestoneBonus,
   type ProgressionState,
 } from '../progression'
+import { resolveVectorBase } from '../vectors'
 import {
   VAULT_SIZE,
   chassisTypeImageUrl,
@@ -3825,12 +3826,14 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<Chassis
     items: (typeof userGearItems.$inferSelect)[]
     profile: typeof profiles.$inferSelect
     unlocks: string[]
+    stats: { moltmaxDimensionScores: Record<string, number> | null; moltmaxCompletedAt: string | null } | null
   }>(sql`SELECT
     (SELECT COALESCE(jsonb_agg(c ORDER BY c."sortOrder"), '[]'::jsonb) FROM public.equipment_catalog c) AS catalog,
     (SELECT COALESCE(jsonb_agg(g ORDER BY g.id), '[]'::jsonb) FROM public.user_gear_items g WHERE g."userId"=${userId}) AS items,
     (SELECT to_jsonb(p) FROM public.profiles p WHERE p.id=${userId}) AS profile,
-    (SELECT COALESCE(jsonb_agg(u."catalogItemId"), '[]'::jsonb) FROM public.gear_unlocks u WHERE u."userId"=${userId}) AS unlocks`)
-  const { catalog: catalogRows, items: gearRows, profile, unlocks } = result.rows[0]
+    (SELECT COALESCE(jsonb_agg(u."catalogItemId"), '[]'::jsonb) FROM public.gear_unlocks u WHERE u."userId"=${userId}) AS unlocks,
+    (SELECT jsonb_build_object('moltmaxDimensionScores', s."moltmaxDimensionScores", 'moltmaxCompletedAt', s."moltmaxCompletedAt") FROM public.user_stats s WHERE s."userId"=${userId}) AS stats`)
+  const { catalog: catalogRows, items: gearRows, profile, unlocks, stats } = result.rows[0]
   const items = gearRows.map(toGearState)
   const everyItem = isAdmin(null, profile?.role)
   // Members wear what they own: the starter set, anything unlocked, and anything already placed.
@@ -3852,6 +3855,7 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<Chassis
     appearanceRevision: profile?.appearanceRevision ?? 0,
     allUnlocked: true,
     ...(everyItem ? { everyItem: true } : {}),
+    vectorBase: resolveVectorBase(stats, userId),
   }
 }
 
@@ -4025,13 +4029,24 @@ export const moveGearItemHandler = async ({ data, context }: ServerFnArgs<MoveGe
 // ─── Public profiles & connections ───────────────────────────────────────────
 
 async function loadMemberEquippedLoadout(dbClient: Db, targetUserId: string) {
-  const [owner] = await dbClient
-    .select({ version: profiles.equipmentVersion })
-    .from(profiles)
-    .where(eq(profiles.id, targetUserId))
-    .limit(1)
+  const [[owner], [stats]] = await Promise.all([
+    dbClient
+      .select({ version: profiles.equipmentVersion })
+      .from(profiles)
+      .where(eq(profiles.id, targetUserId))
+      .limit(1),
+    dbClient
+      .select({
+        moltmaxDimensionScores: userStats.moltmaxDimensionScores,
+        moltmaxCompletedAt: userStats.moltmaxCompletedAt,
+      })
+      .from(userStats)
+      .where(eq(userStats.userId, targetUserId))
+      .limit(1),
+  ])
+  const vectorBase = resolveVectorBase(stats, targetUserId)
   if (owner?.version !== 1)
-    return { catalog: [], items: [], totals: computeLoadoutTotals([], new Map()) }
+    return { catalog: [], items: [], totals: computeLoadoutTotals([], new Map()), vectorBase }
   const catalogRows = await dbClient
     .select()
     .from(equipmentCatalog)
@@ -4051,6 +4066,7 @@ async function loadMemberEquippedLoadout(dbClient: Db, targetUserId: string) {
     catalog: catalog.filter((c) => items.some((item) => item.catalogItemId === c.id)),
     items,
     totals,
+    vectorBase,
   }
 }
 
@@ -4385,17 +4401,6 @@ export const getPublicProfileHandler = async ({
     stageLabel: getStageLabel(profile.stage),
     avatarConfig: (profile.avatarConfig as PublicProfileView['avatarConfig']) ?? null,
     memberSince: profile.createdAt.toISOString(),
-    stats: stats
-      ? {
-          pincerTorque: stats.pincerTorque,
-          shellHardness: stats.shellHardness,
-          processingPower: stats.processingPower,
-          durability: stats.durability,
-          clawStrength: stats.clawStrength,
-          socialDetachmentIndex: stats.socialDetachmentIndex,
-          submergenceDepthRating: stats.submergenceDepthRating,
-        }
-      : null,
     moltmax: stats
       ? {
           score: stats.moltmaxScore,

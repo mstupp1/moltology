@@ -4,8 +4,9 @@ date: 2026-08-26
 title: "Give every larva the same stat budget"
 summary: "Character creation rolls five stats that always total 300, each between 35 and 85."
 domains: [progression]
-rules: [progression.stat-roll]
-status: accepted
+rules: [progression.vector-stats]
+status: superseded
+supersededBy: five-vector-stats
 sources:
   - commit: '35384e06f2814a1de899e78517f1bda0b04ab85d'
 ---

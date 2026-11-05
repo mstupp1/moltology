@@ -94,16 +94,18 @@ rules:
     anchors:
       - file: src/lib/server/db-services.ts
         symbol: syncUserProgression
-  - id: progression.stat-roll
-    title: Larval stat roll
-    kind: limit
-    statement: Character creation rolls five base stats that always sum to 300, with each stat between 35 and 85. The highest stat picks the larval archetype.
+  - id: progression.vector-stats
+    title: Five vector stats
+    kind: invariant
+    statement: Members have one stat set, the five Moltmax vectors. The base is the member's audit scores (0 to 100); before the audit it is a provisional roll from the member id, 35 to 65 each. Equipped gear adds its primary bonus to its slot's vector plus any secondary bonuses, and totals may pass 100. The Moltmax rating weighs the vectors with the audit index weights.
     anchors:
-      - file: src/lib/stats-roller.ts
-        symbol: TOTAL_STAT_POINTS
-      - file: src/lib/stats-roller.ts
-        symbol: rollBaseStats
-    tests: [src/lib/stats-roller.test.ts]
+      - file: src/lib/vectors.ts
+        symbol: resolveVectorBase
+      - file: src/lib/vectors.ts
+        symbol: buildVectorSheet
+      - file: src/lib/vectors.ts
+        symbol: SLOT_VECTOR
+    tests: [src/lib/vectors.test.ts]
   - id: progression.referral-rewards
     title: Qualified referral XP
     kind: threshold

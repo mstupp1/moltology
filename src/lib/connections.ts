@@ -9,16 +9,6 @@ export type RelationshipState =
   | 'friends'
   | 'self'
 
-export type PublicProfileStats = {
-  pincerTorque: number
-  shellHardness: number
-  processingPower: number
-  durability: number
-  clawStrength: number
-  socialDetachmentIndex: number
-  submergenceDepthRating: number
-}
-
 export type PublicMoltmaxSummary = {
   score: number | null
   clearance: string | null
@@ -42,7 +32,6 @@ export type PublicProfileView = {
   stageLabel: string
   avatarConfig: (Omit<import('./lobster-avatar').LobsterAvatarConfig, 'style'> & { style: string }) | null
   memberSince: string
-  stats: PublicProfileStats | null
   moltmax: PublicMoltmaxSummary
   relationship: RelationshipState
   pendingRequestId: string | null

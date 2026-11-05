@@ -96,9 +96,9 @@ describe('OnboardingFlow', () => {
     expect(screen.getByRole('heading', { name: 'Pick a username' })).toBeInTheDocument()
   })
 
-  it('claims the username on Next, then saves the character and a quiet stats roll on Finish', async () => {
+  it('claims the username on Next, then saves the character on Finish without writing stats', async () => {
     const { onDismiss } = renderFlow({ initialStepId: 'username' })
-    await waitFor(() => expect(mockGetStats).toHaveBeenCalled())
+    await waitFor(() => expect(mockGetProfile).toHaveBeenCalled())
 
     fireEvent.change(screen.getByLabelText(/Username/), { target: { value: 'claw_lord' } })
     next()
@@ -112,9 +112,8 @@ describe('OnboardingFlow', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Finish' }))
     await waitFor(() => expect(onDismiss).toHaveBeenCalled())
     expect(mockSaveAvatar).toHaveBeenCalled()
-    expect(mockUpdateStats).toHaveBeenCalledTimes(1)
-    const scores = mockUpdateStats.mock.calls[0][0].data.moltmaxDimensionScores
-    expect(Object.values(scores).reduce((a: number, b) => a + (b as number), 0)).toBe(300)
+    // The starting base is rolled from the member id at read time (src/lib/vectors.ts).
+    expect(mockUpdateStats).not.toHaveBeenCalled()
   })
 
   it('keeps the member on the username step and shows the error when the name is taken', async () => {
