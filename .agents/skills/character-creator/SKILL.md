@@ -1,7 +1,7 @@
 ---
 name: character-creator
 description: >-
-  Design, remake, and extend Moltology's family of 3D cartoon crustacean mascots with reference-guided ImageGen and transparent cutouts. Use for character design tests, consistent pose variants, new cast members, and requested deployment to S3 and the composite registries.
+  Design, remake, and extend Moltology's 3D animated feature-film crustacean mascots with reference-guided ImageGen and transparent cutouts. Use for character design tests, consistent pose variants, new cast members, and requested deployment to S3 and the composite registries.
 ---
 
 # Moltology character creator
@@ -23,17 +23,24 @@ Design tests and explorations produce local experiments. Requests to add, replac
 Discover characters in `src/components/composite/MascotOverlay.tsx`, `scripts/lib/character-overlay.ts`, and `scratch/character_refs/`. If a local reference is missing, retrieve its actual registered public asset. Prefer master PNG; WebP is usable when PNG is unavailable. Keep experimental inputs in the experiment folder.
 
 - Remakes and pose variants **require the existing character image as an identity reference**.
-- New cast members **require an approved family-style image**, plus a brief defining their distinct build, colors, role and temperament.
+- New cast members **require an approved family-style image**, plus an individual character brief and their distinct build and colors.
 - Label additional references by purpose: lighting, material, expression or pose. Explicitly state which costume, props and identity must not transfer.
 
 Inspect local inputs with `view_image` before generation. Use `referenced_image_paths` when all inputs have local paths; otherwise use the smallest `num_last_images_to_include` covering the necessary conversation images. Never pass both. Ask for a missing required image only when the project or conversation cannot supply it.
 
-The existing pointing lobster (`char_lobster_pointing_cta.png`) is the initial family anchor: rounded oblong coral carapace, tan belly plates, warm crescent smile, large eyes seated in the face, attached brows and curved antennae. Preserve identity, not incidental grain, extraction fringes or stray fragments. An experimental redesign becomes a new family anchor when the user selects it.
+The original pointing lobster (`char_lobster_pointing_cta.png`) is the initial family-style anchor: rounded oblong coral carapace, tan belly plates, warm crescent smile, large eyes seated in the face, attached brows and curved antennae. The v2 family anchors are `char_lobster_pointing_adult_v2.webp` and `char_lobster_pointing_junior_v2.webp` (registered under `images/characters/`; see [cast v2](../../../docs/character-cast-v2.md)). For recurring characters, their own registered image controls identity. For new characters, use the original family reference for rendering quality without copying its identity, and an inspected avatar-system reference for relevant design relationships. Label these roles separately. Retrieve missing local references from their actual registered assets; do not substitute an imagined description for an inspected image. Preserve identity, not incidental grain, extraction fringes or stray fragments. An experimental redesign becomes a new family anchor only when the user selects it.
+
+## Individual character brief
+
+New cast members are recurring individuals, not generic age/role variants. Before prompting, define a name, what they want, a strength, a flaw or contradiction, one recognizable habit, and a relationship or tension with another cast member. Give them a distinct silhouette, expression vocabulary and one personal visual detail with a reason behind it. Age, species and occupation support the person; they are not the whole concept. Express personality through posture, facial acting and worn or cherished belongings rather than a pile of job props.
+
+Broad, familiar story archetypes are welcome: the reluctant hero, the brilliant but unreliable inventor, the weary mentor, the charming opportunist, the earnest apprentice. Borrow the emotional pattern and give it an original Moltology life. Avoid reproducing a famous character's signature costume, face, color arrangement, emblem, catchphrase or recognizable combination of details. Record archetype inspirations as temperament or relationship cues, rather than an instruction to render a named fictional character. Keep existing cast keys and identities stable; this direction does not automatically rename or redesign them.
 
 ## Shared style
 
-- **Finished animated-feature character quality**: appealing sculpted forms, coherent facial anatomy, nuanced eyelids and cheeks, expressive poses, and final-film shading. Aim for a character that belongs in an animated feature, with readable volume and soft joint occlusion.
-- Organic chitin with a **soft satin finish**: broad controlled highlights, restrained microtexture visible mainly at close range, subtle tonal variation and subsurface warmth. Keep eye catchlights crisp while shell reflections stay softer. Avoid coarse pebbled texture, grainy velvet, wet plastic gloss, flat illustration and chalky clay.
+- **Finished 3D animated feature-film quality**: sculpted, continuous forms with readable volume; softly modeled cheeks, eyelids and muzzle; dimensional eyes seated in the face; layered forms with contact occlusion at joints and overlaps; nuanced, non-uniform surface response; cinematic key, fill and rim light with gradual falloff and grounded contact shadows. The result should feel like a polished Pixar/DreamWorks-era feature-film character render, not a sticker, logo, toy decal or flat vector illustration. No cel shading, heavy ink/cel outlines, contour strokes around the silhouette, flat fills, hard graphic shadow bands, or cut-paper edges. Keep the contour clean through lighting and form, not an added outline.
+- **Use references with distinct jobs.** A recurring character's own image controls identity: species, face, silhouette, proportions, palette, signature clothing/props and pose when requested. For a new individual, the original family image supplies film-rendering quality rather than identity. A relevant avatar-system reference supplies shared character grammar: upright/compact build as appropriate, face placement, eye and brow attachment, shell segmentation, limb articulation, and restrained Moltology palette. Do not copy its exact identity, costume, pose or rendering limitations unless independently required. The generated avatar SVG is a deterministic hand-drawn vector rig; use it for design relationships, not film materials or lighting.
+- Organic chitin with a **soft satin finish**: broad controlled highlights, restrained microtexture visible mainly at close range, subtle tonal variation and subsurface warmth. Keep eye catchlights crisp while shell reflections stay softer. Avoid coarse pebbled texture, grainy velvet, wet plastic gloss, flat illustration, cel/vector finish, sticker-like edge outlines and chalky clay.
 - Warm, expressive faces with naturally seated glossy eyes and brows attached to the carapace. No eyestalks or detached facial elements.
 - Distinct silhouettes, shell tones, eye colors and personalities across the cast, with consistent material and lighting treatment.
 - Moltology's **stylized lobster anatomy convention**: two main pincer arms, six walking legs (three per side), and a segmented tail fan. This is a character design convention, not a statement of biological anatomy. Require all six walking legs with natural attachment points. Natural overlap is acceptable; verify three legs on each side rather than treating overlap itself as a defect. Define anatomy separately for other species.
@@ -74,10 +81,10 @@ If generation fails, report the actual failure and preserve the brief. Do not lo
 Use case: stylized-concept
 Asset type: isolated Moltology mascot design experiment
 Primary request: polish the pointing lobster and make its face more expressive.
-Input images: Image 1 is the identity and raised-claw pose reference. Optional Image 2 supplies material/lighting quality only; do not copy its costume, props or pose.
+Input images: Image 1 is the original identity reference. Image 2 is the most relevant avatar-system reference for build, face placement and limb articulation only; do not copy its identity, vector finish, costume, props or pose.
 Scene/backdrop: genuinely transparent background.
 Subject: the same uncostumed coral lobster, rounded upright body, tan segmented belly, red tail fan, two curved antennae. Two main pincer arms and six connected walking legs, three per side.
-Style/medium: finished animated-feature 3D character; soft satin organic chitin, broad controlled highlights, subtle close-range microtexture and glossy eyes. Coherent facial sculpting and final-film shading.
+Style/medium: polished Pixar/DreamWorks-era 3D animated feature-film character render; sculpted continuous anatomy, soft satin organic chitin, broad controlled highlights, subtle close-range microtexture, glossy eyes and nuanced cinematic shading. Keep identity from Image 1. Use Image 2 only for avatar-system build, face placement, limb articulation and palette relationships; do not copy its identity, props, pose or vector-rendering treatment. No sticker cutout look, cel shading, ink outlines, flat vector fills or hard graphic shadow bands.
 Expression: warm crescent smile, rounded cheeks, naturally seated eyes, attached expressive brows. Preserve reference eye color.
 Composition/framing: complete body, claws, all six walking legs and antenna tips; about 8% clear transparent margin on every side.
 Lighting/mood: soft cinematic key and fill, natural tonal transitions, warm and welcoming.
