@@ -36,6 +36,18 @@ selected view establishes direction; consistent alternate views still need testi
 
 These limb layouts describe Moltology's stylized cast and avatar conventions. They are not a prompt to add unsupported biological details. Keep pincers recognizable as pincers; do not silently replace them with human hands. Natural overlap is acceptable, but verify all six walking legs and their attachment points in generated art.
 
+For upright adult references, the long weight-bearing legs are the **final pair**.
+On each side, trace the attachment order from top/front to bottom/rear:
+short walking leg, short walking leg, long walking leg. The long leg attaches at
+the lowest, rearmost socket after both short legs; no short pointed leg follows
+behind it. Verify attachment order as well as total count, keeping the two main
+pincer arms separate from the walking legs.
+
+The first crab experiment's wide, squat build is within the character range, but
+the baseline reference should be moderately narrower and taller. Keep a broad
+crab shell while giving the final leg pair enough length for a balanced upright
+stance. This baseline choice does not exclude wide or short named individuals.
+
 ## What a species reference sheet should show
 
 Prepare a clear, neutral design sheet for one of the two implemented species. It should make the grammar easy to inspect without assigning a recurring character identity:
