@@ -92,3 +92,21 @@ design and satchel. Built-in ImageGen again returned HTTP 400
 light/dark QA was possible. Stopped without another retry or provider switch.
 See [the exact attempt record](character-generation-bram-attempt-03.md).
 Prompt and error also remain in `scratch/character_tests/bram-silt-v1/`.
+
+## Different-character test: Mira Kelp (2026-11-04)
+
+The user then asked to try another character. Drafted [Mira Kelp](../content/characters/mira-kelp.md),
+a tall/lean jade-green adult crab with a softly heart-shaped shell, sapphire
+eyes and an ochre neckerchief. Built and inspected a separate avatar study.
+Luna reviewed the brief and performed independent visual QA. The first built-in
+ImageGen attempt succeeded; this does not identify the cause of Bram's failures.
+
+Candidate: `scratch/character_tests/mira-kelp-v1/mira-kelp-v1.png`.
+Prompt, identity, avatar inputs, alpha metadata and light/dark composites remain
+in the same ignored experiment folder; exact prompt and observed QA are durable
+in Mira's brief. Native RGBA, 1199 × 1312. Six walking-leg tips are visible;
+far-side lowest socket partly hidden, so its exact attachment order is unverified.
+Light/dark previews look clean, but faint alpha reaches canvas edges and solid
+silhouette margins fall below 8%. Candidate awaits user review, with production
+cleanup still needed. No upload, registry replacement or publication. Preserve
+Bram and all approved species experiments. Review Mira before extending the cast.
