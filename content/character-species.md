@@ -11,6 +11,22 @@ Use this guide when planning a new mascot or preparing a species reference sheet
 
 Label each supplied image by its job. Do not silently transfer identity, costume, pose or props between references.
 
+## Selected rendering anchor
+
+On 2026-11-04, the user selected `lobster-species-v1.png` as the desired family
+rendering quality: “This is great. Exactly what I wanted.” It is saved locally at
+`scratch/character_tests/lobster-species-v1/lobster-species-v1.png`, with inspected
+inputs, prompt and QA in the same experiment folder. Use this exact image as the
+current family-style reference when available. If it is missing, retrieve the
+selected image rather than silently falling back to an older style. This selection
+does not replace any registered production mascot.
+
+This is a typical lobster build, not a compulsory silhouette. Future individuals
+may vary head/shell shape, build, height, claw size, palette and face traits using
+the avatar system's actual options. Preserve rendering quality and species grammar
+while choosing proportions that express the individual's personality. A single
+selected view establishes direction; consistent alternate views still need testing.
+
 ## Implemented species grammar
 
 | Species | Visible design grammar to preserve | Stylized limb convention |
