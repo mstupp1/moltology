@@ -41,6 +41,7 @@ import {
 import { SilentSynchronizationDialog } from '@/components/hud/SilentSynchronizationDialog'
 import { generateLobsterAvatarDataUri, parseLobsterAvatarConfig } from '@/lib/lobster-avatar'
 import { resolveMemberPublicName } from '@/lib/member-handle'
+import { clearGuestAlignment, guestAlignmentFor, saveGuestAlignment } from '@/lib/guest-progress'
 
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
@@ -277,6 +278,14 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     if (!userId) {
       snapshotUserRef.current = null
       if (!isAuthPending) {
+        // Guests pick up today's ticks from this device, so a reload keeps them.
+        const today = localDateString()
+        const guestKeys = guestAlignmentFor(today)
+        const guestTasks = mergeCompletions(guestKeys)
+        tasksRef.current = guestTasks
+        setTasks(guestTasks)
+        setHistory(guestKeys.length > 0 ? [{ date: today, completedCount: guestKeys.length }] : [])
+        setHasServerStreakBaseline(false)
         hasTrustworthyCountRef.current = true
         setIsLoading(false)
       }
@@ -524,12 +533,15 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
       }
       setOptimisticXpDelta((prev) => prev + delta)
 
-      // Authenticated users: enqueue background sync
+      // Authenticated users: enqueue background sync. Guests keep today's ticks on this device
+      // until they sign in, when the claim below saves them to the account.
       if (userIdRef.current) {
         if (!queueRef.current.includes(canonicalKey)) {
           queueRef.current.push(canonicalKey)
         }
         triggerQueueProcessing()
+      } else {
+        saveGuestAlignment(currentDateRef.current, nextTasks.filter((t) => t.completed).map((t) => t.key))
       }
     },
     [triggerQueueProcessing, persistSnapshot, showCompletionToast]
@@ -540,6 +552,22 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     const current = tasksRef.current.find((task) => task.key === key || task.id === key)
     if (current) await setTaskCompleted(taskKey, !current.completed)
   }, [setTaskCompleted])
+  // Once the new member's day has loaded, save the ticks they made as a guest today.
+  const guestClaimUserRef = useRef<string | null>(null)
+  useEffect(() => {
+    if (!userId || !hasServerStreakBaseline || guestClaimUserRef.current === userId) return
+    guestClaimUserRef.current = userId
+    const guestKeys = guestAlignmentFor(currentDateRef.current)
+    clearGuestAlignment()
+    const missing = guestKeys.filter((key) => !tasksRef.current.find((task) => task.key === key)?.completed)
+    if (missing.length === 0) return
+    toastRef.current.success(
+      missing.length === 1 ? 'Saved the task you finished before signing up.' : `Saved the ${missing.length} tasks you finished before signing up.`,
+      { id: 'guest-alignment-claimed' },
+    )
+    for (const key of missing) void setTaskCompleted(key, true)
+  }, [userId, hasServerStreakBaseline, setTaskCompleted])
+
   const openSilentSynchronization = useCallback(() => {
     silentDialogUserRef.current = userIdRef.current
     setSilentDialogDate(currentDateRef.current)

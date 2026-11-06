@@ -4,6 +4,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MoltMaxPage } from './MoltMaxPage'
 import { authClient } from '@/lib/auth-client'
 import { ToastProvider } from '@/components/ui/ToastProvider'
+import { readGuestProgress } from '@/lib/guest-progress'
 
 const mockNavigate = vi.fn()
 const mockUpdateUserStats = vi.hoisted(() => vi.fn().mockResolvedValue({}))
@@ -38,6 +39,7 @@ describe('MoltMaxPage', () => {
   beforeEach(() => {
     mockNavigate.mockClear()
     mockUpdateUserStats.mockClear()
+    localStorage.clear()
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
   })
 
@@ -129,4 +131,27 @@ describe('MoltMaxPage', () => {
       }),
     }))
   })
+
+  it('keeps a guest audit on this device and marks it for saving when they choose to sign up', () => {
+    renderPage()
+    fireEvent.click(screen.getByRole('button', { name: /take the moltmax quiz/i }))
+    for (let question = 0; question < 15; question += 1) answerCurrentQuestion()
+
+    const stored = readGuestProgress().audit
+    expect(Object.keys(stored?.answers ?? {})).toHaveLength(15)
+    expect(stored?.saveRequested).toBe(false)
+    expect(screen.getByText(/join free within 7 days/i)).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /create a free account to save/i }))
+    expect(readGuestProgress().audit?.saveRequested).toBe(true)
+    expect(mockUpdateUserStats).not.toHaveBeenCalled()
+  }, 10000)
+
+  it('does not keep a guest copy for a signed-in member', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: { user: { id: 'user-1' } } } as any)
+    renderPage()
+    fireEvent.click(screen.getByRole('button', { name: /take the moltmax quiz/i }))
+    for (let question = 0; question < 15; question += 1) answerCurrentQuestion()
+    expect(readGuestProgress().audit).toBeUndefined()
+  }, 10000)
 })

@@ -133,6 +133,7 @@ export interface UserStatsInput {
   moltmaxClearance?: string
   moltmaxStage?: string
   moltmaxDimensionScores?: Record<string, number>
+  onlyIfNoAudit?: boolean
   token?: string
   userId?: string
 }
@@ -153,6 +154,7 @@ export const updateUserStatsFn = createServerFn({ method: 'POST' })
         moltmaxClearance: z.string().min(1).max(10).optional(),
         moltmaxStage: z.string().min(1).max(100).optional(),
         moltmaxDimensionScores: z.record(z.string(), z.number().min(0).max(100)).optional(),
+        onlyIfNoAudit: z.boolean().optional(),
         token: z.string().optional(),
         userId: z.string().optional(),
       })

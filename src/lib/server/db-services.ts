@@ -401,12 +401,15 @@ interface UserStatsInput {
   moltmaxClearance?: string
   moltmaxStage?: string
   moltmaxDimensionScores?: Record<string, number>
+  /** Save the audit only when the member has none yet (claiming a guest audit that was never asked to be saved). */
+  onlyIfNoAudit?: boolean
   token?: string
   userId?: string
 }
 
 /**
  * Server Function: Update authenticated user stats with input validation.
+ * Returns undefined when `onlyIfNoAudit` is set and the member already has an audit.
  */
 export const updateUserStatsHandler = async ({ data, context }: ServerFnArgs<UserStatsInput>) => {
   const auth = await resolveWriteAuth({ data, context })
@@ -420,18 +423,19 @@ export const updateUserStatsHandler = async ({ data, context }: ServerFnArgs<Use
 
   const input = data ?? {}
   // Clearance and stage labels are derived from the score here, never taken from the client.
-  const { token: _token, userId: _userId, moltmaxClearance: _clearance, moltmaxStage: _stage, ...statsFields } = input
+  const { token: _token, userId: _userId, moltmaxClearance: _clearance, moltmaxStage: _stage, onlyIfNoAudit, ...statsFields } = input
   const labels = statsFields.moltmaxScore === undefined ? null : moltmaxLabelsForScore(statsFields.moltmaxScore)
   const statsData = labels
     ? { ...statsFields, moltmaxClearance: labels.clearance, moltmaxStage: labels.stage, moltmaxCompletedAt: new Date() }
     : statsFields
+  const ownRow = eq(userStats.userId, userId)
   const [updated] = await dbClient
     .update(userStats)
     .set({ ...statsData, updatedAt: new Date() })
-    .where(eq(userStats.userId, userId))
+    .where(onlyIfNoAudit ? and(ownRow, isNull(userStats.moltmaxCompletedAt)) : ownRow)
     .returning()
 
-  if (labels) await tryCheckGemMilestones(dbClient, userId)
+  if (labels && updated) await tryCheckGemMilestones(dbClient, userId)
   return updated
 }
 
