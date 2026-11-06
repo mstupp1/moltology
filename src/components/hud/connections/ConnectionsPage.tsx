@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Search, Users, Inbox, Send, Loader2 } from 'lucide-react'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
@@ -25,6 +25,8 @@ import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { useMemberSearch } from '@/hooks/useMemberSearch'
 import { MEMBER_SEARCH_MIN_CHARS } from '@/lib/member-search'
 import { ReferralPanel } from './ReferralPanel'
+import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
+import { MAX_PAGE_SIZE, PAGE_SIZES, mergeById } from '@/lib/pagination'
 
 export { CONNECTIONS_FRIENDS_EMPTY, CONNECTIONS_INCOMING_EMPTY, CONNECTIONS_SENT_EMPTY }
 
@@ -53,12 +55,21 @@ export const ConnectionsPage: React.FC<{
     view === 'friends' ? 'friends' : view === 'requests' && resolvedTab === 'friends' ? 'incoming' : resolvedTab
   const showSearch = view !== 'requests'
 
+  const [loadingMoreFriends, setLoadingMoreFriends] = useState(false)
+  // After a change, reload as many friends as are already on screen so the list does not shrink.
+  const loadedFriendsRef = useRef(0)
+
   const refresh = useCallback(async () => {
     try {
       const token = await getAuthJWTToken()
       const next = await listConnectionsFn({
-        data: { token: token ?? undefined, includeSuggestions: true },
+        data: {
+          token: token ?? undefined,
+          includeSuggestions: true,
+          friendsLimit: Math.min(Math.max(loadedFriendsRef.current, PAGE_SIZES.friends), MAX_PAGE_SIZE),
+        },
       })
+      loadedFriendsRef.current = next?.friends.length ?? 0
       setConnections(next)
       announceFriendRequestCount(next?.incoming?.length ?? 0)
     } catch (err) {
@@ -71,6 +82,33 @@ export const ConnectionsPage: React.FC<{
   useEffect(() => {
     void refresh()
   }, [refresh])
+
+  const loadMoreFriends = async () => {
+    const offset = connections?.nextFriendsOffset
+    if (offset == null) return
+    setLoadingMoreFriends(true)
+    try {
+      const token = await getAuthJWTToken()
+      const next = await listConnectionsFn({
+        data: { token: token ?? undefined, friendsOffset: offset },
+      })
+      setConnections((current) => {
+        if (!current) return next
+        const friends = mergeById(current.friends, next.friends)
+        loadedFriendsRef.current = friends.length
+        return {
+          ...current,
+          friends,
+          friendCount: next.friendCount ?? current.friendCount,
+          nextFriendsOffset: next.nextFriendsOffset ?? null,
+        }
+      })
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not load more friends.')
+    } finally {
+      setLoadingMoreFriends(false)
+    }
+  }
 
   const hideSuggestion = (memberId: string) => {
     setHiddenSuggestionIds((ids) => (ids.includes(memberId) ? ids : [...ids, memberId]))
@@ -105,7 +143,7 @@ export const ConnectionsPage: React.FC<{
     {
       id: 'friends',
       label: 'Friends',
-      count: connections?.friends.length ?? 0,
+      count: connections?.friendCount ?? connections?.friends.length ?? 0,
       icon: Users,
     },
     { id: 'incoming', label: 'Incoming', count: incomingCount, icon: Inbox },
@@ -169,7 +207,7 @@ export const ConnectionsPage: React.FC<{
           {results.length > 0 && (
             <ul className="space-y-2">
               {results.map((member) => {
-                const { relationship, pendingRequestId } = relationshipForMember(connections, member.id)
+                const { relationship, pendingRequestId } = relationshipForMember(connections, member.id, member.isFriend)
                 return (
                   <MemberSearchRow
                     key={member.id}
@@ -234,7 +272,7 @@ export const ConnectionsPage: React.FC<{
 
         {view === 'friends' && (
           <h2 className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
-            Your friends <span className="tabular-nums">{connections?.friends.length ?? 0}</span>
+            Your friends <span className="tabular-nums">{connections?.friendCount ?? connections?.friends.length ?? 0}</span>
           </h2>
         )}
 
@@ -292,6 +330,14 @@ export const ConnectionsPage: React.FC<{
               )
             })}
           </ul>
+        )}
+        {!loading && tab === 'friends' && connections?.nextFriendsOffset != null && (
+          <LoadMoreButton
+            label="Load more friends"
+            loading={loadingMoreFriends}
+            testId="friends-load-more"
+            onClick={() => void loadMoreFriends()}
+          />
         )}
       </div>
     </div>

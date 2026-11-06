@@ -32,6 +32,8 @@ import {
 import { SynapticEntityHud } from './SynapticEntityHud'
 import { useThreadActions, type ThreadPatch } from './useThreadActions'
 import { getAIMessagesFn, getAIThreadsFn, getUserProfileFn } from '../../lib/server/api'
+import { PAGE_SIZES } from '@/lib/pagination'
+import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
 import { streamOracleChat } from '../../lib/ai/stream-oracle-chat-client'
 import { createOracleEntityBridge, type OracleEntityBridge } from '@/lib/ai/oracle-entity-bridge'
 import { useSafeOracle, OracleMode } from '../hud/OracleContext'
@@ -95,6 +97,32 @@ const NEAR_BOTTOM_PX = 80
 
 const isAbortError = (err: unknown) =>
   (err as { name?: string } | null)?.name === 'AbortError'
+
+
+function toChatMessage(r: any, isMounted: boolean): ChatMessage {
+  return {
+    id: r.id,
+    role: r.role,
+    content: r.content,
+    timestamp:
+      r.createdAt && isMounted
+        ? new Date(r.createdAt).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        : '',
+  }
+}
+
+/**
+ * Pages are requested one message larger than shown: an extra (oldest) row means
+ * older messages remain, and the oldest shown message becomes the next cursor.
+ */
+function splitEarlierPage(rows: ChatMessage[]): { messages: ChatMessage[]; earlierCursor: string | null } {
+  if (rows.length <= PAGE_SIZES.oracleMessages) return { messages: rows, earlierCursor: null }
+  const messages = rows.slice(rows.length - PAGE_SIZES.oracleMessages)
+  return { messages, earlierCursor: messages[0]?.id ?? null }
+}
 
 export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   user: propUser,
@@ -358,6 +386,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     ? requestedModel : getOracleModel(getOracleDefaultModelId(accessTier))
 
   const [messages, setMessages] = useState<ChatMessage[]>([])
+  // Id of the oldest loaded message while older ones remain on the server.
+  const [earlierCursor, setEarlierCursor] = useState<string | null>(null)
+  const [loadingEarlier, setLoadingEarlier] = useState(false)
+  // Scroll height before older messages were prepended, so the view stays put.
+  const prependAnchorRef = useRef<number | null>(null)
   // Tracks the thread whose messages are currently owned by this pane (loaded or
   // in-flight). Always start null so a mount with an already-selected thread
   // still fetches instead of rendering a blank pane.
@@ -445,27 +478,20 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     const generation = ++loadGenerationRef.current
     loadedThreadIdRef.current = activeThreadId
     setMessages([])
+    setEarlierCursor(null)
 
     if (!userId) return
 
     void oracleAuthData(userId)
-      .then((auth) => getAIMessagesFn({ data: { threadId: activeThreadId, ...auth } }))
+      .then((auth) =>
+        getAIMessagesFn({ data: { threadId: activeThreadId, limit: PAGE_SIZES.oracleMessages + 1, ...auth } }),
+      )
       .then((records) => {
         if (generation !== loadGenerationRef.current) return
         if (Array.isArray(records) && records.length > 0) {
-          const mapped: ChatMessage[] = records.map((r: any) => ({
-            id: r.id,
-            role: r.role,
-            content: r.content,
-            timestamp:
-              r.createdAt && isMounted
-                ? new Date(r.createdAt).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })
-                : '',
-          }))
-          setMessages(mapped)
+          const page = splitEarlierPage(records.map((r: any) => toChatMessage(r, isMounted)))
+          setEarlierCursor(page.earlierCursor)
+          setMessages(page.messages)
         } else {
           setMessages([])
         }
@@ -476,6 +502,47 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         setMessages([])
       })
   }, [activeThreadId, userId, isMounted, isGuest, selectedModelId])
+
+  const loadEarlierMessages = async () => {
+    if (!earlierCursor || !activeThreadId || !userId || loadingEarlier) return
+    const threadId = activeThreadId
+    const generation = loadGenerationRef.current
+    setLoadingEarlier(true)
+    try {
+      const auth = await oracleAuthData(userId)
+      const records = await getAIMessagesFn({
+        data: { threadId, limit: PAGE_SIZES.oracleMessages + 1, before: earlierCursor, ...auth },
+      })
+      if (generation !== loadGenerationRef.current) return
+      const page = splitEarlierPage((Array.isArray(records) ? records : []).map((r: any) => toChatMessage(r, isMounted)))
+      const el = conversationRef.current
+      prependAnchorRef.current = el ? el.scrollHeight - el.scrollTop : null
+      stickToBottomRef.current = false
+      setEarlierCursor(page.earlierCursor)
+      setMessages((prev) => {
+        const seen = new Set(prev.map((m) => m.id))
+        return [...page.messages.filter((m) => !seen.has(m.id)), ...prev]
+      })
+    } catch (err) {
+      console.warn('Failed to load earlier messages:', err)
+    } finally {
+      setLoadingEarlier(false)
+    }
+  }
+
+  // A cleared pane (new chat, removed thread) has nothing earlier to load.
+  useEffect(() => {
+    if (messages.length === 0 && earlierCursor) setEarlierCursor(null)
+  }, [messages.length, earlierCursor])
+
+  // After older messages land above, keep the same message under the reader's eye.
+  useLayoutEffect(() => {
+    const anchor = prependAnchorRef.current
+    const el = conversationRef.current
+    if (anchor == null || !el) return
+    prependAnchorRef.current = null
+    el.scrollTop = el.scrollHeight - anchor
+  }, [messages])
 
   // Keep the message pane pinned to the latest turn without scrolling outer HUD containers.
   const scrollConversationToBottom = useCallback((behavior: ScrollBehavior = 'auto') => {
@@ -981,6 +1048,15 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                       aria-busy={isSending}
                     >
                       <ConversationContent>
+                        {earlierCursor && (
+                          <LoadMoreButton
+                            label="Load earlier messages"
+                            loading={loadingEarlier}
+                            testId="oracle-load-earlier"
+                            className="pb-2"
+                            onClick={() => void loadEarlierMessages()}
+                          />
+                        )}
                         {messages.map((msg) => {
                           const isAssistant = msg.role === 'assistant'
                           const isStreamingThis = isSending && msg.id === lastAssistantId

@@ -52,6 +52,9 @@ import { verifyAuthJWT } from '../jwt'
 
 
 /** Resolves like a finished query and also supports a trailing `.limit()`. */
+/** Raw page query result: one top-level reply, so the reply select (mocked per test) runs. */
+const ONE_REPLY_PAGE = { rows: [{ id: '30000000-0000-0000-0000-000000000001', rootCount: 1, isRoot: true }] }
+
 function limitable<T>(rows: T) {
   return Object.assign(Promise.resolve(rows), { limit: vi.fn().mockResolvedValue(rows) })
 }
@@ -348,6 +351,7 @@ describe('Forum Server Handlers', () => {
     }))
 
     const mockDb = {
+      execute: vi.fn().mockResolvedValue(ONE_REPLY_PAGE),
       select: vi.fn().mockImplementation(() => {
         selectCall += 1
         if (selectCall === 1) {
@@ -672,6 +676,7 @@ describe('Forum Server Handlers', () => {
 
     let selectCall = 0
     const mockDb = {
+      execute: vi.fn().mockResolvedValue(ONE_REPLY_PAGE),
       select: vi.fn().mockImplementation(() => {
         selectCall += 1
         if (selectCall === 1) {
@@ -768,6 +773,7 @@ describe('Forum Server Handlers', () => {
   it('keeps seed reply attribution when the row has no member id', async () => {
     let selectCall = 0
     const mockDb = {
+      execute: vi.fn().mockResolvedValue(ONE_REPLY_PAGE),
       select: vi.fn().mockImplementation(() => {
         selectCall += 1
         if (selectCall === 1) {
@@ -1013,6 +1019,7 @@ describe('Forum Server Handlers', () => {
         }
       }),
       update: vi.fn(),
+      execute: vi.fn().mockResolvedValue(ONE_REPLY_PAGE),
     }
 
     const detail = await getForumTopicDetailHandler({
@@ -1560,6 +1567,7 @@ describe('Forum author edit and soft-delete', () => {
   it('hides withdrawn bodies when reading a thread', async () => {
     let selectCall = 0
     const mockDb = {
+      execute: vi.fn().mockResolvedValue(ONE_REPLY_PAGE),
       select: vi.fn().mockImplementation(() => {
         selectCall += 1
         if (selectCall === 1) {
@@ -1631,6 +1639,7 @@ describe('Forum author edit and soft-delete', () => {
 
     let selectCall = 0
     const mockDb = {
+      execute: vi.fn().mockResolvedValue(ONE_REPLY_PAGE),
       select: vi.fn().mockImplementation(() => {
         selectCall += 1
         if (selectCall === 1) {
@@ -1713,6 +1722,7 @@ describe('Forum author edit and soft-delete', () => {
     const insert = vi.fn()
     let selectCall = 0
     const mockDb = {
+      execute: vi.fn().mockResolvedValue(ONE_REPLY_PAGE),
       select: vi.fn().mockImplementation(() => {
         selectCall += 1
         if (selectCall === 1) {
@@ -2021,34 +2031,9 @@ describe('Forum author edit and soft-delete', () => {
             }),
           }
         }
-        if (selectCall === 3) {
-          return {
-            from: vi.fn().mockReturnValue({
-              where: vi.fn().mockResolvedValue([
-                {
-                  id: '20000000-0000-0000-0000-000000000001',
-                  categoryId: category.id,
-                  lastReplyAt: new Date('2026-09-06T12:00:00.000Z'),
-                  createdAt: new Date('2026-09-01T12:00:00.000Z'),
-                },
-              ]),
-            }),
-          }
-        }
-        if (selectCall === 4) {
-          return {
-            from: vi.fn().mockReturnValue({
-              where: vi.fn().mockResolvedValue([
-                {
-                  topicId: '20000000-0000-0000-0000-000000000001',
-                  lastVisitedAt: new Date('2026-09-06T10:00:00.000Z'),
-                },
-              ]),
-            }),
-          }
-        }
         return { from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }) }
       }),
+      execute: vi.fn().mockResolvedValue({ rows: [{ categoryId: category.id, count: 1 }] }),
     }
 
     const signedIn = await getForumCategoriesHandler({
@@ -2141,6 +2126,7 @@ describe('forum category slug aliases', () => {
   it('loads a rules thread when the URL uses the name-guessed board slug', async () => {
     let selectCall = 0
     const mockDb = {
+      execute: vi.fn().mockResolvedValue(ONE_REPLY_PAGE),
       select: vi.fn().mockImplementation(() => {
         selectCall += 1
         if (selectCall === 1) {
@@ -2212,6 +2198,7 @@ describe('forum category slug aliases', () => {
 
   it('still rejects a thread under a different live board', async () => {
     const mockDb = {
+      execute: vi.fn().mockResolvedValue(ONE_REPLY_PAGE),
       select: vi.fn().mockImplementation(() => ({
         from: vi.fn().mockReturnValue({
           leftJoin: vi.fn().mockReturnValue({

@@ -26,6 +26,7 @@ import { ForumFlagControl } from '@/components/forum/ForumFlagControl'
 import { ForumEditor } from '@/components/forum/ForumEditor'
 import {
   getForumTopicDetailFn,
+  getForumRepliesFn,
   updateForumTopicFn,
   deleteForumTopicFn,
   ForumPostEntry,
@@ -34,6 +35,8 @@ import {
 import { getAuthJWTToken } from '@/lib/jwt'
 import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
 import { relativeTime, buildForumPostTree, type ForumReplySort } from '@/lib/forum-utils'
+import { mergeById } from '@/lib/pagination'
+import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
@@ -140,6 +143,7 @@ function ForumThreadPage() {
   const userId = session.userId
   const [detail, setDetail] = useState(loader)
   const [replySort, setReplySort] = useState<ForumReplySort>('oldest')
+  const [repliesLoading, setRepliesLoading] = useState(false)
   const [replyingToId, setReplyingToId] = useState<string | null>(null)
   const [replyQuote, setReplyQuote] = useState('')
   const [editingTopic, setEditingTopic] = useState(false)
@@ -188,6 +192,46 @@ function ForumThreadPage() {
 
   const posts = detail?.posts ?? []
   const topic = detail?.topic
+  const nextReplyOffset = detail?.nextReplyOffset ?? null
+
+  /** Loads the next page of replies, or (on a sort change while partial) the first page in the new order. */
+  const loadReplies = async (sort: ForumReplySort, offset: number) => {
+    if (!detail) return
+    setRepliesLoading(true)
+    try {
+      const token = userId ? await getAuthJWTToken() : null
+      const page = await getForumRepliesFn({
+        data: {
+          topicId: detail.topic.id,
+          sort,
+          offset,
+          ...(userId ? { userId, token: token ?? undefined } : {}),
+        },
+      })
+      if (userId) syncForumVotesFromServer(userId, page.posts)
+      setDetail((current) =>
+        current
+          ? {
+              ...current,
+              posts: offset === 0 ? page.posts : mergeById(current.posts, page.posts),
+              nextReplyOffset: page.nextOffset,
+            }
+          : current,
+      )
+    } catch {
+      toast?.toast.error('Could not load more replies. Try again.')
+    } finally {
+      setRepliesLoading(false)
+    }
+  }
+
+  const changeReplySort = (sort: ForumReplySort) => {
+    if (sort === replySort) return
+    setReplySort(sort)
+    // With every reply loaded the tree re-sorts locally; otherwise the server
+    // picks which replies come first in the new order.
+    if (nextReplyOffset !== null) void loadReplies(sort, 0)
+  }
 
   const postTree = useMemo(
     () => buildForumPostTree(posts as ForumPostEntry[], replySort),
@@ -226,6 +270,7 @@ function ForumThreadPage() {
 
   const handlePosted = (post: ForumPostEntry) => {
     setDetail({
+      ...detail,
       topic: { ...topic, repliesCount: topic.repliesCount + 1, lastReplyAt: new Date().toISOString() },
       posts: [...posts, post],
     })
@@ -606,7 +651,7 @@ function ForumThreadPage() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-xs sm:text-sm font-grotesk font-bold uppercase tracking-[0.08em] text-ink flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-cyan-glow" />
-                  <span>{posts.length} Comments</span>
+                  <span>{nextReplyOffset === null ? posts.length : Math.max(topic.repliesCount, posts.length)} Comments</span>
                 </h2>
                 {posts.length > 0 && (
                   <div
@@ -619,7 +664,9 @@ function ForumThreadPage() {
                       <button
                         key={opt.id}
                         type="button"
-                        onClick={() => setReplySort(opt.id)}
+                        onClick={() => changeReplySort(opt.id)}
+                        aria-pressed={replySort === opt.id}
+                        disabled={repliesLoading}
                         className={`px-2 py-1 font-bold uppercase tracking-[0.08em] rounded-t-control border-b-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                           replySort === opt.id
                             ? 'bg-surface-2 text-ink border-cyan-glow'
@@ -659,6 +706,14 @@ function ForumThreadPage() {
                       quoteDraft={replyQuote}
                     />
                   ))}
+                  {nextReplyOffset !== null && (
+                    <LoadMoreButton
+                      label="Load more replies"
+                      loading={repliesLoading}
+                      testId="forum-replies-load-more"
+                      onClick={() => void loadReplies(replySort, nextReplyOffset)}
+                    />
+                  )}
                 </div>
               )}
             </section>

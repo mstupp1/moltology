@@ -32,6 +32,7 @@ vi.mock('@/lib/server/api', () => ({
   getPublicProfileFn: vi.fn().mockReturnValue(new Promise(() => {})),
   getMemberLoadoutFn: vi.fn().mockReturnValue(new Promise(() => {})),
   listConnectionsFn: vi.fn().mockResolvedValue({ incoming: [{ userId: 'a' }], friends: [], sent: [] }),
+  countPendingFriendRequestsFn: vi.fn().mockResolvedValue({ incoming: 1 }),
 }))
 
 vi.mock('@/components/hud/ActivityStreamPage', () => ({

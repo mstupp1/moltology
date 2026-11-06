@@ -1,5 +1,5 @@
-import { and, desc, eq, inArray, like, lt, or } from 'drizzle-orm'
-import { activityEvents, aiThreads, friendships, profiles, type ActivityEventMetadata } from '../../db/schema'
+import { and, desc, eq, inArray, like, lt, or, sql } from 'drizzle-orm'
+import { activityEvents, aiThreads, profiles, type ActivityEventMetadata } from '../../db/schema'
 import { getDb } from '../../db'
 import { CANONICAL_ALIGNMENT_TASKS, TOTAL_ALIGNMENT_TASKS } from '../alignment-tasks'
 import { resolveMemberPublicName } from '../member-handle'
@@ -55,18 +55,6 @@ export interface ActivityFeedQuery {
   filter?: ActivityFeedFilter
   limit?: number
   cursor?: string | null
-}
-
-async function listFriendIdsForUser(dbClient: Db, userId: string): Promise<string[]> {
-  const rows = await dbClient
-    .select({
-      userAId: friendships.userAId,
-      userBId: friendships.userBId,
-    })
-    .from(friendships)
-    .where(or(eq(friendships.userAId, userId), eq(friendships.userBId, userId)))
-
-  return (rows || []).map((row) => (row.userAId === userId ? row.userBId : row.userAId))
 }
 
 async function insertActivityEvent(
@@ -376,16 +364,16 @@ export async function listActivityFeed(
   const kindFilter = kindsForActivityFilter(filter)
   const cursor = query.cursor ? decodeActivityCursor(query.cursor) : null
 
-  let audienceIds = [viewerId]
-  if (scope === 'circle') {
-    const friendIds = await listFriendIdsForUser(dbClient, viewerId)
-    if (friendIds.length === 0) {
-      return { events: [], nextCursor: null }
-    }
-    audienceIds = friendIds
-  }
-
-  const conditions = [inArray(activityEvents.userId, audienceIds)]
+  // Circle reads friends through a subquery so the feed never ships every friend id.
+  const conditions = [
+    scope === 'circle'
+      ? sql`EXISTS (
+          SELECT 1 FROM friendships f
+          WHERE (f."userAId" = ${viewerId} AND f."userBId" = ${activityEvents.userId})
+             OR (f."userBId" = ${viewerId} AND f."userAId" = ${activityEvents.userId})
+        )`
+      : eq(activityEvents.userId, viewerId),
+  ]
 
   if (scope === 'circle') {
     conditions.push(inArray(activityEvents.visibility, ['friends', 'public']))

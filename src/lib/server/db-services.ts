@@ -11,6 +11,8 @@ import { changelogs, profiles, users, userStats, routines, routineCompletions, r
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, notInArray, isNull, getTableColumns } from 'drizzle-orm'
 import { union } from 'drizzle-orm/pg-core'
+import { MAX_PAGE_SIZE, PAGE_SIZES, clampOffset, clampPageSize, nextOffsetFor, takePage } from '../pagination'
+import { olderThanRow } from './keyset'
 import type { ChangelogEntry } from '../changelogs-data'
 import { tryCheckGemMilestones } from './gems'
 import { STARTER_EQUIPMENT_CATALOG_IDS } from '../equipment-seed-data'
@@ -49,6 +51,7 @@ import {
   slugifyForumTitle,
   compareHot,
   FORUM_REPLY_MAX_DEPTH,
+  type ForumReplySort,
   toForumIso,
   visibleForumContent,
   forumCategoryLookupSlugs,
@@ -61,7 +64,6 @@ import {
   FORUM_TOPIC_PREVIEW_CHARS,
 } from '../forum-utils'
 import {
-  countUnreadForumTopics,
   topicHasUnreadActivity,
   type ForumVisitMaps,
 } from '../forum-visits'
@@ -465,6 +467,10 @@ interface GetAIMessagesInput {
   threadId: string
   userId?: string
   token?: string
+  /** Newest messages to return (oldest first). Omit for the whole thread. */
+  limit?: number
+  /** Message id: return only messages older than this one. */
+  before?: string
 }
 
 /**
@@ -476,7 +482,13 @@ export const getAIMessagesHandler = async ({ data, context }: ServerFnArgs<GetAI
   if (!auth) return []
   try {
     const { getAIThreadMessages } = await import('../ai/service')
-    const msgs = await getAIThreadMessages(data.threadId, auth.userId)
+    const msgs =
+      data.limit || data.before
+        ? await getAIThreadMessages(data.threadId, auth.userId, {
+            limit: clampPageSize(data.limit, PAGE_SIZES.oracleMessages),
+            before: data.before,
+          })
+        : await getAIThreadMessages(data.threadId, auth.userId)
     return msgs.map((m: any) => ({
       id: m.id,
       threadId: m.threadId,
@@ -726,7 +738,20 @@ export interface CreateBlogCommentInput {
 /**
  * Server Function: Get comments for a blog post.
  */
-export const getBlogCommentsHandler = async ({ data: postId, context }: ServerFnArgs<string>): Promise<BlogCommentEntry[]> => {
+export interface GetBlogCommentsInput {
+  postId: string
+  /** Newest comments to return. Omit for every comment. */
+  limit?: number
+  /** Comment id: return only comments older than this one. */
+  before?: string
+}
+
+export const getBlogCommentsHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<string | GetBlogCommentsInput>): Promise<BlogCommentEntry[]> => {
+  const input: GetBlogCommentsInput = typeof data === 'string' ? { postId: data } : (data ?? { postId: '' })
+  const postId = input.postId
   if (!postId) return []
   const dbClient = context?.db || getDb()
   try {
@@ -745,8 +770,14 @@ export const getBlogCommentsHandler = async ({ data: postId, context }: ServerFn
       })
       .from(blogComments)
       .leftJoin(profiles, eq(blogComments.userId, profiles.id))
-      .where(eq(blogComments.postId, postId))
-      .orderBy(desc(blogComments.createdAt))
+      .where(
+        and(
+          eq(blogComments.postId, postId),
+          input.before ? olderThanRow(blogComments, blogComments.createdAt, blogComments.id, input.before) : undefined,
+        ),
+      )
+      .orderBy(desc(blogComments.createdAt), desc(blogComments.id))
+      .limit(input.limit ? clampPageSize(input.limit, PAGE_SIZES.blogComments) : MAX_PAGE_SIZE * 10)
 
     return records.map((r: any) => ({
       id: r.id,
@@ -1083,25 +1114,36 @@ export async function persistForumBoardVisit(
   }
 }
 
-async function fetchCategoryTopicActivity(
+/**
+ * Unread topic counts per board for one member, computed in SQL so the forum
+ * never loads every topic id. Same rule as `isForumTopicUnread`: a topic is
+ * unread when its latest activity is after the member's topic visit, else after
+ * their first look at the board, else (no look at either) always.
+ */
+async function countUnreadTopicsByCategory(
   dbClient: Db,
+  userId: string,
   categoryIds: string[],
-): Promise<Array<{ id: string; categoryId: string; lastReplyAt: Date | null; createdAt: Date | null }>> {
-  if (categoryIds.length === 0) return []
+): Promise<Map<string, number>> {
+  const counts = new Map<string, number>()
+  if (!userId || categoryIds.length === 0) return counts
   try {
-    return await dbClient
-      .select({
-        id: forumTopics.id,
-        categoryId: forumTopics.categoryId,
-        lastReplyAt: forumTopics.lastReplyAt,
-        createdAt: forumTopics.createdAt,
-      })
-      .from(forumTopics)
-      .where(inArray(forumTopics.categoryId, categoryIds))
+    const result = await dbClient.execute(sql`
+      SELECT t."categoryId" AS "categoryId", count(*)::int AS "count"
+      FROM forum_topics t
+      LEFT JOIN forum_topic_visits tv ON tv."topicId" = t."id" AND tv."userId" = ${userId}
+      LEFT JOIN forum_board_visits bv ON bv."categoryId" = t."categoryId" AND bv."userId" = ${userId}
+      WHERE t."categoryId" IN (${sql.join(categoryIds.map((id) => sql`${id}::uuid`), sql`, `)})
+        AND GREATEST(t."lastReplyAt", t."createdAt") IS NOT NULL
+        AND GREATEST(t."lastReplyAt", t."createdAt") > COALESCE(tv."lastVisitedAt", bv."lastVisitedAt", '-infinity'::timestamp)
+      GROUP BY t."categoryId"
+    `)
+    const rows = result.rows as Array<{ categoryId: string; count: number }>
+    for (const row of rows) counts.set(String(row.categoryId), Number(row.count) || 0)
   } catch (err) {
-    console.warn('[fetchCategoryTopicActivity] failed:', err)
-    return []
+    console.warn('[countUnreadTopicsByCategory] failed:', err)
   }
+  return counts
 }
 
 /**
@@ -1143,14 +1185,8 @@ export const getForumCategoryBySlugHandler = async ({
       }
 
       if (currentUserId) {
-        const activity = await fetchCategoryTopicActivity(dbClient, [cat.id])
-        const visits = await fetchForumVisitMaps(
-          dbClient,
-          currentUserId,
-          activity.map((row) => row.id),
-          [cat.id],
-        )
-        entry.unreadCount = countUnreadForumTopics(activity, visits, cat.id)
+        const unread = await countUnreadTopicsByCategory(dbClient, currentUserId, [cat.id])
+        entry.unreadCount = unread.get(cat.id) ?? 0
         await persistForumBoardVisit(dbClient, currentUserId, cat.id)
       }
 
@@ -1220,16 +1256,10 @@ export const getForumCategoriesHandler = async ({
 
       if (currentUserId) {
         const categoryIds = entries.map((entry) => entry.id)
-        const activity = await fetchCategoryTopicActivity(dbClient, categoryIds)
-        const visits = await fetchForumVisitMaps(
-          dbClient,
-          currentUserId,
-          activity.map((row) => row.id),
-          categoryIds,
-        )
+        const unread = await countUnreadTopicsByCategory(dbClient, currentUserId, categoryIds)
         return entries.map((entry) => ({
           ...entry,
-          unreadCount: countUnreadForumTopics(activity, visits, entry.id),
+          unreadCount: unread.get(entry.id) ?? 0,
         }))
       }
 
@@ -1250,6 +1280,8 @@ export interface GetForumTopicsInput {
   sortBy?: 'latest' | 'top' | 'active' | 'hot'
   /** Rows to return, capped at FORUM_TOPIC_LIST_LIMIT. */
   limit?: number
+  /** Rows to skip, for "Load more". Default 0. */
+  offset?: number
   userId?: string
   /** Neon Auth JWT so vote state can hydrate for the current initiate. */
   token?: string
@@ -1262,7 +1294,9 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
   const dbClient = context?.db || getDb()
   const { categorySlug, query, sortBy = 'hot' } = data || {}
   const limit = Math.min(Math.max(data?.limit ?? FORUM_TOPIC_LIST_LIMIT, 1), FORUM_TOPIC_LIST_LIMIT)
+  const offset = clampOffset(data?.offset)
   const currentUserId = await resolveForumReaderId(data, context)
+  const page = <Q extends { offset: (n: number) => unknown }>(q: Q) => (offset > 0 ? q.offset(offset) : q)
 
   try {
     const queryBuilder = dbClient
@@ -1313,17 +1347,19 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
       finalQuery = finalQuery.where(sql.join(conditions, sql` AND `)) as any
     }
 
+    // `id` breaks ties so offset pages never repeat or skip a topic.
     if (sortBy === 'top') {
-      finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.upvotes), desc(forumTopics.createdAt)).limit(limit) as any
+      finalQuery = page(finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.upvotes), desc(forumTopics.createdAt), desc(forumTopics.id)).limit(limit) as any) as any
     } else if (sortBy === 'active') {
-      finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.lastReplyAt)).limit(limit) as any
+      finalQuery = page(finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.lastReplyAt), desc(forumTopics.id)).limit(limit) as any) as any
     } else if (sortBy === 'latest') {
-      finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.createdAt)).limit(limit) as any
+      finalQuery = page(finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.createdAt), desc(forumTopics.id)).limit(limit) as any) as any
     } else {
-      // 'hot' ranks in JS, over a pool of the most recently active topics.
+      // 'hot' ranks in JS, over a pool of the most recently active topics that
+      // grows with the page so "Load more" can reach past the first pool.
       finalQuery = finalQuery
-        .orderBy(desc(forumTopics.isPinned), desc(forumTopics.lastReplyAt))
-        .limit(FORUM_HOT_CANDIDATE_POOL) as any
+        .orderBy(desc(forumTopics.isPinned), desc(forumTopics.lastReplyAt), desc(forumTopics.id))
+        .limit(Math.max(FORUM_HOT_CANDIDATE_POOL, offset + limit)) as any
     }
 
     let records = await finalQuery
@@ -1338,7 +1374,7 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
                 discoveryEligible: row.discoveryEligible,
               }),
             )
-      records = [...ranked].sort(compareHot as any).slice(0, limit)
+      records = [...ranked].sort(compareHot as any).slice(offset, offset + limit)
     }
 
     if (records && records.length > 0) {
@@ -1424,18 +1460,173 @@ export interface GetForumTopicDetailInput {
   token?: string
   /** When false, skip the view counter bump (client vote-state hydration). Default true. */
   trackView?: boolean
+  /** Order of the first page of top-level replies. Default oldest. */
+  replySort?: ForumReplySort
+  /** Top-level replies on the first page (their nested replies come with them). */
+  replyLimit?: number
 }
 
 export interface ForumTopicDetailResult {
   topic: ForumTopicEntry
+  /** First page of replies: top-level replies plus every nested reply under them. */
   posts: ForumPostEntry[]
+  /** Offset of the next page of top-level replies, or null when all are loaded. */
+  nextReplyOffset?: number | null
+}
+
+export interface GetForumRepliesInput {
+  topicId: string
+  sort?: ForumReplySort
+  offset?: number
+  limit?: number
+  userId?: string
+  token?: string
+}
+
+export interface ForumReplyPage {
+  posts: ForumPostEntry[]
+  nextOffset: number | null
+}
+
+/**
+ * One page of a topic's replies. Pages are cut on top-level replies, ordered the
+ * same way the thread sorts siblings (sunk last, then the chosen sort), and each
+ * top-level reply brings its whole nested subtree so threads never split across
+ * pages. Replies whose parent no longer exists count as top-level, matching
+ * `buildForumPostTree`.
+ */
+export async function loadForumReplyPage(
+  dbClient: Db,
+  topicId: string,
+  opts: { sort?: ForumReplySort; offset?: number; limit?: number },
+): Promise<ForumReplyPage> {
+  const sort: ForumReplySort = opts.sort === 'newest' || opts.sort === 'top' ? opts.sort : 'oldest'
+  const offset = clampOffset(opts.offset)
+  const limit = clampPageSize(opts.limit, PAGE_SIZES.forumReplies)
+
+  const order =
+    sort === 'newest'
+      ? sql`p."sunk" ASC, p."createdAt" DESC, p."id" DESC`
+      : sort === 'top'
+        ? sql`p."sunk" ASC, p."upvotes" DESC, p."createdAt" ASC, p."id" ASC`
+        : sql`p."sunk" ASC, p."createdAt" ASC, p."id" ASC`
+
+  // One round trip: rank this page's top-level replies (plus one to detect a next
+  // page), then walk each one's nested replies down to the depth cap.
+  const page = await dbClient.execute(sql`
+    WITH RECURSIVE roots AS (
+      SELECT p."id", row_number() OVER (ORDER BY ${order}) AS rn
+      FROM forum_posts p
+      WHERE p."topicId" = ${topicId}
+        AND (p."parentId" IS NULL OR NOT EXISTS (
+          SELECT 1 FROM forum_posts parent WHERE parent."id" = p."parentId" AND parent."topicId" = p."topicId"
+        ))
+      ORDER BY ${order}
+      LIMIT ${limit + 1} OFFSET ${offset}
+    ),
+    thread AS (
+      SELECT r."id", 0 AS depth FROM roots r WHERE r.rn <= ${offset + limit}
+      UNION
+      SELECT child."id", thread.depth + 1 FROM forum_posts child
+      JOIN thread ON child."parentId" = thread."id"
+      WHERE child."topicId" = ${topicId} AND thread.depth < ${FORUM_REPLY_MAX_DEPTH}
+    )
+    SELECT thread."id" AS "id", (SELECT count(*) FROM roots)::int AS "rootCount", (thread.depth = 0) AS "isRoot"
+    FROM thread
+  `)
+  const pageRows = (page.rows ?? []) as Array<{ id: string; rootCount: number; isRoot: boolean }>
+  if (pageRows.length === 0) return { posts: [], nextOffset: null }
+
+  const rootCount = Number(pageRows[0].rootCount) || 0
+  const rootsOnPage = pageRows.filter((row) => row.isRoot).length
+  const hasMore = rootCount > limit
+  const postIds = [...new Set(pageRows.map((row) => String(row.id)))]
+
+  const postsRecords = await dbClient
+    .select({
+      id: forumPosts.id,
+      topicId: forumPosts.topicId,
+      parentId: forumPosts.parentId,
+      userId: forumPosts.userId,
+      authorName: forumPosts.authorName,
+      authorAvatar: forumPosts.authorAvatar,
+      authorStage: forumPosts.authorStage,
+      content: forumPosts.content,
+      upvotes: forumPosts.upvotes,
+      sunk: forumPosts.sunk,
+      createdAt: forumPosts.createdAt,
+      updatedAt: forumPosts.updatedAt,
+      deletedAt: forumPosts.deletedAt,
+      profileHandle: profiles.handle,
+      profileLarvaId: profiles.larvaId,
+      profileStage: profiles.stage,
+      profileAvatarConfig: publicAvatarConfig,
+    })
+    .from(forumPosts)
+    .leftJoin(profiles, eq(forumPosts.userId, profiles.id))
+    .where(and(eq(forumPosts.topicId, topicId), inArray(forumPosts.id, postIds)))
+    .orderBy(asc(forumPosts.createdAt), asc(forumPosts.id))
+
+  const posts: ForumPostEntry[] = postsRecords.map((p: any) => ({
+    id: p.id,
+    topicId: p.topicId,
+    parentId: p.parentId ?? null,
+    userId: p.userId,
+    authorName: resolveMemberPublicName({
+      userId: p.userId,
+      handle: p.profileHandle,
+      larvaId: p.profileLarvaId ?? p.authorName,
+    }),
+    authorHandle: (p.profileHandle as string | null | undefined)?.trim() || null,
+    authorAvatar: p.authorAvatar,
+    authorAvatarConfig: p.profileAvatarConfig ?? null,
+    authorStage: p.profileStage ?? p.authorStage,
+    content: visibleForumContent(p.content, p.deletedAt),
+    upvotes: p.upvotes,
+    sunk: Boolean(p.sunk),
+    createdAt: forumIsoOrNow(p.createdAt),
+    updatedAt: forumIsoOrNow(p.updatedAt ?? p.createdAt),
+    deletedAt: toForumIso(p.deletedAt),
+  }))
+
+  return { posts, nextOffset: nextOffsetFor(offset, rootsOnPage, hasMore) }
+}
+
+/** Marks which of `posts` the member has upvoted. */
+async function withPostVotes(dbClient: Db, userId: string | null | undefined, posts: ForumPostEntry[]): Promise<ForumPostEntry[]> {
+  if (!userId || posts.length === 0) return posts
+  const votedIds = await fetchVotedPostIds(dbClient, userId, posts.map((p) => p.id))
+  return posts.map((p) => ({ ...p, voted: votedIds.has(p.id) }))
+}
+
+/**
+ * Server Function: the next page of a topic's replies (see `loadForumReplyPage`).
+ */
+export const getForumRepliesHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<GetForumRepliesInput>): Promise<ForumReplyPage> => {
+  if (!data?.topicId) return { posts: [], nextOffset: null }
+  const currentUserId = await resolveForumReaderId(data, context)
+  const dbClient = context?.db || getDb()
+  try {
+    const page = await loadForumReplyPage(dbClient, data.topicId, {
+      sort: data.sort,
+      offset: data.offset,
+      limit: data.limit,
+    })
+    return { ...page, posts: await withPostVotes(dbClient, currentUserId, page.posts) }
+  } catch (err) {
+    console.error('[getForumRepliesFn] DB query failed:', err)
+    return { posts: [], nextOffset: null }
+  }
 }
 
 /**
  * Server Function: Get single topic detail with posts and increment view count.
  */
 export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs<GetForumTopicDetailInput>): Promise<ForumTopicDetailResult | null> => {
-  const { slugOrId, categorySlug, trackView = true } = data || {}
+  const { slugOrId, categorySlug, trackView = true, replySort, replyLimit } = data || {}
   if (!slugOrId) return null
   const currentUserId = await resolveForumReaderId(data, context)
   const dbClient = context?.db || getDb()
@@ -1493,31 +1684,11 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
           .catch((err: any) => console.warn('[getForumTopicDetailFn] View count update error:', err))
       }
 
-      // Fetch posts / replies
-      const postsRecords = await dbClient
-        .select({
-          id: forumPosts.id,
-          topicId: forumPosts.topicId,
-          parentId: forumPosts.parentId,
-          userId: forumPosts.userId,
-          authorName: forumPosts.authorName,
-          authorAvatar: forumPosts.authorAvatar,
-          authorStage: forumPosts.authorStage,
-          content: forumPosts.content,
-          upvotes: forumPosts.upvotes,
-          sunk: forumPosts.sunk,
-          createdAt: forumPosts.createdAt,
-          updatedAt: forumPosts.updatedAt,
-          deletedAt: forumPosts.deletedAt,
-          profileHandle: profiles.handle,
-          profileLarvaId: profiles.larvaId,
-          profileStage: profiles.stage,
-          profileAvatarConfig: publicAvatarConfig,
-        })
-        .from(forumPosts)
-        .leftJoin(profiles, eq(forumPosts.userId, profiles.id))
-        .where(eq(forumPosts.topicId, t.id))
-        .orderBy(forumPosts.createdAt)
+      const replyPage = await loadForumReplyPage(dbClient, t.id, {
+        sort: replySort,
+        offset: 0,
+        limit: replyLimit,
+      })
 
       if (currentUserId) {
         await persistForumTopicVisit(dbClient, currentUserId, t.id, t.categoryId)
@@ -1526,33 +1697,6 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
       const topicVoted = currentUserId
         ? (await fetchVotedTopicIds(dbClient, currentUserId, [t.id])).has(t.id)
         : false
-
-      const posts: ForumPostEntry[] = postsRecords.map((p: any) => ({
-        id: p.id,
-        topicId: p.topicId,
-        parentId: p.parentId ?? null,
-        userId: p.userId,
-        authorName: resolveMemberPublicName({
-          userId: p.userId,
-          handle: p.profileHandle,
-          larvaId: p.profileLarvaId ?? p.authorName,
-        }),
-        authorHandle: (p.profileHandle as string | null | undefined)?.trim() || null,
-        authorAvatar: p.authorAvatar,
-        authorAvatarConfig: p.profileAvatarConfig ?? null,
-        authorStage: p.profileStage ?? p.authorStage,
-        content: visibleForumContent(p.content, p.deletedAt),
-        upvotes: p.upvotes,
-        sunk: Boolean(p.sunk),
-        createdAt: forumIsoOrNow(p.createdAt),
-        updatedAt: forumIsoOrNow(p.updatedAt ?? p.createdAt),
-        deletedAt: toForumIso(p.deletedAt),
-      }))
-
-      let postVotedIds = new Set<string>()
-      if (currentUserId && posts.length > 0) {
-        postVotedIds = await fetchVotedPostIds(dbClient, currentUserId, posts.map((p) => p.id))
-      }
 
       return {
         topic: {
@@ -1585,10 +1729,8 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
           updatedAt: forumIsoOrNow(t.updatedAt ?? t.createdAt),
           deletedAt: toForumIso(t.deletedAt),
         },
-        posts: posts.map((p) => ({
-          ...p,
-          ...(currentUserId ? { voted: postVotedIds.has(p.id) } : {}),
-        })),
+        posts: await withPostVotes(dbClient, currentUserId, replyPage.posts),
+        nextReplyOffset: replyPage.nextOffset,
       }
     }
 
@@ -2574,6 +2716,8 @@ export interface ListForumReportsInput {
   token?: string
   status?: 'open' | 'reviewed' | 'all'
   limit?: number
+  /** Rows to skip, for "Load more". */
+  offset?: number
 }
 
 /**
@@ -2596,12 +2740,14 @@ export const listForumReportsHandler = async ({
   const maxLimit = Math.min(Math.max(data?.limit ?? 50, 1), 100)
 
   const queryCondition = filterStatus ? eq(forumReports.status, filterStatus) : undefined
-  const reports = await dbClient
+  const reportOffset = clampOffset(data?.offset)
+  const reportQuery = dbClient
     .select()
     .from(forumReports)
     .where(queryCondition)
-    .orderBy(desc(filterStatus === 'reviewed' ? forumReports.updatedAt : forumReports.createdAt))
+    .orderBy(desc(filterStatus === 'reviewed' ? forumReports.updatedAt : forumReports.createdAt), desc(forumReports.id))
     .limit(maxLimit)
+  const reports = await (reportOffset > 0 ? reportQuery.offset(reportOffset) : reportQuery)
 
   if (reports.length === 0) return []
 
@@ -4471,6 +4617,20 @@ export const searchMembersHandler = async ({
     avatarConfig: (row.avatarConfig as MemberSearchResult['avatarConfig']) ?? null,
   }))
 
+  if (mapped.length > 0) {
+    const friendRows = await auth.dbClient
+      .select({ userAId: friendships.userAId, userBId: friendships.userBId })
+      .from(friendships)
+      .where(
+        or(
+          and(eq(friendships.userAId, auth.userId), inArray(friendships.userBId, mapped.map((m) => m.id))),
+          and(eq(friendships.userBId, auth.userId), inArray(friendships.userAId, mapped.map((m) => m.id))),
+        ),
+      )
+    const friendIds = new Set(friendRows.map((row) => (row.userAId === auth.userId ? row.userBId : row.userAId)))
+    for (const member of mapped) member.isFriend = friendIds.has(member.id)
+  }
+
   return rankMemberSearchResults(query, mapped)
 }
 
@@ -4708,6 +4868,11 @@ async function selectSynapticNearby(
       and(
         uniqueExcludeIds.length > 0 ? notInArray(profiles.id, uniqueExcludeIds) : sql`true`,
         sql`NOT EXISTS (
+          SELECT 1 FROM friendships f
+          WHERE (f."userAId" = ${viewerId} AND f."userBId" = ${profiles.id})
+             OR (f."userBId" = ${viewerId} AND f."userAId" = ${profiles.id})
+        )`,
+        sql`NOT EXISTS (
           SELECT 1 FROM suggestion_dismissals d
           WHERE d."viewerId" = ${viewerId}
             AND d."dismissedUserId" = ${profiles.id}
@@ -4741,16 +4906,29 @@ export const listConnectionsHandler = async ({
   token?: string
   userId?: string
   includeSuggestions?: boolean
+  friendsOffset?: number
+  friendsLimit?: number
 }>): Promise<ConnectionsListView> => {
   const auth = await resolveWriteAuth({ data, context })
   if (!auth) throw new Error('Unauthenticated: Authentication required to list connections.')
 
-  const friendshipRows = await auth.dbClient
-    .select()
-    .from(friendships)
-    .where(or(eq(friendships.userAId, auth.userId), eq(friendships.userBId, auth.userId)))
+  const friendsOffset = clampOffset(data?.friendsOffset)
+  const friendsLimit = clampPageSize(data?.friendsLimit, PAGE_SIZES.friends)
+  const mine = or(eq(friendships.userAId, auth.userId), eq(friendships.userBId, auth.userId))
 
-  const friendIds = friendshipRows.map((row) =>
+  const [friendshipRows, [friendTotal]] = await Promise.all([
+    auth.dbClient
+      .select()
+      .from(friendships)
+      .where(mine)
+      .orderBy(desc(friendships.createdAt), desc(friendships.id))
+      .limit(friendsLimit + 1)
+      .offset(friendsOffset),
+    auth.dbClient.select({ count: sql<number>`count(*)::int` }).from(friendships).where(mine),
+  ])
+  const friendPage = takePage(friendshipRows, friendsLimit)
+
+  const friendIds = friendPage.items.map((row) =>
     row.userAId === auth.userId ? row.userBId : row.userAId
   )
 
@@ -4769,7 +4947,7 @@ export const listConnectionsHandler = async ({
           .where(inArray(profiles.id, friendIds))
 
   const friendSinceById = new Map(
-    friendshipRows.map((row) => [
+    friendPage.items.map((row) => [
       row.userAId === auth.userId ? row.userBId : row.userAId,
       row.createdAt,
     ])
@@ -4834,13 +5012,19 @@ export const listConnectionsHandler = async ({
     })
     .filter(Boolean) as ConnectionsListView['outgoing']
 
-  const friends = friendProfiles.map((p) =>
-    toMemberSummary({
-      ...p,
-      avatarConfig: (p.avatarConfig as LobsterAvatarConfig | null) ?? null,
-      since: friendSinceById.get(p.id) ?? null,
-    }),
-  )
+  const profileByFriendId = new Map(friendProfiles.map((p) => [p.id, p]))
+  // Keep newest-friendship-first order; profiles come back in arbitrary order.
+  const friends = friendIds.flatMap((id) => {
+    const p = profileByFriendId.get(id)
+    if (!p) return []
+    return [
+      toMemberSummary({
+        ...p,
+        avatarConfig: (p.avatarConfig as LobsterAvatarConfig | null) ?? null,
+        since: friendSinceById.get(p.id) ?? null,
+      }),
+    ]
+  })
 
   const pendingCounterpartIds = pendingRows.map((row) =>
     row.senderId === auth.userId ? row.recipientId : row.senderId,
@@ -4849,17 +5033,32 @@ export const listConnectionsHandler = async ({
   const suggested = data?.includeSuggestions
     ? await selectSynapticNearby(auth.dbClient, auth.userId, [
         auth.userId,
-        ...friendIds,
         ...pendingCounterpartIds,
       ])
     : undefined
 
   return {
     friends,
+    friendCount: friendTotal?.count ?? friends.length,
+    nextFriendsOffset: nextOffsetFor(friendsOffset, friendPage.items.length, friendPage.hasMore),
     incoming,
     outgoing,
     ...(suggested ? { suggested } : {}),
   }
+}
+
+/** How many friend requests are waiting on the member. Powers the sidebar badge. */
+export const countPendingFriendRequestsHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ token?: string; userId?: string }>): Promise<{ incoming: number }> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) return { incoming: 0 }
+  const [row] = await auth.dbClient
+    .select({ count: sql<number>`count(*)::int` })
+    .from(friendRequests)
+    .where(and(eq(friendRequests.status, 'pending'), eq(friendRequests.recipientId, auth.userId)))
+  return { incoming: Number(row?.count) || 0 }
 }
 
 export const dismissSynapticNearbyHandler = async ({

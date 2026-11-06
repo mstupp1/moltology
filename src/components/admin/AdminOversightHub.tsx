@@ -8,6 +8,8 @@ import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
+import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
+import { PAGE_SIZES, mergeById, takePage } from '@/lib/pagination'
 import {
   getAdminTelemetryFn,
   getMyExperimentsFn,
@@ -354,18 +356,41 @@ function MemberDirectory({
   )
 }
 
+const PURCHASE_PAGE = PAGE_SIZES.adminRows
+
 function PurchaseLedger({ userId }: { userId: string | null }) {
   const [rows, setRows] = useState<AdminPurchaseRow[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [hasMore, setHasMore] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+
+  const loadMore = async () => {
+    if (!userId || !rows) return
+    setLoadingMore(true)
+    try {
+      const next = await listAdminPurchasesFn({
+        data: { ...(await authData(userId)), limit: PURCHASE_PAGE + 1, offset: rows.length },
+      })
+      const page = takePage(next, PURCHASE_PAGE)
+      setRows((prev) => mergeById(prev ?? [], page.items))
+      setHasMore(page.hasMore)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Could not load purchases.')
+    } finally {
+      setLoadingMore(false)
+    }
+  }
 
   useEffect(() => {
     if (!userId) return
     let cancelled = false
     void (async () => {
       try {
-        const next = await listAdminPurchasesFn({ data: await authData(userId) })
+        const next = await listAdminPurchasesFn({ data: { ...(await authData(userId)), limit: PURCHASE_PAGE + 1 } })
         if (!cancelled) {
-          setRows(next)
+          const page = takePage(next, PURCHASE_PAGE)
+          setRows(page.items)
+          setHasMore(page.hasMore)
           setError(null)
         }
       } catch (err: unknown) {
@@ -414,6 +439,14 @@ function PurchaseLedger({ userId }: { userId: string | null }) {
           ))}
         </ul>
       ) : null}
+      {rows && rows.length > 0 && hasMore && (
+        <LoadMoreButton
+          label="Load more purchases"
+          loading={loadingMore}
+          testId="admin-purchases-load-more"
+          onClick={() => void loadMore()}
+        />
+      )}
     </section>
   )
 }

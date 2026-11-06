@@ -177,8 +177,16 @@ export const getAIThreadsFn = createServerFn({ method: 'POST' })
 
 export const getAIMessagesFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data: { threadId: string; userId?: string; token?: string }) =>
-    z.object({ threadId: z.string().min(1), userId: z.string().optional(), token: z.string().optional() }).parse(data)
+  .validator((data: { threadId: string; userId?: string; token?: string; limit?: number; before?: string }) =>
+    z
+      .object({
+        threadId: z.string().min(1),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+        limit: z.number().int().min(1).max(101).optional(),
+        before: z.string().uuid().optional(),
+      })
+      .parse(data)
   )
   .handler(async (args) => {
     const { getAIMessagesHandler } = await import('./db-services')
@@ -260,7 +268,17 @@ export const incrementBlogPostViewsFn = createServerFn({ method: 'POST' })
 
 export const getBlogCommentsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((postId: string) => postId)
+  .validator((data: string | { postId: string; limit?: number; before?: string }) =>
+    typeof data === 'string'
+      ? data
+      : z
+          .object({
+            postId: z.string().min(1),
+            limit: z.number().int().min(1).max(101).optional(),
+            before: z.string().uuid().optional(),
+          })
+          .parse(data),
+  )
   .handler(async (args) => {
     const { getBlogCommentsHandler } = await import('./db-services')
     return getBlogCommentsHandler(args)
@@ -327,6 +345,7 @@ export const getForumTopicsFn = createServerFn({ method: 'POST' })
     query?: string
     sortBy?: 'latest' | 'top' | 'active' | 'hot'
     limit?: number
+    offset?: number
     userId?: string
     token?: string
   }) =>
@@ -336,6 +355,7 @@ export const getForumTopicsFn = createServerFn({ method: 'POST' })
         query: z.string().max(120).optional(),
         sortBy: z.enum(['latest', 'top', 'active', 'hot']).optional(),
         limit: z.number().int().min(1).max(100).optional(),
+        offset: z.number().int().min(0).max(100_000).optional(),
         userId: z.string().optional(),
         token: z.string().optional(),
       })
@@ -354,6 +374,8 @@ export const getForumTopicDetailFn = createServerFn({ method: 'POST' })
     userId?: string
     token?: string
     trackView?: boolean
+    replySort?: 'oldest' | 'newest' | 'top'
+    replyLimit?: number
   }) =>
     z
       .object({
@@ -362,12 +384,40 @@ export const getForumTopicDetailFn = createServerFn({ method: 'POST' })
         userId: z.string().optional(),
         token: z.string().optional(),
         trackView: z.boolean().optional(),
+        replySort: z.enum(['oldest', 'newest', 'top']).optional(),
+        replyLimit: z.number().int().min(1).max(100).optional(),
       })
       .parse(data)
   )
   .handler(async (args) => {
     const { getForumTopicDetailHandler } = await import('./db-services')
     return getForumTopicDetailHandler(args)
+  })
+
+export const getForumRepliesFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: {
+    topicId: string
+    sort?: 'oldest' | 'newest' | 'top'
+    offset?: number
+    limit?: number
+    userId?: string
+    token?: string
+  }) =>
+    z
+      .object({
+        topicId: z.string().uuid(),
+        sort: z.enum(['oldest', 'newest', 'top']).optional(),
+        offset: z.number().int().min(0).max(100_000).optional(),
+        limit: z.number().int().min(1).max(100).optional(),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(async (args) => {
+    const { getForumRepliesHandler } = await import('./db-services')
+    return getForumRepliesHandler(args)
   })
 
 export const createForumTopicFn = createServerFn({ method: 'POST' })
@@ -591,13 +641,14 @@ export const createForumReportFn = createServerFn({ method: 'POST' })
 
 export const listForumReportsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data?: { userId?: string; token?: string; status?: 'open' | 'reviewed' | 'all'; limit?: number }) =>
+  .validator((data?: { userId?: string; token?: string; status?: 'open' | 'reviewed' | 'all'; limit?: number; offset?: number }) =>
     z
       .object({
         userId: z.string().optional(),
         token: z.string().optional(),
         status: z.enum(['open', 'reviewed', 'all']).optional(),
         limit: z.number().optional(),
+        offset: z.number().int().min(0).max(100_000).optional(),
       })
       .parse(data ?? {})
   )
@@ -952,18 +1003,41 @@ export const dismissSynapticNearbyFn = createServerFn({ method: 'POST' })
 
 export const listConnectionsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data?: { token?: string; userId?: string; includeSuggestions?: boolean }) =>
+  .validator((data?: {
+    token?: string
+    userId?: string
+    includeSuggestions?: boolean
+    friendsOffset?: number
+    friendsLimit?: number
+  }) =>
     z
       .object({
         token: z.string().optional(),
         userId: z.string().optional(),
         includeSuggestions: z.boolean().optional(),
+        friendsOffset: z.number().int().min(0).max(100_000).optional(),
+        friendsLimit: z.number().int().min(1).max(100).optional(),
       })
       .parse(data ?? {})
   )
   .handler(async (args) => {
     const { listConnectionsHandler } = await import('./db-services')
     return listConnectionsHandler(args)
+  })
+
+export const countPendingFriendRequestsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data?: { token?: string; userId?: string }) =>
+    z
+      .object({
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data ?? {})
+  )
+  .handler(async (args) => {
+    const { countPendingFriendRequestsHandler } = await import('./db-services')
+    return countPendingFriendRequestsHandler(args)
   })
 
 export const getNotificationsFn = createServerFn({ method: 'POST' })
@@ -1086,7 +1160,14 @@ export const setAdminMemberRoleFn = createServerFn({ method: 'POST' })
 
 export const listAdminPurchasesFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data?: { token?: string; userId?: string }) => adminAuthSchema.parse(data ?? {}))
+  .validator((data?: { token?: string; userId?: string; limit?: number; offset?: number }) =>
+    adminAuthSchema
+      .extend({
+        limit: z.number().int().min(1).max(51).optional(),
+        offset: z.number().int().min(0).max(100_000).optional(),
+      })
+      .parse(data ?? {}),
+  )
   .handler(async (args) => {
     const { listAdminPurchasesHandler } = await import('./admin-oversight')
     return listAdminPurchasesHandler(args)

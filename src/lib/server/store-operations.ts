@@ -195,8 +195,10 @@ const isPaid = inArray(merchOrders.paymentStatus, [...PAID_PAYMENT_STATUSES])
 
 export type AdminShopOrder = Awaited<ReturnType<typeof listAdminShopOrders>>['orders'][number]
 
-/** Real shop orders for the admin Shop tab. Test-mode orders are opt-in. */
-export async function listAdminShopOrders(args: StoreArgs & { data?: { token?: string; userId?: string; query?: string; filter?: ShopOrderFilter; includeTest?: boolean } }) {
+const SHOP_ORDER_PAGE = 50
+
+/** Real shop orders for the admin Shop tab, 50 per page. Test-mode orders are opt-in. */
+export async function listAdminShopOrders(args: StoreArgs & { data?: { token?: string; userId?: string; query?: string; filter?: ShopOrderFilter; includeTest?: boolean; offset?: number } }) {
   await requireStaff(args)
   const db = getDb(), query = args.data?.query?.trim().slice(0, 100), filter = args.data?.filter ?? 'attention'
   const mode = args.data?.includeTest ? undefined : eq(merchOrders.livemode, true)
@@ -205,7 +207,9 @@ export async function listAdminShopOrders(args: StoreArgs & { data?: { token?: s
     .where(and(mode,
       query ? or(ilike(sql`${merchOrders.id}::text`, `%${query}%`), ilike(merchOrders.customerEmail, `%${query}%`), ilike(merchOrders.printfulOrderId, `%${query}%`)) : undefined,
       filter === 'attention' ? needsAttention : filter === 'paid' ? isPaid : undefined,
-    )).orderBy(desc(merchOrders.createdAt)).limit(50)
+    )).orderBy(desc(merchOrders.createdAt), desc(merchOrders.id)).limit(SHOP_ORDER_PAGE + 1).offset(Math.max(args.data?.offset ?? 0, 0))
+  const hasMore = rows.length > SHOP_ORDER_PAGE
+  const pageRows = hasMore ? rows.slice(0, SHOP_ORDER_PAGE) : rows
   const [summary] = await db.select({
     paidOrders: sql<number>`count(*) filter (where ${isPaid})`.mapWith(Number),
     revenueCents: sql<number>`coalesce(sum(${merchOrders.totalCents} - ${merchOrders.refundCents}) filter (where ${isPaid}), 0)`.mapWith(Number),
@@ -213,7 +217,8 @@ export async function listAdminShopOrders(args: StoreArgs & { data?: { token?: s
   }).from(merchOrders).where(mode)
   return {
     summary: summary ?? { paidOrders: 0, revenueCents: 0, attention: 0 },
-    orders: rows.map(({ order, handle }) => ({
+    hasMore,
+    orders: pageRows.map(({ order, handle }) => ({
       id: order.id, memberHandle: handle, customerEmail: order.customerEmail, shippingAddress: order.shippingAddress,
       livemode: order.livemode, paymentStatus: order.paymentStatus, fulfillmentStatus: order.fulfillmentStatus,
       fulfillmentMode: order.fulfillmentMode, providerStatus: order.providerStatus, fulfillmentError: order.fulfillmentError,

@@ -17,11 +17,16 @@ import { getAuthJWTToken } from '@/lib/jwt'
 import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
+import { PAGE_SIZES, mergeById, takePage } from '@/lib/pagination'
+import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
+
+const TOPIC_PAGE = PAGE_SIZES.forumTopics
 
 export const Route = createFileRoute('/_hud/forum/$categorySlug/')({
   loader: async ({ params }) => {
     let category: ForumCategoryEntry | null = null
     let topics: ForumTopicEntry[] = []
+    let hasMore = false
     try {
       category = await getForumCategoryBySlugFn({ data: { slug: params.categorySlug } })
     } catch (e) {
@@ -35,11 +40,17 @@ export const Route = createFileRoute('/_hud/forum/$categorySlug/')({
       })
     }
     try {
-      topics = (await getForumTopicsFn({ data: { categorySlug: category?.slug || params.categorySlug, sortBy: 'hot' } })) || []
+      const found =
+        (await getForumTopicsFn({
+          data: { categorySlug: category?.slug || params.categorySlug, sortBy: 'hot', limit: TOPIC_PAGE + 1 },
+        })) || []
+      const page = takePage(found, TOPIC_PAGE)
+      topics = page.items
+      hasMore = page.hasMore
     } catch (e) {
       console.warn('Board loader topics error:', e)
     }
-    return { category, topics }
+    return { category, topics, hasMore }
   },
   head: ({ loaderData, params }) => {
     const category = loaderData?.category
@@ -76,6 +87,9 @@ function ForumBoardPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const [loading, setLoading] = useState(false)
+  const [hasMore, setHasMore] = useState(Boolean(loader.hasMore))
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [serverOffset, setServerOffset] = useState((loader.topics || []).length)
   const composerRef = useRef<InlineTopicComposerHandle>(null)
   const staffAccess = useHiddenPageAccess()
   const canStartTopic = !isForumStaffBoard(category?.slug ?? categorySlug) || staffAccess.canView
@@ -83,6 +97,8 @@ function ForumBoardPage() {
   useEffect(() => {
     setCategory(loader.category)
     setTopics(loader.topics || [])
+    setHasMore(Boolean(loader.hasMore))
+    setServerOffset((loader.topics || []).length)
   }, [loader])
 
   // Wait for typing to pause so each keystroke does not run a board-wide search.
@@ -116,6 +132,7 @@ function ForumBoardPage() {
               categorySlug,
               query: debouncedQuery || undefined,
               sortBy,
+              limit: TOPIC_PAGE + 1,
               ...auth,
             },
           }),
@@ -124,13 +141,18 @@ function ForumBoardPage() {
             : Promise.resolve(null),
         ])
         if (active) {
-          const next = res || []
-          if (userId) syncForumVotesFromServer(userId, next)
-          setTopics(next)
+          const page = takePage(res || [], TOPIC_PAGE)
+          if (userId) syncForumVotesFromServer(userId, page.items)
+          setTopics(page.items)
+          setHasMore(page.hasMore)
+          setServerOffset(page.items.length)
           if (nextCategory) setCategory(nextCategory)
         }
       } catch {
-        if (active) setTopics([])
+        if (active) {
+          setTopics([])
+          setHasMore(false)
+        }
       } finally {
         if (active) setLoading(false)
       }
@@ -139,6 +161,33 @@ function ForumBoardPage() {
       active = false
     }
   }, [categorySlug, sortBy, debouncedQuery, userId])
+
+  const loadMoreTopics = async () => {
+    setLoadingMore(true)
+    try {
+      const token = userId ? await getAuthJWTToken() : null
+      const auth = userId ? { userId, token: token ?? undefined } : {}
+      const res = await getForumTopicsFn({
+        data: {
+          categorySlug,
+          query: debouncedQuery || undefined,
+          sortBy,
+          limit: TOPIC_PAGE + 1,
+          offset: serverOffset,
+          ...auth,
+        },
+      })
+      const page = takePage(res || [], TOPIC_PAGE)
+      if (userId) syncForumVotesFromServer(userId, page.items)
+      setTopics((prev) => mergeById(prev, page.items))
+      setHasMore(page.hasMore)
+      setServerOffset((n) => n + page.items.length)
+    } catch {
+      // Leave the button so the member can try again.
+    } finally {
+      setLoadingMore(false)
+    }
+  }
 
   const otherCategories = INITIAL_FORUM_CATEGORIES.filter((c) => c.slug !== categorySlug)
 
@@ -290,6 +339,14 @@ function ForumBoardPage() {
                     {topics.map((topic) => (
                       <ForumTopicRow key={topic.id} topic={topic} showCategory={false} />
                     ))}
+                    {hasMore && (
+                      <LoadMoreButton
+                        label="Load more posts"
+                        loading={loadingMore}
+                        testId="forum-topics-load-more"
+                        onClick={() => void loadMoreTopics()}
+                      />
+                    )}
                   </div>
                 )}
               </div>
