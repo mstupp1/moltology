@@ -7,14 +7,12 @@ import {
   LayoutDashboard,
   BookOpen,
   Scroll,
-  FlaskConical,
   Sliders,
   Users,
   Atom,
   Search,
   LogOut,
   UserPlus,
-  UserCheck,
   LifeBuoy,
   ChevronsLeft,
   ChevronsRight,
@@ -30,6 +28,7 @@ import {
 import { getUserProfileFn } from '../../lib/server/api'
 import { getAuthJWTToken } from '../../lib/jwt'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { usePendingFriendRequests } from '@/hooks/usePendingFriendRequests'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
 import { ChromaElement, HeaderBrand, AnimatedHamburger } from '../ui'
@@ -51,7 +50,7 @@ import { HUDProgressBar } from './HUDProgressBar'
 import { HUDTaskBar } from './HUDTaskBar'
 import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 
-const GUEST_LOCKED_PATHS = new Set(['/academy', '/character', '/friends', '/member'])
+const GUEST_LOCKED_PATHS = new Set(['/academy', '/character', '/member'])
 
 export function computeNavItemHidden(
   item: { path: string; featureFlag?: FeatureFlagId },
@@ -287,6 +286,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   const session = useAuthSession()
   const user = session.user
+  const pendingFriendRequests = usePendingFriendRequests(user?.id)
   const isSessionPending = session.isPending
   const [memberAvatar, setMemberAvatar] = useState<import('@/lib/lobster-avatar').LobsterAvatarConfig | null>(null)
   const [userRole, setUserRole] = useState<string | null>(null)
@@ -362,79 +362,19 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     items: NavItem[]
   }
 
+  // One flat list: with six pages, section headings only added clicks.
+  // A group with an empty title renders without a header and never collapses.
   const navGroups: NavGroup[] = [
     {
       id: 'core',
-      title: 'MAIN',
+      title: '',
       items: [
-        {
-          id: 'hub',
-          label: 'DASHBOARD',
-          shortLabel: 'DASHBOARD',
-          icon: LayoutDashboard,
-          path: '/dashboard',
-        },
-        {
-          id: 'oracle',
-          label: 'ORACLE',
-          shortLabel: 'ORACLE',
-          icon: Atom,
-          path: '/oracle',
-        },
-        {
-          id: 'character',
-          label: 'CHARACTER',
-          shortLabel: 'CHARACTER',
-          icon: Sliders,
-          path: '/character',
-        },
-      ],
-    },
-    {
-      id: 'knowledge',
-      title: 'LEARN',
-      items: [
-        {
-          id: 'codex',
-          label: 'CODEX',
-          shortLabel: 'CODEX',
-          icon: Scroll,
-          path: '/codex',
-        },
-        {
-          id: 'academy',
-          label: 'ACADEMY',
-          shortLabel: 'ACADEMY',
-          icon: BookOpen,
-          path: '/academy',
-        },
-        {
-          id: 'stages',
-          label: 'STAGES',
-          shortLabel: 'STAGES',
-          icon: FlaskConical,
-          path: '/stages',
-        },
-      ],
-    },
-    {
-      id: 'community',
-      title: 'COMMUNITY',
-      items: [
-        {
-          id: 'forum',
-          label: 'FORUM',
-          shortLabel: 'FORUM',
-          icon: Users,
-          path: '/forum',
-        },
-        {
-          id: 'friends',
-          label: 'FRIENDS',
-          shortLabel: 'FRIENDS',
-          icon: UserCheck,
-          path: '/friends',
-        },
+        { id: 'hub', label: 'DASHBOARD', shortLabel: 'DASHBOARD', icon: LayoutDashboard, path: '/dashboard' },
+        { id: 'oracle', label: 'ORACLE', shortLabel: 'ORACLE', icon: Atom, path: '/oracle' },
+        { id: 'character', label: 'CHARACTER', shortLabel: 'CHARACTER', icon: Sliders, path: '/character' },
+        { id: 'codex', label: 'CODEX', shortLabel: 'CODEX', icon: Scroll, path: '/codex' },
+        { id: 'academy', label: 'ACADEMY', shortLabel: 'ACADEMY', icon: BookOpen, path: '/academy' },
+        { id: 'forum', label: 'FORUM', shortLabel: 'FORUM', icon: Users, path: '/forum' },
       ],
     },
   ]
@@ -505,8 +445,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   }
 
   const handleNavClick = (path: string) => {
-    setPendingRoute(path)
-    navigate({ to: path })
+    setPendingRoute(path.split('?')[0])
+    navigate(path.includes('?') ? { href: path } : { to: path })
     if (isMobileOpen) {
       closeMobileMenu()
     }
@@ -514,7 +454,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   const renderNavGroupContent = (isMobile: boolean = false) => {
     return visibleNavGroups.map((group, groupIdx) => {
-      const isOpen = !!openGroups[group.id]
+      const isFlat = !group.title
+      const isOpen = isFlat || !!openGroups[group.id]
       const isGroupActive = group.items.some(
         (item) =>
           effectiveRoute === item.path ||
@@ -598,6 +539,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
       return (
         <div key={group.id} className="border-b border-line-subtle">
+          {!isFlat && (
           <button
             onClick={() => toggleGroup(group.id)}
             className={`w-full flex items-center justify-between ${
@@ -626,6 +568,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               />
             </div>
           </button>
+          )}
 
           {/* Smooth Collapsible Section Content */}
           <div
@@ -1009,9 +952,10 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                         user={{...user, avatarConfig:memberAvatar}}
                         userRole={effectiveUserRole}
                         displayName={displayName}
-                        onNavigate={(path) => navigate({ to: path })}
+                        onNavigate={(path) => navigate(path.includes('?') ? { href: path } : { to: path })}
                         align="left"
                         openDirection="up"
+                        friendRequestCount={pendingFriendRequests}
                       />
                     </div>
                   )}
@@ -1154,11 +1098,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                         user={{...user, avatarConfig:memberAvatar}}
                         userRole={effectiveUserRole}
                         displayName={displayName}
-                        onNavigate={(path) => navigate({ to: path })}
+                        onNavigate={(path) => navigate(path.includes('?') ? { href: path } : { to: path })}
                         align="left"
                         openDirection="up"
                         trigger="row"
                         subtitle={accountSubtitle}
+                        friendRequestCount={pendingFriendRequests}
                       />
                     </div>
                   )}
@@ -1307,6 +1252,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     displayName={displayName}
                     onNavigate={(path) => handleNavClick(path)}
                     inline={true}
+                    friendRequestCount={pendingFriendRequests}
                   />
                 ) : (
                   <BenthicCTAButton

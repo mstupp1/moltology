@@ -21,9 +21,11 @@ vi.mock('@/lib/auth-client', () => ({
 }))
 
 const mockGetUserProfileFn = vi.fn().mockResolvedValue(null)
+const mockListConnectionsFn = vi.fn().mockResolvedValue({ incoming: [] })
 
 vi.mock('../../lib/server/api', () => ({
   getUserProfileFn: (...args: unknown[]) => mockGetUserProfileFn(...args),
+  listConnectionsFn: (...args: unknown[]) => mockListConnectionsFn(...args),
 }))
 
 const mockGetPremiumMembershipFn = vi.fn()
@@ -79,24 +81,27 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     vi.useRealTimers()
   })
 
-  it('renders core navigation groups and items correctly', () => {
+  it('renders one flat list of pages without section headings', () => {
     render(<HUDSidebar />)
 
-    expect(screen.getByText('MAIN')).toBeInTheDocument()
-    expect(screen.getByText('LEARN')).toBeInTheDocument()
-    expect(screen.getByText('COMMUNITY')).toBeInTheDocument()
-    expect(screen.queryByText('GEAR & SHOP')).not.toBeInTheDocument()
+    expect(screen.queryByText('MAIN')).not.toBeInTheDocument()
+    expect(screen.queryByText('LEARN')).not.toBeInTheDocument()
+    expect(screen.queryByText('COMMUNITY')).not.toBeInTheDocument()
 
     expect(screen.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
     expect(screen.getByText('ORACLE')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^CHARACTER$/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^FRIENDS$/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^ACADEMY$/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^FORUM$/i })).toBeInTheDocument()
+    // Friends lives on the profile and Stages on Character, so neither has a sidebar row.
+    expect(screen.queryByRole('button', { name: /^FRIENDS$/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^STAGES$/i })).not.toBeInTheDocument()
     // Daily alignment opens from the dashboard and the tasks menu, not the sidebar.
     expect(screen.queryByRole('button', { name: /^DAILY ALIGNMENT$/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^MARKET$/i })).not.toBeInTheDocument()
   })
 
-  it.each([['CODEX', '/codex'], ['FRIENDS', '/friends'], ['CHARACTER', '/character']])('navigates to %s on nav item click', (label, route) => {
+  it.each([['CODEX', '/codex'], ['FORUM', '/forum'], ['CHARACTER', '/character']])('navigates to %s on nav item click', (label, route) => {
     render(<HUDSidebar />)
 
     fireEvent.click(screen.getByRole('button', { name: label }))
@@ -110,21 +115,6 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     fireEvent.click(brandLogos[0])
 
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })
-  })
-
-  it('toggles section open and closed on header click', () => {
-    render(<HUDSidebar />)
-
-    const coreHeader = screen.getByRole('button', { name: /MAIN/i })
-    fireEvent.click(coreHeader)
-
-    const accordionContent = coreHeader.parentElement?.querySelector('.grid')
-    expect(accordionContent).toHaveClass('grid-rows-[0fr]')
-    expect(accordionContent).toHaveClass('opacity-0')
-
-    fireEvent.click(coreHeader)
-    expect(accordionContent).toHaveClass('grid-rows-[1fr]')
-    expect(accordionContent).toHaveClass('opacity-100')
   })
 
   it('toggles sidebar collapse with shortcut key (Cmd+B)', () => {
@@ -200,10 +190,8 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
     expect(screen.getAllByText('ORACLE').length).toBeGreaterThan(0)
     expect(screen.getAllByText('ACADEMY').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('STAGES').length).toBeGreaterThan(0)
     expect(screen.queryByText('JOURNAL')).not.toBeInTheDocument()
     expect(screen.getAllByText('CHARACTER').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('FRIENDS').length).toBeGreaterThan(0)
     expect(screen.getAllByText('FORUM').length).toBeGreaterThan(0)
     expect(screen.getAllByText('SUPPORT').length).toBeGreaterThan(0)
   })
@@ -350,6 +338,22 @@ describe('HUDSidebar Component Navigation & Animations', () => {
       expect(screen.getByText('alpha@moltology.io')).toBeInTheDocument()
     })
     expect(screen.getByRole('button', { name: /SIGN OUT/i })).toBeInTheDocument()
+  })
+
+  it('badges the account row with waiting friend requests and opens them from the menu', async () => {
+    mockListConnectionsFn.mockResolvedValueOnce({ incoming: [{ userId: 'a' }, { userId: 'b' }] })
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'test-user-1', name: 'Operative Alpha', email: 'alpha@moltology.io' } } as any,
+    } as any)
+
+    render(<HUDSidebar />)
+
+    const rows = await screen.findAllByRole('button', { name: /2 friend requests waiting/i })
+    fireEvent.click(rows[0])
+    const friends = await screen.findByRole('button', { name: /FRIENDS/ })
+    expect(friends).toHaveTextContent('2')
+    fireEvent.click(friends)
+    expect(mockNavigate).toHaveBeenCalledWith({ href: '/profile?tab=incoming' })
   })
 
   it('renders avatar skeleton placeholder while session is pending', () => {

@@ -195,7 +195,7 @@ export async function recordStageReachedEvent(
       previousStage,
       stageTitle: copy.title.replace(/^Reached\s+/, ''),
     },
-    href: '/stages',
+    href: '/character/progress',
   })
 }
 

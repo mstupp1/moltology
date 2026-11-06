@@ -51,7 +51,7 @@ function EventTitleLink({
   const parsed = parseActivityEventHref(event.href)
   if (parsed.kind === 'pipeline') {
     return (
-      <Link to="/stages" className={className}>
+      <Link to="/character/progress" className={className}>
         {children}
       </Link>
     )
@@ -72,7 +72,7 @@ function EventTitleLink({
   }
   if (parsed.kind === 'connections') {
     return (
-      <Link to="/friends" search={{ tab: 'friends' }} className={className}>
+      <Link to="/profile" search={{ tab: 'friends' }} className={className}>
         {children}
       </Link>
     )

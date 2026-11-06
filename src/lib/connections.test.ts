@@ -310,10 +310,10 @@ describe('connections helpers', () => {
     expect(resolveConnectionsTab(undefined, 1)).toBe('incoming')
     expect(resolveConnectionsTab('friends', 2)).toBe('friends')
     expect(resolveConnectionsTab('sent', 2)).toBe('sent')
-    expect(connectionsHubLocation(0)).toEqual({ to: '/friends', search: { tab: 'friends' } })
-    expect(connectionsHubLocation(1)).toEqual({ to: '/friends', search: { tab: 'incoming' } })
+    expect(connectionsHubLocation(0)).toEqual({ to: '/profile', search: { tab: 'friends' } })
+    expect(connectionsHubLocation(1)).toEqual({ to: '/profile', search: { tab: 'incoming' } })
     expect(connectionsPageLocation('incoming')).toEqual({
-      to: '/friends',
+      to: '/profile',
       search: { tab: 'incoming' },
     })
   })
@@ -528,22 +528,25 @@ describe('notifications helpers', () => {
   })
 })
 
-describe('Friends page tabs', () => {
-  it('reads feed and the connection lists from the address and ignores anything else', async () => {
-    const { parseFriendsPageTab } = await import('./connections')
-    expect(parseFriendsPageTab('feed')).toBe('feed')
-    expect(parseFriendsPageTab('incoming')).toBe('incoming')
-    expect(parseFriendsPageTab('sent')).toBe('sent')
-    expect(parseFriendsPageTab('market')).toBeUndefined()
-    expect(parseFriendsPageTab(undefined)).toBeUndefined()
+describe('Profile page tabs', () => {
+  it('reads the profile tabs from the address and maps the old feed tab to Activity', async () => {
+    const { parseProfilePageTab } = await import('./connections')
+    expect(parseProfilePageTab('profile')).toBe('profile')
+    expect(parseProfilePageTab('activity')).toBe('activity')
+    expect(parseProfilePageTab('feed')).toBe('activity')
+    expect(parseProfilePageTab('friends')).toBe('friends')
+    expect(parseProfilePageTab('incoming')).toBe('incoming')
+    expect(parseProfilePageTab('sent')).toBe('sent')
+    expect(parseProfilePageTab('market')).toBeUndefined()
+    expect(parseProfilePageTab(undefined)).toBeUndefined()
   })
 
-  it('opens Feed by default and keeps Incoming and Sent under Requests', async () => {
-    const { friendsPageSection } = await import('./connections')
-    expect(friendsPageSection(undefined)).toBe('feed')
-    expect(friendsPageSection('feed')).toBe('feed')
-    expect(friendsPageSection('friends')).toBe('friends')
-    expect(friendsPageSection('incoming')).toBe('requests')
-    expect(friendsPageSection('sent')).toBe('requests')
+  it('opens Profile by default and keeps Incoming and Sent under Requests', async () => {
+    const { profilePageSection } = await import('./connections')
+    expect(profilePageSection(undefined)).toBe('profile')
+    expect(profilePageSection('activity')).toBe('activity')
+    expect(profilePageSection('friends')).toBe('friends')
+    expect(profilePageSection('incoming')).toBe('requests')
+    expect(profilePageSection('sent')).toBe('requests')
   })
 })

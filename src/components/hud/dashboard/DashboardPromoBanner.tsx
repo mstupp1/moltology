@@ -23,7 +23,7 @@ export const DASHBOARD_PROMOS: DashboardPromo[] = [
     title: 'Four stages. Twelve clearances.',
     description: 'See where you are on the descent and what opens next.',
     ctaText: 'See the stages',
-    to: '/stages',
+    to: '/character/progress',
     image: getAssetUrl('images/dashboard/carousel/start-here-2026-10-22.png'),
   },
   {

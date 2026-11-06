@@ -40,12 +40,11 @@ export type CommandNavTo =
   | '/academy'
   | '/character/shop'
   | '/premium'
-  | '/stages'
+  | '/character/progress'
   | '/forum'
   | '/forum/$categorySlug'
   | '/support'
   | '/oracle'
-  | '/friends'
   | '/character'
   | '/news'
   | '/news/$slug'
@@ -62,12 +61,15 @@ export type CommandCatalogItem = {
   icon: CommandIconId
   to?: CommandNavTo
   params?: Record<string, string>
+  /** Query for pages with tabs, e.g. Friends opens the Friends tab of /profile. */
+  search?: Record<string, string>
   keywords?: string[]
 }
 
 export type CatalogNavigateArgs = {
   to: CommandNavTo
   params?: Record<string, string>
+  search?: Record<string, string>
 }
 
 export type SearchTab = 'people' | 'pages'
@@ -147,11 +149,11 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
   },
   {
     id: 'nav-pipeline',
-    label: 'Stages',
+    label: 'Stage progress',
     category: 'Page',
     icon: 'pipeline',
-    to: '/stages',
-    keywords: ['science', 'moltology science', 'pipeline', 'stages', 'clearance', 'how it works'],
+    to: '/character/progress',
+    keywords: ['progress', 'xp', 'science', 'moltology science', 'pipeline', 'stages', 'clearance', 'how it works'],
   },
   {
     id: 'nav-forum',
@@ -166,7 +168,8 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'Friends',
     category: 'Page',
     icon: 'connections',
-    to: '/friends',
+    to: '/profile',
+    search: { tab: 'friends' },
     keywords: ['friends', 'connections', 'people', 'fellows', 'followers', 'activity', 'activity stream', 'stream', 'feed', 'requests'],
   },
   {
@@ -333,7 +336,11 @@ export function filterCommandCatalog(
 
 export function catalogNavigateArgs(command: CommandCatalogItem): CatalogNavigateArgs | null {
   if (!command.to) return null
-  return command.params ? { to: command.to, params: command.params } : { to: command.to }
+  return {
+    to: command.to,
+    ...(command.params ? { params: command.params } : {}),
+    ...(command.search ? { search: command.search } : {}),
+  }
 }
 
 /** Live catalog row for a stored page recent. Boards and news live on PAGES_CATALOG. */

@@ -96,7 +96,8 @@ describe('search recents', () => {
     const stored = getSearchRecents(MEMBER_A)[0]
     expect(stored.kind).toBe('page')
     if (stored.kind !== 'page') return
-    expect(pageFromRecent(stored).to).toBe('/friends')
+    expect(pageFromRecent(stored).to).toBe('/profile')
+    expect(pageFromRecent(stored).search).toEqual({ tab: 'friends' })
   })
 
   it('ignores saved journal entries after the section is removed', () => {

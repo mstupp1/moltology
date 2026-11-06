@@ -5,13 +5,15 @@ import { cn } from '@/lib/utils'
 const SECTIONS = [
   { id: 'customize', label: 'Customize', to: '/character' },
   { id: 'shop', label: 'Shop', to: '/character/shop' },
+  { id: 'progress', label: 'Progress', to: '/character/progress' },
 ] as const
 
 export type CharacterSection = (typeof SECTIONS)[number]['id']
 
 /**
- * Switches between the two halves of the Character page: dressing your
- * character (/character) and buying gear for it (/character/shop).
+ * Switches between the parts of the Character page: dressing your character
+ * (/character), buying gear for it (/character/shop) and its stage and XP
+ * (/character/progress).
  */
 export function CharacterSectionNav({ current, className }: { current: CharacterSection; className?: string }) {
   return (
