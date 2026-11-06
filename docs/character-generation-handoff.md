@@ -1,50 +1,52 @@
 # Character generation continuation
 
-## Current state: signature-look cast v4 complete
+## Current state: cyber/style cast v5 complete
 
-The user authorized replacing the old active cast, scrapping Bram and using Luna
-subagents for additional individuals, then clarified: “move forward so we can
-have a solid cast of 6.” The earlier design-only statement that no upload had
-been requested is superseded by this replacement request.
+Active cast remains six: **Rook Tide, Pip Current, Mira Kelp, Cal Brack,
+Tess Shoal and Faye Ripple**. Rook is the male red anchor and default. Clove
+remains retired. See [cast v5](character-cast-v5.md) and `src/lib/mascots.ts`.
 
-Active cast: **Rook Tide, Pip Current, Mira Kelp, Cal Brack, Tess Shoal and
-Faye Ripple**. Rook is the default male red anchor. The user explicitly chose
-six characters, replacing Clove. See [cast v4](character-cast-v4.md) and
-`src/lib/mascots.ts`. Rook's mantle, Pip's cap, Cal's armor, Tess's hat and Faye's
-waistcoat are permanent signature attire; Mira's exact scarf render is unchanged.
-All six renders exist, have been inspected and adopted. No further generation
-is needed. Bram, Oren, Ada, Nell, Gus and Clove are archived.
+The latest user request replaces four v4 looks: Cal has full mid-level cyber
+chest, belt, leg, foot and pincer armor without a helmet; Rook has a common cyber
+chest plate without his cape; Tess has a plum mohawk, Pride biker vest and common
+cyber claw casings; Faye has a sassy business expression, tailored aubergine
+blazer and bare pincers/wrists, with the bead and cord removed. Tess is LGBTQIA+
+by explicit user direction. Pip's exact v4 cap render and Mira's exact v3 scarf
+render remain unchanged. Current masters/WebPs use v5 for the four revisions.
 
-The signature-look revision started clean at `b0cbc0a`. Source assets, exact
-prompts, hashes and observed QA are preserved in the individual briefs. New
-masters/WebPs use v4 except unchanged Mira v3. All twelve active public objects
-match local bytes, and each WebP alpha matches its PNG exactly. The current
-comparison boards are in `scratch/character_tests/cast-v4/`; verification artifacts
-are in `tmp/verification/character-cast-v4/`. All delegated work has settled.
-The historical v3 sections below document the earlier adoption, not current
-filenames/defaults. Current registry aliases include Clove → Rook and preserve
-all 22 original role keys plus older named filenames.
+The revision started clean at `fd552c84` in this same worktree. All four images
+exist, were inspected over light/dark backgrounds and adopted. No further
+generation is needed. Exact prompts, source paths, hashes and observed QA are
+in the individual briefs and experiment folders. Comparison boards are in
+`scratch/character_tests/cast-v5/`; reports/screenshots are in
+`tmp/verification/character-cast-v5/`. All twelve active public objects match
+local bytes, formats, dimensions and alpha. All six WebP alpha channels match
+the PNG masters exactly. Historical versions and experiments remain preserved.
 
-Faye's first wardrobe edit returned output moderation category `other`, request
-`d0e32572-8aec-4e31-91da-db1642557e7d`. A concise revised wardrobe-only prompt
-succeeded; its actual PNG and QA are preserved. No unchanged retry loop or
-provider fallback occurred. No specific rejection cause was supplied.
+Tess's first edit returned output moderation category `other`, request
+`60c91961-45cb-43a8-b9a5-6bc47df5eda5`, with no render. One shorter prompt for
+the same design succeeded. No cause was supplied, no unchanged retry loop or
+provider fallback occurred. The earlier failures and prior outfits are historical
+records in the individual briefs and [cast v4](character-cast-v4.md).
 
-Final v4 verification: 42 targeted tests, 1557 core tests and 348 script tests
-passed; typecheck passed. Skill validation, local Markdown links, five exact
-prompt/source-hash records and source-preserving master copies passed. Chrome
-exercised all six selections at desktop 1440×1000 and mobile 390×844, verified
-exact loaded media filenames, legacy default normalization and no page errors
-(12 image checks). Parent inspected final desktop/mobile screenshots and both
-cast boards. Screenshots/reports are in `tmp/verification/character-cast-v4/`.
-No application push, PR, merge or deployment was performed.
+Current registry aliases retain all 22 original role keys, Clove → Rook, and
+older named v3/v4 filenames. Video prompts derive current visual metadata;
+Faye's story role now includes sass, style and practical confidence.
+
+Final v5 verification: 42 targeted tests, 1557 core tests and 348 script tests
+passed; typecheck passed. Skill validation, local Markdown links, all five prompt
+records (including Tess's failed first request), four source hashes and exact
+master copies passed. Chrome exercised all six options at desktop 1440×1000
+and mobile 390×844, with exact loaded media filenames, legacy normalization and
+no page errors (12 image checks). Parent inspected final light/dark boards and
+desktop/mobile screenshots. No application push, PR, merge or deployment.
 
 Remain on `t3/restore-feature-film-character-style` in the same worktree:
 `/Users/mylesstupp/.t3/worktrees/moltology/t3-c324029b`. Ignored experiments and
-approved references are local here; preserve them. The replacement run started
-with a clean tracked tree at `c1f0bd2`. No unrelated concurrent edits were present.
-All subagent work has settled. Parent model stayed inherited; focused generation
-and review agents used Luna.
+approved references are local here; preserve them. The original v3 replacement run started
+with a clean tracked tree at `c1f0bd2`; the current v5 revision started at
+`fd552c84`. No unrelated concurrent edits were present. Earlier Luna generation
+and review work has settled; the parent handled these four requested edits.
 
 ## Approved style and species inputs
 

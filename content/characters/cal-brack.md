@@ -24,11 +24,7 @@ two classic pincer arms, two flank spikes per side, no lobster tail fan. Six
 walking legs: each side has two short legs followed by the final long supporting
 leg at the lowest/rearmost socket. All tips readable, sockets unobscured.
 
-One irregular cream forehead patch. Permanent signature attire: compact fitted
-dark-slate upper-torso armor, restrained brass edging and articulated shoulder
-plates, with all six walking attachments exposed. One pincer lifted
-in a quiet invitation to speak. Distinct square blue silhouette versus lean
-heart-shaped green Mira and slender lavender Pip.
+One irregular cream forehead patch. Full mid-level cyber armor: gunmetal segmented chest and shoulders, restrained brass edges, cyan status lights, a utility belt with two compact pouches, articulated plates on all six walking legs and broad feet, and fitted cyber pincer shells. His head, cream forehead patch, antennae and flank spikes remain exposed. No helmet. Two functional pincers and six connected walking legs remain visible; the armor follows short-short-long attachment order on each side. No tail. One pincer lifted in a quiet invitation to speak.
 
 ## References and state
 
@@ -116,3 +112,26 @@ WebP are retained in both `scratch/characters/` and `scratch/character_refs/` as
 registration. See [cast v4](../../docs/character-cast-v4.md).
 
 Returned v2 source: `/Users/mylesstupp/.codex/generated_images/01a1ae8a-61db-72b3-a856-e3da63fa4318/exec-2137cf61-2147-4cab-9c6f-9c7ff09ce1ef.png`.
+
+## Requested cyber/style revision (2026-11-05)
+
+Full mid-level cyber armor: gunmetal segmented chest and shoulders, restrained brass edges, cyan status lights, a utility belt with two compact pouches, articulated plates on all six walking legs and broad feet, and fitted cyber pincer shells. His head, cream forehead patch, antennae and flank spikes remain exposed. No helmet. Two functional pincers and six connected walking legs remain visible; the armor follows short-short-long attachment order on each side. No tail.
+
+Built-in ImageGen identity-preserving edit with native transparency. Inspected input:
+`scratch/characters/char_cal_brack_v4.png` (SHA-256 `4fc1c8fc2412bc9d73d0b4f1db9fd4d6bda8d7b1c0bb67226d26b19d9f6e8959`).
+Returned source: `/Users/mylesstupp/.codex/generated_images/01a1a981-e9fc-7943-922b-a5d71590284c/exec-46c7f759-3c9b-4047-9884-078ff359962a.png`.
+Selected experiment: `scratch/character_tests/cal-brack-v3/cal-brack-v3.png`.
+Output SHA-256: `d6f1996f751a6662e28e1f6092de39717e394a08f9a75d714e887205d9a576a6`.
+
+Observed QA: 1312 × 1199 RGBA, alpha 0–255. Parent inspected both actual light/dark composites: recognizable face, palette, build and pose; two distinct pincer arms and six walking-leg tips, with final long supports lowest/rearmost. Both sides show short-short-long walking-leg attachment order. No visible opaque backdrop or halo at normal size. Alpha >16 margins L/T/R/B (%): 2.21 / 3.59 / 1.3 / 2.92. Requested 8% margins were not achieved; preserve full framing. Faint alpha can reach canvas edges. No manual pixel cleanup or chroma keying.
+
+Exact successful prompt (`transparent_background: true`):
+
+```text
+Edit this same Cal Brack character. Replace his simple armor with a complete mid-level cyber armor set: fitted segmented gunmetal chest plate with restrained brass edges and small cyan status lights, a practical belt with plain buckle and compact utility pouches, articulated armor on all six walking legs including greaves and broad foot plates, and fitted cyber shells over both pincers preserving their opening shape. Moderately detailed manufactured panels and visible mechanical joints, cohesive and practical, no oversized weapons or ornate high-tier decoration. No helmet: keep his entire cobalt square face, gold eyes, cream forehead patch, brows, curled antennae and flank spikes exposed and recognizable. Preserve his build and raised-pincer pose. Two pincer arms separate from six connected walking legs; three per side in short-short-long attachment order, final long supports lowest. No lobster tail. Same polished 3D animated feature-film finish. Full figure, every appendage, genuinely transparent background, about 8% clear margin.
+```
+
+Selected for the active six under the user’s replacement request, retained as
+`char_cal_brack_v5.png` and quality-90 `.webp` in both
+`scratch/characters/` and `scratch/character_refs/`. Historical versions remain.
+See [cast v5](../../docs/character-cast-v5.md) for public-object verification and adoption.

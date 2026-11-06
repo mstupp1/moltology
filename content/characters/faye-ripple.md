@@ -2,18 +2,21 @@
 
 **State:** Rendered individual selected for the requested six-character cast.
 
-Faye is the friend who can make a small step feel worth celebrating. She loves helping people get unstuck, but sometimes offers a solution before hearing the whole story. Just before laughing at one of her own assumptions, she raises a brow. She is learning that listening can be part of the celebration too.
+Faye brings sharp wit, impeccable style and a practical plan when friends feel
+stuck. She means business and backs her confident smirk with real effort. Her
+quick solutions sometimes get ahead of listening, and she is learning when a
+quiet question works better than a clever answer.
 
 - **Strength:** enthusiastic encouragement; she notices small progress and makes it feel real.
 - **Flaw:** rushes to solve before listening.
 - **Contradiction:** generous with attention to progress, yet impatient with the quiet details behind it.
-- **Habit:** raises one brow before laughing at an assumption she has just made.
+- **Habit:** raises one brow before delivering a dry, playful observation.
 - **Relationship/tension:** Faye and Pip Current both care about first attempts. Pip is careful about sharing unfinished ideas; Faye's lively encouragement helps, provided she listens before proposing the next step.
-- **Archetype:** the exuberant friend learning to listen before fixing.
+- **Archetype:** the stylish, sassy problem-solver learning to listen before fixing.
 
 ## Design brief
 
-Adult lobster with a sturdy, chunky, regular-height build and a softly squared head with rounded corners. Bubblegum-rose satin shell, pale pink belly and sapphire eyes. Warm lopsided smile and one knowingly lifted brow. Two curved antennae, two pincer arms, six walking legs and a segmented tail fan. Each side's leg sockets follow short, short, long, with the final long support at the lowest/rearmost position. Her small sea-glass bead tied on a short plain cord at one wrist remains unchanged. Her permanent signature attire is a fitted cropped dark-teal canvas sleeveless waistcoat with open front, warm cream piping and one plain brass fastening. It is cheerful everyday host attire, not a uniform; it crops well above walking attachments and leaves side openings. No tools, hat or extra gear.
+Adult lobster with a sturdy regular-height build, softly square pink face and pale pink belly. Two curved antennae, two pincer arms, six walking legs and a segmented tail fan. Sassy, stylish business attire: a sharply tailored cropped aubergine blazer with sculpted lapels and upper-arm sleeves, ivory inset blouse, and slim black waist belt with a geometric brass buckle. A direct sapphire gaze, self-assured closed-mouth smirk and strongly raised brow express that she means business. Her sturdy pink softly square face, antennae, raised-pincer gesture, six connected walking legs and tail remain recognizable. Both pincers and wrists are bare: no bead, cord, jewelry, claw accessory or claw armor. The blazer has open sockets exposing short-short-long walking-leg order on each side.
 
 ## First render: Faye Ripple v1 (2026-11-04)
 
@@ -108,3 +111,26 @@ Adopted as `char_faye_ripple_v4.png` and quality-90 `.webp`, retained in both
 `scratch/characters/` and `scratch/character_refs/`. Public objects were checked
 against local bytes before registration. The first failed request remains above
 as history. See [cast v4](../../docs/character-cast-v4.md).
+
+## Requested cyber/style revision (2026-11-05)
+
+Sassy, stylish business attire: a sharply tailored cropped aubergine blazer with sculpted lapels and upper-arm sleeves, ivory inset blouse, and slim black waist belt with a geometric brass buckle. A direct sapphire gaze, self-assured closed-mouth smirk and strongly raised brow express that she means business. Her sturdy pink softly square face, antennae, raised-pincer gesture, six connected walking legs and tail remain recognizable. Both pincers and wrists are bare: no bead, cord, jewelry, claw accessory or claw armor. The blazer has open sockets exposing short-short-long walking-leg order on each side.
+
+Built-in ImageGen identity-preserving edit with native transparency. Inspected input:
+`scratch/characters/char_faye_ripple_v4.png` (SHA-256 `0e531c219ac8ac3c68ee60a91a93a25812fd052b2e0acdf1963ac3b8cc48fdd1`).
+Returned source: `/Users/mylesstupp/.codex/generated_images/01a1a981-e9fc-7943-922b-a5d71590284c/exec-36dc8e4b-9709-4587-95b0-48cb497cfde4.png`.
+Selected experiment: `scratch/character_tests/faye-ripple-v3/faye-ripple-v3.png`.
+Output SHA-256: `279181d08d8fc2aaea903ba6a447e3763de8f7badc0373a1ec7a0e4f46e52086`.
+
+Observed QA: 1199 × 1312 RGBA, alpha 0–255. Parent inspected both actual light/dark composites: recognizable face, palette, build and pose; two distinct pincer arms and six walking-leg tips, with final long supports lowest/rearmost. Both sides show short-short-long walking-leg attachment order. No visible opaque backdrop or halo at normal size. Alpha >16 margins L/T/R/B (%): 6.59 / 2.82 / 13.01 / 3.81. Requested 8% margins were not achieved; preserve full framing. Faint alpha can reach canvas edges. No manual pixel cleanup or chroma keying.
+
+Exact successful prompt (`transparent_background: true`):
+
+```text
+Restyle this same Faye Ripple as a sassy stylish businesswoman who means business. Replace the teal waistcoat with a sharply tailored cropped aubergine blazer, sculpted lapels, ivory inset blouse and a slim black waist belt with a geometric brass buckle, fitted to her lobster torso with generous side openings exposing every walking-leg socket. Give her a self-assured closed-mouth smirk and one boldly raised brow, with her sapphire eyes looking directly toward the viewer. Keep her recognizable pink softly square face, sturdy body proportions, shell palette, both antennae, raised-pincer gesture and tail fan. Remove the wrist cord and sea-glass bead entirely: both pink pincers and wrists completely bare, no claw accessory, jewelry or armor. Two pincer arms separate from six connected walking legs, three per side short-short-long socket order with long supports lowest. Same polished 3D animated feature-film finish. Full figure and all appendages with about 8% clear transparent margin, genuinely transparent background.
+```
+
+Selected for the active six under the user’s replacement request, retained as
+`char_faye_ripple_v5.png` and quality-90 `.webp` in both
+`scratch/characters/` and `scratch/character_refs/`. Historical versions remain.
+See [cast v5](../../docs/character-cast-v5.md) for public-object verification and adoption.

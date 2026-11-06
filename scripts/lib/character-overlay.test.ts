@@ -50,9 +50,9 @@ describe('Character Overlay & Registry', () => {
   })
 
   it('maps retired art file names to the current renders', () => {
-    expect(getCharacterInfo('char_lobster_pointing_cta.png').filename).toBe('char_rook_tide_v4.webp')
+    expect(getCharacterInfo('char_lobster_pointing_cta.png').filename).toBe('char_rook_tide_v5.webp')
     expect(getCharacterInfo('lobster_speed_action').key).toBe('lobster_tess_shoal')
-    expect(getCharacterInfo('char_crab_pointing_stats.webp').filename).toBe('char_cal_brack_v4.webp')
+    expect(getCharacterInfo('char_crab_pointing_stats.webp').filename).toBe('char_cal_brack_v5.webp')
   })
 
   it('generates unique random rotations without duplicates', () => {

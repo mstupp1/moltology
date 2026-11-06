@@ -8,7 +8,7 @@ describe('mascot cast', () => {
     expect(getMascotKeys()).not.toContain('lobster_clove_cinder')
     expect(new Set(getMascotKeys()).size).toBe(MASCOT_CAST.length)
     expect(new Set(MASCOT_CAST.map((m) => m.filename)).size).toBe(MASCOT_CAST.length)
-    for (const m of MASCOT_CAST) expect(m.filename).toMatch(/^char_[a-z_]+_v[34]\.webp$/)
+    for (const m of MASCOT_CAST) expect(m.filename).toMatch(/^char_[a-z_]+_v[345]\.webp$/)
     for (const retired of Object.keys(RETIRED_MASCOT_SUCCESSORS)) expect(getMascotKeys()).not.toContain(retired)
     expect(getMascotKeys()).not.toContain('bram_silt')
   })
@@ -29,9 +29,14 @@ describe('mascot cast', () => {
     expect(resolveMascotAlias('char_pip_current_v3.png')).toBe('lobster_pip_current')
     expect(resolveMascotAlias('Mira')).toBe('crab_mira_kelp')
     expect(resolveMascotAlias('Clove Cinder')).toBe('lobster_rook_tide')
-    expect(resolveMascotAlias('char_rook_tide_v4.png')).toBe('lobster_rook_tide')
+    expect(resolveMascotAlias('char_rook_tide_v5.png')).toBe('lobster_rook_tide')
     for (const name of ['pip_current', 'cal_brack', 'tess_shoal', 'faye_ripple']) {
       expect(resolveMascotAlias(`char_${name}_v3.webp`)).toBe(`${name === 'cal_brack' ? 'crab' : 'lobster'}_${name}`)
+    }
+    for (const name of ['rook_tide', 'cal_brack', 'tess_shoal', 'faye_ripple']) {
+      const key = `${name === 'cal_brack' ? 'crab' : 'lobster'}_${name}`
+      expect(resolveMascotAlias(`char_${name}_v4.png`)).toBe(key)
+      expect(resolveMascotAlias(`char_${name}_v4.webp`)).toBe(key)
     }
     expect(resolveMascotAlias(' Faye Ripple ')).toBe('lobster_faye_ripple')
     expect(resolveMascotAlias('sentinel')).toBe('crab_cal_brack')

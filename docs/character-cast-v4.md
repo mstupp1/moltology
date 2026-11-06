@@ -1,5 +1,8 @@
 # Named signature-look cast v4
 
+Historical snapshot, superseded by [cast v5](character-cast-v5.md) at the user’s
+request. Pip and Mira remain unchanged; Cal, Rook, Tess and Faye have new looks.
+
 The active cast contains exactly six individuals. On 2026-11-05 the user requested
 more distinctive permanent clothing/accessories and explicitly chose to replace
 Clove's gold design with a male brand-red lobster anchor. **Rook Tide** is that

@@ -49,7 +49,7 @@ const NAMED_STORY_ROLES: Record<string, string> = {
   crab_cal_brack: 'A patient mediator learning to make room for his own opinions as well as everyone else’s',
   lobster_rook_tide: 'A steady, decisive friend learning to accept help while encouraging everyone to take the next step',
   lobster_tess_shoal: 'An attentive listener whose practical questions help others choose while she learns to make her own decisions',
-  lobster_faye_ripple: 'An enthusiastic encourager learning to listen before offering a solution',
+  lobster_faye_ripple: 'A stylish, sassy problem-solver whose sharp wit and practical confidence are tempered by learning to listen before fixing',
 }
 
 export const MASCOT_VEO_PROFILES: Record<string, MascotVeoProfile> = Object.fromEntries(

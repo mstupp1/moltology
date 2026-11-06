@@ -275,7 +275,7 @@ describe('Composite UI Components', () => {
 
     const img = container.querySelector('img')
     expect(img).toBeInTheDocument()
-    expect(img?.getAttribute('src')).toContain('char_rook_tide_v4.webp')
+    expect(img?.getAttribute('src')).toContain('char_rook_tide_v5.webp')
     expect(img?.getAttribute('loading')).toBe('eager')
   })
 

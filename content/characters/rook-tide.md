@@ -9,10 +9,8 @@ when a group is uncertain, but sometimes mistakes carrying every worry himself
 for being useful. His strength is making a difficult beginning feel manageable;
 his flaw is waiting too long to say that he needs help too.
 
-He checks the plain brass clasp on his short shoulder mantle before heading out.
-It was repaired by a friend after their first difficult journey, and he keeps the
-repair rather than replacing it. The mantle is part of his everyday silhouette,
-not a temporary costume.
+He checks a repaired shoulder fastener on his simple cyber chest plate before
+heading out. A friend helped mend it, and he values practical repairs.
 
 Rook encourages Pip to share an unfinished idea, listens to Cal's quieter
 objections, and lets Mira choose a route even when he would have planned it
@@ -27,10 +25,7 @@ calm open expression and reassuring asymmetric smile. Two long curved antennae,
 two classic pincers, six walking legs (short-short-long socket order per side,
 final long pair lowest/rearmost) and a tucked segmented tail fan.
 
-Signature attire: a short dark-teal shoulder mantle with one plain aged-brass
-clasp. It drapes behind the shoulders and ends above the hip, leaving the red
-front, face, pincer arms and all six walking attachments readable. No headgear,
-weapons, tools, insignia or additional equipment. Red shell remains dominant.
+Signature attire: A common basic cyber chest plate: matte charcoal front panel, plain short shoulder straps, exposed fasteners and one cyan status light. No cape, mantle, clasp, scarf or other gear. His red pincers remain bare, cream belly visible below the plate and all six walking attachments readable. Red shell remains dominant.
 
 He is an original recurring person with a confident male presence, not a renamed
 generic job mascot. The approved lobster supplies film finish; a local inspected
@@ -70,3 +65,26 @@ Rook has a broad rounded-oblong head, strong attached brows, seated amber eyes, 
 His signature everyday attire is a short dark-teal shoulder mantle with one plain aged-brass clasp, draped behind his shoulders and ending above the hips. Keep the red front dominant, his face clear and every limb connection readable. Two long curved antennae, two pincer arms, six walking legs: on each side two short legs precede the final long supporting leg at the lowest/rearmost socket. Tucked segmented tail fan. No other gear or insignia.
 Single complete full-body shallow three-quarter view, soft cinematic key and fill, genuinely transparent background and generous clear margin around every appendage. No floor shadow or text.
 ```
+
+## Requested cyber/style revision (2026-11-05)
+
+A common basic cyber chest plate: matte charcoal front panel, plain short shoulder straps, exposed fasteners and one cyan status light. No cape, mantle, clasp, scarf or other gear. His red pincers remain bare, cream belly visible below the plate and all six walking attachments readable.
+
+Built-in ImageGen identity-preserving edit with native transparency. Inspected input:
+`scratch/characters/char_rook_tide_v4.png` (SHA-256 `ee218a54c4928baa87b141bd7e08bcc43a46b79c5613475c61a9e1221655700b`).
+Returned source: `/Users/mylesstupp/.codex/generated_images/01a1a981-e9fc-7943-922b-a5d71590284c/exec-74129ef7-478b-4c8f-98d7-88eb7fbd5ec1.png`.
+Selected experiment: `scratch/character_tests/rook-tide-v2/rook-tide-v2.png`.
+Output SHA-256: `154cf96f89e9781cb8938375d9c153e7fac5488ad661f53633d267501604e5c9`.
+
+Observed QA: 1199 × 1312 RGBA, alpha 0–255. Parent inspected both actual light/dark composites: recognizable face, palette, build and pose; two distinct pincer arms and six walking-leg tips, with final long supports lowest/rearmost. Both sides show short-short-long walking-leg attachment order. No visible opaque backdrop or halo at normal size. Alpha >16 margins L/T/R/B (%): 7.67 / 1.07 / 3.0 / 2.67. Requested 8% margins were not achieved; preserve full framing. Faint alpha can reach canvas edges. No manual pixel cleanup or chroma keying.
+
+Exact successful prompt (`transparent_background: true`):
+
+```text
+Edit this same Rook Tide character. Remove the entire fabric cape, shoulder mantle and brass clasp. Give him only a common basic cyber chest plate: simple fitted matte charcoal metal front panel, modest beveled edges, visible fasteners, one small muted cyan status light, plain short shoulder straps. Low-tier practical everyday equipment, restrained detail, no other armor or gear. Keep his red male lobster identity, exact amber eyes, face, confident smile, proportions, cream belly below the plate, antennae, bare red pincers, pose and segmented tail. Two pincer arms separate from six walking legs, three per side in short-short-long attachment order, final long supports lowest. All limb sockets readable. Same polished 3D animated feature-film rendering. Full figure and all appendages, genuinely transparent background, about 8% clear margin. No cape, scarf or fabric drape.
+```
+
+Selected for the active six under the user’s replacement request, retained as
+`char_rook_tide_v5.png` and quality-90 `.webp` in both
+`scratch/characters/` and `scratch/character_refs/`. Historical versions remain.
+See [cast v5](../../docs/character-cast-v5.md) for public-object verification and adoption.

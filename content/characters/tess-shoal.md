@@ -24,13 +24,7 @@ six connected walking legs and a segmented lobster tail fan. On each side, leg
 sockets read short, short, then the final long supporting leg at the
 lowest/rearmost socket.
 
-Her small, naturally colored oval cream patch on one cheek is shared with her
-family and remains part of her shell coloration, not a decal. Her current
-signature attire target is a worn dusky-burgundy felt travelling hat with a
-softly rolled medium-wide brim, simple cream band and two clean antenna openings.
-It supports her patient, thoughtful wayfarer presence. Keep her silhouette and
-cool teal/blue palette clearly distinct from Pip's short round lavender build
-and Mira's lean jade crab. Do not add other costume, tools or props.
+Her small natural oval cream family patch remains part of her shell coloration, not a decal. Tess is LGBTQIA+ as explicitly specified by the user; no narrower orientation or relationship is assumed. Her permanent biker look is a swept-back plum-purple mohawk between her two teal antennae, a cropped black leather biker vest with silver asymmetric zip and a small rainbow Pride patch, and common simple gunmetal cyber claw casings. The casings leave her teal pincer tips and openings readable. No hat. Her amber eyes, cream cheek patch, mint belly, tall tapered build and tail remain recognizable. Six walking-leg tips are visible in short-short-long order; an upper short-leg base remains partly crowded by overlap.
 
 ## First render (2026-11-04)
 
@@ -153,3 +147,34 @@ WebP are retained in both `scratch/characters/` and `scratch/character_refs/` as
 registration. See [cast v4](../../docs/character-cast-v4.md).
 
 Returned source: `/Users/mylesstupp/.codex/generated_images/01a1ae8c-9060-7892-b59f-565562a33a45/exec-ae273e1a-0d70-48fe-b366-cead36d0130a.png`.
+
+## Requested cyber/style revision (2026-11-05)
+
+Tess is LGBTQIA+ as explicitly specified by the user; no narrower orientation or relationship is assumed. Her permanent biker look is a swept-back plum-purple mohawk between her two teal antennae, a cropped black leather biker vest with silver asymmetric zip and a small rainbow Pride patch, and common simple gunmetal cyber claw casings. The casings leave her teal pincer tips and openings readable. No hat. Her amber eyes, cream cheek patch, mint belly, tall tapered build and tail remain recognizable. Six walking-leg tips are visible in short-short-long order; an upper short-leg base remains partly crowded by overlap.
+
+Built-in ImageGen identity-preserving edit with native transparency. Inspected input:
+`scratch/characters/char_tess_shoal_v4.png` (SHA-256 `e2b7c7b597f7bebb96f9e17d60f9ef54f2460234daf312f88b7bb69f933c4ec7`).
+Returned source: `/Users/mylesstupp/.codex/generated_images/01a1a981-e9fc-7943-922b-a5d71590284c/exec-1675fdf9-cd98-426c-bf2c-12920b3ee24a.png`.
+Selected experiment: `scratch/character_tests/tess-shoal-v3/tess-shoal-v3.png`.
+Output SHA-256: `6dc80eec7150e95a4a08b29b459b7fd735c3b605f44366954382f6ca34fe1061`.
+
+Observed QA: 1199 × 1312 RGBA, alpha 0–255. Parent inspected both actual light/dark composites: recognizable face, palette, build and pose; two distinct pincer arms and six walking-leg tips, with final long supports lowest/rearmost. Upper short-leg bases remain partly crowded; hidden connections are unverified. No visible opaque backdrop or halo at normal size. Alpha >16 margins L/T/R/B (%): 6.76 / 1.37 / 19.02 / 1.98. Requested 8% margins were not achieved; preserve full framing. Faint alpha can reach canvas edges. No manual pixel cleanup or chroma keying.
+
+The first request returned no render: HTTP 400 `moderation_blocked`, output stage, category `other`, request `60c91961-45cb-43a8-b9a5-6bc47df5eda5`. The cause was not specified. The exact failure remains in `scratch/character_tests/tess-shoal-v3/failure.json`. One concise revised prompt for the same design succeeded; no provider switch occurred.
+
+First failed prompt:
+
+```text
+Restyle this same Tess Shoal character as a confident queer biker. Remove her hat completely. Add an upright swept-back plum-purple mohawk crest between her two existing teal antennae, a fitted cropped black leather biker vest with asymmetric silver zip and a small rainbow Pride patch, and common basic cyber claw casings in brushed gunmetal with simple fasteners and tiny cyan status lights, fitted around her two existing pincers so both still articulate and read as crustacean pincers. Keep her elongated teal face, amber eyes, cream cheek patch, mint belly, tall tapered body and existing gesture recognizable. Both antennae complete; no hat. Six walking legs stay separate from the two pincer arms, three per side in short-short-long socket order, long supports lowest; vest leaves leg sockets visible. Retain segmented tail fan and polished dimensional 3D animated feature-film finish. Full figure, all appendages and mohawk with about 8% clear transparent margin, genuinely transparent background.
+```
+
+Successful revised prompt:
+
+```text
+Edit this same Tess character: remove the hat, add a plum-purple mohawk between her unchanged antennae, a cropped black leather biker vest with silver zip and a small rainbow Pride patch, and simple gunmetal cyber casings fitted around her two existing pincers. Preserve her teal face, amber eyes, cream cheek patch, tall build, mint belly, pose and tail. Keep all six walking legs and their short-short-long attachment order on each side visible and unchanged. Polished 3D animated feature-film finish, full body and every appendage with clear margins, transparent background.
+```
+
+Selected for the active six under the user’s replacement request, retained as
+`char_tess_shoal_v5.png` and quality-90 `.webp` in both
+`scratch/characters/` and `scratch/character_refs/`. Historical versions remain.
+See [cast v5](../../docs/character-cast-v5.md) for public-object verification and adoption.

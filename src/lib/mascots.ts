@@ -23,13 +23,13 @@ const mascot = (key: string, name: string, filename: string, description: string
   description,
 })
 
-/** Named signature-look cast (v4, 2026-11-05). Historical role keys resolve below. */
+/** Named signature-look cast (v5, 2026-11-05). Historical role keys resolve below. */
 export const MASCOT_CAST: MascotDefinition[] = [
   mascot(
     'lobster_rook_tide',
     'Rook Tide',
-    'char_rook_tide_v4.webp',
-    'Confident male red lobster with amber eyes, a cream belly, dark-teal shoulder mantle and a plain brass clasp'
+    'char_rook_tide_v5.webp',
+    'Confident male red lobster with amber eyes, a cream belly and a common charcoal cyber chest plate with one cyan status light; bare pincers and no cape'
   ),
   mascot(
     'lobster_pip_current',
@@ -46,20 +46,20 @@ export const MASCOT_CAST: MascotDefinition[] = [
   mascot(
     'crab_cal_brack',
     'Cal Brack',
-    'char_cal_brack_v4.webp',
-    'Patient cobalt-blue crab in fitted dark-slate brass-edged armor, with a softly square shell, gold eyes and a small cream forehead patch'
+    'char_cal_brack_v5.webp',
+    'Patient cobalt-blue crab with a square shell, gold eyes and cream forehead patch, wearing a full mid-level gunmetal cyber armor set with brass edges, cyan lights, chest plate, utility belt, six armored walking legs and cyber pincers; head uncovered without a helmet'
   ),
   mascot(
     'lobster_tess_shoal',
     'Tess Shoal',
-    'char_tess_shoal_v4.webp',
-    'Attentive tall teal lobster in a burgundy felt travelling hat with a cream band, with amber eyes, a mint underside and a cream cheek patch'
+    'char_tess_shoal_v5.webp',
+    'Attentive tall teal LGBTQIA+ lobster with amber eyes, mint underside and cream cheek patch, plum-purple mohawk, black leather biker vest with rainbow Pride patch and common gunmetal cyber claw casings'
   ),
   mascot(
     'lobster_faye_ripple',
     'Faye Ripple',
-    'char_faye_ripple_v4.webp',
-    'Enthusiastic rose-pink lobster in a dark-teal cream-piped waistcoat, with a sturdy softly square build, sapphire eyes, a lopsided smile and a sea-glass bead on a wrist cord'
+    'char_faye_ripple_v5.webp',
+    'Sassy stylish rose-pink lobster with a sturdy softly square build, sapphire eyes, a raised brow and confident smirk, wearing a tailored aubergine blazer, ivory blouse and black belt with brass buckle; bare pincers and wrists without accessories'
   ),
 ]
 
@@ -100,6 +100,10 @@ const CAST_BY_KEY = new Map(MASCOT_CAST.map((m) => [m.key, m]))
 
 /** Short names and retired file names that still resolve to a cast key. */
 const MASCOT_ALIASES: Record<string, string> = {
+  rook_tide_v4: 'lobster_rook_tide',
+  cal_brack_v4: 'crab_cal_brack',
+  tess_shoal_v4: 'lobster_tess_shoal',
+  faye_ripple_v4: 'lobster_faye_ripple',
   rook: 'lobster_rook_tide',
   rook_tide: 'lobster_rook_tide',
   pip_current_v3: 'lobster_pip_current',
