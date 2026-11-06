@@ -23,4 +23,24 @@ describe('updateUserStatsHandler', () => {
     })
     expect(sets[0]).toMatchObject({ moltmaxScore: 40, moltmaxClearance: 'L-3', moltmaxStage: 'STAGE I · LARVAL INITIATE' })
   })
+
+  it('saves a claimed guest audit only when the member has none yet', async () => {
+    const sets: Array<Record<string, unknown>> = []
+    const db = {
+      insert: () => ({ values: () => ({ onConflictDoNothing: vi.fn().mockResolvedValue([]) }) }),
+      update: () => ({
+        set: (values: Record<string, unknown>) => {
+          sets.push(values)
+          // An existing audit means the guarded update matches no row.
+          return { where: () => ({ returning: vi.fn().mockResolvedValue([]) }) }
+        },
+      }),
+    }
+    const updated = await updateUserStatsHandler({
+      data: { moltmaxScore: 40, onlyIfNoAudit: true },
+      context: { user: { sub: 'member-1' }, db: db as never },
+    })
+    expect(updated).toBeUndefined()
+    expect(sets[0]).not.toHaveProperty('onlyIfNoAudit')
+  })
 })
