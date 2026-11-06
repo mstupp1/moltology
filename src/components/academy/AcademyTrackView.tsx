@@ -70,7 +70,7 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
               </HudButton>
             )}
             {nextCourse ? (
-              <Link to="/lectures/courses/$slug" params={{ slug: nextCourse.slug }} className={ACADEMY_TEXT_ACTION}>
+              <Link to="/academy/courses/$slug" params={{ slug: nextCourse.slug }} className={ACADEMY_TEXT_ACTION}>
                 Next up: {nextCourse.title}
                 <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
               </Link>
@@ -102,7 +102,7 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
                 return (
                   <li key={course.slug}>
                     <Link
-                      to="/lectures/courses/$slug"
+                      to="/academy/courses/$slug"
                       params={{ slug: course.slug }}
                       className={cn(
                         ACADEMY_CARD_LINK,
@@ -171,7 +171,7 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
               <p className="text-xs text-ink-body leading-relaxed">{detail.certificate.description}</p>
               {detail.certificate.earned && detail.certificate.credentialId ? (
                 <Link
-                  to="/lectures/certificates/$credentialId"
+                  to="/academy/certificates/$credentialId"
                   params={{ credentialId: detail.certificate.credentialId }}
                   className={ACADEMY_TEXT_ACTION}
                 >

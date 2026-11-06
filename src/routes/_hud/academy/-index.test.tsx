@@ -150,7 +150,7 @@ describe('Molt Academy home', () => {
     })
     expect(screen.getByText('The Chitinous Mind')).toBeInTheDocument()
     expect(screen.queryByText('Biomechanical Armor')).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Open certification record/i })).toHaveAttribute('href', '/lectures/certificates')
+    expect(screen.getByRole('link', { name: /Open certification record/i })).toHaveAttribute('href', '/academy/certificates')
   })
 
   it('shows one coming-soon panel instead of empty sections when nothing is published', () => {

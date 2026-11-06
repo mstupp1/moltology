@@ -72,7 +72,7 @@ complete worked course and track in `content/academy/_examples/`. The parser is
 2. Check: `npm run academy:ingest -- --dry-run <slug>`. Fix every ✗. Read the ⚠ warnings and fix
    them unless they are intended (for example a video lesson still waiting for its video).
 3. Write to dev: `npm run academy:ingest -- --dev <slug>`. If you can run the app, open
-   `/lectures/courses/<slug>` and step through each lesson and the quiz.
+   `/academy/courses/<slug>` and step through each lesson and the quiz.
 4. Show the user the course (outline, a sample lesson, the quiz) and get their go-ahead to publish.
 5. Publish: set `status: published` in `course.md`, then `npm run academy:ingest -- <slug>` (no `--dev`
    writes to production). For a track, publish its courses first, then the track.

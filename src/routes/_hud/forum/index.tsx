@@ -34,7 +34,7 @@ export const Route = createFileRoute('/_hud/forum/')({
   head: () => ({
     meta: [
       ...seo({
-        title: 'Forums | Moltology Community',
+        title: 'Forum | Moltology',
         description: 'Join the Moltology community forums: discuss carcinization, AI, molting habits, and personal growth with fellow members.',
         canonical: 'https://moltology.org/forum',
         siteName: 'Moltology Forums',
@@ -161,7 +161,7 @@ function ForumIndexPage() {
       <div className="space-y-4 sm:space-y-5 font-sans relative pb-8">
         <HudTitlePanel
           surface="solid"
-          title="Moltology Community"
+          title="Forum"
           actions={
             <>
               <HudButton

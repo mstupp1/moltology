@@ -276,7 +276,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">Equipped gear</h2>
             {isSelf && (
-              <Link to="/chassis" className="text-xs text-cyan-glow hover:text-ink">
+              <Link to="/character" className="text-xs text-cyan-glow hover:text-ink">
                 Change gear
               </Link>
             )}

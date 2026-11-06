@@ -419,7 +419,7 @@ export function generateSitemapXml(
     { loc: `${baseUrl}/news`, priority: 0.9, changefreq: 'daily' },
     { loc: `${baseUrl}/codex`, priority: 0.8, changefreq: 'weekly' },
     { loc: `${baseUrl}/org`, priority: 0.8, changefreq: 'weekly' },
-    { loc: `${baseUrl}/lectures`, priority: 0.7, changefreq: 'weekly' },
+    { loc: `${baseUrl}/academy`, priority: 0.7, changefreq: 'weekly' },
     { loc: `${baseUrl}/forum`, priority: 0.8, changefreq: 'daily' },
     { loc: `${baseUrl}/changelog`, priority: 0.6, changefreq: 'weekly' },
     { loc: `${baseUrl}/market`, priority: 0.6, changefreq: 'weekly' },

@@ -51,7 +51,7 @@ function EventTitleLink({
   const parsed = parseActivityEventHref(event.href)
   if (parsed.kind === 'pipeline') {
     return (
-      <Link to="/pipeline" className={className}>
+      <Link to="/stages" className={className}>
         {children}
       </Link>
     )

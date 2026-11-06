@@ -1,7 +1,7 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { Route } from './chassis'
+import { Route } from './character'
 import { authClient } from '@/lib/auth-client'
 
 vi.mock('@/lib/auth-client', () => ({
@@ -46,7 +46,7 @@ describe('Chassis Configurator HUD Route', () => {
     const Component = Route.options.component!
     render(<Component />)
 
-    expect(screen.getByText('GEAR LOCKED')).toBeInTheDocument()
+    expect(screen.getByText('CHARACTER LOCKED')).toBeInTheDocument()
     expect(screen.getByText('RESTRICTED ACCESS')).toBeInTheDocument()
     expect(
       screen.getByText(
@@ -62,7 +62,7 @@ describe('Chassis Configurator HUD Route', () => {
     render(<Component />)
 
     expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
-    expect(screen.queryByText('GEAR LOCKED')).not.toBeInTheDocument()
+    expect(screen.queryByText('CHARACTER LOCKED')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /SIGN UP TO UNLOCK/i })).not.toBeInTheDocument()
   })
 

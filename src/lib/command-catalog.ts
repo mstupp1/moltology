@@ -37,18 +37,17 @@ export type CommandNavTo =
   | '/dashboard'
   | '/codex'
   | '/codex/$slug'
-  | '/lectures'
+  | '/academy'
   | '/market'
   | '/premium'
-  | '/pipeline'
+  | '/stages'
   | '/forum'
   | '/forum/$categorySlug'
   | '/stream'
-  | '/landing'
   | '/support'
   | '/oracle'
   | '/connections'
-  | '/chassis'
+  | '/character'
   | '/news'
   | '/news/$slug'
   | '/watch'
@@ -128,15 +127,15 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'Academy',
     category: 'Page',
     icon: 'lectures',
-    to: '/lectures',
+    to: '/academy',
     keywords: ['academy', 'molt academy', 'courses', 'lectures', 'tracks', 'certificates', 'certifications', 'lessons'],
   },
   {
     id: 'nav-pipeline',
-    label: 'Science',
+    label: 'Stages',
     category: 'Page',
     icon: 'pipeline',
-    to: '/pipeline',
+    to: '/stages',
     keywords: ['science', 'moltology science', 'pipeline', 'stages', 'clearance', 'how it works'],
   },
   {
@@ -165,11 +164,11 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
   },
   {
     id: 'nav-chassis',
-    label: 'Gear',
+    label: 'Character',
     category: 'Page',
     icon: 'chassis',
-    to: '/chassis',
-    keywords: ['gear', 'chassis', 'chassis configurator', 'loadout', 'cosmetics', 'avatar', 'configurator'],
+    to: '/character',
+    keywords: ['character', 'gear', 'chassis', 'chassis configurator', 'loadout', 'cosmetics', 'avatar', 'configurator'],
   },
   {
     id: 'nav-market',

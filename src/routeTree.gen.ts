@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HudRouteImport } from './routes/_hud'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ChassisRouteImport } from './routes/chassis'
 import { Route as CodexDotmdRouteImport } from './routes/codex[.]md'
 import { Route as ErrorRouteImport } from './routes/error'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
@@ -23,6 +24,7 @@ import { Route as MoltmaxxingRouteImport } from './routes/moltmaxxing'
 import { Route as NewsDotmdRouteImport } from './routes/news[.]md'
 import { Route as OrgRouteImport } from './routes/org'
 import { Route as OrgDotmdRouteImport } from './routes/org[.]md'
+import { Route as PipelineRouteImport } from './routes/pipeline'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PrivacyDotmdRouteImport } from './routes/privacy[.]md'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
@@ -35,18 +37,18 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TermsDotmdRouteImport } from './routes/terms[.]md'
 import { Route as WhatIsMoltologyRouteImport } from './routes/what-is-moltology'
 import { Route as HudAlignmentRouteImport } from './routes/_hud/alignment'
-import { Route as HudChassisRouteImport } from './routes/_hud/chassis'
+import { Route as HudCharacterRouteImport } from './routes/_hud/character'
 import { Route as HudCodexRouteRouteImport } from './routes/_hud/codex/route'
 import { Route as HudConnectionsRouteImport } from './routes/_hud/connections'
 import { Route as HudDashboardRouteImport } from './routes/_hud/dashboard'
 import { Route as HudHudRouteImport } from './routes/_hud/hud'
 import { Route as HudMarketRouteImport } from './routes/_hud/market'
 import { Route as HudOracleRouteImport } from './routes/_hud/oracle'
-import { Route as HudPipelineRouteImport } from './routes/_hud/pipeline'
 import { Route as HudPremiumRouteImport } from './routes/_hud/premium'
 import { Route as HudProfileRouteImport } from './routes/_hud/profile'
 import { Route as HudSearchRouteImport } from './routes/_hud/search'
 import { Route as HudSettingsRouteImport } from './routes/_hud/settings'
+import { Route as HudStagesRouteImport } from './routes/_hud/stages'
 import { Route as HudStreamRouteImport } from './routes/_hud/stream'
 import { Route as HudSupportRouteImport } from './routes/_hud/support'
 import { Route as HudWatchRouteImport } from './routes/_hud/watch'
@@ -56,6 +58,8 @@ import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as ChangelogIndexRouteImport } from './routes/changelog/index'
 import { Route as ChangelogSlugRouteImport } from './routes/changelog/$slug'
 import { Route as IReferrerIdRouteImport } from './routes/i/$referrerId'
+import { Route as LecturesIndexRouteImport } from './routes/lectures/index'
+import { Route as LecturesSplatRouteImport } from './routes/lectures/$'
 import { Route as NewsIndexRouteImport } from './routes/news/index'
 import { Route as NewsSlugRouteImport } from './routes/news/$slug'
 import { Route as NewsChar123slugChar125DotmdRouteImport } from './routes/news/{$slug}[.]md'
@@ -67,13 +71,13 @@ import { Route as WhatIsMoltologyIndexRouteImport } from './routes/what-is-molto
 import { Route as WhatIsMoltologyBeliefsRouteImport } from './routes/what-is-moltology/beliefs'
 import { Route as WhatIsMoltologyBenthicSacramentsRouteImport } from './routes/what-is-moltology/benthic-sacraments'
 import { Route as WhatIsMoltologyWhatMoltologistsSayRouteImport } from './routes/what-is-moltology/what-moltologists-say'
+import { Route as HudAcademyIndexRouteImport } from './routes/_hud/academy/index'
 import { Route as HudAdminIndexRouteImport } from './routes/_hud/admin.index'
 import { Route as HudAdminLogicRouteImport } from './routes/_hud/admin.logic'
 import { Route as HudAdminStoreRouteImport } from './routes/_hud/admin.store'
 import { Route as HudCodexIndexRouteImport } from './routes/_hud/codex/index'
 import { Route as HudCodexSlugRouteImport } from './routes/_hud/codex/$slug'
 import { Route as HudForumIndexRouteImport } from './routes/_hud/forum/index'
-import { Route as HudLecturesIndexRouteImport } from './routes/_hud/lectures/index'
 import { Route as HudMemberProfileIdRouteImport } from './routes/_hud/member/$profileId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiEmailConfirmRouteImport } from './routes/api/email/confirm'
@@ -81,14 +85,14 @@ import { Route as ApiEmailWebhookRouteImport } from './routes/api/email/webhook'
 import { Route as ApiPrintfulWebhookRouteImport } from './routes/api/printful/webhook'
 import { Route as ApiStoreRecoveryRouteImport } from './routes/api/store/recovery'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
+import { Route as HudAcademyCertificatesIndexRouteImport } from './routes/_hud/academy/certificates/index'
+import { Route as HudAcademyCertificatesCredentialIdRouteImport } from './routes/_hud/academy/certificates/$credentialId'
+import { Route as HudAcademyCoursesSlugRouteImport } from './routes/_hud/academy/courses/$slug'
+import { Route as HudAcademyTracksSlugRouteImport } from './routes/_hud/academy/tracks/$slug'
 import { Route as HudForumCategorySlugIndexRouteImport } from './routes/_hud/forum/$categorySlug/index'
 import { Route as HudForumCategorySlugTopicSlugRouteImport } from './routes/_hud/forum/$categorySlug/$topicSlug'
-import { Route as HudLecturesCertificatesIndexRouteImport } from './routes/_hud/lectures/certificates/index'
-import { Route as HudLecturesCertificatesCredentialIdRouteImport } from './routes/_hud/lectures/certificates/$credentialId'
-import { Route as HudLecturesCoursesSlugRouteImport } from './routes/_hud/lectures/courses/$slug'
-import { Route as HudLecturesTracksSlugRouteImport } from './routes/_hud/lectures/tracks/$slug'
-import { Route as HudLecturesCoursesSlugIndexRouteImport } from './routes/_hud/lectures/courses/$slug/index'
-import { Route as HudLecturesCoursesSlugLessonsLessonSlugRouteImport } from './routes/_hud/lectures/courses/$slug/lessons/$lessonSlug'
+import { Route as HudAcademyCoursesSlugIndexRouteImport } from './routes/_hud/academy/courses/$slug/index'
+import { Route as HudAcademyCoursesSlugLessonsLessonSlugRouteImport } from './routes/_hud/academy/courses/$slug/lessons/$lessonSlug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -102,6 +106,11 @@ const HudRoute = HudRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChassisRoute = ChassisRouteImport.update({
+  id: '/chassis',
+  path: '/chassis',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CodexDotmdRoute = CodexDotmdRouteImport.update({
@@ -157,6 +166,11 @@ const OrgRoute = OrgRouteImport.update({
 const OrgDotmdRoute = OrgDotmdRouteImport.update({
   id: '/org.md',
   path: '/org.md',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PipelineRoute = PipelineRouteImport.update({
+  id: '/pipeline',
+  path: '/pipeline',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -219,9 +233,9 @@ const HudAlignmentRoute = HudAlignmentRouteImport.update({
   path: '/alignment',
   getParentRoute: () => HudRoute,
 } as any)
-const HudChassisRoute = HudChassisRouteImport.update({
-  id: '/chassis',
-  path: '/chassis',
+const HudCharacterRoute = HudCharacterRouteImport.update({
+  id: '/character',
+  path: '/character',
   getParentRoute: () => HudRoute,
 } as any)
 const HudCodexRouteRoute = HudCodexRouteRouteImport.update({
@@ -254,11 +268,6 @@ const HudOracleRoute = HudOracleRouteImport.update({
   path: '/oracle',
   getParentRoute: () => HudRoute,
 } as any)
-const HudPipelineRoute = HudPipelineRouteImport.update({
-  id: '/pipeline',
-  path: '/pipeline',
-  getParentRoute: () => HudRoute,
-} as any)
 const HudPremiumRoute = HudPremiumRouteImport.update({
   id: '/premium',
   path: '/premium',
@@ -277,6 +286,11 @@ const HudSearchRoute = HudSearchRouteImport.update({
 const HudSettingsRoute = HudSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => HudRoute,
+} as any)
+const HudStagesRoute = HudStagesRouteImport.update({
+  id: '/stages',
+  path: '/stages',
   getParentRoute: () => HudRoute,
 } as any)
 const HudStreamRoute = HudStreamRouteImport.update({
@@ -322,6 +336,16 @@ const ChangelogSlugRoute = ChangelogSlugRouteImport.update({
 const IReferrerIdRoute = IReferrerIdRouteImport.update({
   id: '/i/$referrerId',
   path: '/i/$referrerId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LecturesIndexRoute = LecturesIndexRouteImport.update({
+  id: '/lectures/',
+  path: '/lectures/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LecturesSplatRoute = LecturesSplatRouteImport.update({
+  id: '/lectures/$',
+  path: '/lectures/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NewsIndexRoute = NewsIndexRouteImport.update({
@@ -382,6 +406,11 @@ const WhatIsMoltologyWhatMoltologistsSayRoute =
     path: '/what-moltologists-say',
     getParentRoute: () => WhatIsMoltologyRoute,
   } as any)
+const HudAcademyIndexRoute = HudAcademyIndexRouteImport.update({
+  id: '/academy/',
+  path: '/academy/',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudAdminIndexRoute = HudAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -410,11 +439,6 @@ const HudCodexSlugRoute = HudCodexSlugRouteImport.update({
 const HudForumIndexRoute = HudForumIndexRouteImport.update({
   id: '/forum/',
   path: '/forum/',
-  getParentRoute: () => HudRoute,
-} as any)
-const HudLecturesIndexRoute = HudLecturesIndexRouteImport.update({
-  id: '/lectures/',
-  path: '/lectures/',
   getParentRoute: () => HudRoute,
 } as any)
 const HudMemberProfileIdRoute = HudMemberProfileIdRouteImport.update({
@@ -452,6 +476,28 @@ const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
   path: '/api/stripe/webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HudAcademyCertificatesIndexRoute =
+  HudAcademyCertificatesIndexRouteImport.update({
+    id: '/academy/certificates/',
+    path: '/academy/certificates/',
+    getParentRoute: () => HudRoute,
+  } as any)
+const HudAcademyCertificatesCredentialIdRoute =
+  HudAcademyCertificatesCredentialIdRouteImport.update({
+    id: '/academy/certificates/$credentialId',
+    path: '/academy/certificates/$credentialId',
+    getParentRoute: () => HudRoute,
+  } as any)
+const HudAcademyCoursesSlugRoute = HudAcademyCoursesSlugRouteImport.update({
+  id: '/academy/courses/$slug',
+  path: '/academy/courses/$slug',
+  getParentRoute: () => HudRoute,
+} as any)
+const HudAcademyTracksSlugRoute = HudAcademyTracksSlugRouteImport.update({
+  id: '/academy/tracks/$slug',
+  path: '/academy/tracks/$slug',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudForumCategorySlugIndexRoute =
   HudForumCategorySlugIndexRouteImport.update({
     id: '/forum/$categorySlug/',
@@ -464,44 +510,23 @@ const HudForumCategorySlugTopicSlugRoute =
     path: '/forum/$categorySlug/$topicSlug',
     getParentRoute: () => HudRoute,
   } as any)
-const HudLecturesCertificatesIndexRoute =
-  HudLecturesCertificatesIndexRouteImport.update({
-    id: '/lectures/certificates/',
-    path: '/lectures/certificates/',
-    getParentRoute: () => HudRoute,
-  } as any)
-const HudLecturesCertificatesCredentialIdRoute =
-  HudLecturesCertificatesCredentialIdRouteImport.update({
-    id: '/lectures/certificates/$credentialId',
-    path: '/lectures/certificates/$credentialId',
-    getParentRoute: () => HudRoute,
-  } as any)
-const HudLecturesCoursesSlugRoute = HudLecturesCoursesSlugRouteImport.update({
-  id: '/lectures/courses/$slug',
-  path: '/lectures/courses/$slug',
-  getParentRoute: () => HudRoute,
-} as any)
-const HudLecturesTracksSlugRoute = HudLecturesTracksSlugRouteImport.update({
-  id: '/lectures/tracks/$slug',
-  path: '/lectures/tracks/$slug',
-  getParentRoute: () => HudRoute,
-} as any)
-const HudLecturesCoursesSlugIndexRoute =
-  HudLecturesCoursesSlugIndexRouteImport.update({
+const HudAcademyCoursesSlugIndexRoute =
+  HudAcademyCoursesSlugIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => HudLecturesCoursesSlugRoute,
+    getParentRoute: () => HudAcademyCoursesSlugRoute,
   } as any)
-const HudLecturesCoursesSlugLessonsLessonSlugRoute =
-  HudLecturesCoursesSlugLessonsLessonSlugRouteImport.update({
+const HudAcademyCoursesSlugLessonsLessonSlugRoute =
+  HudAcademyCoursesSlugLessonsLessonSlugRouteImport.update({
     id: '/lessons/$lessonSlug',
     path: '/lessons/$lessonSlug',
-    getParentRoute: () => HudLecturesCoursesSlugRoute,
+    getParentRoute: () => HudAcademyCoursesSlugRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/chassis': typeof ChassisRoute
   '/codex.md': typeof CodexDotmdRoute
   '/error': typeof ErrorRoute
   '/feed.xml': typeof FeedDotxmlRoute
@@ -513,6 +538,7 @@ export interface FileRoutesByFullPath {
   '/news.md': typeof NewsDotmdRoute
   '/org': typeof OrgRoute
   '/org.md': typeof OrgDotmdRoute
+  '/pipeline': typeof PipelineRoute
   '/privacy': typeof PrivacyRoute
   '/privacy.md': typeof PrivacyDotmdRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -526,17 +552,17 @@ export interface FileRoutesByFullPath {
   '/what-is-moltology': typeof WhatIsMoltologyRouteWithChildren
   '/codex': typeof HudCodexRouteRouteWithChildren
   '/alignment': typeof HudAlignmentRoute
-  '/chassis': typeof HudChassisRoute
+  '/character': typeof HudCharacterRoute
   '/connections': typeof HudConnectionsRoute
   '/dashboard': typeof HudDashboardRoute
   '/hud': typeof HudHudRoute
   '/market': typeof HudMarketRoute
   '/oracle': typeof HudOracleRoute
-  '/pipeline': typeof HudPipelineRoute
   '/premium': typeof HudPremiumRoute
   '/profile': typeof HudProfileRoute
   '/search': typeof HudSearchRoute
   '/settings': typeof HudSettingsRoute
+  '/stages': typeof HudStagesRoute
   '/stream': typeof HudStreamRoute
   '/support': typeof HudSupportRoute
   '/watch': typeof HudWatchRoute
@@ -544,6 +570,7 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
   '/i/$referrerId': typeof IReferrerIdRoute
+  '/lectures/$': typeof LecturesSplatRoute
   '/news/$slug': typeof NewsSlugRoute
   '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
@@ -554,6 +581,7 @@ export interface FileRoutesByFullPath {
   '/what-is-moltology/what-moltologists-say': typeof WhatIsMoltologyWhatMoltologistsSayRoute
   '/blog/': typeof BlogIndexRoute
   '/changelog/': typeof ChangelogIndexRoute
+  '/lectures/': typeof LecturesIndexRoute
   '/news/': typeof NewsIndexRoute
   '/store/': typeof StoreIndexRoute
   '/what-is-moltology/': typeof WhatIsMoltologyIndexRoute
@@ -567,22 +595,23 @@ export interface FileRoutesByFullPath {
   '/api/printful/webhook': typeof ApiPrintfulWebhookRoute
   '/api/store/recovery': typeof ApiStoreRecoveryRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/academy/': typeof HudAcademyIndexRoute
   '/admin/': typeof HudAdminIndexRoute
   '/codex/': typeof HudCodexIndexRoute
   '/forum/': typeof HudForumIndexRoute
-  '/lectures/': typeof HudLecturesIndexRoute
+  '/academy/certificates/$credentialId': typeof HudAcademyCertificatesCredentialIdRoute
+  '/academy/courses/$slug': typeof HudAcademyCoursesSlugRouteWithChildren
+  '/academy/tracks/$slug': typeof HudAcademyTracksSlugRoute
   '/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
-  '/lectures/certificates/$credentialId': typeof HudLecturesCertificatesCredentialIdRoute
-  '/lectures/courses/$slug': typeof HudLecturesCoursesSlugRouteWithChildren
-  '/lectures/tracks/$slug': typeof HudLecturesTracksSlugRoute
+  '/academy/certificates/': typeof HudAcademyCertificatesIndexRoute
   '/forum/$categorySlug/': typeof HudForumCategorySlugIndexRoute
-  '/lectures/certificates/': typeof HudLecturesCertificatesIndexRoute
-  '/lectures/courses/$slug/': typeof HudLecturesCoursesSlugIndexRoute
-  '/lectures/courses/$slug/lessons/$lessonSlug': typeof HudLecturesCoursesSlugLessonsLessonSlugRoute
+  '/academy/courses/$slug/': typeof HudAcademyCoursesSlugIndexRoute
+  '/academy/courses/$slug/lessons/$lessonSlug': typeof HudAcademyCoursesSlugLessonsLessonSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/chassis': typeof ChassisRoute
   '/codex.md': typeof CodexDotmdRoute
   '/error': typeof ErrorRoute
   '/feed.xml': typeof FeedDotxmlRoute
@@ -594,6 +623,7 @@ export interface FileRoutesByTo {
   '/news.md': typeof NewsDotmdRoute
   '/org': typeof OrgRoute
   '/org.md': typeof OrgDotmdRoute
+  '/pipeline': typeof PipelineRoute
   '/privacy': typeof PrivacyRoute
   '/privacy.md': typeof PrivacyDotmdRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -604,17 +634,17 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
   '/alignment': typeof HudAlignmentRoute
-  '/chassis': typeof HudChassisRoute
+  '/character': typeof HudCharacterRoute
   '/connections': typeof HudConnectionsRoute
   '/dashboard': typeof HudDashboardRoute
   '/hud': typeof HudHudRoute
   '/market': typeof HudMarketRoute
   '/oracle': typeof HudOracleRoute
-  '/pipeline': typeof HudPipelineRoute
   '/premium': typeof HudPremiumRoute
   '/profile': typeof HudProfileRoute
   '/search': typeof HudSearchRoute
   '/settings': typeof HudSettingsRoute
+  '/stages': typeof HudStagesRoute
   '/stream': typeof HudStreamRoute
   '/support': typeof HudSupportRoute
   '/watch': typeof HudWatchRoute
@@ -622,6 +652,7 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
   '/i/$referrerId': typeof IReferrerIdRoute
+  '/lectures/$': typeof LecturesSplatRoute
   '/news/$slug': typeof NewsSlugRoute
   '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
@@ -632,6 +663,7 @@ export interface FileRoutesByTo {
   '/what-is-moltology/what-moltologists-say': typeof WhatIsMoltologyWhatMoltologistsSayRoute
   '/blog': typeof BlogIndexRoute
   '/changelog': typeof ChangelogIndexRoute
+  '/lectures': typeof LecturesIndexRoute
   '/news': typeof NewsIndexRoute
   '/store': typeof StoreIndexRoute
   '/what-is-moltology': typeof WhatIsMoltologyIndexRoute
@@ -645,23 +677,24 @@ export interface FileRoutesByTo {
   '/api/printful/webhook': typeof ApiPrintfulWebhookRoute
   '/api/store/recovery': typeof ApiStoreRecoveryRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/academy': typeof HudAcademyIndexRoute
   '/admin': typeof HudAdminIndexRoute
   '/codex': typeof HudCodexIndexRoute
   '/forum': typeof HudForumIndexRoute
-  '/lectures': typeof HudLecturesIndexRoute
+  '/academy/certificates/$credentialId': typeof HudAcademyCertificatesCredentialIdRoute
+  '/academy/tracks/$slug': typeof HudAcademyTracksSlugRoute
   '/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
-  '/lectures/certificates/$credentialId': typeof HudLecturesCertificatesCredentialIdRoute
-  '/lectures/tracks/$slug': typeof HudLecturesTracksSlugRoute
+  '/academy/certificates': typeof HudAcademyCertificatesIndexRoute
   '/forum/$categorySlug': typeof HudForumCategorySlugIndexRoute
-  '/lectures/certificates': typeof HudLecturesCertificatesIndexRoute
-  '/lectures/courses/$slug': typeof HudLecturesCoursesSlugIndexRoute
-  '/lectures/courses/$slug/lessons/$lessonSlug': typeof HudLecturesCoursesSlugLessonsLessonSlugRoute
+  '/academy/courses/$slug': typeof HudAcademyCoursesSlugIndexRoute
+  '/academy/courses/$slug/lessons/$lessonSlug': typeof HudAcademyCoursesSlugLessonsLessonSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_hud': typeof HudRouteWithChildren
   '/auth': typeof AuthRoute
+  '/chassis': typeof ChassisRoute
   '/codex.md': typeof CodexDotmdRoute
   '/error': typeof ErrorRoute
   '/feed.xml': typeof FeedDotxmlRoute
@@ -673,6 +706,7 @@ export interface FileRoutesById {
   '/news.md': typeof NewsDotmdRoute
   '/org': typeof OrgRoute
   '/org.md': typeof OrgDotmdRoute
+  '/pipeline': typeof PipelineRoute
   '/privacy': typeof PrivacyRoute
   '/privacy.md': typeof PrivacyDotmdRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -686,17 +720,17 @@ export interface FileRoutesById {
   '/what-is-moltology': typeof WhatIsMoltologyRouteWithChildren
   '/_hud/codex': typeof HudCodexRouteRouteWithChildren
   '/_hud/alignment': typeof HudAlignmentRoute
-  '/_hud/chassis': typeof HudChassisRoute
+  '/_hud/character': typeof HudCharacterRoute
   '/_hud/connections': typeof HudConnectionsRoute
   '/_hud/dashboard': typeof HudDashboardRoute
   '/_hud/hud': typeof HudHudRoute
   '/_hud/market': typeof HudMarketRoute
   '/_hud/oracle': typeof HudOracleRoute
-  '/_hud/pipeline': typeof HudPipelineRoute
   '/_hud/premium': typeof HudPremiumRoute
   '/_hud/profile': typeof HudProfileRoute
   '/_hud/search': typeof HudSearchRoute
   '/_hud/settings': typeof HudSettingsRoute
+  '/_hud/stages': typeof HudStagesRoute
   '/_hud/stream': typeof HudStreamRoute
   '/_hud/support': typeof HudSupportRoute
   '/_hud/watch': typeof HudWatchRoute
@@ -704,6 +738,7 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
   '/i/$referrerId': typeof IReferrerIdRoute
+  '/lectures/$': typeof LecturesSplatRoute
   '/news/$slug': typeof NewsSlugRoute
   '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
@@ -714,6 +749,7 @@ export interface FileRoutesById {
   '/what-is-moltology/what-moltologists-say': typeof WhatIsMoltologyWhatMoltologistsSayRoute
   '/blog/': typeof BlogIndexRoute
   '/changelog/': typeof ChangelogIndexRoute
+  '/lectures/': typeof LecturesIndexRoute
   '/news/': typeof NewsIndexRoute
   '/store/': typeof StoreIndexRoute
   '/what-is-moltology/': typeof WhatIsMoltologyIndexRoute
@@ -727,24 +763,25 @@ export interface FileRoutesById {
   '/api/printful/webhook': typeof ApiPrintfulWebhookRoute
   '/api/store/recovery': typeof ApiStoreRecoveryRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/_hud/academy/': typeof HudAcademyIndexRoute
   '/_hud/admin/': typeof HudAdminIndexRoute
   '/_hud/codex/': typeof HudCodexIndexRoute
   '/_hud/forum/': typeof HudForumIndexRoute
-  '/_hud/lectures/': typeof HudLecturesIndexRoute
+  '/_hud/academy/certificates/$credentialId': typeof HudAcademyCertificatesCredentialIdRoute
+  '/_hud/academy/courses/$slug': typeof HudAcademyCoursesSlugRouteWithChildren
+  '/_hud/academy/tracks/$slug': typeof HudAcademyTracksSlugRoute
   '/_hud/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
-  '/_hud/lectures/certificates/$credentialId': typeof HudLecturesCertificatesCredentialIdRoute
-  '/_hud/lectures/courses/$slug': typeof HudLecturesCoursesSlugRouteWithChildren
-  '/_hud/lectures/tracks/$slug': typeof HudLecturesTracksSlugRoute
+  '/_hud/academy/certificates/': typeof HudAcademyCertificatesIndexRoute
   '/_hud/forum/$categorySlug/': typeof HudForumCategorySlugIndexRoute
-  '/_hud/lectures/certificates/': typeof HudLecturesCertificatesIndexRoute
-  '/_hud/lectures/courses/$slug/': typeof HudLecturesCoursesSlugIndexRoute
-  '/_hud/lectures/courses/$slug/lessons/$lessonSlug': typeof HudLecturesCoursesSlugLessonsLessonSlugRoute
+  '/_hud/academy/courses/$slug/': typeof HudAcademyCoursesSlugIndexRoute
+  '/_hud/academy/courses/$slug/lessons/$lessonSlug': typeof HudAcademyCoursesSlugLessonsLessonSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/chassis'
     | '/codex.md'
     | '/error'
     | '/feed.xml'
@@ -756,6 +793,7 @@ export interface FileRouteTypes {
     | '/news.md'
     | '/org'
     | '/org.md'
+    | '/pipeline'
     | '/privacy'
     | '/privacy.md'
     | '/rss.xml'
@@ -769,17 +807,17 @@ export interface FileRouteTypes {
     | '/what-is-moltology'
     | '/codex'
     | '/alignment'
-    | '/chassis'
+    | '/character'
     | '/connections'
     | '/dashboard'
     | '/hud'
     | '/market'
     | '/oracle'
-    | '/pipeline'
     | '/premium'
     | '/profile'
     | '/search'
     | '/settings'
+    | '/stages'
     | '/stream'
     | '/support'
     | '/watch'
@@ -787,6 +825,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/changelog/$slug'
     | '/i/$referrerId'
+    | '/lectures/$'
     | '/news/$slug'
     | '/news/{$slug}.md'
     | '/render/composite'
@@ -797,6 +836,7 @@ export interface FileRouteTypes {
     | '/what-is-moltology/what-moltologists-say'
     | '/blog/'
     | '/changelog/'
+    | '/lectures/'
     | '/news/'
     | '/store/'
     | '/what-is-moltology/'
@@ -810,22 +850,23 @@ export interface FileRouteTypes {
     | '/api/printful/webhook'
     | '/api/store/recovery'
     | '/api/stripe/webhook'
+    | '/academy/'
     | '/admin/'
     | '/codex/'
     | '/forum/'
-    | '/lectures/'
+    | '/academy/certificates/$credentialId'
+    | '/academy/courses/$slug'
+    | '/academy/tracks/$slug'
     | '/forum/$categorySlug/$topicSlug'
-    | '/lectures/certificates/$credentialId'
-    | '/lectures/courses/$slug'
-    | '/lectures/tracks/$slug'
+    | '/academy/certificates/'
     | '/forum/$categorySlug/'
-    | '/lectures/certificates/'
-    | '/lectures/courses/$slug/'
-    | '/lectures/courses/$slug/lessons/$lessonSlug'
+    | '/academy/courses/$slug/'
+    | '/academy/courses/$slug/lessons/$lessonSlug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/chassis'
     | '/codex.md'
     | '/error'
     | '/feed.xml'
@@ -837,6 +878,7 @@ export interface FileRouteTypes {
     | '/news.md'
     | '/org'
     | '/org.md'
+    | '/pipeline'
     | '/privacy'
     | '/privacy.md'
     | '/rss.xml'
@@ -847,17 +889,17 @@ export interface FileRouteTypes {
     | '/terms'
     | '/terms.md'
     | '/alignment'
-    | '/chassis'
+    | '/character'
     | '/connections'
     | '/dashboard'
     | '/hud'
     | '/market'
     | '/oracle'
-    | '/pipeline'
     | '/premium'
     | '/profile'
     | '/search'
     | '/settings'
+    | '/stages'
     | '/stream'
     | '/support'
     | '/watch'
@@ -865,6 +907,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/changelog/$slug'
     | '/i/$referrerId'
+    | '/lectures/$'
     | '/news/$slug'
     | '/news/{$slug}.md'
     | '/render/composite'
@@ -875,6 +918,7 @@ export interface FileRouteTypes {
     | '/what-is-moltology/what-moltologists-say'
     | '/blog'
     | '/changelog'
+    | '/lectures'
     | '/news'
     | '/store'
     | '/what-is-moltology'
@@ -888,22 +932,23 @@ export interface FileRouteTypes {
     | '/api/printful/webhook'
     | '/api/store/recovery'
     | '/api/stripe/webhook'
+    | '/academy'
     | '/admin'
     | '/codex'
     | '/forum'
-    | '/lectures'
+    | '/academy/certificates/$credentialId'
+    | '/academy/tracks/$slug'
     | '/forum/$categorySlug/$topicSlug'
-    | '/lectures/certificates/$credentialId'
-    | '/lectures/tracks/$slug'
+    | '/academy/certificates'
     | '/forum/$categorySlug'
-    | '/lectures/certificates'
-    | '/lectures/courses/$slug'
-    | '/lectures/courses/$slug/lessons/$lessonSlug'
+    | '/academy/courses/$slug'
+    | '/academy/courses/$slug/lessons/$lessonSlug'
   id:
     | '__root__'
     | '/'
     | '/_hud'
     | '/auth'
+    | '/chassis'
     | '/codex.md'
     | '/error'
     | '/feed.xml'
@@ -915,6 +960,7 @@ export interface FileRouteTypes {
     | '/news.md'
     | '/org'
     | '/org.md'
+    | '/pipeline'
     | '/privacy'
     | '/privacy.md'
     | '/rss.xml'
@@ -928,17 +974,17 @@ export interface FileRouteTypes {
     | '/what-is-moltology'
     | '/_hud/codex'
     | '/_hud/alignment'
-    | '/_hud/chassis'
+    | '/_hud/character'
     | '/_hud/connections'
     | '/_hud/dashboard'
     | '/_hud/hud'
     | '/_hud/market'
     | '/_hud/oracle'
-    | '/_hud/pipeline'
     | '/_hud/premium'
     | '/_hud/profile'
     | '/_hud/search'
     | '/_hud/settings'
+    | '/_hud/stages'
     | '/_hud/stream'
     | '/_hud/support'
     | '/_hud/watch'
@@ -946,6 +992,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/changelog/$slug'
     | '/i/$referrerId'
+    | '/lectures/$'
     | '/news/$slug'
     | '/news/{$slug}.md'
     | '/render/composite'
@@ -956,6 +1003,7 @@ export interface FileRouteTypes {
     | '/what-is-moltology/what-moltologists-say'
     | '/blog/'
     | '/changelog/'
+    | '/lectures/'
     | '/news/'
     | '/store/'
     | '/what-is-moltology/'
@@ -969,24 +1017,25 @@ export interface FileRouteTypes {
     | '/api/printful/webhook'
     | '/api/store/recovery'
     | '/api/stripe/webhook'
+    | '/_hud/academy/'
     | '/_hud/admin/'
     | '/_hud/codex/'
     | '/_hud/forum/'
-    | '/_hud/lectures/'
+    | '/_hud/academy/certificates/$credentialId'
+    | '/_hud/academy/courses/$slug'
+    | '/_hud/academy/tracks/$slug'
     | '/_hud/forum/$categorySlug/$topicSlug'
-    | '/_hud/lectures/certificates/$credentialId'
-    | '/_hud/lectures/courses/$slug'
-    | '/_hud/lectures/tracks/$slug'
+    | '/_hud/academy/certificates/'
     | '/_hud/forum/$categorySlug/'
-    | '/_hud/lectures/certificates/'
-    | '/_hud/lectures/courses/$slug/'
-    | '/_hud/lectures/courses/$slug/lessons/$lessonSlug'
+    | '/_hud/academy/courses/$slug/'
+    | '/_hud/academy/courses/$slug/lessons/$lessonSlug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HudRoute: typeof HudRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ChassisRoute: typeof ChassisRoute
   CodexDotmdRoute: typeof CodexDotmdRoute
   ErrorRoute: typeof ErrorRoute
   FeedDotxmlRoute: typeof FeedDotxmlRoute
@@ -998,6 +1047,7 @@ export interface RootRouteChildren {
   NewsDotmdRoute: typeof NewsDotmdRoute
   OrgRoute: typeof OrgRoute
   OrgDotmdRoute: typeof OrgDotmdRoute
+  PipelineRoute: typeof PipelineRoute
   PrivacyRoute: typeof PrivacyRoute
   PrivacyDotmdRoute: typeof PrivacyDotmdRoute
   RssDotxmlRoute: typeof RssDotxmlRoute
@@ -1013,11 +1063,13 @@ export interface RootRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
   ChangelogSlugRoute: typeof ChangelogSlugRoute
   IReferrerIdRoute: typeof IReferrerIdRoute
+  LecturesSplatRoute: typeof LecturesSplatRoute
   NewsSlugRoute: typeof NewsSlugRoute
   NewsChar123slugChar125DotmdRoute: typeof NewsChar123slugChar125DotmdRoute
   RenderCompositeRoute: typeof RenderCompositeRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ChangelogIndexRoute: typeof ChangelogIndexRoute
+  LecturesIndexRoute: typeof LecturesIndexRoute
   NewsIndexRoute: typeof NewsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiEmailConfirmRoute: typeof ApiEmailConfirmRoute
@@ -1048,6 +1100,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chassis': {
+      id: '/chassis'
+      path: '/chassis'
+      fullPath: '/chassis'
+      preLoaderRoute: typeof ChassisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/codex.md': {
@@ -1125,6 +1184,13 @@ declare module '@tanstack/react-router' {
       path: '/org.md'
       fullPath: '/org.md'
       preLoaderRoute: typeof OrgDotmdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pipeline': {
+      id: '/pipeline'
+      path: '/pipeline'
+      fullPath: '/pipeline'
+      preLoaderRoute: typeof PipelineRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -1211,11 +1277,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudAlignmentRouteImport
       parentRoute: typeof HudRoute
     }
-    '/_hud/chassis': {
-      id: '/_hud/chassis'
-      path: '/chassis'
-      fullPath: '/chassis'
-      preLoaderRoute: typeof HudChassisRouteImport
+    '/_hud/character': {
+      id: '/_hud/character'
+      path: '/character'
+      fullPath: '/character'
+      preLoaderRoute: typeof HudCharacterRouteImport
       parentRoute: typeof HudRoute
     }
     '/_hud/codex': {
@@ -1260,13 +1326,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudOracleRouteImport
       parentRoute: typeof HudRoute
     }
-    '/_hud/pipeline': {
-      id: '/_hud/pipeline'
-      path: '/pipeline'
-      fullPath: '/pipeline'
-      preLoaderRoute: typeof HudPipelineRouteImport
-      parentRoute: typeof HudRoute
-    }
     '/_hud/premium': {
       id: '/_hud/premium'
       path: '/premium'
@@ -1293,6 +1352,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof HudSettingsRouteImport
+      parentRoute: typeof HudRoute
+    }
+    '/_hud/stages': {
+      id: '/_hud/stages'
+      path: '/stages'
+      fullPath: '/stages'
+      preLoaderRoute: typeof HudStagesRouteImport
       parentRoute: typeof HudRoute
     }
     '/_hud/stream': {
@@ -1356,6 +1422,20 @@ declare module '@tanstack/react-router' {
       path: '/i/$referrerId'
       fullPath: '/i/$referrerId'
       preLoaderRoute: typeof IReferrerIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lectures/': {
+      id: '/lectures/'
+      path: '/lectures'
+      fullPath: '/lectures/'
+      preLoaderRoute: typeof LecturesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lectures/$': {
+      id: '/lectures/$'
+      path: '/lectures/$'
+      fullPath: '/lectures/$'
+      preLoaderRoute: typeof LecturesSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/news/': {
@@ -1435,6 +1515,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WhatIsMoltologyWhatMoltologistsSayRouteImport
       parentRoute: typeof WhatIsMoltologyRoute
     }
+    '/_hud/academy/': {
+      id: '/_hud/academy/'
+      path: '/academy'
+      fullPath: '/academy/'
+      preLoaderRoute: typeof HudAcademyIndexRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/admin/': {
       id: '/_hud/admin/'
       path: '/admin'
@@ -1475,13 +1562,6 @@ declare module '@tanstack/react-router' {
       path: '/forum'
       fullPath: '/forum/'
       preLoaderRoute: typeof HudForumIndexRouteImport
-      parentRoute: typeof HudRoute
-    }
-    '/_hud/lectures/': {
-      id: '/_hud/lectures/'
-      path: '/lectures'
-      fullPath: '/lectures/'
-      preLoaderRoute: typeof HudLecturesIndexRouteImport
       parentRoute: typeof HudRoute
     }
     '/_hud/member/$profileId': {
@@ -1533,6 +1613,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiStripeWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_hud/academy/certificates/': {
+      id: '/_hud/academy/certificates/'
+      path: '/academy/certificates'
+      fullPath: '/academy/certificates/'
+      preLoaderRoute: typeof HudAcademyCertificatesIndexRouteImport
+      parentRoute: typeof HudRoute
+    }
+    '/_hud/academy/certificates/$credentialId': {
+      id: '/_hud/academy/certificates/$credentialId'
+      path: '/academy/certificates/$credentialId'
+      fullPath: '/academy/certificates/$credentialId'
+      preLoaderRoute: typeof HudAcademyCertificatesCredentialIdRouteImport
+      parentRoute: typeof HudRoute
+    }
+    '/_hud/academy/courses/$slug': {
+      id: '/_hud/academy/courses/$slug'
+      path: '/academy/courses/$slug'
+      fullPath: '/academy/courses/$slug'
+      preLoaderRoute: typeof HudAcademyCoursesSlugRouteImport
+      parentRoute: typeof HudRoute
+    }
+    '/_hud/academy/tracks/$slug': {
+      id: '/_hud/academy/tracks/$slug'
+      path: '/academy/tracks/$slug'
+      fullPath: '/academy/tracks/$slug'
+      preLoaderRoute: typeof HudAcademyTracksSlugRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/forum/$categorySlug/': {
       id: '/_hud/forum/$categorySlug/'
       path: '/forum/$categorySlug'
@@ -1547,47 +1655,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudForumCategorySlugTopicSlugRouteImport
       parentRoute: typeof HudRoute
     }
-    '/_hud/lectures/certificates/': {
-      id: '/_hud/lectures/certificates/'
-      path: '/lectures/certificates'
-      fullPath: '/lectures/certificates/'
-      preLoaderRoute: typeof HudLecturesCertificatesIndexRouteImport
-      parentRoute: typeof HudRoute
-    }
-    '/_hud/lectures/certificates/$credentialId': {
-      id: '/_hud/lectures/certificates/$credentialId'
-      path: '/lectures/certificates/$credentialId'
-      fullPath: '/lectures/certificates/$credentialId'
-      preLoaderRoute: typeof HudLecturesCertificatesCredentialIdRouteImport
-      parentRoute: typeof HudRoute
-    }
-    '/_hud/lectures/courses/$slug': {
-      id: '/_hud/lectures/courses/$slug'
-      path: '/lectures/courses/$slug'
-      fullPath: '/lectures/courses/$slug'
-      preLoaderRoute: typeof HudLecturesCoursesSlugRouteImport
-      parentRoute: typeof HudRoute
-    }
-    '/_hud/lectures/tracks/$slug': {
-      id: '/_hud/lectures/tracks/$slug'
-      path: '/lectures/tracks/$slug'
-      fullPath: '/lectures/tracks/$slug'
-      preLoaderRoute: typeof HudLecturesTracksSlugRouteImport
-      parentRoute: typeof HudRoute
-    }
-    '/_hud/lectures/courses/$slug/': {
-      id: '/_hud/lectures/courses/$slug/'
+    '/_hud/academy/courses/$slug/': {
+      id: '/_hud/academy/courses/$slug/'
       path: '/'
-      fullPath: '/lectures/courses/$slug/'
-      preLoaderRoute: typeof HudLecturesCoursesSlugIndexRouteImport
-      parentRoute: typeof HudLecturesCoursesSlugRoute
+      fullPath: '/academy/courses/$slug/'
+      preLoaderRoute: typeof HudAcademyCoursesSlugIndexRouteImport
+      parentRoute: typeof HudAcademyCoursesSlugRoute
     }
-    '/_hud/lectures/courses/$slug/lessons/$lessonSlug': {
-      id: '/_hud/lectures/courses/$slug/lessons/$lessonSlug'
+    '/_hud/academy/courses/$slug/lessons/$lessonSlug': {
+      id: '/_hud/academy/courses/$slug/lessons/$lessonSlug'
       path: '/lessons/$lessonSlug'
-      fullPath: '/lectures/courses/$slug/lessons/$lessonSlug'
-      preLoaderRoute: typeof HudLecturesCoursesSlugLessonsLessonSlugRouteImport
-      parentRoute: typeof HudLecturesCoursesSlugRoute
+      fullPath: '/academy/courses/$slug/lessons/$lessonSlug'
+      preLoaderRoute: typeof HudAcademyCoursesSlugLessonsLessonSlugRouteImport
+      parentRoute: typeof HudAcademyCoursesSlugRoute
     }
   }
 }
@@ -1606,84 +1686,83 @@ const HudCodexRouteRouteWithChildren = HudCodexRouteRoute._addFileChildren(
   HudCodexRouteRouteChildren,
 )
 
-interface HudLecturesCoursesSlugRouteChildren {
-  HudLecturesCoursesSlugIndexRoute: typeof HudLecturesCoursesSlugIndexRoute
-  HudLecturesCoursesSlugLessonsLessonSlugRoute: typeof HudLecturesCoursesSlugLessonsLessonSlugRoute
+interface HudAcademyCoursesSlugRouteChildren {
+  HudAcademyCoursesSlugIndexRoute: typeof HudAcademyCoursesSlugIndexRoute
+  HudAcademyCoursesSlugLessonsLessonSlugRoute: typeof HudAcademyCoursesSlugLessonsLessonSlugRoute
 }
 
-const HudLecturesCoursesSlugRouteChildren: HudLecturesCoursesSlugRouteChildren =
-  {
-    HudLecturesCoursesSlugIndexRoute: HudLecturesCoursesSlugIndexRoute,
-    HudLecturesCoursesSlugLessonsLessonSlugRoute:
-      HudLecturesCoursesSlugLessonsLessonSlugRoute,
-  }
+const HudAcademyCoursesSlugRouteChildren: HudAcademyCoursesSlugRouteChildren = {
+  HudAcademyCoursesSlugIndexRoute: HudAcademyCoursesSlugIndexRoute,
+  HudAcademyCoursesSlugLessonsLessonSlugRoute:
+    HudAcademyCoursesSlugLessonsLessonSlugRoute,
+}
 
-const HudLecturesCoursesSlugRouteWithChildren =
-  HudLecturesCoursesSlugRoute._addFileChildren(
-    HudLecturesCoursesSlugRouteChildren,
+const HudAcademyCoursesSlugRouteWithChildren =
+  HudAcademyCoursesSlugRoute._addFileChildren(
+    HudAcademyCoursesSlugRouteChildren,
   )
 
 interface HudRouteChildren {
   HudCodexRouteRoute: typeof HudCodexRouteRouteWithChildren
   HudAlignmentRoute: typeof HudAlignmentRoute
-  HudChassisRoute: typeof HudChassisRoute
+  HudCharacterRoute: typeof HudCharacterRoute
   HudConnectionsRoute: typeof HudConnectionsRoute
   HudDashboardRoute: typeof HudDashboardRoute
   HudHudRoute: typeof HudHudRoute
   HudMarketRoute: typeof HudMarketRoute
   HudOracleRoute: typeof HudOracleRoute
-  HudPipelineRoute: typeof HudPipelineRoute
   HudPremiumRoute: typeof HudPremiumRoute
   HudProfileRoute: typeof HudProfileRoute
   HudSearchRoute: typeof HudSearchRoute
   HudSettingsRoute: typeof HudSettingsRoute
+  HudStagesRoute: typeof HudStagesRoute
   HudStreamRoute: typeof HudStreamRoute
   HudSupportRoute: typeof HudSupportRoute
   HudWatchRoute: typeof HudWatchRoute
   HudAdminLogicRoute: typeof HudAdminLogicRoute
   HudAdminStoreRoute: typeof HudAdminStoreRoute
   HudMemberProfileIdRoute: typeof HudMemberProfileIdRoute
+  HudAcademyIndexRoute: typeof HudAcademyIndexRoute
   HudAdminIndexRoute: typeof HudAdminIndexRoute
   HudForumIndexRoute: typeof HudForumIndexRoute
-  HudLecturesIndexRoute: typeof HudLecturesIndexRoute
+  HudAcademyCertificatesCredentialIdRoute: typeof HudAcademyCertificatesCredentialIdRoute
+  HudAcademyCoursesSlugRoute: typeof HudAcademyCoursesSlugRouteWithChildren
+  HudAcademyTracksSlugRoute: typeof HudAcademyTracksSlugRoute
   HudForumCategorySlugTopicSlugRoute: typeof HudForumCategorySlugTopicSlugRoute
-  HudLecturesCertificatesCredentialIdRoute: typeof HudLecturesCertificatesCredentialIdRoute
-  HudLecturesCoursesSlugRoute: typeof HudLecturesCoursesSlugRouteWithChildren
-  HudLecturesTracksSlugRoute: typeof HudLecturesTracksSlugRoute
+  HudAcademyCertificatesIndexRoute: typeof HudAcademyCertificatesIndexRoute
   HudForumCategorySlugIndexRoute: typeof HudForumCategorySlugIndexRoute
-  HudLecturesCertificatesIndexRoute: typeof HudLecturesCertificatesIndexRoute
 }
 
 const HudRouteChildren: HudRouteChildren = {
   HudCodexRouteRoute: HudCodexRouteRouteWithChildren,
   HudAlignmentRoute: HudAlignmentRoute,
-  HudChassisRoute: HudChassisRoute,
+  HudCharacterRoute: HudCharacterRoute,
   HudConnectionsRoute: HudConnectionsRoute,
   HudDashboardRoute: HudDashboardRoute,
   HudHudRoute: HudHudRoute,
   HudMarketRoute: HudMarketRoute,
   HudOracleRoute: HudOracleRoute,
-  HudPipelineRoute: HudPipelineRoute,
   HudPremiumRoute: HudPremiumRoute,
   HudProfileRoute: HudProfileRoute,
   HudSearchRoute: HudSearchRoute,
   HudSettingsRoute: HudSettingsRoute,
+  HudStagesRoute: HudStagesRoute,
   HudStreamRoute: HudStreamRoute,
   HudSupportRoute: HudSupportRoute,
   HudWatchRoute: HudWatchRoute,
   HudAdminLogicRoute: HudAdminLogicRoute,
   HudAdminStoreRoute: HudAdminStoreRoute,
   HudMemberProfileIdRoute: HudMemberProfileIdRoute,
+  HudAcademyIndexRoute: HudAcademyIndexRoute,
   HudAdminIndexRoute: HudAdminIndexRoute,
   HudForumIndexRoute: HudForumIndexRoute,
-  HudLecturesIndexRoute: HudLecturesIndexRoute,
+  HudAcademyCertificatesCredentialIdRoute:
+    HudAcademyCertificatesCredentialIdRoute,
+  HudAcademyCoursesSlugRoute: HudAcademyCoursesSlugRouteWithChildren,
+  HudAcademyTracksSlugRoute: HudAcademyTracksSlugRoute,
   HudForumCategorySlugTopicSlugRoute: HudForumCategorySlugTopicSlugRoute,
-  HudLecturesCertificatesCredentialIdRoute:
-    HudLecturesCertificatesCredentialIdRoute,
-  HudLecturesCoursesSlugRoute: HudLecturesCoursesSlugRouteWithChildren,
-  HudLecturesTracksSlugRoute: HudLecturesTracksSlugRoute,
+  HudAcademyCertificatesIndexRoute: HudAcademyCertificatesIndexRoute,
   HudForumCategorySlugIndexRoute: HudForumCategorySlugIndexRoute,
-  HudLecturesCertificatesIndexRoute: HudLecturesCertificatesIndexRoute,
 }
 
 const HudRouteWithChildren = HudRoute._addFileChildren(HudRouteChildren)
@@ -1725,6 +1804,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HudRoute: HudRouteWithChildren,
   AuthRoute: AuthRoute,
+  ChassisRoute: ChassisRoute,
   CodexDotmdRoute: CodexDotmdRoute,
   ErrorRoute: ErrorRoute,
   FeedDotxmlRoute: FeedDotxmlRoute,
@@ -1736,6 +1816,7 @@ const rootRouteChildren: RootRouteChildren = {
   NewsDotmdRoute: NewsDotmdRoute,
   OrgRoute: OrgRoute,
   OrgDotmdRoute: OrgDotmdRoute,
+  PipelineRoute: PipelineRoute,
   PrivacyRoute: PrivacyRoute,
   PrivacyDotmdRoute: PrivacyDotmdRoute,
   RssDotxmlRoute: RssDotxmlRoute,
@@ -1751,11 +1832,13 @@ const rootRouteChildren: RootRouteChildren = {
   BlogSlugRoute: BlogSlugRoute,
   ChangelogSlugRoute: ChangelogSlugRoute,
   IReferrerIdRoute: IReferrerIdRoute,
+  LecturesSplatRoute: LecturesSplatRoute,
   NewsSlugRoute: NewsSlugRoute,
   NewsChar123slugChar125DotmdRoute: NewsChar123slugChar125DotmdRoute,
   RenderCompositeRoute: RenderCompositeRoute,
   BlogIndexRoute: BlogIndexRoute,
   ChangelogIndexRoute: ChangelogIndexRoute,
+  LecturesIndexRoute: LecturesIndexRoute,
   NewsIndexRoute: NewsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiEmailConfirmRoute: ApiEmailConfirmRoute,

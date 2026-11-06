@@ -54,7 +54,7 @@ import { HUDProgressBar } from './HUDProgressBar'
 import { HUDTaskBar } from './HUDTaskBar'
 import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 
-const GUEST_LOCKED_PATHS = new Set(['/lectures', '/chassis', '/connections', '/member', '/stream'])
+const GUEST_LOCKED_PATHS = new Set(['/academy', '/character', '/connections', '/member', '/stream'])
 
 export function computeNavItemHidden(
   item: { path: string; featureFlag?: FeatureFlagId },
@@ -409,14 +409,14 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           label: 'ACADEMY',
           shortLabel: 'ACADEMY',
           icon: BookOpen,
-          path: '/lectures',
+          path: '/academy',
         },
         {
           id: 'science',
-          label: 'SCIENCE',
-          shortLabel: 'SCIENCE',
+          label: 'STAGES',
+          shortLabel: 'STAGES',
           icon: FlaskConical,
-          path: '/pipeline',
+          path: '/stages',
         },
       ],
     },
@@ -453,10 +453,10 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       items: [
         {
           id: 'chassis',
-          label: 'GEAR',
-          shortLabel: 'GEAR',
+          label: 'CHARACTER',
+          shortLabel: 'CHARACTER',
           icon: Sliders,
-          path: '/chassis',
+          path: '/character',
         },
         {
           id: 'market',

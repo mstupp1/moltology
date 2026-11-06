@@ -27,7 +27,7 @@ describe('Moltology science pipeline', () => {
   it('lights the member’s own clearance', () => {
     render(<PipelineView />)
 
-    expect(screen.getByRole('heading', { name: 'The descent' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Stages' })).toBeInTheDocument()
     expect(screen.getByText('600 XP')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Go to mine' })).not.toBeInTheDocument()
     expect(screen.queryByText(/Four stages, twelve clearances/)).not.toBeInTheDocument()

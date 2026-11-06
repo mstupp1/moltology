@@ -112,7 +112,7 @@ export const Route = createFileRoute('/_hud/oracle')({
   head: () => ({
     meta: [
       ...privatePageSeo({
-        title: 'Synaptic Oracle | Moltology',
+        title: 'Oracle | Moltology',
         description: 'Private benthic consultation channel for authenticated units.',
       }),
     ],
