@@ -215,23 +215,6 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     }
   }, [isPopoutActive, isRendered, isMobile])
 
-  const mobilePillTouchStartYRef = useRef<number | null>(null)
-
-  const handleMobilePillTouchStart = (e: React.TouchEvent) => {
-    mobilePillTouchStartYRef.current = e.touches[0]?.clientY ?? null
-  }
-
-  const handleMobilePillTouchEnd = (e: React.TouchEvent) => {
-    if (mobilePillTouchStartYRef.current !== null && e.changedTouches[0]) {
-      const deltaY = mobilePillTouchStartYRef.current - e.changedTouches[0].clientY
-      mobilePillTouchStartYRef.current = null
-      // If swiped up by > 15px, open the tray
-      if (deltaY > 15) {
-        handleToggle()
-      }
-    }
-  }
-
   const handleResetSize = () => {
     try {
       localStorage.removeItem(STORAGE_KEY_POPOUT_SIZE)
@@ -315,23 +298,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
 
   return (
     <>
-      {/* ── Mobile: Bottom Pull-Up Prompt Pill Dock ── */}
-      {!isPopoutActive && (
-        <div className="fixed inset-x-3 bottom-[var(--oracle-mobile-bottom-offset)] z-40 max-w-md mx-auto sm:hidden font-sans select-none pointer-events-auto">
-          <button
-            type="button"
-            onClick={handleToggle}
-            onTouchStart={handleMobilePillTouchStart}
-            onTouchEnd={handleMobilePillTouchEnd}
-            className={`${ORACLE_PILL_BASE_CLASSES} min-h-[var(--oracle-mobile-launcher-height)] w-full cursor-pointer transition-all duration-200 active:scale-[0.98]`}
-            aria-label="Open Oracle AI Tray"
-            title="Tap or swipe up to consult Oracle AI"
-          >
-            <OracleLauncherPillContent />
-          </button>
-        </div>
-      )}
-
+      {/* Phones reach Oracle from the bottom bar, so there is no floating pill there. */}
       {/* ── Mobile: Gesture-driven Pull-Up Bottom Sheet Tray ── */}
       {isMobile && (
         <HudBottomSheet
@@ -355,7 +322,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
 
       {/* ── Desktop: Fixed Floating Launcher Button ── */}
       {!isMobile && !isPopoutActive && !isRendered && (
-        <div className="hidden sm:block fixed z-40 right-6 bottom-4 font-sans select-none">
+        <div className="hidden md:block fixed z-40 right-6 bottom-4 font-sans select-none">
           <button
             type="button"
             onClick={handleToggle}

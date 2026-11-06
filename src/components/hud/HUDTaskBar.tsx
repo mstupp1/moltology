@@ -23,7 +23,9 @@ export interface AlignmentTask {
 export type TimezoneMode = 'LOCAL' | 'UTC' | 'BENTHIC' | 'STARDATE'
 
 export interface HUDTaskBarProps {
-  variant?: 'hero' | 'header' | 'compact'
+  variant?: 'hero' | 'header' | 'compact' | 'sidebar'
+  /** `sidebar` variant only: render as a collapsed-rail cell. */
+  collapsed?: boolean
   tasks?: AlignmentTask[]
   onCompleteTask?: (taskId: string) => void
   className?: string
@@ -34,6 +36,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   tasks: propTasks,
   onCompleteTask,
   className = '',
+  collapsed = false,
 }) => {
   const [mounted, setMounted] = useState(false)
   const [time, setTime] = useState<Date>(new Date())
@@ -126,7 +129,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   // Other HUD controls can request the same quick liturgies panel.
   useEffect(() => {
     const handleOpenAlignmentPanel = () => {
-      if (variant === 'header' && !isAlignmentPanelHostVisible(headerIslandRef.current)) {
+      if ((variant === 'header' || variant === 'sidebar') && !isAlignmentPanelHostVisible(headerIslandRef.current)) {
         return
       }
       setActiveTab('liturgies')
@@ -551,6 +554,98 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
       )}
     </>
   )
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // SIDEBAR ROW VARIANT (desktop sidebar footer; the panel opens beside the sidebar)
+  // ══════════════════════════════════════════════════════════════════════════════
+  if (variant === 'sidebar') {
+    const countTone = allTasksCompleted ? 'text-emerald-500' : 'text-ink'
+    const icon = allTasksCompleted && countReady ? (
+      <Check className="w-4 h-4 shrink-0 text-emerald-500" aria-hidden="true" />
+    ) : (
+      <ListTodo
+        className={`w-4 h-4 shrink-0 transition-colors duration-150 ${
+          isScheduleOpen ? 'text-cyan-glow' : 'text-ink-muted group-hover/align:text-ink'
+        }`}
+        aria-hidden="true"
+      />
+    )
+    const unreadBadge =
+      notificationUnread > 0 ? (
+        <span
+          className="min-w-[18px] h-[18px] px-1 rounded-chip bg-crimson-aggro text-abyss text-[11px] font-bold leading-[18px] text-center tabular-nums"
+          aria-label={`${notificationUnread} new notifications`}
+        >
+          {notificationUnread}
+        </span>
+      ) : null
+
+    return (
+      <div className={`relative overflow-visible ${className}`} ref={headerIslandRef}>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            setIsScheduleOpen((prev) => !prev)
+          }}
+          title="Today's tasks and notifications"
+          aria-label="Daily alignment tasks schedule"
+          aria-expanded={isScheduleOpen}
+          aria-haspopup="dialog"
+          aria-busy={!countReady}
+          className={`w-full text-left relative flex transition-colors duration-150 group/align cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
+            isScheduleOpen ? 'bg-surface-2' : 'bg-surface-1 hover:bg-surface-2'
+          } ${collapsed ? 'flex-col items-center justify-center py-2 px-1 gap-1' : 'items-center min-h-[44px] px-4 py-2.5 pl-5 gap-3'}`}
+        >
+          {collapsed ? (
+            <>
+              <span className="relative inline-flex">
+                {icon}
+                {notificationUnread > 0 && (
+                  <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-crimson-aggro ring-2 ring-abyss" aria-hidden />
+                )}
+              </span>
+              <span className={`text-[11px] font-sans font-bold leading-none tabular-nums ${countReady ? countTone : 'text-ink-muted'}`}>
+                {countReady ? liturgyCountText : '–'}
+              </span>
+            </>
+          ) : (
+            <>
+              {icon}
+              <span className="flex flex-col min-w-0 flex-1 leading-tight">
+                <span className="text-xs md:text-[12.5px] font-sans font-medium tracking-wide uppercase text-ink-body group-hover/align:text-ink">
+                  Daily alignment
+                </span>
+                {countReady && !allTasksCompleted && nextTask?.title && (
+                  <span data-testid="header-next" className="text-[11px] font-sans text-ink-muted truncate mt-0.5">
+                    Next: {nextTask.title}
+                  </span>
+                )}
+              </span>
+              {unreadBadge}
+              {countReady ? (
+                <span className={`shrink-0 text-xs font-bold tabular-nums ${countTone}`}>
+                  {allTasksCompleted ? 'Done' : liturgyCountText}
+                </span>
+              ) : (
+                <span className="inline-block shrink-0 h-2 w-6 rounded-chip bg-surface-3 animate-pulse" aria-hidden />
+              )}
+            </>
+          )}
+        </button>
+
+        {isScheduleOpen && (
+          <div
+            ref={dropdownRef}
+            data-testid="alignment-panel"
+            className="absolute left-full bottom-0 ml-2 w-96 max-h-[calc(100vh-2rem)] overflow-y-auto rounded-card border border-line bg-surface-1 shadow-menu p-4 z-[200] font-sans space-y-3 animate-in fade-in slide-in-from-left-2 duration-150"
+          >
+            {renderActivityContent()}
+          </div>
+        )}
+      </div>
+    )
+  }
 
   // ══════════════════════════════════════════════════════════════════════════════
   // HEADER TILE VARIANT (HUDHeader bar and phone top bar)

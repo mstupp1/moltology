@@ -1,6 +1,6 @@
 import React from 'react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, fireEvent, within, waitFor, act } from '@testing-library/react'
 import { HUDSidebar, computeNavItemHidden } from './HUDSidebar'
 import { authClient } from '@/lib/auth-client'
 
@@ -47,6 +47,10 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     document.body.style.overflow = ''
   })
 
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('keeps desktop contents at their target width while the outer rail changes width', () => {
     const { container } = render(<HUDSidebar />)
     const aside = screen.getByRole('complementary')
@@ -61,16 +65,16 @@ describe('HUDSidebar Component Navigation & Animations', () => {
   it('cancels mobile close callbacks on reopen and releases scroll lock at the desktop breakpoint', () => {
     vi.useFakeTimers()
     render(<HUDSidebar />)
-    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }))
+    fireEvent.click(screen.getByRole('button', { name: 'More' }))
     act(() => vi.advanceTimersByTime(50))
-    const dialog = screen.getByRole('dialog', { name: 'Navigation Menu' })
-    fireEvent.click(screen.getByRole('button', { name: 'Close menu' }))
+    const dialog = screen.getByRole('dialog', { name: 'More pages' })
+    fireEvent.click(screen.getByRole('button', { name: 'More' }))
     expect(dialog).toHaveAttribute('inert')
     expect(dialog).toHaveClass('-translate-y-2')
     act(() => vi.advanceTimersByTime(100))
-    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }))
+    fireEvent.click(screen.getByRole('button', { name: 'More' }))
     act(() => vi.advanceTimersByTime(250))
-    expect(screen.getByRole('dialog', { name: 'Navigation Menu' })).toBe(dialog)
+    expect(screen.getByRole('dialog', { name: 'More pages' })).toBe(dialog)
     expect(dialog).not.toHaveAttribute('inert')
     const previousWidth = window.innerWidth
     window.innerWidth = 1024
@@ -83,29 +87,30 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
   it('renders one flat list of pages without section headings', () => {
     render(<HUDSidebar />)
+    const sidebar = within(screen.getByRole('complementary'))
 
-    expect(screen.queryByText('MAIN')).not.toBeInTheDocument()
-    expect(screen.queryByText('LEARN')).not.toBeInTheDocument()
-    expect(screen.queryByText('COMMUNITY')).not.toBeInTheDocument()
+    expect(sidebar.queryByText('MAIN')).not.toBeInTheDocument()
+    expect(sidebar.queryByText('LEARN')).not.toBeInTheDocument()
+    expect(sidebar.queryByText('COMMUNITY')).not.toBeInTheDocument()
 
-    expect(screen.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
-    expect(screen.getByText('ORACLE')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^CHARACTER$/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^PROFILE$/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^ACADEMY$/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^FORUM$/i })).toBeInTheDocument()
+    expect(sidebar.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
+    expect(sidebar.getByText('ORACLE')).toBeInTheDocument()
+    expect(sidebar.getByRole('button', { name: /^CHARACTER$/i })).toBeInTheDocument()
+    expect(sidebar.getByRole('button', { name: /^PROFILE$/i })).toBeInTheDocument()
+    expect(sidebar.getByRole('button', { name: /^ACADEMY$/i })).toBeInTheDocument()
+    expect(sidebar.getByRole('button', { name: /^FORUM$/i })).toBeInTheDocument()
     // Friends lives on the profile and Stages on Character, so neither has a sidebar row.
-    expect(screen.queryByRole('button', { name: /^FRIENDS$/i })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /^STAGES$/i })).not.toBeInTheDocument()
-    // Daily alignment opens from the dashboard and the tasks menu, not the sidebar.
-    expect(screen.queryByRole('button', { name: /^DAILY ALIGNMENT$/i })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /^MARKET$/i })).not.toBeInTheDocument()
+    expect(sidebar.queryByRole('button', { name: /^FRIENDS$/i })).not.toBeInTheDocument()
+    expect(sidebar.queryByRole('button', { name: /^STAGES$/i })).not.toBeInTheDocument()
+    // Daily alignment sits in the sidebar footer, above Help & support.
+    expect(sidebar.getAllByRole('button', { name: 'Daily alignment tasks schedule' }).length).toBeGreaterThan(0)
+    expect(sidebar.queryByRole('button', { name: /^MARKET$/i })).not.toBeInTheDocument()
   })
 
   it.each([['CODEX', '/codex'], ['FORUM', '/forum'], ['CHARACTER', '/character']])('navigates to %s on nav item click', (label, route) => {
     render(<HUDSidebar />)
 
-    fireEvent.click(screen.getByRole('button', { name: label }))
+    fireEvent.click(within(screen.getByRole('complementary')).getByRole('button', { name: label }))
     expect(mockNavigate).toHaveBeenCalledWith({ to: route })
   })
 
@@ -197,81 +202,64 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getAllByText('SUPPORT').length).toBeGreaterThan(0)
   })
 
-  it('toggles mobile HUD menu state on mobile button click and renders icon-only with no text', () => {
+  it('shows the phone bottom bar with the main pages and More, and keeps search and tasks up top', () => {
     render(<HUDSidebar />)
 
-    // When mobile menu is closed, task list button is present in header next to hamburger
-    expect(screen.getByLabelText('Daily alignment tasks schedule')).toBeInTheDocument()
+    const bar = within(screen.getByRole('navigation', { name: 'Main' }))
+    expect(bar.getAllByRole('button').map((b) => b.textContent)).toEqual(['DASHBOARD', 'ORACLE', 'CHARACTER', 'FORUM', 'More'])
+    fireEvent.click(bar.getByRole('button', { name: 'FORUM' }))
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/forum' })
 
-    const mobileMenuBtn = screen.getByRole('button', { name: /Open menu/i })
-    expect(mobileMenuBtn).toBeInTheDocument()
-    expect(mobileMenuBtn.textContent).toBe('')
-
-    fireEvent.click(mobileMenuBtn)
-
-    const closeMenuBtn = screen.getByRole('button', { name: /Close menu/i })
-    expect(closeMenuBtn).toBeInTheDocument()
-    expect(closeMenuBtn.textContent).toBe('')
-
-    // When mobile menu is open, the progress bar row is rendered in the top header
-    expect(screen.getByLabelText('Stage 1 Badge')).toBeInTheDocument()
-    expect(screen.getByLabelText('Next Stage 2 Badge')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Search' })).toBeInTheDocument()
+    expect(screen.getAllByLabelText('Daily alignment tasks schedule').length).toBeGreaterThan(0)
+    // The old stage progress bar and hamburger are gone.
+    expect(screen.queryByLabelText('Stage 1 Badge')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Open menu/i })).not.toBeInTheDocument()
   })
 
-  it('renders mobile menu as full-screen portal modal with body scroll locked', async () => {
+  it('opens More as a sheet above the bottom bar with Profile, Codex and Academy', async () => {
     render(<HUDSidebar />)
 
-    const mobileMenuBtn = screen.getByRole('button', { name: /Open menu/i })
-    fireEvent.click(mobileMenuBtn)
+    fireEvent.click(screen.getByRole('button', { name: 'More' }))
 
-    const dialog = screen.getByRole('dialog', { name: /Navigation Menu/i })
-    expect(dialog).toBeInTheDocument()
-    expect(dialog).toHaveClass('fixed', 'inset-x-0', 'bottom-0', 'top-14', 'w-screen')
+    const dialog = screen.getByRole('dialog', { name: 'More pages' })
+    expect(dialog).toHaveClass('fixed', 'inset-x-0', 'top-14', 'w-screen')
     expect(document.body.style.overflow).toBe('hidden')
+    expect(screen.getByRole('button', { name: 'More' })).toHaveAttribute('aria-expanded', 'true')
+    const sheet = within(dialog)
+    expect(sheet.getAllByRole('button').slice(0, 3).map((b) => b.textContent)).toEqual(['PROFILE', 'CODEX', 'ACADEMY'])
+    expect(sheet.queryByRole('button', { name: /^ORACLE$/ })).not.toBeInTheDocument()
 
-    // Close via close button
-    const closeBtn = screen.getByRole('button', { name: /Close menu/i })
-    fireEvent.click(closeBtn)
-
+    fireEvent.click(screen.getByRole('button', { name: 'More' }))
     await waitFor(() => {
-      expect(screen.queryByRole('dialog', { name: /Navigation Menu/i })).not.toBeInTheDocument()
+      expect(screen.queryByRole('dialog', { name: 'More pages' })).not.toBeInTheDocument()
       expect(document.body.style.overflow).toBe('')
     })
   })
 
-  it('closes mobile full-screen menu when Escape key is pressed', async () => {
+  it('closes More when Escape key is pressed', async () => {
     render(<HUDSidebar />)
 
-    const mobileMenuBtn = screen.getByRole('button', { name: /Open menu/i })
-    fireEvent.click(mobileMenuBtn)
-
-    expect(screen.getByRole('dialog', { name: /Navigation Menu/i })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'More' }))
+    expect(screen.getByRole('dialog', { name: 'More pages' })).toBeInTheDocument()
 
     fireEvent.keyDown(window, { key: 'Escape' })
 
     await waitFor(() => {
-      expect(screen.queryByRole('dialog', { name: /Navigation Menu/i })).not.toBeInTheDocument()
+      expect(screen.queryByRole('dialog', { name: 'More pages' })).not.toBeInTheDocument()
     })
   })
 
-  it('navigates and closes mobile menu when nav item inside modal is clicked', async () => {
+  it('navigates and closes More when a page inside it is clicked', async () => {
     render(<HUDSidebar />)
 
-    const mobileMenuBtn = screen.getByRole('button', { name: /Open menu/i })
-    fireEvent.click(mobileMenuBtn)
-
-    const dialog = screen.getByRole('dialog', { name: /Navigation Menu/i })
-    expect(dialog).toBeInTheDocument()
-
-    // Find nav buttons inside the dialog
-    const codexBtns = screen.getAllByRole('button', { name: /^CODEX$/i })
-    // The second one is inside the mobile dialog
-    const mobileCodexBtn = codexBtns[codexBtns.length - 1]
-    fireEvent.click(mobileCodexBtn)
+    fireEvent.click(screen.getByRole('button', { name: 'More' }))
+    const dialog = screen.getByRole('dialog', { name: 'More pages' })
+    fireEvent.click(within(dialog).getByRole('button', { name: /^CODEX$/i }))
 
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/codex' })
     await waitFor(() => {
-      expect(screen.queryByRole('dialog', { name: /Navigation Menu/i })).not.toBeInTheDocument()
+      expect(screen.queryByRole('dialog', { name: 'More pages' })).not.toBeInTheDocument()
     })
   })
 

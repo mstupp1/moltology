@@ -55,7 +55,7 @@ export const DEFAULT_CAPTURE_TARGETS = Object.values(REGISTERED_TARGETS).filter(
  */
 export const SHARED_MOCKUP_SOURCES = [
   'src/components/hud/HUDSidebar.tsx',
-  'src/components/hud/HUDHeader.tsx',
+  'src/components/hud/HUDMobileTabBar.tsx',
   'src/components/hud/HUDTaskBar.tsx',
   'src/components/hud/HudLayout.tsx',
   'src/routes/_hud.tsx',
