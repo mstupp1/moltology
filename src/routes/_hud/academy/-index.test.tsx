@@ -134,7 +134,7 @@ describe('Molt Academy home', () => {
     render(<Page />)
 
     expect(screen.queryByText('MOLT ACADEMY LOCKED')).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { level: 1, name: /learn the molt in order/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /^Academy$/ })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'First Shell' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Abyssal Systems' })).toBeInTheDocument()
     expect(screen.getByText('Introduction to Ecdysis')).toBeInTheDocument()

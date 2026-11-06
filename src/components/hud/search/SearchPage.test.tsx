@@ -117,7 +117,7 @@ describe('SearchPage', () => {
   it('filters the shared command list on the Pages tab', () => {
     renderSearch({ query: 'Codex', type: 'pages' })
     expect(screen.getByText('Codex')).toBeInTheDocument()
-    expect(screen.queryByText('Premium')).not.toBeInTheDocument()
+    expect(screen.queryByText('Oracle MAX')).not.toBeInTheDocument()
     fireEvent.click(screen.getByText('Codex'))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/codex' })
   })
@@ -128,12 +128,12 @@ describe('SearchPage', () => {
       isPending: false,
     } as any)
     renderSearch({ query: 'premium', type: 'pages' })
-    expect(screen.getByText('Premium')).toBeInTheDocument()
+    expect(screen.getByText('Oracle MAX')).toBeInTheDocument()
   })
 
   it('keeps hidden pages off Pages for members', () => {
     renderSearch({ query: 'premium', type: 'pages' })
-    expect(screen.queryByText('Premium')).not.toBeInTheDocument()
+    expect(screen.queryByText('Oracle MAX')).not.toBeInTheDocument()
   })
 
   it('surfaces HUD chambers and news dispatches on Pages for obvious queries', () => {

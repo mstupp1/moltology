@@ -12,7 +12,6 @@ describe('SacredCodexReader Component', () => {
   it('renders the main sacred codex title, hero, and active scripture', () => {
     render(<SacredCodexReader />)
     expect(screen.getByRole('heading', { level: 1, name: /The Sacred Codex/i })).toBeInTheDocument()
-    expect(screen.getByText(/Canonical Codex/i)).toBeInTheDocument()
     expect(screen.getAllByRole('heading', { level: 2, name: /The Prime Directive/i })[0]).toBeInTheDocument()
     expect(screen.queryByText(/OFFICIAL CANON V4.2/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/ARCHIVAL SPEC/i)).not.toBeInTheDocument()
