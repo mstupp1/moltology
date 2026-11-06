@@ -177,8 +177,16 @@ export const getAIThreadsFn = createServerFn({ method: 'POST' })
 
 export const getAIMessagesFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data: { threadId: string; userId?: string; token?: string }) =>
-    z.object({ threadId: z.string().min(1), userId: z.string().optional(), token: z.string().optional() }).parse(data)
+  .validator((data: { threadId: string; userId?: string; token?: string; limit?: number; before?: string }) =>
+    z
+      .object({
+        threadId: z.string().min(1),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+        limit: z.number().int().min(1).max(101).optional(),
+        before: z.string().uuid().optional(),
+      })
+      .parse(data)
   )
   .handler(async (args) => {
     const { getAIMessagesHandler } = await import('./db-services')

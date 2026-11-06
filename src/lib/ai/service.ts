@@ -1,5 +1,6 @@
 import { eq, desc, asc, and, gte, sql } from 'drizzle-orm'
 import { getDb } from '../../db'
+import { olderThanRow } from '../server/keyset'
 import { aiThreads, aiMessages, aiUsageEvents, profiles } from '../../db/schema'
 import { ensureUserProfile } from '../user-sync'
 
@@ -145,15 +146,34 @@ export async function getOwnedAIThread(userId: string, threadId: string) {
 /**
  * Fetches messages for a thread the caller owns. Unknown or foreign threads return [].
  */
-export async function getAIThreadMessages(threadId: string, userId: string) {
+export async function getAIThreadMessages(
+  threadId: string,
+  userId: string,
+  page?: { limit: number; before?: string },
+) {
   const owned = await getOwnedAIThread(userId, threadId)
   if (!owned) return []
   const dbClient = getDb()
-  return await dbClient
+  if (!page) {
+    return await dbClient
+      .select()
+      .from(aiMessages)
+      .where(eq(aiMessages.threadId, threadId))
+      .orderBy(asc(aiMessages.createdAt))
+  }
+  // Newest `limit` messages (older than `before` when given), returned oldest first.
+  const rows = await dbClient
     .select()
     .from(aiMessages)
-    .where(eq(aiMessages.threadId, threadId))
-    .orderBy(asc(aiMessages.createdAt))
+    .where(
+      and(
+        eq(aiMessages.threadId, threadId),
+        page.before ? olderThanRow(aiMessages, aiMessages.createdAt, aiMessages.id, page.before) : undefined,
+      ),
+    )
+    .orderBy(desc(aiMessages.createdAt), desc(aiMessages.id))
+    .limit(page.limit)
+  return rows.reverse()
 }
 
 /**

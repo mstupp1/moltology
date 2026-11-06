@@ -467,6 +467,10 @@ interface GetAIMessagesInput {
   threadId: string
   userId?: string
   token?: string
+  /** Newest messages to return (oldest first). Omit for the whole thread. */
+  limit?: number
+  /** Message id: return only messages older than this one. */
+  before?: string
 }
 
 /**
@@ -478,7 +482,13 @@ export const getAIMessagesHandler = async ({ data, context }: ServerFnArgs<GetAI
   if (!auth) return []
   try {
     const { getAIThreadMessages } = await import('../ai/service')
-    const msgs = await getAIThreadMessages(data.threadId, auth.userId)
+    const msgs =
+      data.limit || data.before
+        ? await getAIThreadMessages(data.threadId, auth.userId, {
+            limit: clampPageSize(data.limit, PAGE_SIZES.oracleMessages),
+            before: data.before,
+          })
+        : await getAIThreadMessages(data.threadId, auth.userId)
     return msgs.map((m: any) => ({
       id: m.id,
       threadId: m.threadId,
