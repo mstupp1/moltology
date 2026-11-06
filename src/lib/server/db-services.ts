@@ -11,7 +11,7 @@ import { changelogs, profiles, users, userStats, routines, routineCompletions, r
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, notInArray, isNull, getTableColumns } from 'drizzle-orm'
 import { union } from 'drizzle-orm/pg-core'
-import { PAGE_SIZES, clampOffset, clampPageSize, nextOffsetFor, takePage } from '../pagination'
+import { MAX_PAGE_SIZE, PAGE_SIZES, clampOffset, clampPageSize, nextOffsetFor, takePage } from '../pagination'
 import { olderThanRow } from './keyset'
 import type { ChangelogEntry } from '../changelogs-data'
 import { tryCheckGemMilestones } from './gems'
@@ -738,7 +738,20 @@ export interface CreateBlogCommentInput {
 /**
  * Server Function: Get comments for a blog post.
  */
-export const getBlogCommentsHandler = async ({ data: postId, context }: ServerFnArgs<string>): Promise<BlogCommentEntry[]> => {
+export interface GetBlogCommentsInput {
+  postId: string
+  /** Newest comments to return. Omit for every comment. */
+  limit?: number
+  /** Comment id: return only comments older than this one. */
+  before?: string
+}
+
+export const getBlogCommentsHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<string | GetBlogCommentsInput>): Promise<BlogCommentEntry[]> => {
+  const input: GetBlogCommentsInput = typeof data === 'string' ? { postId: data } : (data ?? { postId: '' })
+  const postId = input.postId
   if (!postId) return []
   const dbClient = context?.db || getDb()
   try {
@@ -757,8 +770,14 @@ export const getBlogCommentsHandler = async ({ data: postId, context }: ServerFn
       })
       .from(blogComments)
       .leftJoin(profiles, eq(blogComments.userId, profiles.id))
-      .where(eq(blogComments.postId, postId))
-      .orderBy(desc(blogComments.createdAt))
+      .where(
+        and(
+          eq(blogComments.postId, postId),
+          input.before ? olderThanRow(blogComments, blogComments.createdAt, blogComments.id, input.before) : undefined,
+        ),
+      )
+      .orderBy(desc(blogComments.createdAt), desc(blogComments.id))
+      .limit(input.limit ? clampPageSize(input.limit, PAGE_SIZES.blogComments) : MAX_PAGE_SIZE * 10)
 
     return records.map((r: any) => ({
       id: r.id,
@@ -2697,6 +2716,8 @@ export interface ListForumReportsInput {
   token?: string
   status?: 'open' | 'reviewed' | 'all'
   limit?: number
+  /** Rows to skip, for "Load more". */
+  offset?: number
 }
 
 /**
@@ -2719,12 +2740,14 @@ export const listForumReportsHandler = async ({
   const maxLimit = Math.min(Math.max(data?.limit ?? 50, 1), 100)
 
   const queryCondition = filterStatus ? eq(forumReports.status, filterStatus) : undefined
-  const reports = await dbClient
+  const reportOffset = clampOffset(data?.offset)
+  const reportQuery = dbClient
     .select()
     .from(forumReports)
     .where(queryCondition)
-    .orderBy(desc(filterStatus === 'reviewed' ? forumReports.updatedAt : forumReports.createdAt))
+    .orderBy(desc(filterStatus === 'reviewed' ? forumReports.updatedAt : forumReports.createdAt), desc(forumReports.id))
     .limit(maxLimit)
+  const reports = await (reportOffset > 0 ? reportQuery.offset(reportOffset) : reportQuery)
 
   if (reports.length === 0) return []
 

@@ -22,6 +22,8 @@ import { AuthModal } from '@/components/AuthModal'
 import { HudGhostCard } from '@/components/ui/HudGhostLoader'
 import { HudButton } from '@/components/ui/HudButton'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
+import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
+import { PAGE_SIZES, mergeById, takePage } from '@/lib/pagination'
 
 interface BlogCommentsSectionProps {
   postId?: string
@@ -33,6 +35,8 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
 
   const [comments, setComments] = useState<BlogCommentEntry[]>([])
   const [loadingComments, setLoadingComments] = useState(true)
+  const [hasOlderComments, setHasOlderComments] = useState(false)
+  const [loadingOlder, setLoadingOlder] = useState(false)
   const [commentInput, setCommentInput] = useState('')
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
@@ -52,10 +56,12 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
     let isMounted = true
     setLoadingComments(true)
 
-    getBlogCommentsFn({ data: postId })
+    getBlogCommentsFn({ data: { postId, limit: PAGE_SIZES.blogComments + 1 } })
       .then((data) => {
         if (isMounted) {
-          setComments(data || [])
+          const page = takePage(data || [], PAGE_SIZES.blogComments)
+          setComments(page.items)
+          setHasOlderComments(page.hasMore)
           setLoadingComments(false)
         }
       })
@@ -68,6 +74,25 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
       isMounted = false
     }
   }, [postId])
+
+  const loadOlderComments = async () => {
+    const oldest = comments[comments.length - 1]
+    if (!postId || !oldest) return
+    setLoadingOlder(true)
+    try {
+      const data = await getBlogCommentsFn({
+        data: { postId, limit: PAGE_SIZES.blogComments + 1, before: oldest.id },
+      })
+      const page = takePage(data || [], PAGE_SIZES.blogComments)
+      setComments((prev) => mergeById(prev, page.items))
+      setHasOlderComments(page.hasMore)
+    } catch (err) {
+      console.warn('Failed to load older blog comments:', err)
+      toast.error('Could not load more comments. Try again.')
+    } finally {
+      setLoadingOlder(false)
+    }
+  }
 
   const handleOpenAuth = (mode: 'login' | 'signup') => {
     setAuthMode(mode)
@@ -174,6 +199,7 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
               <span>COMMUNICATIONS LOG</span>
               <span className="text-xs px-2 py-0.5 bg-surface-2 border border-line text-ink-body font-sans rounded-chip">
                 {comments.length}
+                {hasOlderComments ? '+' : ''}
               </span>
             </h3>
             <p className="text-xs text-ink-muted font-sans">
@@ -356,6 +382,14 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
               </p>
             </div>
           ))
+        )}
+        {!loadingComments && hasOlderComments && comments.length > 0 && (
+          <LoadMoreButton
+            label="Load older comments"
+            loading={loadingOlder}
+            testId="blog-comments-load-more"
+            onClick={() => void loadOlderComments()}
+          />
         )}
       </div>
 

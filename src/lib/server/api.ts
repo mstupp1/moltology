@@ -268,7 +268,17 @@ export const incrementBlogPostViewsFn = createServerFn({ method: 'POST' })
 
 export const getBlogCommentsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((postId: string) => postId)
+  .validator((data: string | { postId: string; limit?: number; before?: string }) =>
+    typeof data === 'string'
+      ? data
+      : z
+          .object({
+            postId: z.string().min(1),
+            limit: z.number().int().min(1).max(101).optional(),
+            before: z.string().uuid().optional(),
+          })
+          .parse(data),
+  )
   .handler(async (args) => {
     const { getBlogCommentsHandler } = await import('./db-services')
     return getBlogCommentsHandler(args)
@@ -631,13 +641,14 @@ export const createForumReportFn = createServerFn({ method: 'POST' })
 
 export const listForumReportsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data?: { userId?: string; token?: string; status?: 'open' | 'reviewed' | 'all'; limit?: number }) =>
+  .validator((data?: { userId?: string; token?: string; status?: 'open' | 'reviewed' | 'all'; limit?: number; offset?: number }) =>
     z
       .object({
         userId: z.string().optional(),
         token: z.string().optional(),
         status: z.enum(['open', 'reviewed', 'all']).optional(),
         limit: z.number().optional(),
+        offset: z.number().int().min(0).max(100_000).optional(),
       })
       .parse(data ?? {})
   )
@@ -1149,7 +1160,14 @@ export const setAdminMemberRoleFn = createServerFn({ method: 'POST' })
 
 export const listAdminPurchasesFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data?: { token?: string; userId?: string }) => adminAuthSchema.parse(data ?? {}))
+  .validator((data?: { token?: string; userId?: string; limit?: number; offset?: number }) =>
+    adminAuthSchema
+      .extend({
+        limit: z.number().int().min(1).max(51).optional(),
+        offset: z.number().int().min(0).max(100_000).optional(),
+      })
+      .parse(data ?? {}),
+  )
   .handler(async (args) => {
     const { listAdminPurchasesHandler } = await import('./admin-oversight')
     return listAdminPurchasesHandler(args)

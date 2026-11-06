@@ -18,6 +18,10 @@ import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { FORUM_REPORT_COPY } from '@/lib/forum-reports'
 import { relativeTime } from '@/lib/forum-utils'
 import { forumPostAnchorId } from '@/lib/forum-mentions'
+import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
+import { PAGE_SIZES, mergeById, takePage } from '@/lib/pagination'
+
+const REPORT_PAGE = PAGE_SIZES.adminRows
 
 export interface CovenantWatchPageProps {
   onChanged?: () => void
@@ -33,6 +37,8 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
   const [error, setError] = useState<string | null>(null)
   const [actioningId, setActioningId] = useState<string | null>(null)
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null)
+  const [hasMore, setHasMore] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
 
   const loadReports = useCallback(async (tab: 'open' | 'resolved') => {
     if (!session.userId || session.isPending) return
@@ -43,15 +49,42 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
           userId: session.userId,
           token: token ?? undefined,
           status: tab === 'resolved' ? 'reviewed' : 'open',
+          limit: REPORT_PAGE + 1,
         },
       })
-      setReports(rows)
+      const page = takePage(rows, REPORT_PAGE)
+      setReports(page.items)
+      setHasMore(page.hasMore)
       setError(null)
     } catch (err: unknown) {
       setReports([])
       setError(err instanceof Error ? err.message : FORUM_REPORT_COPY.watchSealed)
     }
   }, [session.userId, session.isPending])
+
+  const loadMoreReports = async () => {
+    if (!session.userId || !reports) return
+    setLoadingMore(true)
+    try {
+      const token = await getAuthJWTToken()
+      const rows = await listForumReportsFn({
+        data: {
+          userId: session.userId,
+          token: token ?? undefined,
+          status: activeTab === 'resolved' ? 'reviewed' : 'open',
+          limit: REPORT_PAGE + 1,
+          offset: reports.length,
+        },
+      })
+      const page = takePage(rows, REPORT_PAGE)
+      setReports((prev) => mergeById(prev ?? [], page.items))
+      setHasMore(page.hasMore)
+    } catch (err: unknown) {
+      toast?.toast.error(err instanceof Error ? err.message : FORUM_REPORT_COPY.watchSealed)
+    } finally {
+      setLoadingMore(false)
+    }
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -64,10 +97,13 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
             userId: session.userId,
             token: token ?? undefined,
             status: activeTab === 'resolved' ? 'reviewed' : 'open',
+            limit: REPORT_PAGE + 1,
           },
         })
         if (!cancelled) {
-          setReports(rows)
+          const page = takePage(rows, REPORT_PAGE)
+          setReports(page.items)
+          setHasMore(page.hasMore)
           setError(null)
         }
       } catch (err: unknown) {
@@ -418,6 +454,14 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
               )
             })}
           </ul>
+        )}
+        {reports && reports.length > 0 && hasMore && (
+          <LoadMoreButton
+            label="Load more reports"
+            loading={loadingMore}
+            testId="covenant-watch-load-more"
+            onClick={() => void loadMoreReports()}
+          />
         )}
       </section>
     </div>

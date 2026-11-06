@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ExternalLink, Package, RefreshCw, Search } from 'lucide-react'
 import { HudButton } from '@/components/ui/HudButton'
+import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
+import { mergeById } from '@/lib/pagination'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { formatMerchPrice } from '@/lib/merch'
@@ -71,6 +73,7 @@ export function AdminShopOrders() {
   const [error, setError] = useState<string | null>(null)
   const [openId, setOpenId] = useState<string | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
+  const [loadingMore, setLoadingMore] = useState(false)
 
   const load = useCallback(async () => {
     try {
@@ -89,6 +92,30 @@ export function AdminShopOrders() {
     const timer = setTimeout(() => void load(), query ? 250 : 0)
     return () => clearTimeout(timer)
   }, [load, query])
+
+  const loadMore = async () => {
+    if (!payload) return
+    setLoadingMore(true)
+    try {
+      const token = await getAuthJWTToken().catch(() => null)
+      const next = await listAdminShopOrdersFn({
+        data: {
+          token: token ?? undefined,
+          filter,
+          includeTest,
+          query: query.trim() || undefined,
+          offset: payload.orders.length,
+        },
+      })
+      setPayload((current) =>
+        current ? { ...next, orders: mergeById(current.orders, next.orders) } : next,
+      )
+    } catch (err: unknown) {
+      toast?.toast.error(err instanceof Error ? err.message : 'Could not load more orders.')
+    } finally {
+      setLoadingMore(false)
+    }
+  }
 
   async function act(action: 'retry' | 'reconcile', order: ShopOrder) {
     setBusy(`${action}:${order.id}`)
@@ -217,6 +244,14 @@ export function AdminShopOrders() {
               )
             })}
           </ul>
+        ) : null}
+        {payload && payload.orders.length > 0 && payload.hasMore ? (
+          <LoadMoreButton
+            label="Load more orders"
+            loading={loadingMore}
+            testId="admin-shop-load-more"
+            onClick={() => void loadMore()}
+          />
         ) : null}
       </section>
     </div>

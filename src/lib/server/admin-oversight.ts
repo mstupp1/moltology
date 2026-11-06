@@ -215,10 +215,12 @@ export async function setAdminMemberRoleHandler(
 }
 
 export async function listAdminPurchasesHandler(
-  args: HandlerArgs<WriteAuthData | undefined>,
+  args: HandlerArgs<(WriteAuthData & { limit?: number; offset?: number }) | undefined>,
 ): Promise<AdminPurchaseRow[]> {
   const auth = await requireStaff(args)
-  const rows = await auth.dbClient
+  const limit = Math.min(Math.max(args.data?.limit ?? ADMIN_PURCHASE_LIMIT, 1), ADMIN_PURCHASE_LIMIT + 1)
+  const offset = Math.max(args.data?.offset ?? 0, 0)
+  const query = auth.dbClient
     .select({
       id: profiles.id,
       handle: profiles.handle,
@@ -240,8 +242,9 @@ export async function listAdminPurchasesHandler(
         isNotNull(profiles.stripeCustomerId),
       ),
     )
-    .orderBy(desc(profiles.updatedAt))
-    .limit(ADMIN_PURCHASE_LIMIT)
+    .orderBy(desc(profiles.updatedAt), desc(profiles.id))
+    .limit(limit)
+  const rows = await (offset > 0 ? query.offset(offset) : query)
 
   return rows.map((row) => ({
     id: row.id,
