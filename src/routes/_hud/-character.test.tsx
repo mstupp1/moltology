@@ -14,10 +14,21 @@ vi.mock('@/lib/server/api', () => ({
   getChassisLoadoutFn: vi.fn().mockResolvedValue({
     catalog: [],
     items: [],
-    totals: { defense: 0, attack: 0, intelligence: 0, speed: 0, perception: 0 },
+    totals: { shellHardness: 0, pincerTorque: 0, neuralLatency: 0, ecdysisDiscipline: 0, depthTolerance: 0 },
     vaultSize: 20,
+    config: { style: 'critters', seed: 'saved', race: 'lobster' },
+    appearanceRevision: 1,
   }),
-  moveGearItemFn: vi.fn(),
+  saveCharacterFn: vi.fn(),
+}))
+
+vi.mock('@tanstack/react-router', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@tanstack/react-router')>()),
+  Link: ({ children, to, ...props }: any) => <a href={to} {...props}>{children}</a>,
+}))
+
+vi.mock('@/components/hud/avatar/AvatarCreatorPreview', () => ({
+  AvatarCreatorPreview: () => <div data-testid="preview" />,
 }))
 
 vi.mock('@/lib/jwt', () => ({
@@ -73,6 +84,9 @@ describe('Chassis Configurator HUD Route', () => {
     const Component = Route.options.component!
     render(<Component />)
 
-    expect(await screen.findByRole('button', { name: /^Antennae/ })).toBeInTheDocument()
+    const sections = await screen.findByRole('navigation', { name: 'Character sections' })
+    expect(sections).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Customize' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('link', { name: 'Shop' })).toHaveAttribute('href', '/character/shop')
   })
 })

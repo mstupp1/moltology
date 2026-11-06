@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router'
-import { CharacterSectionNav } from './CharacterSectionNav'
 import React, { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { Dices } from 'lucide-react'
 import { HudWorkspaceGhost } from '../HudGhostSkeletons'
@@ -368,12 +367,9 @@ export const ChassisStatusPage: React.FC = () => {
     >
       <div className="max-lg:sticky max-lg:z-20 max-sm:-top-2.5 max-sm:-mx-2.5 max-sm:-mt-2.5 max-sm:px-2.5 max-sm:pt-2.5 sm:max-md:-top-4 sm:max-md:-mx-4 sm:max-md:-mt-4 sm:max-md:px-4 sm:max-md:pt-4 md:max-lg:-top-6 md:max-lg:-mx-6 md:max-lg:-mt-6 md:max-lg:px-6 md:max-lg:pt-6 max-lg:pb-2 max-lg:space-y-2 max-lg:bg-abyss/95 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-line-subtle lg:contents">
         <div className="lg:col-span-2 flex items-center justify-between gap-3 rounded-card bg-surface-1 px-3 py-2 sm:px-5 sm:py-4">
-          <div className="flex min-w-0 items-center gap-4">
-            <h1 className="max-sm:sr-only font-grotesk font-extrabold text-lg sm:text-2xl text-ink tracking-tight truncate">
-              Character
-            </h1>
-            <CharacterSectionNav current="customize" />
-          </div>
+          <h1 className="font-grotesk font-extrabold text-lg sm:text-2xl text-ink tracking-tight truncate">
+            Character
+          </h1>
           <div className="flex shrink-0 gap-2">
             <HudButton
               size="sm"

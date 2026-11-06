@@ -12,29 +12,22 @@ import {
 const MEMBER_UUID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
 
 describe('/member/$profileId dossier route', () => {
-  it('sets a page title from the public name instead of a static dossier tab', () => {
+  it('titles the page as an invite from the shared identity, falling back to the dossier title', () => {
     const head = Route.options.head as (ctx: {
-      params: { profileId: string }
+      loaderData?: { handle?: string | null; userId?: string | null } | null
     }) => { meta: Array<{ title?: string; name?: string; content?: string }> }
     const headers = Route.options.headers as () => Record<string, string>
+    const titleFor = (loaderData: { handle?: string | null; userId?: string | null } | null) =>
+      head({ loaderData }).meta.find((entry) => entry.title)?.title
 
-    const handleTitle = head({ params: { profileId: 'mstupp' } }).meta.find(
-      (entry) => entry.title,
-    )?.title
-    const larvaTitle = head({ params: { profileId: MEMBER_UUID } }).meta.find(
-      (entry) => entry.title,
-    )?.title
     const larvaName = resolveMemberPublicName({ userId: MEMBER_UUID })
 
-    expect(handleTitle).toBe('mstupp | Moltology')
-    expect(handleTitle).not.toBe(MEMBER_PROFILE_SEO.title)
-    expect(larvaTitle).toBe(`${larvaName} | Moltology`)
-    expect(larvaTitle).not.toBe(MEMBER_PROFILE_SEO.title)
-    expect(larvaTitle).toMatch(/^LARVA UNIT #/)
-    expect(handleTitle).not.toBe('')
-    expect(handleTitle).not.toMatch(/Page Not Found/i)
+    expect(titleFor({ handle: 'mstupp', userId: MEMBER_UUID })).toBe('Add mstupp on Moltology')
+    expect(titleFor({ userId: MEMBER_UUID })).toBe(`Add ${larvaName} on Moltology`)
+    expect(larvaName).toMatch(/^LARVA UNIT #/)
+    expect(titleFor(null)).toBe(MEMBER_PROFILE_SEO.title)
     expect(headers()['X-Robots-Tag']).toBe('noindex, nofollow')
-    expect(head({ params: { profileId: 'mstupp' } }).meta).toEqual(
+    expect(head({ loaderData: null }).meta).toEqual(
       expect.arrayContaining([{ name: 'robots', content: 'noindex, nofollow' }]),
     )
     expect(Route.options.pendingComponent).toBeDefined()
