@@ -12,7 +12,7 @@ describe('/codex routes', () => {
     const result = head()
     const title = result.meta.find((entry) => entry.title)?.title
 
-    expect(title).toBe('The Sacred Codex | Moltology Scriptures & Doctrine')
+    expect(title).toBe('Codex: Moltology scripture | Moltology')
     expect(title).not.toMatch(/Page Not Found/i)
     expect(result.links[0]?.href).toBe('https://moltology.org/codex')
     expect(CodexIndexRoute.options.pendingComponent).toBeDefined()
@@ -45,7 +45,7 @@ describe('/codex routes', () => {
     const title = result.meta.find((entry) => entry.title)?.title
 
     expect(findScriptureBySlug('scr-999')).toBeUndefined()
-    expect(title).toBe('The Sacred Codex | Moltology Scriptures & Doctrine')
+    expect(title).toBe('Codex: Moltology scripture | Moltology')
     expect(title).not.toMatch(/Page Not Found/i)
     expect(result.links[0]?.href).toBe('https://moltology.org/codex')
   })

@@ -1,4 +1,5 @@
 import React, { Suspense, lazy, useEffect, useState } from 'react'
+import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
@@ -31,6 +32,13 @@ function SettingsRoute() {
 }
 
 export const Route = createFileRoute('/_hud/settings')({
+  headers: () => xRobotsNoindexHeaders(),
+  head: () => ({
+    meta: privatePageSeo({
+      title: 'Settings | Moltology',
+      description: 'Account, privacy and notification settings.',
+    }),
+  }),
   validateSearch: (search: Record<string, unknown>) => settingsSearchSchema.parse(search),
   component: SettingsRoute,
   pendingComponent: HudWorkspaceGhost,

@@ -128,8 +128,8 @@ describe('ActivityStreamPanel', () => {
     await waitFor(() => {
       expect(screen.getByText(ACTIVITY_HUB_EMPTY_COPY.title)).toBeInTheDocument()
     })
-    fireEvent.click(screen.getByRole('button', { name: /open stream/i }))
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/stream' })
+    fireEvent.click(screen.getByRole('button', { name: /open feed/i }))
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/friends', search: { tab: 'feed' } })
     expect(screen.getByRole('heading', { name: /activity stream/i })).toBeInTheDocument()
   })
 

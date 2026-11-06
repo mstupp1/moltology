@@ -1,6 +1,6 @@
 # Molt Academy content
 
-Courses and tracks for `/lectures` are written here as Markdown, then written to the database
+Courses and tracks for `/academy` are written here as Markdown, then written to the database
 with `npm run academy:ingest`. The database is what members see; these files are the source you
 edit and review. The [`academy-course-creator`](../../.agents/skills/academy-course-creator/SKILL.md)
 skill covers writing, updating and publishing a course end to end.
@@ -21,7 +21,7 @@ Every field is shown and commented there.
 ## Rules the ingest checks
 
 - **Slugs** are lowercase words joined by hyphens. The folder name is the course slug and the file
-  name is the lesson or track slug. A slug is the address (`/lectures/courses/<slug>`) and the key
+  name is the lesson or track slug. A slug is the address (`/academy/courses/<slug>`) and the key
   that keeps member progress attached, so **never rename one after members have started**.
 - **Course code** looks like `MOLT-101` and is unique.
 - **Modules** are listed in `course.md` with their lessons in order. Every lesson file must be listed;

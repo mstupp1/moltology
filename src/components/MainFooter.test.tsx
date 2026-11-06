@@ -33,10 +33,10 @@ describe('MainFooter Component', () => {
 
     expect(screen.getByText('MOLTMAXXING')).toBeInTheDocument()
     expect(screen.getByText('FIELD MANUAL')).toBeInTheDocument()
-    expect(screen.getByText('MOLTMAX QUIZ')).toBeInTheDocument()
-    expect(screen.getByText('DISPATCHES')).toBeInTheDocument()
-    expect(screen.getByText('SACRED CODEX')).toBeInTheDocument()
-    expect(screen.getByText('ORGANIZATION')).toBeInTheDocument()
+    expect(screen.getByText('QUIZ')).toBeInTheDocument()
+    expect(screen.getByText('NEWS')).toBeInTheDocument()
+    expect(screen.getByText('CODEX')).toBeInTheDocument()
+    expect(screen.getByText('COMPANY')).toBeInTheDocument()
   })
 
   it('renders external merch store, social channels, and RSS feed', () => {

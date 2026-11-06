@@ -6,7 +6,7 @@ import { ACADEMY_COPY } from '@/lib/academy'
 import { seo } from '@/lib/seo'
 import { getAcademyTrackFn } from '@/lib/server/academy-api'
 
-export const Route = createFileRoute('/_hud/lectures/tracks/$slug')({
+export const Route = createFileRoute('/_hud/academy/tracks/$slug')({
   loader: async ({ params }) => {
     try {
       const track = await getAcademyTrackFn({ data: { slug: params.slug } })
@@ -21,7 +21,7 @@ export const Route = createFileRoute('/_hud/lectures/tracks/$slug')({
       ...seo({
         title: loaderData?.track ? `${loaderData.track.title} | Molt Academy` : 'Track | Molt Academy',
         description: loaderData?.track?.description ?? 'A Molt Academy track.',
-        canonical: `https://moltology.org/lectures/tracks/${loaderData?.track?.slug ?? ''}`,
+        canonical: `https://moltology.org/academy/tracks/${loaderData?.track?.slug ?? ''}`,
         siteName: 'Moltology',
         twitterSite: '@moltology',
       }),

@@ -167,7 +167,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
       id: 'daily-alignment-complete-toast',
       title: 'Daily alignment done',
       duration: 6000,
-      ...(copy.withGems ? { icon: <GemIcon />, action: { label: 'Market', href: '/market' } } : {}),
+      ...(copy.withGems ? { icon: <GemIcon />, action: { label: 'Shop', href: '/character/shop' } } : {}),
     })
   }, [])
 
@@ -404,7 +404,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
                   id: 'daily-alignment-gems-toast',
                   title: 'Gems earned',
                   icon: <GemIcon />,
-                  action: { label: 'Market', href: '/market' },
+                  action: { label: 'Shop', href: '/character/shop' },
                 })
               }
 

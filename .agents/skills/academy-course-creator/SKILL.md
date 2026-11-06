@@ -1,7 +1,7 @@
 ---
 name: academy-course-creator
 description: >-
-  Write, update, upload and publish Molt Academy coursework (/lectures): courses, lessons
+  Write, update, upload and publish Molt Academy coursework (/academy): courses, lessons
   (video lectures, readings, quizzes), tracks and certificates, as Markdown in content/academy/,
   written to the database with npm run academy:ingest. Use whenever the user asks to add or
   change a course, lesson, quiz, lecture video, track or certificate, or to publish or unpublish
@@ -72,7 +72,7 @@ complete worked course and track in `content/academy/_examples/`. The parser is
 2. Check: `npm run academy:ingest -- --dry-run <slug>`. Fix every ✗. Read the ⚠ warnings and fix
    them unless they are intended (for example a video lesson still waiting for its video).
 3. Write to dev: `npm run academy:ingest -- --dev <slug>`. If you can run the app, open
-   `/lectures/courses/<slug>` and step through each lesson and the quiz.
+   `/academy/courses/<slug>` and step through each lesson and the quiz.
 4. Show the user the course (outline, a sample lesson, the quiz) and get their go-ahead to publish.
 5. Publish: set `status: published` in `course.md`, then `npm run academy:ingest -- <slug>` (no `--dev`
    writes to production). For a track, publish its courses first, then the track.

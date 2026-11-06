@@ -11,7 +11,7 @@ export const Route = createFileRoute('/terms')({
   head: () => ({
     meta: [
       ...seo({
-        title: 'Terms of Engagement | Moltology Service Directives',
+        title: 'Terms of Service | Moltology',
         description: 'Terms of engagement, covenant agreements, and protocols governing initiate access to the Moltology platform.',
         canonical: 'https://moltology.org/terms',
         siteName: 'Moltology',

@@ -85,14 +85,18 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getByText('MAIN')).toBeInTheDocument()
     expect(screen.getByText('LEARN')).toBeInTheDocument()
     expect(screen.getByText('COMMUNITY')).toBeInTheDocument()
-    expect(screen.getByText('GEAR & SHOP')).toBeInTheDocument()
+    expect(screen.queryByText('GEAR & SHOP')).not.toBeInTheDocument()
 
     expect(screen.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
     expect(screen.getByText('ORACLE')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^DAILY ALIGNMENT$/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^CHARACTER$/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^FRIENDS$/i })).toBeInTheDocument()
+    // Daily alignment opens from the dashboard and the tasks menu, not the sidebar.
+    expect(screen.queryByRole('button', { name: /^DAILY ALIGNMENT$/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^MARKET$/i })).not.toBeInTheDocument()
   })
 
-  it.each([['CODEX', '/codex'], ['DAILY ALIGNMENT', '/alignment']])('navigates to %s on nav item click', (label, route) => {
+  it.each([['CODEX', '/codex'], ['FRIENDS', '/friends'], ['CHARACTER', '/character']])('navigates to %s on nav item click', (label, route) => {
     render(<HUDSidebar />)
 
     fireEvent.click(screen.getByRole('button', { name: label }))
@@ -196,13 +200,11 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
     expect(screen.getAllByText('ORACLE').length).toBeGreaterThan(0)
     expect(screen.getAllByText('ACADEMY').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('SCIENCE').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('STAGES').length).toBeGreaterThan(0)
     expect(screen.queryByText('JOURNAL')).not.toBeInTheDocument()
-    expect(screen.getAllByText('MARKET').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('GEAR').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('PEOPLE').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('CHARACTER').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('FRIENDS').length).toBeGreaterThan(0)
     expect(screen.getAllByText('FORUM').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('ACTIVITY').length).toBeGreaterThan(0)
     expect(screen.getAllByText('SUPPORT').length).toBeGreaterThan(0)
   })
 

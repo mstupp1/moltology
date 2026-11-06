@@ -37,18 +37,16 @@ export type CommandNavTo =
   | '/dashboard'
   | '/codex'
   | '/codex/$slug'
-  | '/lectures'
-  | '/market'
+  | '/academy'
+  | '/character/shop'
   | '/premium'
-  | '/pipeline'
+  | '/stages'
   | '/forum'
   | '/forum/$categorySlug'
-  | '/stream'
-  | '/landing'
   | '/support'
   | '/oracle'
-  | '/connections'
-  | '/chassis'
+  | '/friends'
+  | '/character'
   | '/news'
   | '/news/$slug'
   | '/watch'
@@ -107,6 +105,22 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     keywords: ['oracle', 'synaptic', 'chat', 'ask', 'ai'],
   },
   {
+    id: 'nav-chassis',
+    label: 'Character',
+    category: 'Page',
+    icon: 'chassis',
+    to: '/character',
+    keywords: ['character', 'gear', 'chassis', 'chassis configurator', 'loadout', 'cosmetics', 'avatar', 'configurator'],
+  },
+  {
+    id: 'nav-market',
+    label: 'Gear shop',
+    category: 'Page',
+    icon: 'market',
+    to: '/character/shop',
+    keywords: ['shop', 'gear shop', 'market', 'benthic market', 'credits', 'gems'],
+  },
+  {
     id: 'nav-codex',
     label: 'Codex',
     category: 'Page',
@@ -128,15 +142,15 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'Academy',
     category: 'Page',
     icon: 'lectures',
-    to: '/lectures',
+    to: '/academy',
     keywords: ['academy', 'molt academy', 'courses', 'lectures', 'tracks', 'certificates', 'certifications', 'lessons'],
   },
   {
     id: 'nav-pipeline',
-    label: 'Science',
+    label: 'Stages',
     category: 'Page',
     icon: 'pipeline',
-    to: '/pipeline',
+    to: '/stages',
     keywords: ['science', 'moltology science', 'pipeline', 'stages', 'clearance', 'how it works'],
   },
   {
@@ -148,36 +162,12 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     keywords: ['forum', 'community', 'boards', 'topics', 'posts'],
   },
   {
-    id: 'nav-stream',
-    label: 'Activity',
-    category: 'Page',
-    icon: 'stream',
-    to: '/stream',
-    keywords: ['activity', 'activity stream', 'stream', 'feed'],
-  },
-  {
-    id: 'nav-connections',
-    label: 'Connections',
+    id: 'nav-friends',
+    label: 'Friends',
     category: 'Page',
     icon: 'connections',
-    to: '/connections',
-    keywords: ['connections', 'people', 'fellows', 'friends', 'links', 'followers'],
-  },
-  {
-    id: 'nav-chassis',
-    label: 'Gear',
-    category: 'Page',
-    icon: 'chassis',
-    to: '/chassis',
-    keywords: ['gear', 'chassis', 'chassis configurator', 'loadout', 'cosmetics', 'avatar', 'configurator'],
-  },
-  {
-    id: 'nav-market',
-    label: 'Market',
-    category: 'Page',
-    icon: 'market',
-    to: '/market',
-    keywords: ['market', 'benthic market', 'shop', 'store', 'credits', 'gems'],
+    to: '/friends',
+    keywords: ['friends', 'connections', 'people', 'fellows', 'followers', 'activity', 'activity stream', 'stream', 'feed', 'requests'],
   },
   {
     id: 'nav-premium',

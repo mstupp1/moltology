@@ -31,8 +31,8 @@ export function AcademyFrame({ children }: { children: React.ReactNode }) {
 /** Catalog / Certifications switch. The current page is a lit tile. */
 export function AcademyNav({ current }: { current: 'catalog' | 'certificates' | null }) {
   const items = [
-    { key: 'catalog' as const, to: '/lectures' as const, label: 'Catalog', icon: BookOpen },
-    { key: 'certificates' as const, to: '/lectures/certificates' as const, label: 'Certifications', icon: Award },
+    { key: 'catalog' as const, to: '/academy' as const, label: 'Catalog', icon: BookOpen },
+    { key: 'certificates' as const, to: '/academy/certificates' as const, label: 'Certifications', icon: Award },
   ]
   return (
     <nav className="flex gap-1 rounded-control border border-line-subtle bg-abyss/40 p-1" aria-label="Academy">
@@ -64,7 +64,7 @@ export function AcademyCrumbs({ items }: { items: { label: string; link?: React.
     <nav aria-label="Breadcrumb" className="text-xs text-ink-muted">
       <ol className="flex flex-wrap items-center gap-1">
         <li>
-          <Link to="/lectures" className={cn('inline-flex items-center gap-1.5 rounded-control px-1 hover:text-ink', ACADEMY_FOCUS)}>
+          <Link to="/academy" className={cn('inline-flex items-center gap-1.5 rounded-control px-1 hover:text-ink', ACADEMY_FOCUS)}>
             <GraduationCap className="w-3.5 h-3.5 text-cyan-glow" aria-hidden="true" />
             Academy
           </Link>
@@ -230,7 +230,7 @@ export function AcademyMissing({ message }: { message: string }) {
     <AcademyFrame>
       <div className={cn(ACADEMY_CARD, 'p-5 sm:p-6 space-y-3')}>
         <p className="text-sm text-ink">{message}</p>
-        <Link to="/lectures" className={ACADEMY_TEXT_ACTION}>
+        <Link to="/academy" className={ACADEMY_TEXT_ACTION}>
           Back to Academy
           <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
         </Link>

@@ -6,7 +6,7 @@ import { ACADEMY_COPY } from '@/lib/academy'
 import { seo } from '@/lib/seo'
 import { getAcademyLessonFn } from '@/lib/server/academy-api'
 
-export const Route = createFileRoute('/_hud/lectures/courses/$slug/lessons/$lessonSlug')({
+export const Route = createFileRoute('/_hud/academy/courses/$slug/lessons/$lessonSlug')({
   loader: async ({ params }) => {
     try {
       const lesson = await getAcademyLessonFn({

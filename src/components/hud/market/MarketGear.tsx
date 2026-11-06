@@ -206,7 +206,7 @@ export function MarketPieceDetail({
       <p className="text-[13px] italic text-ink-muted leading-relaxed">{piece.flavorText}</p>
       {shown.owned ? (
         <Link
-          to="/chassis"
+          to="/character"
           className="inline-flex min-h-10 items-center justify-center rounded-control border border-line bg-surface-2 px-4 text-sm font-semibold text-ink hover:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
           {everyItem ? 'Admins own every piece · open the studio' : 'Owned · wear it in the studio'}

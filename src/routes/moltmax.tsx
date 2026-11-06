@@ -12,7 +12,7 @@ export const Route = createFileRoute('/moltmax')({
   head: () => ({
     meta: [
       ...seo({
-        title: 'Moltmax Clearance Audit | Measure the Shell, Meet the Depth',
+        title: 'Moltmax Quiz: measure your five vectors | Moltology',
         description: 'Complete the official 12-vector biometric clearance audit. Calculate your carapace hardness, pincer torque, and benthic readiness index.',
         canonical: 'https://moltology.org/moltmax',
         siteName: 'Moltmax Audit',

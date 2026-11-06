@@ -461,6 +461,6 @@ describe('useDailyAlignment Hook Optimistic State & Rapid Clicks', () => {
     expect(await screen.findByText('+70 Chitin Gems · 7-day streak')).toBeInTheDocument()
     expect(screen.getAllByText('Daily alignment done')).toHaveLength(1)
     expect(screen.queryByText('Gems earned')).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Market' })).toHaveAttribute('href', '/market')
+    expect(screen.getByRole('link', { name: 'Shop' })).toHaveAttribute('href', '/character/shop')
   })
 })

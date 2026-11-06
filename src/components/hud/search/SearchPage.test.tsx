@@ -143,7 +143,7 @@ describe('SearchPage', () => {
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/oracle' })
 
     renderSearch({ query: 'connections', type: 'pages' })
-    expect(screen.getByText('Connections')).toBeInTheDocument()
+    expect(screen.getByText('Friends')).toBeInTheDocument()
 
     renderSearch({ query: 'isolation', type: 'pages' })
     expect(screen.getByText('Isolation Protocols')).toBeInTheDocument()
