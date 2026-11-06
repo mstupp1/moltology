@@ -41,6 +41,13 @@ and mobile 390×844, with exact loaded media filenames, legacy normalization and
 no page errors (12 image checks). Parent inspected final light/dark boards and
 desktop/mobile screenshots. No application push, PR, merge or deployment.
 
+PR preparation revalidated against integrated `origin/main` (`8cd3c9d7`):
+1576 core tests, 352 script tests and 42 scoped tests passed; typecheck,
+asset-budget, brand-assets and UI-token checks passed. All six desktop/mobile
+selections were re-exercised (12 exact-image checks), screenshots inspected,
+all twelve active uploads reverified, and the four archived reference PNGs
+matched their approved local hashes. Skill structure validation passed.
+
 Remain on `t3/restore-feature-film-character-style` in the same worktree:
 `/Users/mylesstupp/.t3/worktrees/moltology/t3-c324029b`. Ignored experiments and
 approved references are local here; preserve them. The original v3 replacement run started
