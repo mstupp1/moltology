@@ -19,7 +19,7 @@ describe('getBlogCommentsHandler public names', () => {
         from: vi.fn().mockReturnValue({
           leftJoin: vi.fn().mockReturnValue({
             where: vi.fn().mockReturnValue({
-              orderBy: vi.fn().mockResolvedValue([
+              orderBy: vi.fn().mockReturnValue({ limit: vi.fn().mockResolvedValue([
                 {
                   id: 'c1',
                   postId: 'p1',
@@ -32,7 +32,7 @@ describe('getBlogCommentsHandler public names', () => {
                   profileHandle: 'claw_lord',
                   profileLarvaId: 'LARVA UNIT #2468',
                 },
-              ]),
+              ]) }),
             }),
           }),
         }),
@@ -54,7 +54,7 @@ describe('getBlogCommentsHandler public names', () => {
         from: vi.fn().mockReturnValue({
           leftJoin: vi.fn().mockReturnValue({
             where: vi.fn().mockReturnValue({
-              orderBy: vi.fn().mockResolvedValue([
+              orderBy: vi.fn().mockReturnValue({ limit: vi.fn().mockResolvedValue([
                 {
                   id: 'c2',
                   postId: 'p1',
@@ -67,7 +67,7 @@ describe('getBlogCommentsHandler public names', () => {
                   profileHandle: null,
                   profileLarvaId: 'LARVA UNIT #2468',
                 },
-              ]),
+              ]) }),
             }),
           }),
         }),
