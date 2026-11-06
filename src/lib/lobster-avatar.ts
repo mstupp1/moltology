@@ -739,52 +739,58 @@ export interface GenerateLobsterAvatarSilhouetteOptions {
 }
 
 /**
- * Empty-state outline: the default lobster as its portrait frames it (head, eyes, antennae and
- * shoulders) in one benthic tone. Coordinates match LOBSTER_PORTRAIT_VIEWBOX, so nothing is
- * clipped and the face sits where a real portrait's would.
+ * Empty-state placeholder: a plain carapace dome with two pairs of antennae in one benthic tone.
+ * Coordinates are in LOBSTER_PORTRAIT_VIEWBOX; SILHOUETTE_FIT scales it to the size a real
+ * portrait's head fills, so the porthole looks the same before and after a member makes one.
  */
 export const SILHOUETTE_PATHS = {
-  shoulders: 'M6,122 C8,98 25,87 50,87 C75,87 92,98 94,122 Z',
-  head: 'M50,6 C73,6 85,30 86.5,54 C88,79 82,104 50,107 C18,104 12,79 13.5,54 C15,30 27,6 50,6 Z',
-  glint: 'M24,42 C24,30 31,22 39,19 C34,26 30,34 29,44 Z',
-  antennaLeft: 'M45,19 C43,5 35,-3 24,-6',
-  antennaRight: 'M55,19 C57,5 65,-3 76,-6',
-  tipLeft: { cx: 24, cy: -6, r: 3 },
-  tipRight: { cx: 76, cy: -6, r: 3 },
-  eyeLeft: { cx: 36.5, cy: 24, r: 13 },
-  eyeRight: { cx: 63.5, cy: 24, r: 13 },
-  pupilLeft: { cx: 38, cy: 25.5, r: 4.2 },
-  pupilRight: { cx: 62, cy: 25.5, r: 4.2 },
+  // Runs past the bottom of the frame, like a real portrait's body.
+  dome: 'M 16 140 V 58 a 34 34 0 0 1 68 0 v 82 Z',
+  antennaLeft: 'M 43 32 C 40 10 30 -10 14 -24',
+  antennaRight: 'M 57 32 C 60 10 70 -10 86 -24',
+  antennaGlintLeft: 'M 42 28 C 39 10 30 -8 15 -21',
+  antennaGlintRight: 'M 58 28 C 61 10 70 -8 85 -21',
+  antennuleLeft: 'M 46 28 C 45 15 42 4 38 -5',
+  antennuleRight: 'M 54 28 C 55 15 58 4 62 -5',
 } as const
 
-/** Shrinks the figure inside the porthole so the antenna tips and shoulders stay clear of the ring. */
-export const SILHOUETTE_FIT = 'translate(50 51) scale(0.84) translate(-50 -47)'
+/** Dome top sits where a real head's top does and matches its width (~two thirds of the ring). */
+export const SILHOUETTE_FIT = 'translate(50 4) scale(1.1) translate(-50 -24)'
 
-export function generateLobsterAvatarSilhouetteSvg(options?: GenerateLobsterAvatarSilhouetteOptions): string {
-  const sizeAttr = options?.size ? ` width="${options.size}" height="${options.size}"` : ''
+function silhouetteMarkup(): string {
   const s = SILHOUETTE_PATHS
-  const c = (o: { cx: number; cy: number; r: number }, attrs = '') => `<circle cx="${o.cx}" cy="${o.cy}" r="${o.r}"${attrs} />`
-  return `<svg data-avatar-slot="portrait" data-avatar-silhouette="true" xmlns="http://www.w3.org/2000/svg" viewBox="${LOBSTER_PORTRAIT_VIEWBOX}" fill="none"${sizeAttr} role="img" aria-label="Avatar not set yet">
-    <defs>
+  return `<defs>
       <linearGradient id="sil-benthic-grad" x1="25%" y1="0%" x2="75%" y2="100%">
         <stop offset="0%" stop-color="#1d5267" />
         <stop offset="45%" stop-color="#0e2d3a" />
         <stop offset="100%" stop-color="#030e14" />
       </linearGradient>
+      <radialGradient id="sil-ambient-glow" cx="50%" cy="45%" r="55%">
+        <stop offset="0%" stop-color="#00c3ff" stop-opacity="0.18" />
+        <stop offset="100%" stop-color="#00c3ff" stop-opacity="0" />
+      </radialGradient>
     </defs>
     <g transform="${SILHOUETTE_FIT}">
-    <g stroke="#00c3ff" stroke-linecap="round" stroke-opacity="0.7" stroke-width="2.6" fill="none">
-      <path d="${s.antennaLeft}" /><path d="${s.antennaRight}" />
-    </g>
-    <g fill="#00c3ff" fill-opacity="0.7">${c(s.tipLeft)}${c(s.tipRight)}</g>
-    <g fill="url(#sil-benthic-grad)" stroke="#00c3ff" stroke-width="1.4" stroke-opacity="0.5" stroke-linejoin="round">
-      <path d="${s.shoulders}" />
-      <path d="${s.head}" />
-      ${c(s.eyeLeft)}${c(s.eyeRight)}
-    </g>
-    <path d="${s.glint}" fill="#ffffff" fill-opacity="0.06" />
-    <g fill="#00c3ff" fill-opacity="0.35">${c(s.pupilLeft)}${c(s.pupilRight)}</g>
-    </g>
+      <ellipse cx="50" cy="45" rx="34" ry="32" fill="url(#sil-ambient-glow)" />
+      <g stroke="#00c3ff" stroke-linecap="round" fill="none">
+        <path d="${s.antennaLeft}" stroke-width="3" stroke-opacity="0.85" />
+        <path d="${s.antennaRight}" stroke-width="3" stroke-opacity="0.85" />
+        <path d="${s.antennaGlintLeft}" stroke="#ffffff" stroke-width="1.2" opacity="0.35" />
+        <path d="${s.antennaGlintRight}" stroke="#ffffff" stroke-width="1.2" opacity="0.35" />
+        <path d="${s.antennuleLeft}" stroke-width="2.2" stroke-opacity="0.6" />
+        <path d="${s.antennuleRight}" stroke-width="2.2" stroke-opacity="0.6" />
+      </g>
+      <path d="${s.dome}" fill="url(#sil-benthic-grad)" stroke="#00c3ff" stroke-width="1.2" stroke-opacity="0.45" stroke-linejoin="round" />
+    </g>`
+}
+
+/** Inner markup of the placeholder, shared by the React component and the image version. */
+export const SILHOUETTE_MARKUP = silhouetteMarkup()
+
+export function generateLobsterAvatarSilhouetteSvg(options?: GenerateLobsterAvatarSilhouetteOptions): string {
+  const sizeAttr = options?.size ? ` width="${options.size}" height="${options.size}"` : ''
+  return `<svg data-avatar-slot="portrait" data-avatar-silhouette="true" xmlns="http://www.w3.org/2000/svg" viewBox="${LOBSTER_PORTRAIT_VIEWBOX}" fill="none"${sizeAttr} role="img" aria-label="Avatar not set yet">
+    ${SILHOUETTE_MARKUP}
   </svg>`
 }
 

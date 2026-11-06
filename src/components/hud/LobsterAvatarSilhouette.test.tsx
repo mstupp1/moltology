@@ -15,12 +15,10 @@ describe('LobsterAvatarSilhouette Component', () => {
     expect(el.getAttribute('viewBox')).toBe(LOBSTER_PORTRAIT_VIEWBOX)
     expect(el).toHaveAttribute('data-avatar-slot', 'portrait')
 
-    // Contains antennae feelers, specular highlights, and carapace dome path
+    // Antennae, antennules and the carapace dome; no face (it stays a plain placeholder)
     const paths = el.querySelectorAll('path')
-    expect(paths.length).toBeGreaterThanOrEqual(5)
-    // Contains sensory beacons
-    const circles = el.querySelectorAll('circle')
-    expect(circles.length).toBeGreaterThanOrEqual(4)
+    expect(paths.length).toBe(7)
+    expect(el.querySelectorAll('circle').length).toBe(0)
   })
 
   it('renders close-up portrait SVG silhouette consistently even when rendered in fullBody slot', () => {
