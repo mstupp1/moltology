@@ -47,7 +47,7 @@ const NAMED_STORY_ROLES: Record<string, string> = {
   lobster_pip_current: 'A shy, observant experimenter learning to share an imperfect first attempt',
   crab_mira_kelp: 'An encouraging explorer learning to check the route and listen before committing',
   crab_cal_brack: 'A patient mediator learning to make room for his own opinions as well as everyone else’s',
-  lobster_clove_cinder: 'A perceptive listener learning to begin before the perfect moment arrives',
+  lobster_rook_tide: 'A steady, decisive friend learning to accept help while encouraging everyone to take the next step',
   lobster_tess_shoal: 'An attentive listener whose practical questions help others choose while she learns to make her own decisions',
   lobster_faye_ripple: 'An enthusiastic encourager learning to listen before offering a solution',
 }

@@ -43,7 +43,7 @@ Use `overlayCharacterOnImage` from `scripts/lib/character-overlay.ts`:
 
 ```typescript
 await overlayCharacterOnImage(baseImagePath, outputImagePath, {
-  character: 'lobster_engineer',
+  character: 'lobster_rook_tide',
   position: 'bottom-right',
   scalePercent: 30,
 })
@@ -51,4 +51,4 @@ await overlayCharacterOnImage(baseImagePath, outputImagePath, {
 
 It resolves local references or S3; check local reference freshness when old art appears. Run scoped character/composite tests and typecheck as listed in the main skill after adoption or registry changes.
 
-`MascotOverlay` falls back to the thumbs-up lobster on an image error. Seeing thumbs-up does not verify the selected asset. Check the selected object's exact URL; upload a missing WebP instead of changing the default. When retrieval succeeds but art is wrong, check filenames, aliases, local references and cache versions.
+`MascotOverlay` falls back to `DEFAULT_MASCOT_KEY` on an image error. Seeing the default does not verify the selected asset. Check the selected object's exact URL; upload a missing WebP instead of changing the default. When retrieval succeeds but art is wrong, check filenames, aliases, local references and cache versions.

@@ -13,7 +13,7 @@ Faye is the friend who can make a small step feel worth celebrating. She loves h
 
 ## Design brief
 
-Adult lobster with a sturdy, chunky, regular-height build and a softly squared head with rounded corners. Bubblegum-rose satin shell, pale pink belly and sapphire eyes. Warm lopsided smile and one knowingly lifted brow. Two curved antennae, two pincer arms, six walking legs and a segmented tail fan. Each side's leg sockets follow short, short, long, with the final long support at the lowest/rearmost position. Her single personal detail is a small sea-glass bead tied on a short plain cord at one wrist. No other costume, gear or props.
+Adult lobster with a sturdy, chunky, regular-height build and a softly squared head with rounded corners. Bubblegum-rose satin shell, pale pink belly and sapphire eyes. Warm lopsided smile and one knowingly lifted brow. Two curved antennae, two pincer arms, six walking legs and a segmented tail fan. Each side's leg sockets follow short, short, long, with the final long support at the lowest/rearmost position. Her small sea-glass bead tied on a short plain cord at one wrist remains unchanged. Her permanent signature attire is a fitted cropped dark-teal canvas sleeveless waistcoat with open front, warm cream piping and one plain brass fastening. It is cheerful everyday host attire, not a uniform; it crops well above walking attachments and leaves side openings. No tools, hat or extra gear.
 
 ## First render: Faye Ripple v1 (2026-11-04)
 
@@ -58,3 +58,53 @@ returned HTTP 200 with exact local-byte matches, expected dimensions and alpha
 before registration. No old asset was overwritten. See [cast v3](../../docs/character-cast-v3.md).
 This adoption does not claim separate user review of every image or application
 deployment.
+
+## First signature-attire request: Faye Ripple v2 (2026-11-05)
+
+**Design target:** the cropped dark-teal waistcoat described above. The
+earlier v1 design brief and adoption notes document the prior no-costume target
+and remain historical; this attempt did not produce a candidate and does not
+adopt the new look.
+
+Source identity render: `scratch/character_tests/faye-ripple-v1/faye-ripple-v1.png`
+(SHA-256 `2741728546e9d3119d3eadc60b687cf5badc8ecd9b9efc704550d5cf14a2f72e`).
+One built-in ImageGen identity-preserving edit was requested with native
+transparency. No image output was returned. The service rejected it at output
+moderation stage (`other`); exact error: `image generation failed: http 400 Bad
+Request: Some("{\n  \"error\": {\n    \"message\": \"Your request was rejected by the safety system. If you believe this is an error, contact us at help.openai.com and include the request ID d0e32572-8aec-4e31-91da-db1642557e7d.\",\n    \"type\": \"image_generation_user_error\",\n    \"param\": null,\n    \"code\": \"moderation_blocked\",\n    \"moderation_details\": {\n      \"moderation_stage\": \"output\",\n      \"categories\": [\n        \"other\"\n      ]\n    }\n  }\n}")`. Request ID: `d0e32572-8aec-4e31-91da-db1642557e7d`. The subagent stopped after this failure. The parent subsequently made the concise revised request recorded below; no provider switch occurred. `scratch/character_tests/faye-ripple-v2/` preserves the prompt and failure record; this first request produced no PNG.
+
+The waistcoat is intended as cheerful everyday host attire, giving Faye a
+recognizable signature while keeping all six walking legs unobstructed. No
+candidate QA is possible because the service returned no image. The parent subsequently resumed with the focused request below.
+
+Exact attempted prompt:
+
+```text
+Use case: identity-preserve. Edit Image 1, Faye Ripple's existing polished 3D feature-film character render. Add only a fitted cropped dark-teal canvas sleeveless waistcoat, open front, warm cream piping and one plain brass fastening. Crop well above every walking-leg attachment and leave clear side openings so all six walking legs remain readable. Preserve her broad square pink adult head/build, sapphire eyes, joyful raised-pincer gesture, exact anatomy and socket order, and sea-glass wrist bead. Full body and every appendage, generous transparent margin, native transparency. No tools, hat, extra gear, logos, background, or anatomy changes.
+```
+
+## Successful signature look and adoption (2026-11-05)
+
+A concise built-in ImageGen edit succeeded with native transparency. Returned
+source: `/Users/mylesstupp/.codex/generated_images/01a1a981-e9fc-7943-922b-a5d71590284c/exec-b1cee09e-3e7b-47d9-b081-a38dd261ef60.png`.
+Preserved candidate: `scratch/character_tests/faye-ripple-v2/faye-ripple-v2.png`.
+SHA-256: `0e531c219ac8ac3c68ee60a91a93a25812fd052b2e0acdf1963ac3b8cc48fdd1`.
+
+Parent inspected the actual light/dark composites: face, palette, pose, bead,
+tail, two pincers and all six walking legs remain recognizable. Both sides show
+short-short-long attachment order. The teal waistcoat has cream piping, a brass
+button and open sockets. It is her permanent signature attire. The 1199 × 1312
+RGBA image has native alpha 0–255. Alpha >16 margins L/T/R/B are
+6.76/2.97/13.34/4.27%; preserve full framing. Faint alpha reaches the canvas
+boundary, but visible appendages are complete and normal-size composites clean.
+
+Exact successful prompt (`transparent_background: true`):
+
+```text
+Add a short open-front dark-teal canvas waistcoat to this same character. Cream piping, one plain brass button, generous side cutouts exposing all six walking-leg sockets. Keep her pink shell, blue eyes, face, raised-pincer pose, wrist bead, both antennae, tail and existing anatomy unchanged. Preserve the polished 3D film rendering and transparent background. Full figure with clear margins. Only add this waistcoat.
+```
+
+Adopted as `char_faye_ripple_v4.png` and quality-90 `.webp`, retained in both
+`scratch/characters/` and `scratch/character_refs/`. Public objects were checked
+against local bytes before registration. The first failed request remains above
+as history. See [cast v4](../../docs/character-cast-v4.md).

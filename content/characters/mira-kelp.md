@@ -109,3 +109,10 @@ overwritten. The generation-stage candidate status above is historical; this
 adoption section describes the current state. Existing anatomy/margin caveats
 remain recorded. See [cast v3](../../docs/character-cast-v3.md) for compatibility
 and browser verification details. No application push, merge or deployment.
+
+## Signature-look pass (2026-11-05)
+
+The user explicitly liked Mira’s distinctive clothing. Her ochre neckerchief,
+identity and exact adopted v3 image are retained unchanged in the v4 cast while
+the other individuals gain stronger signature attire. No new Mira render was
+requested or generated. The existing source hash and alpha QA above still apply.

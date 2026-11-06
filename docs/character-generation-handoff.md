@@ -1,18 +1,43 @@
 # Character generation continuation
 
-## Current state: six-character cast complete
+## Current state: signature-look cast v4 complete
 
 The user authorized replacing the old active cast, scrapping Bram and using Luna
 subagents for additional individuals, then clarified: “move forward so we can
 have a solid cast of 6.” The earlier design-only statement that no upload had
 been requested is superseded by this replacement request.
 
-Active cast: **Pip Current, Mira Kelp, Cal Brack, Clove Cinder, Tess Shoal and
-Faye Ripple**. Faye is the default. See [cast v3](character-cast-v3.md),
-`src/lib/mascots.ts` and each individual brief under `content/characters/`.
-Six renders exist, have been inspected and adopted, and no further generation
-is needed for this request. Bram, Oren, Ada, Nell and Gus are archived, not
-continuation tasks.
+Active cast: **Rook Tide, Pip Current, Mira Kelp, Cal Brack, Tess Shoal and
+Faye Ripple**. Rook is the default male red anchor. The user explicitly chose
+six characters, replacing Clove. See [cast v4](character-cast-v4.md) and
+`src/lib/mascots.ts`. Rook's mantle, Pip's cap, Cal's armor, Tess's hat and Faye's
+waistcoat are permanent signature attire; Mira's exact scarf render is unchanged.
+All six renders exist, have been inspected and adopted. No further generation
+is needed. Bram, Oren, Ada, Nell, Gus and Clove are archived.
+
+The signature-look revision started clean at `b0cbc0a`. Source assets, exact
+prompts, hashes and observed QA are preserved in the individual briefs. New
+masters/WebPs use v4 except unchanged Mira v3. All twelve active public objects
+match local bytes, and each WebP alpha matches its PNG exactly. The current
+comparison boards are in `scratch/character_tests/cast-v4/`; verification artifacts
+are in `tmp/verification/character-cast-v4/`. All delegated work has settled.
+The historical v3 sections below document the earlier adoption, not current
+filenames/defaults. Current registry aliases include Clove → Rook and preserve
+all 22 original role keys plus older named filenames.
+
+Faye's first wardrobe edit returned output moderation category `other`, request
+`d0e32572-8aec-4e31-91da-db1642557e7d`. A concise revised wardrobe-only prompt
+succeeded; its actual PNG and QA are preserved. No unchanged retry loop or
+provider fallback occurred. No specific rejection cause was supplied.
+
+Final v4 verification: 42 targeted tests, 1557 core tests and 348 script tests
+passed; typecheck passed. Skill validation, local Markdown links, five exact
+prompt/source-hash records and source-preserving master copies passed. Chrome
+exercised all six selections at desktop 1440×1000 and mobile 390×844, verified
+exact loaded media filenames, legacy default normalization and no page errors
+(12 image checks). Parent inspected final desktop/mobile screenshots and both
+cast boards. Screenshots/reports are in `tmp/verification/character-cast-v4/`.
+No application push, PR, merge or deployment was performed.
 
 Remain on `t3/restore-feature-film-character-style` in the same worktree:
 `/Users/mylesstupp/.t3/worktrees/moltology/t3-c324029b`. Ignored experiments and
@@ -42,7 +67,7 @@ No short leg follows it. Lobsters retain a segmented tail fan; crabs do not.
 The selected baseline crab has two flank spikes. Named builds and head shapes
 vary intentionally. A request for anatomy does not verify generated anatomy.
 
-## Assets and migration
+## Historical v3 assets and migration
 
 All six source-preserving PNGs and quality-90 WebPs are in both
 `scratch/characters/` and `scratch/character_refs/`, using
@@ -69,7 +94,7 @@ artwork remain available; existing merchandise artwork is historical material.
 The studio's small-screen controls and preview now stack. Its conservative
 initial fit scale avoids starting with the canvas outside the viewport.
 
-## Visual QA
+## Historical v3 visual QA
 
 All six show two distinct pincer arms and six walking-leg tips. Pip, Cal, Clove
 and Faye have readable short-short-long socket order on both sides. Mira's
@@ -112,7 +137,7 @@ old design-only scope as current. The later explicit cast-replacement request
 and repo deployment procedure were supplied as authorization evidence; the same
 versioned upload was approved, completed and verified. No review was bypassed.
 
-## Verification and handback
+## Historical v3 verification and handback
 
 Final core tests: **1557 passed**. Script tests: **348 passed**. Scoped mascot,
 character-overlay, composite-component and video-director tests: **42 passed**.

@@ -24,7 +24,9 @@ two classic pincer arms, two flank spikes per side, no lobster tail fan. Six
 walking legs: each side has two short legs followed by the final long supporting
 leg at the lowest/rearmost socket. All tips readable, sockets unobscured.
 
-One irregular cream forehead patch; no costume or belongings. One pincer lifted
+One irregular cream forehead patch. Permanent signature attire: compact fitted
+dark-slate upper-torso armor, restrained brass edging and articulated shoulder
+plates, with all six walking attachments exposed. One pincer lifted
 in a quiet invitation to speak. Distinct square blue silhouette versus lean
 heart-shaped green Mira and slender lavender Pip.
 
@@ -86,3 +88,31 @@ returned HTTP 200 with exact local-byte matches, expected dimensions and alpha
 before registration. No old asset was overwritten. See [cast v3](../../docs/character-cast-v3.md).
 This adoption does not claim separate user review of every image or application
 deployment.
+
+## Current signature-attire design target (2026-11-05)
+
+Candidate at subagent handoff, subsequently adopted below: `scratch/character_tests/cal-brack-v2/cal-brack-v2.png`.
+
+The current design target adds compact fitted dark-slate satin protective armor over Cal's upper torso, restrained warm brass edging and two small articulated shoulder plates. The open sides and short cut keep all six walking-leg sockets exposed. This is intended as his permanent signature attire: the fitted protective form reflects his instinct to make disagreement feel safe for companions, without turning him into a soldier. Preserve his face, palette, square proportions, raised pincer gesture, curled antennae, cream forehead patch, flank spikes and all appendages unchanged.
+
+Source identity image: `scratch/character_tests/cal-brack-v1/cal-brack-v1.png`, SHA-256 `989d5abe2b0bb8bc79ab2be83649072d865edff73b65ac346f4838a2cb399eae`. Built-in ImageGen edit, native transparency requested. Candidate SHA-256 `4fc1c8fc2412bc9d73d0b4f1db9fd4d6bda8d7b1c0bb67226d26b19d9f6e8959`.
+
+Exact prompt used:
+
+```text
+Edit the same Cal Brack character from the reference. Keep his face, cobalt palette, proportions, raised pincer gesture, curled antennae, cream forehead patch, two flank spikes per side, both pincer arms, and all six walking legs exactly recognizable and unchanged. Add compact fitted dark-slate satin protective armor over his upper torso, with restrained warm brass edging and two small articulated shoulder plates. Organic fitted construction over the square blue crab form, open sides and short cut: all six walking-leg sockets and short-short-long order on each side remain fully readable; armor adds no limbs. The armor should feel companion-protective and welcoming, not like a soldier uniform. Polished dimensional 3D animated feature-film finish. Full-body cutout with every appendage visible and generous clear transparent margin. No helmet, shield, weapons, tools, text, logos or background.
+```
+
+Observed QA and margin caveat: all six legs remain visible with both sides in short-short-long order, and the face, color, gesture, antennae and flank spikes remain recognizable. Light/dark composites appear clean with native alpha and no halo or floor shadow. RGBA 1312×1199, alpha range 0–255. Alpha>16 clear margins are L/T/R/B 3.12% / 3.75% / 1.52% / 2.92%, so the requested generous 8% margin was not achieved. QA composites and pixel bounds are in the v2 experiment folder. The older v1 record above remains historical and unchanged.
+
+## Signature-look adoption (2026-11-05)
+
+Parent inspected the actual render and light/dark composites, then adopted this
+look under the request for distinctive permanent attire. The earlier candidate-only
+status describes the subagent handoff. Identity and visible anatomy are retained,
+with the framing and socket caveats above. Source-preserving PNG and quality-90
+WebP are retained in both `scratch/characters/` and `scratch/character_refs/` as
+`char_cal_brack_v4`. Both public objects matched local bytes before
+registration. See [cast v4](../../docs/character-cast-v4.md).
+
+Returned v2 source: `/Users/mylesstupp/.codex/generated_images/01a1ae8a-61db-72b3-a856-e3da63fa4318/exec-2137cf61-2147-4cab-9c6f-9c7ff09ce1ef.png`.

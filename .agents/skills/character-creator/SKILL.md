@@ -42,7 +42,7 @@ New cast members are recurring individuals, not generic age/role variants. Befor
 
 Broad, familiar story archetypes are welcome: the reluctant hero, the brilliant but unreliable inventor, the weary mentor, the charming opportunist, the earnest apprentice. Borrow the emotional pattern and give it an original Moltology life. Avoid reproducing a famous character's signature costume, face, color arrangement, emblem, catchphrase or recognizable combination of details. Record archetype inspirations as temperament or relationship cues, rather than an instruction to render a named fictional character. Keep existing cast keys and identities stable; this direction does not automatically rename or redesign them.
 
-Save durable individual briefs under `content/characters/` with an explicit draft/adopted/retired state, distinct from ignored image experiments. The active named cast and legacy successor rules are recorded in [cast v3](../../../docs/character-cast-v3.md) and `src/lib/mascots.ts`. Bram Silt is retired at the user's request; his brief and failed attempts are historical records, not an active generation task. Never mistake an avatar study or written target for a generated character.
+Save durable individual briefs under `content/characters/` with an explicit draft/adopted/retired state, distinct from ignored image experiments. The active named cast and legacy successor rules are recorded in [cast v4](../../../docs/character-cast-v4.md) and `src/lib/mascots.ts`. Bram Silt is retired at the user's request; his brief and failed attempts are historical records, not an active generation task. Never mistake an avatar study or written target for a generated character.
 
 ## Shared style
 

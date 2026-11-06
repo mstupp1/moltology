@@ -11,7 +11,7 @@ first version be seen.
 Pip pinches a small copper keepsake ring on a short plain cord at their wrist
 when thinking. It belonged to someone who encouraged their early experiments;
 the familiar circle reminds Pip that an unfinished idea can still be worth
-sharing. This is their only personal belonging.
+sharing. The ring is their keepsake; their soft navy cap is everyday clothing from a patient mentor.
 
 ## Personality and relationships
 
@@ -31,7 +31,8 @@ pincer. Two curved antennae, two pincer arms and six walking legs, three per
 side. On each side the sockets read short, short, long, with the final long
 supporting leg at the lowest/rearmost socket. Preserve the segmented lobster
 tail. The copper keepsake ring on a short plain wrist cord is the single personal
-detail. No costume, occupational cues, tools or other props.
+detail. Permanent signature clothing: a soft slouched deep-navy knitted cap,
+folded brim and two clean antenna openings. No occupational tools or extra props.
 
 The avatar study confirms the system's Orchid palette (`#b25cf0` base shell,
 `#f8ecff` belly) and Emerald eye option. The generated 3D shell may use nuanced
@@ -112,3 +113,51 @@ overwritten. The generation-stage candidate status above is historical; this
 adoption section describes the current state. Existing anatomy/margin caveats
 remain recorded. See [cast v3](../../docs/character-cast-v3.md) for compatibility
 and browser verification details. No application push, merge or deployment.
+
+## Signature-look candidate at subagent handoff (2026-11-05)
+
+The current design target is an identity-preserving edit of the adopted Pip
+render: a soft, slightly slouched deep-navy knitted watch cap with folded brim
+and two neat antenna openings. It reads as cherished fabric from Pip's patient
+mentor, and gives the shy observant experimenter a recognizable permanent
+silhouette detail without adding occupational props. Keep the existing copper
+ring and wrist cord as-is. At subagent handoff this was a parent-review candidate; the adoption below supersedes that state.
+
+The single inspected identity input was
+`scratch/character_tests/pip-current-v1/pip-current-v1.png`. Built-in ImageGen
+returned the candidate at
+`/Users/mylesstupp/.codex/generated_images/01a1ae87-b423-7630-90cd-fe1ea2ad121c/exec-16ae38cf-ad75-4e15-b0a9-b1f1208b8dbf.png`;
+the copied experiment file is
+`scratch/character_tests/pip-current-v2/pip-current-v2.png`. Both have SHA-256
+`37eebc80a6c9ea8d4d425aa9def24ffda6c85579bda2319a07a7f29007534ea5`.
+
+Observed in the actual candidate and light/dark alpha composites: the knit cap
+is deep navy, visibly soft and slouched, with a folded brim and two antenna
+openings; both antennae, emerald eyes, copper ring/cord and complete silhouette
+remain visible. The short-slim lavender body, raised pincer gesture, segmented
+tail, both pincer arms and six walking legs remain present. Per-side leg socket
+order remains visibly short-short-long, with the final long legs attaching
+lowest/rearmost. The alpha channel is RGBA, 1199 × 1312, with values 0–255.
+At alpha >16, bounds are [181, 54, 1052, 1245], leaving 15.10% left, 4.12% top,
+12.26% right and 5.11% bottom margins. The output includes antialiased pixels
+at the canvas edges at alpha 1; the thresholded light and dark composites show
+no visible opaque backdrop or edge halo. The requested generous top/bottom
+margin was not achieved. Detailed bounds and alpha metadata are in
+`scratch/character_tests/pip-current-v2/alpha-report.json`; visual QA composites
+are `qa-light.png` and `qa-dark.png` in that folder. No pixel cleanup was made.
+
+### Exact generation prompt
+
+```text
+Use case: identity-preserve. Edit the reference character by adding one soft, slightly slouched deep-navy knitted watch cap, with two neat antenna openings and a folded brim. Clearly fabric knit, cherished and worn, never a helmet; no human ears. Keep Pip's face, emerald eyes, both curved antennae complete and unchanged, lavender short slim adult body, proportions, gesture, two pincer arms, segmented tail, six walking legs and their visible short-short-long socket order on each side, and copper ring with wrist cord unchanged. Full body with every appendage and generous transparent margin. Polished feature-film 3D finish. No goggles, tools, other clothing, props, logos, text, shadow, hidden or changed limb attachments.
+```
+
+## Signature-look adoption (2026-11-05)
+
+Parent inspected the actual render and light/dark composites, then adopted this
+look under the request for distinctive permanent attire. The earlier candidate-only
+status describes the subagent handoff. Identity and visible anatomy are retained,
+with the framing and socket caveats above. Source-preserving PNG and quality-90
+WebP are retained in both `scratch/characters/` and `scratch/character_refs/` as
+`char_pip_current_v4`. Both public objects matched local bytes before
+registration. See [cast v4](../../docs/character-cast-v4.md).

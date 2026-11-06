@@ -1,5 +1,9 @@
 # Named character cast v3
 
+Historical cast snapshot. The [signature-look v4 cast](character-cast-v4.md)
+supersedes these active looks, retains Mira unchanged, and replaces Clove with
+the male red anchor Rook Tide at the user’s choice. v3 objects remain preserved.
+
 The active cast contains six named individuals in the approved feature-film style.
 The user requested replacing the old role/age cast on 2026-11-04, then clarified
 that the finished cast should contain six successful characters. The shared

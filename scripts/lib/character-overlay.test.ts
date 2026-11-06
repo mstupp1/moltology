@@ -8,7 +8,7 @@ import {
 
 describe('Character Overlay & Registry', () => {
   it('contains core registered cartoon characters with valid S3 URLs', () => {
-    const keys = ['lobster_pip_current', 'crab_mira_kelp', 'crab_cal_brack', 'lobster_clove_cinder', 'lobster_tess_shoal', 'lobster_faye_ripple']
+    const keys = ['lobster_pip_current', 'crab_mira_kelp', 'crab_cal_brack', 'lobster_rook_tide', 'lobster_tess_shoal', 'lobster_faye_ripple']
 
     for (const key of keys) {
       const char = CHARACTER_REGISTRY[key]
@@ -40,7 +40,7 @@ describe('Character Overlay & Registry', () => {
     const excludedKey = allKeys[0]
     const randomKeyWithExclude = getRandomCharacterKey([excludedKey])
     expect(randomKeyWithExclude).not.toBe(excludedKey)
-    const exclusions = allKeys.filter((key) => key !== 'lobster_pip_current').map((key) => key === 'lobster_faye_ripple' ? 'thumbs_up' : key)
+    const exclusions = allKeys.filter((key) => key !== 'lobster_pip_current').map((key) => key === 'lobster_rook_tide' ? 'thumbs_up' : key)
     expect(getRandomCharacterKey(exclusions)).toBe('lobster_pip_current')
 
     // Resolves 'random' keyword
@@ -50,9 +50,9 @@ describe('Character Overlay & Registry', () => {
   })
 
   it('maps retired art file names to the current renders', () => {
-    expect(getCharacterInfo('char_lobster_pointing_cta.png').filename).toBe('char_tess_shoal_v3.webp')
+    expect(getCharacterInfo('char_lobster_pointing_cta.png').filename).toBe('char_rook_tide_v4.webp')
     expect(getCharacterInfo('lobster_speed_action').key).toBe('lobster_tess_shoal')
-    expect(getCharacterInfo('char_crab_pointing_stats.webp').filename).toBe('char_cal_brack_v3.webp')
+    expect(getCharacterInfo('char_crab_pointing_stats.webp').filename).toBe('char_cal_brack_v4.webp')
   })
 
   it('generates unique random rotations without duplicates', () => {

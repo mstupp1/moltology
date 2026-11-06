@@ -1,6 +1,9 @@
 # Clove Cinder
 
-**State:** rendered individual selected for the requested six-character cast.
+**State:** retired from the active cast on 2026-11-05. The user explicitly
+chose to keep six and replace Clove with the male red anchor, Rook Tide.
+This brief and all v3 artwork remain historical records; legacy keys redirect
+to Rook after the v4 adoption.
 
 Clove listens for the tide's smaller changes and wants to help people notice
 when a good moment is arriving. She is patient and perceptive, but can wait so

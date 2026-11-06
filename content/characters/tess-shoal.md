@@ -24,11 +24,13 @@ six connected walking legs and a segmented lobster tail fan. On each side, leg
 sockets read short, short, then the final long supporting leg at the
 lowest/rearmost socket.
 
-Her only personal visual detail is a small, naturally colored oval cream patch
-on one cheek, shared with her family. It is part of her shell coloration, not a
-decal. No costume, tools or extra props. Keep her silhouette and cool teal/blue
-palette clearly distinct from Pip's short round lavender build and Mira's lean
-jade crab.
+Her small, naturally colored oval cream patch on one cheek is shared with her
+family and remains part of her shell coloration, not a decal. Her current
+signature attire target is a worn dusky-burgundy felt travelling hat with a
+softly rolled medium-wide brim, simple cream band and two clean antenna openings.
+It supports her patient, thoughtful wayfarer presence. Keep her silhouette and
+cool teal/blue palette clearly distinct from Pip's short round lavender build
+and Mira's lean jade crab. Do not add other costume, tools or props.
 
 ## First render (2026-11-04)
 
@@ -105,3 +107,49 @@ returned HTTP 200 with exact local-byte matches, expected dimensions and alpha
 before registration. No old asset was overwritten. See [cast v3](../../docs/character-cast-v3.md).
 This adoption does not claim separate user review of every image or application
 deployment.
+
+## Current signature-attire exploration: Tess Shoal v2 (2026-11-05)
+
+**Current design target:** the travelling hat described above. The earlier v1
+design brief and adoption notes document the prior no-costume target and remain
+historical; this exploration does not itself adopt the new look.
+
+Source identity render: `scratch/character_tests/tess-shoal-v1/tess-shoal-v1.png`
+(SHA-256 `d1ae28db94554985f6ad9ca16aa491f2d58a01f9f8847038667a54ba47a85029`).
+Built-in ImageGen identity-preserving edit, with native transparency. One
+candidate: `scratch/character_tests/tess-shoal-v2/tess-shoal-v2.png`
+(SHA-256 `e2b7c7b597f7bebb96f9e17d60f9ef54f2460234daf312f88b7bb69f933c4ec7`).
+The exact returned PNG is preserved with `qa-light.png`, `qa-dark.png`, and
+`alpha-report.json` in the same experiment folder.
+
+Observed QA: 1199 × 1312 RGBA, alpha range 0–255. Light and dark composites
+show no obvious opaque backdrop, fringe or halo. Her face, amber eyes, cheek
+patch, teal proportions, pose, two pincer arms, six walking legs and tail remain
+recognizable and intact. The burgundy felt hat has a simple cream band and two
+separate antenna openings. All six walking-leg tips remain visible in
+short-short-long order on each side, although the upper short sockets are partly
+crowded by the existing pincer/torso overlap, as in v1. Alpha >16 margins are
+7.26% left, 1.68% top, 19.52% right and 3.05% bottom, so the requested generous
+margin is not achieved, especially above the antennae. Candidate awaits parent
+review; no adoption is claimed.
+
+The hat gives Tess a patient, thoughtful wayfarer signature while preserving
+her existing anatomy and keepsake patch.
+
+Exact prompt:
+
+```text
+Use case: identity-preserve. Edit Image 1, Tess Shoal's existing polished 3D feature-film character render. Add only a worn dusky-burgundy felt travelling hat: softly rolled medium-wide brim, simple cream band, and exactly two clean openings through which her existing antennae emerge naturally. Preserve her exact face, amber eyes, cheek patch, teal palette, proportions, gesture, two pincers, six walking legs and their short-short-long socket order, and tail. Keep all walking attachments visible. Full body and every appendage, generous transparent margin, native transparency. No other costume, props, logos, background, or anatomy changes.
+```
+
+## Signature-look adoption (2026-11-05)
+
+Parent inspected the actual render and light/dark composites, then adopted this
+look under the request for distinctive permanent attire. The earlier candidate-only
+status describes the subagent handoff. Identity and visible anatomy are retained,
+with the framing and socket caveats above. Source-preserving PNG and quality-90
+WebP are retained in both `scratch/characters/` and `scratch/character_refs/` as
+`char_tess_shoal_v4`. Both public objects matched local bytes before
+registration. See [cast v4](../../docs/character-cast-v4.md).
+
+Returned source: `/Users/mylesstupp/.codex/generated_images/01a1ae8c-9060-7892-b59f-565562a33a45/exec-ae273e1a-0d70-48fe-b366-cead36d0130a.png`.
