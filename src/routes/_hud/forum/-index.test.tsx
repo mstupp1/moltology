@@ -120,7 +120,7 @@ describe('ForumIndexPage (/_hud/forum/)', () => {
       expect(marks.some((node) => node.textContent === 'New')).toBe(true)
     })
     expect(getForumTopicsFn).toHaveBeenCalledWith({
-      data: { sortBy: 'hot', userId: 'member-1', token: 'eyJ.payload.sig' },
+      data: { sortBy: 'hot', limit: 31, userId: 'member-1', token: 'eyJ.payload.sig' },
     })
     expect(getForumCategoriesFn).toHaveBeenCalledWith({
       data: { userId: 'member-1', token: 'eyJ.payload.sig' },
@@ -145,12 +145,12 @@ describe('ForumIndexPage sorting and filters', () => {
     fireEvent.click(screen.getByRole('button', { name: 'New' }))
     expect(screen.getByRole('button', { name: 'New' })).toHaveAttribute('aria-pressed', 'true')
     await waitFor(() => {
-      expect(getForumTopicsFn).toHaveBeenCalledWith({ data: { sortBy: 'latest' } })
+      expect(getForumTopicsFn).toHaveBeenCalledWith({ data: { sortBy: 'latest', limit: 31 } })
     })
     await waitFor(() => expect(screen.getByText(INITIAL_FORUM_TOPICS[1].title)).toBeInTheDocument())
   })
 
-  it('offers to clear filters when a board has no matching posts', () => {
+  it('offers to clear filters when a board has no matching posts', async () => {
     const categories = INITIAL_FORUM_CATEGORIES.map((c) => ({ ...c, topicCount: 1 }))
     const topic = INITIAL_FORUM_TOPICS[0]
     mockUseLoaderData.mockReturnValue({ categories, topics: [topic] })
@@ -159,8 +159,10 @@ describe('ForumIndexPage sorting and filters', () => {
     const other = categories.find((c) => c.id !== topic.categoryId)!
     fireEvent.change(screen.getByLabelText('Filter by board'), { target: { value: other.slug } })
 
-    expect(screen.getByTestId('forum-empty')).toHaveTextContent('No posts match')
+    // A board filter asks the server for that board's posts.
+    expect(await screen.findByTestId('forum-empty')).toHaveTextContent('No posts match')
+    expect(getForumTopicsFn).toHaveBeenCalledWith({ data: { sortBy: 'hot', limit: 31, categorySlug: other.slug } })
     fireEvent.click(screen.getByRole('button', { name: /clear filters/i }))
-    expect(screen.getByText(topic.title)).toBeInTheDocument()
+    expect(await screen.findByText(topic.title)).toBeInTheDocument()
   })
 })

@@ -14,22 +14,32 @@ import { getAuthJWTToken } from '@/lib/jwt'
 import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
+import { PAGE_SIZES, mergeById, takePage } from '@/lib/pagination'
+import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
+
+const TOPIC_PAGE = PAGE_SIZES.forumTopics
 
 export const Route = createFileRoute('/_hud/forum/')({
   loader: async () => {
     let categories: ForumCategoryEntry[] = []
     let topics: ForumTopicEntry[] = []
+    let hasMore = false
     try {
       const [cats, tops] = await Promise.all([
         getForumCategoriesFn(),
-        getForumTopicsFn({ data: { sortBy: 'hot' } }),
+        // One extra row tells us whether "Load more" has anything to load.
+        getForumTopicsFn({ data: { sortBy: 'hot', limit: TOPIC_PAGE + 1 } }),
       ])
       if (cats && cats.length > 0) categories = cats
-      if (tops && tops.length > 0) topics = tops
+      if (tops && tops.length > 0) {
+        const page = takePage(tops, TOPIC_PAGE)
+        topics = page.items
+        hasMore = page.hasMore
+      }
     } catch (e) {
       console.warn('Forum index loader error:', e)
     }
-    return { categories, topics }
+    return { categories, topics, hasMore }
   },
   head: () => ({
     meta: [
@@ -51,7 +61,7 @@ const FIELD =
   'w-full min-h-8 bg-surface-2 border border-line hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus text-xs text-ink outline-hidden rounded-control transition-colors'
 
 function ForumIndexPage() {
-  const { categories, topics } = Route.useLoaderData()
+  const { categories, topics, hasMore: loaderHasMore } = Route.useLoaderData()
   const navigate = useNavigate()
   const session = useAuthSession()
   const userId = session.userId
@@ -64,10 +74,16 @@ function ForumIndexPage() {
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const [boardFilter, setBoardFilter] = useState<string>('ALL')
   const [loading, setLoading] = useState(false)
+  const [hasMore, setHasMore] = useState(loaderHasMore)
+  const [loadingMore, setLoadingMore] = useState(false)
+  // Rows the server has handed us for the current view; topics created here are not counted.
+  const [serverOffset, setServerOffset] = useState(topics.length)
 
   useEffect(() => {
     setTopicsState(topics)
-  }, [topics])
+    setHasMore(loaderHasMore)
+    setServerOffset(topics.length)
+  }, [topics, loaderHasMore])
 
   useEffect(() => {
     setCategoriesState(categories)
@@ -102,29 +118,50 @@ function ForumIndexPage() {
     return () => clearTimeout(timer)
   }, [searchQuery])
 
+  const boardSlug = boardFilter === 'ALL' ? undefined : boardFilter
+
+  const fetchTopicPage = async (offset: number) => {
+    const token = userId ? await getAuthJWTToken() : null
+    const auth = userId ? { userId, token: token ?? undefined } : {}
+    const found = await getForumTopicsFn({
+      data: {
+        sortBy,
+        limit: TOPIC_PAGE + 1,
+        ...(offset > 0 ? { offset } : {}),
+        ...(debouncedQuery ? { query: debouncedQuery } : {}),
+        ...(boardSlug ? { categorySlug: boardSlug } : {}),
+        ...auth,
+      },
+    })
+    return takePage(found ?? [], TOPIC_PAGE)
+  }
+
   // Guests on the default view already have the loader's list; everything else asks the server.
   useEffect(() => {
-    if (!userId && sortBy === 'hot' && !debouncedQuery) {
+    if (!userId && sortBy === 'hot' && !debouncedQuery && !boardSlug) {
       setTopicsState(topics)
+      setHasMore(loaderHasMore)
+      setServerOffset(topics.length)
       return
     }
     let active = true
     setLoading(true)
     ;(async () => {
       try {
-        const token = userId ? await getAuthJWTToken() : null
-        const auth = userId ? { userId, token: token ?? undefined } : {}
-        const found = await getForumTopicsFn({
-          data: { sortBy, ...(debouncedQuery ? { query: debouncedQuery } : {}), ...auth },
-        })
+        const page = await fetchTopicPage(0)
         if (!active) return
         // An empty signed-in default view keeps the loader list rather than blanking the page.
-        if (found && (found.length > 0 || debouncedQuery || sortBy !== 'hot')) {
-          if (userId) syncForumVotesFromServer(userId, found)
-          setTopicsState(found)
+        if (page.items.length > 0 || debouncedQuery || sortBy !== 'hot' || boardSlug) {
+          if (userId) syncForumVotesFromServer(userId, page.items)
+          setTopicsState(page.items)
+          setHasMore(page.hasMore)
+          setServerOffset(page.items.length)
         }
       } catch {
-        if (active && debouncedQuery) setTopicsState([])
+        if (active && debouncedQuery) {
+          setTopicsState([])
+          setHasMore(false)
+        }
       } finally {
         if (active) setLoading(false)
       }
@@ -132,7 +169,24 @@ function ForumIndexPage() {
     return () => {
       active = false
     }
-  }, [sortBy, debouncedQuery, userId, topics])
+    // fetchTopicPage reads the same inputs listed here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortBy, debouncedQuery, boardSlug, userId, topics, loaderHasMore])
+
+  const loadMoreTopics = async () => {
+    setLoadingMore(true)
+    try {
+      const page = await fetchTopicPage(serverOffset)
+      if (userId) syncForumVotesFromServer(userId, page.items)
+      setTopicsState((prev) => mergeById(prev, page.items))
+      setHasMore(page.hasMore)
+      setServerOffset((n) => n + page.items.length)
+    } catch {
+      // Leave the button so the member can try again.
+    } finally {
+      setLoadingMore(false)
+    }
+  }
 
   const trimmedQuery = searchQuery.trim()
   const query = trimmedQuery.toLowerCase()
@@ -272,6 +326,14 @@ function ForumIndexPage() {
                   {visibleTopics.map((topic) => (
                     <ForumTopicRow key={topic.id} topic={topic} />
                   ))}
+                  {hasMore && !waitingOnSearch && (
+                    <LoadMoreButton
+                      label="Load more posts"
+                      loading={loadingMore}
+                      testId="forum-topics-load-more"
+                      onClick={() => void loadMoreTopics()}
+                    />
+                  )}
                 </div>
               )}
             </section>

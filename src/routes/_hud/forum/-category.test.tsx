@@ -183,6 +183,7 @@ describe('ForumBoardPage (/_hud/forum/$categorySlug/)', () => {
         categorySlug: 'general-discussion',
         query: undefined,
         sortBy: 'hot',
+        limit: 31,
         userId: 'member-1',
         token: 'eyJ.payload.sig',
       },

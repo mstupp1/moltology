@@ -327,6 +327,7 @@ export const getForumTopicsFn = createServerFn({ method: 'POST' })
     query?: string
     sortBy?: 'latest' | 'top' | 'active' | 'hot'
     limit?: number
+    offset?: number
     userId?: string
     token?: string
   }) =>
@@ -336,6 +337,7 @@ export const getForumTopicsFn = createServerFn({ method: 'POST' })
         query: z.string().max(120).optional(),
         sortBy: z.enum(['latest', 'top', 'active', 'hot']).optional(),
         limit: z.number().int().min(1).max(100).optional(),
+        offset: z.number().int().min(0).max(100_000).optional(),
         userId: z.string().optional(),
         token: z.string().optional(),
       })
@@ -354,6 +356,8 @@ export const getForumTopicDetailFn = createServerFn({ method: 'POST' })
     userId?: string
     token?: string
     trackView?: boolean
+    replySort?: 'oldest' | 'newest' | 'top'
+    replyLimit?: number
   }) =>
     z
       .object({
@@ -362,12 +366,40 @@ export const getForumTopicDetailFn = createServerFn({ method: 'POST' })
         userId: z.string().optional(),
         token: z.string().optional(),
         trackView: z.boolean().optional(),
+        replySort: z.enum(['oldest', 'newest', 'top']).optional(),
+        replyLimit: z.number().int().min(1).max(100).optional(),
       })
       .parse(data)
   )
   .handler(async (args) => {
     const { getForumTopicDetailHandler } = await import('./db-services')
     return getForumTopicDetailHandler(args)
+  })
+
+export const getForumRepliesFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: {
+    topicId: string
+    sort?: 'oldest' | 'newest' | 'top'
+    offset?: number
+    limit?: number
+    userId?: string
+    token?: string
+  }) =>
+    z
+      .object({
+        topicId: z.string().uuid(),
+        sort: z.enum(['oldest', 'newest', 'top']).optional(),
+        offset: z.number().int().min(0).max(100_000).optional(),
+        limit: z.number().int().min(1).max(100).optional(),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(async (args) => {
+    const { getForumRepliesHandler } = await import('./db-services')
+    return getForumRepliesHandler(args)
   })
 
 export const createForumTopicFn = createServerFn({ method: 'POST' })
