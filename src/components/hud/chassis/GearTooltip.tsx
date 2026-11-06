@@ -51,12 +51,14 @@ export const GearTooltip: React.FC<GearTooltipProps> = ({ catalog, className = '
         </p>
       </div>
 
-      <details className="px-3 py-2 text-xs text-ink-muted">
-        <summary className="cursor-pointer">Stats · character flavor</summary>
-        <p className="mt-2">{primaryStatLine(catalog)}</p>
-        {(catalog.affixes ?? []).map((affix,index)=><p key={index}>{formatAffixLine(affix)}</p>)}
-        <p className="mt-2">These values do not affect activities or progression.</p>
-      </details>
+      {!isCosmetic(catalog) && (
+        <ul className="px-3 py-2 space-y-0.5 text-xs sm:text-sm tabular-nums" aria-label="Stat bonuses">
+          <li className="font-semibold text-cyan-glow">{primaryStatLine(catalog)}</li>
+          {(catalog.affixes ?? []).map((affix, index) => (
+            <li key={index} className="text-ink-body">{formatAffixLine(affix)}</li>
+          ))}
+        </ul>
+      )}
 
       {power && (
         <div className={`mx-3 mb-2 px-2 py-2 border ${rarity.border} ${rarity.bar} chamfer-corner`}>

@@ -7,6 +7,7 @@ import { CANONICAL_ALIGNMENT_TASKS, mergeCompletions, localDateString, shiftDays
 import { getCachedAlignmentSnapshot, setCachedAlignmentSnapshot } from '@/lib/alignment-snapshot'
 import * as serverApi from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
+import { readGuestProgress, saveGuestAlignment } from '@/lib/guest-progress'
 
 // Mock authClient
 const mockAuthClient = {
@@ -288,6 +289,74 @@ describe('useDailyAlignment Hook Optimistic State & Rapid Clicks', () => {
     expect(toggleSpy).not.toHaveBeenCalled()
   })
 
+  it('keeps guest ticks on this device across a reload', async () => {
+    mockAuthClient.useSession.mockReturnValue({ data: null, isPending: false })
+    const keys = CANONICAL_ALIGNMENT_TASKS.slice(0, 2).map((t) => t.key)
+
+    const first = renderHook(() => useDailyAlignment(), { wrapper })
+    await waitFor(() => expect(first.result.current.isLoading).toBe(false))
+    act(() => {
+      for (const key of keys) first.result.current.toggleTask(key)
+    })
+    expect(readGuestProgress().alignment).toEqual({ date: localDateString(), completedKeys: keys })
+    first.unmount()
+
+    const second = renderHook(() => useDailyAlignment(), { wrapper })
+    await waitFor(() => expect(second.result.current.completedCount).toBe(2))
+    expect(second.result.current.xp).toBeGreaterThan(0)
+  })
+
+  it('ignores guest ticks from another day', async () => {
+    mockAuthClient.useSession.mockReturnValue({ data: null, isPending: false })
+    saveGuestAlignment(shiftDays(localDateString(), -1), [CANONICAL_ALIGNMENT_TASKS[0].key])
+
+    const { result } = renderHook(() => useDailyAlignment(), { wrapper })
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+    expect(result.current.completedCount).toBe(0)
+  })
+
+  it('saves today\'s guest ticks to the account after sign-in, skipping ones already done', async () => {
+    const today = localDateString()
+    const [done, fresh1, fresh2] = CANONICAL_ALIGNMENT_TASKS.slice(0, 3).map((t) => t.key)
+    saveGuestAlignment(today, [done, fresh1, fresh2])
+
+    vi.spyOn(serverApi, 'getDailyAlignmentFn').mockResolvedValue({
+      date: today,
+      tasks: mergeCompletions([done]),
+      completedKeys: [done],
+      completedCount: 1,
+      totalCount: 8,
+      isAllCompleted: false,
+      history: [{ date: today, completedCount: 1 }],
+      streakDays: 0,
+    })
+    const toggleSpy = vi.spyOn(serverApi, 'toggleDailyAlignmentTaskFn').mockImplementation(async ({ data }) => ({
+      date: today,
+      tasks: mergeCompletions([done, fresh1, fresh2]),
+      completedKeys: [done, fresh1, fresh2],
+      completedCount: 3,
+      totalCount: 8,
+      isAllCompleted: false,
+      history: [{ date: today, completedCount: 3 }],
+      streakDays: 0,
+      xp: 30,
+      stage: 1,
+      taskKey: data.taskKey,
+    }) as never)
+
+    const { result } = renderHook(() => useDailyAlignment(), { wrapper })
+
+    await waitFor(() => expect(toggleSpy).toHaveBeenCalledTimes(2))
+    expect(toggleSpy.mock.calls.map(([arg]) => (arg as { data: { taskKey: string; completed: boolean } }).data))
+      .toEqual([
+        expect.objectContaining({ taskKey: fresh1, completed: true }),
+        expect.objectContaining({ taskKey: fresh2, completed: true }),
+      ])
+    await waitFor(() => expect(result.current.completedCount).toBe(3))
+    expect(readGuestProgress().alignment).toBeUndefined()
+    expect(await screen.findByText('Saved the 2 tasks you finished before signing up.')).toBeTruthy()
+  })
+
   it('paints last-known liturgy count before the server fetch resolves', async () => {
     const today = localDateString()
     const completedKeys = CANONICAL_ALIGNMENT_TASKS.slice(0, 4).map((t) => t.key)
@@ -423,5 +492,44 @@ describe('useDailyAlignment Hook Optimistic State & Rapid Clicks', () => {
 
     expect(fetchSpy).not.toHaveBeenCalled()
     expect(result.current.completedCount).toBe(4)
+  })
+
+  it('shows one completion toast carrying the gems the server awarded', async () => {
+    const keys = CANONICAL_ALIGNMENT_TASKS.map((task) => task.key)
+    const lastKey = keys[keys.length - 1]
+    const before = keys.slice(0, -1)
+    vi.spyOn(serverApi, 'getDailyAlignmentFn').mockResolvedValue({
+      date: localDateString(),
+      tasks: mergeCompletions(before),
+      completedKeys: before,
+      completedCount: before.length,
+      totalCount: 8,
+      isAllCompleted: false,
+      history: [{ date: localDateString(), completedCount: before.length }],
+      streakDays: 6,
+    } as any)
+    vi.spyOn(serverApi, 'toggleDailyAlignmentTaskFn').mockResolvedValue({
+      date: localDateString(),
+      tasks: mergeCompletions(keys),
+      completedKeys: keys,
+      completedCount: 8,
+      totalCount: 8,
+      isAllCompleted: true,
+      history: [{ date: localDateString(), completedCount: 8 }],
+      streakDays: 7,
+      gemsDelta: 70,
+    } as any)
+
+    const { result } = renderHook(() => useDailyAlignment(), { wrapper })
+    await waitFor(() => expect(result.current.completedCount).toBe(7))
+
+    act(() => {
+      void result.current.setTaskCompleted(lastKey, true)
+    })
+
+    expect(await screen.findByText('+70 Chitin Gems · 7-day streak')).toBeInTheDocument()
+    expect(screen.getAllByText('Daily alignment done')).toHaveLength(1)
+    expect(screen.queryByText('Gems earned')).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Shop' })).toHaveAttribute('href', '/character/shop')
   })
 })

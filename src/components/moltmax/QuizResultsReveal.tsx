@@ -122,7 +122,7 @@ export const QuizResultsReveal: React.FC<QuizResultsRevealProps> = ({
       {/* Save and share */}
       <div className="rounded-2xl border border-[#00c3ff]/30 bg-gradient-to-br from-[#00c3ff]/10 to-[#00ffcc]/5 p-5 sm:p-8">
         <div className="text-sm font-bold uppercase tracking-wider text-white">Save and share your scorecard</div>
-        <p className="mt-1.5 text-xs leading-relaxed text-[#9ab0af]">Post your score, download the scorecard image, or save it to your profile.</p>
+        <p className="mt-1.5 text-xs leading-relaxed text-[#9ab0af]">{isAuthenticated ? 'Post your score, download the scorecard image, or save it to your profile.' : 'Post your score or download the scorecard image. Join free within 7 days and this result is saved to your new profile.'}</p>
         <div className="mt-5 space-y-2.5">
           <button type="button" onClick={onShare} className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-md bg-[#1d9bf0] px-4 text-xs font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#168ad4]"><Share2 className="h-4 w-4" /> Post score to X</button>
           <div className="grid grid-cols-2 gap-2.5">

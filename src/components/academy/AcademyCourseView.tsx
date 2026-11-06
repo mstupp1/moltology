@@ -91,7 +91,7 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
                 <React.Fragment key={track.slug}>
                   {index > 0 ? ', ' : null}
                   <Link
-                    to="/lectures/tracks/$slug"
+                    to="/academy/tracks/$slug"
                     params={{ slug: track.slug }}
                     className={cn('text-cyan-glow hover:text-cyan-hover rounded-control', ACADEMY_FOCUS)}
                   >
@@ -191,7 +191,7 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
                         <li key={lesson.slug}>
                           {open ? (
                             <Link
-                              to="/lectures/courses/$slug/lessons/$lessonSlug"
+                              to="/academy/courses/$slug/lessons/$lessonSlug"
                               params={{ slug: detail.slug, lessonSlug: lesson.slug }}
                               className={cn(rowClass, !lit && 'hover:bg-surface-2', ACADEMY_FOCUS)}
                             >
@@ -217,7 +217,7 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
                 <AcademyProgress percent={detail.progressPercent} label={detail.completed ? 'Course complete' : 'Your progress'} />
                 {resume ? (
                   <Link
-                    to="/lectures/courses/$slug/lessons/$lessonSlug"
+                    to="/academy/courses/$slug/lessons/$lessonSlug"
                     params={{ slug: detail.slug, lessonSlug: resume }}
                     className={cn(academyButtonLink('primary'), 'w-full')}
                   >
@@ -236,7 +236,7 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
                 </HudButton>
                 {previewSlug ? (
                   <Link
-                    to="/lectures/courses/$slug/lessons/$lessonSlug"
+                    to="/academy/courses/$slug/lessons/$lessonSlug"
                     params={{ slug: detail.slug, lessonSlug: previewSlug }}
                     className={cn(academyButtonLink('secondary'), 'w-full')}
                   >
@@ -262,7 +262,7 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
                 </p>
                 {detail.certificate.earned && detail.certificate.credentialId ? (
                   <Link
-                    to="/lectures/certificates/$credentialId"
+                    to="/academy/certificates/$credentialId"
                     params={{ credentialId: detail.certificate.credentialId }}
                     className={ACADEMY_TEXT_ACTION}
                   >

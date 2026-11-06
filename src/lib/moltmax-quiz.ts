@@ -1,4 +1,5 @@
 import { getAssetUrl } from './assets'
+import { VECTOR_WEIGHTS } from './vectors'
 
 export type QuizDimension =
   | 'shellHardness'
@@ -248,13 +249,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
   },
 ]
 
-const DIMENSION_WEIGHTS: Record<QuizDimension, number> = {
-  shellHardness: 0.3,
-  pincerTorque: 0.25,
-  neuralLatency: 0.2,
-  ecdysisDiscipline: 0.15,
-  depthTolerance: 0.1,
-}
+const DIMENSION_WEIGHTS: Record<QuizDimension, number> = VECTOR_WEIGHTS
 
 const DIMENSIONS: QuizDimension[] = ['shellHardness', 'pincerTorque', 'neuralLatency', 'ecdysisDiscipline', 'depthTolerance']
 

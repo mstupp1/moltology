@@ -66,7 +66,7 @@
   },
   "src/components/hud/ActivityStreamPage.tsx": {
     "hex-color": 12,
-    "chamfer": 4
+    "chamfer": 3
   },
   "src/components/hud/CommandCatalogIcon.tsx": {
     "hex-color": 13
@@ -94,10 +94,6 @@
   "src/components/hud/LobsterAvatarPortrait.tsx": {
     "hex-color": 1
   },
-  "src/components/hud/MoltMaxxingStudio.tsx": {
-    "hex-color": 25,
-    "tiny-text": 9
-  },
   "src/components/hud/PremiumBadge.tsx": {
     "hex-color": 3,
     "chamfer": 1,
@@ -120,11 +116,6 @@
   "src/components/hud/chassis/GearTooltip.tsx": {
     "hex-color": 4,
     "chamfer": 2,
-    "tiny-text": 1
-  },
-  "src/components/hud/chassis/LoadoutStatsPanel.tsx": {
-    "hex-color": 9,
-    "chamfer": 3,
     "tiny-text": 1
   },
   "src/components/hud/chassis/VaultGrid.tsx": {
@@ -209,11 +200,6 @@
     "hex-color": 3,
     "chamfer": 1
   },
-  "src/components/ui/ToastProvider.tsx": {
-    "hex-color": 40,
-    "tiny-text": 1,
-    "off-scale-radius": 1
-  },
   "src/components/ui/magicui/iphone-15-pro.tsx": {
     "hex-color": 16,
     "off-scale-radius": 10
@@ -233,10 +219,7 @@
     "hex-color": 5
   },
   "src/components/what-is-moltology/WhatIsMoltologyHubPage.tsx": {
-    "hex-color": 30
-  },
-  "src/components/what-is-moltology/WhatMoltologistsSayPage.tsx": {
-    "hex-color": 4
+    "hex-color": 29
   },
   "src/components/what-is-moltology/story/StoryPrimitives.tsx": {
     "hex-color": 8

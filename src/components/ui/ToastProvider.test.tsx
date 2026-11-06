@@ -26,6 +26,9 @@ function TestComponent() {
       <button onClick={() => addToast('Custom toast message', { id: 'custom-1', duration: 0 })}>
         Trigger Custom Toast
       </button>
+      <button onClick={() => toast.success('+10 Chitin Gems', { title: 'Daily alignment done', action: { label: 'Market', href: '/market' } })}>
+        Trigger Action Toast
+      </button>
       <button onClick={() => clearToasts()}>Clear All</button>
     </div>
   )
@@ -71,7 +74,7 @@ describe('ToastProvider & useToast', () => {
 
     fireEvent.click(screen.getByText('Trigger Info Toast'))
 
-    expect(screen.getByText('INFO')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveAttribute('data-toast-type', 'info')
     expect(screen.getByText('Notice Title')).toBeInTheDocument()
     expect(screen.getByText('Info notice message')).toBeInTheDocument()
   })
@@ -84,17 +87,17 @@ describe('ToastProvider & useToast', () => {
     )
 
     fireEvent.click(screen.getByText('Trigger Success Toast'))
-    expect(screen.getByText('SUCCESS')).toBeInTheDocument()
+    expect(document.querySelector('[data-toast-type="success"]')).not.toBeNull()
     expect(screen.getByText('Transformation success!')).toBeInTheDocument()
 
     fireEvent.click(screen.getByText('Trigger Warning Toast'))
-    expect(screen.getByText('WARNING')).toBeInTheDocument()
+    expect(document.querySelector('[data-toast-type="warning"]')).not.toBeNull()
 
     fireEvent.click(screen.getByText('Trigger Error Toast'))
-    expect(screen.getByText('ERROR')).toBeInTheDocument()
+    expect(document.querySelector('[data-toast-type="error"]')).not.toBeNull()
 
     fireEvent.click(screen.getByText('Trigger HUD Toast'))
-    expect(screen.getByText('NOTICE')).toBeInTheDocument()
+    expect(document.querySelector('[data-toast-type="hud"]')).not.toBeNull()
   })
 
   it('allows manual dismissal of a toast notification', () => {
@@ -179,5 +182,19 @@ describe('ToastProvider & useToast', () => {
 
     const customToasts = screen.getAllByText('Custom toast message')
     expect(customToasts).toHaveLength(1)
+  })
+
+  it('renders an action link that dismisses the toast', () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    )
+
+    fireEvent.click(screen.getByText('Trigger Action Toast'))
+    const link = screen.getByRole('link', { name: 'Market' })
+    expect(link).toHaveAttribute('href', '/market')
+    fireEvent.click(link)
+    expect(screen.queryByText('+10 Chitin Gems')).not.toBeInTheDocument()
   })
 })

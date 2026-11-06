@@ -166,7 +166,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
           {
             label: detail.courseTitle,
             link: (
-              <Link to="/lectures/courses/$slug" params={{ slug: detail.courseSlug }} className={ACADEMY_CRUMB_LINK}>
+              <Link to="/academy/courses/$slug" params={{ slug: detail.courseSlug }} className={ACADEMY_CRUMB_LINK}>
                 {detail.courseTitle}
               </Link>
             ),
@@ -365,7 +365,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
               >
                 {detail.previousSlug ? (
                   <Link
-                    to="/lectures/courses/$slug/lessons/$lessonSlug"
+                    to="/academy/courses/$slug/lessons/$lessonSlug"
                     params={{ slug: detail.courseSlug, lessonSlug: detail.previousSlug }}
                     className={cn(academyButtonLink('secondary'), 'px-3 border-transparent bg-transparent')}
                   >
@@ -389,7 +389,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
                 </div>
                 {detail.nextSlug ? (
                   <Link
-                    to="/lectures/courses/$slug/lessons/$lessonSlug"
+                    to="/academy/courses/$slug/lessons/$lessonSlug"
                     params={{ slug: detail.courseSlug, lessonSlug: detail.nextSlug }}
                     className={academyButtonLink(detail.completed ? 'primary' : 'secondary')}
                   >
@@ -399,7 +399,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
                   </Link>
                 ) : (
                   <Link
-                    to="/lectures/courses/$slug"
+                    to="/academy/courses/$slug"
                     params={{ slug: detail.courseSlug }}
                     className={academyButtonLink('secondary')}
                   >
@@ -500,7 +500,7 @@ function LessonSyllabus({
               return (
                 <li key={item.slug}>
                   <Link
-                    to="/lectures/courses/$slug/lessons/$lessonSlug"
+                    to="/academy/courses/$slug/lessons/$lessonSlug"
                     params={{ slug: lesson.courseSlug, lessonSlug: item.slug }}
                     onClick={onNavigate}
                     aria-current={active ? 'page' : undefined}

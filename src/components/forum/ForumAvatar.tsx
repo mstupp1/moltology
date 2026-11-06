@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { BrandAwareImage } from '@/components/ui/BrandMark'
 import { cn } from '@/lib/utils'
 import {
@@ -74,8 +74,11 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
 
   const hasCustomImage = !avatarConfig?.seed && isValidCustomImageUrl(src)
 
+  const containerRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    setImageError(false)
+    // A server-rendered image can fail before hydration attaches onError; catch that here.
+    const image = containerRef.current?.querySelector('img')
+    setImageError(Boolean(image?.complete && image.naturalWidth === 0 && image.getAttribute('src')))
   }, [src])
 
   const displayAlt = alt ?? authorName ?? 'Author avatar'
@@ -104,6 +107,7 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
 
   return (
     <div
+      ref={containerRef}
       className={cn(
         'relative rounded-full overflow-hidden shrink-0 border border-line bg-surface-2 flex items-center justify-center transition-all',
         SIZE_CLASSES[size],

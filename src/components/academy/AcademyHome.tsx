@@ -35,11 +35,11 @@ const FILTER_MIN_COURSES = 4
 function courseHref(course: AcademyCourseCard) {
   if (course.enrolled && course.resumeLessonSlug) {
     return {
-      to: '/lectures/courses/$slug/lessons/$lessonSlug' as const,
+      to: '/academy/courses/$slug/lessons/$lessonSlug' as const,
       params: { slug: course.slug, lessonSlug: course.resumeLessonSlug },
     }
   }
-  return { to: '/lectures/courses/$slug' as const, params: { slug: course.slug } }
+  return { to: '/academy/courses/$slug' as const, params: { slug: course.slug } }
 }
 
 function courseAction(course: AcademyCourseCard) {
@@ -116,7 +116,7 @@ function ContinueRow({ course }: { course: AcademyCourseCard }) {
 function TrackCard({ track }: { track: AcademyTrackCard }) {
   return (
     <Link
-      to="/lectures/tracks/$slug"
+      to="/academy/tracks/$slug"
       params={{ slug: track.slug }}
       className={cn(ACADEMY_CARD_LINK, 'group overflow-hidden flex flex-col sm:flex-row')}
     >
@@ -250,7 +250,7 @@ function CertificateRow({ certificate }: { certificate: AcademyCertificateCard }
   if (certificate.earned && certificate.credentialId) {
     return (
       <Link
-        to="/lectures/certificates/$credentialId"
+        to="/academy/certificates/$credentialId"
         params={{ credentialId: certificate.credentialId }}
         className={cn('flex items-center gap-3 rounded-control px-2 py-2 hover:bg-surface-2', ACADEMY_FOCUS)}
       >
@@ -279,7 +279,7 @@ export function AcademyHome({ data }: { data: AcademyHomePayload }) {
     <div className="space-y-5 sm:space-y-6">
       <HudTitlePanel
         surface="solid"
-        title="Molt Academy"
+        title="Academy"
         actions={<AcademyNav current="catalog" />}
       />
 
@@ -393,7 +393,7 @@ export function AcademyHome({ data }: { data: AcademyHomePayload }) {
                   : undefined
               }
               action={
-                <Link to="/lectures/certificates" className={ACADEMY_TEXT_ACTION}>
+                <Link to="/academy/certificates" className={ACADEMY_TEXT_ACTION}>
                   Open certification record
                   <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
                 </Link>

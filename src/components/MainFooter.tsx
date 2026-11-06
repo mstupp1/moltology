@@ -87,7 +87,7 @@ export const MainFooter: React.FC<MainFooterProps> = ({
               className="px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Activity className="w-3.5 h-3.5 shrink-0 text-ink-muted" />
-              <span>MOLTMAX QUIZ</span>
+              <span>QUIZ</span>
             </Link>
 
             {/* MoltNation Dispatches */}
@@ -96,7 +96,7 @@ export const MainFooter: React.FC<MainFooterProps> = ({
               className="px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Newspaper className="w-3.5 h-3.5 shrink-0 text-ink-muted" />
-              <span>DISPATCHES</span>
+              <span>NEWS</span>
             </Link>
 
             {/* Sacred Scriptures & Doctrine */}
@@ -105,7 +105,7 @@ export const MainFooter: React.FC<MainFooterProps> = ({
               className="px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Scroll className="w-3.5 h-3.5 shrink-0 text-ink-muted" />
-              <span>SACRED CODEX</span>
+              <span>CODEX</span>
             </Link>
 
             {/* About / What is Moltology */}
@@ -123,7 +123,7 @@ export const MainFooter: React.FC<MainFooterProps> = ({
               className="px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Building2 className="w-3.5 h-3.5 shrink-0 text-ink-muted" />
-              <span>ORGANIZATION</span>
+              <span>COMPANY</span>
             </Link>
 
             {/* Merch Store (Amber Highlight) */}

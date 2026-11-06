@@ -476,7 +476,7 @@ const CommunitySection: React.FC = () => {
   const half = Math.ceil(MEMBER_VOICES.length / 2)
   const rows = [MEMBER_VOICES.slice(0, half), MEMBER_VOICES.slice(half)]
   return (
-    <section className="relative isolate overflow-hidden py-24 sm:py-36" aria-labelledby="community-title">
+    <section id="voices" className="relative isolate overflow-hidden scroll-mt-20 py-24 sm:py-36" aria-labelledby="community-title">
       <StoryImg image={STORY_MEDIA.softStart} className="absolute inset-0 -z-10 h-full w-full object-cover opacity-80" />
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#020408]/85 via-[#020408]/45 to-[#020408]/90" />
 
@@ -508,15 +508,6 @@ const CommunitySection: React.FC = () => {
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 mt-12">
-        <Link
-          to="/what-is-moltology/what-moltologists-say"
-          className="inline-flex items-center gap-2 font-grotesk font-bold text-sm text-[#00ffcc] hover:text-ink transition-colors rounded-chip focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-        >
-          Hear more from members <ArrowRight className="w-4 h-4" />
-        </Link>
       </div>
     </section>
   )
@@ -578,7 +569,6 @@ const FinalSection: React.FC = () => {
 
 const deeperImages: Record<string, StoryImage> = {
   beliefs: STORY_MEDIA.readingBeliefs,
-  quotes: STORY_MEDIA.readingVoices,
   sacraments: STORY_MEDIA.readingSacraments,
 }
 
@@ -588,7 +578,7 @@ const ReadDeeperSection: React.FC = () => (
       <h2 id="deeper-title" className="font-grotesk font-bold text-2xl sm:text-3xl text-ink">
         Keep reading
       </h2>
-      <div className="mt-8 grid gap-5 md:grid-cols-3">
+      <div className="mt-8 grid gap-5 md:grid-cols-2">
         {WHAT_IS_MOLTOLOGY_NAV.filter((item) => item.id !== 'overview').map((item) => (
           <Link
             key={item.id}

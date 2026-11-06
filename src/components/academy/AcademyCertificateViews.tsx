@@ -102,7 +102,7 @@ function EarnedCard({ certificate }: { certificate: AcademyCertificateCard }) {
   }
   return (
     <Link
-      to="/lectures/certificates/$credentialId"
+      to="/academy/certificates/$credentialId"
       params={{ credentialId: certificate.credentialId }}
       className={cn(ACADEMY_CARD_LINK, 'group p-4 flex flex-col gap-3')}
     >
@@ -125,7 +125,7 @@ function AvailableRow({ certificate }: { certificate: AcademyCertificateCard }) 
       {certificate.subjectTitle && certificate.subjectSlug ? (
         certificate.scope === 'track' ? (
           <Link
-            to="/lectures/tracks/$slug"
+            to="/academy/tracks/$slug"
             params={{ slug: certificate.subjectSlug }}
             className={cn('shrink-0 self-center inline-flex items-center gap-1 min-h-8 px-2 rounded-control text-xs font-bold text-cyan-glow hover:bg-surface-2', ACADEMY_FOCUS)}
           >
@@ -134,7 +134,7 @@ function AvailableRow({ certificate }: { certificate: AcademyCertificateCard }) 
           </Link>
         ) : (
           <Link
-            to="/lectures/courses/$slug"
+            to="/academy/courses/$slug"
             params={{ slug: certificate.subjectSlug }}
             className={cn('shrink-0 self-center inline-flex items-center gap-1 min-h-8 px-2 rounded-control text-xs font-bold text-cyan-glow hover:bg-surface-2', ACADEMY_FOCUS)}
           >
@@ -155,7 +155,7 @@ export function AcademyCredential({ credential }: { credential: AcademyCredentia
           {
             label: 'Certifications',
             link: (
-              <Link to="/lectures/certificates" className={ACADEMY_CRUMB_LINK}>
+              <Link to="/academy/certificates" className={ACADEMY_CRUMB_LINK}>
                 Certifications
               </Link>
             ),
@@ -185,11 +185,11 @@ export function AcademyCredential({ credential }: { credential: AcademyCredentia
               <dt className="text-[11px] uppercase tracking-[0.08em] text-ink-muted">For</dt>
               <dd className="text-sm text-ink">
                 {credential.scope === 'track' ? (
-                  <Link to="/lectures/tracks/$slug" params={{ slug: credential.subjectSlug }} className={cn('text-cyan-glow hover:text-cyan-hover rounded-control', ACADEMY_FOCUS)}>
+                  <Link to="/academy/tracks/$slug" params={{ slug: credential.subjectSlug }} className={cn('text-cyan-glow hover:text-cyan-hover rounded-control', ACADEMY_FOCUS)}>
                     {credential.subjectTitle}
                   </Link>
                 ) : (
-                  <Link to="/lectures/courses/$slug" params={{ slug: credential.subjectSlug }} className={cn('text-cyan-glow hover:text-cyan-hover rounded-control', ACADEMY_FOCUS)}>
+                  <Link to="/academy/courses/$slug" params={{ slug: credential.subjectSlug }} className={cn('text-cyan-glow hover:text-cyan-hover rounded-control', ACADEMY_FOCUS)}>
                     {credential.subjectTitle}
                   </Link>
                 )}

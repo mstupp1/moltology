@@ -64,7 +64,7 @@ describe('Molt Credits', () => {
     expect(params.line_items?.[0]?.price_data?.unit_amount).toBe(chest.priceCents)
     expect(params.metadata).toMatchObject({ orderType: MOLT_CREDIT_ORDER_TYPE, packId: 'chest', userId: 'user-1' })
     expect(params.payment_intent_data?.metadata).toEqual(params.metadata)
-    expect(params.success_url).toBe('https://x.test/market?credits=success')
+    expect(params.success_url).toBe('https://x.test/character/shop?credits=success')
     expect(params).not.toHaveProperty('customer')
     expect(() => buildCreditCheckoutParams({ userId: 'u', packId: 'free-lunch', origin: 'o', customerId: null })).toThrow()
   })

@@ -11,6 +11,8 @@ import { useToast } from '@/components/ui/ToastProvider'
 import { HeroBackground } from '@/components/ui/HeroBackground'
 import { type QuizAnswers, computeMoltmaxResult, MOLTMAX_QUESTIONS, type MoltmaxResult } from '@/lib/moltmax-quiz'
 import { getAssetUrl } from '@/lib/assets'
+import { requestGuestAuditSave, saveGuestAudit } from '@/lib/guest-progress'
+import { GUEST_AUDIT_CLAIMED_EVENT } from '@/lib/guest-progress-key'
 import '@/styles/crt.css'
 import '@/styles/hud-chrome.css'
 import '@/styles/pbr-textures.css'
@@ -161,6 +163,13 @@ export const MoltMaxPage: React.FC = () => {
   const [isSaved, setIsSaved] = useState(false)
   const quizRef = useRef<HTMLElement>(null)
 
+  // A guest who signs in while the results are open sees them marked as saved.
+  React.useEffect(() => {
+    const onClaimed = () => setIsSaved(true)
+    window.addEventListener(GUEST_AUDIT_CLAIMED_EVENT, onClaimed)
+    return () => window.removeEventListener(GUEST_AUDIT_CLAIMED_EVENT, onClaimed)
+  }, [])
+
   // Auto-rotate through the fanned progression cards in hero mode
   React.useEffect(() => {
     if (mode !== 'hero') return
@@ -197,6 +206,8 @@ export const MoltMaxPage: React.FC = () => {
     if (!answers[MOLTMAX_QUESTIONS[questionIndex].id]) return
     if (questionIndex === MOLTMAX_QUESTIONS.length - 1) {
       setResult(computeMoltmaxResult(answers))
+      // Guests keep the finished audit on this device so signing up saves it.
+      if (!session.isPending && !user) saveGuestAudit(answers)
       setMode('results')
       window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0)
       return
@@ -225,9 +236,9 @@ export const MoltMaxPage: React.FC = () => {
     if (typeof navigator === 'undefined' || !navigator.clipboard) return
     navigator.clipboard.writeText('https://moltology.org/moltmax').then(() => {
       setIsCopied(true)
-      toast.success('Link copied to clipboard.', { title: 'Copied' })
+      toast.success('Link copied.')
       window.setTimeout(() => setIsCopied(false), 2500)
-    }).catch(() => toast.error('Could not copy link to clipboard.', { title: 'Copy Failed' }))
+    }).catch(() => toast.error('Could not copy the link. Please try again.'))
   }
 
   const handleSave = async () => {
@@ -236,9 +247,6 @@ export const MoltMaxPage: React.FC = () => {
       const token = await getAuthJWTToken()
       await updateUserStatsFn({
         data: {
-          pincerTorque: result.dimensionScores.pincerTorque,
-          shellHardness: result.dimensionScores.shellHardness,
-          clawStrength: result.score,
           moltmaxScore: result.score,
           moltmaxClearance: result.clearance,
           moltmaxStage: result.stage,
@@ -247,9 +255,9 @@ export const MoltMaxPage: React.FC = () => {
         },
       })
       setIsSaved(true)
-      toast.success('Results saved to your profile.', { title: 'Results Saved' })
+      toast.success('Results saved to your profile.')
     } catch {
-      toast.error('Could not save results. Please try again.', { title: 'Save Failed' })
+      toast.error('Could not save your results. Please try again.')
     }
   }
 
@@ -311,9 +319,9 @@ export const MoltMaxPage: React.FC = () => {
       link.download = `moltmax-clearance-${result.score}.png`
       link.href = canvas.toDataURL('image/png')
       link.click()
-      toast.success('Scorecard downloaded successfully.', { title: 'Scorecard Saved' })
+      toast.success('Scorecard downloaded.')
     } catch {
-      toast.error('Could not generate scorecard image. Please try again.', { title: 'Export Failed' })
+      toast.error('Could not make the scorecard image. Please try again.')
     } finally {
       setIsGeneratingImage(false)
     }
@@ -670,6 +678,7 @@ export const MoltMaxPage: React.FC = () => {
                 handleSave()
                 return
               }
+              requestGuestAuditSave()
               setAuthMode('signup')
               setIsAuthModalOpen(true)
             }}

@@ -3,8 +3,8 @@ import type { getDb } from '../../db'
 import { equipmentCatalog, gearUnlocks, profiles } from '../../db/schema'
 import { getEquipmentVisual } from '../avatar/equipment'
 import { STARTER_EQUIPMENT_CATALOG_IDS } from '../equipment-seed-data'
-import { GEAR_PRICES, RARITY_ORDER, parseVariantKey } from '../gear-variants'
-import type { BuyGearResult, MarketPayload, MarketPiece } from '../market'
+import { GEAR_PRICES } from '../gear-variants'
+import { buildMarketPieces, type BuyGearResult, type MarketPayload } from '../market'
 import { isAdmin } from '../permissions'
 import { balanceRefresh, getGemWallet } from './gems'
 import { canBuyCredits, creditBalanceRefresh } from './molt-credits'
@@ -27,47 +27,12 @@ export async function getMarket(db: Db, userId: string): Promise<MarketPayload> 
   ])
   const everyItem = isAdmin(null, profileRows[0]?.role)
   const owned = new Set([...STARTER, ...unlocks.map((u) => u.id)])
-  const pieces = new Map<string, MarketPiece & { order: number }>()
-  for (const row of [...catalog].sort((a, b) => a.sortOrder - b.sortOrder)) {
-    const key = row.appearanceKey || row.slug
-    if (!getEquipmentVisual(key)) continue
-    const { baseKey } = parseVariantKey(key)
-    let piece = pieces.get(baseKey)
-    if (!piece) {
-      piece = {
-        baseKey,
-        name: row.name,
-        flavorText: row.flavorText,
-        category: row.category,
-        variants: [],
-        order: row.sortOrder,
-      }
-      pieces.set(baseKey, piece)
-    }
-    piece.variants.push({
-      catalogItemId: row.id,
-      rarity: row.rarity,
-      appearanceKey: key,
-      price: GEAR_PRICES[row.rarity],
-      primaryStat: row.primaryStat,
-      affixes: row.affixes ?? [],
-      uniquePower: row.uniquePower ?? null,
-      owned: everyItem || owned.has(row.id),
-    })
-  }
   return {
     wallet,
     everyItem,
     moltCredits: Number(profileRows[0]?.moltCredits ?? 0),
     creditsLive: canBuyCredits(profileRows[0]?.role, profileRows[0]?.experiments),
-    pieces: [...pieces.values()]
-      .sort((a, b) => a.order - b.order)
-      .map(({ order: _order, ...piece }) => ({
-        ...piece,
-        variants: piece.variants.sort(
-          (a, b) => RARITY_ORDER.indexOf(a.rarity) - RARITY_ORDER.indexOf(b.rarity),
-        ),
-      })),
+    pieces: buildMarketPieces(catalog, owned, everyItem),
   }
 }
 

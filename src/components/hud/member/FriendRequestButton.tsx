@@ -56,10 +56,11 @@ export const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({
   if (relationship === 'self') {
     return (
       <Link
-        to="/connections"
+        to="/friends"
+        search={{ tab: 'friends' }}
         className={`inline-flex items-center ${gap} ${pad} font-bold uppercase tracking-[0.08em] rounded-control border border-line bg-surface-1 hud-sheen text-cyan-glow hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow`}
       >
-        Manage Connections
+        Manage friends
       </Link>
     )
   }

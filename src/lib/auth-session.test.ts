@@ -281,7 +281,7 @@ describe('OAuth session settlement', () => {
   })
 
   it('retries getSession once if the first look is empty, then authenticates on the next payload', async () => {
-    beginOAuthSignIn('/chassis')
+    beginOAuthSignIn('/character')
     const getSession = vi
       .fn()
       .mockResolvedValueOnce({ data: null })

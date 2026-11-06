@@ -7,14 +7,14 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-11-03",
+  "syncedAt": "2026-11-04",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
     "rules": 127,
-    "decisions": 54,
-    "anchors": 246,
-    "drifted": 18,
+    "decisions": 55,
+    "anchors": 247,
+    "drifted": 39,
     "flagged": 9
   },
   "canvas": {
@@ -71,7 +71,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "progression.stage-thresholds",
         "progression.clearance-thresholds",
         "progression.legacy-stage",
-        "progression.stat-roll",
+        "progression.vector-stats",
         "progression.referral-rewards"
       ]
     },
@@ -468,17 +468,17 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "file": "src/db/schema.ts",
           "symbol": "profiles.moltCredits",
           "line": 131,
-          "value": "decimal('moltCredits', { precision: 12, scale: 2 }).default('1450.00').notNull()",
-          "drift": "ok",
+          "value": "decimal('moltCredits', { precision: 12, scale: 2 }).default('0.00').notNull()",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L131"
         },
         {
           "file": "src/db/schema.ts",
           "symbol": "profiles.chitinGems",
-          "line": 132,
-          "value": "integer('chitinGems').default(250).notNull()",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L132"
+          "line": 133,
+          "value": "integer('chitinGems').default(0).notNull()",
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L133"
         }
       ],
       "tests": [
@@ -498,7 +498,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 722,
         "y": 232
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "economy.market-catalog",
@@ -511,26 +511,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/components/hud/market/market-data.ts",
           "symbol": "MOLT_CREDIT_PACKS",
-          "line": 43,
-          "value": "[ { id: 'starter-drip', name: 'Starter Drip', credits: 500, priceUsd: '$0.99', imagePath: '/images/molt_credit.png', }, { id: 'pincer-pouch', name: 'Pincer Pou…",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/market-data.ts#L43"
+          "line": null,
+          "value": null,
+          "drift": "missing",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/market-data.ts"
         },
         {
           "file": "src/components/hud/market/market-data.ts",
           "symbol": "GEM_VAULT_ITEMS",
-          "line": 145,
-          "value": "[ { id: 'mariana-aura', name: 'Mariana Singularity Aura', slot: 'Full Carapace', description: 'Apex stillness field. The deepest cosmetic in the catalog.', gem…",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/market-data.ts#L145"
+          "line": null,
+          "value": null,
+          "drift": "missing",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/market-data.ts"
         },
         {
           "file": "src/components/hud/market/market-data.ts",
           "symbol": "EXCHANGE_LISTINGS",
-          "line": 88,
-          "value": "[ { id: 'neural-overclock', name: 'Neural Overclock', category: 'boost', description: '2× Molt Credit yield for seven days.', creditCost: 800, imagePath: '/ima…",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/market-data.ts#L88"
+          "line": null,
+          "value": null,
+          "drift": "missing",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/market-data.ts"
         }
       ],
       "tests": [
@@ -554,7 +554,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1014,
         "y": 232
       },
-      "drift": "ok"
+      "drift": "missing"
     },
     {
       "id": "economy.market-local-preview",
@@ -567,18 +567,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/components/hud/market/MarketShopPage.tsx",
           "symbol": "INITIAL_MOLT_CREDITS",
-          "line": 18,
-          "value": "1450",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx#L18"
+          "line": null,
+          "value": null,
+          "drift": "missing",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx"
         },
         {
           "file": "src/components/hud/market/MarketShopPage.tsx",
           "symbol": "MarketShopPage",
-          "line": 21,
+          "line": 146,
           "value": "MarketShopPage()",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx#L21"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx#L146"
         }
       ],
       "tests": [
@@ -603,7 +603,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1014,
         "y": 388
       },
-      "drift": "changed"
+      "drift": "missing"
     },
     {
       "id": "economy.simulated-gem-grants",
@@ -616,10 +616,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/simulation-engine.ts",
           "symbol": "simulateDailyRoutines",
-          "line": 642,
+          "line": 646,
           "value": "simulateDailyRoutines(dbClient, config, options)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/simulation-engine.ts#L642"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/simulation-engine.ts#L646"
         }
       ],
       "tests": [],
@@ -650,18 +650,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/chassis-loadout.ts",
           "symbol": "computeLoadoutTotals",
-          "line": 267,
+          "line": 266,
           "value": "computeLoadoutTotals(items, catalogById)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L267"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L266"
         },
         {
           "file": "src/lib/chassis-loadout.ts",
           "symbol": "isCosmetic",
-          "line": 239,
+          "line": 244,
           "value": "isCosmetic(catalog)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L239"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L244"
         }
       ],
       "tests": [
@@ -700,18 +700,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/chassis-loadout.ts",
           "symbol": "isLookSlot",
-          "line": 78,
+          "line": 98,
           "value": "isLookSlot(value)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L78"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L98"
         },
         {
           "file": "src/lib/chassis-loadout.ts",
           "symbol": "planGearMove",
-          "line": 379,
+          "line": 400,
           "value": "planGearMove(items, catalogById, itemId, target, vaultSize)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L379"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L400"
         }
       ],
       "tests": [
@@ -747,18 +747,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/equipment-seed-data.ts",
           "symbol": "ALL_EQUIPMENT_CATALOG",
-          "line": 394,
-          "value": "[...INITIAL_EQUIPMENT_CATALOG, ...CREATOR_EQUIPMENT_CATALOG]",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/equipment-seed-data.ts#L394"
+          "line": 412,
+          "value": "[...BASE_EQUIPMENT_CATALOG, ...VARIANT_EQUIPMENT_CATALOG]",
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/equipment-seed-data.ts#L412"
         },
         {
           "file": "src/lib/equipment-seed-data.ts",
           "symbol": "STARTER_EQUIPMENT_CATALOG_IDS",
-          "line": 397,
+          "line": 415,
           "value": "[ 'a1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000004', 'a1000000-0000-4000-8000-000000000004', 'a1000000-0000-4000-8000-000000000007…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/equipment-seed-data.ts#L397"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/equipment-seed-data.ts#L415"
         }
       ],
       "tests": [
@@ -781,7 +781,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 320,
         "y": 544
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "economy.character-starter-equipment",
@@ -794,10 +794,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/equipment-seed-data.ts",
           "symbol": "STARTER_EQUIPMENT_CATALOG_IDS",
-          "line": 397,
+          "line": 415,
           "value": "[ 'a1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000004', 'a1000000-0000-4000-8000-000000000004', 'a1000000-0000-4000-8000-000000000007…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/equipment-seed-data.ts#L397"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/equipment-seed-data.ts#L415"
         },
         {
           "file": "src/lib/avatar/starter-equipment.ts",
@@ -852,18 +852,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/avatar/equipment.ts",
           "symbol": "EQUIPMENT_VISUALS",
-          "line": 63,
+          "line": 65,
           "value": "Object.fromEntries( rows.map(([key, category, material, trim, accent, construction, motif, accessory]) => [ key, { key, category, material, trim, accent, const…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/equipment.ts#L63"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/equipment.ts#L65"
         },
         {
           "file": "src/lib/avatar/races.ts",
           "symbol": "renderCharacter",
-          "line": 770,
+          "line": 989,
           "value": "renderCharacter(spec, ctx)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/races.ts#L770"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/races.ts#L989"
         }
       ],
       "tests": [
@@ -949,7 +949,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "AlignmentProvider",
           "line": 69,
           "value": "AlignmentProvider({ children })",
-          "drift": "ok",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useDailyAlignment.tsx#L69"
         }
       ],
@@ -978,7 +978,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 320,
         "y": 544
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "progression.xp-rewards",
@@ -1031,18 +1031,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/db/schema.ts",
           "symbol": "xpTransactions",
-          "line": 397,
+          "line": 398,
           "value": "pgTable('xp_transactions', { id: uuid('id').defaultRandom().primaryKey(), userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' …",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L397"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L398"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3514,
+          "line": 3524,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3514"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3524"
         }
       ],
       "tests": [
@@ -1070,7 +1070,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 638,
         "y": 388
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "progression.client-date",
@@ -1091,10 +1091,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3514,
+          "line": 3524,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3514"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3524"
         }
       ],
       "tests": [
@@ -1116,7 +1116,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 544
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "progression.stage-from-xp",
@@ -1129,10 +1129,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3294,
+          "line": 3304,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3294"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3304"
         },
         {
           "file": "src/lib/progression.ts",
@@ -1267,10 +1267,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3294,
+          "line": 3304,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3294"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3304"
         }
       ],
       "tests": [],
@@ -1290,40 +1290,49 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "drift": "ok"
     },
     {
-      "id": "progression.stat-roll",
+      "id": "progression.vector-stats",
       "domain": "progression",
-      "title": "Larval stat roll",
-      "kind": "limit",
+      "title": "Five vector stats",
+      "kind": "invariant",
       "status": "active",
-      "statement": "Character creation rolls five base stats that always sum to 300, with each stat between 35 and 85. The highest stat picks the larval archetype.",
+      "statement": "Members have one stat set, the five Moltmax vectors. The base is the member's audit scores (0 to 100); before the audit it is a provisional roll from the member id, 35 to 65 each. Equipped gear adds its primary bonus to its slot's vector plus any secondary bonuses, and totals may pass 100. The Moltmax rating weighs the vectors with the audit index weights.",
       "anchors": [
         {
-          "file": "src/lib/stats-roller.ts",
-          "symbol": "TOTAL_STAT_POINTS",
-          "line": 40,
-          "value": "300",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/stats-roller.ts#L40"
+          "file": "src/lib/vectors.ts",
+          "symbol": "resolveVectorBase",
+          "line": 157,
+          "value": "resolveVectorBase(stats, seed)",
+          "drift": "unverified",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/vectors.ts#L157"
         },
         {
-          "file": "src/lib/stats-roller.ts",
-          "symbol": "rollBaseStats",
-          "line": 198,
-          "value": "rollBaseStats(total, min, max)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/stats-roller.ts#L198"
+          "file": "src/lib/vectors.ts",
+          "symbol": "buildVectorSheet",
+          "line": 196,
+          "value": "buildVectorSheet(base, gearIn)",
+          "drift": "unverified",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/vectors.ts#L196"
+        },
+        {
+          "file": "src/lib/vectors.ts",
+          "symbol": "SLOT_VECTOR",
+          "line": 72,
+          "value": "{ carapace: 'shellHardness', belt: 'shellHardness', claws: 'pincerTorque', head: 'neuralLatency', legs: 'ecdysisDiscipline', antennae: 'depthTolerance', }",
+          "drift": "unverified",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/vectors.ts#L72"
         }
       ],
       "tests": [
         {
-          "file": "src/lib/stats-roller.test.ts",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/stats-roller.test.ts"
+          "file": "src/lib/vectors.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/vectors.test.ts"
         }
       ],
       "dependsOn": [],
       "usedBy": [],
       "decisions": [
-        "fixed-stat-budget"
+        "fixed-stat-budget",
+        "five-vector-stats"
       ],
       "flag": null,
       "flow": null,
@@ -1331,7 +1340,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 76
       },
-      "drift": "ok"
+      "drift": "unverified"
     },
     {
       "id": "progression.referral-rewards",
@@ -1360,10 +1369,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/referrals.ts",
           "symbol": "qualifyReferral",
-          "line": 89,
+          "line": 90,
           "value": "qualifyReferral(db, userId)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/referrals.ts#L89"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/referrals.ts#L90"
         }
       ],
       "tests": [
@@ -1385,7 +1394,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1196,
         "y": 544
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "access.roles",
@@ -1540,7 +1549,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "profiles",
           "line": 123,
           "value": "pgTable('profiles', { id: text('id').primaryKey(), role: text('role').default('user').notNull(), // 'user' | 'admin' larvaId: text('larvaId').default('LARVA UN…",
-          "drift": "ok",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L123"
         }
       ],
@@ -1561,7 +1570,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 904,
         "y": 388
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "access.hidden-pages",
@@ -3012,18 +3021,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "submitLeadHandler",
-          "line": 3114,
+          "line": 3122,
           "value": "submitLeadHandler(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3114"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3122"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createBlogCommentHandler",
-          "line": 766,
+          "line": 772,
           "value": "createBlogCommentHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L766"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L772"
         }
       ],
       "tests": [
@@ -3062,10 +3071,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/premium.ts",
           "symbol": "requirePremiumOperator",
-          "line": 88,
+          "line": 89,
           "value": "requirePremiumOperator(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L88"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L89"
         },
         {
           "file": "src/lib/premium-membership.ts",
@@ -3181,10 +3190,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/db/schema.ts",
           "symbol": "profiles.hasPurchasedPremium",
-          "line": 159,
+          "line": 160,
           "value": "boolean('hasPurchasedPremium').default(false).notNull()",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L159"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L160"
         }
       ],
       "tests": [
@@ -3229,10 +3238,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/premium.ts",
           "symbol": "createPremiumCheckoutHandler",
-          "line": 166,
+          "line": 167,
           "value": "createPremiumCheckoutHandler(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L166"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L167"
         }
       ],
       "tests": [
@@ -3275,10 +3284,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/premium.ts",
           "symbol": "handleStripeWebhookRequest",
-          "line": 428,
+          "line": 429,
           "value": "handleStripeWebhookRequest(request)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L428"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L429"
         },
         {
           "file": "src/lib/server/merch.ts",
@@ -3314,7 +3323,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 948,
         "y": 208
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "premium.event-sync",
@@ -3343,10 +3352,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/premium.ts",
           "symbol": "applyPremiumStripeEvent",
-          "line": 355,
+          "line": 356,
           "value": "applyPremiumStripeEvent(event, secretKey)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L355"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L356"
         }
       ],
       "tests": [
@@ -3644,10 +3653,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/premium.ts",
           "symbol": "setPremiumAccessHandler",
-          "line": 212,
+          "line": 213,
           "value": "setPremiumAccessHandler(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L212"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L213"
         }
       ],
       "tests": [
@@ -3685,18 +3694,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumTopicHandler",
-          "line": 1606,
+          "line": 1612,
           "value": "createForumTopicHandler({ data, context })",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1606"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1612"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "requirePublishableForumPost",
-          "line": 940,
+          "line": 946,
           "value": "requirePublishableForumPost(input)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L940"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L946"
         }
       ],
       "tests": [
@@ -3986,7 +3995,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 116,
         "y": 364
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "forum.rate-limit",
@@ -4058,10 +4067,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createBlogCommentHandler",
-          "line": 766,
+          "line": 772,
           "value": "createBlogCommentHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L766"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L772"
         },
         {
           "file": "src/lib/server/forum-write-limit.ts",
@@ -4425,10 +4434,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertForumAuthor",
-          "line": 948,
+          "line": 954,
           "value": "assertForumAuthor(rowUserId, actorId, action)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L948"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L954"
         }
       ],
       "tests": [
@@ -4471,10 +4480,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumPostHandler",
-          "line": 1752,
+          "line": 1759,
           "value": "createForumPostHandler({ data, context })",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1752"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1759"
         }
       ],
       "tests": [
@@ -4496,7 +4505,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 520
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "forum.peer-flags",
@@ -4561,26 +4570,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertCovenantSteward",
-          "line": 2397,
+          "line": 2405,
           "value": "assertCovenantSteward(dbClient, userId, payload)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2397"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2405"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "reviewForumReportHandler",
-          "line": 2700,
+          "line": 2708,
           "value": "reviewForumReportHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2700"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2708"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "removeForumReportTargetHandler",
-          "line": 2770,
+          "line": 2778,
           "value": "removeForumReportTargetHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2770"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2778"
         }
       ],
       "tests": [
@@ -5683,18 +5692,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/connections.ts",
           "symbol": "SYNAPTIC_NEARBY_LIMIT",
-          "line": 77,
+          "line": 66,
           "value": "5",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/connections.ts#L77"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/connections.ts#L66"
         },
         {
           "file": "src/lib/connections.ts",
           "symbol": "compareSynapticNearby",
-          "line": 122,
+          "line": 111,
           "value": "compareSynapticNearby(a, b, viewerStage)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/connections.ts#L122"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/connections.ts#L111"
         }
       ],
       "tests": [
@@ -5773,18 +5782,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/referrals.ts",
           "symbol": "captureSignupReferral",
-          "line": 69,
+          "line": 70,
           "value": "captureSignupReferral(userId, request)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/referrals.ts#L69"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/referrals.ts#L70"
         },
         {
           "file": "src/lib/server/referrals.ts",
           "symbol": "handleInvitation",
-          "line": 49,
+          "line": 50,
           "value": "handleInvitation(request, referrerId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/referrals.ts#L49"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/referrals.ts#L50"
         }
       ],
       "tests": [
@@ -6082,10 +6091,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "getBlogPostBySlugHandler",
-          "line": 636,
+          "line": 642,
           "value": "getBlogPostBySlugHandler({ data: slug, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L636"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L642"
         },
         {
           "file": "src/routes/news/$slug.tsx",
@@ -6206,17 +6215,17 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/lobster-avatar.ts",
           "symbol": "parseLobsterAvatarConfig",
-          "line": 247,
+          "line": 270,
           "value": "parseLobsterAvatarConfig(raw)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar.ts#L247"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar.ts#L270"
         },
         {
           "file": "src/lib/avatar/config-schema.ts",
           "symbol": "avatarConfigShape",
           "line": 19,
           "value": "{ style: z.string().min(1).max(64), seed: z.string().min(1).max(128), race: z.enum(AVATAR_RACES).optional(), shellColor: z.enum(shellColorIds).optional(), shel…",
-          "drift": "ok",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/config-schema.ts#L19"
         }
       ],
@@ -6240,7 +6249,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 208
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "data.avatar-portraits",
@@ -6292,10 +6301,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "saveCharacterHandler",
-          "line": 3853,
+          "line": 3935,
           "value": "saveCharacterHandler({ data, context })",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3853"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3935"
         },
         {
           "file": "src/lib/character-appearance.ts",
@@ -6331,7 +6340,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 496
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "data.character-public-appearance",
@@ -6344,10 +6353,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "publicAvatarConfig",
-          "line": 168,
+          "line": 171,
           "value": "sql<LobsterAvatarConfig | null>`CASE WHEN ${profiles.avatarConfig} IS NULL THEN NULL ELSE (${profiles.avatarConfig} - 'accessory' - 'claws' - 'equipment') || j…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L168"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L171"
         },
         {
           "file": "src/components/UserAvatar.tsx",
@@ -7662,10 +7671,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "progression"
       ],
       "rules": [
-        "progression.stat-roll"
+        "progression.vector-stats"
       ],
-      "status": "accepted",
-      "supersededBy": null,
+      "status": "superseded",
+      "supersededBy": "five-vector-stats",
       "sources": [
         {
           "kind": "commit",
@@ -9771,6 +9780,39 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "heading": "Consequences",
           "html": "<p>MAX has one chat model. Provider failure returns unavailable without switching tiers. Message allowances and membership authority stay unchanged.</p>"
+        }
+      ]
+    },
+    {
+      "id": "five-vector-stats",
+      "date": "2026-11-04",
+      "title": "One stat set: the five Moltmax vectors",
+      "summary": "Member biometrics and gear stats merge into the audit's five vectors, shown as base plus gear bonus.",
+      "domains": [
+        "progression"
+      ],
+      "rules": [
+        "progression.vector-stats"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Members had three unrelated stat sets: the audit&#39;s five vectors, profile biometrics that were mostly defaults, and gear stats (Defense, Attack and so on) that fed nothing.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>The five vectors (Shell, Torque, Synapse, Ecdysis, Depth) are the only stats. The audit sets the base; before the audit a provisional base is rolled from the member id. Each gear slot raises one vector, and the sheet reads RPG style, &quot;62 (+14)&quot;. Gear bonuses were rescaled to sit beside a 0 to 100 base (about +2 common to +19 legendary), and totals may pass 100.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>Keep the 300-point onboarding roll as the base. Rejected because it ignored moltmaxxing, the thing the stats are about.</li>\n<li>Cap totals at 100. Rejected because top gear would stop mattering for high audit scores.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<ul>\n<li>Retaking the audit moves the base. Gear is how the number climbs past it.</li>\n<li>Rarer gear carries bigger bonuses, so the market rarity ladder shows on the sheet.</li>\n</ul>"
         }
       ]
     }

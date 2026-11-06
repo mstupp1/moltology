@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { spawn, execSync } from 'node:child_process'
+import { spawn, execSync, execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import http from 'node:http'
@@ -10,7 +10,9 @@ import { resolveChromeExecutable } from './lib/composite-renderer'
 import { REGISTERED_TARGETS, DEFAULT_CAPTURE_TARGETS, type CaptureTarget } from './lib/mockup-targets'
 import { advanceServiceWorkerVersion } from './lib/mockup-cache-version'
 import { validateDevCapture } from './lib/mockup-dev-auth'
+import { installShowcase, showcaseNow } from './lib/mockup-showcase'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
+import { needsEmailRefresh } from './build-email-feature-images.mjs'
 
 const PORT = 3019
 const BASE_URL = `http://127.0.0.1:${PORT}`
@@ -118,6 +120,7 @@ async function main() {
   if (authDev && !args.some((arg) => arg.startsWith('--base-url='))) throw new Error('--auth-dev requires an explicit --base-url for a running development server.')
   const credentials = authDev ? validateDevCapture(baseUrl, process.env) : null
   const mediaOrigin = args.find((arg) => arg.startsWith('--media-origin='))?.slice('--media-origin='.length)
+  const offlineExternal = args.includes('--offline-external')
   const mediaCache = new Map<string, { body: Buffer; contentType: string }>()
   const executablePath = process.env.MOCKUP_CHROME_PATH || resolveChromeExecutable()
   if (!executablePath) throw new Error('Install Chrome/Chromium or set MOCKUP_CHROME_PATH.')
@@ -152,9 +155,8 @@ async function main() {
     activeTargets = DEFAULT_CAPTURE_TARGETS
   }
 
-  if (!credentials && activeTargets.some((target) => target.name.startsWith('chassis_'))) {
-    throw new Error('Chassis capture requires --auth-dev and an explicit local development --base-url.')
-  }
+  // One pinned moment for the whole batch, so dates, "Next" task and relative times match across shots.
+  const now = showcaseNow()
 
   // --base-url reuses a running local server; default remains an isolated production build.
   let serverProcess: ReturnType<typeof spawn> | undefined
@@ -181,13 +183,12 @@ async function main() {
         reducedMotion: 'reduce', serviceWorkers: 'block',
       })
       try {
-        // Give the synthetic preview session a date-scoped, empty routine snapshot.
-        // Its fictitious user has no JWT, so the normal authenticated fetch cannot fill it.
-        await context.addInitScript(() => {
-          const now = new Date()
-          const date = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-')
-          localStorage.setItem('moltology:alignment:snapshot:00000000-0000-0000-0000-000000000001', JSON.stringify({ date, completedKeys: [] }))
-        })
+        await context.clock.setFixedTime(now)
+        // Start with the member sidebar collapsed to its icon rail, so the page itself fills the shot.
+        await context.addInitScript(() => localStorage.setItem('moltology_hud_sidebar_collapsed', 'true'))
+        // The synthetic preview session has no JWT, so member reads come back empty. Stage the
+        // showcase member instead; a real --auth-dev login shows that account's own data.
+        if (!credentials) await installShowcase(context, now)
         const page = await context.newPage()
         if (credentials) {
           await context.addInitScript((id) => localStorage.setItem(`moltology:welcomed:${id}`, '1'), credentials.userId)
@@ -199,6 +200,12 @@ async function main() {
           const response = await signIn
           if (!response.ok() || (await response.json()).user?.id !== credentials.userId) throw new Error('Development sign-in failed or returned the wrong account.')
         }
+        // Restricted environments can't reach third-party image hosts (old seed avatars). Failing
+        // those fast lets components show their own fallback instead of a broken image.
+        if (offlineExternal) await page.route(
+          (url) => url.origin !== new URL(baseUrl).origin && (!mediaOrigin || !url.href.startsWith(mediaOrigin)),
+          (route) => (route.request().resourceType() === 'image' ? route.abort('blockedbyclient') : route.fallback()),
+        )
         // Capture-only source override for environments without access to the production CDN.
         if (mediaOrigin) await page.route('**/media/**', async (route) => {
           const key = new URL(route.request().url()).pathname.slice('/media/'.length)
@@ -217,12 +224,14 @@ async function main() {
         const response = await page.goto(captureUrl.toString(), { waitUntil: 'domcontentloaded', timeout: 60000 })
         if (!response?.ok()) throw new Error(`Capture route failed: ${captureUrl.pathname}`)
         await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => undefined)
-        if (target.name.startsWith('oracle')) await stageOracleConversation(page)
+        if (target.name.startsWith('oracle')) await stageOracleConversation(page, target.isMobile ? 1 : ORACLE_SAMPLES.length, now)
         if (target.name.startsWith('moltmax')) {
           await page.getByRole('button', { name: 'Start the quiz', exact: true }).last().click()
           await page.locator('[role=progressbar]').first().waitFor()
         }
         await page.evaluate(async () => {
+          // Lazy images at the fold edge may never start in a still screenshot; load them now.
+          document.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((image) => { image.loading = 'eager' })
           await document.fonts.ready
           await Promise.all(Array.from(document.images).filter((image) => image.getBoundingClientRect().top < innerHeight)
             .map((image) => Promise.race([image.decode().catch(() => undefined), new Promise((resolve) => setTimeout(resolve, 10000))])))
@@ -246,8 +255,9 @@ async function main() {
         if (text.trim().length < 30 || /Something went wrong|Internal Server Error|Cannot read properties|Cannot destructure|Could not load equipment|Could not load your character|Unauthenticated: Authentication required|Reading today’s liturgies…/.test(text)) {
           throw new Error(`Invalid or empty UI for ${target.name}; existing library preserved.`)
         }
-        await page.mouse.move(0, 0)
-        await page.addStyleTag({ content: '* { scrollbar-width: none !important; } ::-webkit-scrollbar { display: none !important; }' })
+        // Park the pointer on empty page edge; the top-left corner shows the collapsed rail's brand tooltip.
+        await page.mouse.move(width - 2, Math.round(height / 2))
+        await page.addStyleTag({ content: CAPTURE_CSS })
         const pngPath = path.join(stage, `${target.outputBase}.png`)
         await page.screenshot({ path: pngPath, animations: 'disabled' })
         await encodeMarketingWebp(pngPath, path.join(stage, `${target.outputBase}.webp`), 90)
@@ -273,6 +283,10 @@ async function main() {
 
   // 3. Automated End-to-End Neon S3 CDN Sync
   const skipS3 = args.includes('--skip-s3') || args.includes('--no-s3')
+  if (needsEmailRefresh(activeTargets)) {
+    // The publisher verifies the public JPEG bytes before replacing email references.
+    execFileSync(process.execPath, ['scripts/build-email-feature-images.mjs', ...(skipS3 ? [] : ['--publish'])], { stdio: 'inherit' })
+  }
   if (!skipS3) {
     console.log('\n☁️ Automatically syncing marketing mockups to Neon S3 CDN...')
     execSync('npm run s3:sync', { stdio: 'inherit' })
@@ -283,31 +297,59 @@ async function main() {
 }
 
 /**
- * A guest Oracle opens on an empty chat, which reads as nothing on the homepage. Ask one sample
- * question and answer it from a fixed reply, so the capture shows a real exchange without
- * calling the model.
+ * Capture-only chrome: no scrollbars, and no floating Oracle launcher, which otherwise covers the
+ * bottom-right of every desktop shot and the bottom of every phone shot.
  */
-const ORACLE_SAMPLE = {
-  question: 'I have a report due Friday and I keep opening my inbox instead. Where do I start?',
-  answer: [
-    'Start smaller than feels respectable.',
-    '',
-    '1. **Close the inbox tab.** Not forever. Just until the first shed is done.',
-    "2. **Write the report's worst first paragraph.** Twenty minutes, timer on, no editing.",
-    '3. **Check messages once at 11:30**, then go back to the draft.',
-    '',
-    'Friday leaves room for three of these. Want me to add them to today’s routine?',
-  ].join('\n'),
-}
+const CAPTURE_CSS = [
+  '* { scrollbar-width: none !important; } ::-webkit-scrollbar { display: none !important; }',
+  '[aria-label="Open Oracle AI Popout"], [aria-label="Open Oracle AI Tray"] { visibility: hidden !important; }',
+].join('\n')
 
-async function stageOracleConversation(page: Page) {
-  await page.route('**/api/chat', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ text: ORACLE_SAMPLE.answer, threadId: null, isGuest: false }) }))
+/**
+ * A guest Oracle opens on an empty chat, which reads as nothing on the homepage. Ask sample
+ * questions and answer each from a fixed reply, so the capture shows a real exchange without
+ * calling the model. Replies only suggest things a member can do; the Oracle has no tools.
+ * Phones show the first exchange; the wide desktop column has room for the follow-up too.
+ */
+const ORACLE_SAMPLES = [
+  {
+    question: 'I have a report due Friday and I keep opening my inbox instead. Where do I start?',
+    answer: [
+      'Start smaller than feels respectable.',
+      '',
+      '1. **Close the inbox tab.** Not forever. Just until the first shed is done.',
+      "2. **Write the report's worst first paragraph.** Twenty minutes, timer on, no editing.",
+      '3. **Check messages once at 11:30**, then go back to the draft.',
+      '',
+      'Friday leaves room for three of these a day. Start the first one now.',
+    ].join('\n'),
+  },
+  {
+    question: 'Done. The paragraph is bad but it exists. What now?',
+    answer: [
+      'Good. A bad paragraph is a shell you can grow out of.',
+      '',
+      'Take five minutes away from the screen, then write the outline under it as plain headings. No sentences yet. When the outline is down, tick **Skill Development** on today’s list and stop for lunch.',
+    ].join('\n'),
+  },
+]
+
+async function stageOracleConversation(page: Page, exchanges: number, now: Date) {
+  await page.route('**/api/chat', (route) => {
+    // Answer the latest sample question in the request; the chat resends earlier turns as history.
+    const body = route.request().postData() ?? ''
+    const sample = [...ORACLE_SAMPLES].reverse().find((item) => body.includes(JSON.stringify(item.question).slice(1, -1))) ?? ORACLE_SAMPLES[0]
+    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ text: sample.answer, threadId: null, isGuest: false }) })
+  })
   const input = page.getByPlaceholder(/Ask/).first()
   await input.waitFor({ timeout: 15000 })
-  await input.fill(ORACLE_SAMPLE.question)
-  await input.press('Enter')
-  await page.getByText('Start smaller than feels respectable.').first().waitFor({ timeout: 15000 })
+  for (const [index, sample] of ORACLE_SAMPLES.slice(0, exchanges).entries()) {
+    // Messages are keyed by time, so each turn needs its own minute on the pinned clock.
+    await page.clock.setFixedTime(new Date(now.getTime() + index * 60_000))
+    await input.fill(sample.question)
+    await input.press('Enter')
+    await page.getByText(sample.answer.split('\n')[0]).first().waitFor({ timeout: 15000 })
+  }
 }
 
 main().catch((err) => {

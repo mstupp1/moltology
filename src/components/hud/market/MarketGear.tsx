@@ -72,6 +72,9 @@ export function MarketPieceCard({
         ) : null}
       </span>
       <span className="text-[12px] sm:text-[13px] leading-tight text-ink font-semibold line-clamp-2 min-h-[2lh]">{piece.name}</span>
+      <span className="text-[11px] font-semibold text-cyan-glow tabular-nums">
+        {primaryStatLine({ category: piece.category, primaryStat: shown.primaryStat })}
+      </span>
       <span className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
         <span className={cn('text-[11px] font-semibold', style.text)}>{RARITY_LABELS[shown.rarity]}</span>
         {shown.owned ? null : <GemAmount value={shown.price} size="sm" />}
@@ -185,11 +188,11 @@ export function MarketPieceDetail({
         })}
       </div>
       <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
-        <dt className="text-ink-muted">Main stat</dt>
-        <dd className="text-ink text-right tabular-nums">{primaryStatLine(catalog)}</dd>
+        <dt className="text-ink-muted">Primary bonus</dt>
+        <dd className="text-cyan-glow font-semibold text-right tabular-nums">{primaryStatLine(catalog)}</dd>
         {shown.affixes.map((a) => (
           <React.Fragment key={a.stat}>
-            <dt className="text-ink-muted">Bonus</dt>
+            <dt className="text-ink-muted">Secondary</dt>
             <dd className="text-ink text-right tabular-nums">{formatAffixLine(a)}</dd>
           </React.Fragment>
         ))}
@@ -203,7 +206,7 @@ export function MarketPieceDetail({
       <p className="text-[13px] italic text-ink-muted leading-relaxed">{piece.flavorText}</p>
       {shown.owned ? (
         <Link
-          to="/chassis"
+          to="/character"
           className="inline-flex min-h-10 items-center justify-center rounded-control border border-line bg-surface-2 px-4 text-sm font-semibold text-ink hover:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
           {everyItem ? 'Admins own every piece · open the studio' : 'Owned · wear it in the studio'}

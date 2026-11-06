@@ -31,6 +31,8 @@ import {
   toggleDailyAlignmentTaskFn,
 } from '@/lib/server/api'
 import { useHudPersist } from '@/hooks/useHudPersist'
+import { gemStreakBonus } from '@/lib/gems'
+import { getAssetUrl } from '@/lib/assets'
 import {
   calculateProgression,
   calculateXpFromHistory,
@@ -39,9 +41,21 @@ import {
 import { SilentSynchronizationDialog } from '@/components/hud/SilentSynchronizationDialog'
 import { generateLobsterAvatarDataUri, parseLobsterAvatarConfig } from '@/lib/lobster-avatar'
 import { resolveMemberPublicName } from '@/lib/member-handle'
+import { clearGuestAlignment, guestAlignmentFor, saveGuestAlignment } from '@/lib/guest-progress'
 
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
+
+/** The one toast shown when the day's tasks are all done, with the gems they earned. */
+function completionToastCopy(gems: number, streakDays: number): { message: string; withGems: boolean } {
+  if (gems <= 0) return { message: `All ${TOTAL_ALIGNMENT_TASKS} tasks done for today.`, withGems: false }
+  const streak = gemStreakBonus(streakDays) > 0 ? ` · ${streakDays}-day streak` : ''
+  return { message: `+${gems} Chitin Gems${streak}`, withGems: true }
+}
+
+function GemIcon() {
+  return <img src={getAssetUrl('/images/chitin_gem.png')} alt="" className="w-4 h-4 object-contain" />
+}
 
 export interface AlignmentContextValue {
   tasks: AlignmentTaskItem[]
@@ -147,6 +161,16 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
 
   const toastRef = useRef(toast)
   toastRef.current = toast
+  const completionToastPendingRef = useRef(false)
+  const showCompletionToast = useCallback((gems: number, streakDays: number) => {
+    const copy = completionToastCopy(gems, streakDays)
+    toastRef.current.success(copy.message, {
+      id: 'daily-alignment-complete-toast',
+      title: 'Daily alignment done',
+      duration: 6000,
+      ...(copy.withGems ? { icon: <GemIcon />, action: { label: 'Shop', href: '/character/shop' } } : {}),
+    })
+  }, [])
 
   const persistRef = useRef(persist)
   persistRef.current = persist
@@ -254,6 +278,14 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     if (!userId) {
       snapshotUserRef.current = null
       if (!isAuthPending) {
+        // Guests pick up today's ticks from this device, so a reload keeps them.
+        const today = localDateString()
+        const guestKeys = guestAlignmentFor(today)
+        const guestTasks = mergeCompletions(guestKeys)
+        tasksRef.current = guestTasks
+        setTasks(guestTasks)
+        setHistory(guestKeys.length > 0 ? [{ date: today, completedCount: guestKeys.length }] : [])
+        setHasServerStreakBaseline(false)
         hasTrustworthyCountRef.current = true
         setIsLoading(false)
       }
@@ -371,10 +403,17 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
               setTasks(merged)
               persistSnapshot(currentDateRef.current, merged)
 
-              if ((response.gemsDelta ?? 0) > 0) {
-                toastRef.current.success(`+${response.gemsDelta} Chitin Gems. Spend them in the market.`, {
+              const gemsDelta = response.gemsDelta ?? 0
+              const serverAllDone = response.tasks.every((task) => task.completed)
+              if (completionToastPendingRef.current && (serverAllDone || queueRef.current.length === 0)) {
+                completionToastPendingRef.current = false
+                showCompletionToast(serverAllDone ? gemsDelta : 0, response.streakDays ?? 0)
+              } else if (gemsDelta > 0) {
+                toastRef.current.success(`+${gemsDelta} Chitin Gems`, {
                   id: 'daily-alignment-gems-toast',
                   title: 'Gems earned',
+                  icon: <GemIcon />,
+                  action: { label: 'Shop', href: '/character/shop' },
                 })
               }
 
@@ -400,14 +439,14 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
           } catch (err) {
             console.warn('[useDailyAlignment] Remote alignment sync disrupted:', err)
             pendingOverridesRef.current.delete(nextKey)
-            toastRef.current.warning(
-              'Alignment liturgy recorded locally. Telemetry synchronization will re-engage.',
-              {
-                id: 'daily-alignment-sync-warning',
-                title: 'TELEMETRY SYNC',
-                duration: 4000,
-              }
-            )
+            if (completionToastPendingRef.current && queueRef.current.length === 0) {
+              completionToastPendingRef.current = false
+              showCompletionToast(0, 0)
+            }
+            toastRef.current.warning("Saved on this device. We'll sync it when you're back online.", {
+              id: 'daily-alignment-sync-warning',
+              duration: 4000,
+            })
           }
         }
       } finally {
@@ -418,7 +457,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     }
 
     runQueue()
-  }, [])
+  }, [showCompletionToast])
 
   const completedTasks = useMemo(() => tasks.filter((t) => t.completed), [tasks])
   const completedCount = completedTasks.length
@@ -476,12 +515,12 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
       })
 
       // Completion celebration trigger
+      // Completion: signed-in members wait for the server so gems land in the same toast.
       if (prevCount < TOTAL_ALIGNMENT_TASKS && nextCount === TOTAL_ALIGNMENT_TASKS) {
-        toastRef.current.success('All eight daily alignment liturgies recorded. Protocol verified.', {
-          id: 'daily-alignment-complete-toast',
-          title: 'DAILY ALIGNMENT COMPLETE',
-          duration: 6000,
-        })
+        if (userIdRef.current) completionToastPendingRef.current = true
+        else showCompletionToast(0, 0)
+      } else if (!nextCompleted) {
+        completionToastPendingRef.current = false
       }
 
       // Optimistic XP adjustment
@@ -494,15 +533,18 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
       }
       setOptimisticXpDelta((prev) => prev + delta)
 
-      // Authenticated users: enqueue background sync
+      // Authenticated users: enqueue background sync. Guests keep today's ticks on this device
+      // until they sign in, when the claim below saves them to the account.
       if (userIdRef.current) {
         if (!queueRef.current.includes(canonicalKey)) {
           queueRef.current.push(canonicalKey)
         }
         triggerQueueProcessing()
+      } else {
+        saveGuestAlignment(currentDateRef.current, nextTasks.filter((t) => t.completed).map((t) => t.key))
       }
     },
-    [triggerQueueProcessing, persistSnapshot]
+    [triggerQueueProcessing, persistSnapshot, showCompletionToast]
   )
 
   const toggleTask = useCallback(async (taskKey: string) => {
@@ -510,6 +552,22 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     const current = tasksRef.current.find((task) => task.key === key || task.id === key)
     if (current) await setTaskCompleted(taskKey, !current.completed)
   }, [setTaskCompleted])
+  // Once the new member's day has loaded, save the ticks they made as a guest today.
+  const guestClaimUserRef = useRef<string | null>(null)
+  useEffect(() => {
+    if (!userId || !hasServerStreakBaseline || guestClaimUserRef.current === userId) return
+    guestClaimUserRef.current = userId
+    const guestKeys = guestAlignmentFor(currentDateRef.current)
+    clearGuestAlignment()
+    const missing = guestKeys.filter((key) => !tasksRef.current.find((task) => task.key === key)?.completed)
+    if (missing.length === 0) return
+    toastRef.current.success(
+      missing.length === 1 ? 'Saved the task you finished before signing up.' : `Saved the ${missing.length} tasks you finished before signing up.`,
+      { id: 'guest-alignment-claimed' },
+    )
+    for (const key of missing) void setTaskCompleted(key, true)
+  }, [userId, hasServerStreakBaseline, setTaskCompleted])
+
   const openSilentSynchronization = useCallback(() => {
     silentDialogUserRef.current = userIdRef.current
     setSilentDialogDate(currentDateRef.current)

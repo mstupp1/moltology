@@ -35,7 +35,9 @@ describe('command catalog', () => {
   it('still finds pages by their old names', () => {
     expect(filterCommandCatalog('command hub').map((cmd) => cmd.id)).toContain('nav-hub')
     expect(filterCommandCatalog('chassis').map((cmd) => cmd.id)).toContain('nav-chassis')
-    expect(filterCommandCatalog('activity stream').map((cmd) => cmd.id)).toContain('nav-stream')
+    expect(filterCommandCatalog('activity stream').map((cmd) => cmd.id)).toContain('nav-friends')
+    expect(filterCommandCatalog('market').map((cmd) => cmd.id)).toContain('nav-market')
+    expect(filterCommandCatalog('science').map((cmd) => cmd.id)).toContain('nav-pipeline')
     expect(filterCommandCatalog('community').map((cmd) => cmd.id)).toContain('nav-forum')
   })
 
@@ -44,15 +46,14 @@ describe('command catalog', () => {
       'nav-home',
       'nav-hub',
       'nav-oracle',
+      'nav-chassis',
+      'nav-market',
       'nav-codex',
       'nav-isolation-protocols',
       'nav-lectures',
       'nav-pipeline',
       'nav-forum',
-      'nav-stream',
-      'nav-connections',
-      'nav-chassis',
-      'nav-market',
+      'nav-friends',
       'nav-premium',
       'nav-news',
       'nav-profile',
@@ -67,10 +68,10 @@ describe('command catalog', () => {
 
   it('surfaces live HUD chambers for obvious page queries', () => {
     expect(filterCommandCatalog('oracle').map((cmd) => cmd.id)).toContain('nav-oracle')
-    expect(filterCommandCatalog('connections').map((cmd) => cmd.id)).toContain('nav-connections')
+    expect(filterCommandCatalog('connections').map((cmd) => cmd.id)).toContain('nav-friends')
     expect(filterCommandCatalog('chassis').map((cmd) => cmd.id)).toContain('nav-chassis')
     expect(filterCommandCatalog('news').map((cmd) => cmd.id)).toContain('nav-news')
-    expect(filterCommandCatalog('stream').map((cmd) => cmd.id)).toContain('nav-stream')
+    expect(filterCommandCatalog('stream').map((cmd) => cmd.id)).toContain('nav-friends')
   })
 
   it('maps isolation to the Isolation Protocols liturgy instead of a removed HUD route', () => {

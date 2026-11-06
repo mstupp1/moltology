@@ -11,7 +11,7 @@ export const Route = createFileRoute('/org')({
   head: () => ({
     meta: [
       ...seo({
-        title: 'The Organization | Moltology',
+        title: 'Company | Moltology',
         description: 'Meet the team behind Moltology, see where we work, browse open roles and get in touch.',
         keywords: 'Moltology organization, Moltology team, Moltology careers, contact Moltology',
         canonical: 'https://moltology.org/org',

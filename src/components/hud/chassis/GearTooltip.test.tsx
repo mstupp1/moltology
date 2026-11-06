@@ -12,8 +12,8 @@ const legendary: CatalogRef = {
   category: 'claws',
   rarity: 'legendary',
   visualType: 'pincer',
-  primaryStat: 96,
-  affixes: [{ stat: 'speed', value: 8 }],
+  primaryStat: 17,
+  affixes: [{ stat: 'ecdysisDiscipline', value: 3 }],
   uniquePower: {
     name: 'Zero-Latency Clamp',
     description: 'The first grip of a session closes without hesitation.',
@@ -27,8 +27,8 @@ describe('GearTooltip', () => {
     render(<GearTooltip catalog={legendary} />)
     expect(screen.getByText('Synapse-Shear Claws')).toBeInTheDocument()
     expect(screen.getByText(/Legendary · Claws/i)).toBeInTheDocument()
-    expect(screen.getByText('+96 Attack')).toBeInTheDocument()
-    expect(screen.getByText('+8 Speed')).toBeInTheDocument()
+    expect(screen.getByText('+17 Torque')).toBeInTheDocument()
+    expect(screen.getByText('+3 Ecdysis')).toBeInTheDocument()
     expect(screen.getByText('Item lore · Zero-Latency Clamp')).toBeInTheDocument()
     expect(
       screen.getByText(/The first grip of a session closes without hesitation/i)

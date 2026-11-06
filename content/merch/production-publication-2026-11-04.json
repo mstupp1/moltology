@@ -1,0 +1,101 @@
+{
+  "publishedAt": "2026-11-04T23:28:07.439800+00:00",
+  "authorization": "User: Publish on prod",
+  "sourcePullRequest": "https://github.com/mstupp1/moltology/pull/409",
+  "mergedCommit": "c98b84fec6ca86cd91ed5ea0f43c9bcb54fc5408",
+  "productionDeployment": {
+    "id": 7560507700,
+    "state": "success"
+  },
+  "scope": [
+    "moltology-hoodie",
+    "moltology-tote"
+  ],
+  "publishedProducts": [
+    {
+      "slug": "moltology-hoodie",
+      "id": "22222222-2222-4222-8222-001400000000",
+      "isPublished": true,
+      "basePriceCents": 6000,
+      "galleryCount": 6
+    },
+    {
+      "slug": "moltology-tote",
+      "id": "22222222-2222-4222-8222-001500000000",
+      "isPublished": true,
+      "basePriceCents": 3000,
+      "galleryCount": 6
+    }
+  ],
+  "variants": [
+    {
+      "id": "22222222-2222-4222-8222-001400000001",
+      "title": "Black / S",
+      "priceCents": 6000,
+      "printfulSyncVariantId": "5619072375",
+      "isAvailable": true
+    },
+    {
+      "id": "22222222-2222-4222-8222-001400000002",
+      "title": "Black / M",
+      "priceCents": 6000,
+      "printfulSyncVariantId": "5619072377",
+      "isAvailable": true
+    },
+    {
+      "id": "22222222-2222-4222-8222-001400000003",
+      "title": "Black / L",
+      "priceCents": 6000,
+      "printfulSyncVariantId": "5619072378",
+      "isAvailable": true
+    },
+    {
+      "id": "22222222-2222-4222-8222-001400000004",
+      "title": "Black / XL",
+      "priceCents": 6000,
+      "printfulSyncVariantId": "5619072379",
+      "isAvailable": true
+    },
+    {
+      "id": "22222222-2222-4222-8222-001400000005",
+      "title": "Black / 2XL",
+      "priceCents": 6300,
+      "printfulSyncVariantId": "5619072380",
+      "isAvailable": true
+    },
+    {
+      "id": "22222222-2222-4222-8222-001500000001",
+      "title": "Black / One size",
+      "priceCents": 3000,
+      "printfulSyncVariantId": "5619072386",
+      "isAvailable": true
+    }
+  ],
+  "priorSelectedProducts": [],
+  "priorSelectedVariants": [],
+  "preservationChecks": {
+    "unrelatedProductsHash": true,
+    "unrelatedVariantsHash": true,
+    "settingsHash": true,
+    "overridesHash": true
+  },
+  "storeControls": [
+    {
+      "id": "main",
+      "publicEnabled": true,
+      "orderingOpen": false,
+      "checkoutPaused": false,
+      "fulfillmentMode": "manual"
+    }
+  ],
+  "verification": {
+    "productionCdn": "All twelve gallery images and two transparent card images returned image content successfully.",
+    "database": "Read-back confirmed both published rows and six available variants with exact prices, galleries, and provider IDs.",
+    "browser": "Anonymous public production pages passed desktop 1440\u00d71000 and mobile 390\u00d7844 checks: both titles, six gallery entries, decoded primary images, disabled ordering, and no horizontal overflow. Screenshots visually inspected.",
+    "screenshots": "tmp/verification/merch-production-2026-11-04/",
+    "doctor": "Local development readiness diagnostic rerun; existing missing Stripe webhook, support/status secrets, deployed callbacks/recovery and policy configuration remain in that local environment. This does not describe production configuration."
+  },
+  "ordersCreated": false,
+  "launchSettingsChanged": false,
+  "rollback": "The two product/variant sets were absent before publication. If rollback is requested, unpublish only these product IDs and preserve their Printful identities and historical mappings."
+}

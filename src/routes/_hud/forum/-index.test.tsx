@@ -60,7 +60,7 @@ describe('ForumIndexPage (/_hud/forum/)', () => {
 
     render(<ForumIndexPage />)
 
-    expect(screen.getByRole('heading', { level: 1, name: /Moltology Community/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /^Forum$/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2, name: /posts/i })).toBeInTheDocument()
     const boardList = screen.getByTestId('forum-board-list')
     expect(boardList).toHaveTextContent('Rules & Directives')

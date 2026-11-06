@@ -119,10 +119,7 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
         setCommentInput('')
         setTurnstileToken(null)
         turnstileRef.current?.reset()
-        toast.success('Comment posted successfully.', {
-          id: 'blog-comment-posted',
-          title: 'Comment Posted',
-        })
+        toast.success('Comment posted.', { id: 'blog-comment-posted' })
       }
     } catch (err: any) {
       console.error('Comment submission error:', err)
