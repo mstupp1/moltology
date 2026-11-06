@@ -60,7 +60,7 @@ export function ProfileSectionNav({
           >
             {section.label}
             {count > 0 && (
-              <span className="min-w-4 h-4 px-1 inline-flex items-center justify-center rounded-full bg-cyan-glow text-[10px] font-bold text-abyss tabular-nums">
+              <span className="min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full bg-cyan-glow text-[11px] font-bold text-abyss tabular-nums">
                 <span className="sr-only">, </span>
                 {count > 99 ? '99+' : count}
                 <span className="sr-only"> waiting</span>
