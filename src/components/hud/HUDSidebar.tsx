@@ -47,9 +47,13 @@ import { UserAvatar } from '../UserAvatar'
 import { UserAvatarMenu } from '../UserAvatarMenu'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { getAssetUrl } from '@/lib/assets'
-import { HUDProgressBar } from './HUDProgressBar'
+import { HUDMobileTabBar } from './HUDMobileTabBar'
 import { HUDTaskBar } from './HUDTaskBar'
 import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
+
+/** Pages in the phone bottom bar; the rest go in its More sheet, in this order. */
+const MOBILE_TAB_IDS = ['hub', 'oracle', 'character', 'forum']
+const MOBILE_MORE_IDS = ['profile', 'codex', 'academy']
 
 const GUEST_LOCKED_PATHS = new Set(['/academy', '/character', '/member', '/profile'])
 
@@ -66,14 +70,10 @@ export function computeNavItemHidden(
 
 interface HUDSidebarProps {
   larvaId?: string
-  stage?: number
-  xp?: number
 }
 
 export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   larvaId = 'LARVA UNIT #8971',
-  stage,
-  xp,
 }) => {
   const router = typeof useRouter === 'function' ? useRouter() : null
   const navigate = useNavigate()
@@ -456,7 +456,16 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   }
 
   const renderNavGroupContent = (isMobile: boolean = false) => {
-    return visibleNavGroups.map((group, groupIdx) => {
+    // On phones the bottom bar holds the main pages; the More sheet lists the rest.
+    const groups = isMobile
+      ? visibleNavGroups.map((group) => ({
+          ...group,
+          items: MOBILE_MORE_IDS.map((id) => group.items.find((item) => item.id === id)).filter(
+            (item): item is NavItem => Boolean(item),
+          ),
+        }))
+      : visibleNavGroups
+    return groups.map((group, groupIdx) => {
       const isFlat = !group.title
       const isOpen = isFlat || !!openGroups[group.id]
       const isGroupActive = group.items.some(
@@ -679,6 +688,19 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     ? `${isCollapsed ? 'animate-[sidebar-content-compact_200ms_ease-out]' : 'animate-[sidebar-content-expanded_200ms_ease-out]'} motion-reduce:animate-none`
     : ''
   const isMobileHeaderOpen = isMobileOpen && !isMobileClosing
+  const allNavItems = visibleNavGroups.flatMap((group) => group.items)
+  const mobileTabs = MOBILE_TAB_IDS.map((id) => allNavItems.find((item) => item.id === id))
+    .filter((item): item is NavItem => Boolean(item))
+    .map((item) => ({ id: item.id, label: item.shortLabel ?? item.label, icon: item.icon, path: item.path }))
+  const isOnPath = (path: string) => effectiveRoute === path || (path !== '/' && effectiveRoute.startsWith(path))
+  const mobileActiveId =
+    mobileTabs.find((tab) => isOnPath(tab.path))?.id ??
+    (MOBILE_MORE_IDS.some((id) => {
+      const item = allNavItems.find((navItem) => navItem.id === id)
+      return item ? isOnPath(item.path) : false
+    }) || isOnPath('/support') || isOnPath('/settings')
+      ? 'more'
+      : null)
 
   return (
     <>
@@ -709,55 +731,26 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             />
           </div>
 
-          {/* Left Brand Area (Visible when menu is closed, slides smoothly back into view when closing) */}
-          <div
-            className={`flex items-center min-w-0 z-10 transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${
-              isMobileHeaderOpen
-                ? 'opacity-0 -translate-x-4 pointer-events-none absolute left-2.5'
-                : 'opacity-100 translate-x-0 relative flex-1'
-            }`}
-          >
+          {/* Brand */}
+          <div className="flex items-center min-w-0 z-10 relative flex-1">
             <HeaderBrand
               logoSize="sm"
               onClick={() => handleNavClick('/dashboard')}
             />
           </div>
 
-          {/* Progress Bar Row Area (Fades in in-place when open without horizontal slide) */}
-          <div
-            className={`flex items-center min-w-0 z-10 transition-opacity duration-150 ${
-              isMobileHeaderOpen
-                ? 'opacity-100 relative flex-1 mr-1'
-                : 'opacity-0 pointer-events-none absolute inset-y-0 left-2.5 right-12'
-            }`}
-          >
-            <HUDProgressBar stage={stage} xp={xp} showTaskBar={false} className="w-full" />
-          </div>
-
-          {/* Right Action Controls */}
+          {/* Search and today's tasks; pages live in the bottom bar */}
           <div className="flex items-center gap-1.5 shrink-0 z-10">
-            {/* Task list button next to hamburger (visible when menu is closed) */}
-            {!isMobileHeaderOpen && (
-              <div className="flex items-center animate-in fade-in duration-200">
-                <HUDTaskBar variant="header" />
-              </div>
-            )}
-
-            {/* Hamburger / Close Menu Toggle Button */}
             <button
-              ref={mobileTriggerRef}
-              onClick={toggleMobileMenu}
-              aria-label={isMobileHeaderOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={isMobileHeaderOpen}
-              title={isMobileHeaderOpen ? 'Close menu' : 'Open menu'}
-              className={`w-9 h-9 flex items-center justify-center rounded-control border transition-all duration-300 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow shrink-0 cursor-pointer ${
-                isMobileHeaderOpen
-                  ? 'bg-surface-2 border-line-strong text-ink hover:bg-surface-3'
-                  : 'bg-surface-1 border-line text-cyan-glow hover:bg-surface-2 hover:border-line-strong'
-              }`}
+              type="button"
+              onClick={() => (isMobileOpen ? closeMobileMenu(() => handleOpenCommandPalette()) : handleOpenCommandPalette())}
+              aria-label="Search"
+              title="Search pages and members"
+              className="w-9 h-9 flex items-center justify-center rounded-control border border-line bg-surface-1 text-cyan-glow hover:bg-surface-2 hover:border-line-strong transition-colors active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow shrink-0 cursor-pointer"
             >
-              <AnimatedHamburger isOpen={isMobileHeaderOpen} />
+              <Search className="w-4 h-4" />
             </button>
+            <HUDTaskBar variant="header" />
           </div>
         </div>
 
@@ -838,8 +831,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             {renderNavGroupContent(false)}
           </nav>
 
-          {/* Desktop Bottom Controls: Admin, Help & Support, Profile/Auth */}
+          {/* Desktop Bottom Controls: Daily alignment, Admin, Help & Support, Profile/Auth */}
           <div className="mt-auto shrink-0 border-t border-line-subtle divide-y divide-line-subtle bg-surface-1 relative z-40 overflow-visible">
+            <HUDTaskBar variant="sidebar" collapsed={isCollapsed} />
             {/* Desktop Bottom Controls: Help & Support + User Avatar / Auth */}
             {isCollapsed ? (
               <div className="flex flex-col divide-y divide-line-subtle relative overflow-visible">
@@ -1133,6 +1127,16 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         </div>
       </aside>
 
+      <HUDMobileTabBar
+        tabs={mobileTabs}
+        activeId={mobileActiveId}
+        moreOpen={isMobileHeaderOpen}
+        moreBadge={pendingFriendRequests}
+        onNavigate={(path) => handleNavClick(path)}
+        onToggleMore={toggleMobileMenu}
+        moreButtonRef={mobileTriggerRef}
+      />
+
       {/* SOLID MOBILE NAVIGATION PORTAL (Anchored directly below the persistent mobile header) */}
       {isMounted &&
         (isMobileOpen || isMobileClosing) &&
@@ -1145,36 +1149,20 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             aria-hidden={isMobileClosing}
             role="dialog"
             aria-modal="true"
-            aria-label="Navigation Menu"
-            className={`md:hidden fixed inset-x-0 bottom-0 top-14 z-[99990] w-screen h-[calc(100dvh-3.5rem)] bg-abyss flex flex-col font-sans text-ink select-none overflow-hidden transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${
+            aria-label="More pages"
+            className={`md:hidden fixed inset-x-0 top-14 bottom-[calc(var(--hud-tabbar-height)+env(safe-area-inset-bottom,0px))] z-[99990] w-screen bg-abyss flex flex-col font-sans text-ink select-none overflow-hidden transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${
               isMobileVisible && !isMobileClosing
                 ? 'opacity-100 translate-y-0'
                 : 'opacity-0 -translate-y-2 pointer-events-none'
             }`}
           >
-            {/* Search Bar (Click opens Command Palette & closes mobile menu) */}
-            <div className="shrink-0 border-b border-line-subtle bg-surface-1">
-              <button
-                onClick={() => {
-                  closeMobileMenu(() => handleOpenCommandPalette())
-                }}
-                className="w-full flex items-center justify-between px-4 py-3 text-xs font-sans text-ink-muted hover:text-ink transition-all group active:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
-                title="Search pages and members"
-              >
-                <div className="flex items-center gap-2.5 truncate">
-                  <Search className="w-4 h-4 text-cyan-glow shrink-0" />
-                  <span className="truncate text-xs font-sans text-ink-body">Search…</span>
-                </div>
-              </button>
-            </div>
-
             {/* Full-Screen Scrollable Navigation Groups List */}
             <nav className="flex-1 divide-y divide-line-subtle bg-surface-1 overflow-y-auto overflow-x-hidden min-h-0 overscroll-contain">
               {renderNavGroupContent(true)}
             </nav>
 
             {/* Mobile Bottom Controls: Admin + Help & Support + Operative Account / Auth */}
-            <div className="mt-auto shrink-0 border-t border-line-subtle divide-y divide-line-subtle bg-surface-1 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+            <div className="mt-auto shrink-0 border-t border-line-subtle divide-y divide-line-subtle bg-surface-1">
               {/* Admin Nav Item (Mobile) */}
               {canViewAdmin && (
                 <div

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { Outlet, useLocation } from '@tanstack/react-router'
-import { HUDHeader } from '@/components/hud/HUDHeader'
 import { HUDSidebar } from '@/components/hud/HUDSidebar'
 import { CommandPalette } from '@/components/hud/CommandPalette'
 import { SynapticOracleWidget } from '@/components/hud/SynapticOracleWidget'
@@ -60,7 +59,6 @@ function HudContent() {
               (location.search as string).includes('main_only=true')))
     )
 
-  const reserveMobileOracleSpace = !isMainOnly && !isFullscreenRoute && oracle?.mode !== 'sidebar'
   const isPending = session.isPending
   const targetId = isPending ? null : userId || 'guest'
   const isDashboardRoute =
@@ -182,12 +180,9 @@ function HudContent() {
         <div className="flex-1 min-w-0 flex h-full overflow-hidden">
           {/* Main Workspace */}
           <div className="flex-1 min-w-0 flex flex-col h-full overflow-hidden relative">
-            {/* Portal Top Bar (hidden in main-only mode) */}
-            {!isMainOnly && <HUDHeader />}
-
             {/* Main Panel Content Workspace with Ultra-Translucent Glass Backdrop */}
             <main
-              className={`flex-1 min-h-0 ${reserveMobileOracleSpace ? 'hud-mobile-oracle-clearance' : ''} ${
+              className={`flex-1 min-h-0 ${
                 isFullscreenRoute
                   ? 'p-0 overflow-hidden'
                   : 'p-2.5 sm:p-4 md:p-6 overflow-y-auto overscroll-y-contain'

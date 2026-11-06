@@ -1,19 +1,6 @@
-/* Keep the fixed phone dock and workspace on the same safe-area geometry. */
-.hud-layout {
-  --oracle-mobile-launcher-height: 2.75rem;
-  --oracle-mobile-bottom-offset: max(0.75rem, env(safe-area-inset-bottom, 0px));
-}
-
-@media (width < 640px) {
-  .hud-mobile-oracle-clearance {
-    /* Scroll content behind the floating launcher, with room to reach its end. */
-    padding-bottom: calc(var(--oracle-mobile-launcher-height) + var(--oracle-mobile-bottom-offset) + 0.5rem);
-  }
-
-  .hud-mobile-oracle-clearance > div {
-    /* Let long pages grow so their final content clears the launcher on scroll. */
-    min-height: auto;
-  }
+/* Phone bottom bar height; the More sheet (portalled to body) stops above it. */
+:root {
+  --hud-tabbar-height: 3.5rem;
 }
 
 /* Horizontal Stock Ticker Marquee Animation */
