@@ -9,19 +9,19 @@ import {
 } from './notifications-refresh'
 
 describe('shouldFetchNotifications', () => {
-  it('keeps the remote inbox off so HUD tabs do not query Neon', () => {
-    expect(NOTIFICATIONS_REMOTE_INBOX_ENABLED).toBe(false)
-    expect(isRemoteInboxEnabled()).toBe(false)
+  it('reads the inbox on load but never more often than the minimum gap', () => {
+    expect(NOTIFICATIONS_REMOTE_INBOX_ENABLED).toBe(true)
+    expect(isRemoteInboxEnabled()).toBe(true)
+    expect(shouldFetchNotifications({ lastFetchedAt: null, now: 1_000 })).toBe(true)
+    expect(shouldFetchNotifications({ lastFetchedAt: 1_000, now: 1_000 + NOTIFICATIONS_MIN_INTERVAL_MS - 1 })).toBe(false)
+    expect(shouldFetchNotifications({ lastFetchedAt: 1_000, now: 1_000 + NOTIFICATIONS_MIN_INTERVAL_MS })).toBe(true)
+  })
+
+  it('reads nothing when the inbox is switched off', () => {
+    expect(isRemoteInboxEnabled(false)).toBe(false)
     expect(DISABLED_REMOTE_INBOX_LIST).toEqual({ notifications: [], unreadCount: 0 })
     expect(DISABLED_REMOTE_INBOX_MARK_READ).toEqual({ ok: true })
-    expect(shouldFetchNotifications({ lastFetchedAt: null, now: 1_000 })).toBe(false)
-    expect(
-      shouldFetchNotifications({
-        lastFetchedAt: 1_000,
-        now: 1_001,
-        force: true,
-      }),
-    ).toBe(false)
+    expect(shouldFetchNotifications({ lastFetchedAt: null, now: 1_000, force: true, enabled: false })).toBe(false)
   })
 
   it('allows the first fetch and user-forced fetches when the inbox is on', () => {

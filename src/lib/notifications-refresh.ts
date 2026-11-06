@@ -1,14 +1,12 @@
 import type { NotificationView } from './notifications'
 
 /**
- * Remote HUD inbox (hails, forum pings, friend alerts) requires a Postgres read.
- * Keep this off on Neon Free until we have a push/no-poll path. Toasts stay local
- * and do not use this flag.
- *
- * Flip to true to restore mount/focus fetch with NOTIFICATIONS_MIN_INTERVAL_MS.
- * Server handlers must honor this too: stale pre-#138 tabs still POST getNotificationsFn.
+ * Notifications inbox (friend requests, forum replies and mentions). There is no
+ * timer: the inbox reads once on load, again when the tab regains focus (no more
+ * often than NOTIFICATIONS_MIN_INTERVAL_MS), and whenever the bell is opened.
+ * Server handlers honor this flag too, so flipping it off stops every read.
  */
-export const NOTIFICATIONS_REMOTE_INBOX_ENABLED = false
+export const NOTIFICATIONS_REMOTE_INBOX_ENABLED = true
 
 /**
  * Automatic HUD inbox fetches must stay above Neon Free's ~5-minute idle.

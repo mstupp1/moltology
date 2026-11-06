@@ -39,7 +39,7 @@ describe('notification inbox handlers', () => {
         user: { sub: viewerId },
         db: mockDb as any,
       },
-    })
+    }, { enabled: false })
 
     expect(result).toEqual({ notifications: [], unreadCount: 0 })
     expect(mockDb.select).not.toHaveBeenCalled()
@@ -59,14 +59,14 @@ describe('notification inbox handlers', () => {
         user: { sub: viewerId },
         db: mockDb as any,
       },
-    })
+    }, { enabled: false })
     const all = await markNotificationReadHandler({
       data: { all: true, userId: viewerId },
       context: {
         user: { sub: viewerId },
         db: mockDb as any,
       },
-    })
+    }, { enabled: false })
 
     expect(single).toEqual({ ok: true })
     expect(all).toEqual({ ok: true })
@@ -155,6 +155,45 @@ describe('notification inbox handlers', () => {
         readAt: '2026-09-06T01:05:00.000Z',
       }),
     )
+  })
+
+  it('counts every unread row when the page is full', async () => {
+    const pageRow = {
+      id: '33333333-3333-4333-8333-333333333333',
+      kind: 'forum_reply',
+      title: 'A reply reached your thread',
+      detail: 'Someone answered a thread you opened.',
+      actorUserId: actorId,
+      payload: { categorySlug: 'general-discussion', topicSlug: 'molt-notes', postId: 'p1' },
+      readAt: null,
+      createdAt: new Date('2026-09-06T00:00:00.000Z'),
+      actorLarvaId: null,
+      actorHandle: 'pincer_prime',
+    }
+    const countWhere = vi.fn().mockResolvedValue([{ count: 7 }])
+    const mockDb = {
+      select: vi
+        .fn()
+        .mockReturnValueOnce({
+          from: vi.fn().mockReturnValue({
+            leftJoin: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                orderBy: vi.fn().mockReturnValue({ limit: vi.fn().mockResolvedValue([pageRow]) }),
+              }),
+            }),
+          }),
+        })
+        .mockReturnValueOnce({ from: vi.fn().mockReturnValue({ where: countWhere }) }),
+    }
+
+    const result = await getNotificationsHandler(
+      { data: { userId: viewerId, limit: 1 }, context: { user: { sub: viewerId }, db: mockDb as any } },
+      { enabled: true },
+    )
+
+    expect(result.notifications).toHaveLength(1)
+    expect(result.unreadCount).toBe(7)
+    expect(countWhere).toHaveBeenCalledTimes(1)
   })
 
   it('marks a single notification read for the owner', async () => {

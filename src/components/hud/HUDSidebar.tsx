@@ -49,6 +49,7 @@ import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { getAssetUrl } from '@/lib/assets'
 import { HUDMobileTabBar } from './HUDMobileTabBar'
 import { HUDTaskBar } from './HUDTaskBar'
+import { NotificationsBell } from './NotificationsBell'
 import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 
 /** Pages in the phone bottom bar; the rest go in its More sheet, in this order. */
@@ -750,6 +751,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             >
               <Search className="w-4 h-4" />
             </button>
+            <NotificationsBell variant="header" />
             <HUDTaskBar variant="header" />
           </div>
         </div>
@@ -831,8 +833,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             {renderNavGroupContent(false)}
           </nav>
 
-          {/* Desktop Bottom Controls: Daily alignment, Admin, Help & Support, Profile/Auth */}
+          {/* Desktop Bottom Controls: Notifications, Daily alignment, Admin, Help & Support, Profile/Auth */}
           <div className="mt-auto shrink-0 border-t border-line-subtle divide-y divide-line-subtle bg-surface-1 relative z-40 overflow-visible">
+            <NotificationsBell variant="sidebar" collapsed={isCollapsed} />
             <HUDTaskBar variant="sidebar" collapsed={isCollapsed} />
             {/* Desktop Bottom Controls: Help & Support + User Avatar / Auth */}
             {isCollapsed ? (
