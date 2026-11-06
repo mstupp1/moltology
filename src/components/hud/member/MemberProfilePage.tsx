@@ -111,8 +111,8 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
         <div className="rounded-card p-5 border border-crimson-aggro/40 bg-surface-crimson hud-sheen text-crimson-text">
           <h1 className="font-grotesk text-sm font-bold uppercase tracking-[0.08em]">Profile unavailable</h1>
           <p className="text-xs mt-2 text-ink-muted">{error || 'Member not found.'}</p>
-          <Link to="/connections" className="inline-block mt-4 text-xs text-cyan-glow underline rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
-            Back to Connections
+          <Link to="/friends" search={{ tab: 'friends' }} className="inline-block mt-4 text-xs text-cyan-glow underline rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
+            Back to friends
           </Link>
         </div>
       </div>
@@ -276,7 +276,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">Equipped gear</h2>
             {isSelf && (
-              <Link to="/chassis" className="text-xs text-cyan-glow hover:text-ink">
+              <Link to="/character" className="text-xs text-cyan-glow hover:text-ink">
                 Change gear
               </Link>
             )}

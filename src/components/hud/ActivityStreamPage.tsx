@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { ActivityFeedItem } from '@/components/hud/ActivityFeedItem'
 import { HudButton } from '@/components/ui/HudButton'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -60,6 +59,7 @@ function SegmentedControl<T extends string>({
   )
 }
 
+/** The friends activity feed. The Friends page (/friends) supplies the title and card. */
 export function ActivityStreamPage() {
   const session = useAuthSession()
   const userId = session.userId
@@ -149,13 +149,8 @@ export function ActivityStreamPage() {
   const showEmpty = !isLoading && events.length === 0
 
   return (
-    <div className="space-y-3.5 sm:space-y-5 font-sans relative">
-      <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3.5">
-        <HudTitlePanel
-          treatment="integrated"
-          accent="cyan"
-          title="Activity Stream"
-        />
+    <div className="font-sans relative">
+      <div className="space-y-3.5">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <SegmentedControl
             items={ACTIVITY_FEED_SCOPES}

@@ -24,7 +24,7 @@ export default function PipelineView() {
       <HudTitlePanel
         surface="solid"
         accent="cyan"
-        title="The descent"
+        title="Stages"
         actions={
           <div className="flex items-center gap-4">
             <div>

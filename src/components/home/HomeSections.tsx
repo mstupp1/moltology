@@ -490,7 +490,7 @@ export const HomeVoices: React.FC = () => (
       </HorizontalScroll>
 
       <ScrollReveal>
-        <Link to="/what-is-moltology/what-moltologists-say" className={`mt-10 sm:mt-12 text-[#00ffcc] ${textLink}`}>
+        <Link to="/what-is-moltology" hash="voices" className={`mt-10 sm:mt-12 text-[#00ffcc] ${textLink}`}>
           Hear more from members
           <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
         </Link>

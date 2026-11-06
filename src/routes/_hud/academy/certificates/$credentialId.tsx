@@ -6,7 +6,7 @@ import { ACADEMY_COPY } from '@/lib/academy'
 import { seo } from '@/lib/seo'
 import { getAcademyCertificateFn } from '@/lib/server/academy-api'
 
-export const Route = createFileRoute('/_hud/lectures/certificates/$credentialId')({
+export const Route = createFileRoute('/_hud/academy/certificates/$credentialId')({
   loader: async ({ params }) => {
     try {
       const credential = await getAcademyCertificateFn({ data: { credentialId: params.credentialId } })

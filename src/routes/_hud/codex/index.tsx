@@ -3,7 +3,7 @@ import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 
 export const CODEX_VAULT_SEO = {
-  title: 'The Sacred Codex | Moltology Scriptures & Doctrine',
+  title: 'Codex: Moltology scripture | Moltology',
   description:
     'Read the official liturgical scriptures, ecdysis directives, and benthic ascendance formulas of Moltology.',
   keywords:

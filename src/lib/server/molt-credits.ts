@@ -69,8 +69,8 @@ export function buildCreditCheckoutParams(input: {
     ],
     metadata,
     payment_intent_data: { metadata },
-    success_url: `${input.origin}/market?credits=success`,
-    cancel_url: `${input.origin}/market?credits=cancel`,
+    success_url: `${input.origin}/character/shop?credits=success`,
+    cancel_url: `${input.origin}/character/shop?credits=cancel`,
   }
 }
 

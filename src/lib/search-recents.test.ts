@@ -92,11 +92,11 @@ describe('search recents', () => {
   })
 
   it('replays a stored page from the live catalog when the chamber still exists', () => {
-    rememberOpenedPage(MEMBER_A, COMMAND_CATALOG.find((cmd) => cmd.id === 'nav-connections')!)
+    rememberOpenedPage(MEMBER_A, COMMAND_CATALOG.find((cmd) => cmd.id === 'nav-friends')!)
     const stored = getSearchRecents(MEMBER_A)[0]
     expect(stored.kind).toBe('page')
     if (stored.kind !== 'page') return
-    expect(pageFromRecent(stored).to).toBe('/connections')
+    expect(pageFromRecent(stored).to).toBe('/friends')
   })
 
   it('ignores saved journal entries after the section is removed', () => {

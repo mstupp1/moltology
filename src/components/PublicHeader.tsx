@@ -11,7 +11,6 @@ import React, { useState, useEffect, useMemo, Suspense, lazy } from 'react'
 import { BrandIcon } from '@/components/ui/BrandMark'
 import { useNavigate, useLocation } from '@tanstack/react-router'
 import {
-  Building2,
   ShoppingBag,
   ExternalLink,
   Newspaper,
@@ -52,9 +51,8 @@ const NAV_TABS: NavTab[] = [
   { id: 'home', label: 'Home', path: '/' },
   { id: 'news', label: 'News', path: '/news', Icon: Newspaper },
   { id: 'forum', label: 'Forum', path: '/forum', Icon: MessageSquare },
-  { id: 'moltmax', label: 'Moltmax', path: '/moltmax', Icon: Activity },
+  { id: 'moltmax', label: 'Quiz', path: '/moltmax', Icon: Activity },
   { id: 'about', label: 'About', path: '/what-is-moltology', Icon: Info },
-  { id: 'org', label: 'Organization', path: '/org', Icon: Building2 },
   { id: 'store', label: 'Store', href: 'https://www.etsy.com/shop/SaasTrash', Icon: ShoppingBag, external: true },
 ]
 

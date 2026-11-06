@@ -1,6 +1,53 @@
 {
   "framework": "tanstack-start",
   "ignoreCommand": "bash scripts/vercel-ignore-build.sh",
+  "redirects": [
+    {
+      "source": "/chassis",
+      "destination": "/character",
+      "permanent": true
+    },
+    {
+      "source": "/pipeline",
+      "destination": "/stages",
+      "permanent": true
+    },
+    {
+      "source": "/lectures",
+      "destination": "/academy",
+      "permanent": true
+    },
+    {
+      "source": "/lectures/:path*",
+      "destination": "/academy/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/landing",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/stream",
+      "destination": "/friends?tab=feed",
+      "permanent": true
+    },
+    {
+      "source": "/connections",
+      "destination": "/friends",
+      "permanent": true
+    },
+    {
+      "source": "/market",
+      "destination": "/character/shop",
+      "permanent": true
+    },
+    {
+      "source": "/what-is-moltology/what-moltologists-say",
+      "destination": "/what-is-moltology#voices",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/media/:path*",

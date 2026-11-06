@@ -126,7 +126,8 @@ describe('ActivityStreamPage', () => {
     expect(screen.getByText('shell_sib')).toBeInTheDocument()
     expect(screen.getByText('Held for 7 consecutive days.')).toBeInTheDocument()
     expect(screen.getByText('7 days')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Activity Stream' })).toBeInTheDocument()
+    // The Friends page owns the title; the feed renders only its controls and items.
+    expect(screen.queryByRole('heading', { name: 'Activity Stream' })).not.toBeInTheDocument()
   })
 
   it('requests the You slice when that audience is selected', async () => {

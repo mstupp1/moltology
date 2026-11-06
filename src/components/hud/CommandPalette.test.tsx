@@ -175,7 +175,7 @@ describe('CommandPalette Component', () => {
     expect(screen.getByText('Oracle')).toBeInTheDocument()
 
     fireEvent.change(input, { target: { value: 'connections' } })
-    expect(screen.getByText('Connections')).toBeInTheDocument()
+    expect(screen.getByText('Friends')).toBeInTheDocument()
 
     fireEvent.change(input, { target: { value: 'news' } })
     expect(screen.getAllByText('News').length).toBeGreaterThan(0)

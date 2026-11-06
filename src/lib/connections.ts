@@ -202,10 +202,10 @@ export function resolveConnectionsTab(
 }
 
 export function connectionsPageLocation(tab: ConnectionsTab = 'friends'): {
-  to: '/connections'
+  to: '/friends'
   search: { tab: ConnectionsTab }
 } {
-  return { to: '/connections', search: { tab } }
+  return { to: '/friends', search: { tab } }
 }
 
 /** Hub CTA: Incoming when anything is pending, otherwise Friends. */
@@ -401,4 +401,25 @@ export function toMemberSummary(row: {
         : row.since.toISOString()
       : undefined,
   }
+}
+
+/**
+ * The Friends page (/friends) holds the activity feed and the friends list.
+ * Its `tab` search value is the feed or one of the connection lists.
+ */
+export const FRIENDS_PAGE_TABS = ['feed', ...CONNECTIONS_TABS] as const
+export type FriendsPageTab = (typeof FRIENDS_PAGE_TABS)[number]
+export type FriendsPageSection = 'feed' | 'friends' | 'requests'
+
+export const FRIENDS_PAGE_DESCRIPTION = 'See what your circle is up to, find members, and answer friend requests.'
+
+export function parseFriendsPageTab(value: unknown): FriendsPageTab | undefined {
+  return value === 'feed' || isConnectionsTab(value) ? value : undefined
+}
+
+/** Feed is the default; Incoming and Sent both live under Requests. */
+export function friendsPageSection(tab: FriendsPageTab | undefined): FriendsPageSection {
+  if (tab === 'friends') return 'friends'
+  if (tab === 'incoming' || tab === 'sent') return 'requests'
+  return 'feed'
 }

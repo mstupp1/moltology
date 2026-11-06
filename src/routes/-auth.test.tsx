@@ -118,7 +118,7 @@ describe('Auth Split Landing Page Component (/auth)', () => {
   })
 
   it('triggers Google OAuth flow with callback destination', async () => {
-    mockSearch = { mode: 'login', redirect: '/chassis' }
+    mockSearch = { mode: 'login', redirect: '/character' }
     vi.mocked(authClient.signIn.social).mockResolvedValue({} as any)
 
     render(<AuthRoute />)
@@ -128,7 +128,7 @@ describe('Auth Split Landing Page Component (/auth)', () => {
 
     expect(authClient.signIn.social).toHaveBeenCalledWith({
       provider: 'google',
-      callbackURL: expect.stringContaining('/chassis'),
+      callbackURL: expect.stringContaining('/character'),
       errorCallbackURL: expect.stringMatching(/\/auth$/),
     })
   })

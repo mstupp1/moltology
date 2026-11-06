@@ -8,7 +8,7 @@ description: >-
 
 Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
 
-This skill guides the design, visual generation, asset optimization, and codebase registration of **cohesive, themed equipment sets** for the Moltology Chassis Configurator (`/chassis`) and Equipment Vault.
+This skill guides the design, visual generation, asset optimization, and codebase registration of **cohesive, themed equipment sets** for the Moltology Chassis Configurator (`/character`) and Equipment Vault.
 
 ---
 
@@ -170,4 +170,4 @@ When introducing new equipment pieces or full sets:
 - [ ] **Visual Consistency**: Unified materials, lighting direction, glow hue, and slate backdrop.
 - [ ] **Asset Validation**: 9:16 aspect ratio, valid WebP header, responsive loading.
 - [ ] **Unit Tests**: `npm run test:core` passes all chassis and seed validation tests.
-- [ ] **Live UI Check**: Inspect `/chassis` in the browser to ensure zero 404s, clean card rendering in both equipped paperdoll and vault grid cells.
+- [ ] **Live UI Check**: Inspect `/character` in the browser to ensure zero 404s, clean card rendering in both equipped paperdoll and vault grid cells.

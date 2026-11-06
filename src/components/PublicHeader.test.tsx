@@ -30,15 +30,11 @@ describe('PublicHeader Navigation Component', () => {
 
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
     expect(within(nav).getByRole('link', { name: /^HOME$/i })).toBeInTheDocument()
-    expect(within(nav).getByRole('link', { name: /^MOLTMAX$/i })).toBeInTheDocument()
+    expect(within(nav).getByRole('link', { name: /^QUIZ$/i })).toHaveAttribute('href', '/moltmax')
     expect(within(nav).getByText('About')).toBeInTheDocument()
-    expect(within(nav).getByText('Organization')).toBeInTheDocument()
-
-    const aboutBtn = within(nav).getByRole('link', { name: /^ABOUT$/i })
-    const orgBtn = within(nav).getByRole('link', { name: /ORGANIZATION/i })
-    expect(
-      aboutBtn.compareDocumentPosition(orgBtn) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy()
+    // The company page lives in the footer, not the header.
+    expect(within(nav).queryByText('Organization')).not.toBeInTheDocument()
+    expect(within(nav).queryByRole('link', { name: /COMPANY/i })).not.toBeInTheDocument()
 
     const storeLink = within(nav).getByRole('link', { name: /STORE/i })
     expect(storeLink).toBeInTheDocument()
@@ -87,10 +83,10 @@ describe('PublicHeader Navigation Component', () => {
     const newsBtn = within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('link', { name: /NEWS/i })
     expect(newsBtn).toHaveClass('text-ink', 'bg-surface-3')
 
-    mockPathname = '/org'
-    rerender(<PublicHeader activePage="org" />)
-    const orgBtn = within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('link', { name: /ORGANIZATION/i })
-    expect(orgBtn).toHaveClass('text-ink', 'bg-surface-3', 'shadow-nav-current')
+    mockPathname = '/what-is-moltology'
+    rerender(<PublicHeader activePage="about" />)
+    const aboutBtn = within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('link', { name: /^ABOUT$/i })
+    expect(aboutBtn).toHaveClass('text-ink', 'bg-surface-3', 'shadow-nav-current')
   })
 
   it('automatically highlights NEWS tab for any /news sub-page article route', () => {
@@ -195,8 +191,8 @@ describe('PublicHeader Navigation Component', () => {
     expect(document.body.style.overflow).toBe('hidden')
 
     const mobileNav = screen.getByRole('navigation', { name: /mobile navigation/i })
-    const moltmaxRow = within(mobileNav).getByRole('link', { name: /^Moltmax/i })
-    expect(moltmaxRow).toHaveTextContent('Moltmax')
+    const moltmaxRow = within(mobileNav).getByRole('link', { name: /^Quiz/i })
+    expect(moltmaxRow).toHaveTextContent('Quiz')
     expect(moltmaxRow).not.toHaveTextContent('Take the clearance audit')
     expect(within(mobileNav).getByRole('link', { name: /^Home/i })).toHaveAttribute('aria-current', 'page')
 
@@ -264,7 +260,7 @@ describe('PublicHeader Navigation Component', () => {
     expect(forumLink).toHaveClass('text-ink')
     expect(forumLink).not.toHaveClass('text-ink-muted', 'bg-surface-3')
 
-    fireEvent.focus(within(nav).getByRole('link', { name: /^MOLTMAX$/i }))
+    fireEvent.focus(within(nav).getByRole('link', { name: /^QUIZ$/i }))
     expect(newsLink).toHaveClass('text-ink', 'bg-surface-3')
   })
 
