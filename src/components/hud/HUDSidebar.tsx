@@ -1137,11 +1137,20 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         moreButtonRef={mobileTriggerRef}
       />
 
-      {/* SOLID MOBILE NAVIGATION PORTAL (Anchored directly below the persistent mobile header) */}
+      {/* Phone More sheet: sized to its rows and sitting on the bottom bar, over a dimmed page */}
       {isMounted &&
         (isMobileOpen || isMobileClosing) &&
         typeof document !== 'undefined' &&
         createPortal(
+          <>
+          <div
+            aria-hidden
+            data-testid="more-backdrop"
+            onClick={() => closeMobileMenu()}
+            className={`md:hidden fixed inset-x-0 top-14 bottom-[calc(var(--hud-tabbar-height)+env(safe-area-inset-bottom,0px))] z-[99989] bg-abyss/70 transition-opacity duration-200 ease-out motion-reduce:transition-none ${
+              isMobileVisible && !isMobileClosing ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
+          />
           <div
             ref={mobileDialogRef}
             tabIndex={-1}
@@ -1150,14 +1159,14 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             role="dialog"
             aria-modal="true"
             aria-label="More pages"
-            className={`md:hidden fixed inset-x-0 top-14 bottom-[calc(var(--hud-tabbar-height)+env(safe-area-inset-bottom,0px))] z-[99990] w-screen bg-abyss flex flex-col font-sans text-ink select-none overflow-hidden transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${
+            className={`md:hidden fixed inset-x-0 bottom-[calc(var(--hud-tabbar-height)+env(safe-area-inset-bottom,0px))] max-h-[calc(100dvh-3.5rem-var(--hud-tabbar-height)-env(safe-area-inset-bottom,0px))] z-[99990] w-screen bg-surface-1 border-t border-line rounded-t-card shadow-menu flex flex-col font-sans text-ink select-none overflow-hidden transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${
               isMobileVisible && !isMobileClosing
                 ? 'opacity-100 translate-y-0'
-                : 'opacity-0 -translate-y-2 pointer-events-none'
+                : 'opacity-0 translate-y-4 pointer-events-none'
             }`}
           >
-            {/* Full-Screen Scrollable Navigation Groups List */}
-            <nav className="flex-1 divide-y divide-line-subtle bg-surface-1 overflow-y-auto overflow-x-hidden min-h-0 overscroll-contain">
+            {/* Pages that are not in the bottom bar */}
+            <nav className="divide-y divide-line-subtle bg-surface-1 overflow-y-auto overflow-x-hidden min-h-0 overscroll-contain">
               {renderNavGroupContent(true)}
             </nav>
 
@@ -1277,7 +1286,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 )}
               </div>
             </div>
-          </div>,
+          </div>
+          </>,
           document.body
         )}
     </>
