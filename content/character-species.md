@@ -61,6 +61,36 @@ Generative edits re-rendered some surface detail beyond the center figures; the
 v1 outer views remain available. This acceptance does not claim strict geometric
 orthographic accuracy or production deployment.
 
+## Durable approved reference assets
+
+The four approved inputs are archived on Neon S3 as original PNGs. On
+2026-11-05 each public object returned HTTP 200 and matched the inspected local
+file byte-for-byte. Local experiments remain preserved; these keys make the
+same approved references recoverable in a fresh worktree.
+
+| Reference | Asset key | Original PNG SHA-256 |
+| --- | --- | --- |
+| lobster-species-v1 | `images/characters/references/lobster-species-v1.png` | `da950be3f5c12a02150c555cad564c9d6d9d49646ab26dd230797ee61000902d` |
+| crab-species-v2 | `images/characters/references/crab-species-v2.png` | `53c347998bc3b559290aeff077b692ae3f9b6d7ff11aef4749625528872b3a49` |
+| lobster-turnaround-v2 | `images/characters/references/lobster-turnaround-v2.png` | `8a6a35af6640b01b121cb2abc15b312caa533a32b93cc2742cefce38dae0d820` |
+| crab-turnaround-v2 | `images/characters/references/crab-turnaround-v2.png` | `11671b7551c54bd9dd093a592be0bb412cbd9f490bf1764474142851192c5482` |
+
+Resolve keys with `getAbsoluteAssetUrl()` from `src/lib/assets.ts` to download
+the original PNG format. Restore to the local paths in the selected-anchor and
+turnaround sections above, verify the SHA-256, then inspect the actual image
+before generation. Prefer original PNGs over automatic compressed twins for
+style and anatomy references. Never regenerate a missing approved foundation
+as a substitute for retrieval.
+
+For existing individuals, read the current `MASCOT_CAST` in `src/lib/mascots.ts`,
+replace the active filename's `.webp` extension with `.png`, and retrieve
+`images/characters/<filename>.png` through the same resolver. Save to
+`scratch/character_refs/` and `scratch/characters/` when absent, retaining any
+older local versions. Verify against the latest individual brief's source hash.
+The active [cast ledger](../docs/character-cast-v5.md) identifies current versions.
+New poses use that individual's current image; new individuals use the approved
+species/style references plus their own avatar study and brief.
+
 ## Implemented species grammar
 
 | Species | Visible design grammar to preserve | Stylized limb convention |

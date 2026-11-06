@@ -48,6 +48,13 @@ with a clean tracked tree at `c1f0bd2`; the current v5 revision started at
 `fd552c84`. No unrelated concurrent edits were present. Earlier Luna generation
 and review work has settled; the parent handled these four requested edits.
 
+Approved species foundations and accepted turnarounds are now archived under
+`images/characters/references/` as original PNGs. All four public PNGs matched
+the local approved bytes. Exact keys, hashes and fresh-worktree recovery steps
+are in [species reference assets](../content/character-species.md#durable-approved-reference-assets).
+Active individual PNG masters are already uploaded too. No new generation is
+needed to recover these references.
+
 ## Approved style and species inputs
 
 | Reference | Local path | User state |
