@@ -7,6 +7,21 @@ export interface CaptureTarget {
   scaleFactor: number
   isMobile?: boolean
   outputBase: string
+  /**
+   * Frame one part of the page instead of the whole viewport: the element matching `selector`
+   * (or its nearest `closest` ancestor), padded, then widened to the viewport's aspect ratio.
+   */
+  clip?: { selector: string; closest?: string; pad: number }
+}
+
+/**
+ * Homepage body shots sit in a ~690px frame, so a full 1760px desktop reads as a thumbnail.
+ * They use a tighter laptop viewport, and some frame the part of the page worth seeing.
+ */
+const FEATURE_FRAMING: Record<string, Pick<CaptureTarget, 'windowSize' | 'clip'>> = {
+  // The public header folds into a menu below 1280px, so the quiz keeps a wide viewport and
+  // frames just the question card.
+  moltmax: { windowSize: '1440,900', clip: { selector: '[role=progressbar]', closest: '.rounded-2xl', pad: 24 } },
 }
 
 export const REGISTERED_TARGETS: Record<string, CaptureTarget> = Object.fromEntries(
@@ -22,7 +37,8 @@ export const REGISTERED_TARGETS: Record<string, CaptureTarget> = Object.fromEntr
     })),
     ...(['dashboard', 'forum', 'oracle', 'moltmax'].includes(sector.id) ? [{
       name: `${sector.id}_feature`, route: `${sector.route}?view=main`,
-      windowSize: '1760,1100', scaleFactor: 2, outputBase: `${sector.id}_feature_preview`,
+      windowSize: '1120,700', scaleFactor: 2, outputBase: `${sector.id}_feature_preview`,
+      ...FEATURE_FRAMING[sector.id],
     }] : []),
   ]).map((target) => [target.name, target]),
 )

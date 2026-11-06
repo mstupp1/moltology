@@ -259,7 +259,7 @@ async function main() {
         await page.mouse.move(width - 2, Math.round(height / 2))
         await page.addStyleTag({ content: CAPTURE_CSS })
         const pngPath = path.join(stage, `${target.outputBase}.png`)
-        await page.screenshot({ path: pngPath, animations: 'disabled' })
+        await page.screenshot({ path: pngPath, animations: 'disabled', clip: target.clip ? await clipRegion(page, target.clip, width, height) : undefined })
         await encodeMarketingWebp(pngPath, path.join(stage, `${target.outputBase}.webp`), 90)
         await encodeMarketingWebp(pngPath, path.join(stage, `${target.outputBase}_sm.webp`), 86, target.isMobile ? 540 : 1280)
       } finally {
@@ -296,13 +296,31 @@ async function main() {
   }
 }
 
+/** The padded element box, grown to the viewport's aspect ratio and kept inside the viewport. */
+async function clipRegion(page: Page, clip: NonNullable<CaptureTarget['clip']>, width: number, height: number) {
+  const box = await page.locator(clip.selector).first().evaluate((node, closest) => {
+    const element = (closest ? node.closest(closest) : node) ?? node
+    const rect = element.getBoundingClientRect()
+    return { x: rect.x, y: rect.y, w: rect.width, h: rect.height }
+  }, clip.closest ?? null)
+  let w = box.w + clip.pad * 2
+  let h = box.h + clip.pad * 2
+  if (w / h > width / height) h = w * (height / width)
+  else w = h * (width / height)
+  w = Math.min(w, width)
+  h = Math.min(h, height)
+  const x = Math.max(0, Math.min(width - w, box.x + box.w / 2 - w / 2))
+  const y = Math.max(0, Math.min(height - h, box.y + box.h / 2 - h / 2))
+  return { x: Math.round(x), y: Math.round(y), width: Math.round(w), height: Math.round(h) }
+}
+
 /**
- * Capture-only chrome: no scrollbars, and no floating Oracle launcher, which otherwise covers the
- * bottom-right of every desktop shot and the bottom of every phone shot.
+ * Capture-only chrome: no scrollbars, no floating Oracle launcher (it covers the bottom-right of
+ * desktop shots and the bottom of phone shots) and no chat "Jump to latest" button.
  */
 const CAPTURE_CSS = [
   '* { scrollbar-width: none !important; } ::-webkit-scrollbar { display: none !important; }',
-  '[aria-label="Open Oracle AI Popout"], [aria-label="Open Oracle AI Tray"] { visibility: hidden !important; }',
+  '[aria-label="Open Oracle AI Popout"], [aria-label="Open Oracle AI Tray"], [aria-label="Jump to latest"] { visibility: hidden !important; }',
 ].join('\n')
 
 /**
@@ -350,6 +368,8 @@ async function stageOracleConversation(page: Page, exchanges: number, now: Date)
     await input.press('Enter')
     await page.getByText(sample.answer.split('\n')[0]).first().waitFor({ timeout: 15000 })
   }
+  // A short viewport scrolls to the latest reply; start the shot at the first question instead.
+  await page.getByText(ORACLE_SAMPLES[0].question).first().evaluate((node) => node.scrollIntoView({ block: 'start' }))
 }
 
 main().catch((err) => {
