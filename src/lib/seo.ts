@@ -414,7 +414,6 @@ export function generateSitemapXml(
     { loc: `${baseUrl}/guide`, priority: 0.95, changefreq: 'daily' },
     { loc: `${baseUrl}/what-is-moltology`, priority: 0.9, changefreq: 'weekly' },
     { loc: `${baseUrl}/what-is-moltology/beliefs`, priority: 0.85, changefreq: 'weekly' },
-    { loc: `${baseUrl}/what-is-moltology/what-moltologists-say`, priority: 0.85, changefreq: 'weekly' },
     { loc: `${baseUrl}/what-is-moltology/benthic-sacraments`, priority: 0.85, changefreq: 'weekly' },
     { loc: `${baseUrl}/news`, priority: 0.9, changefreq: 'daily' },
     { loc: `${baseUrl}/codex`, priority: 0.8, changefreq: 'weekly' },
@@ -422,7 +421,7 @@ export function generateSitemapXml(
     { loc: `${baseUrl}/academy`, priority: 0.7, changefreq: 'weekly' },
     { loc: `${baseUrl}/forum`, priority: 0.8, changefreq: 'daily' },
     { loc: `${baseUrl}/changelog`, priority: 0.6, changefreq: 'weekly' },
-    { loc: `${baseUrl}/market`, priority: 0.6, changefreq: 'weekly' },
+    { loc: `${baseUrl}/character/shop`, priority: 0.6, changefreq: 'weekly' },
     { loc: `${baseUrl}/privacy`, priority: 0.3, changefreq: 'monthly' },
     { loc: `${baseUrl}/terms`, priority: 0.3, changefreq: 'monthly' },
   ]

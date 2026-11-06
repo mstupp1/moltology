@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { MEMBER_VOICES, SACRAMENTS, STAGES } from './content'
-import { filterVoices } from '../WhatMoltologistsSayPage'
+import { SACRAMENTS, STAGES } from './content'
 
 const dir = join(__dirname, '..')
 const sources = [
@@ -10,7 +9,6 @@ const sources = [
   'WhatIsMoltologyHubPage.tsx',
   'BeliefsAndCodesPage.tsx',
   'BenthicSacramentsPage.tsx',
-  'WhatMoltologistsSayPage.tsx',
 ].map((file) => readFileSync(join(dir, file), 'utf8'))
 
 describe('About page copy', () => {
@@ -27,14 +25,5 @@ describe('About page copy', () => {
     for (const source of sources) {
       for (const pattern of banned) expect(source).not.toMatch(pattern)
     }
-  })
-})
-
-describe('filterVoices', () => {
-  it('returns every voice for "all" and only matching stages otherwise', () => {
-    expect(filterVoices(MEMBER_VOICES, 'all')).toHaveLength(MEMBER_VOICES.length)
-    const larval = filterVoices(MEMBER_VOICES, 'larval')
-    expect(larval.length).toBeGreaterThan(0)
-    expect(larval.every((voice) => voice.stage === 'larval')).toBe(true)
   })
 })

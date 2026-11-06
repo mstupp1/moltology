@@ -38,15 +38,14 @@ export type CommandNavTo =
   | '/codex'
   | '/codex/$slug'
   | '/academy'
-  | '/market'
+  | '/character/shop'
   | '/premium'
   | '/stages'
   | '/forum'
   | '/forum/$categorySlug'
-  | '/stream'
   | '/support'
   | '/oracle'
-  | '/connections'
+  | '/friends'
   | '/character'
   | '/news'
   | '/news/$slug'
@@ -106,6 +105,22 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     keywords: ['oracle', 'synaptic', 'chat', 'ask', 'ai'],
   },
   {
+    id: 'nav-chassis',
+    label: 'Character',
+    category: 'Page',
+    icon: 'chassis',
+    to: '/character',
+    keywords: ['character', 'gear', 'chassis', 'chassis configurator', 'loadout', 'cosmetics', 'avatar', 'configurator'],
+  },
+  {
+    id: 'nav-market',
+    label: 'Gear shop',
+    category: 'Page',
+    icon: 'market',
+    to: '/character/shop',
+    keywords: ['shop', 'gear shop', 'market', 'benthic market', 'credits', 'gems'],
+  },
+  {
     id: 'nav-codex',
     label: 'Codex',
     category: 'Page',
@@ -147,36 +162,12 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     keywords: ['forum', 'community', 'boards', 'topics', 'posts'],
   },
   {
-    id: 'nav-stream',
-    label: 'Activity',
-    category: 'Page',
-    icon: 'stream',
-    to: '/stream',
-    keywords: ['activity', 'activity stream', 'stream', 'feed'],
-  },
-  {
-    id: 'nav-connections',
-    label: 'Connections',
+    id: 'nav-friends',
+    label: 'Friends',
     category: 'Page',
     icon: 'connections',
-    to: '/connections',
-    keywords: ['connections', 'people', 'fellows', 'friends', 'links', 'followers'],
-  },
-  {
-    id: 'nav-chassis',
-    label: 'Character',
-    category: 'Page',
-    icon: 'chassis',
-    to: '/character',
-    keywords: ['character', 'gear', 'chassis', 'chassis configurator', 'loadout', 'cosmetics', 'avatar', 'configurator'],
-  },
-  {
-    id: 'nav-market',
-    label: 'Market',
-    category: 'Page',
-    icon: 'market',
-    to: '/market',
-    keywords: ['market', 'benthic market', 'shop', 'store', 'credits', 'gems'],
+    to: '/friends',
+    keywords: ['friends', 'connections', 'people', 'fellows', 'followers', 'activity', 'activity stream', 'stream', 'feed', 'requests'],
   },
   {
     id: 'nav-premium',

@@ -26,6 +26,26 @@
       "source": "/landing",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "/stream",
+      "destination": "/friends?tab=feed",
+      "permanent": true
+    },
+    {
+      "source": "/connections",
+      "destination": "/friends",
+      "permanent": true
+    },
+    {
+      "source": "/market",
+      "destination": "/character/shop",
+      "permanent": true
+    },
+    {
+      "source": "/what-is-moltology/what-moltologists-say",
+      "destination": "/what-is-moltology#voices",
+      "permanent": true
     }
   ],
   "rewrites": [

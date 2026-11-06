@@ -330,7 +330,8 @@ export function parseActivityEventHref(href?: string | null): ParsedActivityHref
   if (path === '/dashboard') return hash ? { kind: 'dashboard', hash } : { kind: 'dashboard' }
   // Older events stored /pipeline before the page moved to /stages.
   if (path === '/stages' || path === '/pipeline') return { kind: 'pipeline' }
-  if (path === '/connections') return { kind: 'connections' }
+  // /connections is the old address of the friends list.
+  if (path === '/friends' || path === '/connections') return { kind: 'connections' }
   if (path === '/oracle') return { kind: 'oracle' }
   if (path === '/forum') return { kind: 'forum' }
   const forum = path.match(/^\/forum\/([^/]+)(?:\/([^/]+))?$/)

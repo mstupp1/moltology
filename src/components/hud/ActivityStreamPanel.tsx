@@ -71,7 +71,7 @@ export function ActivityStreamPanel() {
     <DashboardPanel
       icon={<Activity />}
       title="Activity stream"
-      action={{ label: 'Open stream', onClick: () => navigate({ to: '/stream' }) }}
+      action={{ label: 'Open feed', onClick: () => navigate({ to: '/friends', search: { tab: 'feed' } }) }}
       className="h-full"
       data-testid="activity-stream-panel"
     >

@@ -310,10 +310,10 @@ describe('connections helpers', () => {
     expect(resolveConnectionsTab(undefined, 1)).toBe('incoming')
     expect(resolveConnectionsTab('friends', 2)).toBe('friends')
     expect(resolveConnectionsTab('sent', 2)).toBe('sent')
-    expect(connectionsHubLocation(0)).toEqual({ to: '/connections', search: { tab: 'friends' } })
-    expect(connectionsHubLocation(1)).toEqual({ to: '/connections', search: { tab: 'incoming' } })
+    expect(connectionsHubLocation(0)).toEqual({ to: '/friends', search: { tab: 'friends' } })
+    expect(connectionsHubLocation(1)).toEqual({ to: '/friends', search: { tab: 'incoming' } })
     expect(connectionsPageLocation('incoming')).toEqual({
-      to: '/connections',
+      to: '/friends',
       search: { tab: 'incoming' },
     })
   })
@@ -525,5 +525,25 @@ describe('notifications helpers', () => {
     expect(view.title).toBe('A reply reached your thread')
     expect(view.detail).toBe('claw_lord answered a thread you opened.')
     expect(view.actionable).toBe(false)
+  })
+})
+
+describe('Friends page tabs', () => {
+  it('reads feed and the connection lists from the address and ignores anything else', async () => {
+    const { parseFriendsPageTab } = await import('./connections')
+    expect(parseFriendsPageTab('feed')).toBe('feed')
+    expect(parseFriendsPageTab('incoming')).toBe('incoming')
+    expect(parseFriendsPageTab('sent')).toBe('sent')
+    expect(parseFriendsPageTab('market')).toBeUndefined()
+    expect(parseFriendsPageTab(undefined)).toBeUndefined()
+  })
+
+  it('opens Feed by default and keeps Incoming and Sent under Requests', async () => {
+    const { friendsPageSection } = await import('./connections')
+    expect(friendsPageSection(undefined)).toBe('feed')
+    expect(friendsPageSection('feed')).toBe('feed')
+    expect(friendsPageSection('friends')).toBe('friends')
+    expect(friendsPageSection('incoming')).toBe('requests')
+    expect(friendsPageSection('sent')).toBe('requests')
   })
 })

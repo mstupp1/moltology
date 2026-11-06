@@ -72,7 +72,7 @@ function EventTitleLink({
   }
   if (parsed.kind === 'connections') {
     return (
-      <Link to="/connections" className={className}>
+      <Link to="/friends" search={{ tab: 'friends' }} className={className}>
         {children}
       </Link>
     )

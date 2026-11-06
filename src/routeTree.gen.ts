@@ -14,11 +14,13 @@ import { Route as HudRouteImport } from './routes/_hud'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ChassisRouteImport } from './routes/chassis'
 import { Route as CodexDotmdRouteImport } from './routes/codex[.]md'
+import { Route as ConnectionsRouteImport } from './routes/connections'
 import { Route as ErrorRouteImport } from './routes/error'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
 import { Route as GuideRouteImport } from './routes/guide'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as MarketRouteImport } from './routes/market'
 import { Route as MoltmaxRouteImport } from './routes/moltmax'
 import { Route as MoltmaxxingRouteImport } from './routes/moltmaxxing'
 import { Route as NewsDotmdRouteImport } from './routes/news[.]md'
@@ -33,23 +35,22 @@ import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StoreRouteImport } from './routes/store'
+import { Route as StreamRouteImport } from './routes/stream'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TermsDotmdRouteImport } from './routes/terms[.]md'
 import { Route as WhatIsMoltologyRouteImport } from './routes/what-is-moltology'
 import { Route as HudAlignmentRouteImport } from './routes/_hud/alignment'
 import { Route as HudCharacterRouteImport } from './routes/_hud/character'
 import { Route as HudCodexRouteRouteImport } from './routes/_hud/codex/route'
-import { Route as HudConnectionsRouteImport } from './routes/_hud/connections'
 import { Route as HudDashboardRouteImport } from './routes/_hud/dashboard'
+import { Route as HudFriendsRouteImport } from './routes/_hud/friends'
 import { Route as HudHudRouteImport } from './routes/_hud/hud'
-import { Route as HudMarketRouteImport } from './routes/_hud/market'
 import { Route as HudOracleRouteImport } from './routes/_hud/oracle'
 import { Route as HudPremiumRouteImport } from './routes/_hud/premium'
 import { Route as HudProfileRouteImport } from './routes/_hud/profile'
 import { Route as HudSearchRouteImport } from './routes/_hud/search'
 import { Route as HudSettingsRouteImport } from './routes/_hud/settings'
 import { Route as HudStagesRouteImport } from './routes/_hud/stages'
-import { Route as HudStreamRouteImport } from './routes/_hud/stream'
 import { Route as HudSupportRouteImport } from './routes/_hud/support'
 import { Route as HudWatchRouteImport } from './routes/_hud/watch'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
@@ -75,6 +76,7 @@ import { Route as HudAcademyIndexRouteImport } from './routes/_hud/academy/index
 import { Route as HudAdminIndexRouteImport } from './routes/_hud/admin.index'
 import { Route as HudAdminLogicRouteImport } from './routes/_hud/admin.logic'
 import { Route as HudAdminStoreRouteImport } from './routes/_hud/admin.store'
+import { Route as HudCharacterShopRouteImport } from './routes/_hud/character_.shop'
 import { Route as HudCodexIndexRouteImport } from './routes/_hud/codex/index'
 import { Route as HudCodexSlugRouteImport } from './routes/_hud/codex/$slug'
 import { Route as HudForumIndexRouteImport } from './routes/_hud/forum/index'
@@ -118,6 +120,11 @@ const CodexDotmdRoute = CodexDotmdRouteImport.update({
   path: '/codex.md',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConnectionsRoute = ConnectionsRouteImport.update({
+  id: '/connections',
+  path: '/connections',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ErrorRoute = ErrorRouteImport.update({
   id: '/error',
   path: '/error',
@@ -141,6 +148,11 @@ const LandingRoute = LandingRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketRoute = MarketRouteImport.update({
+  id: '/market',
+  path: '/market',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MoltmaxRoute = MoltmaxRouteImport.update({
@@ -213,6 +225,11 @@ const StoreRoute = StoreRouteImport.update({
   path: '/store',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StreamRoute = StreamRouteImport.update({
+  id: '/stream',
+  path: '/stream',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -243,24 +260,19 @@ const HudCodexRouteRoute = HudCodexRouteRouteImport.update({
   path: '/codex',
   getParentRoute: () => HudRoute,
 } as any)
-const HudConnectionsRoute = HudConnectionsRouteImport.update({
-  id: '/connections',
-  path: '/connections',
-  getParentRoute: () => HudRoute,
-} as any)
 const HudDashboardRoute = HudDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => HudRoute,
 } as any)
+const HudFriendsRoute = HudFriendsRouteImport.update({
+  id: '/friends',
+  path: '/friends',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudHudRoute = HudHudRouteImport.update({
   id: '/hud',
   path: '/hud',
-  getParentRoute: () => HudRoute,
-} as any)
-const HudMarketRoute = HudMarketRouteImport.update({
-  id: '/market',
-  path: '/market',
   getParentRoute: () => HudRoute,
 } as any)
 const HudOracleRoute = HudOracleRouteImport.update({
@@ -291,11 +303,6 @@ const HudSettingsRoute = HudSettingsRouteImport.update({
 const HudStagesRoute = HudStagesRouteImport.update({
   id: '/stages',
   path: '/stages',
-  getParentRoute: () => HudRoute,
-} as any)
-const HudStreamRoute = HudStreamRouteImport.update({
-  id: '/stream',
-  path: '/stream',
   getParentRoute: () => HudRoute,
 } as any)
 const HudSupportRoute = HudSupportRouteImport.update({
@@ -426,6 +433,11 @@ const HudAdminStoreRoute = HudAdminStoreRouteImport.update({
   path: '/admin/store',
   getParentRoute: () => HudRoute,
 } as any)
+const HudCharacterShopRoute = HudCharacterShopRouteImport.update({
+  id: '/character_/shop',
+  path: '/character/shop',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudCodexIndexRoute = HudCodexIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -528,11 +540,13 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/chassis': typeof ChassisRoute
   '/codex.md': typeof CodexDotmdRoute
+  '/connections': typeof ConnectionsRoute
   '/error': typeof ErrorRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/guide': typeof GuideRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
+  '/market': typeof MarketRoute
   '/moltmax': typeof MoltmaxRoute
   '/moltmaxxing': typeof MoltmaxxingRoute
   '/news.md': typeof NewsDotmdRoute
@@ -547,23 +561,22 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/store': typeof StoreRouteWithChildren
+  '/stream': typeof StreamRoute
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
   '/what-is-moltology': typeof WhatIsMoltologyRouteWithChildren
   '/codex': typeof HudCodexRouteRouteWithChildren
   '/alignment': typeof HudAlignmentRoute
   '/character': typeof HudCharacterRoute
-  '/connections': typeof HudConnectionsRoute
   '/dashboard': typeof HudDashboardRoute
+  '/friends': typeof HudFriendsRoute
   '/hud': typeof HudHudRoute
-  '/market': typeof HudMarketRoute
   '/oracle': typeof HudOracleRoute
   '/premium': typeof HudPremiumRoute
   '/profile': typeof HudProfileRoute
   '/search': typeof HudSearchRoute
   '/settings': typeof HudSettingsRoute
   '/stages': typeof HudStagesRoute
-  '/stream': typeof HudStreamRoute
   '/support': typeof HudSupportRoute
   '/watch': typeof HudWatchRoute
   '/api/chat': typeof ApiChatRoute
@@ -587,6 +600,7 @@ export interface FileRoutesByFullPath {
   '/what-is-moltology/': typeof WhatIsMoltologyIndexRoute
   '/admin/logic': typeof HudAdminLogicRoute
   '/admin/store': typeof HudAdminStoreRoute
+  '/character/shop': typeof HudCharacterShopRoute
   '/codex/$slug': typeof HudCodexSlugRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -613,11 +627,13 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/chassis': typeof ChassisRoute
   '/codex.md': typeof CodexDotmdRoute
+  '/connections': typeof ConnectionsRoute
   '/error': typeof ErrorRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/guide': typeof GuideRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
+  '/market': typeof MarketRoute
   '/moltmax': typeof MoltmaxRoute
   '/moltmaxxing': typeof MoltmaxxingRoute
   '/news.md': typeof NewsDotmdRoute
@@ -631,21 +647,20 @@ export interface FileRoutesByTo {
   '/sign-up': typeof SignUpRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/stream': typeof StreamRoute
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
   '/alignment': typeof HudAlignmentRoute
   '/character': typeof HudCharacterRoute
-  '/connections': typeof HudConnectionsRoute
   '/dashboard': typeof HudDashboardRoute
+  '/friends': typeof HudFriendsRoute
   '/hud': typeof HudHudRoute
-  '/market': typeof HudMarketRoute
   '/oracle': typeof HudOracleRoute
   '/premium': typeof HudPremiumRoute
   '/profile': typeof HudProfileRoute
   '/search': typeof HudSearchRoute
   '/settings': typeof HudSettingsRoute
   '/stages': typeof HudStagesRoute
-  '/stream': typeof HudStreamRoute
   '/support': typeof HudSupportRoute
   '/watch': typeof HudWatchRoute
   '/api/chat': typeof ApiChatRoute
@@ -669,6 +684,7 @@ export interface FileRoutesByTo {
   '/what-is-moltology': typeof WhatIsMoltologyIndexRoute
   '/admin/logic': typeof HudAdminLogicRoute
   '/admin/store': typeof HudAdminStoreRoute
+  '/character/shop': typeof HudCharacterShopRoute
   '/codex/$slug': typeof HudCodexSlugRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -696,11 +712,13 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/chassis': typeof ChassisRoute
   '/codex.md': typeof CodexDotmdRoute
+  '/connections': typeof ConnectionsRoute
   '/error': typeof ErrorRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/guide': typeof GuideRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
+  '/market': typeof MarketRoute
   '/moltmax': typeof MoltmaxRoute
   '/moltmaxxing': typeof MoltmaxxingRoute
   '/news.md': typeof NewsDotmdRoute
@@ -715,23 +733,22 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/store': typeof StoreRouteWithChildren
+  '/stream': typeof StreamRoute
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
   '/what-is-moltology': typeof WhatIsMoltologyRouteWithChildren
   '/_hud/codex': typeof HudCodexRouteRouteWithChildren
   '/_hud/alignment': typeof HudAlignmentRoute
   '/_hud/character': typeof HudCharacterRoute
-  '/_hud/connections': typeof HudConnectionsRoute
   '/_hud/dashboard': typeof HudDashboardRoute
+  '/_hud/friends': typeof HudFriendsRoute
   '/_hud/hud': typeof HudHudRoute
-  '/_hud/market': typeof HudMarketRoute
   '/_hud/oracle': typeof HudOracleRoute
   '/_hud/premium': typeof HudPremiumRoute
   '/_hud/profile': typeof HudProfileRoute
   '/_hud/search': typeof HudSearchRoute
   '/_hud/settings': typeof HudSettingsRoute
   '/_hud/stages': typeof HudStagesRoute
-  '/_hud/stream': typeof HudStreamRoute
   '/_hud/support': typeof HudSupportRoute
   '/_hud/watch': typeof HudWatchRoute
   '/api/chat': typeof ApiChatRoute
@@ -755,6 +772,7 @@ export interface FileRoutesById {
   '/what-is-moltology/': typeof WhatIsMoltologyIndexRoute
   '/_hud/admin/logic': typeof HudAdminLogicRoute
   '/_hud/admin/store': typeof HudAdminStoreRoute
+  '/_hud/character_/shop': typeof HudCharacterShopRoute
   '/_hud/codex/$slug': typeof HudCodexSlugRoute
   '/_hud/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -783,11 +801,13 @@ export interface FileRouteTypes {
     | '/auth'
     | '/chassis'
     | '/codex.md'
+    | '/connections'
     | '/error'
     | '/feed.xml'
     | '/guide'
     | '/landing'
     | '/login'
+    | '/market'
     | '/moltmax'
     | '/moltmaxxing'
     | '/news.md'
@@ -802,23 +822,22 @@ export interface FileRouteTypes {
     | '/signup'
     | '/sitemap.xml'
     | '/store'
+    | '/stream'
     | '/terms'
     | '/terms.md'
     | '/what-is-moltology'
     | '/codex'
     | '/alignment'
     | '/character'
-    | '/connections'
     | '/dashboard'
+    | '/friends'
     | '/hud'
-    | '/market'
     | '/oracle'
     | '/premium'
     | '/profile'
     | '/search'
     | '/settings'
     | '/stages'
-    | '/stream'
     | '/support'
     | '/watch'
     | '/api/chat'
@@ -842,6 +861,7 @@ export interface FileRouteTypes {
     | '/what-is-moltology/'
     | '/admin/logic'
     | '/admin/store'
+    | '/character/shop'
     | '/codex/$slug'
     | '/member/$profileId'
     | '/api/auth/$'
@@ -868,11 +888,13 @@ export interface FileRouteTypes {
     | '/auth'
     | '/chassis'
     | '/codex.md'
+    | '/connections'
     | '/error'
     | '/feed.xml'
     | '/guide'
     | '/landing'
     | '/login'
+    | '/market'
     | '/moltmax'
     | '/moltmaxxing'
     | '/news.md'
@@ -886,21 +908,20 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/signup'
     | '/sitemap.xml'
+    | '/stream'
     | '/terms'
     | '/terms.md'
     | '/alignment'
     | '/character'
-    | '/connections'
     | '/dashboard'
+    | '/friends'
     | '/hud'
-    | '/market'
     | '/oracle'
     | '/premium'
     | '/profile'
     | '/search'
     | '/settings'
     | '/stages'
-    | '/stream'
     | '/support'
     | '/watch'
     | '/api/chat'
@@ -924,6 +945,7 @@ export interface FileRouteTypes {
     | '/what-is-moltology'
     | '/admin/logic'
     | '/admin/store'
+    | '/character/shop'
     | '/codex/$slug'
     | '/member/$profileId'
     | '/api/auth/$'
@@ -950,11 +972,13 @@ export interface FileRouteTypes {
     | '/auth'
     | '/chassis'
     | '/codex.md'
+    | '/connections'
     | '/error'
     | '/feed.xml'
     | '/guide'
     | '/landing'
     | '/login'
+    | '/market'
     | '/moltmax'
     | '/moltmaxxing'
     | '/news.md'
@@ -969,23 +993,22 @@ export interface FileRouteTypes {
     | '/signup'
     | '/sitemap.xml'
     | '/store'
+    | '/stream'
     | '/terms'
     | '/terms.md'
     | '/what-is-moltology'
     | '/_hud/codex'
     | '/_hud/alignment'
     | '/_hud/character'
-    | '/_hud/connections'
     | '/_hud/dashboard'
+    | '/_hud/friends'
     | '/_hud/hud'
-    | '/_hud/market'
     | '/_hud/oracle'
     | '/_hud/premium'
     | '/_hud/profile'
     | '/_hud/search'
     | '/_hud/settings'
     | '/_hud/stages'
-    | '/_hud/stream'
     | '/_hud/support'
     | '/_hud/watch'
     | '/api/chat'
@@ -1009,6 +1032,7 @@ export interface FileRouteTypes {
     | '/what-is-moltology/'
     | '/_hud/admin/logic'
     | '/_hud/admin/store'
+    | '/_hud/character_/shop'
     | '/_hud/codex/$slug'
     | '/_hud/member/$profileId'
     | '/api/auth/$'
@@ -1037,11 +1061,13 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ChassisRoute: typeof ChassisRoute
   CodexDotmdRoute: typeof CodexDotmdRoute
+  ConnectionsRoute: typeof ConnectionsRoute
   ErrorRoute: typeof ErrorRoute
   FeedDotxmlRoute: typeof FeedDotxmlRoute
   GuideRoute: typeof GuideRoute
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
+  MarketRoute: typeof MarketRoute
   MoltmaxRoute: typeof MoltmaxRoute
   MoltmaxxingRoute: typeof MoltmaxxingRoute
   NewsDotmdRoute: typeof NewsDotmdRoute
@@ -1056,6 +1082,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StoreRoute: typeof StoreRouteWithChildren
+  StreamRoute: typeof StreamRoute
   TermsRoute: typeof TermsRoute
   TermsDotmdRoute: typeof TermsDotmdRoute
   WhatIsMoltologyRoute: typeof WhatIsMoltologyRouteWithChildren
@@ -1116,6 +1143,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CodexDotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/connections': {
+      id: '/connections'
+      path: '/connections'
+      fullPath: '/connections'
+      preLoaderRoute: typeof ConnectionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/error': {
       id: '/error'
       path: '/error'
@@ -1149,6 +1183,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/market': {
+      id: '/market'
+      path: '/market'
+      fullPath: '/market'
+      preLoaderRoute: typeof MarketRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/moltmax': {
@@ -1249,6 +1290,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/stream': {
+      id: '/stream'
+      path: '/stream'
+      fullPath: '/stream'
+      preLoaderRoute: typeof StreamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -1291,13 +1339,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudCodexRouteRouteImport
       parentRoute: typeof HudRoute
     }
-    '/_hud/connections': {
-      id: '/_hud/connections'
-      path: '/connections'
-      fullPath: '/connections'
-      preLoaderRoute: typeof HudConnectionsRouteImport
-      parentRoute: typeof HudRoute
-    }
     '/_hud/dashboard': {
       id: '/_hud/dashboard'
       path: '/dashboard'
@@ -1305,18 +1346,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudDashboardRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/friends': {
+      id: '/_hud/friends'
+      path: '/friends'
+      fullPath: '/friends'
+      preLoaderRoute: typeof HudFriendsRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/hud': {
       id: '/_hud/hud'
       path: '/hud'
       fullPath: '/hud'
       preLoaderRoute: typeof HudHudRouteImport
-      parentRoute: typeof HudRoute
-    }
-    '/_hud/market': {
-      id: '/_hud/market'
-      path: '/market'
-      fullPath: '/market'
-      preLoaderRoute: typeof HudMarketRouteImport
       parentRoute: typeof HudRoute
     }
     '/_hud/oracle': {
@@ -1359,13 +1400,6 @@ declare module '@tanstack/react-router' {
       path: '/stages'
       fullPath: '/stages'
       preLoaderRoute: typeof HudStagesRouteImport
-      parentRoute: typeof HudRoute
-    }
-    '/_hud/stream': {
-      id: '/_hud/stream'
-      path: '/stream'
-      fullPath: '/stream'
-      preLoaderRoute: typeof HudStreamRouteImport
       parentRoute: typeof HudRoute
     }
     '/_hud/support': {
@@ -1543,6 +1577,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudAdminStoreRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/character_/shop': {
+      id: '/_hud/character_/shop'
+      path: '/character/shop'
+      fullPath: '/character/shop'
+      preLoaderRoute: typeof HudCharacterShopRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/codex/': {
       id: '/_hud/codex/'
       path: '/'
@@ -1706,21 +1747,20 @@ interface HudRouteChildren {
   HudCodexRouteRoute: typeof HudCodexRouteRouteWithChildren
   HudAlignmentRoute: typeof HudAlignmentRoute
   HudCharacterRoute: typeof HudCharacterRoute
-  HudConnectionsRoute: typeof HudConnectionsRoute
   HudDashboardRoute: typeof HudDashboardRoute
+  HudFriendsRoute: typeof HudFriendsRoute
   HudHudRoute: typeof HudHudRoute
-  HudMarketRoute: typeof HudMarketRoute
   HudOracleRoute: typeof HudOracleRoute
   HudPremiumRoute: typeof HudPremiumRoute
   HudProfileRoute: typeof HudProfileRoute
   HudSearchRoute: typeof HudSearchRoute
   HudSettingsRoute: typeof HudSettingsRoute
   HudStagesRoute: typeof HudStagesRoute
-  HudStreamRoute: typeof HudStreamRoute
   HudSupportRoute: typeof HudSupportRoute
   HudWatchRoute: typeof HudWatchRoute
   HudAdminLogicRoute: typeof HudAdminLogicRoute
   HudAdminStoreRoute: typeof HudAdminStoreRoute
+  HudCharacterShopRoute: typeof HudCharacterShopRoute
   HudMemberProfileIdRoute: typeof HudMemberProfileIdRoute
   HudAcademyIndexRoute: typeof HudAcademyIndexRoute
   HudAdminIndexRoute: typeof HudAdminIndexRoute
@@ -1737,21 +1777,20 @@ const HudRouteChildren: HudRouteChildren = {
   HudCodexRouteRoute: HudCodexRouteRouteWithChildren,
   HudAlignmentRoute: HudAlignmentRoute,
   HudCharacterRoute: HudCharacterRoute,
-  HudConnectionsRoute: HudConnectionsRoute,
   HudDashboardRoute: HudDashboardRoute,
+  HudFriendsRoute: HudFriendsRoute,
   HudHudRoute: HudHudRoute,
-  HudMarketRoute: HudMarketRoute,
   HudOracleRoute: HudOracleRoute,
   HudPremiumRoute: HudPremiumRoute,
   HudProfileRoute: HudProfileRoute,
   HudSearchRoute: HudSearchRoute,
   HudSettingsRoute: HudSettingsRoute,
   HudStagesRoute: HudStagesRoute,
-  HudStreamRoute: HudStreamRoute,
   HudSupportRoute: HudSupportRoute,
   HudWatchRoute: HudWatchRoute,
   HudAdminLogicRoute: HudAdminLogicRoute,
   HudAdminStoreRoute: HudAdminStoreRoute,
+  HudCharacterShopRoute: HudCharacterShopRoute,
   HudMemberProfileIdRoute: HudMemberProfileIdRoute,
   HudAcademyIndexRoute: HudAcademyIndexRoute,
   HudAdminIndexRoute: HudAdminIndexRoute,
@@ -1806,11 +1845,13 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ChassisRoute: ChassisRoute,
   CodexDotmdRoute: CodexDotmdRoute,
+  ConnectionsRoute: ConnectionsRoute,
   ErrorRoute: ErrorRoute,
   FeedDotxmlRoute: FeedDotxmlRoute,
   GuideRoute: GuideRoute,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
+  MarketRoute: MarketRoute,
   MoltmaxRoute: MoltmaxRoute,
   MoltmaxxingRoute: MoltmaxxingRoute,
   NewsDotmdRoute: NewsDotmdRoute,
@@ -1825,6 +1866,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StoreRoute: StoreRouteWithChildren,
+  StreamRoute: StreamRoute,
   TermsRoute: TermsRoute,
   TermsDotmdRoute: TermsDotmdRoute,
   WhatIsMoltologyRoute: WhatIsMoltologyRouteWithChildren,

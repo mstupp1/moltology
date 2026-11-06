@@ -25,16 +25,20 @@ import { useMemberSearch } from '@/hooks/useMemberSearch'
 import { MEMBER_SEARCH_MIN_CHARS } from '@/lib/member-search'
 import { ReferralPanel } from './ReferralPanel'
 
-export {
-  CONNECTIONS_FRIENDS_EMPTY,
-  CONNECTIONS_INCOMING_EMPTY,
-  CONNECTIONS_SENT_EMPTY,
-}
+export { CONNECTIONS_FRIENDS_EMPTY, CONNECTIONS_INCOMING_EMPTY, CONNECTIONS_SENT_EMPTY }
+
+/**
+ * `view` picks what the Friends page shows: `friends` is search, invites,
+ * suggestions and the friends list; `requests` is Incoming and Sent.
+ * `all` (the default) shows everything with its own title.
+ */
+export type ConnectionsPageView = 'all' | 'friends' | 'requests'
 
 export const ConnectionsPage: React.FC<{
   tab?: ConnectionsTab
   onTabChange?: (tab: ConnectionsTab) => void
-}> = ({ tab: tabProp, onTabChange }) => {
+  view?: ConnectionsPageView
+}> = ({ tab: tabProp, onTabChange, view = 'all' }) => {
   const [connections, setConnections] = useState<ConnectionsListView | null>(null)
   const [hiddenSuggestionIds, setHiddenSuggestionIds] = useState<string[]>([])
   const [query, setQuery] = useState('')
@@ -43,7 +47,10 @@ export const ConnectionsPage: React.FC<{
   const { results, searching } = useMemberSearch(query, true)
 
   const incomingCount = connections?.incoming.length ?? 0
-  const tab = resolveConnectionsTab(tabProp, incomingCount)
+  const resolvedTab = resolveConnectionsTab(tabProp, incomingCount)
+  const tab: ConnectionsTab =
+    view === 'friends' ? 'friends' : view === 'requests' && resolvedTab === 'friends' ? 'incoming' : resolvedTab
+  const showSearch = view !== 'requests'
 
   const refresh = useCallback(async () => {
     try {
@@ -71,7 +78,9 @@ export const ConnectionsPage: React.FC<{
     hideSuggestion(memberId)
     try {
       const token = await getAuthJWTToken()
-      await dismissSynapticNearbyFn({ data: { memberId, token: token ?? undefined } })
+      await dismissSynapticNearbyFn({
+        data: { memberId, token: token ?? undefined },
+      })
       toast.info(SYNAPTIC_NEARBY_DISMISS_TOAST)
     } catch (err) {
       setHiddenSuggestionIds((ids) => ids.filter((id) => id !== memberId))
@@ -79,26 +88,40 @@ export const ConnectionsPage: React.FC<{
     }
   }
 
-  const suggested = (connections?.suggested ?? []).filter(
-    (member) => !hiddenSuggestionIds.includes(member.id),
-  )
+  const suggested = (connections?.suggested ?? []).filter((member) => !hiddenSuggestionIds.includes(member.id))
 
   const selectTab = (next: ConnectionsTab) => {
     onTabChange?.(next)
   }
 
-  const tabs: Array<{ id: ConnectionsTab; label: string; count: number; icon: typeof Users }> = [
-    { id: 'friends', label: 'Friends', count: connections?.friends.length ?? 0, icon: Users },
+  const allTabs: Array<{
+    id: ConnectionsTab
+    label: string
+    count: number
+    icon: typeof Users
+  }> = [
+    {
+      id: 'friends',
+      label: 'Friends',
+      count: connections?.friends.length ?? 0,
+      icon: Users,
+    },
     { id: 'incoming', label: 'Incoming', count: incomingCount, icon: Inbox },
-    { id: 'sent', label: 'Sent', count: connections?.outgoing.length ?? 0, icon: Send },
+    {
+      id: 'sent',
+      label: 'Sent',
+      count: connections?.outgoing.length ?? 0,
+      icon: Send,
+    },
   ]
+  const tabs = view === 'friends' ? [] : view === 'requests' ? allTabs.filter((t) => t.id !== 'friends') : allTabs
 
   const rows =
     tab === 'friends'
-      ? connections?.friends ?? []
+      ? (connections?.friends ?? [])
       : tab === 'incoming'
-        ? connections?.incoming ?? []
-        : connections?.outgoing ?? []
+        ? (connections?.incoming ?? [])
+        : (connections?.outgoing ?? [])
 
   const emptyCopy =
     tab === 'friends'
@@ -108,86 +131,110 @@ export const ConnectionsPage: React.FC<{
         : CONNECTIONS_SENT_EMPTY
 
   return (
-    <div className="rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 md:p-5 space-y-4 font-sans relative">
-      <div className="space-y-3">
-        <HudTitlePanel
-          treatment="integrated"
-          title="Connections"
-          description={`Find members by username, larva unit, or name (at least ${MEMBER_SEARCH_MIN_CHARS} characters).`}
-        />
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#839493]" />
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search designations, larva units, or names…"
-            className="w-full pl-10 pr-3 py-2.5 bg-[#050808] border border-[#3a4a49] text-sm text-[#dfe3e3] placeholder:text-[#4a5a59] focus:outline-hidden focus:border-[#00c3ff] chamfer-corner"
-          />
-          {searching && (
-            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#00c3ff] animate-spin" />
+    <div
+      className={
+        view === 'all'
+          ? 'rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 md:p-5 space-y-4 font-sans relative'
+          : 'space-y-4 font-sans relative'
+      }
+    >
+      {showSearch && (
+        <div className="space-y-3">
+          {view === 'all' ? (
+            <HudTitlePanel
+              treatment="integrated"
+              title="Connections"
+              description={`Find members by username, larva unit, or name (at least ${MEMBER_SEARCH_MIN_CHARS} characters).`}
+            />
+          ) : (
+            <p className="text-xs text-ink-muted">
+              Find members by username, larva unit, or name (at least {MEMBER_SEARCH_MIN_CHARS} characters).
+            </p>
+          )}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#839493]" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search designations, larva units, or names…"
+              className="w-full pl-10 pr-3 py-2.5 bg-[#050808] border border-[#3a4a49] text-sm text-[#dfe3e3] placeholder:text-[#4a5a59] focus:outline-hidden focus:border-[#00c3ff] chamfer-corner"
+            />
+            {searching && (
+              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#00c3ff] animate-spin" />
+            )}
+          </div>
+          {results.length > 0 && (
+            <ul className="space-y-2">
+              {results.map((member) => {
+                const { relationship, pendingRequestId } = relationshipForMember(connections, member.id)
+                return (
+                  <MemberSearchRow
+                    key={member.id}
+                    member={member}
+                    relationship={relationship}
+                    pendingRequestId={pendingRequestId}
+                    onRelationshipChange={() => void refresh()}
+                  />
+                )
+              })}
+            </ul>
+          )}
+          {query.trim().length >= MEMBER_SEARCH_MIN_CHARS && !searching && results.length === 0 && (
+            <p className="text-xs text-[#839493] text-center py-3">
+              The trench stayed quiet. No designation, larva unit, or name surfaced for that call.
+            </p>
           )}
         </div>
-        {results.length > 0 && (
-          <ul className="space-y-2">
-            {results.map((member) => {
-              const { relationship, pendingRequestId } = relationshipForMember(connections, member.id)
-              return (
-                <MemberSearchRow
-                  key={member.id}
-                  member={member}
-                  relationship={relationship}
-                  pendingRequestId={pendingRequestId}
-                  onRelationshipChange={() => void refresh()}
-                />
-              )
-            })}
-          </ul>
-        )}
-        {query.trim().length >= MEMBER_SEARCH_MIN_CHARS && !searching && results.length === 0 && (
-          <p className="text-xs text-[#839493] text-center py-3">
-            The trench stayed quiet. No designation, larva unit, or name surfaced for that call.
-          </p>
-        )}
-      </div>
+      )}
 
-      <ReferralPanel />
+      {showSearch && <ReferralPanel />}
 
-      <SynapticNearbyStrip
-        members={suggested}
-        onRequested={(memberId) => {
-          hideSuggestion(memberId)
-          void refresh()
-        }}
-        onDismiss={(memberId) => void dismissSuggestion(memberId)}
-      />
+      {showSearch && (
+        <SynapticNearbyStrip
+          members={suggested}
+          onRequested={(memberId) => {
+            hideSuggestion(memberId)
+            void refresh()
+          }}
+          onDismiss={(memberId) => void dismissSuggestion(memberId)}
+        />
+      )}
 
       <div className="space-y-3">
-        <div className="flex flex-wrap gap-2 border-b border-[#3a4a49] pb-3">
-          {tabs.map(({ id, label, count, icon: Icon }) => {
-            const pendingIncoming = id === 'incoming' && count > 0
-            const selected = tab === id
-            return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => selectTab(id)}
-                aria-pressed={selected}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider border chamfer-corner transition-colors ${
-                  selected
-                    ? 'border-[#00c3ff] text-[#00c3ff] bg-[#00c3ff]/10'
-                    : pendingIncoming
-                      ? 'border-[#00ffff]/50 text-[#00ffff] bg-[#00ffff]/10'
-                      : 'border-[#3a4a49] text-[#839493] hover:border-[#00c3ff]/50'
-                }`}
-              >
-                <Icon className="w-3 h-3" />
-                {label}
-                <span className="tabular-nums opacity-80">{count}</span>
-              </button>
-            )
-          })}
-        </div>
+        {tabs.length > 0 && (
+          <div className="flex flex-wrap gap-2 border-b border-[#3a4a49] pb-3">
+            {tabs.map(({ id, label, count, icon: Icon }) => {
+              const pendingIncoming = id === 'incoming' && count > 0
+              const selected = tab === id
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => selectTab(id)}
+                  aria-pressed={selected}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider border chamfer-corner transition-colors ${
+                    selected
+                      ? 'border-[#00c3ff] text-[#00c3ff] bg-[#00c3ff]/10'
+                      : pendingIncoming
+                        ? 'border-[#00ffff]/50 text-[#00ffff] bg-[#00ffff]/10'
+                        : 'border-[#3a4a49] text-[#839493] hover:border-[#00c3ff]/50'
+                  }`}
+                >
+                  <Icon className="w-3 h-3" />
+                  {label}
+                  <span className="tabular-nums opacity-80">{count}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
+
+        {view === 'friends' && (
+          <h2 className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+            Your friends <span className="tabular-nums">{connections?.friends.length ?? 0}</span>
+          </h2>
+        )}
 
         {loading ? (
           <div className="py-10 text-center text-xs text-[#839493]">Loading connections…</div>
@@ -221,9 +268,7 @@ export const ConnectionsPage: React.FC<{
                       Stage {member.stage} · {member.stageLabel}
                     </div>
                     {tab === 'incoming' && (
-                      <div className="text-[10px] uppercase tracking-wider text-[#00ffff] mt-0.5">
-                        Incoming request
-                      </div>
+                      <div className="text-[10px] uppercase tracking-wider text-[#00ffff] mt-0.5">Incoming request</div>
                     )}
                   </div>
                   <div className="flex flex-wrap items-center gap-2">

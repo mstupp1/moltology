@@ -1,7 +1,7 @@
 ---
 name: academy-course-creator
 description: >-
-  Write, update, upload and publish Molt Academy coursework (/lectures): courses, lessons
+  Write, update, upload and publish Molt Academy coursework (/academy): courses, lessons
   (video lectures, readings, quizzes), tracks and certificates, as Markdown in content/academy/,
   written to the database with npm run academy:ingest. Use whenever the user asks to add or
   change a course, lesson, quiz, lecture video, track or certificate, or to publish or unpublish

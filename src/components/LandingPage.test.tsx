@@ -9,7 +9,7 @@ const mockNavigate = vi.fn()
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mockNavigate,
   useLocation: () => ({ pathname: '/' }),
-  Link: ({ children, to, ...props }: any) => <a href={to} {...props}>{children}</a>,
+  Link: ({ children, to, hash, ...props }: any) => <a href={hash ? `${to}#${hash}` : to} {...props}>{children}</a>,
 }))
 
 vi.mock('@/lib/auth-client', () => ({
@@ -163,7 +163,7 @@ describe('LandingPage Component', () => {
     expect(screen.getByRole('link', { name: /What Moltologists believe/ })).toHaveAttribute('href', '/what-is-moltology/beliefs')
     expect(screen.getByRole('link', { name: /Hear more from members/ })).toHaveAttribute(
       'href',
-      '/what-is-moltology/what-moltologists-say',
+      '/what-is-moltology#voices',
     )
   })
 
