@@ -241,6 +241,48 @@ export interface CatalogRef {
   artKey?: string | null
 }
 
+/** A catalog row as stored (or seeded); `toCatalogRef` turns it into what the studio reads. */
+export interface CatalogRow {
+  id: string
+  slug: string
+  name: string
+  flavorText: string
+  category: EquipmentCategory
+  rarity: EquipmentRarity
+  visualType: ChassisVisualType | null
+  primaryStat: number
+  affixes: EquipmentAffix[] | null
+  uniquePower: EquipmentUniquePower | null
+  imageUrl: string | null
+  sortOrder: number
+  kind?: EquipmentKind | null
+  artKey?: string | null
+  appearanceKey?: string | null
+}
+
+export function toCatalogRef(row: CatalogRow): CatalogRef {
+  const visualType = resolveVisualType(row.category, row.visualType)
+  const rawUrl = row.imageUrl
+  const imageUrl = rawUrl && !rawUrl.endsWith('.svg') ? rawUrl : chassisTypeImageUrl(visualType)
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    flavorText: row.flavorText,
+    category: row.category,
+    rarity: row.rarity,
+    visualType,
+    primaryStat: row.primaryStat,
+    affixes: row.affixes ?? [],
+    uniquePower: row.uniquePower ?? null,
+    imageUrl,
+    sortOrder: row.sortOrder,
+    kind: row.kind ?? 'gear',
+    artKey: row.artKey ?? null,
+    appearanceKey: row.appearanceKey ?? row.slug,
+  }
+}
+
 export function isCosmetic(catalog: Pick<CatalogRef, 'kind'> | null | undefined): boolean {
   return catalog?.kind === 'cosmetic'
 }

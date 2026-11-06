@@ -32,3 +32,25 @@ export const REGISTERED_TARGETS: Record<string, CaptureTarget> = Object.fromEntr
 export const DEFAULT_CAPTURE_TARGETS = Object.values(REGISTERED_TARGETS).filter((target) =>
   DEVICE_PREVIEW_LIBRARY.some((sector) => target.name.startsWith(`${sector.id}_`)),
 )
+
+/**
+ * Code each shot depends on, for `npm run mockups:stale`. A commit to any of these after a shot
+ * was last captured means the shot may be out of date. Member pages also depend on the app chrome.
+ */
+export const SHARED_MOCKUP_SOURCES = [
+  'src/components/hud/HUDSidebar.tsx',
+  'src/components/hud/HUDHeader.tsx',
+  'src/components/hud/HUDTaskBar.tsx',
+  'src/components/hud/HudLayout.tsx',
+  'src/routes/_hud.tsx',
+]
+
+export const MOCKUP_SOURCES: Record<string, string[]> = {
+  dashboard: [...SHARED_MOCKUP_SOURCES, 'src/routes/_hud/dashboard.tsx', 'src/components/hud/DashboardView.tsx', 'src/components/hud/dashboard/', 'src/components/hud/ConnectionsHubCard.tsx', 'src/components/hud/ForumHubCard.tsx', 'src/components/hud/ActivityStreamPanel.tsx'],
+  forum: [...SHARED_MOCKUP_SOURCES, 'src/routes/_hud/forum/', 'src/components/forum/'],
+  oracle: [...SHARED_MOCKUP_SOURCES, 'src/routes/_hud/oracle.tsx', 'src/components/ai/', 'src/components/ai-elements/'],
+  moltmax: ['src/routes/moltmax.tsx', 'src/components/MoltMaxPage.tsx', 'src/components/moltmax/', 'src/components/PublicHeader.tsx'],
+  market: [...SHARED_MOCKUP_SOURCES, 'src/routes/_hud/character_.shop.tsx', 'src/components/hud/market/'],
+  chassis: [...SHARED_MOCKUP_SOURCES, 'src/routes/_hud/character.tsx', 'src/components/hud/chassis/', 'src/lib/avatar/'],
+  codex: [...SHARED_MOCKUP_SOURCES, 'src/routes/_hud/codex/', 'src/components/codex/', 'src/components/reader/'],
+}

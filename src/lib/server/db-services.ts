@@ -94,12 +94,11 @@ import {
 import { resolveVectorBase } from '../vectors'
 import {
   VAULT_SIZE,
-  chassisTypeImageUrl,
   computeLoadoutTotals,
   planGearMove,
   isLookSlot,
-  resolveVisualType,
   normalizeEquipSlot,
+  toCatalogRef,
   EQUIP_SLOT_IDS,
   type CatalogRef,
   type ChassisLoadoutPayload,
@@ -3786,29 +3785,6 @@ export const getActivityFeedHandler = async ({
 // ─── Chassis loadout (equipment vault) ───────────────────────────────────────
 
 // ─── Chassis loadout (equipment vault) ───────────────────────────────────────
-
-function toCatalogRef(row: typeof equipmentCatalog.$inferSelect): CatalogRef {
-  const visualType = resolveVisualType(row.category, row.visualType)
-  const rawUrl = row.imageUrl
-  const imageUrl = rawUrl && !rawUrl.endsWith('.svg') ? rawUrl : chassisTypeImageUrl(visualType)
-  return {
-    id: row.id,
-    slug: row.slug,
-    name: row.name,
-    flavorText: row.flavorText,
-    category: row.category,
-    rarity: row.rarity,
-    visualType,
-    primaryStat: row.primaryStat,
-    affixes: row.affixes ?? [],
-    uniquePower: row.uniquePower ?? null,
-    imageUrl,
-    sortOrder: row.sortOrder,
-    kind: row.kind ?? 'gear',
-    artKey: row.artKey ?? null,
-    appearanceKey: row.appearanceKey ?? row.slug,
-  }
-}
 
 function toGearState(row: typeof userGearItems.$inferSelect): GearItemState {
   const look = isLookSlot(row.equippedSlot) ? row.equippedSlot : null
