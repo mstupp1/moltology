@@ -51,11 +51,11 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     const { container } = render(<HUDSidebar />)
     const aside = screen.getByRole('complementary')
     expect(aside).toHaveClass('transition-[width]', 'motion-reduce:transition-none')
-    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-72')
+    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-60')
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
     expect(container.querySelector('nav')?.parentElement).toHaveClass('w-20')
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
-    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-72')
+    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-60')
   })
 
   it('cancels mobile close callbacks on reopen and releases scroll lock at the desktop breakpoint', () => {
@@ -91,6 +91,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
     expect(screen.getByText('ORACLE')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^CHARACTER$/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^PROFILE$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^ACADEMY$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^FORUM$/i })).toBeInTheDocument()
     // Friends lives on the profile and Stages on Character, so neither has a sidebar row.
@@ -121,7 +122,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     render(<HUDSidebar />)
 
     const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-60')
 
     // Press Cmd+B to collapse
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
@@ -129,14 +130,14 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     // Press Cmd+B to un-collapse
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-60')
   })
 
   it('toggles sidebar collapse with interactive edge rail click', () => {
     render(<HUDSidebar />)
 
     const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-60')
 
     const rail = screen.getByRole('separator', { name: /Collapse sidebar/i })
     expect(rail).toBeInTheDocument()
@@ -151,14 +152,14 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     fireEvent.mouseDown(rail, { button: 0, clientX: 72 })
     fireEvent.mouseUp(window)
 
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-60')
   })
 
   it('collapses and expands sidebar by dragging the edge rail', () => {
     render(<HUDSidebar />)
 
     const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-60')
 
     const rail = screen.getByRole('separator')
 
@@ -174,7 +175,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     fireEvent.mouseMove(window, { clientX: 300 })
     fireEvent.mouseUp(window)
 
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-60')
   })
 
   it('renders short centered text names underneath items in collapsed mode', () => {
@@ -340,7 +341,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getByRole('button', { name: /SIGN OUT/i })).toBeInTheDocument()
   })
 
-  it('badges the account row with waiting friend requests and opens them from the menu', async () => {
+  it('badges the Profile item with waiting friend requests', async () => {
     mockListConnectionsFn.mockResolvedValueOnce({ incoming: [{ userId: 'a' }, { userId: 'b' }] })
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'test-user-1', name: 'Operative Alpha', email: 'alpha@moltology.io' } } as any,
@@ -348,12 +349,11 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     render(<HUDSidebar />)
 
-    const rows = await screen.findAllByRole('button', { name: /2 friend requests waiting/i })
-    fireEvent.click(rows[0])
-    const friends = await screen.findByRole('button', { name: /FRIENDS/ })
-    expect(friends).toHaveTextContent('2')
-    fireEvent.click(friends)
-    expect(mockNavigate).toHaveBeenCalledWith({ href: '/profile?tab=incoming' })
+    await waitFor(() => expect(mockListConnectionsFn).toHaveBeenCalled())
+    const profile = await screen.findByRole('button', { name: /^PROFILE\W*2 friend requests waiting$/i })
+    expect(profile).toHaveTextContent('2')
+    fireEvent.click(profile)
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/profile' })
   })
 
   it('renders avatar skeleton placeholder while session is pending', () => {
@@ -384,7 +384,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     const aside = container.querySelector('aside')
     expect(aside?.className).toContain('md:w-20')
-    expect(aside?.className).not.toContain('md:w-72')
+    expect(aside?.className).not.toContain('md:w-60')
   })
 
   it('shows a claimed designation in the account menu instead of the larva unit', async () => {

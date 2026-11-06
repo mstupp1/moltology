@@ -96,7 +96,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   }, [activePage, locationPathname])
 
   const onNavigate = (path: string) => {
-    navigate(path.includes('?') ? { href: path } : { to: path })
+    navigate({ to: path })
     setMobileOpen(false)
     setOverflowOpen(false)
     setPreviewTab(null)

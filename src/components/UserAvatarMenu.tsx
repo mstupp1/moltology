@@ -2,7 +2,7 @@ import { getUserProfileFn } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { parseLobsterAvatarConfig } from '@/lib/lobster-avatar'
 import React, { useState, useRef, useEffect } from 'react'
-import { LogOut, ChevronDown, ChevronsUpDown, Settings, User, Users, Globe } from 'lucide-react'
+import { LogOut, ChevronDown, ChevronsUpDown, Settings, User, Globe } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { beginSignOut, endSignOut } from '@/lib/auth-session'
 import { UserAvatar } from './UserAvatar'
@@ -29,8 +29,6 @@ export interface UserAvatarMenuProps {
   trigger?: 'avatar' | 'row'
   /** Second line under the name on a `row` trigger. */
   subtitle?: string | null
-  /** Friend requests waiting for this member; shows a badge on the trigger and the Friends entry. */
-  friendRequestCount?: number
   className?: string
   displayName?: string | null
 }
@@ -50,7 +48,6 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   inline = false,
   trigger = 'avatar',
   subtitle,
-  friendRequestCount = 0,
   className = '',
   displayName: displayNameProp,
 }) => {
@@ -146,25 +143,6 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
     }
   }
 
-  const handleOpenFriends = () => {
-    handleClose()
-    if (user.id) {
-      onNavigate?.(friendRequestCount > 0 ? '/profile?tab=incoming' : '/profile?tab=friends')
-    }
-  }
-
-  const pendingLabel = friendRequestCount > 99 ? '99+' : String(friendRequestCount)
-  const pendingBadge =
-    friendRequestCount > 0 ? (
-      <span className="ml-auto min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full bg-cyan-glow text-[11px] font-sans font-bold text-abyss tabular-nums">
-        {pendingLabel}
-      </span>
-    ) : null
-  const triggerLabel =
-    friendRequestCount > 0
-      ? `User account menu, ${friendRequestCount} friend request${friendRequestCount === 1 ? '' : 's'} waiting`
-      : 'User account menu'
-
   const displayName = displayNameProp || user.name || user.email?.split('@')[0] || 'Operative'
   const effectiveRole = getEffectiveRole(user, userRole)
 
@@ -234,7 +212,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           onClick={handleToggle}
           aria-expanded={isOpen}
           aria-haspopup="true"
-          aria-label={triggerLabel}
+          aria-label="User account menu"
           className="w-full flex items-center justify-between px-3 py-2.5 rounded-card transition-colors group cursor-pointer bg-surface-1 hud-sheen hover:bg-surface-2 border border-line-subtle hover:border-line text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
           <div className="flex items-center gap-3 min-w-0">
@@ -293,17 +271,6 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                     <span>YOUR PROFILE</span>
                   </button>
                 )}
-                {user.id && (
-                  <button
-                    type="button"
-                    onClick={handleOpenFriends}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer text-ink-body hover:text-ink bg-surface-1 hover:bg-surface-2 border border-line-subtle hover:border-line focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-                  >
-                    <Users className="w-4 h-4 shrink-0" />
-                    <span>FRIENDS</span>
-                    {pendingBadge}
-                  </button>
-                )}
                 {/* Settings Link */}
                 <button
                   type="button"
@@ -353,7 +320,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           onClick={handleToggle}
           aria-expanded={isOpen}
           aria-haspopup="true"
-          aria-label={triggerLabel}
+          aria-label="User account menu"
           className="w-full flex items-center gap-3 min-h-[56px] pl-4 pr-4 py-2.5 text-left transition-colors duration-150 group cursor-pointer hover:bg-surface-2 aria-expanded:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
         >
           <span className="relative flex shrink-0 rounded-full">
@@ -373,14 +340,6 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               </span>
             )}
           </span>
-          {friendRequestCount > 0 && (
-            <span
-              aria-hidden="true"
-              className="min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full bg-cyan-glow text-[11px] font-sans font-bold text-abyss tabular-nums shrink-0"
-            >
-              {pendingLabel}
-            </span>
-          )}
           <ChevronsUpDown
             aria-hidden="true"
             className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-ink transition-colors duration-150"
@@ -392,7 +351,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           onClick={handleToggle}
           aria-expanded={isOpen}
           aria-haspopup="true"
-          aria-label={triggerLabel}
+          aria-label="User account menu"
           className="relative flex rounded-full transition-transform group cursor-pointer active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
           <UserAvatar user={avatarUser} name={displayName} size="nav" borderless />
@@ -400,12 +359,6 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/15 transition-shadow group-hover:ring-white/40 group-aria-expanded:ring-white/40"
           />
-          {friendRequestCount > 0 && (
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-cyan-glow ring-2 ring-abyss"
-            />
-          )}
         </button>
       )}
 
@@ -465,17 +418,6 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               >
                 <User className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow" />
                 <span>YOUR PROFILE</span>
-              </button>
-            )}
-            {user.id && (
-              <button
-                type="button"
-                onClick={handleOpenFriends}
-                className="w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-              >
-                <Users className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow" />
-                <span>FRIENDS</span>
-                {pendingBadge}
               </button>
             )}
             <button
