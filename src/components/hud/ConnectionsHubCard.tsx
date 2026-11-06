@@ -170,7 +170,7 @@ export function ConnectionsHubCard() {
 
   const preview = pickConnectionsHubPreview(connections)
   const circle = pickConnectionsHubCircle(connections)
-  const friendCount = connections.friends.length
+  const friendCount = connections.friendCount ?? connections.friends.length
   const incomingCount = connections.incoming.length
   const sentCount = connections.outgoing.length
   const showSearchResults = canSearch && queryReady
@@ -220,7 +220,7 @@ export function ConnectionsHubCard() {
           {showSearchResults && searchResults.length > 0 && (
             <ul className="space-y-1.5 font-sans">
               {searchResults.map((member) => {
-                const { relationship, pendingRequestId } = relationshipForMember(connections, member.id)
+                const { relationship, pendingRequestId } = relationshipForMember(connections, member.id, member.isFriend)
                 return (
                   <MemberSearchRow
                     key={member.id}

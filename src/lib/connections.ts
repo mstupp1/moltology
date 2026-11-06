@@ -56,7 +56,12 @@ export type ConnectionMemberSummary = {
 }
 
 export type ConnectionsListView = {
+  /** One page of friends, newest friendship first. */
   friends: ConnectionMemberSummary[]
+  /** All of the member's friends, not just this page. */
+  friendCount?: number
+  /** Offset of the next friends page, or null when every friend is loaded. */
+  nextFriendsOffset?: number | null
   incoming: ConnectionMemberSummary[]
   outgoing: ConnectionMemberSummary[]
   /** Present when Connections asked for Synaptic nearby. Omitted on hub/search reads. */
@@ -152,15 +157,21 @@ export type MemberSearchResult = {
   stage: number
   stageLabel: string
   avatarConfig: (Omit<import('./lobster-avatar').LobsterAvatarConfig, 'style'> & { style: string }) | null
+  /** Set by search so friends past the loaded friends page still read as friends. */
+  isFriend?: boolean
 }
 
 export function relationshipForMember(
   connections: ConnectionsListView | null | undefined,
   memberId: string,
+  isFriend?: boolean,
 ): { relationship: RelationshipState; pendingRequestId: string | null } {
-  if (!connections) return { relationship: 'none', pendingRequestId: null }
+  if (!connections) return { relationship: isFriend ? 'friends' : 'none', pendingRequestId: null }
 
-  if (connections.friends.some((row) => row.id === memberId)) {
+  // Search marks friends server-side; only trust that flag when the loaded friends
+  // page is partial; a complete list is fresher after an add or remove.
+  const friendsPartial = connections.nextFriendsOffset != null
+  if (connections.friends.some((row) => row.id === memberId) || (isFriend && friendsPartial)) {
     return { relationship: 'friends', pendingRequestId: null }
   }
 

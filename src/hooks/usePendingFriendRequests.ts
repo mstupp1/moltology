@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { listConnectionsFn } from '@/lib/server/api'
+import { countPendingFriendRequestsFn } from '@/lib/server/api'
 
 /** Fired by the friends lists after they reload, so the account badge stays in step without its own fetch. */
 export const FRIEND_REQUESTS_CHANGED_EVENT = 'friend-requests-changed'
@@ -28,8 +28,9 @@ export function usePendingFriendRequests(userId: string | null | undefined): num
     const load = async () => {
       try {
         const token = await getAuthJWTToken()
-        const next = await listConnectionsFn({ data: { token: token ?? undefined, includeSuggestions: false } })
-        if (!cancelled) setCount(next?.incoming?.length ?? 0)
+        // A single count query; the badge never needs the friends list itself.
+        const next = await countPendingFriendRequestsFn({ data: { token: token ?? undefined } })
+        if (!cancelled) setCount(next?.incoming ?? 0)
       } catch {
         // Keep the last count; the badge is a hint, not a source of truth.
       }

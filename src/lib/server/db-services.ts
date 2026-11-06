@@ -4584,6 +4584,20 @@ export const searchMembersHandler = async ({
     avatarConfig: (row.avatarConfig as MemberSearchResult['avatarConfig']) ?? null,
   }))
 
+  if (mapped.length > 0) {
+    const friendRows = await auth.dbClient
+      .select({ userAId: friendships.userAId, userBId: friendships.userBId })
+      .from(friendships)
+      .where(
+        or(
+          and(eq(friendships.userAId, auth.userId), inArray(friendships.userBId, mapped.map((m) => m.id))),
+          and(eq(friendships.userBId, auth.userId), inArray(friendships.userAId, mapped.map((m) => m.id))),
+        ),
+      )
+    const friendIds = new Set(friendRows.map((row) => (row.userAId === auth.userId ? row.userBId : row.userAId)))
+    for (const member of mapped) member.isFriend = friendIds.has(member.id)
+  }
+
   return rankMemberSearchResults(query, mapped)
 }
 
@@ -4821,6 +4835,11 @@ async function selectSynapticNearby(
       and(
         uniqueExcludeIds.length > 0 ? notInArray(profiles.id, uniqueExcludeIds) : sql`true`,
         sql`NOT EXISTS (
+          SELECT 1 FROM friendships f
+          WHERE (f."userAId" = ${viewerId} AND f."userBId" = ${profiles.id})
+             OR (f."userBId" = ${viewerId} AND f."userAId" = ${profiles.id})
+        )`,
+        sql`NOT EXISTS (
           SELECT 1 FROM suggestion_dismissals d
           WHERE d."viewerId" = ${viewerId}
             AND d."dismissedUserId" = ${profiles.id}
@@ -4854,16 +4873,29 @@ export const listConnectionsHandler = async ({
   token?: string
   userId?: string
   includeSuggestions?: boolean
+  friendsOffset?: number
+  friendsLimit?: number
 }>): Promise<ConnectionsListView> => {
   const auth = await resolveWriteAuth({ data, context })
   if (!auth) throw new Error('Unauthenticated: Authentication required to list connections.')
 
-  const friendshipRows = await auth.dbClient
-    .select()
-    .from(friendships)
-    .where(or(eq(friendships.userAId, auth.userId), eq(friendships.userBId, auth.userId)))
+  const friendsOffset = clampOffset(data?.friendsOffset)
+  const friendsLimit = clampPageSize(data?.friendsLimit, PAGE_SIZES.friends)
+  const mine = or(eq(friendships.userAId, auth.userId), eq(friendships.userBId, auth.userId))
 
-  const friendIds = friendshipRows.map((row) =>
+  const [friendshipRows, [friendTotal]] = await Promise.all([
+    auth.dbClient
+      .select()
+      .from(friendships)
+      .where(mine)
+      .orderBy(desc(friendships.createdAt), desc(friendships.id))
+      .limit(friendsLimit + 1)
+      .offset(friendsOffset),
+    auth.dbClient.select({ count: sql<number>`count(*)::int` }).from(friendships).where(mine),
+  ])
+  const friendPage = takePage(friendshipRows, friendsLimit)
+
+  const friendIds = friendPage.items.map((row) =>
     row.userAId === auth.userId ? row.userBId : row.userAId
   )
 
@@ -4882,7 +4914,7 @@ export const listConnectionsHandler = async ({
           .where(inArray(profiles.id, friendIds))
 
   const friendSinceById = new Map(
-    friendshipRows.map((row) => [
+    friendPage.items.map((row) => [
       row.userAId === auth.userId ? row.userBId : row.userAId,
       row.createdAt,
     ])
@@ -4947,13 +4979,19 @@ export const listConnectionsHandler = async ({
     })
     .filter(Boolean) as ConnectionsListView['outgoing']
 
-  const friends = friendProfiles.map((p) =>
-    toMemberSummary({
-      ...p,
-      avatarConfig: (p.avatarConfig as LobsterAvatarConfig | null) ?? null,
-      since: friendSinceById.get(p.id) ?? null,
-    }),
-  )
+  const profileByFriendId = new Map(friendProfiles.map((p) => [p.id, p]))
+  // Keep newest-friendship-first order; profiles come back in arbitrary order.
+  const friends = friendIds.flatMap((id) => {
+    const p = profileByFriendId.get(id)
+    if (!p) return []
+    return [
+      toMemberSummary({
+        ...p,
+        avatarConfig: (p.avatarConfig as LobsterAvatarConfig | null) ?? null,
+        since: friendSinceById.get(p.id) ?? null,
+      }),
+    ]
+  })
 
   const pendingCounterpartIds = pendingRows.map((row) =>
     row.senderId === auth.userId ? row.recipientId : row.senderId,
@@ -4962,17 +5000,32 @@ export const listConnectionsHandler = async ({
   const suggested = data?.includeSuggestions
     ? await selectSynapticNearby(auth.dbClient, auth.userId, [
         auth.userId,
-        ...friendIds,
         ...pendingCounterpartIds,
       ])
     : undefined
 
   return {
     friends,
+    friendCount: friendTotal?.count ?? friends.length,
+    nextFriendsOffset: nextOffsetFor(friendsOffset, friendPage.items.length, friendPage.hasMore),
     incoming,
     outgoing,
     ...(suggested ? { suggested } : {}),
   }
+}
+
+/** How many friend requests are waiting on the member. Powers the sidebar badge. */
+export const countPendingFriendRequestsHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ token?: string; userId?: string }>): Promise<{ incoming: number }> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) return { incoming: 0 }
+  const [row] = await auth.dbClient
+    .select({ count: sql<number>`count(*)::int` })
+    .from(friendRequests)
+    .where(and(eq(friendRequests.status, 'pending'), eq(friendRequests.recipientId, auth.userId)))
+  return { incoming: Number(row?.count) || 0 }
 }
 
 export const dismissSynapticNearbyHandler = async ({

@@ -21,11 +21,11 @@ vi.mock('@/lib/auth-client', () => ({
 }))
 
 const mockGetUserProfileFn = vi.fn().mockResolvedValue(null)
-const mockListConnectionsFn = vi.fn().mockResolvedValue({ incoming: [] })
+const mockCountPendingFn = vi.fn().mockResolvedValue({ incoming: 0 })
 
 vi.mock('../../lib/server/api', () => ({
   getUserProfileFn: (...args: unknown[]) => mockGetUserProfileFn(...args),
-  listConnectionsFn: (...args: unknown[]) => mockListConnectionsFn(...args),
+  countPendingFriendRequestsFn: (...args: unknown[]) => mockCountPendingFn(...args),
 }))
 
 const mockGetPremiumMembershipFn = vi.fn()
@@ -345,14 +345,14 @@ describe('HUDSidebar Component Navigation & Animations', () => {
   })
 
   it('badges the Profile item with waiting friend requests', async () => {
-    mockListConnectionsFn.mockResolvedValueOnce({ incoming: [{ userId: 'a' }, { userId: 'b' }] })
+    mockCountPendingFn.mockResolvedValueOnce({ incoming: 2 })
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'test-user-1', name: 'Operative Alpha', email: 'alpha@moltology.io' } } as any,
     } as any)
 
     render(<HUDSidebar />)
 
-    await waitFor(() => expect(mockListConnectionsFn).toHaveBeenCalled())
+    await waitFor(() => expect(mockCountPendingFn).toHaveBeenCalled())
     const profile = await screen.findByRole('button', { name: /^PROFILE\W*2 friend requests waiting$/i })
     expect(profile).toHaveTextContent('2')
     fireEvent.click(profile)

@@ -210,7 +210,7 @@ describe('ConnectionsPage', () => {
 
     await waitFor(() => {
       expect(listConnectionsFn).toHaveBeenCalledWith({
-        data: { token: 'a.b.c', includeSuggestions: true },
+        data: { token: 'a.b.c', includeSuggestions: true, friendsLimit: 30 },
       })
     })
     expect(screen.queryByText(SYNAPTIC_NEARBY_TITLE)).not.toBeInTheDocument()

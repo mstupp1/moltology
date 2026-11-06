@@ -984,18 +984,41 @@ export const dismissSynapticNearbyFn = createServerFn({ method: 'POST' })
 
 export const listConnectionsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data?: { token?: string; userId?: string; includeSuggestions?: boolean }) =>
+  .validator((data?: {
+    token?: string
+    userId?: string
+    includeSuggestions?: boolean
+    friendsOffset?: number
+    friendsLimit?: number
+  }) =>
     z
       .object({
         token: z.string().optional(),
         userId: z.string().optional(),
         includeSuggestions: z.boolean().optional(),
+        friendsOffset: z.number().int().min(0).max(100_000).optional(),
+        friendsLimit: z.number().int().min(1).max(100).optional(),
       })
       .parse(data ?? {})
   )
   .handler(async (args) => {
     const { listConnectionsHandler } = await import('./db-services')
     return listConnectionsHandler(args)
+  })
+
+export const countPendingFriendRequestsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data?: { token?: string; userId?: string }) =>
+    z
+      .object({
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data ?? {})
+  )
+  .handler(async (args) => {
+    const { countPendingFriendRequestsHandler } = await import('./db-services')
+    return countPendingFriendRequestsHandler(args)
   })
 
 export const getNotificationsFn = createServerFn({ method: 'POST' })

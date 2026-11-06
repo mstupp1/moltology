@@ -231,7 +231,7 @@ function PeopleResults({
   return (
     <ul className="space-y-2">
       {results.map((member) => {
-        const { relationship, pendingRequestId } = relationshipForMember(connections, member.id)
+        const { relationship, pendingRequestId } = relationshipForMember(connections, member.id, member.isFriend)
         return (
           <MemberSearchRow
             key={member.id}

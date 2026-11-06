@@ -299,22 +299,8 @@ describe('activity event log helpers', () => {
     expect(page.nextCursor).toBe('2026-08-27T17:46:00.000Z|evt-1')
   })
 
-  it('returns an empty circle when the member has no accepted friends', async () => {
-    const mock = createMockDb([
-      {
-        id: 'evt-own',
-        userId: 'user-1',
-        kind: ACTIVITY_EVENT_KIND_ROUTINE_COMPLETED,
-        title: 'Silent Synchronization sealed',
-        detail: 'The 05:30 liturgy is complete.',
-        valueBadge: '05:30',
-        createdAt: new Date('2026-08-27T17:46:00.000Z'),
-        actorHandle: 'claw_lord',
-        actorLarvaId: 'LARVA UNIT #1',
-        actorStage: 1,
-        actorAvatarConfig: null,
-      },
-    ])
+  it('reads Circle friends through one query instead of loading friend ids first', async () => {
+    const mock = createMockDb([])
     const page = await listActivityFeed(
       mock.db,
       'user-1',
@@ -322,7 +308,8 @@ describe('activity event log helpers', () => {
       new Date('2026-08-27T18:00:00.000Z')
     )
     expect(page).toEqual({ events: [], nextCursor: null })
-    expect(mock.innerJoin).not.toHaveBeenCalled()
+    expect(mock.select).toHaveBeenCalledTimes(1)
+    expect(mock.friendWhere).not.toHaveBeenCalled()
   })
 
   it('lists accepted-friend pulses on Circle and never the viewer’s own rows', async () => {
