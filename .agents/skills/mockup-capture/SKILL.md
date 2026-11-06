@@ -85,6 +85,14 @@ open every desktop and phone image and check:
 - **Framing.** Desktop zoom (`focus` in the library) lands on real content, not empty space.
   Captures start with the member sidebar collapsed to its icon rail, and the pointer parks on
   the right edge so no tooltip shows. If the rail or page width changes, re-aim `focus`.
+- **Zoom matches the frame.** Check each shot where it is shown, at desktop and phone width.
+  The homepage "How it works" frame is about 690px wide, so feature shots use a 1120×700
+  viewport (text reads near real size) instead of the full 1760×1100 desktop.
+- **Frame the interesting part.** A shot doesn't have to be the top of the page. Use
+  `FEATURE_FRAMING` in `scripts/lib/mockup-targets.ts` to set a viewport and a `clip`
+  (element selector, optional `closest` ancestor, padding; grown to the viewport's aspect).
+  The quiz frames its question card; the Oracle starts at the first question, not the latest
+  reply. For the hero carousel, aim the zoom with `focus` in the library.
 
 ## Showcase member
 
@@ -117,7 +125,8 @@ and relative times agree across shots.
   takes precedence over the synthetic fallback.
   This is display-only preview data, not a real authenticated account. The capture runner
   stages the showcase member's data for that synthetic user, with no authenticated writes.
-- Feature shots use `view=main`. Moltmax starts the quiz to show a real diagnostic question.
+- Feature shots use `view=main` at 1120 × 700 (2×), or the viewport and clip set in
+  `FEATURE_FRAMING`. Moltmax starts the quiz to show a real diagnostic question.
 - Wait for route readiness, network settling, fonts, visible image decoding (lazy images are
   switched to eager first), and UI settling.
   Reject HTTP errors, empty pages, and visible runtime errors (including missing-catalog errors). Inspect representative desktop/mobile outputs;
