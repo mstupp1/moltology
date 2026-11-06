@@ -1,19 +1,19 @@
 {
   "dashboard": {
-    "key": "images/email/welcome-dashboard-1a780aaf6875.jpg",
-    "revision": "1a780aaf6875",
+    "key": "images/email/welcome-dashboard-97bf4d2be6a6.jpg",
+    "revision": "97bf4d2be6a6",
     "width": 860,
     "height": 430
   },
   "oracle": {
-    "key": "images/email/welcome-oracle-bd72c7a7f932.jpg",
-    "revision": "bd72c7a7f932",
+    "key": "images/email/welcome-oracle-112f7cb88fbf.jpg",
+    "revision": "112f7cb88fbf",
     "width": 860,
     "height": 430
   },
   "forum": {
-    "key": "images/email/welcome-forum-49224c01b8d7.jpg",
-    "revision": "49224c01b8d7",
+    "key": "images/email/welcome-forum-7919f4781d48.jpg",
+    "revision": "7919f4781d48",
     "width": 860,
     "height": 430
   }
