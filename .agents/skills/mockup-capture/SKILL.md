@@ -11,8 +11,8 @@ Before starting, read and follow [content worktree hygiene](../../../docs/conten
 
 The source of truth is [`src/components/home/device-preview-library.ts`](../../../src/components/home/device-preview-library.ts).
 Every entry defines an ID, route, label, and alt text.
-The library includes Character Studio (`chassis`), which needs a real development login;
-its synthetic preview cannot read authenticated equipment. The homepage
+Member pages are captured as the staged showcase member (below), so every sector, Character
+Studio included, can be captured without a login. The homepage
 [`DevicePreviewCarousel.tsx`](../../../src/components/home/DevicePreviewCarousel.tsx)
 and [`scripts/capture-dashboard-mockups.ts`](../../../scripts/capture-dashboard-mockups.ts)
 consume the same registry. Add new sectors there after inspecting both device sizes;
@@ -25,41 +25,83 @@ For marketing presentations, read the [shared annual content calendar](../../../
 # Start the development server first; use its printed loopback URL below.
 npm run dev
 
+# Which shots are out of date? Lists commits to each page's code since its last capture.
+npm run mockups:stale
+
 # All seven sectors: dashboard, forum, oracle, moltmax, market, codex, chassis.
 # Captures desktop/mobile pairs plus the four homepage feature images.
-npm run mockups:capture -- --auth-dev --base-url=http://127.0.0.1:3000
+npm run mockups:capture -- --base-url=http://127.0.0.1:3000
 
 # Refresh only the complete carousel library, preserving feature crops:
-npm run mockups:capture -- --target=device --auth-dev --base-url=http://127.0.0.1:3000
+npm run mockups:capture -- --target=device --base-url=http://127.0.0.1:3000
 
 # One public-preview sector, including both devices and its feature image if registered:
 npm run mockups:capture -- --target=forum
 
 # All desktop or all mobile shots:
-npm run mockups:capture -- --target=mobile --auth-dev --base-url=http://127.0.0.1:3000
+npm run mockups:capture -- --target=mobile --base-url=http://127.0.0.1:3000
 
 # Feature-only refresh:
 npm run mockups:capture -- --target=feature
 
-# Character Studio with saved development credentials:
-npm run mockups:capture -- --target=chassis --auth-dev --base-url=http://127.0.0.1:3000
+# Restricted cloud sessions (no third-party image hosts): fail those images fast so
+# components show their own fallbacks instead of failing the capture.
+npm run mockups:capture -- --base-url=http://127.0.0.1:3000 --skip-s3 --offline-external
 
 # Local-only full refresh:
-npm run mockups:capture -- --auth-dev --base-url=http://127.0.0.1:3000 --skip-s3
+npm run mockups:capture -- --base-url=http://127.0.0.1:3000 --skip-s3
 
 # Custom desktop route (not automatically added to the homepage):
 npm run mockups:capture -- --url=/journal --output=journal_desktop_preview
 ```
 
-Batches containing Chassis require `--auth-dev` and an explicit local `--base-url`;
-they fail early without them. Public-preview-only targets can omit those flags to build
-production and start an isolated server on port 3019. `--base-url` uses an existing server
-and never stops it.
+Without `--base-url` the CLI builds production and starts an isolated server on port 3019.
+`--base-url` uses an existing server and never stops it. Use the development server, not
+production: production server function URLs are hashed, so the showcase fixtures can't
+answer them, and the forum then shows whatever that server's database holds.
 For a restricted cloud environment, `--media-origin=<public bucket origin>`
 can route capture-only `/media/*` reads through Node’s inherited proxy. This never
 changes page asset URLs or the site’s CDN configuration. Use only an allowed origin. Chrome is discovered on
 macOS/Linux through the existing composite renderer resolver; override with
 `MOCKUP_CHROME_PATH`. Requires `playwright-core` and `@napi-rs/canvas` from package.json.
+
+## When to refresh and what to look at
+
+Run `npm run mockups:stale` first. Any sector with commits since its capture gets recaptured;
+a page rebuild (new layout, removed feature, renamed control) always does. After a capture,
+open every desktop and phone image and check:
+
+- **Current UI.** Compare against the live page. Old layouts, removed features (the old
+  credit-bundle market) or retired copy mean the shot is stale even if the run passed.
+- **Looks lived in.** Dashboard shows progress, a streak and a filled heatmap; Oracle shows a
+  real exchange and past chats; Character wears bought gear. Empty states only where the
+  product really is empty for a member.
+- **Nothing covering content.** No floating launcher, toast, cookie bar, dialog or tooltip.
+  The capture hides the Oracle launcher; anything new that floats needs the same.
+- **Text is readable on art.** On phones, stage art must not sit under the greeting or
+  headings (fix the page's scrim or layout, not the screenshot).
+- **No promises the product can't keep.** Sample Oracle replies only suggest things a member
+  can do themselves; the Oracle has no tools.
+- **Framing.** Desktop zoom (`focus` in the library) lands on real content, not empty space.
+
+## Showcase member
+
+`scripts/lib/mockup-showcase.ts` stages one member for every capture that isn't `--auth-dev`:
+mid Stage 2, a 23-day streak, three of today's tasks done, a 90-day history, four connections
+with recent activity, six past Oracle chats, 340 gems, five bought pieces and a worn outfit.
+It answers those member reads in the browser (by server function name, serialized with seroval
+like TanStack Start does) using the same pure builders the server uses (`buildMarketPieces`,
+`toCatalogRef`, `computeLoadoutTotals`, the activity copy builders), so payload shapes follow
+the code. Nothing touches the database. Reads it doesn't list pass through to the server, which
+rejects the placeholder token, so they behave as for a signed-out member.
+
+When a member page starts reading new data, add a fixture there rather than accepting an empty
+or error state. Keep it believable: plain handles, ordinary goals, numbers a real member could
+have. Don't stage other members' engagement on public content (forum votes or views); the
+forum shows real posts from the server's database.
+
+The clock is pinned to 09:40 on the capture day for the whole batch, so the date, "Next" task
+and relative times agree across shots.
 
 ## Capture contract
 
@@ -72,10 +114,10 @@ macOS/Linux through the existing composite renderer resolver; override with
   and use the existing preview session; `--auth-dev` signs in first, so the real account
   takes precedence over the synthetic fallback.
   This is display-only preview data, not a real authenticated account. The capture runner
-  supplies an empty, date-scoped routine snapshot for that synthetic user so the dashboard
-  and shared header finish loading without authenticated writes.
+  stages the showcase member's data for that synthetic user, with no authenticated writes.
 - Feature shots use `view=main`. Moltmax starts the quiz to show a real diagnostic question.
-- Wait for route readiness, network settling, fonts, visible image decoding, and UI settling.
+- Wait for route readiness, network settling, fonts, visible image decoding (lazy images are
+  switched to eager first), and UI settling.
   Reject HTTP errors, empty pages, and visible runtime errors (including missing-catalog errors). Inspect representative desktop/mobile outputs;
   readiness checks cannot establish visual correctness. Loading skeletons, quiz spinners,
   and broken currency/product artwork are capture failures. If local `/media/*` requests
@@ -92,9 +134,10 @@ macOS/Linux through the existing composite renderer resolver; override with
 - Default execution also runs the existing `s3:sync` parity pipeline. `--skip-s3`
   keeps the refresh local. Uploads are not required for homepage images served locally.
 
-## Protected routes and saved development login
+## Optional: a real development login
 
-Read [local development](../../../docs/local-development.md) before authenticated captures.
+The showcase member covers every sector. Use a real login only to check a page against an
+actual account's data. Read [local development](../../../docs/local-development.md) first.
 Use `DEV_TEST_EMAIL`, `DEV_TEST_PASSWORD`, and `DEV_TEST_USER_ID` from the ignored development
 `.env` against a local server backed by the development database. Keep credentials, cookies,
 and saved browser state out of logs, screenshots, and tracked files. Do not use the development

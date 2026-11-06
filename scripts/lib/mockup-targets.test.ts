@@ -26,3 +26,15 @@ describe('marketing capture registry', () => {
     }
   })
 })
+
+describe('mockup source map', () => {
+  it('lists existing source paths for every homepage sector', async () => {
+    const fs = await import('node:fs')
+    const { MOCKUP_SOURCES, SHARED_MOCKUP_SOURCES } = await import('./mockup-targets')
+    for (const sector of DEVICE_PREVIEW_LIBRARY) {
+      expect(MOCKUP_SOURCES[sector.id]?.length).toBeGreaterThan(0)
+      for (const source of MOCKUP_SOURCES[sector.id]) expect(fs.existsSync(source), source).toBe(true)
+    }
+    for (const source of SHARED_MOCKUP_SOURCES) expect(fs.existsSync(source), source).toBe(true)
+  })
+})

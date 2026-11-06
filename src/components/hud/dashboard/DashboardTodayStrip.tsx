@@ -111,7 +111,7 @@ export function DashboardTodayStrip() {
       className="relative isolate overflow-hidden rounded-card border border-line-subtle bg-surface-1 shadow-sheen-inset"
     >
       <div className="relative">
-        <div aria-hidden="true" className="pointer-events-none absolute top-0 right-0 h-[210px] sm:h-full w-full sm:w-3/5 overflow-hidden">
+        <div aria-hidden="true" className="pointer-events-none absolute top-0 right-0 h-[210px] sm:h-full w-[72%] sm:w-3/5 overflow-hidden">
           <img
             key={progression.stage}
             src={getAssetUrl(STAGE_ART[progression.stage] ?? STAGE_ART[1])}
@@ -121,7 +121,8 @@ export function DashboardTodayStrip() {
             fetchPriority="high"
             className="absolute right-0 top-0 h-full w-full object-cover object-right motion-safe:animate-in motion-safe:fade-in motion-safe:duration-700"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-surface-1 via-surface-1/20 to-transparent" />
+          {/* Phones stack the greeting over the art, so the scrim holds further across there. */}
+          <div className="absolute inset-0 bg-gradient-to-r from-surface-1 via-surface-1/60 sm:via-surface-1/20 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface-1 via-transparent to-transparent" />
         </div>
 

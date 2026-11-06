@@ -72,6 +72,7 @@
     "logic:sync": "tsx scripts/sync-logic-atlas.ts",
     "logic:check": "tsx scripts/sync-logic-atlas.ts --check",
     "mockups:capture": "tsx scripts/capture-dashboard-mockups.ts",
+    "mockups:stale": "tsx scripts/mockup-staleness.ts",
     "composite:render": "tsx scripts/render-composite.ts",
     "composite:capture": "tsx scripts/render-composite.ts",
     "refs": "tsx scripts/composite-references.ts",
