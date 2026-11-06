@@ -51,11 +51,11 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     const { container } = render(<HUDSidebar />)
     const aside = screen.getByRole('complementary')
     expect(aside).toHaveClass('transition-[width]', 'motion-reduce:transition-none')
-    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-60')
+    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-56')
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
     expect(container.querySelector('nav')?.parentElement).toHaveClass('w-20')
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
-    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-60')
+    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-56')
   })
 
   it('cancels mobile close callbacks on reopen and releases scroll lock at the desktop breakpoint', () => {
@@ -122,7 +122,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     render(<HUDSidebar />)
 
     const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('md:w-60')
+    expect(aside).toHaveClass('md:w-56')
 
     // Press Cmd+B to collapse
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
@@ -130,14 +130,14 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     // Press Cmd+B to un-collapse
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
-    expect(aside).toHaveClass('md:w-60')
+    expect(aside).toHaveClass('md:w-56')
   })
 
   it('toggles sidebar collapse with interactive edge rail click', () => {
     render(<HUDSidebar />)
 
     const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('md:w-60')
+    expect(aside).toHaveClass('md:w-56')
 
     const rail = screen.getByRole('separator', { name: /Collapse sidebar/i })
     expect(rail).toBeInTheDocument()
@@ -152,14 +152,14 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     fireEvent.mouseDown(rail, { button: 0, clientX: 72 })
     fireEvent.mouseUp(window)
 
-    expect(aside).toHaveClass('md:w-60')
+    expect(aside).toHaveClass('md:w-56')
   })
 
   it('collapses and expands sidebar by dragging the edge rail', () => {
     render(<HUDSidebar />)
 
     const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('md:w-60')
+    expect(aside).toHaveClass('md:w-56')
 
     const rail = screen.getByRole('separator')
 
@@ -175,7 +175,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     fireEvent.mouseMove(window, { clientX: 300 })
     fireEvent.mouseUp(window)
 
-    expect(aside).toHaveClass('md:w-60')
+    expect(aside).toHaveClass('md:w-56')
   })
 
   it('renders short centered text names underneath items in collapsed mode', () => {
@@ -384,7 +384,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     const aside = container.querySelector('aside')
     expect(aside?.className).toContain('md:w-20')
-    expect(aside?.className).not.toContain('md:w-60')
+    expect(aside?.className).not.toContain('md:w-56')
   })
 
   it('shows a claimed designation in the account menu instead of the larva unit', async () => {

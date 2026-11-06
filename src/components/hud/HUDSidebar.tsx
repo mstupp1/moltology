@@ -692,7 +692,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       <aside
         suppressHydrationWarning
         className={`w-full ${
-          isCollapsed ? 'md:w-20' : 'md:w-60'
+          isCollapsed ? 'md:w-20' : 'md:w-56'
         } h-auto md:h-full md:min-h-0 md:max-h-full bg-surface-1 border-b-0 md:border-r border-line-subtle flex flex-col select-none relative z-40 md:z-50 shrink-0 shadow-2xl ${
           isMounted ? 'transition-[width] duration-200 ease-out motion-reduce:transition-none' : ''
         } group/sidebar ${isNavAnimating ? 'md:overflow-hidden' : 'overflow-visible'}`}
@@ -766,7 +766,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           className={`hidden md:flex items-center shrink-0 relative group/brand border-b border-line-subtle h-16 overflow-visible ${
             desktopContentAnimation
           } ${
-            isCollapsed ? 'w-20 justify-center px-2' : 'w-60 justify-start px-3'
+            isCollapsed ? 'w-20 justify-center px-2' : 'w-56 justify-start px-3'
           }`}
         >
           <HeaderBrand
@@ -812,7 +812,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         </div>
 
         {/* Desktop Sidebar Navigation Container */}
-        <div className={`hidden md:flex flex-1 flex-col justify-between space-y-0 overflow-visible min-h-0 shrink-0 ${desktopContentAnimation} ${isCollapsed ? 'w-20' : 'w-60'}`}>
+        <div className={`hidden md:flex flex-1 flex-col justify-between space-y-0 overflow-visible min-h-0 shrink-0 ${desktopContentAnimation} ${isCollapsed ? 'w-20' : 'w-56'}`}>
           {/* Search Bar — full width, above nav */}
           <div className="shrink-0 border-b border-line-subtle">
             <button
@@ -827,7 +827,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               ) : (
                 <div className="flex items-center gap-2 truncate">
                   <Search className="w-3.5 h-3.5 text-cyan-glow group-hover:scale-110 transition-transform shrink-0" />
-                  <span className="truncate">Search pages and members…</span>
+                  <span className="truncate">Search…</span>
                 </div>
               )}
             </button>
@@ -1163,7 +1163,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               >
                 <div className="flex items-center gap-2.5 truncate">
                   <Search className="w-4 h-4 text-cyan-glow shrink-0" />
-                  <span className="truncate text-xs font-sans text-ink-body">Search pages and members…</span>
+                  <span className="truncate text-xs font-sans text-ink-body">Search…</span>
                 </div>
               </button>
             </div>
