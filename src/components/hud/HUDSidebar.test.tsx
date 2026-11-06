@@ -21,9 +21,11 @@ vi.mock('@/lib/auth-client', () => ({
 }))
 
 const mockGetUserProfileFn = vi.fn().mockResolvedValue(null)
+const mockListConnectionsFn = vi.fn().mockResolvedValue({ incoming: [] })
 
 vi.mock('../../lib/server/api', () => ({
   getUserProfileFn: (...args: unknown[]) => mockGetUserProfileFn(...args),
+  listConnectionsFn: (...args: unknown[]) => mockListConnectionsFn(...args),
 }))
 
 const mockGetPremiumMembershipFn = vi.fn()
@@ -49,11 +51,11 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     const { container } = render(<HUDSidebar />)
     const aside = screen.getByRole('complementary')
     expect(aside).toHaveClass('transition-[width]', 'motion-reduce:transition-none')
-    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-72')
+    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-56')
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
     expect(container.querySelector('nav')?.parentElement).toHaveClass('w-20')
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
-    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-72')
+    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-56')
   })
 
   it('cancels mobile close callbacks on reopen and releases scroll lock at the desktop breakpoint', () => {
@@ -79,24 +81,28 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     vi.useRealTimers()
   })
 
-  it('renders core navigation groups and items correctly', () => {
+  it('renders one flat list of pages without section headings', () => {
     render(<HUDSidebar />)
 
-    expect(screen.getByText('MAIN')).toBeInTheDocument()
-    expect(screen.getByText('LEARN')).toBeInTheDocument()
-    expect(screen.getByText('COMMUNITY')).toBeInTheDocument()
-    expect(screen.queryByText('GEAR & SHOP')).not.toBeInTheDocument()
+    expect(screen.queryByText('MAIN')).not.toBeInTheDocument()
+    expect(screen.queryByText('LEARN')).not.toBeInTheDocument()
+    expect(screen.queryByText('COMMUNITY')).not.toBeInTheDocument()
 
     expect(screen.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
     expect(screen.getByText('ORACLE')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^CHARACTER$/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^FRIENDS$/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^PROFILE$/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^ACADEMY$/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^FORUM$/i })).toBeInTheDocument()
+    // Friends lives on the profile and Stages on Character, so neither has a sidebar row.
+    expect(screen.queryByRole('button', { name: /^FRIENDS$/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^STAGES$/i })).not.toBeInTheDocument()
     // Daily alignment opens from the dashboard and the tasks menu, not the sidebar.
     expect(screen.queryByRole('button', { name: /^DAILY ALIGNMENT$/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^MARKET$/i })).not.toBeInTheDocument()
   })
 
-  it.each([['CODEX', '/codex'], ['FRIENDS', '/friends'], ['CHARACTER', '/character']])('navigates to %s on nav item click', (label, route) => {
+  it.each([['CODEX', '/codex'], ['FORUM', '/forum'], ['CHARACTER', '/character']])('navigates to %s on nav item click', (label, route) => {
     render(<HUDSidebar />)
 
     fireEvent.click(screen.getByRole('button', { name: label }))
@@ -112,26 +118,11 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })
   })
 
-  it('toggles section open and closed on header click', () => {
-    render(<HUDSidebar />)
-
-    const coreHeader = screen.getByRole('button', { name: /MAIN/i })
-    fireEvent.click(coreHeader)
-
-    const accordionContent = coreHeader.parentElement?.querySelector('.grid')
-    expect(accordionContent).toHaveClass('grid-rows-[0fr]')
-    expect(accordionContent).toHaveClass('opacity-0')
-
-    fireEvent.click(coreHeader)
-    expect(accordionContent).toHaveClass('grid-rows-[1fr]')
-    expect(accordionContent).toHaveClass('opacity-100')
-  })
-
   it('toggles sidebar collapse with shortcut key (Cmd+B)', () => {
     render(<HUDSidebar />)
 
     const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-56')
 
     // Press Cmd+B to collapse
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
@@ -139,14 +130,14 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     // Press Cmd+B to un-collapse
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-56')
   })
 
   it('toggles sidebar collapse with interactive edge rail click', () => {
     render(<HUDSidebar />)
 
     const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-56')
 
     const rail = screen.getByRole('separator', { name: /Collapse sidebar/i })
     expect(rail).toBeInTheDocument()
@@ -161,14 +152,14 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     fireEvent.mouseDown(rail, { button: 0, clientX: 72 })
     fireEvent.mouseUp(window)
 
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-56')
   })
 
   it('collapses and expands sidebar by dragging the edge rail', () => {
     render(<HUDSidebar />)
 
     const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-56')
 
     const rail = screen.getByRole('separator')
 
@@ -184,7 +175,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     fireEvent.mouseMove(window, { clientX: 300 })
     fireEvent.mouseUp(window)
 
-    expect(aside).toHaveClass('md:w-72')
+    expect(aside).toHaveClass('md:w-56')
   })
 
   it('renders short centered text names underneath items in collapsed mode', () => {
@@ -200,10 +191,8 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
     expect(screen.getAllByText('ORACLE').length).toBeGreaterThan(0)
     expect(screen.getAllByText('ACADEMY').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('STAGES').length).toBeGreaterThan(0)
     expect(screen.queryByText('JOURNAL')).not.toBeInTheDocument()
     expect(screen.getAllByText('CHARACTER').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('FRIENDS').length).toBeGreaterThan(0)
     expect(screen.getAllByText('FORUM').length).toBeGreaterThan(0)
     expect(screen.getAllByText('SUPPORT').length).toBeGreaterThan(0)
   })
@@ -352,6 +341,21 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getByRole('button', { name: /SIGN OUT/i })).toBeInTheDocument()
   })
 
+  it('badges the Profile item with waiting friend requests', async () => {
+    mockListConnectionsFn.mockResolvedValueOnce({ incoming: [{ userId: 'a' }, { userId: 'b' }] })
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'test-user-1', name: 'Operative Alpha', email: 'alpha@moltology.io' } } as any,
+    } as any)
+
+    render(<HUDSidebar />)
+
+    await waitFor(() => expect(mockListConnectionsFn).toHaveBeenCalled())
+    const profile = await screen.findByRole('button', { name: /^PROFILE\W*2 friend requests waiting$/i })
+    expect(profile).toHaveTextContent('2')
+    fireEvent.click(profile)
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/profile' })
+  })
+
   it('renders avatar skeleton placeholder while session is pending', () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: null,
@@ -380,7 +384,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     const aside = container.querySelector('aside')
     expect(aside?.className).toContain('md:w-20')
-    expect(aside?.className).not.toContain('md:w-72')
+    expect(aside?.className).not.toContain('md:w-56')
   })
 
   it('shows a claimed designation in the account menu instead of the larva unit', async () => {

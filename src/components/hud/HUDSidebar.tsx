@@ -7,14 +7,12 @@ import {
   LayoutDashboard,
   BookOpen,
   Scroll,
-  FlaskConical,
   Sliders,
   Users,
   Atom,
   Search,
   LogOut,
   UserPlus,
-  UserCheck,
   LifeBuoy,
   ChevronsLeft,
   ChevronsRight,
@@ -26,10 +24,12 @@ import {
   EyeOff,
   ShieldCheck,
 
+  CircleUser,
 } from 'lucide-react'
 import { getUserProfileFn } from '../../lib/server/api'
 import { getAuthJWTToken } from '../../lib/jwt'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { usePendingFriendRequests } from '@/hooks/usePendingFriendRequests'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
 import { ChromaElement, HeaderBrand, AnimatedHamburger } from '../ui'
@@ -51,7 +51,7 @@ import { HUDProgressBar } from './HUDProgressBar'
 import { HUDTaskBar } from './HUDTaskBar'
 import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 
-const GUEST_LOCKED_PATHS = new Set(['/academy', '/character', '/friends', '/member'])
+const GUEST_LOCKED_PATHS = new Set(['/academy', '/character', '/member', '/profile'])
 
 export function computeNavItemHidden(
   item: { path: string; featureFlag?: FeatureFlagId },
@@ -287,6 +287,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   const session = useAuthSession()
   const user = session.user
+  const pendingFriendRequests = usePendingFriendRequests(user?.id)
+  const requestBadgeLabel = `, ${pendingFriendRequests} friend request${pendingFriendRequests === 1 ? '' : 's'} waiting`
   const isSessionPending = session.isPending
   const [memberAvatar, setMemberAvatar] = useState<import('@/lib/lobster-avatar').LobsterAvatarConfig | null>(null)
   const [userRole, setUserRole] = useState<string | null>(null)
@@ -362,79 +364,20 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     items: NavItem[]
   }
 
+  // One flat list: with six pages, section headings only added clicks.
+  // A group with an empty title renders without a header and never collapses.
   const navGroups: NavGroup[] = [
     {
       id: 'core',
-      title: 'MAIN',
+      title: '',
       items: [
-        {
-          id: 'hub',
-          label: 'DASHBOARD',
-          shortLabel: 'DASHBOARD',
-          icon: LayoutDashboard,
-          path: '/dashboard',
-        },
-        {
-          id: 'oracle',
-          label: 'ORACLE',
-          shortLabel: 'ORACLE',
-          icon: Atom,
-          path: '/oracle',
-        },
-        {
-          id: 'character',
-          label: 'CHARACTER',
-          shortLabel: 'CHARACTER',
-          icon: Sliders,
-          path: '/character',
-        },
-      ],
-    },
-    {
-      id: 'knowledge',
-      title: 'LEARN',
-      items: [
-        {
-          id: 'codex',
-          label: 'CODEX',
-          shortLabel: 'CODEX',
-          icon: Scroll,
-          path: '/codex',
-        },
-        {
-          id: 'academy',
-          label: 'ACADEMY',
-          shortLabel: 'ACADEMY',
-          icon: BookOpen,
-          path: '/academy',
-        },
-        {
-          id: 'stages',
-          label: 'STAGES',
-          shortLabel: 'STAGES',
-          icon: FlaskConical,
-          path: '/stages',
-        },
-      ],
-    },
-    {
-      id: 'community',
-      title: 'COMMUNITY',
-      items: [
-        {
-          id: 'forum',
-          label: 'FORUM',
-          shortLabel: 'FORUM',
-          icon: Users,
-          path: '/forum',
-        },
-        {
-          id: 'friends',
-          label: 'FRIENDS',
-          shortLabel: 'FRIENDS',
-          icon: UserCheck,
-          path: '/friends',
-        },
+        { id: 'hub', label: 'DASHBOARD', shortLabel: 'DASHBOARD', icon: LayoutDashboard, path: '/dashboard' },
+        { id: 'oracle', label: 'ORACLE', shortLabel: 'ORACLE', icon: Atom, path: '/oracle' },
+        { id: 'character', label: 'CHARACTER', shortLabel: 'CHARACTER', icon: Sliders, path: '/character' },
+        { id: 'profile', label: 'PROFILE', shortLabel: 'PROFILE', icon: CircleUser, path: '/profile' },
+        { id: 'codex', label: 'CODEX', shortLabel: 'CODEX', icon: Scroll, path: '/codex' },
+        { id: 'academy', label: 'ACADEMY', shortLabel: 'ACADEMY', icon: BookOpen, path: '/academy' },
+        { id: 'forum', label: 'FORUM', shortLabel: 'FORUM', icon: Users, path: '/forum' },
       ],
     },
   ]
@@ -505,8 +448,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   }
 
   const handleNavClick = (path: string) => {
-    setPendingRoute(path)
-    navigate({ to: path })
+    setPendingRoute(path.split('?')[0])
+    navigate(path.includes('?') ? { href: path } : { to: path })
     if (isMobileOpen) {
       closeMobileMenu()
     }
@@ -514,7 +457,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   const renderNavGroupContent = (isMobile: boolean = false) => {
     return visibleNavGroups.map((group, groupIdx) => {
-      const isOpen = !!openGroups[group.id]
+      const isFlat = !group.title
+      const isOpen = isFlat || !!openGroups[group.id]
       const isGroupActive = group.items.some(
         (item) =>
           effectiveRoute === item.path ||
@@ -551,13 +495,24 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     <div className={`absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-glow ${hidden ? 'opacity-45' : ''}`} />
                   )}
 
-                  <Icon
-                    className={`w-4 h-4 shrink-0 ${hidden ? 'opacity-40' : ''} ${
-                      isActive
-                        ? 'text-cyan-glow'
-                        : 'text-ink-muted group-hover/navitem:text-ink transition-colors duration-150'
-                    }`}
-                  />
+                  <span className="relative inline-flex">
+                    <Icon
+                      className={`w-4 h-4 shrink-0 ${hidden ? 'opacity-40' : ''} ${
+                        isActive
+                          ? 'text-cyan-glow'
+                          : 'text-ink-muted group-hover/navitem:text-ink transition-colors duration-150'
+                      }`}
+                    />
+                    {item.id === 'profile' && pendingFriendRequests > 0 && (
+                      <span
+                        data-testid="profile-requests-dot"
+                        className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-cyan-glow ring-2 ring-abyss"
+                      />
+                    )}
+                  </span>
+                  {item.id === 'profile' && pendingFriendRequests > 0 && (
+                    <span className="sr-only">{requestBadgeLabel}</span>
+                  )}
 
                   <span
                     className={`inline-flex items-center justify-center gap-0.5 text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center max-w-full transition-colors duration-150 ${
@@ -598,6 +553,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
       return (
         <div key={group.id} className="border-b border-line-subtle">
+          {!isFlat && (
           <button
             onClick={() => toggleGroup(group.id)}
             className={`w-full flex items-center justify-between ${
@@ -626,6 +582,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               />
             </div>
           </button>
+          )}
 
           {/* Smooth Collapsible Section Content */}
           <div
@@ -696,6 +653,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     )}
                     {hidden && <span className="sr-only">Hidden</span>}
 
+                    {item.id === 'profile' && pendingFriendRequests > 0 && (
+                      <span className="ml-auto min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full bg-cyan-glow text-[11px] font-sans font-bold text-abyss tabular-nums shrink-0">
+                        <span aria-hidden="true">{pendingFriendRequests > 99 ? '99+' : pendingFriendRequests}</span>
+                        <span className="sr-only">{requestBadgeLabel}</span>
+                      </span>
+                    )}
+
                     {!isSessionPending && !user?.id && GUEST_LOCKED_PATHS.has(item.path) && (
                       <Lock className="w-3.5 h-3.5 text-crimson-text/80 shrink-0 ml-auto" />
                     )}
@@ -728,7 +692,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       <aside
         suppressHydrationWarning
         className={`w-full ${
-          isCollapsed ? 'md:w-20' : 'md:w-72'
+          isCollapsed ? 'md:w-20' : 'md:w-56'
         } h-auto md:h-full md:min-h-0 md:max-h-full bg-surface-1 border-b-0 md:border-r border-line-subtle flex flex-col select-none relative z-40 md:z-50 shrink-0 shadow-2xl ${
           isMounted ? 'transition-[width] duration-200 ease-out motion-reduce:transition-none' : ''
         } group/sidebar ${isNavAnimating ? 'md:overflow-hidden' : 'overflow-visible'}`}
@@ -802,7 +766,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           className={`hidden md:flex items-center shrink-0 relative group/brand border-b border-line-subtle h-16 overflow-visible ${
             desktopContentAnimation
           } ${
-            isCollapsed ? 'w-20 justify-center px-2' : 'w-72 justify-start px-3'
+            isCollapsed ? 'w-20 justify-center px-2' : 'w-56 justify-start px-3'
           }`}
         >
           <HeaderBrand
@@ -848,7 +812,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         </div>
 
         {/* Desktop Sidebar Navigation Container */}
-        <div className={`hidden md:flex flex-1 flex-col justify-between space-y-0 overflow-visible min-h-0 shrink-0 ${desktopContentAnimation} ${isCollapsed ? 'w-20' : 'w-72'}`}>
+        <div className={`hidden md:flex flex-1 flex-col justify-between space-y-0 overflow-visible min-h-0 shrink-0 ${desktopContentAnimation} ${isCollapsed ? 'w-20' : 'w-56'}`}>
           {/* Search Bar — full width, above nav */}
           <div className="shrink-0 border-b border-line-subtle">
             <button
@@ -863,7 +827,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               ) : (
                 <div className="flex items-center gap-2 truncate">
                   <Search className="w-3.5 h-3.5 text-cyan-glow group-hover:scale-110 transition-transform shrink-0" />
-                  <span className="truncate">Search pages and members…</span>
+                  <span className="truncate">Search…</span>
                 </div>
               )}
             </button>
@@ -1199,7 +1163,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               >
                 <div className="flex items-center gap-2.5 truncate">
                   <Search className="w-4 h-4 text-cyan-glow shrink-0" />
-                  <span className="truncate text-xs font-sans text-ink-body">Search pages and members…</span>
+                  <span className="truncate text-xs font-sans text-ink-body">Search…</span>
                 </div>
               </button>
             </div>

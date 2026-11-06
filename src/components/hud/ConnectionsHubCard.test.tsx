@@ -210,7 +210,7 @@ describe('ConnectionsHubCard', () => {
       expect(screen.getByRole('button', { name: /open connections/i })).toBeInTheDocument()
     })
     fireEvent.click(screen.getByRole('button', { name: /open connections/i }))
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/friends', search: { tab: 'friends' } })
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/profile', search: { tab: 'friends' } })
   })
 
   it('deep-links the hub CTA and Incoming count into Incoming when a request is pending', async () => {
@@ -238,9 +238,9 @@ describe('ConnectionsHubCard', () => {
       expect(screen.getByRole('button', { name: /open incoming/i })).toBeInTheDocument()
     })
     fireEvent.click(screen.getByRole('button', { name: /open incoming/i }))
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/friends', search: { tab: 'incoming' } })
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/profile', search: { tab: 'incoming' } })
 
     fireEvent.click(screen.getByRole('button', { name: /^incoming/i }))
-    expect(mockNavigate).toHaveBeenLastCalledWith({ to: '/friends', search: { tab: 'incoming' } })
+    expect(mockNavigate).toHaveBeenLastCalledWith({ to: '/profile', search: { tab: 'incoming' } })
   })
 })

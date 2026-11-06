@@ -9,7 +9,7 @@
     },
     {
       "source": "/pipeline",
-      "destination": "/stages",
+      "destination": "/character/progress",
       "permanent": true
     },
     {
@@ -29,12 +29,34 @@
     },
     {
       "source": "/stream",
-      "destination": "/friends?tab=feed",
+      "destination": "/profile?tab=activity",
+      "permanent": true
+    },
+    {
+      "source": "/stages",
+      "destination": "/character/progress",
       "permanent": true
     },
     {
       "source": "/connections",
-      "destination": "/friends",
+      "has": [{ "type": "query", "key": "tab" }],
+      "destination": "/profile",
+      "permanent": true
+    },
+    {
+      "source": "/connections",
+      "destination": "/profile?tab=friends",
+      "permanent": true
+    },
+    {
+      "source": "/friends",
+      "has": [{ "type": "query", "key": "tab" }],
+      "destination": "/profile",
+      "permanent": true
+    },
+    {
+      "source": "/friends",
+      "destination": "/profile?tab=friends",
       "permanent": true
     },
     {

@@ -422,6 +422,7 @@ export function generateSitemapXml(
     { loc: `${baseUrl}/forum`, priority: 0.8, changefreq: 'daily' },
     { loc: `${baseUrl}/changelog`, priority: 0.6, changefreq: 'weekly' },
     { loc: `${baseUrl}/character/shop`, priority: 0.6, changefreq: 'weekly' },
+    { loc: `${baseUrl}/character/progress`, priority: 0.6, changefreq: 'monthly' },
     { loc: `${baseUrl}/privacy`, priority: 0.3, changefreq: 'monthly' },
     { loc: `${baseUrl}/terms`, priority: 0.3, changefreq: 'monthly' },
   ]

@@ -90,7 +90,7 @@ describe('activity event log helpers', () => {
       expect.objectContaining({ kind: 'streak_milestone', sourceKey: 'streak:7:2026-08-27' })
     )
     expect(mock.values).toHaveBeenCalledWith(
-      expect.objectContaining({ kind: 'stage_reached', sourceKey: 'stage:2', href: '/stages' })
+      expect.objectContaining({ kind: 'stage_reached', sourceKey: 'stage:2', href: '/character/progress' })
     )
   })
 

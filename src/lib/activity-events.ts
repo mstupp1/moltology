@@ -328,10 +328,11 @@ export function parseActivityEventHref(href?: string | null): ParsedActivityHref
   const hash = hashIndex >= 0 ? raw.slice(hashIndex + 1).split('?')[0] || undefined : undefined
   if (path === '/alignment' || (path === '/dashboard' && hash === DAILY_ALIGNMENT_HUB_ID)) return { kind: 'alignment' }
   if (path === '/dashboard') return hash ? { kind: 'dashboard', hash } : { kind: 'dashboard' }
-  // Older events stored /pipeline before the page moved to /stages.
-  if (path === '/stages' || path === '/pipeline') return { kind: 'pipeline' }
-  // /connections is the old address of the friends list.
-  if (path === '/friends' || path === '/connections') return { kind: 'connections' }
+  // Older events stored /pipeline or /stages before the page became Character > Progress.
+  if (path === '/character/progress' || path === '/stages' || path === '/pipeline') return { kind: 'pipeline' }
+  // /friends and /connections are old addresses of the friends list, now a Profile tab.
+  if (path === '/friends' || path === '/connections' || (path === '/profile' && /[?&]tab=(friends|incoming|sent)\b/.test(raw)))
+    return { kind: 'connections' }
   if (path === '/oracle') return { kind: 'oracle' }
   if (path === '/forum') return { kind: 'forum' }
   const forum = path.match(/^\/forum\/([^/]+)(?:\/([^/]+))?$/)

@@ -8,6 +8,7 @@ import { SynapticNearbyStrip } from '@/components/hud/connections/SynapticNearby
 import { FriendRequestButton } from '@/components/hud/member/FriendRequestButton'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { listConnectionsFn, dismissSynapticNearbyFn } from '@/lib/server/api'
+import { announceFriendRequestCount } from '@/hooks/usePendingFriendRequests'
 import {
   CONNECTIONS_FRIENDS_EMPTY,
   CONNECTIONS_INCOMING_EMPTY,
@@ -59,6 +60,7 @@ export const ConnectionsPage: React.FC<{
         data: { token: token ?? undefined, includeSuggestions: true },
       })
       setConnections(next)
+      announceFriendRequestCount(next?.incoming?.length ?? 0)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Could not load connections.')
     } finally {

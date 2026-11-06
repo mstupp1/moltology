@@ -202,10 +202,10 @@ export function resolveConnectionsTab(
 }
 
 export function connectionsPageLocation(tab: ConnectionsTab = 'friends'): {
-  to: '/friends'
+  to: '/profile'
   search: { tab: ConnectionsTab }
 } {
-  return { to: '/friends', search: { tab } }
+  return { to: '/profile', search: { tab } }
 }
 
 /** Hub CTA: Incoming when anything is pending, otherwise Friends. */
@@ -404,22 +404,25 @@ export function toMemberSummary(row: {
 }
 
 /**
- * The Friends page (/friends) holds the activity feed and the friends list.
- * Its `tab` search value is the feed or one of the connection lists.
+ * Your profile (/profile) holds your page, your activity feed, your friends
+ * and friend requests. Its `tab` search value picks one of those.
  */
-export const FRIENDS_PAGE_TABS = ['feed', ...CONNECTIONS_TABS] as const
-export type FriendsPageTab = (typeof FRIENDS_PAGE_TABS)[number]
-export type FriendsPageSection = 'feed' | 'friends' | 'requests'
+export const PROFILE_PAGE_TABS = ['profile', 'activity', ...CONNECTIONS_TABS] as const
+export type ProfilePageTab = (typeof PROFILE_PAGE_TABS)[number]
+export type ProfilePageSection = 'profile' | 'activity' | 'friends' | 'requests'
 
-export const FRIENDS_PAGE_DESCRIPTION = 'See what your circle is up to, find members, and answer friend requests.'
+export const PROFILE_PAGE_DESCRIPTION = 'Your profile, your activity, your friends and friend requests.'
 
-export function parseFriendsPageTab(value: unknown): FriendsPageTab | undefined {
-  return value === 'feed' || isConnectionsTab(value) ? value : undefined
+/** Reads the tab from the address. `feed` is the old name of Activity on /friends. */
+export function parseProfilePageTab(value: unknown): ProfilePageTab | undefined {
+  if (value === 'feed') return 'activity'
+  return value === 'profile' || value === 'activity' || isConnectionsTab(value) ? value : undefined
 }
 
-/** Feed is the default; Incoming and Sent both live under Requests. */
-export function friendsPageSection(tab: FriendsPageTab | undefined): FriendsPageSection {
+/** Profile is the default; Incoming and Sent both live under Requests. */
+export function profilePageSection(tab: ProfilePageTab | undefined): ProfilePageSection {
+  if (tab === 'activity') return 'activity'
   if (tab === 'friends') return 'friends'
   if (tab === 'incoming' || tab === 'sent') return 'requests'
-  return 'feed'
+  return 'profile'
 }
