@@ -1,16 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import { render, screen, fireEvent, act } from '@testing-library/react'
-import { ToastProvider, useToast } from '@/components/ui/ToastProvider'
 import { HUDTaskBar } from './HUDTaskBar'
 import { CANONICAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
 import { OPEN_ALIGNMENT_PANEL_EVENT } from '@/lib/alignment-panel'
-import type { NotificationView } from '@/lib/notifications'
-
-const markRead = vi.fn()
-const markAllRead = vi.fn()
-let mockNotifications: NotificationView[] = []
-let mockUnreadCount = 0
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children, to, params, hash, ...props }: any) => {
@@ -26,19 +19,6 @@ vi.mock('@tanstack/react-router', () => ({
   },
 }))
 
-vi.mock('@/hooks/useNotifications', () => ({
-  useNotifications: () => ({
-    notifications: mockNotifications,
-    unreadCount: mockUnreadCount,
-    isLoading: false,
-    refresh: vi.fn(),
-    markRead,
-    markAllRead,
-    acceptFriendRequest: vi.fn(),
-    declineFriendRequest: vi.fn(),
-  }),
-}))
-
 function tasksWithCompletedCount(completedCount: number) {
   return CANONICAL_ALIGNMENT_TASKS.map((t, i) => ({
     id: t.key,
@@ -50,13 +30,6 @@ function tasksWithCompletedCount(completedCount: number) {
 }
 
 describe('HUDTaskBar', () => {
-  beforeEach(() => {
-    mockNotifications = []
-    mockUnreadCount = 0
-    markRead.mockReset()
-    markAllRead.mockReset()
-  })
-
   it('renders hero task bar chronometer with title, digits, and next alignment task', () => {
     render(<HUDTaskBar variant="hero" />)
     
@@ -124,7 +97,7 @@ describe('HUDTaskBar', () => {
     expect(onComplete).toHaveBeenCalledWith('silent-synchronization')
   })
 
-  it('toggles the dropdown, switches tabs and toggles liturgies from the list', () => {
+  it('toggles the dropdown and toggles liturgies from the list', () => {
     const onComplete = vi.fn()
     render(<HUDTaskBar variant="header" onCompleteTask={onComplete} />)
 
@@ -134,20 +107,15 @@ describe('HUDTaskBar', () => {
     fireEvent.click(headerTile)
 
     expect(screen.getByTestId('alignment-panel')).toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: /Tasks/ })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByText('0 of 8 done')).toBeInTheDocument()
     expect(screen.getByTestId('alignment-panel')).toHaveTextContent('Next')
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument()
+    expect(screen.queryByText('Notifications')).not.toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: /Silent Synchronization/ }))
     expect(onComplete).toHaveBeenCalledWith('silent-synchronization')
 
-    fireEvent.click(screen.getByRole('tab', { name: /Notifications/ }))
-    expect(screen.getByText('Nothing new')).toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('tab', { name: /Tasks/ }))
-    expect(screen.getByText('0 of 8 done')).toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Close activity center' }))
+    fireEvent.click(screen.getByRole('button', { name: "Close today's tasks" }))
     expect(screen.queryByTestId('alignment-panel')).not.toBeInTheDocument()
   })
 
@@ -163,29 +131,6 @@ describe('HUDTaskBar', () => {
     expect(screen.queryByRole('switch', { name: /Reminders/ })).not.toBeInTheDocument()
   })
 
-  it('keeps action feedback in the floating toast without adding inbox entries or badges', () => {
-    function ToastTrigger() {
-      const { toast } = useToast()
-      return <button onClick={() => toast.success('Profile saved.')}>Save profile</button>
-    }
-    render(<ToastProvider><ToastTrigger /><HUDTaskBar variant="header" /></ToastProvider>)
-    fireEvent.click(screen.getByRole('button', { name: 'Save profile' }))
-    expect(screen.getByText('Profile saved.')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
-    fireEvent.click(screen.getByRole('tab', { name: 'Notifications' }))
-    expect(screen.getByText('Nothing new')).toBeInTheDocument()
-    expect(screen.getByRole('tabpanel', { name: 'Notifications' })).not.toHaveTextContent('Profile saved.')
-    expect(screen.queryByText('This session')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument()
-  })
-
-  it('marks the header tile with the unread count', () => {
-    mockUnreadCount = 2
-    render(<HUDTaskBar variant="header" />)
-
-    expect(screen.getByLabelText('2 new notifications')).toHaveTextContent('2')
-  })
-
   it('renders bottom-anchored modal sheet on mobile viewport (< 640px)', () => {
     // Set viewport width to mobile
     act(() => {
@@ -198,7 +143,7 @@ describe('HUDTaskBar', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
 
     // Modal dialog rendered with bottom-anchored modal sheet
-    const dialog = screen.getByRole('dialog', { name: "Today's tasks and notifications" })
+    const dialog = screen.getByRole('dialog', { name: "Today's tasks" })
     expect(dialog).toBeInTheDocument()
     expect(dialog.className).toContain('rounded-t-3xl')
     expect(screen.getByLabelText('Drag handle to close')).toBeInTheDocument()
@@ -211,37 +156,11 @@ describe('HUDTaskBar', () => {
     })
   })
 
-  it('keeps the phone sheet open while switching between Tasks and Notifications', () => {
-    act(() => {
-      window.innerWidth = 390
-      window.dispatchEvent(new Event('resize'))
-    })
-
-    render(<HUDTaskBar variant="header" />)
-    fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
-
-    const notificationsTab = screen.getByRole('tab', { name: /Notifications/ })
-    fireEvent.mouseDown(notificationsTab)
-    fireEvent.click(notificationsTab)
-    expect(screen.getByText('Nothing new')).toBeInTheDocument()
-
-    const tasksTab = screen.getByRole('tab', { name: /Tasks/ })
-    fireEvent.mouseDown(tasksTab)
-    fireEvent.click(tasksTab)
-    expect(screen.getByTestId('alignment-panel')).toBeInTheDocument()
-    expect(tasksTab).toHaveAttribute('aria-selected', 'true')
-
-    act(() => {
-      window.innerWidth = 1024
-      window.dispatchEvent(new Event('resize'))
-    })
-  })
-
   it('closes the desktop dropdown on a click outside it', () => {
     render(<HUDTaskBar variant="header" />)
     fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
 
-    fireEvent.mouseDown(screen.getByRole('tab', { name: /Notifications/ }))
+    fireEvent.mouseDown(screen.getByRole('button', { name: /Silent Synchronization/ }))
     expect(screen.getByTestId('alignment-panel')).toBeInTheDocument()
 
     fireEvent.mouseDown(document.body)
@@ -258,73 +177,10 @@ describe('HUDTaskBar', () => {
     })
 
     expect(screen.getByTestId('alignment-panel')).toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: /Tasks/ })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByRole('button', { name: 'Daily alignment tasks schedule' })).toHaveAttribute(
       'aria-expanded',
       'true',
     )
   })
 
-  it('lists hail and reply transmissions with thread deep-links and marks them read', () => {
-    mockNotifications = [
-      {
-        id: 'n-hail',
-        kind: 'forum_mention',
-        title: 'You were hailed',
-        detail: 'claw_lord hailed you in a discussion.',
-        actorUserId: 'actor-1',
-        actorLarvaId: null,
-        actorHandle: 'claw_lord',
-        payload: {
-          categorySlug: 'general-discussion',
-          topicSlug: 'molt-notes',
-          postId: 'post-hail',
-        },
-        readAt: null,
-        createdAt: '2026-09-06T01:00:00.000Z',
-        actionable: false,
-      },
-      {
-        id: 'n-reply',
-        kind: 'forum_reply',
-        title: 'A reply reached your thread',
-        detail: 'pincer_prime answered a thread you opened.',
-        actorUserId: 'actor-2',
-        actorLarvaId: null,
-        actorHandle: 'pincer_prime',
-        payload: {
-          categorySlug: 'general-discussion',
-          topicSlug: 'molt-notes',
-          postId: 'post-reply',
-          replyTarget: 'topic',
-        },
-        readAt: null,
-        createdAt: '2026-09-06T00:00:00.000Z',
-        actionable: false,
-      },
-    ]
-    mockUnreadCount = 2
-
-    render(<HUDTaskBar variant="header" />)
-    fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
-    fireEvent.click(screen.getByRole('tab', { name: /Notifications/ }))
-
-    expect(screen.getByText('Recent')).toBeInTheDocument()
-    expect(screen.getByText('You were hailed')).toBeInTheDocument()
-    expect(screen.getByText('A reply reached your thread')).toBeInTheDocument()
-
-    const hailLink = screen.getByRole('link', { name: /You were hailed/i })
-    expect(hailLink).toHaveAttribute(
-      'href',
-      '/forum/general-discussion/molt-notes#post-post-hail',
-    )
-    const replyLink = screen.getByRole('link', { name: /A reply reached your thread/i })
-    expect(replyLink).toHaveAttribute(
-      'href',
-      '/forum/general-discussion/molt-notes#post-post-reply',
-    )
-
-    fireEvent.click(hailLink)
-    expect(markRead).toHaveBeenCalledWith('n-hail')
-  })
 })

@@ -5142,9 +5142,19 @@ export const getNotificationsHandler = async (
     })
   })
 
+  // A full page may hide older unread rows, so only then ask the database for the real count.
+  let unreadCount = countUnreadNotifications(views)
+  if (rows.length >= limit) {
+    const [counted] = await auth.dbClient
+      .select({ count: sql<number>`count(*)::int` })
+      .from(notifications)
+      .where(and(eq(notifications.userId, auth.userId), isNull(notifications.readAt)))
+    unreadCount = Number(counted?.count ?? unreadCount)
+  }
+
   return {
     notifications: views,
-    unreadCount: countUnreadNotifications(views),
+    unreadCount,
   }
 }
 

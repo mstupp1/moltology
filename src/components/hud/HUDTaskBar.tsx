@@ -1,15 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { Clock, Calendar, RefreshCw, Sparkles, CheckCircle2, ChevronDown, ChevronUp, CheckSquare, Square, Award, Bell, Check, X, ListTodo } from 'lucide-react'
+import { Clock, Calendar, RefreshCw, Sparkles, CheckCircle2, ChevronDown, ChevronUp, CheckSquare, Square, Award, Check, X, ListTodo } from 'lucide-react'
 import { HudCard, HudBadge, HudBottomSheet } from '@/components/ui'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
-import { useNotifications } from '@/hooks/useNotifications'
 import { Link } from '@tanstack/react-router'
 import { OPEN_ALIGNMENT_PANEL_EVENT, isAlignmentPanelHostVisible } from '@/lib/alignment-panel'
 import { CANONICAL_ALIGNMENT_TASKS, type AlignmentTaskItem } from '@/lib/alignment-tasks'
-import { resolveMemberPublicParam } from '@/lib/member-handle'
-import { isForumInboxKind } from '@/lib/notifications'
-import { forumPostAnchorId } from '@/lib/forum-mentions'
 
 export interface AlignmentTask {
   id: string
@@ -44,7 +40,6 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   const [mode, setMode] = useState<TimezoneMode>('LOCAL')
   const [isSyncing, setIsSyncing] = useState(false)
   const [isScheduleOpen, setIsScheduleOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<'liturgies' | 'transmissions'>('liturgies')
   const [isMobileScreen, setIsMobileScreen] = useState(false)
 
   const alignment = useDailyAlignment()
@@ -59,18 +54,6 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   }, [])
   const dropdownRef = useRef<HTMLDivElement>(null)
   const headerIslandRef = useRef<HTMLDivElement>(null)
-
-  const {
-    notifications: dbNotifications,
-    unreadCount: notificationUnread,
-    markAllRead,
-    acceptFriendRequest,
-    declineFriendRequest,
-    markRead,
-  } = useNotifications()
-
-  const actionableNotifications = dbNotifications.filter((n) => n.actionable)
-  const recentNotifications = dbNotifications.filter((n) => !n.actionable)
 
   // Use propTasks if passed (e.g. in tests/custom usage), otherwise use global alignment tasks
   const [localPropTasks, setLocalPropTasks] = useState<AlignmentTask[] | null>(propTasks || null)
@@ -132,7 +115,6 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
       if ((variant === 'header' || variant === 'sidebar') && !isAlignmentPanelHostVisible(headerIslandRef.current)) {
         return
       }
-      setActiveTab('liturgies')
       setIsScheduleOpen(true)
     }
 
@@ -256,51 +238,16 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   const liturgyCountText = `${completedCount}/${localTasks.length}`
   const progressPct = Math.round((completedCount / Math.max(localTasks.length, 1)) * 100)
   const nextTaskId = allTasksCompleted ? undefined : nextTask?.id
-  const notificationsCount = notificationUnread
-  const hasAnyNotifications = dbNotifications.length > 0
   const todayLabel = mounted
     ? time.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
     : ''
 
   const focusRing =
     'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
-  const sectionLabel = 'text-[11px] font-bold tracking-[0.08em] uppercase text-ink-muted'
   const listFrame = 'rounded-control border border-line-subtle divide-y divide-line-subtle overflow-hidden'
 
-  const renderTab = (id: 'liturgies' | 'transmissions', label: string, meta: React.ReactNode, Icon: typeof ListTodo) => {
-    const selected = activeTab === id
-    return (
-      <button
-        type="button"
-        role="tab"
-        aria-selected={selected}
-        onClick={() => setActiveTab(id)}
-        className={`min-h-10 sm:min-h-8 px-2 rounded-control text-xs font-bold flex items-center justify-center gap-2 transition-colors touch-manipulation ${focusRing} ${
-          selected ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-2'
-        }`}
-      >
-        <Icon className={`w-3.5 h-3.5 ${selected ? 'text-cyan-glow' : ''}`} aria-hidden="true" />
-        <span>{label}</span>
-        {meta}
-      </button>
-    )
-  }
-
-  const renderAlertRow = (key: string, title: React.ReactNode, detail: React.ReactNode, unread: boolean) => (
-    <div key={key} className="flex items-start gap-2.5 min-w-0">
-      <span
-        aria-hidden="true"
-        className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${unread ? 'bg-cyan-glow' : 'bg-surface-3'}`}
-      />
-      <span className="min-w-0 flex-1 space-y-0.5">
-        {title && <span className="block text-xs font-bold text-ink">{title}</span>}
-        {detail && <span className="block text-xs text-ink-body leading-snug">{detail}</span>}
-      </span>
-    </div>
-  )
-
   // Shared body for the desktop dropdown and the phone bottom sheet
-  const renderActivityContent = () => (
+  const renderTodayContent = () => (
     <>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-baseline gap-2 min-w-0">
@@ -310,36 +257,14 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); setIsScheduleOpen(false); }}
-          aria-label="Close activity center"
+          aria-label="Close today's tasks"
           className={`-mr-1 p-1.5 rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors ${focusRing}`}
         >
           <X className="w-4 h-4" />
         </button>
       </div>
 
-      <div role="tablist" aria-label="Today" className="grid grid-cols-2 gap-1 p-1 bg-abyss border border-line-subtle rounded-card">
-        {renderTab(
-          'liturgies',
-          'Tasks',
-          countReady ? (
-            <span className={`tabular-nums ${allTasksCompleted ? 'text-emerald-500' : 'text-ink-muted'}`}>{liturgyCountText}</span>
-          ) : null,
-          ListTodo,
-        )}
-        {renderTab(
-          'transmissions',
-          'Notifications',
-          notificationsCount > 0 ? (
-            <span className="min-w-5 px-1 rounded-chip bg-crimson-soft text-crimson-text text-[11px] tabular-nums">
-              {notificationsCount}
-            </span>
-          ) : null,
-          Bell,
-        )}
-      </div>
-
-      {activeTab === 'liturgies' && (
-        <div role="tabpanel" aria-label="Tasks" className="space-y-2.5">
+      <div className="space-y-2.5">
           <div className="flex items-center justify-between gap-2">
             {countReady ? (
               <span className={`text-xs ${allTasksCompleted ? 'text-emerald-500 font-bold' : 'text-ink-muted'}`}>
@@ -401,157 +326,6 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             })}
           </ul>
         </div>
-      )}
-
-      {activeTab === 'transmissions' && (
-        <div role="tabpanel" aria-label="Notifications" className="space-y-3">
-          {notificationUnread > 0 && (
-            <div className="flex items-center justify-end gap-3 text-[11px]">
-              {notificationUnread > 0 && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    void markAllRead()
-                  }}
-                  className={`min-h-8 px-1 rounded-control font-bold text-ink-muted hover:text-ink transition-colors ${focusRing}`}
-                >
-                  Mark all read
-                </button>
-              )}
-            </div>
-          )}
-
-          {!hasAnyNotifications && (
-            <div className="py-6 text-center space-y-1">
-              <Bell className="w-5 h-5 text-ink-muted mx-auto" aria-hidden="true" />
-              <div className="text-sm font-bold text-ink">Nothing new</div>
-              <div className="text-xs text-ink-muted">Friend requests, replies, and mentions show up here.</div>
-            </div>
-          )}
-
-          {actionableNotifications.length > 0 && (
-            <section className="space-y-1.5">
-              <h3 className={sectionLabel}>Needs you</h3>
-              <ul className={`${listFrame} max-h-60 overflow-y-auto`}>
-                {actionableNotifications.map((n) => (
-                  <li key={n.id} className="p-3 space-y-2">
-                    {renderAlertRow(n.id, n.title, n.detail, !n.readAt)}
-                    <div className="flex flex-wrap gap-1.5 pl-4">
-                      {n.payload.requestId && (
-                        <>
-                          <button
-                            type="button"
-                            className={`min-h-8 px-2.5 text-[11px] font-bold rounded-control bg-cyan-glow hover:bg-cyan-hover text-abyss transition-colors ${focusRing}`}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              void acceptFriendRequest(n.payload.requestId!, n.id)
-                            }}
-                          >
-                            Accept
-                          </button>
-                          <button
-                            type="button"
-                            className={`min-h-8 px-2.5 text-[11px] font-bold rounded-control border border-line text-ink-muted hover:text-ink hover:border-line-strong transition-colors ${focusRing}`}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              void declineFriendRequest(n.payload.requestId!, n.id)
-                            }}
-                          >
-                            Decline
-                          </button>
-                        </>
-                      )}
-                      {n.payload.profileId && (
-                        <Link
-                          to="/member/$profileId"
-                          params={{
-                            profileId: resolveMemberPublicParam({
-                              id: n.payload.profileId,
-                              handle: n.actorHandle,
-                            }),
-                          }}
-                          className={`min-h-8 inline-flex items-center px-2.5 text-[11px] font-bold rounded-control border border-line text-ink-muted hover:text-ink hover:border-line-strong transition-colors ${focusRing}`}
-                          onClick={() => setIsScheduleOpen(false)}
-                        >
-                          View profile
-                        </Link>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {recentNotifications.length > 0 && (
-            <section className="space-y-1.5">
-              <h3 className={sectionLabel}>Recent</h3>
-              <ul className={`${listFrame} max-h-60 overflow-y-auto`}>
-                {recentNotifications.map((n) => {
-                  const rowClass = `block w-full text-left px-3 py-2.5 hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
-                    n.readAt ? 'opacity-75' : ''
-                  }`
-                  const body = renderAlertRow(n.id, n.title, n.detail, !n.readAt)
-                  const markAndClose = () => {
-                    if (!n.readAt) void markRead(n.id)
-                    setIsScheduleOpen(false)
-                  }
-                  if (isForumInboxKind(n.kind)) {
-                    const categorySlug = n.payload.categorySlug?.trim()
-                    const topicSlug = n.payload.topicSlug?.trim()
-                    const postId = n.payload.postId?.trim()
-                    return (
-                      <li key={n.id}>
-                        {categorySlug && topicSlug ? (
-                          <Link
-                            to="/forum/$categorySlug/$topicSlug"
-                            params={{ categorySlug, topicSlug }}
-                            hash={postId ? forumPostAnchorId(postId) : undefined}
-                            className={rowClass}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              markAndClose()
-                            }}
-                          >
-                            {body}
-                          </Link>
-                        ) : (
-                          <Link
-                            to="/forum"
-                            className={rowClass}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              markAndClose()
-                            }}
-                          >
-                            {body}
-                          </Link>
-                        )}
-                      </li>
-                    )
-                  }
-                  return (
-                    <li key={n.id}>
-                      <button
-                        type="button"
-                        className={rowClass}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          if (!n.readAt) void markRead(n.id)
-                        }}
-                      >
-                        {body}
-                      </button>
-                    </li>
-                  )
-                })}
-              </ul>
-            </section>
-          )}
-
-        </div>
-      )}
     </>
   )
 
@@ -570,15 +344,6 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
         aria-hidden="true"
       />
     )
-    const unreadBadge =
-      notificationUnread > 0 ? (
-        <span
-          className="min-w-[18px] h-[18px] px-1 rounded-chip bg-crimson-aggro text-abyss text-[11px] font-bold leading-[18px] text-center tabular-nums"
-          aria-label={`${notificationUnread} new notifications`}
-        >
-          {notificationUnread}
-        </span>
-      ) : null
 
     return (
       <div className={`relative overflow-visible ${className}`} ref={headerIslandRef}>
@@ -588,7 +353,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             e.stopPropagation()
             setIsScheduleOpen((prev) => !prev)
           }}
-          title="Today's tasks and notifications"
+          title="Today's tasks"
           aria-label="Daily alignment tasks schedule"
           aria-expanded={isScheduleOpen}
           aria-haspopup="dialog"
@@ -599,12 +364,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
         >
           {collapsed ? (
             <>
-              <span className="relative inline-flex">
-                {icon}
-                {notificationUnread > 0 && (
-                  <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-crimson-aggro ring-2 ring-abyss" aria-hidden />
-                )}
-              </span>
+              {icon}
               <span className={`text-[11px] font-sans font-bold leading-none tabular-nums ${countReady ? countTone : 'text-ink-muted'}`}>
                 {countReady ? liturgyCountText : '–'}
               </span>
@@ -622,7 +382,6 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                   </span>
                 )}
               </span>
-              {unreadBadge}
               {countReady ? (
                 <span className={`shrink-0 text-xs font-bold tabular-nums ${countTone}`}>
                   {allTasksCompleted ? 'Done' : liturgyCountText}
@@ -640,7 +399,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             data-testid="alignment-panel"
             className="absolute left-full bottom-0 ml-2 w-96 max-h-[calc(100vh-2rem)] overflow-y-auto rounded-card border border-line bg-surface-1 shadow-menu p-4 z-[200] font-sans space-y-3 animate-in fade-in slide-in-from-left-2 duration-150"
           >
-            {renderActivityContent()}
+            {renderTodayContent()}
           </div>
         )}
       </div>
@@ -664,7 +423,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
               ? 'bg-surface-3 shadow-nav-current border-transparent text-ink'
               : 'bg-surface-1 border-line hover:bg-surface-2 hover:border-line-strong text-ink'
           }`}
-          title="Today's tasks and notifications"
+          title="Today's tasks"
           aria-label="Daily alignment tasks schedule"
           aria-expanded={isScheduleOpen}
           aria-haspopup="dialog"
@@ -696,14 +455,6 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             <span className="inline-block shrink-0 md:ml-auto h-2 w-6 rounded-chip bg-surface-3 animate-pulse" aria-hidden />
           )}
 
-          {notificationUnread > 0 && (
-            <span
-              className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-chip bg-crimson-aggro text-abyss text-[11px] font-bold leading-[18px] text-center tabular-nums"
-              aria-label={`${notificationUnread} new notifications`}
-            >
-              {notificationUnread}
-            </span>
-          )}
         </button>
 
         {/* Desktop dropdown (>= 640px) */}
@@ -713,7 +464,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             data-testid="alignment-panel"
             className="absolute top-full right-0 mt-2 w-96 rounded-card border border-line bg-surface-1 shadow-menu p-4 z-50 font-sans space-y-3 animate-in fade-in slide-in-from-top-2 duration-150"
           >
-            {renderActivityContent()}
+            {renderTodayContent()}
           </div>
         )}
 
@@ -722,11 +473,11 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           <HudBottomSheet
             isOpen={isScheduleOpen && isMobileScreen}
             onClose={() => setIsScheduleOpen(false)}
-            title="Today's tasks and notifications"
+            title="Today's tasks"
             className="p-4 space-y-3"
           >
             <div data-testid="alignment-panel" className="space-y-3">
-              {renderActivityContent()}
+              {renderTodayContent()}
             </div>
           </HudBottomSheet>
         )}
