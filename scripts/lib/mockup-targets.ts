@@ -50,7 +50,7 @@ export const MOCKUP_SOURCES: Record<string, string[]> = {
   forum: [...SHARED_MOCKUP_SOURCES, 'src/routes/_hud/forum/', 'src/components/forum/'],
   oracle: [...SHARED_MOCKUP_SOURCES, 'src/routes/_hud/oracle.tsx', 'src/components/ai/', 'src/components/ai-elements/'],
   moltmax: ['src/routes/moltmax.tsx', 'src/components/MoltMaxPage.tsx', 'src/components/moltmax/', 'src/components/PublicHeader.tsx'],
-  market: [...SHARED_MOCKUP_SOURCES, 'src/routes/_hud/market.tsx', 'src/components/hud/market/'],
-  chassis: [...SHARED_MOCKUP_SOURCES, 'src/routes/_hud/chassis.tsx', 'src/components/hud/chassis/', 'src/lib/avatar/'],
+  market: [...SHARED_MOCKUP_SOURCES, 'src/routes/_hud/character_.shop.tsx', 'src/components/hud/market/'],
+  chassis: [...SHARED_MOCKUP_SOURCES, 'src/routes/_hud/character.tsx', 'src/components/hud/chassis/', 'src/lib/avatar/'],
   codex: [...SHARED_MOCKUP_SOURCES, 'src/routes/_hud/codex/', 'src/components/codex/', 'src/components/reader/'],
 }

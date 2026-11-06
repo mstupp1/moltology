@@ -83,6 +83,8 @@ open every desktop and phone image and check:
 - **No promises the product can't keep.** Sample Oracle replies only suggest things a member
   can do themselves; the Oracle has no tools.
 - **Framing.** Desktop zoom (`focus` in the library) lands on real content, not empty space.
+  Captures start with the member sidebar collapsed to its icon rail, and the pointer parks on
+  the right edge so no tooltip shows. If the rail or page width changes, re-aim `focus`.
 
 ## Showcase member
 

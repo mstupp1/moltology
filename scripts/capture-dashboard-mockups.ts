@@ -184,6 +184,8 @@ async function main() {
       })
       try {
         await context.clock.setFixedTime(now)
+        // Start with the member sidebar collapsed to its icon rail, so the page itself fills the shot.
+        await context.addInitScript(() => localStorage.setItem('moltology_hud_sidebar_collapsed', 'true'))
         // The synthetic preview session has no JWT, so member reads come back empty. Stage the
         // showcase member instead; a real --auth-dev login shows that account's own data.
         if (!credentials) await installShowcase(context, now)
@@ -253,7 +255,8 @@ async function main() {
         if (text.trim().length < 30 || /Something went wrong|Internal Server Error|Cannot read properties|Cannot destructure|Could not load equipment|Could not load your character|Unauthenticated: Authentication required|Reading today’s liturgies…/.test(text)) {
           throw new Error(`Invalid or empty UI for ${target.name}; existing library preserved.`)
         }
-        await page.mouse.move(0, 0)
+        // Park the pointer on empty page edge; the top-left corner shows the collapsed rail's brand tooltip.
+        await page.mouse.move(width - 2, Math.round(height / 2))
         await page.addStyleTag({ content: CAPTURE_CSS })
         const pngPath = path.join(stage, `${target.outputBase}.png`)
         await page.screenshot({ path: pngPath, animations: 'disabled' })
