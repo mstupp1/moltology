@@ -71,6 +71,15 @@ Rules:
   (`lobster_engineer` and `crab_builder` count as one look) applies outside The Molt Log.
 - **Same character, same look.** Supply the identity reference every time and keep
   proportions, colours and props. Expression, pose and angle change freely.
+- **Feature-film characters across every series.** Follow the
+  [character-creator style and reference rules](../.agents/skills/character-creator/SKILL.md#shared-style):
+  sculpted 3D forms, expressive facial anatomy, soft satin chitin and cinematic shading.
+  Flat colour blocks and illustrated sets describe the surrounding design; preserve the
+  character's volume and material depth. No sticker borders, cel outlines or flat vector
+  treatment. In scenes, match the environment's light, perspective and contact shadows.
+  For new characters, use the original family reference for rendering quality and an
+  inspected avatar reference for the relevant species, build, palette and equipment;
+  keep those reference roles explicit.
 - **Faces carry the joke.** Give each appearance an expression from the beat: deadpan stare,
   slow horror, smug calm, exhausted, triumphant. Record it in `characterRole`.
 - **One main character per frame.** A second character only when they're reacting to the

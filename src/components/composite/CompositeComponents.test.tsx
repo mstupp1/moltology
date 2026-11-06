@@ -160,7 +160,7 @@ describe('Composite UI Components', () => {
     expect(container.querySelector('.animate-pulse')).toBeNull()
     expect(container.querySelector('.animate-ping')).toBeNull()
 
-    const mascotWrapper = container.querySelector('[data-mascot-key="lobster_thumbs_up"]')
+    const mascotWrapper = container.querySelector('[data-mascot-key="lobster_rook_tide"]')
     expect(mascotWrapper?.className).toContain('top-8')
     expect(mascotWrapper?.className).toContain('right-8')
   })
@@ -198,7 +198,7 @@ describe('Composite UI Components', () => {
     expect(screen.getByText(/Audit my open task latency/i)).toBeInTheDocument()
     expect(screen.getByText('Ecdysis protocols')).toBeInTheDocument()
     expect(screen.getByText('Codex Liturgies')).toBeInTheDocument()
-    expect(container.querySelector('[data-mascot-key="lobster_pointing"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-mascot-key="lobster_rook_tide"]')).toBeInTheDocument()
   })
 
   it('renders ThreeBookCover canvas element with dimensions and custom props', async () => {
@@ -231,15 +231,15 @@ describe('Composite UI Components', () => {
       MASCOT_REGISTRY,
     } = await import('./MascotOverlay')
 
-    expect(normalizeMascotKey('pointing')).toBe('lobster_pointing')
-    expect(normalizeMascotKey('lobster_pointing_cta')).toBe('lobster_pointing')
-    expect(normalizeMascotKey('char_lobster_speed_action.png')).toBe('lobster_navigator')
-    expect(normalizeMascotKey('navigator')).toBe('lobster_navigator')
-    expect(normalizeMascotKey('stats')).toBe('crab_stats')
-    expect(normalizeMascotKey('peek')).toBe('lobster_peek')
-    expect(normalizeMascotKey('peaceful')).toBe('lobster_peaceful')
-    expect(normalizeMascotKey('engineer')).toBe('lobster_engineer')
-    expect(normalizeMascotKey('thumbs_up')).toBe('lobster_thumbs_up')
+    expect(normalizeMascotKey('pointing')).toBe('lobster_rook_tide')
+    expect(normalizeMascotKey('lobster_pointing_cta')).toBe('lobster_rook_tide')
+    expect(normalizeMascotKey('char_lobster_speed_action.png')).toBe('lobster_tess_shoal')
+    expect(normalizeMascotKey('navigator')).toBe('lobster_tess_shoal')
+    expect(normalizeMascotKey('stats')).toBe('crab_cal_brack')
+    expect(normalizeMascotKey('peek')).toBe('lobster_pip_current')
+    expect(normalizeMascotKey('peaceful')).toBe('lobster_rook_tide')
+    expect(normalizeMascotKey('engineer')).toBe('lobster_faye_ripple')
+    expect(normalizeMascotKey('thumbs_up')).toBe('lobster_rook_tide')
 
     // Random normalization
     const randomResolved = normalizeMascotKey('random')
@@ -247,20 +247,22 @@ describe('Composite UI Components', () => {
 
     // Random helpers
     const allKeys = getAllMascotKeys()
-    expect(allKeys.length).toBeGreaterThanOrEqual(7)
+    expect(allKeys.length).toBe(6)
     expect(allKeys).toContain(getRandomMascotKey())
+    const exclusions = allKeys.filter((key) => key !== 'lobster_pip_current').map((key) => key === 'lobster_rook_tide' ? 'thumbs_up' : key)
+    expect(getRandomMascotKey(exclusions)).toBe('lobster_pip_current')
 
-    const rotation = getRandomMascotRotation(3)
-    expect(rotation.length).toBe(3)
-    expect(new Set(rotation).size).toBe(3)
+    const rotation = getRandomMascotRotation(6)
+    expect(rotation.length).toBe(6)
+    expect(new Set(rotation).size).toBe(6)
 
     // Verify all registry items have valid Neon S3 CDN URLs
-    expect(Object.keys(MASCOT_REGISTRY).length).toBe(22)
-    expect(normalizeMascotKey('char_crab_builder_adult_v2.webp')).toBe('crab_builder')
-    expect(normalizeMascotKey('lobster_peek_junior')).toBe('lobster_peek_junior')
+    expect(Object.keys(MASCOT_REGISTRY).length).toBe(6)
+    expect(normalizeMascotKey('char_crab_builder_adult_v2.webp')).toBe('crab_cal_brack')
+    expect(normalizeMascotKey('lobster_peek_junior')).toBe('lobster_pip_current')
     for (const key of Object.keys(MASCOT_REGISTRY)) {
       const info = getMascotInfo(key)
-      expect(info.s3Url).toContain('moltology-public-assets/images/characters/')
+      expect(info.s3Url).toContain('/media/images/characters/')
       expect(info.filename).toMatch(/\.(webp|png)$/)
     }
   })
@@ -273,7 +275,7 @@ describe('Composite UI Components', () => {
 
     const img = container.querySelector('img')
     expect(img).toBeInTheDocument()
-    expect(img?.getAttribute('src')).toContain('char_lobster_pointing_adult_v2.webp')
+    expect(img?.getAttribute('src')).toContain('char_rook_tide_v5.webp')
     expect(img?.getAttribute('loading')).toBe('eager')
   })
 

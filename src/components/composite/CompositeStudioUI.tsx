@@ -10,6 +10,7 @@ import { ReelSimpleOutroCard } from './ReelSimpleOutroCard'
 import { ReelThumbnailCard } from './ReelThumbnailCard'
 import { BlogSchematicCard } from './BlogSchematicCard'
 import { MascotKey, MASCOT_REGISTRY } from './MascotOverlay'
+import { DEFAULT_MASCOT_KEY, resolveMascotAlias } from '@/lib/mascots'
 import {
   Layers,
   Copy,
@@ -52,14 +53,14 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
   initialTemplate = 'marketing-leadmagnet',
   initialTheme = 'moltmaxxing-guide',
   initialAspect = '4:5',
-  initialMascot = 'lobster_thumbs_up',
+  initialMascot = DEFAULT_MASCOT_KEY,
 }) => {
   const [template, setTemplate] = useState<CompositeTemplateType>(initialTemplate)
   const [aspect, setAspect] = useState<CompositeAspectRatio>(initialAspect)
-  const [mascot, setMascot] = useState<MascotKey>(initialMascot)
+  const [mascot, setMascot] = useState<MascotKey>(() => resolveMascotAlias(initialMascot))
   const [ctaTexture, setCtaTexture] = useState<CtaTextureKey>('chitin')
   const [theme, setTheme] = useState(initialTheme)
-  const [previewScale, setPreviewScale] = useState<number>(0.6)
+  const [previewScale, setPreviewScale] = useState<number>(0.15)
   const [copiedCmd, setCopiedCmd] = useState(false)
 
   const canvasContainerRef = useRef<HTMLDivElement>(null)
@@ -178,7 +179,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
       setPromptCard1('Audit my open task latency and calculate my Stage 2 ecdysis schedule.')
       setPromptCard2('Formulate a 24-hour isometric pincer routine to eliminate surface distraction.')
       setCommentKeyword('PROMPTS')
-      setMascot('lobster_pointing')
+      setMascot(resolveMascotAlias('lobster_pointing'))
     } else if (selectedTheme === 'moltmaxxing-guide') {
       setCategoryBadge('STOP MELTING · 10X COGNITIVE OUTPUT · ZERO DRIFT')
       setHeadlinePart1('STOP MELTING.')
@@ -192,7 +193,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
       setTrustBadgeYear('2026 PROTOCOL')
       setQuoteText('Everything you need to shatter biological hesitation and build armored focus!')
       setCommentKeyword('GUIDE')
-      setMascot('lobster_thumbs_up')
+      setMascot(resolveMascotAlias('lobster_thumbs_up'))
     } else if (selectedTheme === 'moltmax-quiz') {
       setCategoryBadge('FREE 2-MINUTE AUDIT · 15 BIOMETRIC METRICS')
       setHeadlinePart1('AUDIT YOUR SHELL.')
@@ -206,7 +207,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
       setTrustBadgeYear('15 METRICS')
       setQuoteText('Pinpoint your exact cognitive bottlenecks and unlock your custom ascension roadmap!')
       setCommentKeyword('QUIZ')
-      setMascot('crab_stats')
+      setMascot(resolveMascotAlias('crab_stats'))
     } else if (selectedTheme === 'benthic-app') {
       setCategoryBadge('NOW LIVE · BIO-SILICON AGENT OS')
       setHeadlinePart1('ORCHESTRATE SWARMS.')
@@ -220,7 +221,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
       setTrustBadgeYear('AGENT OS')
       setQuoteText('Deploy autonomous agent swarms while locking in deep work at 50,000 fathoms!')
       setCommentKeyword('APP')
-      setMascot('lobster_thumbs_up')
+      setMascot(resolveMascotAlias('lobster_thumbs_up'))
     } else if (selectedTheme === 'sacred-codex') {
       setCategoryBadge('CANONICAL VAULT · 12 SACRED SCRIPTURES')
       setHeadlinePart1('REJECT FRAGILITY.')
@@ -234,7 +235,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
       setTrustBadgeYear('12 VOLUMES')
       setQuoteText('The sacred doctrines that turned human hesitation into high-torque titan power!')
       setCommentKeyword('CODEX')
-      setMascot('lobster_thumbs_up')
+      setMascot(resolveMascotAlias('lobster_thumbs_up'))
     } else if (selectedTheme === 'pincer-routine') {
       setCategoryBadge('TACTICAL BLUEPRINT · 1-PAGE CHEAT SHEET')
       setHeadlinePart1('STOP PROCRASTINATING.')
@@ -248,7 +249,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
       setTrustBadgeYear('1-PAGE BLUEPRINT')
       setQuoteText('Stop wasting mornings. The exact 24-hour routine of elite Stage 4 operators!')
       setCommentKeyword('ROUTINE')
-      setMascot('crab_stats')
+      setMascot(resolveMascotAlias('crab_stats'))
     } else if (selectedTheme === 'pincer-torque') {
       setCategoryBadge('DECISIVE EXECUTION')
       setHeadlinePart1('800 NM PINCER TORQUE')
@@ -257,7 +258,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
       setNarrativeText('Terrestrial hesitation bleeds compute. Stage 4 Carcinization requires 800 Nm of decisive pincer torque—locking the grip until completion.')
       setLeftMetricValue('12 TABS OPEN')
       setRightMetricValue('800 NM GRIP')
-      setMascot('crab_stats')
+      setMascot(resolveMascotAlias('crab_stats'))
     } else if (selectedTheme === 'ecdysis') {
       setCategoryBadge('SCHEDULED CALCIFICATION')
       setHeadlinePart1('FORCIBLE ECDYSIS')
@@ -266,7 +267,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
       setNarrativeText('Growth is impossible inside an unyielding shell. When mental heuristics no longer fit, keeping them isn\'t loyalty—it\'s suffocation.')
       setLeftMetricValue('CALCIFIED')
       setRightMetricValue('SHED & ASCEND')
-      setMascot('lobster_thumbs_up')
+      setMascot(resolveMascotAlias('lobster_thumbs_up'))
     } else if (selectedTheme === 'benthic-depth') {
       setCategoryBadge('BENTHIC TELEMETRY')
       setHeadlinePart1('50,000 FATHOMS')
@@ -275,7 +276,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
       setNarrativeText('Surface noise and notifications evaporate under deep hydrostatic pressure. Dive into the benthic silence to forge unbreakable software.')
       setLeftMetricValue('100+ NOTIFS')
       setRightMetricValue('0 NOISE')
-      setMascot('lobster_peaceful')
+      setMascot(resolveMascotAlias('lobster_peaceful'))
     } else {
       setCategoryBadge('FRONTIER AI REASONING')
       setHeadlinePart1('WHY AI REASONING')
@@ -284,7 +285,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
       setNarrativeText('As frontier models scale test-time compute by 100x to "think" before responding, linear KV attention caches are suffocating GPU memory clusters.')
       setLeftMetricValue('78.4 GB')
       setRightMetricValue('-85.1%')
-      setMascot('lobster_thumbs_up')
+      setMascot(resolveMascotAlias('lobster_thumbs_up'))
     }
   }
 
@@ -302,7 +303,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
   return (
     <div className="w-full h-screen h-[100dvh] max-h-screen overflow-hidden bg-[#03070a] text-[#dfe3e3] flex flex-col font-sans select-none">
       {/* Studio Header Bar */}
-      <header className="h-14 sm:h-16 flex-shrink-0 bg-[#060c10] border-b border-cyan-500/30 px-4 sm:px-6 flex items-center justify-between z-30">
+      <header className="min-h-14 sm:h-16 flex-shrink-0 bg-[#060c10] border-b border-cyan-500/30 px-4 sm:px-6 py-3 sm:py-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 z-30">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-cyan-950/80 border border-cyan-400 text-cyan-300 shadow-[0_0_12px_rgba(0,195,255,0.3)]">
             <Layers className="w-5 h-5" />
@@ -345,9 +346,9 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
       </header>
 
       {/* Main Studio Body: Controls Sidebar + Live Preview Canvas */}
-      <div className="flex-1 min-h-0 flex overflow-hidden">
+      <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden">
         {/* Controls Sidebar */}
-        <aside className="w-80 md:w-96 flex-shrink-0 bg-[#04080c] border-r border-slate-800/80 p-5 sm:p-6 overflow-y-auto space-y-6 h-full min-h-0">
+        <aside className="w-full md:w-96 flex-shrink-0 bg-[#04080c] border-b md:border-b-0 md:border-r border-slate-800/80 p-5 sm:p-6 overflow-y-auto space-y-6 h-[34%] md:h-full min-h-0">
           {/* Template Selector */}
           <div>
             <label className="block text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider mb-2">

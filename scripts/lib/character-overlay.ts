@@ -37,7 +37,8 @@ export function getAllCharacterKeys(): CharacterKey[] {
  * Pick a random registered character key, optionally excluding certain keys
  */
 export function getRandomCharacterKey(excludeKeys: string[] = []): CharacterKey {
-  const pool = getAllCharacterKeys().filter((k) => !excludeKeys.includes(k))
+  const excluded = new Set(excludeKeys.map(resolveMascotAlias))
+  const pool = getAllCharacterKeys().filter((k) => !excluded.has(k))
   const candidates = pool.length > 0 ? pool : getAllCharacterKeys()
   return candidates[Math.floor(Math.random() * candidates.length)]
 }

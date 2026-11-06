@@ -23,148 +23,107 @@ const mascot = (key: string, name: string, filename: string, description: string
   description,
 })
 
-/** Rendered cast (v2, 2026-10-08). Adults first, then juniors. */
+/** Named signature-look cast (v5, 2026-11-05). Historical role keys resolve below. */
 export const MASCOT_CAST: MascotDefinition[] = [
   mascot(
-    'lobster_pointing',
-    'Lobster Pointing (CTA / Hero)',
-    'char_lobster_pointing_adult_v2.webp',
-    'Coral lobster raising a claw toward the call to action'
+    'lobster_rook_tide',
+    'Rook Tide',
+    'char_rook_tide_v5.webp',
+    'Confident male red lobster with amber eyes, a cream belly and a common charcoal cyber chest plate with one cyan status light; bare pincers and no cape'
   ),
   mascot(
-    'lobster_thumbs_up',
-    'Lobster Approval (Raised Claw)',
-    'char_lobster_thumbs_up_adult_v2.webp',
-    'Cheerful orange lobster raising one claw in approval'
+    'lobster_pip_current',
+    'Pip Current',
+    'char_pip_current_v4.webp',
+    'Curious lavender lobster in a slouched navy knitted cap, with emerald eyes, a tentative smile and a copper keepsake ring on a wrist cord'
   ),
   mascot(
-    'lobster_navigator',
-    'Lobster Navigator (Explorer)',
-    'char_lobster_navigator_adult_v2.webp',
-    'Lobster explorer in brass goggles and a canvas field harness, waving'
+    'crab_mira_kelp',
+    'Mira Kelp',
+    'char_mira_kelp_v3.webp',
+    'Enthusiastic jade-green crab with a heart-shaped shell, sapphire eyes and an ochre neckerchief'
   ),
   mascot(
-    'lobster_engineer',
-    'Lobster Engineer (Hardhat)',
-    'char_lobster_engineer_adult_v2.webp',
-    'Lobster engineer in a yellow hardhat with a blueprint tablet and wrench belt'
+    'crab_cal_brack',
+    'Cal Brack',
+    'char_cal_brack_v5.webp',
+    'Patient cobalt-blue crab with a square shell, gold eyes and cream forehead patch, wearing a full mid-level gunmetal cyber armor set with brass edges, cyan lights, chest plate, utility belt, six armored walking legs and cyber pincers; head uncovered without a helmet'
   ),
   mascot(
-    'lobster_peaceful',
-    'Lobster Peaceful (Lavender Calm)',
-    'char_lobster_peaceful_adult_v2.webp',
-    'Serene lavender lobster in a teal vest, claws open and relaxed'
+    'lobster_tess_shoal',
+    'Tess Shoal',
+    'char_tess_shoal_v5.webp',
+    'Attentive tall teal LGBTQIA+ lobster with amber eyes, mint underside and cream cheek patch, plum-purple mohawk, black leather biker vest with rainbow Pride patch and common gunmetal cyber claw casings'
   ),
   mascot(
-    'lobster_peek',
-    'Lobster Bashful (Shy Smile)',
-    'char_lobster_peek_adult_v2.webp',
-    'Pink lobster with claws clasped under its chin and a shy smile'
-  ),
-  mascot(
-    'lobster_archivist',
-    'Lobster Archivist (Scripture Keeper)',
-    'char_lobster_archivist_adult_v2.webp',
-    'Thoughtful lobster in a dark cloak holding a bound codex'
-  ),
-  mascot(
-    'lobster_oracle_attendant',
-    'Lobster Oracle Attendant',
-    'char_lobster_oracle_attendant_adult_v2.webp',
-    'Pale gold lobster in a teal mantle holding a glowing sea-glass orb'
-  ),
-  mascot(
-    'crab_stats',
-    'Crab Stats (Metrics)',
-    'char_crab_stats_adult_v2.webp',
-    'Coral crab holding up a bar chart tablet'
-  ),
-  mascot(
-    'crab_builder',
-    'Crab Builder (Hardhat)',
-    'char_crab_builder_adult_v2.webp',
-    'Magenta crab builder in a hardhat and plated harness, wrench raised'
-  ),
-  mascot(
-    'crab_explorer',
-    'Crab Explorer (Compass)',
-    'char_crab_explorer_adult_v2.webp',
-    'Blue crab explorer with goggles, compass and field satchel'
-  ),
-  mascot(
-    'crab_sentinel',
-    'Crab Sentinel (Shield)',
-    'char_crab_sentinel_adult_v2.webp',
-    'Navy armored crab standing guard behind a raised shield'
-  ),
-  mascot(
-    'crab_ritual_keeper',
-    'Crab Ritual Keeper (Bell)',
-    'char_crab_ritual_keeper_adult_v2.webp',
-    'Orange crab in a teal cape ringing a brass bell, tablet in claw'
-  ),
-  mascot(
-    'lobster_pointing_junior',
-    'Junior Lobster Pointing',
-    'char_lobster_pointing_junior_v2.webp',
-    'Young coral lobster with both claws up and a big grin'
-  ),
-  mascot(
-    'lobster_thumbs_up_junior',
-    'Junior Lobster Approval',
-    'char_lobster_thumbs_up_junior_v2.webp',
-    'Young orange lobster raising one claw in approval'
-  ),
-  mascot(
-    'lobster_navigator_junior',
-    'Junior Lobster Navigator',
-    'char_lobster_navigator_junior_v2.webp',
-    'Young lobster explorer in goggles and harness, both claws up'
-  ),
-  mascot(
-    'lobster_engineer_junior',
-    'Junior Lobster Engineer',
-    'char_lobster_engineer_junior_v2.webp',
-    'Young lobster engineer in a hardhat with a blueprint tablet'
-  ),
-  mascot(
-    'lobster_peaceful_junior',
-    'Junior Lobster Peaceful',
-    'char_lobster_peaceful_junior_v2.webp',
-    'Young lavender lobster in a teal vest, calm and content'
-  ),
-  mascot(
-    'lobster_peek_junior',
-    'Junior Lobster Bashful',
-    'char_lobster_peek_junior_v2.webp',
-    'Young pink lobster with claws clasped and wide blue eyes'
-  ),
-  mascot(
-    'crab_stats_junior',
-    'Junior Crab Stats',
-    'char_crab_stats_junior_v2.webp',
-    'Young coral crab holding up a bar chart tablet'
-  ),
-  mascot(
-    'crab_builder_junior',
-    'Junior Crab Builder',
-    'char_crab_builder_junior_v2.webp',
-    'Young violet crab builder in a hardhat, wrench raised'
-  ),
-  mascot(
-    'crab_explorer_junior',
-    'Junior Crab Explorer',
-    'char_crab_explorer_junior_v2.webp',
-    'Young teal crab explorer with goggles, compass and satchel'
+    'lobster_faye_ripple',
+    'Faye Ripple',
+    'char_faye_ripple_v5.webp',
+    'Sassy stylish rose-pink lobster with a sturdy softly square build, sapphire eyes, a raised brow and confident smirk, wearing a tailored aubergine blazer, ivory blouse and black belt with brass buckle; bare pincers and wrists without accessories'
   ),
 ]
 
-export const DEFAULT_MASCOT_KEY = 'lobster_thumbs_up'
+export const DEFAULT_MASCOT_KEY = 'lobster_rook_tide'
+
+/** Retired selections remain readable in saved layouts without entering the active cast. */
+const LEGACY_ROLE_SUCCESSORS: Record<string, string> = {
+  lobster_pointing: 'lobster_rook_tide',
+  lobster_thumbs_up: 'lobster_rook_tide',
+  lobster_navigator: 'lobster_tess_shoal',
+  lobster_engineer: 'lobster_faye_ripple',
+  lobster_peaceful: 'lobster_rook_tide',
+  lobster_peek: 'lobster_pip_current',
+  lobster_archivist: 'lobster_rook_tide',
+  lobster_oracle_attendant: 'lobster_pip_current',
+  crab_stats: 'crab_cal_brack',
+  crab_builder: 'crab_cal_brack',
+  crab_explorer: 'crab_mira_kelp',
+  crab_sentinel: 'crab_cal_brack',
+  crab_ritual_keeper: 'crab_mira_kelp',
+  lobster_pointing_junior: 'lobster_rook_tide',
+  lobster_thumbs_up_junior: 'lobster_rook_tide',
+  lobster_navigator_junior: 'lobster_tess_shoal',
+  lobster_engineer_junior: 'lobster_faye_ripple',
+  lobster_peaceful_junior: 'lobster_rook_tide',
+  lobster_peek_junior: 'lobster_pip_current',
+  crab_stats_junior: 'crab_cal_brack',
+  crab_builder_junior: 'crab_cal_brack',
+  crab_explorer_junior: 'crab_mira_kelp',
+}
+
+export const RETIRED_MASCOT_SUCCESSORS: Record<string, string> = {
+  ...LEGACY_ROLE_SUCCESSORS,
+  lobster_clove_cinder: 'lobster_rook_tide',
+}
 
 const CAST_BY_KEY = new Map(MASCOT_CAST.map((m) => [m.key, m]))
 
 /** Short names and retired file names that still resolve to a cast key. */
 const MASCOT_ALIASES: Record<string, string> = {
+  rook_tide_v4: 'lobster_rook_tide',
+  cal_brack_v4: 'crab_cal_brack',
+  tess_shoal_v4: 'lobster_tess_shoal',
+  faye_ripple_v4: 'lobster_faye_ripple',
+  rook: 'lobster_rook_tide',
+  rook_tide: 'lobster_rook_tide',
+  pip_current_v3: 'lobster_pip_current',
+  cal_brack_v3: 'crab_cal_brack',
+  tess_shoal_v3: 'lobster_tess_shoal',
+  faye_ripple_v3: 'lobster_faye_ripple',
+  clove_cinder_v3: 'lobster_clove_cinder',
+  'clove cinder': 'lobster_clove_cinder',
+  pip: 'lobster_pip_current',
+  pip_current: 'lobster_pip_current',
+  mira: 'crab_mira_kelp',
+  mira_kelp: 'crab_mira_kelp',
+  cal: 'crab_cal_brack',
+  cal_brack: 'crab_cal_brack',
+  clove: 'lobster_rook_tide',
+  clove_cinder: 'lobster_rook_tide',
+  tess: 'lobster_tess_shoal',
+  tess_shoal: 'lobster_tess_shoal',
+  faye: 'lobster_faye_ripple',
+  faye_ripple: 'lobster_faye_ripple',
   pointing: 'lobster_pointing',
   cta: 'lobster_pointing',
   lobster_cta: 'lobster_pointing',
@@ -203,9 +162,16 @@ const MASCOT_ALIASES: Record<string, string> = {
   ritual_keeper: 'crab_ritual_keeper',
 }
 
-// A render's own file name (e.g. char_lobster_pointing_adult_v2.webp) resolves to its key.
+// Accept retired keys and exact v2 file stems, including junior variants.
+for (const key of Object.keys(LEGACY_ROLE_SUCCESSORS)) {
+  const stem = key.endsWith('_junior') ? `${key}_v2` : `${key}_adult_v2`
+  MASCOT_ALIASES[stem] = key
+}
+
+// A named render's own file stem resolves to its canonical cast key.
 for (const m of MASCOT_CAST) {
   MASCOT_ALIASES[m.filename.replace(/^char_/, '').replace(/\.[^/.]+$/, '')] = m.key
+  MASCOT_ALIASES[m.name.toLowerCase()] = m.key
 }
 
 /**
@@ -217,18 +183,19 @@ export function resolveMascotAlias(rawKey: string): string {
   if (/\.(png|jpe?g|webp)$/.test(raw)) raw = raw.replace(/\.[^/.]+$/, '')
   if (raw.startsWith('char_')) raw = raw.slice('char_'.length)
   if (CAST_BY_KEY.has(raw)) return raw
-  return MASCOT_ALIASES[raw] ?? raw
+  const alias = MASCOT_ALIASES[raw] ?? raw
+  return RETIRED_MASCOT_SUCCESSORS[alias] ?? alias
 }
 
 export function getMascotDefinition(key: string): MascotDefinition | undefined {
-  return CAST_BY_KEY.get(key)
+  return CAST_BY_KEY.get(resolveMascotAlias(key))
 }
 
 export function getMascotKeys(): string[] {
   return MASCOT_CAST.map((m) => m.key)
 }
 
-/** Crab renders are near-square; lobsters are tall. Templates size the two shapes differently. */
+/** Preserve species-aware template sizing after resolving historical role keys. */
 export function isCrabMascot(rawKey: string): boolean {
   return resolveMascotAlias(rawKey).startsWith('crab_')
 }

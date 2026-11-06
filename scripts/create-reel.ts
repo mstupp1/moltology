@@ -894,7 +894,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
         checkReelVideoBudget([...measuredSceneDurations, ...sceneDurations.slice(i)], model, options.videoBudgetUsd)
         const referenceImagePath = sceneFrames[i]
         const prompt = referenceImagePath
-          ? `${scenePrompts[i]} The supplied image defines the character's identity. Preserve its face, eyes, shell, proportions, clothing and friendly cartoon design. Animate the existing character; do not redesign it into a realistic animal or add cybernetic armor.`
+          ? `${scenePrompts[i]} The supplied image defines the character's identity. Preserve its face, eyes, shell palette, proportions, connected limbs, pincer geometry, signature clothing and equipment. Animate the same character with sculpted 3D animated-feature forms, nuanced facial shading, soft satin chitin and cinematic depth. Match the scene lighting and contact shadows. Keep existing equipment; add gear only when explicitly requested by the scene. Avoid sticker outlines, cel shading, flat vector fills, toy-like plastic and photorealistic animal redesigns.`
           : scenePrompts[i]
         const veoSceneDuration = sceneDurations[i]
         const sceneOut = path.join(tempDir, `veo-scene-${i + 1}.mp4`)

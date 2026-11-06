@@ -1,12 +1,20 @@
 # Character cast v2
 
+Historical record. The [named v3 cast](character-cast-v3.md) replaces these active
+options. Legacy role keys resolve to named successors; old asset objects remain
+available for historical links. Do not use this document to select current art.
+
 The October 2026 cast keeps the seven established roles and actions, adds crab
 explorers and builders, and introduces four visual classes: archivist, ritual
 keeper, sentinel and Oracle attendant. Existing role keys resolve to adult
 replacements. Junior designs have their own selectable keys.
 
 Shared traits: seated expressive eyes, attached brows, sculpted cheeks, soft satin
-chitin, gentle studio lighting and genuine transparent backgrounds. Both species
+chitin, gentle studio lighting and genuine transparent backgrounds. The art direction
+for future generated renders is polished 3D animated feature-film quality: sculpted
+volume, dimensional facial forms, soft contact occlusion, nuanced materials and
+cinematic light falloff. Do not flatten the approved anatomy into a sticker, cel-shaded
+or outlined vector finish. Both species
 use a stylized six-leg convention, separate from their two pincer arms. Juniors
 have three short walking legs per side. Adults have two short side legs per side
 and a longer lower pair with knees and broad feet for an upright stance. This is
@@ -51,3 +59,22 @@ Approved family anchors are `char_lobster_pointing_adult_v2.png` and
 `char_lobster_pointing_junior_v2.png`. Use their actual registered images for
 future poses. Full prompt sets and measured image bounds are saved with the local
 identity record at `scratch/character_tests/cast-v2/identity.md`.
+
+The member avatar system is separate from these rendered cast assets. Its current
+implementation is a deterministic, hand-drawn SVG rig with selectable race, shell,
+build, head, face, pose, antennae/claws and background traits (`src/lib/avatar/` and
+`src/lib/lobster-avatar.ts`); it is not a 3D renderer. When an avatar reference is
+available, use it to align shared design grammar such as build, face placement,
+articulation and palette. Keep the selected original mascot image authoritative for
+that character's identity, proportions, costume and props. Do not imitate the avatar's
+vector finish or change the cast to match an avatar option.
+
+For the implemented lobster and crab visual grammar, reference roles and future sheet
+acceptance criteria, see the [species reference guide](../content/character-species.md).
+
+New additions should be named individuals with motives, contradictions, habits and
+relationships, following the [individual character brief](../.agents/skills/character-creator/SKILL.md#individual-character-brief).
+The role and age labels above describe the existing registry, rather than a template
+for endless generic variants. Familiar story archetypes may inspire original
+personalities; express them through distinctive acting and personal details rather
+than recognizable costumes or borrowed fictional identities.
