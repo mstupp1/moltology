@@ -70,7 +70,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     const dialog = screen.getByRole('dialog', { name: 'More pages' })
     fireEvent.click(screen.getByRole('button', { name: 'More' }))
     expect(dialog).toHaveAttribute('inert')
-    expect(dialog).toHaveClass('-translate-y-2')
+    expect(dialog).toHaveClass('translate-y-4')
     act(() => vi.advanceTimersByTime(100))
     fireEvent.click(screen.getByRole('button', { name: 'More' }))
     act(() => vi.advanceTimersByTime(250))
@@ -223,7 +223,9 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     fireEvent.click(screen.getByRole('button', { name: 'More' }))
 
     const dialog = screen.getByRole('dialog', { name: 'More pages' })
-    expect(dialog).toHaveClass('fixed', 'inset-x-0', 'top-14', 'w-screen')
+    // A short sheet resting on the bottom bar, not a full-screen panel.
+    expect(dialog).toHaveClass('fixed', 'inset-x-0', 'rounded-t-card', 'w-screen')
+    expect(dialog).not.toHaveClass('top-14')
     expect(document.body.style.overflow).toBe('hidden')
     expect(screen.getByRole('button', { name: 'More' })).toHaveAttribute('aria-expanded', 'true')
     const sheet = within(dialog)
@@ -234,6 +236,19 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     await waitFor(() => {
       expect(screen.queryByRole('dialog', { name: 'More pages' })).not.toBeInTheDocument()
       expect(document.body.style.overflow).toBe('')
+    })
+  })
+
+  it('closes More when the dimmed page behind it is tapped', async () => {
+    render(<HUDSidebar />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'More' }))
+    expect(screen.getByRole('dialog', { name: 'More pages' })).toBeInTheDocument()
+
+    fireEvent.click(screen.getByTestId('more-backdrop'))
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: 'More pages' })).not.toBeInTheDocument()
     })
   })
 
