@@ -27,8 +27,8 @@ export interface MarketPiece {
 export interface MarketPayload {
   wallet: GemWallet
   pieces: MarketPiece[]
-  /** Admins own every piece, so there is nothing for them to buy. */
-  everyItem: boolean
+  /** Admins add pieces to their collection for free instead of buying them. */
+  addFree: boolean
   moltCredits: number
   /** Credit packs can be bought (admins with the Molt Credits experiment, for now). */
   creditsLive: boolean
@@ -58,12 +58,11 @@ export interface MarketCatalogRow {
 
 /**
  * Groups gear rows into market pieces, each with its rarity ladder cheapest first.
- * `owned` holds catalog ids the member owns; `everyItem` marks everything owned (admins).
+ * `owned` holds the catalog ids the member owns.
  */
 export function buildMarketPieces(
   catalog: readonly MarketCatalogRow[],
   owned: ReadonlySet<string>,
-  everyItem: boolean,
 ): MarketPiece[] {
   const pieces = new Map<string, MarketPiece & { order: number }>()
   for (const row of [...catalog].sort((a, b) => a.sortOrder - b.sortOrder)) {
@@ -83,7 +82,7 @@ export function buildMarketPieces(
       primaryStat: row.primaryStat,
       affixes: row.affixes ?? [],
       uniquePower: row.uniquePower ?? null,
-      owned: everyItem || owned.has(row.id),
+      owned: owned.has(row.id),
     })
   }
   return [...pieces.values()]

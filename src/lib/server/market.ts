@@ -1,6 +1,6 @@
 import { and, eq, sql } from 'drizzle-orm'
 import type { getDb } from '../../db'
-import { equipmentCatalog, gearUnlocks, profiles } from '../../db/schema'
+import { equipmentCatalog, gearUnlocks, profiles, userGearItems } from '../../db/schema'
 import { getEquipmentVisual } from '../avatar/equipment'
 import { STARTER_EQUIPMENT_CATALOG_IDS } from '../equipment-seed-data'
 import { GEAR_PRICES } from '../gear-variants'
@@ -15,24 +15,25 @@ type Db = ReturnType<typeof getDb>
 const STARTER = new Set(STARTER_EQUIPMENT_CATALOG_IDS)
 
 export async function getMarket(db: Db, userId: string): Promise<MarketPayload> {
-  const [wallet, catalog, unlocks, profileRows] = await Promise.all([
+  const [wallet, catalog, unlocks, placed, profileRows] = await Promise.all([
     getGemWallet(db, userId),
     db.select().from(equipmentCatalog).where(eq(equipmentCatalog.kind, 'gear')),
     db.select({ id: gearUnlocks.catalogItemId }).from(gearUnlocks).where(eq(gearUnlocks.userId, userId)),
+    db.select({ id: userGearItems.catalogItemId }).from(userGearItems).where(eq(userGearItems.userId, userId)),
     db
       .select({ role: profiles.role, moltCredits: profiles.moltCredits, experiments: profiles.experiments })
       .from(profiles)
       .where(eq(profiles.id, userId))
       .limit(1),
   ])
-  const everyItem = isAdmin(null, profileRows[0]?.role)
-  const owned = new Set([...STARTER, ...unlocks.map((u) => u.id)])
+  // Same rule as the character page: starter set, unlocks, and anything already placed.
+  const owned = new Set([...STARTER, ...unlocks.map((u) => u.id), ...placed.map((p) => p.id)])
   return {
     wallet,
-    everyItem,
+    addFree: isAdmin(null, profileRows[0]?.role),
     moltCredits: Number(profileRows[0]?.moltCredits ?? 0),
     creditsLive: canBuyCredits(profileRows[0]?.role, profileRows[0]?.experiments),
-    pieces: buildMarketPieces(catalog, owned, everyItem),
+    pieces: buildMarketPieces(catalog, owned),
   }
 }
 
@@ -93,6 +94,27 @@ export async function buyGear(db: Db, userId: string, catalogItemId: string): Pr
   return { ok: false, balance, credits, error: `You need ${price - balance - credits} more gems for this piece.` }
 }
 
+/** Admins: add a piece to the collection without spending anything. */
+export async function addGearFree(db: Db, userId: string, catalogItemId: string): Promise<BuyGearResult> {
+  const [item] = await db
+    .select({ id: equipmentCatalog.id, slug: equipmentCatalog.slug, appearanceKey: equipmentCatalog.appearanceKey })
+    .from(equipmentCatalog)
+    .where(and(eq(equipmentCatalog.id, catalogItemId), eq(equipmentCatalog.kind, 'gear')))
+    .limit(1)
+  const [wallet] = await db
+    .select({ balance: profiles.chitinGems, credits: profiles.moltCredits })
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+  const balance = wallet?.balance ?? 0
+  const credits = Math.max(0, Number(wallet?.credits ?? 0))
+  if (!item || !getEquipmentVisual(item.appearanceKey || item.slug))
+    return { ok: false, balance, credits, error: 'That piece is not in the market.' }
+  if (!STARTER.has(item.id))
+    await db.insert(gearUnlocks).values({ userId, catalogItemId: item.id, source: 'admin' }).onConflictDoNothing()
+  return { ok: true, balance, credits }
+}
+
 export async function getMarketHandler(args: { data?: { token?: string }; context?: WriteAuthContext }) {
   const auth = await resolveWriteAuth(args)
   if (!auth) throw new Error('Authentication required.')
@@ -106,5 +128,11 @@ export async function buyGearHandler(args: {
   const auth = await resolveWriteAuth(args)
   if (!auth) throw new Error('Authentication required.')
   if (!args.data?.catalogItemId) throw new Error('Pick a piece to buy.')
+  const [profile] = await auth.dbClient
+    .select({ role: profiles.role })
+    .from(profiles)
+    .where(eq(profiles.id, auth.userId))
+    .limit(1)
+  if (isAdmin(null, profile?.role)) return addGearFree(auth.dbClient, auth.userId, args.data.catalogItemId)
   return buyGear(auth.dbClient, auth.userId, args.data.catalogItemId)
 }

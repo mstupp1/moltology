@@ -3,12 +3,19 @@ import { Link } from '@tanstack/react-router'
 import { Check } from 'lucide-react'
 import type { EquipmentRarity } from '@/db/schema'
 import { HudButton } from '@/components/ui/HudButton'
-import { CATEGORY_LABELS, formatAffixLine, primaryStatLine, type CatalogRef } from '@/lib/chassis-loadout'
+import {
+  CATEGORY_LABELS,
+  formatAffixLine,
+  primaryStatLine,
+  type CatalogRef,
+  type LoadoutTotals,
+} from '@/lib/chassis-loadout'
 import { RARITY_LABELS } from '@/lib/gear-variants'
 import { equipmentIcon, type LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import type { MarketPiece, MarketVariant } from '@/lib/market'
 import { cn } from '@/lib/utils'
 import { LobsterAvatarFullBody } from '../LobsterAvatarFullBody'
+import { BonusChange } from '../chassis/VectorSheetPanel'
 import { GemAmount } from './MarketCurrencyBar'
 import { RARITY_FRAME } from './market-rarity'
 
@@ -109,21 +116,29 @@ export function MarketPieceDetail({
   shown,
   onPickRarity,
   config,
+  currentConfig = null,
+  statChange = null,
   balance,
   credits = 0,
   buying,
-  everyItem,
+  addFree,
   onBuy,
 }: {
   piece: MarketPiece
   shown: MarketVariant
   onPickRarity: (rarity: EquipmentRarity) => void
+  /** The member's character wearing this piece. */
   config: LobsterAvatarConfig | null
+  /** The member's character as saved, for comparing against the try-on. */
+  currentConfig?: LobsterAvatarConfig | null
+  /** Stat totals now and with this piece worn. */
+  statChange?: { from: LoadoutTotals; to: LoadoutTotals } | null
   balance: number
   /** Molt Credits cover what gems don't. */
   credits?: number
   buying: boolean
-  everyItem: boolean
+  /** Admins add pieces for free. */
+  addFree: boolean
   onBuy: (variant: MarketVariant) => void
 }) {
   const style = RARITY_FRAME[shown.rarity]
@@ -131,14 +146,17 @@ export function MarketPieceDetail({
   const spendable = Math.max(0, credits)
   const short = shown.price - balance - spendable
   const creditPart = Math.max(0, shown.price - Math.max(0, balance))
+  const [compare, setCompare] = React.useState(false)
+  const showCurrent = compare && Boolean(currentConfig)
+  const shownConfig = showCurrent ? currentConfig : config
   return (
     <div className="flex flex-col gap-3" data-testid="market-detail">
       <div className={cn('rounded-card border-2 bg-abyss/70 overflow-hidden w-full max-w-[260px] lg:max-w-none mx-auto', style.frame)}>
-        {config ? (
+        {shownConfig ? (
           <LobsterAvatarFullBody
-            config={config}
+            config={shownConfig}
             size={320}
-            alt={`Your character wearing ${piece.name}`}
+            alt={showCurrent ? 'Your character as saved' : `Your character trying on ${piece.name}`}
             className="w-full aspect-square"
           />
         ) : (
@@ -149,6 +167,31 @@ export function MarketPieceDetail({
           </div>
         )}
       </div>
+      {currentConfig ? (
+        <div
+          role="group"
+          aria-label="Preview"
+          className="-mt-1 flex w-full max-w-[260px] lg:max-w-none mx-auto gap-0.5 rounded-control border border-line-subtle bg-surface-1 p-0.5"
+        >
+          {[
+            { id: false, label: 'Trying on' },
+            { id: true, label: 'Your look' },
+          ].map((o) => (
+            <button
+              key={o.label}
+              type="button"
+              aria-pressed={compare === o.id}
+              onClick={() => setCompare(o.id)}
+              className={cn(
+                'flex-1 min-h-8 rounded-chip text-[12px] font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
+                compare === o.id ? 'bg-surface-3 text-ink shadow-nav-current' : 'text-ink-muted hover:text-ink',
+              )}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
       <div>
         <h2 className="text-lg font-semibold text-ink leading-tight">{piece.name}</h2>
         <p className="text-xs text-ink-muted">
@@ -187,6 +230,12 @@ export function MarketPieceDetail({
           )
         })}
       </div>
+      {statChange ? (
+        <p className="text-[13px] text-ink-muted">
+          <span className="text-ink font-semibold">If you wear it: </span>
+          <BonusChange from={statChange.from} to={statChange.to} />
+        </p>
+      ) : null}
       <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
         <dt className="text-ink-muted">Primary bonus</dt>
         <dd className="text-cyan-glow font-semibold text-right tabular-nums">{primaryStatLine(catalog)}</dd>
@@ -209,8 +258,15 @@ export function MarketPieceDetail({
           to="/character"
           className="inline-flex min-h-10 items-center justify-center rounded-control border border-line bg-surface-2 px-4 text-sm font-semibold text-ink hover:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
-          {everyItem ? 'Admins own every piece · open the studio' : 'Owned · wear it in the studio'}
+          Owned · wear it from Customize
         </Link>
+      ) : addFree ? (
+        <>
+          <HudButton size="lg" fullWidth disabled={buying} onClick={() => onBuy(shown)}>
+            {buying ? 'Adding…' : 'Add to collection'}
+          </HudButton>
+          <p className="text-xs text-ink-muted text-center">Admin · free, no gems spent.</p>
+        </>
       ) : (
         <>
           <HudButton size="lg" fullWidth disabled={buying || short > 0} onClick={() => onBuy(shown)}>

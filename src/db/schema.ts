@@ -979,7 +979,7 @@ export const userGearItems = pgTable('user_gear_items', {
     .where(sql`"vaultIndex" IS NOT NULL`),
 ])
 
-export type GearUnlockSource = 'purchase' | 'grant' | 'legacy'
+export type GearUnlockSource = 'purchase' | 'grant' | 'legacy' | 'admin'
 
 // Pieces a member owns for good. Owning a piece lets them wear it in any slot that fits;
 // user_gear_items rows only exist while a piece is placed.

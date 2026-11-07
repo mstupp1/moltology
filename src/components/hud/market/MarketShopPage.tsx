@@ -9,7 +9,14 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { buyGearFn, createCreditCheckoutFn, getChassisLoadoutFn, getMarketFn } from '@/lib/server/api'
 import type { MoltCreditPack } from '@/lib/molt-credits'
-import { clearChassisLoadoutCache, getCachedChassisLoadout, CATEGORY_LABELS } from '@/lib/chassis-loadout'
+import {
+  clearChassisLoadoutCache,
+  computeLoadoutTotals,
+  getCachedChassisLoadout,
+  previewLoadoutTotals,
+  CATEGORY_LABELS,
+  type ChassisLoadoutPayload,
+} from '@/lib/chassis-loadout'
 import { equipmentAppearance } from '@/lib/character-appearance'
 import { RARITY_LABELS, RARITY_ORDER } from '@/lib/gear-variants'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
@@ -21,7 +28,7 @@ import { MarketCreditsPanel } from './MarketCreditsPanel'
 import { MarketCurrencyBar } from './MarketCurrencyBar'
 import { MarketEarnPanel } from './MarketEarnPanel'
 import { MarketBundleDetail, MarketFeatured } from './MarketFeatured'
-import { MarketPieceCard, MarketPieceDetail } from './MarketGear'
+import { MarketPieceCard, MarketPieceDetail, variantAsCatalog } from './MarketGear'
 import './market.css'
 import '../avatar-animations.css'
 
@@ -150,6 +157,7 @@ export function MarketShopPage() {
   const [market, setMarket] = useState<MarketPayload | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [config, setConfig] = useState<LobsterAvatarConfig | null>(null)
+  const [loadout, setLoadout] = useState<ChassisLoadoutPayload | null>(null)
   const [tab, setTab] = useState<Tab>('gear')
   const [filters, setFilters] = useState<GearFilters>(DEFAULT_FILTERS)
   const { slot, rarity, sort, hideOwned, page } = filters
@@ -212,6 +220,7 @@ export function MarketShopPage() {
     let cancelled = false
     const apply = (p: ReturnType<typeof getCachedChassisLoadout>) => {
       if (!p?.config || cancelled) return
+      setLoadout(p)
       setConfig({ ...p.config, equipment: equipmentAppearance(p.items, p.catalog) })
     }
     apply(getCachedChassisLoadout(userId))
@@ -287,6 +296,18 @@ export function MarketShopPage() {
     }
   }, [config, selectedPiece, selectedVariant])
 
+  // What wearing the selected piece would do to the stats, against what is worn now.
+  const statChange = useMemo(() => {
+    if (!loadout || !selectedPiece || !selectedVariant) return null
+    const slotId = selectedPiece.category === 'claws' ? 'claws-1' : selectedPiece.category
+    const catalogById = new Map(loadout.catalog.map((c) => [c.id, c]))
+    catalogById.set(selectedVariant.catalogItemId, variantAsCatalog(selectedPiece, selectedVariant))
+    return {
+      from: computeLoadoutTotals(loadout.items, catalogById),
+      to: previewLoadoutTotals(loadout.items, catalogById, slotId, selectedVariant.catalogItemId),
+    }
+  }, [loadout, selectedPiece, selectedVariant])
+
   const buy = async (variant: MarketVariant) => {
     if (!selectedPiece || buying) return
     setBuying(true)
@@ -295,8 +316,8 @@ export function MarketShopPage() {
       const result = await buyGearFn({ data: { token, catalogItemId: variant.catalogItemId } })
       if (result.ok) {
         clearChassisLoadoutCache()
-        toast?.success(`${selectedPiece.name} is yours. Wear it in the studio.`, {
-          title: `${RARITY_LABELS[variant.rarity]} piece unlocked`,
+        toast?.success(`${selectedPiece.name} is in your inventory. Wear it from Customize.`, {
+          title: market?.addFree ? 'Added to your collection' : `${RARITY_LABELS[variant.rarity]} piece unlocked`,
         })
       } else {
         toast?.warning(result.error ?? 'That purchase did not go through.')
@@ -331,14 +352,17 @@ export function MarketShopPage() {
     <MarketBundleDetail bundle={bundle} pieces={market.pieces} onOpenPiece={openPiece} />
   ) : selectedPiece && selectedVariant ? (
       <MarketPieceDetail
+        key={selectedPiece.baseKey}
         piece={selectedPiece}
         shown={selectedVariant}
         onPickRarity={(r) => setSelected({ baseKey: selectedPiece.baseKey, rarity: r })}
         config={tryOnConfig}
+        currentConfig={config}
+        statChange={statChange}
         balance={market.wallet.balance}
         credits={market.moltCredits}
         buying={buying}
-        everyItem={market.everyItem}
+        addFree={market.addFree}
         onBuy={buy}
       />
     ) : null
@@ -404,11 +428,9 @@ export function MarketShopPage() {
                   onChange={(e) => updateFilters({ sort: e.target.value as Sort })}
                   options={SORTS}
                 />
-                {market.everyItem ? null : (
-                  <LitTile active={hideOwned} onClick={() => updateFilters({ hideOwned: !hideOwned })} className="col-span-2 sm:col-span-1">
-                    Hide owned
-                  </LitTile>
-                )}
+                <LitTile active={hideOwned} onClick={() => updateFilters({ hideOwned: !hideOwned })} className="col-span-2 sm:col-span-1">
+                  Hide owned
+                </LitTile>
                 <span className="hidden sm:block ml-auto pr-1 text-xs text-ink-muted tabular-nums" aria-live="polite">
                   {matches.length} {matches.length === 1 ? 'piece' : 'pieces'}
                 </span>

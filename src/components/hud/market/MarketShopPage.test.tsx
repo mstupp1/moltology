@@ -22,7 +22,7 @@ vi.mock('@tanstack/react-router', () => ({
 
 function payload(balance: number, owned = false): MarketPayload {
   return {
-    everyItem: false,
+    addFree: false,
     moltCredits: 0,
     creditsLive: false,
     wallet: {
@@ -198,6 +198,16 @@ describe('MarketShopPage', () => {
     fireEvent.click(within(detail).getByRole('radio', { name: /Legendary/ }))
     expect(within(detail).getByRole('button', { name: 'Buy for 2,000 gems' })).toBeDisabled()
     expect(within(detail).getByText(/You need 1,680 more gems/)).toBeInTheDocument()
+  })
+
+  it('lets admins add a piece for free instead of buying it', async () => {
+    getMarketFn.mockResolvedValue({ ...payload(0), addFree: true })
+    renderMarket()
+    fireEvent.click(await screen.findByRole('button', { name: /Tide-Braced Carapace, Uncommon/ }))
+    const detail = await screen.findByTestId('market-detail')
+    fireEvent.click(within(detail).getByRole('radio', { name: /Legendary/ }))
+    expect(within(detail).getByRole('button', { name: 'Add to collection' })).toBeEnabled()
+    expect(within(detail).queryByRole('button', { name: /Buy for/ })).toBeNull()
   })
 
   it('lists ways to earn and recent gems', async () => {
