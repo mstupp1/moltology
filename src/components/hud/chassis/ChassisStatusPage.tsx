@@ -72,7 +72,7 @@ function useWideLayout() {
   )
 }
 
-/** One local draft. A catalog try-on is deliberately separate from owned placements. */
+/** One local draft of the character. Only owned pieces are listed; trying on new ones happens in the shop. */
 export const ChassisStatusPage: React.FC = () => {
   const { userId } = useAuthSession()
   const toast = useOptionalToast()?.toast
@@ -86,13 +86,8 @@ export const ChassisStatusPage: React.FC = () => {
   const [tab, setTab] = useState<(typeof TABS)[number]>('equipment')
   const [slot, setSlot] = useState<EquipSlotId>('head')
   const [selected, setSelected] = useState<string | null>(null)
-  const [tryOn, setTryOn] = useState<{
-    catalogId: string
-    slot: EquipSlotId
-  } | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [onlyOwned, setOnlyOwned] = useState(false)
   const draftTouched = useRef(false)
   const canonicalRevision = useRef(0)
   const [reload, setReload] = useState(0)
@@ -109,14 +104,12 @@ export const ChassisStatusPage: React.FC = () => {
     setSaved(payload)
     setConfig(baseConfig(payload))
     setItems(payload.items)
-    setTryOn(null)
     if (userId) setCachedChassisLoadout(userId, payload)
   }
   useEffect(() => {
     let cancelled = false
     setError(null)
     setSelected(null)
-    setTryOn(null)
     const cache = userId ? getCachedChassisLoadout(userId) : null
     if (cache) accept(cache)
     else {
@@ -149,17 +142,10 @@ export const ChassisStatusPage: React.FC = () => {
   const catalog = saved?.catalog ?? []
   const catalogById = useMemo(() => new Map(catalog.map((c) => [c.id, c])), [catalog])
   const equipped = useMemo(() => equipmentAppearance(items, catalog), [items, catalog])
-  const preview = useMemo(() => {
-    if (!config) return null
-    const equipment = { ...equipped }
-    const c = tryOn ? catalogById.get(tryOn.catalogId) : null
-    if (tryOn && c)
-      equipment[tryOn.slot] = {
-        visualKey: c.appearanceKey || c.slug,
-        rarity: c.rarity,
-      }
-    return { ...config, equipment }
-  }, [config, equipped, tryOn, catalogById])
+  const preview = useMemo(
+    () => (config ? { ...config, equipment: { ...equipped } } : null),
+    [config, equipped],
+  )
   const dirty = Boolean(
     saved &&
     config &&
@@ -172,7 +158,7 @@ export const ChassisStatusPage: React.FC = () => {
   const matching = catalog.filter(
     (c) =>
       c.category === equipSlotCategory(slot) &&
-      (unlocked || !onlyOwned || items.some((i) => i.catalogItemId === c.id)),
+      (unlocked || items.some((i) => i.catalogItemId === c.id)),
   )
   /** Admins: wear any catalog item. A new instance is created when the draft is saved. */
   const equipUnlocked = (catalogId: string) => {
@@ -194,7 +180,6 @@ export const ChassisStatusPage: React.FC = () => {
       ...next,
       { id: crypto.randomUUID(), catalogItemId: catalogId, equippedSlot: slot, vaultIndex: null },
     ])
-    setTryOn(null)
   }
   const equip = (catalogId: string) => {
     const instance =
@@ -203,7 +188,6 @@ export const ChassisStatusPage: React.FC = () => {
       items.find((i) => i.catalogItemId === catalogId)
     if (!instance) {
       if (unlocked) equipUnlocked(catalogId)
-      else setTryOn({ catalogId, slot })
       return
     }
     const plan = planGearMove(
@@ -219,7 +203,6 @@ export const ChassisStatusPage: React.FC = () => {
     }
     draftTouched.current = true
     setItems(applyMoveUpdates(items, plan.updates))
-    setTryOn(null)
   }
   const unequip = () => {
     const item = items.find((i) => i.equippedSlot === slot)
@@ -228,7 +211,6 @@ export const ChassisStatusPage: React.FC = () => {
     if (unlocked && (index === null || !saved?.items.some((i) => i.id === item.id))) {
       draftTouched.current = true
       setItems(items.filter((i) => i.id !== item.id))
-      setTryOn(null)
       return
     }
     if (index === null) {
@@ -246,7 +228,6 @@ export const ChassisStatusPage: React.FC = () => {
       draftTouched.current = true
       setItems(applyMoveUpdates(items, plan.updates))
     }
-    setTryOn(null)
   }
   const save = async () => {
     if (!config || !saved || !userId || saving) return
@@ -325,7 +306,6 @@ export const ChassisStatusPage: React.FC = () => {
       setSlot(id)
       setTab('equipment')
       setSelected(null)
-      setTryOn(null)
     },
   }
   // A new key replays the small settle animation whenever the look changes.
@@ -343,10 +323,7 @@ export const ChassisStatusPage: React.FC = () => {
           role="tab"
           aria-selected={tab === id}
           aria-controls="character-controls"
-          onClick={() => {
-            setTab(id)
-            setTryOn(null)
-          }}
+          onClick={() => setTab(id)}
           className={`flex-1 min-h-9 rounded-control text-[11px] font-sans font-semibold tracking-[0.08em] uppercase transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
             tab === id
               ? 'bg-surface-3 shadow-nav-current text-ink'
@@ -374,7 +351,7 @@ export const ChassisStatusPage: React.FC = () => {
             <HudButton
               size="sm"
               variant="secondary"
-              disabled={saving || (!dirty && !tryOn)}
+              disabled={saving || !dirty}
               onClick={() => accept(saved)}
             >
               Discard
@@ -411,19 +388,6 @@ export const ChassisStatusPage: React.FC = () => {
             </div>
             <SlotColumn ids={RIGHT_SLOTS} className="hidden lg:flex" {...slotProps} />
           </div>
-          {tryOn && (
-            <div
-              role="status"
-              className="flex items-center justify-between gap-3 px-3 py-2 border border-cyan-glow/30 bg-cyan-soft rounded-control text-sm"
-            >
-              <span className="truncate">
-                Preview only · {catalogById.get(tryOn.catalogId)?.name}
-              </span>
-              <button type="button" className="underline shrink-0" onClick={() => setTryOn(null)}>
-                End preview
-              </button>
-            </div>
-          )}
           {wide && <VectorSheetPanel sheet={sheet} preview={statPreview} self />}
         </div>
         {!wide && tabBar}
@@ -486,23 +450,18 @@ export const ChassisStatusPage: React.FC = () => {
                   Unequip
                 </HudButton>
               </div>
-              {unlocked ? (
-                <p className="text-xs text-ink-muted">
-                  {saved?.everyItem ? 'Admin · every item is unlocked. ' : 'Your collection. '}
-                  <Link to="/character/shop" className="text-cyan-glow hover:text-ink">
-                    {saved?.everyItem ? 'Open the shop' : 'Get more pieces in the shop'}
-                  </Link>
-                </p>
-              ) : (
-                <label className="flex gap-2 items-center text-xs text-ink-muted">
-                  <input
-                    type="checkbox"
-                    checked={onlyOwned}
-                    onChange={(e) => setOnlyOwned(e.target.checked)}
-                  />
-                  Owned items only
-                </label>
-              )}
+              <p className="text-xs text-ink-muted">
+                {matching.length
+                  ? `${matching.length} owned ${matching.length === 1 ? 'piece' : 'pieces'} for this slot. `
+                  : `You don't own any ${SLOT_NAMES[slot].toLowerCase()} gear yet. `}
+                <Link
+                  to="/character/shop"
+                  search={{ slot: equipSlotCategory(slot) }}
+                  className="text-cyan-glow hover:text-ink"
+                >
+                  Try on more in the shop
+                </Link>
+              </p>
               <div className="grid grid-cols-[repeat(auto-fill,minmax(84px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-2">
                 {matching.map((c) => {
                   const owned = items.filter((i) => i.catalogItemId === c.id).length
@@ -511,7 +470,6 @@ export const ChassisStatusPage: React.FC = () => {
                       key={c.id}
                       catalog={c}
                       owned={owned}
-                      unlocked={unlocked}
                       worn={wearing?.catalogItemId === c.id}
                       selected={selected === c.id}
                       onClick={() => setSelected(c.id)}
@@ -541,18 +499,12 @@ export const ChassisStatusPage: React.FC = () => {
                       onClick={() => equip(selectedCatalog.id)}
                       disabled={saving}
                     >
-                      {unlocked || items.some((i) => i.catalogItemId === selectedCatalog.id)
-                        ? `Equip on ${SLOT_NAMES[slot].toLowerCase()}`
-                        : 'Try on'}
+                      {`Equip on ${SLOT_NAMES[slot].toLowerCase()}`}
                     </HudButton>
                   </div>
                   <GearDetail catalog={selectedCatalog} />
                 </>
               )}
-              <p className={`text-xs text-ink-muted ${unlocked ? 'hidden' : ''}`}>
-                {items.length} owned items · {items.filter((i) => !i.equippedSlot).length}/
-                {saved.vaultSize} vault spaces used. Other designs are available to preview.
-              </p>
             </div>
           )}
         </div>
@@ -630,14 +582,12 @@ function SlotColumn({
 function GearPick({
   catalog,
   owned,
-  unlocked = false,
   worn,
   selected,
   onClick,
 }: {
   catalog: CatalogRef
   owned: number
-  unlocked?: boolean
   worn: boolean
   selected: boolean
   onClick: () => void
@@ -670,13 +620,9 @@ function GearPick({
       <span className={`text-[11px] ${worn ? 'text-cyan-glow' : 'text-ink-muted'}`}>
         {worn
           ? 'Worn'
-          : owned
-            ? owned > 1
-              ? `Owned ×${owned}`
-              : 'Owned'
-            : unlocked
-              ? 'Owned'
-              : 'Preview only'}
+          : owned > 1
+            ? `Owned ×${owned}`
+            : 'Owned'}
       </span>
     </button>
   )

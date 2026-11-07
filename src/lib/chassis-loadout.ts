@@ -649,8 +649,6 @@ export interface ChassisLoadoutPayload {
    * creates its instance on save. The catalog holds only what this member owns.
    */
   allUnlocked?: boolean
-  /** Admins: the catalog is every piece, owned or not. */
-  everyItem?: boolean
   /** The member's base vectors (audit or provisional). Gear totals add on top. */
   vectorBase?: VectorBase
 }

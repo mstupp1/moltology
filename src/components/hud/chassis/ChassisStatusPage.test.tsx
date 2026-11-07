@@ -73,11 +73,11 @@ describe('unified character workspace', () => {
       })),
     }))
   })
-  it('shows a live loadout, owned and preview pieces, with no usable powers', async () => {
+  it('shows a live loadout with only owned pieces and no usable powers', async () => {
     await mount()
     expect(preview().equipment.head.visualKey).toBe('soft-shell-visor')
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled()
-    expect(screen.getAllByText('Preview only').length).toBeGreaterThan(0)
+    expect(screen.queryByText('Preview only')).not.toBeInTheDocument()
     expect(screen.queryByText('Ready')).not.toBeInTheDocument()
     expect(screen.getByTestId('vector-sheet')).toHaveTextContent('Moltmax rating')
     expect(screen.queryByText(/do not affect/i)).not.toBeInTheDocument()
@@ -98,32 +98,21 @@ describe('unified character workspace', () => {
     expect(preview().equipment.head.visualKey).toBe('soft-shell-visor')
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled()
   })
-  it('never includes an unowned try-on in saved configuration or placements', async () => {
+  it('lists only owned pieces and sends try-ons to the shop', async () => {
     await mount()
-    choose('Oracle Dome Lattice')
-    fireEvent.click(screen.getByRole('button', { name: 'Try on' }))
-    expect(preview().equipment.head.visualKey).toBe('oracle-dome-lattice')
-    expect(screen.getByRole('status')).toHaveTextContent('Preview only')
-    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled()
-    fireEvent.click(screen.getByRole('tab', { name: 'Body' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Become crab' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
-    await waitFor(() => expect(saveCharacterFn).toHaveBeenCalledTimes(1))
-    const data = vi.mocked(saveCharacterFn).mock.calls[0][0].data
-    expect(data.config.race).toBe('crab')
-    expect(data.config).not.toHaveProperty('equipment')
-    expect(data.expectedRevision).toBe(4)
-    expect(data.placements).toHaveLength(19)
-    expect(data.placements.find((i) => i.equippedSlot === 'head')?.id).toBe(payload.items[3].id)
+    expect(screen.queryByRole('button', { name: /Oracle Dome Lattice/ })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Try on' })).toBeNull()
+    expect(screen.getByRole('link', { name: 'Try on more in the shop' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('/character/shop'),
+    )
   })
-  it('lets admins wear any item and creates its instance on save', async () => {
+  it('wears an unlocked collection piece and creates its instance on save', async () => {
     vi.mocked(getChassisLoadoutFn).mockResolvedValue({
       ...structuredClone(payload),
       allUnlocked: true,
-      everyItem: true,
     })
     await mount()
-    expect(screen.getByText(/Admin · every item is unlocked/)).toBeInTheDocument()
     choose('Oracle Dome Lattice')
     fireEvent.click(screen.getByRole('button', { name: 'Equip on head' }))
     expect(screen.queryByRole('status')).toBeNull()

@@ -3961,8 +3961,7 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<Chassis
     (SELECT jsonb_build_object('moltmaxDimensionScores', s."moltmaxDimensionScores", 'moltmaxCompletedAt', s."moltmaxCompletedAt") FROM public.user_stats s WHERE s."userId"=${userId}) AS stats`)
   const { catalog: catalogRows, items: gearRows, profile, unlocks, stats } = result.rows[0]
   const items = gearRows.map(toGearState)
-  const everyItem = isAdmin(null, profile?.role)
-  // Members wear what they own: the starter set, anything unlocked, and anything already placed.
+  // Everyone, admins included, wears what they own: the starter set, anything unlocked, and anything already placed.
   const owned = new Set<string>([
     ...STARTER_EQUIPMENT_CATALOG_IDS,
     ...(unlocks ?? []),
@@ -3970,7 +3969,7 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<Chassis
   ])
   const catalog = catalogRows
     .filter((c) => c.kind !== 'cosmetic' && getEquipmentVisual(c.appearanceKey || c.slug))
-    .filter((c) => everyItem || owned.has(c.id))
+    .filter((c) => owned.has(c.id))
     .map(toCatalogRef)
   return {
     catalog,
@@ -3980,7 +3979,6 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<Chassis
     config: profile ? withCharacterAppearance(profile).avatarConfig : null,
     appearanceRevision: profile?.appearanceRevision ?? 0,
     allUnlocked: true,
-    ...(everyItem ? { everyItem: true } : {}),
     vectorBase: resolveVectorBase(stats, userId),
   }
 }

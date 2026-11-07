@@ -169,10 +169,10 @@ export function showcaseMarket(): MarketPayload {
       history: [],
       firsts: GEM_FIRSTS.map((first) => ({ ...first, done: first.id !== 'certificate' })),
     },
-    everyItem: false,
+    addFree: false,
     moltCredits: 0,
     creditsLive: false,
-    pieces: buildMarketPieces(GEAR_ROWS.filter((row) => row.kind === 'gear'), owned, false),
+    pieces: buildMarketPieces(GEAR_ROWS.filter((row) => row.kind === 'gear'), owned),
   }
 }
 
