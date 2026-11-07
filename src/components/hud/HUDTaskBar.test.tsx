@@ -39,29 +39,25 @@ describe('HUDTaskBar', () => {
     expect(screen.getByText('COMPLETE ALIGNMENT')).toBeInTheDocument()
   })
 
-  it('renders compact header task bar variant correctly', () => {
+  it('renders the phone top bar ring instead of the chronometer', () => {
     render(<HUDTaskBar variant="header" />)
-    
+
     expect(screen.queryByText('BENTHIC CHRONOMETER')).not.toBeInTheDocument()
-    expect(screen.getByTestId('header-next')).toHaveTextContent(/^Next /)
+    expect(screen.getByTestId('alignment-ring')).toBeInTheDocument()
   })
 
-  it('does not label the header chip NEXT when all eight liturgies are complete', () => {
+  it('shows the full count in the ring when all eight liturgies are complete', () => {
     render(<HUDTaskBar variant="header" tasks={tasksWithCompletedCount(8)} />)
 
-    expect(screen.getByText('8/8')).toBeInTheDocument()
-    expect(screen.getByText('All done')).toBeInTheDocument()
-    expect(screen.queryByTestId('header-next')).not.toBeInTheDocument()
+    expect(screen.getByTestId('header-count')).toHaveTextContent('8/8')
     expect(screen.queryByText('Alignment Review')).not.toBeInTheDocument()
   })
 
-  it('points the header chip at the next liturgy while alignment is in progress', () => {
+  it('shows the done count in the ring while alignment is in progress', () => {
     render(<HUDTaskBar variant="header" tasks={tasksWithCompletedCount(3)} />)
 
-    expect(screen.getByText('3/8')).toBeInTheDocument()
-    expect(screen.getByTestId('header-next')).toHaveTextContent(/^Next /)
-    expect(screen.getByText('Focus Reset')).toBeInTheDocument()
-    expect(screen.queryByText('All done')).not.toBeInTheDocument()
+    expect(screen.getByTestId('header-count')).toHaveTextContent('3/8')
+    expect(screen.getByLabelText('Daily alignment tasks schedule')).toHaveAttribute('aria-description', '3 of 8 done today')
   })
 
   it('allows switching timezone modes between LOCAL, UTC, BENTHIC, and STARDATE', () => {

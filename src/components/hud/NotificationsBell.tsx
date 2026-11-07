@@ -336,17 +336,17 @@ export const NotificationsBell: React.FC<NotificationsBellProps> = ({ variant, c
         aria-label={countLabel}
         aria-expanded={isOpen}
         aria-haspopup="dialog"
-        className={`relative w-9 h-9 flex items-center justify-center rounded-control border transition-colors active:scale-95 touch-manipulation shrink-0 ${focusRing} ${
-          isOpen
-            ? 'bg-surface-3 shadow-nav-current border-transparent text-cyan-glow'
-            : 'bg-surface-1 border-line hover:bg-surface-2 hover:border-line-strong text-cyan-glow'
+        className={`relative w-11 h-11 -my-1 flex items-center justify-center rounded-control transition-colors active:scale-95 touch-manipulation shrink-0 ${focusRing} ${
+          isOpen ? 'bg-surface-2 text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-2'
         }`}
       >
-        <Bell className="w-4 h-4" aria-hidden="true" />
+        <Bell className="w-5 h-5" aria-hidden="true" />
         {unreadCount > 0 && (
-          <span className={`absolute -top-1.5 -right-1.5 ${countBadge}`} aria-hidden>
-            {unreadCount}
-          </span>
+          <span
+            data-testid="notifications-dot"
+            className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-crimson-aggro ring-2 ring-surface-1"
+            aria-hidden
+          />
         )}
       </button>
 
