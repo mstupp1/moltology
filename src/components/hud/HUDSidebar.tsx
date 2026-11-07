@@ -741,15 +741,15 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           </div>
 
           {/* Search and today's tasks; pages live in the bottom bar */}
-          <div className="flex items-center gap-1.5 shrink-0 z-10">
+          <div className="flex items-center gap-0.5 -mr-1 shrink-0 z-10">
             <button
               type="button"
               onClick={() => (isMobileOpen ? closeMobileMenu(() => handleOpenCommandPalette()) : handleOpenCommandPalette())}
               aria-label="Search"
               title="Search pages and members"
-              className="w-9 h-9 flex items-center justify-center rounded-control border border-line bg-surface-1 text-cyan-glow hover:bg-surface-2 hover:border-line-strong transition-colors active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow shrink-0 cursor-pointer"
+              className="w-11 h-11 -my-1 flex items-center justify-center rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow shrink-0 cursor-pointer"
             >
-              <Search className="w-4 h-4" />
+              <Search className="w-5 h-5" />
             </button>
             <NotificationsBell variant="header" />
             <HUDTaskBar variant="header" />

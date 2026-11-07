@@ -418,43 +418,22 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             e.stopPropagation()
             setIsScheduleOpen((prev) => !prev)
           }}
-          className={`relative flex items-center gap-2 h-9 md:h-8 md:w-[260px] md:min-w-[260px] px-2.5 rounded-control border text-xs transition-colors select-none touch-manipulation ${focusRing} ${
-            isScheduleOpen
-              ? 'bg-surface-3 shadow-nav-current border-transparent text-ink'
-              : 'bg-surface-1 border-line hover:bg-surface-2 hover:border-line-strong text-ink'
+          className={`relative w-11 h-11 -my-1 flex items-center justify-center rounded-control transition-colors select-none touch-manipulation shrink-0 ${focusRing} ${
+            isScheduleOpen ? 'bg-surface-2' : 'hover:bg-surface-2'
           }`}
           title="Today's tasks"
           aria-label="Daily alignment tasks schedule"
+          aria-description={countReady ? `${completedCount} of ${localTasks.length} done today` : undefined}
           aria-expanded={isScheduleOpen}
           aria-haspopup="dialog"
           aria-busy={!countReady}
         >
-          {allTasksCompleted && countReady ? (
-            <Check className="w-3.5 h-3.5 shrink-0 text-emerald-500" aria-hidden="true" />
-          ) : (
-            <ListTodo className={`w-3.5 h-3.5 shrink-0 ${isScheduleOpen ? 'text-cyan-glow' : 'text-ink-muted'}`} aria-hidden="true" />
-          )}
-
-          {countReady ? (
-            allTasksCompleted ? (
-              <span className="hidden md:inline text-emerald-500 font-bold">All done</span>
-            ) : (
-              <span data-testid="header-next" className="hidden md:inline min-w-0 truncate text-ink-muted">
-                Next <span className="text-ink font-bold">{nextTask?.title || 'None'}</span>
-              </span>
-            )
-          ) : (
-            <span className="hidden md:inline-block h-2 w-20 rounded-chip bg-surface-3 animate-pulse" aria-hidden />
-          )}
-
-          {countReady ? (
-            <span className={`shrink-0 font-bold tabular-nums md:ml-auto md:pl-2 md:border-l md:border-line-subtle ${allTasksCompleted ? 'text-emerald-500' : 'text-ink'}`}>
-              {liturgyCountText}
-            </span>
-          ) : (
-            <span className="inline-block shrink-0 md:ml-auto h-2 w-6 rounded-chip bg-surface-3 animate-pulse" aria-hidden />
-          )}
-
+          <AlignmentRing
+            done={countReady ? completedCount : 0}
+            total={countReady ? localTasks.length : 0}
+            label={countReady ? liturgyCountText : ''}
+            complete={countReady && allTasksCompleted}
+          />
         </button>
 
         {/* Desktop dropdown (>= 640px) */}
@@ -755,3 +734,41 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
 // Backward-compatibility alias
 export const DigitalClock = HUDTaskBar
 export type DigitalClockProps = HUDTaskBarProps
+
+/** Small progress ring for the phone top bar: today's done/total count inside a thin arc. */
+function AlignmentRing({ done, total, label, complete }: { done: number; total: number; label: string; complete: boolean }) {
+  const size = 32
+  const stroke = 3
+  const r = (size - stroke) / 2
+  const c = 2 * Math.PI * r
+  const filled = total > 0 ? (c * done) / total : 0
+  return (
+    <span data-testid="alignment-ring" className="relative inline-flex items-center justify-center w-8 h-8" aria-hidden>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="absolute inset-0 -rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} className="stroke-surface-3" />
+        {filled > 0 && (
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            fill="none"
+            strokeWidth={stroke}
+            strokeLinecap="round"
+            strokeDasharray={`${filled} ${c}`}
+            className={`${complete ? 'stroke-emerald-500' : 'stroke-cyan-glow'} transition-[stroke-dasharray] duration-300 motion-reduce:transition-none`}
+          />
+        )}
+      </svg>
+      {label ? (
+        <span
+          data-testid="header-count"
+          className={`relative text-[11px] font-bold leading-none tabular-nums ${complete ? 'text-emerald-500' : 'text-ink'}`}
+        >
+          {label}
+        </span>
+      ) : (
+        <span className="relative h-1.5 w-3 rounded-chip bg-surface-3 animate-pulse" />
+      )}
+    </span>
+  )
+}
