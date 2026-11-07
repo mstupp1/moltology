@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { Search, X, Users, FileText, History } from 'lucide-react'
+import { Search, X, ArrowRight } from 'lucide-react'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { useMemberSearch } from '@/hooks/useMemberSearch'
@@ -9,6 +9,7 @@ import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import {
   catalogNavigateArgs,
   filterCommandCatalog,
+  goToCommands,
   searchPageLocation,
   type CommandCatalogItem,
   type SearchTab,
@@ -72,8 +73,11 @@ export const CommandPalette: React.FC = () => {
   const showRecents = signedIn && !trimmed && visibleRecents.length > 0
 
   const filteredCommands = useMemo(
-    () => filterCommandCatalog(query, undefined, { includeHidden, includeAdminOnly }),
-    [query, includeHidden, includeAdminOnly],
+    () =>
+      trimmed
+        ? filterCommandCatalog(query, undefined, { includeHidden, includeAdminOnly })
+        : filterCommandCatalog('', goToCommands(), { includeHidden, includeAdminOnly }),
+    [query, trimmed, includeHidden, includeAdminOnly],
   )
 
   const rows: PaletteRow[] = useMemo(() => {
@@ -113,6 +117,12 @@ export const CommandPalette: React.FC = () => {
   useEffect(() => {
     setSelectedIndex(0)
   }, [query, people])
+
+  const listRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const row = listRef.current?.querySelector<HTMLElement>('[data-selected]')
+    row?.scrollIntoView?.({ block: 'nearest' })
+  }, [selectedIndex])
 
   useEffect(() => {
     if (!isOpen) return
@@ -175,65 +185,71 @@ export const CommandPalette: React.FC = () => {
     }
   }
 
-  const showPeopleSection = peopleEnabled || (trimmed.length >= MEMBER_SEARCH_MIN_CHARS && !signedIn)
-  let pageCursor = 0
+  const showPeople = peopleEnabled && people.length > 0
+  const showGuestPeopleNote = !signedIn && trimmed.length >= MEMBER_SEARCH_MIN_CHARS
+  const noMatches = Boolean(trimmed) && filteredCommands.length === 0 && !showPeople
+  const seeAllIndex = rows.length - 1
+  let rowCursor = 0
 
   return (
     <>
       {isOpen && (
         <div
           data-testid="command-palette-overlay"
-          className="fixed inset-0 z-50 bg-abyss/80 backdrop-blur-sm flex items-start justify-center pt-8 sm:pt-20 px-3 sm:px-4 animate-in fade-in duration-150"
+          className="fixed inset-0 z-[99995] bg-abyss/85 backdrop-blur-sm flex items-stretch sm:items-start justify-center sm:pt-[12vh] sm:px-6 animate-in fade-in duration-150"
           onClick={() => setIsOpen(false)}
         >
           <div
             data-testid="command-palette-modal"
-            className="w-full max-w-2xl rounded-card bg-surface-1 border border-line shadow-menu overflow-hidden font-sans text-sm max-h-[85vh] flex flex-col"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Search"
+            className="w-full sm:max-w-[720px] h-[100dvh] sm:h-auto sm:max-h-[76vh] flex flex-col overflow-hidden font-sans text-sm bg-surface-1 sm:rounded-card sm:border sm:border-line sm:shadow-menu pt-[env(safe-area-inset-top,0px)] sm:pt-0"
             onClick={(e) => e.stopPropagation()}
             onKeyDown={handleKeyDownMenu}
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-line-subtle bg-surface-2 shrink-0">
-              <div className="flex items-center space-x-3 flex-1">
-                <Search className="w-5 h-5 text-cyan-glow shrink-0" />
-                <input
-                  type="text"
-                  autoFocus
-                  placeholder="Search pages and members"
-                  aria-label="Search"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className="bg-transparent text-ink placeholder:text-ink-muted focus:outline-hidden w-full text-xs sm:text-sm font-sans"
-                />
-              </div>
+            <div className="shrink-0 flex items-center gap-2 sm:gap-3 pl-4 pr-2 sm:pl-5 sm:pr-3 h-14 sm:h-16 border-b border-line-subtle">
+              <Search className="w-5 h-5 text-ink-muted shrink-0" aria-hidden="true" />
+              <input
+                type="search"
+                autoFocus
+                enterKeyHint="go"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                placeholder="Search pages and members"
+                aria-label="Search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="flex-1 min-w-0 bg-transparent text-ink placeholder:text-ink-muted focus:outline-hidden text-base sm:text-lg font-sans [&::-webkit-search-cancel-button]:hidden"
+              />
               <button
                 type="button"
                 aria-label="Close search"
                 onClick={() => setIsOpen(false)}
-                className="rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow p-1 min-w-[36px] min-h-[36px] flex items-center justify-center"
+                className="shrink-0 rounded-control min-h-[40px] min-w-[40px] px-2 flex items-center justify-center text-ink-body hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
-                <X className="w-4 h-4" />
+                <span className="sm:hidden text-sm font-semibold">Cancel</span>
+                <X className="hidden sm:block w-4 h-4" aria-hidden="true" />
               </button>
             </div>
 
-            <div className="max-h-[55vh] sm:max-h-80 overflow-y-auto touch-pan-scroll p-2 space-y-1 flex-1">
+            <div ref={listRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-scroll px-2 sm:px-3 pt-2 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] sm:pb-3">
               {showRecents && (
-                <div data-testid="command-palette-recents" className="px-1 pt-1 pb-2 space-y-2">
-                  <div className="flex items-center justify-between gap-2 px-1">
-                    <div className="text-[11px] uppercase tracking-[0.08em] text-ink-muted font-semibold flex items-center gap-1.5">
-                      <History className="w-3 h-3" />
-                      Recents
-                    </div>
+                <section data-testid="command-palette-recents" className="pt-1 pb-3">
+                  <div className="flex items-center justify-between gap-2 px-2 h-9">
+                    <SectionLabel>Recents</SectionLabel>
                     <button
                       type="button"
                       data-testid="command-palette-recents-clear"
                       onClick={clearRecents}
-                      className="rounded-control text-[11px] uppercase tracking-[0.08em] text-ink-muted hover:text-cyan-glow transition-colors min-h-[36px] px-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                      className="rounded-control text-xs text-ink-muted hover:text-ink transition-colors min-h-[36px] px-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                       aria-label="Clear recents"
                     >
                       Clear
                     </button>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2 px-2">
                     {visibleRecents.map((entry) => (
                       <RecentChip
                         key={searchRecentChipKey(entry)}
@@ -242,154 +258,165 @@ export const CommandPalette: React.FC = () => {
                       />
                     ))}
                   </div>
-                </div>
+                </section>
               )}
 
-              {showPeopleSection && (
-                <div data-testid="command-palette-people" className="space-y-1">
-                  <div className="px-2 pt-1 pb-0.5 text-[11px] uppercase tracking-[0.08em] text-ink-muted font-semibold flex items-center gap-1.5">
-                    <Users className="w-3 h-3" />
-                    People
+              {showPeople && (
+                <section data-testid="command-palette-people" className="pb-2">
+                  <div className="px-2 h-9 flex items-center">
+                    <SectionLabel>People</SectionLabel>
                   </div>
-                  {!signedIn && (
-                    <p className="px-3 py-2 text-xs text-ink-muted">
-                      Sign in to search members. You can still search pages.
-                    </p>
-                  )}
-                  {signedIn && searchingPeople && people.length === 0 && (
-                    <p className="px-3 py-2 text-xs text-ink-muted">Searching members…</p>
-                  )}
-                  {signedIn &&
-                    !searchingPeople &&
-                    people.length === 0 &&
-                    trimmed.length >= MEMBER_SEARCH_MIN_CHARS && (
-                      <p className="px-3 py-2 text-xs text-ink-muted">
-                        No members match that.
-                      </p>
-                    )}
                   {people.map((member) => {
-                    const idx = pageCursor++
-                    const isSelected = idx === selectedIndex
+                    const idx = rowCursor++
                     return (
-                      <button
+                      <ResultRow
                         key={member.id}
-                        type="button"
-                        data-testid={`command-palette-person-${member.id}`}
-                        onClick={() => activateRow({ kind: 'person', member })}
-                        onMouseEnter={() => setSelectedIndex(idx)}
-                        className={`w-full text-left rounded-control px-3 py-2.5 min-h-[44px] flex items-center gap-3 transition-colors ${
-                          isSelected
-                            ? 'bg-surface-2 border-l-2 border-cyan-glow text-ink'
-                            : 'text-ink-body hover:bg-surface-2'
-                        }`}
-                      >
-                        <LobsterAvatarPortrait
-                          config={(member.avatarConfig as LobsterAvatarConfig | null) ?? null}
-                          className="w-8 h-8 shrink-0"
-                          size={64}
-                        />
-                        <div className="min-w-0">
-                          <div className="font-semibold text-xs tracking-wide truncate">
-                            {member.displayName}
-                          </div>
-                          <div className="text-[11px] text-ink-muted uppercase tracking-[0.08em]">
-                            Stage {member.stage} · {member.stageLabel}
-                          </div>
-                        </div>
-                      </button>
+                        testId={`command-palette-person-${member.id}`}
+                        selected={idx === selectedIndex}
+                        onSelect={() => setSelectedIndex(idx)}
+                        onOpen={() => activateRow({ kind: 'person', member })}
+                        leading={
+                          <LobsterAvatarPortrait
+                            config={(member.avatarConfig as LobsterAvatarConfig | null) ?? null}
+                            className="w-9 h-9 shrink-0"
+                            size={72}
+                          />
+                        }
+                        title={member.displayName}
+                        detail={`Stage ${member.stage} · ${member.stageLabel}`}
+                      />
                     )
                   })}
-                </div>
+                </section>
               )}
 
-              <div data-testid="command-palette-pages" className="space-y-1">
-                {trimmed.length >= MEMBER_SEARCH_MIN_CHARS && (
-                  <div className="px-2 pt-2 pb-0.5 text-[11px] uppercase tracking-[0.08em] text-ink-muted font-semibold flex items-center gap-1.5">
-                    <FileText className="w-3 h-3" />
-                    Pages
+              {filteredCommands.length > 0 && (
+                <section data-testid="command-palette-pages">
+                  <div className="px-2 h-9 flex items-center">
+                    <SectionLabel>{trimmed ? 'Pages' : 'Go to'}</SectionLabel>
                   </div>
-                )}
-                {filteredCommands.length === 0 && !trimmed ? (
-                  <div className="p-6 text-center text-ink-muted text-xs tracking-wider">
-                    Search for a page, scripture or member.
-                  </div>
-                ) : filteredCommands.length === 0 ? null : (
-                  filteredCommands.map((cmd) => {
-                    const idx = pageCursor++
-                    const isSelected = idx === selectedIndex
+                  {filteredCommands.map((cmd) => {
+                    const idx = rowCursor++
                     return (
-                      <button
+                      <ResultRow
                         key={cmd.id}
-                        type="button"
-                        onClick={() => activateRow({ kind: 'page', command: cmd })}
-                        onMouseEnter={() => setSelectedIndex(idx)}
-                        className={`w-full text-left rounded-control px-3 py-2.5 min-h-[44px] flex items-center justify-between transition-colors ${
-                          isSelected
-                            ? 'bg-surface-2 border-l-2 border-cyan-glow text-ink'
-                            : 'text-ink-body hover:bg-surface-2'
-                        }`}
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div className="p-1.5 rounded-control bg-surface-2 border border-line-subtle">
+                        selected={idx === selectedIndex}
+                        onSelect={() => setSelectedIndex(idx)}
+                        onOpen={() => activateRow({ kind: 'page', command: cmd })}
+                        leading={
+                          <span className="w-9 h-9 shrink-0 rounded-control bg-surface-2 border border-line-subtle flex items-center justify-center">
                             <CommandCatalogIcon icon={cmd.icon} />
-                          </div>
-                          <div>
-                            <div className="font-semibold text-xs tracking-wide">{cmd.label}</div>
-                            <div className="text-[11px] text-ink-muted uppercase tracking-[0.08em]">
-                              {cmd.category}
-                            </div>
-                          </div>
-                        </div>
-                      </button>
+                          </span>
+                        }
+                        title={cmd.label}
+                        detail={cmd.category === 'Page' ? undefined : cmd.category}
+                      />
                     )
-                  })
-                )}
-              </div>
+                  })}
+                </section>
+              )}
+
+              {signedIn && peopleEnabled && searchingPeople && people.length === 0 && (
+                <p className="px-3 py-3 text-xs text-ink-muted">Searching members…</p>
+              )}
+
+              {noMatches && !searchingPeople && (
+                <div className="px-3 py-8 text-center">
+                  <p className="text-sm text-ink-body">Nothing matches “{trimmed}”.</p>
+                </div>
+              )}
 
               {trimmed && (
-                <button
-                  type="button"
-                  data-testid="command-palette-see-all"
-                  onClick={() => goToSearch(people.length > 0 ? 'people' : 'pages')}
-                  onMouseEnter={() => setSelectedIndex(rows.length - 1)}
-                  className={`w-full text-left rounded-control px-3 py-2.5 min-h-[44px] flex items-center justify-between transition-colors ${
-                    selectedIndex === rows.length - 1
-                      ? 'bg-surface-2 border-l-2 border-cyan-glow text-ink'
-                      : 'text-ink-body hover:bg-surface-2'
-                  }`}
-                >
-                  <div>
-                    <div className="font-semibold text-xs tracking-wide">See all results</div>
-                    <div className="text-[11px] text-ink-muted uppercase tracking-[0.08em]">
-                      Full search for “{trimmed}”
-                    </div>
-                  </div>
-                  <Search className="w-4 h-4 text-cyan-glow" />
-                </button>
-              )}
-
-              {rows.length === 0 && (
-                <div className="p-6 text-center text-ink-muted text-xs tracking-wider">
-                  No results for “{trimmed}”.
+                <div className={noMatches ? 'flex justify-center' : 'pt-2 mt-1 border-t border-line-subtle'}>
+                  <button
+                    type="button"
+                    data-testid="command-palette-see-all"
+                    onClick={() => goToSearch(people.length > 0 ? 'people' : 'pages')}
+                    data-selected={(!noMatches && selectedIndex === seeAllIndex) || undefined}
+                    onMouseEnter={() => setSelectedIndex(seeAllIndex)}
+                    className={
+                      noMatches
+                        ? 'rounded-control min-h-[44px] px-4 inline-flex items-center gap-2 border border-line bg-surface-2 text-ink font-semibold hover:border-line-hover transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
+                        : `w-full text-left rounded-control px-3 min-h-[48px] flex items-center gap-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
+                            selectedIndex === seeAllIndex ? 'bg-surface-2 text-ink' : 'text-ink-body hover:bg-surface-2'
+                          }`
+                    }
+                  >
+                    {noMatches ? (
+                      <>
+                        <Search className="w-4 h-4 text-ink-muted" aria-hidden="true" />
+                        Search everything
+                      </>
+                    ) : (
+                      <>
+                        <span className="w-9 h-9 shrink-0 flex items-center justify-center">
+                          <Search className="w-4 h-4 text-ink-muted" aria-hidden="true" />
+                        </span>
+                        <span className="flex-1 min-w-0 truncate">
+                          See all results for <span className="text-ink font-semibold">“{trimmed}”</span>
+                        </span>
+                        <ArrowRight className="w-4 h-4 text-ink-muted shrink-0" aria-hidden="true" />
+                      </>
+                    )}
+                  </button>
                 </div>
               )}
-            </div>
 
-            <div className="px-4 py-2 bg-surface-2 border-t border-line-subtle text-[11px] text-ink-muted flex flex-wrap gap-x-4 gap-y-1 items-center">
-              <span>
-                <span className="text-ink">↑ ↓</span> move
-              </span>
-              <span>
-                <span className="text-ink">↵</span> open
-              </span>
-              <span>
-                <span className="text-ink">Esc</span> close
-              </span>
+              {showGuestPeopleNote && (
+                <p className="px-3 pt-3 text-xs text-ink-muted">
+                  Sign in to search members. You can still search pages.
+                </p>
+              )}
             </div>
           </div>
         </div>
       )}
     </>
+  )
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="text-[11px] uppercase tracking-[0.12em] text-ink-muted font-semibold">
+      {children}
+    </span>
+  )
+}
+
+function ResultRow({
+  testId,
+  selected,
+  onSelect,
+  onOpen,
+  leading,
+  title,
+  detail,
+}: {
+  testId?: string
+  selected: boolean
+  onSelect: () => void
+  onOpen: () => void
+  leading: React.ReactNode
+  title: string
+  detail?: string
+}) {
+  return (
+    <button
+      type="button"
+      data-testid={testId}
+      data-selected={selected || undefined}
+      onClick={onOpen}
+      onMouseEnter={onSelect}
+      className={`w-full text-left rounded-control px-2 sm:px-3 min-h-[52px] py-1.5 flex items-center gap-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
+        selected ? 'bg-surface-2 text-ink' : 'text-ink-body hover:bg-surface-2'
+      }`}
+    >
+      {leading}
+      <span className="min-w-0 flex-1">
+        <span className="block text-[15px] sm:text-sm font-semibold text-ink truncate">{title}</span>
+        {detail && <span className="block text-xs text-ink-muted truncate">{detail}</span>}
+      </span>
+    </button>
   )
 }
 
@@ -425,10 +452,10 @@ function RecentChip({
       type="button"
       data-testid={testId}
       onClick={onOpen}
-      className="max-w-full inline-flex items-center gap-1.5 px-2.5 py-1.5 min-h-[36px] rounded-control border border-line bg-surface-2 text-ink hover:border-line-strong hover:bg-surface-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+      className="max-w-full inline-flex items-center gap-2 px-3 min-h-[40px] rounded-control border border-line-subtle bg-surface-2 text-ink hover:border-line-hover hover:bg-surface-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
     >
       {entry.kind === 'query' ? (
-        <Search className="w-3 h-3 text-cyan-glow shrink-0" />
+        <Search className="w-3.5 h-3.5 text-ink-muted shrink-0" aria-hidden="true" />
       ) : entry.kind === 'person' ? (
         <LobsterAvatarPortrait
           config={(entry.avatarConfig as LobsterAvatarConfig | null) ?? null}
@@ -438,7 +465,7 @@ function RecentChip({
       ) : (
         <CommandCatalogIcon icon={livePage?.icon ?? entry.icon} />
       )}
-      <span className="text-[11px] font-semibold tracking-wide truncate">{label}</span>
+      <span className="text-sm font-medium truncate">{label}</span>
     </button>
   )
 }

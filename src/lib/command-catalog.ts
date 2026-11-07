@@ -334,6 +334,23 @@ export function filterCommandCatalog(
   return visible.filter((cmd) => catalogHaystack(cmd).includes(q))
 }
 
+/** Sidebar order. The search overlay shows these before anything is typed. */
+export const GO_TO_COMMAND_IDS = [
+  'nav-hub',
+  'nav-oracle',
+  'nav-chassis',
+  'nav-profile',
+  'nav-codex',
+  'nav-lectures',
+  'nav-forum',
+] as const
+
+export function goToCommands(): CommandCatalogItem[] {
+  return GO_TO_COMMAND_IDS.map((id) => COMMAND_CATALOG.find((cmd) => cmd.id === id)).filter(
+    (cmd): cmd is CommandCatalogItem => Boolean(cmd),
+  )
+}
+
 export function catalogNavigateArgs(command: CommandCatalogItem): CatalogNavigateArgs | null {
   if (!command.to) return null
   return {

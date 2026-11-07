@@ -389,4 +389,50 @@ describe('CommandPalette Component', () => {
     expect(screen.queryByText('secret-shell')).not.toBeInTheDocument()
     expect(screen.queryByTestId('command-palette-recents')).not.toBeInTheDocument()
   })
+
+  it('opens on a short Go to list in sidebar order with no keyboard hint text', () => {
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
+    fireEvent(window, new CustomEvent('open-command-palette'))
+
+    expect(screen.getByText('Go to')).toBeInTheDocument()
+    const labels = Array.from(
+      screen.getByTestId('command-palette-pages').querySelectorAll('button'),
+    ).map((button) => button.textContent)
+    expect(labels).toEqual([
+      'Dashboard',
+      'Oracle',
+      'Character',
+      'Your profile',
+      'Codex',
+      'Academy',
+      'Forum',
+    ])
+    expect(screen.queryByText('Home page')).not.toBeInTheDocument()
+    expect(screen.queryByText(/move/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Esc/)).not.toBeInTheDocument()
+  })
+
+  it('only labels rows that are not plain pages', () => {
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
+    fireEvent(window, new CustomEvent('open-command-palette'))
+    fireEvent.change(screen.getByPlaceholderText(/Search pages and members/i), {
+      target: { value: 'SCR-010' },
+    })
+    expect(screen.getByText('Scripture')).toBeInTheDocument()
+    expect(screen.queryByText('Page')).not.toBeInTheDocument()
+  })
+
+  it('hides the People heading when no member matches and offers a full search', async () => {
+    signedInSession()
+    vi.mocked(searchMembersFn).mockResolvedValue([])
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
+    fireEvent(window, new CustomEvent('open-command-palette'))
+    fireEvent.change(screen.getByPlaceholderText(/Search pages and members/i), {
+      target: { value: 'zzzz-nobody' },
+    })
+    await waitFor(() => expect(searchMembersFn).toHaveBeenCalled())
+    await waitFor(() => expect(screen.getByText('Search everything')).toBeInTheDocument())
+    expect(screen.queryByTestId('command-palette-people')).not.toBeInTheDocument()
+    expect(screen.queryByText('People')).not.toBeInTheDocument()
+  })
 })
