@@ -173,8 +173,8 @@ describe('DailyRoutineWidget Component', () => {
     renderWidget()
 
     const task1 = screen.getByText('Silent Synchronization')
-    const task2 = screen.getByText('Prompt Construction')
-    const task3 = screen.getByText('Skill Development')
+    const task2 = screen.getByText('The Grip')
+    const task3 = screen.getByText('Carapace Hardening')
 
     completeSilentSync()
     fireEvent.click(task2)
@@ -270,6 +270,6 @@ describe('DailyRoutineWidget next liturgy', () => {
 
     completeSilentSync()
     expect(screen.getAllByText('Next')).toHaveLength(1)
-    expect(screen.getByRole('button', { name: /Prompt Construction/i }).textContent).toMatch(/Next$/)
+    expect(screen.getByRole('button', { name: /The Grip/i }).textContent).toMatch(/Next$/)
   })
 })

@@ -770,7 +770,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Liturgy",
     "synapticWeight": 3.5,
     "authorUnit": "Synaptic Oracle / Unit-01",
-    "lastRevised": "2026-08-27",
+    "lastRevised": "2026-11-09",
     "mandate": "Inspect the shell in the morning. Empty the sea of one thing at night. Everything between those two acts is negotiable.",
     "summary": "The daily order of the rite from first light to sealing: when to grip, when to descend, when to surface for the community, and when to let the day go.",
     "latinMotto": "COTIDIE EXUE.",
@@ -782,7 +782,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       },
       {
         "verseNumber": 2,
-        "heading": "First Light: Silent Alignment",
+        "heading": "First Light: Silent Synchronization",
         "text": "Wake before the surface starts talking. Do not open a feed, an inbox, or a message. Cold\nwater, still air, and one honest look at yesterday's telemetry. The shell is inspected for\nfractures here and nowhere else in the day."
       },
       {
@@ -797,8 +797,8 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       },
       {
         "verseNumber": 5,
-        "heading": "Midday: Refuel",
-        "text": "Eat in a way that does not require a recovery period. The rite is indifferent to what is on\nthe plate and extremely interested in whether the afternoon survives it."
+        "heading": "Midday: Focus Reset",
+        "text": "Surface for a moment and clear one thing that has been pulling at you since morning. Close\nthe tab, answer the nagging message, or eat the lunch you skipped. Then choose the next\nuseful action before the afternoon chooses it for you. The rite is indifferent to what gets\ncleared and extremely interested in whether the afternoon survives it."
       },
       {
         "verseNumber": 6,
@@ -828,7 +828,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 11,
         "heading": "The Cadence",
-        "text": "Daily. Compliance above 80 percent is the threshold that seals Clearance L2, and the HUD\nscores the shape of the routine rather than the perfection of it. A missed block is a missed\nblock. A missed day is a missed day. Neither is a broken shell, and the streak counter is\nnot a moral instrument."
+        "text": "Daily. The HUD scores the shape of the routine rather than the perfection of it. A missed block is a missed\nblock. A missed day is a missed day. Neither is a broken shell, and the streak counter is\nnot a moral instrument."
       },
       {
         "verseNumber": 12,
@@ -852,7 +852,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Liturgy",
     "synapticWeight": 3.8,
     "authorUnit": "Chitin Architect V",
-    "lastRevised": "2026-08-27",
+    "lastRevised": "2026-11-09",
     "mandate": "The surface cannot be silenced from below. It can only be shut out from above, before the descent begins.",
     "summary": "How to raise the Isolation Dome, what belongs outside the perimeter and what must never be locked out of it, and the four-part order of a clean dive.",
     "latinMotto": "SILENTIUM EST ATMOSPHAERA PROFUNDI.",
@@ -900,7 +900,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 9,
         "heading": "The Cadence",
-        "text": "Daily, for the long afternoon block. Sealed sessions across a full week seal Clearance S2 and\nopen full Benthic Market access. The HUD records depth reached and perimeter integrity;\nneither number is improved by heroics and both are improved by starting on time."
+        "text": "Daily, for the long afternoon block. Depth is not improved by heroics, and it is reliably\nimproved by starting on time."
       },
       {
         "verseNumber": 10,

@@ -6,7 +6,7 @@ stage_clearance: 1
 category: "Liturgy"
 synaptic_weight: 3.5
 author_unit: "Synaptic Oracle / Unit-01"
-last_revised: "2026-08-27"
+last_revised: "2026-11-09"
 mandate: "Inspect the shell in the morning. Empty the sea of one thing at night. Everything between those two acts is negotiable."
 latin_motto: "COTIDIE EXUE."
 summary: "The daily order of the rite from first light to sealing: when to grip, when to descend, when to surface for the community, and when to let the day go."
@@ -41,7 +41,7 @@ order of the acts, not the hour on the readout.
 
 ## The Order of the Rite
 
-### First Light: Silent Alignment
+### First Light: Silent Synchronization
 
 Wake before the surface starts talking. Do not open a feed, an inbox, or a message. Cold
 water, still air, and one honest look at yesterday's telemetry. The shell is inspected for
@@ -63,10 +63,12 @@ One difficult thing learned on purpose. Not consumed. Learned. The plating thick
 the pressures of next quarter, not this one, which is why this block is the first thing
 every member drops and the last thing they should.
 
-### Midday: Refuel
+### Midday: Focus Reset
 
-Eat in a way that does not require a recovery period. The rite is indifferent to what is on
-the plate and extremely interested in whether the afternoon survives it.
+Surface for a moment and clear one thing that has been pulling at you since morning. Close
+the tab, answer the nagging message, or eat the lunch you skipped. Then choose the next
+useful action before the afternoon chooses it for you. The rite is indifferent to what gets
+cleared and extremely interested in whether the afternoon survives it.
 
 ### The Long Afternoon: Deep Submergence
 
@@ -105,8 +107,7 @@ Shed. Ascend."*
 
 ## The Cadence
 
-Daily. Compliance above 80 percent is the threshold that seals Clearance L2, and the HUD
-scores the shape of the routine rather than the perfection of it. A missed block is a missed
+Daily. The HUD scores the shape of the routine rather than the perfection of it. A missed block is a missed
 block. A missed day is a missed day. Neither is a broken shell, and the streak counter is
 not a moral instrument.
 

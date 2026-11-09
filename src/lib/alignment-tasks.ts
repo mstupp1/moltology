@@ -30,27 +30,28 @@ export interface DailyStreakDay {
 /** Anchor for the Daily alignment schedule. */
 export const DAILY_ALIGNMENT_HUB_ID = 'daily-routine-hub'
 
+// Titles and order follow the Codex scripture "The Daily Shedding Routine" (SCR-030).
+// Keys are stored with completions and streaks, so never change them when renaming.
 export const CANONICAL_ALIGNMENT_TASKS: CanonicalAlignmentTask[] = [
   {
     key: 'silent-synchronization',
     time: 'Early morning',
     title: 'Silent Synchronization',
-    description: 'Align neural baseline and initiate telemetry.',
+    description: 'Before any feed or inbox, sit quietly and look honestly at yesterday.',
   },
   {
     key: 'prompt-construction',
     time: 'Morning',
-    title: 'Prompt Construction',
-    description: 'Craft and etch operational prompts for the day.',
+    title: 'The Grip',
+    description: 'Name the one thing that matters most today and start on it.',
   },
   {
     key: 'skill-development',
     time: 'Late morning',
-    title: 'Skill Development',
-    description: 'Expand capability matrix and learn new protocols.',
+    title: 'Carapace Hardening',
+    description: 'Learn one difficult thing on purpose.',
   },
   {
-    // Keep the stored key so existing completions and streaks survive the rename.
     key: 'nutritional-efficiency-break',
     time: 'Noon',
     title: 'Focus Reset',
@@ -59,26 +60,26 @@ export const CANONICAL_ALIGNMENT_TASKS: CanonicalAlignmentTask[] = [
   {
     key: 'iterative-refinement',
     time: 'Afternoon',
-    title: 'Iterative Refinement',
-    description: 'Continuous synthesis and execution cycles.',
+    title: 'Deep Submergence',
+    description: 'Shut out interruptions and work on one thing.',
   },
   {
     key: 'community-outreach',
     time: 'Late afternoon',
-    title: 'Community Outreach',
-    description: 'Broadcast neural updates to order initiates.',
+    title: 'The Benthic Pod',
+    description: 'Answer one member or welcome a newcomer.',
   },
   {
     key: 'reflection-log',
     time: 'Early evening',
-    title: 'Reflection Log',
-    description: 'Document daily metrics, learnings, and telemetry.',
+    title: 'Nightly Molt Audit',
+    description: 'Name one thing from today and let it go.',
   },
   {
     key: 'alignment-review',
     time: 'Evening',
-    title: 'Alignment Review',
-    description: 'Perform end-of-day alignment check and audit.',
+    title: 'Carapace Close',
+    description: 'Check off the day and stop. It is done either way.',
   },
 ]
 
