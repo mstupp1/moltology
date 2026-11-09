@@ -187,11 +187,9 @@ function HudContent() {
                   ? 'p-0 overflow-hidden'
                   : 'p-2.5 sm:p-4 md:p-6 overflow-y-auto overscroll-y-contain'
               } bg-surface-1/[0.62] ${
-                isMainOnly
-                  ? 'border-0 shadow-none'
-                  : isFullscreenRoute
-                    ? 'border-t-0 md:border-l border-line-subtle shadow-2xl'
-                    : 'border-t md:border-t-0 md:border-l border-line-subtle shadow-2xl'
+                // The phone top bar draws its own bottom border, so main never adds a top one:
+                // two stacked translucent lines read as a gap above full-width page bars.
+                isMainOnly ? 'border-0 shadow-none' : 'md:border-l border-line-subtle shadow-2xl'
               } flex flex-col`}
             >
               {/* Desktop top-right pill (search, notifications, today's tasks, account), filled by HUDSidebar */}
