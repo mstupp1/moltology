@@ -68,6 +68,8 @@ export interface AIChatPanelProps {
   onThreadChange?: (threadId: string | null) => void
   isCompact?: boolean
   className?: string
+  /** Extra classes on the conversation header, e.g. room for the floating top-right controls on /oracle. */
+  headerClassName?: string
   showModeControls?: boolean
   /** Full-page desktop keeps a persistent chats column; mobile uses the list takeover. */
   desktopChatsSidebar?: boolean
@@ -129,6 +131,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   userId: propUserId,
   threadId: propThreadId,
   placeholder = DEFAULT_ORACLE_PLACEHOLDER,
+  headerClassName = '',
   onClose,
   onThreadCreated,
   onThreadChange,
@@ -949,7 +952,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         {showConversation && (
           <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden relative">
             {/* Header: conversation controls on the left, window controls on the right */}
-            <div className="h-12 px-2 border-b border-line-subtle flex items-center justify-between gap-2 shrink-0 select-none relative z-10">
+            <div className={`h-12 px-2 border-b border-line-subtle flex items-center justify-between gap-2 shrink-0 select-none relative z-10 ${headerClassName}`}>
               <div className="flex items-center gap-0.5 min-w-0 flex-1">
                 {!chatsOpen && (
                   <>

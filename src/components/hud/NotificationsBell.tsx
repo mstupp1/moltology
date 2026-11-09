@@ -336,7 +336,7 @@ export const NotificationsBell: React.FC<NotificationsBellProps> = ({ variant, c
         aria-label={countLabel}
         aria-expanded={isOpen}
         aria-haspopup="dialog"
-        className={`relative w-11 h-11 -my-1 flex items-center justify-center rounded-control transition-colors active:scale-95 touch-manipulation shrink-0 ${focusRing} ${
+        className={`relative w-11 h-11 -my-1 flex items-center justify-center rounded-full transition-colors active:scale-95 touch-manipulation shrink-0 ${focusRing} ${
           isOpen ? 'bg-surface-2 text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-2'
         }`}
       >

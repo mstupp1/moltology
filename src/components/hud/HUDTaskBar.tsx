@@ -430,7 +430,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             e.stopPropagation()
             setIsScheduleOpen((prev) => !prev)
           }}
-          className={`relative w-11 h-11 -my-1 flex items-center justify-center rounded-control transition-colors select-none touch-manipulation shrink-0 ${focusRing} ${
+          className={`relative w-11 h-11 -my-1 flex items-center justify-center rounded-full transition-colors select-none touch-manipulation shrink-0 ${focusRing} ${
             isScheduleOpen ? 'bg-surface-2' : 'hover:bg-surface-2'
           }`}
           title="Today's tasks"

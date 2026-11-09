@@ -51,15 +51,14 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     vi.useRealTimers()
   })
 
-  it('keeps desktop contents at their target width while the outer rail changes width', () => {
+  it('is always the compact rail on desktop, with no collapse controls', () => {
     const { container } = render(<HUDSidebar />)
     const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('transition-[width]', 'motion-reduce:transition-none')
-    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-56')
-    fireEvent.keyDown(window, { key: 'b', metaKey: true })
+    expect(aside).toHaveClass('md:w-20')
     expect(container.querySelector('nav')?.parentElement).toHaveClass('w-20')
+    expect(screen.queryByRole('separator')).not.toBeInTheDocument()
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
-    expect(container.querySelector('nav')?.parentElement).toHaveClass('w-56')
+    expect(aside).toHaveClass('md:w-20')
   })
 
   it('cancels mobile close callbacks on reopen and releases scroll lock at the desktop breakpoint', () => {
@@ -94,7 +93,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(sidebar.queryByText('COMMUNITY')).not.toBeInTheDocument()
 
     expect(sidebar.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
-    expect(sidebar.getByText('ORACLE')).toBeInTheDocument()
+    expect(sidebar.getAllByText('ORACLE').length).toBeGreaterThan(0)
     expect(sidebar.getByRole('button', { name: /^CHARACTER$/i })).toBeInTheDocument()
     expect(sidebar.getByRole('button', { name: /^PROFILE$/i })).toBeInTheDocument()
     expect(sidebar.getByRole('button', { name: /^ACADEMY$/i })).toBeInTheDocument()
@@ -114,73 +113,16 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(mockNavigate).toHaveBeenCalledWith({ to: route })
   })
 
-  it('navigates to /dashboard when brand emblem logo is clicked', () => {
+  it('sends the emblem to the Moltology home page', () => {
     render(<HUDSidebar />)
 
+    fireEvent.click(screen.getByRole('button', { name: 'Moltology home' }))
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/' })
+
+    mockNavigate.mockClear()
     const brandLogos = screen.getAllByRole('img', { name: 'Order Emblem' })
     fireEvent.click(brandLogos[0])
-
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })
-  })
-
-  it('toggles sidebar collapse with shortcut key (Cmd+B)', () => {
-    render(<HUDSidebar />)
-
-    const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('md:w-56')
-
-    // Press Cmd+B to collapse
-    fireEvent.keyDown(window, { key: 'b', metaKey: true })
-    expect(aside).toHaveClass('md:w-20')
-
-    // Press Cmd+B to un-collapse
-    fireEvent.keyDown(window, { key: 'b', metaKey: true })
-    expect(aside).toHaveClass('md:w-56')
-  })
-
-  it('toggles sidebar collapse with interactive edge rail click', () => {
-    render(<HUDSidebar />)
-
-    const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('md:w-56')
-
-    const rail = screen.getByRole('separator', { name: /Collapse sidebar/i })
-    expect(rail).toBeInTheDocument()
-
-    // Click rail (mouseDown then mouseUp without move)
-    fireEvent.mouseDown(rail, { button: 0, clientX: 288 })
-    fireEvent.mouseUp(window)
-
-    expect(aside).toHaveClass('md:w-20')
-
-    // Click rail again to expand
-    fireEvent.mouseDown(rail, { button: 0, clientX: 72 })
-    fireEvent.mouseUp(window)
-
-    expect(aside).toHaveClass('md:w-56')
-  })
-
-  it('collapses and expands sidebar by dragging the edge rail', () => {
-    render(<HUDSidebar />)
-
-    const aside = screen.getByRole('complementary')
-    expect(aside).toHaveClass('md:w-56')
-
-    const rail = screen.getByRole('separator')
-
-    // Drag left past threshold
-    fireEvent.mouseDown(rail, { button: 0, clientX: 288 })
-    fireEvent.mouseMove(window, { clientX: 100 })
-    fireEvent.mouseUp(window)
-
-    expect(aside).toHaveClass('md:w-20')
-
-    // Drag right past threshold
-    fireEvent.mouseDown(rail, { button: 0, clientX: 72 })
-    fireEvent.mouseMove(window, { clientX: 300 })
-    fireEvent.mouseUp(window)
-
-    expect(aside).toHaveClass('md:w-56')
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/' })
   })
 
   it('renders short centered text names underneath items in collapsed mode', () => {
@@ -288,28 +230,19 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getByRole('heading', { name: /CREATE ACCOUNT/i })).toBeInTheDocument()
   })
 
-  it('stacks Support option on top of Sign Up button in collapsed guest mode and handles clicks', () => {
+  it('keeps Support in the rail and puts Sign up in the top controls for guests', () => {
     render(<HUDSidebar />)
 
-    // Collapse sidebar
-    fireEvent.keyDown(window, { key: 'b', metaKey: true })
-
-    const supportBtn = screen.getByRole('button', { name: /SUPPORT/i })
-    expect(supportBtn).toBeInTheDocument()
-
-    const signUpBtn = screen.getByTitle(/Sign Up \/ Initialize Operative/i)
-    expect(signUpBtn).toBeInTheDocument()
-
-    // Test support navigation
+    const supportBtn = screen.getByRole('button', { name: /^SUPPORT$/i })
     fireEvent.click(supportBtn)
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/support' })
 
-    // Test sign up modal trigger
-    fireEvent.click(signUpBtn)
+    const controls = within(screen.getByTestId('top-controls'))
+    fireEvent.click(controls.getByRole('button', { name: 'Sign up' }))
     expect(screen.getByRole('heading', { name: /CREATE ACCOUNT/i })).toBeInTheDocument()
   })
 
-  it('stacks Support option on top of UserAvatarMenu in collapsed authenticated mode', async () => {
+  it('opens the account menu from the top controls with just Settings and Sign out', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -323,25 +256,16 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     render(<HUDSidebar />)
 
-    // Collapse sidebar
-    fireEvent.keyDown(window, { key: 'b', metaKey: true })
-
-    const supportBtn = screen.getByRole('button', { name: /SUPPORT/i })
-    expect(supportBtn).toBeInTheDocument()
-
-    const userMenuBtn = screen.getByRole('button', { name: /User account menu/i })
-    expect(userMenuBtn).toBeInTheDocument()
-
-    // Test support navigation
-    fireEvent.click(supportBtn)
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/support' })
-
-    // Test opening user avatar menu in collapsed mode
-    fireEvent.click(userMenuBtn)
+    const controls = within(screen.getByTestId('top-controls'))
+    expect(controls.getByRole('button', { name: 'Search' })).toBeInTheDocument()
+    fireEvent.click(controls.getByRole('button', { name: /User account menu/i }))
     await waitFor(() => {
       expect(screen.getByText('alpha@moltology.io')).toBeInTheDocument()
     })
+    expect(screen.getByRole('button', { name: /^SETTINGS$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /SIGN OUT/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /YOUR PROFILE/i })).not.toBeInTheDocument()
+    expect(screen.queryByText('MOLTOLOGY HOME')).not.toBeInTheDocument()
   })
 
   it('badges the Profile item with waiting friend requests', async () => {
@@ -353,8 +277,10 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     render(<HUDSidebar />)
 
     await waitFor(() => expect(mockCountPendingFn).toHaveBeenCalled())
-    const profile = await screen.findByRole('button', { name: /^PROFILE\W*2 friend requests waiting$/i })
-    expect(profile).toHaveTextContent('2')
+    const profile = await within(screen.getByRole('complementary')).findByRole('button', {
+      name: /2 friend requests waiting/i,
+    })
+    expect(profile).toHaveTextContent('2 friend requests waiting')
     fireEvent.click(profile)
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/profile' })
   })
@@ -367,7 +293,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     render(<HUDSidebar />)
 
-    expect(screen.getByTestId('sidebar-auth-skeleton')).toBeInTheDocument()
+    expect(screen.getByTestId('top-controls-auth-skeleton')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /SIGN UP/i })).not.toBeInTheDocument()
   })
 
@@ -376,7 +302,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     render(<HUDSidebar />)
 
-    expect(screen.getByTestId('sidebar-auth-skeleton')).toBeInTheDocument()
+    expect(screen.getByTestId('top-controls-auth-skeleton')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /SIGN UP/i })).not.toBeInTheDocument()
   })
 
@@ -462,8 +388,8 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(premiumBadge).toBeInTheDocument()
     expect(premiumBadge).not.toHaveAttribute('data-hidden', 'true')
 
-    // Admin item should be positioned above Help & Support in bottom controls
-    const supportItem = screen.getByRole('button', { name: /HELP & SUPPORT/i })
+    // Admin item should be positioned above Support in the rail footer
+    const supportItem = screen.getByRole('button', { name: /^SUPPORT$/i })
     expect(adminItem.compareDocumentPosition(supportItem)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
   })
 
@@ -487,7 +413,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(await screen.findByRole('button', { name: /Go Oracle MAX/i })).toBeInTheDocument()
   })
 
-  it('stacks admin above support and hides Go Oracle MAX when sidebar is collapsed', async () => {
+  it('stacks admin, Go Oracle MAX and support in the rail footer', async () => {
     mockGetUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['premium'] })
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
@@ -503,44 +429,17 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     render(<HUDSidebar />)
 
-    // Initially expanded: Go Oracle MAX row visible
-    expect(await screen.findByRole('button', { name: /Go Oracle MAX/i })).toBeInTheDocument()
-
-    // Collapse via Cmd+B
-    fireEvent.keyDown(window, { key: 'b', metaKey: true })
-
-    // Go Oracle MAX is hidden when collapsed
-    expect(screen.queryByRole('button', { name: /Go Oracle MAX/i })).not.toBeInTheDocument()
-
-    // Admin button is stacked above support
-    const collapsedAdmin = screen.getByRole('button', { name: /^ADMIN$/i })
-    const collapsedSupport = screen.getByRole('button', { name: /SUPPORT/i })
-    expect(collapsedAdmin).toBeInTheDocument()
-    expect(collapsedSupport).toBeInTheDocument()
-    expect(collapsedAdmin.compareDocumentPosition(collapsedSupport)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
-  })
-
-  it('shows the account row with the plan and Go Oracle MAX below support for free members', async () => {
-    mockGetUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['premium'] })
-    vi.mocked(authClient.useSession).mockReturnValue({
-      data: { user: { id: 'admin-1', name: 'Admin', email: 'ops@example.com', role: 'admin' } } as any,
-      isPending: false,
-    } as any)
-
-    render(<HUDSidebar />)
-
     const goPremium = await screen.findByRole('button', { name: /Go Oracle MAX/i })
-    const supportItem = screen.getByRole('button', { name: /HELP & SUPPORT/i })
-    const accountRow = screen.getByRole('button', { name: /User account menu/i })
-    expect(supportItem.compareDocumentPosition(goPremium)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
-    expect(goPremium.compareDocumentPosition(accountRow)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
-    expect(accountRow).toHaveTextContent('Free plan')
+    const admin = screen.getByRole('button', { name: /^ADMIN$/i })
+    const support = screen.getByRole('button', { name: /^SUPPORT$/i })
+    expect(admin.compareDocumentPosition(goPremium)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    expect(goPremium.compareDocumentPosition(support)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
 
     fireEvent.click(goPremium)
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/premium' })
   })
 
-  it('hides Go Oracle MAX and labels the account row for current Oracle MAX members', async () => {
+  it('hides Go Oracle MAX for current Oracle MAX members', async () => {
     mockGetUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['premium'] })
     mockGetPremiumMembershipFn.mockResolvedValue({ hasPurchasedPremium: true, isPremium: true })
     vi.mocked(authClient.useSession).mockReturnValue({
@@ -550,9 +449,8 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     render(<HUDSidebar />)
 
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /User account menu/i })).toHaveTextContent('Oracle MAX member')
-    })
+    await waitFor(() => expect(mockGetPremiumMembershipFn).toHaveBeenCalled())
+    await screen.findByRole('button', { name: /^ADMIN$/i })
     expect(screen.queryByRole('button', { name: /Go Oracle MAX/i })).not.toBeInTheDocument()
   })
 

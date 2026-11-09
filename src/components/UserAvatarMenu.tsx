@@ -2,7 +2,7 @@ import { getUserProfileFn } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { parseLobsterAvatarConfig } from '@/lib/lobster-avatar'
 import React, { useState, useRef, useEffect } from 'react'
-import { LogOut, ChevronDown, ChevronsUpDown, Settings, User, Globe } from 'lucide-react'
+import { LogOut, ChevronDown, ChevronsUpDown, Settings } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { beginSignOut, endSignOut } from '@/lib/auth-session'
 import { UserAvatar } from './UserAvatar'
@@ -31,6 +31,8 @@ export interface UserAvatarMenuProps {
   subtitle?: string | null
   className?: string
   displayName?: string | null
+  /** Avatar trigger size: `nav` (36px, default) or `pill` (32px, inside the floating top pills). */
+  size?: 'nav' | 'pill'
 }
 
 /**
@@ -50,6 +52,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   subtitle,
   className = '',
   displayName: displayNameProp,
+  size = 'nav',
 }) => {
   const [character, setCharacter] = useState({ userId: user.id, config: user.avatarConfig })
   useEffect(() => {
@@ -131,17 +134,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
     onNavigate?.('/settings')
   }
 
-  const handleOpenHome = () => {
-    handleClose()
-    onNavigate?.('/')
-  }
 
-  const handleOpenProfile = () => {
-    handleClose()
-    if (user.id) {
-      onNavigate?.('/profile')
-    }
-  }
 
   const displayName = displayNameProp || user.name || user.email?.split('@')[0] || 'Operative'
   const effectiveRole = getEffectiveRole(user, userRole)
@@ -261,16 +254,6 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             <div className="overflow-hidden">
               <div className="pt-2 pb-1 space-y-2">
                 {/* Account Actions Section: Settings & Sign Out */}
-                {user.id && (
-                  <button
-                    type="button"
-                    onClick={handleOpenProfile}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer text-ink-body hover:text-ink bg-surface-1 hover:bg-surface-2 border border-line-subtle hover:border-line focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-                  >
-                    <User className="w-4 h-4 shrink-0" />
-                    <span>YOUR PROFILE</span>
-                  </button>
-                )}
                 {/* Settings Link */}
                 <button
                   type="button"
@@ -279,16 +262,6 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                 >
                   <Settings className="w-4 h-4 shrink-0" />
                   <span>SETTINGS</span>
-                </button>
-
-                {/* Moltology Home Link */}
-                <button
-                  type="button"
-                  onClick={handleOpenHome}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer text-ink-body hover:text-ink bg-surface-1 hover:bg-surface-2 border border-line-subtle hover:border-line focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-                >
-                  <Globe className="w-4 h-4 shrink-0" />
-                  <span>MOLTOLOGY HOME</span>
                 </button>
 
                 {/* Sign Out Action Button */}
@@ -354,7 +327,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           aria-label="User account menu"
           className="relative flex rounded-full transition-transform group cursor-pointer active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
-          <UserAvatar user={avatarUser} name={displayName} size="nav" borderless />
+          <UserAvatar user={avatarUser} name={displayName} size={size === 'pill' ? 'row' : 'nav'} borderless />
           <span
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/15 transition-shadow group-hover:ring-white/40 group-aria-expanded:ring-white/40"
@@ -410,16 +383,6 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
 
           {/* Account Actions Section: Settings & Sign Out */}
           <div className="pt-3 space-y-1.5">
-            {user.id && (
-              <button
-                type="button"
-                onClick={handleOpenProfile}
-                className="w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-              >
-                <User className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow" />
-                <span>YOUR PROFILE</span>
-              </button>
-            )}
             <button
               type="button"
               onClick={handleOpenSettings}
@@ -427,15 +390,6 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             >
               <Settings className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow" />
               <span>SETTINGS</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleOpenHome}
-              className="w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-            >
-              <Globe className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow" />
-              <span>MOLTOLOGY HOME</span>
             </button>
 
             {/* Sign Out Action Button */}

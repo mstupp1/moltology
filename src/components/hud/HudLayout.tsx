@@ -194,6 +194,16 @@ function HudContent() {
                     : 'border-t md:border-t-0 md:border-l border-line-subtle shadow-2xl'
               } flex flex-col`}
             >
+              {/* Desktop top-right pill (search, notifications, today's tasks, account), filled by HUDSidebar */}
+              {!isMainOnly && (
+                <div
+                  className={`hidden md:flex justify-end pointer-events-none z-30 ${
+                    isFullscreenRoute ? 'absolute top-1 right-2' : 'sticky -top-6 -mt-6 -mx-6 px-6 pt-3 pb-4 shrink-0'
+                  }`}
+                >
+                  <div id="hud-top-controls-slot" className="pointer-events-auto" />
+                </div>
+              )}
               {isFullscreenRoute ? (
                 <Outlet />
               ) : (
