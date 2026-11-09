@@ -1,7 +1,7 @@
 import React from 'react'
 import { CANONICAL_SCRIPTURES, type ScriptureItem } from '@/lib/codexData'
 import { cn } from '@/lib/utils'
-import { codexVerseAnchor } from '@/lib/alignment-tasks'
+import { codexVerseAnchor } from '@/lib/codex-links'
 
 export function stripMarkdown(text: string): string {
   return text
@@ -15,8 +15,31 @@ export function stripMarkdown(text: string): string {
     .trim()
 }
 
-export function formatCodexInline(text: string): React.ReactNode[] {
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/** Wraps each case-insensitive match of `query` in a search-hit mark. */
+export function highlightMatches(text: string, query: string | undefined, keyPrefix = 'hit'): React.ReactNode[] {
+  const q = query?.trim()
+  if (!q || q.length < 2) return [text]
+  const pieces = text.split(new RegExp(`(${escapeRegExp(q)})`, 'gi'))
+  return pieces
+    .filter((piece) => piece !== '')
+    .map((piece, i) =>
+      piece.toLowerCase() === q.toLowerCase() ? (
+        <mark key={`${keyPrefix}-${i}`} className="codex-hit" data-codex-hit="">
+          {piece}
+        </mark>
+      ) : (
+        piece
+      )
+    )
+}
+
+export function formatCodexInline(text: string, highlight?: string): React.ReactNode[] {
   const parts: React.ReactNode[] = []
+  const plain = (value: string, key: string) => parts.push(...highlightMatches(value, highlight, key))
   const inlineRegex = /(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g
 
   let lastIdx = 0
@@ -24,7 +47,7 @@ export function formatCodexInline(text: string): React.ReactNode[] {
 
   while ((m = inlineRegex.exec(text)) !== null) {
     if (m.index > lastIdx) {
-      parts.push(text.substring(lastIdx, m.index))
+      plain(text.substring(lastIdx, m.index), `plain-${lastIdx}`)
     }
 
     const matchedStr = m[0]
@@ -36,19 +59,19 @@ export function formatCodexInline(text: string): React.ReactNode[] {
           key={partKey}
           className="bg-current/10 border border-current/20 px-1.5 py-0.5 rounded-chip font-sans font-medium text-[0.88em]"
         >
-          {matchedStr.slice(1, -1)}
+          {highlightMatches(matchedStr.slice(1, -1), highlight, `${partKey}-hit`)}
         </code>
       )
     } else if (matchedStr.startsWith('**') && matchedStr.endsWith('**')) {
       parts.push(
         <strong key={partKey} className="font-bold opacity-100">
-          {matchedStr.slice(2, -2)}
+          {highlightMatches(matchedStr.slice(2, -2), highlight, `${partKey}-hit`)}
         </strong>
       )
     } else if (matchedStr.startsWith('*') && matchedStr.endsWith('*')) {
       parts.push(
         <em key={partKey} className="italic opacity-90">
-          {matchedStr.slice(1, -1)}
+          {highlightMatches(matchedStr.slice(1, -1), highlight, `${partKey}-hit`)}
         </em>
       )
     } else if (matchedStr.startsWith('[') && matchedStr.includes('](')) {
@@ -76,7 +99,7 @@ export function formatCodexInline(text: string): React.ReactNode[] {
   }
 
   if (lastIdx < text.length) {
-    parts.push(text.substring(lastIdx))
+    plain(text.substring(lastIdx), `plain-${lastIdx}`)
   }
 
   return parts
@@ -84,7 +107,7 @@ export function formatCodexInline(text: string): React.ReactNode[] {
 
 type PendingItem = { kind: 'num' | 'bullet' | 'sub'; marker: string; parts: string[] }
 
-function renderVerseBlocks(rawText: string, dropCap = false): React.ReactNode[] {
+function renderVerseBlocks(rawText: string, dropCap = false, highlight?: string): React.ReactNode[] {
   const lines = rawText.split('\n')
   const elements: React.ReactNode[] = []
 
@@ -98,7 +121,7 @@ function renderVerseBlocks(rawText: string, dropCap = false): React.ReactNode[] 
       if (pText) {
         elements.push(
           <p key={key} className={cn(capPending && 'codex-drop-cap')}>
-            {formatCodexInline(pText)}
+            {formatCodexInline(pText, highlight)}
           </p>
         )
         capPending = false
@@ -120,14 +143,14 @@ function renderVerseBlocks(rawText: string, dropCap = false): React.ReactNode[] 
           <span className="font-sans text-[0.72em] font-bold tabular-nums opacity-70 shrink-0 min-w-[1.25em]">
             {item.marker}.
           </span>
-          <div className="flex-1">{formatCodexInline(text)}</div>
+          <div className="flex-1">{formatCodexInline(text, highlight)}</div>
         </div>
       )
     } else if (item.kind === 'sub') {
       elements.push(
         <div key={key} className="flex items-baseline gap-2.5 pl-8 text-[0.95em] opacity-90">
           <span aria-hidden="true" className="opacity-50 shrink-0">–</span>
-          <div className="flex-1">{formatCodexInline(text)}</div>
+          <div className="flex-1">{formatCodexInline(text, highlight)}</div>
         </div>
       )
     } else {
@@ -136,7 +159,7 @@ function renderVerseBlocks(rawText: string, dropCap = false): React.ReactNode[] 
           <span aria-hidden="true" className="text-[0.6em] opacity-60 shrink-0 -translate-y-[0.15em]">
             ◆
           </span>
-          <div className="flex-1">{formatCodexInline(text)}</div>
+          <div className="flex-1">{formatCodexInline(text, highlight)}</div>
         </div>
       )
     }
@@ -182,9 +205,13 @@ function renderVerseBlocks(rawText: string, dropCap = false): React.ReactNode[] 
 }
 
 /** Verse text with paragraphs and lists. `dropCap` sets an initial on the first paragraph. */
-export const CodexVerseBody: React.FC<{ text: string; dropCap?: boolean }> = ({ text, dropCap = false }) => {
+export const CodexVerseBody: React.FC<{ text: string; dropCap?: boolean; highlight?: string }> = ({
+  text,
+  dropCap = false,
+  highlight,
+}) => {
   if (!text) return null
-  return <div className="codex-verse space-y-[0.9em]">{renderVerseBlocks(text, dropCap)}</div>
+  return <div className="codex-verse space-y-[0.9em]">{renderVerseBlocks(text, dropCap, highlight)}</div>
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -214,8 +241,10 @@ export interface CodexDocumentSheetProps {
   prevTitle?: string
   nextTitle?: string
   compact?: boolean
-  /** Give each verse an id so links such as #verse-3 can open at it. */
+  /** Give each verse an id (verse-N) so links such as /codex/scr-030#verse-3 open at it. */
   anchorVerses?: boolean
+  /** Search text to mark in the scripture. */
+  highlight?: string
 }
 
 export function CodexDocumentSheet({
@@ -229,21 +258,22 @@ export function CodexDocumentSheet({
   nextTitle,
   compact = false,
   anchorVerses = false,
+  highlight,
 }: CodexDocumentSheetProps) {
   const hasPrev = pageIndex > 0
   const hasNext = pageIndex < pageCount - 1
 
   return (
-    <article className={cn('relative', compact ? 'space-y-7' : 'space-y-8 sm:space-y-10')}>
-      <header className="space-y-4">
+    <article className={cn('relative', compact ? 'space-y-7' : 'space-y-7 sm:space-y-10')}>
+      <header className="space-y-3 sm:space-y-4">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-sans text-[11px] font-bold uppercase tracking-[0.14em] opacity-70">
           <span>{scripture.volumeName}</span>
           <span aria-hidden="true">·</span>
           <span>{scripture.id}</span>
         </div>
 
-        <h2 className="font-garamond font-bold text-[2rem] leading-[1.05] sm:text-[2.6rem] md:text-5xl tracking-[-0.01em] text-balance">
-          {scripture.title}
+        <h2 className="font-garamond font-bold text-[1.85rem] leading-[1.05] sm:text-[2.6rem] md:text-5xl tracking-[-0.01em] text-balance">
+          {highlightMatches(scripture.title, highlight, 'title')}
         </h2>
 
         <p className="font-sans text-xs sm:text-[13px] opacity-75">
@@ -257,8 +287,8 @@ export function CodexDocumentSheet({
         <figcaption className="font-sans text-[11px] font-bold uppercase tracking-[0.14em] opacity-70">
           Mandate
         </figcaption>
-        <blockquote className="font-garamond italic text-[1.3rem] sm:text-2xl leading-snug">
-          “{scripture.mandate}”
+        <blockquote className="font-garamond italic text-[1.15rem] sm:text-2xl leading-snug">
+          “{highlightMatches(scripture.mandate, highlight, 'mandate')}”
         </blockquote>
         {scripture.latinMotto && (
           <p className="font-garamond italic text-sm tracking-[0.04em] opacity-65">{scripture.latinMotto}</p>
@@ -270,14 +300,14 @@ export function CodexDocumentSheet({
           <section
             key={verse.verseNumber}
             id={anchorVerses ? codexVerseAnchor(verse.verseNumber) : undefined}
-            className="space-y-3 scroll-mt-24"
+            className="space-y-3 scroll-mt-20 lg:scroll-mt-6"
           >
             {verse.heading && (
               <h3 className="font-sans text-[11px] font-bold uppercase tracking-[0.16em] opacity-70 pb-1.5 border-b border-current/15">
-                {verse.heading}
+                {highlightMatches(verse.heading, highlight, 'heading')}
               </h3>
             )}
-            <CodexVerseBody text={verse.text} dropCap={index === 0} />
+            <CodexVerseBody text={verse.text} dropCap={index === 0} highlight={highlight} />
           </section>
         ))}
       </div>

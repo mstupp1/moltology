@@ -277,10 +277,8 @@ export function buildStreakHistory(
   return result
 }
 
-/** DOM id of a verse in the Codex reader, used as the link hash. */
-export function codexVerseAnchor(verse: number): string {
-  return `verse-${verse}`
-}
+/** DOM id of a verse in the Codex reader, used as the link hash. Lives with the other Codex links. */
+export { codexVerseAnchor } from './codex-links'
 
 /** The Codex reference for a task key, looked up from the catalog so server payloads stay small. */
 export function alignmentTaskCodex(key: string | undefined): AlignmentCodexRef | undefined {

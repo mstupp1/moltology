@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen, fireEvent, within } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { SacredCodexReader, CodexVerseBody } from './SacredCodexReader'
+import { SacredCodexReader, CodexVerseBody, CODEX_LAST_READ_KEY } from './SacredCodexReader'
 
 describe('SacredCodexReader Component', () => {
   beforeEach(() => {
@@ -17,15 +17,10 @@ describe('SacredCodexReader Component', () => {
     expect(screen.queryByText(/ARCHIVAL SPEC/i)).not.toBeInTheDocument()
   })
 
-  it('filters scriptures by volume tab and opens that volume', () => {
+  it('drops the daily reflection and the volume tabs', () => {
     render(<SacredCodexReader />)
-    const volumes = within(screen.getByRole('group', { name: 'Volumes' }))
-    fireEvent.click(volumes.getByRole('button', { name: /Doctrine/i }))
-    expect(volumes.getByRole('button', { name: /Doctrine/i })).toHaveAttribute('aria-pressed', 'true')
-    expect(volumes.getByRole('button', { name: /Doctrine/i })).toHaveClass('bg-surface-3', 'shadow-nav-current')
-    expect(screen.getByTestId('codex-scripture-sheet').getAttribute('data-codex-scripture')).not.toBe('SCR-001')
-    const contents = screen.getByRole('complementary', { name: 'Contents' })
-    expect(within(contents).queryByRole('button', { name: /The Prime Directive/i })).not.toBeInTheDocument()
+    expect(screen.queryByText(/Daily reflection/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'Volumes' })).not.toBeInTheDocument()
   })
 
   it('locks the document sheet to paper and garamond without reading pickers', () => {
@@ -163,5 +158,37 @@ describe('SacredCodexReader Component', () => {
     render(<CodexVerseBody text={'1. Log the shed. The Order counts\nwhat you finish.\n\nAfter the list.'} />)
     expect(screen.getByText('Log the shed. The Order counts what you finish.')).toBeInTheDocument()
     expect(screen.getByText('After the list.').tagName).toBe('P')
+  })
+
+  it('gives each verse an anchor and lists the open scripture\'s sections', () => {
+    const onNavigate = vi.fn()
+    const { container } = render(<SacredCodexReader scriptureSlug="scr-030" onNavigate={onNavigate} />)
+    expect(container.querySelector('#verse-3')).toBeTruthy()
+    const contents = screen.getByRole('complementary', { name: 'Contents' })
+    const sections = within(contents).getByRole('list', { name: /Sections of The Daily Shedding Routine/i })
+    const buttons = within(sections).getAllByRole('button')
+    expect(buttons.length).toBeGreaterThan(3)
+    fireEvent.click(buttons[1])
+    expect(onNavigate).toHaveBeenLastCalledWith('SCR-030', { verse: expect.any(Number) })
+  })
+
+  it('marks search hits in the open scripture and counts them in the list', () => {
+    const { container } = render(<SacredCodexReader scriptureSlug="scr-030" />)
+    fireEvent.change(screen.getByPlaceholderText(/Search scriptures/i), { target: { value: 'tide' } })
+    expect(container.querySelectorAll('mark.codex-hit').length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/\d+ match(es)?$/).length).toBeGreaterThan(0)
+  })
+
+  it('reopens the last scripture read when the address names none', () => {
+    localStorage.setItem(CODEX_LAST_READ_KEY, 'SCR-010')
+    const onNavigate = vi.fn()
+    render(<SacredCodexReader onNavigate={onNavigate} />)
+    expect(screen.getByTestId('codex-scripture-sheet')).toHaveAttribute('data-codex-scripture', 'SCR-010')
+    expect(onNavigate).toHaveBeenCalledWith('SCR-010', { replace: true })
+  })
+
+  it('remembers the scripture being read', () => {
+    render(<SacredCodexReader scriptureSlug="scr-002" />)
+    expect(localStorage.getItem(CODEX_LAST_READ_KEY)).toBe('SCR-002')
   })
 })

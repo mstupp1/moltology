@@ -1,5 +1,5 @@
 import { INITIAL_BLOG_POSTS } from './blog-data'
-import { CANONICAL_SCRIPTURES } from './codexData'
+import { SCRIPTURE_CATALOG } from './codexCatalog'
 import {
   isolationProtocolsSlug,
   scriptureSlugFromId,
@@ -273,7 +273,7 @@ export function newsPagesFromPosts(
 }
 
 export function scripturePagesFromCanon(
-  scriptures: Array<{ id: string; title: string; category?: string }> = CANONICAL_SCRIPTURES,
+  scriptures: Array<{ id: string; title: string; category?: string }> = SCRIPTURE_CATALOG,
 ): CommandCatalogItem[] {
   return scriptures.map((scripture) => {
     const slug = scriptureSlugFromId(scripture.id)
@@ -301,7 +301,7 @@ export function buildPagesCatalog(options?: {
 }): CommandCatalogItem[] {
   return [
     ...COMMAND_CATALOG,
-    ...scripturePagesFromCanon(options?.scriptures ?? CANONICAL_SCRIPTURES),
+    ...scripturePagesFromCanon(options?.scriptures ?? SCRIPTURE_CATALOG),
     ...boardPagesFromCategories(options?.boards ?? INITIAL_FORUM_CATEGORIES),
     ...newsPagesFromPosts(options?.news ?? INITIAL_BLOG_POSTS),
   ]

@@ -1,5 +1,5 @@
 import type { FriendRequestStatus, NotificationKind } from '../db/schema'
-import { STAGE_PIPELINE_DATA } from './codexData'
+import { STAGE_PIPELINE_DATA } from './codexStages'
 import { resolveMemberPublicName } from './member-handle'
 
 export type RelationshipState =
