@@ -50,9 +50,11 @@ export interface SacredCodexReaderProps {
   scriptureSlug?: string
   /** Called when the reader picks another scripture, so the address can follow it. */
   onNavigate?: (scriptureId: string) => void
+  /** Address hash such as verse-3; the reader scrolls to that verse. */
+  verseHash?: string
 }
 
-export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureSlug, onNavigate }) => {
+export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureSlug, onNavigate, verseHash }) => {
   const focused = findScriptureBySlug(scriptureSlug)
   const missingFocus = Boolean(scriptureSlug?.trim()) && !focused
   const sheetTopRef = useRef<HTMLDivElement>(null)
@@ -90,6 +92,17 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
       el.scrollIntoView?.({ block: 'start' })
     }
   }, [activeScriptureId, isFullscreen])
+
+  // A link such as /codex/scr-030#verse-3 opens at that verse once the scripture is showing.
+  useEffect(() => {
+    if (isFullscreen || typeof window === 'undefined') return
+    const hash = (verseHash ?? '').replace(/^#/, '')
+    if (!/^verse-\d+$/.test(hash)) return
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById(hash)?.scrollIntoView?.({ block: 'start' })
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [activeScriptureId, isFullscreen, verseHash])
 
   const selectScripture = (id: string) => {
     if (id !== activeScriptureId) scrollOnChangeRef.current = true
@@ -355,6 +368,7 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
               onPrev={handlePrevScripture}
               onNext={handleNextScripture}
               onSelectScripture={selectScripture}
+              anchorVerses
             />
           </div>
         </div>

@@ -7,7 +7,7 @@ const LazySacredCodexReader = lazy(() =>
   import('./SacredCodexReader').then((m) => ({ default: m.SacredCodexReader })),
 )
 
-export function CodexChamber({ scriptureSlug }: { scriptureSlug?: string }) {
+export function CodexChamber({ scriptureSlug, verseHash }: { scriptureSlug?: string; verseHash?: string }) {
   const navigate = useNavigate()
   const handleNavigate = useCallback(
     (scriptureId: string) => {
@@ -23,7 +23,7 @@ export function CodexChamber({ scriptureSlug }: { scriptureSlug?: string }) {
   return (
     <div className="flex flex-col">
       <Suspense fallback={<HudWorkspaceGhost />}>
-        <LazySacredCodexReader scriptureSlug={scriptureSlug} onNavigate={handleNavigate} />
+        <LazySacredCodexReader scriptureSlug={scriptureSlug} verseHash={verseHash} onNavigate={handleNavigate} />
       </Suspense>
     </div>
   )

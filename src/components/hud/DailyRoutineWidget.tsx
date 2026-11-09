@@ -5,9 +5,10 @@ import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { DailyRoutineGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
-import { ALIGNMENT_HISTORY_DAYS, DAILY_ALIGNMENT_HUB_ID, localDateString, parseLocalDate, TOTAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
+import { ALIGNMENT_HISTORY_DAYS, DAILY_ALIGNMENT_HUB_ID, alignmentTaskCodex, localDateString, parseLocalDate, TOTAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
 import type { DailyStreakDay } from '@/lib/alignment-tasks'
 import { cn } from '@/lib/utils'
+import { AlignmentCodexLink } from './AlignmentCodexLink'
 import { AlignmentChamber } from './alignment-chamber/AlignmentChamber'
 
 // ---------------------------------------------------------------------------
@@ -463,15 +464,19 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
             <ul className="rounded-control border border-line-subtle divide-y divide-line-subtle overflow-hidden">
               {tasks.map((task) => {
                 const isNext = task.id === nextTaskId
+                const codex = alignmentTaskCodex(task.key)
                 return (
-                  <li key={task.id}>
+                  <li
+                    key={task.id}
+                    className={cn('flex items-stretch', isNext ? 'bg-surface-3 shadow-nav-current' : task.completed && 'bg-abyss/30')}
+                  >
                     <button
                       type="button"
                       onClick={() => task.key === 'silent-synchronization' ? openSilentSynchronization() : toggleTask(task.key || task.id)}
                       aria-pressed={task.completed}
                       className={cn(
-                        'w-full min-h-[44px] px-3 py-2 flex items-center gap-3 text-left text-xs transition-colors touch-manipulation group focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow',
-                        isNext ? 'bg-surface-3 shadow-nav-current' : task.completed ? 'bg-abyss/30 hover:bg-surface-2' : 'hover:bg-surface-2',
+                        'flex-1 min-w-0 min-h-[44px] px-3 py-2 flex items-center gap-3 text-left text-xs transition-colors touch-manipulation group focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow',
+                        !isNext && 'hover:bg-surface-2',
                       )}
                     >
                       <span
@@ -505,6 +510,12 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                         <span className="shrink-0 text-[11px] font-bold uppercase tracking-[0.08em] text-cyan-glow">Next</span>
                       )}
                     </button>
+                    {codex && (
+                      <AlignmentCodexLink codex={codex} taskTitle={task.title} showLabel className="hidden sm:inline-flex" />
+                    )}
+                    {codex && (
+                      <AlignmentCodexLink codex={codex} taskTitle={task.title} className="sm:hidden" />
+                    )}
                   </li>
                 )
               })}

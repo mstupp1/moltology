@@ -50,7 +50,7 @@ describe('HUDTaskBar', () => {
     render(<HUDTaskBar variant="header" tasks={tasksWithCompletedCount(8)} />)
 
     expect(screen.getByTestId('header-count')).toHaveTextContent('8/8')
-    expect(screen.queryByText('Carapace Close')).not.toBeInTheDocument()
+    expect(screen.queryByText('Close the day')).not.toBeInTheDocument()
   })
 
   it('shows the done count in the ring while alignment is in progress', () => {

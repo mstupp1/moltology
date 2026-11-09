@@ -1,5 +1,5 @@
 import React from 'react'
-import { createFileRoute, useParams } from '@tanstack/react-router'
+import { createFileRoute, useLocation, useParams } from '@tanstack/react-router'
 import { CodexChamber } from '@/components/codex/CodexChamber'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 
@@ -9,7 +9,8 @@ import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
  */
 function CodexLayoutRoute() {
   const { slug } = useParams({ strict: false }) as { slug?: string }
-  return <CodexChamber scriptureSlug={slug} />
+  const hash = useLocation({ select: (location) => location.hash })
+  return <CodexChamber scriptureSlug={slug} verseHash={hash} />
 }
 
 export const Route = createFileRoute('/_hud/codex')({

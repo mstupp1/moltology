@@ -78,6 +78,6 @@ describe('HUDTaskBar alignment count first paint', () => {
     render(<HUDTaskBar variant="header" />)
 
     expect(screen.getByText('8/8')).toBeInTheDocument()
-    expect(screen.queryByText('Carapace Close')).not.toBeInTheDocument()
+    expect(screen.queryByText('Close the day')).not.toBeInTheDocument()
   })
 })

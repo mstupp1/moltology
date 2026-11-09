@@ -179,7 +179,7 @@ export const MOCK_SEED_ROUTINES = [
   {
     id: '00000000-0000-0000-0000-000000000202',
     userId: '00000000-0000-0000-0000-000000000001',
-    title: 'The Grip',
+    title: 'Pick your one thing',
     description: 'Name the one thing that matters most today and start on it.',
     timeSlot: '06:00–08:00',
     category: 'DEVELOPMENT',
@@ -191,7 +191,7 @@ export const MOCK_SEED_ROUTINES = [
   {
     id: '00000000-0000-0000-0000-000000000203',
     userId: '00000000-0000-0000-0000-000000000001',
-    title: 'Carapace Hardening',
+    title: 'Learn something hard',
     description: 'Learn one difficult thing on purpose.',
     timeSlot: '09:00',
     category: 'DISCIPLINE',
@@ -203,7 +203,7 @@ export const MOCK_SEED_ROUTINES = [
   {
     id: '00000000-0000-0000-0000-000000000204',
     userId: '00000000-0000-0000-0000-000000000001',
-    title: 'Focus Reset',
+    title: 'Reset your focus',
     description: 'Clear one distraction and choose the next useful action.',
     timeSlot: '12:00',
     category: 'REPLENISHMENT',
@@ -215,7 +215,7 @@ export const MOCK_SEED_ROUTINES = [
   {
     id: '00000000-0000-0000-0000-000000000205',
     userId: '00000000-0000-0000-0000-000000000001',
-    title: 'Deep Submergence',
+    title: 'Do deep work',
     description: 'Shut out interruptions and work on one thing.',
     timeSlot: '13:00–17:00',
     category: 'EXECUTION',
@@ -227,7 +227,7 @@ export const MOCK_SEED_ROUTINES = [
   {
     id: '00000000-0000-0000-0000-000000000206',
     userId: '00000000-0000-0000-0000-000000000001',
-    title: 'The Benthic Pod',
+    title: 'Help a member',
     description: 'Answer one member or welcome a newcomer.',
     timeSlot: '18:00',
     category: 'OUTREACH',
@@ -239,7 +239,7 @@ export const MOCK_SEED_ROUTINES = [
   {
     id: '00000000-0000-0000-0000-000000000207',
     userId: '00000000-0000-0000-0000-000000000001',
-    title: 'Nightly Molt Audit',
+    title: 'Let one thing go',
     description: 'Name one thing from today and let it go.',
     timeSlot: '20:00',
     category: 'REFLECTION',
@@ -251,7 +251,7 @@ export const MOCK_SEED_ROUTINES = [
   {
     id: '00000000-0000-0000-0000-000000000208',
     userId: '00000000-0000-0000-0000-000000000001',
-    title: 'Carapace Close',
+    title: 'Close the day',
     description: 'Check off the day and stop. It is done either way.',
     timeSlot: '21:00',
     category: 'AUDIT',

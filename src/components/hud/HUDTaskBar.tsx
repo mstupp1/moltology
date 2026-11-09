@@ -5,7 +5,8 @@ import { HudCard, HudBadge, HudBottomSheet } from '@/components/ui'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { Link } from '@tanstack/react-router'
 import { OPEN_ALIGNMENT_PANEL_EVENT, isAlignmentPanelHostVisible } from '@/lib/alignment-panel'
-import { CANONICAL_ALIGNMENT_TASKS, type AlignmentTaskItem } from '@/lib/alignment-tasks'
+import { CANONICAL_ALIGNMENT_TASKS, alignmentTaskCodex, type AlignmentTaskItem } from '@/lib/alignment-tasks'
+import { AlignmentCodexLink } from './AlignmentCodexLink'
 
 export interface AlignmentTask {
   id: string
@@ -286,8 +287,12 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           <ul className={listFrame}>
             {localTasks.map((t) => {
               const isNext = t.id === nextTaskId
+              const codex = alignmentTaskCodex(t.key ?? t.id)
               return (
-                <li key={t.id}>
+                <li
+                  key={t.id}
+                  className={`flex items-stretch ${isNext ? 'bg-surface-3 shadow-nav-current' : t.completed ? 'bg-abyss/30' : ''}`}
+                >
                   <button
                     type="button"
                     onClick={(e) => {
@@ -295,8 +300,8 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                       handleToggleTask(t.id)
                     }}
                     aria-pressed={t.completed}
-                    className={`w-full min-h-[44px] sm:min-h-10 px-3 py-2 flex items-center gap-3 text-left text-xs transition-colors touch-manipulation group focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
-                      isNext ? 'bg-surface-3 shadow-nav-current' : t.completed ? 'bg-abyss/30 hover:bg-surface-2' : 'hover:bg-surface-2'
+                    className={`flex-1 min-w-0 min-h-[44px] sm:min-h-10 pl-3 pr-1 py-2 flex items-center gap-3 text-left text-xs transition-colors touch-manipulation group focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
+                      isNext ? '' : 'hover:bg-surface-2'
                     }`}
                   >
                     <span
@@ -321,6 +326,13 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                       <span className="shrink-0 text-[11px] font-bold uppercase tracking-[0.08em] text-cyan-glow">Next</span>
                     )}
                   </button>
+                  {codex && (
+                    <AlignmentCodexLink
+                      codex={codex}
+                      taskTitle={t.title}
+                      onNavigate={() => setIsScheduleOpen(false)}
+                    />
+                  )}
                 </li>
               )
             })}
