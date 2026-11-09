@@ -29,8 +29,8 @@ function openSearch() {
 
 /**
  * Search, notifications, today's tasks and the account menu as one floating pill.
- * Phone: the emblem sits in its own bubble on the left (it goes to the public home page)
- * with the pill on the right. Desktop: the same pill in the top-right of the workspace.
+ * Phone: a slim solid bar with the emblem on the left (it goes to the public home page)
+ * and a faint pill on the right. Desktop: a glass pill in the top-right of the workspace.
  */
 export function HudTopControls({
   variant,
@@ -102,11 +102,14 @@ export function HudTopControls({
         onClick={() => onNavigate('/')}
         aria-label="Moltology home"
         title="Moltology home"
-        className={`${HUD_GLASS_PILL} w-12 h-12 shrink-0 inline-flex items-center justify-center hover:bg-surface-2 transition-colors active:scale-95 ${focusRing}`}
+        className={`w-10 h-10 -ml-1 shrink-0 inline-flex items-center justify-center rounded-full hover:bg-surface-2 transition-colors active:scale-95 ${focusRing}`}
       >
         <BrandIcon className="w-7 h-7" />
       </button>
-      <div className={`${HUD_GLASS_PILL} flex items-center h-12 px-0.5 shrink-0`}>{controls}</div>
+      {/* A faint, low pill: echoes the desktop pill without the glass bulk */}
+      <div className="flex items-center h-11 px-0.5 shrink-0 rounded-full bg-surface-2/50 border border-line-subtle">
+        {controls}
+      </div>
     </div>
   )
 }
