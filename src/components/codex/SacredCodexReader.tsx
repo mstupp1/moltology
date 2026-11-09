@@ -377,7 +377,7 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
           <div ref={sheetTopRef} className="scroll-mt-20 lg:scroll-mt-4" />
 
           {/* Phone: one slim sticky bar where tapping the title opens the contents. Desktop: position and actions. */}
-          <div className="no-print sticky -top-2.5 sm:-top-4 md:-top-6 z-10 -mx-2.5 sm:-mx-4 md:-mx-6 px-1.5 sm:px-2 mb-3 flex items-center gap-1 bg-abyss/90 backdrop-blur-sm border-b border-line-subtle lg:static lg:mx-0 lg:px-0 lg:bg-transparent lg:backdrop-blur-none lg:border-0">
+          <div className="no-print sticky -top-2.5 sm:-top-4 md:-top-6 z-10 -mx-2.5 sm:-mx-4 md:-mx-6 -mt-2.5 sm:-mt-4 md:-mt-6 px-1.5 sm:px-2 mb-3 lg:mt-0 flex items-center gap-1 bg-abyss/90 backdrop-blur-sm border-b border-line-subtle lg:static lg:mx-0 lg:px-0 lg:bg-transparent lg:backdrop-blur-none lg:border-0">
             <button
               type="button"
               onClick={() => setContentsOpen(true)}
