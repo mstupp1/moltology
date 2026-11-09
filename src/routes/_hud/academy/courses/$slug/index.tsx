@@ -20,8 +20,8 @@ export const Route = createFileRoute('/_hud/academy/courses/$slug/')({
     meta: [
       ...seo({
         title: loaderData?.course
-          ? `${loaderData.course.title} | Molt Academy`
-          : 'Course | Molt Academy',
+          ? `${loaderData.course.title} | Academy | Moltology`
+          : 'Course | Academy | Moltology',
         description: loaderData?.course?.description ?? 'A Molt Academy course.',
         canonical: `https://moltology.org/academy/courses/${loaderData?.course?.slug ?? ''}`,
         siteName: 'Moltology',

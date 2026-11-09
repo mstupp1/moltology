@@ -418,22 +418,27 @@ export function toMemberSummary(row: {
  * Your profile (/profile) holds your page, your activity feed, your friends
  * and friend requests. Its `tab` search value picks one of those.
  */
-export const PROFILE_PAGE_TABS = ['profile', 'activity', ...CONNECTIONS_TABS] as const
+export const PROFILE_PAGE_TABS = ['profile', 'activity', 'requests', ...CONNECTIONS_TABS] as const
 export type ProfilePageTab = (typeof PROFILE_PAGE_TABS)[number]
 export type ProfilePageSection = 'profile' | 'activity' | 'friends' | 'requests'
 
 export const PROFILE_PAGE_DESCRIPTION = 'Your profile, your activity, your friends and friend requests.'
 
-/** Reads the tab from the address. `feed` is the old name of Activity on /friends. */
+/**
+ * Reads the tab from the address. `feed` is the old name of Activity on /friends.
+ * `requests` is the Requests tab; the older `incoming` still opens it.
+ */
 export function parseProfilePageTab(value: unknown): ProfilePageTab | undefined {
   if (value === 'feed') return 'activity'
-  return value === 'profile' || value === 'activity' || isConnectionsTab(value) ? value : undefined
+  return value === 'profile' || value === 'activity' || value === 'requests' || isConnectionsTab(value)
+    ? value
+    : undefined
 }
 
 /** Profile is the default; Incoming and Sent both live under Requests. */
 export function profilePageSection(tab: ProfilePageTab | undefined): ProfilePageSection {
   if (tab === 'activity') return 'activity'
   if (tab === 'friends') return 'friends'
-  if (tab === 'incoming' || tab === 'sent') return 'requests'
+  if (tab === 'requests' || tab === 'incoming' || tab === 'sent') return 'requests'
   return 'profile'
 }

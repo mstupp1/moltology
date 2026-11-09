@@ -419,8 +419,8 @@ describe('premium checkout configuration', () => {
     expect(params.customer).toBeUndefined()
     expect(params.metadata.userId).toBe('user_1')
     expect(params.subscription_data.metadata.userId).toBe('user_1')
-    expect(params.success_url).toBe('https://moltology.org/premium?checkout=success')
-    expect(params.cancel_url).toBe('https://moltology.org/premium?checkout=cancel')
+    expect(params.success_url).toBe('https://moltology.org/max?checkout=success')
+    expect(params.cancel_url).toBe('https://moltology.org/max?checkout=cancel')
     expect(params).not.toHaveProperty('payment_method_types')
     expect(params).not.toHaveProperty('automatic_tax')
     expect(JSON.stringify(params)).not.toMatch(/5\.99|599/)
@@ -447,7 +447,7 @@ describe('premium checkout configuration', () => {
   it('sends the member back to the Oracle MAX page from the customer portal', () => {
     expect(buildPremiumPortalParams({ customerId: 'cus_1', origin: 'http://localhost:3000' })).toEqual({
       customer: 'cus_1',
-      return_url: 'http://localhost:3000/premium',
+      return_url: 'http://localhost:3000/max',
     })
   })
 

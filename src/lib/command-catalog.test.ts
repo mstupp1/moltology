@@ -21,7 +21,7 @@ describe('command catalog', () => {
   it('names support in plain English', () => {
     const supportNav = COMMAND_CATALOG.find((cmd) => cmd.id === 'nav-support')
     expect(supportNav?.to).toBe('/support')
-    expect(supportNav?.label).toBe('Help & support')
+    expect(supportNav?.label).toBe('Support')
     expect(supportNav?.label).not.toMatch(/benthic|neural|telemetry|dispatch|transmit/i)
   })
 

@@ -22,8 +22,8 @@ export const Route = createFileRoute('/_hud/academy/courses/$slug/lessons/$lesso
     meta: [
       ...seo({
         title: loaderData?.lesson
-          ? `${loaderData.lesson.title} | Molt Academy`
-          : 'Lesson | Molt Academy',
+          ? `${loaderData.lesson.title} | Academy | Moltology`
+          : 'Lesson | Academy | Moltology',
         description: loaderData?.lesson?.summary ?? 'A Molt Academy lesson.',
         siteName: 'Moltology',
         twitterSite: '@moltology',

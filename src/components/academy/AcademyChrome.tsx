@@ -28,11 +28,11 @@ export function AcademyFrame({ children }: { children: React.ReactNode }) {
   )
 }
 
-/** Catalog / Certifications switch. The current page is a lit tile. */
+/** Catalog / Certificates switch. The current page is a lit tile. */
 export function AcademyNav({ current }: { current: 'catalog' | 'certificates' | null }) {
   const items = [
     { key: 'catalog' as const, to: '/academy' as const, label: 'Catalog', icon: BookOpen },
-    { key: 'certificates' as const, to: '/academy/certificates' as const, label: 'Certifications', icon: Award },
+    { key: 'certificates' as const, to: '/academy/certificates' as const, label: 'Certificates', icon: Award },
   ]
   return (
     <nav className="flex gap-1 rounded-control border border-line-subtle bg-abyss/40 p-1" aria-label="Academy">

@@ -26,7 +26,7 @@ export const Route = createFileRoute('/_hud/character_/shop')({
   head: () => ({
     meta: [
       ...seo({
-        title: 'Gear shop | Moltology',
+        title: 'Shop | Moltology',
         description:
           'Spend the Chitin Gems you earn on gear for your character, from common pieces to legendary versions.',
         canonical: CANONICAL,

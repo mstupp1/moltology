@@ -59,7 +59,7 @@ export const Route = createFileRoute('/_hud/forum/$categorySlug/')({
     return {
       meta: [
         ...seo({
-          title: `${name} | Moltology Forums`,
+          title: `${name} | Forum | Moltology`,
           description: desc,
           canonical: `https://moltology.org/forum/${params.categorySlug}`,
           siteName: 'Moltology Forums',

@@ -114,7 +114,7 @@ describe('/profile own-dossier route', () => {
       '/profile',
       '/profile?tab=activity',
       '/profile?tab=friends',
-      '/profile?tab=incoming',
+      '/profile?tab=requests',
     ])
     expect(links[2]).toHaveAttribute('aria-current', 'page')
     expect(await screen.findByText('connections friends friends')).toBeInTheDocument()

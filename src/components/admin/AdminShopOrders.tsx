@@ -148,10 +148,10 @@ export function AdminShopOrders() {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Package className="w-4 h-4 text-cyan-glow" />
-            <h2 className="font-grotesk text-sm font-bold uppercase tracking-[0.08em] text-ink">Shop orders</h2>
+            <h2 className="font-grotesk text-sm font-bold uppercase tracking-[0.08em] text-ink">Store orders</h2>
           </div>
           <div className="flex flex-wrap gap-3 text-xs">
-            <Link to="/admin/store" className="text-cyan-glow hover:underline">Store settings and catalog</Link>
+            <a href="#admin-store-settings" className="text-cyan-glow hover:underline">Store settings and catalog</a>
             <Link to="/store" className="text-cyan-glow hover:underline">Open storefront</Link>
           </div>
         </div>

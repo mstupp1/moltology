@@ -96,7 +96,7 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
             )
           })}
         </div>
-        {accessTier !== 'premium' && <a href="/premium" className="block border-t border-line-subtle px-4 py-3 text-xs text-cyan-glow hover:underline">Explore Oracle MAX</a>}
+        {accessTier !== 'premium' && <a href="/max" className="block border-t border-line-subtle px-4 py-3 text-xs text-cyan-glow hover:underline">Explore Oracle MAX</a>}
       </HudDropdownMenuContent>
     </HudDropdownMenu>
   )

@@ -8,7 +8,7 @@ describe('admin access paths', () => {
     expect(isAdminOnlyPath('/watch')).toBe(true)
     expect(isAdminOnlyPath('/watch?tab=open')).toBe(true)
     expect(isAdminOnlyPath('/dashboard')).toBe(false)
-    expect(isAdminOnlyPath('/premium')).toBe(false)
+    expect(isAdminOnlyPath('/max')).toBe(false)
     expect(isAdminOnlyPath(null)).toBe(false)
   })
 })

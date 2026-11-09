@@ -13,7 +13,7 @@ function PremiumPage() {
   );
 }
 
-export const Route = createFileRoute("/_hud/premium")({
+export const Route = createFileRoute("/_hud/max")({
   headers: () => xRobotsNoindexHeaders(),
   head: () => ({
     meta: [

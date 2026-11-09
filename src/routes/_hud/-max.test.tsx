@@ -1,7 +1,7 @@
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { Route } from "./premium";
+import { Route } from "./max";
 import { authClient } from "@/lib/auth-client";
 import { clearCachedUser } from "@/lib/auth-session";
 import { getUserProfileFn } from "@/lib/server/api";

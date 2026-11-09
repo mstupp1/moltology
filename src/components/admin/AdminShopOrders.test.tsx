@@ -40,7 +40,7 @@ describe('AdminShopOrders', () => {
     expect(mocks.list).toHaveBeenCalledWith({ data: { token: 'token', filter: 'attention', includeTest: false, query: undefined } })
     expect(screen.getByText('$129.00')).toBeInTheDocument()
     expect(screen.getByText('Fulfillment failed')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Store settings/ })).toHaveAttribute('href', '/admin/store')
+    expect(screen.getByRole('link', { name: /Store settings/ })).toHaveAttribute('href', '#admin-store-settings')
     expect(screen.getByRole('link', { name: /Open storefront/ })).toHaveAttribute('href', '/store')
   })
 

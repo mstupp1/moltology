@@ -1,11 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { AdminAccessGuard } from '@/components/admin/AdminAccessGuard'
-import { AdminStore } from '@/components/admin/AdminStore'
-import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
-import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
+import { createFileRoute, redirect } from '@tanstack/react-router'
+
+// Store settings now sit in the Store tab of /admin. vercel.json sends a 301 in production;
+// this covers in-app links saved before the move.
 export const Route = createFileRoute('/_hud/admin/store')({
-  headers: () => xRobotsNoindexHeaders(),
-  head: () => ({ meta: privatePageSeo({ title: 'Store settings | Moltology', description: 'Staff store settings.' }) }),
-  pendingComponent: HudWorkspaceGhost,
-  component: () => <AdminAccessGuard skeleton={<HudWorkspaceGhost />}><AdminStore /></AdminAccessGuard>,
+  beforeLoad: () => {
+    throw redirect({ to: '/admin', search: { tab: 'store' }, hash: 'admin-store-settings', replace: true })
+  },
 })

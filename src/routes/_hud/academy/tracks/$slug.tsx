@@ -19,7 +19,7 @@ export const Route = createFileRoute('/_hud/academy/tracks/$slug')({
   head: ({ loaderData }) => ({
     meta: [
       ...seo({
-        title: loaderData?.track ? `${loaderData.track.title} | Molt Academy` : 'Track | Molt Academy',
+        title: loaderData?.track ? `${loaderData.track.title} | Academy | Moltology` : 'Track | Academy | Moltology',
         description: loaderData?.track?.description ?? 'A Molt Academy track.',
         canonical: `https://moltology.org/academy/tracks/${loaderData?.track?.slug ?? ''}`,
         siteName: 'Moltology',

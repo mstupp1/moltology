@@ -26,7 +26,7 @@ export const Route = createFileRoute('/_hud/character_/progress')({
     links: [canonicalLink(CANONICAL)],
     meta: seo({
       canonical: CANONICAL,
-      title: 'Stage progress | Moltology',
+      title: 'Progress | Moltology',
       description: 'The four stages, your XP and what opens next.',
     }),
   }),

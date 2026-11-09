@@ -161,7 +161,7 @@ export function hubUrlForNotificationKind(
 ): string {
   switch (kind) {
     case 'friend_request':
-      return '/profile?tab=incoming'
+      return '/profile?tab=requests'
     case 'friend_accepted':
     case 'friend_rejected':
       return '/profile?tab=friends'
