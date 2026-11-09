@@ -95,10 +95,17 @@ export function ProfileTabsPage({
       <Suspense fallback={<HudWorkspaceGhost />}>
         {section === 'profile' ? (
           <LazyMemberProfilePage profileId={profileId} />
+        ) : section === 'activity' ? (
+          // The tab names the page, so the feed sits on its own without a second title or card.
+          <section aria-labelledby="profile-activity-title">
+            <h1 id="profile-activity-title" className="sr-only">
+              {SECTION_TITLES.activity}
+            </h1>
+            <LazyActivityStreamPage />
+          </section>
         ) : (
           <div className="chitin-card rounded-card p-3 sm:p-4 md:p-5 space-y-4 font-sans text-ink">
             <HudTitlePanel treatment="integrated" title={SECTION_TITLES[section]} />
-            {section === 'activity' && <LazyActivityStreamPage />}
             {section === 'friends' && <LazyConnectionsPage view="friends" tab="friends" />}
             {section === 'requests' && (
               <LazyConnectionsPage

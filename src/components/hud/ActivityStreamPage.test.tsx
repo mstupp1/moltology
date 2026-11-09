@@ -112,7 +112,7 @@ describe('ActivityStreamPage', () => {
     expect(screen.getByText('shell_sib')).toBeInTheDocument()
   })
 
-  it('renders circle pulses with actor, kind, and stats', async () => {
+  it('renders circle pulses with actor, detail, and value', async () => {
     vi.mocked(getActivityFeedFn).mockResolvedValue({
       events: [streakEvent],
       nextCursor: null,
@@ -125,8 +125,10 @@ describe('ActivityStreamPage', () => {
     })
     expect(screen.getByText('shell_sib')).toBeInTheDocument()
     expect(screen.getByText('Held for 7 consecutive days.')).toBeInTheDocument()
-    expect(screen.getByText('7 days')).toBeInTheDocument()
-    // The Friends page owns the title; the feed renders only its controls and items.
+    expect(screen.getByText('7d')).toBeInTheDocument()
+    // Pulses sit under a day heading.
+    expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument()
+    // The Profile page's tab owns the title; the feed renders only its controls and items.
     expect(screen.queryByRole('heading', { name: 'Activity Stream' })).not.toBeInTheDocument()
   })
 

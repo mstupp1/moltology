@@ -666,3 +666,46 @@ export function emptyCopyForFeed(scope: ActivityFeedScope, filter: ActivityFeedF
   if (scope === 'self') return ACTIVITY_STREAM_SELF_EMPTY_COPY
   return ACTIVITY_STREAM_EMPTY_COPY
 }
+
+export interface ActivityDayGroup {
+  /** Local calendar day, YYYY-MM-DD. */
+  key: string
+  /** "Today", "Yesterday", or a short date such as "Tue, Nov 3". */
+  label: string
+  events: ActivityEventView[]
+}
+
+function localDayKey(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+}
+
+function activityDayLabel(at: Date, key: string, now: Date): string {
+  if (key === localDayKey(now)) return 'Today'
+  const yesterday = new Date(now)
+  yesterday.setDate(now.getDate() - 1)
+  if (key === localDayKey(yesterday)) return 'Yesterday'
+  return at.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    ...(at.getFullYear() === now.getFullYear() ? {} : { year: 'numeric' }),
+  })
+}
+
+/** Splits a newest-first feed into local calendar days, keeping the feed's order. */
+export function groupActivityByDay(events: ActivityEventView[], now: Date): ActivityDayGroup[] {
+  const groups: ActivityDayGroup[] = []
+  for (const event of events) {
+    const at = new Date(event.occurredAt)
+    const valid = !Number.isNaN(at.getTime())
+    const key = valid ? localDayKey(at) : 'undated'
+    let group = groups.find((g) => g.key === key)
+    if (!group) {
+      group = { key, label: valid ? activityDayLabel(at, key, now) : 'Earlier', events: [] }
+      groups.push(group)
+    }
+    group.events.push(event)
+  }
+  return groups
+}

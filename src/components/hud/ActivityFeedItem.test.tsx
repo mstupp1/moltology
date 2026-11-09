@@ -64,7 +64,7 @@ describe('ActivityFeedItem', () => {
       '/forum/general-discussion/hold-the-quiet#post-post-1'
     )
     expect(screen.getByText('claw_lord').closest('a')).toHaveAttribute('href', '/member/claw_lord')
-    expect(screen.getByText('shell_sib')).toBeInTheDocument()
+    expect(screen.getByText(/Mentioned shell_sib/)).toBeInTheDocument()
     expect(screen.getByTestId('avatar')).toHaveAttribute('data-animated', 'no')
   })
 

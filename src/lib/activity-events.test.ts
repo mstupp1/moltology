@@ -36,6 +36,8 @@ import {
   parseActivityEventHref,
   routineActivitySourceKey,
   toActivityEventView,
+  groupActivityByDay,
+  type ActivityEventView,
 } from './activity-events'
 
 describe('activity event copy and mapping', () => {
@@ -304,5 +306,28 @@ describe('activity event copy and mapping', () => {
     expect(reply.isOwn).toBe(false)
     expect(activityEventStats(reply).some((stat) => stat.label === 'Board')).toBe(true)
     expect(activityEventStats(reply).some((stat) => stat.value === 'shell_sib')).toBe(true)
+  })
+})
+
+describe('groupActivityByDay', () => {
+  const now = new Date(2026, 10, 9, 9, 40)
+  const at = (d: Date) => ({ id: d.toISOString(), occurredAt: d.toISOString() }) as unknown as ActivityEventView
+
+  it('labels today and yesterday and dates older days, in feed order', () => {
+    const events = [
+      at(new Date(2026, 10, 9, 8, 0)),
+      at(new Date(2026, 10, 9, 1, 0)),
+      at(new Date(2026, 10, 8, 22, 0)),
+      at(new Date(2026, 10, 3, 12, 0)),
+      at(new Date(2025, 11, 30, 12, 0)),
+    ]
+    const groups = groupActivityByDay(events, now)
+    expect(groups.map((g) => g.label)).toEqual(['Today', 'Yesterday', 'Tue, Nov 3', 'Tue, Dec 30, 2025'])
+    expect(groups[0].events).toHaveLength(2)
+  })
+
+  it('keeps one group per day across appended pages', () => {
+    const events = [at(new Date(2026, 10, 8, 22, 0)), at(new Date(2026, 10, 8, 7, 0))]
+    expect(groupActivityByDay(events, now)).toHaveLength(1)
   })
 })
