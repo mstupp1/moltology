@@ -347,7 +347,7 @@ const ORACLE_SAMPLES = [
     answer: [
       'Good. A bad paragraph is a shell you can grow out of.',
       '',
-      'Take five minutes away from the screen, then write the outline under it as plain headings. No sentences yet. When the outline is down, tick **Skill Development** on today’s list and stop for lunch.',
+      'Take five minutes away from the screen, then write the outline under it as plain headings. No sentences yet. When the outline is down, tick **Learn something hard** on today’s list and stop for lunch.',
     ].join('\n'),
   },
 ]

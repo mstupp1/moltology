@@ -21,11 +21,14 @@ vi.mock('@/lib/auth-client', () => ({
 }))
 
 vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, to, ...props }: { children: React.ReactNode; to?: string }) => (
-    <a href={to} {...props}>
-      {children}
-    </a>
-  ),
+  Link: ({ children, to, params, hash, ...props }: any) => {
+    const path = String(to ?? '').replace('$slug', params?.slug ?? '')
+    return (
+      <a href={hash ? `${path}#${hash}` : path} {...props}>
+        {children}
+      </a>
+    )
+  },
 }))
 
 function renderWidget() {
@@ -173,8 +176,8 @@ describe('DailyRoutineWidget Component', () => {
     renderWidget()
 
     const task1 = screen.getByText('Silent Synchronization')
-    const task2 = screen.getByText('Prompt Construction')
-    const task3 = screen.getByText('Skill Development')
+    const task2 = screen.getByText('Pick your one thing')
+    const task3 = screen.getByText('Learn something hard')
 
     completeSilentSync()
     fireEvent.click(task2)
@@ -270,6 +273,14 @@ describe('DailyRoutineWidget next liturgy', () => {
 
     completeSilentSync()
     expect(screen.getAllByText('Next')).toHaveLength(1)
-    expect(screen.getByRole('button', { name: /Prompt Construction/i }).textContent).toMatch(/Next$/)
+    expect(screen.getByRole('button', { name: /Pick your one thing/i }).textContent).toMatch(/Next$/)
+  })
+
+  it('links each task to the Codex passage behind it', () => {
+    renderWidget()
+    const grip = screen.getAllByRole('link', { name: /Pick your one thing in the Codex: The Grip/i })
+    expect(grip[0]).toHaveAttribute('href', '/codex/scr-030#verse-3')
+    const audit = screen.getAllByRole('link', { name: /Let one thing go in the Codex/i })
+    expect(audit[0]).toHaveAttribute('href', '/codex/scr-032')
   })
 })

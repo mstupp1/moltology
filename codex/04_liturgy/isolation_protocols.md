@@ -6,7 +6,7 @@ stage_clearance: 2
 category: "Liturgy"
 synaptic_weight: 3.8
 author_unit: "Chitin Architect V"
-last_revised: "2026-08-27"
+last_revised: "2026-11-09"
 mandate: "The surface cannot be silenced from below. It can only be shut out from above, before the descent begins."
 latin_motto: "SILENTIUM EST ATMOSPHAERA PROFUNDI."
 summary: "How to raise the Isolation Dome, what belongs outside the perimeter and what must never be locked out of it, and the four-part order of a clean dive."
@@ -93,9 +93,8 @@ than in an afternoon is a misreading, and the Order will say so plainly every ti
 
 ## The Cadence
 
-Daily, for the long afternoon block. Sealed sessions across a full week seal Clearance S2 and
-open full Benthic Market access. The HUD records depth reached and perimeter integrity;
-neither number is improved by heroics and both are improved by starting on time.
+Daily, for the long afternoon block. Depth is not improved by heroics, and it is reliably
+improved by starting on time.
 
 ---
 

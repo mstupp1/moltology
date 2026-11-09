@@ -1,6 +1,7 @@
 import React from 'react'
 import { CANONICAL_SCRIPTURES, type ScriptureItem } from '@/lib/codexData'
 import { cn } from '@/lib/utils'
+import { codexVerseAnchor } from '@/lib/alignment-tasks'
 
 export function stripMarkdown(text: string): string {
   return text
@@ -213,6 +214,8 @@ export interface CodexDocumentSheetProps {
   prevTitle?: string
   nextTitle?: string
   compact?: boolean
+  /** Give each verse an id so links such as #verse-3 can open at it. */
+  anchorVerses?: boolean
 }
 
 export function CodexDocumentSheet({
@@ -225,6 +228,7 @@ export function CodexDocumentSheet({
   prevTitle,
   nextTitle,
   compact = false,
+  anchorVerses = false,
 }: CodexDocumentSheetProps) {
   const hasPrev = pageIndex > 0
   const hasNext = pageIndex < pageCount - 1
@@ -263,7 +267,11 @@ export function CodexDocumentSheet({
 
       <div className="font-garamond text-[17px] sm:text-[19px] leading-[1.7] space-y-9 hyphens-auto sm:hyphens-none">
         {scripture.verses.map((verse, index) => (
-          <section key={verse.verseNumber} className="space-y-3">
+          <section
+            key={verse.verseNumber}
+            id={anchorVerses ? codexVerseAnchor(verse.verseNumber) : undefined}
+            className="space-y-3 scroll-mt-24"
+          >
             {verse.heading && (
               <h3 className="font-sans text-[11px] font-bold uppercase tracking-[0.16em] opacity-70 pb-1.5 border-b border-current/15">
                 {verse.heading}

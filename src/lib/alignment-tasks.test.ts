@@ -149,3 +149,22 @@ describe('alignment-tasks catalog and helpers', () => {
     expect(yesterdayItem.pct).toBe(100)
   })
 })
+
+describe('alignment task Codex links', () => {
+  it('points every task at a real scripture and verse whose heading names it', async () => {
+    const { CANONICAL_SCRIPTURES } = await import('./codexData')
+    const { CANONICAL_ALIGNMENT_TASKS: tasks, alignmentTaskCodex } = await import('./alignment-tasks')
+    for (const task of tasks) {
+      const codex = alignmentTaskCodex(task.key)
+      expect(codex, task.key).toBeDefined()
+      const scripture = CANONICAL_SCRIPTURES.find((s) => s.id.toLowerCase() === codex!.slug)
+      expect(scripture, task.key).toBeDefined()
+      if (codex!.verse) {
+        const verse = scripture!.verses.find((v) => v.verseNumber === codex!.verse)
+        expect(verse?.heading, task.key).toContain(codex!.label)
+      } else {
+        expect(scripture!.title).toBe(codex!.label)
+      }
+    }
+  })
+})

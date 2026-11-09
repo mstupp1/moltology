@@ -1,11 +1,22 @@
 /** Visible routine history and maximum per-day retention horizon. */
 export const ALIGNMENT_HISTORY_DAYS = 90
 
+/** Where a task's practice is described in the Codex. */
+export interface AlignmentCodexRef {
+  /** Scripture slug, such as scr-030. */
+  slug: string
+  /** Verse to open at; omit to open the scripture at the top. */
+  verse?: number
+  /** The Codex's name for this practice, shown on the link. */
+  label: string
+}
+
 export interface CanonicalAlignmentTask {
   key: string
   time: string
   title: string
   description?: string
+  codex?: AlignmentCodexRef
 }
 
 export interface AlignmentTaskItem {
@@ -30,55 +41,65 @@ export interface DailyStreakDay {
 /** Anchor for the Daily alignment schedule. */
 export const DAILY_ALIGNMENT_HUB_ID = 'daily-routine-hub'
 
+// Titles are plain actions. The order follows the Codex scripture "The Daily Shedding
+// Routine" (SCR-030), and `codex` points at the verse or scripture behind each task.
+// Keys are stored with completions and streaks, so never change them when renaming.
 export const CANONICAL_ALIGNMENT_TASKS: CanonicalAlignmentTask[] = [
   {
     key: 'silent-synchronization',
     time: 'Early morning',
     title: 'Silent Synchronization',
-    description: 'Align neural baseline and initiate telemetry.',
+    description: 'Before any feed or inbox, sit quietly and look honestly at yesterday.',
+    codex: { slug: 'scr-030', verse: 2, label: 'First Light' },
   },
   {
     key: 'prompt-construction',
     time: 'Morning',
-    title: 'Prompt Construction',
-    description: 'Craft and etch operational prompts for the day.',
+    title: 'Pick your one thing',
+    description: 'Name the one thing that matters most today and start on it.',
+    codex: { slug: 'scr-030', verse: 3, label: 'The Grip' },
   },
   {
     key: 'skill-development',
     time: 'Late morning',
-    title: 'Skill Development',
-    description: 'Expand capability matrix and learn new protocols.',
+    title: 'Learn something hard',
+    description: 'Learn one difficult thing on purpose.',
+    codex: { slug: 'scr-030', verse: 4, label: 'Carapace Hardening' },
   },
   {
-    // Keep the stored key so existing completions and streaks survive the rename.
     key: 'nutritional-efficiency-break',
     time: 'Noon',
-    title: 'Focus Reset',
+    title: 'Reset your focus',
     description: 'Clear one distraction and choose the next useful action.',
+    codex: { slug: 'scr-030', verse: 5, label: 'Focus Reset' },
   },
   {
     key: 'iterative-refinement',
     time: 'Afternoon',
-    title: 'Iterative Refinement',
-    description: 'Continuous synthesis and execution cycles.',
+    title: 'Do deep work',
+    description: 'Shut out interruptions and work on one thing.',
+    codex: { slug: 'scr-031', label: 'The Isolation Protocols' },
   },
   {
     key: 'community-outreach',
     time: 'Late afternoon',
-    title: 'Community Outreach',
-    description: 'Broadcast neural updates to order initiates.',
+    title: 'Help a member',
+    description: 'Answer one member or welcome a newcomer.',
+    codex: { slug: 'scr-030', verse: 7, label: 'The Benthic Pod' },
   },
   {
     key: 'reflection-log',
     time: 'Early evening',
-    title: 'Reflection Log',
-    description: 'Document daily metrics, learnings, and telemetry.',
+    title: 'Let one thing go',
+    description: 'Name one thing from today and let it go.',
+    codex: { slug: 'scr-032', label: 'The Nightly Molt Audit' },
   },
   {
     key: 'alignment-review',
     time: 'Evening',
-    title: 'Alignment Review',
-    description: 'Perform end-of-day alignment check and audit.',
+    title: 'Close the day',
+    description: 'Check off the day and stop. It is done either way.',
+    codex: { slug: 'scr-030', verse: 9, label: 'Carapace Close' },
   },
 ]
 
@@ -254,4 +275,15 @@ export function buildStreakHistory(
     })
   }
   return result
+}
+
+/** DOM id of a verse in the Codex reader, used as the link hash. */
+export function codexVerseAnchor(verse: number): string {
+  return `verse-${verse}`
+}
+
+/** The Codex reference for a task key, looked up from the catalog so server payloads stay small. */
+export function alignmentTaskCodex(key: string | undefined): AlignmentCodexRef | undefined {
+  if (!key) return undefined
+  return CANONICAL_ALIGNMENT_TASKS.find((task) => task.key === key)?.codex
 }
