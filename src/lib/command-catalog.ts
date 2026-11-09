@@ -39,7 +39,7 @@ export type CommandNavTo =
   | '/codex/$slug'
   | '/academy'
   | '/character/shop'
-  | '/premium'
+  | '/max'
   | '/character/progress'
   | '/forum'
   | '/forum/$categorySlug'
@@ -48,7 +48,6 @@ export type CommandNavTo =
   | '/character'
   | '/news'
   | '/news/$slug'
-  | '/watch'
   | '/admin'
   | '/admin/logic'
   | '/settings'
@@ -116,7 +115,7 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
   },
   {
     id: 'nav-market',
-    label: 'Gear shop',
+    label: 'Shop',
     category: 'Page',
     icon: 'market',
     to: '/character/shop',
@@ -149,11 +148,11 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
   },
   {
     id: 'nav-pipeline',
-    label: 'Stage progress',
+    label: 'Progress',
     category: 'Page',
     icon: 'pipeline',
     to: '/character/progress',
-    keywords: ['progress', 'xp', 'science', 'moltology science', 'pipeline', 'stages', 'clearance', 'how it works'],
+    keywords: ['progress', 'stage progress', 'xp', 'science', 'moltology science', 'pipeline', 'stages', 'clearance', 'how it works'],
   },
   {
     id: 'nav-forum',
@@ -177,7 +176,7 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'Oracle MAX',
     category: 'Page',
     icon: 'premium',
-    to: '/premium',
+    to: '/max',
     // Members do not see this page. HIDDEN_PAGES is the registry.
     keywords: ['oracle max', 'premium', 'membership', 'subscription'],
   },
@@ -191,11 +190,11 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
   },
   {
     id: 'nav-profile',
-    label: 'Your profile',
+    label: 'Profile',
     category: 'Page',
     icon: 'profile',
     to: '/profile',
-    keywords: ['profile', 'dossier', 'me'],
+    keywords: ['profile', 'your profile', 'dossier', 'me'],
   },
   {
     id: 'nav-settings',
@@ -207,18 +206,19 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
   },
   {
     id: 'nav-support',
-    label: 'Help & support',
+    label: 'Support',
     category: 'Page',
     icon: 'support',
     to: '/support',
-    keywords: ['support', 'help', 'contact', 'ticket', 'bug'],
+    keywords: ['support', 'help', 'help & support', 'contact', 'ticket', 'bug'],
   },
   {
     id: 'nav-watch',
     label: 'Covenant Watch',
     category: 'Staff',
     icon: 'watch',
-    to: '/watch',
+    to: '/admin',
+    search: { tab: 'watch' },
     keywords: ['watch', 'covenant', 'moderation', 'steward'],
   },
   {

@@ -15,7 +15,7 @@ export async function queueStoreMail(key: string, orderId: string | null, to: st
 export async function alertStoreOperator(orderId: string, problem: string) {
   const to = process.env.STORE_SUPPORT_INBOX
   if (!to) return
-  await queueStoreMail(`alert:${orderId}:${hashStoreValue(problem).slice(0,16)}`, null, to, 'Store order needs review', `Order: ${orderId}\n${problem}\nReview the Shop tab at /admin?tab=shop. Refunds do not cancel Printful production.`)
+  await queueStoreMail(`alert:${orderId}:${hashStoreValue(problem).slice(0,16)}`, null, to, 'Store order needs review', `Order: ${orderId}\n${problem}\nReview the Store tab at /admin?tab=store. Refunds do not cancel Printful production.`)
 }
 export async function enqueueOrderConfirmation(id: string) {
   const [order] = await getDb().select().from(merchOrders).where(eq(merchOrders.id, id)).limit(1)

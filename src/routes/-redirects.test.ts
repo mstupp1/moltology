@@ -25,6 +25,9 @@ describe('renamed page redirects', () => {
     ['/connections', '/profile?tab=friends'],
     ['/friends', '/profile?tab=friends'],
     ['/landing', '/'],
+    ['/premium', '/max'],
+    ['/watch', '/admin?tab=watch'],
+    ['/admin/store', '/admin?tab=store'],
     ['/what-is-moltology/what-moltologists-say', '/what-is-moltology#voices'],
   ])('sends %s to %s with a permanent redirect', (source, destination) => {
     expect(vercel.redirects).toContainEqual({ source, destination, permanent: true })

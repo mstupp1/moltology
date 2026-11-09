@@ -436,7 +436,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(goPremium.compareDocumentPosition(support)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
 
     fireEvent.click(goPremium)
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/premium' })
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/max' })
   })
 
   it('hides Go Oracle MAX for current Oracle MAX members', async () => {

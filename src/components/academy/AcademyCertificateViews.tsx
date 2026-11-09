@@ -30,7 +30,7 @@ export function AcademyCertificateIndex({ data }: { data: AcademyHomePayload }) 
       <HudTitlePanel
         surface="solid"
         eyebrow="Molt Academy"
-        title="Certifications"
+        title="Certificates"
         description="A course certificate is issued when every lesson is complete. A track certificate is issued when every required course on that path is complete."
         actions={<AcademyNav current="certificates" />}
       />
@@ -153,10 +153,10 @@ export function AcademyCredential({ credential }: { credential: AcademyCredentia
       <AcademyCrumbs
         items={[
           {
-            label: 'Certifications',
+            label: 'Certificates',
             link: (
               <Link to="/academy/certificates" className={ACADEMY_CRUMB_LINK}>
-                Certifications
+                Certificates
               </Link>
             ),
           },

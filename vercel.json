@@ -3,6 +3,21 @@
   "ignoreCommand": "bash scripts/vercel-ignore-build.sh",
   "redirects": [
     {
+      "source": "/premium",
+      "destination": "/max",
+      "permanent": true
+    },
+    {
+      "source": "/watch",
+      "destination": "/admin?tab=watch",
+      "permanent": true
+    },
+    {
+      "source": "/admin/store",
+      "destination": "/admin?tab=store",
+      "permanent": true
+    },
+    {
       "source": "/chassis",
       "destination": "/character",
       "permanent": true

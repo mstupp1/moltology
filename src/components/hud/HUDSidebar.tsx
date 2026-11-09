@@ -7,8 +7,8 @@ import {
   LayoutDashboard,
   BookOpen,
   Scroll,
-  Sliders,
-  Users,
+  Shell,
+  MessagesSquare,
   Atom,
   LifeBuoy,
   Sparkles,
@@ -266,11 +266,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       items: [
         { id: 'hub', label: 'DASHBOARD', shortLabel: 'DASHBOARD', icon: LayoutDashboard, path: '/dashboard' },
         { id: 'oracle', label: 'ORACLE', shortLabel: 'ORACLE', icon: Atom, path: '/oracle' },
-        { id: 'character', label: 'CHARACTER', shortLabel: 'CHARACTER', icon: Sliders, path: '/character' },
+        { id: 'character', label: 'CHARACTER', shortLabel: 'CHARACTER', icon: Shell, path: '/character' },
         { id: 'profile', label: 'PROFILE', shortLabel: 'PROFILE', icon: CircleUser, path: '/profile' },
         { id: 'codex', label: 'CODEX', shortLabel: 'CODEX', icon: Scroll, path: '/codex' },
         { id: 'academy', label: 'ACADEMY', shortLabel: 'ACADEMY', icon: BookOpen, path: '/academy' },
-        { id: 'forum', label: 'FORUM', shortLabel: 'FORUM', icon: Users, path: '/forum' },
+        { id: 'forum', label: 'FORUM', shortLabel: 'FORUM', icon: MessagesSquare, path: '/forum' },
       ],
     },
   ]
@@ -584,7 +584,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     (MOBILE_MORE_IDS.some((id) => {
       const item = allNavItems.find((navItem) => navItem.id === id)
       return item ? isOnPath(item.path) : false
-    }) || isOnPath('/support') || isOnPath('/settings')
+    }) || isOnPath('/support') || isOnPath('/settings') || isOnPath('/max')
       ? 'more'
       : null)
 
@@ -720,16 +720,16 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
                 {/* Go Oracle MAX (free members who can see the premium experiment) */}
                 {showGoPremium && (
-                  <div className={`relative transition-colors duration-150 ${effectiveRoute === '/premium' ? 'bg-surface-2' : 'bg-surface-1 hover:bg-surface-2'}`}>
+                  <div className={`relative transition-colors duration-150 ${effectiveRoute === '/max' ? 'bg-surface-2' : 'bg-surface-1 hover:bg-surface-2'}`}>
                     <button
-                      onClick={() => handleNavClick('/premium')}
-                      onMouseEnter={() => handlePrefetch('/premium')}
-                      onFocus={() => handlePrefetch('/premium')}
+                      onClick={() => handleNavClick('/max')}
+                      onMouseEnter={() => handlePrefetch('/max')}
+                      onFocus={() => handlePrefetch('/max')}
                       aria-label="Go Oracle MAX"
                       title="Go Oracle MAX"
                       className="w-full relative flex flex-col items-center justify-center py-2 px-1 gap-1 transition-colors duration-150 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
                     >
-                      {effectiveRoute === '/premium' && <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-glow" />}
+                      {effectiveRoute === '/max' && <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-glow" />}
                       <Sparkles className="w-4 h-4 shrink-0 text-cyan-glow" />
                       <span className="text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center text-cyan-glow">MAX</span>
                     </button>
@@ -777,7 +777,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1.5 text-xs font-sans font-bold shadow-menu whitespace-nowrap flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow" />
                         <span className="tracking-[0.08em] uppercase">
-                          HELP &amp; SUPPORT
+                          SUPPORT
                         </span>
                       </div>
                     </div>
@@ -876,6 +876,24 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 </div>
               )}
 
+              {/* Go Oracle MAX (Mobile): the same entry as the desktop rail's MAX item */}
+              {showGoPremium && (
+                <div className={`transition-colors duration-150 ${effectiveRoute === '/max' ? 'bg-surface-2' : 'bg-surface-1 hover:bg-surface-2'}`}>
+                  <button
+                    onClick={() => handleNavClick('/max')}
+                    onMouseEnter={() => handlePrefetch('/max')}
+                    onFocus={() => handlePrefetch('/max')}
+                    className="w-full text-left relative flex items-center min-h-[44px] transition-colors duration-150 cursor-pointer px-5 py-3 gap-3.5 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
+                  >
+                    {effectiveRoute === '/max' && <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-glow" />}
+                    <Sparkles className="w-4.5 h-4.5 shrink-0 text-cyan-glow" />
+                    <span className="text-xs font-sans font-semibold tracking-wide uppercase leading-tight text-cyan-glow">
+                      ORACLE MAX
+                    </span>
+                  </button>
+                </div>
+              )}
+
               {/* Help & Support Nav Item (Full width row) */}
               <div
                 className={`transition-colors duration-150 ${
@@ -911,7 +929,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                           : 'text-ink-body group-hover/help:text-ink'
                       }`}
                     >
-                      HELP &amp; SUPPORT
+                      SUPPORT
                     </span>
                   </div>
                 </button>

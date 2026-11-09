@@ -8,7 +8,7 @@ import { isAdmin } from './permissions'
 export const HIDDEN_PAGES = [
   {
     id: 'premium',
-    path: '/premium',
+    path: '/max',
   },
   {
     id: 'store',

@@ -402,7 +402,7 @@ describe('CommandPalette Component', () => {
       'Dashboard',
       'Oracle',
       'Character',
-      'Your profile',
+      'Profile',
       'Codex',
       'Academy',
       'Forum',

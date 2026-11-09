@@ -28,6 +28,7 @@ import { Route as NewsDotmdRouteImport } from './routes/news[.]md'
 import { Route as OrgRouteImport } from './routes/org'
 import { Route as OrgDotmdRouteImport } from './routes/org[.]md'
 import { Route as PipelineRouteImport } from './routes/pipeline'
+import { Route as PremiumRouteImport } from './routes/premium'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PrivacyDotmdRouteImport } from './routes/privacy[.]md'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
@@ -40,19 +41,19 @@ import { Route as StoreRouteImport } from './routes/store'
 import { Route as StreamRouteImport } from './routes/stream'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TermsDotmdRouteImport } from './routes/terms[.]md'
+import { Route as WatchRouteImport } from './routes/watch'
 import { Route as WhatIsMoltologyRouteImport } from './routes/what-is-moltology'
 import { Route as HudAlignmentRouteImport } from './routes/_hud/alignment'
 import { Route as HudCharacterRouteImport } from './routes/_hud/character'
 import { Route as HudCodexRouteRouteImport } from './routes/_hud/codex/route'
 import { Route as HudDashboardRouteImport } from './routes/_hud/dashboard'
 import { Route as HudHudRouteImport } from './routes/_hud/hud'
+import { Route as HudMaxRouteImport } from './routes/_hud/max'
 import { Route as HudOracleRouteImport } from './routes/_hud/oracle'
-import { Route as HudPremiumRouteImport } from './routes/_hud/premium'
 import { Route as HudProfileRouteImport } from './routes/_hud/profile'
 import { Route as HudSearchRouteImport } from './routes/_hud/search'
 import { Route as HudSettingsRouteImport } from './routes/_hud/settings'
 import { Route as HudSupportRouteImport } from './routes/_hud/support'
-import { Route as HudWatchRouteImport } from './routes/_hud/watch'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
@@ -191,6 +192,11 @@ const PipelineRoute = PipelineRouteImport.update({
   path: '/pipeline',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PremiumRoute = PremiumRouteImport.update({
+  id: '/premium',
+  path: '/premium',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -251,6 +257,11 @@ const TermsDotmdRoute = TermsDotmdRouteImport.update({
   path: '/terms.md',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WatchRoute = WatchRouteImport.update({
+  id: '/watch',
+  path: '/watch',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WhatIsMoltologyRoute = WhatIsMoltologyRouteImport.update({
   id: '/what-is-moltology',
   path: '/what-is-moltology',
@@ -281,14 +292,14 @@ const HudHudRoute = HudHudRouteImport.update({
   path: '/hud',
   getParentRoute: () => HudRoute,
 } as any)
+const HudMaxRoute = HudMaxRouteImport.update({
+  id: '/max',
+  path: '/max',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudOracleRoute = HudOracleRouteImport.update({
   id: '/oracle',
   path: '/oracle',
-  getParentRoute: () => HudRoute,
-} as any)
-const HudPremiumRoute = HudPremiumRouteImport.update({
-  id: '/premium',
-  path: '/premium',
   getParentRoute: () => HudRoute,
 } as any)
 const HudProfileRoute = HudProfileRouteImport.update({
@@ -309,11 +320,6 @@ const HudSettingsRoute = HudSettingsRouteImport.update({
 const HudSupportRoute = HudSupportRouteImport.update({
   id: '/support',
   path: '/support',
-  getParentRoute: () => HudRoute,
-} as any)
-const HudWatchRoute = HudWatchRouteImport.update({
-  id: '/watch',
-  path: '/watch',
   getParentRoute: () => HudRoute,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -560,6 +566,7 @@ export interface FileRoutesByFullPath {
   '/org': typeof OrgRoute
   '/org.md': typeof OrgDotmdRoute
   '/pipeline': typeof PipelineRoute
+  '/premium': typeof PremiumRoute
   '/privacy': typeof PrivacyRoute
   '/privacy.md': typeof PrivacyDotmdRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -572,19 +579,19 @@ export interface FileRoutesByFullPath {
   '/stream': typeof StreamRoute
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
+  '/watch': typeof WatchRoute
   '/what-is-moltology': typeof WhatIsMoltologyRouteWithChildren
   '/codex': typeof HudCodexRouteRouteWithChildren
   '/alignment': typeof HudAlignmentRoute
   '/character': typeof HudCharacterRoute
   '/dashboard': typeof HudDashboardRoute
   '/hud': typeof HudHudRoute
+  '/max': typeof HudMaxRoute
   '/oracle': typeof HudOracleRoute
-  '/premium': typeof HudPremiumRoute
   '/profile': typeof HudProfileRoute
   '/search': typeof HudSearchRoute
   '/settings': typeof HudSettingsRoute
   '/support': typeof HudSupportRoute
-  '/watch': typeof HudWatchRoute
   '/api/chat': typeof ApiChatRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
@@ -648,6 +655,7 @@ export interface FileRoutesByTo {
   '/org': typeof OrgRoute
   '/org.md': typeof OrgDotmdRoute
   '/pipeline': typeof PipelineRoute
+  '/premium': typeof PremiumRoute
   '/privacy': typeof PrivacyRoute
   '/privacy.md': typeof PrivacyDotmdRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -659,17 +667,17 @@ export interface FileRoutesByTo {
   '/stream': typeof StreamRoute
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
+  '/watch': typeof WatchRoute
   '/alignment': typeof HudAlignmentRoute
   '/character': typeof HudCharacterRoute
   '/dashboard': typeof HudDashboardRoute
   '/hud': typeof HudHudRoute
+  '/max': typeof HudMaxRoute
   '/oracle': typeof HudOracleRoute
-  '/premium': typeof HudPremiumRoute
   '/profile': typeof HudProfileRoute
   '/search': typeof HudSearchRoute
   '/settings': typeof HudSettingsRoute
   '/support': typeof HudSupportRoute
-  '/watch': typeof HudWatchRoute
   '/api/chat': typeof ApiChatRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
@@ -734,6 +742,7 @@ export interface FileRoutesById {
   '/org': typeof OrgRoute
   '/org.md': typeof OrgDotmdRoute
   '/pipeline': typeof PipelineRoute
+  '/premium': typeof PremiumRoute
   '/privacy': typeof PrivacyRoute
   '/privacy.md': typeof PrivacyDotmdRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -746,19 +755,19 @@ export interface FileRoutesById {
   '/stream': typeof StreamRoute
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
+  '/watch': typeof WatchRoute
   '/what-is-moltology': typeof WhatIsMoltologyRouteWithChildren
   '/_hud/codex': typeof HudCodexRouteRouteWithChildren
   '/_hud/alignment': typeof HudAlignmentRoute
   '/_hud/character': typeof HudCharacterRoute
   '/_hud/dashboard': typeof HudDashboardRoute
   '/_hud/hud': typeof HudHudRoute
+  '/_hud/max': typeof HudMaxRoute
   '/_hud/oracle': typeof HudOracleRoute
-  '/_hud/premium': typeof HudPremiumRoute
   '/_hud/profile': typeof HudProfileRoute
   '/_hud/search': typeof HudSearchRoute
   '/_hud/settings': typeof HudSettingsRoute
   '/_hud/support': typeof HudSupportRoute
-  '/_hud/watch': typeof HudWatchRoute
   '/api/chat': typeof ApiChatRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
@@ -824,6 +833,7 @@ export interface FileRouteTypes {
     | '/org'
     | '/org.md'
     | '/pipeline'
+    | '/premium'
     | '/privacy'
     | '/privacy.md'
     | '/rss.xml'
@@ -836,19 +846,19 @@ export interface FileRouteTypes {
     | '/stream'
     | '/terms'
     | '/terms.md'
+    | '/watch'
     | '/what-is-moltology'
     | '/codex'
     | '/alignment'
     | '/character'
     | '/dashboard'
     | '/hud'
+    | '/max'
     | '/oracle'
-    | '/premium'
     | '/profile'
     | '/search'
     | '/settings'
     | '/support'
-    | '/watch'
     | '/api/chat'
     | '/blog/$slug'
     | '/changelog/$slug'
@@ -912,6 +922,7 @@ export interface FileRouteTypes {
     | '/org'
     | '/org.md'
     | '/pipeline'
+    | '/premium'
     | '/privacy'
     | '/privacy.md'
     | '/rss.xml'
@@ -923,17 +934,17 @@ export interface FileRouteTypes {
     | '/stream'
     | '/terms'
     | '/terms.md'
+    | '/watch'
     | '/alignment'
     | '/character'
     | '/dashboard'
     | '/hud'
+    | '/max'
     | '/oracle'
-    | '/premium'
     | '/profile'
     | '/search'
     | '/settings'
     | '/support'
-    | '/watch'
     | '/api/chat'
     | '/blog/$slug'
     | '/changelog/$slug'
@@ -997,6 +1008,7 @@ export interface FileRouteTypes {
     | '/org'
     | '/org.md'
     | '/pipeline'
+    | '/premium'
     | '/privacy'
     | '/privacy.md'
     | '/rss.xml'
@@ -1009,19 +1021,19 @@ export interface FileRouteTypes {
     | '/stream'
     | '/terms'
     | '/terms.md'
+    | '/watch'
     | '/what-is-moltology'
     | '/_hud/codex'
     | '/_hud/alignment'
     | '/_hud/character'
     | '/_hud/dashboard'
     | '/_hud/hud'
+    | '/_hud/max'
     | '/_hud/oracle'
-    | '/_hud/premium'
     | '/_hud/profile'
     | '/_hud/search'
     | '/_hud/settings'
     | '/_hud/support'
-    | '/_hud/watch'
     | '/api/chat'
     | '/blog/$slug'
     | '/changelog/$slug'
@@ -1087,6 +1099,7 @@ export interface RootRouteChildren {
   OrgRoute: typeof OrgRoute
   OrgDotmdRoute: typeof OrgDotmdRoute
   PipelineRoute: typeof PipelineRoute
+  PremiumRoute: typeof PremiumRoute
   PrivacyRoute: typeof PrivacyRoute
   PrivacyDotmdRoute: typeof PrivacyDotmdRoute
   RssDotxmlRoute: typeof RssDotxmlRoute
@@ -1099,6 +1112,7 @@ export interface RootRouteChildren {
   StreamRoute: typeof StreamRoute
   TermsRoute: typeof TermsRoute
   TermsDotmdRoute: typeof TermsDotmdRoute
+  WatchRoute: typeof WatchRoute
   WhatIsMoltologyRoute: typeof WhatIsMoltologyRouteWithChildren
   ApiChatRoute: typeof ApiChatRoute
   BlogSlugRoute: typeof BlogSlugRoute
@@ -1255,6 +1269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PipelineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/premium': {
+      id: '/premium'
+      path: '/premium'
+      fullPath: '/premium'
+      preLoaderRoute: typeof PremiumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -1339,6 +1360,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsDotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/watch': {
+      id: '/watch'
+      path: '/watch'
+      fullPath: '/watch'
+      preLoaderRoute: typeof WatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/what-is-moltology': {
       id: '/what-is-moltology'
       path: '/what-is-moltology'
@@ -1381,18 +1409,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudHudRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/max': {
+      id: '/_hud/max'
+      path: '/max'
+      fullPath: '/max'
+      preLoaderRoute: typeof HudMaxRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/oracle': {
       id: '/_hud/oracle'
       path: '/oracle'
       fullPath: '/oracle'
       preLoaderRoute: typeof HudOracleRouteImport
-      parentRoute: typeof HudRoute
-    }
-    '/_hud/premium': {
-      id: '/_hud/premium'
-      path: '/premium'
-      fullPath: '/premium'
-      preLoaderRoute: typeof HudPremiumRouteImport
       parentRoute: typeof HudRoute
     }
     '/_hud/profile': {
@@ -1421,13 +1449,6 @@ declare module '@tanstack/react-router' {
       path: '/support'
       fullPath: '/support'
       preLoaderRoute: typeof HudSupportRouteImport
-      parentRoute: typeof HudRoute
-    }
-    '/_hud/watch': {
-      id: '/_hud/watch'
-      path: '/watch'
-      fullPath: '/watch'
-      preLoaderRoute: typeof HudWatchRouteImport
       parentRoute: typeof HudRoute
     }
     '/api/chat': {
@@ -1770,13 +1791,12 @@ interface HudRouteChildren {
   HudCharacterRoute: typeof HudCharacterRoute
   HudDashboardRoute: typeof HudDashboardRoute
   HudHudRoute: typeof HudHudRoute
+  HudMaxRoute: typeof HudMaxRoute
   HudOracleRoute: typeof HudOracleRoute
-  HudPremiumRoute: typeof HudPremiumRoute
   HudProfileRoute: typeof HudProfileRoute
   HudSearchRoute: typeof HudSearchRoute
   HudSettingsRoute: typeof HudSettingsRoute
   HudSupportRoute: typeof HudSupportRoute
-  HudWatchRoute: typeof HudWatchRoute
   HudAdminLogicRoute: typeof HudAdminLogicRoute
   HudAdminStoreRoute: typeof HudAdminStoreRoute
   HudCharacterProgressRoute: typeof HudCharacterProgressRoute
@@ -1799,13 +1819,12 @@ const HudRouteChildren: HudRouteChildren = {
   HudCharacterRoute: HudCharacterRoute,
   HudDashboardRoute: HudDashboardRoute,
   HudHudRoute: HudHudRoute,
+  HudMaxRoute: HudMaxRoute,
   HudOracleRoute: HudOracleRoute,
-  HudPremiumRoute: HudPremiumRoute,
   HudProfileRoute: HudProfileRoute,
   HudSearchRoute: HudSearchRoute,
   HudSettingsRoute: HudSettingsRoute,
   HudSupportRoute: HudSupportRoute,
-  HudWatchRoute: HudWatchRoute,
   HudAdminLogicRoute: HudAdminLogicRoute,
   HudAdminStoreRoute: HudAdminStoreRoute,
   HudCharacterProgressRoute: HudCharacterProgressRoute,
@@ -1878,6 +1897,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrgRoute: OrgRoute,
   OrgDotmdRoute: OrgDotmdRoute,
   PipelineRoute: PipelineRoute,
+  PremiumRoute: PremiumRoute,
   PrivacyRoute: PrivacyRoute,
   PrivacyDotmdRoute: PrivacyDotmdRoute,
   RssDotxmlRoute: RssDotxmlRoute,
@@ -1890,6 +1910,7 @@ const rootRouteChildren: RootRouteChildren = {
   StreamRoute: StreamRoute,
   TermsRoute: TermsRoute,
   TermsDotmdRoute: TermsDotmdRoute,
+  WatchRoute: WatchRoute,
   WhatIsMoltologyRoute: WhatIsMoltologyRouteWithChildren,
   ApiChatRoute: ApiChatRoute,
   BlogSlugRoute: BlogSlugRoute,

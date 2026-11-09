@@ -19,8 +19,8 @@ export const Route = createFileRoute('/_hud/academy/certificates/')({
   head: () => ({
     meta: [
       ...seo({
-        title: 'Certifications | Molt Academy',
-        description: 'Course and track certifications issued by Molt Academy.',
+        title: 'Certificates | Academy | Moltology',
+        description: 'Course and track certificates issued by Molt Academy.',
         canonical: 'https://moltology.org/academy/certificates',
         siteName: 'Moltology',
         twitterSite: '@moltology',

@@ -51,7 +51,11 @@ vi.mock('@/lib/server/api', () => ({
 }))
 
 vi.mock('@/components/admin/AdminShopOrders', () => ({
-  AdminShopOrders: () => <div data-testid="admin-shop">Shop orders</div>,
+  AdminShopOrders: () => <div data-testid="admin-shop">Store orders</div>,
+}))
+
+vi.mock('@/components/admin/AdminStore', () => ({
+  AdminStore: () => <div data-testid="admin-store-settings">Store settings</div>,
 }))
 
 describe('Admin access and oversight hub', () => {
@@ -90,7 +94,7 @@ describe('Admin access and oversight hub', () => {
     expect(screen.getByTestId('admin-sectors')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Composite Studio/i })).toHaveAttribute('href', '/render/composite')
     expect(screen.getByRole('link', { name: /Logic Atlas/i })).toHaveAttribute('href', '/admin/logic')
-    expect(screen.getByRole('link', { name: /Store settings/i })).toHaveAttribute('href', '/admin/store')
+    expect(screen.queryByRole('link', { name: /Store settings/i })).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Storefront/i })).toHaveAttribute('href', '/store')
   })
 
@@ -108,11 +112,12 @@ describe('Admin access and oversight hub', () => {
     })
   })
 
-  it('opens the Shop tab with orders above Oracle MAX members', async () => {
+  it('opens the Store tab with orders, Oracle MAX members and store settings', async () => {
     access.canView = true
-    render(<AdminOversightHub initialTab="shop" />)
-    expect(screen.getByTestId('admin-tab-shop')).toHaveAttribute('aria-selected', 'true')
+    render(<AdminOversightHub initialTab="store" />)
+    expect(screen.getByTestId('admin-tab-store')).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByTestId('admin-shop')).toBeInTheDocument()
+    expect(screen.getByTestId('admin-store-settings')).toBeInTheDocument()
     expect(await screen.findByTestId('admin-purchases-empty')).toHaveTextContent('No Oracle MAX purchases')
   })
 })

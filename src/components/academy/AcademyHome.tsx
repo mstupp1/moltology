@@ -162,7 +162,7 @@ const COMING_SOON_STEPS = [
   },
   {
     icon: Award,
-    title: 'Certifications',
+    title: 'Certificates',
     body: 'Finish a course or a whole track and a credential is issued in your name.',
   },
 ]
@@ -386,7 +386,7 @@ export function AcademyHome({ data }: { data: AcademyHomePayload }) {
           <section className="space-y-3" id="certifications" aria-labelledby="certs-heading">
             <AcademySectionHeading
               id="certs-heading"
-              title="Certifications"
+              title="Certificates"
               subtitle={
                 data.certificates.length > 0
                   ? `${earnedCount} of ${data.certificates.length} earned. Finish a course for its certificate, or a whole track for the path certificate.`

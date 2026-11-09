@@ -37,7 +37,7 @@ describe('Oracle MAX dashboard banner', () => {
     expect(screen.getByTestId('premium-dashboard-banner')).toHaveTextContent(/monthly membership/i)
     rerender(<PremiumBanner hasPurchasedPremium={true} />)
     expect(screen.getByTestId('premium-dashboard-banner')).toHaveTextContent(/not active/i)
-    expect(screen.getByRole('link', { name: 'View Oracle MAX' })).toHaveAttribute('href', '/premium')
+    expect(screen.getByRole('link', { name: 'View Oracle MAX' })).toHaveAttribute('href', '/max')
   })
 
   it('shows the banner for free and lapsed admins and hides it for current premium', async () => {

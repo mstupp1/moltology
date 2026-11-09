@@ -469,8 +469,8 @@ export function buildPremiumCheckoutSessionParams(input: {
     mode: 'subscription',
     client_reference_id: input.userId,
     line_items: [{ price: input.priceId, quantity: 1 }],
-    success_url: `${input.origin}/premium?checkout=success`,
-    cancel_url: `${input.origin}/premium?checkout=cancel`,
+    success_url: `${input.origin}/max?checkout=success`,
+    cancel_url: `${input.origin}/max?checkout=cancel`,
     metadata: { userId: input.userId, kind: 'premium' },
     subscription_data: {
       metadata: { userId: input.userId, kind: 'premium' },
@@ -488,7 +488,7 @@ export function buildPremiumPortalParams(input: { customerId: string; origin: st
 } {
   return {
     customer: input.customerId,
-    return_url: `${input.origin}/premium`,
+    return_url: `${input.origin}/max`,
   }
 }
 

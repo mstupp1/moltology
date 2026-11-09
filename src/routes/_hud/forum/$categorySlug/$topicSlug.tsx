@@ -106,7 +106,7 @@ export const Route = createFileRoute('/_hud/forum/$categorySlug/$topicSlug')({
   },
   head: ({ loaderData, params }) => {
     const topic = loaderData?.topic
-    const title = topic?.title ? `${topic.title} | Moltology Forums` : 'Post | Moltology Forums'
+    const title = topic?.title ? `${topic.title} | Forum | Moltology` : 'Post | Forum | Moltology'
     const desc = topic?.content?.slice(0, 160) || 'Moltology community discussion.'
     return {
       meta: [

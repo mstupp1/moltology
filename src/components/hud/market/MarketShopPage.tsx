@@ -372,7 +372,7 @@ export function MarketShopPage() {
       <HudTitlePanel
         surface="solid"
         accent="cyan"
-        title="Gear shop"
+        title="Shop"
         description="Gear for your character. Rarer versions come with bigger stats and stranger abilities."
         actions={
           <MarketCurrencyBar chitinGems={market.wallet.balance} moltCredits={market.moltCredits} creditsLive={market.creditsLive} />

@@ -3,6 +3,7 @@ import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { Link } from '@tanstack/react-router'
 import { ChevronRight, Eye, FlaskConical, ShieldCheck, ShoppingBag, Users } from 'lucide-react'
 import { AdminShopOrders } from '@/components/admin/AdminShopOrders'
+import { AdminStore } from '@/components/admin/AdminStore'
 import { CovenantWatchPage } from '@/components/forum/CovenantWatchPage'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
@@ -24,12 +25,12 @@ import {
   type ExperimentRow,
 } from '@/lib/server/api'
 
-export type AdminTab = 'watch' | 'members' | 'shop' | 'experiments'
+export type AdminTab = 'watch' | 'members' | 'store' | 'experiments'
 
 const TABS: { id: AdminTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'watch', label: 'Covenant Watch', icon: Eye },
   { id: 'members', label: 'Members', icon: Users },
-  { id: 'shop', label: 'Shop', icon: ShoppingBag },
+  { id: 'store', label: 'Store', icon: ShoppingBag },
   { id: 'experiments', label: 'Experiments', icon: FlaskConical },
 ]
 
@@ -88,7 +89,7 @@ export function AdminOversightHub({ initialTab = 'watch' }: { initialTab?: Admin
           accent="cyan"
           eyebrow="Steward oversight"
           title="Admin"
-          description="Moderation, member clearance, shop orders, and system status for staff."
+          description="Moderation, member clearance, store orders, and system status for staff."
         />
 
         <section
@@ -142,10 +143,11 @@ export function AdminOversightHub({ initialTab = 'watch' }: { initialTab?: Admin
       {tab === 'members' ? (
         <MemberDirectory userId={session.userId} onChanged={() => void loadTelemetry()} />
       ) : null}
-      {tab === 'shop' ? (
+      {tab === 'store' ? (
         <>
           <AdminShopOrders />
           <PurchaseLedger userId={session.userId} />
+          <AdminStore />
         </>
       ) : null}
       {tab === 'experiments' ? <ExperimentSwitches userId={session.userId} /> : null}
@@ -173,10 +175,9 @@ function StatusCard({
 }
 
 const SECTORS = [
-  { title: 'Store settings', detail: 'Checkout, policies, catalog', to: '/admin/store' as const },
   { title: 'Storefront', detail: 'The shop as members see it', to: '/store' as const },
   { title: 'Logic Atlas', detail: 'Business rules and where they live', to: '/admin/logic' as const },
-  { title: 'Oracle MAX', detail: 'Membership tools for this account', to: '/premium' as const },
+  { title: 'Oracle MAX', detail: 'Membership tools for this account', to: '/max' as const },
   { title: 'Composite Studio', detail: 'Preview render layouts', to: '/render/composite' as const },
 ]
 
@@ -186,7 +187,7 @@ function SectorDirectory() {
     <nav aria-label="Admin tools" data-testid="admin-sectors">
       <p className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">Tools</p>
       <ul className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2">
-        {SECTORS.filter((sector) => sector.to !== '/premium' || (!premiumAccess.pending && premiumAccess.canView)).map((sector) => (
+        {SECTORS.filter((sector) => sector.to !== '/max' || (!premiumAccess.pending && premiumAccess.canView)).map((sector) => (
           <li key={sector.to}>
             <Link
               to={sector.to}

@@ -85,7 +85,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
       setDetail(saved.lesson)
       if (action === 'complete') toast?.success(saved.awardedCredentialIds.length ? 'Lesson complete. A certification was issued.' : 'Lesson complete.')
       if (saved.awardedCredentialIds[0]) {
-        toast?.info('Open Certifications to see the credential.', { id: 'academy-cert' })
+        toast?.info('Open Certificates to see the credential.', { id: 'academy-cert' })
       }
     } catch (error) {
       const message = error instanceof Error && error.message.includes('Pass the quiz')

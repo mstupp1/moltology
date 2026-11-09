@@ -18,7 +18,7 @@ export function PremiumBanner({ hasPurchasedPremium }: { hasPurchasedPremium: bo
         </div>
       </div>
       <a
-        href="/premium"
+        href="/max"
         className="inline-flex min-h-[38px] items-center justify-center rounded-control border border-line bg-surface-1 hud-sheen px-4 py-2 text-xs font-bold uppercase tracking-[0.08em] text-ink hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
       >
         {copy.action}

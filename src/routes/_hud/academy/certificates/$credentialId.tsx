@@ -20,8 +20,8 @@ export const Route = createFileRoute('/_hud/academy/certificates/$credentialId')
     meta: [
       ...seo({
         title: loaderData?.credential
-          ? `${loaderData.credential.title} | Molt Academy`
-          : 'Credential | Molt Academy',
+          ? `${loaderData.credential.title} | Academy | Moltology`
+          : 'Credential | Academy | Moltology',
         description: loaderData?.credential?.description ?? 'A Molt Academy certification.',
         siteName: 'Moltology',
         twitterSite: '@moltology',

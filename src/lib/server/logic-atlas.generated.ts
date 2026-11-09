@@ -7,14 +7,14 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-11-04",
+  "syncedAt": "2026-11-09",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
     "rules": 127,
     "decisions": 55,
     "anchors": 247,
-    "drifted": 39,
+    "drifted": 44,
     "flagged": 9
   },
   "canvas": {
@@ -575,10 +575,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/components/hud/market/MarketShopPage.tsx",
           "symbol": "MarketShopPage",
-          "line": 146,
+          "line": 153,
           "value": "MarketShopPage()",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx#L146"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx#L153"
         }
       ],
       "tests": [
@@ -650,18 +650,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/chassis-loadout.ts",
           "symbol": "computeLoadoutTotals",
-          "line": 266,
+          "line": 308,
           "value": "computeLoadoutTotals(items, catalogById)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L266"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L308"
         },
         {
           "file": "src/lib/chassis-loadout.ts",
           "symbol": "isCosmetic",
-          "line": 244,
+          "line": 286,
           "value": "isCosmetic(catalog)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L244"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L286"
         }
       ],
       "tests": [
@@ -708,10 +708,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/chassis-loadout.ts",
           "symbol": "planGearMove",
-          "line": 400,
+          "line": 442,
           "value": "planGearMove(items, catalogById, itemId, target, vaultSize)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L400"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/chassis-loadout.ts#L442"
         }
       ],
       "tests": [
@@ -902,10 +902,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/alignment-tasks.ts",
           "symbol": "CANONICAL_ALIGNMENT_TASKS",
-          "line": 33,
-          "value": "[ { key: 'silent-synchronization', time: 'Early morning', title: 'Silent Synchronization', description: 'Align neural baseline and initiate telemetry.', }, { k…",
+          "line": 47,
+          "value": "[ { key: 'silent-synchronization', time: 'Early morning', title: 'Silent Synchronization', description: 'Before any feed or inbox, sit quietly and look honestl…",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/alignment-tasks.ts#L33"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/alignment-tasks.ts#L47"
         }
       ],
       "tests": [
@@ -947,10 +947,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/hooks/useDailyAlignment.tsx",
           "symbol": "AlignmentProvider",
-          "line": 69,
+          "line": 83,
           "value": "AlignmentProvider({ children })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useDailyAlignment.tsx#L69"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useDailyAlignment.tsx#L83"
         }
       ],
       "tests": [
@@ -1039,10 +1039,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3524,
+          "line": 3673,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3524"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3673"
         }
       ],
       "tests": [
@@ -1083,18 +1083,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/alignment-tasks.ts",
           "symbol": "isAlignmentDateWritable",
-          "line": 124,
+          "line": 145,
           "value": "isAlignmentDateWritable(date, now)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/alignment-tasks.ts#L124"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/alignment-tasks.ts#L145"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3524,
+          "line": 3673,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3524"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3673"
         }
       ],
       "tests": [
@@ -1129,10 +1129,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3304,
+          "line": 3453,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3304"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3453"
         },
         {
           "file": "src/lib/progression.ts",
@@ -1267,10 +1267,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3304,
+          "line": 3453,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3304"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3453"
         }
       ],
       "tests": [],
@@ -1584,8 +1584,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "file": "src/lib/hidden-pages.ts",
           "symbol": "HIDDEN_PAGES",
           "line": 8,
-          "value": "[ { id: 'premium', path: '/premium', }, { id: 'store', path: '/store', }, ] as const",
-          "drift": "ok",
+          "value": "[ { id: 'premium', path: '/max', }, { id: 'store', path: '/store', }, ] as const",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/hidden-pages.ts#L8"
         },
         {
@@ -1618,7 +1618,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 388
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "access.admin-only-paths",
@@ -3021,18 +3021,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "submitLeadHandler",
-          "line": 3122,
+          "line": 3271,
           "value": "submitLeadHandler(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3122"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3271"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createBlogCommentHandler",
-          "line": 772,
+          "line": 806,
           "value": "createBlogCommentHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L772"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L806"
         }
       ],
       "tests": [
@@ -3694,18 +3694,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumTopicHandler",
-          "line": 1612,
+          "line": 1757,
           "value": "createForumTopicHandler({ data, context })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1612"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1757"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "requirePublishableForumPost",
-          "line": 946,
+          "line": 980,
           "value": "requirePublishableForumPost(input)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L946"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L980"
         }
       ],
       "tests": [
@@ -4067,10 +4067,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createBlogCommentHandler",
-          "line": 772,
+          "line": 806,
           "value": "createBlogCommentHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L772"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L806"
         },
         {
           "file": "src/lib/server/forum-write-limit.ts",
@@ -4434,10 +4434,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertForumAuthor",
-          "line": 954,
+          "line": 988,
           "value": "assertForumAuthor(rowUserId, actorId, action)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L954"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L988"
         }
       ],
       "tests": [
@@ -4480,10 +4480,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumPostHandler",
-          "line": 1759,
+          "line": 1904,
           "value": "createForumPostHandler({ data, context })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1759"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1904"
         }
       ],
       "tests": [
@@ -4570,26 +4570,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertCovenantSteward",
-          "line": 2405,
+          "line": 2550,
           "value": "assertCovenantSteward(dbClient, userId, payload)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2405"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2550"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "reviewForumReportHandler",
-          "line": 2708,
+          "line": 2857,
           "value": "reviewForumReportHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2708"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2857"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "removeForumReportTargetHandler",
-          "line": 2778,
+          "line": 2927,
           "value": "removeForumReportTargetHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2778"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2927"
         }
       ],
       "tests": [
@@ -4963,18 +4963,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "reserveOracleChatUsage",
-          "line": 311,
+          "line": 331,
           "value": "reserveOracleChatUsage(userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L311"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L331"
         },
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "releaseOracleChatUsage",
-          "line": 388,
+          "line": 408,
           "value": "releaseOracleChatUsage(id)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L388"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L408"
         },
         {
           "file": "src/lib/ai/usage-limits.ts",
@@ -5003,10 +5003,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "getOracleUsageSnapshot",
-          "line": 416,
+          "line": 436,
           "value": "getOracleUsageSnapshot(userId, now)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L416"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L436"
         },
         {
           "file": "src/lib/ai/usage-limits.ts",
@@ -5385,18 +5385,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "summarizeThreadTitle",
-          "line": 30,
+          "line": 31,
           "value": "summarizeThreadTitle(firstMessageText, modelId, userId, signal, context)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L30"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L31"
         },
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "updateAIThreadTitle",
-          "line": 202,
+          "line": 222,
           "value": "updateAIThreadTitle(threadId, title, userId, expectedTitle)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L202"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L222"
         }
       ],
       "tests": [
@@ -5437,10 +5437,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "getOwnedAIThread",
-          "line": 134,
+          "line": 135,
           "value": "getOwnedAIThread(userId, threadId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L134"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L135"
         }
       ],
       "tests": [
@@ -5617,10 +5617,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/activity-log.ts",
           "symbol": "listActivityFeed",
-          "line": 367,
+          "line": 355,
           "value": "listActivityFeed(dbClient, viewerId, query, now)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/activity-log.ts#L367"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/activity-log.ts#L355"
         }
       ],
       "tests": [
@@ -5646,7 +5646,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 208
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "social.circle-scope",
@@ -5659,10 +5659,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/activity-log.ts",
           "symbol": "listFriendIdsForUser",
-          "line": 60,
-          "value": "listFriendIdsForUser(dbClient, userId)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/activity-log.ts#L60"
+          "line": null,
+          "value": null,
+          "drift": "missing",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/activity-log.ts"
         }
       ],
       "tests": [],
@@ -5679,7 +5679,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 364
       },
-      "drift": "ok"
+      "drift": "missing"
     },
     {
       "id": "social.suggestions",
@@ -5692,18 +5692,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/connections.ts",
           "symbol": "SYNAPTIC_NEARBY_LIMIT",
-          "line": 66,
+          "line": 71,
           "value": "5",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/connections.ts#L66"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/connections.ts#L71"
         },
         {
           "file": "src/lib/connections.ts",
           "symbol": "compareSynapticNearby",
-          "line": 111,
+          "line": 116,
           "value": "compareSynapticNearby(a, b, viewerStage)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/connections.ts#L111"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/connections.ts#L116"
         }
       ],
       "tests": [
@@ -5736,18 +5736,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/notifications-refresh.ts",
           "symbol": "NOTIFICATIONS_REMOTE_INBOX_ENABLED",
-          "line": 11,
-          "value": "false",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/notifications-refresh.ts#L11"
+          "line": 9,
+          "value": "true",
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/notifications-refresh.ts#L9"
         },
         {
           "file": "src/lib/notifications-refresh.ts",
           "symbol": "NOTIFICATIONS_MIN_INTERVAL_MS",
-          "line": 17,
+          "line": 15,
           "value": "6 * 60_000",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/notifications-refresh.ts#L17"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/notifications-refresh.ts#L15"
         }
       ],
       "tests": [
@@ -5769,7 +5769,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 320,
         "y": 76
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "social.referrals",
@@ -5868,10 +5868,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/notifications-refresh.ts",
           "symbol": "NOTIFICATIONS_MIN_INTERVAL_MS",
-          "line": 17,
+          "line": 15,
           "value": "6 * 60_000",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/notifications-refresh.ts#L17"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/notifications-refresh.ts#L15"
         },
         {
           "file": "docs/neon-storage-retention.md",
@@ -6091,10 +6091,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "getBlogPostBySlugHandler",
-          "line": 642,
+          "line": 657,
           "value": "getBlogPostBySlugHandler({ data: slug, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L642"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L657"
         },
         {
           "file": "src/routes/news/$slug.tsx",
@@ -6301,10 +6301,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "saveCharacterHandler",
-          "line": 3935,
+          "line": 4059,
           "value": "saveCharacterHandler({ data, context })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3935"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L4059"
         },
         {
           "file": "src/lib/character-appearance.ts",
@@ -6353,10 +6353,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "publicAvatarConfig",
-          "line": 171,
+          "line": 172,
           "value": "sql<LobsterAvatarConfig | null>`CASE WHEN ${profiles.avatarConfig} IS NULL THEN NULL ELSE (${profiles.avatarConfig} - 'accessory' - 'claws' - 'equipment') || j…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L171"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L172"
         },
         {
           "file": "src/components/UserAvatar.tsx",
@@ -6371,7 +6371,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "ForumAvatar",
           "line": 62,
           "value": "React.memo(({ src, authorName, authorHandle, userId, avatarConfig, size = 'md', className, alt, loading = 'lazy', }) => { const [imageError, setImageError] = u…",
-          "drift": "ok",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/components/forum/ForumAvatar.tsx#L62"
         }
       ],
@@ -6398,7 +6398,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 652
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "merch.private-pilot",
@@ -6831,10 +6831,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/store-operations.ts",
           "symbol": "mutateAdminStore",
-          "line": 230,
+          "line": 235,
           "value": "mutateAdminStore(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L230"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store-operations.ts#L235"
         }
       ],
       "tests": [

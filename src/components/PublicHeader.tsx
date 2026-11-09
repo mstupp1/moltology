@@ -14,8 +14,8 @@ import {
   ShoppingBag,
   ExternalLink,
   Newspaper,
-  Activity,
-  MessageSquare,
+  ListChecks,
+  MessagesSquare,
   ChevronDown,
   Info,
 } from 'lucide-react'
@@ -50,8 +50,8 @@ const NAV_TABS: NavTab[] = [
   // The brand beside the nav reads "Moltology", so the tab stays short.
   { id: 'home', label: 'Home', path: '/' },
   { id: 'news', label: 'News', path: '/news', Icon: Newspaper },
-  { id: 'forum', label: 'Forum', path: '/forum', Icon: MessageSquare },
-  { id: 'moltmax', label: 'Quiz', path: '/moltmax', Icon: Activity },
+  { id: 'forum', label: 'Forum', path: '/forum', Icon: MessagesSquare },
+  { id: 'moltmax', label: 'Quiz', path: '/moltmax', Icon: ListChecks },
   { id: 'about', label: 'About', path: '/what-is-moltology', Icon: Info },
   { id: 'store', label: 'Store', href: 'https://www.etsy.com/shop/SaasTrash', Icon: ShoppingBag, external: true },
 ]

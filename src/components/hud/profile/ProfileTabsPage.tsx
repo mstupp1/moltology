@@ -21,13 +21,13 @@ const SECTIONS: Array<{ id: ProfilePageSection; label: string; tab: ProfilePageT
   { id: 'profile', label: 'Profile', tab: undefined },
   { id: 'activity', label: 'Activity', tab: 'activity' },
   { id: 'friends', label: 'Friends', tab: 'friends' },
-  { id: 'requests', label: 'Requests', tab: 'incoming' },
+  { id: 'requests', label: 'Requests', tab: 'requests' },
 ]
 
 const SECTION_TITLES: Record<Exclude<ProfilePageSection, 'profile'>, string> = {
   activity: 'Activity',
   friends: 'Friends',
-  requests: 'Friend requests',
+  requests: 'Requests',
 }
 
 /** Switches between the parts of your own profile, styled like the Character page's switch. */
@@ -104,7 +104,7 @@ export function ProfileTabsPage({
               <LazyConnectionsPage
                 view="requests"
                 tab={tab === 'sent' ? 'sent' : 'incoming'}
-                onTabChange={(next) => onTabChange(next)}
+                onTabChange={(next) => onTabChange(next === 'incoming' ? 'requests' : next)}
               />
             )}
           </div>
