@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useModalPanelFocus } from '@/hooks/useModalPanelFocus'
 import { useNavigate, useLocation, useRouter } from '@tanstack/react-router'
@@ -10,16 +10,11 @@ import {
   Sliders,
   Users,
   Atom,
-  Search,
-  LogOut,
-  UserPlus,
   LifeBuoy,
-  ChevronsLeft,
-  ChevronsRight,
+  Sparkles,
   ChevronRight,
   Plus,
   Minus,
-  Sparkles,
   Lock,
   EyeOff,
   ShieldCheck,
@@ -31,9 +26,8 @@ import { getAuthJWTToken } from '../../lib/jwt'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { usePendingFriendRequests } from '@/hooks/usePendingFriendRequests'
 import { AuthModal } from '../AuthModal'
-import { BenthicCTAButton } from './BenthicCTAButton'
-import { ChromaElement, HeaderBrand, AnimatedHamburger } from '../ui'
 import { usePremiumMembership } from '@/hooks/usePremiumMembership'
+import { ChromaElement, HeaderBrand } from '../ui'
 import { getEffectiveRole, isAdmin } from '../../lib/permissions'
 import { isHiddenPagePath } from '../../lib/hidden-pages'
 import {
@@ -43,13 +37,10 @@ import {
 } from '../../lib/feature-flags'
 import { isAdminOnlyPath } from '../../lib/admin-access'
 import { resolveMemberPublicName } from '../../lib/member-handle'
-import { UserAvatar } from '../UserAvatar'
-import { UserAvatarMenu } from '../UserAvatarMenu'
-import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { getAssetUrl } from '@/lib/assets'
 import { HUDMobileTabBar } from './HUDMobileTabBar'
-import { HUDTaskBar } from './HUDTaskBar'
-import { NotificationsBell } from './NotificationsBell'
+import { HudTopControls } from './HudTopControls'
+import { useDesktopViewport } from '@/hooks/useDesktopViewport'
 import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 
 /** Pages in the phone bottom bar; the rest go in its More sheet, in this order. */
@@ -93,37 +84,27 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const mobileFrames = React.useRef<number[]>([])
   const mobileTriggerRef = React.useRef<HTMLButtonElement>(null)
   const mobileDialogRef = React.useRef<HTMLDivElement>(null)
-  const [isNavAnimating, setIsNavAnimating] = useState(false)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [isMobileClosing, setIsMobileClosing] = useState(false)
   const [isMobileVisible, setIsMobileVisible] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  // Starts expanded to match the server render; the saved choice is applied
-  // before first paint in the layout effect below.
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  // Desktop is always the compact rail; search, notifications, tasks and the
+  // account menu live in the floating top-right pill (HudTopControls).
+  const isCollapsed = true
   const [isMounted, setIsMounted] = useState(false)
-  const [isDragging, setIsDragging] = useState(false)
-  const dragStartRef = React.useRef<{ startX: number; hasMoved: boolean }>({
-    startX: 0,
-    hasMoved: false,
-  })
-
-  // Apply the saved collapsed state before paint so there is no visible jump.
-  useLayoutEffect(() => {
-    try {
-      const savedCollapsed = localStorage.getItem('moltology_hud_sidebar_collapsed')
-      if (savedCollapsed !== null) {
-        setIsCollapsed(savedCollapsed === 'true')
-      }
-    } catch {
-      // Fallback for localStorage access restrictions
-    }
-  }, [])
+  const isDesktop = useDesktopViewport()
+  const [topControlsSlot, setTopControlsSlot] = useState<HTMLElement | null>(null)
 
   // Track mount state for SSR safe portal rendering
   useEffect(() => {
     setIsMounted(true)
   }, [])
+
+  // The desktop pill renders into a slot HudLayout keeps at the top of the workspace.
+  useEffect(() => {
+    if (!isDesktop) return
+    setTopControlsSlot(document.getElementById('hud-top-controls-slot'))
+  }, [isDesktop])
 
   const cancelMobileTransition = () => {
     if (mobileCloseTimer.current) clearTimeout(mobileCloseTimer.current)
@@ -131,12 +112,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     mobileFrames.current = []
   }
   useEffect(() => () => cancelMobileTransition(), [])
-
-  useEffect(() => {
-    setIsNavAnimating(true)
-    const timer = setTimeout(() => setIsNavAnimating(false), window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : 200)
-    return () => clearTimeout(timer)
-  }, [isCollapsed])
 
   const openMobileMenu = () => {
     cancelMobileTransition()
@@ -179,89 +154,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     }
   }
 
-  const toggleCollapse = () => {
-    setIsCollapsed((prev) => {
-      const next = !prev
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('moltology_hud_sidebar_collapsed', String(next))
-      }
-      return next
-    })
-  }
-
-  const handleRailMouseDown = (e: React.MouseEvent) => {
-    if (e.button !== 0) return // Left click only
-    e.preventDefault()
-
-    dragStartRef.current = {
-      startX: e.clientX,
-      hasMoved: false,
-    }
-    setIsDragging(true)
-    if (typeof document !== 'undefined') {
-      document.body.style.cursor = 'col-resize'
-      document.body.style.userSelect = 'none'
-    }
-
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      const deltaX = moveEvent.clientX - dragStartRef.current.startX
-      if (Math.abs(deltaX) > 8) {
-        dragStartRef.current.hasMoved = true
-      }
-
-      if (isCollapsed) {
-        // Dragging right from collapsed state to expand
-        if (deltaX > 25 || moveEvent.clientX > 110) {
-          setIsCollapsed(false)
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('moltology_hud_sidebar_collapsed', 'false')
-          }
-        }
-      } else {
-        // Dragging left from expanded state to collapse
-        if (deltaX < -25 || moveEvent.clientX < 220) {
-          setIsCollapsed(true)
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('moltology_hud_sidebar_collapsed', 'true')
-          }
-        }
-      }
-    }
-
-    const handleMouseUp = () => {
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('mousemove', handleMouseMove)
-        window.removeEventListener('mouseup', handleMouseUp)
-      }
-      if (typeof document !== 'undefined') {
-        document.body.style.cursor = ''
-        document.body.style.userSelect = ''
-      }
-      setIsDragging(false)
-
-      if (!dragStartRef.current.hasMoved) {
-        // Click without dragging -> toggle collapse/expand
-        toggleCollapse()
-      }
-    }
-
-    if (typeof window !== 'undefined') {
-      window.addEventListener('mousemove', handleMouseMove)
-      window.addEventListener('mouseup', handleMouseUp)
-    }
-  }
-
-  // Keyboard shortcut (⌘B / Ctrl+B) to toggle collapse
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
-        e.preventDefault()
-        toggleCollapse()
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
 
   // Lock body scroll and handle Escape key when mobile menu is open
   useEffect(() => {
@@ -387,11 +279,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const canViewAdmin = canViewHiddenPages
   const { membership: premiumMembership, canViewPremium } = usePremiumMembership()
   const showGoPremium = canViewPremium && premiumMembership !== null && !premiumMembership.isPremium
-  const accountSubtitle = premiumMembership
-    ? premiumMembership.isPremium
-      ? 'Oracle MAX member'
-      : 'Free plan'
-    : 'Account and settings'
   const isAdminActive =
     effectiveRoute === '/admin' ||
     (effectiveRoute !== '/' && effectiveRoute.startsWith('/admin'))
@@ -545,7 +432,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   {hidden && <span className="sr-only">Hidden</span>}
 
                   {/* Clean Floating Tooltip */}
-                  <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/navitem:opacity-100 transition-opacity duration-150">
+                  <div aria-hidden className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/navitem:opacity-100 transition-opacity duration-150">
                     <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1.5 text-xs font-sans font-bold shadow-menu whitespace-nowrap flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow" />
                       <span className="tracking-[0.08em] uppercase">
@@ -685,9 +572,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   useModalPanelFocus(isMobileOpen && !isMobileClosing && isMounted, mobileDialogRef, mobileTriggerRef)
 
-  const desktopContentAnimation = isMounted
-    ? `${isCollapsed ? 'animate-[sidebar-content-compact_200ms_ease-out]' : 'animate-[sidebar-content-expanded_200ms_ease-out]'} motion-reduce:animate-none`
-    : ''
+  const desktopContentAnimation = ''
   const isMobileHeaderOpen = isMobileOpen && !isMobileClosing
   const allNavItems = visibleNavGroups.flatMap((group) => group.items)
   const mobileTabs = MOBILE_TAB_IDS.map((id) => allNavItems.find((item) => item.id === id))
@@ -716,45 +601,39 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         suppressHydrationWarning
         className={`w-full ${
           isCollapsed ? 'md:w-20' : 'md:w-56'
-        } h-auto md:h-full md:min-h-0 md:max-h-full bg-surface-1 border-b-0 md:border-r border-line-subtle flex flex-col select-none relative z-40 md:z-50 shrink-0 shadow-2xl ${
-          isMounted ? 'transition-[width] duration-200 ease-out motion-reduce:transition-none' : ''
-        } group/sidebar ${isNavAnimating ? 'md:overflow-hidden' : 'overflow-visible'}`}
+        } h-auto md:h-full md:min-h-0 md:max-h-full md:bg-surface-1 border-b-0 md:border-r border-line-subtle flex flex-col select-none relative z-40 md:z-50 shrink-0 md:shadow-2xl group/sidebar overflow-visible`}
       >
-        {/* Mobile Top Bar (Transitions between HeaderBrand and Progress Bar when hamburger menu is toggled) */}
-        <div className="flex md:hidden items-center justify-between gap-2 px-2.5 py-2 h-14 bg-surface-1 border-b border-line-subtle relative z-50 shrink-0 overflow-hidden">
-          {/* HUD scanline overlay in mobile header */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
-            <div
-              className="absolute inset-0 opacity-[0.02]"
-              style={{
-                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,255,0.5) 2px, rgba(0,255,255,0.5) 3px)',
-              }}
+        {/* Phone top bar: emblem bubble, then search, bell, today's ring and avatar; pages live in the bottom bar */}
+        <div className="flex md:hidden items-center px-3 h-16 relative z-50 shrink-0">
+          {!isDesktop && (
+            <HudTopControls
+              variant="phone"
+              user={user ? { ...user, avatarConfig: memberAvatar } : null}
+              userRole={effectiveUserRole}
+              displayName={displayName}
+              isSessionPending={isSessionPending}
+              onNavigate={(path) => (isMobileOpen ? closeMobileMenu(() => handleNavClick(path)) : handleNavClick(path))}
+              onSignUp={() => setIsAuthModalOpen(true)}
             />
-          </div>
-
-          {/* Brand */}
-          <div className="flex items-center min-w-0 z-10 relative flex-1">
-            <HeaderBrand
-              logoSize="sm"
-              onClick={() => handleNavClick('/dashboard')}
-            />
-          </div>
-
-          {/* Search and today's tasks; pages live in the bottom bar */}
-          <div className="flex items-center gap-0.5 -mr-1 shrink-0 z-10">
-            <button
-              type="button"
-              onClick={() => (isMobileOpen ? closeMobileMenu(() => handleOpenCommandPalette()) : handleOpenCommandPalette())}
-              aria-label="Search"
-              title="Search pages and members"
-              className="w-11 h-11 -my-1 flex items-center justify-center rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow shrink-0 cursor-pointer"
-            >
-              <Search className="w-5 h-5" />
-            </button>
-            <NotificationsBell variant="header" />
-            <HUDTaskBar variant="header" />
-          </div>
+          )}
         </div>
+
+        {/* Desktop: the same controls as one floating pill at the top-right of the workspace */}
+        {isMounted &&
+          isDesktop &&
+          topControlsSlot &&
+          createPortal(
+            <HudTopControls
+              variant="desktop"
+              user={user ? { ...user, avatarConfig: memberAvatar } : null}
+              userRole={effectiveUserRole}
+              displayName={displayName}
+              isSessionPending={isSessionPending}
+              onNavigate={(path) => handleNavClick(path)}
+              onSignUp={() => setIsAuthModalOpen(true)}
+            />,
+            topControlsSlot,
+          )}
 
         {/* Desktop Header Logo */}
         <div
@@ -766,79 +645,29 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         >
           <HeaderBrand
             isCollapsed={isCollapsed}
-            onClick={() => handleNavClick('/dashboard')}
+            onClick={() => handleNavClick('/')}
           />
 
           {/* Brand Tooltip when collapsed */}
           {isCollapsed && (
-            <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/brand:opacity-100 transition-all duration-200">
+            <div aria-hidden className="absolute left-full ml-4 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/brand:opacity-100 transition-all duration-200">
               <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1 text-xs font-sans font-bold shadow-menu whitespace-nowrap">
-                <span className="text-cyan-glow">Moltology</span>
-                <span className="block text-[11px] text-ink-muted font-sans">Click or drag edge to expand (⌘B)</span>
+                <span className="text-cyan-glow">Moltology home</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Desktop Interactive Edge-Grab Rail (Drag or click to collapse/expand) */}
-        <div
-          role="separator"
-          tabIndex={0}
-          aria-orientation="vertical"
-          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          title={isCollapsed ? 'Click or drag edge right to expand (⌘B)' : 'Click or drag edge left to collapse (⌘B)'}
-          onMouseDown={handleRailMouseDown}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              toggleCollapse()
-            }
-          }}
-          className="hidden md:block absolute top-0 bottom-0 -right-1.5 w-3 z-50 cursor-col-resize select-none group/rail transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow"
-        >
-          {/* Glowing Vertical Cyber Rail Line */}
-          <div
-            className={`absolute top-0 bottom-0 left-[5px] w-[2px] transition-all duration-200 ${
-              isDragging
-                ? 'bg-cyan-glow shadow-[0_0_10px_rgba(0,195,255,0.9)] opacity-100'
-                : 'bg-transparent group-hover/rail:bg-cyan-glow/80 opacity-0 group-hover/rail:opacity-100'
-            }`}
-          />
-        </div>
-
         {/* Desktop Sidebar Navigation Container */}
         <div className={`hidden md:flex flex-1 flex-col justify-between space-y-0 overflow-visible min-h-0 shrink-0 ${desktopContentAnimation} ${isCollapsed ? 'w-20' : 'w-56'}`}>
-          {/* Search Bar — full width, above nav */}
-          <div className="shrink-0 border-b border-line-subtle">
-            <button
-              onClick={handleOpenCommandPalette}
-              className={`w-full flex items-center justify-between px-4 py-3 bg-surface-1 hover:bg-surface-2 text-xs font-sans text-ink-muted hover:text-ink transition-all group focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
-                isCollapsed ? 'justify-center px-0' : ''
-              }`}
-              title="Search pages and members"
-            >
-              {isCollapsed ? (
-                <Search className="w-4 h-4 text-cyan-glow group-hover:scale-110 transition-transform mx-auto" />
-              ) : (
-                <div className="flex items-center gap-2 truncate">
-                  <Search className="w-3.5 h-3.5 text-cyan-glow group-hover:scale-110 transition-transform shrink-0" />
-                  <span className="truncate">Search…</span>
-                </div>
-              )}
-            </button>
-          </div>
-
           {/* Desktop Navigation Items List */}
           <nav className="flex-1 divide-y divide-line-subtle bg-surface-1 overflow-y-auto overflow-x-hidden min-h-0 overscroll-y-contain">
             {renderNavGroupContent(false)}
           </nav>
 
-          {/* Desktop Bottom Controls: Notifications, Daily alignment, Admin, Help & Support, Profile/Auth */}
+          {/* Desktop Bottom Controls: Admin and Help & Support (account lives in the top-right pill) */}
           <div className="mt-auto shrink-0 border-t border-line-subtle divide-y divide-line-subtle bg-surface-1 relative z-40 overflow-visible">
-            <NotificationsBell variant="sidebar" collapsed={isCollapsed} />
-            <HUDTaskBar variant="sidebar" collapsed={isCollapsed} />
-            {/* Desktop Bottom Controls: Help & Support + User Avatar / Auth */}
-            {isCollapsed ? (
+            {/* Desktop Bottom Controls: Admin and Help & Support */}
               <div className="flex flex-col divide-y divide-line-subtle relative overflow-visible">
                 {/* Admin Nav Item (Stacked on Top of Support) */}
                 {canViewAdmin && (
@@ -879,12 +708,30 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       </span>
 
                       {/* Tooltip */}
-                      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/admin:opacity-100 transition-opacity duration-150">
+                      <div aria-hidden className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/admin:opacity-100 transition-opacity duration-150">
                         <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1.5 text-xs font-sans font-bold shadow-menu whitespace-nowrap flex items-center gap-2">
                           <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow" />
                           <span className="tracking-[0.08em] uppercase">ADMIN</span>
                         </div>
                       </div>
+                    </button>
+                  </div>
+                )}
+
+                {/* Go Oracle MAX (free members who can see the premium experiment) */}
+                {showGoPremium && (
+                  <div className={`relative transition-colors duration-150 ${effectiveRoute === '/premium' ? 'bg-surface-2' : 'bg-surface-1 hover:bg-surface-2'}`}>
+                    <button
+                      onClick={() => handleNavClick('/premium')}
+                      onMouseEnter={() => handlePrefetch('/premium')}
+                      onFocus={() => handlePrefetch('/premium')}
+                      aria-label="Go Oracle MAX"
+                      title="Go Oracle MAX"
+                      className="w-full relative flex flex-col items-center justify-center py-2 px-1 gap-1 transition-colors duration-150 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
+                    >
+                      {effectiveRoute === '/premium' && <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-glow" />}
+                      <Sparkles className="w-4 h-4 shrink-0 text-cyan-glow" />
+                      <span className="text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center text-cyan-glow">MAX</span>
                     </button>
                   </div>
                 )}
@@ -926,7 +773,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     </span>
 
                     {/* Tooltip */}
-                    <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/help:opacity-100 transition-opacity duration-150">
+                    <div aria-hidden className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/help:opacity-100 transition-opacity duration-150">
                       <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1.5 text-xs font-sans font-bold shadow-menu whitespace-nowrap flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow" />
                         <span className="tracking-[0.08em] uppercase">
@@ -937,195 +784,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   </button>
                 </div>
 
-                {/* User Avatar Menu / Auth Button (Stacked on Bottom) */}
-                <div className="bg-surface-1 py-2 px-1 flex items-center justify-center relative overflow-visible">
-                  {isSessionPending ? (
-                    <div className="flex items-center justify-center p-1" data-testid="sidebar-auth-skeleton">
-                      <HudGhostSkeleton variant="neutral" preset="avatar" width={28} height={28} />
-                    </div>
-                  ) : !user ? (
-                    <div className="relative group/auth flex justify-center overflow-visible">
-                      <BenthicCTAButton
-                        variant="cyan"
-                        size="sm"
-                        onClick={() => setIsAuthModalOpen(true)}
-                        className="!px-2.5 !py-1.5 flex items-center justify-center active:scale-95"
-                        title="Sign Up / Initialize Operative"
-                      >
-                        <span className="flex items-center gap-1 text-[11px]">
-                          <UserPlus className="w-3.5 h-3.5" />
-                        </span>
-                      </BenthicCTAButton>
-                      {/* Tooltip */}
-                      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/auth:opacity-100 transition-opacity duration-150">
-                        <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1.5 text-xs font-sans font-bold shadow-menu whitespace-nowrap flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow" />
-                          <span className="tracking-[0.08em] uppercase">SIGN UP</span>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="relative z-50 flex items-center justify-center overflow-visible">
-                      <UserAvatarMenu
-                        user={{...user, avatarConfig:memberAvatar}}
-                        userRole={effectiveUserRole}
-                        displayName={displayName}
-                        onNavigate={(path) => navigate({ to: path })}
-                        align="left"
-                        openDirection="up"
-                      />
-                    </div>
-                  )}
-                </div>
               </div>
-            ) : (
-              <div className="flex flex-col divide-y divide-line-subtle relative overflow-visible">
-                {/* Admin Nav Item (Above Help & Support, Expanded) */}
-                {canViewAdmin && (
-                  <div
-                    className={`relative transition-colors duration-150 overflow-visible min-h-[44px] ${
-                      isAdminActive
-                        ? 'bg-surface-2'
-                        : 'bg-surface-1 hover:bg-surface-2'
-                    }`}
-                  >
-                    <button
-                      onClick={() => handleNavClick('/admin')}
-                      onMouseEnter={() => handlePrefetch('/admin')}
-                      onFocus={() => handlePrefetch('/admin')}
-                      className="w-full text-left relative flex items-center min-h-[44px] px-4 py-2.5 pl-5 gap-3 transition-colors duration-150 group/admin cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
-                    >
-                      {isAdminActive && (
-                        <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-glow" />
-                      )}
-
-                      <ShieldCheck
-                        className={`w-4 h-4 shrink-0 transition-colors duration-150 ${
-                          isAdminActive
-                            ? 'text-cyan-glow'
-                            : 'text-ink-muted group-hover/admin:text-ink'
-                        }`}
-                      />
-
-                      <div className="flex flex-col min-w-0 justify-center overflow-hidden whitespace-nowrap flex-1">
-                        <span
-                          className={`text-xs md:text-[12.5px] font-sans font-medium tracking-wide uppercase leading-tight transition-colors duration-150 ${
-                            isAdminActive
-                              ? 'text-ink font-semibold'
-                              : 'text-ink-body group-hover/admin:text-ink'
-                          }`}
-                        >
-                          ADMIN
-                        </span>
-                      </div>
-                    </button>
-                  </div>
-                )}
-
-                {/* Help & Support Nav Item (Expanded) */}
-                <div
-                  className={`relative transition-colors duration-150 overflow-visible min-h-[44px] ${
-                    currentRoute === '/support'
-                      ? 'bg-surface-2'
-                      : 'bg-surface-1 hover:bg-surface-2'
-                  }`}
-                >
-                  <button
-                    onClick={() => handleNavClick('/support')}
-                    onMouseEnter={() => handlePrefetch('/support')}
-                    onFocus={() => handlePrefetch('/support')}
-                    className="w-full text-left relative flex items-center min-h-[44px] px-4 py-2.5 pl-5 gap-3 transition-colors duration-150 group/help cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
-                    title={SUPPORT_PAGE_COPY.pageTitle}
-                  >
-                    {currentRoute === '/support' && (
-                      <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-glow" />
-                    )}
-
-                    <LifeBuoy
-                      className={`w-4 h-4 shrink-0 transition-colors duration-150 ${
-                        currentRoute === '/support'
-                          ? 'text-cyan-glow'
-                          : 'text-ink-muted group-hover/help:text-ink'
-                      }`}
-                    />
-
-                    <div className="flex flex-col min-w-0 justify-center overflow-hidden whitespace-nowrap flex-1">
-                      <span
-                        className={`text-xs md:text-[12.5px] font-sans font-medium tracking-wide uppercase leading-tight transition-colors duration-150 ${
-                          currentRoute === '/support'
-                            ? 'text-ink font-semibold'
-                            : 'text-ink-body group-hover/help:text-ink'
-                        }`}
-                      >
-                        HELP &amp; SUPPORT
-                      </span>
-                    </div>
-                  </button>
-                </div>
-
-                {/* Go Oracle MAX (free members only, Expanded) */}
-                {showGoPremium && (
-                  <div
-                    className={`relative transition-colors duration-150 min-h-[44px] ${
-                      effectiveRoute === '/premium'
-                        ? 'bg-surface-2'
-                        : 'bg-surface-1 hover:bg-surface-2'
-                    }`}
-                  >
-                    <button
-                      onClick={() => handleNavClick('/premium')}
-                      onMouseEnter={() => handlePrefetch('/premium')}
-                      onFocus={() => handlePrefetch('/premium')}
-                      className="w-full text-left relative flex items-center min-h-[44px] px-4 py-2.5 pl-5 gap-3 transition-colors duration-150 group/premium cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
-                    >
-                      {effectiveRoute === '/premium' && (
-                        <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-glow" />
-                      )}
-                      <Sparkles className="w-4 h-4 shrink-0 text-cyan-glow" />
-                      <span className="flex-1 min-w-0 truncate text-xs md:text-[12.5px] font-sans font-semibold tracking-wide uppercase leading-tight text-cyan-glow">
-                        Go Oracle MAX
-                      </span>
-                    </button>
-                  </div>
-                )}
-
-                {/* Account Row: avatar, name and plan / Auth (Expanded) */}
-                <div className="relative bg-surface-1 overflow-visible">
-                  {isSessionPending ? (
-                    <div className="flex items-center gap-3 min-h-[56px] px-4" data-testid="sidebar-auth-skeleton">
-                      <HudGhostSkeleton variant="neutral" preset="avatar" width={32} height={32} />
-                    </div>
-                  ) : !user ? (
-                    <div className="p-3">
-                      <BenthicCTAButton
-                        variant="cyan"
-                        size="sm"
-                        fullWidth
-                        onClick={() => setIsAuthModalOpen(true)}
-                      >
-                        <span className="flex items-center justify-center gap-1.5 text-[11px]">
-                          <UserPlus className="w-3.5 h-3.5" />
-                          <span>SIGN UP</span>
-                        </span>
-                      </BenthicCTAButton>
-                    </div>
-                  ) : (
-                    <div className="relative z-50 overflow-visible">
-                      <UserAvatarMenu
-                        user={{...user, avatarConfig:memberAvatar}}
-                        userRole={effectiveUserRole}
-                        displayName={displayName}
-                        onNavigate={(path) => navigate({ to: path })}
-                        align="left"
-                        openDirection="up"
-                        trigger="row"
-                        subtitle={accountSubtitle}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </aside>
@@ -1150,7 +809,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             aria-hidden
             data-testid="more-backdrop"
             onClick={() => closeMobileMenu()}
-            className={`md:hidden fixed inset-x-0 top-14 bottom-[calc(var(--hud-tabbar-height)+env(safe-area-inset-bottom,0px))] z-[99989] bg-abyss/70 transition-opacity duration-200 ease-out motion-reduce:transition-none ${
+            className={`md:hidden fixed inset-x-0 top-16 bottom-[calc(var(--hud-tabbar-height)+env(safe-area-inset-bottom,0px))] z-[99989] bg-abyss/70 transition-opacity duration-200 ease-out motion-reduce:transition-none ${
               isMobileVisible && !isMobileClosing ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
           />
@@ -1162,7 +821,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             role="dialog"
             aria-modal="true"
             aria-label="More pages"
-            className={`md:hidden fixed inset-x-0 bottom-[calc(var(--hud-tabbar-height)+env(safe-area-inset-bottom,0px))] max-h-[calc(100dvh-3.5rem-var(--hud-tabbar-height)-env(safe-area-inset-bottom,0px))] z-[99990] w-screen bg-surface-1 border-t border-line rounded-t-card shadow-menu flex flex-col font-sans text-ink select-none overflow-hidden transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${
+            className={`md:hidden fixed inset-x-0 bottom-[calc(var(--hud-tabbar-height)+env(safe-area-inset-bottom,0px))] max-h-[calc(100dvh-4rem-var(--hud-tabbar-height)-env(safe-area-inset-bottom,0px))] z-[99990] w-screen bg-surface-1 border-t border-line rounded-t-card shadow-menu flex flex-col font-sans text-ink select-none overflow-hidden transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${
               isMobileVisible && !isMobileClosing
                 ? 'opacity-100 translate-y-0'
                 : 'opacity-0 translate-y-4 pointer-events-none'
@@ -1173,7 +832,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               {renderNavGroupContent(true)}
             </nav>
 
-            {/* Mobile Bottom Controls: Admin + Help & Support + Operative Account / Auth */}
+            {/* Mobile Bottom Controls: Admin + Help & Support (account lives in the top bar) */}
             <div className="mt-auto shrink-0 border-t border-line-subtle divide-y divide-line-subtle bg-surface-1">
               {/* Admin Nav Item (Mobile) */}
               {canViewAdmin && (
@@ -1258,36 +917,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 </button>
               </div>
 
-              {/* Dedicated Operative Account / Auth Separate Row (matching homepage mobile header pattern) */}
-              <div className="p-3 bg-surface-1">
-                {isSessionPending ? (
-                  <div className="flex items-center justify-center py-2" data-testid="mobile-sidebar-auth-skeleton">
-                    <HudGhostSkeleton variant="neutral" preset="avatar" width={32} height={32} />
-                  </div>
-                ) : user ? (
-                  <UserAvatarMenu
-                    user={{...user, avatarConfig:memberAvatar}}
-                    userRole={effectiveUserRole}
-                    displayName={displayName}
-                    onNavigate={(path) => handleNavClick(path)}
-                    inline={true}
-                  />
-                ) : (
-                  <BenthicCTAButton
-                    variant="cyan"
-                    size="md"
-                    fullWidth
-                    onClick={() => {
-                      closeMobileMenu(() => setIsAuthModalOpen(true))
-                    }}
-                  >
-                    <span className="flex items-center justify-center gap-2 text-xs font-bold font-grotesk tracking-wider">
-                      <UserPlus className="w-4 h-4" />
-                      <span>SIGN UP</span>
-                    </span>
-                  </BenthicCTAButton>
-                )}
-              </div>
             </div>
           </div>
           </>,

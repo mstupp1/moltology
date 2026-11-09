@@ -45,24 +45,11 @@ describe('UserAvatarMenu Component', () => {
     expect(screen.getByText('Carcinus Ascendant')).toBeInTheDocument()
     expect(screen.getByText('carcinus@moltology.org')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^settings$/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^moltology home$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^sign out$/i })).toBeInTheDocument()
     expect(screen.getByText('SIGN OUT')).toBeInTheDocument()
     expect(screen.getByText('SETTINGS')).toBeInTheDocument()
-    expect(screen.getByText('MOLTOLOGY HOME')).toBeInTheDocument()
-  })
-
-  it('navigates to / when MOLTOLOGY HOME button is clicked', () => {
-    const mockNavigate = vi.fn()
-    render(<UserAvatarMenu user={mockUser} onNavigate={mockNavigate} />)
-
-    const avatarBtn = screen.getByRole('button', { name: /user account menu/i })
-    fireEvent.click(avatarBtn)
-
-    const homeBtn = screen.getByRole('button', { name: /^moltology home$/i })
-    fireEvent.click(homeBtn)
-
-    expect(mockNavigate).toHaveBeenCalledWith('/')
+    expect(screen.queryByText('MOLTOLOGY HOME')).not.toBeInTheDocument()
+    expect(screen.queryByText('YOUR PROFILE')).not.toBeInTheDocument()
   })
 
   it('prefers a claimed designation over auth name or larva unit', () => {
@@ -257,16 +244,5 @@ describe('UserAvatarMenu Component', () => {
 
     fireEvent.click(settingsBtn)
     expect(onNavigate).toHaveBeenCalledWith('/settings')
-  })
-
-  it('navigates to the own-profile alias from YOUR PROFILE', () => {
-    const onNavigate = vi.fn()
-    render(<UserAvatarMenu user={mockUser} onNavigate={onNavigate} />)
-
-    fireEvent.click(screen.getByRole('button', { name: /user account menu/i }))
-    fireEvent.click(screen.getByRole('button', { name: /^your profile$/i }))
-
-    expect(onNavigate).toHaveBeenCalledWith('/profile')
-    expect(onNavigate).not.toHaveBeenCalledWith('/member/user-123')
   })
 })
