@@ -93,3 +93,19 @@
     background: white !important;
   }
 }
+
+/* Search hits inside the reading paper. */
+.codex-hit {
+  background-color: #f1dc8a;
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 0.08em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+@media print {
+  .codex-hit {
+    background: none !important;
+  }
+}

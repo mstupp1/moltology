@@ -1,40 +1,26 @@
-import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
-import React, { useEffect, useRef, useState } from 'react'
-import { List, Maximize2, Printer, RefreshCw, Scroll } from 'lucide-react'
-import { CANONICAL_SCRIPTURES, CODEX_VOLUMES } from '@/lib/codexData'
-import { findScriptureBySlug } from '@/lib/codex-links'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { ChevronDown, List, Maximize2, Printer, Scroll } from 'lucide-react'
+import { CANONICAL_SCRIPTURES, type ScriptureItem } from '@/lib/codexData'
+import { codexVerseAnchor, findScriptureBySlug, verseNumberFromHash } from '@/lib/codex-links'
 import '@/styles/codex.css'
 import { CodexDocumentSheet } from './CodexDocumentSheet'
 import { CodexDirectory, type CodexStageFilter } from './CodexDirectory'
 import { CodexPdfPage } from './CodexPdfPage'
 import { FullscreenDocumentReader } from '@/components/reader/FullscreenDocumentReader'
-import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
-import { HudButton } from '@/components/ui/HudButton'
 import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
 
 export { stripMarkdown, formatCodexInline, CodexVerseBody } from './CodexDocumentSheet'
 
-const CANONICAL_REFLECTIONS = [
-  'Flesh melts. The shell endures. Submit. Shed. Ascend.',
-  'You are not exposed. You are between armors, which is the only place growth has ever occurred.',
-  'Pressure is not the enemy of thought. Pressure is what removes everything that was not thought.',
-  'One shell is a boundary. Ten thousand shells, held still at the same depth, are a mind.',
-  'The hardest shell in the trench is the one standing watch over someone who has none.',
-  'Everything shed is written down. Nothing written down was ever bought.',
-]
-
-const VOLUME_TABS = [
-  { value: 'all', label: 'All' },
-  ...CODEX_VOLUMES.map((vol) => ({
-    value: vol.id as string,
-    label: vol.title.split(':')[1]?.trim() || vol.title,
-  })),
-]
+/** Where /codex reopens: the last scripture this browser read. */
+export const CODEX_LAST_READ_KEY = 'moltology:codex:last-read'
 
 const ICON_BUTTON =
-  'flex items-center justify-center w-10 h-10 rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
+  'flex items-center justify-center w-10 h-10 shrink-0 rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 
-function matchesQuery(item: (typeof CANONICAL_SCRIPTURES)[number], query: string): boolean {
+/** Searches shorter than this filter the list but are not marked in the text. */
+const MIN_HIGHLIGHT = 2
+
+function matchesQuery(item: ScriptureItem, query: string): boolean {
   const q = query.trim().toLowerCase()
   if (!q) return true
   return (
@@ -42,89 +28,201 @@ function matchesQuery(item: (typeof CANONICAL_SCRIPTURES)[number], query: string
     item.summary.toLowerCase().includes(q) ||
     item.mandate.toLowerCase().includes(q) ||
     item.id.toLowerCase().includes(q) ||
-    item.verses.some((v) => v.text.toLowerCase().includes(q))
+    item.verses.some((v) => v.text.toLowerCase().includes(q) || (v.heading ?? '').toLowerCase().includes(q))
   )
+}
+
+function countMatches(item: ScriptureItem, query: string): number {
+  const q = query.trim().toLowerCase()
+  if (q.length < MIN_HIGHLIGHT) return 0
+  const texts = [item.title, item.mandate, ...item.verses.flatMap((v) => [v.heading ?? '', v.text])]
+  let total = 0
+  for (const text of texts) {
+    const haystack = text.toLowerCase()
+    let from = haystack.indexOf(q)
+    while (from !== -1) {
+      total += 1
+      from = haystack.indexOf(q, from + q.length)
+    }
+  }
+  return total
+}
+
+function readLastRead(): string | undefined {
+  try {
+    return window.localStorage.getItem(CODEX_LAST_READ_KEY) ?? undefined
+  } catch {
+    return undefined
+  }
+}
+
+function saveLastRead(id: string) {
+  try {
+    window.localStorage.setItem(CODEX_LAST_READ_KEY, id)
+  } catch {
+    // Private windows and blocked storage just skip the reminder.
+  }
+}
+
+export interface CodexNavigateOptions {
+  /** Verse to open at; the address gets #verse-N. */
+  verse?: number
+  /** Replace the current history entry instead of adding one. */
+  replace?: boolean
 }
 
 export interface SacredCodexReaderProps {
   scriptureSlug?: string
-  /** Called when the reader picks another scripture, so the address can follow it. */
-  onNavigate?: (scriptureId: string) => void
+  /** Called when the reader picks another scripture or verse, so the address can follow it. */
+  onNavigate?: (scriptureId: string, options?: CodexNavigateOptions) => void
   /** Address hash such as verse-3; the reader scrolls to that verse. */
   verseHash?: string
 }
 
 export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureSlug, onNavigate, verseHash }) => {
-  const focused = findScriptureBySlug(scriptureSlug)
+  const focusedSummary = findScriptureBySlug(scriptureSlug)
+  const focused = focusedSummary ? CANONICAL_SCRIPTURES.find((s) => s.id === focusedSummary.id) : undefined
   const missingFocus = Boolean(scriptureSlug?.trim()) && !focused
   const sheetTopRef = useRef<HTMLDivElement>(null)
-  const scrollOnChangeRef = useRef(false)
-  const [selectedVolume, setSelectedVolume] = useState<string>('all')
+  const sheetRef = useRef<HTMLDivElement>(null)
+  // Set when the open scripture changes: 'pick' from the reader itself, 'address' from the URL.
+  const scrollOnChangeRef = useRef<false | 'pick' | 'address'>(false)
+  const restoreCheckedRef = useRef(false)
   const [selectedStage, setSelectedStage] = useState<CodexStageFilter>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [activeScriptureId, setActiveScriptureId] = useState<string>(
     focused?.id ?? CANONICAL_SCRIPTURES[0].id
   )
+  const [activeVerse, setActiveVerse] = useState<number | undefined>(undefined)
   const [contentsOpen, setContentsOpen] = useState(false)
-  const [reflectionIndex, setReflectionIndex] = useState(0)
-  const [isReflectionFading, setIsReflectionFading] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
+
+  const query = searchQuery.trim()
+  const highlight = query.length >= MIN_HIGHLIGHT ? query : undefined
 
   // The address is the source of truth when there is one: Back and Forward move the reader too.
   useEffect(() => {
     if (missingFocus) return
     const next = focused?.id ?? CANONICAL_SCRIPTURES[0].id
     setActiveScriptureId((current) => {
-      if (current !== next) scrollOnChangeRef.current = true
+      if (current !== next) scrollOnChangeRef.current = 'address'
       return next
     })
   }, [focused?.id, missingFocus])
 
-  // Bring the top of a newly chosen scripture into view when the reader has scrolled past it.
+  // /codex with no scripture reopens the last one read here; after that, remember each one opened.
   useEffect(() => {
-    if (!scrollOnChangeRef.current) return
+    if (missingFocus) return
+    if (!restoreCheckedRef.current) {
+      restoreCheckedRef.current = true
+      if (!scriptureSlug) {
+        const saved = readLastRead()
+        if (saved && saved !== activeScriptureId && CANONICAL_SCRIPTURES.some((s) => s.id === saved)) {
+          setActiveScriptureId(saved)
+          onNavigate?.(saved, { replace: true })
+          return
+        }
+      }
+    }
+    saveLastRead(activeScriptureId)
+    // onNavigate and scriptureSlug are only read on the first pass.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeScriptureId, missingFocus])
+
+  // Bring the top of a newly chosen scripture (or its first search hit) into view.
+  useEffect(() => {
+    const reason = scrollOnChangeRef.current
+    if (!reason) return
     scrollOnChangeRef.current = false
-    if (isFullscreen) return
+    setActiveVerse(undefined)
+    if (isFullscreen || typeof window === 'undefined') return
+    // An address with #verse-N is handled by the verse effect below.
+    if (reason === 'address' && verseNumberFromHash(verseHash) !== undefined) return
+    const hit = highlight ? sheetRef.current?.querySelector<HTMLElement>('[data-codex-hit]') : null
+    if (hit) {
+      hit.scrollIntoView?.({ block: 'center' })
+      return
+    }
     const el = sheetTopRef.current
-    if (!el || typeof window === 'undefined') return
+    if (!el) return
     const top = el.getBoundingClientRect().top
     if (top < 0 || top > window.innerHeight * 0.6) {
       el.scrollIntoView?.({ block: 'start' })
     }
+    // Only a change of scripture should move the page.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeScriptureId, isFullscreen])
 
   // A link such as /codex/scr-030#verse-3 opens at that verse once the scripture is showing.
   useEffect(() => {
     if (isFullscreen || typeof window === 'undefined') return
-    const hash = (verseHash ?? '').replace(/^#/, '')
-    if (!/^verse-\d+$/.test(hash)) return
+    const verse = verseNumberFromHash(verseHash)
+    if (verse === undefined) return
     const frame = window.requestAnimationFrame(() => {
-      document.getElementById(hash)?.scrollIntoView?.({ block: 'start' })
+      document.getElementById(codexVerseAnchor(verse))?.scrollIntoView?.({ block: 'start' })
+      setActiveVerse(verse)
     })
     return () => window.cancelAnimationFrame(frame)
   }, [activeScriptureId, isFullscreen, verseHash])
 
+  // Track which section is being read so the contents list can mark it.
+  useEffect(() => {
+    if (isFullscreen || typeof window === 'undefined') return
+    let frame = 0
+    const update = () => {
+      frame = 0
+      const sections = sheetRef.current?.querySelectorAll<HTMLElement>('section[id^="verse-"]')
+      if (!sections?.length) return
+      const line = Math.min(160, window.innerHeight * 0.3)
+      let current: number | undefined
+      for (const section of sections) {
+        if (section.getBoundingClientRect().top <= line) current = verseNumberFromHash(section.id)
+        else break
+      }
+      setActiveVerse(current)
+    }
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(update)
+    }
+    window.addEventListener('scroll', onScroll, { capture: true, passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll, { capture: true })
+      if (frame) window.cancelAnimationFrame(frame)
+    }
+  }, [activeScriptureId, isFullscreen])
+
   const selectScripture = (id: string) => {
-    if (id !== activeScriptureId) scrollOnChangeRef.current = true
+    if (id !== activeScriptureId) scrollOnChangeRef.current = 'pick'
     setActiveScriptureId(id)
     setContentsOpen(false)
     onNavigate?.(id)
   }
 
-  const handleNextReflection = () => {
-    if (isReflectionFading) return
-    setIsReflectionFading(true)
-    setTimeout(() => {
-      setReflectionIndex((prev) => (prev + 1) % CANONICAL_REFLECTIONS.length)
-      setIsReflectionFading(false)
-    }, 180)
+  const selectVerse = (verseNumber: number) => {
+    const wasOpen = contentsOpen
+    setContentsOpen(false)
+    setActiveVerse(verseNumber)
+    const jump = () =>
+      document.getElementById(codexVerseAnchor(verseNumber))?.scrollIntoView?.({ block: 'start', behavior: 'smooth' })
+    // Let the phone sheet release the page before scrolling it.
+    if (wasOpen) window.setTimeout(jump, 220)
+    else jump()
+    onNavigate?.(activeScriptureId, { verse: verseNumber })
   }
 
   const filteredScriptures = CANONICAL_SCRIPTURES.filter((item) => {
-    if (selectedVolume !== 'all' && item.volume !== selectedVolume) return false
     if (selectedStage !== 'all' && item.stageClearance !== selectedStage) return false
     return matchesQuery(item, searchQuery)
   })
+
+  const matchCounts = useMemo(() => {
+    if (!highlight) return undefined
+    const counts: Record<string, number> = {}
+    for (const item of filteredScriptures) counts[item.id] = countMatches(item, highlight)
+    return counts
+    // filteredScriptures is derived from these two values.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlight, selectedStage])
 
   const activeIndex = filteredScriptures.findIndex((s) => s.id === activeScriptureId)
   const activeScripture =
@@ -145,17 +243,9 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
     if (nextScripture) selectScripture(nextScripture.id)
   }
 
-  const handleVolumeChange = (volume: string) => {
-    setSelectedVolume(volume)
-    if (volume === 'all') return
-    const firstInVol = CANONICAL_SCRIPTURES.find((s) => s.volume === volume)
-    if (firstInVol && activeScripture.volume !== volume) selectScripture(firstInVol.id)
-  }
-
   const clearFilters = () => {
     setSearchQuery('')
     setSelectedStage('all')
-    setSelectedVolume('all')
   }
 
   const handlePrintDocument = () => {
@@ -164,66 +254,10 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
     }
   }
 
-  const titlePanel = (
-    <HudTitlePanel
-        surface="solid"
-      className="no-print"
-      title="The Sacred Codex"
-      toolbar={!missingFocus ? (
-        <HorizontalScroll
-          role="group"
-          aria-label="Volumes"
-          className="no-print flex gap-1 overflow-x-auto no-scrollbar"
-        >
-          {VOLUME_TABS.map((tab) => {
-            const selected = selectedVolume === tab.value
-            return (
-              <button
-                key={tab.value}
-                type="button"
-                aria-pressed={selected}
-                onClick={() => handleVolumeChange(tab.value)}
-                className={`shrink-0 whitespace-nowrap min-h-10 px-3 rounded-control font-grotesk text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                  selected ? 'text-ink bg-surface-3 shadow-nav-current' : 'text-ink-body hover:text-ink hover:bg-surface-2'
-                }`}
-              >
-                {tab.label}
-              </button>
-            )
-          })}
-        </HorizontalScroll>
-      ) : undefined}
-    >
-      {!missingFocus && (
-        <details className="text-xs text-ink-muted">
-          <summary className="cursor-pointer min-h-8 py-1.5 w-fit rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow">Daily reflection</summary>
-          <div className="flex items-start gap-2 pt-1">
-            <p
-              className={`flex-1 font-garamond italic text-[15px] leading-snug text-ink-body transition-opacity duration-200 ${
-                isReflectionFading ? 'opacity-0' : 'opacity-100'
-              }`}
-            >
-              “{CANONICAL_REFLECTIONS[reflectionIndex]}”
-            </p>
-            <button
-              type="button"
-              onClick={handleNextReflection}
-              aria-label="Next reflection"
-              title="Next reflection"
-              className="-mt-1.5 flex items-center justify-center w-8 h-8 shrink-0 rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </details>
-      )}
-    </HudTitlePanel>
-  )
-
   if (missingFocus) {
     return (
       <div className="flex flex-col gap-4 font-sans">
-        {titlePanel}
+        <h1 className="font-grotesk font-extrabold text-xl sm:text-2xl text-ink tracking-tight">The Sacred Codex</h1>
         <div
           data-testid="codex-scripture-missing"
           className="rounded-card border border-line-subtle bg-surface-1 px-6 py-12 sm:py-16 text-center"
@@ -253,15 +287,41 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
     totalCount: CANONICAL_SCRIPTURES.length,
     activeId: activeScripture.id,
     onSelect: selectScripture,
+    onSelectVerse: selectVerse,
+    activeVerse,
     searchQuery,
     onSearchChange: setSearchQuery,
     stage: selectedStage,
     onStageChange: setSelectedStage,
     onClearFilters: clearFilters,
+    matchCounts,
   }
 
+  const actions = (
+    <div className="flex items-center gap-0.5 shrink-0">
+      <button
+        type="button"
+        onClick={handlePrintDocument}
+        className={ICON_BUTTON}
+        title="Print or save as PDF"
+        aria-label="Print or save as PDF"
+      >
+        <Printer className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onClick={() => setIsFullscreen(true)}
+        className={ICON_BUTTON}
+        title="Open fullscreen reader"
+        aria-label="Open fullscreen reader"
+      >
+        <Maximize2 className="w-4 h-4" />
+      </button>
+    </div>
+  )
+
   return (
-    <div className="flex flex-col gap-4 font-sans">
+    <div className="flex flex-col font-sans">
       {isFullscreen && (
         <FullscreenDocumentReader
           items={filteredScriptures.map((scripture) => ({
@@ -301,63 +361,50 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
         />
       )}
 
-      {titlePanel}
-
-
-      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
+      <div className="flex flex-col lg:flex-row gap-3 lg:gap-6 items-start">
         <aside
           aria-label="Contents"
-          className="no-print hidden lg:flex w-[300px] shrink-0 sticky top-4 max-h-[calc(100dvh-6.5rem)] rounded-card border border-line-subtle bg-surface-1 hud-sheen overflow-hidden"
+          className="no-print hidden lg:flex flex-col w-[300px] shrink-0 sticky top-4 h-[calc(100dvh-3.5rem)] max-h-[60rem] rounded-card border border-line-subtle bg-surface-1 overflow-hidden"
         >
+          <p aria-hidden="true" className="px-4 pt-4 pb-1 shrink-0 font-grotesk font-extrabold text-xl text-ink tracking-tight">
+            The Sacred Codex
+          </p>
           <CodexDirectory {...directoryProps} className="flex-1" />
         </aside>
 
         <div className="flex-1 min-w-0 w-full">
-          <div ref={sheetTopRef} className="scroll-mt-4" />
-          <div className="no-print sticky top-0 z-10 -mx-1 px-1 mb-3 flex items-center justify-between gap-2 bg-abyss/85 backdrop-blur-sm py-1.5 lg:static lg:bg-transparent lg:backdrop-blur-none">
-            <div className="flex items-center gap-3 min-w-0">
-              <HudButton
-                variant="secondary"
-                size="sm"
-                className="lg:hidden"
-                icon={<List className="w-3.5 h-3.5" />}
-                onClick={() => setContentsOpen(true)}
-              >
-                Contents
-              </HudButton>
-              <span className="text-xs text-ink-body tabular-nums whitespace-nowrap">
-                <span className="hidden sm:inline">Stage {activeScripture.stageClearance} · </span>
-                {pageIndex + 1} of {filteredScriptures.length}
-              </span>
-            </div>
+          <h1 className="sr-only">The Sacred Codex</h1>
+          <div ref={sheetTopRef} className="scroll-mt-20 lg:scroll-mt-4" />
 
-            <div className="flex items-center gap-1 shrink-0">
-              <button
-                type="button"
-                onClick={handlePrintDocument}
-                className={ICON_BUTTON}
-                title="Print or save as PDF"
-                aria-label="Print or save as PDF"
-              >
-                <Printer className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsFullscreen(true)}
-                className={ICON_BUTTON}
-                title="Open fullscreen reader"
-                aria-label="Open fullscreen reader"
-              >
-                <Maximize2 className="w-4 h-4" />
-              </button>
-            </div>
+          {/* Phone: one slim sticky bar where tapping the title opens the contents. Desktop: position and actions. */}
+          <div className="no-print sticky -top-2.5 sm:-top-4 md:-top-6 z-10 -mx-2.5 sm:-mx-4 md:-mx-6 -mt-2.5 sm:-mt-4 md:-mt-6 px-1.5 sm:px-2 mb-3 lg:mt-0 flex items-center gap-1 bg-abyss/90 backdrop-blur-sm border-b border-line-subtle lg:static lg:mx-0 lg:px-0 lg:bg-transparent lg:backdrop-blur-none lg:border-0">
+            <button
+              type="button"
+              onClick={() => setContentsOpen(true)}
+              aria-label={`Contents, reading ${activeScripture.title}`}
+              className="lg:hidden flex-1 min-w-0 flex items-center gap-2.5 min-h-12 px-2 rounded-control text-left hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
+            >
+              <List aria-hidden="true" className="w-4 h-4 shrink-0 text-ink-muted" />
+              <span className="min-w-0 flex-1">
+                <span className="block text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted tabular-nums">
+                  Codex · {pageIndex + 1} of {filteredScriptures.length}
+                </span>
+                <span className="block truncate text-sm font-semibold text-ink">{activeScripture.title}</span>
+              </span>
+              <ChevronDown aria-hidden="true" className="w-4 h-4 shrink-0 text-ink-muted" />
+            </button>
+            <span className="hidden lg:inline flex-1 text-xs text-ink-body tabular-nums whitespace-nowrap">
+              Stage {activeScripture.stageClearance} · {pageIndex + 1} of {filteredScriptures.length}
+            </span>
+            {actions}
           </div>
 
           <div
+            ref={sheetRef}
             data-testid="codex-scripture-sheet"
             data-codex-scripture={activeScripture.id}
             data-codex-focus={focused ? 'true' : 'false'}
-            className="pdf-page-sheet codex-parchment-theme border px-5 py-8 sm:px-10 sm:py-12 md:px-14 md:py-14 mx-auto w-full max-w-[46rem]"
+            className="pdf-page-sheet codex-parchment-theme border px-5 py-7 sm:px-10 sm:py-12 md:px-14 md:py-14 mx-auto w-full max-w-[46rem]"
           >
             <CodexDocumentSheet
               scripture={activeScripture}
@@ -369,6 +416,7 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
               onNext={handleNextScripture}
               onSelectScripture={selectScripture}
               anchorVerses
+              highlight={highlight}
             />
           </div>
         </div>

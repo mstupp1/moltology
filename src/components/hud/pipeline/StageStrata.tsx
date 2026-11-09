@@ -1,7 +1,7 @@
 import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
-import { STAGE_PIPELINE_DATA } from '@/lib/codexData'
+import { STAGE_PIPELINE_DATA } from '@/lib/codexStages'
 import { PIPELINE_CLEARANCES } from '@/lib/pipeline-explorer'
 import { getAssetUrl } from '@/lib/assets'
 import { STAGE_ART } from '@/lib/stage-art'

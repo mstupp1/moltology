@@ -1,7 +1,8 @@
 import React, { Suspense, lazy, useCallback } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
-import { scriptureSlugFromId } from '@/lib/codex-links'
+import { codexVerseAnchor, scriptureSlugFromId } from '@/lib/codex-links'
+import type { CodexNavigateOptions } from './SacredCodexReader'
 
 const LazySacredCodexReader = lazy(() =>
   import('./SacredCodexReader').then((m) => ({ default: m.SacredCodexReader })),
@@ -10,11 +11,14 @@ const LazySacredCodexReader = lazy(() =>
 export function CodexChamber({ scriptureSlug, verseHash }: { scriptureSlug?: string; verseHash?: string }) {
   const navigate = useNavigate()
   const handleNavigate = useCallback(
-    (scriptureId: string) => {
+    (scriptureId: string, options?: CodexNavigateOptions) => {
       void navigate({
         to: '/codex/$slug',
         params: { slug: scriptureSlugFromId(scriptureId) },
+        hash: options?.verse !== undefined ? codexVerseAnchor(options.verse) : undefined,
+        replace: options?.replace,
         resetScroll: false,
+        hashScrollIntoView: false,
       })
     },
     [navigate]

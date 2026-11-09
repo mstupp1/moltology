@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from '@tanstack/react-router'
 import { BookOpen, Check, Lock } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { StagePipelineInfo } from '@/lib/codexData'
+import type { StagePipelineInfo } from '@/lib/codexStages'
 import {
   PIPELINE_CLEARANCES,
   clearanceStatus,

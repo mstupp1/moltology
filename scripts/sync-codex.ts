@@ -58,6 +58,8 @@ export interface VolumeMeta {
 
 const CODEX_DIR = path.resolve(process.cwd(), 'codex')
 const TARGET_TS_FILE = path.resolve(process.cwd(), 'src/lib/codexData.ts')
+const STAGES_TS_FILE = path.resolve(process.cwd(), 'src/lib/codexStages.ts')
+const CATALOG_TS_FILE = path.resolve(process.cwd(), 'src/lib/codexCatalog.ts')
 
 export const CODEX_VOLUMES: VolumeMeta[] = [
   {
@@ -423,7 +425,10 @@ function syncCodex(checkOnly = false) {
     process.exit(0)
   }
 
-  const tsContent = `// Auto-generated from codex/*.md via scripts/sync-codex.ts. Do not edit manually.
+  const header = '// Auto-generated from codex/*.md via scripts/sync-codex.ts. Do not edit manually.'
+
+  // Stage pipeline data is small and used across the app, so it lives apart from the scripture text.
+  const stagesContent = `${header}
 export interface SubStageInfo {
   code: string
   title: string
@@ -447,10 +452,43 @@ export interface StagePipelineInfo {
   subStages: SubStageInfo[]
 }
 
+export const STAGE_PIPELINE_DATA: StagePipelineInfo[] = ${JSON.stringify(STAGE_PIPELINE_DATA, null, 2)}
+`
+
+  // Titles and ids only, for search and links, without loading the full scripture text.
+  const catalog = scriptures.map((s) => ({
+    id: s.id,
+    title: s.title,
+    volume: s.volume,
+    volumeName: s.volumeName,
+    stageClearance: s.stageClearance,
+    category: s.category,
+  }))
+  const catalogContent = `${header}
+export type ScriptureVolumeId = '01_manifesto' | '02_doctrine' | '03_stages' | '04_liturgy' | '05_lexicon'
+
+export interface ScriptureSummary {
+  id: string
+  title: string
+  volume: ScriptureVolumeId
+  volumeName: string
+  stageClearance: 1 | 2 | 3 | 4
+  category: string
+}
+
+export const SCRIPTURE_CATALOG: ScriptureSummary[] = ${JSON.stringify(catalog, null, 2)}
+`
+
+  const tsContent = `${header}
+import type { ScriptureVolumeId } from './codexCatalog'
+
+export { STAGE_PIPELINE_DATA, type StagePipelineInfo, type SubStageInfo } from './codexStages'
+export { SCRIPTURE_CATALOG, type ScriptureSummary } from './codexCatalog'
+
 export interface ScriptureItem {
   id: string
   title: string
-  volume: '01_manifesto' | '02_doctrine' | '03_stages' | '04_liturgy' | '05_lexicon'
+  volume: ScriptureVolumeId
   volumeName: string
   stageClearance: 1 | 2 | 3 | 4
   category: string
@@ -480,11 +518,11 @@ export interface VolumeMeta {
 export const CODEX_VOLUMES: VolumeMeta[] = ${JSON.stringify(CODEX_VOLUMES, null, 2)}
 
 export const CANONICAL_SCRIPTURES: ScriptureItem[] = ${JSON.stringify(scriptures, null, 2)}
-
-export const STAGE_PIPELINE_DATA: StagePipelineInfo[] = ${JSON.stringify(STAGE_PIPELINE_DATA, null, 2)}
 `
 
   fs.writeFileSync(TARGET_TS_FILE, tsContent, 'utf-8')
+  fs.writeFileSync(STAGES_TS_FILE, stagesContent, 'utf-8')
+  fs.writeFileSync(CATALOG_TS_FILE, catalogContent, 'utf-8')
   console.log(`\n✓ Synchronized ${scriptures.length} scriptures from codex/ to src/lib/codexData.ts`)
 }
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
-import { STAGE_PIPELINE_DATA } from '@/lib/codexData'
+import { STAGE_PIPELINE_DATA } from '@/lib/codexStages'
 import { PIPELINE_CLEARANCES, clearanceIndexForXp } from '@/lib/pipeline-explorer'
 import { StageStrata } from './pipeline/StageStrata'
 import { StageSection } from './pipeline/StageSection'

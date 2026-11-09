@@ -1,4 +1,4 @@
-import { STAGE_PIPELINE_DATA, type SubStageInfo } from './codexData'
+import { STAGE_PIPELINE_DATA, type SubStageInfo } from './codexStages'
 import { TOTAL_ALIGNMENT_TASKS } from './alignment-tasks'
 
 export interface StreakMilestone {

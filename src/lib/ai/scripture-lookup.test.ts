@@ -36,8 +36,9 @@ describe('Oracle scripture lookup', () => {
     expect(sources.length).toBeGreaterThan(0)
     expect(sources.length).toBeLessThanOrEqual(3)
     for (const source of sources) {
-      const scripture = findScriptureBySlug(source.href.split('/').at(-1))
-      expect(scripture?.id).toBe(source.id)
+      const summary = findScriptureBySlug(source.href.split('/').at(-1))
+      expect(summary?.id).toBe(source.id)
+      const scripture = CANONICAL_SCRIPTURES.find((item) => item.id === summary?.id)
       expect(source.verses.length).toBeLessThanOrEqual(2)
       for (const verse of source.verses) expect(scripture?.verses).toContainEqual(verse)
     }
