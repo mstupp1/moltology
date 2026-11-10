@@ -1,8 +1,6 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { baselineLook, type Avatar3DLook } from '@/lib/avatar3d/look'
 import {
-  AVATAR_ACCESSORIES,
-  AVATAR_ACCESSORY_LABELS,
   AVATAR_ANTENNAE,
   AVATAR_ANTENNAE_LABELS,
   AVATAR_BUILD_LABELS,
@@ -25,10 +23,41 @@ import {
   SHELL_PALETTES,
 } from '@/lib/avatar/traits'
 import { AVATAR_EYE_COLORS, EYE_COLOR_SWATCH, type Expression } from '@/lib/avatar/parts'
+import { STARTER_CHARACTER_EQUIPMENT } from '@/lib/avatar/starter-equipment'
+import type { EquippedAppearance } from '@/lib/character-appearance'
+import { EQUIP_SLOT_IDS, equipSlotCategory, type EquipSlotId } from '@/lib/chassis-loadout'
+import { BASE_EQUIPMENT_CATALOG } from '@/lib/equipment-seed-data'
+import { RARITY_LABELS, RARITY_ORDER, variantKey } from '@/lib/gear-variants'
+import { HudSelect } from '@/components/ui/HudSelect'
+import type { EquipmentRarity } from '@/db/schema'
 import { cn } from '@/lib/utils'
 import { Avatar3DStage } from './Avatar3DStage'
 
 const EXPRESSIONS = Object.keys(AVATAR_EXPRESSION_LABELS) as Expression[]
+
+const SLOT_LABELS: Record<EquipSlotId, string> = {
+  head: 'Head',
+  carapace: 'Chest',
+  'claws-1': 'Left claw',
+  'claws-2': 'Right claw',
+  belt: 'Belt',
+  legs: 'Legs',
+  antennae: 'Antennae',
+}
+
+type GearPicks = Partial<Record<EquipSlotId, string>>
+
+const SLOT_OPTIONS = Object.fromEntries(
+  EQUIP_SLOT_IDS.map((slot) => [
+    slot,
+    [
+      { value: '', label: 'Nothing' },
+      ...BASE_EQUIPMENT_CATALOG.filter((item) => item.category === equipSlotCategory(slot)).map((item) => ({ value: item.appearanceKey || item.slug, label: item.name })),
+    ],
+  ]),
+) as Record<EquipSlotId, { value: string; label: string }[]>
+
+const STARTER_PICKS: GearPicks = Object.fromEntries(Object.entries(STARTER_CHARACTER_EQUIPMENT).map(([slot, item]) => [slot, item.visualKey]))
 
 function Chips<T extends string>({ label, options, value, onChange, labels }: { label: string; options: readonly T[]; value: T; onChange: (v: T) => void; labels: Readonly<Record<string, string>> }) {
   return (
@@ -84,13 +113,23 @@ function Swatches<T extends string>({ label, options, value, onChange }: { label
 export function Avatar3DLab() {
   const [look, setLook] = useState<Avatar3DLook>(() => baselineLook('lobster'))
   const [spin, setSpin] = useState(false)
+  const [gear, setGear] = useState<GearPicks>({})
+  const [tier, setTier] = useState<EquipmentRarity>('common')
+  const shown = useMemo<Avatar3DLook>(() => {
+    const equipment: EquippedAppearance = {}
+    for (const slot of EQUIP_SLOT_IDS) {
+      const key = gear[slot]
+      if (key) equipment[slot] = { visualKey: tier === 'common' ? key : variantKey(key, tier), rarity: tier }
+    }
+    return { ...look, equipment }
+  }, [look, gear, tier])
   const set = <K extends keyof Avatar3DLook>(key: K, value: Avatar3DLook[K]) => setLook((prev) => ({ ...prev, [key]: value }))
 
   return (
     <div className="flex min-h-0 w-full flex-1 flex-col gap-4 lg:flex-row lg:gap-6" data-testid="avatar-3d-lab">
       <section className="relative h-[46vh] min-h-[300px] shrink-0 overflow-hidden rounded-card bg-surface-1 lg:h-auto lg:min-h-[520px] lg:flex-1">
         <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(34,211,238,0.14),transparent_62%)]" />
-        <Avatar3DStage look={look} spin={spin} className="relative" />
+        <Avatar3DStage look={shown} spin={spin} className="relative" />
         <p className="pointer-events-none absolute left-3 top-3 text-xs text-ink-muted">Drag to turn</p>
       </section>
 
@@ -123,7 +162,23 @@ export function Avatar3DLab() {
           value={look.eyeColor}
           onChange={(v) => set('eyeColor', v)}
         />
-        <Chips label="Hat" options={AVATAR_ACCESSORIES} value={look.accessory} onChange={(v) => set('accessory', v)} labels={AVATAR_ACCESSORY_LABELS} />
+        <fieldset className="min-w-0">
+          <legend className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">Gear</legend>
+          <div className="mb-3 flex flex-wrap gap-1.5">
+            <button type="button" onClick={() => setGear(STARTER_PICKS)} className="inline-flex min-h-8 items-center rounded-control bg-surface-2 px-2.5 text-xs font-medium text-ink-muted transition-colors hover:bg-surface-3/60 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
+              Starter set
+            </button>
+            <button type="button" onClick={() => setGear({})} className="inline-flex min-h-8 items-center rounded-control bg-surface-2 px-2.5 text-xs font-medium text-ink-muted transition-colors hover:bg-surface-3/60 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
+              Take it all off
+            </button>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
+            {EQUIP_SLOT_IDS.map((slot) => (
+              <HudSelect key={slot} fullWidth label={SLOT_LABELS[slot]} options={SLOT_OPTIONS[slot]} value={gear[slot] ?? ''} onChange={(e) => setGear((prev) => ({ ...prev, [slot]: e.target.value || undefined }))} />
+            ))}
+          </div>
+        </fieldset>
+        <Chips label="Gear tier" options={RARITY_ORDER} value={tier} onChange={setTier} labels={RARITY_LABELS} />
         <label className="flex min-h-11 items-center gap-2 text-sm text-ink">
           <input type="checkbox" checked={spin} onChange={(e) => setSpin(e.target.checked)} className="h-4 w-4 accent-cyan-glow" />
           Turn slowly

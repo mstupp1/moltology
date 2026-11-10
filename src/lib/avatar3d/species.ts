@@ -484,7 +484,7 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   })
   rig.add('tail', 'shell', merge(lobes))
 
-  const face = addFace(rig, look, { shell: carapace, bone: 'chest', eyeY: 1.525, eyeSpread: 0.53, eyeRadius: 0.118, browY: 1.688, browSpan: 0.46, browArch: 0.22, mouthY: 1.35, mouthHalf: 0.44 })
+  const face = addFace(rig, look, { shell: carapace, bone: 'chest', eyeY: 1.525, eyeSpread: 0.47, eyeRadius: 0.105, browY: 1.688, browSpan: 0.46, browArch: 0.22, mouthY: 1.35, mouthHalf: 0.44 })
 
   const antenna = addAntennae(rig, look.antennae, {
     parent: 'chest',
@@ -540,7 +540,7 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   rig.wear = {
     race: 'lobster',
     torso: { loft: abdomen, bone: 'pelvis', top: 1.16, bottom: 0.82, belt: 0.74 },
-    head: { loft: carapace, bone: 'chest', top, eyeY: 1.525, eyeRadius: 0.118 },
+    head: { loft: carapace, bone: 'chest', top, eyeY: 1.525, eyeRadius: 0.105 },
     arm,
     leg,
     antenna,

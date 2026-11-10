@@ -358,28 +358,30 @@ function clawGear(kit: Kit, wear: Wearable, tag: 'L' | 'R'): void {
   }
 }
 
-/** Held in the pinch, raised in front of the arm. */
+/** Held upright in the pinch: the shaft runs up the front of the claw and the head sits above it. */
 function hammer(kit: Kit, wear: Wearable, tag: 'L' | 'R'): void {
   const socket = kit.rig.sockets.get(`claw${tag}`)
   if (!socket) return
   const { construction: n } = kit.visual
   const bone = `claw${tag}`
-  const S = wear.arm.clawSize
-  const q = alongY(v(0, 0.62, 0.78))
-  const grip = socket.node.position.clone()
+  const { clawSize: S, claw: style } = wear.arm
+  const lean = tag === 'L' ? -0.16 : 0.16
+  const q = alongY(v(lean, 1, 0.1))
+  // Clear of the palm's front face.
+  const grip = socket.node.position.clone().add(v(0, 0, 0.24 * style.bulk * S * style.depth + 0.035))
   const part = (geo: BufferGeometry, along: number) => placed(geo, grip.clone().add(v(0, along, 0).applyQuaternion(q)), q)
-  const length = 0.62 * S + 0.12
-  kit.add(bone, 'dark', part(new CylinderGeometry(0.02, 0.022, length, 14), length / 2 - 0.1))
-  kit.add(bone, 'trim', part(new CylinderGeometry(0.027, 0.027, 0.05, 14), -0.1))
-  for (const at of [0.02, 0.07, 0.12]) kit.add(bone, 'plate', part(new TorusGeometry(0.023, 0.006, 6, 14).rotateX(Math.PI / 2), at))
-  const w = 0.2 + n * 0.014
-  const h = 0.11 + n * 0.008
-  const top = length - 0.1
-  const head = new BoxGeometry(w, h, h * 0.95, 1, 1, 1)
-  kit.add(bone, 'plate', part(head, top))
+  const below = 0.16 * S
+  const length = 0.74 * S + below
+  kit.add(bone, 'dark', part(new CylinderGeometry(0.02, 0.023, length, 14), length / 2 - below))
+  kit.add(bone, 'trim', part(new CylinderGeometry(0.029, 0.029, 0.045, 14), -below))
+  for (const at of [0.0, 0.05, 0.1]) kit.add(bone, 'plate', part(new TorusGeometry(0.024, 0.006, 6, 14).rotateX(Math.PI / 2), at))
+  const w = 0.22 + n * 0.014
+  const h = 0.12 + n * 0.008
+  const top = length - below
+  kit.add(bone, 'plate', part(new BoxGeometry(w, h, h * 0.95), top))
   for (const side of [1, -1]) {
     kit.add(bone, 'trim', part(new BoxGeometry(0.03, h * 1.12, h * 1.07).translate(side * (w / 2 - 0.005), 0, 0), top))
-    kit.add(bone, 'accent', part(new BoxGeometry(w * 0.34, 0.012, 0.012).translate(side * w * 0.2, 0, h * 0.48), top))
+    kit.add(bone, 'accent', part(new BoxGeometry(w * 0.3, 0.012, 0.012).translate(side * w * 0.22, 0, h * 0.48), top))
   }
   kit.add(bone, 'trim', part(new BoxGeometry(0.07, h * 1.1, h * 1.04), top))
   if (n >= 2) kit.add(bone, 'trim', part(new ConeGeometry(0.03, 0.07, 10).translate(0, h / 2 + 0.03, 0), top))

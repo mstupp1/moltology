@@ -1,11 +1,30 @@
 import { describe, expect, it } from 'vitest'
 import { AVATAR_ACCESSORIES, AVATAR_ANTENNAE, AVATAR_BUILDS, AVATAR_CLAWS, AVATAR_HEAD_SHAPES, AVATAR_MOUTHS, AVATAR_POSES, AVATAR_RACES, SHELL_MARKINGS } from '../avatar/traits'
+import type { Mesh, Object3D } from 'three'
+import { EQUIPMENT_VISUALS } from '../avatar/equipment'
+import { STARTER_CHARACTER_EQUIPMENT } from '../avatar/starter-equipment'
+import type { EquippedAppearance } from '../character-appearance'
+import { ALL_EQUIPMENT_CATALOG } from '../equipment-seed-data'
 import { buildCharacter } from './character'
+import { supportsEquipment } from './equipment'
 import { SUPPORTED_ACCESSORIES } from './gear'
 import { baselineLook } from './look'
 import { keySampler } from './loft'
 
 const SOCKETS = ['head', 'ears', 'face', 'back', 'chest', 'waist', 'clawL', 'clawR', 'wristL', 'wristR', 'footL', 'footR']
+
+/** Meshes that belong to equipped gear: armour plates and anything mounted on a socket. */
+function gearMeshes(root: Object3D): Mesh[] {
+  const out: Mesh[] = []
+  root.traverse((node) => {
+    const mesh = node as Mesh
+    if (!mesh.isMesh) return
+    let inSocket = false
+    for (let p = node.parent; p; p = p.parent) if (p.name.startsWith('socket:')) inSocket = true
+    if (mesh.name.startsWith('gear:') || inSocket) out.push(mesh)
+  })
+  return out
+}
 
 function finite(character: ReturnType<typeof buildCharacter>): boolean {
   return character.rig.meshes.every((mesh) => {
@@ -80,6 +99,32 @@ describe('avatar3d', () => {
     const socket = character.rig.sockets.get('head')!
     expect(socket.node.children).toHaveLength(1)
     expect(socket.node.children[0].scale.x).toBeCloseTo(socket.radius)
+    character.dispose()
+  })
+
+  it.each(AVATAR_RACES)('builds every catalog item on a %s, attached to the body part it covers', (race) => {
+    const slotsFor = { carapace: ['carapace'], belt: ['belt'], legs: ['legs'], antennae: ['antennae'], head: ['head'], claws: ['claws-1', 'claws-2'] } as const
+    for (const visual of Object.values(EQUIPMENT_VISUALS)) {
+      for (const slot of slotsFor[visual.category]) {
+        const equipment: EquippedAppearance = { [slot]: { visualKey: visual.key, rarity: 'common' } }
+        const character = buildCharacter({ ...baselineLook(race), equipment })
+        const gear = gearMeshes(character.root)
+        expect(gear.length, `${visual.key} on ${slot}`).toBeGreaterThan(0)
+        for (const mesh of gear) {
+          const array = mesh.geometry.getAttribute('position').array
+          expect(array.length).toBeGreaterThan(0)
+          for (let i = 0; i < array.length; i++) if (!Number.isFinite(array[i])) throw new Error(`${visual.key}: bad vertex`)
+        }
+        character.dispose()
+        expect(gearMeshes(character.root)).toHaveLength(0)
+      }
+    }
+  }, 120_000)
+
+  it('builds every rarity variant in the catalog and the starter set', () => {
+    for (const item of ALL_EQUIPMENT_CATALOG) expect(supportsEquipment(item.appearanceKey || item.slug), item.slug).toBe(true)
+    const character = buildCharacter({ ...baselineLook('crab'), pose: 'cheer', equipment: STARTER_CHARACTER_EQUIPMENT })
+    expect(gearMeshes(character.root).length).toBeGreaterThan(6)
     character.dispose()
   })
 
