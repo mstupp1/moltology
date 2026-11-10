@@ -404,3 +404,40 @@ export function bellyPlates(host: Loft, o: BellyOptions): BufferGeometry {
   }
   return geo
 }
+
+/**
+ * A thin patch defined by a function over the unit square, with rounded-off corners left to the
+ * caller's curves. Used for anything painted onto a shell that needs its own colour.
+ */
+export function surfacePatch(at: (u: number, t: number) => Vector3, facing: Vector3, cols = 24, rows = 8): BufferGeometry {
+  const positions = new Float32Array((rows + 1) * (cols + 1) * 3)
+  for (let i = 0; i <= rows; i++) {
+    for (let j = 0; j <= cols; j++) {
+      const p = at(j / cols, i / rows)
+      positions.set([p.x, p.y, p.z], (i * (cols + 1) + j) * 3)
+    }
+  }
+  const index: number[] = []
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      const a = i * (cols + 1) + j
+      const b = a + cols + 1
+      index.push(a, b, a + 1, a + 1, b, b + 1)
+    }
+  }
+  const geo = new BufferGeometry()
+  geo.setAttribute('position', new BufferAttribute(positions, 3))
+  geo.setIndex(index)
+  geo.computeVertexNormals()
+  const mid = Math.floor(rows / 2) * (cols + 1) + Math.floor(cols / 2)
+  if (new Vector3().fromBufferAttribute(geo.getAttribute('normal'), mid).dot(facing) < 0) {
+    for (let i = 0; i < index.length; i += 3) {
+      const t = index[i + 1]
+      index[i + 1] = index[i + 2]
+      index[i + 2] = t
+    }
+    geo.setIndex(index)
+    geo.computeVertexNormals()
+  }
+  return withAo(geo)
+}

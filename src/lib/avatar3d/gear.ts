@@ -4,7 +4,7 @@
  */
 import { Color, ConeGeometry, CylinderGeometry, Group, Mesh, MeshPhysicalMaterial, SphereGeometry, TorusGeometry, type Material } from 'three'
 import type { AvatarAccessory } from '../avatar/traits'
-import type { Rig } from './rig'
+import type { Rig, SocketInfo } from './rig'
 
 export interface GearItem {
   socket: string
@@ -39,7 +39,7 @@ const metal = (color: string, roughness = 0.24) => new MeshPhysicalMaterial({ co
 const gloss = (color: string) => new MeshPhysicalMaterial({ color: new Color(color), roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.15 })
 const cloth = (color: string) => new MeshPhysicalMaterial({ color: new Color(color), roughness: 0.9, sheen: 1, sheenRoughness: 0.8, sheenColor: new Color('#ffffff') })
 
-const HEAD_GEAR: Partial<Record<AvatarAccessory, () => GearItem>> = {
+const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo) => GearItem>> = {
   crown: () =>
     item('head', (add) => {
       const gold = metal('#f5b93a')
@@ -101,6 +101,58 @@ const HEAD_GEAR: Partial<Record<AvatarAccessory, () => GearItem>> = {
       pom.translate(0, 1.3, 0)
       add(pom, cloth('#e4f2ff'))
     }),
+  bow: () =>
+    item('head', (add) => {
+      const ribbon = cloth('#ff5a8a')
+      for (const side of [1, -1]) {
+        const loop = new SphereGeometry(0.42, 18, 12)
+        loop.scale(1, 0.72, 0.42)
+        loop.rotateZ(side * 0.35)
+        loop.translate(side * 0.44 + 0.45, 0.36, 0.25)
+        add(loop, ribbon)
+      }
+      const knot = new SphereGeometry(0.17, 14, 10)
+      knot.translate(0.45, 0.33, 0.3)
+      add(knot, cloth('#e0356b'))
+    }),
+  headset: (socket) =>
+    item('ears', (add) => {
+      const dark = gloss('#1c2430')
+      // The band arches from ear to ear over the crown, whatever the head's proportions.
+      const band = new TorusGeometry(1.04, 0.07, 10, 40, Math.PI)
+      band.scale(1, ((socket?.rise ?? socket?.radius ?? 1) / (socket?.radius ?? 1)) * 1.06, 1)
+      add(band, dark)
+      for (const side of [1, -1]) {
+        const cup = new CylinderGeometry(0.26, 0.26, 0.16, 24)
+        cup.rotateZ(Math.PI / 2)
+        cup.translate(side * 1.04, 0, 0)
+        add(cup, dark)
+        const pad = new TorusGeometry(0.2, 0.06, 8, 24)
+        pad.rotateY(Math.PI / 2)
+        pad.translate(side * 1.12, 0, 0)
+        add(pad, new MeshPhysicalMaterial({ color: new Color('#22d3ee'), emissive: new Color('#0e7f92'), roughness: 0.4 }))
+      }
+      const boom = new CylinderGeometry(0.028, 0.028, 0.8, 8)
+      boom.rotateX(Math.PI / 2)
+      boom.rotateY(-0.5)
+      boom.translate(0.86, -0.22, 0.36)
+      add(boom, dark)
+      const mic = new SphereGeometry(0.08, 12, 10)
+      mic.translate(0.67, -0.22, 0.71)
+      add(mic, dark)
+    }),
+  visor: () =>
+    item('face', (add) => {
+      const glass = new MeshPhysicalMaterial({ color: new Color('#22d3ee'), emissive: new Color('#0b8fa6'), emissiveIntensity: 0.9, roughness: 0.1, transparent: true, opacity: 0.55, side: 2, depthWrite: false })
+      const band = new CylinderGeometry(1.12, 1.12, 0.62, 40, 1, true, -1.05, 2.1)
+      band.translate(0, 0.02, -0.98)
+      add(band, glass).castShadow = false
+      const frame = new TorusGeometry(1.13, 0.045, 8, 40, 2.1)
+      frame.rotateX(Math.PI / 2)
+      frame.rotateY(Math.PI / 2 + 1.05)
+      frame.translate(0, 0.34, -0.98)
+      add(frame, gloss('#1c2430'))
+    }),
 }
 
 /** Accessories this renderer can already build. */
@@ -110,7 +162,7 @@ export const SUPPORTED_ACCESSORIES = Object.keys(HEAD_GEAR) as AvatarAccessory[]
 export function equipAccessory(rig: Rig, accessory: AvatarAccessory): GearItem | null {
   const make = HEAD_GEAR[accessory]
   if (!make) return null
-  const gear = make()
+  const gear = make(rig.sockets.get('ears'))
   const socket = rig.sockets.get(gear.socket)
   if (!socket) return null
   gear.node.scale.setScalar(socket.radius)

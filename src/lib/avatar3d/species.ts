@@ -4,8 +4,8 @@
  * plates, seated eyes with lids and brows. Units: feet on y = 0, facing +Z, the character's
  * left on +X; a baseline lobster's head tops out near 1.76.
  */
-import { Quaternion, SphereGeometry, TorusGeometry, Vector3 } from 'three'
-import type { AvatarBuild, AvatarClaws, AvatarHeadShape, AvatarMouth } from '../avatar/traits'
+import { CatmullRomCurve3, Quaternion, SphereGeometry, TorusGeometry, Vector3 } from 'three'
+import type { AvatarAntennae, AvatarBuild, AvatarClaws, AvatarHeadShape, AvatarMouth } from '../avatar/traits'
 import type { Expression } from '../avatar/parts'
 import { loft, uprightFrame, type Loft, type LoftKey } from './loft'
 import {
@@ -22,6 +22,7 @@ import {
   placed,
   ridge,
   spike,
+  surfacePatch,
   tailLobe,
   taperedTube,
   withAo,
@@ -39,10 +40,10 @@ const sided = (p: Vector3, s: number) => new Vector3(p.x * s, p.y, p.z)
 const deg = (d: number) => (d * Math.PI) / 180
 
 const CLAW_STYLES: Record<AvatarClaws, ClawStyle> = {
-  classic: { bulk: 1, reach: 1, depth: 0.62 },
-  crusher: { bulk: 1.22, reach: 0.9, depth: 0.72 },
-  slim: { bulk: 0.8, reach: 1.12, depth: 0.56 },
-  mitten: { bulk: 1.12, reach: 0.72, depth: 0.76 },
+  classic: { bulk: 1.18, reach: 0.86, depth: 0.66 },
+  crusher: { bulk: 1.4, reach: 0.78, depth: 0.74 },
+  slim: { bulk: 0.9, reach: 1.05, depth: 0.58 },
+  mitten: { bulk: 1.3, reach: 0.62, depth: 0.78 },
 }
 
 /** How each head shape bends the baseline shell: width at the top and bottom, height, squareness. */
@@ -88,6 +89,8 @@ interface FaceLayout {
   browY: number
   /** Half length of each brow, in radians round the shell. */
   browSpan: number
+  /** How far the brow's ends drop below its middle, as a fraction of the eye radius. */
+  browArch: number
   mouthY: number
   mouthHalf: number
 }
@@ -159,15 +162,15 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
     // Brow: a soft ridge arching over the eye, on its own bone so expressions can tilt and lift it.
     const sBrow = f.shell.sAt(f.browY)
     const browPoints = [-1, -0.5, 0, 0.5, 1].map((a) => {
-      const along = theta - s * a * f.browSpan
-      const drop = a * a * f.eyeRadius * 0.42
+      const along = theta - s * (a * f.browSpan + f.browSpan * 0.18)
+      const drop = a * a * f.eyeRadius * f.browArch
       const sp = f.shell.sAt(f.browY - drop)
       return f.shell.point(sp, along).addScaledVector(f.shell.normal(sp, along), 0.008)
     })
     const browNormal = f.shell.normal(sBrow, theta)
     const browAt = browPoints[2].clone()
     const brow = rig.addBone(`brow${tag}`, f.bone, browAt, { quaternion: lookQuaternion(browNormal) })
-    rig.addWorld(`brow${tag}`, 'brow', ridge(browPoints, browNormal, f.eyeRadius * 0.3, f.eyeRadius * 0.24))
+    rig.addWorld(`brow${tag}`, 'brow', ridge(browPoints, browNormal, f.eyeRadius * 0.34, f.eyeRadius * 0.3))
     brow.rotateZ(s * deg(pose.browTilt ?? 0))
     brow.position.y += pose.browLift ?? 0
     const rest = rig.rest.get(`brow${tag}`)!
@@ -179,30 +182,30 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
   return { lidOpen }
 }
 
-/** How each mouth curves: rise of the corners, width, and a lean to one side. */
-const MOUTHS: Record<AvatarMouth, { rise: number; width: number; skew?: number; wave?: number; open?: number }> = {
+/** How each mouth curves: rise of the corners, width, a lean to one side, and what shows inside. */
+const MOUTHS: Record<AvatarMouth, { rise: number; width: number; skew?: number; wave?: number; open?: number; tongue?: boolean; fang?: boolean; round?: boolean }> = {
   smile: { rise: 0.05, width: 1 },
   grin: { rise: 0.062, width: 1.22 },
-  beam: { rise: 0.07, width: 1.3 },
+  beam: { rise: 0.066, width: 1.2, open: 0.075 },
   smirk: { rise: 0.035, width: 0.9, skew: 0.045 },
-  tongue: { rise: 0.05, width: 1 },
-  fang: { rise: 0.045, width: 1.05 },
-  oh: { rise: 0, width: 0.3, open: 1 },
+  tongue: { rise: 0.05, width: 1, tongue: true },
+  fang: { rise: 0.045, width: 1.05, fang: true },
+  oh: { rise: 0, width: 0.3, round: true },
   frown: { rise: -0.04, width: 0.9 },
   wobble: { rise: 0.004, width: 0.95, wave: 0.014 },
 }
 
 function addMouth(rig: Rig, kind: AvatarMouth, f: FaceLayout): void {
   const m = MOUTHS[kind]
+  const lineY = (a: number) => f.mouthY + m.rise * (a * a - 0.55) + (m.skew ?? 0) * a + (m.wave ?? 0) * Math.sin(a * 7)
+  const theta = (a: number) => Math.PI / 2 - a * f.mouthHalf * m.width
   const at = (a: number, lift = 0.004) => {
-    const y = f.mouthY + m.rise * (a * a - 0.55) + (m.skew ?? 0) * a + (m.wave ?? 0) * Math.sin(a * 7)
-    const s = f.shell.sAt(y)
-    const theta = Math.PI / 2 - a * f.mouthHalf * m.width
-    return f.shell.point(s, theta).addScaledVector(f.shell.normal(s, theta), lift)
+    const s = f.shell.sAt(lineY(a))
+    return f.shell.point(s, theta(a)).addScaledVector(f.shell.normal(s, theta(a)), lift)
   }
   const sMid = f.shell.sAt(f.mouthY)
   const normal = f.shell.normal(sMid, Math.PI / 2)
-  if (m.open) {
+  if (m.round) {
     const o = new SphereGeometry(0.034, 20, 14)
     o.scale(0.9, 1.15, 0.3)
     rig.addWorld(f.bone, 'mouth', placed(withAo(o), at(0, 0), lookQuaternion(normal)))
@@ -210,18 +213,42 @@ function addMouth(rig: Rig, kind: AvatarMouth, f: FaceLayout): void {
   }
   const line = Array.from({ length: 13 }, (_, i) => at((i / 12) * 2 - 1))
   rig.addWorld(f.bone, 'mouth', ridge(line, normal, 0.0095, 0.008, 36))
+
+  // Things inside or hanging from the mouth are thin patches laid on the shell between two curves.
+  const patch = (slot: 'mouth' | 'teeth' | 'tongue', a0: number, a1: number, upper: (a: number) => number, lower: (a: number) => number, lift: number) =>
+    rig.addWorld(
+      f.bone,
+      slot,
+      surfacePatch(
+        (u, t) => {
+          const a = a0 + (a1 - a0) * u
+          const y = upper(a) + (lower(a) - upper(a)) * t
+          const sp = f.shell.sAt(y)
+          return f.shell.point(sp, theta(a)).addScaledVector(f.shell.normal(sp, theta(a)), lift + Math.sin(Math.PI * t) * Math.sin(Math.PI * u) * lift * 0.8)
+        },
+        normal,
+      ),
+    )
+  if (m.open) {
+    const depth = (a: number) => lineY(a) - m.open! * Math.pow(1 - a * a, 0.6)
+    patch('mouth', -0.94, 0.94, lineY, depth, 0.003)
+    patch('teeth', -0.8, 0.8, (a) => lineY(a) - 0.002, (a) => lineY(a) - 0.002 - m.open! * 0.3 * Math.pow(1 - (a / 0.8) ** 2, 0.5), 0.0055)
+    patch('tongue', -0.5, 0.5, (a) => depth(a) + m.open! * 0.5 * (1 - (a / 0.5) ** 2), (a) => depth(a) + 0.004, 0.0055)
+  }
+  if (m.tongue) patch('tongue', -0.02, 0.5, (a) => lineY(a) - 0.002, (a) => lineY(a) - 0.002 - 0.07 * Math.pow(Math.max(1 - ((a - 0.24) / 0.26) ** 2, 0), 0.5), 0.007)
+  if (m.fang) patch('teeth', 0.3, 0.52, (a) => lineY(a) - 0.002, (a) => lineY(a) - 0.002 - 0.05 * (1 - Math.abs((a - 0.41) / 0.11)), 0.006)
+
   // Cheek creases where the smile ends.
   if (m.rise > 0.02) {
     for (const s of [1, -1]) {
       const end = at(s)
       const sEnd = f.shell.sAt(end.y)
-      const theta = Math.PI / 2 - s * f.mouthHalf * m.width
       const crease = [-0.03, 0, 0.03].map((dy, i) => {
-        const along = theta - s * (0.03 + (i === 1 ? 0.035 : 0))
+        const along = theta(s) - s * (0.03 + (i === 1 ? 0.035 : 0))
         const sp = f.shell.sAt(end.y + dy + 0.012)
         return f.shell.point(sp, along).addScaledVector(f.shell.normal(sp, along), 0.003)
       })
-      rig.addWorld(f.bone, 'mouth', ridge(crease, f.shell.normal(sEnd, theta), 0.006, 0.005, 10))
+      rig.addWorld(f.bone, 'mouth', ridge(crease, f.shell.normal(sEnd, theta(s)), 0.006, 0.005, 10))
     }
   }
 }
@@ -316,19 +343,58 @@ function addSideLegs(rig: Rig, parent: string, legs: Vector3[][], radius: number
   })
 }
 
-function addAntennae(rig: Rig, parent: string, path: Vector3[], r0: number, r1: number, cuffs: number): void {
+interface AntennaLayout {
+  parent: string
+  /** Where the left antenna leaves the head. */
+  base: Vector3
+  /** The species' own whip, from the base outward. */
+  whip: Vector3[]
+  /** Overall reach, which the other styles scale to. */
+  reach: number
+  /** Which way the styles lean front to back. */
+  sweep: number
+  thick: number
+  tip: number
+}
+
+/** Antenna styles as paths in (out, up) units of the species' reach, from the base. */
+const ANTENNA_PATHS: Record<Exclude<AvatarAntennae, 'whip'>, [number, number][]> = {
+  curl: [[0, 0], [0.06, 0.38], [0.2, 0.72], [0.44, 0.84], [0.62, 0.68], [0.6, 0.46], [0.44, 0.42], [0.4, 0.56]],
+  plume: [[0, 0], [0.05, 0.3], [0.16, 0.58], [0.34, 0.8], [0.56, 0.9]],
+  bolt: [[0, 0], [0.16, 0.26], [0.04, 0.42], [0.3, 0.62], [0.2, 0.78], [0.5, 1]],
+  beacon: [[0, 0], [0.05, 0.3], [0.14, 0.56], [0.26, 0.74]],
+}
+
+function addAntennae(rig: Rig, style: AvatarAntennae, a: AntennaLayout): void {
   for (const { s, tag } of SIDES) {
+    const path = style === 'whip' ? a.whip : ANTENNA_PATHS[style].map(([out, up]) => v(a.base.x + out * a.reach, a.base.y + up * a.reach, a.base.z + a.sweep * up * a.reach))
     const pts = path.map((p) => sided(p, s))
-    rig.addBone(`antenna${tag}`, parent, pts[0])
-    const geos = [taperedTube(pts, r0, r1, 40)]
+    rig.addBone(`antenna${tag}`, a.parent, pts[0])
+    const even = style === 'bolt' || style === 'beacon'
+    const geos = [taperedTube(pts, a.thick, even ? a.thick * 0.6 : a.tip, 40)]
     // Short thick base segments, as on the references.
     const dir = pts[1].clone().sub(pts[0]).normalize()
-    for (let i = 0; i < cuffs; i++) {
-      const ring = new TorusGeometry(r0 * (1.25 - i * 0.12), r0 * 0.4, 8, 20)
+    for (let i = 0; i < 2; i++) {
+      const ring = new TorusGeometry(a.thick * (1.25 - i * 0.12), a.thick * 0.4, 8, 20)
       ring.rotateX(Math.PI / 2)
       geos.push(placed(withAo(ring, 0.9), pts[0].clone().addScaledVector(dir, 0.012 + i * 0.05), alongY(dir)))
     }
+    if (style === 'plume') {
+      // Soft barbs along the outer half, shrinking toward the tip.
+      const spine = new CatmullRomCurve3(pts)
+      for (let i = 0; i < 7; i++) {
+        const t = 0.4 + i * 0.095
+        const size = a.thick * (2.3 - i * 0.2)
+        const barb = new SphereGeometry(1, 12, 10)
+        barb.scale(size * 0.75, size * 1.5, size * 0.5)
+        geos.push(placed(withAo(barb), spine.getPointAt(Math.min(t, 1)), alongY(spine.getTangentAt(Math.min(t, 1)).add(v(0, 0.6, 0)))))
+      }
+    }
     rig.addWorld(`antenna${tag}`, 'shell', merge(geos))
+    if (style === 'beacon') {
+      const bulb = new SphereGeometry(a.thick * 2.1, 20, 14)
+      rig.addWorld(`antenna${tag}`, 'glow', placed(withAo(bulb), pts[pts.length - 1]))
+    }
   }
 }
 
@@ -349,12 +415,12 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     keys: reshape(
       [
         { d: 1.77, r: 0, z: 0.05 },
-        { d: 1.735, r: 0.11, z: 0.05, front: 0.95, back: 0.95 },
-        { d: 1.63, r: 0.2, z: 0.045, front: 0.93, back: 0.95 },
-        { d: 1.48, r: 0.258, z: 0.03, front: 0.92, back: 0.98 },
-        { d: 1.32, r: 0.285, z: 0.01, front: 0.92, back: 1 },
-        { d: 1.18, r: 0.262, z: -0.01, front: 0.9, back: 1.02 },
-        { d: 1.08, r: 0.17, z: -0.02, front: 0.88, back: 1.04 },
+        { d: 1.74, r: 0.13, z: 0.05, front: 0.92, back: 0.95 },
+        { d: 1.64, r: 0.235, z: 0.045, front: 0.9, back: 0.95 },
+        { d: 1.5, r: 0.298, z: 0.03, front: 0.88, back: 0.96 },
+        { d: 1.34, r: 0.328, z: 0.01, front: 0.88, back: 0.98 },
+        { d: 1.2, r: 0.31, z: -0.01, front: 0.86, back: 1 },
+        { d: 1.09, r: 0.22, z: -0.02, front: 0.85, back: 1.02 },
         { d: 1.03, r: 0, z: -0.02 },
       ],
       head.top,
@@ -373,11 +439,11 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   const abdomen = loft({
     keys: reshape(
       [
-        { d: 1.26, r: 0.13, z: -0.02, front: 0.8, back: 1.2 },
-        { d: 1.12, r: 0.205, z: -0.02, front: 0.82, back: 1.22 },
-        { d: 0.9, r: 0.178, z: -0.04, front: 0.82, back: 1.22 },
-        { d: 0.68, r: 0.138, z: -0.07, front: 0.84, back: 1.2 },
-        { d: 0.52, r: 0.098, z: -0.1, front: 0.86, back: 1.15 },
+        { d: 1.26, r: 0.16, z: -0.02, front: 0.8, back: 1.15 },
+        { d: 1.12, r: 0.245, z: -0.02, front: 0.8, back: 1.15 },
+        { d: 0.9, r: 0.212, z: -0.04, front: 0.8, back: 1.15 },
+        { d: 0.68, r: 0.166, z: -0.07, front: 0.82, back: 1.15 },
+        { d: 0.52, r: 0.118, z: -0.1, front: 0.84, back: 1.12 },
         { d: 0.44, r: 0, z: -0.12 },
       ],
       build.top,
@@ -389,37 +455,38 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     ao: (k) => 0.74 + 0.26 * Math.min(1, Math.max(0, (1.14 - k.d) / 0.2)),
   })
   rig.addWorld('pelvis', 'shell', abdomen.geometry)
-  rig.addWorld('pelvis', 'belly', bellyPlates(abdomen, { top: 1.13, bottom: 0.455, plates: 9, spreadTop: 1.2, spreadBottom: 0.95, lift: 0.02 }))
+  rig.addWorld('pelvis', 'belly', bellyPlates(abdomen, { top: 1.14, bottom: 0.455, plates: 9, spreadTop: 1.12, spreadBottom: 0.9, lift: 0.024 }))
 
   // Tail fan behind the hips.
-  const tailAt = v(0, 0.53, -0.15)
-  rig.addBone('tail', 'pelvis', tailAt, { quaternion: new Quaternion().setFromAxisAngle(v(1, 0, 0), 0.16) })
-  const lobes = [-68, -34, 0, 34, 68].map((a) => {
-    const lobe = tailLobe(a === 0 ? 0.31 : 0.28, 0.15, 0.22)
+  const tailAt = v(0, 0.52, -0.09)
+  rig.addBone('tail', 'pelvis', tailAt, { quaternion: new Quaternion().setFromAxisAngle(v(1, 0, 0), 0.1) })
+  const lobes = [-70, -35, 0, 35, 70].map((a) => {
+    const lobe = tailLobe(a === 0 ? 0.31 : 0.29, 0.16, 0.2)
     lobe.rotateZ(deg(a))
     return lobe
   })
   rig.add('tail', 'shell', merge(lobes))
 
-  const face = addFace(rig, look, { shell: carapace, bone: 'chest', eyeY: 1.52, eyeSpread: 0.4, eyeRadius: 0.094, browY: 1.668, browSpan: 0.42, mouthY: 1.355, mouthHalf: 0.46 })
+  const face = addFace(rig, look, { shell: carapace, bone: 'chest', eyeY: 1.525, eyeSpread: 0.36, eyeRadius: 0.1, browY: 1.672, browSpan: 0.38, browArch: 0.42, mouthY: 1.35, mouthHalf: 0.44 })
 
-  addAntennae(
-    rig,
-    'chest',
-    [v(0.055, 1.74, 0.07), v(0.09, 1.9, 0.1), v(0.19, 2.07, 0.16), v(0.34, 2.15, 0.24), v(0.47, 2.11, 0.33), v(0.55, 2.03, 0.4)],
-    0.03,
-    0.0045,
-    2,
-  )
+  addAntennae(rig, look.antennae, {
+    parent: 'chest',
+    base: v(0.055, 1.74, 0.07),
+    whip: [v(0.055, 1.74, 0.07), v(0.09, 1.9, 0.1), v(0.19, 2.07, 0.16), v(0.34, 2.15, 0.24), v(0.47, 2.11, 0.33), v(0.55, 2.03, 0.4)],
+    reach: 0.4,
+    sweep: 0.3,
+    thick: 0.037,
+    tip: 0.006,
+  })
 
   addArms(rig, look, {
     parent: 'chest',
-    shoulder: v(0.225, 1.165, 0.0),
-    elbow: v(0.4, 1.035, 0.07),
-    wrist: v(0.5, 0.9, 0.15),
-    tip: v(0.5, 0.36, 0.26),
-    radius: 0.05,
-    clawSize: 0.63,
+    shoulder: v(0.265, 1.17, 0.0),
+    elbow: v(0.45, 1.04, 0.07),
+    wrist: v(0.57, 0.93, 0.15),
+    tip: v(0.58, 0.4, 0.26),
+    radius: 0.058,
+    clawSize: 0.62,
     clawFacing: v(-0.32, 0, 1),
   })
 
@@ -427,20 +494,20 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     rig,
     'pelvis',
     [
-      [v(0.175, 0.98, 0.06), v(0.31, 0.93, 0.14), v(0.37, 0.8, 0.19), v(0.33, 0.62, 0.21)],
-      [v(0.155, 0.83, 0.04), v(0.28, 0.76, 0.12), v(0.33, 0.63, 0.17), v(0.29, 0.46, 0.19)],
+      [v(0.2, 0.98, 0.06), v(0.33, 0.93, 0.14), v(0.39, 0.8, 0.19), v(0.35, 0.62, 0.21)],
+      [v(0.175, 0.83, 0.04), v(0.3, 0.76, 0.12), v(0.35, 0.63, 0.17), v(0.31, 0.46, 0.19)],
     ],
-    0.034,
+    0.042,
   )
 
   addLegs(rig, {
     parent: 'pelvis',
-    hip: v(0.105, 0.62, -0.05),
-    knee: v(0.285, 0.455, 0.0),
-    ankle: v(0.28, 0.105, -0.03),
-    radius: 0.062,
-    footWidth: 0.34,
-    footLength: 0.31,
+    hip: v(0.13, 0.62, -0.05),
+    knee: v(0.3, 0.46, 0.0),
+    ankle: v(0.295, 0.115, -0.03),
+    radius: 0.076,
+    footWidth: 0.38,
+    footLength: 0.34,
   })
 
   // Hats seat a little below the crown, where the head is wide enough to carry a brim.
@@ -448,6 +515,8 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   const seat = carapace.key(carapace.sAt(top - 0.085))
   rig.addSocket('head', 'chest', v(0, seat.d, seat.z ?? 0), seat.r)
   rig.addSocket('face', 'chest', carapace.point(carapace.sAt(1.515), Math.PI / 2), 0.26)
+  const ear = carapace.key(carapace.sAt(1.5))
+  rig.addSocket('ears', 'chest', v(0, 1.5, ear.z ?? 0), ear.r, undefined, top - 1.5)
   rig.addSocket('back', 'chest', carapace.point(carapace.sAt(1.35), -Math.PI / 2), 0.26)
   rig.addSocket('chest', 'pelvis', abdomen.point(abdomen.sAt(1.0), Math.PI / 2), 0.2)
   rig.addSocket('waist', 'pelvis', v(0, 0.7, -0.07), 0.14)
@@ -465,14 +534,14 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     keys: reshape(
       [
         { d: 1.53, r: 0, z: 0 },
-        { d: 1.515, r: 0.17, z: 0, front: 0.68, back: 0.72 },
-        { d: 1.455, r: 0.35, z: 0, front: 0.66, back: 0.7, n: 2.1 },
-        { d: 1.36, r: 0.475, z: 0, front: 0.65, back: 0.69, n: 2.2 },
-        { d: 1.25, r: 0.53, z: 0, front: 0.65, back: 0.69, n: 2.2 },
-        { d: 1.13, r: 0.5, z: 0, front: 0.65, back: 0.69, n: 2.2 },
-        { d: 1.03, r: 0.38, z: 0, front: 0.65, back: 0.7, n: 2.1 },
-        { d: 0.975, r: 0.2, z: 0, front: 0.66, back: 0.7 },
-        { d: 0.95, r: 0, z: 0 },
+        { d: 1.505, r: 0.2, z: 0, front: 0.7, back: 0.74 },
+        { d: 1.43, r: 0.38, z: 0, front: 0.68, back: 0.72 },
+        { d: 1.31, r: 0.495, z: 0, front: 0.67, back: 0.71, n: 2.1 },
+        { d: 1.17, r: 0.535, z: 0, front: 0.67, back: 0.71, n: 2.1 },
+        { d: 1.03, r: 0.5, z: 0, front: 0.67, back: 0.71, n: 2.1 },
+        { d: 0.91, r: 0.39, z: 0, front: 0.67, back: 0.72 },
+        { d: 0.83, r: 0.22, z: 0, front: 0.68, back: 0.72 },
+        { d: 0.8, r: 0, z: 0 },
       ],
       head.top,
       head.bottom,
@@ -482,7 +551,7 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     frame: uprightFrame,
     rows: 56,
     radial: 64,
-    ao: (k) => 0.78 + 0.22 * Math.min(1, Math.max(0, (k.d - 0.97) / 0.16)),
+    ao: (k) => 0.74 + 0.26 * Math.min(1, Math.max(0, (k.d - 0.82) / 0.2)),
   })
   rig.addWorld('chest', 'shell', shell.geometry)
 
@@ -490,11 +559,11 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   const under = loft({
     keys: reshape(
       [
-        { d: 1.1, r: 0.2, z: 0.0, front: 1, back: 1 },
-        { d: 0.98, r: 0.235, z: 0.0, front: 0.95, back: 1 },
-        { d: 0.84, r: 0.19, z: 0.0, front: 0.95, back: 1 },
-        { d: 0.72, r: 0.12, z: 0.0, front: 0.95, back: 1 },
-        { d: 0.66, r: 0, z: 0.0 },
+        { d: 1.06, r: 0.22, z: 0.08, front: 1, back: 1 },
+        { d: 0.96, r: 0.275, z: 0.1, front: 1, back: 1.2 },
+        { d: 0.85, r: 0.235, z: 0.09, front: 1, back: 1.2 },
+        { d: 0.75, r: 0.15, z: 0.06, front: 1, back: 1.2 },
+        { d: 0.69, r: 0, z: 0.04 },
       ],
       build.top,
       build.bottom,
@@ -502,17 +571,18 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     frame: uprightFrame,
     rows: 30,
     radial: 44,
-    ao: (k) => 0.7 + 0.3 * Math.min(1, Math.max(0, (1.0 - k.d) / 0.2)),
+    ao: (k) => 0.7 + 0.3 * Math.min(1, Math.max(0, (0.9 - k.d) / 0.2)),
   })
   rig.addWorld('pelvis', 'shell', under.geometry)
-  rig.addWorld('pelvis', 'belly', bellyPlates(under, { top: 1.01, bottom: 0.675, plates: 5, spreadTop: 1.15, spreadBottom: 0.9, lift: 0.02 }))
+  rig.addWorld('pelvis', 'belly', bellyPlates(under, { top: 1.0, bottom: 0.705, plates: 5, spreadTop: 1.05, spreadBottom: 0.85, lift: 0.024 }))
 
   // Spikes along the upper rim of the shell.
   const spikes: [number, number, number][] = [
-    [1.455, 30, 0.105],
-    [1.375, 12, 0.12],
-    [1.28, 2, 0.115],
-    [1.39, -38, 0.1],
+    [1.44, 30, 0.13],
+    [1.33, 12, 0.15],
+    [1.2, 3, 0.14],
+    [1.36, -36, 0.13],
+    [1.2, -42, 0.12],
   ]
   for (const { s } of SIDES) {
     for (const [y, angle, h] of spikes) {
@@ -521,22 +591,30 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
       const at = shell.point(sp, theta)
       const n = shell.normal(sp, theta)
       n.y += 0.2
-      rig.addWorld('chest', 'shell', placed(spike(h, 0.062), at, alongY(n)))
+      rig.addWorld('chest', 'shell', placed(spike(h, 0.074), at, alongY(n)))
     }
   }
 
-  const face = addFace(rig, look, { shell, bone: 'chest', eyeY: 1.3, eyeSpread: 0.27, eyeRadius: 0.112, browY: 1.462, browSpan: 0.21, mouthY: 1.125, mouthHalf: 0.3 })
+  const face = addFace(rig, look, { shell, bone: 'chest', eyeY: 1.3, eyeSpread: 0.3, eyeRadius: 0.115, browY: 1.455, browSpan: 0.19, browArch: 0.16, mouthY: 1.105, mouthHalf: 0.3 })
 
-  addAntennae(rig, 'chest', [v(0.05, 1.5, 0.06), v(0.065, 1.63, 0.05), v(0.13, 1.73, 0.01), v(0.24, 1.75, -0.05), v(0.31, 1.69, -0.09)], 0.04, 0.014, 2)
+  addAntennae(rig, look.antennae, {
+    parent: 'chest',
+    base: v(0.05, 1.5, 0.06),
+    whip: [v(0.05, 1.5, 0.06), v(0.065, 1.65, 0.05), v(0.14, 1.77, 0.01), v(0.27, 1.79, -0.05), v(0.36, 1.72, -0.09)],
+    reach: 0.34,
+    sweep: -0.2,
+    thick: 0.046,
+    tip: 0.017,
+  })
 
   addArms(rig, look, {
     parent: 'chest',
-    shoulder: v(0.43, 1.1, 0.03),
-    elbow: v(0.6, 1.02, 0.1),
-    wrist: v(0.66, 0.92, 0.18),
-    tip: v(0.62, 0.36, 0.3),
-    radius: 0.062,
-    clawSize: 0.72,
+    shoulder: v(0.47, 1.08, 0.04),
+    elbow: v(0.62, 1.03, 0.1),
+    wrist: v(0.69, 0.95, 0.17),
+    tip: v(0.67, 0.42, 0.28),
+    radius: 0.07,
+    clawSize: 0.66,
     clawFacing: v(-0.36, 0, 1),
   })
 
@@ -544,24 +622,25 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     rig,
     'pelvis',
     [
-      [v(0.2, 0.93, 0.07), v(0.37, 0.9, 0.15), v(0.44, 0.78, 0.2), v(0.41, 0.6, 0.22)],
-      [v(0.17, 0.82, 0.05), v(0.31, 0.77, 0.13), v(0.36, 0.64, 0.18), v(0.33, 0.48, 0.2)],
+      [v(0.3, 0.92, 0.1), v(0.44, 0.88, 0.17), v(0.5, 0.76, 0.21), v(0.47, 0.6, 0.23)],
+      [v(0.22, 0.84, 0.1), v(0.35, 0.77, 0.16), v(0.4, 0.65, 0.2), v(0.37, 0.49, 0.22)],
     ],
-    0.037,
+    0.044,
   )
 
   addLegs(rig, {
     parent: 'pelvis',
-    hip: v(0.165, 0.73, -0.02),
-    knee: v(0.36, 0.56, 0.02),
-    ankle: v(0.355, 0.125, -0.03),
-    radius: 0.07,
-    footWidth: 0.37,
-    footLength: 0.33,
+    hip: v(0.17, 0.76, -0.02),
+    knee: v(0.37, 0.57, 0.02),
+    ankle: v(0.365, 0.125, -0.03),
+    radius: 0.08,
+    footWidth: 0.4,
+    footLength: 0.35,
   })
 
   rig.addSocket('head', 'chest', v(0, shell.key(0).d - 0.035, 0.02), 0.2)
   rig.addSocket('face', 'chest', shell.point(shell.sAt(1.315), Math.PI / 2), 0.4)
+  rig.addSocket('ears', 'chest', v(0, 1.3, 0), shell.key(shell.sAt(1.3)).r, undefined, shell.key(0).d - 1.3)
   rig.addSocket('back', 'chest', shell.point(shell.sAt(1.25), -Math.PI / 2), 0.4)
   rig.addSocket('chest', 'pelvis', under.point(under.sAt(0.9), Math.PI / 2), 0.2)
   rig.addSocket('waist', 'pelvis', v(0, 0.78, 0), 0.16)

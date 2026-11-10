@@ -9,7 +9,7 @@
 import { BufferGeometry, Group, Matrix4, Mesh, Object3D, Quaternion, Vector3, type Material } from 'three'
 import { merge } from './parts'
 
-export type MaterialSlot = 'shell' | 'belly' | 'eye' | 'mouth' | 'brow'
+export type MaterialSlot = 'shell' | 'belly' | 'eye' | 'mouth' | 'brow' | 'teeth' | 'tongue' | 'glow'
 
 export interface BoneOptions {
   /** Point the bone's -Y toward this position. */
@@ -24,6 +24,8 @@ export interface SocketInfo {
   node: Object3D
   /** Size of what the socket sits on (head radius, wrist radius), for fitting gear. */
   radius: number
+  /** Height from the socket up to the crown, for gear that arches over the head. */
+  rise?: number
 }
 
 const FORWARD = new Vector3(0, 0, 1)
@@ -109,7 +111,7 @@ export class Rig {
   }
 
   /** A named mount point for gear, given in character space. */
-  addSocket(name: string, bone: string, at: Vector3, radius: number, worldQuaternion = new Quaternion()): void {
+  addSocket(name: string, bone: string, at: Vector3, radius: number, worldQuaternion = new Quaternion(), rise?: number): void {
     const r = this.restWorldOf(bone)
     const inv = r.quaternion.clone().invert()
     const node = new Group()
@@ -117,7 +119,7 @@ export class Rig {
     node.position.copy(at).sub(r.position).applyQuaternion(inv)
     node.quaternion.copy(inv).multiply(worldQuaternion)
     this.bone(bone).add(node)
-    this.sockets.set(name, { node, radius })
+    this.sockets.set(name, { node, radius, rise })
   }
 
   /** Merge each bone's parts into one mesh per material and add them to the scene graph. */
@@ -126,7 +128,7 @@ export class Rig {
       const mesh = new Mesh(merge(geos), materials[slot])
       mesh.name = `${bone}:${slot}`
       mesh.castShadow = true
-      mesh.receiveShadow = slot !== 'eye'
+      mesh.receiveShadow = slot !== 'eye' && slot !== 'glow'
       this.bone(bone).add(mesh)
       this.meshes.push(mesh)
     }

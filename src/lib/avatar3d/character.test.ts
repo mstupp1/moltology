@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { AVATAR_BUILDS, AVATAR_CLAWS, AVATAR_HEAD_SHAPES, AVATAR_MOUTHS, AVATAR_POSES, AVATAR_RACES, SHELL_MARKINGS } from '../avatar/traits'
+import { AVATAR_ACCESSORIES, AVATAR_ANTENNAE, AVATAR_BUILDS, AVATAR_CLAWS, AVATAR_HEAD_SHAPES, AVATAR_MOUTHS, AVATAR_POSES, AVATAR_RACES, SHELL_MARKINGS } from '../avatar/traits'
 import { buildCharacter } from './character'
+import { SUPPORTED_ACCESSORIES } from './gear'
 import { baselineLook } from './look'
 import { keySampler } from './loft'
 
-const SOCKETS = ['head', 'face', 'back', 'chest', 'waist', 'clawL', 'clawR', 'wristL', 'wristR', 'footL', 'footR']
+const SOCKETS = ['head', 'ears', 'face', 'back', 'chest', 'waist', 'clawL', 'clawR', 'wristL', 'wristR', 'footL', 'footR']
 
 function finite(character: ReturnType<typeof buildCharacter>): boolean {
   return character.rig.meshes.every((mesh) => {
@@ -32,7 +33,7 @@ describe('avatar3d', () => {
     character.dispose()
   })
 
-  it('builds every shape, claw, mouth and marking option without breaking geometry', () => {
+  it('builds every shape, claw, mouth, marking, antenna and hat option without breaking geometry', () => {
     for (const race of AVATAR_RACES) {
       const base = baselineLook(race)
       const looks = [
@@ -41,6 +42,8 @@ describe('avatar3d', () => {
         ...AVATAR_CLAWS.map((claws) => ({ ...base, claws })),
         ...AVATAR_MOUTHS.map((mouth) => ({ ...base, mouth })),
         ...SHELL_MARKINGS.map((marking) => ({ ...base, marking })),
+        ...AVATAR_ANTENNAE.map((antennae) => ({ ...base, antennae })),
+        ...AVATAR_ACCESSORIES.map((accessory) => ({ ...base, accessory })),
       ]
       for (const look of looks) {
         const character = buildCharacter(look)
@@ -48,7 +51,7 @@ describe('avatar3d', () => {
         character.dispose()
       }
     }
-  }, 30_000)
+  }, 60_000)
 
   it('keeps feet planted and limbs attached in every pose', () => {
     for (const race of AVATAR_RACES) {
@@ -66,6 +69,10 @@ describe('avatar3d', () => {
       }
       character.dispose()
     }
+  })
+
+  it('has a 3D build for every hat in the catalog', () => {
+    expect([...SUPPORTED_ACCESSORIES].sort()).toEqual(AVATAR_ACCESSORIES.filter((a) => a !== 'none').sort())
   })
 
   it('mounts a hat on the head socket, scaled to the head', () => {

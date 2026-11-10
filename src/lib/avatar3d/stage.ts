@@ -95,7 +95,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   key.shadow.radius = 7
   key.shadow.blurSamples = 16
   key.target.position.set(0, 1, 0)
-  const fill = new DirectionalLight(0xa9c9ff, 0.7)
+  const fill = new DirectionalLight(0xa9c9ff, 0.5)
   fill.position.set(-3.2, 1.6, 2.4)
   const rim = new DirectionalLight(0xc8ecff, 1.9)
   rim.position.set(-1.8, 2.6, -3.6)

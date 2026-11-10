@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
 import { baselineLook, type Avatar3DLook } from '@/lib/avatar3d/look'
 import {
+  AVATAR_ACCESSORIES,
   AVATAR_ACCESSORY_LABELS,
+  AVATAR_ANTENNAE,
+  AVATAR_ANTENNAE_LABELS,
   AVATAR_BUILD_LABELS,
   AVATAR_BUILDS,
   AVATAR_CLAW_LABELS,
@@ -10,6 +13,7 @@ import {
   AVATAR_HEAD_SHAPE_LABELS,
   AVATAR_HEAD_SHAPES,
   AVATAR_MOUTH_LABELS,
+  AVATAR_MOUTHS,
   AVATAR_POSE_LABELS,
   AVATAR_POSES,
   AVATAR_RACE_LABELS,
@@ -19,16 +23,11 @@ import {
   SHELL_MARKING_LABELS,
   SHELL_MARKINGS,
   SHELL_PALETTES,
-  type AvatarAccessory,
-  type AvatarMouth,
 } from '@/lib/avatar/traits'
 import { AVATAR_EYE_COLORS, EYE_COLOR_SWATCH, type Expression } from '@/lib/avatar/parts'
 import { cn } from '@/lib/utils'
 import { Avatar3DStage } from './Avatar3DStage'
 
-/** Options the 3D build covers so far. The rest of each catalog follows in later steps. */
-const HATS: AvatarAccessory[] = ['none', 'crown', 'hard_hat', 'beanie', 'halo']
-const MOUTHS: AvatarMouth[] = ['smile', 'grin', 'smirk', 'frown', 'wobble', 'oh']
 const EXPRESSIONS = Object.keys(AVATAR_EXPRESSION_LABELS) as Expression[]
 
 function Chips<T extends string>({ label, options, value, onChange, labels }: { label: string; options: readonly T[]; value: T; onChange: (v: T) => void; labels: Readonly<Record<string, string>> }) {
@@ -114,16 +113,17 @@ export function Avatar3DLab() {
         <Chips label="Pattern" options={SHELL_MARKINGS} value={look.marking} onChange={(v) => set('marking', v)} labels={SHELL_MARKING_LABELS} />
         <Chips label="Shell shape" options={AVATAR_HEAD_SHAPES} value={look.headShape} onChange={(v) => set('headShape', v)} labels={AVATAR_HEAD_SHAPE_LABELS[look.race]} />
         <Chips label="Build" options={AVATAR_BUILDS} value={look.build} onChange={(v) => set('build', v)} labels={AVATAR_BUILD_LABELS[look.race]} />
+        <Chips label="Antennae" options={AVATAR_ANTENNAE} value={look.antennae} onChange={(v) => set('antennae', v)} labels={AVATAR_ANTENNAE_LABELS} />
         <Chips label="Claws" options={AVATAR_CLAWS} value={look.claws} onChange={(v) => set('claws', v)} labels={AVATAR_CLAW_LABELS} />
         <Chips label="Expression" options={EXPRESSIONS} value={look.expression} onChange={(v) => set('expression', v)} labels={AVATAR_EXPRESSION_LABELS} />
-        <Chips label="Mouth" options={MOUTHS} value={look.mouth} onChange={(v) => set('mouth', v)} labels={AVATAR_MOUTH_LABELS} />
+        <Chips label="Mouth" options={AVATAR_MOUTHS} value={look.mouth} onChange={(v) => set('mouth', v)} labels={AVATAR_MOUTH_LABELS} />
         <Swatches
           label="Eye colour"
           options={AVATAR_EYE_COLORS.map((id) => ({ id, label: id, color: EYE_COLOR_SWATCH[id].mid }))}
           value={look.eyeColor}
           onChange={(v) => set('eyeColor', v)}
         />
-        <Chips label="Hat" options={HATS} value={look.accessory} onChange={(v) => set('accessory', v)} labels={AVATAR_ACCESSORY_LABELS} />
+        <Chips label="Hat" options={AVATAR_ACCESSORIES} value={look.accessory} onChange={(v) => set('accessory', v)} labels={AVATAR_ACCESSORY_LABELS} />
         <label className="flex min-h-11 items-center gap-2 text-sm text-ink">
           <input type="checkbox" checked={spin} onChange={(e) => setSpin(e.target.checked)} className="h-4 w-4 accent-cyan-glow" />
           Turn slowly

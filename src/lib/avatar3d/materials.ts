@@ -145,9 +145,12 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
       .replace(
         '#include <normal_fragment_maps>',
         `#include <normal_fragment_maps>
+        // Fine leathery grain, so highlights break up the way they do on the painted references.
+        vec3 a3Bump = vec3(a3Noise(vRest * 120.0 + 11.0), a3Noise(vRest * 120.0 + 37.0), a3Noise(vRest * 120.0 + 71.0)) - 0.5;
+        normal = normalize(normal + a3Bump * uGrain * 1.1);
         // Undersides sink toward the shade colour, which gives the forms weight without an occlusion pass.
         float a3Under = smoothstep(0.25, -0.95, inverseTransformDirection(normal, viewMatrix).y);
-        diffuseColor.rgb = mix(diffuseColor.rgb, uShade * 0.8, a3Under * 0.5);`,
+        diffuseColor.rgb = mix(diffuseColor.rgb, uShade * 0.72, a3Under * 0.62);`,
       )
       .replace(
         '#include <roughnessmap_fragment>',
@@ -235,9 +238,12 @@ export function buildMaterials(look: LookMaterials): Record<MaterialSlot, Materi
       finish: look.finish,
     }),
     belly: shellMaterial({ base: p.belly, shade: p.bellyShade, highlight: '#ffffff', finish: 'satin', grain: 0.04 }),
-    brow: shellMaterial({ base: '#' + new Color(p.base).lerp(new Color(p.shade), 0.4).getHexString(), shade: p.shade, highlight: p.highlight, finish: 'satin' }),
+    brow: shellMaterial({ base: '#' + new Color(p.base).lerp(new Color(p.shade), 0.6).getHexString(), shade: p.shade, highlight: p.highlight, finish: 'satin' }),
     eye: eyeMaterial(look.eyeColor, look.pupilScale),
     mouth: new MeshStandardMaterial({ color: new Color(p.deep), roughness: 0.7 }),
+    teeth: new MeshStandardMaterial({ color: new Color('#fffaf0'), roughness: 0.35 }),
+    tongue: new MeshStandardMaterial({ color: new Color('#ff7d93'), roughness: 0.5 }),
+    glow: new MeshStandardMaterial({ color: new Color('#bff6ff'), emissive: new Color('#22d3ee'), emissiveIntensity: 2.2, roughness: 0.3 }),
   }
 }
 
