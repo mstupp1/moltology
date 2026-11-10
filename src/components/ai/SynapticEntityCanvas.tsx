@@ -1,5 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
 
 export interface EntityBridgeFrameSnapshot {
   lifecycle: 'idle' | 'typing' | 'thinking' | 'streaming' | 'error'
@@ -39,8 +43,11 @@ interface SharedUniforms {
   uColorShift: { value: number }
   uReducedMotion: { value: number }
   uPixelRatio: { value: number }
+  uViewport: { value: THREE.Vector2 }
   uColor: { value: THREE.Color }
   uCompColor: { value: THREE.Color }
+  uRipples: { value: THREE.Vector4[] }
+  uFlare: { value: number }
 }
 
 function canUseWebGL(): boolean {
@@ -177,42 +184,82 @@ uniform float uPulseEnergy;
 uniform float uThinkingTension;
 uniform float uTypingIntensity;
 uniform float uReducedMotion;
+uniform vec4 uRipples[3];
 
 varying vec3 vNormal;
 varying vec3 vPosition;
 varying vec3 vViewPosition;
 varying float vDisplacement;
+varying float vRipple;
+varying vec3 vSphereNormal;
 
 ${ASHIMA_SIMPLEX_NOISE_3D}
 
-void main() {
-  vNormal = normalize(normalMatrix * normal);
+// Light ripple fronts: each chunk of a streamed reply launches a ring that
+// travels across the body from a random point (xyz = origin, w = age in s).
+float rippleFronts(vec3 p) {
+  vec3 n = normalize(p);
+  float total = 0.0;
+  for (int i = 0; i < 3; i++) {
+    vec4 r = uRipples[i];
+    if (r.w < 0.0 || r.w > 1.6) continue;
+    float dist = acos(clamp(dot(n, r.xyz), -1.0, 1.0));
+    float front = r.w * 2.6;
+    float band = exp(-pow((dist - front) * 5.5, 2.0));
+    total += band * (1.0 - r.w / 1.6);
+  }
+  return total;
+}
 
-  float motionScale = mix(1.0, 0.15, uReducedMotion);
-
+float coreDisplacement(vec3 p, float motionScale) {
   // Flowing domain-warped organic waves
   vec3 warp = vec3(
-    sin(position.y * 2.4 + uTime * 0.65 * motionScale),
-    cos(position.z * 2.4 - uTime * 0.55 * motionScale),
-    sin(position.x * 2.4 + uTime * 0.7 * motionScale)
+    sin(p.y * 2.4 + uTime * 0.65 * motionScale),
+    cos(p.z * 2.4 - uTime * 0.55 * motionScale),
+    sin(p.x * 2.4 + uTime * 0.7 * motionScale)
   ) * 0.22;
-  float baseWave = simplex2(position * 1.18 + warp, uTime * 0.85 * motionScale);
+  float baseWave = simplex2(p * 1.18 + warp, uTime * 0.85 * motionScale);
 
   // High-frequency radial contraction & tremor during thinking
-  float thinkingTremor = sin(uTime * 32.0 * motionScale + position.x * 14.0 + position.y * 16.0) * uThinkingTension * 0.045;
+  float thinkingTremor = sin(uTime * 32.0 * motionScale + p.x * 14.0 + p.y * 16.0) * uThinkingTension * 0.045;
   float thinkingContract = -uThinkingTension * 0.11;
 
   // Streaming outward ripple with token energy
-  float streamWave = sin(length(position + warp * 0.5) * 6.5 - uTime * 6.5 * motionScale);
+  float streamWave = sin(length(p + warp * 0.5) * 6.5 - uTime * 6.5 * motionScale);
   float streamRipple = streamWave * (uStreamVelocity * 0.085 + uPulseEnergy * 0.14);
 
   // Typing gentle hum
-  float typingHum = sin(position.y * 5.2 + uTime * 3.2 * motionScale) * uTypingIntensity * 0.038;
+  float typingHum = sin(p.y * 5.2 + uTime * 3.2 * motionScale) * uTypingIntensity * 0.038;
 
-  float disp = (baseWave * 0.095 + streamRipple + thinkingTremor + thinkingContract + typingHum) * motionScale;
+  float chunkSwell = rippleFronts(p) * 0.05;
+
+  return (baseWave * 0.095 + streamRipple + thinkingTremor + thinkingContract + typingHum + chunkSwell) * motionScale;
+}
+
+void main() {
+  float motionScale = mix(1.0, 0.15, uReducedMotion);
+
+  vec3 n = normalize(normal);
+  float disp = coreDisplacement(position, motionScale);
   vDisplacement = disp;
+  vRipple = rippleFronts(position);
 
-  vec3 displacedPosition = position + normal * disp;
+  // Rebuild the normal from the displaced surface so light follows the
+  // ripples instead of the undistorted sphere (smooth glossy liquid).
+  vec3 helper = abs(n.y) < 0.99 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0);
+  vec3 tangent = normalize(cross(n, helper));
+  vec3 bitangent = normalize(cross(n, tangent));
+  float eps = 0.012;
+  vec3 pA = position + tangent * eps;
+  vec3 pB = position + bitangent * eps;
+  vec3 dA = pA + normalize(pA) * coreDisplacement(pA, motionScale);
+  vec3 dB = pB + normalize(pB) * coreDisplacement(pB, motionScale);
+  vec3 displacedPosition = position + n * disp;
+  vec3 displacedNormal = normalize(cross(dA - displacedPosition, dB - displacedPosition));
+  if (dot(displacedNormal, n) < 0.0) displacedNormal = -displacedNormal;
+
+  vNormal = normalize(normalMatrix * displacedNormal);
+  vSphereNormal = normalize(normalMatrix * n);
   vPosition = displacedPosition;
 
   vec4 mvPosition = modelViewMatrix * vec4(displacedPosition, 1.0);
@@ -232,11 +279,14 @@ uniform float uTypingIntensity;
 uniform float uSynapseFlash;
 uniform vec3 uColor;
 uniform vec3 uCompColor;
+uniform float uFlare;
 
 varying vec3 vNormal;
 varying vec3 vPosition;
 varying vec3 vViewPosition;
 varying float vDisplacement;
+varying float vRipple;
+varying vec3 vSphereNormal;
 
 float wispyCurrents(vec3 p, float t) {
   vec3 w1 = p * 2.6 + vec3(sin(t * 0.45 + p.y * 1.8), cos(t * 0.5 + p.z * 1.8), sin(t * 0.38 + p.x * 1.8)) * 0.65;
@@ -279,8 +329,12 @@ void main() {
   vec3 halfVec1 = normalize(lightDir1 + viewDir);
   vec3 halfVec2 = normalize(lightDir2 + viewDir);
 
-  float specChrome = pow(max(0.0, dot(norm, halfVec1)), 42.0);
-  float specSheen = pow(max(0.0, dot(norm, halfVec1)), 9.0);
+  // Highlights mix the smooth sphere (keeps the big lit hotspot) with the
+  // rippled surface (glossy liquid glints that follow the waves)
+  vec3 sphereNorm = normalize(vSphereNormal);
+  float specChrome = pow(max(0.0, dot(sphereNorm, halfVec1)), 42.0) * 0.8
+                   + pow(max(0.0, dot(norm, halfVec1)), 60.0) * 0.7;
+  float specSheen = pow(max(0.0, dot(sphereNorm, halfVec1)), 9.0);
   float specComp = pow(max(0.0, dot(norm, halfVec2)), 20.0);
 
   // Anisotropic metallic contour bands across displaced shell
@@ -311,6 +365,18 @@ void main() {
   bodyColor += mix(activeHue, compHue, 0.48) * (fresnel * (0.85 + uSynapseFlash * 0.6));
   bodyColor += mix(hotWhite, activeHue, 0.25) * (specChrome * 0.95);
   bodyColor += hotWhite * (veins * (uSynapseFlash * 1.8 + uPulseEnergy * 0.35) + travelingPulse * 0.75 + arc * 1.15);
+
+  // Glowing nucleus seen through the liquid (gives the body depth)
+  float nucleus = pow(NdotV, 6.0) * (0.3 + uPulseEnergy * 0.2 + uStreamVelocity * 0.12 + uFlare * 0.8);
+  bodyColor += mix(activeHue, hotWhite, 0.55) * nucleus;
+
+  // Chunk ripple fronts and the finishing flare
+  bodyColor += mix(activeHue, hotWhite, 0.35) * vRipple * (0.35 + veins * 0.45);
+  bodyColor += mix(activeHue, hotWhite, 0.5) * uFlare * (0.15 + fresnel * 0.7 + veins * 0.4);
+
+  // Compress hot spots so the liquid detail survives the bloom pass
+  float peak = max(bodyColor.r, max(bodyColor.g, bodyColor.b));
+  bodyColor *= 1.0 / (1.0 + max(0.0, peak - 0.85) * 0.55);
 
   float alpha = clamp(0.94 + fresnel * 0.06, 0.0, 1.0);
   gl_FragColor = vec4(bodyColor, alpha);
@@ -396,8 +462,16 @@ uniform float uPulseEnergy;
 uniform float uThinkingTension;
 uniform float uSynapseFlash;
 uniform float uReducedMotion;
+uniform float uPixelRatio;
+uniform vec2 uViewport;
 
-attribute float aT;
+// Each bolt segment is a screen-facing quad so arcs have real thickness.
+attribute vec3 aStart;
+attribute vec3 aEnd;
+attribute float aT0;
+attribute float aT1;
+attribute float aWhich;
+attribute float aSide;
 attribute float aSeed;
 attribute vec3 aOrtho1;
 attribute vec3 aOrtho2;
@@ -405,36 +479,48 @@ attribute vec3 aOrtho2;
 varying float vT;
 varying float vBoltIntensity;
 varying float vSeed;
+varying float vSide;
+
+vec3 boltPoint(vec3 base, float t, float snapTime) {
+  float envelope = sin(t * 3.14159265);
+  // Quantized time steps so arcs snap & crackle like high-voltage plasma
+  float jag1 = sin(t * 17.0 + snapTime * 4.7 + aSeed * 31.0)
+             + 0.3 * cos(t * 41.0 - snapTime * 7.3 + aSeed * 17.0);
+  float jag2 = cos(t * 19.0 - snapTime * 5.9 + aSeed * 43.0)
+             + 0.3 * sin(t * 45.0 + snapTime * 8.1 + aSeed * 23.0);
+  float amp = envelope * (0.07 + uPulseEnergy * 0.04 + uThinkingTension * 0.04 + uSynapseFlash * 0.05);
+  return base + (aOrtho1 * jag1 + aOrtho2 * jag2) * amp;
+}
 
 void main() {
-  vT = aT;
-  vSeed = aSeed;
-
   float motionScale = mix(1.0, 0.2, uReducedMotion);
-  float envelope = sin(aT * 3.14159265);
-
-  // Quantized time steps so electric arcs snap & crackle like real high-voltage plasma
   float snapRate = (11.0 + uStreamVelocity * 10.0 + uThinkingTension * 12.0) * motionScale;
   float snapTime = floor(uTime * snapRate + aSeed * 19.0);
 
-  // High-frequency jagged displacement + secondary micro-forking jitter
-  float jag1 = sin(aT * 26.0 + snapTime * 4.7 + aSeed * 31.0)
-             + 0.55 * cos(aT * 59.0 - snapTime * 7.3 + aSeed * 17.0);
-  float jag2 = cos(aT * 31.0 - snapTime * 5.9 + aSeed * 43.0)
-             + 0.55 * sin(aT * 67.0 + snapTime * 8.1 + aSeed * 23.0);
+  vec4 clipA = projectionMatrix * modelViewMatrix * vec4(boltPoint(aStart, aT0, snapTime), 1.0);
+  vec4 clipB = projectionMatrix * modelViewMatrix * vec4(boltPoint(aEnd, aT1, snapTime), 1.0);
+  vec4 clip = aWhich < 0.5 ? clipA : clipB;
+  float t = aWhich < 0.5 ? aT0 : aT1;
+  vT = t;
+  vSeed = aSeed;
+  vSide = aSide;
 
-  float amp = envelope * (0.095 + uPulseEnergy * 0.06 + uThinkingTension * 0.055 + uSynapseFlash * 0.07);
-  vec3 displaced = position + (aOrtho1 * jag1 + aOrtho2 * jag2) * amp;
+  vec2 screenA = clipA.xy / clipA.w * uViewport;
+  vec2 screenB = clipB.xy / clipB.w * uViewport;
+  vec2 dir = screenB - screenA;
+  dir = length(dir) > 0.0001 ? normalize(dir) : vec2(1.0, 0.0);
+  vec2 perp = vec2(-dir.y, dir.x);
+
+  float widthPx = (1.6 + uSynapseFlash * 1.2 + uThinkingTension * 0.6) * uPixelRatio * sin(t * 3.14159265 * 0.92 + 0.12);
+  clip.xy += perp * aSide * widthPx / uViewport * clip.w;
 
   // Intermittent firing gate per bolt
   float cycle = sin(uTime * (2.8 + fract(aSeed * 7.3) * 3.2) * motionScale + aSeed * 40.0);
-  float threshold = 0.42 - uPulseEnergy * 0.28 - uThinkingTension * 0.25 - uStreamVelocity * 0.22 - uSynapseFlash * 0.5;
+  float threshold = 0.72 - uPulseEnergy * 0.32 - uThinkingTension * 0.42 - uStreamVelocity * 0.25 - uSynapseFlash * 0.6;
   float activeGate = smoothstep(threshold, threshold + 0.22, cycle);
-
   vBoltIntensity = clamp(activeGate + uSynapseFlash * 0.85, 0.0, 1.0);
 
-  vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);
-  gl_Position = projectionMatrix * mvPosition;
+  gl_Position = clip;
 }
 `
 
@@ -447,18 +533,22 @@ uniform vec3 uCompColor;
 varying float vT;
 varying float vBoltIntensity;
 varying float vSeed;
+varying float vSide;
 
 void main() {
   if (vBoltIntensity < 0.01) discard;
+  float profile = 1.0 - abs(vSide);
+  float coreLine = smoothstep(0.0, 0.7, profile);
 
   float endPinch = sin(vT * 3.14159265);
   float surge = 0.65 + 0.35 * sin(vT * 18.0 - uTime * 28.0 + vSeed * 20.0);
 
   vec3 arcTint = mix(uColor, uCompColor, fract(vSeed * 3.7));
-  vec3 hotCore = mix(arcTint, vec3(0.96, 0.99, 1.0), 0.72 + uSynapseFlash * 0.25);
+  vec3 hotCore = mix(arcTint, vec3(0.96, 0.99, 1.0), 0.6 + uSynapseFlash * 0.3);
 
-  float alpha = vBoltIntensity * surge * (0.35 + 0.65 * endPinch);
-  gl_FragColor = vec4(hotCore, clamp(alpha, 0.0, 1.0));
+  // Bright enough to feed the bloom pass, which turns the thin line into a glowing arc
+  float alpha = vBoltIntensity * surge * (0.35 + 0.65 * endPinch) * coreLine;
+  gl_FragColor = vec4(hotCore * 1.6, clamp(alpha, 0.0, 1.0));
 }
 `
 
@@ -616,8 +706,9 @@ void main() {
   float phase1 = fract(normAngle * uScanDir - uTime * speed);
   float phase2 = fract(normAngle * uScanDir - uTime * speed + 0.5);
 
-  float comet1 = pow(smoothstep(0.0, 0.95, 1.0 - phase1), 3.5);
-  float comet2 = pow(smoothstep(0.0, 0.95, 1.0 - phase2), 4.5) * 0.65;
+  // Soft head (no hard cut where the comet wraps around)
+  float comet1 = pow(smoothstep(0.0, 0.95, 1.0 - phase1), 3.5) * smoothstep(0.0, 0.06, phase1);
+  float comet2 = pow(smoothstep(0.0, 0.95, 1.0 - phase2), 4.5) * 0.65 * smoothstep(0.0, 0.06, phase2);
 
   // Metallic specular sheen along the ribbon
   vec3 viewDir = normalize(vViewPosition);
@@ -742,6 +833,33 @@ void main() {
 }
 `
 
+// Final pass: soft highlight roll-off and an alpha that keeps glow visible on
+// the transparent canvas (the page background shows through everywhere else).
+const OUTPUT_FRAGMENT_SHADER = `
+uniform sampler2D tDiffuse;
+varying vec2 vUv;
+
+vec3 softClip(vec3 c) {
+  vec3 over = max(c - 0.78, 0.0);
+  return min(c, 0.78) + (1.0 - exp(-over * 4.0)) * 0.22;
+}
+
+void main() {
+  vec4 texel = texture2D(tDiffuse, vUv);
+  vec3 col = softClip(max(texel.rgb, 0.0));
+  float alpha = clamp(max(texel.a, max(col.r, max(col.g, col.b))), 0.0, 1.0);
+  gl_FragColor = vec4(col, alpha);
+}
+`
+
+const OUTPUT_VERTEX_SHADER = `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`
+
 // ---------------------------------------------------------------------------
 // BUILDER HELPERS
 // ---------------------------------------------------------------------------
@@ -751,7 +869,7 @@ function buildCore(
   sharedUniforms: SharedUniforms,
   disposables: Disposable[]
 ): THREE.Mesh {
-  const coreDetail = isCompact ? 10 : 16
+  const coreDetail = isCompact ? 14 : 24
   const coreGeo = new THREE.IcosahedronGeometry(1.15, coreDetail)
   const coreMaterial = new THREE.ShaderMaterial({
     vertexShader: CORE_VERTEX_SHADER,
@@ -932,17 +1050,24 @@ function buildWispySynapseAndLightning(
   disposables.push(tendrilGeo, tendrilMat)
 
   // 2. High-Voltage Synaptic Lightning Arcs (branching/snapping electrical bolts between core and outer field)
-  const boltCount = isCompact ? 12 : 22
-  const boltSteps = isCompact ? 16 : 22
+  const boltCount = isCompact ? 8 : 14
+  const boltSteps = isCompact ? 20 : 28
   const totalBoltSegments = boltCount * boltSteps
 
-  const boltPos = new Float32Array(totalBoltSegments * 2 * 3)
-  const boltT = new Float32Array(totalBoltSegments * 2)
-  const boltSeed = new Float32Array(totalBoltSegments * 2)
-  const boltOrtho1 = new Float32Array(totalBoltSegments * 2 * 3)
-  const boltOrtho2 = new Float32Array(totalBoltSegments * 2 * 3)
+  // 4 vertices per segment (quad), 6 indices
+  const vCount = totalBoltSegments * 4
+  const boltStart = new Float32Array(vCount * 3)
+  const boltEnd = new Float32Array(vCount * 3)
+  const boltT0 = new Float32Array(vCount)
+  const boltT1 = new Float32Array(vCount)
+  const boltWhich = new Float32Array(vCount)
+  const boltSide = new Float32Array(vCount)
+  const boltSeed = new Float32Array(vCount)
+  const boltOrtho1 = new Float32Array(vCount * 3)
+  const boltOrtho2 = new Float32Array(vCount * 3)
+  const boltIndex: number[] = []
 
-  let bIdx = 0
+  let vIdx = 0
   for (let b = 0; b < boltCount; b++) {
     const start = sampleSphericalPoint(rng, 1.12)
     const dir = start.clone().normalize()
@@ -977,41 +1102,43 @@ function buildWispySynapseAndLightning(
       const pB = pts[s + 1]
       const t0 = s / boltSteps
       const t1 = (s + 1) / boltSteps
-
-      boltPos[bIdx * 6 + 0] = pA.x
-      boltPos[bIdx * 6 + 1] = pA.y
-      boltPos[bIdx * 6 + 2] = pA.z
-      boltT[bIdx * 2 + 0] = t0
-      boltSeed[bIdx * 2 + 0] = seed
-      boltOrtho1[bIdx * 6 + 0] = ortho1.x
-      boltOrtho1[bIdx * 6 + 1] = ortho1.y
-      boltOrtho1[bIdx * 6 + 2] = ortho1.z
-      boltOrtho2[bIdx * 6 + 0] = ortho2.x
-      boltOrtho2[bIdx * 6 + 1] = ortho2.y
-      boltOrtho2[bIdx * 6 + 2] = ortho2.z
-
-      boltPos[bIdx * 6 + 3] = pB.x
-      boltPos[bIdx * 6 + 4] = pB.y
-      boltPos[bIdx * 6 + 5] = pB.z
-      boltT[bIdx * 2 + 1] = t1
-      boltSeed[bIdx * 2 + 1] = seed
-      boltOrtho1[bIdx * 6 + 3] = ortho1.x
-      boltOrtho1[bIdx * 6 + 4] = ortho1.y
-      boltOrtho1[bIdx * 6 + 5] = ortho1.z
-      boltOrtho2[bIdx * 6 + 3] = ortho2.x
-      boltOrtho2[bIdx * 6 + 4] = ortho2.y
-      boltOrtho2[bIdx * 6 + 5] = ortho2.z
-
-      bIdx++
+      const corners: Array<[number, number]> = [
+        [0, -1],
+        [0, 1],
+        [1, -1],
+        [1, 1],
+      ]
+      for (const [which, side] of corners) {
+        boltStart.set([pA.x, pA.y, pA.z], vIdx * 3)
+        boltEnd.set([pB.x, pB.y, pB.z], vIdx * 3)
+        boltOrtho1.set([ortho1.x, ortho1.y, ortho1.z], vIdx * 3)
+        boltOrtho2.set([ortho2.x, ortho2.y, ortho2.z], vIdx * 3)
+        boltT0[vIdx] = t0
+        boltT1[vIdx] = t1
+        boltWhich[vIdx] = which
+        boltSide[vIdx] = side
+        boltSeed[vIdx] = seed
+        vIdx++
+      }
+      const base = vIdx - 4
+      boltIndex.push(base, base + 2, base + 1, base + 1, base + 2, base + 3)
     }
   }
 
   const boltGeo = new THREE.BufferGeometry()
-  boltGeo.setAttribute('position', new THREE.BufferAttribute(boltPos, 3))
-  boltGeo.setAttribute('aT', new THREE.BufferAttribute(boltT, 1))
+  boltGeo.setAttribute('position', new THREE.BufferAttribute(boltStart, 3))
+  boltGeo.setAttribute('aStart', new THREE.BufferAttribute(boltStart, 3))
+  boltGeo.setAttribute('aEnd', new THREE.BufferAttribute(boltEnd, 3))
+  boltGeo.setAttribute('aT0', new THREE.BufferAttribute(boltT0, 1))
+  boltGeo.setAttribute('aT1', new THREE.BufferAttribute(boltT1, 1))
+  boltGeo.setAttribute('aWhich', new THREE.BufferAttribute(boltWhich, 1))
+  boltGeo.setAttribute('aSide', new THREE.BufferAttribute(boltSide, 1))
   boltGeo.setAttribute('aSeed', new THREE.BufferAttribute(boltSeed, 1))
   boltGeo.setAttribute('aOrtho1', new THREE.BufferAttribute(boltOrtho1, 3))
   boltGeo.setAttribute('aOrtho2', new THREE.BufferAttribute(boltOrtho2, 3))
+  boltGeo.setIndex(boltIndex)
+  // Vertices are moved in the shader; keep the bolts from being culled
+  boltGeo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 3)
 
   const boltMat = new THREE.ShaderMaterial({
     vertexShader: LIGHTNING_VERTEX_SHADER,
@@ -1022,8 +1149,9 @@ function buildWispySynapseAndLightning(
     transparent: true,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
+    side: THREE.DoubleSide,
   })
-  const boltMesh = new THREE.LineSegments(boltGeo, boltMat)
+  const boltMesh = new THREE.Mesh(boltGeo, boltMat)
   group.add(boltMesh)
   disposables.push(boltGeo, boltMat)
 
@@ -1090,7 +1218,7 @@ function buildCyberRibbonRings(
   ring3: THREE.Mesh
 } {
   const group = new THREE.Group()
-  const tubularSegments = isCompact ? 96 : 144
+  const tubularSegments = isCompact ? 128 : 220
 
   const createRibbonMaterial = (ringSpeed: number, scanDir: number, colorMix: number) => {
     const mat = new THREE.ShaderMaterial({
@@ -1111,7 +1239,7 @@ function buildCyberRibbonRings(
     return mat
   }
 
-  const ring1Geo = new THREE.TorusGeometry(1.7, 0.022, 8, tubularSegments)
+  const ring1Geo = new THREE.TorusGeometry(1.7, 0.022, 12, tubularSegments)
   const ring1Mat = createRibbonMaterial(1.0, 1.0, 0.15)
   const ring1 = new THREE.Mesh(ring1Geo, ring1Mat)
   ring1.rotation.x = Math.PI * 0.35
@@ -1119,7 +1247,7 @@ function buildCyberRibbonRings(
   group.add(ring1)
   disposables.push(ring1Geo)
 
-  const ring2Geo = new THREE.TorusGeometry(1.9, 0.018, 8, tubularSegments)
+  const ring2Geo = new THREE.TorusGeometry(1.9, 0.018, 12, tubularSegments)
   const ring2Mat = createRibbonMaterial(-1.25, -1.0, 0.55)
   const ring2 = new THREE.Mesh(ring2Geo, ring2Mat)
   ring2.rotation.x = -Math.PI * 0.4
@@ -1127,7 +1255,7 @@ function buildCyberRibbonRings(
   group.add(ring2)
   disposables.push(ring2Geo)
 
-  const ring3Geo = new THREE.TorusGeometry(2.1, 0.016, 8, tubularSegments)
+  const ring3Geo = new THREE.TorusGeometry(2.1, 0.016, 12, tubularSegments)
   const ring3Mat = createRibbonMaterial(1.45, 1.0, 0.85)
   const ring3 = new THREE.Mesh(ring3Geo, ring3Mat)
   ring3.rotation.x = Math.PI * 0.6
@@ -1192,6 +1320,8 @@ export function SynapticEntityCanvas({
     let mql: MediaQueryList | null = null
     let handleMqlChange: ((e: MediaQueryListEvent) => void) | null = null
     let handleVisibilityChange: (() => void) | null = null
+    let handlePointerMove: ((event: PointerEvent) => void) | null = null
+    let handlePointerLeave: (() => void) | null = null
 
     const disposables: Disposable[] = []
 
@@ -1206,10 +1336,11 @@ export function SynapticEntityCanvas({
       renderer = new THREE.WebGLRenderer({
         canvas,
         alpha: true,
-        antialias: initialPr < 1.5,
+        antialias: false,
         powerPreference: 'high-performance',
       })
       renderer.setPixelRatio(currentPr)
+      renderer.setClearColor(0x000000, 0)
       renderer.toneMapping = THREE.ACESFilmicToneMapping
       renderer.toneMappingExposure = 1.15
 
@@ -1248,8 +1379,17 @@ export function SynapticEntityCanvas({
         uColorShift: { value: 0 },
         uReducedMotion: { value: 0 },
         uPixelRatio: { value: currentPr },
+        uViewport: { value: new THREE.Vector2(150, 150) },
         uColor: { value: activeColor },
         uCompColor: { value: compColor },
+        uRipples: {
+          value: [
+            new THREE.Vector4(0, 0, 1, -1),
+            new THREE.Vector4(0, 0, 1, -1),
+            new THREE.Vector4(0, 0, 1, -1),
+          ],
+        },
+        uFlare: { value: 0 },
       }
 
       const rng = createMulberry32(0x594e)
@@ -1278,6 +1418,35 @@ export function SynapticEntityCanvas({
       const rings = buildCyberRibbonRings(isCompact, sharedUniforms, disposables)
       rootGroup.add(rings.group)
 
+      // Post-processing: real bloom so the core, rings and arcs give off light.
+      // Multisampled HDR target keeps edges clean (the canvas itself has no MSAA).
+      const composerTarget = new THREE.WebGLRenderTarget(1, 1, {
+        type: THREE.HalfFloatType,
+        samples: renderer.capabilities.isWebGL2 ? 4 : 0,
+      })
+      const composer = new EffectComposer(renderer, composerTarget)
+      composer.setPixelRatio(currentPr)
+      const renderPass = new RenderPass(scene, camera)
+      renderPass.clearAlpha = 0
+      composer.addPass(renderPass)
+      const bloomStrengthBase = isCompact ? 0.42 : 0.5
+      const bloomPass = new UnrealBloomPass(
+        new THREE.Vector2(256, 256),
+        bloomStrengthBase,
+        isCompact ? 0.4 : 0.5,
+        0.78
+      )
+      composer.addPass(bloomPass)
+      const outputPass = new ShaderPass(
+        new THREE.ShaderMaterial({
+          uniforms: { tDiffuse: { value: null } },
+          vertexShader: OUTPUT_VERTEX_SHADER,
+          fragmentShader: OUTPUT_FRAGMENT_SHADER,
+        })
+      )
+      composer.addPass(outputPass)
+      disposables.push(composerTarget, bloomPass, outputPass, { dispose: () => composer.dispose() })
+
       const updateDimensions = () => {
         if (!container || !renderer || !camera) return
         const width = container.clientWidth || 300
@@ -1285,6 +1454,9 @@ export function SynapticEntityCanvas({
         camera.aspect = width / height
         camera.updateProjectionMatrix()
         renderer.setSize(width, height, false)
+        composer.setSize(width, height)
+        // Half the drawing-buffer size, for clip-space to pixel conversion
+        sharedUniforms.uViewport.value.set((width * currentPr) / 2, (height * currentPr) / 2)
       }
       updateDimensions()
 
@@ -1318,6 +1490,35 @@ export function SynapticEntityCanvas({
         }
       }
 
+      // Pointer lean: the core turns slightly toward the cursor
+      const pointerTarget = { x: 0, y: 0 }
+      const pointerCurrent = { x: 0, y: 0 }
+      handlePointerMove = (event: PointerEvent) => {
+        if (!container) return
+        const rect = container.getBoundingClientRect()
+        if (rect.width === 0 || rect.height === 0) return
+        const nx = ((event.clientX - rect.left) / rect.width) * 2 - 1
+        const ny = ((event.clientY - rect.top) / rect.height) * 2 - 1
+        pointerTarget.x = Math.max(-1, Math.min(1, nx))
+        pointerTarget.y = Math.max(-1, Math.min(1, ny))
+      }
+      handlePointerLeave = () => {
+        pointerTarget.x = 0
+        pointerTarget.y = 0
+      }
+      window.addEventListener('pointermove', handlePointerMove, { passive: true })
+      document.documentElement.addEventListener('pointerleave', handlePointerLeave)
+
+      // Chunk ripples (3 slots, recycled) and the end-of-reply flare
+      const rippleSlots = sharedUniforms.uRipples.value
+      const rippleOrigin = new THREE.Vector3()
+      const coreInverse = new THREE.Quaternion()
+      let nextRippleSlot = 0
+      let lastRippleAt = -10
+      let lastCharsSeen = 0
+      let lastLifecycle: EntityBridgeFrameSnapshot['lifecycle'] = 'idle'
+      let flare = 0
+
       let lastTimeMs = performance.now()
       let elapsedTotal = 0
       let rollingFrameTimeMs = 16.6
@@ -1339,7 +1540,9 @@ export function SynapticEntityCanvas({
           if (slowAccumulatorSeconds >= 1.5) {
             currentPr = Math.max(1.0, currentPr - 0.25)
             renderer?.setPixelRatio(currentPr)
+            composer.setPixelRatio(currentPr)
             sharedUniforms.uPixelRatio.value = currentPr
+            updateDimensions()
             slowAccumulatorSeconds = 0
           }
         } else {
@@ -1359,6 +1562,37 @@ export function SynapticEntityCanvas({
         sharedUniforms.uSynapseFlash.value = snapshot.synapseFlash
         sharedUniforms.uColorShift.value = snapshot.colorShift
         sharedUniforms.uReducedMotion.value = prefersReducedMotion ? 1.0 : 0.0
+
+        // Age ripples; launch a new one when fresh text arrives (at most ~5/s)
+        for (const slot of rippleSlots) {
+          if (slot.w >= 0) slot.w = slot.w > 1.6 ? -1 : slot.w + dtSeconds * motionScale
+        }
+        if (snapshot.totalCharsStreamed > lastCharsSeen && elapsedTotal - lastRippleAt > 0.2) {
+          // Pick a random point on the visible face, expressed in the core's local space
+          rippleOrigin
+            .set(Math.random() * 1.4 - 0.7, Math.random() * 1.4 - 0.7, 0.8)
+            .normalize()
+          coreInverse.copy(coreMesh.quaternion).invert()
+          rippleOrigin.applyQuaternion(coreInverse)
+          rippleSlots[nextRippleSlot].set(rippleOrigin.x, rippleOrigin.y, rippleOrigin.z, 0)
+          nextRippleSlot = (nextRippleSlot + 1) % rippleSlots.length
+          lastRippleAt = elapsedTotal
+        }
+        lastCharsSeen = snapshot.totalCharsStreamed
+
+        // Short flare when a reply finishes cleanly
+        if (lastLifecycle === 'streaming' && snapshot.lifecycle === 'idle') flare = 1
+        lastLifecycle = snapshot.lifecycle
+        flare *= Math.exp(-2.4 * dtSeconds)
+        sharedUniforms.uFlare.value = flare
+
+        bloomPass.strength =
+          bloomStrengthBase *
+          (1.0 +
+            snapshot.pulseEnergy * 0.18 +
+            snapshot.synapseFlash * 0.3 +
+            snapshot.thinkingTension * 0.2 +
+            flare * 0.8)
 
         // Primary + Complementary Palette Blending across Entity Lifecycle States
         if (snapshot.colorShift < 0.45) {
@@ -1381,7 +1615,8 @@ export function SynapticEntityCanvas({
           (1.0 +
             snapshot.pulseEnergy * 0.18 +
             snapshot.synapseFlash * 0.35 +
-            snapshot.streamVelocity * 0.12)
+            snapshot.streamVelocity * 0.12 +
+            flare * 0.3)
         glow.coronaSprite.scale.set(coronaScale, coronaScale, 1.0)
         glow.coronaMaterial.color.copy(activeColor)
         glow.coronaMaterial.opacity = Math.min(
@@ -1437,10 +1672,13 @@ export function SynapticEntityCanvas({
         // Autonomous subtle sinusoidal idle drift (no mouse/pointer movement)
         const idleSwayX = Math.sin(elapsedTotal * 0.55) * 0.045 * motionScale
         const idleSwayY = Math.cos(elapsedTotal * 0.42) * 0.035 * motionScale
-        rootGroup.rotation.y = idleSwayX
-        rootGroup.rotation.x = idleSwayY
+        const lean = prefersReducedMotion ? 0 : 1 - Math.exp(-3 * dtSeconds)
+        pointerCurrent.x += (pointerTarget.x - pointerCurrent.x) * lean
+        pointerCurrent.y += (pointerTarget.y - pointerCurrent.y) * lean
+        rootGroup.rotation.y = idleSwayX + pointerCurrent.x * 0.22
+        rootGroup.rotation.x = idleSwayY + pointerCurrent.y * 0.16
 
-        renderer?.render(scene, camera)
+        composer.render(dtSeconds)
         frameId = window.requestAnimationFrame(tick)
       }
 
@@ -1496,6 +1734,12 @@ export function SynapticEntityCanvas({
       }
       if (intersectionObserver) {
         intersectionObserver.disconnect()
+      }
+      if (handlePointerMove && typeof window !== 'undefined') {
+        window.removeEventListener('pointermove', handlePointerMove)
+      }
+      if (handlePointerLeave && typeof document !== 'undefined') {
+        document.documentElement.removeEventListener('pointerleave', handlePointerLeave)
       }
       if (handleVisibilityChange && typeof document !== 'undefined') {
         document.removeEventListener('visibilitychange', handleVisibilityChange)
