@@ -77,6 +77,7 @@ import { Route as HudAcademyIndexRouteImport } from './routes/_hud/academy/index
 import { Route as HudAdminIndexRouteImport } from './routes/_hud/admin.index'
 import { Route as HudAdminLogicRouteImport } from './routes/_hud/admin.logic'
 import { Route as HudAdminStoreRouteImport } from './routes/_hud/admin.store'
+import { Route as HudCharacter3dRouteImport } from './routes/_hud/character_.3d'
 import { Route as HudCharacterProgressRouteImport } from './routes/_hud/character_.progress'
 import { Route as HudCharacterShopRouteImport } from './routes/_hud/character_.shop'
 import { Route as HudCodexIndexRouteImport } from './routes/_hud/codex/index'
@@ -440,6 +441,11 @@ const HudAdminStoreRoute = HudAdminStoreRouteImport.update({
   path: '/admin/store',
   getParentRoute: () => HudRoute,
 } as any)
+const HudCharacter3dRoute = HudCharacter3dRouteImport.update({
+  id: '/character_/3d',
+  path: '/character/3d',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudCharacterProgressRoute = HudCharacterProgressRouteImport.update({
   id: '/character_/progress',
   path: '/character/progress',
@@ -613,6 +619,7 @@ export interface FileRoutesByFullPath {
   '/what-is-moltology/': typeof WhatIsMoltologyIndexRoute
   '/admin/logic': typeof HudAdminLogicRoute
   '/admin/store': typeof HudAdminStoreRoute
+  '/character/3d': typeof HudCharacter3dRoute
   '/character/progress': typeof HudCharacterProgressRoute
   '/character/shop': typeof HudCharacterShopRoute
   '/codex/$slug': typeof HudCodexSlugRoute
@@ -699,6 +706,7 @@ export interface FileRoutesByTo {
   '/what-is-moltology': typeof WhatIsMoltologyIndexRoute
   '/admin/logic': typeof HudAdminLogicRoute
   '/admin/store': typeof HudAdminStoreRoute
+  '/character/3d': typeof HudCharacter3dRoute
   '/character/progress': typeof HudCharacterProgressRoute
   '/character/shop': typeof HudCharacterShopRoute
   '/codex/$slug': typeof HudCodexSlugRoute
@@ -789,6 +797,7 @@ export interface FileRoutesById {
   '/what-is-moltology/': typeof WhatIsMoltologyIndexRoute
   '/_hud/admin/logic': typeof HudAdminLogicRoute
   '/_hud/admin/store': typeof HudAdminStoreRoute
+  '/_hud/character_/3d': typeof HudCharacter3dRoute
   '/_hud/character_/progress': typeof HudCharacterProgressRoute
   '/_hud/character_/shop': typeof HudCharacterShopRoute
   '/_hud/codex/$slug': typeof HudCodexSlugRoute
@@ -880,6 +889,7 @@ export interface FileRouteTypes {
     | '/what-is-moltology/'
     | '/admin/logic'
     | '/admin/store'
+    | '/character/3d'
     | '/character/progress'
     | '/character/shop'
     | '/codex/$slug'
@@ -966,6 +976,7 @@ export interface FileRouteTypes {
     | '/what-is-moltology'
     | '/admin/logic'
     | '/admin/store'
+    | '/character/3d'
     | '/character/progress'
     | '/character/shop'
     | '/codex/$slug'
@@ -1055,6 +1066,7 @@ export interface FileRouteTypes {
     | '/what-is-moltology/'
     | '/_hud/admin/logic'
     | '/_hud/admin/store'
+    | '/_hud/character_/3d'
     | '/_hud/character_/progress'
     | '/_hud/character_/shop'
     | '/_hud/codex/$slug'
@@ -1612,6 +1624,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudAdminStoreRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/character_/3d': {
+      id: '/_hud/character_/3d'
+      path: '/character/3d'
+      fullPath: '/character/3d'
+      preLoaderRoute: typeof HudCharacter3dRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/character_/progress': {
       id: '/_hud/character_/progress'
       path: '/character/progress'
@@ -1799,6 +1818,7 @@ interface HudRouteChildren {
   HudSupportRoute: typeof HudSupportRoute
   HudAdminLogicRoute: typeof HudAdminLogicRoute
   HudAdminStoreRoute: typeof HudAdminStoreRoute
+  HudCharacter3dRoute: typeof HudCharacter3dRoute
   HudCharacterProgressRoute: typeof HudCharacterProgressRoute
   HudCharacterShopRoute: typeof HudCharacterShopRoute
   HudMemberProfileIdRoute: typeof HudMemberProfileIdRoute
@@ -1827,6 +1847,7 @@ const HudRouteChildren: HudRouteChildren = {
   HudSupportRoute: HudSupportRoute,
   HudAdminLogicRoute: HudAdminLogicRoute,
   HudAdminStoreRoute: HudAdminStoreRoute,
+  HudCharacter3dRoute: HudCharacter3dRoute,
   HudCharacterProgressRoute: HudCharacterProgressRoute,
   HudCharacterShopRoute: HudCharacterShopRoute,
   HudMemberProfileIdRoute: HudMemberProfileIdRoute,
