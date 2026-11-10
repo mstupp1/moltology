@@ -14,6 +14,100 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    "slug": "2026-11-08-clearer-names-and-a-floating-top-bar",
+    "version": "2026.11.08",
+    "title": "Clearer Names and a Floating Top Bar",
+    "category": "Improvement",
+    "tags": [
+      "Improvement",
+      "Navigation",
+      "Mobile",
+      "Design"
+    ],
+    "summary": "Every page now has one clear name, the top bar floats above your content, and the Activity feed is easier to scan. The Codex reader is lighter and quicker to move through.",
+    "content": "### One Name for Each Page\n- Pages use the same name in the menu, the page heading, and the browser tab.\n- Icons are clearer: Character has a shell, Forum uses speech bubbles, and Quiz has a checklist.\n\n### A Floating Top Bar\n- The top bar floats above your content on phones and desktop.\n- On desktop, the side rail is more compact. On phones, today's alignment count sits inside a small progress ring.\n\n### Activity and Codex\n- Activity shows newer items first, grouped under Today, Yesterday, and date headings, and loads more as you scroll.\n- The Codex reader is slimmer, with section links, search hits, and a sticky bar on phones.\n- Daily alignment tasks now use the names from the Daily Shedding Routine.",
+    "isPublished": true,
+    "releasedAt": "2026-11-08T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-06-lighter-lists-and-a-cleaner-search",
+    "version": "2026.11.06",
+    "title": "Lighter Lists and a Cleaner Search",
+    "category": "Performance",
+    "tags": [
+      "Performance",
+      "Navigation",
+      "UI/UX",
+      "Tools"
+    ],
+    "summary": "Forum topics and replies load in short pages, so long lists open faster. Search has a cleaner panel, and notifications have their own bell.",
+    "content": "### Faster Long Lists\n- Forum topics and replies load 30 at a time, with a Load more button when you want to keep reading.\n- Forum boards show unread counts faster.\n\n### A Cleaner Search\n- The search panel is simpler, and it fills the screen on phones.\n- A Go to list option takes you straight to the full page of results.\n\n### Clearer Notifications and Gear\n- Notifications have their own bell, so they are easy to find.\n- Customize shows only the gear you own, and you can try on new pieces in the shop.",
+    "isPublished": true,
+    "releasedAt": "2026-11-06T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-05-five-vectors-and-a-phone-bottom-bar",
+    "version": "2026.11.05",
+    "title": "Five Vectors and a Phone Bottom Bar",
+    "category": "Improvement",
+    "tags": [
+      "Improvement",
+      "Mobile",
+      "Navigation",
+      "UI/UX"
+    ],
+    "summary": "Your character now shows five clear vectors, with gear bonuses shown beside each one. Phones get a bottom bar for the pages you use most, and the sidebar is flatter.",
+    "content": "### Five Clear Vectors\n- Shell, Torque, Synapse, Ecdysis, and Depth are now the only stats on your character.\n- Gear bonuses appear beside each number, so you can see exactly what a piece adds.\n\n### A Bottom Bar for Phones\n- Dashboard, Oracle, Character, Forum, and More sit at the bottom of the screen.\n- More opens a short sheet with Profile, Codex, Academy, support, and your account.\n\n### A Flatter Sidebar\n- Daily alignment lives in the sidebar, and the sidebar is one simple list.\n- Stages moved into Character, and Friends moved into Profile.\n- Your guest audit results and alignment ticks are kept when you sign up.",
+    "isPublished": true,
+    "releasedAt": "2026-11-05T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-04-earn-gems-and-shop-the-rebuilt-market",
+    "version": "2026.11.04",
+    "title": "Earn Chitin Gems and Shop the Rebuilt Market",
+    "category": "Feature",
+    "tags": [
+      "Feature",
+      "Improvement",
+      "UI/UX",
+      "Tools"
+    ],
+    "summary": "Chitin Gems now come from your own work, and the market is rebuilt around gear with clearer filters, bundles, and a new hoodie and tote in the store.",
+    "content": "### Gems From Your Work\n- Chitin Gems are now earned from daily alignment, streaks, stage milestones, and first-time achievements.\n- Spend your gems on gear you want, with a clear price for each rarity.\n\n### A Rebuilt Market\n- Gear is now shown as unlocks, with rarer versions of each piece to collect.\n- Filter by slot and rarity, and sort the grid to find what you want quickly.\n- A featured banner sits above the grid when nothing is filtered.\n\n### Better Fit and New Store Items\n- Hats sit on the head, and wide bodies no longer clash with narrow heads.\n- A new hoodie and tote are now in the store.\n- On phones, the Creator keeps your character in view while you choose options.",
+    "isPublished": true,
+    "releasedAt": "2026-11-04T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-03-referral-rewards-and-shareable-profiles",
+    "version": "2026.11.03",
+    "title": "Referral Rewards and Shareable Profiles",
+    "category": "Feature",
+    "tags": [
+      "Feature",
+      "Navigation",
+      "UI/UX"
+    ],
+    "summary": "Inviting friends now earns you XP, and profile links preview nicely wherever you share them. Support and character pages are easier to find and use.",
+    "content": "### Rewards for Inviting Friends\n- Friends who join through your invitation now earn you XP.\n- Share your profile link with a clear preview, so the invitation looks as good as it reads.\n\n### Character Studio Polish\n- Head gear sits on the head, and leg gear fits the real legs.\n- Expressions are clearer, and the creator page has a refreshed layout.\n\n### Easier Support\n- Support navigation is simpler, and the support portal matches the rest of the app's look.",
+    "isPublished": true,
+    "releasedAt": "2026-11-03T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-02-oracle-models-and-clearer-limits",
+    "version": "2026.11.02",
+    "title": "Simpler Oracle Choices and Clearer Limits",
+    "category": "Improvement",
+    "tags": [
+      "Improvement",
+      "AI",
+      "UI/UX"
+    ],
+    "summary": "The Oracle model picker is simpler, the Oracle has a fresh look, and free prompts and forum posts now show clear length limits.",
+    "content": "### Simpler Oracle Choices\n- The model picker is shorter and easier to scan, with clearer tier icons.\n- Oracle chat titles are created with the shared chat models, so they stay consistent.\n\n### Clear Limits\n- Free Oracle prompts can be up to 1,500 characters.\n- Forum posts can be up to 1,350 characters, with a live counter while you write.\n\n### A Fresh Look\n- The Oracle core has new flowing currents and lightning.\n- Avatar creation and settings got a polish pass, with consistent profile portraits.",
+    "isPublished": true,
+    "releasedAt": "2026-11-02T23:59:00Z"
+  },
+  {
     "slug": "2026-10-30-oracle-entity-and-stronger-safeguards",
     "version": "2026.10.30",
     "title": "Meet the Oracle in Entity Mode",
