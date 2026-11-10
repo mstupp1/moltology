@@ -301,9 +301,10 @@ export function eyeball(radius: number): BufferGeometry {
  */
 export function eyelid(radius: number, lower = false): BufferGeometry {
   const cap = new SphereGeometry(radius * 1.07, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2)
-  const rim = new TorusGeometry(radius * 1.07, radius * (lower ? 0.07 : 0.1), 8, 32)
+  const rim = new TorusGeometry(radius * 1.07, radius * (lower ? 0.075 : 0.095), 10, 36)
   rim.rotateX(Math.PI / 2)
-  const geo = merge([withAo(cap), withAo(rim, 0.9)])
+  // The rim is shaded darker, so the lid edge reads as a line against the eye.
+  const geo = merge([withAo(cap), withAo(rim, 0.55)])
   if (lower) geo.rotateX(Math.PI)
   return geo
 }
@@ -314,9 +315,9 @@ export function ridge(points: Vector3[], out: Vector3, width: number, height: nu
   return loft({
     keys: profile(spine.length, [
       [0, 0],
-      [0.12, width * 0.7, { front: height / width, back: height / width }],
-      [0.5, width, { front: height / width, back: height / width }],
-      [0.88, width * 0.7, { front: height / width, back: height / width }],
+      [0.1, width * 0.55, { front: height / width, back: height / width }],
+      [0.45, width, { front: height / width, back: height / width }],
+      [0.85, width * 0.6, { front: height / width, back: height / width }],
       [1, 0],
     ]),
     frame: spine.frame,

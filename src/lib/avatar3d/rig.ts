@@ -7,7 +7,8 @@
  * hanging straight down. Sockets are named mount points for gear.
  */
 import { BufferGeometry, Group, Matrix4, Mesh, Object3D, Quaternion, Vector3, type Material } from 'three'
-import { merge } from './parts'
+import type { Loft } from './loft'
+import { merge, type ClawStyle } from './parts'
 
 export type MaterialSlot = 'shell' | 'belly' | 'eye' | 'mouth' | 'brow' | 'teeth' | 'tongue' | 'glow'
 
@@ -26,6 +27,21 @@ export interface SocketInfo {
   radius: number
   /** Height from the socket up to the crown, for gear that arches over the head. */
   rise?: number
+}
+
+/**
+ * What gear needs to know about the body it is built over. Armour is the body's own surface
+ * pushed out a little, so each species publishes the surfaces and sizes that gear wraps.
+ */
+export interface Wearable {
+  race: 'lobster' | 'crab'
+  /** The body a chest plate and belt wrap: the band a plate covers and the belt line, as heights. */
+  torso: { loft: Loft; bone: string; top: number; bottom: number; belt: number }
+  head: { loft: Loft; bone: string; top: number; eyeY: number; eyeRadius: number }
+  arm: { radius: number; upper: number; fore: number; clawSize: number; claw: ClawStyle }
+  leg: { radius: number; thigh: number; shin: number; ankle: number; footLength: number }
+  /** The left antenna's path in character space, and its thickness at the base. */
+  antenna: { path: Vector3[]; thick: number }
 }
 
 const FORWARD = new Vector3(0, 0, 1)
@@ -57,6 +73,8 @@ export class Rig {
   private readonly restWorld = new Map<string, { position: Vector3; quaternion: Quaternion }>()
   private readonly pending = new Map<string, { bone: string; slot: MaterialSlot; geos: BufferGeometry[] }>()
   readonly meshes: Mesh[] = []
+  /** Set by the species builder once the body exists. */
+  wear: Wearable | null = null
 
   constructor() {
     this.root.name = 'avatar3d'
@@ -105,9 +123,18 @@ export class Rig {
 
   /** Attach geometry authored in character space; it is moved into the bone's local space. */
   addWorld(bone: string, slot: MaterialSlot, geo: BufferGeometry): void {
+    this.add(bone, slot, this.localize(bone, geo))
+  }
+
+  /** Move character-space geometry into a bone's local space. */
+  localize(bone: string, geo: BufferGeometry): BufferGeometry {
     const r = this.restWorldOf(bone)
-    const inv = new Matrix4().compose(r.position, r.quaternion, new Vector3(1, 1, 1)).invert()
-    this.add(bone, slot, geo.applyMatrix4(inv))
+    return geo.applyMatrix4(new Matrix4().compose(r.position, r.quaternion, new Vector3(1, 1, 1)).invert())
+  }
+
+  /** The merged mesh a bone carries for a material, once finalized. */
+  mesh(bone: string, slot: MaterialSlot = 'shell'): Mesh | undefined {
+    return this.meshes.find((m) => m.name === `${bone}:${slot}`)
   }
 
   /** A named mount point for gear, given in character space. */

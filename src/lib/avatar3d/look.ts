@@ -5,7 +5,7 @@
 import type { CharacterSpec } from '../avatar/races'
 import { SHELL_PALETTE_MAP, SHELL_PALETTES, type ShellFinish, type ShellMarking, type ShellPalette } from '../avatar/traits'
 
-export interface Avatar3DLook extends Omit<CharacterSpec, 'equipment'> {
+export interface Avatar3DLook extends CharacterSpec {
   palette: ShellPalette
   finish: ShellFinish
   marking: ShellMarking

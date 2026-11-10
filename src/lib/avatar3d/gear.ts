@@ -7,12 +7,22 @@ import type { AvatarAccessory } from '../avatar/traits'
 import type { Rig, SocketInfo } from './rig'
 
 export interface GearItem {
-  socket: string
-  node: Group
   dispose: () => void
 }
 
-function item(socket: string, build: (add: (geo: Mesh['geometry'], material: Material) => Mesh) => void): GearItem {
+interface SocketGear extends GearItem {
+  socket: string
+  node: Group
+}
+
+/** Colours a hat takes from its catalog entry. Left out, each hat uses its own. */
+export interface GearColours {
+  material: string
+  trim: string
+  accent: string
+}
+
+function item(socket: string, build: (add: (geo: Mesh['geometry'], material: Material) => Mesh) => void): SocketGear {
   const node = new Group()
   const owned: { geometry: Mesh['geometry']; material: Material }[] = []
   build((geometry, material) => {
@@ -27,6 +37,7 @@ function item(socket: string, build: (add: (geo: Mesh['geometry'], material: Mat
     socket,
     node,
     dispose: () => {
+      node.removeFromParent()
       for (const o of owned) {
         o.geometry.dispose()
         o.material.dispose()
@@ -37,12 +48,13 @@ function item(socket: string, build: (add: (geo: Mesh['geometry'], material: Mat
 
 const metal = (color: string, roughness = 0.24) => new MeshPhysicalMaterial({ color: new Color(color), metalness: 1, roughness, clearcoat: 0.3 })
 const gloss = (color: string) => new MeshPhysicalMaterial({ color: new Color(color), roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.15 })
+const darker = (hex: string, by: number) => `#${new Color(hex).multiplyScalar(1 - by).getHexString()}`
 const cloth = (color: string) => new MeshPhysicalMaterial({ color: new Color(color), roughness: 0.9, sheen: 1, sheenRoughness: 0.8, sheenColor: new Color('#ffffff') })
 
-const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo) => GearItem>> = {
-  crown: () =>
+const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo, c?: GearColours) => SocketGear>> = {
+  crown: (_s, c) =>
     item('head', (add) => {
-      const gold = metal('#f5b93a')
+      const gold = metal(c?.material ?? '#f5b93a')
       const band = new CylinderGeometry(1.06, 0.98, 0.42, 40, 1, true)
       band.translate(0, 0.2, 0)
       gold.side = 2
@@ -62,12 +74,12 @@ const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo) => GearIt
         gem.scale(1, 1.2, 0.6)
         gem.rotateY(-a + Math.PI / 2)
         gem.translate(Math.cos(a) * 1.05, 0.2, Math.sin(a) * 1.05)
-        add(gem, new MeshPhysicalMaterial({ color: new Color(i % 2 ? '#22d3ee' : '#e8364f'), roughness: 0.08, clearcoat: 1, emissive: new Color(i % 2 ? '#0b6d7d' : '#5c0d1a') }))
+        add(gem, new MeshPhysicalMaterial({ color: new Color(i % 2 ? '#22d3ee' : (c?.accent ?? '#e8364f')), roughness: 0.08, clearcoat: 1, emissive: new Color(i % 2 ? '#0b6d7d' : c ? darker(c.accent, 0.6) : '#5c0d1a') }))
       }
     }),
-  hard_hat: () =>
+  hard_hat: (_s, c) =>
     item('head', (add) => {
-      const shell = gloss('#ffc928')
+      const shell = gloss(c?.material ?? '#ffc928')
       const dome = new SphereGeometry(1.12, 36, 18, 0, Math.PI * 2, 0, Math.PI / 2)
       dome.scale(1, 0.86, 1.04)
       add(dome, shell)
@@ -78,32 +90,32 @@ const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo) => GearIt
       const ridge = new TorusGeometry(1.0, 0.09, 8, 28, Math.PI)
       ridge.rotateY(Math.PI / 2)
       ridge.scale(1, 0.9, 1.04)
-      add(ridge, shell)
+      add(ridge, c ? gloss(c.trim) : shell)
     }),
-  halo: () =>
+  halo: (_s, c) =>
     item('head', (add) => {
       const ring = new TorusGeometry(0.9, 0.09, 12, 48)
       ring.rotateX(Math.PI / 2)
       ring.translate(0, 0.85, 0)
-      add(ring, new MeshPhysicalMaterial({ color: new Color('#fff3bf'), emissive: new Color('#ffd76a'), emissiveIntensity: 1.6, roughness: 0.3 }))
+      add(ring, new MeshPhysicalMaterial({ color: new Color(c?.trim ?? '#fff3bf'), emissive: new Color(c?.accent ?? '#ffd76a'), emissiveIntensity: 1.6, roughness: 0.3 }))
     }),
-  beanie: () =>
+  beanie: (_s, c) =>
     item('head', (add) => {
-      const knit = cloth('#2f7ff0')
+      const knit = cloth(c?.material ?? '#2f7ff0')
       const dome = new SphereGeometry(1.1, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2)
       dome.scale(1, 1.05, 1)
       add(dome, knit)
       const cuff = new TorusGeometry(1.08, 0.17, 12, 40)
       cuff.rotateX(Math.PI / 2)
       cuff.translate(0, 0.08, 0)
-      add(cuff, cloth('#1c4fb8'))
+      add(cuff, cloth(c ? darker(c.material, 0.3) : '#1c4fb8'))
       const pom = new SphereGeometry(0.26, 16, 12)
       pom.translate(0, 1.3, 0)
-      add(pom, cloth('#e4f2ff'))
+      add(pom, cloth(c?.trim ?? '#e4f2ff'))
     }),
-  bow: () =>
+  bow: (_s, c) =>
     item('head', (add) => {
-      const ribbon = cloth('#ff5a8a')
+      const ribbon = cloth(c?.material ?? '#ff5a8a')
       for (const side of [1, -1]) {
         const loop = new SphereGeometry(0.42, 18, 12)
         loop.scale(1, 0.72, 0.42)
@@ -113,11 +125,11 @@ const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo) => GearIt
       }
       const knot = new SphereGeometry(0.17, 14, 10)
       knot.translate(0.45, 0.33, 0.3)
-      add(knot, cloth('#e0356b'))
+      add(knot, cloth(c?.trim ?? '#e0356b'))
     }),
-  headset: (socket) =>
+  headset: (socket, c) =>
     item('ears', (add) => {
-      const dark = gloss('#1c2430')
+      const dark = gloss(c ? darker(c.material, 0.35) : '#1c2430')
       // The band arches from ear to ear over the crown, whatever the head's proportions.
       const band = new TorusGeometry(1.04, 0.07, 10, 40, Math.PI)
       band.scale(1, ((socket?.rise ?? socket?.radius ?? 1) / (socket?.radius ?? 1)) * 1.06, 1)
@@ -130,7 +142,7 @@ const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo) => GearIt
         const pad = new TorusGeometry(0.2, 0.06, 8, 24)
         pad.rotateY(Math.PI / 2)
         pad.translate(side * 1.12, 0, 0)
-        add(pad, new MeshPhysicalMaterial({ color: new Color('#22d3ee'), emissive: new Color('#0e7f92'), roughness: 0.4 }))
+        add(pad, new MeshPhysicalMaterial({ color: new Color(c?.accent ?? '#22d3ee'), emissive: new Color(c ? darker(c.accent, 0.5) : '#0e7f92'), roughness: 0.4 }))
       }
       const boom = new CylinderGeometry(0.028, 0.028, 0.8, 8)
       boom.rotateX(Math.PI / 2)
@@ -141,9 +153,9 @@ const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo) => GearIt
       mic.translate(0.67, -0.22, 0.71)
       add(mic, dark)
     }),
-  visor: () =>
+  visor: (_s, c) =>
     item('face', (add) => {
-      const glass = new MeshPhysicalMaterial({ color: new Color('#22d3ee'), emissive: new Color('#0b8fa6'), emissiveIntensity: 0.9, roughness: 0.1, transparent: true, opacity: 0.55, side: 2, depthWrite: false })
+      const glass = new MeshPhysicalMaterial({ color: new Color(c?.accent ?? '#22d3ee'), emissive: new Color(c ? darker(c.accent, 0.35) : '#0b8fa6'), emissiveIntensity: 0.9, roughness: 0.1, transparent: true, opacity: 0.55, side: 2, depthWrite: false })
       const band = new CylinderGeometry(1.12, 1.12, 0.62, 40, 1, true, -1.05, 2.1)
       band.translate(0, 0.02, -0.98)
       add(band, glass).castShadow = false
@@ -151,7 +163,7 @@ const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo) => GearIt
       frame.rotateX(Math.PI / 2)
       frame.rotateY(Math.PI / 2 + 1.05)
       frame.translate(0, 0.34, -0.98)
-      add(frame, gloss('#1c2430'))
+      add(frame, gloss(c ? darker(c.material, 0.35) : '#1c2430'))
     }),
 }
 
@@ -159,10 +171,10 @@ const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo) => GearIt
 export const SUPPORTED_ACCESSORIES = Object.keys(HEAD_GEAR) as AvatarAccessory[]
 
 /** Mount an accessory on its socket. Returns null when the item has no 3D build yet. */
-export function equipAccessory(rig: Rig, accessory: AvatarAccessory): GearItem | null {
+export function equipAccessory(rig: Rig, accessory: AvatarAccessory, colours?: GearColours): GearItem | null {
   const make = HEAD_GEAR[accessory]
   if (!make) return null
-  const gear = make(rig.sockets.get('ears'))
+  const gear = make(rig.sockets.get('ears'), colours)
   const socket = rig.sockets.get(gear.socket)
   if (!socket) return null
   gear.node.scale.setScalar(socket.radius)

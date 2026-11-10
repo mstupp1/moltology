@@ -3,7 +3,7 @@
  * marking is painted in the shader from each vertex's rest position, so patterns stay glued to
  * the shell in any pose and need no textures.
  */
-import { Color, MeshPhysicalMaterial, MeshStandardMaterial, type Material } from 'three'
+import { Color, MeshPhysicalMaterial, MeshStandardMaterial, type Material, Vector2 } from 'three'
 import type { ShellFinish, ShellMarking, ShellPalette } from '../avatar/traits'
 import { SHELL_PALETTE_MAP } from '../avatar/traits'
 import { EYE_COLOR_SWATCH, type AvatarEyeColor } from '../avatar/parts'
@@ -167,15 +167,22 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
   return material
 }
 
-export function eyeMaterial(color: AvatarEyeColor, pupilScale = 1): MeshPhysicalMaterial {
+/**
+ * Eyes in the reference style: a deep iris with a dark rim and pale streaks, a large pupil and
+ * one crisp highlight on its upper edge. `stretch` is how far the eye socket is widened, so the
+ * iris stays round on an oval eye.
+ */
+export function eyeMaterial(color: AvatarEyeColor, pupilScale = 1, stretch: [number, number] = [1, 1]): MeshPhysicalMaterial {
   const swatch = EYE_COLOR_SWATCH[color]
-  const material = new MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.12, clearcoat: 1, clearcoatRoughness: 0.04 })
+  // Matte enough that the room does not print window shapes on the eye; the highlight is painted.
+  const material = new MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.4, clearcoat: 0.1, clearcoatRoughness: 0.4, envMapIntensity: 0.25 })
   const uniforms = {
     uInner: { value: new Color(swatch.inner) },
     uMid: { value: new Color(swatch.mid) },
     uOuter: { value: new Color(swatch.outer) },
     uRing: { value: new Color(swatch.ring) },
     uPupil: { value: pupilScale },
+    uStretch: { value: new Vector2(stretch[0], stretch[1]) },
   }
   material.userData.uniforms = uniforms
   material.onBeforeCompile = (shader) => {
@@ -188,30 +195,43 @@ export function eyeMaterial(color: AvatarEyeColor, pupilScale = 1): MeshPhysical
         '#include <common>',
         `#include <common>
         varying vec3 vEye;
-        uniform vec3 uInner; uniform vec3 uMid; uniform vec3 uOuter; uniform vec3 uRing; uniform float uPupil;`,
+        uniform vec3 uInner; uniform vec3 uMid; uniform vec3 uOuter; uniform vec3 uRing; uniform float uPupil; uniform vec2 uStretch;
+        float a3Highlight = 0.0;
+        float a3Dark = 0.0;`,
       )
       .replace(
         '#include <color_fragment>',
         `
         vec3 a3Dir = normalize(vEye);
-        float a3Ang = acos(clamp(a3Dir.z, -1.0, 1.0));
-        float a3Iris = 0.74;
-        float a3Pupil = 0.33 * uPupil;
-        float a3T = clamp((a3Ang - a3Pupil) / (a3Iris - a3Pupil), 0.0, 1.0);
-        float a3Spoke = sin(atan(a3Dir.y, a3Dir.x) * 34.0) * 0.5 + 0.5;
-        vec3 a3Col = mix(uInner, uMid, smoothstep(0.0, 0.55, a3T));
-        a3Col = mix(a3Col, uOuter, smoothstep(0.5, 1.0, a3T));
-        a3Col *= 0.9 + 0.16 * a3Spoke * (1.0 - a3T);
-        a3Col = mix(a3Col, uRing, smoothstep(0.84, 1.0, a3T));
+        // Distance from the eye's axis as it appears on the widened eye, in eye radii.
+        vec2 a3At = a3Dir.xy * uStretch;
+        float a3Rho = a3Dir.z > 0.0 ? length(a3At) : 9.0;
+        float a3Iris = 0.6;
+        float a3Pupil = 0.31 * uPupil;
+        float a3T = clamp((a3Rho - a3Pupil) / (a3Iris - a3Pupil), 0.0, 1.0);
+        float a3Angle = atan(a3At.y, a3At.x);
+        float a3Spoke = pow(sin(a3Angle * 19.0) * 0.5 + 0.5, 2.0) * 0.6 + pow(sin(a3Angle * 43.0 + 1.3) * 0.5 + 0.5, 3.0) * 0.4;
+        vec3 a3Deep = mix(uMid, uOuter, 0.38);
+        vec3 a3Col = mix(mix(a3Deep, uMid, 0.7), a3Deep, smoothstep(0.0, 0.5, a3T));
+        a3Col = mix(a3Col, uOuter, smoothstep(0.5, 1.0, a3T) * 0.75);
+        a3Col = mix(a3Col, mix(uMid, uInner, 0.45), 0.42 * a3Spoke * smoothstep(0.05, 0.3, a3T) * (1.0 - smoothstep(0.55, 0.95, a3T)));
+        // Lit from above: the lower half of the iris catches the light.
+        a3Col *= 0.68 + 0.22 * smoothstep(0.5, -0.6, a3At.y / a3Iris);
+        a3Col = mix(a3Col, uRing, smoothstep(0.72, 1.0, a3T) * 0.9);
         // Soft warm shade toward the back of the white, as if the lids shadow it.
-        vec3 a3White = mix(vec3(1.0), vec3(0.86, 0.8, 0.8), smoothstep(0.7, 1.5, a3Ang));
-        vec3 a3Eye = mix(a3Col, a3White, smoothstep(a3Iris - 0.012, a3Iris + 0.012, a3Ang));
-        a3Eye = mix(vec3(0.02, 0.015, 0.02), a3Eye, smoothstep(a3Pupil - 0.012, a3Pupil + 0.012, a3Ang));
-        diffuseColor.rgb = a3Eye;
+        vec3 a3White = mix(vec3(1.0), vec3(0.84, 0.79, 0.8), smoothstep(0.75, 1.25, a3Rho));
+        vec3 a3Eye = mix(a3Col, a3White, smoothstep(a3Iris - 0.012, a3Iris + 0.012, a3Rho));
+        a3Eye = mix(vec3(0.02, 0.015, 0.02), a3Eye, smoothstep(a3Pupil - 0.012, a3Pupil + 0.012, a3Rho));
+        a3Dark = 1.0 - smoothstep(a3Pupil - 0.012, a3Pupil + 0.012, a3Rho);
+        a3Highlight = 1.0 - smoothstep(0.095, 0.11, length(a3At - a3Pupil * vec2(-0.5, 0.7)));
+        diffuseColor.rgb = mix(a3Eye, vec3(1.0), a3Highlight);
         `,
       )
+      // The pupil stays a flat black: no sheen across it.
+      .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, 1.0, a3Dark);')
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(0.9) * a3Highlight;')
   }
-  material.customProgramCacheKey = () => 'avatar3d-eye'
+  material.customProgramCacheKey = () => 'avatar3d-eye-5'
   return material
 }
 
@@ -221,6 +241,8 @@ export interface LookMaterials {
   marking: ShellMarking
   eyeColor: AvatarEyeColor
   pupilScale?: number
+  /** How far the eye socket is widened and heightened. */
+  eyeStretch?: [number, number]
 }
 
 /** The full material set for one character. */
@@ -239,7 +261,7 @@ export function buildMaterials(look: LookMaterials): Record<MaterialSlot, Materi
     }),
     belly: shellMaterial({ base: p.belly, shade: p.bellyShade, highlight: '#ffffff', finish: 'satin', grain: 0.04 }),
     brow: shellMaterial({ base: '#' + new Color(p.base).lerp(new Color(p.shade), 0.6).getHexString(), shade: p.shade, highlight: p.highlight, finish: 'satin' }),
-    eye: eyeMaterial(look.eyeColor, look.pupilScale),
+    eye: eyeMaterial(look.eyeColor, look.pupilScale, look.eyeStretch),
     mouth: new MeshStandardMaterial({ color: new Color(p.deep), roughness: 0.7 }),
     teeth: new MeshStandardMaterial({ color: new Color('#fffaf0'), roughness: 0.35 }),
     tongue: new MeshStandardMaterial({ color: new Color('#ff7d93'), roughness: 0.5 }),

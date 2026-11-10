@@ -4,12 +4,12 @@
  */
 import { BufferAttribute, Quaternion, Vector3, type Group, type Material } from 'three'
 import type { AvatarPose } from '../avatar/traits'
-import { equipAccessory, type GearItem } from './gear'
+import { equipAll } from './equipment'
 import type { Avatar3DLook } from './look'
 import { buildMaterials, disposeMaterials } from './materials'
 import { POSES, poseTargets } from './poses'
 import { Rig, type MaterialSlot } from './rig'
-import { buildCrab, buildLobster, type FaceRig } from './species'
+import { buildCrab, buildLobster, EYE_STRETCH, type FaceRig } from './species'
 
 const PUPIL_SCALE = { standard: 1, big: 1.28, sparkle: 1.1, keen: 0.72 } as const
 const X = new Vector3(1, 0, 0)
@@ -37,6 +37,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     finish: look.finish,
     marking: look.marking,
     eyeColor: look.eyeColor,
+    eyeStretch: EYE_STRETCH[look.eyeShape],
     pupilScale: PUPIL_SCALE[look.pupil] * (look.expression === 'shocked' ? 0.6 : 1),
   })
   rig.finalize(materials)
@@ -53,7 +54,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     mesh.geometry.setAttribute('restPos', new BufferAttribute(rest, 3))
   }
 
-  const gear: GearItem | null = equipAccessory(rig, look.accessory)
+  const gear = equipAll(rig, look.equipment, look.accessory)
   rig.root.scale.setScalar(look.heightScale)
 
   let targets = poseTargets(rig, POSES[look.pose])
@@ -121,7 +122,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     dispose() {
       for (const mesh of rig.meshes) mesh.geometry.dispose()
       disposeMaterials(materials)
-      gear?.dispose()
+      for (const item of gear) item.dispose()
       rig.root.removeFromParent()
     },
   }

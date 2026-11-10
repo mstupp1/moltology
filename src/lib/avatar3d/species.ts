@@ -28,7 +28,7 @@ import {
   withAo,
   type ClawStyle,
 } from './parts'
-import { aimQuaternion, lookQuaternion, type Rig } from './rig'
+import { aimQuaternion, lookQuaternion, type Rig, type Wearable } from './rig'
 import type { Avatar3DLook } from './look'
 
 const v = (x: number, y: number, z: number) => new Vector3(x, y, z)
@@ -38,6 +38,19 @@ const SIDES = [
 ] as const
 const sided = (p: Vector3, s: number) => new Vector3(p.x * s, p.y, p.z)
 const deg = (d: number) => (d * Math.PI) / 180
+
+/** Eyes are ovals, wider than tall, as on the references. The eye material needs the same numbers to keep the iris round. */
+export const EYE_STRETCH: Record<Avatar3DLook['eyeShape'], [number, number]> = {
+  round: [1.2, 1],
+  wide: [1.36, 0.96],
+  tall: [1.1, 1.12],
+}
+
+/**
+ * Looking straight ahead on the references is a relaxed side glance: both eyes a little toward
+ * the character's left, slightly turned in, with the upper lid resting on the iris.
+ */
+const GAZE_REST = { glance: 12, converge: 14, drop: 1 }
 
 const CLAW_STYLES: Record<AvatarClaws, ClawStyle> = {
   classic: { bulk: 1.18, reach: 0.86, depth: 0.66 },
@@ -105,7 +118,7 @@ interface LidPose {
 
 const EXPRESSIONS: Record<Expression, LidPose & { right?: Partial<LidPose> }> = {
   open: { up: 54, lo: 76, browLift: 0.012 },
-  relaxed: { up: 21, lo: 72 },
+  relaxed: { up: 24, lo: 52 },
   cheerful_squint: { up: 36, lo: 14, browLift: 0.01 },
   focused: { up: 16, lo: 60, roll: 7, browTilt: 9, browLift: -0.004 },
   chill: { up: 4, lo: 70, browLift: -0.006 },
@@ -130,7 +143,8 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
   const expression = EXPRESSIONS[look.expression]
   const lidOpen = { L: 0, R: 0 }
   const [yaw, pitch] = GAZE[look.gaze ?? 'ahead']
-  const eyeScale = look.eyeShape === 'wide' ? v(1.14, 0.96, 1) : look.eyeShape === 'tall' ? v(0.95, 1.14, 1) : v(1, 1, 1)
+  const [wide, high] = EYE_STRETCH[look.eyeShape]
+  const eyeScale = v(wide, high, 1)
 
   for (const { s, tag } of SIDES) {
     const theta = Math.PI / 2 - s * f.eyeSpread
@@ -145,7 +159,7 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
 
     const eye = rig.addBone(`eye${tag}`, `eyeSocket${tag}`, centre, { quaternion: lookQuaternion(facing) })
     rig.add(`eye${tag}`, 'eye', eyeball(f.eyeRadius))
-    eye.rotateY(deg(yaw)).rotateX(deg(pitch))
+    eye.rotateY(deg(yaw + GAZE_REST.glance - s * GAZE_REST.converge)).rotateX(deg(pitch + GAZE_REST.drop))
     rig.rest.get(`eye${tag}`)!.quaternion.copy(eye.quaternion)
 
     const up = rig.addBone(`lidUp${tag}`, `eyeSocket${tag}`, centre, { quaternion: lookQuaternion(facing) })
@@ -170,7 +184,7 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
     const browNormal = f.shell.normal(sBrow, theta)
     const browAt = browPoints[2].clone()
     const brow = rig.addBone(`brow${tag}`, f.bone, browAt, { quaternion: lookQuaternion(browNormal) })
-    rig.addWorld(`brow${tag}`, 'brow', ridge(browPoints, browNormal, f.eyeRadius * 0.34, f.eyeRadius * 0.3))
+    rig.addWorld(`brow${tag}`, 'brow', ridge(browPoints, browNormal, f.eyeRadius * 0.25, f.eyeRadius * 0.26))
     brow.rotateZ(s * deg(pose.browTilt ?? 0))
     brow.position.y += pose.browLift ?? 0
     const rest = rig.rest.get(`brow${tag}`)!
@@ -266,7 +280,7 @@ interface ArmLayout {
   clawFacing: Vector3
 }
 
-function addArms(rig: Rig, look: Avatar3DLook, a: ArmLayout): void {
+function addArms(rig: Rig, look: Avatar3DLook, a: ArmLayout): Wearable['arm'] {
   const style = CLAW_STYLES[look.claws]
   const size = a.clawSize * look.armScale
   for (const { s, tag } of SIDES) {
@@ -296,6 +310,7 @@ function addArms(rig: Rig, look: Avatar3DLook, a: ArmLayout): void {
     rig.addSocket(`claw${tag}`, `claw${tag}`, local(parts.grip).applyQuaternion(clawQ).add(wrist), size * 0.2, clawQ)
     rig.addSocket(`wrist${tag}`, `forearm${tag}`, wrist, r * 1.2, aimQuaternion(wrist.clone().sub(elbow)))
   }
+  return { radius: a.radius, upper: a.shoulder.distanceTo(a.elbow), fore: a.elbow.distanceTo(a.wrist), clawSize: size, claw: style }
 }
 
 interface LegLayout {
@@ -308,7 +323,7 @@ interface LegLayout {
   footLength: number
 }
 
-function addLegs(rig: Rig, l: LegLayout): void {
+function addLegs(rig: Rig, l: LegLayout): Wearable['leg'] {
   for (const { s, tag } of SIDES) {
     const hip = sided(l.hip, s)
     const knee = sided(l.knee, s)
@@ -323,6 +338,7 @@ function addLegs(rig: Rig, l: LegLayout): void {
     rig.add(`foot${tag}`, 'shell', merge([jointBall(r * 1.05), foot(l.footWidth, l.footLength, ankle.y)]))
     rig.addSocket(`foot${tag}`, `foot${tag}`, ankle, r, footQ)
   }
+  return { radius: l.radius, thigh: l.hip.distanceTo(l.knee), shin: l.knee.distanceTo(l.ankle), ankle: l.ankle.y, footLength: l.footLength }
 }
 
 /** The two short walking legs on each side: three thin segments ending in a point. */
@@ -365,10 +381,10 @@ const ANTENNA_PATHS: Record<Exclude<AvatarAntennae, 'whip'>, [number, number][]>
   beacon: [[0, 0], [0.05, 0.3], [0.14, 0.56], [0.26, 0.74]],
 }
 
-function addAntennae(rig: Rig, style: AvatarAntennae, a: AntennaLayout): void {
+function addAntennae(rig: Rig, style: AvatarAntennae, a: AntennaLayout): Wearable['antenna'] {
+  const own = style === 'whip' ? a.whip : ANTENNA_PATHS[style].map(([out, up]) => v(a.base.x + out * a.reach, a.base.y + up * a.reach, a.base.z + a.sweep * up * a.reach))
   for (const { s, tag } of SIDES) {
-    const path = style === 'whip' ? a.whip : ANTENNA_PATHS[style].map(([out, up]) => v(a.base.x + out * a.reach, a.base.y + up * a.reach, a.base.z + a.sweep * up * a.reach))
-    const pts = path.map((p) => sided(p, s))
+    const pts = own.map((p) => sided(p, s))
     rig.addBone(`antenna${tag}`, a.parent, pts[0])
     const even = style === 'bolt' || style === 'beacon'
     const geos = [taperedTube(pts, a.thick, even ? a.thick * 0.6 : a.tip, 40)]
@@ -396,6 +412,7 @@ function addAntennae(rig: Rig, style: AvatarAntennae, a: AntennaLayout): void {
       rig.addWorld(`antenna${tag}`, 'glow', placed(withAo(bulb), pts[pts.length - 1]))
     }
   }
+  return { path: own, thick: a.thick }
 }
 
 export interface SpeciesBuild {
@@ -467,9 +484,9 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   })
   rig.add('tail', 'shell', merge(lobes))
 
-  const face = addFace(rig, look, { shell: carapace, bone: 'chest', eyeY: 1.525, eyeSpread: 0.36, eyeRadius: 0.1, browY: 1.672, browSpan: 0.38, browArch: 0.42, mouthY: 1.35, mouthHalf: 0.44 })
+  const face = addFace(rig, look, { shell: carapace, bone: 'chest', eyeY: 1.525, eyeSpread: 0.53, eyeRadius: 0.118, browY: 1.688, browSpan: 0.46, browArch: 0.22, mouthY: 1.35, mouthHalf: 0.44 })
 
-  addAntennae(rig, look.antennae, {
+  const antenna = addAntennae(rig, look.antennae, {
     parent: 'chest',
     base: v(0.055, 1.74, 0.07),
     whip: [v(0.055, 1.74, 0.07), v(0.09, 1.9, 0.1), v(0.19, 2.07, 0.16), v(0.34, 2.15, 0.24), v(0.47, 2.11, 0.33), v(0.55, 2.03, 0.4)],
@@ -479,7 +496,7 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     tip: 0.006,
   })
 
-  addArms(rig, look, {
+  const arm = addArms(rig, look, {
     parent: 'chest',
     shoulder: v(0.265, 1.17, 0.0),
     elbow: v(0.45, 1.04, 0.07),
@@ -500,7 +517,7 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     0.042,
   )
 
-  addLegs(rig, {
+  const leg = addLegs(rig, {
     parent: 'pelvis',
     hip: v(0.13, 0.62, -0.05),
     knee: v(0.3, 0.46, 0.0),
@@ -520,6 +537,14 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   rig.addSocket('back', 'chest', carapace.point(carapace.sAt(1.35), -Math.PI / 2), 0.26)
   rig.addSocket('chest', 'pelvis', abdomen.point(abdomen.sAt(1.0), Math.PI / 2), 0.2)
   rig.addSocket('waist', 'pelvis', v(0, 0.7, -0.07), 0.14)
+  rig.wear = {
+    race: 'lobster',
+    torso: { loft: abdomen, bone: 'pelvis', top: 1.16, bottom: 0.82, belt: 0.74 },
+    head: { loft: carapace, bone: 'chest', top, eyeY: 1.525, eyeRadius: 0.118 },
+    arm,
+    leg,
+    antenna,
+  }
   return { face, height: carapace.key(0).d }
 }
 
@@ -595,9 +620,9 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     }
   }
 
-  const face = addFace(rig, look, { shell, bone: 'chest', eyeY: 1.3, eyeSpread: 0.3, eyeRadius: 0.115, browY: 1.455, browSpan: 0.19, browArch: 0.16, mouthY: 1.105, mouthHalf: 0.3 })
+  const face = addFace(rig, look, { shell, bone: 'chest', eyeY: 1.3, eyeSpread: 0.345, eyeRadius: 0.135, browY: 1.462, browSpan: 0.31, browArch: 0.12, mouthY: 1.105, mouthHalf: 0.3 })
 
-  addAntennae(rig, look.antennae, {
+  const antenna = addAntennae(rig, look.antennae, {
     parent: 'chest',
     base: v(0.05, 1.5, 0.06),
     whip: [v(0.05, 1.5, 0.06), v(0.065, 1.65, 0.05), v(0.14, 1.77, 0.01), v(0.27, 1.79, -0.05), v(0.36, 1.72, -0.09)],
@@ -607,7 +632,7 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     tip: 0.017,
   })
 
-  addArms(rig, look, {
+  const arm = addArms(rig, look, {
     parent: 'chest',
     shoulder: v(0.47, 1.08, 0.04),
     elbow: v(0.62, 1.03, 0.1),
@@ -628,7 +653,7 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     0.044,
   )
 
-  addLegs(rig, {
+  const leg = addLegs(rig, {
     parent: 'pelvis',
     hip: v(0.17, 0.76, -0.02),
     knee: v(0.37, 0.57, 0.02),
@@ -644,5 +669,13 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   rig.addSocket('back', 'chest', shell.point(shell.sAt(1.25), -Math.PI / 2), 0.4)
   rig.addSocket('chest', 'pelvis', under.point(under.sAt(0.9), Math.PI / 2), 0.2)
   rig.addSocket('waist', 'pelvis', v(0, 0.78, 0), 0.16)
+  rig.wear = {
+    race: 'crab',
+    torso: { loft: under, bone: 'pelvis', top: 1.0, bottom: 0.76, belt: 0.84 },
+    head: { loft: shell, bone: 'chest', top: shell.key(0).d, eyeY: 1.3, eyeRadius: 0.135 },
+    arm,
+    leg,
+    antenna,
+  }
   return { face, height: shell.key(0).d }
 }
