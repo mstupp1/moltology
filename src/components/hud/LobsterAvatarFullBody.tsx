@@ -8,6 +8,7 @@ import {
 } from '@/lib/lobster-avatar-slots'
 import { useAvatar3D } from '@/hooks/useAvatar3D'
 import { lookFromConfig } from '@/lib/avatar3d/look'
+import { sceneStyle3D } from '@/lib/avatar3d-scene'
 import { Avatar3DStage } from './avatar3d/Avatar3DStage'
 import { LobsterAvatarDisplay } from './LobsterAvatarDisplay'
 import { LobsterAvatarSilhouette } from './LobsterAvatarSilhouette'
@@ -74,6 +75,8 @@ export const LobsterAvatarFullBody: React.FC<LobsterAvatarFullBodyProps> = React
   // Viewers with the 3D experiment on see the same saved character, live in 3D.
   const in3D = useAvatar3D() && !src && Boolean(effectiveConfig)
   const look = useMemo(() => (in3D && effectiveConfig ? lookFromConfig(effectiveConfig) : null), [in3D, effectiveConfig])
+  // The saved scene sits behind the character, as it does in the 2D drawing.
+  const scene = useMemo(() => (in3D && effectiveConfig ? sceneStyle3D(effectiveConfig) : undefined), [in3D, effectiveConfig])
   if (look) {
     return (
       <div
@@ -82,7 +85,11 @@ export const LobsterAvatarFullBody: React.FC<LobsterAvatarFullBodyProps> = React
         data-renderer="3d"
         className={frameClassName}
       >
-        <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(34,211,238,0.14),transparent_62%)]" />
+        {scene ? (
+          <div aria-hidden data-testid="avatar-3d-scene" className="absolute inset-0" style={scene} />
+        ) : (
+          <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(34,211,238,0.14),transparent_62%)]" />
+        )}
         <Avatar3DStage look={look} label={alt} className="relative" />
       </div>
     )

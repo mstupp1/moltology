@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState, type CSSProperties, type RefObject } from 'react'
 import { useAvatar3D } from '@/hooks/useAvatar3D'
 import { requestPortrait3D } from '@/lib/avatar3d-portrait-queue'
-import { LOBSTER_BACKGROUND_THEME_MAP, resolveAvatarTraits, type LobsterAvatarConfig } from '@/lib/lobster-avatar'
+import { sceneStyle3D } from '@/lib/avatar3d-scene'
+import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 
 export interface Portrait3D {
   /** The 3D still, ready to use as an image `src`. */
@@ -60,10 +61,7 @@ export function usePortrait3D(
   const url = key && still?.key === key ? still.url : null
   return useMemo(() => {
     if (!url || !key) return null
-    const theme = LOBSTER_BACKGROUND_THEME_MAP[resolveAvatarTraits(JSON.parse(key) as LobsterAvatarConfig).backgroundTheme]
-    const scene = theme
-      ? { background: `radial-gradient(circle at 50% 42%, ${theme.glowColor} 0%, transparent 62%), linear-gradient(180deg, ${theme.topColor}, ${theme.bottomColor})` }
-      : undefined
+    const scene = sceneStyle3D(JSON.parse(key) as LobsterAvatarConfig)
     return { url, scene }
   }, [url, key])
 }

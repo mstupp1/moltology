@@ -51,6 +51,21 @@ const NOISE_GLSL = /* glsl */ `
     }
     return vec2(sqrt(best), id);
   }
+  // How close this point is to the border between its two nearest scattered points (0 on the border).
+  float a3CellEdge(vec3 p) {
+    vec3 i = floor(p);
+    vec3 f = fract(p);
+    float best = 8.0;
+    float next = 8.0;
+    for (int x = -1; x <= 1; x++) for (int y = -1; y <= 1; y++) for (int z = -1; z <= 1; z++) {
+      vec3 g = vec3(float(x), float(y), float(z));
+      float h = a3Hash(i + g);
+      vec3 o = g + vec3(h, fract(h * 37.0), fract(h * 91.0)) - f;
+      float d = dot(o, o);
+      if (d < best) { next = best; best = d; } else if (d < next) { next = d; }
+    }
+    return sqrt(next) - sqrt(best);
+  }
   float a3Marking(int kind, vec3 p) {
     if (kind == 1) { vec2 c = a3Cells(p * 6.5); return smoothstep(0.34, 0.26, c.x) * step(0.35, c.y); }
     if (kind == 2) { vec2 c = a3Cells(p * 24.0); return smoothstep(0.26, 0.16, c.x) * step(0.45, c.y) * smoothstep(0.35, 0.6, a3Noise(p * 3.0 + 4.0)); }
@@ -62,9 +77,9 @@ const NOISE_GLSL = /* glsl */ `
     if (kind == 5) { vec2 c = a3Cells(p * 34.0); return smoothstep(0.16, 0.06, c.x) * step(0.62, c.y); }
     if (kind == 6) { return smoothstep(0.52, 0.58, a3Noise(p * 3.4 + 9.0)); }
     if (kind == 8) {
-      vec3 g = abs(fract(p * 9.0) - 0.5);
-      float line = min(smoothstep(0.035, 0.015, g.x) + smoothstep(0.035, 0.015, g.y), 1.0);
-      return line * step(0.55, a3Hash(floor(p * 9.0)));
+      // Branching traces: the seams between scattered cells, bent a little so they wander.
+      float e = a3CellEdge(p * 4.6 + (a3Noise(p * 7.0) - 0.5) * 0.5);
+      return smoothstep(0.05, 0.02, e);
     }
     return 0.0;
   }
@@ -99,7 +114,9 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
   })
   if (finish === 'glossy') Object.assign(material, { roughness: 0.28, clearcoat: 0.9, clearcoatRoughness: 0.12 })
   if (finish === 'pearl') Object.assign(material, { roughness: 0.34, clearcoat: 0.7, clearcoatRoughness: 0.2, iridescence: 1, iridescenceIOR: 1.6 })
-  if (finish === 'chrome') Object.assign(material, { roughness: 0.16, metalness: 1, clearcoat: 0.4, sheen: 0 })
+  // Polished metal that still reads as the shell's colour: not a full mirror, which shows the
+  // room as blotches on rounded shells.
+  if (finish === 'chrome') Object.assign(material, { roughness: 0.2, metalness: 0.45, clearcoat: 1, clearcoatRoughness: 0.05, sheen: 0, envMapIntensity: 3.5 })
   const glow = finish === 'glow' ? 0.45 : 0
   const circuit = o.marking === 'circuit'
 
@@ -108,9 +125,9 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
     uMark: { value: new Color(o.markingColor ?? o.shade) },
     uSplit: { value: new Color(o.splitBase ?? o.base) },
     uMarking: { value: MARKING_INDEX[o.marking ?? 'none'] },
-    uGrain: { value: o.grain ?? 0.07 },
+    uGrain: { value: o.grain ?? (finish === 'chrome' ? 0.015 : 0.07) },
     uGlow: { value: glow },
-    uMarkGlow: { value: circuit ? 1.4 : 0 },
+    uMarkGlow: { value: circuit ? 0.35 : 0 },
   }
   material.userData.uniforms = uniforms
   material.onBeforeCompile = (shader) => {
@@ -163,7 +180,7 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         totalEmissiveRadiance += diffuseColor.rgb * uGlow + uMark * a3Mask * uMarkGlow;`,
       )
   }
-  material.customProgramCacheKey = () => 'avatar3d-shell'
+  material.customProgramCacheKey = () => 'avatar3d-shell-3'
   return material
 }
 
@@ -173,7 +190,8 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
  * iris stays round on an oval eye.
  */
 export function eyeMaterial(color: AvatarEyeColor, pupilScale = 1, stretch: [number, number] = [1, 1]): MeshPhysicalMaterial {
-  const swatch = EYE_COLOR_SWATCH[color]
+  // The approved references paint green eyes as a deep olive, darker than the 2D swatch.
+  const swatch = color === 'emerald' ? { inner: '#d9f2a6', mid: '#5f9a2e', outer: '#2f5216', ring: '#0f1f06' } : EYE_COLOR_SWATCH[color]
   // Matte enough that the room does not print window shapes on the eye; the highlight is painted.
   const material = new MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.4, clearcoat: 0.1, clearcoatRoughness: 0.4, envMapIntensity: 0.25 })
   const uniforms = {
@@ -255,7 +273,8 @@ export function buildMaterials(look: LookMaterials): Record<MaterialSlot, Materi
       shade: p.shade,
       highlight: p.highlight,
       marking: look.marking,
-      markingColor: look.marking === 'stardust' ? p.highlight : p.marking,
+      // Stardust and circuit traces are drawn in light, as in the 2D art; the rest in the darker marking colour.
+      markingColor: look.marking === 'stardust' || look.marking === 'circuit' ? p.highlight : p.marking,
       splitBase: split.base,
       finish: look.finish,
     }),
