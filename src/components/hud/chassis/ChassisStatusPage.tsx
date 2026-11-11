@@ -85,6 +85,9 @@ export const ChassisStatusPage: React.FC = () => {
   const [items, setItems] = useState<GearItemState[]>([])
   const [tab, setTab] = useState<(typeof TABS)[number]>('equipment')
   const [slot, setSlot] = useState<EquipSlotId>('head')
+  // The slot the 3D camera features. Set only when a slot is picked, so the page opens on the
+  // whole character.
+  const [focus, setFocus] = useState<EquipSlotId | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -304,6 +307,7 @@ export const ChassisStatusPage: React.FC = () => {
     },
     onPick: (id) => {
       setSlot(id)
+      setFocus(id)
       setTab('equipment')
       setSelected(null)
     },
@@ -368,6 +372,8 @@ export const ChassisStatusPage: React.FC = () => {
               <div key={popKey} className="avatar-creator-pop">
                 <AvatarCreatorPreview
                   config={preview}
+                  focus={tab === 'equipment' ? focus : null}
+                  onResetFocus={() => setFocus(null)}
                   className="max-w-[min(212px,28svh)] lg:max-w-[560px] mx-auto"
                 />
               </div>
