@@ -30,11 +30,21 @@ export interface Character3D {
   dispose: () => void
 }
 
-function portraitFrame(rig: Rig, height: number, scale: number): Character3D['portrait'] {
+/**
+ * Portraits frame the head as the 2D ones do: it fills most of the circle, sits centred with a
+ * little shoulder below it, and a hat gets some headroom.
+ */
+function portraitFrame(rig: Rig, height: number, scale: number, hat: boolean): Character3D['portrait'] {
   const head = rig.wear?.head
   if (!head) return { y: height * 0.8 * scale, size: 1.2 * scale }
-  const half = head.loft.key(head.loft.sAt(head.eyeY)).r
-  return { y: (head.eyeY + (head.top - head.eyeY) * 0.12) * scale, size: (half * 2.5 + 0.42) * scale }
+  let half = 0
+  for (let i = 0; i <= 24; i++) half = Math.max(half, head.loft.key(i / 24).r)
+  const bottom = head.loft.key(1).d
+  const tall = head.top - bottom
+  const size = Math.max((half * 2) / 0.8, tall / 0.84) * (hat ? 1.16 : 1)
+  const mid = (head.top + bottom) / 2
+  const y = Math.max(mid - size * 0.05, head.top - size * 0.47) + (hat ? size * 0.06 : 0)
+  return { y: y * scale, size: size * scale }
 }
 
 export function buildCharacter(look: Avatar3DLook): Character3D {
@@ -122,7 +132,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     rig,
     look,
     height: built.height * look.heightScale,
-    portrait: portraitFrame(rig, built.height, look.heightScale),
+    portrait: portraitFrame(rig, built.height, look.heightScale, Boolean(look.equipment?.head) || look.accessory !== 'none'),
     setPose(pose, immediate = false) {
       targets = poseTargets(rig, POSES[pose])
       if (immediate) for (const [name, t] of targets) current.get(name)!.copy(t)

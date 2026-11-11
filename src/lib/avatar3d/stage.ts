@@ -134,7 +134,8 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     if (options.framing === 'portrait') {
       const { y, size } = character?.portrait ?? { y: 1.5, size: 1.2 }
       const dist = (size / 2 / Math.tan((camera.fov * Math.PI) / 360) / Math.min(camera.aspect, 1)) * 1.02
-      camera.position.set(0, y + 0.06, dist)
+      // Straight on, so the head sits where the frame puts it.
+      camera.position.set(0, y + 0.02, dist)
       camera.lookAt(0, y, 0)
       camera.updateProjectionMatrix()
       return

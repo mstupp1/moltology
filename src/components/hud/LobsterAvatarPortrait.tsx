@@ -3,6 +3,8 @@ import { useAvatar3D } from '@/hooks/useAvatar3D'
 import { requestPortrait3D } from '@/lib/avatar3d-portrait-queue'
 import {
   LOBSTER_AVATAR_STYLE,
+  LOBSTER_BACKGROUND_THEME_MAP,
+  resolveAvatarTraits,
   generateLobsterAvatarDataUri,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
@@ -118,6 +120,13 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
     }
   }, [in3D, effectiveConfig, sourcePx])
   const still3D = in3D && still && still.for === effectiveConfig ? still.url : null
+  // The character's chosen scene colours sit behind the 3D still, as they do behind the 2D one.
+  const scene3D = useMemo(() => {
+    if (!still3D || !effectiveConfig) return undefined
+    const theme = LOBSTER_BACKGROUND_THEME_MAP[resolveAvatarTraits(effectiveConfig).backgroundTheme]
+    if (!theme) return undefined
+    return { background: `radial-gradient(circle at 50% 42%, ${theme.glowColor} 0%, transparent 62%), linear-gradient(180deg, ${theme.topColor}, ${theme.bottomColor})` }
+  }, [still3D, effectiveConfig])
 
   const portraitClassName = useMemo(
     () =>
@@ -139,7 +148,7 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(0,195,255,0.2)_0%,rgba(0,195,255,0.05)_55%,transparent_75%)] pointer-events-none z-0" />
 
       {still3D ? (
-        <div data-testid="portrait-fisheye-container" data-renderer="3d" className="relative z-10 flex h-full w-full items-center justify-center overflow-hidden">
+        <div data-testid="portrait-fisheye-container" data-renderer="3d" style={scene3D} className="relative z-10 flex h-full w-full items-center justify-center overflow-hidden">
           <img
             src={still3D}
             alt={alt}
