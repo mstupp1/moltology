@@ -101,3 +101,13 @@ it('prefers a saved equipped character over an account photo', () => {
   expect(container.querySelector('img[src="https://example.com/photo.jpg"]')).toBeNull()
   expect(container.querySelector('[data-renderer="3d"]')).not.toBeNull()
 })
+
+it('puts the portrait glass over a character, but not at the tiny sizes', () => {
+  const user = { name: 'Crab', avatarConfig: { style: 'critters' as const, seed: 'member', race: 'crab' as const } }
+  const { rerender } = render(<UserAvatar user={user} size="md" />)
+  expect(screen.getByTestId('glass-lens')).toBeInTheDocument()
+  rerender(<UserAvatar user={user} size="xxs" />)
+  expect(screen.queryByTestId('glass-lens')).toBeNull()
+  rerender(<UserAvatar user={{ name: 'Photo', image: 'https://example.com/p.jpg' }} size="md" />)
+  expect(screen.queryByTestId('glass-lens')).toBeNull()
+})

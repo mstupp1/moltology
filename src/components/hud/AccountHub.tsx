@@ -239,7 +239,7 @@ export function AccountHub({ variant, user, userRole, displayName: displayNamePr
     <div className="space-y-4">
       {/* Who, and where they are on the ladder */}
       <div className="flex items-center gap-3">
-        <UserAvatar user={user} name={displayName} size="xl" borderless className="ring-1 ring-cyan-glow/40" />
+        <UserAvatar user={user} name={displayName} size="xl" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 min-w-0">
             <span className="text-sm font-bold font-grotesk text-ink truncate">{displayName}</span>

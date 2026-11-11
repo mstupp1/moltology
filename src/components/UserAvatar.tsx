@@ -2,6 +2,7 @@ import { parseLobsterAvatarConfig, type LobsterAvatarConfig } from '@/lib/lobste
 import React, { useState, useEffect } from 'react'
 import { BrandAwareImage } from '@/components/ui/BrandMark'
 import { CharacterStill } from '@/components/hud/avatar3d/CharacterStill'
+import { GLASS_FRAME_CLASS, GlassLens } from '@/components/hud/GlassLens'
 
 export interface UserAvatarProps {
   user?: {
@@ -22,6 +23,8 @@ export interface UserAvatarProps {
   className?: string
   /** Drop the letter fallback's own border when the parent draws the edge. */
   borderless?: boolean
+  /** Wear the profile portrait's glass over a character (default true; never below 24px). */
+  glass?: boolean
   alt?: string
 }
 
@@ -43,6 +46,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
     className = '',
     alt,
     borderless = false,
+    glass = true,
   }) => {
     const [imageError, setImageError] = useState(false)
 
@@ -81,11 +85,16 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
       return '?'
     }
 
-    // 1. The member's character, as a still of the 3D face.
+    // 1. The member's character, as a still of the 3D face, behind the portrait glass.
     if (character) {
+      // At 16 to 20px the glass is only noise.
+      const lens = glass && size !== 'xxs' && size !== 'xs'
       return (
-        <div className={`relative shrink-0 rounded-full overflow-hidden bg-abyss ${sizeClasses} ${className}`}>
+        <div
+          className={`relative shrink-0 rounded-full overflow-hidden bg-abyss ${lens && !borderless ? GLASS_FRAME_CLASS : ''} ${sizeClasses} ${className}`}
+        >
           <CharacterStill config={character} px={resolution} alt={displayAlt} scene imgClassName="rounded-full" />
+          {lens && <GlassLens />}
         </div>
       )
     }
