@@ -22,6 +22,16 @@ export class Avatar3DUnavailable extends Error {
  */
 export type StillShot = 'portrait' | 'full' | `gear:${string}`
 
+/**
+ * Gear icons turn the mannequin so the piece is in full view: claws are seen from the outside with
+ * room for a held weapon, and a belt is seen closer than the body camera goes.
+ */
+const ICON_VIEW: Record<string, { yaw: number; zoom: number }> = {
+  'claws-1': { yaw: 1.3, zoom: 1.15 },
+  'claws-2': { yaw: -1.3, zoom: 1.15 },
+  belt: { yaw: 0.35, zoom: 0.75 },
+}
+
 const KEEP = 160
 const cache = new Map<string, string>()
 const stages = new Map<'portrait' | 'full', { stage: Stage; canvas: HTMLCanvasElement }>()
@@ -48,6 +58,7 @@ function stageFor(framing: 'portrait' | 'full', px: number): Stage {
         pixelRatio: 1,
         framing,
         manual: true,
+        shadows: false,
         // Start again with a fresh canvas the next time a picture is asked for.
         onContextLost: () => {
           stages.delete(framing)
@@ -75,9 +86,10 @@ export function renderStill(look: Avatar3DLook, px: number, shot: StillShot = 'p
   // A small picture cannot show fine tessellation, so it is built from coarser meshes: much quicker.
   withLoftDetail(px <= 128 ? 0.6 : 0.8, () => stage.setLook(shot === 'portrait' ? { ...look, pose: 'rest' } : look))
   const slot = shot.startsWith('gear:') ? shot.slice(5) : null
-  stage.focus(slot)
+  const view = slot ? ICON_VIEW[slot] : undefined
+  stage.focus(slot, view?.zoom)
   const close = slot ? stage.character()?.focusOf(slot) : null
-  stage.setYaw(close ? close.yaw : 0)
+  stage.setYaw(close ? (view?.yaw ?? close.yaw) : 0)
   stage.renderStill(0)
   const url = stage.snapshot()
   cache.set(key, url)

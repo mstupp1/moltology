@@ -38,6 +38,8 @@ export interface StageOptions {
   framing?: 'full' | 'portrait'
   /** Draw only when asked (`renderStill`), with no animation loop. */
   manual?: boolean
+  /** Cast soft shadows (default true). Small stills skip them: they barely show and cost the most. */
+  shadows?: boolean
   /** The browser took the 3D context away (too many canvases, or the graphics driver reset). */
   onContextLost?: () => void
 }
@@ -52,7 +54,8 @@ export interface Stage {
    * Glide the camera in on one gear slot and turn the character to show it, or back out to the
    * whole figure with null. Dragging still turns the character while it is framed.
    */
-  focus: (slot: string | null) => void
+  /** Close in on a gear slot (null for the whole figure). `zoom` above 1 stands further back. */
+  focus: (slot: string | null, zoom?: number) => void
   resize: () => void
   /** Stop drawing while the character is off screen, and pick up again when it is back. */
   setActive: (active: boolean) => void
@@ -84,7 +87,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   renderer.outputColorSpace = SRGBColorSpace
   renderer.toneMapping = NeutralToneMapping
   renderer.toneMappingExposure = 1.05
-  renderer.shadowMap.enabled = true
+  renderer.shadowMap.enabled = options.shadows ?? true
   renderer.shadowMap.type = VSMShadowMap
   renderer.setClearColor(0x000000, 0)
 
@@ -133,6 +136,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   const aim = new Vector3()
   let started = false
   let focused: string | null = null
+  let focusZoom = 1
   let focusYaw: number | null = null
   const place = (position: Vector3, look: Vector3) => {
     eye.copy(position)
@@ -152,9 +156,10 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     }
     const at = close.at.clone().applyAxisAngle(new Vector3(0, 1, 0), yaw)
     const vfov = (camera.fov * Math.PI) / 180
-    const dist = (close.size / 2 / Math.tan(vfov / 2) / Math.min(camera.aspect, 1)) * 1.08
+    const size = close.size * focusZoom
+    const dist = (size / 2 / Math.tan(vfov / 2) / Math.min(camera.aspect, 1)) * 1.08
     wantLook.copy(at)
-    wantPosition.set(at.x, at.y + close.size * 0.12, at.z + dist)
+    wantPosition.set(at.x, at.y + size * 0.12, at.z + dist)
   }
   let yaw = options.yaw ?? 0
   let spin = 0
@@ -307,8 +312,9 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       spin = speed
       wake()
     },
-    focus(slot) {
+    focus(slot, zoom = 1) {
       focused = slot
+      focusZoom = zoom
       velocity = 0
       const close = slot && character ? character.focusOf(slot) : null
       // Back to the front when the close-up ends, as a game camera resets.
