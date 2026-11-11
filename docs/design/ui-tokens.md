@@ -136,13 +136,14 @@ additional generic title banner.
 Every standard HUD page (everything except the full-screen Oracle) sits inside one
 see-through page panel drawn by `HudLayout`, so pages never add their own outer frame.
 
-- Desktop: `main` carries a light `surface-1/[0.22]` scrim so the underwater scene
-  stays bright around the edges. The page column (max 1280px) is the panel:
-  `surface-1/[0.68]`, `line-subtle` border, `rounded-panel`, 24px padding. The
-  top-right pill straddles the panel's top edge and sits in its 54px top padding,
-  so content starts right below the pill instead of under a reserved bar.
-- Phone: no inset panel. One full-width frosted layer (`surface-1/[0.58]` plus a 6px
-  backdrop blur) sits in the background stack, and the bubble canvas does not run.
-- Keep the blur off `main` and the page column: `backdrop-filter` makes an element
-  the containing block for `position: fixed` children, which would trap page sheets
+- Desktop: `main` carries a `surface-1/[0.45]` scrim around the panel. The page
+  column (max 1280px) is the panel: `surface-1/[0.68]`, `line-subtle` border,
+  `rounded-panel`, 24px padding. It grows with its content (`flex-1 shrink-0`), so
+  the frame reaches the bottom of long pages. The top-right pill straddles the
+  panel's top edge and sits in its 54px top padding, so content starts right below
+  the pill instead of under a reserved bar.
+- Phone: the panel is full width with no inset or corners. Its `surface-1/[0.72]`
+  tint sits in the background stack. No blur.
+- Avoid `backdrop-filter` on `main` or the page column: it makes an element the
+  containing block for `position: fixed` children, which would trap page sheets
   and dialogs inside it.
