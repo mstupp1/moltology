@@ -5,6 +5,7 @@
  * hand back an image. Results are kept, so the same picture is never drawn twice.
  */
 import type { Avatar3DLook } from './look'
+import { withLoftDetail } from './loft'
 import { createStage, type Stage } from './stage'
 
 /** This browser would not start 3D at all, as opposed to one character failing to draw. */
@@ -71,7 +72,8 @@ export function renderStill(look: Avatar3DLook, px: number, shot: StillShot = 'p
   const hit = cache.get(key)
   if (hit) return hit
   const stage = stageFor(shot === 'portrait' ? 'portrait' : 'full', px)
-  stage.setLook(shot === 'portrait' ? { ...look, pose: 'rest' } : look)
+  // A small picture cannot show fine tessellation, so it is built from coarser meshes: much quicker.
+  withLoftDetail(px <= 128 ? 0.6 : 0.8, () => stage.setLook(shot === 'portrait' ? { ...look, pose: 'rest' } : look))
   const slot = shot.startsWith('gear:') ? shot.slice(5) : null
   stage.focus(slot)
   const close = slot ? stage.character()?.focusOf(slot) : null
