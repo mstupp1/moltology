@@ -39,9 +39,20 @@ describe('useAvatar3D', () => {
     await waitFor(() => expect(result.current).toBe(true))
   })
 
-  it('never reads the profile for members or signed-out visitors', async () => {
+  it('is on for an admin whose role lives only on the profile', async () => {
+    session.value = { isPending: false, userId: 'u3', user: { id: 'u3', role: 'user' } }
+    getUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['avatar-3d'] })
+    const { result } = renderHook(() => useAvatar3D())
+    await waitFor(() => expect(result.current).toBe(true))
+  })
+
+  it('stays off for members and never reads the profile for signed-out visitors', async () => {
     session.value = { isPending: false, userId: 'u2', user: { id: 'u2', role: 'member' } }
+    getUserProfileFn.mockResolvedValue({ role: 'member', experiments: ['avatar-3d'] })
     const member = renderHook(() => useAvatar3D())
+    await waitFor(() => expect(getUserProfileFn).toHaveBeenCalledTimes(1))
+    resetAvatar3DForTests()
+    getUserProfileFn.mockClear()
     session.value = { isPending: false, userId: null, user: null }
     const guest = renderHook(() => useAvatar3D())
     await new Promise((r) => setTimeout(r, 20))

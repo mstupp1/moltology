@@ -2,7 +2,6 @@ import { useEffect, useSyncExternalStore } from 'react'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { can3D, known3D, mark3DUnavailable, subscribe3DSupport } from '@/lib/avatar3d-support'
 import { hasExperiment } from '@/lib/experiments'
-import { canViewHiddenPages } from '@/lib/hidden-pages'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { getUserProfileFn } from '@/lib/server/api'
 
@@ -10,7 +9,8 @@ import { getUserProfileFn } from '@/lib/server/api'
  * Whether the signed-in viewer sees characters in 3D (the `avatar-3d` experiment).
  *
  * Avatars appear many times on a page, so the answer is read once per viewer and shared.
- * Experiments are admin only, so members never trigger the read at all. It is always off in a
+ * Experiments are admin only, and the profile's role decides that (the sign-in session can still
+ * say member for an admin), so signed-in viewers are read and signed-out visitors never are. It is always off in a
  * browser that cannot draw 3D, or once 3D has failed on this page, so those viewers keep 2D.
  */
 let known: { userId: string; on: boolean } | null = null
@@ -62,7 +62,8 @@ function subscribe(listener: () => void): () => void {
 
 export function useAvatar3D(): boolean {
   const session = useAuthSession()
-  const userId = !session.isPending && canViewHiddenPages(session.user, null) ? (session.userId ?? null) : null
+  // The admin role can live on the profile alone, so the profile decides, not the session.
+  const userId = !session.isPending ? (session.userId ?? null) : null
   useEffect(() => {
     if (userId) ensure(userId)
   }, [userId])
