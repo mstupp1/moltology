@@ -1,80 +1,28 @@
-import { renderHook, waitFor, act } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
-const session = vi.hoisted(() => ({ value: { isPending: false, userId: 'u1', user: { id: 'u1', role: 'admin' } } as Record<string, unknown> }))
-const getUserProfileFn = vi.hoisted(() => vi.fn())
-
-vi.mock('@/hooks/useAuthSession', () => ({ useAuthSession: () => session.value }))
-vi.mock('@/lib/jwt', () => ({ getAuthJWTToken: () => Promise.resolve('token') }))
-vi.mock('@/lib/server/api', () => ({ getUserProfileFn }))
-
+import { act, renderHook } from '@testing-library/react'
+import { renderToString } from 'react-dom/server'
+import React from 'react'
+import { describe, expect, it } from 'vitest'
 import { mark3DUnavailable, set3DSupportForTests } from '@/lib/avatar3d-support'
-import { resetAvatar3DForTests, useAvatar3D } from './useAvatar3D'
+import { useAvatar3D } from './useAvatar3D'
 
 describe('useAvatar3D', () => {
-  beforeEach(() => {
-    resetAvatar3DForTests()
+  it('is on for everyone whose browser can draw 3D, with no account check', () => {
     set3DSupportForTests(true)
-    getUserProfileFn.mockReset()
-    session.value = { isPending: false, userId: 'u1', user: { id: 'u1', role: 'admin' } }
-  })
-
-  it('is on for an admin with the experiment, and reads the profile once for many avatars', async () => {
-    getUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['avatar-3d'] })
-    const a = renderHook(() => useAvatar3D())
-    const b = renderHook(() => useAvatar3D())
-    expect(a.result.current).toBe(false)
-    await waitFor(() => expect(a.result.current).toBe(true))
-    expect(b.result.current).toBe(true)
-    expect(getUserProfileFn).toHaveBeenCalledTimes(1)
-  })
-
-  it('stays off without the experiment and follows the switch when it changes', async () => {
-    getUserProfileFn.mockResolvedValue({ role: 'admin', experiments: [] })
     const { result } = renderHook(() => useAvatar3D())
-    await waitFor(() => expect(getUserProfileFn).toHaveBeenCalledTimes(1))
-    expect(result.current).toBe(false)
-    getUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['avatar-3d'] })
-    act(() => window.dispatchEvent(new CustomEvent('experiments-changed')))
-    await waitFor(() => expect(result.current).toBe(true))
+    expect(result.current).toBe(true)
   })
 
-  it('is on for an admin whose role lives only on the profile', async () => {
-    session.value = { isPending: false, userId: 'u3', user: { id: 'u3', role: 'user' } }
-    getUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['avatar-3d'] })
+  it('turns off for the whole page once 3D fails', () => {
+    set3DSupportForTests(true)
     const { result } = renderHook(() => useAvatar3D())
-    await waitFor(() => expect(result.current).toBe(true))
-  })
-
-  it('stays off for members and never reads the profile for signed-out visitors', async () => {
-    session.value = { isPending: false, userId: 'u2', user: { id: 'u2', role: 'member' } }
-    getUserProfileFn.mockResolvedValue({ role: 'member', experiments: ['avatar-3d'] })
-    const member = renderHook(() => useAvatar3D())
-    await waitFor(() => expect(getUserProfileFn).toHaveBeenCalledTimes(1))
-    resetAvatar3DForTests()
-    getUserProfileFn.mockClear()
-    session.value = { isPending: false, userId: null, user: null }
-    const guest = renderHook(() => useAvatar3D())
-    await new Promise((r) => setTimeout(r, 20))
-    expect(member.result.current).toBe(false)
-    expect(guest.result.current).toBe(false)
-    expect(getUserProfileFn).not.toHaveBeenCalled()
-  })
-
-  it('stays off in a browser that cannot draw 3D', async () => {
-    set3DSupportForTests(null) // the test browser has no WebGL, so the real check says no
-    getUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['avatar-3d'] })
-    const { result } = renderHook(() => useAvatar3D())
-    await waitFor(() => expect(getUserProfileFn).toHaveBeenCalledTimes(1))
-    await new Promise((r) => setTimeout(r, 20))
-    expect(result.current).toBe(false)
-  })
-
-  it('drops back to 2D when 3D fails while in use', async () => {
-    getUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['avatar-3d'] })
-    const { result } = renderHook(() => useAvatar3D())
-    await waitFor(() => expect(result.current).toBe(true))
     act(() => mark3DUnavailable())
     expect(result.current).toBe(false)
+  })
+
+  it('is unknown on the server, so the page renders a loader rather than a guess', () => {
+    function Probe() {
+      return <span>{String(useAvatar3D())}</span>
+    }
+    expect(renderToString(<Probe />)).toContain('null')
   })
 })

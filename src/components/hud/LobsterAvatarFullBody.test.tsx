@@ -1,89 +1,49 @@
-import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import React, { useEffect } from 'react'
+import { act, render, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+const ready = vi.hoisted(() => ({ fire: () => {} }))
+vi.mock('./avatar3d/Avatar3DStage', () => ({
+  Avatar3DStage: ({ onReady, label }: { onReady?: () => void; label?: string }) => {
+    useEffect(() => {
+      ready.fire = () => onReady?.()
+    }, [onReady])
+    return <canvas data-testid="avatar-3d-stage" aria-label={label} />
+  },
+}))
+
+import { set3DSupportForTests } from '@/lib/avatar3d-support'
 import { LobsterAvatarFullBody } from './LobsterAvatarFullBody'
-import { resetLobsterFullBodyMotionForTests } from '@/lib/lobster-avatar-slots'
 
-const testSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="red"/></svg>'
-const testSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(testSvg)}`
+const config = { style: 'critters', seed: 'full-body-test', race: 'lobster', backgroundTheme: 'abyssal-cyan' } as never
 
-function mockMatchMedia(reducedMotion = false) {
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    configurable: true,
-    value: vi.fn().mockImplementation((query: string) => ({
-      matches: query === '(prefers-reduced-motion: reduce)' ? reducedMotion : false,
-      media: query,
-      onchange: null,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })),
-  })
-}
+describe('LobsterAvatarFullBody', () => {
+  beforeEach(() => set3DSupportForTests(true))
 
-describe('LobsterAvatarFullBody Component', () => {
-  beforeEach(() => {
-    vi.restoreAllMocks()
-    resetLobsterFullBodyMotionForTests()
-    mockMatchMedia(false)
-    Object.defineProperty(document, 'hidden', { configurable: true, value: false })
+  it('shows a spinner over the scene until the first 3D frame, then the character', () => {
+    render(<LobsterAvatarFullBody config={config} alt="Me" />)
+    const frame = screen.getByTestId('lobster-avatar-full-body')
+    expect(frame).toHaveAttribute('data-state', 'loading')
+    expect(screen.getByRole('status')).toHaveAccessibleName('Loading Me')
+    expect(screen.getByTestId('avatar-3d-stage')).toBeInTheDocument()
+    act(() => ready.fire())
+    expect(frame).toHaveAttribute('data-state', 'ready')
+    expect(screen.queryByRole('status')).toBeNull()
   })
 
-  afterEach(() => {
-    resetLobsterFullBodyMotionForTests()
-  })
-
-  it('mounts the animated full-body slot', async () => {
-    render(<LobsterAvatarFullBody src={testSrc} alt="Stage preview" />)
-
-    expect(screen.getByTestId('lobster-avatar-full-body')).toHaveAttribute('data-slot', 'fullBody')
-    await waitFor(() => {
-      expect(screen.getByTestId('lobster-avatar-inline-svg')).toBeInTheDocument()
-    })
-    expect(screen.getByTestId('lobster-avatar-inline-svg')).toHaveClass('lobster-avatar-animated')
-  })
-
-  it('does not load the animated instance when the document is hidden', async () => {
-    Object.defineProperty(document, 'hidden', { configurable: true, value: true })
-    render(<LobsterAvatarFullBody src={testSrc} alt="Hidden stage" />)
-
-    await waitFor(() => {
-      expect(screen.queryByTestId('lobster-avatar-inline-svg')).toBeNull()
-    })
-    expect(screen.getByAltText('Hidden stage')).toBeInTheDocument()
-  })
-
-  it('holds motion on a second mounted instance', async () => {
-    const { rerender } = render(
-      <>
-        <LobsterAvatarFullBody src={testSrc} alt="First" />
-      </>
-    )
-
-    await waitFor(() => {
-      expect(screen.getByTestId('lobster-avatar-inline-svg')).toBeInTheDocument()
-    })
-
-    rerender(
-      <>
-        <LobsterAvatarFullBody src={testSrc} alt="First" />
-        <LobsterAvatarFullBody src={testSrc} alt="Second" />
-      </>
-    )
-
-    await waitFor(() => {
-      expect(screen.getAllByTestId('lobster-avatar-full-body')).toHaveLength(2)
-    })
-    expect(screen.getAllByTestId('lobster-avatar-inline-svg')).toHaveLength(1)
-    expect(screen.getByAltText('Second')).toBeInTheDocument()
-  })
-
-  it('renders carapace silhouette with antennae when config and src are missing', () => {
-    render(<LobsterAvatarFullBody />)
+  it('never draws a 2D character: no character or no 3D shows the plain silhouette', () => {
+    const { rerender } = render(<LobsterAvatarFullBody config={null} alt="Nobody" />)
     expect(screen.getByTestId('lobster-avatar-silhouette')).toBeInTheDocument()
-    expect(screen.queryByText(/No avatar/i)).toBeNull()
+    set3DSupportForTests(false)
+    rerender(<LobsterAvatarFullBody config={config} alt="No 3D" />)
+    expect(screen.getByTestId('lobster-avatar-full-body')).toHaveAttribute('data-state', 'placeholder')
+    expect(screen.queryByTestId('avatar-3d-stage')).toBeNull()
+  })
+
+  it('offers Reset view while a gear slot is featured', () => {
+    const reset = vi.fn()
+    render(<LobsterAvatarFullBody config={config} focus="head" onResetFocus={reset} />)
+    act(() => screen.getByRole('button', { name: /reset view/i }).click())
+    expect(reset).toHaveBeenCalled()
   })
 })

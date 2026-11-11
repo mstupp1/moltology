@@ -107,15 +107,14 @@ rules:
         symbol: avatarConfigShape
     tests: [src/lib/lobster-avatar.test.ts]
   - id: data.avatar-portraits
-    title: Painted portraits retired
+    title: Every character picture is the 3D character
     kind: invariant
-    status: deprecated
-    statement: Portraits and full-body avatars compose the same drawn character and equipped visual snapshot. Saved painted portrait keys cannot select the retired renderer, and no painted portraits are generated or uploaded.
+    statement: Full-body characters render live in 3D, and portraits, creator option cards and gear icons are stills of the same 3D character, drawn in the browser and kept between visits. There is no 2D drawing; while a picture loads a loader shows, and a browser without 3D shows a plain silhouette. No portraits are generated or uploaded on the server.
     dependsOn: [data.avatar-look-server]
     anchors:
-      - file: src/lib/lobster-avatar-slots.ts
-        symbol: resolveLobsterAvatarAssets
-    tests: [src/lib/lobster-avatar-slots.test.ts]
+      - file: src/lib/avatar3d-portrait-queue.ts
+        symbol: requestStill3D
+    tests: [src/components/hud/LobsterAvatarPortrait.test.tsx, src/components/hud/LobsterAvatarFullBody.test.tsx]
   - id: data.character-atomic-save
     title: Character saves are atomic and versioned
     kind: invariant

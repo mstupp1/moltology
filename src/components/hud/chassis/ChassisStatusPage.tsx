@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { GearIcon } from '@/components/hud/avatar3d/GearIcon'
 import React, { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { Dices } from 'lucide-react'
 import { HudWorkspaceGhost } from '../HudGhostSkeletons'
@@ -10,8 +11,6 @@ import { getAuthJWTToken } from '@/lib/jwt'
 import { getChassisLoadoutFn, saveCharacterFn } from '@/lib/server/api'
 import {
   LOBSTER_AVATAR_STYLE,
-  clearCachedProfileAvatarUrl,
-  equipmentIcon,
   rerollAvatarConfig,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
@@ -264,7 +263,6 @@ export const ChassisStatusPage: React.FC = () => {
       })
       accept(payload)
       setError(null)
-      clearCachedProfileAvatarUrl(userId)
       window.dispatchEvent(new CustomEvent('profile-avatar-changed'))
       toast?.success('Character saved.')
     } catch (e) {
@@ -536,7 +534,7 @@ function SlotButton({
   onPick,
 }: SlotSharedProps & { id: EquipSlotId; className?: string }) {
   const item = itemFor(id)
-  const thumb = item ? equipmentIcon(item.appearanceKey || item.slug) : null
+  const thumb = item ? item.appearanceKey || item.slug : null
   const selected = active === id
   return (
     <button
@@ -553,7 +551,7 @@ function SlotButton({
     >
       <span className="grid place-items-center w-11 h-11 rounded-chip bg-abyss/70">
         {thumb ? (
-          <img src={thumb} alt="" className="w-9 h-9 object-contain" />
+          <GearIcon appearanceKey={thumb} className="w-11 h-11 rounded-chip overflow-hidden" />
         ) : (
           <span
             className="w-5 h-5 rounded-full border border-dashed border-line"
@@ -598,7 +596,7 @@ function GearPick({
   selected: boolean
   onClick: () => void
 }) {
-  const thumb = equipmentIcon(catalog.appearanceKey || catalog.slug)
+  const thumb = catalog.appearanceKey || catalog.slug
   const rarity = RARITY_STYLES[catalog.rarity]
   return (
     <button
@@ -612,8 +610,8 @@ function GearPick({
           : 'border-line-subtle bg-surface-2 hover:border-line-hover'
       }`}
     >
-      <span className="grid place-items-center w-full aspect-square rounded-chip bg-abyss/70">
-        {thumb ? <img src={thumb} alt="" className="w-3/4 h-3/4 object-contain" /> : null}
+      <span className="grid place-items-center w-full aspect-square rounded-chip bg-abyss/70 overflow-hidden">
+        <GearIcon appearanceKey={thumb} className="w-full h-full" />
       </span>
       <span className="text-[12px] leading-tight text-ink font-semibold line-clamp-2 min-h-[2lh]">
         {catalog.name}
