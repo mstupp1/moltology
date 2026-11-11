@@ -3,6 +3,7 @@
  * drag-to-turn. Framework free, so the creator, portraits and tests can all drive it.
  */
 import {
+  AdditiveBlending,
   CanvasTexture,
   DirectionalLight,
   HemisphereLight,
@@ -40,6 +41,12 @@ export interface StageOptions {
   manual?: boolean
   /** Cast soft shadows (default true). Small stills skip them: they barely show and cost the most. */
   shadows?: boolean
+  /**
+   * `studio` (default) is even, soft light for stills. `cinematic` is for the live full-body view:
+   * a darker fill, a cyan rim on one edge and a pink kicker on the other (the glass portrait's
+   * colours), and a faint glowing ring on the floor. Lights only, so it costs no more to draw.
+   */
+  lighting?: 'studio' | 'cinematic'
   /** The browser took the 3D context away (too many canvases, or the graphics driver reset). */
   onContextLost?: () => void
 }
@@ -65,6 +72,23 @@ export interface Stage {
   /** The current frame as a PNG data URL. Needs `preserveDrawingBuffer`. */
   snapshot: () => string
   dispose: () => void
+}
+
+/** A faint cyan ring for the character to stand in, brightest at its edge. */
+function floorRingTexture(): CanvasTexture {
+  const size = 256
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = size
+  const ctx = canvas.getContext('2d')!
+  const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
+  g.addColorStop(0, 'rgba(0,195,255,0.14)')
+  g.addColorStop(0.6, 'rgba(0,195,255,0.05)')
+  g.addColorStop(0.82, 'rgba(120,235,255,0.32)')
+  g.addColorStop(0.88, 'rgba(0,195,255,0.08)')
+  g.addColorStop(1, 'rgba(0,195,255,0)')
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, size, size)
+  return new CanvasTexture(canvas)
 }
 
 function contactShadowTexture(): CanvasTexture {
@@ -119,6 +143,22 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   const rim = new DirectionalLight(0xc8ecff, 1.9)
   rim.position.set(-1.8, 2.6, -3.6)
   scene.add(hemi, key, key.target, fill, rim)
+  const cinematic = options.lighting === 'cinematic'
+  if (cinematic) {
+    // Darker all round, so the coloured edges read: cyan behind the left side, pink behind the right.
+    scene.environmentIntensity = 0.2
+    hemi.intensity = 0.22
+    hemi.groundColor.set(0x0b2a36)
+    fill.intensity = 0.28
+    fill.color.set(0x7fb8ff)
+    key.intensity = 3
+    rim.color.set(0x48dcff)
+    rim.intensity = 8
+    rim.position.set(-3.4, 2.2, -1.6)
+  }
+  const kicker = new DirectionalLight(0xff8fc4, 3.2)
+  kicker.position.set(3.4, 1.4, -1.4)
+  if (cinematic) scene.add(kicker)
 
   const ground = new Mesh(new PlaneGeometry(8, 8), new ShadowMaterial({ opacity: 0.26 }))
   ground.rotation.x = -Math.PI / 2
@@ -128,6 +168,15 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   blob.rotation.x = -Math.PI / 2
   blob.position.y = 0.002
   scene.add(ground, blob)
+  const ringTexture = cinematic ? floorRingTexture() : null
+  const ring = ringTexture
+    ? new Mesh(new PlaneGeometry(2.3, 2.3), new MeshBasicMaterial({ map: ringTexture, transparent: true, depthWrite: false, blending: AdditiveBlending }))
+    : null
+  if (ring) {
+    ring.rotation.x = -Math.PI / 2
+    ring.position.y = 0.001
+    scene.add(ring)
+  }
 
   let character: Character3D | null = null
   // Where the camera sits to take in the whole figure, and where it is now on its way there.
@@ -355,6 +404,9 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       pmrem.dispose()
       room.dispose()
       blobTexture.dispose()
+      ringTexture?.dispose()
+      ring?.geometry.dispose()
+      ;(ring?.material as MeshBasicMaterial | undefined)?.dispose()
       ground.geometry.dispose()
       ;(ground.material as ShadowMaterial).dispose()
       blob.geometry.dispose()

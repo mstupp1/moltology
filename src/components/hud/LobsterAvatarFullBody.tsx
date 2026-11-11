@@ -8,6 +8,7 @@ import { HudButton } from '@/components/ui/HudButton'
 import { HUDSpinner } from '@/components/ui/HUDSpinner'
 import { Avatar3DStage } from './avatar3d/Avatar3DStage'
 import { LobsterAvatarSilhouette } from './LobsterAvatarSilhouette'
+import { GLASS_CASE_FRAME_CLASS, GlassCase } from './GlassLens'
 
 export interface LobsterAvatarFullBodyProps {
   config?: LobsterAvatarConfig | null
@@ -24,7 +25,8 @@ export interface LobsterAvatarFullBodyProps {
 }
 
 /**
- * The whole character, live in 3D, over its chosen scene. A spinner shows until the first frame
+ * The whole character, live in 3D, over its chosen scene, lit like a film still behind the
+ * portrait glass. A spinner shows until the first frame
  * is drawn, and a plain silhouette stands in when there is no character or no 3D in this browser.
  */
 export const LobsterAvatarFullBody: React.FC<LobsterAvatarFullBodyProps> = React.memo(({
@@ -53,7 +55,7 @@ export const LobsterAvatarFullBody: React.FC<LobsterAvatarFullBodyProps> = React
       data-slot="fullBody"
       data-renderer="3d"
       data-state={placeholder ? 'placeholder' : look && ready ? 'ready' : 'loading'}
-      className={`relative overflow-hidden rounded-sm border border-white/[0.14] bg-[#081419]/90 shrink-0 ${className}`}
+      className={`relative overflow-hidden rounded-sm bg-[#081419]/90 shrink-0 ${GLASS_CASE_FRAME_CLASS} ${className}`}
     >
       {scene ? (
         <div aria-hidden data-testid="avatar-3d-scene" className="absolute inset-0" style={scene} />
@@ -82,12 +84,13 @@ export const LobsterAvatarFullBody: React.FC<LobsterAvatarFullBodyProps> = React
           )}
         </>
       )}
+      <GlassCase />
       {focus && onResetFocus && (
         <HudButton
           type="button"
           variant="secondary"
           size="sm"
-          className="absolute top-1 right-1 lg:top-2 lg:right-2"
+          className="absolute top-1 right-1 z-30 lg:top-2 lg:right-2"
           onClick={onResetFocus}
           icon={<RotateCcw className="w-3.5 h-3.5 text-cyan-glow" aria-hidden />}
         >
