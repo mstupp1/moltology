@@ -2,7 +2,7 @@
  * Builds one character from a look and keeps it alive: pose blending, breathing, blinking and
  * antenna sway. Changing the look rebuilds the character; changing the pose only retargets bones.
  */
-import { BufferAttribute, Quaternion, Vector3, type Group, type Material } from 'three'
+import { BufferAttribute, Mesh, Quaternion, Vector3, type Group, type Material } from 'three'
 import type { AvatarPose } from '../avatar/traits'
 import { equipAll } from './equipment'
 import type { Avatar3DLook } from './look'
@@ -34,9 +34,9 @@ export interface Character3D {
  * Portraits frame the head as the 2D ones do: it fills most of the circle, sits centred with a
  * little shoulder below it, and a hat gets some headroom.
  */
-function portraitFrame(rig: Rig, height: number, scale: number, hat: boolean): Character3D['portrait'] {
+function portraitFrame(rig: Rig, height: number, scale: number, hat: boolean, lift = 0): Character3D['portrait'] {
   const head = rig.wear?.head
-  if (!head) return { y: height * 0.8 * scale, size: 1.2 * scale }
+  if (!head) return { y: (height * 0.8 + lift) * scale, size: 1.2 * scale }
   let half = 0
   for (let i = 0; i <= 24; i++) half = Math.max(half, head.loft.key(i / 24).r)
   const bottom = head.loft.key(1).d
@@ -44,7 +44,65 @@ function portraitFrame(rig: Rig, height: number, scale: number, hat: boolean): C
   const size = Math.max((half * 2) / 0.8, tall / 0.84) * (hat ? 1.16 : 1)
   const mid = (head.top + bottom) / 2
   const y = Math.max(mid - size * 0.05, head.top - size * 0.47) + (hat ? size * 0.06 : 0)
-  return { y: y * scale, size: size * scale }
+  return { y: (y + lift) * scale, size: size * scale }
+}
+
+/**
+ * Height the way people read it: a tall character has long legs and stands higher, a short one is
+ * stubby, and the head stays close to the same size either way. Most of the change goes into the
+ * legs; a gentle overall scale carries the rest. Returns the overall scale and how far the body
+ * was raised, in the character's own units.
+ */
+function applyStature(rig: Rig, heightScale: number, bodyHeight: number): { scale: number; lift: number } {
+  const thigh = rig.bones.get('thighL')
+  const shin = rig.bones.get('shinL')
+  const foot = rig.bones.get('footL')
+  if (!thigh || !shin || !foot || Math.abs(heightScale - 1) < 1e-3) {
+    rig.root.scale.setScalar(heightScale)
+    return { scale: heightScale, lift: 0 }
+  }
+  const hipY = rig.restWorldOf('thighL').position.y
+  const ankleY = rig.restWorldOf('footL').position.y
+  const span = hipY - ankleY
+  // Legs take most of the change, within limits that still look like legs.
+  const stretch = Math.min(1.7, Math.max(0.55, 1 + (heightScale - 1) * 2.2))
+  const lift = span * (stretch - 1)
+  const scale = (heightScale * bodyHeight) / (bodyHeight + lift)
+
+  for (const tag of ['L', 'R']) {
+    for (const [name, child] of [[`thigh${tag}`, `shin${tag}`], [`shin${tag}`, `foot${tag}`]] as const) {
+      const bone = rig.bone(name)
+      const next = rig.bone(child)
+      const length = next.position.length()
+      const axis = next.position.clone().normalize()
+      const extra = length * (stretch - 1)
+      // Joints and cuffs keep their shape; only the shaft between them grows or shrinks.
+      const end = Math.min(length * 0.3, 0.06)
+      const middle = Math.max(length - 2 * end, 1e-3)
+      for (const mesh of bone.children) {
+        if (!(mesh instanceof Mesh)) continue
+        const pos = mesh.geometry.getAttribute('position')
+        const p = new Vector3()
+        for (let i = 0; i < pos.count; i++) {
+          p.fromBufferAttribute(pos, i)
+          const t = p.dot(axis)
+          const shift = t <= end ? 0 : t >= length - end ? extra : ((t - end) / middle) * extra
+          p.addScaledVector(axis, shift)
+          pos.setXYZ(i, p.x, p.y, p.z)
+        }
+        pos.needsUpdate = true
+        mesh.geometry.computeBoundingSphere()
+        mesh.geometry.computeBoundingBox()
+      }
+      next.position.addScaledVector(axis, extra)
+      rig.rest.get(child)?.position.copy(next.position)
+    }
+  }
+  const pelvis = rig.bone('pelvis')
+  pelvis.position.y += lift
+  rig.rest.get('pelvis')!.position.copy(pelvis.position)
+  rig.root.scale.setScalar(scale)
+  return { scale, lift }
 }
 
 export function buildCharacter(look: Avatar3DLook): Character3D {
@@ -74,7 +132,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   }
 
   const gear = equipAll(rig, look.equipment, look.accessory)
-  rig.root.scale.setScalar(look.heightScale)
+  const stature = applyStature(rig, look.heightScale, built.height)
 
   let targets = poseTargets(rig, POSES[look.pose])
   const current = new Map<string, Quaternion>()
@@ -131,8 +189,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     root: rig.root,
     rig,
     look,
-    height: built.height * look.heightScale,
-    portrait: portraitFrame(rig, built.height, look.heightScale, Boolean(look.equipment?.head) || look.accessory !== 'none'),
+    height: (built.height + stature.lift) * stature.scale,
+    portrait: portraitFrame(rig, built.height, stature.scale, Boolean(look.equipment?.head) || look.accessory !== 'none', stature.lift),
     setPose(pose, immediate = false) {
       targets = poseTargets(rig, POSES[pose])
       if (immediate) for (const [name, t] of targets) current.get(name)!.copy(t)

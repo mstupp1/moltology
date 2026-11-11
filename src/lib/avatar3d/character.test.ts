@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { AVATAR_ACCESSORIES, AVATAR_ANTENNAE, AVATAR_BUILDS, AVATAR_CLAWS, AVATAR_HEAD_SHAPES, AVATAR_MOUTHS, AVATAR_POSES, AVATAR_RACES, SHELL_MARKINGS } from '../avatar/traits'
-import type { Mesh, Object3D } from 'three'
+import { Vector3, type Mesh, type Object3D } from 'three'
 import { EQUIPMENT_VISUALS } from '../avatar/equipment'
 import { STARTER_CHARACTER_EQUIPMENT } from '../avatar/starter-equipment'
 import type { EquippedAppearance } from '../character-appearance'
@@ -157,6 +157,30 @@ describe('avatar3d', () => {
       expect(k.d).toBeGreaterThanOrEqual(last - 1e-9)
       expect(k.r).toBeLessThanOrEqual(1 + 1e-9)
       last = k.d
+    }
+  })
+
+  it('makes height mostly leg, keeps the head near one size and the feet on the ground', () => {
+    for (const race of AVATAR_RACES) {
+      const measure = (heightScale: number) => {
+        const c = buildCharacter({ ...baselineLook(race), heightScale })
+        c.root.updateMatrixWorld(true)
+        const ankle = c.rig.bone('footL').getWorldPosition(new Vector3()).y
+        const hip = c.rig.bone('thighL').getWorldPosition(new Vector3()).y
+        const out = { height: c.height, head: c.portrait.size, leg: hip - ankle, ankle }
+        c.dispose()
+        return out
+      }
+      const short = measure(0.88)
+      const regular = measure(1)
+      const tall = measure(1.4)
+      expect(tall.height / regular.height).toBeCloseTo(1.4, 1)
+      expect(short.height).toBeLessThan(regular.height)
+      // Legs change far more than the head does.
+      expect(tall.leg / regular.leg).toBeGreaterThan(1.5)
+      expect(tall.head / regular.head).toBeLessThan(1.25)
+      expect(short.leg / regular.leg).toBeLessThan(0.85)
+      expect(Math.abs(tall.ankle - regular.ankle)).toBeLessThan(0.05)
     }
   })
 })

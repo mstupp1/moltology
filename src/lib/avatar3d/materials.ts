@@ -150,7 +150,8 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         `
         float a3Ao = vColor.r;
         vec3 a3Tint = diffuse;
-        if (uMarking == 7 && vRest.x < 0.0) a3Tint = uSplit;
+        // The partner colour takes the viewer's right half, as in the 2D drawing.
+        if (uMarking == 7 && vRest.x > 0.0) a3Tint = uSplit;
         a3Mask = uMarking == 7 ? 0.0 : a3Marking(uMarking, vRest);
         a3Tint = mix(a3Tint, uMark, a3Mask);
         float a3Grain = a3Noise(vRest * 90.0) * 0.6 + a3Noise(vRest * 240.0) * 0.4;

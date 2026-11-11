@@ -87,6 +87,19 @@ function reshape(keys: LoftKey[], top: number, bottom: number, tall = 1, n = 0):
   })
 }
 
+/**
+ * Where a head shape moves things on the shell: a height on the baseline shell maps to its height
+ * on the reshaped one, and `width` is how much wider the shell is there. The face uses both, so
+ * eyes, brows and mouth stay put on the head whatever its shape.
+ */
+function headFit(keys: LoftKey[], shape: { top: number; bottom: number; tall: number }) {
+  const yTop = keys[0].d
+  const yBottom = keys[keys.length - 1].d
+  const y = (at: number) => yBottom + (at - yBottom) * shape.tall
+  const width = (at: number) => shape.top + (shape.bottom - shape.top) * ((yTop - at) / (yTop - yBottom))
+  return { y, width, lift: (at: number) => y(at) - at }
+}
+
 export interface FaceRig {
   /** Upper lid opening per eye, in radians, so blinks can return to it. */
   lidOpen: Record<'L' | 'R', number>
@@ -96,8 +109,11 @@ interface FaceLayout {
   shell: Loft
   bone: string
   eyeY: number
-  /** Radians each eye sits round from straight ahead. */
+  /** Radians each eye sits round from straight ahead, on the baseline head. */
   eyeSpread: number
+  /** How much wider than the baseline the head is at eye height. The gap between the eyes grows
+   * only a little with it, so a wide head reads as a wide face, not as eyes drifting apart. */
+  headWidth?: number
   eyeRadius: number
   browY: number
   /** Half length of each brow, in radians round the shell. */
@@ -146,8 +162,22 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
   const [wide, high] = EYE_STRETCH[look.eyeShape]
   const eyeScale = v(wide, high, 1)
 
+  // Keep the eyes the baseline distance apart (plus a little for a wider head), measured across
+  // the face, so they never slide round to the sides of a wide or boxy head.
+  const w = f.headWidth ?? 1
+  const half = Math.abs(f.shell.point(sEye, 0).x)
+  const target = (half / w) * Math.sin(f.eyeSpread) * (1 + 0.22 * (w - 1))
+  let lo = 0
+  let hi = Math.PI / 2
+  for (let i = 0; i < 24; i++) {
+    const mid = (lo + hi) / 2
+    if (Math.abs(f.shell.point(sEye, Math.PI / 2 - mid).x) < target) lo = mid
+    else hi = mid
+  }
+  const spread = (lo + hi) / 2
+
   for (const { s, tag } of SIDES) {
-    const theta = Math.PI / 2 - s * f.eyeSpread
+    const theta = Math.PI / 2 - s * spread
     const surface = f.shell.point(sEye, theta)
     const normal = f.shell.normal(sEye, theta)
     const centre = surface.clone().addScaledVector(normal, -f.eyeRadius * 0.42)
@@ -421,6 +451,18 @@ export interface SpeciesBuild {
   height: number
 }
 
+/** Baseline lobster carapace, crown to chest. */
+const LOBSTER_HEAD: LoftKey[] = [
+  { d: 1.77, r: 0, z: 0.05 },
+  { d: 1.74, r: 0.13, z: 0.05, front: 0.92, back: 0.95 },
+  { d: 1.64, r: 0.235, z: 0.045, front: 0.9, back: 0.95 },
+  { d: 1.5, r: 0.298, z: 0.03, front: 0.88, back: 0.96 },
+  { d: 1.34, r: 0.328, z: 0.01, front: 0.88, back: 0.98 },
+  { d: 1.2, r: 0.31, z: -0.01, front: 0.86, back: 1 },
+  { d: 1.09, r: 0.22, z: -0.02, front: 0.85, back: 1.02 },
+  { d: 1.03, r: 0, z: -0.02 },
+]
+
 export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   const head = HEAD_SHAPES[look.headShape]
   const build = BUILDS[look.build]
@@ -430,16 +472,7 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   // Carapace: one egg from the crown to the chest, with the face on its front.
   const carapace = loft({
     keys: reshape(
-      [
-        { d: 1.77, r: 0, z: 0.05 },
-        { d: 1.74, r: 0.13, z: 0.05, front: 0.92, back: 0.95 },
-        { d: 1.64, r: 0.235, z: 0.045, front: 0.9, back: 0.95 },
-        { d: 1.5, r: 0.298, z: 0.03, front: 0.88, back: 0.96 },
-        { d: 1.34, r: 0.328, z: 0.01, front: 0.88, back: 0.98 },
-        { d: 1.2, r: 0.31, z: -0.01, front: 0.86, back: 1 },
-        { d: 1.09, r: 0.22, z: -0.02, front: 0.85, back: 1.02 },
-        { d: 1.03, r: 0, z: -0.02 },
-      ],
+      LOBSTER_HEAD,
       head.top,
       head.bottom,
       head.tall,
@@ -484,12 +517,15 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   })
   rig.add('tail', 'shell', merge(lobes))
 
-  const face = addFace(rig, look, { shell: carapace, bone: 'chest', eyeY: 1.525, eyeSpread: 0.47, eyeRadius: 0.105, browY: 1.688, browSpan: 0.46, browArch: 0.22, mouthY: 1.35, mouthHalf: 0.44 })
+  const fit = headFit(LOBSTER_HEAD, head)
+  const face = addFace(rig, look, { shell: carapace, bone: 'chest', eyeY: fit.y(1.525), eyeSpread: 0.47, headWidth: fit.width(1.525), eyeRadius: 0.105, browY: fit.y(1.688), browSpan: 0.46 / fit.width(1.688), browArch: 0.22, mouthY: fit.y(1.35), mouthHalf: 0.44 / fit.width(1.35) })
 
+  // The antennae root on the crown, wherever the head shape puts it.
+  const lift = fit.lift(1.74)
   const antenna = addAntennae(rig, look.antennae, {
     parent: 'chest',
-    base: v(0.055, 1.74, 0.07),
-    whip: [v(0.055, 1.74, 0.07), v(0.09, 1.9, 0.1), v(0.19, 2.07, 0.16), v(0.34, 2.15, 0.24), v(0.47, 2.11, 0.33), v(0.55, 2.03, 0.4)],
+    base: v(0.055, 1.74 + lift, 0.07),
+    whip: [v(0.055, 1.74 + lift, 0.07), v(0.09, 1.9 + lift, 0.1), v(0.19, 2.07 + lift, 0.16), v(0.34, 2.15 + lift, 0.24), v(0.47, 2.11 + lift, 0.33), v(0.55, 2.03 + lift, 0.4)],
     reach: 0.4,
     sweep: 0.3,
     thick: 0.037,
@@ -548,6 +584,19 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   return { face, height: carapace.key(0).d }
 }
 
+/** Baseline crab shell, top to underside. */
+const CRAB_SHELL: LoftKey[] = [
+  { d: 1.53, r: 0, z: 0 },
+  { d: 1.505, r: 0.2, z: 0, front: 0.7, back: 0.74 },
+  { d: 1.43, r: 0.38, z: 0, front: 0.68, back: 0.72 },
+  { d: 1.31, r: 0.495, z: 0, front: 0.67, back: 0.71, n: 2.1 },
+  { d: 1.17, r: 0.535, z: 0, front: 0.67, back: 0.71, n: 2.1 },
+  { d: 1.03, r: 0.5, z: 0, front: 0.67, back: 0.71, n: 2.1 },
+  { d: 0.91, r: 0.39, z: 0, front: 0.67, back: 0.72 },
+  { d: 0.83, r: 0.22, z: 0, front: 0.68, back: 0.72 },
+  { d: 0.8, r: 0, z: 0 },
+]
+
 export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   const head = HEAD_SHAPES[look.headShape]
   const build = BUILDS[look.build]
@@ -557,17 +606,7 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   // Shell: a broad dome that is both head and body.
   const shell = loft({
     keys: reshape(
-      [
-        { d: 1.53, r: 0, z: 0 },
-        { d: 1.505, r: 0.2, z: 0, front: 0.7, back: 0.74 },
-        { d: 1.43, r: 0.38, z: 0, front: 0.68, back: 0.72 },
-        { d: 1.31, r: 0.495, z: 0, front: 0.67, back: 0.71, n: 2.1 },
-        { d: 1.17, r: 0.535, z: 0, front: 0.67, back: 0.71, n: 2.1 },
-        { d: 1.03, r: 0.5, z: 0, front: 0.67, back: 0.71, n: 2.1 },
-        { d: 0.91, r: 0.39, z: 0, front: 0.67, back: 0.72 },
-        { d: 0.83, r: 0.22, z: 0, front: 0.68, back: 0.72 },
-        { d: 0.8, r: 0, z: 0 },
-      ],
+      CRAB_SHELL,
       head.top,
       head.bottom,
       head.tall,
@@ -620,12 +659,15 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     }
   }
 
-  const face = addFace(rig, look, { shell, bone: 'chest', eyeY: 1.3, eyeSpread: 0.345, eyeRadius: 0.135, browY: 1.462, browSpan: 0.31, browArch: 0.12, mouthY: 1.105, mouthHalf: 0.3 })
+  const fit = headFit(CRAB_SHELL, head)
+  const face = addFace(rig, look, { shell, bone: 'chest', eyeY: fit.y(1.3), eyeSpread: 0.345, headWidth: fit.width(1.3), eyeRadius: 0.135, browY: fit.y(1.462), browSpan: 0.31 / fit.width(1.462), browArch: 0.12, mouthY: fit.y(1.105), mouthHalf: 0.3 / fit.width(1.105) })
 
+  // The antennae root on the crown, wherever the head shape puts it.
+  const lift = fit.lift(1.5)
   const antenna = addAntennae(rig, look.antennae, {
     parent: 'chest',
-    base: v(0.05, 1.5, 0.06),
-    whip: [v(0.05, 1.5, 0.06), v(0.065, 1.65, 0.05), v(0.14, 1.77, 0.01), v(0.27, 1.79, -0.05), v(0.36, 1.72, -0.09)],
+    base: v(0.05, 1.5 + lift, 0.06),
+    whip: [v(0.05, 1.5 + lift, 0.06), v(0.065, 1.65 + lift, 0.05), v(0.14, 1.77 + lift, 0.01), v(0.27, 1.79 + lift, -0.05), v(0.36, 1.72 + lift, -0.09)],
     reach: 0.34,
     sweep: -0.2,
     thick: 0.046,
