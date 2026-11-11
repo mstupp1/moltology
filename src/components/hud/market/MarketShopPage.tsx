@@ -370,7 +370,8 @@ export function MarketShopPage() {
   return (
     <div className="space-y-3 sm:space-y-4 font-sans pb-2">
       <HudTitlePanel
-        surface="solid"
+        treatment="band"
+        joined
         accent="cyan"
         title="Shop"
         description="Gear for your character. Rarer versions come with bigger stats and stranger abilities."
@@ -388,7 +389,7 @@ export function MarketShopPage() {
                 onClick={() => setTab(t.id)}
                 className={cn(
                   'flex-1 sm:flex-none min-h-9 rounded-control px-4 text-[11px] font-semibold tracking-[0.08em] uppercase transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
-                  tab === t.id ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-2',
+                  tab === t.id ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-3/60',
                 )}
               >
                 {t.label}

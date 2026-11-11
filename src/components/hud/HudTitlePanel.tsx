@@ -6,10 +6,13 @@ export interface HudTitlePanelProps extends Omit<React.HTMLAttributes<HTMLDivEle
   eyebrow?: React.ReactNode
   description?: React.ReactNode
   actions?: React.ReactNode
-  /** Compact for page sections, integrated inside a workspace, hero for substantial introductions. */
-  treatment?: 'compact' | 'integrated' | 'hero'
-  /** Give a compact heading an opaque ground when the page has background artwork. */
-  surface?: 'none' | 'solid'
+  /**
+   * Compact for page sections, integrated inside a workspace, hero for substantial introductions,
+   * band for the header that runs edge to edge across the top of the page panel.
+   */
+  treatment?: 'compact' | 'integrated' | 'hero' | 'band'
+  /** Band only: a row of section tabs (`HudTitleBandTop`) sits directly above, so the band continues it. */
+  joined?: boolean
   /** Full-width navigation or filters, below the heading and actions. */
   toolbar?: React.ReactNode
   accent?: 'cyan' | 'teal' | 'crimson' | 'green'
@@ -29,7 +32,7 @@ export function HudTitlePanel({
   description,
   actions,
   treatment = 'compact',
-  surface = 'none',
+  joined = false,
   toolbar,
   accent = 'cyan',
   children,
@@ -42,7 +45,9 @@ export function HudTitlePanel({
       data-heading-treatment={treatment}
       className={cn(
         'relative flex flex-wrap items-start justify-between gap-x-6 gap-y-3',
-        treatment === 'compact' && (surface === 'solid' ? 'rounded-card bg-surface-1 p-4 sm:p-5' : 'py-1'),
+        treatment === 'compact' && 'py-1',
+        treatment === 'band' &&
+          cn('bg-surface-2 border-b border-line-subtle', joined ? 'hud-title-band-rest pt-2 pb-4 md:pb-5' : 'hud-title-band'),
         treatment === 'integrated' && 'border-b border-line-subtle pb-4',
         treatment === 'hero' && `overflow-hidden rounded-card border border-line-subtle border-l-2 ${accentClasses.border} bg-surface-1 hud-sheen p-4 sm:p-5`,
         className,
@@ -65,4 +70,12 @@ export function HudTitlePanel({
       {toolbar ? <div className="w-full min-w-0 basis-full">{toolbar}</div> : null}
     </div>
   )
+}
+
+/**
+ * First row of a page header band: the section tabs, pulled up to the panel's top edge so
+ * they sit level with the search pill. The page's band (`joined`) follows directly below.
+ */
+export function HudTitleBandTop({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <div className={cn('hud-title-band-top bg-surface-2', className)}>{children}</div>
 }

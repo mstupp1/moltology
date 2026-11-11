@@ -220,6 +220,7 @@ function HudContent() {
                 // the panel, and 1312px max leaves 1280px of content, so page layouts keep their width.
                 <div
                   data-hud-page-panel
+                  data-hud-main-only={isMainOnly ? '' : undefined}
                   className={`mx-auto flex w-full min-w-0 flex-1 shrink-0 flex-col md:max-w-[1312px] md:px-[15px] md:pb-6 ${
                     isMainOnly ? 'md:pt-6' : 'md:pt-[54px]'
                   } md:rounded-panel md:border md:border-line-subtle md:bg-surface-1/[0.68] md:shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)]`}

@@ -344,8 +344,10 @@ export const ChassisStatusPage: React.FC = () => {
       className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.35fr)_minmax(340px,1fr)] gap-x-6 gap-y-3 lg:gap-y-5 items-start font-sans relative max-lg:pb-16"
       data-testid="character-workspace"
     >
-      <div className="max-lg:sticky max-lg:z-20 max-sm:-top-2.5 max-sm:-mx-2.5 max-sm:-mt-2.5 max-sm:px-2.5 max-sm:pt-2.5 sm:max-md:-top-4 sm:max-md:-mx-4 sm:max-md:-mt-4 sm:max-md:px-4 sm:max-md:pt-4 md:max-lg:-top-6 md:max-lg:-mx-6 md:max-lg:-mt-6 md:max-lg:px-6 md:max-lg:pt-6 max-lg:pb-2 max-lg:space-y-2 max-lg:bg-abyss/95 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-line-subtle lg:contents">
-        <div className="lg:col-span-2 flex items-center justify-between gap-3 rounded-card bg-surface-1 px-3 py-2 sm:px-5 sm:py-4">
+      {/* Below lg this pinned stage continues the page's header band (the section tabs sit just
+          above it, from the route); on wide screens only the title row does. */}
+      <div className="hud-title-band-rest max-lg:sticky max-lg:z-20 max-sm:-top-2.5 sm:max-md:-top-4 md:max-lg:-top-6 max-lg:pt-1 max-lg:pb-2 max-lg:space-y-2 max-lg:bg-surface-2/95 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-line-subtle lg:contents">
+        <div className="hud-title-band-rest-lg lg:col-span-2 flex items-center justify-between gap-3 lg:bg-surface-2 lg:border-b lg:border-line-subtle lg:pt-2 lg:pb-5">
           <h1 className="font-grotesk font-extrabold text-lg sm:text-2xl text-ink tracking-tight truncate">
             Character
           </h1>

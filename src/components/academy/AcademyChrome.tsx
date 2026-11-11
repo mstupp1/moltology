@@ -35,7 +35,8 @@ export function AcademyNav({ current }: { current: 'catalog' | 'certificates' | 
     { key: 'certificates' as const, to: '/academy/certificates' as const, label: 'Certificates', icon: Award },
   ]
   return (
-    <nav className="flex gap-1 rounded-control border border-line-subtle bg-abyss/40 p-1" aria-label="Academy">
+    // Same tab style as the other header bands: plain labels, the current one in a lit pill.
+    <nav className="flex gap-1" aria-label="Academy">
       {items.map(({ key, to, label, icon: Icon }) => {
         const lit = current === key
         return (
@@ -45,7 +46,7 @@ export function AcademyNav({ current }: { current: 'catalog' | 'certificates' | 
             aria-current={lit ? 'page' : undefined}
             className={cn(
               'inline-flex items-center gap-1.5 min-h-8 px-3 rounded-control text-[11px] font-bold uppercase tracking-[0.08em] transition-[background-color,color,box-shadow] duration-200',
-              lit ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-2',
+              lit ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-3/60',
               ACADEMY_FOCUS,
             )}
           >

@@ -17,7 +17,9 @@ export type CharacterSection = (typeof SECTIONS)[number]['id']
  */
 export function CharacterSectionNav({ current, className }: { current: CharacterSection; className?: string }) {
   return (
-    <nav aria-label="Character sections" className={cn('flex gap-1 rounded-control bg-surface-2 p-1', className)}>
+    // The quieter top row of the page's header band: plain labels, the current one in full ink.
+    // Tabs inside the page (Gear, Earn gems...) keep the lit pill, so the two rows don't read alike.
+    <nav aria-label="Character sections" className={cn('flex w-max gap-1', className)}>
       {SECTIONS.map((section) => {
         const selected = section.id === current
         return (
@@ -26,9 +28,9 @@ export function CharacterSectionNav({ current, className }: { current: Character
             to={section.to}
             aria-current={selected ? 'page' : undefined}
             className={cn(
-              'inline-flex min-h-8 items-center justify-center rounded-control px-3 text-[11px] font-semibold uppercase tracking-[0.08em] transition-colors',
+              'inline-flex min-h-9 items-center justify-center rounded-control px-2.5 first:-ml-2.5 text-[11px] uppercase tracking-[0.08em] transition-colors',
               'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
-              selected ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:bg-surface-3/60 hover:text-ink',
+              selected ? 'font-bold text-ink' : 'font-semibold text-ink-muted hover:text-ink',
             )}
           >
             {section.label}

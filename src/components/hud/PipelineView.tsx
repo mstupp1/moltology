@@ -22,7 +22,8 @@ export default function PipelineView() {
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans">
       <HudTitlePanel
-        surface="solid"
+        treatment="band"
+        joined
         accent="cyan"
         title="Progress"
         actions={

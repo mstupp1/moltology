@@ -4,6 +4,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { CharacterSectionNav } from '@/components/hud/chassis/CharacterSectionNav'
+import { HudTitleBandTop } from '@/components/hud/HudTitlePanel'
 
 const LazyChassisStatusPage = lazy(() =>
   import('@/components/hud/chassis/ChassisStatusPage').then((m) => ({ default: m.ChassisStatusPage }))
@@ -16,8 +17,10 @@ function ChassisRoute() {
       message="Chassis loadout, vault storage, and hardpoint calibration require an authorized initiate account."
     >
       <div className="flex flex-col flex-1 min-h-0 h-full w-full">
-        {/* Sits above the workspace so the pinned phone stage keeps its single header row. */}
-        <CharacterSectionNav current="customize" className="w-max mb-3 sm:mb-5 md:mb-7 lg:mb-5" />
+        {/* Opens the header band above the workspace, so the pinned phone stage keeps its single header row. */}
+        <HudTitleBandTop>
+          <CharacterSectionNav current="customize" />
+        </HudTitleBandTop>
         <Suspense fallback={<HudWorkspaceGhost />}>
           <LazyChassisStatusPage />
         </Suspense>

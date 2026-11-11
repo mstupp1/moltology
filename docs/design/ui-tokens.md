@@ -114,10 +114,15 @@ page's structure; a title alone does not need its own card.
   overview content. Premium uses this explicitly. Dashboard and member profiles
   retain their purpose-built identity compositions.
 
-`surface="solid"` gives a compact heading an opaque `surface-1` background and
-standard panel padding on pages with background artwork (Science, Academy,
-Certifications, Codex, Community, Market, and the character editor). Use this
-instead of letting artwork compete with heading text. Integrated headings inherit the surrounding workspace surface.
+`treatment="band"` is the page header band: the title card runs edge to edge across
+the top of the page panel (rounded to the panel's top corners on desktop, flush under
+the top bar on phones) with a `surface-2` fill and a `line-subtle` bottom divider, so it
+stands apart from the `surface-1` panel. Use it as the first element of a standard page
+(Academy, Certificates, Forum, Shop, Progress; Character builds the same band by hand).
+On desktop the search pill straddles the band's top-right corner, so the band leaves room
+for it. Pages with section tabs open the band with `HudTitleBandTop` (tabs level with the
+pill) and pass `joined` to the title band below it. Inside a band, section tabs are plain
+labels; in-page tabs use the lit `surface-3` pill.
 
 `actions` holds page-level commands or a short status summary. `toolbar` spans the
 full width below the heading and actions, for navigation or filters. Both wrap on

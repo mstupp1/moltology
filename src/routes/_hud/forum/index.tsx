@@ -214,7 +214,7 @@ function ForumIndexPage() {
     <ForumShell>
       <div className="space-y-4 sm:space-y-5 font-sans relative pb-8">
         <HudTitlePanel
-          surface="solid"
+          treatment="band"
           title="Forum"
           actions={
             <>

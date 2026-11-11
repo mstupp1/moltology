@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { CharacterSectionNav } from '@/components/hud/chassis/CharacterSectionNav'
+import { HudTitleBandTop } from '@/components/hud/HudTitlePanel'
 import { SITE_ORIGIN, seo } from '@/lib/seo'
 
 const LazyMarketShopPage = lazy(() =>
@@ -12,8 +13,11 @@ const CANONICAL = `${SITE_ORIGIN}/character/shop`
 
 function CharacterShopRoute() {
   return (
-    <div className="space-y-3 sm:space-y-4">
-      <CharacterSectionNav current="shop" className="w-max" />
+    <div>
+      {/* Section tabs open the page's header band; the page's title band continues it below. */}
+      <HudTitleBandTop>
+        <CharacterSectionNav current="shop" />
+      </HudTitleBandTop>
       <Suspense fallback={<HudWorkspaceGhost />}>
         <LazyMarketShopPage />
       </Suspense>
