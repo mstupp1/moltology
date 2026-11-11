@@ -75,6 +75,14 @@ export function HudTopControls({
     </button>
   )
 
+  // The portrait medallion sits beside the pill as its own piece; its rings stay see-through.
+  const medallion = Boolean(user) || isSessionPending
+  const medallionLayer = medallion ? (
+    <span data-testid="top-controls-medallion" className="relative shrink-0 flex">
+      {account}
+    </span>
+  ) : null
+
   const controls = (
     <>
       <button
@@ -88,14 +96,17 @@ export function HudTopControls({
       </button>
       <NotificationsBell variant="header" />
       {!user && !isSessionPending && <HUDTaskBar variant="header" />}
-      {account}
+      {!medallion && account}
     </>
   )
 
   if (variant === 'desktop') {
     return (
-      <div data-testid="top-controls" className={`${HUD_GLASS_PILL} flex items-center h-14 pl-1 ${user ? 'pr-0' : 'pr-1'} font-sans`}>
-        {controls}
+      <div data-testid="top-controls" className="flex items-center gap-2 font-sans">
+        <div className={`${HUD_GLASS_PILL} flex items-center h-14 px-1`}>
+          {controls}
+        </div>
+        {medallionLayer}
       </div>
     )
   }
@@ -112,8 +123,11 @@ export function HudTopControls({
         <BrandIcon className="w-7 h-7" />
       </button>
       {/* A faint, low pill: echoes the desktop pill without the glass bulk */}
-      <div className={`flex items-center h-11 pl-0.5 ${user ? '-mr-1.5 pr-0' : 'pr-0.5'} shrink-0 rounded-full bg-surface-2/50 border border-line-subtle`}>
-        {controls}
+      <div className="flex items-center gap-1.5 shrink-0 -mr-1.5">
+        <div className="flex items-center h-11 px-0.5 shrink-0 rounded-full bg-surface-2/50 border border-line-subtle">
+          {controls}
+        </div>
+        {medallionLayer}
       </div>
     </div>
   )
