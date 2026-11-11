@@ -3,7 +3,8 @@ import {
   parseLobsterAvatarConfig,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { usePortrait3D } from '@/hooks/usePortrait3D'
 import { BrandAwareImage } from '@/components/ui/BrandMark'
 
 export interface UserAvatarProps {
@@ -53,7 +54,10 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
     const portrait = character
       ? generateLobsterAvatarDataUri(character, 128, { frame: 'portrait', staticMotion: true })
       : null
-    const imageUrl = portrait ?? src ?? user?.image ?? user?.avatar ?? user?.picture ?? null
+    // Viewers who see characters in 3D get the 3D face here too, once it is drawn.
+    const frameRef = useRef<HTMLDivElement>(null)
+    const portrait3D = usePortrait3D(character, 128, frameRef)
+    const imageUrl = portrait3D?.url ?? portrait ?? src ?? user?.image ?? user?.avatar ?? user?.picture ?? null
     const displayName = name ?? user?.name ?? email ?? user?.email ?? ''
     const displayAlt = alt ?? displayName ?? 'User avatar'
 
@@ -87,6 +91,9 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
     if (imageUrl && !imageError) {
       return (
         <div
+          ref={frameRef}
+          data-renderer={portrait3D ? '3d' : undefined}
+          style={portrait3D?.scene}
           className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-[#030606] ${sizeClasses} ${className}`}
         >
           <BrandAwareImage

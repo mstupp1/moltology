@@ -5,6 +5,8 @@ import { PublicHeader } from './PublicHeader'
 import { authClient } from '@/lib/auth-client'
 import { getUserProfileFn } from '@/lib/server/api'
 
+// The small avatar's 3D face is covered by its own tests; here it stays on the 2D picture.
+vi.mock('@/hooks/usePortrait3D', () => ({ usePortrait3D: () => null }))
 vi.mock('@/lib/jwt', () => ({ getAuthJWTToken: vi.fn().mockResolvedValue(null) }))
 vi.mock('@/lib/server/api', () => ({ getUserProfileFn: vi.fn().mockResolvedValue({ role: 'admin', experiments: ['new-store'] }) }))
 

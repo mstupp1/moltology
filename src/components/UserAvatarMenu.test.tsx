@@ -5,6 +5,8 @@ import { UserAvatarMenu } from './UserAvatarMenu'
 import { authClient } from '@/lib/auth-client'
 import { isSignOutInFlight } from '@/lib/auth-session'
 
+// The small avatar's 3D face is covered by its own tests; here it stays on the 2D picture.
+vi.mock('@/hooks/usePortrait3D', () => ({ usePortrait3D: () => null }))
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
     signOut: vi.fn().mockResolvedValue({}),

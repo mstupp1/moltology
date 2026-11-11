@@ -1,10 +1,7 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { useAvatar3D } from '@/hooks/useAvatar3D'
-import { requestPortrait3D } from '@/lib/avatar3d-portrait-queue'
+import React, { useMemo, useRef } from 'react'
+import { usePortrait3D } from '@/hooks/usePortrait3D'
 import {
   LOBSTER_AVATAR_STYLE,
-  LOBSTER_BACKGROUND_THEME_MAP,
-  resolveAvatarTraits,
   generateLobsterAvatarDataUri,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
@@ -107,47 +104,10 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
 
   // Viewers with the 3D experiment on get a still drawn from the 3D character. The 2D portrait
   // stays up until that still is ready, and for good if this browser cannot draw 3D.
-  const in3D = useAvatar3D() && !src && Boolean(effectiveConfig?.seed)
-  const [still, setStill] = useState<{ for: LobsterAvatarConfig; url: string } | null>(null)
   const frameRef = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const frame = frameRef.current
-    if (!in3D || !effectiveConfig || !frame) return
-    let cancelled = false
-    const draw = () => {
-      void requestPortrait3D(effectiveConfig, sourcePx).then((url) => {
-        if (!cancelled && url) setStill({ for: effectiveConfig, url })
-      })
-    }
-    // A long list only draws the faces that are on screen, or about to be.
-    if (typeof IntersectionObserver === 'undefined') {
-      draw()
-      return () => {
-        cancelled = true
-      }
-    }
-    const watcher = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return
-        watcher.disconnect()
-        draw()
-      },
-      { rootMargin: '200px' },
-    )
-    watcher.observe(frame)
-    return () => {
-      cancelled = true
-      watcher.disconnect()
-    }
-  }, [in3D, effectiveConfig, sourcePx])
-  const still3D = in3D && still && still.for === effectiveConfig ? still.url : null
-  // The character's chosen scene colours sit behind the 3D still, as they do behind the 2D one.
-  const scene3D = useMemo(() => {
-    if (!still3D || !effectiveConfig) return undefined
-    const theme = LOBSTER_BACKGROUND_THEME_MAP[resolveAvatarTraits(effectiveConfig).backgroundTheme]
-    if (!theme) return undefined
-    return { background: `radial-gradient(circle at 50% 42%, ${theme.glowColor} 0%, transparent 62%), linear-gradient(180deg, ${theme.topColor}, ${theme.bottomColor})` }
-  }, [still3D, effectiveConfig])
+  const portrait3D = usePortrait3D(src ? null : effectiveConfig, sourcePx, frameRef)
+  const still3D = portrait3D?.url ?? null
+  const scene3D = portrait3D?.scene
 
   const portraitClassName = useMemo(
     () =>
