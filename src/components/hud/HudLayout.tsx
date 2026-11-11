@@ -168,7 +168,7 @@ function HudContent() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#030708]/80 pointer-events-none" />
 
         {/* Phone: the page panel goes full width, so its tint sits over the whole scene. */}
-        <div className="md:hidden absolute inset-0 bg-surface-1/[0.72] pointer-events-none" />
+        <div className="md:hidden absolute inset-0 bg-surface-1/[0.82] pointer-events-none" />
       </div>
 
       {/* Experimental Navigation Command Palette */}
@@ -188,7 +188,7 @@ function HudContent() {
               className={`flex-1 min-h-0 ${
                 isFullscreenRoute
                   ? 'p-0 overflow-hidden'
-                  : 'p-2.5 sm:p-4 md:p-6 overflow-y-auto overscroll-y-contain'
+                  : 'p-2.5 sm:p-4 md:px-2 md:py-6 overflow-y-auto overscroll-y-contain'
               } ${
                 // Desktop standard pages keep the scene bright around one see-through page panel.
                 // Phones get the full-width panel tint from the backdrop layer above, so main stays clear there.
@@ -207,7 +207,7 @@ function HudContent() {
                       ? 'absolute top-1 right-2'
                       : // The pill (74px with the XP ring) straddles the page panel's top edge and sits
                         // in the panel's top padding, so content starts right under it, not under a bar.
-                        'sticky -top-6 -mt-6 -mx-6 px-6 pt-2.5 -mb-[44px] shrink-0'
+                        'sticky -top-6 -mt-6 -mx-2 px-2 pt-2.5 -mb-[44px] shrink-0'
                   }`}
                 >
                   <div id="hud-top-controls-slot" className="pointer-events-auto" />
@@ -216,10 +216,12 @@ function HudContent() {
               {isFullscreenRoute ? (
                 <Outlet />
               ) : (
+                // Desktop gutters: main 8px + panel border 1px + panel 15px = the 24px pages had before
+                // the panel, and 1312px max leaves 1280px of content, so page layouts keep their width.
                 <div
                   data-hud-page-panel
-                  className={`mx-auto flex w-full min-w-0 flex-1 shrink-0 flex-col md:max-w-[1280px] md:p-6 ${
-                    isMainOnly ? '' : 'md:pt-[54px]'
+                  className={`mx-auto flex w-full min-w-0 flex-1 shrink-0 flex-col md:max-w-[1312px] md:px-[15px] md:pb-6 ${
+                    isMainOnly ? 'md:pt-6' : 'md:pt-[54px]'
                   } md:rounded-panel md:border md:border-line-subtle md:bg-surface-1/[0.68] md:shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)]`}
                 >
                   <Outlet />
