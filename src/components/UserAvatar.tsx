@@ -22,7 +22,7 @@ export interface UserAvatarProps {
   email?: string | null
   fallbackSrc?: string | null
   fallbackLetter?: string
-  size?: 'xxs' | 'xs' | 'sm' | 'row' | 'nav' | 'md' | 'lg' | 'xl'
+  size?: 'xxs' | 'xs' | 'sm' | 'row' | 'nav' | 'md' | 'lg' | 'xl' | 'fill'
   className?: string
   /** Drop the letter fallback's own border when the parent draws the edge. */
   borderless?: boolean
@@ -51,12 +51,14 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
     const [imageError, setImageError] = useState(false)
 
     const character = parseLobsterAvatarConfig(config ?? user?.avatarConfig)
+    // Large and parent-sized portraits draw at twice the usual resolution so they stay crisp.
+    const resolution = size === 'xl' || size === 'fill' ? 256 : 128
     const portrait = character
-      ? generateLobsterAvatarDataUri(character, 128, { frame: 'portrait', staticMotion: true })
+      ? generateLobsterAvatarDataUri(character, resolution, { frame: 'portrait', staticMotion: true })
       : null
     // Viewers who see characters in 3D get the 3D face here too, once it is drawn.
     const frameRef = useRef<HTMLDivElement>(null)
-    const portrait3D = usePortrait3D(character, 128, frameRef)
+    const portrait3D = usePortrait3D(character, resolution, frameRef)
     const imageUrl = portrait3D?.url ?? portrait ?? src ?? user?.image ?? user?.avatar ?? user?.picture ?? null
     const displayName = name ?? user?.name ?? email ?? user?.email ?? ''
     const displayAlt = alt ?? displayName ?? 'User avatar'
@@ -75,6 +77,8 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
       md: 'w-8 h-8 sm:w-10 sm:h-10 text-xs sm:text-sm',
       lg: 'w-12 h-12 text-base',
       xl: 'w-16 h-16 text-lg',
+      /** Fills a sized parent, e.g. the portrait inside the XP ring. */
+      fill: 'w-full h-full text-sm',
     }[size]
 
     // Compute initial letter fallback from name or email

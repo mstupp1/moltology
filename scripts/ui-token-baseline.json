@@ -64,10 +64,6 @@
   "src/components/home/HomeSections.tsx": {
     "hex-color": 21
   },
-  "src/components/hud/ActivityStreamPage.tsx": {
-    "hex-color": 12,
-    "chamfer": 3
-  },
   "src/components/hud/CommandCatalogIcon.tsx": {
     "hex-color": 13
   },

@@ -76,6 +76,8 @@ export interface AlignmentContextValue {
   xp: number
   stage: number
   progression: ProgressionState
+  /** False until this member's saved XP has loaded, so XP displays don't jump from zero. */
+  xpReady: boolean
 }
 
 const AlignmentContext = createContext<AlignmentContextValue | null>(null)
@@ -104,6 +106,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
   const [hasServerStreakBaseline, setHasServerStreakBaseline] = useState(false)
   const [serverXp, setServerXp] = useState<number>(0)
   const [serverStage, setServerStage] = useState<number>(1)
+  const [serverXpUserId, setServerXpUserId] = useState<string | null>(null)
   const [optimisticXpDelta, setOptimisticXpDelta] = useState<number>(0)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isSyncing, setIsSyncing] = useState<boolean>(false)
@@ -252,6 +255,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
 
         setServerXp(data.xp ?? 0)
         setServerStage(data.stage ?? 1)
+        setServerXpUserId(userId)
 
         if (pendingOverridesRef.current.size === 0) {
           setHistory(serverHistory)
@@ -597,6 +601,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
 
   const effectiveXp = progression.xp
   const effectiveStage = progression.stage
+  const xpReady = !userId || serverXpUserId === userId
 
   const value = useMemo<AlignmentContextValue>(() => ({
     tasks,
@@ -617,6 +622,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     xp: effectiveXp,
     stage: effectiveStage,
     progression,
+    xpReady,
   }), [
     tasks,
     completedCount,
@@ -635,6 +641,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     effectiveXp,
     effectiveStage,
     progression,
+    xpReady,
   ])
 
   return (
@@ -708,6 +715,7 @@ function useStandaloneDailyAlignment(): AlignmentContextValue {
     xp: progression.xp,
     stage: progression.stage,
     progression,
+    xpReady: true,
   }
 }
 

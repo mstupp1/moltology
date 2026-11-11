@@ -197,6 +197,64 @@ export function calculateSubStage(xp: number): SubStageInfo & { stageNum: number
   }
 }
 
+export interface SubStageProgress {
+  code: string
+  shortTitle: string
+  stageNum: number
+  /** 0-based position on the 12-step ladder; higher is further along. */
+  index: number
+  minXp: number
+  next: { code: string; shortTitle: string; minXp: number } | null
+  /** XP earned since this sub-stage began, and the XP between it and the next one. */
+  xpInto: number
+  xpSpan: number
+  /** 0..1 progress towards the next sub-stage; 1 on the final one. */
+  ratio: number
+  xpToNext: number
+}
+
+function subStageShortTitle(code: string): string {
+  for (const stage of STAGE_PIPELINE_DATA) {
+    const hit = stage.subStages.find((s) => s.code === code)
+    if (hit) return hit.shortTitle
+  }
+  return code
+}
+
+/**
+ * Progress towards the next of the 12 sub-stages. Drives the XP ring around the
+ * member's portrait, which fills once per sub-stage rather than once per stage.
+ */
+export function calculateSubStageProgress(xp: number): SubStageProgress {
+  const safeXp = Math.max(0, Math.floor(xp || 0))
+  let index = 0
+  for (let i = SUB_STAGE_THRESHOLDS.length - 1; i >= 0; i--) {
+    if (safeXp >= SUB_STAGE_THRESHOLDS[i].minXp) {
+      index = i
+      break
+    }
+  }
+  const current = SUB_STAGE_THRESHOLDS[index]
+  const nextThreshold = SUB_STAGE_THRESHOLDS[index + 1] ?? null
+  const next = nextThreshold
+    ? { code: nextThreshold.code, shortTitle: subStageShortTitle(nextThreshold.code), minXp: nextThreshold.minXp }
+    : null
+  const xpSpan = next ? next.minXp - current.minXp : 0
+  const xpInto = safeXp - current.minXp
+  return {
+    code: current.code,
+    shortTitle: subStageShortTitle(current.code),
+    stageNum: current.stageNum,
+    index,
+    minXp: current.minXp,
+    next,
+    xpInto,
+    xpSpan,
+    ratio: next ? Math.min(1, Math.max(0, xpInto / xpSpan)) : 1,
+    xpToNext: next ? Math.max(0, next.minXp - safeXp) : 0,
+  }
+}
+
 /**
  * Generates full progression state for a user's XP, optionally adhering to an explicit stage override.
  */
