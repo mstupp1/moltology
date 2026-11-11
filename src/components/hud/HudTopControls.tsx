@@ -75,12 +75,19 @@ export function HudTopControls({
     </button>
   )
 
-  // The portrait medallion is its own layer, overlapping the pill's rounded end so the
-  // pill's outline shows through the gaps between its rings.
+  // The portrait medallion is its own solid round container beside the pill, so nothing
+  // shows through between its rings.
   const medallion = Boolean(user) || isSessionPending
-  const overlap = variant === 'phone' ? 34 : 38
   const medallionLayer = medallion ? (
-    <span className="relative z-10 shrink-0 flex" style={{ marginLeft: -overlap }}>
+    <span
+      data-testid="top-controls-medallion"
+      className={`relative shrink-0 flex items-center justify-center rounded-full ${
+        variant === 'phone'
+          ? 'bg-surface-2 border border-line-subtle'
+          : 'bg-surface-1 border border-line-subtle shadow-menu'
+      }`}
+      style={{ width: ring.box + 2, height: ring.box + 2 }}
+    >
       {account}
     </span>
   ) : null
@@ -104,11 +111,8 @@ export function HudTopControls({
 
   if (variant === 'desktop') {
     return (
-      <div data-testid="top-controls" className="flex items-center font-sans">
-        <div
-          className={`${HUD_GLASS_PILL} flex items-center h-14 pl-1 pr-1`}
-          style={medallion ? { paddingRight: overlap - 4 } : undefined}
-        >
+      <div data-testid="top-controls" className="flex items-center gap-2 font-sans">
+        <div className={`${HUD_GLASS_PILL} flex items-center h-14 px-1`}>
           {controls}
         </div>
         {medallionLayer}
@@ -128,11 +132,8 @@ export function HudTopControls({
         <BrandIcon className="w-7 h-7" />
       </button>
       {/* A faint, low pill: echoes the desktop pill without the glass bulk */}
-      <div className="flex items-center shrink-0 -mr-1.5">
-        <div
-          className="flex items-center h-11 pl-0.5 pr-0.5 shrink-0 rounded-full bg-surface-2/50 border border-line-subtle"
-          style={medallion ? { paddingRight: overlap - 4 } : undefined}
-        >
+      <div className="flex items-center gap-1.5 shrink-0 -mr-1.5">
+        <div className="flex items-center h-11 px-0.5 shrink-0 rounded-full bg-surface-2/50 border border-line-subtle">
           {controls}
         </div>
         {medallionLayer}
