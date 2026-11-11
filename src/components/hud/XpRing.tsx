@@ -2,12 +2,11 @@ import React, { useId } from 'react'
 
 /** Geometry for the two sizes the portrait comes in. */
 export const XP_RING_SIZES = {
-  // Phone top bar is 56px tall: the whole medallion fills it, and the badge
+  // Phone top bar is 56px tall: the medallion (54px) fits inside it, and the badge
   // straddles the bar's bottom border (badgeTop is from the medallion's top).
-  phone: { portrait: 38, gapInner: 1.5, xpStroke: 3, gapOuter: 2, notchStroke: 2.5, badgeTop: 48 },
-  // Desktop pill is 56px tall; the medallion stands 4px proud of it top and bottom,
-  // and the badge straddles the pill's bottom edge.
-  desktop: { portrait: 44, gapInner: 1.5, xpStroke: 3.5, gapOuter: 2, notchStroke: 3, badgeTop: 52 },
+  phone: { portrait: 36, gapInner: 1.5, xpStroke: 3, gapOuter: 2, notchStroke: 2.5, badgeTop: 47 },
+  // Desktop has room to spare: a 50px portrait in a 74px medallion beside the 56px pill.
+  desktop: { portrait: 50, gapInner: 2, xpStroke: 4, gapOuter: 2.5, notchStroke: 3.5, badgeTop: 58 },
 } as const
 
 export type XpRingSize = keyof typeof XP_RING_SIZES

@@ -75,19 +75,10 @@ export function HudTopControls({
     </button>
   )
 
-  // The portrait medallion is its own solid round container beside the pill, so nothing
-  // shows through between its rings.
+  // The portrait medallion sits beside the pill as its own piece; its rings stay see-through.
   const medallion = Boolean(user) || isSessionPending
   const medallionLayer = medallion ? (
-    <span
-      data-testid="top-controls-medallion"
-      className={`relative shrink-0 flex items-center justify-center rounded-full ${
-        variant === 'phone'
-          ? 'bg-surface-2 border border-line-subtle'
-          : 'bg-surface-1 border border-line-subtle shadow-menu'
-      }`}
-      style={{ width: ring.box + 2, height: ring.box + 2 }}
-    >
+    <span data-testid="top-controls-medallion" className="relative shrink-0 flex">
       {account}
     </span>
   ) : null
