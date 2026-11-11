@@ -18,7 +18,7 @@ export interface UserAvatarProps {
   email?: string | null
   fallbackSrc?: string | null
   fallbackLetter?: string
-  size?: 'xxs' | 'xs' | 'sm' | 'row' | 'nav' | 'md' | 'lg' | 'xl'
+  size?: 'xxs' | 'xs' | 'sm' | 'row' | 'nav' | 'md' | 'lg' | 'xl' | 'fill'
   className?: string
   /** Drop the letter fallback's own border when the parent draws the edge. */
   borderless?: boolean
@@ -47,6 +47,8 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
     const [imageError, setImageError] = useState(false)
 
     const character = parseLobsterAvatarConfig(config ?? user?.avatarConfig)
+    // Large and parent-sized portraits draw at twice the usual resolution so they stay crisp.
+    const resolution = size === 'xl' || size === 'fill' ? 256 : 128
     const imageUrl = src ?? user?.image ?? user?.avatar ?? user?.picture ?? null
     const displayName = name ?? user?.name ?? email ?? user?.email ?? ''
     const displayAlt = alt ?? displayName ?? 'User avatar'
@@ -65,6 +67,8 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
       md: 'w-8 h-8 sm:w-10 sm:h-10 text-xs sm:text-sm',
       lg: 'w-12 h-12 text-base',
       xl: 'w-16 h-16 text-lg',
+      /** Fills a sized parent, e.g. the portrait inside the XP ring. */
+      fill: 'w-full h-full text-sm',
     }[size]
 
     // Compute initial letter fallback from name or email
@@ -81,7 +85,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
     if (character) {
       return (
         <div className={`relative shrink-0 rounded-full overflow-hidden bg-abyss ${sizeClasses} ${className}`}>
-          <CharacterStill config={character} px={128} alt={displayAlt} scene imgClassName="rounded-full" />
+          <CharacterStill config={character} px={resolution} alt={displayAlt} scene imgClassName="rounded-full" />
         </div>
       )
     }

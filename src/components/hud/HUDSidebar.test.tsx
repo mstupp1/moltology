@@ -10,6 +10,7 @@ vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mockNavigate,
   useLocation: () => ({ pathname: '/dashboard' }),
   useRouter: () => ({ preloadRoute: vi.fn() }),
+  Link: ({ children, to: _to, params: _params, hash: _hash, ...rest }: any) => <a {...rest}>{children}</a>,
 }))
 
 vi.mock('@/lib/auth-client', () => ({
@@ -266,6 +267,9 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getByRole('button', { name: /SIGN OUT/i })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /YOUR PROFILE/i })).not.toBeInTheDocument()
     expect(screen.queryByText('MOLTOLOGY HOME')).not.toBeInTheDocument()
+    // The same panel carries today's tasks and the member's sub-stage
+    expect(screen.getByText('Silent Synchronization')).toBeInTheDocument()
+    expect(screen.getByTestId('account-hub-level')).toHaveTextContent('L-1 · Molt Curious')
   })
 
   it('badges the Profile item with waiting friend requests', async () => {

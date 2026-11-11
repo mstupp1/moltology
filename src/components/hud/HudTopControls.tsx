@@ -2,7 +2,9 @@ import React from 'react'
 import { Search, UserPlus } from 'lucide-react'
 import { BrandIcon } from '@/components/ui/BrandMark'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
-import { UserAvatarMenu, type UserAvatarMenuProps } from '../UserAvatarMenu'
+import { type UserAvatarMenuProps } from '../UserAvatarMenu'
+import { AccountHub } from './AccountHub'
+import { xpRingGeometry } from './XpRing'
 import { HUDTaskBar } from './HUDTaskBar'
 import { NotificationsBell } from './NotificationsBell'
 
@@ -41,22 +43,25 @@ export function HudTopControls({
   onNavigate,
   onSignUp,
 }: HudTopControlsProps) {
+  const ring = xpRingGeometry(variant)
+  // Members: one portrait medallion (XP ring + today's task notches) that opens account and tasks.
+  // Guests: today's tasks keep their own button next to Sign up.
   const account = isSessionPending ? (
-    <span className="w-11 h-11 flex items-center justify-center" data-testid="top-controls-auth-skeleton">
-      <HudGhostSkeleton variant="neutral" preset="avatar" width={32} height={32} />
+    <span
+      className="flex items-center justify-center"
+      style={{ width: ring.box, height: ring.box }}
+      data-testid="top-controls-auth-skeleton"
+    >
+      <HudGhostSkeleton variant="neutral" preset="avatar" width={ring.portrait} height={ring.portrait} />
     </span>
   ) : user ? (
-    <span className="w-11 h-11 flex items-center justify-center">
-      <UserAvatarMenu
-        user={user}
-        userRole={userRole}
-        displayName={displayName}
-        onNavigate={onNavigate}
-        align="right"
-        openDirection="down"
-        size="pill"
-      />
-    </span>
+    <AccountHub
+      variant={variant}
+      user={user}
+      userRole={userRole}
+      displayName={displayName}
+      onNavigate={onNavigate}
+    />
   ) : (
     <button
       type="button"
@@ -82,14 +87,14 @@ export function HudTopControls({
         <Search className="w-5 h-5" aria-hidden="true" />
       </button>
       <NotificationsBell variant="header" />
-      <HUDTaskBar variant="header" />
+      {!user && !isSessionPending && <HUDTaskBar variant="header" />}
       {account}
     </>
   )
 
   if (variant === 'desktop') {
     return (
-      <div data-testid="top-controls" className={`${HUD_GLASS_PILL} flex items-center h-12 px-0.5 font-sans`}>
+      <div data-testid="top-controls" className={`${HUD_GLASS_PILL} flex items-center h-14 pl-1 ${user ? 'pr-0' : 'pr-1'} font-sans`}>
         {controls}
       </div>
     )
@@ -107,7 +112,7 @@ export function HudTopControls({
         <BrandIcon className="w-7 h-7" />
       </button>
       {/* A faint, low pill: echoes the desktop pill without the glass bulk */}
-      <div className="flex items-center h-11 px-0.5 shrink-0 rounded-full bg-surface-2/50 border border-line-subtle">
+      <div className={`flex items-center h-11 pl-0.5 ${user ? '-mr-1.5 pr-0' : 'pr-0.5'} shrink-0 rounded-full bg-surface-2/50 border border-line-subtle`}>
         {controls}
       </div>
     </div>

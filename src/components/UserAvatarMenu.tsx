@@ -36,6 +36,55 @@ export interface UserAvatarMenuProps {
 }
 
 /**
+ * Props for a Sign out button: starts on pointer down (so a closing menu cannot swallow
+ * the click), sheds member chrome, then returns to the home page.
+ */
+export function useSignOutButton({
+  onNavigate,
+  onBeforeSignOut,
+}: {
+  onNavigate?: (path: string) => void
+  onBeforeSignOut?: () => void
+}) {
+  const signOutLock = useRef(false)
+  const toastApi = useOptionalToast()
+
+  const handleSignOut = async (event?: React.SyntheticEvent) => {
+    event?.preventDefault()
+    event?.stopPropagation()
+    if (signOutLock.current) return
+    signOutLock.current = true
+
+    // Start the auth call before shedding chrome so a re-render cannot swallow it.
+    const signingOut = authClient.signOut()
+    beginSignOut()
+    onBeforeSignOut?.()
+
+    try {
+      await signingOut
+    } catch {
+      endSignOut()
+      signOutLock.current = false
+      toastApi?.toast.error('Could not sign out. Please try again.', { id: 'sign-out' })
+      return
+    }
+
+    onNavigate?.('/')
+  }
+
+  return {
+    type: 'button' as const,
+    onPointerDown: (event: React.PointerEvent<HTMLButtonElement>) => {
+      if (event.button > 0) return
+      void handleSignOut(event)
+    },
+    onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
+      void handleSignOut(event)
+    },
+  }
+}
+
+/**
  * Standardized HUD User Avatar Dropdown Menu component.
  * Supports both floating popover (desktop / sidebar) and inline accordion (mobile navigation drawers).
  * Displays user profile image / letter avatar badge which opens a menu
@@ -89,45 +138,11 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   const [shouldRender, setShouldRender] = useState(isOpen)
   const [isExpanded, setIsExpanded] = useState(isOpen)
   const menuRef = useRef<HTMLDivElement>(null)
-  const signOutLock = useRef(false)
-  const toastApi = useOptionalToast()
 
   const handleToggle = () => setIsOpen((prev) => !prev)
   const handleClose = () => setIsOpen(false)
 
-  const handleSignOut = async (event?: React.SyntheticEvent) => {
-    event?.preventDefault()
-    event?.stopPropagation()
-    if (signOutLock.current) return
-    signOutLock.current = true
-
-    // Start the auth call before shedding chrome so a re-render cannot swallow it.
-    const signingOut = authClient.signOut()
-    beginSignOut()
-    handleClose()
-
-    try {
-      await signingOut
-    } catch {
-      endSignOut()
-      signOutLock.current = false
-      toastApi?.toast.error('Could not sign out. Please try again.', { id: 'sign-out' })
-      return
-    }
-
-    onNavigate?.('/')
-  }
-
-  const signOutButtonProps = {
-    type: 'button' as const,
-    onPointerDown: (event: React.PointerEvent<HTMLButtonElement>) => {
-      if (event.button > 0) return
-      void handleSignOut(event)
-    },
-    onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
-      void handleSignOut(event)
-    },
-  }
+  const signOutButtonProps = useSignOutButton({ onNavigate, onBeforeSignOut: handleClose })
 
   const handleOpenSettings = () => {
     handleClose()
