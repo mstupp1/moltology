@@ -2,7 +2,7 @@
  * Builds one character from a look and keeps it alive: pose blending, breathing, blinking and
  * antenna sway. Changing the look rebuilds the character; changing the pose only retargets bones.
  */
-import { BufferAttribute, Mesh, Quaternion, Vector3, type Group, type Material } from 'three'
+import { Box3, BufferAttribute, Mesh, Quaternion, Vector3, type Group, type Material } from 'three'
 import type { AvatarPose } from '../avatar/traits'
 import { equipAll } from './equipment'
 import type { Avatar3DLook } from './look'
@@ -28,6 +28,32 @@ export interface Character3D {
   update: (dt: number, time: number, idle?: boolean) => void
   triangles: () => number
   dispose: () => void
+  /** Where the camera should look to feature one gear slot, or null for an unknown slot. */
+  focusOf: (slot: string) => Focus3D | null
+}
+
+/** A close-up on part of the character, in the character's own space (before it turns). */
+export interface Focus3D {
+  at: Vector3
+  /** How much of the character the close-up takes in, top to bottom. */
+  size: number
+  /** Which way the character turns to show it (0 faces the viewer). */
+  yaw: number
+}
+
+/**
+ * The close-up for each gear slot: what to look at, how wide to frame it and which way to turn the
+ * character so that part faces the camera. Sizes are in the character's units before scaling.
+ */
+const FOCUS: Record<string, { on: string[]; size: number; yaw: number }> = {
+  head: { on: ['head', 'face'], size: 0.95, yaw: 0.35 },
+  antennae: { on: ['antennaL', 'antennaR', 'head'], size: 1.05, yaw: -0.3 },
+  carapace: { on: ['chest', 'waist'], size: 1.25, yaw: 0.3 },
+  belt: { on: ['waist'], size: 1, yaw: 0.45 },
+  legs: { on: ['thighL', 'thighR', 'footL', 'footR'], size: 1.3, yaw: 0.55 },
+  // The character's own left claw sits on the viewer's right, so it turns that way to show it.
+  'claws-1': { on: ['clawL'], size: 0.85, yaw: -0.6 },
+  'claws-2': { on: ['clawR'], size: 0.85, yaw: 0.6 },
 }
 
 /**
@@ -191,6 +217,30 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     look,
     height: (built.height + stature.lift) * stature.scale,
     portrait: portraitFrame(rig, built.height, stature.scale, Boolean(look.equipment?.head) || look.accessory !== 'none', stature.lift),
+    focusOf(slot) {
+      const spec = FOCUS[slot]
+      if (!spec) return null
+      rig.root.updateMatrixWorld(true)
+      const sum = new Vector3()
+      const p = new Vector3()
+      let n = 0
+      for (const name of spec.on) {
+        const bone = rig.bones.get(name)
+        const node = rig.sockets.get(name)?.node ?? bone
+        if (!node) continue
+        // The middle of what the bone carries (a whole claw, not its wrist), where it is now,
+        // measured before the turn so a raised claw is framed where it is.
+        const box = new Box3()
+        if (bone) for (const child of bone.children) if (child instanceof Mesh) box.expandByObject(child)
+        if (box.isEmpty()) node.getWorldPosition(p)
+        else box.getCenter(p)
+        rig.root.worldToLocal(p).multiplyScalar(stature.scale)
+        sum.add(p)
+        n++
+      }
+      if (!n) return null
+      return { at: sum.divideScalar(n), size: spec.size * stature.scale, yaw: spec.yaw }
+    },
     setPose(pose, immediate = false) {
       targets = poseTargets(rig, POSES[pose])
       if (immediate) for (const [name, t] of targets) current.get(name)!.copy(t)

@@ -10,19 +10,23 @@ export interface Avatar3DStageProps {
   className?: string
   /** What a screen reader announces. Defaults to a description of the species. */
   label?: string
+  /** A gear slot to glide in on, or null for the whole figure. */
+  focus?: string | null
 }
 
 /**
  * Live 3D character. The renderer loads only in the browser and only when this mounts, so pages
  * that never show a 3D character never download it.
  */
-export function Avatar3DStage({ look, spin = false, className, label }: Avatar3DStageProps) {
+export function Avatar3DStage({ look, spin = false, className, label, focus = null }: Avatar3DStageProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const stageRef = useRef<Stage | null>(null)
   const lookRef = useRef(look)
   const spinRef = useRef(spin)
+  const focusRef = useRef(focus)
   lookRef.current = look
   spinRef.current = spin
+  focusRef.current = focus
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -38,6 +42,7 @@ export function Avatar3DStage({ look, spin = false, className, label }: Avatar3D
         const stage = createStage(canvas, { interactive: true, reducedMotion, onContextLost: mark3DUnavailable })
         stage.setLook(lookRef.current)
         stage.setSpin(spinRef.current && !reducedMotion ? 0.5 : 0)
+        if (focusRef.current) stage.focus(focusRef.current)
         stageRef.current = stage
         observer = new ResizeObserver(() => stage.resize())
         observer.observe(canvas)
@@ -75,10 +80,15 @@ export function Avatar3DStage({ look, spin = false, className, label }: Avatar3D
     stageRef.current?.setSpin(spin && !reducedMotion ? 0.5 : 0)
   }, [spin])
 
+  useEffect(() => {
+    stageRef.current?.focus(focus)
+  }, [focus])
+
   return (
     <canvas
       ref={canvasRef}
       data-testid="avatar-3d-stage"
+      data-focus={focus ?? undefined}
       role="img"
       aria-label={label ? `${label}. Drag to turn it.` : `3D ${look.race} character. Drag to turn it.`}
       className={cn('block h-full w-full', className)}

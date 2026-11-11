@@ -16,6 +16,7 @@ import {
   Scene,
   ShadowMaterial,
   SRGBColorSpace,
+  Vector3,
   WebGLRenderer,
 } from 'three'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
@@ -47,6 +48,11 @@ export interface Stage {
   setYaw: (yaw: number) => void
   /** Slow automatic turntable, in radians per second (0 stops it). */
   setSpin: (speed: number) => void
+  /**
+   * Glide the camera in on one gear slot and turn the character to show it, or back out to the
+   * whole figure with null. Dragging still turns the character while it is framed.
+   */
+  focus: (slot: string | null) => void
   resize: () => void
   /** Stop drawing while the character is off screen, and pick up again when it is back. */
   setActive: (active: boolean) => void
@@ -121,6 +127,35 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   scene.add(ground, blob)
 
   let character: Character3D | null = null
+  // Where the camera sits to take in the whole figure, and where it is now on its way there.
+  const home = { position: new Vector3(0, 1.2, 6), look: new Vector3(0, 1, 0) }
+  const eye = new Vector3()
+  const aim = new Vector3()
+  let started = false
+  let focused: string | null = null
+  let focusYaw: number | null = null
+  const place = (position: Vector3, look: Vector3) => {
+    eye.copy(position)
+    aim.copy(look)
+    camera.position.copy(eye)
+    camera.lookAt(aim)
+  }
+  const wantPosition = new Vector3()
+  const wantLook = new Vector3()
+  /** Where the camera wants to be this frame: home, or close on the focused slot as it turns. */
+  const target = () => {
+    const close = focused && character ? character.focusOf(focused) : null
+    if (!close) {
+      wantPosition.copy(home.position)
+      wantLook.copy(home.look)
+      return
+    }
+    const at = close.at.clone().applyAxisAngle(new Vector3(0, 1, 0), yaw)
+    const vfov = (camera.fov * Math.PI) / 180
+    const dist = (close.size / 2 / Math.tan(vfov / 2) / Math.min(camera.aspect, 1)) * 1.08
+    wantLook.copy(at)
+    wantPosition.set(at.x, at.y + close.size * 0.12, at.z + dist)
+  }
   let yaw = options.yaw ?? 0
   let spin = 0
   let velocity = 0
@@ -158,9 +193,10 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     const distWide = wide / 2 / (Math.tan(vfov / 2) * camera.aspect)
     const dist = Math.max(distTall, distWide) * 1.06
     const centre = tall / 2 - 0.06
-    camera.position.set(0, centre + 0.18, dist)
-    camera.lookAt(0, centre, 0)
+    home.position.set(0, centre + 0.18, dist)
+    home.look.set(0, centre, 0)
     camera.updateProjectionMatrix()
+    if (!started) place(home.position, home.look)
   }
 
   const resize = () => {
@@ -172,6 +208,16 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   }
 
   const draw = (dt: number, time: number) => {
+    if (options.framing !== 'portrait') {
+      target()
+      // Ease in like a game camera; snap when motion is reduced or nothing has been drawn yet.
+      const k = options.reducedMotion || !started ? 1 : 1 - Math.exp(-dt * 6)
+      eye.lerp(wantPosition, k)
+      aim.lerp(wantLook, k)
+      camera.position.copy(eye)
+      camera.lookAt(aim)
+      started = true
+    }
     if (character) {
       character.root.rotation.y = yaw
       character.update(dt, time, !options.reducedMotion)
@@ -186,11 +232,17 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     last = now
     clock += dt
     if (!dragging) {
-      yaw += (spin + velocity) * dt
+      if (focusYaw !== null) {
+        // Turn the short way round to show the focused part.
+        const delta = Math.atan2(Math.sin(focusYaw - yaw), Math.cos(focusYaw - yaw))
+        yaw += options.reducedMotion ? delta : delta * (1 - Math.exp(-dt * 6))
+        if (!focused && Math.abs(delta) < 1e-3) focusYaw = null
+      } else yaw += (spin + velocity) * dt
       velocity *= Math.exp(-dt * 3)
     }
     if (options.reducedMotion) {
-      if (dragging || spin !== 0 || Math.abs(velocity) > 0.002) wake()
+      const moving = eye.distanceToSquared(wantPosition) > 1e-6 || aim.distanceToSquared(wantLook) > 1e-6
+      if (dragging || spin !== 0 || Math.abs(velocity) > 0.002 || moving) wake()
       if (awake <= 0) return
       awake -= dt
     }
@@ -199,6 +251,8 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
 
   const onDown = (e: PointerEvent) => {
     dragging = true
+    // The visitor takes over the turn; the close-up stays.
+    focusYaw = null
     lastX = e.clientX
     velocity = 0
     canvas.setPointerCapture(e.pointerId)
@@ -251,6 +305,14 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     },
     setSpin: (speed) => {
       spin = speed
+      wake()
+    },
+    focus(slot) {
+      focused = slot
+      velocity = 0
+      const close = slot && character ? character.focusOf(slot) : null
+      // Back to the front when the close-up ends, as a game camera resets.
+      focusYaw = close ? close.yaw : 0
       wake()
     },
     resize: () => {

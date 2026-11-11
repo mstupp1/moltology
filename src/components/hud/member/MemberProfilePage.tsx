@@ -3,6 +3,7 @@ import { LocalTime } from '@/components/ui/LocalTime'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Calendar } from 'lucide-react'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
+import { CharacterOverlay } from '@/components/hud/CharacterOverlay'
 import { BonusList, VectorSheetPanel } from '@/components/hud/chassis/VectorSheetPanel'
 import { PremiumBadge } from '@/components/hud/PremiumBadge'
 import { FriendRequestButton } from './FriendRequestButton'
@@ -49,6 +50,8 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
   } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loaded, setLoaded] = useState(false)
+  const [showCharacter, setShowCharacter] = useState(false)
+  const closeCharacter = useCallback(() => setShowCharacter(false), [])
 
   const load = useCallback(async () => {
     try {
@@ -141,7 +144,13 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
         />
         <div className="relative p-4 sm:p-6 space-y-5">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 text-center sm:text-left">
-            <div className="shrink-0 rounded-card bg-abyss/80 p-1.5 ring-1 ring-cyan-glow/30 shadow-[0_0_32px_rgba(0,195,255,0.12)]">
+            <button
+              type="button"
+              onClick={() => setShowCharacter(true)}
+              aria-label={`View ${profile.displayName}'s full character`}
+              aria-haspopup="dialog"
+              className="shrink-0 rounded-card bg-abyss/80 p-1.5 ring-1 ring-cyan-glow/30 shadow-[0_0_32px_rgba(0,195,255,0.12)] cursor-zoom-in focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-glow"
+            >
               <LobsterAvatarPortrait
                 config={effectiveAvatarConfig}
                 className="w-28 h-28 sm:w-36 sm:h-36"
@@ -149,7 +158,13 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
                 interactive
                 loading="eager"
               />
-            </div>
+            </button>
+            <CharacterOverlay
+              isOpen={showCharacter}
+              onClose={closeCharacter}
+              config={effectiveAvatarConfig}
+              name={profile.displayName}
+            />
             <div className="min-w-0 flex-1 w-full space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                 <div className="min-w-0 space-y-1.5">

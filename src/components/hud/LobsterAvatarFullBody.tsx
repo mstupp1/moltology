@@ -9,6 +9,8 @@ import {
 import { useAvatar3D } from '@/hooks/useAvatar3D'
 import { lookFromConfig } from '@/lib/avatar3d/look'
 import { sceneStyle3D } from '@/lib/avatar3d-scene'
+import { RotateCcw } from 'lucide-react'
+import { HudButton } from '@/components/ui/HudButton'
 import { Avatar3DStage } from './avatar3d/Avatar3DStage'
 import { LobsterAvatarDisplay } from './LobsterAvatarDisplay'
 import { LobsterAvatarSilhouette } from './LobsterAvatarSilhouette'
@@ -21,6 +23,10 @@ export interface LobsterAvatarFullBodyProps {
   className?: string
   animationSeed?: string
   fallbackSeed?: string
+  /** 3D only: a gear slot for the camera to feature, or null for the whole figure. */
+  focus?: string | null
+  /** 3D only: shown as a Reset view button while a slot is featured. */
+  onResetFocus?: () => void
 }
 
 /**
@@ -35,6 +41,8 @@ export const LobsterAvatarFullBody: React.FC<LobsterAvatarFullBodyProps> = React
   className = 'w-full aspect-[4/5]',
   animationSeed,
   fallbackSeed,
+  focus = null,
+  onResetFocus,
 }) => {
   const [hasMotionLease, setHasMotionLease] = useState(false)
 
@@ -90,7 +98,19 @@ export const LobsterAvatarFullBody: React.FC<LobsterAvatarFullBodyProps> = React
         ) : (
           <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(34,211,238,0.14),transparent_62%)]" />
         )}
-        <Avatar3DStage look={look} label={alt} className="relative" />
+        <Avatar3DStage look={look} label={alt} focus={focus} className="relative" />
+        {focus && onResetFocus && (
+          <HudButton
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="absolute top-1 right-1 lg:top-2 lg:right-2"
+            onClick={onResetFocus}
+            icon={<RotateCcw className="w-3.5 h-3.5 text-cyan-glow" aria-hidden />}
+          >
+            Reset view
+          </HudButton>
+        )}
       </div>
     )
   }
