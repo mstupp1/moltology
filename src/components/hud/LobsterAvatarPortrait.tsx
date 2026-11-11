@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import { LOBSTER_AVATAR_STYLE, type LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import { CharacterStill } from './avatar3d/CharacterStill'
+import { GLASS_FRAME_CLASS, GlassLens } from './GlassLens'
 import { LobsterAvatarSilhouette } from './LobsterAvatarSilhouette'
 
 export interface LobsterAvatarPortraitProps {
@@ -14,16 +15,18 @@ export interface LobsterAvatarPortraitProps {
   interactive?: boolean
   /** A seed to draw a stand-in character from when there is no saved one. */
   fallbackSeed?: string
-  /** Enable foreground optical lens vignette (default true) */
+  /** Darken the rim like a lens (default true) */
   vignette?: boolean
   specularSheen?: boolean
-  /** Lens glow around the rim (default true) */
+  /** Lens glow around the rim (default true). Only the large portrait has it. */
   fisheyeLens?: boolean
 }
 
 /**
  * Circular, face-focused portrait: the canonical porthole avatar for settings, chassis, lists and
  * HUD surfaces. The face is a still of the 3D character, drawn when it scrolls into view.
+ * The large portrait (size 256, the profile) has the full lens; smaller ones wear the same glass
+ * in its lighter, scaled form ({@link GlassLens}).
  */
 export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React.memo(({
   config,
@@ -42,6 +45,7 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
     return null
   }, [config, fallbackSeed])
   const sourcePx = size > 128 ? 256 : 128
+  const full = size >= 256
 
   const portraitClassName = useMemo(
     () =>
@@ -52,6 +56,32 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
       } ${className}`,
     [interactive, className]
   )
+
+  const placeholder = (
+    <span className="flex h-full w-full items-center justify-center">
+      <LobsterAvatarSilhouette alt={alt || 'Uncalibrated carapace silhouette'} />
+    </span>
+  )
+
+  if (!full) {
+    return (
+      <div
+        className={`relative aspect-square rounded-full overflow-hidden shrink-0 bg-abyss ${GLASS_FRAME_CLASS} ${interactive ? 'group' : ''} ${className}`}
+        data-testid="lobster-avatar-portrait"
+        data-slot="portrait"
+      >
+        <CharacterStill
+          config={effectiveConfig}
+          px={sourcePx}
+          alt={alt}
+          scene
+          imgClassName={interactive ? 'duration-300 group-hover:scale-[1.03] transition-[opacity,transform]' : undefined}
+          placeholder={placeholder}
+        />
+        <GlassLens vignette={vignette} sheen={specularSheen} />
+      </div>
+    )
+  }
 
   return (
     <div
@@ -68,11 +98,7 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
           alt={alt}
           scene
           imgClassName={interactive ? 'duration-300 group-hover:scale-[1.03] transition-[opacity,transform]' : undefined}
-          placeholder={
-            <span className="flex h-full w-full items-center justify-center">
-              <LobsterAvatarSilhouette alt={alt || 'Uncalibrated carapace silhouette'} />
-            </span>
-          }
+          placeholder={placeholder}
         />
       </div>
 

@@ -228,9 +228,6 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               user={avatarUser}
               name={displayName}
               size="sm"
-              className={
-                'border border-line group-hover:border-line-strong transition-all shrink-0'
-              }
             />
             <div className="flex flex-col min-w-0 text-left">
               <div className="flex items-center gap-1.5 flex-wrap">
@@ -375,7 +372,6 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               user={avatarUser}
               name={displayName}
               size="md"
-              className={'border-2 border-cyan-glow/40'}
             />
             <div className="flex flex-col min-w-0 flex-1">
               <div className="flex items-center gap-1.5 flex-wrap">

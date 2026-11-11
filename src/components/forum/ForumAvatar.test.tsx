@@ -92,6 +92,15 @@ describe('ForumAvatar', () => {
     expect(container).toHaveClass('shadow-sm')
   })
 
+  it('puts the portrait glass over a character but not over a photo or at 20px', () => {
+    const { rerender } = render(<ForumAvatar src="" authorName="Glass" />)
+    expect(screen.getByTestId('glass-lens')).toBeInTheDocument()
+    rerender(<ForumAvatar src="" authorName="Glass" size="xs" />)
+    expect(screen.queryByTestId('glass-lens')).toBeNull()
+    rerender(<ForumAvatar src="https://example.com/p.jpg" authorName="Glass" />)
+    expect(screen.queryByTestId('glass-lens')).toBeNull()
+  })
+
   it('defaults to md size when size is unspecified', () => {
     render(<ForumAvatar src="" authorName="DefaultUnit" />)
     const container = screen.getByTestId('forum-avatar-container')

@@ -6,6 +6,7 @@ import {
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
 import { CharacterStill } from '@/components/hud/avatar3d/CharacterStill'
+import { GLASS_FRAME_CLASS, GlassLens } from '@/components/hud/GlassLens'
 
 export type ForumAvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
@@ -78,6 +79,9 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
   }, [src])
 
   const displayAlt = alt ?? authorName ?? 'Author avatar'
+  const showPhoto = hasCustomImage && !imageError
+  // A character wears the profile portrait's glass; at 20px it would only be noise.
+  const lens = !showPhoto && size !== 'xs'
 
   const character = useMemo((): LobsterAvatarConfig | null => {
     if (hasCustomImage && !imageError) return null
@@ -94,13 +98,14 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
     <div
       ref={containerRef}
       className={cn(
-        'relative rounded-full overflow-hidden shrink-0 border border-line bg-surface-2 flex items-center justify-center transition-all',
+        'relative rounded-full overflow-hidden shrink-0 bg-surface-2 flex items-center justify-center transition-all',
+        lens ? GLASS_FRAME_CLASS : 'border border-line',
         SIZE_CLASSES[size],
         className
       )}
       data-testid="forum-avatar-container"
     >
-      {hasCustomImage && !imageError ? (
+      {showPhoto ? (
         <BrandAwareImage
           src={src!}
           alt={displayAlt}
@@ -113,6 +118,7 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
       ) : (
         <CharacterStill config={character} px={128} alt={displayAlt} scene imgClassName="rounded-full" />
       )}
+      {lens && <GlassLens />}
     </div>
   )
 })

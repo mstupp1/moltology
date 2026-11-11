@@ -35,6 +35,9 @@ describe('LobsterAvatarPortrait', () => {
     render(<LobsterAvatarPortrait config={config} size={64} alt="Small" />)
     await waitFor(() => expect(screen.getByAltText('Small')).toBeInTheDocument())
     expect(requestStill3D.mock.calls[0][1]).toBe(128)
+    // Small portraits wear the scaled glass instead of the full lens.
+    expect(screen.getByTestId('glass-lens')).toBeInTheDocument()
+    expect(screen.queryByTestId('portrait-fisheye-dome')).toBeNull()
   })
 
   it('shows the plain dome when there is no character or no 3D', () => {
