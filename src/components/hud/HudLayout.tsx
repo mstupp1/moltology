@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useSyncExternalStore } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Outlet, useLocation } from '@tanstack/react-router'
 import { HUDSidebar } from '@/components/hud/HUDSidebar'
 import { CommandPalette } from '@/components/hud/CommandPalette'
@@ -23,26 +23,6 @@ import { getAssetUrl } from '@/lib/assets'
 
 const UNDERWATER_BACKGROUND = '/images/hud/underwater-looking-up-hq-v2.webp'
 
-// Tailwind's md breakpoint. Phones get a frosted full-width layer instead of the glass page panel.
-const DESKTOP_QUERY = '(min-width: 768px)'
-
-function subscribeDesktop(onChange: () => void) {
-  if (typeof window.matchMedia !== 'function') return () => {}
-  const query = window.matchMedia(DESKTOP_QUERY)
-  query.addEventListener('change', onChange)
-  return () => query.removeEventListener('change', onChange)
-}
-
-/** False on the server and on phones, so the bubble canvas only mounts on desktop. */
-function useIsDesktop() {
-  return useSyncExternalStore(
-    subscribeDesktop,
-    // Without matchMedia (old browsers, tests) keep the previous behaviour: bubbles on.
-    () => typeof window.matchMedia !== 'function' || window.matchMedia(DESKTOP_QUERY).matches,
-    () => false
-  )
-}
-
 function HudContent() {
   const [isAIDrawerOpen, setIsAIDrawerOpen] = useState(false)
   const [showWelcome, setShowWelcome] = useState(false)
@@ -53,8 +33,6 @@ function HudContent() {
   const user = session.user
   const userId = session.userId
   const { heavyVfxDisabled } = useHeavyVfx()
-  // The phone frosted layer blurs the bubbles away, so they only run on desktop.
-  const isDesktop = useIsDesktop()
   // Full-screen overlays and the phone Oracle cover the backdrop.
   const backdropCovered = useBackdropCovered()
   // Register service worker + track install prompt for the whole hub (guest + member).
@@ -161,7 +139,7 @@ function HudContent() {
         />
 
         {/* 3D Hydro Dynamic Bubbling Effect with Custom Chroma-Keyed Bubble Variants */}
-        {!isFullscreenRoute && isDesktop && (
+        {!isFullscreenRoute && (
           <UnderwaterBubblesCanvas
             bubbleCount={90}
             customBubbleSrcs={BUBBLE_VARIANT_SRCS}
@@ -189,9 +167,8 @@ function HudContent() {
         {/* Smooth Bottom Fade Gradient into Deep Benthic Teal (#030708) */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#030708]/80 pointer-events-none" />
 
-        {/* Phone: one full-width frosted layer over the scene. It lives here, not on <main>,
-            so the blur never becomes the containing block for fixed elements inside pages. */}
-        <div className="md:hidden absolute inset-0 bg-surface-1/[0.58] backdrop-blur-[6px] pointer-events-none" />
+        {/* Phone: the page panel goes full width, so its tint sits over the whole scene. */}
+        <div className="md:hidden absolute inset-0 bg-surface-1/[0.72] pointer-events-none" />
       </div>
 
       {/* Experimental Navigation Command Palette */}
@@ -214,8 +191,8 @@ function HudContent() {
                   : 'p-2.5 sm:p-4 md:p-6 overflow-y-auto overscroll-y-contain'
               } ${
                 // Desktop standard pages keep the scene bright around one see-through page panel.
-                // Phones are frosted by the backdrop layer above, so main stays clear there.
-                isFullscreenRoute ? 'md:bg-surface-1/[0.62]' : 'md:bg-surface-1/[0.22]'
+                // Phones get the full-width panel tint from the backdrop layer above, so main stays clear there.
+                isFullscreenRoute ? 'md:bg-surface-1/[0.62]' : 'md:bg-surface-1/[0.45]'
               } ${
                 // The phone top bar draws its own bottom border, so main never adds a top one:
                 // two stacked translucent lines read as a gap above full-width page bars.
@@ -241,7 +218,7 @@ function HudContent() {
               ) : (
                 <div
                   data-hud-page-panel
-                  className={`mx-auto flex w-full min-w-0 min-h-0 flex-1 flex-col md:max-w-[1280px] md:p-6 ${
+                  className={`mx-auto flex w-full min-w-0 flex-1 shrink-0 flex-col md:max-w-[1280px] md:p-6 ${
                     isMainOnly ? '' : 'md:pt-[54px]'
                   } md:rounded-panel md:border md:border-line-subtle md:bg-surface-1/[0.68] md:shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)]`}
                 >
