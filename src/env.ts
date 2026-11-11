@@ -1,11 +1,22 @@
 import { z } from 'zod'
 
+/**
+ * Vercel Preview deployments store the Neon dev branch as `DEV_DATABASE_URL`
+ * and have no `DATABASE_URL`. Use it there only, so production can never fall
+ * back to the dev branch.
+ */
+export function resolveDatabaseUrl(processEnv: Record<string, string | undefined>): string | undefined {
+  if (processEnv.DATABASE_URL) return processEnv.DATABASE_URL
+  if (processEnv.VERCEL_ENV === 'preview') return processEnv.DEV_DATABASE_URL || undefined
+  return undefined
+}
+
 function getRawEnv(): Record<string, unknown> {
   const processEnv = typeof process !== 'undefined' && process.env ? process.env : {}
   const importMetaEnv = typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env : {}
 
   return {
-    DATABASE_URL: processEnv.DATABASE_URL || importMetaEnv.DATABASE_URL || importMetaEnv.VITE_DATABASE_URL,
+    DATABASE_URL: resolveDatabaseUrl(processEnv) || importMetaEnv.DATABASE_URL || importMetaEnv.VITE_DATABASE_URL,
     BETTER_AUTH_URL: processEnv.BETTER_AUTH_URL || importMetaEnv.BETTER_AUTH_URL || importMetaEnv.VITE_BETTER_AUTH_URL,
     VITE_GOOGLE_AUTH_ENABLED: importMetaEnv.VITE_GOOGLE_AUTH_ENABLED || processEnv.VITE_GOOGLE_AUTH_ENABLED,
     VITE_EMAIL_VERIFICATION_ENABLED: importMetaEnv.VITE_EMAIL_VERIFICATION_ENABLED || processEnv.VITE_EMAIL_VERIFICATION_ENABLED,

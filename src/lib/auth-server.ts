@@ -55,7 +55,7 @@ function getAuthSecret(): string {
   return DEV_AUTH_SECRET
 }
 
-function getTrustedOrigins(baseURL: string): string[] {
+export function getTrustedOrigins(baseURL: string): string[] {
   const origins = new Set<string>([
     baseURL,
     DEFAULT_AUTH_URL,
@@ -72,9 +72,10 @@ function getTrustedOrigins(baseURL: string): string[] {
     }
   }
 
-  const vercelHost = typeof process !== 'undefined' ? process.env.VERCEL_URL : undefined
-  if (vercelHost) {
-    origins.add(vercelHost.startsWith('http') ? vercelHost : `https://${vercelHost}`)
+  // Previews answer on the per-deploy URL and the branch URL (moltology-git-<branch>-…).
+  for (const key of ['VERCEL_URL', 'VERCEL_BRANCH_URL'] as const) {
+    const host = typeof process !== 'undefined' ? process.env[key] : undefined
+    if (host) origins.add(host.startsWith('http') ? host : `https://${host}`)
   }
 
   return [...origins]
