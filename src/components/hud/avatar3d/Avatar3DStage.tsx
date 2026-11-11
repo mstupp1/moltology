@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import type { Avatar3DLook, Stage } from '@/lib/avatar3d'
+import { mark3DUnavailable } from '@/lib/avatar3d-support'
 import { cn } from '@/lib/utils'
 
 export interface Avatar3DStageProps {
@@ -28,19 +29,27 @@ export function Avatar3DStage({ look, spin = false, className, label }: Avatar3D
     if (!canvas) return
     let cancelled = false
     let observer: ResizeObserver | null = null
+    let watcher: IntersectionObserver | null = null
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    void import('@/lib/avatar3d').then(({ createStage }) => {
-      if (cancelled) return
-      const stage = createStage(canvas, { interactive: true, reducedMotion })
-      stage.setLook(lookRef.current)
-      stage.setSpin(spinRef.current && !reducedMotion ? 0.5 : 0)
-      stageRef.current = stage
-      observer = new ResizeObserver(() => stage.resize())
-      observer.observe(canvas)
-    })
+    void import('@/lib/avatar3d')
+      .then(({ createStage }) => {
+        if (cancelled) return
+        // If the browser takes 3D away, the page goes back to the 2D character.
+        const stage = createStage(canvas, { interactive: true, reducedMotion, onContextLost: mark3DUnavailable })
+        stage.setLook(lookRef.current)
+        stage.setSpin(spinRef.current && !reducedMotion ? 0.5 : 0)
+        stageRef.current = stage
+        observer = new ResizeObserver(() => stage.resize())
+        observer.observe(canvas)
+        // Nothing is drawn while the character is scrolled out of view.
+        watcher = new IntersectionObserver(([entry]) => stage.setActive(entry.isIntersecting))
+        watcher.observe(canvas)
+      })
+      .catch(() => mark3DUnavailable())
     return () => {
       cancelled = true
       observer?.disconnect()
+      watcher?.disconnect()
       stageRef.current?.dispose()
       stageRef.current = null
     }

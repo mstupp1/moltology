@@ -6,6 +6,14 @@
 import type { Avatar3DLook } from './look'
 import { createStage, type Stage } from './stage'
 
+/** This browser would not start 3D at all, as opposed to one character failing to draw. */
+export class Avatar3DUnavailable extends Error {
+  constructor(cause: unknown) {
+    super('3D is not available in this browser', { cause })
+    this.name = 'Avatar3DUnavailable'
+  }
+}
+
 const KEEP = 80
 const cache = new Map<string, string>()
 let stage: Stage | null = null
@@ -26,8 +34,24 @@ export function renderPortrait(look: Avatar3DLook, px: number): string {
   const hit = cache.get(key)
   if (hit) return hit
   if (!canvas || !stage) {
-    canvas = document.createElement('canvas')
-    stage = createStage(canvas, { reducedMotion: true, preserveDrawingBuffer: true, pixelRatio: 1, framing: 'portrait', manual: true })
+    const next = document.createElement('canvas')
+    try {
+      stage = createStage(next, {
+        reducedMotion: true,
+        preserveDrawingBuffer: true,
+        pixelRatio: 1,
+        framing: 'portrait',
+        manual: true,
+        // Start again with a fresh canvas the next time a face is asked for.
+        onContextLost: () => {
+          stage = null
+          canvas = null
+        },
+      })
+    } catch (cause) {
+      throw new Avatar3DUnavailable(cause)
+    }
+    canvas = next
   }
   if (canvas.width !== px || canvas.height !== px) {
     canvas.width = canvas.height = px

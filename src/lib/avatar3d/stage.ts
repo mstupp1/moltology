@@ -37,6 +37,8 @@ export interface StageOptions {
   framing?: 'full' | 'portrait'
   /** Draw only when asked (`renderStill`), with no animation loop. */
   manual?: boolean
+  /** The browser took the 3D context away (too many canvases, or the graphics driver reset). */
+  onContextLost?: () => void
 }
 
 export interface Stage {
@@ -46,6 +48,8 @@ export interface Stage {
   /** Slow automatic turntable, in radians per second (0 stops it). */
   setSpin: (speed: number) => void
   resize: () => void
+  /** Stop drawing while the character is off screen, and pick up again when it is back. */
+  setActive: (active: boolean) => void
   /** Draw one frame now, at a fixed time. Used for stills. */
   renderStill: (time?: number) => void
   character: () => Character3D | null
@@ -126,6 +130,12 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   let raf = 0
   let last = 0
   let clock = 0
+  let active = true
+  // With motion held, nothing moves on its own, so frames are drawn only for a while after a change.
+  let awake = 1.5
+  const wake = () => {
+    awake = 1.5
+  }
 
   const frame = () => {
     const w = canvas.clientWidth || canvas.width
@@ -179,6 +189,11 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       yaw += (spin + velocity) * dt
       velocity *= Math.exp(-dt * 3)
     }
+    if (options.reducedMotion) {
+      if (dragging || spin !== 0 || Math.abs(velocity) > 0.002) wake()
+      if (awake <= 0) return
+      awake -= dt
+    }
     draw(dt, clock)
   }
 
@@ -207,6 +222,14 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     canvas.style.cursor = 'grab'
   }
 
+  const onLost = (e: Event) => {
+    e.preventDefault()
+    cancelAnimationFrame(raf)
+    active = false
+    options.onContextLost?.()
+  }
+  canvas.addEventListener('webglcontextlost', onLost)
+
   resize()
   if (!options.manual) raf = requestAnimationFrame(tick)
 
@@ -216,15 +239,34 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       character = buildCharacter(look)
       scene.add(character.root)
       frame()
+      wake()
     },
-    setPose: (pose, immediate) => character?.setPose(pose, immediate),
+    setPose: (pose, immediate) => {
+      character?.setPose(pose, immediate)
+      wake()
+    },
     setYaw: (value) => {
       yaw = value
+      wake()
     },
     setSpin: (speed) => {
       spin = speed
+      wake()
     },
-    resize,
+    resize: () => {
+      resize()
+      wake()
+    },
+    setActive(next) {
+      if (next === active || disposed || options.manual) return
+      active = next
+      cancelAnimationFrame(raf)
+      if (active) {
+        last = 0
+        wake()
+        raf = requestAnimationFrame(tick)
+      }
+    },
     renderStill(time = 0) {
       if (character) character.setPose(character.look.pose, true)
       draw(0, time)
@@ -238,6 +280,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       canvas.removeEventListener('pointermove', onMove)
       canvas.removeEventListener('pointerup', onUp)
       canvas.removeEventListener('pointercancel', onUp)
+      canvas.removeEventListener('webglcontextlost', onLost)
       character?.dispose()
       env.dispose()
       pmrem.dispose()

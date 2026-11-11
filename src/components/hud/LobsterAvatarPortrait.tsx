@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useAvatar3D } from '@/hooks/useAvatar3D'
 import { requestPortrait3D } from '@/lib/avatar3d-portrait-queue'
 import {
@@ -109,14 +109,35 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
   // stays up until that still is ready, and for good if this browser cannot draw 3D.
   const in3D = useAvatar3D() && !src && Boolean(effectiveConfig?.seed)
   const [still, setStill] = useState<{ for: LobsterAvatarConfig; url: string } | null>(null)
+  const frameRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    if (!in3D || !effectiveConfig) return
+    const frame = frameRef.current
+    if (!in3D || !effectiveConfig || !frame) return
     let cancelled = false
-    void requestPortrait3D(effectiveConfig, sourcePx).then((url) => {
-      if (!cancelled && url) setStill({ for: effectiveConfig, url })
-    })
+    const draw = () => {
+      void requestPortrait3D(effectiveConfig, sourcePx).then((url) => {
+        if (!cancelled && url) setStill({ for: effectiveConfig, url })
+      })
+    }
+    // A long list only draws the faces that are on screen, or about to be.
+    if (typeof IntersectionObserver === 'undefined') {
+      draw()
+      return () => {
+        cancelled = true
+      }
+    }
+    const watcher = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return
+        watcher.disconnect()
+        draw()
+      },
+      { rootMargin: '200px' },
+    )
+    watcher.observe(frame)
     return () => {
       cancelled = true
+      watcher.disconnect()
     }
   }, [in3D, effectiveConfig, sourcePx])
   const still3D = in3D && still && still.for === effectiveConfig ? still.url : null
@@ -140,6 +161,7 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
 
   return (
     <div
+      ref={frameRef}
       className={portraitClassName}
       data-testid="lobster-avatar-portrait"
       data-slot="portrait"

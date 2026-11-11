@@ -8,11 +8,13 @@ vi.mock('@/hooks/useAuthSession', () => ({ useAuthSession: () => session.value }
 vi.mock('@/lib/jwt', () => ({ getAuthJWTToken: () => Promise.resolve('token') }))
 vi.mock('@/lib/server/api', () => ({ getUserProfileFn }))
 
+import { mark3DUnavailable, set3DSupportForTests } from '@/lib/avatar3d-support'
 import { resetAvatar3DForTests, useAvatar3D } from './useAvatar3D'
 
 describe('useAvatar3D', () => {
   beforeEach(() => {
     resetAvatar3DForTests()
+    set3DSupportForTests(true)
     getUserProfileFn.mockReset()
     session.value = { isPending: false, userId: 'u1', user: { id: 'u1', role: 'admin' } }
   })
@@ -46,5 +48,22 @@ describe('useAvatar3D', () => {
     expect(member.result.current).toBe(false)
     expect(guest.result.current).toBe(false)
     expect(getUserProfileFn).not.toHaveBeenCalled()
+  })
+
+  it('stays off in a browser that cannot draw 3D', async () => {
+    set3DSupportForTests(null) // the test browser has no WebGL, so the real check says no
+    getUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['avatar-3d'] })
+    const { result } = renderHook(() => useAvatar3D())
+    await waitFor(() => expect(getUserProfileFn).toHaveBeenCalledTimes(1))
+    await new Promise((r) => setTimeout(r, 20))
+    expect(result.current).toBe(false)
+  })
+
+  it('drops back to 2D when 3D fails while in use', async () => {
+    getUserProfileFn.mockResolvedValue({ role: 'admin', experiments: ['avatar-3d'] })
+    const { result } = renderHook(() => useAvatar3D())
+    await waitFor(() => expect(result.current).toBe(true))
+    act(() => mark3DUnavailable())
+    expect(result.current).toBe(false)
   })
 })
