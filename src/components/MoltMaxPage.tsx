@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react'
+import { requestOneTap } from '@/lib/one-tap'
 import { ArrowDown, ArrowRight, BookOpen, CheckCircle2, Clock, ListChecks, Lock, Sparkles, Terminal } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { PublicHeader } from '@/components/PublicHeader'
@@ -207,7 +208,11 @@ export const MoltMaxPage: React.FC = () => {
     if (questionIndex === MOLTMAX_QUESTIONS.length - 1) {
       setResult(computeMoltmaxResult(answers))
       // Guests keep the finished audit on this device so signing up saves it.
-      if (!session.isPending && !user) saveGuestAudit(answers)
+      if (!session.isPending && !user) {
+        saveGuestAudit(answers)
+        // Offer Google One Tap once the result is on screen; signing in saves it.
+        window.setTimeout(() => requestOneTap({ context: 'signup' }), 1500)
+      }
       setMode('results')
       window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0)
       return

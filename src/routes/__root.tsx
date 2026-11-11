@@ -14,6 +14,7 @@ import brandAssets from '@/components/ui/brand-assets.json'
 import { filterPrivateStoreTelemetry } from '@/lib/store-privacy'
 import { captureAttribution } from '@/lib/attribution'
 import { GuestProgressClaimer } from '@/components/GuestProgressClaimer'
+import { GoogleOneTap } from '@/components/GoogleOneTap'
 
 const LazyHUDNotFound = lazy(() =>
   import('@/components/hud/HUDNotFound').then((m) => ({ default: m.HUDNotFound }))
@@ -136,6 +137,7 @@ function RootDocument() {
           <ToastProvider>
             <Outlet />
             <GuestProgressClaimer />
+            <GoogleOneTap />
           </ToastProvider>
         </HUDErrorBoundary>
         <Scripts />

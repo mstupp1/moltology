@@ -118,6 +118,26 @@ export function isGoogleAuthEnabled(): boolean {
   return isExplicitPublicFlag(flag) === true
 }
 
+/**
+ * Build-time value for `VITE_GOOGLE_CLIENT_ID`. The OAuth client ID is public
+ * (Google shows it in every sign-in URL); only the secret stays server-side.
+ * Empty when Google sign-in is off, so One Tap never loads without it.
+ */
+export function resolveViteGoogleClientId(env: {
+  googleAuthEnabled: 'true' | 'false'
+  VITE_GOOGLE_CLIENT_ID?: string
+  GOOGLE_CLIENT_ID?: string
+}): string {
+  if (env.googleAuthEnabled !== 'true') return ''
+  return (env.GOOGLE_CLIENT_ID || env.VITE_GOOGLE_CLIENT_ID || '').trim()
+}
+
+/** Client-safe Google client ID for One Tap. Empty string when unavailable. */
+export function getPublicGoogleClientId(): string {
+  if (!isGoogleAuthEnabled()) return ''
+  return readViteEnv('VITE_GOOGLE_CLIENT_ID') || readProcessEnv('VITE_GOOGLE_CLIENT_ID') || ''
+}
+
 export function getGoogleClientCredentials(): { clientId: string; clientSecret: string } | null {
   const clientId = readProcessEnv('GOOGLE_CLIENT_ID') || readProcessEnv('VITE_GOOGLE_CLIENT_ID')
   const clientSecret = readProcessEnv('GOOGLE_CLIENT_SECRET')
