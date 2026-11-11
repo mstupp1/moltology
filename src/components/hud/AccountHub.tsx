@@ -6,7 +6,9 @@ import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { OPEN_ALIGNMENT_PANEL_EVENT, isAlignmentPanelHostVisible } from '@/lib/alignment-panel'
 import { STAGE_PIPELINE_DATA } from '@/lib/codexStages'
+import { getAssetUrl } from '@/lib/assets'
 import { getEffectiveRole } from '@/lib/permissions'
+import { useWalletBalances } from '@/hooks/useWalletBalances'
 import { STAGE_THRESHOLDS, calculateSubStageProgress, type SubStageProgress } from '@/lib/progression'
 import { UserAvatar } from '../UserAvatar'
 import { useSignOutButton, type UserAvatarMenuProps } from '../UserAvatarMenu'
@@ -18,10 +20,13 @@ export interface AccountHubProps {
   user: UserAvatarMenuProps['user']
   userRole?: string | null
   displayName?: string | null
+  /** Waiting friend requests; shown on the Profile link. */
+  pendingFriendRequests?: number
   onNavigate: (path: string) => void
 }
 
 const PROGRESS_PATH = '/character/progress'
+const SHOP_PATH = '/character/shop'
 const focusRing =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 
@@ -70,7 +75,14 @@ interface RingView {
  * Top-pill account control: the member's portrait inside the XP ring and today's
  * task notches. Opens one panel with level, today's tasks, Settings and Sign out.
  */
-export function AccountHub({ variant, user, userRole, displayName: displayNameProp, onNavigate }: AccountHubProps) {
+export function AccountHub({
+  variant,
+  user,
+  userRole,
+  displayName: displayNameProp,
+  pendingFriendRequests = 0,
+  onNavigate,
+}: AccountHubProps) {
   const alignment = useDailyAlignment()
   const toastApi = useOptionalToast()
   const toastRef = useRef(toastApi)
@@ -207,6 +219,10 @@ export function AccountHub({ variant, user, userRole, displayName: displayNamePr
     return () => window.removeEventListener(OPEN_ALIGNMENT_PANEL_EVENT, open)
   }, [])
 
+  const wallet = useWalletBalances(isOpen ? userId : null)
+  // Credits read "soon" until purchases open, unless the member already holds some.
+  const creditsShown = Boolean(wallet && (wallet.creditsLive || wallet.credits > 0))
+
   const signOutButtonProps = useSignOutButton({ onNavigate, onBeforeSignOut: close })
 
   const go = (path: string) => {
@@ -237,8 +253,14 @@ export function AccountHub({ variant, user, userRole, displayName: displayNamePr
 
   const panelBody = (
     <div className="space-y-4">
-      {/* Who, and where they are on the ladder */}
-      <div className="flex items-center gap-3">
+      {/* Who: the way into their profile */}
+      <button
+        type="button"
+        onClick={() => go(pendingFriendRequests > 0 ? '/profile?tab=requests' : '/profile')}
+        data-testid="account-hub-profile"
+        aria-label={`View profile${pendingFriendRequests > 0 ? `, ${`${pendingFriendRequests} friend request${pendingFriendRequests === 1 ? '' : 's'} waiting`}` : ''}`}
+        className={`-mx-2 -mt-2 p-2 w-[calc(100%+1rem)] flex items-center gap-3 text-left rounded-control hover:bg-surface-2 transition-colors group ${focusRing}`}
+      >
         <UserAvatar user={user} name={displayName} size="xl" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 min-w-0">
@@ -249,9 +271,21 @@ export function AccountHub({ variant, user, userRole, displayName: displayNamePr
               </span>
             )}
           </div>
-          {user.email && <div className="text-[11px] text-ink-muted truncate mt-0.5">{user.email}</div>}
+          <div className="flex items-center gap-1.5 mt-0.5 min-w-0 text-xs text-ink-body group-hover:text-ink">
+            <span>View profile</span>
+            {pendingFriendRequests > 0 && (
+              <span
+                data-testid="account-hub-requests"
+                className="text-[11px] font-bold px-1.5 py-0.5 rounded-chip shrink-0 bg-cyan-soft border border-cyan-glow/40 text-cyan-glow tabular-nums"
+              >
+                {pendingFriendRequests > 99 ? '99+' : pendingFriendRequests}{' '}
+                {pendingFriendRequests === 1 ? 'request' : 'requests'}
+              </span>
+            )}
+          </div>
         </div>
-      </div>
+        <ChevronRight className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-ink" aria-hidden="true" />
+      </button>
 
       <button
         type="button"
@@ -288,6 +322,29 @@ export function AccountHub({ variant, user, userRole, displayName: displayNamePr
             <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
           </span>
         </div>
+      </button>
+
+      <button
+        type="button"
+        onClick={() => go(SHOP_PATH)}
+        data-testid="account-hub-wallet"
+        aria-label={
+          wallet
+            ? `Shop. ${wallet.gems.toLocaleString()} Chitin Gems, ${creditsShown ? `${wallet.credits.toLocaleString()} Molt Credits` : 'Molt Credits coming soon'}`
+            : 'Shop'
+        }
+        className={`-mt-2 w-full flex items-center gap-3 rounded-control bg-surface-2 hover:bg-surface-3 transition-colors px-3 py-2 text-xs group ${focusRing}`}
+      >
+        <WalletAmount icon="/images/chitin_gem.png" value={wallet ? wallet.gems.toLocaleString() : null} unit="gems" />
+        {wallet && !creditsShown ? (
+          <WalletAmount icon="/images/molt_credit.png" value={null} unit="credits soon" />
+        ) : (
+          <WalletAmount icon="/images/molt_credit.png" value={wallet ? wallet.credits.toLocaleString() : null} unit="credits" />
+        )}
+        <span className="ml-auto shrink-0 inline-flex items-center gap-0.5 text-ink-body group-hover:text-cyan-glow">
+          Shop
+          <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
+        </span>
       </button>
 
       <AlignmentTodayList
@@ -377,6 +434,17 @@ export function AccountHub({ variant, user, userRole, displayName: displayNamePr
         <StageReachedCard stageNum={stageCard} portrait={portrait} onClose={() => setStageCard(null)} onNavigate={onNavigate} />
       )}
     </div>
+  )
+}
+
+/** One balance in the wallet row: icon, amount (blank while loading), unit. */
+function WalletAmount({ icon, value, unit }: { icon: string; value: string | null; unit: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 min-w-0" aria-hidden="true">
+      <img src={getAssetUrl(icon)} alt="" className="w-4 h-4 object-contain shrink-0" />
+      {value !== null && <span className="font-grotesk font-bold tabular-nums text-ink">{value}</span>}
+      <span className="text-ink-muted">{unit}</span>
+    </span>
   )
 }
 

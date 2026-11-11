@@ -19,7 +19,6 @@ import {
   EyeOff,
   ShieldCheck,
 
-  CircleUser,
 } from 'lucide-react'
 import { getUserProfileFn } from '../../lib/server/api'
 import { getAuthJWTToken } from '../../lib/jwt'
@@ -45,7 +44,7 @@ import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 
 /** Pages in the phone bottom bar; the rest go in its More sheet, in this order. */
 const MOBILE_TAB_IDS = ['hub', 'oracle', 'character', 'forum']
-const MOBILE_MORE_IDS = ['profile', 'codex', 'academy']
+const MOBILE_MORE_IDS = ['codex', 'academy']
 
 const GUEST_LOCKED_PATHS = new Set(['/academy', '/character', '/member', '/profile'])
 
@@ -181,7 +180,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const session = useAuthSession()
   const user = session.user
   const pendingFriendRequests = usePendingFriendRequests(user?.id)
-  const requestBadgeLabel = `, ${pendingFriendRequests} friend request${pendingFriendRequests === 1 ? '' : 's'} waiting`
   const isSessionPending = session.isPending
   const [memberAvatar, setMemberAvatar] = useState<import('@/lib/lobster-avatar').LobsterAvatarConfig | null>(null)
   const [userRole, setUserRole] = useState<string | null>(null)
@@ -267,7 +265,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         { id: 'hub', label: 'DASHBOARD', shortLabel: 'DASHBOARD', icon: LayoutDashboard, path: '/dashboard' },
         { id: 'oracle', label: 'ORACLE', shortLabel: 'ORACLE', icon: Atom, path: '/oracle' },
         { id: 'character', label: 'CHARACTER', shortLabel: 'CHARACTER', icon: Shell, path: '/character' },
-        { id: 'profile', label: 'PROFILE', shortLabel: 'PROFILE', icon: CircleUser, path: '/profile' },
         { id: 'codex', label: 'CODEX', shortLabel: 'CODEX', icon: Scroll, path: '/codex' },
         { id: 'academy', label: 'ACADEMY', shortLabel: 'ACADEMY', icon: BookOpen, path: '/academy' },
         { id: 'forum', label: 'FORUM', shortLabel: 'FORUM', icon: MessagesSquare, path: '/forum' },
@@ -400,16 +397,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                           : 'text-ink-muted group-hover/navitem:text-ink transition-colors duration-150'
                       }`}
                     />
-                    {item.id === 'profile' && pendingFriendRequests > 0 && (
-                      <span
-                        data-testid="profile-requests-dot"
-                        className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-cyan-glow ring-2 ring-abyss"
-                      />
-                    )}
                   </span>
-                  {item.id === 'profile' && pendingFriendRequests > 0 && (
-                    <span className="sr-only">{requestBadgeLabel}</span>
-                  )}
 
                   <span
                     className={`inline-flex items-center justify-center gap-0.5 text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center max-w-full transition-colors duration-150 ${
@@ -550,12 +538,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     )}
                     {hidden && <span className="sr-only">Hidden</span>}
 
-                    {item.id === 'profile' && pendingFriendRequests > 0 && (
-                      <span className="ml-auto min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full bg-cyan-glow text-[11px] font-sans font-bold text-abyss tabular-nums shrink-0">
-                        <span aria-hidden="true">{pendingFriendRequests > 99 ? '99+' : pendingFriendRequests}</span>
-                        <span className="sr-only">{requestBadgeLabel}</span>
-                      </span>
-                    )}
 
                     {!isSessionPending && !user?.id && GUEST_LOCKED_PATHS.has(item.path) && (
                       <Lock className="w-3.5 h-3.5 text-crimson-text/80 shrink-0 ml-auto" />
@@ -612,6 +594,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               userRole={effectiveUserRole}
               displayName={displayName}
               isSessionPending={isSessionPending}
+              pendingFriendRequests={pendingFriendRequests}
               onNavigate={(path) => (isMobileOpen ? closeMobileMenu(() => handleNavClick(path)) : handleNavClick(path))}
               onSignUp={() => setIsAuthModalOpen(true)}
             />
@@ -629,6 +612,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               userRole={effectiveUserRole}
               displayName={displayName}
               isSessionPending={isSessionPending}
+              pendingFriendRequests={pendingFriendRequests}
               onNavigate={(path) => handleNavClick(path)}
               onSignUp={() => setIsAuthModalOpen(true)}
             />,
@@ -793,7 +777,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         tabs={mobileTabs}
         activeId={mobileActiveId}
         moreOpen={isMobileHeaderOpen}
-        moreBadge={pendingFriendRequests}
         onNavigate={(path) => handleNavClick(path)}
         onToggleMore={toggleMobileMenu}
         moreButtonRef={mobileTriggerRef}

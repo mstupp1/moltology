@@ -51,7 +51,7 @@ describe('UserAvatarMenu Component', () => {
     expect(screen.getByText('SIGN OUT')).toBeInTheDocument()
     expect(screen.getByText('SETTINGS')).toBeInTheDocument()
     expect(screen.queryByText('MOLTOLOGY HOME')).not.toBeInTheDocument()
-    expect(screen.queryByText('YOUR PROFILE')).not.toBeInTheDocument()
+    expect(screen.getByText('PROFILE')).toBeInTheDocument()
   })
 
   it('prefers a claimed designation over auth name or larva unit', () => {
@@ -246,5 +246,14 @@ describe('UserAvatarMenu Component', () => {
 
     fireEvent.click(settingsBtn)
     expect(onNavigate).toHaveBeenCalledWith('/settings')
+  })
+
+  it('renders a Profile link inside dropdown menu', () => {
+    const onNavigate = vi.fn()
+    render(<UserAvatarMenu user={mockUser} onNavigate={onNavigate} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /user account menu/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^profile$/i }))
+    expect(onNavigate).toHaveBeenCalledWith('/profile')
   })
 })
