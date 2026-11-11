@@ -27,10 +27,12 @@ export interface PoseSpec {
 
 // Directions follow the 2D poses: raised claws point straight up beside the head with the pincer
 // opening toward it, the wave holds one claw up, and the flex curls the tips in over the head.
-// The flat of each claw faces the viewer, so the opening reads from the front.
-const UP: ArmPose = { arm: [0.8, 0.55, 0.12], forearm: [0.12, 1, 0.12], claw: [-0.04, 1, 0.1], clawFacing: [-0.15, 0, 1], pinch: 0.45 }
-const FLEX: ArmPose = { arm: [1, 0.05, 0.1], forearm: [0.5, 1, 0.28], claw: [-0.5, 0.86, 0.3], clawFacing: [0.1, 0, 1], pinch: 0.15 }
-const WAVE: ArmPose = { arm: [0.9, 0.4, 0.12], forearm: [0.18, 1, 0.12], claw: [0.06, 1, 0.1], clawFacing: [-0.1, 0, 1], pinch: 0.5 }
+// A raised claw points the other way along its own axis from a hanging one, so its facing is
+// turned to the back: that rolls the claw half a turn and keeps the opening toward the head
+// instead of swinging it out to the side. The flat still reads square to the viewer.
+const UP: ArmPose = { arm: [0.8, 0.55, 0.12], forearm: [0.12, 1, 0.12], claw: [-0.04, 1, 0.1], clawFacing: [0.15, 0, -1], pinch: 0.45 }
+const FLEX: ArmPose = { arm: [1, 0.05, 0.1], forearm: [0.5, 1, 0.28], claw: [-0.5, 0.86, 0.3], clawFacing: [-0.1, 0, -1], pinch: 0.15 }
+const WAVE: ArmPose = { arm: [0.9, 0.4, 0.12], forearm: [0.18, 1, 0.12], claw: [0.06, 1, 0.1], clawFacing: [0.1, 0, -1], pinch: 0.5 }
 
 export const POSES: Record<AvatarPose, PoseSpec> = {
   rest: {},

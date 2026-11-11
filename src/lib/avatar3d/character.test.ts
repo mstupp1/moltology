@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { AVATAR_ACCESSORIES, AVATAR_ANTENNAE, AVATAR_BUILDS, AVATAR_CLAWS, AVATAR_HEAD_SHAPES, AVATAR_MOUTHS, AVATAR_POSES, AVATAR_RACES, SHELL_MARKINGS } from '../avatar/traits'
-import { Vector3, type Mesh, type Object3D } from 'three'
+import { Quaternion, Vector3, type Mesh, type Object3D } from 'three'
 import { EQUIPMENT_VISUALS } from '../avatar/equipment'
 import { STARTER_CHARACTER_EQUIPMENT } from '../avatar/starter-equipment'
 import type { EquippedAppearance } from '../character-appearance'
@@ -85,6 +85,27 @@ describe('avatar3d', () => {
         expect(foot.getWorldPosition(foot.position.clone()).distanceTo(rest)).toBeLessThan(1e-6)
         for (const [name, bone] of character.rig.bones) {
           expect(Number.isFinite(bone.quaternion.x), `${pose} ${name}`).toBe(true)
+        }
+      }
+      character.dispose()
+    }
+  })
+
+  it('opens every pincer toward the head in every pose', () => {
+    for (const race of AVATAR_RACES) {
+      const character = buildCharacter(baselineLook(race))
+      for (const pose of AVATAR_POSES) {
+        character.setPose(pose, true)
+        character.update(0, 0, false)
+        character.root.updateMatrixWorld(true)
+        const eye = (tag: string) => character.rig.bone(`eye${tag}`).getWorldPosition(new Vector3())
+        const head = eye('L').add(eye('R')).multiplyScalar(0.5)
+        // The left claw is the mirrored mesh, so its opening is along local -X and the right one's along +X.
+        for (const [tag, side] of [['L', -1], ['R', 1]] as const) {
+          const claw = character.rig.bone(`claw${tag}`)
+          const opening = new Vector3(side, 0, 0).applyQuaternion(claw.getWorldQuaternion(new Quaternion()))
+          const toHead = head.clone().sub(claw.getWorldPosition(new Vector3())).normalize()
+          expect(opening.dot(toHead), `${race} ${pose} claw${tag}`).toBeGreaterThan(0.2)
         }
       }
       character.dispose()
