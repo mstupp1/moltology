@@ -43,7 +43,7 @@ export function Avatar3DStage({ look, spin = false, className, label, focus = nu
       .then(({ createStage }) => {
         if (cancelled) return
         // If the browser takes 3D away, the page shows the plain placeholder instead.
-        const stage = createStage(canvas, { interactive: true, reducedMotion, onContextLost: mark3DUnavailable })
+        const stage = createStage(canvas, { interactive: true, reducedMotion, lighting: 'cinematic', onContextLost: mark3DUnavailable })
         stage.setLook(lookRef.current)
         stage.setSpin(spinRef.current && !reducedMotion ? 0.5 : 0)
         if (focusRef.current) stage.focus(focusRef.current)
