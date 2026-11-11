@@ -6,6 +6,9 @@ import {
   releaseLobsterFullBodyMotion,
   resolveLobsterAvatarAssets,
 } from '@/lib/lobster-avatar-slots'
+import { useAvatar3D } from '@/hooks/useAvatar3D'
+import { lookFromConfig } from '@/lib/avatar3d/look'
+import { Avatar3DStage } from './avatar3d/Avatar3DStage'
 import { LobsterAvatarDisplay } from './LobsterAvatarDisplay'
 import { LobsterAvatarSilhouette } from './LobsterAvatarSilhouette'
 
@@ -67,12 +70,30 @@ export const LobsterAvatarFullBody: React.FC<LobsterAvatarFullBodyProps> = React
     return picked?.slot === 'fullBody' ? picked.url : null
   }, [src, effectiveConfig, configSeed, size])
 
+  const frameClassName = `relative overflow-hidden rounded-sm border border-white/[0.14] bg-[#081419]/90 shrink-0 ${className}`
+  // Viewers with the 3D experiment on see the same saved character, live in 3D.
+  const in3D = useAvatar3D() && !src && Boolean(effectiveConfig)
+  const look = useMemo(() => (in3D && effectiveConfig ? lookFromConfig(effectiveConfig) : null), [in3D, effectiveConfig])
+  if (look) {
+    return (
+      <div
+        data-testid="lobster-avatar-full-body"
+        data-slot="fullBody"
+        data-renderer="3d"
+        className={frameClassName}
+      >
+        <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(34,211,238,0.14),transparent_62%)]" />
+        <Avatar3DStage look={look} label={alt} className="relative" />
+      </div>
+    )
+  }
+
   return (
     <div
       data-testid="lobster-avatar-full-body"
       data-slot="fullBody"
       data-motion={hasMotionLease ? 'on' : 'held'}
-      className={`relative overflow-hidden rounded-sm border border-white/[0.14] bg-[#081419]/90 shrink-0 ${className}`}
+      className={frameClassName}
     >
       {pickedUrl ? (
         <LobsterAvatarDisplay

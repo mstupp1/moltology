@@ -1,4 +1,6 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useAvatar3D } from '@/hooks/useAvatar3D'
+import { requestPortrait3D } from '@/lib/avatar3d-portrait-queue'
 import {
   LOBSTER_AVATAR_STYLE,
   generateLobsterAvatarDataUri,
@@ -101,6 +103,22 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
     return picked?.slot === 'portrait' ? picked.url : null
   }, [animated, src, effectiveConfig, sourcePx])
 
+  // Viewers with the 3D experiment on get a still drawn from the 3D character. The 2D portrait
+  // stays up until that still is ready, and for good if this browser cannot draw 3D.
+  const in3D = useAvatar3D() && !src && Boolean(effectiveConfig?.seed)
+  const [still, setStill] = useState<{ for: LobsterAvatarConfig; url: string } | null>(null)
+  useEffect(() => {
+    if (!in3D || !effectiveConfig) return
+    let cancelled = false
+    void requestPortrait3D(effectiveConfig, sourcePx).then((url) => {
+      if (!cancelled && url) setStill({ for: effectiveConfig, url })
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [in3D, effectiveConfig, sourcePx])
+  const still3D = in3D && still && still.for === effectiveConfig ? still.url : null
+
   const portraitClassName = useMemo(
     () =>
       `relative aspect-square rounded-full border border-white/[0.18] bg-[#081419]/90 bg-gradient-to-b from-white/[0.14] via-white/[0.04] to-transparent overflow-hidden shrink-0 shadow-[0_8px_32px_-4px_rgba(0,0,0,0.8),0_2px_8px_rgba(0,0,0,0.6),inset_0_1.5px_0_0_rgba(255,255,255,0.45),inset_0_-1.5px_0_0_rgba(0,195,255,0.25),0_0_28px_rgba(0,195,255,0.2)] ${
@@ -120,7 +138,19 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(0,195,255,0.2)_0%,rgba(0,195,255,0.05)_55%,transparent_75%)] pointer-events-none z-0" />
 
-      {animated && animatedUri ? (
+      {still3D ? (
+        <div data-testid="portrait-fisheye-container" data-renderer="3d" className="relative z-10 flex h-full w-full items-center justify-center overflow-hidden">
+          <img
+            src={still3D}
+            alt={alt}
+            width={sourcePx}
+            height={sourcePx}
+            decoding="async"
+            data-testid="lobster-avatar-portrait-image"
+            className={`h-full w-full object-cover ${interactive ? 'transition-transform duration-300 group-hover:scale-[1.03]' : ''}`}
+          />
+        </div>
+      ) : animated && animatedUri ? (
         <div
           data-testid="portrait-fisheye-container"
           className={`relative z-10 w-full h-full flex items-center justify-center overflow-hidden ${

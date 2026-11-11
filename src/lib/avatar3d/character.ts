@@ -21,11 +21,20 @@ export interface Character3D {
   look: Avatar3DLook
   /** Height of the body in world units, antennae not included. */
   height: number
+  /** Where a head-and-shoulders portrait looks, and how much it takes in. */
+  portrait: { y: number; size: number }
   setPose: (pose: AvatarPose, immediate?: boolean) => void
   /** Advance the pose blend and idle motion. `time` is seconds; pass `idle = false` to hold still. */
   update: (dt: number, time: number, idle?: boolean) => void
   triangles: () => number
   dispose: () => void
+}
+
+function portraitFrame(rig: Rig, height: number, scale: number): Character3D['portrait'] {
+  const head = rig.wear?.head
+  if (!head) return { y: height * 0.8 * scale, size: 1.2 * scale }
+  const half = head.loft.key(head.loft.sAt(head.eyeY)).r
+  return { y: (head.eyeY + (head.top - head.eyeY) * 0.12) * scale, size: (half * 2.5 + 0.42) * scale }
 }
 
 export function buildCharacter(look: Avatar3DLook): Character3D {
@@ -113,6 +122,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     rig,
     look,
     height: built.height * look.heightScale,
+    portrait: portraitFrame(rig, built.height, look.heightScale),
     setPose(pose, immediate = false) {
       targets = poseTargets(rig, POSES[pose])
       if (immediate) for (const [name, t] of targets) current.get(name)!.copy(t)

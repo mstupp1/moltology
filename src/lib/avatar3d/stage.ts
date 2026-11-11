@@ -33,6 +33,10 @@ export interface StageOptions {
   /** Keep the drawing buffer so the canvas can be saved as an image. */
   preserveDrawingBuffer?: boolean
   pixelRatio?: number
+  /** `portrait` closes in on the head; the default takes in the whole figure. */
+  framing?: 'full' | 'portrait'
+  /** Draw only when asked (`renderStill`), with no animation loop. */
+  manual?: boolean
 }
 
 export interface Stage {
@@ -45,6 +49,8 @@ export interface Stage {
   /** Draw one frame now, at a fixed time. Used for stills. */
   renderStill: (time?: number) => void
   character: () => Character3D | null
+  /** The current frame as a PNG data URL. Needs `preserveDrawingBuffer`. */
+  snapshot: () => string
   dispose: () => void
 }
 
@@ -125,6 +131,14 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     const w = canvas.clientWidth || canvas.width
     const h = canvas.clientHeight || canvas.height
     camera.aspect = w / Math.max(h, 1)
+    if (options.framing === 'portrait') {
+      const { y, size } = character?.portrait ?? { y: 1.5, size: 1.2 }
+      const dist = (size / 2 / Math.tan((camera.fov * Math.PI) / 360) / Math.min(camera.aspect, 1)) * 1.02
+      camera.position.set(0, y + 0.06, dist)
+      camera.lookAt(0, y, 0)
+      camera.updateProjectionMatrix()
+      return
+    }
     // Fit the whole figure, antennae and claws included, whatever the canvas shape.
     const tall = (character?.height ?? 1.8) + 0.62
     const wide = 2.3
@@ -139,8 +153,9 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   }
 
   const resize = () => {
-    const w = canvas.clientWidth
-    const h = canvas.clientHeight
+    // A canvas that is not on the page has no layout size, so it keeps the size it was given.
+    const w = canvas.clientWidth || canvas.width
+    const h = canvas.clientHeight || canvas.height
     if (w && h) renderer.setSize(w, h, false)
     frame()
   }
@@ -192,7 +207,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   }
 
   resize()
-  raf = requestAnimationFrame(tick)
+  if (!options.manual) raf = requestAnimationFrame(tick)
 
   return {
     setLook(look) {
@@ -214,6 +229,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       draw(0, time)
     },
     character: () => character,
+    snapshot: () => canvas.toDataURL('image/png'),
     dispose() {
       disposed = true
       cancelAnimationFrame(raf)

@@ -8,7 +8,8 @@ import { ALL_EQUIPMENT_CATALOG } from '../equipment-seed-data'
 import { buildCharacter } from './character'
 import { supportsEquipment } from './equipment'
 import { SUPPORTED_ACCESSORIES } from './gear'
-import { baselineLook } from './look'
+import { resolveAvatarTraits, type LobsterAvatarConfig } from '../lobster-avatar'
+import { baselineLook, lookFromConfig } from './look'
 import { keySampler } from './loft'
 
 const SOCKETS = ['head', 'ears', 'face', 'back', 'chest', 'waist', 'clawL', 'clawR', 'wristL', 'wristR', 'footL', 'footR']
@@ -126,6 +127,21 @@ describe('avatar3d', () => {
     const character = buildCharacter({ ...baselineLook('crab'), pose: 'cheer', equipment: STARTER_CHARACTER_EQUIPMENT })
     expect(gearMeshes(character.root).length).toBeGreaterThan(6)
     character.dispose()
+  })
+
+  it('turns a saved character into the same character in 3D', () => {
+    const config: LobsterAvatarConfig = { style: 'critters', seed: 'reef-42', race: 'crab', shellColor: 'cobalt', marking: 'spots', height: 'tall', armScale: 2, equipment: STARTER_CHARACTER_EQUIPMENT }
+    const traits = resolveAvatarTraits(config)
+    const look = lookFromConfig(config)
+    expect(look).toMatchObject({ race: 'crab', marking: 'spots', mouth: traits.mouth, antennae: traits.antennae, expression: traits.eyelidStyle, eyeColor: traits.eyeColor, pose: traits.pose, claws: 'classic', accessory: 'none', armScale: 1.3 })
+    expect(look.palette.id).toBe('cobalt')
+    expect(look.heightScale).toBeGreaterThan(1)
+    expect(look.equipment).toBe(STARTER_CHARACTER_EQUIPMENT)
+    // A bare seed is enough: unset traits fall back to the seeded ones, as in 2D.
+    const seeded = buildCharacter(lookFromConfig({ style: 'critters', seed: 'only-a-seed' }))
+    expect(finite(seeded)).toBe(true)
+    expect(seeded.portrait.size).toBeGreaterThan(0)
+    seeded.dispose()
   })
 
   it('never overshoots unevenly spaced keys, so thin parts cannot fold', () => {
