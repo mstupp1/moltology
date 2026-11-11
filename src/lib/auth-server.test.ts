@@ -6,11 +6,24 @@ import {
   auth,
   ensureValidJwks,
   getAuthApiErrorUrl,
+  getTrustedOrigins,
   isGoogleSocialConfigured,
   sendVerificationEmail,
 } from './auth-server'
 
 describe('auth-server', () => {
+  it('trusts both the per-deploy and branch URLs on Vercel previews', () => {
+    vi.stubEnv('VERCEL_URL', 'moltology-abc123-team.vercel.app')
+    vi.stubEnv('VERCEL_BRANCH_URL', 'moltology-git-feature-team.vercel.app')
+    try {
+      const origins = getTrustedOrigins('https://moltology.org')
+      expect(origins).toContain('https://moltology-abc123-team.vercel.app')
+      expect(origins).toContain('https://moltology-git-feature-team.vercel.app')
+    } finally {
+      vi.unstubAllEnvs()
+    }
+  })
+
   it('uses the same verification lifetime as the email copy', () => {
     expect(auth.options.emailVerification?.expiresIn).toBe(EMAIL_VERIFICATION_EXPIRES_IN_SECONDS)
   })
