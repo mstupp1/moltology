@@ -8,6 +8,7 @@ import {
   isOneTapQuizPath,
   markOneTapShownThisVisit,
   markOneTapSignedOut,
+  oneTapLanding,
   oneTapAutoSelectAllowed,
   onOneTapRequest,
   requestOneTap,
@@ -79,5 +80,15 @@ describe('helpers', () => {
     requestOneTap({ context: 'signin' })
     expect(listener).toHaveBeenCalledTimes(1)
     expect(listener).toHaveBeenCalledWith({ context: 'signup' })
+  })
+})
+
+describe('where a One Tap sign-in lands', () => {
+  it('sends new accounts and homepage sign-ins to the dashboard, keeps readers in place', () => {
+    expect(oneTapLanding({ path: '/', fresh: false })).toBe('/dashboard')
+    expect(oneTapLanding({ path: '/landing', fresh: false })).toBe('/dashboard')
+    expect(oneTapLanding({ path: '/forum/topic/1', fresh: true })).toBe('/dashboard')
+    expect(oneTapLanding({ path: '/forum/topic/1', fresh: false })).toBeNull()
+    expect(oneTapLanding({ path: '/moltmax', fresh: true })).toBeNull()
   })
 })

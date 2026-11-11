@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useRouterState } from '@tanstack/react-router'
+import { useNavigate, useRouterState } from '@tanstack/react-router'
 import { authClient } from '@/lib/auth-client'
 import { getPublicGoogleClientId } from '@/lib/auth-config'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -14,16 +14,20 @@ import {
   isOneTapQuizPath,
   markOneTapShownThisVisit,
   oneTapAutoSelectAllowed,
+  oneTapLanding,
   onOneTapRequest,
 } from '@/lib/one-tap'
 
 type OneTapContext = 'signin' | 'signup'
-type OneTapUser = { name?: string | null; createdAt?: unknown }
+type OneTapUser = { createdAt?: unknown }
 type ToastApi = NonNullable<ReturnType<typeof useOptionalToast>>['toast']
+type OneTapRefs = {
+  toast: { current: ToastApi | undefined }
+  path: { current: string }
+  navigate: { current: (to: string) => void }
+}
 
 export const ONE_TAP_COPY = {
-  welcome: 'Welcome to Moltology. Your account is ready.',
-  signedIn: (name?: string | null) => (name ? `Signed in as ${name}.` : 'Signed in with Google.'),
   notLinked: 'That email already has a password account. Sign in with your password, then link Google in Settings.',
   failed: 'Google sign-in did not go through. Try the Sign in button instead.',
 } as const
@@ -65,12 +69,17 @@ export function GoogleOneTap() {
   canPromptRef.current = enabled && isGuest
   const pathRef = useRef(pathname)
   pathRef.current = pathname
+  const navigate = useNavigate()
+  const navigateRef = useRef((to: string) => void navigate({ to }))
+  navigateRef.current = (to: string) => void navigate({ to })
+  const refs: OneTapRefs = { toast: toastRef, path: pathRef, navigate: navigateRef }
+  const refsRef = useRef(refs)
 
   useEffect(() => {
     if (!enabled) return
     return onOneTapRequest(({ context }) => {
       if (!canPromptRef.current) return
-      void runOneTap(context, toastRef)
+      void runOneTap(context, refsRef.current)
     })
   }, [enabled])
 
@@ -79,7 +88,7 @@ export function GoogleOneTap() {
     const timer = window.setTimeout(() => {
       if (!canPromptRef.current || !isOneTapAutoPath(pathRef.current)) return
       markOneTapShownThisVisit()
-      void runOneTap('signin', toastRef)
+      void runOneTap('signin', refsRef.current)
     }, ONE_TAP_DELAY_MS)
     return () => window.clearTimeout(timer)
   }, [enabled, isGuest, pathname])
@@ -93,10 +102,12 @@ export function GoogleOneTap() {
   return null
 }
 
-async function runOneTap(
-  context: OneTapContext,
-  toastRef: { current: ToastApi | undefined },
-): Promise<void> {
+/**
+ * After sign-in: new accounts and homepage sign-ins go into the app; a
+ * returning member reading something stays on it (the header avatar is the
+ * cue). No success toast either way. Errors still explain themselves.
+ */
+async function runOneTap(context: OneTapContext, refs: OneTapRefs): Promise<void> {
   try {
     await authClient.oneTap({
       context,
@@ -106,20 +117,11 @@ async function runOneTap(
           clearOneTapSignedOut()
           authClient.$store.notify('$sessionSignal')
           const user = readOneTapUser(data)
-          if (isFreshAccount(user?.createdAt)) {
-            toastRef.current?.success(ONE_TAP_COPY.welcome, {
-              id: 'one-tap',
-              action: { label: 'Get started', href: '/dashboard' },
-            })
-          } else {
-            toastRef.current?.success(ONE_TAP_COPY.signedIn(user?.name), {
-              id: 'one-tap',
-              action: { label: 'Dashboard', href: '/dashboard' },
-            })
-          }
+          const landing = oneTapLanding({ path: refs.path.current, fresh: isFreshAccount(user?.createdAt) })
+          if (landing) refs.navigate.current(landing)
         },
         onError: ({ error }) => {
-          toastRef.current?.error(errorCopy(error?.message), { id: 'one-tap' })
+          refs.toast.current?.error(errorCopy(error?.message), { id: 'one-tap' })
         },
       },
     })

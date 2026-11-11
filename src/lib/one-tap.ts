@@ -109,6 +109,18 @@ export function isFreshAccount(createdAt: unknown, now = Date.now()): boolean {
   return now - created < 2 * 60 * 1000
 }
 
+/**
+ * Where a One Tap sign-in lands. The quiz keeps its result on screen (it gets
+ * saved to the account). Otherwise new accounts and homepage sign-ins go to
+ * the dashboard (onboarding starts there); anywhere else the member stays put.
+ */
+export function oneTapLanding({ path, fresh }: { path: string; fresh: boolean }): '/dashboard' | null {
+  const normalized = normalizePath(path)
+  if (isOneTapQuizPath(normalized)) return null
+  if (fresh || PUBLIC_EXACT.has(normalized)) return '/dashboard'
+  return null
+}
+
 type OneTapRequest = { context: 'signin' | 'signup' }
 type OneTapListener = (request: OneTapRequest) => void
 const listeners = new Set<OneTapListener>()
