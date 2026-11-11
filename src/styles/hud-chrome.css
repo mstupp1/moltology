@@ -149,3 +149,79 @@ input[type="range"].stat-slider::-moz-range-thumb {
   cursor: pointer;
   box-shadow: 0 0 8px #ff453a;
 }
+
+/*
+ * Page header band. A page's title card runs edge to edge across the top of the page
+ * panel. The variables match the padding HudLayout puts around page content: main's
+ * padding on phones (the panel itself has none there), the panel's padding on desktop.
+ * Outside the panel they fall back to zero, so a band there is a plain full-width block.
+ */
+[data-hud-page-panel] {
+  --hud-band-x: 0.625rem;
+  --hud-band-top: 0.625rem;
+}
+@media (min-width: 640px) {
+  [data-hud-page-panel] {
+    --hud-band-x: 1rem;
+    --hud-band-top: 1rem;
+  }
+}
+@media (min-width: 768px) {
+  [data-hud-page-panel] {
+    --hud-band-x: 15px;
+    --hud-band-top: 54px;
+  }
+  [data-hud-page-panel][data-hud-main-only] {
+    --hud-band-top: 1.5rem;
+  }
+}
+
+/* A band that starts the page: pulled up to the panel's top edge and out to its sides. */
+.hud-title-band,
+.hud-title-band-top {
+  margin-top: calc(var(--hud-band-top, 0px) * -1);
+  margin-left: calc(var(--hud-band-x, 0px) * -1);
+  margin-right: calc(var(--hud-band-x, 0px) * -1);
+  padding-left: var(--hud-band-x, 1rem);
+  padding-right: var(--hud-band-x, 1rem);
+}
+/* The rest of a band whose first row (section tabs) sits directly above it. */
+.hud-title-band-rest {
+  margin-left: calc(var(--hud-band-x, 0px) * -1);
+  margin-right: calc(var(--hud-band-x, 0px) * -1);
+  padding-left: var(--hud-band-x, 1rem);
+  padding-right: var(--hud-band-x, 1rem);
+}
+.hud-title-band {
+  padding-top: 0.875rem;
+  padding-bottom: 1rem;
+}
+.hud-title-band-top {
+  padding-top: 0.625rem;
+}
+@media (min-width: 768px) {
+  .hud-title-band,
+  .hud-title-band-top {
+    /* Panel radius 12px less its 1px border. */
+    border-top-left-radius: 11px;
+    border-top-right-radius: 11px;
+  }
+  /* The search pill straddles the panel's top-right corner, so a band without section
+     tabs starts its title just under the pill; section tabs sit level with the pill. */
+  .hud-title-band {
+    padding-top: 2.75rem;
+    padding-bottom: 1.25rem;
+  }
+  .hud-title-band-top {
+    padding-top: 0.75rem;
+  }
+}
+/* Same as .hud-title-band-rest, from lg up only (the Character title row). */
+@media (min-width: 1024px) {
+  .hud-title-band-rest-lg {
+    margin-left: calc(var(--hud-band-x, 0px) * -1);
+    margin-right: calc(var(--hud-band-x, 0px) * -1);
+    padding-left: var(--hud-band-x, 1rem);
+    padding-right: var(--hud-band-x, 1rem);
+  }
+}
