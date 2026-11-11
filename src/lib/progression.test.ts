@@ -5,6 +5,7 @@ import {
   SUB_STAGE_THRESHOLDS,
   calculateStage,
   calculateSubStage,
+  calculateSubStageProgress,
   calculateProgression,
   getStreakMilestoneBonus,
   calculateXpFromHistory,
@@ -129,5 +130,27 @@ describe('Progression Engine: Streak Milestones & Guest XP', () => {
     expect(prog.subStage.code).toBe('S-2')
     expect(prog.progressRatio).toBe(0.5) // 4,000 / 8,000
     expect(prog.xpIntoStage).toBe(4000)
+  })
+})
+
+describe('calculateSubStageProgress', () => {
+  it('measures progress inside the current sub-stage', () => {
+    const p = calculateSubStageProgress(840)
+    expect(p.code).toBe('L-2')
+    expect(p.shortTitle).toBe('Shell Sprout')
+    expect(p.next).toEqual({ code: 'L-3', shortTitle: 'First Calcification', minXp: 1200 })
+    expect(p.xpInto).toBe(340)
+    expect(p.xpSpan).toBe(700)
+    expect(p.xpToNext).toBe(360)
+    expect(p.ratio).toBeCloseTo(340 / 700)
+  })
+
+  it('starts empty at a threshold and crosses stages', () => {
+    expect(calculateSubStageProgress(0)).toMatchObject({ code: 'L-1', index: 0, ratio: 0, xpToNext: 500 })
+    expect(calculateSubStageProgress(2000)).toMatchObject({ code: 'S-1', stageNum: 2, index: 3, ratio: 0 })
+  })
+
+  it('is full on the final sub-stage', () => {
+    expect(calculateSubStageProgress(250000)).toMatchObject({ code: 'C-3', next: null, ratio: 1, xpToNext: 0 })
   })
 })
