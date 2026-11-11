@@ -6,7 +6,15 @@ import { chromium } from 'playwright-core'
 import { resolveChromeExecutable } from './lib/composite-renderer'
 
 const base = new URL(process.argv[2] || 'http://localhost:3000')
-assert(['localhost', '127.0.0.1', '[::1]'].includes(base.hostname), 'Use a local development server.')
+const isLocal = ['localhost', '127.0.0.1', '[::1]'].includes(base.hostname)
+// Vercel previews use the dev database. Production never does, so only *.vercel.app is allowed.
+const isPreview = base.protocol === 'https:' && base.hostname.endsWith('.vercel.app')
+assert(isLocal || isPreview, 'Use a local development server or a Vercel preview URL.')
+const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+assert(isLocal || bypass, 'Set VERCEL_AUTOMATION_BYPASS_SECRET to pass Vercel preview protection.')
+const extraHTTPHeaders = isPreview && bypass
+  ? { 'x-vercel-protection-bypass': bypass, 'x-vercel-set-bypass-cookie': 'samesitenone' }
+  : undefined
 const email = process.env.DEV_TEST_EMAIL
 const password = process.env.DEV_TEST_PASSWORD
 assert(email && password, 'Set DEV_TEST_EMAIL and DEV_TEST_PASSWORD in the ignored development .env.')
@@ -20,6 +28,7 @@ try {
     const context = await browser.newContext({
       viewport: { width: viewport.width, height: viewport.height },
       isMobile: viewport.name === 'mobile', hasTouch: viewport.name === 'mobile',
+      extraHTTPHeaders,
     })
     try {
       if (process.env.DEV_TEST_USER_ID) {

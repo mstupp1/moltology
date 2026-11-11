@@ -64,6 +64,20 @@ sends no email or Oracle message, and saves screenshots in
 `tmp/verification/login/`. Google OAuth is a separate provider flow and is not
 covered by this email/password check.
 
+The same check runs against a Vercel preview, which uses the Neon dev branch
+(`DEV_DATABASE_URL`), so the saved account works there too:
+
+```sh
+VERCEL_AUTOMATION_BYPASS_SECRET=... npm run dev:verify-login -- https://moltology-git-<branch>-myles-projects-886f221f.vercel.app
+```
+
+Previews sit behind Vercel login, so the script sends the project's
+Protection Bypass for Automation secret. Cloud sessions need `DEV_TEST_EMAIL`,
+`DEV_TEST_PASSWORD`, `DEV_TEST_USER_ID` and `VERCEL_AUTOMATION_BYPASS_SECRET`
+in their environment, and `*.vercel.app` in their network allowlist. Google
+sign-in does not work on previews because their callback URLs are not
+registered with Google.
+
 ## Worktrees with shared dependencies
 
 A worktree may reuse a matching `node_modules` installation through a directory

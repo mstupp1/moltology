@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { validateEnv, env, envSchema } from './env'
+import { validateEnv, env, envSchema, resolveDatabaseUrl } from './env'
 
 describe('src/env.ts - Environment Variable Validation', () => {
   it('exports a default validated env object', () => {
@@ -56,5 +56,13 @@ describe('src/env.ts - Environment Variable Validation', () => {
   it('exposes the env schema shape used by validateEnv', () => {
     expect(envSchema.shape.BETTER_AUTH_URL).toBeDefined()
     expect(envSchema.shape.DATABASE_URL).toBeDefined()
+  })
+
+  it('uses DEV_DATABASE_URL only on Vercel previews without DATABASE_URL', () => {
+    const dev = 'postgresql://dev'
+    expect(resolveDatabaseUrl({ VERCEL_ENV: 'preview', DEV_DATABASE_URL: dev })).toBe(dev)
+    expect(resolveDatabaseUrl({ VERCEL_ENV: 'preview', DATABASE_URL: 'postgresql://main', DEV_DATABASE_URL: dev })).toBe('postgresql://main')
+    expect(resolveDatabaseUrl({ VERCEL_ENV: 'production', DEV_DATABASE_URL: dev })).toBeUndefined()
+    expect(resolveDatabaseUrl({ DEV_DATABASE_URL: dev })).toBeUndefined()
   })
 })
