@@ -2,7 +2,7 @@
  * What a 3D character is built from. It mirrors the saved avatar settings one for one, so the
  * same stored config drives either renderer.
  */
-import type { CharacterSpec } from '../avatar/races'
+import type { CharacterSpec } from '../avatar/spec'
 import { resolveAvatarTraits, resolveHeightScale, type LobsterAvatarConfig } from '../lobster-avatar'
 import { SHELL_PALETTE_MAP, SHELL_PALETTES, type ShellFinish, type ShellMarking, type ShellPalette } from '../avatar/traits'
 

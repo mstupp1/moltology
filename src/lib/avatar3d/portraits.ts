@@ -1,9 +1,11 @@
 /**
- * Still portraits for small avatars. A page can show dozens of faces, and a browser allows only
- * a handful of live 3D canvases, so one hidden stage draws each face once and hands back an
- * image. Results are kept, so the same character is never drawn twice.
+ * Stills for every small picture of a character: avatars, creator option cards and gear icons.
+ * A page can show dozens of them, and a browser allows only a handful of live 3D canvases, so
+ * two hidden stages (one framed on the face, one on the whole figure) draw each picture once and
+ * hand back an image. Results are kept, so the same picture is never drawn twice.
  */
 import type { Avatar3DLook } from './look'
+import { withLoftDetail } from './loft'
 import { createStage, type Stage } from './stage'
 
 /** This browser would not start 3D at all, as opposed to one character failing to draw. */
@@ -14,50 +16,80 @@ export class Avatar3DUnavailable extends Error {
   }
 }
 
-const KEEP = 80
+/**
+ * What a still shows: the head and shoulders, the whole figure, or a close-up on one gear slot
+ * (`gear:head`, `gear:claws-1`, ...), turned the way the creator camera turns to show it.
+ */
+export type StillShot = 'portrait' | 'full' | `gear:${string}`
+
+/**
+ * Gear icons turn the mannequin so the piece is in full view: claws are seen from the outside with
+ * room for a held weapon, and a belt is seen closer than the body camera goes.
+ */
+const ICON_VIEW: Record<string, { yaw: number; zoom: number }> = {
+  'claws-1': { yaw: 1.3, zoom: 1.15 },
+  'claws-2': { yaw: -1.3, zoom: 1.15 },
+  belt: { yaw: 0.35, zoom: 0.75 },
+}
+
+const KEEP = 160
 const cache = new Map<string, string>()
-let stage: Stage | null = null
-let canvas: HTMLCanvasElement | null = null
+const stages = new Map<'portrait' | 'full', { stage: Stage; canvas: HTMLCanvasElement }>()
 
-export function portraitKey(look: Avatar3DLook, px: number): string {
+export function stillKey(look: Avatar3DLook, px: number, shot: StillShot = 'portrait'): string {
   // A portrait holds its pose, so the same face in another stance is the same picture.
-  return `${px}|${JSON.stringify({ ...look, pose: 'rest', palette: look.palette.id })}`
+  const held = shot === 'portrait' ? { ...look, pose: 'rest' } : look
+  return `${shot}|${px}|${JSON.stringify({ ...held, palette: look.palette.id })}`
 }
 
-export function cachedPortrait(look: Avatar3DLook, px: number): string | undefined {
-  return cache.get(portraitKey(look, px))
+export function cachedStill(look: Avatar3DLook, px: number, shot: StillShot = 'portrait'): string | undefined {
+  return cache.get(stillKey(look, px, shot))
 }
 
-/** Draw a head-and-shoulders still. Synchronous and fairly heavy: call it from a queue, not a render. */
-export function renderPortrait(look: Avatar3DLook, px: number): string {
-  const key = portraitKey(look, px)
-  const hit = cache.get(key)
-  if (hit) return hit
-  if (!canvas || !stage) {
-    const next = document.createElement('canvas')
+function stageFor(framing: 'portrait' | 'full', px: number): Stage {
+  let entry = stages.get(framing)
+  if (!entry) {
+    const canvas = document.createElement('canvas')
+    let stage: Stage
     try {
-      stage = createStage(next, {
+      stage = createStage(canvas, {
         reducedMotion: true,
         preserveDrawingBuffer: true,
         pixelRatio: 1,
-        framing: 'portrait',
+        framing,
         manual: true,
-        // Start again with a fresh canvas the next time a face is asked for.
+        shadows: false,
+        // Start again with a fresh canvas the next time a picture is asked for.
         onContextLost: () => {
-          stage = null
-          canvas = null
+          stages.delete(framing)
         },
       })
     } catch (cause) {
       throw new Avatar3DUnavailable(cause)
     }
-    canvas = next
+    entry = { stage, canvas }
+    stages.set(framing, entry)
   }
-  if (canvas.width !== px || canvas.height !== px) {
-    canvas.width = canvas.height = px
-    stage.resize()
+  if (entry.canvas.width !== px || entry.canvas.height !== px) {
+    entry.canvas.width = entry.canvas.height = px
+    entry.stage.resize()
   }
-  stage.setLook({ ...look, pose: 'rest' })
+  return entry.stage
+}
+
+/** Draw a still. Synchronous and fairly heavy: call it from a queue, not a render. */
+export function renderStill(look: Avatar3DLook, px: number, shot: StillShot = 'portrait'): string {
+  const key = stillKey(look, px, shot)
+  const hit = cache.get(key)
+  if (hit) return hit
+  const stage = stageFor(shot === 'portrait' ? 'portrait' : 'full', px)
+  // A small picture cannot show fine tessellation, so it is built from coarser meshes: much quicker.
+  withLoftDetail(px <= 128 ? 0.6 : 0.8, () => stage.setLook(shot === 'portrait' ? { ...look, pose: 'rest' } : look))
+  const slot = shot.startsWith('gear:') ? shot.slice(5) : null
+  const view = slot ? ICON_VIEW[slot] : undefined
+  stage.focus(slot, view?.zoom)
+  const close = slot ? stage.character()?.focusOf(slot) : null
+  stage.setYaw(close ? (view?.yaw ?? close.yaw) : 0)
   stage.renderStill(0)
   const url = stage.snapshot()
   cache.set(key, url)
@@ -65,9 +97,13 @@ export function renderPortrait(look: Avatar3DLook, px: number): string {
   return url
 }
 
+/** A head-and-shoulders still. */
+export function renderPortrait(look: Avatar3DLook, px: number): string {
+  return renderStill(look, px, 'portrait')
+}
+
 export function disposePortraits(): void {
-  stage?.dispose()
-  stage = null
-  canvas = null
+  for (const { stage } of stages.values()) stage.dispose()
+  stages.clear()
   cache.clear()
 }

@@ -171,11 +171,7 @@ describe('MemberProfilePage', () => {
       expect(screen.getByTestId('lobster-avatar-portrait')).toBeInTheDocument()
     })
     expect(screen.queryByTestId('lobster-avatar-full-body')).toBeNull()
-    await waitFor(() => {
-      expect(screen.getByTestId('lobster-avatar-portrait-image')).toBeInTheDocument()
-    })
-    expect(screen.getByTestId('lobster-avatar-portrait')).toHaveAttribute('data-animated', 'false')
-    expect(screen.queryByTestId('lobster-avatar-inline-svg')).toBeNull()
+    expect(screen.getByTestId('lobster-avatar-portrait').querySelector('[data-renderer="3d"]')).not.toBeNull()
   })
 
   it('renders uncalibrated carapace silhouette in circular portrait when avatarConfig is null', async () => {

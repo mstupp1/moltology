@@ -105,9 +105,23 @@ export function superellipse(k: LoftKey, theta: number): [number, number] {
   return [k.r * spow(c, e), k.r * (s >= 0 ? (k.front ?? 1) : (k.back ?? 1)) * spow(s, e)]
 }
 
+/** Mesh density for everything lofted from here on; small stills need far fewer rings. */
+let detail = 1
+
+/** Build with coarser (or finer) meshes inside `fn`: 0.5 halves rows and ring points. */
+export function withLoftDetail<T>(scale: number, fn: () => T): T {
+  const before = detail
+  detail = scale
+  try {
+    return fn()
+  } finally {
+    detail = before
+  }
+}
+
 export function loft(opts: LoftOptions): Loft {
-  const rows = opts.rows ?? 40
-  const radial = opts.radial ?? 40
+  const rows = Math.max(6, Math.round((opts.rows ?? 40) * detail))
+  const radial = Math.max(8, Math.round(((opts.radial ?? 40) * detail) / 2) * 2)
   const sample = keySampler(opts.keys)
   const shape = opts.shape ?? superellipse
   const frame: Frame = { o: new Vector3(), u: new Vector3(), v: new Vector3() }
@@ -161,13 +175,18 @@ export function loft(opts: LoftOptions): Loft {
     const k = sample(s)
     opts.frame(k, frame)
     origins.push(frame.o.clone())
+    // The ring's key and frame are the same all the way round, so work them out once per row.
     for (let j = 0; j <= radial; j++) {
       const theta = (j / radial) * Math.PI * 2
-      point(s, theta, p)
-      positions.set([p.x, p.y, p.z], vi * 3)
-      uvs.set([j / radial, s], vi * 2)
+      const [a, b] = shape(k, theta)
+      p.copy(frame.o).addScaledVector(frame.u, a).addScaledVector(frame.v, b)
+      positions[vi * 3] = p.x
+      positions[vi * 3 + 1] = p.y
+      positions[vi * 3 + 2] = p.z
+      uvs[vi * 2] = j / radial
+      uvs[vi * 2 + 1] = s
       const ao = opts.ao ? opts.ao(k, s, theta) : 1
-      colors.set([ao, ao, ao], vi * 3)
+      colors[vi * 3] = colors[vi * 3 + 1] = colors[vi * 3 + 2] = ao
       vi++
     }
   }
@@ -188,16 +207,25 @@ export function loft(opts: LoftOptions): Loft {
         n.normalize()
         if (n.dot(at(i, j, q).sub(origins[i])) < 0) n.negate()
       }
-      normals.set([n.x, n.y, n.z], (i * (radial + 1) + j) * 3)
+      const o = (i * (radial + 1) + j) * 3
+      normals[o] = n.x
+      normals[o + 1] = n.y
+      normals[o + 2] = n.z
     }
   }
 
-  const index: number[] = []
+  const index = rows * (radial + 1) > 65535 ? new Uint32Array((rows - 1) * radial * 6) : new Uint16Array((rows - 1) * radial * 6)
+  let ii = 0
   for (let i = 0; i < rows - 1; i++) {
     for (let j = 0; j < radial; j++) {
       const a = i * (radial + 1) + j
       const b = a + radial + 1
-      index.push(a, b, a + 1, a + 1, b, b + 1)
+      index[ii++] = a
+      index[ii++] = b
+      index[ii++] = a + 1
+      index[ii++] = a + 1
+      index[ii++] = b
+      index[ii++] = b + 1
     }
   }
   // Make the winding agree with the outward normals, whatever way the spine runs.
@@ -219,7 +247,7 @@ export function loft(opts: LoftOptions): Loft {
   geometry.setAttribute('normal', new BufferAttribute(normals, 3))
   geometry.setAttribute('uv', new BufferAttribute(uvs, 2))
   geometry.setAttribute('color', new BufferAttribute(colors, 3))
-  geometry.setIndex(index)
+  geometry.setIndex(new BufferAttribute(index, 1))
 
   const d0 = opts.keys[0].d
   const d1 = opts.keys[opts.keys.length - 1].d

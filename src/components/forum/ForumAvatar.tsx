@@ -5,11 +5,7 @@ import {
   LOBSTER_AVATAR_STYLE,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
-import {
-  pickLobsterAvatarSlot,
-  portraitSourcePxForCssPx,
-  resolveLobsterAvatarAssets,
-} from '@/lib/lobster-avatar-slots'
+import { CharacterStill } from '@/components/hud/avatar3d/CharacterStill'
 
 export type ForumAvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
@@ -83,26 +79,15 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
 
   const displayAlt = alt ?? authorName ?? 'Author avatar'
 
-  const lobsterPortraitUrl = useMemo(() => {
+  const character = useMemo((): LobsterAvatarConfig | null => {
     if (hasCustomImage && !imageError) return null
-
     const effectiveSeed =
       avatarConfig?.seed?.trim() ||
       authorHandle?.trim().toLowerCase() ||
       authorName?.trim().toLowerCase() ||
       userId?.trim() ||
       'larva-unit'
-
-    const assets = resolveLobsterAvatarAssets(
-      {
-        style: avatarConfig?.style || LOBSTER_AVATAR_STYLE,
-        ...avatarConfig,
-        seed: effectiveSeed,
-      },
-      { portraitSize: portraitSourcePxForCssPx(64) }
-    )
-    const picked = pickLobsterAvatarSlot(assets, 'portrait')
-    return picked?.slot === 'portrait' ? picked.url : null
+    return { style: avatarConfig?.style || LOBSTER_AVATAR_STYLE, ...avatarConfig, seed: effectiveSeed }
   }, [hasCustomImage, imageError, avatarConfig, authorHandle, authorName, userId])
 
   return (
@@ -126,15 +111,7 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
           data-testid="forum-avatar-custom-image"
         />
       ) : (
-        <img
-          src={lobsterPortraitUrl ?? ''}
-          alt={displayAlt}
-          className="w-full h-full object-cover rounded-full"
-          loading={loading}
-          decoding="async"
-          data-testid="forum-avatar-lobster-still"
-          data-slot="portrait"
-        />
+        <CharacterStill config={character} px={128} alt={displayAlt} scene imgClassName="rounded-full" />
       )}
     </div>
   )

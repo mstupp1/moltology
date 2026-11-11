@@ -136,9 +136,9 @@ rules:
     anchors:
       - file: src/lib/avatar/equipment.ts
         symbol: EQUIPMENT_VISUALS
-      - file: src/lib/avatar/races.ts
-        symbol: renderCharacter
-    tests: [src/lib/character-appearance.test.ts, src/components/hud/chassis/ChassisStatusPage.test.tsx]
+      - file: src/lib/avatar3d/character.ts
+        symbol: buildCharacter
+    tests: [src/lib/character-appearance.test.ts, src/lib/avatar3d/character.test.ts, src/components/hud/chassis/ChassisStatusPage.test.tsx]
 
 ---
 

@@ -1,151 +1,98 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { LOBSTER_AVATAR_STYLE, type LobsterAvatarConfig } from '@/lib/lobster-avatar'
-import {
-  acquireLobsterFullBodyMotion,
-  pickLobsterAvatarSlot,
-  releaseLobsterFullBodyMotion,
-  resolveLobsterAvatarAssets,
-} from '@/lib/lobster-avatar-slots'
 import { useAvatar3D } from '@/hooks/useAvatar3D'
 import { lookFromConfig } from '@/lib/avatar3d/look'
 import { sceneStyle3D } from '@/lib/avatar3d-scene'
 import { RotateCcw } from 'lucide-react'
 import { HudButton } from '@/components/ui/HudButton'
+import { HUDSpinner } from '@/components/ui/HUDSpinner'
 import { Avatar3DStage } from './avatar3d/Avatar3DStage'
-import { LobsterAvatarDisplay } from './LobsterAvatarDisplay'
 import { LobsterAvatarSilhouette } from './LobsterAvatarSilhouette'
 
 export interface LobsterAvatarFullBodyProps {
-  src?: string | null
   config?: LobsterAvatarConfig | null
+  /** Kept for callers that size the frame by it; the 3D stage fills whatever frame it gets. */
   size?: number
   alt?: string
   className?: string
-  animationSeed?: string
+  /** A seed to draw a stand-in character from when there is no saved one. */
   fallbackSeed?: string
-  /** 3D only: a gear slot for the camera to feature, or null for the whole figure. */
+  /** A gear slot for the camera to feature, or null for the whole figure. */
   focus?: string | null
-  /** 3D only: shown as a Reset view button while a slot is featured. */
+  /** Shown as a Reset view button while a slot is featured. */
   onResetFocus?: () => void
 }
 
 /**
- * Animated full-body lobster. Mount only on the profile page and settings.
- * Holds at most one motion lease and yields motion while the document is hidden.
+ * The whole character, live in 3D, over its chosen scene. A spinner shows until the first frame
+ * is drawn, and a plain silhouette stands in when there is no character or no 3D in this browser.
  */
 export const LobsterAvatarFullBody: React.FC<LobsterAvatarFullBodyProps> = React.memo(({
-  src,
   config,
-  size = 320,
   alt = 'Carapace avatar',
   className = 'w-full aspect-[4/5]',
-  animationSeed,
   fallbackSeed,
   focus = null,
   onResetFocus,
 }) => {
-  const [hasMotionLease, setHasMotionLease] = useState(false)
-
-  useEffect(() => {
-    const ok = acquireLobsterFullBodyMotion()
-    setHasMotionLease(ok)
-    return () => {
-      if (ok) releaseLobsterFullBodyMotion()
-    }
-  }, [])
-
   const effectiveConfig = useMemo((): LobsterAvatarConfig | null => {
     if (config?.seed) return config
-    if (fallbackSeed?.trim()) {
-      return {
-        style: config?.style || LOBSTER_AVATAR_STYLE,
-        seed: fallbackSeed.trim(),
-        ...(config?.height ? { height: config.height } : {}),
-        ...(config?.armScale ? { armScale: config.armScale } : {}),
-        ...(config?.backgroundTheme ? { backgroundTheme: config.backgroundTheme } : {}),
-        ...(config?.backgroundPattern ? { backgroundPattern: config.backgroundPattern } : {}),
-        ...(config?.backgroundTexture ? { backgroundTexture: config.backgroundTexture } : {}),
-      }
-    }
+    if (fallbackSeed?.trim()) return { ...config, style: config?.style || LOBSTER_AVATAR_STYLE, seed: fallbackSeed.trim() }
     return null
   }, [config, fallbackSeed])
 
-  const configSeed = effectiveConfig?.seed
-  const pickedUrl = useMemo(() => {
-    if (src) return src
-    if (!effectiveConfig || !configSeed) return null
-    const assets = resolveLobsterAvatarAssets(effectiveConfig, { fullBodySize: size })
-    const picked = pickLobsterAvatarSlot(assets, 'fullBody')
-    return picked?.slot === 'fullBody' ? picked.url : null
-  }, [src, effectiveConfig, configSeed, size])
-
-  const frameClassName = `relative overflow-hidden rounded-sm border border-white/[0.14] bg-[#081419]/90 shrink-0 ${className}`
-  // Viewers with the 3D experiment on see the same saved character, live in 3D.
-  const in3D = useAvatar3D() && !src && Boolean(effectiveConfig)
-  const look = useMemo(() => (in3D && effectiveConfig ? lookFromConfig(effectiveConfig) : null), [in3D, effectiveConfig])
-  // The saved scene sits behind the character, as it does in the 2D drawing.
-  const scene = useMemo(() => (in3D && effectiveConfig ? sceneStyle3D(effectiveConfig) : undefined), [in3D, effectiveConfig])
-  if (look) {
-    return (
-      <div
-        data-testid="lobster-avatar-full-body"
-        data-slot="fullBody"
-        data-renderer="3d"
-        className={frameClassName}
-      >
-        {scene ? (
-          <div aria-hidden data-testid="avatar-3d-scene" className="absolute inset-0" style={scene} />
-        ) : (
-          <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(34,211,238,0.14),transparent_62%)]" />
-        )}
-        <Avatar3DStage look={look} label={alt} focus={focus} className="relative" />
-        {focus && onResetFocus && (
-          <HudButton
-            type="button"
-            variant="secondary"
-            size="sm"
-            className="absolute top-1 right-1 lg:top-2 lg:right-2"
-            onClick={onResetFocus}
-            icon={<RotateCcw className="w-3.5 h-3.5 text-cyan-glow" aria-hidden />}
-          >
-            Reset view
-          </HudButton>
-        )}
-      </div>
-    )
-  }
+  const support = useAvatar3D()
+  const [ready, setReady] = useState(false)
+  const look = useMemo(() => (support && effectiveConfig ? lookFromConfig(effectiveConfig) : null), [support, effectiveConfig])
+  const scene = useMemo(() => (effectiveConfig ? sceneStyle3D(effectiveConfig) : undefined), [effectiveConfig])
+  const placeholder = !effectiveConfig || support === false
 
   return (
     <div
       data-testid="lobster-avatar-full-body"
       data-slot="fullBody"
-      data-motion={hasMotionLease ? 'on' : 'held'}
-      className={frameClassName}
+      data-renderer="3d"
+      data-state={placeholder ? 'placeholder' : look && ready ? 'ready' : 'loading'}
+      className={`relative overflow-hidden rounded-sm border border-white/[0.14] bg-[#081419]/90 shrink-0 ${className}`}
     >
-      {pickedUrl ? (
-        <LobsterAvatarDisplay
-          src={pickedUrl}
-          alt={alt}
-          pixelated={false}
-          crt={false}
-          outputSize={size}
-          maskRadial={false}
-          animated={hasMotionLease}
-          animationSeed={animationSeed ?? configSeed}
-          texture={effectiveConfig?.backgroundTexture}
-          containerClassName="relative w-full h-full flex items-center justify-center overflow-hidden"
-          className="w-full h-full overflow-hidden"
-          imgClassName="w-full h-full object-contain"
-        />
-      ) : null}
-      {pickedUrl ? null : (
+      {scene ? (
+        <div aria-hidden data-testid="avatar-3d-scene" className="absolute inset-0" style={scene} />
+      ) : (
+        <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(34,211,238,0.14),transparent_62%)]" />
+      )}
+      {placeholder ? (
         <div className="relative z-10 flex h-full w-full min-h-[8rem] items-center justify-center p-4">
-          <LobsterAvatarSilhouette
-            alt={alt || 'Uncalibrated chassis silhouette'}
-            frame="fullBody"
-            className="w-full h-full max-w-[180px] max-h-[180px]"
-          />
+          <LobsterAvatarSilhouette alt={alt || 'Uncalibrated chassis silhouette'} frame="fullBody" className="w-full h-full max-w-[180px] max-h-[180px]" />
         </div>
+      ) : (
+        <>
+          {look && (
+            <Avatar3DStage
+              look={look}
+              label={alt}
+              focus={focus}
+              onReady={() => setReady(true)}
+              className={`relative transition-opacity duration-300 motion-reduce:transition-none ${ready ? 'opacity-100' : 'opacity-0'}`}
+            />
+          )}
+          {!(look && ready) && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <HUDSpinner size="md" aria-label={`Loading ${alt}`} />
+            </div>
+          )}
+        </>
+      )}
+      {focus && onResetFocus && (
+        <HudButton
+          type="button"
+          variant="secondary"
+          size="sm"
+          className="absolute top-1 right-1 lg:top-2 lg:right-2"
+          onClick={onResetFocus}
+          icon={<RotateCcw className="w-3.5 h-3.5 text-cyan-glow" aria-hidden />}
+        >
+          Reset view
+        </HudButton>
       )}
     </div>
   )

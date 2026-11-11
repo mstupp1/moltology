@@ -1,5 +1,5 @@
-import { equipmentIcon } from '@/lib/lobster-avatar'
 import React from 'react'
+import { GearIcon } from '@/components/hud/avatar3d/GearIcon'
 import type { CatalogRef } from '@/lib/chassis-loadout'
 import {
   RARITY_STYLES,
@@ -40,7 +40,8 @@ export const GearItemCard: React.FC<GearItemCardProps> = ({
     catalog.imageUrl && !catalog.imageUrl.endsWith('.svg')
       ? catalog.imageUrl
       : chassisTypeImageUrl(catalog.visualType)
-  const imageSrc = equipmentIcon(catalog.appearanceKey || catalog.slug) ?? getAssetUrl(rawSrc)
+  const iconKey = catalog.appearanceKey || catalog.slug
+  const imageSrc = getAssetUrl(rawSrc)
 
   return (
     <button
@@ -70,11 +71,17 @@ export const GearItemCard: React.FC<GearItemCardProps> = ({
     >
       <div className={`w-full ${compact ? 'h-1' : 'h-1.5'} ${rarity.bar} shrink-0`} />
       <div className="flex-1 relative min-h-0">
-        <img
-          src={imageSrc}
-          alt=""
-          className={`absolute inset-0 w-full h-full object-contain p-1 pointer-events-none ${flipped ? 'scale-x-[-1]' : ''}`}
-          draggable={false}
+        <GearIcon
+          appearanceKey={iconKey}
+          className={`!absolute inset-0 w-full h-full pointer-events-none ${flipped ? 'scale-x-[-1]' : ''}`}
+          fallback={
+            <img
+              src={imageSrc}
+              alt=""
+              className={`absolute inset-0 w-full h-full object-contain p-1 pointer-events-none ${flipped ? 'scale-x-[-1]' : ''}`}
+              draggable={false}
+            />
+          }
         />
       </div>
       <div className={`w-full ${compact ? 'py-0.5 px-0.5' : 'py-1 px-1'} text-center ${rarity.bar} shrink-0`}>
