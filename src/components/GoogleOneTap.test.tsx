@@ -6,11 +6,12 @@ const state = vi.hoisted(() => ({
   session: { user: null, userId: null, isPending: false, isGuest: true, isAuthenticated: false } as Record<string, unknown>,
   clientId: 'client.apps.googleusercontent.com',
 }))
-const { oneTap, notify, success, error } = vi.hoisted(() => ({
-  oneTap: vi.fn(), notify: vi.fn(), success: vi.fn(), error: vi.fn(),
+const { oneTap, notify, success, error, navigate } = vi.hoisted(() => ({
+  oneTap: vi.fn(), notify: vi.fn(), success: vi.fn(), error: vi.fn(), navigate: vi.fn(),
 }))
 
 vi.mock('@tanstack/react-router', () => ({
+  useNavigate: () => navigate,
   useRouterState: ({ select }: { select: (s: unknown) => unknown }) => select({ location: { pathname: state.pathname } }),
 }))
 vi.mock('@/lib/auth-client', () => ({ authClient: { oneTap, $store: { notify } } }))
@@ -83,21 +84,32 @@ describe('GoogleOneTap', () => {
     expect(oneTap).toHaveBeenCalledWith(expect.objectContaining({ context: 'signup' }))
   })
 
-  it('refreshes the session and welcomes a brand-new account', async () => {
+  const NEW = { data: { user: { createdAt: new Date().toISOString() } } }
+  const OLD = { data: { user: { createdAt: '2026-01-01T00:00:00Z' } } }
+
+  it.each([
+    ['a new account on the homepage', '/', NEW, '/dashboard'],
+    ['a new account on a news post', '/news/some-post', NEW, '/dashboard'],
+    ['a returning member on the homepage', '/', OLD, '/dashboard'],
+    ['a returning member on a news post', '/news/some-post', OLD, null],
+    ['a returning member in the forum', '/forum', OLD, null],
+  ])('lands %s correctly with no success toast', (_label, path, response, landing) => {
+    state.pathname = path as string
     render(<GoogleOneTap />)
     settle()
-    const { onSuccess } = oneTap.mock.calls[0][0].fetchOptions
-    onSuccess({ data: { user: { name: 'Myles', createdAt: new Date().toISOString() } } })
+    oneTap.mock.calls[0][0].fetchOptions.onSuccess(response)
     expect(notify).toHaveBeenCalledWith('$sessionSignal')
-    expect(success).toHaveBeenCalledWith(ONE_TAP_COPY.welcome, expect.anything())
+    if (landing) expect(navigate).toHaveBeenCalledWith({ to: landing })
+    else expect(navigate).not.toHaveBeenCalled()
+    expect(success).not.toHaveBeenCalled()
   })
 
-  it('greets a returning member by name', () => {
+  it('keeps a new account on the quiz result', () => {
+    state.pathname = '/moltmax'
     render(<GoogleOneTap />)
-    settle()
-    const { onSuccess } = oneTap.mock.calls[0][0].fetchOptions
-    onSuccess({ data: { user: { name: 'Myles', createdAt: '2026-01-01T00:00:00Z' } } })
-    expect(success).toHaveBeenCalledWith('Signed in as Myles.', expect.anything())
+    act(() => requestOneTap({ context: 'signup' }))
+    oneTap.mock.calls[0][0].fetchOptions.onSuccess(NEW)
+    expect(navigate).not.toHaveBeenCalled()
   })
 
   it('explains an unlinked password account', () => {
