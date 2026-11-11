@@ -14,7 +14,7 @@ export type { StillShot }
  * Bump when the 3D character's look changes (shapes, materials, lighting or framing), so stills
  * kept from an older drawing are thrown away instead of shown.
  */
-export const STILL_VERSION = 1
+export const STILL_VERSION = 2
 const STORE = `avatar3d-stills-v${STILL_VERSION}`
 /** Stills kept between visits. Each is a few kilobytes. */
 const KEEP = 800
@@ -39,8 +39,17 @@ let writes = 0
 function stillKeyOf(config: LobsterAvatarConfig, px: number, shot: StillShot): string {
   const { backgroundTheme: _t, backgroundPattern: _p, backgroundTexture: _x, ...rest } = config as LobsterAvatarConfig & Record<string, unknown>
   const look = shot === 'portrait' ? { ...rest, pose: undefined } : rest
-  const sorted = JSON.stringify(look, Object.keys(look).sort())
-  return `${shot}|${px}|${sorted}`
+  return `${shot}|${px}|${canonical(look)}`
+}
+
+/** JSON with every object's keys in order, at every depth, so equal characters match. */
+function canonical(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`
+  if (value && typeof value === 'object') {
+    const entries = Object.entries(value as Record<string, unknown>).filter(([, v]) => v !== undefined)
+    return `{${entries.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)).map(([k, v]) => `${JSON.stringify(k)}:${canonical(v)}`).join(',')}}`
+  }
+  return JSON.stringify(value) ?? 'null'
 }
 
 function hash(text: string): string {

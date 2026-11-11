@@ -26,6 +26,13 @@ describe('3D still queue', () => {
     expect(readyStill3D(config, 128)).toBe(a)
   })
 
+  it('tells characters apart by what they wear', async () => {
+    const crown = await requestStill3D({ ...config, equipment: { head: { visualKey: 'creator-crown', rarity: 'common' } } }, 128, 'gear:head')
+    const bow = await requestStill3D({ ...config, equipment: { head: { visualKey: 'creator-bow', rarity: 'common' } } }, 128, 'gear:head')
+    expect(renderStill).toHaveBeenCalledTimes(2)
+    expect(crown).toBe(bow) // the mock draws by framing only; what matters is that both were drawn
+  })
+
   it('keeps faces, full figures and gear close-ups apart', async () => {
     await requestStill3D(config, 128, 'portrait')
     await requestStill3D(config, 128, 'full')
