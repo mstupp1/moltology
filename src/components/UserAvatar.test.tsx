@@ -98,7 +98,6 @@ it('prefers a saved equipped character over an account photo', () => {
       }}
     />,
   )
-  const svg = decodeURIComponent(container.querySelector('img')!.src.split(',')[1])
-  expect(svg).toContain('data-race="crab"')
-  expect(svg).toContain('data-equipment="creator-bow"')
+  expect(container.querySelector('img[src="https://example.com/photo.jpg"]')).toBeNull()
+  expect(container.querySelector('[data-renderer="3d"]')).not.toBeNull()
 })

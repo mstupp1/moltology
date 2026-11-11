@@ -31,7 +31,6 @@ import {
   SHELL_MARKINGS,
   SHELL_MARKING_LABELS,
   SHELL_PALETTES,
-  generateLobsterAvatarDataUri,
   rerollAvatarConfig,
   resolveAvatarTraits,
   type AvatarRace,
@@ -40,6 +39,8 @@ import {
 } from '@/lib/lobster-avatar'
 import { EYE_COLOR_SWATCH } from '@/lib/avatar/parts'
 import { HudButton } from '@/components/ui/HudButton'
+import { CharacterStill } from '../avatar3d/CharacterStill'
+import type { StillShot } from '@/lib/avatar3d-portrait-queue'
 
 export interface AvatarCreatorPanelProps {
   value: LobsterAvatarConfig
@@ -130,7 +131,7 @@ function Tile({
   onClick: () => void
   disabled?: boolean
   label: string
-  src: string | null
+  src: TileShot
   /** Face options zoom in on the eyes and mouth. */
   zoom?: boolean
 }) {
@@ -146,18 +147,14 @@ function Tile({
           : 'border-line-subtle bg-surface-2 hover:border-line-hover'
       }`}
     >
-      <span className="block w-full aspect-square rounded-chip bg-abyss/70 overflow-hidden">
-        {src ? (
-          <img
-            src={src}
-            alt=""
-            width={96}
-            height={96}
-            loading="lazy"
-            decoding="async"
-            className={`w-full h-full object-contain transition-transform duration-150 motion-reduce:transition-none ${zoom ? 'scale-[1.45] translate-y-[6%] group-hover:scale-[1.5]' : 'group-hover:scale-105'}`}
-          />
-        ) : null}
+      <span className="relative block w-full aspect-square rounded-chip bg-abyss/70 overflow-hidden">
+        <CharacterStill
+          config={src.config}
+          px={128}
+          shot={src.shot}
+          alt=""
+          imgClassName={`object-contain transition-[opacity,transform] ${zoom ? 'scale-[1.45] translate-y-[6%] group-hover:scale-[1.5]' : 'group-hover:scale-105'}`}
+        />
       </span>
       <span
         className={`text-[11px] leading-tight font-sans text-center ${selected ? 'text-ink font-semibold' : 'text-ink-body'}`}
@@ -198,6 +195,11 @@ function Swatch({
 }
 
 type TileFrame = 'portrait' | 'fullBody'
+/** The character a card shows, and how it is framed. */
+interface TileShot {
+  config: LobsterAvatarConfig
+  shot: StillShot
+}
 
 /**
  * Character creator controls. Every choice is written straight into the config,
@@ -231,14 +233,13 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
     }),
     [value, traits],
   )
-  const tile = (patch: Partial<LobsterAvatarConfig>, frame: TileFrame) =>
-    generateLobsterAvatarDataUri({ ...base, ...patch }, 96, {
-      frame,
-      staticMotion: true,
-    })
+  const tile = (patch: Partial<LobsterAvatarConfig>, frame: TileFrame): TileShot => ({
+    config: { ...base, ...patch } as LobsterAvatarConfig,
+    shot: frame === 'fullBody' ? 'full' : 'portrait',
+  })
 
   const racePreviews = useMemo(() => {
-    const out: Partial<Record<AvatarRace, string | null>> = {}
+    const out: Partial<Record<AvatarRace, TileShot>> = {}
     for (const race of AVATAR_RACES) out[race] = tile({ race }, 'portrait')
     return out
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -263,15 +264,9 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
                     : 'border-line bg-surface-2 hover:border-line-hover'
                 }`}
               >
-                {racePreviews[race] ? (
-                  <img
-                    src={racePreviews[race] ?? undefined}
-                    alt=""
-                    width={44}
-                    height={44}
-                    className="w-11 h-11 rounded-full bg-abyss"
-                  />
-                ) : null}
+                <span className="relative w-11 h-11 shrink-0 rounded-full bg-abyss overflow-hidden">
+                  <CharacterStill config={racePreviews[race]?.config} px={128} alt="" />
+                </span>
                 <span
                   className={`font-sans text-sm font-semibold ${selected ? 'text-cyan-glow' : 'text-ink'}`}
                 >

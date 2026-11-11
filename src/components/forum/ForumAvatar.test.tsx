@@ -1,7 +1,20 @@
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { beforeEach, describe, it, expect, vi } from 'vitest'
+
+const requestStill3D = vi.hoisted(() => vi.fn(() => new Promise<string | null>(() => {})))
+vi.mock('@/lib/avatar3d-portrait-queue', () => ({ requestStill3D, readyStill3D: () => null }))
+
+import { set3DSupportForTests } from '@/lib/avatar3d-support'
 import { ForumAvatar } from './ForumAvatar'
+
+beforeEach(() => {
+  set3DSupportForTests(true)
+  requestStill3D.mockClear()
+})
+
+/** The character the 3D still was asked for. */
+const askedFor = () => (requestStill3D.mock.calls.at(-1) as unknown as [Record<string, unknown>] | undefined)?.[0]
 
 describe('ForumAvatar', () => {
   it('renders custom image when valid http URL is provided', () => {
@@ -21,33 +34,24 @@ describe('ForumAvatar', () => {
     expect(customImg).toHaveAttribute('alt', 'Larva Unit #8971')
   })
 
-  it('falls back to lobster SVG still when src is empty or null', () => {
+  it('falls back to the 3D character still when src is empty or null', () => {
     render(<ForumAvatar src="" authorName="CLAW_LORD_99" authorHandle="claw_lord_99" />)
 
     expect(screen.queryByTestId('forum-avatar-custom-image')).toBeNull()
-    const lobsterImg = screen.getByTestId('forum-avatar-lobster-still')
-    expect(lobsterImg).toBeInTheDocument()
-    expect(lobsterImg.getAttribute('src')?.startsWith('data:image/svg+xml')).toBe(true)
-    expect(lobsterImg).toHaveAttribute('data-slot', 'portrait')
-    expect(lobsterImg.className).not.toContain('scale-[')
-    expect(lobsterImg.className).not.toContain('origin-[')
-    expect(decodeURIComponent(lobsterImg.getAttribute('src') ?? '')).toContain(
-      'data-avatar-slot="portrait"',
-    )
-    expect(screen.queryByTestId('lobster-avatar-inline-svg')).toBeNull()
+    expect(screen.getByTestId('character-still-loading')).toBeInTheDocument()
+    expect(askedFor()).toMatchObject({ seed: 'claw_lord_99' })
     expect(screen.queryByTestId('lobster-avatar-full-body')).toBeNull()
   })
 
-  it('falls back to lobster SVG still when src is /images/stage1_larva.png', () => {
+  it('falls back to the 3D character still when src is /images/stage1_larva.png', () => {
     render(<ForumAvatar src="/images/stage1_larva.png" authorName="ABYSSAL_ARCHITECT" />)
 
     expect(screen.queryByTestId('forum-avatar-custom-image')).toBeNull()
-    const lobsterImg = screen.getByTestId('forum-avatar-lobster-still')
-    expect(lobsterImg).toBeInTheDocument()
-    expect(lobsterImg.getAttribute('src')?.startsWith('data:image/svg+xml')).toBe(true)
+    expect(screen.getByTestId('character-still-loading')).toBeInTheDocument()
+    expect(requestStill3D).toHaveBeenCalled()
   })
 
-  it('falls back to lobster SVG still when custom image errors', () => {
+  it('falls back to the 3D character still when custom image errors', () => {
     render(
       <ForumAvatar src="https://broken-avatar-url.example.com/photo.jpg" authorName="Vaelen" />,
     )
@@ -59,9 +63,8 @@ describe('ForumAvatar', () => {
     fireEvent.error(customImg)
 
     expect(screen.queryByTestId('forum-avatar-custom-image')).toBeNull()
-    const lobsterImg = screen.getByTestId('forum-avatar-lobster-still')
-    expect(lobsterImg).toBeInTheDocument()
-    expect(lobsterImg.getAttribute('src')?.startsWith('data:image/svg+xml')).toBe(true)
+    expect(screen.getByTestId('character-still-loading')).toBeInTheDocument()
+    expect(requestStill3D).toHaveBeenCalled()
   })
 
   it('uses custom avatarConfig if provided', () => {
@@ -77,10 +80,7 @@ describe('ForumAvatar', () => {
       />,
     )
 
-    const lobsterImg = screen.getByTestId('forum-avatar-lobster-still')
-    expect(lobsterImg).toBeInTheDocument()
-    const src = lobsterImg.getAttribute('src') || ''
-    expect(src).toContain('data:image/svg+xml')
+    expect(askedFor()).toMatchObject({ seed: 'kaelith-custom-seed' })
   })
 
   it('applies custom className to the container', () => {
@@ -108,7 +108,7 @@ describe('ForumAvatar', () => {
 })
 
 it('preserves species and equipped items when a character overrides an account photo', () => {
-  const { container } = render(
+  render(
     <ForumAvatar
       src="https://example.com/photo.jpg"
       avatarConfig={{
@@ -121,8 +121,6 @@ it('preserves species and equipped items when a character overrides an account p
       }}
     />,
   )
-  const svg = decodeURIComponent(container.querySelector('img')!.src.split(',')[1])
-  expect(svg).toContain('data-race="crab"')
-  expect(svg).toContain('data-build="chunky"')
-  expect(svg).toContain('data-equipment="creator-crown"')
+  expect(screen.queryByTestId('forum-avatar-custom-image')).toBeNull()
+  expect(askedFor()).toMatchObject({ race: 'crab', build: 'chunky', equipment: { head: { visualKey: 'creator-crown' } } })
 })

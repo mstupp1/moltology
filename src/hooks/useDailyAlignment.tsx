@@ -39,7 +39,8 @@ import {
   type ProgressionState,
 } from '@/lib/progression'
 import { SilentSynchronizationDialog } from '@/components/hud/SilentSynchronizationDialog'
-import { generateLobsterAvatarDataUri, parseLobsterAvatarConfig } from '@/lib/lobster-avatar'
+import { parseLobsterAvatarConfig } from '@/lib/lobster-avatar'
+import { requestPortrait3D } from '@/lib/avatar3d-portrait-queue'
 import { resolveMemberPublicName } from '@/lib/member-handle'
 import { clearGuestAlignment, guestAlignmentFor, saveGuestAlignment } from '@/lib/guest-progress'
 
@@ -126,7 +127,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
       const profile = await getUserProfileFn({ data: { token: token ?? undefined, userId: activeUserId } })
       if (userIdRef.current !== activeUserId) return
       const config = parseLobsterAvatarConfig(profile?.avatarConfig)
-      setSilentAvatarUrl(config ? generateLobsterAvatarDataUri(config, 128, { frame: 'portrait', staticMotion: true }) : sessionImage)
+      setSilentAvatarUrl((config ? await requestPortrait3D(config, 128) : null) ?? sessionImage)
       setSilentAvatarName(resolveMemberPublicName({ userId: activeUserId, handle: profile?.handle, larvaId: profile?.larvaId }))
     } catch {
       if (userIdRef.current !== activeUserId) return

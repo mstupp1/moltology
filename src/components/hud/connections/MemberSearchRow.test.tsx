@@ -23,7 +23,7 @@ const member: MemberSearchResult = {
 }
 
 describe('MemberSearchRow', () => {
-  it('renders a static close-up portrait and does not mount animated full-body', () => {
+  it('renders a 3D portrait still and does not mount a live full body', () => {
     render(
       <MemberSearchRow
         member={member}
@@ -33,10 +33,7 @@ describe('MemberSearchRow', () => {
     )
 
     expect(screen.getByTestId('lobster-avatar-portrait')).toBeInTheDocument()
-    const img = screen.getByTestId('lobster-avatar-portrait-image')
-    expect(img).toBeInTheDocument()
-    expect(decodeURIComponent(img.getAttribute('src') ?? '')).toContain('data-avatar-slot="portrait"')
-    expect(screen.queryByTestId('lobster-avatar-inline-svg')).toBeNull()
+    expect(screen.getByTestId('lobster-avatar-portrait').querySelector('[data-renderer="3d"]')).not.toBeNull()
     expect(screen.queryByTestId('lobster-avatar-full-body')).toBeNull()
   })
 })

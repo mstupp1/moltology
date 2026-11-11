@@ -1,9 +1,9 @@
 import React from 'react'
+import { GearIcon } from '@/components/hud/avatar3d/GearIcon'
 import { Check } from 'lucide-react'
 import { HudBadge } from '@/components/ui/HudBadge'
 import { CATEGORY_LABELS } from '@/lib/chassis-loadout'
 import { RARITY_LABELS } from '@/lib/gear-variants'
-import { equipmentIcon } from '@/lib/lobster-avatar'
 import type { MarketPiece, MarketVariant } from '@/lib/market'
 import {
   MARKET_BUNDLES,
@@ -44,8 +44,7 @@ function Tag({ children }: { children: React.ReactNode }) {
 }
 
 function Icon({ variant, className }: { variant: MarketVariant; className?: string }) {
-  const icon = equipmentIcon(variant.appearanceKey)
-  return icon ? <img src={icon} alt="" className={cn('object-contain', className)} /> : null
+  return <GearIcon appearanceKey={variant.appearanceKey} className={className} />
 }
 
 /** Overlapping icons for a bundle's pieces. */

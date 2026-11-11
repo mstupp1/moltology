@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { GearIcon } from '../avatar3d/GearIcon'
+import { gearStill } from '@/lib/avatar3d-gear-icon'
 import { LocalTime } from '@/components/ui/LocalTime'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Calendar } from 'lucide-react'
@@ -24,7 +26,6 @@ import {
 } from '@/lib/chassis-loadout'
 import { buildVectorSheet, emptyVectors, formatBonus, resolveVectorBase, type VectorBase } from '@/lib/vectors'
 import {
-  equipmentIcon,
   parseLobsterAvatarConfig,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
@@ -156,7 +157,6 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
                 className="w-28 h-28 sm:w-36 sm:h-36"
                 size={256}
                 interactive
-                loading="eager"
               />
             </button>
             <CharacterOverlay
@@ -323,12 +323,12 @@ function HeroStat({ label, children }: { label: string; children: React.ReactNod
 }
 
 function GearRow({ slot, catalog }: { slot: EquipSlotId; catalog?: CatalogRef }) {
-  const icon = catalog ? equipmentIcon(catalog.appearanceKey || catalog.slug) : null
+  const iconKey = catalog ? catalog.appearanceKey || catalog.slug : null
   return (
     <li className="flex items-center gap-3 py-2 first:pt-0 last:pb-0">
       <span className="grid place-items-center w-10 h-10 shrink-0 rounded-control bg-abyss/70 border border-line-subtle">
-        {icon ? (
-          <img src={icon} alt="" className="w-8 h-8 object-contain" />
+        {gearStill(iconKey) ? (
+          <GearIcon appearanceKey={iconKey} className="w-8 h-8" />
         ) : (
           <span className="w-4 h-4 rounded-full border border-dashed border-line" aria-hidden="true" />
         )}

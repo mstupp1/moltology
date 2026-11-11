@@ -1,19 +1,92 @@
 /**
- * Asks for 3D portrait stills without pulling the 3D renderer into every page. The renderer
- * loads on the first request, and faces are drawn one at a time between frames so a long list
- * fills in without freezing the page.
+ * Asks for 3D stills (avatars, creator option cards, gear icons) without pulling the 3D renderer
+ * into every page. Each still is kept in the browser between visits, so a returning member sees
+ * pictures at once and a page of known faces never downloads the renderer at all. New stills are
+ * drawn one at a time between frames, so a long list fills in without freezing the page.
  */
 import { mark3DUnavailable } from './avatar3d-support'
 import type { LobsterAvatarConfig } from './lobster-avatar'
+import type { StillShot } from './avatar3d/portraits'
+
+export type { StillShot }
+
+/**
+ * Bump when the 3D character's look changes (shapes, materials, lighting or framing), so stills
+ * kept from an older drawing are thrown away instead of shown.
+ */
+export const STILL_VERSION = 1
+const STORE = `avatar3d-stills-v${STILL_VERSION}`
+/** Stills kept between visits. Each is a few kilobytes. */
+const KEEP = 800
 
 interface Job {
+  key: string
   config: LobsterAvatarConfig
   px: number
+  shot: StillShot
   resolve: (url: string | null) => void
+  /** How many on-screen pictures still want this one; at 0 it is dropped before it is drawn. */
+  wanted: number
 }
 
 const queue: Job[] = []
+const pending = new Map<string, Promise<string | null>>()
+const ready = new Map<string, string>()
 let running = false
+let writes = 0
+
+/** Same character, same picture: the key ignores field order and anything a still cannot show. */
+function stillKeyOf(config: LobsterAvatarConfig, px: number, shot: StillShot): string {
+  const { backgroundTheme: _t, backgroundPattern: _p, backgroundTexture: _x, ...rest } = config as LobsterAvatarConfig & Record<string, unknown>
+  const look = shot === 'portrait' ? { ...rest, pose: undefined } : rest
+  const sorted = JSON.stringify(look, Object.keys(look).sort())
+  return `${shot}|${px}|${sorted}`
+}
+
+function hash(text: string): string {
+  // FNV-1a over 53 bits: short, stable, and plenty to tell characters apart.
+  let h1 = 0x811c9dc5
+  let h2 = 0x01000193
+  for (let i = 0; i < text.length; i++) {
+    const c = text.charCodeAt(i)
+    h1 = Math.imul(h1 ^ c, 0x01000193)
+    h2 = Math.imul(h2 ^ c, 0x5bd1e995)
+  }
+  return ((h2 >>> 0) * 0x200000 + ((h1 >>> 0) & 0x1fffff)).toString(36)
+}
+
+function storeUrl(key: string): string {
+  return `${location.origin}/__avatar3d-still/${hash(key)}`
+}
+
+async function openStore(): Promise<Cache | null> {
+  try {
+    return typeof caches === 'undefined' ? null : await caches.open(STORE)
+  } catch {
+    return null
+  }
+}
+
+async function readKept(key: string): Promise<string | null> {
+  const store = await openStore()
+  const hit = await store?.match(storeUrl(key)).catch(() => undefined)
+  return hit ? hit.text().catch(() => null) : null
+}
+
+async function keep(key: string, url: string): Promise<void> {
+  const store = await openStore()
+  if (!store) return
+  try {
+    await store.put(storeUrl(key), new Response(url, { headers: { 'content-type': 'text/plain' } }))
+    // Now and then, drop the oldest stills so the store stays small.
+    if (++writes % 40 === 0) {
+      const keys = await store.keys()
+      for (const old of keys.slice(0, Math.max(0, keys.length - KEEP))) await store.delete(old)
+    }
+  } catch {
+    // Storage full or blocked: the still just is not kept.
+  }
+}
 
 /** Wait for the browser to have a spare moment, so scrolling and typing stay smooth. */
 function breathe(): Promise<void> {
@@ -26,13 +99,19 @@ function breathe(): Promise<void> {
 async function run(): Promise<void> {
   running = true
   try {
-    const { Avatar3DUnavailable, lookFromConfig, renderPortrait } = await import('./avatar3d')
+    const { Avatar3DUnavailable, lookFromConfig, renderStill } = await import('./avatar3d')
     while (queue.length) {
       const job = queue.shift()!
+      if (job.wanted <= 0) {
+        job.resolve(null)
+        continue
+      }
       try {
-        job.resolve(renderPortrait(lookFromConfig(job.config), job.px))
+        const url = renderStill(lookFromConfig(job.config), job.px, job.shot)
+        job.resolve(url)
+        void keep(job.key, url)
       } catch (error) {
-        // The caller keeps its 2D portrait. If 3D would not start at all, so does everything else.
+        // If 3D would not start at all, every picture falls back to its placeholder.
         if (error instanceof Avatar3DUnavailable) mark3DUnavailable()
         job.resolve(null)
       }
@@ -45,10 +124,62 @@ async function run(): Promise<void> {
   }
 }
 
+/** A still drawn this visit, ready to show on the first render. */
+export function readyStill3D(config: LobsterAvatarConfig, px: number, shot: StillShot = 'portrait'): string | null {
+  return ready.get(stillKeyOf(config, px, shot)) ?? null
+}
+
+const interest = new Map<string, number>()
+
+/**
+ * A 3D still of this character, or null when 3D is not available. Pass a signal to say the
+ * picture is no longer wanted (it scrolled away, or the character changed): a still nobody wants
+ * any more is skipped instead of drawn, so quick edits never queue up stale pictures.
+ */
+export function requestStill3D(config: LobsterAvatarConfig, px: number, shot: StillShot = 'portrait', signal?: AbortSignal): Promise<string | null> {
+  const key = stillKeyOf(config, px, shot)
+  const done = ready.get(key)
+  if (done) return Promise.resolve(done)
+  interest.set(key, (interest.get(key) ?? 0) + 1)
+  const queued = queue.find((j) => j.key === key)
+  if (queued) queued.wanted = interest.get(key)!
+  signal?.addEventListener('abort', () => {
+    if (!interest.has(key)) return
+    const left = interest.get(key)! - 1
+    interest.set(key, left)
+    const job = queue.find((j) => j.key === key)
+    if (job) job.wanted = left
+  }, { once: true })
+  const waiting = pending.get(key)
+  if (waiting) return waiting
+  const promise = (async () => {
+    const kept = await readKept(key)
+    const url =
+      kept ??
+      (await new Promise<string | null>((resolve) => {
+        queue.push({ key, config, px, shot, resolve, wanted: interest.get(key) ?? 1 })
+        if (!running) void run()
+      }))
+    pending.delete(key)
+    interest.delete(key)
+    if (url) {
+      ready.set(key, url)
+      if (ready.size > 400) ready.delete(ready.keys().next().value as string)
+    }
+    return url
+  })()
+  pending.set(key, promise)
+  return promise
+}
+
 /** A head-and-shoulders still of this character in 3D, or null when 3D is not available. */
 export function requestPortrait3D(config: LobsterAvatarConfig, px: number): Promise<string | null> {
-  return new Promise((resolve) => {
-    queue.push({ config, px, resolve })
-    if (!running) void run()
-  })
+  return requestStill3D(config, px, 'portrait')
+}
+
+export function resetStillsForTests(): void {
+  queue.length = 0
+  pending.clear()
+  interest.clear()
+  ready.clear()
 }

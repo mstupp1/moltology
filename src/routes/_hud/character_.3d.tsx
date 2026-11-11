@@ -8,7 +8,7 @@ const LazyAvatar3DLab = lazy(() => import('@/components/hud/avatar3d/Avatar3DLab
 
 function Character3DRoute() {
   return (
-    <HiddenPageGuard experiment="avatar-3d" skeleton={<HudWorkspaceGhost />}>
+    <HiddenPageGuard skeleton={<HudWorkspaceGhost />}>
       <Suspense fallback={<HudWorkspaceGhost />}>
         <LazyAvatar3DLab />
       </Suspense>

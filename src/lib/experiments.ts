@@ -16,10 +16,6 @@ export const EXPERIMENTS = {
     title: 'Molt Credits',
     description: 'Buy Molt Credit packs in the market with Stripe. Members see them as coming soon.',
   },
-  'avatar-3d': {
-    title: '3D character',
-    description: 'Preview the 3D character builder at /character/3d. Your saved character and everyone else stay on the current look.',
-  },
   'new-store': {
     title: 'New store',
     description: 'Open the on-site store and checkout. Store links use Etsy while this is off.',

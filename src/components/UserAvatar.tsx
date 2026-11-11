@@ -1,11 +1,7 @@
-import {
-  generateLobsterAvatarDataUri,
-  parseLobsterAvatarConfig,
-  type LobsterAvatarConfig,
-} from '@/lib/lobster-avatar'
-import React, { useState, useEffect, useRef } from 'react'
-import { usePortrait3D } from '@/hooks/usePortrait3D'
+import { parseLobsterAvatarConfig, type LobsterAvatarConfig } from '@/lib/lobster-avatar'
+import React, { useState, useEffect } from 'react'
 import { BrandAwareImage } from '@/components/ui/BrandMark'
+import { CharacterStill } from '@/components/hud/avatar3d/CharacterStill'
 
 export interface UserAvatarProps {
   user?: {
@@ -51,13 +47,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
     const [imageError, setImageError] = useState(false)
 
     const character = parseLobsterAvatarConfig(config ?? user?.avatarConfig)
-    const portrait = character
-      ? generateLobsterAvatarDataUri(character, 128, { frame: 'portrait', staticMotion: true })
-      : null
-    // Viewers who see characters in 3D get the 3D face here too, once it is drawn.
-    const frameRef = useRef<HTMLDivElement>(null)
-    const portrait3D = usePortrait3D(character, 128, frameRef)
-    const imageUrl = portrait3D?.url ?? portrait ?? src ?? user?.image ?? user?.avatar ?? user?.picture ?? null
+    const imageUrl = src ?? user?.image ?? user?.avatar ?? user?.picture ?? null
     const displayName = name ?? user?.name ?? email ?? user?.email ?? ''
     const displayAlt = alt ?? displayName ?? 'User avatar'
 
@@ -87,13 +77,19 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
       return '?'
     }
 
-    // 1. Primary Avatar Image (e.g. Google SSO profile picture)
+    // 1. The member's character, as a still of the 3D face.
+    if (character) {
+      return (
+        <div className={`relative shrink-0 rounded-full overflow-hidden bg-abyss ${sizeClasses} ${className}`}>
+          <CharacterStill config={character} px={128} alt={displayAlt} scene imgClassName="rounded-full" />
+        </div>
+      )
+    }
+
+    // 2. A sign-in profile picture (e.g. Google)
     if (imageUrl && !imageError) {
       return (
         <div
-          ref={frameRef}
-          data-renderer={portrait3D ? '3d' : undefined}
-          style={portrait3D?.scene}
           className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-[#030606] ${sizeClasses} ${className}`}
         >
           <BrandAwareImage

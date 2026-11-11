@@ -334,7 +334,8 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       draw(0, time)
     },
     character: () => character,
-    snapshot: () => canvas.toDataURL('image/png'),
+    // WebP where the browser can write it (much smaller, keeps transparency); PNG elsewhere.
+    snapshot: () => canvas.toDataURL('image/webp', 0.9),
     dispose() {
       disposed = true
       cancelAnimationFrame(raf)

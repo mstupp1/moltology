@@ -1,4 +1,5 @@
 import React from 'react'
+import { GearIcon } from '@/components/hud/avatar3d/GearIcon'
 import { Link } from '@tanstack/react-router'
 import { Check } from 'lucide-react'
 import type { EquipmentRarity } from '@/db/schema'
@@ -11,7 +12,7 @@ import {
   type LoadoutTotals,
 } from '@/lib/chassis-loadout'
 import { RARITY_LABELS } from '@/lib/gear-variants'
-import { equipmentIcon, type LobsterAvatarConfig } from '@/lib/lobster-avatar'
+import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import type { MarketPiece, MarketVariant } from '@/lib/market'
 import { cn } from '@/lib/utils'
 import { LobsterAvatarFullBody } from '../LobsterAvatarFullBody'
@@ -49,7 +50,6 @@ export function MarketPieceCard({
   selected: boolean
   onSelect: () => void
 }) {
-  const icon = equipmentIcon(shown.appearanceKey)
   const style = RARITY_FRAME[shown.rarity]
   return (
     <button
@@ -64,13 +64,11 @@ export function MarketPieceCard({
       )}
     >
       <span className="relative grid place-items-center w-full aspect-square rounded-control bg-abyss/70 overflow-hidden">
-        {icon ? (
-          <img
-            src={icon}
-            alt=""
-            className="w-4/5 h-4/5 object-contain transition-transform duration-200 group-hover:scale-105 motion-reduce:transition-none"
-          />
-        ) : null}
+        <GearIcon
+          appearanceKey={shown.appearanceKey}
+          className="!absolute inset-0"
+          imgClassName="transition-[opacity,transform] duration-200 group-hover:scale-105"
+        />
         {shown.owned ? (
           <span className="absolute top-1.5 right-1.5 inline-flex items-center gap-1 rounded-chip bg-surface-3 px-1 sm:px-1.5 py-0.5 text-[11px] font-semibold text-ink">
             <Check className="w-3 h-3" aria-hidden="true" />
@@ -161,9 +159,7 @@ export function MarketPieceDetail({
           />
         ) : (
           <div className="grid place-items-center aspect-square">
-            {equipmentIcon(shown.appearanceKey) ? (
-              <img src={equipmentIcon(shown.appearanceKey)!} alt="" className="w-3/4 h-3/4 object-contain" />
-            ) : null}
+            <GearIcon appearanceKey={shown.appearanceKey} className="w-full h-full" />
           </div>
         )}
       </div>

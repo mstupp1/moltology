@@ -12,13 +12,15 @@ export interface Avatar3DStageProps {
   label?: string
   /** A gear slot to glide in on, or null for the whole figure. */
   focus?: string | null
+  /** Called once the first frame of the character is on screen. */
+  onReady?: () => void
 }
 
 /**
  * Live 3D character. The renderer loads only in the browser and only when this mounts, so pages
  * that never show a 3D character never download it.
  */
-export function Avatar3DStage({ look, spin = false, className, label, focus = null }: Avatar3DStageProps) {
+export function Avatar3DStage({ look, spin = false, className, label, focus = null, onReady }: Avatar3DStageProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const stageRef = useRef<Stage | null>(null)
   const lookRef = useRef(look)
@@ -27,6 +29,8 @@ export function Avatar3DStage({ look, spin = false, className, label, focus = nu
   lookRef.current = look
   spinRef.current = spin
   focusRef.current = focus
+  const readyRef = useRef(onReady)
+  readyRef.current = onReady
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -38,7 +42,7 @@ export function Avatar3DStage({ look, spin = false, className, label, focus = nu
     void import('@/lib/avatar3d')
       .then(({ createStage }) => {
         if (cancelled) return
-        // If the browser takes 3D away, the page goes back to the 2D character.
+        // If the browser takes 3D away, the page shows the plain placeholder instead.
         const stage = createStage(canvas, { interactive: true, reducedMotion, onContextLost: mark3DUnavailable })
         stage.setLook(lookRef.current)
         stage.setSpin(spinRef.current && !reducedMotion ? 0.5 : 0)
@@ -49,6 +53,10 @@ export function Avatar3DStage({ look, spin = false, className, label, focus = nu
         // Nothing is drawn while the character is scrolled out of view.
         watcher = new IntersectionObserver(([entry]) => stage.setActive(entry.isIntersecting))
         watcher.observe(canvas)
+        // The stage draws on the next animation frame; say so once that frame is up.
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          if (!cancelled) readyRef.current?.()
+        }))
       })
       .catch(() => mark3DUnavailable())
     return () => {

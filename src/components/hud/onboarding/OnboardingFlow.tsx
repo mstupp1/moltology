@@ -11,7 +11,6 @@ import {
   saveLobsterAvatarFn,
 } from '@/lib/server/api'
 import {
-  clearCachedProfileAvatarUrl,
   lockAvatarConfig,
   LOBSTER_AVATAR_STYLE,
   parseLobsterAvatarConfig,
@@ -194,7 +193,6 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
       const [avatar] = await Promise.allSettled([
         saveLobsterAvatarFn({ data: { ...config, userId, token } }),
       ])
-      clearCachedProfileAvatarUrl(userId)
       window.dispatchEvent(new CustomEvent('profile-avatar-changed'))
 
       if (avatar.status === 'rejected') {

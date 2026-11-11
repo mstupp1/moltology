@@ -7,14 +7,14 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-11-09",
+  "syncedAt": "2026-11-11",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
     "rules": 127,
     "decisions": 55,
     "anchors": 247,
-    "drifted": 44,
+    "drifted": 47,
     "flagged": 9
   },
   "canvas": {
@@ -852,24 +852,28 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/avatar/equipment.ts",
           "symbol": "EQUIPMENT_VISUALS",
-          "line": 65,
+          "line": 62,
           "value": "Object.fromEntries( rows.map(([key, category, material, trim, accent, construction, motif, accessory]) => [ key, { key, category, material, trim, accent, const…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/equipment.ts#L65"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/equipment.ts#L62"
         },
         {
-          "file": "src/lib/avatar/races.ts",
-          "symbol": "renderCharacter",
-          "line": 989,
-          "value": "renderCharacter(spec, ctx)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/races.ts#L989"
+          "file": "src/lib/avatar3d/character.ts",
+          "symbol": "buildCharacter",
+          "line": 134,
+          "value": "buildCharacter(look)",
+          "drift": "unverified",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d/character.ts#L134"
         }
       ],
       "tests": [
         {
           "file": "src/lib/character-appearance.test.ts",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/character-appearance.test.ts"
+        },
+        {
+          "file": "src/lib/avatar3d/character.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d/character.test.ts"
         },
         {
           "file": "src/components/hud/chassis/ChassisStatusPage.test.tsx",
@@ -889,7 +893,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 656,
         "y": 388
       },
-      "drift": "ok"
+      "drift": "unverified"
     },
     {
       "id": "progression.daily-liturgies",
@@ -947,10 +951,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/hooks/useDailyAlignment.tsx",
           "symbol": "AlignmentProvider",
-          "line": 83,
+          "line": 84,
           "value": "AlignmentProvider({ children })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useDailyAlignment.tsx#L83"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useDailyAlignment.tsx#L84"
         }
       ],
       "tests": [
@@ -1799,10 +1803,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-server.ts",
           "symbol": "auth",
-          "line": 105,
+          "line": 106,
           "value": "betterAuth({ baseURL, secret: getAuthSecret(), database: drizzleAdapter(getDb(), { provider: 'pg', camelCase: true, transaction: false, schema: { user: authUse…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L105"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L106"
         }
       ],
       "tests": [
@@ -1878,10 +1882,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-server.ts",
           "symbol": "auth.minPasswordLength",
-          "line": 122,
+          "line": 123,
           "value": "MIN_PASSWORD_LENGTH",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L122"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L123"
         },
         {
           "file": "src/lib/auth-config.ts",
@@ -2023,10 +2027,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-server.ts",
           "symbol": "ACCOUNT_LINKING_OPTIONS",
-          "line": 95,
+          "line": 96,
           "value": "{ enabled: true, trustedProviders: ['google'] as const, requireLocalEmailVerified: true, }",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L95"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L96"
         }
       ],
       "tests": [
@@ -2108,10 +2112,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-server.ts",
           "symbol": "getAuthApiErrorUrl",
-          "line": 101,
+          "line": 102,
           "value": "getAuthApiErrorUrl(origin)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L101"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L102"
         }
       ],
       "tests": [
@@ -6215,10 +6219,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/lobster-avatar.ts",
           "symbol": "parseLobsterAvatarConfig",
-          "line": 270,
+          "line": 267,
           "value": "parseLobsterAvatarConfig(raw)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar.ts#L270"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar.ts#L267"
         },
         {
           "file": "src/lib/avatar/config-schema.ts",
@@ -6254,24 +6258,28 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "data.avatar-portraits",
       "domain": "data",
-      "title": "Painted portraits retired",
+      "title": "Every character picture is the 3D character",
       "kind": "invariant",
-      "status": "deprecated",
-      "statement": "Portraits and full-body avatars compose the same drawn character and equipped visual snapshot. Saved painted portrait keys cannot select the retired renderer, and no painted portraits are generated or uploaded.",
+      "status": "active",
+      "statement": "Full-body characters render live in 3D, and portraits, creator option cards and gear icons are stills of the same 3D character, drawn in the browser and kept between visits. There is no 2D drawing; while a picture loads a loader shows, and a browser without 3D shows a plain silhouette. No portraits are generated or uploaded on the server.",
       "anchors": [
         {
-          "file": "src/lib/lobster-avatar-slots.ts",
-          "symbol": "resolveLobsterAvatarAssets",
-          "line": 71,
-          "value": "resolveLobsterAvatarAssets(config, options)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar-slots.ts#L71"
+          "file": "src/lib/avatar3d-portrait-queue.ts",
+          "symbol": "requestStill3D",
+          "line": 139,
+          "value": "requestStill3D(config, px, shot, signal)",
+          "drift": "unverified",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d-portrait-queue.ts#L139"
         }
       ],
       "tests": [
         {
-          "file": "src/lib/lobster-avatar-slots.test.ts",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar-slots.test.ts"
+          "file": "src/components/hud/LobsterAvatarPortrait.test.tsx",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/LobsterAvatarPortrait.test.tsx"
+        },
+        {
+          "file": "src/components/hud/LobsterAvatarFullBody.test.tsx",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/LobsterAvatarFullBody.test.tsx"
         }
       ],
       "dependsOn": [
@@ -6288,7 +6296,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 364
       },
-      "drift": "ok"
+      "drift": "unverified"
     },
     {
       "id": "data.character-atomic-save",
@@ -6361,18 +6369,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/components/UserAvatar.tsx",
           "symbol": "UserAvatar",
-          "line": 36,
+          "line": 33,
           "value": "React.memo( ({ user, config, src, name, email, fallbackSrc, fallbackLetter, size = 'md', className = '', alt, borderless = false, }) => { const [imageError, se…",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/UserAvatar.tsx#L36"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/UserAvatar.tsx#L33"
         },
         {
           "file": "src/components/forum/ForumAvatar.tsx",
           "symbol": "ForumAvatar",
-          "line": 62,
+          "line": 58,
           "value": "React.memo(({ src, authorName, authorHandle, userId, avatarConfig, size = 'md', className, alt, loading = 'lazy', }) => { const [imageError, setImageError] = u…",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/forum/ForumAvatar.tsx#L62"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/forum/ForumAvatar.tsx#L58"
         }
       ],
       "tests": [

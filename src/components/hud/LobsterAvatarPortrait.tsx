@@ -1,113 +1,47 @@
-import React, { useMemo, useRef } from 'react'
-import { usePortrait3D } from '@/hooks/usePortrait3D'
-import {
-  LOBSTER_AVATAR_STYLE,
-  generateLobsterAvatarDataUri,
-  type LobsterAvatarConfig,
-} from '@/lib/lobster-avatar'
-import {
-  normalizePortraitSourcePx,
-  pickLobsterAvatarSlot,
-  resolveLobsterAvatarAssets,
-} from '@/lib/lobster-avatar-slots'
-import { LobsterAvatarDisplay } from './LobsterAvatarDisplay'
+import React, { useMemo } from 'react'
+import { LOBSTER_AVATAR_STYLE, type LobsterAvatarConfig } from '@/lib/lobster-avatar'
+import { CharacterStill } from './avatar3d/CharacterStill'
 import { LobsterAvatarSilhouette } from './LobsterAvatarSilhouette'
 
-/** Upper-body / face crop for critters full-body sprites in a circular frame */
-const PORTRAIT_FACE_CLASSES = 'scale-[1.3] origin-[center_38%] object-[center_42%]'
-
 export interface LobsterAvatarPortraitProps {
-  /** Pre-generated still (portrait slot or SSO image) or data URI */
-  src?: string | null
-  /** Generate an avatar after mount from config (SSR-safe) */
   config?: LobsterAvatarConfig | null
-  /** Requested source px; clamped to the two shipped sizes (128 / 256) or render resolution. */
+  /** Requested source px; drawn at 128 or 256. */
   size?: number
   alt?: string
   /** Outer frame diameter, e.g. w-48 h-48 */
   className?: string
-  /** Subtle hover scale on the sprite */
+  /** Subtle hover scale on the face */
   interactive?: boolean
-  animationSeed?: string
+  /** A seed to draw a stand-in character from when there is no saved one. */
   fallbackSeed?: string
   /** Enable foreground optical lens vignette (default true) */
   vignette?: boolean
   specularSheen?: boolean
-  /** Enable spherical fisheye lens curvature & chromatic refraction (default true) */
+  /** Lens glow around the rim (default true) */
   fisheyeLens?: boolean
-  /** Lazy-load below the fold. Eager is OK for the signed-in user's own HUD face. */
-  loading?: 'lazy' | 'eager'
-  /**
-   * When true, renders the animated bathysphere porthole with live idle motion and eye tracking.
-   * When false (default), renders the static face-focused portrait image.
-   */
-  animated?: boolean
 }
 
 /**
- * Circular, face-focused lobster portrait — canonical porthole avatar for settings, chassis, and HUD surfaces.
- * Supports both static crisp portrait rendering (for lists and HUD chrome) and full moving bathysphere
- * animation with eye tracking and idle breathing (for character creation, settings, and member profiles).
+ * Circular, face-focused portrait: the canonical porthole avatar for settings, chassis, lists and
+ * HUD surfaces. The face is a still of the 3D character, drawn when it scrolls into view.
  */
 export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React.memo(({
-  src,
   config,
   size = 256,
   alt = 'Carapace avatar',
   className = 'w-48 h-48 sm:w-56 sm:h-56',
   interactive = false,
-  animationSeed,
   fallbackSeed,
   vignette = true,
   specularSheen = true,
   fisheyeLens = true,
-  loading = 'lazy',
-  animated = false,
 }) => {
   const effectiveConfig = useMemo((): LobsterAvatarConfig | null => {
     if (config?.seed) return config
-    if (fallbackSeed?.trim()) {
-      return {
-        style: config?.style || LOBSTER_AVATAR_STYLE,
-        seed: fallbackSeed.trim(),
-        ...(config?.height ? { height: config.height } : {}),
-        ...(config?.armScale ? { armScale: config.armScale } : {}),
-        ...(config?.backgroundTheme ? { backgroundTheme: config.backgroundTheme } : {}),
-        ...(config?.backgroundPattern ? { backgroundPattern: config.backgroundPattern } : {}),
-        ...(config?.backgroundTexture ? { backgroundTexture: config.backgroundTexture } : {}),
-      }
-    }
+    if (fallbackSeed?.trim()) return { ...config, style: config?.style || LOBSTER_AVATAR_STYLE, seed: fallbackSeed.trim() }
     return null
   }, [config, fallbackSeed])
-
-  const resolvedSeed = animationSeed ?? effectiveConfig?.seed
-  const sourcePx = normalizePortraitSourcePx(size)
-
-  const animatedUri = useMemo(() => {
-    if (!animated) return null
-    if (src) return src
-    if (!effectiveConfig?.seed) return null
-    return generateLobsterAvatarDataUri(effectiveConfig, size, {
-      frame: 'fullBody',
-      staticMotion: false,
-    })
-  }, [animated, src, effectiveConfig, size])
-
-  const staticPortraitUrl = useMemo(() => {
-    if (animated) return null
-    if (src) return src
-    if (!effectiveConfig?.seed) return null
-    const assets = resolveLobsterAvatarAssets(effectiveConfig, { portraitSize: sourcePx })
-    const picked = pickLobsterAvatarSlot(assets, 'portrait')
-    return picked?.slot === 'portrait' ? picked.url : null
-  }, [animated, src, effectiveConfig, sourcePx])
-
-  // Viewers with the 3D experiment on get a still drawn from the 3D character. The 2D portrait
-  // stays up until that still is ready, and for good if this browser cannot draw 3D.
-  const frameRef = useRef<HTMLDivElement>(null)
-  const portrait3D = usePortrait3D(src ? null : effectiveConfig, sourcePx, frameRef)
-  const still3D = portrait3D?.url ?? null
-  const scene3D = portrait3D?.scene
+  const sourcePx = size > 128 ? 256 : 128
 
   const portraitClassName = useMemo(
     () =>
@@ -121,79 +55,26 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
 
   return (
     <div
-      ref={frameRef}
       className={portraitClassName}
       data-testid="lobster-avatar-portrait"
       data-slot="portrait"
-      data-animated={animated ? 'true' : 'false'}
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(0,195,255,0.2)_0%,rgba(0,195,255,0.05)_55%,transparent_75%)] pointer-events-none z-0" />
 
-      {still3D ? (
-        <div data-testid="portrait-fisheye-container" data-renderer="3d" style={scene3D} className="relative z-10 flex h-full w-full items-center justify-center overflow-hidden">
-          <img
-            src={still3D}
-            alt={alt}
-            width={sourcePx}
-            height={sourcePx}
-            decoding="async"
-            data-testid="lobster-avatar-portrait-image"
-            className={`h-full w-full object-cover ${interactive ? 'transition-transform duration-300 group-hover:scale-[1.03]' : ''}`}
-          />
-        </div>
-      ) : animated && animatedUri ? (
-        <div
-          data-testid="portrait-fisheye-container"
-          className={`relative z-10 w-full h-full flex items-center justify-center overflow-hidden ${
-            fisheyeLens ? 'scale-[1.06] [filter:url(#benthic-fisheye-disp)]' : ''
-          }`}
-        >
-          <LobsterAvatarDisplay
-            src={animatedUri}
-            alt={alt}
-            pixelated={false}
-            crt={false}
-            outputSize={size}
-            maskRadial={false}
-            animationSeed={resolvedSeed}
-            texture={effectiveConfig?.backgroundTexture}
-            containerClassName={`relative w-full h-full flex items-start justify-center overflow-hidden ${
-              interactive ? 'transition-transform duration-300 group-hover:scale-[1.03]' : ''
-            }`}
-            className="w-full h-full overflow-hidden"
-            imgClassName={`w-full h-full object-cover brightness-[0.96] contrast-[1.12] saturate-[1.15] ${PORTRAIT_FACE_CLASSES}`}
-          />
-        </div>
-      ) : !animated && staticPortraitUrl ? (
-        <div
-          data-testid="portrait-fisheye-container"
-          className={`relative z-10 w-full h-full flex items-center justify-center overflow-hidden ${
-            fisheyeLens ? 'scale-[1.06] [filter:url(#benthic-fisheye-disp)]' : ''
-          }`}
-        >
-          <img
-            src={staticPortraitUrl}
-            alt={alt}
-            width={sourcePx}
-            height={sourcePx}
-            loading={loading}
-            decoding="async"
-            data-testid="lobster-avatar-portrait-image"
-            className={`w-full h-full object-cover brightness-[0.96] contrast-[1.12] saturate-[1.15] ${
-              interactive ? 'transition-transform duration-300 group-hover:scale-[1.03]' : ''
-            }`}
-          />
-        </div>
-      ) : (
-        <div
-          data-testid="portrait-fisheye-container"
-          className={`relative z-10 w-full h-full flex items-center justify-center overflow-hidden ${
-            fisheyeLens ? 'scale-[1.06] [filter:url(#benthic-fisheye-disp)]' : ''
-          }`}
-        >
-          <LobsterAvatarSilhouette alt={alt || 'Uncalibrated carapace silhouette'} />
-        </div>
-      )}
+      <div data-testid="portrait-fisheye-container" className="relative z-10 h-full w-full">
+        <CharacterStill
+          config={effectiveConfig}
+          px={sourcePx}
+          alt={alt}
+          scene
+          imgClassName={interactive ? 'duration-300 group-hover:scale-[1.03] transition-[opacity,transform]' : undefined}
+          placeholder={
+            <span className="flex h-full w-full items-center justify-center">
+              <LobsterAvatarSilhouette alt={alt || 'Uncalibrated carapace silhouette'} />
+            </span>
+          }
+        />
+      </div>
 
       {fisheyeLens && (
         <>
