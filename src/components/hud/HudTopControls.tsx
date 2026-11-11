@@ -21,6 +21,8 @@ export interface HudTopControlsProps {
   userRole?: string | null
   displayName?: string | null
   isSessionPending: boolean
+  /** Waiting friend requests, shown on the Profile link in the account menu. */
+  pendingFriendRequests?: number
   onNavigate: (path: string) => void
   onSignUp: () => void
 }
@@ -40,6 +42,7 @@ export function HudTopControls({
   userRole,
   displayName,
   isSessionPending,
+  pendingFriendRequests = 0,
   onNavigate,
   onSignUp,
 }: HudTopControlsProps) {
@@ -60,6 +63,7 @@ export function HudTopControls({
       user={user}
       userRole={userRole}
       displayName={displayName}
+      pendingFriendRequests={pendingFriendRequests}
       onNavigate={onNavigate}
     />
   ) : (

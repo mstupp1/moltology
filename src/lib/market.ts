@@ -92,3 +92,11 @@ export function buildMarketPieces(
       variants: piece.variants.sort((a, b) => RARITY_ORDER.indexOf(a.rarity) - RARITY_ORDER.indexOf(b.rarity)),
     }))
 }
+
+/** Balances shown in the avatar menu. */
+export interface WalletBalances {
+  gems: number
+  credits: number
+  /** False until Molt Credit purchases open for this member. */
+  creditsLive: boolean
+}

@@ -33,6 +33,14 @@ export const getGemWalletFn = createServerFn({ method: 'POST' })
     return getGemWalletHandler(args)
   })
 
+export const getWalletBalancesFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { token?: string }) => z.object({ token: z.string().optional() }).parse(data))
+  .handler(async (args) => {
+    const { getWalletBalancesHandler } = await import('./market')
+    return getWalletBalancesHandler(args)
+  })
+
 export const getMarketFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: { token?: string }) => z.object({ token: z.string().optional() }).parse(data))

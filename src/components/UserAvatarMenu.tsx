@@ -2,7 +2,7 @@ import { getUserProfileFn } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { parseLobsterAvatarConfig } from '@/lib/lobster-avatar'
 import React, { useState, useRef, useEffect } from 'react'
-import { LogOut, ChevronDown, ChevronsUpDown, Settings } from 'lucide-react'
+import { LogOut, ChevronDown, ChevronsUpDown, CircleUser, Settings } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { beginSignOut, endSignOut } from '@/lib/auth-session'
 import { UserAvatar } from './UserAvatar'
@@ -149,6 +149,11 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
     onNavigate?.('/settings')
   }
 
+  const handleOpenProfile = () => {
+    handleClose()
+    onNavigate?.('/profile')
+  }
+
 
 
   const displayName = displayNameProp || user.name || user.email?.split('@')[0] || 'Operative'
@@ -265,7 +270,16 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           >
             <div className="overflow-hidden">
               <div className="pt-2 pb-1 space-y-2">
-                {/* Account Actions Section: Settings & Sign Out */}
+                {/* Account Actions Section: Profile, Settings & Sign Out */}
+                <button
+                  type="button"
+                  onClick={handleOpenProfile}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer text-ink-body hover:text-ink bg-surface-1 hover:bg-surface-2 border border-line-subtle hover:border-line focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                >
+                  <CircleUser className="w-4 h-4 shrink-0" />
+                  <span>PROFILE</span>
+                </button>
+
                 {/* Settings Link */}
                 <button
                   type="button"
@@ -392,8 +406,16 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             </div>
           </div>
 
-          {/* Account Actions Section: Settings & Sign Out */}
+          {/* Account Actions Section: Profile, Settings & Sign Out */}
           <div className="pt-3 space-y-1.5">
+            <button
+              type="button"
+              onClick={handleOpenProfile}
+              className="w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            >
+              <CircleUser className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow" />
+              <span>PROFILE</span>
+            </button>
             <button
               type="button"
               onClick={handleOpenSettings}

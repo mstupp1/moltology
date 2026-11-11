@@ -4,7 +4,7 @@ import { equipmentCatalog, gearUnlocks, profiles, userGearItems } from '../../db
 import { getEquipmentVisual } from '../avatar/equipment'
 import { STARTER_EQUIPMENT_CATALOG_IDS } from '../equipment-seed-data'
 import { GEAR_PRICES } from '../gear-variants'
-import { buildMarketPieces, type BuyGearResult, type MarketPayload } from '../market'
+import { buildMarketPieces, type BuyGearResult, type MarketPayload, type WalletBalances } from '../market'
 import { isAdmin } from '../permissions'
 import { balanceRefresh, getGemWallet } from './gems'
 import { canBuyCredits, creditBalanceRefresh } from './molt-credits'
@@ -113,6 +113,31 @@ export async function addGearFree(db: Db, userId: string, catalogItemId: string)
   if (!STARTER.has(item.id))
     await db.insert(gearUnlocks).values({ userId, catalogItemId: item.id, source: 'admin' }).onConflictDoNothing()
   return { ok: true, balance, credits }
+}
+
+/** Gem and credit balances for the avatar menu: one profile row, no ledger or catalog reads. */
+export async function getWalletBalances(db: Db, userId: string): Promise<WalletBalances> {
+  const [row] = await db
+    .select({
+      gems: profiles.chitinGems,
+      credits: profiles.moltCredits,
+      role: profiles.role,
+      experiments: profiles.experiments,
+    })
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+  return {
+    gems: Math.max(0, Number(row?.gems ?? 0)),
+    credits: Math.max(0, Number(row?.credits ?? 0)),
+    creditsLive: canBuyCredits(row?.role, row?.experiments),
+  }
+}
+
+export async function getWalletBalancesHandler(args: { data?: { token?: string }; context?: WriteAuthContext }) {
+  const auth = await resolveWriteAuth(args)
+  if (!auth) throw new Error('Authentication required.')
+  return getWalletBalances(auth.dbClient, auth.userId)
 }
 
 export async function getMarketHandler(args: { data?: { token?: string }; context?: WriteAuthContext }) {

@@ -23,10 +23,12 @@ vi.mock('@/lib/auth-client', () => ({
 
 const mockGetUserProfileFn = vi.fn().mockResolvedValue(null)
 const mockCountPendingFn = vi.fn().mockResolvedValue({ incoming: 0 })
+const mockGetWalletBalancesFn = vi.fn().mockResolvedValue({ gems: 100, credits: 0, creditsLive: false })
 
 vi.mock('../../lib/server/api', () => ({
   getUserProfileFn: (...args: unknown[]) => mockGetUserProfileFn(...args),
   countPendingFriendRequestsFn: (...args: unknown[]) => mockCountPendingFn(...args),
+  getWalletBalancesFn: (...args: unknown[]) => mockGetWalletBalancesFn(...args),
 }))
 
 const mockGetPremiumMembershipFn = vi.fn()
@@ -96,7 +98,8 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(sidebar.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
     expect(sidebar.getAllByText('ORACLE').length).toBeGreaterThan(0)
     expect(sidebar.getByRole('button', { name: /^CHARACTER$/i })).toBeInTheDocument()
-    expect(sidebar.getByRole('button', { name: /^PROFILE$/i })).toBeInTheDocument()
+    // Profile opens from the account menu, so the rail leaves it out.
+    expect(sidebar.queryByRole('button', { name: /^PROFILE$/i })).not.toBeInTheDocument()
     expect(sidebar.getByRole('button', { name: /^ACADEMY$/i })).toBeInTheDocument()
     expect(sidebar.getByRole('button', { name: /^FORUM$/i })).toBeInTheDocument()
     // Friends lives on the profile and Stages on Character, so neither has a sidebar row.
@@ -160,7 +163,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.queryByRole('button', { name: /Open menu/i })).not.toBeInTheDocument()
   })
 
-  it('opens More as a sheet above the bottom bar with Profile, Codex and Academy', async () => {
+  it('opens More as a sheet above the bottom bar with Codex and Academy', async () => {
     render(<HUDSidebar />)
 
     fireEvent.click(screen.getByRole('button', { name: 'More' }))
@@ -172,7 +175,8 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(document.body.style.overflow).toBe('hidden')
     expect(screen.getByRole('button', { name: 'More' })).toHaveAttribute('aria-expanded', 'true')
     const sheet = within(dialog)
-    expect(sheet.getAllByRole('button').slice(0, 3).map((b) => b.textContent)).toEqual(['PROFILE', 'CODEX', 'ACADEMY'])
+    expect(sheet.getAllByRole('button').slice(0, 2).map((b) => b.textContent)).toEqual(['CODEX', 'ACADEMY'])
+    expect(sheet.queryByRole('button', { name: /^PROFILE$/ })).not.toBeInTheDocument()
     expect(sheet.queryByRole('button', { name: /^ORACLE$/ })).not.toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'More' }))
@@ -243,7 +247,8 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getByRole('heading', { name: /CREATE ACCOUNT/i })).toBeInTheDocument()
   })
 
-  it('opens the account menu from the top controls with just Settings and Sign out', async () => {
+  it('opens the account menu from the top controls with Profile, balances, Settings and Sign out', async () => {
+    mockGetWalletBalancesFn.mockResolvedValueOnce({ gems: 1250, credits: 0, creditsLive: false })
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -260,19 +265,22 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     const controls = within(screen.getByTestId('top-controls'))
     expect(controls.getByRole('button', { name: 'Search' })).toBeInTheDocument()
     fireEvent.click(controls.getByRole('button', { name: /User account menu/i }))
-    await waitFor(() => {
-      expect(screen.getByText('alpha@moltology.io')).toBeInTheDocument()
-    })
+    const profile = await screen.findByTestId('account-hub-profile')
+    expect(profile).toHaveTextContent('View profile')
     expect(screen.getByRole('button', { name: /^SETTINGS$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /SIGN OUT/i })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /YOUR PROFILE/i })).not.toBeInTheDocument()
+    // Gems and credits sit in a slim row that opens the shop; credits read "soon" until they open.
+    const wallet = screen.getByTestId('account-hub-wallet')
+    await waitFor(() => expect(wallet).toHaveTextContent('1,250'))
+    expect(wallet).toHaveTextContent('credits soon')
+    expect(wallet).toHaveAccessibleName('Shop. 1,250 Chitin Gems, Molt Credits coming soon')
     expect(screen.queryByText('MOLTOLOGY HOME')).not.toBeInTheDocument()
     // The same panel carries today's tasks and the member's sub-stage
     expect(screen.getByText('Silent Synchronization')).toBeInTheDocument()
     expect(screen.getByTestId('account-hub-level')).toHaveTextContent('L-1 · Molt Curious')
   })
 
-  it('badges the Profile item with waiting friend requests', async () => {
+  it('opens Profile from the account menu, on Requests when friend requests are waiting', async () => {
     mockCountPendingFn.mockResolvedValueOnce({ incoming: 2 })
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'test-user-1', name: 'Operative Alpha', email: 'alpha@moltology.io' } } as any,
@@ -281,11 +289,24 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     render(<HUDSidebar />)
 
     await waitFor(() => expect(mockCountPendingFn).toHaveBeenCalled())
-    const profile = await within(screen.getByRole('complementary')).findByRole('button', {
-      name: /2 friend requests waiting/i,
-    })
-    expect(profile).toHaveTextContent('2 friend requests waiting')
+    fireEvent.click(within(screen.getByTestId('top-controls')).getByRole('button', { name: /User account menu/i }))
+    const profile = await screen.findByRole('button', { name: 'View profile, 2 friend requests waiting' })
+    expect(screen.getByTestId('account-hub-requests')).toHaveTextContent('2 requests')
     fireEvent.click(profile)
+    expect(mockNavigate).toHaveBeenCalledWith({ href: '/profile?tab=requests' })
+    // The badge no longer rides on More.
+    expect(screen.queryByTestId('more-badge')).not.toBeInTheDocument()
+  })
+
+  it('opens Profile from the account menu', async () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'test-user-1', name: 'Operative Alpha', email: 'alpha@moltology.io' } } as any,
+    } as any)
+
+    render(<HUDSidebar />)
+
+    fireEvent.click(within(screen.getByTestId('top-controls')).getByRole('button', { name: /User account menu/i }))
+    fireEvent.click(await screen.findByRole('button', { name: 'View profile' }))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/profile' })
   })
 
