@@ -20,6 +20,7 @@ export function isVerifiedGoogleSignup(user: WelcomeUser, context?: SignupContex
   if (!user.emailVerified) return false
   return (context?.path === '/callback/:id' && context.params?.id === 'google')
     || (context?.path === '/sign-in/social' && context.body?.provider === 'google')
+    || context?.path === '/one-tap/callback'
 }
 
 /** Best effort: do not let a lookup, render, or delivery failure break authentication. */

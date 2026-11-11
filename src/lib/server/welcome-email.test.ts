@@ -14,6 +14,8 @@ describe('welcome eligibility', () => {
   it('recognizes verified Google OAuth and ID-token account creation', () => {
     expect(isVerifiedGoogleSignup(user, { path: '/callback/:id', params: { id: 'google' } })).toBe(true)
     expect(isVerifiedGoogleSignup(user, { path: '/sign-in/social', body: { provider: 'google' } })).toBe(true)
+    expect(isVerifiedGoogleSignup(user, { path: '/one-tap/callback' })).toBe(true)
+    expect(isVerifiedGoogleSignup({ ...user, emailVerified: false }, { path: '/one-tap/callback' })).toBe(false)
     expect(isVerifiedGoogleSignup({ ...user, emailVerified: false }, { path: '/callback/:id', params: { id: 'google' } })).toBe(false)
   })
 

@@ -23,6 +23,7 @@
 
 import { authErrorCallbackURL, hasOAuthCallbackError } from './auth-oauth-errors'
 import { clearCachedJwt } from './jwt-cache'
+import { markOneTapSignedOut } from './one-tap'
 
 export type AuthSessionUser = {
   id?: string
@@ -164,6 +165,7 @@ let signOutInFlight = false
 
 export function beginSignOut(): void {
   signOutInFlight = true
+  markOneTapSignedOut()
   clearOAuthPending()
   clearCachedUser()
   clearCachedJwt()

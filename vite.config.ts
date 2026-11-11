@@ -7,7 +7,11 @@ import { redact } from '@tanstack/redact/vite'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 import { realpathSync } from 'node:fs'
-import { resolveViteEmailVerificationEnabled, resolveViteGoogleAuthEnabled } from './src/lib/auth-config.ts'
+import {
+  resolveViteEmailVerificationEnabled,
+  resolveViteGoogleAuthEnabled,
+  resolveViteGoogleClientId,
+} from './src/lib/auth-config.ts'
 
 const isTest = Boolean(process.env.VITEST)
 const shouldUseRedact = process.env.DISABLE_REDACT !== 'true'
@@ -28,6 +32,12 @@ function syncPublicGoogleAuthFlag(mode: string) {
     VITE_GOOGLE_AUTH_ENABLED: env.VITE_GOOGLE_AUTH_ENABLED || process.env.VITE_GOOGLE_AUTH_ENABLED,
     GOOGLE_CLIENT_ID: env.GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: env.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET,
+  })
+  // One Tap runs in the browser and needs the (public) client ID there too.
+  process.env.VITE_GOOGLE_CLIENT_ID = resolveViteGoogleClientId({
+    googleAuthEnabled: process.env.VITE_GOOGLE_AUTH_ENABLED === 'true' ? 'true' : 'false',
+    VITE_GOOGLE_CLIENT_ID: env.VITE_GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_ID: env.GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID,
   })
 }
 
@@ -58,6 +68,9 @@ export default defineConfig(({ mode, command }) => {
           define: {
             'import.meta.env.VITE_GOOGLE_AUTH_ENABLED': JSON.stringify(
               process.env.VITE_GOOGLE_AUTH_ENABLED || 'false',
+            ),
+            'import.meta.env.VITE_GOOGLE_CLIENT_ID': JSON.stringify(
+              process.env.VITE_GOOGLE_CLIENT_ID || '',
             ),
             'import.meta.env.VITE_EMAIL_VERIFICATION_ENABLED': JSON.stringify(
               process.env.VITE_EMAIL_VERIFICATION_ENABLED || 'false',
