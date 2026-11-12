@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { EyeOff, Mail, Radio, Sparkles } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -7,7 +7,9 @@ import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { HudButton } from '@/components/ui/HudButton'
 import { HubSurfaceControls } from '@/components/hud/HubSurfaceControls'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { claimMemberHandleFn, getUserProfileFn, updateEmailPreferencesFn } from '@/lib/server/api'
+import { claimMemberHandleFn, updateEmailPreferencesFn } from '@/lib/server/api'
+import { useAccountProfile } from '@/hooks/useAccountProfile'
+import { accountKeys, useAppQueryClient } from '@/lib/query/account'
 import { parseMemberHandle } from '@/lib/member-handle'
 import { DesignationField } from '../DesignationField'
 import { useHudPersist } from '@/hooks/useHudPersist'
@@ -26,32 +28,24 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
   const [emailSaving, setEmailSaving] = useState(false)
   const [designation, setDesignation] = useState('')
   const [savedDesignation, setSavedDesignation] = useState('')
-  const [loading, setLoading] = useState(true)
-
-  const loadProfile = useCallback(async () => {
-    if (!userId) return
-    setLoading(true)
-    try {
-      const token = await getAuthJWTToken()
-      const profile = await getUserProfileFn({
-        data: { userId, token: token ?? undefined },
-      })
-      if (profile && typeof profile.emailOptIn === 'boolean') {
-        setEmailOptIn(profile.emailOptIn)
-      }
-      const nextHandle = profile?.handle?.trim() || ''
-      setDesignation(nextHandle)
-      setSavedDesignation(nextHandle)
-    } catch {
-      toast.error('Could not load settings.')
-    } finally {
-      setLoading(false)
-    }
-  }, [userId])
+  // Shared, cached profile: a returning member's settings show at once and refresh quietly.
+  const { profile, isLoading: profileLoading } = useAccountProfile(userId)
+  const loading = session.isPending || profileLoading
+  const seededFor = useRef<unknown>(null)
+  const queryClient = useAppQueryClient()
 
   useEffect(() => {
-    loadProfile()
-  }, [loadProfile])
+    // Copy each new server reading into the form, unless the member is mid-edit.
+    if (profile === undefined || seededFor.current === profile) return
+    seededFor.current = profile
+    if (profile && typeof profile.emailOptIn === 'boolean' && !emailSaving) {
+      setEmailOptIn(profile.emailOptIn)
+    }
+    const nextHandle = profile?.handle?.trim() || ''
+    setDesignation((current) => (current === savedDesignation ? nextHandle : current))
+    setSavedDesignation(nextHandle)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile])
 
   const toggleEmailOptIn = async () => {
     if (!userId || emailSaving) return
@@ -70,6 +64,7 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
           },
         })
         setEmailOptIn(result.emailOptIn)
+        void queryClient.invalidateQueries({ queryKey: accountKeys.profile(userId) })
         if (result.confirmationPending) toast.info('Check your email to confirm your subscription.')
       })
     } catch {

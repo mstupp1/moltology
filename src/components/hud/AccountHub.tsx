@@ -110,7 +110,7 @@ export function AccountHub({
   const [gain, setGain] = useState<{ id: number; amount: number } | null>(null)
   const [stageCard, setStageCard] = useState<number | null>(null)
   const [poppedNotch, setPoppedNotch] = useState<number | null>(null)
-  const prevRef = useRef<{ userId: string; xp: number; index: number } | null>(null)
+  const prevRef = useRef<{ userId: string; xp: number; index: number; confirmed: boolean } | null>(null)
   const timersRef = useRef<number[]>([])
 
   useEffect(() => () => timersRef.current.forEach((t) => window.clearTimeout(t)), [])
@@ -137,9 +137,10 @@ export function AccountHub({
     const prev = prevRef.current
     const current = progress
 
-    // First reading for this member: show it as is, and catch up on a stage reached elsewhere.
-    if (!prev || prev.userId !== userId) {
-      prevRef.current = { userId, xp: alignment.xp, index: current.index }
+    // First reading for this member (or the server confirming a reading saved on this
+    // device): show it as is, and catch up on a stage reached elsewhere. No gain animation.
+    if (!prev || prev.userId !== userId || (!prev.confirmed && alignment.xpConfirmed)) {
+      prevRef.current = { userId, xp: alignment.xp, index: current.index, confirmed: alignment.xpConfirmed }
       setView({ ratio: current.ratio, badge: current.code, instant: false, pulseKey: 0 })
       const seen = readSeen(userId)
       if (seen === null || current.index < seen) writeSeen(userId, Math.max(seen ?? 0, current.index))
@@ -150,7 +151,7 @@ export function AccountHub({
 
     if (alignment.xp === prev.xp) return
     const delta = alignment.xp - prev.xp
-    prevRef.current = { userId, xp: alignment.xp, index: current.index }
+    prevRef.current = { userId, xp: alignment.xp, index: current.index, confirmed: alignment.xpConfirmed }
     if (delta > 0) setGain({ id: Date.now(), amount: delta })
 
     if (current.index > prev.index && !prefersReducedMotion()) {
@@ -173,7 +174,7 @@ export function AccountHub({
     setView((v) => ({ ...v, ratio: current.ratio, badge: current.code, instant: current.index !== prev.index }))
     // progress is derived from alignment.xp
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, alignment.xp, alignment.xpReady, celebrate])
+  }, [userId, alignment.xp, alignment.xpReady, alignment.xpConfirmed, celebrate])
 
   const prevDoneRef = useRef<number | null>(null)
   useEffect(() => {
@@ -249,7 +250,9 @@ export function AccountHub({
     : `${progress.code} ${progress.shortTitle} · final sub-stage`
   const tasksSummary = countReady ? `${done} of ${tasks.length} tasks done today` : ''
 
-  const portrait = <UserAvatar user={user} name={displayName} size="fill" borderless />
+  // The sidebar passes `avatarConfig: undefined` until the member's profile is known.
+  const characterPending = user.avatarConfig === undefined
+  const portrait = <UserAvatar user={user} pending={characterPending} name={displayName} size="fill" borderless />
 
   const panelBody = (
     <div className="space-y-4">
@@ -261,7 +264,7 @@ export function AccountHub({
         aria-label={`View profile${pendingFriendRequests > 0 ? `, ${`${pendingFriendRequests} friend request${pendingFriendRequests === 1 ? '' : 's'} waiting`}` : ''}`}
         className={`-mx-2 -mt-2 p-2 w-[calc(100%+1rem)] flex items-center gap-3 text-left rounded-control hover:bg-surface-2 transition-colors group ${focusRing}`}
       >
-        <UserAvatar user={user} name={displayName} size="xl" />
+        <UserAvatar user={user} pending={characterPending} name={displayName} size="xl" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 min-w-0">
             <span className="text-sm font-bold font-grotesk text-ink truncate">{displayName}</span>

@@ -1,5 +1,6 @@
 import React, { lazy, useEffect } from 'react'
-import { createRootRoute, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
+import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
+import type { QueryClient } from '@tanstack/react-query'
 import '@/index.css'
 import { SITE_ORIGIN, buildJsonLd, notFoundSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import {
@@ -32,7 +33,12 @@ function isNotFoundMatch(match: { status?: string; globalNotFound?: boolean }) {
   return match.status === 'notFound' || match.globalNotFound === true
 }
 
-export const Route = createRootRoute({
+/** Loaders can read or prefill account queries through `context.queryClient`. */
+export interface RouterContext {
+  queryClient: QueryClient
+}
+
+export const Route = createRootRouteWithContext<RouterContext>()({
   head: ({ matches }) => {
     const notFound = matches.some(isNotFoundMatch)
     return {

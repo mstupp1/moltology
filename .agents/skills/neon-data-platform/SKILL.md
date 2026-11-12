@@ -95,7 +95,7 @@ Also triggerable via `workflow_dispatch`. **Agents do not manually migrate prod*
 
 ## Authenticated HUD writes (TanStack Start)
 
-Reference surfaces: daily alignment, forum, blog comments. **Not** React Query `useMutation` / `invalidateQueries`.
+Reference surfaces: daily alignment, forum, blog comments. Writes use the hand-written loop below, **not** React Query `useMutation`. TanStack Query is for **reads** (see [Reading account data](#reading-account-data-tanstack-query)); after a write that changes cached member data, update it with `queryClient.setQueryData(...)` or `invalidateQueries({ queryKey })`.
 
 ### Server declaration
 
@@ -155,6 +155,17 @@ When building interactive toggles, multi-item check-ins, or rapidly clickable ac
 
 Before insert/vote/update that FKs to another table, verify the parent row exists (or catch FK and map to a clear user-facing error). Prefer existence checks so prod empty-DB fails loudly instead of opaque constraint errors.
 
+## Reading account data (TanStack Query)
+
+The signed-in member's own data (profile, character, wallet, Premium, Standing, friend-request count) is read through TanStack Query, not fetched in a component `useEffect`. Full rules: AGENTS.md "Loading account data".
+
+- **Keys:** start with `['account', userId, ...]` via `accountKeys` in [`src/lib/query/account.ts`](../../../src/lib/query/account.ts). Sign-out drops every `['account']` query and the saved copy (`beginSignOut` → `clearAccountQueryCache`).
+- **Hooks:** call `useAppQuery` (works with or without the provider) with `enabled: Boolean(userId)`. Existing hooks: `useAccountProfile`, `useWalletBalances`, `usePremiumMembership`, `useForumStanding`, `usePendingFriendRequests`. Reuse one before writing a new read; several components reading the same key share one request.
+- **Saved on device:** `meta: { persist: true }` writes the query to localStorage (`moltology:query-cache:v1`, 7 days) so a returning member paints real values on the first client frame. Use it for small, member-owned data only, never secrets or other members' data. Bump `QUERY_CACHE_BUSTER` in [`client.ts`](../../../src/lib/query/client.ts) when a persisted shape changes.
+- **Server fn:** unchanged. The `queryFn` passes `token: await authToken()` like any other read.
+- **SSR:** queries stay disabled on the server and hydration frame (no `userId` until the client session resolves), so nothing account-specific renders server-side. Route loaders can prefill a query via `context.queryClient` when needed.
+- Daily alignment keeps its own provider and local snapshots (`src/lib/alignment-snapshot.ts`: today's ticks plus last-known XP/streak) because of its optimistic write queue.
+
 ## HUD UI when shipping Neon-backed pages
 
 When building or redoing authenticated HUD routes/widgets that load Neon data, match existing HUD chrome — do not invent a narrower one-off layout.
@@ -177,7 +188,8 @@ Use **`HudWorkspaceGhost` only** for route-level pending — set `pendingCompone
 | Situation | Pattern |
 | :--- | :--- |
 | Route transition / code-split pending | `pendingComponent: HudWorkspaceGhost` on the file route |
-| Authenticated page data (Neon fetch) | TanStack `loader` when public/cached, **or** a small session cache + silent background refetch — never re-show ghosts on remount |
+| Member's own data (profile, balances, stage) | A TanStack Query hook (see [Reading account data](#reading-account-data-tanstack-query)); `PendingBar` / `UserAvatar pending` while unknown, never a default value |
+| Other authenticated page data (Neon fetch) | TanStack `loader` when public/cached, **or** a small session cache + silent background refetch — never re-show ghosts on remount |
 | In-flight writes | `useHudPersist().begin/end` (shell spinner), not page ghosts |
 | Embedded dashboard widget | `HudGhostWidget` + an existing widget ghost only when the widget has no loader cache |
 

@@ -26,6 +26,8 @@ const mockAlignment: AlignmentContextValue = {
   stage: 1,
   progression: calculateProgression(0, 1),
   xpReady: true,
+  xpConfirmed: true,
+  streakReady: true,
 }
 
 vi.mock('@/hooks/useDailyAlignment', () => ({

@@ -5,6 +5,7 @@ import { PremiumBanner, PremiumDashboardBanner } from './PremiumDashboardBanner'
 import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getPremiumMembershipFn } from '@/lib/server/premium-api'
+import { getQueryClient } from '@/lib/query/client'
 
 vi.mock('@/hooks/useHiddenPageAccess', () => ({
   useHiddenPageAccess: vi.fn(),
@@ -47,11 +48,13 @@ describe('Oracle MAX dashboard banner', () => {
     const free = render(<PremiumDashboardBanner />)
     expect(await screen.findByTestId('premium-dashboard-banner')).toHaveTextContent(/monthly membership/i)
     free.unmount()
+    getQueryClient().clear()
 
     vi.mocked(getPremiumMembershipFn).mockResolvedValue({ hasPurchasedPremium: true, isPremium: false })
     const lapsed = render(<PremiumDashboardBanner />)
     expect(await screen.findByTestId('premium-dashboard-banner')).toHaveTextContent(/not active/i)
     lapsed.unmount()
+    getQueryClient().clear()
 
     vi.mocked(getPremiumMembershipFn).mockResolvedValue({ hasPurchasedPremium: true, isPremium: true })
     render(<PremiumDashboardBanner />)

@@ -11,6 +11,7 @@ import { describeAlignmentToday, pickDashboardNextStep } from '@/lib/dashboard-n
 import { cn } from '@/lib/utils'
 import { getAssetUrl } from '@/lib/assets'
 import { STAGE_ART } from '@/lib/stage-art'
+import { PendingBar, REVEAL_CLASS } from '@/components/ui/PendingBar'
 
 function firstName(name?: string | null): string | null {
   const first = (name || '').trim().split(/\s+/)[0]
@@ -70,7 +71,8 @@ function WeekMarks({ days }: { days: Array<{ date: string; pct: number; isToday?
 export function DashboardTodayStrip() {
   const navigate = useNavigate()
   const session = useAuthSession()
-  const { completedCount, totalCount, streakDays, streakHistory, progression, isLoading } = useDailyAlignment()
+  const { completedCount, totalCount, streakDays, streakHistory, progression, isLoading, xpReady, streakReady } =
+    useDailyAlignment()
   const lastThread = useLastOracleThread()
   const [dateLabel, setDateLabel] = useState('')
   const [isAuthOpen, setIsAuthOpen] = useState(false)
@@ -83,6 +85,9 @@ export function DashboardTodayStrip() {
   const name = firstName(session.user?.name)
   const step = pickDashboardNextStep({ isGuest, completedCount, totalCount, lastThread })
   const ready = !isLoading && !session.isPending
+  // Stage and streak each wait for their own reading, so nothing paints as Stage 1 / 0 first.
+  const stageKnown = isGuest || (!session.isPending && xpReady)
+  const streakKnown = !session.isPending && streakReady
   const alignmentDone = completedCount >= totalCount
   const xpToNext = Math.max(0, progression.xpNeededForNextStage - progression.xpIntoStage)
 
@@ -112,6 +117,7 @@ export function DashboardTodayStrip() {
     >
       <div className="relative">
         <div aria-hidden="true" className="pointer-events-none absolute top-0 right-0 h-[210px] sm:h-full w-[72%] sm:w-3/5 overflow-hidden">
+          {stageKnown && (
           <img
             key={progression.stage}
             src={getAssetUrl(STAGE_ART[progression.stage] ?? STAGE_ART[1])}
@@ -121,6 +127,7 @@ export function DashboardTodayStrip() {
             fetchPriority="high"
             className="absolute right-0 top-0 h-full w-full object-cover object-right motion-safe:animate-in motion-safe:fade-in motion-safe:duration-700"
           />
+          )}
           {/* Phones stack the greeting over the art, so the scrim holds further across there. */}
           <div className="absolute inset-0 bg-gradient-to-r from-surface-1 via-surface-1/60 sm:via-surface-1/20 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface-1 via-transparent to-transparent" />
@@ -138,16 +145,22 @@ export function DashboardTodayStrip() {
 
           <div className="mt-14 sm:mt-7 max-w-full sm:max-w-[55%]">
             <p className="text-[11px] font-bold tracking-[0.12em] uppercase text-cyan-glow mb-2">
-              {isGuest ? 'Your journey begins here' : `Stage ${progression.stage}`}
+              {isGuest ? 'Your journey begins here' : stageKnown ? `Stage ${progression.stage}` : <PendingBar width="7ch" label="Loading your stage" />}
             </p>
             <h2 className="font-grotesk text-3xl lg:text-4xl font-bold text-ink leading-tight tracking-tight">
-              {stageName}
+              {stageKnown ? <span key="stage" className={REVEAL_CLASS}>{stageName}</span> : <PendingBar width="9ch" />}
             </h2>
             {!isGuest && (
               <p className="mt-2 text-sm text-ink-body" data-testid="dashboard-clearance">
-                <span className="font-mono text-cyan-glow">{progression.subStage.code}</span>
-                <span className="mx-2 text-ink-muted" aria-hidden="true">·</span>
-                {progression.subStage.shortTitle}
+                {stageKnown ? (
+                  <span className={REVEAL_CLASS}>
+                    <span className="font-mono text-cyan-glow">{progression.subStage.code}</span>
+                    <span className="mx-2 text-ink-muted" aria-hidden="true">·</span>
+                    {progression.subStage.shortTitle}
+                  </span>
+                ) : (
+                  <PendingBar width="14ch" />
+                )}
               </p>
             )}
             <p className="mt-3 text-xs text-ink-body leading-relaxed max-w-sm">
@@ -186,9 +199,11 @@ export function DashboardTodayStrip() {
           label="Progress"
           footer={
             <>
-              <Meter ratio={progression.progressRatio} label="Progress to the next stage" />
+              <Meter ratio={stageKnown ? progression.progressRatio : 0} label="Progress to the next stage" />
               <span className="text-[11px] text-ink-muted truncate">
-                {progression.isMaxStage ? (
+                {!stageKnown ? (
+                  <PendingBar width="9ch" />
+                ) : progression.isMaxStage ? (
                   'Final stage'
                 ) : (
                   <>
@@ -201,20 +216,20 @@ export function DashboardTodayStrip() {
             </>
           }
         >
-          {ready ? `${Math.round(progression.progressRatio * 100)}%` : '–'}
+          {stageKnown && !session.isPending ? `${Math.round(progression.progressRatio * 100)}%` : <PendingBar width="3ch" />}
         </Readout>
         <Readout
           label="Streak"
           footer={
             <>
-              <WeekMarks days={streakHistory.slice(-7)} />
+              <WeekMarks days={streakKnown ? streakHistory.slice(-7) : []} />
               <span className="text-[11px] text-ink-muted truncate">{streakDays === 1 ? 'day in a row' : 'days in a row'}</span>
             </>
           }
         >
           <span className="inline-flex items-center gap-1.5">
             <Flame className={cn('w-4 h-4 shrink-0', streakDays > 0 ? 'text-crimson-text' : 'text-ink-muted')} aria-hidden="true" />
-            {ready ? streakDays : '–'}
+            {streakKnown ? streakDays : <PendingBar width="2ch" />}
           </span>
         </Readout>
         <Readout
@@ -228,7 +243,7 @@ export function DashboardTodayStrip() {
             </>
           }
         >
-          {ready ? `${completedCount}/${totalCount}` : '–'}
+          {ready ? `${completedCount}/${totalCount}` : <PendingBar width="3ch" />}
         </Readout>
       </div>
 
