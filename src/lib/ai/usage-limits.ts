@@ -18,6 +18,15 @@ export const ORACLE_MAX_HISTORY_MESSAGES = 20
 export const ORACLE_MAX_HISTORY_CHARS = 16_000
 export const ORACLE_MAX_OUTPUT_TOKENS = 1_024
 
+/**
+ * Signed-out visitors get real answers, kept small: a few messages a day per visitor
+ * (by IP) and a ceiling on all guest messages together so cost stays bounded.
+ */
+export const ORACLE_GUEST_LIMITS = { perDay: 5, allGuestsPerDay: 300 } as const
+export const ORACLE_GUEST_MAX_OUTPUT_TOKENS = 700
+export const ORACLE_GUEST_MAX_HISTORY_MESSAGES = 6
+export const ORACLE_GUEST_MAX_HISTORY_CHARS = 6_000
+
 export function oracleLimitsFor(isPremium: boolean): OracleUsageLimits {
   return isPremium ? ORACLE_PREMIUM_LIMITS : ORACLE_FREE_LIMITS
 }

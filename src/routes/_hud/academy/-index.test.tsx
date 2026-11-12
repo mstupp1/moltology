@@ -116,13 +116,13 @@ describe('Molt Academy home', () => {
     mockUseLoaderData.mockReturnValue({ home: homeFixture() })
   })
 
-  it('locks the academy for a guest', () => {
+  it('lets a guest browse the catalog', () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
     const Page = Route.options.component!
     render(<Page />)
-    expect(screen.getByText('MOLT ACADEMY LOCKED')).toBeInTheDocument()
-    expect(screen.getByText(ACADEMY_COPY.guestLock)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /SIGN UP TO UNLOCK/i })).toBeInTheDocument()
+    expect(screen.queryByText('MOLT ACADEMY LOCKED')).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /^Academy$/ })).toBeInTheDocument()
+    expect(screen.getByText('Introduction to Ecdysis')).toBeInTheDocument()
   })
 
   it('lets a member explore tracks, filter courses, and open certifications', () => {

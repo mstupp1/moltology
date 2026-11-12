@@ -120,6 +120,7 @@ export function MarketPieceDetail({
   credits = 0,
   buying,
   addFree,
+  guest = false,
   onBuy,
 }: {
   piece: MarketPiece
@@ -137,6 +138,8 @@ export function MarketPieceDetail({
   buying: boolean
   /** Admins add pieces for free. */
   addFree: boolean
+  /** Signed out: the button opens sign-up instead of buying. */
+  guest?: boolean
   onBuy: (variant: MarketVariant) => void
 }) {
   const style = RARITY_FRAME[shown.rarity]
@@ -249,13 +252,24 @@ export function MarketPieceDetail({
         </div>
       ) : null}
       <p className="text-[13px] italic text-ink-muted leading-relaxed">{piece.flavorText}</p>
-      {shown.owned ? (
+      {shown.owned && guest ? (
+        <p className="text-sm text-ink-body text-center">Every new account starts with this piece.</p>
+      ) : shown.owned ? (
         <Link
           to="/character"
           className="inline-flex min-h-10 items-center justify-center rounded-control border border-line bg-surface-2 px-4 text-sm font-semibold text-ink hover:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
           Owned · wear it from Customize
         </Link>
+      ) : guest ? (
+        <>
+          <HudButton size="lg" fullWidth onClick={() => onBuy(shown)}>
+            Sign up to buy
+          </HudButton>
+          <p className="text-xs text-ink-muted text-center">
+            {shown.price.toLocaleString('en-US')} gems. Accounts are free, and gems come from daily liturgies, streaks and firsts.
+          </p>
+        </>
       ) : addFree ? (
         <>
           <HudButton size="lg" fullWidth disabled={buying} onClick={() => onBuy(shown)}>

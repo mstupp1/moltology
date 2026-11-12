@@ -41,7 +41,9 @@ export const ACADEMY_COPY = {
   missingCertificate: 'This certification could not be found.',
   lessonLocked: 'Enroll in this course to open the lesson.',
   videoWaiting: 'The video for this lecture is not up yet. Read the summary, then mark it complete or come back later.',
-  guestLock: 'Courses, tracks, and certifications need a free account. Sign up to enroll and keep your progress.',
+  guestLock: 'Lessons and certificates need a free account. Sign up to enroll and keep your progress.',
+  guestEnroll: 'Sign up to enroll',
+  guestEnrollNote: 'Accounts are free. Enrolling opens every lesson and keeps your place.',
 } as const
 
 export interface AcademyTrackRow {

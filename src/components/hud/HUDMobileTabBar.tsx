@@ -1,11 +1,13 @@
 import React from 'react'
-import { MoreHorizontal } from 'lucide-react'
+import { Lock, MoreHorizontal } from 'lucide-react'
 
 export interface MobileTab {
   id: string
   label: string
   icon: React.ComponentType<{ className?: string }>
   path: string
+  /** Signed out and the page needs an account: a small lock on the icon. */
+  locked?: boolean
 }
 
 export interface HUDMobileTabBarProps {
@@ -69,10 +71,24 @@ export function HUDMobileTabBar({
     >
       {tabs.map((tab) => {
         const current = !moreOpen && activeId === tab.id
-        return renderCell(tab.id, tab.label, tab.icon, current, {
-          onClick: () => onNavigate(tab.path),
-          'aria-current': current ? 'page' : undefined,
-        })
+        return renderCell(
+          tab.id,
+          tab.label,
+          tab.icon,
+          current,
+          {
+            onClick: () => onNavigate(tab.path),
+            'aria-current': current ? 'page' : undefined,
+            title: tab.locked ? 'Needs an account' : undefined,
+          },
+          tab.locked ? (
+            <Lock
+              aria-hidden
+              data-testid="guest-lock-icon"
+              className="absolute -top-1 -right-2 w-2.5 h-2.5 text-crimson-text/80"
+            />
+          ) : null,
+        )
       })}
       {renderCell(
         'more',

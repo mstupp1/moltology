@@ -1117,7 +1117,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                                   <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-surface-2 px-3 py-2 rounded-control border border-line-subtle">
                                     <div className="text-[11px] text-ink-body font-sans flex items-center gap-1.5 min-w-0">
                                       <Shield className="w-3 h-3 text-cyan-glow shrink-0" />
-                                      <span>Sign up free for full answers and saved chats.</span>
+                                      <span>Sign up free to save this chat and keep asking.</span>
                                     </div>
                                     <BenthicCTAButton
                                       variant="cyan"

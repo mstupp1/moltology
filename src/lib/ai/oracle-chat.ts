@@ -1,13 +1,15 @@
 import { ORACLE_MODELS, getOracleDefaultModelId, canUseOracleChatModel, type OracleAccessTier } from './oracle-models'
-import { capOracleHistory } from './usage-limits'
+import { capOracleHistory, ORACLE_FREE_LIMITS } from './usage-limits'
 
-export const GUEST_ORACLE_RESPONSES = [
-  "The Oracle sees great potential in you, but you're still in Guest Mode! Create a free account to unlock detailed answers, advice, and save your chat history.",
-  'That is a great question! In Guest Mode, my answers are kept brief. Sign up for a free account to unlock full Oracle guidance and start your journey.',
-  "I'd love to give you the full breakdown, but you're browsing as a guest. Create your free account in seconds to get complete answers and track your progress!",
-  'The answer lies just beneath the surface! In Guest Mode, detailed insights and saved chats are locked. Sign up for free to unlock the full Oracle experience.',
-  "You're asking the right questions, but full answers require a free account. Sign up below to unlock complete answers and permanent chat history!",
-]
+/** Shown in the chat, as the Oracle's reply, when a guest can't send another message. */
+export const GUEST_ORACLE_LIMIT_MESSAGES = {
+  visitor:
+    `That's all the guest messages for today. Sign up free to keep going: members get ${ORACLE_FREE_LIMITS.perFiveHours} messages every 5 hours, and your chats are saved.`,
+  allGuests:
+    'The Oracle has answered all the guest questions it can for today. Sign up free to keep asking, and your chats will be saved.',
+  unavailable:
+    "The Oracle can't answer guests right now. Try again in a little while, or sign up free to keep asking.",
+} as const
 
 export const ORACLE_UNAVAILABLE_MESSAGE =
   "Sorry — the Oracle couldn't reach a working model right now. Please try again in a moment."
@@ -20,11 +22,6 @@ export const ORACLE_MODEL_TIMEOUT_ERROR = 'The request timed out.'
 export const ORACLE_MODEL_FIRST_TOKEN_MS = 12_000
 
 export const ORACLE_THREAD_ID_HEADER = 'X-Oracle-Thread-Id'
-
-export function pickGuestOracleResponse(userText: string, messageCount: number): string {
-  const index = Math.abs(userText.length + messageCount) % GUEST_ORACLE_RESPONSES.length
-  return GUEST_ORACLE_RESPONSES[index]
-}
 
 /** Title/preview rows never enter chat routing; membership is supplied by the server. */
 export function getOracleCandidateModelIds(selectedModelId?: string, tier: OracleAccessTier = 'free'): string[] {
@@ -63,7 +60,7 @@ export function getLastUserText(messages: OracleChatMessageInput[]): string {
  * Stored history becomes model input. Only user and assistant turns pass, so a
  * system message never reaches the model, and the history is capped by size.
  */
-export function toModelMessages(messages: OracleChatMessageInput[]) {
+export function toModelMessages(messages: OracleChatMessageInput[], maxMessages?: number, maxChars?: number) {
   const turns = messages
     .filter((m) => m.role === 'user' || m.role === 'assistant')
     .filter((m) => Boolean((m.content || m.text || '').trim()))
@@ -71,7 +68,7 @@ export function toModelMessages(messages: OracleChatMessageInput[]) {
       role: m.role as 'user' | 'assistant',
       content: (m.content || m.text || '').trim(),
     }))
-  return capOracleHistory(turns)
+  return capOracleHistory(turns, maxMessages, maxChars)
 }
 
 function chunkHasText(chunk: unknown): boolean {

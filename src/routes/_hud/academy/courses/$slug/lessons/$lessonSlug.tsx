@@ -38,7 +38,7 @@ function AcademyLessonRoute() {
   const { lesson } = Route.useLoaderData()
   if (!lesson) return <AcademyMissing message={ACADEMY_COPY.missingLesson} />
   return (
-    <AcademyFrame>
+    <AcademyFrame membersOnly>
       <AcademyLessonView lesson={lesson} />
     </AcademyFrame>
   )

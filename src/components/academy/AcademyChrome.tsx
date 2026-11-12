@@ -1,7 +1,9 @@
 import React from 'react'
 import { Link } from '@tanstack/react-router'
 import { Award, BookOpen, ChevronRight, GraduationCap } from 'lucide-react'
+import { AuthModal } from '@/components/AuthModal'
 import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { ACADEMY_COPY, levelLabel } from '@/lib/academy'
 import type { AcademyLevel } from '@/lib/academy-types'
 import { cn } from '@/lib/utils'
@@ -20,12 +22,33 @@ export const ACADEMY_CARD_LINK = cn(
   ACADEMY_FOCUS,
 )
 
-export function AcademyFrame({ children }: { children: React.ReactNode }) {
+/**
+ * Page shell for the Academy. Guests can browse the catalog, tracks, courses and credentials;
+ * pages that keep a learner's progress pass `membersOnly`.
+ */
+export function AcademyFrame({ children, membersOnly = false }: { children: React.ReactNode; membersOnly?: boolean }) {
+  const page = <div className="space-y-3.5 sm:space-y-5 font-sans relative">{children}</div>
+  if (!membersOnly) return page
   return (
     <GuestLockGuard featureName="Molt Academy" message={ACADEMY_COPY.guestLock}>
-      <div className="space-y-3.5 sm:space-y-5 font-sans relative">{children}</div>
+      {page}
     </GuestLockGuard>
   )
+}
+
+/**
+ * Enroll buttons for signed-out visitors: they open sign-up instead of calling the server.
+ * Render `modal` once in the page.
+ */
+export function useAcademyGuestEnroll() {
+  const session = useAuthSession()
+  const [open, setOpen] = React.useState(false)
+  const isGuest = !session.isPending && !session.userId
+  return {
+    isGuest,
+    promptSignUp: () => setOpen(true),
+    modal: isGuest ? <AuthModal isOpen={open} onClose={() => setOpen(false)} initialMode="signup" /> : null,
+  }
 }
 
 /** Catalog / Certificates switch. The current page is a lit tile. */
