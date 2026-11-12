@@ -74,6 +74,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   const [pendingRoute, setPendingRoute] = useState<string | null>(null)
   const effectiveRoute = pendingRoute || currentRoute
+  // Fullscreen Oracle is a focus view: no top bar or pill, so its own header controls sit at the top.
+  const isOracleFullscreen = currentRoute.startsWith('/oracle')
 
   useEffect(() => {
     setPendingRoute(null)
@@ -566,8 +568,10 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         } h-auto md:h-full md:min-h-0 md:max-h-full md:bg-surface-1 border-b-0 md:border-r border-line-subtle flex flex-col select-none relative z-40 md:z-50 shrink-0 md:shadow-2xl group/sidebar overflow-visible`}
       >
         {/* Phone top bar: emblem, then a pill with search, bell, today's ring and avatar; pages live in the bottom bar */}
-        <div className="flex md:hidden items-center px-3 h-14 bg-surface-1 border-b border-line-subtle relative z-50 shrink-0">
-          {!isDesktop && (
+        <div
+          className={`${isOracleFullscreen ? 'hidden' : 'flex'} md:hidden items-center px-3 h-14 bg-surface-1 border-b border-line-subtle relative z-50 shrink-0`}
+        >
+          {!isDesktop && !isOracleFullscreen && (
             <HudTopControls
               variant="phone"
               user={user ? { ...user, avatarConfig: memberAvatar } : null}
@@ -584,6 +588,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         {/* Desktop: the same controls as one floating pill at the top-right of the workspace */}
         {isMounted &&
           isDesktop &&
+          !isOracleFullscreen &&
           topControlsSlot &&
           createPortal(
             <HudTopControls
@@ -772,7 +777,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             aria-hidden
             data-testid="more-backdrop"
             onClick={() => closeMobileMenu()}
-            className={`md:hidden fixed inset-x-0 top-14 bottom-[calc(var(--hud-tabbar-height)+env(safe-area-inset-bottom,0px))] z-[99989] bg-abyss/70 transition-opacity duration-200 ease-out motion-reduce:transition-none ${
+            className={`md:hidden fixed inset-x-0 ${isOracleFullscreen ? 'top-0' : 'top-14'} bottom-[calc(var(--hud-tabbar-height)+env(safe-area-inset-bottom,0px))] z-[99989] bg-abyss/70 transition-opacity duration-200 ease-out motion-reduce:transition-none ${
               isMobileVisible && !isMobileClosing ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
           />
@@ -784,7 +789,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             role="dialog"
             aria-modal="true"
             aria-label="More pages"
-            className={`md:hidden fixed inset-x-0 bottom-[calc(var(--hud-tabbar-height)+env(safe-area-inset-bottom,0px))] max-h-[calc(100dvh-3.5rem-var(--hud-tabbar-height)-env(safe-area-inset-bottom,0px))] z-[99990] w-screen bg-surface-1 border-t border-line rounded-t-card shadow-menu flex flex-col font-sans text-ink select-none overflow-hidden transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${
+            className={`md:hidden fixed inset-x-0 bottom-[calc(var(--hud-tabbar-height)+env(safe-area-inset-bottom,0px))] ${isOracleFullscreen ? 'max-h-[calc(100dvh-var(--hud-tabbar-height)-env(safe-area-inset-bottom,0px))]' : 'max-h-[calc(100dvh-3.5rem-var(--hud-tabbar-height)-env(safe-area-inset-bottom,0px))]'} z-[99990] w-screen bg-surface-1 border-t border-line rounded-t-card shadow-menu flex flex-col font-sans text-ink select-none overflow-hidden transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${
               isMobileVisible && !isMobileClosing
                 ? 'opacity-100 translate-y-0'
                 : 'opacity-0 translate-y-4 pointer-events-none'
