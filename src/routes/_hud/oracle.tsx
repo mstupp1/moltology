@@ -99,7 +99,6 @@ function OracleRouteComponent() {
             onThreadCreated={handleThreadCreated}
             onThreadChange={setActiveThreadId}
             className="h-full border-none shadow-none bg-transparent"
-            headerClassName="md:pr-52"
           />
         </React.Suspense>
       </div>
