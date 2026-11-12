@@ -3,8 +3,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const counts = new Map<string, number>()
 const insertedKeys: string[] = []
 
+const released: string[][] = []
+
 vi.mock('../../db', () => ({
   getDb: () => ({
+    update: () => ({
+      set: () => ({
+        where: async () => {
+          released.push([...counts.keys()])
+          for (const key of counts.keys()) counts.set(key, Math.max(0, (counts.get(key) ?? 0) - 1))
+        },
+      }),
+    }),
     insert: () => ({
       values: (row: { key: string }) => ({
         onConflictDoUpdate: () => ({
@@ -20,7 +30,7 @@ vi.mock('../../db', () => ({
   }),
 }))
 
-import { reserveGuestOracleMessage } from './guest-usage'
+import { releaseGuestOracleMessage, reserveGuestOracleMessage } from './guest-usage'
 import { ORACLE_GUEST_LIMITS } from './usage-limits'
 
 const NOON = Date.UTC(2026, 10, 12, 12)
@@ -55,5 +65,12 @@ describe('reserveGuestOracleMessage', () => {
   it('never stores the raw IP address', async () => {
     await reserveGuestOracleMessage('203.0.113.9', NOON)
     expect(insertedKeys.every((key) => /^[0-9a-f]{64}$/.test(key))).toBe(true)
+  })
+
+  it('gives a message back when the model never answered', async () => {
+    for (let i = 0; i < ORACLE_GUEST_LIMITS.perDay; i += 1) await reserveGuestOracleMessage('203.0.113.9', NOON)
+    await releaseGuestOracleMessage('203.0.113.9', NOON)
+    expect(released).toHaveLength(1)
+    expect(await reserveGuestOracleMessage('203.0.113.9', NOON)).toEqual({ allowed: true })
   })
 })

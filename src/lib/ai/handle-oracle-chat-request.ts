@@ -31,7 +31,7 @@ import {
   ORACLE_MAX_HISTORY_MESSAGES,
   ORACLE_MAX_OUTPUT_TOKENS,
 } from './usage-limits'
-import { reserveGuestOracleMessage } from './guest-usage'
+import { releaseGuestOracleMessage, reserveGuestOracleMessage } from './guest-usage'
 import {
   commitOracleTextStream,
   formatOracleUnavailableMessage,
@@ -436,6 +436,8 @@ async function handleGuestOracleChat(
     abortController.abort()
     signal.removeEventListener('abort', abort)
     console.warn('[Oracle Chat] Guest reply failed:', err?.message)
+    // The model never answered, so the visitor keeps today's message.
+    await releaseGuestOracleMessage(clientIp)
     const message = formatOracleUnavailableMessage(err instanceof Error ? err : null)
     return Response.json({ error: message, text: message, threadId: null }, { status: 502 })
   }

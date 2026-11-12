@@ -7,7 +7,7 @@ import { getOracleUsageSnapshot, getRecentAIThreadTurns, releaseOracleChatUsage,
 import { buildOracleUsageSnapshot, ORACLE_FREE_LIMITS, ORACLE_MAX_OUTPUT_TOKENS, ORACLE_PREMIUM_LIMITS } from './usage-limits'
 import { validateInputGuardrails } from './guardrails'
 import { getChatLimitError } from './chat-retention'
-import { reserveGuestOracleMessage } from './guest-usage'
+import { releaseGuestOracleMessage, reserveGuestOracleMessage } from './guest-usage'
 import { GUEST_ORACLE_LIMIT_MESSAGES } from './oracle-chat'
 import { ORACLE_GUEST_MAX_OUTPUT_TOKENS } from './usage-limits'
 
@@ -41,6 +41,7 @@ vi.mock('./service', () => ({
 
 vi.mock('./guest-usage', () => ({
   reserveGuestOracleMessage: vi.fn().mockResolvedValue({ allowed: true }),
+  releaseGuestOracleMessage: vi.fn().mockResolvedValue(undefined),
 }))
 
 vi.mock('./codex-prompt', () => ({
@@ -373,6 +374,7 @@ describe('handleOracleChatRequest', () => {
     const res = await handleOracleChatRequest(makeRequest({ messages: [{ role: 'user', content: 'Hi' }] }))
     expect(res.status).toBe(502)
     expect((await res.json()).text).toBe(ORACLE_UNAVAILABLE_MESSAGE)
+    expect(releaseGuestOracleMessage).toHaveBeenCalledTimes(1)
   })
 
   it('streams for a Bearer JWT even without body.userId', async () => {
