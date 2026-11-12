@@ -8,6 +8,9 @@ interface CodexPdfPageProps {
   scriptureId: string
   children: React.ReactNode
   className?: string
+  /** light, dark, or auto (follow the device). */
+  readingTheme?: string
+  onCopy?: React.ClipboardEventHandler<HTMLDivElement>
 }
 
 export function CodexPdfPage({
@@ -16,6 +19,8 @@ export function CodexPdfPage({
   scriptureId,
   children,
   className,
+  readingTheme = 'light',
+  onCopy,
 }: CodexPdfPageProps) {
   return (
     <ReaderPdfPage
@@ -25,6 +30,8 @@ export function CodexPdfPage({
       dataPageAttribute="data-codex-pdf-page"
       dataStageAttribute="data-codex-pdf-stage"
       className={cn('codex-parchment-theme', className)}
+      dataReadingTheme={readingTheme}
+      onCopy={onCopy}
     >
       {children}
     </ReaderPdfPage>

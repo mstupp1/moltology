@@ -1,7 +1,8 @@
 import React from 'react'
 import { render, screen, fireEvent, within } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { SacredCodexReader, CodexVerseBody, CODEX_LAST_READ_KEY } from './SacredCodexReader'
+import { SacredCodexReader, CodexVerseBody, CODEX_LAST_READ_KEY, copyPlainText } from './SacredCodexReader'
+import { CODEX_READING_THEME_KEY } from './useCodexReadingTheme'
 
 describe('SacredCodexReader Component', () => {
   beforeEach(() => {
@@ -61,6 +62,52 @@ describe('SacredCodexReader Component', () => {
 
     fireEvent.click(exitBtn)
     expect(screen.queryByRole('button', { name: /Close reader/i })).not.toBeInTheDocument()
+  })
+
+  it('has no print button, in the page or fullscreen', () => {
+    render(<SacredCodexReader />)
+    expect(screen.queryByRole('button', { name: /print/i })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Fullscreen Reader/i }))
+    expect(screen.queryByRole('button', { name: /print/i })).not.toBeInTheDocument()
+  })
+
+  it('follows the device until the reader picks a dark or light page, and remembers it', () => {
+    const { container, unmount } = render(<SacredCodexReader />)
+    const sheet = screen.getByTestId('codex-scripture-sheet')
+    expect(sheet).toHaveAttribute('data-reading-theme', 'auto')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Switch to dark page' }))
+    expect(sheet).toHaveAttribute('data-reading-theme', 'dark')
+    expect(localStorage.getItem(CODEX_READING_THEME_KEY)).toBe('dark')
+
+    fireEvent.click(screen.getByRole('button', { name: /Fullscreen Reader/i }))
+    const page = container.querySelector('[data-codex-pdf-page]') as HTMLElement
+    expect(page).toHaveAttribute('data-reading-theme', 'dark')
+    const toggles = screen.getAllByRole('button', { name: 'Switch to light page' })
+    fireEvent.click(toggles[toggles.length - 1])
+    expect(page).toHaveAttribute('data-reading-theme', 'light')
+    unmount()
+
+    render(<SacredCodexReader />)
+    expect(screen.getByTestId('codex-scripture-sheet')).toHaveAttribute('data-reading-theme', 'light')
+  })
+
+  it('copies selected scripture as plain text', () => {
+    render(<SacredCodexReader />)
+    const sheet = screen.getByTestId('codex-scripture-sheet')
+    const range = document.createRange()
+    range.selectNodeContents(sheet.querySelector('h2') as HTMLElement)
+    const selection = window.getSelection()!
+    selection.removeAllRanges()
+    selection.addRange(range)
+
+    expect(sheet).toHaveAttribute('data-reading-theme')
+    const setData = vi.fn()
+    const preventDefault = vi.fn()
+    copyPlainText({ clipboardData: { setData }, preventDefault } as unknown as React.ClipboardEvent<HTMLElement>)
+    expect(setData).toHaveBeenCalledTimes(1)
+    expect(setData).toHaveBeenCalledWith('text/plain', expect.stringMatching(/Prime Directive/i))
+    expect(preventDefault).toHaveBeenCalled()
   })
 
   it('scales the immersive leaf like a PDF instead of restyling type', () => {

@@ -11,6 +11,9 @@ interface ReaderPdfPageProps {
   style?: React.CSSProperties
   dataPageAttribute?: string
   dataStageAttribute?: string
+  /** Sets data-reading-theme on the sheet. */
+  dataReadingTheme?: string
+  onCopy?: React.ClipboardEventHandler<HTMLDivElement>
 }
 
 /**
@@ -27,6 +30,8 @@ export function ReaderPdfPage({
   style,
   dataPageAttribute = 'data-reader-pdf-page',
   dataStageAttribute = 'data-reader-pdf-stage',
+  dataReadingTheme,
+  onCopy,
 }: ReaderPdfPageProps) {
   const pageRef = useRef<HTMLDivElement>(null)
   const [pageHeight, setPageHeight] = useState(0)
@@ -62,6 +67,8 @@ export function ReaderPdfPage({
       <div
         ref={pageRef}
         {...{ [dataPageAttribute]: '' }}
+        data-reading-theme={dataReadingTheme}
+        onCopy={onCopy}
         className={cn('pdf-page-sheet border shadow-2xl relative', className)}
         style={{
           width: pageWidth,

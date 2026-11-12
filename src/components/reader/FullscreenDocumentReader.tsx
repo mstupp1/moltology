@@ -4,7 +4,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Menu,
-  Printer,
   X,
   ZoomIn,
   ZoomOut,
@@ -39,7 +38,8 @@ interface FullscreenDocumentReaderProps {
   onPrev: () => void
   onNext: () => void
   onSelectItem: (id: string) => void
-  onPrint?: () => void
+  /** Extra toolbar buttons, given the toolbar's button class. */
+  renderActions?: (buttonClassName: string) => React.ReactNode
   onClose: () => void
 }
 
@@ -63,7 +63,7 @@ export function FullscreenDocumentReader({
   onPrev,
   onNext,
   onSelectItem,
-  onPrint,
+  renderActions,
   onClose,
 }: FullscreenDocumentReaderProps) {
   const viewportRef = useRef<HTMLDivElement>(null)
@@ -238,6 +238,9 @@ export function FullscreenDocumentReader({
   const handleViewportPointer = (event: React.MouseEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement
     if (target.closest('button, a, textarea, input')) return
+    // Selecting text (drag, or double-click on a word) shouldn't toggle the bars or zoom.
+    const selection = typeof window !== 'undefined' ? window.getSelection() : null
+    if (selection && !selection.isCollapsed) return
 
     const now = typeof performance !== 'undefined' ? performance.now() : 0
     if (now - lastTapRef.current < 280) {
@@ -267,7 +270,7 @@ export function FullscreenDocumentReader({
       aria-label={overlayLabel}
     >
       <div
-        className="codex-reader-chrome codex-reader-chrome-top no-print shrink-0 z-30"
+        className="codex-reader-chrome codex-reader-chrome-top shrink-0 z-30"
         data-hidden={showChrome ? 'false' : 'true'}
         data-pinned={navOpen ? 'true' : 'false'}
         onMouseEnter={() => {
@@ -361,17 +364,7 @@ export function FullscreenDocumentReader({
           </div>
 
           <div className="flex items-center justify-end gap-1">
-            {onPrint && (
-              <button
-                type="button"
-                onClick={onPrint}
-                className={`hidden sm:flex ${toolButton}`}
-                title="Print or save as PDF"
-                aria-label="Print or save as PDF"
-              >
-                <Printer className="w-4 h-4" />
-              </button>
-            )}
+            {renderActions?.(toolButton)}
 
             <button
               type="button"
@@ -447,7 +440,7 @@ export function FullscreenDocumentReader({
       </div>
 
       <div
-        className="codex-reader-chrome codex-reader-chrome-bottom no-print absolute inset-x-0 bottom-0 z-30 sm:hidden"
+        className="codex-reader-chrome codex-reader-chrome-bottom absolute inset-x-0 bottom-0 z-30 sm:hidden"
         data-hidden={showChrome ? 'false' : 'true'}
       >
         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-2 py-1.5 bg-surface-1/95 backdrop-blur-md border-t border-line-subtle pb-[max(0.375rem,env(safe-area-inset-bottom))] font-sans">
