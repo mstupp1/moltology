@@ -5084,10 +5084,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/guest-usage.ts",
           "symbol": "reserveGuestOracleMessage",
-          "line": 28,
+          "line": 32,
           "value": "reserveGuestOracleMessage(visitorKey, now)",
           "drift": "unverified",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guest-usage.ts#L28"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guest-usage.ts#L32"
         },
         {
           "file": "src/lib/ai/usage-limits.ts",
