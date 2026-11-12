@@ -33,7 +33,7 @@ function Row({ label, value, done }: { label: string; value: React.ReactNode; do
   )
 }
 
-export function MarketEarnPanel({ wallet }: { wallet: GemWallet }) {
+export function MarketEarnPanel({ wallet, guest = false }: { wallet: GemWallet; guest?: boolean }) {
   const streaks = GEM_STREAK_MILESTONES.map((m) => `${m.days}d`).join(', ')
   return (
     <div className="grid gap-3 lg:grid-cols-2">
@@ -66,7 +66,9 @@ export function MarketEarnPanel({ wallet }: { wallet: GemWallet }) {
       <section className="rounded-card border border-line-subtle bg-surface-1 p-4">
         <h2 className="text-sm font-semibold text-ink mb-2">Recent gems</h2>
         {wallet.history.length === 0 ? (
-          <p className="text-sm text-ink-muted">Nothing yet. Finish today's liturgies to get started.</p>
+          <p className="text-sm text-ink-muted">
+            {guest ? 'Sign up free and your gems start here.' : "Nothing yet. Finish today's liturgies to get started."}
+          </p>
         ) : (
           <ul>
             {wallet.history.map((h) => (

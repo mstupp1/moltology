@@ -16,18 +16,21 @@ import {
   AcademyEmpty,
   AcademyProgress,
   LevelMark,
+  useAcademyGuestEnroll,
 } from './AcademyChrome'
 
 export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
   const toast = useOptionalToast()?.toast
   const [detail, setDetail] = useState(track)
   const [busy, setBusy] = useState(false)
+  const guest = useAcademyGuestEnroll()
   const enrolledCount = detail.courses.filter((course) => course.enrolled).length
   const completedCount = detail.courses.filter((course) => course.completed).length
   const allEnrolled = detail.courses.length > 0 && enrolledCount === detail.courses.length
   const nextCourse = enrolledCount > 0 ? detail.courses.find((course) => !course.completed) ?? null : null
 
   async function enroll() {
+    if (guest.isGuest) return guest.promptSignUp()
     setBusy(true)
     try {
       const token = await getAuthJWTToken()
@@ -66,7 +69,7 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
           <div className="flex flex-wrap items-center gap-3 pt-1">
             {allEnrolled ? null : (
               <HudButton type="button" variant="primary" size="md" disabled={busy || detail.courses.length === 0} onClick={() => void enroll()}>
-                {busy ? 'Enrolling…' : 'Enroll in track'}
+                {busy ? 'Enrolling…' : guest.isGuest ? ACADEMY_COPY.guestEnroll : 'Enroll in track'}
               </HudButton>
             )}
             {nextCourse ? (
@@ -185,6 +188,7 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
           ) : null}
         </aside>
       </div>
+      {guest.modal}
     </div>
   )
 }

@@ -7,14 +7,14 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-11-11",
+  "syncedAt": "2026-11-12",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
-    "rules": 127,
-    "decisions": 55,
-    "anchors": 247,
-    "drifted": 47,
+    "rules": 128,
+    "decisions": 56,
+    "anchors": 249,
+    "drifted": 53,
     "flagged": 9
   },
   "canvas": {
@@ -212,13 +212,14 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "box": {
         "x": 0,
         "y": 1988,
-        "width": 1306,
+        "width": 1718,
         "height": 808
       },
       "ruleIds": [
         "oracle.request-pipeline",
         "oracle.rate-limit",
         "oracle.usage-allowance",
+        "oracle.guest-allowance",
         "oracle.request-caps",
         "oracle.input-guardrails",
         "oracle.jailbreak-gate",
@@ -236,7 +237,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Members claim one unique handle, and feeds only show real activity from the member and their friends. Empty stays honest.",
       "overviewHtml": "<p>Social surfaces follow one rule. Show real people and real activity, or show nothing. A quiet new account sees an honest, empty stream instead of fake veterans.</p>",
       "box": {
-        "x": 1402,
+        "x": 1814,
         "y": 1988,
         "width": 904,
         "height": 496
@@ -259,7 +260,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "The app runs inside Neon Free and Vercel Hobby limits. Retention windows, polling rules, and the asset budget keep it there.",
       "overviewHtml": "<p>Most cost decisions trace back to two limits: Neon Free compute hours and Vercel Hobby Active CPU. Anything that polls, keeps compute awake, or grows storage without bound has to justify itself here.</p>",
       "box": {
-        "x": 2402,
+        "x": 2814,
         "y": 1988,
         "width": 904,
         "height": 940
@@ -287,7 +288,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Private-by-default guest checkout preparation with live quotes, audited operations, and recoverable draft fulfillment.",
       "overviewHtml": "<h1>Store launch preparation</h1>\n<p>The store stays private, test-only and manual until separately authorized. Authored product data,\noperational controls and order snapshots have separate lifecycles. See <code>docs/merch-launch.md</code>.</p>",
       "box": {
-        "x": 3402,
+        "x": 3814,
         "y": 1988,
         "width": 992,
         "height": 988
@@ -314,7 +315,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Standing is a member's forum reputation, from upvotes plus review adjustments. It decides who can start threads, which replies sink, and who is limited.",
       "overviewHtml": "<p>Standing is the forum&#39;s reputation score. It comes from other members&#39; upvotes and gates the actions that cost the community the most: new threads and high reply volume.</p>",
       "box": {
-        "x": 4490,
+        "x": 4902,
         "y": 1988,
         "width": 1196,
         "height": 520
@@ -575,10 +576,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/components/hud/market/MarketShopPage.tsx",
           "symbol": "MarketShopPage",
-          "line": 153,
+          "line": 157,
           "value": "MarketShopPage()",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx#L153"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx#L157"
         }
       ],
       "tests": [
@@ -951,10 +952,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/hooks/useDailyAlignment.tsx",
           "symbol": "AlignmentProvider",
-          "line": 84,
+          "line": 86,
           "value": "AlignmentProvider({ children })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useDailyAlignment.tsx#L84"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useDailyAlignment.tsx#L86"
         }
       ],
       "tests": [
@@ -1805,7 +1806,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "auth",
           "line": 106,
           "value": "betterAuth({ baseURL, secret: getAuthSecret(), database: drizzleAdapter(getDb(), { provider: 'pg', camelCase: true, transaction: false, schema: { user: authUse…",
-          "drift": "ok",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L106"
         }
       ],
@@ -1836,7 +1837,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1688,
         "y": 76
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "auth.production-secret",
@@ -2071,10 +2072,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/auth-config.ts",
           "symbol": "isEmailVerificationEnabled",
-          "line": 134,
+          "line": 154,
           "value": "isEmailVerificationEnabled()",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-config.ts#L134"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-config.ts#L154"
         }
       ],
       "tests": [
@@ -4659,15 +4660,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Oracle request pipeline",
       "kind": "flow",
       "status": "active",
-      "statement": "Every message passes flood and local input checks. Guests get a canned reply. Members pass usage checks and atomically reserve an allowance slot before chat model calls. Oversized tier-specific prompts release the slot. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.",
+      "statement": "Every message passes flood and local input checks. Guests get a capped free-model reply, unsaved. Members pass usage checks and atomically reserve an allowance slot before chat model calls. Oversized tier-specific prompts release the slot. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.",
       "anchors": [
         {
           "file": "src/lib/ai/handle-oracle-chat-request.ts",
           "symbol": "handleOracleChatRequest",
-          "line": 74,
+          "line": 78,
           "value": "handleOracleChatRequest(request)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L74"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L78"
         }
       ],
       "tests": [
@@ -4680,6 +4681,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "usedBy": [
         "oracle.rate-limit",
         "oracle.usage-allowance",
+        "oracle.guest-allowance",
         "oracle.request-caps",
         "oracle.input-guardrails"
       ],
@@ -4688,7 +4690,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "security-scan-2026-10",
         "atomic-oracle-allowance",
         "oracle-tier-models-and-titles",
-        "oracle-local-screening"
+        "oracle-local-screening",
+        "guest-access"
       ],
       "flag": null,
       "flow": {
@@ -4767,7 +4770,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           },
           {
             "id": "guest",
-            "label": "Canned guest reply",
+            "label": "Capped guest reply, nothing saved",
             "kind": "outcome",
             "tone": "neutral",
             "position": {
@@ -4910,10 +4913,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "height": 786
       },
       "position": {
-        "x": 825,
+        "x": 1215,
         "y": 208
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "oracle.rate-limit",
@@ -4999,10 +5002,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/usage-limits.ts",
           "symbol": "decideOracleUsage",
-          "line": 92,
+          "line": 101,
           "value": "decideOracleUsage(counts, isPremium)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L92"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L101"
         },
         {
           "file": "src/lib/ai/service.ts",
@@ -5015,10 +5018,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/usage-limits.ts",
           "symbol": "buildOracleUsageSnapshot",
-          "line": 51,
+          "line": 60,
           "value": "buildOracleUsageSnapshot(events, isPremium, now)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L51"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L60"
         },
         {
           "file": "src/lib/server/oracle-usage.ts",
@@ -5071,6 +5074,57 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "drift": "ok"
     },
     {
+      "id": "oracle.guest-allowance",
+      "domain": "oracle",
+      "title": "Guests get a few real answers a day",
+      "kind": "limit",
+      "status": "active",
+      "statement": "Guests can send 5 Oracle messages per UTC day per IP (stored hashed), and all guests share 300 a day. Replies use Oracle Lite, capped at 700 tokens, with up to 6 recent turns from the visitor's chat re-checked by the input filter. Nothing is saved and no title is made. If the counter can't be written, guests get a notice and no model call.",
+      "anchors": [
+        {
+          "file": "src/lib/ai/guest-usage.ts",
+          "symbol": "reserveGuestOracleMessage",
+          "line": 28,
+          "value": "reserveGuestOracleMessage(visitorKey, now)",
+          "drift": "unverified",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guest-usage.ts#L28"
+        },
+        {
+          "file": "src/lib/ai/usage-limits.ts",
+          "symbol": "ORACLE_GUEST_LIMITS",
+          "line": 25,
+          "value": "{ perDay: 5, allGuestsPerDay: 300 } as const",
+          "drift": "unverified",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L25"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/ai/guest-usage.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guest-usage.test.ts"
+        },
+        {
+          "file": "src/lib/ai/handle-oracle-chat-request.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "oracle.request-pipeline",
+        "oracle.input-guardrails"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "guest-access"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 506,
+        "y": 520
+      },
+      "drift": "unverified"
+    },
+    {
       "id": "oracle.request-caps",
       "domain": "oracle",
       "title": "History and reply size caps",
@@ -5097,10 +5151,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/oracle-chat.ts",
           "symbol": "toModelMessages",
-          "line": 66,
-          "value": "toModelMessages(messages)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-chat.ts#L66"
+          "line": 63,
+          "value": "toModelMessages(messages, maxMessages, maxChars)",
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-chat.ts#L63"
         }
       ],
       "tests": [
@@ -5126,10 +5180,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       },
       "flow": null,
       "position": {
-        "x": 612,
+        "x": 1011,
         "y": 364
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "oracle.input-guardrails",
@@ -5167,6 +5221,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "forum.content-safety"
       ],
       "usedBy": [
+        "oracle.guest-allowance",
         "oracle.jailbreak-gate",
         "oracle.intent-context",
         "oracle.model-routing"
@@ -5178,7 +5233,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 904,
+        "x": 1303,
         "y": 364
       },
       "drift": "ok"
@@ -5194,10 +5249,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/handle-oracle-chat-request.ts",
           "symbol": "handleOracleChatRequest",
-          "line": 74,
+          "line": 78,
           "value": "handleOracleChatRequest(request)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L74"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L78"
         }
       ],
       "tests": [
@@ -5217,10 +5272,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 386,
+        "x": 798,
         "y": 520
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "oracle.intent-context",
@@ -5268,7 +5323,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 678,
+        "x": 1090,
         "y": 520
       },
       "drift": "ok"
@@ -5279,15 +5334,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Membership determines model access",
       "kind": "permission",
       "status": "active",
-      "statement": "Guests receive preset preview replies. Free members use Oracle Lite (DeepSeek V4.1 Flash 1017). MAX defaults to Claude Haiku 5.5 and can select Lite. Titles use the selected chat model. Both providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.",
+      "statement": "Guests use Oracle Lite without saved chats or titles. Free members use Oracle Lite (DeepSeek V4.1 Flash 1017). MAX defaults to Claude Haiku 5.5 and can select Lite. Titles use the selected chat model. Both providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.",
       "anchors": [
         {
           "file": "src/lib/ai/oracle-chat.ts",
           "symbol": "getOracleCandidateModelIds",
-          "line": 30,
+          "line": 27,
           "value": "getOracleCandidateModelIds(selectedModelId, tier)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-chat.ts#L30"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-chat.ts#L27"
         },
         {
           "file": "src/lib/ai/oracle-models.ts",
@@ -5324,12 +5379,13 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "oracle-haiku-and-deepseek-1017",
         "oracle-local-screening",
         "shared-oracle-chat-titles",
-        "simplify-oracle-models"
+        "simplify-oracle-models",
+        "guest-access"
       ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 970,
+        "x": 1382,
         "y": 520
       },
       "drift": "ok"
@@ -5373,7 +5429,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 722,
+        "x": 1134,
         "y": 676
       },
       "drift": "ok"
@@ -5425,7 +5481,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1014,
+        "x": 1426,
         "y": 676
       },
       "drift": "ok"
@@ -6266,10 +6322,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/avatar3d-portrait-queue.ts",
           "symbol": "requestStill3D",
-          "line": 139,
+          "line": 148,
           "value": "requestStill3D(config, px, shot, signal)",
           "drift": "unverified",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d-portrait-queue.ts#L139"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d-portrait-queue.ts#L148"
         }
       ],
       "tests": [
@@ -6369,18 +6425,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/components/UserAvatar.tsx",
           "symbol": "UserAvatar",
-          "line": 33,
-          "value": "React.memo( ({ user, config, src, name, email, fallbackSrc, fallbackLetter, size = 'md', className = '', alt, borderless = false, }) => { const [imageError, se…",
+          "line": 36,
+          "value": "React.memo( ({ user, config, src, name, email, fallbackSrc, fallbackLetter, size = 'md', className = '', alt, borderless = false, glass = true, }) => { const […",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/UserAvatar.tsx#L33"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/UserAvatar.tsx#L36"
         },
         {
           "file": "src/components/forum/ForumAvatar.tsx",
           "symbol": "ForumAvatar",
-          "line": 58,
+          "line": 59,
           "value": "React.memo(({ src, authorName, authorHandle, userId, avatarConfig, size = 'md', className, alt, loading = 'lazy', }) => { const [imageError, setImageError] = u…",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/forum/ForumAvatar.tsx#L58"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/forum/ForumAvatar.tsx#L59"
         }
       ],
       "tests": [
@@ -9823,6 +9879,57 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "html": "<ul>\n<li>Retaking the audit moves the base. Gear is how the number climbs past it.</li>\n<li>Rarer gear carries bigger bonuses, so the market rarity ladder shows on the sheet.</li>\n</ul>"
         }
       ]
+    },
+    {
+      "id": "guest-access",
+      "date": "2026-11-12",
+      "title": "Open the Shop, Academy catalog, and a capped Oracle to guests",
+      "summary": "Signed-out visitors can browse the Shop and the Academy catalog, see the support email, and get a few real Oracle answers a day.",
+      "domains": [
+        "oracle"
+      ],
+      "rules": [
+        "oracle.request-pipeline",
+        "oracle.guest-allowance",
+        "oracle.model-routing"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "doc",
+          "label": "handle-oracle-chat-request.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts"
+        },
+        {
+          "kind": "doc",
+          "label": "guest-usage.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guest-usage.ts"
+        },
+        {
+          "kind": "doc",
+          "label": "market.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/market.ts"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>A review of guest gates found the Shop never loaded for signed-out visitors, the whole Academy was locked while it only held a coming-soon note, guests had no way to reach support, and guest Oracle replies were five preset lines telling them to sign up. Signup from guests is the main growth bottleneck.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<ul>\n<li>The Shop loads the full gear catalog for guests, with the starter set marked as included. Buying opens sign-up.</li>\n<li>The Academy catalog, track, course and credential pages are open. Lessons and the learner&#39;s own certificates still need an account, and Enroll opens sign-up.</li>\n<li>Support shows <a href=\"mailto:support@moltology.org\">support@moltology.org</a> to guests. Tickets still need an account.</li>\n<li>Guests get real Oracle answers from Oracle Lite: 5 a day per visitor (hashed IP), 300 a day across all guests, a 700-token cap, nothing saved. The counters reuse the durable store counter table, so there is no migration.</li>\n</ul>\n<p>Character Customize, profiles, settings, member search, and posting stay members-only.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>Keep the preset guest replies. Rejected because they gave guests no reason to come back.</li>\n<li>A new table for guest counters. Rejected for now; the existing server-only counter table has the same shape and is already swept.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<ul>\n<li>Guest Oracle spend is bounded by the all-guests ceiling. Raise or lower ORACLE_GUEST_LIMITS to tune it.</li>\n<li>IP-based counting can be shared by people behind one network; the ceiling still bounds cost.</li>\n</ul>"
+        }
+      ]
     }
   ],
   "edges": [
@@ -10359,6 +10466,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "source": "economy.red-line",
       "target": "oracle.usage-allowance",
       "crossDomain": true
+    },
+    {
+      "id": "oracle.request-pipeline->oracle.guest-allowance",
+      "source": "oracle.request-pipeline",
+      "target": "oracle.guest-allowance",
+      "crossDomain": false
+    },
+    {
+      "id": "oracle.input-guardrails->oracle.guest-allowance",
+      "source": "oracle.input-guardrails",
+      "target": "oracle.guest-allowance",
+      "crossDomain": false
     },
     {
       "id": "oracle.request-pipeline->oracle.request-caps",

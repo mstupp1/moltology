@@ -5,7 +5,7 @@ import { ToastProvider } from '@/components/ui/ToastProvider'
 import { authClient } from '@/lib/auth-client'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { createSupportTicketFn } from '@/lib/server/api'
-import { SUPPORT_TICKET_COPY } from '@/lib/support-tickets'
+import { SUPPORT_INBOX, SUPPORT_TICKET_COPY } from '@/lib/support-tickets'
 import SupportTicketForm from './SupportTicketForm'
 
 vi.mock('@/lib/auth-client', () => ({
@@ -49,14 +49,15 @@ describe('SupportTicketForm', () => {
     vi.mocked(getAuthJWTToken).mockResolvedValue('mock-jwt')
   })
 
-  it('shows an honest sealed state for guests instead of a fake form', () => {
+  it('gives guests the support email instead of a fake form', () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
     renderForm()
 
     expect(screen.getByTestId('support-ticket-guest')).toBeInTheDocument()
     expect(screen.getByText(SUPPORT_TICKET_COPY.guestTitle)).toBeInTheDocument()
     expect(screen.getByText(SUPPORT_TICKET_COPY.guestBody)).toBeInTheDocument()
-    expect(screen.getByText(SUPPORT_TICKET_COPY.guestSignUp)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: SUPPORT_INBOX })).toHaveAttribute('href', `mailto:${SUPPORT_INBOX}`)
+    expect(screen.getByText(SUPPORT_TICKET_COPY.guestEmail)).toBeInTheDocument()
     expect(screen.getByText(SUPPORT_TICKET_COPY.guestSignIn)).toBeInTheDocument()
     expect(screen.queryByTestId('support-ticket-form')).not.toBeInTheDocument()
     expect(screen.queryByText(/Benthic|carapace|Dispatch|Transmit|initiate/i)).not.toBeInTheDocument()

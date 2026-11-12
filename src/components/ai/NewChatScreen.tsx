@@ -2,6 +2,7 @@ import React from 'react'
 import { ArrowUpRight, Shield, UserPlus } from 'lucide-react'
 import { BrandIcon3D } from '@/components/ui/BrandIcon3D'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
+import { ORACLE_GUEST_LIMITS } from '@/lib/ai/usage-limits'
 
 export interface PromptShortcut {
   label: string
@@ -91,7 +92,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
           <span>You're exploring as a guest</span>
         </div>
         <p className="text-[11px] text-ink-muted">
-          Sign up free for full answers and saved chats.
+          Guests get {ORACLE_GUEST_LIMITS.perDay} messages a day, and chats aren't saved. Sign up free for more.
         </p>
       </div>
       {onOpenAuthModal && (

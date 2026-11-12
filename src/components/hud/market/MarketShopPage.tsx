@@ -6,6 +6,7 @@ import { HudPagination } from '@/components/ui/HudPagination'
 import { HudSelect } from '@/components/ui/HudSelect'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { AuthModal } from '@/components/AuthModal'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { buyGearFn, createCreditCheckoutFn, getChassisLoadoutFn, getMarketFn } from '@/lib/server/api'
 import type { MoltCreditPack } from '@/lib/molt-credits'
@@ -19,7 +20,7 @@ import {
 } from '@/lib/chassis-loadout'
 import { equipmentAppearance } from '@/lib/character-appearance'
 import { RARITY_LABELS, RARITY_ORDER } from '@/lib/gear-variants'
-import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
+import { LOBSTER_AVATAR_STYLE, type LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import type { MarketPayload, MarketPiece, MarketVariant } from '@/lib/market'
 import { MARKET_BUNDLES, type PieceRef } from '@/lib/market-featured'
 import { cn } from '@/lib/utils'
@@ -31,6 +32,9 @@ import { MarketBundleDetail, MarketFeatured } from './MarketFeatured'
 import { MarketPieceCard, MarketPieceDetail, variantAsCatalog } from './MarketGear'
 import './market.css'
 import '../avatar-animations.css'
+
+/** The stand-in larva guests try gear on. */
+const GUEST_TRY_ON_CONFIG: LobsterAvatarConfig = { style: LOBSTER_AVATAR_STYLE, seed: 'guest-larva' }
 
 type Tab = 'gear' | 'earn' | 'credits'
 const TABS: { id: Tab; label: string }[] = [
@@ -151,7 +155,7 @@ function sortPieces(list: { piece: MarketPiece; shown: MarketVariant }[], sort: 
 }
 
 export function MarketShopPage() {
-  const { userId } = useAuthSession()
+  const { userId, isPending } = useAuthSession()
   const toast = useOptionalToast()?.toast
   const wide = useWide()
   const [market, setMarket] = useState<MarketPayload | null>(null)
@@ -167,9 +171,12 @@ export function MarketShopPage() {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [buying, setBuying] = useState(false)
   const [buyingPack, setBuyingPack] = useState<string | null>(null)
+  const [authOpen, setAuthOpen] = useState(false)
 
+  // Guests get the catalog too; they sign up to buy. Wait for the session so members don't
+  // see the guest version first.
   const load = useCallback(async () => {
-    if (!userId) return
+    if (isPending) return
     try {
       const token = (await getAuthJWTToken()) ?? undefined
       const payload = await getMarketFn({ data: { token } })
@@ -178,7 +185,7 @@ export function MarketShopPage() {
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not load the market.')
     }
-  }, [userId])
+  }, [userId, isPending])
 
   useEffect(() => {
     void load()
@@ -215,8 +222,12 @@ export function MarketShopPage() {
   }, [load, toast])
 
   // The member's own character, wearing what they have on, for try-ons.
+  // Guests try pieces on a stand-in larva.
   useEffect(() => {
-    if (!userId) return
+    if (!userId) {
+      if (!isPending) setConfig(GUEST_TRY_ON_CONFIG)
+      return
+    }
     let cancelled = false
     const apply = (p: ReturnType<typeof getCachedChassisLoadout>) => {
       if (!p?.config || cancelled) return
@@ -235,7 +246,7 @@ export function MarketShopPage() {
     return () => {
       cancelled = true
     }
-  }, [userId])
+  }, [userId, isPending])
 
   const matches = useMemo(
     () =>
@@ -309,6 +320,10 @@ export function MarketShopPage() {
   }, [loadout, selectedPiece, selectedVariant])
 
   const buy = async (variant: MarketVariant) => {
+    if (market?.guest) {
+      setAuthOpen(true)
+      return
+    }
     if (!selectedPiece || buying) return
     setBuying(true)
     try {
@@ -363,6 +378,7 @@ export function MarketShopPage() {
         credits={market.moltCredits}
         buying={buying}
         addFree={market.addFree}
+        guest={market.guest}
         onBuy={buy}
       />
     ) : null
@@ -376,7 +392,9 @@ export function MarketShopPage() {
         title="Shop"
         description="Gear for your character. Rarer versions come with bigger stats and stranger abilities."
         actions={
-          <MarketCurrencyBar chitinGems={market.wallet.balance} moltCredits={market.moltCredits} creditsLive={market.creditsLive} />
+          market.guest ? undefined : (
+            <MarketCurrencyBar chitinGems={market.wallet.balance} moltCredits={market.moltCredits} creditsLive={market.creditsLive} />
+          )
         }
         toolbar={
           <div role="tablist" aria-label="Market sections" className="flex gap-1">
@@ -480,10 +498,11 @@ export function MarketShopPage() {
         </div>
       ) : null}
 
-      {tab === 'earn' ? <MarketEarnPanel wallet={market.wallet} /> : null}
+      {tab === 'earn' ? <MarketEarnPanel wallet={market.wallet} guest={market.guest} /> : null}
       {tab === 'credits' ? (
         <MarketCreditsPanel live={market.creditsLive} buyingPackId={buyingPack} onBuy={buyPack} />
       ) : null}
+      {market.guest ? <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} initialMode="signup" /> : null}
     </div>
   )
 }

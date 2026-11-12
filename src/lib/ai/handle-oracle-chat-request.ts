@@ -22,18 +22,22 @@ import {
   finalizeOracleUsage,
 } from './service'
 import { getChatLimitMessage, isChatLimitError } from './chat-retention'
-import { getOracleGenerationOptions, getOracleThreadFallbackTitle } from './oracle-models'
+import { DEFAULT_ORACLE_MODEL_ID, getOracleGenerationOptions, getOracleThreadFallbackTitle } from './oracle-models'
 import {
   decideOracleUsage,
+  ORACLE_GUEST_MAX_HISTORY_CHARS,
+  ORACLE_GUEST_MAX_HISTORY_MESSAGES,
+  ORACLE_GUEST_MAX_OUTPUT_TOKENS,
   ORACLE_MAX_HISTORY_MESSAGES,
   ORACLE_MAX_OUTPUT_TOKENS,
 } from './usage-limits'
+import { reserveGuestOracleMessage } from './guest-usage'
 import {
   commitOracleTextStream,
   formatOracleUnavailableMessage,
   getLastUserText,
   ORACLE_THREAD_ID_HEADER,
-  pickGuestOracleResponse,
+  GUEST_ORACLE_LIMIT_MESSAGES,
   orderOracleModels,
   toModelMessages,
   type OracleChatMessageInput,
@@ -121,15 +125,10 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     )
   }
 
-  // Guests get a canned reply, so they never reach the chat models.
   if (!userId) {
     const lengthError = getOraclePromptLengthError(userText, false)
     if (lengthError) return Response.json({ error: lengthError }, { status: 400 })
-    return Response.json({
-      text: pickGuestOracleResponse(userText, messages.length),
-      threadId: null,
-      isGuest: true,
-    })
+    return handleGuestOracleChat(messages, userText, clientIp, request.signal)
   }
 
   try {
@@ -369,4 +368,75 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     },
     { status: 502 }
   )
+}
+
+/** A guest's limit or outage notice, shown in the chat as the Oracle's reply with the sign-up prompt. */
+function guestNotice(text: string, limit?: string): Response {
+  return Response.json({ text, threadId: null, isGuest: true, ...(limit ? { limit } : {}) })
+}
+
+/**
+ * Signed-out chat: real answers from the free model, nothing saved, no titles.
+ * History is the visitor's own recent turns from the request (they have no saved
+ * thread), capped small, with user turns re-checked by the input filter.
+ */
+async function handleGuestOracleChat(
+  messages: OracleChatMessageInput[],
+  userText: string,
+  clientIp: string,
+  signal: AbortSignal,
+): Promise<Response> {
+  try {
+    const allowance = await reserveGuestOracleMessage(clientIp)
+    if (!allowance.allowed) {
+      return guestNotice(GUEST_ORACLE_LIMIT_MESSAGES[allowance.scope], allowance.scope === 'visitor' ? 'guestDay' : 'guestAll')
+    }
+  } catch (err) {
+    // Without the counter there is no cap on spend, so guests don't reach the model.
+    console.warn('[handleGuestOracleChat] Guest allowance unavailable:', err)
+    return guestNotice(GUEST_ORACLE_LIMIT_MESSAGES.unavailable)
+  }
+
+  const history = toModelMessages(
+    messages
+      .slice(0, -1)
+      .filter((m) => m.role !== 'user' || validateInputGuardrails(m.content || m.text || '').allowed),
+    ORACLE_GUEST_MAX_HISTORY_MESSAGES - 1,
+    ORACLE_GUEST_MAX_HISTORY_CHARS,
+  )
+  const payloadMessages = toModelMessages(
+    [...history, { role: 'user', content: userText }],
+    ORACLE_GUEST_MAX_HISTORY_MESSAGES,
+    ORACLE_GUEST_MAX_HISTORY_CHARS,
+  )
+  const lastAssistant = [...history].reverse().find((turn) => turn.role === 'assistant')?.content
+  const lastUser = [...history].reverse().find((turn) => turn.role === 'user')?.content
+  const systemPrompt = buildSystemPrompt(DEFAULT_ORACLE_PERSONA)
+    + buildOracleScriptureContext(userText, lastUser, lastAssistant)
+
+  const abortController = new AbortController()
+  const abort = () => abortController.abort()
+  signal.addEventListener('abort', abort, { once: true })
+  try {
+    const result = streamText({
+      model: DEFAULT_ORACLE_MODEL_ID as any,
+      ...getOracleGenerationOptions(DEFAULT_ORACLE_MODEL_ID),
+      maxRetries: 0,
+      system: systemPrompt,
+      messages: payloadMessages,
+      maxOutputTokens: ORACLE_GUEST_MAX_OUTPUT_TOKENS,
+      abortSignal: abortController.signal,
+      onError: ({ error }) => {
+        console.warn('[Oracle Chat] Guest stream error:', error instanceof Error ? error.message : error)
+      },
+    })
+    const stream = await commitOracleTextStream(toTextStream({ stream: result.stream }))
+    return createTextStreamResponse({ stream })
+  } catch (err: any) {
+    abortController.abort()
+    signal.removeEventListener('abort', abort)
+    console.warn('[Oracle Chat] Guest reply failed:', err?.message)
+    const message = formatOracleUnavailableMessage(err instanceof Error ? err : null)
+    return Response.json({ error: message, text: message, threadId: null }, { status: 502 })
+  }
 }

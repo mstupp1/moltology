@@ -15,7 +15,11 @@ vi.mock('@/lib/server/api', () => ({
   getChassisLoadoutFn: vi.fn().mockRejectedValue(new Error('no character')),
 }))
 vi.mock('@/lib/jwt', () => ({ getAuthJWTToken: vi.fn().mockResolvedValue('token') }))
-vi.mock('@/hooks/useAuthSession', () => ({ useAuthSession: () => ({ userId: 'member-1' }) }))
+let session: { userId: string | null; isPending?: boolean } = { userId: 'member-1' }
+vi.mock('@/hooks/useAuthSession', () => ({ useAuthSession: () => session }))
+vi.mock('@/components/AuthModal', () => ({
+  AuthModal: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div role="dialog" aria-label="Sign up" /> : null),
+}))
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
 }))
@@ -77,6 +81,7 @@ describe('MarketShopPage', () => {
   beforeEach(() => {
     window.history.replaceState(null, '', '/market')
     getMarketFn.mockReset()
+    session = { userId: 'member-1' }
     buyGearFn.mockReset()
   })
 
@@ -188,6 +193,26 @@ describe('MarketShopPage', () => {
       }),
     )
     expect(await screen.findByTestId('gem-balance')).toHaveTextContent('170')
+  })
+
+  it('lets a guest browse the shop and sends them to sign up to buy', async () => {
+    session = { userId: null, isPending: false }
+    getMarketFn.mockResolvedValue({ ...payload(0), guest: true })
+    renderMarket()
+    fireEvent.click(await screen.findByRole('button', { name: /Tide-Braced Carapace, Uncommon/ }))
+    const detail = await screen.findByTestId('market-detail')
+    expect(screen.queryByTestId('gem-balance')).not.toBeInTheDocument()
+    fireEvent.click(within(detail).getByRole('button', { name: 'Sign up to buy' }))
+    expect(await screen.findByRole('dialog', { name: 'Sign up' })).toBeInTheDocument()
+    expect(buyGearFn).not.toHaveBeenCalled()
+  })
+
+  it('waits for the session before loading, so members never see the guest shop', async () => {
+    session = { userId: null, isPending: true }
+    getMarketFn.mockResolvedValue(payload(320))
+    renderMarket()
+    await new Promise((r) => setTimeout(r, 20))
+    expect(getMarketFn).not.toHaveBeenCalled()
   })
 
   it("won't let a member buy what they can't afford", async () => {

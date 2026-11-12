@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { CheckCircle2, Lock, LogIn, Send, UserPlus } from 'lucide-react'
+import { CheckCircle2, LogIn, Mail, Send } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
@@ -13,6 +13,7 @@ import {
   SUPPORT_TICKET_CATEGORIES,
   SUPPORT_TICKET_CATEGORY_LABELS,
   SUPPORT_TICKET_COPY,
+  SUPPORT_INBOX,
   SUPPORT_TICKET_HONEYPOT_FIELD,
   SUPPORT_TICKET_TURNSTILE_ACTION,
   SUPPORT_TICKET_URGENCIES,
@@ -57,16 +58,28 @@ export default function SupportTicketForm() {
     return (
       <div className="space-y-4" data-testid="support-ticket-guest">
         <div className="bg-surface-2 border border-line-subtle p-6 rounded-card text-center space-y-3">
-          <Lock className="w-8 h-8 text-crimson-text mx-auto" />
+          <Mail className="w-8 h-8 text-cyan-glow mx-auto" aria-hidden="true" />
           <h3 className="font-grotesk text-sm font-bold text-ink uppercase tracking-wider">
             {SUPPORT_TICKET_COPY.guestTitle}
           </h3>
           <p className="text-xs text-ink-muted max-w-md mx-auto leading-relaxed">
             {SUPPORT_TICKET_COPY.guestBody}
           </p>
+          <p>
+            <a
+              href={`mailto:${SUPPORT_INBOX}`}
+              className="text-sm font-semibold text-cyan-glow hover:text-ink underline underline-offset-4 rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            >
+              {SUPPORT_INBOX}
+            </a>
+          </p>
           <div className="pt-2 space-y-2">
-            <HudButton type="button" onClick={() => openAuth('signup')} icon={<UserPlus className="w-4 h-4" />}>
-              {SUPPORT_TICKET_COPY.guestSignUp}
+            <HudButton
+              type="button"
+              onClick={() => window.location.assign(`mailto:${SUPPORT_INBOX}`)}
+              icon={<Mail className="w-4 h-4" />}
+            >
+              {SUPPORT_TICKET_COPY.guestEmail}
             </HudButton>
             <div>
               <HudButton type="button" variant="ghost" onClick={() => openAuth('login')} icon={<LogIn className="w-3.5 h-3.5" />}>

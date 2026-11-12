@@ -259,7 +259,7 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
               <div className="p-2.5 bg-surface-1/80 backdrop-blur-md hud-sheen border border-line-subtle rounded-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-left">
                 <div className="flex items-center gap-1.5 text-xs text-ink-body">
                   <Shield className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
-                  <span>Exploring in guest communion. Sign up free for full answers and saved chats.</span>
+                  <span>Guest chats aren't saved. Sign up free to keep them and ask more.</span>
                 </div>
                 <BenthicCTAButton
                   variant="cyan"
@@ -359,7 +359,7 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
                           className="inline-flex items-center gap-1 text-[11px] font-medium text-cyan-glow hover:underline cursor-pointer"
                         >
                           <UserPlus className="w-3 h-3" />
-                          <span>Sign up for full answers</span>
+                          <span>Sign up to keep this chat</span>
                         </button>
                       )}
                     </div>

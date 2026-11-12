@@ -23,6 +23,7 @@ import {
   AcademyProgress,
   LevelMark,
   academyButtonLink,
+  useAcademyGuestEnroll,
 } from './AcademyChrome'
 
 export function lessonKindIcon(kind: AcademyLessonKind) {
@@ -35,8 +36,10 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
   const toast = useOptionalToast()?.toast
   const [detail, setDetail] = useState(course)
   const [busy, setBusy] = useState(false)
+  const guest = useAcademyGuestEnroll()
 
   async function enroll() {
+    if (guest.isGuest) return guest.promptSignUp()
     setBusy(true)
     try {
       const token = await getAuthJWTToken()
@@ -229,10 +232,10 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
             ) : (
               <>
                 <p className="text-xs text-ink-body leading-relaxed">
-                  Enroll to open every lesson and keep your place.
+                  {guest.isGuest ? ACADEMY_COPY.guestEnrollNote : 'Enroll to open every lesson and keep your place.'}
                 </p>
                 <HudButton type="button" variant="primary" size="md" fullWidth disabled={busy} onClick={() => void enroll()}>
-                  {busy ? 'Enrolling…' : 'Enroll'}
+                  {busy ? 'Enrolling…' : guest.isGuest ? ACADEMY_COPY.guestEnroll : 'Enroll'}
                 </HudButton>
                 {previewSlug ? (
                   <Link
@@ -277,6 +280,7 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
           </section>
         </aside>
       </div>
+      {guest.modal}
     </div>
   )
 }

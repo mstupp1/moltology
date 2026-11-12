@@ -91,7 +91,7 @@ describe('support ticket intake helpers', () => {
     expect(SUPPORT_TICKET_COPY.successBody('abc-123')).toBe(
       "We got your ticket. Reference abc-123. We'll email you when there's an update.",
     )
-    expect(SUPPORT_TICKET_COPY.guestTitle).toBe('Sign in to contact support')
+    expect(SUPPORT_TICKET_COPY.guestTitle).toBe('Contact support')
     expect(SUPPORT_PAGE_COPY.pageTitle).toBe('Support')
     expect(SUPPORT_PAGE_COPY.tabChangelog).toBe('Changelog')
     expect(SUPPORT_PAGE_COPY.tabFaq).toBe('FAQ')

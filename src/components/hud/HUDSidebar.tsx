@@ -46,7 +46,7 @@ import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 const MOBILE_TAB_IDS = ['hub', 'oracle', 'character', 'forum']
 const MOBILE_MORE_IDS = ['codex', 'academy']
 
-const GUEST_LOCKED_PATHS = new Set(['/academy', '/character', '/member', '/profile'])
+const GUEST_LOCKED_PATHS = new Set(['/character', '/member', '/profile'])
 
 export function computeNavItemHidden(
   item: { path: string; featureFlag?: FeatureFlagId },
@@ -376,7 +376,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   onMouseEnter={() => handlePrefetch(item.path)}
                   onFocus={() => handlePrefetch(item.path)}
                   data-hidden={hidden ? 'true' : undefined}
-                  title={hidden ? 'Hidden page' : undefined}
+                  title={
+                    hidden
+                      ? 'Hidden page'
+                      : !isSessionPending && !user?.id && GUEST_LOCKED_PATHS.has(item.path)
+                        ? 'Needs an account'
+                        : undefined
+                  }
                   className={`w-full text-left relative flex flex-col items-center justify-center py-2 px-1 gap-1 transition-colors duration-150 group/navitem cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
                     isActive
                       ? 'bg-surface-2'
@@ -397,7 +403,15 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                           : 'text-ink-muted group-hover/navitem:text-ink transition-colors duration-150'
                       }`}
                     />
+                    {!isSessionPending && !user?.id && GUEST_LOCKED_PATHS.has(item.path) && (
+                      <Lock
+                        data-testid="guest-lock-icon"
+                        aria-hidden
+                        className="absolute -top-1 -right-2 w-2.5 h-2.5 text-crimson-text/80"
+                      />
+                    )}
                   </span>
+
 
                   <span
                     className={`inline-flex items-center justify-center gap-0.5 text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center max-w-full transition-colors duration-150 ${
@@ -559,7 +573,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const allNavItems = visibleNavGroups.flatMap((group) => group.items)
   const mobileTabs = MOBILE_TAB_IDS.map((id) => allNavItems.find((item) => item.id === id))
     .filter((item): item is NavItem => Boolean(item))
-    .map((item) => ({ id: item.id, label: item.shortLabel ?? item.label, icon: item.icon, path: item.path }))
+    .map((item) => ({
+      id: item.id,
+      label: item.shortLabel ?? item.label,
+      icon: item.icon,
+      path: item.path,
+      locked: !isSessionPending && !user?.id && GUEST_LOCKED_PATHS.has(item.path),
+    }))
   const isOnPath = (path: string) => effectiveRoute === path || (path !== '/' && effectiveRoute.startsWith(path))
   const mobileActiveId =
     mobileTabs.find((tab) => isOnPath(tab.path))?.id ??

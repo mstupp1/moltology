@@ -7,7 +7,6 @@ import {
   ORACLE_EMPTY_RESPONSE_ERROR,
   ORACLE_MODEL_TIMEOUT_ERROR,
   ORACLE_UNAVAILABLE_MESSAGE,
-  pickGuestOracleResponse,
   toModelMessages,
 } from './oracle-chat'
 import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel, ORACLE_TITLE_MODEL_ID, PREMIUM_ORACLE_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID, getOracleTitleModelId, getOracleGenerationOptions } from './oracle-models'
@@ -36,13 +35,6 @@ describe('oracle-chat helpers', () => {
     expect(out.every((m) => m.role === 'user' || m.role === 'assistant')).toBe(true)
     expect(out).toHaveLength(1)
     expect(out[0].content.length).toBe(16_000)
-  })
-
-  it('picks a stable guest response from the message fingerprint', () => {
-    const a = pickGuestOracleResponse('hello', 1)
-    const b = pickGuestOracleResponse('hello', 1)
-    expect(a).toBe(b)
-    expect(a).toMatch(/Guest|account|Sign up/i)
   })
 
   it('keeps guests offline and prevents free accounts from selecting MAX or retired models', () => {

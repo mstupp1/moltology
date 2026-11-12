@@ -1,9 +1,10 @@
 import { and, eq, sql } from 'drizzle-orm'
-import type { getDb } from '../../db'
+import { getDb } from '../../db'
 import { equipmentCatalog, gearUnlocks, profiles, userGearItems } from '../../db/schema'
 import { getEquipmentVisual } from '../avatar/equipment'
 import { STARTER_EQUIPMENT_CATALOG_IDS } from '../equipment-seed-data'
 import { GEAR_PRICES } from '../gear-variants'
+import { GEM_FIRSTS } from '../gems'
 import { buildMarketPieces, type BuyGearResult, type MarketPayload, type WalletBalances } from '../market'
 import { isAdmin } from '../permissions'
 import { balanceRefresh, getGemWallet } from './gems'
@@ -140,9 +141,22 @@ export async function getWalletBalancesHandler(args: { data?: { token?: string }
   return getWalletBalances(auth.dbClient, auth.userId)
 }
 
+/** What a signed-out visitor sees: the full catalog, the starter set owned, nothing to spend. */
+export async function getGuestMarket(db: Db): Promise<MarketPayload> {
+  const catalog = await db.select().from(equipmentCatalog).where(eq(equipmentCatalog.kind, 'gear'))
+  return {
+    wallet: { balance: 0, history: [], firsts: GEM_FIRSTS.map((f) => ({ ...f, done: false })) },
+    addFree: false,
+    moltCredits: 0,
+    creditsLive: false,
+    guest: true,
+    pieces: buildMarketPieces(catalog, new Set(STARTER)),
+  }
+}
+
 export async function getMarketHandler(args: { data?: { token?: string }; context?: WriteAuthContext }) {
-  const auth = await resolveWriteAuth(args)
-  if (!auth) throw new Error('Authentication required.')
+  const auth = await resolveWriteAuth({ ...args, requireAuth: false })
+  if (!auth) return getGuestMarket(args.context?.db || getDb())
   return getMarket(auth.dbClient, auth.userId)
 }
 

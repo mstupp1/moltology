@@ -8,7 +8,7 @@ rules:
   - id: oracle.request-pipeline
     title: Oracle request pipeline
     kind: flow
-    statement: Every message passes flood and local input checks. Guests get a canned reply. Members pass usage checks and atomically reserve an allowance slot before chat model calls. Oversized tier-specific prompts release the slot. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.
+    statement: Every message passes flood and local input checks. Guests get a capped free-model reply, unsaved. Members pass usage checks and atomically reserve an allowance slot before chat model calls. Oversized tier-specific prompts release the slot. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.
     anchors:
       - file: src/lib/ai/handle-oracle-chat-request.ts
         symbol: handleOracleChatRequest
@@ -42,7 +42,7 @@ rules:
           - { to: guest, label: 'no' }
           - { to: usage, label: 'yes' }
       - id: guest
-        label: Canned guest reply
+        label: Capped guest reply, nothing saved
         kind: outcome
       - id: usage
         label: Over minute, five-hour, or weekly allowance?
@@ -101,6 +101,17 @@ rules:
       - file: src/lib/server/oracle-usage.ts
         symbol: getOracleUsageHandler
     tests: [src/lib/ai/usage-limits.test.ts, src/lib/ai/handle-oracle-chat-request.test.ts, src/lib/server/oracle-usage.test.ts, src/hooks/useOracleUsage.test.tsx, src/components/ai/OracleUsage.test.tsx]
+  - id: oracle.guest-allowance
+    title: Guests get a few real answers a day
+    kind: limit
+    statement: Guests can send 5 Oracle messages per UTC day per IP (stored hashed), and all guests share 300 a day. Replies use Oracle Lite, capped at 700 tokens, with up to 6 recent turns from the visitor's chat re-checked by the input filter. Nothing is saved and no title is made. If the counter can't be written, guests get a notice and no model call.
+    dependsOn: [oracle.request-pipeline, oracle.input-guardrails]
+    anchors:
+      - file: src/lib/ai/guest-usage.ts
+        symbol: reserveGuestOracleMessage
+      - file: src/lib/ai/usage-limits.ts
+        symbol: ORACLE_GUEST_LIMITS
+    tests: [src/lib/ai/guest-usage.test.ts, src/lib/ai/handle-oracle-chat-request.test.ts]
   - id: oracle.request-caps
     title: History and reply size caps
     kind: limit
@@ -152,7 +163,7 @@ rules:
   - id: oracle.model-routing
     title: Membership determines model access
     kind: permission
-    statement: Guests receive preset preview replies. Free members use Oracle Lite (DeepSeek V4.1 Flash 1017). MAX defaults to Claude Haiku 5.5 and can select Lite. Titles use the selected chat model. Both providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.
+    statement: Guests use Oracle Lite without saved chats or titles. Free members use Oracle Lite (DeepSeek V4.1 Flash 1017). MAX defaults to Claude Haiku 5.5 and can select Lite. Titles use the selected chat model. Both providers disallow training. Membership comes from the atomic usage reservation. Requested model ids cannot grant paid access, and title-only entries cannot receive chat.
     dependsOn: [oracle.input-guardrails, economy.red-line]
     anchors:
       - file: src/lib/ai/oracle-chat.ts

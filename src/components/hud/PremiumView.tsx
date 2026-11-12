@@ -108,8 +108,8 @@ export function PremiumOfferPanel({
             </h2>
           </div>
           <p className="text-xs text-ink-muted max-w-xs">
-            The free allowance starts when you sign in. Guests can explore a
-            demo.
+            The free allowance starts when you sign in. Guests can try a few
+            messages a day.
           </p>
         </div>
         <div className="oracle-max-models grid sm:grid-cols-2 gap-6 sm:gap-10 mb-7">

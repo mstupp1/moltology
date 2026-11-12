@@ -32,6 +32,8 @@ export interface MarketPayload {
   moltCredits: number
   /** Credit packs can be bought (admins with the Molt Credits experiment, for now). */
   creditsLive: boolean
+  /** Signed-out visitor: browse and try on, sign up to buy. */
+  guest?: boolean
 }
 
 export interface BuyGearResult {

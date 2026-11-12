@@ -129,7 +129,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
     expect(screen.queryByText(/Welcome! I am the/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/Welcome back!/i)).not.toBeInTheDocument()
     expect(screen.getByText(/You're exploring as a guest/i)).toBeInTheDocument()
-    expect(screen.getByText(/Sign up free for full answers/i)).toBeInTheDocument()
+    expect(screen.getByText(/Guests get 5 messages a day/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Sign Up/i })).toBeInTheDocument()
   })
 
@@ -138,7 +138,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
 
     expect(screen.queryByText(/Welcome! I am the/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/Welcome back!/i)).not.toBeInTheDocument()
-    expect(screen.queryByText(/Sign up free for full answers/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Guests get 5 messages a day/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/You're exploring as a guest/i)).not.toBeInTheDocument()
     expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Select model/i })).toBeInTheDocument()
@@ -208,7 +208,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
     expect(screen.queryByText(/Welcome back!/i)).not.toBeInTheDocument()
 
     // In-message CTA card appears on assistant responses
-    expect(screen.getAllByText(/Sign up free for full answers/i).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/Sign up free to save this chat/i).length).toBeGreaterThan(0)
     const accountButtons = screen.getAllByRole('button', { name: /Sign Up/i })
     expect(accountButtons.length).toBeGreaterThan(0)
   })
