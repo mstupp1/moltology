@@ -1,0 +1,131 @@
+/*
+ * In-app underwater scene: moving light at the surface and a slow "breath" on the painting.
+ * Everything here animates only transform and opacity on its own layer, so the browser
+ * moves it on the graphics card without repainting. Used by HudLayout.
+ */
+
+@keyframes scene-breathe {
+  0%, 100% { transform: scale(1.02); }
+  50% { transform: scale(1.06) translateY(-0.6%); }
+}
+
+@keyframes scene-caustics-a {
+  from { transform: translate3d(0, 0, 0) scale(1.5); }
+  to { transform: translate3d(-256px, -128px, 0) scale(1.5); }
+}
+
+@keyframes scene-caustics-b {
+  from { transform: translate3d(-256px, 0, 0) scale(2) rotate(8deg); }
+  to { transform: translate3d(0, -256px, 0) scale(2) rotate(8deg); }
+}
+
+@keyframes scene-rays-a {
+  0%, 100% { transform: rotate(-2.4deg); opacity: 0.7; }
+  50% { transform: rotate(2.4deg); opacity: 1; }
+}
+
+@keyframes scene-rays-b {
+  0%, 100% { transform: rotate(1.8deg); opacity: 0.9; }
+  50% { transform: rotate(-1.8deg); opacity: 0.5; }
+}
+
+/* The painting plus everything that lives in the water; dives as the page scrolls. */
+.scene-water {
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.scene-breathe {
+  animation: scene-breathe 40s ease-in-out infinite;
+  transform-origin: 50% 40%;
+  will-change: transform;
+}
+
+.scene-rays {
+  position: absolute;
+  left: -30%;
+  right: -30%;
+  top: -12%;
+  height: 125%;
+  transform-origin: 50% 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  will-change: transform, opacity;
+  -webkit-mask-image: radial-gradient(ellipse 55% 85% at 50% 0%, #000, rgba(0, 0, 0, 0.4) 55%, transparent 85%);
+  mask-image: radial-gradient(ellipse 55% 85% at 50% 0%, #000, rgba(0, 0, 0, 0.4) 55%, transparent 85%);
+}
+
+.scene-rays--a {
+  background: repeating-conic-gradient(
+    from 155deg at 50% 0%,
+    rgba(140, 245, 255, 0) 0deg,
+    rgba(140, 245, 255, 0.11) 2.2deg,
+    rgba(140, 245, 255, 0) 4.6deg,
+    rgba(140, 245, 255, 0) 7.5deg
+  );
+  animation: scene-rays-a 17s ease-in-out infinite;
+}
+
+.scene-rays--b {
+  background: repeating-conic-gradient(
+    from 160deg at 46% 0%,
+    rgba(200, 255, 255, 0) 0deg,
+    rgba(200, 255, 255, 0.08) 1.4deg,
+    rgba(200, 255, 255, 0) 3.3deg,
+    rgba(200, 255, 255, 0) 9deg
+  );
+  animation: scene-rays-b 23s ease-in-out infinite;
+}
+
+.scene-caustics {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 46%;
+  overflow: hidden;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000, rgba(0, 0, 0, 0.5) 35%, transparent);
+  mask-image: linear-gradient(to bottom, #000, rgba(0, 0, 0, 0.5) 35%, transparent);
+}
+
+.scene-caustics > i {
+  position: absolute;
+  inset: -400px;
+  background-image: var(--scene-caustics);
+  background-size: 256px 256px;
+  will-change: transform;
+}
+
+.scene-caustics > i:first-child {
+  opacity: 0.26;
+  animation: scene-caustics-a 34s linear infinite;
+}
+
+.scene-caustics > i:last-child {
+  opacity: 0.18;
+  animation: scene-caustics-b 48s linear infinite;
+}
+
+.scene-surface-glow {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 28%;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  background: radial-gradient(ellipse 60% 100% at 50% 0%, rgba(120, 240, 255, 0.26), transparent 70%);
+}
+
+/* Darkens the water as the page scrolls deeper. */
+.scene-depth {
+  background: linear-gradient(to bottom, rgba(2, 10, 14, 0) 0%, rgba(2, 8, 12, 0.92) 100%);
+  opacity: 0;
+  will-change: opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-breathe,
+  .scene-rays,
+  .scene-caustics > i {
+    animation: none;
+  }
+}

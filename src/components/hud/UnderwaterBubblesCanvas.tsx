@@ -1,38 +1,35 @@
 import React, { useEffect, useRef } from 'react'
 
-type ParticleType = 'fizz' | 'standard' | 'bokeh'
+/**
+ * Bubbles for the in-app underwater scene.
+ *
+ * Bubbles are drawn as clear glass: a bright rim, a glint where the surface light
+ * hits them, and light pooled in the lower inside. Most rise in streams from the
+ * vents and the little sub in the painting, so the scene reads as one place.
+ * Far bubbles are out of focus, near ones are sharp and wobble as they rise, and
+ * bubbles that pass through the light shafts catch more light.
+ */
+
+type ParticleKind = 'bead' | 'bubble'
 
 interface Particle {
-  type: ParticleType
+  kind: ParticleKind
   x: number
   y: number
-  z: number // depth scale: 0.05 (far background) .. 1.0 (near camera lens)
+  z: number // depth: 0 far .. 1 near
   radius: number
   speed: number
+  wobblePhase: number
   wobbleSpeed: number
   wobbleAmount: number
-  wobbleOffset: number
   opacity: number
-  variantIndex: number
-  clusterCenterX?: number
-  bokehRingWidth?: number
+  /** Bubbles from the same vent rise in a loose column. */
+  fromVent: boolean
 }
 
 export interface UnderwaterBubblesCanvasProps {
   bubbleCount?: number
   className?: string
-  /**
-   * Single URL to a custom bubble graphic asset.
-   */
-  customBubbleSrc?: string
-  /**
-   * Array of URLs for distinct bubble graphic variants.
-   */
-  customBubbleSrcs?: string[]
-  /**
-   * Chroma key color mode for custom image assets: 'green' | 'black' | 'auto'. Defaults to 'black'.
-   */
-  chromaKeyMode?: 'green' | 'black' | 'auto'
   /**
    * Disables canvas particle physics & animation frame loop when true.
    */
@@ -45,15 +42,33 @@ export interface UnderwaterBubblesCanvasProps {
 }
 
 /**
- * Stable module-level variant source list. Sharing one array identity between
- * callers (e.g. HudLayout) and the component prevents effect churn from fresh
- * inline literals on every parent re-render.
+ * Where bubbles come from, in the painting's own coordinates (0..1). The scene image
+ * is drawn with background-size: cover, centred, so these map the same way.
  */
-export const BUBBLE_VARIANT_SRCS: string[] = [
-  '/images/bubble_variant_1.jpg',
-  '/images/bubble_variant_2.jpg',
-  '/images/bubble_variant_3.jpg',
+export const SCENE_IMAGE_SIZE = { width: 1672, height: 941 }
+export const BUBBLE_VENTS = [
+  { x: 0.262, y: 0.7, weight: 2.2 },
+  { x: 0.282, y: 0.75, weight: 1.4 },
+  { x: 0.752, y: 0.66, weight: 2 },
+  { x: 0.51, y: 0.84, weight: 0.8 }, // the little sub
 ]
+const VENT_SHARE = 0.68
+
+/** Maps a point in the painting to the canvas, matching background-size: cover. */
+export function mapScenePoint(u: number, v: number, width: number, height: number): [number, number] {
+  const scale = Math.max(width / SCENE_IMAGE_SIZE.width, height / SCENE_IMAGE_SIZE.height)
+  const drawnW = SCENE_IMAGE_SIZE.width * scale
+  const drawnH = SCENE_IMAGE_SIZE.height * scale
+  return [(width - drawnW) / 2 + u * drawnW, (height - drawnH) / 2 + v * drawnH]
+}
+
+/** How much surface light reaches a point: strongest in the shafts at the top centre. */
+export function sceneLightAt(x: number, y: number, width: number, height: number): number {
+  const dx = x / Math.max(width, 1) - 0.5
+  const across = Math.exp(-(dx * dx) / 0.06)
+  const down = 1 - Math.min(1, Math.max(0, y / Math.max(height, 1))) * 0.7
+  return across * down
+}
 
 // ---------------------------------------------------------------------------
 // BUBBLE BUDGET
@@ -74,8 +89,8 @@ export interface BubbleBudget {
 }
 
 const PHONE_MAX_WIDTH = 768
-const PHONE_BUBBLES = 40
-const LOW_POWER_PHONE_BUBBLES = 24
+const PHONE_BUBBLES = 26
+const LOW_POWER_PHONE_BUBBLES = 16
 
 export function isLowPowerDevice(hints: BubbleDeviceHints): boolean {
   return (
@@ -227,218 +242,156 @@ export function createFpsGovernor(tiers: number[]): FpsGovernor {
   }
 }
 
+
+// ---------------------------------------------------------------------------
+// SPRITES
+// ---------------------------------------------------------------------------
+// Baked once per session; every frame is only drawImage calls.
+
+function newSpriteCanvas(size: number) {
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  return { canvas, ctx: canvas.getContext('2d', { alpha: true }) }
+}
+
 /**
- * Creates a chroma-keyed transparent offscreen canvas from a source image or canvas.
- * Keying out green screen or black background pixels to 0 alpha for ultra-fast sprite rendering.
+ * A clear glass bubble lit from the surface above: a bright silvery rim (total internal
+ * reflection), a sharp glint and a soft window near the top, and the bright surface seen
+ * upside down in the lower inside. The centre stays mostly clear.
  */
-export function createChromaKeyedSprite(
-  source: HTMLCanvasElement | HTMLImageElement,
-  keyMode: 'green' | 'black' | 'auto' = 'auto'
-): HTMLCanvasElement {
-  const width = (source as HTMLImageElement).naturalWidth || source.width || 128
-  const height = (source as HTMLImageElement).naturalHeight || source.height || 128
-
-  const offscreen = document.createElement('canvas')
-  offscreen.width = width
-  offscreen.height = height
-
-  const ctx = offscreen.getContext('2d', { alpha: true })
-  if (!ctx) return offscreen
-
-  ctx.drawImage(source, 0, 0, width, height)
-
+function createGlassBubbleSprite(size: number, blur = 0): HTMLCanvasElement {
+  const { canvas, ctx: g } = newSpriteCanvas(size)
+  if (!g) return canvas
   try {
-    const imgData = ctx.getImageData(0, 0, width, height)
-    const data = imgData.data
+    const c = size / 2
+    const r = size * 0.4
+    const tint = '150,235,255'
+    if (blur) g.filter = `blur(${blur}px)`
 
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i]
-      const g = data[i + 1]
-      const b = data[i + 2]
+    // The water lit around the bubble
+    let grad = g.createRadialGradient(c, c, r * 0.9, c, c, r * 1.22)
+    grad.addColorStop(0, `rgba(${tint},0.16)`)
+    grad.addColorStop(1, `rgba(${tint},0)`)
+    g.fillStyle = grad
+    g.beginPath()
+    g.arc(c, c, r * 1.22, 0, Math.PI * 2)
+    g.fill()
 
-      let isKeyPixel = false
-      const isGreenPixel = g > 100 && g > r * 1.3 && g > b * 1.3
-      const isBlackPixel = r < 25 && g < 25 && b < 25
+    // Body: clear centre, a darker band, then the bright rim
+    grad = g.createRadialGradient(c, c - r * 0.08, 0, c, c, r)
+    grad.addColorStop(0, 'rgba(200,245,255,0.04)')
+    grad.addColorStop(0.62, 'rgba(40,120,140,0.10)')
+    grad.addColorStop(0.84, `rgba(${tint},0.30)`)
+    grad.addColorStop(0.95, 'rgba(225,250,255,0.85)')
+    grad.addColorStop(1, 'rgba(255,255,255,0.35)')
+    g.fillStyle = grad
+    g.beginPath()
+    g.arc(c, c, r, 0, Math.PI * 2)
+    g.fill()
 
-      if ((keyMode === 'green' || keyMode === 'auto') && isGreenPixel) {
-        isKeyPixel = true
-      } else if ((keyMode === 'black' || keyMode === 'auto') && isBlackPixel) {
-        isKeyPixel = true
-      }
+    g.save()
+    g.beginPath()
+    g.arc(c, c, r, 0, Math.PI * 2)
+    g.clip()
+    // Rim is brighter where it faces the light and at the bottom, dimmer on the sides
+    const lin = g.createLinearGradient(0, c - r, 0, c + r)
+    lin.addColorStop(0, 'rgba(255,255,255,0.35)')
+    lin.addColorStop(0.35, 'rgba(255,255,255,0)')
+    lin.addColorStop(0.7, 'rgba(255,255,255,0)')
+    lin.addColorStop(1, `rgba(${tint},0.35)`)
+    g.fillStyle = lin
+    g.fillRect(0, 0, size, size)
+    // The bright surface, refracted into the lower inside
+    grad = g.createRadialGradient(c, c + r * 0.55, 0, c, c + r * 0.55, r * 0.62)
+    grad.addColorStop(0, 'rgba(190,255,255,0.55)')
+    grad.addColorStop(1, `rgba(${tint},0)`)
+    g.fillStyle = grad
+    g.beginPath()
+    g.ellipse(c, c + r * 0.55, r * 0.62, r * 0.32, 0, 0, Math.PI * 2)
+    g.fill()
+    g.restore()
 
-      if (isKeyPixel) {
-        data[i + 3] = 0 // Transparent alpha
-      }
+    // Soft window near the top
+    grad = g.createRadialGradient(c, c - r * 0.62, 0, c, c - r * 0.62, r * 0.42)
+    grad.addColorStop(0, 'rgba(255,255,255,0.75)')
+    grad.addColorStop(1, 'rgba(255,255,255,0)')
+    g.fillStyle = grad
+    g.beginPath()
+    g.ellipse(c, c - r * 0.62, r * 0.42, r * 0.2, 0, 0, Math.PI * 2)
+    g.fill()
+    // Sharp glint, upper left
+    g.fillStyle = 'rgba(255,255,255,0.98)'
+    g.beginPath()
+    g.ellipse(c - r * 0.38, c - r * 0.42, r * 0.1, r * 0.065, -0.7, 0, Math.PI * 2)
+    g.fill()
+    g.beginPath()
+    g.arc(c - r * 0.18, c - r * 0.58, r * 0.035, 0, Math.PI * 2)
+    g.fill()
+
+    // Thin crisp outline
+    g.lineWidth = Math.max(1, size * 0.01)
+    g.strokeStyle = 'rgba(235,252,255,0.9)'
+    g.beginPath()
+    g.arc(c, c, r - g.lineWidth / 2, 0, Math.PI * 2)
+    g.stroke()
+  } catch {
+    // A partial sprite still draws; never let a missing canvas feature break the page.
+  }
+  return canvas
+}
+
+/** Tiny bubbles are mostly highlight: a bright bead ring with one glint. */
+function createBeadSprite(size: number): HTMLCanvasElement {
+  const { canvas, ctx: g } = newSpriteCanvas(size)
+  if (!g) return canvas
+  try {
+    const c = size / 2
+    const r = size * 0.36
+    const grad = g.createRadialGradient(c, c, 0, c, c, c)
+    grad.addColorStop(0, 'rgba(200,250,255,0)')
+    grad.addColorStop(0.55, 'rgba(200,250,255,0.25)')
+    grad.addColorStop(0.72, 'rgba(240,255,255,0.95)')
+    grad.addColorStop(0.85, 'rgba(160,235,255,0.35)')
+    grad.addColorStop(1, 'rgba(160,235,255,0)')
+    g.fillStyle = grad
+    g.fillRect(0, 0, size, size)
+    g.fillStyle = 'rgba(255,255,255,1)'
+    g.beginPath()
+    g.arc(c - r * 0.3, c - r * 0.35, r * 0.28, 0, Math.PI * 2)
+    g.fill()
+  } catch {
+    // see createGlassBubbleSprite
+  }
+  return canvas
+}
+
+interface SpriteSet {
+  sharp: HTMLCanvasElement
+  soft: HTMLCanvasElement
+  far: HTMLCanvasElement
+  bead: HTMLCanvasElement
+}
+
+let spriteCache: SpriteSet | null = null
+function getSprites(): SpriteSet {
+  if (!spriteCache) {
+    spriteCache = {
+      sharp: createGlassBubbleSprite(160),
+      soft: createGlassBubbleSprite(112, 2),
+      far: createGlassBubbleSprite(96, 5),
+      bead: createBeadSprite(24),
     }
-
-    ctx.putImageData(imgData, 0, 0)
-  } catch (err) {
-    // Tainted canvas security fallback: screen blend mode will key out black background
   }
-
-  return offscreen
+  return spriteCache
 }
 
-/**
- * Pre-renders high-detail 3D Glass Spherical Bubble sprite to an offscreen canvas.
- */
-function createStandardBubbleSprite(size = 128): HTMLCanvasElement {
-  const offscreen = document.createElement('canvas')
-  offscreen.width = size
-  offscreen.height = size
-
-  const ctx = offscreen.getContext('2d', { alpha: true })
-  if (!ctx) return offscreen
-
-  const center = size / 2
-  const radius = size * 0.42
-
-  if (typeof ctx.createRadialGradient === 'function') {
-    const glowGrad = ctx.createRadialGradient(center, center, radius * 0.35, center, center, size * 0.5)
-    glowGrad.addColorStop(0, 'rgba(0, 255, 255, 0.65)')
-    glowGrad.addColorStop(0.5, 'rgba(0, 195, 255, 0.25)')
-    glowGrad.addColorStop(1, 'rgba(0, 255, 255, 0)')
-
-    ctx.fillStyle = glowGrad
-    ctx.beginPath()
-    ctx.arc(center, center, size * 0.5, 0, Math.PI * 2)
-    ctx.fill()
-
-    const shellGrad = ctx.createRadialGradient(
-      center - radius * 0.3,
-      center - radius * 0.3,
-      radius * 0.08,
-      center,
-      center,
-      radius
-    )
-    shellGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)')
-    shellGrad.addColorStop(0.38, 'rgba(0, 240, 255, 0.65)')
-    shellGrad.addColorStop(0.82, 'rgba(0, 180, 220, 0.45)')
-    shellGrad.addColorStop(1, 'rgba(0, 255, 255, 0.95)')
-
-    ctx.beginPath()
-    ctx.arc(center, center, radius, 0, Math.PI * 2)
-    ctx.fillStyle = shellGrad
-    ctx.fill()
-  } else {
-    ctx.beginPath()
-    ctx.arc(center, center, radius, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(0, 240, 255, 0.8)'
-    ctx.fill()
-  }
-
-  const highlightRadius = radius * 0.28
-  ctx.beginPath()
-  ctx.arc(
-    center - radius * 0.35,
-    center - radius * 0.35,
-    highlightRadius,
-    0,
-    Math.PI * 2
-  )
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.98)'
-  ctx.fill()
-
-  return offscreen
-}
-
-/**
- * Pre-renders Chroma-Keyed Bokeh Ring Bubble sprite to an offscreen canvas.
- */
-function createBokehBubbleSprite(size = 128): HTMLCanvasElement {
-  const offscreen = document.createElement('canvas')
-  offscreen.width = size
-  offscreen.height = size
-
-  const ctx = offscreen.getContext('2d', { alpha: true })
-  if (!ctx) return offscreen
-
-  const center = size / 2
-  const radius = size * 0.44
-
-  if (typeof ctx.createRadialGradient === 'function') {
-    const bokehGrad = ctx.createRadialGradient(center, center, radius * 0.2, center, center, radius)
-    bokehGrad.addColorStop(0, 'rgba(0, 240, 255, 0.25)')
-    bokehGrad.addColorStop(0.7, 'rgba(0, 200, 240, 0.18)')
-    bokehGrad.addColorStop(1, 'rgba(160, 255, 255, 0.85)')
-
-    ctx.beginPath()
-    ctx.arc(center, center, radius, 0, Math.PI * 2)
-    ctx.fillStyle = bokehGrad
-    ctx.fill()
-  } else {
-    ctx.beginPath()
-    ctx.arc(center, center, radius, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(0, 240, 255, 0.4)'
-    ctx.fill()
-  }
-
-  ctx.lineWidth = 3
-  ctx.strokeStyle = 'rgba(160, 255, 255, 0.85)'
-  ctx.stroke()
-
-  ctx.beginPath()
-  ctx.arc(center - radius * 0.3, center - radius * 0.3, radius * 0.3, 0, Math.PI * 2)
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
-  ctx.fill()
-
-  return offscreen
-}
-
-/**
- * Pre-renders Micro-Fizz Particle sprite to an offscreen canvas.
- */
-function createFizzBubbleSprite(size = 32): HTMLCanvasElement {
-  const offscreen = document.createElement('canvas')
-  offscreen.width = size
-  offscreen.height = size
-
-  const ctx = offscreen.getContext('2d', { alpha: true })
-  if (!ctx) return offscreen
-
-  const center = size / 2
-  const radius = size * 0.4
-
-  ctx.beginPath()
-  ctx.arc(center, center, radius, 0, Math.PI * 2)
-  ctx.fillStyle = 'rgba(220, 255, 255, 0.95)'
-  ctx.fill()
-
-  return offscreen
-}
-
-// Global persistent particle store and sprite cache across route transitions & re-mounts
+// Bubbles carry on where they were when the layout remounts (route changes).
 let globalParticles: Particle[] | null = null
-let globalCustomSpritesCache: Record<string, HTMLCanvasElement> = {}
-
-interface ProceduralSpriteSet {
-  standard: HTMLCanvasElement
-  bokeh: HTMLCanvasElement
-  fizz: HTMLCanvasElement
-}
-
-// Procedural sprites are deterministic: bake them once per session and reuse
-// across effect re-runs instead of re-rendering gradients on every mount.
-let globalProceduralSprites: ProceduralSpriteSet | null = null
-
-function getProceduralSprites(): ProceduralSpriteSet {
-  if (!globalProceduralSprites) {
-    globalProceduralSprites = {
-      standard: createStandardBubbleSprite(128),
-      bokeh: createBokehBubbleSprite(128),
-      fizz: createFizzBubbleSprite(32),
-    }
-  }
-  return globalProceduralSprites
-}
 
 export function UnderwaterBubblesCanvas({
-  bubbleCount = 90,
+  bubbleCount = 48,
   className = 'absolute inset-0 pointer-events-none z-0',
-  customBubbleSrc,
-  customBubbleSrcs,
-  chromaKeyMode = 'black',
   disabled = false,
   paused = false,
 }: UnderwaterBubblesCanvasProps) {
@@ -465,233 +418,142 @@ export function UnderwaterBubblesCanvas({
     let running = false
 
     const parent = canvas.parentElement
-    let width = (canvas.width = parent?.clientWidth || window.innerWidth || 800)
-    let height = (canvas.height = parent?.clientHeight || window.innerHeight || 600)
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5)
+    let width = 800
+    let height = 600
+    const sizeCanvas = () => {
+      width = parent?.clientWidth || window.innerWidth || 800
+      height = parent?.clientHeight || window.innerHeight || 600
+      canvas.width = Math.round(width * pixelRatio)
+      canvas.height = Math.round(height * pixelRatio)
+      if (typeof ctx.setTransform === 'function') ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
+    }
+    sizeCanvas()
 
-    // -------------------------------------------------------------------
-    // PRE-RENDERED HARDWARE-ACCELERATED SPRITE TEXTURE CACHE
-    // -------------------------------------------------------------------
-    const { standard: standardSprite, bokeh: bokehSprite, fizz: fizzSprite } = getProceduralSprites()
+    const sprites = getSprites()
+    const totalVentWeight = BUBBLE_VENTS.reduce((sum, vent) => sum + vent.weight, 0)
 
-    const targetSources = customBubbleSrcs
-      ? customBubbleSrcs
-      : customBubbleSrc
-      ? [customBubbleSrc]
-      : BUBBLE_VARIANT_SRCS
-
-    const customSprites: HTMLCanvasElement[] = []
-
-    if (typeof window !== 'undefined') {
-      targetSources.forEach((src, idx) => {
-        if (globalCustomSpritesCache[src]) {
-          customSprites[idx] = globalCustomSpritesCache[src]
-        } else {
-          const img = new Image()
-          img.onload = () => {
-            const sprite = createChromaKeyedSprite(img, chromaKeyMode)
-            globalCustomSpritesCache[src] = sprite
-            customSprites[idx] = sprite
+    const createParticle = (initial: boolean, zOverride?: number): Particle => {
+      const fromVent = Math.random() < VENT_SHARE
+      let x: number
+      let y: number
+      let z: number
+      if (fromVent) {
+        let pick = Math.random() * totalVentWeight
+        let vent = BUBBLE_VENTS[0]
+        for (const candidate of BUBBLE_VENTS) {
+          pick -= candidate.weight
+          if (pick <= 0) {
+            vent = candidate
+            break
           }
-          img.src = src
         }
-      })
-    }
-
-    // -------------------------------------------------------------------
-    // BAKED SUN GLOW BITMAP
-    // -------------------------------------------------------------------
-    // The sun glow is static between resizes; re-filling a huge radial
-    // gradient every frame is the most expensive op in the loop. Bake it
-    // once into an offscreen canvas cropped to its on-screen region, then
-    // blit with a single drawImage per frame (pixel-identical output).
-    let cachedSunGlowSprite: HTMLCanvasElement | null = null
-    let sunGlowDestX = 0
-    let sunGlowDestY = 0
-    const updateSunGlowCache = () => {
-      const sunX = width * 0.5
-      const sunY = -20
-      const sunGlowRadius = Math.max(width * 0.45, 380)
-
-      const glowLeft = Math.max(0, sunX - sunGlowRadius)
-      const glowTop = Math.max(0, sunY - sunGlowRadius)
-      const glowRight = Math.min(width, sunX + sunGlowRadius)
-      const glowBottom = Math.min(height, sunY + sunGlowRadius)
-      const glowWidth = Math.max(1, Math.ceil(glowRight - glowLeft))
-      const glowHeight = Math.max(1, Math.ceil(glowBottom - glowTop))
-
-      const glowCanvas = document.createElement('canvas')
-      glowCanvas.width = glowWidth
-      glowCanvas.height = glowHeight
-      const glowCtx = glowCanvas.getContext('2d', { alpha: true })
-
-      if (glowCtx) {
-        const localX = sunX - glowLeft
-        const localY = sunY - glowTop
-
-        if (typeof glowCtx.createRadialGradient === 'function') {
-          const glow = glowCtx.createRadialGradient(localX, localY, 10, localX, localY, sunGlowRadius)
-          glow.addColorStop(0, 'rgba(0, 255, 255, 0.18)')
-          glow.addColorStop(0.4, 'rgba(0, 195, 255, 0.08)')
-          glow.addColorStop(1, 'rgba(0, 255, 255, 0)')
-          glowCtx.fillStyle = glow
-        } else {
-          glowCtx.fillStyle = 'rgba(0, 255, 255, 0.08)'
-        }
-        glowCtx.beginPath()
-        glowCtx.arc(localX, localY, sunGlowRadius, 0, Math.PI * 2)
-        glowCtx.fill()
+        ;[x, y] = mapScenePoint(vent.x, vent.y, width, height)
+        x += (Math.random() - 0.5) * 14
+        // Vents are in the middle distance.
+        z = zOverride ?? 0.15 + Math.random() * 0.45
+      } else {
+        x = Math.random() * width
+        y = height + 20 + Math.random() * 40
+        z = zOverride ?? Math.random()
       }
+      if (initial) y -= Math.random() * (y + 40)
 
-      cachedSunGlowSprite = glowCanvas
-      sunGlowDestX = glowLeft
-      sunGlowDestY = glowTop
+      // Most bubbles are small beads; a few larger glass bubbles, mostly up close.
+      const kind: ParticleKind = Math.random() < (fromVent ? 0.6 : 0.35) ? 'bead' : 'bubble'
+      const near = z > 0.75
+      const radius =
+        kind === 'bead'
+          ? (1.6 + Math.random() * 2.4) * (0.6 + z * 0.6)
+          : (near ? 9 + Math.random() * 15 : 3.5 + Math.random() * 7) * (0.6 + z * 0.7)
+
+      return {
+        kind,
+        x,
+        y,
+        z,
+        radius,
+        // Bigger bubbles rise faster; nearer ones look faster.
+        speed: (20 + radius * 2.2 + Math.random() * 18) * (0.55 + z * 0.6),
+        wobblePhase: Math.random() * Math.PI * 2,
+        wobbleSpeed: kind === 'bead' ? 3 + Math.random() * 3 : 1.4 + Math.random() * 1.8,
+        wobbleAmount: kind === 'bead' ? 1 + Math.random() * 2.5 : 2 + z * 6,
+        opacity: kind === 'bead' ? 0.55 + z * 0.4 : 0.5 + z * 0.45,
+        fromVent,
+      }
     }
-    updateSunGlowCache()
+
+    const budget = pickBubbleBudget(bubbleCount, readDeviceHints())
+    let particles: Particle[]
+    if (globalParticles && globalParticles.length === budget.count) {
+      particles = globalParticles
+    } else {
+      particles = Array.from({ length: budget.count }, () => createParticle(true)).sort((a, b) => a.z - b.z)
+      globalParticles = particles
+    }
+
+    // When a device can't keep up, swap the most out-of-focus bubbles (the costliest
+    // blurred sprites relative to what they add) for nearer, cheaper beads.
+    let farCulled = false
+    const cullFar = () => {
+      if (farCulled) return
+      farCulled = true
+      for (let i = 0; i < particles.length; i++) {
+        if (particles[i].z < 0.25) particles[i] = createParticle(false, 0.45 + Math.random() * 0.5)
+      }
+      particles.sort((a, b) => a.z - b.z)
+    }
 
     let resizeTimeout: ReturnType<typeof setTimeout>
     const handleResize = () => {
       clearTimeout(resizeTimeout)
       resizeTimeout = setTimeout(() => {
-        if (!canvas) return
-        width = canvas.width = parent?.clientWidth || window.innerWidth || 800
-        height = canvas.height = parent?.clientHeight || window.innerHeight || 600
-        updateClusterCenters()
-        updateSunGlowCache()
+        sizeCanvas()
+        for (let i = 0; i < particles.length; i++) particles[i] = createParticle(true)
+        particles.sort((a, b) => a.z - b.z)
+        if (!running) drawFrame(0)
       }, 100)
     }
-
     window.addEventListener('resize', handleResize, { passive: true })
 
     const prefersReducedMotion =
-      typeof window !== 'undefined' &&
-      window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+      typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
 
-    let clusterCenters: number[] = []
-    const updateClusterCenters = () => {
-      clusterCenters = [
-        width * 0.15,
-        width * 0.35,
-        width * 0.50,
-        width * 0.65,
-        width * 0.85,
-      ]
-    }
-    updateClusterCenters()
-
-    const createParticle = (initialY?: number, zOverride?: number): Particle => {
-      const roll = Math.random()
-
-      let type: ParticleType
-      if (roll < 0.35) {
-        type = 'fizz'
-      } else if (roll < 0.78) {
-        type = 'standard'
-      } else {
-        type = 'bokeh'
-      }
-
-      const z = zOverride ?? Math.random() * 0.92 + 0.08
-      const isClustered = Math.random() < 0.88
-
-      let x: number
-      let clusterCenterX: number | undefined
-      if (isClustered && clusterCenters.length > 0) {
-        const center = clusterCenters[Math.floor(Math.random() * clusterCenters.length)]
-        clusterCenterX = center
-        const spread = type === 'fizz' ? 45 : type === 'bokeh' ? 95 : 65
-        const clusterJitter = (Math.random() + Math.random() - 1) * spread
-        x = center + clusterJitter
-      } else {
-        x = Math.random() * width
-      }
-
-      let radius: number
-      let speed: number
-      let opacity: number
-      let bokehRingWidth: number | undefined
-
-      if (type === 'fizz') {
-        radius = (Math.random() * 3.0 + 1.2) * (0.5 + 0.5 * z)
-        speed = (Math.random() * 140 + 60) * (0.45 + 0.55 * z)
-        opacity = Math.random() * 0.6 + 0.35
-      } else if (type === 'standard') {
-        const sizePower = Math.pow(Math.random(), 1.8)
-        radius = (sizePower * 26 + 8.0) * (0.4 + 0.6 * z)
-        speed = (Math.random() * 110 + 45) * (0.4 + 0.6 * z)
-        opacity = Math.random() * 0.65 + 0.35
-      } else {
-        radius = (Math.random() * 34 + 20) * (0.5 + 0.5 * z)
-        speed = (Math.random() * 80 + 35) * (0.35 + 0.65 * z)
-        opacity = Math.random() * 0.45 + 0.25
-        bokehRingWidth = Math.random() * 2.5 + 1.2
-      }
-
-      const variantIndex = Math.floor(Math.random() * targetSources.length)
-
-      return {
-        type,
-        x,
-        y: initialY !== undefined ? initialY : Math.random() * (height + 140),
-        z,
-        radius,
-        speed,
-        wobbleSpeed: Math.random() * 2.5 + 0.8,
-        wobbleAmount: Math.random() * 20 + 6,
-        wobbleOffset: Math.random() * Math.PI * 2,
-        opacity,
-        variantIndex,
-        clusterCenterX,
-        bokehRingWidth,
-      }
-    }
-
-    const budget = pickBubbleBudget(bubbleCount, readDeviceHints())
-    const activeParticleCount = budget.count
-
-    // Reuse persistent global particle positions across page changes & re-renders
-    let particles: Particle[]
-    if (globalParticles && globalParticles.length === activeParticleCount) {
-      particles = globalParticles
-    } else {
-      particles = Array.from({ length: activeParticleCount }, () => createParticle()).sort(
-        (a, b) => a.z - b.z
-      )
-      globalParticles = particles
-    }
-
-    const applyParticle = (target: Particle, src: Particle) => {
-      target.type = src.type
-      target.x = src.x
-      target.y = src.y
-      target.z = src.z
-      target.radius = src.radius
-      target.speed = src.speed
-      target.wobbleSpeed = src.wobbleSpeed
-      target.wobbleAmount = src.wobbleAmount
-      target.wobbleOffset = src.wobbleOffset
-      target.opacity = src.opacity
-      target.variantIndex = src.variantIndex
-      target.clusterCenterX = src.clusterCenterX
-      target.bokehRingWidth = src.bokehRingWidth
-    }
-
-    // One-time overdraw relief for the lowest FPS tier: near-invisible far
-    // fizz is recycled into visible mid/near bubbles so perceived density
-    // stays constant while tiny high-churn sprites disappear.
-    let farFizzCulled = false
-    const cullFarFizz = () => {
-      if (farFizzCulled) return
-      farFizzCulled = true
+    const drawFrame = (dt: number) => {
+      ctx.clearRect(0, 0, width, height)
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i]
-        if (p.type === 'fizz' && p.z < 0.25) {
-          applyParticle(p, createParticle(height + Math.random() * 50 + 10, 0.45 + Math.random() * 0.5))
+        p.y -= p.speed * dt
+        p.wobblePhase += p.wobbleSpeed * dt
+
+        if (p.y < -40) {
+          particles[i] = createParticle(false, p.z)
+          continue
+        }
+
+        const x = p.x + Math.sin(p.wobblePhase) * p.wobbleAmount
+        // Fade in from the vent or the bottom edge, and out just under the surface.
+        let edge = 1
+        if (p.y < 90) edge = Math.max(0, p.y / 90)
+        const light = sceneLightAt(x, p.y, width, height)
+        const alpha = p.opacity * edge * (0.55 + 0.6 * light)
+        if (alpha <= 0.02) continue
+        ctx.globalAlpha = Math.min(1, alpha)
+
+        if (p.kind === 'bead') {
+          const d = p.radius * 2 / 0.72
+          ctx.drawImage(sprites.bead, x - d / 2, p.y - d / 2, d, d)
+        } else {
+          const sprite = p.z > 0.88 ? sprites.soft : p.z > 0.3 ? sprites.sharp : sprites.far
+          // Larger bubbles flatten and rock as they rise.
+          const squash = p.radius > 8 ? 1 + Math.sin(p.wobblePhase * 1.7) * 0.08 : 1
+          const d = (p.radius * 2) / 0.8
+          ctx.drawImage(sprite, x - (d * squash) / 2, p.y - d / squash / 2, d * squash, d / squash)
         }
       }
+      ctx.globalAlpha = 1
     }
 
-    // Restart the loop after a hidden tab or an external pause, without
-    // letting the time gap turn into one big jump.
     const resume = () => {
       if (running || isPaused || pausedRef.current || prefersReducedMotion) return
       const now = performance.now()
@@ -713,7 +575,6 @@ export function UnderwaterBubblesCanvas({
         resume()
       }
     }
-
     document.addEventListener('visibilitychange', handleVisibilityChange)
 
     const startTime = performance.now()
@@ -722,7 +583,6 @@ export function UnderwaterBubblesCanvas({
     let lastRafTimestamp = startTime
     const governor = createFpsGovernor(budget.fpsTiers)
     let frameInterval = governor.intervalMs
-    // Let the very first callback draw instead of waiting out a frame interval.
     lastFrameTime = startTime - frameInterval
 
     const render = (now: number = performance.now()) => {
@@ -743,72 +603,15 @@ export function UnderwaterBubblesCanvas({
       }
 
       const workStart = performance.now()
-      const dt = Math.min((now - lastTime) / 1000, 0.1)
+      const dt = prefersReducedMotion ? 0 : Math.min((now - lastTime) / 1000, 0.1)
       lastTime = now
       lastFrameTime = now - (elapsed % frameInterval)
 
-      ctx.clearRect(0, 0, width, height)
+      drawFrame(dt)
 
-      if (cachedSunGlowSprite) {
-        ctx.drawImage(cachedSunGlowSprite, sunGlowDestX, sunGlowDestY)
-      }
-
-      // Set blend mode ONCE for particle sprites to avoid context flushing
-      if (chromaKeyMode === 'black' || chromaKeyMode === 'auto') {
-        ctx.globalCompositeOperation = 'screen'
-      }
-
-      // Hardware-accelerated multi-variant sprite draw loop
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i]
-
-        if (!prefersReducedMotion) {
-          p.y -= p.speed * dt
-          p.wobbleOffset += p.wobbleSpeed * dt
-        }
-
-        const renderX = p.x + Math.sin(p.wobbleOffset) * p.wobbleAmount * p.z
-        const renderY = p.y
-
-        if (renderY < -60) {
-          applyParticle(p, createParticle(height + Math.random() * 50 + 10))
-        }
-
-        let edgeAlpha = 1
-        if (renderY < 100) {
-          edgeAlpha = Math.max(0, renderY / 100)
-        } else if (renderY > height - 60) {
-          edgeAlpha = Math.max(0, (height - renderY) / 60)
-        }
-
-        const currentOpacity = p.opacity * edgeAlpha * (0.45 + 0.55 * p.z)
-
-        if (currentOpacity <= 0.01) continue
-
-        // Select sprite texture from custom variants or fallbacks
-        const customVariant = customSprites[p.variantIndex]
-        const activeSprite =
-          customVariant ||
-          (p.type === 'fizz' ? fizzSprite : p.type === 'bokeh' ? bokehSprite : standardSprite)
-
-        ctx.globalAlpha = currentOpacity
-        const size = p.radius * 2
-
-        if (typeof ctx.drawImage === 'function') {
-          ctx.drawImage(activeSprite, renderX - p.radius, renderY - p.radius, size, size)
-        }
-      }
-
-      // Reset canvas context state ONCE after draw loop finishes
-      ctx.globalCompositeOperation = 'source-over'
-      ctx.globalAlpha = 1.0
-
-      const renderMs = performance.now() - workStart
-      const tierSample = governor.sample(renderMs, rafDelta)
+      const tierSample = governor.sample(performance.now() - workStart, rafDelta)
       frameInterval = tierSample.intervalMs
-      if (tierSample.cullRequested) {
-        cullFarFizz()
-      }
+      if (tierSample.cullRequested) cullFar()
 
       if (!prefersReducedMotion && !isPaused) {
         animationFrameId = requestAnimationFrame(render)
@@ -817,8 +620,7 @@ export function UnderwaterBubblesCanvas({
       }
     }
 
-    // Always paint one frame, even when mounting paused or with reduced motion,
-    // so the scene is in place the moment the page underneath is shown.
+    // Always paint one frame, even when starting paused or under reduced motion.
     running = true
     animationFrameId = requestAnimationFrame((now) => {
       const wasPaused = pausedRef.current
@@ -838,7 +640,7 @@ export function UnderwaterBubblesCanvas({
       window.removeEventListener('resize', handleResize)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [bubbleCount, customBubbleSrc, customBubbleSrcs, chromaKeyMode, disabled])
+  }, [bubbleCount, disabled])
 
   if (disabled) {
     return null
@@ -848,10 +650,9 @@ export function UnderwaterBubblesCanvas({
     <canvas
       ref={canvasRef}
       className={className}
+      style={{ width: '100%', height: '100%' }}
       aria-hidden="true"
       data-testid="underwater-bubbles-canvas"
     />
   )
 }
-
-

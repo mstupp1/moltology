@@ -64,7 +64,7 @@ function isEssentialPublicAsset(relPath: string): boolean {
       relPath === 'public/images/order_emblem.webp' ||
       relPath === 'public/images/order_emblem.svg' ||
       relPath === 'public/images/scanline_pattern.png' ||
-      relPath.startsWith('public/images/bubble_variant_') ||
+      relPath === 'public/images/scene-caustics.webp' ||
       relPath.startsWith('public/images/pwa/')
     )
   }

@@ -2,11 +2,12 @@ import React from 'react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import {
-  BUBBLE_VARIANT_SRCS,
+  BUBBLE_VENTS,
   UnderwaterBubblesCanvas,
-  createChromaKeyedSprite,
   createFpsGovernor,
+  mapScenePoint,
   pickBubbleBudget,
+  sceneLightAt,
 } from './UnderwaterBubblesCanvas'
 
 describe('UnderwaterBubblesCanvas Component', () => {
@@ -53,87 +54,32 @@ describe('UnderwaterBubblesCanvas Component', () => {
 
     HTMLCanvasElement.prototype.getContext = getContextMock
 
-    render(<UnderwaterBubblesCanvas bubbleCount={15} customBubbleSrc="/images/custom_bubble.png" chromaKeyMode="green" />)
+    render(<UnderwaterBubblesCanvas bubbleCount={15} />)
 
     expect(getContextMock).toHaveBeenCalledWith('2d', { alpha: true })
   })
 
-  it('processes green/black background keying via createChromaKeyedSprite helper', () => {
-    const mockImageData = {
-      data: new Uint8ClampedArray([
-        0, 200, 0, 255, // Green key pixel
-        10, 10, 10, 255, // Black key pixel
-        255, 255, 255, 255 // White foreground pixel
-      ]),
-      width: 3,
-      height: 1,
-    }
-
-    const mockCtx = {
-      drawImage: vi.fn(),
-      getImageData: vi.fn().mockReturnValue(mockImageData),
-      putImageData: vi.fn(),
-    }
-
-    HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue(mockCtx)
-
-    const mockCanvas = {
-      width: 128,
-      height: 128,
-    } as unknown as HTMLCanvasElement
-
-    const spriteCanvas = createChromaKeyedSprite(mockCanvas, 'auto')
-
-    expect(spriteCanvas).toBeInstanceOf(HTMLCanvasElement)
-    expect(mockCtx.getImageData).toHaveBeenCalledWith(0, 0, 128, 128)
-    expect(mockCtx.putImageData).toHaveBeenCalled()
-    // Green pixel (index 0) and Black pixel (index 4) alpha channels set to 0, white (index 8) stays 255
-    expect(mockImageData.data[3]).toBe(0)
-    expect(mockImageData.data[7]).toBe(0)
-    expect(mockImageData.data[11]).toBe(255)
-  })
-
-  it('correctly keys only black pixels when chromaKeyMode="black"', () => {
-    const mockImageData = {
-      data: new Uint8ClampedArray([
-        0, 200, 0, 255, // Green pixel (should NOT be keyed when mode is black)
-        10, 10, 10, 255, // Black pixel (should be keyed)
-        255, 255, 255, 255 // White foreground pixel (should NOT be keyed)
-      ]),
-      width: 3,
-      height: 1,
-    }
-
-    const mockCtx = {
-      drawImage: vi.fn(),
-      getImageData: vi.fn().mockReturnValue(mockImageData),
-      putImageData: vi.fn(),
-    }
-
-    HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue(mockCtx)
-
-    const mockCanvas = {
-      width: 128,
-      height: 128,
-    } as unknown as HTMLCanvasElement
-
-    createChromaKeyedSprite(mockCanvas, 'black')
-
-    expect(mockImageData.data[3]).toBe(255) // Green pixel stays opaque
-    expect(mockImageData.data[7]).toBe(0)   // Black pixel becomes transparent
-    expect(mockImageData.data[11]).toBe(255) // White pixel stays opaque
-  })
-
 })
 
-describe('BUBBLE_VARIANT_SRCS', () => {
-  it('exposes a stable module-level array of the three variant assets', () => {
-    expect(BUBBLE_VARIANT_SRCS).toEqual([
-      '/images/bubble_variant_1.jpg',
-      '/images/bubble_variant_2.jpg',
-      '/images/bubble_variant_3.jpg',
-    ])
-    expect(BUBBLE_VARIANT_SRCS).toBe(BUBBLE_VARIANT_SRCS)
+describe('scene mapping', () => {
+  it('maps painting points like background-size: cover, centred', () => {
+    // A 16:9-ish desktop fills the width, so the painting's corners land on the canvas corners horizontally.
+    const [x0] = mapScenePoint(0, 0.5, 1672, 941)
+    const [x1, y1] = mapScenePoint(1, 1, 1672, 941)
+    expect(x0).toBeCloseTo(0)
+    expect(x1).toBeCloseTo(1672)
+    expect(y1).toBeCloseTo(941)
+    // A tall phone crops the sides, so the left vent falls off screen and the sub stays near the middle.
+    const [ventX] = mapScenePoint(BUBBLE_VENTS[0].x, BUBBLE_VENTS[0].y, 390, 844)
+    const [subX] = mapScenePoint(0.51, 0.84, 390, 844)
+    expect(ventX).toBeLessThan(0)
+    expect(subX).toBeGreaterThan(150)
+    expect(subX).toBeLessThan(250)
+  })
+
+  it('puts the most light in the shafts at the top centre', () => {
+    expect(sceneLightAt(720, 0, 1440, 900)).toBeGreaterThan(sceneLightAt(720, 800, 1440, 900))
+    expect(sceneLightAt(720, 100, 1440, 900)).toBeGreaterThan(sceneLightAt(100, 100, 1440, 900))
   })
 })
 
@@ -272,15 +218,15 @@ describe('pickBubbleBudget', () => {
     })
   })
 
-  it('caps phones at 40 bubbles and 30fps', () => {
+  it('caps phones at 26 bubbles and 30fps', () => {
     expect(pickBubbleBudget(90, { viewportWidth: 390, hardwareConcurrency: 8, deviceMemory: 8 })).toEqual({
-      count: 40,
+      count: 26,
       fpsTiers: [30, 24, 18],
     })
   })
 
-  it('drops low-power and data-saver phones to 24 bubbles at 24fps', () => {
-    const lowPower = { count: 24, fpsTiers: [24, 18] }
+  it('drops low-power and data-saver phones to 16 bubbles at 24fps', () => {
+    const lowPower = { count: 16, fpsTiers: [24, 18] }
     expect(pickBubbleBudget(90, { viewportWidth: 390, hardwareConcurrency: 4 })).toEqual(lowPower)
     expect(pickBubbleBudget(90, { viewportWidth: 390, deviceMemory: 2 })).toEqual(lowPower)
     expect(pickBubbleBudget(90, { viewportWidth: 390, saveData: true })).toEqual(lowPower)
