@@ -99,3 +99,68 @@ export function getFreshAlignmentSnapshot(
   if (!snapshot || snapshot.date !== todayDate) return null
   return snapshot
 }
+
+/**
+ * Last-known XP and streak for first paint, so the dashboard and XP ring open on the
+ * member's real stage instead of Stage 1 / 0 XP while the server read is in flight.
+ * XP never resets, so it is used at any age; the streak only when saved today.
+ */
+export const PROGRESS_SNAPSHOT_STORAGE_PREFIX = 'moltology:alignment:progress:'
+
+export interface ProgressSnapshot {
+  /** Local date the streak values were read for. */
+  date: string
+  xp: number
+  stage: number
+  streakDays: number
+  todayWasComplete: boolean
+  history: Array<{ date: string; completedCount: number }>
+}
+
+export function progressSnapshotStorageKey(userId: string): string {
+  return `${PROGRESS_SNAPSHOT_STORAGE_PREFIX}${userId}`
+}
+
+function isProgressSnapshot(value: unknown): value is ProgressSnapshot {
+  if (!value || typeof value !== 'object') return false
+  const r = value as Record<string, unknown>
+  return (
+    typeof r.date === 'string' &&
+    DATE_RE.test(r.date) &&
+    typeof r.xp === 'number' &&
+    Number.isFinite(r.xp) &&
+    typeof r.stage === 'number' &&
+    typeof r.streakDays === 'number' &&
+    typeof r.todayWasComplete === 'boolean' &&
+    Array.isArray(r.history) &&
+    r.history.every(
+      (day) =>
+        !!day &&
+        typeof (day as { date?: unknown }).date === 'string' &&
+        typeof (day as { completedCount?: unknown }).completedCount === 'number',
+    )
+  )
+}
+
+export function getCachedProgressSnapshot(userId: string | null | undefined): ProgressSnapshot | null {
+  if (!userId || !canUseLocalStorage()) return null
+  try {
+    const raw = window.localStorage.getItem(progressSnapshotStorageKey(userId))
+    if (!raw) return null
+    const parsed: unknown = JSON.parse(raw)
+    return isProgressSnapshot(parsed) ? parsed : null
+  } catch {
+    return null
+  }
+}
+
+export function setCachedProgressSnapshot(userId: string | null | undefined, snapshot: ProgressSnapshot): void {
+  if (!userId || !canUseLocalStorage() || !isProgressSnapshot(snapshot)) return
+  try {
+    // The streak strip only shows two weeks; keep the record small.
+    const history = snapshot.history.slice(-21)
+    window.localStorage.setItem(progressSnapshotStorageKey(userId), JSON.stringify({ ...snapshot, history }))
+  } catch {
+    // Ignore quota / privacy-mode write failures
+  }
+}

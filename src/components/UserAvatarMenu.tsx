@@ -1,5 +1,4 @@
-import { getUserProfileFn } from '@/lib/server/api'
-import { getAuthJWTToken } from '@/lib/jwt'
+import { useAccountProfile } from '@/hooks/useAccountProfile'
 import { parseLobsterAvatarConfig } from '@/lib/lobster-avatar'
 import React, { useState, useRef, useEffect } from 'react'
 import { LogOut, ChevronDown, ChevronsUpDown, CircleUser, Settings } from 'lucide-react'
@@ -103,36 +102,13 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   displayName: displayNameProp,
   size = 'nav',
 }) => {
-  const [character, setCharacter] = useState({ userId: user.id, config: user.avatarConfig })
-  useEffect(() => {
-    let cancelled = false
-    setCharacter({ userId: user.id, config: user.avatarConfig })
-    if (user.avatarConfig !== undefined || !user.id) return
-    const load = async () => {
-      try {
-        const token = await getAuthJWTToken()
-        const profile = await getUserProfileFn({
-          data: { userId: user.id, token: token ?? undefined },
-        })
-        if (!cancelled)
-          setCharacter({ userId: user.id, config: parseLobsterAvatarConfig(profile?.avatarConfig) })
-      } catch {}
-    }
-    void load()
-    window.addEventListener('profile-avatar-changed', load)
-    return () => {
-      cancelled = true
-      window.removeEventListener('profile-avatar-changed', load)
-    }
-  }, [user.id, user.avatarConfig])
+  // The caller may already know the character; otherwise read the shared, cached profile.
+  const { profile } = useAccountProfile(user.avatarConfig === undefined ? user.id : null)
+  const characterPending = user.avatarConfig === undefined && Boolean(user.id) && profile === undefined
   const avatarUser = {
     ...user,
     avatarConfig:
-      user.avatarConfig !== undefined
-        ? user.avatarConfig
-        : character.userId === user.id
-          ? character.config
-          : null,
+      user.avatarConfig !== undefined ? user.avatarConfig : parseLobsterAvatarConfig(profile?.avatarConfig),
   }
   const [isOpen, setIsOpen] = useState(false)
   const [shouldRender, setShouldRender] = useState(isOpen)
@@ -231,6 +207,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           <div className="flex items-center gap-3 min-w-0">
             <UserAvatar
               user={avatarUser}
+              pending={characterPending}
               name={displayName}
               size="sm"
             />
@@ -323,7 +300,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           className="w-full flex items-center gap-3 min-h-[56px] pl-4 pr-4 py-2.5 text-left transition-colors duration-150 group cursor-pointer hover:bg-surface-2 aria-expanded:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
         >
           <span className="relative flex shrink-0 rounded-full">
-            <UserAvatar user={avatarUser} name={displayName} size="row" borderless />
+            <UserAvatar user={avatarUser} pending={characterPending} name={displayName} size="row" borderless />
             <span
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/15 transition-shadow group-hover:ring-white/40 group-aria-expanded:ring-white/40"
@@ -353,7 +330,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           aria-label="User account menu"
           className="relative flex rounded-full transition-transform group cursor-pointer active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
-          <UserAvatar user={avatarUser} name={displayName} size={size === 'pill' ? 'row' : 'nav'} borderless />
+          <UserAvatar user={avatarUser} pending={characterPending} name={displayName} size={size === 'pill' ? 'row' : 'nav'} borderless />
           <span
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/15 transition-shadow group-hover:ring-white/40 group-aria-expanded:ring-white/40"
@@ -384,6 +361,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           <div className="flex items-center gap-3 pb-3 border-b border-line-subtle">
             <UserAvatar
               user={avatarUser}
+              pending={characterPending}
               name={displayName}
               size="md"
             />

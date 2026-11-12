@@ -67,3 +67,23 @@ describe('alignment snapshot cache', () => {
     expect(getCachedAlignmentSnapshot(USER_ID)).toBeNull()
   })
 })
+
+describe('progress snapshot', () => {
+  it('round-trips XP and streak per member and rejects bad records', async () => {
+    const { getCachedProgressSnapshot, setCachedProgressSnapshot, progressSnapshotStorageKey } = await import(
+      './alignment-snapshot'
+    )
+    setCachedProgressSnapshot('m-1', {
+      date: '2026-11-11',
+      xp: 420,
+      stage: 3,
+      streakDays: 5,
+      todayWasComplete: false,
+      history: [{ date: '2026-11-10', completedCount: 8 }],
+    })
+    expect(getCachedProgressSnapshot('m-1')).toMatchObject({ xp: 420, stage: 3, streakDays: 5 })
+    expect(getCachedProgressSnapshot('m-2')).toBeNull()
+    window.localStorage.setItem(progressSnapshotStorageKey('m-3'), JSON.stringify({ xp: 'lots' }))
+    expect(getCachedProgressSnapshot('m-3')).toBeNull()
+  })
+})

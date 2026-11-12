@@ -111,3 +111,13 @@ it('puts the portrait glass over a character, but not at the tiny sizes', () => 
   rerender(<UserAvatar user={{ name: 'Photo', image: 'https://example.com/p.jpg' }} size="md" />)
   expect(screen.queryByTestId('glass-lens')).toBeNull()
 })
+
+it('holds a pulse placeholder instead of a letter or photo while the character loads', () => {
+  const user = { name: 'Carcinus', image: 'https://example.com/p.jpg' }
+  const { rerender } = render(<UserAvatar user={user} pending size="row" />)
+  expect(screen.getByTestId('user-avatar-pending')).toBeInTheDocument()
+  expect(screen.queryByText('C')).toBeNull()
+  expect(screen.queryByRole('img')).toBeNull()
+  rerender(<UserAvatar user={user} size="row" />)
+  expect(screen.queryByTestId('user-avatar-pending')).toBeNull()
+})

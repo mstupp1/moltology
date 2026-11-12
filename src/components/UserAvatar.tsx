@@ -26,6 +26,11 @@ export interface UserAvatarProps {
   /** Wear the profile portrait's glass over a character (default true; never below 24px). */
   glass?: boolean
   alt?: string
+  /**
+   * The member's character is still loading: draw the same soft pulse as a loading
+   * still instead of a letter or sign-in picture that would be swapped out a moment later.
+   */
+  pending?: boolean
 }
 
 /**
@@ -47,6 +52,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
     alt,
     borderless = false,
     glass = true,
+    pending = false,
   }) => {
     const [imageError, setImageError] = useState(false)
 
@@ -95,6 +101,19 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
         >
           <CharacterStill config={character} px={resolution} alt={displayAlt} scene imgClassName="rounded-full" />
           {lens && <GlassLens />}
+        </div>
+      )
+    }
+
+    // Still learning who this is: hold the portrait's shape with the still's own loading pulse.
+    if (pending) {
+      return (
+        <div
+          data-testid="user-avatar-pending"
+          aria-label={displayAlt}
+          className={`relative shrink-0 rounded-full overflow-hidden bg-abyss ${glass && !borderless ? GLASS_FRAME_CLASS : ''} ${sizeClasses} ${className}`}
+        >
+          <span aria-hidden className="absolute inset-0 animate-pulse bg-white/[0.05] motion-reduce:animate-none" />
         </div>
       )
     }

@@ -21,15 +21,18 @@ import {
   type DailyStreakDay,
 } from '@/lib/alignment-tasks'
 import {
+  getCachedProgressSnapshot,
   getFreshAlignmentSnapshot,
   setCachedAlignmentSnapshot,
+  setCachedProgressSnapshot,
   snapshotFromCompletedKeys,
 } from '@/lib/alignment-snapshot'
 import {
   getDailyAlignmentFn,
-  getUserProfileFn,
   toggleDailyAlignmentTaskFn,
 } from '@/lib/server/api'
+import { getQueryClient } from '@/lib/query/client'
+import { accountProfileQuery } from '@/hooks/useAccountProfile'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { gemStreakBonus } from '@/lib/gems'
 import { getAssetUrl } from '@/lib/assets'
@@ -77,8 +80,15 @@ export interface AlignmentContextValue {
   xp: number
   stage: number
   progression: ProgressionState
-  /** False until this member's saved XP has loaded, so XP displays don't jump from zero. */
+  /**
+   * True once this member's XP is known, from the server or from the last reading saved on
+   * this device, so XP displays never jump from zero. Show a placeholder while false.
+   */
   xpReady: boolean
+  /** True only once the server has confirmed XP; gains and level-ups are measured from here. */
+  xpConfirmed: boolean
+  /** True once the streak is known (server, or today's saved reading). */
+  streakReady: boolean
 }
 
 const AlignmentContext = createContext<AlignmentContextValue | null>(null)
@@ -108,6 +118,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
   const [serverXp, setServerXp] = useState<number>(0)
   const [serverStage, setServerStage] = useState<number>(1)
   const [serverXpUserId, setServerXpUserId] = useState<string | null>(null)
+  const [cachedXpUserId, setCachedXpUserId] = useState<string | null>(null)
   const [optimisticXpDelta, setOptimisticXpDelta] = useState<number>(0)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isSyncing, setIsSyncing] = useState<boolean>(false)
@@ -126,8 +137,8 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     }
     const activeUserId = userId
     try {
-      const token = await getAuthJWTToken().catch(() => null)
-      const profile = await getUserProfileFn({ data: { token: token ?? undefined, userId: activeUserId } })
+      // Shared profile cache: usually already loaded by the top pill, so no extra request.
+      const profile = await getQueryClient().fetchQuery(accountProfileQuery(activeUserId))
       if (userIdRef.current !== activeUserId) return
       const config = parseLobsterAvatarConfig(profile?.avatarConfig)
       setSilentAvatarUrl((config ? await requestPortrait3D(config, 128) : null) ?? sessionImage)
@@ -257,6 +268,15 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
         setServerXp(data.xp ?? 0)
         setServerStage(data.stage ?? 1)
         setServerXpUserId(userId)
+        setCachedProgressSnapshot(userId, {
+          date: targetDate,
+          xp: data.xp ?? 0,
+          stage: data.stage ?? 1,
+          streakDays: data.streakDays || 0,
+          todayWasComplete:
+            serverHistory.find((day) => day.date === targetDate)?.completedCount === TOTAL_ALIGNMENT_TASKS,
+          history: serverHistory,
+        })
 
         if (pendingOverridesRef.current.size === 0) {
           setHistory(serverHistory)
@@ -301,6 +321,19 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     snapshotUserRef.current = userId
 
     const today = localDateString()
+    // Last-known XP (any age) and streak (today only), so nothing paints as Stage 1 / 0.
+    const progress = getCachedProgressSnapshot(userId)
+    if (progress) {
+      setServerXp(progress.xp)
+      setServerStage(progress.stage)
+      setCachedXpUserId(userId)
+      if (progress.date === today) {
+        setServerStreakDays(progress.streakDays)
+        setServerTodayWasComplete(progress.todayWasComplete)
+        setHistory(progress.history)
+        setHasServerStreakBaseline(true)
+      }
+    }
     const snapshot = getFreshAlignmentSnapshot(userId, today)
     if (!snapshot) return
 
@@ -602,7 +635,9 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
 
   const effectiveXp = progression.xp
   const effectiveStage = progression.stage
-  const xpReady = !userId || serverXpUserId === userId
+  const xpConfirmed = !userId || serverXpUserId === userId
+  const xpReady = xpConfirmed || cachedXpUserId === userId
+  const streakReady = !userId || hasServerStreakBaseline
 
   const value = useMemo<AlignmentContextValue>(() => ({
     tasks,
@@ -624,6 +659,8 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     stage: effectiveStage,
     progression,
     xpReady,
+    xpConfirmed,
+    streakReady,
   }), [
     tasks,
     completedCount,
@@ -643,6 +680,8 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     effectiveStage,
     progression,
     xpReady,
+    xpConfirmed,
+    streakReady,
   ])
 
   return (
@@ -717,6 +756,8 @@ function useStandaloneDailyAlignment(): AlignmentContextValue {
     stage: progression.stage,
     progression,
     xpReady: true,
+    xpConfirmed: true,
+    streakReady: true,
   }
 }
 

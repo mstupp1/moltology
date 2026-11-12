@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
-import { getAuthJWTToken } from '@/lib/jwt'
 import { getPremiumMembershipFn } from '@/lib/server/premium-api'
+import { accountKeys, authToken, useAppQuery } from '@/lib/query/account'
 
 export type PremiumMembership = { hasPurchasedPremium: boolean; isPremium: boolean }
 
@@ -16,30 +15,18 @@ export function usePremiumMembership(): {
 } {
   const access = useHiddenPageAccess('premium')
   const session = useAuthSession()
-  const [membership, setMembership] = useState<PremiumMembership | null>(null)
+  const userId = session.userId
+  const enabled = Boolean(userId) && !access.pending && access.canView
+  const query = useAppQuery<PremiumMembership | null>({
+    queryKey: userId ? accountKeys.premium(userId) : ['account', null, 'premium'],
+    queryFn: async () =>
+      (await getPremiumMembershipFn({ data: { token: await authToken(), userId: userId! } })) ?? null,
+    enabled,
+    meta: { persist: true },
+  })
 
-  useEffect(() => {
-    if (access.pending || !access.canView || !session.userId) {
-      setMembership(null)
-      return
-    }
-    let cancelled = false
-    const userId = session.userId
-    void (async () => {
-      try {
-        const token = await getAuthJWTToken().catch(() => null)
-        const result = await getPremiumMembershipFn({
-          data: { token: token ?? undefined, userId },
-        })
-        if (!cancelled) setMembership(result)
-      } catch {
-        if (!cancelled) setMembership(null)
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [access.pending, access.canView, session.userId])
-
-  return { membership, canViewPremium: !access.pending && access.canView }
+  return {
+    membership: enabled && !query.isError ? (query.data ?? null) : null,
+    canViewPremium: !access.pending && access.canView,
+  }
 }

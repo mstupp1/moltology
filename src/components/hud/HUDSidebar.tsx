@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useModalPanelFocus } from '@/hooks/useModalPanelFocus'
 import { useNavigate, useLocation, useRouter } from '@tanstack/react-router'
@@ -20,8 +20,8 @@ import {
   ShieldCheck,
 
 } from 'lucide-react'
-import { getUserProfileFn } from '../../lib/server/api'
-import { getAuthJWTToken } from '../../lib/jwt'
+import { useAccountProfile } from '@/hooks/useAccountProfile'
+import { parseLobsterAvatarConfig } from '@/lib/lobster-avatar'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { usePendingFriendRequests } from '@/hooks/usePendingFriendRequests'
 import { AuthModal } from '../AuthModal'
@@ -181,54 +181,14 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const user = session.user
   const pendingFriendRequests = usePendingFriendRequests(user?.id)
   const isSessionPending = session.isPending
-  const [memberAvatar, setMemberAvatar] = useState<import('@/lib/lobster-avatar').LobsterAvatarConfig | null>(null)
-  const [userRole, setUserRole] = useState<string | null>(null)
-  const [memberHandle, setMemberHandle] = useState<string | null>(null)
-  const [memberLarvaId, setMemberLarvaId] = useState(larvaId)
+  // Shared, cached profile read (also refreshes on profile/handle/experiment change events).
+  const { profile } = useAccountProfile(user?.id)
+  const userRole = profile ? getEffectiveRole(user, profile.role) : null
+  const memberHandle = profile?.handle ?? null
+  const memberLarvaId = profile?.larvaId ?? larvaId
   const effectiveUserRole = getEffectiveRole(user, userRole)
-
-  const loadUserProfile = useCallback(async (userId: string) => {
-    try {
-      const token = await getAuthJWTToken().catch(() => null)
-      return await getUserProfileFn({ data: { token: token ?? undefined, userId } })
-    } catch {
-      return null
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!user?.id) {
-      setMemberAvatar(null)
-      setUserRole(null)
-      setMemberHandle(null)
-      setMemberLarvaId(larvaId)
-      return
-    }
-    const profileUserId = user.id
-    if (!profileUserId) return
-    let isSubscribed = true
-    const applyProfile = (profile: { avatarConfig?: import('@/lib/lobster-avatar').LobsterAvatarConfig | null; role?: string | null; handle?: string | null; larvaId?: string | null } | null) => {
-      if (!isSubscribed) return
-      const role = getEffectiveRole(user, profile?.role)
-      setMemberAvatar(profile?.avatarConfig ?? null)
-      setUserRole(role)
-      setMemberHandle(profile?.handle ?? null)
-      setMemberLarvaId(profile?.larvaId ?? larvaId)
-    }
-    loadUserProfile(profileUserId)
-      .then(applyProfile)
-      .catch(() => applyProfile(null))
-    const onHandleChanged = () => {
-      loadUserProfile(profileUserId).then(applyProfile).catch(() => applyProfile(null))
-    }
-    window.addEventListener('profile-avatar-changed', onHandleChanged)
-    window.addEventListener('member-handle-changed', onHandleChanged)
-    return () => {
-      isSubscribed = false
-      window.removeEventListener('profile-avatar-changed', onHandleChanged)
-      window.removeEventListener('member-handle-changed', onHandleChanged)
-    }
-  }, [user?.id, user?.email, user?.role, loadUserProfile, larvaId])
+  // `undefined` tells the top controls the character is still loading (placeholder, not a letter).
+  const memberAvatar = profile === undefined ? undefined : parseLobsterAvatarConfig(profile?.avatarConfig)
 
   const displayName = resolveMemberPublicName({
     userId: user?.id,

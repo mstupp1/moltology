@@ -24,6 +24,7 @@
 import { authErrorCallbackURL, hasOAuthCallbackError } from './auth-oauth-errors'
 import { clearCachedJwt } from './jwt-cache'
 import { markOneTapSignedOut } from './one-tap'
+import { clearAccountQueryCache } from './query/client'
 
 export type AuthSessionUser = {
   id?: string
@@ -169,6 +170,7 @@ export function beginSignOut(): void {
   clearOAuthPending()
   clearCachedUser()
   clearCachedJwt()
+  clearAccountQueryCache()
 }
 
 export function endSignOut(): void {

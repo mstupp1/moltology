@@ -1,36 +1,19 @@
-import { useEffect, useState } from 'react'
-import { getAuthJWTToken } from '@/lib/jwt'
 import type { WalletBalances } from '@/lib/market'
 import { getWalletBalancesFn } from '@/lib/server/api'
+import { accountKeys, authToken, useAppQuery } from '@/lib/query/account'
 
 /**
- * Gem and credit balances for the avatar menu. Loads whenever `userId` is set (the menu
- * passes it only while open), so a purchase elsewhere shows the next time it opens.
+ * Gem and credit balances for the avatar menu. Reads whenever `userId` is set (the menu
+ * passes it only while open) and refreshes in the background each time it opens, while
+ * the last known balances show straight away.
  */
 export function useWalletBalances(userId: string | null | undefined): WalletBalances | null {
-  const [balances, setBalances] = useState<WalletBalances | null>(null)
-  const [ownerId, setOwnerId] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!userId) return
-    let cancelled = false
-    void (async () => {
-      try {
-        const token = await getAuthJWTToken()
-        const next = await getWalletBalancesFn({ data: { token: token ?? undefined } })
-        if (!cancelled && next) {
-          setBalances(next)
-          setOwnerId(userId)
-        }
-      } catch {
-        // Keep the last reading; the row is a glance, the shop is the source of truth.
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [userId])
-
-  // Never show one member's balances to another after an account switch.
-  return userId && ownerId !== null && ownerId !== userId ? null : balances
+  const query = useAppQuery<WalletBalances | null>({
+    queryKey: userId ? accountKeys.wallet(userId) : ['account', null, 'wallet'],
+    queryFn: async () => (await getWalletBalancesFn({ data: { token: await authToken() } })) ?? null,
+    enabled: Boolean(userId),
+    staleTime: 0,
+    meta: { persist: true },
+  })
+  return userId ? (query.data ?? null) : null
 }

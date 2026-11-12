@@ -31,7 +31,8 @@ import {
 } from './OracleHeaderControls'
 import { SynapticEntityHud } from './SynapticEntityHud'
 import { useThreadActions, type ThreadPatch } from './useThreadActions'
-import { getAIMessagesFn, getAIThreadsFn, getUserProfileFn } from '../../lib/server/api'
+import { getAIMessagesFn, getAIThreadsFn } from '../../lib/server/api'
+import { useAccountProfile } from '../../hooks/useAccountProfile'
 import { PAGE_SIZES } from '@/lib/pagination'
 import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
 import { streamOracleChat } from '../../lib/ai/stream-oracle-chat-client'
@@ -150,7 +151,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   const userId = propUserId ?? user?.id ?? user?.sub ?? oracle?.userId ?? session.userId ?? null
   const usage = useOracleUsage(userId)
-  const [profileRole, setProfileRole] = useState<{ userId: string; role: string | null } | null>(null)
   const isAuthPending = !userId && session.isPending
   const isGuest = !userId && !isAuthPending
 
@@ -229,8 +229,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const [modelChoice, setModelChoice] = useState<{ userId: string | null; id: string } | null>(null)
   const selectedModelId = modelChoice?.userId === userId ? modelChoice.id : null
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  const [memberHandle, setMemberHandle] = useState<string | null>(null)
-  const [memberLarvaId, setMemberLarvaId] = useState<string | null>(null)
+  // Shared, cached profile read (refreshes itself when the handle changes).
+  const { profile: memberProfile } = useAccountProfile(userId)
+  const memberHandle = memberProfile?.handle ?? null
+  const memberLarvaId = memberProfile?.larvaId ?? null
   const [draft, setDraft] = useState('')
   const [preferredViewMode, setViewMode] = useState<OracleViewMode>(initialViewMode ?? 'standard')
   const viewMode = allowEntityMode ? preferredViewMode : 'standard'
@@ -272,39 +274,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const stickToBottomRef = useRef(true)
   const abortRef = useRef<AbortController | null>(null)
 
-
-  useEffect(() => {
-    if (!userId) {
-      setMemberHandle(null)
-      setMemberLarvaId(null)
-      return
-    }
-
-    let isSubscribed = true
-    const applyProfile = async () => {
-      try {
-        const token = await getAuthJWTToken().catch(() => null)
-        const profile = await getUserProfileFn({ data: { token: token ?? undefined, userId } })
-        if (isSubscribed) {
-          setProfileRole({ userId, role: profile?.role ?? null })
-          setMemberHandle(profile?.handle ?? null)
-          setMemberLarvaId(profile?.larvaId ?? null)
-        }
-      } catch {
-        if (isSubscribed) {
-          setMemberHandle(null)
-          setMemberLarvaId(null)
-        }
-      }
-    }
-    void applyProfile()
-    window.addEventListener('member-handle-changed', applyProfile)
-
-    return () => {
-      isSubscribed = false
-      window.removeEventListener('member-handle-changed', applyProfile)
-    }
-  }, [userId, user?.email, user?.role])
 
   useEffect(() => {
     setIsMounted(true)
@@ -875,7 +844,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         placeholder={placeholder}
         autoFocus
         accessTier={accessTier}
-        showModelNames={Boolean(userId) && isAdmin(user, profileRole?.userId === userId ? profileRole.role : null)}
+        showModelNames={Boolean(userId) && isAdmin(user, memberProfile?.role ?? null)}
         selectedModel={selectedModel}
         onSelectModel={(id) => {
           if (canUseOracleChatModel(getOracleModel(id), accessTier)) setModelChoice({ userId, id })
