@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Outlet, useLocation } from '@tanstack/react-router'
 import { HUDSidebar } from '@/components/hud/HUDSidebar'
 import { CommandPalette } from '@/components/hud/CommandPalette'
 import { SynapticOracleWidget } from '@/components/hud/SynapticOracleWidget'
 import { AISidebarDrawer } from '@/components/hud/AISidebarDrawer'
-import { BUBBLE_VARIANT_SRCS, UnderwaterBubblesCanvas } from '@/components/hud/UnderwaterBubblesCanvas'
+import { UnderwaterBubblesCanvas } from '@/components/hud/UnderwaterBubblesCanvas'
 import { OracleProvider, useSafeOracle } from '@/components/hud/OracleContext'
 import { AlignmentProvider } from '@/hooks/useDailyAlignment'
 import { HudPersistProvider } from '@/hooks/useHudPersist'
@@ -15,13 +15,29 @@ import { PwaInstallBanner } from '@/components/hud/PwaInstallBanner'
 import { PwaNotificationBridge } from '@/components/hud/PwaNotificationBridge'
 import '@/styles/crt.css'
 import '@/styles/hud-chrome.css'
+import '@/styles/scene.css'
 import { useBackdropCovered } from '@/hooks/useBackdropCovered'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
+import { useSceneDive } from '@/hooks/useSceneDive'
 import { usePwaInstall } from '@/hooks/usePwaInstall'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAssetUrl } from '@/lib/assets'
 
 const UNDERWATER_BACKGROUND = '/images/hud/underwater-looking-up-hq-v2.webp'
+const SCENE_CAUSTICS = '/images/scene-caustics.webp'
+
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false)
+  useEffect(() => {
+    const query = window.matchMedia?.('(prefers-reduced-motion: reduce)')
+    if (!query) return
+    setReduced(query.matches)
+    const onChange = () => setReduced(query.matches)
+    query.addEventListener?.('change', onChange)
+    return () => query.removeEventListener?.('change', onChange)
+  }, [])
+  return reduced
+}
 
 function HudContent() {
   const [isAIDrawerOpen, setIsAIDrawerOpen] = useState(false)
@@ -35,6 +51,12 @@ function HudContent() {
   const { heavyVfxDisabled } = useHeavyVfx()
   // Full-screen overlays and the phone Oracle cover the backdrop.
   const backdropCovered = useBackdropCovered()
+  const reducedMotion = usePrefersReducedMotion()
+  // Scrolling a page sinks the scene deeper; off for reduced motion and the effects switch.
+  const mainRef = useRef<HTMLElement | null>(null)
+  const sceneRef = useRef<HTMLDivElement | null>(null)
+  const depthRef = useRef<HTMLDivElement | null>(null)
+  useSceneDive(mainRef, sceneRef, depthRef, !isFullscreenRoute && !heavyVfxDisabled && !reducedMotion, location.pathname)
   // Register service worker + track install prompt for the whole hub (guest + member).
   usePwaInstall()
 
@@ -132,23 +154,39 @@ function HudContent() {
       )}
       {/* Dedicated Portal CRT Screen Background (Behind UI) */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-abyss">
-        {/* Full-Bleed Default Aqua Underwater Background */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-95"
-          style={{ backgroundImage: `url('${getAssetUrl(UNDERWATER_BACKGROUND)}')` }}
-        />
-
-        {/* 3D Hydro Dynamic Bubbling Effect with Custom Chroma-Keyed Bubble Variants */}
-        {!isFullscreenRoute && (
-          <UnderwaterBubblesCanvas
-            bubbleCount={90}
-            customBubbleSrcs={BUBBLE_VARIANT_SRCS}
-            chromaKeyMode="black"
-            disabled={heavyVfxDisabled}
-            paused={backdropCovered}
-            className="absolute inset-0 pointer-events-none z-[1] opacity-85"
+        {/* The water: painting, moving surface light and bubbles. Sinks as the page scrolls. */}
+        <div ref={sceneRef} className="scene-water absolute inset-0">
+          <div
+            className={`absolute inset-0 bg-cover bg-center bg-no-repeat opacity-95 ${heavyVfxDisabled ? '' : 'scene-breathe'}`}
+            style={{ backgroundImage: `url('${getAssetUrl(UNDERWATER_BACKGROUND)}')` }}
           />
-        )}
+
+          {/* Light shafts sway and the surface shimmers. Hidden on phones, where the page tint covers it. */}
+          {!heavyVfxDisabled && !isFullscreenRoute && (
+            <div
+              className="absolute inset-0 hidden md:block overflow-hidden"
+              style={{ '--scene-caustics': `url('${getAssetUrl(SCENE_CAUSTICS)}')` } as React.CSSProperties}
+            >
+              <div className="scene-rays scene-rays--b" />
+              <div className="scene-rays scene-rays--a" />
+              <div className="scene-caustics">
+                <i />
+                <i />
+              </div>
+              <div className="scene-surface-glow" />
+            </div>
+          )}
+
+          {/* Clear glass bubbles rising from the vents in the painting */}
+          {!isFullscreenRoute && (
+            <UnderwaterBubblesCanvas
+              bubbleCount={48}
+              disabled={heavyVfxDisabled}
+              paused={backdropCovered}
+              className="absolute inset-0 pointer-events-none z-[1]"
+            />
+          )}
+        </div>
 
         {/* Phosphor Ambient Radial Glow (Electric Cyan) */}
         <div
@@ -166,6 +204,9 @@ function HudContent() {
 
         {/* Smooth Bottom Fade Gradient into Deep Benthic Teal (#030708) */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#030708]/80 pointer-events-none" />
+
+        {/* Darkens the water as the page scrolls deeper */}
+        <div ref={depthRef} className="scene-depth absolute inset-0 pointer-events-none" />
 
         {/* Phone: the page panel goes full width, so its tint sits over the whole scene. */}
         <div className="md:hidden absolute inset-0 bg-surface-1/[0.82] pointer-events-none" />
@@ -185,6 +226,7 @@ function HudContent() {
           <div className="flex-1 min-w-0 flex flex-col h-full overflow-hidden relative">
             {/* Main Panel Content Workspace with Ultra-Translucent Glass Backdrop */}
             <main
+              ref={mainRef}
               className={`flex-1 min-h-0 ${
                 isFullscreenRoute
                   ? 'p-0 overflow-hidden'

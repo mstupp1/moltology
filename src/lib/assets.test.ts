@@ -20,7 +20,7 @@ describe('Asset URL Resolver', () => {
     expect(getAssetUrl('/images/order_emblem.webp')).toBe('/images/order_emblem.webp')
     expect(getAssetUrl('images/order_emblem.webp')).toBe('/images/order_emblem.webp')
     expect(getAssetUrl('/favicon.ico')).toBe('/favicon.ico')
-    expect(getAssetUrl('/images/bubble_variant_1.jpg')).toBe('/images/bubble_variant_1.jpg')
+    expect(getAssetUrl('/images/scene-caustics.webp')).toBe('/images/scene-caustics.webp')
     expect(getAssetUrl('/images/scanline_pattern.png')).toBe('/images/scanline_pattern.png')
     expect(getAssetUrl('/images/marketing/dashboard_desktop_preview.webp')).toBe(
       `/images/marketing/dashboard_desktop_preview.webp?v=${MARKETING_ASSET_VERSION}`,
