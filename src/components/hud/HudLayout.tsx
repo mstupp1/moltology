@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Outlet, useLocation } from '@tanstack/react-router'
 import { HUDSidebar } from '@/components/hud/HUDSidebar'
 import { CommandPalette } from '@/components/hud/CommandPalette'
@@ -18,7 +18,6 @@ import '@/styles/hud-chrome.css'
 import '@/styles/scene.css'
 import { useBackdropCovered } from '@/hooks/useBackdropCovered'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
-import { useSceneDive } from '@/hooks/useSceneDive'
 import { usePwaInstall } from '@/hooks/usePwaInstall'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAssetUrl } from '@/lib/assets'
@@ -26,18 +25,6 @@ import { getAssetUrl } from '@/lib/assets'
 const UNDERWATER_BACKGROUND = '/images/hud/underwater-looking-up-hq-v2.webp'
 const SCENE_CAUSTICS = '/images/scene-caustics.webp'
 
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false)
-  useEffect(() => {
-    const query = window.matchMedia?.('(prefers-reduced-motion: reduce)')
-    if (!query) return
-    setReduced(query.matches)
-    const onChange = () => setReduced(query.matches)
-    query.addEventListener?.('change', onChange)
-    return () => query.removeEventListener?.('change', onChange)
-  }, [])
-  return reduced
-}
 
 function HudContent() {
   const [isAIDrawerOpen, setIsAIDrawerOpen] = useState(false)
@@ -51,12 +38,6 @@ function HudContent() {
   const { heavyVfxDisabled } = useHeavyVfx()
   // Full-screen overlays and the phone Oracle cover the backdrop.
   const backdropCovered = useBackdropCovered()
-  const reducedMotion = usePrefersReducedMotion()
-  // Scrolling a page sinks the scene deeper; off for reduced motion and the effects switch.
-  const mainRef = useRef<HTMLElement | null>(null)
-  const sceneRef = useRef<HTMLDivElement | null>(null)
-  const depthRef = useRef<HTMLDivElement | null>(null)
-  useSceneDive(mainRef, sceneRef, depthRef, !isFullscreenRoute && !heavyVfxDisabled && !reducedMotion, location.pathname)
   // Register service worker + track install prompt for the whole hub (guest + member).
   usePwaInstall()
 
@@ -154,8 +135,8 @@ function HudContent() {
       )}
       {/* Dedicated Portal CRT Screen Background (Behind UI) */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-abyss">
-        {/* The water: painting, moving surface light and bubbles. Sinks as the page scrolls. */}
-        <div ref={sceneRef} className="scene-water absolute inset-0">
+        {/* The water: painting, moving surface light and bubbles. */}
+        <div className="absolute inset-0">
           <div
             className={`absolute inset-0 bg-cover bg-center bg-no-repeat opacity-95 ${heavyVfxDisabled ? '' : 'scene-breathe'}`}
             style={{ backgroundImage: `url('${getAssetUrl(UNDERWATER_BACKGROUND)}')` }}
@@ -205,9 +186,6 @@ function HudContent() {
         {/* Smooth Bottom Fade Gradient into Deep Benthic Teal (#030708) */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#030708]/80 pointer-events-none" />
 
-        {/* Darkens the water as the page scrolls deeper */}
-        <div ref={depthRef} className="scene-depth absolute inset-0 pointer-events-none" />
-
         {/* Phone: the page panel goes full width, so its tint sits over the whole scene. */}
         <div className="md:hidden absolute inset-0 bg-surface-1/[0.82] pointer-events-none" />
       </div>
@@ -226,7 +204,6 @@ function HudContent() {
           <div className="flex-1 min-w-0 flex flex-col h-full overflow-hidden relative">
             {/* Main Panel Content Workspace with Ultra-Translucent Glass Backdrop */}
             <main
-              ref={mainRef}
               className={`flex-1 min-h-0 ${
                 isFullscreenRoute
                   ? 'p-0 overflow-hidden'
