@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { ChevronDown, List, Maximize2, Printer, Scroll } from 'lucide-react'
+import { ChevronDown, List, Maximize2, Moon, Scroll, Sun } from 'lucide-react'
 import { CANONICAL_SCRIPTURES, type ScriptureItem } from '@/lib/codexData'
 import { codexVerseAnchor, findScriptureBySlug, verseNumberFromHash } from '@/lib/codex-links'
 import '@/styles/codex.css'
@@ -8,6 +8,7 @@ import { CodexDirectory, type CodexStageFilter } from './CodexDirectory'
 import { CodexPdfPage } from './CodexPdfPage'
 import { FullscreenDocumentReader } from '@/components/reader/FullscreenDocumentReader'
 import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
+import { useCodexReadingTheme } from './useCodexReadingTheme'
 
 export { stripMarkdown, formatCodexInline, CodexVerseBody } from './CodexDocumentSheet'
 
@@ -46,6 +47,14 @@ function countMatches(item: ScriptureItem, query: string): number {
     }
   }
   return total
+}
+
+/** Copy scripture as plain text, so pasting elsewhere doesn't carry the page colours. */
+export function copyPlainText(event: React.ClipboardEvent<HTMLElement>) {
+  const text = window.getSelection()?.toString()
+  if (!text || !event.clipboardData) return
+  event.clipboardData.setData('text/plain', text)
+  event.preventDefault()
 }
 
 function readLastRead(): string | undefined {
@@ -96,6 +105,7 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
   const [activeVerse, setActiveVerse] = useState<number | undefined>(undefined)
   const [contentsOpen, setContentsOpen] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const readingTheme = useCodexReadingTheme()
 
   const query = searchQuery.trim()
   const highlight = query.length >= MIN_HIGHLIGHT ? query : undefined
@@ -248,11 +258,6 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
     setSelectedStage('all')
   }
 
-  const handlePrintDocument = () => {
-    if (typeof window !== 'undefined') {
-      window.print()
-    }
-  }
 
   if (missingFocus) {
     return (
@@ -297,17 +302,24 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
     matchCounts,
   }
 
+  const darkPage = readingTheme.theme === 'dark'
+  const themeLabel = darkPage ? 'Switch to light page' : 'Switch to dark page'
+  const ThemeIcon = darkPage ? Sun : Moon
+  const renderThemeButton = (className: string) => (
+    <button
+      type="button"
+      onClick={readingTheme.toggle}
+      className={className}
+      title={themeLabel}
+      aria-label={themeLabel}
+    >
+      <ThemeIcon className="w-4 h-4" />
+    </button>
+  )
+
   const actions = (
     <div className="flex items-center gap-0.5 shrink-0">
-      <button
-        type="button"
-        onClick={handlePrintDocument}
-        className={ICON_BUTTON}
-        title="Print or save as PDF"
-        aria-label="Print or save as PDF"
-      >
-        <Printer className="w-4 h-4" />
-      </button>
+      {renderThemeButton(ICON_BUTTON)}
       <button
         type="button"
         onClick={() => setIsFullscreen(true)}
@@ -336,13 +348,15 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
           onPrev={handlePrevScripture}
           onNext={handleNextScripture}
           onSelectItem={selectScripture}
-          onPrint={handlePrintDocument}
+          renderActions={renderThemeButton}
           onClose={() => setIsFullscreen(false)}
           renderItem={({ zoom, pageWidth }) => (
             <CodexPdfPage
               zoom={zoom}
               pageWidth={pageWidth}
               scriptureId={activeScripture.id}
+              readingTheme={readingTheme.attribute}
+              onCopy={copyPlainText}
               className="p-6 sm:p-10 md:p-14"
             >
               <CodexDocumentSheet
@@ -364,7 +378,7 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
       <div className="flex flex-col lg:flex-row gap-3 lg:gap-6 items-start">
         <aside
           aria-label="Contents"
-          className="no-print hidden lg:flex flex-col w-[300px] shrink-0 sticky top-4 h-[calc(100dvh-3.5rem)] max-h-[60rem] rounded-card border border-line-subtle bg-surface-1 overflow-hidden"
+          className="hidden lg:flex flex-col w-[300px] shrink-0 sticky top-4 h-[calc(100dvh-3.5rem)] max-h-[60rem] rounded-card border border-line-subtle bg-surface-1 overflow-hidden"
         >
           <p aria-hidden="true" className="px-4 pt-4 pb-1 shrink-0 font-grotesk font-extrabold text-xl text-ink tracking-tight">
             The Sacred Codex
@@ -377,7 +391,7 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
           <div ref={sheetTopRef} className="scroll-mt-20 lg:scroll-mt-4" />
 
           {/* Phone: one slim sticky bar where tapping the title opens the contents. Desktop: position and actions. */}
-          <div className="no-print sticky -top-2.5 sm:-top-4 md:-top-6 z-10 -mx-2.5 sm:-mx-4 md:-mx-6 -mt-2.5 sm:-mt-4 md:-mt-6 px-1.5 sm:px-2 mb-3 lg:mt-0 flex items-center gap-1 bg-abyss/90 backdrop-blur-sm border-b border-line-subtle lg:static lg:mx-0 lg:px-0 lg:bg-transparent lg:backdrop-blur-none lg:border-0">
+          <div className="sticky -top-2.5 sm:-top-4 md:-top-6 z-10 -mx-2.5 sm:-mx-4 md:-mx-6 -mt-2.5 sm:-mt-4 md:-mt-6 px-1.5 sm:px-2 mb-3 lg:mt-0 flex items-center gap-1 bg-abyss/90 backdrop-blur-sm border-b border-line-subtle lg:static lg:mx-0 lg:px-0 lg:bg-transparent lg:backdrop-blur-none lg:border-0">
             <button
               type="button"
               onClick={() => setContentsOpen(true)}
@@ -404,6 +418,8 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
             data-testid="codex-scripture-sheet"
             data-codex-scripture={activeScripture.id}
             data-codex-focus={focused ? 'true' : 'false'}
+            data-reading-theme={readingTheme.attribute}
+            onCopy={copyPlainText}
             className="pdf-page-sheet codex-parchment-theme border px-5 py-7 sm:px-10 sm:py-12 md:px-14 md:py-14 mx-auto w-full max-w-[46rem]"
           >
             <CodexDocumentSheet

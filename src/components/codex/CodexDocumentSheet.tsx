@@ -340,7 +340,7 @@ export function CodexDocumentSheet({
 
       <nav
         aria-label="Scripture pages"
-        className="no-print pt-5 border-t border-current/20 grid grid-cols-2 gap-3 font-sans"
+        className="pt-5 border-t border-current/20 grid grid-cols-2 gap-3 font-sans"
       >
         <div>
           {hasPrev && (

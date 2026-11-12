@@ -1,11 +1,45 @@
 @import './editorial-fonts.css';
 
-/* Codex reading paper. The sheet is the one light surface in the app, so it keeps its own colours. */
+/* Codex reading page. Light cream paper by default, or a dark page when the reader picks it
+   (data-reading-theme="dark") or leaves it on "auto" with the device in dark mode. The sheet
+   keeps its own colours; everything inside it draws from currentColor. */
 .codex-parchment-theme {
-  background-color: #fbf8ef;
-  color: #1f1b16;
-  border-color: #e2d9c3;
+  --codex-paper: #fbf8ef;
+  --codex-ink: #1f1b16;
+  --codex-edge: #e2d9c3;
+  --codex-hit: #f1dc8a;
+  background-color: var(--codex-paper);
+  color: var(--codex-ink);
+  border-color: var(--codex-edge);
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.12);
+  /* The app turns selection off; scripture text can be selected and copied. */
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
+.codex-parchment-theme button,
+.codex-parchment-theme nav {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.codex-parchment-theme[data-reading-theme='dark'] {
+  --codex-paper: #191714;
+  --codex-ink: #e6dfd0;
+  --codex-edge: #2e2a24;
+  --codex-hit: rgba(214, 178, 86, 0.4);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  .codex-parchment-theme[data-reading-theme='auto'] {
+    --codex-paper: #191714;
+    --codex-ink: #e6dfd0;
+    --codex-edge: #2e2a24;
+    --codex-hit: rgba(214, 178, 86, 0.4);
+    color-scheme: dark;
+  }
 }
 
 .pdf-page-sheet {
@@ -75,37 +109,12 @@
   }
 }
 
-/* Media Print Rules for Professional PDF Output */
-@media print {
-  body {
-    background-color: #ffffff !important;
-    color: #000000 !important;
-  }
-  .hud-sidebar, .hud-header, .no-print, .codex-reader-chrome {
-    display: none !important;
-  }
-  .pdf-page-sheet {
-    box-shadow: none !important;
-    border: none !important;
-    width: 100% !important;
-    max-width: none !important;
-    padding: 0 !important;
-    background: white !important;
-  }
-}
-
 /* Search hits inside the reading paper. */
 .codex-hit {
-  background-color: #f1dc8a;
+  background-color: var(--codex-hit);
   color: inherit;
   border-radius: 2px;
   padding: 0 0.08em;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
-}
-
-@media print {
-  .codex-hit {
-    background: none !important;
-  }
 }
