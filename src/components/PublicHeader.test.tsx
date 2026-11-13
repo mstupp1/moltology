@@ -139,10 +139,11 @@ describe('PublicHeader Navigation Component', () => {
     render(<PublicHeader activePage="home" />)
 
     const avatarBtns = await screen.findAllByRole('button', { name: /user account menu, level/i })
-    // The phone bar uses the app's own XP-ring account control.
-    expect(avatarBtns).toHaveLength(1)
+    // Phone bar and desktop header both use the app's own XP-ring account control.
+    expect(avatarBtns).toHaveLength(2)
     fireEvent.click(avatarBtns[0])
     expect(await screen.findByRole('dialog', { name: /account and today's tasks/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^dashboard$/i })).toBeInTheDocument()
   })
 
   it('ends the phone menu with an Open dashboard row for members', async () => {
@@ -232,8 +233,7 @@ describe('PublicHeader Navigation Component', () => {
     render(<PublicHeader activePage="home" />)
 
     expect((await screen.findAllByRole('button', { name: /LOG IN/i })).length).toBeGreaterThan(0)
-    expect(screen.getAllByRole('button', { name: /JOIN PATH/i }).length).toBeGreaterThan(0)
-    expect(screen.getAllByRole('button', { name: /^join$/i }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('button', { name: /^join$/i })).toHaveLength(2)
     expect(screen.queryByTestId('public-header-auth-skeleton')).not.toBeInTheDocument()
   })
 

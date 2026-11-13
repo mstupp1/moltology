@@ -551,7 +551,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             tabIndex={-1}
             inert={!mobileOpen}
             style={{ transform: menuPresence.visible ? 'translateY(0)' : 'translateY(100%)' }}
-            className="xl:hidden fixed inset-0 z-[99980] flex flex-col bg-surface-1 font-sans transition-transform duration-250 ease-out motion-reduce:transition-none"
+            className="lg:hidden fixed inset-0 z-[99980] flex flex-col bg-surface-1 font-sans transition-transform duration-250 ease-out motion-reduce:transition-none"
           >
             <div className="shrink-0 h-14 px-2 pt-[env(safe-area-inset-top)] box-content flex items-center gap-2 border-b border-line-subtle">
               <button
@@ -592,16 +592,16 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   return (
     <header
       ref={headerRef}
-      className={`w-full px-4 sm:px-8 lg:px-12 py-0 xl:py-3 fixed top-0 left-0 right-0 z-50 border-b border-line-subtle transition-transform duration-300 ease-in-out ${
+      className={`w-full px-4 sm:px-8 xl:px-12 py-0 lg:py-3 fixed top-0 left-0 right-0 z-50 border-b border-line-subtle transition-transform duration-300 ease-in-out ${
         headerShown ? 'translate-y-0' : '-translate-y-full pointer-events-none'
       } ${
         // Phones get the app's solid bar; wide screens keep the frosted strip over the hero art.
         isScrolled
-          ? 'bg-surface-1 xl:bg-abyss/90 xl:backdrop-blur-2xl shadow-xl'
-          : 'bg-surface-1 xl:bg-abyss/75 xl:backdrop-blur-xl xl:shadow-md'
+          ? 'bg-surface-1 lg:bg-abyss/90 lg:backdrop-blur-2xl shadow-xl'
+          : 'bg-surface-1 lg:bg-abyss/75 lg:backdrop-blur-xl lg:shadow-md'
       }`}
     >
-      <div className="max-w-[1700px] mx-auto h-14 xl:h-auto flex items-center justify-between gap-4">
+      <div className="max-w-[1700px] mx-auto h-14 lg:h-auto flex items-center justify-between gap-4">
         {/* Shared Brand Logo & Emblem */}
         <HeaderBrand
           onClick={() => onNavigate('/')}
@@ -611,7 +611,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         <nav
           ref={navMeasureRef}
           aria-label="Main Navigation"
-          className="relative hidden xl:flex flex-1 min-w-0 items-center justify-center"
+          className="relative hidden lg:flex flex-1 min-w-0 items-center justify-center"
         >
           <div
             ref={navRef}
@@ -681,7 +681,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         {/* Header Action Items */}
         <div className="flex items-center gap-3 sm:gap-4 shrink-0">
           {/* Phone: the app's faint pill (Join or menu) and the member's XP-ring portrait */}
-          <div className="xl:hidden flex items-center">
+          <div className="lg:hidden flex items-center">
             {authReady ? (
               <Suspense fallback={<div className="flex items-center -mr-1.5"><div className={PUBLIC_PHONE_PILL}>{menuButton}</div></div>}>
                 <LazyPublicHeaderAuthSlot
@@ -696,7 +696,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             )}
           </div>
 
-          <div className="hidden xl:flex items-center gap-3 sm:gap-4">
+          <div className="hidden lg:flex items-center gap-3 sm:gap-4">
             {authReady ? (
               <Suspense fallback={<PublicHeaderAuthSkeleton layout="desktop" />}>
                 <LazyPublicHeaderAuthSlot

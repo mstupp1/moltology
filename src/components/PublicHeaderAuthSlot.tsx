@@ -6,9 +6,7 @@
  * and the Account panel, so signing in feels like one product on both sides.
  */
 import React from 'react'
-import { ChevronRight, Cpu, LogIn, UserPlus } from 'lucide-react'
-import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
-import { UserAvatarMenu } from '@/components/UserAvatarMenu'
+import { ChevronRight, LogIn, UserPlus } from 'lucide-react'
 import { UserAvatar } from '@/components/UserAvatar'
 import { AccountHub } from '@/components/hud/AccountHub'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
@@ -104,15 +102,22 @@ export function PublicHeaderAuthSlot({
   if (layout === 'desktop') {
     if (user) {
       return (
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => onNavigate('/dashboard')}
-            className="px-5 py-2 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong font-grotesk font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-          >
-            <Cpu className="w-4 h-4 text-cyan-glow" />
-            <span>DASHBOARD</span>
-          </button>
-          <UserAvatarMenu user={user} onNavigate={onNavigate} />
+        <div className="flex items-center gap-2">
+          <div className={PUBLIC_PHONE_PILL}>
+            <button
+              onClick={() => onNavigate('/dashboard')}
+              className={`h-9 px-4 rounded-full text-sm font-grotesk font-semibold text-ink-body hover:text-ink hover:bg-surface-2 transition-colors ${focusRing}`}
+            >
+              Dashboard
+            </button>
+          </div>
+          <AccountHub
+            variant="desktop"
+            user={user}
+            userRole={userRole}
+            displayName={displayName}
+            onNavigate={onNavigate}
+          />
         </div>
       )
     }
@@ -120,26 +125,27 @@ export function PublicHeaderAuthSlot({
     if (isPending) {
       return (
         <div className="flex items-center gap-2.5" data-testid="public-header-auth-skeleton">
-          <div className="h-8 w-16 rounded-control bg-surface-1 border border-line-subtle animate-pulse" />
-          <div className="h-8 w-24 rounded-control bg-surface-1 border border-line-subtle animate-pulse" />
+          <div className="h-9 w-16 rounded-control bg-surface-1 border border-line-subtle animate-pulse" />
+          <div className="h-9 w-20 rounded-full bg-surface-1 border border-line-subtle animate-pulse" />
         </div>
       )
     }
 
     return (
-      <div className="flex items-center gap-3">
+      <div className={PUBLIC_PHONE_PILL}>
         <button
           onClick={() => onOpenAuth?.('login')}
-          className="px-4 py-2 rounded-control text-xs font-grotesk font-bold uppercase tracking-wider transition-colors text-ink-body hover:text-ink hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+          className={`h-9 px-4 rounded-full text-sm font-grotesk font-semibold text-ink-body hover:text-ink hover:bg-surface-2 transition-colors ${focusRing}`}
         >
-          LOG IN
+          Log in
         </button>
-        <BenthicCTAButton size="sm" variant="cyan" onClick={() => onOpenAuth?.('signup')}>
-          <span className="flex items-center gap-1.5">
-            <UserPlus className="w-3.5 h-3.5" />
-            <span>JOIN PATH</span>
-          </span>
-        </BenthicCTAButton>
+        <button
+          onClick={() => onOpenAuth?.('signup')}
+          className={`h-9 px-4 mx-0.5 inline-flex items-center gap-1.5 rounded-full bg-cyan-glow text-abyss text-sm font-bold hover:bg-cyan-hover transition-colors active:scale-95 ${focusRing}`}
+        >
+          <UserPlus className="w-4 h-4" aria-hidden="true" />
+          <span>Join</span>
+        </button>
       </div>
     )
   }
