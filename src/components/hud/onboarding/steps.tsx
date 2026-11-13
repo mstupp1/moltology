@@ -76,33 +76,33 @@ const TOUR = [
     id: 'dashboard',
     icon: LayoutDashboard,
     title: 'Dashboard',
-    body: 'Your day at a glance: today’s tasks, the lesson you are on, and your streak.',
+    body: 'Your day at a glance.',
   },
   {
     id: 'oracle',
     icon: Atom,
     title: 'Oracle',
-    body: 'Ask when you are stuck. It helps you find a first step and plan a routine.',
+    body: 'Ask for help when you are stuck.',
   },
   {
     id: 'character',
     icon: Shell,
     title: 'Character',
-    body: 'Dress your lobster or crab, shop for gear, and watch your stats grow.',
+    body: 'Your lobster or crab, gear and stats.',
   },
   {
     id: 'forum',
     icon: MessagesSquare,
     title: 'Forum',
-    body: 'Share progress, ask questions, and borrow routines from other members.',
+    body: 'Talk with other members.',
   },
   {
     id: 'learn',
     icon: BookOpen,
     title: 'Codex and Academy',
     // Phones keep these two under More in the bottom bar; desktop lists them in the rail.
-    body: 'The core texts and short courses, read at your own pace.',
-    phoneBody: 'The core texts and short courses. Find them under More.',
+    body: 'The core texts and short courses.',
+    phoneBody: 'Texts and courses, under More.',
   },
 ] as const
 
@@ -110,10 +110,7 @@ function TourStep({ isGuest, headingId }: OnboardingStepProps) {
   const card = 'rounded-card border border-line-subtle bg-surface-2 hud-sheen p-3 sm:p-4 flex gap-3'
   return (
     <div className="max-w-xl mx-auto w-full space-y-5">
-      <StepHeading id={headingId} title="What's here">
-        <span className="md:hidden">Your main pages are in the bar at the bottom of the screen.</span>
-        <span className="hidden md:inline">Your pages are in the rail on the left. Hover an icon to see its name.</span>
-      </StepHeading>
+      <StepHeading id={headingId} title="What's here" />
       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
         {TOUR.map((item) => {
           const Icon = item.icon
@@ -140,8 +137,8 @@ function TourStep({ isGuest, headingId }: OnboardingStepProps) {
             <h3 className="font-sans text-sm font-semibold text-ink">Today&rsquo;s tasks</h3>
             <p className="font-sans text-xs text-ink-muted leading-relaxed mt-1">
               {isGuest
-                ? 'Eight small tasks a day. Open them from the 0/8 button at the top of the screen.'
-                : 'Eight small tasks a day. The gold marks around your picture at the top fill as you finish them, and the ring shows your XP. Tap it to see the list.'}
+                ? 'Eight a day, from the 0/8 button up top.'
+                : 'Eight a day. Gold marks around your picture fill as you go.'}
             </p>
           </div>
         </li>
@@ -153,9 +150,7 @@ function TourStep({ isGuest, headingId }: OnboardingStepProps) {
 function CharacterStep({ draft, update, busy, headingId }: OnboardingStepProps) {
   return (
     <div className="w-full space-y-4">
-      <StepHeading id={headingId} title="Make your character">
-        Pick a lobster or a crab. Your basic equipment is included. Change your look any time in the character studio.
-      </StepHeading>
+      <StepHeading id={headingId} title="Make your character" />
       <div className="grid grid-cols-1 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-4 md:gap-6 items-start">
         <AvatarCreatorPreview config={{...draft.config,equipment:STARTER_CHARACTER_EQUIPMENT}} className="max-w-[180px] md:max-w-none mx-auto md:sticky md:top-0" />
         <AvatarCreatorPanel value={draft.config} onChange={(config) => update({ config })} disabled={busy} />
