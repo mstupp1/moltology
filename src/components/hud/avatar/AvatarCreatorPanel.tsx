@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import * as SliderPrimitive from '@radix-ui/react-slider'
 import { Dices } from 'lucide-react'
 import {
   AVATAR_ANTENNAE,
@@ -203,20 +202,32 @@ function Dial({
     sent.current = Date.now()
     onChange(Number(next.toFixed(2)))
   }
+  const clamped = Math.min(max, Math.max(min, shown))
+  /** The drag ended: send the resting value now rather than waiting out the throttle. */
+  const settle = () => {
+    if (!dragging.current) return
+    dragging.current = false
+    if (timer.current) clearTimeout(timer.current)
+    send(shown)
+  }
   return (
     <div className="space-y-1.5 min-w-0">
       <div className="flex items-baseline justify-between gap-2">
         <span className="text-[11px] font-sans font-semibold tracking-[0.08em] uppercase text-ink-muted">{label}</span>
         <span className="text-[11px] font-sans text-ink-muted tabular-nums">{Math.round(shown * 100)}%</span>
       </div>
-      <SliderPrimitive.Root
-        className="relative flex h-6 w-full touch-none select-none items-center"
+      <input
+        type="range"
+        className="dial-range"
+        aria-label={label}
         min={min}
         max={max}
         step={0.01}
-        value={[Math.min(max, Math.max(min, shown))]}
+        value={clamped}
         disabled={disabled}
-        onValueChange={([next]) => {
+        style={{ '--dial-fill': `${((clamped - min) / (max - min)) * 100}%` } as React.CSSProperties}
+        onChange={(event) => {
+          const next = Number(event.target.value)
           dragging.current = true
           setShown(next)
           if (timer.current) clearTimeout(timer.current)
@@ -224,20 +235,10 @@ function Dial({
           if (wait <= 0) send(next)
           else timer.current = setTimeout(() => send(next), wait)
         }}
-        onValueCommit={([next]) => {
-          dragging.current = false
-          if (timer.current) clearTimeout(timer.current)
-          send(next)
-        }}
-      >
-        <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-surface-3">
-          <SliderPrimitive.Range className="absolute h-full bg-cyan-glow/70" />
-        </SliderPrimitive.Track>
-        <SliderPrimitive.Thumb
-          aria-label={label}
-          className="block h-5 w-5 rounded-full border-2 border-cyan-glow bg-abyss transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow disabled:opacity-50 cursor-grab active:cursor-grabbing motion-reduce:transition-none"
-        />
-      </SliderPrimitive.Root>
+        onPointerUp={settle}
+        onKeyUp={settle}
+        onBlur={settle}
+      />
       <div className="flex justify-between text-[11px] font-sans text-ink-muted">
         <span>{low}</span>
         <span>{high}</span>

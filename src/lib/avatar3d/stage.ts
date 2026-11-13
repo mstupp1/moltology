@@ -481,6 +481,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
         zoom = zoom > 1.3 ? 1 : 1.9
         if (zoom === 1) tilt = 0
         lastTap = 0
+        wake()
       } else {
         lastTap = now
         tap(e)
