@@ -3,11 +3,12 @@
  * PUBLIC TOP NAVIGATION HEADER
  * Shared navigation bar across top-level public pages (Landing / Org).
  * Features a rounded card tab bar: the current page is a lit tile and a faint lens follows hover and focus.
- * Phones get a full-height menu sheet built from the same tab list.
+ * Phones get the app's top bar (faint pill, XP-ring portrait) and a full-screen menu like the app's Account screen.
  * The new-store experiment switches opted-in admins from Etsy to /store.
  * ============================================================================
  */
 import React, { useState, useEffect, useMemo, Suspense, lazy } from 'react'
+import { createPortal } from 'react-dom'
 import { BrandIcon } from '@/components/ui/BrandMark'
 import { useNavigate, useLocation } from '@tanstack/react-router'
 import {
@@ -17,14 +18,19 @@ import {
   ListChecks,
   MessagesSquare,
   ChevronDown,
+  ChevronRight,
   Info,
+  Menu,
+  X,
 } from 'lucide-react'
 import { HeaderBrand } from '@/components/ui/HeaderBrand'
-import { AnimatedHamburger } from '@/components/ui/AnimatedHamburger'
 import { PublicHeaderAuthSkeleton } from '@/components/PublicHeaderAuthSkeleton'
 import { useIdleReady } from '@/hooks/useIdleReady'
 import { useStoreDestination } from '@/components/store/useStoreDestination'
 import { useRegisterPublicHeaderChrome } from '@/components/public-header-chrome'
+import { PUBLIC_PHONE_PILL } from '@/components/public-header-pill'
+import { usePanelPresence } from '@/hooks/usePanelPresence'
+import { useModalPanelFocus } from '@/hooks/useModalPanelFocus'
 
 const LazyPublicHeaderAuthSlot = lazy(() =>
   import('@/components/PublicHeaderAuthSlot').then((m) => ({ default: m.PublicHeaderAuthSlot }))
@@ -122,8 +128,12 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   const lastScrollY = React.useRef(0)
   const mobileOpenRef = React.useRef(false)
   const headerRef = React.useRef<HTMLElement>(null)
-  const barRef = React.useRef<HTMLDivElement>(null)
-  const [barHeight, setBarHeight] = useState(0)
+  const menuPanelRef = React.useRef<HTMLDivElement>(null)
+  const menuButtonRef = React.useRef<HTMLButtonElement>(null)
+  const menuPresence = usePanelPresence(mobileOpen, 250)
+  const [portalReady, setPortalReady] = useState(false)
+  useEffect(() => setPortalReady(true), [])
+  useModalPanelFocus(mobileOpen && menuPresence.mounted, menuPanelRef, menuButtonRef)
   mobileOpenRef.current = mobileOpen
   const headerShown = isVisible || mobileOpen
   const navRef = React.useRef<HTMLDivElement>(null)
@@ -186,21 +196,11 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     const measure = () => {
       const next = Math.round(el.getBoundingClientRect().height)
       setHeaderHeight((prev) => (prev === next ? prev : next))
-      // The top row alone (plus the header's vertical padding) sizes the phone sheet; the open sheet would feed back into headerHeight.
-      const bar = barRef.current
-      if (bar) {
-        const style = window.getComputedStyle(el)
-        const nextBar = Math.round(
-          bar.getBoundingClientRect().height + parseFloat(style.paddingTop) + parseFloat(style.paddingBottom)
-        )
-        setBarHeight((prev) => (prev === nextBar ? prev : nextBar))
-      }
     }
     measure()
     if (typeof ResizeObserver === 'undefined') return
     const observer = new ResizeObserver(measure)
     observer.observe(el)
-    if (barRef.current) observer.observe(barRef.current)
     return () => observer.disconnect()
   }, [])
 
@@ -465,19 +465,13 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     )
   }
 
+  // Phone menu rows match the app's menus: full-width rows with thin dividers; the current page is the lit tile.
   const renderMobileItem = (tab: NavTab) => {
     const isActive = currentTab === tab.id
     const isStore = tab.id === 'store'
-    const itemCls = `relative w-full flex items-center gap-3.5 px-3.5 py-3 min-h-[56px] rounded-card transition-colors ${tabFocusCls} ${
-      isActive
-        ? 'bg-surface-3 shadow-nav-current'
-        : 'hover:bg-surface-2 active:bg-surface-2'
-    }`
-    const labelCls = `font-grotesk font-semibold text-base leading-tight ${
-      isStore
-        ? 'text-amber-300'
-        : 'text-ink'
-    }`
+    const itemCls = `relative w-full flex items-center gap-3.5 px-5 h-14 border-b border-line-subtle font-grotesk font-semibold text-base transition-colors ${tabFocusCls} ${
+      isActive ? 'bg-surface-3 shadow-nav-current' : 'hover:bg-surface-2 active:bg-surface-2'
+    } ${isStore ? 'text-amber-300' : 'text-ink'}`
     const icon =
       tab.id === 'home' ? (
         <BrandIcon aria-hidden="true" width={20} height={20} className="w-5 h-5 object-contain shrink-0" />
@@ -485,24 +479,20 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         tab.Icon && (
           <tab.Icon
             aria-hidden="true"
-            className={`w-5 h-5 shrink-0 ${
-              isStore
-                ? 'text-amber-400'
-                : isActive
-                  ? 'text-cyan-glow'
-                  : 'text-ink-muted'
-            }`}
+            className={`w-5 h-5 shrink-0 ${isStore ? 'text-amber-400' : isActive ? 'text-cyan-glow' : 'text-ink-muted'}`}
           />
         )
       )
     const content = (
       <>
         {icon}
-        <span className={`min-w-0 flex-1 ${labelCls}`}>{tab.label}</span>
-        {tab.external && (
-          <ExternalLink
+        <span className="min-w-0 flex-1">{tab.label}</span>
+        {tab.external ? (
+          <ExternalLink aria-hidden="true" className="w-4 h-4 shrink-0 text-amber-500/80" />
+        ) : (
+          <ChevronRight
             aria-hidden="true"
-            className="w-4 h-4 shrink-0 opacity-70 text-amber-500"
+            className={`w-4 h-4 shrink-0 ${isStore ? 'text-amber-400/80' : isActive ? 'text-cyan-glow' : 'text-ink-muted'}`}
           />
         )}
       </>
@@ -534,20 +524,84 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     )
   }
 
+  const menuButton = (
+    <button
+      ref={menuButtonRef}
+      type="button"
+      onClick={() => setMobileOpen(true)}
+      aria-label="Open menu"
+      aria-expanded={mobileOpen}
+      aria-controls="public-header-mobile-menu"
+      className={`w-11 h-11 -my-1 inline-flex items-center justify-center rounded-full text-ink hover:bg-surface-2 transition-colors active:scale-95 shrink-0 ${tabFocusCls}`}
+    >
+      <Menu className="w-[22px] h-[22px]" aria-hidden="true" />
+    </button>
+  )
+
+  // Full-screen phone menu, shaped like the app's Account screen: X · MENU bar, rows, account at the foot.
+  const mobileMenu =
+    portalReady && menuPresence.mounted
+      ? createPortal(
+          <div
+            ref={menuPanelRef}
+            id="public-header-mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu"
+            tabIndex={-1}
+            inert={!mobileOpen}
+            style={{ transform: menuPresence.visible ? 'translateY(0)' : 'translateY(100%)' }}
+            className="xl:hidden fixed inset-0 z-[99980] flex flex-col bg-surface-1 font-sans transition-transform duration-250 ease-out motion-reduce:transition-none"
+          >
+            <div className="shrink-0 h-14 px-2 pt-[env(safe-area-inset-top)] box-content flex items-center gap-2 border-b border-line-subtle">
+              <button
+                type="button"
+                onClick={() => setMobileOpen(false)}
+                aria-label="Close menu"
+                className={`shrink-0 w-11 h-11 rounded-control flex items-center justify-center text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors ${tabFocusCls}`}
+              >
+                <X className="w-5 h-5" aria-hidden="true" />
+              </button>
+              <h2 className="flex-1 text-center font-grotesk text-sm font-bold tracking-[0.08em] uppercase text-ink">Menu</h2>
+              <span className="w-11 shrink-0" aria-hidden="true" />
+            </div>
+            <nav aria-label="Mobile Navigation" className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+              <div className="max-w-xl mx-auto">{navTabs.map(renderMobileItem)}</div>
+            </nav>
+            <div className="shrink-0 border-t border-line-subtle px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+              <div className="max-w-xl mx-auto">
+                {authReady ? (
+                  <Suspense fallback={<PublicHeaderAuthSkeleton layout="mobile" />}>
+                    <LazyPublicHeaderAuthSlot
+                      layout="menu"
+                      onNavigate={onNavigate}
+                      onOpenAuth={onOpenAuth}
+                      onMobileClose={() => setMobileOpen(false)}
+                    />
+                  </Suspense>
+                ) : (
+                  <PublicHeaderAuthSkeleton layout="mobile" />
+                )}
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+      : null
+
   return (
     <header
       ref={headerRef}
-      className={`w-full px-4 sm:px-8 lg:px-12 py-3 fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out ${
+      className={`w-full px-4 sm:px-8 lg:px-12 py-0 xl:py-3 fixed top-0 left-0 right-0 z-50 border-b border-line-subtle transition-transform duration-300 ease-in-out ${
         headerShown ? 'translate-y-0' : '-translate-y-full pointer-events-none'
       } ${
-        mobileOpen
-          ? 'bg-abyss border-b border-line-subtle shadow-xl'
-          : isScrolled
-            ? 'bg-abyss/90 backdrop-blur-2xl border-b border-line-subtle shadow-xl'
-            : 'bg-abyss/75 backdrop-blur-xl border-b border-line-subtle shadow-md'
+        // Phones get the app's solid bar; wide screens keep the frosted strip over the hero art.
+        isScrolled
+          ? 'bg-surface-1 xl:bg-abyss/90 xl:backdrop-blur-2xl shadow-xl'
+          : 'bg-surface-1 xl:bg-abyss/75 xl:backdrop-blur-xl xl:shadow-md'
       }`}
     >
-      <div ref={barRef} className="max-w-[1700px] mx-auto flex items-center justify-between gap-4">
+      <div className="max-w-[1700px] mx-auto h-14 xl:h-auto flex items-center justify-between gap-4">
         {/* Shared Brand Logo & Emblem */}
         <HeaderBrand
           onClick={() => onNavigate('/')}
@@ -626,28 +680,26 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
         {/* Header Action Items */}
         <div className="flex items-center gap-3 sm:gap-4 shrink-0">
-          {/* Mobile Hamburger Menu Toggle */}
-          <button
-            onClick={() => setMobileOpen((o) => !o)}
-            aria-label="Toggle navigation menu"
-            aria-expanded={mobileOpen}
-            aria-controls="public-header-mobile-menu"
-            className={`xl:hidden flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 rounded-control active:scale-95 transition-all duration-300 ${
-              `focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                    mobileOpen
-                      ? 'bg-crimson-soft border border-crimson-aggro/55 text-crimson-text hover:border-crimson-aggro'
-                      : 'bg-surface-1 hud-sheen border border-line text-ink hover:bg-surface-2 hover:border-line-strong'
-                  }`
-            }`}
-          >
-            <AnimatedHamburger isOpen={mobileOpen} />
-          </button>
+          {/* Phone: the app's faint pill (Join or menu) and the member's XP-ring portrait */}
+          <div className="xl:hidden flex items-center">
+            {authReady ? (
+              <Suspense fallback={<div className="flex items-center -mr-1.5"><div className={PUBLIC_PHONE_PILL}>{menuButton}</div></div>}>
+                <LazyPublicHeaderAuthSlot
+                  layout="bar"
+                  onNavigate={onNavigate}
+                  onOpenAuth={onOpenAuth}
+                  menuButton={menuButton}
+                />
+              </Suspense>
+            ) : (
+              <div className="flex items-center -mr-1.5"><div className={PUBLIC_PHONE_PILL}>{menuButton}</div></div>
+            )}
+          </div>
 
           <div className="hidden xl:flex items-center gap-3 sm:gap-4">
             {authReady ? (
               <Suspense fallback={<PublicHeaderAuthSkeleton layout="desktop" />}>
                 <LazyPublicHeaderAuthSlot
-                 
                   layout="desktop"
                   onNavigate={onNavigate}
                   onOpenAuth={onOpenAuth}
@@ -660,40 +712,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         </div>
       </div>
 
-      {/* Phone menu: a full-height sheet under the top row, with account actions pinned to the bottom. */}
-      <div
-        id="public-header-mobile-menu"
-        aria-hidden={!mobileOpen}
-        inert={!mobileOpen}
-        style={{ height: mobileOpen ? `calc(100dvh - ${barHeight || 68}px)` : 0 }}
-        className={`xl:hidden -mx-4 sm:-mx-8 lg:-mx-12 overflow-hidden transition-[height,opacity] duration-300 ease-[cubic-bezier(0.2,1,0.3,1)] motion-reduce:transition-none ${
-          mobileOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
-      >
-        <div className="h-full flex flex-col px-4 sm:px-8 lg:px-12 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
-          <nav aria-label="Mobile Navigation" className="flex-1 min-h-0 overflow-y-auto overscroll-contain -mx-1 px-1">
-            <div className="max-w-xl mx-auto flex flex-col gap-1">{navTabs.map(renderMobileItem)}</div>
-          </nav>
-
-          <div
-            className="max-w-xl w-full mx-auto shrink-0 border-t pt-3 mt-3 border-line-subtle"
-          >
-            {authReady ? (
-              <Suspense fallback={<PublicHeaderAuthSkeleton layout="mobile" />}>
-                <LazyPublicHeaderAuthSlot
-                 
-                  layout="mobile"
-                  onNavigate={onNavigate}
-                  onOpenAuth={onOpenAuth}
-                  onMobileClose={() => setMobileOpen(false)}
-                />
-              </Suspense>
-            ) : (
-              <PublicHeaderAuthSkeleton layout="mobile" />
-            )}
-          </div>
-        </div>
-      </div>
+      {mobileMenu}
     </header>
   )
 }

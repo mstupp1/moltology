@@ -53,5 +53,4 @@ export {
   type ZoomableImageProps,
   type LightboxImageItem,
 } from './ImageLightbox'
-export { AnimatedHamburger, type AnimatedHamburgerProps } from './AnimatedHamburger'
 export { LocalTime, type LocalTimeProps } from './LocalTime'
