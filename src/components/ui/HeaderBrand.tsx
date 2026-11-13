@@ -10,7 +10,8 @@ export interface HeaderBrandProps {
   isCollapsed?: boolean
   onClick?: () => void
   className?: string
-  logoSize?: 'sm' | 'md'
+  /** lg: the public site header (20px phone, 26px from 1024px). */
+  logoSize?: 'sm' | 'md' | 'lg'
   badge?: React.ReactNode
 }
 
@@ -23,8 +24,14 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
   logoSize = 'md',
   badge,
 }) => {
-  const sizeClasses = logoSize === 'sm' ? 'w-6 h-6 sm:w-7 sm:h-7' : 'w-8 h-8 sm:w-9 sm:h-9'
-  const titleSizeClasses = logoSize === 'sm' ? 'text-base' : 'text-lg sm:text-[22px]'
+  const sizeClasses =
+    logoSize === 'sm'
+      ? 'w-6 h-6 sm:w-7 sm:h-7'
+      : logoSize === 'lg'
+        ? 'w-9 h-9 lg:w-[42px] lg:h-[42px]'
+        : 'w-8 h-8 sm:w-9 sm:h-9'
+  const titleSizeClasses =
+    logoSize === 'sm' ? 'text-base' : logoSize === 'lg' ? 'text-[20px] lg:text-[26px]' : 'text-lg sm:text-[22px]'
   const isTagline = subtext === BRAND_TAGLINE
   const brandContent = (
     <>

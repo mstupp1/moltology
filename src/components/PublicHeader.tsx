@@ -603,9 +603,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     >
       <div className="max-w-[1700px] mx-auto h-14 lg:h-auto flex items-center justify-between gap-4">
         {/* Shared Brand Logo & Emblem */}
-        <HeaderBrand
-          onClick={() => onNavigate('/')}
-        />
+        <HeaderBrand logoSize="lg" onClick={() => onNavigate('/')} />
 
         {/* Central navigation bar */}
         <nav
