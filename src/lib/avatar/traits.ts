@@ -104,13 +104,37 @@ export const AVATAR_CLAW_LABELS: Readonly<Record<AvatarClaws, string>> = {
   mitten: 'Mittens',
 }
 
-export const AVATAR_POSES = ['cheer', 'wave', 'rest', 'flex'] as const
+export const AVATAR_POSES = ['cheer', 'wave', 'rest', 'flex', 'think', 'point', 'shrug', 'victory', 'ready', 'strut'] as const
 export type AvatarPose = (typeof AVATAR_POSES)[number]
 export const AVATAR_POSE_LABELS: Readonly<Record<AvatarPose, string>> = {
   cheer: 'Cheer',
   wave: 'Wave',
   rest: 'Relaxed',
   flex: 'Flex',
+  think: 'Thinking',
+  point: 'Point',
+  shrug: 'Shrug',
+  victory: 'Victory',
+  ready: 'Ready',
+  strut: 'Strut',
+}
+
+/** How a character carries itself when it is standing about: the pace and size of its idle movement. */
+export const AVATAR_TEMPERAMENTS = ['calm', 'lively', 'shy', 'proud', 'goofy'] as const
+export type AvatarTemperament = (typeof AVATAR_TEMPERAMENTS)[number]
+export const AVATAR_TEMPERAMENT_LABELS: Readonly<Record<AvatarTemperament, string>> = {
+  calm: 'Calm',
+  lively: 'Lively',
+  shy: 'Shy',
+  proud: 'Proud',
+  goofy: 'Goofy',
+}
+export const AVATAR_TEMPERAMENT_HINTS: Readonly<Record<AvatarTemperament, string>> = {
+  calm: 'Slow breaths, easy stance',
+  lively: 'Bouncy, always looking about',
+  shy: 'Tucked in, quick glances',
+  proud: 'Chest out, chin up',
+  goofy: 'Wobbles, wags and snaps',
 }
 
 export const AVATAR_ACCESSORIES = ['none', 'hard_hat', 'crown', 'visor', 'headset', 'halo', 'bow', 'beanie'] as const

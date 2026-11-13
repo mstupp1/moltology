@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type CSSProperties, type RefObject } from 'react'
 import { useAvatar3D } from '@/hooks/useAvatar3D'
-import { readyStill3D, requestStill3D, type StillShot } from '@/lib/avatar3d-portrait-queue'
+import { forgetStoredStill, readyStill3D, requestStill3D, type StillShot } from '@/lib/avatar3d-portrait-queue'
 import { sceneStyle3D } from '@/lib/avatar3d-scene'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 
@@ -11,6 +11,8 @@ export interface Still3D {
   status: 'loading' | 'ready' | 'unavailable'
   /** The character's chosen scene colours, to sit behind the still. */
   scene: CSSProperties | undefined
+  /** Call when the image would not load: a stored portrait is dropped and the still is drawn here. */
+  failed: () => void
 }
 
 /**
@@ -29,6 +31,7 @@ export function useStill3D(
   // Callers often hand over a freshly parsed config each render, so compare by content.
   const key = config?.seed ? JSON.stringify(config) : null
   const [still, setStill] = useState<{ key: string; shot: StillShot; px: number; url: string } | null>(null)
+  const [retry, setRetry] = useState(0)
 
   useEffect(() => {
     const frame = frameRef.current
@@ -63,15 +66,22 @@ export function useStill3D(
       stop.abort()
       watcher.disconnect()
     }
-  }, [key, px, shot, frameRef, support])
+  }, [key, px, shot, frameRef, support, retry])
 
   const drawn = key && still?.key === key && still.shot === shot && still.px === px ? still.url : null
   // A still drawn earlier this visit shows on the first render, with no loader.
-  const url = drawn ?? (key && support ? readyStill3D(JSON.parse(key) as LobsterAvatarConfig, px, shot) : null)
+  // A stored portrait is a plain image, so it shows even where 3D cannot run.
+  const url = drawn ?? (key ? readyStill3D(JSON.parse(key) as LobsterAvatarConfig, px, shot) : null)
   return useMemo(() => {
     const scene = key ? sceneStyle3D(JSON.parse(key) as LobsterAvatarConfig) : undefined
-    if (support === false) return { url: null, status: 'unavailable', scene }
-    return { url, status: url ? 'ready' : 'loading', scene }
+    const failed = () => {
+      if (!url || url.startsWith('data:')) return
+      forgetStoredStill(url)
+      setStill(null)
+      setRetry((n) => n + 1)
+    }
+    if (support === false && !url) return { url: null, status: 'unavailable', scene, failed }
+    return { url, status: url ? 'ready' : 'loading', scene, failed }
   }, [url, key, support])
 }
 

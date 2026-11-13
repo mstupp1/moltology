@@ -1,8 +1,8 @@
 /**
  * Stills for every small picture of a character: avatars, creator option cards and gear icons.
  * A page can show dozens of them, and a browser allows only a handful of live 3D canvases, so
- * two hidden stages (one framed on the face, one on the whole figure) draw each picture once and
- * hand back an image. Results are kept, so the same picture is never drawn twice.
+ * one hidden stage draws each picture once and hands back an image. Results are kept, so the same
+ * picture is never drawn twice.
  */
 import type { Avatar3DLook } from './look'
 import { withLoftDetail } from './loft'
@@ -34,21 +34,24 @@ const ICON_VIEW: Record<string, { yaw: number; zoom: number }> = {
 
 const KEEP = 160
 const cache = new Map<string, string>()
-const stages = new Map<'portrait' | 'full', { stage: Stage; canvas: HTMLCanvasElement }>()
+let studio: { stage: Stage; canvas: HTMLCanvasElement; detail: number } | null = null
+
+/** What a still shows of a look: the idle temperament never does, and a portrait holds its pose. */
+function shown(look: Avatar3DLook, shot: StillShot): Avatar3DLook {
+  const { temperament: _idle, ...rest } = look
+  return shot === 'portrait' ? { ...rest, pose: 'rest' } : rest
+}
 
 export function stillKey(look: Avatar3DLook, px: number, shot: StillShot = 'portrait'): string {
-  // A portrait holds its pose, so the same face in another stance is the same picture.
-  const held = shot === 'portrait' ? { ...look, pose: 'rest' } : look
-  return `${shot}|${px}|${JSON.stringify({ ...held, palette: look.palette.id })}`
+  return `${shot}|${px}|${JSON.stringify({ ...shown(look, shot), palette: look.palette.id })}`
 }
 
 export function cachedStill(look: Avatar3DLook, px: number, shot: StillShot = 'portrait'): string | undefined {
   return cache.get(stillKey(look, px, shot))
 }
 
-function stageFor(framing: 'portrait' | 'full', px: number): Stage {
-  let entry = stages.get(framing)
-  if (!entry) {
+function stageFor(framing: 'portrait' | 'full', px: number): NonNullable<typeof studio> {
+  if (!studio) {
     const canvas = document.createElement('canvas')
     let stage: Stage
     try {
@@ -58,23 +61,24 @@ function stageFor(framing: 'portrait' | 'full', px: number): Stage {
         pixelRatio: 1,
         framing,
         manual: true,
-        shadows: false,
+        // Soft cast shadows give small pictures their depth; one draw of them costs very little.
+        quality: 'low',
         // Start again with a fresh canvas the next time a picture is asked for.
         onContextLost: () => {
-          stages.delete(framing)
+          studio = null
         },
       })
     } catch (cause) {
       throw new Avatar3DUnavailable(cause)
     }
-    entry = { stage, canvas }
-    stages.set(framing, entry)
+    studio = { stage, canvas, detail: 0 }
   }
-  if (entry.canvas.width !== px || entry.canvas.height !== px) {
-    entry.canvas.width = entry.canvas.height = px
-    entry.stage.resize()
+  studio.stage.setFraming(framing)
+  if (studio.canvas.width !== px || studio.canvas.height !== px) {
+    studio.canvas.width = studio.canvas.height = px
+    studio.stage.resize()
   }
-  return entry.stage
+  return studio
 }
 
 /** Draw a still. Synchronous and fairly heavy: call it from a queue, not a render. */
@@ -82,9 +86,13 @@ export function renderStill(look: Avatar3DLook, px: number, shot: StillShot = 'p
   const key = stillKey(look, px, shot)
   const hit = cache.get(key)
   if (hit) return hit
-  const stage = stageFor(shot === 'portrait' ? 'portrait' : 'full', px)
+  const entry = stageFor(shot === 'portrait' ? 'portrait' : 'full', px)
+  const { stage } = entry
   // A small picture cannot show fine tessellation, so it is built from coarser meshes: much quicker.
-  withLoftDetail(px <= 128 ? 0.6 : 0.8, () => stage.setLook(shot === 'portrait' ? { ...look, pose: 'rest' } : look))
+  // A look that differs from the last one only in colour is repainted, not rebuilt.
+  const detail = px <= 128 ? 0.6 : 0.8
+  withLoftDetail(detail, () => stage.setLook(shown(look, shot), entry.detail !== detail))
+  entry.detail = detail
   const slot = shot.startsWith('gear:') ? shot.slice(5) : null
   const view = slot ? ICON_VIEW[slot] : undefined
   stage.focus(slot, view?.zoom)
@@ -103,7 +111,7 @@ export function renderPortrait(look: Avatar3DLook, px: number): string {
 }
 
 export function disposePortraits(): void {
-  for (const { stage } of stages.values()) stage.dispose()
-  stages.clear()
+  studio?.stage.dispose()
+  studio = null
   cache.clear()
 }

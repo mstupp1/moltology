@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Dices } from 'lucide-react'
 import {
   AVATAR_ANTENNAE,
@@ -20,8 +20,6 @@ import {
   LOBSTER_EYE_COLOR_LABELS,
   LOBSTER_EYE_VARIANTS,
   LOBSTER_EYE_VARIANT_LABELS,
-  LOBSTER_HEIGHTS,
-  LOBSTER_HEIGHT_LABELS,
   LOBSTER_PUPIL_VARIANTS,
   LOBSTER_GAZES,
   LOBSTER_GAZE_LABELS,
@@ -33,11 +31,14 @@ import {
   SHELL_PALETTES,
   rerollAvatarConfig,
   resolveAvatarTraits,
+  resolveHeightScale,
+  resolveTemperament,
   type AvatarRace,
   type LobsterAvatarConfig,
   type ResolvedAvatarTraits,
 } from '@/lib/lobster-avatar'
 import { EYE_COLOR_SWATCH } from '@/lib/avatar/parts'
+import { AVATAR_TEMPERAMENTS, AVATAR_TEMPERAMENT_HINTS, AVATAR_TEMPERAMENT_LABELS } from '@/lib/avatar/traits'
 import { HudButton } from '@/components/ui/HudButton'
 import { CharacterStill } from '../avatar3d/CharacterStill'
 import type { StillShot } from '@/lib/avatar3d-portrait-queue'
@@ -165,6 +166,87 @@ function Tile({
   )
 }
 
+/**
+ * A slider for a size. The thumb follows the finger at once; the character is rebuilt a few times
+ * a second while it moves, and once more when it is let go.
+ */
+function Dial({
+  label,
+  value,
+  min,
+  max,
+  low,
+  high,
+  disabled,
+  onChange,
+}: {
+  label: string
+  value: number
+  min: number
+  max: number
+  /** Words for the two ends of the scale. */
+  low: string
+  high: string
+  disabled?: boolean
+  onChange: (next: number) => void
+}) {
+  const [shown, setShown] = useState(value)
+  const sent = useRef(0)
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const dragging = useRef(false)
+  useEffect(() => {
+    if (!dragging.current) setShown(value)
+  }, [value])
+  useEffect(() => () => void (timer.current && clearTimeout(timer.current)), [])
+  const send = (next: number) => {
+    sent.current = Date.now()
+    onChange(Number(next.toFixed(2)))
+  }
+  const clamped = Math.min(max, Math.max(min, shown))
+  /** The drag ended: send the resting value now rather than waiting out the throttle. */
+  const settle = () => {
+    if (!dragging.current) return
+    dragging.current = false
+    if (timer.current) clearTimeout(timer.current)
+    send(shown)
+  }
+  return (
+    <div className="space-y-1.5 min-w-0">
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="text-[11px] font-sans font-semibold tracking-[0.08em] uppercase text-ink-muted">{label}</span>
+        <span className="text-[11px] font-sans text-ink-muted tabular-nums">{Math.round(shown * 100)}%</span>
+      </div>
+      <input
+        type="range"
+        className="dial-range"
+        aria-label={label}
+        min={min}
+        max={max}
+        step={0.01}
+        value={clamped}
+        disabled={disabled}
+        style={{ '--dial-fill': `${((clamped - min) / (max - min)) * 100}%` } as React.CSSProperties}
+        onChange={(event) => {
+          const next = Number(event.target.value)
+          dragging.current = true
+          setShown(next)
+          if (timer.current) clearTimeout(timer.current)
+          const wait = 160 - (Date.now() - sent.current)
+          if (wait <= 0) send(next)
+          else timer.current = setTimeout(() => send(next), wait)
+        }}
+        onPointerUp={settle}
+        onKeyUp={settle}
+        onBlur={settle}
+      />
+      <div className="flex justify-between text-[11px] font-sans text-ink-muted">
+        <span>{low}</span>
+        <span>{high}</span>
+      </div>
+    </div>
+  )
+}
+
 function Swatch({
   selected,
   onClick,
@@ -221,6 +303,13 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
     // Pin the resolved look first so changing one trait never reshuffles the others.
     onChange({ ...value, ...traits, [key]: next })
   }
+
+  /** Settings that are not seeded traits: sizes, temperament and the extra colours. */
+  const setField = <K extends 'armScale' | 'headScale' | 'temperament' | 'bellyColor' | 'markingColor' | 'markingScale'>(key: K, next: LobsterAvatarConfig[K]) => {
+    onChange({ ...value, ...traits, [key]: next })
+  }
+  const temperament = resolveTemperament(value)
+  const palette = SHELL_PALETTES.find((p) => p.id === traits.shellColor) ?? SHELL_PALETTES[0]
 
   // One look shared by every tile: the member's current character, no backdrop, no gear.
   const base = useMemo(
@@ -352,18 +441,11 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
                 />
               ))}
             </OptionGroup>
-            <OptionGroup label="Height">
-              {LOBSTER_HEIGHTS.map((h) => (
-                <Chip
-                  key={h}
-                  selected={traits.height === h}
-                  disabled={disabled}
-                  onClick={() => set('height', h)}
-                >
-                  {LOBSTER_HEIGHT_LABELS[h]}
-                </Chip>
-              ))}
-            </OptionGroup>
+            <div className="grid gap-x-5 gap-y-3 sm:grid-cols-3">
+              <Dial label="Height" value={resolveHeightScale(traits.height)} min={0.85} max={1.28} low="Short" high="Towering" disabled={disabled} onChange={(v) => set('height', v)} />
+              <Dial label={traits.race === 'crab' ? 'Shell size' : 'Head size'} value={value.headScale ?? 1} min={0.88} max={1.14} low="Small" high="Big" disabled={disabled} onChange={(v) => setField('headScale', v)} />
+              <Dial label="Claw size" value={value.armScale ?? 1} min={0.8} max={1.3} low="Small" high="Big" disabled={disabled} onChange={(v) => setField('armScale', v)} />
+            </div>
             <OptionGroup label="Pose" tiles>
               {AVATAR_POSES.map((p) => (
                 <Tile
@@ -374,6 +456,14 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
                   disabled={disabled}
                   onClick={() => set('pose', p)}
                 />
+              ))}
+            </OptionGroup>
+            <OptionGroup label="Temperament">
+              {AVATAR_TEMPERAMENTS.map((t) => (
+                <Chip key={t} selected={temperament === t} disabled={disabled} onClick={() => setField('temperament', t)}>
+                  <span className="font-semibold">{AVATAR_TEMPERAMENT_LABELS[t]}</span>
+                  <span className="hidden sm:inline text-ink-muted"> · {AVATAR_TEMPERAMENT_HINTS[t]}</span>
+                </Chip>
               ))}
             </OptionGroup>
             <OptionGroup label="Antennae" tiles>
@@ -426,6 +516,49 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
                   selected={traits.marking === m}
                   disabled={disabled}
                   onClick={() => set('marking', m)}
+                />
+              ))}
+            </OptionGroup>
+            {traits.marking !== 'none' && traits.marking !== 'split' && (
+              <>
+                <OptionGroup label="Pattern color">
+                  <Swatch
+                    label="Match the shell"
+                    selected={!value.markingColor}
+                    disabled={disabled}
+                    onClick={() => setField('markingColor', undefined)}
+                    background={`linear-gradient(135deg, ${palette.marking} 0 50%, ${palette.highlight} 50% 100%)`}
+                  />
+                  {SHELL_PALETTES.map((p) => (
+                    <Swatch
+                      key={p.id}
+                      label={p.label}
+                      selected={value.markingColor === p.id}
+                      disabled={disabled}
+                      onClick={() => setField('markingColor', p.id)}
+                      background={`radial-gradient(circle at 35% 30%, ${p.highlight} 0%, ${p.base} 60%, ${p.shade} 100%)`}
+                    />
+                  ))}
+                </OptionGroup>
+                <Dial label="Pattern size" value={value.markingScale ?? 1} min={0.5} max={1.8} low="Fine" high="Bold" disabled={disabled} onChange={(v) => setField('markingScale', v)} />
+              </>
+            )}
+            <OptionGroup label="Belly color">
+              <Swatch
+                label="Match the shell"
+                selected={!value.bellyColor}
+                disabled={disabled}
+                onClick={() => setField('bellyColor', undefined)}
+                background={`radial-gradient(circle at 35% 30%, #ffffff 0%, ${palette.belly} 50%, ${palette.bellyShade} 100%)`}
+              />
+              {SHELL_PALETTES.filter((p) => p.id !== palette.id).map((p) => (
+                <Swatch
+                  key={p.id}
+                  label={p.label}
+                  selected={value.bellyColor === p.id}
+                  disabled={disabled}
+                  onClick={() => setField('bellyColor', p.id)}
+                  background={`radial-gradient(circle at 35% 30%, #ffffff 0%, ${p.belly} 50%, ${p.bellyShade} 100%)`}
                 />
               ))}
             </OptionGroup>

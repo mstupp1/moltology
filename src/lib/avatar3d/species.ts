@@ -463,8 +463,21 @@ const LOBSTER_HEAD: LoftKey[] = [
   { d: 1.03, r: 0, z: -0.02 },
 ]
 
+/** A head shape at the member's chosen head size. */
+function sizedHead(look: Avatar3DLook) {
+  const shape = HEAD_SHAPES[look.headShape]
+  const size = look.headScale ?? 1
+  return { top: shape.top * size, bottom: shape.bottom * size, tall: shape.tall * size, n: shape.n }
+}
+
+/** Move an arm's joints out with a wider head, so the shoulders stay on its surface. */
+function reachOut(joints: Pick<ArmLayout, 'shoulder' | 'elbow' | 'wrist' | 'tip'>, look: Avatar3DLook): void {
+  const out = ((look.headScale ?? 1) - 1) * joints.shoulder.x * 0.8
+  for (const p of [joints.shoulder, joints.elbow, joints.wrist, joints.tip]) p.x += out
+}
+
 export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
-  const head = HEAD_SHAPES[look.headShape]
+  const head = sizedHead(look)
   const build = BUILDS[look.build]
   rig.addBone('pelvis', 'root', v(0, 0.78, -0.05))
   rig.addBone('chest', 'pelvis', v(0, 1.1, -0.02))
@@ -500,9 +513,10 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
       build.bottom,
     ),
     frame: uprightFrame,
-    rows: 40,
+    rows: 72,
     radial: 48,
-    ao: (k) => 0.74 + 0.26 * Math.min(1, Math.max(0, (1.14 - k.d) / 0.2)),
+    // Dark seams where the tail segments overlap, as on a real abdomen.
+    ao: (k) => (0.74 + 0.26 * Math.min(1, Math.max(0, (1.14 - k.d) / 0.2))) * (1 - 0.42 * Math.pow(Math.max(0, Math.cos(((k.d - 0.5) / 0.105) * Math.PI * 2)), 10)),
   })
   rig.addWorld('pelvis', 'shell', abdomen.geometry)
   rig.addWorld('pelvis', 'belly', bellyPlates(abdomen, { top: 1.14, bottom: 0.455, plates: 9, spreadTop: 1.12, spreadBottom: 0.9, lift: 0.024 }))
@@ -532,7 +546,7 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     tip: 0.006,
   })
 
-  const arm = addArms(rig, look, {
+  const arms: ArmLayout = {
     parent: 'chest',
     shoulder: v(0.265, 1.17, 0.0),
     elbow: v(0.45, 1.04, 0.07),
@@ -541,7 +555,9 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     radius: 0.058,
     clawSize: 0.62,
     clawFacing: v(-0.32, 0, 1),
-  })
+  }
+  reachOut(arms, look)
+  const arm = addArms(rig, look, arms)
 
   addSideLegs(
     rig,
@@ -598,7 +614,7 @@ const CRAB_SHELL: LoftKey[] = [
 ]
 
 export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
-  const head = HEAD_SHAPES[look.headShape]
+  const head = sizedHead(look)
   const build = BUILDS[look.build]
   rig.addBone('pelvis', 'root', v(0, 0.85, 0))
   rig.addBone('chest', 'pelvis', v(0, 1.0, 0))
@@ -674,16 +690,18 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     tip: 0.017,
   })
 
-  const arm = addArms(rig, look, {
+  const arms: ArmLayout = {
     parent: 'chest',
     shoulder: v(0.47, 1.08, 0.04),
     elbow: v(0.62, 1.03, 0.1),
     wrist: v(0.69, 0.95, 0.17),
     tip: v(0.67, 0.42, 0.28),
-    radius: 0.07,
-    clawSize: 0.66,
+    radius: 0.086,
+    clawSize: 0.76,
     clawFacing: v(-0.36, 0, 1),
-  })
+  }
+  reachOut(arms, look)
+  const arm = addArms(rig, look, arms)
 
   addSideLegs(
     rig,
@@ -692,7 +710,7 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
       [v(0.3, 0.92, 0.1), v(0.44, 0.88, 0.17), v(0.5, 0.76, 0.21), v(0.47, 0.6, 0.23)],
       [v(0.22, 0.84, 0.1), v(0.35, 0.77, 0.16), v(0.4, 0.65, 0.2), v(0.37, 0.49, 0.22)],
     ],
-    0.044,
+    0.054,
   )
 
   const leg = addLegs(rig, {
@@ -700,9 +718,9 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     hip: v(0.17, 0.76, -0.02),
     knee: v(0.37, 0.57, 0.02),
     ankle: v(0.365, 0.125, -0.03),
-    radius: 0.08,
-    footWidth: 0.4,
-    footLength: 0.35,
+    radius: 0.094,
+    footWidth: 0.43,
+    footLength: 0.37,
   })
 
   rig.addSocket('head', 'chest', v(0, shell.key(0).d - 0.035, 0.02), 0.2)

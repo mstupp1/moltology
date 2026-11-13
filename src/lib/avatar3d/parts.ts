@@ -5,7 +5,7 @@
  */
 import { BufferAttribute, BufferGeometry, Matrix4, Quaternion, SphereGeometry, TorusGeometry, Vector3 } from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
-import { loft, profile, spineFrame, type Frame, type Loft, type LoftKey } from './loft'
+import { loft, profile, SHELL_BUMP, spineFrame, type Frame, type Loft, type LoftKey } from './loft'
 
 const Z = new Vector3(0, 0, 1)
 const smooth = (a: number, b: number, x: number) => {
@@ -16,9 +16,23 @@ const smooth = (a: number, b: number, x: number) => {
 /** Give a stock three geometry the same attributes as a loft so parts can merge. */
 export function withAo(geo: BufferGeometry, ao = 1): BufferGeometry {
   const count = geo.getAttribute('position').count
-  const colors = new Float32Array(count * 3).fill(ao)
+  const colors = new Float32Array(count * 3)
+  for (let i = 0; i < count; i++) colors.set([ao, 1, SHELL_BUMP], i * 3)
   geo.setAttribute('color', new BufferAttribute(colors, 3))
   if (!geo.getAttribute('uv')) geo.setAttribute('uv', new BufferAttribute(new Float32Array(count * 2), 2))
+  return geo
+}
+
+/**
+ * Say what a part's surface is like: `soft` for the pale membrane at a joint, `bump` for how
+ * pebbled the shell is (claws are the roughest).
+ */
+export function surface(geo: BufferGeometry, o: { soft?: boolean; bump?: number }): BufferGeometry {
+  const col = geo.getAttribute('color')
+  for (let i = 0; i < col.count; i++) {
+    if (o.soft) col.setY(i, 0)
+    if (o.bump !== undefined) col.setZ(i, o.bump)
+  }
   return geo
 }
 
@@ -64,7 +78,7 @@ function straightFrame(k: LoftKey, out: Frame): void {
 
 /** A ball that fills the gap at a joint. */
 export function jointBall(radius: number): BufferGeometry {
-  return withAo(new SphereGeometry(radius, 20, 14), 0.9)
+  return surface(withAo(new SphereGeometry(radius, 20, 14), 0.9), { soft: true, bump: 0 })
 }
 
 export interface SegmentOptions {
@@ -200,8 +214,8 @@ export function claw(style: ClawStyle): ClawGeometry {
   const fingerTeeth = [0.52, 0.7].map((s, i) => tooth(0.028 - i * 0.006, fingerLoft.point(s, Math.PI - 0.12)))
 
   return {
-    palm: merge([palmLoft.geometry, ...palmTeeth]),
-    finger: merge([fingerLoft.geometry, ...fingerTeeth]),
+    palm: merge([surface(palmLoft.geometry, { bump: 1 }), ...palmTeeth]),
+    finger: merge([surface(fingerLoft.geometry, { bump: 1 }), ...fingerTeeth]),
     hinge,
     grip: new Vector3(0.02, -0.42 - 0.3 * reach, 0),
   }
@@ -229,7 +243,7 @@ export function foot(width: number, length: number, ankleHeight: number): Buffer
     if (pos.getY(i) < -ankleHeight) {
       pos.setY(i, -ankleHeight)
       nor.setXYZ(i, 0, -1, 0)
-      col.setXYZ(i, 0.6, 0.6, 0.6)
+      col.setXYZ(i, 0.6, 1, 0)
     }
   }
   return geo

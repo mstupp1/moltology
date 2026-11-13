@@ -37,6 +37,7 @@ import { equipmentAppearance } from '@/lib/character-appearance'
 import { parseVariantKey } from '@/lib/gear-variants'
 import { AvatarCreatorPanel } from '../avatar/AvatarCreatorPanel'
 import { AvatarCreatorPreview } from '../avatar/AvatarCreatorPreview'
+import { reactAvatars } from '@/lib/avatar3d-events'
 import { GearDetail } from './GearDetail'
 import { BonusChange, VectorSheetPanel } from './VectorSheetPanel'
 import { buildVectorSheet, resolveVectorBase } from '@/lib/vectors'
@@ -265,6 +266,8 @@ export const ChassisStatusPage: React.FC = () => {
       setError(null)
       window.dispatchEvent(new CustomEvent('profile-avatar-changed'))
       toast?.success('Character saved.')
+      // Once the saved look has settled in, the character celebrates.
+      window.setTimeout(() => reactAvatars('celebrate'), 80)
     } catch (e) {
       if (e instanceof Error && e.message.includes('another session'))
         setError('A newer character is available. Reload to replace this draft.')
@@ -310,8 +313,6 @@ export const ChassisStatusPage: React.FC = () => {
       setSelected(null)
     },
   }
-  // A new key replays the small settle animation whenever the look changes.
-  const popKey = JSON.stringify(preview).length + ':' + JSON.stringify(preview.equipment ?? {})
   const tabBar = (
     <div
       role="tablist"
@@ -369,9 +370,11 @@ export const ChassisStatusPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-[84px_minmax(0,1fr)_84px] gap-2 items-center">
             <SlotColumn ids={LEFT_SLOTS} className="hidden lg:flex" {...slotProps} />
             <div className="relative">
-              <div key={popKey} className="avatar-creator-pop">
+              {/* The stage stays mounted across edits, so the character can react instead of reloading. */}
+              <div>
                 <AvatarCreatorPreview
                   config={preview}
+                  portraitBeside
                   focus={tab === 'equipment' ? focus : null}
                   onResetFocus={() => setFocus(null)}
                   className="max-w-[min(212px,28svh)] lg:max-w-[560px] mx-auto"
@@ -381,15 +384,16 @@ export const ChassisStatusPage: React.FC = () => {
                 type="button"
                 variant="secondary"
                 size="sm"
-                className="absolute top-1 left-0 lg:top-2 lg:left-2"
+                className="absolute top-1 left-0 max-lg:px-2.5 lg:top-2 lg:left-2"
                 disabled={saving}
+                aria-label="Surprise me"
                 onClick={() => {
                   draftTouched.current = true
                   setConfig(rerollAvatarConfig(config))
                 }}
                 icon={<Dices className="w-3.5 h-3.5 text-cyan-glow" />}
               >
-                Surprise me
+                <span className="max-lg:sr-only">Surprise me</span>
               </HudButton>
             </div>
             <SlotColumn ids={RIGHT_SLOTS} className="hidden lg:flex" {...slotProps} />

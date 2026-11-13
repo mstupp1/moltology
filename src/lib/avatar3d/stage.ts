@@ -14,16 +14,22 @@ import {
   PerspectiveCamera,
   PlaneGeometry,
   PMREMGenerator,
+  Raycaster,
   Scene,
   ShadowMaterial,
+  Sprite,
+  SpriteMaterial,
   SRGBColorSpace,
+  Vector2,
   Vector3,
   WebGLRenderer,
 } from 'three'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import type { AvatarPose } from '../avatar/traits'
 import { buildCharacter, type Character3D } from './character'
-import type { Avatar3DLook } from './look'
+import { lookChange, type Avatar3DLook } from './look'
+import { withLoftDetail } from './loft'
+import type { Reaction } from './motion'
 
 export interface StageOptions {
   /** Hold still: no breathing, blinking or drift. */
@@ -47,12 +53,22 @@ export interface StageOptions {
    * colours), and a faint glowing ring on the floor. Lights only, so it costs no more to draw.
    */
   lighting?: 'studio' | 'cinematic'
+  /**
+   * `low` is for phones and weaker machines: a lower pixel ratio, a smaller shadow map and coarser
+   * meshes. Either way the stage lowers its own resolution if frames run slow.
+   */
+  quality?: 'high' | 'low'
   /** The browser took the 3D context away (too many canvases, or the graphics driver reset). */
   onContextLost?: () => void
 }
 
 export interface Stage {
-  setLook: (look: Avatar3DLook) => void
+  /**
+   * Show this look. Only what changed is redone: a new pose or temperament retargets the bones, a
+   * new colour, finish, marking or eye colour repaints the materials, and anything else rebuilds
+   * the character. `fresh` always rebuilds.
+   */
+  setLook: (look: Avatar3DLook, fresh?: boolean) => void
   setPose: (pose: AvatarPose, immediate?: boolean) => void
   setYaw: (yaw: number) => void
   /** Slow automatic turntable, in radians per second (0 stops it). */
@@ -63,6 +79,14 @@ export interface Stage {
    */
   /** Close in on a gear slot (null for the whole figure). `zoom` above 1 stands further back. */
   focus: (slot: string | null, zoom?: number) => void
+  /** Play a short reaction (a flinch, a claw snap, trying on gear, a celebration). */
+  react: (kind: Reaction, side?: 1 | -1) => void
+  /** Zoom (1 is the whole figure) and tilt back to where they started. */
+  resetView: () => void
+  /** Switch a manual stage between the whole figure and the head-and-shoulders framing. */
+  setFraming: (framing: 'full' | 'portrait') => void
+  /** Move time on by `dt` seconds and draw. For manual stages (tests and review renders). */
+  step: (dt: number) => void
   resize: () => void
   /** Stop drawing while the character is off screen, and pick up again when it is back. */
   setActive: (active: boolean) => void
@@ -91,6 +115,21 @@ function floorRingTexture(): CanvasTexture {
   return new CanvasTexture(canvas)
 }
 
+/** A soft white disc, tinted and drawn behind a glowing shell as its halo. */
+function haloTexture(): CanvasTexture {
+  const size = 128
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = size
+  const ctx = canvas.getContext('2d')!
+  const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
+  g.addColorStop(0, 'rgba(255,255,255,0.55)')
+  g.addColorStop(0.45, 'rgba(255,255,255,0.2)')
+  g.addColorStop(1, 'rgba(255,255,255,0)')
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, size, size)
+  return new CanvasTexture(canvas)
+}
+
 function contactShadowTexture(): CanvasTexture {
   const size = 256
   const canvas = document.createElement('canvas')
@@ -105,9 +144,16 @@ function contactShadowTexture(): CanvasTexture {
   return new CanvasTexture(canvas)
 }
 
+const ZOOM_MAX = 2.4
+const TILT_MIN = -0.12
+const TILT_MAX = 0.6
+const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x))
+
 export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {}): Stage {
   const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: options.preserveDrawingBuffer })
-  renderer.setPixelRatio(options.pixelRatio ?? Math.min(window.devicePixelRatio || 1, 2))
+  const low = options.quality === 'low'
+  let pixelRatio = options.pixelRatio ?? Math.min(window.devicePixelRatio || 1, low ? 1.5 : 2)
+  renderer.setPixelRatio(pixelRatio)
   renderer.outputColorSpace = SRGBColorSpace
   renderer.toneMapping = NeutralToneMapping
   renderer.toneMappingExposure = 1.05
@@ -128,7 +174,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   const key = new DirectionalLight(0xfff4e8, 3.2)
   key.position.set(2.2, 3.4, 4.4)
   key.castShadow = true
-  key.shadow.mapSize.set(1024, 1024)
+  key.shadow.mapSize.set(low ? 512 : 1024, low ? 512 : 1024)
   key.shadow.camera.left = key.shadow.camera.bottom = -1.7
   key.shadow.camera.right = key.shadow.camera.top = 1.7
   key.shadow.camera.near = 1
@@ -136,7 +182,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   key.shadow.bias = -0.0004
   key.shadow.normalBias = 0.012
   key.shadow.radius = 7
-  key.shadow.blurSamples = 16
+  key.shadow.blurSamples = low ? 8 : 16
   key.target.position.set(0, 1, 0)
   const fill = new DirectionalLight(0xa9c9ff, 0.5)
   fill.position.set(-3.2, 1.6, 2.4)
@@ -178,6 +224,21 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     scene.add(ring)
   }
 
+  // Shells with the glow finish light the water around them.
+  const glowTexture = haloTexture()
+  const halo = new Sprite(new SpriteMaterial({ map: glowTexture, transparent: true, depthWrite: false, depthTest: false, blending: AdditiveBlending, opacity: 0.5 }))
+  halo.renderOrder = -1
+  halo.visible = false
+  scene.add(halo)
+  let glowing = false
+  const lightHalo = (look: Avatar3DLook, height: number) => {
+    glowing = look.finish === 'glow'
+    if (!glowing) return
+    halo.material.color.set(look.palette.base)
+    halo.position.set(0, height * 0.56, -0.2)
+    halo.scale.setScalar(height * 1.9)
+  }
+
   let character: Character3D | null = null
   // Where the camera sits to take in the whole figure, and where it is now on its way there.
   const home = { position: new Vector3(0, 1.2, 6), look: new Vector3(0, 1, 0) }
@@ -198,23 +259,34 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   /** Where the camera wants to be this frame: home, or close on the focused slot as it turns. */
   const target = () => {
     const close = focused && character ? character.focusOf(focused) : null
+    let dist: number
+    let rise: number
     if (!close) {
-      wantPosition.copy(home.position)
+      // Zooming in closes on the head and shoulders rather than the middle of the body.
+      const near = (zoom - 1) / (ZOOM_MAX - 1)
       wantLook.copy(home.look)
-      return
+      wantLook.y += ((character?.height ?? 1.8) * 0.8 - home.look.y) * near
+      dist = (home.position.z - home.look.z) / zoom
+      rise = (home.position.y - home.look.y) / zoom
+    } else {
+      const at = close.at.clone().applyAxisAngle(new Vector3(0, 1, 0), yaw)
+      const vfov = (camera.fov * Math.PI) / 180
+      const size = close.size * focusZoom
+      dist = ((size / 2 / Math.tan(vfov / 2) / Math.min(camera.aspect, 1)) * 1.08) / zoom
+      rise = size * 0.12
+      wantLook.copy(at)
     }
-    const at = close.at.clone().applyAxisAngle(new Vector3(0, 1, 0), yaw)
-    const vfov = (camera.fov * Math.PI) / 180
-    const size = close.size * focusZoom
-    const dist = (size / 2 / Math.tan(vfov / 2) / Math.min(camera.aspect, 1)) * 1.08
-    wantLook.copy(at)
-    wantPosition.set(at.x, at.y + size * 0.12, at.z + dist)
+    wantPosition.set(wantLook.x, wantLook.y + rise + dist * Math.sin(tilt), wantLook.z + dist * Math.cos(tilt))
   }
   let yaw = options.yaw ?? 0
+  let zoom = 1
+  let tilt = 0
+  let framing = options.framing ?? 'full'
   let spin = 0
   let velocity = 0
   let dragging = false
   let lastX = 0
+  let lastY = 0
   let disposed = false
   let raf = 0
   let last = 0
@@ -225,12 +297,20 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   const wake = () => {
     awake = 1.5
   }
+  let slow = 16
+  let frames = 0
+  // The eyes follow the pointer anywhere on the page, for a while after it last moved.
+  const follow = Boolean(options.interactive) && !options.reducedMotion
+  let seen: { x: number; y: number; at: number } | null = null
+  const onSeen = (e: PointerEvent) => {
+    seen = { x: e.clientX, y: e.clientY, at: performance.now() }
+  }
 
   const frame = () => {
     const w = canvas.clientWidth || canvas.width
     const h = canvas.clientHeight || canvas.height
     camera.aspect = w / Math.max(h, 1)
-    if (options.framing === 'portrait') {
+    if (framing === 'portrait') {
       const { y, size } = character?.portrait ?? { y: 1.5, size: 1.2 }
       const dist = (size / 2 / Math.tan((camera.fov * Math.PI) / 360) / Math.min(camera.aspect, 1)) * 1.02
       // Straight on, so the head sits where the frame puts it.
@@ -262,7 +342,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   }
 
   const draw = (dt: number, time: number) => {
-    if (options.framing !== 'portrait') {
+    if (framing !== 'portrait') {
       target()
       // Ease in like a game camera; snap when motion is reduced or nothing has been drawn yet.
       const k = options.reducedMotion || !started ? 1 : 1 - Math.exp(-dt * 6)
@@ -276,15 +356,39 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       character.root.rotation.y = yaw
       character.update(dt, time, !options.reducedMotion)
     }
+    // A close portrait would be all halo, so only the whole figure wears it.
+    halo.visible = glowing && framing === 'full'
     renderer.render(scene, camera)
   }
 
   const tick = (now: number) => {
     if (disposed) return
     raf = requestAnimationFrame(tick)
-    const dt = Math.min((now - last) / 1000 || 0, 0.05)
+    const elapsed = last ? now - last : 0
+    const dt = Math.min(elapsed / 1000 || 0, 0.05)
     last = now
     clock += dt
+    // If frames run slow for a while, draw fewer pixels, and then drop the cast shadow.
+    if (elapsed > 0 && elapsed < 250) {
+      slow = slow * 0.95 + elapsed * 0.05
+      if (++frames > 90 && slow > 30) {
+        frames = 0
+        if (pixelRatio > 1) {
+          pixelRatio = Math.max(1, pixelRatio - 0.5)
+          renderer.setPixelRatio(pixelRatio)
+          resize()
+        } else if (key.castShadow) key.castShadow = false
+      }
+    }
+    if (character && follow) {
+      if (seen && now - seen.at < 4000) {
+        const box = canvas.getBoundingClientRect()
+        character.lookAt({
+          x: clamp((seen.x - box.left - box.width / 2) / (box.width / 2), -2, 2),
+          y: clamp(-(seen.y - box.top - box.height / 2) / (box.height / 2), -2, 2),
+        })
+      } else character.lookAt(null)
+    }
     if (!dragging) {
       if (focusYaw !== null) {
         // Turn the short way round to show the focused part.
@@ -303,32 +407,105 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     draw(dt, clock)
   }
 
+  const touches = new Map<number, { x: number; y: number }>()
+  let pinch: { span: number; zoom: number } | null = null
+  let press: { x: number; y: number; at: number; moved: number } | null = null
+  let lastTap = 0
+  const raycaster = new Raycaster()
+  const span = () => {
+    const [a, b] = [...touches.values()]
+    return Math.hypot(a.x - b.x, a.y - b.y)
+  }
+  /** A tap on the character: a claw snaps, anywhere else makes it jump. */
+  const tap = (e: PointerEvent) => {
+    if (!character || options.reducedMotion) return
+    const box = canvas.getBoundingClientRect()
+    const at = new Vector2(((e.clientX - box.left) / box.width) * 2 - 1, -((e.clientY - box.top) / box.height) * 2 + 1)
+    raycaster.setFromCamera(at, camera)
+    const hit = raycaster.intersectObject(character.root, true)[0]
+    if (!hit) return
+    const bone = character.boneOf(hit.object) ?? ''
+    const claw = /^(claw|thumb|forearm)([LR])$/.exec(bone)
+    if (claw) character.react('snap', claw[2] === 'L' ? 1 : -1)
+    else character.react('poke')
+    wake()
+  }
   const onDown = (e: PointerEvent) => {
+    touches.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    canvas.setPointerCapture(e.pointerId)
+    if (touches.size === 2) {
+      // Two fingers: pinch to zoom.
+      pinch = { span: span() || 1, zoom }
+      dragging = false
+      press = null
+      return
+    }
     dragging = true
+    press = { x: e.clientX, y: e.clientY, at: performance.now(), moved: 0 }
     // The visitor takes over the turn; the close-up stays.
     focusYaw = null
     lastX = e.clientX
+    lastY = e.clientY
     velocity = 0
-    canvas.setPointerCapture(e.pointerId)
   }
   const onMove = (e: PointerEvent) => {
+    const touch = touches.get(e.pointerId)
+    if (!touch) return
+    touch.x = e.clientX
+    touch.y = e.clientY
+    if (pinch && touches.size === 2) {
+      zoom = clamp(pinch.zoom * (span() / pinch.span), 1, ZOOM_MAX)
+      wake()
+      return
+    }
     if (!dragging) return
     const dx = e.clientX - lastX
+    const dy = e.clientY - lastY
     lastX = e.clientX
+    lastY = e.clientY
+    if (press) press.moved += Math.abs(dx) + Math.abs(dy)
     yaw += dx * 0.01
     velocity = dx * 0.6
+    // A mouse can also tilt the view; on a touch screen an up and down drag scrolls the page.
+    if (e.pointerType === 'mouse') tilt = clamp(tilt + dy * 0.005, TILT_MIN, TILT_MAX)
   }
-  const onUp = () => {
+  const onUp = (e: PointerEvent) => {
+    touches.delete(e.pointerId)
+    if (touches.size < 2) pinch = null
+    if (!dragging) return
     dragging = false
+    const now = performance.now()
+    if (e.type === 'pointerup' && press && press.moved < 6 && now - press.at < 350) {
+      if (now - lastTap < 320) {
+        // Double tap: in close, or back out.
+        zoom = zoom > 1.3 ? 1 : 1.9
+        if (zoom === 1) tilt = 0
+        lastTap = 0
+        wake()
+      } else {
+        lastTap = now
+        tap(e)
+      }
+    }
+    press = null
+  }
+  const onWheel = (e: WheelEvent) => {
+    // Pinch on a trackpad, or the wheel with Ctrl or Cmd held; a plain wheel scrolls the page.
+    if (!e.ctrlKey && !e.metaKey) return
+    e.preventDefault()
+    zoom = clamp(zoom * Math.exp(-e.deltaY * 0.01), 1, ZOOM_MAX)
+    wake()
   }
   if (options.interactive) {
     canvas.addEventListener('pointerdown', onDown)
     canvas.addEventListener('pointermove', onMove)
     canvas.addEventListener('pointerup', onUp)
     canvas.addEventListener('pointercancel', onUp)
+    canvas.addEventListener('wheel', onWheel, { passive: false })
     canvas.style.touchAction = 'pan-y'
     canvas.style.cursor = 'grab'
   }
+  if (follow) window.addEventListener('pointermove', onSeen, { passive: true })
 
   const onLost = (e: Event) => {
     e.preventDefault()
@@ -342,10 +519,26 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   if (!options.manual) raf = requestAnimationFrame(tick)
 
   return {
-    setLook(look) {
+    setLook(look, fresh = false) {
+      const before = character?.look
+      const change = before && !fresh ? lookChange(before, look) : 'shape'
+      if (character && change !== 'shape') {
+        if (change === 'paint') {
+          character.repaint(look)
+          lightHalo(look, character.height)
+        } else character.look = look
+        if (before!.pose !== look.pose) character.setPose(look.pose)
+        character.setTemperament(look.temperament)
+        wake()
+        return
+      }
       character?.dispose()
-      character = buildCharacter(look)
+      // A live character on a phone is built from slightly coarser meshes; stills choose their own detail.
+      character = low && !options.manual ? withLoftDetail(0.8, () => buildCharacter(look)) : buildCharacter(look)
       scene.add(character.root)
+      lightHalo(look, character.height)
+      // New gear on a live character: it tries the piece on.
+      if (before && follow && JSON.stringify(before.equipment ?? {}) !== JSON.stringify(look.equipment ?? {})) character.react('equip')
       frame()
       wake()
     },
@@ -369,6 +562,26 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       // Back to the front when the close-up ends, as a game camera resets.
       focusYaw = close ? close.yaw : 0
       wake()
+    },
+    react(kind, side) {
+      if (options.reducedMotion) return
+      character?.react(kind, side)
+      wake()
+    },
+    resetView() {
+      zoom = 1
+      tilt = 0
+      wake()
+    },
+    setFraming(next) {
+      if (next === framing) return
+      framing = next
+      started = false
+      frame()
+    },
+    step(dt) {
+      clock += dt
+      draw(dt, clock)
     },
     resize: () => {
       resize()
@@ -398,12 +611,16 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       canvas.removeEventListener('pointermove', onMove)
       canvas.removeEventListener('pointerup', onUp)
       canvas.removeEventListener('pointercancel', onUp)
+      canvas.removeEventListener('wheel', onWheel)
+      window.removeEventListener('pointermove', onSeen)
       canvas.removeEventListener('webglcontextlost', onLost)
       character?.dispose()
       env.dispose()
       pmrem.dispose()
       room.dispose()
       blobTexture.dispose()
+      glowTexture.dispose()
+      halo.material.dispose()
       ringTexture?.dispose()
       ring?.geometry.dispose()
       ;(ring?.material as MeshBasicMaterial | undefined)?.dispose()
