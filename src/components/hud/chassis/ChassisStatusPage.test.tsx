@@ -14,7 +14,12 @@ import {
   STARTER_EQUIPMENT_CATALOG_IDS,
   STARTER_EQUIPPED_SLOTS,
 } from '@/lib/equipment-seed-data'
-vi.mock('@/hooks/useAuthSession', () => ({ useAuthSession: () => ({ userId: 'user-1' }) }))
+const authState = vi.hoisted(() => ({ value: { userId: 'user-1' } as Record<string, unknown> }))
+vi.mock('@/hooks/useAuthSession', () => ({ useAuthSession: () => authState.value }))
+vi.mock('@/components/AuthModal', () => ({
+  AuthModal: ({ isOpen, subtitle }: { isOpen: boolean; subtitle?: string }) =>
+    isOpen ? <div role="dialog">{subtitle}</div> : null,
+}))
 vi.mock('@/lib/jwt', () => ({ getAuthJWTToken: vi.fn().mockResolvedValue('token') }))
 vi.mock('@/lib/server/api', () => ({ getChassisLoadoutFn: vi.fn(), saveCharacterFn: vi.fn() }))
 vi.mock('@/hooks/useHudPersist', () => ({
@@ -62,6 +67,8 @@ describe('unified character workspace', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     clearChassisLoadoutCache()
+    localStorage.clear()
+    authState.value = { userId: 'user-1' }
     vi.mocked(getChassisLoadoutFn).mockResolvedValue(structuredClone(payload))
     vi.mocked(saveCharacterFn).mockImplementation(async ({ data }: any) => ({
       ...structuredClone(payload),
@@ -168,5 +175,30 @@ describe('unified character workspace', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Equip on head' }))
     await act(async () => finish(structuredClone(payload)))
     expect(preview().equipment.head.visualKey).toBe('creator-bow')
+  })
+  it('lets guests edit and keep a draft in the browser, and asks them to sign up to save', async () => {
+    authState.value = { userId: null, isGuest: true, isPending: false }
+    vi.mocked(getChassisLoadoutFn).mockResolvedValue({ ...structuredClone(payload), config: null, appearanceRevision: 0 })
+    await mount()
+    expect(getChassisLoadoutFn).toHaveBeenCalledWith({ data: {} })
+    expect(screen.queryByTestId('guest-character-strip')).toBeNull()
+    choose('Bow')
+    fireEvent.click(screen.getByRole('button', { name: 'Equip on head' }))
+    expect(preview().equipment.head.visualKey).toBe('creator-bow')
+    expect(screen.getByTestId('guest-character-strip')).toBeInTheDocument()
+    const stored = JSON.parse(localStorage.getItem('moltology:guest-character-gear:v1')!)
+    expect(stored.some((i: any) => i.equippedSlot === 'head')).toBe(true)
+    expect(localStorage.getItem('moltology:avatar_config:guest')).toContain('critters')
+    fireEvent.click(screen.getByRole('button', { name: /Save my character/ }))
+    expect(screen.getByRole('dialog')).toHaveTextContent('keep your character')
+    expect(saveCharacterFn).not.toHaveBeenCalled()
+  })
+  it('brings back a guest draft on return', async () => {
+    authState.value = { userId: null, isGuest: true, isPending: false }
+    vi.mocked(getChassisLoadoutFn).mockResolvedValue({ ...structuredClone(payload), config: null, appearanceRevision: 0 })
+    localStorage.setItem('moltology:avatar_config:guest', JSON.stringify({ style: 'critters', seed: 'kept', race: 'crab' }))
+    await mount()
+    expect(preview().seed).toBe('kept')
+    expect(screen.getByTestId('guest-character-strip')).toBeInTheDocument()
   })
 })

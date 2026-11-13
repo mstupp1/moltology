@@ -24,10 +24,16 @@ interface AuthModalProps {
   onClose: () => void
   onSuccess?: () => void
   initialMode?: 'login' | 'signup'
+  /** Replaces the sign-up line under the title, e.g. to say what signing up keeps. */
+  subtitle?: string
 }
 
+/** Pages a guest signs up from that they should land back on. */
+const STAY_ON_PATHS = ['/member/', '/character']
+
 function authModalDestination(): string {
-  return typeof window !== 'undefined' && window.location.pathname.startsWith('/member/')
+  return typeof window !== 'undefined' &&
+    STAY_ON_PATHS.some((p) => window.location.pathname.startsWith(p))
     ? window.location.pathname
     : '/dashboard'
 }
@@ -37,6 +43,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onClose,
   onSuccess,
   initialMode = 'signup',
+  subtitle,
 }) => {
   const toast = useOptionalToast()?.toast
   const session = useAuthSession()
@@ -237,7 +244,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </h2>
           <p className="text-xs text-cyan-glow/80 mt-1 uppercase tracking-[0.08em] font-sans">
             {mode === 'signup'
-              ? 'Sign up to persist your session'
+              ? (subtitle ?? 'Sign up to persist your session')
               : 'Sign in to access your saved state'}
           </p>
         </div>

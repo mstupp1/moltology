@@ -15,13 +15,31 @@ describe('Chassis loadout handlers', () => {
     vi.clearAllMocks()
   })
 
-  it('rejects unauthenticated chassis inspection', async () => {
-    await expect(
-      getChassisLoadoutHandler({
-        data: {},
-        context: {},
-      }),
-    ).rejects.toThrow('Unauthenticated')
+  it('gives guests the starter character without touching their data', async () => {
+    const { ALL_EQUIPMENT_CATALOG, STARTER_EQUIPMENT_CATALOG_IDS, STARTER_EQUIPPED_SLOTS, catalogSeedInsertValues } =
+      await import('../equipment-seed-data')
+    const rows = ALL_EQUIPMENT_CATALOG.filter((c) => STARTER_EQUIPMENT_CATALOG_IDS.includes(c.id)).map(
+      catalogSeedInsertValues,
+    )
+    const chain = {
+      select: vi.fn(() => chain),
+      from: vi.fn(() => chain),
+      where: vi.fn(() => chain),
+      orderBy: vi.fn(async () => rows),
+      execute: vi.fn(),
+      insert: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    }
+    const payload = await getChassisLoadoutHandler({ data: {}, context: { db: chain } })
+    expect(chain.execute).not.toHaveBeenCalled()
+    expect(chain.insert).not.toHaveBeenCalled()
+    expect(payload.config).toBeNull()
+    expect(payload.items).toHaveLength(STARTER_EQUIPMENT_CATALOG_IDS.length)
+    expect(payload.items.filter((i) => i.equippedSlot).map((i) => i.equippedSlot)).toEqual([
+      ...STARTER_EQUIPPED_SLOTS,
+    ])
+    expect(payload.catalog.length).toBeGreaterThan(0)
   })
 
   it('rejects unauthenticated gear moves', async () => {

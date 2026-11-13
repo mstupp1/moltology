@@ -52,29 +52,26 @@ describe('Chassis Configurator HUD Route', () => {
     clearChassisLoadoutCache()
   })
 
-  it('renders guest lock screen when unauthenticated', () => {
+  it('lets guests edit the starter character and asks them to sign up to save it', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
     const Component = Route.options.component!
     render(<Component />)
 
-    expect(screen.getByText('CHARACTER LOCKED')).toBeInTheDocument()
-    expect(screen.getByText('RESTRICTED ACCESS')).toBeInTheDocument()
     expect(
-      screen.getByText(
-        'Chassis loadout, vault storage, and hardpoint calibration require an authorized initiate account.'
-      )
+      await screen.findByRole('button', { name: /Save my character/i }, { timeout: 8000 }),
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /SIGN UP TO UNLOCK/i })).toBeInTheDocument()
+    expect(screen.queryByText('CHARACTER LOCKED')).not.toBeInTheDocument()
+    const { getChassisLoadoutFn } = await import('@/lib/server/api')
+    expect(getChassisLoadoutFn).toHaveBeenCalledWith({ data: {} })
   })
 
-  it('holds the lock overlay for the first-paint empty session shape', () => {
+  it('holds the workspace skeleton for the first-paint empty session shape', () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
     const Component = Route.options.component!
     render(<Component />)
 
     expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
-    expect(screen.queryByText('CHARACTER LOCKED')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /SIGN UP TO UNLOCK/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Save my character/i })).not.toBeInTheDocument()
   })
 
   it('renders chassis status page when authenticated', async () => {

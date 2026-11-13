@@ -16,6 +16,7 @@ import { olderThanRow } from './keyset'
 import type { ChangelogEntry } from '../changelogs-data'
 import { tryCheckGemMilestones } from './gems'
 import { STARTER_EQUIPMENT_CATALOG_IDS } from '../equipment-seed-data'
+import { guestStarterItems } from '../guest-character'
 import { resolveWriteAuth } from './write-auth'
 import { ensureUserProfile } from '../user-sync'
 import {
@@ -4085,12 +4086,40 @@ export async function saveCharacterHandler({ data, context }: ServerFnArgs<SaveC
   return loadChassisPayload(auth.dbClient, auth.userId)
 }
 
+/**
+ * What a guest edits in Customize: the starter character a new member gets, with no database
+ * writes. Their draft stays in the browser until they sign up.
+ */
+async function loadGuestChassisPayload(dbClient: Db): Promise<ChassisLoadoutPayload> {
+  const owned = new Set(STARTER_EQUIPMENT_CATALOG_IDS)
+  const rows = await dbClient
+    .select()
+    .from(equipmentCatalog)
+    .where(inArray(equipmentCatalog.id, [...owned]))
+    .orderBy(asc(equipmentCatalog.sortOrder))
+  const catalog = rows
+    .filter((c) => c.kind !== 'cosmetic' && getEquipmentVisual(c.appearanceKey || c.slug))
+    .map(toCatalogRef)
+  const listed = new Set(catalog.map((c) => c.id))
+  const items = guestStarterItems().filter((i) => listed.has(i.catalogItemId))
+  return {
+    catalog,
+    items,
+    totals: computeLoadoutTotals(items, new Map(catalog.map((c) => [c.id, c]))),
+    vaultSize: VAULT_SIZE,
+    config: null,
+    appearanceRevision: 0,
+    allUnlocked: true,
+    vectorBase: resolveVectorBase(null, 'guest'),
+  }
+}
+
 export const getChassisLoadoutHandler = async ({
   data,
   context,
 }: ServerFnArgs<{ token?: string; userId?: string }>) => {
-  const auth = await resolveWriteAuth({ data, context })
-  if (!auth) throw new Error('Unauthenticated: Authentication required to inspect equipment.')
+  const auth = await resolveWriteAuth({ data, context, requireAuth: false })
+  if (!auth) return loadGuestChassisPayload(context?.db || getDb())
   const payload = await loadChassisPayload(auth.dbClient, auth.userId)
   if (!payload.allUnlocked || payload.items.every((i) => i.equippedSlot || i.vaultIndex !== null))
     return payload
