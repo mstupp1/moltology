@@ -1,6 +1,7 @@
 import { createRouter } from '@tanstack/react-router'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { getQueryClient } from '@/lib/query/client'
+import { FRESH, registerRouteCache } from '@/lib/query/content'
 import { routeTree } from './routeTree.gen'
 import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
 import { HUDNotFound } from '@/components/hud/HUDNotFound'
@@ -17,10 +18,14 @@ export function getRouter() {
     // Preload routes on intent (hover/focus) for instant navigation transitions.
     defaultPreload: 'intent',
     defaultPreloadDelay: 50,
+    // Going back to a page reuses what its loader already fetched instead of reading again.
+    // Forum routes set a shorter window; forum writes clear the forum's saved pages.
+    defaultStaleTime: FRESH.content,
     defaultPendingComponent: HUDPageLoader,
     defaultPendingMs: 250,
     defaultPendingMinMs: 0,
   })
+  registerRouteCache(router)
 
   return router
 }

@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Loader2, Search, Users } from 'lucide-react'
 import { useAuthSession } from '@/hooks/useAuthSession'
-import { getAuthJWTToken } from '@/lib/jwt'
-import { listConnectionsFn } from '@/lib/server/api'
+import { useConnectionsSummary } from '@/hooks/useConnectionsSummary'
 import {
   connectionsHubLocation,
   connectionsPageLocation,
@@ -33,12 +32,6 @@ export const CONNECTIONS_HUB_EMPTY_COPY = {
   body: 'Search a designation to send a request.',
 } as const
 export const CONNECTIONS_HUB_SEARCH_PLACEHOLDER = 'Search names or designations…'
-
-const EMPTY_CONNECTIONS: ConnectionsListView = {
-  friends: [],
-  incoming: [],
-  outgoing: [],
-}
 
 const HUB_SEARCH_RESULT_LIMIT = 3
 
@@ -117,56 +110,13 @@ export function ConnectionsHubCard() {
   const navigate = useNavigate()
   const session = useAuthSession()
   const userId = session.userId
-  const isAuthPending = session.isPending
   const canSearch = Boolean(userId)
 
-  const [connections, setConnections] = useState<ConnectionsListView>(EMPTY_CONNECTIONS)
-  const [isLoading, setIsLoading] = useState(true)
+  const { connections, isLoading, refresh: refreshConnections } = useConnectionsSummary()
   const [query, setQuery] = useState('')
   const { results, searching } = useMemberSearch(query, canSearch)
   const searchResults = results.slice(0, HUB_SEARCH_RESULT_LIMIT)
   const queryReady = query.trim().length >= MEMBER_SEARCH_MIN_CHARS
-
-  const refreshConnections = useCallback(async () => {
-    if (!userId) return
-    try {
-      const token = await getAuthJWTToken()
-      const next = await listConnectionsFn({ data: { token: token ?? undefined } })
-      setConnections(next ?? EMPTY_CONNECTIONS)
-    } catch {
-      // Keep the last good snapshot; the row actions toast their own failures.
-    }
-  }, [userId])
-
-  useEffect(() => {
-    let cancelled = false
-
-    async function load() {
-      if (isAuthPending) return
-      if (!userId) {
-        if (!cancelled) {
-          setConnections(EMPTY_CONNECTIONS)
-          setIsLoading(false)
-        }
-        return
-      }
-
-      try {
-        const token = await getAuthJWTToken()
-        const next = await listConnectionsFn({ data: { token: token ?? undefined } })
-        if (!cancelled) setConnections(next ?? EMPTY_CONNECTIONS)
-      } catch {
-        if (!cancelled) setConnections(EMPTY_CONNECTIONS)
-      } finally {
-        if (!cancelled) setIsLoading(false)
-      }
-    }
-
-    void load()
-    return () => {
-      cancelled = true
-    }
-  }, [userId, isAuthPending])
 
   const preview = pickConnectionsHubPreview(connections)
   const circle = pickConnectionsHubCircle(connections)

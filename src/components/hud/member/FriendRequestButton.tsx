@@ -8,6 +8,7 @@ import {
   cancelFriendRequestFn,
   removeConnectionFn,
 } from '@/lib/server/api'
+import { invalidateConnections, useAppQueryClient } from '@/lib/query/account'
 import { useToast } from '@/components/ui/ToastProvider'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { Link } from '@tanstack/react-router'
@@ -35,6 +36,7 @@ export const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({
   const [busy, setBusy] = useState(false)
   const { toast } = useToast()
   const persist = useHudPersist()
+  const queryClient = useAppQueryClient()
   const pad = compact ? 'px-2 py-1 text-[11px]' : 'px-3 py-2 text-xs'
   const iconCls = compact ? 'w-3 h-3' : 'w-3.5 h-3.5'
   const gap = compact ? 'gap-1' : 'gap-1.5'
@@ -45,6 +47,7 @@ export const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({
     persist.begin('friend-request')
     try {
       await fn()
+      void invalidateConnections(queryClient)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Connection action failed.')
     } finally {

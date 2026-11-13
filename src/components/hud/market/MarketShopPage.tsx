@@ -8,6 +8,8 @@ import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { AuthModal } from '@/components/AuthModal'
 import { getAuthJWTToken } from '@/lib/jwt'
+import { accountKeys, useAppQueryClient } from '@/lib/query/account'
+import { FRESH } from '@/lib/query/content'
 import { buyGearFn, createCreditCheckoutFn, getChassisLoadoutFn, getMarketFn } from '@/lib/server/api'
 import type { MoltCreditPack } from '@/lib/molt-credits'
 import {
@@ -158,7 +160,11 @@ export function MarketShopPage() {
   const { userId, isPending } = useAuthSession()
   const toast = useOptionalToast()?.toast
   const wide = useWide()
-  const [market, setMarket] = useState<MarketPayload | null>(null)
+  const queryClient = useAppQueryClient()
+  const marketKeyHash = JSON.stringify(accountKeys.market(userId ?? null))
+  const [market, setMarket] = useState<MarketPayload | null>(
+    () => (isPending ? null : (queryClient.getQueryData<MarketPayload>(accountKeys.market(userId ?? null)) ?? null)),
+  )
   const [error, setError] = useState<string | null>(null)
   const [config, setConfig] = useState<LobsterAvatarConfig | null>(null)
   const [loadout, setLoadout] = useState<ChassisLoadoutPayload | null>(null)
@@ -175,21 +181,32 @@ export function MarketShopPage() {
 
   // Guests get the catalog too; they sign up to buy. Wait for the session so members don't
   // see the guest version first.
-  const load = useCallback(async () => {
-    if (isPending) return
-    try {
-      const token = (await getAuthJWTToken()) ?? undefined
-      const payload = await getMarketFn({ data: { token } })
-      setMarket(payload)
-      setError(null)
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not load the market.')
-    }
-  }, [userId, isPending])
+  // A revisit inside the freshness window reuses the saved catalog; `force` follows a purchase.
+  const fetchMarket = useCallback(
+    async (force: boolean) => {
+      if (isPending) return
+      try {
+        const payload = await queryClient.fetchQuery({
+          queryKey: JSON.parse(marketKeyHash) as readonly unknown[],
+          queryFn: async () => {
+            const token = (await getAuthJWTToken()) ?? undefined
+            return getMarketFn({ data: { token } })
+          },
+          staleTime: force ? 0 : FRESH.panel,
+        })
+        setMarket(payload)
+        setError(null)
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Could not load the market.')
+      }
+    },
+    [isPending, queryClient, marketKeyHash],
+  )
+  const load = useCallback(() => fetchMarket(true), [fetchMarket])
 
   useEffect(() => {
-    void load()
-  }, [load])
+    void fetchMarket(false)
+  }, [fetchMarket])
 
   useEffect(() => {
     if (typeof window !== 'undefined') setFilters(readFilters(window.location.search))

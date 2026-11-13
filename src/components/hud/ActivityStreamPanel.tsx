@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Activity } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -9,6 +9,8 @@ import { ActivityFeedGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
 import { ActivityFeedItem } from '@/components/hud/ActivityFeedItem'
 import { DashboardEmptyRow, DashboardPanel } from '@/components/hud/dashboard/DashboardPanel'
+import { accountKeys, useAppQuery } from '@/lib/query/account'
+import { FRESH } from '@/lib/query/content'
 
 const HUB_STREAM_LIMIT = 5
 
@@ -24,48 +26,20 @@ export function ActivityStreamPanel() {
   const userId = session.userId
   const isAuthPending = session.isPending
 
-  const [events, setEvents] = useState<ActivityEventView[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    let isMounted = true
-
-    async function loadEvents() {
-      if (isAuthPending) return
-      if (!userId) {
-        if (isMounted) {
-          setEvents([])
-          setIsLoading(false)
-        }
-        return
-      }
-
-      try {
-        const token = await getAuthJWTToken()
-        const fetched = await getActivityFeedFn({
-          data: {
-            token: token ?? undefined,
-            userId,
-            scope: 'circle',
-            filter: 'all',
-            limit: HUB_STREAM_LIMIT,
-          },
-        })
-        if (isMounted) {
-          setEvents(Array.isArray(fetched?.events) ? fetched.events : [])
-        }
-      } catch {
-        if (isMounted) setEvents([])
-      } finally {
-        if (isMounted) setIsLoading(false)
-      }
-    }
-
-    loadEvents()
-    return () => {
-      isMounted = false
-    }
-  }, [userId, isAuthPending])
+  const params = { scope: 'circle', filter: 'all', limit: HUB_STREAM_LIMIT } as const
+  const feed = useAppQuery<ActivityEventView[]>({
+    queryKey: accountKeys.activity(userId ?? '', params),
+    queryFn: async () => {
+      const token = await getAuthJWTToken()
+      const fetched = await getActivityFeedFn({ data: { token: token ?? undefined, userId: userId!, ...params } })
+      return Array.isArray(fetched?.events) ? fetched.events : []
+    },
+    enabled: Boolean(userId) && !isAuthPending,
+    staleTime: FRESH.panel,
+  })
+  const events = feed.data ?? []
+  // Guests have nothing to load; members wait for their first read (or its failure).
+  const isLoading = isAuthPending || (Boolean(userId) && feed.isPending && !feed.isError)
 
   return (
     <DashboardPanel

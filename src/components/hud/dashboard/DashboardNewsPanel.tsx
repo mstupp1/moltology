@@ -1,33 +1,28 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Newspaper } from 'lucide-react'
 import { getAssetUrl } from '@/lib/assets'
 import { INITIAL_BLOG_POSTS, formatNewsTitle, type BlogPostData } from '@/lib/blog-data'
 import { getBlogPostsFn } from '@/lib/server/api'
 import { cn } from '@/lib/utils'
+import { useAppQuery } from '@/lib/query/account'
+import { FRESH, contentKeys } from '@/lib/query/content'
 import { DASHBOARD_FOCUS, DashboardEmptyRow, DashboardPanel } from './DashboardPanel'
 
 export const DASHBOARD_NEWS_LIMIT = 4
 
 export function DashboardNewsPanel() {
   const navigate = useNavigate()
-  const [posts, setPosts] = useState<BlogPostData[]>(() => INITIAL_BLOG_POSTS.slice(0, DASHBOARD_NEWS_LIMIT))
-
-  useEffect(() => {
-    let isMounted = true
-    getBlogPostsFn()
-      .then((fetched) => {
-        if (isMounted && Array.isArray(fetched) && fetched.length > 0) {
-          setPosts((fetched as BlogPostData[]).slice(0, DASHBOARD_NEWS_LIMIT))
-        }
-      })
-      .catch(() => {
-        // keep the bundled posts
-      })
-    return () => {
-      isMounted = false
-    }
-  }, [])
+  const { data } = useAppQuery<BlogPostData[]>({
+    queryKey: contentKeys.news,
+    queryFn: async () => {
+      const fetched = await getBlogPostsFn()
+      // An empty or failed read keeps the bundled posts.
+      return Array.isArray(fetched) && fetched.length > 0 ? (fetched as BlogPostData[]) : INITIAL_BLOG_POSTS
+    },
+    staleTime: FRESH.content,
+  })
+  const posts = (data ?? INITIAL_BLOG_POSTS).slice(0, DASHBOARD_NEWS_LIMIT)
 
   return (
     <DashboardPanel

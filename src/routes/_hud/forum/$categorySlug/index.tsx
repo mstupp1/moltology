@@ -19,8 +19,18 @@ import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 import { PAGE_SIZES, mergeById, takePage } from '@/lib/pagination'
 import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
+import { useAppQuery, useAppQueryClient } from '@/lib/query/account'
+import { FRESH, forumKeys } from '@/lib/query/content'
+import { useForgetForumReads } from '@/hooks/useForgetForumReads'
 
 const TOPIC_PAGE = PAGE_SIZES.forumTopics
+
+type BoardRead = { items: ForumTopicEntry[]; hasMore: boolean; category: ForumCategoryEntry | null }
+
+/** The board list a member is looking at, as a cache key. */
+function boardView(board: string, sortBy: string, query: string, userId: string | null | undefined) {
+  return { board, sortBy, query, userId: userId ?? null, view: 'board' }
+}
 
 export const Route = createFileRoute('/_hud/forum/$categorySlug/')({
   loader: async ({ params }) => {
@@ -71,6 +81,7 @@ export const Route = createFileRoute('/_hud/forum/$categorySlug/')({
   },
   component: ForumBoardPage,
   pendingComponent: HudWorkspaceGhost,
+  staleTime: FRESH.forum,
 })
 
 type SortKey = ForumSortKey
@@ -81,25 +92,23 @@ function ForumBoardPage() {
   const navigate = useNavigate()
   const session = useAuthSession()
   const userId = session.userId
-  const [category, setCategory] = useState<ForumCategoryEntry | null>(loader.category)
-  const [topics, setTopics] = useState<ForumTopicEntry[]>(loader.topics || [])
+  const queryClient = useAppQueryClient()
+  const forgetForumReads = useForgetForumReads()
+  // A revisit paints the member's saved board, not the guest version from the loader.
+  const saved = userId
+    ? queryClient.getQueryData<BoardRead>(forumKeys.topics(boardView(categorySlug, 'hot', '', userId)))
+    : undefined
+  const [category, setCategory] = useState<ForumCategoryEntry | null>(saved?.category ?? loader.category)
+  const [topics, setTopics] = useState<ForumTopicEntry[]>(saved?.items ?? (loader.topics || []))
   const [sortBy, setSortBy] = useState<SortKey>('hot')
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [hasMore, setHasMore] = useState(Boolean(loader.hasMore))
+  const [hasMore, setHasMore] = useState(saved?.hasMore ?? Boolean(loader.hasMore))
   const [loadingMore, setLoadingMore] = useState(false)
-  const [serverOffset, setServerOffset] = useState((loader.topics || []).length)
+  const [serverOffset, setServerOffset] = useState(saved?.items.length ?? (loader.topics || []).length)
   const composerRef = useRef<InlineTopicComposerHandle>(null)
   const staffAccess = useHiddenPageAccess()
   const canStartTopic = !isForumStaffBoard(category?.slug ?? categorySlug) || staffAccess.canView
-
-  useEffect(() => {
-    setCategory(loader.category)
-    setTopics(loader.topics || [])
-    setHasMore(Boolean(loader.hasMore))
-    setServerOffset((loader.topics || []).length)
-  }, [loader])
 
   // Wait for typing to pause so each keystroke does not run a board-wide search.
   useEffect(() => {
@@ -112,55 +121,55 @@ function ForumBoardPage() {
     return () => clearTimeout(timer)
   }, [searchQuery])
 
-  const initialFetchHandled = useRef(false)
+  // Guests on the default view already have the loader's topics; everything else asks the
+  // server once and keeps the first page for revisits.
+  const usesServerList = Boolean(userId) || sortBy !== 'hot' || Boolean(debouncedQuery)
+  const board = useAppQuery<BoardRead>({
+    queryKey: forumKeys.topics(boardView(categorySlug, sortBy, debouncedQuery, userId)),
+    queryFn: async () => {
+      const token = userId ? await getAuthJWTToken() : null
+      const auth = userId ? { userId, token: token ?? undefined } : {}
+      const [res, nextCategory] = await Promise.all([
+        getForumTopicsFn({
+          data: {
+            categorySlug,
+            query: debouncedQuery || undefined,
+            sortBy,
+            limit: TOPIC_PAGE + 1,
+            ...auth,
+          },
+        }),
+        userId ? getForumCategoryBySlugFn({ data: { slug: categorySlug, ...auth } }) : Promise.resolve(null),
+      ])
+      const page = takePage(res || [], TOPIC_PAGE)
+      if (userId) syncForumVotesFromServer(userId, page.items)
+      return { ...page, category: nextCategory }
+    },
+    enabled: usesServerList && !session.isPending,
+    staleTime: FRESH.forum,
+  })
+  const loading = usesServerList && board.isFetching && !board.data
 
   useEffect(() => {
-    // A guest's first render already has the loader's topics for the default view.
-    if (!initialFetchHandled.current) {
-      initialFetchHandled.current = true
-      if (!userId && sortBy === 'hot' && !debouncedQuery) return
+    if (!usesServerList) {
+      setCategory(loader.category)
+      setTopics(loader.topics || [])
+      setHasMore(Boolean(loader.hasMore))
+      setServerOffset((loader.topics || []).length)
+      return
     }
-    let active = true
-    setLoading(true)
-    ;(async () => {
-      try {
-        const token = userId ? await getAuthJWTToken() : null
-        const auth = userId ? { userId, token: token ?? undefined } : {}
-        const [res, nextCategory] = await Promise.all([
-          getForumTopicsFn({
-            data: {
-              categorySlug,
-              query: debouncedQuery || undefined,
-              sortBy,
-              limit: TOPIC_PAGE + 1,
-              ...auth,
-            },
-          }),
-          userId
-            ? getForumCategoryBySlugFn({ data: { slug: categorySlug, ...auth } })
-            : Promise.resolve(null),
-        ])
-        if (active) {
-          const page = takePage(res || [], TOPIC_PAGE)
-          if (userId) syncForumVotesFromServer(userId, page.items)
-          setTopics(page.items)
-          setHasMore(page.hasMore)
-          setServerOffset(page.items.length)
-          if (nextCategory) setCategory(nextCategory)
-        }
-      } catch {
-        if (active) {
-          setTopics([])
-          setHasMore(false)
-        }
-      } finally {
-        if (active) setLoading(false)
-      }
-    })()
-    return () => {
-      active = false
+    if (board.isError && !board.data) {
+      setTopics([])
+      setHasMore(false)
+      return
     }
-  }, [categorySlug, sortBy, debouncedQuery, userId])
+    const page = board.data
+    if (!page) return
+    setTopics(page.items)
+    setHasMore(page.hasMore)
+    setServerOffset(page.items.length)
+    setCategory(page.category ?? loader.category)
+  }, [usesServerList, board.data, board.isError, loader])
 
   const loadMoreTopics = async () => {
     setLoadingMore(true)
@@ -282,6 +291,7 @@ function ForumBoardPage() {
                 fixedCategory={true}
                 onCreated={(topic) => {
                   setTopics((prev) => [topic, ...prev])
+                  forgetForumReads()
                   navigate({
                     to: '/forum/$categorySlug/$topicSlug',
                     params: {

@@ -16,8 +16,18 @@ import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 import { PAGE_SIZES, mergeById, takePage } from '@/lib/pagination'
 import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
+import { useAppQuery, useAppQueryClient } from '@/lib/query/account'
+import { FRESH, forumKeys } from '@/lib/query/content'
+import { useForgetForumReads } from '@/hooks/useForgetForumReads'
 
 const TOPIC_PAGE = PAGE_SIZES.forumTopics
+
+type TopicPage = { items: ForumTopicEntry[]; hasMore: boolean }
+
+/** The forum list a member is looking at, as a cache key. */
+function topicListView(sortBy: string, query: string, board: string | undefined, userId: string | null | undefined) {
+  return { sortBy, query, board: board ?? null, userId: userId ?? null }
+}
 
 export const Route = createFileRoute('/_hud/forum/')({
   loader: async () => {
@@ -55,6 +65,7 @@ export const Route = createFileRoute('/_hud/forum/')({
   }),
   component: ForumIndexPage,
   pendingComponent: HudWorkspaceGhost,
+  staleTime: FRESH.forum,
 })
 
 const FIELD =
@@ -67,45 +78,40 @@ function ForumIndexPage() {
   const userId = session.userId
   const composerRef = useRef<InlineTopicComposerHandle>(null)
   const [showRules, setShowRules] = useState(false)
-  const [topicsState, setTopicsState] = useState<ForumTopicEntry[]>(topics)
-  const [categoriesState, setCategoriesState] = useState<ForumCategoryEntry[]>(categories)
+  const queryClient = useAppQueryClient()
+  const forgetForumReads = useForgetForumReads()
+  // A revisit paints the member's saved list and boards, not the guest list from the loader.
+  const savedFirstPage = userId
+    ? queryClient.getQueryData<TopicPage>(forumKeys.topics(topicListView('hot', '', undefined, userId)))
+    : undefined
+  const savedBoards = userId ? queryClient.getQueryData<ForumCategoryEntry[]>(forumKeys.categories(userId)) : undefined
+  const [topicsState, setTopicsState] = useState<ForumTopicEntry[]>(savedFirstPage?.items ?? topics)
+  const [categoriesState, setCategoriesState] = useState<ForumCategoryEntry[]>(
+    savedBoards && savedBoards.length > 0 ? savedBoards : categories,
+  )
   const [sortBy, setSortBy] = useState<ForumSortKey>('hot')
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const [boardFilter, setBoardFilter] = useState<string>('ALL')
-  const [loading, setLoading] = useState(false)
-  const [hasMore, setHasMore] = useState(loaderHasMore)
+  const [hasMore, setHasMore] = useState(savedFirstPage?.hasMore ?? loaderHasMore)
   const [loadingMore, setLoadingMore] = useState(false)
   // Rows the server has handed us for the current view; topics created here are not counted.
-  const [serverOffset, setServerOffset] = useState(topics.length)
-
-  useEffect(() => {
-    setTopicsState(topics)
-    setHasMore(loaderHasMore)
-    setServerOffset(topics.length)
-  }, [topics, loaderHasMore])
-
-  useEffect(() => {
-    setCategoriesState(categories)
-  }, [categories])
+  const [serverOffset, setServerOffset] = useState(savedFirstPage?.items.length ?? topics.length)
 
   // Unread counts need the member's JWT, which SSR loaders cannot send.
+  const memberBoards = useAppQuery<ForumCategoryEntry[]>({
+    queryKey: forumKeys.categories(userId),
+    queryFn: async () => {
+      const token = await getAuthJWTToken()
+      return (await getForumCategoriesFn({ data: { userId: userId!, token: token ?? undefined } })) ?? []
+    },
+    enabled: Boolean(userId),
+    staleTime: FRESH.forum,
+  })
   useEffect(() => {
-    if (!userId) return
-    let active = true
-    ;(async () => {
-      try {
-        const token = await getAuthJWTToken()
-        const cats = await getForumCategoriesFn({ data: { userId, token: token ?? undefined } })
-        if (active && cats && cats.length > 0) setCategoriesState(cats)
-      } catch {
-        // Keep loader boards if hydration fails
-      }
-    })()
-    return () => {
-      active = false
-    }
-  }, [userId])
+    const boards = memberBoards.data
+    setCategoriesState(boards && boards.length > 0 ? boards : categories)
+  }, [categories, memberBoards.data])
 
   // Lists carry previews, not whole bodies, so a search asks the server once typing pauses.
   useEffect(() => {
@@ -136,42 +142,46 @@ function ForumIndexPage() {
     return takePage(found ?? [], TOPIC_PAGE)
   }
 
-  // Guests on the default view already have the loader's list; everything else asks the server.
+  // Guests on the default view already have the loader's list; everything else asks the server
+  // once and keeps the first page for revisits.
+  const usesServerList = Boolean(userId) || sortBy !== 'hot' || Boolean(debouncedQuery) || Boolean(boardSlug)
+  const firstPage = useAppQuery<TopicPage>({
+    queryKey: forumKeys.topics(topicListView(sortBy, debouncedQuery, boardSlug, userId)),
+    queryFn: async () => {
+      const page = await fetchTopicPage(0)
+      if (userId) syncForumVotesFromServer(userId, page.items)
+      return page
+    },
+    enabled: usesServerList && !session.isPending,
+    staleTime: FRESH.forum,
+  })
+  const loading = usesServerList && firstPage.isFetching && !firstPage.data
+
   useEffect(() => {
-    if (!userId && sortBy === 'hot' && !debouncedQuery && !boardSlug) {
+    if (!usesServerList) {
       setTopicsState(topics)
       setHasMore(loaderHasMore)
       setServerOffset(topics.length)
       return
     }
-    let active = true
-    setLoading(true)
-    ;(async () => {
-      try {
-        const page = await fetchTopicPage(0)
-        if (!active) return
-        // An empty signed-in default view keeps the loader list rather than blanking the page.
-        if (page.items.length > 0 || debouncedQuery || sortBy !== 'hot' || boardSlug) {
-          if (userId) syncForumVotesFromServer(userId, page.items)
-          setTopicsState(page.items)
-          setHasMore(page.hasMore)
-          setServerOffset(page.items.length)
-        }
-      } catch {
-        if (active && debouncedQuery) {
-          setTopicsState([])
-          setHasMore(false)
-        }
-      } finally {
-        if (active) setLoading(false)
+    if (firstPage.isError && !firstPage.data) {
+      if (debouncedQuery) {
+        setTopicsState([])
+        setHasMore(false)
       }
-    })()
-    return () => {
-      active = false
+      return
     }
-    // fetchTopicPage reads the same inputs listed here.
+    const page = firstPage.data
+    if (!page) return
+    // An empty signed-in default view keeps the loader list rather than blanking the page.
+    if (page.items.length > 0 || debouncedQuery || sortBy !== 'hot' || boardSlug) {
+      setTopicsState(page.items)
+      setHasMore(page.hasMore)
+      setServerOffset(page.items.length)
+    }
+    // The page result already reflects sortBy, debouncedQuery and boardSlug.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortBy, debouncedQuery, boardSlug, userId, topics, loaderHasMore])
+  }, [usesServerList, firstPage.data, firstPage.isError, topics, loaderHasMore])
 
   const loadMoreTopics = async () => {
     setLoadingMore(true)
@@ -244,6 +254,7 @@ function ForumIndexPage() {
               categories={categoriesState}
               onCreated={(topic) => {
                 setTopicsState((prev) => [topic, ...prev])
+                forgetForumReads()
                 navigate({
                   to: '/forum/$categorySlug/$topicSlug',
                   params: {
