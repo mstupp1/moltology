@@ -82,6 +82,20 @@ describe('AccountHub', () => {
     expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
   })
 
+  it('opens full screen on phone, with Settings in the bar and Sign out last', () => {
+    render(<AccountHub variant="phone" user={user} onNavigate={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: /User account menu/ }))
+    const screenEl = screen.getByTestId('account-hub-screen')
+    expect(screenEl).toHaveAttribute('aria-modal', 'true')
+    expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument()
+    expect(screen.getByTestId('account-hub-level')).toBeInTheDocument()
+    expect(screen.getByTestId('account-hub-wallet')).toBeInTheDocument()
+    const buttons = screenEl.querySelectorAll('button')
+    expect(buttons[buttons.length - 1]).toHaveTextContent('Sign out')
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    expect(screen.getByRole('button', { name: /User account menu/ })).toHaveAttribute('aria-expanded', 'false')
+  })
+
   it('floats the XP gained', () => {
     const view = render(hub())
     setAlignment({ xp: 850 })
