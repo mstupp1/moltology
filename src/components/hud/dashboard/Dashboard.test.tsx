@@ -120,6 +120,20 @@ describe('Dashboard news and changelog', () => {
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/news' })
   })
 
+  it('shows saved news on a revisit without reading it again', async () => {
+    vi.mocked(getBlogPostsFn).mockResolvedValue([
+      { slug: 'kept-dispatch', title: 'Kept dispatch', category: 'Doctrine', readTimeMinutes: 4, coverImageUrl: '' },
+    ] as any)
+    const first = render(<DashboardNewsPanel />)
+    await waitFor(() => expect(screen.getByText('Kept dispatch')).toBeInTheDocument())
+    first.unmount()
+    vi.mocked(getBlogPostsFn).mockClear()
+
+    render(<DashboardNewsPanel />)
+    expect(screen.getByText('Kept dispatch')).toBeInTheDocument()
+    expect(getBlogPostsFn).not.toHaveBeenCalled()
+  })
+
   it('lists recent releases as links', () => {
     render(<DashboardChangelogPanel />)
     const links = screen.getAllByRole('link')

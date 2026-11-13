@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { ShoppingBag } from 'lucide-react'
 import { MerchImage } from '@/components/store/MerchImage'
@@ -8,6 +8,8 @@ import { merchPriceLabel, type MerchProductView } from '@/lib/merch'
 import { MERCH_CUTOUTS } from '@/lib/merch-cutouts'
 import { getMerchCatalogFn, getStoreAccessFn } from '@/lib/server/merch-api'
 import { cn } from '@/lib/utils'
+import { useAppQuery } from '@/lib/query/account'
+import { FRESH, contentKeys } from '@/lib/query/content'
 import { DASHBOARD_FOCUS, DashboardPanel } from './DashboardPanel'
 
 export const DASHBOARD_STORE_LIMIT = 4
@@ -19,30 +21,30 @@ export const DASHBOARD_STORE_LIMIT = 4
 export function DashboardStorePanel() {
   const navigate = useNavigate()
   const session = useAuthSession()
-  const [products, setProducts] = useState<MerchProductView[]>([])
-  const [orderingOpen, setOrderingOpen] = useState(false)
-
-  useEffect(() => {
-    let cancelled = false
-    async function load() {
+  // A viewer the store is not open to gets an error here. Save that as an empty catalog so the
+  // panel stays out without asking again on every visit (failed reads retry on mount).
+  const catalog = useAppQuery<MerchProductView[]>({
+    queryKey: contentKeys.merchCatalog(session.userId),
+    queryFn: async () => {
+      const token = await getAuthJWTToken()
       try {
-        const token = await getAuthJWTToken()
-        const [catalog, access] = await Promise.all([
-          getMerchCatalogFn({ data: { token: token ?? undefined, userId: session.userId ?? undefined } }),
-          getStoreAccessFn(),
-        ])
-        if (cancelled) return
-        setProducts(catalog.slice(0, DASHBOARD_STORE_LIMIT))
-        setOrderingOpen(access.orderingOpen && !access.checkoutPaused)
+        return await getMerchCatalogFn({ data: { token: token ?? undefined, userId: session.userId ?? undefined } })
       } catch {
-        // The store is not open to this viewer, or it failed to load: leave the panel out.
+        return []
       }
-    }
-    void load()
-    return () => {
-      cancelled = true
-    }
-  }, [session.userId])
+    },
+    enabled: !session.isPending,
+    staleTime: FRESH.content,
+    retry: false,
+  })
+  const access = useAppQuery({
+    queryKey: contentKeys.storeAccess,
+    queryFn: () => getStoreAccessFn(),
+    staleTime: FRESH.content,
+    retry: false,
+  })
+  const products = access.data ? (catalog.data ?? []).slice(0, DASHBOARD_STORE_LIMIT) : []
+  const orderingOpen = Boolean(access.data?.orderingOpen && !access.data.checkoutPaused)
 
   if (products.length === 0) return null
 

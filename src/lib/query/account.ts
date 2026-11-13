@@ -24,6 +24,23 @@ export const accountKeys = {
   premium: (userId: string) => ['account', userId, 'premium'] as const,
   forumStanding: (userId: string) => ['account', userId, 'forum-standing'] as const,
   friendRequests: (userId: string) => ['account', userId, 'friend-requests'] as const,
+  /** Friends, incoming and sent. `variant` separates the page's paged read from the plain summary. */
+  connections: (userId: string, variant: string = 'summary') => ['account', userId, 'connections', variant] as const,
+  activity: (userId: string, params: Record<string, unknown>) => ['account', userId, 'activity', params] as const,
+  market: (userId: string | null) => ['account', userId ?? 'guest', 'market'] as const,
+  /** Another member's profile page as this member sees it. */
+  memberProfile: (userId: string | null, profileParam: string) =>
+    ['account', userId ?? 'guest', 'member-profile', profileParam] as const,
+}
+
+/** After a friend request, accept, cancel or removal: every friends list and member page reloads. */
+export function invalidateConnections(client: QueryClient): Promise<void> {
+  return client.invalidateQueries({
+    predicate: (query) => {
+      const part = query.queryKey[2]
+      return query.queryKey[0] === 'account' && (part === 'connections' || part === 'member-profile' || part === 'friend-requests')
+    },
+  })
 }
 
 /** Server functions take the member's JWT in `data.token`; resolve it once per read. */

@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { GitCommit } from 'lucide-react'
 import { INITIAL_CHANGELOGS, type ChangelogEntry } from '@/lib/changelogs-data'
 import { getPublicChangelogs } from '@/lib/changelogs'
 import { cn } from '@/lib/utils'
+import { useAppQuery } from '@/lib/query/account'
+import { FRESH, contentKeys } from '@/lib/query/content'
 import { DASHBOARD_FOCUS, DashboardPanel } from './DashboardPanel'
 
 export const DASHBOARD_CHANGELOG_LIMIT = 5
@@ -17,21 +19,16 @@ export function formatReleaseDay(value: string | Date): string {
 
 export function DashboardChangelogPanel() {
   const navigate = useNavigate()
-  const [entries, setEntries] = useState<ChangelogEntry[]>(INITIAL_CHANGELOGS)
-
-  useEffect(() => {
-    let isMounted = true
-    getPublicChangelogs()
-      .then((fetched) => {
-        if (isMounted && fetched.length > 0) setEntries(fetched)
-      })
-      .catch(() => {
-        // keep the bundled entries
-      })
-    return () => {
-      isMounted = false
-    }
-  }, [])
+  const { data } = useAppQuery<ChangelogEntry[]>({
+    queryKey: contentKeys.changelogs,
+    queryFn: async () => {
+      const fetched = await getPublicChangelogs()
+      // An empty read keeps the bundled entries.
+      return fetched.length > 0 ? fetched : INITIAL_CHANGELOGS
+    },
+    staleTime: FRESH.content,
+  })
+  const entries = data ?? INITIAL_CHANGELOGS
 
   return (
     <DashboardPanel

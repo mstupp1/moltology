@@ -1,5 +1,5 @@
 import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { MessageSquare, Pin } from 'lucide-react'
 import {
@@ -18,6 +18,8 @@ import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { ForumUnreadMark } from '@/components/forum/ForumBits'
 import { DASHBOARD_FOCUS, DashboardEmptyRow, DashboardPanel } from '@/components/hud/dashboard/DashboardPanel'
 import { cn } from '@/lib/utils'
+import { useAppQuery } from '@/lib/query/account'
+import { FRESH, forumKeys } from '@/lib/query/content'
 
 export const FORUM_HUB_TITLE = 'COMMUNITY'
 export const FORUM_HUB_CTA = 'Open boards'
@@ -138,42 +140,26 @@ export function ForumHubCard() {
   const userId = session.userId
   const isAuthPending = session.isPending
 
-  const [threads, setThreads] = useState<ForumHubThreadView[]>([])
-  const [boards, setBoards] = useState<ForumHubBoardView[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    let isMounted = true
-
-    async function loadHub() {
-      if (isAuthPending) return
-
-      try {
-        const token = userId ? ((await getAuthJWTToken()) ?? undefined) : undefined
-        const auth = userId ? { userId, token } : {}
-        const [fetchedTopics, fetchedCats] = await Promise.all([
-          getForumTopicsFn({ data: { sortBy: HUB_SORT, limit: HUB_THREAD_LIMIT, ...auth } }),
-          getForumCategoriesFn({ data: auth }),
-        ])
-        if (isMounted) {
-          setThreads(toForumHubThreads(Array.isArray(fetchedTopics) ? fetchedTopics : []))
-          setBoards(toForumHubBoards(Array.isArray(fetchedCats) ? fetchedCats : []))
-        }
-      } catch {
-        if (isMounted) {
-          setThreads([])
-          setBoards([])
-        }
-      } finally {
-        if (isMounted) setIsLoading(false)
+  const hub = useAppQuery({
+    queryKey: forumKeys.topics({ hub: true, sortBy: HUB_SORT, limit: HUB_THREAD_LIMIT, userId: userId ?? null }),
+    queryFn: async () => {
+      const token = userId ? ((await getAuthJWTToken()) ?? undefined) : undefined
+      const auth = userId ? { userId, token } : {}
+      const [fetchedTopics, fetchedCats] = await Promise.all([
+        getForumTopicsFn({ data: { sortBy: HUB_SORT, limit: HUB_THREAD_LIMIT, ...auth } }),
+        getForumCategoriesFn({ data: auth }),
+      ])
+      return {
+        threads: toForumHubThreads(Array.isArray(fetchedTopics) ? fetchedTopics : []),
+        boards: toForumHubBoards(Array.isArray(fetchedCats) ? fetchedCats : []),
       }
-    }
-
-    loadHub()
-    return () => {
-      isMounted = false
-    }
-  }, [userId, isAuthPending])
+    },
+    enabled: !isAuthPending,
+    staleTime: FRESH.forum,
+  })
+  const threads: ForumHubThreadView[] = hub.data?.threads ?? []
+  const boards: ForumHubBoardView[] = hub.data?.boards ?? []
+  const isLoading = isAuthPending || (hub.isPending && !hub.isError)
 
   const pulse = toForumHubPulse(boards)
 

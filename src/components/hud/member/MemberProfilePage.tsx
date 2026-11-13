@@ -14,6 +14,9 @@ import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { getPublicProfileFn, getMemberLoadoutFn } from '@/lib/server/api'
 import type { PublicProfileView } from '@/lib/connections'
+import { useAuthSession } from '@/hooks/useAuthSession'
+import { accountKeys, useAppQuery, useAppQueryClient } from '@/lib/query/account'
+import { FRESH } from '@/lib/query/content'
 import {
   EQUIP_SLOT_IDS,
   EQUIP_SLOT_LABELS,
@@ -37,43 +40,50 @@ export interface MemberProfilePageProps {
   canonicalizePath?: boolean
 }
 
+type MemberLoadout = {
+  catalog: CatalogRef[]
+  items: GearItemState[]
+  totals: LoadoutTotals
+  vectorBase?: VectorBase
+}
+
 export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
   profileId,
   canonicalizePath = false,
 }) => {
   const navigate = useNavigate()
-  const [profile, setProfile] = useState<PublicProfileView | null>(null)
-  const [loadout, setLoadout] = useState<{
-    catalog: CatalogRef[]
-    items: GearItemState[]
-    totals: LoadoutTotals
-    vectorBase?: VectorBase
-  } | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [loaded, setLoaded] = useState(false)
-  const [showCharacter, setShowCharacter] = useState(false)
-  const closeCharacter = useCallback(() => setShowCharacter(false), [])
-
-  const load = useCallback(async () => {
-    try {
+  const session = useAuthSession()
+  const queryClient = useAppQueryClient()
+  const profileKey = accountKeys.memberProfile(session.userId ?? null, profileId)
+  // Kept between visits; friend actions invalidate it (see invalidateConnections).
+  const dossier = useAppQuery<{ profile: PublicProfileView; loadout: MemberLoadout | null }>({
+    queryKey: profileKey,
+    queryFn: async () => {
       const token = await getAuthJWTToken()
       const [nextProfile, nextLoadout] = await Promise.all([
         getPublicProfileFn({ data: { profileId, token: token ?? undefined } }),
         getMemberLoadoutFn({ data: { profileId, token: token ?? undefined } }),
       ])
-      setProfile(nextProfile)
-      setLoadout(nextLoadout)
-      setError(nextProfile ? null : 'Member not found.')
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not load this profile.')
-    } finally {
-      setLoaded(true)
-    }
-  }, [profileId])
-
-  useEffect(() => {
-    void load()
-  }, [load])
+      if (!nextProfile) throw new Error('Member not found.')
+      return { profile: nextProfile, loadout: nextLoadout }
+    },
+    enabled: !session.isPending,
+    staleTime: FRESH.panel,
+    retry: false,
+  })
+  const profile = dossier.data?.profile ?? null
+  const loadout = dossier.data?.loadout ?? null
+  const error = dossier.error ? dossier.error.message || 'Could not load this profile.' : null
+  const loaded = dossier.isSuccess || dossier.isError
+  const setProfile = (update: (prev: PublicProfileView | null) => PublicProfileView | null) => {
+    queryClient.setQueryData<{ profile: PublicProfileView; loadout: MemberLoadout | null }>(profileKey, (prev) => {
+      if (!prev) return prev
+      const next = update(prev.profile)
+      return next ? { ...prev, profile: next } : prev
+    })
+  }
+  const [showCharacter, setShowCharacter] = useState(false)
+  const closeCharacter = useCallback(() => setShowCharacter(false), [])
 
   useEffect(() => {
     if (!canonicalizePath || !profile) return

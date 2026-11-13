@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { FileText, Loader2, Lock, LogIn, Search, UserPlus, Users } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
@@ -7,8 +7,7 @@ import { CommandCatalogIcon } from '@/components/hud/CommandCatalogIcon'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { useMemberSearch } from '@/hooks/useMemberSearch'
-import { getAuthJWTToken } from '@/lib/jwt'
-import { listConnectionsFn } from '@/lib/server/api'
+import { useConnectionsSummary } from '@/hooks/useConnectionsSummary'
 import {
   relationshipForMember,
   type ConnectionsListView,
@@ -37,7 +36,9 @@ export function SearchPage({
   const hiddenAccess = useHiddenPageAccess()
   const signedIn = session.isAuthenticated && !session.isGuest
   const { results, searching } = useMemberSearch(query, signedIn)
-  const [connections, setConnections] = useState<ConnectionsListView | null>(null)
+  const connectionsSummary = useConnectionsSummary()
+  const connections = signedIn && !connectionsSummary.isLoading ? connectionsSummary.connections : null
+  const refreshConnections = connectionsSummary.refresh
   const navigate = useNavigate()
   const trimmed = query.trim()
   const staffCatalog = hiddenAccess.canView && !hiddenAccess.pending
@@ -45,23 +46,6 @@ export function SearchPage({
     includeHidden: staffCatalog,
     includeAdminOnly: staffCatalog,
   })
-
-  const refreshConnections = useCallback(async () => {
-    if (!signedIn) {
-      setConnections(null)
-      return
-    }
-    try {
-      const token = await getAuthJWTToken()
-      setConnections(await listConnectionsFn({ data: { token: token ?? undefined } }))
-    } catch {
-      setConnections(null)
-    }
-  }, [signedIn])
-
-  useEffect(() => {
-    void refreshConnections()
-  }, [refreshConnections])
 
   const runPage = (command: CommandCatalogItem) => {
     const dest = catalogNavigateArgs(command)

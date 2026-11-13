@@ -38,6 +38,9 @@ import { relativeTime, buildForumPostTree, type ForumReplySort } from '@/lib/for
 import { mergeById } from '@/lib/pagination'
 import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { useAppQueryClient } from '@/lib/query/account'
+import { FRESH, forumKeys } from '@/lib/query/content'
+import { useForgetForumReads } from '@/hooks/useForgetForumReads'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
@@ -128,6 +131,8 @@ export const Route = createFileRoute('/_hud/forum/$categorySlug/$topicSlug')({
   },
   component: ForumThreadPage,
   pendingComponent: HudWorkspaceGhost,
+  staleTime: FRESH.forum,
+  preloadStaleTime: FRESH.forum,
 })
 
 const SORT_OPTIONS: { id: ForumReplySort; label: string }[] = [
@@ -141,7 +146,23 @@ function ForumThreadPage() {
   const loader = Route.useLoaderData()
   const session = useAuthSession()
   const userId = session.userId
-  const [detail, setDetail] = useState(loader)
+  const queryClient = useAppQueryClient()
+  const forgetForumReads = useForgetForumReads()
+  const detailKey = forumKeys.topic(categorySlug, topicSlug, userId)
+  const detailKeyHash = JSON.stringify(detailKey)
+  // A revisit paints the member's saved thread (their votes included), not the loader's guest copy.
+  const [detail, setDetailState] = useState<typeof loader>(
+    () => (userId ? queryClient.getQueryData<typeof loader>(detailKey) : undefined) ?? loader,
+  )
+  const firstLoaderRef = useRef(loader)
+  /** Local changes (votes, replies, edits) also update the saved copy. */
+  const setDetail = (next: typeof loader | ((current: typeof loader) => typeof loader)) => {
+    setDetailState((current) => {
+      const value = typeof next === 'function' ? next(current) : next
+      if (userId && value) queryClient.setQueryData(JSON.parse(detailKeyHash), value)
+      return value
+    })
+  }
   const [replySort, setReplySort] = useState<ForumReplySort>('oldest')
   const [repliesLoading, setRepliesLoading] = useState(false)
   const [replyingToId, setReplyingToId] = useState<string | null>(null)
@@ -158,7 +179,9 @@ function ForumThreadPage() {
   const toast = useOptionalToast()
 
   useEffect(() => {
-    setDetail(loader)
+    // The first loader result is already in state (or replaced by the saved member copy).
+    if (loader === firstLoaderRef.current) return
+    setDetailState(loader)
   }, [loader])
 
   // Hydrate vote flags without bumping the view counter again.
@@ -167,20 +190,25 @@ function ForumThreadPage() {
     let active = true
     ;(async () => {
       try {
-        const token = await getAuthJWTToken()
-        const res = await getForumTopicDetailFn({
-          data: {
-            slugOrId: topicSlug,
-            categorySlug,
-            userId,
-            token: token ?? undefined,
-            trackView: false,
+        const res = await queryClient.fetchQuery({
+          queryKey: JSON.parse(detailKeyHash) as readonly unknown[],
+          queryFn: async () => {
+            const token = await getAuthJWTToken()
+            const fresh = await getForumTopicDetailFn({
+              data: {
+                slugOrId: topicSlug,
+                categorySlug,
+                userId,
+                token: token ?? undefined,
+                trackView: false,
+              },
+            })
+            if (fresh) syncForumVotesFromServer(userId, [fresh.topic, ...fresh.posts])
+            return fresh
           },
+          staleTime: FRESH.forum,
         })
-        if (active && res) {
-          syncForumVotesFromServer(userId, [res.topic, ...res.posts])
-          setDetail(res)
-        }
+        if (active && res) setDetailState(res)
       } catch {
         // Keep loader detail if vote hydration fails
       }
@@ -188,7 +216,7 @@ function ForumThreadPage() {
     return () => {
       active = false
     }
-  }, [userId, topicSlug, categorySlug, loader])
+  }, [userId, topicSlug, categorySlug, loader, queryClient, detailKeyHash])
 
   const posts = detail?.posts ?? []
   const topic = detail?.topic
@@ -275,6 +303,7 @@ function ForumThreadPage() {
       posts: [...posts, post],
     })
     setReplyQuote('')
+    forgetForumReads()
   }
 
   const handlePostUpdated = (post: ForumPostEntry) => {
@@ -282,6 +311,7 @@ function ForumThreadPage() {
       ...detail,
       posts: posts.map((p) => (p.id === post.id ? { ...p, ...post } : p)),
     })
+    forgetForumReads()
   }
 
   const handleTopicUpdated = (next: ForumTopicEntry) => {
@@ -289,6 +319,7 @@ function ForumThreadPage() {
       ...detail,
       topic: { ...topic, ...next },
     })
+    forgetForumReads()
   }
 
   const handleTopicSave = async (e: React.FormEvent) => {

@@ -17,8 +17,10 @@ import {
 } from '@/lib/activity-events'
 import {
   getCachedActivityFeed,
+  isCachedActivityFeedFresh,
   setCachedActivityFeed,
 } from '@/lib/activity-feed-cache'
+import { FRESH } from '@/lib/query/content'
 
 const PAGE_LIMIT = 20
 
@@ -160,7 +162,7 @@ export function ActivityStreamPage() {
     if (cached) {
       applyPage(cached, false)
       setIsLoading(false)
-      void loadFeed({})
+      if (!isCachedActivityFeedFresh(userId, scope, filter, FRESH.panel)) void loadFeed({})
       return
     }
 

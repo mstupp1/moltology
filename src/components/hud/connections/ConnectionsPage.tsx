@@ -9,6 +9,9 @@ import { FriendRequestButton } from '@/components/hud/member/FriendRequestButton
 import { getAuthJWTToken } from '@/lib/jwt'
 import { listConnectionsFn, dismissSynapticNearbyFn } from '@/lib/server/api'
 import { announceFriendRequestCount } from '@/hooks/usePendingFriendRequests'
+import { useAuthSession } from '@/hooks/useAuthSession'
+import { accountKeys, useAppQueryClient } from '@/lib/query/account'
+import { FRESH } from '@/lib/query/content'
 import {
   CONNECTIONS_FRIENDS_EMPTY,
   CONNECTIONS_INCOMING_EMPTY,
@@ -42,10 +45,17 @@ export const ConnectionsPage: React.FC<{
   onTabChange?: (tab: ConnectionsTab) => void
   view?: ConnectionsPageView
 }> = ({ tab: tabProp, onTabChange, view = 'all' }) => {
-  const [connections, setConnections] = useState<ConnectionsListView | null>(null)
+  const session = useAuthSession()
+  const queryClient = useAppQueryClient()
+  // The page's own read (with suggestions and every loaded friend), kept between visits.
+  const pageKey = accountKeys.connections(session.userId ?? '', 'page')
+  const pageKeyHash = JSON.stringify(pageKey)
+  const [connections, setConnections] = useState<ConnectionsListView | null>(
+    () => queryClient.getQueryData<ConnectionsListView>(pageKey) ?? null,
+  )
   const [hiddenSuggestionIds, setHiddenSuggestionIds] = useState<string[]>([])
   const [query, setQuery] = useState('')
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(() => !queryClient.getQueryData(pageKey))
   const { toast } = useToast()
   const { results, searching } = useMemberSearch(query, true)
 
@@ -57,31 +67,42 @@ export const ConnectionsPage: React.FC<{
 
   const [loadingMoreFriends, setLoadingMoreFriends] = useState(false)
   // After a change, reload as many friends as are already on screen so the list does not shrink.
-  const loadedFriendsRef = useRef(0)
+  const loadedFriendsRef = useRef(connections?.friends.length ?? 0)
 
-  const refresh = useCallback(async () => {
-    try {
-      const token = await getAuthJWTToken()
-      const next = await listConnectionsFn({
-        data: {
-          token: token ?? undefined,
-          includeSuggestions: true,
-          friendsLimit: Math.min(Math.max(loadedFriendsRef.current, PAGE_SIZES.friends), MAX_PAGE_SIZE),
-        },
-      })
-      loadedFriendsRef.current = next?.friends.length ?? 0
-      setConnections(next)
-      announceFriendRequestCount(next?.incoming?.length ?? 0)
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Could not load connections.')
-    } finally {
-      setLoading(false)
-    }
-  }, [toast])
+  /** `force` skips the cache, after this member changed something. */
+  const load = useCallback(
+    async (force: boolean) => {
+      try {
+        const next = await queryClient.fetchQuery({
+          queryKey: JSON.parse(pageKeyHash) as readonly unknown[],
+          queryFn: async () => {
+            const token = await getAuthJWTToken()
+            return listConnectionsFn({
+              data: {
+                token: token ?? undefined,
+                includeSuggestions: true,
+                friendsLimit: Math.min(Math.max(loadedFriendsRef.current, PAGE_SIZES.friends), MAX_PAGE_SIZE),
+              },
+            })
+          },
+          staleTime: force ? 0 : FRESH.panel,
+        })
+        loadedFriendsRef.current = next?.friends.length ?? 0
+        setConnections(next)
+        announceFriendRequestCount(next?.incoming?.length ?? 0)
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : 'Could not load connections.')
+      } finally {
+        setLoading(false)
+      }
+    },
+    [toast, queryClient, pageKeyHash],
+  )
+  const refresh = useCallback(() => load(true), [load])
 
   useEffect(() => {
-    void refresh()
-  }, [refresh])
+    void load(false)
+  }, [load])
 
   const loadMoreFriends = async () => {
     const offset = connections?.nextFriendsOffset
@@ -96,12 +117,14 @@ export const ConnectionsPage: React.FC<{
         if (!current) return next
         const friends = mergeById(current.friends, next.friends)
         loadedFriendsRef.current = friends.length
-        return {
+        const merged = {
           ...current,
           friends,
           friendCount: next.friendCount ?? current.friendCount,
           nextFriendsOffset: next.nextFriendsOffset ?? null,
         }
+        queryClient.setQueryData(pageKey, merged)
+        return merged
       })
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Could not load more friends.')
@@ -122,6 +145,7 @@ export const ConnectionsPage: React.FC<{
         data: { memberId, token: token ?? undefined },
       })
       toast.info(SYNAPTIC_NEARBY_DISMISS_TOAST)
+      void queryClient.invalidateQueries({ queryKey: pageKey, exact: true })
     } catch (err) {
       setHiddenSuggestionIds((ids) => ids.filter((id) => id !== memberId))
       toast.error(err instanceof Error ? err.message : 'Could not hide that suggestion.')
