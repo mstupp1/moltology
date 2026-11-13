@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { useAvatarStillSync } from '@/hooks/useAvatarStillSync'
 import { createPortal } from 'react-dom'
 import { ChevronRight, LogOut, Settings, X } from 'lucide-react'
 import { HudBottomSheet } from '@/components/ui'
@@ -99,6 +100,8 @@ export function AccountHub({
   const displayName = displayNameProp || user.name || user.email?.split('@')[0] || 'Operative'
   const effectiveRole = getEffectiveRole(user, userRole)
   const userId = user.id ?? null
+  // Store the member's own portrait as an image, so other members' lists need not draw it.
+  useAvatarStillSync(userId, user.avatarConfig)
 
   const progress = calculateSubStageProgress(alignment.xp)
   const countReady = !alignment.isLoading

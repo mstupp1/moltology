@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { AVATAR_ACCESSORIES, AVATAR_ANTENNAE, AVATAR_BUILDS, AVATAR_CLAWS, AVATAR_HEAD_SHAPES, AVATAR_MOUTHS, AVATAR_POSES, AVATAR_RACES, SHELL_MARKINGS } from '../avatar/traits'
+import { AVATAR_ACCESSORIES, AVATAR_ANTENNAE, AVATAR_BUILDS, AVATAR_CLAWS, AVATAR_HEAD_SHAPES, AVATAR_MOUTHS, AVATAR_POSES, AVATAR_RACES, AVATAR_TEMPERAMENTS, SHELL_MARKINGS, SHELL_PALETTES } from '../avatar/traits'
 import { Quaternion, Vector3, type Mesh, type Object3D } from 'three'
 import { EQUIPMENT_VISUALS } from '../avatar/equipment'
 import { STARTER_CHARACTER_EQUIPMENT } from '../avatar/starter-equipment'
@@ -9,7 +9,9 @@ import { buildCharacter } from './character'
 import { supportsEquipment } from './equipment'
 import { SUPPORTED_ACCESSORIES } from './gear'
 import { resolveAvatarTraits, type LobsterAvatarConfig } from '../lobster-avatar'
-import { baselineLook, lookFromConfig } from './look'
+import { baselineLook, lookChange, lookFromConfig } from './look'
+import { REACTION_SECONDS } from './motion'
+import { POSES } from './poses'
 import { keySampler } from './loft'
 
 const SOCKETS = ['head', 'ears', 'face', 'back', 'chest', 'waist', 'clawL', 'clawR', 'wristL', 'wristR', 'footL', 'footR']
@@ -82,7 +84,9 @@ describe('avatar3d', () => {
         character.update(0, 0, false)
         character.root.updateMatrixWorld(true)
         const foot = character.rig.bone('footL')
-        expect(foot.getWorldPosition(foot.position.clone()).distanceTo(rest)).toBeLessThan(1e-6)
+        // A pose may set a foot down somewhere else; otherwise it stays exactly where it stood.
+        const stand = rest.clone().add(new Vector3(...(POSES[pose].feet?.left ?? [0, 0, 0])))
+        expect(foot.getWorldPosition(foot.position.clone()).distanceTo(stand), pose).toBeLessThan(1e-5)
         for (const [name, bone] of character.rig.bones) {
           expect(Number.isFinite(bone.quaternion.x), `${pose} ${name}`).toBe(true)
         }
@@ -91,10 +95,10 @@ describe('avatar3d', () => {
     }
   })
 
-  it('opens every pincer toward the head in every pose', () => {
+  it('opens every pincer toward the head in the hanging and raised-claw poses', () => {
     for (const race of AVATAR_RACES) {
       const character = buildCharacter(baselineLook(race))
-      for (const pose of AVATAR_POSES) {
+      for (const pose of ['rest', 'cheer', 'wave', 'flex'] as const) {
         character.setPose(pose, true)
         character.update(0, 0, false)
         character.root.updateMatrixWorld(true)
@@ -202,6 +206,94 @@ describe('avatar3d', () => {
       expect(tall.head / regular.head).toBeLessThan(1.25)
       expect(short.leg / regular.leg).toBeLessThan(0.85)
       expect(Math.abs(tall.ankle - regular.ankle)).toBeLessThan(0.05)
+    }
+  })
+  it('bends the knees instead of stretching the legs when the hips sink', () => {
+    for (const race of AVATAR_RACES) {
+      const character = buildCharacter(baselineLook(race))
+      const at = (name: string) => character.rig.bone(name).getWorldPosition(new Vector3())
+      const lengths = () => [at('thighL').distanceTo(at('shinL')), at('shinL').distanceTo(at('footL'))]
+      character.root.updateMatrixWorld(true)
+      const before = lengths()
+      const hip = at('thighL').y
+      character.setPose('ready', true)
+      character.update(0, 0, false)
+      character.root.updateMatrixWorld(true)
+      const after = lengths()
+      expect(at('thighL').y).toBeLessThan(hip - 0.05)
+      expect(after[0]).toBeCloseTo(before[0], 5)
+      expect(after[1]).toBeCloseTo(before[1], 5)
+      character.dispose()
+    }
+  })
+
+  it('plays a reaction and then returns to the pose it was holding', () => {
+    const character = buildCharacter({ ...baselineLook('lobster'), pose: 'wave' })
+    const pose = () => [...character.rig.bones.values()].map((b) => b.quaternion.clone())
+    const apart = (a: Quaternion[], b: Quaternion[]) => Math.max(...a.map((q, i) => q.angleTo(b[i])))
+    character.update(0, 0, false)
+    const held = pose()
+    character.react('celebrate')
+    let t = 0
+    for (let i = 0; i < 20; i++) character.update(0.05, (t += 0.05), true)
+    expect(apart(pose(), held)).toBeGreaterThan(0.3)
+    for (let i = 0; i < 80; i++) character.update(0.05, (t += 0.05), true)
+    expect(t).toBeGreaterThan(REACTION_SECONDS.celebrate + 2)
+    // Held still again, it is back in the wave.
+    character.update(0, t, false)
+    expect(apart(pose(), held)).toBeLessThan(1e-3)
+    for (const bone of character.rig.bones.values()) expect(Number.isFinite(bone.quaternion.w)).toBe(true)
+    character.dispose()
+  })
+
+  it('turns its eyes toward the pointer and keeps every temperament finite', () => {
+    for (const temperament of AVATAR_TEMPERAMENTS) {
+      const character = buildCharacter({ ...baselineLook('crab'), temperament })
+      const gaze = () => new Vector3(0, 0, 1).applyQuaternion(character.rig.bone('eyeL').getWorldQuaternion(new Quaternion()))
+      character.lookAt({ x: 1.5, y: 0 })
+      for (let i = 1; i <= 40; i++) character.update(0.05, i * 0.05, true)
+      character.root.updateMatrixWorld(true)
+      const right = gaze().x
+      character.lookAt({ x: -1.5, y: 0 })
+      for (let i = 41; i <= 80; i++) character.update(0.05, i * 0.05, true)
+      character.root.updateMatrixWorld(true)
+      expect(right, temperament).toBeGreaterThan(gaze().x + 0.1)
+      for (const [name, bone] of character.rig.bones) expect(Number.isFinite(bone.quaternion.x + bone.position.y), `${temperament} ${name}`).toBe(true)
+      character.dispose()
+    }
+  })
+
+  it('tells a repaint from a rebuild', () => {
+    const base = baselineLook('lobster')
+    expect(lookChange(base, { ...base, pose: 'think', temperament: 'goofy' })).toBe('motion')
+    expect(lookChange(base, { ...base, finish: 'chrome', marking: 'tiger', eyeColor: 'ruby', markingScale: 1.4 })).toBe('paint')
+    expect(lookChange(base, { ...base, headShape: 'wide' })).toBe('shape')
+    expect(lookChange(base, { ...base, headScale: 1.1 })).toBe('shape')
+  })
+
+  it('repaints in place without touching geometry', () => {
+    const character = buildCharacter(baselineLook('lobster'))
+    const mesh = character.rig.mesh('chest')!
+    const geometry = mesh.geometry
+    const material = mesh.material as unknown as { color: { getHexString: () => string }; userData: { uniforms: { uMarking: { value: number } } } }
+    const before = material.color.getHexString()
+    const palette = SHELL_PALETTES.find((p) => p.id === 'cobalt')!
+    character.repaint({ ...character.look, palette, marking: 'tiger' })
+    expect(mesh.geometry).toBe(geometry)
+    expect(material.color.getHexString()).not.toBe(before)
+    expect(material.userData.uniforms.uMarking.value).toBeGreaterThan(0)
+    expect(character.look.palette.id).toBe('cobalt')
+    character.dispose()
+  })
+
+  it('sizes the head without breaking the body', () => {
+    for (const race of AVATAR_RACES) {
+      const small = buildCharacter({ ...baselineLook(race), headScale: 0.88 })
+      const big = buildCharacter({ ...baselineLook(race), headScale: 1.14 })
+      expect(big.height).toBeGreaterThan(small.height)
+      expect(finite(small) && finite(big)).toBe(true)
+      small.dispose()
+      big.dispose()
     }
   })
 })

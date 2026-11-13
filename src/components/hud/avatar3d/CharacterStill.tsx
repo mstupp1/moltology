@@ -56,6 +56,7 @@ export function CharacterStill({ config, px, shot = 'portrait', alt, imgClassNam
               decoding="async"
               draggable={false}
               onLoad={() => setShownUrl(still.url)}
+              onError={still.failed}
               data-testid="character-still"
               className={cn(
                 'relative h-full w-full object-cover transition-opacity duration-200 motion-reduce:transition-none',

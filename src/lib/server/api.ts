@@ -1212,6 +1212,23 @@ export const setExperimentFn = createServerFn({ method: 'POST' })
     return setExperimentHandler(args)
   })
 
+/** Store the signed-in member's portrait image, so other browsers need not draw it in 3D. */
+export const saveAvatarStillFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: import('./avatar-still').SaveAvatarStillInput) =>
+    z
+      .object({
+        token: z.string().optional(),
+        userId: z.string().optional(),
+        image: z.string().min(32).max(200_000),
+      })
+      .parse(data),
+  )
+  .handler(async (args) => {
+    const { saveAvatarStillHandler } = await import('./avatar-still')
+    return saveAvatarStillHandler(args)
+  })
+
 /** One explicit save for the complete character draft. Render snapshots are server-owned. */
 export const saveCharacterFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)

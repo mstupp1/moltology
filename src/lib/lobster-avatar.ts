@@ -48,6 +48,7 @@ import {
   SEEDED_MOUTHS,
   AVATAR_POSES,
   AVATAR_RACES,
+  AVATAR_TEMPERAMENTS,
   SHELL_FINISHES,
   SHELL_MARKINGS,
   SHELL_PALETTES,
@@ -56,6 +57,7 @@ import {
   pickFrom,
   seededRandom,
   type AvatarAccessory,
+  type AvatarTemperament,
   type AvatarAntennae,
   type AvatarBuild,
   type AvatarClaws,
@@ -194,6 +196,15 @@ export interface LobsterAvatarConfig {
   build?: AvatarBuild
   height?: LobsterHeight | number
   armScale?: number
+  /** Head (or crab shell) size, 0.88 to 1.14. */
+  headScale?: number
+  /** How the character carries itself while idle. Unset, the seed picks one. */
+  temperament?: AvatarTemperament
+  /** Palette ids for a belly or pattern in another colour than the shell's own. */
+  bellyColor?: string
+  markingColor?: string
+  /** Pattern size, 0.5 (fine) to 1.8 (bold). */
+  markingScale?: number
   backgroundTheme?: string
   backgroundPattern?: string
   backgroundTexture?: string
@@ -208,6 +219,8 @@ export interface LobsterAvatarConfig {
   gaze?: LobsterGaze
   backgroundMotion?: BackgroundMotionMode
   transparentBackground?: boolean
+  /** Name of the stored portrait drawn from this look. Written by the server only. See avatar-still.ts. */
+  still?: string
 }
 
 /** Every look trait, fully resolved from a config plus its seed. */
@@ -303,6 +316,15 @@ export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | nu
   if (typeof obj.armScale === 'number' && Number.isFinite(obj.armScale)) {
     config.armScale = Math.min(1.4, Math.max(0.7, Number(obj.armScale.toFixed(2))))
   }
+  if (typeof obj.headScale === 'number' && Number.isFinite(obj.headScale)) {
+    config.headScale = Math.min(1.14, Math.max(0.88, Number(obj.headScale.toFixed(2))))
+  }
+  if (isOneOf(AVATAR_TEMPERAMENTS, lower(obj.temperament))) config.temperament = lower(obj.temperament) as AvatarTemperament
+  if (typeof obj.bellyColor === 'string' && SHELL_PALETTE_MAP[obj.bellyColor.trim()]) config.bellyColor = obj.bellyColor.trim()
+  if (typeof obj.markingColor === 'string' && SHELL_PALETTE_MAP[obj.markingColor.trim()]) config.markingColor = obj.markingColor.trim()
+  if (typeof obj.markingScale === 'number' && Number.isFinite(obj.markingScale)) {
+    config.markingScale = Math.min(1.8, Math.max(0.5, Number(obj.markingScale.toFixed(2))))
+  }
   if (typeof obj.backgroundTheme === 'string' && obj.backgroundTheme.trim()) config.backgroundTheme = obj.backgroundTheme.trim()
   if (typeof obj.backgroundPattern === 'string' && obj.backgroundPattern.trim()) config.backgroundPattern = obj.backgroundPattern.trim()
   if (typeof obj.backgroundTexture === 'string' && obj.backgroundTexture.trim()) config.backgroundTexture = obj.backgroundTexture.trim()
@@ -319,6 +341,7 @@ export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | nu
     config.backgroundMotion = obj.backgroundMotion.trim() as BackgroundMotionMode
   }
   if (typeof obj.transparentBackground === 'boolean') config.transparentBackground = obj.transparentBackground
+  if (typeof obj.still === 'string' && /^[a-z0-9]{4,16}$/.test(obj.still)) config.still = obj.still
   if (obj.equipment && typeof obj.equipment === 'object') {
     config.equipment = {}
     for (const slot of EQUIP_SLOT_IDS) {
@@ -448,6 +471,12 @@ export function getLobsterAvatarSeededOptions(seed: string): SeededAvatarOptions
     claws: pickFrom(rng, AVATAR_CLAWS),
     accessory: accessoryRoll < 0.45 ? 'none' : pickFrom(rng, AVATAR_ACCESSORIES),
   }
+}
+
+/** A character's temperament: the saved pick, or one the seed chooses so members differ from the start. */
+export function resolveTemperament(config: Pick<LobsterAvatarConfig, 'seed' | 'temperament'>): AvatarTemperament {
+  if (isOneOf(AVATAR_TEMPERAMENTS, config.temperament)) return config.temperament
+  return pickFrom(seededRandom(`${config.seed}:temperament`), AVATAR_TEMPERAMENTS)
 }
 
 /** Resolve every look trait: explicit config values win, the seed fills the rest. */

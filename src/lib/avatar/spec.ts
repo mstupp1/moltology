@@ -10,6 +10,7 @@ import type {
   AvatarMouth,
   AvatarPose,
   AvatarRace,
+  AvatarTemperament,
 } from './traits'
 
 export interface CharacterSpec {
@@ -33,4 +34,8 @@ export interface CharacterSpec {
   heightScale: number
   /** Claw size multiplier. */
   armScale: number
+  /** Head (or crab shell) size multiplier; 1 when unset. */
+  headScale?: number
+  /** How it carries itself while idle. Stills ignore it. */
+  temperament?: AvatarTemperament
 }

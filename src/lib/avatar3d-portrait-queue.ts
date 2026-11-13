@@ -5,16 +5,13 @@
  * drawn one at a time between frames, so a long list fills in without freezing the page.
  */
 import { mark3DUnavailable } from './avatar3d-support'
+import { canonical, shortHash, STILL_VERSION, storedStillUrl } from './avatar-still'
 import type { LobsterAvatarConfig } from './lobster-avatar'
 import type { StillShot } from './avatar3d/portraits'
 
 export type { StillShot }
 
-/**
- * Bump when the 3D character's look changes (shapes, materials, lighting or framing), so stills
- * kept from an older drawing are thrown away instead of shown.
- */
-export const STILL_VERSION = 2
+export { STILL_VERSION }
 const STORE = `avatar3d-stills-v${STILL_VERSION}`
 /** Stills kept between visits. Each is a few kilobytes. */
 const KEEP = 800
@@ -37,35 +34,13 @@ let writes = 0
 
 /** Same character, same picture: the key ignores field order and anything a still cannot show. */
 function stillKeyOf(config: LobsterAvatarConfig, px: number, shot: StillShot): string {
-  const { backgroundTheme: _t, backgroundPattern: _p, backgroundTexture: _x, ...rest } = config as LobsterAvatarConfig & Record<string, unknown>
+  const { backgroundTheme: _t, backgroundPattern: _p, backgroundTexture: _x, temperament: _i, still: _s, ...rest } = config as LobsterAvatarConfig & Record<string, unknown>
   const look = shot === 'portrait' ? { ...rest, pose: undefined } : rest
   return `${shot}|${px}|${canonical(look)}`
 }
 
-/** JSON with every object's keys in order, at every depth, so equal characters match. */
-function canonical(value: unknown): string {
-  if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`
-  if (value && typeof value === 'object') {
-    const entries = Object.entries(value as Record<string, unknown>).filter(([, v]) => v !== undefined)
-    return `{${entries.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)).map(([k, v]) => `${JSON.stringify(k)}:${canonical(v)}`).join(',')}}`
-  }
-  return JSON.stringify(value) ?? 'null'
-}
-
-function hash(text: string): string {
-  // FNV-1a over 53 bits: short, stable, and plenty to tell characters apart.
-  let h1 = 0x811c9dc5
-  let h2 = 0x01000193
-  for (let i = 0; i < text.length; i++) {
-    const c = text.charCodeAt(i)
-    h1 = Math.imul(h1 ^ c, 0x01000193)
-    h2 = Math.imul(h2 ^ c, 0x5bd1e995)
-  }
-  return ((h2 >>> 0) * 0x200000 + ((h1 >>> 0) & 0x1fffff)).toString(36)
-}
-
 function storeUrl(key: string): string {
-  return `${location.origin}/__avatar3d-still/${hash(key)}`
+  return `${location.origin}/__avatar3d-still/${shortHash(key)}`
 }
 
 async function openStore(): Promise<Cache | null> {
@@ -135,7 +110,21 @@ async function run(): Promise<void> {
 
 /** A still drawn this visit, ready to show on the first render. */
 export function readyStill3D(config: LobsterAvatarConfig, px: number, shot: StillShot = 'portrait'): string | null {
-  return ready.get(stillKeyOf(config, px, shot)) ?? null
+  return savedPortrait(config, shot) ?? ready.get(stillKeyOf(config, px, shot)) ?? null
+}
+
+const broken = new Set<string>()
+
+/** The member's stored portrait image, when one was saved for exactly this look. */
+function savedPortrait(config: LobsterAvatarConfig, shot: StillShot): string | null {
+  if (shot !== 'portrait') return null
+  const url = storedStillUrl(config)
+  return url && !broken.has(url) ? url : null
+}
+
+/** A stored portrait would not load: stop offering it, so the character is drawn here instead. */
+export function forgetStoredStill(url: string): void {
+  broken.add(url)
 }
 
 const interest = new Map<string, number>()
@@ -146,6 +135,8 @@ const interest = new Map<string, number>()
  * any more is skipped instead of drawn, so quick edits never queue up stale pictures.
  */
 export function requestStill3D(config: LobsterAvatarConfig, px: number, shot: StillShot = 'portrait', signal?: AbortSignal): Promise<string | null> {
+  const saved = savedPortrait(config, shot)
+  if (saved) return Promise.resolve(saved)
   const key = stillKeyOf(config, px, shot)
   const done = ready.get(key)
   if (done) return Promise.resolve(done)
@@ -191,4 +182,5 @@ export function resetStillsForTests(): void {
   pending.clear()
   interest.clear()
   ready.clear()
+  broken.clear()
 }

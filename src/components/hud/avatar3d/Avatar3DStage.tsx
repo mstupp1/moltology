@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import type { Avatar3DLook, Stage } from '@/lib/avatar3d'
+import { onAvatarReaction } from '@/lib/avatar3d-events'
 import { mark3DUnavailable } from '@/lib/avatar3d-support'
 import { cn } from '@/lib/utils'
 
@@ -38,12 +39,15 @@ export function Avatar3DStage({ look, spin = false, className, label, focus = nu
     let cancelled = false
     let observer: ResizeObserver | null = null
     let watcher: IntersectionObserver | null = null
+    let stopReactions: (() => void) | null = null
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     void import('@/lib/avatar3d')
       .then(({ createStage }) => {
         if (cancelled) return
         // If the browser takes 3D away, the page shows the plain placeholder instead.
-        const stage = createStage(canvas, { interactive: true, reducedMotion, lighting: 'cinematic', onContextLost: mark3DUnavailable })
+        // Phones and small machines get the lighter setup; the stage also adapts if frames run slow.
+        const quality = window.matchMedia('(pointer: coarse)').matches || (navigator.hardwareConcurrency ?? 8) <= 4 ? 'low' : 'high'
+        const stage = createStage(canvas, { interactive: true, reducedMotion, lighting: 'cinematic', quality, onContextLost: mark3DUnavailable })
         stage.setLook(lookRef.current)
         stage.setSpin(spinRef.current && !reducedMotion ? 0.5 : 0)
         if (focusRef.current) stage.focus(focusRef.current)
@@ -53,6 +57,7 @@ export function Avatar3DStage({ look, spin = false, className, label, focus = nu
         // Nothing is drawn while the character is scrolled out of view.
         watcher = new IntersectionObserver(([entry]) => stage.setActive(entry.isIntersecting))
         watcher.observe(canvas)
+        stopReactions = onAvatarReaction((kind) => stage.react(kind))
         // The stage draws on the next animation frame; say so once that frame is up.
         requestAnimationFrame(() => requestAnimationFrame(() => {
           if (!cancelled) readyRef.current?.()
@@ -63,25 +68,21 @@ export function Avatar3DStage({ look, spin = false, className, label, focus = nu
       cancelled = true
       observer?.disconnect()
       watcher?.disconnect()
+      stopReactions?.()
       stageRef.current?.dispose()
       stageRef.current = null
     }
   }, [])
 
-  // A new pose only retargets the bones, so it blends; anything else rebuilds the character.
-  const { pose, ...shape } = look
-  const shapeKey = JSON.stringify(shape)
-  const builtKey = useRef(shapeKey)
+  // The stage works out what changed: a pose blends, a colour repaints, a new shape rebuilds.
+  const lookKey = JSON.stringify({ ...look, palette: look.palette.id })
+  const shownKey = useRef(lookKey)
   useEffect(() => {
     const stage = stageRef.current
-    if (!stage) return
-    if (builtKey.current !== shapeKey) {
-      builtKey.current = shapeKey
-      stage.setLook(lookRef.current)
-    } else {
-      stage.setPose(pose)
-    }
-  }, [shapeKey, pose])
+    if (!stage || shownKey.current === lookKey) return
+    shownKey.current = lookKey
+    stage.setLook(lookRef.current)
+  }, [lookKey])
 
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -90,6 +91,7 @@ export function Avatar3DStage({ look, spin = false, className, label, focus = nu
 
   useEffect(() => {
     stageRef.current?.focus(focus)
+    if (!focus) stageRef.current?.resetView()
   }, [focus])
 
   return (
@@ -98,7 +100,7 @@ export function Avatar3DStage({ look, spin = false, className, label, focus = nu
       data-testid="avatar-3d-stage"
       data-focus={focus ?? undefined}
       role="img"
-      aria-label={label ? `${label}. Drag to turn it.` : `3D ${look.race} character. Drag to turn it.`}
+      aria-label={label ? `${label}. Drag to turn it, tap it, or double tap to zoom.` : `3D ${look.race} character. Drag to turn it, tap it, or double tap to zoom.`}
       className={cn('block h-full w-full', className)}
     />
   )

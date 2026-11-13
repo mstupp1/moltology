@@ -9,6 +9,7 @@
  * construction level pick the details, and the three colours become the three materials.
  */
 import { BoxGeometry, BufferAttribute, BufferGeometry, CatmullRomCurve3, Color, ConeGeometry, CylinderGeometry, Mesh, MeshPhysicalMaterial, Quaternion, SphereGeometry, TorusGeometry, Vector3, type Material } from 'three'
+import { workedSurface } from './materials'
 import { mergeGeometries, mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { getEquipmentVisual, tone, type EquipmentVisual } from '../avatar/equipment'
 import type { EquippedAppearance } from '../character-appearance'
@@ -115,11 +116,11 @@ class Kit {
   finish(): GearItem {
     const v = this.visual
     const materials: Record<Tone, Material> = {
-      plate: new MeshPhysicalMaterial({ color: new Color(v.material), metalness: 0.55, roughness: 0.42, clearcoat: 0.5, clearcoatRoughness: 0.3 }),
+      plate: workedSurface(new MeshPhysicalMaterial({ color: new Color(v.material), metalness: 0.6, roughness: 0.4, clearcoat: 0.45, clearcoatRoughness: 0.3 }), 'metal'),
       trim: new MeshPhysicalMaterial({ color: new Color(v.trim), metalness: 0.9, roughness: 0.26 }),
       accent: new MeshPhysicalMaterial({ color: new Color(v.accent), emissive: new Color(v.accent), emissiveIntensity: 0.85, roughness: 0.3 }),
-      cloth: new MeshPhysicalMaterial({ color: new Color(v.material), roughness: 0.92, sheen: 1, sheenRoughness: 0.8, sheenColor: new Color(v.trim) }),
-      dark: new MeshPhysicalMaterial({ color: new Color(tone(v.material, -0.62)), metalness: 0.4, roughness: 0.55 }),
+      cloth: workedSurface(new MeshPhysicalMaterial({ color: new Color(v.material), roughness: 0.92, sheen: 1, sheenRoughness: 0.8, sheenColor: new Color(v.trim) }), 'cloth'),
+      dark: workedSurface(new MeshPhysicalMaterial({ color: new Color(tone(v.material, -0.62)), metalness: 0.4, roughness: 0.55 }), 'metal'),
     }
     const meshes: Mesh[] = []
     for (const { bone, tone: t, geos } of this.parts.values()) {

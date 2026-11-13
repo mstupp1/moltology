@@ -9,6 +9,9 @@
 import { BufferAttribute, BufferGeometry, CatmullRomCurve3, Vector3 } from 'three'
 
 /** `d` is distance along the spine, `r` the ring's half width. Extra fields shape the ring. */
+/** How pebbled plain shell is, from 0 (smooth) to 1 (a claw). */
+export const SHELL_BUMP = 0.35
+
 export type LoftKey = { d: number; r: number } & Record<string, number>
 
 export interface Frame {
@@ -186,7 +189,10 @@ export function loft(opts: LoftOptions): Loft {
       uvs[vi * 2] = j / radial
       uvs[vi * 2 + 1] = s
       const ao = opts.ao ? opts.ao(k, s, theta) : 1
-      colors[vi * 3] = colors[vi * 3 + 1] = colors[vi * 3 + 2] = ao
+      // Red is shading. Green marks hard shell (1) or joint membrane (0); blue is how pebbled it is.
+      colors[vi * 3] = ao
+      colors[vi * 3 + 1] = 1
+      colors[vi * 3 + 2] = SHELL_BUMP
       vi++
     }
   }
