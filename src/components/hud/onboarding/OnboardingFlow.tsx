@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { HudButton } from '@/components/ui/HudButton'
@@ -263,9 +264,12 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
   const nextLabel = step.nextLabel ? step.nextLabel(stepProps) : isLast ? 'Finish' : 'Next'
   const { Component } = step
 
-  return (
+  // Portalled to <body> so nothing in the hub layout can sit on top of it: the phone
+  // bottom bar used to cover the footer and hide Next. HudLayout makes the page inert meanwhile.
+  return createPortal(
     <div
-      className="fixed inset-0 z-[9999] flex items-stretch sm:items-center justify-center sm:p-6 transition-opacity duration-200 motion-reduce:transition-none"
+      data-onboarding-root=""
+      className="fixed inset-0 z-[9998] flex items-stretch sm:items-center justify-center sm:p-6 transition-opacity duration-200 motion-reduce:transition-none"
       style={{ opacity: visible ? 1 : 0 }}
     >
       <div className="absolute inset-0 bg-abyss/85 backdrop-blur-sm" aria-hidden="true" />
@@ -353,6 +357,7 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
           </div>
         </footer>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

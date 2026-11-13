@@ -1,6 +1,6 @@
 import { STARTER_CHARACTER_EQUIPMENT } from '@/lib/avatar/starter-equipment'
 import React from 'react'
-import { Atom, BookOpen, LayoutDashboard, Users } from 'lucide-react'
+import { Atom, BookOpen, LayoutDashboard, MessagesSquare, Shell, Sparkles } from 'lucide-react'
 import { BrandIcon3D } from '@/components/ui/BrandIcon3D'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import { parseMemberHandle } from '@/lib/member-handle'
@@ -52,7 +52,7 @@ function StepHeading({ id, title, children }: { id: string; title: string; child
   )
 }
 
-function WelcomeStep({ firstName, headingId }: OnboardingStepProps) {
+function WelcomeStep({ firstName, isGuest, headingId }: OnboardingStepProps) {
   return (
     <div className="max-w-md mx-auto w-full flex flex-col items-center text-center gap-6 py-4">
       <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full flex items-center justify-center border border-line bg-surface-2 hud-sheen shadow-menu">
@@ -62,18 +62,21 @@ function WelcomeStep({ firstName, headingId }: OnboardingStepProps) {
         Moltology helps you shed the noise of always-online life, one small habit at a time.
       </StepHeading>
       <p className="font-sans text-sm text-ink-muted leading-relaxed">
-        This takes about a minute. We will show you around, then you will pick a username and make your character.
+        {isGuest
+          ? 'This takes about a minute. We will show you around, then you can make a character. No account needed to look around.'
+          : 'This takes about a minute. We will show you around, then you will pick a username and make your character.'}
       </p>
     </div>
   )
 }
 
+/** The places in the app nav, in the same order as the phone bottom bar and desktop rail. */
 const TOUR = [
   {
     id: 'dashboard',
     icon: LayoutDashboard,
     title: 'Dashboard',
-    body: 'Your day at a glance: a few small tasks, the lesson you are on, and your streak.',
+    body: 'Your day at a glance: today’s tasks, the lesson you are on, and your streak.',
   },
   {
     id: 'oracle',
@@ -82,35 +85,66 @@ const TOUR = [
     body: 'Ask when you are stuck. It helps you find a first step and plan a routine.',
   },
   {
-    id: 'learn',
-    icon: BookOpen,
-    title: 'Academy and Codex',
-    body: 'Short courses and the core texts, read at your own pace.',
+    id: 'character',
+    icon: Shell,
+    title: 'Character',
+    body: 'Dress your lobster or crab, shop for gear, and watch your stats grow.',
   },
   {
     id: 'forum',
-    icon: Users,
+    icon: MessagesSquare,
     title: 'Forum',
     body: 'Share progress, ask questions, and borrow routines from other members.',
   },
+  {
+    id: 'learn',
+    icon: BookOpen,
+    title: 'Codex and Academy',
+    // Phones keep these two under More in the bottom bar; desktop lists them in the rail.
+    body: 'The core texts and short courses, read at your own pace.',
+    phoneBody: 'The core texts and short courses. Find them under More.',
+  },
 ] as const
 
-function TourStep({ headingId }: OnboardingStepProps) {
+function TourStep({ isGuest, headingId }: OnboardingStepProps) {
+  const card = 'rounded-card border border-line-subtle bg-surface-2 hud-sheen p-3 sm:p-4 flex gap-3'
   return (
     <div className="max-w-xl mx-auto w-full space-y-5">
       <StepHeading id={headingId} title="What's here">
-        Everything lives in the sidebar. These are the places most members start.
+        <span className="md:hidden">Your main pages are in the bar at the bottom of the screen.</span>
+        <span className="hidden md:inline">Your pages are in the rail on the left. Hover an icon to see its name.</span>
       </StepHeading>
-      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {TOUR.map(({ id, icon: Icon, title, body }) => (
-          <li key={id} className="rounded-card border border-line-subtle bg-surface-2 hud-sheen p-4 flex gap-3">
-            <Icon className="w-5 h-5 shrink-0 text-cyan-glow mt-0.5" aria-hidden="true" />
-            <div className="min-w-0">
-              <h3 className="font-sans text-sm font-semibold text-ink">{title}</h3>
-              <p className="font-sans text-xs text-ink-muted leading-relaxed mt-1">{body}</p>
-            </div>
-          </li>
-        ))}
+      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+        {TOUR.map((item) => {
+          const Icon = item.icon
+          return (
+            <li key={item.id} className={card}>
+              <Icon className="w-5 h-5 shrink-0 text-cyan-glow mt-0.5" aria-hidden="true" />
+              <div className="min-w-0">
+                <h3 className="font-sans text-sm font-semibold text-ink">{item.title}</h3>
+                {'phoneBody' in item ? (
+                  <p className="font-sans text-xs text-ink-muted leading-relaxed mt-1">
+                    <span className="md:hidden">{item.phoneBody}</span>
+                    <span className="hidden md:inline">{item.body}</span>
+                  </p>
+                ) : (
+                  <p className="font-sans text-xs text-ink-muted leading-relaxed mt-1">{item.body}</p>
+                )}
+              </div>
+            </li>
+          )
+        })}
+        <li className={card} data-testid="tour-daily-tasks">
+          <Sparkles className="w-5 h-5 shrink-0 text-cyan-glow mt-0.5" aria-hidden="true" />
+          <div className="min-w-0">
+            <h3 className="font-sans text-sm font-semibold text-ink">Today&rsquo;s tasks</h3>
+            <p className="font-sans text-xs text-ink-muted leading-relaxed mt-1">
+              {isGuest
+                ? 'Eight small tasks a day. Open them from the 0/8 button at the top of the screen.'
+                : 'Eight small tasks a day. The gold marks around your picture at the top fill as you finish them, and the ring shows your XP. Tap it to see the list.'}
+            </p>
+          </div>
+        </li>
       </ul>
     </div>
   )
