@@ -15,6 +15,7 @@ let mockPathname = '/'
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => vi.fn(),
   useLocation: () => ({ pathname: mockPathname }),
+  Link: ({ to, children, ...rest }: any) => <a href={to} {...rest}>{children}</a>,
 }))
 
 vi.mock('@/lib/auth-client', () => ({
@@ -114,7 +115,7 @@ describe('PublicHeader Navigation Component', () => {
     ).toHaveClass('text-ink', 'bg-surface-3')
   })
 
-  it('triggers authentication modal callback when clicking desktop LOG IN / JOIN PATH', async () => {
+  it('triggers authentication modal callback when clicking desktop Log in', async () => {
     const onOpenAuth = vi.fn()
     render(<PublicHeader activePage="home" onOpenAuth={onOpenAuth} />)
 
@@ -123,7 +124,7 @@ describe('PublicHeader Navigation Component', () => {
     expect(onOpenAuth).toHaveBeenCalledWith('login')
   })
 
-  it('renders user SSO avatar menu when user is signed in', async () => {
+  it('gives members the app account panel from their portrait', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -137,72 +138,62 @@ describe('PublicHeader Navigation Component', () => {
 
     render(<PublicHeader activePage="home" />)
 
-    const avatarBtns = await screen.findAllByRole('button', { name: /user account menu/i })
-    expect(avatarBtns.length).toBeGreaterThan(0)
-
-    const avatarBtn = avatarBtns[0]
-    fireEvent.click(avatarBtn)
-
-    expect(screen.getAllByText('Google User').length).toBeGreaterThan(0)
-    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
+    const avatarBtns = await screen.findAllByRole('button', { name: /user account menu, level/i })
+    // Phone bar and desktop header both use the app's own XP-ring account control.
+    expect(avatarBtns).toHaveLength(2)
+    fireEvent.click(avatarBtns[0])
+    expect(await screen.findByRole('dialog', { name: /account and today's tasks/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^dashboard$/i })).toBeInTheDocument()
   })
 
-  it('renders mobile-friendly operative account accordion in hamburger menu when signed in', async () => {
+  it('ends the phone menu with an Open dashboard row for members', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
-      data: {
-        user: {
-          id: 'user-2',
-          name: 'Operative Neo',
-          email: 'neo@moltology.org',
-          image: null,
-        },
-      },
+      data: { user: { id: 'user-2', name: 'Operative Neo', email: 'neo@moltology.org', image: null } },
     } as any)
 
     render(<PublicHeader activePage="home" />)
 
-    const toggle = screen.getByRole('button', { name: /toggle navigation menu/i })
-    fireEvent.click(toggle)
-
-    const avatarBtns = await screen.findAllByRole('button', { name: /user account menu/i })
-    const mobileAvatarBtn = avatarBtns[avatarBtns.length - 1]
-    expect(mobileAvatarBtn).toBeInTheDocument()
-
-    // Clicking the mobile accordion button opens the account drawer with settings and sign out
-    fireEvent.click(mobileAvatarBtn)
-    expect(screen.getAllByText('neo@moltology.org').length).toBeGreaterThan(0)
-    expect(screen.getByRole('button', { name: /^settings$/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
-    expect(screen.queryByText('Underwater Bubbles')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /open menu/i }))
+    const menu = screen.getByRole('dialog', { name: /^menu$/i })
+    expect(await within(menu).findByRole('button', { name: /open dashboard/i })).toBeInTheDocument()
+    expect(within(menu).queryByText('neo@moltology.org')).not.toBeInTheDocument()
   })
 
-  it('opens mobile menu with nav links and auth actions via hamburger toggle without badges', async () => {
+  it('opens the full-screen phone menu with nav rows and guest actions', async () => {
     const onOpenAuth = vi.fn()
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
     mockPathname = '/'
 
     render(<PublicHeader activePage="home" onOpenAuth={onOpenAuth} />)
 
-    const toggle = screen.getByRole('button', { name: /toggle navigation menu/i })
+    const toggle = screen.getByRole('button', { name: /open menu/i })
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.queryByRole('dialog', { name: /^menu$/i })).not.toBeInTheDocument()
 
-    // The sheet is in the DOM but collapsed and inert until opened
-    expect(screen.queryByRole('navigation', { name: /mobile navigation/i })).not.toBeInTheDocument()
     fireEvent.click(toggle)
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
     expect(document.body.style.overflow).toBe('hidden')
 
-    const mobileNav = screen.getByRole('navigation', { name: /mobile navigation/i })
-    const moltmaxRow = within(mobileNav).getByRole('link', { name: /^Quiz/i })
-    expect(moltmaxRow).toHaveTextContent('Quiz')
-    expect(moltmaxRow).not.toHaveTextContent('Take the clearance audit')
+    const menu = screen.getByRole('dialog', { name: /^menu$/i })
+    const mobileNav = within(menu).getByRole('navigation', { name: /mobile navigation/i })
+    expect(within(mobileNav).getByRole('link', { name: /^Quiz/i })).toHaveTextContent('Quiz')
     expect(within(mobileNav).getByRole('link', { name: /^Home/i })).toHaveAttribute('aria-current', 'page')
+    expect(within(menu).getByRole('button', { name: /close menu/i })).toBeInTheDocument()
 
-    const mobileLogin = (await screen.findAllByRole('button', { name: /LOG IN/i })).at(-1)!
-    fireEvent.click(mobileLogin)
+    fireEvent.click(await within(menu).findByRole('button', { name: /^log in$/i }))
     expect(onOpenAuth).toHaveBeenCalledWith('login')
-    // closing menu on auth open
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('puts a Join button in the phone pill for guests', async () => {
+    const onOpenAuth = vi.fn()
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
+
+    render(<PublicHeader activePage="home" onOpenAuth={onOpenAuth} />)
+
+    const joinButtons = await screen.findAllByRole('button', { name: /^join$/i })
+    fireEvent.click(joinButtons[0])
+    expect(onOpenAuth).toHaveBeenCalledWith('signup')
   })
 
   it('hides header when scrolling down past threshold and shows header when scrolling up', () => {
@@ -242,7 +233,7 @@ describe('PublicHeader Navigation Component', () => {
     render(<PublicHeader activePage="home" />)
 
     expect((await screen.findAllByRole('button', { name: /LOG IN/i })).length).toBeGreaterThan(0)
-    expect(screen.getAllByRole('button', { name: /JOIN PATH/i }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('button', { name: /^join$/i })).toHaveLength(2)
     expect(screen.queryByTestId('public-header-auth-skeleton')).not.toBeInTheDocument()
   })
 
@@ -268,7 +259,7 @@ describe('PublicHeader Navigation Component', () => {
 
   it('closes the mobile menu with Escape', () => {
     render(<PublicHeader activePage="home" />)
-    const toggle = screen.getByRole('button', { name: /toggle navigation menu/i })
+    const toggle = screen.getByRole('button', { name: /open menu/i })
     fireEvent.click(toggle)
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
     fireEvent.keyDown(document, { key: 'Escape' })
