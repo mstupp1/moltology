@@ -19,9 +19,12 @@ function sheet() {
 }
 
 describe('StatHud', () => {
-  it('names every stat on wide screens and explains it in the guide', () => {
+  it('labels stats by code with the full name a hover or click away', () => {
     render(<StatHud variant="strip" sheet={sheet()} />)
-    for (const v of Object.values(VECTORS)) expect(screen.getAllByText(v.label).length).toBeGreaterThan(0)
+    for (const v of Object.values(VECTORS)) {
+      expect(screen.getByText(v.short)).toBeInTheDocument()
+      expect(screen.getAllByText(v.label).length).toBeGreaterThan(0)
+    }
     fireEvent.click(screen.getByTestId('stat-hud-pincerTorque'))
     const dialog = screen.getByRole('dialog', { name: 'What the Moltmax stats mean' })
     expect(dialog).toHaveTextContent(VECTORS.depthTolerance.description)

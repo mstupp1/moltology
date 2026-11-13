@@ -319,14 +319,13 @@ export const StatHud: React.FC<StatHudProps> = ({ sheet, preview, variant, class
               onClick={() => show(k)}
             >
               <span className="flex items-baseline justify-between gap-1.5">
-                <span className="text-[12px] font-bold text-ink truncate">{meta.label}</span>
+                <span className="text-[12px] font-bold tracking-[0.14em] text-ink-muted group-hover:text-ink">{meta.short}</span>
                 <span className="shrink-0 font-grotesk text-[15px] font-bold text-ink tabular-nums">{base}</span>
               </span>
               <span className="mt-1.5 block">
                 <Segments base={base} gear={gear} next={next} />
               </span>
-              <span className="flex items-center justify-between gap-1 mt-1 h-3.5 text-[11px] tabular-nums">
-                <span className="tracking-[0.14em] font-bold text-ink-muted">{meta.short}</span>
+              <span className="flex items-center justify-end gap-1 mt-1 h-3.5 text-[11px] tabular-nums">
                 <span className="truncate">
                   <span className={gear > 0 ? 'text-cyan-glow font-semibold' : 'text-ink-muted'}>{formatBonus(gear)} gear</span>
                   <Delta from={gear} to={next} className="ml-1" />
