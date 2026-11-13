@@ -39,7 +39,8 @@ import { AvatarCreatorPanel } from '../avatar/AvatarCreatorPanel'
 import { AvatarCreatorPreview } from '../avatar/AvatarCreatorPreview'
 import { reactAvatars } from '@/lib/avatar3d-events'
 import { GearDetail } from './GearDetail'
-import { BonusChange, VectorSheetPanel } from './VectorSheetPanel'
+import { BonusChange } from './VectorSheetPanel'
+import { StatHud } from './StatHud'
 import { buildVectorSheet, resolveVectorBase } from '@/lib/vectors'
 import '../avatar-animations.css'
 
@@ -395,10 +396,18 @@ export const ChassisStatusPage: React.FC = () => {
               >
                 <span className="max-lg:sr-only">Surprise me</span>
               </HudButton>
+              {!wide && (
+                <StatHud
+                  variant="rail"
+                  sheet={sheet}
+                  preview={statPreview}
+                  className="absolute left-0 top-10 w-[72px] max-[379px]:w-[64px]"
+                />
+              )}
             </div>
             <SlotColumn ids={RIGHT_SLOTS} className="hidden lg:flex" {...slotProps} />
           </div>
-          {wide && <VectorSheetPanel sheet={sheet} preview={statPreview} self />}
+          {wide && <StatHud variant="strip" sheet={sheet} preview={statPreview} />}
         </div>
         {!wide && tabBar}
       </div>
@@ -519,7 +528,6 @@ export const ChassisStatusPage: React.FC = () => {
           )}
         </div>
       </div>
-      {!wide && <VectorSheetPanel className="min-w-0" sheet={sheet} preview={statPreview} self />}
     </div>
   )
 }
