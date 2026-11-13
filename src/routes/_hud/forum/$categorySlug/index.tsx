@@ -82,6 +82,7 @@ export const Route = createFileRoute('/_hud/forum/$categorySlug/')({
   component: ForumBoardPage,
   pendingComponent: HudWorkspaceGhost,
   staleTime: FRESH.forum,
+  preloadStaleTime: FRESH.forum,
 })
 
 type SortKey = ForumSortKey

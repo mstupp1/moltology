@@ -21,6 +21,8 @@ export function getRouter() {
     // Going back to a page reuses what its loader already fetched instead of reading again.
     // Forum routes set a shorter window; forum writes clear the forum's saved pages.
     defaultStaleTime: FRESH.content,
+    // A hover preload saves the page for the same window (the router default is 30 seconds).
+    defaultPreloadStaleTime: FRESH.content,
     defaultPendingComponent: HUDPageLoader,
     defaultPendingMs: 250,
     defaultPendingMinMs: 0,

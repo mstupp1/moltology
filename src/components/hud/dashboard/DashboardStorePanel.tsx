@@ -21,12 +21,17 @@ export const DASHBOARD_STORE_LIMIT = 4
 export function DashboardStorePanel() {
   const navigate = useNavigate()
   const session = useAuthSession()
-  // A viewer the store is not open to gets an error here: the panel just stays out.
+  // A viewer the store is not open to gets an error here. Save that as an empty catalog so the
+  // panel stays out without asking again on every visit (failed reads retry on mount).
   const catalog = useAppQuery<MerchProductView[]>({
     queryKey: contentKeys.merchCatalog(session.userId),
     queryFn: async () => {
       const token = await getAuthJWTToken()
-      return getMerchCatalogFn({ data: { token: token ?? undefined, userId: session.userId ?? undefined } })
+      try {
+        return await getMerchCatalogFn({ data: { token: token ?? undefined, userId: session.userId ?? undefined } })
+      } catch {
+        return []
+      }
     },
     enabled: !session.isPending,
     staleTime: FRESH.content,

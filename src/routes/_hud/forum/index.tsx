@@ -66,6 +66,7 @@ export const Route = createFileRoute('/_hud/forum/')({
   component: ForumIndexPage,
   pendingComponent: HudWorkspaceGhost,
   staleTime: FRESH.forum,
+  preloadStaleTime: FRESH.forum,
 })
 
 const FIELD =

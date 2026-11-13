@@ -132,6 +132,7 @@ export const Route = createFileRoute('/_hud/forum/$categorySlug/$topicSlug')({
   component: ForumThreadPage,
   pendingComponent: HudWorkspaceGhost,
   staleTime: FRESH.forum,
+  preloadStaleTime: FRESH.forum,
 })
 
 const SORT_OPTIONS: { id: ForumReplySort; label: string }[] = [
