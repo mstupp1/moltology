@@ -19,6 +19,8 @@ export interface AlignmentTodayListProps {
   /** Closes the surrounding panel (close button and Codex links). */
   onClose: () => void
   showClose?: boolean
+  /** Taller rows and larger titles, for the full-screen phone account screen. */
+  roomy?: boolean
 }
 
 const focusRing =
@@ -33,6 +35,7 @@ export function AlignmentTodayList({
   onToggle,
   onClose,
   showClose = true,
+  roomy = false,
 }: AlignmentTodayListProps) {
   const allTasksCompleted = tasks.length > 0 && tasks.every((t) => t.completed)
   const completedCount = tasks.filter((t) => t.completed).length
@@ -92,7 +95,7 @@ export function AlignmentTodayList({
                       onToggle(t.id)
                     }}
                     aria-pressed={t.completed}
-                    className={`flex-1 min-w-0 min-h-[44px] sm:min-h-10 pl-3 pr-1 py-2 flex items-center gap-3 text-left text-xs transition-colors touch-manipulation group focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
+                    className={`flex-1 min-w-0 ${roomy ? 'min-h-12 py-2.5 text-sm' : 'min-h-[44px] sm:min-h-10 py-2 text-xs'} pl-3 pr-1 flex items-center gap-3 text-left transition-colors touch-manipulation group focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow ${
                       isNext ? '' : 'hover:bg-surface-2'
                     }`}
                   >
@@ -108,7 +111,7 @@ export function AlignmentTodayList({
                       {t.time}
                     </span>
                     <span
-                      className={`min-w-0 flex-1 truncate ${
+                      className={`min-w-0 flex-1 ${roomy ? 'line-clamp-2' : 'truncate'} ${
                         t.completed ? 'line-through decoration-ink-muted/60 text-ink-muted' : 'text-ink font-bold'
                       }`}
                     >
