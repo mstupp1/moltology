@@ -8,7 +8,22 @@ const access = { canView: false, pending: false }
 const session = { userId: 'staff-1' as string | null, isPending: false }
 
 vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
+  Link: ({
+    children,
+    to,
+    search,
+    ...rest
+  }: {
+    children: React.ReactNode
+    to: string
+    search?: { tab?: string }
+    'aria-current'?: 'page'
+    'data-testid'?: string
+  }) => (
+    <a href={search?.tab ? `${to}?tab=${search.tab}` : to} aria-current={rest['aria-current']} data-testid={rest['data-testid']}>
+      {children}
+    </a>
+  ),
 }))
 
 vi.mock('@/hooks/useHiddenPageAccess', () => ({
@@ -89,9 +104,9 @@ describe('Admin access and oversight hub', () => {
       expect(screen.getByText('Healthy')).toBeInTheDocument()
     })
 
-    // Tools sit above the tabs, so they show alongside whichever tab is open.
-    expect(screen.queryByTestId('admin-tab-sectors')).not.toBeInTheDocument()
+    // Tools sit in the header band, so they show alongside whichever tab is open.
     expect(screen.getByTestId('admin-sectors')).toBeInTheDocument()
+    expect(screen.getByTestId('band-section-watch')).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('link', { name: /Composite Studio/i })).toHaveAttribute('href', '/render/composite')
     expect(screen.getByRole('link', { name: /Logic Atlas/i })).toHaveAttribute('href', '/admin/logic')
     expect(screen.queryByRole('link', { name: /Store settings/i })).not.toBeInTheDocument()
@@ -101,8 +116,7 @@ describe('Admin access and oversight hub', () => {
   it('switches an experiment on for the signed-in admin', async () => {
     access.canView = true
     const api = await import('@/lib/server/api')
-    render(<AdminOversightHub />)
-    fireEvent.click(screen.getByTestId('admin-tab-experiments'))
+    render(<AdminOversightHub tab="experiments" />)
     const toggle = await screen.findByRole('switch', { name: 'New store' })
     expect(toggle).toHaveAttribute('aria-checked', 'false')
     fireEvent.click(toggle)
@@ -114,8 +128,9 @@ describe('Admin access and oversight hub', () => {
 
   it('opens the Store tab with orders, Oracle MAX members and store settings', async () => {
     access.canView = true
-    render(<AdminOversightHub initialTab="store" />)
-    expect(screen.getByTestId('admin-tab-store')).toHaveAttribute('aria-selected', 'true')
+    render(<AdminOversightHub tab="store" />)
+    expect(screen.getByTestId('band-section-store')).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByTestId('band-section-store')).toHaveAttribute('href', '/admin?tab=store')
     expect(screen.getByTestId('admin-shop')).toBeInTheDocument()
     expect(screen.getByTestId('admin-store-settings')).toBeInTheDocument()
     expect(await screen.findByTestId('admin-purchases-empty')).toHaveTextContent('No Oracle MAX purchases')

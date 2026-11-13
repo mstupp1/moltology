@@ -19,7 +19,9 @@ export interface HudTabsProps<T extends string = string> {
 }
 
 /**
- * Underline tabs: the current tab gets ink text and a 2px cyan underline.
+ * Section tabs for the top row of a header band (`HudTitleBandTop`), matching `BandSectionNav`:
+ * plain labels, the current one in full ink, no underline. Use this when the sections are
+ * in-page state; use `BandSectionNav` when each section has its own URL.
  * Arrow keys move between tabs; Home and End jump to the ends.
  */
 export function HudTabs<T extends string = string>({
@@ -54,7 +56,7 @@ export function HudTabs<T extends string = string>({
   }
 
   return (
-    <div role="tablist" aria-label={label} className={cn('flex flex-wrap gap-5 border-b border-line-subtle', className)}>
+    <div role="tablist" aria-label={label} className={cn('-ml-2.5 flex flex-wrap gap-1', className)}>
       {items.map((item, index) => {
         const selected = item.value === value
         return (
@@ -72,10 +74,10 @@ export function HudTabs<T extends string = string>({
             onClick={() => onValueChange(item.value)}
             onKeyDown={(event) => onKeyDown(event, index)}
             className={cn(
-              '-mb-px border-b-2 py-2.5 font-grotesk text-xs font-bold uppercase tracking-[0.08em] transition-colors duration-200',
-              'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
+              'inline-flex min-h-9 items-center whitespace-nowrap rounded-control px-2.5 text-[11px] uppercase tracking-[0.08em] transition-colors',
+              'focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow',
               'disabled:cursor-not-allowed disabled:opacity-50',
-              selected ? 'border-cyan-glow text-ink' : 'border-transparent text-ink-muted hover:text-ink'
+              selected ? 'font-bold text-ink' : 'font-semibold text-ink-muted hover:text-ink'
             )}
           >
             {item.label}

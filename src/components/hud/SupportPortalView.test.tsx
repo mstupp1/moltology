@@ -4,6 +4,10 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 import SupportPortalView from './SupportPortalView'
 
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
+}))
+
 vi.mock('./SupportTicketForm', () => ({
   default: () => <div data-testid="support-ticket-form-stub" />,
 }))
@@ -37,6 +41,7 @@ describe('SupportPortalView chrome', () => {
     expect(screen.getByRole('heading', { name: SUPPORT_PAGE_COPY.faqTitle })).toBeInTheDocument()
     expect(screen.getByText(SUPPORT_PAGE_COPY.faqHint)).toBeInTheDocument()
     expect(screen.getByText(SUPPORT_PAGE_COPY.faqStartTitle)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Open settings/ })).toHaveAttribute('href', '/settings')
 
     fireEvent.click(screen.getByRole('tab', { name: new RegExp(SUPPORT_PAGE_COPY.tabContact, 'i') }))
     expect(screen.getByTestId('support-ticket-form-stub')).toBeInTheDocument()

@@ -1139,10 +1139,11 @@ export const getAdminTelemetryFn = createServerFn({ method: 'POST' })
 
 export const searchAdminMembersFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data?: { token?: string; userId?: string; query?: string }) =>
+  .validator((data?: { token?: string; userId?: string; query?: string; offset?: number }) =>
     adminAuthSchema
       .extend({
         query: z.string().max(80).optional(),
+        offset: z.number().int().min(0).max(100_000).optional(),
       })
       .parse(data ?? {}),
   )

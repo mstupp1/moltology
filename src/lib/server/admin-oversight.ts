@@ -39,6 +39,8 @@ export type AdminMemberRow = {
 
 export type AdminMemberDirectory = {
   members: AdminMemberRow[]
+  /** More members match beyond this page; ask again with `offset`. */
+  hasMore: boolean
 }
 
 export type AdminPurchaseRow = {
@@ -124,7 +126,7 @@ export async function getAdminTelemetryHandler(
 }
 
 export async function searchAdminMembersHandler(
-  args: HandlerArgs<(WriteAuthData & { query?: string }) | undefined>,
+  args: HandlerArgs<(WriteAuthData & { query?: string; offset?: number }) | undefined>,
 ): Promise<AdminMemberDirectory> {
   const auth = await requireStaff(args)
   const query = args.data?.query?.trim() ?? ''
@@ -151,9 +153,14 @@ export async function searchAdminMembersHandler(
       )
     : selection
 
-  const rows = await filtered.orderBy(desc(profiles.updatedAt)).limit(ADMIN_MEMBER_LIMIT)
+  const found = await filtered
+    .orderBy(desc(profiles.updatedAt), desc(profiles.id))
+    .limit(ADMIN_MEMBER_LIMIT + 1)
+    .offset(args.data?.offset ?? 0)
+  const rows = found.slice(0, ADMIN_MEMBER_LIMIT)
 
   return {
+    hasMore: found.length > ADMIN_MEMBER_LIMIT,
     members: rows.map((row) => ({
       id: row.id,
       handle: row.handle?.trim() || null,

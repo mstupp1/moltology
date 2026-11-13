@@ -61,16 +61,17 @@ export function ChangelogFilterBar({
           <input ref={searchInputRef} type="search" aria-label="Search changelogs" placeholder="Search updates…"
             value={searchQuery} onChange={(e) => onSearchChange(e.target.value)} className={`${control} w-full pl-9`} />
         </div>
-        <div className="grid min-w-0 grid-cols-1 gap-3 sm:block">
+        <div className={`grid min-w-0 gap-2 sm:block ${tags.length > 0 ? 'grid-cols-2' : 'grid-cols-1'}`}>
           <label className="flex min-w-0 flex-col gap-1.5 text-xs text-ink-muted sm:hidden">
-            Category
+            {/* Phones show the two filters side by side; the selects carry their own names. */}
+            <span className="sr-only">Category</span>
             <select aria-label="Filter by category" value={selectedCategory} onChange={(e) => onCategoryChange(e.target.value)} className={`${control} w-full min-w-0`}>
               {categories.map((cat) => <option key={cat.label} value={cat.label}>{cat.label === 'ALL' ? 'All updates' : cat.label}{typeof cat.count === 'number' ? ` (${cat.count})` : ''}</option>)}
             </select>
           </label>
           {tags.length > 0 && (
             <label className="flex min-w-0 flex-col gap-1.5 text-xs text-ink-muted sm:w-44">
-              Topic
+              <span className="sr-only sm:not-sr-only">Topic</span>
               <select aria-label="Filter by topic" value={selectedTag || ''} onChange={(e) => onTagChange?.(e.target.value || null)} className={`${control} w-full min-w-0`}>
                 <option value="">All topics</option>
                 {tags.map((tag) => <option key={tag.label} value={tag.label}>{tag.label === 'UI/UX' ? 'Interface' : tag.label === 'Auth' ? 'Sign-in' : tag.label} {typeof tag.count === 'number' ? `(${tag.count})` : ''}</option>)}

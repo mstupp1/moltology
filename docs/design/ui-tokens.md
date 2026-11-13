@@ -80,7 +80,12 @@ pinned to the bottom.
 ## Primitives
 
 `HudButton` variants: `primary` (alias `cyan`), `crimson`, `secondary` (alias `dark`), `ghost`, `danger`
-(alias `sacred`). One `primary` per screen. `HudTabs` is the underline tab list for in-page sections.
+(alias `sacred`). One `primary` per screen. There are two tab styles and no underline tabs:
+
+- Section tabs, the top row of a header band: `BandSectionNav` (each section has a URL) or
+  `HudTabs` (in-page state). Plain tracked labels, the current one in full ink.
+- In-page view tabs and filters: `pillTabClass()` from `src/components/ui/pillTab.ts`, the
+  current one a lit `surface-3` pill.
 
 ## Guard
 
@@ -106,10 +111,10 @@ Use `HudTitlePanel` for shared HUD page headings. The heading treatment follows 
 page's structure; a title alone does not need its own card.
 
 - `treatment="compact"` (default): unboxed heading and actions above independent
-  sections. Use for Community, Academy, admin pages, and editor toolbars.
+  sections. Use for section headings inside a page and editor toolbars.
 - `treatment="integrated"`: heading inside an existing workspace surface, separated
   from its controls/content by a divider. Use for Search, Connections, Activity Stream,
-  Settings, Daily Alignment, and Covenant Watch. The parent supplies padding and section spacing.
+  Settings and Daily Alignment. The parent supplies padding and section spacing.
 - `treatment="hero"`: substantial introduction with useful imagery, identity, or
   overview content. Premium uses this explicitly. Dashboard and member profiles
   retain their purpose-built identity compositions.
@@ -117,19 +122,28 @@ page's structure; a title alone does not need its own card.
 `treatment="band"` is the page header band: the title card runs edge to edge across
 the top of the page panel (rounded to the panel's top corners on desktop, flush under
 the top bar on phones) with a `surface-2` fill and a `line-subtle` bottom divider, so it
-stands apart from the `surface-1` panel. Use it as the first element of a standard page
-(Academy, Certificates, Forum, Shop, Progress; Character builds the same band by hand).
-On desktop the search pill straddles the band's top-right corner, so the band leaves room
-for it. Pages with section tabs open the band with `HudTitleBandTop` (tabs level with the
-pill) and pass `joined` to the title band below it. Inside a band, section tabs are plain
-labels; in-page tabs use the lit `surface-3` pill.
+stands apart from the `surface-1` panel. Use it as the first element of every standard page
+(Academy, Certificates, Forum, Shop, Progress, Admin, Logic Atlas, Support; Character builds
+the same band by hand). On desktop the search pill straddles the band's top-right corner,
+so the band leaves room for it.
+
+One band, the same rows on every page:
+
+1. Section tabs (only for an area with sibling pages: Character, Academy, Admin, Support):
+   `HudTitleBandTop` holding `BandSectionNav` or `HudTabs`, level with the pill. The band
+   below passes `joined`. Phones scroll this row sideways rather than wrapping it.
+2. Title row: the `h1`, at most one short description line, no eyebrow. `actions` on the
+   right hold page commands (Forum's New post) or a few figures as `BandStat` (Progress XP,
+   Admin status). Shop's wallet is the one custom summary.
+3. Optional `toolbar`: in-page view tabs as lit pills (Shop's Gear / Earn gems / Credits).
+   Content such as cards, lists or forms always starts below the band.
 
 `actions` holds page-level commands or a short status summary. `toolbar` spans the
 full width below the heading and actions, for navigation or filters. Both wrap on
 small screens; do not force fixed header heights. Keep collection filters near
-their results and editor save actions accessible while scrolling. Admin overview
-metrics, tool links, and section tabs share one solid workspace; keep Atlas
-filters and Store settings navigation on solid surfaces too.
+their results and editor save actions accessible while scrolling. Admin status figures,
+section tabs and tool links all sit in the Admin band; Atlas filters and Store settings stay
+on solid cards below it.
 
 Use one page heading. Keep descriptions brief, omit redundant eyebrows, and avoid
 repeating the page title as the first section heading. Oracle, lesson readers,

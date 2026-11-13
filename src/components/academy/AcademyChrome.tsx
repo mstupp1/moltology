@@ -1,6 +1,8 @@
+import { BandSectionNav, type BandSection } from '@/components/hud/BandSectionNav'
+import { HudTitleBandTop } from '@/components/hud/HudTitlePanel'
 import React from 'react'
 import { Link } from '@tanstack/react-router'
-import { Award, BookOpen, ChevronRight, GraduationCap } from 'lucide-react'
+import { ChevronRight, GraduationCap } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -52,33 +54,17 @@ export function useAcademyGuestEnroll() {
 }
 
 /** Catalog / Certificates switch. The current page is a lit tile. */
+const ACADEMY_SECTIONS = [
+  { id: 'catalog', label: 'Catalog', to: '/academy' },
+  { id: 'certificates', label: 'Certificates', to: '/academy/certificates' },
+] as const satisfies readonly BandSection[]
+
+/** Catalog / Certificates: the top row of the Academy header band (same style as Character's). */
 export function AcademyNav({ current }: { current: 'catalog' | 'certificates' | null }) {
-  const items = [
-    { key: 'catalog' as const, to: '/academy' as const, label: 'Catalog', icon: BookOpen },
-    { key: 'certificates' as const, to: '/academy/certificates' as const, label: 'Certificates', icon: Award },
-  ]
   return (
-    // Same tab style as the other header bands: plain labels, the current one in a lit pill.
-    <nav className="flex gap-1" aria-label="Academy">
-      {items.map(({ key, to, label, icon: Icon }) => {
-        const lit = current === key
-        return (
-          <Link
-            key={key}
-            to={to}
-            aria-current={lit ? 'page' : undefined}
-            className={cn(
-              'inline-flex items-center gap-1.5 min-h-8 px-3 rounded-control text-[11px] font-bold uppercase tracking-[0.08em] transition-[background-color,color,box-shadow] duration-200',
-              lit ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-3/60',
-              ACADEMY_FOCUS,
-            )}
-          >
-            <Icon className={cn('w-3.5 h-3.5', lit ? 'text-cyan-glow' : '')} aria-hidden="true" />
-            {label}
-          </Link>
-        )
-      })}
-    </nav>
+    <HudTitleBandTop>
+      <BandSectionNav label="Academy" sections={ACADEMY_SECTIONS} current={current} />
+    </HudTitleBandTop>
   )
 }
 
