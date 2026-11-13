@@ -79,7 +79,9 @@ describe('unified character workspace', () => {
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled()
     expect(screen.queryByText('Preview only')).not.toBeInTheDocument()
     expect(screen.queryByText('Ready')).not.toBeInTheDocument()
-    expect(screen.getByTestId('vector-sheet')).toHaveTextContent('Moltmax rating')
+    expect(screen.getByTestId('stat-hud')).toBeInTheDocument()
+    fireEvent.click(screen.getByTestId('stat-hud-shellHardness'))
+    expect(screen.getByText('Holding your boundaries and taking a hit without cracking.')).toBeInTheDocument()
     expect(screen.queryByText(/do not affect/i)).not.toBeInTheDocument()
   })
   it('shows what a picked piece would change before it is equipped', async () => {
