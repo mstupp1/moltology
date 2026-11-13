@@ -1,4 +1,4 @@
-import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
+import { HudTitleBandTop, HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import React, { useState } from 'react'
 import { HudTabs } from '@/components/ui/HudTabs'
 import { HudButton } from '@/components/ui/HudButton'
@@ -8,8 +8,11 @@ import { formatReleaseDay } from '@/components/hud/dashboard/DashboardChangelogP
 import { Link } from '@tanstack/react-router'
 import { HudGhostCard } from '@/components/ui/HudGhostLoader'
 import {
+  ArrowRight,
+  CreditCard,
   GitCommit,
-  HelpCircle,
+  Lock,
+  Sparkles,
   ChevronDown,
   ChevronUp,
   AlertTriangle,
@@ -22,6 +25,30 @@ import { HudPagination } from '@/components/ui/HudPagination'
 import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 import SupportTicketForm from '@/components/hud/SupportTicketForm'
 import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
+
+const FAQ_ITEMS = [
+  {
+    icon: Sparkles,
+    title: SUPPORT_PAGE_COPY.faqStartTitle,
+    body: SUPPORT_PAGE_COPY.faqStartBody,
+    to: '/dashboard' as const,
+    linkLabel: 'Open your dashboard',
+  },
+  {
+    icon: CreditCard,
+    title: SUPPORT_PAGE_COPY.faqBillingTitle,
+    body: SUPPORT_PAGE_COPY.faqBillingBody,
+    to: '/max' as const,
+    linkLabel: 'See Oracle MAX',
+  },
+  {
+    icon: Lock,
+    title: SUPPORT_PAGE_COPY.faqPrivacyTitle,
+    body: SUPPORT_PAGE_COPY.faqPrivacyBody,
+    to: '/settings' as const,
+    linkLabel: 'Open settings',
+  },
+]
 
 export default function SupportPortalView({ loaderData }: { loaderData: any }) {
   // loaderData passed as prop
@@ -129,23 +156,34 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
     setCurrentPage(1)
   }
 
+  const tabDescription =
+    activeTab === 'changelog'
+      ? SUPPORT_PAGE_COPY.changelogHint
+      : activeTab === 'kb'
+        ? SUPPORT_PAGE_COPY.faqHint
+        : SUPPORT_PAGE_COPY.contactHint
+
   return (
-    <div className="chitin-card rounded-card p-4 sm:p-6 space-y-5 font-sans text-ink">
-      <HudTitlePanel treatment="integrated" title={SUPPORT_PAGE_COPY.pageTitle} />
-      <HorizontalScroll className="overflow-x-auto p-1">
-        <HudTabs
-          label="Support sections"
-          className="w-max min-w-full flex-nowrap [&_button]:shrink-0"
-          idPrefix="support-tab"
-          value={activeTab}
-          onValueChange={setActiveTab}
-          items={[
-            { value: 'changelog', label: SUPPORT_PAGE_COPY.tabChangelog },
-            { value: 'kb', label: SUPPORT_PAGE_COPY.tabFaq },
-            { value: 'ticket', label: SUPPORT_PAGE_COPY.tabContact },
-          ]}
-        />
-      </HorizontalScroll>
+    <div className="space-y-4 sm:space-y-5 font-sans text-ink">
+      <div>
+        <HudTitleBandTop>
+          <HorizontalScroll className="-ml-2.5 overflow-x-auto pl-2.5" tabIndex={-1}>
+            <HudTabs
+              label="Support sections"
+              className="w-max flex-nowrap"
+              idPrefix="support-tab"
+              value={activeTab}
+              onValueChange={setActiveTab}
+              items={[
+                { value: 'changelog', label: SUPPORT_PAGE_COPY.tabChangelog },
+                { value: 'kb', label: SUPPORT_PAGE_COPY.tabFaq },
+                { value: 'ticket', label: SUPPORT_PAGE_COPY.tabContact },
+              ]}
+            />
+          </HorizontalScroll>
+        </HudTitleBandTop>
+        <HudTitlePanel treatment="band" joined title={SUPPORT_PAGE_COPY.pageTitle} description={tabDescription} />
+      </div>
       <div role="tabpanel" aria-labelledby={`support-tab-${activeTab}`}>
         {/* Changelog */}
         {activeTab === 'changelog' && (
@@ -246,54 +284,44 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
 
         {activeTab === 'kb' && (
           <div className="space-y-4">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 border-b border-line pb-3">
-                <HelpCircle className="w-5 h-5 text-cyan-glow" />
-                <h2 className="font-grotesk text-sm font-bold text-ink uppercase tracking-wider">
-                  {SUPPORT_PAGE_COPY.faqTitle}
-                </h2>
-              </div>
-              <p className="text-xs text-ink-muted leading-relaxed">
-                {SUPPORT_PAGE_COPY.faqHint}
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-                <div className="space-y-2 border-t border-line-subtle pt-4">
-                  <h3 className="font-grotesk text-xs font-bold text-ink">
-                    {SUPPORT_PAGE_COPY.faqStartTitle}
-                  </h3>
-                  <p className="text-xs text-ink-muted leading-relaxed">
-                    {SUPPORT_PAGE_COPY.faqStartBody}
-                  </p>
-                </div>
-
-                <div className="space-y-2 border-t border-line-subtle pt-4">
-                  <h3 className="font-grotesk text-xs font-bold text-ink">
-                    {SUPPORT_PAGE_COPY.faqBillingTitle}
-                  </h3>
-                  <p className="text-xs text-ink-muted leading-relaxed">
-                    {SUPPORT_PAGE_COPY.faqBillingBody}
-                  </p>
-                </div>
-
-                <div className="space-y-2 border-t border-line-subtle pt-4">
-                  <h3 className="font-grotesk text-xs font-bold text-ink">
-                    {SUPPORT_PAGE_COPY.faqPrivacyTitle}
-                  </h3>
-                  <p className="text-xs text-ink-muted leading-relaxed">
-                    {SUPPORT_PAGE_COPY.faqPrivacyBody}
-                  </p>
-                </div>
-              </div>
-            </div>
+            <h2 className="sr-only">{SUPPORT_PAGE_COPY.faqTitle}</h2>
+            <ul className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              {FAQ_ITEMS.map((item) => {
+                const Icon = item.icon
+                return (
+                  <li key={item.title} className="flex flex-col gap-2 rounded-card border border-line-subtle bg-surface-1 p-4">
+                    <Icon className="h-4 w-4 text-ink-muted" aria-hidden />
+                    <h3 className="font-grotesk text-sm font-bold text-ink">{item.title}</h3>
+                    <p className="flex-1 text-xs leading-relaxed text-ink-muted">{item.body}</p>
+                    <Link
+                      to={item.to}
+                      className={`inline-flex min-h-8 items-center gap-1 self-start text-xs font-semibold text-ink-body transition-colors hover:text-ink rounded-control ${DASHBOARD_FOCUS}`}
+                    >
+                      {item.linkLabel}
+                      <ArrowRight className="h-3.5 w-3.5 text-ink-muted" aria-hidden />
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+            <p className="text-xs text-ink-muted">
+              {SUPPORT_PAGE_COPY.faqStillStuck}{' '}
+              <button
+                type="button"
+                onClick={() => setActiveTab('ticket')}
+                className={`font-semibold text-ink-body hover:text-ink rounded-control ${DASHBOARD_FOCUS}`}
+              >
+                {SUPPORT_PAGE_COPY.faqContactLink}
+              </button>
+            </p>
           </div>
         )}
 
         {/* TAB 3: Contact support */}
         {activeTab === 'ticket' && (
-          <div className="space-y-4">
+          <section className="rounded-card border border-line-subtle bg-surface-1 p-4 sm:p-5 max-w-3xl">
             <SupportTicketForm />
-          </div>
+          </section>
         )}
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { BandStat } from '@/components/hud/BandSectionNav'
 import React, { useState } from 'react'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
@@ -27,24 +28,18 @@ export default function PipelineView() {
         accent="cyan"
         title="Progress"
         actions={
-          <div className="flex items-center gap-4">
-            <div>
-              <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">Your XP</div>
-              <div className="font-grotesk text-lg font-bold text-ink">{formatXp(xp)}</div>
-            </div>
-            <div>
-              <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">Clearance</div>
-              <div className="font-grotesk text-lg font-bold text-cyan-glow">{current.code}</div>
-            </div>
+          <div className="flex items-center gap-5">
+            <BandStat label="Your XP" value={formatXp(xp)} />
+            <BandStat label="Clearance" value={current.code} tone="cyan" />
           </div>
         }
-        toolbar={
-          <StageStrata
-            currentIndex={current.index}
-            selectedStage={selectedStage}
-            onSelectStage={setChosenStage}
-          />
-        }
+      />
+
+      {/* Stage cards are content, so they sit below the band rather than inside it. */}
+      <StageStrata
+        currentIndex={current.index}
+        selectedStage={selectedStage}
+        onSelectStage={setChosenStage}
       />
 
       <div id="pipeline-stage-details">

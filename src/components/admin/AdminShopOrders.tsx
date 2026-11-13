@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { Link } from '@tanstack/react-router'
-import { ExternalLink, Package, RefreshCw, Search } from 'lucide-react'
+import { ArrowDown, ArrowUpRight, ExternalLink, Package, RefreshCw, Search } from 'lucide-react'
+import { ADMIN_CARD, ADMIN_FIELD, AdminCardHeading, AdminSwitch, QUIET_LINK } from '@/components/admin/admin-ui'
+import { BandStat } from '@/components/hud/BandSectionNav'
+import { pillTabClass } from '@/components/ui/pillTab'
+import { cn } from '@/lib/utils'
 import { HudButton } from '@/components/ui/HudButton'
 import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
 import { mergeById } from '@/lib/pagination'
@@ -56,13 +60,6 @@ function stripeHref(order: ShopOrder) {
   if (order.stripeCheckoutSessionId) return `${base}search?query=${encodeURIComponent(order.stripeCheckoutSessionId)}`
   return null
 }
-
-const chipClass = (active: boolean) =>
-  `inline-flex min-h-[36px] items-center rounded-control border px-3 text-xs font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-    active
-      ? 'bg-cyan-soft border-cyan-glow/40 text-cyan-glow'
-      : 'bg-surface-2 border-line-subtle text-ink-muted hover:text-ink hover:border-line'
-  }`
 
 export function AdminShopOrders() {
   const toast = useOptionalToast()
@@ -133,31 +130,35 @@ export function AdminShopOrders() {
 
   const summary = payload?.summary
   return (
-    <div className="space-y-3" data-testid="admin-shop">
-      <section className="grid grid-cols-3 gap-2" aria-label="Shop summary">
-        <SummaryCard label={includeTest ? 'Paid (incl. test)' : 'Paid orders'} value={summary ? String(summary.paidOrders) : '—'} />
-        <SummaryCard label="Net revenue" value={summary ? formatMerchPrice(summary.revenueCents) : '—'} />
-        <SummaryCard
-          label="Needs attention"
-          value={summary ? String(summary.attention) : '—'}
-          tone={summary && summary.attention > 0 ? 'amber' : 'cyan'}
+    <section className={ADMIN_CARD} data-testid="admin-shop">
+      <div className="space-y-3" data-testid="admin-shop-orders">
+        <AdminCardHeading
+          icon={<Package />}
+          title="Store orders"
+          actions={
+            <>
+              <a href="#admin-store-settings" className={QUIET_LINK}>
+                Store settings <ArrowDown className="h-3.5 w-3.5 text-ink-muted" aria-hidden />
+              </a>
+              <Link to="/store" className={QUIET_LINK}>
+                Open storefront <ArrowUpRight className="h-3.5 w-3.5 text-ink-muted" aria-hidden />
+              </Link>
+            </>
+          }
         />
-      </section>
 
-      <section className="hud-sheen rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 md:p-5 space-y-3" data-testid="admin-shop-orders">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Package className="w-4 h-4 text-cyan-glow" />
-            <h2 className="font-grotesk text-sm font-bold uppercase tracking-[0.08em] text-ink">Store orders</h2>
-          </div>
-          <div className="flex flex-wrap gap-3 text-xs">
-            <a href="#admin-store-settings" className="text-cyan-glow hover:underline">Store settings and catalog</a>
-            <Link to="/store" className="text-cyan-glow hover:underline">Open storefront</Link>
-          </div>
+        <div className="flex flex-wrap gap-x-6 gap-y-2 border-y border-line-subtle py-3" role="group" aria-label="Shop summary">
+          <BandStat label={includeTest ? 'Paid (incl. test)' : 'Paid orders'} value={summary ? String(summary.paidOrders) : '—'} />
+          <BandStat label="Net revenue" value={summary ? formatMerchPrice(summary.revenueCents) : '—'} />
+          <BandStat
+            label="Needs attention"
+            value={summary ? String(summary.attention) : '—'}
+            tone={summary && summary.attention > 0 ? 'amber' : 'ink'}
+          />
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex gap-1.5" role="group" aria-label="Order filter">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <div className="flex gap-1" role="group" aria-label="Order filter">
             {FILTERS.map((item) => (
               <button
                 key={item.id}
@@ -165,29 +166,25 @@ export function AdminShopOrders() {
                 aria-pressed={filter === item.id}
                 data-testid={`shop-filter-${item.id}`}
                 onClick={() => setFilter(item.id)}
-                className={chipClass(filter === item.id)}
+                className={pillTabClass(filter === item.id)}
               >
                 {item.label}
               </button>
             ))}
           </div>
-          <label className="inline-flex items-center gap-2 text-xs text-ink-body">
-            <input
-              type="checkbox"
-              checked={includeTest}
-              onChange={(event) => setIncludeTest(event.target.checked)}
-              data-testid="shop-include-test"
-            />
-            Show test orders
+          <label className="inline-flex min-h-9 items-center gap-2 text-xs text-ink-body">
+            <AdminSwitch checked={includeTest} onChange={setIncludeTest} label="Show test orders" testId="shop-include-test" />
+            Test orders
           </label>
-          <label className="relative ml-auto w-full sm:w-64">
+          <label className="relative w-full sm:ml-auto sm:w-64">
             <span className="sr-only">Search orders</span>
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-muted" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-muted" />
             <input
+              type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Order number or email"
-              className="w-full rounded-control border border-line bg-surface-2 py-2 pl-8 pr-2 text-sm text-ink placeholder:text-ink-muted"
+              className={cn(ADMIN_FIELD, 'w-full pl-9')}
             />
           </label>
         </div>
@@ -210,7 +207,7 @@ export function AdminShopOrders() {
               const payment = shopPaymentLabel(order.paymentStatus)
               const shipping = shopShippingLabel(order)
               return (
-                <li key={order.id} className="rounded-card border border-line-subtle bg-surface-2">
+                <li key={order.id} className="rounded-card border border-line-subtle bg-surface-2 transition-colors hover:border-line">
                   <button
                     type="button"
                     aria-expanded={open}
@@ -253,8 +250,8 @@ export function AdminShopOrders() {
             onClick={() => void loadMore()}
           />
         ) : null}
-      </section>
-    </div>
+      </div>
+    </section>
   )
 }
 
@@ -312,7 +309,7 @@ function OrderDetail({
               <li key={shipment.id}>
                 {shipment.carrier || 'Carrier'} {shipment.trackingNumber}
                 {shipment.trackingUrl ? (
-                  <a className="ml-2 text-cyan-glow hover:underline" href={shipment.trackingUrl} target="_blank" rel="noreferrer">Track</a>
+                  <a className={`ml-2 ${QUIET_LINK}`} href={shipment.trackingUrl} target="_blank" rel="noreferrer">Track</a>
                 ) : null}
               </li>
             ))}
@@ -342,7 +339,7 @@ function OrderDetail({
           <ExternalButton href={`https://www.printful.com/dashboard/default/orders?order_id=${encodeURIComponent(order.printfulOrderId)}`}>Printful</ExternalButton>
         ) : null}
         {order.customerEmail ? (
-          <a className="text-cyan-glow hover:underline" href={`mailto:${order.customerEmail}?subject=${encodeURIComponent(`Your Moltology order #${orderNumber(order.id)}`)}`}>
+          <a className={QUIET_LINK} href={`mailto:${order.customerEmail}?subject=${encodeURIComponent(`Your Moltology order #${orderNumber(order.id)}`)}`}>
             Email customer
           </a>
         ) : null}
@@ -356,17 +353,8 @@ function OrderDetail({
 
 function ExternalButton({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <a className="inline-flex items-center gap-1 text-cyan-glow hover:underline" href={href} target="_blank" rel="noreferrer">
-      {children} <ExternalLink className="w-3 h-3" />
+    <a className={QUIET_LINK} href={href} target="_blank" rel="noreferrer">
+      {children} <ExternalLink className="h-3.5 w-3.5 text-ink-muted" aria-hidden />
     </a>
-  )
-}
-
-function SummaryCard({ label, value, tone = 'cyan' }: { label: string; value: string; tone?: 'cyan' | 'amber' }) {
-  return (
-    <div className="hud-sheen rounded-card border border-line-subtle bg-surface-1 p-2.5 sm:p-4">
-      <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">{label}</p>
-      <p className={`mt-1 font-grotesk text-base sm:text-xl font-bold ${tone === 'amber' ? 'text-amber-400' : 'text-cyan-glow'}`}>{value}</p>
-    </div>
   )
 }

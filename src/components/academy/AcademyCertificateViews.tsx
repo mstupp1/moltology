@@ -27,13 +27,15 @@ export function AcademyCertificateIndex({ data }: { data: AcademyHomePayload }) 
   const available = data.certificates.filter((certificate) => !certificate.earned)
   return (
     <div className="space-y-5 sm:space-y-6">
-      <HudTitlePanel
-        treatment="band"
-        eyebrow="Molt Academy"
-        title="Certificates"
-        description="A course certificate is issued when every lesson is complete. A track certificate is issued when every required course on that path is complete."
-        actions={<AcademyNav current="certificates" />}
-      />
+      <div>
+        <AcademyNav current="certificates" />
+        <HudTitlePanel
+          treatment="band"
+          joined
+          title="Certificates"
+          description="Finish every lesson for a course certificate, or every required course on a track for its certificate."
+        />
+      </div>
       <section className="space-y-3" aria-labelledby="earned-heading">
         <AcademySectionHeading
           id="earned-heading"

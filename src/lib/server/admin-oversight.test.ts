@@ -14,7 +14,8 @@ function rows(result: unknown[]) {
     leftJoin: () => typeof node
     where: () => typeof node
     orderBy: () => typeof node
-    limit: () => Promise<unknown[]>
+    limit: () => typeof node
+    offset: () => Promise<unknown[]>
     set: () => typeof node
     returning: () => Promise<unknown[]>
     then: Promise<unknown[]>['then']
@@ -23,7 +24,8 @@ function rows(result: unknown[]) {
     leftJoin: () => node,
     where: () => node,
     orderBy: () => node,
-    limit: () => promise,
+    limit: () => node,
+    offset: () => promise,
     set: () => node,
     returning: () => promise,
     then: promise.then.bind(promise),

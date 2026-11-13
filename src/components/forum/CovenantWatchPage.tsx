@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { LocalTime } from '@/components/ui/LocalTime'
 import { Link } from '@tanstack/react-router'
 import { History, RotateCcw, ShieldAlert, ShieldCheck, Trash2 } from 'lucide-react'
-import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
+import { pillTabClass } from '@/components/ui/pillTab'
 import {
   listForumReportsFn,
   reviewForumReportFn,
@@ -231,14 +231,8 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
 
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans relative" data-testid="covenant-watch">
-      <section className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 md:p-5 space-y-4">
-        <HudTitlePanel
-          treatment="integrated"
-          accent="cyan"
-          title="Covenant Watch"
-          description="Review community flags. Removed posts are hidden from the board and retained for staff review."
-        />
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line-subtle pb-3">
+      <section className="rounded-card border border-line-subtle bg-surface-1 p-4 sm:p-5 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-1.5" role="tablist" aria-label="Flag filter">
             <button
               type="button"
@@ -250,11 +244,7 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
                 setConfirmRemoveId(null)
               }}
               data-testid="covenant-watch-tab-open"
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.08em] rounded-control border-b-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                activeTab === 'open'
-                  ? 'border-cyan-glow bg-surface-2 text-ink'
-                  : 'border-transparent text-ink-muted hover:text-ink hover:bg-surface-2'
-              }`}
+              className={pillTabClass(activeTab === 'open')}
             >
               <ShieldAlert className="w-3.5 h-3.5 text-crimson-text" />
               <span>{FORUM_REPORT_COPY.watchTabOpen}</span>
@@ -269,16 +259,13 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
                 setConfirmRemoveId(null)
               }}
               data-testid="covenant-watch-tab-resolved"
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.08em] rounded-control border-b-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                activeTab === 'resolved'
-                  ? 'border-cyan-glow bg-surface-2 text-ink'
-                  : 'border-transparent text-ink-muted hover:text-ink hover:bg-surface-2'
-              }`}
+              className={pillTabClass(activeTab === 'resolved')}
             >
               <History className="w-3.5 h-3.5 text-cyan-glow" />
               <span>{FORUM_REPORT_COPY.watchTabResolved}</span>
             </button>
           </div>
+          <p className="text-xs text-ink-muted">Removed posts are hidden from the board and kept for staff review.</p>
         </div>
 
         {error && (

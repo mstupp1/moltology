@@ -6,8 +6,11 @@ import { formatMerchPrice } from '@/lib/merch'
 import { storeCouponLabel, type StoreCouponView } from '@/lib/store-coupons'
 import { HudButton } from '@/components/ui/HudButton'
 import { useToast } from '@/components/ui/ToastProvider'
+import { Ticket } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { ADMIN_CARD, ADMIN_FIELD, ADMIN_LABEL, AdminCardHeading } from './admin-ui'
 
-const FIELD = 'block w-full bg-surface-2 border border-line p-2'
+const FIELD = cn(ADMIN_FIELD, 'mt-1 block w-full')
 const EMPTY = { code: '', kind: 'percent' as 'percent' | 'amount', value: '', expiresAt: '', maxRedemptions: '', minimum: '', oncePerEmail: true }
 
 function usage(coupon: StoreCouponView): string {
@@ -64,27 +67,28 @@ export function AdminStoreCoupons() {
   }
 
   return (
-    <section className="chitin-card p-3 sm:p-4 md:p-5 rounded-card shadow-2xl space-y-4" aria-labelledby="store-coupons-heading">
-      <div className="space-y-1">
-        <h2 id="store-coupons-heading" className="font-grotesk text-sm font-bold tracking-wider uppercase">Promo codes</h2>
-        <p className="text-sm text-ink-body">Codes take money off the items, never shipping or tax. Shoppers enter them before paying. Test-mode codes only work with test payments, so make them again for live.</p>
-      </div>
+    <section className={ADMIN_CARD} aria-labelledby="store-coupons-heading">
+      <AdminCardHeading
+        icon={<Ticket />}
+        title={<span id="store-coupons-heading">Promo codes</span>}
+        description="Codes take money off the items, never shipping or tax. Shoppers enter them before paying. Test-mode codes only work with test payments, so make them again for live."
+      />
 
       <form className="grid gap-3 sm:grid-cols-2" onSubmit={e => { e.preventDefault(); void create() }}>
-        <label>Code<input required className={`${FIELD} uppercase`} maxLength={32} placeholder="LAUNCH15" value={form.code} onChange={e => setForm({ ...form, code: e.target.value })} /></label>
+        <label className="block"><span className={ADMIN_LABEL}>Code</span><input required className={`${FIELD} uppercase`} maxLength={32} placeholder="LAUNCH15" value={form.code} onChange={e => setForm({ ...form, code: e.target.value })} /></label>
         <div className="grid grid-cols-[auto_1fr] gap-2">
-          <label>Type<select className={FIELD} value={form.kind} onChange={e => setForm({ ...form, kind: e.target.value as 'percent' | 'amount' })}><option value="percent">Percent off</option><option value="amount">Dollars off</option></select></label>
-          <label>{form.kind === 'percent' ? 'Percent' : 'Dollars'}<input required type="number" min={form.kind === 'percent' ? 1 : 0.01} max={form.kind === 'percent' ? 100 : 1000} step={form.kind === 'percent' ? 1 : 0.01} className={FIELD} value={form.value} onChange={e => setForm({ ...form, value: e.target.value })} /></label>
+          <label className="block"><span className={ADMIN_LABEL}>Type</span><select className={FIELD} value={form.kind} onChange={e => setForm({ ...form, kind: e.target.value as 'percent' | 'amount' })}><option value="percent">Percent off</option><option value="amount">Dollars off</option></select></label>
+          <label className="block"><span className={ADMIN_LABEL}>{form.kind === 'percent' ? 'Percent' : 'Dollars'}</span><input required type="number" min={form.kind === 'percent' ? 1 : 0.01} max={form.kind === 'percent' ? 100 : 1000} step={form.kind === 'percent' ? 1 : 0.01} className={FIELD} value={form.value} onChange={e => setForm({ ...form, value: e.target.value })} /></label>
         </div>
-        <label>Expires after (optional)<input type="date" className={FIELD} value={form.expiresAt} onChange={e => setForm({ ...form, expiresAt: e.target.value })} /></label>
-        <label>Total uses (optional)<input type="number" min={1} step={1} className={FIELD} value={form.maxRedemptions} onChange={e => setForm({ ...form, maxRedemptions: e.target.value })} /></label>
-        <label>Minimum order in dollars (optional)<input type="number" min={0} step={0.01} className={FIELD} value={form.minimum} onChange={e => setForm({ ...form, minimum: e.target.value })} /></label>
-        <label className="flex items-center gap-2 self-end pb-2"><input type="checkbox" checked={form.oncePerEmail} onChange={e => setForm({ ...form, oncePerEmail: e.target.checked })} /> One use per email</label>
+        <label className="block"><span className={ADMIN_LABEL}>Expires after (optional)</span><input type="date" className={FIELD} value={form.expiresAt} onChange={e => setForm({ ...form, expiresAt: e.target.value })} /></label>
+        <label className="block"><span className={ADMIN_LABEL}>Total uses (optional)</span><input type="number" min={1} step={1} className={FIELD} value={form.maxRedemptions} onChange={e => setForm({ ...form, maxRedemptions: e.target.value })} /></label>
+        <label className="block"><span className={ADMIN_LABEL}>Minimum order in dollars (optional)</span><input type="number" min={0} step={0.01} className={FIELD} value={form.minimum} onChange={e => setForm({ ...form, minimum: e.target.value })} /></label>
+        <label className="flex min-h-10 items-center gap-2 self-end text-sm text-ink-body"><input type="checkbox" className="h-4 w-4 accent-cyan-glow" checked={form.oncePerEmail} onChange={e => setForm({ ...form, oncePerEmail: e.target.checked })} /> One use per email</label>
         <div className="sm:col-span-2"><HudButton type="submit" disabled={busy}>Create code</HudButton></div>
       </form>
 
       {loadError ? <p className="text-sm text-crimson-text" role="alert">{loadError}</p> : null}
-      {coupons && coupons.length === 0 ? <p className="text-sm text-ink-muted">No promo codes yet.</p> : null}
+      {coupons && coupons.length === 0 ? <p className="text-xs text-ink-muted">No promo codes yet.</p> : null}
       {coupons && coupons.length > 0 ? (
         <ul className="divide-y divide-line-subtle border-y border-line-subtle" data-testid="store-coupon-list">
           {coupons.map(coupon => (

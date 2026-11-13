@@ -58,7 +58,7 @@ export default function SupportTicketForm() {
     return (
       <div className="space-y-4" data-testid="support-ticket-guest">
         <div className="bg-surface-2 border border-line-subtle p-6 rounded-card text-center space-y-3">
-          <Mail className="w-8 h-8 text-cyan-glow mx-auto" aria-hidden="true" />
+          <Mail className="w-8 h-8 text-ink-muted mx-auto" aria-hidden="true" />
           <h3 className="font-grotesk text-sm font-bold text-ink uppercase tracking-wider">
             {SUPPORT_TICKET_COPY.guestTitle}
           </h3>
@@ -68,7 +68,7 @@ export default function SupportTicketForm() {
           <p>
             <a
               href={`mailto:${SUPPORT_INBOX}`}
-              className="text-sm font-semibold text-cyan-glow hover:text-ink underline underline-offset-4 rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="text-sm font-semibold text-ink hover:text-cyan-glow rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               {SUPPORT_INBOX}
             </a>
@@ -171,7 +171,7 @@ export default function SupportTicketForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="relative space-y-4 max-w-2xl" data-testid="support-ticket-form">
+    <form onSubmit={handleSubmit} className="relative space-y-4" data-testid="support-ticket-form">
       <p className="text-xs text-ink-muted leading-relaxed">{SUPPORT_TICKET_COPY.formHint}</p>
 
       <div className="space-y-2">
