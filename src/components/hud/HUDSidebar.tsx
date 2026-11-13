@@ -46,7 +46,7 @@ import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 const MOBILE_TAB_IDS = ['hub', 'oracle', 'character', 'forum']
 const MOBILE_MORE_IDS = ['codex', 'academy']
 
-const GUEST_LOCKED_PATHS = new Set(['/character', '/member', '/profile'])
+const GUEST_LOCKED_PATHS = new Set(['/member', '/profile'])
 
 export function computeNavItemHidden(
   item: { path: string; featureFlag?: FeatureFlagId },

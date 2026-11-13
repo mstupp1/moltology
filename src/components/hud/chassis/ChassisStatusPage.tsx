@@ -1,7 +1,8 @@
 import { Link } from '@tanstack/react-router'
 import { GearIcon } from '@/components/hud/avatar3d/GearIcon'
 import React, { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
-import { Dices } from 'lucide-react'
+import { Dices, UserPlus } from 'lucide-react'
+import { AuthModal } from '@/components/AuthModal'
 import { HudWorkspaceGhost } from '../HudGhostSkeletons'
 import { HudButton } from '@/components/ui/HudButton'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
@@ -11,6 +12,7 @@ import { getAuthJWTToken } from '@/lib/jwt'
 import { getChassisLoadoutFn, saveCharacterFn } from '@/lib/server/api'
 import {
   LOBSTER_AVATAR_STYLE,
+  lockAvatarConfig,
   rerollAvatarConfig,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
@@ -42,6 +44,8 @@ import { GearDetail } from './GearDetail'
 import { BonusChange } from './VectorSheetPanel'
 import { StatHud } from './StatHud'
 import { buildVectorSheet, resolveVectorBase } from '@/lib/vectors'
+import { readGuestCharacter, saveGuestCharacter } from '@/lib/guest-character'
+import { GUEST_CHARACTER_CLAIMED_EVENT } from '@/lib/guest-character-key'
 import '../avatar-animations.css'
 
 const TABS = ['equipment', 'body', 'shell', 'face', 'scene'] as const
@@ -73,9 +77,12 @@ function useWideLayout() {
   )
 }
 
-/** One local draft of the character. Only owned pieces are listed; trying on new ones happens in the shop. */
+/**
+ * One local draft of the character. Only owned pieces are listed; trying on new ones happens in the shop.
+ * Guests edit the starter character; their draft stays in this browser and saving asks them to sign up.
+ */
 export const ChassisStatusPage: React.FC = () => {
-  const { userId } = useAuthSession()
+  const { userId, isGuest, isPending } = useAuthSession()
   const toast = useOptionalToast()?.toast
   const persist = useHudPersist()
   const wide = useWideLayout()
@@ -95,6 +102,8 @@ export const ChassisStatusPage: React.FC = () => {
   const draftTouched = useRef(false)
   const canonicalRevision = useRef(0)
   const [reload, setReload] = useState(0)
+  const [authOpen, setAuthOpen] = useState(false)
+  const [guestEdited, setGuestEdited] = useState(false)
   const baseConfig = (payload: ChassisLoadoutPayload): LobsterAvatarConfig =>
     payload.config ?? {
       style: LOBSTER_AVATAR_STYLE,
@@ -114,6 +123,28 @@ export const ChassisStatusPage: React.FC = () => {
     let cancelled = false
     setError(null)
     setSelected(null)
+    draftTouched.current = false
+    if (isPending) return
+    if (isGuest) {
+      void (async () => {
+        try {
+          const payload = await getChassisLoadoutFn({ data: {} })
+          if (cancelled) return
+          const stored = readGuestCharacter()
+          accept({
+            ...payload,
+            config: stored.config ?? lockAvatarConfig(rerollAvatarConfig({ race: 'lobster' })),
+          })
+          if (stored.items) setItems(stored.items)
+          setGuestEdited(Boolean(stored.config || stored.items))
+        } catch (e) {
+          if (!cancelled) setError(e instanceof Error ? e.message : 'Could not load the character.')
+        }
+      })()
+      return () => {
+        cancelled = true
+      }
+    }
     const cache = userId ? getCachedChassisLoadout(userId) : null
     if (cache) accept(cache)
     else {
@@ -142,7 +173,19 @@ export const ChassisStatusPage: React.FC = () => {
     return () => {
       cancelled = true
     }
-  }, [userId, reload])
+  }, [userId, isGuest, isPending, reload])
+  // A character made as a guest was just saved to this account: show the saved one.
+  useEffect(() => {
+    const onClaimed = () => setReload((n) => n + 1)
+    window.addEventListener(GUEST_CHARACTER_CLAIMED_EVENT, onClaimed)
+    return () => window.removeEventListener(GUEST_CHARACTER_CLAIMED_EVENT, onClaimed)
+  }, [])
+  // Guests keep their draft in this browser, so it survives leaving and coming back.
+  useEffect(() => {
+    if (!isGuest || !config || !draftTouched.current) return
+    saveGuestCharacter(config, items)
+    setGuestEdited(true)
+  }, [isGuest, config, items])
   const catalog = saved?.catalog ?? []
   const catalogById = useMemo(() => new Map(catalog.map((c) => [c.id, c])), [catalog])
   const equipped = useMemo(() => equipmentAppearance(items, catalog), [items, catalog])
@@ -234,6 +277,11 @@ export const ChassisStatusPage: React.FC = () => {
     }
   }
   const save = async () => {
+    if (isGuest) {
+      if (config) saveGuestCharacter(config, items)
+      setAuthOpen(true)
+      return
+    }
     if (!config || !saved || !userId || saving) return
     setSaving(true)
     persist.begin('character')
@@ -358,13 +406,22 @@ export const ChassisStatusPage: React.FC = () => {
               size="sm"
               variant="secondary"
               disabled={saving || !dirty}
-              onClick={() => accept(saved)}
+              onClick={() => {
+                accept(saved)
+                if (isGuest && saved.config) saveGuestCharacter(saved.config, saved.items)
+              }}
             >
               Discard
             </HudButton>
-            <HudButton size="sm" disabled={saving || !dirty} onClick={() => void save()}>
-              {saving ? 'Saving…' : 'Save changes'}
-            </HudButton>
+            {isGuest ? (
+              <HudButton size="sm" onClick={() => void save()} icon={<UserPlus className="w-3.5 h-3.5" />}>
+                Save my character
+              </HudButton>
+            ) : (
+              <HudButton size="sm" disabled={saving || !dirty} onClick={() => void save()}>
+                {saving ? 'Saving…' : 'Save changes'}
+              </HudButton>
+            )}
           </div>
         </div>
         <div className="lg:row-start-2 lg:sticky lg:top-6 lg:self-start space-y-3">
@@ -415,6 +472,19 @@ export const ChassisStatusPage: React.FC = () => {
         {wide && (
           <div className="sticky -top-6 z-10 -mx-5 -mt-5 px-5 pt-5 pb-2 rounded-t-card bg-abyss/95 backdrop-blur-md">
             {tabBar}
+          </div>
+        )}
+        {isGuest && guestEdited && (
+          <div
+            className="flex items-center justify-between gap-3 rounded-control border border-line-subtle bg-surface-2 px-3 py-2"
+            data-testid="guest-character-strip"
+          >
+            <p className="text-xs sm:text-[13px] text-ink-body">
+              Your character is only saved on this device. Create a free account to keep it.
+            </p>
+            <HudButton size="sm" variant="secondary" className="shrink-0" onClick={() => setAuthOpen(true)}>
+              Sign up
+            </HudButton>
           </div>
         )}
         {error && (
@@ -528,6 +598,15 @@ export const ChassisStatusPage: React.FC = () => {
           )}
         </div>
       </div>
+      {isGuest && (
+        <AuthModal
+          isOpen={authOpen}
+          initialMode="signup"
+          subtitle="Create a free account to keep your character"
+          onClose={() => setAuthOpen(false)}
+          onSuccess={() => setAuthOpen(false)}
+        />
+      )}
     </div>
   )
 }
