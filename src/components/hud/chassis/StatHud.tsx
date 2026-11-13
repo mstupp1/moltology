@@ -84,7 +84,7 @@ function StatGuide({
       <div className="flex items-center gap-3">
         <RatingHex value={sheet.rating.total} />
         <div className="min-w-0">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-glow">Moltmax rating</div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-glow">Moltmax rating</div>
           <div className="font-grotesk text-lg font-bold text-ink tabular-nums leading-tight">
             {sheet.rating.total}{' '}
             <span className="text-sm font-semibold text-ink-muted">
@@ -125,7 +125,7 @@ function StatGuide({
               <div className="flex items-baseline justify-between gap-3">
                 <div className="min-w-0">
                   <span className="text-[13px] font-bold text-ink">{meta.label}</span>
-                  <span className="ml-2 text-[10px] font-bold tracking-[0.14em] text-ink-muted">{meta.short}</span>
+                  <span className="ml-2 text-[11px] font-bold tracking-[0.14em] text-ink-muted">{meta.short}</span>
                 </div>
                 <div className="shrink-0 tabular-nums text-[13px]">
                   <span className="font-bold text-ink">{base}</span>{' '}
@@ -210,12 +210,12 @@ export const StatHud: React.FC<StatHudProps> = ({ sheet, preview, variant, class
       <div className={`stat-hud stat-hud-rail ${className}`} data-testid="stat-hud">
         <button
           type="button"
-          className="stat-hud-cell flex items-baseline justify-between w-full px-1.5 pt-1 pb-1"
+          className="stat-hud-cell flex items-baseline justify-between w-full px-1.5 pt-1 pb-0.5 leading-none"
           aria-label={`Moltmax rating ${sheet.rating.total}. Show what the stats mean`}
           aria-haspopup="dialog"
           onClick={() => show(null)}
         >
-          <span className="inline-flex items-center gap-0.5 text-[8px] font-bold tracking-[0.1em] text-cyan-glow">
+          <span className="inline-flex items-center gap-0.5 text-[11px] font-bold tracking-[0.02em] text-cyan-glow">
             MAX
             <Info className="w-2.5 h-2.5" aria-hidden="true" />
           </span>
@@ -231,16 +231,16 @@ export const StatHud: React.FC<StatHudProps> = ({ sheet, preview, variant, class
             <button
               key={k}
               type="button"
-              className="stat-hud-cell block w-full px-1.5 pt-[3px] pb-1 border-t border-line-subtle text-left"
+              className="stat-hud-cell block w-full px-1.5 pt-0.5 pb-[3px] leading-none border-t border-line-subtle text-left"
               aria-label={`${meta.label} ${sheet.total[k]}: ${meta.description} Show what the stats mean`}
               aria-haspopup="dialog"
               data-testid={`stat-hud-${k}`}
               onClick={() => show(k)}
             >
               <span className="flex items-baseline justify-between">
-                <span className="text-[9px] font-bold tracking-[0.1em] text-ink-muted">{meta.short}</span>
+                <span className="text-[11px] font-bold tracking-[0.1em] text-ink-muted">{meta.short}</span>
                 <span className="text-[11px] leading-[14px] font-bold text-ink tabular-nums">
-                  {next !== gear ? <Delta from={gear} to={next} className="text-[9px] mr-0.5" /> : null}
+                  {next !== gear ? <Delta from={gear} to={next} className="text-[11px] mr-0.5" /> : null}
                   {sheet.total[k]}
                 </span>
               </span>
@@ -292,14 +292,14 @@ export const StatHud: React.FC<StatHudProps> = ({ sheet, preview, variant, class
         >
           <RatingHex value={sheet.rating.total} size="sm" />
           <span className="text-left">
-            <span className="block text-[10px] font-bold tracking-[0.14em] text-cyan-glow">MOLTMAX</span>
+            <span className="block text-[11px] font-bold tracking-[0.14em] text-cyan-glow">MOLTMAX</span>
             <span className="block text-[11px] tabular-nums">
               <span className={sheet.rating.gear > 0 ? 'text-cyan-glow font-semibold' : 'text-ink-muted'}>
                 {formatBonus(sheet.rating.gear)} gear
               </span>
               {nextRating !== null && <Delta from={sheet.rating.total} to={nextRating} className="ml-1" />}
             </span>
-            <span className="block text-[10px] text-ink-muted group-hover:text-ink">What&apos;s this?</span>
+            <span className="block text-[11px] text-ink-muted group-hover:text-ink">What&apos;s this?</span>
           </span>
         </button>
         {VECTOR_KEYS.map((k) => {
@@ -325,7 +325,7 @@ export const StatHud: React.FC<StatHudProps> = ({ sheet, preview, variant, class
               <span className="mt-1.5 block">
                 <Segments base={base} gear={gear} next={next} />
               </span>
-              <span className="flex items-center justify-between gap-1 mt-1 h-3.5 text-[10px] tabular-nums">
+              <span className="flex items-center justify-between gap-1 mt-1 h-3.5 text-[11px] tabular-nums">
                 <span className="tracking-[0.14em] font-bold text-ink-muted">{meta.short}</span>
                 <span className="truncate">
                   <span className={gear > 0 ? 'text-cyan-glow font-semibold' : 'text-ink-muted'}>{formatBonus(gear)} gear</span>

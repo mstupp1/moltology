@@ -401,7 +401,7 @@ export const ChassisStatusPage: React.FC = () => {
                   variant="rail"
                   sheet={sheet}
                   preview={statPreview}
-                  className="absolute left-0 top-11 w-[72px] max-[379px]:w-[64px]"
+                  className="absolute left-0 top-10 w-[72px] max-[379px]:w-[64px]"
                 />
               )}
             </div>
