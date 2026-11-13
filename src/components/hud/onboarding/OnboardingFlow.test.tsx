@@ -81,6 +81,12 @@ describe('OnboardingFlow', () => {
 
     next()
     expect(screen.getByRole('heading', { name: "What's here" })).toBeInTheDocument()
+    // The tour matches the app nav and explains the ring around the member's picture.
+    for (const place of ['Dashboard', 'Oracle', 'Character', 'Forum', 'Codex and Academy']) {
+      expect(screen.getByRole('heading', { name: place })).toBeInTheDocument()
+    }
+    expect(screen.queryByText(/sidebar/i)).toBeNull()
+    expect(screen.getByTestId('tour-daily-tasks')).toHaveTextContent(/around your picture/)
     next()
     expect(screen.getByRole('heading', { name: 'Pick a username' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled()
@@ -146,8 +152,10 @@ describe('OnboardingFlow', () => {
   it('skips the username step for guests and ends on a free account offer', async () => {
     guest()
     const { onDismiss } = renderFlow({ userName: 'Guest' })
+    expect(screen.queryByText(/username/i)).toBeNull()
 
     next()
+    expect(screen.getByTestId('tour-daily-tasks')).toHaveTextContent('0/8')
     next()
     expect(screen.getByRole('heading', { name: 'Make your character' })).toBeInTheDocument()
     next()

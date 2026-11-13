@@ -1,6 +1,6 @@
 import { STARTER_CHARACTER_EQUIPMENT } from '@/lib/avatar/starter-equipment'
 import React from 'react'
-import { Atom, BookOpen, LayoutDashboard, Users } from 'lucide-react'
+import { Atom, BookOpen, LayoutDashboard, MessagesSquare, Shell, Sparkles } from 'lucide-react'
 import { BrandIcon3D } from '@/components/ui/BrandIcon3D'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import { parseMemberHandle } from '@/lib/member-handle'
@@ -52,7 +52,7 @@ function StepHeading({ id, title, children }: { id: string; title: string; child
   )
 }
 
-function WelcomeStep({ firstName, headingId }: OnboardingStepProps) {
+function WelcomeStep({ firstName, isGuest, headingId }: OnboardingStepProps) {
   return (
     <div className="max-w-md mx-auto w-full flex flex-col items-center text-center gap-6 py-4">
       <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full flex items-center justify-center border border-line bg-surface-2 hud-sheen shadow-menu">
@@ -62,55 +62,86 @@ function WelcomeStep({ firstName, headingId }: OnboardingStepProps) {
         Moltology helps you shed the noise of always-online life, one small habit at a time.
       </StepHeading>
       <p className="font-sans text-sm text-ink-muted leading-relaxed">
-        This takes about a minute. We will show you around, then you will pick a username and make your character.
+        {isGuest
+          ? 'This takes about a minute. We will show you around, then you can make a character. No account needed to look around.'
+          : 'This takes about a minute. We will show you around, then you will pick a username and make your character.'}
       </p>
     </div>
   )
 }
 
+/** The places in the app nav, in the same order as the phone bottom bar and desktop rail. */
 const TOUR = [
   {
     id: 'dashboard',
     icon: LayoutDashboard,
     title: 'Dashboard',
-    body: 'Your day at a glance: a few small tasks, the lesson you are on, and your streak.',
+    body: 'Your day at a glance.',
   },
   {
     id: 'oracle',
     icon: Atom,
     title: 'Oracle',
-    body: 'Ask when you are stuck. It helps you find a first step and plan a routine.',
+    body: 'Ask for help when you are stuck.',
+  },
+  {
+    id: 'character',
+    icon: Shell,
+    title: 'Character',
+    body: 'Your lobster or crab, gear and stats.',
+  },
+  {
+    id: 'forum',
+    icon: MessagesSquare,
+    title: 'Forum',
+    body: 'Talk with other members.',
   },
   {
     id: 'learn',
     icon: BookOpen,
-    title: 'Academy and Codex',
-    body: 'Short courses and the core texts, read at your own pace.',
-  },
-  {
-    id: 'forum',
-    icon: Users,
-    title: 'Forum',
-    body: 'Share progress, ask questions, and borrow routines from other members.',
+    title: 'Codex and Academy',
+    // Phones keep these two under More in the bottom bar; desktop lists them in the rail.
+    body: 'The core texts and short courses.',
+    phoneBody: 'Texts and courses, under More.',
   },
 ] as const
 
-function TourStep({ headingId }: OnboardingStepProps) {
+function TourStep({ isGuest, headingId }: OnboardingStepProps) {
+  const card = 'rounded-card border border-line-subtle bg-surface-2 hud-sheen p-3 sm:p-4 flex gap-3'
   return (
     <div className="max-w-xl mx-auto w-full space-y-5">
-      <StepHeading id={headingId} title="What's here">
-        Everything lives in the sidebar. These are the places most members start.
-      </StepHeading>
-      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {TOUR.map(({ id, icon: Icon, title, body }) => (
-          <li key={id} className="rounded-card border border-line-subtle bg-surface-2 hud-sheen p-4 flex gap-3">
-            <Icon className="w-5 h-5 shrink-0 text-cyan-glow mt-0.5" aria-hidden="true" />
-            <div className="min-w-0">
-              <h3 className="font-sans text-sm font-semibold text-ink">{title}</h3>
-              <p className="font-sans text-xs text-ink-muted leading-relaxed mt-1">{body}</p>
-            </div>
-          </li>
-        ))}
+      <StepHeading id={headingId} title="What's here" />
+      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+        {TOUR.map((item) => {
+          const Icon = item.icon
+          return (
+            <li key={item.id} className={card}>
+              <Icon className="w-5 h-5 shrink-0 text-cyan-glow mt-0.5" aria-hidden="true" />
+              <div className="min-w-0">
+                <h3 className="font-sans text-sm font-semibold text-ink">{item.title}</h3>
+                {'phoneBody' in item ? (
+                  <p className="font-sans text-xs text-ink-muted leading-relaxed mt-1">
+                    <span className="md:hidden">{item.phoneBody}</span>
+                    <span className="hidden md:inline">{item.body}</span>
+                  </p>
+                ) : (
+                  <p className="font-sans text-xs text-ink-muted leading-relaxed mt-1">{item.body}</p>
+                )}
+              </div>
+            </li>
+          )
+        })}
+        <li className={card} data-testid="tour-daily-tasks">
+          <Sparkles className="w-5 h-5 shrink-0 text-cyan-glow mt-0.5" aria-hidden="true" />
+          <div className="min-w-0">
+            <h3 className="font-sans text-sm font-semibold text-ink">Today&rsquo;s tasks</h3>
+            <p className="font-sans text-xs text-ink-muted leading-relaxed mt-1">
+              {isGuest
+                ? 'Eight a day, from the 0/8 button up top.'
+                : 'Eight a day. Gold marks around your picture fill as you go.'}
+            </p>
+          </div>
+        </li>
       </ul>
     </div>
   )
@@ -119,9 +150,7 @@ function TourStep({ headingId }: OnboardingStepProps) {
 function CharacterStep({ draft, update, busy, headingId }: OnboardingStepProps) {
   return (
     <div className="w-full space-y-4">
-      <StepHeading id={headingId} title="Make your character">
-        Pick a lobster or a crab. Your basic equipment is included. Change your look any time in the character studio.
-      </StepHeading>
+      <StepHeading id={headingId} title="Make your character" />
       <div className="grid grid-cols-1 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-4 md:gap-6 items-start">
         <AvatarCreatorPreview config={{...draft.config,equipment:STARTER_CHARACTER_EQUIPMENT}} className="max-w-[180px] md:max-w-none mx-auto md:sticky md:top-0" />
         <AvatarCreatorPanel value={draft.config} onChange={(config) => update({ config })} disabled={busy} />

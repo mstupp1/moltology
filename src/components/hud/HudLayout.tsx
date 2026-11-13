@@ -193,8 +193,13 @@ function HudContent() {
       {/* Experimental Navigation Command Palette */}
       <CommandPalette />
 
-      {/* Main Full-Height Layout with Sidebar extending to the top of screen */}
-      <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden relative pt-[env(safe-area-inset-top,0px)]">
+      {/* Main Full-Height Layout with Sidebar extending to the top of screen.
+          Inert while the welcome flow is open, so the phone bottom bar and page can't be tapped or tabbed to. */}
+      <div
+        inert={showWelcome || undefined}
+        data-testid="hud-main-layout"
+        className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden relative pt-[env(safe-area-inset-top,0px)]"
+      >
         {/* Full Height Glassmorphic Sidebar spanning top-to-bottom (hidden in main-only mode) */}
         {!isMainOnly && <HUDSidebar />}
 

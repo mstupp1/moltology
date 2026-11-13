@@ -54,6 +54,23 @@ describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
     expect(screen.getByRole('dialog', { name: 'Welcome to Moltology' })).toBeInTheDocument()
   })
 
+  it('sits outside the hub layout and makes it inert, so the phone bottom bar cannot cover or steal taps', () => {
+    renderHud()
+
+    const flow = screen.getByTestId('onboarding-flow')
+    const layout = screen.getByTestId('hud-main-layout')
+    expect(layout.contains(flow)).toBe(false)
+    expect(layout).toHaveAttribute('inert')
+    const bar = screen.queryByTestId('mobile-tab-bar')
+    if (bar) expect(layout.contains(bar)).toBe(true)
+
+    fireEvent.click(screen.getByRole('button', { name: /close/i }))
+    act(() => {
+      vi.advanceTimersByTime(550)
+    })
+    expect(screen.getByTestId('hud-main-layout')).not.toHaveAttribute('inert')
+  })
+
   it('dismisses welcome popup for guest demo mode and sets localStorage key', () => {
     renderHud()
 
