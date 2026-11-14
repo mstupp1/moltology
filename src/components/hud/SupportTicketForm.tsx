@@ -10,18 +10,12 @@ import { getAuthJWTToken } from '@/lib/jwt'
 import { createSupportTicketFn } from '@/lib/server/api'
 import {
   SUPPORT_TICKET_BODY_MAX,
-  SUPPORT_TICKET_CATEGORIES,
-  SUPPORT_TICKET_CATEGORY_LABELS,
   SUPPORT_TICKET_COPY,
   SUPPORT_INBOX,
   SUPPORT_TICKET_HONEYPOT_FIELD,
   SUPPORT_TICKET_TURNSTILE_ACTION,
-  SUPPORT_TICKET_URGENCIES,
-  SUPPORT_TICKET_URGENCY_LABELS,
   formatSupportTicketReference,
-  validateSupportTicketFields,
-  type SupportTicketCategoryId,
-  type SupportTicketUrgencyId,
+  validateSupportTicketBody,
 } from '@/lib/support-tickets'
 
 const fieldClass =
@@ -32,9 +26,6 @@ export default function SupportTicketForm() {
   const toast = useOptionalToast()?.toast
   const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
 
-  const [subject, setSubject] = useState('')
-  const [category, setCategory] = useState<SupportTicketCategoryId>('ACCOUNT')
-  const [urgency, setUrgency] = useState<SupportTicketUrgencyId>('NORMAL')
   const [body, setBody] = useState('')
   const [honeypot, setHoneypot] = useState('')
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
@@ -101,7 +92,7 @@ export default function SupportTicketForm() {
     event.preventDefault()
     setErrorMessage(null)
 
-    const validated = validateSupportTicketFields({ subject, body })
+    const validated = validateSupportTicketBody(body)
     if (!validated.ok) {
       setErrorMessage(validated.error)
       return
@@ -117,10 +108,7 @@ export default function SupportTicketForm() {
       const token = await getAuthJWTToken()
       const result = await createSupportTicketFn({
         data: {
-          subject: validated.subject,
           body: validated.body,
-          category,
-          urgency,
           turnstileToken,
           [SUPPORT_TICKET_HONEYPOT_FIELD]: honeypot,
           userId: session.userId ?? undefined,
@@ -130,7 +118,6 @@ export default function SupportTicketForm() {
 
       setReceived(true)
       setTicketReference(result?.ticketReference ? formatSupportTicketReference(result.ticketReference) : null)
-      setSubject('')
       setBody('')
       setTurnstileToken(null)
       turnstileRef.current?.reset()
@@ -175,72 +162,27 @@ export default function SupportTicketForm() {
       <p className="text-xs text-ink-muted leading-relaxed">{SUPPORT_TICKET_COPY.formHint}</p>
 
       <div className="space-y-2">
-        <label className="text-xs text-ink-muted font-bold block" htmlFor="support-ticket-subject">
-          {SUPPORT_TICKET_COPY.subjectLabel}
-        </label>
-        <input
-          id="support-ticket-subject"
-          type="text"
-          required
-          maxLength={160}
-          placeholder={SUPPORT_TICKET_COPY.subjectPlaceholder}
-          value={subject}
-          onChange={(event) => setSubject(event.target.value)}
-          className={fieldClass}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div className="space-y-2">
-          <label className="text-xs text-ink-muted font-bold block" htmlFor="support-ticket-category">
-            {SUPPORT_TICKET_COPY.categoryLabel}
-          </label>
-          <select
-            id="support-ticket-category"
-            value={category}
-            onChange={(event) => setCategory(event.target.value as SupportTicketCategoryId)}
-            className={fieldClass}
-          >
-            {SUPPORT_TICKET_CATEGORIES.map((id) => (
-              <option key={id} value={id}>
-                {SUPPORT_TICKET_CATEGORY_LABELS[id]}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="space-y-2">
-          <label className="text-xs text-ink-muted font-bold block" htmlFor="support-ticket-urgency">
-            {SUPPORT_TICKET_COPY.urgencyLabel}
-          </label>
-          <select
-            id="support-ticket-urgency"
-            value={urgency}
-            onChange={(event) => setUrgency(event.target.value as SupportTicketUrgencyId)}
-            className={fieldClass}
-          >
-            {SUPPORT_TICKET_URGENCIES.map((id) => (
-              <option key={id} value={id}>
-                {SUPPORT_TICKET_URGENCY_LABELS[id]}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="space-y-2">
         <label className="text-xs text-ink-muted font-bold block" htmlFor="support-ticket-body">
           {SUPPORT_TICKET_COPY.bodyLabel}
         </label>
         <textarea
           id="support-ticket-body"
           required
-          rows={5}
+          rows={6}
           maxLength={SUPPORT_TICKET_BODY_MAX}
+          aria-describedby="support-ticket-counter"
           placeholder={SUPPORT_TICKET_COPY.bodyPlaceholder}
           value={body}
           onChange={(event) => setBody(event.target.value)}
           className={`${fieldClass} resize-y`}
         />
+        <p
+          id="support-ticket-counter"
+          className={`text-right text-[11px] tabular-nums ${body.length >= SUPPORT_TICKET_BODY_MAX ? 'text-crimson-text' : 'text-ink-muted'}`}
+          data-testid="support-ticket-counter"
+        >
+          {SUPPORT_TICKET_COPY.counter(body.length, SUPPORT_TICKET_BODY_MAX)}
+        </p>
       </div>
 
       <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">

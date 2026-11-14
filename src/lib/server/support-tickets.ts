@@ -12,24 +12,18 @@ import {
   SUPPORT_TICKET_IP_LIMIT,
   SUPPORT_TICKET_MEMBER_LIMIT,
   SUPPORT_TICKET_RATE_WINDOW_MS,
-  SUPPORT_TICKET_SUBJECT_MAX,
-  SUPPORT_TICKET_SUBJECT_MIN,
   SUPPORT_TICKET_TURNSTILE_ACTION,
   formatSupportTicketReference,
   isSupportTicketHoneypotTriggered,
-  parseSupportTicketCategory,
-  parseSupportTicketUrgency,
-  validateSupportTicketFields,
+  validateSupportTicketBody,
 } from '../support-tickets'
 import { sendSupportTicketEmail } from './mail'
+import { triageSupportTicket, type SupportTriageDeps } from './support-triage'
 import { verifyTurnstileToken } from './turnstile'
 import { resolveWriteAuth } from './write-auth'
 
 export const createSupportTicketSchema = z.object({
-  subject: z.string().min(1).max(SUPPORT_TICKET_SUBJECT_MAX + 64),
   body: z.string().min(1).max(SUPPORT_TICKET_BODY_MAX + 256),
-  category: z.string().max(64).optional(),
-  urgency: z.string().max(32).optional(),
   turnstileToken: z.string().optional(),
   [SUPPORT_TICKET_HONEYPOT_FIELD]: z.string().optional(),
   to: z.string().optional(),
@@ -55,6 +49,8 @@ interface ServerFnArgs<TData = CreateSupportTicketInput> {
     db?: any
     clientIp?: string | null
   }
+  /** Test seam for the Laya and summary calls. */
+  triage?: SupportTriageDeps
 }
 
 export function hashClientIp(ip: string | null | undefined): string | null {
@@ -91,10 +87,7 @@ export async function createSupportTicketHandler(
     throw new Error(SUPPORT_TICKET_COPY.unauthenticated)
   }
 
-  const validated = validateSupportTicketFields({
-    subject: data.subject,
-    body: data.body,
-  })
+  const validated = validateSupportTicketBody(data.body)
   if (!validated.ok) {
     throw new Error(validated.error)
   }
@@ -158,8 +151,7 @@ export async function createSupportTicketHandler(
       larvaId: userProfile?.larvaId,
     })
 
-  const category = parseSupportTicketCategory(data.category)
-  const urgency = parseSupportTicketUrgency(data.urgency)
+  const { category, urgency, subject } = await triageSupportTicket(validated.body, args.triage)
   const memberEmail = sessionEmail(payload)
 
   const [inserted] = await dbClient
@@ -167,7 +159,7 @@ export async function createSupportTicketHandler(
     .values({
       userId,
       handle,
-      subject: validated.subject,
+      subject,
       body: validated.body,
       category,
       urgency,
@@ -185,7 +177,7 @@ export async function createSupportTicketHandler(
     memberId: userId,
     handle,
     memberEmail,
-    subject: validated.subject,
+    subject,
     body: validated.body,
     category,
     urgency,
@@ -207,4 +199,4 @@ export async function createSupportTicketHandler(
   }
 }
 
-export { SUPPORT_TICKET_SUBJECT_MIN, SUPPORT_TICKET_SUBJECT_MAX, SUPPORT_TICKET_BODY_MIN, SUPPORT_TICKET_BODY_MAX }
+export { SUPPORT_TICKET_BODY_MIN, SUPPORT_TICKET_BODY_MAX }

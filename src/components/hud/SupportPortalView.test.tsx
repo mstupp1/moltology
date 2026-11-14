@@ -24,24 +24,22 @@ describe('SupportPortalView chrome', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: SUPPORT_PAGE_COPY.pageTitle })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: new RegExp(SUPPORT_PAGE_COPY.tabChangelog, 'i') })).toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: new RegExp(`^${SUPPORT_PAGE_COPY.tabFaq}$`, 'i') })).toBeInTheDocument()
+    expect(screen.queryByRole('tab', { name: /FAQ/i })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
+      SUPPORT_PAGE_COPY.tabContact,
+      SUPPORT_PAGE_COPY.tabChangelog,
+    ])
     expect(screen.getAllByText(SUPPORT_PAGE_COPY.tabContact).length).toBeGreaterThan(0)
     expect(screen.queryByRole('tab', { name: 'Diagnostics' })).not.toBeInTheDocument()
     expect(screen.getByTestId('support-ticket-form-stub')).toBeInTheDocument()
     expect(screen.queryByText(LORE)).not.toBeInTheDocument()
   })
 
-  it('renames changelog and FAQ panels without lore', () => {
+  it('switches between contact and changelog without lore', () => {
     renderPortal()
 
     fireEvent.click(screen.getByRole('tab', { name: new RegExp(SUPPORT_PAGE_COPY.tabChangelog, 'i') }))
     expect(screen.getByText(SUPPORT_PAGE_COPY.changelogEmpty)).toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('tab', { name: new RegExp(`^${SUPPORT_PAGE_COPY.tabFaq}$`, 'i') }))
-    expect(screen.getByRole('heading', { name: SUPPORT_PAGE_COPY.faqTitle })).toBeInTheDocument()
-    expect(screen.getByText(SUPPORT_PAGE_COPY.faqHint)).toBeInTheDocument()
-    expect(screen.getByText(SUPPORT_PAGE_COPY.faqStartTitle)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Open settings/ })).toHaveAttribute('href', '/settings')
 
     fireEvent.click(screen.getByRole('tab', { name: new RegExp(SUPPORT_PAGE_COPY.tabContact, 'i') }))
     expect(screen.getByTestId('support-ticket-form-stub')).toBeInTheDocument()
@@ -60,8 +58,8 @@ describe('SupportPortalView chrome', () => {
     expect(screen.getByRole('tabpanel')).toHaveAccessibleName(SUPPORT_PAGE_COPY.tabChangelog)
 
     fireEvent.keyDown(document.activeElement!, { key: 'Home' })
-    expect(screen.getByRole('tab', { name: SUPPORT_PAGE_COPY.tabChangelog })).toHaveFocus()
-    expect(screen.getByRole('tabpanel')).toHaveAccessibleName(SUPPORT_PAGE_COPY.tabChangelog)
+    expect(screen.getByRole('tab', { name: SUPPORT_PAGE_COPY.tabContact })).toHaveFocus()
+    expect(screen.getByRole('tabpanel')).toHaveAccessibleName(SUPPORT_PAGE_COPY.tabContact)
   })
 
 
