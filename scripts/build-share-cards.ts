@@ -1,7 +1,7 @@
 /**
  * Draws the link-preview images (og:image). Run `npm run share:cards` after changing the artwork.
  *
- *   public/images/sharing/site-card-v1.jpg          the site card: glowing emblem over the wordmark
+ *   public/images/sharing/site-card-v2.jpg          the site card: glowing emblem over the wordmark
  *   src/lib/server/share-card-art/member-card-base.webp   member card without the portrait
  *   src/lib/server/share-card-art/member-card-glass.webp  the porthole's glass, laid over the portrait
  *   public/images/sharing/member-card-v{N}.jpg      the member card with the crab, for members
@@ -80,20 +80,20 @@ const LOCKUP_CSS = `
 .caption .gap{width:.3em}
 `
 
+/** The approved black-tee composition: large red emblem over the stacked merch wordmark. */
 async function siteCard(emblem: string): Promise<string> {
   return page(
-    `<div class="abs ground"></div><div class="abs caustics"></div><div class="abs halo"></div>
+    `<div class="abs ground"></div><div class="abs halo"></div>
      <div class="abs mark">${emblem}</div>
-     <div class="abs name">Moltology</div>
-     <div class="abs line">Shed the noise. Grow a shell.</div>`,
-    `.ground{inset:0;background:radial-gradient(ellipse 60% 75% at 50% 40%,#3a0f12 0%,#14080c 45%,${T.abyss} 85%)}
-     .caustics{inset:0;background:url(${fileUrl('public/images/scene-caustics.webp')}) center/cover;opacity:.16;mix-blend-mode:screen}
-     .halo{left:50%;top:220px;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;background:radial-gradient(circle,rgba(255,69,58,.28) 0%,transparent 62%)}
-     .mark{left:50%;top:72px;width:296px;height:296px;margin-left:-148px;filter:drop-shadow(0 0 36px rgba(255,69,58,.55))}
+     <img class="abs word" src="${fileUrl('content/brand/synaptic-path/parts/merch-v2/moltology-stacked-dark.svg')}" alt="">`,
+    `.ground{inset:0;background:
+        radial-gradient(ellipse 55% 70% at 50% 34%,rgba(255,69,58,.2) 0%,rgba(105,18,0,.1) 40%,transparent 72%),
+        radial-gradient(ellipse 60% 22% at 50% 104%,rgba(0,195,255,.16) 0%,transparent 100%),${T.abyss}}
+     .halo{left:50%;top:205px;width:500px;height:500px;margin:-250px 0 0 -250px;border-radius:50%;background:radial-gradient(circle,rgba(255,69,58,.3) 0%,transparent 60%)}
+     .mark{left:50%;top:64px;width:284px;height:284px;margin-left:-142px;filter:drop-shadow(0 0 32px rgba(255,69,58,.55))}
      .mark .emblem{width:100%;height:100%}
      .mark .emblem g{fill:${T.crimson}}
-     .name{left:0;right:0;top:396px;text-align:center;font-size:76px;font-weight:800;letter-spacing:-.025em;line-height:1}
-     .line{left:0;right:0;top:496px;text-align:center;font-family:Inter,sans-serif;font-size:28px;color:${T.inkBody}}`,
+     .word{left:50%;top:384px;width:400px;margin-left:-200px}`,
   )
 }
 

@@ -17,8 +17,8 @@ export const SHARE_CARD_SIZE = { width: 1200, height: 630 } as const
 export const SHARE_CARD_LENS = { x: 688, y: 95, size: 440 } as const
 
 /** The site-wide preview: the glowing emblem over the wordmark. */
-export const SITE_SHARE_IMAGE = 'images/sharing/site-card-v1.jpg'
-export const SITE_SHARE_IMAGE_ALT = 'The Moltology emblem above the words "Shed the noise. Grow a shell."'
+export const SITE_SHARE_IMAGE = 'images/sharing/site-card-v2.jpg'
+export const SITE_SHARE_IMAGE_ALT = 'The glowing Moltology emblem above the Moltology wordmark, The Synaptic Path'
 
 /** The member card for members without a saved portrait: a generic crimson crab. */
 export const MEMBER_SHARE_FALLBACK_IMAGE = `images/sharing/member-card-v${SHARE_CARD_VERSION}.jpg`

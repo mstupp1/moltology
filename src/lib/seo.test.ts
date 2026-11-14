@@ -111,10 +111,10 @@ describe('SEO Meta Tag Generator', () => {
     const meta = seo({ title: 'Forum' })
     expect(meta).toEqual(
       expect.arrayContaining([
-        { property: 'og:image', content: 'https://moltology.org/images/sharing/site-card-v1.jpg' },
+        { property: 'og:image', content: 'https://moltology.org/images/sharing/site-card-v2.jpg' },
         { property: 'og:image:width', content: '1200' },
         { property: 'og:image:height', content: '630' },
-        { name: 'twitter:image', content: 'https://moltology.org/images/sharing/site-card-v1.jpg' },
+        { name: 'twitter:image', content: 'https://moltology.org/images/sharing/site-card-v2.jpg' },
       ]),
     )
   })
