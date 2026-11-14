@@ -16,7 +16,7 @@ describe('public link-preview identity', () => {
     expect(Object.keys(select.mock.calls[0][0])).toEqual(['id', 'handle', 'larvaId', 'avatarConfig', 'equipmentVersion', 'equippedAppearance'])
   })
   it('names the saved portrait only while it still shows the member', async () => {
-    const look = { style: 'critters', seed: 'larva-a', race: 'crab', shellColor: 'cobalt' }
+    const look = { style: 'critters', seed: 'larva-a', race: 'crab', shellColor: 'cobalt' } as const
     const { avatarStillHash } = await import('../avatar-still')
     const still = avatarStillHash(look)
     const row = { id: 'u1', handle: 'mstupp', larvaId: 'L', equipmentVersion: 0, equippedAppearance: {} }
