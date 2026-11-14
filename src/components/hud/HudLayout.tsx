@@ -4,7 +4,7 @@ import { HUDSidebar } from '@/components/hud/HUDSidebar'
 import { CommandPalette } from '@/components/hud/CommandPalette'
 import { SynapticOracleWidget } from '@/components/hud/SynapticOracleWidget'
 import { AISidebarDrawer } from '@/components/hud/AISidebarDrawer'
-import { UnderwaterBubblesCanvas } from '@/components/hud/UnderwaterBubblesCanvas'
+import { UnderwaterBubblesCanvas, isLowPowerDevice, readDeviceHints } from '@/components/hud/UnderwaterBubblesCanvas'
 import { OracleProvider, useSafeOracle } from '@/components/hud/OracleContext'
 import { AlignmentProvider } from '@/hooks/useDailyAlignment'
 import { HudPersistProvider } from '@/hooks/useHudPersist'
@@ -17,7 +17,6 @@ import '@/styles/crt.css'
 import '@/styles/hud-chrome.css'
 import '@/styles/scene.css'
 import { useBackdropCovered } from '@/hooks/useBackdropCovered'
-import { useHeavyVfx } from '@/hooks/useHeavyVfx'
 import { usePwaInstall } from '@/hooks/usePwaInstall'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAssetUrl } from '@/lib/assets'
@@ -35,7 +34,11 @@ function HudContent() {
   const session = useAuthSession()
   const user = session.user
   const userId = session.userId
-  const { heavyVfxDisabled } = useHeavyVfx()
+  // Low-power or data-saver devices skip the light shafts; bubbles scale themselves down.
+  const [lowPowerDevice, setLowPowerDevice] = useState(false)
+  useEffect(() => {
+    setLowPowerDevice(isLowPowerDevice(readDeviceHints()))
+  }, [])
   // Full-screen overlays and the phone Oracle cover the backdrop.
   const backdropCovered = useBackdropCovered()
   // Register service worker + track install prompt for the whole hub (guest + member).
@@ -138,12 +141,12 @@ function HudContent() {
         {/* The water: painting, moving surface light and bubbles. */}
         <div className="absolute inset-0">
           <div
-            className={`absolute inset-0 bg-cover bg-center bg-no-repeat opacity-95 ${heavyVfxDisabled ? '' : 'scene-breathe'}`}
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-95 scene-breathe"
             style={{ backgroundImage: `url('${getAssetUrl(UNDERWATER_BACKGROUND)}')` }}
           />
 
           {/* Light shafts sway and the surface shimmers. Hidden on phones, where the page tint covers it. */}
-          {!heavyVfxDisabled && !isFullscreenRoute && (
+          {!lowPowerDevice && !isFullscreenRoute && (
             <div
               className="absolute inset-0 hidden md:block overflow-hidden"
               style={{ '--scene-caustics': `url('${getAssetUrl(SCENE_CAUSTICS)}')` } as React.CSSProperties}
@@ -162,7 +165,6 @@ function HudContent() {
           {!isFullscreenRoute && (
             <UnderwaterBubblesCanvas
               bubbleCount={48}
-              disabled={heavyVfxDisabled}
               paused={backdropCovered}
               className="absolute inset-0 pointer-events-none z-[1]"
             />

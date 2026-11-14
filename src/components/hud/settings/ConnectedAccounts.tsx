@@ -14,6 +14,7 @@ import {
   type LinkedAccount,
 } from '@/lib/auth-accounts'
 import { mapOAuthLinkError } from '@/lib/auth-oauth-errors'
+import { SettingsRow, SettingsRows } from './settings-ui'
 
 export function ConnectedAccounts({ oauthError }: { oauthError?: string }) {
   const { toast } = useToast()
@@ -125,86 +126,81 @@ export function ConnectedAccounts({ oauthError }: { oauthError?: string }) {
   }
 
 
+  const emailStatus =
+    accounts === null
+      ? 'Loading…'
+      : emailConnected
+        ? showVerification
+          ? emailVerified
+            ? EMAIL_VERIFICATION_COPY.settingsVerified
+            : EMAIL_VERIFICATION_COPY.settingsUnverified
+          : 'Connected'
+        : 'Not connected'
+
   return (
-    <div className="rounded-card border border-line-subtle bg-abyss/50 p-3 sm:p-4 space-y-3">
+    <div className="space-y-2.5">
       <div>
-        <h3 className="text-sm font-grotesk font-bold text-ink">Sign-in methods</h3>
+        <h3 className="text-xs font-grotesk font-bold text-ink-body">Sign-in methods</h3>
         <p className="text-xs text-ink-muted font-sans mt-0.5">
           Use Google or email and password to sign in to this account.
         </p>
       </div>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <KeyRound className="w-5 h-5 shrink-0 text-cyan-glow" />
-            <div className="min-w-0">
-              <span className="text-sm font-grotesk font-bold text-ink block">Email and password</span>
-              <span className="text-xs text-ink-muted font-sans">
-                {accounts === null
-                  ? 'Loading…'
-                  : emailConnected
-                    ? showVerification
-                      ? emailVerified
-                        ? EMAIL_VERIFICATION_COPY.settingsVerified
-                        : EMAIL_VERIFICATION_COPY.settingsUnverified
-                      : 'Connected'
-                    : 'Not connected'}
-              </span>
-            </div>
-          </div>
-          {showVerification && !emailVerified ? (
-            <HudButton
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() => void handleResendVerification()}
-              disabled={resendBusy || busy !== null}
-              aria-label="Resend confirmation"
-            >
-              {resendBusy ? 'Sending…' : EMAIL_VERIFICATION_COPY.resend}
-            </HudButton>
-          ) : null}
-        </div>
-
-        {googleEnabled ? (
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <Link2 className="w-5 h-5 shrink-0 text-cyan-glow" />
-              <div className="min-w-0">
-                <span className="text-sm font-grotesk font-bold text-ink block">Google</span>
-                <span className="text-xs text-ink-muted font-sans">
-                  {accounts === null ? 'Loading…' : googleConnected ? 'Connected' : 'Not connected'}
-                </span>
-              </div>
-            </div>
-            {googleConnected ? (
-              <HudButton
-                type="button"
-                variant="danger"
-                size="sm"
-                onClick={handleDisconnectGoogle}
-                disabled={busy !== null || !canDisconnectGoogle}
-                aria-label="Disconnect Google"
-                icon={<Unlink className="w-3.5 h-3.5" />}
-              >
-                Disconnect
-              </HudButton>
-            ) : (
+      <SettingsRows>
+        <SettingsRow
+          icon={<KeyRound />}
+          label="Email and password"
+          status={emailStatus}
+          control={
+            showVerification && !emailVerified ? (
               <HudButton
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={handleConnectGoogle}
-                disabled={busy !== null || accounts === null}
-                aria-label="Connect Google"
+                onClick={() => void handleResendVerification()}
+                disabled={resendBusy || busy !== null}
+                aria-label="Resend confirmation"
               >
-                Connect Google
+                {resendBusy ? 'Sending…' : EMAIL_VERIFICATION_COPY.resend}
               </HudButton>
-            )}
-          </div>
+            ) : null
+          }
+        />
+
+        {googleEnabled ? (
+          <SettingsRow
+            icon={<Link2 />}
+            label="Google"
+            status={accounts === null ? 'Loading…' : googleConnected ? 'Connected' : 'Not connected'}
+            control={
+              googleConnected ? (
+                <HudButton
+                  type="button"
+                  variant="danger"
+                  size="sm"
+                  onClick={handleDisconnectGoogle}
+                  disabled={busy !== null || !canDisconnectGoogle}
+                  aria-label="Disconnect Google"
+                  icon={<Unlink className="w-3.5 h-3.5" />}
+                >
+                  Disconnect
+                </HudButton>
+              ) : (
+                <HudButton
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleConnectGoogle}
+                  disabled={busy !== null || accounts === null}
+                  aria-label="Connect Google"
+                >
+                  Connect Google
+                </HudButton>
+              )
+            }
+          />
         ) : null}
-      </div>
+      </SettingsRows>
     </div>
   )
 }

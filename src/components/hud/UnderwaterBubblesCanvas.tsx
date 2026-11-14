@@ -110,7 +110,7 @@ export function pickBubbleBudget(bubbleCount: number, hints: BubbleDeviceHints):
   return { count: Math.min(bubbleCount, PHONE_BUBBLES), fpsTiers: [30, 24, 18] }
 }
 
-function readDeviceHints(): BubbleDeviceHints {
+export function readDeviceHints(): BubbleDeviceHints {
   const nav = navigator as Navigator & { connection?: { saveData?: boolean }; deviceMemory?: number }
   return {
     viewportWidth: window.innerWidth,

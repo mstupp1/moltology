@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 import type { OracleUsageSnapshot, OracleUsageWindow } from '@/lib/ai/usage-limits'
 import { useOracleUsage } from '@/hooks/useOracleUsage'
 import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
-import { HudCard } from '@/components/ui/HudCard'
+import { SettingsCard } from '@/components/hud/settings/settings-ui'
 
 function UsageBar({ window, label }: { window: OracleUsageWindow; label: string }) {
   const low = window.remaining / window.limit <= 0.2
@@ -60,10 +60,9 @@ export function PlanUsageSection({ userId }: { userId: string | null }) {
   const usage = useOracleUsage(userId)
   const access = useHiddenPageAccess('premium')
   if (!userId) return null
-  return <HudCard className="p-3 sm:p-4 lg:p-5 space-y-3">
-    <h2 className="font-grotesk text-sm font-bold text-ink">Plan &amp; usage</h2>
-    {usage.snapshot && <p className="text-xs text-ink-muted">{usage.snapshot.isPremium ? 'Oracle MAX' : 'Free'} plan · Oracle messages</p>}
+  return <SettingsCard title="Plan & usage"
+    description={usage.snapshot ? `${usage.snapshot.isPremium ? 'Oracle MAX' : 'Free'} plan · Oracle messages` : undefined}>
     <OracleUsage snapshot={usage.snapshot} unavailable={usage.unavailable} expanded />
     {access.canView && <Link to="/max" className="inline-block text-xs text-ink-muted underline underline-offset-2 hover:text-ink">View Oracle MAX</Link>}
-  </HudCard>
+  </SettingsCard>
 }

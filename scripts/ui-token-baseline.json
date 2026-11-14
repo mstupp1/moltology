@@ -70,12 +70,6 @@
   "src/components/hud/HiddenPageGuard.tsx": {
     "hex-color": 6
   },
-  "src/components/hud/HubSurfaceControls.tsx": {
-    "hex-color": 13,
-    "chamfer": 1,
-    "tiny-text": 1,
-    "off-scale-radius": 2
-  },
   "src/components/hud/HudLayout.tsx": {
     "hex-color": 1
   },

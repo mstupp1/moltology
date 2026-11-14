@@ -1,19 +1,17 @@
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import { BellRing, Download, MonitorSmartphone } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastProvider'
 import { usePwaInstall } from '@/hooks/usePwaInstall'
 import { useSystemNotifications } from '@/hooks/useSystemNotifications'
-
-type HubSurfaceControlsProps = {
-  /** When true, show denser copy suited to the Settings page. */
-  dense?: boolean
-}
+import { HudButton } from '@/components/ui/HudButton'
+import { HudSwitch } from '@/components/ui/HudSwitch'
+import { SettingsRow } from '@/components/hud/settings/settings-ui'
 
 /**
- * Install + surface-alert controls.
- * Usable for guests (dashboard strip) and signed-in Settings.
+ * Device notification + install rows for the Settings Notifications card.
+ * Renders SettingsRow items; the parent wraps them in SettingsRows.
  */
-export function HubSurfaceControls({ dense = false }: HubSurfaceControlsProps) {
+export function HubSurfaceControls() {
   const { isStandalone, canPromptInstall, install } = usePwaInstall()
   const { supported, enabled, permission, enable, disable } = useSystemNotifications()
   const { toast } = useToast()
@@ -39,11 +37,11 @@ export function HubSurfaceControls({ dense = false }: HubSurfaceControlsProps) {
   const handleInstall = useCallback(async () => {
     const outcome = await install()
     if (outcome === 'accepted') {
-      toast.success('Command Hub installed.')
+      toast.success('App installed.')
     } else if (outcome === 'unavailable') {
       toast.info(
         isStandalone
-          ? 'Command Hub is already installed on this device.'
+          ? 'The app is already installed on this device.'
           : 'Use your browser install menu if the prompt is hidden.'
       )
     }
@@ -59,71 +57,44 @@ export function HubSurfaceControls({ dense = false }: HubSurfaceControlsProps) {
           : 'Disabled'
 
   return (
-    <div className={dense ? 'space-y-3' : 'space-y-2.5'}>
-      <div className="chitin-card-inset p-3 sm:p-4 flex items-center justify-between gap-3 rounded-sm">
-        <div className="flex items-center gap-3 min-w-0">
-          <BellRing className="w-5 h-5 shrink-0 text-[#00c3ff]" />
-          <div className="min-w-0">
-            <span className="text-sm font-grotesk font-bold text-[#dfe3e3] block">
-              Surface Alerts
-            </span>
-            <span className="text-xs text-[#839493] font-sans">{alertStatus}</span>
-          </div>
-        </div>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={enabled}
-          aria-label="Toggle surface alerts"
-          disabled={!supported || permission === 'denied'}
-          onClick={() => {
-            void handleToggleAlerts()
-          }}
-          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-1 focus:ring-[#00c3ff] disabled:opacity-40 disabled:cursor-not-allowed ${
-            enabled ? 'bg-[#00c3ff]' : 'bg-cyan-950 border-cyan-800'
-          }`}
-        >
-          <span
-            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-              enabled ? 'translate-x-5' : 'translate-x-0 bg-slate-300'
-            }`}
+    <>
+      <SettingsRow
+        icon={<BellRing />}
+        label="Device notifications"
+        status={alertStatus}
+        control={
+          <HudSwitch
+            checked={enabled}
+            onChange={() => void handleToggleAlerts()}
+            disabled={!supported || permission === 'denied'}
+            aria-label="Toggle device notifications"
           />
-        </button>
-      </div>
-
-      <div className="chitin-card-inset p-3 sm:p-4 flex items-center justify-between gap-3 rounded-sm">
-        <div className="flex items-center gap-3 min-w-0">
-          {isStandalone ? (
-            <MonitorSmartphone className="w-5 h-5 shrink-0 text-[#00c3ff]" />
-          ) : (
-            <Download className="w-5 h-5 shrink-0 text-[#00c3ff]" />
-          )}
-          <div className="min-w-0">
-            <span className="text-sm font-grotesk font-bold text-[#dfe3e3] block">
-              {isStandalone ? 'Command Hub Installed' : 'Install Command Hub'}
-            </span>
-            <span className="text-xs text-[#839493] font-sans">
-              {isStandalone
-                ? 'Running as a standalone app on this device'
-                : canPromptInstall
-                  ? 'Add to home screen or desktop for quick access'
-                  : 'Available when your browser offers install'}
-            </span>
-          </div>
-        </div>
-        {!isStandalone && (
-          <button
-            type="button"
-            onClick={() => {
-              void handleInstall()
-            }}
-            disabled={!canPromptInstall}
-            className="shrink-0 px-3 py-1.5 bg-[#00c3ff]/20 hover:bg-[#00c3ff]/30 border border-[#00c3ff]/60 text-[#00c3ff] font-grotesk font-bold text-[10px] uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            Install
-          </button>
-        )}
-      </div>
-    </div>
+        }
+      />
+      <SettingsRow
+        icon={isStandalone ? <MonitorSmartphone /> : <Download />}
+        label={isStandalone ? 'App installed' : 'Install the app'}
+        status={
+          isStandalone
+            ? 'Running as an app on this device'
+            : canPromptInstall
+              ? 'Add Moltology to your home screen or desktop'
+              : 'Available when your browser offers install'
+        }
+        control={
+          isStandalone ? null : (
+            <HudButton
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => void handleInstall()}
+              disabled={!canPromptInstall}
+            >
+              Install
+            </HudButton>
+          )
+        }
+      />
+    </>
   )
 }
