@@ -17,6 +17,9 @@ export const STILL_VERSION = 3
 /** Size of a stored portrait, in pixels. Smaller avatars scale it down. */
 export const STORED_STILL_PX = 256
 
+/** Size of the sharper copy kept for share cards (og:image), where 256px looks soft. */
+export const LARGE_STILL_PX = 512
+
 /** JSON with every object's keys in order, at every depth, so equal characters match. */
 export function canonical(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`
@@ -54,6 +57,11 @@ export function avatarStillHash(config: LobsterAvatarConfig): string | null {
 /** Where a portrait with this name is kept in the public bucket. */
 export function storedStillKey(hash: string): string {
   return `avatars/v${STILL_VERSION}/${hash}.webp`
+}
+
+/** Where the 512px copy of a portrait is kept, beside the 256px one. */
+export function largeStillKey(hash: string): string {
+  return `avatars/v${STILL_VERSION}/${hash}-${LARGE_STILL_PX}.webp`
 }
 
 /** The stored portrait for this character, if one was saved for exactly this look. */

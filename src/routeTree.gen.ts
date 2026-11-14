@@ -97,6 +97,7 @@ import { Route as HudAcademyTracksSlugRouteImport } from './routes/_hud/academy/
 import { Route as HudForumCategorySlugIndexRouteImport } from './routes/_hud/forum/$categorySlug/index'
 import { Route as HudForumCategorySlugTopicSlugRouteImport } from './routes/_hud/forum/$categorySlug/$topicSlug'
 import { Route as HudAcademyCoursesSlugIndexRouteImport } from './routes/_hud/academy/courses/$slug/index'
+import { Route as ApiShareMemberVersionCardRouteImport } from './routes/api/share/member.$version.$card'
 import { Route as HudAcademyCoursesSlugLessonsLessonSlugRouteImport } from './routes/_hud/academy/courses/$slug/lessons/$lessonSlug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -546,6 +547,12 @@ const HudAcademyCoursesSlugIndexRoute =
     path: '/',
     getParentRoute: () => HudAcademyCoursesSlugRoute,
   } as any)
+const ApiShareMemberVersionCardRoute =
+  ApiShareMemberVersionCardRouteImport.update({
+    id: '/api/share/member/$version/$card',
+    path: '/api/share/member/$version/$card',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const HudAcademyCoursesSlugLessonsLessonSlugRoute =
   HudAcademyCoursesSlugLessonsLessonSlugRouteImport.update({
     id: '/lessons/$lessonSlug',
@@ -640,6 +647,7 @@ export interface FileRoutesByFullPath {
   '/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
   '/academy/certificates/': typeof HudAcademyCertificatesIndexRoute
   '/forum/$categorySlug/': typeof HudForumCategorySlugIndexRoute
+  '/api/share/member/$version/$card': typeof ApiShareMemberVersionCardRoute
   '/academy/courses/$slug/': typeof HudAcademyCoursesSlugIndexRoute
   '/academy/courses/$slug/lessons/$lessonSlug': typeof HudAcademyCoursesSlugLessonsLessonSlugRoute
 }
@@ -726,6 +734,7 @@ export interface FileRoutesByTo {
   '/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
   '/academy/certificates': typeof HudAcademyCertificatesIndexRoute
   '/forum/$categorySlug': typeof HudForumCategorySlugIndexRoute
+  '/api/share/member/$version/$card': typeof ApiShareMemberVersionCardRoute
   '/academy/courses/$slug': typeof HudAcademyCoursesSlugIndexRoute
   '/academy/courses/$slug/lessons/$lessonSlug': typeof HudAcademyCoursesSlugLessonsLessonSlugRoute
 }
@@ -818,6 +827,7 @@ export interface FileRoutesById {
   '/_hud/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
   '/_hud/academy/certificates/': typeof HudAcademyCertificatesIndexRoute
   '/_hud/forum/$categorySlug/': typeof HudForumCategorySlugIndexRoute
+  '/api/share/member/$version/$card': typeof ApiShareMemberVersionCardRoute
   '/_hud/academy/courses/$slug/': typeof HudAcademyCoursesSlugIndexRoute
   '/_hud/academy/courses/$slug/lessons/$lessonSlug': typeof HudAcademyCoursesSlugLessonsLessonSlugRoute
 }
@@ -910,6 +920,7 @@ export interface FileRouteTypes {
     | '/forum/$categorySlug/$topicSlug'
     | '/academy/certificates/'
     | '/forum/$categorySlug/'
+    | '/api/share/member/$version/$card'
     | '/academy/courses/$slug/'
     | '/academy/courses/$slug/lessons/$lessonSlug'
   fileRoutesByTo: FileRoutesByTo
@@ -996,6 +1007,7 @@ export interface FileRouteTypes {
     | '/forum/$categorySlug/$topicSlug'
     | '/academy/certificates'
     | '/forum/$categorySlug'
+    | '/api/share/member/$version/$card'
     | '/academy/courses/$slug'
     | '/academy/courses/$slug/lessons/$lessonSlug'
   id:
@@ -1087,6 +1099,7 @@ export interface FileRouteTypes {
     | '/_hud/forum/$categorySlug/$topicSlug'
     | '/_hud/academy/certificates/'
     | '/_hud/forum/$categorySlug/'
+    | '/api/share/member/$version/$card'
     | '/_hud/academy/courses/$slug/'
     | '/_hud/academy/courses/$slug/lessons/$lessonSlug'
   fileRoutesById: FileRoutesById
@@ -1145,6 +1158,7 @@ export interface RootRouteChildren {
   ApiPrintfulWebhookRoute: typeof ApiPrintfulWebhookRoute
   ApiStoreRecoveryRoute: typeof ApiStoreRecoveryRoute
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
+  ApiShareMemberVersionCardRoute: typeof ApiShareMemberVersionCardRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1765,6 +1779,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudAcademyCoursesSlugIndexRouteImport
       parentRoute: typeof HudAcademyCoursesSlugRoute
     }
+    '/api/share/member/$version/$card': {
+      id: '/api/share/member/$version/$card'
+      path: '/api/share/member/$version/$card'
+      fullPath: '/api/share/member/$version/$card'
+      preLoaderRoute: typeof ApiShareMemberVersionCardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_hud/academy/courses/$slug/lessons/$lessonSlug': {
       id: '/_hud/academy/courses/$slug/lessons/$lessonSlug'
       path: '/lessons/$lessonSlug'
@@ -1951,6 +1972,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPrintfulWebhookRoute: ApiPrintfulWebhookRoute,
   ApiStoreRecoveryRoute: ApiStoreRecoveryRoute,
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,
+  ApiShareMemberVersionCardRoute: ApiShareMemberVersionCardRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

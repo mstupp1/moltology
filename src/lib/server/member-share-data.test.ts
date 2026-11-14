@@ -11,8 +11,19 @@ beforeEach(() => {
 describe('public link-preview identity', () => {
   it('resolves opaque account ids to their public name and returns only public identity', async () => {
     limit.mockResolvedValue([{ id: 'NUBirqu1KNSnM41jXnQt3SMGobGHuoCJ', handle: 'mstupp', larvaId: 'LARVA UNIT #1234', email: 'private@example.com', bio: 'private' }])
-    expect(await getMemberShareIdentity('NUBirqu1KNSnM41jXnQt3SMGobGHuoCJ')).toEqual({ userId: 'NUBirqu1KNSnM41jXnQt3SMGobGHuoCJ', handle: 'mstupp', larvaId: 'LARVA UNIT #1234' })
-    expect(Object.keys(select.mock.calls[0][0])).toEqual(['id', 'handle', 'larvaId'])
+    expect(await getMemberShareIdentity('NUBirqu1KNSnM41jXnQt3SMGobGHuoCJ')).toEqual({ userId: 'NUBirqu1KNSnM41jXnQt3SMGobGHuoCJ', handle: 'mstupp', larvaId: 'LARVA UNIT #1234', still: null })
+    // The character is read only to name the saved portrait for the share card.
+    expect(Object.keys(select.mock.calls[0][0])).toEqual(['id', 'handle', 'larvaId', 'avatarConfig', 'equipmentVersion', 'equippedAppearance'])
+  })
+  it('names the saved portrait only while it still shows the member', async () => {
+    const look = { style: 'critters', seed: 'larva-a', race: 'crab', shellColor: 'cobalt' }
+    const { avatarStillHash } = await import('../avatar-still')
+    const still = avatarStillHash(look)
+    const row = { id: 'u1', handle: 'mstupp', larvaId: 'L', equipmentVersion: 0, equippedAppearance: {} }
+    limit.mockResolvedValue([{ ...row, avatarConfig: { ...look, still } }])
+    expect((await getMemberShareIdentity('u1'))?.still).toBe(still)
+    limit.mockResolvedValue([{ ...row, avatarConfig: { ...look, still, shellColor: 'gold' } }])
+    expect((await getMemberShareIdentity('u1'))?.still).toBeNull()
   })
   it('resolves case-insensitive handles and prefers exact id matches', async () => {
     limit.mockResolvedValue([{ id: 'other', handle: 'mstupp', larvaId: 'other' }, { id: 'mstupp', handle: null, larvaId: 'LARVA UNIT #4321' }])

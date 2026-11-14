@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { avatarStillHash, storedStillKey, storedStillUrl, STORED_STILL_PX, webpSize } from './avatar-still'
+import { avatarStillHash, LARGE_STILL_PX, largeStillKey, storedStillKey, storedStillUrl, STORED_STILL_PX, webpSize } from './avatar-still'
 import { STARTER_CHARACTER_EQUIPMENT } from './avatar/starter-equipment'
 import type { LobsterAvatarConfig } from './lobster-avatar'
 
@@ -42,14 +42,14 @@ describe('saved portraits', () => {
 })
 
 describe('saveAvatarStillHandler', () => {
-  async function run(image: string, row: Record<string, unknown> | undefined, upload = vi.fn(async () => {})) {
+  async function run(image: string, row: Record<string, unknown> | undefined, upload = vi.fn(async () => {}), large?: string) {
     const set = vi.fn(() => ({ where: vi.fn(async () => {}) }))
     const db = {
       select: () => ({ from: () => ({ where: () => ({ limit: async () => (row ? [row] : []) }) }) }),
       update: () => ({ set }),
     }
     const { saveAvatarStillHandler } = await import('./server/avatar-still')
-    const result = await saveAvatarStillHandler({ data: { image }, context: { user: { sub: 'u1' }, db: db as never } }, upload)
+    const result = await saveAvatarStillHandler({ data: { image, large }, context: { user: { sub: 'u1' }, db: db as never } }, upload)
     return { result, upload, set }
   }
 
@@ -62,6 +62,16 @@ describe('saveAvatarStillHandler', () => {
     expect(upload).toHaveBeenCalledWith(expect.objectContaining({ key: storedStillKey(result.still!), contentType: 'image/webp' }))
     expect(set).toHaveBeenCalled()
     expect(storedStillUrl({ ...sent, still: result.still! })).not.toBeNull()
+  })
+
+  it('keeps a sharp 512px copy for share cards when one is sent, and skips a bad one', async () => {
+    const row = { avatarConfig: base, equipmentVersion: 0, equippedAppearance: {} }
+    const small = dataUrl(webp(STORED_STILL_PX, STORED_STILL_PX))
+    const sharp = await run(small, row, undefined, dataUrl(webp(LARGE_STILL_PX, LARGE_STILL_PX)))
+    expect(sharp.upload).toHaveBeenCalledWith(expect.objectContaining({ key: largeStillKey(sharp.result.still!) }))
+    const wrong = await run(small, row, undefined, dataUrl(webp(300, 300)))
+    expect(wrong.result.still).toBeTruthy()
+    expect(wrong.upload).toHaveBeenCalledTimes(1)
   })
 
   it('refuses anything that is not a square portrait of the right size', async () => {

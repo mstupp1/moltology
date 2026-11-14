@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { avatarStillHash, STORED_STILL_PX } from '@/lib/avatar-still'
+import { avatarStillHash, LARGE_STILL_PX, STORED_STILL_PX } from '@/lib/avatar-still'
 import { requestStill3D } from '@/lib/avatar3d-portrait-queue'
 import { getAuthJWTToken } from '@/lib/jwt'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
@@ -36,9 +36,14 @@ export function useAvatarStillSync(userId: string | null | undefined, config: Lo
         const url = await requestStill3D(look, STORED_STILL_PX, 'portrait')
         // Browsers that cannot write WebP hand back a PNG, which is not stored.
         if (cancelled || !url?.startsWith('data:image/webp')) return
+        // A sharper copy for the member's share card (the link preview of their profile).
+        const large = await requestStill3D(look, LARGE_STILL_PX, 'portrait').catch(() => null)
+        if (cancelled) return
         const token = await getAuthJWTToken()
         const { saveAvatarStillFn } = await import('@/lib/server/api')
-        const result = await saveAvatarStillFn({ data: { userId, token: token ?? undefined, image: url } })
+        const result = await saveAvatarStillFn({
+          data: { userId, token: token ?? undefined, image: url, large: large?.startsWith('data:image/webp') ? large : undefined },
+        })
         if (result.still) window.dispatchEvent(new CustomEvent('profile-avatar-changed'))
         else localStorage.setItem(memo(hash), String(Date.now()))
       } catch {

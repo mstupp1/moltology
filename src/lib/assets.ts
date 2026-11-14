@@ -87,7 +87,8 @@ function resolveAssetUrl(assetPath: string, { preferWebp }: ResolveOptions): str
   if (
     LOCAL_ASSET_WHITELIST.has(pathWithoutQuery) ||
     cleanPath.startsWith('images/chassis/') ||
-    cleanPath.startsWith('images/marketing/')
+    cleanPath.startsWith('images/marketing/') ||
+    cleanPath.startsWith('images/sharing/')
   ) {
     if (cleanPath.startsWith('images/marketing/') && !cleanPath.includes('?')) {
       return `/${cleanPath}?v=${MARKETING_ASSET_VERSION}`

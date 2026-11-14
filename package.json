@@ -18,6 +18,7 @@
     "email": "email dev --dir src/emails --port 3001",
     "email:brand": "node --import tsx scripts/build-email-brand.mjs",
     "email:images": "node scripts/build-email-feature-images.mjs",
+    "share:cards": "tsx scripts/build-share-cards.ts",
     "email:preview": "tsx scripts/preview-transactional-email.ts",
     "pretypecheck": "node scripts/setup-dev-worktree.mjs --dependencies-only",
     "typecheck": "tsc --noEmit",

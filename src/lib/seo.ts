@@ -1,9 +1,10 @@
 import type { DetailedHTMLProps, MetaHTMLAttributes } from 'react'
 import { isMemberProfileUuid, resolveMemberPublicName } from './member-handle'
 import { MOLTMAXXING_DAY, MOLTMAXXING_DEFINITION, MOLTMAXXING_FAQ } from './moltmaxxing-content'
-import { getAbsoluteAssetUrl } from './assets'
 import { SITE_ORIGIN } from './site-origin'
+import { getAbsoluteAssetUrl } from './assets'
 import { profileSharePath } from './referrals'
+import { MEMBER_SHARE_IMAGE_ALT, memberShareImageUrl, SHARE_CARD_SIZE, SITE_SHARE_IMAGE, SITE_SHARE_IMAGE_ALT } from './share-card'
 
 export type MetaElement = DetailedHTMLProps<MetaHTMLAttributes<HTMLMetaElement>, HTMLMetaElement>
 
@@ -27,13 +28,15 @@ export interface SEOOptions {
   section?: string
 }
 
+/** The site card: every page without its own picture shows this in link previews. */
+export const DEFAULT_OG_IMAGE = getAbsoluteAssetUrl(SITE_SHARE_IMAGE)
+
 export const HOMEPAGE_SEO: SEOOptions = {
   title: 'Moltology \u2014 The Synaptic Path',
   description:
-    'The digital onboarding portal for algorithmic carcinization, benthic philosophy, and personal optimization.',
+    'Shed the noise. Grow a shell. A free practice and community for building daily routines, protecting your focus, and finishing what you start.',
   keywords: 'Synaptic Path, Moltology, moltism, benthic core, carcinization, ascension, algorithmic ecdysis',
   canonical: SITE_ORIGIN,
-  ogImage: `${SITE_ORIGIN}/images/order_emblem.png`,
   twitterSite: '@moltology',
 }
 
@@ -46,8 +49,6 @@ export const MEMBER_PROFILE_SEO = {
   description:
     'Connect on Moltology. Open this profile to send a friend request.',
 } as const
-
-export const MEMBER_SHARE_IMAGE = 'images/sharing/member-invite-v1.png'
 
 export const SEARCH_PAGE_SEO = {
   title: 'Search | Moltology',
@@ -67,6 +68,8 @@ export type MemberProfileSeoInput = {
   userId?: string | null
   handle?: string | null
   larvaId?: string | null
+  /** The member's saved 3D portrait name, when it matches their current look. */
+  still?: string | null
 }
 
 /** Map `/member/$profileId` (designation or uuid) to a public-name input. */
@@ -86,12 +89,12 @@ export function memberProfileSeo(member?: MemberProfileSeoInput | null) {
   return [...privatePageSeo({
     title: publicName ? `Add ${publicName} on Moltology` : MEMBER_PROFILE_SEO.title,
     description: MEMBER_PROFILE_SEO.description,
-    ogImage: getAbsoluteAssetUrl(MEMBER_SHARE_IMAGE),
+    ogImage: memberShareImageUrl(member?.still),
   }),
-    { property: 'og:image:width', content: '1200' },
-    { property: 'og:image:height', content: '630' },
-    { property: 'og:image:type', content: 'image/png' },
-    { property: 'og:image:alt', content: 'Add me on Moltology. A friend beneath the surface.' },
+    { property: 'og:image:width', content: String(SHARE_CARD_SIZE.width) },
+    { property: 'og:image:height', content: String(SHARE_CARD_SIZE.height) },
+    { property: 'og:image:type', content: 'image/jpeg' },
+    { property: 'og:image:alt', content: MEMBER_SHARE_IMAGE_ALT },
     ...(member?.userId || handle ? [{ property: 'og:url', content: `${SITE_ORIGIN}${profileSharePath(member?.userId || handle || '', handle)}` }] : []),
   ]
 }
@@ -172,6 +175,15 @@ export function seo({
     metas.push(
       { property: 'og:image', content: ogImage },
       { name: 'twitter:image', content: ogImage },
+    )
+  } else {
+    // No picture of its own: show the site card, with its size so unfurlers lay it out wide.
+    metas.push(
+      { property: 'og:image', content: DEFAULT_OG_IMAGE },
+      { property: 'og:image:width', content: String(SHARE_CARD_SIZE.width) },
+      { property: 'og:image:height', content: String(SHARE_CARD_SIZE.height) },
+      { property: 'og:image:alt', content: SITE_SHARE_IMAGE_ALT },
+      { name: 'twitter:image', content: DEFAULT_OG_IMAGE },
     )
   }
 
