@@ -62,7 +62,7 @@ rules:
   - id: data.canonical-content
     title: Canonical content is kept
     kind: invariant
-    statement: Forum, blog, changelog, and catalog rows are canonical and never expire. The simulator is throttled instead to control growth.
+    statement: Forum, blog, changelog, and catalog rows are canonical and never expire, and so are the Gem and Credit ledgers, because balances are their full sums. The simulator is throttled instead to control growth.
     dependsOn: [data.retention-windows]
     anchors:
       - file: src/lib/data-retention.ts
@@ -109,16 +109,42 @@ rules:
   - id: data.avatar-portraits
     title: Every character picture is the 3D character
     kind: invariant
-    statement: Full-body characters render live in 3D, and portraits, creator option cards and gear icons are stills of the same 3D character, drawn in the browser and kept between visits. There is no 2D drawing; while a picture loads a loader shows, and a browser without 3D shows a plain silhouette. No portraits are generated or uploaded on the server.
+    statement: Full-body characters render live in 3D, and portraits, creator option cards and gear icons are stills of the same 3D character, drawn in the browser. There is no 2D drawing; while a picture loads a loader shows, and a browser without 3D shows a plain silhouette. Nothing is drawn on the server.
     dependsOn: [data.avatar-look-server]
     anchors:
       - file: src/lib/avatar3d-portrait-queue.ts
         symbol: requestStill3D
     tests: [src/components/hud/LobsterAvatarPortrait.test.tsx, src/components/hud/LobsterAvatarFullBody.test.tsx]
+  - id: data.saved-portraits
+    title: Portraits are stored once per look
+    kind: flow
+    statement: After a member saves, their browser uploads a 256 by 256 WebP portrait of at most 120 KB. The server names it by a hash of the saved look plus worn gear and stores it once in the public bucket. Other browsers show the stored image only while the hash still matches the member's look, and draw the character themselves otherwise.
+    dependsOn: [data.avatar-portraits, access.write-auth]
+    anchors:
+      - file: src/lib/server/avatar-still.ts
+        symbol: saveAvatarStillHandler
+      - file: src/lib/avatar-still.ts
+        symbol: avatarStillHash
+      - file: src/lib/avatar-still.ts
+        symbol: storedStillUrl
+    tests: [src/lib/avatar-still.test.ts]
+  - id: data.community-photo
+    title: Group photo retakes at most daily
+    kind: flow
+    statement: The forum group photo shows up to 48 members with a saved character. When the cast or a look changes and the stored photo is at least a day old, a signed-in visitor's browser draws a new photo and uploads it. The server stores it only when it is still due, matches the current cast exactly, and is a 1800 by 720 WebP of at most 1.5 MB.
+    dependsOn: [data.saved-portraits, access.write-auth]
+    anchors:
+      - file: src/lib/community-photo.ts
+        symbol: photoDue
+      - file: src/lib/community-photo.ts
+        symbol: RETAKE_AFTER_MS
+      - file: src/lib/server/community-photo.ts
+        symbol: saveCommunityPhotoHandler
+    tests: [src/lib/community-photo.test.ts]
   - id: data.character-atomic-save
     title: Character saves are atomic and versioned
     kind: invariant
-    statement: Character saves validate the verified member, every owned placement, slot compatibility, and vault capacity. A locked database function commits body configuration, equipment, appearance snapshot, and revision together; stale revisions fail without partial changes.
+    statement: Character saves validate the verified member, every owned placement, slot compatibility, and vault capacity. Members can only place pieces they own, which means the starter set, their unlocks, and pieces already placed. A locked database function commits body configuration, equipment, appearance snapshot, and revision together; stale revisions fail without partial changes.
     dependsOn: [access.write-auth]
     anchors:
       - file: src/lib/server/db-services.ts

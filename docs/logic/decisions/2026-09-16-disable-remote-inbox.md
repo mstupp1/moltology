@@ -5,7 +5,8 @@ title: "Turn off the remote notification inbox"
 summary: "The HUD inbox no longer polls the server, and the server short-circuits stale polls without touching Postgres."
 domains: [social, data]
 rules: [social.remote-inbox-off, data.neon-compute-budget]
-status: accepted
+status: superseded
+supersededBy: notifications-bell
 sources:
   - pr: 138
   - pr: 139

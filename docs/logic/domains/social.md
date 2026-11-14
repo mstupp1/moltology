@@ -49,11 +49,11 @@ rules:
   - id: social.circle-scope
     title: Circle means accepted friends
     kind: permission
-    statement: The Circle feed shows pulses from accepted friends only. The You feed shows the member's own pulses.
+    statement: The Circle feed shows only accepted friends' pulses marked for friends or public. The You feed shows the member's own pulses. Both load newest first in pages of 20, at most 50 at a time.
     dependsOn: [social.honest-feeds]
     anchors:
       - file: src/lib/server/activity-log.ts
-        symbol: listFriendIdsForUser
+        symbol: listActivityFeed
   - id: social.suggestions
     title: Synaptic nearby suggestions
     kind: threshold
@@ -65,9 +65,9 @@ rules:
         symbol: compareSynapticNearby
     tests: [src/lib/connections.test.ts]
   - id: social.remote-inbox-off
-    title: Remote inbox is off
-    kind: gate
-    statement: The HUD notification inbox does not read from the server. The client skips the fetch, and the server returns an empty list without touching the database, until a push or no-poll path exists.
+    title: Inbox reads without a timer
+    kind: limit
+    statement: The notification inbox reads the server on page load, when the bell opens, and when the tab regains focus, no more than once every 6 minutes. There is no polling timer. The panel shows the latest 30 notifications with an exact unread count. One flag turns every read off on both client and server.
     dependsOn: [data.neon-compute-budget]
     anchors:
       - file: src/lib/notifications-refresh.ts

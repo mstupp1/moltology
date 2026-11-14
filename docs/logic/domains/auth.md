@@ -8,7 +8,7 @@ rules:
   - id: auth.better-auth
     title: Self-hosted Better Auth
     kind: invariant
-    statement: Accounts live in the app's own user, session, account, verification, and jwks tables through Better Auth. The app no longer depends on Managed Neon Auth.
+    statement: Accounts live in the app's own user, session, account, verification, and jwks tables through Better Auth. The app no longer depends on Managed Neon Auth. Google One Tap verifies Google's token and then runs the normal Google sign-in path, so signup screening and account-linking rules still apply.
     anchors:
       - file: src/lib/auth-server.ts
         symbol: auth

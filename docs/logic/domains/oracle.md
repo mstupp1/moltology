@@ -112,6 +112,28 @@ rules:
       - file: src/lib/ai/usage-limits.ts
         symbol: ORACLE_GUEST_LIMITS
     tests: [src/lib/ai/guest-usage.test.ts, src/lib/ai/handle-oracle-chat-request.test.ts]
+  - id: oracle.skill-context
+    title: Skills the member owns
+    kind: permission
+    statement: A picked skill's playbook goes into the prompt for that conversation. With no skill picked, the Oracle sees only the member's owned and switched-on skills and may load one playbook once before replying. It never suggests a skill the member doesn't own, and members can turn automatic picking off.
+    dependsOn: [oracle.request-pipeline, economy.oracle-skill-prices]
+    anchors:
+      - file: src/lib/ai/oracle-skills-prompt.ts
+        symbol: buildOracleSkillContext
+      - file: src/lib/ai/oracle-skills-prompt.ts
+        symbol: createOracleSkillTools
+    tests: [src/lib/ai/oracle-skills-prompt.test.ts]
+  - id: oracle.custom-instructions
+    title: Custom instructions are screened
+    kind: gate
+    statement: Members can pick an Oracle personality and save up to 1,000 characters of custom instructions. Instructions pass the local input checks, then Laya, which blocks them above 0.8 confidence within 2.5 seconds. If Laya is unavailable, the save goes through. The prompt fences the text as the member's own preferences, below the safety rules.
+    dependsOn: [oracle.input-guardrails]
+    anchors:
+      - file: src/lib/server/oracle-chat-settings.ts
+        symbol: screenCustomInstructions
+      - file: src/lib/oracle-chat-settings.ts
+        symbol: ORACLE_CUSTOM_INSTRUCTIONS_MAX
+    tests: [src/lib/server/oracle-chat-settings.test.ts]
   - id: oracle.request-caps
     title: History and reply size caps
     kind: limit
