@@ -92,7 +92,7 @@ describe('Oracle Route Component', () => {
       expect(screen.queryByRole('dialog', { name: 'Chats' })).not.toBeInTheDocument()
       expect(screen.queryByRole('textbox', { name: 'Message' })).not.toBeInTheDocument()
       expect(await screen.findByText('Carcinization Inquiries')).toBeInTheDocument()
-      expect(screen.getByRole('link', { name: 'Settings' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Oracle settings' })).toBeInTheDocument()
 
       fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
       expect(screen.getByTestId('oracle-chats-panel')).toHaveAttribute('aria-hidden', 'true')

@@ -93,6 +93,31 @@ export const setOracleSkillSettingsFn = createServerFn({ method: 'POST' })
     return setOracleSkillSettingsHandler(args)
   })
 
+export const getOracleChatSettingsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { token?: string }) => z.object({ token: z.string().optional() }).parse(data))
+  .handler(async (args) => {
+    const { getOracleChatSettingsHandler } = await import('./oracle-chat-settings')
+    return getOracleChatSettingsHandler(args)
+  })
+
+export const saveOracleChatSettingsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { token?: string; personality?: string; customInstructions?: string }) =>
+    z
+      .object({
+        token: z.string().optional(),
+        personality: z.string().min(1).max(24).optional(),
+        // A little room over the cap so the server can answer with the plain-language limit.
+        customInstructions: z.string().max(2_000).optional(),
+      })
+      .parse(data),
+  )
+  .handler(async (args) => {
+    const { saveOracleChatSettingsHandler } = await import('./oracle-chat-settings')
+    return saveOracleChatSettingsHandler(args)
+  })
+
 export const createCreditCheckoutFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: { token?: string; packId: string }) =>

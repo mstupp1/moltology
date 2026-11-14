@@ -6,6 +6,7 @@ import { BenthicCTAButton } from '../hud/BenthicCTAButton'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { CHAT_LIMIT } from '@/lib/ai/chat-retention'
 import { OracleUsage } from './OracleUsage'
+import { OracleSettingsDialog } from './OracleChatSettings'
 import { headerIconButtonClasses } from './OracleHeaderControls'
 import type { OracleUsageSnapshot } from '@/lib/ai/usage-limits'
 
@@ -57,6 +58,7 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
   onOpenAuthModal,
 }) => {
   const [showUsage, setShowUsage] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   const usageId = useId()
   const searchId = useId()
   const [showSearch, setShowSearch] = useState(false)
@@ -102,18 +104,34 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
         : isOpen ? 'w-full flex-1' : 'absolute inset-0 z-20 w-full'} ${isOpen ? 'opacity-100 translate-x-0' : 'pointer-events-none opacity-0 -translate-x-2'}`}
     >
       <div className="flex shrink-0 items-center gap-1 px-3 pt-3 pb-2">
-        <h2 className="min-w-0 flex-1 text-base font-semibold text-ink select-none">Synaptic Oracle</h2>
+        {showSearch ? (
+          // Search takes over the title row, right where the magnifier was, so the list never shifts.
+          <div id={searchId} className="relative min-w-0 flex-1">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted pointer-events-none" aria-hidden="true" />
+            <input
+              ref={searchInputRef}
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              aria-label="Search chats"
+              placeholder="Search chats"
+              className={`${touch ? 'h-10' : 'h-8'} w-full rounded-control border border-line-subtle bg-surface-2 pl-8 pr-2 text-base sm:text-sm text-ink placeholder-ink-muted focus:border-line-strong focus:outline-hidden [&::-webkit-search-cancel-button]:hidden`}
+            />
+          </div>
+        ) : (
+          <h2 className="min-w-0 flex-1 text-base font-semibold text-ink select-none">Synaptic Oracle</h2>
+        )}
         <button
           ref={searchButtonRef}
           type="button"
-          title="Search chats"
-          aria-label="Search chats"
+          title={showSearch ? 'Close search' : 'Search chats'}
+          aria-label={showSearch ? 'Close search' : 'Search chats'}
           aria-expanded={showSearch}
-          aria-controls={searchId}
+          aria-controls={showSearch ? searchId : undefined}
           onClick={() => showSearch ? hideSearch() : setShowSearch(true)}
           className={headerButton}
         >
-          <Search className="w-4 h-4" aria-hidden="true" />
+          {showSearch ? <X className="w-4 h-4" aria-hidden="true" /> : <Search className="w-4 h-4" aria-hidden="true" />}
         </button>
         <button
           ref={collapseButtonRef}
@@ -139,35 +157,6 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
           <SquarePen className="w-4 h-4 shrink-0" aria-hidden="true" />
           New Chat
         </button>
-        <div id={searchId} hidden={!showSearch} className="relative mt-2">
-          {showSearch && (
-            <>
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted pointer-events-none" aria-hidden="true" />
-              <input
-                ref={searchInputRef}
-                type="search"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                aria-label="Search chats"
-                placeholder="Search chats"
-                className="h-11 w-full rounded-control border border-line-subtle bg-surface-2 pl-9 pr-10 text-base sm:text-sm text-ink placeholder-ink-muted focus:border-cyan-glow focus:outline-hidden [&::-webkit-search-cancel-button]:hidden"
-              />
-              {query && (
-                <button
-                  type="button"
-                  aria-label="Clear search"
-                  onClick={() => {
-                    setQuery('')
-                    searchInputRef.current?.focus()
-                  }}
-                  className="absolute right-0 top-0 inline-flex h-11 w-10 items-center justify-center rounded-control text-ink-muted hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-                >
-                  <X className="w-4 h-4" aria-hidden="true" />
-                </button>
-              )}
-            </>
-          )}
-        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-2 pb-2 min-h-0">
@@ -242,14 +231,16 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <a
-              href="/settings"
-              title="Settings"
-              aria-label="Settings"
+            <button
+              type="button"
+              title="Oracle settings"
+              aria-label="Oracle settings"
+              aria-haspopup="dialog"
+              onClick={() => setShowSettings(true)}
               className={headerButton}
             >
               <Settings className="w-4 h-4" aria-hidden="true" />
-            </a>
+            </button>
             <button
               type="button"
               title="Usage"
@@ -264,6 +255,7 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
           </div>
         </div>
       )}
+      <OracleSettingsDialog open={showSettings} onClose={() => setShowSettings(false)} />
     </section>
   )
 }

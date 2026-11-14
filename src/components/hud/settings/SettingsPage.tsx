@@ -16,6 +16,7 @@ import { useHudPersist } from '@/hooks/useHudPersist'
 import { ConnectedAccounts } from './ConnectedAccounts'
 import { PlanUsageSection } from '@/components/ai/OracleUsage'
 import { PremiumSettingsSection } from './PremiumSettingsSection'
+import { OracleChatSettingsForm } from '@/components/ai/OracleChatSettings'
 import { SettingsCard, SettingsRow, SettingsRows } from './settings-ui'
 
 export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) => {
@@ -165,6 +166,9 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
         </div>
 
         <div className="space-y-3 sm:space-y-4 lg:space-y-5">
+          <SettingsCard title="Oracle" description="Personality and custom instructions for every chat.">
+            <OracleChatSettingsForm />
+          </SettingsCard>
           <PlanUsageSection userId={userId} />
           <PremiumSettingsSection />
           <SettingsCard title="Help">

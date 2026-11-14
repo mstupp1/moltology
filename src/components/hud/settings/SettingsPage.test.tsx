@@ -33,6 +33,9 @@ vi.mock('@/lib/server/api', () => ({
   updateEmailPreferencesFn: vi.fn().mockResolvedValue({}),
   claimMemberHandleFn: vi.fn().mockResolvedValue({ handle: 'operative' }),
   saveLobsterAvatarFn: vi.fn().mockResolvedValue({}),
+  getOracleChatSettingsFn: vi.fn().mockResolvedValue({ personality: 'balanced', customInstructions: '', autoPick: true }),
+  saveOracleChatSettingsFn: vi.fn(),
+  setOracleSkillSettingsFn: vi.fn(),
 }))
 
 vi.mock('@/components/hud/HubSurfaceControls', () => ({
