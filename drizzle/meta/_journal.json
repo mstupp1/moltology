@@ -428,6 +428,13 @@
       "when": 1793830954728,
       "tag": "0060_vector_stats",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1794622923388,
+      "tag": "0061_oracle_skills",
+      "breakpoints": true
     }
   ]
 }

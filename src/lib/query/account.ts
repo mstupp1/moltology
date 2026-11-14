@@ -28,6 +28,8 @@ export const accountKeys = {
   connections: (userId: string, variant: string = 'summary') => ['account', userId, 'connections', variant] as const,
   activity: (userId: string, params: Record<string, unknown>) => ['account', userId, 'activity', params] as const,
   market: (userId: string | null) => ['account', userId ?? 'guest', 'market'] as const,
+  /** Oracle skills with this member's access, plus the auto-pick setting. Guests get the catalog. */
+  oracleSkills: (userId: string | null) => ['account', userId ?? 'guest', 'oracle-skills'] as const,
   /** Another member's profile page as this member sees it. */
   memberProfile: (userId: string | null, profileParam: string) =>
     ['account', userId ?? 'guest', 'member-profile', profileParam] as const,

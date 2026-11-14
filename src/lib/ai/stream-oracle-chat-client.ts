@@ -1,4 +1,5 @@
 import { ORACLE_THREAD_ID_HEADER } from './oracle-chat'
+import { ORACLE_SKILL_HEADER } from '../oracle-skills'
 import { getAuthJWTToken, jwtAuthHeaders } from '../jwt'
 
 export interface StreamOracleChatParams {
@@ -6,6 +7,8 @@ export interface StreamOracleChatParams {
   userId?: string | null
   threadId?: string | null
   model?: string
+  /** A skill the member turned on in the chat box. */
+  skillId?: string | null
   /**
    * Compact JWT for `Authorization: Bearer`. When omitted, mint one with a short
    * timeout. Pass `null` to skip (guest / tests). Same-origin cookies are never
@@ -15,12 +18,16 @@ export interface StreamOracleChatParams {
   signal?: AbortSignal
   onThreadId?: (threadId: string) => void
   onChunk?: (fullText: string) => void
+  /** The skill that shaped this reply, as soon as the reply starts. */
+  onSkill?: (skillId: string) => void
 }
 
 export interface StreamOracleChatResult {
   text: string
   threadId: string | null
   isGuest?: boolean
+  /** The skill that shaped the reply, when one did. */
+  skillId?: string | null
 }
 
 async function resolveOracleToken(token: string | null | undefined): Promise<string | null> {
@@ -52,6 +59,7 @@ export async function streamOracleChat(params: StreamOracleChatParams): Promise<
       userId: params.userId || undefined,
       threadId: params.threadId || undefined,
       model: params.model,
+      skillId: params.skillId || undefined,
     }),
   })
 
@@ -85,6 +93,8 @@ export async function streamOracleChat(params: StreamOracleChatParams): Promise<
   if (headerThreadId && params.onThreadId) {
     params.onThreadId(headerThreadId)
   }
+  const skillId = res.headers.get(ORACLE_SKILL_HEADER)
+  if (skillId) params.onSkill?.(skillId)
 
   if (!res.body) {
     throw new Error('Empty response from chat server.')
@@ -110,5 +120,6 @@ export async function streamOracleChat(params: StreamOracleChatParams): Promise<
   return {
     text: fullText,
     threadId: headerThreadId,
+    skillId,
   }
 }

@@ -32,15 +32,17 @@ import { MarketCurrencyBar } from './MarketCurrencyBar'
 import { MarketEarnPanel } from './MarketEarnPanel'
 import { MarketBundleDetail, MarketFeatured } from './MarketFeatured'
 import { MarketPieceCard, MarketPieceDetail, variantAsCatalog } from './MarketGear'
+import { MarketSkillsPanel } from './MarketSkillsPanel'
 import './market.css'
 import '../avatar-animations.css'
 
 /** The stand-in larva guests try gear on. */
 const GUEST_TRY_ON_CONFIG: LobsterAvatarConfig = { style: LOBSTER_AVATAR_STYLE, seed: 'guest-larva' }
 
-type Tab = 'gear' | 'earn' | 'credits'
+type Tab = 'gear' | 'skills' | 'earn' | 'credits'
 const TABS: { id: Tab; label: string }[] = [
   { id: 'gear', label: 'Gear' },
+  { id: 'skills', label: 'Skills' },
   { id: 'earn', label: 'Earn gems' },
   { id: 'credits', label: 'Credits' },
 ]
@@ -169,6 +171,25 @@ export function MarketShopPage() {
   const [config, setConfig] = useState<LobsterAvatarConfig | null>(null)
   const [loadout, setLoadout] = useState<ChassisLoadoutPayload | null>(null)
   const [tab, setTab] = useState<Tab>('gear')
+  // Links into the Skills tab: ?tab=skills, optionally &skill=<id> to open one.
+  const [linkedSkillId, setLinkedSkillId] = useState<string | null>(null)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const q = new URLSearchParams(window.location.search)
+    if (q.get('tab') === 'skills') {
+      setTab('skills')
+      setLinkedSkillId(q.get('skill'))
+    }
+  }, [])
+  const chooseTab = (next: Tab) => {
+    setTab(next)
+    if (typeof window === 'undefined') return
+    const url = new URL(window.location.href)
+    if (next === 'skills') url.searchParams.set('tab', 'skills')
+    else url.searchParams.delete('tab')
+    url.searchParams.delete('skill')
+    window.history.replaceState(window.history.state, '', url.pathname + url.search)
+  }
   const [filters, setFilters] = useState<GearFilters>(DEFAULT_FILTERS)
   const { slot, rarity, sort, hideOwned, page } = filters
   const [selected, setSelected] = useState<{ baseKey: string; rarity: EquipmentRarity } | null>(null)
@@ -407,7 +428,11 @@ export function MarketShopPage() {
         joined
         accent="cyan"
         title="Shop"
-        description="Gear for your character. Rarer versions come with bigger stats and stranger abilities."
+        description={
+          tab === 'skills'
+            ? 'Methods the Oracle can walk you through. Pick one in the chat box, or let the Oracle reach for it.'
+            : 'Gear for your character. Rarer versions come with bigger stats and stranger abilities.'
+        }
         actions={
           market.guest ? undefined : (
             <MarketCurrencyBar chitinGems={market.wallet.balance} moltCredits={market.moltCredits} creditsLive={market.creditsLive} />
@@ -421,7 +446,7 @@ export function MarketShopPage() {
                 type="button"
                 role="tab"
                 aria-selected={tab === t.id}
-                onClick={() => setTab(t.id)}
+                onClick={() => chooseTab(t.id)}
                 className={cn(
                   'flex-1 sm:flex-none min-h-9 rounded-control px-4 text-[11px] font-semibold tracking-[0.08em] uppercase transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
                   tab === t.id ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-3/60',
@@ -515,6 +540,20 @@ export function MarketShopPage() {
         </div>
       ) : null}
 
+      {tab === 'skills' ? (
+        <MarketSkillsPanel
+          key={linkedSkillId ?? 'skills'}
+          userId={userId ?? null}
+          ready={!isPending}
+          wide={wide}
+          initialSkillId={linkedSkillId}
+          onNeedAuth={() => setAuthOpen(true)}
+          onPurchased={() => {
+            void load()
+            if (userId) void queryClient.invalidateQueries({ queryKey: accountKeys.wallet(userId) })
+          }}
+        />
+      ) : null}
       {tab === 'earn' ? <MarketEarnPanel wallet={market.wallet} guest={market.guest} /> : null}
       {tab === 'credits' ? (
         <MarketCreditsPanel live={market.creditsLive} buyingPackId={buyingPack} onBuy={buyPack} />

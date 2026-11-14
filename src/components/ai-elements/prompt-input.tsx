@@ -1,6 +1,6 @@
 import { getOraclePromptLengthError } from '@/lib/ai/prompt-limits'
 import React, { useState, useRef, useEffect, useLayoutEffect, useId } from 'react'
-import { ArrowUp, Mic, Loader2, ChevronDown, Check, Square } from 'lucide-react'
+import { ArrowUp, Mic, Loader2, ChevronDown, Check, Square, ScrollText, X } from 'lucide-react'
 import { OracleModel, ORACLE_MODELS, DEFAULT_ORACLE_PLACEHOLDER, canUseOracleChatModel } from '@/lib/ai/oracle-models'
 import { OracleTierIcon } from '@/components/ai/OracleTierIcon'
 import { OracleModelLogo } from '@/components/ai/OracleModelLogo'
@@ -102,6 +102,82 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
   )
 }
 
+/** A skill the member can turn on from the chat box. */
+export interface PromptSkillOption {
+  id: string
+  name: string
+  summary: string
+}
+
+export const BROWSE_SKILLS_HREF = '/character/shop?tab=skills'
+
+/** Skills whose name or id contains the text typed after "/". */
+export function filterSkillOptions(skills: PromptSkillOption[], query: string): PromptSkillOption[] {
+  const q = query.trim().toLowerCase().replace(/-/g, ' ')
+  if (!q) return skills
+  return skills.filter((s) => s.name.toLowerCase().includes(q) || s.id.replace(/-/g, ' ').includes(q))
+}
+
+/** "/" or "/focus" alone in the box opens the skill list; anything else is a message. */
+export function readSlashQuery(text: string): string | null {
+  const match = /^\/([a-z0-9 -]{0,40})$/i.exec(text)
+  return match ? match[1] : null
+}
+
+/** Skills button beside the model picker: every usable skill, plus a way to browse more. */
+export const OracleSkillMenu: React.FC<{
+  skills: PromptSkillOption[]
+  activeSkillId?: string | null
+  onPick: (id: string) => void
+  compactLabel?: boolean
+}> = ({ skills, activeSkillId, onPick, compactLabel = false }) => (
+  <HudDropdownMenu modal={false}>
+    <HudDropdownMenuTrigger asChild>
+      <button
+        type="button"
+        className={`flex min-h-8 items-center gap-1 text-[11px] sm:text-xs text-ink-body hover:text-ink bg-surface-1 border border-line hover:bg-surface-3 hover:border-line-strong px-2 py-1 rounded-control transition-colors cursor-pointer ${FOCUS_RING}`}
+        title="Skills (type /)"
+        aria-label="Skills"
+      >
+        <ScrollText className="w-3.5 h-3.5 text-cyan-glow" aria-hidden="true" />
+        {compactLabel ? null : <span className="font-medium">Skills</span>}
+      </button>
+    </HudDropdownMenuTrigger>
+    <HudDropdownMenuContent
+      side="top"
+      align="start"
+      sideOffset={8}
+      collisionPadding={12}
+      aria-label="Skills"
+      aria-labelledby={undefined}
+      className="w-[320px] max-w-[calc(100vw-24px)] p-0 overflow-y-auto overscroll-contain"
+      style={{ maxHeight: 'min(480px, var(--radix-dropdown-menu-content-available-height))' }}
+    >
+      <p className="px-4 pt-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">Use a skill</p>
+      <div className="pb-1">
+        {skills.map((skill) => (
+          <HudDropdownMenuItem
+            key={skill.id}
+            role="menuitemradio"
+            aria-checked={skill.id === activeSkillId}
+            onSelect={() => onPick(skill.id)}
+            className={`block rounded-none px-4 py-2 ${skill.id === activeSkillId ? 'bg-surface-3' : ''}`}
+          >
+            <span className="flex items-center justify-between gap-2 text-sm font-semibold text-ink">
+              {skill.name}
+              {skill.id === activeSkillId && <Check aria-label="On" className="h-4 w-4 shrink-0 text-cyan-glow" />}
+            </span>
+            <span className="block text-xs leading-snug text-ink-muted">{skill.summary}</span>
+          </HudDropdownMenuItem>
+        ))}
+      </div>
+      <a href={BROWSE_SKILLS_HREF} className="block border-t border-line-subtle px-4 py-3 text-xs text-cyan-glow hover:underline">
+        Browse all skills
+      </a>
+    </HudDropdownMenuContent>
+  </HudDropdownMenu>
+)
+
 export interface PromptInputProps {
   onSubmit: (message: { text: string }) => void
   /** Shown as a Stop button while a reply streams. */
@@ -127,6 +203,12 @@ export interface PromptInputProps {
   compact?: boolean
   /** Small muted line under the box. */
   footnote?: string
+  /** Skills the member can turn on. Typing "/" lists them. Omit for guests. */
+  skills?: PromptSkillOption[]
+  /** The skill turned on for this chat, shown as a chip in the box. */
+  activeSkill?: { id: string; name: string } | null
+  onPickSkill?: (skillId: string) => void
+  onClearSkill?: () => void
 }
 
 export const PromptInput: React.FC<PromptInputProps> = ({
@@ -147,6 +229,10 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   autoFocus = false,
   compact = false,
   footnote,
+  skills,
+  activeSkill = null,
+  onPickSkill,
+  onClearSkill,
 }) => {
   const lengthFeedbackId = useId()
   const [localText, setLocalText] = useState('')
@@ -161,6 +247,22 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   }
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const skillListId = useId()
+  const canPickSkills = Boolean(skills?.length && onPickSkill)
+  const slashQuery = canPickSkills ? readSlashQuery(text) : null
+  const skillMatches = slashQuery !== null ? filterSkillOptions(skills ?? [], slashQuery) : []
+  const [skillCursor, setSkillCursor] = useState(0)
+  const [slashDismissed, setSlashDismissed] = useState(false)
+  const showSkillList = slashQuery !== null && !slashDismissed
+  useEffect(() => {
+    setSkillCursor(0)
+    if (slashQuery === null) setSlashDismissed(false)
+  }, [slashQuery])
+  const pickSkill = (id: string) => {
+    onPickSkill?.(id)
+    if (slashQuery !== null) setText('')
+    textareaRef.current?.focus()
+  }
   const toastCtx = useOptionalToast()
   const isStreaming = status === 'streaming' || status === 'submitted'
 
@@ -197,6 +299,30 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (showSkillList && skillMatches.length > 0) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault()
+        const step = e.key === 'ArrowDown' ? 1 : -1
+        setSkillCursor((c) => (c + step + skillMatches.length) % skillMatches.length)
+        return
+      }
+      if ((e.key === 'Enter' || e.key === 'Tab') && !e.shiftKey && !e.nativeEvent.isComposing) {
+        e.preventDefault()
+        pickSkill(skillMatches[Math.min(skillCursor, skillMatches.length - 1)].id)
+        return
+      }
+    }
+    if (showSkillList && e.key === 'Escape') {
+      e.preventDefault()
+      e.stopPropagation()
+      setSlashDismissed(true)
+      return
+    }
+    // Backspace in an empty box turns the skill off.
+    if (e.key === 'Backspace' && !text && activeSkill && onClearSkill) {
+      onClearSkill()
+      return
+    }
     if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault()
       handleSubmit()
@@ -278,7 +404,68 @@ export const PromptInput: React.FC<PromptInputProps> = ({
     />
   ) : null
 
-  const inlineActions = oneRow && !modelPicker
+  const skillMenu = canPickSkills ? (
+    <OracleSkillMenu
+      skills={skills ?? []}
+      activeSkillId={activeSkill?.id}
+      onPick={pickSkill}
+      compactLabel={oneRow}
+    />
+  ) : null
+
+  const inlineActions = oneRow && !modelPicker && !skillMenu
+  const skillList = showSkillList ? (
+    <div
+      id={skillListId}
+      role="listbox"
+      aria-label="Skills"
+      className="mb-1.5 max-h-56 overflow-y-auto rounded-control border border-line-subtle bg-surface-1 py-1"
+    >
+      {skillMatches.length === 0 ? (
+        <p className="px-3 py-2 text-xs text-ink-muted">
+          No skill matches. <a href={BROWSE_SKILLS_HREF} className="text-cyan-glow hover:underline">Browse skills</a>
+        </p>
+      ) : (
+        skillMatches.map((skill, index) => (
+          <button
+            key={skill.id}
+            id={`${skillListId}-${skill.id}`}
+            type="button"
+            role="option"
+            aria-selected={index === skillCursor}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => pickSkill(skill.id)}
+            className={`block w-full px-3 py-1.5 text-left ${index === skillCursor ? 'bg-surface-3' : 'hover:bg-surface-2'}`}
+          >
+            <span className="block text-[13px] font-semibold text-ink">{skill.name}</span>
+            <span className="block text-[11px] leading-snug text-ink-muted truncate">{skill.summary}</span>
+          </button>
+        ))
+      )}
+    </div>
+  ) : null
+  const skillChip = activeSkill ? (
+    <div className="flex px-1 pb-1">
+      <span className="inline-flex max-w-full items-center gap-1 rounded-chip border border-line bg-surface-3 pl-2 pr-0.5 py-0.5 text-[12px] font-semibold text-ink">
+        <ScrollText className="w-3 h-3 shrink-0 text-cyan-glow" aria-hidden="true" />
+        <span className="truncate">{activeSkill.name}</span>
+        {onClearSkill && (
+          <button
+            type="button"
+            onClick={() => {
+              onClearSkill()
+              textareaRef.current?.focus()
+            }}
+            className={`ml-0.5 inline-flex h-5 w-5 items-center justify-center rounded-chip text-ink-muted hover:text-ink hover:bg-surface-2 ${FOCUS_RING}`}
+            aria-label={`Turn off ${activeSkill.name}`}
+            title="Turn off skill"
+          >
+            <X className="w-3 h-3" aria-hidden="true" />
+          </button>
+        )}
+      </span>
+    </div>
+  ) : null
 
   const card = (
     <div
@@ -286,6 +473,8 @@ export const PromptInput: React.FC<PromptInputProps> = ({
         oneRow ? 'p-1.5' : 'p-2 sm:p-2.5'
       } ${dictation.isListening ? 'border-line' : 'border-line-subtle'}`}
     >
+      {skillList}
+      {skillChip}
       <form onSubmit={handleSubmit} className={inlineActions ? 'flex items-end gap-1.5' : 'flex flex-col'}>
         <textarea
           ref={textareaRef}
@@ -298,6 +487,10 @@ export const PromptInput: React.FC<PromptInputProps> = ({
           aria-label="Message"
           aria-invalid={Boolean(lengthError)}
           aria-describedby={lengthError ? lengthFeedbackId : undefined}
+          aria-controls={showSkillList ? skillListId : undefined}
+          aria-activedescendant={
+            showSkillList && skillMatches[skillCursor] ? `${skillListId}-${skillMatches[skillCursor].id}` : undefined
+          }
           className={`${inlineActions ? 'flex-1 min-w-0' : 'w-full'} bg-transparent text-ink placeholder-ink-muted text-base sm:text-sm focus:outline-hidden resize-none select-text min-h-[40px] max-h-[200px] leading-relaxed font-sans px-1.5 py-[0.4rem]`}
         />
 
@@ -307,6 +500,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
           <div className="flex items-center justify-between gap-2 pt-1.5 select-none">
             <div className="flex items-center gap-1.5 min-w-0">
               {modelPicker}
+              {skillMenu}
             </div>
             {actionButtons}
           </div>

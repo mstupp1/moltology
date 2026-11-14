@@ -104,6 +104,7 @@ Plain names for real features. Use them as written; don't invent in-world substi
 | **Chitin Gems** | The earned currency. |
 | **Molt Credits** | The paid currency. |
 | **Oracle MAX** | The paid subscription and its advanced Oracle model. |
+| **Oracle skills** | Short written methods the Oracle walks a member through, such as Focus rounds or Weekly review. Four are free; the rest cost Chitin Gems or come with Oracle MAX. Bought in the Shop's Skills tab. |
 | **Benthic Market** | The in-app shop where currencies are spent. |
 | **Oracle** | The chat companion, voiced by the Synaptic Oracle. |
 | **Oracle Lite** | The standard Oracle chat model for free members. Guests see it selected while using preview replies. |

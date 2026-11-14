@@ -148,6 +148,8 @@ export const profiles = pgTable('profiles', {
   emailOptInSource: text('emailOptInSource'),
   isSimulated: boolean('isSimulated').default(false).notNull(),
   simulatedPersona: jsonb('simulatedPersona').$type<SimulatedPersonaConfig>(),
+  /** Oracle skill preferences: auto-pick on or off, and owned skills switched off (src/lib/oracle-skills.ts). */
+  oracleSkillSettings: jsonb('oracleSkillSettings').$type<import('../lib/oracle-skills').OracleSkillSettings>().default({}).notNull(),
   /** Experiments this admin has switched on (see src/lib/experiments.ts). Ignored for non-admins. */
   experiments: jsonb('experiments').$type<string[]>().default([]).notNull(),
   /** How the member found the Order: organic, word of mouth, or brought in. */
@@ -991,6 +993,26 @@ export const gearUnlocks = pgTable('gear_unlocks', {
 }, (table) => [
   primaryKey({ columns: [table.userId, table.catalogItemId] }),
   pgPolicy('gear_unlocks_server_only', {
+    for: 'all',
+    using: sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`,
+    withCheck: sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`,
+  }),
+])
+
+export type OracleSkillUnlockSource = 'purchase' | 'admin'
+
+/**
+ * Oracle skills a member bought (or an admin granted). Free starters and Oracle MAX access
+ * are worked out on read, not stored. Skill ids match content/oracle-skills/*.md.
+ */
+export const oracleSkillUnlocks = pgTable('oracle_skill_unlocks', {
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  skillId: text('skillId').notNull(),
+  source: text('source').$type<OracleSkillUnlockSource>().notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+}, (table) => [
+  primaryKey({ columns: [table.userId, table.skillId] }),
+  pgPolicy('oracle_skill_unlocks_server_only', {
     for: 'all',
     using: sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`,
     withCheck: sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`,

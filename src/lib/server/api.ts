@@ -58,6 +58,41 @@ export const buyGearFn = createServerFn({ method: 'POST' })
     const { buyGearHandler } = await import('./market')
     return buyGearHandler(args)
   })
+export const getOracleSkillsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { token?: string }) => z.object({ token: z.string().optional() }).parse(data))
+  .handler(async (args) => {
+    const { getOracleSkillsHandler } = await import('./oracle-skills')
+    return getOracleSkillsHandler(args)
+  })
+
+export const buyOracleSkillFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { token?: string; skillId: string }) =>
+    z.object({ token: z.string().optional(), skillId: z.string().min(1).max(48) }).parse(data),
+  )
+  .handler(async (args) => {
+    const { buyOracleSkillHandler } = await import('./oracle-skills')
+    return buyOracleSkillHandler(args)
+  })
+
+export const setOracleSkillSettingsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { token?: string; autoPick?: boolean; skillId?: string; enabled?: boolean }) =>
+    z
+      .object({
+        token: z.string().optional(),
+        autoPick: z.boolean().optional(),
+        skillId: z.string().min(1).max(48).optional(),
+        enabled: z.boolean().optional(),
+      })
+      .parse(data),
+  )
+  .handler(async (args) => {
+    const { setOracleSkillSettingsHandler } = await import('./oracle-skills')
+    return setOracleSkillSettingsHandler(args)
+  })
+
 export const createCreditCheckoutFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: { token?: string; packId: string }) =>
