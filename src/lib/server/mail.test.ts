@@ -14,6 +14,7 @@ import {
   sendEmailVerificationEmail,
   sendSupportTicketEmail,
   sendContactFormEmail,
+  supportTicketEmailSubject,
 } from './mail'
 
 describe('support ticket mail', () => {
@@ -112,7 +113,10 @@ describe('support ticket mail', () => {
     expect(payload.to).not.toContain('attacker@evil.test')
     expect(payload.reply_to).toBe('claw@moltology.org')
     expect(payload.from).toBe(DEFAULT_SUPPORT_FROM)
-    expect(payload.subject).toBe('[Ticket ticket-1] Chassis freeze')
+    expect(payload.subject).toBe('[High] Account & sign-in: Chassis freeze')
+    expect(supportTicketEmailSubject({ category: 'BUG', urgency: 'NORMAL', subject: 'Feed is blank' })).toBe(
+      "Something's broken: Feed is blank",
+    )
     expect(payload.text).toContain('Member id: member-9')
   })
 })

@@ -150,6 +150,13 @@ export async function sendTransactionalEmail(
   }
 }
 
+/** "[Urgent] Billing: Charged twice for MAX". Normal priority leaves the tag off. */
+export function supportTicketEmailSubject(input: Pick<SupportTicketMailInput, 'category' | 'urgency' | 'subject'>): string {
+  const urgency = supportTicketUrgencyLabel(input.urgency)
+  const tag = urgency === 'Normal' ? '' : `[${urgency}] `
+  return `${tag}${supportTicketCategoryLabel(input.category)}: ${input.subject}`
+}
+
 /**
  * Sends the intake notification to support@moltology.org only.
  * Form-chosen `to` / `recipient` values are discarded.
@@ -159,7 +166,7 @@ export async function sendSupportTicketEmail(
 ): Promise<SupportTicketMailResult> {
   return sendTransactionalEmail({
     to: SUPPORT_INBOX,
-    subject: `[Ticket ${input.ticketId}] ${input.subject}`,
+    subject: supportTicketEmailSubject(input),
     text: renderSupportTicketEmailText(input),
     replyTo: input.memberEmail?.trim() || undefined,
   })

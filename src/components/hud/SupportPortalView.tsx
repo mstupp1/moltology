@@ -8,11 +8,7 @@ import { formatReleaseDay } from '@/components/hud/dashboard/DashboardChangelogP
 import { Link } from '@tanstack/react-router'
 import { HudGhostCard } from '@/components/ui/HudGhostLoader'
 import {
-  ArrowRight,
-  CreditCard,
   GitCommit,
-  Lock,
-  Sparkles,
   ChevronDown,
   ChevronUp,
   AlertTriangle,
@@ -26,33 +22,9 @@ import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 import SupportTicketForm from '@/components/hud/SupportTicketForm'
 import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 
-const FAQ_ITEMS = [
-  {
-    icon: Sparkles,
-    title: SUPPORT_PAGE_COPY.faqStartTitle,
-    body: SUPPORT_PAGE_COPY.faqStartBody,
-    to: '/dashboard' as const,
-    linkLabel: 'Open your dashboard',
-  },
-  {
-    icon: CreditCard,
-    title: SUPPORT_PAGE_COPY.faqBillingTitle,
-    body: SUPPORT_PAGE_COPY.faqBillingBody,
-    to: '/max' as const,
-    linkLabel: 'See Oracle MAX',
-  },
-  {
-    icon: Lock,
-    title: SUPPORT_PAGE_COPY.faqPrivacyTitle,
-    body: SUPPORT_PAGE_COPY.faqPrivacyBody,
-    to: '/settings' as const,
-    linkLabel: 'Open settings',
-  },
-]
-
 export default function SupportPortalView({ loaderData }: { loaderData: any }) {
   // loaderData passed as prop
-  const [activeTab, setActiveTab] = useState<'changelog' | 'kb' | 'ticket'>('ticket')
+  const [activeTab, setActiveTab] = useState<'ticket' | 'changelog'>('ticket')
   const changelogs: ChangelogEntry[] = loaderData?.changelogs || []
   const loading = !loaderData?.changelogs
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
@@ -159,9 +131,7 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
   const tabDescription =
     activeTab === 'changelog'
       ? SUPPORT_PAGE_COPY.changelogHint
-      : activeTab === 'kb'
-        ? SUPPORT_PAGE_COPY.faqHint
-        : SUPPORT_PAGE_COPY.contactHint
+      : SUPPORT_PAGE_COPY.contactHint
 
   return (
     <div className="space-y-4 sm:space-y-5 font-sans text-ink">
@@ -175,9 +145,8 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
               value={activeTab}
               onValueChange={setActiveTab}
               items={[
-                { value: 'changelog', label: SUPPORT_PAGE_COPY.tabChangelog },
-                { value: 'kb', label: SUPPORT_PAGE_COPY.tabFaq },
                 { value: 'ticket', label: SUPPORT_PAGE_COPY.tabContact },
+                { value: 'changelog', label: SUPPORT_PAGE_COPY.tabChangelog },
               ]}
             />
           </HorizontalScroll>
@@ -282,42 +251,7 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
           </div>
         )}
 
-        {activeTab === 'kb' && (
-          <div className="space-y-4">
-            <h2 className="sr-only">{SUPPORT_PAGE_COPY.faqTitle}</h2>
-            <ul className="grid grid-cols-1 gap-3 md:grid-cols-3">
-              {FAQ_ITEMS.map((item) => {
-                const Icon = item.icon
-                return (
-                  <li key={item.title} className="flex flex-col gap-2 rounded-card border border-line-subtle bg-surface-1 p-4">
-                    <Icon className="h-4 w-4 text-ink-muted" aria-hidden />
-                    <h3 className="font-grotesk text-sm font-bold text-ink">{item.title}</h3>
-                    <p className="flex-1 text-xs leading-relaxed text-ink-muted">{item.body}</p>
-                    <Link
-                      to={item.to}
-                      className={`inline-flex min-h-8 items-center gap-1 self-start text-xs font-semibold text-ink-body transition-colors hover:text-ink rounded-control ${DASHBOARD_FOCUS}`}
-                    >
-                      {item.linkLabel}
-                      <ArrowRight className="h-3.5 w-3.5 text-ink-muted" aria-hidden />
-                    </Link>
-                  </li>
-                )
-              })}
-            </ul>
-            <p className="text-xs text-ink-muted">
-              {SUPPORT_PAGE_COPY.faqStillStuck}{' '}
-              <button
-                type="button"
-                onClick={() => setActiveTab('ticket')}
-                className={`font-semibold text-ink-body hover:text-ink rounded-control ${DASHBOARD_FOCUS}`}
-              >
-                {SUPPORT_PAGE_COPY.faqContactLink}
-              </button>
-            </p>
-          </div>
-        )}
-
-        {/* TAB 3: Contact support */}
+        {/* Contact support */}
         {activeTab === 'ticket' && (
           <section className="rounded-card border border-line-subtle bg-surface-1 p-4 sm:p-5 max-w-3xl">
             <SupportTicketForm />

@@ -5,7 +5,7 @@ import { ToastProvider } from '@/components/ui/ToastProvider'
 import { authClient } from '@/lib/auth-client'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { createSupportTicketFn } from '@/lib/server/api'
-import { SUPPORT_INBOX, SUPPORT_TICKET_COPY } from '@/lib/support-tickets'
+import { SUPPORT_INBOX, SUPPORT_TICKET_BODY_MAX, SUPPORT_TICKET_COPY } from '@/lib/support-tickets'
 import SupportTicketForm from './SupportTicketForm'
 
 vi.mock('@/lib/auth-client', () => ({
@@ -76,29 +76,22 @@ describe('SupportTicketForm', () => {
 
     renderForm()
 
-    expect(screen.getByLabelText(SUPPORT_TICKET_COPY.categoryLabel)).toBeInTheDocument()
-    expect(screen.getByLabelText(SUPPORT_TICKET_COPY.urgencyLabel)).toBeInTheDocument()
-    expect(screen.getByText('Account & sign-in')).toBeInTheDocument()
-    expect(screen.getByText("Something's broken")).toBeInTheDocument()
-    expect(screen.getByText('Urgent')).toBeInTheDocument()
-    expect(screen.queryByText('Shell and chassis')).not.toBeInTheDocument()
-    expect(screen.queryByText('Critical breach')).not.toBeInTheDocument()
+    // One box: no subject, topic or priority fields.
+    expect(screen.getAllByRole('textbox').filter((el) => el.id !== 'support-ticket-bait')).toHaveLength(1)
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    expect(screen.getByLabelText(SUPPORT_TICKET_COPY.bodyLabel)).toHaveAttribute('maxLength', String(SUPPORT_TICKET_BODY_MAX))
+    expect(screen.getByTestId('support-ticket-counter')).toHaveTextContent('0 / 1,200')
 
-    fireEvent.change(screen.getByLabelText(SUPPORT_TICKET_COPY.subjectLabel), {
-      target: { value: 'Chassis freeze' },
-    })
     fireEvent.change(screen.getByLabelText(SUPPORT_TICKET_COPY.bodyLabel), {
       target: { value: 'The vault would not open after a greaves swap.' },
     })
+    expect(screen.getByTestId('support-ticket-counter')).toHaveTextContent('46 / 1,200')
     fireEvent.submit(screen.getByTestId('support-ticket-form'))
 
     await waitFor(() => {
       expect(createSupportTicketFn).toHaveBeenCalledWith({
         data: expect.objectContaining({
-          subject: 'Chassis freeze',
           body: 'The vault would not open after a greaves swap.',
-          category: 'ACCOUNT',
-          urgency: 'NORMAL',
           userId: 'usr-1',
           token: 'mock-jwt',
           turnstileToken: 'turnstile-ok',

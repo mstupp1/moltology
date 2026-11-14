@@ -63,10 +63,7 @@ function createMockDb(opts?: { recentCount?: number; handle?: string | null }) {
 }
 
 const validData = {
-  subject: 'Chassis freeze',
   body: 'The vault would not open after a greaves swap.',
-  category: 'ACCOUNT' as const,
-  urgency: 'NORMAL' as const,
   turnstileToken: 'turnstile-ok',
 }
 
@@ -136,7 +133,6 @@ describe('createSupportTicketHandler', () => {
     const result = await createSupportTicketHandler({
       data: {
         ...validData,
-        subject: '<b>Chassis</b> freeze',
         body: '<script>alert(1)</script>The vault would not open after a greaves swap.',
         to: 'attacker@evil.test',
         recipient: 'other@evil.test',
@@ -157,9 +153,10 @@ describe('createSupportTicketHandler', () => {
       expect.objectContaining({
         userId: MEMBER_ID,
         handle: 'claw_lord',
-        subject: 'Chassis freeze',
+        subject: 'alert(1)The vault would not open after a greaves swap.',
         body: 'alert(1)The vault would not open after a greaves swap.',
-        category: 'ACCOUNT',
+        category: 'OTHER',
+        urgency: 'NORMAL',
         ipHash: hashClientIp('203.0.113.9'),
       }),
     )
@@ -169,7 +166,7 @@ describe('createSupportTicketHandler', () => {
         memberId: MEMBER_ID,
         handle: 'claw_lord',
         memberEmail: 'claw@moltology.org',
-        subject: 'Chassis freeze',
+        subject: 'alert(1)The vault would not open after a greaves swap.',
         to: 'attacker@evil.test',
         recipient: 'other@evil.test',
       }),
@@ -177,7 +174,31 @@ describe('createSupportTicketHandler', () => {
     expect(mockDb.update).toHaveBeenCalled()
   })
 
-  it('maps legacy CRITICAL to URGENT and unknown categories to OTHER', async () => {
+  it('files the topic and priority Laya picks with the summary as subject', async () => {
+    const mockDb = createMockDb()
+    const values = vi.fn().mockReturnValue({
+      returning: vi.fn().mockResolvedValue([{ id: TICKET_ID, userId: MEMBER_ID, handle: 'claw_lord' }]),
+    })
+    mockDb.insert = vi.fn().mockReturnValue({ values })
+    const classify = vi.fn().mockResolvedValue({ topic: { choice: 'BILLING' }, priority: { choice: 'URGENT' } })
+    const summarize = vi.fn().mockResolvedValue('"Charged twice for MAX."')
+
+    await createSupportTicketHandler({
+      data: { ...validData, body: 'I was charged twice for Oracle MAX today and need a refund.' },
+      context: { user: { sub: MEMBER_ID, email: 'claw@moltology.org' }, db: mockDb as any },
+      triage: { classify, summarize },
+    })
+
+    expect(classify).toHaveBeenCalledWith('I was charged twice for Oracle MAX today and need a refund.')
+    expect(values).toHaveBeenCalledWith(
+      expect.objectContaining({ category: 'BILLING', urgency: 'URGENT', subject: 'Charged twice for MAX' }),
+    )
+    expect(sendSupportTicketEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ category: 'BILLING', urgency: 'URGENT', subject: 'Charged twice for MAX' }),
+    )
+  })
+
+  it('still files the ticket as Other / Normal when Laya and the summary fail', async () => {
     const mockDb = createMockDb()
     const values = vi.fn().mockReturnValue({
       returning: vi.fn().mockResolvedValue([{ id: TICKET_ID, userId: MEMBER_ID, handle: 'claw_lord' }]),
@@ -185,24 +206,19 @@ describe('createSupportTicketHandler', () => {
     mockDb.insert = vi.fn().mockReturnValue({ values })
 
     await createSupportTicketHandler({
-      data: {
-        ...validData,
-        category: 'SHELL_INTEGRITY',
-        urgency: 'CRITICAL',
+      data: validData,
+      context: { user: { sub: MEMBER_ID }, db: mockDb as any },
+      triage: {
+        classify: vi.fn().mockRejectedValue(new Error('timeout')),
+        summarize: vi.fn().mockResolvedValue(null),
       },
-      context: { user: { sub: MEMBER_ID, email: 'claw@moltology.org' }, db: mockDb as any },
     })
 
     expect(values).toHaveBeenCalledWith(
       expect.objectContaining({
         category: 'OTHER',
-        urgency: 'URGENT',
-      }),
-    )
-    expect(sendSupportTicketEmail).toHaveBeenCalledWith(
-      expect.objectContaining({
-        category: 'OTHER',
-        urgency: 'URGENT',
+        urgency: 'NORMAL',
+        subject: 'The vault would not open after a greaves swap.',
       }),
     )
   })
