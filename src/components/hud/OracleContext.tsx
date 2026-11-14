@@ -132,20 +132,17 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }
 
   const setMode = (newMode: OracleMode) => {
-    // If mobile and sidebar mode is requested, redirect to dedicated page mode.
-    // Phones have no floating window at all: the Oracle always opens as the full page.
+    // Narrow screens have no docked sidebar. Phones show 'popout' as a full-screen overlay
+    // that slides up over the current page; tablets get the dedicated page.
     let targetMode = newMode
     const width = typeof window !== 'undefined' ? window.innerWidth : Infinity
     const isPhone = width < 640
     if (targetMode === 'sidebar' && width < 768) {
-      targetMode = 'page'
-    }
-    if (targetMode === 'popout' && isPhone) {
-      targetMode = 'page'
+      targetMode = isPhone ? 'popout' : 'page'
     }
 
-    // A phone's forced page mode is not a preference, so desktop keeps its last choice.
-    if (targetMode !== 'closed' && !(isPhone && newMode !== targetMode)) {
+    // Phones only ever use the overlay, so their choice is not saved as the desktop preference.
+    if (targetMode !== 'closed' && !isPhone) {
       setLastActiveMode(targetMode)
       if (typeof window !== 'undefined') {
         try {
@@ -195,10 +192,9 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const toggleMode = (targetMode?: 'popout' | 'sidebar' | 'page') => {
     const effectiveTarget = targetMode || lastActiveMode || 'popout'
     const width = typeof window !== 'undefined' ? window.innerWidth : Infinity
+    // Phones: every open is the slide-up overlay.
     const resolvedMode =
-      (effectiveTarget === 'sidebar' && width < 768) || (effectiveTarget === 'popout' && width < 640)
-        ? 'page'
-        : effectiveTarget
+      width < 640 ? 'popout' : effectiveTarget === 'sidebar' && width < 768 ? 'page' : effectiveTarget
 
     if (mode === resolvedMode) {
       setMode('closed')
@@ -210,7 +206,8 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const openWithSkill = (skillId: string) => {
     setActiveThreadId(null)
     setPendingSkillId(skillId)
-    if (mode === 'closed') setMode(lastActiveMode || 'popout')
+    const isPhone = typeof window !== 'undefined' && window.innerWidth < 640
+    if (mode === 'closed') setMode(isPhone ? 'popout' : lastActiveMode || 'popout')
   }
 
   return (

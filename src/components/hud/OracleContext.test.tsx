@@ -81,9 +81,9 @@ describe('OracleContext & Mode Management', () => {
     expect(result.current.mode).not.toBe('sidebar')
   })
 
-  it('redirects sidebar mode to page mode on mobile viewports', () => {
+  it('turns sidebar into the overlay on phones and the page on tablets', () => {
     const originalWidth = window.innerWidth
-    window.innerWidth = 500
+    window.innerWidth = 700
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <OracleProvider>{children}</OracleProvider>
@@ -96,6 +96,25 @@ describe('OracleContext & Mode Management', () => {
     })
     expect(result.current.mode).toBe('page')
 
+    act(() => result.current.setMode('closed'))
+    window.innerWidth = 390
+    act(() => result.current.setMode('sidebar'))
+    expect(result.current.mode).toBe('popout')
+    // A phone's overlay is not saved as the desktop preference.
+    expect(result.current.lastActiveMode).toBe('page')
+
+    window.innerWidth = originalWidth
+  })
+
+  it('always opens the slide-up overlay from the phone core, whatever desktop last used', () => {
+    const originalWidth = window.innerWidth
+    window.innerWidth = 390
+    const wrapper = ({ children }: { children: React.ReactNode }) => <OracleProvider>{children}</OracleProvider>
+    const { result } = renderHook(() => useOracle(), { wrapper })
+    act(() => result.current.toggleMode('page'))
+    expect(result.current.mode).toBe('popout')
+    act(() => result.current.toggleMode('popout'))
+    expect(result.current.mode).toBe('closed')
     window.innerWidth = originalWidth
   })
 

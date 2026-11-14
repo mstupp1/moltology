@@ -38,6 +38,7 @@ import { resolveMemberPublicName } from '../../lib/member-handle'
 import { getAssetUrl } from '@/lib/assets'
 import { HUDMobileTabBar } from './HUDMobileTabBar'
 import { HudTopControls } from './HudTopControls'
+import { useSafeOracle } from './OracleContext'
 import { useDesktopViewport } from '@/hooks/useDesktopViewport'
 import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 
@@ -73,6 +74,19 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const location = useLocation()
 
   const currentRoute = location.pathname
+  const oracle = useSafeOracle()
+  // Phones show the Oracle as an overlay ('popout' mode) that slides up over the page.
+  const isOracleOverlayOpen = oracle?.mode === 'popout'
+
+  // Going to another page (a tab, a link in a reply) closes the phone overlay.
+  const lastRouteRef = React.useRef(currentRoute)
+  useEffect(() => {
+    if (lastRouteRef.current === currentRoute) return
+    lastRouteRef.current = currentRoute
+    if (oracle?.mode === 'popout' && typeof window !== 'undefined' && window.innerWidth < 640) {
+      oracle.setMode('closed')
+    }
+  }, [currentRoute])
 
   const [pendingRoute, setPendingRoute] = useState<string | null>(null)
   const effectiveRoute = pendingRoute || currentRoute
@@ -763,10 +777,23 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         tabs={mobileTabs}
         activeId={mobileActiveId}
         moreOpen={isMobileHeaderOpen}
-        onNavigate={(path) => handleNavClick(path)}
+        onNavigate={(path) => {
+          // Any tab, even the current page's, closes the phone Oracle overlay.
+          if (isOracleOverlayOpen) oracle?.setMode('closed')
+          handleNavClick(path)
+        }}
         onToggleMore={toggleMobileMenu}
         moreButtonRef={mobileTriggerRef}
-        core={{ current: isOnPath('/oracle'), onPress: () => handleNavClick('/oracle') }}
+        core={{
+          current: isOnPath('/oracle') || isOracleOverlayOpen,
+          onPress: () => {
+            // On the Oracle page itself (a direct link) the core has nothing to open.
+            if (isOnPath('/oracle')) return
+            if (isMobileOpen) closeMobileMenu()
+            if (oracle) oracle.toggleMode('popout')
+            else handleNavClick('/oracle')
+          },
+        }}
       />
 
       {/* Phone More sheet: sized to its rows and sitting on the bottom bar, over a dimmed page.
