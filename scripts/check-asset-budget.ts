@@ -65,6 +65,9 @@ function isEssentialPublicAsset(relPath: string): boolean {
       relPath === 'public/images/order_emblem.svg' ||
       relPath === 'public/images/scanline_pattern.png' ||
       relPath === 'public/images/scene-caustics.webp' ||
+      // Synaptic core launcher face (about 17 KB each), shown on every app page.
+      relPath === 'public/images/oracle-core-a.webp' ||
+      relPath === 'public/images/oracle-core-b.webp' ||
       relPath.startsWith('public/images/pwa/')
     )
   }
