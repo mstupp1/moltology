@@ -65,6 +65,8 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [isCaptionMinimized, setIsCaptionMinimized] = useState(false)
   const liveScrollRef = useRef<HTMLDivElement>(null)
+  // The open space between the top controls and the lower HUD; phones center the core in it.
+  const coreSpaceRef = useRef<HTMLDivElement>(null)
   const stickLiveBottomRef = useRef(true)
 
   // Identify latest user message, latest assistant reply, and prior history turns
@@ -116,6 +118,8 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
         <SynapticEntityCanvas
           bridge={bridge}
           isCompact={isCompact || isPhone}
+          fitPortrait={isPhone}
+          focusRef={coreSpaceRef}
           className="w-full h-full"
         />
         {/* Subtle top/bottom vignette for HUD legibility */}
@@ -221,7 +225,7 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
       )}
 
       {/* Spacer keeping the center of the 3D core unobstructed */}
-      <div className="flex-1 min-h-12 pointer-events-none" />
+      <div ref={coreSpaceRef} data-testid="synaptic-core-space" className="flex-1 min-h-12 pointer-events-none" />
 
       {/* Lower-Third Live Conversational HUD + Docked Composer */}
       <div className="relative z-10 flex flex-col gap-2 px-3 pb-2 pointer-events-none">

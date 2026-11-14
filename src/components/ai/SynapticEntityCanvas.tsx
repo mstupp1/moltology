@@ -26,7 +26,49 @@ export interface EntityBridgeReader {
 export interface SynapticEntityCanvasProps {
   bridge: EntityBridgeReader
   isCompact?: boolean
+  /**
+   * Phones: on a tall, narrow canvas, size the core by width (not height) and
+   * center it in the open space marked by `focusRef`, instead of filling the screen.
+   */
+  fitPortrait?: boolean
+  /** The open area the core should sit in (e.g. the space above the prompt chips). */
+  focusRef?: React.RefObject<HTMLElement | null>
   className?: string
+}
+
+const BASE_FOV = 45
+/** Core body diameter as a share of canvas height at the base FOV (measured from renders). */
+const CORE_HEIGHT_SHARE = 0.6
+
+export interface CoreFraming {
+  fov: number
+  /** Pixels to shift the view so the core's center lands at the focus area's center. */
+  offsetY: number
+}
+
+/**
+ * Camera framing for the core. Wide canvases keep the base view. Tall ones
+ * (phones) size the core to ~60% of the width, shrunk further to fit the open
+ * focus area, never below ~42% of the width, and move it to that area's center.
+ */
+export function computeCoreFraming(
+  width: number,
+  height: number,
+  fitPortrait: boolean,
+  focus: { top: number; height: number } | null,
+): CoreFraming {
+  if (!fitPortrait || width >= height || width <= 0 || height <= 0) return { fov: BASE_FOV, offsetY: 0 }
+  let target = width * 0.6
+  if (focus && focus.height > 0) target = Math.min(target, focus.height * 0.9)
+  target = Math.max(target, width * 0.42)
+  const baseDiameter = CORE_HEIGHT_SHARE * height
+  if (target >= baseDiameter) return { fov: BASE_FOV, offsetY: 0 }
+  const halfTan = Math.tan(((BASE_FOV / 2) * Math.PI) / 180) * (baseDiameter / target)
+  const fov = Math.min(100, (2 * Math.atan(halfTan) * 180) / Math.PI)
+  const centerY = focus && focus.height > 0 ? focus.top + focus.height / 2 : height / 2
+  const limit = height * 0.3
+  const offsetY = Math.max(-limit, Math.min(limit, height / 2 - centerY))
+  return { fov, offsetY }
 }
 
 interface Disposable {
@@ -1296,9 +1338,16 @@ function buildAegisContainmentShell(
 export function SynapticEntityCanvas({
   bridge,
   isCompact = false,
+  fitPortrait = false,
+  focusRef,
   className = '',
 }: SynapticEntityCanvasProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
+  // Read inside the render loop, so changing them never rebuilds the scene.
+  const fitPortraitRef = useRef(fitPortrait)
+  fitPortraitRef.current = fitPortrait
+  const focusRefRef = useRef(focusRef)
+  focusRefRef.current = focusRef
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const [webglUnavailable, setWebglUnavailable] = useState<boolean>(() => !canUseWebGL())
 
@@ -1345,7 +1394,7 @@ export function SynapticEntityCanvas({
       renderer.toneMappingExposure = 1.15
 
       const scene = new THREE.Scene()
-      const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 50)
+      const camera = new THREE.PerspectiveCamera(BASE_FOV, 1, 0.1, 50)
       camera.position.set(0, 0, isCompact ? 5.1 : 4.65)
       camera.lookAt(0, 0, 0)
 
@@ -1447,12 +1496,57 @@ export function SynapticEntityCanvas({
       composer.addPass(outputPass)
       disposables.push(composerTarget, bloomPass, outputPass, { dispose: () => composer.dispose() })
 
+      // Framing eases toward its target (e.g. when the prompt chips leave), and snaps on first layout.
+      const framing: CoreFraming = { fov: BASE_FOV, offsetY: 0 }
+      let framingTarget: CoreFraming = { fov: BASE_FOV, offsetY: 0 }
+      let framingReady = false
+      let viewWidth = 300
+      let viewHeight = 300
+      const applyFraming = () => {
+        camera.fov = framing.fov
+        if (Math.abs(framing.offsetY) > 0.5) {
+          camera.setViewOffset(viewWidth, viewHeight, 0, framing.offsetY, viewWidth, viewHeight)
+        } else {
+          camera.clearViewOffset()
+        }
+        camera.updateProjectionMatrix()
+      }
+      const measureFraming = () => {
+        const focusEl = focusRefRef.current?.current
+        let focus: { top: number; height: number } | null = null
+        if (focusEl && container) {
+          const box = focusEl.getBoundingClientRect()
+          const frame = container.getBoundingClientRect()
+          focus = { top: box.top - frame.top, height: box.height }
+        }
+        framingTarget = computeCoreFraming(viewWidth, viewHeight, fitPortraitRef.current, focus)
+        const reduceMotion =
+          typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+        if (!framingReady || reduceMotion) {
+          framing.fov = framingTarget.fov
+          framing.offsetY = framingTarget.offsetY
+          framingReady = true
+        }
+      }
+      const stepFraming = (dtSeconds: number) => {
+        const dFov = framingTarget.fov - framing.fov
+        const dOffset = framingTarget.offsetY - framing.offsetY
+        if (Math.abs(dFov) < 0.01 && Math.abs(dOffset) < 0.25) return
+        const k = 1 - Math.exp(-5 * dtSeconds)
+        framing.fov += dFov * k
+        framing.offsetY += dOffset * k
+        applyFraming()
+      }
+
       const updateDimensions = () => {
         if (!container || !renderer || !camera) return
         const width = container.clientWidth || 300
         const height = container.clientHeight || 300
+        viewWidth = width
+        viewHeight = height
         camera.aspect = width / height
-        camera.updateProjectionMatrix()
+        measureFraming()
+        applyFraming()
         renderer.setSize(width, height, false)
         composer.setSize(width, height)
         // Half the drawing-buffer size, for clip-space to pixel conversion
@@ -1465,6 +1559,9 @@ export function SynapticEntityCanvas({
           updateDimensions()
         })
         resizeObserver.observe(container)
+        // The open area resizes when the chips, captions or history panel change height.
+        const focusEl = focusRefRef.current?.current
+        if (focusEl) resizeObserver.observe(focusEl)
       } else if (typeof window !== 'undefined') {
         handleWindowResize = updateDimensions
         window.addEventListener('resize', handleWindowResize)
@@ -1678,6 +1775,7 @@ export function SynapticEntityCanvas({
         rootGroup.rotation.y = idleSwayX + pointerCurrent.x * 0.22
         rootGroup.rotation.x = idleSwayY + pointerCurrent.y * 0.16
 
+        stepFraming(dtSeconds)
         composer.render(dtSeconds)
         frameId = window.requestAnimationFrame(tick)
       }
