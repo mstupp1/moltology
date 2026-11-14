@@ -88,7 +88,8 @@ function OracleRouteComponent() {
   }
 
   return (
-    <div className="h-full flex flex-col font-sans text-ink">
+    // On phones the page rises from the bottom bar's core as it opens (oracle-page-rise in hud-chrome.css).
+    <div className="oracle-page-rise h-full flex flex-col font-sans text-ink">
       <div className="flex-1 min-h-0 bg-surface-1 sm:bg-abyss/40 backdrop-blur-md overflow-hidden relative">
         <React.Suspense fallback={<HudWorkspaceGhost />}>
           <LazyAIChatPanel

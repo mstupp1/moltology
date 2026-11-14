@@ -399,6 +399,20 @@ export function AccountHub({
     </div>
   )
 
+  // Phone: Settings is a plain row above Sign out, so the screen's header only holds the close button.
+  const settingsRow = (
+    <button
+      type="button"
+      onClick={() => go('/settings')}
+      data-testid="account-hub-settings"
+      className={`w-full min-h-12 px-3 rounded-control flex items-center gap-3 text-sm font-semibold text-ink hover:bg-surface-2 transition-colors ${focusRing}`}
+    >
+      <Settings className="w-5 h-5 text-ink-muted" aria-hidden="true" />
+      <span className="flex-1 text-left">Settings</span>
+      <ChevronRight className="w-4 h-4 text-ink-muted" aria-hidden="true" />
+    </button>
+  )
+
   const tasksList = (
     <AlignmentTodayList
       tasks={tasks}
@@ -466,10 +480,11 @@ export function AccountHub({
 
       {/* Phone: full-screen account screen */}
       {mounted && isPhone && (
-        <AccountScreen isOpen={isOpen} onClose={close} settingsButton={settingsButton}>
+        <AccountScreen isOpen={isOpen} onClose={close}>
           {identity}
           {statusCard}
           {tasksList}
+          {settingsRow}
           {signOutRow}
         </AccountScreen>
       )}
@@ -485,12 +500,10 @@ export function AccountHub({
 function AccountScreen({
   isOpen,
   onClose,
-  settingsButton,
   children,
 }: {
   isOpen: boolean
   onClose: () => void
-  settingsButton: React.ReactNode
   children: React.ReactNode
 }) {
   const { mounted: rendered, visible } = usePanelPresence(isOpen, 250)
@@ -559,6 +572,9 @@ function AccountScreen({
         {...swipe}
         className="shrink-0 h-14 px-2 pt-[env(safe-area-inset-top)] box-content flex items-center gap-2 border-b border-line-subtle touch-none"
       >
+        {/* Balances the close button so the title stays centred; close sits top right like every other close. */}
+        <span aria-hidden className="shrink-0 w-11 h-11" />
+        <h2 className="flex-1 text-center font-grotesk text-sm font-bold tracking-[0.08em] uppercase text-ink">Account</h2>
         <button
           type="button"
           onClick={onClose}
@@ -567,8 +583,6 @@ function AccountScreen({
         >
           <X className="w-5 h-5" aria-hidden="true" />
         </button>
-        <h2 className="flex-1 text-center font-grotesk text-sm font-bold tracking-[0.08em] uppercase text-ink">Account</h2>
-        {settingsButton}
       </div>
       <div
         data-testid="account-hub-panel"

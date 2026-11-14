@@ -899,8 +899,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         />
       )}
 
-      {showModeControls && oracle && oracle.mode !== 'closed' && (
-        <OracleModeMenu mode={oracle.mode} onSelect={handleModeSwitch} touch={isPhone} />
+      {/* Phones always use the full page, so there is nothing to switch to. */}
+      {showModeControls && oracle && oracle.mode !== 'closed' && !isPhone && (
+        <OracleModeMenu mode={oracle.mode} onSelect={handleModeSwitch} />
       )}
 
       <button

@@ -356,3 +356,19 @@ input[type="range"].dial-range:focus-visible {
   }
 }
 
+
+/* Phone Oracle page: slides up out of the bottom bar's core when it opens. */
+@media (max-width: 639px) {
+  .oracle-page-rise {
+    animation: oracle-page-rise 420ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+}
+@keyframes oracle-page-rise {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .oracle-page-rise {
+    animation: none;
+  }
+}
