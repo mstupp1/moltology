@@ -29,6 +29,8 @@ const PUBLIC_IMAGE_ALLOW_PREFIXES = [
   'public/images/chassis/',
   'public/images/forum/',
   'public/images/marketing/',
+  // Link-preview cards (og:image): small brand images built by `npm run share:cards`.
+  'public/images/sharing/',
 ]
 
 const PUBLIC_ALLOWED_ROOT_FILES = new Set([
