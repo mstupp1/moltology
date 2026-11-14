@@ -1605,6 +1605,25 @@ export const storeSettings = pgTable('store_settings', {
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),
 }, () => [pgPolicy('store_settings_server_only', { for: 'all', using: merchServerOnly, withCheck: merchServerOnly })]).enableRLS()
 
+/**
+ * The forum's group photo of every member's character (src/lib/community-photo.ts). One row,
+ * `id = 'forum'`. A visitor's browser draws a new photo when the cast has changed and this one is
+ * old enough; the server only stores it. Server-only: browsers read it through a server function.
+ */
+export const communityPhotos = pgTable('community_photos', {
+  id: text('id').primaryKey(),
+  /** Hash of who is in the photo and how each of them looks. */
+  castHash: text('castHash').notNull(),
+  /** Bucket key of the image. */
+  imageKey: text('imageKey').notNull(),
+  width: integer('width').notNull(),
+  height: integer('height').notNull(),
+  /** Where each member's head is in the image, as fractions of its size. */
+  spots: jsonb('spots').$type<import('../lib/community-photo').CommunityPhotoSpot[]>().default([]).notNull(),
+  takenBy: text('takenBy'),
+  takenAt: timestamp('takenAt').defaultNow().notNull(),
+}, () => [pgPolicy('community_photos_server_only', { for: 'all', using: merchServerOnly, withCheck: merchServerOnly })]).enableRLS()
+
 export const storeOverrides = pgTable('store_overrides', {
   id: uuid('id').primaryKey(),
   enabled: boolean('enabled').notNull(),
