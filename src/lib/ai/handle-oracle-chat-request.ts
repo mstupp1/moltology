@@ -9,6 +9,10 @@ import { verifyAuthJWT } from '../jwt'
 import { validateInputGuardrails, checkRateLimit } from './guardrails'
 import { buildSystemPrompt, DEFAULT_ORACLE_PERSONA } from './codex-prompt'
 import { buildOracleScriptureContext } from './scripture-lookup'
+import { buildOracleSkillContext, createOracleSkillTools, joinStepText } from './oracle-skills-prompt'
+import type { OracleSkill } from './oracle-skills-catalog'
+import { resolveOracleSkillPlan } from '../server/oracle-skill-access'
+import { ORACLE_SKILL_HEADER, type OracleSkillPart } from '../oracle-skills'
 import {
   saveAIMessage,
   createAIThread,
@@ -69,6 +73,8 @@ export interface OracleChatRequestBody {
   userId?: string
   threadId?: string
   model?: string
+  /** A skill the member turned on in the chat box. Ignored unless they can use it. */
+  skillId?: string
 }
 
 /**
@@ -214,12 +220,15 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     }
   }
 
-  const systemPrompt = buildSystemPrompt(DEFAULT_ORACLE_PERSONA)
+  const skillPlan = await resolveOracleSkillPlan(userId, typeof body.skillId === 'string' ? body.skillId : null)
+  const basePrompt = buildSystemPrompt(DEFAULT_ORACLE_PERSONA)
     + buildOracleScriptureContext(
       userText,
       [...storedTurns].reverse().find((turn) => turn.role === 'user')?.content,
       [...storedTurns].reverse().find((turn) => turn.role === 'assistant')?.content,
     )
+  const pickedPrompt = skillPlan.picked ? basePrompt + buildOracleSkillContext(skillPlan) : basePrompt
+  const discoveryPrompt = skillPlan.discoverable.length ? basePrompt + buildOracleSkillContext(skillPlan) : null
   // History comes from saved messages, never the client, so a caller cannot forge
   // assistant turns. Only the new user turn is taken from the request. If the
   // previous reply is still being saved, it is missing from this one request.
@@ -232,6 +241,11 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   ])
   const accessTier = usageReservation.isPremium ? 'premium' : 'free'
   const candidateModels = orderOracleModels(body.model, undefined, accessTier)
+  // Each model gets a try with the skill lookup, then one without it, so a model that
+  // stumbles on tools still answers.
+  const attempts = candidateModels.flatMap((model) =>
+    discoveryPrompt ? [{ model, withSkillTool: true }, { model, withSkillTool: false }] : [{ model, withSkillTool: false }],
+  )
   let lastError: Error | null = null
 
   queueOracleUserMessagePersistence({ userId, threadId: activeThreadId, userText })
@@ -248,10 +262,17 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     request.signal.removeEventListener('abort', abortTitle)
   }
 
-  for (const modelCandidate of candidateModels) {
+  for (const { model: modelCandidate, withSkillTool } of attempts) {
     const abortController = new AbortController()
     try {
       const threadIdForSave = activeThreadId
+      let usedSkill: { skill: OracleSkill; how: OracleSkillPart['how'] } | null = skillPlan.picked
+        ? { skill: skillPlan.picked, how: 'picked' }
+        : null
+      const skillTools = withSkillTool
+        ? createOracleSkillTools(skillPlan, { onUse: (skill) => { usedSkill = { skill, how: 'auto' } } })
+        : undefined
+      const systemPrompt = skillTools && discoveryPrompt ? discoveryPrompt : pickedPrompt
       const result = streamText({
         model: modelCandidate as any,
         ...getOracleGenerationOptions(modelCandidate),
@@ -260,7 +281,13 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
         messages: payloadMessages,
         maxOutputTokens: ORACLE_MAX_OUTPUT_TOKENS,
         abortSignal: abortController.signal,
-        onFinish: async ({ text, totalUsage }) => {
+        ...(skillTools ?? {}),
+        onFinish: async ({ text: finalStepText, steps, totalUsage }) => {
+          // A skill lookup splits the reply into two steps; save everything the member saw.
+          const text = joinStepText(steps, finalStepText)
+          const skillParts: OracleSkillPart[] = usedSkill
+            ? [{ type: 'skill', id: usedSkill.skill.id, name: usedSkill.skill.name, how: usedSkill.how }]
+            : []
           if (usageEventId) {
             void finalizeOracleUsage(usageEventId, {
               model: modelCandidate,
@@ -276,6 +303,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
                 userId,
                 role: 'assistant',
                 content: text,
+                parts: skillParts as unknown as Record<string, unknown>[],
               })
             }
           } catch (dbErr) {
@@ -316,6 +344,9 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
       if (activeThreadId) {
         headers[ORACLE_THREAD_ID_HEADER] = activeThreadId
       }
+      // A lookup runs before the first word, so by now the skill is known.
+      const skillUsed = usedSkill as { skill: OracleSkill } | null
+      if (skillUsed) headers[ORACLE_SKILL_HEADER] = skillUsed.skill.id
 
       const reader = committedStream.getReader()
       const responseStream = new ReadableStream({

@@ -31,6 +31,11 @@ interface OracleContextType {
   removeThreadLocally: (threadId: string) => void
   restoreThreadLocally: (thread: OracleThread) => void
   userId: string | null
+  /** A skill to turn on in the chat box the next time it renders (set by Use in Oracle). */
+  pendingSkillId: string | null
+  clearPendingSkill: () => void
+  /** Opens the Oracle on a new chat with this skill turned on. */
+  openWithSkill: (skillId: string) => void
 }
 
 const OracleContext = createContext<OracleContextType | undefined>(undefined)
@@ -58,6 +63,7 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return 'popout'
   })
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null)
+  const [pendingSkillId, setPendingSkillId] = useState<string | null>(null)
   const [threads, setThreads] = useState<OracleThread[]>([])
   const [isLoadingThreads, setIsLoadingThreads] = useState(false)
   const threadsCountRef = useRef(0)
@@ -193,6 +199,12 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }
 
+  const openWithSkill = (skillId: string) => {
+    setActiveThreadId(null)
+    setPendingSkillId(skillId)
+    if (mode === 'closed') setMode(lastActiveMode || 'popout')
+  }
+
   return (
     <OracleContext.Provider
       value={{
@@ -209,6 +221,9 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         removeThreadLocally,
         restoreThreadLocally,
         userId,
+        pendingSkillId,
+        clearPendingSkill: () => setPendingSkillId(null),
+        openWithSkill,
       }}
     >
       {children}

@@ -10,6 +10,9 @@ import { getChatLimitError } from './chat-retention'
 import { releaseGuestOracleMessage, reserveGuestOracleMessage } from './guest-usage'
 import { GUEST_ORACLE_LIMIT_MESSAGES } from './oracle-chat'
 import { ORACLE_GUEST_MAX_OUTPUT_TOKENS } from './usage-limits'
+import { resolveOracleSkillPlan } from '../server/oracle-skill-access'
+import { getOracleSkill } from './oracle-skills-catalog'
+import { ORACLE_SKILL_HEADER } from '../oracle-skills'
 
 vi.mock('../jwt', () => {
   const verifyAuthJWT = vi.fn().mockResolvedValue({ valid: false })
@@ -39,6 +42,10 @@ vi.mock('./service', () => ({
   finalizeOracleUsage: vi.fn().mockResolvedValue(undefined),
 }))
 
+vi.mock('../server/oracle-skill-access', () => ({
+  resolveOracleSkillPlan: vi.fn().mockResolvedValue({ discoverable: [] }),
+}))
+
 vi.mock('./guest-usage', () => ({
   reserveGuestOracleMessage: vi.fn().mockResolvedValue({ allowed: true }),
   releaseGuestOracleMessage: vi.fn().mockResolvedValue(undefined),
@@ -56,6 +63,9 @@ const streamTextMock = vi.fn()
 vi.mock('ai', () => ({
   experimental_evaluate: (...args: any[]) => evaluateMock(...args),
   streamText: (...args: any[]) => streamTextMock(...args),
+  tool: (definition: unknown) => definition,
+  jsonSchema: (schema: unknown) => schema,
+  isStepCount: (count: number) => ({ stepCount: count }),
   toTextStream: ({ stream }: any) => stream,
   createTextStreamResponse: ({ stream, headers }: any) =>
     new Response(stream, {
@@ -811,5 +821,110 @@ describe('handleOracleChatRequest', () => {
     expect(buildSystemPrompt).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'Synaptic Oracle' }),
     )
+  })
+})
+
+describe('handleOracleChatRequest with Oracle skills', () => {
+  const twoMinuteStart = getOracleSkill('two-minute-start')!
+  const focusRounds = getOracleSkill('focus-rounds')!
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    streamTextMock.mockReset()
+    vi.mocked(saveAIMessage).mockReset().mockResolvedValue({ id: 'msg-1' } as any)
+    vi.mocked(summarizeThreadTitle).mockReset().mockResolvedValue('Test Title')
+    vi.spyOn(crypto, 'randomUUID').mockReturnValue(TEST_THREAD_ID)
+  })
+
+  it('loads a picked skill into the prompt without the lookup tool and labels the reply', async () => {
+    vi.mocked(resolveOracleSkillPlan).mockResolvedValueOnce({ picked: twoMinuteStart, discoverable: [] })
+    streamTextMock.mockImplementationOnce((options) => ({
+      stream: textStream('Put the forms on your desk.').pipeThrough(new TransformStream({
+        async flush() { await options.onFinish({ text: 'Put the forms on your desk.', totalUsage: {} }) },
+      })),
+    }))
+    const response = await handleOracleChatRequest(await authedRequest({
+      skillId: 'two-minute-start',
+      messages: [{ role: 'user', content: 'I keep avoiding my taxes' }],
+    }))
+    expect(response.headers.get(ORACLE_SKILL_HEADER)).toBe('two-minute-start')
+    expect(await response.text()).toBe('Put the forms on your desk.')
+    expect(resolveOracleSkillPlan).toHaveBeenCalledWith('usr_from_jwt', 'two-minute-start')
+    const options = streamTextMock.mock.calls[0][0]
+    expect(options.system).toContain('SKILL IN USE: Two-minute start')
+    expect(options.system).toContain(twoMinuteStart.playbook)
+    expect(options.tools).toBeUndefined()
+    await vi.waitFor(() => expect(saveAIMessage).toHaveBeenCalledWith(expect.objectContaining({
+      role: 'assistant',
+      parts: [{ type: 'skill', id: 'two-minute-start', name: 'Two-minute start', how: 'picked' }],
+    })))
+  })
+
+  it('lets the Oracle look up an owned skill, then saves the text from both steps', async () => {
+    vi.mocked(resolveOracleSkillPlan).mockResolvedValueOnce({ discoverable: [twoMinuteStart, focusRounds] })
+    streamTextMock.mockImplementationOnce((options) => {
+      expect(options.system).toContain('- focus-rounds (Focus rounds)')
+      expect(options.stopWhen).toEqual({ stepCount: 2 })
+      expect(options.prepareStep({ stepNumber: 1 })).toEqual({ activeTools: [] })
+      return {
+        stream: new ReadableStream({
+          async start(controller) {
+            const playbook = await options.tools.use_skill.execute({ skill: 'focus-rounds' })
+            expect(playbook).toContain(focusRounds.playbook)
+            controller.enqueue(encoder.encode('Round 1 starts now.'))
+            controller.close()
+          },
+        }).pipeThrough(new TransformStream({
+          async flush() {
+            await options.onFinish({
+              text: 'Round 1 starts now.',
+              steps: [{ text: '' }, { text: 'Round 1 starts now.' }],
+              totalUsage: {},
+            })
+          },
+        })),
+      }
+    })
+    const response = await handleOracleChatRequest(await authedRequest({
+      messages: [{ role: 'user', content: 'Help me focus for two hours' }],
+    }))
+    expect(response.headers.get(ORACLE_SKILL_HEADER)).toBe('focus-rounds')
+    expect(await response.text()).toBe('Round 1 starts now.')
+    await vi.waitFor(() => expect(saveAIMessage).toHaveBeenCalledWith(expect.objectContaining({
+      role: 'assistant',
+      content: 'Round 1 starts now.',
+      parts: [{ type: 'skill', id: 'focus-rounds', name: 'Focus rounds', how: 'auto' }],
+    })))
+  })
+
+  it('answers without a label when the Oracle skips the lookup', async () => {
+    vi.mocked(resolveOracleSkillPlan).mockResolvedValueOnce({ discoverable: [focusRounds] })
+    streamTextMock.mockImplementationOnce((options) => ({
+      stream: textStream('Paris.').pipeThrough(new TransformStream({
+        async flush() { await options.onFinish({ text: 'Paris.', steps: [{ text: 'Paris.' }], totalUsage: {} }) },
+      })),
+    }))
+    const response = await handleOracleChatRequest(await authedRequest({
+      messages: [{ role: 'user', content: 'What is the capital of France?' }],
+    }))
+    expect(response.headers.get(ORACLE_SKILL_HEADER)).toBeNull()
+    await response.text()
+    await vi.waitFor(() => expect(saveAIMessage).toHaveBeenCalledWith(expect.objectContaining({ role: 'assistant', parts: [] })))
+  })
+
+  it('retries the same model without the lookup when the tool call fails', async () => {
+    vi.mocked(resolveOracleSkillPlan).mockResolvedValueOnce({ discoverable: [focusRounds] })
+    streamTextMock
+      .mockImplementationOnce(() => { throw new Error('tools not supported') })
+      .mockImplementationOnce((options) => ({ stream: textStream(options.tools ? 'with tools' : 'plain answer') }))
+    const response = await handleOracleChatRequest(await authedRequest({
+      messages: [{ role: 'user', content: 'Help me focus for two hours' }],
+    }))
+    expect(await response.text()).toBe('plain answer')
+    expect(streamTextMock).toHaveBeenCalledTimes(2)
+    expect(streamTextMock.mock.calls[0][0].model).toBe(streamTextMock.mock.calls[1][0].model)
+    expect(streamTextMock.mock.calls[0][0].tools).toBeDefined()
+    expect(streamTextMock.mock.calls[1][0].tools).toBeUndefined()
+    expect(streamTextMock.mock.calls[1][0].system).not.toContain('=== SKILLS ===')
   })
 })

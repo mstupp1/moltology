@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import React from 'react'
 import { render, screen, fireEvent, within, waitFor } from '@testing-library/react'
-import { PromptInput, OracleModelPicker } from './prompt-input'
+import { PromptInput, OracleModelPicker, filterSkillOptions, readSlashQuery } from './prompt-input'
 import { getOracleModel, ORACLE_MODELS } from '@/lib/ai/oracle-models'
 
 describe('PromptInput', () => {
@@ -211,5 +211,94 @@ describe('PromptInput', () => {
     const { container } = render(<PromptInput onSubmit={vi.fn()} compact footnote="Check anything important." />)
     expect(container.querySelector('form')?.className).toContain('items-end')
     expect(screen.getByText('Check anything important.')).toBeInTheDocument()
+  })
+})
+
+describe('PromptInput skills', () => {
+  const skills = [
+    { id: 'focus-rounds', name: 'Focus rounds', summary: 'Work in 25-minute rounds.' },
+    { id: 'two-minute-start', name: 'Two-minute start', summary: 'Get moving.' },
+  ]
+
+  it('reads "/" queries and filters by name or id', () => {
+    expect(readSlashQuery('/')).toBe('')
+    expect(readSlashQuery('/two min')).toBe('two min')
+    expect(readSlashQuery('hello /focus')).toBeNull()
+    expect(readSlashQuery('/focus\nmore')).toBeNull()
+    expect(filterSkillOptions(skills, 'two-minute').map((s) => s.id)).toEqual(['two-minute-start'])
+    expect(filterSkillOptions(skills, '')).toHaveLength(2)
+  })
+
+  function Harness({ onSubmit = vi.fn() }: { onSubmit?: (m: { text: string }) => void }) {
+    const [active, setActive] = React.useState<string | null>(null)
+    const activeSkill = skills.find((s) => s.id === active) ?? null
+    return (
+      <PromptInput
+        onSubmit={onSubmit}
+        skills={skills}
+        activeSkill={activeSkill}
+        onPickSkill={setActive}
+        onClearSkill={() => setActive(null)}
+      />
+    )
+  }
+
+  it('lists skills after "/", picks one with the keyboard, and shows it as a chip', () => {
+    const onSubmit = vi.fn()
+    render(<Harness onSubmit={onSubmit} />)
+    const box = screen.getByRole('textbox', { name: 'Message' }) as HTMLTextAreaElement
+    fireEvent.change(box, { target: { value: '/' } })
+    const list = screen.getByRole('listbox', { name: 'Skills' })
+    expect(within(list).getAllByRole('option')).toHaveLength(2)
+    fireEvent.keyDown(box, { key: 'ArrowDown' })
+    fireEvent.keyDown(box, { key: 'Enter' })
+    expect(onSubmit).not.toHaveBeenCalled()
+    expect(box.value).toBe('')
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Turn off Two-minute start' })).toBeInTheDocument()
+  })
+
+  it('narrows the list as the member types and turns the skill off with Backspace in an empty box', () => {
+    render(<Harness />)
+    const box = screen.getByRole('textbox', { name: 'Message' }) as HTMLTextAreaElement
+    fireEvent.change(box, { target: { value: '/foc' } })
+    const option = screen.getByRole('option', { name: /Focus rounds/ })
+    fireEvent.click(option)
+    expect(screen.getByRole('button', { name: 'Turn off Focus rounds' })).toBeInTheDocument()
+    fireEvent.keyDown(box, { key: 'Backspace' })
+    expect(screen.queryByRole('button', { name: 'Turn off Focus rounds' })).not.toBeInTheDocument()
+  })
+
+  it('closes the list on Escape and sends the text as a normal message', () => {
+    const onSubmit = vi.fn()
+    render(<Harness onSubmit={onSubmit} />)
+    const box = screen.getByRole('textbox', { name: 'Message' }) as HTMLTextAreaElement
+    fireEvent.change(box, { target: { value: '/shrug' } })
+    expect(screen.getByText(/No skill matches/)).toBeInTheDocument()
+    fireEvent.keyDown(box, { key: 'Escape' })
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+    fireEvent.keyDown(box, { key: 'Enter' })
+    expect(onSubmit).toHaveBeenCalledWith({ text: '/shrug' })
+  })
+
+  it('floats the list over the chat and swaps the Skills button for the active skill, without adding a row', () => {
+    render(<Harness />)
+    const box = screen.getByRole('textbox', { name: 'Message' }) as HTMLTextAreaElement
+    fireEvent.change(box, { target: { value: '/' } })
+    expect(screen.getByRole('listbox', { name: 'Skills' }).className).toMatch(/\babsolute\b/)
+    fireEvent.keyDown(box, { key: 'Enter' })
+    expect(screen.queryByRole('button', { name: 'Skills' })).not.toBeInTheDocument()
+    const pill = screen.getByRole('button', { name: 'Skill: Focus rounds. Change skill' })
+    const clear = screen.getByRole('button', { name: 'Turn off Focus rounds' })
+    expect(pill.parentElement).toBe(clear.parentElement)
+    fireEvent.click(clear)
+    expect(screen.getByRole('button', { name: 'Skills' })).toBeInTheDocument()
+  })
+
+  it('shows no skill controls without skills', () => {
+    render(<PromptInput onSubmit={vi.fn()} />)
+    fireEvent.change(screen.getByRole('textbox', { name: 'Message' }), { target: { value: '/' } })
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Skills' })).not.toBeInTheDocument()
   })
 })

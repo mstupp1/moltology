@@ -7,7 +7,9 @@ import {
   Shield,
   UserPlus,
   ArrowDown,
+  ScrollText,
 } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 import { Conversation, ConversationContent } from '../ai-elements/conversation'
 import {
   Message,
@@ -48,6 +50,8 @@ import { oracleAuthData } from '../../lib/ai/oracle-auth-client'
 import { useOracleUsage } from '@/hooks/useOracleUsage'
 import { isAdmin } from '@/lib/permissions'
 import { CHAT_LIMIT, getChatLimitError } from '@/lib/ai/chat-retention'
+import { readSkillPart, usableSkills } from '@/lib/oracle-skills'
+import { useOracleSkills } from '@/hooks/useOracleSkills'
 
 const INLINE_COMPOSER_MIN_WIDTH = 640
 
@@ -93,6 +97,8 @@ interface ChatMessage {
   failedError?: string
   /** Set on an assistant reply the member stopped. */
   stopped?: boolean
+  /** The skill that shaped an assistant reply. */
+  skill?: { id: string; name: string }
 }
 
 /** Distance from the bottom (px) that still counts as reading the latest turn. */
@@ -103,10 +109,12 @@ const isAbortError = (err: unknown) =>
 
 
 function toChatMessage(r: any, isMounted: boolean): ChatMessage {
+  const skill = r.role === 'assistant' ? readSkillPart(r.parts) : null
   return {
     id: r.id,
     role: r.role,
     content: r.content,
+    ...(skill ? { skill: { id: skill.id, name: skill.name } } : {}),
     timestamp:
       r.createdAt && isMounted
         ? new Date(r.createdAt).toLocaleTimeString([], {
@@ -234,6 +242,17 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const memberHandle = memberProfile?.handle ?? null
   const memberLarvaId = memberProfile?.larvaId ?? null
   const [draft, setDraft] = useState('')
+  // Skills: what this member can use, and the one turned on for this chat (the chip).
+  const { data: skillsData } = useOracleSkills(userId, Boolean(userId))
+  const skillOptions = userId ? usableSkills(skillsData?.skills ?? []) : []
+  const [activeSkillId, setActiveSkillId] = useState<string | null>(null)
+  const activeSkill = skillOptions.find((s) => s.id === activeSkillId) ?? null
+  const pendingSkillId = oracle?.pendingSkillId ?? null
+  useEffect(() => {
+    if (!pendingSkillId) return
+    setActiveSkillId(pendingSkillId)
+    oracle?.clearPendingSkill()
+  }, [pendingSkillId, oracle])
   const [preferredViewMode, setViewMode] = useState<OracleViewMode>(initialViewMode ?? 'standard')
   const viewMode = allowEntityMode ? preferredViewMode : 'standard'
 
@@ -636,14 +655,25 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
           content: m.content,
         }))
 
+      const labelReply = (skillId: string) => {
+        const skill = skillOptions.find((s) => s.id === skillId)
+        if (!skill) return
+        // A skill the Oracle picked stays on for the chat, like one the member picked.
+        setActiveSkillId(skill.id)
+        setMessages((prev) =>
+          prev.map((m) => (m.id === assistantId ? { ...m, skill: { id: skill.id, name: skill.name } } : m)),
+        )
+      }
       const res = await streamOracleChat({
         messages: payloadMessages,
         userId: userId || undefined,
         threadId: activeThreadId || undefined,
         model: requestedModel && canUseOracleChatModel(requestedModel, accessTier) ? requestedModel.id : undefined,
+        skillId: activeSkill?.id,
         signal: controller.signal,
         onThreadId: applyThreadId,
         onChunk: queueStreamText,
+        onSkill: labelReply,
       })
 
       if (res.threadId) {
@@ -754,6 +784,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       entityBridge.reset()
       loadedThreadIdRef.current = null
       setMessages([])
+      setActiveSkillId(null)
     }
     if (oracle) {
       oracle.setActiveThreadId(selectedId)
@@ -775,6 +806,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
     setMessages([])
     setErrorMessage(null)
+    setActiveSkillId(null)
     if (chatsLayout === 'takeover') closeChats(false)
   }
 
@@ -849,6 +881,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         onSelectModel={(id) => {
           if (canUseOracleChatModel(getOracleModel(id), accessTier)) setModelChoice({ userId, id })
         }}
+        skills={skillOptions}
+        activeSkill={activeSkill}
+        onPickSkill={setActiveSkillId}
+        onClearSkill={() => setActiveSkillId(null)}
       />
     </div>
   )
@@ -1068,6 +1104,17 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                               actionsAlwaysVisible={Boolean(msg.failedError)}
                             >
                               <MessageContent>
+                                {isAssistant && msg.skill && (
+                                  <Link
+                                    to="/character/shop"
+                                    search={{ tab: 'skills', skill: msg.skill.id } as never}
+                                    className="mb-1 inline-flex items-center gap-1 rounded-chip text-[11px] font-medium text-ink-muted hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                                    title="About this skill"
+                                  >
+                                    <ScrollText className="w-3 h-3 text-cyan-glow" aria-hidden="true" />
+                                    Using {msg.skill.name}
+                                  </Link>
+                                )}
                                 {msg.role === 'user' ? (
                                   msg.content
                                 ) : msg.content ? (
