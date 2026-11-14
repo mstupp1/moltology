@@ -4,6 +4,7 @@ import { HUDSidebar } from '@/components/hud/HUDSidebar'
 import { CommandPalette } from '@/components/hud/CommandPalette'
 import { SynapticOracleWidget } from '@/components/hud/SynapticOracleWidget'
 import { AISidebarDrawer } from '@/components/hud/AISidebarDrawer'
+import { setOracleCoreIntroBlocked } from '@/lib/ai/oracle-core-intro'
 import { UnderwaterBubblesCanvas, isLowPowerDevice, readDeviceHints } from '@/components/hud/UnderwaterBubblesCanvas'
 import { OracleProvider, useSafeOracle } from '@/components/hud/OracleContext'
 import { AlignmentProvider } from '@/hooks/useDailyAlignment'
@@ -37,7 +38,10 @@ function HudContent() {
   // Low-power or data-saver devices skip the light shafts; bubbles scale themselves down.
   const [lowPowerDevice, setLowPowerDevice] = useState(false)
   useEffect(() => {
-    setLowPowerDevice(isLowPowerDevice(readDeviceHints()))
+    const lowPower = isLowPowerDevice(readDeviceHints())
+    setLowPowerDevice(lowPower)
+    // CSS hook for always-on ambient motion (the Oracle core's idle ring) to stand down.
+    if (lowPower) document.documentElement.dataset.lowPower = 'true'
   }, [])
   // Full-screen overlays and the phone Oracle cover the backdrop.
   const backdropCovered = useBackdropCovered()
@@ -91,6 +95,11 @@ function HudContent() {
       setShowWelcome(true)
     }
   }, [targetId, isDashboardRoute])
+
+  // The Oracle core's first-visit tip waits until the welcome flow is closed.
+  useEffect(() => {
+    setOracleCoreIntroBlocked(showWelcome)
+  }, [showWelcome])
 
   const handleDismissWelcome = () => {
     const activeId = userId || 'guest'

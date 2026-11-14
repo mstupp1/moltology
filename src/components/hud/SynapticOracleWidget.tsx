@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { OracleCoreGlyph } from '../ai/OracleCoreGlyph'
+import { OracleCoreTip } from '../ai/OracleCoreTip'
+import { markOracleCoreIntroSeen, useOracleCoreIntro } from '@/lib/ai/oracle-core-intro'
 import { PhoneOracleOverlay } from './PhoneOracleOverlay'
 import { DEFAULT_ORACLE_PLACEHOLDER } from '@/lib/ai/oracle-models'
 import { AIChatPanel } from '../ai/AIChatPanel'
@@ -149,6 +151,10 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     }
   }, [oracle?.mode, updatePopoutSize])
 
+  // First-visit tip beside the launcher (phones show theirs on the bottom bar's core).
+  const launcherShown = isMounted && !isMobile && !isPopoutActive && !isRendered
+  const showIntro = useOracleCoreIntro(launcherShown)
+
   const handleToggle = () => {
     if (oracle) {
       oracle.toggleMode()
@@ -259,7 +265,10 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
 
       {/* ── Desktop: the synaptic core launcher; hovering slides out the prompt ── */}
       {!isMobile && !isPopoutActive && !isRendered && (
-        <div className="hidden md:block fixed z-40 right-6 bottom-4 font-sans select-none">
+        <div className="hidden md:flex items-center gap-3 fixed z-40 right-6 bottom-4 font-sans select-none">
+          {showIntro && (
+            <OracleCoreTip placement="left" onOpen={handleToggle} onDismiss={markOracleCoreIntroSeen} />
+          )}
           <button
             type="button"
             onClick={handleToggle}
@@ -270,7 +279,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
           >
             <span
               aria-hidden
-              className="pointer-events-none -mr-7 flex h-10 items-center overflow-hidden whitespace-nowrap rounded-full border border-line bg-surface-1/95 backdrop-blur-xl shadow-menu max-w-0 pl-0 pr-0 opacity-0 transition-[max-width,padding,opacity] duration-300 ease-out group-hover:max-w-[240px] group-hover:pl-4 group-hover:pr-10 group-hover:opacity-100 group-focus-visible:max-w-[240px] group-focus-visible:pl-4 group-focus-visible:pr-10 group-focus-visible:opacity-100 motion-reduce:transition-none"
+              className={`${showIntro ? 'hidden ' : ''}pointer-events-none -mr-7 flex h-10 items-center overflow-hidden whitespace-nowrap rounded-full border border-line bg-surface-1/95 backdrop-blur-xl shadow-menu max-w-0 pl-0 pr-0 opacity-0 transition-[max-width,padding,opacity] duration-300 ease-out group-hover:max-w-[240px] group-hover:pl-4 group-hover:pr-10 group-hover:opacity-100 group-focus-visible:max-w-[240px] group-focus-visible:pl-4 group-focus-visible:pr-10 group-focus-visible:opacity-100 motion-reduce:transition-none`}
             >
               <span className="text-xs tracking-wide text-ink-body font-medium">{DEFAULT_ORACLE_PLACEHOLDER}</span>
               <span
@@ -279,7 +288,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
               />
             </span>
             <span className="relative transition-transform duration-200 ease-out group-hover:scale-105 group-active:scale-95 motion-reduce:transition-none">
-              <OracleCoreGlyph size={52} />
+              <OracleCoreGlyph size={52} beacon={showIntro} />
             </span>
           </button>
         </div>

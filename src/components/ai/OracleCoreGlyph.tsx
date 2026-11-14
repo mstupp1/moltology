@@ -7,25 +7,32 @@ export interface OracleCoreGlyphProps {
   size: number
   /** Brighter halo, e.g. while on the Oracle page. */
   active?: boolean
+  /** Stronger, faster rings while the first-visit tip points at the core. */
+  beacon?: boolean
   className?: string
 }
 
 /**
  * The synaptic core as a small, cheap button face: two cached stills of the
  * real 3D core, slowly turning and cross-fading inside a glass socket, with a
- * breathing halo. No WebGL; the live core only runs in Oracle's entity view.
- * Motion stops under prefers-reduced-motion (see hud-chrome.css).
+ * breathing halo and one slow ring every few seconds so it reads as alive.
+ * No WebGL; the live core only runs in Oracle's entity view. Motion stops under
+ * prefers-reduced-motion, and the idle ring stops on low-power devices
+ * (see hud-chrome.css).
  */
-export function OracleCoreGlyph({ size, active = false, className = '' }: OracleCoreGlyphProps) {
+export function OracleCoreGlyph({ size, active = false, beacon = false, className = '' }: OracleCoreGlyphProps) {
   return (
     <span
       aria-hidden
       data-testid="oracle-core-glyph"
       data-active={active ? 'true' : undefined}
+      data-beacon={beacon ? 'true' : undefined}
       className={`oracle-core ${className}`}
       style={{ width: size, height: size }}
     >
       <span className="oracle-core__halo" />
+      <span className="oracle-core__ring" />
+      <span className="oracle-core__ring oracle-core__ring--b" />
       <span className="oracle-core__orb">
         <img src={CORE_FRAMES[0]} alt="" draggable={false} decoding="async" className="oracle-core__frame" />
         <img
