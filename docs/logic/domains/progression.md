@@ -109,7 +109,7 @@ rules:
   - id: progression.referral-rewards
     title: Qualified referral XP
     kind: threshold
-    statement: A new member qualifies after a character, username, and first liturgy. The referrer earns 100 XP once, capped at five per UTC month of qualification. Clicks, existing accounts, self-referrals, and simulated members earn none. Unchecking a liturgy does not undo qualification. Deleting a referred account keeps its reward slot occupied.
+    statement: A new member qualifies after a character, username, and first liturgy. The referrer earns 100 XP and 100 Chitin Gems once, capped at five per UTC month of qualification. Clicks, existing accounts, self-referrals, and simulated members earn none. Unchecking a liturgy does not undo qualification. Deleting a referred account keeps its reward slot occupied.
     dependsOn: [social.referrals, progression.xp-ledger, economy.red-line]
     anchors:
       - file: src/lib/referrals.ts

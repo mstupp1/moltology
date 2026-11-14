@@ -7,19 +7,19 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-11-12",
+  "syncedAt": "2026-11-14",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
-    "rules": 128,
-    "decisions": 56,
-    "anchors": 249,
-    "drifted": 53,
-    "flagged": 9
+    "rules": 137,
+    "decisions": 64,
+    "anchors": 278,
+    "drifted": 0,
+    "flagged": 8
   },
   "canvas": {
-    "width": 6697,
-    "height": 2976
+    "width": 7236,
+    "height": 3248
   },
   "domains": [
     {
@@ -27,20 +27,24 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Economy & currencies",
       "color": "#ffb020",
       "summary": "Two currencies with a locked split. Chitin Gems are earned, Molt Credits are bought, and rank and authority cannot be purchased.",
-      "overviewHtml": "<p>The economy is a locked design decision in <code>BRAND_BIBLE.md</code> §4 and hard rule 2 in <code>AGENTS.md</code>. Every paid feature must be checked against the red line before it ships.</p>\n<p>Today the market is a demo. No real Credits are sold and nothing is enforced on the server.</p>",
+      "overviewHtml": "<p>The economy is a locked design decision in <code>BRAND_BIBLE.md</code> §4 and hard rule 2 in <code>AGENTS.md</code>. Every paid feature must be checked against the red line before it ships.</p>\n<p>Gems and Credits are real ledgers. The Shop sells gear and Oracle skills, and every purchase is checked on the server. Credit packs are live only for members with the molt-credits experiment.</p>",
       "box": {
         "x": 0,
         "y": 0,
-        "width": 1598,
-        "height": 676
+        "width": 2137,
+        "height": 996
       },
       "ruleIds": [
         "economy.two-currencies",
         "economy.red-line",
         "economy.signup-free",
         "economy.starting-balances",
+        "economy.gem-ledger",
+        "economy.gem-earning",
         "economy.market-catalog",
-        "economy.market-local-preview",
+        "economy.market-purchases",
+        "economy.credit-packs",
+        "economy.oracle-skill-prices",
         "economy.simulated-gem-grants",
         "economy.cosmetics-no-stats",
         "economy.look-slots",
@@ -56,7 +60,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Daily liturgies earn XP into an append-only ledger. Stage and clearance are derived from lifetime XP, never set directly.",
       "overviewHtml": "<p>Progression is the earned half of the economy. The XP ledger is the source of truth, and <code>profiles.xp</code> and <code>profiles.stage</code> are caches rebuilt from it after every change.</p>",
       "box": {
-        "x": 1694,
+        "x": 2233,
         "y": 0,
         "width": 1488,
         "height": 988
@@ -82,7 +86,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Two roles, user and admin. Server functions verify the caller's JWT, then check the role before any staff action.",
       "overviewHtml": "<p>Access has two layers. The UI hides staff tools from everyone else, and each server function checks the role again, because the client can be skipped.</p>",
       "box": {
-        "x": 3278,
+        "x": 3817,
         "y": 0,
         "width": 1196,
         "height": 676
@@ -106,7 +110,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Self-hosted Better Auth with email and password plus Google. Sessions are cookie-cached, and writes use short-lived JWTs.",
       "overviewHtml": "<p>Auth moved off Managed Neon Auth because its background polling kept Neon compute awake and blew the compute budget. Identity for writes is always a verified JWT, never a client-supplied id.</p>",
       "box": {
-        "x": 4570,
+        "x": 5109,
         "y": 0,
         "width": 2127,
         "height": 548
@@ -133,12 +137,13 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "overviewHtml": "<p>Screening uses cheap local checks first, then asks Laya only when needed. Every path fails open, because a false block costs a real member.</p>",
       "box": {
         "x": 0,
-        "y": 1084,
+        "y": 1092,
         "width": 2364,
         "height": 680
       },
       "ruleIds": [
         "signup.pipeline",
+        "signup.guest-progress-claim",
         "signup.honeypot",
         "signup.fast-form",
         "signup.disposable-domains",
@@ -159,7 +164,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "overviewHtml": "<p>Premium is a subscription, not a currency. It sits beside the economy and must stay on the right side of the red line. During the soft launch, only staff can see, buy, or turn Premium on without a charge.</p>",
       "box": {
         "x": 2460,
-        "y": 1084,
+        "y": 1092,
         "width": 1240,
         "height": 496
       },
@@ -182,7 +187,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "overviewHtml": "<p>Moderation is deliberately light. The gate refuses only clear abuse. Everything else is published, and low quality is handled by keeping it out of Hot, not by deleting it. Staff act on flags by hand.</p>",
       "box": {
         "x": 3796,
-        "y": 1084,
+        "y": 1092,
         "width": 1780,
         "height": 808
       },
@@ -211,15 +216,17 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "overviewHtml": "<p>The Oracle is the most expensive surface, because every message is a billed model call. The pipeline refuses abuse cheaply first, caps each member&#39;s allowance, then selects a chat model allowed by the verified membership tier. There is no remote moderation call in chat; Laya and Jev remain in forum and signup screening.</p>",
       "box": {
         "x": 0,
-        "y": 1988,
-        "width": 1718,
-        "height": 808
+        "y": 1996,
+        "width": 2010,
+        "height": 816
       },
       "ruleIds": [
         "oracle.request-pipeline",
         "oracle.rate-limit",
         "oracle.usage-allowance",
         "oracle.guest-allowance",
+        "oracle.skill-context",
+        "oracle.custom-instructions",
         "oracle.request-caps",
         "oracle.input-guardrails",
         "oracle.jailbreak-gate",
@@ -237,8 +244,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Members claim one unique handle, and feeds only show real activity from the member and their friends. Empty stays honest.",
       "overviewHtml": "<p>Social surfaces follow one rule. Show real people and real activity, or show nothing. A quiet new account sees an honest, empty stream instead of fake veterans.</p>",
       "box": {
-        "x": 1814,
-        "y": 1988,
+        "x": 2106,
+        "y": 1996,
         "width": 904,
         "height": 496
       },
@@ -260,10 +267,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "The app runs inside Neon Free and Vercel Hobby limits. Retention windows, polling rules, and the asset budget keep it there.",
       "overviewHtml": "<p>Most cost decisions trace back to two limits: Neon Free compute hours and Vercel Hobby Active CPU. Anything that polls, keeps compute awake, or grows storage without bound has to justify itself here.</p>",
       "box": {
-        "x": 2814,
-        "y": 1988,
-        "width": 904,
-        "height": 940
+        "x": 3106,
+        "y": 1996,
+        "width": 1196,
+        "height": 1252
       },
       "ruleIds": [
         "data.member-share-previews",
@@ -277,6 +284,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "data.asset-budget",
         "data.avatar-look-server",
         "data.avatar-portraits",
+        "data.saved-portraits",
+        "data.community-photo",
         "data.character-atomic-save",
         "data.character-public-appearance"
       ]
@@ -288,8 +297,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Private-by-default guest checkout preparation with live quotes, audited operations, and recoverable draft fulfillment.",
       "overviewHtml": "<h1>Store launch preparation</h1>\n<p>The store stays private, test-only and manual until separately authorized. Authored product data,\noperational controls and order snapshots have separate lifecycles. See <code>docs/merch-launch.md</code>.</p>",
       "box": {
-        "x": 3814,
-        "y": 1988,
+        "x": 4398,
+        "y": 1996,
         "width": 992,
         "height": 988
       },
@@ -315,8 +324,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Standing is a member's forum reputation, from upvotes plus review adjustments. It decides who can start threads, which replies sink, and who is limited.",
       "overviewHtml": "<p>Standing is the forum&#39;s reputation score. It comes from other members&#39; upvotes and gates the actions that cost the community the most: new threads and high reply volume.</p>",
       "box": {
-        "x": 4902,
-        "y": 1988,
+        "x": 5486,
+        "y": 1996,
         "width": 1196,
         "height": 520
       },
@@ -343,10 +352,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "BRAND_BIBLE.md",
           "symbol": "4. The Economy",
-          "line": 182,
+          "line": 183,
           "value": "Signup is free. Chitin Gems are earned by doing the work: shedding, routines, and being",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L182"
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L183"
         },
         {
           "file": "AGENTS.md",
@@ -363,8 +372,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "economy.red-line",
         "economy.signup-free",
         "economy.starting-balances",
+        "economy.gem-ledger",
         "economy.market-catalog",
-        "economy.simulated-gem-grants"
+        "economy.credit-packs"
       ],
       "decisions": [
         "lock-two-currency-economy",
@@ -373,7 +383,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 226,
+        "x": 1716,
         "y": 76
       },
       "drift": "ok"
@@ -389,10 +399,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "BRAND_BIBLE.md",
           "symbol": "4. The Economy",
-          "line": 182,
+          "line": 183,
           "value": "Signup is free. Chitin Gems are earned by doing the work: shedding, routines, and being",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L182"
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L183"
         }
       ],
       "tests": [],
@@ -400,6 +410,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "economy.two-currencies"
       ],
       "usedBy": [
+        "economy.credit-packs",
+        "economy.oracle-skill-prices",
         "economy.cosmetics-no-stats",
         "economy.character-starter-equipment",
         "economy.character-equipment-visuals",
@@ -419,8 +431,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 138,
-        "y": 232
+        "x": 605,
+        "y": 240
       },
       "drift": "ok"
     },
@@ -452,25 +464,25 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 430,
-        "y": 232
+        "x": 1518,
+        "y": 240
       },
       "drift": "ok"
     },
     {
       "id": "economy.starting-balances",
       "domain": "economy",
-      "title": "Starting balances",
+      "title": "New accounts start at zero",
       "kind": "threshold",
       "status": "active",
-      "statement": "New profiles start with 1,450 Molt Credits and 250 Chitin Gems, set as column defaults on the profiles table.",
+      "statement": "New profiles start with 0 Molt Credits and 0 Chitin Gems. A 100 Gem welcome grant lands through the Gem ledger on the member's first earning action.",
       "anchors": [
         {
           "file": "src/db/schema.ts",
           "symbol": "profiles.moltCredits",
           "line": 131,
           "value": "decimal('moltCredits', { precision: 12, scale: 2 }).default('0.00').notNull()",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L131"
         },
         {
@@ -478,8 +490,16 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "profiles.chitinGems",
           "line": 133,
           "value": "integer('chitinGems').default(0).notNull()",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L133"
+        },
+        {
+          "file": "src/lib/gems.ts",
+          "symbol": "GEM_WELCOME_GRANT",
+          "line": 11,
+          "value": "100",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/gems.ts#L11"
         }
       ],
       "tests": [
@@ -489,156 +509,546 @@ export const LOGIC_ATLAS: LogicAtlas = {
         }
       ],
       "dependsOn": [
-        "economy.two-currencies"
+        "economy.two-currencies",
+        "economy.gem-ledger"
       ],
       "usedBy": [],
-      "decisions": [],
+      "decisions": [
+        "earned-gem-ledger"
+      ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 722,
-        "y": 232
+        "x": 1233,
+        "y": 396
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
-      "id": "economy.market-catalog",
+      "id": "economy.gem-ledger",
       "domain": "economy",
-      "title": "Market catalog",
-      "kind": "gate",
+      "title": "Gems live in a ledger",
+      "kind": "invariant",
       "status": "active",
-      "statement": "The market has three tabs. Buy Credits sells Credit packs, Exchange spends Credits on accelerators and cosmetics, and the Gem Vault holds prestige cosmetics that only Gems unlock.",
+      "statement": "Every Gem award, purchase, and refund is a row in gem_transactions with a source key that is unique per member, so no award lands twice. The profile balance is a cached sum, refreshed after locking the profile row so concurrent writes can't leave it stale.",
       "anchors": [
         {
-          "file": "src/components/hud/market/market-data.ts",
-          "symbol": "MOLT_CREDIT_PACKS",
-          "line": null,
-          "value": null,
-          "drift": "missing",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/market-data.ts"
+          "file": "src/lib/server/gems.ts",
+          "symbol": "balanceRefresh",
+          "line": 24,
+          "value": "balanceRefresh(db, userId)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/gems.ts#L24"
         },
         {
-          "file": "src/components/hud/market/market-data.ts",
-          "symbol": "GEM_VAULT_ITEMS",
-          "line": null,
-          "value": null,
-          "drift": "missing",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/market-data.ts"
-        },
-        {
-          "file": "src/components/hud/market/market-data.ts",
-          "symbol": "EXCHANGE_LISTINGS",
-          "line": null,
-          "value": null,
-          "drift": "missing",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/market-data.ts"
+          "file": "src/lib/server/gems.ts",
+          "symbol": "awardGems",
+          "line": 48,
+          "value": "awardGems(db, userId, awards)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/gems.ts#L48"
         }
       ],
       "tests": [
         {
-          "file": "src/components/hud/market/MarketShopPage.test.tsx",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.test.tsx"
+          "file": "src/lib/server/gems.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/gems.test.ts"
         }
       ],
       "dependsOn": [
         "economy.two-currencies"
       ],
       "usedBy": [
-        "economy.market-local-preview"
+        "economy.starting-balances",
+        "economy.gem-earning",
+        "economy.market-purchases",
+        "economy.simulated-gem-grants"
       ],
       "decisions": [
-        "market-dual-currency-shop"
+        "earned-gem-ledger"
       ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1014,
-        "y": 232
+        "x": 1810,
+        "y": 240
       },
-      "drift": "missing"
+      "drift": "ok"
     },
     {
-      "id": "economy.market-local-preview",
+      "id": "economy.gem-earning",
       "domain": "economy",
-      "title": "Market is a local preview",
-      "kind": "gate",
-      "status": "soft-launch",
-      "statement": "Market purchases, exchanges, and unlocks only change component state in the browser. Nothing is charged, persisted, or checked on the server, and balances reset on reload.",
+      "title": "How members earn Gems",
+      "kind": "threshold",
+      "status": "active",
+      "statement": "Finishing every daily liturgy earns 10 Gems. Streak milestones from 3 to 180 days earn 25 to 1,000, and unchecking a task takes both back. Reaching stage 2, 3, and 4 earns 150, 300, and 600 once each. One-time firsts earn 25 to 100, and each referral that earns its XP reward earns 100.",
       "anchors": [
         {
-          "file": "src/components/hud/market/MarketShopPage.tsx",
-          "symbol": "INITIAL_MOLT_CREDITS",
-          "line": null,
-          "value": null,
-          "drift": "missing",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx"
+          "file": "src/lib/gems.ts",
+          "symbol": "GEM_ALL_TASKS_DAILY",
+          "line": 14,
+          "value": "10",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/gems.ts#L14"
         },
         {
-          "file": "src/components/hud/market/MarketShopPage.tsx",
-          "symbol": "MarketShopPage",
-          "line": 157,
-          "value": "MarketShopPage()",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx#L157"
+          "file": "src/lib/gems.ts",
+          "symbol": "GEM_STREAK_MILESTONES",
+          "line": 17,
+          "value": "[ { days: 3, gems: 25 }, { days: 7, gems: 60 }, { days: 14, gems: 120 }, { days: 30, gems: 250 }, { days: 60, gems: 400 }, { days: 90, gems: 600 }, { days: 180…",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/gems.ts#L17"
+        },
+        {
+          "file": "src/lib/gems.ts",
+          "symbol": "GEM_STAGE_REWARDS",
+          "line": 28,
+          "value": "[ { stage: 2, gems: 150 }, { stage: 3, gems: 300 }, { stage: 4, gems: 600 }, ]",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/gems.ts#L28"
+        },
+        {
+          "file": "src/lib/gems.ts",
+          "symbol": "GEM_FIRSTS",
+          "line": 40,
+          "value": "[ { id: 'handle', title: 'Claim your name', gems: 25 }, { id: 'moltmax', title: 'Finish the Moltmax quiz', gems: 50 }, { id: 'forum', title: 'Post in the forum…",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/gems.ts#L40"
+        },
+        {
+          "file": "src/lib/gems.ts",
+          "symbol": "GEM_PER_REFERRAL",
+          "line": 35,
+          "value": "100",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/gems.ts#L35"
         }
       ],
       "tests": [
+        {
+          "file": "src/lib/server/gems.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/gems.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "economy.gem-ledger",
+        "progression.xp-ledger",
+        "progression.referral-rewards"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "earned-gem-ledger"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 1747,
+        "y": 396
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "economy.market-catalog",
+      "domain": "economy",
+      "title": "The Shop sells gear by rarity",
+      "kind": "threshold",
+      "status": "active",
+      "statement": "The Shop sells every wearable gear piece outside the starter set, in every rarity above the base piece. Prices are flat by rarity at 60, 150, 400, 900, and 2,000 Gems. Members own the starter set, their unlocks, and anything already placed on their character.",
+      "anchors": [
+        {
+          "file": "src/lib/gear-variants.ts",
+          "symbol": "GEAR_PRICES",
+          "line": 26,
+          "value": "{ common: 60, uncommon: 150, rare: 400, epic: 900, legendary: 2000, }",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/gear-variants.ts#L26"
+        },
+        {
+          "file": "src/lib/market.ts",
+          "symbol": "buildMarketPieces",
+          "line": 65,
+          "value": "buildMarketPieces(catalog, owned)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/market.ts#L65"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/gear-variants.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/gear-variants.test.ts"
+        },
         {
           "file": "src/components/hud/market/MarketShopPage.test.tsx",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.test.tsx"
         }
       ],
       "dependsOn": [
-        "economy.market-catalog"
+        "economy.two-currencies",
+        "economy.character-starter-equipment"
+      ],
+      "usedBy": [
+        "economy.market-purchases"
+      ],
+      "decisions": [
+        "market-dual-currency-shop",
+        "gear-market"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 1331,
+        "y": 552
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "economy.market-purchases",
+      "domain": "economy",
+      "title": "Purchases are checked on the server",
+      "kind": "flow",
+      "status": "active",
+      "statement": "A purchase locks the profile row, spends Gems first, covers any shortfall with Credits, and writes the unlock in the same batch. A piece or skill the member already owns charges nothing, and a purchase the member can't afford is refused. Staff can add gear to their own collection for free.",
+      "anchors": [
+        {
+          "file": "src/lib/server/market.ts",
+          "symbol": "buyGear",
+          "line": 45,
+          "value": "buyGear(db, userId, catalogItemId)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/market.ts#L45"
+        },
+        {
+          "file": "src/lib/server/market.ts",
+          "symbol": "addGearFree",
+          "line": 99,
+          "value": "addGearFree(db, userId, catalogItemId)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/market.ts#L99"
+        },
+        {
+          "file": "src/lib/server/oracle-skills.ts",
+          "symbol": "buySkill",
+          "line": 18,
+          "value": "buySkill(db, userId, skillId)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/oracle-skills.ts#L18"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/server/market.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/market.test.ts"
+        },
+        {
+          "file": "src/lib/server/oracle-skills.integration.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/oracle-skills.integration.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "economy.gem-ledger",
+        "economy.market-catalog",
+        "access.staff"
+      ],
+      "usedBy": [
+        "economy.oracle-skill-prices",
+        "economy.simulated-gem-grants"
+      ],
+      "decisions": [
+        "gear-market",
+        "molt-credit-packs",
+        "oracle-skills"
+      ],
+      "flag": null,
+      "flow": {
+        "steps": [
+          {
+            "id": "start",
+            "label": "Member presses Buy",
+            "kind": "start",
+            "tone": "neutral",
+            "position": {
+              "x": 197,
+              "y": 0
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "owned",
+            "label": "Already owned?",
+            "kind": "check",
+            "tone": "neutral",
+            "position": {
+              "x": 197,
+              "y": 86
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "afford",
+            "label": "Gems plus Credits cover the price?",
+            "kind": "check",
+            "tone": "neutral",
+            "position": {
+              "x": 232,
+              "y": 228
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "charge",
+            "label": "Spend Gems first, then Credits, write unlock",
+            "kind": "outcome",
+            "tone": "allow",
+            "position": {
+              "x": 35,
+              "y": 370
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "free",
+            "label": "Nothing charged",
+            "kind": "outcome",
+            "tone": "neutral",
+            "position": {
+              "x": 0,
+              "y": 228
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "refuse",
+            "label": "Refused, nothing written",
+            "kind": "outcome",
+            "tone": "block",
+            "position": {
+              "x": 267,
+              "y": 370
+            },
+            "width": 208,
+            "height": 46
+          }
+        ],
+        "links": [
+          {
+            "id": "start-0-owned",
+            "source": "start",
+            "target": "owned",
+            "label": null
+          },
+          {
+            "id": "owned-0-free",
+            "source": "owned",
+            "target": "free",
+            "label": "yes"
+          },
+          {
+            "id": "owned-1-afford",
+            "source": "owned",
+            "target": "afford",
+            "label": "no"
+          },
+          {
+            "id": "afford-0-charge",
+            "source": "afford",
+            "target": "charge",
+            "label": "yes"
+          },
+          {
+            "id": "afford-1-refuse",
+            "source": "afford",
+            "target": "refuse",
+            "label": "no"
+          }
+        ],
+        "width": 475,
+        "height": 416
+      },
+      "position": {
+        "x": 1560,
+        "y": 708
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "economy.credit-packs",
+      "domain": "economy",
+      "title": "Molt Credit packs",
+      "kind": "gate",
+      "status": "soft-launch",
+      "statement": "Credits come in four Stripe packs from $1.99 to $19.99. Checkout opens only for members with the molt-credits experiment. Each paid checkout grants its pack once, and a full refund takes it back. Credits spend at Gem prices.",
+      "anchors": [
+        {
+          "file": "src/lib/molt-credits.ts",
+          "symbol": "MOLT_CREDIT_PACKS",
+          "line": 17,
+          "value": "[ { id: 'pouch', name: 'Pouch', credits: 200, priceCents: 199, bonusPercent: 0 }, { id: 'satchel', name: 'Satchel', credits: 550, priceCents: 499, bonusPercent…",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/molt-credits.ts#L17"
+        },
+        {
+          "file": "src/lib/server/molt-credits.ts",
+          "symbol": "canBuyCredits",
+          "line": 16,
+          "value": "canBuyCredits(role, experiments)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/molt-credits.ts#L16"
+        },
+        {
+          "file": "src/lib/server/molt-credits.ts",
+          "symbol": "grantCreditsFromCheckout",
+          "line": 113,
+          "value": "grantCreditsFromCheckout(event, db)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/molt-credits.ts#L113"
+        },
+        {
+          "file": "src/lib/server/molt-credits.ts",
+          "symbol": "handleCreditRefundEvent",
+          "line": 146,
+          "value": "handleCreditRefundEvent(event, db)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/molt-credits.ts#L146"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/server/molt-credits.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/molt-credits.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "economy.two-currencies",
+        "economy.red-line",
+        "premium.webhook-signature"
       ],
       "usedBy": [],
       "decisions": [
-        "market-dual-currency-shop"
+        "molt-credit-packs"
       ],
       "flag": {
-        "level": "gap",
-        "note": "Balance checks run only in the client. Before Credits cost real money, spending needs a server-side ledger with balance checks, like the XP ledger."
+        "level": "watch",
+        "note": "Partial refunds are not reversed automatically and must be settled by hand. A refund after Credits were spent leaves a negative balance, which blocks further spending."
       },
       "flow": null,
       "position": {
-        "x": 1014,
-        "y": 388
+        "x": 941,
+        "y": 396
       },
-      "drift": "missing"
+      "drift": "ok"
+    },
+    {
+      "id": "economy.oracle-skill-prices",
+      "domain": "economy",
+      "title": "Oracle skill prices",
+      "kind": "threshold",
+      "status": "active",
+      "statement": "Free Oracle skills are starters every member owns. Paid skills cost 60 or 150 Gems and are bought like gear. Staff and active Oracle MAX members can use every skill without buying it.",
+      "anchors": [
+        {
+          "file": "src/lib/oracle-skills.ts",
+          "symbol": "ORACLE_SKILL_PRICES",
+          "line": 15,
+          "value": "[0, 60, 150] as const",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/oracle-skills.ts#L15"
+        },
+        {
+          "file": "src/lib/server/oracle-skill-access.ts",
+          "symbol": "skillAccess",
+          "line": 31,
+          "value": "skillAccess(skill, member)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/oracle-skill-access.ts#L31"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/oracle-skills.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/oracle-skills.test.ts"
+        },
+        {
+          "file": "src/lib/server/oracle-skill-access.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/oracle-skill-access.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "economy.market-purchases",
+        "economy.red-line"
+      ],
+      "usedBy": [
+        "oracle.skill-context"
+      ],
+      "decisions": [
+        "oracle-skills"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 1472,
+        "y": 864
+      },
+      "drift": "ok"
     },
     {
       "id": "economy.simulated-gem-grants",
       "domain": "economy",
-      "title": "Simulated members earn Gems",
+      "title": "Simulated members earn and spend Gems",
       "kind": "flow",
       "status": "active",
-      "statement": "The 12-hour activity simulator adds 15 Chitin Gems per liturgy a simulated member completes, using a SQL increment on the profile row. Real members do not earn Gems on the server yet.",
+      "statement": "Simulated members earn 15 Gems per liturgy through the same ledger. Each simulation tick, a simulated member has a 12% chance to buy one piece and an 8% chance to change outfit. It buys only when its Gems cover the whole price, so it never spends Credits.",
       "anchors": [
         {
           "file": "src/lib/server/simulation-engine.ts",
           "symbol": "simulateDailyRoutines",
-          "line": 646,
+          "line": 644,
           "value": "simulateDailyRoutines(dbClient, config, options)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/simulation-engine.ts#L646"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/simulation-engine.ts#L644"
+        },
+        {
+          "file": "src/lib/server/simulation-wardrobe.ts",
+          "symbol": "WARDROBE_SHOP_CHANCE",
+          "line": 26,
+          "value": "0.12",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/simulation-wardrobe.ts#L26"
+        },
+        {
+          "file": "src/lib/server/simulation-wardrobe.ts",
+          "symbol": "runMemberWardrobe",
+          "line": 201,
+          "value": "runMemberWardrobe(db, member, rng, options)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/simulation-wardrobe.ts#L201"
         }
       ],
-      "tests": [],
+      "tests": [
+        {
+          "file": "src/lib/server/simulation-wardrobe.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/simulation-wardrobe.test.ts"
+        }
+      ],
       "dependsOn": [
-        "economy.two-currencies"
+        "economy.gem-ledger",
+        "economy.market-purchases"
       ],
       "usedBy": [],
-      "decisions": [],
-      "flag": {
-        "level": "watch",
-        "note": "The only server path that grants Gems is the simulator. Real Gem earning is still to be defined."
-      },
+      "decisions": [
+        "simulated-members-shop"
+      ],
+      "flag": null,
       "flow": null,
       "position": {
-        "x": 1306,
-        "y": 232
+        "x": 1845,
+        "y": 864
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "economy.cosmetics-no-stats",
@@ -685,8 +1095,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 72,
-        "y": 388
+        "x": 320,
+        "y": 396
       },
       "drift": "ok"
     },
@@ -732,8 +1142,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 28,
-        "y": 544
+        "x": 72,
+        "y": 552
       },
       "drift": "ok"
     },
@@ -750,7 +1160,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "ALL_EQUIPMENT_CATALOG",
           "line": 412,
           "value": "[...BASE_EQUIPMENT_CATALOG, ...VARIANT_EQUIPMENT_CATALOG]",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/equipment-seed-data.ts#L412"
         },
         {
@@ -779,10 +1189,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
-        "y": 544
+        "x": 364,
+        "y": 552
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "economy.character-starter-equipment",
@@ -830,15 +1240,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "dependsOn": [
         "economy.red-line"
       ],
-      "usedBy": [],
+      "usedBy": [
+        "economy.market-catalog"
+      ],
       "decisions": [
-        "visible-character-equipment"
+        "visible-character-equipment",
+        "gear-market"
       ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 364,
-        "y": 388
+        "x": 649,
+        "y": 396
       },
       "drift": "ok"
     },
@@ -861,10 +1274,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/avatar3d/character.ts",
           "symbol": "buildCharacter",
-          "line": 134,
+          "line": 149,
           "value": "buildCharacter(look)",
-          "drift": "unverified",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d/character.ts#L134"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d/character.ts#L149"
         }
       ],
       "tests": [
@@ -891,10 +1304,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 656,
-        "y": 388
+        "x": 28,
+        "y": 396
       },
-      "drift": "unverified"
+      "drift": "ok"
     },
     {
       "id": "progression.daily-liturgies",
@@ -909,7 +1322,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "CANONICAL_ALIGNMENT_TASKS",
           "line": 47,
           "value": "[ { key: 'silent-synchronization', time: 'Early morning', title: 'Silent Synchronization', description: 'Before any feed or inbox, sit quietly and look honestl…",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/alignment-tasks.ts#L47"
         }
       ],
@@ -931,7 +1344,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 320,
         "y": 76
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "progression.silent-synchronization",
@@ -952,10 +1365,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/hooks/useDailyAlignment.tsx",
           "symbol": "AlignmentProvider",
-          "line": 86,
+          "line": 96,
           "value": "AlignmentProvider({ children })",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useDailyAlignment.tsx#L86"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useDailyAlignment.tsx#L96"
         }
       ],
       "tests": [
@@ -983,7 +1396,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 320,
         "y": 544
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "progression.xp-rewards",
@@ -1036,18 +1449,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/db/schema.ts",
           "symbol": "xpTransactions",
-          "line": 398,
+          "line": 402,
           "value": "pgTable('xp_transactions', { id: uuid('id').defaultRandom().primaryKey(), userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' …",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L398"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L402"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3673,
+          "line": 3674,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3673"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3674"
         }
       ],
       "tests": [
@@ -1060,10 +1473,12 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "progression.xp-rewards"
       ],
       "usedBy": [
+        "economy.gem-earning",
         "progression.silent-synchronization",
         "progression.client-date",
         "progression.stage-from-xp",
-        "progression.referral-rewards"
+        "progression.referral-rewards",
+        "signup.guest-progress-claim"
       ],
       "decisions": [
         "xp-ledger",
@@ -1075,7 +1490,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 638,
         "y": 388
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "progression.client-date",
@@ -1096,10 +1511,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3673,
+          "line": 3674,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3673"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3674"
         }
       ],
       "tests": [
@@ -1121,7 +1536,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 544
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "progression.stage-from-xp",
@@ -1134,10 +1549,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3453,
+          "line": 3454,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3453"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3454"
         },
         {
           "file": "src/lib/progression.ts",
@@ -1233,10 +1648,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "BRAND_BIBLE.md",
           "symbol": "3.3 Stages and clearances",
-          "line": 148,
+          "line": 149,
           "value": "Scriptures describe what the metrics typically read at each stage. What actually moves a",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L148"
+          "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L149"
         }
       ],
       "tests": [
@@ -1272,10 +1687,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3453,
+          "line": 3454,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3453"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3454"
         }
       ],
       "tests": [],
@@ -1307,7 +1722,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "resolveVectorBase",
           "line": 157,
           "value": "resolveVectorBase(stats, seed)",
-          "drift": "unverified",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/vectors.ts#L157"
         },
         {
@@ -1315,7 +1730,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "buildVectorSheet",
           "line": 196,
           "value": "buildVectorSheet(base, gearIn)",
-          "drift": "unverified",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/vectors.ts#L196"
         },
         {
@@ -1323,7 +1738,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "SLOT_VECTOR",
           "line": 72,
           "value": "{ carapace: 'shellHardness', belt: 'shellHardness', claws: 'pincerTorque', head: 'neuralLatency', legs: 'ecdysisDiscipline', antennae: 'depthTolerance', }",
-          "drift": "unverified",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/vectors.ts#L72"
         }
       ],
@@ -1345,7 +1760,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 76
       },
-      "drift": "unverified"
+      "drift": "ok"
     },
     {
       "id": "progression.referral-rewards",
@@ -1353,7 +1768,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Qualified referral XP",
       "kind": "threshold",
       "status": "active",
-      "statement": "A new member qualifies after a character, username, and first liturgy. The referrer earns 100 XP once, capped at five per UTC month of qualification. Clicks, existing accounts, self-referrals, and simulated members earn none. Unchecking a liturgy does not undo qualification. Deleting a referred account keeps its reward slot occupied.",
+      "statement": "A new member qualifies after a character, username, and first liturgy. The referrer earns 100 XP and 100 Chitin Gems once, capped at five per UTC month of qualification. Clicks, existing accounts, self-referrals, and simulated members earn none. Unchecking a liturgy does not undo qualification. Deleting a referred account keeps its reward slot occupied.",
       "anchors": [
         {
           "file": "src/lib/referrals.ts",
@@ -1376,7 +1791,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "qualifyReferral",
           "line": 90,
           "value": "qualifyReferral(db, userId)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/referrals.ts#L90"
         }
       ],
@@ -1391,7 +1806,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "progression.xp-ledger",
         "economy.red-line"
       ],
-      "usedBy": [],
+      "usedBy": [
+        "economy.gem-earning"
+      ],
       "decisions": [],
       "flag": null,
       "flow": null,
@@ -1399,7 +1816,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1196,
         "y": 544
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "access.roles",
@@ -1414,7 +1831,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "ADMIN_MEMBER_ROLES",
           "line": 11,
           "value": "['user', 'admin'] as const",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/admin-oversight.ts#L11"
         },
         {
@@ -1440,7 +1857,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 94,
         "y": 76
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "access.staff",
@@ -1455,7 +1872,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "isAdmin",
           "line": 27,
           "value": "isAdmin(user, profileRole)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/permissions.ts#L27"
         },
         {
@@ -1463,7 +1880,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "getEffectiveRole",
           "line": 14,
           "value": "getEffectiveRole(user, profileRole)",
-          "drift": "unverified",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/permissions.ts#L14"
         }
       ],
@@ -1477,6 +1894,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "access.roles"
       ],
       "usedBy": [
+        "economy.market-purchases",
         "access.hidden-pages",
         "access.admin-only-paths",
         "access.staff-server-check",
@@ -1492,7 +1910,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 94,
         "y": 232
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "access.write-auth",
@@ -1527,6 +1945,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "forum.author-only-edits",
         "forum.peer-flags",
         "oracle.thread-ownership",
+        "data.saved-portraits",
+        "data.community-photo",
         "data.character-atomic-save"
       ],
       "decisions": [
@@ -1554,7 +1974,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "profiles",
           "line": 123,
           "value": "pgTable('profiles', { id: text('id').primaryKey(), role: text('role').default('user').notNull(), // 'user' | 'admin' larvaId: text('larvaId').default('LARVA UN…",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L123"
         }
       ],
@@ -1575,7 +1995,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 904,
         "y": 388
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "access.hidden-pages",
@@ -1590,7 +2010,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "HIDDEN_PAGES",
           "line": 8,
           "value": "[ { id: 'premium', path: '/max', }, { id: 'store', path: '/store', }, ] as const",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/hidden-pages.ts#L8"
         },
         {
@@ -1623,7 +2043,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 388
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "access.admin-only-paths",
@@ -1682,10 +2102,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/admin-oversight.ts",
           "symbol": "requireStaff",
-          "line": 79,
+          "line": 81,
           "value": "requireStaff(args)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/admin-oversight.ts#L79"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/admin-oversight.ts#L81"
         }
       ],
       "tests": [
@@ -1711,7 +2131,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 388
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "access.role-changes",
@@ -1724,10 +2144,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/admin-oversight.ts",
           "symbol": "setAdminMemberRoleHandler",
-          "line": 171,
+          "line": 178,
           "value": "setAdminMemberRoleHandler(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/admin-oversight.ts#L171"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/admin-oversight.ts#L178"
         }
       ],
       "tests": [
@@ -1799,14 +2219,14 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Self-hosted Better Auth",
       "kind": "invariant",
       "status": "active",
-      "statement": "Accounts live in the app's own user, session, account, verification, and jwks tables through Better Auth. The app no longer depends on Managed Neon Auth.",
+      "statement": "Accounts live in the app's own user, session, account, verification, and jwks tables through Better Auth. The app no longer depends on Managed Neon Auth. Google One Tap verifies Google's token and then runs the normal Google sign-in path, so signup screening and account-linking rules still apply.",
       "anchors": [
         {
           "file": "src/lib/auth-server.ts",
           "symbol": "auth",
           "line": 106,
           "value": "betterAuth({ baseURL, secret: getAuthSecret(), database: drizzleAdapter(getDb(), { provider: 'pg', camelCase: true, transaction: false, schema: { user: authUse…",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/auth-server.ts#L106"
         }
       ],
@@ -1829,7 +2249,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "signup.pipeline"
       ],
       "decisions": [
-        "self-hosted-better-auth"
+        "self-hosted-better-auth",
+        "google-one-tap"
       ],
       "flag": null,
       "flow": null,
@@ -1837,7 +2258,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1688,
         "y": 76
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "auth.production-secret",
@@ -2051,7 +2472,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "usedBy": [],
       "decisions": [
         "google-auto-link",
-        "security-scan-2026-10"
+        "security-scan-2026-10",
+        "google-one-tap"
       ],
       "flag": null,
       "flow": null,
@@ -2605,6 +3027,68 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "drift": "ok"
     },
     {
+      "id": "signup.guest-progress-claim",
+      "domain": "signup",
+      "title": "Guest progress carries over",
+      "kind": "flow",
+      "status": "active",
+      "statement": "A guest's finished Moltmax audit (kept on the device for 7 days), today's task ticks, and their character carry over when they sign in on the same browser. The audit score is recomputed on the server, and ticks go through the normal task rules. An account that already has an audit or a character keeps its own unless the guest asked to save the audit.",
+      "anchors": [
+        {
+          "file": "src/lib/guest-progress.ts",
+          "symbol": "GUEST_AUDIT_MAX_AGE_MS",
+          "line": 18,
+          "value": "7 * 24 * 60 * 60 * 1000",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/guest-progress.ts#L18"
+        },
+        {
+          "file": "src/lib/guest-progress-claim.ts",
+          "symbol": "claimGuestAudit",
+          "line": 18,
+          "value": "claimGuestAudit()",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/guest-progress-claim.ts#L18"
+        },
+        {
+          "file": "src/lib/guest-character-claim.ts",
+          "symbol": "claimGuestCharacter",
+          "line": 17,
+          "value": "claimGuestCharacter(userId)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/guest-character-claim.ts#L17"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/guest-progress.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/guest-progress.test.ts"
+        },
+        {
+          "file": "src/lib/guest-progress-claim.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/guest-progress-claim.test.ts"
+        },
+        {
+          "file": "src/lib/guest-character-claim.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/guest-character-claim.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "progression.xp-ledger"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "guest-progress-carries-over"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 28,
+        "y": 76
+      },
+      "drift": "ok"
+    },
+    {
       "id": "signup.honeypot",
       "domain": "signup",
       "title": "Honeypot rejects bots",
@@ -3026,18 +3510,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "submitLeadHandler",
-          "line": 3271,
+          "line": 3272,
           "value": "submitLeadHandler(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3271"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3272"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createBlogCommentHandler",
-          "line": 806,
+          "line": 807,
           "value": "createBlogCommentHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L806"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L807"
         }
       ],
       "tests": [
@@ -3060,7 +3544,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 28,
+        "x": 320,
         "y": 76
       },
       "drift": "ok"
@@ -3195,10 +3679,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/db/schema.ts",
           "symbol": "profiles.hasPurchasedPremium",
-          "line": 160,
+          "line": 164,
           "value": "boolean('hasPurchasedPremium').default(false).notNull()",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L160"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L164"
         }
       ],
       "tests": [
@@ -3276,7 +3760,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Webhooks must be signed",
       "kind": "gate",
       "status": "active",
-      "statement": "Stripe signatures are verified before membership or merch writes. A missing secret returns 500; a bad signature returns 400. Completed, async success/failure, and expired checkout events go to merch handling. Orders reach Printful only after payment; pending coupon claims release only on final failure or matching confirmed expiration. Other events go to membership sync.",
+      "statement": "Stripe signatures are verified before any write. A missing secret returns 500; a bad signature returns 400. Molt Credit checkouts and refunds go to credit handling first, then checkout events go to merch handling. Orders reach Printful only after payment; pending coupon claims release only on final failure or confirmed expiration. Other events go to membership sync.",
       "anchors": [
         {
           "file": "src/lib/stripe-webhook.ts",
@@ -3291,7 +3775,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "handleStripeWebhookRequest",
           "line": 429,
           "value": "handleStripeWebhookRequest(request)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L429"
         },
         {
@@ -3315,6 +3799,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "dependsOn": [],
       "usedBy": [
+        "economy.credit-packs",
         "premium.event-sync",
         "merch.fulfillment-claim"
       ],
@@ -3328,7 +3813,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 948,
         "y": 208
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "premium.event-sync",
@@ -3699,18 +4184,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumTopicHandler",
-          "line": 1757,
+          "line": 1758,
           "value": "createForumTopicHandler({ data, context })",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1757"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1758"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "requirePublishableForumPost",
-          "line": 980,
+          "line": 981,
           "value": "requirePublishableForumPost(input)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L980"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L981"
         }
       ],
       "tests": [
@@ -4000,7 +4485,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 116,
         "y": 364
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "forum.rate-limit",
@@ -4072,10 +4557,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createBlogCommentHandler",
-          "line": 806,
+          "line": 807,
           "value": "createBlogCommentHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L806"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L807"
         },
         {
           "file": "src/lib/server/forum-write-limit.ts",
@@ -4439,10 +4924,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertForumAuthor",
-          "line": 988,
+          "line": 989,
           "value": "assertForumAuthor(rowUserId, actorId, action)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L988"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L989"
         }
       ],
       "tests": [
@@ -4485,10 +4970,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumPostHandler",
-          "line": 1904,
+          "line": 1905,
           "value": "createForumPostHandler({ data, context })",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1904"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1905"
         }
       ],
       "tests": [
@@ -4510,7 +4995,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 520
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "forum.peer-flags",
@@ -4575,26 +5060,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertCovenantSteward",
-          "line": 2550,
+          "line": 2551,
           "value": "assertCovenantSteward(dbClient, userId, payload)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2550"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2551"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "reviewForumReportHandler",
-          "line": 2857,
+          "line": 2858,
           "value": "reviewForumReportHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2857"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2858"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "removeForumReportTargetHandler",
-          "line": 2927,
+          "line": 2928,
           "value": "removeForumReportTargetHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2927"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2928"
         }
       ],
       "tests": [
@@ -4618,7 +5103,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 232
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "forum.community-rules",
@@ -4665,10 +5150,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/handle-oracle-chat-request.ts",
           "symbol": "handleOracleChatRequest",
-          "line": 78,
+          "line": 86,
           "value": "handleOracleChatRequest(request)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L78"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L86"
         }
       ],
       "tests": [
@@ -4682,6 +5167,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "oracle.rate-limit",
         "oracle.usage-allowance",
         "oracle.guest-allowance",
+        "oracle.skill-context",
         "oracle.request-caps",
         "oracle.input-guardrails"
       ],
@@ -4913,10 +5399,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "height": 786
       },
       "position": {
-        "x": 1215,
+        "x": 1492,
         "y": 208
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "oracle.rate-limit",
@@ -4955,7 +5441,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flow": null,
       "position": {
         "x": 28,
-        "y": 364
+        "y": 372
       },
       "drift": "ok"
     },
@@ -5069,7 +5555,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flow": null,
       "position": {
         "x": 320,
-        "y": 364
+        "y": 372
       },
       "drift": "ok"
     },
@@ -5086,7 +5572,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "reserveGuestOracleMessage",
           "line": 32,
           "value": "reserveGuestOracleMessage(visitorKey, now)",
-          "drift": "unverified",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/guest-usage.ts#L32"
         },
         {
@@ -5094,7 +5580,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "ORACLE_GUEST_LIMITS",
           "line": 25,
           "value": "{ perDay: 5, allGuestsPerDay: 300 } as const",
-          "drift": "unverified",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L25"
         }
       ],
@@ -5120,9 +5606,102 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flow": null,
       "position": {
         "x": 506,
-        "y": 520
+        "y": 528
       },
-      "drift": "unverified"
+      "drift": "ok"
+    },
+    {
+      "id": "oracle.skill-context",
+      "domain": "oracle",
+      "title": "Skills the member owns",
+      "kind": "permission",
+      "status": "active",
+      "statement": "A picked skill's playbook goes into the prompt for that conversation. With no skill picked, the Oracle sees only the member's owned and switched-on skills and may load one playbook once before replying. It never suggests a skill the member doesn't own, and members can turn automatic picking off.",
+      "anchors": [
+        {
+          "file": "src/lib/ai/oracle-skills-prompt.ts",
+          "symbol": "buildOracleSkillContext",
+          "line": 16,
+          "value": "buildOracleSkillContext(plan)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-skills-prompt.ts#L16"
+        },
+        {
+          "file": "src/lib/ai/oracle-skills-prompt.ts",
+          "symbol": "createOracleSkillTools",
+          "line": 42,
+          "value": "createOracleSkillTools(plan, options)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-skills-prompt.ts#L42"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/ai/oracle-skills-prompt.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-skills-prompt.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "oracle.request-pipeline",
+        "economy.oracle-skill-prices"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "oracle-skills"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 1002,
+        "y": 372
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "oracle.custom-instructions",
+      "domain": "oracle",
+      "title": "Custom instructions are screened",
+      "kind": "gate",
+      "status": "active",
+      "statement": "Members can pick an Oracle personality and save up to 1,000 characters of custom instructions. Instructions pass the local input checks, then Laya, which blocks them above 0.8 confidence within 2.5 seconds. If Laya is unavailable, the save goes through. The prompt fences the text as the member's own preferences, below the safety rules.",
+      "anchors": [
+        {
+          "file": "src/lib/server/oracle-chat-settings.ts",
+          "symbol": "screenCustomInstructions",
+          "line": 55,
+          "value": "screenCustomInstructions(text, screen)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/oracle-chat-settings.ts#L55"
+        },
+        {
+          "file": "src/lib/oracle-chat-settings.ts",
+          "symbol": "ORACLE_CUSTOM_INSTRUCTIONS_MAX",
+          "line": 42,
+          "value": "1_000",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/oracle-chat-settings.ts#L42"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/server/oracle-chat-settings.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/oracle-chat-settings.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "oracle.input-guardrails"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "oracle-skills"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 798,
+        "y": 528
+      },
+      "drift": "ok"
     },
     {
       "id": "oracle.request-caps",
@@ -5153,7 +5732,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "toModelMessages",
           "line": 63,
           "value": "toModelMessages(messages, maxMessages, maxChars)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-chat.ts#L63"
         }
       ],
@@ -5180,10 +5759,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       },
       "flow": null,
       "position": {
-        "x": 1011,
-        "y": 364
+        "x": 1294,
+        "y": 372
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "oracle.input-guardrails",
@@ -5222,6 +5801,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [
         "oracle.guest-allowance",
+        "oracle.custom-instructions",
         "oracle.jailbreak-gate",
         "oracle.intent-context",
         "oracle.model-routing"
@@ -5233,8 +5813,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1303,
-        "y": 364
+        "x": 1586,
+        "y": 372
       },
       "drift": "ok"
     },
@@ -5249,10 +5829,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/handle-oracle-chat-request.ts",
           "symbol": "handleOracleChatRequest",
-          "line": 78,
+          "line": 86,
           "value": "handleOracleChatRequest(request)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L78"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L86"
         }
       ],
       "tests": [
@@ -5272,10 +5852,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 798,
-        "y": 520
+        "x": 1090,
+        "y": 528
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "oracle.intent-context",
@@ -5323,8 +5903,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1090,
-        "y": 520
+        "x": 1382,
+        "y": 528
       },
       "drift": "ok"
     },
@@ -5385,8 +5965,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1382,
-        "y": 520
+        "x": 1674,
+        "y": 528
       },
       "drift": "ok"
     },
@@ -5429,8 +6009,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1134,
-        "y": 676
+        "x": 1426,
+        "y": 684
       },
       "drift": "ok"
     },
@@ -5481,8 +6061,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1426,
-        "y": 676
+        "x": 1718,
+        "y": 684
       },
       "drift": "ok"
     },
@@ -5679,7 +6259,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "listActivityFeed",
           "line": 355,
           "value": "listActivityFeed(dbClient, viewerId, query, now)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/activity-log.ts#L355"
         }
       ],
@@ -5706,7 +6286,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 208
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "social.circle-scope",
@@ -5714,15 +6294,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Circle means accepted friends",
       "kind": "permission",
       "status": "active",
-      "statement": "The Circle feed shows pulses from accepted friends only. The You feed shows the member's own pulses.",
+      "statement": "The Circle feed shows only accepted friends' pulses marked for friends or public. The You feed shows the member's own pulses. Both load newest first in pages of 20, at most 50 at a time.",
       "anchors": [
         {
           "file": "src/lib/server/activity-log.ts",
-          "symbol": "listFriendIdsForUser",
-          "line": null,
-          "value": null,
-          "drift": "missing",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/activity-log.ts"
+          "symbol": "listActivityFeed",
+          "line": 355,
+          "value": "listActivityFeed(dbClient, viewerId, query, now)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/activity-log.ts#L355"
         }
       ],
       "tests": [],
@@ -5739,7 +6319,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 364
       },
-      "drift": "missing"
+      "drift": "ok"
     },
     {
       "id": "social.suggestions",
@@ -5788,17 +6368,17 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "social.remote-inbox-off",
       "domain": "social",
-      "title": "Remote inbox is off",
-      "kind": "gate",
+      "title": "Inbox reads without a timer",
+      "kind": "limit",
       "status": "active",
-      "statement": "The HUD notification inbox does not read from the server. The client skips the fetch, and the server returns an empty list without touching the database, until a push or no-poll path exists.",
+      "statement": "The notification inbox reads the server on page load, when the bell opens, and when the tab regains focus, no more than once every 6 minutes. There is no polling timer. The panel shows the latest 30 notifications with an exact unread count. One flag turns every read off on both client and server.",
       "anchors": [
         {
           "file": "src/lib/notifications-refresh.ts",
           "symbol": "NOTIFICATIONS_REMOTE_INBOX_ENABLED",
           "line": 9,
           "value": "true",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/notifications-refresh.ts#L9"
         },
         {
@@ -5821,7 +6401,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [],
       "decisions": [
-        "disable-remote-inbox"
+        "disable-remote-inbox",
+        "notifications-bell"
       ],
       "flag": null,
       "flow": null,
@@ -5829,7 +6410,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 320,
         "y": 76
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "social.referrals",
@@ -5938,7 +6519,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "Current constraints",
           "line": 73,
           "value": "Largest tables today: `blog_posts` (248 kB, 20 rows — TOAST), `ai_messages` (144 kB, 69 rows — JSONB `parts`), `activity_events` / `routine_completions` (~112 …",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/docs/neon-storage-retention.md#L73"
         }
       ],
@@ -5950,7 +6531,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "decisions": [
         "self-hosted-better-auth",
-        "disable-remote-inbox"
+        "disable-remote-inbox",
+        "notifications-bell"
       ],
       "flag": null,
       "flow": null,
@@ -5958,7 +6540,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 320,
         "y": 76
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "data.storage-headroom",
@@ -6009,8 +6591,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 364,
-        "y": 496
+        "x": 72,
+        "y": 808
       },
       "drift": "ok"
     },
@@ -6027,7 +6609,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "LEAN_WINDOWS",
           "line": 55,
           "value": "{ activityEventsHotDays: 14, notificationsReadDays: 14, notificationsUnreadDays: 90, routineCompletionsHotDays: 45, routineDaySummaryDays: ROUTINE_DAY_SUMMARY_…",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/data-retention.ts#L55"
         },
         {
@@ -6035,7 +6617,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "LENIENT_WINDOWS",
           "line": 70,
           "value": "{ activityEventsHotDays: 90, notificationsReadDays: 90, notificationsUnreadDays: 365, routineCompletionsHotDays: 60, routineDaySummaryDays: ROUTINE_DAY_SUMMARY…",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/data-retention.ts#L70"
         }
       ],
@@ -6058,10 +6640,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 364,
-        "y": 652
+        "x": 72,
+        "y": 964
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "data.retention-dry-run",
@@ -6076,7 +6658,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "buildTablePolicies",
           "line": 103,
           "value": "buildTablePolicies(windows)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/data-retention.ts#L103"
         },
         {
@@ -6084,7 +6666,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "main",
           "line": 29,
           "value": "main()",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/scripts/db-retention-report.ts#L29"
         }
       ],
@@ -6102,10 +6684,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       },
       "flow": null,
       "position": {
-        "x": 320,
-        "y": 808
+        "x": 28,
+        "y": 1120
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "data.canonical-content",
@@ -6113,14 +6695,14 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Canonical content is kept",
       "kind": "invariant",
       "status": "active",
-      "statement": "Forum, blog, changelog, and catalog rows are canonical and never expire. The simulator is throttled instead to control growth.",
+      "statement": "Forum, blog, changelog, and catalog rows are canonical and never expire, and so are the Gem and Credit ledgers, because balances are their full sums. The simulator is throttled instead to control growth.",
       "anchors": [
         {
           "file": "src/lib/data-retention.ts",
           "symbol": "buildTablePolicies",
           "line": 103,
           "value": "buildTablePolicies(windows)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/data-retention.ts#L103"
         }
       ],
@@ -6135,10 +6717,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 612,
-        "y": 808
+        "x": 320,
+        "y": 1120
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "data.public-article-privacy",
@@ -6151,10 +6733,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "getBlogPostBySlugHandler",
-          "line": 657,
+          "line": 658,
           "value": "getBlogPostBySlugHandler({ data: slug, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L657"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L658"
         },
         {
           "file": "src/routes/news/$slug.tsx",
@@ -6209,7 +6791,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "npm run db:migrate",
           "line": 38,
           "value": "run: npm run db:migrate",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/.github/workflows/migrate.yml#L38"
         }
       ],
@@ -6220,10 +6802,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 28,
-        "y": 208
+        "x": 904,
+        "y": 76
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "data.asset-budget",
@@ -6244,10 +6826,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "AGENTS.md",
           "symbol": "Assets and media",
-          "line": 26,
+          "line": 27,
           "value": "Heavy website/blog media, character source assets, and reusable templates belong in Neon S3 (`moltology-public-assets`), never `public/`. Use `getAssetUrl` for…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md#L26"
+          "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md#L27"
         }
       ],
       "tests": [],
@@ -6259,7 +6841,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 28,
         "y": 208
       },
       "drift": "ok"
@@ -6275,18 +6857,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/lobster-avatar.ts",
           "symbol": "parseLobsterAvatarConfig",
-          "line": 267,
+          "line": 280,
           "value": "parseLobsterAvatarConfig(raw)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar.ts#L267"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar.ts#L280"
         },
         {
           "file": "src/lib/avatar/config-schema.ts",
           "symbol": "avatarConfigShape",
-          "line": 19,
+          "line": 20,
           "value": "{ style: z.string().min(1).max(64), seed: z.string().min(1).max(128), race: z.enum(AVATAR_RACES).optional(), shellColor: z.enum(shellColorIds).optional(), shel…",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/config-schema.ts#L19"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/config-schema.ts#L20"
         }
       ],
       "tests": [
@@ -6309,7 +6891,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 208
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "data.avatar-portraits",
@@ -6317,15 +6899,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Every character picture is the 3D character",
       "kind": "invariant",
       "status": "active",
-      "statement": "Full-body characters render live in 3D, and portraits, creator option cards and gear icons are stills of the same 3D character, drawn in the browser and kept between visits. There is no 2D drawing; while a picture loads a loader shows, and a browser without 3D shows a plain silhouette. No portraits are generated or uploaded on the server.",
+      "statement": "Full-body characters render live in 3D, and portraits, creator option cards and gear icons are stills of the same 3D character, drawn in the browser. There is no 2D drawing; while a picture loads a loader shows, and a browser without 3D shows a plain silhouette. Nothing is drawn on the server.",
       "anchors": [
         {
           "file": "src/lib/avatar3d-portrait-queue.ts",
           "symbol": "requestStill3D",
-          "line": 148,
+          "line": 137,
           "value": "requestStill3D(config, px, shot, signal)",
-          "drift": "unverified",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d-portrait-queue.ts#L148"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d-portrait-queue.ts#L137"
         }
       ],
       "tests": [
@@ -6341,7 +6923,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "dependsOn": [
         "data.avatar-look-server"
       ],
-      "usedBy": [],
+      "usedBy": [
+        "data.saved-portraits"
+      ],
       "decisions": [
         "equippable-cosmetics",
         "retire-painted-avatar-builder"
@@ -6352,7 +6936,115 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 364
       },
-      "drift": "unverified"
+      "drift": "ok"
+    },
+    {
+      "id": "data.saved-portraits",
+      "domain": "data",
+      "title": "Portraits are stored once per look",
+      "kind": "flow",
+      "status": "active",
+      "statement": "After a member saves, their browser uploads a 256 by 256 WebP portrait of at most 120 KB. The server names it by a hash of the saved look plus worn gear and stores it once in the public bucket. Other browsers show the stored image only while the hash still matches the member's look, and draw the character themselves otherwise.",
+      "anchors": [
+        {
+          "file": "src/lib/server/avatar-still.ts",
+          "symbol": "saveAvatarStillHandler",
+          "line": 40,
+          "value": "saveAvatarStillHandler({ data, context }, upload)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/avatar-still.ts#L40"
+        },
+        {
+          "file": "src/lib/avatar-still.ts",
+          "symbol": "avatarStillHash",
+          "line": 46,
+          "value": "avatarStillHash(config)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar-still.ts#L46"
+        },
+        {
+          "file": "src/lib/avatar-still.ts",
+          "symbol": "storedStillUrl",
+          "line": 60,
+          "value": "storedStillUrl(config)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar-still.ts#L60"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/avatar-still.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar-still.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "data.avatar-portraits",
+        "access.write-auth"
+      ],
+      "usedBy": [
+        "data.community-photo"
+      ],
+      "decisions": [],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 612,
+        "y": 520
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "data.community-photo",
+      "domain": "data",
+      "title": "Group photo retakes at most daily",
+      "kind": "flow",
+      "status": "active",
+      "statement": "The forum group photo shows up to 48 members with a saved character. When the cast or a look changes and the stored photo is at least a day old, a signed-in visitor's browser draws a new photo and uploads it. The server stores it only when it is still due, matches the current cast exactly, and is a 1800 by 720 WebP of at most 1.5 MB.",
+      "anchors": [
+        {
+          "file": "src/lib/community-photo.ts",
+          "symbol": "photoDue",
+          "line": 81,
+          "value": "photoDue(photo, hash, now)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-photo.ts#L81"
+        },
+        {
+          "file": "src/lib/community-photo.ts",
+          "symbol": "RETAKE_AFTER_MS",
+          "line": 21,
+          "value": "24 * 60 * 60 * 1000",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-photo.ts#L21"
+        },
+        {
+          "file": "src/lib/server/community-photo.ts",
+          "symbol": "saveCommunityPhotoHandler",
+          "line": 122,
+          "value": "saveCommunityPhotoHandler({ data, context }, upload, db)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/community-photo.ts#L122"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/community-photo.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-photo.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "data.saved-portraits",
+        "access.write-auth"
+      ],
+      "usedBy": [],
+      "decisions": [],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 612,
+        "y": 676
+      },
+      "drift": "ok"
     },
     {
       "id": "data.character-atomic-save",
@@ -6360,15 +7052,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Character saves are atomic and versioned",
       "kind": "invariant",
       "status": "active",
-      "statement": "Character saves validate the verified member, every owned placement, slot compatibility, and vault capacity. A locked database function commits body configuration, equipment, appearance snapshot, and revision together; stale revisions fail without partial changes.",
+      "statement": "Character saves validate the verified member, every owned placement, slot compatibility, and vault capacity. Members can only place pieces they own, which means the starter set, their unlocks, and pieces already placed. A locked database function commits body configuration, equipment, appearance snapshot, and revision together; stale revisions fail without partial changes.",
       "anchors": [
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "saveCharacterHandler",
-          "line": 4059,
+          "line": 4060,
           "value": "saveCharacterHandler({ data, context })",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L4059"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L4060"
         },
         {
           "file": "src/lib/character-appearance.ts",
@@ -6401,10 +7093,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 28,
-        "y": 496
+        "x": 320,
+        "y": 208
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "data.character-public-appearance",
@@ -6417,25 +7109,25 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "publicAvatarConfig",
-          "line": 172,
+          "line": 173,
           "value": "sql<LobsterAvatarConfig | null>`CASE WHEN ${profiles.avatarConfig} IS NULL THEN NULL ELSE (${profiles.avatarConfig} - 'accessory' - 'claws' - 'equipment') || j…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L172"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L173"
         },
         {
           "file": "src/components/UserAvatar.tsx",
           "symbol": "UserAvatar",
-          "line": 36,
-          "value": "React.memo( ({ user, config, src, name, email, fallbackSrc, fallbackLetter, size = 'md', className = '', alt, borderless = false, glass = true, }) => { const […",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/UserAvatar.tsx#L36"
+          "line": 41,
+          "value": "React.memo( ({ user, config, src, name, email, fallbackSrc, fallbackLetter, size = 'md', className = '', alt, borderless = false, glass = true, pending = false…",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/UserAvatar.tsx#L41"
         },
         {
           "file": "src/components/forum/ForumAvatar.tsx",
           "symbol": "ForumAvatar",
           "line": 59,
           "value": "React.memo(({ src, authorName, authorHandle, userId, avatarConfig, size = 'md', className, alt, loading = 'lazy', }) => { const [imageError, setImageError] = u…",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/components/forum/ForumAvatar.tsx#L59"
         }
       ],
@@ -6459,10 +7151,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 28,
-        "y": 652
+        "x": 320,
+        "y": 364
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "merch.private-pilot",
@@ -6801,7 +7493,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "retryMerchOrder",
           "line": 205,
           "value": "retryMerchOrder(orderId)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/merch.ts#L205"
         }
       ],
@@ -6829,7 +7521,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 700
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "merch.shipping-quote",
@@ -6844,7 +7536,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "createStoreQuote",
           "line": 81,
           "value": "createStoreQuote(args)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L81"
         },
         {
@@ -6882,7 +7574,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 656,
         "y": 388
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "merch.operational-overrides",
@@ -6935,7 +7627,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "getStoreStatus",
           "line": 191,
           "value": "getStoreStatus(orderId, token)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L191"
         },
         {
@@ -6972,7 +7664,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 700,
         "y": 700
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "merch.provider-status",
@@ -7852,11 +8544,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "economy"
       ],
       "rules": [
-        "economy.market-catalog",
-        "economy.market-local-preview"
+        "economy.market-catalog"
       ],
-      "status": "accepted",
-      "supersededBy": null,
+      "status": "superseded",
+      "supersededBy": "gear-market",
       "sources": [
         {
           "kind": "pr",
@@ -8371,8 +9062,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "social.remote-inbox-off",
         "data.neon-compute-budget"
       ],
-      "status": "accepted",
-      "supersededBy": null,
+      "status": "superseded",
+      "supersededBy": "notifications-bell",
       "sources": [
         {
           "kind": "pr",
@@ -9848,6 +10539,47 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ]
     },
     {
+      "id": "earned-gem-ledger",
+      "date": "2026-11-04",
+      "title": "Make Chitin Gems real and earned",
+      "summary": "Gems moved from placeholder numbers to a ledger that awards them for tasks, streaks, stages, firsts, and referrals.",
+      "domains": [
+        "economy"
+      ],
+      "rules": [
+        "economy.gem-ledger",
+        "economy.gem-earning",
+        "economy.starting-balances"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "pr",
+          "label": "PR #404",
+          "url": "https://github.com/mstupp1/moltology/pull/404"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Chitin Gems and Molt Credits were placeholder numbers. Every account started with 1,450 Credits and 250 Gems, and nothing a member did earned more. The market rebuild needed a currency members actually earn.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Every Gem change is a row in <code>gem_transactions</code> with a source key that is unique per member, and the profile balance is a cached sum refreshed under a row lock. Balances were reset: every member got a 100 Gem welcome grant and Credits went to 0. All earning amounts live in one file, tuned so a regular member can buy a common piece every few days and a legendary one in a couple of months. Unchecking a task takes its Gems back, the same way XP works.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>Keep incrementing the profile column directly. Rejected because awards could land twice and there was no history to audit.</li>\n<li>Keep the old starting balances. Rejected because they were never earned and would undercut the earning loop.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Gems now have a full history and can&#39;t be double-awarded. Simulated members earn through the same ledger. Real members start at 0 and earn their first Gems on their first action.</p>"
+        }
+      ]
+    },
+    {
       "id": "five-vector-stats",
       "date": "2026-11-04",
       "title": "One stat set: the five Moltmax vectors",
@@ -9877,6 +10609,179 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "heading": "Consequences",
           "html": "<ul>\n<li>Retaking the audit moves the base. Gear is how the number climbs past it.</li>\n<li>Rarer gear carries bigger bonuses, so the market rarity ladder shows on the sheet.</li>\n</ul>"
+        }
+      ]
+    },
+    {
+      "id": "gear-market",
+      "date": "2026-11-04",
+      "title": "Turn the market into a real gear shop",
+      "summary": "The demo market was replaced by a shop that sells rarer gear variants for Gems, with purchases checked and recorded on the server.",
+      "domains": [
+        "economy"
+      ],
+      "rules": [
+        "economy.market-catalog",
+        "economy.market-purchases",
+        "economy.character-starter-equipment"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "pr",
+          "label": "PR #403",
+          "url": "https://github.com/mstupp1/moltology/pull/403"
+        },
+        {
+          "kind": "pr",
+          "label": "PR #405",
+          "url": "https://github.com/mstupp1/moltology/pull/405"
+        },
+        {
+          "kind": "pr",
+          "label": "PR #427",
+          "url": "https://github.com/mstupp1/moltology/pull/427"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>The old market was a demo. Items were hardcoded, balances lived in the browser, and nothing was charged or saved. The atlas flagged this as a gap before any currency could have real value.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Owning gear became an unlock in <code>gear_unlocks</code>. Every base piece gets each rarity above its own, priced flat by rarity at 60, 150, 400, 900, and 2,000 Gems. A purchase locks the profile row, checks a fresh ledger sum, and writes the spend and the unlock together. Customize shows only owned gear, and try-ons moved to the shop. Staff can add any piece to their own collection for free.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>Keep the 20-slot vault as the limit on ownership. Rejected because unlocks are simpler and never fill up.</li>\n<li>Price each piece individually. Rejected in favor of one price table that is easy to tune.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>The client-only balance gap is closed. The fake exchange, transmute, and boosts were deleted. Rarer gear adds stats, which stay flavor and never affect progression or authority.</p>"
+        }
+      ]
+    },
+    {
+      "id": "molt-credit-packs",
+      "date": "2026-11-04",
+      "title": "Sell Molt Credit packs through Stripe behind an experiment",
+      "summary": "Credits can be bought in four packs through Stripe Checkout, but only for members with the molt-credits experiment while the flow is tested.",
+      "domains": [
+        "economy"
+      ],
+      "rules": [
+        "economy.credit-packs",
+        "economy.market-purchases"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "pr",
+          "label": "PR #406",
+          "url": "https://github.com/mstupp1/moltology/pull/406"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>The gear shop worked with Gems. Credits are the paid currency, and they needed a real way to be bought before the Credits tab could open.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Credits use their own ledger, <code>credit_transactions</code>, built like the Gem ledger. Four packs use inline Stripe prices, so there are no Stripe products to manage. The Stripe webhook grants a pack once per payment and checks that the amount matches what Stripe charged. A full refund takes the pack back. Credits spend at Gem prices, and Gems are always spent first. Checkout is refused unless the member has the molt-credits experiment.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>Separate Credit prices for each item. Rejected to keep one price list.</li>\n<li>Open Credits to every member at once. Rejected until live Stripe has been tried by staff.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Members still see Credits as coming soon. Partial refunds have to be settled by hand. Credits only add speed, so the red line holds: they buy the same items Gems buy, at the same prices.</p>"
+        }
+      ]
+    },
+    {
+      "id": "notifications-bell",
+      "date": "2026-11-06",
+      "title": "Turn the notification inbox back on, without a timer",
+      "summary": "Notifications moved to their own bell and read the server on load, on focus at most every 6 minutes, and when the bell opens.",
+      "domains": [
+        "social",
+        "data"
+      ],
+      "rules": [
+        "social.remote-inbox-off",
+        "data.neon-compute-budget"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "pr",
+          "label": "PR #425",
+          "url": "https://github.com/mstupp1/moltology/pull/425"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>The inbox was switched off in September so that polling would not keep the Neon compute awake. Friend requests, forum replies, and mentions had nowhere to show up.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>The inbox is back on, with no polling timer. It reads once when the page loads, again when the tab regains focus (no more than every 6 minutes), and whenever the bell opens. When a page comes back full, the server runs one count query, so the unread badge stays correct.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>Keep the inbox off until push notifications exist. Rejected because members could not see replies or requests at all.</li>\n<li>Poll on a short timer. Rejected because it would keep the database awake.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Reads only happen when a member is active, which keeps to the compute budget. The panel shows the latest 30 notifications and has no load-more yet.</p>"
+        }
+      ]
+    },
+    {
+      "id": "google-one-tap",
+      "date": "2026-11-11",
+      "title": "Offer Google One Tap sign-in on public pages",
+      "summary": "Signed-out visitors on public pages get a Google One Tap card that runs the normal Google sign-in path, screening included.",
+      "domains": [
+        "auth",
+        "signup"
+      ],
+      "rules": [
+        "auth.better-auth",
+        "auth.google-linking"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "pr",
+          "label": "PR #441",
+          "url": "https://github.com/mstupp1/moltology/pull/441"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Signing up took several steps. Google One Tap lets a visitor who is signed in to Google create an account or sign in with one tap.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>One Tap shows once per visit on public pages, never on sign-in, checkout, or app pages. The server verifies Google&#39;s token, then runs Better Auth&#39;s normal Google sign-in, so signup screening, the email verification linking rule, and new-account hooks all apply. Signing out turns off automatic sign-in, so a member who signed out is asked instead of being signed straight back in.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>A separate One Tap account path. Rejected because it would skip signup screening.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>One Tap only runs on the production origins and localhost, which are registered on the Google client. Preview deployments skip it.</p>"
         }
       ]
     },
@@ -9930,6 +10835,142 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "html": "<ul>\n<li>Guest Oracle spend is bounded by the all-guests ceiling. Raise or lower ORACLE_GUEST_LIMITS to tune it.</li>\n<li>IP-based counting can be shared by people behind one network; the ceiling still bounds cost.</li>\n</ul>"
         }
       ]
+    },
+    {
+      "id": "guest-progress-carries-over",
+      "date": "2026-11-13",
+      "title": "Keep what a guest did when they sign up",
+      "summary": "A guest's Moltmax audit, today's task ticks, and character are kept on the device and saved to the account when they sign in.",
+      "domains": [
+        "signup"
+      ],
+      "rules": [
+        "signup.guest-progress-claim"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "pr",
+          "label": "PR #416",
+          "url": "https://github.com/mstupp1/moltology/pull/416"
+        },
+        {
+          "kind": "pr",
+          "label": "PR #464",
+          "url": "https://github.com/mstupp1/moltology/pull/464"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>About 65 guests a month try the app, and almost none sign up. A guest&#39;s audit result, task ticks, and character lived only in page state, so signing up, reloading, or a sign-in redirect threw them away.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Guest progress is kept on the device. The audit keeps its answers for 7 days, and the server recomputes the score at sign-in. Today&#39;s ticks go through the normal task rules, so XP, Gems, and streaks follow the server&#39;s rules. Customize is open to guests. A guest character is saved only to an account that has never saved one, and an existing character always wins.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>Store guest progress on the server before signup. Rejected because guests have no account to own the rows.</li>\n<li>Let the guest character replace an existing one. Rejected because signing in to an older account must never overwrite it.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Guests can try the audit, tasks, and character creator and keep the results. Ticks from an earlier day are dropped.</p>"
+        }
+      ]
+    },
+    {
+      "id": "oracle-skills",
+      "date": "2026-11-14",
+      "title": "Sell Oracle skills in the Shop",
+      "summary": "Members can buy Oracle skills with Gems. Four skills are free, and staff and Oracle MAX members get every skill.",
+      "domains": [
+        "economy",
+        "oracle"
+      ],
+      "rules": [
+        "economy.oracle-skill-prices",
+        "economy.market-purchases",
+        "oracle.skill-context",
+        "oracle.custom-instructions"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "pr",
+          "label": "PR #469",
+          "url": "https://github.com/mstupp1/moltology/pull/469"
+        },
+        {
+          "kind": "pr",
+          "label": "PR #474",
+          "url": "https://github.com/mstupp1/moltology/pull/474"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Oracle skills are written methods the Oracle can walk a member through, such as focus rounds or box breathing. They needed a clear way to be owned, and Gems needed more to spend on than gear.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>There are twelve skills. Four are free starters, five cost 60 Gems, and three cost 150. Buying a skill uses the same locked Gems-then-Credits batch as gear and records it in <code>oracle_skill_unlocks</code>. Staff and members with an active Oracle MAX subscription can use every skill. The Oracle only suggests skills the member owns, and members can turn that suggestion off.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>Make skills a MAX-only feature. Rejected because skills are a good thing to spend earned Gems on.</li>\n<li>Give every skill to everyone. Rejected because it would leave Gems with less to buy.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Skills are help, not rank, so selling them keeps to the red line. The skill playbook goes into the prompt only for the conversation that uses it. The same release added an Oracle personality and up to 1,000 characters of custom instructions. Laya screens the instructions, and the prompt keeps them below the safety rules.</p>"
+        }
+      ]
+    },
+    {
+      "id": "simulated-members-shop",
+      "date": "2026-11-14",
+      "title": "Let simulated members look varied, shop, and wear gear",
+      "summary": "Simulated members get fully random characters, buy gear with their Gems only, and change outfits during simulation ticks.",
+      "domains": [
+        "economy"
+      ],
+      "rules": [
+        "economy.simulated-gem-grants"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "pr",
+          "label": "PR #477",
+          "url": "https://github.com/mstupp1/moltology/pull/477"
+        },
+        {
+          "kind": "pr",
+          "label": "PR #478",
+          "url": "https://github.com/mstupp1/moltology/pull/478"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>The forum group photo showed every simulated member as the same default lobster, wearing nothing. Simulated members earned Gems but never spent them.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>New simulated members get a fully rolled character and the starter gear set. Each simulation tick, a simulated member has a 12% chance to buy one piece and an 8% chance to change outfit. Purchases go through the real market, but only when the member&#39;s Gem ledger covers the whole price, so a simulated member never spends Credits. Outfits are saved through the same database function a member&#39;s own save uses.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>Let simulated members spend Credits too. Rejected because simulated members should never touch the paid currency.</li>\n<li>Dress simulated members once and never change them. Rejected because the community would look static.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>The existing simulated members were re-rolled and dressed once in production. Their cached Gem balances were synced to their ledgers so purchases don&#39;t make their balances drop. Real members are never touched, because every write re-checks the simulated flag.</p>"
+        }
+      ]
     }
   ],
   "edges": [
@@ -9952,20 +10993,104 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "crossDomain": false
     },
     {
+      "id": "economy.gem-ledger->economy.starting-balances",
+      "source": "economy.gem-ledger",
+      "target": "economy.starting-balances",
+      "crossDomain": false
+    },
+    {
+      "id": "economy.two-currencies->economy.gem-ledger",
+      "source": "economy.two-currencies",
+      "target": "economy.gem-ledger",
+      "crossDomain": false
+    },
+    {
+      "id": "economy.gem-ledger->economy.gem-earning",
+      "source": "economy.gem-ledger",
+      "target": "economy.gem-earning",
+      "crossDomain": false
+    },
+    {
+      "id": "progression.xp-ledger->economy.gem-earning",
+      "source": "progression.xp-ledger",
+      "target": "economy.gem-earning",
+      "crossDomain": true
+    },
+    {
+      "id": "progression.referral-rewards->economy.gem-earning",
+      "source": "progression.referral-rewards",
+      "target": "economy.gem-earning",
+      "crossDomain": true
+    },
+    {
       "id": "economy.two-currencies->economy.market-catalog",
       "source": "economy.two-currencies",
       "target": "economy.market-catalog",
       "crossDomain": false
     },
     {
-      "id": "economy.market-catalog->economy.market-local-preview",
-      "source": "economy.market-catalog",
-      "target": "economy.market-local-preview",
+      "id": "economy.character-starter-equipment->economy.market-catalog",
+      "source": "economy.character-starter-equipment",
+      "target": "economy.market-catalog",
       "crossDomain": false
     },
     {
-      "id": "economy.two-currencies->economy.simulated-gem-grants",
+      "id": "economy.gem-ledger->economy.market-purchases",
+      "source": "economy.gem-ledger",
+      "target": "economy.market-purchases",
+      "crossDomain": false
+    },
+    {
+      "id": "economy.market-catalog->economy.market-purchases",
+      "source": "economy.market-catalog",
+      "target": "economy.market-purchases",
+      "crossDomain": false
+    },
+    {
+      "id": "access.staff->economy.market-purchases",
+      "source": "access.staff",
+      "target": "economy.market-purchases",
+      "crossDomain": true
+    },
+    {
+      "id": "economy.two-currencies->economy.credit-packs",
       "source": "economy.two-currencies",
+      "target": "economy.credit-packs",
+      "crossDomain": false
+    },
+    {
+      "id": "economy.red-line->economy.credit-packs",
+      "source": "economy.red-line",
+      "target": "economy.credit-packs",
+      "crossDomain": false
+    },
+    {
+      "id": "premium.webhook-signature->economy.credit-packs",
+      "source": "premium.webhook-signature",
+      "target": "economy.credit-packs",
+      "crossDomain": true
+    },
+    {
+      "id": "economy.market-purchases->economy.oracle-skill-prices",
+      "source": "economy.market-purchases",
+      "target": "economy.oracle-skill-prices",
+      "crossDomain": false
+    },
+    {
+      "id": "economy.red-line->economy.oracle-skill-prices",
+      "source": "economy.red-line",
+      "target": "economy.oracle-skill-prices",
+      "crossDomain": false
+    },
+    {
+      "id": "economy.gem-ledger->economy.simulated-gem-grants",
+      "source": "economy.gem-ledger",
+      "target": "economy.simulated-gem-grants",
+      "crossDomain": false
+    },
+    {
+      "id": "economy.market-purchases->economy.simulated-gem-grants",
+      "source": "economy.market-purchases",
       "target": "economy.simulated-gem-grants",
       "crossDomain": false
     },
@@ -10219,6 +11344,12 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "auth.better-auth->signup.pipeline",
       "source": "auth.better-auth",
       "target": "signup.pipeline",
+      "crossDomain": true
+    },
+    {
+      "id": "progression.xp-ledger->signup.guest-progress-claim",
+      "source": "progression.xp-ledger",
+      "target": "signup.guest-progress-claim",
       "crossDomain": true
     },
     {
@@ -10480,6 +11611,24 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "crossDomain": false
     },
     {
+      "id": "oracle.request-pipeline->oracle.skill-context",
+      "source": "oracle.request-pipeline",
+      "target": "oracle.skill-context",
+      "crossDomain": false
+    },
+    {
+      "id": "economy.oracle-skill-prices->oracle.skill-context",
+      "source": "economy.oracle-skill-prices",
+      "target": "oracle.skill-context",
+      "crossDomain": true
+    },
+    {
+      "id": "oracle.input-guardrails->oracle.custom-instructions",
+      "source": "oracle.input-guardrails",
+      "target": "oracle.custom-instructions",
+      "crossDomain": false
+    },
+    {
       "id": "oracle.request-pipeline->oracle.request-caps",
       "source": "oracle.request-pipeline",
       "target": "oracle.request-caps",
@@ -10586,6 +11735,30 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "source": "data.avatar-look-server",
       "target": "data.avatar-portraits",
       "crossDomain": false
+    },
+    {
+      "id": "data.avatar-portraits->data.saved-portraits",
+      "source": "data.avatar-portraits",
+      "target": "data.saved-portraits",
+      "crossDomain": false
+    },
+    {
+      "id": "access.write-auth->data.saved-portraits",
+      "source": "access.write-auth",
+      "target": "data.saved-portraits",
+      "crossDomain": true
+    },
+    {
+      "id": "data.saved-portraits->data.community-photo",
+      "source": "data.saved-portraits",
+      "target": "data.community-photo",
+      "crossDomain": false
+    },
+    {
+      "id": "access.write-auth->data.community-photo",
+      "source": "access.write-auth",
+      "target": "data.community-photo",
+      "crossDomain": true
     },
     {
       "id": "access.write-auth->data.character-atomic-save",

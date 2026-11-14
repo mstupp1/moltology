@@ -4,8 +4,9 @@ date: 2026-08-30
 title: "Rebuild the market around the currency split"
 summary: "The market has Buy Credits, Exchange, and a Gem-only vault, and the old buy-Gems flows were removed."
 domains: [economy]
-rules: [economy.market-catalog, economy.market-local-preview]
-status: accepted
+rules: [economy.market-catalog]
+status: superseded
+supersededBy: gear-market
 sources:
   - pr: 31
 ---

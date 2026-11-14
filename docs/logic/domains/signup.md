@@ -72,6 +72,19 @@ rules:
         label: Allow
         kind: outcome
         tone: allow
+  - id: signup.guest-progress-claim
+    title: Guest progress carries over
+    kind: flow
+    statement: A guest's finished Moltmax audit (kept on the device for 7 days), today's task ticks, and their character carry over when they sign in on the same browser. The audit score is recomputed on the server, and ticks go through the normal task rules. An account that already has an audit or a character keeps its own unless the guest asked to save the audit.
+    dependsOn: [progression.xp-ledger]
+    anchors:
+      - file: src/lib/guest-progress.ts
+        symbol: GUEST_AUDIT_MAX_AGE_MS
+      - file: src/lib/guest-progress-claim.ts
+        symbol: claimGuestAudit
+      - file: src/lib/guest-character-claim.ts
+        symbol: claimGuestCharacter
+    tests: [src/lib/guest-progress.test.ts, src/lib/guest-progress-claim.test.ts, src/lib/guest-character-claim.test.ts]
   - id: signup.honeypot
     title: Honeypot rejects bots
     kind: gate
