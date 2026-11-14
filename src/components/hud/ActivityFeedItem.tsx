@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from '@tanstack/react-router'
 import { CheckCircle2, Flame, Layers, MessageSquare, Sparkles, Users } from 'lucide-react'
+import { openAlignmentPanel } from '@/lib/alignment-panel'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import {
   ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
@@ -57,8 +58,18 @@ function EventTitleLink({
     )
   }
   if (parsed.kind === 'alignment') {
+    // Today's tasks live in the avatar menu (the /alignment page is gone), so open it in place.
+    // The link still points at the dashboard for new-tab clicks.
     return (
-      <Link to="/alignment" className={className}>
+      <Link
+        to="/dashboard"
+        className={className}
+        onClick={(e) => {
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
+          e.preventDefault()
+          openAlignmentPanel()
+        }}
+      >
         {children}
       </Link>
     )

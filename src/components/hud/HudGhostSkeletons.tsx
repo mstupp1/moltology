@@ -5,50 +5,6 @@ import { HudGhostSkeleton, HudGhostCard, HudGhostStatBox } from '@/components/ui
 const GHOST_CARD = 'rounded-card border-line-subtle bg-surface-1 shadow-none'
 
 /**
- * Clean Ghost Skeleton composite for the Daily Routine Alignment Widget.
- */
-export function DailyRoutineGhost() {
-  return (
-    <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-5 space-y-4 relative min-w-0 overflow-hidden">
-      {/* Widget Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line-subtle pb-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <HudGhostSkeleton variant="teal" preset="avatar" width={28} height={28} />
-          <HudGhostSkeleton variant="teal" preset="heading" width={150} height={16} />
-        </div>
-        <HudGhostSkeleton variant="teal" preset="badge" width={76} height={20} />
-      </div>
-
-      {/* Progress Meter skeleton */}
-      <div className="rounded-card border border-line-subtle bg-surface-2 p-3 space-y-2">
-        <div className="flex items-center justify-between">
-          <HudGhostSkeleton variant="neutral" preset="text" width={100} height={12} />
-          <HudGhostSkeleton variant="teal" preset="heading" width={50} height={16} />
-        </div>
-        <HudGhostSkeleton variant="neutral" height={12} width="100%" />
-      </div>
-
-      {/* Routine Items List skeleton */}
-      <div className="space-y-2.5">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="rounded-card border border-line-subtle bg-surface-2 p-2.5 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5 flex-1">
-              <HudGhostSkeleton variant="neutral" width={16} height={16} cornerCut={false} />
-              <div className="space-y-1 flex-1">
-                <HudGhostSkeleton variant="neutral" preset="heading" width="45%" height={13} />
-                <HudGhostSkeleton variant="neutral" preset="text" width="70%" height={10} />
-              </div>
-            </div>
-            <HudGhostSkeleton variant="neutral" preset="badge" width={60} height={18} />
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-
-/**
  * Clean Ghost Skeleton composite for Initiate Activity Feed list.
  */
 export function ActivityFeedGhost() {

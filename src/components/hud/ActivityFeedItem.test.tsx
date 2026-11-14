@@ -1,6 +1,7 @@
 import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { OPEN_ALIGNMENT_PANEL_EVENT } from '@/lib/alignment-panel'
 import { ActivityFeedItem } from './ActivityFeedItem'
 import type { ActivityEventView } from '@/lib/activity-events'
 
@@ -68,7 +69,9 @@ describe('ActivityFeedItem', () => {
     expect(screen.getByTestId('avatar')).toHaveAttribute('data-animated', 'no')
   })
 
-  it('deep-links a sealed liturgy to the alignment hub', () => {
+  it('opens the avatar menu tasks for a sealed liturgy', () => {
+    const listener = vi.fn()
+    window.addEventListener(OPEN_ALIGNMENT_PANEL_EVENT, listener)
     render(
       <ActivityFeedItem
         event={event({
@@ -83,10 +86,11 @@ describe('ActivityFeedItem', () => {
       />
     )
 
-    expect(screen.getByRole('heading', { name: 'Silent Synchronization sealed' }).closest('a')).toHaveAttribute(
-      'href',
-      '/alignment'
-    )
+    const link = screen.getByRole('heading', { name: 'Silent Synchronization sealed' }).closest('a')!
+    expect(link).toHaveAttribute('href', '/dashboard')
+    fireEvent.click(link)
+    expect(listener).toHaveBeenCalledTimes(1)
+    window.removeEventListener(OPEN_ALIGNMENT_PANEL_EVENT, listener)
   })
 
   it('deep-links a welcomed connection to the peer dossier', () => {
