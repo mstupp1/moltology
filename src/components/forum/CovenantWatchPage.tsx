@@ -230,8 +230,8 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
   }
 
   return (
-    <div className="space-y-3.5 sm:space-y-5 font-sans relative" data-testid="covenant-watch">
-      <section className="rounded-card border border-line-subtle bg-surface-1 p-4 sm:p-5 space-y-4">
+    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative" data-testid="covenant-watch">
+      <section className="rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 lg:p-5 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-1.5" role="tablist" aria-label="Flag filter">
             <button

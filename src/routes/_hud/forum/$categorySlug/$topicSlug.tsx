@@ -408,7 +408,7 @@ function ForumThreadPage() {
 
   return (
     <ForumShell>
-      <div className="space-y-3.5 sm:space-y-5 font-sans relative pb-8">
+      <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative pb-8">
         {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-2">
           <Link
@@ -424,9 +424,9 @@ function ForumThreadPage() {
         {/* 2-Column Bento Split */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
           {/* Left Column (8 cols): Original Topic Post, Reply Composer, Comments Stream */}
-          <div className="lg:col-span-8 flex flex-col space-y-3.5 sm:space-y-5">
+          <div className="lg:col-span-8 flex flex-col space-y-3 sm:space-y-4 lg:space-y-5">
             {/* Topic Main Card */}
-            <article className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-4 sm:p-5 space-y-3.5 relative overflow-hidden">
+            <article className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 lg:p-5 space-y-3.5 relative overflow-hidden">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-2 text-[11px]">
                   {topic.categoryName && (
@@ -667,7 +667,7 @@ function ForumThreadPage() {
             {/* Reply Composer */}
             {topic.isLocked ? (
               <div
-                className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-4 sm:p-5 text-center space-y-1.5"
+                className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 lg:p-5 text-center space-y-1.5"
                 data-testid="forum-thread-locked"
               >
                 <p className="text-xs text-ink font-bold">Thread locked</p>
@@ -751,7 +751,7 @@ function ForumThreadPage() {
           </div>
 
           {/* Right Column (4 cols): Transmission Intel & Guidelines */}
-          <div className="lg:col-span-4 flex flex-col space-y-3.5 sm:space-y-5">
+          <div className="lg:col-span-4 flex flex-col space-y-3 sm:space-y-4 lg:space-y-5">
             {/* Transmission Intel Card */}
             <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 space-y-2.5">
               <div className="flex items-center justify-between border-b border-line-subtle pb-2.5">

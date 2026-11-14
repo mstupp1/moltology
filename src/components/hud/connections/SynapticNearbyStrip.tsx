@@ -22,7 +22,7 @@ export function SynapticNearbyStrip({
   const visible = members.slice(0, SYNAPTIC_NEARBY_LIMIT)
 
   return (
-    <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
+    <div className="chitin-card p-3 sm:p-4 lg:p-5 chamfer-corner shadow-2xl space-y-3">
       <div className="border-b border-[#3a4a49] pb-3">
         <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase flex items-center gap-2">
           <Radio className="w-4 h-4 text-[#00c3ff]" />

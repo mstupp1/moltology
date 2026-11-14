@@ -134,7 +134,7 @@ export function DashboardTodayStrip() {
           <div className="absolute inset-0 bg-gradient-to-t from-surface-1 via-transparent to-transparent" />
         </div>
 
-        <div className="relative z-10 p-5 sm:p-6 lg:p-8 sm:min-h-[300px] flex flex-col items-start">
+        <div className="relative z-10 p-4 sm:p-5 lg:p-6 lg:p-8 sm:min-h-[300px] flex flex-col items-start">
           <div className="max-w-[60%] sm:max-w-[55%] space-y-2">
             <p className="text-[11px] font-bold tracking-[0.08em] uppercase text-ink-muted min-h-[1em]">
               {dateLabel ? `Today · ${dateLabel}` : 'Today'}

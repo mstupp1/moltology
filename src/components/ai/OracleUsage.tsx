@@ -60,7 +60,7 @@ export function PlanUsageSection({ userId }: { userId: string | null }) {
   const usage = useOracleUsage(userId)
   const access = useHiddenPageAccess('premium')
   if (!userId) return null
-  return <HudCard className="p-3 sm:p-4 md:p-5 space-y-3">
+  return <HudCard className="p-3 sm:p-4 lg:p-5 space-y-3">
     <h2 className="font-grotesk text-sm font-bold text-ink">Plan &amp; usage</h2>
     {usage.snapshot && <p className="text-xs text-ink-muted">{usage.snapshot.isPremium ? 'Oracle MAX' : 'Free'} plan · Oracle messages</p>}
     <OracleUsage snapshot={usage.snapshot} unavailable={usage.unavailable} expanded />

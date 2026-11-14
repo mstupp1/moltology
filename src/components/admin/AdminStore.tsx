@@ -79,7 +79,7 @@ export function AdminStore() {
 
   // Lives under the order list in the Store tab of /admin (it was its own page at /admin/store).
   return (
-    <div id="admin-store-settings" className="space-y-4 sm:space-y-5 font-sans scroll-mt-20" data-testid="admin-store-settings">
+    <div id="admin-store-settings" className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans scroll-mt-20" data-testid="admin-store-settings">
       <header className="space-y-1 pt-2">
         <h2 className="font-grotesk text-lg font-bold text-ink">Store settings</h2>
         <p className="text-xs text-ink-muted">Checkout switches, policies, promo codes, catalog availability and the email queue.</p>

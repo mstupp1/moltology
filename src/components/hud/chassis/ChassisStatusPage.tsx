@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { GearIcon } from '@/components/hud/avatar3d/GearIcon'
 import React, { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
-import { Dices, UserPlus } from 'lucide-react'
+import { Check, Dices, Loader2, Undo2, UserPlus } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { HudWorkspaceGhost } from '../HudGhostSkeletons'
 import { HudButton } from '@/components/ui/HudButton'
@@ -405,21 +405,36 @@ export const ChassisStatusPage: React.FC = () => {
             <HudButton
               size="sm"
               variant="secondary"
+              className="w-8 px-0"
+              aria-label="Discard changes"
+              title="Discard changes"
               disabled={saving || !dirty}
               onClick={() => {
                 accept(saved)
                 if (isGuest && saved.config) saveGuestCharacter(saved.config, saved.items)
               }}
             >
-              Discard
+              <Undo2 className="w-4 h-4" aria-hidden="true" />
             </HudButton>
             {isGuest ? (
               <HudButton size="sm" onClick={() => void save()} icon={<UserPlus className="w-3.5 h-3.5" />}>
                 Save my character
               </HudButton>
             ) : (
-              <HudButton size="sm" disabled={saving || !dirty} onClick={() => void save()}>
-                {saving ? 'Saving…' : 'Save changes'}
+              <HudButton
+                size="sm"
+                className="w-8 px-0"
+                aria-label={saving ? 'Saving' : 'Save changes'}
+                title="Save changes"
+                aria-busy={saving || undefined}
+                disabled={saving || !dirty}
+                onClick={() => void save()}
+              >
+                {saving ? (
+                  <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                ) : (
+                  <Check className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />
+                )}
               </HudButton>
             )}
           </div>

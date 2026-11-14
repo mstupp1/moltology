@@ -62,8 +62,6 @@ export const SUPPORT_PAGE_COPY = {
   changelogExpand: 'View release notes',
   changelogCollapse: 'Hide release notes',
   changelogPermalink: 'Permalink',
-  changelogHint: 'Every release, newest first.',
-  contactHint: 'Questions about your account, billing, or something that broke.',
 } as const
 
 export const SUPPORT_TICKET_CATEGORY_LABELS: Record<SupportTicketCategoryId, string> = {

@@ -128,13 +128,8 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
     setCurrentPage(1)
   }
 
-  const tabDescription =
-    activeTab === 'changelog'
-      ? SUPPORT_PAGE_COPY.changelogHint
-      : SUPPORT_PAGE_COPY.contactHint
-
   return (
-    <div className="space-y-4 sm:space-y-5 font-sans text-ink">
+    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans text-ink">
       <div>
         <HudTitleBandTop>
           <HorizontalScroll className="-ml-2.5 overflow-x-auto pl-2.5" tabIndex={-1}>
@@ -151,7 +146,7 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
             />
           </HorizontalScroll>
         </HudTitleBandTop>
-        <HudTitlePanel treatment="band" joined title={SUPPORT_PAGE_COPY.pageTitle} description={tabDescription} />
+        <HudTitlePanel treatment="band" joined title={SUPPORT_PAGE_COPY.pageTitle} />
       </div>
       <div role="tabpanel" aria-labelledby={`support-tab-${activeTab}`}>
         {/* Changelog */}
@@ -253,7 +248,7 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
 
         {/* Contact support */}
         {activeTab === 'ticket' && (
-          <section className="rounded-card border border-line-subtle bg-surface-1 p-4 sm:p-5 max-w-3xl">
+          <section className="rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 lg:p-5 max-w-3xl">
             <SupportTicketForm />
           </section>
         )}

@@ -116,7 +116,7 @@ export function StageSection({ stage, xp }: { stage: StagePipelineInfo; xp: numb
     <section
       id={stageSectionId(stage.stageNum)}
       aria-labelledby={headingId}
-      className="scroll-mt-20 rounded-card border border-line-subtle bg-surface-1 p-4 sm:p-5"
+      className="scroll-mt-20 rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 lg:p-5"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 max-w-3xl">

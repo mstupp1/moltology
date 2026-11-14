@@ -256,7 +256,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
       <div
         ref={containerRef}
         id="topic-composer"
-        className={`rounded-card border border-cyan-glow/40 bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-5 space-y-3.5 sm:space-y-4 animate-in fade-in duration-200 ${className}`}
+        className={`rounded-card border border-cyan-glow/40 bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 lg:p-5 space-y-3.5 sm:space-y-4 animate-in fade-in duration-200 ${className}`}
         data-testid="inline-composer-expanded"
       >
         <div className="flex items-center justify-between border-b border-line-subtle pb-2.5 sm:pb-3">

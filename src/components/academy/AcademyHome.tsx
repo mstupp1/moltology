@@ -60,7 +60,7 @@ function CourseCard({ course }: { course: AcademyCourseCard }) {
           ) : null}
         </div>
       </AcademyCover>
-      <div className="p-4 flex flex-col gap-2.5 flex-1">
+      <div className="p-3 sm:p-4 flex flex-col gap-2.5 flex-1">
         <div className="space-y-1">
           <h3 className="font-grotesk font-bold text-base text-ink leading-snug">{course.title}</h3>
           <p className="text-xs text-ink-body leading-relaxed">{course.subtitle}</p>
@@ -128,7 +128,7 @@ function TrackCard({ track }: { track: AcademyTrackCard }) {
           </span>
         </div>
       </AcademyCover>
-      <div className="p-4 flex flex-col gap-2 flex-1 min-w-0">
+      <div className="p-3 sm:p-4 flex flex-col gap-2 flex-1 min-w-0">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <LevelMark level={track.level} />
           <span className="text-[11px] text-ink-muted">
@@ -197,7 +197,7 @@ function AcademyComingSoon() {
           <li
             key={title}
             className={cn(
-              'p-4 sm:p-5 space-y-2',
+              'p-3 sm:p-4 lg:p-5 space-y-2',
               index > 0 && 'border-t md:border-t-0 md:border-l border-line-subtle',
             )}
           >
@@ -276,7 +276,7 @@ export function AcademyHome({ data }: { data: AcademyHomePayload }) {
   const certificatePreview = [...data.certificates].sort((a, b) => Number(b.earned) - Number(a.earned)).slice(0, 4)
 
   return (
-    <div className="space-y-5 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-5">
       <div>
         <AcademyNav current="catalog" />
         <HudTitlePanel treatment="band" joined title="Academy" />

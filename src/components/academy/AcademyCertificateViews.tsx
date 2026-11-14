@@ -26,7 +26,7 @@ export function AcademyCertificateIndex({ data }: { data: AcademyHomePayload }) 
   const earned = data.certificates.filter((certificate) => certificate.earned)
   const available = data.certificates.filter((certificate) => !certificate.earned)
   return (
-    <div className="space-y-5 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-5">
       <div>
         <AcademyNav current="certificates" />
         <HudTitlePanel
@@ -151,7 +151,7 @@ function AvailableRow({ certificate }: { certificate: AcademyCertificateCard }) 
 
 export function AcademyCredential({ credential }: { credential: AcademyCredentialView }) {
   return (
-    <div className="space-y-4 sm:space-y-5">
+    <div className="space-y-3 sm:space-y-4 lg:space-y-5">
       <AcademyCrumbs
         items={[
           {

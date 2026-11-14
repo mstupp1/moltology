@@ -49,7 +49,7 @@ export function HudTitlePanel({
         treatment === 'band' &&
           cn('bg-surface-2 border-b border-line-subtle', joined ? 'hud-title-band-rest pt-2 pb-4 md:pb-5' : 'hud-title-band'),
         treatment === 'integrated' && 'border-b border-line-subtle pb-4',
-        treatment === 'hero' && `overflow-hidden rounded-card border border-line-subtle border-l-2 ${accentClasses.border} bg-surface-1 hud-sheen p-4 sm:p-5`,
+        treatment === 'hero' && `overflow-hidden rounded-card border border-line-subtle border-l-2 ${accentClasses.border} bg-surface-1 hud-sheen p-3 sm:p-4 lg:p-5`,
         className,
       )}
       {...props}

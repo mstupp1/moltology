@@ -33,7 +33,7 @@ export function DashboardPanel({
   return (
     <section
       className={cn(
-        'rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-4 flex flex-col gap-3 min-w-0',
+        'rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 flex flex-col gap-3 min-w-0',
         className,
       )}
       {...props}

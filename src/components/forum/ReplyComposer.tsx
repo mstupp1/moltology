@@ -105,7 +105,7 @@ export const ReplyComposer = forwardRef<
   if (isPending) {
     return (
       <div
-        className={`${compact ? 'p-3' : 'rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-4 sm:p-5'} space-y-2.5`}
+        className={`${compact ? 'p-3' : 'rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 lg:p-5'} space-y-2.5`}
         data-testid="forum-reply-auth-skeleton"
       >
         <HudGhostSkeleton variant="neutral" preset="text" width="60%" height={14} />
@@ -117,7 +117,7 @@ export const ReplyComposer = forwardRef<
   if (!isAuthenticated) {
     return (
       <div
-        className={`${compact ? 'p-3 rounded-card border border-line-subtle bg-abyss/60' : 'rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-4 sm:p-5'} text-center space-y-2.5`}
+        className={`${compact ? 'p-3 rounded-card border border-line-subtle bg-abyss/60' : 'rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 lg:p-5'} text-center space-y-2.5`}
       >
         <p className="text-xs text-ink-muted">Sign in to join the discussion.</p>
         <button
@@ -138,7 +138,7 @@ export const ReplyComposer = forwardRef<
       className={
         compact
           ? 'p-3 rounded-card border border-line-subtle bg-abyss/60 space-y-2.5'
-          : 'rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-4 sm:p-5 space-y-3'
+          : 'rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 lg:p-5 space-y-3'
       }
       data-testid={parentId ? 'forum-inline-reply-composer' : 'forum-top-reply-composer'}
     >

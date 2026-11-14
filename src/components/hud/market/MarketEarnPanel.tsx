@@ -37,7 +37,7 @@ export function MarketEarnPanel({ wallet, guest = false }: { wallet: GemWallet; 
   const streaks = GEM_STREAK_MILESTONES.map((m) => `${m.days}d`).join(', ')
   return (
     <div className="grid gap-3 lg:grid-cols-2">
-      <section className="rounded-card border border-line-subtle bg-surface-1 p-4">
+      <section className="rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4">
         <h2 className="text-sm font-semibold text-ink mb-1">Ways to earn</h2>
         <p className="text-xs text-ink-muted mb-2">Gems land as soon as you finish something.</p>
         <ul>
@@ -63,7 +63,7 @@ export function MarketEarnPanel({ wallet, guest = false }: { wallet: GemWallet; 
           ))}
         </ul>
       </section>
-      <section className="rounded-card border border-line-subtle bg-surface-1 p-4">
+      <section className="rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4">
         <h2 className="text-sm font-semibold text-ink mb-2">Recent gems</h2>
         {wallet.history.length === 0 ? (
           <p className="text-sm text-ink-muted">

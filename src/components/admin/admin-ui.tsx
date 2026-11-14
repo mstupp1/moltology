@@ -2,7 +2,7 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 
 /** Section card on admin pages: one edge, one fill, the same padding everywhere. */
-export const ADMIN_CARD = 'rounded-card border border-line-subtle bg-surface-1 p-4 sm:p-5 space-y-3'
+export const ADMIN_CARD = 'rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 lg:p-5 space-y-3'
 
 /** Text field, textarea or select on admin pages. */
 export const ADMIN_FIELD =

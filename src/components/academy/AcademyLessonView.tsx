@@ -160,7 +160,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
   )
 
   return (
-    <div className="space-y-4 sm:space-y-5">
+    <div className="space-y-3 sm:space-y-4 lg:space-y-5">
       <AcademyCrumbs
         items={[
           {
@@ -218,7 +218,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
           </header>
 
           {detail.locked ? (
-            <section className={cn(ACADEMY_CARD, 'p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4')}>
+            <section className={cn(ACADEMY_CARD, 'p-4 sm:p-5 lg:p-6 flex flex-col sm:flex-row sm:items-center gap-4')}>
               <span className="flex w-10 h-10 shrink-0 items-center justify-center rounded-card bg-surface-2 text-cyan-glow">
                 <Lock className="w-5 h-5" aria-hidden="true" />
               </span>
@@ -252,7 +252,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
               ) : null}
 
               {detail.kind === 'video' && detail.body?.trim() ? (
-                <section className={cn(ACADEMY_CARD, 'p-4 sm:p-5 space-y-3')} aria-labelledby="lecture-notes-heading">
+                <section className={cn(ACADEMY_CARD, 'p-3 sm:p-4 lg:p-5 space-y-3')} aria-labelledby="lecture-notes-heading">
                   <h2 id="lecture-notes-heading" className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
                     Lecture notes
                   </h2>
@@ -261,7 +261,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
               ) : null}
 
               {detail.kind === 'quiz' ? (
-                <section className={cn(ACADEMY_CARD, 'p-4 sm:p-5 space-y-5')} aria-label="Quiz">
+                <section className={cn(ACADEMY_CARD, 'p-3 sm:p-4 lg:p-5 space-y-5')} aria-label="Quiz">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="text-xs text-ink-muted">
                       Pass mark {detail.passingScore}%. Answer every question, then submit.
