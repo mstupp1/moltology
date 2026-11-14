@@ -132,13 +132,20 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }
 
   const setMode = (newMode: OracleMode) => {
-    // If mobile and sidebar mode is requested, redirect to dedicated page mode
+    // If mobile and sidebar mode is requested, redirect to dedicated page mode.
+    // Phones have no floating window at all: the Oracle always opens as the full page.
     let targetMode = newMode
-    if (targetMode === 'sidebar' && typeof window !== 'undefined' && window.innerWidth < 768) {
+    const width = typeof window !== 'undefined' ? window.innerWidth : Infinity
+    const isPhone = width < 640
+    if (targetMode === 'sidebar' && width < 768) {
+      targetMode = 'page'
+    }
+    if (targetMode === 'popout' && isPhone) {
       targetMode = 'page'
     }
 
-    if (targetMode !== 'closed') {
+    // A phone's forced page mode is not a preference, so desktop keeps its last choice.
+    if (targetMode !== 'closed' && !(isPhone && newMode !== targetMode)) {
       setLastActiveMode(targetMode)
       if (typeof window !== 'undefined') {
         try {
@@ -187,8 +194,9 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const toggleMode = (targetMode?: 'popout' | 'sidebar' | 'page') => {
     const effectiveTarget = targetMode || lastActiveMode || 'popout'
+    const width = typeof window !== 'undefined' ? window.innerWidth : Infinity
     const resolvedMode =
-      effectiveTarget === 'sidebar' && typeof window !== 'undefined' && window.innerWidth < 768
+      (effectiveTarget === 'sidebar' && width < 768) || (effectiveTarget === 'popout' && width < 640)
         ? 'page'
         : effectiveTarget
 

@@ -3,7 +3,6 @@ import { OracleCoreGlyph } from '../ai/OracleCoreGlyph'
 import { DEFAULT_ORACLE_PLACEHOLDER } from '@/lib/ai/oracle-models'
 import { AIChatPanel } from '../ai/AIChatPanel'
 import { usePanelPresence } from '@/hooks/usePanelPresence'
-import { HudBottomSheet } from '../ui/HudBottomSheet'
 import { useSafeOracle } from './OracleContext'
 
 export interface SynapticOracleWidgetProps {
@@ -162,22 +161,14 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     else setLocalIsOpen(false)
   }
 
-  const handleMobileClose = useCallback(() => {
-    if (oracle) {
-      oracle.setMode('closed')
-    } else {
-      setLocalIsOpen(false)
-    }
-  }, [oracle])
-
   const wasPopoutOpenRef = useRef(false)
   useEffect(() => {
     if (isPopoutActive) wasPopoutOpenRef.current = true
     if (wasPopoutOpenRef.current && !isPopoutActive && !isRendered) {
       wasPopoutOpenRef.current = false
-      document.querySelector<HTMLButtonElement>(isMobile ? '[aria-label="Open Oracle AI Tray"]' : '[aria-label="Open Oracle AI Popout"]')?.focus()
+      document.querySelector<HTMLButtonElement>('[aria-label="Open Oracle AI Popout"]')?.focus()
     }
-  }, [isPopoutActive, isRendered, isMobile])
+  }, [isPopoutActive, isRendered])
 
   const handleResetSize = () => {
     try {
@@ -262,28 +253,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
 
   return (
     <>
-      {/* Phones reach Oracle from the bottom bar, so there is no floating pill there. */}
-      {/* ── Mobile: Gesture-driven Pull-Up Bottom Sheet Tray ── */}
-      {isMobile && (
-        <HudBottomSheet
-          isOpen={isPopoutActive}
-          onClose={handleMobileClose}
-          contentLayout="fill"
-          height="80dvh"
-          maxHeight="85dvh"
-          ariaLabel="Synaptic Oracle AI Assistant"
-          containerClassName="sm:hidden font-sans"
-          className="bg-surface-1 border-t border-line rounded-t-card shadow-menu"
-        >
-          <AIChatPanel
-            userId={userId}
-            isCompact={true}
-            onClose={handleMobileClose}
-            className="h-full w-full border-none shadow-none"
-          />
-        </HudBottomSheet>
-      )}
-
+      {/* Phones have no floating Oracle: the bottom bar's core opens the full page. */}
       {/* ── Desktop: the synaptic core launcher; hovering slides out the prompt ── */}
       {!isMobile && !isPopoutActive && !isRendered && (
         <div className="hidden md:block fixed z-40 right-6 bottom-4 font-sans select-none">

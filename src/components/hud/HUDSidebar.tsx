@@ -769,11 +769,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         core={{ current: isOnPath('/oracle'), onPress: () => handleNavClick('/oracle') }}
       />
 
-      {/* Phone More sheet: sized to its rows and sitting on the bottom bar, over a dimmed page */}
+      {/* Phone More sheet: sized to its rows and sitting on the bottom bar, over a dimmed page.
+          Rendered beside the bottom bar (not portalled to body) so the bar's raised Oracle core,
+          one z-index step higher, stays on top of the sheet. */}
       {isMounted &&
-        (isMobileOpen || isMobileClosing) &&
-        typeof document !== 'undefined' &&
-        createPortal(
+        (isMobileOpen || isMobileClosing) && (
           <>
           <div
             aria-hidden
@@ -907,8 +907,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
             </div>
           </div>
-          </>,
-          document.body
+          </>
         )}
     </>
   )

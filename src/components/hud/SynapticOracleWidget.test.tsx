@@ -227,7 +227,7 @@ describe('SynapticOracleWidget', () => {
     expect(container.querySelector('.fixed.rounded-card')).toHaveStyle({ width: '480px', height: '680px' })
   })
 
-  it('shows no floating launcher on phones, where Oracle is a bottom bar tab', () => {
+  it('shows no floating launcher on phones, where the bottom bar core opens Oracle', () => {
     window.innerWidth = 375
     window.innerHeight = 667
 
@@ -237,7 +237,6 @@ describe('SynapticOracleWidget', () => {
       </OracleProvider>
     )
 
-    expect(screen.queryByRole('button', { name: /Open Oracle AI Tray/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Open Oracle AI Popout/i })).not.toBeInTheDocument()
   })
 
