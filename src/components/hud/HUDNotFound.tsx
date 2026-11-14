@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import {
-  Compass,
   Home,
   LayoutDashboard,
   Newspaper,
@@ -11,6 +10,7 @@ import {
 } from 'lucide-react'
 import { PublicHeader } from '@/components/PublicHeader'
 import { HudButton } from '@/components/ui/HudButton'
+import { GlowEmblem } from '@/components/ui/GlowEmblem'
 import '@/styles/editorial-fonts.css'
 
 export function HUDNotFound() {
@@ -77,9 +77,7 @@ export function HUDNotFound() {
 
           {/* Core Warning Section */}
           <div className="flex flex-col sm:flex-row items-start gap-5 mb-6">
-            <div className="p-3.5 rounded-card bg-crimson-soft border border-crimson-aggro/30 text-crimson-text shrink-0">
-              <Compass className="w-8 h-8 animate-spin text-crimson-text [animation-duration:12s]" />
-            </div>
+            <GlowEmblem size={56} className="m-2 sm:m-3" />
             <div className="flex-1 min-w-0">
               <div className="text-[11px] font-sans tracking-[0.08em] text-cyan-glow uppercase mb-1">
                 PAGE NOT FOUND

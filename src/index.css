@@ -111,6 +111,26 @@
   clip-path: polygon(0 0, calc(100% - var(--hud-cut, 10px)) 0, 100% var(--hud-cut, 10px), 100% 100%, 0 100%);
 }
 
+/* GlowEmblem: the emblem in its own light (src/components/ui/GlowEmblem.tsx). The halo is a
+   plain gradient and the mark a drop shadow, so the emblem keeps its production colour. */
+.glow-emblem-halo {
+  inset: calc(var(--glow-emblem-size) * -0.45);
+  background: radial-gradient(circle, rgba(255, 69, 58, 0.36) 0%, rgba(255, 69, 58, 0.12) 38%, transparent 66%);
+}
+.glow-emblem-mark {
+  filter: drop-shadow(0 0 calc(var(--glow-emblem-size) * 0.11) rgba(255, 69, 58, 0.55));
+}
+.glow-emblem-breathe .glow-emblem-halo {
+  animation: glow-emblem-breathe 3.2s ease-in-out infinite;
+}
+@keyframes glow-emblem-breathe {
+  0%, 100% { opacity: 0.75; transform: scale(0.96); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glow-emblem-breathe .glow-emblem-halo { animation: none; }
+}
+
 /* Logo lockup: title over a tracked tagline stretched to the title's width (HeaderBrand).
    Sizes are in em of the title so the pair scales together. The tagline is part of the mark,
    so it sits below the 11px text floor on purpose. */

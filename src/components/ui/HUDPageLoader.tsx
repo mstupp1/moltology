@@ -1,11 +1,11 @@
 import React from 'react'
-import { BrandIcon } from '@/components/ui/BrandMark'
+import { GlowEmblem } from '@/components/ui/GlowEmblem'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HUDPageLoader
 // Full-screen loading state for TanStack Router's defaultPendingComponent.
-// The page behind dims and blurs; the emblem fades in and a soft band of light
-// passes across it every couple of seconds. Nothing else moves.
+// The page behind dims and blurs; the emblem fades in, glowing, and a soft band of
+// light passes across it every couple of seconds while its glow slowly swells.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function HUDPageLoader() {
@@ -16,12 +16,7 @@ export function HUDPageLoader() {
       aria-label="Loading"
     >
       <div className="hud-page-loader-emblem">
-        <BrandIcon
-          label="Loading"
-          width={36}
-          height={36}
-          className="hud-page-loader-sheen block w-9 h-9"
-        />
+        <GlowEmblem size={40} label="Loading" breathe markClassName="hud-page-loader-sheen" />
       </div>
 
       {/* SSR-safe keyframes */}

@@ -1,6 +1,7 @@
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import React, { useState, useEffect } from 'react'
 import { BrandIcon } from '@/components/ui/BrandMark'
+import { GlowEmblem } from '@/components/ui/GlowEmblem'
 import { useNavigate, Link } from '@tanstack/react-router'
 import {
   Lock,
@@ -371,6 +372,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
               >
               {/* Header */}
               <div className="text-center mb-5 sm:mb-6">
+                <GlowEmblem size={56} className="mb-4 sm:mb-5" />
                 <h2 className="text-xl sm:text-2xl font-bold font-grotesk text-ink tracking-wider uppercase">
                   {mode === 'signup' ? 'Create Account' : 'Welcome Back'}
                 </h2>

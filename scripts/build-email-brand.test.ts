@@ -36,8 +36,9 @@ describe('email brand export', () => {
         maxX = Math.max(maxX, x)
       }
     }
-    // The emblem's visible red artwork occupies about 87% of its square SVG canvas.
-    expect((maxX - minX + 1) / image.width).toBeCloseTo((1440 / 2520) * 0.87, 2)
+    // The emblem's visible red artwork occupies about 87% of its square SVG canvas; the artwork
+    // fills the plate inside a 22px margin (of 220) left for the emblem's glow.
+    expect((maxX - minX + 1) / image.width).toBeCloseTo((1440 / 2520) * 0.87 * (176 / 220), 2)
     expect(manifest.height / manifest.width).toBeCloseTo(0.97, 1)
   })
 })
