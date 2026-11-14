@@ -357,7 +357,7 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
               scriptureId={activeScripture.id}
               readingTheme={readingTheme.attribute}
               onCopy={copyPlainText}
-              className="p-6 sm:p-10 md:p-14"
+              className="px-6 pt-6 pb-24 sm:p-10 md:p-14"
             >
               <CodexDocumentSheet
                 scripture={activeScripture}

@@ -83,6 +83,15 @@
   transition: opacity 180ms ease, transform 180ms ease, max-height 180ms ease;
 }
 
+/* Phones: the reader paper runs edge to edge, so drop the card frame. */
+@media (max-width: 767.98px) {
+  .codex-reader-well .pdf-page-sheet {
+    border-radius: 0;
+    border-width: 0;
+    box-shadow: none;
+  }
+}
+
 /* In-flow top chrome collapses when hidden so TOC never sits under the bar. */
 .codex-reader-chrome-top[data-hidden='true'] {
   max-height: 0;

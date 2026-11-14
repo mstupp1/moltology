@@ -38,9 +38,11 @@ describe('codex-reader zoom geometry', () => {
   it('sizes the paper to a comfortable column instead of stretching full viewport', () => {
     expect(isCompactCodexViewport(390)).toBe(true)
     expect(isCompactCodexViewport(1280)).toBe(false)
-    expect(resolveCodexPageWidth(390)).toBe(370)
+    // Phones run the paper edge to edge.
+    expect(resolveCodexPageWidth(390)).toBe(390)
+    expect(resolveCodexPageWidth(320)).toBe(320)
+    expect(resolveCodexPageWidth(800)).toBe(704)
     expect(resolveCodexPageWidth(1280)).toBe(CODEX_PAGE_WIDTH)
-    expect(resolveCodexPageWidth(200)).toBe(300)
   })
 
   it('scales the page box like a PDF sheet', () => {
