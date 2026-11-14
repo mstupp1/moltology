@@ -1,6 +1,8 @@
 import React from 'react'
 import { Lock, MoreHorizontal } from 'lucide-react'
 import { OracleCoreGlyph } from '../ai/OracleCoreGlyph'
+import { OracleCoreTip } from '../ai/OracleCoreTip'
+import { markOracleCoreIntroSeen, useOracleCoreIntro } from '@/lib/ai/oracle-core-intro'
 
 export interface MobileTab {
   id: string
@@ -43,6 +45,9 @@ export function HUDMobileTabBar({
   moreButtonRef,
   core,
 }: HUDMobileTabBarProps) {
+  // First-visit tip over the core; held back while the More sheet or the Oracle itself is open.
+  const showIntro = useOracleCoreIntro(Boolean(core) && !core?.current && !moreOpen)
+
   const cell =
     'relative flex-1 min-w-0 flex flex-col items-center justify-center gap-1 py-2 transition-colors duration-150 cursor-pointer select-none touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow'
 
@@ -90,7 +95,7 @@ export function HUDMobileTabBar({
           } group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-cyan-glow`}
         />
         <span className="absolute left-1/2 -top-[14px] -translate-x-1/2 transition-transform duration-150 ease-out group-active:scale-[0.92] motion-reduce:transition-none">
-          <OracleCoreGlyph size={46} active={isCurrent} />
+          <OracleCoreGlyph size={46} active={isCurrent} beacon={showIntro} />
         </span>
         {/* Same icon-height spacer as the other cells, so the labels share a baseline. */}
         <span aria-hidden className="w-5 h-5 shrink-0" />
@@ -111,6 +116,12 @@ export function HUDMobileTabBar({
       data-testid="mobile-tab-bar"
       className="md:hidden order-last shrink-0 relative z-[99991] flex items-stretch h-[calc(var(--hud-tabbar-height)+env(safe-area-inset-bottom,0px))] bg-surface-1 border-t border-line-subtle pb-[env(safe-area-inset-bottom,0px)] font-sans"
     >
+      {showIntro && core && (
+        // Sits over the raised core (its top is 14px above the bar), arrow pointing down at it.
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-[26px]">
+          <OracleCoreTip placement="above" onOpen={core.onPress} onDismiss={markOracleCoreIntroSeen} />
+        </div>
+      )}
       {tabs.map((tab, index) => {
         const current = !moreOpen && activeId === tab.id
         const cellNode = renderCell(

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from '@tanstack/react-router'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAIThreadsFn } from '@/lib/server/api'
 import { oracleAuthData } from '@/lib/ai/oracle-auth-client'
+import { markOracleCoreIntroSeen } from '@/lib/ai/oracle-core-intro'
 
 export type OracleMode = 'closed' | 'popout' | 'sidebar' | 'page'
 
@@ -89,6 +90,11 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
     }
   }, [currentPath])
+
+  // Once the Oracle has opened in any mode, the core's first-visit tip has done its job.
+  useEffect(() => {
+    if (mode !== 'closed') markOracleCoreIntroSeen()
+  }, [mode])
 
   // Load threads for authenticated user
   const refreshThreads = async (): Promise<OracleThread[]> => {

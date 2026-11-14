@@ -286,8 +286,9 @@ input[type="range"].dial-range:focus-visible {
   inset: -28%;
   z-index: -1;
   border-radius: 9999px;
-  background: radial-gradient(circle, rgba(0, 170, 255, 0.42) 0%, rgba(0, 120, 255, 0.16) 42%, transparent 70%);
-  opacity: 0.55;
+  /* Orb edge sits at ~64% of the halo's radius, so the glow band is 60-100%. */
+  background: radial-gradient(circle closest-side, rgba(0, 190, 255, 0.55) 58%, rgba(0, 140, 255, 0.22) 76%, transparent 100%);
+  opacity: 0.65;
   animation: oracle-core-breathe 4.8s ease-in-out infinite;
   pointer-events: none;
 }
@@ -335,8 +336,48 @@ input[type="range"].dial-range:focus-visible {
   100% { opacity: 0; }
 }
 @keyframes oracle-core-breathe {
-  0%, 100% { transform: scale(0.94); opacity: 0.5; }
-  50% { transform: scale(1.04); opacity: 0.8; }
+  0%, 100% { transform: scale(0.94); opacity: 0.6; }
+  50% { transform: scale(1.06); opacity: 0.95; }
+}
+/* One soft ring leaves the orb every 6s; the rest of the cycle is still. */
+.oracle-core__ring {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 1.5px rgba(120, 210, 255, 0.55), 0 0 12px rgba(0, 170, 255, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  animation: oracle-core-ring 6s ease-out infinite;
+}
+.oracle-core__ring--b {
+  display: none;
+}
+@keyframes oracle-core-ring {
+  0% { transform: scale(1); opacity: 0; }
+  4% { opacity: 0.7; }
+  36%, 100% { transform: scale(1.75); opacity: 0; }
+}
+/* First-visit beacon: two rings, quicker and brighter, while the tip is up. */
+.oracle-core[data-beacon='true'] .oracle-core__ring {
+  animation: oracle-core-beacon 1.8s ease-out infinite;
+}
+.oracle-core[data-beacon='true'] .oracle-core__ring--b {
+  display: block;
+  animation-delay: 0.6s;
+}
+.oracle-core[data-beacon='true'] .oracle-core__halo {
+  animation-name: oracle-core-breathe-active;
+  animation-duration: 1.8s;
+}
+@keyframes oracle-core-beacon {
+  0% { transform: scale(1); opacity: 0.9; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+/* Low-power and data-saver devices skip the idle ring (HudLayout sets the flag);
+   the halo's breathing, which has always run everywhere, stays. */
+:root[data-low-power='true'] .oracle-core:not([data-beacon='true']) .oracle-core__ring {
+  animation: none;
 }
 .oracle-core[data-active='true'] .oracle-core__halo {
   animation-name: oracle-core-breathe-active;
@@ -348,8 +389,15 @@ input[type="range"].dial-range:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .oracle-core__halo,
   .oracle-core__frame,
-  .oracle-core__frame--b {
+  .oracle-core__frame--b,
+  .oracle-core__ring,
+  .oracle-core[data-beacon='true'] .oracle-core__ring,
+  .oracle-core[data-beacon='true'] .oracle-core__halo {
     animation: none;
+  }
+  /* No pulse: the tip itself does the pointing, with a steady bright halo. */
+  .oracle-core[data-beacon='true'] .oracle-core__halo {
+    opacity: 1;
   }
   .oracle-core__frame--b {
     opacity: 0;
@@ -369,6 +417,46 @@ input[type="range"].dial-range:focus-visible {
 }
 @media (prefers-reduced-motion: reduce) {
   .oracle-page-rise {
+    animation: none;
+  }
+}
+
+/* First-visit tip beside / above the Oracle core: fades and slides in once. */
+.oracle-core-tip {
+  position: relative;
+  animation: oracle-core-tip-in 320ms ease-out both;
+}
+.oracle-core-tip[data-placement='above'] {
+  animation-name: oracle-core-tip-in-up;
+}
+.oracle-core-tip__arrow {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 0 2px 0 0;
+  pointer-events: none;
+}
+.oracle-core-tip[data-placement='left'] .oracle-core-tip__arrow {
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+}
+.oracle-core-tip[data-placement='above'] .oracle-core-tip__arrow {
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  border-radius: 0 0 2px 0;
+}
+@keyframes oracle-core-tip-in {
+  from { opacity: 0; transform: translateX(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes oracle-core-tip-in-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .oracle-core-tip {
     animation: none;
   }
 }
