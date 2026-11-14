@@ -1,5 +1,6 @@
 import React from 'react'
 import { Lock, MoreHorizontal } from 'lucide-react'
+import { OracleCoreGlyph } from '../ai/OracleCoreGlyph'
 
 export interface MobileTab {
   id: string
@@ -20,6 +21,11 @@ export interface HUDMobileTabBarProps {
   onNavigate: (path: string) => void
   onToggleMore: () => void
   moreButtonRef?: React.Ref<HTMLButtonElement>
+  /** The Oracle as a raised synaptic core in the middle of the bar. */
+  core?: {
+    current: boolean
+    onPress: () => void
+  }
 }
 
 /**
@@ -35,6 +41,7 @@ export function HUDMobileTabBar({
   onNavigate,
   onToggleMore,
   moreButtonRef,
+  core,
 }: HUDMobileTabBarProps) {
   const cell =
     'relative flex-1 min-w-0 flex flex-col items-center justify-center gap-1 py-2 transition-colors duration-150 cursor-pointer select-none touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow'
@@ -63,15 +70,50 @@ export function HUDMobileTabBar({
     </button>
   )
 
+  const renderCore = ({ current, onPress }: NonNullable<HUDMobileTabBarProps['core']>) => {
+    const isCurrent = current && !moreOpen
+    return (
+      <button
+        key="oracle-core"
+        type="button"
+        onClick={onPress}
+        aria-label="Oracle"
+        aria-current={isCurrent ? 'page' : undefined}
+        data-testid="mobile-oracle-core"
+        className="group relative flex-1 min-w-0 flex flex-col items-center justify-center gap-1 py-2 cursor-pointer select-none touch-manipulation focus-visible:outline-none"
+      >
+        {/* Raised socket: only its top arc shows above the bar's edge. */}
+        <span
+          aria-hidden
+          className={`absolute left-1/2 -top-[18px] -translate-x-1/2 w-[54px] h-[54px] rounded-full bg-surface-1 border-t transition-colors duration-200 ${
+            isCurrent ? 'border-cyan-glow/50' : 'border-line-subtle'
+          } group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-cyan-glow`}
+        />
+        <span className="absolute left-1/2 -top-[14px] -translate-x-1/2 transition-transform duration-150 ease-out group-active:scale-[0.92] motion-reduce:transition-none">
+          <OracleCoreGlyph size={46} active={isCurrent} />
+        </span>
+        {/* Same icon-height spacer as the other cells, so the labels share a baseline. */}
+        <span aria-hidden className="w-5 h-5 shrink-0" />
+        <span
+          className={`relative text-[11px] font-sans font-bold uppercase leading-none ${
+            isCurrent ? 'text-ink' : 'text-ink-muted'
+          }`}
+        >
+          ORACLE
+        </span>
+      </button>
+    )
+  }
+
   return (
     <nav
       aria-label="Main"
       data-testid="mobile-tab-bar"
       className="md:hidden order-last shrink-0 relative z-[99991] flex items-stretch h-[calc(var(--hud-tabbar-height)+env(safe-area-inset-bottom,0px))] bg-surface-1 border-t border-line-subtle pb-[env(safe-area-inset-bottom,0px)] font-sans"
     >
-      {tabs.map((tab) => {
+      {tabs.map((tab, index) => {
         const current = !moreOpen && activeId === tab.id
-        return renderCell(
+        const cellNode = renderCell(
           tab.id,
           tab.label,
           tab.icon,
@@ -89,6 +131,16 @@ export function HUDMobileTabBar({
             />
           ) : null,
         )
+        // The core sits in the middle: after the first half of the page tabs.
+        if (core && index === Math.ceil(tabs.length / 2) - 1) {
+          return (
+            <React.Fragment key={tab.id}>
+              {cellNode}
+              {renderCore(core)}
+            </React.Fragment>
+          )
+        }
+        return cellNode
       })}
       {renderCell(
         'more',

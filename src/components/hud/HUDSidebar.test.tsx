@@ -96,7 +96,8 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(sidebar.queryByText('COMMUNITY')).not.toBeInTheDocument()
 
     expect(sidebar.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
-    expect(sidebar.getAllByText('ORACLE').length).toBeGreaterThan(0)
+    // The Oracle is reached from the synaptic core launcher, not a rail item.
+    expect(sidebar.queryByText('ORACLE')).not.toBeInTheDocument()
     expect(sidebar.getByRole('button', { name: /^CHARACTER$/i })).toBeInTheDocument()
     // Profile opens from the account menu, so the rail leaves it out.
     expect(sidebar.queryByRole('button', { name: /^PROFILE$/i })).not.toBeInTheDocument()
@@ -140,7 +141,6 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     // Check for short labels
     expect(screen.getAllByText('CODEX').length).toBeGreaterThan(0)
     expect(screen.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('ORACLE').length).toBeGreaterThan(0)
     expect(screen.getAllByText('ACADEMY').length).toBeGreaterThan(0)
     expect(screen.queryByText('JOURNAL')).not.toBeInTheDocument()
     expect(screen.getAllByText('CHARACTER').length).toBeGreaterThan(0)
@@ -152,9 +152,14 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     render(<HUDSidebar />)
 
     const bar = within(screen.getByRole('navigation', { name: 'Main' }))
-    expect(bar.getAllByRole('button').map((b) => b.textContent)).toEqual(['DASHBOARD', 'ORACLE', 'CHARACTER', 'FORUM', 'More'])
+    expect(bar.getAllByRole('button').map((b) => b.textContent)).toEqual(['DASHBOARD', 'CHARACTER', 'ORACLE', 'FORUM', 'More'])
     fireEvent.click(bar.getByRole('button', { name: 'FORUM' }))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/forum' })
+    // The middle slot is the synaptic core, opening the Oracle page.
+    const core = bar.getByTestId('mobile-oracle-core')
+    expect(within(core).getByTestId('oracle-core-glyph')).toBeInTheDocument()
+    fireEvent.click(core)
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/oracle' })
 
     expect(screen.getByRole('button', { name: 'Search' })).toBeInTheDocument()
     expect(screen.getAllByLabelText('Daily alignment tasks schedule').length).toBeGreaterThan(0)

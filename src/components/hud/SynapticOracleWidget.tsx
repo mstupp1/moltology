@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { BrandIcon } from '@/components/ui/BrandMark'
-import { ChevronUp } from 'lucide-react'
+import { OracleCoreGlyph } from '../ai/OracleCoreGlyph'
 import { DEFAULT_ORACLE_PLACEHOLDER } from '@/lib/ai/oracle-models'
 import { AIChatPanel } from '../ai/AIChatPanel'
 import { usePanelPresence } from '@/hooks/usePanelPresence'
@@ -31,41 +30,6 @@ function clearStalePositionKeys() {
     localStorage.removeItem(STORAGE_KEY_BTN_POS)
     localStorage.removeItem(STORAGE_KEY_POPOUT_POS)
   } catch {}
-}
-
-/**
- * Shared styling classes for the rounded pill launcher (both mobile dock and desktop floating button).
- */
-export const ORACLE_PILL_BASE_CLASSES =
-  'bg-surface-1/95 hud-sheen backdrop-blur-xl border border-line hover:border-line-strong hover:bg-surface-2 shadow-menu rounded-card px-4 py-2.5 flex items-center justify-between gap-3 group select-none text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
-
-/**
- * Shared interior content for the Oracle launcher pill (emblem, placeholder, realistic caret, chevron).
- */
-export function OracleLauncherPillContent() {
-  return (
-    <>
-      <div className="flex items-center gap-2.5 min-w-0 flex-1 pointer-events-none">
-        <div className="relative shrink-0 flex items-center justify-center">
-          <BrandIcon
-            label="Oracle AI"
-            className="w-5 h-5 object-contain group-hover:scale-105 transition-transform"
-          />
-        </div>
-        <div className="flex items-center min-w-0">
-          <span className="text-xs tracking-wide text-ink-body font-medium group-hover:text-ink transition-colors truncate">
-            {DEFAULT_ORACLE_PLACEHOLDER}
-          </span>
-          <span
-            data-testid="oracle-caret-cursor"
-            aria-hidden="true"
-            className="inline-block w-[1.5px] h-3.5 ml-1 bg-cyan-glow animate-caret-blink shrink-0"
-          />
-        </div>
-      </div>
-      <ChevronUp className="w-4 h-4 text-ink-muted group-hover:text-cyan-glow transition-transform group-hover:-translate-y-0.5 shrink-0 ml-auto pointer-events-none" />
-    </>
-  )
 }
 
 export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ userId }) => {
@@ -320,17 +284,30 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
         </HudBottomSheet>
       )}
 
-      {/* ── Desktop: Fixed Floating Launcher Button ── */}
+      {/* ── Desktop: the synaptic core launcher; hovering slides out the prompt ── */}
       {!isMobile && !isPopoutActive && !isRendered && (
         <div className="hidden md:block fixed z-40 right-6 bottom-4 font-sans select-none">
           <button
             type="button"
             onClick={handleToggle}
-            className={`${ORACLE_PILL_BASE_CLASSES} cursor-pointer hover:scale-105 transition-transform`}
+            className="group relative flex items-center rounded-full cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-glow"
             title="Open Oracle AI"
             aria-label="Open Oracle AI Popout"
+            data-testid="oracle-core-launcher"
           >
-            <OracleLauncherPillContent />
+            <span
+              aria-hidden
+              className="pointer-events-none -mr-7 flex h-10 items-center overflow-hidden whitespace-nowrap rounded-full border border-line bg-surface-1/95 backdrop-blur-xl shadow-menu max-w-0 pl-0 pr-0 opacity-0 transition-[max-width,padding,opacity] duration-300 ease-out group-hover:max-w-[240px] group-hover:pl-4 group-hover:pr-10 group-hover:opacity-100 group-focus-visible:max-w-[240px] group-focus-visible:pl-4 group-focus-visible:pr-10 group-focus-visible:opacity-100 motion-reduce:transition-none"
+            >
+              <span className="text-xs tracking-wide text-ink-body font-medium">{DEFAULT_ORACLE_PLACEHOLDER}</span>
+              <span
+                data-testid="oracle-caret-cursor"
+                className="inline-block w-[1.5px] h-3.5 ml-1 bg-cyan-glow animate-caret-blink shrink-0"
+              />
+            </span>
+            <span className="relative transition-transform duration-200 ease-out group-hover:scale-105 group-active:scale-95 motion-reduce:transition-none">
+              <OracleCoreGlyph size={52} />
+            </span>
           </button>
         </div>
       )}
