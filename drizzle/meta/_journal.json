@@ -442,6 +442,13 @@
       "when": 1794629201462,
       "tag": "0062_oracle_chat_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1794680623063,
+      "tag": "0063_community_photo",
+      "breakpoints": true
     }
   ]
 }
