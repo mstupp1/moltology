@@ -67,33 +67,24 @@ describe('SettingsPage', () => {
     localStorage.clear()
   })
 
-  it('renders the shared heavy effects toggle and persists the VFX preference', async () => {
+  it('groups settings into titled cards without the old effects toggle', async () => {
     render(
       <ToastProvider>
         <SettingsPage />
       </ToastProvider>,
     )
 
-    await waitFor(() => {
-      expect(screen.getByText('Heavy visual effects')).toBeInTheDocument()
-    })
-
+    expect(await screen.findByRole('heading', { name: 'Account', level: 2 })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Notifications', level: 2 })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Help', level: 2 })).toBeInTheDocument()
     expect(screen.queryByTestId('premium-settings')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Purchase Premium/i })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Cancel Premium/i })).not.toBeInTheDocument()
-    expect(screen.getByText('Underwater bubbles and animated ritual flames enabled.')).toBeInTheDocument()
-    expect(screen.getByText('Email Updates')).toBeInTheDocument()
+    expect(screen.getByText('Email updates')).toBeInTheDocument()
     expect(screen.getByText('Sign-in methods')).toBeInTheDocument()
     expect(screen.getByTestId('hub-surface-controls')).toBeInTheDocument()
-
-    const toggle = screen.getByRole('switch', { name: /toggle heavy visual effects/i })
-    expect(toggle).toHaveAttribute('aria-checked', 'true')
-
-    fireEvent.click(toggle)
-
-    expect(toggle).toHaveAttribute('aria-checked', 'false')
-    expect(screen.getByText(/Bubbles and animated ritual flames off/i)).toBeInTheDocument()
-    expect(localStorage.getItem('moltology_heavy_vfx_disabled')).toBe('true')
+    expect(screen.getByRole('button', { name: 'Replay' })).toBeInTheDocument()
+    expect(screen.queryByText(/visual effects/i)).not.toBeInTheDocument()
+    expect(screen.queryByText('Preferences')).not.toBeInTheDocument()
+    expect(screen.queryByText('Command Surface')).not.toBeInTheDocument()
   })
 
   it('keeps an unconfirmed subscription off and asks the member to check email', async () => {
@@ -117,10 +108,9 @@ describe('SettingsPage', () => {
   it('shows the simplified settings title without the avatar section', async () => {
     render(<ToastProvider><SettingsPage /></ToastProvider>)
     expect(await screen.findByRole('heading', { name: 'Settings', level: 1 })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Plan & usage' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Plan & usage' })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Avatar' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Open character studio' })).not.toBeInTheDocument()
-    expect(screen.queryByText('Account', { exact: true })).not.toBeInTheDocument()
     expect(screen.queryByText('Manage your account, email preferences, sign-in methods, and display options.')).not.toBeInTheDocument()
     expect(screen.queryByTestId('avatar-creator-panel')).not.toBeInTheDocument()
   })

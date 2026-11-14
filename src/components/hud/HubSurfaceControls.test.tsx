@@ -36,15 +36,15 @@ describe('HubSurfaceControls', () => {
     disable.mockClear()
   })
 
-  it('renders surface alert and install controls', () => {
+  it('renders device notification and install rows', () => {
     render(<ToastProvider><HubSurfaceControls /></ToastProvider>)
-    expect(screen.getByText('Surface Alerts')).toBeInTheDocument()
-    expect(screen.getByText('Install Command Hub')).toBeInTheDocument()
+    expect(screen.getByText('Device notifications')).toBeInTheDocument()
+    expect(screen.getByText('Install the app')).toBeInTheDocument()
   })
 
   it('requests system permission when arming surface alerts', async () => {
     render(<ToastProvider><HubSurfaceControls /></ToastProvider>)
-    fireEvent.click(screen.getByRole('switch', { name: 'Toggle surface alerts' }))
+    fireEvent.click(screen.getByRole('switch', { name: 'Toggle device notifications' }))
     await waitFor(() => {
       expect(enable).toHaveBeenCalled()
     })
