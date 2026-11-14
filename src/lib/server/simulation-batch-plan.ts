@@ -49,6 +49,7 @@ type PrepareOptions = Pick<
   | 'mutationsOnly'
   | 'socialOnly'
   | 'reviewOnly'
+  | 'wardrobeOnly'
 >
 
 export function isBatchPlan(value: unknown): value is SimulationBatchPlan {

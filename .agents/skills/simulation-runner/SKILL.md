@@ -46,6 +46,7 @@ Simulated members must look varied in the forum group photo and on profiles. A s
 
 - **New spawns:** the engine saves `rollSimulatedAvatarConfig()` from `src/lib/simulated-avatar.ts`. It picks a random race, shell colour and finish, marking, head shape, build, height, eyes and backdrop from the creator's options, and pins every trait. Claws and accessory are left to gear, as in a member's own save.
 - **Re-rolling existing bots:** `run simulate:reroll-avatars` (production wrapper for prod) prints new looks without writing. Add `-- --apply` to save them. It splits races evenly and deals shell colours from a shuffled deck, so colours do not repeat until all have been used. It updates only `isSimulated = true` rows (`avatarConfig`, `appearanceRevision + 1`). Never edit real members' characters.
+- **Gear and shopping (`wardrobe` phase, `src/lib/server/simulation-wardrobe.ts`):** new bots get the starter set and wear none, all, or some of it. Each tick, every simulated member has a 12% chance to buy one affordable market piece and an 8% chance to change outfit (bare 20%, full starter 30%, random mix of owned pieces 50%, bought pieces preferred). Purchases go through the real market (`buyGear`) only when the gem ledger covers the full price, so bots never spend Molt Credits; a new piece is worn straight away 75% of the time. Outfits are committed with `commit_character`, which updates `equippedAppearance`. Run it alone with `--wardrobe-only`; report `wardrobe.purchases` and `wardrobe.restyles` with the tick summary.
 - Writing to production requires the user's go-ahead first, outside a normal simulation run. The group photo retakes itself on the next forum visit once its cast changed and the photo is at least a day old.
 
 ---
@@ -78,6 +79,7 @@ Pipeline Stages:
   ├── 4b. Blog Comments (recent published articles favored; one per tick, no repeat member/article pairs)
   ├── 5. Community Upvotes (topics and replies scored with affinity clustering)
   ├── 6. Persona Mutations (mild trait evolution based on activity)
+  ├── 6b. Wardrobe (gem-only gear purchases and outfit changes)
   ├── 7. Member Connections & Bonds (friendships and member affinity pairs)
   └── 8. Standing & Moderation Review (reviews new posts against guardrails)
 ```
@@ -124,6 +126,7 @@ npm run simulate:activity -- --mutations-only   # Only roll persona mutations
 npm run simulate:activity -- --social-only      # Only roll connections and bonds
 npm run simulate:activity -- --review-only      # Only run standing moderation review
 npm run simulate:activity -- --spawn-only       # Only check/trigger acolyte spawning
+npm run simulate:activity -- --wardrobe-only    # Only shop for gear and change outfits
 ```
 
 ---
@@ -181,9 +184,9 @@ When running Mode 2 (`npm run simulate:activity`), the engine automatically fall
 ## 6. Verification & Telemetry Inspection
 
 After each cycle completes, verify the production target and inserted IDs as described above, then check:
-* **Result Summary**: Ensure the JSON output reports `driveBackfill`, `routines`, `forum`, `blog`, `votes`, `mutation`, `connection`, and `relationship`.
+* **Result Summary**: Ensure the JSON output reports `driveBackfill`, `routines`, `forum`, `blog`, `votes`, `mutation`, `wardrobe`, `connection`, and `relationship`.
 * **Storage Budget**: Keep total simulated users capped at 30 (`MAX_SIMULATED_POPULATION`) to preserve Neon database storage limits.
 * **Unit Tests**:
   ```bash
-  npx vitest run src/lib/server/simulation-engine.test.ts src/lib/simulation-social.test.ts
+  npx vitest run src/lib/server/simulation-engine.test.ts src/lib/server/simulation-wardrobe.test.ts src/lib/simulation-social.test.ts
   ```

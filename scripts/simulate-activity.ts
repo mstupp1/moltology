@@ -31,6 +31,7 @@ async function main() {
   const mutationsOnly = args.includes('--mutations-only')
   const socialOnly = args.includes('--social-only')
   const reviewOnly = args.includes('--review-only')
+  const wardrobeOnly = args.includes('--wardrobe-only')
 
   const waveIdx = args.indexOf('--wave')
   const wave = waveIdx !== -1 ? Number(args[waveIdx + 1]) : 1
@@ -72,6 +73,7 @@ async function main() {
         mutationsOnly,
         socialOnly,
         reviewOnly,
+        wardrobeOnly,
         schedule,
         wave,
         outPath: preparePath,
@@ -98,6 +100,7 @@ async function main() {
         mutationsOnly,
         socialOnly,
         reviewOnly,
+        wardrobeOnly,
         outPath: preparePath,
       })
       console.log(`[SIMULATE] ✓ Simulation plan saved to: ${preparePath}`)
@@ -130,6 +133,7 @@ async function main() {
       mutationsOnly,
       socialOnly,
       reviewOnly,
+      wardrobeOnly,
       at,
     })
     const results = weekly
