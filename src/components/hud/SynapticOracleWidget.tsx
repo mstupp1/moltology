@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { OracleCoreGlyph } from '../ai/OracleCoreGlyph'
+import { PhoneOracleOverlay } from './PhoneOracleOverlay'
 import { DEFAULT_ORACLE_PLACEHOLDER } from '@/lib/ai/oracle-models'
 import { AIChatPanel } from '../ai/AIChatPanel'
 import { usePanelPresence } from '@/hooks/usePanelPresence'
@@ -253,7 +254,9 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
 
   return (
     <>
-      {/* Phones have no floating Oracle: the bottom bar's core opens the full page. */}
+      {/* Phones: the bottom bar's core opens the Oracle as a slide-up overlay over the current page. */}
+      {isMobile && <PhoneOracleOverlay isOpen={isPopoutActive} onClose={handleClose} userId={userId} />}
+
       {/* ── Desktop: the synaptic core launcher; hovering slides out the prompt ── */}
       {!isMobile && !isPopoutActive && !isRendered && (
         <div className="hidden md:block fixed z-40 right-6 bottom-4 font-sans select-none">
