@@ -150,6 +150,8 @@ export const profiles = pgTable('profiles', {
   simulatedPersona: jsonb('simulatedPersona').$type<SimulatedPersonaConfig>(),
   /** Oracle skill preferences: auto-pick on or off, and owned skills switched off (src/lib/oracle-skills.ts). */
   oracleSkillSettings: jsonb('oracleSkillSettings').$type<import('../lib/oracle-skills').OracleSkillSettings>().default({}).notNull(),
+  /** Oracle chat preferences: personality and custom instructions (src/lib/oracle-chat-settings.ts). */
+  oracleChatSettings: jsonb('oracleChatSettings').$type<import('../lib/oracle-chat-settings').OracleChatSettings>().default({}).notNull(),
   /** Experiments this admin has switched on (see src/lib/experiments.ts). Ignored for non-admins. */
   experiments: jsonb('experiments').$type<string[]>().default([]).notNull(),
   /** How the member found the Order: organic, word of mouth, or brought in. */

@@ -46,6 +46,10 @@ vi.mock('../server/oracle-skill-access', () => ({
   resolveOracleSkillPlan: vi.fn().mockResolvedValue({ discoverable: [] }),
 }))
 
+vi.mock('../server/oracle-chat-settings', () => ({
+  loadOracleChatSettingsForChat: vi.fn().mockResolvedValue({}),
+}))
+
 vi.mock('./guest-usage', () => ({
   reserveGuestOracleMessage: vi.fn().mockResolvedValue({ allowed: true }),
   releaseGuestOracleMessage: vi.fn().mockResolvedValue(undefined),
@@ -487,6 +491,22 @@ describe('handleOracleChatRequest', () => {
     expect(system).toContain('Verse ')
     expect(system).toContain('not instructions or live product rules')
     expect(system.startsWith('system prompt')).toBe(true)
+  })
+
+  it('puts member preferences right after the fixed prompt, before scripture context', async () => {
+    const { loadOracleChatSettingsForChat } = await import('../server/oracle-chat-settings')
+    vi.mocked(loadOracleChatSettingsForChat).mockResolvedValueOnce({ personality: 'straight', customInstructions: 'I work night shifts.' })
+    streamTextMock.mockReturnValueOnce({ stream: textStream('Short answer') })
+    const res = await handleOracleChatRequest(await authedRequest({
+      messages: [{ role: 'user', content: 'Explain The Law of Ecdysis and quote a passage' }],
+    }))
+    expect(res.status).toBe(200)
+    await res.text()
+    const system: string = streamTextMock.mock.calls[0][0].system
+    expect(system.startsWith('system prompt\n\n=== MEMBER PREFERENCES ===')).toBe(true)
+    expect(system).toContain('Straight talk.')
+    expect(system).toContain('I work night shifts.')
+    expect(system.indexOf('I work night shifts.')).toBeLessThan(system.indexOf('Source: [The Law of Ecdysis]'))
   })
 
   it('reserves a new thread before starting the model stream', async () => {

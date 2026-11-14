@@ -49,6 +49,8 @@ vi.mock('@/lib/server/api', async (importOriginal) => {
     getAIMessagesFn: vi.fn().mockResolvedValue([]),
     getAIThreadsFn: vi.fn().mockResolvedValue([]),
     getUserProfileFn: vi.fn().mockResolvedValue({ role: 'user' }),
+    getOracleChatSettingsFn: vi.fn().mockResolvedValue({ personality: 'balanced', customInstructions: '', autoPick: true }),
+    saveOracleChatSettingsFn: vi.fn(),
   }
 })
 
@@ -89,9 +91,9 @@ describe('AIChatPanel Guest Mode Gating', () => {
       fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
       const usageButton = screen.getByRole('button', { name: 'Usage' })
       expect(usageButton).toHaveAttribute('aria-expanded', 'false')
-      const settingsLink = screen.getByRole('link', { name: 'Settings' })
-      expect(settingsLink).toHaveAttribute('href', '/settings')
-      expect(settingsLink.compareDocumentPosition(usageButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+      const settingsButton = screen.getByRole('button', { name: 'Oracle settings' })
+      expect(settingsButton).toHaveAttribute('aria-haspopup', 'dialog')
+      expect(settingsButton.compareDocumentPosition(usageButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
       fireEvent.click(usageButton)
       expect(usageButton).toHaveAttribute('aria-expanded', 'true')
       expect(screen.getByRole('region', { name: 'Usage' })).toHaveAttribute('aria-label', 'Usage')
@@ -100,7 +102,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
       fireEvent.click(usageButton)
       expect(usageButton).toHaveAttribute('aria-expanded', 'false')
       expect(screen.queryByRole('meter')).not.toBeInTheDocument()
-      expect(screen.getByRole('link', { name: 'Settings' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Oracle settings' })).toBeInTheDocument()
     } finally { phoneSpy.mockRestore() }
   })
 
@@ -119,7 +121,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
     render(<AIChatPanel userId={null} />)
     expect(screen.queryByRole('button', { name: 'Usage' })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /(Open|Collapse) chats/i }))
-    expect(screen.queryByRole('link', { name: 'Settings' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Oracle settings' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Usage' })).not.toBeInTheDocument()
   })
 

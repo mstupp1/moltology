@@ -12,6 +12,8 @@ import { buildOracleScriptureContext } from './scripture-lookup'
 import { buildOracleSkillContext, createOracleSkillTools, joinStepText } from './oracle-skills-prompt'
 import type { OracleSkill } from './oracle-skills-catalog'
 import { resolveOracleSkillPlan } from '../server/oracle-skill-access'
+import { loadOracleChatSettingsForChat } from '../server/oracle-chat-settings'
+import { buildOracleChatSettingsContext } from './oracle-chat-settings-prompt'
 import { ORACLE_SKILL_HEADER, type OracleSkillPart } from '../oracle-skills'
 import {
   saveAIMessage,
@@ -220,8 +222,14 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     }
   }
 
-  const skillPlan = await resolveOracleSkillPlan(userId, typeof body.skillId === 'string' ? body.skillId : null)
+  const [skillPlan, chatSettings] = await Promise.all([
+    resolveOracleSkillPlan(userId, typeof body.skillId === 'string' ? body.skillId : null),
+    loadOracleChatSettingsForChat(userId),
+  ])
+  // Order: fixed prompt, then the member's preferences (same on every message, so the
+  // cached prefix holds), then the per-message scripture lookup, then any skill playbook.
   const basePrompt = buildSystemPrompt(DEFAULT_ORACLE_PERSONA)
+    + buildOracleChatSettingsContext(chatSettings)
     + buildOracleScriptureContext(
       userText,
       [...storedTurns].reverse().find((turn) => turn.role === 'user')?.content,
