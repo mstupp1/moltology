@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { profiles } from '../db/schema'
-import { castHash, groupLayout, photoDue, photoKey, photoPose, PHOTO_HEIGHT, PHOTO_WIDTH, RETAKE_AFTER_MS, ROW_SIZE } from './community-photo'
+import { arrangeGroup, castHash, photoDue, photoKey, photoPose, PHOTO_HEIGHT, PHOTO_WIDTH, RETAKE_AFTER_MS, ROW_SIZE, rowSizes, type Figure } from './community-photo'
 import type { LobsterAvatarConfig } from './lobster-avatar'
 
 const crab: LobsterAvatarConfig = { style: 'critters', seed: 'a', race: 'crab', shellColor: 'cobalt' }
@@ -15,28 +15,75 @@ function webp(width: number, height: number): Uint8Array {
 }
 const dataUrl = (bytes: Uint8Array) => `data:image/webp;base64,${Buffer.from(bytes).toString('base64')}`
 
-describe('group photo layout', () => {
-  it('keeps everyone in rows of at most ROW_SIZE, front row first', () => {
+/** A cast of figures with varied sizes, like real characters (heights 1.6 to 2.6). */
+function figures(n: number): Figure[] {
+  return Array.from({ length: n }, (_, i) => {
+    const height = 1.6 + ((i * 37) % 11) / 10
+    return { id: `m${i}`, height, width: 1.3 + ((i * 17) % 7) / 10, face: height * 0.72, head: 0.32 }
+  })
+}
+
+describe('group photo arrangement', () => {
+  it('keeps everyone in rows of at most ROW_SIZE', () => {
     for (const n of [1, 5, 8, 9, 17, 22, 48]) {
-      const spots = groupLayout(n)
-      expect(spots).toHaveLength(n)
-      const rows = new Map<number, number>()
-      for (const s of spots) rows.set(s.row, (rows.get(s.row) ?? 0) + 1)
-      for (const count of rows.values()) expect(count).toBeLessThanOrEqual(ROW_SIZE)
-      // Back rows stand further back and higher up.
-      for (const s of spots) {
-        expect(s.z).toBeLessThanOrEqual(0)
-        expect(s.y).toBeGreaterThanOrEqual(0)
-      }
+      const sizes = rowSizes(n)
+      expect(sizes.reduce((a, b) => a + b, 0)).toBe(n)
+      for (const size of sizes) expect(size).toBeLessThanOrEqual(ROW_SIZE)
+      expect(arrangeGroup(figures(n))).toHaveLength(n)
     }
-    expect(groupLayout(0)).toEqual([])
+    expect(arrangeGroup([])).toEqual([])
   })
 
-  it('puts back-row faces between the heads in front', () => {
-    const spots = groupLayout(12)
-    const front = spots.filter((s) => s.row === 0).map((s) => s.x)
-    const back = spots.filter((s) => s.row === 1).map((s) => s.x)
-    for (const x of back) expect(Math.min(...front.map((f) => Math.abs(f - x)))).toBeGreaterThan(0.3)
+  it('puts the shortest in front and the tallest behind, on higher steps', () => {
+    const cast = figures(22)
+    const spots = arrangeGroup(cast)
+    const rows = Math.max(...spots.map((s) => s.row)) + 1
+    for (let row = 1; row < rows; row++) {
+      const front = cast.filter((_, i) => spots[i].row === row - 1)
+      const back = cast.filter((_, i) => spots[i].row === row)
+      expect(Math.max(...front.map((f) => f.height))).toBeLessThanOrEqual(Math.min(...back.map((f) => f.height)))
+      const y = (r: number) => spots.find((s) => s.row === r)!.y
+      expect(y(row)).toBeGreaterThan(y(row - 1))
+    }
+  })
+
+  it('stands the tallest of a row in its middle', () => {
+    const cast = figures(8)
+    const spots = arrangeGroup(cast)
+    const tallest = cast.reduce((a, b) => (b.height > a.height ? b : a))
+    const middle = Math.min(...spots.map((s) => Math.abs(s.x)))
+    expect(Math.abs(spots[cast.indexOf(tallest)].x)).toBeCloseTo(middle, 6)
+  })
+
+  it('squeezes neighbours in a little, but not on top of each other', () => {
+    const cast = figures(8)
+    const spots = arrangeGroup(cast)
+    const order = cast.map((f, i) => ({ f, x: spots[i].x })).sort((a, b) => a.x - b.x)
+    for (let i = 1; i < order.length; i++) {
+      const gap = order[i].x - order[i - 1].x
+      const room = (order[i].f.width + order[i - 1].f.width) / 2
+      expect(gap).toBeLessThan(room)
+      expect(gap).toBeGreaterThan(room * 0.6)
+    }
+  })
+
+  it('keeps back-row faces clear of the heads in front', () => {
+    const cast = figures(22)
+    const spots = arrangeGroup(cast)
+    cast.forEach((back, i) => {
+      if (spots[i].row === 0) return
+      const faceY = spots[i].y + back.face
+      cast.forEach((front, j) => {
+        if (spots[j].row !== spots[i].row - 1) return
+        if (Math.abs(spots[j].x - spots[i].x) > front.head) return
+        // Directly behind a head, the face is lifted over it (allowing for the camera looking down).
+        expect(faceY + 0.35).toBeGreaterThan(spots[j].y + front.height - back.head)
+      })
+    })
+  })
+
+  it('is the same every time for the same cast', () => {
+    expect(arrangeGroup(figures(12))).toEqual(arrangeGroup(figures(12)))
   })
 
   it('gives each member the same pose every time', () => {

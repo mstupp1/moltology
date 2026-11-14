@@ -13,7 +13,7 @@ import { avatarStillHash, shortHash, STILL_VERSION } from './avatar-still'
 import type { LobsterAvatarConfig } from './lobster-avatar'
 
 /** Bump when the photo's layout, lighting or framing changes, so the next visit retakes it. */
-export const PHOTO_VERSION = 1
+export const PHOTO_VERSION = 2
 export const COMMUNITY_PHOTO_ID = 'forum'
 export const PHOTO_WIDTH = 1800
 export const PHOTO_HEIGHT = 720
@@ -90,35 +90,147 @@ export interface Placement {
   z: number
   y: number
   row: number
+  /** Small lean toward the middle of the group, in radians (positive leans left). */
+  lean: number
 }
 
-const SPACING = 1.4
-const ROW_DEPTH = 1.5
-const STEP = 0.85
+/** A character's measured size, in world units, standing at the origin. */
+export interface Figure {
+  id: string
+  /** Top of the tallest part: antennae, hat or raised claw. */
+  height: number
+  /** Width across, claws included. */
+  width: number
+  /** Height of the middle of the face. */
+  face: number
+  /** Radius of the head. */
+  head: number
+}
 
-/**
- * A team-photo layout: the first members stand in the front row, later ones on steps behind.
- * Rows alternate between a full row and one place shorter, so each back-row face sits in the gap
- * between two heads in front.
- */
-export function groupLayout(count: number): Placement[] {
+const ROW_DEPTH = 1.35
+/** Neighbours stand this much closer than their widths, so shoulders and claws overlap a little. */
+const SQUEEZE = 0.74
+/** How far the camera looks down: a step back reads this much higher in the photo. */
+const CAMERA_DROP = 0.12
+/** How far below the middle of a face must clear the head in front, in head radii. */
+const FACE_CLEAR = 0.6
+
+/** A steady number in [-1, 1] for this text, so a cast always stands the same way. */
+function wobble(text: string): number {
+  return (parseInt(shortHash(text).slice(-5), 36) % 2001) / 1000 - 1
+}
+
+/** How many stand in each row, front first: alternating a full row and one place shorter. */
+export function rowSizes(count: number): number[] {
   if (count <= 0) return []
-  // Every other row is one place short, so allow for that when counting rows.
   let rows = Math.ceil(count / ROW_SIZE)
   while (rows * ROW_SIZE - Math.floor(rows / 2) < count) rows++
   const full = Math.ceil((count + Math.floor(rows / 2)) / rows)
-  const out: Placement[] = []
-  let placed = 0
-  let below = 0
-  for (let row = 0; row < rows && placed < count; row++) {
-    const inRow = Math.min(row % 2 === 0 ? full : full - 1, count - placed)
-    // Rows of the same parity would line up head behind head: move this one half a place over.
-    const shift = row > 0 && inRow % 2 === below % 2 ? (row % 2 ? 0.5 : -0.5) * SPACING : 0
-    for (let i = 0; i < inRow; i++) {
-      out.push({ x: (i - (inRow - 1) / 2) * SPACING + shift, z: -row * ROW_DEPTH, y: row * STEP, row })
-    }
-    placed += inRow
-    below = inRow
+  const sizes: number[] = []
+  let left = count
+  for (let row = 0; row < rows && left > 0; row++) {
+    const n = Math.min(row % 2 === 0 ? full : full - 1, left)
+    sizes.push(n)
+    left -= n
   }
+  return sizes
+}
+
+/** Tallest in the middle, then alternately right and left of them, shortest at the ends. */
+function middleOut<T>(tallestFirst: T[]): T[] {
+  const out: T[] = []
+  tallestFirst.forEach((item, i) => (i % 2 === 0 ? out.push(item) : out.unshift(item)))
   return out
+}
+
+/** How much of `back`'s face the heads in `front` hide, in world units (0 when it is clear). */
+function hidden(back: { x: number; y: number; fig: Figure }, front: { x: number; y: number; fig: Figure }[]): number {
+  const faceY = back.y + back.fig.face
+  let worst = 0
+  for (const f of front) {
+    // Only what is directly in front of the face can hide it: the head, antennae or hat.
+    const reach = f.fig.head * 1.15 + back.fig.head * 0.8
+    const across = Math.abs(f.x - back.x)
+    if (across >= reach) continue
+    // The top of the head in front (antennae are thin enough to see past), against the lower
+    // part of this face. Standing a row back reads a little higher, as the camera looks down.
+    const top = f.y + f.fig.face + f.fig.head * 1.05 - ROW_DEPTH * CAMERA_DROP
+    const cover = top - (faceY - back.fig.head * FACE_CLEAR)
+    // Partly to the side hides less of the face.
+    worst = Math.max(worst, cover * (1 - across / reach))
+  }
+  return Math.max(0, worst)
+}
+
+/**
+ * Arrange a group for the photo, the way people line up for one: the shortest in front and the
+ * tallest behind, the tallest of each row in its middle, neighbours squeezed in a little, each
+ * back row on a step just high enough to show its faces, and faces sitting between the heads in
+ * front. Returns one placement per figure, in the order given.
+ */
+export function arrangeGroup(figures: readonly Figure[]): Placement[] {
+  if (!figures.length) return []
+  const byHeight = [...figures].sort((a, b) => a.height - b.height || (a.id < b.id ? -1 : 1))
+  const placed = new Map<string, Placement>()
+  let front: { x: number; y: number; fig: Figure }[] = []
+  let used = 0
+  let lastY = 0
+  rowSizes(figures.length).forEach((size, row) => {
+    const members = middleOut(byHeight.slice(used, used + size).reverse())
+    used += size
+    // Squeeze neighbours together by their widths, a little more or less for each pair.
+    const xs = [0]
+    for (let i = 1; i < members.length; i++) {
+      const a = members[i - 1]
+      const b = members[i]
+      const squeeze = SQUEEZE + 0.05 * wobble(`${a.id}|${b.id}`)
+      xs.push(xs[i - 1] + ((a.width + b.width) / 2) * squeeze)
+    }
+    // Centre the row on its tallest (or its two tallest), so they stand in the middle of the photo.
+    const mid = (xs[Math.floor((xs.length - 1) / 2)] + xs[Math.ceil((xs.length - 1) / 2)]) / 2
+    let row0 = members.map((fig, i) => ({ fig, x: xs[i] - mid, y: 0 }))
+
+    let y = 0
+    if (row > 0) {
+      // Slide the row sideways so its faces sit between the heads in front, then raise its step
+      // only as far as it takes to show every face.
+      const width = Math.max(...front.map((f) => f.fig.width)) * SQUEEZE
+      let best = { shift: 0, cost: Infinity }
+      for (let k = -10; k <= 10; k++) {
+        const shift = (k / 20) * width
+        const cost = row0.reduce((sum, m) => sum + hidden({ ...m, x: m.x + shift, y: lastY }, front), 0) + Math.abs(shift) * 0.05
+        if (cost < best.cost - 1e-9) best = { shift, cost }
+      }
+      row0 = row0.map((m) => ({ ...m, x: m.x + best.shift }))
+      // Anyone still hidden steps a little to the side, toward the nearer gap.
+      row0 = row0.map((m) => {
+        let bestX = m.x
+        let bestHide = hidden({ ...m, y: lastY }, front)
+        for (const dx of [-0.3, 0.3, -0.18, 0.18]) {
+          const h = hidden({ ...m, x: m.x + dx, y: lastY }, front)
+          if (h < bestHide - 1e-6) {
+            bestHide = h
+            bestX = m.x + dx
+          }
+        }
+        return { ...m, x: bestX }
+      })
+      let need = 0
+      for (const m of row0) need = Math.max(need, hidden({ ...m, y: lastY }, front))
+      y = lastY + Math.max(0.25, need)
+    }
+    const z = -row * ROW_DEPTH
+    for (const m of row0) {
+      placed.set(m.fig.id, {
+        x: m.x,
+        y,
+        z: z + 0.08 * wobble(`z|${m.fig.id}`),
+        row,
+        lean: -Math.max(-0.05, Math.min(0.05, m.x * 0.012)) + 0.015 * wobble(`lean|${m.fig.id}`),
+      })
+    }
+    front = row0.map((m) => ({ ...m, y }))
+    lastY = y
+  })
+  return figures.map((f) => placed.get(f.id)!)
 }

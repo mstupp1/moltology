@@ -23,7 +23,7 @@ import {
   CanvasTexture,
 } from 'three'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
-import { groupLayout, photoPose, type CommunityPhotoSpot } from '../community-photo'
+import { arrangeGroup, photoPose, type CommunityPhotoSpot, type Figure } from '../community-photo'
 import type { LobsterAvatarConfig } from '../lobster-avatar'
 import { buildCharacter, type Character3D } from './character'
 import { withLoftDetail } from './loft'
@@ -97,7 +97,28 @@ export async function renderGroupPhoto(members: readonly GroupMember[], width: n
     scene.environment = env.texture
     scene.environmentIntensity = 0.28
 
-    const layout = groupLayout(members.length)
+    // Build and measure everyone first, then line them up by size.
+    const figures: Figure[] = []
+    const measure = new Box3()
+    for (const member of members) {
+      if (signal?.aborted) return null
+      const look = { ...lookFromConfig(member.config), pose: photoPose(member.id), temperament: undefined }
+      const character = withLoftDetail(0.8, () => buildCharacter(look))
+      built.push(character)
+      character.setPose(look.pose, true)
+      character.update(0.016, 0, false)
+      character.root.updateMatrixWorld(true)
+      measure.setFromObject(character.root)
+      figures.push({
+        id: member.id,
+        height: measure.max.y,
+        width: measure.max.x - measure.min.x,
+        face: character.portrait.y,
+        head: character.portrait.size * 0.42,
+      })
+      await breathe()
+    }
+    const layout = arrangeGroup(figures)
     const across = Math.max(...layout.map((p) => Math.abs(p.x))) + 1.6
     const deep = Math.max(...layout.map((p) => -p.z)) + 1.6
 
@@ -141,28 +162,22 @@ export async function renderGroupPhoto(members: readonly GroupMember[], width: n
     disposables.push(blobGeo, blobMat)
     const spots: { id: string; at: Vector3; size: number }[] = []
     for (let i = 0; i < members.length; i++) {
-      if (signal?.aborted) return null
-      const member = members[i]
       const place = layout[i]
-      const look = { ...lookFromConfig(member.config), pose: photoPose(member.id), temperament: undefined }
-      const character = withLoftDetail(0.8, () => buildCharacter(look))
-      built.push(character)
-      character.setPose(look.pose, true)
-      character.update(0.016, 0, false)
+      const character = built[i]
       character.root.traverse((o) => {
         if ((o as Mesh).isMesh) o.castShadow = true
       })
-      // Everyone turns a little toward the middle of the group, as people do in a photo.
+      // Everyone turns and leans a little toward the middle of the group, as people do in a photo.
       const holder = new Group()
       holder.position.set(place.x, place.y, place.z)
       holder.rotation.y = -place.x * 0.05
+      holder.rotation.z = place.lean
       holder.add(character.root)
       const shadow = new Mesh(blobGeo, blobMat)
       shadow.rotation.x = -Math.PI / 2
       shadow.position.set(place.x, place.y + 0.003, place.z)
       scene.add(holder, shadow)
-      spots.push({ id: member.id, at: new Vector3(place.x, place.y + character.portrait.y, place.z), size: character.portrait.size })
-      await breathe()
+      spots.push({ id: members[i].id, at: new Vector3(place.x, place.y + figures[i].face, place.z), size: character.portrait.size })
     }
 
     // Frame the whole group, looking down a little so the back rows show over the front.
