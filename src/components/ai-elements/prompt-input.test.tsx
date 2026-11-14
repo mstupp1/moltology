@@ -281,6 +281,20 @@ describe('PromptInput skills', () => {
     expect(onSubmit).toHaveBeenCalledWith({ text: '/shrug' })
   })
 
+  it('floats the list over the chat and swaps the Skills button for the active skill, without adding a row', () => {
+    render(<Harness />)
+    const box = screen.getByRole('textbox', { name: 'Message' }) as HTMLTextAreaElement
+    fireEvent.change(box, { target: { value: '/' } })
+    expect(screen.getByRole('listbox', { name: 'Skills' }).className).toMatch(/\babsolute\b/)
+    fireEvent.keyDown(box, { key: 'Enter' })
+    expect(screen.queryByRole('button', { name: 'Skills' })).not.toBeInTheDocument()
+    const pill = screen.getByRole('button', { name: 'Skill: Focus rounds. Change skill' })
+    const clear = screen.getByRole('button', { name: 'Turn off Focus rounds' })
+    expect(pill.parentElement).toBe(clear.parentElement)
+    fireEvent.click(clear)
+    expect(screen.getByRole('button', { name: 'Skills' })).toBeInTheDocument()
+  })
+
   it('shows no skill controls without skills', () => {
     render(<PromptInput onSubmit={vi.fn()} />)
     fireEvent.change(screen.getByRole('textbox', { name: 'Message' }), { target: { value: '/' } })

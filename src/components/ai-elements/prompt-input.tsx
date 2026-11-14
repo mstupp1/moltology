@@ -124,59 +124,119 @@ export function readSlashQuery(text: string): string | null {
   return match ? match[1] : null
 }
 
-/** Skills button beside the model picker: every usable skill, plus a way to browse more. */
+/**
+ * Skills button beside the model picker: every usable skill, plus a way to browse more. With a
+ * skill on, the button becomes that skill's pill (with an X to turn it off), so the box never
+ * gains a row.
+ */
 export const OracleSkillMenu: React.FC<{
   skills: PromptSkillOption[]
-  activeSkillId?: string | null
+  activeSkill?: { id: string; name: string } | null
   onPick: (id: string) => void
+  onClear?: () => void
   compactLabel?: boolean
-}> = ({ skills, activeSkillId, onPick, compactLabel = false }) => (
-  <HudDropdownMenu modal={false}>
-    <HudDropdownMenuTrigger asChild>
-      <button
-        type="button"
-        className={`flex min-h-8 items-center gap-1 text-[11px] sm:text-xs text-ink-body hover:text-ink bg-surface-1 border border-line hover:bg-surface-3 hover:border-line-strong px-2 py-1 rounded-control transition-colors cursor-pointer ${FOCUS_RING}`}
-        title="Skills (type /)"
-        aria-label="Skills"
-      >
-        <ScrollText className="w-3.5 h-3.5 text-cyan-glow" aria-hidden="true" />
-        {compactLabel ? null : <span className="font-medium">Skills</span>}
-      </button>
-    </HudDropdownMenuTrigger>
-    <HudDropdownMenuContent
-      side="top"
-      align="start"
-      sideOffset={8}
-      collisionPadding={12}
-      aria-label="Skills"
-      aria-labelledby={undefined}
-      className="w-[320px] max-w-[calc(100vw-24px)] p-0 overflow-y-auto overscroll-contain"
-      style={{ maxHeight: 'min(480px, var(--radix-dropdown-menu-content-available-height))' }}
-    >
-      <p className="px-4 pt-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">Use a skill</p>
-      <div className="pb-1">
-        {skills.map((skill) => (
-          <HudDropdownMenuItem
-            key={skill.id}
-            role="menuitemradio"
-            aria-checked={skill.id === activeSkillId}
-            onSelect={() => onPick(skill.id)}
-            className={`block rounded-none px-4 py-2 ${skill.id === activeSkillId ? 'bg-surface-3' : ''}`}
+}> = ({ skills, activeSkill = null, onPick, onClear, compactLabel = false }) => {
+  const activeSkillId = activeSkill?.id
+  const menu = (
+    <HudDropdownMenu modal={false}>
+      <HudDropdownMenuTrigger asChild>
+        {activeSkill ? (
+          <button
+            type="button"
+            className={`flex min-h-[30px] min-w-0 items-center gap-1 pl-2 ${onClear ? 'pr-1' : 'pr-2'} py-1 text-[11px] sm:text-xs font-semibold text-ink cursor-pointer ${FOCUS_RING} rounded-control`}
+            title="Change skill (type /)"
+            aria-label={`Skill: ${activeSkill.name}. Change skill`}
           >
-            <span className="flex items-center justify-between gap-2 text-sm font-semibold text-ink">
-              {skill.name}
-              {skill.id === activeSkillId && <Check aria-label="On" className="h-4 w-4 shrink-0 text-cyan-glow" />}
-            </span>
-            <span className="block text-xs leading-snug text-ink-muted">{skill.summary}</span>
-          </HudDropdownMenuItem>
-        ))}
-      </div>
-      <a href={BROWSE_SKILLS_HREF} className="block border-t border-line-subtle px-4 py-3 text-xs text-cyan-glow hover:underline">
-        Browse all skills
-      </a>
-    </HudDropdownMenuContent>
-  </HudDropdownMenu>
-)
+            <ScrollText className="w-3.5 h-3.5 shrink-0 text-cyan-glow" aria-hidden="true" />
+            <span className="truncate">{activeSkill.name}</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={`flex min-h-8 items-center gap-1 text-[11px] sm:text-xs text-ink-body hover:text-ink bg-surface-1 border border-line hover:bg-surface-3 hover:border-line-strong px-2 py-1 rounded-control transition-colors cursor-pointer ${FOCUS_RING}`}
+            title="Skills (type /)"
+            aria-label="Skills"
+          >
+            <ScrollText className="w-3.5 h-3.5 text-cyan-glow" aria-hidden="true" />
+            {compactLabel ? null : <span className="font-medium">Skills</span>}
+          </button>
+        )}
+      </HudDropdownMenuTrigger>
+      <HudDropdownMenuContent
+        side="top"
+        align="start"
+        sideOffset={8}
+        collisionPadding={12}
+        aria-label="Skills"
+        aria-labelledby={undefined}
+        className="w-[320px] max-w-[calc(100vw-24px)] p-0 overflow-y-auto overscroll-contain"
+        style={{ maxHeight: 'min(480px, var(--radix-dropdown-menu-content-available-height))' }}
+      >
+        <p className="px-4 pt-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">Use a skill</p>
+        <div className="pb-1">
+          {skills.map((skill) => (
+            <HudDropdownMenuItem
+              key={skill.id}
+              role="menuitemradio"
+              aria-checked={skill.id === activeSkillId}
+              onSelect={() => onPick(skill.id)}
+              className={`block rounded-none px-4 py-2 ${skill.id === activeSkillId ? 'bg-surface-3' : ''}`}
+            >
+              <span className="flex items-center justify-between gap-2 text-sm font-semibold text-ink">
+                {skill.name}
+                {skill.id === activeSkillId && <Check aria-label="On" className="h-4 w-4 shrink-0 text-cyan-glow" />}
+              </span>
+              <span className="block text-xs leading-snug text-ink-muted">{skill.summary}</span>
+            </HudDropdownMenuItem>
+          ))}
+        </div>
+        <a href={BROWSE_SKILLS_HREF} className="block border-t border-line-subtle px-4 py-3 text-xs text-cyan-glow hover:underline">
+          Browse all skills
+        </a>
+      </HudDropdownMenuContent>
+    </HudDropdownMenu>
+  )
+  if (!activeSkill) return menu
+  return (
+    <span className="inline-flex min-w-0 max-w-[12rem] sm:max-w-[16rem] items-center rounded-control border border-line bg-surface-3 hover:border-line-strong transition-colors">
+      {menu}
+      {onClear && <SkillClearButton name={activeSkill.name} onClear={onClear} />}
+    </span>
+  )
+}
+
+function SkillClearButton({ name, onClear }: { name: string; onClear: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClear}
+      className={`mr-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-chip text-ink-muted hover:text-ink hover:bg-surface-2 ${FOCUS_RING}`}
+      aria-label={`Turn off ${name}`}
+      title="Turn off skill"
+    >
+      <X className="w-3 h-3" aria-hidden="true" />
+    </button>
+  )
+}
+
+/** Room left above and below an element inside whatever clips it (a scroll area, a panel, or the window). */
+function readRoom(el: HTMLElement): { above: number; below: number } {
+  const rect = el.getBoundingClientRect()
+  let top = 0
+  let bottom = window.innerHeight
+  for (let node = el.parentElement; node && node !== document.body; node = node.parentElement) {
+    const style = window.getComputedStyle(node)
+    if (/(auto|scroll|hidden|clip)/.test(`${style.overflowY}${style.overflow}`)) {
+      const box = node.getBoundingClientRect()
+      top = Math.max(top, box.top)
+      bottom = Math.min(bottom, box.bottom)
+      break
+    }
+  }
+  return { above: rect.top - top, below: bottom - rect.bottom }
+}
+
+const SKILL_LIST_MAX = 240
 
 export interface PromptInputProps {
   onSubmit: (message: { text: string }) => void
@@ -254,6 +314,20 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   const [skillCursor, setSkillCursor] = useState(0)
   const [slashDismissed, setSlashDismissed] = useState(false)
   const showSkillList = slashQuery !== null && !slashDismissed
+  const cardRef = useRef<HTMLDivElement>(null)
+  // The list floats over the chat like a menu, above the box when there's room (docked at the
+  // bottom), below it when the box sits at the top of the screen (new chat on phones).
+  const [skillListPlace, setSkillListPlace] = useState<{ side: 'top' | 'bottom'; max: number }>({
+    side: 'top',
+    max: SKILL_LIST_MAX,
+  })
+  useLayoutEffect(() => {
+    if (!showSkillList || !cardRef.current) return
+    const { above, below } = readRoom(cardRef.current)
+    const side = above >= Math.min(SKILL_LIST_MAX, 160) || above >= below ? 'top' : 'bottom'
+    const room = (side === 'top' ? above : below) - 12
+    setSkillListPlace({ side, max: Math.max(120, Math.min(SKILL_LIST_MAX, room)) })
+  }, [showSkillList])
   useEffect(() => {
     setSkillCursor(0)
     if (slashQuery === null) setSlashDismissed(false)
@@ -407,8 +481,16 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   const skillMenu = canPickSkills ? (
     <OracleSkillMenu
       skills={skills ?? []}
-      activeSkillId={activeSkill?.id}
+      activeSkill={activeSkill}
       onPick={pickSkill}
+      onClear={
+        onClearSkill
+          ? () => {
+              onClearSkill()
+              textareaRef.current?.focus()
+            }
+          : undefined
+      }
       compactLabel={oneRow}
     />
   ) : null
@@ -419,7 +501,10 @@ export const PromptInput: React.FC<PromptInputProps> = ({
       id={skillListId}
       role="listbox"
       aria-label="Skills"
-      className="mb-1.5 max-h-56 overflow-y-auto rounded-control border border-line-subtle bg-surface-1 py-1"
+      className={`absolute inset-x-0 z-30 overflow-y-auto overscroll-contain rounded-card border border-line bg-surface-1 py-1 shadow-lg ${
+        skillListPlace.side === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
+      }`}
+      style={{ maxHeight: skillListPlace.max }}
     >
       {skillMatches.length === 0 ? (
         <p className="px-3 py-2 text-xs text-ink-muted">
@@ -444,32 +529,23 @@ export const PromptInput: React.FC<PromptInputProps> = ({
       )}
     </div>
   ) : null
-  const skillChip = activeSkill ? (
-    <div className="flex px-1 pb-1">
-      <span className="inline-flex max-w-full items-center gap-1 rounded-chip border border-line bg-surface-3 pl-2 pr-0.5 py-0.5 text-[12px] font-semibold text-ink">
-        <ScrollText className="w-3 h-3 shrink-0 text-cyan-glow" aria-hidden="true" />
-        <span className="truncate">{activeSkill.name}</span>
-        {onClearSkill && (
-          <button
-            type="button"
-            onClick={() => {
-              onClearSkill()
-              textareaRef.current?.focus()
-            }}
-            className={`ml-0.5 inline-flex h-5 w-5 items-center justify-center rounded-chip text-ink-muted hover:text-ink hover:bg-surface-2 ${FOCUS_RING}`}
-            aria-label={`Turn off ${activeSkill.name}`}
-            title="Turn off skill"
-          >
-            <X className="w-3 h-3" aria-hidden="true" />
-          </button>
-        )}
-      </span>
-    </div>
-  ) : null
+  // The active skill normally lives in the toolbar as the Skills pill; this row is only for a
+  // skill that is on while the member can't pick skills here.
+  const skillChip =
+    activeSkill && !skillMenu ? (
+      <div className="flex px-1 pb-1">
+        <span className="inline-flex max-w-full items-center gap-1 rounded-chip border border-line bg-surface-3 pl-2 pr-0.5 py-0.5 text-[12px] font-semibold text-ink">
+          <ScrollText className="w-3 h-3 shrink-0 text-cyan-glow" aria-hidden="true" />
+          <span className="truncate">{activeSkill.name}</span>
+          {onClearSkill && <SkillClearButton name={activeSkill.name} onClear={onClearSkill} />}
+        </span>
+      </div>
+    ) : null
 
   const card = (
     <div
-      className={`pointer-events-auto bg-surface-2 border ${variant !== 'inline' ? 'rounded-panel shadow-sm' : 'rounded-card'} transition-colors focus-within:border-line ${
+      ref={cardRef}
+      className={`relative pointer-events-auto bg-surface-2 border ${variant !== 'inline' ? 'rounded-panel shadow-sm' : 'rounded-card'} transition-colors focus-within:border-line ${
         oneRow ? 'p-1.5' : 'p-2 sm:p-2.5'
       } ${dictation.isListening ? 'border-line' : 'border-line-subtle'}`}
     >
