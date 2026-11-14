@@ -95,6 +95,8 @@ describe('SynapticOracleWidget', () => {
     expect(btn).toHaveTextContent(DEFAULT_ORACLE_PLACEHOLDER)
     expect(btn).toHaveAttribute('title', 'Open Oracle AI')
     expect(btn.parentElement).toHaveClass('right-6', 'bottom-4')
+    // The launcher's face is the synaptic core still, not the logo pill.
+    expect(btn.querySelector('[data-testid="oracle-core-glyph"]')).not.toBeNull()
   })
 
   it('opens popout window on click and keeps it bottom-right', () => {

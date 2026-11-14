@@ -9,7 +9,6 @@ import {
   Scroll,
   Shell,
   MessagesSquare,
-  Atom,
   LifeBuoy,
   Sparkles,
   ChevronRight,
@@ -42,8 +41,11 @@ import { HudTopControls } from './HudTopControls'
 import { useDesktopViewport } from '@/hooks/useDesktopViewport'
 import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 
-/** Pages in the phone bottom bar; the rest go in its More sheet, in this order. */
-const MOBILE_TAB_IDS = ['hub', 'oracle', 'character', 'forum']
+/**
+ * Pages in the phone bottom bar; the rest go in its More sheet, in this order.
+ * The Oracle is not a page tab: it sits in the middle of the bar as the synaptic core.
+ */
+const MOBILE_TAB_IDS = ['hub', 'character', 'forum']
 const MOBILE_MORE_IDS = ['codex', 'academy']
 
 const GUEST_LOCKED_PATHS = new Set(['/member', '/profile'])
@@ -225,7 +227,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       title: '',
       items: [
         { id: 'hub', label: 'DASHBOARD', shortLabel: 'DASHBOARD', icon: LayoutDashboard, path: '/dashboard' },
-        { id: 'oracle', label: 'ORACLE', shortLabel: 'ORACLE', icon: Atom, path: '/oracle' },
         { id: 'character', label: 'CHARACTER', shortLabel: 'CHARACTER', icon: Shell, path: '/character' },
         { id: 'codex', label: 'CODEX', shortLabel: 'CODEX', icon: Scroll, path: '/codex' },
         { id: 'academy', label: 'ACADEMY', shortLabel: 'ACADEMY', icon: BookOpen, path: '/academy' },
@@ -765,6 +766,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         onNavigate={(path) => handleNavClick(path)}
         onToggleMore={toggleMobileMenu}
         moreButtonRef={mobileTriggerRef}
+        core={{ current: isOnPath('/oracle'), onPress: () => handleNavClick('/oracle') }}
       />
 
       {/* Phone More sheet: sized to its rows and sitting on the bottom bar, over a dimmed page */}
