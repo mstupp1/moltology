@@ -29,6 +29,7 @@ import {
 import { CANONICAL_SCRIPTURES } from '../codexData'
 import { resolveMemberLarvaId } from '../larva-id'
 import { rollSimulatedAvatarConfig } from '../simulated-avatar'
+import { dressNewSimulatedMember, simulateWardrobes } from './simulation-wardrobe'
 import { resolveMemberPublicName } from '../member-handle'
 import { slugifyForumTitle } from '../forum-utils'
 import { validateInputGuardrails } from '../ai/guardrails'
@@ -594,6 +595,7 @@ export async function spawnSimulatedUser(
   await awardGems(dbClient, userId, [
     { amount: curr.gems, source: 'simulation', sourceKey: 'simulation:seed', description: 'Simulated starting balance' },
   ])
+  await dressNewSimulatedMember(dbClient, userId)
 
   await dbClient
     .insert(userStats)
@@ -1818,7 +1820,7 @@ export async function simulateRelationships(
 }
 
 function shouldRunPhase(
-  phase: 'blog' | 'spawn' | 'routines' | 'forum' | 'votes' | 'mutations' | 'social' | 'review',
+  phase: 'blog' | 'spawn' | 'routines' | 'forum' | 'votes' | 'mutations' | 'social' | 'review' | 'wardrobe',
   options: {
     spawnOnly?: boolean
     routinesOnly?: boolean
@@ -1828,6 +1830,7 @@ function shouldRunPhase(
     mutationsOnly?: boolean
     socialOnly?: boolean
     reviewOnly?: boolean
+    wardrobeOnly?: boolean
   }
 ) {
   const anyOnly = Boolean(
@@ -1838,11 +1841,13 @@ function shouldRunPhase(
       options.votesOnly ||
       options.mutationsOnly ||
       options.socialOnly ||
-      options.reviewOnly
+      options.reviewOnly ||
+      options.wardrobeOnly
   )
   if (!anyOnly) return true
   if (phase === 'blog') return Boolean(options.blogOnly)
   if (phase === 'review') return Boolean(options.reviewOnly)
+  if (phase === 'wardrobe') return Boolean(options.wardrobeOnly)
   if (phase === 'spawn') return Boolean(options.spawnOnly)
   if (phase === 'routines') return Boolean(options.routinesOnly)
   if (phase === 'forum') return Boolean(options.forumOnly)
@@ -1865,6 +1870,7 @@ export async function runSimulationCycle(options: {
   mutationsOnly?: boolean
   socialOnly?: boolean
   reviewOnly?: boolean
+  wardrobeOnly?: boolean
   /** Simulated moment for this tick. Rows written are backdated to land at or before it. */
   at?: Date
 } = {}) {
@@ -1982,6 +1988,17 @@ export async function runSimulationCycle(options: {
       )
     } else {
       console.log(`[SimulationCycle] - Mutation skipped: ${mutationRes.reason}`)
+    }
+  }
+
+  // 5b. Wardrobe: shop the market with gems and change outfits
+  if (shouldRunPhase('wardrobe', options)) {
+    const wardrobeRes = await simulateWardrobes(dbClient, { dryRun: options.dryRun })
+    results.wardrobe = wardrobeRes
+    for (const a of wardrobeRes.actions) {
+      console.log(
+        `[SimulationCycle] ${a.skipped ? '-' : '✓'} ${a.handle || a.userId}: ${a.bought ? `bought ${a.bought.name} (${a.bought.rarity}, ${a.bought.price} gems) ` : ''}${a.outfit ? `wears ${a.outfit.style} (${a.outfit.slots.length} pieces)` : ''}${a.skipped ? ` skipped: ${a.skipped}` : ''}`
+      )
     }
   }
 
@@ -2138,6 +2155,7 @@ export interface SimulationPlan {
     mutationsOnly?: boolean
     socialOnly?: boolean
     reviewOnly?: boolean
+    wardrobeOnly?: boolean
   }
   tasks: SimulationPlanTask[]
   meta: {
@@ -2157,6 +2175,7 @@ export interface PrepareSimulationPlanOptions {
   mutationsOnly?: boolean
   socialOnly?: boolean
   reviewOnly?: boolean
+  wardrobeOnly?: boolean
   config?: SimulationGrowthConfig
   at?: Date
   outPath?: string
@@ -2543,6 +2562,7 @@ export async function prepareSimulationPlan(
       mutationsOnly: Boolean(options.mutationsOnly),
       socialOnly: Boolean(options.socialOnly),
       reviewOnly: Boolean(options.reviewOnly),
+      wardrobeOnly: Boolean(options.wardrobeOnly),
     },
     tasks,
     meta: {
@@ -2681,6 +2701,7 @@ export async function applySimulationPlan(
       await awardGems(dbClient, userId, [
         { amount: curr.gems, source: 'simulation', sourceKey: 'simulation:seed', description: 'Simulated starting balance' },
       ])
+      await dressNewSimulatedMember(dbClient, userId)
       await dbClient.insert(userStats).values({
         userId,
         pincerTorque: 50 + stage * 12,
@@ -2974,6 +2995,11 @@ export async function applySimulationPlan(
   // 7. Mutations
   if (shouldRunPhase('mutations', plan.options)) {
     results.mutation = await mutateSimulatedPersona(dbClient, config, { dryRun })
+  }
+
+  // 7b. Wardrobe
+  if (shouldRunPhase('wardrobe', plan.options)) {
+    results.wardrobe = await simulateWardrobes(dbClient, { dryRun })
   }
 
   // 8. Social
