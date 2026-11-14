@@ -28,6 +28,7 @@ import {
 } from './activity-log'
 import { CANONICAL_SCRIPTURES } from '../codexData'
 import { resolveMemberLarvaId } from '../larva-id'
+import { rollSimulatedAvatarConfig } from '../simulated-avatar'
 import { resolveMemberPublicName } from '../member-handle'
 import { slugifyForumTitle } from '../forum-utils'
 import { validateInputGuardrails } from '../ai/guardrails'
@@ -545,8 +546,6 @@ export async function spawnSimulatedUser(
   }
   const curr = currencyMap[stage] || currencyMap[1]
 
-  const diceBearStyles = ['bottts', 'pixel-art', 'shapes', 'identicon']
-  const selectedStyle = diceBearStyles[Math.floor(Math.random() * diceBearStyles.length)]
 
   const simulatedPersona: SimulatedPersonaConfig = {
     archetype: persona.archetype,
@@ -589,10 +588,7 @@ export async function spawnSimulatedUser(
       chitinGems: curr.gems,
       synapseShards: curr.shards,
       depthPressureCoins: stage * 15,
-      avatarConfig: {
-        style: selectedStyle,
-        seed: crypto.randomUUID(),
-      },
+      avatarConfig: rollSimulatedAvatarConfig(),
     })
     .returning()
   await awardGems(dbClient, userId, [
@@ -2641,8 +2637,6 @@ export async function applySimulationPlan(
       4: { credits: '250000.00', gems: 35000, shards: 8200 },
     }
     const curr = currencyMap[stage] || currencyMap[1]
-    const diceBearStyles = ['bottts', 'pixel-art', 'shapes', 'identicon']
-    const selectedStyle = diceBearStyles[Math.floor(Math.random() * diceBearStyles.length)]
 
     const simulatedPersona: SimulatedPersonaConfig = {
       archetype,
@@ -2682,10 +2676,7 @@ export async function applySimulationPlan(
         chitinGems: curr.gems,
         synapseShards: curr.shards,
         depthPressureCoins: stage * 15,
-        avatarConfig: {
-          style: selectedStyle,
-          seed: crypto.randomUUID(),
-        },
+        avatarConfig: rollSimulatedAvatarConfig(),
       })
       await awardGems(dbClient, userId, [
         { amount: curr.gems, source: 'simulation', sourceKey: 'simulation:seed', description: 'Simulated starting balance' },
