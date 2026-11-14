@@ -130,9 +130,9 @@
     "chamfer": 1
   },
   "src/components/hud/search/SearchPage.tsx": {
-    "hex-color": 35,
-    "chamfer": 8,
-    "tiny-text": 3
+    "hex-color": 21,
+    "chamfer": 5,
+    "tiny-text": 2
   },
   "src/components/moltmax/QuizProgressHUD.tsx": {
     "hex-color": 6

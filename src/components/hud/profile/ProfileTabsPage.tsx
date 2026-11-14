@@ -1,10 +1,9 @@
 import React, { Suspense, lazy } from 'react'
-import { Link } from '@tanstack/react-router'
-import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
+import { HudTitleBandTop, HudTitlePanel } from '@/components/hud/HudTitlePanel'
+import { BandSectionNav, type BandSection } from '@/components/hud/BandSectionNav'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { usePendingFriendRequests } from '@/hooks/usePendingFriendRequests'
 import { profilePageSection, type ProfilePageSection, type ProfilePageTab } from '@/lib/connections'
-import { cn } from '@/lib/utils'
 
 const LazyMemberProfilePage = lazy(() =>
   import('@/components/hud/member/MemberProfilePage').then((m) => ({ default: m.MemberProfilePage }))
@@ -30,46 +29,29 @@ const SECTION_TITLES: Record<Exclude<ProfilePageSection, 'profile'>, string> = {
   requests: 'Requests',
 }
 
-/** Switches between the parts of your own profile, styled like the Character page's switch. */
+/** First row of the profile's header band: Profile, Activity, Friends, Requests. */
 export function ProfileSectionNav({
   current,
   requestCount = 0,
-  className,
+  alone = false,
 }: {
   current: ProfilePageSection
   requestCount?: number
-  className?: string
+  /** No title row follows, so this row closes the band itself. */
+  alone?: boolean
 }) {
+  const sections: BandSection<ProfilePageSection>[] = SECTIONS.map((section) => ({
+    id: section.id,
+    label: section.label,
+    to: '/profile',
+    search: { tab: section.tab },
+    replace: true,
+    badge: section.id === 'requests' ? requestCount : 0,
+  }))
   return (
-    <nav aria-label="Profile sections" className={cn('flex gap-1 rounded-control bg-surface-2 p-1', className)}>
-      {SECTIONS.map((section) => {
-        const selected = section.id === current
-        const count = section.id === 'requests' ? requestCount : 0
-        return (
-          <Link
-            key={section.id}
-            to="/profile"
-            search={{ tab: section.tab }}
-            replace
-            aria-current={selected ? 'page' : undefined}
-            className={cn(
-              'inline-flex min-h-8 items-center justify-center gap-1.5 rounded-control px-3 text-[11px] font-semibold uppercase tracking-[0.08em] transition-colors',
-              'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
-              selected ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:bg-surface-3/60 hover:text-ink',
-            )}
-          >
-            {section.label}
-            {count > 0 && (
-              <span className="min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full bg-cyan-glow text-[11px] font-bold text-abyss tabular-nums">
-                <span className="sr-only">, </span>
-                {count > 99 ? '99+' : count}
-                <span className="sr-only"> waiting</span>
-              </span>
-            )}
-          </Link>
-        )
-      })}
-    </nav>
+    <HudTitleBandTop className={alone ? 'border-b border-line-subtle pb-2' : undefined}>
+      <BandSectionNav label="Profile sections" sections={sections} current={current} />
+    </HudTitleBandTop>
   )
 }
 
@@ -90,31 +72,26 @@ export function ProfileTabsPage({
   const requestCount = usePendingFriendRequests(profileId)
 
   return (
-    <div className="space-y-3 sm:space-y-4">
-      <ProfileSectionNav current={section} requestCount={requestCount} className="w-max max-w-full overflow-x-auto" />
+    <div className="space-y-3 sm:space-y-4 lg:space-y-5">
+      <div>
+        {/* The profile card below carries the member's name as the page heading, so that
+            tab's band is the section row alone. */}
+        <ProfileSectionNav current={section} requestCount={requestCount} alone={section === 'profile'} />
+        {section !== 'profile' && <HudTitlePanel treatment="band" joined title={SECTION_TITLES[section]} />}
+      </div>
       <Suspense fallback={<HudWorkspaceGhost />}>
         {section === 'profile' ? (
           <LazyMemberProfilePage profileId={profileId} />
         ) : section === 'activity' ? (
-          // The tab names the page, so the feed sits on its own without a second title or card.
-          <section aria-labelledby="profile-activity-title">
-            <h1 id="profile-activity-title" className="sr-only">
-              {SECTION_TITLES.activity}
-            </h1>
-            <LazyActivityStreamPage />
-          </section>
+          <LazyActivityStreamPage />
+        ) : section === 'friends' ? (
+          <LazyConnectionsPage view="friends" tab="friends" />
         ) : (
-          <div className="chitin-card rounded-card p-3 sm:p-4 md:p-5 space-y-4 font-sans text-ink">
-            <HudTitlePanel treatment="integrated" title={SECTION_TITLES[section]} />
-            {section === 'friends' && <LazyConnectionsPage view="friends" tab="friends" />}
-            {section === 'requests' && (
-              <LazyConnectionsPage
-                view="requests"
-                tab={tab === 'sent' ? 'sent' : 'incoming'}
-                onTabChange={(next) => onTabChange(next === 'incoming' ? 'requests' : next)}
-              />
-            )}
-          </div>
+          <LazyConnectionsPage
+            view="requests"
+            tab={tab === 'sent' ? 'sent' : 'incoming'}
+            onTabChange={(next) => onTabChange(next === 'incoming' ? 'requests' : next)}
+          />
         )}
       </Suspense>
     </div>

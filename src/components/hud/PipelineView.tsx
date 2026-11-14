@@ -21,7 +21,7 @@ export default function PipelineView() {
   const stage = STAGE_PIPELINE_DATA.find((item) => item.stageNum === selectedStage)!
 
   return (
-    <div className="space-y-3.5 sm:space-y-5 font-sans">
+    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans">
       <HudTitlePanel
         treatment="band"
         joined
@@ -46,7 +46,7 @@ export default function PipelineView() {
         <StageSection key={stage.stageNum} stage={stage} xp={xp} />
       </div>
 
-      <aside aria-labelledby="pipeline-readings-title" className="rounded-card border border-line-subtle bg-surface-1 p-4 sm:p-5">
+      <aside aria-labelledby="pipeline-readings-title" className="rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 lg:p-5">
         <h2 id="pipeline-readings-title" className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
           About the readings
         </h2>

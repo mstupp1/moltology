@@ -203,7 +203,7 @@ function ForumBoardPage() {
 
   return (
     <ForumShell>
-      <div className="space-y-3.5 sm:space-y-5 font-sans relative pb-8">
+      <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative pb-8">
         {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-2">
           <Link
@@ -226,7 +226,7 @@ function ForumBoardPage() {
         {/* Board Header Bento Banner */}
         {category ? (
           <div
-            className="relative overflow-hidden rounded-card border border-line-subtle bg-surface-1 p-4 sm:p-5 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+            className="relative overflow-hidden rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 lg:p-5 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
             style={{ borderLeftWidth: '2px', borderLeftColor: category.color || '#00c3ff' }}
           >
             {/* Background Image with Dark Gradient Overlay */}
@@ -304,7 +304,7 @@ function ForumBoardPage() {
               />
             )}
 
-            <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 md:p-5 space-y-3.5 h-full flex flex-col justify-between">
+            <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 lg:p-5 space-y-3.5 h-full flex flex-col justify-between">
               <div className="space-y-3">
                 {/* Toolbar */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 border-b border-line-subtle pb-3">
@@ -365,7 +365,7 @@ function ForumBoardPage() {
           </div>
 
           {/* Right Column (4 cols): Board Context & Quick Navigation */}
-          <div className="lg:col-span-4 flex flex-col space-y-3.5 sm:space-y-5">
+          <div className="lg:col-span-4 flex flex-col space-y-3 sm:space-y-4 lg:space-y-5">
             {/* Board Directive Card */}
             <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 space-y-2.5">
               <div className="flex items-center gap-2 border-b border-line-subtle pb-2.5">

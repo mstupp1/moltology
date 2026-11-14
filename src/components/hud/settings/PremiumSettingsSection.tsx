@@ -70,7 +70,7 @@ export function PremiumSettingsSection() {
 
   if (!membership) {
     return (
-      <section data-testid="premium-settings" className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5" aria-busy="true">
+      <section data-testid="premium-settings" className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 lg:p-5" aria-busy="true">
         <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">
           {PREMIUM_PAGE_COPY.settingsTitle}
         </h2>
@@ -80,7 +80,7 @@ export function PremiumSettingsSection() {
   }
 
   return (
-    <section data-testid="premium-settings" className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 md:p-5 space-y-3">
+    <section data-testid="premium-settings" className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 lg:p-5 space-y-3">
       <div className="flex flex-wrap items-center gap-2">
         <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">
           {PREMIUM_PAGE_COPY.settingsTitle}

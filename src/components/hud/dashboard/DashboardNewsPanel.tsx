@@ -40,7 +40,7 @@ export function DashboardNewsPanel() {
               <Link
                 to="/news/$slug"
                 params={{ slug: post.slug }}
-                className={cn('group flex items-center gap-3 py-2.5 rounded-control hover:bg-surface-2 -mx-2 px-2 transition-colors', DASHBOARD_FOCUS)}
+                className={cn('group flex items-center gap-3 py-2 sm:py-2.5 rounded-control hover:bg-surface-2 -mx-2 px-2 transition-colors', DASHBOARD_FOCUS)}
               >
                 <span
                   className="relative w-[72px] h-12 shrink-0 rounded-control overflow-hidden border border-line-subtle bg-surface-3 flex items-center justify-center"

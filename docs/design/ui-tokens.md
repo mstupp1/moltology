@@ -60,7 +60,23 @@ icons or geometry and verifies the original-icon backups.
 ## Sizes and states
 
 - Controls are `min-h-8`, `min-h-10` or `min-h-12` (32, 40, 48px at the base font size).
-- Cards pad 16px (`p-4`); large panels 24px. No text under 11px.
+- No text under 11px.
+
+## Spacing
+
+One scale, tighter on phones. Use these exact class sets so pages stay in step:
+
+| What | Classes | Phone / sm / lg |
+| --- | --- | --- |
+| Gap between a page's sections | `space-y-3 sm:space-y-4 lg:space-y-5` | 12 / 16 / 20px |
+| Gap between cards in a grid | `gap-3 sm:gap-4 lg:gap-5` | 12 / 16 / 20px |
+| Card padding | `p-3 sm:p-4` | 12 / 16px |
+| Large card or panel padding | `p-3 sm:p-4 lg:p-5` | 12 / 16 / 20px |
+| Hero padding (Dashboard today, Academy, profile header) | `p-4 sm:p-5 lg:p-6` | 16 / 20 / 24px |
+| List rows inside a card | `py-2 sm:py-2.5` | 8 / 10px |
+
+Every standard page starts with the header band (see Page headings), then its sections.
+Pages never wrap themselves in an extra outer card; the page panel is the frame.
 - Standard app pages share a centered, fluid content area capped at 1,280px on desktop
   in `HudLayout`. The cap excludes sidebar navigation and page padding. Use pixels here
   because the root font size scales on desktop. Fullscreen Oracle pages use the full workspace.
@@ -113,8 +129,7 @@ page's structure; a title alone does not need its own card.
 - `treatment="compact"` (default): unboxed heading and actions above independent
   sections. Use for section headings inside a page and editor toolbars.
 - `treatment="integrated"`: heading inside an existing workspace surface, separated
-  from its controls/content by a divider. Use for Search, Connections, Activity Stream,
-  Settings and Daily Alignment. The parent supplies padding and section spacing.
+  from its controls/content by a divider. Use for Connections and Daily Alignment. The parent supplies padding and section spacing.
 - `treatment="hero"`: substantial introduction with useful imagery, identity, or
   overview content. Premium uses this explicitly. Dashboard and member profiles
   retain their purpose-built identity compositions.
@@ -123,13 +138,14 @@ page's structure; a title alone does not need its own card.
 the top of the page panel (rounded to the panel's top corners on desktop, flush under
 the top bar on phones) with a `surface-2` fill and a `line-subtle` bottom divider, so it
 stands apart from the `surface-1` panel. Use it as the first element of every standard page
-(Academy, Certificates, Forum, Shop, Progress, Admin, Logic Atlas, Support; Character builds
+(Academy, Certificates, Forum, Shop, Progress, Admin, Logic Atlas, Support, Settings, Search,
+Profile; Character builds
 the same band by hand). On desktop the search pill straddles the band's top-right corner,
 so the band leaves room for it.
 
 One band, the same rows on every page:
 
-1. Section tabs (only for an area with sibling pages: Character, Academy, Admin, Support):
+1. Section tabs (only for an area with sibling pages: Character, Academy, Admin, Support, Profile):
    `HudTitleBandTop` holding `BandSectionNav` or `HudTabs`, level with the pill. The band
    below passes `joined`. Phones scroll this row sideways rather than wrapping it.
 2. Title row: the `h1`, at most one short description line, no eyebrow. `actions` on the

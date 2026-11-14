@@ -59,7 +59,7 @@ export function PremiumOfferPanel({
   return (
     <div
       data-testid="premium-page"
-      className="oracle-max-page space-y-3.5 sm:space-y-5 font-sans relative"
+      className="oracle-max-page space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative"
     >
       <section className="oracle-max-hero relative isolate overflow-hidden rounded-card border border-line-subtle bg-abyss">
         <img

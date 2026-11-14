@@ -198,7 +198,7 @@ export const ConnectionsPage: React.FC<{
     <div
       className={
         view === 'all'
-          ? 'rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 md:p-5 space-y-4 font-sans relative'
+          ? 'rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 lg:p-5 space-y-4 font-sans relative'
           : 'space-y-4 font-sans relative'
       }
     >

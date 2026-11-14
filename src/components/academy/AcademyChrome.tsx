@@ -29,7 +29,7 @@ export const ACADEMY_CARD_LINK = cn(
  * pages that keep a learner's progress pass `membersOnly`.
  */
 export function AcademyFrame({ children, membersOnly = false }: { children: React.ReactNode; membersOnly?: boolean }) {
-  const page = <div className="space-y-3.5 sm:space-y-5 font-sans relative">{children}</div>
+  const page = <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative">{children}</div>
   if (!membersOnly) return page
   return (
     <GuestLockGuard featureName="Molt Academy" message={ACADEMY_COPY.guestLock}>
@@ -238,7 +238,7 @@ export function AcademyCover({
 export function AcademyMissing({ message }: { message: string }) {
   return (
     <AcademyFrame>
-      <div className={cn(ACADEMY_CARD, 'p-5 sm:p-6 space-y-3')}>
+      <div className={cn(ACADEMY_CARD, 'p-4 sm:p-5 lg:p-6 space-y-3')}>
         <p className="text-sm text-ink">{message}</p>
         <Link to="/academy" className={ACADEMY_TEXT_ACTION}>
           Back to Academy

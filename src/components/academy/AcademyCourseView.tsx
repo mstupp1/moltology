@@ -61,11 +61,11 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
   let lessonNumber = 0
 
   return (
-    <div className="space-y-4 sm:space-y-5">
+    <div className="space-y-3 sm:space-y-4 lg:space-y-5">
       <AcademyCrumbs items={[{ label: detail.title }]} />
 
       <header className={cn(ACADEMY_CARD, 'overflow-hidden grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,320px)]')}>
-        <div className="p-5 sm:p-6 space-y-3 order-2 md:order-1">
+        <div className="p-4 sm:p-5 lg:p-6 space-y-3 order-2 md:order-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-cyan-glow">{detail.code}</span>
             <LevelMark level={detail.level} />
@@ -114,7 +114,7 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-4 items-start">
         <div className="space-y-4 order-2 lg:order-1">
-          <section className={cn(ACADEMY_CARD, 'p-4 sm:p-5 space-y-4')} aria-labelledby="about-heading">
+          <section className={cn(ACADEMY_CARD, 'p-3 sm:p-4 lg:p-5 space-y-4')} aria-labelledby="about-heading">
             <h2 id="about-heading" className="font-grotesk text-sm font-bold tracking-[0.08em] uppercase text-ink">
               About this course
             </h2>

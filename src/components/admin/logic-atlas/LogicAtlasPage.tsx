@@ -201,7 +201,6 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
           treatment="band"
           joined
           title="Logic Atlas"
-          description="How the app's rules fit together, where each one lives in code, and why it was decided."
         />
       </div>
       <section className="grid grid-cols-2 gap-2.5 lg:grid-cols-4" aria-label="Atlas summary">
@@ -245,7 +244,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
         </div>
       ) : null}
 
-      <div className="rounded-card bg-surface-1 p-4 space-y-2.5">
+      <div className="rounded-card bg-surface-1 p-3 sm:p-4 space-y-2.5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <div className="flex gap-1" role="tablist" aria-label="Atlas views">
             {(

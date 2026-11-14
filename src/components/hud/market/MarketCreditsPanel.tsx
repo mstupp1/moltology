@@ -14,7 +14,7 @@ export function MarketCreditsPanel({
   onBuy?: (pack: MoltCreditPack) => void
 }) {
   return (
-    <section className="rounded-card border border-line-subtle bg-surface-1 p-4">
+    <section className="rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1">
         <h2 className="text-sm font-semibold text-ink">Molt Credits</h2>
         {live ? null : (

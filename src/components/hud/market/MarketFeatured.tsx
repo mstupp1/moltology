@@ -124,7 +124,7 @@ export function MarketFeatured({
               type="button"
               onClick={() => onOpenPiece(hero.piece)}
               className={cn(
-                'group relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 overflow-hidden rounded-card border-2 bg-surface-1 p-4 sm:p-5 text-left hover:bg-surface-2 transition-colors',
+                'group relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 overflow-hidden rounded-card border-2 bg-surface-1 p-3 sm:p-4 lg:p-5 text-left hover:bg-surface-2 transition-colors',
                 RARITY_FRAME[hero.resolved.variant.rarity].frame,
                 focusRing,
               )}
@@ -233,7 +233,7 @@ function BundleTile({
       aria-label={`${bundle.name} bundle, ${items.length} pieces`}
       className={cn(
         'flex flex-col gap-2 rounded-card border-2 border-line bg-surface-1 p-3 text-left hover:bg-surface-2 transition-colors',
-        large && 'p-4 sm:p-5 gap-3',
+        large && 'p-3 sm:p-4 lg:p-5 gap-3',
         focusRing,
         className,
       )}

@@ -80,14 +80,13 @@ export function AdminOversightHub({ tab = 'watch' }: { tab?: AdminTab }) {
 
   const flags = telemetry?.pendingFlags ?? null
   return (
-    <div className="space-y-4 sm:space-y-5 font-sans" data-testid="admin-oversight-hub">
+    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans" data-testid="admin-oversight-hub">
       <div>
         <AdminSectionNav current={tab} />
         <HudTitlePanel
           treatment="band"
           joined
           title="Admin"
-          description="Moderation, members, store orders and system status."
           actions={
             <div className="flex items-end gap-5 sm:gap-6" data-testid="admin-telemetry" aria-label="System status" role="group">
               <BandStat label="Pending flags" value={flags === null ? '—' : String(flags)} tone={flags ? 'amber' : 'ink'} />

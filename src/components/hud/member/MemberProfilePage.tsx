@@ -121,7 +121,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
 
   if (error || !profile) {
     return (
-      <div className="space-y-3.5 sm:space-y-5 font-sans relative">
+      <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative">
         <div className="rounded-card p-5 border border-crimson-aggro/40 bg-surface-crimson hud-sheen text-crimson-text">
           <h1 className="font-grotesk text-sm font-bold uppercase tracking-[0.08em]">Profile unavailable</h1>
           <p className="text-xs mt-2 text-ink-muted">{error || 'Member not found.'}</p>
@@ -143,7 +143,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
   const auditTaken = sheet.source === 'audit' && profile.moltmax?.score != null
 
   return (
-    <div className="space-y-3.5 sm:space-y-5 font-sans relative">
+    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative">
       <section
         aria-labelledby="member-name"
         className="relative overflow-hidden rounded-card border border-line-subtle bg-surface-1 shadow-sheen-inset"
@@ -153,7 +153,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_90%_at_0%_0%,rgba(0,195,255,0.14),transparent_55%)]"
         />
-        <div className="relative p-4 sm:p-6 space-y-5">
+        <div className="relative p-4 sm:p-5 lg:p-6 space-y-5">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 text-center sm:text-left">
             <button
               type="button"
@@ -294,7 +294,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
 
       <section
         aria-label="Stats and gear"
-        className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-4 sm:p-5 grid grid-cols-1 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] gap-5 lg:gap-8"
+        className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 lg:p-5 grid grid-cols-1 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] gap-5 lg:gap-8"
       >
         <VectorSheetPanel sheet={sheet} self={isSelf} bare hideRating />
         <div className="space-y-3 min-w-0 lg:border-l lg:border-line-subtle lg:pl-8 max-lg:border-t max-lg:border-line-subtle max-lg:pt-4">

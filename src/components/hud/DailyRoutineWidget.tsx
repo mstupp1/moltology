@@ -436,7 +436,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
     <HudGhostWidget isLoading={isLoading || isAlignmentLoading} skeleton={<DailyRoutineGhost />}>
       <section
         id={DAILY_ALIGNMENT_HUB_ID}
-        className="min-w-0 rounded-card bg-surface-1 p-4 sm:p-5 space-y-4 font-sans overflow-hidden scroll-mt-24"
+        className="min-w-0 rounded-card bg-surface-1 p-3 sm:p-4 lg:p-5 space-y-4 font-sans overflow-hidden scroll-mt-24"
       >
         <HudTitlePanel
           treatment="integrated"

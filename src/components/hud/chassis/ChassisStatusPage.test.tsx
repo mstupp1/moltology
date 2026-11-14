@@ -103,7 +103,7 @@ describe('unified character workspace', () => {
     expect(preview().equipment.head.visualKey).toBe('creator-bow')
     expect(saveCharacterFn).not.toHaveBeenCalled()
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled()
-    fireEvent.click(screen.getByRole('button', { name: 'Discard' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Discard changes' }))
     expect(preview().equipment.head.visualKey).toBe('soft-shell-visor')
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled()
   })

@@ -223,7 +223,7 @@ function ForumIndexPage() {
 
   return (
     <ForumShell>
-      <div className="space-y-4 sm:space-y-5 font-sans relative pb-8">
+      <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative pb-8">
         <HudTitlePanel
           treatment="band"
           title="Forum"
@@ -247,7 +247,7 @@ function ForumIndexPage() {
 
         <ForumBoardNav boards={categoriesState} variant="strip" className="lg:hidden" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 items-start">
           <div className="lg:col-span-8 space-y-4 min-w-0">
             <InlineTopicComposer
               ref={composerRef}
@@ -267,7 +267,7 @@ function ForumIndexPage() {
             />
 
             <section aria-labelledby="forum-posts-heading" className="min-w-0 space-y-3">
-              <header className="space-y-3 rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3.5 sm:p-5">
+              <header className="space-y-3 rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 lg:p-5">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <h2 id="forum-posts-heading" className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
                     <MessageSquare className="w-4 h-4 text-cyan-glow" aria-hidden="true" />
