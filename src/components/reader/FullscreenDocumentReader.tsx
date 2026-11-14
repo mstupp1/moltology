@@ -433,7 +433,7 @@ export function FullscreenDocumentReader({
           onClick={handleViewportPointer}
           onMouseMove={revealChrome}
         >
-          <div className="codex-reader-well min-h-full flex justify-center items-start px-2 sm:px-6 py-6 sm:py-10 pb-24">
+          <div className="codex-reader-well min-h-full flex justify-center items-start md:px-6 md:py-10 md:pb-24">
             {renderItem({ zoom, pageWidth })}
           </div>
         </div>

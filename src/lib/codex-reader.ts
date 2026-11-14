@@ -1,7 +1,6 @@
 /** Canonical paper width for the Sacred Codex reading sheet, in CSS pixels (matches max-w-3xl / 48rem). */
 export const CODEX_PAGE_WIDTH = 768
 export const CODEX_PAGE_MIN_WIDTH = 300
-export const CODEX_MOBILE_GUTTER = 20
 export const CODEX_DESKTOP_GUTTER = 96
 export const CODEX_COMPACT_BREAKPOINT = 768
 
@@ -28,11 +27,13 @@ export function isCompactCodexViewport(viewportWidth: number): boolean {
 }
 
 export function resolveCodexPageWidth(viewportWidth: number): number {
-  const compact = isCompactCodexViewport(viewportWidth)
-  const gutter = compact ? CODEX_MOBILE_GUTTER : CODEX_DESKTOP_GUTTER
+  // Phones and small tablets: the paper runs edge to edge with no outer gutter.
+  if (isCompactCodexViewport(viewportWidth)) {
+    return Math.max(0, Math.min(CODEX_PAGE_WIDTH, viewportWidth))
+  }
   return Math.max(
     CODEX_PAGE_MIN_WIDTH,
-    Math.min(CODEX_PAGE_WIDTH, viewportWidth - gutter)
+    Math.min(CODEX_PAGE_WIDTH, viewportWidth - CODEX_DESKTOP_GUTTER)
   )
 }
 
