@@ -3,6 +3,11 @@
   "ignoreCommand": "bash scripts/vercel-ignore-build.sh",
   "redirects": [
     {
+      "source": "/alignment",
+      "destination": "/dashboard",
+      "permanent": true
+    },
+    {
       "source": "/premium",
       "destination": "/max",
       "permanent": true

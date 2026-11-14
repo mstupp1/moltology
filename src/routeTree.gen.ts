@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HudRouteImport } from './routes/_hud'
+import { Route as AlignmentRouteImport } from './routes/alignment'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ChassisRouteImport } from './routes/chassis'
 import { Route as CodexDotmdRouteImport } from './routes/codex[.]md'
@@ -43,7 +44,6 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TermsDotmdRouteImport } from './routes/terms[.]md'
 import { Route as WatchRouteImport } from './routes/watch'
 import { Route as WhatIsMoltologyRouteImport } from './routes/what-is-moltology'
-import { Route as HudAlignmentRouteImport } from './routes/_hud/alignment'
 import { Route as HudCharacterRouteImport } from './routes/_hud/character'
 import { Route as HudCodexRouteRouteImport } from './routes/_hud/codex/route'
 import { Route as HudDashboardRouteImport } from './routes/_hud/dashboard'
@@ -106,6 +106,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const HudRoute = HudRouteImport.update({
   id: '/_hud',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AlignmentRoute = AlignmentRouteImport.update({
+  id: '/alignment',
+  path: '/alignment',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -267,11 +272,6 @@ const WhatIsMoltologyRoute = WhatIsMoltologyRouteImport.update({
   id: '/what-is-moltology',
   path: '/what-is-moltology',
   getParentRoute: () => rootRouteImport,
-} as any)
-const HudAlignmentRoute = HudAlignmentRouteImport.update({
-  id: '/alignment',
-  path: '/alignment',
-  getParentRoute: () => HudRoute,
 } as any)
 const HudCharacterRoute = HudCharacterRouteImport.update({
   id: '/character',
@@ -555,6 +555,7 @@ const HudAcademyCoursesSlugLessonsLessonSlugRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/alignment': typeof AlignmentRoute
   '/auth': typeof AuthRoute
   '/chassis': typeof ChassisRoute
   '/codex.md': typeof CodexDotmdRoute
@@ -588,7 +589,6 @@ export interface FileRoutesByFullPath {
   '/watch': typeof WatchRoute
   '/what-is-moltology': typeof WhatIsMoltologyRouteWithChildren
   '/codex': typeof HudCodexRouteRouteWithChildren
-  '/alignment': typeof HudAlignmentRoute
   '/character': typeof HudCharacterRoute
   '/dashboard': typeof HudDashboardRoute
   '/hud': typeof HudHudRoute
@@ -645,6 +645,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/alignment': typeof AlignmentRoute
   '/auth': typeof AuthRoute
   '/chassis': typeof ChassisRoute
   '/codex.md': typeof CodexDotmdRoute
@@ -675,7 +676,6 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
   '/watch': typeof WatchRoute
-  '/alignment': typeof HudAlignmentRoute
   '/character': typeof HudCharacterRoute
   '/dashboard': typeof HudDashboardRoute
   '/hud': typeof HudHudRoute
@@ -733,6 +733,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_hud': typeof HudRouteWithChildren
+  '/alignment': typeof AlignmentRoute
   '/auth': typeof AuthRoute
   '/chassis': typeof ChassisRoute
   '/codex.md': typeof CodexDotmdRoute
@@ -766,7 +767,6 @@ export interface FileRoutesById {
   '/watch': typeof WatchRoute
   '/what-is-moltology': typeof WhatIsMoltologyRouteWithChildren
   '/_hud/codex': typeof HudCodexRouteRouteWithChildren
-  '/_hud/alignment': typeof HudAlignmentRoute
   '/_hud/character': typeof HudCharacterRoute
   '/_hud/dashboard': typeof HudDashboardRoute
   '/_hud/hud': typeof HudHudRoute
@@ -825,6 +825,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/alignment'
     | '/auth'
     | '/chassis'
     | '/codex.md'
@@ -858,7 +859,6 @@ export interface FileRouteTypes {
     | '/watch'
     | '/what-is-moltology'
     | '/codex'
-    | '/alignment'
     | '/character'
     | '/dashboard'
     | '/hud'
@@ -915,6 +915,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/alignment'
     | '/auth'
     | '/chassis'
     | '/codex.md'
@@ -945,7 +946,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/terms.md'
     | '/watch'
-    | '/alignment'
     | '/character'
     | '/dashboard'
     | '/hud'
@@ -1002,6 +1002,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_hud'
+    | '/alignment'
     | '/auth'
     | '/chassis'
     | '/codex.md'
@@ -1035,7 +1036,6 @@ export interface FileRouteTypes {
     | '/watch'
     | '/what-is-moltology'
     | '/_hud/codex'
-    | '/_hud/alignment'
     | '/_hud/character'
     | '/_hud/dashboard'
     | '/_hud/hud'
@@ -1094,6 +1094,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HudRoute: typeof HudRouteWithChildren
+  AlignmentRoute: typeof AlignmentRoute
   AuthRoute: typeof AuthRoute
   ChassisRoute: typeof ChassisRoute
   CodexDotmdRoute: typeof CodexDotmdRoute
@@ -1160,6 +1161,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof HudRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alignment': {
+      id: '/alignment'
+      path: '/alignment'
+      fullPath: '/alignment'
+      preLoaderRoute: typeof AlignmentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -1385,13 +1393,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/what-is-moltology'
       preLoaderRoute: typeof WhatIsMoltologyRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_hud/alignment': {
-      id: '/_hud/alignment'
-      path: '/alignment'
-      fullPath: '/alignment'
-      preLoaderRoute: typeof HudAlignmentRouteImport
-      parentRoute: typeof HudRoute
     }
     '/_hud/character': {
       id: '/_hud/character'
@@ -1806,7 +1807,6 @@ const HudAcademyCoursesSlugRouteWithChildren =
 
 interface HudRouteChildren {
   HudCodexRouteRoute: typeof HudCodexRouteRouteWithChildren
-  HudAlignmentRoute: typeof HudAlignmentRoute
   HudCharacterRoute: typeof HudCharacterRoute
   HudDashboardRoute: typeof HudDashboardRoute
   HudHudRoute: typeof HudHudRoute
@@ -1835,7 +1835,6 @@ interface HudRouteChildren {
 
 const HudRouteChildren: HudRouteChildren = {
   HudCodexRouteRoute: HudCodexRouteRouteWithChildren,
-  HudAlignmentRoute: HudAlignmentRoute,
   HudCharacterRoute: HudCharacterRoute,
   HudDashboardRoute: HudDashboardRoute,
   HudHudRoute: HudHudRoute,
@@ -1901,6 +1900,7 @@ const WhatIsMoltologyRouteWithChildren = WhatIsMoltologyRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HudRoute: HudRouteWithChildren,
+  AlignmentRoute: AlignmentRoute,
   AuthRoute: AuthRoute,
   ChassisRoute: ChassisRoute,
   CodexDotmdRoute: CodexDotmdRoute,

@@ -25,6 +25,7 @@ describe('renamed page redirects', () => {
     ['/connections', '/profile?tab=friends'],
     ['/friends', '/profile?tab=friends'],
     ['/landing', '/'],
+    ['/alignment', '/dashboard'],
     ['/premium', '/max'],
     ['/watch', '/admin?tab=watch'],
     ['/admin/store', '/admin?tab=store'],
