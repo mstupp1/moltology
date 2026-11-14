@@ -1287,6 +1287,35 @@ export const saveAvatarStillFn = createServerFn({ method: 'POST' })
     return saveAvatarStillHandler(args)
   })
 
+/** The forum's group photo, and whether this visitor's browser should retake it. */
+export const getCommunityPhotoFn = createServerFn({ method: 'GET' })
+  .middleware(publicMiddleware)
+  .handler(async () => {
+    const { getCommunityPhotoHandler } = await import('./community-photo')
+    return getCommunityPhotoHandler()
+  })
+
+/** Store a group photo drawn by a signed-in visitor's browser, when a retake is due. */
+export const saveCommunityPhotoFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: import('./community-photo').SaveCommunityPhotoInput) =>
+    z
+      .object({
+        token: z.string().optional(),
+        userId: z.string().optional(),
+        castHash: z.string().min(1).max(32),
+        image: z.string().min(32).max(2_100_000),
+        spots: z
+          .array(z.object({ id: z.string().min(1).max(64), x: z.number(), y: z.number(), r: z.number() }))
+          .max(64),
+      })
+      .parse(data),
+  )
+  .handler(async (args) => {
+    const { saveCommunityPhotoHandler } = await import('./community-photo')
+    return saveCommunityPhotoHandler(args)
+  })
+
 /** One explicit save for the complete character draft. Render snapshots are server-owned. */
 export const saveCharacterFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)

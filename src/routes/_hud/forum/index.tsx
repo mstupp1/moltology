@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus, MessageSquare, ShieldCheck, Search, LayoutGrid, SearchX } from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
+import { CommunityPhoto } from '@/components/forum/CommunityPhoto'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { HudButton } from '@/components/ui/HudButton'
 import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
@@ -244,6 +245,8 @@ function ForumIndexPage() {
             </>
           }
         />
+
+        <CommunityPhoto />
 
         <ForumBoardNav boards={categoriesState} variant="strip" className="lg:hidden" />
 
