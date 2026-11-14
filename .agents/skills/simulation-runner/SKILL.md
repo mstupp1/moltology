@@ -40,6 +40,14 @@ Blog comments run in both Gateway and prepare/apply modes. The newest 30 publish
 
 After applying each tick, query the production database to confirm the returned topic/reply IDs exist. Report the production target, actual inserted activity, and a verified `https://moltology.org/forum/<categorySlug>/<topicSlug>` link when a topic or reply was created. A successful command or `dryRun=false` alone does not prove the production app received it. Save target and verification in automation memory. Do not repeat a committed tick just because later verification fails; investigate the committed IDs first.
 
+### Simulated member looks
+
+Simulated members must look varied in the forum group photo and on profiles. A seed-only `avatarConfig` renders every bot as the same default red or orange lobster, so never write one.
+
+- **New spawns:** the engine saves `rollSimulatedAvatarConfig()` from `src/lib/simulated-avatar.ts`. It picks a random race, shell colour and finish, marking, head shape, build, height, eyes and backdrop from the creator's options, and pins every trait. Claws and accessory are left to gear, as in a member's own save.
+- **Re-rolling existing bots:** `run simulate:reroll-avatars` (production wrapper for prod) prints new looks without writing. Add `-- --apply` to save them. It splits races evenly and deals shell colours from a shuffled deck, so colours do not repeat until all have been used. It updates only `isSimulated = true` rows (`avatarConfig`, `appearanceRevision + 1`). Never edit real members' characters.
+- Writing to production requires the user's go-ahead first, outside a normal simulation run. The group photo retakes itself on the next forum visit once its cast changed and the photo is at least a day old.
+
 ---
 
 ## 1. Architecture & Execution Modes
