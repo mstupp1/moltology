@@ -5,7 +5,6 @@ import { MessageSquare, Eye } from 'lucide-react'
 import type { ForumTopicEntry } from '@/lib/server/api'
 import { FORUM_WITHDRAWN_PREVIEW, isForumEntryWithdrawn, relativeTime } from '@/lib/forum-utils'
 import { FORUM_UNREAD_LABEL } from '@/lib/forum-visits'
-import { cn } from '@/lib/utils'
 import { VoteButton, StageBadge, PinBadge, LockBadge, WithdrawnBadge, ForumUnreadMark } from './ForumBits'
 import { ForumAvatar } from './ForumAvatar'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
@@ -42,17 +41,10 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
 
   return (
     <article
-      className={cn(
-        'group relative flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-card border bg-surface-1 hud-sheen transition-colors hover:bg-surface-2 hover:border-line',
-        topic.unread ? 'border-line-subtle border-l-2 border-l-cyan-glow' : 'border-line-subtle',
-      )}
+      className="group relative p-3 sm:p-4 rounded-card border border-line-subtle bg-surface-1 hud-sheen transition-colors hover:bg-surface-2 hover:border-line"
       data-testid="forum-topic-row"
     >
-      <div className="relative z-10">
-        <VoteButton count={topic.upvotes} voted={topic.voted} targetId={topic.id} targetType="topic" size="sm" />
-      </div>
-
-      <div className="min-w-0 flex-1 space-y-1.5">
+      <div className="min-w-0 space-y-1.5">
         {hasMeta && (
           <div className="flex flex-wrap items-center gap-2 text-[11px] text-ink-muted">
             {showBoard && (
@@ -81,7 +73,7 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
             {topic.title}
           </Link>
         </h3>
-        <p className="text-xs text-ink-muted leading-relaxed line-clamp-1 sm:line-clamp-2">
+        <p className="text-xs text-ink-muted leading-relaxed line-clamp-2">
           {withdrawn ? FORUM_WITHDRAWN_PREVIEW : topic.content}
         </p>
 
@@ -104,13 +96,16 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
           </span>
           <LocalTime value={topic.createdAt} format={relativeTime} />
 
-          <span className="ml-auto flex items-center gap-3 tabular-nums">
-            <span className="flex items-center gap-1" title={`${topic.repliesCount} replies`}>
+          <span className="ml-auto flex items-center gap-1 tabular-nums">
+            <span className="relative z-10">
+              <VoteButton count={topic.upvotes} voted={topic.voted} targetId={topic.id} targetType="topic" size="inline" />
+            </span>
+            <span className="flex items-center gap-1 px-2 py-1" title={`${topic.repliesCount} replies`}>
               <MessageSquare className="w-3.5 h-3.5" aria-hidden="true" />
               <span>{topic.repliesCount}</span>
               <span className="sr-only">replies</span>
             </span>
-            <span className="flex items-center gap-1" title={`${topic.views} views`}>
+            <span className="hidden sm:flex items-center gap-1 px-2 py-1" title={`${topic.views} views`}>
               <Eye className="w-3.5 h-3.5" aria-hidden="true" />
               <span>{topic.views}</span>
               <span className="sr-only">views</span>

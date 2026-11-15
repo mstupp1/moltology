@@ -29,7 +29,7 @@ export function ForumRevisedMark({
   if (!isForumEntryRevised({ createdAt, updatedAt, deletedAt }) || !updatedAt) return null
   return (
     <span className="text-[11px] text-ink-muted" data-testid="forum-revised-mark">
-      Revised <LocalTime value={updatedAt} format={relativeTime} />
+      Edited <LocalTime value={updatedAt} format={relativeTime} />
     </span>
   )
 }
@@ -56,7 +56,7 @@ export function ForumAuthorTools({
         data-testid="forum-withdraw-confirm"
       >
         <span className="text-ink-muted">
-          Withdraw this transmission? The body will be sealed. Replies stay in the thread.
+          Withdraw this post? Its text will be hidden. Replies stay.
         </span>
         <button
           type="button"
@@ -85,17 +85,17 @@ export function ForumAuthorTools({
         type="button"
         onClick={onRevise}
         disabled={busy}
-        className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+        className="inline-flex items-center gap-1 px-2 min-h-8 text-[11px] font-bold uppercase tracking-[0.08em] rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         data-testid="forum-revise"
       >
         <Pencil className="w-3 h-3" />
-        Revise
+        Edit
       </button>
       <button
         type="button"
         onClick={onStartWithdraw}
         disabled={busy}
-        className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] rounded-control text-ink-muted hover:text-crimson-text hover:bg-crimson-soft transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+        className="inline-flex items-center gap-1 px-2 min-h-8 text-[11px] font-bold uppercase tracking-[0.08em] rounded-control text-ink-muted hover:text-crimson-text hover:bg-crimson-soft transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         data-testid="forum-withdraw"
       >
         <Undo2 className="w-3 h-3" />

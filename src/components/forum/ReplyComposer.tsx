@@ -11,9 +11,12 @@ import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { ForumEditor, type ForumEditorHandle } from '@/components/forum/ForumEditor'
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { prependForumQuote } from '@/lib/forum-quotes'
+import { HudButton } from '@/components/ui/HudButton'
 
 export type ReplyComposerHandle = {
   insertQuote: (markup: string) => void
+  /** Opens a collapsed composer, scrolls it into view and focuses the editor. */
+  open: () => void
 }
 
 export const ReplyComposer = forwardRef<
@@ -26,6 +29,8 @@ export const ReplyComposer = forwardRef<
     onCancel?: () => void
     compact?: boolean
     autoFocus?: boolean
+    /** Starts as a one-line "Write a reply" bar that opens into the editor. */
+    collapsible?: boolean
   }
 >(function ReplyComposer(
   {
@@ -36,6 +41,7 @@ export const ReplyComposer = forwardRef<
     onCancel,
     compact = false,
     autoFocus = false,
+    collapsible = false,
   },
   ref,
 ) {
@@ -47,6 +53,18 @@ export const ReplyComposer = forwardRef<
   const [content, setContent] = useState(initialContent)
   const [posting, setPosting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [expanded, setExpanded] = useState(!collapsible)
+  const [focusOnOpen, setFocusOnOpen] = useState(autoFocus)
+  const rootRef = useRef<HTMLDivElement>(null)
+
+  const openComposer = () => {
+    setFocusOnOpen(true)
+    setExpanded(true)
+    requestAnimationFrame(() => {
+      rootRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      editorRef.current?.focus()
+    })
+  }
 
   useEffect(() => {
     if (!initialContent) return
@@ -56,10 +74,9 @@ export const ReplyComposer = forwardRef<
   useImperativeHandle(ref, () => ({
     insertQuote: (markup: string) => {
       setContent((prev) => prependForumQuote(prev, markup))
-      requestAnimationFrame(() => {
-        editorRef.current?.focus()
-      })
+      openComposer()
     },
+    open: openComposer,
   }))
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -90,6 +107,7 @@ export const ReplyComposer = forwardRef<
       })
       onPosted(post)
       setContent('')
+      if (collapsible) setExpanded(false)
     } catch (err: any) {
       setError(err?.message || 'Failed to post reply. Please try again.')
     } finally {
@@ -105,11 +123,11 @@ export const ReplyComposer = forwardRef<
   if (isPending) {
     return (
       <div
-        className={`${compact ? 'p-3' : 'rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 lg:p-5'} space-y-2.5`}
+        className={`${compact ? 'p-3' : 'rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3'} flex items-center gap-2.5`}
         data-testid="forum-reply-auth-skeleton"
       >
-        <HudGhostSkeleton variant="neutral" preset="text" width="60%" height={14} />
-        <HudGhostSkeleton variant="cyan" preset="button" width={140} height={32} />
+        <HudGhostSkeleton variant="neutral" preset="avatar" width={28} height={28} />
+        <HudGhostSkeleton variant="neutral" preset="text" width="40%" height={14} />
       </div>
     )
   }
@@ -117,55 +135,54 @@ export const ReplyComposer = forwardRef<
   if (!isAuthenticated) {
     return (
       <div
-        className={`${compact ? 'p-3 rounded-card border border-line-subtle bg-abyss/60' : 'rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 lg:p-5'} text-center space-y-2.5`}
+        className={`${compact ? 'p-3 rounded-card border border-line-subtle bg-abyss/60' : 'rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3'} flex flex-wrap items-center justify-between gap-2.5`}
       >
         <p className="text-xs text-ink-muted">Sign in to join the discussion.</p>
+        <HudButton type="button" variant="primary" size="sm" onClick={() => openAuth('signup')}>
+          Sign in / Join
+        </HudButton>
+      </div>
+    )
+  }
+
+  const me = user ? (
+    <ForumAvatar
+      src={user.image || user.avatar || user.picture}
+      authorName={user.name || undefined}
+      userId={userId}
+      size="sm"
+      loading="eager"
+    />
+  ) : null
+
+  if (!expanded) {
+    return (
+      <div ref={rootRef}>
         <button
           type="button"
-          onClick={() => openAuth('signup')}
-          className="px-4 py-1.5 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+          onClick={openComposer}
+          className="w-full flex items-center gap-2.5 p-2.5 sm:p-3 rounded-card border border-line-subtle bg-surface-1 hud-sheen text-left text-sm text-ink-muted hover:bg-surface-2 hover:border-line transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+          data-testid="forum-reply-open"
         >
-          Sign In / Join
+          {me}
+          <span className="flex-1">Write a reply...</span>
         </button>
       </div>
     )
   }
 
   return (
+    <div ref={rootRef}>
     <form
       ref={formRef}
       onSubmit={handleSubmit}
       className={
         compact
           ? 'p-3 rounded-card border border-line-subtle bg-abyss/60 space-y-2.5'
-          : 'rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 lg:p-5 space-y-3'
+          : 'rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 space-y-2.5'
       }
       data-testid={parentId ? 'forum-inline-reply-composer' : 'forum-top-reply-composer'}
     >
-      <div className="flex items-center justify-between border-b border-line-subtle pb-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <h3 className="text-xs font-grotesk font-bold uppercase tracking-[0.08em] text-cyan-glow flex items-center gap-2 shrink-0">
-            <Send className="w-3.5 h-3.5" />
-            <span>{parentId ? 'Reply to comment' : 'Post Reply'}</span>
-          </h3>
-          {user && (
-            <div className="hidden sm:flex items-center gap-1.5 border-l border-line-subtle pl-2 min-w-0 text-[11px] text-ink-muted">
-              <ForumAvatar
-                src={user.image || user.avatar || user.picture}
-                authorName={user.name || undefined}
-                userId={userId}
-                size="xs"
-                className="w-4 h-4 ring-1 ring-line"
-                loading="eager"
-              />
-              <span className="truncate">
-                as <strong className="text-ink">{user.name || 'Initiate'}</strong>
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-
       {error && (
         <div className="p-2.5 bg-crimson-soft border border-crimson-aggro/55 text-crimson-text text-xs flex items-center gap-2 rounded-control">
           <AlertTriangle className="w-4 h-4 shrink-0" />
@@ -180,7 +197,7 @@ export const ReplyComposer = forwardRef<
         onSubmit={handleShortcutSubmit}
         disabled={posting}
         size={compact ? 'compact' : 'default'}
-        autoFocus={autoFocus}
+        autoFocus={focusOnOpen}
         aria-label={parentId ? 'Reply to comment' : 'Write a reply'}
         placeholder="Write a reply. Type @ to mention someone."
         testId="forum-reply-editor"
@@ -191,25 +208,32 @@ export const ReplyComposer = forwardRef<
           Ctrl/Cmd + Enter to post
         </span>
         <div className="flex items-center gap-2 ml-auto">
-          {onCancel && (
-            <button
+          {(onCancel || (collapsible && !content.trim())) && (
+            <HudButton
               type="button"
-              onClick={onCancel}
-              className="px-3 py-1.5 rounded-control text-xs font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                if (onCancel) onCancel()
+                else setExpanded(false)
+              }}
             >
               Cancel
-            </button>
+            </HudButton>
           )}
-          <button
+          <HudButton
             type="submit"
+            variant="primary"
+            size="sm"
+            icon={<Send className="w-3.5 h-3.5" />}
             disabled={posting || forumVisibleLength(content) < 10 || content.trim().length > FORUM_BODY_MAX_CHARS}
-            className="px-4 py-1.5 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             {posting ? 'Posting...' : 'Reply'}
-          </button>
+          </HudButton>
         </div>
       </div>
     </form>
+    </div>
   )
 })
 

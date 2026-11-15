@@ -193,7 +193,7 @@ export function forumCategorySlugsMatch(
 
 /** HUD badge copy for a board topic count: "1 TOPIC" / "0 TOPICS" / "N TOPICS". */
 export function formatForumTopicCount(count: number): string {
-  return `${count} ${count === 1 ? 'TOPIC' : 'TOPICS'}`
+  return `${count} ${count === 1 ? 'post' : 'posts'}`
 }
 
 /**
