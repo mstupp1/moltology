@@ -13,16 +13,20 @@ export function announceFriendRequestCount(incoming: number) {
 /**
  * How many friend requests are waiting for the signed-in member. One shared read per
  * member, refreshed when the tab regains focus; the friends lists push fresh counts
- * through FRIEND_REQUESTS_CHANGED_EVENT.
+ * through FRIEND_REQUESTS_CHANGED_EVENT. `cachedOnly` reads the shared count without fetching.
  */
-export function usePendingFriendRequests(userId: string | null | undefined): number {
+export function usePendingFriendRequests(
+  userId: string | null | undefined,
+  { cachedOnly = false }: { cachedOnly?: boolean } = {},
+): number {
   const client = useAppQueryClient()
   const query = useAppQuery<number>({
     queryKey: userId ? accountKeys.friendRequests(userId) : ['account', null, 'friend-requests'],
     // A single count query; the badge never needs the friends list itself.
     queryFn: async () =>
       (await countPendingFriendRequestsFn({ data: { token: await authToken() } }))?.incoming ?? 0,
-    enabled: Boolean(userId),
+    // cachedOnly: show a count another screen already read, never fetch one (public pages).
+    enabled: Boolean(userId) && !cachedOnly,
     refetchOnWindowFocus: true,
     staleTime: 0,
   })

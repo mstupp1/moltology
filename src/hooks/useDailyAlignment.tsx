@@ -93,7 +93,26 @@ export interface AlignmentContextValue {
 
 const AlignmentContext = createContext<AlignmentContextValue | null>(null)
 
-export function AlignmentProvider({ children }: { children: React.ReactNode }) {
+/** How long a server read stays good enough for a provider that remounts often (public pages). */
+const RECENT_SYNC_MS = 5 * 60_000
+/** Last successful server read per member, for this tab only; a full page load always reads once. */
+const recentSync = new Map<string, { date: string; at: number }>()
+
+function syncedRecently(userId: string, date: string): boolean {
+  const last = recentSync.get(userId)
+  return Boolean(last && last.date === date && Date.now() - last.at < RECENT_SYNC_MS)
+}
+
+export interface AlignmentProviderProps {
+  children: React.ReactNode
+  /**
+   * Skip the mount read when this tab read today's alignment in the last few minutes and the
+   * saved copy is current. For the public header, which remounts on every public page.
+   */
+  reuseRecentSync?: boolean
+}
+
+export function AlignmentProvider({ children, reuseRecentSync = false }: AlignmentProviderProps) {
   const session = useAuthSession()
   const userId = session.userId
   const isAuthPending = session.isPending
@@ -268,6 +287,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
         setServerXp(data.xp ?? 0)
         setServerStage(data.stage ?? 1)
         setServerXpUserId(userId)
+        recentSync.set(userId, { date: targetDate, at: Date.now() })
         setCachedProgressSnapshot(userId, {
           date: targetDate,
           xp: data.xp ?? 0,
@@ -350,12 +370,26 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     currentDateRef.current = today
 
     if (userId) {
+      const progress = reuseRecentSync ? getCachedProgressSnapshot(userId) : null
+      if (
+        reuseRecentSync &&
+        syncedRecently(userId, today) &&
+        getFreshAlignmentSnapshot(userId, today) &&
+        progress?.date === today
+      ) {
+        // Seeded from the saved copy above, which this tab confirmed minutes ago.
+        setServerXpUserId(userId)
+        hasTrustworthyCountRef.current = true
+        initialFetchDoneRef.current = true
+        setIsLoading(false)
+        return
+      }
       fetchAlignment(today, hasTrustworthyCountRef.current)
     } else if (!isAuthPending) {
       hasTrustworthyCountRef.current = true
       setIsLoading(false)
     }
-  }, [userId, isAuthPending, fetchAlignment])
+  }, [userId, isAuthPending, fetchAlignment, reuseRecentSync])
 
   // Check for local calendar date turnover on window focus
   useEffect(() => {

@@ -13,6 +13,8 @@ import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { xpRingGeometry } from '@/components/hud/XpRing'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useAccountProfile } from '@/hooks/useAccountProfile'
+import { AlignmentProvider } from '@/hooks/useDailyAlignment'
+import { usePendingFriendRequests } from '@/hooks/usePendingFriendRequests'
 import { parseLobsterAvatarConfig } from '@/lib/lobster-avatar'
 import { getEffectiveRole } from '@/lib/permissions'
 import { resolveMemberPublicName } from '@/lib/member-handle'
@@ -31,6 +33,18 @@ export interface PublicHeaderAuthSlotProps {
 const focusRing =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 
+
+/**
+ * XP and today's tasks for the account medallion, as in the app. Members only: guests get
+ * no provider. One provider covers the phone bar and the desktop slot (both stay mounted),
+ * and it reuses a read this tab made in the last few minutes, so moving between public
+ * pages does not ask the server again.
+ */
+export function PublicHeaderAccountProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useAuthSession()
+  if (!user) return <>{children}</>
+  return <AlignmentProvider reuseRecentSync>{children}</AlignmentProvider>
+}
 
 /** Same member details the app's top bar uses, from the shared cached profile. */
 function useMemberChrome() {
@@ -59,6 +73,8 @@ export function PublicHeaderAuthSlot({
   menuButton,
 }: PublicHeaderAuthSlotProps) {
   const { user, isPending, userRole, displayName } = useMemberChrome()
+  // Only a count the app already read; public pages never fetch it.
+  const pendingFriendRequests = usePendingFriendRequests(user?.id, { cachedOnly: true })
 
   if (layout === 'bar') {
     const ring = xpRingGeometry('phone')
@@ -91,6 +107,7 @@ export function PublicHeaderAuthSlot({
               user={user}
               userRole={userRole}
               displayName={displayName}
+              pendingFriendRequests={pendingFriendRequests}
               onNavigate={onNavigate}
             />
           </span>
@@ -116,6 +133,7 @@ export function PublicHeaderAuthSlot({
             user={user}
             userRole={userRole}
             displayName={displayName}
+            pendingFriendRequests={pendingFriendRequests}
             onNavigate={onNavigate}
           />
         </div>
