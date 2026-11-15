@@ -2,6 +2,7 @@ import React from 'react'
 import { renderHook, act, waitFor, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { AlignmentProvider, useDailyAlignment } from './useDailyAlignment'
+import { reportAlignmentAction } from '@/lib/alignment-actions'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 import { CANONICAL_ALIGNMENT_TASKS, mergeCompletions, localDateString, shiftDays } from '@/lib/alignment-tasks'
 import { getCachedAlignmentSnapshot, setCachedAlignmentSnapshot } from '@/lib/alignment-snapshot'
@@ -287,6 +288,21 @@ describe('useDailyAlignment Hook Optimistic State & Rapid Clicks', () => {
     expect(result.current.tasks[1].completed).toBe(true)
     expect(result.current.completedCount).toBe(2)
     expect(toggleSpy).not.toHaveBeenCalled()
+  })
+
+  it('checks off a task when a real action reports it, once', async () => {
+    mockAuthClient.useSession.mockReturnValue({ data: null, isPending: false })
+    const { result } = renderHook(() => useDailyAlignment(), { wrapper })
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+    const index = CANONICAL_ALIGNMENT_TASKS.findIndex((t) => t.key === 'community-outreach')
+
+    act(() => reportAlignmentAction('community-outreach'))
+    expect(result.current.tasks[index].completed).toBe(true)
+    expect(result.current.completedCount).toBe(1)
+
+    act(() => reportAlignmentAction('community-outreach'))
+    act(() => reportAlignmentAction('not-a-task'))
+    expect(result.current.completedCount).toBe(1)
   })
 
   it('keeps guest ticks on this device across a reload', async () => {

@@ -5,11 +5,43 @@ import { HudButton } from '@/components/ui/HudButton'
 import { createSilentSynchronizationBridge } from './silentSynchronizationBridge'
 import './silent-synchronization.css'
 import {
+  DEEP_WORK_PRESETS,
+  formatTimerClock,
   getSilentSyncProgress,
   SILENT_SYNC_PRESETS,
   silentSyncDurationMs,
   type SilentSyncMinutes,
 } from './silentSynchronizationTimer'
+import type { AlignmentPractice } from '@/lib/alignment-actions'
+
+const PRACTICE_COPY: Record<AlignmentPractice, {
+  eyebrow: string
+  title: string
+  aria: string
+  instructions: string
+  presets: readonly number[]
+  defaultMinutes: number
+  running: string
+}> = {
+  silent: {
+    eyebrow: 'Quiet practice',
+    title: 'Silent synchronization',
+    aria: 'Silent synchronization timer',
+    instructions: 'Sit quietly while the Oracle synchronizes. Select Start timer to begin. You can stop at any time.',
+    presets: SILENT_SYNC_PRESETS,
+    defaultMinutes: 3,
+    running: 'Syncing',
+  },
+  'deep-work': {
+    eyebrow: 'Focus timer',
+    title: 'Deep work',
+    aria: 'Deep work timer',
+    instructions: 'Pick a length, silence your notifications and work on one thing. You can stop at any time.',
+    presets: DEEP_WORK_PRESETS,
+    defaultMinutes: 25,
+    running: 'Focusing',
+  },
+}
 
 const SynapticEntityCanvas = lazy(() =>
   import('@/components/ai/SynapticEntityCanvas').then((module) => ({ default: module.SynapticEntityCanvas }))
@@ -21,6 +53,8 @@ export interface SilentSynchronizationDialogProps {
   onComplete: () => void
   avatarUrl?: string | null
   avatarName?: string
+  /** Which daily practice this timer is for. */
+  practice?: AlignmentPractice
 }
 
 type SessionState = 'ready' | 'running' | 'complete'
@@ -41,8 +75,10 @@ export function SilentSynchronizationDialog({
   onComplete,
   avatarUrl,
   avatarName = 'Your profile',
+  practice = 'silent',
 }: SilentSynchronizationDialogProps) {
-  const [minutes, setMinutes] = useState<SilentSyncMinutes>(3)
+  const copy = PRACTICE_COPY[practice]
+  const [minutes, setMinutes] = useState<SilentSyncMinutes>(copy.defaultMinutes)
   const [session, setSession] = useState<SessionState>('ready')
   const [startedAt, setStartedAt] = useState<number | null>(null)
   const [now, setNow] = useState(() => Date.now())
@@ -69,13 +105,14 @@ export function SilentSynchronizationDialog({
       completedRef.current = false
       startedRef.current = false
       setSession('ready')
+      setMinutes(copy.defaultMinutes)
       setStartedAt(null)
       setNow(Date.now())
     } else if (!open && previousOpenRef.current) {
       completeOnce()
     }
     previousOpenRef.current = open
-  }, [open, completeOnce])
+  }, [open, completeOnce, copy.defaultMinutes])
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return
@@ -144,8 +181,8 @@ export function SilentSynchronizationDialog({
     <HudBottomSheet
       isOpen={open}
       onClose={handleClose}
-      title="Silent synchronization"
-      ariaLabel="Silent synchronization timer"
+      title={copy.title}
+      ariaLabel={copy.aria}
       showHandle={false}
       contentLayout="fill"
       maxHeight="min(92dvh, 760px)"
@@ -155,8 +192,8 @@ export function SilentSynchronizationDialog({
       <section className="flex max-h-[min(92dvh,760px)] flex-col overflow-y-auto" aria-describedby="silent-sync-instructions">
         <header className="flex items-start justify-between gap-4 border-b border-line-subtle px-5 py-4 sm:px-7">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-cyan-glow">Quiet practice</p>
-            <h2 className="mt-1 font-grotesk text-xl font-bold text-ink sm:text-2xl">Silent synchronization</h2>
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-cyan-glow">{copy.eyebrow}</p>
+            <h2 className="mt-1 font-grotesk text-xl font-bold text-ink sm:text-2xl">{copy.title}</h2>
           </div>
           <HudButton variant="ghost" size="sm" onClick={handleClose} aria-label="Close dialog">
             Close
@@ -165,7 +202,7 @@ export function SilentSynchronizationDialog({
 
         <div className="px-5 pb-6 pt-4 sm:px-7">
           <p id="silent-sync-instructions" className="text-sm leading-relaxed text-ink-body">
-            Sit quietly while the Oracle synchronizes. Select Start timer to begin. You can stop at any time.
+            {copy.instructions}
           </p>
 
           <div className="relative my-5 flex min-h-44 items-center justify-center overflow-hidden rounded-card border border-line-subtle bg-abyss px-4 py-5 sm:min-h-52">
@@ -188,7 +225,7 @@ export function SilentSynchronizationDialog({
                 <span className="sr-only">{avatarName}</span>
               </div>
             </div>
-            <div className="absolute bottom-3 left-0 right-0 text-center text-[11px] uppercase tracking-[0.16em] text-ink-muted">{running ? 'Syncing' : session === 'complete' ? 'Session complete' : 'Ready'}</div>
+            <div className="absolute bottom-3 left-0 right-0 text-center text-[11px] uppercase tracking-[0.16em] text-ink-muted">{running ? copy.running : session === 'complete' ? 'Session complete' : 'Ready'}</div>
           </div>
 
           <div className="flex items-center justify-between gap-3">
@@ -209,19 +246,31 @@ export function SilentSynchronizationDialog({
             <fieldset className="mt-5">
               <legend className="mb-2 text-xs font-medium text-ink-muted">Duration</legend>
               <div className="grid grid-cols-4 gap-2" role="group" aria-label="Timer duration">
-                {SILENT_SYNC_PRESETS.map((preset) => (
+                {copy.presets.map((preset) => (
                   <HudButton
                     key={preset}
                     variant="secondary"
                     aria-pressed={minutes === preset}
                     onClick={() => setMinutes(preset)}
-                    className={minutes === preset ? 'border-cyan-glow bg-cyan-soft' : ''}
+                    className={`!px-1 ${minutes === preset ? 'border-cyan-glow bg-cyan-soft' : ''}`}
                   >
                     {preset} min
                   </HudButton>
                 ))}
               </div>
             </fieldset>
+          ) : practice === 'deep-work' ? (
+            <div className="mt-5">
+              <div className="flex items-end justify-between">
+                <span className="text-xs text-ink-muted">{running ? 'Time left' : 'Time worked'}</span>
+                <span className="font-mono text-2xl tabular-nums text-ink" data-testid="silent-sync-readout">
+                  {formatTimerClock(running ? progress.remainingMs : progress.elapsedMs)}
+                </span>
+              </div>
+              <div className="mt-2 h-2 overflow-hidden rounded-chip bg-surface-3" role="progressbar" aria-label="Timer progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress.progress * 100)}>
+                <div className="h-full rounded-chip bg-cyan-glow transition-[width] duration-200 motion-reduce:transition-none" style={{ width: `${Math.round(progress.progress * 100)}%` }} />
+              </div>
+            </div>
           ) : (
             <div className="mt-5">
               <div className="flex items-end justify-between">

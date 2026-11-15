@@ -6,6 +6,7 @@ import { peekForumVote, resolveForumVoted, writeForumVote } from '@/lib/forum-vo
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useForumAuth } from './ForumShell'
+import { reportAlignmentAction } from '@/lib/alignment-actions'
 
 const STAGE_COLORS: Record<number, string> = {
   4: 'bg-cyan-soft text-cyan-glow border-line-subtle',
@@ -102,6 +103,8 @@ interface VoteButtonProps {
   targetType: 'topic' | 'post'
   onResult?: (res: { upvotes: number; voted: boolean }) => void
   size?: 'sm' | 'md' | 'inline'
+  /** Who wrote it. Upvoting another member's post counts toward Help a member. */
+  authorId?: string | null
 }
 
 export function VoteButton({
@@ -111,6 +114,7 @@ export function VoteButton({
   targetType,
   onResult,
   size = 'md',
+  authorId,
 }: VoteButtonProps) {
   const { isAuthenticated, isPending, userId, openAuth } = useForumAuth()
   const persist = useHudPersist()
@@ -165,6 +169,7 @@ export function VoteButton({
       setLocal({ count: res.upvotes, voted: res.voted })
       writeForumVote(userId, targetId, res.voted)
       onResult?.(res)
+      if (res.voted && authorId && authorId !== userId) reportAlignmentAction('community-outreach')
     } catch (err) {
       console.error('Vote failed:', err)
       setLocal(rollback)

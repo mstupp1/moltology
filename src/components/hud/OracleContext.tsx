@@ -37,6 +37,8 @@ interface OracleContextType {
   clearPendingSkill: () => void
   /** Opens the Oracle on a new chat with this skill turned on. */
   openWithSkill: (skillId: string) => void
+  /** Opens the Oracle on a new chat (used with a waiting draft from a daily task). */
+  openNewChat: () => void
   /** A phone Oracle chat is showing the big synaptic core, so the bottom-bar orb drains into it. */
   coreViewOpen: boolean
   setCoreViewOpen: (open: boolean) => void
@@ -220,6 +222,12 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (mode === 'closed') setMode(isPhone ? 'popout' : lastActiveMode || 'popout')
   }
 
+  const openNewChat = () => {
+    setActiveThreadId(null)
+    const isPhone = typeof window !== 'undefined' && window.innerWidth < 640
+    if (mode === 'closed') setMode(isPhone ? 'popout' : lastActiveMode || 'popout')
+  }
+
   return (
     <OracleContext.Provider
       value={{
@@ -239,6 +247,7 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         pendingSkillId,
         clearPendingSkill: () => setPendingSkillId(null),
         openWithSkill,
+        openNewChat,
         coreViewOpen,
         setCoreViewOpen,
       }}

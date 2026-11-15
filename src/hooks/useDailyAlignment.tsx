@@ -42,6 +42,11 @@ import {
   type ProgressionState,
 } from '@/lib/progression'
 import { SilentSynchronizationDialog } from '@/components/hud/SilentSynchronizationDialog'
+import {
+  ALIGNMENT_ACTION_EVENT,
+  type AlignmentActionDetail,
+  type AlignmentPractice,
+} from '@/lib/alignment-actions'
 import { parseLobsterAvatarConfig } from '@/lib/lobster-avatar'
 import { requestPortrait3D } from '@/lib/avatar3d-portrait-queue'
 import { resolveMemberPublicName } from '@/lib/member-handle'
@@ -74,6 +79,10 @@ export interface AlignmentContextValue {
   toggleTask: (taskKey: string) => Promise<void>
   setTaskCompleted: (taskKey: string, completed: boolean) => Promise<void>
   openSilentSynchronization: () => void
+  /** Opens the timer for Silent Synchronization or Do deep work. */
+  openPractice: (practice: AlignmentPractice) => void
+  /** Signed-in member's id, or null for guests (keys device-only notes such as today's one thing). */
+  memberId: string | null
   refetch: () => Promise<void>
   currentDate: string
   isGuest: boolean
@@ -142,6 +151,7 @@ export function AlignmentProvider({ children, reuseRecentSync = false }: Alignme
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isSyncing, setIsSyncing] = useState<boolean>(false)
   const [silentDialogOpen, setSilentDialogOpen] = useState(false)
+  const [dialogPractice, setDialogPractice] = useState<AlignmentPractice>('silent')
   const [silentDialogDate, setSilentDialogDate] = useState<string | null>(null)
   const silentDialogUserRef = useRef<string | null>(null)
   const [silentAvatarUrl, setSilentAvatarUrl] = useState<string | null>(null)
@@ -640,19 +650,36 @@ export function AlignmentProvider({ children, reuseRecentSync = false }: Alignme
     for (const key of missing) void setTaskCompleted(key, true)
   }, [userId, hasServerStreakBaseline, setTaskCompleted])
 
-  const openSilentSynchronization = useCallback(() => {
+  const openPractice = useCallback((practice: AlignmentPractice) => {
     silentDialogUserRef.current = userIdRef.current
     setSilentDialogDate(currentDateRef.current)
+    setDialogPractice(practice)
     setSilentDialogOpen(true)
     void profileAvatarRef.current()
   }, [])
+  const openSilentSynchronization = useCallback(() => openPractice('silent'), [openPractice])
   const completeSilentSynchronization = useCallback(() => {
     const sameDate = silentDialogDate === currentDateRef.current
     const sameUser = silentDialogUserRef.current === userIdRef.current
     if (sameDate && sameUser) {
-      void setTaskCompleted('silent-synchronization', true)
+      void setTaskCompleted(dialogPractice === 'deep-work' ? 'iterative-refinement' : 'silent-synchronization', true)
     }
-  }, [silentDialogDate, setTaskCompleted])
+  }, [silentDialogDate, dialogPractice, setTaskCompleted])
+
+  // Real actions elsewhere in the app (a forum reply, a finished lesson, an Oracle message)
+  // check off the matching task for today. Already-done tasks stay as they are.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const onAction = (event: Event) => {
+      const key = (event as CustomEvent<AlignmentActionDetail>).detail?.taskKey
+      const task = key ? tasksRef.current.find((t) => t.key === key) : undefined
+      if (!task || task.completed) return
+      void setTaskCompleted(task.key, true)
+      toastRef.current.success(`${task.title} checked off`, { id: `alignment-action-${task.key}` })
+    }
+    window.addEventListener(ALIGNMENT_ACTION_EVENT, onAction)
+    return () => window.removeEventListener(ALIGNMENT_ACTION_EVENT, onAction)
+  }, [setTaskCompleted])
 
   const refetch = useCallback(async () => {
     await fetchAlignment(currentDateRef.current)
@@ -686,6 +713,8 @@ export function AlignmentProvider({ children, reuseRecentSync = false }: Alignme
     toggleTask,
     setTaskCompleted,
     openSilentSynchronization,
+    openPractice,
+    memberId: userId ?? null,
     refetch,
     currentDate,
     isGuest,
@@ -707,6 +736,8 @@ export function AlignmentProvider({ children, reuseRecentSync = false }: Alignme
     toggleTask,
     setTaskCompleted,
     openSilentSynchronization,
+    openPractice,
+    userId,
     refetch,
     currentDate,
     isGuest,
@@ -727,6 +758,7 @@ export function AlignmentProvider({ children, reuseRecentSync = false }: Alignme
         onComplete={completeSilentSynchronization}
         avatarUrl={silentAvatarUrl}
         avatarName={silentAvatarName}
+        practice={dialogPractice}
       />
     </AlignmentContext.Provider>
   )
@@ -762,6 +794,7 @@ function useStandaloneDailyAlignment(): AlignmentContextValue {
     })
   }, [])
   const openSilentSynchronization = useCallback(() => {}, [])
+  const openPractice = useCallback((_practice: AlignmentPractice) => {}, [])
 
   const refetch = useCallback(async () => {}, [])
 
@@ -783,6 +816,8 @@ function useStandaloneDailyAlignment(): AlignmentContextValue {
     toggleTask,
     setTaskCompleted,
     openSilentSynchronization,
+    openPractice,
+    memberId: null,
     refetch,
     currentDate,
     isGuest: true,

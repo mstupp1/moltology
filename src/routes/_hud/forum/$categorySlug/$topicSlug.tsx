@@ -565,6 +565,7 @@ function ForumThreadPage() {
                   voted={topic.voted}
                   targetId={topic.id}
                   targetType="topic"
+                  authorId={topic.userId}
                   onResult={handleTopicVote}
                   size="inline"
                 />

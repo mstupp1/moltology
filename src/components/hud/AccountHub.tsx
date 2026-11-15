@@ -236,12 +236,6 @@ export function AccountHub({
   }
 
   const handleToggleTask = (taskId: string) => {
-    const task = tasks.find((t) => t.id === taskId || t.key === taskId)
-    if (task?.key === 'silent-synchronization') {
-      close()
-      alignment.openSilentSynchronization()
-      return
-    }
     void alignment.toggleTask(taskId)
   }
 

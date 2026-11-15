@@ -98,7 +98,7 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
 
           <span className="ml-auto flex items-center gap-1 tabular-nums">
             <span className="relative z-10">
-              <VoteButton count={topic.upvotes} voted={topic.voted} targetId={topic.id} targetType="topic" size="inline" />
+              <VoteButton count={topic.upvotes} voted={topic.voted} targetId={topic.id} targetType="topic" size="inline" authorId={topic.userId} />
             </span>
             <span className="flex items-center gap-1 px-2 py-1" title={`${topic.repliesCount} replies`}>
               <MessageSquare className="w-3.5 h-3.5" aria-hidden="true" />
