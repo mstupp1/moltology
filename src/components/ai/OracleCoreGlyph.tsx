@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 const CORE_FRAMES = ['/images/oracle-core-a.webp', '/images/oracle-core-b.webp'] as const
 
 /** How long the orb takes to pour back in after the core view closes (see hud-chrome.css). */
-const REFILL_MS = 1100
+const REFILL_MS = 850
 
 export interface OracleCoreGlyphProps {
   /** Diameter of the orb in pixels. */

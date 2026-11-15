@@ -429,7 +429,7 @@ input[type="range"].dial-range:focus-visible {
    core view is on, so both are never lit at once. The liquid layer is clipped from
    the top down (it holds the turning stills, so the edge stays level), a bright
    surface line rides down with it, and a faint ember is left in the dark socket.
-   Refilling runs the other way after a short pause, timed with the spark's return. */
+   Refilling runs the other way after a short pause, timed after the core view closes. */
 .oracle-core__liquid {
   position: absolute;
   inset: 0;
@@ -482,10 +482,10 @@ input[type="range"].dial-range:focus-visible {
   display: none;
 }
 .oracle-core[data-drain='refilling'] .oracle-core__liquid {
-  transition: clip-path 700ms cubic-bezier(0.2, 0.6, 0.3, 1) 380ms;
+  transition: clip-path 700ms cubic-bezier(0.2, 0.6, 0.3, 1) 120ms;
 }
 .oracle-core[data-drain='refilling'] .oracle-core__level {
-  animation: oracle-core-level-up 700ms cubic-bezier(0.2, 0.6, 0.3, 1) 380ms backwards;
+  animation: oracle-core-level-up 700ms cubic-bezier(0.2, 0.6, 0.3, 1) 120ms backwards;
 }
 @keyframes oracle-core-level-down {
   0% { top: 4%; opacity: 1; }
@@ -502,23 +502,8 @@ input[type="range"].dial-range:focus-visible {
   0%, 100% { transform: translate(-50%, -50%) scale(0.75); opacity: 0.45; }
   50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.95; }
 }
-/* The spark that carries the orb up into the chat's core (and back down). */
-.oracle-core-spark {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 99995;
-  width: 12px;
-  height: 12px;
-  margin: -6px 0 0 -6px;
-  border-radius: 9999px;
-  background: #bff0ff;
-  box-shadow: 0 0 10px 4px rgba(0, 195, 255, 0.85), 0 0 26px 10px rgba(0, 120, 255, 0.35);
-  pointer-events: none;
-  opacity: 0;
-}
 @media (prefers-reduced-motion: reduce) {
-  /* No falling level or travelling spark: the orb just fades to the empty socket and back. */
+  /* No falling level: the orb just fades to the empty socket and back. */
   .oracle-core[data-drain='drained'] .oracle-core__liquid,
   .oracle-core[data-drain='refilling'] .oracle-core__liquid {
     clip-path: inset(0 0 0 0);

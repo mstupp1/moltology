@@ -1,8 +1,7 @@
 /**
  * Motion for the Oracle chat's core view toggle ("dive in"): the core opens out of
  * the small core button in the chat header as a growing circle, and shrinks back into
- * it on the way out. On phones the bottom-bar orb's spark travels up into the core
- * and back (the drain itself is CSS on OracleCoreGlyph).
+ * it on the way out. (The phone bottom-bar orb's drain is CSS on OracleCoreGlyph.)
  *
  * Everything here is one Web Animations call on transform, opacity or clip-path, so
  * there is no per-frame script. Under prefers-reduced-motion, or where element.animate
@@ -77,49 +76,4 @@ export function fadeInChat(el: Element | null): void {
     duration: 240,
     easing: 'ease-out',
   })
-}
-
-/**
- * A spark that carries the bottom-bar orb up into the chat's core, or back down.
- * Appended to body (the bar sits inside transformed parents) and removed when done.
- */
-export function playCoreSpark(orb: Element, direction: 'up' | 'down'): void {
-  if (typeof document === 'undefined' || prefersReducedMotion()) return
-  const spark = document.createElement('span')
-  if (typeof spark.animate !== 'function') return
-  const from = orb.getBoundingClientRect()
-  const start = { x: from.left + from.width / 2, y: from.top + from.height / 2 }
-  // The phone core sits in the middle of the open space above the chat's lower controls.
-  const space = document.querySelector('[data-testid="synaptic-core-space"]')?.getBoundingClientRect()
-  const end =
-    // Skip the measured spot while the overlay is still sliding up from below.
-    space && space.height > 0 && space.top + space.height / 2 < window.innerHeight * 0.6
-      ? { x: space.left + space.width / 2, y: space.top + space.height / 2 }
-      : { x: window.innerWidth / 2, y: window.innerHeight * 0.36 }
-  const [a, b] = direction === 'up' ? [start, end] : [end, start]
-  spark.className = 'oracle-core-spark'
-  spark.setAttribute('aria-hidden', 'true')
-  document.body.appendChild(spark)
-  const frames =
-    direction === 'up'
-      ? [
-          { transform: `translate(${a.x}px, ${a.y}px) scale(0.6)`, opacity: 0 },
-          { transform: `translate(${a.x}px, ${a.y - 28}px) scale(1)`, opacity: 1, offset: 0.2 },
-          { transform: `translate(${b.x}px, ${b.y}px) scale(1.8)`, opacity: 0.9, offset: 0.88 },
-          { transform: `translate(${b.x}px, ${b.y}px) scale(3)`, opacity: 0 },
-        ]
-      : [
-          { transform: `translate(${a.x}px, ${a.y}px) scale(2)`, opacity: 0 },
-          { transform: `translate(${a.x}px, ${a.y}px) scale(1.4)`, opacity: 1, offset: 0.15 },
-          { transform: `translate(${b.x}px, ${b.y}px) scale(0.8)`, opacity: 1, offset: 0.85 },
-          { transform: `translate(${b.x}px, ${b.y}px) scale(0.4)`, opacity: 0 },
-        ]
-  const animation = spark.animate(frames, {
-    duration: direction === 'up' ? 640 : 560,
-    delay: direction === 'up' ? 160 : 0,
-    easing: direction === 'up' ? 'cubic-bezier(0.3, 0.1, 0.3, 1)' : 'cubic-bezier(0.5, 0, 0.6, 1)',
-    fill: 'backwards',
-  })
-  const remove = () => spark.remove()
-  animation.finished.then(remove, remove)
 }
