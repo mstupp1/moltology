@@ -725,6 +725,10 @@ export interface BlogCommentEntry {
   authorName: string
   authorAvatar: string
   authorStage: number
+  /** Public handle, so the name can link to the member's profile. */
+  authorHandle?: string | null
+  /** Public character setup, so the row can show the member's 3D portrait. */
+  authorAvatarConfig?: LobsterAvatarConfig | null
   content: string
   createdAt: string
 }
@@ -769,6 +773,7 @@ export const getBlogCommentsHandler = async ({
         profileStage: profiles.stage,
         profileHandle: profiles.handle,
         profileLarvaId: profiles.larvaId,
+        profileAvatarConfig: publicAvatarConfig,
       })
       .from(blogComments)
       .leftJoin(profiles, eq(blogComments.userId, profiles.id))
@@ -792,6 +797,8 @@ export const getBlogCommentsHandler = async ({
       }),
       authorAvatar: r.authorAvatar,
       authorStage: r.profileStage ?? 1,
+      authorHandle: r.profileHandle ?? null,
+      authorAvatarConfig: r.profileAvatarConfig ?? null,
       content: r.content,
       createdAt: r.createdAt ? new Date(r.createdAt).toISOString() : new Date().toISOString(),
     }))
@@ -858,7 +865,12 @@ export const createBlogCommentHandler = async ({ data, context }: ServerFnArgs<C
   await requirePublishableForumPost({ body: sanitizedContent })
 
   const [userProfile] = await dbClient
-    .select()
+    .select({
+      handle: profiles.handle,
+      larvaId: profiles.larvaId,
+      stage: profiles.stage,
+      avatarConfig: publicAvatarConfig,
+    })
     .from(profiles)
     .where(eq(profiles.id, userId))
     .limit(1)
@@ -888,6 +900,8 @@ export const createBlogCommentHandler = async ({ data, context }: ServerFnArgs<C
     authorName: inserted.authorName,
     authorAvatar: inserted.authorAvatar,
     authorStage: userProfile?.stage ?? 1,
+    authorHandle: userProfile?.handle ?? null,
+    authorAvatarConfig: userProfile?.avatarConfig ?? null,
     content: inserted.content,
     createdAt: inserted.createdAt ? new Date(inserted.createdAt).toISOString() : new Date().toISOString(),
   }

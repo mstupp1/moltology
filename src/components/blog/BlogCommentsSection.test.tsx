@@ -12,6 +12,14 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({ children, to, params, ...props }: any) => (
+    <a href={params?.profileId ? `/member/${params.profileId}` : to} {...props}>
+      {children}
+    </a>
+  ),
+}))
+
 vi.mock('@/lib/jwt', () => ({
   getAuthJWTToken: vi.fn().mockResolvedValue('mock-jwt'),
 }))
@@ -52,15 +60,15 @@ describe('BlogCommentsSection', () => {
 
     render(<ToastProvider><BlogCommentsSection postId="post-100" /></ToastProvider>)
 
-    expect(screen.getByText('COMMUNICATIONS LOG')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /Comments/ })).toBeInTheDocument()
 
     await waitFor(() => {
-      expect(screen.getByText('AUTHENTICATION REQUIRED TO JOIN DISCUSSION')).toBeInTheDocument()
+      expect(screen.getByText('Sign in to join the discussion.')).toBeInTheDocument()
     })
 
-    expect(screen.getByRole('button', { name: /SIGN IN/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /REGISTER INITIATE/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Sign in / Join' })).toBeInTheDocument()
     expect(screen.getByText('This transmission was profoundly enlightening.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Initiate #99' })).toHaveAttribute('href', '/member/user-1')
   })
 
   it('holds the lock box for the first-paint empty session shape', async () => {
@@ -69,7 +77,7 @@ describe('BlogCommentsSection', () => {
     render(<ToastProvider><BlogCommentsSection postId="post-100" /></ToastProvider>)
 
     expect(screen.getByTestId('blog-comments-auth-skeleton')).toBeInTheDocument()
-    expect(screen.queryByText('AUTHENTICATION REQUIRED TO JOIN DISCUSSION')).not.toBeInTheDocument()
+    expect(screen.queryByText('Sign in to join the discussion.')).not.toBeInTheDocument()
   })
 
   it('renders interactive HUD comment form when user is authenticated', async () => {
@@ -81,10 +89,11 @@ describe('BlogCommentsSection', () => {
 
     render(<ToastProvider><BlogCommentsSection postId="post-100" /></ToastProvider>)
 
+    fireEvent.click(await screen.findByTestId('blog-comment-open'))
+
     await waitFor(() => {
-      expect(screen.getByText('Ascendant Pilot')).toBeInTheDocument()
-      expect(screen.getByPlaceholderText(/Log your thoughts or synaptic telemetry.../i)).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /TRANSMIT COMMENT/i })).toBeInTheDocument()
+      expect(screen.getByPlaceholderText('Write a comment...')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Post comment/i })).toBeInTheDocument()
     })
   })
 
@@ -97,14 +106,11 @@ describe('BlogCommentsSection', () => {
 
     render(<ToastProvider><BlogCommentsSection postId="post-100" /></ToastProvider>)
 
-    await waitFor(() => {
-      expect(screen.getByPlaceholderText(/Log your thoughts/i)).toBeInTheDocument()
-    })
-
-    const textarea = screen.getByPlaceholderText(/Log your thoughts/i)
+    fireEvent.click(await screen.findByTestId('blog-comment-open'))
+    const textarea = await screen.findByPlaceholderText('Write a comment...')
     fireEvent.change(textarea, { target: { value: 'hi' } })
 
-    const transmitBtn = screen.getByRole('button', { name: /TRANSMIT COMMENT/i })
+    const transmitBtn = screen.getByRole('button', { name: /Post comment/i })
     expect(transmitBtn).toBeDisabled()
   })
 
@@ -128,14 +134,11 @@ describe('BlogCommentsSection', () => {
 
     render(<ToastProvider><BlogCommentsSection postId="post-100" /></ToastProvider>)
 
-    await waitFor(() => {
-      expect(screen.getByPlaceholderText(/Log your thoughts/i)).toBeInTheDocument()
-    })
-
-    const textarea = screen.getByPlaceholderText(/Log your thoughts/i)
+    fireEvent.click(await screen.findByTestId('blog-comment-open'))
+    const textarea = await screen.findByPlaceholderText('Write a comment...')
     fireEvent.change(textarea, { target: { value: 'A thrilling bio-silicon perspective!' } })
 
-    const submitBtn = screen.getByRole('button', { name: /TRANSMIT COMMENT/i })
+    const submitBtn = screen.getByRole('button', { name: /Post comment/i })
     expect(submitBtn).not.toBeDisabled()
 
     fireEvent.click(submitBtn)
