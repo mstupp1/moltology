@@ -114,7 +114,12 @@
 /* GlowEmblem: the emblem in its own light (src/components/ui/GlowEmblem.tsx). The halo is a
    plain gradient and the mark a drop shadow, so the emblem keeps its production colour. */
 .glow-emblem-halo {
-  inset: calc(var(--glow-emblem-size) * -0.45);
+  /* Centred on the mark; sized from it, so it also fits the 3D emblem's larger canvas. */
+  left: 50%;
+  top: 50%;
+  width: calc(var(--glow-emblem-size) * 1.9);
+  height: calc(var(--glow-emblem-size) * 1.9);
+  transform: translate(-50%, -50%);
   background: radial-gradient(circle, rgba(255, 69, 58, 0.36) 0%, rgba(255, 69, 58, 0.12) 38%, transparent 66%);
 }
 .glow-emblem-mark {
@@ -124,8 +129,8 @@
   animation: glow-emblem-breathe 3.2s ease-in-out infinite;
 }
 @keyframes glow-emblem-breathe {
-  0%, 100% { opacity: 0.75; transform: scale(0.96); }
-  50% { opacity: 1; transform: scale(1.04); }
+  0%, 100% { opacity: 0.75; transform: translate(-50%, -50%) scale(0.96); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); }
 }
 @media (prefers-reduced-motion: reduce) {
   .glow-emblem-breathe .glow-emblem-halo { animation: none; }

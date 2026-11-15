@@ -54,7 +54,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
 
   const greeting = (
     <div className={`flex flex-col gap-2 ${isCentered ? 'items-center text-center' : 'items-start'}`}>
-      <BrandIcon3D size={64} aria-hidden="true" />
+      <BrandIcon3D size={64} glow aria-hidden="true" />
       <h2 className="font-grotesk text-lg sm:text-xl font-semibold text-ink tracking-tight">
         Ask the Oracle
       </h2>
