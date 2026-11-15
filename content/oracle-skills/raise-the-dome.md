@@ -4,6 +4,7 @@ name: Raise the dome
 summary: A five-step setup before deep work, so nothing on the surface can reach you.
 whenToUse: The member is about to start deep or important work, gets interrupted a lot, or asks how to set up for focus.
 category: Focus
+icon: shield-half
 price: 60
 order: 50
 examples:

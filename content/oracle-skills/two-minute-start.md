@@ -4,6 +4,7 @@ name: Two-minute start
 summary: Get moving on anything you've been putting off with a step that takes two minutes.
 whenToUse: The member is stuck, avoiding a task, procrastinating, or says they can't get started.
 category: Starting
+icon: zap
 price: 0
 order: 30
 examples:

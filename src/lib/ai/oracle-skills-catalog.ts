@@ -1,8 +1,10 @@
 import matter from 'gray-matter'
 import {
   ORACLE_SKILL_CATEGORIES,
+  ORACLE_SKILL_ICONS,
   ORACLE_SKILL_PRICES,
   type OracleSkillCategory,
+  type OracleSkillIconName,
   type OracleSkillInfo,
 } from '../oracle-skills'
 
@@ -31,6 +33,10 @@ export function parseOracleSkill(source: string, file: string): OracleSkill {
   if (!ORACLE_SKILL_CATEGORIES.includes(category)) {
     throw new Error(`${file}: category must be one of ${ORACLE_SKILL_CATEGORIES.join(', ')}.`)
   }
+  const icon = data.icon as OracleSkillIconName
+  if (!ORACLE_SKILL_ICONS.includes(icon)) {
+    throw new Error(`${file}: icon must be one of ${ORACLE_SKILL_ICONS.join(', ')}.`)
+  }
   const price = Number(data.price)
   if (!(ORACLE_SKILL_PRICES as readonly number[]).includes(price)) {
     throw new Error(`${file}: price must be one of ${ORACLE_SKILL_PRICES.join(', ')}.`)
@@ -49,6 +55,7 @@ export function parseOracleSkill(source: string, file: string): OracleSkill {
     summary: text(data.summary, 'summary', file, 120),
     whenToUse: text(data.whenToUse, 'whenToUse', file, 200),
     category,
+    icon,
     price,
     order: Number.isFinite(Number(data.order)) ? Number(data.order) : 999,
     examples,

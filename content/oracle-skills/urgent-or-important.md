@@ -4,6 +4,7 @@ name: Urgent or important
 summary: Sort a long list into do now, schedule, hand off, or drop.
 whenToUse: The member has a long or messy to-do list, feels busy but not productive, or everything seems urgent.
 category: Planning
+icon: grid-2x2
 price: 60
 order: 80
 examples:

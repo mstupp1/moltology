@@ -6,6 +6,7 @@ import { OracleTierIcon } from '@/components/ai/OracleTierIcon'
 import { OracleModelLogo } from '@/components/ai/OracleModelLogo'
 import { useSpeechDictation, type DictationError } from '@/hooks/useSpeechDictation'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
+import { OracleSkillIcon } from '@/components/ai/OracleSkillIcon'
 import {
   HudDropdownMenu,
   HudDropdownMenuTrigger,
@@ -107,6 +108,8 @@ export interface PromptSkillOption {
   id: string
   name: string
   summary: string
+  /** Icon name from the skill file; older cached lists may not have one. */
+  icon?: string
 }
 
 export const BROWSE_SKILLS_HREF = '/character/shop?tab=skills'
@@ -137,6 +140,7 @@ export const OracleSkillMenu: React.FC<{
   compactLabel?: boolean
 }> = ({ skills, activeSkill = null, onPick, onClear, compactLabel = false }) => {
   const activeSkillId = activeSkill?.id
+  const activeIcon = skills.find((s) => s.id === activeSkillId)?.icon
   const menu = (
     <HudDropdownMenu modal={false}>
       <HudDropdownMenuTrigger asChild>
@@ -147,7 +151,7 @@ export const OracleSkillMenu: React.FC<{
             title="Change skill (type /)"
             aria-label={`Skill: ${activeSkill.name}. Change skill`}
           >
-            <ScrollText className="w-3.5 h-3.5 shrink-0 text-cyan-glow" aria-hidden="true" />
+            <OracleSkillIcon icon={activeIcon} className="w-3.5 h-3.5 shrink-0 text-cyan-glow" />
             <span className="truncate">{activeSkill.name}</span>
           </button>
         ) : (
@@ -180,13 +184,16 @@ export const OracleSkillMenu: React.FC<{
               role="menuitemradio"
               aria-checked={skill.id === activeSkillId}
               onSelect={() => onPick(skill.id)}
-              className={`block rounded-none px-4 py-2 ${skill.id === activeSkillId ? 'bg-surface-3' : ''}`}
+              className={`flex items-start gap-3 rounded-none px-4 py-2 ${skill.id === activeSkillId ? 'bg-surface-3' : ''}`}
             >
-              <span className="flex items-center justify-between gap-2 text-sm font-semibold text-ink">
-                {skill.name}
-                {skill.id === activeSkillId && <Check aria-label="On" className="h-4 w-4 shrink-0 text-cyan-glow" />}
+              <OracleSkillIcon icon={skill.icon} className="mt-0.5 h-4 w-4 shrink-0 text-ink-body" />
+              <span className="min-w-0 flex-1">
+                <span className="flex items-center justify-between gap-2 text-sm font-semibold text-ink">
+                  {skill.name}
+                  {skill.id === activeSkillId && <Check aria-label="On" className="h-4 w-4 shrink-0 text-cyan-glow" />}
+                </span>
+                <span className="block text-xs leading-snug text-ink-muted">{skill.summary}</span>
               </span>
-              <span className="block text-xs leading-snug text-ink-muted">{skill.summary}</span>
             </HudDropdownMenuItem>
           ))}
         </div>
@@ -236,7 +243,12 @@ function readRoom(el: HTMLElement): { above: number; below: number } {
   return { above: rect.top - top, below: bottom - rect.bottom }
 }
 
-const SKILL_LIST_MAX = 240
+/**
+ * Tallest the "/" list grows: about five and a half roomy rows on phones and eight and a half
+ * compact rows on desktop, so the last visible row is cut and the list reads as scrollable.
+ */
+const SKILL_LIST_MAX = { phone: 300, desktop: 336 }
+const DESKTOP_QUERY = '(min-width: 768px)'
 
 export interface PromptInputProps {
   onSubmit: (message: { text: string }) => void
@@ -319,15 +331,22 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   // bottom), below it when the box sits at the top of the screen (new chat on phones).
   const [skillListPlace, setSkillListPlace] = useState<{ side: 'top' | 'bottom'; max: number }>({
     side: 'top',
-    max: SKILL_LIST_MAX,
+    max: SKILL_LIST_MAX.phone,
   })
   useLayoutEffect(() => {
     if (!showSkillList || !cardRef.current) return
+    const cap = window.matchMedia?.(DESKTOP_QUERY).matches ? SKILL_LIST_MAX.desktop : SKILL_LIST_MAX.phone
     const { above, below } = readRoom(cardRef.current)
-    const side = above >= Math.min(SKILL_LIST_MAX, 160) || above >= below ? 'top' : 'bottom'
+    const side = above >= Math.min(cap, 160) || above >= below ? 'top' : 'bottom'
     const room = (side === 'top' ? above : below) - 12
-    setSkillListPlace({ side, max: Math.max(120, Math.min(SKILL_LIST_MAX, room)) })
+    setSkillListPlace({ side, max: Math.max(120, Math.min(cap, room)) })
   }, [showSkillList])
+  // Keep the highlighted row in view as the arrow keys move through a list taller than the sheet.
+  const highlightedSkillId = showSkillList ? skillMatches[skillCursor]?.id : undefined
+  useEffect(() => {
+    if (!highlightedSkillId) return
+    document.getElementById(`${skillListId}-${highlightedSkillId}`)?.scrollIntoView?.({ block: 'nearest' })
+  }, [highlightedSkillId, skillListId])
   useEffect(() => {
     setSkillCursor(0)
     if (slashQuery === null) setSlashDismissed(false)
@@ -496,37 +515,69 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   ) : null
 
   const inlineActions = oneRow && !modelPicker && !skillMenu
+  // Phones: a full-width rounded sheet with roomy rows. Desktop: a compact popover on the box's
+  // left edge. Either way the highlighted row is a soft inset pill and the list scrolls inside.
   const skillList = showSkillList ? (
     <div
-      id={skillListId}
-      role="listbox"
-      aria-label="Skills"
-      className={`absolute inset-x-0 z-30 overflow-y-auto overscroll-contain rounded-card border border-line bg-surface-1 py-1 shadow-lg ${
+      className={`absolute inset-x-0 z-30 flex flex-col overflow-hidden rounded-panel border border-line-subtle bg-surface-2 shadow-lg md:right-auto md:w-80 md:rounded-card ${
         skillListPlace.side === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
       }`}
       style={{ maxHeight: skillListPlace.max }}
     >
-      {skillMatches.length === 0 ? (
-        <p className="px-3 py-2 text-xs text-ink-muted">
-          No skill matches. <a href={BROWSE_SKILLS_HREF} className="text-cyan-glow hover:underline">Browse skills</a>
-        </p>
-      ) : (
-        skillMatches.map((skill, index) => (
-          <button
-            key={skill.id}
-            id={`${skillListId}-${skill.id}`}
-            type="button"
-            role="option"
-            aria-selected={index === skillCursor}
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => pickSkill(skill.id)}
-            className={`block w-full px-3 py-1.5 text-left ${index === skillCursor ? 'bg-surface-3' : 'hover:bg-surface-2'}`}
-          >
-            <span className="block text-[13px] font-semibold text-ink">{skill.name}</span>
-            <span className="block text-[11px] leading-snug text-ink-muted truncate">{skill.summary}</span>
-          </button>
-        ))
-      )}
+      <p
+        id={`${skillListId}-label`}
+        className="shrink-0 px-4 pt-3 pb-1.5 text-[13px] font-medium text-ink-muted md:px-3.5 md:pt-2.5 md:pb-1 md:text-[11px]"
+      >
+        Skills
+      </p>
+      <div
+        id={skillListId}
+        role="listbox"
+        aria-labelledby={`${skillListId}-label`}
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-1.5 pb-1.5 md:px-1 md:pb-1"
+      >
+        {skillMatches.length === 0 ? (
+          <p className="px-2.5 py-3 text-[13px] text-ink-muted md:py-2 md:text-xs">No skill matches.</p>
+        ) : (
+          skillMatches.map((skill, index) => {
+            const on = index === skillCursor
+            return (
+              <button
+                key={skill.id}
+                id={`${skillListId}-${skill.id}`}
+                type="button"
+                role="option"
+                aria-selected={on}
+                title={skill.summary}
+                tabIndex={-1}
+                onMouseDown={(e) => e.preventDefault()}
+                onMouseMove={() => {
+                  if (!on) setSkillCursor(index)
+                }}
+                onClick={() => pickSkill(skill.id)}
+                className={`flex h-12 w-full items-center gap-3 rounded-card px-2.5 text-left text-[15px] font-medium text-ink transition-colors md:h-9 md:gap-2.5 md:rounded-control md:text-[13px] ${
+                  on ? 'bg-surface-3' : ''
+                }`}
+              >
+                <OracleSkillIcon
+                  icon={skill.icon}
+                  className={`h-5 w-5 shrink-0 md:h-4 md:w-4 ${on ? 'text-cyan-glow' : 'text-ink-body'}`}
+                />
+                <span className="truncate">{skill.name}</span>
+              </button>
+            )
+          })
+        )}
+        <a
+          href={BROWSE_SKILLS_HREF}
+          tabIndex={-1}
+          onMouseDown={(e) => e.preventDefault()}
+          className="flex h-12 w-full items-center gap-3 rounded-card px-2.5 text-[15px] text-ink-muted transition-colors hover:bg-surface-3 hover:text-ink md:h-9 md:gap-2.5 md:rounded-control md:text-[13px]"
+        >
+          <ScrollText className="h-5 w-5 shrink-0 md:h-4 md:w-4" aria-hidden="true" />
+          Browse all skills
+        </a>
+      </div>
     </div>
   ) : null
   // The active skill normally lives in the toolbar as the Skills pill; this row is only for a
@@ -535,7 +586,10 @@ export const PromptInput: React.FC<PromptInputProps> = ({
     activeSkill && !skillMenu ? (
       <div className="flex px-1 pb-1">
         <span className="inline-flex max-w-full items-center gap-1 rounded-chip border border-line bg-surface-3 pl-2 pr-0.5 py-0.5 text-[12px] font-semibold text-ink">
-          <ScrollText className="w-3 h-3 shrink-0 text-cyan-glow" aria-hidden="true" />
+          <OracleSkillIcon
+            icon={skills?.find((s) => s.id === activeSkill.id)?.icon}
+            className="w-3 h-3 shrink-0 text-cyan-glow"
+          />
           <span className="truncate">{activeSkill.name}</span>
           {onClearSkill && <SkillClearButton name={activeSkill.name} onClear={onClearSkill} />}
         </span>

@@ -4,6 +4,7 @@ name: Shed a habit
 summary: Map what triggers a habit and what it gives you, add friction, and pick a swap.
 whenToUse: The member wants to stop or cut down a habit such as doomscrolling, snacking, late nights, or checking their phone.
 category: Habits
+icon: circle-off
 price: 150
 order: 120
 examples:
