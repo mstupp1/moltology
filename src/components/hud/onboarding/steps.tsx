@@ -56,7 +56,7 @@ function WelcomeStep({ firstName, isGuest, headingId }: OnboardingStepProps) {
   return (
     <div className="max-w-md mx-auto w-full flex flex-col items-center text-center gap-6 py-4">
       <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full flex items-center justify-center border border-line bg-surface-2 hud-sheen shadow-menu">
-        <BrandIcon3D size={96} aria-hidden="true" />
+        <BrandIcon3D size={96} glow aria-hidden="true" />
       </div>
       <StepHeading id={headingId} title={firstName ? `Welcome to Moltology, ${firstName}` : 'Welcome to Moltology'}>
         Moltology helps you shed the noise of always-online life, one small habit at a time.

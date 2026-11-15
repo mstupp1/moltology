@@ -14,6 +14,8 @@ export interface BrandIcon3DProps {
   className?: string
   /** Whether to animate a gentle continuous 3D tilt/rotation when motion is allowed. */
   animate?: boolean
+  /** The emblem in its own light, as GlowEmblem: a soft red halo and glow behind the mark. */
+  glow?: boolean
   /** Initial yaw angle in radians (used for static or reduced-motion renders). */
   initialRotateY?: number
   /** Initial pitch angle in radians (used for static or reduced-motion renders). */
@@ -121,6 +123,7 @@ export function BrandIcon3D({
   'aria-hidden': ariaHidden,
   className = '',
   animate = true,
+  glow = false,
   initialRotateY = -0.32,
   initialRotateX = 0.12,
   'data-testid': testId = 'brand-icon-3d',
@@ -275,14 +278,15 @@ export function BrandIcon3D({
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
       className={`relative inline-flex items-center justify-center select-none ${className}`}
-      style={{ width: `${size}px`, height: `${size}px` }}
+      style={{ width: `${size}px`, height: `${size}px`, ['--glow-emblem-size' as string]: `${Math.round(size * 0.62)}px` }}
     >
+      {glow ? <span aria-hidden="true" className="glow-emblem-halo pointer-events-none absolute rounded-full" /> : null}
       <canvas
         ref={canvasRef}
         width={size}
         height={size}
         aria-hidden="true"
-        className={`w-full h-full block transition-opacity duration-200 motion-reduce:transition-none ${
+        className={`relative w-full h-full block ${glow ? 'glow-emblem-mark' : ''} transition-opacity duration-200 motion-reduce:transition-none ${
           webglReady ? 'opacity-100' : 'opacity-0'
         }`}
       />
@@ -291,7 +295,7 @@ export function BrandIcon3D({
           aria-hidden="true"
           width={Math.round(size * 0.62)}
           height={Math.round(size * 0.62)}
-          className="absolute inset-0 m-auto"
+          className={`absolute inset-0 m-auto ${glow ? 'glow-emblem-mark' : ''}`}
         />
       ) : null}
     </div>
