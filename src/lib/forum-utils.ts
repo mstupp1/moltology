@@ -270,3 +270,33 @@ export function relativeTime(iso: DateInput, timeZone?: string): string {
   if (diffWk < 5) return `${diffWk}w ago`
   return formatDay(iso, timeZone)
 }
+const TITLE_SMALL_WORDS = new Set([
+  'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'in', 'nor', 'of', 'on', 'or', 'per', 'the', 'to', 'vs', 'via', 'with',
+])
+
+/**
+ * Turns a title typed in all caps into title case ("BEST PRACTICES FOR SHELL GAINS" becomes
+ * "Best Practices for Shell Gains"), so it does not shout in lists. Titles with normal casing,
+ * and short ones, are left exactly as typed. Short all-caps words that are not small words
+ * (AI, HP, XP) stay as they are.
+ */
+export function tameForumTitle(title: string): string {
+  const letters = title.match(/\p{L}/gu) ?? []
+  if (letters.length < 8) return title
+  const upper = letters.filter((ch) => ch !== ch.toLowerCase()).length
+  if (upper / letters.length < 0.8) return title
+
+  let startOfPhrase = true
+  return title.replace(/[\p{L}\p{N}'’]+|[^\p{L}\p{N}'’]+/gu, (part) => {
+    if (!/\p{L}/u.test(part)) {
+      if (/[:.!?—–-]/.test(part)) startOfPhrase = true
+      return part
+    }
+    const lower = part.toLowerCase()
+    const first = startOfPhrase
+    startOfPhrase = false
+    if (!first && TITLE_SMALL_WORDS.has(lower)) return lower
+    if (part.length <= 2 && !TITLE_SMALL_WORDS.has(lower)) return part
+    return lower.charAt(0).toUpperCase() + lower.slice(1)
+  })
+}
