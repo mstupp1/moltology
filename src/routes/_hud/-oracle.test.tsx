@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import { Route } from './oracle'
 
 import { authClient } from '@/lib/auth-client'
@@ -112,7 +112,10 @@ describe('Oracle Route Component', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Open chats' }))
       fireEvent.click(screen.getByRole('button', { name: 'New Chat' }))
       await waitFor(() => expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument())
-      expect(screen.queryByText('Carcinization Inquiries')).not.toBeInTheDocument()
+      // The chat list is gone; the chat only shows in the new-chat screen's Recent block.
+      const recent = screen.getByRole('region', { name: 'Recent' })
+      expect(within(recent).getByText('Carcinization Inquiries')).toBeInTheDocument()
+      expect(screen.getAllByText('Carcinization Inquiries')).toHaveLength(1)
       expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
     } finally {
       resizeSpy.mockRestore()

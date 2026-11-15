@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useId } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useId, useMemo } from 'react'
 import {
   X,
   PanelLeftOpen,
@@ -22,7 +22,7 @@ import {
 } from '../ai-elements/message'
 import { useIsPhone, useKeyboardInset } from '../../hooks/useChatViewport'
 import { PromptInput } from '../ai-elements/prompt-input'
-import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS } from './NewChatScreen'
+import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS, pickLatestChat, pickRecentChats } from './NewChatScreen'
 import { OracleChatsPanel } from './OracleChatsPanel'
 import {
   OracleEntityModeToggle,
@@ -868,12 +868,17 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   const showConversation = !chatsOpen || chatsLayout === 'column'
   const isNewChat = !hasUserMessages && !activeThreadId
-  // Narrow panels (phone sheet, popout, sidebar) keep the prompt box docked at the bottom
+  // Narrow panels (phones, popout, sidebar) keep the prompt box docked at the bottom
   // from the first message, so it sits above the keyboard and never jumps after sending.
   const isNarrow = panelWidth - (chatsOpen && chatsLayout === 'column' ? 288 : 0) < INLINE_COMPOSER_MIN_WIDTH
-  // Phones: a new chat puts the box at the top (the keyboard opens below it); an ongoing
-  // chat docks it at the bottom and lifts it by the keyboard inset instead of panning the page.
+  // Phones lift the docked box by the part of the keyboard that covers this panel.
   const isPhone = useIsPhone()
+  // A few recent chats on the empty screen; hidden while the full chats column is open beside it.
+  const recentChats = useMemo(
+    () => (userId && !(chatsOpen && chatsLayout === 'column') ? pickRecentChats(threads) : []),
+    [userId, chatsOpen, chatsLayout, threads]
+  )
+  const latestChat = useMemo(() => (userId ? pickLatestChat(threads) : null), [userId, threads])
   // Phones: while the big core is showing, the bottom bar's orb drains into it.
   const setCoreViewOpen = oracle?.setCoreViewOpen
   const coreViewShowing = allowEntityMode && isPhone && viewMode === 'entity'
@@ -882,7 +887,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     setCoreViewOpen(coreViewShowing)
     return () => setCoreViewOpen(false)
   }, [setCoreViewOpen, coreViewShowing])
-  const keyboardInset = useKeyboardInset(isPhone && (!isNewChat || viewMode === 'entity'))
+  const keyboardInset = useKeyboardInset(isPhone, rootRef)
 
   // The keyboard shrinks the message pane, so keep the latest turn in view as it opens.
   useLayoutEffect(() => {
@@ -1090,6 +1095,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                 onEditFailed={handleEditFailed}
                 onOpenAuthModal={() => setIsAuthModalOpen(true)}
                 composer={composer('floating')}
+                continueChat={
+                  isNewChat && latestChat
+                    ? { title: latestChat.title || 'Untitled chat', onOpen: () => handleSelectThread(latestChat.id) }
+                    : null
+                }
               />
               </div>
             ) : (
@@ -1102,8 +1112,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                       disabled={isSending || usage.blocked}
                       onOpenAuthModal={() => setIsAuthModalOpen(true)}
                       shortcuts={DEFAULT_PROMPT_SHORTCUTS}
-                      composer={isPhone || !isNarrow ? composer('inline') : undefined}
-                      composerPosition={isPhone ? 'top' : 'center'}
+                      composer={isNarrow ? undefined : composer('inline')}
+                      recentChats={recentChats}
+                      onOpenChat={handleSelectThread}
+                      onShowAllChats={handleToggleChats}
                     />
                   </div>
                 ) : (
@@ -1234,7 +1246,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                   </div>
                 )}
 
-                {(!isNewChat || (isNarrow && !isPhone)) && (
+                {(!isNewChat || isNarrow) && (
                   // Overlap only the fade; the input stays in flow as its draft grows.
                   // Pointer events pass through the fade to the conversation beneath it.
                   <div className="relative z-10 shrink-0 -mt-12 pointer-events-none">{composer('docked')}</div>

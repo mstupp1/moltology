@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
-import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS } from './NewChatScreen'
+import { render, screen, fireEvent, within } from '@testing-library/react'
+import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS, pickLatestChat, pickRecentChats } from './NewChatScreen'
 
 describe('NewChatScreen', () => {
   const onSubmit = vi.fn()
@@ -45,13 +45,50 @@ describe('NewChatScreen', () => {
     expect(onOpenAuthModal).toHaveBeenCalled()
   })
 
-  it('puts the composer first in the top layout used on phones', () => {
-    const { container } = render(
-      <NewChatScreen onSubmit={onSubmit} composer={<textarea aria-label="Message" />} composerPosition="top" />
+  it('lists recent chats with an All chats link and trims suggestions on narrow panels', () => {
+    const onOpenChat = vi.fn()
+    const onShowAllChats = vi.fn()
+    const recentChats = [
+      { id: 't1', title: 'Laya forum basics', updatedAt: new Date().toISOString() },
+      { id: 't2', title: 'Morning molt routine', updatedAt: new Date().toISOString() },
+    ]
+    render(
+      <NewChatScreen
+        onSubmit={onSubmit}
+        recentChats={recentChats}
+        onOpenChat={onOpenChat}
+        onShowAllChats={onShowAllChats}
+      />
     )
-    const root = container.firstElementChild as HTMLElement
-    expect(root.firstElementChild?.tagName).toBe('TEXTAREA')
-    expect(screen.getByRole('heading', { name: 'Ask the Oracle' })).toBeInTheDocument()
-    expect(screen.queryByText('Try asking')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Laya forum basics/ }))
+    expect(onOpenChat).toHaveBeenCalledWith('t1')
+    fireEvent.click(screen.getByRole('button', { name: 'All chats' }))
+    expect(onShowAllChats).toHaveBeenCalled()
+    const suggested = screen.getByRole('list', { name: 'Suggested questions' })
+    expect(within(suggested).getAllByRole('button')).toHaveLength(2)
+  })
+
+  it('shows no recents block without chats', () => {
+    render(<NewChatScreen onSubmit={onSubmit} recentChats={[]} onOpenChat={vi.fn()} />)
+    expect(screen.queryByRole('heading', { name: 'Recent' })).not.toBeInTheDocument()
+  })
+})
+
+describe('pickRecentChats / pickLatestChat', () => {
+  const threads = [
+    { id: 'old', title: 'Old', updatedAt: '2026-11-01T00:00:00Z' },
+    { id: 'new', title: 'New', updatedAt: '2026-11-14T00:00:00Z' },
+    { id: 'pin', title: 'Pinned', updatedAt: '2026-10-01T00:00:00Z', pinnedAt: '2026-11-02T00:00:00Z' },
+    { id: 'arch', title: 'Archived', updatedAt: '2026-11-15T00:00:00Z', archivedAt: '2026-11-15T00:00:00Z' },
+    { id: 'mid', title: 'Mid', updatedAt: '2026-11-10T00:00:00Z' },
+  ]
+
+  it('puts pinned chats first, skips archived ones and caps at three', () => {
+    expect(pickRecentChats(threads).map((t) => t.id)).toEqual(['pin', 'new', 'mid'])
+  })
+
+  it('picks the most recently active chat for Continue', () => {
+    expect(pickLatestChat(threads)?.id).toBe('new')
+    expect(pickLatestChat([])).toBeNull()
   })
 })

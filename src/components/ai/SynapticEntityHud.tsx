@@ -52,6 +52,8 @@ export interface SynapticEntityHudProps {
    * cheap still of the core instead, so building the scene never stutters the motion.
    */
   deferCanvasMs?: number
+  /** On a fresh core view, one quiet chip to pick the latest chat back up. */
+  continueChat?: { title: string; onOpen: () => void } | null
 }
 
 export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
@@ -68,6 +70,7 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
   onOpenAuthModal,
   composer,
   deferCanvasMs = 0,
+  continueChat = null,
 }) => {
   // Read once at mount: later prop changes must not unmount a running canvas.
   const [canvasReady, setCanvasReady] = useState(() => deferCanvasMs <= 0)
@@ -277,6 +280,19 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
                 Interface with the Synaptic Core
               </span>
             </div>
+
+            {continueChat && (
+              <div className="flex justify-center">
+                <button
+                  type="button"
+                  onClick={continueChat.onOpen}
+                  className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-line-subtle bg-surface-1/75 backdrop-blur-md hover:bg-surface-2 hover:border-line px-3 py-1.5 text-xs text-ink-body hover:text-ink transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                >
+                  <History className="w-3.5 h-3.5 shrink-0 text-ink-muted" />
+                  <span className="truncate">Continue: {continueChat.title}</span>
+                </button>
+              </div>
+            )}
 
             {shortcuts.length > 0 && (
               <ul
