@@ -3,7 +3,8 @@
  * marking is painted in the shader from each vertex's rest position, so patterns stay glued to
  * the shell in any pose and need no textures.
  */
-import { Color, MeshPhysicalMaterial, MeshStandardMaterial, type Material, Vector2 } from 'three'
+import { Color, MeshPhysicalMaterial, MeshStandardMaterial, type Material, Vector2, Vector4 } from 'three'
+import { OCCLUDERS } from './flex'
 import type { ShellFinish, ShellMarking, ShellPalette } from '../avatar/traits'
 import { SHELL_PALETTE_MAP } from '../avatar/traits'
 import { EYE_COLOR_SWATCH, type AvatarEyeColor } from '../avatar/parts'
@@ -180,7 +181,19 @@ const shellUniforms = () => ({
   uDetail: { value: 1 },
   uGlow: { value: 0 },
   uMarkGlow: { value: 0 },
+  // Spheres standing in for the body's bulk, which shade the shell where parts crowd it.
+  uOcc: { value: Array.from({ length: OCCLUDERS }, () => new Vector4(0, -1000, 0, 0)) },
+  uOccN: { value: 0 },
 })
+
+/** Let a character's shell materials shade themselves with its own occluder spheres. */
+export function shadeWith(materials: Record<MaterialSlot, Material>, spheres: Vector4[], count: number): void {
+  for (const slot of ['shell', 'belly', 'brow'] as const) {
+    const u = (materials[slot] as MeshPhysicalMaterial).userData.uniforms as ShellUniforms
+    u.uOcc.value = spheres
+    u.uOccN.value = count
+  }
+}
 
 export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
   const material = new MeshPhysicalMaterial({ vertexColors: true })
@@ -190,13 +203,21 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms)
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nattribute vec3 restPos;\nvarying vec3 vRest;')
+      .replace('#include <common>', '#include <common>\nattribute vec3 restPos;\nvarying vec3 vRest;\nvarying vec3 vA3World;\nvarying vec3 vA3Normal;')
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvRest = restPos;')
+      .replace(
+        '#include <project_vertex>',
+        '#include <project_vertex>\nvA3World = (modelMatrix * vec4(transformed, 1.0)).xyz;\nvA3Normal = normalize(mat3(modelMatrix) * objectNormal);',
+      )
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
         `#include <common>
         varying vec3 vRest;
+        varying vec3 vA3World;
+        varying vec3 vA3Normal;
+        uniform vec4 uOcc[${OCCLUDERS}];
+        uniform int uOccN;
         uniform vec3 uShade; uniform vec3 uMark; uniform vec3 uSplit; uniform vec3 uSoft;
         uniform int uMarking; uniform float uMarkScale; uniform float uGrain; uniform float uDetail; uniform float uGlow; uniform float uMarkGlow;
         float a3Mask = 0.0;
@@ -253,12 +274,31 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         roughnessFactor = clamp(roughnessFactor + uGrain * 1.6 * (a3Grain - 0.5) + a3Soft * 0.3 + a3Pebble * 0.1 * (0.5 - a3Lump), 0.04, 1.0);`,
       )
       .replace(
+        '#include <aomap_fragment>',
+        `#include <aomap_fragment>
+        // Soft contact shadow: how much of the sky around this point the body's other parts hide.
+        float a3Occ = 1.0;
+        vec3 a3N = normalize(vA3Normal);
+        for (int i = 0; i < ${OCCLUDERS}; i++) {
+          if (i >= uOccN) break;
+          vec3 a3D = uOcc[i].xyz - vA3World;
+          float a3L2 = max(dot(a3D, a3D), 1e-6);
+          float a3R = uOcc[i].w;
+          a3Occ *= 1.0 - clamp(1.5 * max(dot(a3N, a3D * inversesqrt(a3L2)), 0.0) * a3R * a3R / a3L2, 0.0, 0.85);
+        }
+        a3Occ = max(a3Occ, 0.3);
+        reflectedLight.indirectDiffuse *= a3Occ;
+        reflectedLight.indirectSpecular *= a3Occ;
+        reflectedLight.directDiffuse *= mix(1.0, a3Occ, 0.55);
+        reflectedLight.directSpecular *= mix(1.0, a3Occ, 0.4);`,
+      )
+      .replace(
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
         totalEmissiveRadiance += diffuseColor.rgb * uGlow + uMark * a3Mask * uMarkGlow;`,
       )
   }
-  material.customProgramCacheKey = () => 'avatar3d-shell-4'
+  material.customProgramCacheKey = () => 'avatar3d-shell-5'
   return material
 }
 

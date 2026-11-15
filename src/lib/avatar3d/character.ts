@@ -1,18 +1,50 @@
 /**
- * Builds one character from a look and keeps it alive: pose blending, breathing, blinking and
- * antenna sway. Changing the look rebuilds the character; changing the pose only retargets bones.
+ * Builds one character from a look and keeps it alive: pose changes with a little wind-up and
+ * overshoot, breathing, blinking, feet that step round as it turns, and springy antennae, tail,
+ * claws and hats. Changing the look rebuilds the character; changing the pose only retargets bones.
  */
-import { Box3, BufferAttribute, Mesh, Quaternion, Vector3, type Group, type Material, type Object3D } from 'three'
+import { Box3, BufferAttribute, Mesh, Quaternion, SkinnedMesh, Vector3, type Group, type Material, type Object3D } from 'three'
 import type { AvatarPose, AvatarTemperament } from '../avatar/traits'
 import { equipAll } from './equipment'
 import type { Avatar3DLook } from './look'
-import { buildMaterials, disposeMaterials, repaintMaterials } from './materials'
+import { buildOccluders, buildSprings, type Spring } from './flex'
+import { buildMaterials, disposeMaterials, repaintMaterials, shadeWith } from './materials'
 import { arc, hops, jitter, MOODS, REACTION_SECONDS, type Mood, type Reaction } from './motion'
 import { POSES, poseExtras, poseTargets } from './poses'
 import { aimQuaternion, Rig, type MaterialSlot } from './rig'
 import { buildCrab, buildLobster, EYE_STRETCH, type FaceRig } from './species'
 
 const PUPIL_SCALE = { standard: 1, big: 1.28, sparkle: 1.1, keen: 0.72 } as const
+/** How long a pose change takes, wind-up and settle included. */
+const POSE_SECONDS = 0.62
+/** How long one step takes when the feet catch up with a turn. */
+const STEP_SECONDS = 0.26
+/** How far the body turns past its feet before one of them steps round. */
+const STEP_AFTER = 0.32
+/** Springs for each link of an antenna, base to tip: looser toward the tip. */
+const ANTENNA_SPRINGS = [
+  { stiffness: 120, damping: 11, limit: 0.3 },
+  { stiffness: 95, damping: 9, limit: 0.4 },
+  { stiffness: 80, damping: 8, limit: 0.45 },
+  { stiffness: 65, damping: 7, limit: 0.5 },
+]
+
+/**
+ * Timing for a pose change: a slight pull back the other way, then a move that runs a little
+ * past the new pose and settles into it.
+ */
+export function poseEase(p: number): number {
+  if (p <= 0) return 0
+  if (p >= 1) return 1
+  const wind = 0.16
+  if (p < wind) return -0.05 * Math.sin((p / wind) * Math.PI)
+  const q = (p - wind) / (1 - wind) - 1
+  const c1 = 1.25
+  return 1 + (c1 + 1) * q * q * q + c1 * q * q
+}
+
+/** An angle brought into -PI..PI. */
+const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a))
 const X = new Vector3(1, 0, 0)
 const Zaxis = new Vector3(0, 0, 1)
 const Yaxis = new Vector3(0, 1, 0)
@@ -178,6 +210,10 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
 
   const gear = equipAll(rig, look.equipment, look.accessory)
   const stature = applyStature(rig, look.heightScale, built.height)
+  // The bendy parts are built once the legs have their final length.
+  rig.finalizeSkinned(materials)
+  const occluders = buildOccluders(rig)
+  shadeWith(materials, occluders.spheres, occluders.count)
 
   // Legs are solved from the hips to where the feet stand, so the hips can sink, shift and
   // bounce while the feet stay planted. Everything here is in the character's own space.
@@ -215,9 +251,13 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   const thighQ = new Quaternion()
   const shinQ = new Quaternion()
   const inv = new Quaternion()
-  const solveLeg = (leg: (typeof legs)[number], offset: Vector3, lift: number) => {
+  const twistQ = new Quaternion()
+  const footQ = new Quaternion()
+  /** `twist` turns where the foot stands (and the way it points) round the character's middle. */
+  const solveLeg = (leg: (typeof legs)[number], offset: Vector3, lift: number, twist = 0) => {
     hipAt.copy(leg.thigh.position).applyQuaternion(pelvisBone.quaternion).add(pelvisBone.position)
-    reach.copy(leg.ankle).add(offset)
+    twistQ.setFromAxisAngle(Yaxis, twist)
+    reach.copy(leg.ankle).applyQuaternion(twistQ).add(offset)
     reach.y += lift
     reach.sub(hipAt)
     const far = reach.length()
@@ -235,13 +275,49 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     shinQ.copy(aimQuaternion(ankleAt.clone().sub(kneeAt)))
     leg.thigh.quaternion.copy(inv.copy(pelvisBone.quaternion).invert()).multiply(thighQ)
     leg.shin.quaternion.copy(inv.copy(thighQ).invert()).multiply(shinQ)
-    leg.foot.quaternion.copy(inv.copy(shinQ).invert()).multiply(leg.footQ)
+    leg.foot.quaternion.copy(inv.copy(shinQ).invert()).multiply(footQ.copy(twistQ).multiply(leg.footQ))
+  }
+
+  // Loose parts lag behind the body and spring back: each antenna link by link, the tail fan,
+  // the claws and a worn hat.
+  const springs: Spring[] = []
+  const sockets: { node: Object3D; rest: Quaternion }[] = []
+  for (const tag of ['L', 'R'] as const) {
+    const chain = rig.chains.get(`antenna${tag}`)
+    const path = rig.wear?.antenna.path
+    if (!chain || !path) continue
+    const end = path[path.length - 1].clone()
+    if (tag === 'R') end.x = -end.x
+    chain.bones.forEach((name, k) => {
+      const next = chain.bones[k + 1]
+      const tip = next ? rig.bone(next).position.clone() : new Vector3(0, -rig.restWorldOf(name).position.distanceTo(end), 0)
+      springs.push({ node: rig.bone(name), tip, ...ANTENNA_SPRINGS[Math.min(k, ANTENNA_SPRINGS.length - 1)] })
+    })
+  }
+  if (rig.bones.has('tail')) springs.push({ node: rig.bone('tail'), tip: new Vector3(0, -0.3, 0), stiffness: 120, damping: 12, limit: 0.3 })
+  for (const tag of ['L', 'R'] as const) {
+    const grip = rig.sockets.get(`claw${tag}`)
+    if (grip) springs.push({ node: rig.bone(`claw${tag}`), tip: grip.node.position.clone(), stiffness: 210, damping: 19, limit: 0.16 })
+  }
+  for (const name of ['head', 'ears']) {
+    const socket = rig.sockets.get(name)
+    if (!socket?.node.children.length) continue
+    sockets.push({ node: socket.node, rest: socket.node.quaternion.clone() })
+    springs.push({ node: socket.node, tip: new Vector3(0, Math.max(socket.radius, 0.12), 0), stiffness: 170, damping: 13, limit: 0.14 })
+  }
+  const spring = buildSprings(springs)
+  // Where each foot is planted, as a turn of the whole character, and the step it is taking.
+  const feet = {
+    L: { yaw: null as number | null, step: null as { from: number; to: number; start: number } | null },
+    R: { yaw: null as number | null, step: null as { from: number; to: number; start: number } | null },
   }
 
   let pose: AvatarPose = look.pose
   let targets = poseTargets(rig, POSES[pose])
   let extraTarget = poseExtras(POSES[pose])
   const extra = poseExtras(POSES[pose])
+  /** A pose change in progress: where every bone started from. */
+  let transition: { from: Map<string, Quaternion>; extra: ReturnType<typeof poseExtras>; start: number | null } | null = null
   const current = new Map<string, Quaternion>()
   for (const [name, q] of targets) current.set(name, q.clone())
   const q = new Quaternion()
@@ -262,7 +338,13 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   const aimPose = (next: AvatarPose, immediate = false) => {
     targets = poseTargets(rig, POSES[next])
     extraTarget = poseExtras(POSES[next])
-    if (!immediate) return
+    if (!immediate) {
+      const from = new Map<string, Quaternion>()
+      for (const [name, c] of current) from.set(name, c.clone())
+      transition = { from, extra: { drop: extra.drop, shift: extra.shift, footL: extra.footL.clone(), footR: extra.footR.clone(), eyes: [...extra.eyes] }, start: null }
+      return
+    }
+    transition = null
     for (const [name, t] of targets) current.get(name)!.copy(t)
     extra.drop = extraTarget.drop
     extra.shift = extraTarget.shift
@@ -277,18 +359,27 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   }
 
   const update: Character3D['update'] = (dt, time, idle = true) => {
-    const blend = 1 - Math.exp(-dt * 9)
+    // A pose change runs on its own clock; held still (stills, reduced motion) it lands at once.
+    if (transition && transition.start === null) transition.start = time
+    const progress = transition && idle ? (time - transition.start!) / POSE_SECONDS : 1
+    const e = poseEase(progress)
     for (const [name, target] of targets) {
       const c = current.get(name)!
-      c.slerp(target, blend)
+      const from = transition?.from.get(name)
+      if (from && progress < 1) c.slerpQuaternions(from, target, e)
+      else c.copy(target)
       rig.bones.get(name)!.quaternion.copy(c)
     }
-    extra.drop += (extraTarget.drop - extra.drop) * blend
-    extra.shift += (extraTarget.shift - extra.shift) * blend
-    extra.footL.lerp(extraTarget.footL, blend)
-    extra.footR.lerp(extraTarget.footR, blend)
-    extra.eyes[0] += (extraTarget.eyes[0] - extra.eyes[0]) * blend
-    extra.eyes[1] += (extraTarget.eyes[1] - extra.eyes[1]) * blend
+    const was = transition && progress < 1 ? transition.extra : extraTarget
+    const mix = progress < 1 ? e : 1
+    extra.drop = was.drop + (extraTarget.drop - was.drop) * mix
+    extra.shift = was.shift + (extraTarget.shift - was.shift) * mix
+    extra.footL.lerpVectors(was.footL, extraTarget.footL, mix)
+    extra.footR.lerpVectors(was.footR, extraTarget.footR, mix)
+    extra.eyes[0] = was.eyes[0] + (extraTarget.eyes[0] - was.eyes[0]) * mix
+    extra.eyes[1] = was.eyes[1] + (extraTarget.eyes[1] - was.eyes[1]) * mix
+    if (progress >= 1) transition = null
+    for (const { node, rest } of sockets) node.quaternion.copy(rest)
 
     const chest = rig.bone('chest')
     chest.scale.setScalar(1)
@@ -304,6 +395,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       held = null
     } else {
       const m = mood
+      // The body dips a little as it winds up for a new pose.
+      if (progress < 0.3) dy -= 0.025 * arc(progress / 0.3) * legLength
       const breath = Math.sin(time * m.breathRate)
       chest.scale.setScalar(1 + breath * 0.006 * m.breathDepth)
       dy += breath * 0.004 * m.breathDepth - m.sink * legLength
@@ -414,14 +507,43 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     }
 
     pelvisBone.position.set(pelvisRest.x + dx, pelvisRest.y + dy, pelvisRest.z)
-    solveLeg(legs[0], extra.footL, lift)
-    solveLeg(legs[1], extra.footR, lift)
+    // Feet stay planted while the body turns above them; once it has turned far enough, one
+    // steps round to catch up, then the other.
+    const turned = rig.root.rotation.y
+    for (const leg of legs) {
+      const f = feet[leg.tag]
+      const other = feet[leg.tag === 'L' ? 'R' : 'L']
+      let raise = 0
+      if (!idle || f.yaw === null) {
+        f.yaw = turned
+        f.step = null
+      } else if (f.step) {
+        const p = (time - f.step.start) / STEP_SECONDS
+        if (p >= 1) {
+          f.yaw = f.step.to
+          f.step = null
+        } else {
+          const s = p * p * (3 - 2 * p)
+          f.yaw = f.step.from + wrap(f.step.to - f.step.from) * s
+          raise = arc(p) * 0.06 * legLength
+        }
+      } else {
+        const behind = wrap(turned - f.yaw)
+        // Never let the legs wind up too far, however fast it is spun.
+        if (Math.abs(behind) > 1.1) f.yaw = wrap(turned - Math.sign(behind) * 1.1)
+        if (Math.abs(behind) > STEP_AFTER && !other.step) f.step = { from: f.yaw, to: turned + Math.sign(behind) * 0.08, start: time }
+      }
+      solveLeg(leg, leg.tag === 'L' ? extra.footL : extra.footR, lift + raise, wrap(f.yaw - turned))
+    }
     if (eyeYaw || eyePitch) {
       for (const tag of ['L', 'R'] as const) {
         overlay(`eye${tag}`, Yaxis, (eyeYaw * Math.PI) / 180)
         overlay(`eye${tag}`, X, (eyePitch * Math.PI) / 180)
       }
     }
+    spring.update(dt, idle)
+    rig.root.updateMatrixWorld(true)
+    occluders.update()
   }
 
   const character: Character3D = {
@@ -483,6 +605,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       }
     },
     boneOf(object) {
+      // A skinned part (a bendy antenna, a joint's membrane) names the bone it belongs to.
+      if (typeof object.userData.bone === 'string') return object.userData.bone
       for (let node: Object3D | null = object; node && node !== rig.root; node = node.parent) {
         if (rig.bones.get(node.name) === node) return node.name
       }
@@ -491,7 +615,10 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     update,
     triangles: () => rig.meshes.reduce((sum, m) => sum + (m.geometry.getIndex()?.count ?? 0) / 3, 0),
     dispose() {
-      for (const mesh of rig.meshes) mesh.geometry.dispose()
+      for (const mesh of rig.meshes) {
+        mesh.geometry.dispose()
+        if (mesh instanceof SkinnedMesh) mesh.skeleton.dispose()
+      }
       disposeMaterials(materials)
       for (const item of gear) item.dispose()
       rig.root.removeFromParent()

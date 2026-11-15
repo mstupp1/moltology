@@ -1,12 +1,13 @@
 /**
- * The skeleton. Crustaceans are rigid plates, so there is no skinning: every part is a solid
- * mesh parented to one bone, and a pose is just a rotation per bone.
+ * The skeleton. Crustaceans are rigid plates, so nearly every part is a solid mesh parented to
+ * one bone, and a pose is just a rotation per bone. The exceptions are skinned: the soft membrane
+ * at a bending joint, and the antennae, which bend along a short chain of bones.
  *
  * Bones are placed by joint position in character space (feet on y = 0, facing +Z). A bone that
  * aims at the next joint gets its local -Y along the limb, so limb geometry is always authored
  * hanging straight down. Sockets are named mount points for gear.
  */
-import { BufferGeometry, Group, Matrix4, Mesh, Object3D, Quaternion, Vector3, type Material } from 'three'
+import { BufferAttribute, BufferGeometry, Group, Matrix4, Mesh, Object3D, Quaternion, Skeleton, SkinnedMesh, Vector3, type Bone, type Material } from 'three'
 import type { Loft } from './loft'
 import { merge, type ClawStyle } from './parts'
 
@@ -46,6 +47,9 @@ export interface Wearable {
 
 const FORWARD = new Vector3(0, 0, 1)
 
+/** How much each bone moves one vertex: pairs of bone name and weight. */
+export type Weigh = (p: Vector3) => [string, number][]
+
 /** Orientation with +Z along `z` and +Y as close to `up` as it can be. */
 export function lookQuaternion(z: Vector3, up = new Vector3(0, 1, 0)): Quaternion {
   const zn = z.clone().normalize()
@@ -75,6 +79,9 @@ export class Rig {
   readonly meshes: Mesh[] = []
   /** Set by the species builder once the body exists. */
   wear: Wearable | null = null
+  /** Bone chains that bend (antennae): the base bone, the chain and where along the path each link starts. */
+  readonly chains = new Map<string, { bones: string[]; at: number[] }>()
+  private readonly skinned: { anchor: string; slot: MaterialSlot; geo: BufferGeometry; weigh: Weigh }[] = []
 
   constructor() {
     this.root.name = 'avatar3d'
@@ -130,6 +137,106 @@ export class Rig {
   localize(bone: string, geo: BufferGeometry): BufferGeometry {
     const r = this.restWorldOf(bone)
     return geo.applyMatrix4(new Matrix4().compose(r.position, r.quaternion, new Vector3(1, 1, 1)).invert())
+  }
+
+  /**
+   * A bendy chain along a path (character space) from an existing base bone at path[0]: one
+   * extra bone starts at each fraction of the path's length in `at`, each aimed along the path.
+   */
+  addChain(base: string, path: Vector3[], at: number[]): string[] {
+    const lengths = [0]
+    for (let i = 1; i < path.length; i++) lengths.push(lengths[i - 1] + path[i].distanceTo(path[i - 1]))
+    const total = lengths[lengths.length - 1] || 1
+    const pointAt = (u: number) => {
+      const d = u * total
+      let i = 1
+      while (i < path.length - 1 && lengths[i] < d) i++
+      const t = (d - lengths[i - 1]) / Math.max(lengths[i] - lengths[i - 1], 1e-6)
+      return path[i - 1].clone().lerp(path[i], Math.min(Math.max(t, 0), 1))
+    }
+    const bones = [base]
+    const stops = [0, ...at, 1]
+    for (let k = 1; k < stops.length - 1; k++) {
+      const name = `${base}${k}`
+      this.addBone(name, bones[k - 1], pointAt(stops[k]), { aim: pointAt(stops[k + 1]) })
+      bones.push(name)
+    }
+    this.chains.set(base, { bones, at: stops.slice(0, -1) })
+    return bones
+  }
+
+  /** The link of a chain that carries the point a fraction `u` along it. */
+  chainBoneAt(base: string, u: number): string {
+    const chain = this.chains.get(base)
+    if (!chain) return base
+    let k = 0
+    while (k < chain.at.length - 1 && chain.at[k + 1] <= u) k++
+    return chain.bones[k]
+  }
+
+  /**
+   * Skinned geometry, authored in character space at rest, that bends with several bones.
+   * `anchor` is the bone it is measured from (taps on it count as that bone).
+   */
+  addSkinned(anchor: string, slot: MaterialSlot, geo: BufferGeometry, weigh: Weigh): void {
+    this.bone(anchor)
+    this.skinned.push({ anchor, slot, geo, weigh })
+  }
+
+  /**
+   * Build the skinned meshes. Called once the body is finished (after height has stretched the
+   * legs), with the rig in its rest pose: each piece follows its anchor bone to wherever it is now.
+   */
+  finalizeSkinned(materials: Record<MaterialSlot, Material>): void {
+    this.resetPose()
+    this.root.updateMatrixWorld(true)
+    const toRoot = this.root.matrixWorld.clone().invert()
+    const p = new Vector3()
+    for (const { anchor, slot, geo, weigh } of this.skinned) {
+      const r = this.restWorldOf(anchor)
+      const move = toRoot.clone().multiply(this.bone(anchor).matrixWorld).multiply(new Matrix4().compose(r.position, r.quaternion, new Vector3(1, 1, 1)).invert())
+      const pos = geo.getAttribute('position')
+      // Markings are painted from where each point sat when the body was authored.
+      if (!geo.getAttribute('restPos')) geo.setAttribute('restPos', new BufferAttribute(new Float32Array(pos.array as Float32Array), 3))
+      const names: string[] = []
+      const index = new Uint16Array(pos.count * 4)
+      const weight = new Float32Array(pos.count * 4)
+      for (let i = 0; i < pos.count; i++) {
+        const pairs = weigh(p.fromBufferAttribute(pos, i))
+          .filter(([, w]) => w > 1e-4)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 4)
+        const sum = pairs.reduce((t, [, w]) => t + w, 0) || 1
+        pairs.forEach(([name, w], k) => {
+          let at = names.indexOf(name)
+          if (at < 0) at = names.push(name) - 1
+          index[i * 4 + k] = at
+          weight[i * 4 + k] = w / sum
+        })
+        if (!pairs.length) {
+          let at = names.indexOf(anchor)
+          if (at < 0) at = names.push(anchor) - 1
+          index[i * 4] = at
+          weight[i * 4] = 1
+        }
+      }
+      geo.applyMatrix4(move)
+      geo.setAttribute('skinIndex', new BufferAttribute(index, 4))
+      geo.setAttribute('skinWeight', new BufferAttribute(weight, 4))
+      const mesh = new SkinnedMesh(geo, materials[slot])
+      mesh.name = `${anchor}:${slot}:skin`
+      mesh.userData.bone = anchor
+      mesh.castShadow = true
+      mesh.receiveShadow = slot !== 'eye' && slot !== 'glow'
+      // It moves with its bones, so its resting bounds say little about where it is.
+      mesh.frustumCulled = false
+      this.root.add(mesh)
+      mesh.updateMatrixWorld(true)
+      // Bones here are plain nodes; a skeleton only reads their world matrices.
+      mesh.bind(new Skeleton(names.map((n) => this.bone(n)) as unknown as Bone[]))
+      this.meshes.push(mesh)
+    }
+    this.skinned.length = 0
   }
 
   /** The merged mesh a bone carries for a material, once finalized. */
