@@ -4,6 +4,7 @@ name: Box breathing
 summary: Four slow rounds of paced breathing to reset, then one next step.
 whenToUse: The member feels wound up, scattered, or overwhelmed before or during work, or asks for a quick reset.
 category: Calm
+icon: wind
 price: 60
 order: 90
 examples:

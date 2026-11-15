@@ -4,6 +4,7 @@ name: Close the day
 summary: End work cleanly. Capture loose ends, pick tomorrow's first task, and switch off.
 whenToUse: The member is wrapping up for the day, can't stop thinking about work in the evening, or asks how to end the day well.
 category: Planning
+icon: moon-star
 price: 0
 order: 40
 examples:

@@ -14,6 +14,7 @@ name: Test skill
 summary: A short summary.
 whenToUse: When testing.
 category: Focus
+icon: timer
 price: 60
 examples:
   - Help me test
@@ -65,6 +66,7 @@ describe('Oracle skill catalog', () => {
     expect(parseOracleSkill(VALID, 'test.md')).toMatchObject({ id: 'test-skill', price: 60, playbook: 'Do the thing.' })
     expect(() => parseOracleSkill(VALID.replace('price: 60', 'price: 75'), 'test.md')).toThrow(/price/)
     expect(() => parseOracleSkill(VALID.replace('category: Focus', 'category: Vibes'), 'test.md')).toThrow(/category/)
+    expect(() => parseOracleSkill(VALID.replace('icon: timer', 'icon: rocket'), 'test.md')).toThrow(/icon/)
     expect(() => parseOracleSkill(VALID.replace('id: test-skill', 'id: Test Skill'), 'test.md')).toThrow(/id/)
     expect(() => parseOracleSkill(VALID.replace('Do the thing.', ''), 'test.md')).toThrow(/empty/)
   })

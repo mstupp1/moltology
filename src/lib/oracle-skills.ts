@@ -11,6 +11,23 @@
 export const ORACLE_SKILL_CATEGORIES = ['Focus', 'Planning', 'Starting', 'Habits', 'Calm'] as const
 export type OracleSkillCategory = (typeof ORACLE_SKILL_CATEGORIES)[number]
 
+/** Icons a skill file can name in its `icon` field (drawn by OracleSkillIcon). */
+export const ORACLE_SKILL_ICONS = [
+  'anchor',
+  'wind',
+  'list-tree',
+  'moon-star',
+  'timer',
+  'target',
+  'calendar-clock',
+  'shield-half',
+  'circle-off',
+  'zap',
+  'grid-2x2',
+  'calendar-check',
+] as const
+export type OracleSkillIconName = (typeof ORACLE_SKILL_ICONS)[number]
+
 /** Gem prices. A free skill is a starter every member owns. */
 export const ORACLE_SKILL_PRICES = [0, 60, 150] as const
 
@@ -25,6 +42,8 @@ export interface OracleSkillInfo {
   /** One line on when the skill helps. Also the Oracle's discovery hint. */
   whenToUse: string
   category: OracleSkillCategory
+  /** Icon shown beside the name in the chat's skill list. */
+  icon: OracleSkillIconName
   /** Gem price; 0 = free starter. */
   price: number
   order: number

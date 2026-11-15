@@ -4,6 +4,7 @@ name: Break it down
 summary: Turn a big, vague project into the next physical action and a short ordered list.
 whenToUse: The member faces a big or fuzzy project, feels overwhelmed by its size, or doesn't know what the steps are.
 category: Starting
+icon: list-tree
 price: 60
 order: 60
 examples:

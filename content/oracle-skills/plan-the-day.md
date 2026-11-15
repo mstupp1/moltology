@@ -4,6 +4,7 @@ name: Plan the day in blocks
 summary: Turn your task list into time blocks with breathing room, and replan when the day slips.
 whenToUse: The member wants to plan their day or week, has meetings and tasks competing for time, or their day keeps getting away from them.
 category: Planning
+icon: calendar-clock
 price: 60
 order: 70
 examples:

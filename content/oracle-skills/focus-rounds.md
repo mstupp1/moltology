@@ -4,6 +4,7 @@ name: Focus rounds
 summary: Work in 25-minute rounds with short breaks, one clear target each round.
 whenToUse: The member wants to focus, study, or work through a long task and keeps drifting, or asks for a timer or a work session.
 category: Focus
+icon: timer
 price: 0
 order: 10
 examples:

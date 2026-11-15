@@ -216,7 +216,7 @@ describe('PromptInput', () => {
 
 describe('PromptInput skills', () => {
   const skills = [
-    { id: 'focus-rounds', name: 'Focus rounds', summary: 'Work in 25-minute rounds.' },
+    { id: 'focus-rounds', name: 'Focus rounds', summary: 'Work in 25-minute rounds.', icon: 'timer' },
     { id: 'two-minute-start', name: 'Two-minute start', summary: 'Get moving.' },
   ]
 
@@ -249,8 +249,17 @@ describe('PromptInput skills', () => {
     const box = screen.getByRole('textbox', { name: 'Message' }) as HTMLTextAreaElement
     fireEvent.change(box, { target: { value: '/' } })
     const list = screen.getByRole('listbox', { name: 'Skills' })
-    expect(within(list).getAllByRole('option')).toHaveLength(2)
+    const options = within(list).getAllByRole('option')
+    expect(options).toHaveLength(2)
+    expect(options[0]).toHaveAttribute('title', 'Work in 25-minute rounds.')
+    expect(options[0].querySelector('svg.lucide-timer')).not.toBeNull()
+    // No icon in the data falls back to the general skills scroll.
+    expect(options[1].querySelector('svg.lucide-scroll-text')).not.toBeNull()
+    const scrollIntoView = vi.fn()
+    options[1].scrollIntoView = scrollIntoView
     fireEvent.keyDown(box, { key: 'ArrowDown' })
+    expect(options[1]).toHaveAttribute('aria-selected', 'true')
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: 'nearest' })
     fireEvent.keyDown(box, { key: 'Enter' })
     expect(onSubmit).not.toHaveBeenCalled()
     expect(box.value).toBe('')
@@ -285,7 +294,9 @@ describe('PromptInput skills', () => {
     render(<Harness />)
     const box = screen.getByRole('textbox', { name: 'Message' }) as HTMLTextAreaElement
     fireEvent.change(box, { target: { value: '/' } })
-    expect(screen.getByRole('listbox', { name: 'Skills' }).className).toMatch(/\babsolute\b/)
+    const list = screen.getByRole('listbox', { name: 'Skills' })
+    expect(list.parentElement?.className).toMatch(/\babsolute\b/)
+    expect(list.className).toMatch(/overflow-y-auto/)
     fireEvent.keyDown(box, { key: 'Enter' })
     expect(screen.queryByRole('button', { name: 'Skills' })).not.toBeInTheDocument()
     const pill = screen.getByRole('button', { name: 'Skill: Focus rounds. Change skill' })

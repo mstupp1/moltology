@@ -4,6 +4,7 @@ name: Anchor a habit
 summary: Attach a new habit to something you already do, start tiny, and plan for missed days.
 whenToUse: The member wants to start a new habit or routine, or has tried before and it didn't stick.
 category: Habits
+icon: anchor
 price: 150
 order: 110
 examples:

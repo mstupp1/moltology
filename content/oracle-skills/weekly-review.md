@@ -4,6 +4,7 @@ name: Weekly review
 summary: A guided 20-minute review. Clear the decks, look back and ahead, pick three priorities.
 whenToUse: The member wants to plan their week, feels the week got away from them, or asks for a weekly check-in or review.
 category: Planning
+icon: calendar-check
 price: 150
 order: 100
 examples:

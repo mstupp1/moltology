@@ -4,6 +4,7 @@ name: One thing first
 summary: Find the single task that makes the rest of the day easier, and do it first.
 whenToUse: The member has too much on their plate, can't decide where to start, or asks what to prioritize today.
 category: Planning
+icon: target
 price: 0
 order: 20
 examples:
