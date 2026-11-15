@@ -63,6 +63,7 @@ import {
   FORUM_HOT_CANDIDATE_POOL,
   FORUM_TOPIC_LIST_LIMIT,
   FORUM_TOPIC_PREVIEW_CHARS,
+  tameForumTitle,
 } from '../forum-utils'
 import {
   topicHasUnreadActivity,
@@ -1817,7 +1818,7 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
       authorName,
       authorAvatar,
       authorStage,
-      title: data.title.trim(),
+      title: tameForumTitle(data.title.trim()),
       slug: uniqueSlug,
       content: data.content.trim(),
       ...forumTopicQualityFields(gate),
@@ -2211,7 +2212,7 @@ export const updateForumTopicHandler = async ({
   const [updated] = await dbClient
     .update(forumTopics)
     .set({
-      title: data.title.trim(),
+      title: tameForumTitle(data.title.trim()),
       content: data.content.trim(),
       ...forumTopicQualityFields(gate),
       updatedAt: now,

@@ -192,6 +192,57 @@ describe('Forum Server Handlers', () => {
     expect(mockDb.insert).not.toHaveBeenCalled()
   })
 
+  it('stores an all-caps topic title in title case', async () => {
+    let stored: any = null
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => ({
+        from: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockImplementation(() => ({
+            limit: vi.fn().mockImplementation(() => {
+              selectCall += 1
+              if (selectCall === 1) return Promise.resolve([{ larvaId: 'Larva Unit', stage: 1 }])
+              return Promise.resolve([
+                { id: '10000000-0000-0000-0000-000000000005', slug: 'general-discussion', name: 'General Discussion', color: '#00ffff' },
+              ])
+            }),
+          })),
+        })),
+      })),
+      insert: vi.fn().mockImplementation(() => ({
+        values: vi.fn().mockImplementation((values: any) => {
+          stored = values
+          return {
+            returning: vi.fn().mockResolvedValue([
+              {
+                ...values,
+                id: 'topic-caps',
+                views: 0,
+                repliesCount: 0,
+                upvotes: 0,
+                isPinned: false,
+                isLocked: false,
+                lastReplyAt: new Date('2026-08-25T12:00:00.000Z'),
+                createdAt: new Date('2026-08-25T12:00:00.000Z'),
+              },
+            ]),
+          }
+        }),
+      })),
+    }
+
+    await createForumTopicHandler({
+      data: {
+        categoryId: '10000000-0000-0000-0000-000000000005',
+        title: 'BEST PRACTICES FOR SHELL HARDNESS',
+        content: 'This is enough content for a forum topic.',
+      },
+      context: { user: { sub: 'test-user-id' }, db: mockDb as any },
+    })
+
+    expect(stored?.title).toBe('Best Practices for Shell Hardness')
+  })
+
   it('creates a topic and returns the mapped entry', async () => {
     const inserted = {
       id: 'topic-1',

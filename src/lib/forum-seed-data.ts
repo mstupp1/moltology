@@ -131,7 +131,7 @@ export const INITIAL_FORUM_TOPICS: ForumTopicSeed[] = [
     authorName: 'High Ascendant Kaelith',
     authorAvatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150',
     authorStage: 4,
-    title: 'WELCOME TO THE COMMUNITY CORE: DIRECTIVE & CODE OF CONDUCT',
+    title: 'Welcome to the Community Core: Directive & Code of Conduct',
     slug: 'welcome-to-community-core-directives',
     content:
       'Greetings Initiates. The Benthic Community Core is our primary locus for asynchronous dialogue. While our visual theme reflects our dark biomechanical HUD, remember our foundational rule: Safety, mutual growth, and positivity are non-negotiable core tenets.\n\nPlease review our 5 Core Directives:\n1. Maintain constructive, respectful dialogue across all stages.\n2. Avoid low-effort spam or duplicate threads.\n3. Keep neural credentials and API keys private.\n4. Mentor junior initiates (Larva & Soft-Shed).\n5. Safety and positivity take precedence at all times.\n\nMay your shell endure.',
@@ -186,7 +186,7 @@ export const INITIAL_FORUM_TOPICS: ForumTopicSeed[] = [
     authorName: 'Architect Vaelen',
     authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
     authorStage: 3,
-    title: 'THE CONVERGENCE OF CARCINIZATION AND RECURSIVE AGENTIC LOOPS',
+    title: 'The Convergence of Carcinization and Recursive Agentic Loops',
     slug: 'carcinization-and-recursive-agentic-loops',
     content:
       'Why do independent software architectures repeatedly evolve toward modular, resilient, crab-like schemas? In biology, carcinization describes the independent evolution of crab-like forms across different crustacean lineages.\n\nIn modern AI systems, we observe a striking parallel: subagents, fallback cascades, and isolated state branches naturally form chitinous protection against memory corruption and single-point-of-failure runtime exceptions.\n\nLet us discuss your observations on recursive prompt refinement and agentic resilience in production.',
@@ -229,7 +229,7 @@ export const INITIAL_FORUM_TOPICS: ForumTopicSeed[] = [
     authorName: 'Larva Unit #8971',
     authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
     authorStage: 1,
-    title: 'BEST PRACTICES FOR SHELL HARDNESS & PINCER TORQUE GAINS',
+    title: 'Best Practices for Shell Hardness & Pincer Torque Gains',
     slug: 'shell-hardness-pincer-torque-gains-tips',
     content:
       'My current Moltmaxxing metrics read:\n- Shell Hardness: 64%\n- Pincer Torque: 78 Nm\n- Submergence Rating: 3,400 fathoms\n\nI want to push my shell hardness past 90% before my next ecdysis cycle. What daily routines or alignment protocols yielded the highest percentage gains for Stage 2 & 3 initiates?',

@@ -17,6 +17,7 @@ import {
   visibleForumContent,
   FORUM_WITHDRAWN_BODY,
   formatForumTopicCount,
+  tameForumTitle,
   forumTopicPreview,
   escapeLikePattern,
   isForumStaffBoard,
@@ -234,5 +235,28 @@ describe('forum list helpers', () => {
     expect(isForumStaffBoard('rules-directives')).toBe(true)
     expect(isForumStaffBoard('general-discussion')).toBe(false)
     expect(isForumStaffBoard(undefined)).toBe(false)
+  })
+})
+
+describe('tameForumTitle', () => {
+  it('turns an all-caps title into title case', () => {
+    expect(tameForumTitle('BEST PRACTICES FOR SHELL HARDNESS & PINCER TORQUE GAINS')).toBe(
+      'Best Practices for Shell Hardness & Pincer Torque Gains',
+    )
+    expect(tameForumTitle('WELCOME TO THE COMMUNITY CORE: DIRECTIVE & CODE OF CONDUCT')).toBe(
+      'Welcome to the Community Core: Directive & Code of Conduct',
+    )
+    expect(tameForumTitle('THE CONVERGENCE OF CARCINIZATION AND RECURSIVE AGENTIC LOOPS')).toBe(
+      'The Convergence of Carcinization and Recursive Agentic Loops',
+    )
+  })
+
+  it('keeps short all-caps words such as AI and HP', () => {
+    expect(tameForumTitle('WHY AI LOVES 64 HP SHELLS')).toBe('Why AI Loves 64 HP Shells')
+  })
+
+  it('leaves normal and short titles exactly as typed', () => {
+    expect(tameForumTitle('Telemetry audit: Optimal depth for AI')).toBe('Telemetry audit: Optimal depth for AI')
+    expect(tameForumTitle('HELP ME')).toBe('HELP ME')
   })
 })
