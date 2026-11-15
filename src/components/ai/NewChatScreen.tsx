@@ -1,8 +1,39 @@
 import React from 'react'
-import { ArrowUpRight, Shield, UserPlus } from 'lucide-react'
+import { ArrowUpRight, Pin, Shield, UserPlus } from 'lucide-react'
 import { BrandIcon3D } from '@/components/ui/BrandIcon3D'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
 import { ORACLE_GUEST_LIMITS } from '@/lib/ai/usage-limits'
+import { LocalTime } from '@/components/ui/LocalTime'
+import { relativeTime } from '@/lib/forum-utils'
+import type { ManagedThread } from './useThreadActions'
+
+/** How many recent chats the empty new-chat screen lists. */
+export const RECENT_CHATS_LIMIT = 3
+
+const timeMs = (value?: string | Date | null) => {
+  const ms = value ? new Date(value).getTime() : 0
+  return Number.isNaN(ms) ? 0 : ms
+}
+
+/** The most recently active chat, pinned or not. */
+export function pickLatestChat(threads: ManagedThread[]): ManagedThread | null {
+  let latest: ManagedThread | null = null
+  for (const t of threads) {
+    if (t.archivedAt) continue
+    if (!latest || timeMs(t.updatedAt ?? t.createdAt) > timeMs(latest.updatedAt ?? latest.createdAt)) latest = t
+  }
+  return latest
+}
+
+/** The chats worth showing on a fresh screen: pinned first, then the most recently active. */
+export function pickRecentChats(threads: ManagedThread[], limit = RECENT_CHATS_LIMIT): ManagedThread[] {
+  const active = threads.filter((t) => !t.archivedAt)
+  const pinned = active.filter((t) => t.pinnedAt).sort((a, b) => timeMs(b.pinnedAt) - timeMs(a.pinnedAt))
+  const rest = active
+    .filter((t) => !t.pinnedAt)
+    .sort((a, b) => timeMs(b.updatedAt ?? b.createdAt) - timeMs(a.updatedAt ?? a.createdAt))
+  return [...pinned, ...rest].slice(0, limit)
+}
 
 export interface PromptShortcut {
   label: string
@@ -27,14 +58,14 @@ export interface NewChatScreenProps {
   shortcuts?: PromptShortcut[]
   /**
    * The prompt box, rendered under the greeting on wide panels. Leave it out on narrow
-   * panels, where the panel docks the same box at the bottom so it sits above the keyboard.
+   * panels (phones, popout, sidebar), where the panel docks the same box at the bottom.
    */
   composer?: React.ReactNode
-  /**
-   * `center` puts the box under the greeting (wide panels). `top` puts it first, right under
-   * the header, so a phone keyboard opens below it instead of covering it.
-   */
-  composerPosition?: 'center' | 'top'
+  /** Up to three recent chats, already picked with `pickRecentChats`. Empty hides the block. */
+  recentChats?: ManagedThread[]
+  onOpenChat?: (id: string) => void
+  /** Opens the full chats panel. */
+  onShowAllChats?: () => void
   disabled?: boolean
   className?: string
 }
@@ -45,12 +76,16 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
   onOpenAuthModal,
   shortcuts = DEFAULT_PROMPT_SHORTCUTS,
   composer,
-  composerPosition = 'center',
+  recentChats = [],
+  onOpenChat,
+  onShowAllChats,
   disabled = false,
   className = '',
 }) => {
-  const isTop = Boolean(composer) && composerPosition === 'top'
-  const isCentered = Boolean(composer) && !isTop
+  const isCentered = Boolean(composer)
+  const showRecents = recentChats.length > 0 && Boolean(onOpenChat)
+  // Narrow panels trim suggestions while recents show, so the empty screen keeps its height.
+  const visibleShortcuts = showRecents && !isCentered ? shortcuts.slice(0, 2) : shortcuts
 
   const greeting = (
     <div className={`flex flex-col gap-2 ${isCentered ? 'items-center text-center' : 'items-start'}`}>
@@ -61,12 +96,12 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
     </div>
   )
 
-  const suggestions = shortcuts.length > 0 && (
+  const suggestions = visibleShortcuts.length > 0 && (
     <ul
       aria-label="Suggested questions"
       className={isCentered ? 'flex flex-wrap justify-center gap-2' : 'flex flex-col gap-1.5 w-full'}
     >
-      {shortcuts.map((s) => (
+      {visibleShortcuts.map((s) => (
         <li key={s.label} className={isCentered ? '' : 'w-full'}>
           <button
             type="button"
@@ -82,6 +117,46 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
         </li>
       ))}
     </ul>
+  )
+
+  const recents = showRecents && (
+    <section aria-labelledby="oracle-recent-chats" className="-mx-2 flex flex-col gap-1 text-left">
+      <div className="flex items-center justify-between pl-2 pr-1">
+        <h3 id="oracle-recent-chats" className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
+          Recent
+        </h3>
+        {onShowAllChats && (
+          <button
+            type="button"
+            onClick={onShowAllChats}
+            className="rounded-control px-1 py-0.5 text-xs text-cyan-glow hover:text-ink transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+          >
+            All chats
+          </button>
+        )}
+      </div>
+      <ul className="flex flex-col">
+        {recentChats.map((t) => (
+          <li key={t.id}>
+            <button
+              type="button"
+              onClick={() => onOpenChat?.(t.id)}
+              className="w-full flex items-center gap-2 rounded-control px-2 py-2 text-left text-sm text-ink-body hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            >
+              {t.pinnedAt && <Pin aria-label="Pinned" className="w-3 h-3 shrink-0 text-ink-muted" />}
+              <span className="flex-1 min-w-0 truncate">{t.title || 'Untitled chat'}</span>
+              {(t.updatedAt ?? t.createdAt) && (
+                <LocalTime
+                  value={(t.updatedAt ?? t.createdAt)!}
+                  format={relativeTime}
+                  className="shrink-0 text-xs text-ink-muted"
+                />
+              )}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
   )
 
   const guestBanner = isGuest && (
@@ -111,19 +186,6 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
     </div>
   )
 
-  if (isTop) {
-    return (
-      <div className={`flex flex-col min-h-full w-full px-3 pt-3 pb-6 gap-5 font-sans ${className}`}>
-        {composer}
-        <div className="flex flex-col gap-5 px-1 mt-auto">
-          {greeting}
-          {suggestions}
-        </div>
-        {guestBanner}
-      </div>
-    )
-  }
-
   if (isCentered) {
     return (
       <div className={`flex flex-col items-center justify-center min-h-full w-full px-4 py-8 font-sans ${className}`}>
@@ -131,6 +193,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
           {greeting}
           {composer}
           {suggestions}
+          {recents}
           {guestBanner}
         </div>
       </div>
@@ -142,6 +205,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
     <div className={`flex flex-col justify-end min-h-full w-full px-4 pt-6 pb-4 font-sans ${className}`}>
       <div className="w-full flex flex-col gap-5">
         {greeting}
+        {recents}
         {suggestions}
         {guestBanner}
       </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type RefObject } from 'react'
 
 /** Phone widths, matching Tailwind's `sm` breakpoint (640px). */
 export const PHONE_MEDIA_QUERY = '(max-width: 639px)'
@@ -16,6 +16,16 @@ export function computeKeyboardInset(layoutHeight: number, visualHeight: number,
   return covered >= KEYBOARD_MIN_INSET ? covered : 0
 }
 
+/**
+ * The part of a keyboard inset that actually overlaps a panel ending `gapBelow` px above the
+ * layout viewport's bottom (the phone Oracle overlay stops above the bottom tab bar, so the
+ * keyboard covers that bar first and only the rest needs padding).
+ */
+export function panelKeyboardInset(viewportInset: number, gapBelow: number): number {
+  if (viewportInset <= 0) return 0
+  return Math.max(0, Math.round(viewportInset - Math.max(0, gapBelow)))
+}
+
 /** True on phone-width screens. False during SSR and until mounted. */
 export function useIsPhone(): boolean {
   const [isPhone, setIsPhone] = useState(false)
@@ -31,11 +41,11 @@ export function useIsPhone(): boolean {
 }
 
 /**
- * Tracks the keyboard's bottom inset while `enabled`. Callers pad their bottom edge by it so
+ * Tracks the keyboard's bottom inset while `enabled`, measured against `panelRef` when given. Callers pad their bottom edge by it so
  * a docked prompt box sits right on top of the keyboard, and the page is scrolled back so
  * the keyboard opening never slides the whole window up.
  */
-export function useKeyboardInset(enabled: boolean): number {
+export function useKeyboardInset(enabled: boolean, panelRef?: RefObject<HTMLElement | null>): number {
   const [inset, setInset] = useState(0)
 
   useEffect(() => {
@@ -48,7 +58,11 @@ export function useKeyboardInset(enabled: boolean): number {
 
     const sync = () => {
       frame = null
-      const next = computeKeyboardInset(window.innerHeight, vv.height, vv.offsetTop)
+      const viewportInset = computeKeyboardInset(window.innerHeight, vv.height, vv.offsetTop)
+      // Measure the panel itself so anything below it (the phone tab bar) isn't counted twice.
+      const panel = panelRef?.current
+      const gapBelow = panel ? window.innerHeight - panel.getBoundingClientRect().bottom : 0
+      const next = panelKeyboardInset(viewportInset, gapBelow)
       setInset((prev) => (prev === next ? prev : next))
       // Undo Safari's pan so the chat header stays in view; the inset already lifts the box.
       if (next > 0 && (vv.offsetTop > 0 || window.scrollY > 0)) {
@@ -67,7 +81,7 @@ export function useKeyboardInset(enabled: boolean): number {
       vv.removeEventListener('resize', schedule)
       vv.removeEventListener('scroll', schedule)
     }
-  }, [enabled])
+  }, [enabled, panelRef])
 
   return inset
 }
