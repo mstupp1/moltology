@@ -139,7 +139,7 @@ describe('ForumPostCard', () => {
       />,
     )
 
-    const opBadge = screen.getByTitle('Original Poster')
+    const opBadge = screen.getByTitle('Started this post')
     expect(opBadge).toBeInTheDocument()
     expect(opBadge).toHaveTextContent('OP')
   })
@@ -155,7 +155,7 @@ describe('ForumPostCard', () => {
       />,
     )
 
-    expect(screen.queryByTitle('Original Poster')).not.toBeInTheDocument()
+    expect(screen.queryByTitle('Started this post')).not.toBeInTheDocument()
   })
 
   it('copies permalink to clipboard when copy link button is clicked', async () => {
@@ -175,13 +175,10 @@ describe('ForumPostCard', () => {
       />,
     )
 
-    const copyBtn = screen.getByTitle('Copy link to post')
-    fireEvent.click(copyBtn)
+    fireEvent.pointerDown(screen.getByTestId('forum-post-actions-menu'))
+    fireEvent.click(screen.getByTestId('forum-copy-link-menu-item'))
 
     expect(writeTextMock).toHaveBeenCalled()
-    await vi.waitFor(() => {
-      expect(screen.getByTitle('Link copied!')).toBeInTheDocument()
-    })
   })
 
   it('invokes onReplyClick when reply button is pressed', () => {
@@ -371,10 +368,10 @@ describe('ForumPostCard author tools', () => {
     const { rerender } = renderCard(authorPost, 'author-1', onUpdated)
     fireEvent.pointerDown(screen.getByTestId('forum-post-actions-menu'))
     fireEvent.click(screen.getByTestId('forum-revise'))
-    fireEvent.change(screen.getByLabelText('Revise reply'), {
+    fireEvent.change(screen.getByLabelText('Edit reply'), {
       target: { value: 'Revised hail for @pincer_prime after the molt.' },
     })
-    fireEvent.click(screen.getByRole('button', { name: /seal revision/i }))
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
 
     await waitFor(() => {
       expect(updateForumPostFn).toHaveBeenCalled()

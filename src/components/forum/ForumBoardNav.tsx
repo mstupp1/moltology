@@ -66,10 +66,13 @@ export function ForumBoardNav({
   boards,
   variant,
   className,
+  current,
 }: {
   boards: ForumCategoryEntry[]
   variant: 'list' | 'strip'
   className?: string
+  /** Slug of the board being viewed: shown as the lit tile. */
+  current?: string
 }) {
   if (boards.length === 0) return null
 
@@ -82,8 +85,10 @@ export function ForumBoardNav({
               <Link
                 to="/forum/$categorySlug"
                 params={{ categorySlug: board.slug }}
+                aria-current={board.slug === current ? 'page' : undefined}
                 className={cn(
-                  'flex flex-col gap-1 w-36 min-w-0 h-full p-3 rounded-card border border-line-subtle bg-surface-1 hud-sheen hover:bg-surface-2 hover:border-line transition-colors',
+                  'flex flex-col gap-1 w-36 min-w-0 h-full p-3 rounded-card border border-line-subtle transition-colors',
+                  board.slug === current ? 'bg-surface-3 shadow-nav-current' : 'bg-surface-1 hud-sheen hover:bg-surface-2 hover:border-line',
                   FOCUS,
                 )}
               >
@@ -113,7 +118,13 @@ export function ForumBoardNav({
             <Link
               to="/forum/$categorySlug"
               params={{ categorySlug: board.slug }}
-              className={cn('group flex items-start gap-3 px-3 py-2.5 rounded-card border border-line-subtle bg-surface-1 hud-sheen hover:bg-surface-2 transition-colors', FOCUS, 'focus-visible:outline-offset-[-2px]')}
+              aria-current={board.slug === current ? 'page' : undefined}
+              className={cn(
+                'group flex items-start gap-3 px-3 py-2.5 rounded-card border border-line-subtle transition-colors',
+                board.slug === current ? 'bg-surface-3 shadow-nav-current' : 'bg-surface-1 hud-sheen hover:bg-surface-2',
+                FOCUS,
+                'focus-visible:outline-offset-[-2px]',
+              )}
             >
               <span className="mt-1.5 w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: board.color }} aria-hidden="true" />
               <span className="min-w-0 flex-1">

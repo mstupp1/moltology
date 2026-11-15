@@ -54,6 +54,12 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
+// The desktop rail repeats the author and vote; these tests cover the main column.
+vi.mock('@/components/forum/ForumThreadRail', () => ({
+  ForumThreadRail: () => <div data-testid="forum-thread-rail" />,
+  MoreFromBoard: () => null,
+}))
+
 import { authClient } from '@/lib/auth-client'
 import { getForumTopicDetailFn } from '@/lib/server/api'
 import { Route } from './$categorySlug/$topicSlug'
@@ -84,7 +90,7 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: seed.title })).toBeInTheDocument()
     expect(screen.getByText(/Greetings Initiates/)).toBeInTheDocument()
-    expect(screen.getByText(/0 Comments/)).toBeInTheDocument()
+    expect(screen.getByText('0 replies')).toBeInTheDocument()
     expect(screen.getByText('Sign in to join the discussion.')).toBeInTheDocument()
   })
 
@@ -150,7 +156,8 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
 
     render(<ForumThreadPage />)
 
-    expect(screen.getByText('Post Reply')).toBeInTheDocument()
+    fireEvent.click(screen.getByTestId('forum-reply-open'))
+    expect(screen.getByTestId('forum-top-reply-composer')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^reply$/i })).toBeInTheDocument()
     expect(screen.queryByText('Sign in to join the discussion.')).not.toBeInTheDocument()
   })
@@ -200,7 +207,7 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
 
     render(<ForumThreadPage />)
 
-    expect(screen.getByText('Post Not Found')).toBeInTheDocument()
+    expect(screen.getByText('Post not found')).toBeInTheDocument()
   })
 
   it('shows member B on the reply and member A on the original post', () => {
@@ -369,7 +376,7 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
 
     fireEvent.click(screen.getAllByTestId('forum-reply-to-comment')[0])
     expect(screen.getByTestId('forum-inline-reply-composer')).toBeInTheDocument()
-    expect(screen.getByText('Reply to comment')).toBeInTheDocument()
+    expect(screen.getByLabelText('Reply to comment')).toBeInTheDocument()
   })
 
 

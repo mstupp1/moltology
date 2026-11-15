@@ -74,8 +74,8 @@ describe('ForumBoardPage (/_hud/forum/$categorySlug/)', () => {
     expect(screen.getByText(cat.description)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /new post/i })).toBeInTheDocument()
     expect(screen.queryByTestId('forum-unread-mark')).not.toBeInTheDocument()
-    expect(screen.getByText('1 TOPIC')).toBeInTheDocument()
-    expect(screen.queryByText('1 TOPICS')).not.toBeInTheDocument()
+    expect(screen.getByText('1 post')).toBeInTheDocument()
+    expect(screen.queryByText('1 posts')).not.toBeInTheDocument()
   })
 
   it('pluralizes the board topic-count badge for empty and multi-topic boards', () => {
@@ -86,7 +86,7 @@ describe('ForumBoardPage (/_hud/forum/$categorySlug/)', () => {
       topics: [],
     })
     const { unmount } = render(<ForumBoardPage />)
-    expect(screen.getByText('0 TOPICS')).toBeInTheDocument()
+    expect(screen.getByText('0 posts')).toBeInTheDocument()
     unmount()
 
     mockUseLoaderData.mockReturnValue({
@@ -94,7 +94,7 @@ describe('ForumBoardPage (/_hud/forum/$categorySlug/)', () => {
       topics: [],
     })
     render(<ForumBoardPage />)
-    expect(screen.getByText('2 TOPICS')).toBeInTheDocument()
+    expect(screen.getByText('2 posts')).toBeInTheDocument()
   })
 
   it('shows unread chrome on the board header and topic list for members', async () => {
@@ -195,7 +195,7 @@ describe('ForumBoardPage (/_hud/forum/$categorySlug/)', () => {
 
     render(<ForumBoardPage />)
 
-    expect(screen.getByText('Board Not Found')).toBeInTheDocument()
+    expect(screen.getByText('Board not found')).toBeInTheDocument()
   })
 
   it('redirects rules-directives to the seeded rules-announcements board', async () => {

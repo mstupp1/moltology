@@ -190,14 +190,14 @@ describe('withdrawn and revised visibility', () => {
 })
 
 describe('formatForumTopicCount', () => {
-  it('uses singular TOPIC only when the count is 1', () => {
-    expect(formatForumTopicCount(1)).toBe('1 TOPIC')
+  it('uses singular post only when the count is 1', () => {
+    expect(formatForumTopicCount(1)).toBe('1 post')
   })
 
-  it('uses plural TOPICS for zero and for two or more', () => {
-    expect(formatForumTopicCount(0)).toBe('0 TOPICS')
-    expect(formatForumTopicCount(2)).toBe('2 TOPICS')
-    expect(formatForumTopicCount(12)).toBe('12 TOPICS')
+  it('uses plural posts for zero and for two or more', () => {
+    expect(formatForumTopicCount(0)).toBe('0 posts')
+    expect(formatForumTopicCount(2)).toBe('2 posts')
+    expect(formatForumTopicCount(12)).toBe('12 posts')
   })
 })
 

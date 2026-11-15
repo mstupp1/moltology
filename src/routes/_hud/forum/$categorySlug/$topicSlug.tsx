@@ -3,20 +3,14 @@ import { LocalTime } from '@/components/ui/LocalTime'
 import { formatDayTime } from '@/lib/dates'
 import { forumVisibleLength } from '@/lib/forum-markdown'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
-import {
-  ArrowLeft,
-  MessageSquare,
-  Eye,
-  Terminal,
-  Clock,
-  ShieldCheck,
-  Activity,
-  Link2,
-  Check,
-  Quote,
-  AlertTriangle,
-} from 'lucide-react'
+import { ArrowLeft, Eye, Link2, Check, Quote, AlertTriangle, Lock } from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
+import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
+import { HudButton } from '@/components/ui/HudButton'
+import { pillTabClass } from '@/components/ui/pillTab'
+import { ForumBandCrumbs } from '@/components/forum/ForumBandCrumbs'
+import { ForumThreadRail, MoreFromBoard } from '@/components/forum/ForumThreadRail'
+import { ForumThreadGhost } from '@/components/forum/ForumGhosts'
 import { VoteButton, StageBadge, PinBadge, LockBadge, WithdrawnBadge } from '@/components/forum/ForumBits'
 import { ReplyComposer, type ReplyComposerHandle } from '@/components/forum/ReplyComposer'
 import { ForumPostCard } from '@/components/forum/ForumPostCard'
@@ -43,44 +37,52 @@ import { FRESH, forumKeys } from '@/lib/query/content'
 import { useForgetForumReads } from '@/hooks/useForgetForumReads'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
-import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { ForumPostBody } from '@/components/forum/ForumPostBody'
 import { buildForumQuoteMarkup, isForumQuoteSourceWithdrawn } from '@/lib/forum-quotes'
 import { FORUM_BODY_MAX_CHARS, FORUM_TITLE_MAX_CHARS, FORUM_LOCKED_ERROR, validateForumContent } from '@/lib/community-rules'
 
-function TopicShareButton() {
+function TopicShareButton({ compact = false }: { compact?: boolean }) {
   const [copied, setCopied] = useState(false)
+  const toast = useOptionalToast()
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href)
       setCopied(true)
+      toast?.toast.success('Link copied.')
       setTimeout(() => setCopied(false), 2000)
     } catch {
-      // Fallback
+      toast?.toast.error('Could not copy the link.')
     }
   }
 
+  if (compact) {
+    return (
+      <button
+        type="button"
+        onClick={handleCopy}
+        aria-label="Share"
+        title="Copy a link to this post"
+        className="inline-flex min-h-8 min-w-8 items-center justify-center text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+      >
+        {copied ? <Check className="w-3.5 h-3.5 text-cyan-glow" /> : <Link2 className="w-3.5 h-3.5" />}
+      </button>
+    )
+  }
+
   return (
-    <button
+    <HudButton
       type="button"
+      variant="secondary"
+      size="sm"
       onClick={handleCopy}
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink rounded-control border border-line bg-surface-1 hover:bg-surface-2 hover:border-line-strong transition-colors shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-      title={copied ? 'Link copied!' : 'Share discussion'}
+      icon={copied ? <Check className="w-3.5 h-3.5 text-cyan-glow" /> : <Link2 className="w-3.5 h-3.5" />}
+      title="Copy a link to this post"
+      data-testid="forum-share"
     >
-      {copied ? (
-        <>
-          <Check className="w-3.5 h-3.5 text-cyan-glow" />
-          <span className="text-cyan-glow">Copied</span>
-        </>
-      ) : (
-        <>
-          <Link2 className="w-3.5 h-3.5" />
-          <span>Share</span>
-        </>
-      )}
-    </button>
+      {copied ? 'Copied' : 'Share'}
+    </HudButton>
   )
 }
 
@@ -130,7 +132,7 @@ export const Route = createFileRoute('/_hud/forum/$categorySlug/$topicSlug')({
     }
   },
   component: ForumThreadPage,
-  pendingComponent: HudWorkspaceGhost,
+  pendingComponent: ForumThreadGhost,
   staleTime: FRESH.forum,
   preloadStaleTime: FRESH.forum,
 })
@@ -269,16 +271,15 @@ function ForumThreadPage() {
   if (!detail || !topic) {
     return (
       <ForumShell>
-        <div className="max-w-2xl mx-auto w-full py-16 text-center font-sans space-y-4">
-          <Terminal className="w-10 h-10 text-crimson-text mx-auto" />
-          <h1 className="font-grotesk font-bold text-xl text-ink uppercase">Post Not Found</h1>
+        <div className="max-w-2xl mx-auto w-full py-16 text-center font-sans space-y-3">
+          <h1 className="font-grotesk font-bold text-xl text-ink">Post not found</h1>
           <p className="text-xs text-ink-muted">This post does not exist or was removed.</p>
           <Link
             to="/forum"
-            className="inline-flex items-center gap-2 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.08em] rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            className="inline-flex min-h-8 items-center gap-2 px-3 text-[11px] font-bold uppercase tracking-[0.08em] rounded-control border border-line bg-surface-2 text-ink hover:bg-surface-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            Back to Community
+            Back to the forum
           </Link>
         </div>
       </ForumShell>
@@ -406,155 +407,105 @@ function ForumThreadPage() {
   const topicWithdrawn = isForumQuoteSourceWithdrawn(topic)
   const canAuthorTopic = Boolean(userId && topic.userId && userId === topic.userId && !topicWithdrawn)
 
+  const canReply = !topic.isLocked && !topicWithdrawn
+  const board = topic.categorySlug
+    ? { slug: topic.categorySlug, name: topic.categoryName || 'Board', color: topic.categoryColor }
+    : { slug: categorySlug, name: topic.categoryName || 'Board', color: topic.categoryColor }
+  const replyCount = nextReplyOffset === null ? posts.length : Math.max(topic.repliesCount, posts.length)
+  const handle = topic.authorHandle?.replace(/^@/, '')
+  const authorParams = topic.userId
+    ? { profileId: resolveMemberPublicParam({ id: topic.userId, handle: topic.authorHandle }) }
+    : null
+  const flags = topic.isPinned || topic.isLocked || topicWithdrawn
+
   return (
     <ForumShell>
       <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative pb-8">
-        {/* Breadcrumb Navigation */}
-        <div className="flex items-center gap-2">
-          <Link
-            to="/forum/$categorySlug"
-            params={{ categorySlug }}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-glow hover:underline uppercase transition-colors rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+        <div>
+          <ForumBandCrumbs board={board} />
+          <HudTitlePanel
+            treatment="band"
+            joined
+            title={<span className="break-words">{topic.title}</span>}
+            actions={
+              <span className="hidden sm:inline-flex">
+                <TopicShareButton />
+              </span>
+            }
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>{topic.categoryName || 'Back to board'}</span>
-          </Link>
+            {flags ? (
+              <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                {topic.isPinned && <PinBadge />}
+                {topic.isLocked && <LockBadge />}
+                {topicWithdrawn && <WithdrawnBadge />}
+              </div>
+            ) : null}
+          </HudTitlePanel>
         </div>
 
-        {/* 2-Column Bento Split */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
-          {/* Left Column (8 cols): Original Topic Post, Reply Composer, Comments Stream */}
-          <div className="lg:col-span-8 flex flex-col space-y-3 sm:space-y-4 lg:space-y-5">
-            {/* Topic Main Card */}
-            <article className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 lg:p-5 space-y-3.5 relative overflow-hidden">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-2 text-[11px]">
-                  {topic.categoryName && (
-                    <span
-                      className="px-1.5 py-0.2 font-sans font-bold uppercase tracking-[0.08em] rounded-chip"
-                      style={{
-                        color: topic.categoryColor || '#00c3ff',
-                        backgroundColor: `${topic.categoryColor || '#00c3ff'}26`,
-                      }}
-                    >
-                      {topic.categoryName}
-                    </span>
-                  )}
-                  {topic.isPinned && <PinBadge />}
-                  {topic.isLocked && <LockBadge />}
-                  {topicWithdrawn && <WithdrawnBadge />}
-                </div>
-
-                <div className="text-[11px] text-ink-muted flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-ink-muted/60" />
-                  <LocalTime value={topic.createdAt} format={relativeTime} />
-                  <ForumRevisedMark
-                    createdAt={topic.createdAt}
-                    updatedAt={topic.updatedAt}
-                    deletedAt={topic.deletedAt}
-                  />
-                </div>
-              </div>
-
-              <h1 className="font-grotesk font-extrabold text-lg sm:text-xl md:text-2xl text-ink leading-snug uppercase">
-                {topic.title}
-              </h1>
-
-              {/* Author & Stats Strip */}
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line-subtle pb-3.5">
-                <div className="flex items-center gap-3 min-w-0">
-                  {topic.userId ? (
-                    <Link
-                      to="/member/$profileId"
-                      params={{
-                        profileId: resolveMemberPublicParam({
-                          id: topic.userId,
-                          handle: topic.authorHandle,
-                        }),
-                      }}
-                      className="shrink-0 group/topic-avatar focus:outline-hidden"
-                      tabIndex={-1}
-                      aria-hidden="true"
-                    >
-                      <ForumAvatar
-                        src={topic.authorAvatar}
-                        authorName={topic.authorName}
-                        authorHandle={topic.authorHandle}
-                        userId={topic.userId}
-                        avatarConfig={topic.authorAvatarConfig}
-                        alt=""
-                        size="lg"
-                        className="ring-2 ring-line group-hover/topic-avatar:ring-line-strong transition-all shadow-md"
-                      />
-                    </Link>
-                  ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 items-start">
+          <div className="lg:col-span-8 min-w-0 space-y-3 sm:space-y-4">
+            {/* The post itself */}
+            <article
+              className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 lg:p-5 space-y-3"
+              data-testid="forum-topic-post"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                {authorParams ? (
+                  <Link to="/member/$profileId" params={authorParams} className="shrink-0 focus:outline-hidden" tabIndex={-1} aria-hidden="true">
                     <ForumAvatar
                       src={topic.authorAvatar}
                       authorName={topic.authorName}
                       authorHandle={topic.authorHandle}
                       userId={topic.userId}
                       avatarConfig={topic.authorAvatarConfig}
+                      alt=""
                       size="lg"
-                      className="ring-2 ring-line shadow-md"
+                      loading="eager"
                     />
-                  )}
-
-                  <div className="min-w-0 flex flex-col justify-center">
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                      {topic.userId ? (
-                        <Link
-                          to="/member/$profileId"
-                          params={{
-                            profileId: resolveMemberPublicParam({
-                              id: topic.userId,
-                              handle: topic.authorHandle,
-                            }),
-                          }}
-                          className="text-ink font-grotesk font-bold text-sm sm:text-base hover:text-cyan-glow transition-colors truncate"
-                        >
-                          {topic.authorName}
-                        </Link>
-                      ) : (
-                        <span className="text-ink font-grotesk font-bold text-sm sm:text-base truncate">
-                          {topic.authorName}
-                        </span>
-                      )}
-
-                      {topic.authorHandle && (
-                        <span className="text-xs text-ink-muted hidden sm:inline truncate">
-                          @{topic.authorHandle.replace(/^@/, '')}
-                        </span>
-                      )}
-
-                      <span className="px-1.5 py-0.2 text-[11px] font-sans font-bold uppercase tracking-[0.08em] bg-cyan-soft text-cyan-glow rounded-chip">
-                        AUTHOR
-                      </span>
-
-                      <StageBadge stage={topic.authorStage} />
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11px] text-ink-muted mt-0.5">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-ink-muted/60" />
-                        <LocalTime value={topic.createdAt} format={relativeTime} titleFormat={formatDayTime} />
-                      </span>
-                      <span className="text-ink-muted/60">·</span>
-                      <span className="flex items-center gap-1">
-                        <Eye className="w-3.5 h-3.5 text-ink-muted/60" />
-                        <span>{topic.views} views</span>
-                      </span>
-                    </div>
+                  </Link>
+                ) : (
+                  <ForumAvatar
+                    src={topic.authorAvatar}
+                    authorName={topic.authorName}
+                    authorHandle={topic.authorHandle}
+                    userId={topic.userId}
+                    avatarConfig={topic.authorAvatarConfig}
+                    size="lg"
+                    loading="eager"
+                  />
+                )}
+                <div className="min-w-0 space-y-0.5">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                    {authorParams ? (
+                      <Link
+                        to="/member/$profileId"
+                        params={authorParams}
+                        className="text-ink font-bold text-sm sm:text-base truncate hover:text-cyan-glow transition-colors rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                      >
+                        {topic.authorName}
+                      </Link>
+                    ) : (
+                      <span className="text-ink font-bold text-sm sm:text-base truncate">{topic.authorName}</span>
+                    )}
+                    <StageBadge stage={topic.authorStage} />
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-1.5 text-[11px] text-ink-muted">
+                    {handle ? <span className="hidden sm:inline truncate">@{handle}</span> : null}
+                    {handle ? <span className="hidden sm:inline" aria-hidden="true">·</span> : null}
+                    <LocalTime value={topic.createdAt} format={relativeTime} titleFormat={formatDayTime} />
+                    <ForumRevisedMark createdAt={topic.createdAt} updatedAt={topic.updatedAt} deletedAt={topic.deletedAt} />
+                    <span aria-hidden="true">·</span>
+                    <span className="inline-flex items-center gap-1">
+                      <Eye className="w-3.5 h-3.5" aria-hidden="true" />
+                      {topic.views} views
+                    </span>
                   </div>
                 </div>
-
-                <TopicShareButton />
               </div>
 
-              {/* Topic Body */}
               {topicWithdrawn ? (
-                <div className="rounded-control border border-line-subtle bg-abyss/60 p-3.5 sm:p-4">
-                  <ForumWithdrawnBody className="text-xs sm:text-sm text-ink-muted leading-relaxed italic" />
-                </div>
+                <ForumWithdrawnBody className="text-sm text-ink-muted leading-relaxed italic" />
               ) : editingTopic ? (
                 <form ref={topicFormRef} onSubmit={handleTopicSave} className="space-y-2.5" data-testid="forum-revise-topic-form">
                   {topicError && (
@@ -569,7 +520,7 @@ function ForumThreadPage() {
                     type="text"
                     value={topicTitleDraft}
                     onChange={(e) => setTopicTitleDraft(e.target.value)}
-                    aria-label="Revise topic title"
+                    aria-label="Edit post title"
                     className="w-full bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus p-3 text-sm text-ink outline-hidden rounded-control transition-[border-color,box-shadow]"
                   />
                   <ForumEditor
@@ -579,37 +530,36 @@ function ForumThreadPage() {
                     disabled={topicBusy}
                     size="tall"
                     autoFocus
-                    aria-label="Revise topic body"
+                    aria-label="Edit post body"
                     testId="forum-revise-topic-editor"
                   />
                   <div className="flex items-center justify-end gap-2">
-                    <button
+                    <HudButton
                       type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => {
                         setEditingTopic(false)
                         setTopicError(null)
                       }}
-                      className="px-3 py-1.5 rounded-control text-xs font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     >
                       Cancel
-                    </button>
-                    <button
+                    </HudButton>
+                    <HudButton
                       type="submit"
+                      variant="primary"
+                      size="sm"
                       disabled={topicBusy || topicTitleDraft.trim().length < 5 || forumVisibleLength(topicBodyDraft) < 10 || topicBodyDraft.trim().length > FORUM_BODY_MAX_CHARS}
-                      className="px-4 py-1.5 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     >
-                      {topicBusy ? 'Sealing...' : 'Seal revision'}
-                    </button>
+                      {topicBusy ? 'Saving...' : 'Save changes'}
+                    </HudButton>
                   </div>
                 </form>
               ) : (
-                <div className="rounded-control border border-line-subtle bg-abyss/60 p-3.5 sm:p-4 text-xs sm:text-sm text-ink-body leading-relaxed">
-                  <ForumPostBody content={topic.content} />
-                </div>
+                <ForumPostBody content={topic.content} className="space-y-2.5 text-sm sm:text-[15px] text-ink-body leading-relaxed" />
               )}
 
-              {/* Action Footer */}
-              <div className="pt-2 border-t border-line-subtle flex items-center justify-between gap-2">
+              <div className="-ml-2 flex flex-wrap items-center gap-1">
                 <VoteButton
                   count={topic.upvotes}
                   voted={topic.voted}
@@ -618,8 +568,21 @@ function ForumThreadPage() {
                   onResult={handleTopicVote}
                   size="inline"
                 />
-
-                <div className="flex items-center gap-3">
+                {canReply && (
+                  <button
+                    type="button"
+                    onClick={handleQuoteTopic}
+                    className="inline-flex min-h-8 items-center gap-1.5 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                    data-testid="forum-quote-topic"
+                  >
+                    <Quote className="w-3.5 h-3.5" />
+                    Quote
+                  </button>
+                )}
+                <div className="ml-auto flex items-center gap-1">
+                  <span className="sm:hidden">
+                    <TopicShareButton compact />
+                  </span>
                   {canAuthorTopic && (
                     <ForumAuthorTools
                       confirmingWithdraw={confirmingTopicWithdraw}
@@ -645,50 +608,35 @@ function ForumThreadPage() {
                     withdrawn={topicWithdrawn}
                     deletedAt={topic.deletedAt}
                   />
-                  {!topicWithdrawn && !topic.isLocked && (
-                    <button
-                      type="button"
-                      onClick={handleQuoteTopic}
-                      className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-                      data-testid="forum-quote-topic"
-                    >
-                      <Quote className="w-3.5 h-3.5" />
-                      Quote
-                    </button>
-                  )}
-                  <div className="text-[11px] text-ink-muted flex items-center gap-1">
-                    <MessageSquare className="w-3.5 h-3.5 text-cyan-glow" />
-                    <span>{topic.repliesCount} comments</span>
-                  </div>
                 </div>
               </div>
             </article>
 
-            {/* Reply Composer */}
             {topic.isLocked ? (
               <div
-                className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 lg:p-5 text-center space-y-1.5"
+                className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 flex items-start gap-2.5"
                 data-testid="forum-thread-locked"
               >
-                <p className="text-xs text-ink font-bold">Thread locked</p>
-                <p className="text-xs text-ink-muted">{FORUM_LOCKED_ERROR}</p>
+                <Lock className="w-4 h-4 text-ink-muted shrink-0 mt-0.5" aria-hidden="true" />
+                <div className="space-y-0.5">
+                  <p className="text-xs text-ink font-bold">Thread locked</p>
+                  <p className="text-xs text-ink-muted">{FORUM_LOCKED_ERROR}</p>
+                </div>
               </div>
             ) : (
-              <ReplyComposer ref={topComposerRef} topicId={topic.id} onPosted={handlePosted} />
+              <ReplyComposer ref={topComposerRef} topicId={topic.id} onPosted={handlePosted} collapsible />
             )}
 
-            {/* Comments Stream */}
-            <section className="space-y-3">
+            <section className="space-y-2.5 sm:space-y-3" aria-labelledby="forum-replies-heading">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h2 className="text-xs sm:text-sm font-grotesk font-bold uppercase tracking-[0.08em] text-ink flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-cyan-glow" />
-                  <span>{nextReplyOffset === null ? posts.length : Math.max(topic.repliesCount, posts.length)} Comments</span>
+                <h2 id="forum-replies-heading" className="font-grotesk text-base font-bold text-ink">
+                  {replyCount} {replyCount === 1 ? 'reply' : 'replies'}
                 </h2>
-                {posts.length > 0 && (
+                {posts.length > 1 && (
                   <div
-                    className="flex items-center gap-1 text-[11px]"
+                    className="flex items-center gap-1 rounded-control bg-abyss/40 p-0.5"
                     role="group"
-                    aria-label="Sort comments"
+                    aria-label="Sort replies"
                     data-testid="forum-reply-sort"
                   >
                     {SORT_OPTIONS.map((opt) => (
@@ -698,11 +646,7 @@ function ForumThreadPage() {
                         onClick={() => changeReplySort(opt.id)}
                         aria-pressed={replySort === opt.id}
                         disabled={repliesLoading}
-                        className={`px-2 py-1 font-bold uppercase tracking-[0.08em] rounded-t-control border-b-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
-                          replySort === opt.id
-                            ? 'bg-surface-2 text-ink border-cyan-glow'
-                            : 'text-ink-muted border-transparent hover:text-ink hover:bg-surface-2'
-                        }`}
+                        className={pillTabClass(replySort === opt.id, 'min-h-8 normal-case tracking-normal text-xs')}
                       >
                         {opt.label}
                       </button>
@@ -712,11 +656,11 @@ function ForumThreadPage() {
               </div>
 
               {posts.length === 0 ? (
-                <div className="p-8 text-center text-xs text-ink-muted rounded-card border border-line-subtle bg-surface-1">
-                  No replies yet. Be the first to respond.
-                </div>
+                <p className="py-6 text-center text-xs text-ink-muted">
+                  {canReply ? 'No replies yet. Be the first to respond.' : 'No replies.'}
+                </p>
               ) : (
-                <div className="space-y-2.5">
+                <div className="space-y-2.5 sm:space-y-3">
                   {postTree.map((node) => (
                     <ForumPostCard
                       key={node.post.id}
@@ -748,56 +692,18 @@ function ForumThreadPage() {
                 </div>
               )}
             </section>
+
+            <MoreFromBoard topic={{ ...topic, categorySlug: board.slug }} className="lg:hidden" />
           </div>
 
-          {/* Right Column (4 cols): Transmission Intel & Guidelines */}
-          <div className="lg:col-span-4 flex flex-col space-y-3 sm:space-y-4 lg:space-y-5">
-            {/* Transmission Intel Card */}
-            <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 space-y-2.5">
-              <div className="flex items-center justify-between border-b border-line-subtle pb-2.5">
-                <div className="flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-cyan-glow" />
-                  <h3 className="font-grotesk text-xs sm:text-sm font-bold text-ink uppercase tracking-[0.08em]">
-                    THREAD INFO
-                  </h3>
-                </div>
-                <span className="text-[11px] font-sans font-bold tracking-[0.08em] text-cyan-glow bg-cyan-soft px-2 py-0.5 rounded-chip">
-                  LIVE
-                </span>
-              </div>
-
-              <div className="space-y-1.5 font-sans text-xs">
-                <div className="rounded-control border border-line-subtle bg-abyss/60 p-2 flex items-center justify-between">
-                  <span className="text-ink-muted text-[11px] uppercase font-bold tracking-[0.08em]">BOARD</span>
-                  <span className="text-ink font-bold uppercase">{topic.categoryName || 'General'}</span>
-                </div>
-                <div className="rounded-control border border-line-subtle bg-abyss/60 p-2 flex items-center justify-between">
-                  <span className="text-ink-muted text-[11px] uppercase font-bold tracking-[0.08em]">AUTHOR STAGE</span>
-                  <StageBadge stage={topic.authorStage} />
-                </div>
-                <div className="rounded-control border border-line-subtle bg-abyss/60 p-2 flex items-center justify-between">
-                  <span className="text-ink-muted text-[11px] uppercase font-bold tracking-[0.08em]">TOTAL VIEWS</span>
-                  <span className="text-cyan-glow font-bold">{topic.views}</span>
-                </div>
-                <div className="rounded-control border border-line-subtle bg-abyss/60 p-2 flex items-center justify-between">
-                  <span className="text-ink-muted text-[11px] uppercase font-bold tracking-[0.08em]">TOTAL REPLIES</span>
-                  <span className="text-ink font-bold">{topic.repliesCount}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Directives Reminder */}
-            <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset p-3 sm:p-4 space-y-2.5">
-              <div className="flex items-center gap-2 border-b border-line-subtle pb-2.5">
-                <ShieldCheck className="w-4 h-4 text-cyan-glow" />
-                <h3 className="font-grotesk text-xs sm:text-sm font-bold text-ink uppercase tracking-[0.08em]">
-                  COMMUNITY RULES
-                </h3>
-              </div>
-              <p className="text-xs text-ink-muted leading-relaxed">
-                Be constructive and civil. Keep credentials private, and encourage growth across every stage.
-              </p>
-            </div>
+          <div className="hidden lg:block lg:col-span-4 lg:self-stretch">
+            <ForumThreadRail
+              topic={topic}
+              posts={posts as ForumPostEntry[]}
+              canReply={canReply}
+              onReply={() => topComposerRef.current?.open()}
+              onVote={handleTopicVote}
+            />
           </div>
         </div>
       </div>
