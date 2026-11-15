@@ -533,3 +533,58 @@ describe('useDailyAlignment Hook Optimistic State & Rapid Clicks', () => {
     expect(screen.getByRole('link', { name: 'Shop' })).toHaveAttribute('href', '/character/shop')
   })
 })
+
+describe('AlignmentProvider reuseRecentSync (public header)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    localStorage.clear()
+    vi.mocked(getAuthJWTToken).mockResolvedValue('mock-jwt-token')
+    mockAuthClient.useSession.mockReturnValue({
+      data: { user: { id: 'public-reuse-user' } },
+      isPending: false,
+    })
+  })
+
+  const reuseWrapper = ({ children }: { children: React.ReactNode }) => (
+    <ToastProvider>
+      <AlignmentProvider reuseRecentSync>{children}</AlignmentProvider>
+    </ToastProvider>
+  )
+
+  it('reads once, then reuses that read when the header remounts on the next public page', async () => {
+    const today = localDateString()
+    const completedKeys = CANONICAL_ALIGNMENT_TASKS.slice(0, 3).map((t) => t.key)
+    const fetchSpy = vi.spyOn(serverApi, 'getDailyAlignmentFn').mockResolvedValue({
+      date: today,
+      tasks: mergeCompletions(completedKeys),
+      completedKeys,
+      completedCount: 3,
+      totalCount: 8,
+      isAllCompleted: false,
+      history: [{ date: today, completedCount: 3 }],
+      streakDays: 2,
+      xp: 420,
+      stage: 2,
+    })
+
+    const first = renderHook(() => useDailyAlignment(), { wrapper: reuseWrapper })
+    await waitFor(() => expect(first.result.current.xpConfirmed).toBe(true))
+    expect(first.result.current.xp).toBe(420)
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+    first.unmount()
+
+    const second = renderHook(() => useDailyAlignment(), { wrapper: reuseWrapper })
+    expect(second.result.current.completedCount).toBe(3)
+    await waitFor(() => expect(second.result.current.isLoading).toBe(false))
+    expect(second.result.current.xp).toBe(420)
+    expect(second.result.current.xpConfirmed).toBe(true)
+    expect(second.result.current.streakDays).toBe(2)
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+    second.unmount()
+
+    // The app's provider keeps reading on mount.
+    const app = renderHook(() => useDailyAlignment(), { wrapper })
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(2))
+    app.unmount()
+  })
+})

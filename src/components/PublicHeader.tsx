@@ -35,6 +35,10 @@ import { useModalPanelFocus } from '@/hooks/useModalPanelFocus'
 const LazyPublicHeaderAuthSlot = lazy(() =>
   import('@/components/PublicHeaderAuthSlot').then((m) => ({ default: m.PublicHeaderAuthSlot }))
 )
+// Same chunk as the auth slot: members' XP and today's tasks for the account medallion.
+const LazyPublicHeaderAccountProvider = lazy(() =>
+  import('@/components/PublicHeaderAuthSlot').then((m) => ({ default: m.PublicHeaderAccountProvider }))
+)
 
 export interface PublicHeaderProps {
   activePage?: 'home' | 'org' | 'blog' | 'news' | 'store' | 'moltmax' | 'forum' | 'about'
@@ -589,6 +593,40 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         )
       : null
 
+  // Phone: the app's faint pill (Join or menu) and the member's XP-ring portrait. Desktop: Dashboard + medallion.
+  const headerActions = (
+    <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+      <div className="lg:hidden flex items-center">
+        {authReady ? (
+          <Suspense fallback={<div className="flex items-center -mr-1.5"><div className={PUBLIC_PHONE_PILL}>{menuButton}</div></div>}>
+            <LazyPublicHeaderAuthSlot
+              layout="bar"
+              onNavigate={onNavigate}
+              onOpenAuth={onOpenAuth}
+              menuButton={menuButton}
+            />
+          </Suspense>
+        ) : (
+          <div className="flex items-center -mr-1.5"><div className={PUBLIC_PHONE_PILL}>{menuButton}</div></div>
+        )}
+      </div>
+
+      <div className="hidden lg:flex items-center gap-3 sm:gap-4">
+        {authReady ? (
+          <Suspense fallback={<PublicHeaderAuthSkeleton layout="desktop" />}>
+            <LazyPublicHeaderAuthSlot
+              layout="desktop"
+              onNavigate={onNavigate}
+              onOpenAuth={onOpenAuth}
+            />
+          </Suspense>
+        ) : (
+          <PublicHeaderAuthSkeleton layout="desktop" />
+        )}
+      </div>
+    </div>
+  )
+
   return (
     <header
       ref={headerRef}
@@ -677,37 +715,13 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         </nav>
 
         {/* Header Action Items */}
-        <div className="flex items-center gap-3 sm:gap-4 shrink-0">
-          {/* Phone: the app's faint pill (Join or menu) and the member's XP-ring portrait */}
-          <div className="lg:hidden flex items-center">
-            {authReady ? (
-              <Suspense fallback={<div className="flex items-center -mr-1.5"><div className={PUBLIC_PHONE_PILL}>{menuButton}</div></div>}>
-                <LazyPublicHeaderAuthSlot
-                  layout="bar"
-                  onNavigate={onNavigate}
-                  onOpenAuth={onOpenAuth}
-                  menuButton={menuButton}
-                />
-              </Suspense>
-            ) : (
-              <div className="flex items-center -mr-1.5"><div className={PUBLIC_PHONE_PILL}>{menuButton}</div></div>
-            )}
-          </div>
-
-          <div className="hidden lg:flex items-center gap-3 sm:gap-4">
-            {authReady ? (
-              <Suspense fallback={<PublicHeaderAuthSkeleton layout="desktop" />}>
-                <LazyPublicHeaderAuthSlot
-                  layout="desktop"
-                  onNavigate={onNavigate}
-                  onOpenAuth={onOpenAuth}
-                />
-              </Suspense>
-            ) : (
-              <PublicHeaderAuthSkeleton layout="desktop" />
-            )}
-          </div>
-        </div>
+        {authReady ? (
+          <Suspense fallback={headerActions}>
+            <LazyPublicHeaderAccountProvider>{headerActions}</LazyPublicHeaderAccountProvider>
+          </Suspense>
+        ) : (
+          headerActions
+        )}
       </div>
 
       {mobileMenu}
