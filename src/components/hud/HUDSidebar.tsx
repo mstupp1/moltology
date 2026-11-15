@@ -786,6 +786,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         moreButtonRef={mobileTriggerRef}
         core={{
           current: isOnPath('/oracle') || isOracleOverlayOpen,
+          drained: Boolean(oracle?.coreViewOpen) && (isOnPath('/oracle') || isOracleOverlayOpen),
           onPress: () => {
             // On the Oracle page itself (a direct link) the core has nothing to open.
             if (isOnPath('/oracle')) return
