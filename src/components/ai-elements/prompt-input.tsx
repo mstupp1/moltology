@@ -128,85 +128,55 @@ export function readSlashQuery(text: string): string | null {
 }
 
 /**
- * Skills button beside the model picker: every usable skill, plus a way to browse more. With a
- * skill on, the button becomes that skill's pill (with an X to turn it off), so the box never
- * gains a row.
+ * Skills button beside the model picker. It opens the same floating skills sheet as typing "/"
+ * (drawn by PromptInput). With a skill on, the button becomes that skill's pill (with an X to
+ * turn it off), so the box never gains a row.
  */
 export const OracleSkillMenu: React.FC<{
   skills: PromptSkillOption[]
   activeSkill?: { id: string; name: string } | null
-  onPick: (id: string) => void
+  open: boolean
+  listId: string
+  onToggle: () => void
+  onKeyDown?: (e: React.KeyboardEvent<HTMLButtonElement>) => void
   onClear?: () => void
   compactLabel?: boolean
-}> = ({ skills, activeSkill = null, onPick, onClear, compactLabel = false }) => {
-  const activeSkillId = activeSkill?.id
-  const activeIcon = skills.find((s) => s.id === activeSkillId)?.icon
-  const menu = (
-    <HudDropdownMenu modal={false}>
-      <HudDropdownMenuTrigger asChild>
-        {activeSkill ? (
-          <button
-            type="button"
-            className={`flex min-h-[30px] min-w-0 items-center gap-1 pl-2 ${onClear ? 'pr-1' : 'pr-2'} py-1 text-[11px] sm:text-xs font-semibold text-ink cursor-pointer ${FOCUS_RING} rounded-control`}
-            title="Change skill (type /)"
-            aria-label={`Skill: ${activeSkill.name}. Change skill`}
-          >
-            <OracleSkillIcon icon={activeIcon} className="w-3.5 h-3.5 shrink-0 text-cyan-glow" />
-            <span className="truncate">{activeSkill.name}</span>
-          </button>
-        ) : (
-          <button
-            type="button"
-            className={`flex min-h-8 items-center gap-1 text-[11px] sm:text-xs text-ink-body hover:text-ink bg-surface-1 border border-line hover:bg-surface-3 hover:border-line-strong px-2 py-1 rounded-control transition-colors cursor-pointer ${FOCUS_RING}`}
-            title="Skills (type /)"
-            aria-label="Skills"
-          >
-            <ScrollText className="w-3.5 h-3.5 text-cyan-glow" aria-hidden="true" />
-            {compactLabel ? null : <span className="font-medium">Skills</span>}
-          </button>
-        )}
-      </HudDropdownMenuTrigger>
-      <HudDropdownMenuContent
-        side="top"
-        align="start"
-        sideOffset={8}
-        collisionPadding={12}
+}> = ({ skills, activeSkill = null, open, listId, onToggle, onKeyDown, onClear, compactLabel = false }) => {
+  const activeIcon = skills.find((s) => s.id === activeSkill?.id)?.icon
+  const shared = {
+    type: 'button' as const,
+    onClick: onToggle,
+    onKeyDown,
+    'aria-haspopup': 'listbox' as const,
+    'aria-expanded': open,
+    'aria-controls': open ? listId : undefined,
+  }
+  if (!activeSkill) {
+    return (
+      <button
+        {...shared}
+        className={`flex min-h-8 items-center gap-1 text-[11px] sm:text-xs text-ink-body hover:text-ink border px-2 py-1 rounded-control transition-colors cursor-pointer ${FOCUS_RING} ${
+          open ? 'bg-surface-3 border-line-strong text-ink' : 'bg-surface-1 border-line hover:bg-surface-3 hover:border-line-strong'
+        }`}
+        title="Skills (or type /)"
         aria-label="Skills"
-        aria-labelledby={undefined}
-        className="w-[320px] max-w-[calc(100vw-24px)] p-0 overflow-y-auto overscroll-contain"
-        style={{ maxHeight: 'min(480px, var(--radix-dropdown-menu-content-available-height))' }}
       >
-        <p className="px-4 pt-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">Use a skill</p>
-        <div className="pb-1">
-          {skills.map((skill) => (
-            <HudDropdownMenuItem
-              key={skill.id}
-              role="menuitemradio"
-              aria-checked={skill.id === activeSkillId}
-              onSelect={() => onPick(skill.id)}
-              className={`flex items-start gap-3 rounded-none px-4 py-2 ${skill.id === activeSkillId ? 'bg-surface-3' : ''}`}
-            >
-              <OracleSkillIcon icon={skill.icon} className="mt-0.5 h-4 w-4 shrink-0 text-ink-body" />
-              <span className="min-w-0 flex-1">
-                <span className="flex items-center justify-between gap-2 text-sm font-semibold text-ink">
-                  {skill.name}
-                  {skill.id === activeSkillId && <Check aria-label="On" className="h-4 w-4 shrink-0 text-cyan-glow" />}
-                </span>
-                <span className="block text-xs leading-snug text-ink-muted">{skill.summary}</span>
-              </span>
-            </HudDropdownMenuItem>
-          ))}
-        </div>
-        <a href={BROWSE_SKILLS_HREF} className="block border-t border-line-subtle px-4 py-3 text-xs text-cyan-glow hover:underline">
-          Browse all skills
-        </a>
-      </HudDropdownMenuContent>
-    </HudDropdownMenu>
-  )
-  if (!activeSkill) return menu
+        <ScrollText className="w-3.5 h-3.5 text-cyan-glow" aria-hidden="true" />
+        {compactLabel ? null : <span className="font-medium">Skills</span>}
+      </button>
+    )
+  }
   return (
     <span className="inline-flex min-w-0 max-w-[12rem] sm:max-w-[16rem] items-center rounded-control border border-line bg-surface-3 hover:border-line-strong transition-colors">
-      {menu}
+      <button
+        {...shared}
+        className={`flex min-h-[30px] min-w-0 items-center gap-1 pl-2 ${onClear ? 'pr-1' : 'pr-2'} py-1 text-[11px] sm:text-xs font-semibold text-ink cursor-pointer ${FOCUS_RING} rounded-control`}
+        title="Change skill (or type /)"
+        aria-label={`Skill: ${activeSkill.name}. Change skill`}
+      >
+        <OracleSkillIcon icon={activeIcon} className="w-3.5 h-3.5 shrink-0 text-cyan-glow" />
+        <span className="truncate">{activeSkill.name}</span>
+      </button>
       {onClear && <SkillClearButton name={activeSkill.name} onClear={onClear} />}
     </span>
   )
@@ -314,6 +284,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   const textRef = useRef(text)
   textRef.current = text
   const setText = (next: string) => {
+    if (next) setSkillMenuOpen(false)
     if (!isControlled) setLocalText(next)
     onValueChange?.(next)
   }
@@ -322,10 +293,13 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   const skillListId = useId()
   const canPickSkills = Boolean(skills?.length && onPickSkill)
   const slashQuery = canPickSkills ? readSlashQuery(text) : null
-  const skillMatches = slashQuery !== null ? filterSkillOptions(skills ?? [], slashQuery) : []
+  // The Skills button opens the full list; typing "/" opens it filtered by what follows.
+  const [skillMenuOpen, setSkillMenuOpen] = useState(false)
+  const skillMatches =
+    slashQuery !== null ? filterSkillOptions(skills ?? [], slashQuery) : skillMenuOpen ? (skills ?? []) : []
   const [skillCursor, setSkillCursor] = useState(0)
   const [slashDismissed, setSlashDismissed] = useState(false)
-  const showSkillList = slashQuery !== null && !slashDismissed
+  const showSkillList = canPickSkills && ((slashQuery !== null && !slashDismissed) || skillMenuOpen)
   const cardRef = useRef<HTMLDivElement>(null)
   // The list floats over the chat like a menu, above the box when there's room (docked at the
   // bottom), below it when the box sits at the top of the screen (new chat on phones).
@@ -351,7 +325,30 @@ export const PromptInput: React.FC<PromptInputProps> = ({
     setSkillCursor(0)
     if (slashQuery === null) setSlashDismissed(false)
   }, [slashQuery])
+  const closeSkillMenu = () => {
+    setSkillMenuOpen(false)
+    if (slashQuery !== null) setSlashDismissed(true)
+  }
+  const toggleSkillMenu = () => {
+    if (showSkillList) {
+      closeSkillMenu()
+      return
+    }
+    const activeIndex = (skills ?? []).findIndex((s) => s.id === activeSkill?.id)
+    setSkillCursor(Math.max(0, activeIndex))
+    setSkillMenuOpen(true)
+  }
+  // Clicking or tapping anywhere outside the box closes a list the button opened.
+  useEffect(() => {
+    if (!skillMenuOpen) return
+    const onPointerDown = (e: PointerEvent) => {
+      if (cardRef.current && !cardRef.current.contains(e.target as Node)) setSkillMenuOpen(false)
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    return () => document.removeEventListener('pointerdown', onPointerDown)
+  }, [skillMenuOpen])
   const pickSkill = (id: string) => {
+    setSkillMenuOpen(false)
     onPickSkill?.(id)
     if (slashQuery !== null) setText('')
     textareaRef.current?.focus()
@@ -391,26 +388,33 @@ export const PromptInput: React.FC<PromptInputProps> = ({
     setText('')
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (showSkillList && skillMatches.length > 0) {
+  /** Arrow keys, Enter/Tab and Escape while the skills list is open. True when the key was used. */
+  const handleSkillListKey = (e: React.KeyboardEvent<HTMLElement>): boolean => {
+    if (!showSkillList) return false
+    if (skillMatches.length > 0) {
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault()
         const step = e.key === 'ArrowDown' ? 1 : -1
         setSkillCursor((c) => (c + step + skillMatches.length) % skillMatches.length)
-        return
+        return true
       }
       if ((e.key === 'Enter' || e.key === 'Tab') && !e.shiftKey && !e.nativeEvent.isComposing) {
         e.preventDefault()
         pickSkill(skillMatches[Math.min(skillCursor, skillMatches.length - 1)].id)
-        return
+        return true
       }
     }
-    if (showSkillList && e.key === 'Escape') {
+    if (e.key === 'Escape') {
       e.preventDefault()
       e.stopPropagation()
-      setSlashDismissed(true)
-      return
+      closeSkillMenu()
+      return true
     }
+    return false
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (handleSkillListKey(e)) return
     // Backspace in an empty box turns the skill off.
     if (e.key === 'Backspace' && !text && activeSkill && onClearSkill) {
       onClearSkill()
@@ -501,7 +505,17 @@ export const PromptInput: React.FC<PromptInputProps> = ({
     <OracleSkillMenu
       skills={skills ?? []}
       activeSkill={activeSkill}
-      onPick={pickSkill}
+      open={showSkillList}
+      listId={skillListId}
+      onToggle={toggleSkillMenu}
+      onKeyDown={(e) => {
+        if (!showSkillList && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+          e.preventDefault()
+          toggleSkillMenu()
+          return
+        }
+        handleSkillListKey(e)
+      }}
       onClear={
         onClearSkill
           ? () => {
@@ -563,7 +577,10 @@ export const PromptInput: React.FC<PromptInputProps> = ({
                   icon={skill.icon}
                   className={`h-5 w-5 shrink-0 md:h-4 md:w-4 ${on ? 'text-cyan-glow' : 'text-ink-body'}`}
                 />
-                <span className="truncate">{skill.name}</span>
+                <span className="min-w-0 flex-1 truncate">{skill.name}</span>
+                {skill.id === activeSkill?.id && (
+                  <Check aria-label="On" className="h-4 w-4 shrink-0 text-cyan-glow" />
+                )}
               </button>
             )
           })
