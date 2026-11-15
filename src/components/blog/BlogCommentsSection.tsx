@@ -1,15 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import {
-  MessageSquare,
-  Send,
-  Lock,
-  Shield,
-  UserCheck,
-  AlertCircle,
-  Loader2,
-  Sparkles,
-  Terminal,
-} from 'lucide-react'
+import React, { useState, useEffect, useRef } from 'react'
+import { Link } from '@tanstack/react-router'
+import { AlertTriangle, Send } from 'lucide-react'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useToast } from '@/components/ui/ToastProvider'
 import { getAuthJWTToken } from '@/lib/jwt'
@@ -19,14 +10,93 @@ import {
   type BlogCommentEntry,
 } from '@/lib/server/api'
 import { AuthModal } from '@/components/AuthModal'
-import { HudGhostCard } from '@/components/ui/HudGhostLoader'
+import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { HudButton } from '@/components/ui/HudButton'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
+import { LocalTime } from '@/components/ui/LocalTime'
+import { ForumAvatar } from '@/components/forum/ForumAvatar'
+import { StageBadge } from '@/components/forum/ForumBits'
+import { relativeTime } from '@/lib/forum-utils'
+import { formatDayTime } from '@/lib/dates'
+import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { PAGE_SIZES, mergeById, takePage } from '@/lib/pagination'
+
+const MAX_CHAR_LIMIT = 1000
+const MIN_CHAR_LIMIT = 3
+/** The count shows once a comment gets this close to the limit. */
+const COUNT_SHOWS_AT = MAX_CHAR_LIMIT - 200
+
+const CARD = 'rounded-card border border-line-subtle bg-surface-1 hud-sheen'
+const FOCUS =
+  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 
 interface BlogCommentsSectionProps {
   postId?: string
+}
+
+function CommentRowsSkeleton({ rows = 2 }: { rows?: number }) {
+  return (
+    <div className={`${CARD} px-3 sm:px-4 divide-y divide-line-subtle`} data-testid="blog-comments-loading">
+      {Array.from({ length: rows }, (_, i) => (
+        <div key={i} className="py-3 sm:py-4 flex gap-2.5">
+          <HudGhostSkeleton variant="neutral" preset="avatar" width={32} height={32} />
+          <div className="flex-1 space-y-2 pt-1">
+            <HudGhostSkeleton variant="neutral" preset="text" width="35%" height={12} />
+            <HudGhostSkeleton variant="neutral" preset="text" width="90%" height={12} />
+            <HudGhostSkeleton variant="neutral" preset="text" width="60%" height={12} />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function CommentRow({ comment }: { comment: BlogCommentEntry }) {
+  const profileParams = comment.userId
+    ? { profileId: resolveMemberPublicParam({ id: comment.userId, handle: comment.authorHandle }) }
+    : null
+  const avatar = (
+    <ForumAvatar
+      src={comment.authorAvatar}
+      authorName={comment.authorName}
+      authorHandle={comment.authorHandle}
+      userId={comment.userId}
+      avatarConfig={comment.authorAvatarConfig}
+      alt=""
+      className="w-8 h-8"
+    />
+  )
+
+  return (
+    <li className="py-3 sm:py-4 flex gap-2.5" data-testid="blog-comment-row">
+      {profileParams ? (
+        <Link to="/member/$profileId" params={profileParams} className="shrink-0" tabIndex={-1} aria-hidden="true">
+          {avatar}
+        </Link>
+      ) : (
+        avatar
+      )}
+      <div className="min-w-0 flex-1 space-y-1">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-ink-muted">
+          {profileParams ? (
+            <Link
+              to="/member/$profileId"
+              params={profileParams}
+              className={`text-ink font-bold text-xs sm:text-sm truncate max-w-[60vw] sm:max-w-none hover:text-cyan-glow transition-colors rounded-control ${FOCUS}`}
+            >
+              {comment.authorName}
+            </Link>
+          ) : (
+            <span className="text-ink font-bold text-xs sm:text-sm truncate">{comment.authorName}</span>
+          )}
+          <StageBadge stage={comment.authorStage} />
+          <LocalTime value={comment.createdAt} format={relativeTime} titleFormat={formatDayTime} />
+        </div>
+        <p className="text-sm text-ink-body leading-relaxed whitespace-pre-wrap break-words">{comment.content}</p>
+      </div>
+    </li>
+  )
 }
 
 export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId }) => {
@@ -38,18 +108,15 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
   const [hasOlderComments, setHasOlderComments] = useState(false)
   const [loadingOlder, setLoadingOlder] = useState(false)
   const [commentInput, setCommentInput] = useState('')
+  const [composerOpen, setComposerOpen] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
-  const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
+  const turnstileRef = useRef<TurnstileWidgetRef>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  // Auth modal state
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup')
   const { toast } = useToast()
-
-  const MAX_CHAR_LIMIT = 1000
-  const MIN_CHAR_LIMIT = 3
 
   useEffect(() => {
     if (!postId) return
@@ -94,9 +161,9 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
     }
   }
 
-  const handleOpenAuth = (mode: 'login' | 'signup') => {
-    setAuthMode(mode)
-    setIsAuthModalOpen(true)
+  const openComposer = () => {
+    setComposerOpen(true)
+    requestAnimationFrame(() => textareaRef.current?.focus())
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,19 +172,17 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
     setErrorMessage(null)
 
     if (!user) {
-      handleOpenAuth('login')
+      setIsAuthModalOpen(true)
       return
     }
 
     const trimmed = commentInput.trim()
-
-    // Validation
     if (trimmed.length < MIN_CHAR_LIMIT) {
-      setErrorMessage(`Comment must be at least ${MIN_CHAR_LIMIT} characters.`)
+      setErrorMessage(`Comments need at least ${MIN_CHAR_LIMIT} characters.`)
       return
     }
     if (trimmed.length > MAX_CHAR_LIMIT) {
-      setErrorMessage(`Comment cannot exceed ${MAX_CHAR_LIMIT} characters.`)
+      setErrorMessage(`Comments can be up to ${MAX_CHAR_LIMIT} characters.`)
       return
     }
     if (!turnstileToken) {
@@ -126,7 +191,6 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
     }
 
     setIsSubmitting(true)
-
     try {
       const token = await getAuthJWTToken()
       const newComment = await createBlogCommentFn({
@@ -142,6 +206,7 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
       if (newComment) {
         setComments((prev) => [newComment, ...prev])
         setCommentInput('')
+        setComposerOpen(false)
         setTurnstileToken(null)
         turnstileRef.current?.reset()
         toast.success('Comment posted.', { id: 'blog-comment-posted' })
@@ -149,256 +214,159 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
     } catch (err: any) {
       console.error('Comment submission error:', err)
       turnstileRef.current?.reset()
-      setErrorMessage(err.message || 'Failed to post comment. Please try again.')
+      setErrorMessage(err?.message || 'Could not post your comment. Try again.')
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const formatStageLabel = (stageNum: number) => {
-    switch (stageNum) {
-      case 2:
-        return 'Stage 2: Soft-Shed'
-      case 3:
-        return 'Stage 3: Architect'
-      case 4:
-        return 'Stage 4: Ascendant'
-      default:
-        return 'Stage 1: Larva'
-    }
-  }
-
-  const formatTimestamp = (dateStr: string) => {
-    try {
-      const d = new Date(dateStr)
-      return d.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    } catch {
-      return dateStr
-    }
-  }
-
   const charCount = commentInput.length
   const isOverLimit = charCount > MAX_CHAR_LIMIT
+  const count = `${comments.length}${hasOlderComments ? '+' : ''}`
+
+  const me = user ? (
+    <ForumAvatar
+      src={user.image || (user as any).avatar || (user as any).picture}
+      authorName={user.name || undefined}
+      userId={user.id}
+      size="sm"
+      loading="eager"
+    />
+  ) : null
+
+  let composer: React.ReactNode
+  if (session.isPending) {
+    composer = (
+      <div className={`${CARD} p-3 flex items-center gap-2.5`} data-testid="blog-comments-auth-skeleton">
+        <HudGhostSkeleton variant="neutral" preset="avatar" width={28} height={28} />
+        <HudGhostSkeleton variant="neutral" preset="text" width="40%" height={14} />
+      </div>
+    )
+  } else if (!user) {
+    composer = (
+      <div className={`${CARD} p-3 flex flex-wrap items-center justify-between gap-2.5`} data-testid="blog-comments-signed-out">
+        <p className="text-xs text-ink-muted">Sign in to join the discussion.</p>
+        <HudButton type="button" variant="primary" size="sm" onClick={() => setIsAuthModalOpen(true)}>
+          Sign in / Join
+        </HudButton>
+      </div>
+    )
+  } else if (!composerOpen) {
+    composer = (
+      <button
+        type="button"
+        onClick={openComposer}
+        className={`w-full flex items-center gap-2.5 p-2.5 sm:p-3 ${CARD} text-left text-sm text-ink-muted hover:bg-surface-2 hover:border-line transition-colors ${FOCUS}`}
+        data-testid="blog-comment-open"
+      >
+        {me}
+        <span className="flex-1">Write a comment...</span>
+      </button>
+    )
+  } else {
+    composer = (
+      <form onSubmit={handleSubmit} className={`${CARD} p-3 sm:p-4 space-y-2.5`} data-testid="blog-comment-form">
+        {errorMessage && (
+          <div className="p-2.5 bg-crimson-soft border border-crimson-aggro/55 text-crimson-text text-xs flex items-center gap-2 rounded-control">
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+            <span className="break-words">{errorMessage}</span>
+          </div>
+        )}
+
+        <div className="flex items-start gap-2.5">
+          <span className="hidden sm:block pt-1">{me}</span>
+          <textarea
+            ref={textareaRef}
+            value={commentInput}
+            onChange={(e) => setCommentInput(e.target.value)}
+            placeholder="Write a comment..."
+            aria-label="Write a comment"
+            rows={3}
+            className="flex-1 min-w-0 bg-surface-2 border border-line hover:border-line-hover rounded-control p-3 text-sm text-ink placeholder:text-ink-muted focus:outline-hidden focus:border-cyan-glow focus:shadow-field-focus transition-[border-color,box-shadow] resize-y"
+          />
+        </div>
+
+        <TurnstileWidget
+          ref={turnstileRef}
+          action="blog_comment"
+          size="flexible"
+          onVerify={(token) => setTurnstileToken(token)}
+          onExpire={() => setTurnstileToken(null)}
+        />
+
+        <div className="flex items-center justify-end gap-2">
+          {charCount >= COUNT_SHOWS_AT && (
+            <span
+              className={`mr-auto text-[11px] ${isOverLimit ? 'text-crimson-text font-bold' : 'text-ink-muted'}`}
+              data-testid="blog-comment-count"
+            >
+              {charCount} / {MAX_CHAR_LIMIT}
+            </span>
+          )}
+          <HudButton
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setComposerOpen(false)
+              setErrorMessage(null)
+            }}
+          >
+            Cancel
+          </HudButton>
+          <HudButton
+            type="submit"
+            variant="primary"
+            size="sm"
+            disabled={isSubmitting || isOverLimit || commentInput.trim().length < MIN_CHAR_LIMIT}
+          >
+            <Send className="w-3.5 h-3.5" />
+            <span>{isSubmitting ? 'Posting...' : 'Post comment'}</span>
+          </HudButton>
+        </div>
+      </form>
+    )
+  }
 
   return (
-    <section className="mt-12 sm:mt-16 pt-8 sm:pt-10 border-t border-line-subtle">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 sm:mb-8">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-surface-1 border border-line-subtle rounded-control text-cyan-glow shrink-0">
-            <MessageSquare className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="font-grotesk font-black text-lg sm:text-xl text-ink uppercase tracking-[0.08em] flex items-center gap-2">
-              <span>COMMUNICATIONS LOG</span>
-              <span className="text-xs px-2 py-0.5 bg-surface-2 border border-line text-ink-body font-sans rounded-chip">
-                {comments.length}
-                {hasOlderComments ? '+' : ''}
-              </span>
-            </h3>
-            <p className="text-xs text-ink-muted font-sans">
-              Synaptic telemetry & initiate responses
-            </p>
-          </div>
-        </div>
-      </div>
+    <section
+      className="mt-10 sm:mt-12 pt-6 sm:pt-8 border-t border-line-subtle space-y-3 sm:space-y-4"
+      aria-labelledby="blog-comments-heading"
+    >
+      <h2 id="blog-comments-heading" className="font-grotesk text-base sm:text-lg font-bold text-ink flex items-center gap-2">
+        Comments
+        {!loadingComments && (
+          <span className="text-xs font-sans font-bold px-2 py-0.5 bg-surface-2 border border-line-subtle text-ink-body rounded-chip">
+            {count}
+          </span>
+        )}
+      </h2>
 
-      {/* Input Box / Auth Lock */}
-      <div className="mb-8 sm:mb-12">
-        {session.isPending ? (
-          <div className="chitin-card p-4 sm:p-5 border border-line-subtle rounded-card bg-surface-1 hud-sheen space-y-3" data-testid="blog-comments-auth-skeleton">
-            <HudGhostCard lines={2} />
-          </div>
-        ) : user ? (
-          <form onSubmit={handleSubmit} className="chitin-card p-4 sm:p-5 border border-line-subtle rounded-card bg-surface-1 hud-sheen space-y-4 shadow-sheen-inset">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-subtle pb-3">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-7 h-7 rounded-full bg-surface-2 border border-line flex items-center justify-center overflow-hidden shrink-0">
-                  <span className="font-sans text-xs font-bold text-cyan-glow uppercase">
-                    {(user.name || user.email || 'I')[0]}
-                  </span>
-                </div>
-                <span className="font-sans text-xs text-ink font-semibold truncate max-w-[140px] sm:max-w-[220px]">
-                  {user.name || user.email}
-                </span>
-                <span className="text-[11px] px-2 py-0.5 bg-cyan-soft border border-line-subtle text-cyan-glow font-sans uppercase tracking-[0.08em] rounded-chip shrink-0">
-                  REGISTERED INITIATE
-                </span>
-              </div>
-              <span className={`font-sans text-[11px] shrink-0 ${isOverLimit ? 'text-crimson-text font-bold' : 'text-ink-muted'}`}>
-                {charCount} / {MAX_CHAR_LIMIT}
-              </span>
-            </div>
+      {composer}
 
-            <div className="relative">
-              <textarea
-                value={commentInput}
-                onChange={(e) => setCommentInput(e.target.value)}
-                placeholder="Log your thoughts or synaptic telemetry..."
-                rows={3}
-                className="w-full bg-surface-2 border border-line hover:border-line-hover rounded-control p-3 font-sans text-sm text-ink placeholder:text-ink-muted focus:outline-hidden focus:border-cyan-glow focus:shadow-field-focus transition-all resize-y"
-              />
-            </div>
-
-            {errorMessage && (
-              <div className="flex items-center gap-2 text-xs font-sans text-crimson-text bg-crimson-soft border border-crimson-aggro/40 p-2.5 rounded-control">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span className="break-words">{errorMessage}</span>
-              </div>
-            )}
-
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
-              <span className="text-[11px] font-sans text-ink-muted flex items-center gap-1">
-                <Shield className="w-3 h-3 text-cyan-glow shrink-0" />
-                <span>Encrypted Initiate Feed • Standard Guardrails Enforced</span>
-              </span>
-
-              <HudButton
-                type="submit"
-                variant="primary"
-                size="md"
-                disabled={isSubmitting || isOverLimit || commentInput.trim().length < MIN_CHAR_LIMIT}
-                className="w-full sm:w-auto px-5"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    <span>TRANSMITTING...</span>
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-3.5 h-3.5" />
-                    <span>TRANSMIT COMMENT</span>
-                  </>
-                )}
-              </HudButton>
-            </div>
-
-            <TurnstileWidget
-              ref={turnstileRef}
-              action="blog_comment"
-              size="flexible"
-              onVerify={(token) => setTurnstileToken(token)}
-              onExpire={() => setTurnstileToken(null)}
+      {loadingComments ? (
+        <CommentRowsSkeleton />
+      ) : comments.length === 0 ? (
+        <p className="py-6 text-center text-xs text-ink-muted">No comments yet. Start the discussion.</p>
+      ) : (
+        <div className="space-y-3">
+          <ul className={`${CARD} px-3 sm:px-4 divide-y divide-line-subtle`}>
+            {comments.map((comment) => (
+              <CommentRow key={comment.id} comment={comment} />
+            ))}
+          </ul>
+          {hasOlderComments && (
+            <LoadMoreButton
+              label="Load older comments"
+              loading={loadingOlder}
+              testId="blog-comments-load-more"
+              onClick={() => void loadOlderComments()}
             />
-          </form>
-        ) : (
-          <div className="chitin-card p-5 sm:p-8 border border-line-subtle rounded-card bg-surface-1 hud-sheen text-center relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-3 opacity-10 pointer-events-none">
-              <Lock className="w-24 h-24 text-cyan-glow" />
-            </div>
+          )}
+        </div>
+      )}
 
-            <div className="max-w-md mx-auto relative z-10 space-y-4">
-              <div className="w-10 h-10 bg-surface-2 border border-line text-cyan-glow rounded-full flex items-center justify-center mx-auto">
-                <Lock className="w-5 h-5" />
-              </div>
-
-              <div>
-                <h4 className="font-grotesk font-bold text-sm sm:text-base text-ink uppercase tracking-wide">
-                  AUTHENTICATION REQUIRED TO JOIN DISCUSSION
-                </h4>
-                <p className="text-xs text-ink-muted font-sans mt-1 leading-relaxed">
-                  Commentary is restricted to verified initiates of the Benthic Collective. Sign in or initialize your registration to transmit.
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 pt-2 w-full sm:w-auto">
-                <HudButton
-                  type="button"
-                  variant="secondary"
-                  size="md"
-                  onClick={() => handleOpenAuth('login')}
-                  className="w-full sm:w-auto px-4"
-                >
-                  <UserCheck className="w-3.5 h-3.5" />
-                  <span>SIGN IN</span>
-                </HudButton>
-                <HudButton
-                  type="button"
-                  variant="primary"
-                  size="md"
-                  onClick={() => handleOpenAuth('signup')}
-                  className="w-full sm:w-auto px-4"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>REGISTER INITIATE</span>
-                </HudButton>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Comments Feed */}
-      <div className="space-y-4">
-        {loadingComments ? (
-          <div className="space-y-3">
-            <HudGhostCard lines={2} />
-            <HudGhostCard lines={2} />
-          </div>
-        ) : comments.length === 0 ? (
-          <div className="p-6 sm:p-8 text-center chitin-card border border-line-subtle rounded-card bg-surface-1 space-y-2">
-            <Terminal className="w-7 h-7 sm:w-8 sm:h-8 text-ink-muted/60 mx-auto mb-2" />
-            <h5 className="font-grotesk font-bold text-xs sm:text-sm text-ink-body uppercase">
-              NO TRANSMISSIONS RECORDED YET
-            </h5>
-            <p className="font-sans text-[11px] sm:text-xs text-ink-muted">
-              Be the first initiate to log commentary on this post.
-            </p>
-          </div>
-        ) : (
-          comments.map((comment) => (
-            <div
-              key={comment.id}
-              className="chitin-card p-3.5 sm:p-4 border border-line-subtle rounded-card bg-surface-1 hud-sheen hover:border-line-hover transition-all space-y-2"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-subtle pb-2">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-6 h-6 rounded-full bg-surface-2 border border-line flex items-center justify-center overflow-hidden shrink-0">
-                    <span className="font-sans text-[11px] font-bold text-cyan-glow uppercase">
-                      {(comment.authorName || 'A')[0]}
-                    </span>
-                  </div>
-                  <span className="font-sans text-xs font-bold text-ink truncate max-w-[140px] sm:max-w-[200px]">
-                    {comment.authorName}
-                  </span>
-                  <span className="text-[11px] px-2 py-0.5 bg-surface-2 border border-line-subtle text-ink-muted font-sans rounded-chip shrink-0">
-                    {formatStageLabel(comment.authorStage)}
-                  </span>
-                </div>
-                <span className="font-sans text-[11px] text-ink-muted shrink-0">
-                  {formatTimestamp(comment.createdAt)}
-                </span>
-              </div>
-
-              <p className="font-sans text-xs sm:text-sm text-ink-body leading-relaxed whitespace-pre-wrap break-words pl-1">
-                {comment.content}
-              </p>
-            </div>
-          ))
-        )}
-        {!loadingComments && hasOlderComments && comments.length > 0 && (
-          <LoadMoreButton
-            label="Load older comments"
-            loading={loadingOlder}
-            testId="blog-comments-load-more"
-            onClick={() => void loadOlderComments()}
-          />
-        )}
-      </div>
-
-      {/* Auth Modal Portal */}
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        initialMode={authMode}
-      />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} initialMode="signup" />
     </section>
   )
 }
