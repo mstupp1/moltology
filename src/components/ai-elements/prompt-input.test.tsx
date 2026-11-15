@@ -306,6 +306,32 @@ describe('PromptInput skills', () => {
     expect(screen.getByRole('button', { name: 'Skills' })).toBeInTheDocument()
   })
 
+  it('opens the same skills sheet from the Skills button, marks the skill that is on, and closes outside', () => {
+    render(<Harness />)
+    const button = screen.getByRole('button', { name: 'Skills' })
+    expect(button).toHaveAttribute('aria-expanded', 'false')
+    fireEvent.click(button)
+    expect(button).toHaveAttribute('aria-expanded', 'true')
+    const list = screen.getByRole('listbox', { name: 'Skills' })
+    expect(within(list).getAllByRole('option')).toHaveLength(2)
+    fireEvent.keyDown(button, { key: 'ArrowDown' })
+    fireEvent.keyDown(button, { key: 'Enter' })
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+    const pill = screen.getByRole('button', { name: 'Skill: Two-minute start. Change skill' })
+    // Reopening from the pill highlights and marks the skill that is on.
+    fireEvent.click(pill)
+    const options = within(screen.getByRole('listbox', { name: 'Skills' })).getAllByRole('option')
+    expect(options[1]).toHaveAttribute('aria-selected', 'true')
+    expect(within(options[1]).getByLabelText('On')).toBeInTheDocument()
+    fireEvent.pointerDown(document.body)
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+    // Clicking a row picks it.
+    fireEvent.click(pill)
+    fireEvent.click(within(screen.getByRole('listbox', { name: 'Skills' })).getByRole('option', { name: /Focus rounds/ }))
+    expect(screen.getByRole('button', { name: 'Skill: Focus rounds. Change skill' })).toBeInTheDocument()
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+  })
+
   it('shows no skill controls without skills', () => {
     render(<PromptInput onSubmit={vi.fn()} />)
     fireEvent.change(screen.getByRole('textbox', { name: 'Message' }), { target: { value: '/' } })
