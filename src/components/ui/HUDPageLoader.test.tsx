@@ -19,7 +19,10 @@ describe('HUDPageLoader Component', () => {
   it('renders cleanly without extra text paragraphs or boot logs', () => {
     const { container } = render(<HUDPageLoader />)
     expect(container.querySelector('p')).toBeNull()
-    expect(container.querySelector('span')).toBeNull()
+    // Only the glowing emblem: no visible words.
+    const visible = container.cloneNode(true) as HTMLElement
+    visible.querySelectorAll('style').forEach((style) => style.remove())
+    expect(visible.textContent?.trim()).toBe('')
     expect(screen.queryByText(/INITIALIZING/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/MOLTOLOGY/i)).not.toBeInTheDocument()
   })

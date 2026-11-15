@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0a1212" />
-    <title>Signal Lost — Moltology</title>
+    <title>You're offline — Moltology</title>
     <style>
       :root {
         color-scheme: dark;
@@ -25,11 +25,26 @@
         color: #dfe3e3;
         text-align: center;
       }
-      img {
-        width: 88px;
-        height: 88px;
-        margin-bottom: 1.25rem;
-        opacity: 0.95;
+      .emblem {
+        position: relative;
+        display: inline-block;
+        width: 96px;
+        height: 96px;
+        margin-bottom: 1.75rem;
+      }
+      /* The emblem in its own light, as on GlowEmblem in the app. */
+      .emblem::before {
+        content: '';
+        position: absolute;
+        inset: -44px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 69, 58, 0.3) 0%, rgba(255, 69, 58, 0.1) 38%, transparent 66%);
+      }
+      .emblem img {
+        position: relative;
+        width: 96px;
+        height: 96px;
+        filter: drop-shadow(0 0 11px rgba(255, 69, 58, 0.55));
       }
       h1 {
         margin: 0 0 0.5rem;
@@ -62,13 +77,12 @@
   </head>
   <body>
     <main>
-      <img src="/images/order_emblem.svg" alt="Order emblem" width="88" height="88" />
-      <h1>Signal Lost</h1>
+      <span class="emblem"><img src="/images/order_emblem.svg" alt="Moltology emblem" width="96" height="96" /></span>
+      <h1>You're offline</h1>
       <p>
-        The benthic link is quiet. Cached Command Hub pages may still open; live rites and
-        transmissions need the surface channel restored.
+        Pages you've opened before may still load. Everything else will be back once you reconnect.
       </p>
-      <a href="/dashboard">Return to Command Hub</a>
+      <a href="/dashboard">Go to dashboard</a>
     </main>
   </body>
 </html>

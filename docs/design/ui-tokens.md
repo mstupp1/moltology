@@ -33,7 +33,10 @@ Use `BrandIcon` from `src/components/ui/BrandMark.tsx` for the inline emblem and
 text, the tagline in tracked caps stretched to the title's width (`.brand-lockup` in
 `src/index.css`; it is part of the mark, so it may sit under the 11px floor). The
 outlined word SVGs live only in the downloadable kit. The emblem path inherits color;
-do not apply filters to approximate a different brand color. Use `BrandAwareImage`
+do not apply filters to approximate a different brand color. For a page's one hero mark (page loader, not-found, sign-in, certificates, offline page,
+link-preview cards) use `GlowEmblem` from `src/components/ui/GlowEmblem.tsx`: the emblem
+in its own light, a soft red halo plus a drop shadow, colour unchanged. Never in lists or rows.
+Use `BrandAwareImage`
 for data-driven avatars and product images: existing emblem PNG/WebP/SVG URLs render
 the current inline vector, while other images retain their source and fallbacks.
 This keeps stored emblem URLs current without relying on image caches.

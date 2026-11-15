@@ -87,9 +87,34 @@ describe('SEO Meta Tag Generator', () => {
     expect(memberProfileSeo({ userId: 'NUBirqu1KNSnM41jXnQt3SMGobGHuoCJ', handle: 'mstupp' })).toEqual(
       expect.arrayContaining([
         { property: 'og:title', content: 'Add mstupp on Moltology' },
-        { property: 'og:image', content: 'https://moltology.org/media/images/sharing/member-invite-v1.png' },
+        { property: 'og:image', content: 'https://moltology.org/images/sharing/member-card-v2.jpg' },
         { property: 'og:image:width', content: '1200' },
         { property: 'og:image:height', content: '630' },
+        { property: 'og:image:type', content: 'image/jpeg' },
+      ]),
+    )
+    // A member with a saved 3D portrait gets their own card.
+    expect(memberProfileSeo({ userId: larvaId, handle: 'mstupp', still: 'k3x9q2a' })).toEqual(
+      expect.arrayContaining([
+        { property: 'og:image', content: 'https://moltology.org/api/share/member/v2/k3x9q2a.jpg' },
+      ]),
+    )
+    // Anything that is not a portrait name falls back to the crab card.
+    expect(memberProfileSeo({ handle: 'mstupp', still: '../etc' })).toEqual(
+      expect.arrayContaining([
+        { property: 'og:image', content: 'https://moltology.org/images/sharing/member-card-v2.jpg' },
+      ]),
+    )
+  })
+
+  it('shows the site card on pages without a picture of their own', () => {
+    const meta = seo({ title: 'Forum' })
+    expect(meta).toEqual(
+      expect.arrayContaining([
+        { property: 'og:image', content: 'https://moltology.org/images/sharing/site-card-v2.jpg' },
+        { property: 'og:image:width', content: '1200' },
+        { property: 'og:image:height', content: '630' },
+        { name: 'twitter:image', content: 'https://moltology.org/images/sharing/site-card-v2.jpg' },
       ]),
     )
   })

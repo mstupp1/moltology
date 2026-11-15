@@ -1279,6 +1279,7 @@ export const saveAvatarStillFn = createServerFn({ method: 'POST' })
         token: z.string().optional(),
         userId: z.string().optional(),
         image: z.string().min(32).max(200_000),
+        large: z.string().min(32).max(600_000).optional(),
       })
       .parse(data),
   )

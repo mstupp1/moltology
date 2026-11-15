@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, Award, Lock } from 'lucide-react'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
-import { BrandIcon } from '@/components/ui/BrandMark'
+import { GlowEmblem } from '@/components/ui/GlowEmblem'
 import {
   ACADEMY_COPY,
   formatIssuedDate,
@@ -171,7 +171,7 @@ export function AcademyCredential({ credential }: { credential: AcademyCredentia
           aria-hidden="true"
         />
         <div className="relative m-2 sm:m-3 rounded-card border border-line-subtle px-5 py-8 sm:px-12 sm:py-12 text-center space-y-5">
-          <BrandIcon className="mx-auto w-12 h-12" aria-hidden="true" />
+          <GlowEmblem size={64} className="mt-2" />
           <div className="space-y-1">
             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-cyan-glow">Molt Academy</p>
             <p className="text-[11px] uppercase tracking-[0.08em] text-ink-muted">{scopeLabel(credential)}</p>

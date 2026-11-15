@@ -1,7 +1,7 @@
 /* Moltology Command Hub service worker — network-first navigations, asset caching, notification click. */
 /* global self, caches, clients, fetch, Response */
 
-const VERSION = 'moltology-hub-v18-brand-58da5cd3ec3d'
+const VERSION = 'moltology-hub-v19-brand-58da5cd3ec3d'
 const PRECACHE = `${VERSION}-precache`
 const RUNTIME = `${VERSION}-runtime`
 const PAGES = `${VERSION}-pages`
@@ -92,7 +92,7 @@ async function networkFirstPage(request) {
     const cached = await cache.match(request)
     if (cached) return cached
     const offline = await caches.match('/offline.html')
-    return offline || new Response('Signal lost', { status: 503, statusText: 'Offline' })
+    return offline || new Response('You are offline', { status: 503, statusText: 'Offline' })
   }
 }
 
@@ -109,7 +109,7 @@ async function cacheFirstAsset(request) {
   } catch {
     return (
       (await caches.match('/offline.html')) ||
-      new Response('Signal lost', { status: 503, statusText: 'Offline' })
+      new Response('You are offline', { status: 503, statusText: 'Offline' })
     )
   }
 }
