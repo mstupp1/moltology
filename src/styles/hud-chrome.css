@@ -404,6 +404,165 @@ input[type="range"].dial-range:focus-visible {
   }
 }
 
+/* Small copies (the chat header toggle) keep the halo but skip the idle rings. */
+.oracle-core[data-quiet='true'] .oracle-core__ring {
+  display: none;
+}
+
+/* Dimmed: the Oracle this orb opens is already open, so it steps back. */
+.oracle-core__liquid,
+.oracle-core__halo {
+  transition: opacity 300ms ease;
+}
+.oracle-core[data-dimmed='true'] .oracle-core__liquid {
+  opacity: 0.38;
+}
+.oracle-core[data-dimmed='true'] .oracle-core__halo {
+  opacity: 0.15;
+  animation: none;
+}
+.oracle-core[data-dimmed='true'] .oracle-core__ring {
+  display: none;
+}
+
+/* Drain: on phones the bottom-bar orb empties into the chat's big core while the
+   core view is on, so both are never lit at once. The liquid layer is clipped from
+   the top down (it holds the turning stills, so the edge stays level), a bright
+   surface line rides down with it, and a faint ember is left in the dark socket.
+   Refilling runs the other way after a short pause, timed with the spark's return. */
+.oracle-core__liquid {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 0 0 0);
+}
+.oracle-core__level {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(175, 235, 255, 0.95);
+  box-shadow: 0 0 8px rgba(0, 195, 255, 0.9);
+  opacity: 0;
+  pointer-events: none;
+}
+.oracle-core__ember {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14%;
+  height: 14%;
+  transform: translate(-50%, -50%);
+  border-radius: 9999px;
+  background: rgba(120, 220, 255, 0.65);
+  box-shadow: 0 0 8px rgba(0, 195, 255, 0.85);
+  opacity: 0;
+  transition: opacity 400ms ease;
+  pointer-events: none;
+}
+.oracle-core[data-drain='drained'] .oracle-core__liquid {
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 640ms cubic-bezier(0.5, 0, 0.8, 0.6);
+}
+.oracle-core[data-drain='drained'] .oracle-core__level {
+  animation: oracle-core-level-down 640ms cubic-bezier(0.5, 0, 0.8, 0.6);
+}
+.oracle-core[data-drain='drained'] .oracle-core__ember {
+  opacity: 1;
+  transition-delay: 500ms;
+  animation: oracle-core-ember 3.2s ease-in-out infinite;
+}
+.oracle-core[data-drain='drained'] .oracle-core__halo {
+  opacity: 0.12;
+  animation: none;
+  transition: opacity 500ms ease;
+}
+.oracle-core[data-drain='drained'] .oracle-core__ring {
+  display: none;
+}
+.oracle-core[data-drain='refilling'] .oracle-core__liquid {
+  transition: clip-path 700ms cubic-bezier(0.2, 0.6, 0.3, 1) 380ms;
+}
+.oracle-core[data-drain='refilling'] .oracle-core__level {
+  animation: oracle-core-level-up 700ms cubic-bezier(0.2, 0.6, 0.3, 1) 380ms backwards;
+}
+@keyframes oracle-core-level-down {
+  0% { top: 4%; opacity: 1; }
+  92% { top: 94%; opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+@keyframes oracle-core-level-up {
+  0% { top: 100%; opacity: 0; }
+  8% { top: 94%; opacity: 1; }
+  92% { top: 4%; opacity: 1; }
+  100% { top: 0; opacity: 0; }
+}
+@keyframes oracle-core-ember {
+  0%, 100% { transform: translate(-50%, -50%) scale(0.75); opacity: 0.45; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.95; }
+}
+/* The spark that carries the orb up into the chat's core (and back down). */
+.oracle-core-spark {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 99995;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 9999px;
+  background: #bff0ff;
+  box-shadow: 0 0 10px 4px rgba(0, 195, 255, 0.85), 0 0 26px 10px rgba(0, 120, 255, 0.35);
+  pointer-events: none;
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* No falling level or travelling spark: the orb just fades to the empty socket and back. */
+  .oracle-core[data-drain='drained'] .oracle-core__liquid,
+  .oracle-core[data-drain='refilling'] .oracle-core__liquid {
+    clip-path: inset(0 0 0 0);
+    transition: opacity 200ms ease;
+  }
+  .oracle-core[data-drain='drained'] .oracle-core__liquid {
+    opacity: 0;
+  }
+  .oracle-core[data-drain] .oracle-core__level {
+    animation: none;
+  }
+  .oracle-core[data-drain='drained'] .oracle-core__ember {
+    animation: none;
+    transition-delay: 0ms;
+  }
+}
+
+/* Core view toggle in the chat header: the core lights up after the dive lands. */
+.oracle-core-ignite {
+  animation: oracle-core-ignite 560ms cubic-bezier(0.3, 0.6, 0.2, 1) backwards;
+}
+@keyframes oracle-core-ignite {
+  from { transform: scale(0.15); opacity: 0.4; }
+  to { transform: scale(1); opacity: 1; }
+}
+.oracle-core-ignite-out {
+  opacity: 0;
+  transform: scale(1.25);
+  transition: opacity 600ms ease, transform 600ms ease;
+}
+.oracle-core-canvas-in {
+  animation: oracle-core-canvas-in 700ms ease-out backwards;
+}
+@keyframes oracle-core-canvas-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .oracle-core-ignite,
+  .oracle-core-canvas-in {
+    animation: none;
+  }
+}
+
 
 /* Phone Oracle page: slides up out of the bottom bar's core when it opens. */
 @media (max-width: 639px) {

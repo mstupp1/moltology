@@ -39,6 +39,14 @@ import { PAGE_SIZES } from '@/lib/pagination'
 import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
 import { streamOracleChat } from '../../lib/ai/stream-oracle-chat-client'
 import { createOracleEntityBridge, type OracleEntityBridge } from '@/lib/ai/oracle-entity-bridge'
+import {
+  CORE_DIVE_IN_MS,
+  canPlayCoreMotion,
+  diveIntoCore,
+  fadeInChat,
+  fadeOutChat,
+  surfaceFromCore,
+} from '@/lib/ai/oracle-core-dive'
 import { useSafeOracle, OracleMode } from '../hud/OracleContext'
 import { getOracleDefaultModelId, canUseOracleChatModel, getOracleModel, DEFAULT_ORACLE_PLACEHOLDER, type OracleAccessTier } from '../../lib/ai/oracle-models'
 import { AuthModal } from '../AuthModal'
@@ -269,15 +277,54 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   }
   const entityBridge = entityBridgeRef.current
 
-  const handleToggleViewMode = useCallback(() => {
-    setViewMode((prev) => {
-      const next: OracleViewMode = prev === 'entity' ? 'standard' : 'entity'
-      try {
-        localStorage.setItem(STORAGE_KEY_ORACLE_VIEW_MODE, next)
-      } catch {}
-      return next
-    })
+  // Core view toggle motion ("dive in"): the chat fades, then the core opens out of the
+  // header's small core button; on the way out it shrinks back into it. Instant under
+  // reduced motion or where the Web Animations API is missing.
+  const coreToggleRef = useRef<HTMLButtonElement>(null)
+  const coreLayerRef = useRef<HTMLDivElement>(null)
+  const coreSwitchingRef = useRef(false)
+  const [coreDive, setCoreDive] = useState<'in' | 'out' | null>(null)
+
+  const commitViewMode = useCallback((next: OracleViewMode) => {
+    setViewMode(next)
+    try {
+      localStorage.setItem(STORAGE_KEY_ORACLE_VIEW_MODE, next)
+    } catch {}
   }, [])
+
+  const handleToggleViewMode = useCallback(async () => {
+    if (coreSwitchingRef.current) return
+    if (viewMode !== 'entity') {
+      const chatView = rootRef.current?.querySelector('[data-oracle-view="chat"]')
+      if (canPlayCoreMotion(chatView)) {
+        coreSwitchingRef.current = true
+        await fadeOutChat(chatView)
+        setCoreDive('in')
+      }
+      commitViewMode('entity')
+      return
+    }
+    const layer = coreLayerRef.current
+    if (canPlayCoreMotion(layer)) {
+      coreSwitchingRef.current = true
+      await surfaceFromCore(layer, coreToggleRef.current)
+      setCoreDive('out')
+    }
+    commitViewMode('standard')
+  }, [viewMode, commitViewMode])
+
+  useLayoutEffect(() => {
+    if (!coreDive) return
+    if (coreDive === 'in' && viewMode === 'entity' && coreLayerRef.current) {
+      void diveIntoCore(coreLayerRef.current, coreToggleRef.current).finally(() => {
+        coreSwitchingRef.current = false
+      })
+    } else {
+      if (coreDive === 'out') fadeInChat(rootRef.current?.querySelector('[data-oracle-view="chat"]') ?? null)
+      coreSwitchingRef.current = false
+    }
+    setCoreDive(null)
+  }, [coreDive, viewMode])
 
   const handleDraftChange = useCallback(
     (nextDraft: string) => {
@@ -827,6 +874,14 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   // Phones: a new chat puts the box at the top (the keyboard opens below it); an ongoing
   // chat docks it at the bottom and lifts it by the keyboard inset instead of panning the page.
   const isPhone = useIsPhone()
+  // Phones: while the big core is showing, the bottom bar's orb drains into it.
+  const setCoreViewOpen = oracle?.setCoreViewOpen
+  const coreViewShowing = allowEntityMode && isPhone && viewMode === 'entity'
+  useEffect(() => {
+    if (!setCoreViewOpen) return
+    setCoreViewOpen(coreViewShowing)
+    return () => setCoreViewOpen(false)
+  }, [setCoreViewOpen, coreViewShowing])
   const keyboardInset = useKeyboardInset(isPhone && (!isNewChat || viewMode === 'entity'))
 
   // The keyboard shrinks the message pane, so keep the latest turn in view as it opens.
@@ -893,6 +948,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     <>
       {allowEntityMode && (
         <OracleEntityModeToggle
+          ref={coreToggleRef}
           viewMode={viewMode}
           onToggle={handleToggleViewMode}
           touch={isPhone}
@@ -1019,7 +1075,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             )}
 
             {viewMode === 'entity' ? (
+              <div ref={coreLayerRef} data-oracle-view="core" className="flex-1 min-h-0 flex flex-col">
               <SynapticEntityHud
+                deferCanvasMs={coreDive === 'in' ? CORE_DIVE_IN_MS : 0}
                 bridge={entityBridge}
                 messages={messages}
                 isSending={isSending}
@@ -1033,10 +1091,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                 onOpenAuthModal={() => setIsAuthModalOpen(true)}
                 composer={composer('floating')}
               />
+              </div>
             ) : (
               <>
                 {isNewChat ? (
-                  <div className="flex-1 overflow-y-auto min-h-0 relative">
+                  <div data-oracle-view="chat" className="flex-1 overflow-y-auto min-h-0 relative">
                     <NewChatScreen
                       isGuest={isGuest}
                       onSubmit={handlePromptSubmit}
@@ -1048,7 +1107,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                     />
                   </div>
                 ) : (
-                  <div className="flex-1 min-h-0 relative flex flex-col">
+                  <div data-oracle-view="chat" className="flex-1 min-h-0 relative flex flex-col">
                     <Conversation
                       ref={conversationRef}
                       onScroll={handleConversationScroll}

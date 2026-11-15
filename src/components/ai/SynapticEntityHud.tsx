@@ -22,6 +22,7 @@ import { DEFAULT_PROMPT_SHORTCUTS, type PromptShortcut } from './NewChatScreen'
 import { SynapticEntityCanvas } from './SynapticEntityCanvas'
 import type { OracleEntityBridge } from '@/lib/ai/oracle-entity-bridge'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
+import { OracleCoreGlyph } from './OracleCoreGlyph'
 
 export interface EntityHudMessage {
   id: string
@@ -46,6 +47,11 @@ export interface SynapticEntityHudProps {
   onEditFailed: (failedId: string) => void
   onOpenAuthModal: () => void
   composer: React.ReactNode
+  /**
+   * Hold the 3D canvas back this long (while the dive-in opens the view) and show a
+   * cheap still of the core instead, so building the scene never stutters the motion.
+   */
+  deferCanvasMs?: number
 }
 
 export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
@@ -61,7 +67,33 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
   onEditFailed,
   onOpenAuthModal,
   composer,
+  deferCanvasMs = 0,
 }) => {
+  // Read once at mount: later prop changes must not unmount a running canvas.
+  const [canvasReady, setCanvasReady] = useState(() => deferCanvasMs <= 0)
+  const [stillVisible, setStillVisible] = useState(() => deferCanvasMs > 0)
+  const deferMsRef = useRef(deferCanvasMs)
+  useEffect(() => {
+    if (canvasReady) return
+    const show = window.setTimeout(() => setCanvasReady(true), deferMsRef.current)
+    return () => window.clearTimeout(show)
+  }, [canvasReady])
+  useEffect(() => {
+    if (!canvasReady || !stillVisible) return
+    // The still fades out under the canvas fading in (see .oracle-core-ignite-out).
+    const hide = window.setTimeout(() => setStillVisible(false), 650)
+    return () => window.clearTimeout(hide)
+  }, [canvasReady, stillVisible])
+  const ignitingStill = stillVisible ? (
+    <span
+      aria-hidden
+      className={`absolute inset-0 flex items-center justify-center ${canvasReady ? 'oracle-core-ignite-out' : ''}`}
+    >
+      <span className="oracle-core-ignite">
+        <OracleCoreGlyph size={isPhone ? 150 : 170} quiet />
+      </span>
+    </span>
+  ) : null
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [isCaptionMinimized, setIsCaptionMinimized] = useState(false)
   const liveScrollRef = useRef<HTMLDivElement>(null)
@@ -115,13 +147,18 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
     >
       {/* 3D Procedural Synaptic Brain Backdrop */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <SynapticEntityCanvas
-          bridge={bridge}
-          isCompact={isCompact || isPhone}
-          fitPortrait={isPhone}
-          focusRef={coreSpaceRef}
-          className="w-full h-full"
-        />
+        {canvasReady && (
+          <div className={`absolute inset-0 ${deferMsRef.current > 0 ? 'oracle-core-canvas-in' : ''}`}>
+            <SynapticEntityCanvas
+              bridge={bridge}
+              isCompact={isCompact || isPhone}
+              fitPortrait={isPhone}
+              focusRef={coreSpaceRef}
+              className="w-full h-full"
+            />
+          </div>
+        )}
+        {!isPhone && ignitingStill}
         {/* Subtle top/bottom vignette for HUD legibility */}
         <div
           aria-hidden="true"
@@ -225,7 +262,10 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
       )}
 
       {/* Spacer keeping the center of the 3D core unobstructed */}
-      <div ref={coreSpaceRef} data-testid="synaptic-core-space" className="flex-1 min-h-12 pointer-events-none" />
+      <div ref={coreSpaceRef} data-testid="synaptic-core-space" className="relative flex-1 min-h-12 pointer-events-none">
+        {/* Phones center the core in this space, so the still waits here too. */}
+        {isPhone && ignitingStill}
+      </div>
 
       {/* Lower-Third Live Conversational HUD + Docked Composer */}
       <div className="relative z-10 flex flex-col gap-2 px-3 pb-2 pointer-events-none">

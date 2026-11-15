@@ -843,7 +843,7 @@ describe('AIChatPanel 3D Synaptic Entity Mode', () => {
   it('keeps embedded panels in standard chat despite saved or requested Entity mode', () => {
     localStorage.setItem('moltology:oracle_view_mode', 'entity')
     render(<AIChatPanel userId="usr_valid_user" initialViewMode="entity" />)
-    expect(screen.queryByRole('button', { name: /Switch to 3D Entity Mode/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Enter the core/i })).not.toBeInTheDocument()
     expect(screen.queryByTestId('synaptic-entity-hud')).not.toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Message' })).toBeInTheDocument()
   })
@@ -854,7 +854,7 @@ describe('AIChatPanel 3D Synaptic Entity Mode', () => {
     expect(screen.getByTestId('synaptic-entity-hud')).toBeInTheDocument()
     rerender(<AIChatPanel userId="usr_valid_user" />)
     expect(screen.queryByTestId('synaptic-entity-hud')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Switch to 3D Entity Mode/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Enter the core/i })).not.toBeInTheDocument()
     expect(localStorage.getItem('moltology:oracle_view_mode')).toBe('entity')
   })
 
@@ -867,7 +867,7 @@ describe('AIChatPanel 3D Synaptic Entity Mode', () => {
     expect(input).toHaveValue('Protocol status check')
 
     // Switch to 3D Entity Mode
-    const toggleToEntity = screen.getByRole('button', { name: /Switch to 3D Entity Mode/i })
+    const toggleToEntity = screen.getByRole('button', { name: /Enter the core/i })
     fireEvent.click(toggleToEntity)
 
     expect(screen.getByTestId('synaptic-entity-hud')).toBeInTheDocument()
@@ -887,7 +887,7 @@ describe('AIChatPanel 3D Synaptic Entity Mode', () => {
     })
 
     // Switch back to Standard Chat and verify the conversation is intact
-    const toggleToChat = screen.getByRole('button', { name: /Switch to standard chat/i })
+    const toggleToChat = screen.getByRole('button', { name: /Back to chat/i })
     fireEvent.click(toggleToChat)
 
     expect(screen.queryByTestId('synaptic-entity-hud')).not.toBeInTheDocument()

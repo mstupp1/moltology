@@ -1,6 +1,5 @@
 import React from 'react'
 import {
-  Brain,
   Check,
   ChevronsUpDown,
   Fullscreen,
@@ -16,6 +15,7 @@ import {
   HudDropdownMenuItem,
 } from '@/components/ui/HudDropdownMenu'
 import type { OracleMode } from '../hud/OracleContext'
+import { OracleCoreGlyph } from './OracleCoreGlyph'
 
 export type OracleDisplayMode = Exclude<OracleMode, 'closed'>
 export type OracleViewMode = 'standard' | 'entity'
@@ -49,41 +49,42 @@ interface OracleEntityModeToggleProps {
 }
 
 /**
- * Seamless toggle between standard text chat and 3D Token-Reactive Entity Mode.
+ * Core view toggle: a tiny live synaptic core. Tapping it opens the big core out of
+ * this button (see oracle-core-dive); in core view it turns into a chat icon in the
+ * same spot, and the core shrinks back into it.
  */
-export const OracleEntityModeToggle: React.FC<OracleEntityModeToggleProps> = ({
-  viewMode,
-  onToggle,
-  touch = false,
-}) => {
-  const isEntity = viewMode === 'entity'
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-pressed={isEntity}
-      aria-label={isEntity ? 'Switch to standard chat' : 'Switch to 3D Entity Mode'}
-      title={isEntity ? 'Switch to standard chat' : 'Switch to 3D Entity Mode'}
-      className={`${headerIconButtonClasses(touch)} !w-auto px-2 gap-1.5 text-xs font-medium ${
-        isEntity
-          ? 'bg-cyan-soft text-cyan-glow border border-line-strong hover:bg-cyan-soft hover:text-cyan-bright'
-          : 'border border-transparent'
-      }`}
-    >
-      {isEntity ? (
-        <>
-          <MessageSquareText className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-          <span className="hidden sm:inline">Chat View</span>
-        </>
-      ) : (
-        <>
-          <Brain className="w-3.5 h-3.5 shrink-0 text-cyan-glow" aria-hidden="true" />
-          <span className="hidden sm:inline">Entity Mode</span>
-        </>
-      )}
-    </button>
-  )
-}
+export const OracleEntityModeToggle = React.forwardRef<HTMLButtonElement, OracleEntityModeToggleProps>(
+  function OracleEntityModeToggle({ viewMode, onToggle, touch = false }, ref) {
+    const isEntity = viewMode === 'entity'
+    const label = isEntity ? 'Back to chat' : 'Enter the core'
+    return (
+      <button
+        ref={ref}
+        type="button"
+        onClick={onToggle}
+        aria-pressed={isEntity}
+        aria-label={label}
+        title={label}
+        data-testid="oracle-core-toggle"
+        className={`${headerIconButtonClasses(touch)} group relative ${isEntity ? 'text-cyan-glow hover:text-cyan-bright' : ''}`}
+      >
+        <span
+          className={`absolute inset-0 grid place-items-center transition-[opacity,transform] duration-200 motion-reduce:transition-none ${
+            isEntity ? 'opacity-0 scale-50' : 'opacity-100 scale-100 group-hover:scale-110'
+          }`}
+        >
+          <OracleCoreGlyph size={touch ? 24 : 20} quiet />
+        </span>
+        <MessageSquareText
+          aria-hidden="true"
+          className={`w-4 h-4 transition-[opacity,transform] duration-200 motion-reduce:transition-none ${
+            isEntity ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+          }`}
+        />
+      </button>
+    )
+  },
+)
 
 /** Two stacked lines, the long one on top: the chat list toggle. */
 export const ChatListIcon: React.FC<{ className?: string }> = ({ className }) => (
