@@ -2071,7 +2071,7 @@
         "finalVideo": "/Users/mylesstupp/Development/moltology/tmp/reels-2026-10-29/choose-the-hat.mp4",
         "durationSeconds": 27.3,
         "hookWordStartsSeconds": [
-          0.0,
+          0,
           0.21,
           0.71,
           1.57,
@@ -2255,9 +2255,9 @@
       "productionReview": {
         "rawDirectory": "/Users/mylesstupp/Development/moltology/tmp/reel-daily-1793365572768",
         "finalVideo": "/Users/mylesstupp/Development/moltology/tmp/reels-2026-10-30/introducing-the-agenda.mp4",
-        "durationSeconds": 28.0,
+        "durationSeconds": 28,
         "hookWordStartsSeconds": [
-          0.0,
+          0,
           0.28,
           0.71,
           1.35,
@@ -2265,7 +2265,7 @@
           1.92,
           2.07
         ],
-        "bodySubtitleStartSeconds": 3.0,
+        "bodySubtitleStartSeconds": 3,
         "subtitleHandoff": "Full clean timeline overlay through measured first body word; original body subtitles and narration preserved; sentence boundary prevents straddling.",
         "headlineSafeBox": [
           120,
@@ -2305,6 +2305,46 @@
         "archiveStatus": "archived before queue",
         "soundReview": "User confirmed sound review passed and instructed queueing."
       }
+    },
+    {
+      "id": "reel-1794846062728",
+      "topic": "The Daily Shedding Routine (Codex SCR-030): one thing first in the morning, one thing let go at night",
+      "hookHeadline": "Two moments decide your whole day.",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": null,
+      "characterArc": "host-crab (animated 3D host)",
+      "narrationScript": "Two moments decide your whole day. The Codex calls it the Daily Shedding Routine. It's short. Morning: before any feed or inbox, name the one thing that matters, and start it first. Night: pick one thing you're still carrying, write it down, let it go. Everything in between? Negotiable. Try it tomorrow. Read the full passage at moltology.org.",
+      "series": "Codex Lessons",
+      "episode": 1,
+      "format": "animated-lesson",
+      "archivePath": "Social Archive/2026/11/reel-acabb42d2ecc0083b1af7cf9",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1794846064007_af5d1f3bf2c15794_01.mp4"
+      ],
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 27.933333,
+      "status": "queued",
+      "scheduledFor": "2026-11-19T23:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6afb2d71ca9734bbd40e0672",
+      "zernioYouTubePostId": "6afb2d71ca9734bbd40e0672",
+      "zernioPostId": "6afb2d71ca9734bbd40e0672",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "firstComment": "The full passage: https://moltology.org/codex/scr-030",
+      "caption": "Two moments decide your whole day.\n\nMorning: name the one thing that matters and start it before any feed or inbox.\nNight: write down one thing you're still carrying and let it go.\n\nRead the full passage at moltology.org.",
+      "hashtags": [
+        "#morningroutine",
+        "#productivity"
+      ],
+      "ctaGoal": "codex",
+      "commentTriggerKeyword": "CODEX",
+      "commentTriggerUrl": "https://moltology.org/codex",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-11-16T16:21:10.628Z"
     }
   ]
 }
