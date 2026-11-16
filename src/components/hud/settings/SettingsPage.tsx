@@ -18,6 +18,7 @@ import { PlanUsageSection } from '@/components/ai/OracleUsage'
 import { PremiumSettingsSection } from './PremiumSettingsSection'
 import { OracleChatSettingsForm } from '@/components/ai/OracleChatSettings'
 import { SettingsCard, SettingsRow, SettingsRows } from './settings-ui'
+import { PracticeDaysCard } from './PracticeDaysCard'
 
 export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) => {
   const session = useAuthSession()
@@ -144,6 +145,8 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
               <ConnectedAccounts oauthError={oauthError} />
             </SettingsRows>
           </SettingsCard>
+
+          <PracticeDaysCard />
 
           <SettingsCard title="Notifications">
             <SettingsRows>

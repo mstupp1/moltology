@@ -4,6 +4,7 @@ import {
   type RetentionProfile,
 } from '../../src/lib/data-retention'
 import { shiftDays, TOTAL_ALIGNMENT_TASKS } from '../../src/lib/alignment-tasks'
+import { ALL_PRACTICE_DAYS, DEFAULT_PRACTICE_DAYS, PRACTICE_DAYS_START } from '../../src/lib/practice-days'
 import type { RetentionProgressCallback } from './db-retention-cleanup'
 
 export const COMPLETION_RETENTION_BATCH_SIZE = 250
@@ -88,8 +89,8 @@ export async function applyCompletionRetention(
   }
 
   // Advance a single counter per member before expiring any source history.
-  // The rank/date equality counts only complete days in the uninterrupted run
-  // ending on the day immediately before the retained 90-day window. Existing
+  // It counts the complete days in the run ending on the day immediately before
+  // the retained 90-day window, skipping missed off days (practice days). Existing
   // carry state seeds days already compacted by an earlier run; reruns at the
   // same cutoff leave that state unchanged.
   for (let batch = 0; batch < maxBatches; batch++) {
@@ -130,17 +131,58 @@ export async function applyCompletionRetention(
       FROM source_keys
       GROUP BY "userId", "completedOn"
       HAVING COUNT(DISTINCT "taskKey") = ${TOTAL_ALIGNMENT_TASKS}
-    ), ranked AS (
+    ), windows AS (
+      -- Days not yet folded into the carry: from the day after the previous anchor, or
+      -- from the member's first full day when there is no carry yet.
       SELECT
-        "userId",
-        completed_date,
-        ROW_NUMBER() OVER (PARTITION BY "userId" ORDER BY completed_date DESC) AS day_rank
-      FROM full_days
-    ), full_day_suffix AS (
-      SELECT "userId", COUNT(*)::int AS trailing_days
-      FROM ranked
-      WHERE completed_date + (day_rank::int - 1) = ${carryAnchorDate}::date
+        u."userId",
+        COALESCE(
+          p."anchorDate"::date + 1,
+          (SELECT MIN(fd.completed_date) FROM full_days fd WHERE fd."userId" = u."userId"),
+          ${carryAnchorDate}::date + 1
+        ) AS start_date
+      FROM batch_users u
+      LEFT JOIN previous p USING ("userId")
+    ), calendar AS (
+      SELECT w."userId", d::date AS day
+      FROM windows w
+      CROSS JOIN LATERAL generate_series(w.start_date, ${carryAnchorDate}::date, interval '1 day') AS d
+    ), day_states AS (
+      -- A missed practice day breaks the run; a missed off day is skipped. Before
+      -- practice days existed every day was a practice day; after, no saved schedule
+      -- means the default.
+      SELECT
+        c."userId",
+        c.day,
+        fd."userId" IS NOT NULL AS full_day,
+        ((
+          CASE
+            WHEN c.day < ${PRACTICE_DAYS_START}::date THEN ${ALL_PRACTICE_DAYS}::int
+            ELSE COALESCE(sched.days, ${DEFAULT_PRACTICE_DAYS}::int)
+          END >> EXTRACT(DOW FROM c.day)::int
+        ) & 1) = 1 AS practice_day
+      FROM calendar c
+      LEFT JOIN full_days fd ON fd."userId" = c."userId" AND fd.completed_date = c.day
+      LEFT JOIN LATERAL (
+        SELECT s.days::int AS days
+        FROM practice_day_schedules s
+        WHERE s."userId" = c."userId" AND s."effectiveFrom" <= to_char(c.day, 'YYYY-MM-DD')
+        ORDER BY s."effectiveFrom" DESC
+        LIMIT 1
+      ) sched ON true
+    ), last_break AS (
+      SELECT "userId", MAX(day) AS break_day
+      FROM day_states
+      WHERE NOT full_day AND practice_day
       GROUP BY "userId"
+    ), full_day_suffix AS (
+      SELECT
+        ds."userId",
+        COUNT(*) FILTER (WHERE ds.full_day AND (lb.break_day IS NULL OR ds.day > lb.break_day))::int AS trailing_days,
+        bool_and(lb.break_day IS NULL) AS unbroken
+      FROM day_states ds
+      LEFT JOIN last_break lb USING ("userId")
+      GROUP BY ds."userId"
     ), candidate_users AS (
       SELECT "userId" FROM batch_users
     ), carry_values AS (
@@ -148,8 +190,7 @@ export async function applyCompletionRetention(
         u."userId",
         CASE
           WHEN p."anchorDate" >= ${carryAnchorDate} THEN p."streakDays"
-          WHEN p."anchorDate" IS NOT NULL
-            AND COALESCE(t.trailing_days, 0) = (${carryAnchorDate}::date - p."anchorDate"::date)
+          WHEN p."anchorDate" IS NOT NULL AND COALESCE(t.unbroken, true)
             THEN p."streakDays" + COALESCE(t.trailing_days, 0)
           ELSE COALESCE(t.trailing_days, 0)
         END::int AS streak_days

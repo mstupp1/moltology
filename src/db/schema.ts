@@ -1,4 +1,4 @@
-import { pgTable, pgSchema, text, integer, bigint, timestamp, boolean, uuid, decimal, jsonb, pgPolicy, uniqueIndex, index, foreignKey, primaryKey, type AnyPgColumn } from 'drizzle-orm/pg-core'
+import { pgTable, pgSchema, text, integer, smallint, bigint, timestamp, boolean, uuid, decimal, jsonb, pgPolicy, uniqueIndex, index, foreignKey, primaryKey, type AnyPgColumn } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 import type {
   AcademyCertificateScope,
@@ -309,6 +309,23 @@ export const routineStreakCarries = pgTable('routine_streak_carries', {
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 }, (table) => [
   pgPolicy('routine_streak_carries_isolation_policy', {
+    for: 'all',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+])
+
+/**
+ * A member's practice days (weekday bitmask, bit 0 = Sunday), each row applying from
+ * `effectiveFrom` until the next row. No rows means the default, Mon to Fri.
+ */
+export const practiceDaySchedules = pgTable('practice_day_schedules', {
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  effectiveFrom: text('effectiveFrom').notNull(), // 'YYYY-MM-DD'
+  days: smallint('days').notNull(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+}, (table) => [
+  primaryKey({ columns: [table.userId, table.effectiveFrom] }),
+  pgPolicy('practice_day_schedules_isolation_policy', {
     for: 'all',
     using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`,
   }),

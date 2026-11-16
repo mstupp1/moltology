@@ -13,6 +13,8 @@ export interface DashboardNextStepInput {
   completedCount: number
   totalCount: number
   lastThread?: { id: string; title?: string | null } | null
+  /** Off day with nothing started: alignment is not offered as the next step. */
+  restDay?: boolean
 }
 
 export function pickDashboardNextStep({
@@ -20,11 +22,12 @@ export function pickDashboardNextStep({
   completedCount,
   totalCount,
   lastThread,
+  restDay = false,
 }: DashboardNextStepInput): DashboardNextStep {
   if (isGuest) return { kind: 'join', label: 'Create your free account' }
 
   const remaining = Math.max(0, totalCount - completedCount)
-  if (remaining > 0) {
+  if (remaining > 0 && !restDay) {
     return {
       kind: 'alignment',
       label: completedCount === 0 ? 'Start today’s alignment' : 'Continue alignment',
@@ -45,8 +48,9 @@ export function pickDashboardNextStep({
 }
 
 /** One-line status under the Today heading. Plain readout, no economy lines. */
-export function describeAlignmentToday(completedCount: number, totalCount: number): string {
+export function describeAlignmentToday(completedCount: number, totalCount: number, restDay = false): string {
   if (totalCount <= 0) return ''
+  if (restDay) return 'Rest day. Nothing is due and your streak is safe.'
   if (completedCount >= totalCount) return 'All liturgies done today. The shell holds.'
   if (completedCount === 0) return `${totalCount} liturgies waiting today.`
   const remaining = totalCount - completedCount
