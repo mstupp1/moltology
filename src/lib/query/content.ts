@@ -13,6 +13,8 @@ export const FRESH = {
   panel: 2 * 60_000,
   /** Editorial content that changes a few times a week (news, releases, store, academy). */
   content: 5 * 60_000,
+  /** Crest holders only change on Monday. */
+  honors: 30 * 60_000,
 } as const
 
 /** Shared, not member-specific content. Member data lives under `accountKeys`. */
@@ -21,6 +23,10 @@ export const contentKeys = {
   changelogs: ['content', 'changelogs'] as const,
   storeAccess: ['content', 'store-access'] as const,
   merchCatalog: (userId: string | null | undefined) => ['content', 'merch-catalog', userId ?? 'guest'] as const,
+  /** Crest holders and top-3 records. Changes once a week, so one read serves every badge. */
+  rankHonors: ['content', 'rank-honors'] as const,
+  leaderboard: (window: 'week' | 'all', viewerId: string | null | undefined, limit: number) =>
+    ['content', 'leaderboard', window, viewerId ?? 'guest', limit] as const,
 }
 
 /** Forum reads. Invalidate `forumKeys.all` after any forum write. */

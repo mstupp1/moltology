@@ -83,6 +83,7 @@ import { Route as HudCharacterShopRouteImport } from './routes/_hud/character_.s
 import { Route as HudCodexIndexRouteImport } from './routes/_hud/codex/index'
 import { Route as HudCodexSlugRouteImport } from './routes/_hud/codex/$slug'
 import { Route as HudForumIndexRouteImport } from './routes/_hud/forum/index'
+import { Route as HudForumLeaderboardRouteImport } from './routes/_hud/forum/leaderboard'
 import { Route as HudMemberProfileIdRouteImport } from './routes/_hud/member/$profileId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiEmailConfirmRouteImport } from './routes/api/email/confirm'
@@ -472,6 +473,11 @@ const HudForumIndexRoute = HudForumIndexRouteImport.update({
   path: '/forum/',
   getParentRoute: () => HudRoute,
 } as any)
+const HudForumLeaderboardRoute = HudForumLeaderboardRouteImport.update({
+  id: '/forum/leaderboard',
+  path: '/forum/leaderboard',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudMemberProfileIdRoute = HudMemberProfileIdRouteImport.update({
   id: '/member/$profileId',
   path: '/member/$profileId',
@@ -630,6 +636,7 @@ export interface FileRoutesByFullPath {
   '/character/progress': typeof HudCharacterProgressRoute
   '/character/shop': typeof HudCharacterShopRoute
   '/codex/$slug': typeof HudCodexSlugRoute
+  '/forum/leaderboard': typeof HudForumLeaderboardRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/email/confirm': typeof ApiEmailConfirmRoute
@@ -718,6 +725,7 @@ export interface FileRoutesByTo {
   '/character/progress': typeof HudCharacterProgressRoute
   '/character/shop': typeof HudCharacterShopRoute
   '/codex/$slug': typeof HudCodexSlugRoute
+  '/forum/leaderboard': typeof HudForumLeaderboardRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/email/confirm': typeof ApiEmailConfirmRoute
@@ -810,6 +818,7 @@ export interface FileRoutesById {
   '/_hud/character_/progress': typeof HudCharacterProgressRoute
   '/_hud/character_/shop': typeof HudCharacterShopRoute
   '/_hud/codex/$slug': typeof HudCodexSlugRoute
+  '/_hud/forum/leaderboard': typeof HudForumLeaderboardRoute
   '/_hud/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/email/confirm': typeof ApiEmailConfirmRoute
@@ -903,6 +912,7 @@ export interface FileRouteTypes {
     | '/character/progress'
     | '/character/shop'
     | '/codex/$slug'
+    | '/forum/leaderboard'
     | '/member/$profileId'
     | '/api/auth/$'
     | '/api/email/confirm'
@@ -991,6 +1001,7 @@ export interface FileRouteTypes {
     | '/character/progress'
     | '/character/shop'
     | '/codex/$slug'
+    | '/forum/leaderboard'
     | '/member/$profileId'
     | '/api/auth/$'
     | '/api/email/confirm'
@@ -1082,6 +1093,7 @@ export interface FileRouteTypes {
     | '/_hud/character_/progress'
     | '/_hud/character_/shop'
     | '/_hud/codex/$slug'
+    | '/_hud/forum/leaderboard'
     | '/_hud/member/$profileId'
     | '/api/auth/$'
     | '/api/email/confirm'
@@ -1681,6 +1693,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudForumIndexRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/forum/leaderboard': {
+      id: '/_hud/forum/leaderboard'
+      path: '/forum/leaderboard'
+      fullPath: '/forum/leaderboard'
+      preLoaderRoute: typeof HudForumLeaderboardRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/member/$profileId': {
       id: '/_hud/member/$profileId'
       path: '/member/$profileId'
@@ -1842,6 +1861,7 @@ interface HudRouteChildren {
   HudCharacter3dRoute: typeof HudCharacter3dRoute
   HudCharacterProgressRoute: typeof HudCharacterProgressRoute
   HudCharacterShopRoute: typeof HudCharacterShopRoute
+  HudForumLeaderboardRoute: typeof HudForumLeaderboardRoute
   HudMemberProfileIdRoute: typeof HudMemberProfileIdRoute
   HudAcademyIndexRoute: typeof HudAcademyIndexRoute
   HudAdminIndexRoute: typeof HudAdminIndexRoute
@@ -1870,6 +1890,7 @@ const HudRouteChildren: HudRouteChildren = {
   HudCharacter3dRoute: HudCharacter3dRoute,
   HudCharacterProgressRoute: HudCharacterProgressRoute,
   HudCharacterShopRoute: HudCharacterShopRoute,
+  HudForumLeaderboardRoute: HudForumLeaderboardRoute,
   HudMemberProfileIdRoute: HudMemberProfileIdRoute,
   HudAcademyIndexRoute: HudAcademyIndexRoute,
   HudAdminIndexRoute: HudAdminIndexRoute,

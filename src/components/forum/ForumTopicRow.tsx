@@ -5,6 +5,7 @@ import { MessageSquare, Eye } from 'lucide-react'
 import type { ForumTopicEntry } from '@/lib/server/api'
 import { FORUM_WITHDRAWN_PREVIEW, isForumEntryWithdrawn, relativeTime } from '@/lib/forum-utils'
 import { FORUM_UNREAD_LABEL } from '@/lib/forum-visits'
+import { RankCrest } from '@/components/leaderboard/RankCrest'
 import { VoteButton, StageBadge, PinBadge, LockBadge, WithdrawnBadge, ForumUnreadMark } from './ForumBits'
 import { ForumAvatar } from './ForumAvatar'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
@@ -92,6 +93,7 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
             ) : (
               author
             )}
+            <RankCrest userId={topic.userId} />
             <StageBadge stage={topic.authorStage} />
           </span>
           <LocalTime value={topic.createdAt} format={relativeTime} />

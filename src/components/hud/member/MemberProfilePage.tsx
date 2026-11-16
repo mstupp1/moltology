@@ -8,6 +8,7 @@ import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import { CharacterOverlay } from '@/components/hud/CharacterOverlay'
 import { BonusList, VectorSheetPanel } from '@/components/hud/chassis/VectorSheetPanel'
 import { PremiumBadge } from '@/components/hud/PremiumBadge'
+import { RankCrest, RankRecordChip } from '@/components/leaderboard/RankCrest'
 import { FriendRequestButton } from './FriendRequestButton'
 import { ProfileLinkButton } from './ProfileLinkButton'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
@@ -192,6 +193,8 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
                       Stage {profile.stage} · {profile.stageLabel}
                     </span>
                     {profile.isPremium ? <PremiumBadge /> : null}
+                    <RankCrest userId={profile.id} variant="chip" />
+                    <RankRecordChip userId={profile.id} />
                   </div>
                 </div>
                 <div className="flex flex-wrap justify-center sm:justify-end items-center gap-2 shrink-0 max-sm:[&>*]:flex-1">

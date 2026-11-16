@@ -1,4 +1,5 @@
 import { awardGems } from './gems'
+import { awardSimulatedTaskXp } from './simulation-xp'
 import fs from 'node:fs'
 import path from 'node:path'
 import { generateText } from 'ai'
@@ -710,6 +711,12 @@ export async function simulateDailyRoutines(
           description: 'Simulated liturgy',
         })),
       )
+      // XP on the same ledger as real members, so simulated members appear on the leaderboard.
+      try {
+        await awardSimulatedTaskXp(dbClient, user.id, taskKeys, today, options.at)
+      } catch (xpErr) {
+        console.warn('[SimulationEngine] XP award warning:', xpErr)
+      }
       const updatedPersona: SimulatedPersonaConfig = {
         ...(user.simulatedPersona || { archetype: 'Acolyte', tone: 'Steadfast' }),
         lastSimulatedAt: new Date().toISOString(),

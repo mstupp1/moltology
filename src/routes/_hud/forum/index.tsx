@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Plus, MessageSquare, ShieldCheck, Search, LayoutGrid, SearchX } from 'lucide-react'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { Plus, MessageSquare, ShieldCheck, Search, LayoutGrid, SearchX, Trophy } from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
 import { CommunityPhoto } from '@/components/forum/CommunityPhoto'
+import { LeaderboardRailCard } from '@/components/leaderboard/LeaderboardRailCard'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { HudButton } from '@/components/ui/HudButton'
 import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
@@ -250,6 +251,16 @@ function ForumIndexPage() {
 
         <ForumBoardNav boards={categoriesState} variant="strip" className="lg:hidden" />
 
+        <Link
+          to="/forum/leaderboard"
+          className="lg:hidden flex items-center gap-2 min-h-11 px-3 rounded-card border border-line-subtle bg-surface-1 hud-sheen text-xs font-bold text-ink hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+          data-testid="forum-leaderboard-link"
+        >
+          <Trophy className="w-4 h-4 text-cyan-glow" aria-hidden="true" />
+          <span className="flex-1">Leaderboard</span>
+          <span className="text-[11px] font-normal text-ink-muted">Top members this week</span>
+        </Link>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 items-start">
           <div className="lg:col-span-8 space-y-4 min-w-0">
             <InlineTopicComposer
@@ -354,7 +365,8 @@ function ForumIndexPage() {
             </section>
           </div>
 
-          <aside className="hidden min-w-0 lg:block lg:col-span-4 lg:sticky lg:top-4">
+          <aside className="hidden min-w-0 lg:block lg:col-span-4 lg:sticky lg:top-4 space-y-3 sm:space-y-4">
+            <LeaderboardRailCard />
             <ForumBoardNav boards={categoriesState} variant="list" />
           </aside>
         </div>

@@ -13,6 +13,7 @@ import { getEffectiveRole } from '@/lib/permissions'
 import { useWalletBalances } from '@/hooks/useWalletBalances'
 import { STAGE_THRESHOLDS, calculateSubStageProgress, type SubStageProgress } from '@/lib/progression'
 import { UserAvatar } from '../UserAvatar'
+import { RankCrest } from '@/components/leaderboard/RankCrest'
 import { useSignOutButton, type UserAvatarMenuProps } from '../UserAvatarMenu'
 import { AlignmentTodayList } from './AlignmentTodayList'
 import { XpRing, type XpRingSize } from './XpRing'
@@ -292,6 +293,7 @@ export function AccountHub({
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5 min-w-0">
           <span className={`font-bold font-grotesk text-ink truncate ${isPhone ? 'text-lg' : 'text-sm'}`}>{displayName}</span>
+          <RankCrest userId={user.id} />
           {effectiveRole === 'admin' && (
             <span className="text-[11px] font-sans font-extrabold tracking-[0.08em] uppercase px-1.5 py-0.5 rounded-chip shrink-0 bg-cyan-soft border border-cyan-glow/40 text-cyan-glow">
               Admin
