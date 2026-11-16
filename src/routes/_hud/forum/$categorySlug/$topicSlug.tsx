@@ -30,7 +30,7 @@ import { getAuthJWTToken } from '@/lib/jwt'
 import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
 import { relativeTime, buildForumPostTree, type ForumReplySort } from '@/lib/forum-utils'
 import { mergeById } from '@/lib/pagination'
-import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
+import { AutoLoadMore } from '@/components/ui/AutoLoadMore'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useAppQueryClient } from '@/lib/query/account'
 import { FRESH, forumKeys } from '@/lib/query/content'
@@ -224,9 +224,12 @@ function ForumThreadPage() {
   const topic = detail?.topic
   const nextReplyOffset = detail?.nextReplyOffset ?? null
 
-  /** Loads the next page of replies, or (on a sort change while partial) the first page in the new order. */
+  /**
+   * Loads the next page of replies, or (on a sort change while partial) the first page
+   * in the new order. A failed next page rejects so the scroll loader can offer "Try again".
+   */
   const loadReplies = async (sort: ForumReplySort, offset: number) => {
-    if (!detail) return
+    if (!detail || repliesLoading) return
     setRepliesLoading(true)
     try {
       const token = userId ? await getAuthJWTToken() : null
@@ -248,12 +251,29 @@ function ForumThreadPage() {
             }
           : current,
       )
-    } catch {
-      toast?.toast.error('Could not load more replies. Try again.')
+    } catch (err) {
+      if (offset > 0) throw err
+      toast?.toast.error('Could not load replies. Try again.')
     } finally {
       setRepliesLoading(false)
     }
   }
+
+  // A shared link to a reply further down keeps loading pages until that reply is on screen.
+  const [linkedPostId] = useState(() =>
+    typeof window !== 'undefined' && window.location.hash.startsWith('#post-') ? window.location.hash.slice(6) : null,
+  )
+  const linkedFoundRef = useRef(false)
+  useEffect(() => {
+    if (!linkedPostId || linkedFoundRef.current || repliesLoading) return
+    if (posts.some((p) => p.id === linkedPostId)) {
+      linkedFoundRef.current = true
+      requestAnimationFrame(() => document.getElementById(`post-${linkedPostId}`)?.scrollIntoView({ block: 'center' }))
+      return
+    }
+    if (nextReplyOffset !== null) void loadReplies(replySort, nextReplyOffset).catch(() => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [linkedPostId, posts, nextReplyOffset, repliesLoading])
 
   const changeReplySort = (sort: ForumReplySort) => {
     if (sort === replySort) return
@@ -683,11 +703,11 @@ function ForumThreadPage() {
                     />
                   ))}
                   {nextReplyOffset !== null && (
-                    <LoadMoreButton
+                    <AutoLoadMore
                       label="Load more replies"
                       loading={repliesLoading}
                       testId="forum-replies-load-more"
-                      onClick={() => void loadReplies(replySort, nextReplyOffset)}
+                      onLoad={() => loadReplies(replySort, nextReplyOffset)}
                     />
                   )}
                 </div>
