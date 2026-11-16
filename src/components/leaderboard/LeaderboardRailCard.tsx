@@ -35,13 +35,7 @@ export function LeaderboardRailCard({ className }: { className?: string }) {
         </Link>
       </div>
       {board.data ? (
-        <LeaderboardRows
-          view={board.data}
-          viewerId={viewerId}
-          minRows={3}
-          size="sm"
-          firstHint={board.data.entries.length === 0 ? 'Finish a daily task to take #1' : 'Open spot'}
-        />
+        <LeaderboardRows entries={board.data.entries} viewer={board.data.viewer} viewerId={viewerId} minRows={3} size="sm" />
       ) : board.isError ? (
         <p className="text-xs text-ink-muted">The leaderboard could not load.</p>
       ) : (

@@ -1,10 +1,11 @@
 import React from 'react'
 import { Link } from '@tanstack/react-router'
 import { getLeaderboardFn, type LeaderboardEntry, type LeaderboardView } from '@/lib/server/api'
-import { useAppQuery } from '@/lib/query/account'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { useAppQuery, useAppQueryClient } from '@/lib/query/account'
 import { FRESH, contentKeys } from '@/lib/query/content'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
-import { CREST_TIERS, formatXp, isCrestRank, type LeaderboardWindow } from '@/lib/leaderboard'
+import { CREST_TIERS, LEADERBOARD_PAGE_SIZE, formatXp, isCrestRank, type LeaderboardWindow } from '@/lib/leaderboard'
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { StageBadge } from '@/components/forum/ForumBits'
 import { RankCrest } from './RankCrest'
@@ -18,6 +19,24 @@ export function useLeaderboard(period: LeaderboardWindow, viewerId: string | nul
     staleTime: FRESH.forum,
     refetchOnWindowFocus: false,
   })
+}
+
+/** The full board, a page at a time, optionally one stage only. */
+export function useLeaderboardPages(period: LeaderboardWindow, viewerId: string | null | undefined, stage: number | null) {
+  return useInfiniteQuery(
+    {
+      queryKey: [...contentKeys.leaderboard(period, viewerId, LEADERBOARD_PAGE_SIZE), 'pages', stage ?? 'all'] as const,
+      initialPageParam: 0,
+      queryFn: async ({ pageParam }) =>
+        (await getLeaderboardFn({
+          data: { window: period, viewerId: viewerId ?? undefined, limit: LEADERBOARD_PAGE_SIZE, offset: pageParam, stage },
+        })) as LeaderboardView,
+      getNextPageParam: (last) => (last.hasMore ? last.offset + LEADERBOARD_PAGE_SIZE : undefined),
+      staleTime: FRESH.forum,
+      refetchOnWindowFocus: false,
+    },
+    useAppQueryClient(),
+  )
 }
 
 const FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
@@ -117,36 +136,39 @@ export function LeaderboardRowsPending({ count, size = 'md' }: { count: number; 
   )
 }
 
-/** Ranked rows plus open spots up to `minRows`; the first open spot invites the viewer. */
+/** Ranked rows plus open spots up to `minRows`; the viewer's own row sits under the list when it is further down. */
 export function LeaderboardRows({
-  view,
+  entries,
+  viewer,
   viewerId,
   minRows,
   size = 'md',
   firstHint,
 }: {
-  view: LeaderboardView
+  entries: LeaderboardEntry[]
+  viewer?: LeaderboardEntry | null
   viewerId: string | null | undefined
   minRows: number
   size?: 'sm' | 'md'
-  firstHint: string
+  firstHint?: string
 }) {
-  const open = Math.max(0, minRows - view.entries.length)
+  const open = Math.max(0, minRows - entries.length)
+  const showViewer = viewer && !entries.some((e) => e.userId === viewer.userId)
   return (
     <ol className="space-y-1" data-testid="leaderboard-rows">
-      {view.entries.map((entry) => (
+      {entries.map((entry) => (
         <li key={entry.userId}>
           <LeaderboardRow entry={entry} isViewer={entry.userId === viewerId} size={size} />
         </li>
       ))}
       {Array.from({ length: open }, (_, i) => (
         <li key={`open-${i}`}>
-          <OpenSpotRow rank={view.entries.length + i + 1} size={size} hint={i === 0 ? firstHint : undefined} />
+          <OpenSpotRow rank={entries.length + i + 1} size={size} hint={i === 0 ? firstHint : undefined} />
         </li>
       ))}
-      {view.viewer ? (
+      {showViewer ? (
         <li className="pt-1 mt-1 border-t border-line-subtle">
-          <LeaderboardRow entry={view.viewer} isViewer size={size} />
+          <LeaderboardRow entry={viewer} isViewer size={size} />
         </li>
       ) : null}
     </ol>

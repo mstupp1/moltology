@@ -1,4 +1,4 @@
-import { and, desc, gt, inArray, lt, notInArray, sql } from 'drizzle-orm'
+import { and, desc, eq, gt, inArray, lt, notInArray, sql } from 'drizzle-orm'
 import { getDb } from '../../db'
 import { profiles, xpTransactions } from '../../db/schema'
 import {
@@ -47,6 +47,12 @@ export interface RankHonors {
 
 export interface LeaderboardView extends RankHonors {
   window: LeaderboardWindow
+  /** Stage filter, or null for everyone. */
+  stage: number | null
+  offset: number
+  /** Ranked members in this view (after the stage filter). */
+  total: number
+  hasMore: boolean
   weekStart: string
   weekEnd: string
   entries: LeaderboardEntry[]
@@ -146,15 +152,22 @@ export async function getLeaderboard(input: {
   window: LeaderboardWindow
   viewerId?: string | null
   limit?: number
+  offset?: number
+  /** Only members at this stage; ranks are counted within the filtered list. */
+  stage?: number | null
   db?: Db
   now?: Date
 }): Promise<LeaderboardView> {
   const now = input.now ?? new Date()
   const db = input.db ?? getDb()
   const limit = Math.max(1, Math.min(LEADERBOARD_PAGE_SIZE, Math.trunc(input.limit ?? LEADERBOARD_PAGE_SIZE)))
+  const offset = Math.max(0, Math.trunc(input.offset ?? 0))
+  const stage = input.stage && input.stage >= 1 && input.stage <= 4 ? Math.trunc(input.stage) : null
   const { currentStart, currentEnd } = leaderboardWeeks(now)
   const base = {
     window: input.window,
+    stage,
+    offset,
     weekStart: currentStart.toISOString(),
     weekEnd: currentEnd.toISOString(),
   }
@@ -172,20 +185,30 @@ export async function getLeaderboard(input: {
         .filter((t) => t.weekStart === thisWeek && t.xp > 0)
         .sort(compareTotals)
         .map((t) => ({ userId: t.userId, xp: t.xp }))
+      if (stage !== null && ranked.length > 0) {
+        const rows = await db
+          .select({ id: profiles.id })
+          .from(profiles)
+          .where(and(inArray(profiles.id, ranked.map((r) => r.userId)), eq(profiles.stage, stage)))
+        const keep = new Set(rows.map((r) => r.id))
+        ranked = ranked.filter((r) => keep.has(r.userId))
+      }
     } else {
       const rows = await db
         .select({ userId: profiles.id, xp: profiles.xp })
         .from(profiles)
-        .where(gt(profiles.xp, 0))
+        .where(and(gt(profiles.xp, 0), stage !== null ? eq(profiles.stage, stage) : undefined))
         .orderBy(desc(profiles.xp), profiles.createdAt, profiles.id)
       ranked = rows.map((r) => ({ userId: r.userId, xp: r.xp }))
     }
 
-    const top = ranked.slice(0, limit)
+    const page = ranked.slice(offset, offset + limit)
+    const hasMore = ranked.length > offset + limit
     const viewerIndex = input.viewerId ? ranked.findIndex((r) => r.userId === input.viewerId) : -1
-    const viewerBelow = viewerIndex >= limit ? ranked[viewerIndex] : null
+    // The viewer's own row, when it sits below everything loaded so far.
+    const viewerBelow = viewerIndex >= offset + limit ? ranked[viewerIndex] : null
 
-    const ids = new Set<string>([...top.map((r) => r.userId), ...honors.holders.map((h) => h.userId)])
+    const ids = new Set<string>([...page.map((r) => r.userId), ...(offset === 0 ? honors.holders.map((h) => h.userId) : [])])
     if (viewerBelow) ids.add(viewerBelow.userId)
     const members = await loadMembers(db, [...ids])
 
@@ -196,17 +219,18 @@ export async function getLeaderboard(input: {
       return { rank, userId, name: m.name, handle: m.handle, stage: m.stage, xp, avatarConfig: m.avatarConfig, crest: isCrestRank(crest) ? crest : null }
     }
 
-    const entries = top
-      .map((r, i) => toEntry(r.userId, r.xp, i + 1))
+    const entries = page
+      .map((r, i) => toEntry(r.userId, r.xp, offset + i + 1))
       .filter((e): e is LeaderboardEntry => e !== null)
-    const podium = honors.holders
-      .map((h) => toEntry(h.userId, h.xp, h.rank))
-      .filter((e): e is LeaderboardEntry => e !== null)
+    const podium =
+      offset === 0
+        ? honors.holders.map((h) => toEntry(h.userId, h.xp, h.rank)).filter((e): e is LeaderboardEntry => e !== null)
+        : []
     const viewer = viewerBelow ? toEntry(viewerBelow.userId, viewerBelow.xp, viewerIndex + 1) : null
 
-    return { ...base, ...honors, entries, podium, viewer }
+    return { ...base, ...honors, total: ranked.length, hasMore, entries, podium, viewer }
   } catch (err) {
     console.warn('[leaderboard] read failed:', err)
-    return { ...base, crestWeekStart: leaderboardWeeks(now).crestWeekStart.toISOString(), holders: [], records: {}, entries: [], podium: [], viewer: null }
+    return { ...base, crestWeekStart: leaderboardWeeks(now).crestWeekStart.toISOString(), holders: [], records: {}, total: 0, hasMore: false, entries: [], podium: [], viewer: null }
   }
 }
