@@ -11,7 +11,8 @@ import { BufferAttribute, BufferGeometry, Group, Matrix4, Mesh, Object3D, Quater
 import type { Loft } from './loft'
 import { merge, type ClawStyle } from './parts'
 
-export type MaterialSlot = 'shell' | 'belly' | 'eye' | 'mouth' | 'brow' | 'teeth' | 'tongue' | 'glow'
+/** `fin` is shell that is thin enough for light to come through: antennae, the tail fan, swimmerets. */
+export type MaterialSlot = 'shell' | 'fin' | 'belly' | 'eye' | 'mouth' | 'brow' | 'teeth' | 'tongue' | 'glow'
 
 export interface BoneOptions {
   /** Point the bone's -Y toward this position. */

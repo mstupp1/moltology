@@ -33,6 +33,19 @@ const ICON_VIEW: Record<string, { yaw: number; zoom: number }> = {
 }
 
 const KEEP = 160
+const SUPERSAMPLE = 2
+
+/** The picture on a canvas, smoothly scaled down to `px` square, as a WebP (PNG where WebP is unavailable). */
+function downscale(source: HTMLCanvasElement, px: number): string {
+  const out = document.createElement('canvas')
+  out.width = out.height = px
+  const ctx = out.getContext('2d')
+  if (!ctx) return source.toDataURL('image/webp', 0.9)
+  ctx.imageSmoothingEnabled = true
+  ctx.imageSmoothingQuality = 'high'
+  ctx.drawImage(source, 0, 0, px, px)
+  return out.toDataURL('image/webp', 0.9)
+}
 const cache = new Map<string, string>()
 let studio: { stage: Stage; canvas: HTMLCanvasElement; detail: number } | null = null
 
@@ -86,11 +99,13 @@ export function renderStill(look: Avatar3DLook, px: number, shot: StillShot = 'p
   const key = stillKey(look, px, shot)
   const hit = cache.get(key)
   if (hit) return hit
-  const entry = stageFor(shot === 'portrait' ? 'portrait' : 'full', px)
+  // Drawn at twice the size and scaled down, which gives cleaner edges than antialiasing alone.
+  const drawn = Math.min(px * SUPERSAMPLE, 1024)
+  const entry = stageFor(shot === 'portrait' ? 'portrait' : 'full', drawn)
   const { stage } = entry
   // A small picture cannot show fine tessellation, so it is built from coarser meshes: much quicker.
   // A look that differs from the last one only in colour is repainted, not rebuilt.
-  const detail = px <= 128 ? 0.6 : 0.8
+  const detail = px <= 128 ? 0.7 : 0.9
   withLoftDetail(detail, () => stage.setLook(shown(look, shot), entry.detail !== detail))
   entry.detail = detail
   const slot = shot.startsWith('gear:') ? shot.slice(5) : null
@@ -99,7 +114,7 @@ export function renderStill(look: Avatar3DLook, px: number, shot: StillShot = 'p
   const close = slot ? stage.character()?.focusOf(slot) : null
   stage.setYaw(close ? (view?.yaw ?? close.yaw) : 0)
   stage.renderStill(0)
-  const url = stage.snapshot()
+  const url = drawn === px ? stage.snapshot() : downscale(entry.canvas, px)
   cache.set(key, url)
   if (cache.size > KEEP) cache.delete(cache.keys().next().value as string)
   return url

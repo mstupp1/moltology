@@ -49,3 +49,35 @@ describe('bendy parts and springs', () => {
     c.dispose()
   })
 })
+
+describe('detail pass', () => {
+  it('opens the mouth and lifts the brows in a reaction, and keeps them still otherwise', () => {
+    const c = buildCharacter(baselineLook('lobster'))
+    const mouth = c.rig.bone('mouthOpen')
+    const brow = c.rig.bone('browL')
+    c.update(1 / 60, 0, true)
+    expect(mouth.visible).toBe(false)
+    const restY = brow.position.y
+    c.react('poke')
+    for (let t = 1; t < 18; t++) c.update(1 / 60, t / 60, true)
+    expect(mouth.visible).toBe(true)
+    // The open mouth replaces the drawn one instead of sitting over it.
+    expect(c.rig.bone('mouthLine').visible).toBe(false)
+    expect(brow.position.y).toBeGreaterThan(restY)
+    c.update(0, 1, false)
+    expect(mouth.visible).toBe(false)
+    expect(c.rig.bone('mouthLine').visible).toBe(true)
+    c.dispose()
+  })
+
+  it('gives the lobster a five-paddle fan and swimmerets, drawn in the thin-shell material', () => {
+    const c = buildCharacter(baselineLook('lobster'))
+    for (let i = 0; i < 5; i++) expect(c.rig.mesh(`tailFan${i}`, 'fin')).toBeDefined()
+    expect(c.rig.mesh('swimmeret0L', 'fin')).toBeDefined()
+    expect(c.rig.meshes.some((m) => m.userData.bone === 'antennaL' && (m.material as unknown as { userData: { uniforms: { uThin: { value: number } } } }).userData.uniforms.uThin.value === 1)).toBe(true)
+    c.setWater(2)
+    const u = (c.rig.mesh('chest', 'shell')!.material as unknown as { userData: { uniforms: { uWater: { value: number } } } }).userData.uniforms
+    expect(u.uWater.value).toBe(1)
+    c.dispose()
+  })
+})
