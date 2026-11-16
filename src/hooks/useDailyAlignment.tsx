@@ -100,6 +100,12 @@ export interface AlignmentContextValue {
   streakReady: boolean
 }
 
+const PRACTICE_TASK_KEY: Record<AlignmentPractice, string> = {
+  silent: 'silent-synchronization',
+  reset: 'nutritional-efficiency-break',
+  'deep-work': 'iterative-refinement',
+}
+
 const AlignmentContext = createContext<AlignmentContextValue | null>(null)
 
 /** How long a server read stays good enough for a provider that remounts often (public pages). */
@@ -662,7 +668,7 @@ export function AlignmentProvider({ children, reuseRecentSync = false }: Alignme
     const sameDate = silentDialogDate === currentDateRef.current
     const sameUser = silentDialogUserRef.current === userIdRef.current
     if (sameDate && sameUser) {
-      void setTaskCompleted(dialogPractice === 'deep-work' ? 'iterative-refinement' : 'silent-synchronization', true)
+      void setTaskCompleted(PRACTICE_TASK_KEY[dialogPractice], true)
     }
   }, [silentDialogDate, dialogPractice, setTaskCompleted])
 

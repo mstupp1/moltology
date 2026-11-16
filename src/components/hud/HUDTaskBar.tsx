@@ -142,7 +142,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
         prev ? prev.map((t) => (t.id === taskId || t.key === taskId ? { ...t, completed: !t.completed } : t)) : prev
       )
     } else {
-      alignment.toggleTask(taskId)
+      void alignment.setTaskCompleted(taskId, true)
     }
   }
 

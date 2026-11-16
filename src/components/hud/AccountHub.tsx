@@ -236,7 +236,7 @@ export function AccountHub({
   }
 
   const handleToggleTask = (taskId: string) => {
-    void alignment.toggleTask(taskId)
+    void alignment.setTaskCompleted(taskId, true)
   }
 
   const todayLabel = mounted

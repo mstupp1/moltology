@@ -6,6 +6,7 @@ import { createSilentSynchronizationBridge } from './silentSynchronizationBridge
 import './silent-synchronization.css'
 import {
   DEEP_WORK_PRESETS,
+  RESET_PRESETS,
   formatTimerClock,
   getSilentSyncProgress,
   SILENT_SYNC_PRESETS,
@@ -31,6 +32,15 @@ const PRACTICE_COPY: Record<AlignmentPractice, {
     presets: SILENT_SYNC_PRESETS,
     defaultMinutes: 3,
     running: 'Syncing',
+  },
+  reset: {
+    eyebrow: 'Breathing timer',
+    title: 'Reset your focus',
+    aria: 'Reset your focus timer',
+    instructions: 'Breathe in slowly, then out a little slower. Look away from the screen. You can stop at any time.',
+    presets: RESET_PRESETS,
+    defaultMinutes: 1,
+    running: 'Breathing',
   },
   'deep-work': {
     eyebrow: 'Focus timer',
@@ -78,6 +88,7 @@ export function SilentSynchronizationDialog({
   practice = 'silent',
 }: SilentSynchronizationDialogProps) {
   const copy = PRACTICE_COPY[practice]
+  const presetColumns = copy.presets.length === 3 ? 'grid-cols-3' : 'grid-cols-4'
   const [minutes, setMinutes] = useState<SilentSyncMinutes>(copy.defaultMinutes)
   const [session, setSession] = useState<SessionState>('ready')
   const [startedAt, setStartedAt] = useState<number | null>(null)
@@ -245,7 +256,7 @@ export function SilentSynchronizationDialog({
           {session === 'ready' ? (
             <fieldset className="mt-5">
               <legend className="mb-2 text-xs font-medium text-ink-muted">Duration</legend>
-              <div className="grid grid-cols-4 gap-2" role="group" aria-label="Timer duration">
+              <div className={`grid ${presetColumns} gap-2`} role="group" aria-label="Timer duration">
                 {copy.presets.map((preset) => (
                   <HudButton
                     key={preset}
@@ -259,7 +270,7 @@ export function SilentSynchronizationDialog({
                 ))}
               </div>
             </fieldset>
-          ) : practice === 'deep-work' ? (
+          ) : practice !== 'silent' ? (
             <div className="mt-5">
               <div className="flex items-end justify-between">
                 <span className="text-xs text-ink-muted">{running ? 'Time left' : 'Time worked'}</span>

@@ -13,6 +13,8 @@ vi.mock('@tanstack/react-router', () => ({
 vi.mock('./OracleContext', () => ({ useSafeOracle: () => undefined }))
 
 const alignment = {
+  tasks: [] as ReturnType<typeof mergeCompletions>,
+  streakDays: 4,
   memberId: 'member-1',
   currentDate: '2026-11-15',
   setTaskCompleted: vi.fn(),
@@ -24,6 +26,7 @@ function renderList(completed: string[] = []) {
   const onToggle = vi.fn()
   const onClose = vi.fn()
   const tasks = mergeCompletions(completed)
+  alignment.tasks = tasks
   render(
     <AlignmentTodayList tasks={tasks} countReady todayLabel="Sun, Nov 15" onToggle={onToggle} onClose={onClose} />,
   )
@@ -47,22 +50,34 @@ describe('AlignmentTodayList task shortcuts', () => {
     expect(screen.queryByTestId('alignment-task-panel')).not.toBeInTheDocument()
   })
 
-  it('opens Help a member with a forum link and still lets the member mark it done', () => {
-    const { onToggle, onClose } = renderList()
+  it('opens Help a member with a forum button and its Codex passage', () => {
+    const { onClose } = renderList()
     fireEvent.click(row('Help a member'))
     expect(screen.getByText(/upvote another member's post/)).toBeInTheDocument()
+    expect(screen.getByTestId('alignment-codex-link')).toHaveTextContent('Read in the Codex')
+    expect(screen.queryByRole('button', { name: /Mark done/ })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Open the forum' }))
     expect(onClose).toHaveBeenCalled()
     expect(navigate).toHaveBeenCalledWith({ to: '/forum' })
-    fireEvent.click(screen.getByRole('button', { name: 'Mark done' }))
-    expect(onToggle).toHaveBeenCalledWith('community-outreach')
   })
 
-  it('starts the deep work timer from Do deep work', () => {
+  it('keeps done tasks done: no checkbox button and the row does not open', () => {
+    const { onToggle } = renderList(['community-outreach'])
+    expect(screen.getByRole('img', { name: 'Help a member done' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Mark Help a member done' })).not.toBeInTheDocument()
+    fireEvent.click(row('Help a member'))
+    expect(screen.queryByTestId('alignment-task-panel')).not.toBeInTheDocument()
+    expect(onToggle).not.toHaveBeenCalled()
+  })
+
+  it('starts the deep work and breathing timers', () => {
     renderList()
     fireEvent.click(row('Do deep work'))
     fireEvent.click(screen.getByRole('button', { name: 'Start a focus timer' }))
     expect(alignment.openPractice).toHaveBeenCalledWith('deep-work')
+    fireEvent.click(row('Reset your focus'))
+    fireEvent.click(screen.getByRole('button', { name: 'Start a breathing timer' }))
+    expect(alignment.openPractice).toHaveBeenCalledWith('reset')
   })
 
   it('saves the one thing, ticks the task and shows it on Close the day', () => {
@@ -73,7 +88,15 @@ describe('AlignmentTodayList task shortcuts', () => {
     expect(alignment.setTaskCompleted).toHaveBeenCalledWith('prompt-construction', true)
     expect(readOneThing('member-1', '2026-11-15')).toBe('Ship the forum fix')
     const lines = screen.getAllByTestId('alignment-one-thing-line').map((el) => el.textContent)
-    expect(lines).toEqual(['Ship the forum fix', 'Did you do it? Ship the forum fix'])
+    expect(lines).toEqual([' · Ship the forum fix', ' · Your one thing: Ship the forum fix'])
+  })
+
+  it('closes the day from a short recap', () => {
+    renderList(['silent-synchronization', 'prompt-construction'])
+    fireEvent.click(row('Close the day'))
+    expect(screen.getByTestId('alignment-day-recap')).toHaveTextContent('2 of 7 tasks done today · 4-day streak')
+    fireEvent.click(screen.getByRole('button', { name: 'Close the day' }))
+    expect(alignment.setTaskCompleted).toHaveBeenCalledWith('alignment-review', true)
   })
 
   it('hands the Oracle a starter line for Let one thing go', () => {
@@ -85,11 +108,5 @@ describe('AlignmentTodayList task shortcuts', () => {
       text: expect.stringContaining('Help me let go'),
       taskKey: 'reflection-log',
     })
-  })
-
-  it('ticks tasks without a shortcut straight from the row', () => {
-    const { onToggle } = renderList()
-    fireEvent.click(row('Reset your focus'))
-    expect(onToggle).toHaveBeenCalledWith('nutritional-efficiency-break')
   })
 })

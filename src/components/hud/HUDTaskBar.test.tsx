@@ -104,7 +104,7 @@ describe('HUDTaskBar', () => {
 
     expect(screen.getByTestId('alignment-panel')).toBeInTheDocument()
     expect(screen.getByText('0 of 8 done')).toBeInTheDocument()
-    expect(screen.getByTestId('alignment-panel')).toHaveTextContent('Next')
+    expect(screen.getAllByTestId('alignment-task-row')[0]).toHaveTextContent('Silent Synchronization')
     expect(screen.queryByRole('tab')).not.toBeInTheDocument()
     expect(screen.queryByText('Notifications')).not.toBeInTheDocument()
 
