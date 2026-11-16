@@ -163,7 +163,7 @@ describe('alignment task Codex links', () => {
         const verse = scripture!.verses.find((v) => v.verseNumber === codex!.verse)
         expect(verse?.heading, task.key).toContain(codex!.label)
       } else {
-        expect(scripture!.title).toBe(codex!.label)
+        expect(scripture!.title).toContain(codex!.label)
       }
     }
   })

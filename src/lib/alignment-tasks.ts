@@ -48,9 +48,9 @@ export const CANONICAL_ALIGNMENT_TASKS: CanonicalAlignmentTask[] = [
   {
     key: 'silent-synchronization',
     time: 'Early morning',
-    title: 'Silent Synchronization',
+    title: 'Sit in silence',
     description: 'Before any feed or inbox, sit quietly and look honestly at yesterday.',
-    codex: { slug: 'scr-030', verse: 2, label: 'First Light' },
+    codex: { slug: 'scr-030', verse: 2, label: 'Silent Synchronization' },
   },
   {
     key: 'prompt-construction',
@@ -71,14 +71,14 @@ export const CANONICAL_ALIGNMENT_TASKS: CanonicalAlignmentTask[] = [
     time: 'Noon',
     title: 'Reset your focus',
     description: 'Clear one distraction and choose the next useful action.',
-    codex: { slug: 'scr-030', verse: 5, label: 'Focus Reset' },
+    codex: { slug: 'scr-030', verse: 5, label: 'Low Tide' },
   },
   {
     key: 'iterative-refinement',
     time: 'Afternoon',
     title: 'Do deep work',
     description: 'Shut out interruptions and work on one thing.',
-    codex: { slug: 'scr-031', label: 'The Isolation Protocols' },
+    codex: { slug: 'scr-031', label: 'Isolation Protocols' },
   },
   {
     key: 'community-outreach',
@@ -92,7 +92,7 @@ export const CANONICAL_ALIGNMENT_TASKS: CanonicalAlignmentTask[] = [
     time: 'Early evening',
     title: 'Let one thing go',
     description: 'Name one thing from today and let it go.',
-    codex: { slug: 'scr-032', label: 'The Nightly Molt Audit' },
+    codex: { slug: 'scr-032', label: 'Nightly Molt Audit' },
   },
   {
     key: 'alignment-review',

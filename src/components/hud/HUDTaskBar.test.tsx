@@ -35,7 +35,7 @@ describe('HUDTaskBar', () => {
     
     expect(screen.getByText('BENTHIC CHRONOMETER')).toBeInTheDocument()
     expect(screen.getByText('NEXT UPCOMING ALIGNMENT TASK')).toBeInTheDocument()
-    expect(screen.getByText('Silent Synchronization')).toBeInTheDocument()
+    expect(screen.getByText('Sit in silence')).toBeInTheDocument()
     expect(screen.getByText('COMPLETE ALIGNMENT')).toBeInTheDocument()
   })
 
@@ -104,11 +104,11 @@ describe('HUDTaskBar', () => {
 
     expect(screen.getByTestId('alignment-panel')).toBeInTheDocument()
     expect(screen.getByText('0 of 8 done')).toBeInTheDocument()
-    expect(screen.getAllByTestId('alignment-task-row')[0]).toHaveTextContent('Silent Synchronization')
+    expect(screen.getAllByTestId('alignment-task-row')[0]).toHaveTextContent('Sit in silence')
     expect(screen.queryByRole('tab')).not.toBeInTheDocument()
     expect(screen.queryByText('Notifications')).not.toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Mark Silent Synchronization done' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Mark Sit in silence done' }))
     expect(onComplete).toHaveBeenCalledWith('silent-synchronization')
 
     fireEvent.click(screen.getByRole('button', { name: "Close today's tasks" }))
@@ -156,7 +156,7 @@ describe('HUDTaskBar', () => {
     render(<HUDTaskBar variant="header" />)
     fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
 
-    fireEvent.mouseDown(screen.getByRole('button', { name: 'Mark Silent Synchronization done' }))
+    fireEvent.mouseDown(screen.getByRole('button', { name: 'Mark Sit in silence done' }))
     expect(screen.getByTestId('alignment-panel')).toBeInTheDocument()
 
     fireEvent.mouseDown(document.body)

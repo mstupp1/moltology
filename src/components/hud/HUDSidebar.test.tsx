@@ -281,7 +281,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(wallet).toHaveAccessibleName('Shop. 1,250 Chitin Gems, Molt Credits coming soon')
     expect(screen.queryByText('MOLTOLOGY HOME')).not.toBeInTheDocument()
     // The same panel carries today's tasks and the member's sub-stage
-    expect(screen.getByText('Silent Synchronization')).toBeInTheDocument()
+    expect(screen.getByText('Sit in silence')).toBeInTheDocument()
     expect(screen.getByTestId('account-hub-level')).toHaveTextContent('L-1 · Molt Curious')
   })
 

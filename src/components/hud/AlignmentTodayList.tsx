@@ -113,6 +113,7 @@ export function AlignmentTodayList({
             {tasks.map((t) => {
               const isNext = t.id === nextTaskId
               const key = t.key ?? t.id
+              const name = alignmentTaskCodex(key)?.label
               const codex = actions ? alignmentTaskCodex(key) : undefined
               const action = actions ? ALIGNMENT_TASK_ACTIONS[key] : undefined
               const opens = !t.completed && Boolean(action || codex)
@@ -134,7 +135,7 @@ export function AlignmentTodayList({
                     {t.title}
                   </span>
                   <span className={`block truncate text-[11px] ${isNext ? 'text-cyan-glow' : 'text-ink-muted'}`}>
-                    {t.time}
+                    {name ? `${name} · ${t.time}` : t.time}
                     {detail && <span data-testid="alignment-one-thing-line"> · {detail}</span>}
                   </span>
                 </>
