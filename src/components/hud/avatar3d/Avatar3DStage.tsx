@@ -15,7 +15,7 @@ export interface Avatar3DStageProps {
   focus?: string | null
   /** Called once the first frame of the character is on screen. */
   onReady?: () => void
-  /** Faint moving light from the water above (an admin experiment for now). */
+  /** Faint moving light from the water above (on unless turned off; never with reduced motion). */
   water?: boolean
 }
 
@@ -23,7 +23,7 @@ export interface Avatar3DStageProps {
  * Live 3D character. The renderer loads only in the browser and only when this mounts, so pages
  * that never show a 3D character never download it.
  */
-export function Avatar3DStage({ look, spin = false, className, label, focus = null, onReady, water = false }: Avatar3DStageProps) {
+export function Avatar3DStage({ look, spin = false, className, label, focus = null, onReady, water = true }: Avatar3DStageProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const stageRef = useRef<Stage | null>(null)
   const lookRef = useRef(look)

@@ -61,9 +61,12 @@ describe('detail pass', () => {
     c.react('poke')
     for (let t = 1; t < 18; t++) c.update(1 / 60, t / 60, true)
     expect(mouth.visible).toBe(true)
+    // The open mouth replaces the drawn one instead of sitting over it.
+    expect(c.rig.bone('mouthLine').visible).toBe(false)
     expect(brow.position.y).toBeGreaterThan(restY)
     c.update(0, 1, false)
     expect(mouth.visible).toBe(false)
+    expect(c.rig.bone('mouthLine').visible).toBe(true)
     c.dispose()
   })
 

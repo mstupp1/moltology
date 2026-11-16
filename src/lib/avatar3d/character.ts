@@ -328,6 +328,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   const q = new Quaternion()
   // Face parts that move with reactions: the open mouth, the brows and the eyes' squash.
   const mouthBone = rig.bones.get('mouthOpen') ?? null
+  const mouthLine = rig.bones.get('mouthLine') ?? null
   const brows = (['L', 'R'] as const).flatMap((tag) => {
     const bone = rig.bones.get(`brow${tag}`)
     const rest = rig.rest.get(`brow${tag}`)
@@ -560,8 +561,11 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
 
     pelvisBone.position.set(pelvisRest.x + dx, pelvisRest.y + dy, pelvisRest.z)
     if (mouthBone) {
-      mouthBone.visible = mouthOpen > 0.02
-      mouthBone.scale.set(1 - 0.42 * mouthRound, Math.max(mouthOpen * (1 + 0.35 * mouthRound), 1e-3), 1)
+      // The open mouth takes the drawn one's place rather than sitting over it.
+      mouthBone.visible = mouthOpen > 0.06
+      if (mouthLine) mouthLine.visible = !mouthBone.visible
+      // A cheer is wide, a gasp is round.
+      mouthBone.scale.set((1 - 0.42 * mouthRound) * (1 + 0.45 * (1 - mouthRound)), Math.max(mouthOpen * (1 + 0.35 * mouthRound), 1e-3), 1)
     }
     for (const b of brows) {
       b.bone.position.copy(b.rest)

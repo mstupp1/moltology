@@ -266,20 +266,22 @@ function addMouth(rig: Rig, kind: AvatarMouth, f: FaceLayout): void {
   }
   const sMid = f.shell.sAt(f.mouthY)
   const normal = f.shell.normal(sMid, Math.PI / 2)
-  addOpenMouth(rig, f, m.round ? f.mouthY : lineY(0) - 0.024, normal)
+  addOpenMouth(rig, f, m.round ? f.mouthY : lineY(0) - 0.012, normal)
+  // The drawn mouth sits on its own bone so it can give way to the open one in a reaction.
+  rig.addBone('mouthLine', f.bone, at(0, 0))
   if (m.round) {
     const o = new SphereGeometry(0.034, 20, 14)
     o.scale(0.9, 1.15, 0.3)
-    rig.addWorld(f.bone, 'mouth', placed(withAo(o), at(0, 0), lookQuaternion(normal)))
+    rig.addWorld('mouthLine', 'mouth', placed(withAo(o), at(0, 0), lookQuaternion(normal)))
     return
   }
   const line = Array.from({ length: 13 }, (_, i) => at((i / 12) * 2 - 1))
-  rig.addWorld(f.bone, 'mouth', ridge(line, normal, 0.0095, 0.008, 36))
+  rig.addWorld('mouthLine', 'mouth', ridge(line, normal, 0.0095, 0.008, 36))
 
   // Things inside or hanging from the mouth are thin patches laid on the shell between two curves.
   const patch = (slot: 'mouth' | 'teeth' | 'tongue', a0: number, a1: number, upper: (a: number) => number, lower: (a: number) => number, lift: number) =>
     rig.addWorld(
-      f.bone,
+      'mouthLine',
       slot,
       surfacePatch(
         (u, t) => {
@@ -310,7 +312,7 @@ function addMouth(rig: Rig, kind: AvatarMouth, f: FaceLayout): void {
         const sp = f.shell.sAt(end.y + dy + 0.012)
         return f.shell.point(sp, along).addScaledVector(f.shell.normal(sp, along), 0.003)
       })
-      rig.addWorld(f.bone, 'mouth', ridge(crease, f.shell.normal(sEnd, theta(s)), 0.006, 0.005, 10))
+      rig.addWorld('mouthLine', 'mouth', ridge(crease, f.shell.normal(sEnd, theta(s)), 0.006, 0.005, 10))
     }
   }
 }
