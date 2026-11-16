@@ -33,6 +33,8 @@ export interface SynapticEntityCanvasProps {
   fitPortrait?: boolean
   /** The open area the core should sit in (e.g. the space above the prompt chips). */
   focusRef?: React.RefObject<HTMLElement | null>
+  /** Draw the core this many pixels across (capped to fit the canvas), centered. */
+  coreSize?: number
   className?: string
 }
 
@@ -47,26 +49,35 @@ export interface CoreFraming {
 }
 
 /**
- * Camera framing for the core. Wide canvases keep the base view. Tall ones
- * (phones) size the core to ~60% of the width, shrunk further to fit the open
- * focus area, never below ~42% of the width, and move it to that area's center.
+ * Camera framing for the core. With `coreSize`, the core is drawn that many pixels
+ * across (capped to fit the canvas or focus area) and centered on the focus area.
+ * Without it, wide canvases keep the base view and tall ones (phones) size the core
+ * to ~60% of the width, shrunk to fit the focus area, never below ~42% of the width.
  */
 export function computeCoreFraming(
   width: number,
   height: number,
   fitPortrait: boolean,
   focus: { top: number; height: number } | null,
+  coreSize?: number,
 ): CoreFraming {
-  if (!fitPortrait || width >= height || width <= 0 || height <= 0) return { fov: BASE_FOV, offsetY: 0 }
-  let target = width * 0.6
-  if (focus && focus.height > 0) target = Math.min(target, focus.height * 0.9)
-  target = Math.max(target, width * 0.42)
+  if (width <= 0 || height <= 0) return { fov: BASE_FOV, offsetY: 0 }
+  let target: number
+  if (coreSize && coreSize > 0) {
+    // Fixed core size on every surface, capped so it still fits the open area.
+    target = Math.min(coreSize, width * 0.7, focus && focus.height > 0 ? focus.height * 0.92 : height * 0.8)
+  } else {
+    if (!fitPortrait || width >= height) return { fov: BASE_FOV, offsetY: 0 }
+    target = width * 0.6
+    if (focus && focus.height > 0) target = Math.min(target, focus.height * 0.9)
+    target = Math.max(target, width * 0.42)
+  }
   const baseDiameter = CORE_HEIGHT_SHARE * height
-  if (target >= baseDiameter) return { fov: BASE_FOV, offsetY: 0 }
+  if (!coreSize && target >= baseDiameter) return { fov: BASE_FOV, offsetY: 0 }
   const halfTan = Math.tan(((BASE_FOV / 2) * Math.PI) / 180) * (baseDiameter / target)
-  const fov = Math.min(100, (2 * Math.atan(halfTan) * 180) / Math.PI)
+  const fov = Math.max(10, Math.min(100, (2 * Math.atan(halfTan) * 180) / Math.PI))
   const centerY = focus && focus.height > 0 ? focus.top + focus.height / 2 : height / 2
-  const limit = height * 0.3
+  const limit = height * 0.35
   const offsetY = Math.max(-limit, Math.min(limit, height / 2 - centerY))
   return { fov, offsetY }
 }
@@ -1340,8 +1351,11 @@ export function SynapticEntityCanvas({
   isCompact = false,
   fitPortrait = false,
   focusRef,
+  coreSize,
   className = '',
 }: SynapticEntityCanvasProps) {
+  const coreSizeRef = useRef(coreSize)
+  coreSizeRef.current = coreSize
   const containerRef = useRef<HTMLDivElement | null>(null)
   // Read inside the render loop, so changing them never rebuilds the scene.
   const fitPortraitRef = useRef(fitPortrait)
@@ -1519,7 +1533,7 @@ export function SynapticEntityCanvas({
           const frame = container.getBoundingClientRect()
           focus = { top: box.top - frame.top, height: box.height }
         }
-        framingTarget = computeCoreFraming(viewWidth, viewHeight, fitPortraitRef.current, focus)
+        framingTarget = computeCoreFraming(viewWidth, viewHeight, fitPortraitRef.current, focus, coreSizeRef.current)
         const reduceMotion =
           typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
         if (!framingReady || reduceMotion) {

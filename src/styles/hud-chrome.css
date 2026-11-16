@@ -604,3 +604,10 @@ input[type="range"].dial-range:focus-visible {
     animation: none;
   }
 }
+
+/* Oracle core view: the 3D core draws in a square around itself, fading out at the edges. */
+.oracle-core-box {
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle closest-side, #000 62%, transparent 100%);
+  mask-image: radial-gradient(circle closest-side, #000 62%, transparent 100%);
+}
