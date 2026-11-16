@@ -437,27 +437,29 @@ function antennaGear(kit: Kit, wear: Wearable): void {
   const { motif, construction: n } = kit.visual
   const t = wear.antenna.thick
   for (const { s, tag } of SIDES) {
-    const bone = `antenna${tag}`
+    const base = `antenna${tag}`
+    // Each piece rides the link of the bending antenna it sits on.
+    const at = (u: number) => kit.rig.chainBoneAt(base, u)
     const curve = new CatmullRomCurve3(wear.antenna.path.map((p) => v(p.x * s, p.y, p.z)), false, 'centripetal')
     const ring = (u: number, radius: number, thick: number, tone: Tone) => {
       const g = new TorusGeometry(radius, thick, 8, 20)
       g.rotateX(Math.PI / 2)
-      kit.addWorld(bone, tone, placed(g, curve.getPointAt(u), alongY(curve.getTangentAt(u))))
+      kit.addWorld(at(u), tone, placed(g, curve.getPointAt(u), alongY(curve.getTangentAt(u))))
     }
     const sleeve = new CylinderGeometry(t * 1.5, t * 1.75, t * 2.4, 16)
-    kit.addWorld(bone, 'plate', placed(sleeve, curve.getPointAt(0.05), alongY(curve.getTangentAt(0.05))))
+    kit.addWorld(at(0.05), 'plate', placed(sleeve, curve.getPointAt(0.05), alongY(curve.getTangentAt(0.05))))
     ring(0.1, t * 1.6, t * 0.4, 'trim')
     const bands = n >= 3 ? [0.32, 0.5, 0.68] : n >= 1 ? [0.36, 0.6] : [0.45]
     for (const u of bands) ring(u, t * (1.25 - u * 0.6), t * 0.3, 'trim')
     const end = curve.getPointAt(1)
-    kit.addWorld(bone, 'accent', placed(new SphereGeometry(t * (0.85 + n * 0.14), 16, 12), end))
+    kit.addWorld(at(1), 'accent', placed(new SphereGeometry(t * (0.85 + n * 0.14), 16, 12), end))
     if (motif === 'crown') {
       const dir = curve.getTangentAt(1)
       for (let i = 0; i < 3; i++) {
         const prong = new ConeGeometry(t * 0.34, t * 2.6, 8)
         prong.translate(0, t * 1.5, 0)
         const lean = new Quaternion().setFromAxisAngle(dir, (i / 3) * Math.PI * 2).multiply(alongY(dir.clone().add(v(0.55, 0.2, 0.3).cross(dir).multiplyScalar(0.9))))
-        kit.addWorld(bone, 'trim', placed(prong, end, lean))
+        kit.addWorld(at(1), 'trim', placed(prong, end, lean))
       }
     } else if (n >= 2) {
       // A small dish part way up, facing outward.
@@ -465,8 +467,8 @@ function antennaGear(kit: Kit, wear: Wearable): void {
       const dish = new ConeGeometry(t * 2.1, t * 1.1, 16, 1, true)
       dish.translate(0, t * 0.55, 0)
       const out = v(s, 0.25, 0.35)
-      kit.addWorld(bone, 'trim', placed(dish, curve.getPointAt(u).addScaledVector(out.normalize(), t * 0.9), alongY(out.clone().negate())))
-      kit.addWorld(bone, 'accent', placed(new SphereGeometry(t * 0.45, 10, 8), curve.getPointAt(u).addScaledVector(out, t * 1.7)))
+      kit.addWorld(at(u), 'trim', placed(dish, curve.getPointAt(u).addScaledVector(out.normalize(), t * 0.9), alongY(out.clone().negate())))
+      kit.addWorld(at(u), 'accent', placed(new SphereGeometry(t * 0.45, 10, 8), curve.getPointAt(u).addScaledVector(out, t * 1.7)))
     }
   }
 }

@@ -28,6 +28,7 @@ import {
   withAo,
   type ClawStyle,
 } from './parts'
+import { addSleeve, chainWeigh } from './flex'
 import { aimQuaternion, lookQuaternion, type Rig, type Wearable } from './rig'
 import type { Avatar3DLook } from './look'
 
@@ -323,7 +324,9 @@ function addArms(rig: Rig, look: Avatar3DLook, a: ArmLayout): Wearable['arm'] {
     rig.addBone(`arm${tag}`, a.parent, shoulder, { aim: elbow })
     rig.add(`arm${tag}`, 'shell', merge([jointBall(r * 1.5), limbSegment(shoulder.distanceTo(elbow), r * 1.05, r * 0.95, { cuff: true })]))
     rig.addBone(`forearm${tag}`, `arm${tag}`, elbow, { aim: wrist })
-    rig.add(`forearm${tag}`, 'shell', merge([jointBall(r * 1.12), limbSegment(elbow.distanceTo(wrist), r * 0.98, r * 1.05, { cuff: true })]))
+    // The elbow bends under a sleeve of membrane; the ball inside only fills the gap.
+    rig.add(`forearm${tag}`, 'shell', merge([jointBall(r * 0.8), limbSegment(elbow.distanceTo(wrist), r * 0.98, r * 1.05, { cuff: true })]))
+    addSleeve(rig, `arm${tag}`, `forearm${tag}`, r)
 
     const facing = sided(a.clawFacing, s)
     const clawQ = aimQuaternion(tip.clone().sub(wrist), facing)
@@ -332,7 +335,8 @@ function addArms(rig: Rig, look: Avatar3DLook, a: ArmLayout): Wearable['arm'] {
     // The pincer opens toward the body, so the character's left claw is the mirrored one.
     const flip = s === 1
     const fit = (g: typeof parts.palm) => (flip ? mirrorX(g) : g).scale(size, size, size)
-    rig.add(`claw${tag}`, 'shell', merge([jointBall(r * 1.25), fit(parts.palm)]))
+    rig.add(`claw${tag}`, 'shell', merge([jointBall(r * 0.9), fit(parts.palm)]))
+    addSleeve(rig, `forearm${tag}`, `claw${tag}`, r * 1.02)
     const local = (p: Vector3) => v(flip ? -p.x : p.x, p.y, p.z).multiplyScalar(size)
     const hinge = local(parts.hinge).applyQuaternion(clawQ).add(wrist)
     rig.addBone(`thumb${tag}`, `claw${tag}`, hinge, { quaternion: clawQ })
@@ -362,7 +366,8 @@ function addLegs(rig: Rig, l: LegLayout): Wearable['leg'] {
     rig.addBone(`thigh${tag}`, l.parent, hip, { aim: knee })
     rig.add(`thigh${tag}`, 'shell', merge([jointBall(r * 1.25), limbSegment(hip.distanceTo(knee), r * 1.05, r, { cuff: true })]))
     rig.addBone(`shin${tag}`, `thigh${tag}`, knee, { aim: ankle })
-    rig.add(`shin${tag}`, 'shell', merge([jointBall(r * 1.2), limbSegment(knee.distanceTo(ankle), r * 1.02, r * 0.92, { cuff: true })]))
+    rig.add(`shin${tag}`, 'shell', merge([jointBall(r * 0.8), limbSegment(knee.distanceTo(ankle), r * 1.02, r * 0.92, { cuff: true })]))
+    addSleeve(rig, `thigh${tag}`, `shin${tag}`, r)
     const footQ = lookQuaternion(v(s * 0.3, 0, 1))
     rig.addBone(`foot${tag}`, `shin${tag}`, ankle, { quaternion: footQ })
     rig.add(`foot${tag}`, 'shell', merge([jointBall(r * 1.05), foot(l.footWidth, l.footLength, ankle.y)]))
@@ -382,7 +387,8 @@ function addSideLegs(rig: Rig, parent: string, legs: Vector3[][], radius: number
         rig.addBone(name, prev, pts[j], { aim: pts[j + 1] })
         const r0 = radius * (1 - j * 0.2)
         const seg = limbSegment(pts[j].distanceTo(pts[j + 1]), r0, r0 * 0.82, j === 2 ? { pointed: true } : { cuff: true })
-        rig.add(name, 'shell', merge([jointBall(r0 * (j === 0 ? 1.45 : 1.15)), seg]))
+        rig.add(name, 'shell', merge([jointBall(r0 * (j === 0 ? 1.45 : 0.8)), seg]))
+        if (j > 0) addSleeve(rig, prev, name, r0 * 1.05)
         prev = name
       }
     }
@@ -411,6 +417,9 @@ const ANTENNA_PATHS: Record<Exclude<AvatarAntennae, 'whip'>, [number, number][]>
   beacon: [[0, 0], [0.05, 0.3], [0.14, 0.56], [0.26, 0.74]],
 }
 
+/** Where along an antenna each extra link of its chain starts. */
+export const ANTENNA_LINKS = [0.3, 0.55, 0.78]
+
 function addAntennae(rig: Rig, style: AvatarAntennae, a: AntennaLayout): Wearable['antenna'] {
   const own = style === 'whip' ? a.whip : ANTENNA_PATHS[style].map(([out, up]) => v(a.base.x + out * a.reach, a.base.y + up * a.reach, a.base.z + a.sweep * up * a.reach))
   for (const { s, tag } of SIDES) {
@@ -436,10 +445,13 @@ function addAntennae(rig: Rig, style: AvatarAntennae, a: AntennaLayout): Wearabl
         geos.push(placed(withAo(barb), spine.getPointAt(Math.min(t, 1)), alongY(spine.getTangentAt(Math.min(t, 1)).add(v(0, 0.6, 0)))))
       }
     }
-    rig.addWorld(`antenna${tag}`, 'shell', merge(geos))
+    // The whip bends along a short chain of bones, so it can sway and lag behind the head.
+    const base = `antenna${tag}`
+    const links = rig.addChain(base, pts, ANTENNA_LINKS)
+    rig.addSkinned(base, 'shell', merge(geos), chainWeigh(rig, base, pts))
     if (style === 'beacon') {
       const bulb = new SphereGeometry(a.thick * 2.1, 20, 14)
-      rig.addWorld(`antenna${tag}`, 'glow', placed(withAo(bulb), pts[pts.length - 1]))
+      rig.addWorld(links[links.length - 1], 'glow', placed(withAo(bulb), pts[pts.length - 1]))
     }
   }
   return { path: own, thick: a.thick }
