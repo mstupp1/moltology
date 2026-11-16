@@ -68,6 +68,41 @@ describe('NewChatScreen', () => {
     expect(within(suggested).getAllByRole('button')).toHaveLength(2)
   })
 
+  it('switches between Suggested and More ideas like two views, hiding recents in ideas', () => {
+    const moreIdeas = [
+      { id: 'start', label: 'Start', prompts: [{ label: 'Walk me through the stages', prompt: 'Stages?' }] },
+      { id: 'codex', label: 'Codex', prompts: [{ label: 'A verse for a hard morning', prompt: 'Verse?' }] },
+    ]
+    render(
+      <NewChatScreen
+        onSubmit={onSubmit}
+        moreIdeas={moreIdeas}
+        recentChats={[{ id: 't1', title: 'Laya forum basics', updatedAt: new Date().toISOString() }]}
+        onOpenChat={vi.fn()}
+      />
+    )
+    const views = screen.getByRole('tablist', { name: 'Prompt views' })
+    expect(within(views).getByRole('tab', { name: 'Suggested' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('heading', { name: 'Recent' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Close/ })).not.toBeInTheDocument()
+
+    fireEvent.click(within(views).getByRole('tab', { name: 'More ideas' }))
+    expect(screen.queryByRole('heading', { name: 'Recent' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('list', { name: 'Suggested questions' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('tab', { name: 'Codex' }))
+    fireEvent.click(screen.getByRole('button', { name: 'A verse for a hard morning' }))
+    expect(onSubmit).toHaveBeenCalledWith({ text: 'Verse?' })
+
+    fireEvent.keyDown(screen.getByRole('tab', { name: 'Codex' }), { key: 'Escape' })
+    expect(within(views).getByRole('tab', { name: 'Suggested' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('heading', { name: 'Recent' })).toBeInTheDocument()
+  })
+
+  it('has no view switch without ideas', () => {
+    render(<NewChatScreen onSubmit={onSubmit} />)
+    expect(screen.queryByRole('tablist', { name: 'Prompt views' })).not.toBeInTheDocument()
+  })
+
   it('shows no recents block without chats', () => {
     render(<NewChatScreen onSubmit={onSubmit} recentChats={[]} onOpenChat={vi.fn()} />)
     expect(screen.queryByRole('heading', { name: 'Recent' })).not.toBeInTheDocument()
