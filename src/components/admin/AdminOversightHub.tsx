@@ -1,3 +1,4 @@
+import { AdminStarterPrompts } from './AdminStarterPrompts'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { Link } from '@tanstack/react-router'
@@ -120,6 +121,7 @@ export function AdminOversightHub({ tab = 'watch' }: { tab?: AdminTab }) {
         </>
       ) : null}
       {tab === 'experiments' ? <ExperimentSwitches userId={session.userId} /> : null}
+      {tab === 'prompts' ? <AdminStarterPrompts /> : null}
     </div>
   )
 }

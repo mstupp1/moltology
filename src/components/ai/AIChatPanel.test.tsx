@@ -7,6 +7,17 @@ import { useOracleUsage } from '@/hooks/useOracleUsage'
 import { buildOracleUsageSnapshot } from '@/lib/ai/usage-limits'
 import { authClient } from '@/lib/auth-client'
 
+// Starter chips rotate daily; pin the old fixed set so these tests stay about the panel.
+vi.mock('@/lib/oracle-starter-prompts', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/oracle-starter-prompts')>()
+  const fixed = ['what-is-moltology', 'start-moltmaxxing', 'melt-vs-molt', 'top-posts-today']
+  return {
+    ...actual,
+    pickStarterChips: () => fixed.map((id) => actual.STARTER_PROMPTS.find((p) => p.id === id)!),
+  }
+})
+
+
 vi.mock('@/hooks/useOracleUsage', () => ({
   useOracleUsage: vi.fn(() => ({ snapshot: null, unavailable: false, blocked: false, refresh: vi.fn() })),
 }))
