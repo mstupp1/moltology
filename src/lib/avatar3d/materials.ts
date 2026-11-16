@@ -140,6 +140,8 @@ export interface ShellMaterialOptions {
   detail?: number
   /** Size of the marking: above 1 is a bigger, sparser pattern. */
   markingScale?: number
+  /** Thin enough for light to come through at the edges (antennae, fins, membrane). */
+  thin?: boolean
 }
 
 /** Set a shell material's colours, finish and marking. Used to make one and to repaint it. */
@@ -147,8 +149,9 @@ export function paintShell(material: MeshPhysicalMaterial, o: ShellMaterialOptio
   const finish = o.finish ?? 'satin'
   material.color.set(o.base)
   material.sheenColor.set(o.highlight)
-  Object.assign(material, { roughness: 0.5, metalness: 0, clearcoat: 0.25, clearcoatRoughness: 0.45, sheen: 0.55, sheenRoughness: 0.55, iridescence: 0, iridescenceIOR: 1.3, envMapIntensity: 1 })
-  if (finish === 'glossy') Object.assign(material, { roughness: 0.28, clearcoat: 0.9, clearcoatRoughness: 0.12 })
+  // A wet shell: a thin, fairly tight clear coat over the satin, broken up a little in the shader.
+  Object.assign(material, { roughness: 0.5, metalness: 0, clearcoat: 0.42, clearcoatRoughness: 0.26, sheen: 0.55, sheenRoughness: 0.55, iridescence: 0, iridescenceIOR: 1.3, envMapIntensity: 1 })
+  if (finish === 'glossy') Object.assign(material, { roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.07 })
   if (finish === 'pearl') Object.assign(material, { roughness: 0.34, clearcoat: 0.7, clearcoatRoughness: 0.2, iridescence: 1, iridescenceIOR: 1.6 })
   // Polished metal that still reads as the shell's colour: not a full mirror, which shows the
   // room as blotches on rounded shells.
@@ -165,6 +168,9 @@ export function paintShell(material: MeshPhysicalMaterial, o: ShellMaterialOptio
   u.uDetail.value = (o.detail ?? 1) * (finish === 'chrome' ? 0.3 : finish === 'glossy' || finish === 'pearl' ? 0.6 : 1)
   u.uGlow.value = finish === 'glow' ? 0.45 : 0
   u.uMarkGlow.value = o.marking === 'circuit' ? 0.35 : 0
+  u.uThin.value = o.thin ? 1 : 0
+  // Water beads on the shell, less so on polished metal; the plain belly and brows stay dry-looking.
+  u.uWet.value = (o.detail ?? 1) === 0 ? 0 : finish === 'chrome' ? 0.4 : 1
   // A change of finish can switch shader features on or off.
   material.needsUpdate = true
 }
@@ -184,11 +190,32 @@ const shellUniforms = () => ({
   // Spheres standing in for the body's bulk, which shade the shell where parts crowd it.
   uOcc: { value: Array.from({ length: OCCLUDERS }, () => new Vector4(0, -1000, 0, 0)) },
   uOccN: { value: 0 },
+  uThin: { value: 0 },
+  uWet: { value: 0 },
+  // Faint moving light from the water above (0 off), and the time it moves by.
+  uWater: { value: 0 },
+  uTime: { value: 0 },
 })
 
 /** Let a character's shell materials shade themselves with its own occluder spheres. */
+const SHELL_SLOTS = ['shell', 'fin', 'belly', 'brow'] as const
+
+/**
+ * The live water state shared by one character's shell materials: how strong the moving light
+ * from above is, and the clock it moves by.
+ */
+export function waterOf(materials: Record<MaterialSlot, Material>): { strength: { value: number }; time: { value: number } } {
+  const u = (materials.shell as MeshPhysicalMaterial).userData.uniforms as ShellUniforms
+  for (const slot of SHELL_SLOTS) {
+    const v = (materials[slot] as MeshPhysicalMaterial).userData.uniforms as ShellUniforms
+    v.uWater = u.uWater
+    v.uTime = u.uTime
+  }
+  return { strength: u.uWater, time: u.uTime }
+}
+
 export function shadeWith(materials: Record<MaterialSlot, Material>, spheres: Vector4[], count: number): void {
-  for (const slot of ['shell', 'belly', 'brow'] as const) {
+  for (const slot of SHELL_SLOTS) {
     const u = (materials[slot] as MeshPhysicalMaterial).userData.uniforms as ShellUniforms
     u.uOcc.value = spheres
     u.uOccN.value = count
@@ -218,6 +245,7 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         varying vec3 vA3Normal;
         uniform vec4 uOcc[${OCCLUDERS}];
         uniform int uOccN;
+        uniform float uThin; uniform float uWet; uniform float uWater; uniform float uTime;
         uniform vec3 uShade; uniform vec3 uMark; uniform vec3 uSplit; uniform vec3 uSoft;
         uniform int uMarking; uniform float uMarkScale; uniform float uGrain; uniform float uDetail; uniform float uGlow; uniform float uMarkGlow;
         float a3Mask = 0.0;
@@ -269,6 +297,14 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         diffuseColor.rgb = mix(diffuseColor.rgb, uShade * 0.72, a3Under * 0.62);`,
       )
       .replace(
+        '#include <lights_physical_fragment>',
+        `#include <lights_physical_fragment>
+        #ifdef USE_CLEARCOAT
+        // Wet shell: the clear coat is sharper in patches, as if water has beaded there.
+        material.clearcoatRoughness = clamp(material.clearcoatRoughness * mix(1.0, 0.35 + 1.1 * a3Noise(vRest * 9.0 + 13.0), uWet), 0.03, 1.0);
+        #endif`,
+      )
+      .replace(
         '#include <roughnessmap_fragment>',
         `#include <roughnessmap_fragment>
         roughnessFactor = clamp(roughnessFactor + uGrain * 1.6 * (a3Grain - 0.5) + a3Soft * 0.3 + a3Pebble * 0.1 * (0.5 - a3Lump), 0.04, 1.0);`,
@@ -290,7 +326,20 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         reflectedLight.indirectDiffuse *= a3Occ;
         reflectedLight.indirectSpecular *= a3Occ;
         reflectedLight.directDiffuse *= mix(1.0, a3Occ, 0.55);
-        reflectedLight.directSpecular *= mix(1.0, a3Occ, 0.4);`,
+        reflectedLight.directSpecular *= mix(1.0, a3Occ, 0.4);
+        // Light through thin parts: fins, feelers and soft joints glow warm toward their edges.
+        float a3Thin = max(uThin, a3Soft * 0.6);
+        if (a3Thin > 0.0) {
+          float a3Rim = 1.0 - abs(dot(normal, normalize(vViewPosition)));
+          reflectedLight.directDiffuse += diffuseColor.rgb * vec3(1.0, 0.86, 0.72) * a3Thin * (0.1 + 0.55 * a3Rim * a3Rim) * a3Occ;
+        }
+        // Light from the water above: soft bright lines drifting over whatever faces up.
+        if (uWater > 0.0) {
+          vec3 a3Q = vec3(vA3World.x * 4.2, vA3World.z * 4.2 + vA3World.y * 1.5, uTime * 0.32);
+          float a3E = min(a3CellEdge(a3Q), a3CellEdge(a3Q * 1.7 + vec3(3.1, 7.7, uTime * 0.21)) * 1.3);
+          float a3Caustic = pow(1.0 - smoothstep(0.0, 0.16, a3E), 2.0) * (0.35 + 0.65 * max(a3N.y, 0.0));
+          reflectedLight.directDiffuse += diffuseColor.rgb * vec3(0.75, 0.95, 1.0) * a3Caustic * uWater * 0.55 * a3Occ;
+        }`,
       )
       .replace(
         '#include <emissivemap_fragment>',
@@ -298,7 +347,7 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         totalEmissiveRadiance += diffuseColor.rgb * uGlow + uMark * a3Mask * uMarkGlow;`,
       )
   }
-  material.customProgramCacheKey = () => 'avatar3d-shell-5'
+  material.customProgramCacheKey = () => 'avatar3d-shell-6'
   return material
 }
 
@@ -431,6 +480,7 @@ export function buildMaterials(look: LookMaterials): Record<MaterialSlot, Materi
   const o = shellOptions(look)
   return {
     shell: shellMaterial(o.shell),
+    fin: shellMaterial({ ...o.shell, thin: true }),
     belly: shellMaterial(o.belly),
     brow: shellMaterial(o.brow),
     eye: eyeMaterial(look.eyeColor, look.pupilScale, look.eyeStretch),
@@ -445,6 +495,7 @@ export function buildMaterials(look: LookMaterials): Record<MaterialSlot, Materi
 export function repaintMaterials(materials: Record<MaterialSlot, Material>, look: LookMaterials): void {
   const o = shellOptions(look)
   paintShell(materials.shell as MeshPhysicalMaterial, o.shell)
+  paintShell(materials.fin as MeshPhysicalMaterial, { ...o.shell, thin: true })
   paintShell(materials.belly as MeshPhysicalMaterial, o.belly)
   paintShell(materials.brow as MeshPhysicalMaterial, o.brow)
   paintEye(materials.eye as MeshPhysicalMaterial, look.eyeColor, look.pupilScale)

@@ -8,11 +8,11 @@ import type { AvatarPose, AvatarTemperament } from '../avatar/traits'
 import { equipAll } from './equipment'
 import type { Avatar3DLook } from './look'
 import { buildOccluders, buildSprings, type Spring } from './flex'
-import { buildMaterials, disposeMaterials, repaintMaterials, shadeWith } from './materials'
+import { buildMaterials, disposeMaterials, repaintMaterials, shadeWith, waterOf } from './materials'
 import { arc, hops, jitter, MOODS, REACTION_SECONDS, type Mood, type Reaction } from './motion'
 import { POSES, poseExtras, poseTargets } from './poses'
 import { aimQuaternion, Rig, type MaterialSlot } from './rig'
-import { buildCrab, buildLobster, EYE_STRETCH, type FaceRig } from './species'
+import { buildCrab, buildLobster, EYE_STRETCH, SWIMMERETS, TAIL_FAN, type FaceRig } from './species'
 
 const PUPIL_SCALE = { standard: 1, big: 1.28, sparkle: 1.1, keen: 0.72 } as const
 /** How long a pose change takes, wind-up and settle included. */
@@ -67,6 +67,8 @@ export interface Character3D {
    * viewer's right, y up), for the eyes to follow. Null lets them wander again.
    */
   lookAt: (at: { x: number; y: number } | null) => void
+  /** Faint moving light from the water above, 0 (off) to 1. For the live full view only. */
+  setWater: (strength: number) => void
   /** Play a short reaction over the current pose. `side` is 1 for the character's left claw. */
   react: (kind: Reaction, side?: 1 | -1) => void
   /** The bone that carries a mesh of this character (for working out what was tapped). */
@@ -214,6 +216,9 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   rig.finalizeSkinned(materials)
   const occluders = buildOccluders(rig)
   shadeWith(materials, occluders.spheres, occluders.count)
+  const water = waterOf(materials)
+  const fan = TAIL_FAN.map((_, i) => `tailFan${i}`).filter((name) => rig.bones.has(name))
+  const swimmerets = SWIMMERETS.flatMap((_, i) => [`swimmeret${i}L`, `swimmeret${i}R`]).filter((name) => rig.bones.has(name))
 
   // Legs are solved from the hips to where the feet stand, so the hips can sink, shift and
   // bounce while the feet stay planted. Everything here is in the character's own space.
@@ -321,6 +326,17 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   const current = new Map<string, Quaternion>()
   for (const [name, q] of targets) current.set(name, q.clone())
   const q = new Quaternion()
+  // Face parts that move with reactions: the open mouth, the brows and the eyes' squash.
+  const mouthBone = rig.bones.get('mouthOpen') ?? null
+  const brows = (['L', 'R'] as const).flatMap((tag) => {
+    const bone = rig.bones.get(`brow${tag}`)
+    const rest = rig.rest.get(`brow${tag}`)
+    return bone && rest ? [{ s: tag === 'L' ? 1 : -1, bone, rest: rest.position.clone() }] : []
+  })
+  const eyeSockets = (['L', 'R'] as const).flatMap((tag) => {
+    const bone = rig.bones.get(`eyeSocket${tag}`)
+    return bone ? [{ bone, base: bone.scale.clone() }] : []
+  })
   let mood: Mood = MOODS[look.temperament ?? 'calm']
   let nextBlink = 2.5
   let blinkStart = -10
@@ -388,6 +404,16 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     let lift = 0
     let eyeYaw = extra.eyes[0]
     let eyePitch = extra.eyes[1]
+    // How open the mouth is (0 shut), how round, how far the brows rise and knit, how squashed the eyes are.
+    let mouthOpen = 0
+    let mouthRound = 0
+    let browUp = 0
+    let browKnit = 0
+    let squash = 0
+    // How far the tail fan spreads (radians between paddles) and how far its plates curl, outer first.
+    let fanSpread = 0
+    let fanCurl = 0
+    water.time.value = time
 
     if (!idle) {
       if (reaction && held) aimPose(held, true)
@@ -414,6 +440,9 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
         overlay(`thumb${tag}`, Zaxis, s * (Math.sin(time * 0.8 + s) * 0.5 + 0.5) * -0.05)
       }
       overlay('tail', X, Math.sin(time * 1.1 * Math.sqrt(m.tail)) * 0.04 * m.tail)
+      // The fan breathes open and shut a little, and the swimmerets paddle in a slow wave.
+      fanSpread += Math.sin(time * 0.8) * 0.025 * m.tail
+      swimmerets.forEach((name, k) => overlay(name, X, Math.sin(time * 3.2 - Math.floor(k / 2) * 0.9) * 0.18))
       if (m.snapEvery) {
         const n = Math.floor(time / m.snapEvery)
         const since = time - n * m.snapEvery - jitter(n) * m.snapEvery * 0.5
@@ -436,6 +465,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
         if (time - n * m.glanceEvery < m.glanceHold) {
           wantYaw = (jitter(n) * 2 - 1) * m.glance
           wantPitch = (jitter(n + 0.5) * 2 - 1) * m.glance * 0.35
+          // A look round comes with a little lift of the brows.
+          browUp += 0.004 * arc((time - n * m.glanceEvery) / m.glanceHold)
         }
       }
       const ease = 1 - Math.exp(-dt * 12)
@@ -470,6 +501,11 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
           lift = Math.max(up, 0)
           wide = arc(Math.min(p * 1.6, 1))
           closed = 0
+          // A gasp: round open mouth, brows up.
+          mouthOpen = 0.85 * arc(Math.min(p * 1.4, 1))
+          mouthRound = 1
+          browUp += 0.02 * arc(p)
+          fanSpread += 0.1 * arc(p)
           for (const [tag, s] of [['L', 1], ['R', -1]] as const) {
             overlay(`arm${tag}`, Zaxis, s * 0.28 * arc(p))
             overlay(`thumb${tag}`, Zaxis, -s * 0.45 * arc(p))
@@ -482,6 +518,10 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
           overlay(`claw${tag}`, Zaxis, s * Math.sin(p * 30) * 0.05 * (1 - p))
           overlay(`forearm${tag}`, X, -0.12 * arc(p))
           eyeYaw += s * 14 * arc(p)
+          // Concentrating on the snap: brows knit, teeth set.
+          browKnit = 0.22 * arc(p)
+          browUp -= 0.005 * arc(p)
+          mouthOpen = 0.3 * arc(p)
         } else if (reaction.kind === 'equip') {
           // Tries it on: a look down, a little bob and a turn each way to see it.
           dy -= 0.035 * hops(p, 2) * legLength
@@ -489,6 +529,10 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
           overlay('pelvis', Yaxis, Math.sin(p * Math.PI * 2) * 0.06)
           eyePitch += 10 * arc(p)
           squint = 0.6 * arc(p)
+          // Pleased with it: a small open smile and raised brows.
+          mouthOpen = 0.35 * arc(p)
+          mouthRound = 0.4
+          browUp += 0.012 * arc(p)
           for (const [tag, s] of [['L', 1], ['R', -1]] as const) overlay(`arm${tag}`, Zaxis, s * 0.12 * arc(p))
         } else {
           // Celebrate: claws up and two hops.
@@ -497,8 +541,16 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
           lift = up
           squint = arc(p)
           overlay('tail', X, Math.sin(p * 22) * 0.2)
+          // A big open cheer, held for most of it.
+          const held = Math.min(1, p * 6, (1 - p) * 5)
+          mouthOpen = held
+          browUp += 0.016 * held
+          fanSpread += 0.14 * held
+          fanCurl = held
         }
       }
+      // Eyes squash a little as they blink and stretch when startled.
+      squash = -0.1 * closed + 0.12 * wide - 0.07 * squint
       for (const tag of ['L', 'R'] as const) {
         const open = face.lidOpen[tag]
         overlay(`lidUp${tag}`, X, (open + 0.12) * closed - Math.max(0, 1.25 - open) * 0.5 * wide)
@@ -507,6 +559,23 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     }
 
     pelvisBone.position.set(pelvisRest.x + dx, pelvisRest.y + dy, pelvisRest.z)
+    if (mouthBone) {
+      mouthBone.visible = mouthOpen > 0.02
+      mouthBone.scale.set(1 - 0.42 * mouthRound, Math.max(mouthOpen * (1 + 0.35 * mouthRound), 1e-3), 1)
+    }
+    for (const b of brows) {
+      b.bone.position.copy(b.rest)
+      b.bone.position.y += browUp
+      if (browKnit) overlay(b.bone.name, Zaxis, b.s * browKnit)
+    }
+    fan.forEach((name, i) => {
+      const k = i - (fan.length - 1) / 2
+      if (fanSpread) overlay(name, Zaxis, k * fanSpread)
+      // The outer plates curl first and furthest, the middle one last.
+      const curl = fanCurl * 0.32 * (Math.abs(k) / 2 + 0.25) + (idle ? Math.sin(time * 1.4 - Math.abs(k) * 0.7) * 0.03 : 0)
+      if (curl) overlay(name, X, curl)
+    })
+    for (const e of eyeSockets) e.bone.scale.set(e.base.x * (1 - squash * 0.4), e.base.y * (1 + squash), e.base.z)
     // Feet stay planted while the body turns above them; once it has turned far enough, one
     // steps round to catch up, then the other.
     const turned = rig.root.rotation.y
@@ -588,6 +657,9 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     repaint(next) {
       character.look = next
       repaintMaterials(materials, paint(next))
+    },
+    setWater(strength) {
+      water.strength.value = Math.min(Math.max(strength, 0), 1)
     },
     setTemperament(temperament) {
       mood = MOODS[temperament ?? 'calm']

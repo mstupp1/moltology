@@ -227,6 +227,22 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
   return { lidOpen }
 }
 
+/**
+ * An open mouth for reactions: a dark oval with a tongue at its floor, on its own bone just
+ * under the drawn mouth. It is squashed flat and hidden until a cheer or a gasp opens it.
+ */
+function addOpenMouth(rig: Rig, f: FaceLayout, y: number, normal: Vector3): void {
+  const s = f.shell.sAt(y)
+  const at = f.shell.point(s, Math.PI / 2).addScaledVector(normal, -0.004)
+  rig.addBone('mouthOpen', f.bone, at, { quaternion: lookQuaternion(normal) })
+  const hole = new SphereGeometry(1, 24, 14)
+  hole.scale(0.08, 0.048, 0.016)
+  rig.add('mouthOpen', 'mouth', withAo(hole, 0.6))
+  const tongue = new SphereGeometry(1, 16, 10)
+  tongue.scale(0.042, 0.017, 0.012)
+  rig.add('mouthOpen', 'tongue', placed(withAo(tongue), v(0, -0.02, 0.008)))
+}
+
 /** How each mouth curves: rise of the corners, width, a lean to one side, and what shows inside. */
 const MOUTHS: Record<AvatarMouth, { rise: number; width: number; skew?: number; wave?: number; open?: number; tongue?: boolean; fang?: boolean; round?: boolean }> = {
   smile: { rise: 0.05, width: 1 },
@@ -250,6 +266,7 @@ function addMouth(rig: Rig, kind: AvatarMouth, f: FaceLayout): void {
   }
   const sMid = f.shell.sAt(f.mouthY)
   const normal = f.shell.normal(sMid, Math.PI / 2)
+  addOpenMouth(rig, f, m.round ? f.mouthY : lineY(0) - 0.024, normal)
   if (m.round) {
     const o = new SphereGeometry(0.034, 20, 14)
     o.scale(0.9, 1.15, 0.3)
@@ -448,7 +465,7 @@ function addAntennae(rig: Rig, style: AvatarAntennae, a: AntennaLayout): Wearabl
     // The whip bends along a short chain of bones, so it can sway and lag behind the head.
     const base = `antenna${tag}`
     const links = rig.addChain(base, pts, ANTENNA_LINKS)
-    rig.addSkinned(base, 'shell', merge(geos), chainWeigh(rig, base, pts))
+    rig.addSkinned(base, 'fin', merge(geos), chainWeigh(rig, base, pts))
     if (style === 'beacon') {
       const bulb = new SphereGeometry(a.thick * 2.1, 20, 14)
       rig.addWorld(links[links.length - 1], 'glow', placed(withAo(bulb), pts[pts.length - 1]))
@@ -462,6 +479,11 @@ export interface SpeciesBuild {
   /** Overall height of the body without antennae, for framing. */
   height: number
 }
+
+/** Angles of the tail fan's five paddles, left to right. */
+export const TAIL_FAN = [-70, -35, 0, 35, 70]
+/** Heights of the swimmeret pairs down a lobster's belly, top to bottom. */
+export const SWIMMERETS = [0.84, 0.74, 0.64]
 
 /** Baseline lobster carapace, crown to chest. */
 const LOBSTER_HEAD: LoftKey[] = [
@@ -536,12 +558,25 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   // Tail fan behind the hips.
   const tailAt = v(0, 0.52, -0.09)
   rig.addBone('tail', 'pelvis', tailAt, { quaternion: new Quaternion().setFromAxisAngle(v(1, 0, 0), 0.1) })
-  const lobes = [-70, -35, 0, 35, 70].map((a) => {
-    const lobe = tailLobe(a === 0 ? 0.31 : 0.29, 0.16, 0.2)
-    lobe.rotateZ(deg(a))
-    return lobe
+  // Each paddle of the fan is its own bone, so the fan can spread and its plates curl in turn.
+  const tailQ = new Quaternion().setFromAxisAngle(v(1, 0, 0), 0.1)
+  TAIL_FAN.forEach((a, i) => {
+    rig.addBone(`tailFan${i}`, 'tail', tailAt, { quaternion: tailQ.clone().multiply(new Quaternion().setFromAxisAngle(v(0, 0, 1), deg(a))) })
+    rig.add(`tailFan${i}`, 'fin', tailLobe(a === 0 ? 0.31 : 0.29, 0.16, 0.2))
   })
-  rig.add('tail', 'shell', merge(lobes))
+
+  // Swimmerets: small paired paddles down the sides of the belly, as under a real tail.
+  for (const { s, tag } of SIDES) {
+    SWIMMERETS.forEach((y, i) => {
+      const sp = abdomen.sAt(y)
+      const theta = Math.PI / 2 - s * 1.12
+      const at = abdomen.point(sp, theta).addScaledVector(abdomen.normal(sp, theta), -0.01)
+      const out = abdomen.normal(sp, theta).multiplyScalar(0.55).add(v(0, -1, 0.15))
+      const name = `swimmeret${i}${tag}`
+      rig.addBone(name, 'pelvis', at, { aim: at.clone().add(out), facing: abdomen.normal(sp, theta) })
+      rig.add(name, 'fin', tailLobe(0.085 - i * 0.008, 0.05, 0.32))
+    })
+  }
 
   const fit = headFit(LOBSTER_HEAD, head)
   const face = addFace(rig, look, { shell: carapace, bone: 'chest', eyeY: fit.y(1.525), eyeSpread: 0.47, headWidth: fit.width(1.525), eyeRadius: 0.105, browY: fit.y(1.688), browSpan: 0.46 / fit.width(1.688), browArch: 0.22, mouthY: fit.y(1.35), mouthHalf: 0.44 / fit.width(1.35) })

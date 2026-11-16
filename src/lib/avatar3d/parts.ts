@@ -210,11 +210,15 @@ export function claw(style: ClawStyle): ClawGeometry {
 
   // Rounded teeth along the two edges that meet.
   const tooth = (r: number, at: Vector3) => placed(withAo(new SphereGeometry(r, 10, 8), 0.95), at, undefined, new Vector3(1, 1.25, 0.9))
-  const palmTeeth = [0.66, 0.75, 0.84].map((s, i) => tooth(0.034 - i * 0.006, palmLoft.point(s, 0.12)))
-  const fingerTeeth = [0.52, 0.7].map((s, i) => tooth(0.028 - i * 0.006, fingerLoft.point(s, Math.PI - 0.12)))
+  // Bigger knobs alternate with small ones, shrinking toward the tip.
+  const palmTeeth = [0.62, 0.68, 0.74, 0.8, 0.86].map((s, i) => tooth((i % 2 ? 0.02 : 0.033) - i * 0.003, palmLoft.point(s, 0.12)))
+  const fingerTeeth = [0.42, 0.53, 0.64, 0.75].map((s, i) => tooth((i % 2 ? 0.017 : 0.027) - i * 0.003, fingerLoft.point(s, Math.PI - 0.12)))
+  // Rows of short blunt spines along the back of the claw, as on a real lobster's crusher.
+  const knob = (s: number, theta: number, h: number) => placed(withAo(spike(h, h * 0.6), 0.92), palmLoft.point(s, theta), alongY(palmLoft.normal(s, theta)))
+  const spines = [0.18, 0.28, 0.38, 0.48].flatMap((s, i) => [knob(s, Math.PI - 0.35, 0.036 - i * 0.004), knob(s + 0.05, Math.PI + 0.35, 0.032 - i * 0.004)])
 
   return {
-    palm: merge([surface(palmLoft.geometry, { bump: 1 }), ...palmTeeth]),
+    palm: merge([surface(palmLoft.geometry, { bump: 1 }), ...palmTeeth, ...spines.map((g) => surface(g, { bump: 1 }))]),
     finger: merge([surface(fingerLoft.geometry, { bump: 1 }), ...fingerTeeth]),
     hinge,
     grip: new Vector3(0.02, -0.42 - 0.3 * reach, 0),

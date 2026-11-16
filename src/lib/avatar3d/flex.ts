@@ -88,7 +88,7 @@ export function addSleeve(rig: Rig, parent: string, child: string, radius: numbe
   // Each point's share of the child bone, looked up by position since the rig only hands over points.
   const byPoint = new Map<string, number>()
   for (let k = 0; k < weights.length; k++) byPoint.set(key(positions, k), weights[k])
-  rig.addSkinned(child, 'shell', geo, (q) => {
+  rig.addSkinned(child, 'fin', geo, (q) => {
     const w = byPoint.get(key(q.toArray(), 0)) ?? 1
     return [
       [parent, 1 - w],

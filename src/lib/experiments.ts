@@ -20,6 +20,10 @@ export const EXPERIMENTS = {
     title: 'New store',
     description: 'Open the on-site store and checkout. Store links use Etsy while this is off.',
   },
+  'avatar-water': {
+    title: 'Water light on characters',
+    description: 'Faint moving light from the water above, on the full 3D character (Customize, Shop, profile).',
+  },
 } as const satisfies Record<string, { title: string; description: string }>
 
 export type ExperimentId = keyof typeof EXPERIMENTS

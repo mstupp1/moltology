@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { LOBSTER_AVATAR_STYLE, type LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import { useAvatar3D } from '@/hooks/useAvatar3D'
+import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { lookFromConfig } from '@/lib/avatar3d/look'
 import { sceneStyle3D } from '@/lib/avatar3d-scene'
 import { RotateCcw } from 'lucide-react'
@@ -45,6 +46,8 @@ export const LobsterAvatarFullBody: React.FC<LobsterAvatarFullBodyProps> = React
 
   const support = useAvatar3D()
   const [ready, setReady] = useState(false)
+  // Admins trying the water light see it on every full character view.
+  const waterAccess = useHiddenPageAccess('avatar-water')
   const look = useMemo(() => (support && effectiveConfig ? lookFromConfig(effectiveConfig) : null), [support, effectiveConfig])
   const scene = useMemo(() => (effectiveConfig ? sceneStyle3D(effectiveConfig) : undefined), [effectiveConfig])
   const placeholder = !effectiveConfig || support === false
@@ -71,6 +74,7 @@ export const LobsterAvatarFullBody: React.FC<LobsterAvatarFullBodyProps> = React
           {look && (
             <Avatar3DStage
               look={look}
+              water={waterAccess.canView}
               label={alt}
               focus={focus}
               onReady={() => setReady(true)}
