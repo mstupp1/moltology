@@ -20,18 +20,23 @@ export interface Still3D {
  *
  * `frameRef` is the element the picture sits in. A still is only drawn once it is on screen, or
  * about to be, so a long list never draws pictures nobody scrolls to.
+ *
+ * `settle` (ms): once a still has been drawn, wait this long after the character last changed
+ * before drawing the next one, so a run of quick picks draws only the picture it ends on.
  */
 export function useStill3D(
   config: LobsterAvatarConfig | null | undefined,
   px: number,
   frameRef: RefObject<Element | null>,
   shot: StillShot = 'portrait',
+  settle = 0,
 ): Still3D {
   const support = useAvatar3D()
   // Callers often hand over a freshly parsed config each render, so compare by content.
   const key = config?.seed ? JSON.stringify(config) : null
   const [still, setStill] = useState<{ key: string; shot: StillShot; px: number; url: string } | null>(null)
   const [retry, setRetry] = useState(0)
+  const hadStill = still !== null
 
   useEffect(() => {
     const frame = frameRef.current
@@ -40,15 +45,21 @@ export function useStill3D(
     if (readyStill3D(parsed, px, shot)) return
     let cancelled = false
     const stop = new AbortController()
-    const draw = () => {
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const request = () => {
       void requestStill3D(parsed, px, shot, stop.signal).then((url) => {
         if (!cancelled && url) setStill({ key, shot, px, url })
       })
+    }
+    const draw = () => {
+      if (settle > 0 && hadStill) timer = setTimeout(request, settle)
+      else request()
     }
     if (typeof IntersectionObserver === 'undefined') {
       draw()
       return () => {
         cancelled = true
+        clearTimeout(timer)
         stop.abort()
       }
     }
@@ -63,10 +74,13 @@ export function useStill3D(
     watcher.observe(frame)
     return () => {
       cancelled = true
+      clearTimeout(timer)
       stop.abort()
       watcher.disconnect()
     }
-  }, [key, px, shot, frameRef, support, retry])
+    // hadStill only decides whether to wait; it must not redraw by itself.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, px, shot, frameRef, support, retry, settle])
 
   const drawn = key && still?.key === key && still.shot === shot && still.px === px ? still.url : null
   // A still drawn earlier this visit shows on the first render, with no loader.

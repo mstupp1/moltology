@@ -44,7 +44,9 @@ function HudContent() {
     if (lowPower) document.documentElement.dataset.lowPower = 'true'
   }, [])
   // Full-screen overlays and the phone Oracle cover the backdrop.
-  const backdropCovered = useBackdropCovered()
+  const overlayCovered = useBackdropCovered()
+  // The welcome flow covers everything from its first frame, before the check notices it.
+  const backdropCovered = overlayCovered || showWelcome
   // Register service worker + track install prompt for the whole hub (guest + member).
   usePwaInstall()
 
@@ -136,6 +138,7 @@ function HudContent() {
 
   return (
     <div
+      data-covered={backdropCovered || undefined}
       className="hud-layout fixed inset-0 w-full h-full text-ink flex flex-col font-sans overflow-hidden bg-abyss overscroll-none select-none"
     >
       {/* First-visit onboarding */}

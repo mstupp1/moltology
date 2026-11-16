@@ -153,6 +153,7 @@ function Tile({
           config={src.config}
           px={128}
           shot={src.shot}
+          follow
           alt=""
           imgClassName={`object-contain transition-[opacity,transform] ${zoom ? 'scale-[1.45] translate-y-[6%] group-hover:scale-[1.5]' : 'group-hover:scale-105'}`}
         />
@@ -354,7 +355,7 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
                 }`}
               >
                 <span className="relative w-11 h-11 shrink-0 rounded-full bg-abyss overflow-hidden">
-                  <CharacterStill config={racePreviews[race]?.config} px={128} alt="" />
+                  <CharacterStill config={racePreviews[race]?.config} px={128} follow alt="" />
                 </span>
                 <span
                   className={`font-sans text-sm font-semibold ${selected ? 'text-cyan-glow' : 'text-ink'}`}

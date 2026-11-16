@@ -272,7 +272,8 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
       className="fixed inset-0 z-[9998] flex items-stretch sm:items-center justify-center sm:p-6 transition-opacity duration-200 motion-reduce:transition-none"
       style={{ opacity: visible ? 1 : 0 }}
     >
-      <div className="absolute inset-0 bg-abyss/85 backdrop-blur-sm" aria-hidden="true" />
+      {/* Phones: the dialog fills the screen, so a blur behind it would cost every frame for nothing. */}
+      <div className="absolute inset-0 bg-abyss/90 sm:bg-abyss/85 sm:backdrop-blur-sm" aria-hidden="true" />
 
       <div
         ref={panelRef}

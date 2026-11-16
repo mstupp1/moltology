@@ -121,10 +121,11 @@ function portraitFrame(rig: Rig, height: number, scale: number, hat: boolean, li
 }
 
 /**
- * Height the way people read it: a tall character has long legs and stands higher, a short one is
- * stubby, and the head stays close to the same size either way. Most of the change goes into the
- * legs; a gentle overall scale carries the rest. Returns the overall scale and how far the body
- * was raised, in the character's own units.
+ * Height the way people read it: a tall character is a bigger body on somewhat longer, sturdier
+ * legs, and a short one is smaller and stubbier. The legs take a share of the change (too much
+ * reads as stilts), they thicken as they lengthen so they still carry the body, and the overall
+ * scale carries the rest. Returns the overall scale and how far the body was raised, in the
+ * character's own units.
  */
 function applyStature(rig: Rig, heightScale: number, bodyHeight: number): { scale: number; lift: number } {
   const thigh = rig.bones.get('thighL')
@@ -137,8 +138,10 @@ function applyStature(rig: Rig, heightScale: number, bodyHeight: number): { scal
   const hipY = rig.restWorldOf('thighL').position.y
   const ankleY = rig.restWorldOf('footL').position.y
   const span = hipY - ankleY
-  // Legs take most of the change, within limits that still look like legs.
-  const stretch = Math.min(1.7, Math.max(0.55, 1 + (heightScale - 1) * 2.2))
+  // Legs take part of the change, within limits that still look like legs.
+  const stretch = Math.min(1.35, Math.max(0.75, 1 + (heightScale - 1) * 0.8))
+  // Longer legs get thicker in step, so a tall character stands on legs, not poles.
+  const thick = stretch > 1 ? 1 + (stretch - 1) * 0.5 : 1
   const lift = span * (stretch - 1)
   const scale = (heightScale * bodyHeight) / (bodyHeight + lift)
 
@@ -160,7 +163,8 @@ function applyStature(rig: Rig, heightScale: number, bodyHeight: number): { scal
           p.fromBufferAttribute(pos, i)
           const t = p.dot(axis)
           const shift = t <= end ? 0 : t >= length - end ? extra : ((t - end) / middle) * extra
-          p.addScaledVector(axis, shift)
+          // Out from the bone's line, widened by the thickness factor.
+          p.addScaledVector(axis, -t).multiplyScalar(thick).addScaledVector(axis, t + shift)
           pos.setXYZ(i, p.x, p.y, p.z)
         }
         pos.needsUpdate = true
