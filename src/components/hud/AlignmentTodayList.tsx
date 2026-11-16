@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Check, ChevronDown, X } from 'lucide-react'
+import { Check, X } from 'lucide-react'
 import { alignmentTaskCodex } from '@/lib/alignment-tasks'
 import {
   ALIGNMENT_TASK_ACTIONS,
@@ -10,7 +10,6 @@ import {
   saveOneThing,
 } from '@/lib/alignment-actions'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
-import { AlignmentCodexLink } from './AlignmentCodexLink'
 import { AlignmentTaskActionPanel } from './AlignmentTaskActionPanel'
 
 export interface AlignmentTodayTask {
@@ -114,97 +113,95 @@ export function AlignmentTodayList({
             {tasks.map((t) => {
               const isNext = t.id === nextTaskId
               const key = t.key ?? t.id
-              const codex = alignmentTaskCodex(key)
+              const codex = actions ? alignmentTaskCodex(key) : undefined
               const action = actions ? ALIGNMENT_TASK_ACTIONS[key] : undefined
-              const isOpen = Boolean(action) && openKey === key
-              const subline =
-                key === ONE_THING_TASK_KEY || key === CLOSE_THE_DAY_TASK_KEY ? oneThing : ''
-              const rowSize = roomy ? 'min-h-12 py-2.5 text-sm' : 'min-h-[44px] sm:min-h-10 py-2 text-xs'
+              const opens = !t.completed && Boolean(action || codex)
+              const isOpen = opens && openKey === key
+              const detail =
+                oneThing && key === ONE_THING_TASK_KEY
+                  ? oneThing
+                  : oneThing && key === CLOSE_THE_DAY_TASK_KEY
+                    ? `Your one thing: ${oneThing}`
+                    : ''
+              const rowPad = roomy ? 'min-h-14 py-2.5' : 'min-h-12 py-2'
+              const body = (
+                <>
+                  <span
+                    className={`block ${roomy ? 'text-sm' : 'text-[13px]'} ${roomy ? 'line-clamp-2' : 'truncate'} ${
+                      t.completed ? 'text-ink-muted' : 'text-ink font-bold'
+                    }`}
+                  >
+                    {t.title}
+                  </span>
+                  <span className={`block truncate text-[11px] ${isNext ? 'text-cyan-glow' : 'text-ink-muted'}`}>
+                    {t.time}
+                    {detail && <span data-testid="alignment-one-thing-line"> · {detail}</span>}
+                  </span>
+                </>
+              )
               return (
-                <li
-                  key={t.id}
-                  className={isNext ? 'bg-surface-3 shadow-nav-current' : t.completed ? 'bg-abyss/30' : ''}
-                >
+                <li key={t.id} className={isNext ? 'bg-surface-3 shadow-nav-current' : isOpen ? 'bg-surface-2' : ''}>
                   <div className="flex items-stretch">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onToggle(t.id)
-                      }}
-                      aria-pressed={t.completed}
-                      aria-label={t.completed ? `Mark ${t.title} not done` : `Mark ${t.title} done`}
-                      data-testid="alignment-task-check"
-                      className={`shrink-0 ${rowSize} pl-3 pr-2 flex items-center touch-manipulation group hover:bg-surface-2 transition-colors ${rowFocus}`}
-                    >
+                    {t.completed ? (
                       <span
-                        aria-hidden="true"
-                        className={`w-4 h-4 shrink-0 rounded-chip border flex items-center justify-center transition-colors ${
-                          t.completed ? 'bg-emerald-500 border-emerald-500 text-abyss' : 'border-line-strong group-hover:border-cyan-glow'
+                        role="img"
+                        aria-label={`${t.title} done`}
+                        data-testid="alignment-task-done"
+                        className={`shrink-0 ${rowPad} pl-3 pr-3 flex items-center`}
+                      >
+                        <span className="w-[18px] h-[18px] rounded-chip bg-emerald-500 text-abyss flex items-center justify-center">
+                          <Check className="w-3 h-3" strokeWidth={3} aria-hidden="true" />
+                        </span>
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setOpenKey(null)
+                          onToggle(t.id)
+                        }}
+                        aria-label={`Mark ${t.title} done`}
+                        data-testid="alignment-task-check"
+                        className={`shrink-0 ${rowPad} pl-3 pr-3 flex items-center touch-manipulation group hover:bg-surface-2 transition-colors ${rowFocus}`}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className="w-[18px] h-[18px] rounded-chip border border-line-strong group-hover:border-cyan-glow transition-colors"
+                        />
+                      </button>
+                    )}
+                    {t.completed ? (
+                      <div className={`flex-1 min-w-0 ${rowPad} pr-3 flex flex-col justify-center`} data-testid="alignment-task-row">
+                        {body}
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (opens) setOpenKey(isOpen ? null : key)
+                          else onToggle(t.id)
+                        }}
+                        {...(opens ? { 'aria-expanded': isOpen, 'aria-controls': `alignment-task-${key}` } : {})}
+                        data-testid="alignment-task-row"
+                        className={`flex-1 min-w-0 ${rowPad} pr-3 flex flex-col justify-center text-left transition-colors touch-manipulation ${rowFocus} ${
+                          isNext ? '' : 'hover:bg-surface-2'
                         }`}
                       >
-                        {t.completed && <Check className="w-3 h-3" strokeWidth={3} />}
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        if (action) setOpenKey(isOpen ? null : key)
-                        else onToggle(t.id)
-                      }}
-                      {...(action
-                        ? { 'aria-expanded': isOpen, 'aria-controls': `alignment-task-${key}` }
-                        : { 'aria-pressed': t.completed })}
-                      data-testid="alignment-task-row"
-                      className={`flex-1 min-w-0 ${rowSize} pr-1 flex items-center gap-3 text-left transition-colors touch-manipulation ${rowFocus} ${
-                        isNext ? '' : 'hover:bg-surface-2'
-                      }`}
-                    >
-                      <span className={`w-24 shrink-0 text-[11px] ${isNext ? 'text-cyan-glow font-bold' : 'text-ink-muted'}`}>
-                        {t.time}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span
-                          className={`block ${roomy ? 'line-clamp-2' : 'truncate'} ${
-                            t.completed ? 'line-through decoration-ink-muted/60 text-ink-muted' : 'text-ink font-bold'
-                          }`}
-                        >
-                          {t.title}
-                        </span>
-                        {subline && (
-                          <span className="block truncate text-[11px] text-ink-muted" data-testid="alignment-one-thing-line">
-                            {key === CLOSE_THE_DAY_TASK_KEY ? `Did you do it? ${subline}` : subline}
-                          </span>
-                        )}
-                      </span>
-                      {isNext && !isOpen && (
-                        <span className="shrink-0 text-[11px] font-bold uppercase tracking-[0.08em] text-cyan-glow">Next</span>
-                      )}
-                      {action && (
-                        <ChevronDown
-                          aria-hidden="true"
-                          className={`w-3.5 h-3.5 shrink-0 text-ink-muted transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                        />
-                      )}
-                    </button>
-                    {codex && (
-                      <AlignmentCodexLink
-                        codex={codex}
-                        taskTitle={t.title}
-                        onNavigate={onClose}
-                      />
+                        {body}
+                      </button>
                     )}
                   </div>
-                  {isOpen && action && (
+                  {isOpen && (
                     <AlignmentTaskActionPanel
                       id={`alignment-task-${key}`}
                       taskKey={key}
+                      taskTitle={t.title}
                       action={action}
-                      completed={t.completed}
+                      codex={codex}
                       oneThing={oneThing}
                       onSaveOneThing={saveTodaysOneThing}
-                      onToggle={() => onToggle(t.id)}
                       onClose={onClose}
                       onDone={() => setOpenKey(null)}
                     />

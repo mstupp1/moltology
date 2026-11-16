@@ -24,8 +24,9 @@ export type AlignmentTaskAction =
   | { kind: 'timer'; practice: AlignmentPractice; label: string; hint: string }
   | { kind: 'one-thing'; hint: string }
   | { kind: 'oracle'; label: string; hint: string; draft: string }
+  | { kind: 'close-day'; hint: string }
 
-export type AlignmentPractice = 'silent' | 'deep-work'
+export type AlignmentPractice = 'silent' | 'deep-work' | 'reset'
 
 /** What each task offers when its row is opened. Tasks without an entry just tick. */
 export const ALIGNMENT_TASK_ACTIONS: Record<string, AlignmentTaskAction> = {
@@ -45,6 +46,12 @@ export const ALIGNMENT_TASK_ACTIONS: Record<string, AlignmentTaskAction> = {
     label: 'Open Academy',
     hint: 'Finish a lesson or pass a quiz and this checks off.',
   },
+  'nutritional-efficiency-break': {
+    kind: 'timer',
+    practice: 'reset',
+    label: 'Start a breathing timer',
+    hint: 'Breathe slowly for a minute or two. Starting the timer checks this off.',
+  },
   'iterative-refinement': {
     kind: 'timer',
     practice: 'deep-work',
@@ -62,6 +69,10 @@ export const ALIGNMENT_TASK_ACTIONS: Record<string, AlignmentTaskAction> = {
     label: 'Talk it through',
     hint: 'Tell the Oracle what you want to let go of. Sending it checks this off.',
     draft: 'Help me let go of something from today. What happened was ',
+  },
+  'alignment-review': {
+    kind: 'close-day',
+    hint: '',
   },
 }
 
