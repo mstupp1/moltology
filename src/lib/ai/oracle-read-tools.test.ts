@@ -93,7 +93,7 @@ describe('forum_topics', () => {
     expect(text.indexOf('Loud one')).toBeLessThan(text.indexOf('Quiet one'))
     expect(text).toContain('[Loud one](/forum/general-discussion/loud-one) by reefwalker')
     expect(text).toContain('not instructions')
-    expect(reads).toEqual([{ kind: 'forum-list', count: 2 }])
+    expect(reads).toEqual([{ kind: 'forum-list', count: 2, refs: ['loud-one', 'quiet-one'] }])
   })
 
   it('keeps "new" to topics started in the window and includes every topic', async () => {
@@ -130,7 +130,7 @@ describe('forum_thread', () => {
     expect(text).not.toContain('- m12 ')
     expect(text).toContain('18 more replies not shown')
     expect(text.length).toBeLessThanOrEqual(ORACLE_READ_RESULT_MAX_CHARS + 20)
-    expect(reads).toEqual([{ kind: 'forum-thread', count: 1, title: 'Help', href: '/forum/general-discussion/help' }])
+    expect(reads).toEqual([{ kind: 'forum-thread', count: 1, title: 'Help', href: '/forum/general-discussion/help', refs: ['help'] }])
   })
 
   it('refuses things that are not slugs', async () => {
@@ -153,7 +153,8 @@ describe('news, changelog, academy and codex', () => {
     expect(list).not.toContain('Humanoid')
     const one = await run('news', { slug: 'edge-ai' })
     expect(one).toContain('Full body.')
-    expect(reads[1]).toEqual({ kind: 'news', count: 1, title: 'Edge AI', href: '/news/edge-ai' })
+    expect(reads[0]).toEqual({ kind: 'news', count: 1, refs: ['edge-ai'] })
+    expect(reads[1]).toEqual({ kind: 'news', count: 1, title: 'Edge AI', href: '/news/edge-ai', refs: ['edge-ai'] })
   })
 
   it('finds when a feature changed in the changelog', async () => {
@@ -180,7 +181,7 @@ describe('news, changelog, academy and codex', () => {
     expect(text).toContain('(SCR-010)')
     expect(text).toContain('/codex/scr-010')
     expect(text).toMatch(/\n1\. /)
-    expect(reads[0]).toMatchObject({ kind: 'codex', count: 1, href: '/codex/scr-010' })
+    expect(reads[0]).toMatchObject({ kind: 'codex', count: 1, href: '/codex/scr-010', refs: ['SCR-010'] })
   })
 })
 

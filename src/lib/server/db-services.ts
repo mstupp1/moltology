@@ -1302,6 +1302,8 @@ export interface GetForumTopicsInput {
   userId?: string
   /** Neon Auth JWT so vote state can hydrate for the current initiate. */
   token?: string
+  /** Only these topics (the Oracle's reply cards). Order is up to the caller. */
+  slugs?: string[]
 }
 
 /**
@@ -1357,6 +1359,10 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
     if (query && query.trim() !== '') {
       const q = `%${escapeLikePattern(query.trim())}%`
       conditions.push(or(ilike(forumTopics.title, q), ilike(forumTopics.content, q)))
+    }
+    if (data?.slugs) {
+      if (!data.slugs.length) return []
+      conditions.push(inArray(forumTopics.slug, data.slugs))
     }
 
     let finalQuery = queryBuilder

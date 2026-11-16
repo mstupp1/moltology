@@ -1018,6 +1018,7 @@ describe('handleOracleChatRequest site reading tools', () => {
     streamTextMock.mockImplementationOnce((options) => {
       expect(options.system).toContain('=== READING THE SITE ===')
       expect(options.system).toContain('=== CURRENT PAGE ===')
+      expect(options.system).toContain('sees what you looked up as cards')
       expect(options.system).toContain('call forum_thread with topic "shedding-my-phone-habit"')
       return readingStream(options, 'Top today: Shedding my phone habit.')
     })
@@ -1026,7 +1027,7 @@ describe('handleOracleChatRequest site reading tools', () => {
       messages: [{ role: 'user', content: "What are today's top posts?" }],
     }))
     const reads = decodeReadsHeader(response.headers.get(ORACLE_READS_HEADER))
-    expect(reads).toEqual([{ kind: 'forum-list', count: 1, title: 'Shedding my phone habit', href: '/forum/general-discussion/shedding-my-phone-habit' }])
+    expect(reads).toEqual([{ kind: 'forum-list', count: 1, title: 'Shedding my phone habit', href: '/forum/general-discussion/shedding-my-phone-habit', refs: ['shedding-my-phone-habit'] }])
     expect(await response.text()).toBe('Top today: Shedding my phone habit.')
     await vi.waitFor(() => expect(saveAIMessage).toHaveBeenCalledWith(expect.objectContaining({
       role: 'assistant',

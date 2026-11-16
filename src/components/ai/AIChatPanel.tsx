@@ -61,7 +61,7 @@ import { isAdmin } from '@/lib/permissions'
 import { CHAT_LIMIT, getChatLimitError } from '@/lib/ai/chat-retention'
 import { readSkillPart, usableSkills } from '@/lib/oracle-skills'
 import { readReadsPart, type OracleReadItem } from '@/lib/oracle-reads'
-import { OracleReadsLabel } from './OracleReadsLabel'
+import { OracleReadCards } from './OracleReadCards'
 import { useOracleSkills } from '@/hooks/useOracleSkills'
 
 const INLINE_COMPOSER_MIN_WIDTH = 640
@@ -1219,7 +1219,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                                     Using {msg.skill.name}
                                   </Link>
                                 )}
-                                {isAssistant && msg.reads?.length ? <OracleReadsLabel reads={msg.reads} /> : null}
                                 {msg.role === 'user' ? (
                                   msg.content
                                 ) : msg.content ? (
@@ -1234,6 +1233,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                                     {msg.content ? 'Stopped.' : 'Stopped before a reply came through.'}
                                   </p>
                                 )}
+                                {isAssistant && msg.reads?.length ? (
+                                  <OracleReadCards reads={msg.reads} signedIn={Boolean(userId)} />
+                                ) : null}
                                 {showGuestNudge && (
                                   <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-surface-2 px-3 py-2 rounded-control border border-line-subtle">
                                     <div className="text-[11px] text-ink-body font-sans flex items-center gap-1.5 min-w-0">
