@@ -30,6 +30,11 @@ const mockAlignment: AlignmentContextValue = {
   xpReady: true,
   xpConfirmed: true,
   streakReady: true,
+  practiceSchedule: [],
+  isOffDay: false,
+  showRestDay: false,
+  practiceAnyway: vi.fn(),
+  setPracticeSchedule: vi.fn(),
 }
 
 vi.mock('@/hooks/useDailyAlignment', () => ({

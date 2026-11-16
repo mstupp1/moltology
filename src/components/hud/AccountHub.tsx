@@ -246,7 +246,8 @@ export function AccountHub({
   const levelSummary = progress.next
     ? `${progress.code} ${progress.shortTitle} · ${progress.xpToNext.toLocaleString()} XP to ${progress.next.code}`
     : `${progress.code} ${progress.shortTitle} · final sub-stage`
-  const tasksSummary = countReady ? `${done} of ${tasks.length} tasks done today` : ''
+  const restDay = countReady && alignment.showRestDay
+  const tasksSummary = !countReady ? '' : restDay ? 'Rest day, no tasks today' : `${done} of ${tasks.length} tasks done today`
 
   // The sidebar passes `avatarConfig: undefined` until the member's profile is known.
   const characterPending = user.avatarConfig === undefined
@@ -438,7 +439,7 @@ export function AccountHub({
           instant={view.instant}
           pulseKey={view.pulseKey}
           done={done}
-          total={tasks.length}
+          total={restDay ? 0 : tasks.length}
           poppedNotch={poppedNotch}
         />
         {gain && (

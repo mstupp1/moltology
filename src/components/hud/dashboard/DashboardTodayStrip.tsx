@@ -48,16 +48,25 @@ function Readout({ label, children, footer }: { label: string; children: React.R
   )
 }
 
-/** Seven small marks, oldest to today: lit when that day's liturgies were all done. */
-function WeekMarks({ days }: { days: Array<{ date: string; pct: number; isToday?: boolean }> }) {
+/**
+ * Seven small marks, oldest to today: lit when that day's liturgies were all done.
+ * An off day with nothing done is a thin dash, so it doesn't read as a miss.
+ */
+function WeekMarks({ days }: { days: Array<{ date: string; pct: number; isToday?: boolean; offDay?: boolean }> }) {
   return (
     <div className="flex items-center gap-1 h-1.5" aria-hidden="true">
       {days.map((day) => (
         <span
           key={day.date}
           className={cn(
-            'h-1.5 flex-1 rounded-chip',
-            day.pct >= 100 ? 'bg-cyan-glow' : day.pct > 0 ? 'bg-cyan-glow/35' : 'bg-surface-3',
+            'flex-1 rounded-chip',
+            day.pct >= 100
+              ? 'h-1.5 bg-cyan-glow'
+              : day.pct > 0
+                ? 'h-1.5 bg-cyan-glow/35'
+                : day.offDay
+                  ? 'h-0.5 bg-surface-3'
+                  : 'h-1.5 bg-surface-3',
           )}
         />
       ))}
@@ -72,7 +81,7 @@ function WeekMarks({ days }: { days: Array<{ date: string; pct: number; isToday?
 export function DashboardTodayStrip() {
   const navigate = useNavigate()
   const session = useAuthSession()
-  const { completedCount, totalCount, streakDays, streakHistory, progression, isLoading, xpReady, streakReady } =
+  const { completedCount, totalCount, streakDays, streakHistory, progression, isLoading, xpReady, streakReady, showRestDay } =
     useDailyAlignment()
   const lastThread = useLastOracleThread()
   const [dateLabel, setDateLabel] = useState('')
@@ -84,7 +93,8 @@ export function DashboardTodayStrip() {
 
   const isGuest = session.isGuest
   const name = firstName(session.user?.name)
-  const step = pickDashboardNextStep({ isGuest, completedCount, totalCount, lastThread })
+  const restDay = !isGuest && showRestDay
+  const step = pickDashboardNextStep({ isGuest, completedCount, totalCount, lastThread, restDay })
   const ready = !isLoading && !session.isPending
   // Stage and streak each wait for their own reading, so nothing paints as Stage 1 / 0 first.
   const stageKnown = isGuest || (!session.isPending && xpReady)
@@ -168,7 +178,7 @@ export function DashboardTodayStrip() {
               {isGuest
                 ? 'Look around freely. An account keeps your liturgies, streak and Oracle threads.'
                 : ready
-                  ? describeAlignmentToday(completedCount, totalCount)
+                  ? describeAlignmentToday(completedCount, totalCount, restDay)
                   : 'Reading today’s liturgies…'}
             </p>
           </div>
@@ -239,12 +249,12 @@ export function DashboardTodayStrip() {
             <>
               <Meter ratio={completedCount / Math.max(totalCount, 1)} done={alignmentDone} label="Today’s alignment" />
               <span className={cn('text-[11px] truncate', alignmentDone ? 'text-emerald-500' : 'text-ink-muted')}>
-                {alignmentDone ? 'Done today' : 'done today'}
+                {alignmentDone ? 'Done today' : ready && restDay ? 'rest day' : 'done today'}
               </span>
             </>
           }
         >
-          {ready ? `${completedCount}/${totalCount}` : <PendingBar width="3ch" />}
+          {!ready ? <PendingBar width="3ch" /> : restDay ? 'Off' : `${completedCount}/${totalCount}`}
         </Readout>
       </div>
 

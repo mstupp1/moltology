@@ -449,6 +449,13 @@
       "when": 1794680623063,
       "tag": "0063_community_photo",
       "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1794803916671,
+      "tag": "0064_practice_days",
+      "breakpoints": true
     }
   ]
 }

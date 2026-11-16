@@ -23,6 +23,7 @@ async function applyRLS() {
     await sql`ALTER TABLE IF EXISTS routine_completions ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS routine_day_summaries ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS routine_streak_carries ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS practice_day_schedules ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS activity_events ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS user_avatars ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS equipment_catalog ENABLE ROW LEVEL SECURITY;`
@@ -36,7 +37,7 @@ async function applyRLS() {
     await sql`ALTER TABLE IF EXISTS member_referrals ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS referral_rewards ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS ai_usage_daily_summaries ENABLE ROW LEVEL SECURITY;`
-    console.log('✓ RLS enabled on profiles, user_stats, routines, routine_completions, routine_day_summaries, routine_streak_carries, activity_events, user_avatars, equipment_catalog, user_gear_items, friend_requests, friendships, suggestion_dismissals, member_bonds, notifications, xp_transactions, ai_usage_daily_summaries')
+    console.log('✓ RLS enabled on profiles, user_stats, routines, routine_completions, routine_day_summaries, routine_streak_carries, practice_day_schedules, activity_events, user_avatars, equipment_catalog, user_gear_items, friend_requests, friendships, suggestion_dismissals, member_bonds, notifications, xp_transactions, ai_usage_daily_summaries')
 
     // 2. Drop existing policies if any to ensure clean idempotent script
     for (const table of ['member_referrals', 'referral_rewards']) {
@@ -129,6 +130,19 @@ async function applyRLS() {
 
     await sql`
       CREATE POLICY routine_streak_carries_isolation_policy ON routine_streak_carries
+      FOR ALL
+      USING (
+        "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+
+    await sql`
+      DROP POLICY IF EXISTS practice_day_schedules_isolation_policy ON practice_day_schedules;
+    `
+
+    await sql`
+      CREATE POLICY practice_day_schedules_isolation_policy ON practice_day_schedules
       FOR ALL
       USING (
         "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')

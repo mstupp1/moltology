@@ -878,6 +878,21 @@ export const toggleDailyAlignmentTaskFn = createServerFn({ method: 'POST' })
     return toggleDailyAlignmentTaskHandler(args)
   })
 
+const setPracticeDaysSchema = z.object({
+  days: z.number().int().min(0).max(127),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  userId: z.string().optional(),
+  token: z.string().optional(),
+})
+
+export const setPracticeDaysFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: z.input<typeof setPracticeDaysSchema>) => setPracticeDaysSchema.parse(data))
+  .handler(async (args) => {
+    const { setPracticeDaysHandler } = await import('./db-services')
+    return setPracticeDaysHandler(args)
+  })
+
 const getActivityEventsSchema = z.object({
   limit: z.number().int().min(1).max(50).optional(),
   userId: z.string().optional(),

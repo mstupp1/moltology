@@ -7,18 +7,18 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-11-14",
+  "syncedAt": "2026-11-16",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
-    "rules": 137,
-    "decisions": 64,
-    "anchors": 278,
-    "drifted": 0,
+    "rules": 138,
+    "decisions": 65,
+    "anchors": 283,
+    "drifted": 8,
     "flagged": 8
   },
   "canvas": {
-    "width": 7236,
+    "width": 7334,
     "height": 3248
   },
   "domains": [
@@ -62,7 +62,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "box": {
         "x": 2233,
         "y": 0,
-        "width": 1488,
+        "width": 1586,
         "height": 988
       },
       "ruleIds": [
@@ -71,6 +71,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "progression.xp-rewards",
         "progression.xp-ledger",
         "progression.client-date",
+        "progression.practice-days",
         "progression.stage-from-xp",
         "progression.stage-thresholds",
         "progression.clearance-thresholds",
@@ -86,7 +87,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Two roles, user and admin. Server functions verify the caller's JWT, then check the role before any staff action.",
       "overviewHtml": "<p>Access has two layers. The UI hides staff tools from everyone else, and each server function checks the role again, because the client can be skipped.</p>",
       "box": {
-        "x": 3817,
+        "x": 3915,
         "y": 0,
         "width": 1196,
         "height": 676
@@ -110,7 +111,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Self-hosted Better Auth with email and password plus Google. Sessions are cookie-cached, and writes use short-lived JWTs.",
       "overviewHtml": "<p>Auth moved off Managed Neon Auth because its background polling kept Neon compute awake and blew the compute budget. Identity for writes is always a verified JWT, never a client-supplied id.</p>",
       "box": {
-        "x": 5109,
+        "x": 5207,
         "y": 0,
         "width": 2127,
         "height": 548
@@ -953,10 +954,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/oracle-skills.ts",
           "symbol": "ORACLE_SKILL_PRICES",
-          "line": 15,
+          "line": 32,
           "value": "[0, 60, 150] as const",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/oracle-skills.ts#L15"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/oracle-skills.ts#L32"
         },
         {
           "file": "src/lib/server/oracle-skill-access.ts",
@@ -1274,10 +1275,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/avatar3d/character.ts",
           "symbol": "buildCharacter",
-          "line": 149,
+          "line": 181,
           "value": "buildCharacter(look)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d/character.ts#L149"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d/character.ts#L181"
         }
       ],
       "tests": [
@@ -1307,7 +1308,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 396
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "progression.daily-liturgies",
@@ -1320,10 +1321,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/alignment-tasks.ts",
           "symbol": "CANONICAL_ALIGNMENT_TASKS",
-          "line": 47,
-          "value": "[ { key: 'silent-synchronization', time: 'Early morning', title: 'Silent Synchronization', description: 'Before any feed or inbox, sit quietly and look honestl…",
+          "line": 49,
+          "value": "[ { key: 'silent-synchronization', time: 'Early morning', title: 'Sit in silence', description: 'Before any feed or inbox, sit quietly and look honestly at yes…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/alignment-tasks.ts#L47"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/alignment-tasks.ts#L49"
         }
       ],
       "tests": [
@@ -1335,13 +1336,14 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "dependsOn": [],
       "usedBy": [
         "progression.silent-synchronization",
-        "progression.xp-rewards"
+        "progression.xp-rewards",
+        "progression.practice-days"
       ],
       "decisions": [],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 1272,
         "y": 76
       },
       "drift": "ok"
@@ -1357,18 +1359,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/components/hud/SilentSynchronizationDialog.tsx",
           "symbol": "SilentSynchronizationDialog",
-          "line": 38,
-          "value": "SilentSynchronizationDialog({ open, onClose, onComplete, avatarUrl, avatarName = 'Your profile', })",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/SilentSynchronizationDialog.tsx#L38"
+          "line": 82,
+          "value": "SilentSynchronizationDialog({ open, onClose, onComplete, avatarUrl, avatarName = 'Your profile', practice = 'silent', })",
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/SilentSynchronizationDialog.tsx#L82"
         },
         {
           "file": "src/hooks/useDailyAlignment.tsx",
           "symbol": "AlignmentProvider",
-          "line": 96,
-          "value": "AlignmentProvider({ children })",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useDailyAlignment.tsx#L96"
+          "line": 152,
+          "value": "AlignmentProvider({ children, reuseRecentSync = false })",
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useDailyAlignment.tsx#L152"
         }
       ],
       "tests": [
@@ -1393,10 +1395,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
+        "x": 1196,
         "y": 544
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "progression.xp-rewards",
@@ -1433,7 +1435,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 638,
+        "x": 878,
         "y": 232
       },
       "drift": "ok"
@@ -1449,18 +1451,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/db/schema.ts",
           "symbol": "xpTransactions",
-          "line": 402,
+          "line": 419,
           "value": "pgTable('xp_transactions', { id: uuid('id').defaultRandom().primaryKey(), userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' …",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L402"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L419"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3674,
+          "line": 3714,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3674"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3714"
         }
       ],
       "tests": [
@@ -1487,7 +1489,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 638,
+        "x": 878,
         "y": 388
       },
       "drift": "ok"
@@ -1503,18 +1505,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/alignment-tasks.ts",
           "symbol": "isAlignmentDateWritable",
-          "line": 145,
+          "line": 147,
           "value": "isAlignmentDateWritable(date, now)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/alignment-tasks.ts#L145"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/alignment-tasks.ts#L147"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3674,
+          "line": 3714,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3674"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3714"
         }
       ],
       "tests": [
@@ -1526,15 +1528,92 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "dependsOn": [
         "progression.xp-ledger"
       ],
-      "usedBy": [],
+      "usedBy": [
+        "progression.practice-days"
+      ],
       "decisions": [
         "clamp-alignment-dates"
       ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 612,
+        "x": 904,
         "y": 544
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "progression.practice-days",
+      "domain": "progression",
+      "title": "Practice days protect streaks",
+      "kind": "flow",
+      "status": "active",
+      "statement": "Members pick at least 4 practice days (default Mon to Fri). A missed off day is skipped instead of breaking the streak, and a full off day adds one. Off days hide the tasks until Practice anyway. A change applies from the member's tomorrow and is kept as history, so past days keep their schedule. Days before 2026-11-14 were all practice days.",
+      "anchors": [
+        {
+          "file": "src/lib/practice-days.ts",
+          "symbol": "DEFAULT_PRACTICE_DAYS",
+          "line": 10,
+          "value": "0b0111110",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/practice-days.ts#L10"
+        },
+        {
+          "file": "src/lib/practice-days.ts",
+          "symbol": "MIN_PRACTICE_DAYS",
+          "line": 12,
+          "value": "4",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/practice-days.ts#L12"
+        },
+        {
+          "file": "src/lib/practice-days.ts",
+          "symbol": "PRACTICE_DAYS_START",
+          "line": 19,
+          "value": "'2026-11-14'",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/practice-days.ts#L19"
+        },
+        {
+          "file": "src/lib/alignment-tasks.ts",
+          "symbol": "computeStreakWithCarry",
+          "line": 223,
+          "value": "computeStreakWithCarry(history, todayDate, carry, totalTasks, isPracticeDay)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/alignment-tasks.ts#L223"
+        },
+        {
+          "file": "src/lib/server/db-services.ts",
+          "symbol": "setPracticeDaysHandler",
+          "line": 3926,
+          "value": "setPracticeDaysHandler({ data, context, })",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3926"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/practice-days.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/practice-days.test.ts"
+        },
+        {
+          "file": "scripts/lib/db-retention-completions.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/scripts/lib/db-retention-completions.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "progression.daily-liturgies",
+        "progression.client-date"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "practice-days"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 1294,
+        "y": 700
       },
       "drift": "ok"
     },
@@ -1549,10 +1628,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3454,
+          "line": 3472,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3454"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3472"
         },
         {
           "file": "src/lib/progression.ts",
@@ -1583,7 +1662,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 904,
+        "x": 612,
         "y": 544
       },
       "drift": "ok"
@@ -1624,7 +1703,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 860,
+        "x": 656,
         "y": 700
       },
       "drift": "ok"
@@ -1671,7 +1750,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 860,
+        "x": 656,
         "y": 856
       },
       "drift": "ok"
@@ -1687,10 +1766,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3454,
+          "line": 3472,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3454"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3472"
         }
       ],
       "tests": [],
@@ -1704,7 +1783,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1152,
+        "x": 364,
         "y": 700
       },
       "drift": "ok"
@@ -1813,7 +1892,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1196,
+        "x": 320,
         "y": 544
       },
       "drift": "ok"
@@ -3510,18 +3589,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "submitLeadHandler",
-          "line": 3272,
+          "line": 3288,
           "value": "submitLeadHandler(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3272"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3288"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createBlogCommentHandler",
-          "line": 807,
+          "line": 816,
           "value": "createBlogCommentHandler({ data, context })",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L807"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L816"
         }
       ],
       "tests": [
@@ -3547,7 +3626,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 320,
         "y": 76
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "premium.soft-launch",
@@ -4110,10 +4189,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/db/enable-rls.ts",
           "symbol": "applyPremiumColumnGuard",
-          "line": 769,
+          "line": 783,
           "value": "applyPremiumColumnGuard()",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/enable-rls.ts#L769"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/enable-rls.ts#L783"
         }
       ],
       "tests": [],
@@ -4184,18 +4263,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumTopicHandler",
-          "line": 1758,
+          "line": 1774,
           "value": "createForumTopicHandler({ data, context })",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1758"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1774"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "requirePublishableForumPost",
-          "line": 981,
+          "line": 997,
           "value": "requirePublishableForumPost(input)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L981"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L997"
         }
       ],
       "tests": [
@@ -4485,7 +4564,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 116,
         "y": 364
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "forum.rate-limit",
@@ -4557,10 +4636,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createBlogCommentHandler",
-          "line": 807,
+          "line": 816,
           "value": "createBlogCommentHandler({ data, context })",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L807"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L816"
         },
         {
           "file": "src/lib/server/forum-write-limit.ts",
@@ -4592,7 +4671,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 364,
         "y": 676
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "forum.content-limits",
@@ -4924,10 +5003,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertForumAuthor",
-          "line": 989,
+          "line": 1005,
           "value": "assertForumAuthor(rowUserId, actorId, action)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L989"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1005"
         }
       ],
       "tests": [
@@ -4970,10 +5049,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumPostHandler",
-          "line": 1905,
+          "line": 1921,
           "value": "createForumPostHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1905"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1921"
         }
       ],
       "tests": [
@@ -5060,26 +5139,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertCovenantSteward",
-          "line": 2551,
+          "line": 2567,
           "value": "assertCovenantSteward(dbClient, userId, payload)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2551"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2567"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "reviewForumReportHandler",
-          "line": 2858,
+          "line": 2874,
           "value": "reviewForumReportHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2858"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2874"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "removeForumReportTargetHandler",
-          "line": 2928,
+          "line": 2944,
           "value": "removeForumReportTargetHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2928"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2944"
         }
       ],
       "tests": [
@@ -6471,10 +6550,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/member-share-data.ts",
           "symbol": "getMemberShareIdentity",
-          "line": 6,
+          "line": 18,
           "value": "getMemberShareIdentity(profileId)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/member-share-data.ts#L6"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/member-share-data.ts#L18"
         }
       ],
       "tests": [
@@ -6496,7 +6575,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 76
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "data.neon-compute-budget",
@@ -6733,10 +6812,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "getBlogPostBySlugHandler",
-          "line": 658,
+          "line": 660,
           "value": "getBlogPostBySlugHandler({ data: slug, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L658"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L660"
         },
         {
           "file": "src/routes/news/$slug.tsx",
@@ -6949,26 +7028,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/avatar-still.ts",
           "symbol": "saveAvatarStillHandler",
-          "line": 40,
+          "line": 58,
           "value": "saveAvatarStillHandler({ data, context }, upload)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/avatar-still.ts#L40"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/avatar-still.ts#L58"
         },
         {
           "file": "src/lib/avatar-still.ts",
           "symbol": "avatarStillHash",
-          "line": 46,
+          "line": 49,
           "value": "avatarStillHash(config)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar-still.ts#L46"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar-still.ts#L49"
         },
         {
           "file": "src/lib/avatar-still.ts",
           "symbol": "storedStillUrl",
-          "line": 60,
+          "line": 68,
           "value": "storedStillUrl(config)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar-still.ts#L60"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar-still.ts#L68"
         }
       ],
       "tests": [
@@ -6991,7 +7070,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 520
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "data.community-photo",
@@ -7057,10 +7136,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "saveCharacterHandler",
-          "line": 4060,
+          "line": 4156,
           "value": "saveCharacterHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L4060"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L4156"
         },
         {
           "file": "src/lib/character-appearance.ts",
@@ -7109,10 +7188,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "publicAvatarConfig",
-          "line": 173,
+          "line": 175,
           "value": "sql<LobsterAvatarConfig | null>`CASE WHEN ${profiles.avatarConfig} IS NULL THEN NULL ELSE (${profiles.avatarConfig} - 'accessory' - 'claws' - 'equipment') || j…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L173"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L175"
         },
         {
           "file": "src/components/UserAvatar.tsx",
@@ -10971,6 +11050,45 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "html": "<p>The existing simulated members were re-rolled and dressed once in production. Their cached Gem balances were synced to their ledgers so purchases don&#39;t make their balances drop. Real members are never touched, because every write re-checks the simulated flag.</p>"
         }
       ]
+    },
+    {
+      "id": "practice-days",
+      "date": "2026-11-16",
+      "title": "Let members choose practice days so weekends don't break streaks",
+      "summary": "Members pick at least four practice days (Mon to Fri by default); missed off days no longer break a streak and their tasks are hidden.",
+      "domains": [
+        "progression"
+      ],
+      "rules": [
+        "progression.practice-days"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "pr",
+          "label": "PR #500",
+          "url": "https://github.com/mstupp1/moltology/pull/500"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>A streak needed every liturgy done every single day, so one quiet weekend reset it. Myles asked for a work week setting so members can take days off without losing their streak.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Settings has a Practice days card with seven day chips, Mon to Fri by default and at least four days. Everyone, including existing members, starts on Mon to Fri. On an off day the avatar menu shows a rest-day note instead of the tasks, the XP ring shows no task notches, and the Dashboard shows a thin dash for that day. Practice anyway brings the tasks back; they earn normal XP and Gems, and finishing all of them adds one to the streak. A missed off day is skipped, a missed practice day still breaks the streak.</p>\n<p>Changes apply from the member&#39;s tomorrow, so nobody can turn today into an off day to rescue a streak. Each change is stored with its start date, and the streak and the long-streak carry judge every day by the schedule that applied then. Days before 2026-11-14 count as practice days, and that launch weekend already counts as off.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>Keep existing members on every day. Rejected because Mon to Fri can only protect a streak, never break one.</li>\n<li>Let a change apply today. Rejected because it would let members rescue a streak after missing a day.</li>\n<li>Make a full off day neutral (no streak bonus). Rejected because doing the work should count for something.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Streak milestones count streak days, so with Mon to Fri a 7-day streak takes about a week and a half. The day is still the member&#39;s device date, within the existing one-day window.</p>"
+        }
+      ]
     }
   ],
   "edges": [
@@ -11158,6 +11276,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "progression.xp-ledger->progression.client-date",
       "source": "progression.xp-ledger",
       "target": "progression.client-date",
+      "crossDomain": false
+    },
+    {
+      "id": "progression.daily-liturgies->progression.practice-days",
+      "source": "progression.daily-liturgies",
+      "target": "progression.practice-days",
+      "crossDomain": false
+    },
+    {
+      "id": "progression.client-date->progression.practice-days",
+      "source": "progression.client-date",
+      "target": "progression.practice-days",
       "crossDomain": false
     },
     {

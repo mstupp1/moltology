@@ -7,10 +7,11 @@ import {
   DISABLED_REMOTE_INBOX_MARK_READ,
   isRemoteInboxEnabled,
 } from '../notifications-refresh'
-import { changelogs, profiles, users, userStats, routines, routineCompletions, routineDaySummaries, routineStreakCarries, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, forumTopicVisits, forumBoardVisits, leads, equipmentCatalog, userGearItems, friendRequests, friendships, suggestionDismissals, memberBonds, notifications, xpTransactions, type NotificationKind, type NotificationPayload } from '../../db/schema'
+import { changelogs, profiles, users, userStats, routines, routineCompletions, routineDaySummaries, routineStreakCarries, practiceDaySchedules, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, forumTopicVisits, forumBoardVisits, leads, equipmentCatalog, userGearItems, friendRequests, friendships, suggestionDismissals, memberBonds, notifications, xpTransactions, type NotificationKind, type NotificationPayload } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, notInArray, isNull, getTableColumns } from 'drizzle-orm'
 import { union } from 'drizzle-orm/pg-core'
+import { MIN_PRACTICE_DAYS, normalizeSchedule, practiceDayChecker, isValidPracticeDays, type PracticeSchedule } from '../practice-days'
 import { MAX_PAGE_SIZE, PAGE_SIZES, clampOffset, clampPageSize, nextOffsetFor, takePage } from '../pagination'
 import { olderThanRow } from './keyset'
 import type { ChangelogEntry } from '../changelogs-data'
@@ -3445,6 +3446,8 @@ export interface DailyAlignmentResponse {
   isAllCompleted: boolean
   history: Array<{ date: string; completedCount: number }>
   streakDays: number
+  /** The member's practice-day changes, oldest first. Empty means the default (Mon to Fri). */
+  practiceSchedule?: PracticeSchedule
   xp?: number
   stage?: number
   progression?: ProgressionState
@@ -3580,9 +3583,23 @@ export const getDailyAlignmentData = async (
     })
     .from(routineStreakCarries)
     .where(eq(routineStreakCarries.userId, userId))
-  // One SQL statement gives raw, compacted task keys, and the carry the same
-  // snapshot while cleanup advances the retention boundary.
-  const alignmentRows = await union(rawCompletions, summarizedCompletions, streakCarry)
+  const scheduleRows = dbClient
+    .select({
+      completedOn: practiceDaySchedules.effectiveFrom,
+      taskKey: sql<string>`''`,
+      rowKind: sql<string>`'schedule'`,
+      streakDays: sql<number | null>`${practiceDaySchedules.days}::integer`,
+    })
+    .from(practiceDaySchedules)
+    .where(eq(practiceDaySchedules.userId, userId))
+  // One SQL statement gives raw, compacted task keys, the carry and the practice days the
+  // same snapshot while cleanup advances the retention boundary.
+  const alignmentRows = await union(rawCompletions, summarizedCompletions, streakCarry, scheduleRows)
+  const practiceSchedule = normalizeSchedule(
+    alignmentRows
+      .filter((row) => row.rowKind === 'schedule')
+      .map((row) => ({ from: row.completedOn, days: Number(row.streakDays ?? 0) })),
+  )
   const carryRow = alignmentRows.find((row) => row.rowKind === 'carry')
   const carry = carryRow
     ? { anchorDate: carryRow.completedOn, streakDays: Number(carryRow.streakDays ?? 0) }
@@ -3619,7 +3636,13 @@ export const getDailyAlignmentData = async (
     const d = shiftDays(targetDate, -i)
     streakHistory.push({ date: d, completedCount: dayCounts.get(d)?.size || 0 })
   }
-  const streakDays = computeStreakWithCarry(streakHistory, targetDate, carry)
+  const streakDays = computeStreakWithCarry(
+    streakHistory,
+    targetDate,
+    carry,
+    TOTAL_ALIGNMENT_TASKS,
+    practiceDayChecker(practiceSchedule),
+  )
 
   // Fetch or sync user XP and stage
   let xp = 0
@@ -3651,6 +3674,7 @@ export const getDailyAlignmentData = async (
     isAllCompleted: completedCount >= TOTAL_ALIGNMENT_TASKS,
     history,
     streakDays,
+    practiceSchedule,
     xp,
     stage,
     progression,
@@ -3677,6 +3701,7 @@ export const getDailyAlignmentHandler = async ({
       isAllCompleted: false,
       history: [],
       streakDays: 0,
+      practiceSchedule: [],
       xp: 0,
       stage: 1,
       progression,
@@ -3877,6 +3902,62 @@ export const toggleDailyAlignmentTaskHandler = async ({
 }
 
 
+
+export interface SetPracticeDaysInput {
+  days: number
+  /** The member's own today (YYYY-MM-DD); the change applies from the day after. */
+  date: string
+  userId?: string
+  token?: string
+}
+
+const setPracticeDaysSchema = z.object({
+  days: z.number().int(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  userId: z.string().optional(),
+  token: z.string().optional(),
+})
+
+/**
+ * Saves a member's practice days. The change applies from tomorrow, so today's off or
+ * practice status (and the streak it protects) can't be changed after the fact. Saving
+ * twice in one day replaces tomorrow's change.
+ */
+export const setPracticeDaysHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<SetPracticeDaysInput>): Promise<{ practiceSchedule: PracticeSchedule; effectiveFrom: string }> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Sign in to choose your practice days.')
+  }
+  const { days, date } = setPracticeDaysSchema.parse(data)
+  if (!isValidPracticeDays(days)) {
+    throw new Error(`Pick at least ${MIN_PRACTICE_DAYS} practice days.`)
+  }
+  if (!isAlignmentDateWritable(date)) {
+    throw new Error('Your device date looks wrong. Check it and try again.')
+  }
+  const { userId, dbClient } = auth
+  const effectiveFrom = shiftDays(date, 1)
+
+  await dbClient
+    .delete(practiceDaySchedules)
+    .where(and(eq(practiceDaySchedules.userId, userId), sql`${practiceDaySchedules.effectiveFrom} > ${effectiveFrom}`))
+  await dbClient
+    .insert(practiceDaySchedules)
+    .values({ userId, effectiveFrom, days })
+    .onConflictDoUpdate({
+      target: [practiceDaySchedules.userId, practiceDaySchedules.effectiveFrom],
+      set: { days, updatedAt: new Date() },
+    })
+
+  const rows = await dbClient
+    .select({ from: practiceDaySchedules.effectiveFrom, days: practiceDaySchedules.days })
+    .from(practiceDaySchedules)
+    .where(eq(practiceDaySchedules.userId, userId))
+  return { practiceSchedule: normalizeSchedule(rows), effectiveFrom }
+}
 
 export interface GetActivityEventsInput {
   userId?: string

@@ -49,7 +49,7 @@ describe('completion retention', () => {
 
     const statements = vi.mocked(query).mock.calls.map(([strings]) => Array.from(strings).join(' '))
     expect(statements[0]).toContain('routine_streak_carries')
-    expect(statements[0]).toContain('ROW_NUMBER() OVER')
+    expect(statements[0]).toContain('practice_day_schedules')
     expect(statements[0]).toContain('ON CONFLICT ("userId") DO UPDATE')
     const compaction = statements.find((statement) => statement.includes('day_keys AS'))
     expect(compaction).toContain('GROUP BY c."userId", c."completedOn"')

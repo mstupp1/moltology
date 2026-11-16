@@ -1,3 +1,4 @@
+import { normalizeSchedule, type PracticeSchedule } from './practice-days'
 /**
  * Last-known daily alignment snapshot for first paint.
  *
@@ -115,6 +116,8 @@ export interface ProgressSnapshot {
   streakDays: number
   todayWasComplete: boolean
   history: Array<{ date: string; completedCount: number }>
+  /** The member's practice-day changes, so a return visit knows at once whether today is off. */
+  practiceSchedule?: PracticeSchedule
 }
 
 export function progressSnapshotStorageKey(userId: string): string {
@@ -148,7 +151,8 @@ export function getCachedProgressSnapshot(userId: string | null | undefined): Pr
     const raw = window.localStorage.getItem(progressSnapshotStorageKey(userId))
     if (!raw) return null
     const parsed: unknown = JSON.parse(raw)
-    return isProgressSnapshot(parsed) ? parsed : null
+    if (!isProgressSnapshot(parsed)) return null
+    return { ...parsed, practiceSchedule: normalizeSchedule(Array.isArray(parsed.practiceSchedule) ? parsed.practiceSchedule : []) }
   } catch {
     return null
   }

@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Check, X } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { Check, Moon, X } from 'lucide-react'
+import { HudButton } from '@/components/ui/HudButton'
 import { alignmentTaskCodex } from '@/lib/alignment-tasks'
 import {
   ALIGNMENT_TASK_ACTIONS,
@@ -51,7 +53,7 @@ export function AlignmentTodayList({
   roomy = false,
   actions = true,
 }: AlignmentTodayListProps) {
-  const { memberId, currentDate, setTaskCompleted } = useDailyAlignment()
+  const { memberId, currentDate, setTaskCompleted, showRestDay, isOffDay, practiceAnyway, streakDays } = useDailyAlignment()
   const [openKey, setOpenKey] = useState<string | null>(null)
   const [oneThing, setOneThing] = useState('')
   useEffect(() => {
@@ -90,11 +92,52 @@ export function AlignmentTodayList({
         </button>}
       </div>
 
+      {actions && showRestDay ? (
+        <div className="rounded-control border border-line-subtle p-4 space-y-3" data-testid="alignment-rest-day">
+          <div className="flex items-start gap-3">
+            <Moon className="w-5 h-5 mt-0.5 shrink-0 text-cyan-glow" aria-hidden="true" />
+            <div className="min-w-0 space-y-1">
+              <p className="text-sm font-bold text-ink">Rest day</p>
+              <p className="text-xs leading-relaxed text-ink-muted">
+                Today isn't one of your practice days, so there's nothing to do and your
+                {streakDays > 0 ? ` ${streakDays}-day` : ''} streak is safe.
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pl-8">
+            <HudButton
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation()
+                practiceAnyway()
+              }}
+              data-testid="alignment-practice-anyway"
+            >
+              Practice anyway
+            </HudButton>
+            {memberId && (
+              <Link
+                to="/settings"
+                hash="practice-days"
+                onClick={onClose}
+                className={`inline-flex items-center min-h-9 text-xs text-ink-muted hover:text-cyan-glow transition-colors rounded-control ${focusRing}`}
+              >
+                Change practice days
+              </Link>
+            )}
+          </div>
+        </div>
+      ) : (
       <div className="space-y-2.5">
           <div className="flex items-center justify-between gap-2">
             {countReady ? (
               <span className={`text-xs ${allTasksCompleted ? 'text-emerald-500 font-bold' : 'text-ink-muted'}`}>
                 {allTasksCompleted ? 'All eight done for today' : `${completedCount} of ${tasks.length} done`}
+                {actions && isOffDay && (
+                  <span className="text-ink-muted font-normal" data-testid="alignment-off-day-note"> · Off day, so this is a bonus</span>
+                )}
               </span>
             ) : (
               <span className="inline-block h-2 w-24 rounded-chip bg-surface-3 animate-pulse" aria-hidden />
@@ -212,6 +255,7 @@ export function AlignmentTodayList({
             })}
           </ul>
         </div>
+      )}
     </>
   )
 }

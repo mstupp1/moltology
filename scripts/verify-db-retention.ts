@@ -7,6 +7,7 @@ import { applyCompletionRetention } from './lib/db-retention-completions'
 import { applyUsageRetention } from './lib/db-retention-usage'
 import { CANONICAL_ALIGNMENT_TASKS, computeStreakWithCarry, shiftDays } from '../src/lib/alignment-tasks'
 import { CHAT_LIMIT, createChatThreadWithinLimit } from '../src/lib/ai/chat-retention'
+import { weekdayOf } from '../src/lib/practice-days'
 import { applyChatRetention, countChatRetentionCandidates } from './lib/db-retention-chats'
 
 // Explicitly opt-in: these checks create and remove only their own fixture schema.
@@ -25,7 +26,7 @@ async function main() {
   const namespace = `retention_check_${Date.now()}_${randomBytes(4).toString('hex')}`
   const tables = [
     'profiles', 'activity_events', 'notifications', 'friend_requests', 'friendships',
-    'routine_completions', 'routine_day_summaries', 'routine_streak_carries', 'ai_usage_events', 'ai_usage_daily_summaries',
+    'routine_completions', 'routine_day_summaries', 'routine_streak_carries', 'practice_day_schedules', 'ai_usage_events', 'ai_usage_daily_summaries',
     'ai_threads', 'ai_messages',
   ]
   const tablePattern = new RegExp(`\\b(${tables.join('|')})\\b`, 'g')
@@ -50,7 +51,7 @@ async function main() {
     // LIKE copies indexes/defaults but not foreign keys; test the real cascade
     // explicitly against the isolated parent, never against public data.
     await isolated`ALTER TABLE ai_messages ADD FOREIGN KEY ("threadId") REFERENCES ai_threads(id) ON DELETE CASCADE`
-    await isolated`INSERT INTO profiles (id) VALUES ('a'), ('b'), ('c'), ('d')`
+    await isolated`INSERT INTO profiles (id) VALUES ('a'), ('b'), ('c'), ('d'), ('e'), ('f')`
     await isolated`
       INSERT INTO activity_events ("userId", kind, title, detail, "sourceKey", "createdAt")
       VALUES ('a', 'routine_completed', 'Old', 'Fixture', 'old', '2026-08-01'),
@@ -173,6 +174,42 @@ async function main() {
       anchorDate: String(timezoneCarry.anchorDate), streakDays: Number(timezoneCarry.streakDays),
     }), 181)
 
+    // Practice days: missed off days are skipped, missed practice days break the run.
+    // 'e' practises Mon to Fri on the default; 'f' does the same but chose every day from
+    // 2026-12-01, so its first missed weekend after that breaks the carried run.
+    const practiceAsOf = new Date('2027-03-15T12:00:00.000Z')
+    const practiceFixtures: Array<{ userId: string; completedOn: string; taskKey: string }> = []
+    for (let date = '2026-11-16'; date <= '2027-03-15'; date = shiftDays(date, 1)) {
+      if ([0, 6].includes(weekdayOf(date))) continue
+      for (const task of CANONICAL_ALIGNMENT_TASKS) {
+        practiceFixtures.push({ userId: 'e', completedOn: date, taskKey: task.key })
+        practiceFixtures.push({ userId: 'f', completedOn: date, taskKey: task.key })
+      }
+    }
+    await isolated`
+      INSERT INTO routine_completions ("userId", "completedOn", "taskKey")
+      SELECT "userId", "completedOn", "taskKey"
+      FROM jsonb_to_recordset(${JSON.stringify(practiceFixtures)}::jsonb)
+        AS fixture("userId" text, "completedOn" text, "taskKey" text)
+    `
+    await isolated`INSERT INTO practice_day_schedules ("userId", "effectiveFrom", days) VALUES ('f', '2026-12-01', 127)`
+    await applyCompletionRetention(isolated, practiceAsOf, 'lean')
+    const [practiceCarryE] = await isolated`SELECT "anchorDate", "streakDays" FROM routine_streak_carries WHERE "userId"='e'`
+    const [practiceCarryF] = await isolated`SELECT "anchorDate", "streakDays" FROM routine_streak_carries WHERE "userId"='f'`
+    const practiceAnchor = String(practiceCarryE.anchorDate)
+    let weekdaysToAnchor = 0
+    let weekdaysSinceLastWeekend = 0
+    for (let date = '2026-11-16'; date <= practiceAnchor; date = shiftDays(date, 1)) {
+      if ([0, 6].includes(weekdayOf(date))) {
+        weekdaysSinceLastWeekend = 0
+        continue
+      }
+      weekdaysToAnchor++
+      weekdaysSinceLastWeekend++
+    }
+    assert.equal(Number(practiceCarryE.streakDays), weekdaysToAnchor, 'Missed default off days must not break the carry')
+    assert.equal(Number(practiceCarryF.streakDays), weekdaysSinceLastWeekend, 'A missed chosen practice day must break the carry')
+
     await isolated`
       INSERT INTO ai_usage_events ("userId", kind, model, "inputTokens", "outputTokens", "createdAt")
       VALUES ('a', 'chat', NULL, 10, NULL, '2026-08-01 23:59:00'),
@@ -257,7 +294,7 @@ async function main() {
     `
     assert.equal(policies.length, 3)
     assert(policies.every((row) => row.relrowsecurity), 'Summary-table RLS must be enabled')
-    console.log('[retention-verify] PASS: request dependencies, 90-day history/timezone/streak carries, usage rollups, concurrent chat cap/replay, archive expiry/cascade, usage-limit preservation, and migrated RLS')
+    console.log('[retention-verify] PASS: request dependencies, 90-day history/timezone/streak carries with practice days, usage rollups, concurrent chat cap/replay, archive expiry/cascade, usage-limit preservation, and migrated RLS')
   } finally {
     await query.query(`DROP SCHEMA "${namespace}" CASCADE`)
     console.log('[retention-verify] isolated fixture schema removed')

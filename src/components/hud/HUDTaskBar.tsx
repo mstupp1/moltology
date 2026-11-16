@@ -230,7 +230,8 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   const nextTask = localTasks.find(t => !t.completed) || localTasks[localTasks.length - 1]
   const allTasksCompleted = localTasks.length > 0 && localTasks.every(t => t.completed)
   const completedCount = localTasks.filter(t => t.completed).length
-  const liturgyCountText = `${completedCount}/${localTasks.length}`
+  const restDay = countReady && !localPropTasks && alignment.showRestDay
+  const liturgyCountText = restDay ? 'Off' : `${completedCount}/${localTasks.length}`
   const progressPct = Math.round((completedCount / Math.max(localTasks.length, 1)) * 100)
   const nextTaskId = allTasksCompleted ? undefined : nextTask?.id
   const todayLabel = mounted
@@ -347,14 +348,14 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           }`}
           title="Today's tasks"
           aria-label="Daily alignment tasks schedule"
-          aria-description={countReady ? `${completedCount} of ${localTasks.length} done today` : undefined}
+          aria-description={!countReady ? undefined : restDay ? 'Rest day, no tasks today' : `${completedCount} of ${localTasks.length} done today`}
           aria-expanded={isScheduleOpen}
           aria-haspopup="dialog"
           aria-busy={!countReady}
         >
           <AlignmentRing
             done={countReady ? completedCount : 0}
-            total={countReady ? localTasks.length : 0}
+            total={countReady && !restDay ? localTasks.length : 0}
             label={countReady ? liturgyCountText : ''}
             complete={countReady && allTasksCompleted}
           />

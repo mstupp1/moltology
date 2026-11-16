@@ -51,6 +51,18 @@ import { parseLobsterAvatarConfig } from '@/lib/lobster-avatar'
 import { requestPortrait3D } from '@/lib/avatar3d-portrait-queue'
 import { resolveMemberPublicName } from '@/lib/member-handle'
 import { clearGuestAlignment, guestAlignmentFor, saveGuestAlignment } from '@/lib/guest-progress'
+import { isPracticeDay, normalizeSchedule, practiceDayChecker, type PracticeSchedule } from '@/lib/practice-days'
+
+const PRACTICE_ANYWAY_KEY = 'moltology:alignment:practice-anyway'
+
+/** The off day this device chose to practise on anyway (YYYY-MM-DD), if any. */
+function readPracticeAnyway(): string | null {
+  try {
+    return typeof window === 'undefined' ? null : window.localStorage.getItem(PRACTICE_ANYWAY_KEY)
+  } catch {
+    return null
+  }
+}
 
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
@@ -98,6 +110,16 @@ export interface AlignmentContextValue {
   xpConfirmed: boolean
   /** True once the streak is known (server, or today's saved reading). */
   streakReady: boolean
+  /** The member's practice-day changes, oldest first; empty means the default (Mon to Fri). */
+  practiceSchedule: PracticeSchedule
+  /** Today is not one of the member's practice days. */
+  isOffDay: boolean
+  /** Off day with nothing done and no "Practice anyway": show the rest-day note instead of tasks. */
+  showRestDay: boolean
+  /** Brings today's tasks back on an off day. */
+  practiceAnyway: () => void
+  /** Replaces the schedule after Settings saves a change. */
+  setPracticeSchedule: (schedule: PracticeSchedule) => void
 }
 
 const PRACTICE_TASK_KEY: Record<AlignmentPractice, string> = {
@@ -147,6 +169,9 @@ export function AlignmentProvider({ children, reuseRecentSync = false }: Alignme
   const [tasks, setTasks] = useState<AlignmentTaskItem[]>(() => mergeCompletions([]))
   const [history, setHistory] = useState<Array<{ date: string; completedCount: number }>>([])
   const [serverStreakDays, setServerStreakDays] = useState<number>(0)
+  const [practiceSchedule, setPracticeScheduleState] = useState<PracticeSchedule>([])
+  const [practiceAnywayDate, setPracticeAnywayDate] = useState<string | null>(null)
+  useEffect(() => setPracticeAnywayDate(readPracticeAnyway()), [])
   const [serverTodayWasComplete, setServerTodayWasComplete] = useState(false)
   const [hasServerStreakBaseline, setHasServerStreakBaseline] = useState(false)
   const [serverXp, setServerXp] = useState<number>(0)
@@ -290,6 +315,8 @@ export function AlignmentProvider({ children, reuseRecentSync = false }: Alignme
       })
       if (data) {
         const serverHistory = data.history || []
+        const schedule = normalizeSchedule(data.practiceSchedule)
+        setPracticeScheduleState(schedule)
         setServerStreakDays(data.streakDays || 0)
         setServerTodayWasComplete(
           serverHistory.find((day) => day.date === targetDate)?.completedCount === TOTAL_ALIGNMENT_TASKS,
@@ -312,6 +339,7 @@ export function AlignmentProvider({ children, reuseRecentSync = false }: Alignme
           todayWasComplete:
             serverHistory.find((day) => day.date === targetDate)?.completedCount === TOTAL_ALIGNMENT_TASKS,
           history: serverHistory,
+          practiceSchedule: schedule,
         })
 
         if (pendingOverridesRef.current.size === 0) {
@@ -347,6 +375,7 @@ export function AlignmentProvider({ children, reuseRecentSync = false }: Alignme
         setTasks(guestTasks)
         setHistory(guestKeys.length > 0 ? [{ date: today, completedCount: guestKeys.length }] : [])
         setHasServerStreakBaseline(false)
+        setPracticeScheduleState([])
         hasTrustworthyCountRef.current = true
         setIsLoading(false)
       }
@@ -363,6 +392,7 @@ export function AlignmentProvider({ children, reuseRecentSync = false }: Alignme
       setServerXp(progress.xp)
       setServerStage(progress.stage)
       setCachedXpUserId(userId)
+      setPracticeScheduleState(progress.practiceSchedule ?? [])
       if (progress.date === today) {
         setServerStreakDays(progress.streakDays)
         setServerTodayWasComplete(progress.todayWasComplete)
@@ -509,6 +539,7 @@ export function AlignmentProvider({ children, reuseRecentSync = false }: Alignme
               setServerXp(response.xp ?? 0)
               setServerStage(response.stage ?? 1)
               const responseHistory = response.history || []
+              if (response.practiceSchedule) setPracticeScheduleState(normalizeSchedule(response.practiceSchedule))
               setServerStreakDays(response.streakDays || 0)
               setServerTodayWasComplete(
                 responseHistory.find((day) => day.date === currentDateRef.current)?.completedCount === TOTAL_ALIGNMENT_TASKS,
@@ -562,12 +593,31 @@ export function AlignmentProvider({ children, reuseRecentSync = false }: Alignme
       }
       return serverStreakDays
     }
-    return computeStreak(history, currentDate)
-  }, [userId, hasServerStreakBaseline, serverTodayWasComplete, serverStreakDays, tasks, history, currentDate])
+    return computeStreak(history, currentDate, TOTAL_ALIGNMENT_TASKS, practiceDayChecker(practiceSchedule))
+  }, [userId, hasServerStreakBaseline, serverTodayWasComplete, serverStreakDays, tasks, history, currentDate, practiceSchedule])
 
   const streakHistory = useMemo(() => {
-    return buildStreakHistory(history, currentDate, 14)
-  }, [history, currentDate])
+    return buildStreakHistory(history, currentDate, 14, TOTAL_ALIGNMENT_TASKS, practiceDayChecker(practiceSchedule))
+  }, [history, currentDate, practiceSchedule])
+
+  const isOffDay = !isPracticeDay(currentDate, practiceSchedule)
+  const showRestDay = isOffDay && completedCount === 0 && practiceAnywayDate !== currentDate
+  const practiceAnyway = useCallback(() => {
+    const date = currentDateRef.current
+    setPracticeAnywayDate(date)
+    try {
+      window.localStorage.setItem(PRACTICE_ANYWAY_KEY, date)
+    } catch {
+      // Private mode: it lasts for this visit only.
+    }
+  }, [])
+  const setPracticeSchedule = useCallback((schedule: PracticeSchedule) => {
+    const next = normalizeSchedule(schedule)
+    setPracticeScheduleState(next)
+    const id = userIdRef.current
+    const progress = id ? getCachedProgressSnapshot(id) : null
+    if (id && progress) setCachedProgressSnapshot(id, { ...progress, practiceSchedule: next })
+  }, [])
 
   const setTaskCompleted = useCallback(
     async (taskKeyOrId: string, nextCompleted: boolean) => {
@@ -730,6 +780,11 @@ export function AlignmentProvider({ children, reuseRecentSync = false }: Alignme
     xpReady,
     xpConfirmed,
     streakReady,
+    practiceSchedule,
+    isOffDay,
+    showRestDay,
+    practiceAnyway,
+    setPracticeSchedule,
   }), [
     tasks,
     completedCount,
@@ -753,6 +808,11 @@ export function AlignmentProvider({ children, reuseRecentSync = false }: Alignme
     xpReady,
     xpConfirmed,
     streakReady,
+    practiceSchedule,
+    isOffDay,
+    showRestDay,
+    practiceAnyway,
+    setPracticeSchedule,
   ])
 
   return (
@@ -833,8 +893,15 @@ function useStandaloneDailyAlignment(): AlignmentContextValue {
     xpReady: true,
     xpConfirmed: true,
     streakReady: true,
+    practiceSchedule: [],
+    isOffDay: false,
+    showRestDay: false,
+    practiceAnyway: noop,
+    setPracticeSchedule: noop,
   }
 }
+
+function noop() {}
 
 export function useDailyAlignment(): AlignmentContextValue {
   const ctx = useContext(AlignmentContext)

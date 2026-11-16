@@ -55,6 +55,23 @@ rules:
       - file: src/lib/server/db-services.ts
         symbol: toggleDailyAlignmentTaskHandler
     tests: [src/lib/server/daily-alignment.test.ts]
+  - id: progression.practice-days
+    title: Practice days protect streaks
+    kind: flow
+    statement: Members pick at least 4 practice days (default Mon to Fri). A missed off day is skipped instead of breaking the streak, and a full off day adds one. Off days hide the tasks until Practice anyway. A change applies from the member's tomorrow and is kept as history, so past days keep their schedule. Days before 2026-11-14 were all practice days.
+    dependsOn: [progression.daily-liturgies, progression.client-date]
+    anchors:
+      - file: src/lib/practice-days.ts
+        symbol: DEFAULT_PRACTICE_DAYS
+      - file: src/lib/practice-days.ts
+        symbol: MIN_PRACTICE_DAYS
+      - file: src/lib/practice-days.ts
+        symbol: PRACTICE_DAYS_START
+      - file: src/lib/alignment-tasks.ts
+        symbol: computeStreakWithCarry
+      - file: src/lib/server/db-services.ts
+        symbol: setPracticeDaysHandler
+    tests: [src/lib/practice-days.test.ts, scripts/lib/db-retention-completions.test.ts]
   - id: progression.stage-from-xp
     title: Stage is derived from lifetime XP
     kind: invariant

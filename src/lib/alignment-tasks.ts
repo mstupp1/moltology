@@ -36,6 +36,8 @@ export interface DailyStreakDay {
   total: number
   pct: number
   isToday?: boolean
+  /** Not a practice day under the member's schedule: a miss here does not break the streak. */
+  offDay?: boolean
 }
 
 /** Anchor for the Daily alignment schedule. */
@@ -168,68 +170,68 @@ export function mergeCompletions(
   }))
 }
 
+/** Every day is a practice day: the rule before practice days existed. */
+const EVERY_DAY = () => true
+
 /**
- * Computes consecutive full-completion streak days ending today or yesterday.
+ * Walks back from today through the history. Full days add one. A missed practice day
+ * ends the streak; a missed off day is skipped. Today never breaks the streak, because it
+ * is not over yet. `reachedStart` is true when the walk passed the oldest history date
+ * without a break, so an older compacted carry may continue the run.
+ */
+function walkStreak(
+  history: Array<{ date: string; completedCount: number }>,
+  todayDate: string,
+  totalTasks: number,
+  isPracticeDay: (date: string) => boolean,
+): { streak: number; reachedStart: boolean } {
+  const countMap = new Map<string, number>()
+  let oldestDate = todayDate
+  for (const item of history) {
+    countMap.set(item.date, item.completedCount)
+    if (item.date < oldestDate) oldestDate = item.date
+  }
+
+  let streak = (countMap.get(todayDate) ?? 0) >= totalTasks ? 1 : 0
+  let currentDate = shiftDays(todayDate, -1)
+  while (currentDate >= oldestDate) {
+    const full = (countMap.get(currentDate) ?? 0) >= totalTasks
+    if (full) streak++
+    else if (isPracticeDay(currentDate)) return { streak, reachedStart: false }
+    currentDate = shiftDays(currentDate, -1)
+  }
+  return { streak, reachedStart: true }
+}
+
+/**
+ * Computes the streak ending today or yesterday: full-completion days, skipping off days
+ * that were missed. A full off day still counts as a bonus day.
  */
 export function computeStreak(
   history: Array<{ date: string; completedCount: number }>,
   todayDate: string,
-  totalTasks: number = TOTAL_ALIGNMENT_TASKS
+  totalTasks: number = TOTAL_ALIGNMENT_TASKS,
+  isPracticeDay: (date: string) => boolean = EVERY_DAY
 ): number {
-  const countMap = new Map<string, number>()
-  for (const item of history) {
-    countMap.set(item.date, item.completedCount)
-  }
-
-  const todayCount = countMap.get(todayDate) ?? 0
-  let streak = 0
-  let currentDate = todayDate
-
-  if (todayCount === totalTasks) {
-    streak = 1
-    currentDate = shiftDays(todayDate, -1)
-  } else {
-    currentDate = shiftDays(todayDate, -1)
-  }
-
-  while (true) {
-    const count = countMap.get(currentDate) ?? 0
-    if (count === totalTasks) {
-      streak++
-      currentDate = shiftDays(currentDate, -1)
-    } else {
-      break
-    }
-  }
-
-  return streak
+  return walkStreak(history, todayDate, totalTasks, isPracticeDay).streak
 }
 
 /**
- * Computes the visible streak and joins a compacted carry when the streak
- * reaches the day immediately after the carry anchor without a gap.
+ * Computes the visible streak and joins a compacted carry when the run reaches the day
+ * immediately after the carry anchor without a break.
  */
 export function computeStreakWithCarry(
   history: Array<{ date: string; completedCount: number }>,
   todayDate: string,
   carry?: { anchorDate: string; streakDays: number } | null,
-  totalTasks: number = TOTAL_ALIGNMENT_TASKS
+  totalTasks: number = TOTAL_ALIGNMENT_TASKS,
+  isPracticeDay: (date: string) => boolean = EVERY_DAY
 ): number {
-  const streak = computeStreak(history, todayDate, totalTasks)
-  if (!carry || history.length === 0) return streak
+  const { streak, reachedStart } = walkStreak(history, todayDate, totalTasks, isPracticeDay)
+  if (!carry || history.length === 0 || !reachedStart) return streak
 
-  const countMap = new Map(history.map(({ date, completedCount }) => [date, completedCount]))
-  let currentDate = countMap.get(todayDate) === totalTasks
-    ? todayDate
-    : shiftDays(todayDate, -1)
-  let counted = 0
-  while (countMap.get(currentDate) === totalTasks) {
-    counted++
-    currentDate = shiftDays(currentDate, -1)
-  }
-
-  const oldestDate = history[0].date
-  if (counted > 0 && currentDate < oldestDate && shiftDays(oldestDate, -1) === carry.anchorDate) {
+  const oldestDate = history.reduce((min, item) => (item.date < min ? item.date : min), history[0].date)
+  if (shiftDays(oldestDate, -1) === carry.anchorDate) {
     return streak + Math.max(0, carry.streakDays)
   }
   return streak
@@ -242,7 +244,8 @@ export function buildStreakHistory(
   history: Array<{ date: string; completedCount: number }>,
   todayDate: string,
   daysCount = 14,
-  totalTasks = TOTAL_ALIGNMENT_TASKS
+  totalTasks = TOTAL_ALIGNMENT_TASKS,
+  isPracticeDay: (date: string) => boolean = EVERY_DAY
 ): DailyStreakDay[] {
   const countMap = new Map<string, number>()
   for (const item of history) {
@@ -272,6 +275,7 @@ export function buildStreakHistory(
       total: totalTasks,
       pct,
       isToday,
+      offDay: !isPracticeDay(dStr),
     })
   }
   return result
