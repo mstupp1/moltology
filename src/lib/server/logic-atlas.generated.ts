@@ -11067,8 +11067,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "sources": [
         {
           "kind": "pr",
-          "label": "PR #500",
-          "url": "https://github.com/mstupp1/moltology/pull/500"
+          "label": "PR #501",
+          "url": "https://github.com/mstupp1/moltology/pull/501"
         }
       ],
       "sections": [

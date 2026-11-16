@@ -7,7 +7,7 @@ domains: [progression]
 rules: [progression.practice-days]
 status: accepted
 sources:
-  - pr: 500
+  - pr: 501
 ---
 
 ## Context
