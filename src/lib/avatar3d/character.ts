@@ -8,7 +8,7 @@ import type { AvatarPose, AvatarTemperament } from '../avatar/traits'
 import { equipAll } from './equipment'
 import type { Avatar3DLook } from './look'
 import { buildOccluders, buildSprings, type Spring } from './flex'
-import { buildMaterials, disposeMaterials, repaintMaterials, shadeWith, waterOf } from './materials'
+import { buildMaterials, disposeMaterials, repaintMaterials, shadeWith } from './materials'
 import { arc, hops, jitter, MOODS, REACTION_SECONDS, type Mood, type Reaction } from './motion'
 import { POSES, poseExtras, poseTargets } from './poses'
 import { aimQuaternion, Rig, type MaterialSlot } from './rig'
@@ -67,8 +67,6 @@ export interface Character3D {
    * viewer's right, y up), for the eyes to follow. Null lets them wander again.
    */
   lookAt: (at: { x: number; y: number } | null) => void
-  /** Faint moving light from the water above, 0 (off) to 1. For the live full view only. */
-  setWater: (strength: number) => void
   /** Play a short reaction over the current pose. `side` is 1 for the character's left claw. */
   react: (kind: Reaction, side?: 1 | -1) => void
   /** The bone that carries a mesh of this character (for working out what was tapped). */
@@ -216,7 +214,6 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   rig.finalizeSkinned(materials)
   const occluders = buildOccluders(rig)
   shadeWith(materials, occluders.spheres, occluders.count)
-  const water = waterOf(materials)
   const fan = TAIL_FAN.map((_, i) => `tailFan${i}`).filter((name) => rig.bones.has(name))
   const swimmerets = SWIMMERETS.flatMap((_, i) => [`swimmeret${i}L`, `swimmeret${i}R`]).filter((name) => rig.bones.has(name))
 
@@ -414,7 +411,6 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     // How far the tail fan spreads (radians between paddles) and how far its plates curl, outer first.
     let fanSpread = 0
     let fanCurl = 0
-    water.time.value = time
 
     if (!idle) {
       if (reaction && held) aimPose(held, true)
@@ -661,9 +657,6 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     repaint(next) {
       character.look = next
       repaintMaterials(materials, paint(next))
-    },
-    setWater(strength) {
-      water.strength.value = Math.min(Math.max(strength, 0), 1)
     },
     setTemperament(temperament) {
       mood = MOODS[temperament ?? 'calm']

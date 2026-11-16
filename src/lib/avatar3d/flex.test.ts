@@ -9,13 +9,14 @@ describe('bendy parts and springs', () => {
       const c = buildCharacter(baselineLook(race))
       const skinned = c.rig.meshes.filter((m): m is SkinnedMesh => m instanceof SkinnedMesh)
       expect(c.rig.chains.get('antennaL')?.bones.length).toBe(4)
-      expect(skinned.some((m) => m.userData.bone === 'antennaL')).toBe(true)
-      for (const joint of ['forearmL', 'shinR', 'clawL']) expect(skinned.some((m) => m.userData.bone === joint)).toBe(true)
+      // Every bendy piece shares one mesh and one skeleton, so it costs one draw call.
+      expect(skinned).toHaveLength(1)
+      const bones = skinned[0].skeleton.bones.map((b) => b.name)
+      for (const bone of ['antennaL', 'antennaL3', 'forearmL', 'shinR', 'clawL']) expect(bones).toContain(bone)
       for (const m of skinned) {
         const w = m.geometry.getAttribute('skinWeight')
         for (let i = 0; i < w.count; i++) expect(w.getX(i) + w.getY(i) + w.getZ(i) + w.getW(i)).toBeCloseTo(1, 4)
       }
-      expect(c.boneOf(skinned[0])).toBe(skinned[0].userData.bone)
       c.dispose()
     }
   })
@@ -72,12 +73,11 @@ describe('detail pass', () => {
 
   it('gives the lobster a five-paddle fan and swimmerets, drawn in the thin-shell material', () => {
     const c = buildCharacter(baselineLook('lobster'))
-    for (let i = 0; i < 5; i++) expect(c.rig.mesh(`tailFan${i}`, 'fin')).toBeDefined()
-    expect(c.rig.mesh('swimmeret0L', 'fin')).toBeDefined()
-    expect(c.rig.meshes.some((m) => m.userData.bone === 'antennaL' && (m.material as unknown as { userData: { uniforms: { uThin: { value: number } } } }).userData.uniforms.uThin.value === 1)).toBe(true)
-    c.setWater(2)
-    const u = (c.rig.mesh('chest', 'shell')!.material as unknown as { userData: { uniforms: { uWater: { value: number } } } }).userData.uniforms
-    expect(u.uWater.value).toBe(1)
+    const fin = c.rig.meshes.find((m): m is SkinnedMesh => m instanceof SkinnedMesh)!
+    const bones = fin.skeleton.bones.map((b) => b.name)
+    for (let i = 0; i < 5; i++) expect(bones).toContain(`tailFan${i}`)
+    expect(bones).toContain('swimmeret0L')
+    expect((fin.material as unknown as { userData: { uniforms: { uThin: { value: number } } } }).userData.uniforms.uThin.value).toBe(1)
     c.dispose()
   })
 })
