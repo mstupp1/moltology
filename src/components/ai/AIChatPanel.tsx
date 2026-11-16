@@ -60,6 +60,8 @@ import { useOracleUsage } from '@/hooks/useOracleUsage'
 import { isAdmin } from '@/lib/permissions'
 import { CHAT_LIMIT, getChatLimitError } from '@/lib/ai/chat-retention'
 import { readSkillPart, usableSkills } from '@/lib/oracle-skills'
+import { readReadsPart, type OracleReadItem } from '@/lib/oracle-reads'
+import { OracleReadsLabel } from './OracleReadsLabel'
 import { useOracleSkills } from '@/hooks/useOracleSkills'
 
 const INLINE_COMPOSER_MIN_WIDTH = 640
@@ -108,6 +110,8 @@ interface ChatMessage {
   stopped?: boolean
   /** The skill that shaped an assistant reply. */
   skill?: { id: string; name: string }
+  /** Site content the Oracle read for an assistant reply. */
+  reads?: OracleReadItem[]
 }
 
 /** Distance from the bottom (px) that still counts as reading the latest turn. */
@@ -119,11 +123,13 @@ const isAbortError = (err: unknown) =>
 
 function toChatMessage(r: any, isMounted: boolean): ChatMessage {
   const skill = r.role === 'assistant' ? readSkillPart(r.parts) : null
+  const reads = r.role === 'assistant' ? readReadsPart(r.parts) : []
   return {
     id: r.id,
     role: r.role,
     content: r.content,
     ...(skill ? { skill: { id: skill.id, name: skill.name } } : {}),
+    ...(reads.length ? { reads } : {}),
     timestamp:
       r.createdAt && isMounted
         ? new Date(r.createdAt).toLocaleTimeString([], {
@@ -739,6 +745,14 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         onThreadId: applyThreadId,
         onChunk: queueStreamText,
         onSkill: labelReply,
+        onReads: (reads) => {
+          setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, reads } : m)))
+        },
+        // The page behind the chat, so "summarize this" means that page. The full
+        // Oracle page has nothing behind it.
+        page: typeof window !== 'undefined' && !window.location.pathname.startsWith('/oracle')
+          ? window.location.pathname
+          : undefined,
       })
 
       if (res.threadId) {
@@ -1205,6 +1219,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                                     Using {msg.skill.name}
                                   </Link>
                                 )}
+                                {isAssistant && msg.reads?.length ? <OracleReadsLabel reads={msg.reads} /> : null}
                                 {msg.role === 'user' ? (
                                   msg.content
                                 ) : msg.content ? (

@@ -691,13 +691,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                         ADMIN
                       </span>
 
-                      {/* Tooltip */}
-                      <div aria-hidden className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/admin:opacity-100 transition-opacity duration-150">
-                        <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1.5 text-xs font-sans font-bold shadow-menu whitespace-nowrap flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow" />
-                          <span className="tracking-[0.08em] uppercase">ADMIN</span>
-                        </div>
-                      </div>
                     </button>
                   </div>
                 )}
@@ -756,15 +749,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       SUPPORT
                     </span>
 
-                    {/* Tooltip */}
-                    <div aria-hidden className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/help:opacity-100 transition-opacity duration-150">
-                      <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1.5 text-xs font-sans font-bold shadow-menu whitespace-nowrap flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow" />
-                        <span className="tracking-[0.08em] uppercase">
-                          SUPPORT
-                        </span>
-                      </div>
-                    </div>
                   </button>
                 </div>
 
