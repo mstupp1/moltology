@@ -14,10 +14,13 @@ const CRUMB =
 export function ForumBandCrumbs({
   board,
   current,
+  page,
 }: {
   board?: { slug: string; name: string; color?: string | null } | null
   /** The board page itself, so its crumb is the current page rather than a link back. */
   current?: boolean
+  /** A forum page that is not a board (Leaderboard): shown as the current crumb. */
+  page?: string
 }) {
   return (
     <HudTitleBandTop>
@@ -47,6 +50,14 @@ export function ForumBandCrumbs({
                   <span className="truncate">{board.name}</span>
                 </Link>
               )}
+            </li>
+          ) : null}
+          {page ? (
+            <li className="flex min-w-0 items-center">
+              <ChevronRight className="h-3.5 w-3.5 shrink-0 text-ink-muted/60" aria-hidden="true" />
+              <span aria-current="page" className={cn(CRUMB, 'min-w-0 font-bold text-ink')}>
+                <span className="truncate">{page}</span>
+              </span>
             </li>
           ) : null}
         </ol>

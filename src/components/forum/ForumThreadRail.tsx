@@ -12,6 +12,7 @@ import { HudButton } from '@/components/ui/HudButton'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { ForumAvatar } from './ForumAvatar'
 import { StageBadge, VoteButton } from './ForumBits'
+import { RankCrest } from '@/components/leaderboard/RankCrest'
 import { BoardDot } from './ForumBandCrumbs'
 import { cn } from '@/lib/utils'
 
@@ -85,8 +86,11 @@ export function ForumThreadRail({
             size="xl"
           />
           <span className="min-w-0 space-y-0.5">
-            <span className="block text-sm font-bold text-ink truncate group-hover:text-cyan-glow transition-colors">
-              {topic.authorName}
+            <span className="flex items-center gap-1.5 min-w-0">
+              <span className="block text-sm font-bold text-ink truncate group-hover:text-cyan-glow transition-colors">
+                {topic.authorName}
+              </span>
+              <RankCrest userId={topic.userId} />
             </span>
             {handle ? <span className="block text-[11px] text-ink-muted truncate">@{handle}</span> : null}
             <span className="flex items-center gap-2 text-[11px] text-ink-muted">

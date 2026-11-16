@@ -5,6 +5,7 @@ import { forumVisibleLength } from '@/lib/forum-markdown'
 import { Link } from '@tanstack/react-router'
 import { AlertTriangle, ChevronDown, ChevronRight, MessageSquare, Link2, Check, Quote, MoreHorizontal, Pencil, Undo2, Flag } from 'lucide-react'
 import { VoteButton, StageBadge } from '@/components/forum/ForumBits'
+import { RankCrest } from '@/components/leaderboard/RankCrest'
 import { HudButton } from '@/components/ui/HudButton'
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { ReplyComposer } from '@/components/forum/ReplyComposer'
@@ -225,6 +226,7 @@ export function ForumPostCard({
                 OP
               </span>
             )}
+            <RankCrest userId={post.userId} />
             <StageBadge stage={post.authorStage} />
             <span className="inline-flex items-center gap-1">
               <LocalTime value={post.createdAt} format={relativeTime} titleFormat={formatDayTime} />

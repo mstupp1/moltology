@@ -1363,3 +1363,40 @@ export const saveCharacterFn = createServerFn({ method: 'POST' })
     const { saveCharacterHandler } = await import('./db-services')
     return saveCharacterHandler(args as Parameters<typeof saveCharacterHandler>[0])
   })
+
+/* ── Community leaderboard ─────────────────────────────────── */
+
+export type { LeaderboardEntry, LeaderboardView, RankHonors, CrestHolder } from './leaderboard'
+
+/** Public: weekly or all-time XP ranking, last week's crest holders and lasting records. */
+export const getLeaderboardFn = createServerFn({ method: 'POST' })
+  .middleware(loggingOnlyMiddleware)
+  .validator((data: { window?: 'week' | 'all'; viewerId?: string; limit?: number; offset?: number; stage?: number | null }) =>
+    z
+      .object({
+        window: z.enum(['week', 'all']).default('week'),
+        viewerId: z.string().max(128).optional(),
+        limit: z.number().int().min(1).max(25).optional(),
+        offset: z.number().int().min(0).max(100_000).optional(),
+        stage: z.number().int().min(1).max(4).nullable().optional(),
+      })
+      .parse(data || {}),
+  )
+  .handler(async ({ data }) => {
+    const { getLeaderboard } = await import('./leaderboard')
+    return getLeaderboard({
+      window: data.window,
+      viewerId: data.viewerId ?? null,
+      limit: data.limit,
+      offset: data.offset,
+      stage: data.stage ?? null,
+    })
+  })
+
+/** Public: who wears a crest this week and every member's top-3 record. Small and cached client-side. */
+export const getRankHonorsFn = createServerFn({ method: 'POST' })
+  .middleware(loggingOnlyMiddleware)
+  .handler(async () => {
+    const { getRankHonors } = await import('./leaderboard')
+    return getRankHonors()
+  })

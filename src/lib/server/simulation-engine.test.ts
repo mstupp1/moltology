@@ -38,6 +38,7 @@ vi.mock('./activity-log', () => ({
 }))
 
 vi.mock('./gems', () => ({ awardGems: vi.fn().mockResolvedValue(undefined) }))
+vi.mock('./simulation-xp', () => ({ awardSimulatedTaskXp: vi.fn().mockResolvedValue(undefined) }))
 
 vi.mock('./db-services', () => ({
   recordForumMentions: vi.fn().mockResolvedValue(['mock-user-id']),
@@ -327,6 +328,9 @@ describe('Simulation Engine', () => {
         'sim-user-1',
         expect.arrayContaining([expect.objectContaining({ source: 'simulation', amount: 15 })]),
       )
+      // XP lands on the same ledger as real members, for the leaderboard.
+      const { awardSimulatedTaskXp } = await import('./simulation-xp')
+      expect(vi.mocked(awardSimulatedTaskXp)).toHaveBeenCalledWith(mockDb, 'sim-user-1', res.actions[0].tasks, expect.any(String), undefined)
     })
   })
 
