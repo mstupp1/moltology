@@ -63,7 +63,7 @@ One difficult thing learned on purpose. Not consumed. Learned. The plating thick
 the pressures of next quarter, not this one, which is why this block is the first thing
 every member drops and the last thing they should.
 
-### Midday: Focus Reset
+### Midday: Low Tide
 
 Surface for a moment and clear one thing that has been pulling at you since morning. Close
 the tab, answer the nagging message, or eat the lunch you skipped. Then choose the next

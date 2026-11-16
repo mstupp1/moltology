@@ -52,7 +52,7 @@ describe('activity event copy and mapping', () => {
     expect(task).toBeDefined()
     const copy = buildRoutineCompletedCopy(task!)
     expect(copy.kind).toBe(ACTIVITY_EVENT_KIND_ROUTINE_COMPLETED)
-    expect(copy.title).toBe('Silent Synchronization sealed')
+    expect(copy.title).toBe('Sit in silence sealed')
     expect(copy.detail).toBe('The Early morning liturgy is complete.')
     expect(copy.valueBadge).toBe('Early morning')
     const blob = `${copy.title} ${copy.detail} ${copy.valueBadge}`
@@ -213,7 +213,7 @@ describe('activity event copy and mapping', () => {
         id: 'evt-1',
         userId: 'user-1',
         kind: ACTIVITY_EVENT_KIND_ROUTINE_COMPLETED,
-        title: 'Silent Synchronization sealed',
+        title: 'Sit in silence sealed',
         detail: 'The 05:30 liturgy is complete.',
         valueBadge: '05:30',
         createdAt: new Date('2026-08-27T17:46:00.000Z'),

@@ -66,7 +66,7 @@ describe('activity event log helpers', () => {
       expect.objectContaining({
         userId: 'user-1',
         kind: ACTIVITY_EVENT_KIND_ROUTINE_COMPLETED,
-        title: 'Silent Synchronization sealed',
+        title: 'Sit in silence sealed',
         detail: 'The Early morning liturgy is complete.',
         valueBadge: 'Early morning',
         sourceKey: 'routine:silent-synchronization:2026-08-27',
@@ -252,7 +252,7 @@ describe('activity event log helpers', () => {
         id: 'evt-1',
         userId: 'user-1',
         kind: ACTIVITY_EVENT_KIND_ROUTINE_COMPLETED,
-        title: 'Silent Synchronization sealed',
+        title: 'Sit in silence sealed',
         detail: 'The 05:30 liturgy is complete.',
         valueBadge: '05:30',
         createdAt: new Date('2026-08-27T17:46:00.000Z'),
@@ -269,7 +269,7 @@ describe('activity event log helpers', () => {
       new Date('2026-08-27T18:00:00.000Z')
     )
     expect(events).toHaveLength(1)
-    expect(events[0].title).toBe('Silent Synchronization sealed')
+    expect(events[0].title).toBe('Sit in silence sealed')
     expect(events[0].occurredLabel).toBe('14 minutes ago')
     expect(events[0].actor.displayName).toBe('claw_lord')
   })

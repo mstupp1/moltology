@@ -779,7 +779,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       },
       {
         "verseNumber": 5,
-        "heading": "Midday: Focus Reset",
+        "heading": "Midday: Low Tide",
         "text": "Surface for a moment and clear one thing that has been pulling at you since morning. Close\nthe tab, answer the nagging message, or eat the lunch you skipped. Then choose the next\nuseful action before the afternoon chooses it for you. The rite is indifferent to what gets\ncleared and extremely interested in whether the afternoon survives it."
       },
       {
