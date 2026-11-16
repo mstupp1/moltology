@@ -192,27 +192,10 @@ const shellUniforms = () => ({
   uOccN: { value: 0 },
   uThin: { value: 0 },
   uWet: { value: 0 },
-  // Faint moving light from the water above (0 off), and the time it moves by.
-  uWater: { value: 0 },
-  uTime: { value: 0 },
 })
 
 /** Let a character's shell materials shade themselves with its own occluder spheres. */
 const SHELL_SLOTS = ['shell', 'fin', 'belly', 'brow'] as const
-
-/**
- * The live water state shared by one character's shell materials: how strong the moving light
- * from above is, and the clock it moves by.
- */
-export function waterOf(materials: Record<MaterialSlot, Material>): { strength: { value: number }; time: { value: number } } {
-  const u = (materials.shell as MeshPhysicalMaterial).userData.uniforms as ShellUniforms
-  for (const slot of SHELL_SLOTS) {
-    const v = (materials[slot] as MeshPhysicalMaterial).userData.uniforms as ShellUniforms
-    v.uWater = u.uWater
-    v.uTime = u.uTime
-  }
-  return { strength: u.uWater, time: u.uTime }
-}
 
 export function shadeWith(materials: Record<MaterialSlot, Material>, spheres: Vector4[], count: number): void {
   for (const slot of SHELL_SLOTS) {
@@ -245,7 +228,7 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         varying vec3 vA3Normal;
         uniform vec4 uOcc[${OCCLUDERS}];
         uniform int uOccN;
-        uniform float uThin; uniform float uWet; uniform float uWater; uniform float uTime;
+        uniform float uThin; uniform float uWet;
         uniform vec3 uShade; uniform vec3 uMark; uniform vec3 uSplit; uniform vec3 uSoft;
         uniform int uMarking; uniform float uMarkScale; uniform float uGrain; uniform float uDetail; uniform float uGlow; uniform float uMarkGlow;
         float a3Mask = 0.0;
@@ -332,13 +315,6 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         if (a3Thin > 0.0) {
           float a3Rim = 1.0 - abs(dot(normal, normalize(vViewPosition)));
           reflectedLight.directDiffuse += diffuseColor.rgb * vec3(1.0, 0.86, 0.72) * a3Thin * (0.1 + 0.55 * a3Rim * a3Rim) * a3Occ;
-        }
-        // Light from the water above: soft bright lines drifting over whatever faces up.
-        if (uWater > 0.0) {
-          vec3 a3Q = vec3(vA3World.x * 4.2, vA3World.z * 4.2 + vA3World.y * 1.5, uTime * 0.32);
-          float a3E = min(a3CellEdge(a3Q), a3CellEdge(a3Q * 1.7 + vec3(3.1, 7.7, uTime * 0.21)) * 1.3);
-          float a3Caustic = pow(1.0 - smoothstep(0.0, 0.16, a3E), 2.0) * (0.35 + 0.65 * max(a3N.y, 0.0));
-          reflectedLight.directDiffuse += diffuseColor.rgb * vec3(0.75, 0.95, 1.0) * a3Caustic * uWater * 0.55 * a3Occ;
         }`,
       )
       .replace(
@@ -347,7 +323,7 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         totalEmissiveRadiance += diffuseColor.rgb * uGlow + uMark * a3Mask * uMarkGlow;`,
       )
   }
-  material.customProgramCacheKey = () => 'avatar3d-shell-6'
+  material.customProgramCacheKey = () => 'avatar3d-shell-7'
   return material
 }
 

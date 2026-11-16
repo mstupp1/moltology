@@ -26,8 +26,8 @@ export function addSleeve(rig: Rig, parent: string, child: string, radius: numbe
   const a = joint.clone().addScaledVector(into, -reach)
   const b = joint.clone().addScaledVector(out, reach)
 
-  const rows = 16
-  const radial = 22
+  const rows = 12
+  const radial = 16
   const at = (t: number) =>
     a
       .clone()
@@ -85,19 +85,11 @@ export function addSleeve(rig: Rig, parent: string, child: string, radius: numbe
   geo.setAttribute('color', new BufferAttribute(colors, 3))
   geo.setAttribute('uv', new BufferAttribute(uvs, 2))
   geo.setIndex(index)
-  // Each point's share of the child bone, looked up by position since the rig only hands over points.
-  const byPoint = new Map<string, number>()
-  for (let k = 0; k < weights.length; k++) byPoint.set(key(positions, k), weights[k])
-  rig.addSkinned(child, 'fin', geo, (q) => {
-    const w = byPoint.get(key(q.toArray(), 0)) ?? 1
-    return [
-      [parent, 1 - w],
-      [child, w],
-    ]
-  })
+  rig.addSkinned(child, 'fin', geo, (_p, k) => [
+    [parent, 1 - weights[k]],
+    [child, weights[k]],
+  ])
 }
-
-const key = (arr: ArrayLike<number>, k: number) => `${arr[k * 3].toFixed(5)},${arr[k * 3 + 1].toFixed(5)},${arr[k * 3 + 2].toFixed(5)}`
 
 /**
  * Weights for an antenna along its chain: each point goes to the link that carries its spot on

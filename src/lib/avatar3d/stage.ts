@@ -58,8 +58,6 @@ export interface StageOptions {
    * meshes. Either way the stage lowers its own resolution if frames run slow.
    */
   quality?: 'high' | 'low'
-  /** Faint moving light from the water above the character, 0 (off) to 1. Live views only. */
-  water?: number
   /** The browser took the 3D context away (too many canvases, or the graphics driver reset). */
   onContextLost?: () => void
 }
@@ -73,8 +71,6 @@ export interface Stage {
   setLook: (look: Avatar3DLook, fresh?: boolean) => void
   setPose: (pose: AvatarPose, immediate?: boolean) => void
   setYaw: (yaw: number) => void
-  /** Turn the moving water light on (up to 1) or off (0). */
-  setWater: (strength: number) => void
   /** Slow automatic turntable, in radians per second (0 stops it). */
   setSpin: (speed: number) => void
   /**
@@ -287,7 +283,6 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   let tilt = 0
   let framing = options.framing ?? 'full'
   let spin = 0
-  let water = options.water ?? 0
   let velocity = 0
   let dragging = false
   let lastX = 0
@@ -541,7 +536,6 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       // A live character on a phone is built from slightly coarser meshes; stills choose their own detail.
       character = low && !options.manual ? withLoftDetail(0.8, () => buildCharacter(look)) : buildCharacter(look)
       scene.add(character.root)
-      character.setWater(options.reducedMotion ? 0 : water)
       lightHalo(look, character.height)
       // New gear on a live character: it tries the piece on.
       if (before && follow && JSON.stringify(before.equipment ?? {}) !== JSON.stringify(look.equipment ?? {})) character.react('equip')
@@ -554,11 +548,6 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     },
     setYaw: (value) => {
       yaw = value
-      wake()
-    },
-    setWater(strength) {
-      water = strength
-      character?.setWater(options.reducedMotion ? 0 : strength)
       wake()
     },
     setSpin: (speed) => {

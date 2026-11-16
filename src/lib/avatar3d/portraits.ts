@@ -100,7 +100,7 @@ export function renderStill(look: Avatar3DLook, px: number, shot: StillShot = 'p
   const hit = cache.get(key)
   if (hit) return hit
   // Drawn at twice the size and scaled down, which gives cleaner edges than antialiasing alone.
-  const drawn = Math.min(px * SUPERSAMPLE, 1024)
+  const drawn = Math.min(px * SUPERSAMPLE, 512)
   const entry = stageFor(shot === 'portrait' ? 'portrait' : 'full', drawn)
   const { stage } = entry
   // A small picture cannot show fine tessellation, so it is built from coarser meshes: much quicker.

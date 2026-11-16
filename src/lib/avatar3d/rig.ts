@@ -49,7 +49,7 @@ export interface Wearable {
 const FORWARD = new Vector3(0, 0, 1)
 
 /** How much each bone moves one vertex: pairs of bone name and weight. */
-export type Weigh = (p: Vector3) => [string, number][]
+export type Weigh = (p: Vector3, index: number) => [string, number][]
 
 /** Orientation with +Z along `z` and +Y as close to `up` as it can be. */
 export function lookQuaternion(z: Vector3, up = new Vector3(0, 1, 0)): Quaternion {
@@ -82,7 +82,7 @@ export class Rig {
   wear: Wearable | null = null
   /** Bone chains that bend (antennae): the base bone, the chain and where along the path each link starts. */
   readonly chains = new Map<string, { bones: string[]; at: number[] }>()
-  private readonly skinned: { anchor: string; slot: MaterialSlot; geo: BufferGeometry; weigh: Weigh }[] = []
+  private readonly skinned: { anchor: string; slot: MaterialSlot; geo: BufferGeometry; weigh?: Weigh }[] = []
 
   constructor() {
     this.root.name = 'avatar3d'
@@ -177,11 +177,17 @@ export class Rig {
 
   /**
    * Skinned geometry, authored in character space at rest, that bends with several bones.
-   * `anchor` is the bone it is measured from (taps on it count as that bone).
+   * `anchor` is the bone it is measured from; without `weigh` it simply rides that bone.
    */
-  addSkinned(anchor: string, slot: MaterialSlot, geo: BufferGeometry, weigh: Weigh): void {
+  addSkinned(anchor: string, slot: MaterialSlot, geo: BufferGeometry, weigh?: Weigh): void {
     this.bone(anchor)
     this.skinned.push({ anchor, slot, geo, weigh })
+  }
+
+  /** Rigid geometry in a bone's own space, drawn as part of that material's single skinned mesh. */
+  addRiding(bone: string, slot: MaterialSlot, geo: BufferGeometry): void {
+    const r = this.restWorldOf(bone)
+    this.addSkinned(bone, slot, geo.applyMatrix4(new Matrix4().compose(r.position, r.quaternion, new Vector3(1, 1, 1))))
   }
 
   /**
@@ -193,40 +199,42 @@ export class Rig {
     this.root.updateMatrixWorld(true)
     const toRoot = this.root.matrixWorld.clone().invert()
     const p = new Vector3()
+    // Every bendy piece in one material becomes one mesh with one skeleton: one draw call.
+    const bySlot = new Map<MaterialSlot, { names: string[]; geos: BufferGeometry[] }>()
     for (const { anchor, slot, geo, weigh } of this.skinned) {
+      const group = bySlot.get(slot) ?? { names: [], geos: [] }
+      bySlot.set(slot, group)
+      const { names } = group
+      const slotOf = (name: string) => {
+        let at = names.indexOf(name)
+        if (at < 0) at = names.push(name) - 1
+        return at
+      }
       const r = this.restWorldOf(anchor)
       const move = toRoot.clone().multiply(this.bone(anchor).matrixWorld).multiply(new Matrix4().compose(r.position, r.quaternion, new Vector3(1, 1, 1)).invert())
       const pos = geo.getAttribute('position')
       // Markings are painted from where each point sat when the body was authored.
       if (!geo.getAttribute('restPos')) geo.setAttribute('restPos', new BufferAttribute(new Float32Array(pos.array as Float32Array), 3))
-      const names: string[] = []
       const index = new Uint16Array(pos.count * 4)
       const weight = new Float32Array(pos.count * 4)
       for (let i = 0; i < pos.count; i++) {
-        const pairs = weigh(p.fromBufferAttribute(pos, i))
-          .filter(([, w]) => w > 1e-4)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 4)
+        const pairs = weigh ? weigh(p.fromBufferAttribute(pos, i), i).filter(([, w]) => w > 1e-4) : []
+        if (pairs.length > 4) pairs.sort((a, b) => b[1] - a[1]).length = 4
+        if (!pairs.length) pairs.push([anchor, 1])
         const sum = pairs.reduce((t, [, w]) => t + w, 0) || 1
         pairs.forEach(([name, w], k) => {
-          let at = names.indexOf(name)
-          if (at < 0) at = names.push(name) - 1
-          index[i * 4 + k] = at
+          index[i * 4 + k] = slotOf(name)
           weight[i * 4 + k] = w / sum
         })
-        if (!pairs.length) {
-          let at = names.indexOf(anchor)
-          if (at < 0) at = names.push(anchor) - 1
-          index[i * 4] = at
-          weight[i * 4] = 1
-        }
       }
       geo.applyMatrix4(move)
       geo.setAttribute('skinIndex', new BufferAttribute(index, 4))
       geo.setAttribute('skinWeight', new BufferAttribute(weight, 4))
-      const mesh = new SkinnedMesh(geo, materials[slot])
-      mesh.name = `${anchor}:${slot}:skin`
-      mesh.userData.bone = anchor
+      group.geos.push(geo)
+    }
+    for (const [slot, { names, geos }] of bySlot) {
+      const mesh = new SkinnedMesh(merge(geos), materials[slot])
+      mesh.name = `skin:${slot}`
       mesh.castShadow = true
       mesh.receiveShadow = slot !== 'eye' && slot !== 'glow'
       // It moves with its bones, so its resting bounds say little about where it is.

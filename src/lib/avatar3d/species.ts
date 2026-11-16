@@ -7,7 +7,7 @@
 import { CatmullRomCurve3, Quaternion, SphereGeometry, TorusGeometry, Vector3 } from 'three'
 import type { AvatarAntennae, AvatarBuild, AvatarClaws, AvatarHeadShape, AvatarMouth } from '../avatar/traits'
 import type { Expression } from '../avatar/parts'
-import { loft, uprightFrame, type Loft, type LoftKey } from './loft'
+import { loft, uprightFrame, withLoftDetail, type Loft, type LoftKey } from './loft'
 import {
   alongY,
   bellyPlates,
@@ -564,7 +564,7 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   const tailQ = new Quaternion().setFromAxisAngle(v(1, 0, 0), 0.1)
   TAIL_FAN.forEach((a, i) => {
     rig.addBone(`tailFan${i}`, 'tail', tailAt, { quaternion: tailQ.clone().multiply(new Quaternion().setFromAxisAngle(v(0, 0, 1), deg(a))) })
-    rig.add(`tailFan${i}`, 'fin', tailLobe(a === 0 ? 0.31 : 0.29, 0.16, 0.2))
+    rig.addRiding(`tailFan${i}`, 'fin', tailLobe(a === 0 ? 0.31 : 0.29, 0.16, 0.2))
   })
 
   // Swimmerets: small paired paddles down the sides of the belly, as under a real tail.
@@ -576,7 +576,7 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
       const out = abdomen.normal(sp, theta).multiplyScalar(0.55).add(v(0, -1, 0.15))
       const name = `swimmeret${i}${tag}`
       rig.addBone(name, 'pelvis', at, { aim: at.clone().add(out), facing: abdomen.normal(sp, theta) })
-      rig.add(name, 'fin', tailLobe(0.085 - i * 0.008, 0.05, 0.32))
+      rig.addRiding(name, 'fin', withLoftDetail(0.5, () => tailLobe(0.085 - i * 0.008, 0.05, 0.32)))
     })
   }
 

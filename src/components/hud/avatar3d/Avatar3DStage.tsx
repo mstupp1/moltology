@@ -15,22 +15,18 @@ export interface Avatar3DStageProps {
   focus?: string | null
   /** Called once the first frame of the character is on screen. */
   onReady?: () => void
-  /** Faint moving light from the water above (on unless turned off; never with reduced motion). */
-  water?: boolean
 }
 
 /**
  * Live 3D character. The renderer loads only in the browser and only when this mounts, so pages
  * that never show a 3D character never download it.
  */
-export function Avatar3DStage({ look, spin = false, className, label, focus = null, onReady, water = true }: Avatar3DStageProps) {
+export function Avatar3DStage({ look, spin = false, className, label, focus = null, onReady }: Avatar3DStageProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const stageRef = useRef<Stage | null>(null)
   const lookRef = useRef(look)
   const spinRef = useRef(spin)
   const focusRef = useRef(focus)
-  const waterRef = useRef(water)
-  waterRef.current = water
   lookRef.current = look
   spinRef.current = spin
   focusRef.current = focus
@@ -51,7 +47,7 @@ export function Avatar3DStage({ look, spin = false, className, label, focus = nu
         // If the browser takes 3D away, the page shows the plain placeholder instead.
         // Phones and small machines get the lighter setup; the stage also adapts if frames run slow.
         const quality = window.matchMedia('(pointer: coarse)').matches || (navigator.hardwareConcurrency ?? 8) <= 4 ? 'low' : 'high'
-        const stage = createStage(canvas, { interactive: true, reducedMotion, lighting: 'cinematic', quality, water: waterRef.current ? 1 : 0, onContextLost: mark3DUnavailable })
+        const stage = createStage(canvas, { interactive: true, reducedMotion, lighting: 'cinematic', quality, onContextLost: mark3DUnavailable })
         stage.setLook(lookRef.current)
         stage.setSpin(spinRef.current && !reducedMotion ? 0.5 : 0)
         if (focusRef.current) stage.focus(focusRef.current)
@@ -92,10 +88,6 @@ export function Avatar3DStage({ look, spin = false, className, label, focus = nu
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     stageRef.current?.setSpin(spin && !reducedMotion ? 0.5 : 0)
   }, [spin])
-
-  useEffect(() => {
-    stageRef.current?.setWater(water ? 1 : 0)
-  }, [water])
 
   useEffect(() => {
     stageRef.current?.focus(focus)
