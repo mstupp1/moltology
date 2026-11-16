@@ -416,6 +416,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     // How open the mouth is (0 shut), how round, how far the brows rise and knit, how squashed the eyes are.
     let mouthOpen = 0
     let mouthRound = 0
+    // Speech draws the open mouth a size larger than a gasp, so it reads at phone size.
+    let mouthSize = 1
     let browUp = 0
     let browKnit = 0
     let squash = 0
@@ -560,10 +562,12 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       if (talk > 0.02) {
         // Speaking: the mouth opens with the voice (a reaction's bigger mouth wins), the head
         // nods a touch on the louder syllables and the brows ride up with emphasis.
-        const open = 0.15 + 0.7 * talk
+        // Eased so ordinary speech (levels around 0.3 to 0.6) still reads as a clearly open mouth.
+        const open = Math.min(1, 0.25 + 0.85 * Math.pow(talk, 0.7))
         if (open > mouthOpen) {
           mouthOpen = open
-          mouthRound = 0.25 + 0.3 * talk
+          mouthRound = 0.15 + 0.25 * talk
+          mouthSize = 1.35
         }
         overlay('chest', X, -0.03 * talk)
         browUp += 0.006 * talk
@@ -583,7 +587,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       mouthBone.visible = mouthOpen > 0.06
       if (mouthLine) mouthLine.visible = !mouthBone.visible
       // A cheer is wide, a gasp is round.
-      mouthBone.scale.set((1 - 0.42 * mouthRound) * (1 + 0.45 * (1 - mouthRound)), Math.max(mouthOpen * (1 + 0.35 * mouthRound), 1e-3), 1)
+      mouthBone.scale.set((1 - 0.42 * mouthRound) * (1 + 0.45 * (1 - mouthRound)) * mouthSize, Math.max(mouthOpen * (1 + 0.35 * mouthRound) * mouthSize, 1e-3), 1)
     }
     for (const b of brows) {
       b.bone.position.copy(b.rest)
