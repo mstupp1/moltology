@@ -22,6 +22,7 @@ import {
 } from '../ai-elements/message'
 import { useIsPhone, useKeyboardInset } from '../../hooks/useChatViewport'
 import { PromptInput } from '../ai-elements/prompt-input'
+import { ORACLE_DRAFT_EVENT, reportAlignmentAction, takeOracleDraft } from '@/lib/alignment-actions'
 import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS, pickLatestChat, pickRecentChats } from './NewChatScreen'
 import { OracleChatsPanel } from './OracleChatsPanel'
 import {
@@ -250,6 +251,19 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const memberHandle = memberProfile?.handle ?? null
   const memberLarvaId = memberProfile?.larvaId ?? null
   const [draft, setDraft] = useState('')
+  // A daily task can hand the chat box a starter line; sending it checks the task off.
+  const draftTaskKeyRef = useRef<string | null>(null)
+  useEffect(() => {
+    const pickUp = () => {
+      const waiting = takeOracleDraft()
+      if (!waiting) return
+      setDraft(waiting.text)
+      draftTaskKeyRef.current = waiting.taskKey ?? null
+    }
+    pickUp()
+    window.addEventListener(ORACLE_DRAFT_EVENT, pickUp)
+    return () => window.removeEventListener(ORACLE_DRAFT_EVENT, pickUp)
+  }, [])
   // Skills: what this member can use, and the one turned on for this chat (the chip).
   const { data: skillsData } = useOracleSkills(userId, Boolean(userId))
   const skillOptions = userId ? usableSkills(skillsData?.skills ?? []) : []
@@ -634,6 +648,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       setErrorMessage(getChatLimitError().message)
       setDraft((prev) => prev || text)
       return
+    }
+    if (draftTaskKeyRef.current) {
+      reportAlignmentAction(draftTaskKeyRef.current)
+      draftTaskKeyRef.current = null
     }
     stickToBottomRef.current = true
     const userMsg: ChatMessage = {

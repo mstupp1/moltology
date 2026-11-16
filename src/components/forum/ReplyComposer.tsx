@@ -12,6 +12,7 @@ import { ForumEditor, type ForumEditorHandle } from '@/components/forum/ForumEdi
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { prependForumQuote } from '@/lib/forum-quotes'
 import { HudButton } from '@/components/ui/HudButton'
+import { reportAlignmentAction } from '@/lib/alignment-actions'
 
 export type ReplyComposerHandle = {
   insertQuote: (markup: string) => void
@@ -106,6 +107,7 @@ export const ReplyComposer = forwardRef<
         },
       })
       onPosted(post)
+      reportAlignmentAction('community-outreach')
       setContent('')
       if (collapsible) setExpanded(false)
     } catch (err: any) {

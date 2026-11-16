@@ -113,6 +113,7 @@ export function ForumThreadRail({
             voted={topic.voted}
             targetId={topic.id}
             targetType="topic"
+            authorId={topic.userId}
             onResult={onVote}
             size="inline"
           />

@@ -25,6 +25,7 @@ import {
 } from './AcademyChrome'
 import { lessonKindIcon } from './AcademyCourseView'
 import { AcademyVideo } from './AcademyVideo'
+import { reportAlignmentAction } from '@/lib/alignment-actions'
 
 type NoteStatus = 'idle' | 'dirty' | 'saving' | 'saved' | 'error'
 
@@ -83,6 +84,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
         },
       })
       setDetail(saved.lesson)
+      if (action === 'complete') reportAlignmentAction('skill-development')
       if (action === 'complete') toast?.success(saved.awardedCredentialIds.length ? 'Lesson complete. A certification was issued.' : 'Lesson complete.')
       if (saved.awardedCredentialIds[0]) {
         toast?.info('Open Certificates to see the credential.', { id: 'academy-cert' })
@@ -130,6 +132,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
       })
       setDetail(result.lesson)
       setGrade(result.grade)
+      if (result.grade.passed) reportAlignmentAction('skill-development')
       toast?.[result.grade.passed ? 'success' : 'warning'](result.grade.passed ? ACADEMY_COPY.quizPass : ACADEMY_COPY.quizFail)
     } catch {
       toast?.error(ACADEMY_COPY.progressError)

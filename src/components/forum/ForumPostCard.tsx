@@ -299,6 +299,7 @@ export function ForumPostCard({
               voted={post.voted}
               targetId={post.id}
               targetType="post"
+              authorId={post.userId}
               onResult={onPostVote(post.id)}
               size="inline"
             />

@@ -108,7 +108,7 @@ describe('HUDTaskBar', () => {
     expect(screen.queryByRole('tab')).not.toBeInTheDocument()
     expect(screen.queryByText('Notifications')).not.toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: /Silent Synchronization/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Mark Silent Synchronization done' }))
     expect(onComplete).toHaveBeenCalledWith('silent-synchronization')
 
     fireEvent.click(screen.getByRole('button', { name: "Close today's tasks" }))
@@ -156,7 +156,7 @@ describe('HUDTaskBar', () => {
     render(<HUDTaskBar variant="header" />)
     fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
 
-    fireEvent.mouseDown(screen.getByRole('button', { name: /Silent Synchronization/ }))
+    fireEvent.mouseDown(screen.getByRole('button', { name: 'Mark Silent Synchronization done' }))
     expect(screen.getByTestId('alignment-panel')).toBeInTheDocument()
 
     fireEvent.mouseDown(document.body)

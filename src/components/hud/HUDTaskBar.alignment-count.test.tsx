@@ -19,6 +19,8 @@ const mockAlignment: AlignmentContextValue = {
   toggleTask: vi.fn(),
   setTaskCompleted: vi.fn(),
   openSilentSynchronization: vi.fn(),
+  openPractice: vi.fn(),
+  memberId: null,
   refetch: vi.fn(),
   currentDate: '2026-08-31',
   isGuest: false,
