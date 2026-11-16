@@ -11,10 +11,12 @@ import {
   Rss,
   ExternalLink,
   Info,
+  Coffee,
 } from 'lucide-react'
 import { Instagram, Youtube } from '@/components/ui/SocialIcons'
 import { useStoreDestination } from '@/components/store/useStoreDestination'
 import { FooterBrand } from '@/components/ui/FooterBrand'
+import { TIP_JAR_COPY, TIP_JAR_URL } from '@/lib/tip-jar'
 
 export interface MainFooterProps {
   className?: string
@@ -147,6 +149,18 @@ export const MainFooter: React.FC<MainFooterProps> = ({
                 <span>STORE</span>
               </Link>
             )}
+
+            {/* Tip jar (Buy Me a Coffee) */}
+            <a
+              href={TIP_JAR_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            >
+              <Coffee className="w-3.5 h-3.5 shrink-0 text-ink-muted" />
+              <span>{TIP_JAR_COPY.footerLabel}</span>
+              <ExternalLink className="w-2.5 h-2.5 opacity-70 shrink-0" />
+            </a>
 
             {/* Instagram */}
             <a
