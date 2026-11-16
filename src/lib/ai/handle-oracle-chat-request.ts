@@ -1,8 +1,10 @@
 import { getOraclePromptLengthError } from './prompt-limits'
 import {
   createTextStreamResponse,
+  isStepCount,
   streamText,
   toTextStream,
+  type ToolSet,
 } from 'ai'
 import { extractAuthToken } from '../server/middleware'
 import { verifyAuthJWT } from '../jwt'
@@ -15,6 +17,17 @@ import { resolveOracleSkillPlan } from '../server/oracle-skill-access'
 import { loadOracleChatSettingsForChat } from '../server/oracle-chat-settings'
 import { buildOracleChatSettingsContext } from './oracle-chat-settings-prompt'
 import { ORACLE_SKILL_HEADER, type OracleSkillPart } from '../oracle-skills'
+import { ORACLE_READS_HEADER, encodeReadsHeader, type OracleReadItem, type OracleReadsPart } from '../oracle-reads'
+import {
+  buildOraclePageContext,
+  createOracleReadTools,
+  ORACLE_MAX_READS_PER_REPLY,
+  ORACLE_READ_TOOLS_PROMPT,
+  parseOraclePage,
+  type OracleContentSource,
+  type OraclePageRef,
+} from './oracle-read-tools'
+import { oracleContentSource } from '../server/oracle-content-source'
 import {
   saveAIMessage,
   createAIThread,
@@ -77,6 +90,35 @@ export interface OracleChatRequestBody {
   model?: string
   /** A skill the member turned on in the chat box. Ignored unless they can use it. */
   skillId?: string
+  /** Path of the page open behind the chat, so "summarize this" can find it. */
+  page?: string
+}
+
+/**
+ * The Oracle's lookup tools for one reply: the site readers, plus the skill lookup when
+ * the member owns skills to discover. Lookups come first; the last step only answers.
+ */
+export function buildOracleReplyTools(params: {
+  source: OracleContentSource
+  onRead: (item: OracleReadItem) => void
+  skillTools?: { tools: ToolSet }
+}) {
+  const tools: ToolSet = {
+    ...createOracleReadTools(params.source, { onRead: params.onRead }),
+    ...(params.skillTools?.tools ?? {}),
+  }
+  // Up to ORACLE_MAX_READS_PER_REPLY lookup steps, then one step that only writes the answer.
+  const answerStep = ORACLE_MAX_READS_PER_REPLY
+  return {
+    tools,
+    stopWhen: isStepCount(answerStep + 1),
+    prepareStep: ({ stepNumber }: { stepNumber: number }) =>
+      stepNumber >= answerStep ? { activeTools: [] as string[] } : undefined,
+  }
+}
+
+function readsParts(reads: OracleReadItem[]): OracleReadsPart[] {
+  return reads.length ? [{ type: 'reads', items: reads }] : []
 }
 
 /**
@@ -136,7 +178,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   if (!userId) {
     const lengthError = getOraclePromptLengthError(userText, false)
     if (lengthError) return Response.json({ error: lengthError }, { status: 400 })
-    return handleGuestOracleChat(messages, userText, clientIp, request.signal)
+    return handleGuestOracleChat(messages, userText, clientIp, request.signal, parseOraclePage(body.page))
   }
 
   try {
@@ -226,17 +268,20 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     resolveOracleSkillPlan(userId, typeof body.skillId === 'string' ? body.skillId : null),
     loadOracleChatSettingsForChat(userId),
   ])
-  // Order: fixed prompt, then the member's preferences (same on every message, so the
-  // cached prefix holds), then the per-message scripture lookup, then any skill playbook.
-  const basePrompt = buildSystemPrompt(DEFAULT_ORACLE_PERSONA)
-    + buildOracleChatSettingsContext(chatSettings)
+  // Order: fixed prompt (plus the fixed site-reading guidance when tools are on), then the
+  // member's preferences (same on every message, so the cached prefix holds), then the
+  // per-message scripture lookup, then any skill playbook, then the page they have open.
+  const fixedPrompt = buildSystemPrompt(DEFAULT_ORACLE_PERSONA)
+  const memberContext = buildOracleChatSettingsContext(chatSettings)
     + buildOracleScriptureContext(
       userText,
       [...storedTurns].reverse().find((turn) => turn.role === 'user')?.content,
       [...storedTurns].reverse().find((turn) => turn.role === 'assistant')?.content,
     )
-  const pickedPrompt = skillPlan.picked ? basePrompt + buildOracleSkillContext(skillPlan) : basePrompt
-  const discoveryPrompt = skillPlan.discoverable.length ? basePrompt + buildOracleSkillContext(skillPlan) : null
+  const skillContext = buildOracleSkillContext(skillPlan)
+  const plainPrompt = fixedPrompt + memberContext + (skillPlan.picked ? skillContext : '')
+  const toolPrompt = fixedPrompt + ORACLE_READ_TOOLS_PROMPT + memberContext + skillContext
+    + buildOraclePageContext(parseOraclePage(body.page))
   // History comes from saved messages, never the client, so a caller cannot forge
   // assistant turns. Only the new user turn is taken from the request. If the
   // previous reply is still being saved, it is missing from this one request.
@@ -249,11 +294,12 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   ])
   const accessTier = usageReservation.isPremium ? 'premium' : 'free'
   const candidateModels = orderOracleModels(body.model, undefined, accessTier)
-  // Each model gets a try with the skill lookup, then one without it, so a model that
+  // Each model gets a try with the lookup tools, then one without them, so a model that
   // stumbles on tools still answers.
-  const attempts = candidateModels.flatMap((model) =>
-    discoveryPrompt ? [{ model, withSkillTool: true }, { model, withSkillTool: false }] : [{ model, withSkillTool: false }],
-  )
+  const attempts = candidateModels.flatMap((model) => [
+    { model, withTools: true },
+    { model, withTools: false },
+  ])
   let lastError: Error | null = null
 
   queueOracleUserMessagePersistence({ userId, threadId: activeThreadId, userText })
@@ -270,17 +316,22 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     request.signal.removeEventListener('abort', abortTitle)
   }
 
-  for (const { model: modelCandidate, withSkillTool } of attempts) {
+  for (const { model: modelCandidate, withTools } of attempts) {
     const abortController = new AbortController()
     try {
       const threadIdForSave = activeThreadId
       let usedSkill: { skill: OracleSkill; how: OracleSkillPart['how'] } | null = skillPlan.picked
         ? { skill: skillPlan.picked, how: 'picked' }
         : null
-      const skillTools = withSkillTool
-        ? createOracleSkillTools(skillPlan, { onUse: (skill) => { usedSkill = { skill, how: 'auto' } } })
+      const reads: OracleReadItem[] = []
+      const replyTools = withTools
+        ? buildOracleReplyTools({
+            source: oracleContentSource,
+            onRead: (item) => { reads.push(item) },
+            skillTools: createOracleSkillTools(skillPlan, { onUse: (skill) => { usedSkill = { skill, how: 'auto' } } }),
+          })
         : undefined
-      const systemPrompt = skillTools && discoveryPrompt ? discoveryPrompt : pickedPrompt
+      const systemPrompt = replyTools ? toolPrompt : plainPrompt
       const result = streamText({
         model: modelCandidate as any,
         ...getOracleGenerationOptions(modelCandidate),
@@ -289,13 +340,16 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
         messages: payloadMessages,
         maxOutputTokens: ORACLE_MAX_OUTPUT_TOKENS,
         abortSignal: abortController.signal,
-        ...(skillTools ?? {}),
+        ...(replyTools ?? {}),
         onFinish: async ({ text: finalStepText, steps, totalUsage }) => {
           // A skill lookup splits the reply into two steps; save everything the member saw.
           const text = joinStepText(steps, finalStepText)
-          const skillParts: OracleSkillPart[] = usedSkill
-            ? [{ type: 'skill', id: usedSkill.skill.id, name: usedSkill.skill.name, how: usedSkill.how }]
-            : []
+          const skillParts: Array<OracleSkillPart | OracleReadsPart> = [
+            ...(usedSkill
+              ? [{ type: 'skill' as const, id: usedSkill.skill.id, name: usedSkill.skill.name, how: usedSkill.how }]
+              : []),
+            ...readsParts(reads),
+          ]
           if (usageEventId) {
             void finalizeOracleUsage(usageEventId, {
               model: modelCandidate,
@@ -355,6 +409,8 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
       // A lookup runs before the first word, so by now the skill is known.
       const skillUsed = usedSkill as { skill: OracleSkill } | null
       if (skillUsed) headers[ORACLE_SKILL_HEADER] = skillUsed.skill.id
+      // Lookups made before the first word; any later ones are saved with the message.
+      if (reads.length) headers[ORACLE_READS_HEADER] = encodeReadsHeader(reads)
 
       const reader = committedStream.getReader()
       const responseStream = new ReadableStream({
@@ -424,6 +480,7 @@ async function handleGuestOracleChat(
   userText: string,
   clientIp: string,
   signal: AbortSignal,
+  page: OraclePageRef | null = null,
 ): Promise<Response> {
   try {
     const allowance = await reserveGuestOracleMessage(clientIp)
@@ -450,34 +507,50 @@ async function handleGuestOracleChat(
   )
   const lastAssistant = [...history].reverse().find((turn) => turn.role === 'assistant')?.content
   const lastUser = [...history].reverse().find((turn) => turn.role === 'user')?.content
-  const systemPrompt = buildSystemPrompt(DEFAULT_ORACLE_PERSONA)
-    + buildOracleScriptureContext(userText, lastUser, lastAssistant)
+  const fixedPrompt = buildSystemPrompt(DEFAULT_ORACLE_PERSONA)
+  const scripture = buildOracleScriptureContext(userText, lastUser, lastAssistant)
 
-  const abortController = new AbortController()
-  const abort = () => abortController.abort()
-  signal.addEventListener('abort', abort, { once: true })
-  try {
-    const result = streamText({
-      model: DEFAULT_ORACLE_MODEL_ID as any,
-      ...getOracleGenerationOptions(DEFAULT_ORACLE_MODEL_ID),
-      maxRetries: 0,
-      system: systemPrompt,
-      messages: payloadMessages,
-      maxOutputTokens: ORACLE_GUEST_MAX_OUTPUT_TOKENS,
-      abortSignal: abortController.signal,
-      onError: ({ error }) => {
-        console.warn('[Oracle Chat] Guest stream error:', error instanceof Error ? error.message : error)
-      },
-    })
-    const stream = await commitOracleTextStream(toTextStream({ stream: result.stream }))
-    return createTextStreamResponse({ stream })
-  } catch (err: any) {
-    abortController.abort()
-    signal.removeEventListener('abort', abort)
-    console.warn('[Oracle Chat] Guest reply failed:', err?.message)
-    // The model never answered, so the visitor keeps today's message.
-    await releaseGuestOracleMessage(clientIp)
-    const message = formatOracleUnavailableMessage(err instanceof Error ? err : null)
-    return Response.json({ error: message, text: message, threadId: null }, { status: 502 })
+  let lastError: Error | null = null
+  // Public pages only, so guests can read too. A try with the lookup tools, then one
+  // without them if the model stumbles on tools.
+  for (const withTools of [true, false]) {
+    const abortController = new AbortController()
+    const abort = () => abortController.abort()
+    signal.addEventListener('abort', abort, { once: true })
+    const reads: OracleReadItem[] = []
+    const replyTools = withTools
+      ? buildOracleReplyTools({ source: oracleContentSource, onRead: (item) => { reads.push(item) } })
+      : undefined
+    try {
+      const result = streamText({
+        model: DEFAULT_ORACLE_MODEL_ID as any,
+        ...getOracleGenerationOptions(DEFAULT_ORACLE_MODEL_ID),
+        maxRetries: 0,
+        system: replyTools
+          ? fixedPrompt + ORACLE_READ_TOOLS_PROMPT + scripture + buildOraclePageContext(page)
+          : fixedPrompt + scripture,
+        messages: payloadMessages,
+        maxOutputTokens: ORACLE_GUEST_MAX_OUTPUT_TOKENS,
+        abortSignal: abortController.signal,
+        ...(replyTools ?? {}),
+        onError: ({ error }) => {
+          console.warn('[Oracle Chat] Guest stream error:', error instanceof Error ? error.message : error)
+        },
+      })
+      const stream = await commitOracleTextStream(toTextStream({ stream: result.stream }))
+      const headers: Record<string, string> = {}
+      if (reads.length) headers[ORACLE_READS_HEADER] = encodeReadsHeader(reads)
+      return createTextStreamResponse({ headers, stream })
+    } catch (err: any) {
+      abortController.abort()
+      signal.removeEventListener('abort', abort)
+      console.warn(`[Oracle Chat] Guest reply failed${withTools ? ' with tools' : ''}:`, err?.message)
+      lastError = err instanceof Error ? err : new Error(err?.message || 'Model request failed.')
+      if (signal.aborted) break
+    }
   }
+  // The model never answered, so the visitor keeps today's message.
+  await releaseGuestOracleMessage(clientIp)
+  const message = formatOracleUnavailableMessage(lastError)
+  return Response.json({ error: message, text: message, threadId: null }, { status: 502 })
 }
