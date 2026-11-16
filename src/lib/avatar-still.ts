@@ -12,7 +12,7 @@ import { parseLobsterAvatarConfig, type LobsterAvatarConfig } from './lobster-av
  * Bump when the 3D character's look changes (shapes, materials, lighting or framing), so stills
  * kept from an older drawing are thrown away instead of shown.
  */
-export const STILL_VERSION = 5
+export const STILL_VERSION = 6
 
 /** Size of a stored portrait, in pixels. Smaller avatars scale it down. */
 export const STORED_STILL_PX = 256

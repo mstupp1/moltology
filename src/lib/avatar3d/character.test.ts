@@ -185,7 +185,7 @@ describe('avatar3d', () => {
     }
   })
 
-  it('makes height mostly leg, keeps the head near one size and the feet on the ground', () => {
+  it('spreads height over body and legs, so tall legs never read as stilts, and keeps the feet on the ground', () => {
     for (const race of AVATAR_RACES) {
       const measure = (heightScale: number) => {
         const c = buildCharacter({ ...baselineLook(race), heightScale })
@@ -201,9 +201,10 @@ describe('avatar3d', () => {
       const tall = measure(1.4)
       expect(tall.height / regular.height).toBeCloseTo(1.4, 1)
       expect(short.height).toBeLessThan(regular.height)
-      // Legs change far more than the head does.
-      expect(tall.leg / regular.leg).toBeGreaterThan(1.5)
-      expect(tall.head / regular.head).toBeLessThan(1.25)
+      // Legs grow somewhat more than the body, but the body grows too: a bigger character, not stilts.
+      expect(tall.leg / regular.leg).toBeGreaterThan(tall.head / regular.head)
+      expect((tall.leg / regular.leg) / (tall.head / regular.head)).toBeLessThan(1.4)
+      expect(tall.head / regular.head).toBeGreaterThan(1.2)
       expect(short.leg / regular.leg).toBeLessThan(0.85)
       expect(Math.abs(tall.ankle - regular.ankle)).toBeLessThan(0.05)
     }

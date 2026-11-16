@@ -240,6 +240,9 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   }
 
   let character: Character3D | null = null
+  // The character just replaced. Freed only after the next one has been drawn, so the shader
+  // programs both share stay alive in between instead of being thrown away and recompiled.
+  let retired: Character3D | null = null
   // Where the camera sits to take in the whole figure, and where it is now on its way there.
   const home = { position: new Vector3(0, 1.2, 6), look: new Vector3(0, 1, 0) }
   const eye = new Vector3()
@@ -359,6 +362,8 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     // A close portrait would be all halo, so only the whole figure wears it.
     halo.visible = glowing && framing === 'full'
     renderer.render(scene, camera)
+    retired?.dispose()
+    retired = null
   }
 
   const tick = (now: number) => {
@@ -532,7 +537,9 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
         wake()
         return
       }
-      character?.dispose()
+      retired?.dispose()
+      retired = character
+      retired?.root.removeFromParent()
       // A live character on a phone is built from slightly coarser meshes; stills choose their own detail.
       character = low && !options.manual ? withLoftDetail(0.8, () => buildCharacter(look)) : buildCharacter(look)
       scene.add(character.root)
@@ -614,6 +621,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       canvas.removeEventListener('wheel', onWheel)
       window.removeEventListener('pointermove', onSeen)
       canvas.removeEventListener('webglcontextlost', onLost)
+      retired?.dispose()
       character?.dispose()
       env.dispose()
       pmrem.dispose()

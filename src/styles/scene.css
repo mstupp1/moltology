@@ -109,6 +109,14 @@
   background: radial-gradient(ellipse 60% 100% at 50% 0%, rgba(120, 240, 255, 0.26), transparent 70%);
 }
 
+/* Nothing behind a full-screen overlay needs to move: stop it so the overlay stays smooth. */
+.hud-layout[data-covered='true'] .scene-breathe,
+.hud-layout[data-covered='true'] .scene-rays,
+.hud-layout[data-covered='true'] .scene-caustics > i,
+.hud-layout[data-covered='true'] .oracle-core__ring {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .scene-breathe,
   .scene-rays,
