@@ -560,7 +560,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       if (talk > 0.02) {
         // Speaking: the mouth opens with the voice (a reaction's bigger mouth wins), the head
         // nods a touch on the louder syllables and the brows ride up with emphasis.
-        const open = 0.15 + 0.7 * talk
+        // A square-root curve so ordinary syllables, not just the loudest peaks, read as open.
+        const open = 0.3 + 0.75 * Math.sqrt(talk)
         if (open > mouthOpen) {
           mouthOpen = open
           mouthRound = 0.25 + 0.3 * talk

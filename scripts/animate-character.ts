@@ -124,7 +124,7 @@ async function main() {
   const lastWord = (words[words.length - 1]?.endMs ?? 0) / 1000
   const frameCount = Math.ceil((lastWord + 0.8) * FPS)
   const talk = measured ?? talkFromWords(words, FPS, frameCount)
-  const { timeline, windows, hookEnd } = buildTimeline(lesson, look, words, talk, { width, height, fps: FPS, tail: 0.8, hookLift: 0.5 })
+  const { timeline, windows, hookEnd } = buildTimeline(lesson, look, words, talk, { width, height, fps: FPS, tail: 0.8, hookLift: 0.9 })
   if (args.maxSeconds) timeline.frames = Math.min(timeline.frames, Math.ceil(args.maxSeconds * FPS))
   fs.writeFileSync(path.join(outDir, 'timeline.json'), JSON.stringify({ ...timeline, talk: undefined, windows, hookEnd }, null, 2))
 
