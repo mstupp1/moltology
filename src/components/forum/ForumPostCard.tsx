@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { LocalTime } from '@/components/ui/LocalTime'
 import { formatDayTime } from '@/lib/dates'
 import { forumVisibleLength } from '@/lib/forum-markdown'
@@ -30,6 +30,14 @@ import {
   HudDropdownMenuItem,
   HudDropdownMenuSeparator,
 } from '@/components/ui/HudDropdownMenu'
+
+/** A reply with more direct replies than this shows the first few and a "Show more replies" link. */
+const CHILD_PREVIEW_MAX = 5
+const CHILD_PREVIEW_SHOWN = 3
+
+function subtreeHas(nodes: ForumPostTreeNode[], postId: string): boolean {
+  return nodes.some((node) => node.post.id === postId || subtreeHas(node.children, postId))
+}
 
 export interface ForumPostCardProps {
   node: ForumPostTreeNode<ForumPostEntry>
@@ -75,6 +83,19 @@ export function ForumPostCard({
   const indent = forumReplyIndentDepth(depth)
   const isReplying = replyingToId === post.id
   const childCount = children.length
+  const childrenFolded = childCount > CHILD_PREVIEW_MAX
+  // A shared link to a reply inside the folded part opens it straight away.
+  const [showAllChildren, setShowAllChildren] = useState(() => {
+    if (!childrenFolded || typeof window === 'undefined') return false
+    const hash = window.location.hash
+    return hash.startsWith('#post-') && subtreeHas(children.slice(CHILD_PREVIEW_SHOWN), hash.slice(6))
+  })
+  // Replying here opens every reply, so the new one is not tucked away.
+  useEffect(() => {
+    if (isReplying) setShowAllChildren(true)
+  }, [isReplying])
+  const shownChildren = childrenFolded && !showAllChildren ? children.slice(0, CHILD_PREVIEW_SHOWN) : children
+  const hiddenChildCount = childCount - shownChildren.length
   const isOp = Boolean(topicAuthorId && post.userId && post.userId === topicAuthorId)
   const withdrawn = isForumQuoteSourceWithdrawn(post)
   const canAuthor = Boolean(userId && post.userId && userId === post.userId && !withdrawn)
@@ -478,7 +499,7 @@ export function ForumPostCard({
               : 'mt-3 space-y-3'
           }
         >
-          {children.map((child) => (
+          {shownChildren.map((child) => (
             <ForumPostCard
               key={child.post.id}
               node={child}
@@ -495,6 +516,19 @@ export function ForumPostCard({
               quoteDraft={quoteDraft}
             />
           ))}
+          {hiddenChildCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowAllChildren(true)}
+              className={`${actionClass} normal-case tracking-normal text-xs`}
+              data-testid="forum-show-more-replies"
+            >
+              <ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>
+                Show {hiddenChildCount} more {hiddenChildCount === 1 ? 'reply' : 'replies'}
+              </span>
+            </button>
+          )}
         </div>
       )}
     </div>

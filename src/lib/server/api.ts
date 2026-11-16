@@ -474,7 +474,8 @@ export const getForumRepliesFn = createServerFn({ method: 'POST' })
   }) =>
     z
       .object({
-        topicId: z.string().uuid(),
+        // Seeded topics use ids such as 20000000-0000-0000-0000-000000000003, which strict uuid() rejects.
+        topicId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i),
         sort: z.enum(['oldest', 'newest', 'top']).optional(),
         offset: z.number().int().min(0).max(100_000).optional(),
         limit: z.number().int().min(1).max(100).optional(),

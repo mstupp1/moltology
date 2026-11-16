@@ -435,3 +435,37 @@ describe('ForumPostCard author tools', () => {
     expect(onUpdated).toHaveBeenCalledWith(expect.objectContaining({ deletedAt: '2026-09-06T02:00:00.000Z' }))
   })
 })
+
+describe('ForumPostCard folded replies', () => {
+  const kids = (n: number) =>
+    Array.from({ length: n }, (_, i) => ({
+      post: post({ id: `kid-${i}`, parentId: 'post-1', content: `Reply number ${i}` }),
+      depth: 1,
+      children: [],
+    }))
+
+  it('shows every reply when there are only a few', () => {
+    render(<ForumPostCard node={node(post(), kids(5))} topicId="topic-1" replyingToId={null} {...cardHandlers} />)
+    expect(screen.getByText('Reply number 4')).toBeTruthy()
+    expect(screen.queryByTestId('forum-show-more-replies')).toBeNull()
+  })
+
+  it('folds a long list of replies behind Show more replies', () => {
+    render(<ForumPostCard node={node(post(), kids(8))} topicId="topic-1" replyingToId={null} {...cardHandlers} />)
+    expect(screen.getByText('Reply number 2')).toBeTruthy()
+    expect(screen.queryByText('Reply number 3')).toBeNull()
+    fireEvent.click(screen.getByTestId('forum-show-more-replies'))
+    expect(screen.getByText('Reply number 7')).toBeTruthy()
+    expect(screen.queryByTestId('forum-show-more-replies')).toBeNull()
+  })
+
+  it('opens the folded replies when a shared link points inside them', () => {
+    window.history.replaceState(null, '', '#post-kid-6')
+    try {
+      render(<ForumPostCard node={node(post(), kids(8))} topicId="topic-1" replyingToId={null} {...cardHandlers} />)
+      expect(screen.getByText('Reply number 6')).toBeTruthy()
+    } finally {
+      window.history.replaceState(null, '', window.location.pathname)
+    }
+  })
+})

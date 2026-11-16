@@ -4,14 +4,18 @@ import { INITIAL_BLOG_POSTS } from '@/lib/blog-data'
 
 vi.mock('@/lib/server/api', () => ({
   getBlogPostsFn: vi.fn(),
+  getForumCategoriesFn: vi.fn(),
+  getForumTopicsFn: vi.fn(),
 }))
 
-import { getBlogPostsFn } from '@/lib/server/api'
-import { loadPublishedBlogPosts, rssXmlResponse, sitemapXmlResponse } from './document-feeds'
+import { getBlogPostsFn, getForumCategoriesFn, getForumTopicsFn } from '@/lib/server/api'
+import { loadForumSitemapEntries, loadPublishedBlogPosts, rssXmlResponse, sitemapXmlResponse } from './document-feeds'
 
 describe('published document feeds', () => {
   beforeEach(() => {
     vi.mocked(getBlogPostsFn).mockReset()
+    vi.mocked(getForumCategoriesFn).mockReset().mockResolvedValue([] as never)
+    vi.mocked(getForumTopicsFn).mockReset().mockResolvedValue([] as never)
   })
 
   it('uses live published posts when the listing source returns them', async () => {
@@ -71,5 +75,34 @@ describe('published document feeds', () => {
     } finally {
       vi.useRealTimers()
     }
+  })
+
+  it('lists forum boards and topics, skipping removed ones', async () => {
+    vi.mocked(getForumCategoriesFn).mockResolvedValue([{ slug: 'general' }, { slug: '' }] as never)
+    vi.mocked(getForumTopicsFn).mockResolvedValue([
+      { slug: 'first-molt', categorySlug: 'general', lastReplyAt: '2026-11-10T12:00:00.000Z', createdAt: '2026-11-01T00:00:00.000Z' },
+      { slug: 'gone', categorySlug: 'general', deletedAt: '2026-11-02T00:00:00.000Z', lastReplyAt: '2026-11-10T12:00:00.000Z', createdAt: '2026-11-01T00:00:00.000Z' },
+    ] as never)
+
+    const entries = await loadForumSitemapEntries('https://moltology.org')
+
+    expect(entries.map((e) => e.loc)).toEqual([
+      'https://moltology.org/forum/general',
+      'https://moltology.org/forum/general/first-molt',
+    ])
+    expect(entries[1].lastmod).toBe('2026-11-10')
+    // A short page means there is nothing older to ask for.
+    expect(getForumTopicsFn).toHaveBeenCalledTimes(1)
+  })
+
+  it('pages through topics up to the cap and survives a failed lookup', async () => {
+    const full = Array.from({ length: 100 }, (_, i) => ({ slug: `t-${i}`, categorySlug: 'general', createdAt: '2026-11-01T00:00:00.000Z' }))
+    vi.mocked(getForumTopicsFn).mockResolvedValue(full as never)
+    const entries = await loadForumSitemapEntries('https://moltology.org')
+    expect(getForumTopicsFn).toHaveBeenCalledTimes(5)
+    expect(entries).toHaveLength(500)
+
+    vi.mocked(getForumCategoriesFn).mockRejectedValue(new Error('down'))
+    await expect(loadForumSitemapEntries('https://moltology.org')).resolves.toEqual([])
   })
 })
