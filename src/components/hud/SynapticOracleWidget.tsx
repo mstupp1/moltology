@@ -335,6 +335,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
           />
 
           <AIChatPanel
+            allowEntityMode
             userId={userId}
             isCompact={true}
             onClose={handleClose}

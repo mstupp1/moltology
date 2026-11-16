@@ -56,6 +56,30 @@ export interface SynapticEntityHudProps {
   continueChat?: { title: string; onOpen: () => void } | null
 }
 
+/** The core's diameter on every surface, unless the open space is shorter. */
+export const CORE_SIZE_PX = 240
+/** The drawn square is this many core widths across, so the rings and glow fit. */
+const CORE_BOX_SCALE = 2.4
+
+export interface CoreBox {
+  /** Core diameter in pixels. */
+  size: number
+  /** Side of the square canvas around it. */
+  side: number
+  /** Center of the core, in the HUD's coordinates. */
+  cx: number
+  cy: number
+}
+
+/** Where and how big to draw the core inside a HUD of this size. */
+export function computeCoreBox(width: number, height: number, space: { top: number; height: number }): CoreBox {
+  const open = space.height > 0 ? space.height : height * 0.5
+  const size = Math.max(96, Math.round(Math.min(CORE_SIZE_PX, open * 0.92, width * 0.7)))
+  const side = Math.round(Math.min(size * CORE_BOX_SCALE, Math.max(width, size)))
+  const cy = space.height > 0 ? space.top + space.height / 2 : height / 2
+  return { size, side, cx: width / 2, cy }
+}
+
 export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
   bridge,
   messages,
@@ -87,22 +111,55 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
     const hide = window.setTimeout(() => setStillVisible(false), 650)
     return () => window.clearTimeout(hide)
   }, [canvasReady, stillVisible])
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
+  const [isCaptionMinimized, setIsCaptionMinimized] = useState(false)
+  const liveScrollRef = useRef<HTMLDivElement>(null)
+  // The open space between the top controls and the lower HUD; phones center the core in it.
+  const coreSpaceRef = useRef<HTMLDivElement>(null)
+  const hudRef = useRef<HTMLDivElement>(null)
+  const stickLiveBottomRef = useRef(true)
+
+  // One core size everywhere (~240px), smaller only when the open space is too short,
+  // centered in that space. The canvas is a square around it, not the whole panel.
+  const [coreBox, setCoreBox] = useState<CoreBox | null>(null)
+  useLayoutEffect(() => {
+    const hud = hudRef.current
+    const space = coreSpaceRef.current
+    if (!hud || !space) return
+    const measure = () => {
+      const frame = hud.getBoundingClientRect()
+      const box = space.getBoundingClientRect()
+      const next = computeCoreBox(frame.width, frame.height, {
+        top: box.top - frame.top,
+        height: box.height,
+      })
+      setCoreBox((prev) =>
+        prev && Math.abs(prev.size - next.size) < 1 && Math.abs(prev.cy - next.cy) < 1 && Math.abs(prev.cx - next.cx) < 1 && prev.side === next.side
+          ? prev
+          : next
+      )
+    }
+    measure()
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', measure)
+      return () => window.removeEventListener('resize', measure)
+    }
+    const observer = new ResizeObserver(measure)
+    observer.observe(hud)
+    observer.observe(space)
+    return () => observer.disconnect()
+  }, [])
+
   const ignitingStill = stillVisible ? (
     <span
       aria-hidden
       className={`absolute inset-0 flex items-center justify-center ${canvasReady ? 'oracle-core-ignite-out' : ''}`}
     >
       <span className="oracle-core-ignite">
-        <OracleCoreGlyph size={isPhone ? 150 : 170} quiet />
+        <OracleCoreGlyph size={Math.round((coreBox?.size ?? CORE_SIZE_PX) * 0.8)} quiet />
       </span>
     </span>
   ) : null
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
-  const [isCaptionMinimized, setIsCaptionMinimized] = useState(false)
-  const liveScrollRef = useRef<HTMLDivElement>(null)
-  // The open space between the top controls and the lower HUD; phones center the core in it.
-  const coreSpaceRef = useRef<HTMLDivElement>(null)
-  const stickLiveBottomRef = useRef(true)
 
   // Identify latest user message, latest assistant reply, and prior history turns
   const lastUserIndex = (() => {
@@ -145,23 +202,27 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
 
   return (
     <div
+      ref={hudRef}
       data-testid="synaptic-entity-hud"
       className="flex-1 min-h-0 relative flex flex-col justify-between overflow-hidden bg-abyss select-none"
     >
       {/* 3D Procedural Synaptic Brain Backdrop */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        {canvasReady && (
-          <div className={`absolute inset-0 ${deferMsRef.current > 0 ? 'oracle-core-canvas-in' : ''}`}>
+        {canvasReady && coreBox && (
+          // Only a square around the core is drawn, with soft edges, instead of the whole panel.
+          <div
+            data-testid="synaptic-core-box"
+            className={`absolute oracle-core-box ${deferMsRef.current > 0 ? 'oracle-core-canvas-in' : ''}`}
+            style={{ left: coreBox.cx - coreBox.side / 2, top: coreBox.cy - coreBox.side / 2, width: coreBox.side, height: coreBox.side }}
+          >
             <SynapticEntityCanvas
               bridge={bridge}
               isCompact={isCompact || isPhone}
-              fitPortrait={isPhone}
-              focusRef={coreSpaceRef}
+              coreSize={coreBox.size}
               className="w-full h-full"
             />
           </div>
         )}
-        {!isPhone && ignitingStill}
         {/* Subtle top/bottom vignette for HUD legibility */}
         <div
           aria-hidden="true"
@@ -266,8 +327,8 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
 
       {/* Spacer keeping the center of the 3D core unobstructed */}
       <div ref={coreSpaceRef} data-testid="synaptic-core-space" className="relative flex-1 min-h-12 pointer-events-none">
-        {/* Phones center the core in this space, so the still waits here too. */}
-        {isPhone && ignitingStill}
+        {/* The core is centered in this space, so the still waits here too. */}
+        {ignitingStill}
       </div>
 
       {/* Lower-Third Live Conversational HUD + Docked Composer */}

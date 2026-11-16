@@ -157,6 +157,7 @@ export const AISidebarDrawer: React.FC<AISidebarDrawerProps> = ({
         </div>
         <div className="flex-1 overflow-hidden">
           <AIChatPanel
+            allowEntityMode
             userId={userId}
             isCompact={false}
             onClose={handleClose}
