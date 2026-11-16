@@ -12,11 +12,11 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { execFileSync } from 'node:child_process'
-import { buildTimeline, castLook, estimateWords, lessonProblems, narrationOf, reelDraftFrom, talkFromWords, type Lesson } from './lib/character-animation/lesson'
-import { talkFromAudio } from './lib/character-animation/talk'
+import { buildTimeline, castLook, castOf, lessonProblems, reelDraftFrom, type Lesson } from './lib/character-animation/lesson'
+import { voiceLesson } from './lib/character-animation/voices'
 import { renderFrames } from './lib/character-animation/render'
-import { defaultBackdrop, headlineOverlays, normaliseBackdrop, renderHeadlineCards, renderOutroText, renderSceneClip, silentAudio } from './lib/character-animation/compose'
-import { tokenizeScriptText, type WordBoundaryEvent } from './lib/tts-engine'
+import { defaultBackdrop, headlineOverlays, normaliseBackdrop, renderHeadlineCards, renderOutroText, renderSceneClip } from './lib/character-animation/compose'
+import { tokenizeScriptText } from './lib/tts-engine'
 import { SHOTS } from '../src/lib/avatar3d/scripted'
 
 /** Same narrator as the reels (scripts/create-reel.ts REEL_NARRATOR_VOICE). */
@@ -53,7 +53,7 @@ function parseArgs(argv: string[]): Args {
       console.log(`Usage: npm run anim:create -- --lesson <lesson.json> [options]
 
   --silent          No voice: estimated word timings, silent audio (cloud tests, layout checks)
-  --voice <name>    Fish voice (default ${NARRATOR}, same as reels)
+  --voice <name>    Narrator's Fish voice (default ${NARRATOR}, same as reels); characters use their cast voice
   --scale <0..1>    Render the 3D at a fraction of 1080x1920 (0.5 for quick tests)
   --max-seconds <n> Only render the first n seconds (motion tests)
   --frames-only     Stop after rendering frames
@@ -69,32 +69,6 @@ function parseArgs(argv: string[]): Args {
 }
 
 const even = (n: number) => Math.round(n / 2) * 2
-
-async function voiceFor(lesson: Lesson, outDir: string, args: Args): Promise<{ audio: string; words: WordBoundaryEvent[]; talk: number[] | null }> {
-  const narration = narrationOf(lesson)
-  if (args.silent) {
-    const words = estimateWords(narration, 2.6 * 1.12)
-    const seconds = (words[words.length - 1]?.endMs ?? 0) / 1000 + 0.3
-    return { audio: await silentAudio(seconds, path.join(outDir, 'voice-silent.mp3')), words, talk: null }
-  }
-  const audio = path.join(outDir, 'voice.mp3')
-  const wordsFile = path.join(outDir, 'words.json')
-  if (fs.existsSync(audio) && fs.existsSync(wordsFile)) {
-    const saved = JSON.parse(fs.readFileSync(wordsFile, 'utf8'))
-    if (saved.narration === narration) {
-      console.log('🎙️  Reusing voice.mp3 (narration unchanged)')
-      return { audio, words: saved.words, talk: await talkFromAudio(audio, FPS) }
-    }
-  }
-  const { generateVoiceover } = await import('./lib/tts-engine')
-  const voice = args.voice || (process.env.FISH_VOICE_REFERENCE_ID ? undefined : NARRATOR)
-  console.log(`🎙️  Voice: ${voice ?? 'FISH_VOICE_REFERENCE_ID'}`)
-  const result = await generateVoiceover(narration, { voice, rate: '+12%', outputDir: outDir, outputFilename: 'voice.mp3' })
-  if (path.resolve(result.audioPath) !== path.resolve(audio)) fs.copyFileSync(result.audioPath, audio)
-  fs.writeFileSync(wordsFile, JSON.stringify({ narration, provider: result.providerUsed, words: result.words }, null, 2))
-  console.log(`   ${result.providerUsed ?? 'tts'} · ${result.durationSeconds.toFixed(2)}s · ${result.words.length} words`)
-  return { audio, words: result.words, talk: await talkFromAudio(audio, FPS) }
-}
 
 /** Stills of the finished file at the moments the reel rules ask to check. */
 function previewStills(video: string, outDir: string, moments: Record<string, number>) {
@@ -117,16 +91,15 @@ async function main() {
   fs.mkdirSync(outDir, { recursive: true })
   const rel = (p: string) => path.resolve(path.dirname(lessonPath), p)
 
-  const look = castLook(lesson.host)
-  const { audio, words, talk: measured } = await voiceFor(lesson, outDir, args)
+  const looks = Object.fromEntries(castOf(lesson).map((c) => [c.id, castLook(c.id)]))
+  const look = looks[lesson.host]
+  const narratorVoice = args.voice || (process.env.FISH_VOICE_REFERENCE_ID ? '' : NARRATOR)
+  const { audio, words, talkBy } = await voiceLesson(lesson, outDir, { silent: args.silent, fps: FPS, narratorVoice })
   const width = even(1080 * args.scale)
   const height = even(1920 * args.scale)
-  const lastWord = (words[words.length - 1]?.endMs ?? 0) / 1000
-  const frameCount = Math.ceil((lastWord + 0.8) * FPS)
-  const talk = measured ?? talkFromWords(words, FPS, frameCount)
-  const { timeline, windows, hookEnd } = buildTimeline(lesson, look, words, talk, { width, height, fps: FPS, tail: 0.8, hookLift: 0.9 })
+  const { timeline, windows, hookEnd } = buildTimeline(lesson, looks, words, talkBy, { width, height, fps: FPS, tail: 0.8, hookLift: 0.9 })
   if (args.maxSeconds) timeline.frames = Math.min(timeline.frames, Math.ceil(args.maxSeconds * FPS))
-  fs.writeFileSync(path.join(outDir, 'timeline.json'), JSON.stringify({ ...timeline, talk: undefined, windows, hookEnd }, null, 2))
+  fs.writeFileSync(path.join(outDir, 'timeline.json'), JSON.stringify({ ...timeline, talk: undefined, talkBy: undefined, windows, hookEnd }, null, 2))
 
   const framesDir = path.join(outDir, 'frames')
   if (!args.reuseFrames) {
@@ -151,6 +124,8 @@ async function main() {
       frames: outroFrames,
       look: { ...look, pose: 'wave' as const },
       talk: [],
+      talkBy: undefined,
+      cast: undefined,
       cues: [{ t: 0, camera: { ...SHOTS.wide, pan: 0, lift: 0.75, cut: true }, look: { x: 0, y: 0 } }, { t: 0.9, react: { kind: 'snap' as const, side: -1 as const } }],
     }
     const outroDir = path.join(outDir, 'outro-frames')
@@ -159,7 +134,7 @@ async function main() {
       console.log('👋 Rendering outro...')
       await renderFrames(outroTimeline, { outDir: outroDir })
     }
-    const backdrop = await (lesson.backdrop ? normaliseBackdrop(rel(lesson.backdrop), path.join(outDir, 'backdrop.png')) : defaultBackdrop(path.join(outDir, 'backdrop.png')))
+    const backdrop = await (lesson.backdrop ? normaliseBackdrop(rel(lesson.backdrop), path.join(outDir, 'backdrop.png')) : defaultBackdrop(path.join(outDir, 'backdrop.png'), lesson.set))
     outroVideo = await renderSceneClip({
       framesDir: outroDir,
       fps: FPS,
@@ -173,7 +148,7 @@ async function main() {
 
   // Scenes: backdrop, character, and the hook headline over the opening.
   console.log('🎞️  Building scene clips...')
-  const defaultSet = lesson.backdrop ? await normaliseBackdrop(rel(lesson.backdrop), path.join(outDir, 'backdrop.png')) : await defaultBackdrop(path.join(outDir, 'backdrop.png'))
+  const defaultSet = lesson.backdrop ? await normaliseBackdrop(rel(lesson.backdrop), path.join(outDir, 'backdrop.png')) : await defaultBackdrop(path.join(outDir, 'backdrop.png'), lesson.set)
   const hookCount = tokenizeScriptText(lesson.hookHeadline).length
   const cards = renderHeadlineCards(lesson.hookHeadline, path.join(outDir, 'headline'))
   const clips: string[] = []

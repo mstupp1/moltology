@@ -1,0 +1,153 @@
+{
+  "id": "codex-scr-032-nightly-molt-audit",
+  "title": "Stop trying to fix your whole day at night",
+  "topic": "The Nightly Molt Audit (Codex SCR-032): release one thing a night, not the whole day",
+  "series": "Codex Lessons",
+  "episode": 2,
+  "format": "short",
+  "host": "host-crab",
+  "cast": [
+    {
+      "id": "junior-lobster",
+      "at": "left"
+    },
+    {
+      "id": "host-crab",
+      "at": "right"
+    }
+  ],
+  "set": "codex-study",
+  "codex": {
+    "id": "SCR-032",
+    "title": "The Nightly Molt Audit",
+    "url": "https://moltology.org/codex/scr-032"
+  },
+  "hookHeadline": "I try to fix my whole day every night.",
+  "scenes": [
+    {
+      "speaker": "junior-lobster",
+      "line": "I try to fix my whole day every night. It never works.",
+      "shot": "two",
+      "pose": "shrug",
+      "look": "camera",
+      "act": {
+        "host-crab": {
+          "pose": "think",
+          "look": "other"
+        }
+      },
+      "description": "The junior lobster shrugs at camera in the Codex study while the host crab listens, thinking."
+    },
+    {
+      "speaker": "host-crab",
+      "line": "That's the problem. Shed one thing a night, not the whole day.",
+      "shot": "medium",
+      "move": "cut",
+      "pose": "point",
+      "react": [
+        {
+          "kind": "snap",
+          "word": 5,
+          "side": -1
+        }
+      ],
+      "description": "Medium on the host crab pointing, snapping on 'one'."
+    },
+    {
+      "speaker": "junior-lobster",
+      "line": "Just one?",
+      "shot": "close",
+      "move": "cut",
+      "react": [
+        {
+          "kind": "poke",
+          "word": 1
+        }
+      ],
+      "description": "Close on the junior lobster, startled."
+    },
+    {
+      "speaker": "host-crab",
+      "line": "One. Name three candidates: a thought that looped, an hour that vanished, a distraction.",
+      "shot": "medium",
+      "move": "cut",
+      "pose": "think",
+      "look": "camera",
+      "description": "The host crab counts off the three candidates to camera."
+    },
+    {
+      "speaker": "host-crab",
+      "line": "Then pick exactly one, write it down, and let it go.",
+      "shot": "close",
+      "move": "push-in",
+      "pose": "rest",
+      "look": "camera",
+      "react": [
+        {
+          "kind": "snap",
+          "word": 10,
+          "side": 1
+        }
+      ],
+      "description": "Push in on the host crab as it lets the one thing go."
+    },
+    {
+      "speaker": "junior-lobster",
+      "line": "That's it? Four minutes?",
+      "shot": "close",
+      "move": "cut",
+      "pose": "cheer",
+      "description": "Close on the junior lobster, delighted."
+    },
+    {
+      "speaker": "host-crab",
+      "line": "Small enough for bad nights, and those are the ones that count.",
+      "shot": "two",
+      "move": "cut",
+      "pose": "rest",
+      "act": {
+        "junior-lobster": {
+          "pose": "rest",
+          "look": "other"
+        }
+      },
+      "description": "Two-shot in the study: the host crab explains, the junior nods along."
+    },
+    {
+      "speaker": "host-crab",
+      "line": "Read the Nightly Molt Audit at moltology.org.",
+      "shot": "two",
+      "move": "pull-out",
+      "pose": "point",
+      "look": "camera",
+      "react": [
+        {
+          "kind": "celebrate",
+          "word": 3
+        }
+      ],
+      "act": {
+        "junior-lobster": {
+          "pose": "wave",
+          "look": "camera"
+        }
+      },
+      "description": "Both face camera; the host points, the junior waves."
+    }
+  ],
+  "caption": "I try to fix my whole day every night. It never works.\n\nThe Codex says shed one thing a night: name three candidates, pick one, write it down, let it go. Four minutes.\n\nRead the Nightly Molt Audit at moltology.org.",
+  "hashtags": [
+    "#nightroutine",
+    "#productivity"
+  ],
+  "firstComment": "The full passage: https://moltology.org/codex/scr-032",
+  "youtubeTitle": "Stop trying to fix your whole day at night #shorts",
+  "youtubeDescription": "The Nightly Molt Audit from the Moltology Codex: each night, name three candidates, pick exactly one, write it down and let it go. Four minutes, small enough for bad nights.\n\nRead the full passage: https://moltology.org/codex/scr-032",
+  "youtubeTags": [
+    "night routine",
+    "productivity",
+    "habits",
+    "moltology"
+  ],
+  "ctaGoal": "codex"
+}

@@ -1,7 +1,9 @@
 {
   "cast": {
     "host-crab": {
+      "name": "Host crab",
       "role": "Lesson host: explains Codex passages, what Moltology is and moltmaxxing, straight to camera.",
+      "voice": "BOOK RECORD REGULAR",
       "config": {
         "seed": "animation-host-crab",
         "race": "crab",
@@ -19,6 +21,31 @@
         "eyelidStyle": "relaxed",
         "gaze": "ahead",
         "temperament": "lively"
+      }
+    },
+    "junior-lobster": {
+      "name": "Junior lobster",
+      "role": "Newcomer: asks the questions a first-timer would ask, reacts, gets the payoff first. Small, shy, curious.",
+      "voice": "Friendly Young Female",
+      "config": {
+        "seed": "animation-junior-lobster",
+        "race": "lobster",
+        "shellColor": "lagoon",
+        "shellFinish": "satin",
+        "marking": "none",
+        "mouth": "smile",
+        "antennae": "curl",
+        "pose": "rest",
+        "headShape": "round",
+        "build": "slim",
+        "height": "short",
+        "headScale": 1.12,
+        "eyeColor": "emerald",
+        "eyeVariant": "wide",
+        "pupilVariant": "big",
+        "eyelidStyle": "relaxed",
+        "gaze": "ahead",
+        "temperament": "shy"
       }
     }
   }

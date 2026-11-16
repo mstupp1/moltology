@@ -2,9 +2,10 @@
 name: animated-lessons
 description: >-
   Write and produce animated lesson shorts starring the site's own 3D characters (Codex
-  passages, what Moltology is, moltmaxxing) for Instagram Reels and YouTube Shorts: script six
-  directed scenes, voice them with the reel narrator, render the real three.js character with a
-  talking mouth, camera moves, poses and reactions, then archive and queue through the reel CLI.
+  passages, what Moltology is, moltmaxxing) for Instagram Reels and YouTube Shorts: script
+  directed scenes for a solo host or a small cast on a 3D set, voice each speaker with their own
+  Fish voice, render the real three.js characters with talking mouths, camera moves, poses and
+  reactions, then archive and queue through the reel CLI.
   Use for any animated character video, Codex lesson video or 3D character short.
 ---
 
@@ -33,19 +34,33 @@ Translate lore into plain, useful words. A passage's mandate or one Codex term c
 
 Pitch three hooks and shapes for the same idea (for example: claim then steps, myth then fix, "you're doing X, do Y"), score them with the playbook's Stop, Pull, Keep and Fresh scores in `tmp/anim-next/pitches.md`, and build the winner.
 
-## 3. Write the six scenes
+## 3. Pick a format and cast
 
-A short is exactly six scenes. Each scene is one or two spoken sentences plus its direction. House rules:
+| Format | Cast | Who speaks |
+| --- | --- | --- |
+| **Host lesson** | `host-crab` alone | The host, straight to camera |
+| **Ask the host** | `junior-lobster` + `host-crab` | The junior asks or admits the mistake, the host answers, the junior lands the payoff |
+| **Nature doc** | One or two characters who never speak | `narrator` only: an off-screen voice describes what the characters do, and their poses and reactions carry the scene |
+| **Myth vs fact** | Two characters | One states the myth, the other corrects it; or the narrator calls each one |
+
+Characters, their looks and their fixed Fish voices live in `content/animation/cast.json`. A character always uses its own voice so viewers learn who is who; the narrator (`speaker: "narrator"`) uses the reel narrator. Add a new cast member there (a config from the character creator, a role, a voice from Fish) rather than restyling an existing one. Keep a dialogue to two or three characters.
+
+Pick a set: `codex-study` (desk, lamp, books, rug: Codex lessons), `reef-office` (desk, screen, kelp: work and routines), `open-water` (rocks and kelp: what Moltology is, moltmaxxing). The set is built in 3D so the characters stand on it and cast shadows; a matching painted backdrop is drawn behind it unless `backdrop` is given.
+
+## 4. Write the scenes
+
+A short is six to ten scenes (six for a solo host; a dialogue usually needs eight, one per line). Each scene is one or two spoken sentences plus its direction. House rules:
 
 - **Spoken hook.** Scene 1's line starts with `hookHeadline`: sentence case, under 14 words, concrete. It is shown big on screen while it is spoken; regular subtitles start after it.
-- **Length.** 50 to 65 words in total (about 23 seconds with the narrator at +12%), then the 2.5-second waving outro.
+- **Length.** 50 to 65 words in total (about 23 seconds with the narrator at +12%), up to 75 for a dialogue (each change of speaker adds a short pause), then the 2.5-second waving outro.
+- **Dialogue.** Each line is short and sounds like a person talking. The newcomer asks what a viewer would ask; the host never lectures for more than two lines in a row. Open on the `two` shot so viewers meet both characters, cut to the speaker for most lines, and come back to `two` for the payoff or a reaction. Give the listener something to do with `act` (a think pose, a nod via `snap`, a `poke` at the surprise).
 - **Payoff late.** The doable action lands in scenes 3 to 5. The host demonstrates it with a pose or reaction.
 - **Ending.** Scene 6 gives one website invitation matching the destination, such as "Read the full passage at moltology.org" for a Codex lesson. No save, share, keyword or DM asks.
-- **Direction.** Use at least four different shots across the six scenes, put a reaction on the word that carries a joke or the payoff, and cut (`"move": "cut"`) on a change of idea. A push-in suits the reveal of the idea; a pull-out suits the ending. Keep the host looking at the camera unless the line is about something else.
+- **Direction.** Use at least four different shots across the six scenes, put a reaction on the word that carries a joke or the payoff, and cut (`"move": "cut"`) on a change of idea. A push-in suits the reveal of the idea; a pull-out suits the ending. Keep the host looking at the camera unless the line is about something else; in a dialogue, characters mostly look at each other (`"look": "other"`) and turn to camera for the line meant for the viewer.
 
-Save the lesson as `tmp/anim-next/lesson.json` (format in the reference; `content/animation/examples/daily-shedding-routine.json` is a complete example). Captions, first comment and YouTube copy follow the reels skill (STYLE_GUIDE section 4.3, at most three hashtags, a direct URL in the first comment).
+Save the lesson as `tmp/anim-next/lesson.json` (format in the reference; `content/animation/examples/daily-shedding-routine.json` is a complete solo example and `nightly-molt-audit.json` a complete dialogue). Captions, first comment and YouTube copy follow the reels skill (STYLE_GUIDE section 4.3, at most three hashtags, a direct URL in the first comment).
 
-## 4. Boredom check, then a silent render
+## 5. Boredom check, then a silent render
 
 Run the playbook's boredom check on the script. Then render without the voice to check the direction cheaply:
 
@@ -53,21 +68,21 @@ Run the playbook's boredom check on the script. Then render without the voice to
 npm run anim:create -- --lesson tmp/anim-next/lesson.json --silent --scale 0.5
 ```
 
-Look at `tmp/anim-<id>/checks/*.jpg` and watch `final.mp4`. Fix shots where the character is cut off in a way that hides the action, where the face sits under the subtitles, or where nothing changes for more than four seconds.
+Look at `tmp/anim-<id>/checks/*.jpg` and watch `final.mp4`. Fix shots where the character is cut off in a way that hides the action, where the face sits under the subtitles, or where nothing changes for more than four seconds. In a dialogue also check that the speaker is the one in frame, that both characters fit the two-shot, and that set pieces never stand in front of anyone.
 
-## 5. Voice and full render
+## 6. Voice and full render
 
 ```bash
 npm run anim:create -- --lesson tmp/anim-next/lesson.json
 ```
 
-This makes the narration with the reel narrator (`BOOK RECORD REGULAR`, `--voice` to change), measures the voice frame by frame for the talking mouth, renders every frame at 1080x1920 in Chrome on the Mac's GPU, builds one clip per scene over the backdrop with the hook headline, and finishes with the shared reel compositor (subtitles, ambient music, watermark, outro). Re-running reuses the voice while the narration is unchanged; `--reuse-frames` skips the 3D render when only backdrops or the outro changed.
+This voices each run of lines by one speaker as a take in that speaker's Fish voice (the narrator is `BOOK RECORD REGULAR`, `--voice` to change), joins the takes with a short pause, measures each take frame by frame so only the speaker's mouth moves, renders every frame at 1080x1920 in Chrome on the Mac's GPU, builds one clip per scene over the backdrop with the hook headline, and finishes with the shared reel compositor (subtitles, ambient music, watermark, outro). Takes are cached by their words and voice, so editing one line re-voices only that take; `--reuse-frames` skips the 3D render when only backdrops or the outro changed.
 
-Backdrops: the default is a plain deep-water set. For a real episode, generate one 9:16 backdrop with ImageGen in the series look (a lamp-lit study at depth, empty floor in the lower third where the host stands, no characters, no text) and set `backdrop` in the lesson. A scene can override it.
+Backdrops: the default is a painted plate matching the set. For a richer episode, generate one 9:16 backdrop with ImageGen in the series look (matching the set, empty floor in the lower third where the cast stands, no characters, no text) and set `backdrop` in the lesson. A scene can override it.
 
-## 6. Inspect and queue
+## 7. Inspect and queue
 
-Before queueing, watch the final file once with sound on at phone size and run the playbook's phone proof on the stills in `checks/` (frame zero, mid-hook, last hook word, first body phrase, a later moment and the outro). Check that the mouth moves with the voice, the headline never overlaps the face, the subtitles never cover the eyes, and every reaction lands on its word.
+Before queueing, watch the final file once with sound on at phone size and run the playbook's phone proof on the stills in `checks/` (frame zero, mid-hook, last hook word, first body phrase, a later moment and the outro). Check that the right mouth moves with each voice, the headline never overlaps the face, the subtitles never cover the eyes, and every reaction lands on its word.
 
 Queue the inspected file through the reel CLI, which archives to Google Drive, uploads to Zernio and records the ledgers:
 
@@ -84,4 +99,4 @@ A lesson that does well can also go on the Academy as a short video lesson: hand
 
 ## Not built yet
 
-Long-form episodes (16:9 chapters that cut into shorts), a second character in the same shot, props and a branded intro sting. Long form needs a 16:9 compositor; ask before building it.
+Long-form episodes (16:9 chapters that cut into shorts), characters walking between marks, hand props and a branded intro sting. Long form needs a 16:9 compositor; ask before building it.
