@@ -1,0 +1,68 @@
+{
+  "id": "codex-scr-030-daily-shedding-routine",
+  "title": "Two moments decide your whole day",
+  "topic": "The Daily Shedding Routine (Codex SCR-030): one thing first in the morning, one thing let go at night",
+  "series": "Codex Lessons",
+  "episode": 1,
+  "format": "short",
+  "host": "host-crab",
+  "codex": { "id": "SCR-030", "title": "The Daily Shedding Routine", "url": "https://moltology.org/codex/scr-030" },
+  "hookHeadline": "Two moments decide your whole day.",
+  "scenes": [
+    {
+      "line": "Two moments decide your whole day.",
+      "description": "The host crab, mid-snap, holds up a claw to camera under the headline.",
+      "shot": "medium",
+      "pose": "point",
+      "react": [{ "kind": "snap", "word": 0, "side": -1 }]
+    },
+    {
+      "line": "The Codex calls it the Daily Shedding Routine. It's short.",
+      "description": "Close on the host, thinking, then a small shrug at 'It's short'.",
+      "shot": "close",
+      "move": "push-in",
+      "pose": "think"
+    },
+    {
+      "line": "Morning: before any feed or inbox, name the one thing that matters, and start it first.",
+      "description": "Low angle, the host squares up ready for the day and snaps on 'first'.",
+      "shot": "low",
+      "move": "cut",
+      "pose": "ready",
+      "frame": "left",
+      "react": [{ "kind": "snap", "word": 15, "side": 1 }]
+    },
+    {
+      "line": "Night: pick one thing you're still carrying, write it down, let it go.",
+      "description": "High angle, the host relaxes and looks down, letting the day go.",
+      "shot": "high",
+      "move": "cut",
+      "pose": "rest",
+      "look": "down",
+      "turn": -12
+    },
+    {
+      "line": "Everything in between? Negotiable.",
+      "description": "Extreme close-up, the host shrugs with a goofy face.",
+      "shot": "extreme",
+      "move": "cut",
+      "pose": "shrug",
+      "react": [{ "kind": "poke", "word": 3 }]
+    },
+    {
+      "line": "Try it tomorrow. Read the full passage at moltology.org.",
+      "description": "Wide, the host points at the viewer and celebrates.",
+      "shot": "wide",
+      "move": "pull-out",
+      "pose": "point",
+      "react": [{ "kind": "celebrate", "word": 2 }]
+    }
+  ],
+  "caption": "Two moments decide your whole day.\n\nMorning: name the one thing that matters and start it before any feed or inbox.\nNight: write down one thing you're still carrying and let it go.\n\nRead the full passage at moltology.org.",
+  "hashtags": ["#morningroutine", "#productivity"],
+  "firstComment": "The full passage: https://moltology.org/codex/scr-030",
+  "youtubeTitle": "Two moments decide your whole day #shorts",
+  "youtubeDescription": "The Daily Shedding Routine from the Moltology Codex: name the one thing that matters before any feed or inbox, and let one thing go at night.\n\nRead the full passage: https://moltology.org/codex/scr-030",
+  "youtubeTags": ["morning routine", "productivity", "habits", "moltology"],
+  "ctaGoal": "codex"
+}

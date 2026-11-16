@@ -247,6 +247,26 @@ describe('avatar3d', () => {
     character.dispose()
   })
 
+  it('opens its mouth with the voice level and shuts it in silence', () => {
+    for (const race of AVATAR_RACES) {
+      const character = buildCharacter(baselineLook(race))
+      const mouth = character.rig.bones.get('mouthOpen')!
+      character.update(0.033, 0.033, true)
+      expect(mouth.visible, race).toBe(false)
+      character.setTalk(1)
+      character.update(0.033, 0.066, true)
+      expect(mouth.visible, race).toBe(true)
+      const loud = mouth.scale.y
+      character.setTalk(0.2)
+      character.update(0.033, 0.1, true)
+      expect(mouth.scale.y, race).toBeLessThan(loud)
+      character.setTalk(0)
+      character.update(0.033, 0.133, true)
+      expect(mouth.visible, race).toBe(false)
+      character.dispose()
+    }
+  })
+
   it('turns its eyes toward the pointer and keeps every temperament finite', () => {
     for (const temperament of AVATAR_TEMPERAMENTS) {
       const character = buildCharacter({ ...baselineLook('crab'), temperament })

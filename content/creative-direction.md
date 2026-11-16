@@ -26,6 +26,7 @@ blank page. Keep one-offs to at most one in four pieces.
 | **Shell Check** | A judge rates your habits and you laugh at yourself | Tier list, red flags, rate it, starter pack, myth vs fact, stop doing X | `crab_sentinel` as the unimpressed judge, `crab_stats` keeping score | Type-led, hard flat colour blocks, stamps and scores, high contrast | Crimson |
 | **Ask the Oracle** | One real, recognisable problem, answered calmly and usefully | Steal these lines, cheat sheet, quote deck, reverse tutorial | `lobster_oracle_attendant` answering, `lobster_archivist` for anything from the Codex | Warm lamp-lit study at depth, sea-glass glow from the orb as the one light source | Amber |
 | **The Molt Log** | A running workplace story with the same characters, one small win per episode | POV, fake group chat, expectation vs reality, story, before and after | The Log crew (section 2): the same three characters every episode | Illustrated deep-sea office, warm practicals, recurring set (the same desk, the same window, the same plant) | Lavender |
+| **Codex Lessons** | One Codex passage turned into one thing to do today, taught by the same 3D host | Animated lesson shorts ([animated-lessons](../.agents/skills/animated-lessons/SKILL.md)): claim, the passage in plain words, the action, the website invitation | `host-crab` from `content/animation/cast.json`, rendered by the site's 3D character code | Deep-water set or a lamp-lit study at depth, cinematic rim light, the host centre frame | Amber |
 
 Rules:
 
@@ -40,7 +41,8 @@ Rules:
 - **Rotate series.** Don't run the same series twice in a row on one channel unless it's a
   two-part story. Check the ledger (section 7).
 - **New series.** Propose a new series only with three episode ideas ready. Add it to this
-  table in the same change.
+  table in the same change. Codex Lessons started with: the Daily Shedding Routine (SCR-030),
+  the Nightly Molt Audit and the Isolation Protocols.
 
 ## 2. Cast
 

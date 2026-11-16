@@ -1,0 +1,25 @@
+{
+  "cast": {
+    "host-crab": {
+      "role": "Lesson host: explains Codex passages, what Moltology is and moltmaxxing, straight to camera.",
+      "config": {
+        "seed": "animation-host-crab",
+        "race": "crab",
+        "shellColor": "coral",
+        "shellFinish": "satin",
+        "marking": "none",
+        "mouth": "smile",
+        "antennae": "whip",
+        "pose": "rest",
+        "headShape": "bean",
+        "build": "classic",
+        "eyeColor": "emerald",
+        "eyeVariant": "round",
+        "pupilVariant": "standard",
+        "eyelidStyle": "relaxed",
+        "gaze": "ahead",
+        "temperament": "lively"
+      }
+    }
+  }
+}

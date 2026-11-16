@@ -83,6 +83,15 @@ export interface Stage {
   react: (kind: Reaction, side?: 1 | -1) => void
   /** Zoom (1 is the whole figure) and tilt back to where they started. */
   resetView: () => void
+  /**
+   * Direct the camera for scripted animation: `zoom` (1 is the whole figure, up to 3 for a face
+   * close-up), `tilt` (radians, looking down from above when positive) and `pan` (world units;
+   * positive moves the character to the viewer's left, leaving room on the right) and `lift`
+   * (world units; positive aims higher, so the character sits lower with room above it). The
+   * camera glides to the new place (`rate` sets how quickly: 6 is the usual snappy glide, 1 a slow
+   * creep across a scene); `cut` jumps there in the next frame.
+   */
+  setCamera: (camera: { zoom?: number; tilt?: number; pan?: number; lift?: number; rate?: number; cut?: boolean }) => void
   /** Switch a manual stage between the whole figure and the head-and-shoulders framing. */
   setFraming: (framing: 'full' | 'portrait') => void
   /** Move time on by `dt` seconds and draw. For manual stages (tests and review renders). */
@@ -266,7 +275,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     let rise: number
     if (!close) {
       // Zooming in closes on the head and shoulders rather than the middle of the body.
-      const near = (zoom - 1) / (ZOOM_MAX - 1)
+      const near = clamp((zoom - 1) / (ZOOM_MAX - 1), 0, 1)
       wantLook.copy(home.look)
       wantLook.y += ((character?.height ?? 1.8) * 0.8 - home.look.y) * near
       dist = (home.position.z - home.look.z) / zoom
@@ -279,11 +288,16 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       rise = size * 0.12
       wantLook.copy(at)
     }
+    wantLook.x += pan
+    wantLook.y += lift
     wantPosition.set(wantLook.x, wantLook.y + rise + dist * Math.sin(tilt), wantLook.z + dist * Math.cos(tilt))
   }
   let yaw = options.yaw ?? 0
   let zoom = 1
   let tilt = 0
+  let pan = 0
+  let lift = 0
+  let glideRate = 6
   let framing = options.framing ?? 'full'
   let spin = 0
   let velocity = 0
@@ -348,7 +362,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     if (framing !== 'portrait') {
       target()
       // Ease in like a game camera; snap when motion is reduced or nothing has been drawn yet.
-      const k = options.reducedMotion || !started ? 1 : 1 - Math.exp(-dt * 6)
+      const k = options.reducedMotion || !started ? 1 : 1 - Math.exp(-dt * glideRate)
       eye.lerp(wantPosition, k)
       aim.lerp(wantLook, k)
       camera.position.copy(eye)
@@ -578,6 +592,18 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     resetView() {
       zoom = 1
       tilt = 0
+      pan = 0
+      lift = 0
+      wake()
+    },
+    setCamera(next) {
+      if (next.zoom !== undefined) zoom = clamp(next.zoom, 0.6, 3)
+      if (next.tilt !== undefined) tilt = clamp(next.tilt, TILT_MIN, TILT_MAX)
+      if (next.pan !== undefined) pan = next.pan
+      if (next.lift !== undefined) lift = next.lift
+      glideRate = next.rate ?? 6
+      // A cut lands on the next frame drawn, as the very first frame does.
+      if (next.cut) started = false
       wake()
     },
     setFraming(next) {
@@ -588,6 +614,8 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     },
     step(dt) {
       clock += dt
+      // A manual stage turns on its own turntable too (scripted animation uses it).
+      yaw += spin * dt
       draw(dt, clock)
     },
     resize: () => {

@@ -21,6 +21,7 @@ Read the shared prerequisites and matching skill before any content pipeline, in
 | Instagram carousels | [instagram-carousel-creator](../.agents/skills/instagram-carousel-creator/SKILL.md) |
 | Loud, format-led carousels | [benthic-swipe-lab](../.agents/skills/benthic-swipe-lab/SKILL.md) |
 | Reels and Shorts | [reels-and-shorts-creator](../.agents/skills/reels-and-shorts-creator/SKILL.md) |
+| Animated lessons with the 3D characters | [animated-lessons](../.agents/skills/animated-lessons/SKILL.md), `npm run anim:create`; cast in [animation/cast.json](animation/cast.json) |
 | Blog dispatches | [blog-creator](../.agents/skills/blog-creator/SKILL.md) |
 | Long-form YouTube topic validation | [youtube-research](../.agents/skills/youtube-research/SKILL.md) |
 | Composite layouts from references | [composite-reference-library](../.agents/skills/composite-reference-library/SKILL.md), `npm run refs`; JSON specs in [composite-layouts/](composite-layouts/README.md) |

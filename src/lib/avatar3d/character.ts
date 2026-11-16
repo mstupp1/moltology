@@ -69,6 +69,11 @@ export interface Character3D {
   lookAt: (at: { x: number; y: number } | null) => void
   /** Play a short reaction over the current pose. `side` is 1 for the character's left claw. */
   react: (kind: Reaction, side?: 1 | -1) => void
+  /**
+   * How loud the character is speaking right now, 0 (silent) to 1, for scripted animation. The
+   * mouth opens with it and the head nods a little on the louder syllables.
+   */
+  setTalk: (level: number) => void
   /** The bone that carries a mesh of this character (for working out what was tapped). */
   boneOf: (object: Object3D) => string | null
   /** Advance the pose blend and idle motion. `time` is seconds; pass `idle = false` to hold still. */
@@ -348,6 +353,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   let reaction: { kind: Reaction; start: number | null; side: 1 | -1 } | null = null
   /** The pose to go back to once a reaction that borrows another pose is over. */
   let held: AvatarPose | null = null
+  /** Speech level from a scripted voice track (0 silent, 1 loudest). */
+  let talk = 0
 
   const overlay = (name: string, axis: Vector3, angle: number) => {
     const bone = rig.bones.get(name)
@@ -550,6 +557,17 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
           fanCurl = held
         }
       }
+      if (talk > 0.02) {
+        // Speaking: the mouth opens with the voice (a reaction's bigger mouth wins), the head
+        // nods a touch on the louder syllables and the brows ride up with emphasis.
+        const open = 0.15 + 0.7 * talk
+        if (open > mouthOpen) {
+          mouthOpen = open
+          mouthRound = 0.25 + 0.3 * talk
+        }
+        overlay('chest', X, -0.03 * talk)
+        browUp += 0.006 * talk
+      }
       // Eyes squash a little as they blink and stretch when startled.
       squash = -0.1 * closed + 0.12 * wide - 0.07 * squint
       for (const tag of ['L', 'R'] as const) {
@@ -676,6 +694,9 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
         held = pose
         aimPose('cheer')
       }
+    },
+    setTalk(level) {
+      talk = Math.min(1, Math.max(0, level))
     },
     boneOf(object) {
       // A skinned part (a bendy antenna, a joint's membrane) names the bone it belongs to.
