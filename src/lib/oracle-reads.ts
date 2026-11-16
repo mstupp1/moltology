@@ -17,6 +17,12 @@ export interface OracleReadItem {
   /** Set when the lookup returned exactly one thing the member can open. */
   title?: string
   href?: string
+  /**
+   * What the lookup returned, in order, so the chat can show each one as a card:
+   * forum topic slugs, news slugs, changelog slugs, Academy course slugs, or Codex
+   * passage ids with an optional verse (`SCR-010` or `SCR-010#3`).
+   */
+  refs?: string[]
 }
 
 /** Saved on an assistant message's `parts`, so a reloaded chat keeps the label. */
@@ -27,6 +33,9 @@ export interface OracleReadsPart {
 
 const KINDS = new Set<OracleReadKind>(['forum-list', 'forum-thread', 'news', 'changelog', 'academy', 'codex'])
 const MAX_ITEMS = 6
+/** Cards one lookup can show. */
+export const ORACLE_READ_MAX_REFS = 8
+const REF = /^[A-Za-z0-9][A-Za-z0-9-]{0,199}(?:#\d{1,4})?$/
 
 function plural(count: number, one: string, many: string): string {
   return `${count} ${count === 1 ? one : many}`
@@ -75,7 +84,15 @@ function cleanItem(raw: unknown): OracleReadItem | null {
   const count = typeof r.count === 'number' && Number.isFinite(r.count) ? Math.max(0, Math.floor(r.count)) : 0
   const href = typeof r.href === 'string' && r.href.startsWith('/') && !r.href.startsWith('//') ? r.href.slice(0, 300) : undefined
   const title = typeof r.title === 'string' ? r.title.slice(0, 160) : undefined
-  return { kind: r.kind as OracleReadKind, count, ...(href && title ? { href, title } : {}) }
+  const refs = Array.isArray(r.refs)
+    ? [...new Set(r.refs.filter((ref): ref is string => typeof ref === 'string' && REF.test(ref)))].slice(0, ORACLE_READ_MAX_REFS)
+    : []
+  return {
+    kind: r.kind as OracleReadKind,
+    count,
+    ...(href && title ? { href, title } : {}),
+    ...(refs.length ? { refs } : {}),
+  }
 }
 
 export function cleanReadItems(raw: unknown): OracleReadItem[] {
@@ -83,8 +100,14 @@ export function cleanReadItems(raw: unknown): OracleReadItem[] {
   return raw.map(cleanItem).filter((item): item is OracleReadItem => item !== null).slice(0, MAX_ITEMS)
 }
 
+const HEADER_MAX_CHARS = 6_000
+
 export function encodeReadsHeader(items: readonly OracleReadItem[]): string {
-  return encodeURIComponent(JSON.stringify(items.slice(0, MAX_ITEMS)))
+  const kept = items.slice(0, MAX_ITEMS)
+  const full = encodeURIComponent(JSON.stringify(kept))
+  if (full.length <= HEADER_MAX_CHARS) return full
+  // Too long for a header: keep the label, drop the cards (the saved message still has them).
+  return encodeURIComponent(JSON.stringify(kept.map(({ refs: _refs, ...rest }) => rest)))
 }
 
 export function decodeReadsHeader(value: string | null | undefined): OracleReadItem[] {
@@ -100,4 +123,31 @@ export function readReadsPart(parts: unknown): OracleReadItem[] {
   if (!Array.isArray(parts)) return []
   const part = parts.find((p) => Boolean(p) && typeof p === 'object' && (p as { type?: unknown }).type === 'reads')
   return part ? cleanReadItems((part as { items?: unknown }).items) : []
+}
+
+/** Card references across a reply's lookups, grouped by what loads them. */
+export interface OracleCardRefs {
+  forum: string[]
+  news: string[]
+  changelog: string[]
+  academy: string[]
+  codex: string[]
+}
+
+export function collectCardRefs(items: readonly OracleReadItem[]): OracleCardRefs {
+  const out: OracleCardRefs = { forum: [], news: [], changelog: [], academy: [], codex: [] }
+  for (const item of items) {
+    const bucket =
+      item.kind === 'forum-list' || item.kind === 'forum-thread' ? out.forum
+        : item.kind === 'news' ? out.news
+          : item.kind === 'changelog' ? out.changelog
+            : item.kind === 'academy' ? out.academy
+              : out.codex
+    for (const ref of item.refs ?? []) if (!bucket.includes(ref)) bucket.push(ref)
+  }
+  return out
+}
+
+export function hasCardRefs(refs: OracleCardRefs): boolean {
+  return Object.values(refs).some((list) => list.length > 0)
 }

@@ -2,7 +2,7 @@ import React from 'react'
 import { BandSectionNav, type BandSection } from '@/components/hud/BandSectionNav'
 import { HudTitleBandTop } from '@/components/hud/HudTitlePanel'
 
-export const ADMIN_TAB_IDS = ['watch', 'members', 'store', 'experiments'] as const
+export const ADMIN_TAB_IDS = ['watch', 'members', 'store', 'experiments', 'prompts'] as const
 export type AdminTab = (typeof ADMIN_TAB_IDS)[number]
 export type AdminSection = AdminTab | 'logic'
 
@@ -11,6 +11,7 @@ const SECTIONS = [
   { id: 'members', label: 'Members', to: '/admin', search: { tab: 'members' } },
   { id: 'store', label: 'Store', to: '/admin', search: { tab: 'store' } },
   { id: 'experiments', label: 'Experiments', to: '/admin', search: { tab: 'experiments' } },
+  { id: 'prompts', label: 'Starter prompts', to: '/admin', search: { tab: 'prompts' } },
   { id: 'logic', label: 'Logic Atlas', to: '/admin/logic' },
 ] as const satisfies readonly BandSection<AdminSection>[]
 

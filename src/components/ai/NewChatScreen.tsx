@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArrowUpRight, Pin, Shield, UserPlus } from 'lucide-react'
+import { ArrowUpRight, Pin, Shield, Sparkles, UserPlus, X } from 'lucide-react'
 import { BrandIcon3D } from '@/components/ui/BrandIcon3D'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
 import { ORACLE_GUEST_LIMITS } from '@/lib/ai/usage-limits'
@@ -50,12 +50,21 @@ export const DEFAULT_PROMPT_SHORTCUTS: PromptShortcut[] = [
   },
 ]
 
+/** One tab of the "More ideas" list. */
+export interface PromptIdeaGroup {
+  id: string
+  label: string
+  prompts: PromptShortcut[]
+}
+
 export interface NewChatScreenProps {
   isGuest?: boolean
   /** Sends a suggestion straight away. */
   onSubmit: (data: { text: string }) => void
   onOpenAuthModal?: () => void
   shortcuts?: PromptShortcut[]
+  /** Every starter prompt the visitor can use, by group. Empty hides "More ideas". */
+  moreIdeas?: PromptIdeaGroup[]
   /**
    * The prompt box, rendered under the greeting on wide panels. Leave it out on narrow
    * panels (phones, popout, sidebar), where the panel docks the same box at the bottom.
@@ -75,6 +84,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
   onSubmit,
   onOpenAuthModal,
   shortcuts = DEFAULT_PROMPT_SHORTCUTS,
+  moreIdeas = [],
   composer,
   recentChats = [],
   onOpenChat,
@@ -86,6 +96,10 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
   const showRecents = recentChats.length > 0 && Boolean(onOpenChat)
   // Narrow panels trim suggestions while recents show, so the empty screen keeps its height.
   const visibleShortcuts = showRecents && !isCentered ? shortcuts.slice(0, 2) : shortcuts
+  const [ideasOpen, setIdeasOpen] = React.useState(false)
+  const [ideaTab, setIdeaTab] = React.useState(0)
+  const ideaGroup = moreIdeas[Math.min(ideaTab, moreIdeas.length - 1)]
+  const focus = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 
   const greeting = (
     <div className={`flex flex-col gap-2 ${isCentered ? 'items-center text-center' : 'items-start'}`}>
@@ -96,7 +110,71 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
     </div>
   )
 
-  const suggestions = visibleShortcuts.length > 0 && (
+  const moreIdeasButton = moreIdeas.length > 0 && (
+    <li className={isCentered ? '' : 'w-full'}>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setIdeasOpen(true)}
+        aria-expanded={false}
+        className={`inline-flex items-center gap-1.5 rounded-control text-sm text-cyan-glow hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${focus} ${
+          isCentered ? 'px-3 py-1.5' : 'px-3 py-1.5 -ml-1'
+        }`}
+      >
+        <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+        More ideas
+      </button>
+    </li>
+  )
+
+  // "More ideas" swaps in place of the chips: tabs by group, then that group's prompts.
+  const ideas = ideasOpen && ideaGroup && (
+    <section aria-label="More ideas" className="w-full flex flex-col gap-2 text-left" data-testid="oracle-more-ideas">
+      <div className="flex items-center gap-1">
+        <div role="tablist" aria-label="Idea groups" className="flex flex-1 min-w-0 gap-1 overflow-x-auto no-scrollbar">
+          {moreIdeas.map((g, i) => (
+            <button
+              key={g.id}
+              type="button"
+              role="tab"
+              aria-selected={g.id === ideaGroup.id}
+              onClick={() => setIdeaTab(i)}
+              className={`shrink-0 rounded-chip px-3 py-1 text-xs font-bold transition-colors cursor-pointer ${focus} ${
+                g.id === ideaGroup.id ? 'bg-cyan-soft text-cyan-glow' : 'text-ink-muted hover:text-ink hover:bg-surface-2'
+              }`}
+            >
+              {g.label}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => setIdeasOpen(false)}
+          aria-label="Close ideas"
+          className={`shrink-0 rounded-control p-1.5 text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer ${focus}`}
+        >
+          <X className="w-4 h-4" aria-hidden="true" />
+        </button>
+      </div>
+      <ul role="tabpanel" aria-label={ideaGroup.label} className="flex flex-col">
+        {ideaGroup.prompts.map((s) => (
+          <li key={s.label}>
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={() => onSubmit({ text: s.prompt })}
+              className={`group w-full flex items-center justify-between gap-2 rounded-control px-2 py-2 text-left text-sm text-ink-body hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${focus}`}
+            >
+              <span className="min-w-0">{s.label}</span>
+              <ArrowUpRight className="w-3.5 h-3.5 text-ink-muted group-hover:text-cyan-glow shrink-0 transition-colors" aria-hidden="true" />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+
+  const suggestions = ideas || (visibleShortcuts.length > 0 && (
     <ul
       aria-label="Suggested questions"
       className={isCentered ? 'flex flex-wrap justify-center gap-2' : 'flex flex-col gap-1.5 w-full'}
@@ -116,8 +194,9 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
           </button>
         </li>
       ))}
+      {moreIdeasButton}
     </ul>
-  )
+  ))
 
   const recents = showRecents && (
     <section aria-labelledby="oracle-recent-chats" className="-mx-2 flex flex-col gap-1 text-left">

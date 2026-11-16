@@ -23,7 +23,15 @@ import {
 import { useIsPhone, useKeyboardInset } from '../../hooks/useChatViewport'
 import { PromptInput } from '../ai-elements/prompt-input'
 import { ORACLE_DRAFT_EVENT, reportAlignmentAction, takeOracleDraft } from '@/lib/alignment-actions'
-import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS, pickLatestChat, pickRecentChats } from './NewChatScreen'
+import { NewChatScreen, pickLatestChat, pickRecentChats, type PromptIdeaGroup, type PromptShortcut } from './NewChatScreen'
+import {
+  localDay,
+  pickStarterChips,
+  starterPageKind,
+  starterPromptText,
+  starterPromptsByGroup,
+  type StarterContext,
+} from '@/lib/oracle-starter-prompts'
 import { OracleChatsPanel } from './OracleChatsPanel'
 import {
   OracleEntityModeToggle,
@@ -61,7 +69,8 @@ import { isAdmin } from '@/lib/permissions'
 import { CHAT_LIMIT, getChatLimitError } from '@/lib/ai/chat-retention'
 import { readSkillPart, usableSkills } from '@/lib/oracle-skills'
 import { readReadsPart, type OracleReadItem } from '@/lib/oracle-reads'
-import { OracleReadsLabel } from './OracleReadsLabel'
+import { OracleReadCards } from './OracleReadCards'
+import { useHydrated } from '@/hooks/useHydrated'
 import { useOracleSkills } from '@/hooks/useOracleSkills'
 
 const INLINE_COMPOSER_MIN_WIDTH = 640
@@ -439,6 +448,27 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   }
 
   const accessTier: OracleAccessTier = !userId ? 'guest' : usage.snapshot?.isPremium ? 'premium' : 'free'
+
+  // Starter prompts for this visitor and the page behind the chat (the full Oracle page has none).
+  // Day and page are only read after hydration, so server and first client render match.
+  const hydrated = useHydrated()
+  const pathname = hydrated ? window.location.pathname : ''
+  const memberSince = (user as { createdAt?: string | Date } | null | undefined)?.createdAt
+  const { starterChips, starterIdeas } = useMemo(() => {
+    const memberDays = memberSince ? Math.floor((Date.now() - new Date(memberSince).getTime()) / 86_400_000) : undefined
+    const ctx: StarterContext = {
+      audience: accessTier === 'guest' ? 'guest' : accessTier === 'premium' ? 'max' : 'member',
+      memberDays: Number.isFinite(memberDays) ? memberDays : undefined,
+      page: pathname.startsWith('/oracle') ? null : starterPageKind(pathname),
+      today: hydrated ? localDay() : '',
+      seed: userId ?? 'guest',
+    }
+    const toShortcut = (p: { label: string; prompt?: string }): PromptShortcut => ({ label: p.label, prompt: starterPromptText(p) })
+    return {
+      starterChips: pickStarterChips(ctx).map(toShortcut),
+      starterIdeas: starterPromptsByGroup(ctx).map((g): PromptIdeaGroup => ({ id: g.group, label: g.label, prompts: g.prompts.map(toShortcut) })),
+    }
+  }, [accessTier, memberSince, userId, pathname, hydrated])
   const requestedModel = selectedModelId ? getOracleModel(selectedModelId) : null
   const selectedModel = requestedModel && canUseOracleChatModel(requestedModel, accessTier)
     ? requestedModel : getOracleModel(getOracleDefaultModelId(accessTier))
@@ -1121,7 +1151,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                 isGuest={isGuest}
                 isPhone={isPhone}
                 isCompact={isCompact}
-                shortcuts={DEFAULT_PROMPT_SHORTCUTS}
+                shortcuts={starterChips}
                 onSubmitShortcut={handlePromptSubmit}
                 onRetryFailed={handleRetryFailed}
                 onEditFailed={handleEditFailed}
@@ -1143,7 +1173,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                       onSubmit={handlePromptSubmit}
                       disabled={isSending || usage.blocked}
                       onOpenAuthModal={() => setIsAuthModalOpen(true)}
-                      shortcuts={DEFAULT_PROMPT_SHORTCUTS}
+                      shortcuts={starterChips}
+                      moreIdeas={starterIdeas}
                       composer={isNarrow ? undefined : composer('inline')}
                       recentChats={recentChats}
                       onOpenChat={handleSelectThread}
@@ -1219,7 +1250,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                                     Using {msg.skill.name}
                                   </Link>
                                 )}
-                                {isAssistant && msg.reads?.length ? <OracleReadsLabel reads={msg.reads} /> : null}
                                 {msg.role === 'user' ? (
                                   msg.content
                                 ) : msg.content ? (
@@ -1234,6 +1264,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                                     {msg.content ? 'Stopped.' : 'Stopped before a reply came through.'}
                                   </p>
                                 )}
+                                {isAssistant && msg.reads?.length ? (
+                                  <OracleReadCards reads={msg.reads} signedIn={Boolean(userId)} />
+                                ) : null}
                                 {showGuestNudge && (
                                   <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-surface-2 px-3 py-2 rounded-control border border-line-subtle">
                                     <div className="text-[11px] text-ink-body font-sans flex items-center gap-1.5 min-w-0">

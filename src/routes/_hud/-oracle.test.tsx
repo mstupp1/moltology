@@ -5,6 +5,17 @@ import { Route } from './oracle'
 
 import { authClient } from '@/lib/auth-client'
 
+// Starter chips rotate daily; pin the old fixed set so these tests stay about the panel.
+vi.mock('@/lib/oracle-starter-prompts', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/oracle-starter-prompts')>()
+  const fixed = ['what-is-moltology', 'start-moltmaxxing', 'melt-vs-molt', 'top-posts-today']
+  return {
+    ...actual,
+    pickStarterChips: () => fixed.map((id) => actual.STARTER_PROMPTS.find((p) => p.id === id)!),
+  }
+})
+
+
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 
 let mockUser: any = null

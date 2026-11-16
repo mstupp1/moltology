@@ -1401,3 +1401,33 @@ export const getRankHonorsFn = createServerFn({ method: 'POST' })
     const { getRankHonors } = await import('./leaderboard')
     return getRankHonors()
   })
+
+const oracleCardRefList = z.array(z.string().regex(/^[A-Za-z0-9][A-Za-z0-9-]{0,199}(?:#\d{1,4})?$/)).max(16)
+
+/** Card data for what an Oracle reply read (public content only). */
+export const getOracleCardsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: {
+    forum?: string[]
+    news?: string[]
+    changelog?: string[]
+    academy?: string[]
+    codex?: string[]
+    token?: string
+  }) =>
+    z
+      .object({
+        forum: oracleCardRefList.default([]),
+        news: oracleCardRefList.default([]),
+        changelog: oracleCardRefList.default([]),
+        academy: oracleCardRefList.default([]),
+        codex: oracleCardRefList.default([]),
+        token: z.string().optional(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data }) => {
+    const { getOracleCardsHandler } = await import('./oracle-content-source')
+    const { token, ...refs } = data
+    return getOracleCardsHandler(refs, token)
+  })

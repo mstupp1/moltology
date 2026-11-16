@@ -4,6 +4,11 @@ import { forumCategories, forumTopics, profiles } from '../../db/schema'
 import { escapeLikePattern, forumCategoryLookupSlugs, toForumIso, visibleForumContent } from '../forum-utils'
 import { resolveMemberPublicName } from '../member-handle'
 import type { BlogPostData } from '../blog-data'
+import type { AcademyCourseCard } from '../academy'
+import { CANONICAL_SCRIPTURES } from '../codexData'
+import { codexVerseAnchor, scriptureSlugFromId } from '../codex-links'
+import type { OracleCardRefs } from '../oracle-reads'
+import type { ForumTopicEntry } from './db-services'
 import type { ChangelogEntry } from '../changelogs-data'
 import type {
   AcademyCatalogRead,
@@ -182,4 +187,85 @@ export const oracleContentSource: OracleContentSource = {
   newsArticle: newsArticleFromDb,
   changelogs: changelogsFromDb,
   academyCatalog: academyCatalogFromDb,
+}
+
+/** One Codex passage for a reply card, with the verse the lookup matched. */
+export interface OracleCodexCard {
+  id: string
+  title: string
+  volumeName: string
+  href: string
+  verse: { verseNumber: number; heading?: string; text: string } | null
+}
+
+export interface OracleCardsPayload {
+  forum: ForumTopicEntry[]
+  news: BlogPostData[]
+  changelog: ChangelogEntry[]
+  academy: AcademyCourseCard[]
+  codex: OracleCodexCard[]
+}
+
+function inOrder<T>(refs: string[], rows: T[], key: (row: T) => string): T[] {
+  const byKey = new Map(rows.map((row) => [key(row), row]))
+  return refs.map((ref) => byKey.get(ref)).filter((row): row is T => Boolean(row))
+}
+
+async function settle<T>(label: string, run: () => Promise<T[]>): Promise<T[]> {
+  try {
+    return await run()
+  } catch (err) {
+    console.warn(`[oracle-cards] ${label} failed:`, err instanceof Error ? err.message : err)
+    return []
+  }
+}
+
+/**
+ * Card data for the things an Oracle reply read: the same public rows the forum, news,
+ * changelog and Academy pages show. Unknown, unpublished or removed refs drop out.
+ * The token only hydrates the reader's own vote state on forum cards.
+ */
+export async function getOracleCardsHandler(refs: OracleCardRefs, token?: string): Promise<OracleCardsPayload> {
+  const { getForumTopicsHandler, getBlogPostsHandler, getPublicChangelogsHandler } = await import('./db-services')
+  const [forum, news, changelog, academy] = await Promise.all([
+    refs.forum.length
+      ? settle('forum', async () =>
+          inOrder(refs.forum, await getForumTopicsHandler({ data: { slugs: refs.forum, sortBy: 'latest', limit: refs.forum.length, token } } as never), (t) => t.slug))
+      : [],
+    refs.news.length
+      ? settle('news', async () => inOrder(refs.news, ((await getBlogPostsHandler({} as never)) as BlogPostData[]).filter((p) => p.isPublished !== false), (p) => p.slug))
+      : [],
+    refs.changelog.length
+      ? settle('changelog', async () => inOrder(refs.changelog, (await getPublicChangelogsHandler({} as never)) as ChangelogEntry[], (c) => c.slug))
+      : [],
+    refs.academy.length
+      ? settle('academy', async () => {
+          const { getAcademyHomeHandler } = await import('./academy')
+          return inOrder(refs.academy, (await getAcademyHomeHandler({})).courses, (c) => c.slug)
+        })
+      : [],
+  ])
+  const codex = refs.codex.flatMap((ref): OracleCodexCard[] => {
+    const [id, verseRaw] = ref.split('#')
+    const scripture = CANONICAL_SCRIPTURES.find((s) => s.id === id.toUpperCase())
+    if (!scripture) return []
+    const verseNumber = verseRaw ? Number(verseRaw) : NaN
+    const verse = scripture.verses.find((v) => v.verseNumber === verseNumber) ?? scripture.verses[0] ?? null
+    const base = `/codex/${scriptureSlugFromId(scripture.id)}`
+    return [{
+      id: scripture.id,
+      title: scripture.title,
+      volumeName: scripture.volumeName,
+      href: verse && verseRaw ? `${base}#${codexVerseAnchor(verse.verseNumber)}` : base,
+      verse: verse ? { verseNumber: verse.verseNumber, heading: verse.heading, text: verse.text } : null,
+    }]
+  })
+  // Listings never need bodies; keep the payload small.
+  return {
+    forum,
+    news: news.map((p) => ({ ...p, content: '' })),
+    changelog: changelog.map((c) => ({ ...c, content: '' })),
+    academy,
+    codex,
+  }
 }
