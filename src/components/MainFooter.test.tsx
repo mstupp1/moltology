@@ -56,6 +56,15 @@ describe('MainFooter Component', () => {
     expect(rssLink).toHaveAttribute('href', '/rss.xml')
   })
 
+  it('links the tip jar as a plain outbound link', () => {
+    render(<MainFooter />)
+
+    const tipLink = screen.getByText('BUY US A COFFEE').closest('a')
+    expect(tipLink).toHaveAttribute('href', 'https://buymeacoffee.com/moltology')
+    expect(tipLink).toHaveAttribute('target', '_blank')
+    expect(tipLink).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
   it('points STORE at the on-site catalog for admins', () => {
     storeAccess = { canView: true, pending: false }
     render(<MainFooter />)

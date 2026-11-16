@@ -35,6 +35,17 @@ describe('SupportPortalView chrome', () => {
     expect(screen.queryByText(LORE)).not.toBeInTheDocument()
   })
 
+  it('shows a quiet tip jar link under the contact form only', () => {
+    renderPortal()
+
+    const tipLink = screen.getByRole('link', { name: /buy us a coffee/i })
+    expect(tipLink).toHaveAttribute('href', 'https://buymeacoffee.com/moltology')
+    expect(tipLink).toHaveAttribute('target', '_blank')
+
+    fireEvent.click(screen.getByRole('tab', { name: new RegExp(SUPPORT_PAGE_COPY.tabChangelog, 'i') }))
+    expect(screen.queryByRole('link', { name: /buy us a coffee/i })).not.toBeInTheDocument()
+  })
+
   it('switches between contact and changelog without lore', () => {
     renderPortal()
 
