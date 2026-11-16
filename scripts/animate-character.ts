@@ -151,7 +151,7 @@ async function main() {
       frames: outroFrames,
       look: { ...look, pose: 'wave' as const },
       talk: [],
-      cues: [{ t: 0, camera: { ...SHOTS.medium, pan: 0, tilt: SHOTS.medium.tilt - 0.12, cut: true }, look: { x: 0, y: 0 } }, { t: 0.9, react: { kind: 'snap' as const, side: -1 as const } }],
+      cues: [{ t: 0, camera: { ...SHOTS.wide, pan: 0, lift: 0.75, cut: true }, look: { x: 0, y: 0 } }, { t: 0.9, react: { kind: 'snap' as const, side: -1 as const } }],
     }
     const outroDir = path.join(outDir, 'outro-frames')
     if (!args.reuseFrames || !fs.existsSync(outroDir)) {

@@ -15,9 +15,9 @@ export const SHOTS = {
   /** Knees up: the everyday talking shot. */
   medium: { zoom: 1.35, tilt: 0.06 },
   /** Head and shoulders. */
-  close: { zoom: 2.3, tilt: 0.05 },
+  close: { zoom: 1.9, tilt: 0.05 },
   /** The face fills the frame: for one punchline, not a whole scene. */
-  extreme: { zoom: 2.9, tilt: 0.03 },
+  extreme: { zoom: 2.5, tilt: 0.03 },
   /** From below: the character looks big and sure of itself. */
   low: { zoom: 1.25, tilt: -0.1 },
   /** From above: the character looks small, or the viewer looks down at a problem. */

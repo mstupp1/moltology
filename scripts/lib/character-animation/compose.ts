@@ -139,7 +139,7 @@ export function renderOutroText(lines: string[], outPath: string): string {
   lines.forEach((text, i) => {
     const size = i === 0 ? 76 : 96
     ctx.font = `800 ${size}px ${FONT}`
-    const y = 470 + i * 130
+    const y = 500 + i * 130
     ctx.lineWidth = 10
     ctx.strokeStyle = 'rgba(8,12,18,0.92)'
     ctx.strokeText(text, OUT_W / 2, y)

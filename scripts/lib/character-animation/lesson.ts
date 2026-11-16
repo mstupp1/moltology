@@ -185,7 +185,7 @@ export function sceneWindows(lesson: Pick<Lesson, 'scenes'>, words: WordBoundary
   return starts.map((start, i) => ({ start, end: i + 1 < starts.length ? starts[i + 1] : total, firstWord: firsts[i] }))
 }
 
-const PAN = { center: 0, left: 0.38, right: -0.38 } as const
+const PAN = { center: 0, left: 0.22, right: -0.22 } as const
 const LOOK_AT: Record<LessonLook, { x: number; y: number } | null> = {
   camera: { x: 0, y: 0 },
   wander: null,
