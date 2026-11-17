@@ -15,7 +15,7 @@ export const EMAIL_THEME = {
 } as const
 
 export const TRANSACTIONAL_EMAIL_BRAND_URL = getAbsoluteAssetUrl(brand.key)
-const BRAND_DISPLAY_WIDTH = 110
+const BRAND_DISPLAY_WIDTH = 160
 export const TRANSACTIONAL_EMAIL_FOOTER = {
   name: 'Moltology',
   support: 'support@moltology.org',

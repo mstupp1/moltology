@@ -27,47 +27,24 @@ const layers = await Promise.all(tee.layers.map(async (layer) => {
   const fit = Math.min(layer.maxWidth * tee.width / image.width, layer.maxHeight * tee.height / image.height)
   const layerWidth = image.width * fit
   const layerHeight = image.height * fit
-  return { image, width: layerWidth, height: layerHeight, emblem: layer.source.repo.endsWith('/icon.svg'),
+  return { image, width: layerWidth, height: layerHeight,
     x: layer.cx * tee.width - layerWidth / 2, y: layer.cy * tee.height - layerHeight / 2 }
 }))
 const left = Math.min(...layers.map((layer) => layer.x))
 const top = Math.min(...layers.map((layer) => layer.y))
 const right = Math.max(...layers.map((layer) => layer.x + layer.width))
 const bottom = Math.max(...layers.map((layer) => layer.y + layer.height))
-// Room around the artwork so the emblem's glow fades out inside the plate.
-const pad = 22
-const reduction = (width - pad * 2) / (right - left)
-const height = Math.ceil((bottom - top) * reduction + pad * 2)
+const reduction = width / (right - left)
+const height = Math.ceil((bottom - top) * reduction)
 const canvas = createCanvas(width * scale, height * scale)
 const context = canvas.getContext('2d')
 context.scale(scale, scale)
 // A solid plate preserves the lettering when clients invert surrounding colors.
 context.fillStyle = tailwind.theme.extend.colors.benthic.surface
 context.fillRect(0, 0, width, height)
-const crimson = tailwind.theme.extend.colors.crimson.aggro
 for (const layer of layers) {
-  const x = (layer.x - left) * reduction + pad
-  const y = (layer.y - top) * reduction + pad
-  const w = layer.width * reduction
-  const h = layer.height * reduction
-  if (layer.emblem) {
-    // The emblem in its own light, as on GlowEmblem in the app and the site's link-preview card.
-    const cx = x + w / 2
-    const cy = y + h / 2
-    const halo = context.createRadialGradient(cx, cy, 0, cx, cy, w * 0.95)
-    halo.addColorStop(0, 'rgba(255, 69, 58, 0.30)')
-    halo.addColorStop(0.4, 'rgba(255, 69, 58, 0.10)')
-    halo.addColorStop(1, 'rgba(255, 69, 58, 0)')
-    context.fillStyle = halo
-    context.fillRect(0, 0, width, height)
-    context.save()
-    context.shadowColor = crimson
-    context.shadowBlur = w * 0.22 * scale
-    context.drawImage(layer.image, x, y, w, h)
-    context.restore()
-  } else {
-    context.drawImage(layer.image, x, y, w, h)
-  }
+  context.drawImage(layer.image, (layer.x - left) * reduction, (layer.y - top) * reduction,
+    layer.width * reduction, layer.height * reduction)
 }
 const png = await canvas.encode('png')
 const revision = createHash('sha256').update(png).digest('hex').slice(0, 12)
