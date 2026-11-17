@@ -15,20 +15,45 @@ export const EMAIL_THEME = {
 } as const
 
 export const TRANSACTIONAL_EMAIL_BRAND_URL = getAbsoluteAssetUrl(brand.key)
-const BRAND_DISPLAY_WIDTH = 160
+export const TRANSACTIONAL_EMAIL_FOOTER_EMBLEM_URL = getAbsoluteAssetUrl(brand.footerEmblem.key)
+const BRAND_DISPLAY_WIDTH = 188
 export const TRANSACTIONAL_EMAIL_FOOTER = {
   name: 'Moltology',
   support: 'support@moltology.org',
   privacyUrl: `${SITE_ORIGIN}/privacy`,
   termsUrl: `${SITE_ORIGIN}/terms`,
+  youtubeUrl: 'https://www.youtube.com/@Moltology',
+  instagramUrl: 'https://www.instagram.com/moltology_org/',
+} as const
+
+export const TRANSACTIONAL_EMAIL_SOCIAL = {
+  youtube: {
+    label: 'YouTube',
+    url: TRANSACTIONAL_EMAIL_FOOTER.youtubeUrl,
+    iconUrl: getAbsoluteAssetUrl(brand.social.youtube.key),
+    width: brand.social.youtube.width,
+    height: brand.social.youtube.height,
+  },
+  instagram: {
+    label: 'Instagram',
+    url: TRANSACTIONAL_EMAIL_FOOTER.instagramUrl,
+    iconUrl: getAbsoluteAssetUrl(brand.social.instagram.key),
+    width: brand.social.instagram.width,
+    height: brand.social.instagram.height,
+  },
 } as const
 
 export function TransactionalBrandHeader() {
   return (
-    <Section style={{ textAlign: 'center', paddingBottom: '32px' }}>
-      <Link href={SITE_ORIGIN} style={{ textDecoration: 'none' }}>
-        <Img src={TRANSACTIONAL_EMAIL_BRAND_URL} width={BRAND_DISPLAY_WIDTH} height={Math.round(brand.height * BRAND_DISPLAY_WIDTH / brand.width)}
-          alt="Moltology — The Synaptic Path" style={{ margin: '0 auto', maxWidth: '100%', height: 'auto' }} />
+    <Section style={{ textAlign: 'left', paddingBottom: '24px' }}>
+      <Link href={SITE_ORIGIN} style={{ textDecoration: 'none', display: 'inline-block' }}>
+        <Img
+          src={TRANSACTIONAL_EMAIL_BRAND_URL}
+          width={BRAND_DISPLAY_WIDTH}
+          height={Math.round(brand.height * BRAND_DISPLAY_WIDTH / brand.width)}
+          alt="Moltology — The Synaptic Path"
+          style={{ display: 'block', margin: '0', maxWidth: '100%', height: 'auto' }}
+        />
       </Link>
     </Section>
   )
@@ -47,11 +72,76 @@ export function TransactionalButton({ href, children }: { href: string; children
 export function TransactionalFooter() {
   const linkStyle = { color: EMAIL_THEME.muted, textDecoration: 'underline' }
   return (
-    <Section style={{ borderTop: `1px solid ${EMAIL_THEME.border}`, marginTop: '28px', paddingTop: '20px', textAlign: 'center' }}>
-      <Text style={{ color: EMAIL_THEME.muted, fontSize: '12px', lineHeight: '20px', margin: '0' }}>
-        {TRANSACTIONAL_EMAIL_FOOTER.name}<br />
+    <Section style={{ borderTop: `1px solid ${EMAIL_THEME.border}`, marginTop: '28px', paddingTop: '20px' }}>
+      <table width="100%" border={0} cellPadding={0} cellSpacing={0} role="presentation">
+        <tbody>
+          <tr>
+            <td align="left" valign="middle">
+              <Link href={SITE_ORIGIN} style={{ color: EMAIL_THEME.muted, textDecoration: 'none', display: 'inline-block' }}>
+                <table border={0} cellPadding={0} cellSpacing={0} role="presentation">
+                  <tbody>
+                    <tr>
+                      <td valign="middle" style={{ paddingRight: '8px' }}>
+                        <Img
+                          src={TRANSACTIONAL_EMAIL_FOOTER_EMBLEM_URL}
+                          width={brand.footerEmblem.width}
+                          height={brand.footerEmblem.height}
+                          alt="Moltology"
+                          style={{ display: 'block' }}
+                        />
+                      </td>
+                      <td valign="middle" style={{ color: EMAIL_THEME.muted, fontSize: '13px', lineHeight: '18px', fontWeight: 700 }}>
+                        {TRANSACTIONAL_EMAIL_FOOTER.name}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </Link>
+            </td>
+            <td align="right" valign="middle">
+              <table border={0} cellPadding={0} cellSpacing={0} role="presentation" style={{ display: 'inline-table' }}>
+                <tbody>
+                  <tr>
+                    <td valign="middle" style={{ paddingRight: '14px' }}>
+                      <Link
+                        href={TRANSACTIONAL_EMAIL_SOCIAL.youtube.url}
+                        aria-label="Moltology on YouTube"
+                        style={{ color: EMAIL_THEME.muted, textDecoration: 'none', display: 'inline-block' }}
+                      >
+                        <Img
+                          src={TRANSACTIONAL_EMAIL_SOCIAL.youtube.iconUrl}
+                          width={TRANSACTIONAL_EMAIL_SOCIAL.youtube.width}
+                          height={TRANSACTIONAL_EMAIL_SOCIAL.youtube.height}
+                          alt="YouTube"
+                          style={{ display: 'block' }}
+                        />
+                      </Link>
+                    </td>
+                    <td valign="middle">
+                      <Link
+                        href={TRANSACTIONAL_EMAIL_SOCIAL.instagram.url}
+                        aria-label="Moltology on Instagram"
+                        style={{ color: EMAIL_THEME.muted, textDecoration: 'none', display: 'inline-block' }}
+                      >
+                        <Img
+                          src={TRANSACTIONAL_EMAIL_SOCIAL.instagram.iconUrl}
+                          width={TRANSACTIONAL_EMAIL_SOCIAL.instagram.width}
+                          height={TRANSACTIONAL_EMAIL_SOCIAL.instagram.height}
+                          alt="Instagram"
+                          style={{ display: 'block' }}
+                        />
+                      </Link>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <Text style={{ color: EMAIL_THEME.muted, fontSize: '12px', lineHeight: '20px', margin: '12px 0 0', textAlign: 'left' }}>
         <Link href={`mailto:${TRANSACTIONAL_EMAIL_FOOTER.support}`} style={linkStyle}>{TRANSACTIONAL_EMAIL_FOOTER.support}</Link>
-        <br />
+        {' · '}
         <Link href={TRANSACTIONAL_EMAIL_FOOTER.privacyUrl} style={linkStyle}>Privacy</Link>
         {' · '}
         <Link href={TRANSACTIONAL_EMAIL_FOOTER.termsUrl} style={linkStyle}>Terms</Link>
@@ -86,6 +176,12 @@ export function TransactionalLayout({ preview, children }: { preview: string; ch
 }
 
 export function renderTransactionalFooterText(): string {
-  return [TRANSACTIONAL_EMAIL_FOOTER.name, TRANSACTIONAL_EMAIL_FOOTER.support,
-    `Privacy: ${TRANSACTIONAL_EMAIL_FOOTER.privacyUrl}`, `Terms: ${TRANSACTIONAL_EMAIL_FOOTER.termsUrl}`].join('\n')
+  return [
+    TRANSACTIONAL_EMAIL_FOOTER.name,
+    TRANSACTIONAL_EMAIL_FOOTER.support,
+    `Privacy: ${TRANSACTIONAL_EMAIL_FOOTER.privacyUrl}`,
+    `Terms: ${TRANSACTIONAL_EMAIL_FOOTER.termsUrl}`,
+    `YouTube: ${TRANSACTIONAL_EMAIL_FOOTER.youtubeUrl}`,
+    `Instagram: ${TRANSACTIONAL_EMAIL_FOOTER.instagramUrl}`,
+  ].join('\n')
 }

@@ -6,7 +6,13 @@ import {
   renderEmailVerificationEmailHtml,
   renderEmailVerificationEmailText,
 } from './email-verification'
-import { EMAIL_THEME, TRANSACTIONAL_EMAIL_BRAND_URL, TRANSACTIONAL_EMAIL_FOOTER } from './components/transactional'
+import {
+  EMAIL_THEME,
+  TRANSACTIONAL_EMAIL_BRAND_URL,
+  TRANSACTIONAL_EMAIL_FOOTER,
+  TRANSACTIONAL_EMAIL_FOOTER_EMBLEM_URL,
+  TRANSACTIONAL_EMAIL_SOCIAL,
+} from './components/transactional'
 
 const url = 'https://moltology.org/api/auth/verify-email?token=abc&next=/dashboard'
 
@@ -21,9 +27,16 @@ describe('email verification React template', () => {
     const logo = document.querySelector('img')!
     expect(logo.src).toBe(TRANSACTIONAL_EMAIL_BRAND_URL)
     expect(logo.alt).toBe('Moltology — The Synaptic Path')
-    expect(logo.width).toBe(160)
-    expect(logo.height).toBe(156)
+    expect(logo.width).toBe(188)
+    expect(logo.height).toBe(48)
     expect(logo.closest('a')?.href).toBe('https://moltology.org/')
+    const images = Array.from(document.querySelectorAll('img'))
+    expect(images.map((img) => img.src)).toEqual([
+      TRANSACTIONAL_EMAIL_BRAND_URL,
+      TRANSACTIONAL_EMAIL_FOOTER_EMBLEM_URL,
+      TRANSACTIONAL_EMAIL_SOCIAL.youtube.iconUrl,
+      TRANSACTIONAL_EMAIL_SOCIAL.instagram.iconUrl,
+    ])
     expect(html).toContain(`background-color:${EMAIL_THEME.background}`)
     expect(html).toContain(`background-color:${EMAIL_THEME.surface}`)
     const action = Array.from(document.querySelectorAll('a')).find((link) => link.textContent === EMAIL_VERIFICATION_MAIL.button)!
@@ -50,7 +63,12 @@ describe('email verification React template', () => {
     }
     expect(EMAIL_VERIFICATION_EXPIRES_IN_SECONDS).toBe(3600)
     expect(EMAIL_VERIFICATION_MAIL.expiration).toBe('This link expires in 1 hour.')
-    for (const destination of [TRANSACTIONAL_EMAIL_FOOTER.privacyUrl, TRANSACTIONAL_EMAIL_FOOTER.termsUrl]) {
+    for (const destination of [
+      TRANSACTIONAL_EMAIL_FOOTER.privacyUrl,
+      TRANSACTIONAL_EMAIL_FOOTER.termsUrl,
+      TRANSACTIONAL_EMAIL_FOOTER.youtubeUrl,
+      TRANSACTIONAL_EMAIL_FOOTER.instagramUrl,
+    ]) {
       expect(document.querySelector(`a[href="${destination}"]`)).not.toBeNull()
       expect(text).toContain(destination)
     }

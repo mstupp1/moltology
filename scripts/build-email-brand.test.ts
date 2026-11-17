@@ -13,31 +13,37 @@ describe('email brand export', () => {
     execFileSync(process.execPath, ['--import', 'tsx', 'scripts/build-email-brand.mjs'])
     expect(readFileSync(manifestPath, 'utf8')).toBe(manifestBefore)
     const manifest = JSON.parse(manifestBefore)
-    const png = readFileSync(path.join('tmp/email-brand', path.basename(manifest.key)))
-    const revision = createHash('sha256').update(png).digest('hex').slice(0, 12)
-    expect(manifest.key).toBe(`images/email/moltology-lockup-dark-${revision}.png`)
-    expect(Array.from(png.subarray(0, 8))).toEqual([137, 80, 78, 71, 13, 10, 26, 10])
-    const image = await loadImage(png)
-    expect(image.width).toBe(manifest.width * 3)
-    expect(image.height).toBe(manifest.height * 3)
-    expect(png.length).toBeLessThan(100_000)
-    // Tee: icon fits 30% of 4800px height; wordmark spans 70% of 3600px width.
-    // Check visible red pixels so a regression to the former small emblem fails.
-    const canvas = createCanvas(image.width, image.height)
-    const context = canvas.getContext('2d')
-    context.drawImage(image, 0, 0)
-    const pixels = context.getImageData(0, 0, image.width, image.height).data
-    let minX = image.width
-    let maxX = -1
-    for (let y = 0; y < image.height; y++) for (let x = 0; x < image.width; x++) {
-      const index = (y * image.width + x) * 4
-      if (pixels[index] > 220 && pixels[index + 1] < 100 && pixels[index + 2] < 100) {
-        minX = Math.min(minX, x)
-        maxX = Math.max(maxX, x)
-      }
+    const assets = [
+      manifest,
+      manifest.footerEmblem,
+      manifest.social.youtube,
+      manifest.social.instagram,
+    ]
+    for (const asset of assets) {
+      const png = readFileSync(path.join('tmp/email-brand', path.basename(asset.key)))
+      const revision = createHash('sha256').update(png).digest('hex').slice(0, 12)
+      expect(asset.key).toMatch(new RegExp(`^images/email/[a-z-]+-${revision}\\.png$`))
+      expect(Array.from(png.subarray(0, 8))).toEqual([137, 80, 78, 71, 13, 10, 26, 10])
+      const image = await loadImage(png)
+      expect(image.width).toBe(asset.width * 3)
+      expect(image.height).toBe(asset.height * 3)
+      expect(png.length).toBeLessThan(100_000)
     }
-    // The emblem's visible red artwork occupies about 87% of its square SVG canvas.
-    expect((maxX - minX + 1) / image.width).toBeCloseTo((1440 / 2520) * 0.87, 2)
-    expect(manifest.height / manifest.width).toBeCloseTo(0.97, 1)
+
+    const headerPng = readFileSync(path.join('tmp/email-brand', path.basename(manifest.key)))
+    const headerImage = await loadImage(headerPng)
+    const canvas = createCanvas(headerImage.width, headerImage.height)
+    const context = canvas.getContext('2d')
+    context.drawImage(headerImage, 0, 0)
+    const pixels = context.getImageData(0, 0, headerImage.width, headerImage.height).data
+    let redPixels = 0
+    let lightPixels = 0
+    for (let i = 0; i < pixels.length; i += 4) {
+      if (pixels[i] > 220 && pixels[i + 1] < 100 && pixels[i + 2] < 100) redPixels++
+      if (pixels[i] > 220 && pixels[i + 1] > 220 && pixels[i + 2] > 220) lightPixels++
+    }
+    expect(redPixels).toBeGreaterThan(2000)
+    expect(lightPixels).toBeGreaterThan(2000)
+    expect(manifest.width).toBeGreaterThan(manifest.height * 3)
   })
 })
