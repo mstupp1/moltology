@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useAvatarStillSync } from '@/hooks/useAvatarStillSync'
 import { createPortal } from 'react-dom'
-import { ChevronRight, LogOut, Settings, X } from 'lucide-react'
+import { ChevronRight, Coffee, ExternalLink, LogOut, Settings, X } from 'lucide-react'
+import { TIP_JAR_COPY, TIP_JAR_URL } from '@/lib/tip-jar'
 import { usePanelPresence } from '@/hooks/usePanelPresence'
 import { useModalPanelFocus } from '@/hooks/useModalPanelFocus'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
@@ -381,14 +382,34 @@ export function AccountHub({
     </div>
   )
 
+  // Tip jar: a small link beside Sign out on desktop, a plain row above it on phone.
+  const coffeeLink = (
+    <a
+      href={TIP_JAR_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-testid="account-hub-coffee"
+      className={
+        isPhone
+          ? `w-full min-h-12 px-3 rounded-control flex items-center gap-3 text-sm font-semibold text-ink hover:bg-surface-2 transition-colors ${focusRing}`
+          : `min-h-11 mt-2 px-3 rounded-control text-sm font-semibold whitespace-nowrap flex items-center gap-2 text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors ${focusRing}`
+      }
+    >
+      <Coffee className={isPhone ? 'w-5 h-5 text-ink-muted' : 'w-4 h-4'} aria-hidden="true" />
+      <span className={isPhone ? 'flex-1 text-left' : undefined}>{TIP_JAR_COPY.supportCta}</span>
+      <ExternalLink className={isPhone ? 'w-4 h-4 text-ink-muted' : 'w-3 h-3 opacity-70'} aria-hidden="true" />
+    </a>
+  )
+
   // Quiet row at the very end. On phone it signs out on tap only, so a scroll that starts on it cannot.
   const signOutRow = (
-    <div className="pt-1 border-t border-line-subtle">
+    <div className={`pt-1 border-t border-line-subtle ${isPhone ? '' : 'flex items-center justify-between gap-2'}`}>
+      {!isPhone && coffeeLink}
       <button
         {...signOutButtonProps}
         {...(isPhone ? { onPointerDown: undefined } : {})}
         data-testid="account-hub-sign-out"
-        className={`w-full min-h-11 mt-2 px-3 rounded-control text-sm font-semibold flex items-center justify-center gap-2 text-crimson-text hover:bg-crimson-soft transition-colors ${focusRing}`}
+        className={`${isPhone ? 'w-full' : 'whitespace-nowrap'} min-h-11 mt-2 px-3 rounded-control text-sm font-semibold flex items-center justify-center gap-2 text-crimson-text hover:bg-crimson-soft transition-colors ${focusRing}`}
       >
         <LogOut className="w-4 h-4" aria-hidden="true" />
         Sign out
@@ -482,6 +503,7 @@ export function AccountHub({
           {statusCard}
           {tasksList}
           {settingsRow}
+          {coffeeLink}
           {signOutRow}
         </AccountScreen>
       )}

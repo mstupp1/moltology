@@ -103,6 +103,14 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
     return matchesCategory && matchesTag && matchesSearch
   })
 
+  const latestChangelogs = React.useMemo(
+    () =>
+      [...(Array.isArray(changelogs) ? changelogs : [])]
+        .sort((a, b) => new Date(b.releasedAt).getTime() - new Date(a.releasedAt).getTime())
+        .slice(0, 3),
+    [changelogs],
+  )
+
   const paginatedChangelogs = React.useMemo(() => {
     const start = (currentPage - 1) * pageSize
     return filteredChangelogs.slice(start, start + pageSize)
@@ -248,34 +256,60 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
           </div>
         )}
 
-        {/* Contact support */}
+        {/* Contact support: stacked on phones, form + side column from lg */}
         {activeTab === 'ticket' && (
-          <div className="space-y-3 sm:space-y-4 max-w-3xl">
+          <div className="grid gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start xl:grid-cols-[minmax(0,1fr)_22rem]">
             <section className="rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 lg:p-5">
               <SupportTicketForm />
             </section>
 
-            {/* Tip jar: quiet, below the form */}
-            <section
-              aria-label="Tip jar"
-              className="rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-3"
-            >
-              <Coffee className="hidden sm:block w-5 h-5 shrink-0 text-ink-muted" aria-hidden="true" />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-ink">{TIP_JAR_COPY.supportTitle}</p>
-                <p className="text-xs text-ink-muted leading-relaxed">{TIP_JAR_COPY.supportBody}</p>
-              </div>
-              <a
-                href={TIP_JAR_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`inline-flex items-center justify-center gap-1.5 self-start sm:self-auto rounded-control border border-line bg-surface-2 px-3 py-2 text-xs font-bold text-ink hover:border-line-strong hover:bg-surface-3 transition-colors ${DASHBOARD_FOCUS}`}
+            <div className="space-y-3 sm:space-y-4">
+              {latestChangelogs.length > 0 && (
+                <DashboardPanel
+                  icon={<GitCommit />}
+                  title="What’s new"
+                  className="hidden lg:block"
+                  action={{ label: 'All updates', onClick: () => setActiveTab('changelog') }}
+                >
+                  <ol className="divide-y divide-line-subtle -my-1">
+                    {latestChangelogs.map((entry) => (
+                      <li key={entry.version} className="py-2">
+                        <p className="text-sm font-bold text-ink leading-snug line-clamp-2">{entry.title}</p>
+                        {formatReleaseDay(entry.releasedAt) && (
+                          <time
+                            dateTime={new Date(entry.releasedAt).toISOString()}
+                            className="text-[11px] text-ink-muted tabular-nums"
+                          >
+                            {formatReleaseDay(entry.releasedAt)}
+                          </time>
+                        )}
+                      </li>
+                    ))}
+                  </ol>
+                </DashboardPanel>
+              )}
+
+              {/* Tip jar: quiet, beside (desktop) or below (phone) the form */}
+              <section
+                aria-label="Tip jar"
+                className="rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 flex flex-col gap-3"
               >
-                <Coffee className="w-3.5 h-3.5 text-ink-muted" aria-hidden="true" />
-                {TIP_JAR_COPY.supportCta}
-                <ExternalLink className="w-3 h-3 opacity-70" aria-hidden="true" />
-              </a>
-            </section>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-ink">{TIP_JAR_COPY.supportTitle}</p>
+                  <p className="text-xs text-ink-muted leading-relaxed">{TIP_JAR_COPY.supportBody}</p>
+                </div>
+                <a
+                  href={TIP_JAR_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center justify-center gap-1.5 self-start rounded-control border border-line bg-surface-2 px-3 py-2 text-xs font-bold text-ink hover:border-line-strong hover:bg-surface-3 transition-colors ${DASHBOARD_FOCUS}`}
+                >
+                  <Coffee className="w-3.5 h-3.5 text-ink-muted" aria-hidden="true" />
+                  {TIP_JAR_COPY.supportCta}
+                  <ExternalLink className="w-3 h-3 opacity-70" aria-hidden="true" />
+                </a>
+              </section>
+            </div>
           </div>
         )}
       </div>
