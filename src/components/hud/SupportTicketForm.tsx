@@ -174,7 +174,7 @@ export default function SupportTicketForm() {
           placeholder={SUPPORT_TICKET_COPY.bodyPlaceholder}
           value={body}
           onChange={(event) => setBody(event.target.value)}
-          className={`${fieldClass} resize-y`}
+          className={`${fieldClass} resize-y lg:min-h-[15rem]`}
         />
         <p
           id="support-ticket-counter"

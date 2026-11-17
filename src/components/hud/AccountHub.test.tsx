@@ -82,6 +82,7 @@ describe('AccountHub', () => {
     expect(screen.getByText('Pick your one thing')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /settings/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
+    expect(screen.getByTestId('account-hub-coffee')).toHaveAttribute('href', 'https://buymeacoffee.com/moltology')
   })
 
   it('opens full screen on phone, with Settings in the bar and Sign out last', () => {
@@ -94,6 +95,7 @@ describe('AccountHub', () => {
     expect(screen.getByTestId('account-hub-wallet')).toBeInTheDocument()
     const buttons = screenEl.querySelectorAll('button')
     expect(buttons[buttons.length - 1]).toHaveTextContent('Sign out')
+    expect(screen.getByTestId('account-hub-coffee')).toHaveAttribute('target', '_blank')
     fireEvent.click(screen.getByRole('button', { name: 'Close' }))
     expect(screen.getByRole('button', { name: /User account menu/ })).toHaveAttribute('aria-expanded', 'false')
   })
