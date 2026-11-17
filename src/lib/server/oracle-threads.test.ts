@@ -96,6 +96,10 @@ describe('Oracle thread authorization', () => {
     })
     vi.mocked(getAIThreadMessages).mockResolvedValueOnce([
       { id: 'm1', threadId: 't1', userId: 'usr_jwt', role: 'user', content: 'hi', createdAt: new Date() },
+      {
+        id: 'm2', threadId: 't1', userId: 'usr_jwt', role: 'assistant', content: 'Top posts...', createdAt: new Date(),
+        parts: [{ type: 'reads', items: [{ kind: 'forum-list', count: 2, refs: ['a', 'b'] }] }],
+      },
     ] as any)
 
     const rows = await getAIMessagesHandler({
@@ -105,6 +109,8 @@ describe('Oracle thread authorization', () => {
 
     expect(getAIThreadMessages).toHaveBeenCalledWith('t1', 'usr_jwt')
     expect(rows[0]?.content).toBe('hi')
+    // Read cards and skill labels come back with the reply.
+    expect(rows[1]?.parts).toEqual([{ type: 'reads', items: [{ kind: 'forum-list', count: 2, refs: ['a', 'b'] }] }])
   })
 })
 

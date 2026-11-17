@@ -498,6 +498,8 @@ export const getAIMessagesHandler = async ({ data, context }: ServerFnArgs<GetAI
       userId: m.userId,
       role: m.role,
       content: m.content,
+      // Skill labels and read cards live in parts; without them a reloaded reply loses both.
+      parts: m.parts ?? null,
       createdAt: m.createdAt,
     }))
   } catch (err) {
