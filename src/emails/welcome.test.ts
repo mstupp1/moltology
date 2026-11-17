@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { WELCOME_MAIL, renderWelcomeEmailHtml, renderWelcomeEmailText } from './welcome'
-import { TRANSACTIONAL_EMAIL_BRAND_URL, TRANSACTIONAL_EMAIL_FOOTER } from './components/transactional'
+import {
+  TRANSACTIONAL_EMAIL_BRAND_URL,
+  TRANSACTIONAL_EMAIL_FOOTER,
+  TRANSACTIONAL_EMAIL_FOOTER_LOCKUP_URL,
+  TRANSACTIONAL_EMAIL_SOCIAL,
+} from './components/transactional'
 
 describe('welcome email', () => {
   it('introduces the three starting points with one primary button and the approved logo', async () => {
@@ -10,15 +15,19 @@ describe('welcome email', () => {
     expect(document.querySelectorAll('h1')).toHaveLength(1)
     expect(document.querySelector('h1')?.textContent).toBe(WELCOME_MAIL.heading)
     expect(document.querySelector('img')?.src).toBe(TRANSACTIONAL_EMAIL_BRAND_URL)
-    expect(document.querySelector('img')?.width).toBe(160)
-    expect(document.querySelector('img')?.alt).toBe('Moltology — The Synaptic Path')
+    expect(document.querySelector('img')?.width).toBe(48)
+    expect(document.querySelector('img')?.alt).toBe('Moltology')
     const steps = Array.from(document.querySelectorAll('ol > li'))
     expect(steps).toHaveLength(3)
     expect(steps.map((step) => step.querySelector('a')?.href)).toEqual([
       'https://moltology.org/dashboard', 'https://moltology.org/oracle', 'https://moltology.org/forum',
     ])
     expect(document.querySelectorAll('h2')).toHaveLength(3)
-    expect(document.querySelectorAll('img')).toHaveLength(4)
+    expect(document.querySelectorAll('img')).toHaveLength(7)
+    const imageSrcs = Array.from(document.querySelectorAll('img'), (img) => img.src)
+    expect(imageSrcs).toContain(TRANSACTIONAL_EMAIL_FOOTER_LOCKUP_URL)
+    expect(imageSrcs).toContain(TRANSACTIONAL_EMAIL_SOCIAL.youtube.iconUrl)
+    expect(imageSrcs).toContain(TRANSACTIONAL_EMAIL_SOCIAL.instagram.iconUrl)
     steps.forEach((step, index) => {
       const image = step.querySelector('img')!
       expect(image.src).toBe(WELCOME_MAIL.steps[index].imageUrl)
@@ -54,8 +63,13 @@ describe('welcome email', () => {
       expect(text).toContain(copy)
     }
     expect(html).toContain(WELCOME_MAIL.preview)
-    for (const url of [...WELCOME_MAIL.steps.map((step) => step.url),
-      TRANSACTIONAL_EMAIL_FOOTER.privacyUrl, TRANSACTIONAL_EMAIL_FOOTER.termsUrl]) {
+    for (const url of [
+      ...WELCOME_MAIL.steps.map((step) => step.url),
+      TRANSACTIONAL_EMAIL_FOOTER.privacyUrl,
+      TRANSACTIONAL_EMAIL_FOOTER.termsUrl,
+      TRANSACTIONAL_EMAIL_FOOTER.youtubeUrl,
+      TRANSACTIONAL_EMAIL_FOOTER.instagramUrl,
+    ]) {
       expect(document.querySelector(`a[href="${url}"]`)).not.toBeNull()
       expect(text).toContain(url)
     }
