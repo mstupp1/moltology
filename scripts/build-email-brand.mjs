@@ -1,11 +1,10 @@
 #!/usr/bin/env node
-/** Export approved flat header lockup and greyscale footer/social icons for email clients. */
+/** Export approved flat header emblem and greyscale footer lockup/social icons for email clients. */
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createHash } from 'node:crypto'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
-import tailwind from '../tailwind.config.js'
 
 const root = fileURLToPath(new URL('../', import.meta.url))
 const scale = 3
@@ -22,40 +21,57 @@ async function writeBrandPng(name, png) {
   return { key, output }
 }
 
-/**
- * Horizontal header lockup: canonical flat red emblem on the left + approved outlined
- * "Moltology / THE SYNAPTIC PATH" stacked wordmark on the right, on a solid surface plate.
- */
-async function buildHorizontalHeaderLockup() {
-  const height = 46
-  const padY = 2
-  const padX = 2
-  const gap = 11
-
+/** Centered header icon: canonical flat red emblem (parts/icon.svg) at 3x resolution. */
+async function buildHeaderEmblem() {
+  const size = 48
   let iconSvg = await fs.readFile(path.join(root, 'content/brand/synaptic-path/parts/icon.svg'), 'utf8')
   iconSvg = iconSvg.replace(/<svg\b[^>]*>/, (tag) => tag
-    .replace(/\bwidth="[^"]+"/, 'width="1200"')
-    .replace(/\bheight="[^"]+"/, 'height="1200"'))
+    .replace(/\bwidth="[^"]+"/, `width="${size * scale * 4}"`)
+    .replace(/\bheight="[^"]+"/, `height="${size * scale * 4}"`))
+  const img = await loadImage(Buffer.from(iconSvg))
+  const canvas = createCanvas(size * scale, size * scale)
+  const context = canvas.getContext('2d')
+  context.drawImage(img, 0, 0, canvas.width, canvas.height)
+  const png = await canvas.encode('png')
+  const { key, output } = await writeBrandPng('moltology-emblem-dark', png)
+  console.log(`Header emblem: ${output} (${canvas.width} × ${canvas.height}, ${png.length} bytes)`)
+  return { key, width: size, height: size }
+}
+
+/**
+ * Greyscale (#8fa0a0) full horizontal lockup for the footer:
+ * canonical emblem on the left + "Moltology / THE SYNAPTIC PATH" on the right.
+ */
+async function buildFooterLockup() {
+  const height = 38
+  const padY = 1
+  const padX = 1
+  const gap = 9
+
+  let iconSvg = await fs.readFile(path.join(root, 'content/brand/synaptic-path/parts/variants/icon-inherit.svg'), 'utf8')
+  iconSvg = iconSvg
+    .replaceAll('currentColor', mutedColor)
+    .replace(/<svg\b[^>]*>/, (tag) => tag
+      .replace(/\bwidth="[^"]+"/, 'width="1200"')
+      .replace(/\bheight="[^"]+"/, 'height="1200"'))
   const iconImg = await loadImage(Buffer.from(iconSvg))
 
-  // Wordmark SVG uses explicit width/height (1018x344) without a viewBox; inject viewBox so
-  // decoding at 3x vector resolution stays sharp instead of upscaling a 1018px bitmap.
   let wordmarkSvg = await fs.readFile(path.join(root, 'content/brand/synaptic-path/parts/merch-v2/moltology-stacked-dark.svg'), 'utf8')
   const origW = 1018
   const origH = 344
-  wordmarkSvg = wordmarkSvg.replace(/<svg\b[^>]*>/, (tag) => tag
-    .replace(/\bwidth="[^"]+"/, `viewBox="0 0 ${origW} ${origH}" width="${origW * 3}"`)
-    .replace(/\bheight="[^"]+"/, `height="${origH * 3}"`))
+  wordmarkSvg = wordmarkSvg
+    .replaceAll('#F3F7F5', mutedColor)
+    .replaceAll('#A9B5B1', mutedColor)
+    .replace(/<svg\b[^>]*>/, (tag) => tag
+      .replace(/\bwidth="[^"]+"/, `viewBox="0 0 ${origW} ${origH}" width="${origW * 3}"`)
+      .replace(/\bheight="[^"]+"/, `height="${origH * 3}"`))
   const wordmarkImg = await loadImage(Buffer.from(wordmarkSvg))
 
-  // Visual artwork bounds within their source canvases (measured from vector paths):
-  // icon.svg: x 6.5%..93.5% (87.1% wide), y 2%..98% (96% tall)
-  // moltology-stacked-dark.svg: x 21..992 (972px wide), y 21..323 (303px tall)
   const iconBoxSize = height - padY * 2
   const iconVisLeft = iconBoxSize * 0.0647
   const iconVisWidth = iconBoxSize * 0.8706
 
-  const wordmarkTargetVisH = 40
+  const wordmarkTargetVisH = 33
   const wordmarkScale = wordmarkTargetVisH / 303
   const wordmarkDrawW = origW * wordmarkScale
   const wordmarkDrawH = origH * wordmarkScale
@@ -68,10 +84,6 @@ async function buildHorizontalHeaderLockup() {
   const context = canvas.getContext('2d')
   context.scale(scale, scale)
 
-  // Solid plate preserves lettering contrast if an email client forces light mode.
-  context.fillStyle = tailwind.theme.extend.colors.benthic.surface
-  context.fillRect(0, 0, width, height)
-
   const iconDrawX = padX - iconVisLeft
   const iconDrawY = (height - iconBoxSize) / 2
   context.drawImage(iconImg, iconDrawX, iconDrawY, iconBoxSize, iconBoxSize)
@@ -81,28 +93,9 @@ async function buildHorizontalHeaderLockup() {
   context.drawImage(wordmarkImg, wordmarkDrawX, wordmarkDrawY, wordmarkDrawW, wordmarkDrawH)
 
   const png = await canvas.encode('png')
-  const { key, output } = await writeBrandPng('moltology-lockup-dark', png)
-  console.log(`Header lockup: ${output} (${canvas.width} × ${canvas.height}, ${png.length} bytes)`)
+  const { key, output } = await writeBrandPng('moltology-lockup-muted', png)
+  console.log(`Footer lockup: ${output} (${canvas.width} × ${canvas.height}, ${png.length} bytes)`)
   return { key, width, height }
-}
-
-/** Greyscale (#8fa0a0) Moltology emblem for the footer, matching footer text color. */
-async function buildFooterEmblem() {
-  const size = 22
-  let svg = await fs.readFile(path.join(root, 'content/brand/synaptic-path/parts/variants/icon-inherit.svg'), 'utf8')
-  svg = svg
-    .replaceAll('currentColor', mutedColor)
-    .replace(/<svg\b[^>]*>/, (tag) => tag
-      .replace(/\bwidth="[^"]+"/, `width="${size * scale * 4}"`)
-      .replace(/\bheight="[^"]+"/, `height="${size * scale * 4}"`))
-  const img = await loadImage(Buffer.from(svg))
-  const canvas = createCanvas(size * scale, size * scale)
-  const context = canvas.getContext('2d')
-  context.drawImage(img, 0, 0, canvas.width, canvas.height)
-  const png = await canvas.encode('png')
-  const { key, output } = await writeBrandPng('moltology-emblem-muted', png)
-  console.log(`Footer emblem: ${output} (${canvas.width} × ${canvas.height}, ${png.length} bytes)`)
-  return { key, width: size, height: size }
 }
 
 /** Greyscale (#8fa0a0) Lucide-style social icon matching the site footer. */
@@ -120,8 +113,8 @@ async function buildSocialIcon(name, innerPaths) {
   return { key, width: size, height: size }
 }
 
-const header = await buildHorizontalHeaderLockup()
-const footerEmblem = await buildFooterEmblem()
+const header = await buildHeaderEmblem()
+const footerLockup = await buildFooterLockup()
 const youtubeIcon = await buildSocialIcon(
   'youtube',
   '<path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" /><path d="m10 15 5-3-5-3z" />',
@@ -133,7 +126,7 @@ const instagramIcon = await buildSocialIcon(
 
 const manifest = {
   ...header,
-  footerEmblem,
+  footerLockup,
   social: {
     youtube: youtubeIcon,
     instagram: instagramIcon,

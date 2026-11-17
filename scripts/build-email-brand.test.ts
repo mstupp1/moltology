@@ -15,7 +15,7 @@ describe('email brand export', () => {
     const manifest = JSON.parse(manifestBefore)
     const assets = [
       manifest,
-      manifest.footerEmblem,
+      manifest.footerLockup,
       manifest.social.youtube,
       manifest.social.instagram,
     ]
@@ -32,18 +32,32 @@ describe('email brand export', () => {
 
     const headerPng = readFileSync(path.join('tmp/email-brand', path.basename(manifest.key)))
     const headerImage = await loadImage(headerPng)
-    const canvas = createCanvas(headerImage.width, headerImage.height)
-    const context = canvas.getContext('2d')
-    context.drawImage(headerImage, 0, 0)
-    const pixels = context.getImageData(0, 0, headerImage.width, headerImage.height).data
+    const headerCanvas = createCanvas(headerImage.width, headerImage.height)
+    const headerContext = headerCanvas.getContext('2d')
+    headerContext.drawImage(headerImage, 0, 0)
+    const headerPixels = headerContext.getImageData(0, 0, headerImage.width, headerImage.height).data
     let redPixels = 0
-    let lightPixels = 0
-    for (let i = 0; i < pixels.length; i += 4) {
-      if (pixels[i] > 220 && pixels[i + 1] < 100 && pixels[i + 2] < 100) redPixels++
-      if (pixels[i] > 220 && pixels[i + 1] > 220 && pixels[i + 2] > 220) lightPixels++
+    for (let i = 0; i < headerPixels.length; i += 4) {
+      if (headerPixels[i] > 220 && headerPixels[i + 1] < 100 && headerPixels[i + 2] < 100) redPixels++
     }
     expect(redPixels).toBeGreaterThan(2000)
-    expect(lightPixels).toBeGreaterThan(2000)
-    expect(manifest.width).toBeGreaterThan(manifest.height * 3)
+    expect(manifest.width).toBe(manifest.height)
+
+    const footerPng = readFileSync(path.join('tmp/email-brand', path.basename(manifest.footerLockup.key)))
+    const footerImage = await loadImage(footerPng)
+    const footerCanvas = createCanvas(footerImage.width, footerImage.height)
+    const footerContext = footerCanvas.getContext('2d')
+    footerContext.drawImage(footerImage, 0, 0)
+    const footerPixels = footerContext.getImageData(0, 0, footerImage.width, footerImage.height).data
+    let mutedPixels = 0
+    let footerRedPixels = 0
+    for (let i = 0; i < footerPixels.length; i += 4) {
+      const [r, g, b, a] = [footerPixels[i], footerPixels[i + 1], footerPixels[i + 2], footerPixels[i + 3]]
+      if (a > 120 && Math.abs(r - 143) <= 20 && Math.abs(g - 160) <= 20 && Math.abs(b - 160) <= 20) mutedPixels++
+      if (r > 200 && g < 100 && b < 100) footerRedPixels++
+    }
+    expect(mutedPixels).toBeGreaterThan(3000)
+    expect(footerRedPixels).toBe(0)
+    expect(manifest.footerLockup.width).toBeGreaterThan(manifest.footerLockup.height * 3)
   })
 })

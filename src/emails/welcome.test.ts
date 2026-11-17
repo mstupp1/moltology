@@ -3,7 +3,7 @@ import { WELCOME_MAIL, renderWelcomeEmailHtml, renderWelcomeEmailText } from './
 import {
   TRANSACTIONAL_EMAIL_BRAND_URL,
   TRANSACTIONAL_EMAIL_FOOTER,
-  TRANSACTIONAL_EMAIL_FOOTER_EMBLEM_URL,
+  TRANSACTIONAL_EMAIL_FOOTER_LOCKUP_URL,
   TRANSACTIONAL_EMAIL_SOCIAL,
 } from './components/transactional'
 
@@ -15,8 +15,8 @@ describe('welcome email', () => {
     expect(document.querySelectorAll('h1')).toHaveLength(1)
     expect(document.querySelector('h1')?.textContent).toBe(WELCOME_MAIL.heading)
     expect(document.querySelector('img')?.src).toBe(TRANSACTIONAL_EMAIL_BRAND_URL)
-    expect(document.querySelector('img')?.width).toBe(188)
-    expect(document.querySelector('img')?.alt).toBe('Moltology — The Synaptic Path')
+    expect(document.querySelector('img')?.width).toBe(48)
+    expect(document.querySelector('img')?.alt).toBe('Moltology')
     const steps = Array.from(document.querySelectorAll('ol > li'))
     expect(steps).toHaveLength(3)
     expect(steps.map((step) => step.querySelector('a')?.href)).toEqual([
@@ -25,7 +25,7 @@ describe('welcome email', () => {
     expect(document.querySelectorAll('h2')).toHaveLength(3)
     expect(document.querySelectorAll('img')).toHaveLength(7)
     const imageSrcs = Array.from(document.querySelectorAll('img'), (img) => img.src)
-    expect(imageSrcs).toContain(TRANSACTIONAL_EMAIL_FOOTER_EMBLEM_URL)
+    expect(imageSrcs).toContain(TRANSACTIONAL_EMAIL_FOOTER_LOCKUP_URL)
     expect(imageSrcs).toContain(TRANSACTIONAL_EMAIL_SOCIAL.youtube.iconUrl)
     expect(imageSrcs).toContain(TRANSACTIONAL_EMAIL_SOCIAL.instagram.iconUrl)
     steps.forEach((step, index) => {

@@ -15,8 +15,7 @@ export const EMAIL_THEME = {
 } as const
 
 export const TRANSACTIONAL_EMAIL_BRAND_URL = getAbsoluteAssetUrl(brand.key)
-export const TRANSACTIONAL_EMAIL_FOOTER_EMBLEM_URL = getAbsoluteAssetUrl(brand.footerEmblem.key)
-const BRAND_DISPLAY_WIDTH = 188
+export const TRANSACTIONAL_EMAIL_FOOTER_LOCKUP_URL = getAbsoluteAssetUrl(brand.footerLockup.key)
 export const TRANSACTIONAL_EMAIL_FOOTER = {
   name: 'Moltology',
   support: 'support@moltology.org',
@@ -45,14 +44,14 @@ export const TRANSACTIONAL_EMAIL_SOCIAL = {
 
 export function TransactionalBrandHeader() {
   return (
-    <Section style={{ textAlign: 'left', paddingBottom: '24px' }}>
+    <Section className="molt-email-header" style={{ textAlign: 'center', paddingBottom: '24px' }}>
       <Link href={SITE_ORIGIN} style={{ textDecoration: 'none', display: 'inline-block' }}>
         <Img
           src={TRANSACTIONAL_EMAIL_BRAND_URL}
-          width={BRAND_DISPLAY_WIDTH}
-          height={Math.round(brand.height * BRAND_DISPLAY_WIDTH / brand.width)}
-          alt="Moltology — The Synaptic Path"
-          style={{ display: 'block', margin: '0', maxWidth: '100%', height: 'auto' }}
+          width={brand.width}
+          height={brand.height}
+          alt="Moltology"
+          style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto' }}
         />
       </Link>
     </Section>
@@ -61,7 +60,7 @@ export function TransactionalBrandHeader() {
 
 export function TransactionalButton({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <Button href={href} style={{ backgroundColor: EMAIL_THEME.accent, color: EMAIL_THEME.background,
+    <Button className="molt-email-cta" href={href} style={{ backgroundColor: EMAIL_THEME.accent, color: EMAIL_THEME.background,
       borderRadius: '6px', boxSizing: 'border-box', padding: '14px 24px', fontSize: '16px',
       lineHeight: '20px', fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
       {children}
@@ -72,41 +71,31 @@ export function TransactionalButton({ href, children }: { href: string; children
 export function TransactionalFooter() {
   const linkStyle = { color: EMAIL_THEME.muted, textDecoration: 'underline' }
   return (
-    <Section style={{ borderTop: `1px solid ${EMAIL_THEME.border}`, marginTop: '28px', paddingTop: '20px' }}>
+    <Section className="molt-email-footer" style={{ borderTop: `1px solid ${EMAIL_THEME.border}`, marginTop: '28px', paddingTop: '20px' }}>
       <table width="100%" border={0} cellPadding={0} cellSpacing={0} role="presentation">
         <tbody>
           <tr>
             <td align="left" valign="middle">
               <Link href={SITE_ORIGIN} style={{ color: EMAIL_THEME.muted, textDecoration: 'none', display: 'inline-block' }}>
-                <table border={0} cellPadding={0} cellSpacing={0} role="presentation">
-                  <tbody>
-                    <tr>
-                      <td valign="middle" style={{ paddingRight: '8px' }}>
-                        <Img
-                          src={TRANSACTIONAL_EMAIL_FOOTER_EMBLEM_URL}
-                          width={brand.footerEmblem.width}
-                          height={brand.footerEmblem.height}
-                          alt="Moltology"
-                          style={{ display: 'block' }}
-                        />
-                      </td>
-                      <td valign="middle" style={{ color: EMAIL_THEME.muted, fontSize: '13px', lineHeight: '18px', fontWeight: 700 }}>
-                        {TRANSACTIONAL_EMAIL_FOOTER.name}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                <Img
+                  className="molt-email-footer-lockup"
+                  src={TRANSACTIONAL_EMAIL_FOOTER_LOCKUP_URL}
+                  width={brand.footerLockup.width}
+                  height={brand.footerLockup.height}
+                  alt="Moltology — The Synaptic Path"
+                  style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
+                />
               </Link>
             </td>
-            <td align="right" valign="middle">
+            <td align="right" valign="middle" style={{ whiteSpace: 'nowrap', paddingLeft: '12px' }}>
               <table border={0} cellPadding={0} cellSpacing={0} role="presentation" style={{ display: 'inline-table' }}>
                 <tbody>
                   <tr>
-                    <td valign="middle" style={{ paddingRight: '14px' }}>
+                    <td valign="middle" style={{ paddingRight: '4px' }}>
                       <Link
                         href={TRANSACTIONAL_EMAIL_SOCIAL.youtube.url}
                         aria-label="Moltology on YouTube"
-                        style={{ color: EMAIL_THEME.muted, textDecoration: 'none', display: 'inline-block' }}
+                        style={{ color: EMAIL_THEME.muted, textDecoration: 'none', display: 'inline-block', padding: '6px' }}
                       >
                         <Img
                           src={TRANSACTIONAL_EMAIL_SOCIAL.youtube.iconUrl}
@@ -121,7 +110,7 @@ export function TransactionalFooter() {
                       <Link
                         href={TRANSACTIONAL_EMAIL_SOCIAL.instagram.url}
                         aria-label="Moltology on Instagram"
-                        style={{ color: EMAIL_THEME.muted, textDecoration: 'none', display: 'inline-block' }}
+                        style={{ color: EMAIL_THEME.muted, textDecoration: 'none', display: 'inline-block', padding: '6px 0 6px 6px' }}
                       >
                         <Img
                           src={TRANSACTIONAL_EMAIL_SOCIAL.instagram.iconUrl}
@@ -157,14 +146,50 @@ export function TransactionalLayout({ preview, children }: { preview: string; ch
       <Head>
         <meta name="color-scheme" content="dark" />
         <meta name="supported-color-schemes" content="dark" />
+        <style>{`
+          @media only screen and (max-width: 480px) {
+            .molt-email-body > table > tbody > tr > td {
+              padding: 12px 6px !important;
+            }
+            .molt-email-shell > tbody > tr > td {
+              padding: 22px 16px !important;
+            }
+            .molt-email-header > tbody > tr > td {
+              padding-bottom: 18px !important;
+            }
+            .molt-email-lead {
+              margin-bottom: 20px !important;
+            }
+            .molt-email-step {
+              margin-bottom: 16px !important;
+            }
+            .molt-email-card-body > tbody > tr > td {
+              padding: 14px 16px !important;
+            }
+            .molt-email-cta-wrap {
+              margin-top: 20px !important;
+            }
+            .molt-email-cta {
+              display: block !important;
+              width: 100% !important;
+              padding: 14px 16px !important;
+            }
+            .molt-email-footer {
+              margin-top: 22px !important;
+            }
+            .molt-email-footer > tbody > tr > td {
+              padding-top: 16px !important;
+            }
+          }
+        `}</style>
       </Head>
-      <Body style={{ backgroundColor: EMAIL_THEME.background, color: EMAIL_THEME.text,
+      <Body className="molt-email-body" style={{ backgroundColor: EMAIL_THEME.background, color: EMAIL_THEME.text,
         margin: '0', padding: '32px 12px', fontFamily: EMAIL_THEME.fontFamily }}>
         <Preview>{preview}</Preview>
         <Container style={{ maxWidth: '480px', width: '100%', margin: '0 auto',
           backgroundColor: EMAIL_THEME.surface, border: `1px solid ${EMAIL_THEME.border}`,
           borderRadius: '8px' }}>
-          <Section style={{ padding: '32px 24px' }}>
+          <Section className="molt-email-shell" style={{ padding: '32px 24px' }}>
             <TransactionalBrandHeader />
             {children}
             <TransactionalFooter />

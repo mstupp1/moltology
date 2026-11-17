@@ -1,11 +1,11 @@
 {
-  "key": "images/email/moltology-lockup-dark-c40a8aac7f31.png",
-  "width": 180,
-  "height": 46,
-  "footerEmblem": {
-    "key": "images/email/moltology-emblem-muted-de2d440cc76b.png",
-    "width": 22,
-    "height": 22
+  "key": "images/email/moltology-emblem-dark-42ee9efea69b.png",
+  "width": 48,
+  "height": 48,
+  "footerLockup": {
+    "key": "images/email/moltology-lockup-muted-83326434bac1.png",
+    "width": 149,
+    "height": 38
   },
   "social": {
     "youtube": {
