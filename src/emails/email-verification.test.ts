@@ -21,8 +21,8 @@ describe('email verification React template', () => {
     const logo = document.querySelector('img')!
     expect(logo.src).toBe(TRANSACTIONAL_EMAIL_BRAND_URL)
     expect(logo.alt).toBe('Moltology — The Synaptic Path')
-    expect(logo.width).toBe(110)
-    expect(logo.height).toBe(108)
+    expect(logo.width).toBe(160)
+    expect(logo.height).toBe(156)
     expect(logo.closest('a')?.href).toBe('https://moltology.org/')
     expect(html).toContain(`background-color:${EMAIL_THEME.background}`)
     expect(html).toContain(`background-color:${EMAIL_THEME.surface}`)

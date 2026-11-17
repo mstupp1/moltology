@@ -36,7 +36,7 @@ Send through `sendTransactionalEmail` in `src/lib/server/mail.ts`; preserve conf
 
 ## Welcome email pattern
 
-`src/emails/welcome.tsx` introduces the daily routine, Oracle, and community with one dashboard button. Keep its 110px shared logo and three image cards with unnumbered headings. The introduction thanks the member for joining, rather than reporting that the account is ready. Feature titles and images link to absolute production URLs. Plain text contains the same content and destinations.
+`src/emails/welcome.tsx` introduces the daily routine, Oracle, and community with one dashboard button. Keep its 160px shared logo and three image cards with unnumbered headings. The introduction thanks the member for joining, rather than reporting that the account is ready. Feature titles and images link to absolute production URLs. Plain text contains the same content and destinations.
 
 Automatic delivery is limited to `emailVerification.afterEmailVerification` and new verified Google account creation (OAuth callback or Google ID-token signup). The creation hook does not run on ordinary sign-ins or account linking. `src/lib/server/welcome-email.ts` checks verification and the profile, skips simulated or missing profiles, and contains lookup/sender failures so they cannot fail authentication. Do not add a backfill or send from generic session/profile-sync hooks.
 

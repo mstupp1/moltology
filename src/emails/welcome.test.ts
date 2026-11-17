@@ -3,14 +3,14 @@ import { WELCOME_MAIL, renderWelcomeEmailHtml, renderWelcomeEmailText } from './
 import { TRANSACTIONAL_EMAIL_BRAND_URL, TRANSACTIONAL_EMAIL_FOOTER } from './components/transactional'
 
 describe('welcome email', () => {
-  it('introduces the three starting points with one primary button and the approved small logo', async () => {
+  it('introduces the three starting points with one primary button and the approved logo', async () => {
     const html = await renderWelcomeEmailHtml()
     const document = new DOMParser().parseFromString(html, 'text/html')
     expect(document.documentElement.lang).toBe('en')
     expect(document.querySelectorAll('h1')).toHaveLength(1)
     expect(document.querySelector('h1')?.textContent).toBe(WELCOME_MAIL.heading)
     expect(document.querySelector('img')?.src).toBe(TRANSACTIONAL_EMAIL_BRAND_URL)
-    expect(document.querySelector('img')?.width).toBe(110)
+    expect(document.querySelector('img')?.width).toBe(160)
     expect(document.querySelector('img')?.alt).toBe('Moltology — The Synaptic Path')
     const steps = Array.from(document.querySelectorAll('ol > li'))
     expect(steps).toHaveLength(3)
