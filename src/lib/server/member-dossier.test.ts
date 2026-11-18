@@ -69,6 +69,18 @@ describe('member dossier handle lookup', () => {
     expect(profile?.displayName).not.toBe('mstupp')
   })
 
+  it('serves a signed-out visitor the public dossier with no relationship', async () => {
+    const profile = await getPublicProfileHandler({
+      data: { profileId: 'mstupp' },
+      context: { db: mockDb([claimedRow]) as any },
+    })
+    expect(profile?.id).toBe(MEMBER_A)
+    expect(profile?.displayName).toBe('mstupp')
+    expect(profile?.relationship).toBe('none')
+    expect(profile?.pendingRequestId).toBeNull()
+    expect(profile).not.toHaveProperty('email')
+  })
+
   it('returns not-found when neither id nor designation matches', async () => {
     const profile = await getPublicProfileHandler({
       data: { profileId: 'ghost_handle' },

@@ -40,6 +40,10 @@ vi.mock('@/hooks/useAuthSession', () => ({
   useAuthSession: () => mockSession,
 }))
 
+vi.mock('@/components/AuthModal', () => ({
+  AuthModal: () => null,
+}))
+
 vi.mock('./FriendRequestButton', () => ({
   FriendRequestButton: () => <button type="button">Request</button>,
 }))
@@ -101,16 +105,19 @@ describe('MemberProfilePage', () => {
     })
   })
 
-  it('makes no dossier lookups for a signed-out visitor behind the guest lock', async () => {
+  it('shows the dossier to a signed-out visitor with a sign-up prompt instead of friend actions', async () => {
     mockSession = guest
+    mockGetPublicProfile.mockResolvedValue(claimedProfile)
 
     render(<MemberProfilePage profileId="member-a" canonicalizePath />)
 
-    expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
-    await new Promise((resolve) => setTimeout(resolve, 0))
-    expect(mockGetPublicProfile).not.toHaveBeenCalled()
-    expect(mockGetMemberLoadout).not.toHaveBeenCalled()
-    expect(screen.queryByText('Profile unavailable')).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'claw_lord' })).toBeInTheDocument()
+    })
+    expect(mockGetPublicProfile).toHaveBeenCalledWith({ data: expect.objectContaining({ profileId: 'member-a' }) })
+    expect(mockGetMemberLoadout).toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: /sign up to add friend/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Request' })).not.toBeInTheDocument()
   })
 
   it('shows a workspace ghost while the dossier hydrates', () => {
