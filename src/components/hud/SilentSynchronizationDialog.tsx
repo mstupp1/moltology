@@ -6,7 +6,6 @@ import { createSilentSynchronizationBridge } from './silentSynchronizationBridge
 import './silent-synchronization.css'
 import {
   DEEP_WORK_PRESETS,
-  RESET_PRESETS,
   formatTimerClock,
   getSilentSyncProgress,
   SILENT_SYNC_PRESETS,
@@ -32,15 +31,6 @@ const PRACTICE_COPY: Record<AlignmentPractice, {
     presets: SILENT_SYNC_PRESETS,
     defaultMinutes: 3,
     running: 'Syncing',
-  },
-  reset: {
-    eyebrow: 'Breathing timer',
-    title: 'Reset your focus',
-    aria: 'Reset your focus timer',
-    instructions: 'Breathe in slowly, then out a little slower. Look away from the screen. You can stop at any time.',
-    presets: RESET_PRESETS,
-    defaultMinutes: 1,
-    running: 'Breathing',
   },
   'deep-work': {
     eyebrow: 'Focus timer',

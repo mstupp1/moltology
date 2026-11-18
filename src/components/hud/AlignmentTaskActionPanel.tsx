@@ -78,6 +78,23 @@ export function AlignmentTaskActionPanel({
     )
   }
 
+  if (action?.kind === 'break') {
+    primary = (
+      <HudButton
+        type="button"
+        variant="primary"
+        size="sm"
+        onClick={(e) => {
+          e.stopPropagation()
+          void alignment.setTaskCompleted(taskKey, true)
+          onDone()
+        }}
+      >
+        {action.label}
+      </HudButton>
+    )
+  }
+
   if (action?.kind === 'close-day') {
     const closeDay = (e: React.MouseEvent) => {
       e.stopPropagation()
