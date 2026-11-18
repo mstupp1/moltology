@@ -117,9 +117,9 @@ async function memberBase(emblem: string): Promise<string> {
         linear-gradient(180deg,#071012 0%,${T.abyss} 100%)}
      .head{left:72px;top:214px;font-size:78px;font-weight:700;letter-spacing:-.02em;line-height:1.02;color:${T.ink}}
      .sub{left:72px;top:400px;font-family:Inter,sans-serif;font-size:26px;color:${T.inkBody}}
-     .cta{left:72px;top:462px;height:60px;padding:0 28px;display:flex;align-items:center;--hud-cut:14px}
-     .cta .fill{position:absolute;inset:0;background:${T.cyan};clip-path:polygon(0 0,calc(100% - var(--hud-cut)) 0,100% var(--hud-cut),100% 100%,0 100%)}
-     .cta .label{position:relative;display:flex;align-items:center;gap:12px;color:${T.abyss};font-weight:700;font-size:20px;letter-spacing:.08em;text-transform:uppercase}
+     .cta{left:72px;top:462px;height:60px;padding:0 28px;display:flex;align-items:center}
+     .cta .fill{position:absolute;inset:0;background:${T.cyan};border-radius:12px}
+     .cta .label{position:relative;display:flex;align-items:center;gap:12px;color:${T.abyss};font-family:Inter,sans-serif;font-weight:600;font-size:22px}
      .cta svg{width:24px;height:24px}
      .url{left:72px;bottom:44px;font-family:Inter,sans-serif;font-size:20px;color:${T.inkMuted}}
      .lens{left:${L.x}px;top:${L.y}px;width:${L.size}px;height:${L.size}px;border-radius:50%;
