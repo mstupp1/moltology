@@ -124,7 +124,6 @@ export interface AlignmentContextValue {
 
 const PRACTICE_TASK_KEY: Record<AlignmentPractice, string> = {
   silent: 'silent-synchronization',
-  reset: 'nutritional-efficiency-break',
   'deep-work': 'iterative-refinement',
 }
 
