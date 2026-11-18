@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from '@tanstack/react-router'
 import { AlertCircle, AlertTriangle, Bell, CheckCircle2, Info, X } from 'lucide-react'
 
@@ -192,16 +193,20 @@ function ToastContainer({
     return null
   }
 
-  return (
+  // Portalled to <body> above every overlay (account menu, sheets, Oracle, Codex reader top out at z 100000),
+  // so a toast is never hidden behind whatever is open.
+  return createPortal(
     <div
       aria-live="polite"
       aria-atomic="true"
-      className="fixed top-3 sm:top-4 left-1/2 -translate-x-1/2 z-[9999] flex flex-col items-center gap-2 max-w-md w-[calc(100%-1.5rem)] pointer-events-none"
+      data-testid="toast-viewport"
+      className="fixed top-[calc(env(safe-area-inset-top,0px)+0.75rem)] sm:top-4 left-1/2 -translate-x-1/2 z-[100100] flex flex-col items-center gap-2 max-w-md w-[calc(100%-1.5rem)] pointer-events-none"
     >
       {toasts.map((toast) => (
         <ToastItemCard key={toast.id} toast={toast} onDismiss={onDismiss} />
       ))}
-    </div>
+    </div>,
+    document.body,
   )
 }
 
