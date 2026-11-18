@@ -3,7 +3,7 @@ import { LocalTime } from '@/components/ui/LocalTime'
 import { Link } from '@tanstack/react-router'
 import { MessageSquare, Eye } from 'lucide-react'
 import type { ForumTopicEntry } from '@/lib/server/api'
-import { FORUM_WITHDRAWN_PREVIEW, isForumEntryWithdrawn, relativeTime } from '@/lib/forum-utils'
+import { FORUM_WITHDRAWN_PREVIEW, isForumEntryWithdrawn, relativeTime, shortRelativeTime } from '@/lib/forum-utils'
 import { FORUM_UNREAD_LABEL } from '@/lib/forum-visits'
 import { RankCrest } from '@/components/leaderboard/RankCrest'
 import { VoteButton, StageBadge, PinBadge, LockBadge, WithdrawnBadge, ForumUnreadMark } from './ForumBits'
@@ -36,7 +36,7 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
         size="sm"
         className="ring-1 ring-line"
       />
-      <span className="text-ink font-semibold truncate max-w-[120px] sm:max-w-[180px]">{topic.authorName}</span>
+      <span className="text-ink font-semibold truncate min-w-[3rem] sm:max-w-[180px]">{topic.authorName}</span>
     </>
   )
 
@@ -78,8 +78,8 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
           {withdrawn ? FORUM_WITHDRAWN_PREVIEW : topic.content}
         </p>
 
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 pt-1 text-2xs text-ink-muted">
-          <span className="flex items-center gap-1.5 min-w-0">
+        <div className="flex items-center gap-2 sm:gap-3 pt-1 text-2xs text-ink-muted">
+          <span className="flex flex-1 items-center gap-1.5 min-w-0">
             {topic.userId ? (
               <Link
                 to="/member/$profileId"
@@ -94,11 +94,12 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
               author
             )}
             <RankCrest userId={topic.userId} />
-            <StageBadge stage={topic.authorStage} />
+            <StageBadge stage={topic.authorStage} compact />
+            <LocalTime value={topic.createdAt} format={shortRelativeTime} className="shrink-0 whitespace-nowrap sm:hidden" />
+            <LocalTime value={topic.createdAt} format={relativeTime} className="hidden shrink-0 whitespace-nowrap sm:inline sm:ml-1.5" />
           </span>
-          <LocalTime value={topic.createdAt} format={relativeTime} />
 
-          <span className="ml-auto flex items-center gap-1 tabular-nums">
+          <span className="ml-auto flex shrink-0 items-center gap-1 tabular-nums">
             <span className="relative z-10">
               <VoteButton count={topic.upvotes} voted={topic.voted} targetId={topic.id} targetType="topic" size="inline" authorId={topic.userId} />
             </span>

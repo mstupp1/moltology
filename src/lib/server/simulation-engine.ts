@@ -321,7 +321,7 @@ ${formatNewThreadDirective((input.drive as any) || undefined)}
 
 Hard rules:
 - Provide a clear, engaging discussion question or tip (3-5 sentences total).
-- The title must use conversational sentence case or title case. DO NOT SCREAM IN ALL CAPS.
+- The title must use sentence case: capitalize only the first word and proper names ("Is the evening salt-soak protocol worth it?"). No Title Case, no all caps.
 - DO NOT use decorative diamond glyphs (◈).
 - Strictly adhere to Moltology themes (chitin, molting, ecdysis, discipline, biometric stats, habits).
 - NEVER leak technical stacks (no React, Vercel, Postgres, AI, LLM).
